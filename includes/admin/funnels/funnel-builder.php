@@ -19,7 +19,10 @@ if ( ! isset( $_GET['ID'] ) || ! is_numeric( $_GET['ID'] ) )
 
 $funnel_id = intval( $_GET['ID'] );
 
-include dirname( __FILE__ ) . '/elements/email-step.php';
+foreach ( glob( dirname( __FILE__ ) . "/elements/*.php" ) as $filename )
+{
+    include $filename;
+}
 
 wp_enqueue_script( 'jquery-ui-sortable' );
 
@@ -27,6 +30,41 @@ wp_enqueue_script( 'jquery-ui-sortable' );
 <script type="text/javascript">
     document.body.className = document.body.className.replace('no-js','js');
 </script>
+
+<style>
+    .wpfn-element{
+        display: inline-block;
+        height: 70px;
+        width: 100%;
+        padding-top: 10px;
+        padding-left: 25px;
+        cursor: move;
+    }
+
+    #actions .dashicons,
+    #benchmarks .dashicons{
+        font-size: 60px;
+    }
+
+    #actions table,
+    #benchmarks table{
+        box-sizing: border-box;
+        width: 100%;
+        border-spacing: 7px;
+    }
+
+    #actions table td,
+    #benchmarks table td{
+        text-align: center;
+        border: 1px solid #F1F1F1;
+
+    }
+
+    #actions table td .wpfn-element,
+    #benchmarks table td .wpfn-element{
+        text-align: left;
+    }
+</style>
 
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php echo __('Edit Funnel', 'wp-funnels');?></h1>
@@ -69,6 +107,9 @@ wp_enqueue_script( 'jquery-ui-sortable' );
                                 </tbody>
                             </table>
                             <?php do_action( 'wpfn_benchmark_icons_after' ); ?>
+                            <p>
+                                <?php echo esc_html__( 'Benchmarks start and stop automation actions for a contact.','wp-funnels' ); ?>
+                            </p>
                         </div>
                     </div>
                     <!-- End Benckmark Icons-->
@@ -99,7 +140,12 @@ wp_enqueue_script( 'jquery-ui-sortable' );
                                 </tbody>
                             </table>
                             <?php do_action( 'wpfn_action_icons_after' ); ?>
+
+                            <p>
+                                <?php echo esc_html__( 'Actions are launched whenever a contact completes a benchmark.','wp-funnels' ); ?>
+                            </p>
                         </div>
+
                     </div>
                     <!-- End Action Icons-->
                 </div>
