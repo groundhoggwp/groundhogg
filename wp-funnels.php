@@ -10,13 +10,10 @@ Text Domain: wp-funnels
 Domain Path: /languages
 */
 
-include dirname( __FILE__ ) . '/includes/class-contact.php';
-include dirname( __FILE__ ) . '/includes/contact-db.php';
-include dirname( __FILE__ ) . '/includes/contact-functions.php';
-include dirname( __FILE__ ) . '/includes/email-db.php';
-include dirname( __FILE__ ) . '/includes/email-functions.php';
-include dirname( __FILE__ ) . '/includes/field-functions.php';
-
+foreach ( glob( dirname( __FILE__ ) . "/includes/*.php" ) as $filename )
+{
+    include $filename;
+}
 
 /**
  * Create all the database tables
@@ -30,6 +27,13 @@ function wpfn_activation()
 	wpfn_create_emails_db();
 	wpfn_create_email_meta_db();
 
+	wpfn_create_events_db();
+
+	wpfn_create_funnels_db();
+	wpfn_create_funnel_meta_db();
+
+	wpfn_create_funnelsteps_db();
+	wpfn_create_funnelstep_meta_db();
 }
 
 register_activation_hook( __FILE__, 'wpfn_activation');

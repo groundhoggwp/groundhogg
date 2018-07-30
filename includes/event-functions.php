@@ -41,17 +41,19 @@ function wpfn_do_queued_events()
 	if ( ! $dequeued )
 		return false;
 
+
+    /**
+     * Iterate through the events and perform them
+     *
+     * @var $funnel_id  int The ID of the funnel the event was queued from
+     * @var $step_id    int The ID of the step within the associated funnel
+     * @var $contact_id int The Contact's ID
+     * @var $callback   string a callback function to run when the event is triggered
+     * @var $arg1       mixed  an optional argument to pass to the call back function
+     * @var $arg2       mixed  an optional argument to pass to the call back function
+     */
 	foreach ( $events as $event_args )
 	{
-		/**
-		 * @var $funnel_id  int The ID of the funnel the event was queued from
-		 * @var $step_id    int The ID of the step within the associated funnel
-		 * @var $contact_id int The Contact's ID
-		 * @var $callback   string a callback function to run when the event is triggered
-		 * @var $arg1       mixed  an optional argument to pass to the call back function
-		 * @var $arg2       mixed  an optional argument to pass to the call back function
-		 */
-
 		$funnel_id  = intval( $event_args['funnel_id'] );
 		$step_id    = intval( $event_args['step_id'] );
 		$contact_id = intval( $event_args['contact_id'] );
@@ -63,10 +65,10 @@ function wpfn_do_queued_events()
 		/**
 		 * Run the action specified...
 		 *
-		 * For example: call_user_func( Function: 'wpfn_send_email', Contact Id: 42, Funnel Id: 1, Step Id: 3, Email Id: 30, null, null )
+		 * For example: call_user_func( Function: 'wpfn_send_email', Contact Id: 42, Email Id: 30, null, null )
 		 */
 
-		call_user_func( $callback, $contact_id, $funnel_id, $step_id, $arg1, $arg2, $arg3 );
+		call_user_func( $callback, $contact_id, $arg1, $arg2, $arg3 );
 	}
 
 	return key( $events ) + 1;

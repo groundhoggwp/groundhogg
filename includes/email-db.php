@@ -49,6 +49,20 @@ function wpfn_insert_new_email( $content, $subject, $pre_header, $from_name, $fr
 }
 
 /**
+ * Return a list of emails
+ *
+ * @return array associative list of emails to their respective IDs
+ */
+function wpfn_get_emails()
+{
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . WPFN_EMAILS;
+
+    return $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A );
+}
+
+/**
  * Get an email row via the ID of the email
  *
  * @param int $id Email Id

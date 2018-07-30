@@ -75,12 +75,11 @@ if ( isset( $_POST['add_new_contact_nonce'] ) && wp_verify_nonce( $_POST['add_ne
 				<th><label for="phone_extension"><?php echo __( 'Phone Extension', 'wp-funnels' )?></label></th>
 				<td><?php echo wpfn_admin_text_input_field( 'primary_phone_extension', 'primary_phone_extension', '' );?></td>
 			</tr>
-			<tr>
-				<td><?php submit_button('Add Contact', 'primary', 'add_contact'); ?></td>
-			</tr>
 			</tbody>
 		</table>
 		<?php do_action('wpfn_add_new_contact_form_after'); ?>
+
+        <?php submit_button('Add Contact', 'primary', 'add_contact'); ?>
 	</form>
 </div>
 <?php
