@@ -1,11 +1,11 @@
 <?php
 /**
- * Contacts Table Class
+ * Emails Table Class
  *
- * This class shows the data table for accessing information about a customer.
+ * This class shows the data table for accessing information about an email.
  *
  * @package     wp-funnels
- * @subpackage  Modules/Contacts
+ * @subpackage  Includes/Emails
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.1
@@ -19,29 +19,8 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Contacts_Table extends WP_List_Table {
-	/**
-	 * ***********************************************************************
-	 * Normally we would be querying data from a database and manipulating that
-	 * for use in your list table. For this example, we're going to simplify it
-	 * slightly and create a pre-built array. Think of this as the data that might
-	 * be returned by $wpdb->query()
-	 *
-	 * In a real-world scenario, you would run your own custom query inside
-	 * the prepare_items() method in this class.
-	 *
-	 * @var array
-	 * ************************************************************************
-	 */
-	protected $example_data = array(
-		array(
-			'ID'            => 1,
-			'email'         => 'you@domain.com',
-			'first_name'    => 'you',
-			'last_name'     => 'them',
-			'date_created'          => '2018-04-11 15:37:40',
-		)
-	);
+class WPFN_Emails_Table extends WP_List_Table {
+
 	/**
 	 * TT_Example_List_Table constructor.
 	 *
@@ -51,8 +30,8 @@ class WPFN_Contacts_Table extends WP_List_Table {
 	public function __construct() {
 		// Set parent defaults.
 		parent::__construct( array(
-			'singular' => 'contact',     // Singular name of the listed records.
-			'plural'   => 'contacts',    // Plural name of the listed records.
+			'singular' => 'email',     // Singular name of the listed records.
+			'plural'   => 'emails',    // Plural name of the listed records.
 			'ajax'     => false,       // Does this table support ajax?
 		) );
 	}
@@ -75,9 +54,9 @@ class WPFN_Contacts_Table extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'email'    => _x( 'Email', 'Column label', 'wp-funnels' ),
-			'first_name'   => _x( 'First Name', 'Column label', 'wp-funnels' ),
-			'last_name' => _x( 'Last Name', 'Column label', 'wp-funnels' ),
+			'subject'    => _x( 'Subject', 'Column label', 'wp-funnels' ),
+			'from_name'   => _x( 'From Name', 'Column label', 'wp-funnels' ),
+			'from_email' => _x( 'From Email', 'Column label', 'wp-funnels' ),
 			'date_created' => _x( 'Date Created', 'Column label', 'wp-funnels' ),
 		);
 		return $columns;
@@ -105,9 +84,9 @@ class WPFN_Contacts_Table extends WP_List_Table {
 	 */
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
-			'email'    => array( 'email', false ),
-			'first_name' => array( 'first_name', false ),
-			'last_name' => array( 'last_name', false ),
+			'subject'    => array( 'subject', false ),
+			'from_name' => array( 'from_name', false ),
+			'from_email' => array( 'from_email', false ),
 			'date_created' => array( 'date_created', false )
 		);
 		return $sortable_columns;
@@ -137,8 +116,8 @@ class WPFN_Contacts_Table extends WP_List_Table {
 	 */
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
-			case 'email':
-				$editUrl = admin_url( 'admin.php?page=contacts&ID=' . $item['ID'] );
+			case 'subject':
+				$editUrl = admin_url( 'admin.php?page=emails&ID=' . $item['ID'] );
 				return "<a href='$editUrl'>{$item[ $column_name ]}</a>";
 				break;
 			default:
@@ -183,13 +162,10 @@ class WPFN_Contacts_Table extends WP_List_Table {
 	 */
 	protected function get_bulk_actions() {
 		$actions = array(
-			'delete' => _x( 'Delete', 'List table bulk action', 'wp-funnels' ),
-			'export' => _x( 'Export', 'List table bulk action', 'wp-funnels' ),
-			'apply_tag' => _x( 'Apply Tag', 'List table bulk action', 'wp-funnels'),
-			'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'wp-funnels')
+			'delete' => _x( 'Delete', 'List table bulk action', 'wp-funnels' )
 		);
 
-		return apply_filters( 'wpfn_contact_bulk_actions', $actions );
+		return apply_filters( 'wpfn_email_bulk_actions', $actions );
 	}
 	/**
 	 * Handle bulk actions.
@@ -205,30 +181,12 @@ class WPFN_Contacts_Table extends WP_List_Table {
 		global $wpdb;
 
 		switch ( $this->current_action() ){
-			case 'export':
-				//todo
-				break;
 			case 'delete':
 				//todo
 				break;
-			case 'apply_tag':
-				//todo
-				break;
-			case 'remove_tag':
-				//todo
+			default:
 				break;
 		}
-	}
-
-	protected function get_views() {
-
-		return array(
-			'all' => 'All',
-			'unconfirmed' => 'Unconfirmed',
-			'confirmed' => 'Confirmed',
-			'opted_out' => 'Opted Out'
-		);
-
 	}
 
 	/**
@@ -293,18 +251,18 @@ class WPFN_Contacts_Table extends WP_List_Table {
 		 * For information on making queries in WordPress, see this Codex entry:
 		 * http://codex.wordpress.org/Class_Reference/wpdb
 		 */
-		$table_name = $wpdb->prefix . WPFN_CONTACTS;
+		$table_name = $wpdb->prefix . WPFN_EMAILS;
 
 		if ( isset( $_REQUEST['s'] ) ){
 			$pattern = "%" . $_REQUEST['s'] . "%" ;
 			$data =  $wpdb->get_results(
 				"
-	SELECT ID, email, first_name, last_name, date_created
+	SELECT ID, subject, from_name, from_email, date_created
 	FROM $table_name
-	WHERE email LIKE '$pattern' OR first_name LIKE '$pattern' OR last_name LIKE '$pattern'
+	WHERE content LIKE '$pattern' OR subject LIKE '$pattern' OR from_name LIKE '$pattern' OR from_email LIKE '$pattern'
 	", ARRAY_A );
 		} else {
-			$data = $wpdb->get_results( "SELECT ID, email, first_name, last_name, date_created FROM $table_name ORDER BY date_created DESC", ARRAY_A );
+			$data = $wpdb->get_results( "SELECT ID, subject, from_name, from_email, date_created FROM $table_name ORDER BY date_created DESC", ARRAY_A );
 		}
 
 		/*

@@ -1,12 +1,20 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Adrian
- * Date: 2018-07-23
- * Time: 9:32 AM
+ * Contact Record
+ *
+ * Allow the user to edit the contact details and contact fields
+ *
+ * @package     wp-funnels
+ * @subpackage  Includes/Contacts
+ * @copyright   Copyright (c) 2018, Adrian Tobey
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       0.1
  */
 
-if ( isset( $_GET['id'] ) && is_numeric( $_GET['id'] ) ) {
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+if ( isset( $_GET['ID'] ) && is_numeric( $_GET['ID'] ) ) {
 
 	include dirname( __FILE__ ) . '/contact-record.php';
 
@@ -20,19 +28,17 @@ if ( isset( $_GET['id'] ) && is_numeric( $_GET['id'] ) ) {
 
 	?>
 	<div class="wrap">
-		<form method="post" >
+        <h1 class="wp-heading-inline"><?php echo __('Contacts', 'wp-funnels');?></h1>
+        <form method="post" >
 			<!-- search form -->
-			<h1 class="wp-heading-inline">Contacts</h1>
-			<p><?php wp_nonce_field('', 'formlift_export_nonce' )?><input type="submit" class="button button-primary" name="export_contacts" value="Export Contacts"></p>
-		</form>
-		<form method="post">
+            <?php $contacts_table->views(); ?>
 			<p class="search-box">
 				<label class="screen-reader-text" for="post-search-input">Search Contacts:</label>
 				<input type="search" id="post-search-input" name="s" value="">
 				<input type="submit" id="search-submit" class="button" value="Search Contacts">
 			</p>
-			<?php $contacts_table->prepare_items();
-			$contacts_table->display(); ?>
+			<?php $contacts_table->prepare_items(); ?>
+			<?php $contacts_table->display(); ?>
 		</form>
 	</div>
 <?php

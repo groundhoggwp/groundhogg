@@ -5,7 +5,7 @@
  * Allow the user to edit the contact details and contact fields
  *
  * @package     wp-funnels
- * @subpackage  Modules/Contacts
+ * @subpackage  Includes/Contacts
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.1
@@ -14,11 +14,50 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( ! isset( $_GET['id'] ) || ! is_numeric( $_GET['id'] ) ) {
+if ( ! isset( $_GET['ID'] ) || ! is_numeric( $_GET['ID'] ) )
+{
 	wp_die( __( 'Contact ID not supplied. Please try again', 'wp-funnels' ), __( 'Error', 'wp-funnels' ) );
 }
 
 $contact_id = intval( $_GET['ID'] );
+
+if ( isset( $_POST['update_contact_nonce'] ) && wp_verify_nonce( $_POST['update_contact_nonce'], 'update_contact' ) && current_user_can( 'manage_options' ) )
+{
+	if ( ! isset( $_POST['email'] ) ){
+		?><div class="notice notice-error"><p>An email is required to update the contact.</p></div><?php
+	} else {
+
+	    do_action( 'wpfn_contact_update_before' );
+
+	    $email = sanitize_text_field( $_POST['email'] );
+
+	    wpfn_update_contact_email( $contact_id, $email );
+
+		$first_name = ( isset($_POST['first_name']) )? sanitize_text_field( $_POST['first_name'] ) : '';
+
+		wpfn_update_contact( $contact_id, 'first_name', $first_name );
+
+		$last_name =  ( isset($_POST['last_name']) )? sanitize_text_field( $_POST['last_name'] ): '';
+
+		wpfn_update_contact( $contact_id, 'last_name', $last_name );
+
+		if ( isset( $_POST['meta'] ) && is_array( $_POST['meta'] ) )
+        {
+            foreach ( $_POST['meta'] as $key => $value )
+            {
+                wpfn_update_contact_meta( $contact_id, $key, $value );
+            }
+        }
+
+        do_action( 'wpfn_contact_update_after' );
+
+		wpfn_log_contact_activity( $contact_id, 'User ' . wp_get_current_user()->user_login . ' Updated Contact Via Admin.')
+
+		?><div class="notice notice-success"><p>Successfully updated contact!</p></div><?php
+
+	}
+}
+
 $contact = new WPFN_Contact( $contact_id );
 
 ?>
@@ -37,53 +76,49 @@ $contact = new WPFN_Contact( $contact_id );
 		    $active_tab = $_GET[ 'tab' ];
 	    } else {
 	        $active_tab = 'general';
-        }// end if
+        }
 	    ?>
 
         <h2 class="nav-tab-wrapper">
-            <a href="?ID=<?php echo $contact_id; ?>&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">General</a>
-            <a href="?ID=<?php echo $contact_id; ?>&tab=activity" class="nav-tab <?php echo $active_tab == 'activity' ? 'nav-tab-active' : ''; ?>">Activity</a>
-            <a href="?ID=<?php echo $contact_id; ?>&tab=funnels" class="nav-tab <?php echo $active_tab == 'funnels' ? 'nav-tab-active' : ''; ?>">Funnels</a>
-            <a href="?ID=<?php echo $contact_id; ?>&tab=tags" class="nav-tab <?php echo $active_tab == 'tags' ? 'nav-tab-active' : ''; ?>">Tags</a>
-            <a href="?ID=<?php echo $contact_id; ?>&tab=orders" class="nav-tab <?php echo $active_tab == 'orders' ? 'nav-tab-active' : ''; ?>">Orders</a>
+            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">General</a>
+            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=activity" class="nav-tab <?php echo $active_tab == 'activity' ? 'nav-tab-active' : ''; ?>">Activity</a>
+            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=funnels" class="nav-tab <?php echo $active_tab == 'funnels' ? 'nav-tab-active' : ''; ?>">Funnels</a>
+            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=tags" class="nav-tab <?php echo $active_tab == 'tags' ? 'nav-tab-active' : ''; ?>">Tags</a>
+            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=orders" class="nav-tab <?php echo $active_tab == 'orders' ? 'nav-tab-active' : ''; ?>">Orders</a>
             <?php do_action('wpfn_contact_record_tabs_after', $contact_id ); ?>
         </h2>
 
-        <?php switch ( $active_tab ): ?>
+        <?php switch ( $active_tab ):
 
-        <?php case 'general': ?>
+            case 'general': ?>
 
             <h3><?php echo __( 'General Information', 'wp-funnels' ); ?></h3>
 
             <?php do_action( 'wpfn_contact_record_general_before', $contact_id ); ?>
-
             <table class="form-table">
                 <tbody>
                     <tr>
-                        <td><h3><?php echo __('Basic Information');?></h3></td>
+                        <th><label for="first_name"><?php echo __( 'First Name', 'wp-funnels' )?></label></th>
+                        <td><?php echo wpfn_admin_text_input_field( 'first_name', 'first_name', $contact->getFirst() );?></td>
                     </tr>
                     <tr>
-                        <td><label for="first_name"><?php echo __( 'First Name', 'wp-funnels' )?></label></td>
-                        <td><?php echo wpfn_contact_record_text_input_field( 'first_name', 'first_name', $contact->getFirst() );?></td>
+                        <th><label for="last_name"><?php echo __( 'Last Name', 'wp-funnels' )?></label></th>
+                        <td><?php echo wpfn_admin_text_input_field( 'last_name', 'last_name', $contact->getLast() );?></td>
                     </tr>
                     <tr>
-                        <td><label for="last_name"><?php echo __( 'Last Name', 'wp-funnels' )?></label></td>
-                        <td><?php echo wpfn_contact_record_text_input_field( 'last_name', 'last_name', $contact->getLast() );?></td>
-                    </tr>
-                    <tr>
-                        <td><label for="email"><?php echo __( 'First Name', 'wp-funnels' )?></label></td>
+                        <th><label for="email"><?php echo __( 'Email', 'wp-funnels' )?></label></th>
                         <td>
-                            <?php echo wpfn_contact_record_text_input_field( 'email', 'email', $contact->getEmail() );?>
-                            <?php echo __('Email Status: ', 'wp-funnels') . wpfn_get_optin_status_text( $contact->getOptInStatus() ); ?>
+                            <?php echo wpfn_admin_text_input_field( 'email', 'email', $contact->getEmail() );?>
+                            <p><?php echo '<b>' . __('Email Status', 'wp-funnels') . ': </b>' . wpfn_get_optin_status_text( $contact->getOptInStatus() ); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <td><label for="primary_phone"><?php echo __( 'Primary Phone', 'wp-funnels' )?></label></td>
-                        <td><?php echo wpfn_contact_record_text_input_field( 'primary_phone', 'primary_phone', $contact->getPhone() );?></td>
+                        <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'wp-funnels' )?></label></th>
+                        <td><?php echo wpfn_admin_text_input_field( 'primary_phone', 'meta[primary_phone]', $contact->getPhone() );?></td>
                     </tr>
                     <tr>
-                        <td><label for="phone_extension"><?php echo __( 'Phone Extension', 'wp-funnels' )?></label></td>
-                        <td><?php echo wpfn_contact_record_text_input_field( 'phone_extension', 'phone_extension', $contact->getPhoneExtension() );?></td>
+                        <th><label for="primary_phone_extension"><?php echo __( 'Phone Extension', 'wp-funnels' )?></label></th>
+                        <td><?php echo wpfn_admin_text_input_field( 'primary_phone_extension', 'meta[primary_phone_extension]', $contact->getPhoneExtension() );?></td>
                     </tr>
                 </tbody>
             </table>
@@ -92,9 +127,9 @@ $contact = new WPFN_Contact( $contact_id );
 
             <?php submit_button( 'Save Changes', 'primary' ); ?>
 
-        <?php break; ?>
+            <?php break; ?>
 
-        <?php case 'activity': ?>
+            <?php case 'activity': ?>
 
             <h3><?php echo __( 'Recent Activity', 'wp-funnels' ); ?></h3>
 
@@ -107,12 +142,14 @@ $contact = new WPFN_Contact( $contact_id );
                 </thead>
                 <tbody>
                     <?php $entries = $contact->getParsedActivity(); ?>
-                    <?php foreach ( $entries as $entry ): ?>
+                    <?php if ( $entries ): foreach ( $entries as $entry ): ?>
                     <tr>
+                        <?php if ( isset( $entry[0] ) && isset( $entry[1] ) ): ?>
                         <td><?php echo $entry[0];?></td>
                         <td><?php echo $entry[1];?></td>
+                        <?php endif; ?>
                     </tr>
-                    <?php endforeach; ?>
+                    <?php endforeach; endif;?>
                     <?php if ( empty( $entries ) ):?>
                     <tr>
                         <td colspan="2">
@@ -144,3 +181,5 @@ $contact = new WPFN_Contact( $contact_id );
 
     </form>
 </div>
+
+<?php

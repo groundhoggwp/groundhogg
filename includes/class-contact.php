@@ -5,7 +5,7 @@
  * This class is a readonly format for easily access data of a customer.
  *
  * @package     wp-funnels
- * @subpackage  Includes
+ * @subpackage  Includes/Contacts
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.1
@@ -53,6 +53,11 @@ class WPFN_Contact
 	public $activity;
 
 	/**
+	 * @var int $optin_status the optin status of the contact
+	 */
+	public $optin_status;
+
+	/**
 	 * WPFN_Contact constructor.
 	 *
 	 * @param string|int $email_or_id either the email or the id of the contact to retrieve
@@ -67,13 +72,17 @@ class WPFN_Contact
 			$contact = wpfn_get_contact_by_id( $id );
 		} elseif ( is_string( $email_or_id ) ) {
 			$contact = wpfn_get_contact_by_email( $email_or_id );
+		} else {
+			$contact = wpfn_get_contact_by_id( $email_or_id );
 		}
 
 		$this->ID = intval( $contact['ID'] );
 		$this->email = strtolower( $contact['email'] );
 		$this->first_name = ucfirst( $contact['first_name'] );
 		$this->last_name = ucfirst( $contact['last_name'] );
-		$this->tags = wpfn_get_contact_meta( $this->ID, 'tags' );
+		$this->optin_status = intval( $contact['optin_status'] );
+		$this->tags = wpfn_get_contact_meta( $this->ID, 'tags', true );
+		$this->activity = wpfn_get_contact_meta( $this->ID, 'activity_log', true );
 	}
 
 	/**
@@ -133,7 +142,7 @@ class WPFN_Contact
 	 */
 	function getPhone()
 	{
-		return wpfn_get_contact_meta( $this->ID, 'phone_primary', true );
+		return wpfn_get_contact_meta( $this->ID, 'primary_phone', true );
 	}
 
 	/**
@@ -143,7 +152,7 @@ class WPFN_Contact
 	 */
 	function getPhoneExtension()
 	{
-		return wpfn_get_contact_meta( $this->ID, 'phone_extension', true );
+		return wpfn_get_contact_meta( $this->ID, 'primary_phone_extension', true );
 	}
 
 	/**
@@ -163,7 +172,7 @@ class WPFN_Contact
 	 */
 	function getOptInStatus()
 	{
-		return wpfn_get_contact_meta( $this->ID, 'optin_status', true );
+		return $this->optin_status;
 	}
 
 	/**
@@ -179,10 +188,13 @@ class WPFN_Contact
 	/**
 	 * Get the activity in an array format for easy manipulation.
 	 *
-	 * @return array the activity in an array format
+	 * @return array|false the activity in an array format
 	 */
 	function getParsedActivity()
 	{
+		if ( empty( $this->activity ) )
+			return false;
+
 		$activity = explode( PHP_EOL, $this->activity );
 		$activity = array_map( 'trim', $activity );
 		foreach ( $activity as $i => $entry ){

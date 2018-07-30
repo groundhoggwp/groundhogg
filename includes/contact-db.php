@@ -1,11 +1,11 @@
 <?php
 /**
- * database functions
+ * Contact database functions
  *
  * Functions to manipulate and retrieve data from the database.
  *
  * @package     wp-funnels
- * @subpackage  Modules/Contacts
+ * @subpackage  Includes/Contacts
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.1
@@ -48,8 +48,8 @@ function wpfn_delete_contact_meta($contact_id, $meta_key, $meta_value = '') {
  * @param bool   $single  Whether to return a single value.
  * @return mixed Will be an array if $single is false. Will be value of meta data field if $single is true.
  */
-function wpfn_get_contact_meta($contact_id, $key = '', $single = false) {
-	return get_metadata('contact', $contact_id, $key, $single);
+function wpfn_get_contact_meta( $contact_id, $key = '', $single = true ) {
+	return get_metadata('contact', $contact_id, $key, $single );
 }
 
 /**
@@ -120,18 +120,117 @@ function wpfn_get_contact_by_email( $email )
 
 	$table_name = $wpdb->prefix . WPFN_CONTACTS;
 
-	$sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE ID = %d", $email);
+	$sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE email = %s", $email);
 	$contact = $wpdb->get_row( $sql_prep1, ARRAY_A );
 
 	return $contact;
 }
 
-add_action( 'plugins_loaded', 'wpfn_integrate_wpdb' );
+/**
+ * Insert a new contact into the DB.
+ *
+ * @param $email string Contact's email
+ * @param string $first First name
+ * @param string $last Last Name
+ *
+ * @return false|int the contact ID on success, false on failure.
+ */
+function wpfn_insert_new_contact( $email, $first='', $last='' )
+{
+	global $wpdb;
+
+	if ( ! $email || ! is_string( $email ) )
+		return false;
+
+	$email = stripslashes( strtolower( $email ) );
+	if ( ! $email )
+		return false;
+
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		return false;
+	}
+
+	$success = $wpdb->insert(
+		$wpdb->prefix . WPFN_CONTACTS,
+		array(
+			'email' => $email,
+			'first_name' => $first,
+			'last_name' => $last,
+			'optin_status' => 0,
+			'date_created' => current_time( 'mysql' ),
+		)
+	);
+
+	if ( $success ){
+		return $wpdb->insert_id;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Update information about a contact
+ *
+ * @param $id int Contact ID
+ * @param $key string Column Name
+ * @param $value string New Column Value
+ *
+ * @return false|int contact ID in success, false on failure
+ */
+function wpfn_update_contact( $id, $key, $value )
+{
+	global $wpdb;
+
+	if ( ! $id || ! is_numeric( $id ) )
+		return false;
+
+	$id = absint( $id );
+	if ( ! $id )
+		return false;
+
+	return $wpdb->update(
+		$wpdb->prefix . WPFN_CONTACTS,
+		array(
+			$key => $value
+		),
+		array( 'ID' => $id ),
+		array(
+			'%s'	// value1
+		),
+		array( '%d' )
+	);
+}
+
+/**
+ * Quick function to update contact's email
+ *
+ * @param $id int Contact's ID
+ * @param $email string the contact's email
+ *
+ * @return bool|false ID on success, false on failure
+ */
+function wpfn_update_contact_email( $id, $email )
+{
+	if ( ! $email || ! is_string( $email ) )
+		return false;
+
+	$email = stripslashes( strtolower( $email ) );
+	if ( ! $email )
+		return false;
+
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		return false;
+	}
+
+	return wpfn_update_contact( $id, 'email', $email );
+}
+
+add_action( 'plugins_loaded', 'wpfn_integrate_contacts_wpdb' );
 
 /**
  * add support for the metadata API so I don't have to code it myself.
  */
-function wpfn_integrate_wpdb()
+function wpfn_integrate_contacts_wpdb()
 {
 	global $wpdb;
 
@@ -141,8 +240,8 @@ function wpfn_integrate_wpdb()
 	return;
 }
 
-define( 'WPFN_CONTACTS', 'wpfn_contacts' );
-define( 'WPFN_CONTACTS_DB_VERSION', '0.1' );
+define( 'WPFN_CONTACTS', 'contacts' );
+define( 'WPFN_CONTACTS_DB_VERSION', '0.2' );
 
 function wpfn_create_contacts_db()
 {
@@ -161,6 +260,7 @@ function wpfn_create_contacts_db()
       email tinytext NOT NULL,
       first_name tinytext NOT NULL,
       last_name tinytext NOT NULL,
+      optin_status int NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       PRIMARY KEY  (ID)
     ) $charset_collate;";
@@ -172,8 +272,8 @@ function wpfn_create_contacts_db()
 
 }
 
-define( 'WPFN_CONTACT_META', 'wpfn_contactmeta' );
-define( 'WPFN_CONTACT_META_DB_VERSION', '0.1' );
+define( 'WPFN_CONTACT_META', 'contactmeta' );
+define( 'WPFN_CONTACT_META_DB_VERSION', '0.2' );
 
 function wpfn_create_contact_meta_db()
 {
@@ -194,7 +294,7 @@ function wpfn_create_contact_meta_db()
 		meta_key varchar(255) default NULL,
 		meta_value longtext,
 		PRIMARY KEY  (meta_id),
-		KEY badge (badge_id),
+		KEY contact (contact_id),
 		KEY meta_key (meta_key($max_index_length))
 	) $charset_collate;";
 
