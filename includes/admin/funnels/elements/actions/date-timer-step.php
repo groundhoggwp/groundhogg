@@ -16,14 +16,28 @@ function wpfn_date_timer_funnel_step_html( $step_id )
 
     //todo finish function
 
+    $run_date = wpfn_get_step_meta( $step_id, 'run_date', true );
+    if ( ! $run_date )
+        $run_date = date( 'Y-m-d', strtotime( '+1 day' ) );
+
+    $run_time = wpfn_get_step_meta( $step_id, 'run_time', true );
+    if ( ! $run_time )
+        $run_time = '09:30';
+
     ?>
 
     <table class="form-table">
         <tbody>
-        <tr>
-            <th><?php echo esc_html__( 'Select a date to run the next action', 'wp-funnels' ); ?></th>
-            <td> TODO DATE TIMER HTML</td>
-        </tr>
+            <tr>
+                <th><?php echo esc_html__( 'Wait till:', 'wp-funnels' ); ?></th>
+                <td><input type="date" min="<?php echo date( 'Y-m-d', strtotime( 'now' ) );?>" id="<?php echo wpfn_prefix_step_meta( $step_id, 'run_date' ); ?>" name="<?php echo wpfn_prefix_step_meta( $step_id, 'run_date' ); ?>" value="<?php echo $run_date; ?>"></td>
+            </tr>
+            <tr>
+                <th><?php echo esc_html__( 'And run at:', 'wp-funnels' ); ?></th>
+                <td>
+                    <input type="time" id="<?php echo wpfn_prefix_step_meta( $step_id, 'run_time' ); ?>" name="<?php echo wpfn_prefix_step_meta( $step_id, 'run_time' ); ?>" value="<?php echo $run_time;?>">
+                </td>
+            </tr>
         </tbody>
     </table>
 

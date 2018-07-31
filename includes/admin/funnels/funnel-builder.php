@@ -74,8 +74,7 @@ wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-edito
         cursor: move;
     }
 
-    .wpfn-element.ui-draggable-dragging
-    {
+    .wpfn-element.ui-draggable-dragging {
         font-size: 60px;
         width: 120px;
         height: 120px;
@@ -83,10 +82,15 @@ wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-edito
         border: 1px solid #F1F1F1;
     }
 
-    .funnel-editor .sortable-placeholder
-    {
+    .funnel-editor .sortable-placeholder {
         box-sizing: border-box;
         min-width:100% !important;
+    }
+
+    .funnel-editor .postbox.action {
+        width: 90%;
+        margin-left: auto;
+        margin-right: 0;
     }
 
 </style>
@@ -224,7 +228,7 @@ wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-edito
                             </div>
                         <?php else:
                             foreach ( $steps as $step_id ): ?>
-                                <div id="<?php echo $step_id; ?>" class="postbox">
+                                <div id="<?php echo $step_id; ?>" class="postbox <?php echo wpfn_get_step_group( $step_id ); ?>">
                                     <button type="button" class="handlediv delete-step-<?php echo $step_id;?>">
                                         <span class="dashicons dashicons-trash"></span>
                                         <script>

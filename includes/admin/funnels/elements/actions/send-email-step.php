@@ -31,8 +31,11 @@ function wpfn_send_email_funnel_step_html( $step_id )
     <table class="form-table">
         <tbody>
             <tr>
-                <th><?php echo esc_html__( 'Select an email to send', 'wp-funnels' ); ?></th>
-                <td><?php wpfn_dropdown_emails( $dropdown_args ); ?></td>
+                <th><?php echo esc_html__( 'Select an email to send:', 'wp-funnels' ); ?></th>
+                <td>
+                    <?php wpfn_dropdown_emails( $dropdown_args ); ?>
+                    <p><a target="_blank" href="<?php echo admin_url( 'admin.php?page=emails&ID=' . $previously_selected );?>"><?php echo esc_html__( 'Edit Email', 'wp-funnels' );?></a> | <a target="_blank" href="<?php echo admin_url( 'admin.php?page=add_email' );?>"><?php echo esc_html__( 'Create New Email', 'wp-funnels' );?></a></p>
+                </td>
             </tr>
         </tbody>
     </table>

@@ -30,7 +30,7 @@ function wpfn_email_opened_funnel_step_html( $step_id )
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo esc_html__( 'Select an email to send', 'wp-funnels' ); ?></th>
+            <th><?php echo esc_html__( 'Email being opened:', 'wp-funnels' ); ?></th>
             <td><?php wpfn_dropdown_emails( $dropdown_args ); ?></td>
         </tr>
         </tbody>

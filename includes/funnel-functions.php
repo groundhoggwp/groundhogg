@@ -304,6 +304,22 @@ function wpfn_get_step_type( $step_id )
 }
 
 /**
+ * Get the group of a funnel step, either action or benckmark
+ *
+ * @param $step_id int the ID of the step
+ * @return bool|string the group of the step of false on failure
+ */
+function wpfn_get_step_group( $step_id )
+{
+    $step = wpfn_get_funnel_step_by_id( $step_id );
+
+    if ( ! $step )
+        return false;
+
+    return $step->funnelstep_group;
+}
+
+/**
  * create a new funnel!
  *
  * @return int|false new funnel ID, false on failure
@@ -417,7 +433,7 @@ function wpfn_get_step_html_via_ajax()
     ob_start();
 
     ?>
-    <div id="<?php echo $step_id; ?>" class="postbox">
+    <div id="<?php echo $step_id; ?>" class="postbox <?php echo $step_group; ?>">
         <button type="button" class="handlediv delete-step-<?php echo $step_id;?>">
             <span class="dashicons dashicons-trash"></span>
             <script>
