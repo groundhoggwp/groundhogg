@@ -19,12 +19,14 @@ if ( ! isset( $_GET['ID'] ) || ! is_numeric( $_GET['ID'] ) )
 
 $funnel_id = intval( $_GET['ID'] );
 
-foreach ( glob( dirname( __FILE__ ) . "/elements/*.php" ) as $filename )
+foreach ( glob( dirname( __FILE__ ) . "/elements/*/*.php" ) as $filename )
 {
     include $filename;
 }
 
 wp_enqueue_script( 'jquery-ui-sortable' );
+wp_enqueue_script( 'jquery-ui-draggable' );
+wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
 
 ?>
 <script type="text/javascript">
@@ -32,15 +34,20 @@ wp_enqueue_script( 'jquery-ui-sortable' );
 </script>
 
 <style>
-    .wpfn-element{
+    .wpfn-element div{
+        box-sizing: border-box;
         display: inline-block;
         height: 70px;
         width: 100%;
         padding-top: 10px;
-        padding-left: 25px;
-        cursor: move;
+        /*padding-bottom: 70px;*/
     }
 
+    .hndle label {
+        margin: 0 10px 0 0;
+    }
+
+    .wpfn-element.ui-draggable-dragging .dashicons,
     #actions .dashicons,
     #benchmarks .dashicons{
         font-size: 60px;
@@ -61,9 +68,27 @@ wp_enqueue_script( 'jquery-ui-sortable' );
     }
 
     #actions table td .wpfn-element,
-    #benchmarks table td .wpfn-element{
-        text-align: left;
+    #benchmarks table td .wpfn-element,
+    .wpfn-element p{
+        text-align: center;
+        cursor: move;
     }
+
+    .wpfn-element.ui-draggable-dragging
+    {
+        font-size: 60px;
+        width: 120px;
+        height: 120px;
+        background: #FFFFFF;
+        border: 1px solid #F1F1F1;
+    }
+
+    .funnel-editor .sortable-placeholder
+    {
+        box-sizing: border-box;
+        min-width:100% !important;
+    }
+
 </style>
 
 <div class="wrap">
@@ -80,7 +105,42 @@ wp_enqueue_script( 'jquery-ui-sortable' );
                     </div>
                 </div>
                 <!-- begin elements area -->
-                <div id="postbox-container-1" class="postbox-container">
+                <div id="postbox-container-1" class="postbox-container sticky">
+                    <div id="submitdiv" class="postbox">
+                        <h3 class="hndle"><?php echo __( 'Funnel Status', 'wp-funnels' );?></h3>
+                        <div class="inside">
+                            <div class="submitbox">
+                                <div id="minor-publishing-actions">
+                                    <?php do_action( 'wpfn_funnel_status_before' ); ?>
+                                    <table class="form-table">
+                                        <tbody>
+                                        <tr>
+                                            <th><label for="funnel_status"><?php echo __( 'Status', 'wp-funnels' );?></label></th>
+                                            <td>
+                                                <select id="funnel_status" name="funnel_status">
+                                                    <option value="inactive" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'inactive' ) echo 'selected="selected"'; ?>><?php echo __( 'Inactive', 'wp-funnels' );?></option>
+                                                    <option value="active" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'active' ) echo 'selected="selected"'; ?>><?php echo __( 'Active', 'wp-funnels' );?></option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <?php do_action( 'wpfn_funnel_status_after' ); ?>
+                                </div>
+                                <div id="major-publishing-actions">
+                                    <div id="delete-action">
+                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=funnels' ), 'delete_funnel', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Delete Funnel', 'wp-funnels' ); ?></a>
+                                    </div>
+                                    <div id="publishing-action">
+                                        <span class="spinner"></span>
+                                        <input name="original_publish" type="hidden" id="original_publish" value="Update">
+                                        <input name="save" type="submit" class="button button-primary button-large" id="publish" value="Update">
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Begin Benckmark Icons-->
                     <div id='benchmarks' class="postbox">
                         <h3 class="hndle"><?php echo __( 'Benchmarks', 'wp-funnels' );?></h3>
@@ -96,7 +156,7 @@ wp_enqueue_script( 'jquery-ui-sortable' );
                                         ?><tr><?php
                                     endif;
 
-                                    ?><td><div id='<?php echo $element; ?>' class="wpfn-element"><?php do_action( 'wpfn_benckmark_element_icon_html_' . $element ); ?></div></td><?php
+                                    ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><?php do_action( 'wpfn_benchmark_element_icon_html_' . $element ); ?></div></td><?php
 
                                     if ( $i & 1 ):
                                         ?></tr><?php
@@ -129,7 +189,7 @@ wp_enqueue_script( 'jquery-ui-sortable' );
                                         ?><tr><?php
                                     endif;
 
-                                    ?><td><div id='<?php echo $element; ?>' class="wpfn-element"><?php do_action( 'wpfn_action_element_icon_html_' . $element ); ?></div></td><?php
+                                    ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><?php do_action( 'wpfn_action_element_icon_html_' . $element ); ?></div></td><?php
 
                                     if ( $i & 1 ):
                                         ?></tr><?php
@@ -152,42 +212,37 @@ wp_enqueue_script( 'jquery-ui-sortable' );
                 <!-- End elements area-->
 
                 <!-- main funnel editing area -->
-                <div id="postbox-container-2" class="postbox-container">
-
+                <div id="postbox-container-2" class="postbox-container funnel-editor">
                     <div id="normal-sortables" class="meta-box-sortables ui-sortable">
                         <?php do_action('wpfn_funnel_steps_before' ); ?>
 
                         <?php $steps = wpfn_get_funnel_steps( $funnel_id );
 
-                        foreach ( $steps as $step_id ): ?>
-
-                            <div id="<?php echo $step_id; ?>" class="postbox">
-                                <h2 class="hndle ui-sortable-handle"><?php echo __( wpfn_get_step_hndle( $step_id ), 'wp-funnels' ); ?></h2>
-                                <div class="inside">
-                                    <?php do_action( 'wpfn_step_settings_before' ); ?>
-                                    <?php do_action( 'wpfn_get_step_settings_' . wpfn_get_step_type( $step_id ) ); ?>
-                                    <?php do_action( 'wpfn_step_settings_after' ); ?>
-                                </div>
+                        if ( empty( $steps ) ): ?>
+                            <div class="">
+                                Drag in new steps to build the ultimate sales machine!
                             </div>
-
-                        <?php endforeach;?>
+                        <?php else:
+                            foreach ( $steps as $step_id ): ?>
+                                <div id="<?php echo $step_id; ?>" class="postbox">
+                                    <button type="button" class="handlediv delete-step-<?php echo $step_id;?>">
+                                        <span class="dashicons dashicons-trash"></span>
+                                        <script>
+                                            jQuery(document).ready(function(){jQuery('.delete-step-<?php echo $step_id;?>').click( wpfn_delete_funnel_step )})
+                                        </script>
+                                    </button>
+                                    <h2 class="hndle ui-sortable-handle"><label for="<?php echo $step_id; ?>_title"><span class="dashicons <?php echo esc_attr( wpfn_get_step_dashicon_by_id( $step_id ) ); ?>"></span></label><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'wp-funnels' ); ?>"></h2>
+                                    <div class="inside">
+                                        <?php do_action( 'wpfn_step_settings_before' ); ?>
+                                        <?php do_action( 'wpfn_get_step_settings_' . wpfn_get_step_type( $step_id ), $step_id ); ?>
+                                        <?php do_action( 'wpfn_step_settings_after' ); ?>
+                                    </div>
+                                </div>
+                            <?php endforeach;
+                        endif; ?>
                         <?php do_action('wpfn_funnel_steps_after' ); ?>
                     </div>
                 </div>
-                <script>
-                    jQuery(document).ready( function() {
-                        jQuery( ".ui-sortable" ).sortable(
-                            {
-                                placeholder: "sortable-placeholder",
-                                connectWith: ".ui-sortable",
-                                start: function(e, ui){
-                                    ui.placeholder.height(ui.item.height());
-                                }
-                            }
-                        );
-                        jQuery( ".ui-sortable" ).disableSelection();
-                    });
-                </script>
                 <!-- end main funnel editing area -->
             </div>
         </div>

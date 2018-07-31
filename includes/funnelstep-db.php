@@ -55,6 +55,29 @@ function wpfn_insert_new_funnel_step( $funnel_id, $title, $status, $group, $type
 }
 
 /**
+ * Delete a funnel step
+ *
+ * @param $id int The step ID to delete
+ *
+ * @return false|int the number of rows updated, false on failure
+ */
+function wpfn_delete_funnel_step( $id )
+{
+    global $wpdb;
+
+    if ( ! $id || ! is_numeric( $id ) )
+        return false;
+
+    $id = absint( $id );
+    if ( ! $id )
+        return false;
+
+    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+
+    return $wpdb->delete( $table_name, array( 'ID' => $id ), array( '%d' ) );
+}
+
+/**
  * Get an funnelstep row via the ID of the funnelstep
  *
  * @param int $id Email Id

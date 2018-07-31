@@ -85,7 +85,7 @@ function wpfn_get_funnel_benchmark_icons()
     $benchmarks[] = 'link_clicked';
     $benchmarks[] = 'page_visited';
     $benchmarks[] = 'tag_applied';
-    $benchmarks[] = 'account_created';
+    $benchmarks[] = 'tag_removed';
 
     // WC compatibility
     if ( class_exists( 'WooCommerce' ) ){
@@ -96,12 +96,15 @@ function wpfn_get_funnel_benchmark_icons()
     }
 
     //EDD compatibility
+    //todo verify this is an appropriate check.
     if ( class_exists( 'EDD' ) ){
         $benchmarks[] = 'edd_reached_checkout';
         $benchmarks[] = 'edd_download_added_to_cart';
         $benchmarks[] = 'edd_download_removed_from_cart';
         $benchmarks[] = 'edd_download_purchased';
     }
+
+    $benchmarks[] = 'account_created';
 
     return apply_filters( 'wpfn_funnel_benchmarks', $benchmarks );
 }
@@ -116,13 +119,80 @@ function wpfn_get_funnel_action_icons()
     $actions = array();
 
     $actions[] = 'send_email';
+    $actions[] = 'apply_note';
     $actions[] = 'apply_tag';
     $actions[] = 'remove_tag';
     $actions[] = 'create_user';
     $actions[] = 'delete_user';
-    $actions[] = 'wait';
+    $actions[] = 'date_timer';
+    $actions[] = 'delay_timer';
 
     return apply_filters( 'wpfn_funnel_actions', $actions );
+}
+
+
+/**
+ * Get the relevant dashicon for the step type
+ *
+ * @param $step_type string the step type
+ *
+ * @return string the dashicon class
+ */
+function wpfn_get_step_dashicon_by_step_type( $step_type )
+{
+    $dashicons = array();
+    $dashicons['send_email'] = 'dashicons-email-alt';
+    $dashicons['apply_note'] = 'dashicons-id-alt';
+    $dashicons['apply_tag'] = 'dashicons-tag';
+    $dashicons['remove_tag'] = 'dashicons-tag';
+    $dashicons['create_user'] = 'dashicons-admin-users';
+    $dashicons['delete_user'] = 'dashicons-admin-users';
+    $dashicons['date_timer'] = 'dashicons-calendar';
+    $dashicons['delay_timer'] = 'dashicons-clock';
+
+    $dashicons['form_fill'] = 'dashicons-feedback';
+
+    //todo GF dashicons
+    $dashicons['gf_form_fill'] = '';
+
+    $dashicons['email_opened'] = 'dashicons-email';
+    $dashicons['link_clicked'] = 'dashicons-admin-links';
+    $dashicons['page_visited'] = 'dashicons-welcome-view-site';
+    $dashicons['tag_applied'] = 'dashicons-tag';
+    $dashicons['tag_removed'] = 'dashicons-tag';
+    $dashicons['account_created'] = 'dashicons-admin-users';
+
+    //todo WC dashicons
+    $dashicons['wc_reached_checkout'] = '';
+    $dashicons['wc_product_added_to_cart'] = '';
+    $dashicons['wc_product_removed_from_cart'] = '';
+    $dashicons['wc_product_purchased'] = '';
+
+    //todo EDD dashicons
+    $dashicons['edd_reached_checkout'] = '';
+    $dashicons['edd_download_added_to_cart'] = '';
+    $dashicons['edd_download_removed_from_cart'] = '';
+    $dashicons['edd_download_removed_from_cart'] = '';
+
+    $dashicons = apply_filters( 'wpfn_element_dashicons', $dashicons );
+
+    if ( ! in_array( $step_type, array_keys( $dashicons ) ) )
+        return false;
+
+    return $dashicons[ $step_type ];
+}
+
+/**
+ * Get the dashicon for a cetain step
+ *
+ * @param $step_id int Step ID
+ * @return string the dashicon class
+ */
+function wpfn_get_step_dashicon_by_id( $step_id )
+{
+    $type = wpfn_get_step_type( $step_id );
+
+    return wpfn_get_step_dashicon_by_step_type( $type );
 }
 
 /**
@@ -140,6 +210,23 @@ function wpfn_get_funnel_name( $funnel_id )
         return false;
 
     return $funnel->funnel_title;
+}
+
+/**
+ * Get the status of a funnel
+ *
+ * @param $funnel_id int the ID of the funnel
+ *
+ * @return int|false the Name of the funnel or false if the funnel DNE
+ */
+function wpfn_get_funnel_status( $funnel_id )
+{
+    $funnel = wpfn_get_funnel_by_id( $funnel_id );
+
+    if ( ! $funnel )
+        return false;
+
+    return $funnel->funnel_status;
 }
 
 /**
@@ -263,4 +350,124 @@ function wpfn_add_funnel_step( $funnel_id, $title, $group, $type, $order )
     $order = absint( intval( $order ) );
 
     return wpfn_insert_new_funnel_step( $funnel_id, $title, 'inactive' , $group, $type, $order );
+}
+
+/**
+ * Return whether or not the given element is a benchmark
+ *
+ * @param $element string the element to test
+ *
+ * @return bool, true if is a benchmark, false otherwise
+ */
+function wpfn_is_benchmark( $element )
+{
+    return in_array( $element, wpfn_get_funnel_benchmark_icons() );
+}
+
+/**
+ * Extract the funnel ID from a link, only for use in ADMIN funnel editor.
+ *
+ * @param $link string link from the funnel editor page
+ *
+ * @return int|false the funnel ID, false otherwise
+ */
+function wpfn_url_to_funnel_id( $link )
+{
+
+    $queryString = parse_url( $link, PHP_URL_QUERY );
+
+    $queryArgs = explode( '&', $queryString );
+
+    foreach ( $queryArgs as $args ){
+
+        $subArgs = explode( '=' , $args );
+        if ( $subArgs[0] == 'ID' ){
+            return intval( $subArgs[1] );
+        }
+
+    }
+
+    return false;
+
+}
+
+/**
+ * Return the html of the new step VIA ajax.
+ *
+ * @var $step_type string the typeof step to create
+ * @var $
+ */
+function wpfn_get_step_html_via_ajax()
+{
+    //wp_die( 'made-it-here' );
+
+    $step_type = $_POST['step_type'];
+    $step_order = $_POST['step_order'];
+    $funnel_id = wpfn_url_to_funnel_id( wp_get_referer() );
+
+    $step_group = ( wpfn_is_benchmark( $step_type ) )? 'benchmark' : 'action' ;
+
+    foreach ( glob( dirname( __FILE__ ) . "/admin/funnels/elements/*/*.php" ) as $filename )
+    {
+        include $filename;
+    }
+
+    $step_id = wpfn_add_funnel_step( $funnel_id, 'New Step', $step_group, $step_type, $step_order );
+
+    ob_start();
+
+    ?>
+    <div id="<?php echo $step_id; ?>" class="postbox">
+        <button type="button" class="handlediv delete-step-<?php echo $step_id;?>">
+            <span class="dashicons dashicons-trash"></span>
+            <script>
+                jQuery('.delete-step-<?php echo $step_id;?>').click( wpfn_delete_funnel_step );
+            </script>
+        </button>
+        <h2 class="hndle ui-sortable-handle"><label for="<?php echo $step_id; ?>_title"><span class="dashicons <?php echo esc_attr( wpfn_get_step_dashicon_by_step_type( $step_type ) ); ?>"></span></label><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'wp-funnels' ); ?>"></h2>
+        <div class="inside">
+            <?php do_action( 'wpfn_step_settings_before' ); ?>
+            <?php do_action( 'wpfn_get_step_settings_' . $step_type, $step_id ); ?>
+            <?php do_action( 'wpfn_step_settings_after' ); ?>
+        </div>
+    </div>
+    <?php
+
+    $content = ob_get_contents();
+
+    ob_end_clean();
+
+    wp_die( $content );
+}
+
+add_action( 'wp_ajax_wpfn_get_step_html', 'wpfn_get_step_html_via_ajax' );
+
+/**
+ * Delete the funnel step by it's ID
+ */
+function wpfn_delete_funnel_step_via_ajax()
+{
+    if ( ! isset( $_POST['step_id'] ) )
+        wp_die( 'No Step.' );
+
+    $stepid = absint( intval( $_POST['step_id'] ) );
+
+    wp_die( wpfn_delete_funnel_step( $stepid ) );
+}
+
+add_action( 'wp_ajax_wpfn_delete_funnel_step', 'wpfn_delete_funnel_step_via_ajax' );
+
+/**
+ * pre-fix step setting attrivutes suych and name and id with the ID of the step for easy $_POST sorting.
+ *
+ * @param $step_id int the step ID
+ * @param $atter string the meta attribute
+ *
+ * @return string the prefixed meta attribute.
+ */
+function wpfn_prefix_step_meta( $step_id, $atter )
+{
+
+
+    return $step_id . '_' . $atter;
 }

@@ -21,7 +21,7 @@ function wpfn_apply_tag_funnel_step_html( $step_id )
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo __( 'Select an tag to apply', 'wp-funnels' ); ?></th>
+            <th><?php echo esc_html__( 'Select an tag to apply', 'wp-funnels' ); ?></th>
             <td> TODO APPLY TAG HTML</td>
         </tr>
         </tbody>
@@ -35,7 +35,7 @@ add_action( 'wpfn_get_step_settings_apply_tag', 'wpfn_apply_tag_funnel_step_html
 function wpfn_apply_tag_icon_html()
 {
     ?>
-    <span class="dashicons dashicons-tag"></span><p><?php echo esc_html__( 'Apply A Tag', 'wp-funnels' ) ?></p>
+    <div class="dashicons dashicons-tag"></div><p>Apply Tag</p>
     <?php
 }
 

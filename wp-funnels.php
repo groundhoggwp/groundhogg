@@ -10,6 +10,9 @@ Text Domain: wp-funnels
 Domain Path: /languages
 */
 
+define ( 'WPFN_ASSETS_FOLDER', plugins_url( 'assets', __FILE__ ) );
+define ( 'WPFN_INCLUDES_FOLDER', dirname( __FILE__ ) . '/includes/' );
+
 foreach ( glob( dirname( __FILE__ ) . "/includes/*.php" ) as $filename )
 {
     include $filename;
