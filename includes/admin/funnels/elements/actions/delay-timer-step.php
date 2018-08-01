@@ -66,3 +66,17 @@ function wpfn_delay_timer_icon_html()
 }
 
 add_action( 'wpfn_action_element_icon_html_delay_timer', 'wpfn_delay_timer_icon_html' );
+
+function wpfn_save_delay_timer_step( $step_id )
+{
+    $amount = $_POST[ wpfn_prefix_step_meta( $step_id, 'delay_amount' ) ];
+    wpfn_update_step_meta( $step_id, 'delay_amount', $amount );
+
+    $type = $_POST[ wpfn_prefix_step_meta( $step_id, 'delay_type' ) ];
+    wpfn_update_step_meta( $step_id, 'delay_type', $type );
+
+    $run_time = $_POST[ wpfn_prefix_step_meta( $step_id, 'run_time' ) ];
+    wpfn_update_step_meta( $step_id, 'run_time', $run_time );
+}
+
+add_action( 'wpfn_save_step_delay_timer', 'wpfn_save_delay_timer_step' );

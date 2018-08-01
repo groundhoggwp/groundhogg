@@ -19,6 +19,7 @@ if ( ! isset( $_GET['ID'] ) || ! is_numeric( $_GET['ID'] ) )
 
 $funnel_id = intval( $_GET['ID'] );
 
+
 foreach ( glob( dirname( __FILE__ ) . "/elements/*/*.php" ) as $filename )
 {
     include $filename;
@@ -27,6 +28,8 @@ foreach ( glob( dirname( __FILE__ ) . "/elements/*/*.php" ) as $filename )
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
+
+do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
 ?>
 <script type="text/javascript">
@@ -84,13 +87,26 @@ wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-edito
 
     .funnel-editor .sortable-placeholder {
         box-sizing: border-box;
-        min-width:100% !important;
+        margin-left: auto;
+        margin-right: 0;
     }
 
     .funnel-editor .postbox.action {
         width: 90%;
         margin-left: auto;
         margin-right: 0;
+    }
+
+    .funnel-editor .hndle{
+        background-color: rgba(157, 157, 157, 0.11);
+    }
+
+    .funnel-editor .postbox.action {
+        background-color: rgb(241, 253, 243);
+    }
+
+    .funnel-editor .postbox.benchmark{
+        background-color: rgb(255, 254, 218);
     }
 
 </style>
@@ -104,7 +120,7 @@ wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-edito
                     <div id="titlediv">
                         <div id="titlewrap">
                             <label class="screen-reader-text" id="title-prompt-text" for="title"><?php echo __('Enter Funnel Name Here', 'wp-funnels');?></label>
-                            <input type="text" name="post_title" size="30" value="<?php echo wpfn_get_funnel_name( $funnel_id ); ?>" id="title" spellcheck="true" autocomplete="off">
+                            <input placeholder="<?php echo __('Enter Funnel Name Here', 'wp-funnels');?>" type="text" name="funnel_title" size="30" value="<?php echo wpfn_get_funnel_name( $funnel_id ); ?>" id="title" spellcheck="true" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -227,7 +243,7 @@ wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-edito
                                 Drag in new steps to build the ultimate sales machine!
                             </div>
                         <?php else:
-                            foreach ( $steps as $step_id ): ?>
+                            foreach ( $steps as $i => $step_id ): ?>
                                 <div id="<?php echo $step_id; ?>" class="postbox <?php echo wpfn_get_step_group( $step_id ); ?>">
                                     <button type="button" class="handlediv delete-step-<?php echo $step_id;?>">
                                         <span class="dashicons dashicons-trash"></span>
@@ -237,6 +253,8 @@ wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-edito
                                     </button>
                                     <h2 class="hndle ui-sortable-handle"><label for="<?php echo $step_id; ?>_title"><span class="dashicons <?php echo esc_attr( wpfn_get_step_dashicon_by_id( $step_id ) ); ?>"></span></label><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'wp-funnels' ); ?>"></h2>
                                     <div class="inside">
+                                        <input type="hidden" name="<?php echo wpfn_prefix_step_meta( $step_id, 'order' ); ?>" value="<?php echo $i + 1; ?>" >
+                                        <input type="hidden" name="steps[]" value="<?php echo $step_id; ?>">
                                         <?php do_action( 'wpfn_step_settings_before' ); ?>
                                         <?php do_action( 'wpfn_get_step_settings_' . wpfn_get_step_type( $step_id ), $step_id ); ?>
                                         <?php do_action( 'wpfn_step_settings_after' ); ?>

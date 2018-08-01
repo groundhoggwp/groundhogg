@@ -11,11 +11,16 @@
  * @since       0.1
  */
 
+/**
+ * Output the HTML fpr the email step in the funnel builder
+ *
+ * @param $step_id
+ */
 function wpfn_send_email_funnel_step_html( $step_id )
 {
 
     $email_dropdown_id = $step_id . '_email_id';
-    $email_dropdown_name = $step_id . '_email_name';
+    $email_dropdown_name = $step_id . '_email_id';
 
     $dropdown_args = array();
     $dropdown_args[ 'id' ] = $email_dropdown_id;
@@ -53,3 +58,17 @@ function wpfn_send_email_icon_html()
 }
 
 add_action( 'wpfn_action_element_icon_html_send_email', 'wpfn_send_email_icon_html' );
+
+/**
+ * Save the email type step
+ *
+ * @param $step_id int ID of the step we're saving.
+ */
+function wpfn_save_send_email_step( $step_id )
+{
+    //no need to check the validation as it's already been done buy the main funnel.
+    $email_id = intval( $_POST[ wpfn_prefix_step_meta( $step_id, 'email_id' ) ] );
+    wpfn_update_step_meta( $step_id, 'email_id', $email_id );
+}
+
+add_action( 'wpfn_save_step_send_email', 'wpfn_save_send_email_step' );

@@ -1,15 +1,20 @@
 jQuery(document).ready( function() {
-    jQuery( ".ui-sortable" ).sortable(
+    var funnelSortables = jQuery( ".ui-sortable" ).sortable(
         {
             placeholder: "sortable-placeholder",
             connectWith: ".ui-sortable",
+            axis: 'y',
             start: function(e, ui){
+                ui.helper.css( 'left', ui.item.parent().width() - ui.item.width() );
                 ui.placeholder.height(ui.item.height());
+                ui.placeholder.width(ui.item.width());
+            },
+            stop: function (e, ui) {
+                wpfn_update_funnel_step_order();
             }
-        }
-    );
-    jQuery( ".ui-sortable" ).disableSelection();
-    jQuery( ".ui-draggable" ).draggable({
+        });
+    funnelSortables.disableSelection();
+    var funnelDraggables = jQuery( ".ui-draggable" ).draggable({
         connectToSortable: ".ui-sortable",
         helper: "clone",
         stop: function (){
@@ -32,18 +37,14 @@ jQuery(document).ready( function() {
 
                     var newEl = wrapper.firstChild;
                     jQuery('#normal-sortables').find('.replace-me').replaceWith( html );
-                }
-            });
-        }
-    });
+                }});}});
 });
 
-function wpfn_delete_funnel_step() {
+function wpfn_delete_funnel_step()
+{
     var el = this;
     var id = el.parentNode.id;
-
     var result = confirm("Are you sure you want to delete this step?");
-
     if ( result ){
         var ajaxCall = jQuery.ajax({
             type : "post",
@@ -55,4 +56,14 @@ function wpfn_delete_funnel_step() {
             }
         });
     }
+}
+
+function wpfn_update_funnel_step_order()
+{
+    jQuery( "input[name$='_order']" ).each(
+        function( index ){
+            jQuery( this ).val( index + 1 );
+            //console.log( index);
+        }
+    );
 }

@@ -129,7 +129,7 @@ function wpfn_get_funnel_steps_by_funnel_id( $funnel_id )
             "
          SELECT * FROM $table_name
 		 WHERE funnel_id = %d
-		 ORDER BY funnelstep_order DESC
+		 ORDER BY funnelstep_order ASC
 		",
             $funnel_id
         ), ARRAY_A
@@ -153,6 +153,7 @@ function wpfn_update_funnel_step( $id, $key, $value )
         return false;
 
     $id = absint( $id );
+
     if ( ! $id )
         return false;
 

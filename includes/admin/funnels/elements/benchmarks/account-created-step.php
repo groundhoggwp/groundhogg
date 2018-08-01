@@ -14,15 +14,25 @@
 function wpfn_account_created_funnel_step_html( $step_id )
 {
 
-    //todo finish function
+    $account_role = wpfn_get_step_meta( $step_id, 'role', true );
+
+    $args = array();
+
+    if ( ! $account_role )
+        $account_role = 'subscriber'
 
     ?>
 
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo esc_html__( 'Select a user account level.', 'wp-funnels' ); ?></th>
-            <td>TODO ACCOUNT CREATED HTML</td>
+            <th><?php echo esc_html__( 'Run when the following type of account is created', 'wp-funnels' ); ?></th>
+            <td>
+                <select name="<?php echo wpfn_prefix_step_meta( $step_id, 'role' ); ?>" id="<?php echo wpfn_prefix_step_meta( $step_id, 'role' ); ?>">
+                    <?php wp_dropdown_roles( $account_role ); ?>
+                </select>
+                <script>jQuery(document).ready(function(){jQuery( '#<?php echo wpfn_prefix_step_meta( $step_id, 'role' ); ?>' ).select2()});</script>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -40,3 +50,11 @@ function wpfn_account_created_icon_html()
 }
 
 add_action( 'wpfn_benchmark_element_icon_html_account_created', 'wpfn_account_created_icon_html' );
+
+function wpfn_save_account_created_funnel_step( $step_id )
+{
+    $role = sanitize_text_field( $_POST[ wpfn_prefix_step_meta( $step_id, 'role' ) ] );
+    wpfn_update_step_meta( $step_id, 'role', $role );
+}
+
+add_action( 'wpfn_save_step_account_created', 'wpfn_save_account_created_funnel_step' );

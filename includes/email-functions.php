@@ -151,7 +151,10 @@ function wpfn_dropdown_emails( $args )
         //$output .= walk_email_dropdown_tree( $emails, $r['depth'], $r );
 
         foreach ( $emails as $item ) {
-            $output .= "<option value=\"" . $item['ID'] . "\">" . $item['subject'] . "</option>";
+
+            $selected = ( intval( $item['ID'] ) === intval( $r['selected'] ) )? "selected='selected'" : '' ;
+
+            $output .= "<option value=\"" . $item['ID'] . "\" $selected >" . $item['subject'] . "</option>";
         }
 
         $output .= "</select>\n";

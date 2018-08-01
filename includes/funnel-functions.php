@@ -487,3 +487,53 @@ function wpfn_prefix_step_meta( $step_id, $atter )
 
     return $step_id . '_' . $atter;
 }
+
+/**
+ * Update the funnel and all of the funnel steps.
+ *
+ * @param $funnel_id
+ */
+function wpfn_save_funnel( $funnel_id )
+{
+    //todo user validation...
+    if ( ! isset( $_POST[ 'save' ] ) )
+        return;
+
+    do_action( 'wpfn_save_funnel', $funnel_id );
+
+    $title = sanitize_text_field( $_POST[ 'funnel_title' ] );
+    wpfn_update_funnel( $funnel_id, 'funnel_title', $title );
+
+    $status = sanitize_text_field( $_POST[ 'funnel_status' ] );
+    if ( $status !== 'active' && $status !== 'inactive' )
+        $status = 'inactive';
+
+    wpfn_update_funnel( $funnel_id, 'funnel_status', $status );
+
+    //get all the steps in the funnel.
+    $steps = $_POST['steps'];
+
+    foreach ( $steps as $i => $stepId )
+    {
+        $stepId = intval( $stepId );
+        //quick Order Hack to get the proper order of a step...
+        $order = $i + 1;
+        wpfn_update_funnel_step( $stepId, 'funnelstep_order', $order );
+
+        $title = sanitize_text_field( $_POST[ wpfn_prefix_step_meta( $stepId, 'title' ) ] );
+        wpfn_update_funnel_step( $stepId, 'funnelstep_title', $title );
+
+        $step_type = wpfn_get_step_type( $stepId );
+
+        do_action( 'wpfn_save_step_' . $step_type, $stepId );
+
+    }
+
+    do_action( 'wpfn_save_funnel_after', $funnel_id );
+
+    ?>
+<div class="notice notice-success is-dismissible"><p><?php echo esc_html__( 'Funnel updated!', 'wp-funnels' ); ?></p></div>
+    <?php
+}
+
+add_action( 'wpfn_funnel_editor_before_everything', 'wpfn_save_funnel' );
