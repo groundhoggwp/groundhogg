@@ -109,6 +109,10 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
         background-color: rgb(255, 254, 218);
     }
 
+    select {
+        vertical-align: top;
+    }
+
 </style>
 
 <div class="wrap">
@@ -243,6 +247,13 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                 Drag in new steps to build the ultimate sales machine!
                             </div>
                         <?php else:
+
+                            if ( wpfn_get_step_group( $steps[0] ) !== 'benchmark' ){
+                                ?>
+                                <div class="notice notice-error is-dismissible"><p>Funnels should start with benchmarks, otherwise actions cannot be triggered. Please use a benchmark to trigger automation.</p></div>
+                                <?php
+                            }
+
                             foreach ( $steps as $i => $step_id ): ?>
                                 <div id="<?php echo $step_id; ?>" class="postbox <?php echo wpfn_get_step_group( $step_id ); ?>">
                                     <button type="button" class="handlediv delete-step-<?php echo $step_id;?>">

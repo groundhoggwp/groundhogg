@@ -307,7 +307,7 @@ function wpfn_get_step_type( $step_id )
  * Get the group of a funnel step, either action or benckmark
  *
  * @param $step_id int the ID of the step
- * @return bool|string the group of the step of false on failure
+ * @return bool|string the group of the step or false on failure
  */
 function wpfn_get_step_group( $step_id )
 {
@@ -317,6 +317,99 @@ function wpfn_get_step_group( $step_id )
         return false;
 
     return $step->funnelstep_group;
+}
+
+/**
+ * Get the order of a funnel step, either action or benchmark
+ *
+ * @param $step_id int the ID of the step
+ * @return bool|int the order of the step of false on failure
+ */
+function wpfn_get_step_order( $step_id )
+{
+    $step = wpfn_get_funnel_step_by_id( $step_id );
+
+    if ( ! $step )
+        return false;
+
+    return intval( $step->funnelstep_order );
+}
+
+/**
+ * Get the funnel ID of a funnel step, either action or benchmark
+ *
+ * @param $step_id int the ID of the step
+ * @return bool|int the Id of the funnel or false on failure
+ */
+function wpfn_get_step_funnel( $step_id )
+{
+    $step = wpfn_get_funnel_step_by_id( $step_id );
+
+    if ( ! $step )
+        return false;
+
+    return intval( $step->funnelstep_order );
+}
+
+/**
+ * Get the next action in a funnel, or false if benchmark
+ *
+ * @param $step_id int the ID of the step
+ * @return false|int the Id of the next step, or false if there is not next action or the next step is a benchmark
+ */
+function wpfn_get_next_funnel_action( $step_id )
+{
+    $funnel_id = wpfn_get_step_funnel( $step_id );
+    $step_order = wpfn_get_step_order( $step_id );
+    $step_group = wpfn_get_step_group( $step_id );
+
+    $next_steps = wpfn_get_funnel_steps_by_order( $funnel_id, $step_order );
+
+    if ( ! $next_steps )
+        return false;
+
+    if ( $step_group === 'benchmark' ){
+        foreach ( $next_steps as $step ){
+            if ( $step['funnelstep_group'] === 'action' ){
+                return intval( $step['ID'] );
+            }
+        }
+        return false;
+    } else {
+        if ( $next_steps[0]['funnelstep_group'] === 'benchmark' )
+            return false;
+
+        return intval( $next_steps[0]['ID'] );
+    }
+}
+
+/**
+ * Enqueue the next funnel step in the queue
+ *
+ * @param $last_step_id int the last steps's ID, the current step being run.
+ * @param $contact_id int the contact's ID
+ */
+function wpfn_enqueue_next_funnel_action( $last_step_id, $contact_id )
+{
+    $next_action_id = wpfn_get_next_funnel_action( $last_step_id );
+
+    var_dump( $next_action_id );
+
+
+    if ( ! $next_action_id )
+        return;
+
+    //wp_die( 'Made It Here' );
+
+    $next_action = wpfn_get_funnel_step_by_id( $next_action_id );
+
+    $next_action_type = $next_action->funnelstep_type;
+
+    /**
+     * @var $next_action_id int the step_id of the action
+     * @var $contact_id int the Id of the contact
+     */
+    do_action( 'wpfn_enqueue_next_funnel_action_' . $next_action_type, $next_action_id, $contact_id );
 }
 
 /**

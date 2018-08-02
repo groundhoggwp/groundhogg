@@ -83,6 +83,7 @@ class WPFN_Contact
 		$this->optin_status = intval( $contact['optin_status'] );
 		$this->tags = wpfn_get_contact_meta( $this->ID, 'tags', true );
 		$this->activity = wpfn_get_contact_meta( $this->ID, 'activity_log', true );
+		$this->date_created = $contact['date_created'];
 	}
 
 	/**

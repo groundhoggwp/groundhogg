@@ -23,7 +23,10 @@ function wpfn_do_queued_events()
 	# perform the events
 	# happy days
 
-	$time = strtotime( 'now' );
+    //schedule the action set again.
+    wp_schedule_single_event( time() + 30, 'wpfn_do_queued_events' );
+
+    $time = strtotime( 'now' );
 
 	$events = wpfn_get_queued_events( 0, $time );
 
@@ -68,8 +71,24 @@ function wpfn_do_queued_events()
 		 * For example: call_user_func( Function: 'wpfn_send_email', Contact Id: 42, Email Id: 30, null, null )
 		 */
 
-		call_user_func( $callback, $contact_id, $arg1, $arg2, $arg3 );
+		$step_type = wpfn_get_step_type( $step_id );
+
+		do_action( 'wpfn_do_action_' . $step_type, $step_id, $contact_id );
+
+		if ( $callback ) call_user_func( $callback, $contact_id, $arg1, $arg2, $arg3 );
 	}
 
-	return key( $events ) + 1;
+    return key( $events ) + 1;
 }
+
+add_action( 'wpfn_do_queued_events', 'wpfn_do_queued_events' );
+
+function wpfn_setup_queue_cron_event()
+{
+    if (! wp_next_scheduled ( 'wpfn_do_queued_events' )) {
+        wp_schedule_single_event( time() + 30, 'wpfn_do_queued_events' );
+    }
+}
+
+add_action( 'init', 'wpfn_setup_queue_cron_event' );
+add_action( 'admin_init', 'wpfn_setup_queue_cron_event' );

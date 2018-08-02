@@ -137,6 +137,67 @@ function wpfn_get_funnel_steps_by_funnel_id( $funnel_id )
 }
 
 /**
+ * Get the list of funnel steps following the given order.
+ *
+ * @param $funnel_id int the ID of the funnel
+ * @param $order int the Order of a particular step
+ * @return array|bool|null|object
+ */
+function wpfn_get_funnel_steps_by_order( $funnel_id, $order )
+{
+    global $wpdb;
+
+    if ( ! $funnel_id || ! is_int( $funnel_id) || ! $order || ! is_int( $order )  )
+        return false;
+
+    $funnel_id = absint( $funnel_id );
+    $order = absint( $order );
+
+    if ( ! $funnel_id )
+        return false;
+
+    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+
+    return $wpdb->get_results(
+        $wpdb->prepare(
+            "
+         SELECT * FROM $table_name
+		 WHERE funnel_id = %d AND funnelstep_order > %d
+		 ORDER BY funnelstep_order ASC",
+            $funnel_id, $order
+        ), ARRAY_A
+    );
+}
+
+/**
+ * Get the steps available starting steps for a particular benchmark
+ *
+ * @param $step_type string the type of funnel step
+ *
+ * @return array|false list of funnel steps, false on failure.
+ */
+function wpfn_get_funnel_steps_by_type( $step_type )
+{
+    global $wpdb;
+
+    if ( ! in_array( $step_type, wpfn_get_funnel_benchmark_icons() ) )
+        return false;
+
+    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+
+    return $wpdb->get_results(
+        $wpdb->prepare(
+            "
+         SELECT * FROM $table_name
+		 WHERE funnelstep_type = %s
+		 ORDER BY funnelstep_order ASC
+		",
+            $step_type
+        ), ARRAY_A
+    );
+}
+
+/**
  * Update information about an funnelstep
  *
  * @param $id int Contact ID

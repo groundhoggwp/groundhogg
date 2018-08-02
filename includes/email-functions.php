@@ -1,9 +1,14 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Adrian
- * Date: 2018-07-28
- * Time: 3:09 PM
+ * Emailing Functions
+ *
+ * Anything to do with saving, manipulating, and running email functions in the event queue
+ *
+ * @package     wp-funnels
+ * @subpackage  Includes/Emails
+ * @copyright   Copyright (c) 2018, Adrian Tobey
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       0.1
  */
 
 /**
@@ -75,6 +80,8 @@ function wpfn_send_email( $contact_id, $email_id )
 	if ( ! $contact_id || ! is_int( $contact_id ) || ! $email_id || ! is_int( $email_id )  )
 		return false;
 
+    $logo_url = get_option( 'logo_url', '#' );
+
 	$email = wpfn_get_email_by_id( $email_id );
 
 	$title = get_bloginfo( 'name' );
@@ -84,6 +91,10 @@ function wpfn_send_email( $contact_id, $email_id )
 	$pre_header = wpfn_do_replacements( $contact_id, $email->pre_header );
 
 	$content = apply_filters( 'the_content', wpfn_do_replacements( $contact_id, $email->content ) );
+
+    $email_footer_text = get_option( 'email_footer_text', 'My Company Address & Phone Number' );
+
+    $unsubscribe_link = "<a href='#'>Unsubscribe</a>";
 
 	//merged in email template
 
@@ -104,6 +115,38 @@ function wpfn_send_email( $contact_id, $email_id )
 	return wp_mail( $contact->getEmail() , $subject_line, $email_content, $headers );
 
 }
+
+/**
+ * Queue the email in the event queue. Does Basically it runs immediately but is queued for the sake of semantics.
+ *
+ * @param $step_id int The Id of the step
+ * @param $contact_id int the Contact's ID
+ */
+function wpfn_enqueue_send_email_action( $step_id, $contact_id )
+{
+    $funnel_id = wpfn_get_step_funnel( $step_id );
+    wpfn_enqueue_event( strtotime( 'now' ) + 10, $funnel_id,  $step_id, $contact_id );
+}
+
+add_action( 'wpfn_enqueue_next_funnel_action_send_email', 'wpfn_enqueue_send_email_action' );
+
+/**
+ * Process the email action step sending and then queue up the next action in the funnel.
+ *
+ * @param $step_id int the email step's id
+ * @param $contact_id int The contact's ID
+ */
+function wpfn_do_send_email_action( $step_id, $contact_id )
+{
+    $email_id = wpfn_get_step_meta( $step_id, 'email_id', true );
+
+    wpfn_send_email( $contact_id, $email_id );
+
+    wpfn_enqueue_next_funnel_action( $step_id, $contact_id );
+}
+
+add_action( 'wpfn_do_action_send_email', 'wpfn_do_send_email_action' );
+
 
 /**
  * Get a dropdown of all the available emails

@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( isset( $_GET['ID'] ) && is_numeric( $_GET['ID'] ) ) {
 
-	include dirname( __FILE__ ) . '/contact-record.php';
+	include dirname(__FILE__) . '/contact-record.php';
 
 } else {
 

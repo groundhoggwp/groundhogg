@@ -82,26 +82,26 @@ function wpfn_dequeue_events( $time_from, $time_to )
 }
 
 /**
- * Remove specific events for a contact from the queue.
+ * Remove specific funnel events for a contact from the queue.
+ * Since funnels are linear, we can simply remove any existing funnel events.
+ * There should only be one event per contact per funnel, but we'll delete multiple if necessary
  *
  * @param $contact_id int The contact's ID
  * @param $funnel_id  int The funnel's ID
- * @param $step_id    int The step to dequeue
  *
  * @return int|false The number or events deleted, or false if there were no rows affected.
  */
-function wpfn_dequeue_contact_funnel_events( $contact_id, $funnel_id, $step_id )
+function wpfn_dequeue_contact_funnel_events( $contact_id, $funnel_id )
 {
 	global $wpdb;
 
-	if ( ! $contact_id || ! is_int( $contact_id ) || ! $funnel_id || ! is_int( $funnel_id ) || ! $step_id || ! is_int( $step_id ) )
+	if ( ! $contact_id || ! is_int( $contact_id ) || ! $funnel_id || ! is_int( $funnel_id ) )
 		return false;
 
 	$contact_id = absint( $contact_id );
 	$funnel_id = absint( $funnel_id );
-	$step_id = absint( $step_id );
 
-	if ( ! $contact_id || ! $funnel_id || ! $step_id )
+	if ( ! $contact_id || ! $funnel_id )
 		return false;
 
 	$table_name = $wpdb->prefix . WPFN_EVENTS;
@@ -112,9 +112,8 @@ function wpfn_dequeue_contact_funnel_events( $contact_id, $funnel_id, $step_id )
          DELETE FROM $table_name
 		 WHERE contact_id = %d
 		 AND funnel_id = %d
-		 AND step_id = %d
 		",
-			$contact_id, $funnel_id, $step_id
+			$contact_id, $funnel_id
 		)
 	);
 }
@@ -133,7 +132,7 @@ function wpfn_dequeue_contact_funnel_events( $contact_id, $funnel_id, $step_id )
  *
  * @return int|bool 1 on success, false on failure
  */
-function wpfn_enqueue_event( $time, $funnel_id, $step_id, $contact_id, $callback, $arg1='', $arg2='', $arg3='' )
+function wpfn_enqueue_event( $time, $funnel_id, $step_id, $contact_id, $callback='', $arg1='', $arg2='', $arg3='' )
 {
 	global $wpdb;
 

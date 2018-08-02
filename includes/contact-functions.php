@@ -226,3 +226,28 @@ function wpfn_do_replacements( $contact_id, $content )
 	return $content;
 
 }
+
+/**
+ * Return the contact ID of the current contact, perhaps if they are broswing the site based on a cookie.
+ *
+ * @return WPFN_Contact|false the ID of the contact, false if a contact ID doesn't exist
+ */
+function wpfn_get_the_contact()
+{
+    //todo implement a get the contact function
+    // this will likely return the contact ID based on a cookie, or possibly the URL if in the admin.
+
+    return new WPFN_Contact( 0 ) ;
+}
+
+/**
+ * Return whether a contact is in a funnel or not.
+ *
+ * @param $contact_id int the Contcat's ID
+ * @return bool whether the contact is in a funnel or not
+ */
+function wpfn_contact_is_in_funnel( $contact_id )
+{
+    //todo implement
+    return true;
+}

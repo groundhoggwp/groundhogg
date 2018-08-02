@@ -24,6 +24,11 @@ function wpfn_delay_timer_funnel_step_html( $step_id )
     if ( ! $type )
         $type = 'days';
 
+    $run_when = wpfn_get_step_meta( $step_id, 'run_when', true );
+    if ( ! $run_when )
+        $run_when = 'now';
+
+
     $run_time = wpfn_get_step_meta( $step_id, 'run_time', true );
     if ( ! $run_time )
         $run_time = '09:30';
@@ -36,7 +41,7 @@ function wpfn_delay_timer_funnel_step_html( $step_id )
             <th><?php echo esc_html__( 'Wait at least:', 'wp-funnels' ); ?></th>
             <td>
                 <input type="number" class="input" min="0" maxlength="20" name="<?php echo wpfn_prefix_step_meta( $step_id, 'delay_amount' ); ?>" value="<?php echo esc_html( $amount ); ?>" >
-                <select class="input" name="<?php echo wpfn_prefix_step_meta( $step_id, 'delay_type' ); ?>">
+                <select style="vertical-align: top;" class="input" name="<?php echo wpfn_prefix_step_meta( $step_id, 'delay_type' ); ?>">
                     <option value="minutes" <?php if ( $type == 'minutes' ) echo "selected='selected'" ?> ><?php echo esc_html__( 'Minutes', 'wp-funnels' ); ?></option>
                     <option value="hours" <?php if ( $type == 'hours' ) echo "selected='selected'" ?>  ><?php echo esc_html__( 'Hours', 'wp-funnels' ); ?></option>
                     <option value="days" <?php if ( $type == 'days' ) echo "selected='selected'" ?>  ><?php echo esc_html__( 'Days', 'wp-funnels' ); ?></option>
@@ -45,9 +50,18 @@ function wpfn_delay_timer_funnel_step_html( $step_id )
             </td>
         </tr>
         <tr>
-            <th><?php echo esc_html__( 'And run at:', 'wp-funnels' ); ?></th>
+            <th><?php echo esc_html__( 'And run:', 'wp-funnels' ); ?></th>
             <td>
-                <input type="time" id="<?php echo wpfn_prefix_step_meta( $step_id, 'run_time' ); ?>" name="<?php echo wpfn_prefix_step_meta( $step_id, 'run_time' ); ?>" value="<?php echo $run_time;?>">
+                <select style="vertical-align: top;" id="<?php echo wpfn_prefix_step_meta( $step_id, 'run_when' ); ?>" name="<?php echo wpfn_prefix_step_meta( $step_id, 'run_when' ); ?>">
+                    <option value="now" <?php if ( 'now' === $run_when ) echo "selected='selected'"; ?> ><?php echo esc_html__( 'Immediately', 'wp-funnels' ); ?></option>
+                    <option value="later" <?php if ( 'later' === $run_when ) echo "selected='selected'"; ?> ><?php echo esc_html__( 'At time of day', 'wp-funnels' ); ?></option>
+                </select>
+                <input class="input <?php if ( 'now' === $run_when ) echo "hidden"; ?>" type="time" id="<?php echo wpfn_prefix_step_meta( $step_id, 'run_time' ); ?>" name="<?php echo wpfn_prefix_step_meta( $step_id, 'run_time' ); ?>" value="<?php echo $run_time;?>">
+                <script>
+                    jQuery( "#<?php echo wpfn_prefix_step_meta( $step_id, 'run_when' ); ?>" ).change(function(){
+                        jQuery( "#<?php echo wpfn_prefix_step_meta( $step_id, 'run_time' ); ?>" ).toggleClass( 'hidden' );
+                    });
+                </script>
             </td>
         </tr>
         </tbody>
@@ -74,6 +88,9 @@ function wpfn_save_delay_timer_step( $step_id )
 
     $type = $_POST[ wpfn_prefix_step_meta( $step_id, 'delay_type' ) ];
     wpfn_update_step_meta( $step_id, 'delay_type', $type );
+
+    $run_time = $_POST[ wpfn_prefix_step_meta( $step_id, 'run_when' ) ];
+    wpfn_update_step_meta( $step_id, 'run_when', $run_time );
 
     $run_time = $_POST[ wpfn_prefix_step_meta( $step_id, 'run_time' ) ];
     wpfn_update_step_meta( $step_id, 'run_time', $run_time );
