@@ -80,7 +80,7 @@ function wpfn_send_email( $contact_id, $email_id )
 	if ( ! $contact_id || ! is_int( $contact_id ) || ! $email_id || ! is_int( $email_id )  )
 		return false;
 
-    $logo_url = get_option( 'logo_url', '#' );
+    $logo_url = get_option( 'logo_url', 'https://formlift.net/wp-content/uploads/2018/05/Final-logo3-transparent-lg-200x87.png' );
 
 	$email = wpfn_get_email_by_id( $email_id );
 
@@ -108,12 +108,25 @@ function wpfn_send_email( $contact_id, $email_id )
 
 	$contact = new WPFN_Contact( $contact_id );
 
+	$headers = array();
 	$headers[] = 'From: ' . $email->from_name . ' <' . $email->from_email . '>';
-	$headers[] = 'Reply To: ' . $email->from_email;
+	$headers[] = 'Reply-To: ' . $email->from_email;
 	$headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+	add_filter( 'wp_mail_content_type', 'wpfn_send_html_email' );
 
 	return wp_mail( $contact->getEmail() , $subject_line, $email_content, $headers );
 
+}
+
+/**
+ * Convert to HTML email
+ *
+ * @return string the content type for the email
+ */
+function wpfn_send_html_email()
+{
+    return 'text/html';
 }
 
 /**
@@ -128,7 +141,7 @@ function wpfn_enqueue_send_email_action( $step_id, $contact_id )
     wpfn_enqueue_event( strtotime( 'now' ) + 10, $funnel_id,  $step_id, $contact_id );
 }
 
-add_action( 'wpfn_enqueue_next_funnel_action_send_email', 'wpfn_enqueue_send_email_action' );
+add_action( 'wpfn_enqueue_next_funnel_action_send_email', 'wpfn_enqueue_send_email_action', 10, 2 );
 
 /**
  * Process the email action step sending and then queue up the next action in the funnel.
@@ -139,13 +152,10 @@ add_action( 'wpfn_enqueue_next_funnel_action_send_email', 'wpfn_enqueue_send_ema
 function wpfn_do_send_email_action( $step_id, $contact_id )
 {
     $email_id = wpfn_get_step_meta( $step_id, 'email_id', true );
-
     wpfn_send_email( $contact_id, $email_id );
-
-    wpfn_enqueue_next_funnel_action( $step_id, $contact_id );
 }
 
-add_action( 'wpfn_do_action_send_email', 'wpfn_do_send_email_action' );
+add_action( 'wpfn_do_action_send_email', 'wpfn_do_send_email_action', 10, 2 );
 
 
 /**
@@ -222,4 +232,92 @@ function wpfn_dropdown_emails( $args )
     }
 
     return $html;
+}
+
+/**
+ * Save and update an email
+ *
+ * @param $email_id int, the Email's ID
+ */
+function wpfn_save_email( $email_id )
+{
+    if ( isset( $_POST['edit_email_nonce'] ) && wp_verify_nonce( $_POST['edit_email_nonce'], 'edit_email' ) && current_user_can( 'manage_options' ) ) {
+
+        do_action( 'wpfn_email_update_before', $email_id );
+
+        $from_name =  ( isset( $_POST['from_name'] ) )? sanitize_text_field( $_POST['from_name'] ): '';
+        wpfn_update_email( $email_id, 'from_name', $from_name );
+        $from_email =  ( isset( $_POST['from_email'] ) )? sanitize_email( $_POST['from_email'] ): '';
+        wpfn_update_email( $email_id, 'from_email', $from_email );
+
+        $subject =  ( isset( $_POST['subject'] ) )? sanitize_text_field( $_POST['subject'] ): '';
+        wpfn_update_email( $email_id, 'subject', $subject );
+
+        $pre_header =  ( isset( $_POST['pre_header'] ) )? sanitize_text_field( $_POST['pre_header'] ): '';
+        wpfn_update_email( $email_id, 'pre_header', $pre_header );
+
+        $content =  ( isset( $_POST['content'] ) )? wp_kses_post( stripslashes( $_POST['content'] ) ): '';
+//        $content =  ( isset( $_POST['content'] ) )? wp_kses( stripslashes( $_POST['content'] ), wpfn_emails_allowed_html() ): '';
+        wpfn_update_email( $email_id, 'content', $content );
+
+        do_action( 'wpfn_email_update_after', $email_id );
+
+        ?><div class="notice notice-success is-dismissible"><p>Successfully updated email!</p></div><?php
+    }
+}
+
+add_action( 'wpfn_email_editor_before_everything', 'wpfn_save_email' );
+
+/**
+ * Send a test email
+ *
+ * @param $email_id int the ID pf the email
+ */
+function wpfn_send_test_email( $email_id )
+{
+    if ( isset( $_POST['test_email'] ) ){
+
+        do_action( 'wpfn_before_send_test_email', $email_id );
+
+        //todo proper implementation of test email
+        wpfn_send_email( 5, $email_id );
+
+        do_action( 'wpfn_after_send_test_email', $email_id );
+
+        ?><div class="notice notice-success is-dismissible"><p>Successfully sent test email!</p></div><?php
+    }
+}
+
+add_action( 'wpfn_email_update_after', 'wpfn_send_test_email' );
+
+
+/**
+ * Add utm parameters and contact args to the end of all email links
+ *
+ * @param $string
+ * @return string
+ */
+function wpfn_suffix_emails( $string )
+{
+    $regex = '#(<a href=")([^"]*)("[^>]*?>)#i';
+
+    return preg_replace_callback( $regex, 'wpfn_email_suffix_callback', $string );
+}
+
+/**
+ *
+ * @param $match
+ * @return string
+ */
+function wpfn_email_suffix_callback( $match )
+{
+    $url = $match[2];
+
+    if (strpos($url, '?') === false) {
+        $url .= '?';
+    }
+
+    $url .= '&utm_source=email&utm_medium=email&utm_campaign=product_notify&contact_key=';
+
+    return $match[1].$url.$match[3];
 }

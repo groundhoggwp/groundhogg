@@ -1,7 +1,11 @@
 <?php
-
+/**
+ * Created by PhpStorm.
+ * User: adria
+ * Date: 2018-07-18
+ * Time: 2:00 PM
+ */
 ?>
-
 <!doctype html>
 <html>
 <head>
@@ -141,5 +145,3 @@
 </table>
 </body>
 </html>
-
-<?php

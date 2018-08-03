@@ -348,7 +348,7 @@ function wpfn_get_step_funnel( $step_id )
     if ( ! $step )
         return false;
 
-    return intval( $step->funnelstep_order );
+    return intval( $step->funnel_id );
 }
 
 /**
@@ -364,6 +364,8 @@ function wpfn_get_next_funnel_action( $step_id )
     $step_group = wpfn_get_step_group( $step_id );
 
     $next_steps = wpfn_get_funnel_steps_by_order( $funnel_id, $step_order );
+
+    //var_dump( $next_steps );
 
     if ( ! $next_steps )
         return false;
@@ -388,18 +390,15 @@ function wpfn_get_next_funnel_action( $step_id )
  *
  * @param $last_step_id int the last steps's ID, the current step being run.
  * @param $contact_id int the contact's ID
+ *
+ * @return int|false the ID of the next action to run, false on failure.
  */
 function wpfn_enqueue_next_funnel_action( $last_step_id, $contact_id )
 {
     $next_action_id = wpfn_get_next_funnel_action( $last_step_id );
 
-    var_dump( $next_action_id );
-
-
     if ( ! $next_action_id )
-        return;
-
-    //wp_die( 'Made It Here' );
+        return false;
 
     $next_action = wpfn_get_funnel_step_by_id( $next_action_id );
 
@@ -410,6 +409,8 @@ function wpfn_enqueue_next_funnel_action( $last_step_id, $contact_id )
      * @var $contact_id int the Id of the contact
      */
     do_action( 'wpfn_enqueue_next_funnel_action_' . $next_action_type, $next_action_id, $contact_id );
+
+    return $next_action_id;
 }
 
 /**
@@ -576,8 +577,6 @@ add_action( 'wp_ajax_wpfn_delete_funnel_step', 'wpfn_delete_funnel_step_via_ajax
  */
 function wpfn_prefix_step_meta( $step_id, $atter )
 {
-
-
     return $step_id . '_' . $atter;
 }
 

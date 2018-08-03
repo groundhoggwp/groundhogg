@@ -14,7 +14,7 @@
 /**
  * Get events in between the times given
  *
- * @param $time_from int the time to start searching from
+ * @param $time_from int the time to start searching from, can be 0
  * @param $time_to   int the time to end searching
  *
  * @return array|false List of events on success, false on failure
@@ -23,13 +23,13 @@ function wpfn_get_queued_events( $time_from, $time_to )
 {
 	global $wpdb;
 
-	if ( ! $time_from || ! is_int( $time_from) || ! $time_to || ! is_int( $time_to ) )
+	if ( ! $time_from || ! is_int( $time_from ) )
 		return false;
 
 	$time_from = absint( $time_from );
 	$time_to = absint( $time_to );
 
-	if ( ! $time_from || ! $time_to )
+	if ( ! $time_to )
 		return false;
 
 	$table_name = $wpdb->prefix . WPFN_EVENTS;
@@ -37,9 +37,9 @@ function wpfn_get_queued_events( $time_from, $time_to )
 	return $wpdb->get_results(
 		$wpdb->prepare(
 			"
-         SELECT FROM $table_name
-		 WHERE time >= %d
-		 AND time <= %d
+         SELECT * FROM $table_name
+		 WHERE %d <= time 
+		 AND time <= %d 
 		",
 			$time_from, $time_to
 		), ARRAY_A

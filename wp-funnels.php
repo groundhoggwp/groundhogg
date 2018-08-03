@@ -37,6 +37,8 @@ function wpfn_activation()
 
 	wpfn_create_funnelsteps_db();
 	wpfn_create_funnelstep_meta_db();
+
+    wpfn_setup_queue_cron_event();
 }
 
 register_activation_hook( __FILE__, 'wpfn_activation');

@@ -31,8 +31,6 @@ function wpfn_complete_benchmark( $benchmark_id, $contact_id )
     wpfn_enqueue_next_funnel_action( $benchmark_id, $contact_id );
 
     do_action( 'wpfn_complete_benchmark_after', $benchmark_id );
-
-    ?><div class="notice notice-success"><p>Completed Benchmark</p></div><?php
 }
 
 /**
@@ -82,6 +80,9 @@ add_action( 'user_register', 'wpfn_run_account_created_benchmark_action' );
  */
 function wpfn_complete_page_view_benchmark( $post_object )
 {
+    if ( is_admin() )
+        return;
+
     $contact = wpfn_get_the_contact();
 
     if ( ! $contact )
@@ -90,6 +91,9 @@ function wpfn_complete_page_view_benchmark( $post_object )
     $contact_id = $contact->getId();
 
     $benchmarks = wpfn_get_funnel_steps_by_type( 'page_view' );
+
+    if ( ! $benchmarks )
+        return;
 
     foreach ( $benchmarks as $benchmark ) {
 

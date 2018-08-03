@@ -141,7 +141,7 @@ function wpfn_get_funnel_steps_by_funnel_id( $funnel_id )
  *
  * @param $funnel_id int the ID of the funnel
  * @param $order int the Order of a particular step
- * @return array|bool|null|object
+ * @return array|false list of steps, false on error
  */
 function wpfn_get_funnel_steps_by_order( $funnel_id, $order )
 {

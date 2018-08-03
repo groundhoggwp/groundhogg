@@ -24,26 +24,30 @@ function wpfn_do_queued_events()
 	# happy days
 
     //schedule the action set again.
-    wp_schedule_single_event( time() + 30, 'wpfn_do_queued_events' );
+    //wp_schedule_single_event( time() + 30, 'wpfn_do_queued_events' );
 
     $time = strtotime( 'now' );
 
-	$events = wpfn_get_queued_events( 0, $time );
+    // Get any events that should have already been run.
+	$events = wpfn_get_queued_events( 1, $time );
 
-	/**
+	//var_dump( $events );
+
+    /**
 	 * Obviously don't run if their are no events to perform
 	 */
-	if ( empty( $events ) )
-		return false;
+    if ( empty( $events ) )
+        return false;
 
-	$dequeued = wpfn_dequeue_events( 0, $time );
+    $dequeued = wpfn_dequeue_events( 1, $time );
 
-	/**
+    /**
 	 * Don't run if the events were not dequeued to avoid running them again
 	 */
-	if ( ! $dequeued )
-		return false;
+    if ( ! $dequeued )
+        return false;
 
+    //wp_die( 'Made It Here' );
 
     /**
      * Iterate through the events and perform them
@@ -55,40 +59,37 @@ function wpfn_do_queued_events()
      * @var $arg1       mixed  an optional argument to pass to the call back function
      * @var $arg2       mixed  an optional argument to pass to the call back function
      */
-	foreach ( $events as $event_args )
-	{
-		$funnel_id  = intval( $event_args['funnel_id'] );
-		$step_id    = intval( $event_args['step_id'] );
-		$contact_id = intval( $event_args['contact_id'] );
-		$callback   = $event_args['callback'];
-		$arg1       = maybe_unserialize( $event_args['arg1'] );
-		$arg2       = maybe_unserialize( $event_args['arg2'] );
-		$arg3       = maybe_unserialize( $event_args['arg3'] );
+    foreach ( $events as $event_args )
+    {
+        $funnel_id  = intval( $event_args['funnel_id'] );
+        $step_id    = intval( $event_args['step_id'] );
+        $contact_id = intval( $event_args['contact_id'] );
+        $callback   = $event_args['callback'];
+        $arg1       = maybe_unserialize( $event_args['arg1'] );
+        $arg2       = maybe_unserialize( $event_args['arg2'] );
+        $arg3       = maybe_unserialize( $event_args['arg3'] );
 
-		/**
-		 * Run the action specified...
-		 *
-		 * For example: call_user_func( Function: 'wpfn_send_email', Contact Id: 42, Email Id: 30, null, null )
-		 */
+        $step_type = wpfn_get_step_type( $step_id );
 
-		$step_type = wpfn_get_step_type( $step_id );
+        do_action( 'wpfn_do_action_' . $step_type, $step_id, $contact_id );
 
-		do_action( 'wpfn_do_action_' . $step_type, $step_id, $contact_id );
+        if ( $callback )
+            call_user_func( $callback, $contact_id, $arg1, $arg2, $arg3 );
 
-		if ( $callback ) call_user_func( $callback, $contact_id, $arg1, $arg2, $arg3 );
-	}
+        $next_step_id = wpfn_enqueue_next_funnel_action( $step_id, $contact_id );
+    }
 
     return key( $events ) + 1;
 }
 
 add_action( 'wpfn_do_queued_events', 'wpfn_do_queued_events' );
+add_action( 'init', 'wpfn_do_queued_events' );
+add_action( 'admin_init', 'wpfn_do_queued_events' );
 
 function wpfn_setup_queue_cron_event()
 {
-    if (! wp_next_scheduled ( 'wpfn_do_queued_events' )) {
-        wp_schedule_single_event( time() + 30, 'wpfn_do_queued_events' );
-    }
+    wp_schedule_single_event( time() + 30, 'wpfn_do_queued_events' );
 }
 
-add_action( 'init', 'wpfn_setup_queue_cron_event' );
-add_action( 'admin_init', 'wpfn_setup_queue_cron_event' );
+//add_action( 'init', 'wpfn_setup_queue_cron_event' );
+//add_action( 'admin_init', 'wpfn_setup_queue_cron_event' );

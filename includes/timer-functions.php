@@ -38,7 +38,7 @@ function wpfn_enqueue_delay_timer_action( $step_id, $contact_id )
     wpfn_enqueue_event( strtotime( $time_string ), $funnel_id, $step_id, $contact_id );
 }
 
-add_action( 'wpfn_enqueue_next_funnel_action_delay_timer', 'wpfn_enqueue_delay_timer_action' );
+add_action( 'wpfn_enqueue_next_funnel_action_delay_timer', 'wpfn_enqueue_delay_timer_action', 10, 2 );
 
 /**
  * Translate the date timer settings into a timestamp and enqueue the action so it runs eventually.
@@ -58,20 +58,19 @@ function wpfn_enqueue_date_timer_action( $step_id, $contact_id )
     wpfn_enqueue_event( strtotime( $time_string ), $funnel_id, $step_id, $contact_id );
 }
 
-add_action( 'wpfn_enqueue_next_funnel_action_date_timer', 'wpfn_enqueue_date_timer_action' );
+add_action( 'wpfn_enqueue_next_funnel_action_date_timer', 'wpfn_enqueue_date_timer_action', 10, 2 );
 
 /**
- * run the timer events, we use this function for both the date timer and the
- * delay timer as there is no reason to use different ones since they do the same this.
- * The only thing that actually happens is that the timer enqueus the next event, well, because thats what timers do.
+ * run the timer events, we use this function for both the date timer and the delay timer.
  *
  * @param $step_id int the timer's step ID
  * @param $contact_id int the Contact's ID
  */
 function wpfn_run_timer_event_function( $step_id, $contact_id )
 {
-    wpfn_enqueue_next_funnel_action( $step_id, $contact_id );
+    //todo
+    //does nothing for now, will probably log some form of reporting...
 }
 
-add_action( 'wpfn_do_action_delay_timer', 'wpfn_run_timer_event_function' );
-add_action( 'wpfn_do_action_date_timer', 'wpfn_run_timer_event_function' );
+add_action( 'wpfn_do_action_delay_timer', 'wpfn_run_timer_event_function', 10, 2 );
+add_action( 'wpfn_do_action_date_timer', 'wpfn_run_timer_event_function', 10, 2 );
