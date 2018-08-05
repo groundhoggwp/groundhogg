@@ -30,7 +30,7 @@ function wpfn_get_email_html_blocks()
 function wpfn_email_text_block()
 {
     ?>
-    <p contenteditable="true"><?php echo esc_html__( 'Customize this section by editing the text, adding your own copy, using the options above to bold, italicize, or create links and bullets, or use the options in the "Design" panel on the left to change the font styles of your email.', 'wp-funnels' );?></p>
+    <div class="content" contenteditable="true"><p style="font-size: 16px; font-family: Arial, sans-serif;"><?php echo esc_html__( 'Customize this section by editing the text, adding your own copy, using the options above to bold, italicize, or create links and bullets, or use the options in the "Design" panel on the left to change the font styles of your email.', 'wp-funnels' );?></p></div>
     <?php
 }
 
@@ -39,7 +39,7 @@ add_action( 'wpfn_email_block_html_text_block', 'wpfn_email_text_block' );
 function wpfn_email_spacer_block()
 {
     ?>
-    <div style="margin: 5px 0 5px 0"></div>
+    <div class="spacer" style="margin: 5px 0 5px 0; height: 15px;"></div>
     <?php
 }
 
@@ -58,7 +58,7 @@ function wpfn_email_image_block()
 {
     $src = 'https://via.placeholder.com/350x150';
     ?>
-    <div class="image-wrapper" style="text-align: center"><img src="<?php echo $src;?>" style="max-width: 100%;width: 50%;"></div>
+    <div class="image-wrapper" style="text-align: center"><a href=""><img src="<?php echo $src;?>" style="max-width: 100%;width: 50%;" title="" alt=""></a></div>
     <?php
 }
 
@@ -68,18 +68,12 @@ function wpfn_email_button_block()
 {
     ?>
     <!--Button-->
-    <table align="center" cellspacing="0" cellpadding="0" width="100%">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
-            <td align="center" style="padding: 10px;">
-                <table border="0" class="mobile-button" cellspacing="0" cellpadding="0">
+            <td>
+                <table border="0" cellspacing="0" cellpadding="0" style="margin-right: auto;margin-left: auto;">
                     <tr>
-                        <td align="center" bgcolor="#2b3138" style="background-color: #2b3138; margin: auto; max-width: 600px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; padding: 15px 20px; " width="100%">
-                            <!--[if mso]>&nbsp;<![endif]-->
-                            <a class="prevent-default" href="#" target="_blank" style="16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; text-align:center; background-color: #2b3138; text-decoration: none; border: none; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; display: inline-block;">
-                                <span contenteditable="true" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; line-height:1.5em; text-align:center;">Click Here</span>
-                            </a>
-                            <!--[if mso]>&nbsp;<![endif]-->
-                        </td>
+                        <td class="email-button" bgcolor="#EB7035" style="padding: 12px 18px 12px 18px; border-radius:3px" align="center"><a contenteditable="true" href="http://litmus.com" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; font-weight: normal; color: #ffffff; text-decoration: none; display: inline-block;">I am a button &rarr;</a></td>
                     </tr>
                 </table>
             </td>
@@ -94,16 +88,15 @@ add_action( 'wpfn_email_block_html_button_block', 'wpfn_email_button_block' );
 function wpfn_get_email_block( $type )
 {
     ?>
-    <div class="email-row">
-        <div class="row-content">
-            <div class="content-wrapper <?php echo $type; ?>">
-                <div class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span> | <span class="dashicons dashicons-move handle"></span> | <span class="dashicons dashicons-trash"></span></div></div>
-                <div class="content-inside">
-                    <?php do_action( 'wpfn_email_block_html_' . $type ); ?>
-                </div>
+    <div class="row">
+        <div class="content-wrapper <?php echo $type; ?>">
+            <wpfn-toolbar class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span> | <span class="dashicons dashicons-move handle"></span> | <span class="dashicons dashicons-trash"></span></div></wpfn-toolbar>
+            <div class="content-inside" style="padding: 10px;">
+                <?php do_action( 'wpfn_email_block_html_' . $type ); ?>
             </div>
         </div>
     </div>
+
     <?php
 }
 

@@ -90,7 +90,7 @@ function wpfn_send_email( $contact_id, $email_id )
 
 	$pre_header = wpfn_do_replacements( $contact_id, $email->pre_header );
 
-	$content = apply_filters( 'the_content', wpfn_do_replacements( $contact_id, $email->content ) );
+	$content = apply_filters( 'wpfn_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
 
     $email_footer_text = get_option( 'email_footer_text', 'My Company Address & Phone Number' );
 
@@ -128,6 +128,21 @@ function wpfn_send_html_email()
 {
     return 'text/html';
 }
+
+/**
+ * Remove the editing toolbar from the email content so it doesn't show up in the client's email.
+ *
+ * @param $content string the email content
+ *
+ * @return string the new email content.
+ */
+function wpfn_remove_builder_toolbar( $content )
+{
+    return preg_replace( '/<wpfn-toolbar\b[^>]*>(.*?)<\/wpfn-toolbar>/', '', $content );
+}
+
+add_filter( 'wpfn_email_content', 'wpfn_remove_builder_toolbar' );
+
 
 /**
  * Queue the email in the event queue. Does Basically it runs immediately but is queued for the sake of semantics.
@@ -256,7 +271,7 @@ function wpfn_save_email( $email_id )
         $pre_header =  ( isset( $_POST['pre_header'] ) )? sanitize_text_field( $_POST['pre_header'] ): '';
         wpfn_update_email( $email_id, 'pre_header', $pre_header );
 
-        $content =  ( isset( $_POST['content'] ) )? wp_kses_post( stripslashes( $_POST['content'] ) ): '';
+        $content =  ( isset( $_POST['content'] ) )? trim( stripslashes( $_POST['content'] ) ): '';
 //        $content =  ( isset( $_POST['content'] ) )? wp_kses( stripslashes( $_POST['content'] ), wpfn_emails_allowed_html() ): '';
         wpfn_update_email( $email_id, 'content', $content );
 

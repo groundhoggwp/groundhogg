@@ -24,9 +24,13 @@ if ( isset( $_GET['notice'] ) && $_GET['notice'] == 'success' ){
 
 $email_id = intval( $_GET['ID'] );
 
+wp_enqueue_media();
+wp_enqueue_style( 'wp-color-picker' );
+//wp_enqueue_script( 'wpfn-color', WPFN_ASSETS_FOLDER . '/js/admin/color-picker.js' , array( 'wp-color-picker' ), false, true );
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/email-editor.js' );
+wp_enqueue_script('media-picker', WPFN_ASSETS_FOLDER . '/js/admin/media-picker.js' );
 
 do_action( 'wpfn_email_editor_before_everything', $email_id );
 
@@ -95,26 +99,19 @@ $email = wpfn_get_email_by_id( $email_id );
         vertical-align: top;
     }
 
-    #email-content {
-        width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-        box-sizing: border-box;
-        background-color: #FFFFFF;
-        margin-top: 50px;
-    }
-
+    #email-content {margin-left: auto;margin-right: auto;box-sizing: border-box;background-color: #FFFFFF;margin-top: 50px;}
     #email-body{width: 100%;min-height: 20px;padding: 10px;}
     #editor-actions{border-right: 1px solid rgb(238, 238, 238);min-height: 50px;}
     #editor-actions .postbox{border: none; box-shadow: none;}
     .content-inside p {padding: 10px;margin:0;}
     .content-wrapper{border: 2px solid transparent;}
+    .active .content-wrapper{ border: 2px solid #35afe6 !important;}
+    .active .content-wrapper .action-icons{ background-color: #35afe6 !important;}
+    .ui-sortable-helper .action-icons,.content-wrapper:hover .action-icons{display: block;width:100px;margin-top:-30px;margin-right:-2px;float: right;background-color: #EAEAEA;text-align: center;vertical-align: center;}
     .ui-sortable-helper .content-wrapper,.content-wrapper:hover{border: 2px dashed #EAEAEA;background-color: #FFF;}
     [contenteditable]:focus {outline: 0px solid transparent;}
     .sortable-placeholder{border-width: 2px;}
     .action-icons {display: none;}
-    .ui-sortable-helper .action-icons,
-    .content-wrapper:hover .action-icons{display: block;width:100px;margin-top:-30px;margin-right:-2px;float: right;background-color: #EAEAEA;text-align: center;vertical-align: center;}
 </style>
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php echo __('Edit Email', 'wp-funnels');?></h1>
@@ -144,179 +141,123 @@ $email = wpfn_get_email_by_id( $email_id );
                         </div>
                     </div>
                     <div id="email-content" class="postbox">
-                        <h3 class="hndle">Email Editor</h3>
+                        <h3 class="hndle"><?php _e( 'Email Editor'); ?></h3>
                         <div style="display: flex;">
                             <div id="editor-actions" style="display: inline-block;width: 255px;margin-right: 10px;">
-                                <div class="postbox">
-                                    <h3 class="hndle">Styling</h3>
+                                <div id="text_block-editor" class="postbox">
+                                    <h3 class="hndle"><?php _e( 'Text'); ?></h3>
                                     <div class="inside">
-                                        <div id="text_block-editor">
+                                        <div class="options">
                                             <table class="form-table">
                                                 <tr>
-                                                    <th>H1 Size:</th>
+                                                    <th><?php _e( 'H1 Size'); ?>:</th>
                                                     <td><input class="input" type="number" id="h1-size" min="10" max="40" value=""></td>
                                                 </tr>
                                                 <tr>
-                                                    <th>H1 Font:</th>
-                                                    <td>
-                                                        <select name="h1-font" id="h1-font">
-                                                            <option value="Arial, sans-serif">Arial</option>
-                                                            <option value="Arial Black, Arial, sans-serif">Arial Black</option>
-                                                            <option value="Century Gothic, Times, serif">Century Gothic</option>
-                                                            <option value="Courier, monospace">Courier</option>
-                                                            <option value="Courier New, monospace">Courier New</option>
-                                                            <option value="Geneva, Tahoma, Verdana, sans-serif">Geneva</option>
-                                                            <option value="Georgia, Times, Times New Roman, serif">Georgia</option>
-                                                            <option value="Helvetica, Arial, sans-serif">Helvetica</option>
-                                                            <option value="Lucida, Geneva, Verdana, sans-serif">Lucida</option>
-                                                            <option value="Tahoma, Verdana, sans-serif">Tahoma</option>
-                                                            <option value="Times, Times New Roman, Baskerville, Georgia, serif">Times</option>
-                                                            <option value="Times New Roman, Times, Georgia, serif">Times New Roman</option>
-                                                            <option value="Verdana, Geneva, sans-serif">Verdana</option>
-                                                        </select>
-                                                    </td>
+                                                    <th><?php _e( 'H1 Font'); ?>:</th>
+                                                    <td><?php wpfn_font_select( 'h1-font', 'h1-font' ); ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <th>H2 Size:</th>
+                                                    <th><?php _e( 'H2 Size'); ?>:</th>
                                                     <td><input class="input" type="number" id="h2-size" min="10" max="40" value=""></td>
                                                 </tr>
                                                 <tr>
-                                                    <th>H2 Font:</th>
-                                                    <td><select name="h2-font" id="h2-font">
-                                                            <option value="Arial, sans-serif">Arial</option>
-                                                            <option value="Arial Black, Arial, sans-serif">Arial Black</option>
-                                                            <option value="Century Gothic, Times, serif">Century Gothic</option>
-                                                            <option value="Courier, monospace">Courier</option>
-                                                            <option value="Courier New, monospace">Courier New</option>
-                                                            <option value="Geneva, Tahoma, Verdana, sans-serif">Geneva</option>
-                                                            <option value="Georgia, Times, Times New Roman, serif">Georgia</option>
-                                                            <option value="Helvetica, Arial, sans-serif">Helvetica</option>
-                                                            <option value="Lucida, Geneva, Verdana, sans-serif">Lucida</option>
-                                                            <option value="Tahoma, Verdana, sans-serif">Tahoma</option>
-                                                            <option value="Times, Times New Roman, Baskerville, Georgia, serif">Times</option>
-                                                            <option value="Times New Roman, Times, Georgia, serif">Times New Roman</option>
-                                                            <option value="Verdana, Geneva, sans-serif">Verdana</option>
-                                                        </select></td>
+                                                    <th><?php _e( 'H2 Font'); ?>:</th>
+                                                    <td><?php wpfn_font_select( 'h2-font', 'h2-font' ); ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <th>Paragraph Size:</th>
+                                                    <th><?php _e( 'Paragraph Size'); ?>:</th>
                                                     <td><input class="input" type="number" id="p-size" min="10" max="40" value=""></td>
-                                                    <script>jQuery( '#p-size' ).on( 'change' , function () {
-                                                            jQuery( '#email-body p' ).css( 'font-size', jQuery(this).val() + 'px' );
-                                                        });</script>
                                                 </tr>
                                                 <tr>
-                                                    <th>Paragraph Font:</th>
-                                                    <td><select name="p-font" id="p-font">
-                                                            <option value="Arial, sans-serif">Arial</option>
-                                                            <option value="Arial Black, Arial, sans-serif">Arial Black</option>
-                                                            <option value="Century Gothic, Times, serif">Century Gothic</option>
-                                                            <option value="Courier, monospace">Courier</option>
-                                                            <option value="Courier New, monospace">Courier New</option>
-                                                            <option value="Geneva, Tahoma, Verdana, sans-serif">Geneva</option>
-                                                            <option value="Georgia, Times, Times New Roman, serif">Georgia</option>
-                                                            <option value="Helvetica, Arial, sans-serif">Helvetica</option>
-                                                            <option value="Lucida, Geneva, Verdana, sans-serif">Lucida</option>
-                                                            <option value="Tahoma, Verdana, sans-serif">Tahoma</option>
-                                                            <option value="Times, Times New Roman, Baskerville, Georgia, serif">Times</option>
-                                                            <option value="Times New Roman, Times, Georgia, serif">Times New Roman</option>
-                                                            <option value="Verdana, Geneva, sans-serif">Verdana</option>
-                                                        </select></td>
-                                                    <script>jQuery( '#p-font' ).on( 'change' , function () {
-                                                            jQuery( '#email-body p' ).css( 'font-family', jQuery(this).val() + 'px' );
-                                                        });</script>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <div id="button_block-editor">
-                                            <table class="form-table">
-                                                <tr>
-                                                    <th>Font Size:</th>
-                                                    <td><input class="input" type="number" id="button-font-size" min="10" max="40" value=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>H1 Font:</th>
-                                                    <td>
-                                                        <select name="h1-font" id="h1-font">
-                                                            <option value="Arial, sans-serif">Arial</option>
-                                                            <option value="Arial Black, Arial, sans-serif">Arial Black</option>
-                                                            <option value="Century Gothic, Times, serif">Century Gothic</option>
-                                                            <option value="Courier, monospace">Courier</option>
-                                                            <option value="Courier New, monospace">Courier New</option>
-                                                            <option value="Geneva, Tahoma, Verdana, sans-serif">Geneva</option>
-                                                            <option value="Georgia, Times, Times New Roman, serif">Georgia</option>
-                                                            <option value="Helvetica, Arial, sans-serif">Helvetica</option>
-                                                            <option value="Lucida, Geneva, Verdana, sans-serif">Lucida</option>
-                                                            <option value="Tahoma, Verdana, sans-serif">Tahoma</option>
-                                                            <option value="Times, Times New Roman, Baskerville, Georgia, serif">Times</option>
-                                                            <option value="Times New Roman, Times, Georgia, serif">Times New Roman</option>
-                                                            <option value="Verdana, Geneva, sans-serif">Verdana</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>H2 Size:</th>
-                                                    <td><input class="input" type="number" id="h2-size" min="10" max="40" value=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>H2 Font:</th>
-                                                    <td><select name="h2-font" id="h2-font">
-                                                            <option value="Arial, sans-serif">Arial</option>
-                                                            <option value="Arial Black, Arial, sans-serif">Arial Black</option>
-                                                            <option value="Century Gothic, Times, serif">Century Gothic</option>
-                                                            <option value="Courier, monospace">Courier</option>
-                                                            <option value="Courier New, monospace">Courier New</option>
-                                                            <option value="Geneva, Tahoma, Verdana, sans-serif">Geneva</option>
-                                                            <option value="Georgia, Times, Times New Roman, serif">Georgia</option>
-                                                            <option value="Helvetica, Arial, sans-serif">Helvetica</option>
-                                                            <option value="Lucida, Geneva, Verdana, sans-serif">Lucida</option>
-                                                            <option value="Tahoma, Verdana, sans-serif">Tahoma</option>
-                                                            <option value="Times, Times New Roman, Baskerville, Georgia, serif">Times</option>
-                                                            <option value="Times New Roman, Times, Georgia, serif">Times New Roman</option>
-                                                            <option value="Verdana, Geneva, sans-serif">Verdana</option>
-                                                        </select></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Paragraph Size:</th>
-                                                    <td><input class="input" type="number" id="p-size" min="10" max="40" value=""></td>
-                                                    <script>jQuery( '#p-size' ).on( 'change' , function () {
-                                                            jQuery( '#email-body p' ).css( 'font-size', jQuery(this).val() + 'px' );
-                                                        });</script>
-                                                </tr>
-                                                <tr>
-                                                    <th>Paragraph Font:</th>
-                                                    <td><select name="p-font" id="p-font">
-                                                            <option value="Arial, sans-serif">Arial</option>
-                                                            <option value="Arial Black, Arial, sans-serif">Arial Black</option>
-                                                            <option value="Century Gothic, Times, serif">Century Gothic</option>
-                                                            <option value="Courier, monospace">Courier</option>
-                                                            <option value="Courier New, monospace">Courier New</option>
-                                                            <option value="Geneva, Tahoma, Verdana, sans-serif">Geneva</option>
-                                                            <option value="Georgia, Times, Times New Roman, serif">Georgia</option>
-                                                            <option value="Helvetica, Arial, sans-serif">Helvetica</option>
-                                                            <option value="Lucida, Geneva, Verdana, sans-serif">Lucida</option>
-                                                            <option value="Tahoma, Verdana, sans-serif">Tahoma</option>
-                                                            <option value="Times, Times New Roman, Baskerville, Georgia, serif">Times</option>
-                                                            <option value="Times New Roman, Times, Georgia, serif">Times New Roman</option>
-                                                            <option value="Verdana, Geneva, sans-serif">Verdana</option>
-                                                        </select></td>
-                                                    <script>jQuery( '#p-font' ).on( 'change' , function () {
-                                                            jQuery( '#email-body p' ).css( 'font-family', jQuery(this).val() + 'px' );
-                                                        });</script>
+                                                    <th><?php _e( 'Paragraph Font'); ?>:</th>
+                                                    <td><?php wpfn_font_select( 'p-font', 'p-font' ); ?></td>
                                                 </tr>
                                             </table>
                                         </div>
                                     </div>
                                 </div>
-                                <div id="spacer_block-editor"></div>
+                                <div id="button_block-editor" class="postbox hidden">
+                                    <h3 class="hndle"><?php _e( 'Button'); ?></h3>
+                                    <div class="inside">
+                                        <div class="options">
+                                            <table class="form-table">
+                                                <tr>
+                                                    <th><?php _e( 'Text Size'); ?>:</th>
+                                                    <td><input class="input" type="number" id="button-size" min="10" max="40" value=""></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><?php _e( 'Button Font'); ?>:</th>
+                                                    <td><?php wpfn_font_select( 'button-font', 'button-font' ); ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><?php _e( 'Button Color'); ?>:</th>
+                                                    <td><?php wpfn_color_select( 'button-color', 'button-color', '#dd9933' ); ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><?php _e( 'Text Color'); ?>:</th>
+                                                    <td><?php wpfn_color_select( 'button-text-color', 'button-text-color', '#FFFFFF' ); ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><?php _e( 'Button Link'); ?>:</th>
+                                                    <td><input type="url" id="button-link" name="button-link" value=""></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="spacer_block-editor" class="postbox hidden">
+                                    <h3 class="hndle"><?php _e( 'Spacer'); ?></h3>
+                                    <div class="inside">
+                                        <div class="options">
+                                            <table class="form-table">
+                                                <tr>
+                                                    <th><?php _e( 'Spacer Height'); ?>:</th>
+                                                    <td><input class="input" type="number" id="spacer-size" min="10" max="40" value=""></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div id="divider_block-editor"></div>
-                                <div id="image_block-editor"></div>
+                                <div id="image_block-editor" class="postbox hidden">
+                                    <h3 class="hndle"><?php _e( 'Image'); ?></h3>
+                                    <div class="inside">
+                                        <div class="options">
+                                            <table class="form-table">
+                                                <tr>
+                                                    <th><?php _e( 'Image'); ?>:</th>
+                                                    <td>
+                                                        <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Upload Image' ); ?>" />
+                                                        <input type='hidden' name='image-src' id='image-src'>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th><?php _e( 'Image Width'); ?></th>
+                                                    <td><input class="input" type="number" id="image-width" name="image-width" min="0" max="100"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><?php _e( 'Alt Text'); ?></th>
+                                                    <td><input class="input" type="text" id="image-alt" name="image-alt"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><?php _e( 'Image title'); ?></th>
+                                                    <td><input class="input" type="text" id="image-title" name="image-title"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><?php _e( 'Image Link'); ?></th>
+                                                    <td><input type="url" id="image-link" name="image-link" value=""></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div id="button_block-editor"></div>
                                 <div id="social_block-editor"></div>
                                 <div id="video_block-editor"></div>
                             </div>
-                            <div id="email-body" class="main-email-body" style="display: inline-block;width: 650px;vertical-align: top">
-                                <div class="ui-sortable">
+                            <div id="email-body" class="main-email-body" style="display: inline-block;max-width: 650px;vertical-align: top">
+                                <div id="email-inside" class="email-sortable">
                                     <?php if ( empty( $email->content ) ): ?>
                                         <?php wpfn_get_email_block( 'image_block' ); ?>
                                         <?php wpfn_get_email_block( 'text_block' ); ?>
@@ -331,8 +272,9 @@ $email = wpfn_get_email_by_id( $email_id );
                             </div>
                         </div>
                     </div>
-
-                    <?php // wp_editor( $email->content, 'content',  array( 'textarea_name' => 'content' ) ); ?>
+                    <div class="hidden">
+                        <textarea id="content" name="content"><?php echo $email->content; ?></textarea>
+                    </div>
                 </div>
                 <!-- begin elements area -->
                 <div id="postbox-container-1" class="postbox-container sticky">
@@ -363,7 +305,8 @@ $email = wpfn_get_email_by_id( $email_id );
                                     </div>
                                     <div id="publishing-action">
                                         <span class="spinner"></span>
-                                        <?php submit_button('Update Email', 'primary', 'update_email', false ); ?>                                    </div>
+                                        <?php submit_button('Update Email', 'primary', 'update_email', false ); ?>
+                                    </div>
                                     <div class="clear"></div>
                                 </div>
                             </div>
@@ -377,20 +320,20 @@ $email = wpfn_get_email_by_id( $email_id );
                             <table>
                                 <tbody>
                                 <tr>
-                                    <td><div id='text_block' class="wpfn-element ui-draggable"><div class="dashicons dashicons-text"></div><p>Text</p></div></td>
-                                    <td><div id='spacer_block' class="wpfn-element ui-draggable"><div class="dashicons dashicons-image-flip-vertical"></div><p>Spacer</p></div></td>
+                                    <td><div id='text_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-text"></div><p>Text</p></div></td>
+                                    <td><div id='spacer_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-image-flip-vertical"></div><p>Spacer</p></div></td>
                                 </tr>
                                 <tr>
-                                    <td><div id='divider_block' class="wpfn-element ui-draggable"><div class="dashicons dashicons-minus"></div><p>Divider</p></div></td>
-                                    <td><div id='image_block' class="wpfn-element ui-draggable"><div class="dashicons dashicons-format-image"></div><p>Image</p></div></td>
+                                    <td><div id='divider_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-minus"></div><p>Divider</p></div></td>
+                                    <td><div id='image_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-format-image"></div><p>Image</p></div></td>
                                 </tr>
                                 <tr>
-                                    <td><div id='button_block' class="wpfn-element ui-draggable"><div class="dashicons dashicons-id-alt"></div><p>Button</p></div></td>
-                                    <td><div id='social_block' class="wpfn-element ui-draggable"><div class="dashicons dashicons-networking"></div><p>Social</p></div></td>
+                                    <td><div id='button_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-id-alt"></div><p>Button</p></div></td>
+                                    <td><div id='social_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-networking"></div><p>Social</p></div></td>
                                 </tr>
                                 <tr>
-                                    <td><div id='video_block' class="wpfn-element ui-draggable"><div class="dashicons dashicons-video-alt3"></div><p>Video</p></div></td>
-                                    <td><div id='code_block' class="wpfn-element ui-draggable"><div class="dashicons dashicons-editor-code"></div><p>HTML</p></div></td>
+                                    <td><div id='video_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-video-alt3"></div><p>Video</p></div></td>
+                                    <td><div id='code_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-editor-code"></div><p>HTML</p></div></td>
                                 </tr>
                                 </tbody>
                             </table>

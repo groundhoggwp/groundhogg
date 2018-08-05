@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( isset( $_GET['ID'] ) && is_numeric( $_GET['ID'] ) ) {
 
-	include dirname(__FILE__) . '/email-editor-old.php';
+	include dirname(__FILE__) . '/email-editor.php';
 
 } else {
 
