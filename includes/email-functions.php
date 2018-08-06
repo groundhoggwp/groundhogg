@@ -80,7 +80,6 @@ function wpfn_send_email( $contact_id, $email_id )
 	if ( ! $contact_id || ! is_int( $contact_id ) || ! $email_id || ! is_int( $email_id )  )
 		return false;
 
-    $logo_url = get_option( 'logo_url', 'https://formlift.net/wp-content/uploads/2018/05/Final-logo3-transparent-lg-200x87.png' );
 
 	$email = wpfn_get_email_by_id( $email_id );
 
@@ -90,7 +89,7 @@ function wpfn_send_email( $contact_id, $email_id )
 
 	$pre_header = wpfn_do_replacements( $contact_id, $email->pre_header );
 
-	$content = apply_filters( 'wpfn_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
+	$content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
 
     $email_footer_text = get_option( 'email_footer_text', 'My Company Address & Phone Number' );
 
@@ -108,9 +107,11 @@ function wpfn_send_email( $contact_id, $email_id )
 
 	$contact = new WPFN_Contact( $contact_id );
 
+	$from_user = get_userdata( wpfn_get_email_meta( $email_id, 'from_user', true ) );
+
 	$headers = array();
-	$headers[] = 'From: ' . $email->from_name . ' <' . $email->from_email . '>';
-	$headers[] = 'Reply-To: ' . $email->from_email;
+	$headers[] = 'From: ' . $from_user->display_name . ' <' . $from_user->user_email . '>';
+	$headers[] = 'Reply-To: ' . $from_user->user_email;
 	$headers[] = 'Content-Type: text/html; charset=UTF-8';
 
 	add_filter( 'wp_mail_content_type', 'wpfn_send_html_email' );
@@ -141,7 +142,7 @@ function wpfn_remove_builder_toolbar( $content )
     return preg_replace( '/<wpfn-toolbar\b[^>]*>(.*?)<\/wpfn-toolbar>/', '', $content );
 }
 
-add_filter( 'wpfn_email_content', 'wpfn_remove_builder_toolbar' );
+add_filter( 'wpfn_the_email_content', 'wpfn_remove_builder_toolbar' );
 
 
 /**
@@ -265,6 +266,9 @@ function wpfn_save_email( $email_id )
         $from_email =  ( isset( $_POST['from_email'] ) )? sanitize_email( $_POST['from_email'] ): '';
         wpfn_update_email( $email_id, 'from_email', $from_email );
 
+        $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): '';
+        wpfn_update_email_meta( $email_id, 'from_user', $from_user );
+
         $subject =  ( isset( $_POST['subject'] ) )? sanitize_text_field( $_POST['subject'] ): '';
         wpfn_update_email( $email_id, 'subject', $subject );
 
@@ -294,8 +298,10 @@ function wpfn_send_test_email( $email_id )
 
         do_action( 'wpfn_before_send_test_email', $email_id );
 
-        //todo proper implementation of test email
-        wpfn_send_email( 5, $email_id );
+        $test_email_uid =  ( isset( $_POST['test_email'] ) )? intval( $_POST['test_email'] ): '';
+        wpfn_update_email_meta( $email_id, 'test_email', $test_email_uid );
+
+        wpfn_send_email( $test_email_uid, $email_id );
 
         do_action( 'wpfn_after_send_test_email', $email_id );
 
@@ -309,7 +315,7 @@ add_action( 'wpfn_email_update_after', 'wpfn_send_test_email' );
 /**
  * Add utm parameters and contact args to the end of all email links
  *
- * @param $string
+ * @param $string string
  * @return string
  */
 function wpfn_suffix_emails( $string )
@@ -320,8 +326,9 @@ function wpfn_suffix_emails( $string )
 }
 
 /**
+ * This is to add the relevant query args to the end of an email link back to the site.
  *
- * @param $match
+ * @param $match string
  * @return string
  */
 function wpfn_email_suffix_callback( $match )

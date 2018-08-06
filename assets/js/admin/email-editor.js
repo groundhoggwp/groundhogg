@@ -1,4 +1,4 @@
-jQuery(document).ready( function() {
+jQuery(function($) {
     var emailSortables = jQuery( ".email-sortable" ).sortable(
         {
             placeholder: "sortable-placeholder",
@@ -38,140 +38,204 @@ jQuery(document).ready( function() {
         }
     });
 
+    var $sticky = $('.editor-actions-inner');
+    $sticky.css( 'height', 'auto' );
+    $sticky.css( 'width', $sticky.parent().width() );
+    // var $stickyrStopper = $('#sidebar-stop');
+    if (!!$sticky.offset()) { // make sure ".sticky" element exists
+
+        var generalSidebarHeight = $sticky.innerHeight();
+        var stickyTop = $sticky.offset().top;
+        var stickOffset = 32;
+        // var stickyStopperPosition = $stickyrStopper.offset().top;
+        // var stopPoint = stickyStopperPosition - generalSidebarHeight - stickOffset;
+        // var diff = stopPoint + stickOffset;
+
+        $(window).scroll(function(){ // scroll event
+            var windowTop = $(window).scrollTop(); // returns number
+
+            // if (stopPoint < windowTop) {
+            //     $sticky.css({ position: 'absolute', top: diff });
+            // } else if (stickyTop < windowTop+stickOffset) {
+            if (stickyTop < windowTop+stickOffset) {
+                $sticky.css({ position: 'fixed', top: stickOffset });
+            } else {
+                $sticky.css({position: 'absolute', top: 'initial'});
+            }
+        });
+
+    }
 });
 
-jQuery(function() {
+var WPFNEmailEditor = {};
 
-    var content = jQuery( '#email-body' );
-    var inside = jQuery( '#email-inside' );
-    var contentTextArea = jQuery( '#content' );
-    var form = jQuery('form');
-    form.on('submit', function(e){
-        e.preventDefault();
-        contentTextArea.val( inside.html() );
-        jQuery(this).unbind('submit').submit();
-    });
+WPFNEmailEditor.init = function () {
+    this.content = jQuery( '#email-body' );
+    this.actions = jQuery( '#editor-actions' );
+    this.contentInside = jQuery( '#email-inside' );
+    this.textarea = jQuery( '#content' );
+    this.form = jQuery('form');
+    this.form.on('submit', WPFNEmailEditor.switchContent );
+};
 
-    var editor = jQuery( '#editor-actions' );
+WPFNEmailEditor.switchContent = function( e ){
+    e.preventDefault();
+    WPFNEmailEditor.textarea.val( WPFNEmailEditor.contentInside.html() );
+    WPFNEmailEditor.form.unbind( 'submit' ).submit();
+};
 
-    var pFontSize = jQuery( '#p-size' );
-    pFontSize.on( 'change', function( ){
-        content.find('.active').find('p').css('font-size', pFontSize.val() + 'px' );
-    });
+WPFNEmailEditor.getActive = function () {
+  return this.content.find( '.active' );
+};
 
-    var pFontFamily = jQuery( '#p-font' );
-    pFontFamily.on( 'change', function( ){
-        content.find('.active').find('p').css('font-family', pFontFamily.val() );
-    });
+WPFNEmailEditor.hideActions = function (){
+  this.actions.find( '.postbox' ).addClass( 'hidden' );
+};
 
-    var buttonFontSize = jQuery( '#button-size' );
-    buttonFontSize.on( 'change', function( ){
-        content.find('.active').find('a').css('font-size', buttonFontSize.val() + 'px' );
-    });
+// paragraphs
+WPFNEmailEditor.pFont = jQuery( '#p-font' );
+WPFNEmailEditor.pFont.on( 'change', function( ){WPFNEmailEditor.getActive().find('p').css('font-family', WPFNEmailEditor.pFont.val() );});
+WPFNEmailEditor.pFont.update = function () { WPFNEmailEditor.pFont.val( WPFNEmailEditor.getActive().find('p').css( 'font-family' ).replace(/"/g, '') );};
 
-    var buttonFontFamily = jQuery( '#button-font' );
-    buttonFontFamily.on( 'change', function( ){
-        content.find('.active').find('a').css('font-family', buttonFontFamily.val() );
-    });
+WPFNEmailEditor.pSize = jQuery( '#p-size' );
+WPFNEmailEditor.pSize.on( 'change', function(){WPFNEmailEditor.getActive().find('p').css('font-size', WPFNEmailEditor.pSize.val() + 'px' );});
+WPFNEmailEditor.pSize.update = function () {WPFNEmailEditor.pSize.val( WPFNEmailEditor.getActive().find('p').css( 'font-size' ).replace('px', '') );};
 
-    var buttonColor = jQuery( '#button-color' );
-    buttonColor.wpColorPicker({
-        change: function (event, ui) {
-            content.find('.active').find('.email-button').attr('bgcolor', buttonColor.val() );
-        }
-    });
+//buttons
+WPFNEmailEditor.buttonSize = jQuery( '#button-size' );
+WPFNEmailEditor.buttonSize.on( 'change', function(){WPFNEmailEditor.getActive().find('a').css('font-size', WPFNEmailEditor.buttonSize.val() + 'px' );});
+WPFNEmailEditor.buttonSize.update = function () { WPFNEmailEditor.buttonSize.val( WPFNEmailEditor.getActive().find('a').css( 'font-size' ).replace('px', '') );};
 
-    var buttonTextColor = jQuery( '#button-text-color' );
-    buttonTextColor.wpColorPicker({
-        change: function (event, ui) {
-            content.find('.active').find('a').css('color', buttonTextColor.val() );
-        }
-    });
+WPFNEmailEditor.buttonFont = jQuery( '#button-font' );
+WPFNEmailEditor.buttonFont.on( 'change', function( ){WPFNEmailEditor.getActive().find('a').css('font-family', WPFNEmailEditor.buttonFont.val() );});
+WPFNEmailEditor.buttonFont.update = function () { WPFNEmailEditor.buttonFont.val( WPFNEmailEditor.getActive().find('a').css( 'font-family' ).replace(/"/g, '') );};
 
-    var buttonLink = jQuery( '#button-link' );
-    buttonLink.on( 'change', function( ){
-        content.find('.active').find('a').attr('href', buttonLink.val() );
-    });
+WPFNEmailEditor.buttonColor = jQuery( '#button-color' );
+WPFNEmailEditor.buttonColor.wpColorPicker({change: function (event, ui) {WPFNEmailEditor.getActive().find('.email-button').attr('bgcolor', WPFNEmailEditor.buttonColor.val() );}});
 
-    var spacerSize = jQuery( '#spacer-size' );
-    spacerSize.on( 'change', function( ){
-        content.find('.active').find('.spacer').css('height', spacerSize.val() + 'px' );
-    });
+WPFNEmailEditor.buttonTextColor = jQuery( '#button-text-color' );
+WPFNEmailEditor.buttonTextColor.wpColorPicker({change: function (event, ui) {WPFNEmailEditor.getActive().find('a').css('color', WPFNEmailEditor.buttonTextColor.val() );}});
 
-    var imageSRC = jQuery( '#image-src' );
-    imageSRC.on( 'change', function( ){
-        content.find('.active').find('img').attr('src', imageSRC.val() );
-    });
+WPFNEmailEditor.buttonLink = jQuery( '#button-link' );
+WPFNEmailEditor.buttonLink.on( 'change', function( ){WPFNEmailEditor.getActive().find('a').attr('href', WPFNEmailEditor.buttonLink.val() );});
+WPFNEmailEditor.buttonLink.update = function () { WPFNEmailEditor.buttonLink.val( WPFNEmailEditor.getActive().find('a').attr( 'href' ));};
 
-    var imageLink = jQuery( '#image-link' );
-    imageLink.on( 'change', function( ){
-        content.find('.active').find('a').attr('href', imageLink.val() );
-    });
+//spacer
+WPFNEmailEditor.spacerSize = jQuery( '#spacer-size' );
+WPFNEmailEditor.spacerSize.on( 'change', function(){WPFNEmailEditor.getActive().find('.spacer').css('height', WPFNEmailEditor.spacerSize.val() + 'px' );});
+WPFNEmailEditor.spacerSize.update = function () { WPFNEmailEditor.spacerSize.val( WPFNEmailEditor.getActive().find('a').height() );};
 
-    var imageAltText = jQuery( '#image-alt' );
-    imageAltText.on( 'change', function( ){
-        content.find('.active').find('img').attr('alt', imageAltText.val() );
-    });
+//images
+WPFNEmailEditor.imageSRC = jQuery( '#image-src' );
+WPFNEmailEditor.imageSRC.on( 'change', function(){WPFNEmailEditor.getActive().find('img').attr('src', WPFNEmailEditor.imageSRC.val() );});
+WPFNEmailEditor.imageSRC.update = function () {WPFNEmailEditor.imageSRC.val( WPFNEmailEditor.getActive().find('img').attr('src') );};
 
-    var imageTitle = jQuery( '#image-title' );
-    imageTitle.on( 'change', function( ){
-        content.find('.active').find('img').attr('title', imageTitle.val() );
-    });
+WPFNEmailEditor.imageLink = jQuery( '#image-link' );
+WPFNEmailEditor.imageLink.on( 'change', function(){WPFNEmailEditor.getActive().find('a').attr('href', WPFNEmailEditor.imageLink.val() );});
+WPFNEmailEditor.imageLink.update = function () {WPFNEmailEditor.imageLink.val( WPFNEmailEditor.getActive().find('a').attr('href') );};
 
-    var imageWidth = jQuery( '#image-width' );
-    imageWidth.on( 'change', function( ){
-        content.find('.active').find('img').css('width', imageWidth.val() + '%' );
-    });
+WPFNEmailEditor.imageAltText = jQuery( '#image-alt' );
+WPFNEmailEditor.imageAltText.on( 'change', function(){WPFNEmailEditor.getActive().find('img').attr('alt', WPFNEmailEditor.imageAltText.val() );});
+WPFNEmailEditor.imageAltText.update = function () {WPFNEmailEditor.imageAltText.val( WPFNEmailEditor.getActive().find('img').attr('alt') );};
 
-    content.on("click", function(e) {
+WPFNEmailEditor.imageTitle = jQuery( '#image-title' );
+WPFNEmailEditor.imageTitle.on( 'change', function( ){WPFNEmailEditor.getActive().find('img').attr('title', WPFNEmailEditor.imageTitle.val() );});
+WPFNEmailEditor.imageTitle.update = function () {WPFNEmailEditor.imageTitle.val( WPFNEmailEditor.getActive().find('img').attr('title') );};
 
-        e.preventDefault();
+WPFNEmailEditor.imageWidth = jQuery( '#image-width' );
+WPFNEmailEditor.imageWidth.on( 'change', function( ){WPFNEmailEditor.getActive().find('img').css('width', WPFNEmailEditor.imageWidth.val() + '%' );});
+WPFNEmailEditor.imageWidth.update = function () { WPFNEmailEditor.imageWidth.val( Math.ceil( ( WPFNEmailEditor.getActive().find('img').width() / WPFNEmailEditor.getActive().find('img').closest('div').width() ) * 100 ) );};
 
-        var el = jQuery(e.target);
+WPFNEmailEditor.imageAlignment = jQuery( '#image-align' );
+WPFNEmailEditor.imageAlignment.on( 'change', function( ){WPFNEmailEditor.getActive().find('.image-wrapper').css('text-align', WPFNEmailEditor.imageAlignment.val() );});
+WPFNEmailEditor.imageAlignment.update = function () {WPFNEmailEditor.imageAlignment.val( WPFNEmailEditor.getActive().find('.image-wrapper').css('text-align') );};
 
-        if ( el.hasClass('dashicons-trash') ){
-            el.closest('.row').remove();
-        }
+WPFNEmailEditor.textOptions = jQuery( '#text_block-editor' );
+WPFNEmailEditor.showTextOptions = function () {
+    this.showOptions( this.textOptions );
 
-        //apply & remove active class
-        if ( el.closest('#email-body').length ){
-           jQuery('.row').removeClass("active");
-        }
+    this.pFont.update();
+    this.pSize.update();
+};
 
-        el.closest('.row').addClass('active');
+WPFNEmailEditor.imageOptions = jQuery( '#image_block-editor' );
+WPFNEmailEditor.showImageOptions = function() {
+    this.showOptions( this.imageOptions );
 
-        //show appropriate-settings
-        editor.find('.postbox').addClass('hidden');
+    this.imageSRC.update();
+    this.imageWidth.update();
+    this.imageAlignment.update();
+    this.imageLink.update();
+    this.imageAltText.update();
+    this.imageTitle.update();
+};
+
+WPFNEmailEditor.buttonOptions = jQuery( '#button_block-editor' );
+WPFNEmailEditor.showButtonOptions = function() {
+    this.showOptions( this.buttonOptions );
+
+    this.buttonFont.update();
+    this.buttonSize.update();
+    // this.buttonColor.update();
+    // this.buttonTextColor.update();
+    this.buttonLink.update();
+};
+
+WPFNEmailEditor.spacerOptions = jQuery( '#spacer_block-editor' );
+WPFNEmailEditor.showSpacerOptions = function() {
+    this.showOptions( this.spacerOptions );
+
+    this.spacerSize.update();
+};
+
+WPFNEmailEditor.showOptions = function( el ){
+    this.actions.find( '.postbox' ).addClass( 'hidden' );
+    el.removeClass( 'hidden' );
+};
+
+WPFNEmailEditor.makeActive = function ( el ) {
+    if ( el.closest('#email-body').length ){
+        jQuery('.row').removeClass("active");
+    }
+
+    el.closest('.row').addClass('active');
+};
+
+WPFNEmailEditor.action = function( e )
+{
+    e.preventDefault();
+
+    var el = jQuery(e.target);
+
+    WPFNEmailEditor.makeActive( el );
+
+    if ( el.hasClass('dashicons-trash') ){
+        el.closest('.row').remove();
+    } else if ( el.hasClass('dashicons-admin-page') ){
+        el.closest('.row').clone().insertAfter( el.closest('.row') );
+    } else {
 
         if ( el.closest( '.text_block' ).length ){
-            jQuery( '#text_block-editor' ).removeClass( 'hidden' );
 
-            pFontSize.val( content.find('.active').find('p').css( 'font-size' ).replace('px', '') );
-            pFontFamily.val( content.find('.active').find('p').css( 'font-family' ).replace(/"/g, '') );
+            WPFNEmailEditor.showTextOptions();
 
         } else if ( el.closest( '.button_block' ).length ){
-            jQuery( '#button_block-editor' ).removeClass( 'hidden' );
 
-            buttonFontSize.val( content.find('.active').find('a').css( 'font-size' ).replace('px', '') );
-            buttonFontFamily.val( content.find('.active').find('a').css( 'font-family' ).replace(/"/g, '') );
-            buttonColor.val( content.find('.active').find('.email-button').attr( 'bgcolor' ) );
-            buttonTextColor.val(  content.find('.active').find('a').css( 'color' ) );
-            buttonLink.val(  content.find('.active').find('a').attr( 'href' ) );
+            WPFNEmailEditor.showButtonOptions();
 
         } else if ( el.closest( '.spacer_block' ).length ){
 
-            jQuery( '#spacer_block-editor' ).removeClass( 'hidden' );
-            spacerSize.val( content.find('.active').find('.spacer').css( 'height' ).replace('px', '') );
+            WPFNEmailEditor.showSpacerOptions();
 
         } else if ( el.closest( '.image_block' ).length ){
-            jQuery( '#image_block-editor' ).removeClass( 'hidden' );
 
-            imageSRC.val( content.find('.active').find('img').attr('src' ) );
-            imageLink.val( content.find('.active').find('a').attr('href' ) );
-            imageAltText.val( content.find('.active').find('img').attr('alt' ) );
-            imageTitle.val( content.find('.active').find('img').attr('title' ) );
-            imageWidth.val( Math.ceil( ( content.find('.active').find('img').width() / content.find('.active').find('img').closest('div').width() ) * 100 ) );
+            WPFNEmailEditor.showImageOptions();
 
         }
-    });
+    }
+};
+
+jQuery(function() {
+    WPFNEmailEditor.init();
+    WPFNEmailEditor.content.on("click", WPFNEmailEditor.action );
 });
