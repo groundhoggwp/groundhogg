@@ -491,7 +491,7 @@ function wpfn_url_to_funnel_id( $link )
     foreach ( $queryArgs as $args ){
 
         $subArgs = explode( '=' , $args );
-        if ( $subArgs[0] == 'ID' ){
+        if ( $subArgs[0] == 'funnel' ){
             return intval( $subArgs[1] );
         }
 

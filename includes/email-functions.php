@@ -67,57 +67,98 @@ function wpfn_emails_allowed_html()
 }
 
 /**
- * Send the specified email to a contact.
+ * Send an email to a contact.
+ * Replaces all links in email content with new links that direct to site containing information about the
+ * funnel, email, and step the email was sent from if applicable.
+ * uses the "ref" parameter to send the contact to the intent destination.
  *
- * @param $contact_id
- * @param $email_id
+ * @param $contact_id int the ID of the contact the email is being sent to.
+ * @param $email_id int the ID of the emai to send
+ * @param $step_id int the ID of the step the email is being sent from
+ * @param $funnel_id int the ID of the funnel the step is in (maybe required)
  *
  * @return bool true on success, false on failure
  */
-function wpfn_send_email( $contact_id, $email_id )
+function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null )
 {
 
-	if ( ! $contact_id || ! is_int( $contact_id ) || ! $email_id || ! is_int( $email_id )  )
-		return false;
+    if ( ! $contact_id || ! is_int( $contact_id ) || ! $email_id || ! is_int( $email_id )  )
+        return false;
 
+    /**
+     * @var $link_args array array of $_GET args that will be used to run analytics actions on the site
+     */
+    $link_args = array();
 
-	$email = wpfn_get_email_by_id( $email_id );
+    if ( $funnel_id && is_int( $funnel_id ) )
+        $link_args['step_id'] = absint( $step_id );
 
-	$title = get_bloginfo( 'name' );
+    if ( $step_id && is_int( $step_id ) )
+        $link_args['step_id'] = absint( $step_id );
 
-	$subject_line = wpfn_do_replacements( $contact_id, $email->subject );
+    //$link_args['enc_contact_id'] = wpfn_encrypt( $contact_id ); //todo create the encryption algo for the contact for later reference.
+    $link_args['contact_id'] = $contact_id; //todo remove this line
+    $link_args['email_id'] = $email_id;
 
-	$pre_header = wpfn_do_replacements( $contact_id, $email->pre_header );
+    /**
+     * @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to.
+     */
+    $ref_link = add_query_arg( $link_args, site_url() ) . '&ref=';
 
-	$content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
+    $email = wpfn_get_email_by_id( $email_id );
 
+    //merged in email template
+
+    $title = get_bloginfo( 'name' );
+    $subject_line = wpfn_do_replacements( $contact_id, $email->subject );
+    $pre_header = wpfn_do_replacements( $contact_id, $email->pre_header );
+    $content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
     $email_footer_text = get_option( 'email_footer_text', 'My Company Address & Phone Number' );
+    $unsubscribe_link = get_permalink( get_option( 'unsubscribe_page' ) );
 
-    $unsubscribe_link = "<a href='#'>Unsubscribe</a>";
+    ob_start();
 
-	//merged in email template
+    include dirname( __FILE__ ) . '/templates/email.php';
 
-	ob_start();
+    $email_content = ob_get_contents();
 
-	include dirname( __FILE__ ) . '/templates/email.php';
+    ob_end_clean();
 
-	$email_content = ob_get_contents();
+    /**
+     * Filter the links to include data about the email, campaign, and funnel steps...
+     */
+    $email_content = preg_replace_callback( '/(<a href=")([^"]*)("[^>]*?>)/i', 'wpfn_urlencode_email_links' , $email_content );
+    $email_content = preg_replace( '/(<a href=")([^"]*)("[^>]*?>)/i', '${1}' . $ref_link . '${2}${3}' , $email_content );
 
-	ob_end_clean();
+    $contact = new WPFN_Contact( $contact_id );
 
-	$contact = new WPFN_Contact( $contact_id );
+    $from_user = get_userdata( $email->from_user );
 
-	$from_user = get_userdata( wpfn_get_email_meta( $email_id, 'from_user', true ) );
+    //todo find better way to send test emails, different function?
+    if ( isset( $_POST['send_test'] ) )
+        $to_email = get_userdata( $contact_id )->user_email;
+    else
+        $to_email = $contact->getEmail();
 
-	$headers = array();
-	$headers[] = 'From: ' . $from_user->display_name . ' <' . $from_user->user_email . '>';
-	$headers[] = 'Reply-To: ' . $from_user->user_email;
-	$headers[] = 'Content-Type: text/html; charset=UTF-8';
+    $headers = array();
+    $headers[] = 'From: ' . $from_user->display_name . ' <' . $from_user->user_email . '>';
+    $headers[] = 'Reply-To: ' . $from_user->user_email;
+    $headers[] = 'Content-Type: text/html; charset=UTF-8';
 
-	add_filter( 'wp_mail_content_type', 'wpfn_send_html_email' );
+    add_filter( 'wp_mail_content_type', 'wpfn_send_html_email' );
 
-	return wp_mail( $contact->getEmail() , $subject_line, $email_content, $headers );
+    return wp_mail( $to_email , $subject_line, $email_content, $headers );
+}
 
+/**
+ * PRE URL encode email links for the ref passage
+ *
+ * @param $matches array
+ * @return string
+ */
+function wpfn_urlencode_email_links( $matches )
+{
+    return $matches[1] . urlencode( $matches[2] ) . $matches[3];
 }
 
 /**
@@ -144,6 +185,47 @@ function wpfn_remove_builder_toolbar( $content )
 
 add_filter( 'wpfn_the_email_content', 'wpfn_remove_builder_toolbar' );
 
+/**
+ * Remove the content editable attribute from the email's html
+ *
+ * @param $content string email HTML
+ * @return string the filtered email content.
+ */
+function wpfn_remove_content_editable( $content )
+{
+    return str_replace( 'contenteditable="true" ', '', $content );
+}
+
+add_filter( 'wpfn_the_email_content', 'wpfn_remove_content_editable' );
+
+/**
+ * Strip out irrelevant whitespace form the html.
+ *
+ * @param $content string
+ * @return string
+ */
+function wpfn_minify_html( $content )
+{
+    $search = array(
+        '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
+        '/[^\S ]+\</s',     // strip whitespaces before tags, except space
+        '/(\s)+/s',         // shorten multiple whitespace sequences
+        '/<!--(.|\s)*?-->/' // Remove HTML comments
+    );
+
+    $replace = array(
+        '>',
+        '<',
+        '\\1',
+        ''
+    );
+
+    $buffer = preg_replace($search, $replace, $content);
+
+    return $buffer;
+}
+
+add_filter( 'wpfn_the_email_content', 'wpfn_minify_html' );
 
 /**
  * Queue the email in the event queue. Does Basically it runs immediately but is queued for the sake of semantics.
@@ -261,13 +343,8 @@ function wpfn_save_email( $email_id )
 
         do_action( 'wpfn_email_update_before', $email_id );
 
-        $from_name =  ( isset( $_POST['from_name'] ) )? sanitize_text_field( $_POST['from_name'] ): '';
-        wpfn_update_email( $email_id, 'from_name', $from_name );
-        $from_email =  ( isset( $_POST['from_email'] ) )? sanitize_email( $_POST['from_email'] ): '';
-        wpfn_update_email( $email_id, 'from_email', $from_email );
-
-        $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): '';
-        wpfn_update_email_meta( $email_id, 'from_user', $from_user );
+        $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
+        wpfn_update_email( $email_id, 'from_user', $from_user );
 
         $subject =  ( isset( $_POST['subject'] ) )? sanitize_text_field( $_POST['subject'] ): '';
         wpfn_update_email( $email_id, 'subject', $subject );
@@ -275,7 +352,7 @@ function wpfn_save_email( $email_id )
         $pre_header =  ( isset( $_POST['pre_header'] ) )? sanitize_text_field( $_POST['pre_header'] ): '';
         wpfn_update_email( $email_id, 'pre_header', $pre_header );
 
-        $content =  ( isset( $_POST['content'] ) )? trim( stripslashes( $_POST['content'] ) ): '';
+        $content =  ( isset( $_POST['content'] ) )? wpfn_minify_html( trim( stripslashes( $_POST['content'] ) ) ): '';
 //        $content =  ( isset( $_POST['content'] ) )? wp_kses( stripslashes( $_POST['content'] ), wpfn_emails_allowed_html() ): '';
         wpfn_update_email( $email_id, 'content', $content );
 
@@ -294,7 +371,7 @@ add_action( 'wpfn_email_editor_before_everything', 'wpfn_save_email' );
  */
 function wpfn_send_test_email( $email_id )
 {
-    if ( isset( $_POST['test_email'] ) ){
+    if ( isset( $_POST['send_test'] ) ){
 
         do_action( 'wpfn_before_send_test_email', $email_id );
 

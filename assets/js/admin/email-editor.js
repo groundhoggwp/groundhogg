@@ -213,6 +213,7 @@ WPFNEmailEditor.action = function( e )
         el.closest('.row').remove();
     } else if ( el.hasClass('dashicons-admin-page') ){
         el.closest('.row').clone().insertAfter( el.closest('.row') );
+        el.closest('.row').removeClass('active');
     } else {
 
         if ( el.closest( '.text_block' ).length ){

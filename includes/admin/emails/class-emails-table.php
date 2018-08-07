@@ -55,8 +55,7 @@ class WPFN_Emails_Table extends WP_List_Table {
 		$columns = array(
 			'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'subject'    => _x( 'Subject', 'Column label', 'wp-funnels' ),
-			'from_name'   => _x( 'From Name', 'Column label', 'wp-funnels' ),
-			'from_email' => _x( 'From Email', 'Column label', 'wp-funnels' ),
+			'from_user'   => _x( 'From User', 'Column label', 'wp-funnels' ),
 			'date_created' => _x( 'Date Created', 'Column label', 'wp-funnels' ),
 		);
 		return $columns;
@@ -85,8 +84,7 @@ class WPFN_Emails_Table extends WP_List_Table {
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
 			'subject'    => array( 'subject', false ),
-			'from_name' => array( 'from_name', false ),
-			'from_email' => array( 'from_email', false ),
+			'from_user' => array( 'from_name', false ),
 			'date_created' => array( 'date_created', false )
 		);
 		return $sortable_columns;
@@ -117,9 +115,14 @@ class WPFN_Emails_Table extends WP_List_Table {
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'subject':
-				$editUrl = admin_url( 'admin.php?page=emails&ID=' . $item['ID'] );
+				$editUrl = admin_url( 'admin.php?page=emails&email=' . $item['ID'] );
 				return "<a href='$editUrl'>{$item[ $column_name ]}</a>";
 				break;
+            case 'from_user':
+                $user = get_userdata( intval( ( $item['from_user'] ) ) );
+                $from_user = esc_html( $user->display_name . ' <' . $user->user_email . '>' );
+                $queryUrl = admin_url( 'admin.php?page=emails&from_user=' . $item['from_user'] );
+                return "<a href='$queryUrl'>$from_user</a>";
 			default:
 				return print_r( $item[ $column_name ], true );
 				break;
@@ -257,12 +260,12 @@ class WPFN_Emails_Table extends WP_List_Table {
 			$pattern = "%" . $_REQUEST['s'] . "%" ;
 			$data =  $wpdb->get_results(
 				"
-	SELECT ID, subject, from_name, from_email, date_created
+	SELECT *
 	FROM $table_name
 	WHERE content LIKE '$pattern' OR subject LIKE '$pattern' OR from_name LIKE '$pattern' OR from_email LIKE '$pattern'
 	", ARRAY_A );
 		} else {
-			$data = $wpdb->get_results( "SELECT ID, subject, from_name, from_email, date_created FROM $table_name ORDER BY date_created DESC", ARRAY_A );
+			$data = $wpdb->get_results( "SELECT * FROM $table_name ORDER BY date_created DESC", ARRAY_A );
 		}
 
 		/*

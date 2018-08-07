@@ -173,61 +173,6 @@ function wpfn_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 }
 
 /**
- * Substitute the replacement codes with actual contact information.
- *
- * @param $contact_id int    The Contact's ID
- * @param $content    string the content to replace
- *
- * @return string, the content with codes replaced with contact data
- */
-function wpfn_do_replacements( $contact_id, $content )
-{
-
-	if ( ! $contact_id || ! is_int( $contact_id ) )
-		return false;
-
-	preg_match_all( '/{[\w\d]+}/', $content, $matches );
-	$actual_matches = $matches[0];
-
-	$contact = new WPFN_Contact( $contact_id );
-
-	foreach ( $actual_matches as $pattern ) {
-
-		# trim off the { and } from either end.
-		$replacement = substr( $pattern, 1, -1);
-
-		switch ( $replacement ){
-
-			case 'first_name':
-				$new_replacement = $contact->getFirst();
-				break;
-
-			case 'last_name':
-				$new_replacement = $contact->getLast();
-				break;
-
-			case 'email':
-				$new_replacement = $contact->getEmail();
-				break;
-
-			case 'primary_phone':
-				$new_replacement = $contact->getPhone();
-				break;
-
-			default:
-				# add custom filter for special replacements such as links and what not.
-				$new_replacement = apply_filters( 'wpfn_replacement_' . $replacement, $contact->getFieldMeta( $replacement ), $contact_id );
-				break;
-		}
-
-		$content = preg_replace( '/' . $pattern . '/', $new_replacement, $content );
-	}
-
-	return $content;
-
-}
-
-/**
  * Return the contact ID of the current contact, perhaps if they are broswing the site based on a cookie.
  *
  * @return WPFN_Contact|false the ID of the contact, false if a contact ID doesn't exist

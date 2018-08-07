@@ -39,9 +39,9 @@ function wpfn_get_queued_events( $time_from, $time_to )
 			"
          SELECT * FROM $table_name
 		 WHERE %d <= time 
-		 AND time <= %d 
+		 AND time <= %d AND status = %s
 		",
-			$time_from, $time_to
+			$time_from, $time_to, 'waiting'
 		), ARRAY_A
 	);
 }
@@ -72,11 +72,11 @@ function wpfn_dequeue_events( $time_from, $time_to )
 	return $wpdb->query(
 		$wpdb->prepare(
 			"
-         DELETE FROM $table_name
-		 WHERE time >= %d
-		 AND time <= %d
+         UPDATE $table_name
+         SET status = %s
+		 WHERE time >= %d AND time <= %d AND status = %s
 		",
-			$time_from, $time_to
+			'complete', $time_from, $time_to, 'waiting'
 		)
 	);
 }
@@ -109,17 +109,18 @@ function wpfn_dequeue_contact_funnel_events( $contact_id, $funnel_id )
 	return $wpdb->query(
 		$wpdb->prepare(
 			"
-         DELETE FROM $table_name
-		 WHERE contact_id = %d
-		 AND funnel_id = %d
+         UPDATE $table_name
+         SET status = %s
+		 WHERE contact_id = %d AND funnel_id = %d AND status = %s
 		",
-			$contact_id, $funnel_id
+            'skipped', $contact_id, $funnel_id, 'waiting'
 		)
 	);
 }
 
 /**
  * Insert a new event into the DB.
+ * Set the default event status to waitin as it's waiting to be run.
  *
  * @param $time       int The time the event is to occur
  * @param $funnel_id  int The ID of the funnel the event was queued from
@@ -146,6 +147,7 @@ function wpfn_enqueue_event( $time, $funnel_id, $step_id, $contact_id, $callback
 			'funnel_id'     => $funnel_id,
 			'step_id'       => $step_id,
 			'contact_id'    => $contact_id,
+			'status'        => 'waiting',
 			'callback'      => $callback,
 			'arg1'          => maybe_serialize( $arg1 ),
 			'arg2'          => maybe_serialize( $arg2 ),
@@ -155,7 +157,7 @@ function wpfn_enqueue_event( $time, $funnel_id, $step_id, $contact_id, $callback
 }
 
 define( 'WPFN_EVENTS', 'event_queue' );
-define( 'WPFN_EVENTS_DB_VERSION', '0.1' );
+define( 'WPFN_EVENTS_DB_VERSION', '0.2' );
 
 /**
  * Create the events database table.
@@ -177,6 +179,7 @@ function wpfn_create_events_db()
       funnel_id bigint(20) NOT NULL,
       step_id bigint(20) NOT NULL,
       contact_id bigint(20) NOT NULL,
+      status varchar(20) NOT NULL,
       callback text NOT NULL,
       arg1 text NOT NULL,
       arg2 text NOT NULL,

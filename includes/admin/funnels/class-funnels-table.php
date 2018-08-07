@@ -115,7 +115,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'title':
-				$editUrl = admin_url( 'admin.php?page=funnels&ID=' . $item['ID'] );
+				$editUrl = admin_url( 'admin.php?page=funnels&funnel=' . $item['ID'] );
 				return "<a href='$editUrl'>{$item[ 'funnel_title' ]}</a>";
 				break;
             case 'status':

@@ -13,7 +13,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( ! isset( $_GET['ID'] ) || ! is_numeric( $_GET['ID'] ) )
+if ( ! isset( $_GET['email'] ) || ! is_numeric( $_GET['email'] ) )
 {
     wp_die( __( 'Email ID not supplied. Please try again', 'wp-funnels' ), __( 'Error', 'wp-funnels' ) );
 }
@@ -22,7 +22,7 @@ if ( isset( $_GET['notice'] ) && $_GET['notice'] == 'success' ){
     ?><div class="notice notice-success"><p>Successfully created email!</p></div><?php
 }
 
-$email_id = intval( $_GET['ID'] );
+$email_id = intval( $_GET['email'] );
 
 wp_enqueue_media();
 wp_enqueue_style( 'wp-color-picker' );
@@ -296,7 +296,11 @@ $email = wpfn_get_email_by_id( $email_id );
                                             <td><?php wp_dropdown_users( $args); ?><script>jQuery(document).ready(function(){jQuery( '#from_user' ).select2()});</script></td>
                                         </tr>
                                         <tr>
-                                            <th><?php _e( 'Send Test:' ); ?></th>
+                                            <th><label for="send_test"><?php _e( 'Send Test:' ); ?></label></th>
+                                            <td><input type="checkbox" id="send_test" name="send_test"></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e( 'To:' ); ?></th>
                                             <?php $args = array( 'id' => 'test_email', 'name' => 'test_email', 'selected' => wpfn_get_email_meta( $email_id, 'test_email', true ) ); ?>
                                             <td><?php wp_dropdown_users( $args); ?><script>jQuery(document).ready(function(){jQuery( '#test_email' ).select2()});</script></td>
                                         </tr>

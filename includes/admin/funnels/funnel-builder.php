@@ -12,12 +12,12 @@
  */
 
 
-if ( ! isset( $_GET['ID'] ) || ! is_numeric( $_GET['ID'] ) )
+if ( ! isset( $_GET['funnel'] ) || ! is_numeric( $_GET['funnel'] ) )
 {
     wp_die( __( 'Funnel ID not supplied. Please try again', 'wp-funnels' ), __( 'Error', 'wp-funnels' ) );
 }
 
-$funnel_id = intval( $_GET['ID'] );
+$funnel_id = intval( $_GET['funnel'] );
 
 
 foreach ( glob( dirname( __FILE__ ) . "/elements/*/*.php" ) as $filename )

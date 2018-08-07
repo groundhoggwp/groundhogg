@@ -17,12 +17,11 @@
  * @param $content string the Email Content
  * @param $subject string the Email Subject
  * @param $pre_header string the Email Pre_header
- * @param $from_name string the Email From Name
- * @param $from_email string the Email which it's sent from
+ * @param $from_user int the ID of the user the email is to be sent from
  *
  * @return bool|int the ID of the new Email, false on failure.
  */
-function wpfn_insert_new_email( $content, $subject, $pre_header, $from_name, $from_email )
+function wpfn_insert_new_email( $content, $subject, $pre_header, $from_user )
 {
 	global $wpdb;
 
@@ -35,8 +34,7 @@ function wpfn_insert_new_email( $content, $subject, $pre_header, $from_name, $fr
 			'content'       => $content,
 			'subject'       => $subject,
 			'pre_header'    => $pre_header,
-			'from_name'     => $from_name,
-			'from_email'    => $from_email,
+			'from_user'     => $from_user,
 			'date_created'  => current_time( 'mysql' )
 		)
 	);
@@ -218,8 +216,7 @@ function wpfn_create_emails_db()
       content longtext NOT NULL,
       subject text NOT NULL,
       pre_header text NOT NULL,
-      from_name tinytext NOT NULL,
-      from_email tinytext NOT NULL,
+      from_user bigint(20) NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       PRIMARY KEY  (ID)
     ) $charset_collate;";

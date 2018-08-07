@@ -14,7 +14,7 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( isset( $_GET['ID'] ) && is_numeric( $_GET['ID'] ) ) {
+if ( isset( $_GET['email'] ) && is_numeric( $_GET['email'] ) ) {
 
 	include dirname(__FILE__) . '/email-editor.php';
 

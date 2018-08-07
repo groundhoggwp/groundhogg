@@ -14,7 +14,7 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( isset( $_GET['ID'] ) && is_numeric( $_GET['ID'] ) ) {
+if ( isset( $_GET['funnel'] ) && is_numeric( $_GET['funnel'] ) ) {
 
     include dirname( __FILE__ ) . '/funnel-builder.php';
 
