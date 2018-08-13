@@ -138,7 +138,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'email':
-				$editUrl = admin_url( 'admin.php?page=contacts&ID=' . $item['ID'] );
+				$editUrl = admin_url( 'admin.php?page=contacts&contact=' . $item['ID'] );
 				return "<a href='$editUrl'>{$item[ $column_name ]}</a>";
 				break;
 			default:
@@ -222,12 +222,14 @@ class WPFN_Contacts_Table extends WP_List_Table {
 
 	protected function get_views() {
 
-		return array(
-			'all' => 'All',
-			'unconfirmed' => 'Unconfirmed',
-			'confirmed' => 'Confirmed',
-			'opted_out' => 'Opted Out'
-		);
+	    $base_url = admin_url( 'admin.php?page=contacts&optin_status=' );
+
+		return apply_filters( 'contact_views', array(
+			'all' => "<a href='" . $base_url . "all" . "'>" . __( 'All' ) . "</a>",
+			'unconfirmed' => "<a href='" . $base_url . "unconfirmed" . "'>" . __( 'Unconfirmed' ) . "</a>",
+			'confirmed' => "<a href='" . $base_url . "confirmed" . "'>" . __( 'Confirmed' ) . "</a>",
+			'opted_out' => "<a href='" . $base_url . "opted_out" . "'>" . __( 'Opted Out' ) . "</a>"
+		) );
 
 	}
 

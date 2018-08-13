@@ -23,7 +23,7 @@ function wpfn_get_queued_events( $time_from, $time_to )
 {
 	global $wpdb;
 
-	if ( ! $time_from || ! is_int( $time_from ) )
+	if ( ! $time_to || ! is_int( $time_to ) )
 		return false;
 
 	$time_from = absint( $time_from );
@@ -38,8 +38,7 @@ function wpfn_get_queued_events( $time_from, $time_to )
 		$wpdb->prepare(
 			"
          SELECT * FROM $table_name
-		 WHERE %d <= time 
-		 AND time <= %d AND status = %s
+		 WHERE %d <= time AND time <= %d AND status = %s
 		",
 			$time_from, $time_to, 'waiting'
 		), ARRAY_A
@@ -74,7 +73,7 @@ function wpfn_dequeue_events( $time_from, $time_to )
 			"
          UPDATE $table_name
          SET status = %s
-		 WHERE time >= %d AND time <= %d AND status = %s
+		 WHERE %d <= time AND time <= %d AND status = %s
 		",
 			'complete', $time_from, $time_to, 'waiting'
 		)

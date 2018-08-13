@@ -80,6 +80,10 @@ WPFNEmailEditor.init = function () {
 
 WPFNEmailEditor.switchContent = function( e ){
     e.preventDefault();
+    jQuery('.row').removeClass('active');
+    if ( WPFNEmailEditor.richText ){
+        WPFNEmailEditor.richText.simpleEditor().destroy();
+    }
     WPFNEmailEditor.textarea.val( WPFNEmailEditor.contentInside.html() );
     WPFNEmailEditor.form.unbind( 'submit' ).submit();
 };
@@ -94,12 +98,38 @@ WPFNEmailEditor.hideActions = function (){
 
 // paragraphs
 WPFNEmailEditor.pFont = jQuery( '#p-font' );
-WPFNEmailEditor.pFont.on( 'change', function( ){WPFNEmailEditor.getActive().find('p').css('font-family', WPFNEmailEditor.pFont.val() );});
-WPFNEmailEditor.pFont.update = function () { WPFNEmailEditor.pFont.val( WPFNEmailEditor.getActive().find('p').css( 'font-family' ).replace(/"/g, '') );};
+WPFNEmailEditor.pFont.on( 'change', function( ){ WPFNEmailEditor.getActive().find('.simple-editor-content').css('font-family', WPFNEmailEditor.pFont.val() );});
+WPFNEmailEditor.pFont.update = function () { WPFNEmailEditor.pFont.val( WPFNEmailEditor.getActive().find('.simple-editor-content').css( 'font-family' ).replace(/"/g, '') );};
 
 WPFNEmailEditor.pSize = jQuery( '#p-size' );
-WPFNEmailEditor.pSize.on( 'change', function(){WPFNEmailEditor.getActive().find('p').css('font-size', WPFNEmailEditor.pSize.val() + 'px' );});
-WPFNEmailEditor.pSize.update = function () {WPFNEmailEditor.pSize.val( WPFNEmailEditor.getActive().find('p').css( 'font-size' ).replace('px', '') );};
+WPFNEmailEditor.pSize.on( 'change', function(){WPFNEmailEditor.getActive().find('.simple-editor-content').css('font-size', WPFNEmailEditor.pSize.val() + 'px' );});
+WPFNEmailEditor.pSize.update = function () {WPFNEmailEditor.pSize.val( WPFNEmailEditor.getActive().find('.simple-editor-content').css( 'font-size' ).replace('px', '') );};
+
+// h1
+WPFNEmailEditor.h1Font = jQuery( '#h1-font' );
+WPFNEmailEditor.h1Font.on( 'change', function( ){WPFNEmailEditor.getActive().find('h1').css('font-family', WPFNEmailEditor.h1Font.val() );});
+WPFNEmailEditor.h1Font.update = function () { WPFNEmailEditor.h1Font.val( WPFNEmailEditor.getActive().find('h1').css( 'font-family' ).replace(/"/g, '') );};
+
+WPFNEmailEditor.h1Size = jQuery( '#h1-size' );
+WPFNEmailEditor.h1Size.on( 'change', function(){WPFNEmailEditor.getActive().find('h1').css('font-size', WPFNEmailEditor.h1Size.val() + 'px' );});
+WPFNEmailEditor.h1Size.update = function () { WPFNEmailEditor.h1Size.val( WPFNEmailEditor.getActive().find('h1').css( 'font-size' ).replace('px', '') );};
+
+// h2
+WPFNEmailEditor.h2Font = jQuery( '#h2-font' );
+WPFNEmailEditor.h2Font.on( 'change', function( ){WPFNEmailEditor.getActive().find('h2').css('font-family', WPFNEmailEditor.h2Font.val() );});
+WPFNEmailEditor.h2Font.update = function () { WPFNEmailEditor.h2Font.val( WPFNEmailEditor.getActive().find('h2').css( 'font-family' ).replace(/"/g, '') );};
+
+WPFNEmailEditor.h2Size = jQuery( '#h2-size' );
+WPFNEmailEditor.h2Size.on( 'change', function(){ WPFNEmailEditor.getActive().find('h2').css('font-size', WPFNEmailEditor.h2Size.val() + 'px' );});
+WPFNEmailEditor.h2Size.update = function () { WPFNEmailEditor.h2Size.val( WPFNEmailEditor.getActive().find('h2').css( 'font-size' ).replace('px', '') || 30 );};
+
+WPFNEmailEditor.textOptions = jQuery( '#text_block-editor' );
+WPFNEmailEditor.showTextOptions = function () {
+    this.showOptions( this.textOptions );
+
+    this.pFont.update();
+    this.pSize.update();
+};
 
 //buttons
 WPFNEmailEditor.buttonSize = jQuery( '#button-size' );
@@ -120,10 +150,32 @@ WPFNEmailEditor.buttonLink = jQuery( '#button-link' );
 WPFNEmailEditor.buttonLink.on( 'change', function( ){WPFNEmailEditor.getActive().find('a').attr('href', WPFNEmailEditor.buttonLink.val() );});
 WPFNEmailEditor.buttonLink.update = function () { WPFNEmailEditor.buttonLink.val( WPFNEmailEditor.getActive().find('a').attr( 'href' ));};
 
+WPFNEmailEditor.buttonOptions = jQuery( '#button_block-editor' );
+WPFNEmailEditor.showButtonOptions = function() {
+    this.showOptions( this.buttonOptions );
+
+    this.buttonFont.update();
+    this.buttonSize.update();
+    // this.buttonColor.update();
+    // this.buttonTextColor.update();
+    this.buttonLink.update();
+};
+
 //spacer
 WPFNEmailEditor.spacerSize = jQuery( '#spacer-size' );
 WPFNEmailEditor.spacerSize.on( 'change', function(){WPFNEmailEditor.getActive().find('.spacer').css('height', WPFNEmailEditor.spacerSize.val() + 'px' );});
-WPFNEmailEditor.spacerSize.update = function () { WPFNEmailEditor.spacerSize.val( WPFNEmailEditor.getActive().find('a').height() );};
+WPFNEmailEditor.spacerSize.update = function () { WPFNEmailEditor.spacerSize.val( WPFNEmailEditor.getActive().find('.spacer').height() );};
+
+//divider
+WPFNEmailEditor.dividerWidth = jQuery( '#divider-width' );
+WPFNEmailEditor.dividerWidth.on( 'change', function(){WPFNEmailEditor.getActive().find('hr').css('width', WPFNEmailEditor.dividerWidth.val() + '%' );});
+WPFNEmailEditor.dividerWidth.update = function () { WPFNEmailEditor.dividerWidth.val( Math.ceil( ( WPFNEmailEditor.getActive().find('hr').width() / WPFNEmailEditor.getActive().find('hr').closest('div').width() ) * 100 ) );};
+
+WPFNEmailEditor.dividerOptions = jQuery( '#divider_block-editor' );
+WPFNEmailEditor.showDividerOptions = function() {
+    this.showOptions( this.dividerOptions );
+    this.dividerWidth.update();
+};
 
 //images
 WPFNEmailEditor.imageSRC = jQuery( '#image-src' );
@@ -150,14 +202,6 @@ WPFNEmailEditor.imageAlignment = jQuery( '#image-align' );
 WPFNEmailEditor.imageAlignment.on( 'change', function( ){WPFNEmailEditor.getActive().find('.image-wrapper').css('text-align', WPFNEmailEditor.imageAlignment.val() );});
 WPFNEmailEditor.imageAlignment.update = function () {WPFNEmailEditor.imageAlignment.val( WPFNEmailEditor.getActive().find('.image-wrapper').css('text-align') );};
 
-WPFNEmailEditor.textOptions = jQuery( '#text_block-editor' );
-WPFNEmailEditor.showTextOptions = function () {
-    this.showOptions( this.textOptions );
-
-    this.pFont.update();
-    this.pSize.update();
-};
-
 WPFNEmailEditor.imageOptions = jQuery( '#image_block-editor' );
 WPFNEmailEditor.showImageOptions = function() {
     this.showOptions( this.imageOptions );
@@ -170,15 +214,14 @@ WPFNEmailEditor.showImageOptions = function() {
     this.imageTitle.update();
 };
 
-WPFNEmailEditor.buttonOptions = jQuery( '#button_block-editor' );
-WPFNEmailEditor.showButtonOptions = function() {
-    this.showOptions( this.buttonOptions );
+WPFNEmailEditor.htmlContent = jQuery( '#custom-html-content' );
+WPFNEmailEditor.htmlContent.on( 'change', function( ){WPFNEmailEditor.getActive().find('.content-inside').html( WPFNEmailEditor.htmlContent.val().trim() );});
+WPFNEmailEditor.htmlContent.update = function () {WPFNEmailEditor.htmlContent.val( WPFNEmailEditor.getActive().find('.content-inside').html().trim() );};
 
-    this.buttonFont.update();
-    this.buttonSize.update();
-    // this.buttonColor.update();
-    // this.buttonTextColor.update();
-    this.buttonLink.update();
+WPFNEmailEditor.codeOptions = jQuery( '#code_block-editor' );
+WPFNEmailEditor.showCodeOptions = function() {
+    this.showOptions( this.codeOptions );
+    this.htmlContent.update();
 };
 
 WPFNEmailEditor.spacerOptions = jQuery( '#spacer_block-editor' );
@@ -199,24 +242,43 @@ WPFNEmailEditor.makeActive = function ( el ) {
     }
 
     el.closest('.row').addClass('active');
+    this.active = el.closest('.row');
 };
+
+WPFNEmailEditor.richText = null;
+WPFNEmailEditor.active = null;
 
 WPFNEmailEditor.action = function( e )
 {
     e.preventDefault();
 
-    var el = jQuery(e.target);
+    WPFNEmailEditor.active = el;
 
-    WPFNEmailEditor.makeActive( el );
+    var el = jQuery(e.target);
 
     if ( el.hasClass('dashicons-trash') ){
         el.closest('.row').remove();
     } else if ( el.hasClass('dashicons-admin-page') ){
-        el.closest('.row').clone().insertAfter( el.closest('.row') );
+        WPFNEmailEditor.richText.simpleEditor().destroy();
         el.closest('.row').removeClass('active');
+        el.closest('.row').clone().insertAfter( el.closest('.row') );
     } else {
 
+        if ( el.closest('.row').hasClass('active') )
+            return true;
+
+        WPFNEmailEditor.makeActive( el );
+
+        if ( WPFNEmailEditor.richText )
+            WPFNEmailEditor.richText.simpleEditor().destroy();
+
         if ( el.closest( '.text_block' ).length ){
+
+            WPFNEmailEditor.richText = el.closest('.content-wrapper');
+
+            WPFNEmailEditor.richText.simpleEditor({
+                defaultParagraphSeparator: 'p'
+            });
 
             WPFNEmailEditor.showTextOptions();
 
@@ -231,6 +293,14 @@ WPFNEmailEditor.action = function( e )
         } else if ( el.closest( '.image_block' ).length ){
 
             WPFNEmailEditor.showImageOptions();
+
+        } else if ( el.closest( '.divider_block' ).length ){
+
+            WPFNEmailEditor.showDividerOptions();
+
+        } else if ( el.closest( '.code_block' ) ){
+
+            WPFNEmailEditor.showCodeOptions();
 
         }
     }

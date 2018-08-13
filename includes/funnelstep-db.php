@@ -74,7 +74,9 @@ function wpfn_delete_funnel_step( $id )
 
     $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
 
-    return $wpdb->delete( $table_name, array( 'ID' => $id ), array( '%d' ) );
+    $delete_step = $wpdb->delete( $table_name, array( 'ID' => $id ), array( '%d' ) );
+
+    return $wpdb->delete( $wpdb->funnelstepmeta, array( 'ID' => $id ), array( '%d' ) ) && $delete_step;
 }
 
 /**

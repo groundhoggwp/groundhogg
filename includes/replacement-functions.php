@@ -30,9 +30,11 @@ function wpfn_do_replacements( $contact_id, $content )
 
         # trim off the { and } from either end.
         $replacement = substr( $pattern, 1, -1);
-
-        $new_replacement = call_user_func( $replacement, $contact_id );
-
+        if ( substr($replacement, 0, 1) === '_' ) {
+            $new_replacement = $contact->getFieldMeta( substr($replacement, 1) );
+        } else {
+            $new_replacement = apply_filters( 'wpfn_replacement_' . $replacement, $contact );
+        }
         $content = preg_replace( '/' . $pattern . '/', $new_replacement, $content );
     }
 
@@ -40,12 +42,60 @@ function wpfn_do_replacements( $contact_id, $content )
 
 }
 
-function wpfn_get_replacement_codes()
+/**
+ * Return back the first name ot the contact.
+ *
+ * @param $contact WPFN_Contact the contact
+ * @return string the first name
+ */
+function wpfn_replacement_first_name( $contact )
 {
-
+    return $contact->getFirst();
 }
 
-function wpfn_add_replacment_code( $tag, $callback )
-{
+add_filter( 'wpfn_replacement_first_name', 'wpfn_replacement_first_name' );
+add_filter( 'wpfn_replacement_first', 'wpfn_replacement_first_name' );
 
+/**
+ * Return back the last name ot the contact.
+ *
+ * @param $contact WPFN_Contact the contact
+ * @return string the last name
+ */
+function wpfn_replacement_last_name( $contact )
+{
+    return $contact->getLast();
 }
+
+add_filter( 'wpfn_replacement_last_name', 'wpfn_replacement_last_name' );
+add_filter( 'wpfn_replacement_last', 'wpfn_replacement_last_name' );
+
+/**
+ * Return back the email of the contact.
+ *
+ * @param $contact WPFN_Contact the contact
+ * @return string the email
+ */
+function wpfn_replacement_email( $contact )
+{
+    return $contact->getEmail();
+}
+
+add_filter( 'wpfn_replacement_email', 'wpfn_replacement_email' );
+
+/**
+ * Return a confirmation link for the contact
+ * This just gets the Optin Page link for now.
+ *
+ * @param $contact WPFN_Contact the contact
+ * @return string the optin link
+ */
+function wpfn_replacement_confirmation_link( $contact )
+{
+    $link_text = get_option( 'wpfn_confirmation_text', __( 'Confirm your email', 'wp-funnels' ) );
+    $link_url = get_option( 'wpfn_confirmation_page', site_url( 'confirmed' ) );
+
+    return "<a href=\"$link_url\" target=\"_blank\">$link_text</a>";
+}
+
+add_filter( 'wpfn_replacement_confirmation_link', 'wpfn_replacement_confirmation_link' );

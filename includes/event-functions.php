@@ -31,8 +31,6 @@ function wpfn_do_queued_events()
     // Get any events that should have already been run.
 	$events = wpfn_get_queued_events( 1, $time );
 
-	//var_dump( $events );
-
     /**
 	 * Obviously don't run if their are no events to perform
 	 */
@@ -84,7 +82,7 @@ function wpfn_do_queued_events()
 
 add_action( 'wpfn_do_queued_events', 'wpfn_do_queued_events' );
 add_action( 'init', 'wpfn_do_queued_events' );
-add_action( 'admin_init', 'wpfn_do_queued_events' );
+//add_action( 'admin_init', 'wpfn_do_queued_events' );
 
 function wpfn_setup_queue_cron_event()
 {

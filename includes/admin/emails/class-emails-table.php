@@ -115,8 +115,9 @@ class WPFN_Emails_Table extends WP_List_Table {
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'subject':
+			    $subject = ( ! $item[ $column_name ] )? __( 'No Subject' ) : $item[ $column_name ] ;
 				$editUrl = admin_url( 'admin.php?page=emails&email=' . $item['ID'] );
-				return "<a href='$editUrl'>{$item[ $column_name ]}</a>";
+				return "<a href='$editUrl'>{$subject}</a>";
 				break;
             case 'from_user':
                 $user = get_userdata( intval( ( $item['from_user'] ) ) );

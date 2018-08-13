@@ -30,7 +30,7 @@ function wpfn_get_email_html_blocks()
 function wpfn_email_text_block()
 {
     ?>
-    <div class="content" contenteditable="true"><p style="font-size: 16px; font-family: Arial, sans-serif;"><?php echo esc_html__( 'Customize this section by editing the text, adding your own copy, using the options above to bold, italicize, or create links and bullets, or use the options in the "Design" panel on the left to change the font styles of your email.', 'wp-funnels' );?></p></div>
+    <p><?php echo esc_html__( 'Customize this section by editing the text, adding your own copy, using the options above to bold, italicize, or create links and bullets, or use the options in the "Design" panel on the left to change the font styles of your email.', 'wp-funnels' );?></p>
     <?php
 }
 
@@ -84,14 +84,22 @@ function wpfn_email_button_block()
 
 add_action( 'wpfn_email_block_html_button_block', 'wpfn_email_button_block' );
 
+function wpfn_email_code_block()
+{
+    ?>
+    <div><p>This is some custom HTML which you can edit on the right. You may enter any valid HTML tags, but they may get filtered out as some email browsers to not support certain HTML.</p></div>
+    <?php
+}
+
+add_action( 'wpfn_email_block_html_code_block', 'wpfn_email_code_block' );
 
 function wpfn_get_email_block( $type )
 {
     ?>
     <div class="row">
+        <wpfn-toolbar class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span> | <span class="dashicons dashicons-move handle"></span> | <span class="dashicons dashicons-trash"></span></div></wpfn-toolbar>
         <div class="content-wrapper <?php echo $type; ?>">
-            <wpfn-toolbar class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span> | <span class="dashicons dashicons-move handle"></span> | <span class="dashicons dashicons-trash"></span></div></wpfn-toolbar>
-            <div class="content-inside" style="padding: 10px;">
+            <div class="content-inside inner-content text-content" style="padding: 5px;">
                 <?php do_action( 'wpfn_email_block_html_' . $type ); ?>
             </div>
         </div>

@@ -27,6 +27,8 @@ foreach ( glob( dirname( __FILE__ ) . "/elements/*/*.php" ) as $filename )
 
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
+wp_enqueue_script( 'jquery-ui-datepicker' );
+wp_enqueue_style( 'jquery-ui', 'http://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
 wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
 
 do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
@@ -88,29 +90,42 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
     .funnel-editor .sortable-placeholder {
         box-sizing: border-box;
         margin-left: auto;
-        margin-right: 0;
+        margin-right: auto;
     }
 
-    .funnel-editor .postbox.action {
-        width: 90%;
-        margin-left: auto;
-        margin-right: 0;
-    }
-
-    .funnel-editor .hndle{
-        background-color: rgba(157, 157, 157, 0.11);
-    }
-
-    .funnel-editor .postbox.action {
+    .funnel-editor .postbox.action .hndle{
         background-color: rgb(241, 253, 243);
     }
 
-    .funnel-editor .postbox.benchmark{
+    .funnel-editor .postbox.benchmark .hndle{
         background-color: rgb(255, 254, 218);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .funnel-editor .postbox.action {
+        /*background-color: rgb(241, 253, 243);*/
+        width: 600px;
+        border-radius: 0px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .funnel-editor .postbox.benchmark{
+        /*background-color: rgb(255, 254, 218);*/
+        width: 500px;
+        border-radius: 20px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     select {
         vertical-align: top;
+    }
+
+    #postbox-container-2{
+        padding: 40px 0 40px 0;
+        background-image: linear-gradient(#e5e5e5 1px, transparent 1px), linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+        background-size: 31px 31px;
     }
 
 </style>
@@ -127,111 +142,152 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                             <input placeholder="<?php echo __('Enter Funnel Name Here', 'wp-funnels');?>" type="text" name="funnel_title" size="30" value="<?php echo wpfn_get_funnel_name( $funnel_id ); ?>" id="title" spellcheck="true" autocomplete="off">
                         </div>
                     </div>
+                    <div class="postbox">
+                        <h2 class="hndle"><?php _e("Reporting", 'wp-funnels'); ?></h2>
+                        <div class="inside">
+                            <p>
+                                <select class="input" name="date_range" id="date_range">
+                                    <?php $selected = ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ; ?>
+                                    <option value="last_24" <?php if ( $selected == 'last_24' ) echo 'selected'; ?> ><?php _e( "Last 24 Hours", 'wp-funnels' );?></option>
+                                    <option value="last_7" <?php if ( $selected == 'last_7' ) echo 'selected'; ?>><?php _e( "Last 7 Days", 'wp-funnels' );?></option>
+                                    <option value="last_30" <?php if ( $selected == 'last_30' ) echo 'selected'; ?>><?php _e( "Last 30 Days", 'wp-funnels' );?></option>
+                                    <option value="custom" <?php if ( $selected == 'custom' ) echo 'selected'; ?>><?php _e( "Custom Range", 'wp-funnels' );?></option>
+                                </select>
+                                <input autocomplete="off" placeholder="<?php esc_attr_e('From:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_start" name="custom_date_range_start" type="text">
+                                <script>jQuery(function($){$('#custom_date_range_start').datepicker({
+                                        changeMonth: true,
+                                        changeYear: true,
+                                        maxDate:0,
+                                        dateFormat:'yy-m-d'
+                                    })});</script>
+                                <input autocomplete="off" placeholder="<?php esc_attr_e('To:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_end" name="custom_date_range_end" type="text">
+                                <script>jQuery(function($){$('#custom_date_range_end').datepicker({
+                                        changeMonth: true,
+                                        changeYear: true,
+                                        maxDate:0,
+                                        dateFormat:'yy-m-d'
+                                    })});</script>
+
+                                <script>jQuery(function($){$('#date_range').change(function(){
+                                    if($(this).val() === 'custom'){
+                                        $('#custom_date_range_end').removeClass('hidden');
+                                        $('#custom_date_range_start').removeClass('hidden');
+                                    } else {
+                                        $('#custom_date_range_end').addClass('hidden');
+                                        $('#custom_date_range_start').addClass('hidden');
+                                    }})});</script>
+                                <?php submit_button( 'Filter', 'secondary', 'change_reporting', false ); ?>
+                                <?php do_action( 'funnel_sate_range_filters_after' ); ?>
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 <!-- begin elements area -->
                 <div id="postbox-container-1" class="postbox-container sticky">
-                    <div id="submitdiv" class="postbox">
-                        <h3 class="hndle"><?php echo __( 'Funnel Status', 'wp-funnels' );?></h3>
-                        <div class="inside">
-                            <div class="submitbox">
-                                <div id="minor-publishing-actions">
-                                    <?php do_action( 'wpfn_funnel_status_before' ); ?>
-                                    <table class="form-table">
-                                        <tbody>
-                                        <tr>
-                                            <th><label for="funnel_status"><?php echo __( 'Status', 'wp-funnels' );?></label></th>
-                                            <td>
-                                                <select id="funnel_status" name="funnel_status">
-                                                    <option value="inactive" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'inactive' ) echo 'selected="selected"'; ?>><?php echo __( 'Inactive', 'wp-funnels' );?></option>
-                                                    <option value="active" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'active' ) echo 'selected="selected"'; ?>><?php echo __( 'Active', 'wp-funnels' );?></option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                    <?php do_action( 'wpfn_funnel_status_after' ); ?>
-                                </div>
-                                <div id="major-publishing-actions">
-                                    <div id="delete-action">
-                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=funnels' ), 'delete_funnel', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Delete Funnel', 'wp-funnels' ); ?></a>
+                    <div class="sticky-actions" id="sticky-actions">
+                        <div id="submitdiv" class="postbox">
+                            <h3 class="hndle"><?php echo __( 'Funnel Status', 'wp-funnels' );?></h3>
+                            <div class="inside">
+                                <div class="submitbox">
+                                    <div id="minor-publishing-actions">
+                                        <?php do_action( 'wpfn_funnel_status_before' ); ?>
+                                        <table class="form-table">
+                                            <tbody>
+                                            <tr>
+                                                <th><label for="funnel_status"><?php echo __( 'Status', 'wp-funnels' );?></label></th>
+                                                <td>
+                                                    <select id="funnel_status" name="funnel_status">
+                                                        <option value="inactive" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'inactive' ) echo 'selected="selected"'; ?>><?php echo __( 'Inactive', 'wp-funnels' );?></option>
+                                                        <option value="active" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'active' ) echo 'selected="selected"'; ?>><?php echo __( 'Active', 'wp-funnels' );?></option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <?php do_action( 'wpfn_funnel_status_after' ); ?>
                                     </div>
-                                    <div id="publishing-action">
-                                        <span class="spinner"></span>
-                                        <input name="original_publish" type="hidden" id="original_publish" value="Update">
-                                        <input name="save" type="submit" class="button button-primary button-large" id="publish" value="Update">
+                                    <div id="major-publishing-actions">
+                                        <div id="delete-action">
+                                            <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=funnels' ), 'delete_funnel', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Delete Funnel', 'wp-funnels' ); ?></a>
+                                        </div>
+                                        <div id="publishing-action">
+                                            <span class="spinner"></span>
+                                            <input name="original_publish" type="hidden" id="original_publish" value="Update">
+                                            <input name="save" type="submit" class="button button-primary button-large" id="publish" value="Update">
+                                        </div>
+                                        <div class="clear"></div>
                                     </div>
-                                    <div class="clear"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Begin Benckmark Icons-->
-                    <div id='benchmarks' class="postbox">
-                        <h3 class="hndle"><?php echo __( 'Benchmarks', 'wp-funnels' );?></h3>
-                        <div class="elements-inner inside">
-                            <?php do_action( 'wpfn_benchmark_icons_before' ); ?>
-                            <table>
-                                <tbody>
-                                <?php $elements = wpfn_get_funnel_benchmark_icons();
+                        <!-- Begin Benckmark Icons-->
+                        <div id='benchmarks' class="postbox">
+                            <h3 class="hndle"><?php echo __( 'Benchmarks', 'wp-funnels' );?></h3>
+                            <div class="elements-inner inside">
+                                <?php do_action( 'wpfn_benchmark_icons_before' ); ?>
+                                <table>
+                                    <tbody>
+                                    <?php $elements = wpfn_get_funnel_benchmark_icons();
 
-                                foreach ( $elements as $i => $element ):
+                                    foreach ( $elements as $i => $element ):
 
-                                    if ( ( $i % 2 ) == 0 ):
-                                        ?><tr><?php
-                                    endif;
+                                        if ( ( $i % 2 ) == 0 ):
+                                            ?><tr><?php
+                                        endif;
 
-                                    ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><?php do_action( 'wpfn_benchmark_element_icon_html_' . $element ); ?></div></td><?php
+                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><?php do_action( 'wpfn_benchmark_element_icon_html_' . $element ); ?></div></td><?php
 
-                                    if ( $i & 1 ):
-                                        ?></tr><?php
-                                    endif;
+                                        if ( $i & 1 ):
+                                            ?></tr><?php
+                                        endif;
 
-                                endforeach;
-                                ?>
-                                </tbody>
-                            </table>
-                            <?php do_action( 'wpfn_benchmark_icons_after' ); ?>
-                            <p>
-                                <?php echo esc_html__( 'Benchmarks start and stop automation actions for a contact.','wp-funnels' ); ?>
-                            </p>
+                                    endforeach;
+                                    ?>
+                                    </tbody>
+                                </table>
+                                <?php do_action( 'wpfn_benchmark_icons_after' ); ?>
+                                <p>
+                                    <?php echo esc_html__( 'Benchmarks start and stop automation actions for a contact.','wp-funnels' ); ?>
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <!-- End Benckmark Icons-->
+                        <!-- End Benckmark Icons-->
 
-                    <!-- Begin Action Icons-->
-                    <div id='actions' class="postbox">
-                    <h2 class="hndle"><?php echo __( 'Actions', 'wp-funnels' );?></h2>
-                        <div class="inside">
-                            <?php do_action( 'wpfn_action_icons_before' ); ?>
-                            <table>
-                                <tbody>
-                                <?php $elements = wpfn_get_funnel_action_icons();
+                        <!-- Begin Action Icons-->
+                        <div id='actions' class="postbox">
+                            <h2 class="hndle"><?php echo __( 'Actions', 'wp-funnels' );?></h2>
+                            <div class="inside">
+                                <?php do_action( 'wpfn_action_icons_before' ); ?>
+                                <table>
+                                    <tbody>
+                                    <?php $elements = wpfn_get_funnel_action_icons();
 
-                                foreach ( $elements as $i => $element ):
+                                    foreach ( $elements as $i => $element ):
 
-                                    if ( ( $i % 2 ) == 0 ):
-                                        ?><tr><?php
-                                    endif;
+                                        if ( ( $i % 2 ) == 0 ):
+                                            ?><tr><?php
+                                        endif;
 
-                                    ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><?php do_action( 'wpfn_action_element_icon_html_' . $element ); ?></div></td><?php
+                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><?php do_action( 'wpfn_action_element_icon_html_' . $element ); ?></div></td><?php
 
-                                    if ( $i & 1 ):
-                                        ?></tr><?php
-                                    endif;
+                                        if ( $i & 1 ):
+                                            ?></tr><?php
+                                        endif;
 
-                                endforeach;
-                                ?>
-                                </tbody>
-                            </table>
-                            <?php do_action( 'wpfn_action_icons_after' ); ?>
+                                    endforeach;
+                                    ?>
+                                    </tbody>
+                                </table>
+                                <?php do_action( 'wpfn_action_icons_after' ); ?>
 
-                            <p>
-                                <?php echo esc_html__( 'Actions are launched whenever a contact completes a benchmark.','wp-funnels' ); ?>
-                            </p>
+                                <p>
+                                    <?php echo esc_html__( 'Actions are launched whenever a contact completes a benchmark.','wp-funnels' ); ?>
+                                </p>
+                            </div>
+
                         </div>
-
+                        <!-- End Action Icons-->
                     </div>
-                    <!-- End Action Icons-->
                 </div>
                 <!-- End elements area-->
 

@@ -536,6 +536,7 @@ function wpfn_get_step_html_via_ajax()
         </button>
         <h2 class="hndle ui-sortable-handle"><label for="<?php echo $step_id; ?>_title"><span class="dashicons <?php echo esc_attr( wpfn_get_step_dashicon_by_step_type( $step_type ) ); ?>"></span></label><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'wp-funnels' ); ?>"></h2>
         <div class="inside">
+            <input type="hidden" name="steps[]" value="<?php echo $step_id; ?>">
             <?php do_action( 'wpfn_step_settings_before' ); ?>
             <?php do_action( 'wpfn_get_step_settings_' . $step_type, $step_id ); ?>
             <?php do_action( 'wpfn_step_settings_after' ); ?>

@@ -82,8 +82,11 @@ function wpfn_emails_allowed_html()
 function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null )
 {
 
-    if ( ! $contact_id || ! is_int( $contact_id ) || ! $email_id || ! is_int( $email_id )  )
+    if ( ! $contact_id || ! $email_id  )
         return false;
+
+    $contact_id = absint( intval( $contact_id ) );
+    $email_id = absint( intval( $email_id ) );
 
     /**
      * @var $link_args array array of $_GET args that will be used to run analytics actions on the site
@@ -127,8 +130,8 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     /**
      * Filter the links to include data about the email, campaign, and funnel steps...
      */
-    $email_content = preg_replace_callback( '/(<a href=")([^"]*)("[^>]*?>)/i', 'wpfn_urlencode_email_links' , $email_content );
-    $email_content = preg_replace( '/(<a href=")([^"]*)("[^>]*?>)/i', '${1}' . $ref_link . '${2}${3}' , $email_content );
+    $email_content = preg_replace_callback( '/(href=")([^"]*)(")/i', 'wpfn_urlencode_email_links' , $email_content );
+    $email_content = preg_replace( '/(href=")([^"]*)(")/i', '${1}' . $ref_link . '${2}${3}' , $email_content );
 
     $contact = new WPFN_Contact( $contact_id );
 
@@ -246,11 +249,13 @@ add_action( 'wpfn_enqueue_next_funnel_action_send_email', 'wpfn_enqueue_send_ema
  *
  * @param $step_id int the email step's id
  * @param $contact_id int The contact's ID
+ *
+ * @return bool, whether the email was sent successfully
  */
 function wpfn_do_send_email_action( $step_id, $contact_id )
 {
     $email_id = wpfn_get_step_meta( $step_id, 'email_id', true );
-    wpfn_send_email( $contact_id, $email_id );
+    return wpfn_send_email( intval( $contact_id ), intval( $email_id ), wpfn_get_step_funnel( $step_id ), $step_id );
 }
 
 add_action( 'wpfn_do_action_send_email', 'wpfn_do_send_email_action', 10, 2 );
@@ -333,6 +338,26 @@ function wpfn_dropdown_emails( $args )
 }
 
 /**
+ * Create a new email and redirect to the email editor.
+ */
+function wpfn_create_new_email()
+{
+    if ( ! isset( $_POST['add_new_email_nonce'] ) || ! wp_verify_nonce( $_POST['add_new_email_nonce'], 'add_new_email' ) )
+        return;
+
+    if ( isset( $_POST['scratch_email'] ) ){
+        $email_id = wpfn_insert_new_email( '', '', '', get_current_user_id() );
+    } else {
+        $email = wpfn_get_email_by_id( intval( $_POST['copy_email_id'] ) );
+        $email_id = wpfn_insert_new_email( $email->content, $email->subject, $email->pre_header, get_current_user_id() );
+    }
+
+    wp_redirect( admin_url( 'admin.php?page=emails&email=' .  $email_id ) );
+}
+
+add_action( 'wpfn_before_new_email', 'wpfn_create_new_email' );
+
+/**
  * Save and update an email
  *
  * @param $email_id int, the Email's ID
@@ -346,13 +371,13 @@ function wpfn_save_email( $email_id )
         $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
         wpfn_update_email( $email_id, 'from_user', $from_user );
 
-        $subject =  ( isset( $_POST['subject'] ) )? sanitize_text_field( $_POST['subject'] ): '';
+        $subject =  ( isset( $_POST['subject'] ) )? sanitize_text_field( trim( stripslashes( $_POST['subject'] ) ) ): '';
         wpfn_update_email( $email_id, 'subject', $subject );
 
-        $pre_header =  ( isset( $_POST['pre_header'] ) )? sanitize_text_field( $_POST['pre_header'] ): '';
+        $pre_header =  ( isset( $_POST['pre_header'] ) )? sanitize_text_field( trim( stripslashes( $_POST['pre_header'] ) ) ): '';
         wpfn_update_email( $email_id, 'pre_header', $pre_header );
 
-        $content =  ( isset( $_POST['content'] ) )? wpfn_minify_html( trim( stripslashes( $_POST['content'] ) ) ): '';
+        $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpfn_sanitize_email_content', wpfn_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
 //        $content =  ( isset( $_POST['content'] ) )? wp_kses( stripslashes( $_POST['content'] ), wpfn_emails_allowed_html() ): '';
         wpfn_update_email( $email_id, 'content', $content );
 
@@ -363,6 +388,32 @@ function wpfn_save_email( $email_id )
 }
 
 add_action( 'wpfn_email_editor_before_everything', 'wpfn_save_email' );
+
+/**
+ * Remove script tags from the email content
+ *
+ * @param $content string the email content
+ * @return string, sanitized email content
+ */
+function wpfn_strip_script_tags( $content )
+{
+    return preg_replace( '/<script\b[^>]*>(.*?)<\/script>/', '', $content );
+}
+
+add_filter( 'wpfn_sanitize_email_content', 'wpfn_strip_script_tags' );
+
+/**
+ * Remove form tags from emails.
+ *
+ * @param $content string the email content
+ * @return string, sanitized email content
+ */
+function wpfn_strip_form_tags( $content )
+{
+    return preg_replace( '/<form\b[^>]*>(.*?)<\/form>/', '', $content );
+}
+
+add_filter( 'wpfn_sanitize_email_content', 'wpfn_strip_form_tags' );
 
 /**
  * Send a test email

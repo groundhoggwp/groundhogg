@@ -188,7 +188,9 @@ function wpfn_update_contact( $id, $key, $value )
 	if ( ! $id )
 		return false;
 
-	return $wpdb->update(
+    do_action( 'wpfn_update_contact_before', $id );
+
+    return $wpdb->update(
 		$wpdb->prefix . WPFN_CONTACTS,
 		array(
 			$key => $value
@@ -199,6 +201,45 @@ function wpfn_update_contact( $id, $key, $value )
 		),
 		array( '%d' )
 	);
+}
+
+/**
+ * Deletes the contact from the db.
+ *
+ * @param $id int ID of the contact
+ * @return true
+ */
+function wpfn_delete_contact( $id )
+{
+    global $wpdb;
+
+    if ( ! $id || ! is_numeric( $id ) )
+        return false;
+
+    $id = absint( $id );
+    if ( ! $id )
+        return false;
+
+    do_action( 'wpfn_delete_contact_before', $id );
+
+    //delete contact from contacts table
+    $wpdb->delete(
+        $wpdb->prefix . WPFN_CONTACTS,
+        array( 'ID' => $id ),
+        array( '%d' )
+    );
+
+    //delete the contact meta
+    $wpdb->delete(
+        $wpdb->contactmeta,
+        array( 'ID' => $id ),
+        array( '%d' )
+    );
+
+    do_action( 'wpfn_delete_contact_after' );
+
+    return true;
+
 }
 
 /**
@@ -234,6 +275,9 @@ function wpfn_integrate_contacts_wpdb()
 {
 	global $wpdb;
 
+	$wpdb->contacts = $wpdb->prefix . 'contacts';
+	$wpdb->tables[] = 'contacts';
+
 	$wpdb->contactmeta = $wpdb->prefix . 'contactmeta';
 	$wpdb->tables[] = 'contactmeta';
 
@@ -260,6 +304,7 @@ function wpfn_create_contacts_db()
       email tinytext NOT NULL,
       first_name tinytext NOT NULL,
       last_name tinytext NOT NULL,
+      owner_id bigint(20) NOT NULL,
       optin_status int NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       PRIMARY KEY  (ID)

@@ -25,9 +25,6 @@ function wpfn_insert_new_email( $content, $subject, $pre_header, $from_user )
 {
 	global $wpdb;
 
-	if ( ! $content || ! is_string( $content ) )
-		return false;
-
 	$success = $wpdb->insert(
 		$wpdb->prefix . WPFN_EMAILS,
 		array(

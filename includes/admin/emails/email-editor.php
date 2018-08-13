@@ -26,10 +26,15 @@ $email_id = intval( $_GET['email'] );
 
 wp_enqueue_media();
 wp_enqueue_style( 'wp-color-picker' );
+wp_enqueue_editor();
+wp_enqueue_script('wp-link');
+wp_enqueue_style( 'editor-buttons' );
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/email-editor.js' );
 wp_enqueue_script('media-picker', WPFN_ASSETS_FOLDER . '/js/admin/media-picker.js' );
+wp_enqueue_script('simple-editor', WPFN_ASSETS_FOLDER . '/js/admin/simple-editor.js' );
+wp_enqueue_style('simple-editor', WPFN_ASSETS_FOLDER . '/css/admin/simple-editor.css' );
 wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css' );
 wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js' );
 
@@ -40,79 +45,34 @@ $email = wpfn_get_email_by_id( $email_id );
 
 <style>
     select {vertical-align: top;}
-    #titlediv #subject,
-    #titlediv #pre_header {
-        padding: 3px 8px;
-        font-size: 1.7em;
-        line-height: 100%;
-        height: 1.7em;
-        width: 100%;
-        outline: 0;
-        margin: 0 0 3px;
-        background-color: #fff;
-    }
-
-    .wpfn-element div{
-        box-sizing: border-box;
-        display: inline-block;
-        height: 70px;
-        width: 100%;
-        padding-top: 10px;
-        /*padding-bottom: 70px;*/
-    }
-
-    .hndle label {
-        margin: 0 10px 0 0;
-    }
-
-    .wpfn-element.ui-draggable-dragging .dashicons,
-    #blocks .dashicons{
-        font-size: 60px;
-    }
-
-    #blocks table{
-        box-sizing: border-box;
-        width: 100%;
-        border-spacing: 7px;
-    }
-
-    #blocks table td{
-        text-align: center;
-        border: 1px solid #F1F1F1;
-
-    }
-
-    #blocks table td .wpfn-element,
-    .wpfn-element p{
-        text-align: center;
-        cursor: move;
-    }
-
-    .wpfn-element.ui-draggable-dragging {
-        font-size: 60px;
-        width: 120px;
-        height: 120px;
-        background: #FFFFFF;
-        border: 1px solid #F1F1F1;
-    }
-
-    select {
-        vertical-align: top;
-    }
-
+    #titlediv #subject, #titlediv #pre_header {padding: 3px 8px;font-size: 1.7em;line-height: 100%;height: 1.7em;width: 100%;outline: 0;margin: 0 0 3px;background-color: #fff;}
+    .wpfn-element div{box-sizing: border-box;display: inline-block;height: 70px;width: 100%;padding-top: 10px; /*padding-bottom: 70px;*/}
+    .hndle label {margin: 0 10px 0 0;}
+    .wpfn-element.ui-draggable-dragging .dashicons, #blocks .dashicons{font-size: 60px;}
+    #blocks table{box-sizing: border-box;width: 100%;border-spacing: 7px;}
+    #blocks table td{text-align: center;border: 1px solid #F1F1F1;}
+    #blocks table td .wpfn-element, .wpfn-element p{text-align: center;cursor: move;}
+    .wpfn-element.ui-draggable-dragging {font-size: 60px;width: 120px;height: 120px;background: #FFFFFF;border: 1px solid #F1F1F1;}
+    select {vertical-align: top;}
     #email-content {margin-left: auto;margin-right: auto;box-sizing: border-box;background-color: #FFFFFF;}
     #email-body{width: 100%;min-height: 20px;padding: 10px;}
+    #email-body ul{ list-style-type: disc;margin-left: 2em; }
+    #email-body p{ font-size: inherit; }
+    #email-body h1{ font-weight: bold; padding: 0;margin: 0.67em 0 0.67em 0;}
+    #email-body h2{ font-weight: bold; padding: 0;margin: 0.83em 0 0.83em 0;}
     #editor-actions{border-right: 1px solid rgb(238, 238, 238);min-height: 50px;}
     #editor-actions .postbox{border: none; box-shadow: none;}
     .content-inside p {padding: 10px;margin:0;}
     .content-wrapper{border: 2px solid transparent;}
     .active .content-wrapper{ border: 2px solid #35afe6 !important;}
-    .active .content-wrapper .action-icons{ background-color: #35afe6 !important;}
-    .ui-sortable-helper .action-icons,.content-wrapper:hover .action-icons{display: block;width:100px;margin-top:-30px;margin-right:-2px;float: right;background-color: #EAEAEA;text-align: center;vertical-align: center;}
+    .action-icons {display: none;}
+    .active .action-icons{ background-color: #35afe6 !important;}
+    .action-icons .dashicons:hover{ cursor: pointer;}
+    .active .action-icons .dashicons:hover{ color: #ffffff; }
+    .ui-sortable-helper .action-icons,.row:hover .action-icons{display: block;width:100px;margin-top:-30px;float: right;background-color: #EAEAEA;text-align: center;vertical-align: center;}
     .ui-sortable-helper .content-wrapper,.content-wrapper:hover{border: 2px dashed #EAEAEA;background-color: #FFF;}
     [contenteditable]:focus {outline: 0px solid transparent;}
     .sortable-placeholder{border-width: 2px;}
-    .action-icons {display: none;}
 </style>
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php echo __('Edit Email', 'wp-funnels');?></h1>
@@ -126,7 +86,7 @@ $email = wpfn_get_email_by_id( $email_id );
                     <div id="titlediv">
                         <div id="titlewrap">
                             <label class="screen-reader-text" id="title-prompt-text" for="subject"><?php echo __('Subject Line: Used to capture the attention of the reader.', 'wp-funnels');?></label>
-                            <input placeholder="<?php echo __('Subject Line: Used to capture the attention of the reader.', 'wp-funnels');?>" type="text" name="subject" size="30" value="<?php echo  $email->subject; ?>" id="subject" spellcheck="true" autocomplete="off">
+                            <input placeholder="<?php echo __('Subject Line: Used to capture the attention of the reader.', 'wp-funnels');?>" type="text" name="subject" size="30" value="<?php echo  $email->subject; ?>" id="subject" spellcheck="true" autocomplete="off" required>
                             <label class="screen-reader-text" id="title-prompt-text" for="pre_header"><?php echo __('Pre Header Text: Used to summarize the content of the email.', 'wp-funnels');?></label>
                             <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'wp-funnels');?>" type="text" name="pre_header" size="30" value="<?php echo  $email->pre_header; ?>" id="pre_header" spellcheck="true" autocomplete="off">
                         </div>
@@ -143,7 +103,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                                 <table class="form-table">
                                                     <tr>
                                                         <th><?php _e( 'H1 Size'); ?>:</th>
-                                                        <td><input class="input" type="number" id="h1-size" min="10" max="40" value=""></td>
+                                                        <td><input class="input" type="number" id="h1-size" min="10" max="40" value="30"></td>
                                                     </tr>
                                                     <tr>
                                                         <th><?php _e( 'H1 Font'); ?>:</th>
@@ -151,7 +111,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                                     </tr>
                                                     <tr>
                                                         <th><?php _e( 'H2 Size'); ?>:</th>
-                                                        <td><input class="input" type="number" id="h2-size" min="10" max="40" value=""></td>
+                                                        <td><input class="input" type="number" id="h2-size" min="10" max="40" value="20"></td>
                                                     </tr>
                                                     <tr>
                                                         <th><?php _e( 'H2 Font'); ?>:</th>
@@ -159,7 +119,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                                     </tr>
                                                     <tr>
                                                         <th><?php _e( 'Paragraph Size'); ?>:</th>
-                                                        <td><input class="input" type="number" id="p-size" min="10" max="40" value=""></td>
+                                                        <td><input class="input" type="number" id="p-size" min="10" max="40" value="16"></td>
                                                     </tr>
                                                     <tr>
                                                         <th><?php _e( 'Paragraph Font'); ?>:</th>
@@ -211,7 +171,19 @@ $email = wpfn_get_email_by_id( $email_id );
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="divider_block-editor"></div>
+                                    <div id="divider_block-editor" class="postbox hidden">
+                                        <h3 class="hndle"><?php _e( 'Divider'); ?></h3>
+                                        <div class="inside">
+                                            <div class="options">
+                                                <table class="form-table">
+                                                    <tr>
+                                                        <th><?php _e( 'Divider width'); ?>:</th>
+                                                        <td><input class="input" type="number" id="divider-width" min="10" max="100" value=""></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div id="image_block-editor" class="postbox hidden">
                                         <h3 class="hndle"><?php _e( 'Image'); ?></h3>
                                         <div class="inside">
@@ -254,12 +226,26 @@ $email = wpfn_get_email_by_id( $email_id );
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="button_block-editor"></div>
+                                    <div id="code_block-editor" class="postbox hidden">
+                                        <h3 class="hndle"><?php _e( 'Custom HTML'); ?></h3>
+                                        <div class="inside">
+                                            <div class="options">
+                                                <table class="form-table">
+                                                    <tr>
+                                                        <th><?php _e( 'HTML Content'); ?>:</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><textarea class="input" rows="20" cols="22" id="custom-html-content"></textarea></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div id="social_block-editor"></div>
                                     <div id="video_block-editor"></div>
                                 </div>
                             </div>
-                            <div id="email-body" class="main-email-body" style="display: inline-block;max-width: 650px;vertical-align: top">
+                            <div id="email-body" class="main-email-body" style="display: inline-block;max-width: 580px;vertical-align: top">
 
                                 <div id="email-inside" class="email-sortable">
                                     <?php if ( empty( $email->content ) ): ?>
