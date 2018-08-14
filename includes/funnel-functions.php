@@ -105,6 +105,7 @@ function wpfn_get_funnel_benchmark_icons()
     }
 
     $benchmarks[] = 'account_created';
+    $benchmarks[] = 'role_changed';
 
     return apply_filters( 'wpfn_funnel_benchmarks', $benchmarks );
 }
@@ -161,6 +162,7 @@ function wpfn_get_step_dashicon_by_step_type( $step_type )
     $dashicons['tag_applied'] = 'dashicons-tag';
     $dashicons['tag_removed'] = 'dashicons-tag';
     $dashicons['account_created'] = 'dashicons-admin-users';
+    $dashicons['role_changed'] = 'dashicons-admin-users';
 
     //todo WC dashicons
     $dashicons['wc_reached_checkout'] = '';
@@ -475,6 +477,19 @@ function wpfn_is_benchmark( $element )
 }
 
 /**
+ * Return true if the funnel is marked as active.
+ *
+ * @param $funnel_id int Funnel ID
+ * @return bool whether the funnel is active.
+ */
+function wpfn_is_funnel_active( $funnel_id )
+{
+    $status = wpfn_get_funnel_status( $funnel_id );
+
+    return $status === 'active';
+}
+
+/**
  * Extract the funnel ID from a link, only for use in ADMIN funnel editor.
  *
  * @param $link string link from the funnel editor page
@@ -498,7 +513,89 @@ function wpfn_url_to_funnel_id( $link )
     }
 
     return false;
+}
 
+/**
+ * Gt the current reporting range for a funnel...
+ *
+ * @return string
+ */
+function wpfn_get_the_report_range()
+{
+    return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ;
+}
+
+/**
+ * Out put the HTML for a step. used in the ajax call and in the funnel builder itself.
+ *
+ * @param $step_id int the ID of a step
+ */
+function wpfn_get_step_html( $step_id )
+{
+    ?>
+    <div id="<?php echo $step_id; ?>" class="postbox <?php echo wpfn_get_step_group( $step_id ); ?>">
+        <button type="button" class="handlediv delete-step-<?php echo $step_id;?>">
+            <span class="dashicons dashicons-trash"></span>
+            <script>
+                jQuery(function(){jQuery('.delete-step-<?php echo $step_id;?>').click( wpfn_delete_funnel_step )})
+            </script>
+        </button>
+        <h2 class="hndle ui-sortable-handle"><label for="<?php echo $step_id; ?>_title"><span class="dashicons <?php echo esc_attr( wpfn_get_step_dashicon_by_id( $step_id ) ); ?>"></span></label><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'wp-funnels' ); ?>"></h2>
+        <div class="inside">
+            <div class="step-edit">
+                <input type="hidden" name="<?php echo wpfn_prefix_step_meta( $step_id, 'order' ); ?>" value="<?php wpfn_get_step_order( $step_id ) ?>" >
+                <input type="hidden" name="steps[]" value="<?php echo $step_id; ?>">
+                <?php do_action( 'wpfn_step_settings_before' ); ?>
+                <?php do_action( 'wpfn_get_step_settings_' . wpfn_get_step_type( $step_id ), $step_id ); ?>
+                <?php do_action( 'wpfn_step_settings_after' ); ?>
+            </div>
+            <div class="step-reporting hidden">
+                <?php do_action( 'wpfn_step_reporting_before' );
+
+                $range = wpfn_get_the_report_range();
+
+                switch ( $range ):
+                    case 'last_24';
+                        $start = strtotime( '1 day ago' );
+                        $end = strtotime( 'now' );
+                        break;
+                    case 'last_7';
+                        $start = strtotime( '7 days ago' );
+                        $end = strtotime( 'now' );
+                        break;
+                    case 'last_30';
+                        $start = strtotime( '30 days ago' );
+                        $end = strtotime( 'now' );
+                        break;
+                    case 'custom';
+                        $start = strtotime( $_POST['custom_date_range_start'] );
+                        $end = strtotime( $_POST['custom_date_range_end'] );
+                        break;
+                    default:
+                        $start = strtotime( '1 day ago' );
+                        $end = strtotime( 'now' );
+                        break;
+                endswitch;
+
+                $report = new WPFN_Event_Report( wpfn_get_step_funnel( $step_id ), $step_id, $start, $end );
+
+                ?>
+
+                <?php do_action( 'wpfn_get_step_report_' . wpfn_get_step_type( $step_id ) ); ?>
+
+                <?php if ( wpfn_get_step_group( $step_id ) === 'benchmark'): ?>
+                    <p class="report"><a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><?php _e('Completed', 'wp-funnels') ?>: <b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
+                <?php else: ?>
+                    <p class="report"><a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><?php _e('Completed', 'wp-funnels') ?>: <b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
+                    <hr>
+                    <p class="report"><a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=waiting&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><?php _e('Waiting', 'wp-funnels') ?>: <b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
+                <?php endif; ?>
+
+                <?php do_action( 'wpfn_step_reporting_after' ); ?>
+            </div>
+        </div>
+    </div>
+    <?php
 }
 
 /**
@@ -526,23 +623,7 @@ function wpfn_get_step_html_via_ajax()
 
     ob_start();
 
-    ?>
-    <div id="<?php echo $step_id; ?>" class="postbox <?php echo $step_group; ?>">
-        <button type="button" class="handlediv delete-step-<?php echo $step_id;?>">
-            <span class="dashicons dashicons-trash"></span>
-            <script>
-                jQuery('.delete-step-<?php echo $step_id;?>').click( wpfn_delete_funnel_step );
-            </script>
-        </button>
-        <h2 class="hndle ui-sortable-handle"><label for="<?php echo $step_id; ?>_title"><span class="dashicons <?php echo esc_attr( wpfn_get_step_dashicon_by_step_type( $step_type ) ); ?>"></span></label><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'wp-funnels' ); ?>"></h2>
-        <div class="inside">
-            <input type="hidden" name="steps[]" value="<?php echo $step_id; ?>">
-            <?php do_action( 'wpfn_step_settings_before' ); ?>
-            <?php do_action( 'wpfn_get_step_settings_' . $step_type, $step_id ); ?>
-            <?php do_action( 'wpfn_step_settings_after' ); ?>
-        </div>
-    </div>
-    <?php
+    wpfn_get_step_html( $step_id );
 
     $content = ob_get_contents();
 
@@ -588,23 +669,34 @@ function wpfn_prefix_step_meta( $step_id, $atter )
  */
 function wpfn_save_funnel( $funnel_id )
 {
-    //todo user validation...
+    //todo user validation & permissions...
+
     if ( ! isset( $_POST[ 'save' ] ) )
         return;
 
     do_action( 'wpfn_save_funnel', $funnel_id );
 
-    $title = sanitize_text_field( $_POST[ 'funnel_title' ] );
+    $title = sanitize_text_field( stripslashes( $_POST[ 'funnel_title' ] ) );
     wpfn_update_funnel( $funnel_id, 'funnel_title', $title );
 
     $status = sanitize_text_field( $_POST[ 'funnel_status' ] );
     if ( $status !== 'active' && $status !== 'inactive' )
         $status = 'inactive';
 
-    wpfn_update_funnel( $funnel_id, 'funnel_status', $status );
+    //do not update the status to inactive if it's not confirmed
+    if ( ( $status === 'inactive' && isset( $_POST['confirm'] ) && $_POST['confirm'] === 'yes' ) || $status === 'active' ){
+        wpfn_update_funnel( $funnel_id, 'funnel_status', $status );
+    }
 
     //get all the steps in the funnel.
     $steps = $_POST['steps'];
+
+    if ( ! $steps ){
+        ?>
+        <div class="notice notice-error is-dismissible"><p><?php echo esc_html__( 'No funnel steps present. Please add some automation.', 'wp-funnels' ); ?></p></div>
+        <?php
+        return;
+    }
 
     foreach ( $steps as $i => $stepId )
     {
@@ -613,7 +705,7 @@ function wpfn_save_funnel( $funnel_id )
         $order = $i + 1;
         wpfn_update_funnel_step( $stepId, 'funnelstep_order', $order );
 
-        $title = sanitize_text_field( $_POST[ wpfn_prefix_step_meta( $stepId, 'title' ) ] );
+        $title = sanitize_text_field( stripslashes( $_POST[ wpfn_prefix_step_meta( $stepId, 'title' ) ] ) );
         wpfn_update_funnel_step( $stepId, 'funnelstep_title', $title );
 
         $step_type = wpfn_get_step_type( $stepId );
@@ -625,8 +717,94 @@ function wpfn_save_funnel( $funnel_id )
     do_action( 'wpfn_save_funnel_after', $funnel_id );
 
     ?>
-<div class="notice notice-success is-dismissible"><p><?php echo esc_html__( 'Funnel updated!', 'wp-funnels' ); ?></p></div>
+    <div class="notice notice-success is-dismissible"><p><?php echo esc_html__( 'Funnel updated!', 'wp-funnels' ); ?></p></div>
     <?php
 }
 
 add_action( 'wpfn_funnel_editor_before_everything', 'wpfn_save_funnel' );
+
+/**
+ * Auto save the funnel steps. nothing else
+ */
+function wpfn_auto_save_funnel()
+{
+    if ( ! wp_doing_ajax() )
+        wp_die('You should not be running this function without an ajax request.');
+
+    //todo user permissions
+
+    $steps = $_POST['steps'];
+
+    if ( ! $steps )
+        wp_die('No steps present.');
+
+    foreach ( $steps as $i => $stepId )
+    {
+        $stepId = intval( $stepId );
+        //quick Order Hack to get the proper order of a step...
+        $order = $i + 1;
+        wpfn_update_funnel_step( $stepId, 'funnelstep_order', $order );
+
+        $title = sanitize_text_field( stripslashes( $_POST[ wpfn_prefix_step_meta( $stepId, 'title' ) ] ) );
+        wpfn_update_funnel_step( $stepId, 'funnelstep_title', $title );
+
+        $step_type = wpfn_get_step_type( $stepId );
+
+        do_action( 'wpfn_save_step_' . $step_type, $stepId );
+    }
+
+    wp_die('Auto Saved Successfully.');
+
+}
+
+add_action( 'wp_ajax_wpfn_auto_save_funnel_via_ajax', 'wpfn_auto_save_funnel' );
+
+/**
+ * Return whether the contact is in a certain funnel.
+ * Used to verify a certain benchmark should be completed or not.
+ * Will return true if there are previous funnel ACTIONS (not benchmarks) in the event queue.
+ *
+ * @param $contact_id int the ID of the contact
+ * @param $funnel_id int the ID of the funnel
+ * @return true|false whether the contact is in the funnel
+ */
+function wpfn_contact_is_in_funnel( $contact_id, $funnel_id )
+{
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . WPFN_EVENTS;
+
+    return ! empty( $wpdb->get_results(
+        $wpdb->prepare(
+            "
+         SELECT * FROM $table_name
+		 WHERE contact_id = %d AND funnel_id = %d AND status = %s
+		",
+            $contact_id, $funnel_id, 'complete'
+        ) )
+    );
+
+}
+
+/**
+ * Convert the funnel into a json object so it can be duplicated fairly easily.
+ *
+ * @param $funnel_id int the ID of the funnel to convert.
+ * @return false|string the json string of a converted funnel or false on failure.
+ */
+function wpfn_convert_funnel_to_json( $funnel_id )
+{
+
+    if ( ! $funnel_id || is_int( $funnel_id) )
+        return false;
+
+    $funnel = wpfn_get_funnel_step_by_id( $funnel_id );
+
+    if ( ! $funnel )
+        return false;
+
+    $funnelArray = array();
+
+    $funnelArray['title'] = $funnel->funnel_title;
+
+}

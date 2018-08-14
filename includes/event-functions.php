@@ -14,7 +14,7 @@
 /**
  * Run all events that have yet to be run.
  *
- * @return int|bool
+ * @return int|bool the number of completed steps or false if no events were run
  */
 function wpfn_do_queued_events()
 {
@@ -45,8 +45,6 @@ function wpfn_do_queued_events()
     if ( ! $dequeued )
         return false;
 
-    //wp_die( 'Made It Here' );
-
     /**
      * Iterate through the events and perform them
      *
@@ -74,7 +72,12 @@ function wpfn_do_queued_events()
         if ( $callback )
             call_user_func( $callback, $contact_id, $arg1, $arg2, $arg3 );
 
-        $next_step_id = wpfn_enqueue_next_funnel_action( $step_id, $contact_id );
+        //run the next step only if the funnel is active.
+        if ( wpfn_is_funnel_active( $funnel_id ) ){
+            $next_step_id = wpfn_enqueue_next_funnel_action( $step_id, $contact_id );
+
+            do_action( 'wpfn_step_queued', $next_step_id );
+        }
     }
 
     return key( $events ) + 1;

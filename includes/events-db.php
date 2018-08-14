@@ -119,7 +119,7 @@ function wpfn_dequeue_contact_funnel_events( $contact_id, $funnel_id )
 
 /**
  * Insert a new event into the DB.
- * Set the default event status to waitin as it's waiting to be run.
+ * Set the default event status to waiting as it's waiting to be run.
  *
  * @param $time       int The time the event is to occur
  * @param $funnel_id  int The ID of the funnel the event was queued from

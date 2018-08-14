@@ -24,17 +24,23 @@ if ( isset( $_GET['notice'] ) && $_GET['notice'] == 'success' ){
 
 $email_id = intval( $_GET['email'] );
 
+//for media picker
 wp_enqueue_media();
-wp_enqueue_style( 'wp-color-picker' );
+//for link editor
 wp_enqueue_editor();
-wp_enqueue_script('wp-link');
-wp_enqueue_style( 'editor-buttons' );
+wp_enqueue_script('wplink');
+wp_enqueue_style('editor-buttons');
+//for color picker
+wp_enqueue_style( 'wp-color-picker' );
+//for drag & drop
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
+//custom scripts
 wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/email-editor.js' );
 wp_enqueue_script('media-picker', WPFN_ASSETS_FOLDER . '/js/admin/media-picker.js' );
 wp_enqueue_script('simple-editor', WPFN_ASSETS_FOLDER . '/js/admin/simple-editor.js' );
 wp_enqueue_style('simple-editor', WPFN_ASSETS_FOLDER . '/css/admin/simple-editor.css' );
+//for select 2
 wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css' );
 wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js' );
 

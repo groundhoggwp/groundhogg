@@ -1,3 +1,5 @@
+var wpfnDoingAutoSave = false;
+
 jQuery( function($) {
     var funnelSortables = jQuery( ".ui-sortable" ).sortable(
         {
@@ -25,7 +27,7 @@ jQuery( function($) {
             var sortables = jQuery('#normal-sortables');
 
             sortables.find('.ui-draggable').replaceWith(
-                '<div class="postbox replace-me"><h3 class="hndle"></h3><div class="inside"></div></div>'
+                '<div class="postbox replace-me" style="width: 500px;margin-right: auto;margin-left: auto;"><h3 class="hndle">Please Wait...</h3><div class="inside">Loading content...</div></div>'
             );
 
             if ( sortables.find( '.replace-me' ).length ){
@@ -40,6 +42,8 @@ jQuery( function($) {
 
                         var newEl = wrapper.firstChild;
                         jQuery('#normal-sortables').find('.replace-me').replaceWith( html );
+
+                        wpfn_update_funnel_step_order();
                     }
                 });
             }
@@ -62,6 +66,8 @@ function wpfn_delete_funnel_step()
             }
         });
     }
+
+    wpfn_auto_save_funnel();
 }
 
 function wpfn_update_funnel_step_order()
@@ -69,7 +75,32 @@ function wpfn_update_funnel_step_order()
     jQuery( "input[name$='_order']" ).each(
         function( index ){
             jQuery( this ).val( index + 1 );
-            //console.log( index);
         }
     );
+
+    wpfn_auto_save_funnel();
+}
+
+function wpfn_auto_save_funnel()
+{
+    if ( wpfnDoingAutoSave )
+        return;
+
+    wpfnDoingAutoSave = true;
+
+    var fd = jQuery('form').serialize();
+
+    fd = fd +  '&action=wpfn_auto_save_funnel_via_ajax';
+
+    var ajaxCall = jQuery.ajax({
+        type : "post",
+        url : ajaxurl,
+        //data : fd,
+        data : fd,
+        success: function( result )
+        {
+            console.log(result);
+            wpfnDoingAutoSave = false;
+        }
+    });
 }

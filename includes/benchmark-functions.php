@@ -24,11 +24,13 @@ function wpfn_complete_benchmark( $benchmark_id, $contact_id )
 
     $funnel_id = wpfn_get_step_funnel( $benchmark_id );
 
+    //do not run if the funnel is set to inactive.
+    if ( ! wpfn_is_funnel_active( $funnel_id ) )
+        return;
+
     wpfn_dequeue_contact_funnel_events( $contact_id, $funnel_id );
 
-    //todo implement reporting for funnel. I imagine it will appear in the meta or something for the step or the funnel itself.
-
-    wpfn_enqueue_next_funnel_action( $benchmark_id, $contact_id );
+    wpfn_enqueue_event( strtotime('now'), wpfn_get_step_funnel( $benchmark_id ), $benchmark_id, $contact_id );
 
     do_action( 'wpfn_complete_benchmark_after', $benchmark_id );
 }
@@ -54,8 +56,6 @@ function wpfn_run_account_created_benchmark_action( $userId )
 
     $benchmarks = wpfn_get_funnel_steps_by_type( 'account_created' );
 
-    //var_dump( $benchmarks );
-
     foreach ( $benchmarks as $benchmark ) {
 
         $step_id = intval( $benchmark['ID'] );
@@ -65,7 +65,6 @@ function wpfn_run_account_created_benchmark_action( $userId )
         $role = wpfn_get_step_meta( $step_id, 'role', true );
 
         if ( ( 1 === $step_order || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $role, $user_info->roles ) ){
-            //wp_die( 'made it here' );
             wpfn_complete_benchmark( $step_id, $contact_id );
         }
     }
@@ -74,7 +73,44 @@ function wpfn_run_account_created_benchmark_action( $userId )
 add_action( 'user_register', 'wpfn_run_account_created_benchmark_action' );
 
 /**
+ * Run the benchmark for user role changes. Helpful for membership sites.
+ *
+ * @param $userId int the ID of a user.
+ * @param $cur_role string the new role of the user
+ * @param $old_roles array list of previous user roles.
+ */
+function wpfn_run_user_role_changed_benchmark( $userId, $cur_role, $old_roles )
+{
+    $user_info = get_userdata( $userId );
+
+    $contact = new WPFN_Contact( $user_info->user_email );
+
+    if ( ! $contact->getEmail() )
+        return;
+
+    $contact_id = $contact->getId();
+
+    $benchmarks = wpfn_get_funnel_steps_by_type( 'role_changed' );
+
+    foreach ( $benchmarks as $benchmark ) {
+
+        $step_id = intval( $benchmark['ID'] );
+        $step_order = intval( $benchmark['funnelstep_order'] );
+        $funnel_id = intval( $benchmark['funnel_id'] );
+
+        $role = wpfn_get_step_meta( $step_id, 'role', true );
+
+        if ( ( 1 === $step_order || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $cur_role === $role ){
+            wpfn_complete_benchmark( $step_id, $contact_id );
+        }
+    }
+}
+
+add_action( 'set_user_role', 'wpfn_run_user_role_changed_benchmark', 10, 3 );
+
+/**
  * Complete the Page View benchmark.
+ * todo Review this goal. The hook needs to be changed probably...
  *
  * @param $post_object object post object goes unused.
  */

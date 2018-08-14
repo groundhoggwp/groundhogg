@@ -602,7 +602,7 @@
                 result: function result() {
                     var elm = getSelectionContainerElement();
                     if (getSelectionContainerElement().is('h1')) {
-                        //unwrap(elm[0]);
+                        unwrap(elm[0]);
                         return true;
                     }
                     return exec(formatBlock, '<h1>');
@@ -617,7 +617,7 @@
                 result: function result() {
                     var elm = getSelectionContainerElement();
                     if (getSelectionContainerElement().is('h2')) {
-                        //unwrap(elm[0]);
+                        unwrap(elm[0]);
                         return true;
                     }
                     return exec(formatBlock, '<h2>');
@@ -652,7 +652,7 @@
                 result: function result() {
                     var elm = getSelectionContainerElement();
                     if (getSelectionContainerElement().is('p')) {
-                        //unwrap(elm[0]);
+                        unwrap(elm[0]);
                         return true;
                     }
                     return exec(formatBlock, '<p>');
@@ -913,3 +913,4 @@
         return wrapper;
     };
 }(jQuery));
+

@@ -269,15 +269,18 @@ WPFNEmailEditor.action = function( e )
 
         WPFNEmailEditor.makeActive( el );
 
-        if ( WPFNEmailEditor.richText )
+        if ( WPFNEmailEditor.richText ){
+            console.log('destroy-editor');
             WPFNEmailEditor.richText.simpleEditor().destroy();
+        }
 
         if ( el.closest( '.text_block' ).length ){
 
             WPFNEmailEditor.richText = el.closest('.content-wrapper');
 
             WPFNEmailEditor.richText.simpleEditor({
-                defaultParagraphSeparator: 'p'
+                defaultParagraphSeparator: 'p',
+                actions: ["heading1", "heading2", "paragraph", "bold", "italic",  "underline", "color", "strikethrough", "alignLeft", "alignRight", "alignCenter", "olist", "ulist","link", "unlink"]
             });
 
             WPFNEmailEditor.showTextOptions();

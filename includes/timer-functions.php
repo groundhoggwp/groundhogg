@@ -29,8 +29,13 @@ function wpfn_enqueue_delay_timer_action( $step_id, $contact_id )
         $time_string = '+ ' . $amount . ' ' . $type;
     } else {
         $time_string = '+ ' . $amount . ' ' . $type;
-        $formated_date = date( 'Y-m-d', strtotime( $time_string ) );
-        $time_string = $formated_date . ' ' . $run_time;
+        $base_time = strtotime( $time_string );
+        $formatted_date = date( 'Y-m-d', $base_time );
+        $time_string = $formatted_date . ' ' . $run_time;
+        if ( strtotime( $time_string ) < time() ){
+            $formatted_date = date( 'Y-m-d', strtotime( 'tomorrow' ) );
+            $time_string = $formatted_date . ' ' . $run_time;
+        }
     }
 
     $funnel_id = wpfn_get_step_funnel( $step_id );

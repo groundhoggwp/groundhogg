@@ -184,15 +184,3 @@ function wpfn_get_the_contact()
 
     return new WPFN_Contact( 0 ) ;
 }
-
-/**
- * Return whether a contact is in a funnel or not.
- *
- * @param $contact_id int the Contcat's ID
- * @return bool whether the contact is in a funnel or not
- */
-function wpfn_contact_is_in_funnel( $contact_id )
-{
-    //todo implement
-    return true;
-}
