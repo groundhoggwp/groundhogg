@@ -581,8 +581,6 @@ function wpfn_get_step_html( $step_id )
 
                 ?>
 
-                <?php do_action( 'wpfn_get_step_report_' . wpfn_get_step_type( $step_id ) ); ?>
-
                 <?php if ( wpfn_get_step_group( $step_id ) === 'benchmark'): ?>
                     <p class="report"><a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><?php _e('Completed', 'wp-funnels') ?>: <b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
                 <?php else: ?>
@@ -590,6 +588,8 @@ function wpfn_get_step_html( $step_id )
                     <hr>
                     <p class="report"><a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=waiting&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><?php _e('Waiting', 'wp-funnels') ?>: <b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
                 <?php endif; ?>
+
+                <?php do_action( 'wpfn_get_step_report_' . wpfn_get_step_type( $step_id ) ); ?>
 
                 <?php do_action( 'wpfn_step_reporting_after' ); ?>
             </div>

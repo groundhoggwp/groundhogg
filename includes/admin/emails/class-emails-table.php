@@ -39,13 +39,6 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 * Get a list of columns. The format is:
 	 * 'internal-name' => 'Title'
 	 *
-	 * REQUIRED! This method dictates the table's columns and titles. This should
-	 * return an array where the key is the column slug (and class) and the value
-	 * is the column's title text. If you need a checkbox for bulk actions, refer
-	 * to the $columns array below.
-	 *
-	 * The 'cb' column is treated differently than the rest. If including a checkbox
-	 * column in your table you must create a `column_cb()` method. If you don't need
 	 * bulk actions or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
 	 * @see WP_List_Table::::single_row_columns()
@@ -66,19 +59,6 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 * or
 	 * 'internal-name' => array( 'orderby', true )
 	 *
-	 * The second format will make the initial sorting order be descending
-	 *
-	 * Optional. If you want one or more columns to be sortable (ASC/DESC toggle),
-	 * you will need to register it here. This should return an array where the
-	 * key is the column that needs to be sortable, and the value is db column to
-	 * sort by. Often, the key and value will be the same, but this is not always
-	 * the case (as the value is a column name from the database, not the list table).
-	 *
-	 * This method merely defines which columns should be sortable and makes them
-	 * clickable - it does not handle the actual sorting. You still need to detect
-	 * the ORDERBY and ORDER querystring variables within `prepare_items()` and sort
-	 * your data accordingly (usually by modifying your query).
-	 *
 	 * @return array An associative array containing all the columns that should be sortable.
 	 */
 	protected function get_sortable_columns() {
@@ -89,22 +69,55 @@ class WPFN_Emails_Table extends WP_List_Table {
 		);
 		return $sortable_columns;
 	}
+
+    /**
+     * Get the views for the emails, all, ready, unready, trash
+     *
+     * @return array
+     */
+	protected function get_views()
+    {
+        $views =  array();
+
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=emails&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_email_items() . ")</span>" . "</a>";
+
+        $views['ready'] = "<a class='" .  print_r( ( $this->get_view() === 'ready' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=emails&view=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'ready' ) . ")</span>" . "</a>";
+
+        $views['draft'] = "<a class='" .  print_r( ( $this->get_view() === 'draft' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=emails&view=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'draft' ) . ")</span>" . "</a>";
+
+        $views['trash'] = "<a class='" .  print_r( ( $this->get_view() === 'trash' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=emails&view=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'trash' ) . ")</span>" . "</a>";
+
+        return apply_filters(  'wpfn_email_views', $views );
+    }
+
+    protected function get_view()
+    {
+        return ( isset( $_GET['view'] ) )? $_GET['view'] : 'all';
+    }
+
+    /**
+     * Get default row actions...
+     *
+     * @param $id int an item ID
+     * @return array a list of actions
+     */
+	protected function get_row_actions( $id )
+    {
+        if ( $this->get_view() === 'trash' )
+        {
+            return array(
+                "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=emails&view=all&action=restore&email='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>",
+                "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=emails&view=trash&action=delete&email='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
+            );
+        } else {
+            return apply_filters( 'wpfn_email_row_actions', array(
+                "<span class='edit'><a href='" . admin_url( 'admin.php?page=emails&action=edit&email='. $id ). "'>" . __( 'Edit' ) . "</a></span>",
+                "<span class='trash'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=emails&view=all&action=trash&email='. $id ), 'trash' ). "'>" . __( 'Trash' ) . "</a></span>",
+            ));
+        }
+    }
+
 	/**
-	 * Get default column value.
-	 *
-	 * Recommended. This method is called when the parent class can't find a method
-	 * specifically build for a given column. Generally, it's recommended to include
-	 * one method for each column you want to render, keeping your package class
-	 * neat and organized. For example, if the class needs to process a column
-	 * named 'title', it would first see if a method named $this->column_title()
-	 * exists - if it does, that method will be used. If it doesn't, this one will
-	 * be used. Generally, you should try to use custom column methods as much as
-	 * possible.
-	 *
-	 * Since we have defined a column_title() method later on, this method doesn't
-	 * need to concern itself with any column with a name of 'title'. Instead, it
-	 * needs to handle everything else.
-	 *
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
@@ -115,9 +128,27 @@ class WPFN_Emails_Table extends WP_List_Table {
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'subject':
-			    $subject = ( ! $item[ $column_name ] )? __( 'No Subject' ) : $item[ $column_name ] ;
-				$editUrl = admin_url( 'admin.php?page=emails&email=' . $item['ID'] );
-				return "<a href='$editUrl'>{$subject}</a>";
+			    $subject = ( ! $item[ $column_name ] )? '(' . __( 'no subject' ) . ')' : $item[ $column_name ] ;
+				$editUrl = admin_url( 'admin.php?page=emails&action=edit&email=' . $item['ID'] );
+
+				if ( $this->get_view() === 'trash' ){
+				    $html = "<strong>{$subject}</strong>";
+                } else {
+				    $html = "<strong>";
+
+                    $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+
+                    if ( $item['email_status'] === 'draft' ){
+                        $html .= " — " . "<span class='post-state'>(" . __( 'Draft' ) . ")</span>";
+                    }
+                }
+                $html .= "</strong>";
+
+                $html .= $this->row_actions( $this->get_row_actions( $item['ID'] ) );
+
+
+                return $html;
+
 				break;
             case 'from_user':
                 $user = get_userdata( intval( ( $item['from_user'] ) ) );
@@ -131,10 +162,6 @@ class WPFN_Emails_Table extends WP_List_Table {
 	}
 	/**
 	 * Get value for checkbox column.
-	 *
-	 * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
-	 * is given special treatment when columns are processed. It ALWAYS needs to
-	 * have it's own method.
 	 *
 	 * @param object $item A singular item (one full row's worth of data).
 	 * @return string Text to be placed inside the column <td>.
@@ -151,17 +178,6 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 * Get an associative array ( option_name => option_title ) with the list
 	 * of bulk actions available on this table.
 	 *
-	 * Optional. If you need to include bulk actions in your list table, this is
-	 * the place to define them. Bulk actions are an associative array in the format
-	 * 'slug'=>'Visible Title'
-	 *
-	 * If this method returns an empty value, no bulk action will be rendered. If
-	 * you specify any bulk actions, the bulk actions box will be rendered with
-	 * the table automatically on display().
-	 *
-	 * Also note that list tables are not automatically wrapped in <form> elements,
-	 * so you will need to create those manually in order for bulk actions to function.
-	 *
 	 * @return array An associative array containing all the bulk actions.
 	 */
 	protected function get_bulk_actions() {
@@ -173,10 +189,6 @@ class WPFN_Emails_Table extends WP_List_Table {
 	}
 	/**
 	 * Handle bulk actions.
-	 *
-	 * Optional. You can handle your bulk actions anywhere or anyhow you prefer.
-	 * For this example package, we will handle it in the class to keep things
-	 * clean and organized.
 	 *
 	 * @see $this->prepare_items()
 	 */
@@ -197,10 +209,6 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 * Prepares the list of items for displaying.
 	 *
 	 * REQUIRED! This is where you prepare your data for display. This method will
-	 * usually be used to query the database, sort and filter the data, and generally
-	 * get it ready to be displayed. At a minimum, we should set $this->items and
-	 * $this->set_pagination_args(), although the following properties and methods
-	 * are frequently interacted with here.
 	 *
 	 * @global wpdb $wpdb
 	 * @uses $this->_column_headers
@@ -257,17 +265,34 @@ class WPFN_Emails_Table extends WP_List_Table {
 		 */
 		$table_name = $wpdb->prefix . WPFN_EMAILS;
 
-		if ( isset( $_REQUEST['s'] ) ){
-			$pattern = "%" . $_REQUEST['s'] . "%" ;
-			$data =  $wpdb->get_results(
-				"
-	SELECT *
-	FROM $table_name
-	WHERE content LIKE '$pattern' OR subject LIKE '$pattern' OR from_name LIKE '$pattern' OR from_email LIKE '$pattern'
-	", ARRAY_A );
-		} else {
-			$data = $wpdb->get_results( "SELECT * FROM $table_name ORDER BY date_created DESC", ARRAY_A );
-		}
+		$query = "SELECT * FROM $table_name WHERE ";
+
+        if ( isset( $_REQUEST[ 's' ] ) ){
+
+            $pattern = '%' . $wpdb->esc_like( sanitize_text_field( $_REQUEST[ 's' ] ) ) . '%' ;
+            $query .= $wpdb->prepare( "(subject LIKE %s OR content LIKE %s OR pre_header LIKE %s) AND ", $pattern , $pattern , $pattern );
+
+        }
+
+        if ( $this->get_view() === 'trash' ){
+
+            $query .= $wpdb->prepare( '( email_status = %s )', 'trash' );
+
+        } else if ( $this->get_view() === 'ready' ) {
+
+            $query .= $wpdb->prepare( '( email_status = %s )', 'ready' );
+
+        } else if ( $this->get_view() === 'draft' ) {
+
+            $query .= $wpdb->prepare( '( email_status = %s )', 'draft' );
+
+        } else {
+
+            $query .= $wpdb->prepare( '( email_status = %s OR email_status = %s OR email_status = %s )', 'ready', 'draft', '' );
+
+        }
+
+        $data = $wpdb->get_results( $query, ARRAY_A );
 
 		/*
 		 * Sort the data

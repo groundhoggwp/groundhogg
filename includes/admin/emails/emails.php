@@ -12,34 +12,82 @@
  */
 
 // Exit if accessed directly
+
+function wpfn_render_emails_table()
+{
+
+    if ( ! class_exists( 'WPFN_Emails_Table' ) ){
+        include dirname( __FILE__ ) . '/class-emails-table.php';
+    }
+
+    $emails_table = new WPFN_Emails_Table();
+
+    ?>
+    <div class="wrap">
+        <h1 class="wp-heading-inline"><?php echo __('Emails', 'wp-funnels');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+        <hr class="wp-header-end">
+        <form method="post" >
+            <!-- search form -->
+            <p class="search-box">
+                <label class="screen-reader-text" for="post-search-input">Search Emails:</label>
+                <input type="search" id="post-search-input" name="s" value="">
+                <input type="submit" id="search-submit" class="button" value="Search Contacts">
+            </p>
+            <?php $emails_table->views(); ?>
+            <?php $emails_table->prepare_items(); ?>
+            <?php $emails_table->display(); ?>
+        </form>
+    </div>
+    <?php
+}
+
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( isset( $_GET['email'] ) && is_numeric( $_GET['email'] ) ) {
+if ( isset( $_GET['action'] ) && $_GET['action'] === 'trash' ){
 
-	include dirname(__FILE__) . '/email-editor.php';
+    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'trash' ) ){
+
+        wpfn_update_email( intval( $_GET[ 'email' ] ), 'email_status', 'trash' );
+
+        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Trashed email.' ) ?>.</p></div><?php
+
+        wpfn_render_emails_table();
+
+    } else {
+
+        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not trash email.' ) ?>.</p></div><?php
+
+        wpfn_render_emails_table();
+
+    }
+
+} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' ) {
+
+    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'delete' ) ){
+
+        wpfn_delete_email( intval( $_GET[ 'email' ] ) );
+
+        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Deleted email.' ) ?>.</p></div><?php
+
+        wpfn_render_emails_table();
+
+    } else {
+
+        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not delete email.' ) ?>.</p></div><?php
+
+        wpfn_render_emails_table();
+    }
+} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'edit' ) {
+
+    include dirname( __FILE__ ) . '/email-editor.php';
+
+} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'add'  ) {
+
+    include dirname( __FILE__ ) . '/add-email.php';
 
 } else {
 
-	if ( ! class_exists( 'WPFN_Emails_Table' ) ){
-		include dirname( __FILE__ ) . '/class-emails-table.php';
-	}
-
-	$emails_table = new WPFN_Emails_Table();
-
-	?>
-	<div class="wrap">
-		<h1 class="wp-heading-inline"><?php echo __('Emails', 'wp-funnels');?></h1>
-		<form method="post" >
-			<!-- search form -->
-			<p class="search-box">
-				<label class="screen-reader-text" for="post-search-input">Search Emails:</label>
-				<input type="search" id="post-search-input" name="s" value="">
-				<input type="submit" id="search-submit" class="button" value="Search Contacts">
-			</p>
-			<?php $emails_table->prepare_items(); ?>
-			<?php $emails_table->display(); ?>
-		</form>
-	</div>
-	<?php
+    wpfn_render_emails_table();
 
 }

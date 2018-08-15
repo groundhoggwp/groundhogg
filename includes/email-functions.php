@@ -187,6 +187,8 @@ function wpfn_remove_builder_toolbar( $content )
 }
 
 add_filter( 'wpfn_the_email_content', 'wpfn_remove_builder_toolbar' );
+add_filter( 'wpfn_sanitize_email_content', 'wpfn_remove_builder_toolbar' );
+
 
 /**
  * Remove the content editable attribute from the email's html
@@ -352,7 +354,7 @@ function wpfn_create_new_email()
         $email_id = wpfn_insert_new_email( $email->content, $email->subject, $email->pre_header, get_current_user_id() );
     }
 
-    wp_redirect( admin_url( 'admin.php?page=emails&email=' .  $email_id ) );
+    wp_redirect( admin_url( 'admin.php?page=emails&action=edit&email=' .  $email_id ) );
 }
 
 add_action( 'wpfn_before_new_email', 'wpfn_create_new_email' );
@@ -367,6 +369,9 @@ function wpfn_save_email( $email_id )
     if ( isset( $_POST['edit_email_nonce'] ) && wp_verify_nonce( $_POST['edit_email_nonce'], 'edit_email' ) && current_user_can( 'manage_options' ) ) {
 
         do_action( 'wpfn_email_update_before', $email_id );
+
+        $status = ( isset( $_POST['status'] ) )? sanitize_text_field( trim( stripslashes( $_POST['status'] ) ) ): 'draft';
+        wpfn_update_email( $email_id, 'email_status', $status );
 
         $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
         wpfn_update_email( $email_id, 'from_user', $from_user );

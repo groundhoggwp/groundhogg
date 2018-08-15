@@ -97,14 +97,12 @@ function wpfn_get_email_block( $type )
 {
     ?>
     <div class="row">
-        <wpfn-toolbar class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span> | <span class="dashicons dashicons-move handle"></span> | <span class="dashicons dashicons-trash"></span></div></wpfn-toolbar>
         <div class="content-wrapper <?php echo $type; ?>">
             <div class="content-inside inner-content text-content" style="padding: 5px;">
                 <?php do_action( 'wpfn_email_block_html_' . $type ); ?>
             </div>
         </div>
     </div>
-
     <?php
 }
 

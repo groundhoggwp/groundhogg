@@ -1,3 +1,24 @@
+(function( $ ) {
+
+    $.fn.wpfnToolBar = function() {
+
+        var html = '<wpfn-toolbar class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span> | <span class="dashicons dashicons-move handle"></span> | <span class="dashicons dashicons-trash"></span></div></wpfn-toolbar>';
+
+        this.each(function() {
+
+            var row = $( this );
+
+            row.prepend( html );
+
+        });
+
+        return this;
+
+    };
+
+}( jQuery ));
+
+
 jQuery(function($) {
     var emailSortables = jQuery( ".email-sortable" ).sortable(
         {
@@ -32,7 +53,7 @@ jQuery(function($) {
                 data : {action: "get_email_block_html", block_type: block_type },
                 success: function( html )
                 {
-                    jQuery('#email-content').find('.replace-me').replaceWith(html);
+                    jQuery('#email-content').find('.replace-me').replaceWith( $( html ).wpfnToolBar() );
                 }
             });
         }
@@ -65,6 +86,8 @@ jQuery(function($) {
         });
 
     }
+
+    $( '.row' ).wpfnToolBar();
 });
 
 var WPFNEmailEditor = {};
@@ -81,6 +104,7 @@ WPFNEmailEditor.init = function () {
 WPFNEmailEditor.switchContent = function( e ){
     e.preventDefault();
     jQuery('.row').removeClass('active');
+    jQuery('wpfn-toolbar').remove();
     if ( WPFNEmailEditor.richText ){
         WPFNEmailEditor.richText.simpleEditor().destroy();
     }
@@ -98,30 +122,37 @@ WPFNEmailEditor.hideActions = function (){
 
 // paragraphs
 WPFNEmailEditor.pFont = jQuery( '#p-font' );
-WPFNEmailEditor.pFont.on( 'change', function( ){ WPFNEmailEditor.getActive().find('.simple-editor-content').css('font-family', WPFNEmailEditor.pFont.val() );});
 WPFNEmailEditor.pFont.update = function () { WPFNEmailEditor.pFont.val( WPFNEmailEditor.getActive().find('.simple-editor-content').css( 'font-family' ).replace(/"/g, '') );};
+WPFNEmailEditor.pFont.apply = function() { WPFNEmailEditor.getActive().find('.simple-editor-content').css('font-family', WPFNEmailEditor.pFont.val() ) };
+WPFNEmailEditor.pFont.on( 'change', WPFNEmailEditor.pFont.apply );
 
 WPFNEmailEditor.pSize = jQuery( '#p-size' );
-WPFNEmailEditor.pSize.on( 'change', function(){WPFNEmailEditor.getActive().find('.simple-editor-content').css('font-size', WPFNEmailEditor.pSize.val() + 'px' );});
 WPFNEmailEditor.pSize.update = function () {WPFNEmailEditor.pSize.val( WPFNEmailEditor.getActive().find('.simple-editor-content').css( 'font-size' ).replace('px', '') );};
+WPFNEmailEditor.pSize.apply = function() { WPFNEmailEditor.getActive().find('.simple-editor-content').css('font-size', WPFNEmailEditor.pSize.val() + 'px' ) };
+WPFNEmailEditor.pSize.on( 'change', WPFNEmailEditor.pSize.apply );
 
 // h1
 WPFNEmailEditor.h1Font = jQuery( '#h1-font' );
-WPFNEmailEditor.h1Font.on( 'change', function( ){WPFNEmailEditor.getActive().find('h1').css('font-family', WPFNEmailEditor.h1Font.val() );});
+WPFNEmailEditor.h1Font.apply = function() {WPFNEmailEditor.getActive().find('h1').css('font-family', WPFNEmailEditor.h1Font.val() )};
 WPFNEmailEditor.h1Font.update = function () { WPFNEmailEditor.h1Font.val( WPFNEmailEditor.getActive().find('h1').css( 'font-family' ).replace(/"/g, '') );};
+WPFNEmailEditor.h1Font.on( 'change', WPFNEmailEditor.h1Font.apply );
+
 
 WPFNEmailEditor.h1Size = jQuery( '#h1-size' );
-WPFNEmailEditor.h1Size.on( 'change', function(){WPFNEmailEditor.getActive().find('h1').css('font-size', WPFNEmailEditor.h1Size.val() + 'px' );});
+WPFNEmailEditor.h1Size.apply = function(){ WPFNEmailEditor.getActive().find('h1').css('font-size', WPFNEmailEditor.h1Size.val() + 'px' );};
 WPFNEmailEditor.h1Size.update = function () { WPFNEmailEditor.h1Size.val( WPFNEmailEditor.getActive().find('h1').css( 'font-size' ).replace('px', '') );};
+WPFNEmailEditor.h1Size.on( 'change', WPFNEmailEditor.h1Size.apply );
 
 // h2
 WPFNEmailEditor.h2Font = jQuery( '#h2-font' );
-WPFNEmailEditor.h2Font.on( 'change', function( ){WPFNEmailEditor.getActive().find('h2').css('font-family', WPFNEmailEditor.h2Font.val() );});
+WPFNEmailEditor.h2Font.apply = function(){ WPFNEmailEditor.getActive().find('h2').css('font-family', WPFNEmailEditor.h2Font.val() ); };
 WPFNEmailEditor.h2Font.update = function () { WPFNEmailEditor.h2Font.val( WPFNEmailEditor.getActive().find('h2').css( 'font-family' ).replace(/"/g, '') );};
+WPFNEmailEditor.h2Font.on( 'change', WPFNEmailEditor.h2Font.apply );
 
 WPFNEmailEditor.h2Size = jQuery( '#h2-size' );
-WPFNEmailEditor.h2Size.on( 'change', function(){ WPFNEmailEditor.getActive().find('h2').css('font-size', WPFNEmailEditor.h2Size.val() + 'px' );});
+WPFNEmailEditor.h2Size.apply = function(){ WPFNEmailEditor.getActive().find('h2').css('font-size', WPFNEmailEditor.h2Size.val() + 'px' ); };
 WPFNEmailEditor.h2Size.update = function () { WPFNEmailEditor.h2Size.val( WPFNEmailEditor.getActive().find('h2').css( 'font-size' ).replace('px', '') || 30 );};
+WPFNEmailEditor.h2Size.on( 'change', WPFNEmailEditor.h2Size.apply );
 
 WPFNEmailEditor.textOptions = jQuery( '#text_block-editor' );
 WPFNEmailEditor.showTextOptions = function () {
@@ -129,6 +160,10 @@ WPFNEmailEditor.showTextOptions = function () {
 
     this.pFont.update();
     this.pSize.update();
+    this.h1Font.update();
+    this.h1Size.update();
+    this.h2Font.update();
+    this.h2Size.update();
 };
 
 //buttons
@@ -280,7 +315,7 @@ WPFNEmailEditor.action = function( e )
 
             WPFNEmailEditor.richText.simpleEditor({
                 defaultParagraphSeparator: 'p',
-                actions: ["heading1", "heading2", "paragraph", "bold", "italic",  "underline", "color", "strikethrough", "alignLeft", "alignRight", "alignCenter", "olist", "ulist","link", "unlink"]
+                actions: ["heading1", "heading2", "paragraph", "bold", "italic",  "underline", "color", "strikethrough", "alignLeft", "alignCenter", "alignRight", "olist", "ulist","link", "unlink"]
             });
 
             WPFNEmailEditor.showTextOptions();

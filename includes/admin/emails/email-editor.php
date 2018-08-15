@@ -79,9 +79,59 @@ $email = wpfn_get_email_by_id( $email_id );
     .ui-sortable-helper .content-wrapper,.content-wrapper:hover{border: 2px dashed #EAEAEA;background-color: #FFF;}
     [contenteditable]:focus {outline: 0px solid transparent;}
     .sortable-placeholder{border-width: 2px;}
+
+    .onoffswitch {
+        position: relative; width: 110px;
+        -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+    }
+    .onoffswitch-checkbox {
+        visibility: hidden;
+        position: absolute;
+    }
+    .onoffswitch-label {
+        display: block; overflow: hidden; cursor: pointer;
+        border: 1px solid #999999; border-radius: 4px;
+    }
+    .onoffswitch-inner {
+        display: block; width: 200%; margin-left: -100%;
+        transition: margin 0.3s ease-in 0s;
+    }
+    .onoffswitch-inner:before, .onoffswitch-inner:after {
+        display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+        font-size: 14px; color: white;
+        box-sizing: border-box;
+    }
+    .onoffswitch-inner:before {
+        text-shadow: 0 -1px 1px #006799, 1px 0 1px #006799, 0 1px 1px #006799, -1px 0 1px #006799;
+        content: "Ready";
+        padding-left: 10px;
+        background-color: #008ec2; color: #FFFFFF;
+    }
+    .onoffswitch-inner:after {
+        content: "Draft";
+        padding-right: 10px;
+        background-color: #EEEEEE; color: #999999;
+        text-align: right;
+    }
+    .onoffswitch-switch {
+        display: block; width: 21px; margin: 4.5px;
+        background: #FFFFFF;
+        position: absolute; top: 0; bottom: 0;
+        right: 78px;
+        border: 1px solid #999999; border-radius: 4px;
+        transition: all 0.3s ease-in 0s;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+        margin-left: 0;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+        right: 0px;
+    }
+
 </style>
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php echo __('Edit Email', 'wp-funnels');?></h1>
+    <h1 class="wp-heading-inline"><?php echo __('Edit Email', 'wp-funnels');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+    <hr class="wp-header-end">
     <form method="post">
         <?php wp_nonce_field( 'edit_email', 'edit_email_nonce' ); ?>
         <?php do_action('wpfn_edit_email_form_before'); ?>
@@ -283,6 +333,28 @@ $email = wpfn_get_email_by_id( $email_id );
                                     <table class="form-table">
                                         <tbody>
                                         <tr>
+                                            <th><?php _e( 'Status:' ); ?></th>
+                                            <td>
+                                                <input type="hidden" id="status" name="status" value="<?php echo $email->email_status; ?>" >
+                                                <div class="onoffswitch" style="text-align: left;">
+                                                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="status-toggle" <?php if ( $email->email_status === 'ready' ) echo 'checked'; ?> >
+                                                    <label class="onoffswitch-label" for="status-toggle">
+                                                        <span class="onoffswitch-inner"></span>
+                                                        <span class="onoffswitch-switch"></span>
+                                                    </label>
+                                                </div>
+                                                <script>
+                                                    jQuery(function($){$("#status-toggle").on( 'input', function(){
+                                                        if ( $(this).is(':checked')){
+                                                            $('#status').val('ready');
+                                                        } else {
+                                                            $('#status').val('draft');
+                                                        }
+                                                    })});
+                                                </script>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th><?php _e( 'From User:' ); ?></th>
                                             <?php $args = array( 'id' => 'from_user', 'name' => 'from_user', 'selected' => wpfn_get_email_meta( $email_id, 'from_user', true ) ); ?>
                                             <td><?php wp_dropdown_users( $args); ?><script>jQuery(document).ready(function(){jQuery( '#from_user' ).select2()});</script></td>
@@ -291,18 +363,23 @@ $email = wpfn_get_email_by_id( $email_id );
                                             <th><label for="send_test"><?php _e( 'Send Test:' ); ?></label></th>
                                             <td><input type="checkbox" id="send_test" name="send_test"></td>
                                         </tr>
-                                        <tr>
+                                        <tr id="send-to" class="hidden">
                                             <th><?php _e( 'To:' ); ?></th>
                                             <?php $args = array( 'id' => 'test_email', 'name' => 'test_email', 'selected' => wpfn_get_email_meta( $email_id, 'test_email', true ) ); ?>
-                                            <td><?php wp_dropdown_users( $args); ?><script>jQuery(document).ready(function(){jQuery( '#test_email' ).select2()});</script></td>
+                                            <td><?php wp_dropdown_users( $args ); ?><script>jQuery(document).ready(function(){jQuery( '#test_email' ).select2()});</script></td>
                                         </tr>
+                                        <script>
+                                            jQuery(function($){$("#send_test").on( 'input', function(){
+                                                $("#send-to").toggleClass( 'hidden' );
+                                            })});
+                                        </script>
                                         </tbody>
                                     </table>
                                     <?php do_action( 'wpfn_email_actions_after' ); ?>
                                 </div>
                                 <div id="major-publishing-actions">
                                     <div id="delete-action">
-                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=emails' ), 'delete_email', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Delete Email', 'wp-funnels' ); ?></a>
+                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=emails&action=trash&email=' . $email_id ), 'trash_email', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Move To Trash' ); ?></a>
                                     </div>
                                     <div id="publishing-action">
                                         <span class="spinner"></span>

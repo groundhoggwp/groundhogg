@@ -605,7 +605,12 @@
                         //unwrap(elm[0]);
                         return true;
                     }
-                    return exec(formatBlock, '<h1>');
+                    
+                    var n = exec(formatBlock, '<h1>');
+                    WPFNEmailEditor.h1Font.apply();
+                    WPFNEmailEditor.h1Size.apply();
+                    
+                    return n;
                 }
             },
             heading2: {
@@ -620,7 +625,11 @@
                         //unwrap(elm[0]);
                         return true;
                     }
-                    return exec(formatBlock, '<h2>');
+                    var n = exec(formatBlock, '<h2>');
+                    WPFNEmailEditor.h2Font.apply();
+                    WPFNEmailEditor.h2Size.apply();
+
+                    return n;
                 }
             },
             olist: {

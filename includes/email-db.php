@@ -32,6 +32,7 @@ function wpfn_insert_new_email( $content, $subject, $pre_header, $from_user )
 			'subject'       => $subject,
 			'pre_header'    => $pre_header,
 			'from_user'     => $from_user,
+			'email_status'  => 'draft',
 			'date_created'  => current_time( 'mysql' )
 		)
 	);
@@ -41,6 +42,26 @@ function wpfn_insert_new_email( $content, $subject, $pre_header, $from_user )
 	} else {
 		return false;
 	}
+}
+
+/**
+ * Get the count of emails for a specifci column value
+ *
+ * @param $where string the column
+ * @param $clause string the value
+ * @return int the count of items
+ */
+function wpfn_count_email_items( $where='', $clause='' )
+{
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . WPFN_EMAILS;
+
+    if ( $where && $clause ){
+        return $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE $where LIKE %s", $clause ) );
+    } else {
+        return $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE email_status LIKE %s OR email_status LIKE %s OR email_status LIKE %s", 'ready', 'draft', '' ) );
+    }
 }
 
 /**
@@ -54,7 +75,7 @@ function wpfn_get_emails()
 
     $table_name = $wpdb->prefix . WPFN_EMAILS;
 
-    return $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A );
+    return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name WHERE email_status LIKE %s", 'ready' ), ARRAY_A );
 }
 
 /**
@@ -114,6 +135,40 @@ function wpfn_update_email( $id, $key, $value )
 		),
 		array( '%d' )
 	);
+}
+
+/**
+ * Delta an email and all email meta form the DB
+ *
+ * @param $id int thi ID of the email
+ * @return bool whether the deletion of the email was successful.
+ */
+function wpfn_delete_email( $id )
+{
+    global $wpdb;
+
+    if ( ! $id || ! is_numeric( $id ) )
+        return false;
+
+    $id = absint( $id );
+    if ( ! $id )
+        return false;
+
+    $table = $wpdb->prefix . WPFN_EMAILS;
+
+    $email = $wpdb->delete(
+        $table,
+        array( 'ID' => $id ),
+        array( '%d' )
+    );
+
+    $meta = $wpdb->delete(
+        $wpdb->emailmeta,
+        array( 'email_id' => $id ),
+        array( '%d' )
+    );
+
+    return $email && $meta;
 }
 
 /**
@@ -191,7 +246,7 @@ function wpfn_integrate_emails_wpdb()
 }
 
 define( 'WPFN_EMAILS', 'emails' );
-define( 'WPFN_EMAILS_DB_VERSION', '0.1' );
+define( 'WPFN_EMAILS_DB_VERSION', '0.2' );
 
 /**
  * Create the emails database table.
@@ -215,6 +270,7 @@ function wpfn_create_emails_db()
       pre_header text NOT NULL,
       from_user bigint(20) NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+      email_status VARCHAR(20) NOT NULL,
       PRIMARY KEY  (ID)
     ) $charset_collate;";
 

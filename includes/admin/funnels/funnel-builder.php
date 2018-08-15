@@ -129,51 +129,52 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
         background-image: linear-gradient(to right, #e5e5e5 1px, transparent 1px), linear-gradient(to bottom, #e5e5e5 1px, transparent 1px);
     }
 
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
+    .onoffswitch {
+        position: relative; width: 110px;
+        -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
     }
-
-    .switch input {display:none;}
-
-    .slider {
+    .onoffswitch-checkbox {
+        visibility: hidden;
         position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: .4s;
-        transition: .4s;
     }
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 13px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        -webkit-transition: .4s;
-        transition: .4s;
+    .onoffswitch-label {
+        display: block; overflow: hidden; cursor: pointer;
+        border: 1px solid #999999; border-radius: 4px;
     }
-
-    input:checked + .slider {
-        background-color: #0088BC;
+    .onoffswitch-inner {
+        display: block; width: 200%; margin-left: -100%;
+        transition: margin 0.3s ease-in 0s;
     }
-
-    input:focus + .slider {
-        box-shadow: 0 0 1px #0088BC;
+    .onoffswitch-inner:before, .onoffswitch-inner:after {
+        display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+        font-size: 14px; color: white;
+        box-sizing: border-box;
     }
-
-    input:checked + .slider:before {
-        -webkit-transform: translateX(39px);
-        -ms-transform: translateX(39px);
-        transform: translateX(39px);
+    .onoffswitch-inner:before {
+        text-shadow: 0 -1px 1px #006799, 1px 0 1px #006799, 0 1px 1px #006799, -1px 0 1px #006799;
+        content: "Reporting";
+        padding-left: 10px;
+        background-color: #008ec2; color: #FFFFFF;
+    }
+    .onoffswitch-inner:after {
+        content: "Editing";
+        padding-right: 10px;
+        background-color: #EEEEEE; color: #999999;
+        text-align: right;
+    }
+    .onoffswitch-switch {
+        display: block; width: 21px; margin: 4.5px;
+        background: #FFFFFF;
+        position: absolute; top: 0; bottom: 0;
+        right: 78px;
+        border: 1px solid #999999; border-radius: 4px;
+        transition: all 0.3s ease-in 0s;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+        margin-left: 0;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+        right: 0px;
     }
 
     .step-reporting p,
@@ -232,11 +233,14 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                             </script>
                             <?php submit_button( 'Filter', 'secondary', 'change_reporting', false ); ?>
                             <?php do_action( 'funnel_sate_range_filters_after' ); ?>
-                            <div style="float: right; display: inline-block; border: 1px solid #e5e5e5; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
-                                <label class="switch">
-                                    <input type="checkbox" id="reporting-toggle">
-                                    <span class="slider"></span>
-                                </label>
+                            <div style="float: right; display: inline-block;">
+                                <div class="onoffswitch">
+                                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="reporting-toggle">
+                                    <label class="onoffswitch-label" for="reporting-toggle">
+                                        <span class="onoffswitch-inner"></span>
+                                        <span class="onoffswitch-switch"></span>
+                                    </label>
+                                </div>
                             </div>
                             <script>
                                 jQuery(function($){$("#reporting-toggle").on( 'input', function(){
