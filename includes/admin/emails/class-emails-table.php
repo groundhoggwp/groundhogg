@@ -4,7 +4,7 @@
  *
  * This class shows the data table for accessing information about an email.
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Emails
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -47,9 +47,9 @@ class WPFN_Emails_Table extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'subject'    => _x( 'Subject', 'Column label', 'wp-funnels' ),
-			'from_user'   => _x( 'From User', 'Column label', 'wp-funnels' ),
-			'date_created' => _x( 'Date Created', 'Column label', 'wp-funnels' ),
+			'subject'    => _x( 'Subject', 'Column label', 'groundhogg' ),
+			'from_user'   => _x( 'From User', 'Column label', 'groundhogg' ),
+			'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 		return $columns;
 	}
@@ -182,7 +182,7 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 */
 	protected function get_bulk_actions() {
 		$actions = array(
-			'delete' => _x( 'Delete', 'List table bulk action', 'wp-funnels' )
+			'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' )
 		);
 
 		return apply_filters( 'wpfn_email_bulk_actions', $actions );

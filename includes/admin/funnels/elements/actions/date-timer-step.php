@@ -4,7 +4,7 @@
  *
  * Html for the remove tag funnel step in the Funnel builder
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels/Steps
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -29,7 +29,7 @@ function wpfn_date_timer_funnel_step_html( $step_id )
     <table class="form-table">
         <tbody>
             <tr>
-                <th><?php echo esc_html__( 'Wait till:', 'wp-funnels' ); ?></th>
+                <th><?php echo esc_html__( 'Wait till:', 'groundhogg' ); ?></th>
                 <td><input placeholder="d-m-yy" type="text" id="<?php echo wpfn_prefix_step_meta( $step_id, 'run_date' ); ?>" name="<?php echo wpfn_prefix_step_meta( $step_id, 'run_date' ); ?>" value="<?php echo $run_date; ?>"></td>
                 <script>jQuery(function($){$('#<?php echo wpfn_prefix_step_meta( $step_id, 'run_date' ); ?>').datepicker({
                         changeMonth: true,
@@ -39,7 +39,7 @@ function wpfn_date_timer_funnel_step_html( $step_id )
                     })});</script>
             </tr>
             <tr>
-                <th><?php echo esc_html__( 'And run at:', 'wp-funnels' ); ?></th>
+                <th><?php echo esc_html__( 'And run at:', 'groundhogg' ); ?></th>
                 <td>
                     <input type="time" id="<?php echo wpfn_prefix_step_meta( $step_id, 'run_time' ); ?>" name="<?php echo wpfn_prefix_step_meta( $step_id, 'run_time' ); ?>" value="<?php echo $run_time;?>">
                 </td>

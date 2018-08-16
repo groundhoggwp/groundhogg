@@ -4,7 +4,7 @@
  *
  * Html for the tag removed funnel step in the Funnel builder
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels/Steps
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -21,7 +21,7 @@ function wpfn_tag_removed_funnel_step_html( $step_id )
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo esc_html__( 'Select a tag.', 'wp-funnels' ); ?></th>
+            <th><?php echo esc_html__( 'Select a tag.', 'groundhogg' ); ?></th>
             <td>TODO TAG REMOVED HTML</td>
         </tr>
         </tbody>

@@ -4,7 +4,7 @@
  *
  * Anything to do with saving, manipulating, and running timer functions in the event queue
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Timers
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License

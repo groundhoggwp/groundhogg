@@ -4,7 +4,7 @@
  *
  * Html for the page visited funnel step in the Funnel builder
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels/Steps
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -30,7 +30,7 @@ function wpfn_email_opened_funnel_step_html( $step_id )
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo esc_html__( 'Email being opened:', 'wp-funnels' ); ?></th>
+            <th><?php echo esc_html__( 'Email being opened:', 'groundhogg' ); ?></th>
             <td><?php wpfn_dropdown_emails( $dropdown_args ); ?></td>
         </tr>
         </tbody>

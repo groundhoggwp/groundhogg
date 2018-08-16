@@ -4,7 +4,7 @@
  *
  * Allow the user to view & edit the emails
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Emails
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -24,12 +24,12 @@ function wpfn_render_emails_table()
 
     ?>
     <div class="wrap">
-        <h1 class="wp-heading-inline"><?php echo __('Emails', 'wp-funnels');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+        <h1 class="wp-heading-inline"><?php echo __('Emails', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
         <hr class="wp-header-end">
         <form method="post" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input">Search Emails:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Emails ', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
                 <input type="submit" id="search-submit" class="button" value="Search Contacts">
             </p>
@@ -50,13 +50,13 @@ if ( isset( $_GET['action'] ) && $_GET['action'] === 'trash' ){
 
         wpfn_update_email( intval( $_GET[ 'email' ] ), 'email_status', 'trash' );
 
-        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Trashed email.' ) ?>.</p></div><?php
+        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Trashed email', 'groundhogg' ); ?>.</p></div><?php
 
         wpfn_render_emails_table();
 
     } else {
 
-        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not trash email.' ) ?>.</p></div><?php
+        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not trash email', 'groundhogg' ); ?>.</p></div><?php
 
         wpfn_render_emails_table();
 
@@ -68,13 +68,13 @@ if ( isset( $_GET['action'] ) && $_GET['action'] === 'trash' ){
 
         wpfn_delete_email( intval( $_GET[ 'email' ] ) );
 
-        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Deleted email.' ) ?>.</p></div><?php
+        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Deleted email', 'groundhogg' ); ?>.</p></div><?php
 
         wpfn_render_emails_table();
 
     } else {
 
-        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not delete email.' ) ?>.</p></div><?php
+        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not delete email', 'groundhogg' ); ?>.</p></div><?php
 
         wpfn_render_emails_table();
     }

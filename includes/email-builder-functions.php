@@ -30,7 +30,7 @@ function wpfn_get_email_html_blocks()
 function wpfn_email_text_block()
 {
     ?>
-    <p><?php echo esc_html__( 'Customize this section by editing the text, adding your own copy, using the options above to bold, italicize, or create links and bullets, or use the options in the "Design" panel on the left to change the font styles of your email.', 'wp-funnels' );?></p>
+    <p><?php echo esc_html__( 'Customize this section by editing the text, adding your own copy, using the options above to bold, italicize, or create links and bullets, or use the options in the "Design" panel on the left to change the font styles of your email.', 'groundhogg' );?></p>
     <?php
 }
 

@@ -4,7 +4,7 @@
  *
  * Allow the user to edit the contact details and contact fields
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Contacts
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -28,7 +28,7 @@ if ( isset( $_GET['ID'] ) && is_numeric( $_GET['ID'] ) ) {
 
 	?>
 	<div class="wrap">
-        <h1 class="wp-heading-inline"><?php echo __('Contacts', 'wp-funnels');?></h1>
+        <h1 class="wp-heading-inline"><?php echo __('Contacts', 'groundhogg');?></h1>
         <form method="post" >
 			<!-- search form -->
             <?php $contacts_table->views(); ?>

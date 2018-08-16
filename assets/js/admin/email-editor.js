@@ -103,6 +103,7 @@ WPFNEmailEditor.init = function () {
 
 WPFNEmailEditor.switchContent = function( e ){
     e.preventDefault();
+    jQuery('.spinner').css('visibility','visible');
     jQuery('.row').removeClass('active');
     jQuery('wpfn-toolbar').remove();
     if ( WPFNEmailEditor.richText ){
@@ -134,24 +135,24 @@ WPFNEmailEditor.pSize.on( 'change', WPFNEmailEditor.pSize.apply );
 // h1
 WPFNEmailEditor.h1Font = jQuery( '#h1-font' );
 WPFNEmailEditor.h1Font.apply = function() {WPFNEmailEditor.getActive().find('h1').css('font-family', WPFNEmailEditor.h1Font.val() )};
-WPFNEmailEditor.h1Font.update = function () { WPFNEmailEditor.h1Font.val( WPFNEmailEditor.getActive().find('h1').css( 'font-family' ).replace(/"/g, '') );};
+WPFNEmailEditor.h1Font.update = function () { try{ WPFNEmailEditor.h1Font.val( WPFNEmailEditor.getActive().find('h1').css( 'font-family' ).replace(/"/g, '') ); } catch (e){}};
 WPFNEmailEditor.h1Font.on( 'change', WPFNEmailEditor.h1Font.apply );
 
 
 WPFNEmailEditor.h1Size = jQuery( '#h1-size' );
 WPFNEmailEditor.h1Size.apply = function(){ WPFNEmailEditor.getActive().find('h1').css('font-size', WPFNEmailEditor.h1Size.val() + 'px' );};
-WPFNEmailEditor.h1Size.update = function () { WPFNEmailEditor.h1Size.val( WPFNEmailEditor.getActive().find('h1').css( 'font-size' ).replace('px', '') );};
+WPFNEmailEditor.h1Size.update = function () { try{ WPFNEmailEditor.h1Size.val( WPFNEmailEditor.getActive().find('h1').css( 'font-size' ).replace('px', '') ); } catch (e){}};
 WPFNEmailEditor.h1Size.on( 'change', WPFNEmailEditor.h1Size.apply );
 
 // h2
 WPFNEmailEditor.h2Font = jQuery( '#h2-font' );
 WPFNEmailEditor.h2Font.apply = function(){ WPFNEmailEditor.getActive().find('h2').css('font-family', WPFNEmailEditor.h2Font.val() ); };
-WPFNEmailEditor.h2Font.update = function () { WPFNEmailEditor.h2Font.val( WPFNEmailEditor.getActive().find('h2').css( 'font-family' ).replace(/"/g, '') );};
+WPFNEmailEditor.h2Font.update = function () { try{ WPFNEmailEditor.h2Font.val( WPFNEmailEditor.getActive().find('h2').css( 'font-family' ).replace(/"/g, '') );} catch (e){}};
 WPFNEmailEditor.h2Font.on( 'change', WPFNEmailEditor.h2Font.apply );
 
 WPFNEmailEditor.h2Size = jQuery( '#h2-size' );
 WPFNEmailEditor.h2Size.apply = function(){ WPFNEmailEditor.getActive().find('h2').css('font-size', WPFNEmailEditor.h2Size.val() + 'px' ); };
-WPFNEmailEditor.h2Size.update = function () { WPFNEmailEditor.h2Size.val( WPFNEmailEditor.getActive().find('h2').css( 'font-size' ).replace('px', '') || 30 );};
+WPFNEmailEditor.h2Size.update = function () { try{ WPFNEmailEditor.h2Size.val( WPFNEmailEditor.getActive().find('h2').css( 'font-size' ).replace('px', '') || 30 ); } catch(e) {}};
 WPFNEmailEditor.h2Size.on( 'change', WPFNEmailEditor.h2Size.apply );
 
 WPFNEmailEditor.textOptions = jQuery( '#text_block-editor' );
@@ -191,8 +192,6 @@ WPFNEmailEditor.showButtonOptions = function() {
 
     this.buttonFont.update();
     this.buttonSize.update();
-    // this.buttonColor.update();
-    // this.buttonTextColor.update();
     this.buttonLink.update();
 };
 
@@ -266,6 +265,27 @@ WPFNEmailEditor.showSpacerOptions = function() {
     this.spacerSize.update();
 };
 
+
+WPFNEmailEditor.emailAlignment = jQuery( '#email-align' );
+WPFNEmailEditor.emailAlignment.apply = function(){
+
+    if ( jQuery( this ).val() === 'left' ){
+        jQuery( '#email-inside' ).css( 'margin-left', '0' );
+        jQuery( '#email-inside' ).css( 'margin-right', 'auto' );
+    } else {
+        jQuery( '#email-inside' ).css( 'margin-left', 'auto' );
+        jQuery( '#email-inside' ).css( 'margin-right', 'auto' );
+    }
+
+};
+WPFNEmailEditor.emailAlignment.change( WPFNEmailEditor.emailAlignment.apply );
+
+
+WPFNEmailEditor.emailOptions = jQuery( '#email-editor' );
+WPFNEmailEditor.showEmailOptions = function () {
+    this.showOptions( this.emailOptions );
+};
+
 WPFNEmailEditor.showOptions = function( el ){
     this.actions.find( '.postbox' ).addClass( 'hidden' );
     el.removeClass( 'hidden' );
@@ -293,6 +313,8 @@ WPFNEmailEditor.action = function( e )
 
     if ( el.hasClass('dashicons-trash') ){
         el.closest('.row').remove();
+        WPFNEmailEditor.showEmailOptions();
+
     } else if ( el.hasClass('dashicons-admin-page') ){
         WPFNEmailEditor.richText.simpleEditor().destroy();
         el.closest('.row').removeClass('active');
@@ -305,7 +327,6 @@ WPFNEmailEditor.action = function( e )
         WPFNEmailEditor.makeActive( el );
 
         if ( WPFNEmailEditor.richText ){
-            console.log('destroy-editor');
             WPFNEmailEditor.richText.simpleEditor().destroy();
         }
 
@@ -336,9 +357,15 @@ WPFNEmailEditor.action = function( e )
 
             WPFNEmailEditor.showDividerOptions();
 
-        } else if ( el.closest( '.code_block' ) ){
+        } else if ( el.closest( '.code_block' ).length ){
 
             WPFNEmailEditor.showCodeOptions();
+
+        } else if ( el.closest( '#editor' ).length ) {
+
+            jQuery('.row').removeClass('active');
+
+            WPFNEmailEditor.showEmailOptions();
 
         }
     }

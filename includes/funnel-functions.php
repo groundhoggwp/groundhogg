@@ -4,7 +4,7 @@
  *
  * Fucntions to help the funnel builder do it's thing
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -30,8 +30,7 @@ function wpfn_add_funnel_menu_items()
         'Add Email',
         'Add New',
         'manage_options',
-        'add_funnel',
-        'wpfn_add_funnels_page'
+        'admin.php?page=funnels&action=add'
     );
 }
 
@@ -44,26 +43,6 @@ function wpfn_funnels_page()
 {
     include dirname( __FILE__ ) . '/admin/funnels/funnels.php';
 }
-
-/**
- * Include the relevant admin file to display the output.
- */
-function wpfn_add_funnels_page()
-{
-
-    $new_funnel = wpfn_create_new_funnel();
-
-    $new_step = wpfn_add_funnel_step(
-        $new_funnel,
-        'Welcome Email',
-        'action',
-        'send_email',
-        1
-    );
-
-    wp_redirect( admin_url( 'admin.php?page=funnels&ID=' . $new_funnel ) );
-}
-
 
 /**
  * Return a list of slugs for the available benchmarks in the funnel builder
@@ -416,19 +395,6 @@ function wpfn_enqueue_next_funnel_action( $last_step_id, $contact_id )
 }
 
 /**
- * create a new funnel!
- *
- * @return int|false new funnel ID, false on failure
- */
-function wpfn_create_new_funnel()
-{
-    $title = __( 'My awesome new funnel!', 'wp-funnels' );
-    $status = 'inactive';
-
-    return wpfn_insert_new_funnel( $title, $status );
-}
-
-/**
  * Add a step to a funnel
  *
  * @param $funnel_id int    the ID of the funnel
@@ -540,7 +506,7 @@ function wpfn_get_step_html( $step_id )
                 jQuery(function(){jQuery('.delete-step-<?php echo $step_id;?>').click( wpfn_delete_funnel_step )})
             </script>
         </button>
-        <h2 class="hndle ui-sortable-handle"><label for="<?php echo $step_id; ?>_title"><span class="dashicons <?php echo esc_attr( wpfn_get_step_dashicon_by_id( $step_id ) ); ?>"></span></label><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'wp-funnels' ); ?>"></h2>
+        <h2 class="hndle ui-sortable-handle"><label for="<?php echo $step_id; ?>_title"><span class="dashicons <?php echo esc_attr( wpfn_get_step_dashicon_by_id( $step_id ) ); ?>"></span></label><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'groundhogg' ); ?>"></h2>
         <div class="inside">
             <div class="step-edit">
                 <input type="hidden" name="<?php echo wpfn_prefix_step_meta( $step_id, 'order' ); ?>" value="<?php wpfn_get_step_order( $step_id ) ?>" >
@@ -582,11 +548,11 @@ function wpfn_get_step_html( $step_id )
                 ?>
 
                 <?php if ( wpfn_get_step_group( $step_id ) === 'benchmark'): ?>
-                    <p class="report"><a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><?php _e('Completed', 'wp-funnels') ?>: <b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
+                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
                 <?php else: ?>
-                    <p class="report"><a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><?php _e('Completed', 'wp-funnels') ?>: <b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
+                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
                     <hr>
-                    <p class="report"><a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=waiting&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><?php _e('Waiting', 'wp-funnels') ?>: <b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
+                    <p class="report"><?php _e('Waiting', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=waiting&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
                 <?php endif; ?>
 
                 <?php do_action( 'wpfn_get_step_report_' . wpfn_get_step_type( $step_id ) ); ?>
@@ -693,7 +659,7 @@ function wpfn_save_funnel( $funnel_id )
 
     if ( ! $steps ){
         ?>
-        <div class="notice notice-error is-dismissible"><p><?php echo esc_html__( 'No funnel steps present. Please add some automation.', 'wp-funnels' ); ?></p></div>
+        <div class="notice notice-error is-dismissible"><p><?php echo esc_html__( 'No funnel steps present. Please add some automation.', 'groundhogg' ); ?></p></div>
         <?php
         return;
     }
@@ -717,7 +683,7 @@ function wpfn_save_funnel( $funnel_id )
     do_action( 'wpfn_save_funnel_after', $funnel_id );
 
     ?>
-    <div class="notice notice-success is-dismissible"><p><?php echo esc_html__( 'Funnel updated!', 'wp-funnels' ); ?></p></div>
+    <div class="notice notice-success is-dismissible"><p><?php echo esc_html__( 'Funnel updated!', 'groundhogg' ); ?></p></div>
     <?php
 }
 
@@ -758,6 +724,61 @@ function wpfn_auto_save_funnel()
 }
 
 add_action( 'wp_ajax_wpfn_auto_save_funnel_via_ajax', 'wpfn_auto_save_funnel' );
+
+/**
+ * Create a new funnel and redirect to the email editor.
+ */
+function wpfn_create_new_funnel()
+{
+    if ( ! isset( $_POST['add_new_funnel_nonce'] ) || ! wp_verify_nonce( $_POST['add_new_funnel_nonce'], 'add_new_funnel' ) )
+        return;
+
+    if ( isset( $_POST[ 'funnel_template' ] ) ){
+
+        include dirname(__FILE__) . '/templates/funnel-templates.php';
+
+        /* @var $funnel_templates array included from funnel-templates.php*/
+        $funnel = $funnel_templates[ $_POST[ 'funnel_template' ] ];
+
+        $funnel_id = wpfn_insert_new_funnel( $funnel['title'], 'inactive' );
+
+        foreach ( $funnel['steps'] as $i => $step )
+        {
+
+            $step_id = wpfn_insert_new_funnel_step(
+                $funnel_id,
+                $step['title'],
+                'ready',
+                $step['group'],
+                $step['type'],
+                $i + 1
+            );
+
+            foreach ( $step[ 'meta' ] as $meta_key => $meta_value )
+            {
+                wpfn_update_step_meta( $step_id , $meta_key, $meta_value );
+            }
+
+        }
+
+
+    } else if ( isset( $_POST[ 'funnel_id' ] ) ) {
+
+        //todo copy and duplicate steps from old funnel...
+
+    } else {
+
+        ?><div class="notice notice-error"><p><?php _e( 'Could not create funnel. PLease select a template.', 'groundhogg' ); ?></p></div><?php
+
+        return;
+
+    }
+
+    wp_redirect( admin_url( 'admin.php?page=funnels&action=edit&funnel=' .  $funnel_id ) );
+    die();
+}
+
+add_action( 'wpfn_before_new_funnel', 'wpfn_create_new_funnel' );
 
 /**
  * Return whether the contact is in a certain funnel.

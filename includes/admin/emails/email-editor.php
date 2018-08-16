@@ -4,7 +4,7 @@
  *
  * Allow the user to edit the email
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Emails
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( ! isset( $_GET['email'] ) || ! is_numeric( $_GET['email'] ) )
 {
-    wp_die( __( 'Email ID not supplied. Please try again', 'wp-funnels' ), __( 'Error', 'wp-funnels' ) );
+    wp_die( __( 'Email ID not supplied. Please try again', 'groundhogg' ), __( 'Error', 'groundhogg' ) );
 }
 
 if ( isset( $_GET['notice'] ) && $_GET['notice'] == 'success' ){
@@ -61,7 +61,7 @@ $email = wpfn_get_email_by_id( $email_id );
     .wpfn-element.ui-draggable-dragging {font-size: 60px;width: 120px;height: 120px;background: #FFFFFF;border: 1px solid #F1F1F1;}
     select {vertical-align: top;}
     #email-content {margin-left: auto;margin-right: auto;box-sizing: border-box;background-color: #FFFFFF;}
-    #email-body{width: 100%;min-height: 20px;padding: 10px;}
+    #email-body{min-height: 20px;padding: 10px;}
     #email-body ul{ list-style-type: disc;margin-left: 2em; }
     #email-body p{ font-size: inherit; }
     #email-body h1{ font-weight: bold; padding: 0;margin: 0.67em 0 0.67em 0;}
@@ -128,9 +128,12 @@ $email = wpfn_get_email_by_id( $email_id );
         right: 0px;
     }
 
+    wpfn-toolbar{z-index: 99999999; position: relative;}
+    .row a:focus{box-shadow: none;}
+
 </style>
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php echo __('Edit Email', 'wp-funnels');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+    <h1 class="wp-heading-inline"><?php echo __('Edit Email', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
     <hr class="wp-header-end">
     <form method="post">
         <?php wp_nonce_field( 'edit_email', 'edit_email_nonce' ); ?>
@@ -141,18 +144,19 @@ $email = wpfn_get_email_by_id( $email_id );
                 <div id="post-body-content">
                     <div id="titlediv">
                         <div id="titlewrap">
-                            <label class="screen-reader-text" id="title-prompt-text" for="subject"><?php echo __('Subject Line: Used to capture the attention of the reader.', 'wp-funnels');?></label>
-                            <input placeholder="<?php echo __('Subject Line: Used to capture the attention of the reader.', 'wp-funnels');?>" type="text" name="subject" size="30" value="<?php echo  $email->subject; ?>" id="subject" spellcheck="true" autocomplete="off" required>
-                            <label class="screen-reader-text" id="title-prompt-text" for="pre_header"><?php echo __('Pre Header Text: Used to summarize the content of the email.', 'wp-funnels');?></label>
-                            <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'wp-funnels');?>" type="text" name="pre_header" size="30" value="<?php echo  $email->pre_header; ?>" id="pre_header" spellcheck="true" autocomplete="off">
+                            <label class="screen-reader-text" id="title-prompt-text" for="subject"><?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?></label>
+                            <input placeholder="<?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?>" type="text" name="subject" size="30" value="<?php echo  $email->subject; ?>" id="subject" spellcheck="true" autocomplete="off" required>
+                            <label class="screen-reader-text" id="title-prompt-text" for="pre_header"><?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?></label>
+                            <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo  $email->pre_header; ?>" id="pre_header" spellcheck="true" autocomplete="off">
                         </div>
                     </div>
                     <div id="email-content" class="postbox">
                         <h3 class="hndle"><?php _e( 'Email Editor'); ?></h3>
                         <div id="editor" class="editor" style="display: flex;">
-                            <div id="editor-actions" style="display: inline-block;width: 280px;margin-right: 10px;">
+                            <div id="editor-actions" style="display: inline-block;width: 280px;float: left">
+                                <div style="width: 280px;"></div>
                                 <div class="editor-actions-inner">
-                                    <div id="text_block-editor" class="postbox">
+                                    <div id="text_block-editor" class="postbox hidden">
                                         <h3 class="hndle"><?php _e( 'Text'); ?></h3>
                                         <div class="inside">
                                             <div class="options">
@@ -249,7 +253,8 @@ $email = wpfn_get_email_by_id( $email_id );
                                                         <th><?php _e( 'Image'); ?>:</th>
                                                         <td>
                                                             <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Upload Image' ); ?>" />
-                                                            <input type='hidden' name='image-src' id='image-src'>
+
+                                                            <input style="margin-top: 10px;" type='url' name='image-src' id='image-src'>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -291,7 +296,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                                         <th><?php _e( 'HTML Content'); ?>:</th>
                                                     </tr>
                                                     <tr>
-                                                        <td><textarea class="input" rows="20" cols="22" id="custom-html-content"></textarea></td>
+                                                        <td><textarea class="input" rows="20" style="width: 100%;" id="custom-html-content"></textarea></td>
                                                     </tr>
                                                 </table>
                                             </div>
@@ -299,11 +304,38 @@ $email = wpfn_get_email_by_id( $email_id );
                                     </div>
                                     <div id="social_block-editor"></div>
                                     <div id="video_block-editor"></div>
+                                    <div id="email-editor" class="postbox">
+                                        <h3 class="hndle"><?php _e( 'Email Options'); ?></h3>
+                                        <div class="inside">
+                                            <div class="options">
+                                                <table class="form-table">
+                                                    <tr>
+                                                        <th><?php _e( 'Alignment'); ?></th>
+                                                        <td>
+                                                            <select id="email-align" name="email_alignment">
+                                                                <option value="left" <?php if ( wpfn_get_email_meta( $email_id, 'alignment', true ) === 'left' ) echo 'selected' ; ?> ><?php _e('Left'); ?></option>
+                                                                <option value="center" <?php if ( wpfn_get_email_meta( $email_id, 'alignment', true ) === 'center' ) echo 'selected' ; ?>><?php _e('Center'); ?></option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div id="email-body" class="main-email-body" style="display: inline-block;max-width: 580px;vertical-align: top">
+                            <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto; overflow:hidden;">
+                                <?php
 
-                                <div id="email-inside" class="email-sortable">
+                                $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
+                                if ( $alignment === 'center' ){
+                                    $margins = "margin-left:auto;margin-right:auto;";
+                                } else {
+                                    $margins = "margin-left:0;margin-right:auto;";
+                                }
+
+                                ?>
+                                <div id="email-inside" class="email-sortable" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
                                     <?php if ( empty( $email->content ) ): ?>
                                         <?php wpfn_get_email_block( 'image_block' ); ?>
                                         <?php wpfn_get_email_block( 'text_block' ); ?>
@@ -325,7 +357,7 @@ $email = wpfn_get_email_by_id( $email_id );
                 <!-- begin elements area -->
                 <div id="postbox-container-1" class="postbox-container sticky">
                     <div id="submitdiv" class="postbox">
-                        <h3 class="hndle"><?php echo __( 'Email Actions', 'wp-funnels' );?></h3>
+                        <h3 class="hndle"><?php echo __( 'Email Actions', 'groundhogg' );?></h3>
                         <div class="inside">
                             <div class="submitbox">
                                 <div id="minor-publishing-actions">
@@ -393,7 +425,7 @@ $email = wpfn_get_email_by_id( $email_id );
                     <?php do_action( 'wpfn_email_side_actions_after' ); ?>
                     <?php do_action( 'wpfn_email_blocks_before' ); ?>
                     <div id='blocks' class="postbox">
-                        <h2 class="hndle"><?php echo __( 'Blocks', 'wp-funnels' );?></h2>
+                        <h2 class="hndle"><?php echo __( 'Blocks', 'groundhogg' );?></h2>
                         <div class="inside">
                             <table>
                                 <tbody>

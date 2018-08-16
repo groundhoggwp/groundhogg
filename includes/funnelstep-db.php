@@ -4,7 +4,7 @@
  *
  * Functions to manipulate and retrieve data from the database.
  *
- * @package     wp-funnelsteps
+ * @package     groundhoggteps
  * @subpackage  Includes/Emails
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License

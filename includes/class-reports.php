@@ -4,7 +4,7 @@
  *
  * This class is a readonly format for easily access data of a customer.
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Contacts
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License

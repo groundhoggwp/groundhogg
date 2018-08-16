@@ -4,7 +4,7 @@
  *
  * Functions to manipulate and retrieve data from the database.
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Emails
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -75,7 +75,7 @@ function wpfn_get_emails()
 
     $table_name = $wpdb->prefix . WPFN_EMAILS;
 
-    return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name WHERE email_status LIKE %s", 'ready' ), ARRAY_A );
+    return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name WHERE email_status LIKE %s ORDER BY ID DESC", 'ready' ), ARRAY_A );
 }
 
 /**

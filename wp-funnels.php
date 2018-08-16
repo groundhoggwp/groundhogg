@@ -1,12 +1,12 @@
 <?php
 /*
 Plugin Name: WP Funnels
-Plugin URI: https://wordpress.org/plugins/wp-funnels/
+Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
 Version: 0.1.0
 Author: Adrian Tobey
 Author URI: http://health-check-team.example.com
-Text Domain: wp-funnels
+Text Domain: groundhogg
 Domain Path: /languages
 */
 
@@ -17,6 +17,8 @@ foreach ( glob( dirname( __FILE__ ) . "/includes/*.php" ) as $filename )
 {
     include $filename;
 }
+
+include dirname( __FILE__ ) . '/includes/admin/settings/settings.php';
 
 /**
  * Create all the database tables

@@ -4,7 +4,7 @@
  *
  * Allow the user to edit the contact details and contact fields
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Contacts
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( ! isset( $_GET['ID'] ) || ! is_numeric( $_GET['ID'] ) )
 {
-	wp_die( __( 'Contact ID not supplied. Please try again', 'wp-funnels' ), __( 'Error', 'wp-funnels' ) );
+	wp_die( __( 'Contact ID not supplied. Please try again', 'groundhogg' ), __( 'Error', 'groundhogg' ) );
 }
 
 $contact_id = intval( $_GET['ID'] );
@@ -92,32 +92,32 @@ $contact = new WPFN_Contact( $contact_id );
 
             case 'general': ?>
 
-            <h3><?php echo __( 'General Information', 'wp-funnels' ); ?></h3>
+            <h3><?php echo __( 'General Information', 'groundhogg' ); ?></h3>
 
             <?php do_action( 'wpfn_contact_record_general_before', $contact_id ); ?>
             <table class="form-table">
                 <tbody>
                     <tr>
-                        <th><label for="first_name"><?php echo __( 'First Name', 'wp-funnels' )?></label></th>
+                        <th><label for="first_name"><?php echo __( 'First Name', 'groundhogg' )?></label></th>
                         <td><?php echo wpfn_admin_text_input_field( 'first_name', 'first_name', $contact->getFirst() );?></td>
                     </tr>
                     <tr>
-                        <th><label for="last_name"><?php echo __( 'Last Name', 'wp-funnels' )?></label></th>
+                        <th><label for="last_name"><?php echo __( 'Last Name', 'groundhogg' )?></label></th>
                         <td><?php echo wpfn_admin_text_input_field( 'last_name', 'last_name', $contact->getLast() );?></td>
                     </tr>
                     <tr>
-                        <th><label for="email"><?php echo __( 'Email', 'wp-funnels' )?></label></th>
+                        <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
                         <td>
                             <?php echo wpfn_admin_text_input_field( 'email', 'email', $contact->getEmail() );?>
-                            <p><?php echo '<b>' . __('Email Status', 'wp-funnels') . ': </b>' . wpfn_get_optin_status_text( $contact->getOptInStatus() ); ?></p>
+                            <p><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpfn_get_optin_status_text( $contact->getOptInStatus() ); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'wp-funnels' )?></label></th>
+                        <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'groundhogg' )?></label></th>
                         <td><?php echo wpfn_admin_text_input_field( 'primary_phone', 'meta[primary_phone]', $contact->getPhone() );?></td>
                     </tr>
                     <tr>
-                        <th><label for="primary_phone_extension"><?php echo __( 'Phone Extension', 'wp-funnels' )?></label></th>
+                        <th><label for="primary_phone_extension"><?php echo __( 'Phone Extension', 'groundhogg' )?></label></th>
                         <td><?php echo wpfn_admin_text_input_field( 'primary_phone_extension', 'meta[primary_phone_extension]', $contact->getPhoneExtension() );?></td>
                     </tr>
                 </tbody>
@@ -131,13 +131,13 @@ $contact = new WPFN_Contact( $contact_id );
 
             <?php case 'activity': ?>
 
-            <h3><?php echo __( 'Recent Activity', 'wp-funnels' ); ?></h3>
+            <h3><?php echo __( 'Recent Activity', 'groundhogg' ); ?></h3>
 
             <table class="wp-list-table widefat striped contact-activity">
                 <thead>
                     <tr>
-                        <th><?php echo __('Date', 'wp-funnels');?></th>
-                        <th><?php echo __('Entry', 'wp-funnels');?></th>
+                        <th><?php echo __('Date', 'groundhogg');?></th>
+                        <th><?php echo __('Entry', 'groundhogg');?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -153,7 +153,7 @@ $contact = new WPFN_Contact( $contact_id );
                     <?php if ( empty( $entries ) ):?>
                     <tr>
                         <td colspan="2">
-	                        <?php echo __( 'No Recent Activity Recorded...', 'wp-funnels' ); ?>
+	                        <?php echo __( 'No Recent Activity Recorded...', 'groundhogg' ); ?>
                         </td>
                     </tr>
                     <?php endif; ?>

@@ -4,7 +4,7 @@
  *
  * This class shows the data table for accessing information about a customer.
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Modules/Contacts
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -75,10 +75,10 @@ class WPFN_Contacts_Table extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'email'    => _x( 'Email', 'Column label', 'wp-funnels' ),
-			'first_name'   => _x( 'First Name', 'Column label', 'wp-funnels' ),
-			'last_name' => _x( 'Last Name', 'Column label', 'wp-funnels' ),
-			'date_created' => _x( 'Date Created', 'Column label', 'wp-funnels' ),
+			'email'    => _x( 'Email', 'Column label', 'groundhogg' ),
+			'first_name'   => _x( 'First Name', 'Column label', 'groundhogg' ),
+			'last_name' => _x( 'Last Name', 'Column label', 'groundhogg' ),
+			'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 		return $columns;
 	}
@@ -183,10 +183,10 @@ class WPFN_Contacts_Table extends WP_List_Table {
 	 */
 	protected function get_bulk_actions() {
 		$actions = array(
-			'delete' => _x( 'Delete', 'List table bulk action', 'wp-funnels' ),
-			'export' => _x( 'Export', 'List table bulk action', 'wp-funnels' ),
-			'apply_tag' => _x( 'Apply Tag', 'List table bulk action', 'wp-funnels'),
-			'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'wp-funnels')
+			'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
+			'export' => _x( 'Export', 'List table bulk action', 'groundhogg' ),
+			'apply_tag' => _x( 'Apply Tag', 'List table bulk action', 'groundhogg'),
+			'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'groundhogg')
 		);
 
 		return apply_filters( 'wpfn_contact_bulk_actions', $actions );

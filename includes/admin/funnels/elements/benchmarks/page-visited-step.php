@@ -4,7 +4,7 @@
  *
  * Html for the page visited funnel step in the Funnel builder
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels/Steps
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -32,7 +32,7 @@ function wpfn_page_visited_funnel_step_html( $step_id )
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo esc_html__( 'Select a page.', 'wp-funnels' ); ?></th>
+            <th><?php echo esc_html__( 'Select a page.', 'groundhogg' ); ?></th>
             <td><?php wp_dropdown_pages( $args ); ?>
                 <p>
                     <a id="<?php echo wpfn_prefix_step_meta( $step_id, 'view_page' ); ?>" target="_blank" href="<?php echo admin_url( 'post.php?action=edit&post=' . $pageId ); ?>"><?php _e( 'Edit Page'); ?></a>

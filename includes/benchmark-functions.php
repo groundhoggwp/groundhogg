@@ -4,7 +4,7 @@
  *
  * Functions to have users complete benchmarks within funnels...
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License

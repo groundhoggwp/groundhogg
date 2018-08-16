@@ -4,7 +4,7 @@
  *
  * Functions to manipulate and retrieve data from the database.
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Emails
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -99,6 +99,69 @@ function wpfn_update_funnel( $id, $key, $value )
         ),
         array( '%d' )
     );
+}
+
+/**
+ * Deletes a funnel, all related funnel meta, and all steps and their meta as well.
+ *
+ * @param $id int the ID of the funnel to delete
+ * @return bool whether the funnel was delete successfully.
+ */
+function wpfn_delete_funnel( $id )
+{
+    global $wpdb;
+
+    if ( ! $id || ! is_numeric( $id ) )
+        return false;
+
+    $id = absint( $id );
+    if ( ! $id )
+        return false;
+
+    /* delete funnel meta */
+
+    $a = $wpdb->delete(
+      $wpdb->funnelmeta,
+      array( 'funnel_id' => $id ),
+      array( '%d' )
+    );
+
+    /* delete steps */
+
+    $steps = wpfn_get_funnel_steps( $id );
+
+    foreach ( $steps as $args ){
+        $b = wpfn_delete_funnel_step( $args[ 'ID' ] );
+    }
+
+    $c = $wpdb->delete(
+        $wpdb->prefix . WPFN_FUNNELS,
+        array( 'ID' => $id ),
+        array( '%d' )
+    );
+
+    /* delete funnel */
+    return $a && $b && $c;
+}
+
+/**
+ * Get the count of funnels for a specific column value
+ *
+ * @param $where string the column
+ * @param $clause string the value
+ * @return int the count of items
+ */
+function wpfn_count_funnel_items( $where='', $clause='' )
+{
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . WPFN_FUNNELS;
+
+    if ( $where && $clause ){
+        return $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE $where LIKE %s", $clause ) );
+    } else {
+        return $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE funnel_status LIKE %s OR funnel_status LIKE %s OR funnel_status LIKE %s", 'active', 'inactive', '' ) );
+    }
 }
 
 /**

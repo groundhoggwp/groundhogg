@@ -92,7 +92,7 @@ add_filter( 'wpfn_replacement_email', 'wpfn_replacement_email' );
  */
 function wpfn_replacement_confirmation_link( $contact )
 {
-    $link_text = get_option( 'wpfn_confirmation_text', __( 'Confirm your email', 'wp-funnels' ) );
+    $link_text = get_option( 'wpfn_confirmation_text', __( 'Confirm your email', 'groundhogg' ) );
     $link_url = get_option( 'wpfn_confirmation_page', site_url( 'confirmed' ) );
 
     return "<a href=\"$link_url\" target=\"_blank\">$link_text</a>";

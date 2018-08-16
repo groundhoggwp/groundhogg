@@ -1,6 +1,13 @@
 var wpfnDoingAutoSave = false;
 
 jQuery( function($) {
+
+    jQuery('form').on('submit', function( e ){
+        e.preventDefault();
+        jQuery('.spinner').css('visibility','visible');
+        jQuery('form').unbind( 'submit' ).submit();
+    });
+    
     var funnelSortables = jQuery( ".ui-sortable" ).sortable(
         {
             placeholder: "sortable-placeholder",

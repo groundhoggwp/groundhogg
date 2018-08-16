@@ -4,7 +4,7 @@
  *
  * Html for the accoutn created funnel step in the Funnel builder
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels/Steps
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -26,7 +26,7 @@ function wpfn_role_changed_funnel_step_html( $step_id )
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo esc_html__( 'Run when user role is changed to', 'wp-funnels' ); ?>:</th>
+            <th><?php echo esc_html__( 'Run when user role is changed to', 'groundhogg' ); ?>:</th>
             <td>
                 <select name="<?php echo wpfn_prefix_step_meta( $step_id, 'role' ); ?>" id="<?php echo wpfn_prefix_step_meta( $step_id, 'role' ); ?>">
                     <?php wp_dropdown_roles( $account_role ); ?>
@@ -45,7 +45,7 @@ add_action( 'wpfn_get_step_settings_role_changed', 'wpfn_role_changed_funnel_ste
 function wpfn_role_changed_icon_html()
 {
     ?>
-    <div class="dashicons dashicons-admin-users"></div><p><? _e( 'Role Changed', 'wp-funnels' ); ?></p>
+    <div class="dashicons dashicons-admin-users"></div><p><? _e( 'Role Changed', 'groundhogg' ); ?></p>
     <?php
 }
 

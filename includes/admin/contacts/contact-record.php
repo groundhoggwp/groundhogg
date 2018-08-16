@@ -4,7 +4,7 @@
  *
  * Drag and drop builder for marketing automation
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -13,7 +13,7 @@
 
 if ( ! isset( $_GET['ID'] ) || ! is_numeric( $_GET['ID'] ) )
 {
-    wp_die( __( 'Contact ID not supplied. Please try again', 'wp-funnels' ), __( 'Error', 'wp-funnels' ) );
+    wp_die( __( 'Contact ID not supplied. Please try again', 'groundhogg' ), __( 'Error', 'groundhogg' ) );
 }
 
 $contact_id = intval( $_GET['ID'] );
@@ -25,22 +25,22 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
 
 <style>select {vertical-align: top;}</style>
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php echo __('Edit Contact', 'wp-funnels');?></h1>
+    <h1 class="wp-heading-inline"><?php echo __('Edit Contact', 'groundhogg');?></h1>
     <form method="post">
         <div id='poststuff' class="wpfn-funnel-builder">
             <div id="post-body" class="metabox-holder columns-2">
                 <div id="post-body-content">
                     <div id="titlediv">
                         <div id="titlewrap">
-                            <label class="screen-reader-text" id="title-prompt-text" for="title"><?php echo __('Enter Contact Name Here', 'wp-funnels');?></label>
-                            <input placeholder="<?php echo __('Enter Contact Name Here', 'wp-funnels');?>" type="text" name="contact_name" size="30" value="<?php echo $contact->getFullName(); ?>" id="title" spellcheck="true" autocomplete="off">
+                            <label class="screen-reader-text" id="title-prompt-text" for="title"><?php echo __('Enter Contact Name Here', 'groundhogg');?></label>
+                            <input placeholder="<?php echo __('Enter Contact Name Here', 'groundhogg');?>" type="text" name="contact_name" size="30" value="<?php echo $contact->getFullName(); ?>" id="title" spellcheck="true" autocomplete="off">
                         </div>
                     </div>
                 </div>
                 <!-- begin elements area -->
                 <div id="postbox-container-1" class="postbox-container sticky">
                     <div id="submitdiv" class="postbox">
-                        <h3 class="hndle"><?php echo __( 'Contact Actions', 'wp-funnels' );?></h3>
+                        <h3 class="hndle"><?php echo __( 'Contact Actions', 'groundhogg' );?></h3>
                         <div class="inside">
                             <div class="submitbox">
                                 <div id="minor-publishing-actions">
@@ -48,7 +48,7 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
                                     <table>
                                         <tbody>
                                         <tr>
-                                            <th><label for="date_created"><?php echo __( 'Dated Created', 'wp-funnels' );?></label></th>
+                                            <th><label for="date_created"><?php echo __( 'Dated Created', 'groundhogg' );?></label></th>
                                             <td><?php echo date( 'Y-m-d', strtotime( $contact->date_created ) ); ?></td>
                                         </tr>
                                         </tbody>
@@ -57,7 +57,7 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
                                 </div>
                                 <div id="major-publishing-actions">
                                     <div id="delete-action">
-                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=contacts' ), 'delete_contact', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Delete Contact', 'wp-funnels' ); ?></a>
+                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=contacts' ), 'delete_contact', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Delete Contact', 'groundhogg' ); ?></a>
                                     </div>
                                     <div id="publishing-action">
                                         <span class="spinner"></span>
@@ -79,32 +79,32 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
 
                     <?php do_action('wpfn_contact_general_box_before' ); ?>
                     <div id="general" class="postbox">
-                        <h2 class="hndle ui-sortable-handle"><?php echo __( 'General Info', 'wp-funnels' )?></h2>
+                        <h2 class="hndle ui-sortable-handle"><?php echo __( 'General Info', 'groundhogg' )?></h2>
                         <div class="inside">
                             <table class="form-table">
                                 <?php do_action( 'wpfn_contact_general_settings_before' ); ?>
                                 <tbody>
                                 <tr>
-                                    <th><label for="first_name"><?php echo __( 'First Name', 'wp-funnels' )?></label></th>
+                                    <th><label for="first_name"><?php echo __( 'First Name', 'groundhogg' )?></label></th>
                                     <td><?php echo wpfn_admin_text_input_field( 'first_name', 'first_name', $contact->getFirst() );?></td>
                                 </tr>
                                 <tr>
-                                    <th><label for="last_name"><?php echo __( 'Last Name', 'wp-funnels' )?></label></th>
+                                    <th><label for="last_name"><?php echo __( 'Last Name', 'groundhogg' )?></label></th>
                                     <td><?php echo wpfn_admin_text_input_field( 'last_name', 'last_name', $contact->getLast() );?></td>
                                 </tr>
                                 <tr>
-                                    <th><label for="email"><?php echo __( 'Email', 'wp-funnels' )?></label></th>
+                                    <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
                                     <td>
                                         <?php echo wpfn_admin_text_input_field( 'email', 'email', $contact->getEmail() );?>
-                                        <p><?php echo '<b>' . __('Email Status', 'wp-funnels') . ': </b>' . wpfn_get_optin_status_text( $contact->getOptInStatus() ); ?></p>
+                                        <p><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpfn_get_optin_status_text( $contact->getOptInStatus() ); ?></p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'wp-funnels' )?></label></th>
+                                    <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'groundhogg' )?></label></th>
                                     <td><?php echo wpfn_admin_text_input_field( 'primary_phone', 'meta[primary_phone]', $contact->getPhone() );?></td>
                                 </tr>
                                 <tr>
-                                    <th><label for="primary_phone_extension"><?php echo __( 'Phone Extension', 'wp-funnels' )?></label></th>
+                                    <th><label for="primary_phone_extension"><?php echo __( 'Phone Extension', 'groundhogg' )?></label></th>
                                     <td><?php echo wpfn_admin_text_input_field( 'primary_phone_extension', 'meta[primary_phone_extension]', $contact->getPhoneExtension() );?></td>
                                 </tr>
                                 </tbody>
@@ -116,13 +116,13 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
 
                     <?php do_action('wpfn_contact_activity_box_before' ); ?>
                     <div id="activity" class="postbox">
-                        <h2 class="hndle ui-sortable-handle"><?php echo __( 'Recent Activity', 'wp-funnels' )?></h2>
+                        <h2 class="hndle ui-sortable-handle"><?php echo __( 'Recent Activity', 'groundhogg' )?></h2>
                         <div class="inside">
                             <table class="wp-list-table widefat striped contact-activity">
                                 <thead>
                                 <tr>
-                                    <th><?php echo __('Date', 'wp-funnels');?></th>
-                                    <th><?php echo __('Entry', 'wp-funnels');?></th>
+                                    <th><?php echo __('Date', 'groundhogg');?></th>
+                                    <th><?php echo __('Entry', 'groundhogg');?></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -138,7 +138,7 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
                                 <?php if ( empty( $entries ) ):?>
                                     <tr>
                                         <td colspan="2">
-                                            <?php echo __( 'No Recent Activity Recorded...', 'wp-funnels' ); ?>
+                                            <?php echo __( 'No Recent Activity Recorded...', 'groundhogg' ); ?>
                                         </td>
                                     </tr>
                                 <?php endif; ?>

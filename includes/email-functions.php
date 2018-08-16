@@ -4,7 +4,7 @@
  *
  * Anything to do with saving, manipulating, and running email functions in the event queue
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Emails
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -30,8 +30,7 @@ function wpfn_add_email_menu_items()
 		'Add Email',
 		'Add New',
 		'manage_options',
-		'add_email',
-		'wpfn_add_emails_page'
+		'admin.php?page=emails&action=add'
 	);
 }
 
@@ -43,14 +42,6 @@ add_action( 'admin_menu', 'wpfn_add_email_menu_items' );
 function wpfn_emails_page()
 {
 	include dirname( __FILE__ ) . '/admin/emails/emails.php';
-}
-
-/**
- * Include the relevant admin file to display the output.
- */
-function wpfn_add_emails_page()
-{
-	include dirname( __FILE__ ) . '/admin/emails/add-email.php';
 }
 
 /**
@@ -118,6 +109,12 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     $content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
     $email_footer_text = get_option( 'email_footer_text', 'My Company Address & Phone Number' );
     $unsubscribe_link = get_permalink( get_option( 'unsubscribe_page' ) );
+    $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
+    if ( $alignment === 'left' ){
+        $margins = "margin-left:0;margin-right:auto;";
+    } else {
+        $margins = "margin-left:auto;margin-right:auto;";
+    }
 
     ob_start();
 
@@ -347,14 +344,31 @@ function wpfn_create_new_email()
     if ( ! isset( $_POST['add_new_email_nonce'] ) || ! wp_verify_nonce( $_POST['add_new_email_nonce'], 'add_new_email' ) )
         return;
 
-    if ( isset( $_POST['scratch_email'] ) ){
-        $email_id = wpfn_insert_new_email( '', '', '', get_current_user_id() );
+    if ( isset( $_POST[ 'email_template' ] ) ){
+
+        include dirname(__FILE__) . '/templates/email-templates.php';
+
+        /* @var $email_templates array included from email-templates.php*/
+        $email_content = $email_templates[ $_POST[ 'email_template' ] ][ 'content' ];
+
+    } else if ( isset( $_POST[ 'email_id' ] ) ) {
+
+        $email = wpfn_get_email_by_id( intval( $_POST['email_id'] ) );
+
+        $email_content = $email->content;
+
     } else {
-        $email = wpfn_get_email_by_id( intval( $_POST['copy_email_id'] ) );
-        $email_id = wpfn_insert_new_email( $email->content, $email->subject, $email->pre_header, get_current_user_id() );
+
+        ?><div class="notice notice-error"><p><?php _e( 'Could not create email. PLease select a template.', 'groundhogg' ); ?></p></div><?php
+
+        return;
+
     }
 
+    $email_id = wpfn_insert_new_email( $email_content, '', '', get_current_user_id() );
+
     wp_redirect( admin_url( 'admin.php?page=emails&action=edit&email=' .  $email_id ) );
+    die();
 }
 
 add_action( 'wpfn_before_new_email', 'wpfn_create_new_email' );
@@ -381,6 +395,9 @@ function wpfn_save_email( $email_id )
 
         $pre_header =  ( isset( $_POST['pre_header'] ) )? sanitize_text_field( trim( stripslashes( $_POST['pre_header'] ) ) ): '';
         wpfn_update_email( $email_id, 'pre_header', $pre_header );
+
+        $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
+        wpfn_update_email_meta( $email_id, 'alignment', $alignment );
 
         $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpfn_sanitize_email_content', wpfn_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
 //        $content =  ( isset( $_POST['content'] ) )? wp_kses( stripslashes( $_POST['content'] ), wpfn_emails_allowed_html() ): '';

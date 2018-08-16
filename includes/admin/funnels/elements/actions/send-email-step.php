@@ -4,7 +4,7 @@
  *
  * Html for the email funnel stp in the Funel builder
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels/Steps
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -36,10 +36,10 @@ function wpfn_send_email_funnel_step_html( $step_id )
     <table class="form-table">
         <tbody>
             <tr>
-                <th><?php echo esc_html__( 'Select an email to send:', 'wp-funnels' ); ?></th>
+                <th><?php echo esc_html__( 'Select an email to send:', 'groundhogg' ); ?></th>
                 <td>
                     <?php wpfn_dropdown_emails( $dropdown_args ); ?>
-                    <p><a id="<?php echo wpfn_prefix_step_meta( $step_id, 'edit_email' ); ?>" target="_blank" href="<?php echo admin_url( 'admin.php?page=emails&email=' . $previously_selected );?>"><?php echo esc_html__( 'Edit Email', 'wp-funnels' );?></a> | <a target="_blank" href="<?php echo admin_url( 'admin.php?page=add_email' );?>"><?php echo esc_html__( 'Create New Email', 'wp-funnels' );?></a></p>
+                    <p><a id="<?php echo wpfn_prefix_step_meta( $step_id, 'edit_email' ); ?>" target="_blank" href="<?php echo admin_url( 'admin.php?page=emails&email=' . $previously_selected );?>"><?php echo esc_html__( 'Edit Email', 'groundhogg' );?></a> | <a target="_blank" href="<?php echo admin_url( 'admin.php?page=add_email' );?>"><?php echo esc_html__( 'Create New Email', 'groundhogg' );?></a></p>
                     <script>jQuery(function($){$('#<?php echo $email_dropdown_id;?>').change(function(){$('#<?php echo wpfn_prefix_step_meta( $step_id, 'edit_email' ); ?>').attr('href', '<?php echo admin_url( 'admin.php?page=emails&email=');?>' + $(this).val())})});</script>
                 </td>
             </tr>
@@ -54,7 +54,7 @@ add_action( 'wpfn_get_step_settings_send_email', 'wpfn_send_email_funnel_step_ht
 function wpfn_send_email_icon_html()
 {
     ?>
-    <div class="dashicons dashicons-email-alt"></div><p><?php echo esc_html__( 'Send Email', 'wp-funnels' ); ?></p>
+    <div class="dashicons dashicons-email-alt"></div><p><?php echo esc_html__( 'Send Email', 'groundhogg' ); ?></p>
     <?php
 }
 

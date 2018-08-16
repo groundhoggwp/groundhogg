@@ -2,7 +2,7 @@
 /**
  * Contact Functions
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -73,16 +73,16 @@ function wpfn_get_optin_status_text( $status )
 	switch ( $status ){
 
 		case 0:
-			return __( 'Unconfirmed. They will receive emails.', 'wp-funnels' );
+			return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
 			break;
 		case 1:
-			return __( 'Confirmed. They will receive emails.', 'wp-funnels' );
+			return __( 'Confirmed. They will receive emails.', 'groundhogg' );
 			break;
 		case 2:
-			return __( 'Opted Out. They will not receive emails.', 'wp-funnels' );
+			return __( 'Opted Out. They will not receive emails.', 'groundhogg' );
 			break;
 		default:
-			return __( 'Unconfirmed. They will receive emails.', 'wp-funnels' );
+			return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
 			break;
 	}
 }

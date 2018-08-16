@@ -4,7 +4,7 @@
  *
  * Drag and drop builder for marketing automation
  *
- * @package     wp-funnels
+ * @package     groundhogg
  * @subpackage  Includes/Funnels
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -14,7 +14,7 @@
 
 if ( ! isset( $_GET['funnel'] ) || ! is_numeric( $_GET['funnel'] ) )
 {
-    wp_die( __( 'Funnel ID not supplied. Please try again', 'wp-funnels' ), __( 'Error', 'wp-funnels' ) );
+    wp_die( __( 'Funnel ID not supplied. Please try again', 'groundhogg' ), __( 'Error', 'groundhogg' ) );
 }
 
 $funnel_id = intval( $_GET['funnel'] );
@@ -156,12 +156,22 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
         padding-left: 10px;
         background-color: #008ec2; color: #FFFFFF;
     }
+
+    #status-toggle-switch .onoffswitch-inner:before{
+        content: "Active";
+    }
+
     .onoffswitch-inner:after {
         content: "Editing";
         padding-right: 10px;
         background-color: #EEEEEE; color: #999999;
         text-align: right;
     }
+
+    #status-toggle-switch .onoffswitch-inner:after{
+        content: "Inactive";
+    }
+
     .onoffswitch-switch {
         display: block; width: 21px; margin: 4.5px;
         background: #FFFFFF;
@@ -186,26 +196,27 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 </style>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php echo __('Edit Funnel', 'wp-funnels');?></h1>
+    <h1 class="wp-heading-inline"><?php echo __('Edit Funnel', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+    <hr class="wp-header-end">
     <form method="post">
         <div id='poststuff' class="wpfn-funnel-builder">
             <div id="post-body" class="metabox-holder columns-2">
                 <div id="post-body-content">
                     <div id="titlediv">
                         <div id="titlewrap">
-                            <label class="screen-reader-text" id="title-prompt-text" for="title"><?php echo __('Enter Funnel Name Here', 'wp-funnels');?></label>
-                            <input placeholder="<?php echo __('Enter Funnel Name Here', 'wp-funnels');?>" type="text" name="funnel_title" size="30" value="<?php echo wpfn_get_funnel_name( $funnel_id ); ?>" id="title" spellcheck="true" autocomplete="off">
+                            <label class="screen-reader-text" id="title-prompt-text" for="title"><?php echo __('Enter Funnel Name Here', 'groundhogg');?></label>
+                            <input placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo wpfn_get_funnel_name( $funnel_id ); ?>" id="title" spellcheck="true" autocomplete="off">
                         </div>
                     </div>
                     <div class="postbox">
-                        <h2 class="hndle"><?php _e("Reporting", 'wp-funnels'); ?></h2>
+                        <h2 class="hndle"><?php _e("Reporting", 'groundhogg'); ?></h2>
                         <div class="inside">
                             <select class="input" name="date_range" id="date_range">
                                 <?php $selected = ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ; ?>
-                                <option value="last_24" <?php if ( $selected == 'last_24' ) echo 'selected'; ?> ><?php _e( "Last 24 Hours", 'wp-funnels' );?></option>
-                                <option value="last_7" <?php if ( $selected == 'last_7' ) echo 'selected'; ?>><?php _e( "Last 7 Days", 'wp-funnels' );?></option>
-                                <option value="last_30" <?php if ( $selected == 'last_30' ) echo 'selected'; ?>><?php _e( "Last 30 Days", 'wp-funnels' );?></option>
-                                <option value="custom" <?php if ( $selected == 'custom' ) echo 'selected'; ?>><?php _e( "Custom Range", 'wp-funnels' );?></option>
+                                <option value="last_24" <?php if ( $selected == 'last_24' ) echo 'selected'; ?> ><?php _e( "Last 24 Hours", 'groundhogg' );?></option>
+                                <option value="last_7" <?php if ( $selected == 'last_7' ) echo 'selected'; ?>><?php _e( "Last 7 Days", 'groundhogg' );?></option>
+                                <option value="last_30" <?php if ( $selected == 'last_30' ) echo 'selected'; ?>><?php _e( "Last 30 Days", 'groundhogg' );?></option>
+                                <option value="custom" <?php if ( $selected == 'custom' ) echo 'selected'; ?>><?php _e( "Custom Range", 'groundhogg' );?></option>
                             </select>
                             <input autocomplete="off" placeholder="<?php esc_attr_e('From:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_start" name="custom_date_range_start" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_start' ] ) ) echo $_POST['custom_date_range_start']; ?>">
                             <script>jQuery(function($){$('#custom_date_range_start').datepicker({
@@ -260,7 +271,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                 <div id="postbox-container-1" class="postbox-container sticky">
                     <div class="sticky-actions" id="sticky-actions">
                         <div id="submitdiv" class="postbox">
-                            <h3 class="hndle"><?php echo __( 'Funnel Status', 'wp-funnels' );?></h3>
+                            <h3 class="hndle"><?php echo __( 'Funnel Status', 'groundhogg' );?></h3>
                             <div class="inside">
                                 <div class="submitbox">
                                     <div id="minor-publishing-actions">
@@ -268,12 +279,16 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                         <table class="form-table">
                                             <tbody>
                                             <tr>
-                                                <th><label for="funnel_status"><?php echo __( 'Status', 'wp-funnels' );?></label></th>
+                                                <th><label for="funnel_status"><?php echo __( 'Status', 'groundhogg' );?></label></th>
                                                 <td>
-                                                    <select id="funnel_status" name="funnel_status">
-                                                        <option value="inactive" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'inactive' ) echo 'selected="selected"'; ?>><?php echo __( 'Inactive', 'wp-funnels' );?></option>
-                                                        <option value="active" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'active' ) echo 'selected="selected"'; ?>><?php echo __( 'Active', 'wp-funnels' );?></option>
-                                                    </select>
+                                                    <input type="hidden" name="funnel_status" id="funnel-status" value="<?php echo wpfn_get_funnel_status( $funnel_id );?> ">
+                                                    <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
+                                                        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="status-toggle" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'active' ) echo 'checked'; ?>>
+                                                        <label class="onoffswitch-label" for="status-toggle">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -281,14 +296,16 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                         <?php do_action( 'wpfn_funnel_status_after' ); ?>
                                         <div style="text-align: left" id="confirm" class="hidden">
                                             <p>
-                                                <label for="confirm-inactive"><input type="checkbox" value="yes" id="confirm-inactive" name="confirm"><?php _e('Are you sure? Setting the status to inactive will stop any automation present or future from happening.', 'wp-funnels' ); ?></label></td>
+                                                <label for="confirm-inactive"><input type="checkbox" value="yes" id="confirm-inactive" name="confirm"><?php _e('Are you sure? Setting the status to inactive will stop any automation present or future from happening.', 'groundhogg' ); ?></label></td>
                                             </p>
                                             <script>jQuery(function($){
-                                                    $( '#funnel_status' ).change(function(){
-                                                        if ( $(this).val() === 'inactive' ){
+                                                    $( '#status-toggle' ).change(function(){
+                                                        if ( ! $(this).is(':checked') ){
                                                             $('#confirm').removeClass('hidden');
+                                                            $('#funnel-status').val( 'inactive' )
                                                         } else {
                                                             $('#confirm').addClass('hidden');
+                                                            $('#funnel-status').val( 'active' )
                                                         }
                                                     });
                                                 })</script>
@@ -296,7 +313,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                     </div>
                                     <div id="major-publishing-actions">
                                         <div id="delete-action">
-                                            <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=funnels' ), 'delete_funnel', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Delete Funnel', 'wp-funnels' ); ?></a>
+                                            <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=funnels&action=archive&funnel=' . $funnel_id ), 'archive' ) ); ?>"><?php echo esc_html__( 'Archive Funnel', 'groundhogg' ); ?></a>
                                         </div>
                                         <div id="publishing-action">
                                             <span class="spinner"></span>
@@ -310,7 +327,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                         </div>
                         <!-- Begin Benckmark Icons-->
                         <div id='benchmarks' class="postbox">
-                            <h3 class="hndle"><?php echo __( 'Benchmarks', 'wp-funnels' );?></h3>
+                            <h3 class="hndle"><?php echo __( 'Benchmarks', 'groundhogg' );?></h3>
                             <div class="elements-inner inside">
                                 <?php do_action( 'wpfn_benchmark_icons_before' ); ?>
                                 <table>
@@ -335,7 +352,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                 </table>
                                 <?php do_action( 'wpfn_benchmark_icons_after' ); ?>
                                 <p>
-                                    <?php echo esc_html__( 'Benchmarks start and stop automation actions for a contact.','wp-funnels' ); ?>
+                                    <?php echo esc_html__( 'Benchmarks start and stop automation actions for a contact.','groundhogg' ); ?>
                                 </p>
                             </div>
                         </div>
@@ -343,7 +360,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
                         <!-- Begin Action Icons-->
                         <div id='actions' class="postbox">
-                            <h2 class="hndle"><?php echo __( 'Actions', 'wp-funnels' );?></h2>
+                            <h2 class="hndle"><?php echo __( 'Actions', 'groundhogg' );?></h2>
                             <div class="inside">
                                 <?php do_action( 'wpfn_action_icons_before' ); ?>
                                 <table>
@@ -369,7 +386,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                 <?php do_action( 'wpfn_action_icons_after' ); ?>
 
                                 <p>
-                                    <?php echo esc_html__( 'Actions are launched whenever a contact completes a benchmark.','wp-funnels' ); ?>
+                                    <?php echo esc_html__( 'Actions are launched whenever a contact completes a benchmark.','groundhogg' ); ?>
                                 </p>
                             </div>
 
