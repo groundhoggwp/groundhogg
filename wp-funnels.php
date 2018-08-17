@@ -13,12 +13,13 @@ Domain Path: /languages
 define ( 'WPFN_ASSETS_FOLDER', plugins_url( 'assets', __FILE__ ) );
 define ( 'WPFN_INCLUDES_FOLDER', dirname( __FILE__ ) . '/includes/' );
 
+include dirname( __FILE__ ) . '/includes/admin/settings/settings.php';
+
 foreach ( glob( dirname( __FILE__ ) . "/includes/*.php" ) as $filename )
 {
-    include $filename;
+	include $filename;
 }
 
-include dirname( __FILE__ ) . '/includes/admin/settings/settings.php';
 
 /**
  * Create all the database tables

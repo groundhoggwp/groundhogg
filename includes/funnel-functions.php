@@ -11,38 +11,6 @@
  * @since       0.1
  */
 
-/**
- * Add the funnel menu items to the menu.
- */
-function wpfn_add_funnel_menu_items()
-{
-    $funnel_admin_id = add_menu_page(
-        'Funnels',
-        'Funnels',
-        'manage_options',
-        'funnels',
-        'wpfn_funnels_page',
-        'dashicons-filter'
-    );
-
-    $funnel_admin_add = add_submenu_page(
-        'funnels',
-        'Add Email',
-        'Add New',
-        'manage_options',
-        'admin.php?page=funnels&action=add'
-    );
-}
-
-add_action( 'admin_menu', 'wpfn_add_funnel_menu_items' );
-
-/**
- * Include the relevant admin file to display the output.
- */
-function wpfn_funnels_page()
-{
-    include dirname( __FILE__ ) . '/admin/funnels/funnels.php';
-}
 
 /**
  * Return a list of slugs for the available benchmarks in the funnel builder

@@ -1,7 +1,7 @@
 <?php
 
 /* Groundhogg Settings Page */
-class groundhogg_Settings_Page
+class WPFN_Settings_Page
 {
 	public function __construct()
     {
@@ -17,9 +17,9 @@ class groundhogg_Settings_Page
 		$capability = 'manage_options';
 		$slug = 'groundhogg';
 		$callback = array($this, 'wpfn_settings_content');
-		$icon = 'dashicons-admin-settings';
+		$icon = 'dashicons-email-alt';
 		$position = 2;
-		add_menu_page($page_title, $menu_title, $capability, $slug, $callback, $icon, $position);
+		add_menu_page( $page_title, $menu_title, $capability, $slug, $callback, $icon, $position );
 	}
 
 	public function wpfn_settings_content()
@@ -303,5 +303,3 @@ class groundhogg_Settings_Page
 		}
 	}
 }
-
-new groundhogg_Settings_Page();
