@@ -10,49 +10,6 @@
  */
 
 /**
- * Add the contacts menu items to the menu.
- */
-function wpfn_add_contact_menu_items()
-{
-	$contact_admin_id = add_menu_page(
-		'Contacts',
-		'Contacts',
-		'manage_options',
-		'contacts',
-		'wpfn_contacts_page',
-		'dashicons-universal-access'
-	);
-
-	$contact_admin_add = add_submenu_page(
-		'contacts',
-		'Add Contact',
-		'Add New',
-		'manage_options',
-		'add_contact',
-		'wpfn_add_contacts_page'
-	);
-}
-
-add_action( 'admin_menu', 'wpfn_add_contact_menu_items' );
-
-/**
- * Include the relevant admin file to display the output.
- */
-function wpfn_contacts_page()
-{
-	include dirname( __FILE__ ) . '/admin/contacts/contacts.php';
-}
-
-/**
- * Include the relevant admin file to display the output.
- */
-function wpfn_add_contacts_page()
-{
-	include dirname( __FILE__ ) . '/admin/contacts/add-contact.php';
-}
-
-
-/**
  * Get the text explanation for the optin status of a contact
  * 0 = unconfirmed, can send email
  * 1 = confirmed, can send email

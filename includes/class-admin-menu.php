@@ -25,6 +25,34 @@ class WPFN_Admin_Menu
 	function setup_menu_items()
 	{
 
+        $page_title = 'Groundhogg';
+        $menu_title = 'Groundhogg';
+        $capability = 'manage_options';
+        $slug = 'groundhogg';
+        $callback = array( $this, 'groundhogg_callback' );
+        $icon = 'dashicons-email-alt';
+        $position = 2;
+
+        $settings_page = add_menu_page( $page_title, $menu_title, $capability, $slug, $callback, $icon, $position );
+
+        $contacts_admin_add = add_submenu_page(
+            'groundhogg',
+            'Contacts',
+            'Contacts',
+            'manage_options',
+            'contacts',
+            array( $this, 'contacts_callback' )
+        );
+
+        $tags_admin_add = add_submenu_page(
+            'groundhogg',
+            'Tags',
+            'Tags',
+            'manage_options',
+            'tags',
+            array( $this, 'tags_callback' )
+        );
+
 		$email_admin_add = add_submenu_page(
 			'groundhogg',
 			'Emails',
@@ -43,15 +71,23 @@ class WPFN_Admin_Menu
 			array( $this, 'funnels_callback' )
 		);
 
-		add_submenu_page(
-			'groundhogg',
-			'Settings',
-			'Settings',
-			'manage_options',
-			'groundhogg',
-			array( $this->settings_page, 'wpfn_settings_content' )
-		);
-	}
+        add_submenu_page(
+            'groundhogg',
+            'Settings',
+            'Settings',
+            'manage_options',
+            'groundhogg',
+            array( $this->settings_page, 'wpfn_settings_content' )
+        );
+
+        remove_submenu_page( 'groundhogg', 'groundhogg' );
+
+    }
+
+	function groundhogg_callback()
+    {
+
+    }
 
 	function emails_callback()
 	{
@@ -62,6 +98,16 @@ class WPFN_Admin_Menu
 	{
 		include dirname( __FILE__ ) . '/admin/funnels/funnels.php';
 	}
+
+    function contacts_callback()
+    {
+        include dirname( __FILE__ ) . '/admin/contacts/contacts.php';
+    }
+
+    function tags_callback()
+    {
+        include dirname( __FILE__ ) . '/admin/tags/tags.php';
+    }
 
 }
 

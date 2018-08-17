@@ -40,6 +40,9 @@ function wpfn_activation()
 
 	wpfn_create_funnelsteps_db();
 	wpfn_create_funnelstep_meta_db();
+
+	wpfn_create_contact_tags_db();
+	wpfn_create_contact_tag_relationships_db();
 }
 
 register_activation_hook( __FILE__, 'wpfn_activation');

@@ -5,21 +5,9 @@ class WPFN_Settings_Page
 {
 	public function __construct()
     {
-		add_action( 'admin_menu', array( $this, 'wpfn_create_settings' ) );
+		//add_action( 'admin_menu', array( $this, 'wpfn_create_settings' ) );
 		add_action( 'admin_init', array( $this, 'wpfn_setup_sections' ) );
 		add_action( 'admin_init', array( $this, 'wpfn_setup_fields' ) );
-	}
-
-	public function wpfn_create_settings()
-    {
-		$page_title = 'Groundhogg Settings';
-		$menu_title = 'Groundhogg';
-		$capability = 'manage_options';
-		$slug = 'groundhogg';
-		$callback = array($this, 'wpfn_settings_content');
-		$icon = 'dashicons-email-alt';
-		$position = 2;
-		add_menu_page( $page_title, $menu_title, $capability, $slug, $callback, $icon, $position );
 	}
 
 	public function wpfn_settings_content()

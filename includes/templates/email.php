@@ -29,19 +29,20 @@
                 <div class="footer" style="clear: both; Margin-top: 10px; text-align: center; width: 100%;">
                     <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                         <tr>
-                            <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
-                                <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;"><?php echo $email_footer_text; ?></span>
+                            <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 13px; color: #999999; text-align: center;">
+                                <span class="apple-link" style="color: #999999; font-size: 13px; text-align: center;"><?php echo $email_footer_text; ?></span>
                             </td>
                         </tr>
                         <tr>
-                            <span style="color: #999999; font-size: 12px; text-align: center;">Don't want these emails? <a href="<?php echo $unsubscribe_link; ?>">Unsubscribe.</a></span>
+                            <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 13px; color: #999999; text-align: center;">
+                                <span style="color: #999999; font-size: 13px; text-align: center;"><?php _e( "Don't want these emails?", 'groundhogg'); ?> <a href="<?php echo $unsubscribe_link; ?>"><?php _e( "Unsubscribe", 'groundhogg'); ?></a>.</span>
+                            </td>
                         </tr>
                     </table>
                 </div>
                 <!-- END FOOTER -->
             </div>
         </td>
-        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
     </tr>
 </table>
 </body>

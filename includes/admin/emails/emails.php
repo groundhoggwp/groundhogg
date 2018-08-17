@@ -26,14 +26,14 @@ function wpfn_render_emails_table()
     <div class="wrap">
         <h1 class="wp-heading-inline"><?php echo __('Emails', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
         <hr class="wp-header-end">
-        <form method="post" >
+        <?php $emails_table->views(); ?>
+        <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
                 <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Emails ', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
                 <input type="submit" id="search-submit" class="button" value="Search Contacts">
             </p>
-            <?php $emails_table->views(); ?>
             <?php $emails_table->prepare_items(); ?>
             <?php $emails_table->display(); ?>
         </form>
@@ -75,6 +75,22 @@ if ( isset( $_GET['action'] ) && $_GET['action'] === 'trash' ){
     } else {
 
         ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not delete email', 'groundhogg' ); ?>.</p></div><?php
+
+        wpfn_render_emails_table();
+    }
+} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'restore' ) {
+
+    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'restore' ) ){
+
+        wpfn_update_email( intval( $_GET[ 'email' ] ), 'email_status', 'draft' );
+
+        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Restored email', 'groundhogg' ); ?>.</p></div><?php
+
+        wpfn_render_emails_table();
+
+    } else {
+
+        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not restore email', 'groundhogg' ); ?>.</p></div><?php
 
         wpfn_render_emails_table();
     }

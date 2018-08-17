@@ -49,7 +49,9 @@ class WPFN_Emails_Table extends WP_List_Table {
 			'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'subject'    => _x( 'Subject', 'Column label', 'groundhogg' ),
 			'from_user'   => _x( 'From User', 'Column label', 'groundhogg' ),
-			'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
+			'author'   => _x( 'Author', 'Column label', 'groundhogg' ),
+            'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
+            'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 		return $columns;
 	}
@@ -65,6 +67,8 @@ class WPFN_Emails_Table extends WP_List_Table {
 		$sortable_columns = array(
 			'subject'    => array( 'subject', false ),
 			'from_user' => array( 'from_name', false ),
+			'author' => array( 'from_name', false ),
+			'last_updated' => array( 'last_updated', false ),
 			'date_created' => array( 'date_created', false )
 		);
 		return $sortable_columns;
@@ -153,7 +157,12 @@ class WPFN_Emails_Table extends WP_List_Table {
             case 'from_user':
                 $user = get_userdata( intval( ( $item['from_user'] ) ) );
                 $from_user = esc_html( $user->display_name . ' <' . $user->user_email . '>' );
-                $queryUrl = admin_url( 'admin.php?page=emails&from_user=' . $item['from_user'] );
+                $queryUrl = admin_url( 'admin.php?page=emails&view=from_user&from_user' . $item['from_user'] );
+                return "<a href='$queryUrl'>$from_user</a>";
+            case 'author':
+                $user = get_userdata( intval( ( $item['author'] ) ) );
+                $from_user = esc_html( $user->user_login );
+                $queryUrl = admin_url( 'admin.php?page=emails&view=author&author=' . $item['author'] );
                 return "<a href='$queryUrl'>$from_user</a>";
 			default:
 				return print_r( $item[ $column_name ], true );
@@ -181,11 +190,20 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 * @return array An associative array containing all the bulk actions.
 	 */
 	protected function get_bulk_actions() {
-		$actions = array(
-			'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' )
-		);
+        if ( $this->get_view() === 'trash' )
+        {
+            $actions = array(
+                'delete' => _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' ),
+                'restore' => _x( 'Restore', 'List table bulk action', 'groundhogg' )
+            );
 
-		return apply_filters( 'wpfn_email_bulk_actions', $actions );
+        } else {
+            $actions = array(
+                'trash' => _x( 'Trash', 'List table bulk action', 'groundhogg' )
+            );
+        }
+
+        return apply_filters( 'wpfn_email_bulk_actions', $actions );
 	}
 	/**
 	 * Handle bulk actions.
@@ -194,15 +212,44 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 */
 	protected function process_bulk_action() {
 		// Detect when a bulk action is being triggered.
-		global $wpdb;
+        global $wpdb;
 
-		switch ( $this->current_action() ){
-			case 'delete':
-				//todo
-				break;
-			default:
-				break;
-		}
+        if ( ! isset( $_REQUEST[ 'email' ] ) )
+            return;
+
+        $items = $_REQUEST[ 'email' ];
+
+        if ( ! is_array( $items ) || empty( $items ) )
+            return;
+
+        switch ( $this->current_action() ){
+            case 'delete':
+
+                foreach ( $items as $id ){
+                    wpfn_delete_email( intval( $id ) );
+                }
+
+                break;
+            case 'restore':
+
+                foreach ( $items as $id ){
+                    wpfn_update_email( intval( $id ), 'email_status', 'draft' );
+                }
+
+                break;
+            case 'trash':
+
+                foreach ( $items as $id ){
+                    wpfn_update_email( intval( $id ), 'email_status', 'trash' );
+                }
+
+                break;
+            default:
+                do_action( 'wpfn_emails_process_bulk_action_' . $this->current_action() );
+                break;
+        }
+
+        //unset( $_REQUEST['email'] );
 	}
 
 	/**
@@ -224,45 +271,15 @@ class WPFN_Emails_Table extends WP_List_Table {
 		 * First, lets decide how many records per page to show
 		 */
 		$per_page = 20;
-		/*
-		 * REQUIRED. Now we need to define our column headers. This includes a complete
-		 * array of columns to be displayed (slugs & titles), a list of columns
-		 * to keep hidden, and a list of columns that are sortable. Each of these
-		 * can be defined in another method (as we've done here) before being
-		 * used to build the value for our _column_headers property.
-		 */
+
 		$columns  = $this->get_columns();
 		$hidden   = array();
 		$sortable = $this->get_sortable_columns();
-		/*
-		 * REQUIRED. Finally, we build an array to be used by the class for column
-		 * headers. The $this->_column_headers property takes an array which contains
-		 * three other arrays. One for all columns, one for hidden columns, and one
-		 * for sortable columns.
-		 */
+
 		$this->_column_headers = array( $columns, $hidden, $sortable );
-		/**
-		 * Optional. You can handle your bulk actions however you see fit. In this
-		 * case, we'll handle them within our package just to keep things clean.
-		 */
+
 		$this->process_bulk_action();
-		/*
-		 * GET THE DATA!
-		 *
-		 * Instead of querying a database, we're going to fetch the example data
-		 * property we created for use in this plugin. This makes this example
-		 * package slightly different than one you might build on your own. In
-		 * this example, we'll be using array manipulation to sort and paginate
-		 * our dummy data.
-		 *
-		 * In a real-world situation, this is probably where you would want to
-		 * make your actual database query. Likewise, you will probably want to
-		 * use any posted sort or pagination data to build a custom query instead,
-		 * as you'll then be able to use the returned query data immediately.
-		 *
-		 * For information on making queries in WordPress, see this Codex entry:
-		 * http://codex.wordpress.org/Class_Reference/wpdb
-		 */
+
 		$table_name = $wpdb->prefix . WPFN_EMAILS;
 
 		$query = "SELECT * FROM $table_name WHERE ";

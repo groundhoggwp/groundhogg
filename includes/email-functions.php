@@ -68,14 +68,18 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
 
     $email = wpfn_get_email_by_id( $email_id );
 
-    //merged in email template
+    /* don't send if the email is marked as unready. */
+    if ( $email->email_status !== 'ready' )
+        return false;
 
+
+    /* merge in email content into default template */
     $title = get_bloginfo( 'name' );
     $subject_line = wpfn_do_replacements( $contact_id, $email->subject );
     $pre_header = wpfn_do_replacements( $contact_id, $email->pre_header );
     $content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
-    $email_footer_text = get_option( 'email_footer_text', 'My Company Address & Phone Number' );
-    $unsubscribe_link = get_permalink( get_option( 'unsubscribe_page' ) );
+    $email_footer_text = wpfn_get_email_footer_text();
+    $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
     $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
     if ( $alignment === 'left' ){
         $margins = "margin-left:0;margin-right:auto;";
@@ -91,9 +95,7 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
 
     ob_end_clean();
 
-    /**
-     * Filter the links to include data about the email, campaign, and funnel steps...
-     */
+    /* Filter the links to include data about the email, campaign, and funnel steps... */
     $email_content = preg_replace_callback( '/(href=")([^"]*)(")/i', 'wpfn_urlencode_email_links' , $email_content );
     $email_content = preg_replace( '/(href=")([^"]*)(")/i', '${1}' . $ref_link . '${2}${3}' , $email_content );
 
@@ -101,20 +103,62 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
 
     $from_user = get_userdata( $email->from_user );
 
-    //todo find better way to send test emails, different function?
+    /* todo find better way to send test emails, different function? */
     if ( isset( $_POST['send_test'] ) )
         $to_email = get_userdata( $contact_id )->user_email;
     else
         $to_email = $contact->getEmail();
 
     $headers = array();
-    $headers[] = 'From: ' . $from_user->display_name . ' <' . $from_user->user_email . '>';
-    $headers[] = 'Reply-To: ' . $from_user->user_email;
-    $headers[] = 'Content-Type: text/html; charset=UTF-8';
+    $headers[ 'from' ] = 'From: ' . $from_user->display_name . ' <' . $from_user->user_email . '>';
+    $headers[ 'reply_to' ] = 'Reply-To: ' . $from_user->user_email;
+    $headers[ 'content_type' ] = 'Content-Type: text/html; charset=UTF-8';
+
+    $headers = apply_filters( 'wpfn_email_headers', $headers );
 
     add_filter( 'wp_mail_content_type', 'wpfn_send_html_email' );
 
     return wp_mail( $to_email , $subject_line, $email_content, $headers );
+}
+
+
+/**
+ * Get the can spam compliant email footer.
+ *
+ * @return string the email footer
+ */
+function wpfn_get_email_footer_text()
+{
+    $footer = "";
+
+    if ( get_option( 'gh_business_name' ) )
+        $footer .= "&copy; " . get_option( 'gh_business_name' ) . "<br/>" ;
+
+    if ( get_option( 'gh_street_address_1' ) )
+        $address[] = get_option( 'gh_street_address_1' ) . ' ' . get_option( 'gh_street_address_2' );
+    if ( get_option( 'gh_city' ) )
+        $address[] = get_option( 'gh_city' );
+    if ( get_option( 'gh_region' ) )
+        $address[] = get_option( 'gh_region' );
+    if ( get_option( 'gh_country' ) )
+        $address[] = get_option( 'gh_country' );
+    if ( get_option( 'gh_zip_or_postal' ) )
+        $address[] = strtoupper( get_option( 'gh_zip_or_postal' ) );
+
+    $footer .= implode( ', ', $address ) . "<br/>";
+
+    if ( get_option( 'gh_phone' ) )
+        $sub[] = "<a href='tel:" . esc_attr( get_option( 'gh_phone' ) ) . "'>" . esc_attr( get_option( 'gh_phone' ) ) . "</a>";
+    if ( get_option( 'gh_privacy_policy' ) )
+        $sub[] = "<a href=\"" . esc_attr( get_permalink( get_option( 'gh_privacy_policy' ) ) ) . "\">" . __( 'Privacy Policy', 'groundhogg' ) . "</a>";
+    if ( get_option( 'gh_terms' ) )
+        $sub[] = "<a href=\"" . esc_attr( get_permalink( get_option( 'gh_terms' ) ) ) . "\">" . __( 'Terms', 'groundhogg' ) . "</a>";
+
+    $footer .= implode( ' | ', $sub ) ;
+
+    $footer = apply_filters( 'wpfn_email_footer', $footer );
+
+    return $footer;
 }
 
 /**
@@ -332,7 +376,7 @@ function wpfn_create_new_email()
 
     }
 
-    $email_id = wpfn_insert_new_email( $email_content, '', '', get_current_user_id() );
+    $email_id = wpfn_insert_new_email( $email_content, '', '', get_current_user_id(), get_current_user_id() );
 
     wp_redirect( admin_url( 'admin.php?page=emails&action=edit&email=' .  $email_id ) );
     die();

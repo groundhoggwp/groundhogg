@@ -18,10 +18,11 @@
  * @param $subject string the Email Subject
  * @param $pre_header string the Email Pre_header
  * @param $from_user int the ID of the user the email is to be sent from
+ * @param $author int the ID of the user who create the email.
  *
  * @return bool|int the ID of the new Email, false on failure.
  */
-function wpfn_insert_new_email( $content, $subject, $pre_header, $from_user )
+function wpfn_insert_new_email( $content, $subject, $pre_header, $from_user, $author )
 {
 	global $wpdb;
 
@@ -32,7 +33,9 @@ function wpfn_insert_new_email( $content, $subject, $pre_header, $from_user )
 			'subject'       => $subject,
 			'pre_header'    => $pre_header,
 			'from_user'     => $from_user,
+			'author'        => $author,
 			'email_status'  => 'draft',
+			'last_updated'  => current_time( 'mysql' ),
 			'date_created'  => current_time( 'mysql' )
 		)
 	);
@@ -127,11 +130,13 @@ function wpfn_update_email( $id, $key, $value )
 	return $wpdb->update(
 		$wpdb->prefix . WPFN_EMAILS,
 		array(
-			$key => $value
+			$key => $value,
+            'last_updated' => current_time( 'mysql' )
 		),
 		array( 'ID' => $id ),
 		array(
-			'%s'	// value1
+			'%s',	// value1
+            '%s'
 		),
 		array( '%d' )
 	);
@@ -246,7 +251,7 @@ function wpfn_integrate_emails_wpdb()
 }
 
 define( 'WPFN_EMAILS', 'emails' );
-define( 'WPFN_EMAILS_DB_VERSION', '0.2' );
+define( 'WPFN_EMAILS_DB_VERSION', '0.3' );
 
 /**
  * Create the emails database table.
@@ -269,6 +274,8 @@ function wpfn_create_emails_db()
       subject text NOT NULL,
       pre_header text NOT NULL,
       from_user bigint(20) NOT NULL,
+      author bigint(20) NOT NULL,   
+      last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       email_status VARCHAR(20) NOT NULL,
       PRIMARY KEY  (ID)

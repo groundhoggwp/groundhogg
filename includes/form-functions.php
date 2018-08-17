@@ -45,4 +45,4 @@ function wpfn_form_submit_listener()
     do_action( 'wpfn_caught_form_submit', $id );
 }
 
-add_action( 'init', 'wpfn_form_submit_listener' );
+//add_action( 'init', 'wpfn_form_submit_listener' );
