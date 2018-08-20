@@ -13,6 +13,29 @@
 
 
 /**
+ *Add easy way for devs to register new funnel actions and benchmarks
+ *
+ * @param $name string the Name of the new action
+ * @param $type string the identifier
+ * @param $settings_callback string callback for the settings of the new action
+ * @param $save_callback string callback to save the new settings
+ * @param $action_callback string the callback to perform the action
+ * @param $icon string a link or class to the icon of the new action.
+ */
+function wpfn_register_custom_action
+(
+        $name,
+        $type,
+        $settings_callback,
+        $save_callback,
+        $action_callback,
+        $icon
+)
+{
+    //todo
+}
+
+/**
  * Return a list of slugs for the available benchmarks in the funnel builder
  *
  * @return array
@@ -123,7 +146,7 @@ function wpfn_get_step_dashicon_by_step_type( $step_type )
     $dashicons['edd_download_removed_from_cart'] = '';
     $dashicons['edd_download_removed_from_cart'] = '';
 
-    $dashicons = apply_filters( 'wpfn_element_dashicons', $dashicons );
+    $dashicons = apply_filters( 'wpfn_builder_icons', $dashicons );
 
     if ( ! in_array( $step_type, array_keys( $dashicons ) ) )
         return false;
@@ -605,7 +628,7 @@ function wpfn_save_funnel( $funnel_id )
 {
     //todo user validation & permissions...
 
-    if ( ! isset( $_POST[ 'save' ] ) )
+    if ( empty( $_POST ) )
         return;
 
     do_action( 'wpfn_save_funnel', $funnel_id );

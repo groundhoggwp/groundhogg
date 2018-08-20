@@ -52,14 +52,14 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     $link_args = array();
 
     if ( $funnel_id && is_int( $funnel_id ) )
-        $link_args['step_id'] = absint( $step_id );
+        $link_args['funnel'] = absint( $step_id );
 
     if ( $step_id && is_int( $step_id ) )
-        $link_args['step_id'] = absint( $step_id );
+        $link_args['step'] = absint( $step_id );
 
     //$link_args['enc_contact_id'] = wpfn_encrypt( $contact_id ); //todo create the encryption algo for the contact for later reference.
-    $link_args['contact_id'] = $contact_id; //todo remove this line
-    $link_args['email_id'] = $email_id;
+    $link_args['contact'] = $contact_id; //todo remove this line
+    $link_args['email'] = $email_id;
 
     /**
      * @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to.
@@ -285,7 +285,7 @@ function wpfn_dropdown_emails( $args )
     $defaults = array(
         'selected' => 0, 'echo' => 1,
         'name' => 'email_id', 'id' => '',
-        'class' => '',
+        'class' => '', 'width' => '100%',
         'show_option_none' => '', 'show_option_no_change' => '',
         'option_none_value' => ''
     );
@@ -306,7 +306,7 @@ function wpfn_dropdown_emails( $args )
             $class = " class='" . esc_attr( $r['class'] ) . "'";
         }
 
-        $output = "<select name='" . esc_attr( $r['name'] ) . "'" . $class . " id='" . esc_attr( $r['id'] ) . "'>\n";
+        $output = "<select style='width:" . esc_attr( $r['width'] ) . ";' name='" . esc_attr( $r['name'] ) . "'" . $class . " id='" . esc_attr( $r['id'] ) . "'>\n";
         if ( $r['show_option_no_change'] ) {
             $output .= "\t<option value=\"-1\">" . $r['show_option_no_change'] . "</option>\n";
         }
@@ -320,7 +320,7 @@ function wpfn_dropdown_emails( $args )
 
             $selected = ( intval( $item['ID'] ) === intval( $r['selected'] ) )? "selected='selected'" : '' ;
 
-            $output .= "<option value=\"" . $item['ID'] . "\" $selected >" . $item['subject'] . "</option>";
+            $output .= "<option value=\"" . $item['ID'] . "\" $selected >" . $item['subject'] . " (" . wpfn_email_status( $item['ID'] ).  ")</option>";
         }
 
         $output .= "</select>\n";
@@ -503,4 +503,33 @@ function wpfn_email_suffix_callback( $match )
     $url .= '&utm_source=email&utm_medium=email&utm_campaign=product_notify&contact_key=';
 
     return $match[1].$url.$match[3];
+}
+
+/**
+ * Retutn the status of an email...
+ *
+ * @param $id int the ID of the email
+ * @return string thhe email status
+ */
+function wpfn_email_status( $id )
+{
+    $email = wpfn_get_email_by_id( intval( $id) );
+
+    if ( ! $email )
+        return false;
+
+    switch ( $email->email_status){
+        case 'ready':
+            return __( 'Ready', 'groundhogg' );
+            break;
+        case 'draft':
+            return __( 'Draft', 'groundhogg' );
+            break;
+        case 'trash':
+            return __( 'Trash', 'groundhogg' );
+            break;
+        default:
+            return '';
+            break;
+    }
 }

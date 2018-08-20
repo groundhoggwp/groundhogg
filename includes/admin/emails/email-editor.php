@@ -195,6 +195,10 @@ $email = wpfn_get_email_by_id( $email_id );
                                             <div class="options">
                                                 <table class="form-table">
                                                     <tr>
+                                                        <th><?php _e( 'Button Text'); ?>:</th>
+                                                        <td><input type="text" id="button-text" name="button-text" value=""></td>
+                                                    </tr>
+                                                    <tr>
                                                         <th><?php _e( 'Text Size'); ?>:</th>
                                                         <td><input class="input" type="number" id="button-size" min="10" max="40" value=""></td>
                                                     </tr>
@@ -302,8 +306,6 @@ $email = wpfn_get_email_by_id( $email_id );
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="social_block-editor"></div>
-                                    <div id="video_block-editor"></div>
                                     <div id="email-editor" class="postbox">
                                         <h3 class="hndle"><?php _e( 'Email Options'); ?></h3>
                                         <div class="inside">
@@ -411,7 +413,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                 </div>
                                 <div id="major-publishing-actions">
                                     <div id="delete-action">
-                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=emails&action=trash&email=' . $email_id ), 'trash_email', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Move To Trash' ); ?></a>
+                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=emails&action=trash&email=' . $email_id ), 'trash' ) ); ?>"><?php echo esc_html__( 'Move To Trash' ); ?></a>
                                     </div>
                                     <div id="publishing-action">
                                         <span class="spinner"></span>
@@ -439,10 +441,6 @@ $email = wpfn_get_email_by_id( $email_id );
                                 </tr>
                                 <tr>
                                     <td><div id='button_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-id-alt"></div><p>Button</p></div></td>
-                                    <td><div id='social_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-networking"></div><p>Social</p></div></td>
-                                </tr>
-                                <tr>
-                                    <td><div id='video_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-video-alt3"></div><p>Video</p></div></td>
                                     <td><div id='code_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-editor-code"></div><p>HTML</p></div></td>
                                 </tr>
                                 </tbody>

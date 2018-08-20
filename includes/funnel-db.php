@@ -31,7 +31,8 @@ function wpfn_insert_new_funnel( $title, $status )
         array(
             'funnel_title'  => $title,
             'funnel_status' => $status,
-            'date_created'  => current_time( 'mysql' )
+            'date_created'  => current_time( 'mysql' ),
+            'last_updated'  => current_time( 'mysql' )
         )
     );
 
@@ -91,11 +92,13 @@ function wpfn_update_funnel( $id, $key, $value )
     return $wpdb->update(
         $wpdb->prefix . WPFN_FUNNELS,
         array(
-            $key => $value
+            $key => $value,
+            'last_updated' => current_time( 'mysql' )
         ),
         array( 'ID' => $id ),
         array(
-            '%s'	// value1
+            '%s',	// value1
+            '%s'
         ),
         array( '%d' )
     );
@@ -239,7 +242,7 @@ function wpfn_integrate_funnels_wpdb()
 }
 
 define( 'WPFN_FUNNELS', 'funnels' );
-define( 'WPFN_FUNNELS_DB_VERSION', '0.1' );
+define( 'WPFN_FUNNELS_DB_VERSION', '0.2' );
 
 /**
  * Create the funnels database table.
@@ -260,6 +263,7 @@ function wpfn_create_funnels_db()
       ID bigint(20) NOT NULL AUTO_INCREMENT,
       funnel_title text NOT NULL,
       funnel_status varchar(20) NOT NULL,
+      last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       PRIMARY KEY  (ID)
     ) $charset_collate;";

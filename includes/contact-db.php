@@ -377,6 +377,20 @@ function wpfn_create_contact_meta_db()
 }
 
 /**
+ * Return ALL the tags...
+ *
+ * @return array list of tags...
+ */
+function wpfn_get_tags()
+{
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . WPFN_CONTACT_TAGS;
+
+    return $wpdb->get_results( "SELECT * FROM $table_name ORDER BY tag_id DESC", ARRAY_A );
+}
+
+/**
  * Check if a tag exists, if it does return it.
  *
  * @param $id int the ID of a given tag
@@ -438,7 +452,14 @@ function wpfn_insert_tag( $tag_name, $tag_description='' )
     }
 }
 
-
+/**
+ * Update info about a tag
+ *
+ * @param $id int ID of the tag
+ * @param $column string the column to update
+ * @param string $value the value to update the column to
+ * @return bool whether the update was successful.
+ */
 function wpfn_update_tag( $id, $column, $value='' )
 {
     global $wpdb;
@@ -505,6 +526,31 @@ function wpfn_delete_tag( $id )
 }
 
 /**
+ * Gets contact -> tag relationship
+ *
+ * @param $contact_id int the ID of the contact
+ * @param $tag_id int the ID of the tag
+ * @return array the relationship.
+ */
+function wpfn_get_contact_tag_relationship( $contact_id, $tag_id )
+{
+    global $wpdb;
+
+    if ( ! $contact_id || ! is_numeric( $contact_id ) || ! $tag_id || ! is_numeric( $tag_id ) )
+        return false;
+
+    $contact_id = absint( $contact_id );
+    $tag_id = absint( $tag_id );
+    if ( ! $contact_id || ! $tag_id )
+        return false;
+
+    return $wpdb->get_row( $wpdb->prepare(
+        "SELECT * FROM " . $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS . "
+        WHERE tag_id = %d AND contact_id = %d", $contact_id, $tag_id), ARRAY_A
+    );
+}
+
+/**
  * Add a tag relationship to the DB
  *
  * @param $contact_id int the ID of the contact
@@ -523,6 +569,9 @@ function wpfn_insert_contact_tag_relationship( $contact_id, $tag_id )
     if ( ! $contact_id || ! $tag_id )
         return false;
 
+    if ( ! wpfn_get_contact_tag_relationship( $contact_id, $tag_id ) )
+        return false;
+
     return $wpdb->insert(
         $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS,
         array(
@@ -534,7 +583,38 @@ function wpfn_insert_contact_tag_relationship( $contact_id, $tag_id )
             '%d'
         )
     );
+}
 
+/**
+ * delete a tag relationship from the DB
+ *
+ * @param $contact_id int the ID of the contact
+ * @param $tag_id int the ID of the tag
+ * @return int 1
+ */
+function wpfn_delete_contact_tag_relationship( $contact_id, $tag_id )
+{
+    global $wpdb;
+
+    if ( ! $contact_id || ! is_numeric( $contact_id ) || ! $tag_id || ! is_numeric( $tag_id ) )
+        return false;
+
+    $contact_id = absint( $contact_id );
+    $tag_id = absint( $tag_id );
+    if ( ! $contact_id || ! $tag_id )
+        return false;
+
+    return $wpdb->delete(
+        $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS,
+        array(
+            'contact_id' => $contact_id,
+            'tag_id'     => $tag_id
+        ),
+        array(
+            '%d',
+            '%d'
+        )
+    );
 }
 
 /**
@@ -644,8 +724,7 @@ function wpfn_create_contact_tag_relationships_db()
     $sql = "CREATE TABLE $table_name (
       tag_id bigint(20) NOT NULL,
       contact_id bigint(20) NOT NULL,
-      tag_description text NOT NULL,
-      PRIMARY KEY  (tag_id),
+      KEY tag (tag_id),
       KEY contact (contact_id)
     ) $charset_collate;";
 

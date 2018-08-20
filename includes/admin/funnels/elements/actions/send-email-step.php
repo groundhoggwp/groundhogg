@@ -25,6 +25,7 @@ function wpfn_send_email_funnel_step_html( $step_id )
     $dropdown_args = array();
     $dropdown_args[ 'id' ] = $email_dropdown_id;
     $dropdown_args[ 'name' ] = $email_dropdown_name;
+    $dropdown_args[ 'class' ] = 'hidden';
 
     $previously_selected = intval( wpfn_get_step_meta( $step_id, 'email_id', true ) );
 
@@ -39,7 +40,7 @@ function wpfn_send_email_funnel_step_html( $step_id )
                 <th><?php echo esc_html__( 'Select an email to send:', 'groundhogg' ); ?></th>
                 <td>
                     <?php wpfn_dropdown_emails( $dropdown_args ); ?>
-                    <p><a id="<?php echo wpfn_prefix_step_meta( $step_id, 'edit_email' ); ?>" target="_blank" href="<?php echo admin_url( 'admin.php?page=emails&email=' . $previously_selected );?>"><?php echo esc_html__( 'Edit Email', 'groundhogg' );?></a> | <a target="_blank" href="<?php echo admin_url( 'admin.php?page=add_email' );?>"><?php echo esc_html__( 'Create New Email', 'groundhogg' );?></a></p>
+                    <p><a id="<?php echo wpfn_prefix_step_meta( $step_id, 'edit_email' ); ?>" target="_blank" href="<?php echo admin_url( 'admin.php?page=emails&action=edit&email=' . $previously_selected );?>"><?php esc_html_e( 'Edit Email', 'groundhogg' );?></a> | <a target="_blank" href="<?php echo admin_url( 'admin.php?page=emails&action=add' );?>"><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a></p>
                     <script>jQuery(function($){$('#<?php echo $email_dropdown_id;?>').change(function(){$('#<?php echo wpfn_prefix_step_meta( $step_id, 'edit_email' ); ?>').attr('href', '<?php echo admin_url( 'admin.php?page=emails&email=');?>' + $(this).val())})});</script>
                 </td>
             </tr>

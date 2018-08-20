@@ -29,7 +29,7 @@ class WPFN_Event_Report
      */
     var $end;
 
-    function __construct( $funnel, $step, $start_time=0, $end_time=0 )
+    function __construct( $funnel, $step=0, $start_time=0, $end_time=0 )
     {
         $this->funnel = intval( $funnel );
         $this->step = intval( $step );

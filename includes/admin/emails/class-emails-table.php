@@ -222,12 +222,19 @@ class WPFN_Emails_Table extends WP_List_Table {
         if ( ! is_array( $items ) || empty( $items ) )
             return;
 
+        $sendback = remove_query_arg( 'action', wp_get_referer() );
+
         switch ( $this->current_action() ){
             case 'delete':
 
                 foreach ( $items as $id ){
                     wpfn_delete_email( intval( $id ) );
                 }
+
+                $sendback = add_query_arg( array(
+                    'notice' => 'deleted',
+                    'emails' => urlencode( implode( ',', $items ) )
+                ), $sendback );
 
                 break;
             case 'restore':
@@ -236,6 +243,11 @@ class WPFN_Emails_Table extends WP_List_Table {
                     wpfn_update_email( intval( $id ), 'email_status', 'draft' );
                 }
 
+                $sendback = add_query_arg( array(
+                    'notice' => 'restored',
+                    'emails' => urlencode( implode( ',', $items ) )
+                ), $sendback );
+
                 break;
             case 'trash':
 
@@ -243,13 +255,19 @@ class WPFN_Emails_Table extends WP_List_Table {
                     wpfn_update_email( intval( $id ), 'email_status', 'trash' );
                 }
 
+                $sendback = add_query_arg( array(
+                    'notice' => 'trashed',
+                    'emails' => urlencode( implode( ',', $items ) )
+                ), $sendback );
+
                 break;
             default:
                 do_action( 'wpfn_emails_process_bulk_action_' . $this->current_action() );
                 break;
         }
 
-        //unset( $_REQUEST['email'] );
+        wp_redirect( $sendback );
+        die();
 	}
 
 	/**

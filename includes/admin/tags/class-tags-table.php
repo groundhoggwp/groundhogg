@@ -122,35 +122,27 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
     protected function process_bulk_action() {
         // Detect when a bulk action is being triggered.
         global $wpdb;
+
         $doaction = $this->current_action();
-        $sendback = remove_query_arg( array('trashed', 'untrashed', 'deleted', 'locked', 'ids'), wp_get_referer() );
+        $sendback = remove_query_arg( array( 'deleted' ), wp_get_referer() );
 
-        if ($doaction && isset($_REQUEST['contact'])) {
-            $ids = $_REQUEST['contact'];
-
+        if ($doaction && isset($_REQUEST['tag'])) {
+            $ids = $_REQUEST['tag'];
             switch ( $this->current_action() ){
-                case 'export':
-                    //todo
-                    break;
                 case 'delete':
                     $deleted = 0;
                     if(!empty($ids)) {
                         foreach ($ids as $id) {
-                            wpfn_delete_contact($id);
+                            wpfn_delete_tag( intval( $id ) );
                             $deleted++;
                         }
                     }
-                    $sendback = add_query_arg('deleted', $deleted, $sendback);
+                    $sendback = add_query_arg( array( 'notice' => 'deleted', 'tags' => urlencode( implode( ',', $ids ) ) ) , $sendback);
                     break;
-                case 'apply_tag':
-                    //todo
-                    break;
-                case 'remove_tag':
-                    //todo
-                    break;
+                default:
             }
 
-            wp_redirect($sendback);
+            wp_redirect( $sendback );
             exit();
         }
     }
@@ -309,7 +301,7 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=contacts&contact[]='. $item['tag_id'].'&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=tags&tad_id='. $item['tag_id'].'&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )

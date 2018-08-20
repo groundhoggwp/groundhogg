@@ -28,8 +28,10 @@ function wpfn_complete_benchmark( $benchmark_id, $contact_id )
     if ( ! wpfn_is_funnel_active( $funnel_id ) )
         return;
 
+    /* stop previously queued events from running and set their status to skipped. */
     wpfn_dequeue_contact_funnel_events( $contact_id, $funnel_id );
 
+    /* Rather than juist starting the next action, enter this benchmark into the queue for easy goal reporting */
     wpfn_enqueue_event( strtotime('now'), wpfn_get_step_funnel( $benchmark_id ), $benchmark_id, $contact_id );
 
     do_action( 'wpfn_complete_benchmark_after', $benchmark_id );
@@ -146,3 +148,61 @@ function wpfn_complete_page_view_benchmark( $post_object )
 }
 
 add_action( 'the_post', 'wpfn_complete_page_view_benchmark' );
+
+/**
+ * Complete the tag removed benchmark
+ *
+ * @param $contact_id int the ID of the contact
+ * @param $tag_id int the ID of the tag which was just removed
+ */
+function wpfn_complete_tag_removed_benchmark( $contact_id, $tag_id )
+{
+    $benchmarks = wpfn_get_funnel_steps_by_type( 'tag_removed' );
+
+    if ( ! $benchmarks )
+        return;
+
+    foreach ( $benchmarks as $benchmark ) {
+
+        $step_id = intval( $benchmark['ID'] );
+        $step_order = intval( $benchmark['funnelstep_order'] );
+        $funnel_id = intval( $benchmarks['funnel_id'] );
+
+        $tags = wpfn_get_step_meta( $step_id, 'tags', true );
+
+        if ( ( 1 === $step_order || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $tag_id, $tags ) ){
+            wpfn_complete_benchmark( $step_id, $contact_id );
+        }
+    }
+}
+
+add_action( 'wpfn_tag_removed' , 'wpfn_complete_tag_removed_benchmark' , 10, 2 );
+
+/**
+ * run the tag applied benchmark
+ *
+ * @param $contact_id int the ID of the contact
+ * @param $tag_id int the ID of the tag
+ */
+function wpfn_complete_tag_applied_benchmark( $contact_id, $tag_id )
+{
+    $benchmarks = wpfn_get_funnel_steps_by_type( 'tag_applied' );
+
+    if ( ! $benchmarks )
+        return;
+
+    foreach ( $benchmarks as $benchmark ) {
+
+        $step_id = intval( $benchmark['ID'] );
+        $step_order = intval( $benchmark['funnelstep_order'] );
+        $funnel_id = intval( $benchmarks['funnel_id'] );
+
+        $tags = wpfn_get_step_meta( $step_id, 'tags', true );
+
+        if ( ( 1 === $step_order || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $tag_id, $tags ) ){
+            wpfn_complete_benchmark( $step_id, $contact_id );
+        }
+    }
+}
+
+add_action( 'wpfn_tag_applied' , 'wpfn_complete_tag_applied_benchmark' , 10, 2 );

@@ -14,17 +14,53 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-function wpfn_render_funnel_table()
-{
+if ( isset( $_GET['action'] ) && $_GET['action'] === 'archive' ){
+    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'archive' ) ){
+        wpfn_update_funnel( intval( $_GET[ 'funnel' ] ), 'funnel_status', 'archived' );
+    }
+    $sendback = remove_query_arg( array('action','_wpnonce', 'funnel'), wp_get_referer() );
+    wp_redirect( add_query_arg( array( 'notice' => 'archived', 'funnels' => intval( $_GET[ 'funnel' ] ) ), $sendback ) );
+    die();
+} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' ) {
+    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'delete' ) ){
+        wpfn_delete_funnel( intval( $_GET[ 'funnel' ] ) );
+    }
+    $sendback = remove_query_arg( array('action','_wpnonce', 'funnel'), wp_get_referer() );
+    wp_redirect( add_query_arg( array( 'notice' => 'deleted', 'funnels' => intval( $_GET[ 'funnel' ] ) ), $sendback ) );
+    die();
+} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'restore' ) {
+    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'restore' ) ){
+        wpfn_update_funnel( intval( $_GET[ 'funnel' ] ), 'funnel_status', 'inactive' );
+    }
+    $sendback = remove_query_arg( array('action','_wpnonce', 'funnel'), wp_get_referer() );
+    wp_redirect( add_query_arg( array( 'notice' => 'restored', 'funnels' => intval( $_GET[ 'funnel' ] ) ), $sendback ) );
+    die();
+} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'edit' ) {
+    include dirname( __FILE__ ) . '/funnel-builder.php';
+} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'add'  ) {
+    include dirname( __FILE__ ) . '/add-funnel.php';
+} else {
     if ( ! class_exists( 'WPFN_Funnel_Builder' ) ){
         include dirname( __FILE__ ) . '/class-funnels-table.php';
     }
-
     $funnels_table = new WPFN_Funnels_Table();
-
     ?>
     <div class="wrap">
         <h1 class="wp-heading-inline"><?php echo __('Funnels', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+        <?php $notice = isset( $_GET[ 'notice' ] )? $_GET[ 'notice' ] : '';
+        $item_count = isset( $_GET['funnels'] )? count( explode( ',', urldecode( $_GET['funnels'] ) ) ) : 0;
+        switch ( $notice ):
+            case 'archived':
+                ?><div class="notice notice-success is-dismissible"><p><?php echo $item_count . ' ' .  __( 'funnels archived.', 'groundhogg' );?></p></div><?php
+                break;
+            case 'restored':
+                ?><div class="notice notice-success is-dismissible"><p><?php echo $item_count . ' ' .  __( 'funnels restored.', 'groundhogg' );?></p></div><?php
+                break;
+            case 'deleted':
+                ?><div class="notice notice-success is-dismissible"><p><?php echo $item_count . ' ' .  __( 'funnels deleted permanently.', 'groundhogg' );?></p></div><?php
+                break;
+            default:
+        endswitch; ?>
         <hr class="wp-header-end">
         <form method="post" >
             <!-- search form -->
@@ -39,69 +75,4 @@ function wpfn_render_funnel_table()
         </form>
     </div>
     <?php
-}
-
-
-if ( isset( $_GET['action'] ) && $_GET['action'] === 'archive' ){
-
-    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'archive' ) ){
-
-        wpfn_update_funnel( intval( $_GET[ 'funnel' ] ), 'funnel_status', 'archived' );
-
-        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Archived Funnel', 'groundhogg' ); ?>.</p></div><?php
-
-        wpfn_render_funnel_table();
-
-    } else {
-
-        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not archive funnel', 'groundhogg' ); ?>.</p></div><?php
-
-        wpfn_render_funnel_table();
-
-    }
-
-} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' ) {
-
-    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'delete' ) ){
-
-        wpfn_delete_funnel( intval( $_GET[ 'funnel' ] ) );
-
-        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Deleted funnel', 'groundhogg' ); ?>.</p></div><?php
-
-        wpfn_render_funnel_table();
-
-    } else {
-
-        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not delete funnel', 'groundhogg' ); ?>.</p></div><?php
-
-        wpfn_render_funnel_table();
-    }
-} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'restore' ) {
-
-    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'restore' ) ){
-
-        wpfn_update_funnel( intval( $_GET[ 'funnel' ] ), 'funnel_status', 'inactive' );
-
-        ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Restored funnel', 'groundhogg' ); ?>.</p></div><?php
-
-        wpfn_render_funnel_table();
-
-    } else {
-
-        ?><div class="notice notice-error is-dismissible"><p><?php _e( 'Could not restore funnel', 'groundhogg' ); ?>.</p></div><?php
-
-        wpfn_render_funnel_table();
-    }
-} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'edit' ) {
-
-    include dirname( __FILE__ ) . '/funnel-builder.php';
-
-} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'add'  ) {
-
-    include dirname( __FILE__ ) . '/add-funnel.php';
-
-} else {
-
-    wpfn_render_funnel_table();
-
 }

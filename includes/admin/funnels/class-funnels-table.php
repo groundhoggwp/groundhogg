@@ -49,6 +49,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
             'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
             'title'    => _x( 'Title', 'Column label', 'groundhogg' ),
             'active_contacts'   => _x( 'Active Contacts', 'Column label', 'groundhogg' ),
+            'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
             'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
         );
         return $columns;
@@ -65,6 +66,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
         $sortable_columns = array(
             'title'    => array( 'title', false ),
             'active_contacts' => array( 'active_contacts', false ),
+            'last_updated' => array( 'last_updated', false ),
             'date_created' => array( 'date_created', false )
         );
         return $sortable_columns;
@@ -151,8 +153,21 @@ class WPFN_Funnels_Table extends WP_List_Table {
 
                 break;
             case 'active_contacts':
-                $count = 0;
-                $queryUrl = admin_url( 'admin.php?page=contacts&view=report&funnel=' . $item['ID'] );
+                global $wpdb;
+
+                $table_name = $wpdb->prefix . WPFN_EVENTS;
+
+                $count = $wpdb->get_var(
+                    $wpdb->prepare(
+                        "
+                         SELECT COUNT(*) FROM $table_name
+                         WHERE funnel_id = %d AND status = %s
+                        ",
+                        $item['ID'], 'waiting'
+                    )
+                );
+
+                $queryUrl = admin_url( 'admin.php?page=contacts&view=report&status=waiting&funnel=' . $item['ID'] );
                 return "<a href='$queryUrl'>$count</a>";
             default:
                 return print_r( $item[ $column_name ], true );
@@ -213,32 +228,55 @@ class WPFN_Funnels_Table extends WP_List_Table {
         if ( ! is_array( $items ) || empty( $items ) )
             return;
 
+        $sendback = remove_query_arg( 'action' , wp_get_referer() );
+
         switch ( $this->current_action() ){
             case 'delete':
 
                 foreach ( $items as $id ){
+                    do_action( 'wpfn_funnel_deleted', $id );
                     wpfn_delete_funnel( intval( $id ) );
                 }
+
+                $sendback = add_query_arg( array(
+                    'notice' => 'deleted',
+                    'funnels' => urlencode( implode( ',', $items ) )
+                ), $sendback );
 
                 break;
             case 'restore':
 
                 foreach ( $items as $id ){
+                    do_action( 'wpfn_funnel_restored', $id );
                     wpfn_update_funnel( intval( $id ), 'funnel_status', 'inactive' );
                 }
+
+                $sendback = add_query_arg( array(
+                    'notice' => 'restored',
+                    'funnels' => urlencode( implode( ',', $items ) )
+                ), $sendback );
 
                 break;
             case 'archive':
 
                 foreach ( $items as $id ){
+                    do_action( 'wpfn_funnel_archived', $id );
                     wpfn_update_funnel( intval( $id ), 'funnel_status', 'archived' );
                 }
+
+                $sendback = add_query_arg( array(
+                    'notice' => 'archived',
+                    'funnels' => urlencode( implode( ',', $items ) )
+                ), $sendback );
 
                 break;
             default:
                 do_action( 'wpfn_funnels_process_bulk_action_' . $this->current_action() );
                 break;
         }
+
+        wp_redirect( $sendback );
+        die();
     }
 
     /**
@@ -256,49 +294,17 @@ class WPFN_Funnels_Table extends WP_List_Table {
      */
     function prepare_items() {
         global $wpdb; //This is used only if making any database queries
-        /*
-         * First, lets decide how many records per page to show
-         */
+
         $per_page = 20;
-        /*
-         * REQUIRED. Now we need to define our column headers. This includes a complete
-         * array of columns to be displayed (slugs & titles), a list of columns
-         * to keep hidden, and a list of columns that are sortable. Each of these
-         * can be defined in another method (as we've done here) before being
-         * used to build the value for our _column_headers property.
-         */
+
         $columns  = $this->get_columns();
         $hidden   = array();
         $sortable = $this->get_sortable_columns();
-        /*
-         * REQUIRED. Finally, we build an array to be used by the class for column
-         * headers. The $this->_column_headers property takes an array which contains
-         * three other arrays. One for all columns, one for hidden columns, and one
-         * for sortable columns.
-         */
+
         $this->_column_headers = array( $columns, $hidden, $sortable );
-        /**
-         * Optional. You can handle your bulk actions however you see fit. In this
-         * case, we'll handle them within our package just to keep things clean.
-         */
+
         $this->process_bulk_action();
-        /*
-         * GET THE DATA!
-         *
-         * Instead of querying a database, we're going to fetch the example data
-         * property we created for use in this plugin. This makes this example
-         * package slightly different than one you might build on your own. In
-         * this example, we'll be using array manipulation to sort and paginate
-         * our dummy data.
-         *
-         * In a real-world situation, this is probably where you would want to
-         * make your actual database query. Likewise, you will probably want to
-         * use any posted sort or pagination data to build a custom query instead,
-         * as you'll then be able to use the returned query data immediately.
-         *
-         * For information on making queries in WordPress, see this Codex entry:
-         * http://codex.wordpress.org/Class_Reference/wpdb
-         */
+
         $table_name = $wpdb->prefix . WPFN_FUNNELS;
 
         $query = "SELECT * FROM $table_name WHERE ";
@@ -335,34 +341,14 @@ class WPFN_Funnels_Table extends WP_List_Table {
          */
         usort( $data, array( $this, 'usort_reorder' ) );
 
-
-        /*
-         * REQUIRED for pagination. Let's figure out what page the user is currently
-         * looking at. We'll need this later, so you should always include it in
-         * your own package classes.
-         */
         $current_page = $this->get_pagenum();
-        /*
-         * REQUIRED for pagination. Let's check how many items are in our data array.
-         * In real-world use, this would be the total number of items in your database,
-         * without filtering. We'll need this later, so you should always include it
-         * in your own package classes.
-         */
+
         $total_items = count( $data );
-        /*
-         * The WP_List_Table class does not handle pagination for us, so we need
-         * to ensure that the data is trimmed to only the current page. We can use
-         * array_slice() to do that.
-         */
+
         $data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
-        /*
-         * REQUIRED. Now we can add our *sorted* data to the items property, where
-         * it can be used by the rest of the class.
-         */
+
         $this->items = $data;
-        /**
-         * REQUIRED. We also have to register our pagination options & calculations.
-         */
+
         $this->set_pagination_args( array(
             'total_items' => $total_items,                     // WE have to calculate the total number of items.
             'per_page'    => $per_page,                        // WE have to determine how many items to show on a page.

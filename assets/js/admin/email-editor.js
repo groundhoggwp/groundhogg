@@ -186,6 +186,11 @@ WPFNEmailEditor.buttonLink = jQuery( '#button-link' );
 WPFNEmailEditor.buttonLink.on( 'change', function( ){WPFNEmailEditor.getActive().find('a').attr('href', WPFNEmailEditor.buttonLink.val() );});
 WPFNEmailEditor.buttonLink.update = function () { WPFNEmailEditor.buttonLink.val( WPFNEmailEditor.getActive().find('a').attr( 'href' ));};
 
+WPFNEmailEditor.buttonText = jQuery( '#button-text' );
+WPFNEmailEditor.buttonText.on( 'change', function( ){WPFNEmailEditor.getActive().find('a').html( WPFNEmailEditor.buttonText.val() );});
+WPFNEmailEditor.buttonText.update = function () { WPFNEmailEditor.buttonText.val( WPFNEmailEditor.getActive().find('a').html());};
+
+
 WPFNEmailEditor.buttonOptions = jQuery( '#button_block-editor' );
 WPFNEmailEditor.showButtonOptions = function() {
     this.showOptions( this.buttonOptions );
@@ -193,6 +198,7 @@ WPFNEmailEditor.showButtonOptions = function() {
     this.buttonFont.update();
     this.buttonSize.update();
     this.buttonLink.update();
+    this.buttonText.update();
 };
 
 //spacer
