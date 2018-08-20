@@ -268,18 +268,26 @@ class WPFN_Contacts_Table extends WP_List_Table {
                 $sql = "SELECT e.contact_id, c.*
                 FROM " . $wpdb->prefix . WPFN_EVENTS ." e 
                 LEFT JOIN " . $wpdb->prefix . WPFN_CONTACTS . " c ON e.contact_id = c.ID 
-                WHERE (";
+                WHERE (1=1 ";
                 if ( isset( $_REQUEST['status'] ) ) {
                     $status = $_REQUEST['status'];
-                    $sql .= $wpdb->prepare('e.status = %s AND ', $status);
+                    $sql .= $wpdb->prepare(' AND e.status = %s', $status);
                 }
                 if ( isset( $_REQUEST['funnel'] ) ){
                     $funnel = intval ( $_REQUEST['funnel'] );
-                    $sql .= $wpdb->prepare( 'e.funnel_id = %d', $funnel );
+                    $sql .= $wpdb->prepare( ' AND e.funnel_id = %d', $funnel );
                 }
                 if ( isset(  $_REQUEST['step'] ) ){
                     $step = intval ( $_REQUEST['step'] );
                     $sql .= $wpdb->prepare( ' AND e.step_id = %d', $step );
+                }
+                if ( isset( $_REQUEST['start'] ) ){
+                    $start = intval ( $_REQUEST['start'] );
+                    $sql .= $wpdb->prepare( ' AND %d <= e.time', $start );
+                }
+                if ( isset( $_REQUEST['end'] ) ){
+                    $end = intval ( $_REQUEST['end'] );
+                    $sql .= $wpdb->prepare( ' AND e.time <= %d', $end );
                 }
 
                 $sql .= ") $search
