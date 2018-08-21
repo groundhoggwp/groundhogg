@@ -44,6 +44,20 @@
     border-radius: 2px;
 }
 
+.color-preview {
+    display: block;
+    position: absolute;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    top: auto;
+    bottom: 2px;
+    left: 6px;
+    height: 3px;
+    width: 20px;
+    background: #555d66;
+}
+
 .simple-editor-content {
     background: white;
     outline: none;

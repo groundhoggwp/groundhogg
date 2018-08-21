@@ -1,5 +1,14 @@
 <?php
 
+
+function wpfn_form_shortcode( $atts )
+{
+
+    
+
+}
+
+
 /**
  * Listens for basic contact information whenever the post variable is exists.
  */

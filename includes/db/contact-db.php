@@ -336,7 +336,7 @@ function wpfn_create_contacts_db()
       PRIMARY KEY  (ID)
     ) $charset_collate;";
 
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
     update_option( 'wpfn_contacts_db_version', WPFN_CONTACTS_DB_VERSION );
@@ -369,11 +369,39 @@ function wpfn_create_contact_meta_db()
 		KEY meta_key (meta_key($max_index_length))
 	) $charset_collate;";
 
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $install_query );
 
     update_option( 'wpfn_contact_meta_db_version', WPFN_CONTACT_META_DB_VERSION );
 
+}
+
+/**
+ * Get the name of a tag
+ *
+ * @param $id int the Id of the tag
+ * @return string the name of the tag
+ */
+function wpfn_get_tag_name( $id )
+{
+    global $wpdb;
+
+    if ( ! $id || ! is_numeric( $id ) )
+        return false;
+
+    $id = absint( $id );
+    if ( ! $id )
+        return false;
+
+    $table = $wpdb->prefix . WPFN_CONTACT_TAGS;
+
+    $tag = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT * FROM $table WHERE tag_id = %d", $id
+        ), ARRAY_A
+    );
+
+    return $tag['tag_name'];
 }
 
 /**
@@ -699,7 +727,7 @@ function wpfn_create_contact_tags_db()
       PRIMARY KEY  (tag_id)
     ) $charset_collate;";
 
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
     update_option( 'wpfn_contact_tags_db_version', WPFN_CONTACT_TAGS_DB_VERSION );
@@ -728,7 +756,7 @@ function wpfn_create_contact_tag_relationships_db()
       KEY contact (contact_id)
     ) $charset_collate;";
 
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
     update_option( 'wpfn_contact_tag_relationships_db_version', WPFN_CONTACT_TAG_RELATIONSHIPS_DB_VERSION );

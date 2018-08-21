@@ -40,42 +40,18 @@ function wpfn_register_custom_action
  *
  * @return array
  */
-function wpfn_get_funnel_benchmark_icons()
+function wpfn_get_funnel_benchmarks()
 {
     $benchmarks = array();
 
-    $benchmarks[] = 'form_fill';
-
-    //GF compatibility
-    if ( class_exists( 'GFCommon' ) ){
-        $benchmarks[] = 'gf_form_fill';
-    }
-
-    $benchmarks[] = 'email_opened';
-    $benchmarks[] = 'link_clicked';
-    $benchmarks[] = 'page_visited';
-    $benchmarks[] = 'tag_applied';
-    $benchmarks[] = 'tag_removed';
-
-    // WC compatibility
-    if ( class_exists( 'WooCommerce' ) ){
-        $benchmarks[] = 'wc_reached_checkout';
-        $benchmarks[] = 'wc_product_added_to_cart';
-        $benchmarks[] = 'wc_product_removed_from_cart';
-        $benchmarks[] = 'wc_product_purchased';
-    }
-
-    //EDD compatibility
-    //todo verify this is an appropriate check.
-    if ( class_exists( 'EDD' ) ){
-        $benchmarks[] = 'edd_reached_checkout';
-        $benchmarks[] = 'edd_download_added_to_cart';
-        $benchmarks[] = 'edd_download_removed_from_cart';
-        $benchmarks[] = 'edd_download_purchased';
-    }
-
-    $benchmarks[] = 'account_created';
-    $benchmarks[] = 'role_changed';
+    $benchmarks['form_fill'] = array( 'title' => __('Form Filled'), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/form-filled.png' );
+    $benchmarks['email_opened'] = array( 'title' => __('Email opened', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/opened-email.png' );
+//    $benchmarks['link_clicked'] = array( 'title' => __('Link Clicked', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/' );
+    $benchmarks['tag_applied']  = array( 'title' => __('Tag Applied', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/tag-applied.png' );
+    $benchmarks['tag_removed']  = array( 'title' => __('Tag Removed', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/tag-removed.png' );
+    $benchmarks['page_visited'] = array( 'title' => __('Page Visited', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/page-visited.png' );
+    $benchmarks['account_created'] = array( 'title' => __('Account Created', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/account-created.png' );
+    $benchmarks['role_changed']    = array( 'title' => __('Role Changed', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/role-changed.png' );
 
     return apply_filters( 'wpfn_funnel_benchmarks', $benchmarks );
 }
@@ -85,88 +61,45 @@ function wpfn_get_funnel_benchmark_icons()
  *
  * @return array()
  */
-function wpfn_get_funnel_action_icons()
+function wpfn_get_funnel_actions()
 {
     $actions = array();
 
-    $actions[] = 'send_email';
-    $actions[] = 'apply_note';
-    $actions[] = 'apply_tag';
-    $actions[] = 'remove_tag';
-    $actions[] = 'create_user';
-    $actions[] = 'delete_user';
-    $actions[] = 'date_timer';
-    $actions[] = 'delay_timer';
+    $actions['send_email']  = array( 'title' => __( 'Send Email', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/send-email.png' );
+    $actions['apply_note']  = array( 'title' => __( 'Apply Note', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/apply-note.png' );
+    $actions['apply_tag']   = array( 'title' => __( 'Apply Tag', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/apply-tag.png' );
+    $actions['remove_tag']  = array( 'title' => __( 'Remove Tag', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/remove-tag.png' );
+    $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/create-user.png' );
+//    $actions['delete_user'] = array( 'title' => __( '', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/.png' );
+    $actions['date_timer']  = array( 'title' => __( 'Date Timer', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/date-timer.png' );
+    $actions['delay_timer'] = array( 'title' => __( 'Delay Timer', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/delay-timer.png' );
 
     return apply_filters( 'wpfn_funnel_actions', $actions );
 }
 
-
 /**
- * Get the relevant dashicon for the step type
+ * Get the icon for a step
  *
- * @param $step_type string the step type
- *
- * @return string the dashicon class
+ * @param $step_id int the Id of the step
+ * @return string the URL of the icon.
  */
-function wpfn_get_step_dashicon_by_step_type( $step_type )
+function wpfn_get_step_icon( $step_id )
 {
-    $dashicons = array();
-    $dashicons['send_email'] = 'dashicons-email-alt';
-    $dashicons['apply_note'] = 'dashicons-id-alt';
-    $dashicons['apply_tag'] = 'dashicons-tag';
-    $dashicons['remove_tag'] = 'dashicons-tag';
-    $dashicons['create_user'] = 'dashicons-admin-users';
-    $dashicons['delete_user'] = 'dashicons-admin-users';
-    $dashicons['date_timer'] = 'dashicons-calendar';
-    $dashicons['delay_timer'] = 'dashicons-clock';
 
-    $dashicons['form_fill'] = 'dashicons-feedback';
+    $step_group = wpfn_get_step_group( $step_id );
 
-    //todo GF dashicons
-    $dashicons['gf_form_fill'] = '';
+    $step_type = wpfn_get_step_type( $step_id );
 
-    $dashicons['email_opened'] = 'dashicons-email';
-    $dashicons['link_clicked'] = 'dashicons-admin-links';
-    $dashicons['page_visited'] = 'dashicons-welcome-view-site';
-    $dashicons['tag_applied'] = 'dashicons-tag';
-    $dashicons['tag_removed'] = 'dashicons-tag';
-    $dashicons['account_created'] = 'dashicons-admin-users';
-    $dashicons['role_changed'] = 'dashicons-admin-users';
+    if ( $step_group === 'benchmark' ){
 
-    //todo WC dashicons
-    $dashicons['wc_reached_checkout'] = '';
-    $dashicons['wc_product_added_to_cart'] = '';
-    $dashicons['wc_product_removed_from_cart'] = '';
-    $dashicons['wc_product_purchased'] = '';
+        return wpfn_get_funnel_benchmarks()[$step_type]['icon'];
 
-    //todo EDD dashicons
-    $dashicons['edd_reached_checkout'] = '';
-    $dashicons['edd_download_added_to_cart'] = '';
-    $dashicons['edd_download_removed_from_cart'] = '';
-    $dashicons['edd_download_removed_from_cart'] = '';
+    } else {
 
-    $dashicons = apply_filters( 'wpfn_builder_icons', $dashicons );
+        return wpfn_get_funnel_actions()[$step_type]['icon'];
 
-    if ( ! in_array( $step_type, array_keys( $dashicons ) ) )
-        return false;
-
-    return $dashicons[ $step_type ];
+    }
 }
-
-/**
- * Get the dashicon for a cetain step
- *
- * @param $step_id int Step ID
- * @return string the dashicon class
- */
-function wpfn_get_step_dashicon_by_id( $step_id )
-{
-    $type = wpfn_get_step_type( $step_id );
-
-    return wpfn_get_step_dashicon_by_step_type( $type );
-}
-
 /**
  * Get the Name of a funnel
  *
@@ -405,11 +338,16 @@ function wpfn_add_funnel_step( $funnel_id, $title, $group, $type, $order )
 
     switch ( $group ):
         case 'action':
-            if ( ! in_array( $type, wpfn_get_funnel_action_icons() ) )
+
+            $actions = wpfn_get_funnel_actions();
+
+            if ( ! isset( $actions[ $type ] ) )
                 return false;
             break;
         case 'benchmark':
-            if ( ! in_array( $type, wpfn_get_funnel_benchmark_icons() ) )
+            $benchmarks = wpfn_get_funnel_benchmarks();
+
+            if ( ! isset( $benchmarks[ $type ] ) )
                 return false;
             break;
         default:
@@ -430,7 +368,9 @@ function wpfn_add_funnel_step( $funnel_id, $title, $group, $type, $order )
  */
 function wpfn_is_benchmark( $element )
 {
-    return in_array( $element, wpfn_get_funnel_benchmark_icons() );
+    $benchmarks = wpfn_get_funnel_benchmarks();
+
+    return isset( $benchmarks[$element] );
 }
 
 /**
@@ -497,7 +437,7 @@ function wpfn_get_step_html( $step_id )
                 jQuery(function(){jQuery('.delete-step-<?php echo $step_id;?>').click( wpfn_delete_funnel_step )})
             </script>
         </button>
-        <h2 class="hndle ui-sortable-handle"><label for="<?php echo $step_id; ?>_title"><span class="dashicons <?php echo esc_attr( wpfn_get_step_dashicon_by_id( $step_id ) ); ?>"></span></label><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'groundhogg' ); ?>"></h2>
+        <h2 class="hndle ui-sortable-handle"><img class="hndle-icon" width="50" src="<?php echo esc_url( wpfn_get_step_icon( $step_id ) ); ?>"><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'groundhogg' ); ?>"></h2>
         <div class="inside">
             <div class="step-edit">
                 <input type="hidden" name="<?php echo wpfn_prefix_step_meta( $step_id, 'order' ); ?>" value="<?php wpfn_get_step_order( $step_id ) ?>" >
@@ -539,11 +479,11 @@ function wpfn_get_step_html( $step_id )
                 ?>
 
                 <?php if ( wpfn_get_step_group( $step_id ) === 'benchmark'): ?>
-                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
+                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
                 <?php else: ?>
-                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
+                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
                     <hr>
-                    <p class="report"><?php _e('Waiting', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=contacts&view=report&status=waiting&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
+                    <p class="report"><?php _e('Waiting', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
                 <?php endif; ?>
 
                 <?php do_action( 'wpfn_get_step_report_' . wpfn_get_step_type( $step_id ) ); ?>
@@ -563,13 +503,13 @@ function wpfn_get_step_html( $step_id )
  */
 function wpfn_get_step_html_via_ajax()
 {
-    //wp_die( 'made-it-here' );
 
     $step_type = $_POST['step_type'];
     $step_order = $_POST['step_order'];
     $funnel_id = wpfn_url_to_funnel_id( wp_get_referer() );
 
     $step_group = ( wpfn_is_benchmark( $step_type ) )? 'benchmark' : 'action' ;
+//    wp_die( 'made-it-here' );
 
     foreach ( glob( dirname( __FILE__ ) . "/admin/funnels/elements/*/*.php" ) as $filename )
     {
@@ -765,7 +705,7 @@ function wpfn_create_new_funnel()
 
     }
 
-    wp_redirect( admin_url( 'admin.php?page=funnels&action=edit&funnel=' .  $funnel_id ) );
+    wp_redirect( admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' .  $funnel_id ) );
     die();
 }
 

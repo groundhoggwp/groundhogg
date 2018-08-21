@@ -36,7 +36,7 @@ if ( isset( $_POST['add_new_contact_nonce'] ) && wp_verify_nonce( $_POST['add_ne
 
 		if ( $ID ){
 
-            ?><div class="notice notice-success"><p>Successfully added new contact! <a href="<?php echo admin_url( 'admin.php?page=contacts&ID=' . $ID ); ?>">Click here to view contact record.</a></p></div><?php
+            ?><div class="notice notice-success"><p>Successfully added new contact! <a href="<?php echo admin_url( 'admin.php?page=gh_contacts&ID=' . $ID ); ?>">Click here to view contact record.</a></p></div><?php
 
 		} else {
 

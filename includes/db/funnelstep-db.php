@@ -172,6 +172,38 @@ function wpfn_get_funnel_steps_by_order( $funnel_id, $order )
 }
 
 /**
+ * Get the funnel step of the given order.
+ *
+ * @param $funnel_id int the ID of the funnel
+ * @param $order int the Order of a particular step
+ * @return array|false list of steps, false on error
+ */
+function wpfn_get_funnel_step_by_order( $funnel_id, $order )
+{
+    global $wpdb;
+
+    if ( ! $funnel_id || ! is_int( $funnel_id) || ! $order || ! is_int( $order )  )
+        return false;
+
+    $funnel_id = absint( $funnel_id );
+    $order = absint( $order );
+
+    if ( ! $funnel_id )
+        return false;
+
+    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+
+    return $wpdb->get_row(
+        $wpdb->prepare(
+            "
+         SELECT * FROM $table_name
+		 WHERE funnel_id = %d AND funnelstep_order = %d",
+            $funnel_id, $order
+        ), ARRAY_A
+    );
+}
+
+/**
  * Get the steps available starting steps for a particular benchmark
  *
  * @param $step_type string the type of funnel step
@@ -182,7 +214,7 @@ function wpfn_get_funnel_steps_by_type( $step_type )
 {
     global $wpdb;
 
-    if ( ! in_array( $step_type, wpfn_get_funnel_benchmark_icons() ) )
+    if ( ! isset( wpfn_get_funnel_benchmarks()[ $step_type ] ) )
         return false;
 
     $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
@@ -337,7 +369,7 @@ function wpfn_create_funnelsteps_db()
       PRIMARY KEY  (ID)
     ) $charset_collate;";
 
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
     update_option( 'wpfn_funnelsteps_db_version', WPFN_FUNNELSTEPS_DB_VERSION );
@@ -369,7 +401,7 @@ function wpfn_create_funnelstep_meta_db()
 		KEY meta_key (meta_key($max_index_length))
 	) $charset_collate;";
 
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $install_query );
 
     update_option( 'wpfn_funnelstep_meta_db_version', WPFN_FUNNELSTEP_META_DB_VERSION );

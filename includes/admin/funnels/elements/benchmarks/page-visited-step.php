@@ -27,36 +27,37 @@ function wpfn_page_visited_funnel_step_html( $step_id )
     $args['name'] = wpfn_prefix_step_meta( $step_id, 'page_id' );
     $args['id'] = wpfn_prefix_step_meta( $step_id, 'page_id' );
 
+    $match_type = wpfn_get_step_meta( $step_id, 'match_type' );
+    $match_url = wpfn_get_step_meta( $step_id, 'url_match' );
+
     ?>
 
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo esc_html__( 'Select a page.', 'groundhogg' ); ?></th>
-            <td><?php wp_dropdown_pages( $args ); ?>
-                <p>
-                    <a id="<?php echo wpfn_prefix_step_meta( $step_id, 'view_page' ); ?>" target="_blank" href="<?php echo admin_url( 'post.php?action=edit&post=' . $pageId ); ?>"><?php _e( 'Edit Page'); ?></a>
-                </p>
-                <script>jQuery(document).ready(function(){jQuery( '#<?php echo wpfn_prefix_step_meta( $step_id, 'page_id' ); ?>' ).select2()});</script>
-                <script>jQuery(function($){$('#<?php echo $args['id'];?>').change(function(){$('#<?php echo wpfn_prefix_step_meta( $step_id, 'view_page' ); ?>').attr('href', '<?php echo admin_url( 'post.php?action=edit&post='); ?>' + $(this).val())})});</script>
+            <th>
+                <?php esc_attr_e( 'Enter URL', 'groundhogg' ); ?>
+            </th>
+            <td>
+                <select style="vertical-align: top;" id="<?php echo wpfn_prefix_step_meta( $step_id, 'match_type' ); ?>" name="<?php echo wpfn_prefix_step_meta( $step_id, 'match_type' ); ?>">
+                    <option value="partial" <?php if ( 'partial' === $match_type ) echo "selected='selected'"; ?> ><?php echo esc_html__( 'Partial Match', 'groundhogg' ); ?></option>
+                    <option value="exact" <?php if ( 'exact' === $match_type ) echo "selected='selected'"; ?> ><?php echo esc_html__( 'Exact Match', 'groundhogg' ); ?></option>
+                </select>
+                <input title="<?php esc_attr_e( 'Match Url', 'groundhogg' )?>" type="text" class="input" name="<?php echo wpfn_prefix_step_meta( $step_id, 'url_match' ); ?>" id="<?php echo wpfn_prefix_step_meta( $step_id, 'url_match' ); ?>" value="<?php echo esc_url( $match_url ); ?>">
+                <p><a href="#" data-target="<?php echo wpfn_prefix_step_meta( $step_id, 'url_match' ); ?>" id="<?php echo wpfn_prefix_step_meta( $step_id, 'add_link' ); ?>"><?php _e( 'Insert Link' , 'groundhogg' ); ?></a> | <?php _e('Does not match query string.', 'groundhogg' ); ?></p>
+                <script>
+                    jQuery(function($){
+                        $('#<?php echo wpfn_prefix_step_meta( $step_id, 'add_link' ); ?>').linkPicker();
+                    });
+                </script>
             </td>
         </tr>
-        </tbody>
     </table>
 
     <?php
 }
 
 add_action( 'wpfn_get_step_settings_page_visited', 'wpfn_page_visited_funnel_step_html' );
-
-function wpfn_page_visited_icon_html()
-{
-    ?>
-    <div class="dashicons dashicons-welcome-view-site"></div><p>Page Visited</p>
-    <?php
-}
-
-add_action( 'wpfn_benchmark_element_icon_html_page_visited', 'wpfn_page_visited_icon_html' );
 
 /**
  * Save the email type step
@@ -66,8 +67,13 @@ add_action( 'wpfn_benchmark_element_icon_html_page_visited', 'wpfn_page_visited_
 function wpfn_save_page_visited_step( $step_id )
 {
     //no need to check the validation as it's already been done buy the main funnel.
-    $page_id = intval( $_POST[ wpfn_prefix_step_meta( $step_id, 'page_id' ) ] );
-    wpfn_update_step_meta( $step_id, 'page_id', $page_id );
+
+    if ( isset( $_POST[ wpfn_prefix_step_meta( $step_id, 'match_type' ) ] ) )
+        wpfn_update_step_meta( $step_id, 'match_type', $_POST[ wpfn_prefix_step_meta( $step_id, 'match_type' ) ] );
+
+    if ( isset( $_POST[ wpfn_prefix_step_meta( $step_id, 'url_match' ) ] ) )
+        wpfn_update_step_meta( $step_id, 'url_match', $_POST[ wpfn_prefix_step_meta( $step_id, 'url_match' ) ] );
+
 }
 
 add_action( 'wpfn_save_step_page_visited', 'wpfn_save_page_visited_step' );

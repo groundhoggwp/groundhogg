@@ -37,6 +37,39 @@ function wpfn_complete_benchmark( $benchmark_id, $contact_id )
     do_action( 'wpfn_complete_benchmark_after', $benchmark_id );
 }
 
+
+/**
+ * Check to see if the benchmark can kick off a funnel.
+ *
+ * @param $benchmark_id int ID of the benchmark
+ * @return bool whether it can start a funnel
+ */
+function wpfn_is_starting( $benchmark_id  )
+{
+
+    $step_order = wpfn_get_step_order( $benchmark_id );
+    $funnel_id = wpfn_get_step_funnel( $benchmark_id );
+
+    if ( $step_order === 1 )
+        return true;
+
+    $step_order -= 1;
+
+    while ( $step_order > 0 ){
+
+        $step =  wpfn_get_funnel_step_by_order( $funnel_id, $step_order );
+
+        if ( $step['group'] === 'action' ){
+            return false;
+        }
+
+        $step_order -= 1;
+    }
+
+    return true;
+}
+
+
 /**
  * Complete account_created benchmarks for the funnels.
  * Create a new contact record if one doesn't exist.
@@ -66,7 +99,7 @@ function wpfn_run_account_created_benchmark_action( $userId )
 
         $role = wpfn_get_step_meta( $step_id, 'role', true );
 
-        if ( ( 1 === $step_order || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $role, $user_info->roles ) ){
+        if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $role, $user_info->roles ) ){
             wpfn_complete_benchmark( $step_id, $contact_id );
         }
     }
@@ -102,7 +135,7 @@ function wpfn_run_user_role_changed_benchmark( $userId, $cur_role, $old_roles )
 
         $role = wpfn_get_step_meta( $step_id, 'role', true );
 
-        if ( ( 1 === $step_order || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $cur_role === $role ){
+        if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $cur_role === $role ){
             wpfn_complete_benchmark( $step_id, $contact_id );
         }
     }
@@ -141,7 +174,7 @@ function wpfn_complete_page_view_benchmark( $post_object )
 
         $page_id = wpfn_get_step_meta( $step_id, 'page_id', true );
 
-        if ( ( 1 === $step_order || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $page_id === get_the_ID() ){
+        if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $page_id === get_the_ID() ){
             wpfn_complete_benchmark( $step_id, $contact_id );
         }
     }
@@ -170,7 +203,7 @@ function wpfn_complete_tag_removed_benchmark( $contact_id, $tag_id )
 
         $tags = wpfn_get_step_meta( $step_id, 'tags', true );
 
-        if ( ( 1 === $step_order || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $tag_id, $tags ) ){
+        if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $tag_id, $tags ) ){
             wpfn_complete_benchmark( $step_id, $contact_id );
         }
     }
@@ -199,7 +232,7 @@ function wpfn_complete_tag_applied_benchmark( $contact_id, $tag_id )
 
         $tags = wpfn_get_step_meta( $step_id, 'tags', true );
 
-        if ( ( 1 === $step_order || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $tag_id, $tags ) ){
+        if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $tag_id, $tags ) ){
             wpfn_complete_benchmark( $step_id, $contact_id );
         }
     }

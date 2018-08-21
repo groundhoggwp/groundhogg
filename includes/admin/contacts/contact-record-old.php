@@ -80,11 +80,11 @@ $contact = new WPFN_Contact( $contact_id );
 	    ?>
 
         <h2 class="nav-tab-wrapper">
-            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">General</a>
-            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=activity" class="nav-tab <?php echo $active_tab == 'activity' ? 'nav-tab-active' : ''; ?>">Activity</a>
-            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=funnels" class="nav-tab <?php echo $active_tab == 'funnels' ? 'nav-tab-active' : ''; ?>">Funnels</a>
-            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=tags" class="nav-tab <?php echo $active_tab == 'tags' ? 'nav-tab-active' : ''; ?>">Tags</a>
-            <a href="?page=contacts&ID=<?php echo $contact_id; ?>&tab=orders" class="nav-tab <?php echo $active_tab == 'orders' ? 'nav-tab-active' : ''; ?>">Orders</a>
+            <a href="?page=gh_contacts&ID=<?php echo $contact_id; ?>&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">General</a>
+            <a href="?page=gh_contacts&ID=<?php echo $contact_id; ?>&tab=activity" class="nav-tab <?php echo $active_tab == 'activity' ? 'nav-tab-active' : ''; ?>">Activity</a>
+            <a href="?page=gh_contacts&ID=<?php echo $contact_id; ?>&tab=funnels" class="nav-tab <?php echo $active_tab == 'funnels' ? 'nav-tab-active' : ''; ?>">Funnels</a>
+            <a href="?page=gh_contacts&ID=<?php echo $contact_id; ?>&tab=tags" class="nav-tab <?php echo $active_tab == 'tags' ? 'nav-tab-active' : ''; ?>">Tags</a>
+            <a href="?page=gh_contacts&ID=<?php echo $contact_id; ?>&tab=orders" class="nav-tab <?php echo $active_tab == 'orders' ? 'nav-tab-active' : ''; ?>">Orders</a>
             <?php do_action('wpfn_contact_record_tabs_after', $contact_id ); ?>
         </h2>
 

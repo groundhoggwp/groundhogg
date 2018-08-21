@@ -249,6 +249,9 @@ class WPFN_Contact
 		return wpfn_get_contact_meta( $this->ID, $meta_key, true );
 	}
 
-
+	function __toString()
+    {
+        return $this->getEmail();
+    }
 
 }

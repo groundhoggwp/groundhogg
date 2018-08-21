@@ -81,13 +81,13 @@ class WPFN_Funnels_Table extends WP_List_Table {
     {
         $views =  array();
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=funnels&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_funnel_items() . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_funnel_items() . ")</span>" . "</a>";
 
-        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=funnels&view=active' ) . "'>" . __( 'Active' ) . " <span class='count'>(" . wpfn_count_funnel_items( 'funnel_status', 'active' ) . ")</span>" . "</a>";
+        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=active' ) . "'>" . __( 'Active' ) . " <span class='count'>(" . wpfn_count_funnel_items( 'funnel_status', 'active' ) . ")</span>" . "</a>";
 
-        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=funnels&view=inactive' ) . "'>" . __( 'Inactive' ) . " <span class='count'>(" . wpfn_count_funnel_items( 'funnel_status', 'inactive' ) . ")</span>" . "</a>";
+        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=inactive' ) . "'>" . __( 'Inactive' ) . " <span class='count'>(" . wpfn_count_funnel_items( 'funnel_status', 'inactive' ) . ")</span>" . "</a>";
 
-        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=funnels&view=archived' ) . "'>" . __( 'Archived' ) . " <span class='count'>(" . wpfn_count_funnel_items( 'funnel_status', 'archived' ) . ")</span>" . "</a>";
+        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=archived' ) . "'>" . __( 'Archived' ) . " <span class='count'>(" . wpfn_count_funnel_items( 'funnel_status', 'archived' ) . ")</span>" . "</a>";
 
         return apply_filters(  'wpfn_funnel_views', $views );
     }
@@ -108,13 +108,13 @@ class WPFN_Funnels_Table extends WP_List_Table {
         if ( $this->get_view() === 'archived' )
         {
             return array(
-                "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>",
-                "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
+                "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>",
+                "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
             );
         } else {
             return apply_filters( 'wpfn_email_row_actions', array(
-                "<span class='edit'><a href='" . admin_url( 'admin.php?page=funnels&action=edit&funnel='. $id ). "'>" . __( 'Edit' ) . "</a></span>",
-                "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive' ) . "</a></span>",
+                "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_funnels&action=edit&funnel='. $id ). "'>" . __( 'Edit' ) . "</a></span>",
+                "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive' ) . "</a></span>",
             ));
         }
     }
@@ -131,7 +131,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
         switch ( $column_name ) {
             case 'title':
                 $subject = ( ! $item[ 'funnel_title' ] )? '(' . __( 'no title' ) . ')' : $item[ 'funnel_title' ] ;
-                $editUrl = admin_url( 'admin.php?page=funnels&action=edit&funnel=' . $item['ID'] );
+                $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $item['ID'] );
 
                 if ( $this->get_view() === 'archived' ){
                     $html = "<strong>{$subject}</strong>";
@@ -167,7 +167,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
                     )
                 );
 
-                $queryUrl = admin_url( 'admin.php?page=contacts&view=report&status=waiting&funnel=' . $item['ID'] );
+                $queryUrl = admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . $item['ID'] );
                 return "<a href='$queryUrl'>$count</a>";
             default:
                 return print_r( $item[ $column_name ], true );

@@ -80,7 +80,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
     protected function column_default( $item, $column_name ) {
         switch ( $column_name ) {
             case 'email':
-                $editUrl = admin_url( 'admin.php?page=contacts&action=edit&contact=' . $item['ID'] );
+                $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $item['ID'] );
                 $html  = '<div id="inline_' .$item['ID']. '" class="hidden">';
                 $html .= '  <div class="email">' .$item['email']. '</div>';
                 $html .= '  <div class="first_name">' .$item['first_name']. '</div>';
@@ -94,7 +94,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
                 break;
             case 'owner':
                 $owner = get_userdata( $item['owner_id'] );
-                return ! empty( $item['owner_id'] ) ? '<a href="'.admin_url('admin.php?page=contacts&view=owner&owner=' .$item['owner_id'] ).'">'. $owner->user_login .'</a>' :  '&#x2014;';
+                return ! empty( $item['owner_id'] ) ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=owner&owner=' .$item['owner_id'] ).'">'. $owner->user_login .'</a>' :  '&#x2014;';
                 break;
             case 'date_created':
                 return date('d/M/Y g:i a', strtotime($item['date_created']));
@@ -179,7 +179,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
 
     protected function get_views() {
         global $wpdb;
-        $base_url = admin_url( 'admin.php?page=contacts&view=optin_status&optin_status=' );
+        $base_url = admin_url( 'admin.php?page=gh_contacts&view=optin_status&optin_status=' );
 
         $view = isset($_REQUEST['optin_status']) ? $_REQUEST['optin_status'] : 'all';
 
@@ -373,7 +373,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=contacts&contact[]='. $item['ID'].'&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $item['ID'].'&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete Permanently' )

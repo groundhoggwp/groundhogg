@@ -38,6 +38,7 @@ wp_enqueue_script( 'jquery-ui-draggable' );
 //custom scripts
 wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/email-editor.js' );
 wp_enqueue_script('media-picker', WPFN_ASSETS_FOLDER . '/js/admin/media-picker.js' );
+//wp_enqueue_script('link-picker', WPFN_ASSETS_FOLDER . '/js/admin/link-picker.js' );
 wp_enqueue_script('simple-editor', WPFN_ASSETS_FOLDER . '/js/admin/simple-editor.js' );
 wp_enqueue_style('simple-editor', WPFN_ASSETS_FOLDER . '/css/admin/simple-editor.css' );
 //for select 2
@@ -133,7 +134,7 @@ $email = wpfn_get_email_by_id( $email_id );
 
 </style>
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php echo __('Edit Email', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+    <h1 class="wp-heading-inline"><?php echo __('Edit Email', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
     <hr class="wp-header-end">
     <form method="post">
         <?php wp_nonce_field( 'edit_email', 'edit_email_nonce' ); ?>
@@ -216,7 +217,15 @@ $email = wpfn_get_email_by_id( $email_id );
                                                     </tr>
                                                     <tr>
                                                         <th><?php _e( 'Button Link'); ?>:</th>
-                                                        <td><input type="url" id="button-link" name="button-link" value=""></td>
+                                                        <td><input type="text" id="button-link" name="button-link" value="">
+                                                            <!--
+                                                        <p><a href="#" id="insert-link" data-target="button-link"><?php _e( 'Insert Link' ); ?></a></p>
+                                                        <script>
+                                                            jQuery( function($){
+                                                                $( '#insert-link' ).linkPicker();
+                                                            });
+                                                        </script> -->
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
@@ -285,7 +294,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                                     </tr>
                                                     <tr>
                                                         <th><?php _e( 'Image Link'); ?></th>
-                                                        <td><input type="url" id="image-link" name="image-link" value=""></td>
+                                                        <td><input type="text" id="image-link" name="image-link" value=""></td>
                                                     </tr>
                                                 </table>
                                             </div>
@@ -319,6 +328,10 @@ $email = wpfn_get_email_by_id( $email_id );
                                                                 <option value="center" <?php if ( wpfn_get_email_meta( $email_id, 'alignment', true ) === 'center' ) echo 'selected' ; ?>><?php _e('Center'); ?></option>
                                                             </select>
                                                         </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><?php _e( 'Image Link'); ?></th>
+                                                        <td><input type="text" id="image-link" name="image-link" value=""></td>
                                                     </tr>
                                                 </table>
                                             </div>
@@ -413,7 +426,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                 </div>
                                 <div id="major-publishing-actions">
                                     <div id="delete-action">
-                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=emails&action=trash&email=' . $email_id ), 'trash' ) ); ?>"><?php echo esc_html__( 'Move To Trash' ); ?></a>
+                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_emails&action=trash&email=' . $email_id ), 'trash' ) ); ?>"><?php echo esc_html__( 'Move To Trash' ); ?></a>
                                     </div>
                                     <div id="publishing-action">
                                         <span class="spinner"></span>

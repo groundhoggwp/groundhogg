@@ -27,8 +27,8 @@ do_action( 'wpfn_before_new_email' );
 		<h1 class="wp-heading-inline"><?php echo __('Add New Email', 'groundhogg');?></h1>
 		<?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'templates'; ?>
         <h2 class="nav-tab-wrapper">
-            <a href="?page=emails&action=add&tab=templates" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Email Templates', 'groundhogg'); ?></a>
-            <a href="?page=emails&action=add&tab=my-emails" class="nav-tab <?php echo $active_tab == 'my-emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Emails', 'groundhogg'); ?></a>
+            <a href="?page=gh_emails&action=add&tab=templates" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Email Templates', 'groundhogg'); ?></a>
+            <a href="?page=gh_emails&action=add&tab=my-emails" class="nav-tab <?php echo $active_tab == 'my-emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Emails', 'groundhogg'); ?></a>
         </h2>
 		<form method="post" id="poststuff" >
 			<!-- search form -->

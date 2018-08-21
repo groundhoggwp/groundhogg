@@ -34,7 +34,10 @@ function wpfn_apply_tag_funnel_step_html( $step_id )
         <tbody>
         <tr>
             <th><?php echo esc_html__( 'Select Tags to Apply:', 'groundhogg' ); ?></th>
-            <td><?php wpfn_dropdown_tags( $dropdown_args ); ?></td>
+            <td>
+                <?php wpfn_dropdown_tags( $dropdown_args ); ?>
+                <p><a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_tags' ); ?>"><?php _e( 'Add New Tag' ); ?></a></p>
+            </td>
         </tr>
         </tbody>
     </table>

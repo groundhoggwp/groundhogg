@@ -43,7 +43,7 @@ function wpfn_create_broadcasts_db()
       PRIMARY KEY  (ID)
     ) $charset_collate;";
 
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
     update_option( 'wpfn_broadcasts_db_version', WPFN_EMAILS_DB_VERSION );

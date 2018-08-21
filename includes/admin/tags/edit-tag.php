@@ -29,7 +29,7 @@ if ( isset( $_POST[ 'update' ] ) ){
 
     ?><div class="notice notice-success is-dismissible">
     <p><strong><?php _e( 'Updated Tag' ); ?>.</strong></p>
-    <p><a href="<?php echo admin_url( 'admin.php?page=tags' )?>">&larr; <?php _e('Back to Tags');?></a></p>
+    <p><a href="<?php echo admin_url( 'admin.php?page=gh_tags' )?>">&larr; <?php _e('Back to Tags');?></a></p>
     </div><?php
 
 }
@@ -59,7 +59,7 @@ $tag = wpfn_tag_exists( $id );
         </table>
         <div class="edit-tag-actions">
             <?php submit_button( __( 'Update' ), 'primary', 'update', false ); ?>
-            <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=tags&action=delete&tag_id='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
+            <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_tags&action=delete&tag_id='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
         </div>
     </form>
 </div>

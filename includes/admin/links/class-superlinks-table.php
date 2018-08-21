@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Contact_Tags_Table extends WP_List_Table {
+class WPFN_Superlinks_Table extends WP_List_Table {
     /**
      * TT_Example_List_Table constructor.
      *
@@ -29,8 +29,8 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
     public function __construct() {
         // Set parent defaults.
         parent::__construct( array(
-            'singular' => 'tag',     // Singular name of the listed records.
-            'plural'   => 'tags',    // Plural name of the listed records.
+            'singular' => 'superlink',     // Singular name of the listed records.
+            'plural'   => 'superlinks',    // Plural name of the listed records.
             'ajax'     => false,       // Does this table support ajax?
         ) );
     }
@@ -42,9 +42,11 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
     public function get_columns() {
         $columns = array(
             'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
-            'tag_name'    => _x( 'Name', 'Column label', 'groundhogg' ),
-            'tag_description'   => _x( 'Description', 'Column label', 'groundhogg' ),
-            'contact_count' => _x( 'Count', 'Column label', 'groundhogg' ),
+            'name'    => _x( 'Name', 'Column label', 'groundhogg' ),
+            'replacement'    => _x( 'Replacement Code', 'Column label', 'groundhogg' ),
+            'target'    => _x( 'Target Url', 'Column label', 'groundhogg' ),
+            'tags'   => _x( 'Tags', 'Column label', 'groundhogg' ),
+            'clicks' => _x( 'Clicks', 'Column label', 'groundhogg' ),
         );
         return $columns;
     }
@@ -53,9 +55,11 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
      */
     protected function get_sortable_columns() {
         $sortable_columns = array(
-            'tag_name'    => array( 'tag_name', false ),
-            'tag_description' => array( 'tag_description', false ),
-            'contact_count' => array( 'contact_count', false ),
+            'name'    => array( 'name', false ),
+//            'target'    => array( 'target', false ),
+            'replacement'    => array( 'replacement', false ),
+            'tags' => array( 'tags', false ),
+            'clicks' => array( 'clicks', false ),
         );
         return $sortable_columns;
     }
@@ -67,22 +71,37 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
      */
     protected function column_default( $item, $column_name ) {
         switch ( $column_name ) {
-            case 'tag_name':
-                $editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag_id=' . $item['tag_id'] );
-                $html  = '<div id="inline_' .$item['tag_id']. '" class="hidden">';
-                $html .= '  <div class="name">' .$item['tag_name']. '</div>';
-                $html .= '  <div class="description">' .$item['tag_description']. '</div>';
-                $html .= '  <div class="count">' . wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) . '</div>';
+            case 'name':
+                $editUrl = admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink_id=' . $item['ID'] );
+                $html  = '<div id="inline_' .$item['ID'] . '" class="hidden">';
+                $html .= '  <div class="name">' . $item['name'] . '</div>';
+                $html .= '  <div class="target">' . $item['target'] . '</div>';
+                $html .= '  <div class="replacement">' . '{superlink.' . $item['ID'] . '}</div>';
+                $html .= '  <div class="tags">' . implode(', ', maybe_unserialize( $item[ 'tags' ] ) ) . '</div>';
+                $html .= '  <div class="clicks">' . $item['clicks'] . '</div>';
                 $html .= '</div>';
                 $html .= "<a class='row-title' href='$editUrl'>{$item[ $column_name ]}</a>";
                 return $html;
                 break;
-            case 'contact_count':
-                $count = wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] );
-                return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag_id='.$item['tag_id']).'">'. wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) .'</a>' : '0';
+            case 'target':
+                return '<a target="_blank" href="' . esc_url_raw( $item['target'] ) . '">' . esc_url( $item['target'] ) . '</a>';
                 break;
-            case 'tag_description':
-                return ! empty( $item['tag_description'] ) ? $item['tag_description'] : '&#x2014;';
+            case 'replacement':
+                return '{superlink.' . $item['ID'] . '}';
+                break;
+            case 'tags':
+                $tags = maybe_unserialize( $item['tags'] );
+
+                $html = '';
+
+                foreach ( $tags as $i => $tag_id ){
+                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag_id='.$tag_id).'">' . wpfn_get_tag_name( $tag_id ). '</a>';
+                }
+
+                return implode( ', ', $tags );
+                break;
+            case 'clicks':
+                return ! empty( $item['clicks'] ) ? $item['clicks'] : '0';
             default:
                 return print_r( $item[ $column_name ], true );
                 break;
@@ -96,7 +115,7 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $item['tag_id']                // The value of the checkbox should be the record's ID.
+            $item['ID']                // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -108,7 +127,7 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
             'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
         );
 
-        return apply_filters( 'wpfn_contact_tag_bulk_actions', $actions );
+        return apply_filters( 'wpfn_superlink_bulk_actions', $actions );
     }
     /**
      * Handle bulk actions.
@@ -126,18 +145,18 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
         $doaction = $this->current_action();
         $sendback = remove_query_arg( array( 'deleted' ), wp_get_referer() );
 
-        if ($doaction && isset($_REQUEST['tag'])) {
-            $ids = $_REQUEST['tag'];
+        if ($doaction && isset($_REQUEST['superlink'])) {
+            $ids = $_REQUEST['superlink'];
             switch ( $this->current_action() ){
                 case 'delete':
                     $deleted = 0;
                     if(!empty($ids)) {
                         foreach ($ids as $id) {
-                            wpfn_delete_tag( intval( $id ) );
+                            wpfn_delete_superlink( intval( $id ) );
                             $deleted++;
                         }
                     }
-                    $sendback = add_query_arg( array( 'notice' => 'deleted', 'tags' => urlencode( implode( ',', $ids ) ) ) , $sendback);
+                    $sendback = add_query_arg( array( 'notice' => 'deleted', 'superlinks' => urlencode( implode( ',', $ids ) ) ) , $sendback);
                     break;
                 default:
             }
@@ -203,16 +222,16 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
          * For information on making queries in WordPress, see this Codex entry:
          * http://codex.wordpress.org/Class_Reference/wpdb
          */
-        $table_name = $wpdb->prefix . WPFN_CONTACT_TAGS;
+        $table_name = $wpdb->prefix . WPFN_SUPER_LINKS;
 
         if ( isset( $_REQUEST['s'] ) ){
             $data = $wpdb->get_results(
-                $wpdb->prepare( "SELECT * FROM $table_name WHERE tag_name LIKE %s", '%' . $wpdb->esc_like( $_REQUEST['s'] ) . '%' ),
+                $wpdb->prepare( "SELECT * FROM $table_name WHERE name LIKE %s ORDER BY ID DESC", '%' . $wpdb->esc_like( $_REQUEST['s'] ) . '%' ),
                 ARRAY_A
             );
         } else {
             $data = $wpdb->get_results(
-                "SELECT * FROM $table_name", ARRAY_A
+                "SELECT * FROM $table_name ORDER BY ID DESC", ARRAY_A
             );
         }
 
@@ -267,7 +286,7 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
      */
     protected function usort_reorder( $a, $b ) {
         // If no sort, default to title.
-        $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'tag_id'; // WPCS: Input var ok.
+        $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'ID'; // WPCS: Input var ok.
         // If no order, default to asc.
         $order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
         // Determine sort order.
@@ -289,19 +308,19 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
         }
 
         $actions = array();
-        $title = $item['tag_name'];
+        $title = $item['name'];
 
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',
             /* translators: %s: title */
-            admin_url( 'admin.php?page=gh_tags&action=edit&tag_id=' . $item['tag_id'] ),
+            admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink_id=' . $item['ID'] ),
             esc_attr( sprintf( __( 'Edit' ), $title ) ),
             __( 'Edit' )
         );
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_tags&tad_id='. $item['tag_id'].'&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_superlinks&tad_id='. $item['ID'].'&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )

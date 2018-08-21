@@ -83,13 +83,13 @@ class WPFN_Emails_Table extends WP_List_Table {
     {
         $views =  array();
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=emails&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_email_items() . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_email_items() . ")</span>" . "</a>";
 
-        $views['ready'] = "<a class='" .  print_r( ( $this->get_view() === 'ready' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=emails&view=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'ready' ) . ")</span>" . "</a>";
+        $views['ready'] = "<a class='" .  print_r( ( $this->get_view() === 'ready' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'ready' ) . ")</span>" . "</a>";
 
-        $views['draft'] = "<a class='" .  print_r( ( $this->get_view() === 'draft' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=emails&view=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'draft' ) . ")</span>" . "</a>";
+        $views['draft'] = "<a class='" .  print_r( ( $this->get_view() === 'draft' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'draft' ) . ")</span>" . "</a>";
 
-        $views['trash'] = "<a class='" .  print_r( ( $this->get_view() === 'trash' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=emails&view=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'trash' ) . ")</span>" . "</a>";
+        $views['trash'] = "<a class='" .  print_r( ( $this->get_view() === 'trash' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'trash' ) . ")</span>" . "</a>";
 
         return apply_filters(  'wpfn_email_views', $views );
     }
@@ -110,13 +110,13 @@ class WPFN_Emails_Table extends WP_List_Table {
         if ( $this->get_view() === 'trash' )
         {
             return array(
-                "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=emails&view=all&action=restore&email='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>",
-                "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=emails&view=trash&action=delete&email='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
+                "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>",
+                "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=delete&email='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
             );
         } else {
             return apply_filters( 'wpfn_email_row_actions', array(
-                "<span class='edit'><a href='" . admin_url( 'admin.php?page=emails&action=edit&email='. $id ). "'>" . __( 'Edit' ) . "</a></span>",
-                "<span class='trash'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=emails&view=all&action=trash&email='. $id ), 'trash' ). "'>" . __( 'Trash' ) . "</a></span>",
+                "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email='. $id ). "'>" . __( 'Edit' ) . "</a></span>",
+                "<span class='trash'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email='. $id ), 'trash' ). "'>" . __( 'Trash' ) . "</a></span>",
             ));
         }
     }
@@ -133,7 +133,7 @@ class WPFN_Emails_Table extends WP_List_Table {
 		switch ( $column_name ) {
 			case 'subject':
 			    $subject = ( ! $item[ $column_name ] )? '(' . __( 'no subject' ) . ')' : $item[ $column_name ] ;
-				$editUrl = admin_url( 'admin.php?page=emails&action=edit&email=' . $item['ID'] );
+				$editUrl = admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $item['ID'] );
 
 				if ( $this->get_view() === 'trash' ){
 				    $html = "<strong>{$subject}</strong>";
@@ -157,12 +157,12 @@ class WPFN_Emails_Table extends WP_List_Table {
             case 'from_user':
                 $user = get_userdata( intval( ( $item['from_user'] ) ) );
                 $from_user = esc_html( $user->display_name . ' <' . $user->user_email . '>' );
-                $queryUrl = admin_url( 'admin.php?page=emails&view=from_user&from_user' . $item['from_user'] );
+                $queryUrl = admin_url( 'admin.php?page=gh_emails&view=from_user&from_user' . $item['from_user'] );
                 return "<a href='$queryUrl'>$from_user</a>";
             case 'author':
                 $user = get_userdata( intval( ( $item['author'] ) ) );
                 $from_user = esc_html( $user->user_login );
-                $queryUrl = admin_url( 'admin.php?page=emails&view=author&author=' . $item['author'] );
+                $queryUrl = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $item['author'] );
                 return "<a href='$queryUrl'>$from_user</a>";
 			default:
 				return print_r( $item[ $column_name ], true );

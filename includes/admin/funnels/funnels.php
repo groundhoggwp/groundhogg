@@ -46,7 +46,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] === 'archive' ){
     $funnels_table = new WPFN_Funnels_Table();
     ?>
     <div class="wrap">
-        <h1 class="wp-heading-inline"><?php echo __('Funnels', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+        <h1 class="wp-heading-inline"><?php echo __('Funnels', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
         <?php $notice = isset( $_GET[ 'notice' ] )? $_GET[ 'notice' ] : '';
         $item_count = isset( $_GET['funnels'] )? count( explode( ',', urldecode( $_GET['funnels'] ) ) ) : 0;
         switch ( $notice ):

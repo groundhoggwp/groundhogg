@@ -21,7 +21,9 @@ function wpfn_do_replacements( $contact_id, $content )
     if ( ! $contact_id || ! is_int( $contact_id ) )
         return false;
 
-    preg_match_all( '/{[\w\d]+}/', $content, $matches );
+    do_action( 'wpfn_load_replacements' );
+
+    preg_match_all( '/{[\w\d.]+}/', $content, $matches );
     $actual_matches = $matches[0];
 
     $contact = new WPFN_Contact( $contact_id );
@@ -30,11 +32,24 @@ function wpfn_do_replacements( $contact_id, $content )
 
         # trim off the { and } from either end.
         $replacement = substr( $pattern, 1, -1);
+
         if ( substr($replacement, 0, 1) === '_' ) {
             $new_replacement = $contact->getFieldMeta( substr($replacement, 1) );
         } else {
-            $new_replacement = apply_filters( 'wpfn_replacement_' . $replacement, $contact );
+
+            if ( strpos( $replacement, '.' ) > 0 ){
+
+                $parts = explode( '.', $replacement );
+
+                $function = $parts[0];
+                $arg = $parts[1];
+                $new_replacement = apply_filters( 'wpfn_replacement_' . $function, $arg, $contact );
+
+            } else {
+                $new_replacement = apply_filters( 'wpfn_replacement_' . $replacement, $contact );
+            }
         }
+
         $content = preg_replace( '/' . $pattern . '/', $new_replacement, $content );
     }
 

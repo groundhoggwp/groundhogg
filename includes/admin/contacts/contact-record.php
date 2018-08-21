@@ -57,7 +57,7 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
                                 </div>
                                 <div id="major-publishing-actions">
                                     <div id="delete-action">
-                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=contacts' ), 'delete_contact', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Delete Contact', 'groundhogg' ); ?></a>
+                                        <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_contacts' ), 'delete_contact', 'wpfn_nonce' ) ); ?>"><?php echo esc_html__( 'Delete Contact', 'groundhogg' ); ?></a>
                                     </div>
                                     <div id="publishing-action">
                                         <span class="spinner"></span>

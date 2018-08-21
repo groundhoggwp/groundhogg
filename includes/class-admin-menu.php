@@ -40,7 +40,7 @@ class WPFN_Admin_Menu
             'Contacts',
             'Contacts',
             'manage_options',
-            'contacts',
+            'gh_contacts',
             array( $this, 'contacts_callback' )
         );
 
@@ -49,8 +49,17 @@ class WPFN_Admin_Menu
             'Tags',
             'Tags',
             'manage_options',
-            'tags',
+            'gh_tags',
             array( $this, 'tags_callback' )
+        );
+
+        $superlinks_admin_add = add_submenu_page(
+            'groundhogg',
+            'Superlinks',
+            'Superlinks',
+            'manage_options',
+            'gh_superlinks',
+            array( $this, 'superlinks_callback' )
         );
 
 		$email_admin_add = add_submenu_page(
@@ -58,7 +67,7 @@ class WPFN_Admin_Menu
 			'Emails',
 			'Emails',
 			'manage_options',
-			'emails',
+			'gh_emails',
 			array( $this, 'emails_callback' )
 		);
 
@@ -69,9 +78,11 @@ class WPFN_Admin_Menu
 			'Funnels',
 			'Funnels',
 			'manage_options',
-			'funnels',
+			'gh_funnels',
 			array( $this, 'funnels_callback' )
 		);
+
+        add_action( "load-" . $funnel_admin_add, array( $this, 'funnels_help_bar' ) );
 
         add_submenu_page(
             'groundhogg',
@@ -150,9 +161,38 @@ class WPFN_Admin_Menu
             array(
                 'id'      => 'gh_overview',
                 'title'   => __( 'Overview' ),
-                'content' => '<p>' . __( '', 'groundhogg' ) . '</p>'
+                'content' => '<p>' . __( 'Here you can edit your funnels. A funnel is a set of steps which can run automation based on contact interactions with your site. You can view the number of active contacts in each funnel, as well as when it was created and last updated.', 'groundhogg' ) . '</p>'
+               . '<p>' . __( 'Funnels can be either Active/Inactive/Archived. If a funnel is Inactive, no contacts can enter and any contacts that may have been in the funnel will stop moving forward. The same goes for Archived funnels which simply do not show in the main list.', 'groundhogg' ) . '</p>'
             )
         );
+
+        $screen->add_help_tab(
+            array(
+                'id'      => 'gh_add',
+                'title'   => __( 'Add A Funnel' ),
+                'content' => '<p>' . __( 'To create a new funnel, simply click the Add New Button in the top left and select a pre-built funnel template. If you have a funnel import file you can click the import tab and upload the funnel file which will auto generate a funnel for you.', 'groundhogg' ) . '</p>'
+            )
+        );
+
+        $screen->add_help_tab(
+            array(
+                'id'      => 'gh_edit',
+                'title'   => __( 'Editing' ),
+                'content' => '<p>' . __( 'When editing a funnel you can add Funnel Steps. Funnel Steps are either Benchmarks or Actions. Benchmarks are whenever a Contact "does" something, while Actions are doing thing to a contact such as sending an email. Simply drag in the desired funnel steps in any order.', 'groundhogg' ) . '</p>'
+                . '<p>' . __( 'Actions are run sequentially, so when an action takes place, it simply loads the next action. That means if you need to change it you can!', 'groundhogg' ) . '</p>'
+                . '<p>' . __( 'Benchmarks are a bit different. If you have several benchmarks in a row, what happens is once one of them is completed by a contact the first action found proceeding that benchmark is launched, skipping all other benchmarks. That way you can have multiple automation triggers. ', 'groundhogg' ) . '</p>'
+                . '<p>' . __( 'Once a benchmark is complete all actions that are scheduled before that benchmark will stop immediately.', 'groundhogg' ) . '</p>'
+            )
+        );
+
+        $screen->add_help_tab(
+            array(
+                'id'      => 'gh_reporting',
+                'title'   => __( 'Reporting' ),
+                'content' => '<p>' . __( 'To view funnel reporting, simply dgo to the editing screen of any funnel, and then toggle the Reporting/Editing switch in the reporting box. You can select the time range which you would like to view by using the dropdown on the left and click the filter button.', 'groundhogg' ) . '</p>'
+            )
+        );
+
     }
 
     function contacts_callback()
@@ -163,6 +203,11 @@ class WPFN_Admin_Menu
     function tags_callback()
     {
         include dirname( __FILE__ ) . '/admin/tags/tags.php';
+    }
+
+    function superlinks_callback()
+    {
+        include dirname( __FILE__ ) . '/admin/links/superlinks.php';
     }
 
 }

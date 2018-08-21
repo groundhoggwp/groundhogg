@@ -25,11 +25,17 @@ foreach ( glob( dirname( __FILE__ ) . "/elements/*/*.php" ) as $filename )
     include $filename;
 }
 
+//for link editor
+wp_enqueue_editor();
+wp_enqueue_script('wplink');
+wp_enqueue_style('editor-buttons');
+
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 wp_enqueue_script( 'jquery-ui-datepicker' );
 wp_enqueue_style( 'jquery-ui', 'http://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
 wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
+wp_enqueue_script( 'link-picker', WPFN_ASSETS_FOLDER . '/js/admin/link-picker.js' );
 
 do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
@@ -42,10 +48,12 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
     .wpfn-element div{
         box-sizing: border-box;
         display: inline-block;
-        height: 70px;
         width: 100%;
-        padding-top: 10px;
+        /*padding-top: 10px;*/
         /*padding-bottom: 70px;*/
+    }
+    .wpfn-element p{
+        margin: -12px 0 0 0;
     }
 
     .hndle label {
@@ -80,9 +88,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
     }
 
     .wpfn-element.ui-draggable-dragging {
-        font-size: 60px;
         width: 120px;
-        height: 120px;
         background: #FFFFFF;
         border: 1px solid #F1F1F1;
     }
@@ -104,7 +110,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
     .funnel-editor .postbox.action {
         /*background-color: rgb(241, 253, 243);*/
-        width: 600px;
+        width: 620px;
         border-radius: 0px;
         margin-left: auto;
         margin-right: auto;
@@ -112,7 +118,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
     .funnel-editor .postbox.benchmark{
         /*background-color: rgb(255, 254, 218);*/
-        width: 500px;
+        width: 580px;
         border-radius: 20px;
         margin-left: auto;
         margin-right: auto;
@@ -193,10 +199,24 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
         font-size: 16px;
     }
 
+    .hndle input {
+        vertical-align: top;
+    }
+
+    .hndle .hndle-icon{
+        border-radius: 100%;
+        background: #FFF;
+        margin-left: -38px;
+        margin-right: 10px;
+        margin-top: 12px;
+        margin-bottom: -37px;
+        border: 1px solid #e5e5e5;
+    }
+
 </style>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php echo __('Edit Funnel', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+    <h1 class="wp-heading-inline"><?php echo __('Edit Funnel', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
     <hr class="wp-header-end">
     <form method="post">
         <div id='poststuff' class="wpfn-funnel-builder">
@@ -313,7 +333,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                     </div>
                                     <div id="major-publishing-actions">
                                         <div id="delete-action">
-                                            <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=funnels&action=archive&funnel=' . $funnel_id ), 'archive' ) ); ?>"><?php echo esc_html__( 'Archive Funnel', 'groundhogg' ); ?></a>
+                                            <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&action=archive&funnel=' . $funnel_id ), 'archive' ) ); ?>"><?php echo esc_html__( 'Archive Funnel', 'groundhogg' ); ?></a>
                                         </div>
                                         <div id="publishing-action">
                                             <span class="spinner"></span>
@@ -332,19 +352,23 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                 <?php do_action( 'wpfn_benchmark_icons_before' ); ?>
                                 <table>
                                     <tbody>
-                                    <?php $elements = wpfn_get_funnel_benchmark_icons();
+                                    <?php $elements = wpfn_get_funnel_benchmarks();
 
-                                    foreach ( $elements as $i => $element ):
+                                    $i = 0;
+
+                                    foreach ( $elements as  $element => $args  ):
 
                                         if ( ( $i % 2 ) == 0 ):
                                             ?><tr><?php
                                         endif;
 
-                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><?php do_action( 'wpfn_benchmark_element_icon_html_' . $element ); ?></div></td><?php
+                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img width="100%" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
 
                                         if ( $i & 1 ):
                                             ?></tr><?php
                                         endif;
+
+                                        $i++;
 
                                     endforeach;
                                     ?>
@@ -365,19 +389,23 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                 <?php do_action( 'wpfn_action_icons_before' ); ?>
                                 <table>
                                     <tbody>
-                                    <?php $elements = wpfn_get_funnel_action_icons();
+                                    <?php $elements = wpfn_get_funnel_actions();
 
-                                    foreach ( $elements as $i => $element ):
+                                    $i = 0;
+
+                                    foreach ( $elements as  $element => $args  ):
 
                                         if ( ( $i % 2 ) == 0 ):
                                             ?><tr><?php
                                         endif;
 
-                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><?php do_action( 'wpfn_action_element_icon_html_' . $element ); ?></div></td><?php
+                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img width="100%" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
 
                                         if ( $i & 1 ):
                                             ?></tr><?php
                                         endif;
+
+                                        $i++;
 
                                     endforeach;
                                     ?>

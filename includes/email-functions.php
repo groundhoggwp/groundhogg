@@ -378,7 +378,7 @@ function wpfn_create_new_email()
 
     $email_id = wpfn_insert_new_email( $email_content, '', '', get_current_user_id(), get_current_user_id() );
 
-    wp_redirect( admin_url( 'admin.php?page=emails&action=edit&email=' .  $email_id ) );
+    wp_redirect( admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id ) );
     die();
 }
 

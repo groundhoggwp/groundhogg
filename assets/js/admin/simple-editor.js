@@ -440,6 +440,7 @@
                 el.removeAttr('color');
                 settings.onChange.call($element, content.innerHTML);
             }
+            $('.color-preview').css( 'background', color );
             hideColorPickerDiv();
         });
 
@@ -530,7 +531,7 @@
                 }
             },
             color: {
-                icon: '<span class="dashicons simple-editor-color-picker-handle dashicons-editor-textcolor"></span>',
+                icon: '<span class="dashicons simple-editor-color-picker-handle dashicons-editor-textcolor"><span class="color-preview"></span></span>',
                 title: 'Color',
                 state: function state() {
                     return queryCommandState('foreColor');

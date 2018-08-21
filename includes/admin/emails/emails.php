@@ -49,7 +49,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] === 'trash' ){
 
     ?>
     <div class="wrap">
-        <h1 class="wp-heading-inline"><?php echo __('Emails', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+        <h1 class="wp-heading-inline"><?php echo __('Emails', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
         <?php $notice = isset( $_GET[ 'notice' ] )? $_GET[ 'notice' ] : '';
         $item_count = isset( $_GET['emails'] )? count( explode( ',', urldecode( $_GET['emails'] ) ) ) : 0;
         switch ( $notice ):

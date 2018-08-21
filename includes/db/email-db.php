@@ -281,7 +281,7 @@ function wpfn_create_emails_db()
       PRIMARY KEY  (ID)
     ) $charset_collate;";
 
-	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 	dbDelta( $sql );
 
 	update_option( 'wpfn_emails_db_version', WPFN_EMAILS_DB_VERSION );
@@ -313,7 +313,7 @@ function wpfn_create_email_meta_db()
 		KEY meta_key (meta_key($max_index_length))
 	) $charset_collate;";
 
-	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 	dbDelta( $install_query );
 
 	update_option( 'wpfn_email_meta_db_version', WPFN_EMAIL_META_DB_VERSION );
