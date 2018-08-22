@@ -34,8 +34,11 @@ wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 wp_enqueue_script( 'jquery-ui-datepicker' );
 wp_enqueue_style( 'jquery-ui', 'http://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
-wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
 wp_enqueue_script( 'link-picker', WPFN_ASSETS_FOLDER . '/js/admin/link-picker.js' );
+//wp_enqueue_script( 'sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-admin-sidebar.js' );
+wp_enqueue_script( 'sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-sidebar.js' );
+wp_enqueue_script( 'jquery-sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/jquery.sticky-sidebar.js' );
+wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
 
 do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
@@ -219,8 +222,8 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
     <h1 class="wp-heading-inline"><?php echo __('Edit Funnel', 'groundhogg');?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
     <hr class="wp-header-end">
     <form method="post">
-        <div id='poststuff' class="wpfn-funnel-builder">
-            <div id="post-body" class="metabox-holder columns-2">
+        <div id='poststuff' class="wpfn-funnel-builder" style="overflow: hidden">
+            <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
                 <div id="post-body-content">
                     <div id="titlediv">
                         <div id="titlewrap">
@@ -288,8 +291,8 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                     </div>
                 </div>
                 <!-- begin elements area -->
-                <div id="postbox-container-1" class="postbox-container sticky">
-                    <div class="sticky-actions" id="sticky-actions">
+                <div id="postbox-container-1" class="postbox-container sidebar">
+
                         <div id="submitdiv" class="postbox">
                             <h3 class="hndle"><?php echo __( 'Funnel Status', 'groundhogg' );?></h3>
                             <div class="inside">
@@ -381,7 +384,6 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                             </div>
                         </div>
                         <!-- End Benckmark Icons-->
-
                         <!-- Begin Action Icons-->
                         <div id='actions' class="postbox">
                             <h2 class="hndle"><?php echo __( 'Actions', 'groundhogg' );?></h2>
@@ -420,38 +422,38 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
                         </div>
                         <!-- End Action Icons-->
-                    </div>
+
                 </div>
                 <!-- End elements area-->
-
                 <!-- main funnel editing area -->
                 <div id="postbox-container-2" class="postbox-container funnel-editor">
                     <div id="normal-sortables" class="meta-box-sortables ui-sortable">
-                        <?php do_action('wpfn_funnel_steps_before' ); ?>
+			            <?php do_action('wpfn_funnel_steps_before' ); ?>
 
-                        <?php $steps = wpfn_get_funnel_steps( $funnel_id );
+			            <?php $steps = wpfn_get_funnel_steps( $funnel_id );
 
-                        if ( empty( $steps ) ): ?>
+			            if ( empty( $steps ) ): ?>
                             <div class="">
                                 Drag in new steps to build the ultimate sales machine!
                             </div>
-                        <?php else:
+			            <?php else:
 
-                            if ( wpfn_get_step_group( $steps[0] ) !== 'benchmark' ){
-                                ?>
+				            if ( wpfn_get_step_group( $steps[0] ) !== 'benchmark' ){
+					            ?>
                                 <div class="notice notice-error is-dismissible"><p>Funnels should start with benchmarks, otherwise actions cannot be triggered. Please use a benchmark to trigger automation.</p></div>
-                                <?php
-                            }
+					            <?php
+				            }
 
-                            foreach ( $steps as $i => $step_id ):
-                                wpfn_get_step_html( $step_id );
-                            endforeach;
+				            foreach ( $steps as $i => $step_id ):
+					            wpfn_get_step_html( $step_id );
+				            endforeach;
 
-                        endif; ?>
-                        <?php do_action('wpfn_funnel_steps_after' ); ?>
+			            endif; ?>
+			            <?php do_action('wpfn_funnel_steps_after' ); ?>
                     </div>
                 </div>
                 <!-- end main funnel editing area -->
+                <div style="clear: both;"></div>
             </div>
         </div>
     </form>

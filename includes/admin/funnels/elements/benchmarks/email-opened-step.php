@@ -13,39 +13,54 @@
 
 function wpfn_email_opened_funnel_step_html( $step_id )
 {
-    $email_dropdown_id = $step_id . '_email_id';
-    $email_dropdown_name = $step_id . '_email_name';
+    global $wpdb;
 
-    $dropdown_args = array();
-    $dropdown_args[ 'id' ] = $email_dropdown_id;
-    $dropdown_args[ 'name' ] = $email_dropdown_name;
+    $table = $wpdb->prefix . WPFN_FUNNELSTEPS;
 
-    $previously_selected = intval( wpfn_get_step_meta( $step_id, 'email_id', true ) );
+    $email_steps = $wpdb->get_results( $wpdb->prepare(
+        "SELECT * FROM $table
+        WHERE funnel_id = %d AND funnelstep_order < %d AND funnelstep_type = %s
+        ORDER BY funnelstep_order DESC",
+        wpfn_get_step_funnel( $step_id ), wpfn_get_step_order( $step_id ), 'send_email'
+    ), ARRAY_A );
 
-    if ( $previously_selected )
-        $dropdown_args['selected'] = $previously_selected;
+    $selected_emails = wpfn_get_step_meta( $step_id, 'emails', true );
 
-    ?>
+    if ( ! $selected_emails )
+        $selected_emails = array();
+
+	?>
 
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo esc_html__( 'Email being opened:', 'groundhogg' ); ?></th>
-            <td><?php wpfn_dropdown_emails( $dropdown_args ); ?></td>
+            <th><?php esc_html_e( 'Email being opened:', 'groundhogg' ); ?></th>
+            <td>
+                <select id="<?php wpfn_prefix_step_meta_e( $step_id, 'emails' ); ?>" name="<?php wpfn_prefix_step_meta_e( $step_id, 'emails[]' ); ?>" multiple>
+                    <?php foreach ( $email_steps as $step ):
+
+                        ?><option value="<?php echo $step['ID']; ?>" <?php if ( in_array( $step['ID'], $selected_emails ) ) echo 'selected="selected"'; ?> ><?php esc_html_e( $step[ 'funnelstep_title' ] ); ?></option><?php
+
+                     endforeach; ?>
+                </select>
+                <script>
+                    jQuery(function($){$( "#<?php wpfn_prefix_step_meta_e( $step_id, 'emails' ); ?>" ).select2() })
+                </script>
+            </td>
         </tr>
         </tbody>
     </table>
 
-    <?php
+	<?php
 }
 
 add_action( 'wpfn_get_step_settings_email_opened', 'wpfn_email_opened_funnel_step_html' );
 
-function wpfn_email_opened_icon_html()
+function wpfn_save_email_opened_step( $step_id )
 {
-    ?>
-    <div class="dashicons dashicons-email"></div><p>Email Opened</p>
-    <?php
+    if ( isset( $_POST[ wpfn_prefix_step_meta( $step_id, 'emails' ) ] ) ){
+        wpfn_update_step_meta( $step_id, 'emails', $_POST[ wpfn_prefix_step_meta( $step_id, 'emails' ) ] );
+    }
 }
 
-add_action( 'wpfn_benchmark_element_icon_html_email_opened', 'wpfn_email_opened_icon_html' );
+add_action( 'wpfn_save_step_email_opened', 'wpfn_save_email_opened_step' );

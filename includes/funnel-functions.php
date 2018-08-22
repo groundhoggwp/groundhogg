@@ -560,6 +560,19 @@ function wpfn_prefix_step_meta( $step_id, $atter )
 }
 
 /**
+ * pre-fix step setting attrivutes suych and name and id with the ID of the step for easy $_POST sorting.
+ *
+ * @param $step_id int the step ID
+ * @param $atter string the meta attribute
+ *
+ * @return void
+ */
+function wpfn_prefix_step_meta_e( $step_id, $atter )
+{
+	echo wpfn_prefix_step_meta( $step_id, $atter );
+}
+
+/**
  * Update the funnel and all of the funnel steps.
  *
  * @param $funnel_id

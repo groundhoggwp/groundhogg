@@ -55,6 +55,11 @@ jQuery( function($) {
                 });
             }
         }});
+
+    $('.sidebar').stickySidebar({
+        topSpacing: 40,
+        bottomSpacing: 40
+    });
 });
 
 function wpfn_delete_funnel_step()
