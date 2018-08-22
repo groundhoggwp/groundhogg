@@ -66,10 +66,10 @@ function wpfn_get_funnel_actions()
     $actions = array();
 
     $actions['send_email']  = array( 'title' => __( 'Send Email', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/send-email.png' );
-    $actions['apply_note']  = array( 'title' => __( 'Apply Note', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/apply-note.png' );
+    $actions['apply_note']  = array( 'title' => __( 'Apply Note', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/apply-a-note.png' );
     $actions['apply_tag']   = array( 'title' => __( 'Apply Tag', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/apply-tag.png' );
     $actions['remove_tag']  = array( 'title' => __( 'Remove Tag', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/remove-tag.png' );
-    $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/create-user.png' );
+    $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/create-account.png' );
 //    $actions['delete_user'] = array( 'title' => __( '', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/.png' );
     $actions['date_timer']  = array( 'title' => __( 'Date Timer', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/date-timer.png' );
     $actions['delay_timer'] = array( 'title' => __( 'Delay Timer', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/delay-timer.png' );
@@ -92,11 +92,15 @@ function wpfn_get_step_icon( $step_id )
 
     if ( $step_group === 'benchmark' ){
 
-        return wpfn_get_funnel_benchmarks()[$step_type]['icon'];
+        $benchmarks = wpfn_get_funnel_benchmarks();
+
+        return $benchmarks[$step_type]['icon'];
 
     } else {
 
-        return wpfn_get_funnel_actions()[$step_type]['icon'];
+        $actions = wpfn_get_funnel_actions();
+
+        return $actions[$step_type]['icon'];
 
     }
 }
@@ -430,7 +434,7 @@ function wpfn_get_the_report_range()
 function wpfn_get_step_html( $step_id )
 {
     ?>
-    <div id="<?php echo $step_id; ?>" class="postbox <?php echo wpfn_get_step_group( $step_id ); ?>">
+    <div id="<?php echo $step_id; ?>" class="postbox step <?php echo wpfn_get_step_group( $step_id ); ?> <?php echo wpfn_get_step_type( $step_id ); ?>">
         <button type="button" class="handlediv delete-step-<?php echo $step_id;?>">
             <span class="dashicons dashicons-trash"></span>
             <script>
@@ -442,9 +446,11 @@ function wpfn_get_step_html( $step_id )
             <div class="step-edit">
                 <input type="hidden" name="<?php echo wpfn_prefix_step_meta( $step_id, 'order' ); ?>" value="<?php wpfn_get_step_order( $step_id ) ?>" >
                 <input type="hidden" name="steps[]" value="<?php echo $step_id; ?>">
-                <?php do_action( 'wpfn_step_settings_before' ); ?>
-                <?php do_action( 'wpfn_get_step_settings_' . wpfn_get_step_type( $step_id ), $step_id ); ?>
-                <?php do_action( 'wpfn_step_settings_after' ); ?>
+                <div class="custom-settings">
+                    <?php do_action( 'wpfn_step_settings_before' ); ?>
+                    <?php do_action( 'wpfn_get_step_settings_' . wpfn_get_step_type( $step_id ), $step_id ); ?>
+                    <?php do_action( 'wpfn_step_settings_after' ); ?>
+                </div>
             </div>
             <div class="step-reporting hidden">
                 <?php do_action( 'wpfn_step_reporting_before' );
@@ -505,7 +511,7 @@ function wpfn_get_step_html_via_ajax()
 {
 
     $step_type = $_POST['step_type'];
-    $step_order = $_POST['step_order'];
+    $step_order = intval( $_POST['step_order'] );
     $funnel_id = wpfn_url_to_funnel_id( wp_get_referer() );
 
     $step_group = ( wpfn_is_benchmark( $step_type ) )? 'benchmark' : 'action' ;
@@ -530,6 +536,33 @@ function wpfn_get_step_html_via_ajax()
 }
 
 add_action( 'wp_ajax_wpfn_get_step_html', 'wpfn_get_step_html_via_ajax' );
+
+function wpfn_get_step_html_inside()
+{
+    $step_id = intval( $_POST['step_id'] );
+    $step_order = intval( $_POST['step_order'] );
+
+    wpfn_update_funnel_step( $step_id, 'funnelstep_order', $step_order );
+
+    foreach ( glob( dirname( __FILE__ ) . "/admin/funnels/elements/*/*.php" ) as $filename )
+    {
+        include $filename;
+    }
+
+    ob_start();
+
+    do_action( 'wpfn_step_settings_before' );
+    do_action( 'wpfn_get_step_settings_' . wpfn_get_step_type( $step_id ), $step_id );
+    do_action( 'wpfn_step_settings_after' );
+
+    $content = ob_get_contents();
+
+    ob_end_clean();
+
+    wp_die( $content );
+}
+
+add_action( 'wp_ajax_wpfn_get_step_html_inside', 'wpfn_get_step_html_inside' );
 
 /**
  * Delete the funnel step by it's ID
@@ -739,15 +772,16 @@ function wpfn_contact_is_in_funnel( $contact_id, $funnel_id )
 
     $table_name = $wpdb->prefix . WPFN_EVENTS;
 
-    return ! empty( $wpdb->get_results(
+    $results = $wpdb->get_results(
         $wpdb->prepare(
             "
          SELECT * FROM $table_name
 		 WHERE contact_id = %d AND funnel_id = %d AND status = %s
 		",
             $contact_id, $funnel_id, 'complete'
-        ) )
-    );
+        ) );
+
+    return ! empty( $results );
 
 }
 

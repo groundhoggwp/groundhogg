@@ -214,7 +214,9 @@ function wpfn_get_funnel_steps_by_type( $step_type )
 {
     global $wpdb;
 
-    if ( ! isset( wpfn_get_funnel_benchmarks()[ $step_type ] ) )
+    $benchmarks = wpfn_get_funnel_benchmarks();
+
+    if ( ! isset( $benchmarks[ $step_type ] ) )
         return false;
 
     $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;

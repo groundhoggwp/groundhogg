@@ -574,7 +574,7 @@ function wpfn_get_contact_tag_relationship( $contact_id, $tag_id )
 
     return $wpdb->get_row( $wpdb->prepare(
         "SELECT * FROM " . $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS . "
-        WHERE tag_id = %d AND contact_id = %d", $contact_id, $tag_id), ARRAY_A
+        WHERE tag_id = %d AND contact_id = %d", $tag_id, $contact_id ), ARRAY_A
     );
 }
 
@@ -597,7 +597,7 @@ function wpfn_insert_contact_tag_relationship( $contact_id, $tag_id )
     if ( ! $contact_id || ! $tag_id )
         return false;
 
-    if ( ! wpfn_get_contact_tag_relationship( $contact_id, $tag_id ) )
+    if ( wpfn_get_contact_tag_relationship( $contact_id, $tag_id ) )
         return false;
 
     return $wpdb->insert(

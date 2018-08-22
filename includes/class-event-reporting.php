@@ -29,6 +29,11 @@ class WPFN_Event_Report
      */
     var $end;
 
+    /**
+     * @var $unique, whether the report should offer DISTINCT rows
+     */
+    var $unique;
+
     function __construct( $funnel, $step=0, $start_time=0, $end_time=0 )
     {
         $this->funnel = intval( $funnel );

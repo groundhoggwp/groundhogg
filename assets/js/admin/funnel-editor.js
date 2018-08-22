@@ -8,53 +8,56 @@ jQuery( function($) {
         jQuery('form').unbind( 'submit' ).submit();
     });
     
-    var funnelSortables = jQuery( ".ui-sortable" ).sortable(
-        {
-            placeholder: "sortable-placeholder",
-            connectWith: ".ui-sortable",
-            axis: 'y',
-            start: function(e, ui){
-                ui.helper.css( 'left', ( ui.item.parent().width() - ui.item.width() ) / 2 );
-                ui.placeholder.height(ui.item.height());
-                ui.placeholder.width(ui.item.width());
-            },
-            stop: function (e, ui) {
-                wpfn_update_funnel_step_order();
-            }
-        });
+    var funnelSortables = jQuery( ".ui-sortable" ).sortable({
+        placeholder: "sortable-placeholder",
+        connectWith: ".ui-sortable",
+        axis: 'y',
+        start: function(e, ui){
+            ui.helper.css( 'left', ( ui.item.parent().width() - ui.item.width() ) / 2 );
+            ui.placeholder.height(ui.item.height());
+            ui.placeholder.width(ui.item.width());
+        }
+    });
+
     funnelSortables.disableSelection();
+
     var funnelDraggables = jQuery( ".ui-draggable" ).draggable({
         connectToSortable: ".ui-sortable",
         helper: "clone",
         stop: function ( e, ui ){
-            console.log( this.id );
             var el = this;
             var step_type = el.id;
 
             var sortables = jQuery('#normal-sortables');
 
             sortables.find('.ui-draggable').replaceWith(
-                '<div class="postbox replace-me" style="width: 500px;margin-right: auto;margin-left: auto;"><h3 class="hndle">Please Wait...</h3><div class="inside">Loading content...</div></div>'
+                '<div id="temp-step" class="postbox step replace-me" style="width: 500px;margin-right: auto;margin-left: auto;"><h3 class="hndle">Please Wait...</h3><div class="inside">Loading content...</div></div>'
             );
+
+            var order = $( '.step' ).index( $( '#temp-step' ) ) + 1;
 
             if ( sortables.find( '.replace-me' ).length ){
                 var ajaxCall = jQuery.ajax({
                     type : "post",
                     url : ajaxurl,
-                    data : {action: "wpfn_get_step_html",step_type: step_type, step_order: 1 },
+                    data : {action: "wpfn_get_step_html", step_type: step_type, step_order: order },
                     success: function( html )
                     {
-                        var wrapper = document.createElement('div');
-                        wrapper.innerHTML = html;
-
-                        var newEl = wrapper.firstChild;
                         jQuery('#normal-sortables').find('.replace-me').replaceWith( html );
-
-                        wpfn_update_funnel_step_order();
                     }
                 });
             }
-        }});
+        }
+    });
+
+
+    funnelSortables.on( 'sortupdate', function( e, ui ){
+        $( '.email_opened' ).each( wpfn_update_inside_contents );
+    });
+    funnelSortables.on( 'sortupdate', function( e, ui ){
+        wpfn_update_funnel_step_order();
+        wpfn_auto_save_funnel();
+    });
 
     $('.sidebar').stickySidebar({
         topSpacing: 40,
@@ -89,8 +92,6 @@ function wpfn_update_funnel_step_order()
             jQuery( this ).val( index + 1 );
         }
     );
-
-    wpfn_auto_save_funnel();
 }
 
 function wpfn_auto_save_funnel()
@@ -113,6 +114,23 @@ function wpfn_auto_save_funnel()
         {
             console.log(result);
             wpfnDoingAutoSave = false;
+        }
+    });
+}
+
+function wpfn_update_inside_contents()
+{
+    var order = jQuery( '.step' ).index( jQuery( this ) ) + 1;
+
+    var e = jQuery( this );
+
+    var ajaxCall = jQuery.ajax({
+        type : "post",
+        url : ajaxurl,
+        data : {action: "wpfn_get_step_html_inside", step_id: e.attr( 'id' ) , step_order: order },
+        success: function( html )
+        {
+            e.find( '.custom-settings' ).html( html );
         }
     });
 }

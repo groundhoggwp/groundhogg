@@ -64,7 +64,7 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     /**
      * @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to.
      */
-    $ref_link = add_query_arg( $link_args, site_url() ) . '&ref=';
+    $ref_link = add_query_arg( $link_args, site_url( 'gh-tracking/' ) ) . '&ref=';
 
     $email = wpfn_get_email_by_id( $email_id );
 
@@ -79,7 +79,7 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     $pre_header = wpfn_do_replacements( $contact_id, $email->pre_header );
     $content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
     $email_footer_text = wpfn_get_email_footer_text();
-    $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
+//    $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
     $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
     if ( $alignment === 'left' ){
         $margins = "margin-left:0;margin-right:auto;";
@@ -147,11 +147,11 @@ function wpfn_get_email_footer_text()
 
     $footer .= implode( ', ', $address ) . "<br/>";
 
-    if ( get_option( 'gh_phone' ) )
+    if ( get_option( 'gh_phone', 0 ) )
         $sub[] = "<a href='tel:" . esc_attr( get_option( 'gh_phone' ) ) . "'>" . esc_attr( get_option( 'gh_phone' ) ) . "</a>";
     if ( get_option( 'gh_privacy_policy' ) )
         $sub[] = "<a href=\"" . esc_attr( get_permalink( get_option( 'gh_privacy_policy' ) ) ) . "\">" . __( 'Privacy Policy', 'groundhogg' ) . "</a>";
-    if ( get_option( 'gh_terms' ) )
+    if ( get_option( 'gh_terms', 0 ) )
         $sub[] = "<a href=\"" . esc_attr( get_permalink( get_option( 'gh_terms' ) ) ) . "\">" . __( 'Terms', 'groundhogg' ) . "</a>";
 
     $footer .= implode( ' | ', $sub ) ;
@@ -352,37 +352,30 @@ function wpfn_dropdown_emails( $args )
  */
 function wpfn_create_new_email()
 {
-    if ( ! isset( $_POST['add_new_email_nonce'] ) || ! wp_verify_nonce( $_POST['add_new_email_nonce'], 'add_new_email' ) )
-        return;
-
     if ( isset( $_POST[ 'email_template' ] ) ){
 
         include dirname(__FILE__) . '/templates/email-templates.php';
-
         /* @var $email_templates array included from email-templates.php*/
         $email_content = $email_templates[ $_POST[ 'email_template' ] ][ 'content' ];
 
     } else if ( isset( $_POST[ 'email_id' ] ) ) {
 
         $email = wpfn_get_email_by_id( intval( $_POST['email_id'] ) );
-
         $email_content = $email->content;
 
     } else {
 
         ?><div class="notice notice-error"><p><?php _e( 'Could not create email. PLease select a template.', 'groundhogg' ); ?></p></div><?php
-
         return;
 
     }
 
     $email_id = wpfn_insert_new_email( $email_content, '', '', get_current_user_id(), get_current_user_id() );
-
     wp_redirect( admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id ) );
     die();
 }
 
-add_action( 'wpfn_before_new_email', 'wpfn_create_new_email' );
+add_action( 'wpfn_add_email', 'wpfn_create_new_email' );
 
 /**
  * Save and update an email
@@ -391,36 +384,31 @@ add_action( 'wpfn_before_new_email', 'wpfn_create_new_email' );
  */
 function wpfn_save_email( $email_id )
 {
-    if ( isset( $_POST['edit_email_nonce'] ) && wp_verify_nonce( $_POST['edit_email_nonce'], 'edit_email' ) && current_user_can( 'manage_options' ) ) {
+    do_action( 'wpfn_email_update_before', $email_id );
 
-        do_action( 'wpfn_email_update_before', $email_id );
+    $status = ( isset( $_POST['status'] ) )? sanitize_text_field( trim( stripslashes( $_POST['status'] ) ) ): 'draft';
+    wpfn_update_email( $email_id, 'email_status', $status );
 
-        $status = ( isset( $_POST['status'] ) )? sanitize_text_field( trim( stripslashes( $_POST['status'] ) ) ): 'draft';
-        wpfn_update_email( $email_id, 'email_status', $status );
+    $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
+    wpfn_update_email( $email_id, 'from_user', $from_user );
 
-        $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
-        wpfn_update_email( $email_id, 'from_user', $from_user );
+    $subject =  ( isset( $_POST['subject'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['subject'] ) ) ) ): '';
+    wpfn_update_email( $email_id, 'subject', $subject );
 
-        $subject =  ( isset( $_POST['subject'] ) )? sanitize_text_field( trim( stripslashes( $_POST['subject'] ) ) ): '';
-        wpfn_update_email( $email_id, 'subject', $subject );
+    $pre_header =  ( isset( $_POST['pre_header'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['pre_header'] ) ) ) ): '';
+    wpfn_update_email( $email_id, 'pre_header', $pre_header );
 
-        $pre_header =  ( isset( $_POST['pre_header'] ) )? sanitize_text_field( trim( stripslashes( $_POST['pre_header'] ) ) ): '';
-        wpfn_update_email( $email_id, 'pre_header', $pre_header );
+    $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
+    wpfn_update_email_meta( $email_id, 'alignment', $alignment );
 
-        $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
-        wpfn_update_email_meta( $email_id, 'alignment', $alignment );
-
-        $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpfn_sanitize_email_content', wpfn_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
+    $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpfn_sanitize_email_content', wpfn_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
 //        $content =  ( isset( $_POST['content'] ) )? wp_kses( stripslashes( $_POST['content'] ), wpfn_emails_allowed_html() ): '';
-        wpfn_update_email( $email_id, 'content', $content );
+    wpfn_update_email( $email_id, 'content', $content );
 
-        do_action( 'wpfn_email_update_after', $email_id );
-
-        ?><div class="notice notice-success is-dismissible"><p>Successfully updated email!</p></div><?php
-    }
+    do_action( 'wpfn_email_update_after', $email_id );
 }
 
-add_action( 'wpfn_email_editor_before_everything', 'wpfn_save_email' );
+add_action( 'wpfn_update_email', 'wpfn_save_email' );
 
 /**
  * Remove script tags from the email content
@@ -533,3 +521,22 @@ function wpfn_email_status( $id )
             break;
     }
 }
+
+/**
+ * Perform the stats collection when a contact clicks a link in an email.
+ */
+function wpfn_do_email_tracking()
+{
+    if ( strpos( $_SERVER[ 'REQUEST_URI' ], 'gh-tracking' ) < 0 )
+        return;
+
+    //todo click thru rate, open rate, etc...
+
+    $ref = urldecode( $_GET[ 'ref' ] );
+
+    /* send to original destination. */
+    wp_redirect( $ref );
+    die();
+}
+
+//add_action( 'plugins_loaded', 'wpfn_do_email_tracking' );

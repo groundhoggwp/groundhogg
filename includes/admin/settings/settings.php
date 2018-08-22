@@ -68,10 +68,10 @@ class WPFN_Settings_Page
         add_settings_section('business_info', 'Edit Business Settings', array(), 'groundhogg_business_settings');
 
         /* marketing */
-        add_settings_section('confirmation_page', 'Confirmation Page', array(), 'groundhogg_marketing_settings');
-        add_settings_section('unsubscribe_page', 'Unsubscribe Page', array(), 'groundhogg_marketing_settings');
-        add_settings_section('email_preferences_page', 'Email Preferences Page', array(), 'groundhogg_marketing_settings');
-        add_settings_section('compliance', 'Compliance Settings', array(), 'groundhogg_marketing_settings');
+        add_settings_section('contact_endpoints', __ ( 'Contact Endpoints' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
+//        add_settings_section('confirmation_page', 'Confirmation Page', array(), 'groundhogg_marketing_settings');
+//        add_settings_section('email_preferences_page', 'Email Preferences Page', array(), 'groundhogg_marketing_settings');
+        add_settings_section('compliance', __( 'Compliance Settings', 'groundhogg' ), array(), 'groundhogg_marketing_settings');
     }
 
 	public function wpfn_setup_fields()
@@ -162,52 +162,52 @@ class WPFN_Settings_Page
                 'id' => 'gh_email_confirmation_page',
                 'type' => 'page',
                 'desc' => 'Page contacts see when they confirm their email.',
-                'section' => 'confirmation_page',
+                'section' => 'contact_endpoints',
                 'page' => 'groundhogg_marketing_settings'
             ),
-            array(
-                'label' => 'Email Confirmation Text',
-                'id' => 'gh_email_confirmation_text',
-                'type' => 'textarea',
-                'placeholder' => 'Thank you for confirming your email.',
-                'desc' => 'What the contact sees when they confirm their email address',
-                'section' => 'confirmation_page',
-                'page' => 'groundhogg_marketing_settings'
-            ),
+//            array(
+//                'label' => 'Email Confirmation Text',
+//                'id' => 'gh_email_confirmation_text',
+//                'type' => 'textarea',
+//                'placeholder' => 'Thank you for confirming your email.',
+//                'desc' => 'What the contact sees when they confirm their email address',
+//                'section' => 'confirmation_page',
+//                'page' => 'groundhogg_marketing_settings'
+//            ),
             array(
                 'label' => 'Unsubscribe Page',
                 'id' => 'gh_unsubscribe_page',
                 'type' => 'page',
-                'desc' => 'Page contacts see when they unsubscribe. Custom content is allowed.',
-                'section' => 'unsubscribe_page',
+                'desc' => 'Page contacts see when they unsubscribe.',
+                'section' => 'contact_endpoints',
                 'page' => 'groundhogg_marketing_settings'
             ),
-            array(
-                'label' => 'Unsubscribe Text',
-                'id' => 'gh_unsubscribe_text',
-                'type' => 'textarea',
-                'placeholder' => 'We\'re sorry to see you go. We hope you come back soon!',
-                'desc' => 'What the contact sees when they unsubscribe.',
-                'section' => 'unsubscribe_page',
-                'page' => 'groundhogg_marketing_settings'
-            ),
+//            array(
+//                'label' => 'Unsubscribe Text',
+//                'id' => 'gh_unsubscribe_text',
+//                'type' => 'textarea',
+//                'placeholder' => 'We\'re sorry to see you go. We hope you come back soon!',
+//                'desc' => 'What the contact sees when they unsubscribe.',
+//                'section' => 'unsubscribe_page',
+//                'page' => 'groundhogg_marketing_settings'
+//            ),
             array(
                 'label' => 'Email Preferences Page',
                 'id' => 'gh_email_preferences_page',
                 'type' => 'page',
-                'desc' => 'Page where contacts can manage their email preferences. Custom content is overwritten.',
-                'section' => 'email_preferences_page',
+                'desc' => 'Page where contacts can manage their email preferences.',
+                'section' => 'contact_endpoints',
                 'page' => 'groundhogg_marketing_settings'
             ),
-            array(
-                'label' => 'Email Preferences Text',
-                'id' => 'gh_email_preferences_text',
-                'type' => 'textarea',
-                'placeholder' => 'Manage your email preferences below.',
-                'desc' => 'What the contact sees before the email preferences form.',
-                'section' => 'email_preferences_page',
-                'page' => 'groundhogg_marketing_settings'
-            ),
+//            array(
+//                'label' => 'Email Preferences Text',
+//                'id' => 'gh_email_preferences_text',
+//                'type' => 'textarea',
+//                'placeholder' => 'Manage your email preferences below.',
+//                'desc' => 'What the contact sees before the email preferences form.',
+//                'section' => 'email_preferences_page',
+//                'page' => 'groundhogg_marketing_settings'
+//            ),
             array(
                 'label' => 'Privacy Policy',
                 'id' => 'gh_privacy_policy',

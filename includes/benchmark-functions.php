@@ -239,3 +239,20 @@ function wpfn_complete_tag_applied_benchmark( $contact_id, $tag_id )
 }
 
 add_action( 'wpfn_tag_applied' , 'wpfn_complete_tag_applied_benchmark' , 10, 2 );
+
+/**
+ * run the form-filled benchmark
+ *
+ * @param $step_id int the ID of the form step...
+ * @param $contact_id int the ID of the contact
+ */
+function wpfn_complete_form_fill_benchmark( $step_id, $contact_id )
+{
+    $funnel_id = wpfn_get_step_funnel( $step_id );
+
+    if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) ){
+        wpfn_complete_benchmark( $step_id, $contact_id );
+    }
+}
+
+add_action( 'wpfn_form_submit' , 'wpfn_complete_form_fill_benchmark' , 10, 2 );

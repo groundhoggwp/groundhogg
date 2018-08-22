@@ -265,7 +265,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
                 break;
             case 'report':
 
-                $sql = "SELECT e.contact_id, c.*
+                $sql = "SELECT DISTINCT e.contact_id, c.*
                 FROM " . $wpdb->prefix . WPFN_EVENTS ." e 
                 LEFT JOIN " . $wpdb->prefix . WPFN_CONTACTS . " c ON e.contact_id = c.ID 
                 WHERE (1=1 ";

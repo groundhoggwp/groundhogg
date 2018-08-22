@@ -150,7 +150,6 @@ class WPFN_Emails_Table extends WP_List_Table {
 
                 $html .= $this->row_actions( $this->get_row_actions( $item['ID'] ) );
 
-
                 return $html;
 
 				break;
@@ -205,70 +204,6 @@ class WPFN_Emails_Table extends WP_List_Table {
 
         return apply_filters( 'wpfn_email_bulk_actions', $actions );
 	}
-	/**
-	 * Handle bulk actions.
-	 *
-	 * @see $this->prepare_items()
-	 */
-	protected function process_bulk_action() {
-		// Detect when a bulk action is being triggered.
-        global $wpdb;
-
-        if ( ! isset( $_REQUEST[ 'email' ] ) )
-            return;
-
-        $items = $_REQUEST[ 'email' ];
-
-        if ( ! is_array( $items ) || empty( $items ) )
-            return;
-
-        $sendback = remove_query_arg( 'action', wp_get_referer() );
-
-        switch ( $this->current_action() ){
-            case 'delete':
-
-                foreach ( $items as $id ){
-                    wpfn_delete_email( intval( $id ) );
-                }
-
-                $sendback = add_query_arg( array(
-                    'notice' => 'deleted',
-                    'emails' => urlencode( implode( ',', $items ) )
-                ), $sendback );
-
-                break;
-            case 'restore':
-
-                foreach ( $items as $id ){
-                    wpfn_update_email( intval( $id ), 'email_status', 'draft' );
-                }
-
-                $sendback = add_query_arg( array(
-                    'notice' => 'restored',
-                    'emails' => urlencode( implode( ',', $items ) )
-                ), $sendback );
-
-                break;
-            case 'trash':
-
-                foreach ( $items as $id ){
-                    wpfn_update_email( intval( $id ), 'email_status', 'trash' );
-                }
-
-                $sendback = add_query_arg( array(
-                    'notice' => 'trashed',
-                    'emails' => urlencode( implode( ',', $items ) )
-                ), $sendback );
-
-                break;
-            default:
-                do_action( 'wpfn_emails_process_bulk_action_' . $this->current_action() );
-                break;
-        }
-
-        wp_redirect( $sendback );
-        die();
-	}
 
 	/**
 	 * Prepares the list of items for displaying.
@@ -295,8 +230,6 @@ class WPFN_Emails_Table extends WP_List_Table {
 		$sortable = $this->get_sortable_columns();
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
-
-		$this->process_bulk_action();
 
 		$table_name = $wpdb->prefix . WPFN_EMAILS;
 

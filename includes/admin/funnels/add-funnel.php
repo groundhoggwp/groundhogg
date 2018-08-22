@@ -25,13 +25,12 @@ do_action( 'wpfn_before_new_funnel' );
             <a href="?page=gh_funnels&action=add&tab=templates" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Funnel Templates', 'groundhogg'); ?></a>
             <a href="?page=gh_funnels&action=add&tab=import" class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Import Funnel', 'groundhogg'); ?></a>
         </h2>
+        <!-- search form -->
+        <?php do_action('wpfn_add_new_funnel_form_before'); ?>
+
+        <?php if ( 'templates' === $active_tab ): ?>
         <form method="post" id="poststuff" >
-            <!-- search form -->
-            <?php do_action('wpfn_add_new_funnel_form_before'); ?>
             <?php wp_nonce_field( 'add_new_funnel', 'add_new_funnel_nonce' ); ?>
-
-            <?php if ( 'templates' === $active_tab ): ?>
-
             <?php include dirname(__FILE__) . '/../../templates/funnel-templates.php'; ?>
 
             <?php foreach ( $funnel_templates as $id => $funnel_args ): ?>
@@ -48,22 +47,25 @@ do_action( 'wpfn_before_new_funnel' );
                 </div>
 
             <?php endforeach; ?>
-            <?php else: ?>
-
-            <table class="form-table">
-                <tbody>
-                    <tr>
-                        <th><?php _e( 'Upload your Funnel Template File' ) ?></th>
-                        <td><input type="file" name="funnel_template" id="funnel_template" accept=".funnel" multiple></td>
-                    </tr>
-                </tbody>
-
-            </table>
-
-            <?php endif;?>
-
-            <?php do_action('wpfn_add_new_funnel_form_after'); ?>
         </form>
+        <?php else: ?>
+            <div class="show-upload-view">
+                <div class="upload-pluing-wrap">
+                    <div class="upload-plugin">
+                        <p class="install-help"><?php _e( 'If you have a funnel import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
+                        <form enctype="multipart/form-data" class="wp-upload-form">
+                            <?php wp_nonce_field(); ?>
+
+                            <input type="file" name="funnel_template" id="funnel_template" accept=".funnel" multiple>
+
+                            <button class="button-primary" name="funnel_inport" value="import"><?php _e('Import Funnels', 'groundhogg'); ?></button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <?php endif;?>
+        <?php do_action('wpfn_add_new_funnel_form_after'); ?>
     </div>
 <?php
 

@@ -1,0 +1,228 @@
+select {
+    vertical-align: top;
+}
+
+#titlediv #subject, #titlediv #pre_header {
+    padding: 3px 8px;
+    font-size: 1.7em;
+    line-height: 100%;
+    height: 1.7em;
+    width: 100%;
+    outline: 0;
+    margin: 0 0 3px;
+    background-color: #fff;
+}
+
+.wpfn-element div {
+    box-sizing: border-box;
+    display: inline-block;
+    height: 70px;
+    width: 100%;
+    padding-top: 10px; /*padding-bottom: 70px;*/
+}
+
+.hndle label {
+    margin: 0 10px 0 0;
+}
+
+.wpfn-element.ui-draggable-dragging .dashicons, #blocks .dashicons {
+    font-size: 60px;
+}
+
+#blocks table {
+    box-sizing: border-box;
+    width: 100%;
+    border-spacing: 7px;
+}
+
+#blocks table td {
+    text-align: center;
+    border: 1px solid #F1F1F1;
+}
+
+#blocks table td .wpfn-element, .wpfn-element p {
+    text-align: center;
+    cursor: move;
+}
+
+.wpfn-element.ui-draggable-dragging {
+    font-size: 60px;
+    width: 120px;
+    height: 120px;
+    background: #FFFFFF;
+    border: 1px solid #F1F1F1;
+}
+
+select {
+    vertical-align: top;
+}
+
+#email-content {
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+    background-color: #FFFFFF;
+}
+
+#email-body {
+    min-height: 20px;
+    padding: 10px;
+}
+
+#email-body ul {
+    list-style-type: disc;
+    margin-left: 2em;
+}
+
+#email-body h1 {
+    font-weight: bold;
+    padding: 0;
+    margin: 0.67em 0 0.67em 0;
+}
+
+#email-body h2 {
+    font-weight: bold;
+    padding: 0;
+    margin: 0.83em 0 0.83em 0;
+}
+
+#editor-actions {
+    border-right: 1px solid rgb(238, 238, 238);
+    min-height: 50px;
+}
+
+#editor-actions .postbox {
+    border: none;
+    box-shadow: none;
+}
+
+.text_block p {
+    font-size: inherit;
+    padding: 10px;
+    margin: 0;
+}
+
+.content-wrapper {
+    border: 2px solid transparent;
+}
+
+.active .content-wrapper {
+    border: 2px solid #35afe6 !important;
+}
+
+.action-icons {
+    display: none;
+}
+
+.active .action-icons {
+    background-color: #35afe6 !important;
+}
+
+.action-icons .dashicons:hover {
+    cursor: pointer;
+}
+
+.active .action-icons .dashicons:hover {
+    color: #ffffff;
+}
+
+.ui-sortable-helper .action-icons, .row:hover .action-icons {
+    display: block;
+    width: 100px;
+    margin-top: -30px;
+    float: right;
+    background-color: #EAEAEA;
+    text-align: center;
+    vertical-align: center;
+}
+
+.ui-sortable-helper .content-wrapper, .content-wrapper:hover {
+    border: 2px dashed #EAEAEA;
+    background-color: #FFF;
+}
+
+[contenteditable]:focus {
+    outline: 0px solid transparent;
+}
+
+.sortable-placeholder {
+    border-width: 2px;
+}
+
+.onoffswitch {
+    position: relative;
+    width: 110px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.onoffswitch-checkbox {
+    visibility: hidden;
+    position: absolute;
+}
+
+.onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid #999999;
+    border-radius: 4px;
+}
+
+.onoffswitch-inner {
+    display: block;
+    width: 200%;
+    margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block;
+    float: left;
+    width: 50%;
+    height: 30px;
+    padding: 0;
+    line-height: 30px;
+    font-size: 14px;
+    color: white;
+    box-sizing: border-box;
+}
+
+.onoffswitch-inner:before {
+    text-shadow: 0 -1px 1px #006799, 1px 0 1px #006799, 0 1px 1px #006799, -1px 0 1px #006799;
+    content: "Ready";
+    padding-left: 10px;
+    background-color: #008ec2;
+    color: #FFFFFF;
+}
+
+.onoffswitch-inner:after {
+    content: "Draft";
+    padding-right: 10px;
+    background-color: #EEEEEE;
+    color: #999999;
+    text-align: right;
+}
+
+.onoffswitch-switch {
+    display: block;
+    width: 21px;
+    margin: 4.5px;
+    background: #FFFFFF;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 78px;
+    border: 1px solid #999999;
+    border-radius: 4px;
+    transition: all 0.3s ease-in 0s;
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+}

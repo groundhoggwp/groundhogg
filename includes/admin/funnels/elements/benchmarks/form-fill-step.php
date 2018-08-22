@@ -14,17 +14,20 @@
 function wpfn_form_fill_funnel_step_html( $step_id )
 {
 
-    //todo finish function
+    $step = wpfn_get_funnel_step_by_id( $step_id );
+    //$title = $step[ 'funnelstep_title' ];
 
     ?>
 
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php echo esc_html__( 'Select a form.', 'groundhogg' ); ?></th>
-            <td>TODO FORM FILL HTML</td>
+            <th>
+                <?php esc_attr_e( 'Copy & Paste:', 'groundhogg' ); ?>
+            </th>
+            <td><p><strong><input class="regular-text" type="text" value='[gh_form id="<?php echo $step_id; ?>" fields="first,last,email,phone" submit="submit" success="/thank-you/" labels="off"]' readonly></strong></p>
+            </td>
         </tr>
-        </tbody>
     </table>
 
     <?php
@@ -32,11 +35,4 @@ function wpfn_form_fill_funnel_step_html( $step_id )
 
 add_action( 'wpfn_get_step_settings_form_fill', 'wpfn_form_fill_funnel_step_html' );
 
-function wpfn_form_fill_icon_html()
-{
-    ?>
-    <div class="dashicons dashicons-feedback"></div><p>Form Fill</p>
-    <?php
-}
 
-add_action( 'wpfn_benchmark_element_icon_html_form_fill', 'wpfn_form_fill_icon_html' );

@@ -204,11 +204,11 @@ add_action( 'wpfn_enqueue_next_funnel_action_remove_tag', 'wpfn_enqueue_apply_ta
 function wpfn_do_apply_tag_action( $step_id, $contact_id )
 {
     $tags = wpfn_get_step_meta( $step_id, 'tags', true );
-    foreach ( $tags as $tag_id ){
-        if ( wpfn_tag_exists( $tag_id ) && wpfn_get_contact_by_id( $contact_id ) && ! wpfn_has_tag( $contact_id, $tag_id ) ){
-            wpfn_apply_tag( $contact_id, $tag_id );
 
-            do_action( 'wpfn_tag_applied', $contact_id, $tag_id );
+    foreach ( $tags as $tag_id ){
+        if ( wpfn_tag_exists( intval( $tag_id ) ) && wpfn_get_contact_by_id( $contact_id ) && ! wpfn_has_tag( $contact_id, intval( $tag_id ) ) ){
+            wpfn_apply_tag( $contact_id, intval( $tag_id ) );
+            do_action( 'wpfn_tag_applied', $contact_id, intval( $tag_id ) );
         }
     }
 }
@@ -226,10 +226,9 @@ function wpfn_do_remove_tag_action( $step_id, $contact_id )
 {
     $tags = wpfn_get_step_meta( $step_id, 'tags', true );
     foreach ( $tags as $tag_id ){
-        if ( wpfn_tag_exists( $tag_id ) && wpfn_get_contact_by_id( $contact_id ) && wpfn_has_tag( $contact_id, $tag_id ) ){
-            wpfn_remove_tag( $contact_id, $tag_id );
-
-            do_action( 'wpfn_tag_removed', $contact_id, $tag_id );
+        if ( wpfn_tag_exists( intval( $tag_id ) ) && wpfn_get_contact_by_id( $contact_id ) && wpfn_has_tag( $contact_id, intval( $tag_id ) ) ){
+            wpfn_remove_tag( $contact_id, intval( $tag_id ) );
+            do_action( 'wpfn_tag_removed', $contact_id, intval( $tag_id ) );
         }
     }
 }

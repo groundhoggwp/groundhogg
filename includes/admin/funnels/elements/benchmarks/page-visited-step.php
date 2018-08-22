@@ -13,20 +13,6 @@
 
 function wpfn_page_visited_funnel_step_html( $step_id )
 {
-
-    //todo finish function
-
-    $pageId = wpfn_get_step_meta( $step_id, 'page_id' );
-
-    $args = array();
-
-    if ( $pageId ){
-        $args['selected'] = $pageId;
-    }
-
-    $args['name'] = wpfn_prefix_step_meta( $step_id, 'page_id' );
-    $args['id'] = wpfn_prefix_step_meta( $step_id, 'page_id' );
-
     $match_type = wpfn_get_step_meta( $step_id, 'match_type' );
     $match_url = wpfn_get_step_meta( $step_id, 'url_match' );
 
@@ -60,7 +46,7 @@ function wpfn_page_visited_funnel_step_html( $step_id )
 add_action( 'wpfn_get_step_settings_page_visited', 'wpfn_page_visited_funnel_step_html' );
 
 /**
- * Save the email type step
+ * Save the page visited type step
  *
  * @param $step_id int ID of the step we're saving.
  */

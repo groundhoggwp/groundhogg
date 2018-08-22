@@ -48,6 +48,16 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 </script>
 
 <style>
+    .wpfn-element{
+        height: 112px;
+        text-align: center;
+    }
+
+    .step-icon img{
+        margin: 0 auto 0 auto;
+        width:80%;
+    }
+
     .wpfn-element div{
         box-sizing: border-box;
         display: inline-block;
@@ -365,7 +375,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                             ?><tr><?php
                                         endif;
 
-                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img width="100%" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
+                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
 
                                         if ( $i & 1 ):
                                             ?></tr><?php
@@ -401,7 +411,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                             ?><tr><?php
                                         endif;
 
-                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img width="100%" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
+                                        ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
 
                                         if ( $i & 1 ):
                                             ?></tr><?php

@@ -50,7 +50,6 @@ function wpfn_email_opened_funnel_step_html( $step_id )
         </tr>
         </tbody>
     </table>
-
 	<?php
 }
 

@@ -10,6 +10,7 @@ class WPFN_Admin_Menu
 {
 
 	var $settings_page;
+	var $emails_page;
 
 	function __construct() {
 
@@ -18,13 +19,17 @@ class WPFN_Admin_Menu
 
 		$this->settings_page = new WPFN_Settings_Page();
 
+		if ( ! class_exists( 'WPFN_Emails' ) )
+            include dirname( __FILE__ ) . '/admin/emails/emails.php';
+
+		$this->emails_page = new WPFN_Emails_Page();
+
 		add_action( 'admin_menu', array( $this, 'setup_menu_items' ) );
 
 	}
 
 	function setup_menu_items()
 	{
-
         $page_title = 'Groundhogg';
         $menu_title = 'Groundhogg';
         $capability = 'manage_options';
@@ -33,7 +38,15 @@ class WPFN_Admin_Menu
         $icon = 'dashicons-email-alt';
         $position = 2;
 
-        $settings_page = add_menu_page( $page_title, $menu_title, $capability, $slug, $callback, $icon, $position );
+        $settings_page = add_menu_page(
+            $page_title,
+            $menu_title,
+            $capability,
+            $slug,
+            $callback,
+            $icon,
+            $position
+        );
 
         $contacts_admin_add = add_submenu_page(
             'groundhogg',
@@ -68,7 +81,7 @@ class WPFN_Admin_Menu
 			'Emails',
 			'manage_options',
 			'gh_emails',
-			array( $this, 'emails_callback' )
+			array( $this->emails_page, 'page' )
 		);
 
         add_action( "load-" . $email_admin_add, array( $this, 'emails_help_bar' ) );
@@ -101,11 +114,6 @@ class WPFN_Admin_Menu
     {
 
     }
-
-	function emails_callback()
-	{
-		include dirname( __FILE__ ) . '/admin/emails/emails.php';
-	}
 
 	function emails_help_bar()
     {
