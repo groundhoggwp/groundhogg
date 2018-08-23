@@ -8,6 +8,44 @@
 
 
 /**
+ * If the link is pobviously a superlink, then perform the request actions...
+ */
+function wpfn_process_superlink()
+{
+    if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/superlinks/link/' ) === false )
+        return;
+
+    $link_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+    $link_parts = explode( '/', $link_path );
+    $link_id = intval( $link_parts[ count( $link_parts) -1 ] );
+
+    $link = wpfn_get_superlink_by_id( $link_id );
+
+    if ( ! $link )
+        return;
+
+    $contact = wpfn_get_the_contact();
+
+    if ( $link[ 'tags' ] && $contact )
+    {
+        $tags = maybe_unserialize( $link['tags'] );
+
+        foreach ( $tags as $tag_id )
+        {
+            wpfn_apply_tag( $contact->getId(), $tag_id );
+        }
+    }
+
+    if ( ! $link['target'] )
+        return;
+
+    wp_redirect( esc_url_raw( $link['target'] ) );
+}
+
+add_action( 'init', 'wpfn_process_superlink' );
+
+
+/**
  * Do the link replacement...
  *
  * @param $linkId int the ID of the link

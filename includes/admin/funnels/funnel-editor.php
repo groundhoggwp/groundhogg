@@ -13,12 +13,6 @@
 
 $funnel_id = intval( $_GET['funnel'] );
 
-
-foreach ( glob( dirname( __FILE__ ) . "/elements/*/*.php" ) as $filename )
-{
-    include $filename;
-}
-
 //for link editor
 wp_enqueue_editor();
 wp_enqueue_script('wplink');
@@ -27,7 +21,7 @@ wp_enqueue_style('editor-buttons');
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 wp_enqueue_script( 'jquery-ui-datepicker' );
-wp_enqueue_style( 'jquery-ui', 'http://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
+wp_enqueue_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
 wp_enqueue_script( 'link-picker', WPFN_ASSETS_FOLDER . '/js/admin/link-picker.js' );
 //wp_enqueue_script( 'sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-admin-sidebar.js' );
 wp_enqueue_script( 'sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-sidebar.js' );

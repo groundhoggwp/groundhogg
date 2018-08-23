@@ -9,6 +9,12 @@
  * @since       0.1
  */
 
+define( 'WPFN_UNCONFIRMED', 0 );
+define( 'WPFN_CONFIRMED', 1 );
+define( 'WPFN_UNSUBSCRIBED', 2 );
+define( 'WPFN_WEEKLY', 3 );
+define( 'WPFN_MONTHLY', 4 );
+
 /**
  * Get the text explanation for the optin status of a contact
  * 0 = unconfirmed, can send email
@@ -29,15 +35,21 @@ function wpfn_get_optin_status_text( $status )
 
 	switch ( $status ){
 
-		case 0:
+		case WPFN_UNCONFIRMED:
 			return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
 			break;
-		case 1:
+		case WPFN_CONFIRMED:
 			return __( 'Confirmed. They will receive emails.', 'groundhogg' );
 			break;
-		case 2:
-			return __( 'Opted Out. They will not receive emails.', 'groundhogg' );
+		case WPFN_UNSUBSCRIBED:
+			return __( 'Unsubscribed. They will not receive emails.', 'groundhogg' );
 			break;
+        case WPFN_WEEKLY:
+            return __( 'This contact will only receive emails weekly.', 'groundhogg' );
+            break;
+        case WPFN_MONTHLY:
+            return __( 'This contact will only receive emails monthly.', 'groundhogg' );
+            break;
 		default:
 			return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
 			break;
@@ -109,7 +121,7 @@ function wpfn_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 	$contact_exists = wpfn_get_contact_by_email( $email );
 
 	if ( $contact_exists ){
-		return false;
+		return intval( $contact_exists[ 'ID' ] );
 	}
 
 	$id = wpfn_insert_new_contact( $email, $first, $last );
@@ -129,6 +141,53 @@ function wpfn_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 
 }
 
+
+function wpfn_encrypt_decrypt( $string, $action = 'e' ) {
+    // you may change these values to your own
+    $encrypt_method = "AES-256-CBC";
+
+    if ( ! get_option( 'gh_secret_key', false ) )
+        update_option( 'gh_secret_key', wp_generate_password() );
+
+    if ( ! get_option( 'gh_secret_iv', false ) )
+        update_option( 'gh_secret_iv', wp_generate_password() );
+
+    if ( in_array( $encrypt_method, openssl_get_cipher_methods()) ){
+        $secret_key = get_option( 'gh_secret_key' );
+        $secret_iv = get_option( 'gh_secret_iv' );
+
+        $output = false;
+        $key = hash( 'sha256', $secret_key );
+        $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
+
+        if( $action == 'e' ) {
+            $output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+        }
+        else if( $action == 'd' ){
+            $output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv );
+        }
+    } else {
+        if( $action == 'e' ) {
+            $output = base64_encode( $string );
+        }
+        else if( $action == 'd' ){
+            $output = base64_decode( $string );
+        }
+    }
+
+    return $output;
+}
+
+/**
+ * Set the contact cookie for reference
+ *
+ * @param $id int the ID of the contact
+ */
+function wpfn_set_the_contact( $id )
+{
+    setcookie( 'gh_contact', wpfn_encrypt_decrypt( $id, 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+}
+
 /**
  * Return the contact ID of the current contact, perhaps if they are broswing the site based on a cookie.
  *
@@ -136,10 +195,39 @@ function wpfn_quick_add_contact( $email, $first='', $last='', $phone='', $extens
  */
 function wpfn_get_the_contact()
 {
-    //todo implement a get the contact function
-    // this will likely return the contact ID based on a cookie, or possibly the URL if in the admin.
+    if ( is_admin() )
+        return false;
 
-    return new WPFN_Contact( 0 ) ;
+    if ( isset( $_COOKIE[ 'gh_contact' ] ) ){
+        /* if the contact cookie has been set. */
+        $id = wpfn_encrypt_decrypt( sanitize_text_field( $_COOKIE[ 'gh_contact' ] ), 'd' );
+    } else if ( isset( $_GET[ 'contact' ] ) ){
+        /* if the contact is coming from an email link */
+        $id = wpfn_encrypt_decrypt( urldecode( $_REQUEST[ 'contact' ] ), 'd' );
+    } else if ( isset( $_REQUEST[ 'email' ] ) ) {
+        /* possibly they are in the process of a form submission and the cookie has yet to be sent.*/
+        if ( is_email( sanitize_email( $_REQUEST['email'] ) ) ){
+            $contact = wpfn_get_contact_by_email( sanitize_email( $_REQUEST['email'] ) );
+            if ( ! empty( $contact ) ){
+                $id = intval( $contact['ID'] );
+            }
+        }
+    } else {
+        return false;
+    }
+
+
+    return new WPFN_Contact( $id ) ;
+}
+
+/**
+ * wrapper function for wpfn_get_the_contact
+ *
+ * @return false|WPFN_Contact the contact instance or false on failure.
+ */
+function wpfn_get_current_contact()
+{
+    return wpfn_get_the_contact();
 }
 
 /**
@@ -345,4 +433,47 @@ function wpfn_dropdown_tags( $args )
     }
 
     return $html;
+}
+
+/**
+ * If the contact is visiting the confirmation page then confirm the email address!
+ */
+function wpfn_process_email_confirmation()
+{
+    if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-confirmation/via/email' ) === false )
+        return;
+
+    $contact = wpfn_get_the_contact();
+
+    if ( ! $contact )
+        return;
+
+    wpfn_update_contact( $contact->getId(), 'optin_status', 1 );
+
+    $conf_page = get_permalink( get_option( 'gh_confirmation_page' ) );
+
+    do_action( 'wpfn_email_confirmed', $contact->getId() );
+
+    wp_redirect( $conf_page );
+    die();
+}
+
+add_action( 'init', 'wpfn_process_email_confirmation' );
+
+/**
+ * Get the IP address of the current visiotor
+ *
+ * @return string the IP of a vsitor.
+ */
+function wpfn_get_visitor_ip() {
+    if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+        //check ip from share internet
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+        //to check ip is pass from proxy
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return apply_filters( 'wpfn_get_ip', $ip );
 }

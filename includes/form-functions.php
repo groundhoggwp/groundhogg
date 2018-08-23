@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Check if GDPR is enabled throughout the plugin.
+ *
+ * @return bool, whether it's enable or not.
+ */
+function wpfn_is_gdpr()
+{
+    return in_array( 'on', get_option( 'gh_enable_gdpr', array() ) );
+}
+
+/**
+ * Output the form html based on the settings.
+ *
+ * @param $atts array the shortcode attributes
+ * @return string the form html
+ */
 function wpfn_form_shortcode( $atts )
 {
     $a = shortcode_atts( array(
@@ -7,14 +23,16 @@ function wpfn_form_shortcode( $atts )
         'submit' => __( 'Submit' ),
         'success' => '',
         'labels' => 'on',
-        'id' => 0
+        'id' => 0,
+        'gdpr' => 'off',
+        'classes' => ''
     ), $atts );
 
     $fields = array_map( 'trim', explode( ',', $a['fields'] ) );
 
     $form = '<div class="gh-form-wrapper">';
 
-    $form .= "<form method='post' class='gh-form' action='" . esc_url_raw( $a['success'] ) . "'>";
+    $form .= "<form method='post' class='gh-form " . $a[ 'classes' ] ."' action='" . esc_url_raw( $a['success'] ) . "'>";
 
     $form .= wp_nonce_field( 'gh_submit', 'gh_submit_nonce', true, false );
 
@@ -56,6 +74,15 @@ function wpfn_form_shortcode( $atts )
                     $form .= '</label>';
                 break;
         }
+    }
+
+    if ( wpfn_is_gdpr() )
+    {
+        $form .= '<div class="gh-consent-field"><p>';
+
+        $form .= '<label>';
+        $form .= ' <input class="gh-form-input" type="checkbox" name="gdpr_consent" id="' . $id . '" title="' . __( 'Explicit Consent', 'groundhogg' ) . '" required> ';
+        $form .=  __( 'I consent to receive marketing & transactional information from ' . get_bloginfo( 'name' ) . ' and I agree to the terms of service.' , 'groundhogg' ) . '</label>';
 
         $form .= '</p></div>';
     }
@@ -76,8 +103,16 @@ add_shortcode( 'gh_form', 'wpfn_form_shortcode' );
 function wpfn_form_submit_listener()
 {
     /* verify real user */
-    if ( ! isset( $_POST[ 'gh_submit_nonce' ] ) || ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) )
+    if ( ! isset( $_POST[ 'gh_submit_nonce' ] ) )
         return;
+
+    if( ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) )
+        wp_redirect( wp_get_referer() );
+
+    if ( wpfn_is_gdpr() ){
+        if ( ! isset( $_POST[ 'gdpr_consent' ] ) )
+            wp_redirect( wp_get_referer() );
+    }
 
     /* verify email exists */
     if ( ! isset( $_POST['email'] ) || ! isset( $_POST[ 'step_id' ] ) )
@@ -95,30 +130,181 @@ function wpfn_form_submit_listener()
     if ( isset( $_POST[ 'phone' ] ) )
         $args['phone'] = sanitize_text_field( $_POST[ 'phone' ] );
 
+    if ( ! is_email( $args['email'] ) )
+        wp_redirect( wp_get_referer() );
 
-    wp_parse_args( $args, array(
+    $args = wp_parse_args( $args, array(
         'first' => '',
         'last'  => '',
         'email' => '',
         'phone' => '',
     ));
 
-    $contact = new WPFN_Contact( $args[ 'email' ] );
+    $id = wpfn_quick_add_contact( $args['email'], $args['first'], $args['last'], $args['phone'] );
 
-    if ( $contact->getEmail() ){
+    $contact = new WPFN_Contact( $id );
+    /* if gdpr is enabled, make sure that the consent box is checked */
+    if ( wpfn_is_gdpr() )
+        wpfn_update_contact_meta( $id, 'gdpr_consent', 'yes' );
 
-        wpfn_update_contact( $contact->getId(), 'first_name', $args['first'] );
-        wpfn_update_contact( $contact->getId(), 'last_name', $args['last'] );
-        wpfn_update_contact_meta( $contact->getId(), 'phone_primary', $args['phone'] );
-        $id = $contact->getId();
+    /* Set the IP address of the contact */
+    wpfn_update_contact_meta( $id, 'ip_address', wpfn_get_visitor_ip() );
 
-    } else {
-        $id = wpfn_quick_add_contact( $args['email'], $args['first'], $args['last'], $args['phone'] );
-    }
+    /* Set the Leadsource if it doesn't exist */
+    if ( ! wpfn_get_contact_meta( $id, 'source_page', true) )
+        wpfn_update_contact_meta( $id, 'source_page', wp_get_referer() );
+
+    /* if the contact previously unsubscribed, set them to unconfirmed. */
+    if ( $contact->getOptInStatus() === WPFN_UNSUBSCRIBED )
+        wpfn_update_contact( $id, 'optin_status', WPFN_UNCONFIRMED );
+
+    /* set the contact cookie */
+    wpfn_set_the_contact( $id );
 
     $step = intval( $_POST[ 'step_id' ] );
+
+    /* make sure the funnel for the step is active*/
+    if ( ! wpfn_get_funnel_step_by_id( $step ) || ! wpfn_is_funnel_active( wpfn_get_step_funnel( $step ) ) )
+        wp_die( __( 'This form is not accepting submissions right now.' ) );
+
 
     do_action( 'wpfn_form_submit', $step, $id );
 }
 
 add_action( 'init', 'wpfn_form_submit_listener' );
+
+/**
+ * Ouput the html for the email preferences form.
+ *
+ * @return string
+ */
+function wpfn_email_preferences_form()
+{
+
+    $contact = wpfn_get_the_contact();
+
+    if ( ! $contact )
+        return __( 'No email to manage.' );
+
+    ob_start();
+
+    ?>
+    <div class="gh-form-wrapper">
+        <p><?php _e( 'Hi' )?> <strong><?php echo $contact->getFullName(); ?></strong></p>
+        <p><?php _e( 'You are managing your email preferences for the email address: ', 'groundhogg' ) ?> <strong><?php echo $contact->getEmail(); ?></strong></p>
+        <form class="gh-form" method="post" action="">
+            <?php wp_nonce_field( 'change_email_preferences', 'email_preferences_nonce' ) ?>
+            <?php if ( ! empty( $_POST ) ):
+                ?><div class="gh-notice"><p><?php _e( 'Preferences Updated!', 'groundhogg' ); ?></p></div><?php
+            endif;
+            ?>
+            <div class="gh-form-field">
+                <p>
+                    <label><input type="radio" name="preference" value="none"> <?php _e( 'I love you guys. Send email whenever you want!' ); ?></label>
+                </p>
+            </div>
+            <div class="gh-form-field">
+                <p>
+                    <label><input type="radio" name="preference" value="weekly"> <?php _e( 'It\'s a bit much... start sending me emails weekly.' ); ?></label>
+                </p>
+            </div>
+            <div class="gh-form-field">
+                <p>
+                    <label><input type="radio" name="preference" value="monthly"> <?php _e( 'Distance makes the heart grow fonder. Only send emails monthly.' ); ?></label>
+                </p>
+            </div>
+            <div class="gh-form-field">
+                <p>
+                    <label><input type="radio" name="preference" value="unsubscribe"> <?php _e( 'I no longer wish to receive any emails. Unsubscribe me!' ); ?></label>
+                </p>
+            </div>
+            <div class="gh-form-field">
+                <p>
+                    <input type='submit' name='change_preferences' value='<?php _e('Change Preferences','groundhogg'); ?>' >
+                    <?php if ( wpfn_is_gdpr() ):?>
+                        <input type='submit' name='delete_everything' value='<?php _e('Delete Everything You Know About Me', 'groundhogg'); ?>' >
+                    <?php endif; ?>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <?php
+
+    $form = ob_get_contents();
+
+    ob_end_clean();
+
+    return $form;
+
+}
+
+add_shortcode( 'gh_email_preferences', 'wpfn_email_preferences_form' );
+
+/**
+ * Process changes to the subscription status of a contact.
+ */
+function wpfn_process_email_preferences_changes()
+{
+    if ( ! isset( $_POST[ 'email_preferences_nonce' ] ) || ! wp_verify_nonce( $_POST[ 'email_preferences_nonce' ], 'change_email_preferences' ) )
+        return;
+
+    $contact = wpfn_get_the_contact();
+
+    if ( ! $contact )
+        return;
+
+    if ( isset( $_POST[ 'delete_everything' ] ) )
+    {
+
+        do_action( 'wpfn_delete_everything', $contact->getId() );
+
+        wpfn_delete_contact( $contact->getId() );
+
+        $unsub_page = get_permalink( get_option( 'gh_unsubscribe_page' ) );
+
+        do_action( 'wpfn_preference_unsubscribe', $contact->getId() );
+
+        wp_redirect( $unsub_page );
+        die();
+    }
+
+    $preference = $_POST[ 'preference' ];
+
+    switch ( $preference ){
+        case 'none':
+
+            wpfn_update_contact( $contact->getId(), 'optin_status', WPFN_CONFIRMED );
+
+            do_action( 'wpfn_preference_none', $contact->getId() );
+
+            break;
+        case 'weekly':
+
+            wpfn_update_contact( $contact->getId(), 'optin_status', WPFN_WEEKLY );
+
+            do_action( 'wpfn_preference_weekly', $contact->getId() );
+
+            break;
+        case 'monthly':
+
+            wpfn_update_contact( $contact->getId(), 'optin_status', WPFN_MONTHLY );
+
+            do_action( 'wpfn_preference_monthly', $contact->getId() );
+
+            break;
+        case 'unsubscribe':
+
+            wpfn_update_contact( $contact->getId(), 'optin_status', WPFN_UNSUBSCRIBED );
+
+            $unsub_page = get_permalink( get_option( 'gh_unsubscribe_page' ) );
+
+            do_action( 'wpfn_preference_unsubscribe', $contact->getId() );
+
+            wp_redirect( $unsub_page );
+            die();
+            break;
+    }
+}
+
+add_action( 'init', 'wpfn_process_email_preferences_changes' );

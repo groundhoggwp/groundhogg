@@ -148,10 +148,12 @@ class WPFN_Tags_Page
 
 	function verify_action()
 	{
-		if ( ! isset( $_REQUEST['_wpnonce'] ) )
+        if ( ! isset( $_REQUEST['_wpnonce'] ) )
 			return false;
 
-		return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() );
+//        var_dump( $_REQUEST['_wpnonce'] );
+
+        return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-tags' );
 	}
 
 	function table()
@@ -218,7 +220,6 @@ class WPFN_Tags_Page
             <div id="col-right">
                 <div class="col-wrap">
                     <form id="posts-filter" method="post">
-						<?php wp_nonce_field(); ?>
 						<?php $tags_table->prepare_items(); ?>
 						<?php $tags_table->display(); ?>
                     </form>

@@ -45,9 +45,9 @@ class WPFN_Contacts_Table extends WP_List_Table {
             'email'    => _x( 'Email', 'Column label', 'wp-funnels' ),
             'first_name'   => _x( 'First Name', 'Column label', 'wp-funnels' ),
             'last_name' => _x( 'Last Name', 'Column label', 'wp-funnels' ),
-            'user_id' => _x( 'User ID', 'Column label', 'wp-funnels' ),
+            'user_id' => _x( 'Username', 'Column label', 'wp-funnels' ),
             'owner' => _x( 'Owner', 'Column label', 'wp-funnels' ),
-            'date_created' => _x( 'Date Created', 'Column label', 'wp-funnels' ),
+            'date_created' => _x( 'Date', 'Column label', 'wp-funnels' ),
         );
         return $columns;
     }
@@ -90,16 +90,18 @@ class WPFN_Contacts_Table extends WP_List_Table {
                 return $html;
                 break;
             case 'user_id':
-                return $item['user_id'] ? '<a href="'.admin_url('user-edit.php?user_id='.$item['user_id']).'">'.$item['user_id'].'</a>' :  '&#x2014;';
+                $user = get_user_by( 'email', $item[ 'email' ] );
+
+                return $user ? '<a href="'.admin_url('user-edit.php?user_id='.$user->ID ).'">'.$user->display_name.'</a>' :  '&#x2014;';
                 break;
             case 'owner':
                 $owner = get_userdata( $item['owner_id'] );
                 return ! empty( $item['owner_id'] ) ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=owner&owner=' .$item['owner_id'] ).'">'. $owner->user_login .'</a>' :  '&#x2014;';
                 break;
             case 'date_created':
-                return date('d/M/Y g:i a', strtotime($item['date_created']));
+                return __( 'Created' ) . '<br><abbr title="' . $item['date_created'] . '">' . date('Y/m/d', strtotime($item['date_created'])) . '</abbr>';
             default:
-                return print_r( $item[ $column_name ], true );
+                return ! empty( $item[ $column_name ] ) ? print_r( $item[ $column_name ], true ) : '&#x2014;' ;
                 break;
         }
     }
@@ -192,7 +194,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
         );
 
         return apply_filters( 'contact_views', array(
-            'all' => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . $base_url . "all" . "'>" . __( 'All <span class="count">('.array_sum($count).')</span>' ) . "</a>",
+            'all' => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . __( 'All <span class="count">('.array_sum($count).')</span>' ) . "</a>",
             'unconfirmed' => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . __( 'Unconfirmed <span class="count">('.$count['unconfirmed'].')</span>' ) . "</a>",
             'confirmed' => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . __( 'Confirmed <span class="count">('.$count['confirmed'].')</span>' ) . "</a>",
             'opted_out' => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . __( 'Unsubscribed <span class="count">('.$count['opted_out'].')</span>' ) . "</a>"

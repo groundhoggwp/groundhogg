@@ -67,7 +67,7 @@ function wpfn_activation()
     if ( ! get_option( 'gh_unsubscribe_page', false ) ){
         $unsubscribed_args = array(
             'post_title' => __( 'Unsubscribed', 'groundhogg' ),
-            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been unsubscribed.</h2><p>This means you will not receive any further marketing communication from us, but you may receive transactional emails related to billing.</p><p>Note that opting in again to any from or program on our site is implied consent and may result in starting to receive email communication again.</p>', 'groundhogg' ),
+            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been unsubscribed.</h2><p>This means you will not receive any further marketing communication from us, but you may receive transactional emails related to billing.</p><p>Note that opting in again to any optin form or program on our site is implied consent and may result in starting to receive email communication again.</p>', 'groundhogg' ),
             'post_type' => 'page',
             'post_status' => 'publish',
             'post_author' => get_current_user_id(),

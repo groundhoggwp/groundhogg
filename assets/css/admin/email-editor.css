@@ -1,3 +1,12 @@
+wpfn-toolbar{
+    z-index: 9999;
+    position: relative;
+}
+
+#from_user, #test_email{
+    width: 100%;
+}
+
 select {
     vertical-align: top;
 }
@@ -16,9 +25,11 @@ select {
 .wpfn-element div {
     box-sizing: border-box;
     display: inline-block;
-    height: 70px;
     width: 100%;
-    padding-top: 10px; /*padding-bottom: 70px;*/
+}
+
+.wpfn-element p{
+    margin: 0 0 5px 0;
 }
 
 .hndle label {
@@ -36,7 +47,6 @@ select {
 }
 
 #blocks table td {
-    text-align: center;
     border: 1px solid #F1F1F1;
 }
 
@@ -62,6 +72,10 @@ select {
     margin-right: auto;
     box-sizing: border-box;
     background-color: #FFFFFF;
+}
+
+#email-body a:focus{
+    box-shadow: none;
 }
 
 #email-body {
@@ -96,10 +110,14 @@ select {
     box-shadow: none;
 }
 
-.text_block p {
+.text_block .simple-editor-content{
+    margin: 5px;
+}
+
+.text_block p{
+    font-family: inherit;
     font-size: inherit;
-    padding: 10px;
-    margin: 0;
+    margin: 1em 0;
 }
 
 .content-wrapper {
@@ -225,4 +243,10 @@ select {
 
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px;
+}
+.builder-icon{
+    text-align: center;
+}
+.builder-icon img{
+    width: 80%;
 }

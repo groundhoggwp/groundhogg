@@ -182,7 +182,7 @@ class WPFN_Emails_Page
         if ( ! isset( $_REQUEST['_wpnonce'] ) )
             return false;
 
-        return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() );
+        return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() )|| wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-emails' );
     }
 
     function table()
@@ -225,6 +225,9 @@ class WPFN_Emails_Page
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
             <?php $this->get_notice(); ?>
+            <?php if( isset( $_POST['send_test'] ) ): ?>
+                <div class="notice notice-success is-dismissible"><p><?php _e( 'Sent test email.', 'groundhogg' ); ?></p></div>
+            <?php endif; ?>
             <hr class="wp-header-end">
             <?php switch ( $this->get_action() ){
                 case 'add':

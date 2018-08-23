@@ -305,7 +305,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                     </tr>
                                     <tr>
                                         <th><?php _e( 'From User:' ); ?></th>
-                                        <?php $args = array( 'id' => 'from_user', 'name' => 'from_user', 'selected' => wpfn_get_email_meta( $email_id, 'from_user', true ) ); ?>
+                                        <?php $args = array( 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user); ?>
                                         <td><?php wp_dropdown_users( $args); ?><script>jQuery(document).ready(function(){jQuery( '#from_user' ).select2()});</script></td>
                                     </tr>
                                     <tr>
@@ -347,16 +347,16 @@ $email = wpfn_get_email_by_id( $email_id );
                         <table>
                             <tbody>
                             <tr>
-                                <td><div id='text_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-text"></div><p>Text</p></div></td>
-                                <td><div id='spacer_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-image-flip-vertical"></div><p>Spacer</p></div></td>
+                                <td><div id='text_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/text-block.png'; ?>"></div><p><?php _e( 'Text', 'groundhogg' ); ?></p></div></td>
+                                <td><div id='spacer_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/spacer-block.png'; ?>"></div><p><?php _e( 'Spacer', 'groundhogg' ); ?></p></div></td>
                             </tr>
                             <tr>
-                                <td><div id='divider_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-minus"></div><p>Divider</p></div></td>
-                                <td><div id='image_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-format-image"></div><p>Image</p></div></td>
+                                <td><div id='divider_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/divider.png'; ?>"></div><p><?php _e( 'Divider', 'groundhogg' ); ?></p></div></td>
+                                <td><div id='image_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/image-block.png'; ?>"></div><p><?php _e( 'Image', 'groundhogg' ); ?></p></div></td>
                             </tr>
                             <tr>
-                                <td><div id='button_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-id-alt"></div><p>Button</p></div></td>
-                                <td><div id='code_block' class="wpfn-element email-draggable"><div class="dashicons dashicons-editor-code"></div><p>HTML</p></div></td>
+                                <td><div id='button_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/button.png'; ?>"></div><p><?php _e( 'Button', 'groundhogg' ); ?></p></div></td>
+                                <td><div id='code_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/html-block.png'; ?>"></div><p><?php _e( 'HTML', 'groundhogg' ); ?></p></div></td>
                             </tr>
                             </tbody>
                         </table>

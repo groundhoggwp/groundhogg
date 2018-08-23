@@ -163,7 +163,13 @@ class WPFN_Emails_Table extends WP_List_Table {
                 $from_user = esc_html( $user->user_login );
                 $queryUrl = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $item['author'] );
                 return "<a href='$queryUrl'>$from_user</a>";
-			default:
+            case 'date_created':
+                return __( 'Created' ) . '<br><abbr title="' . $item['date_created'] . '">' . date('Y/m/d', strtotime($item['date_created'])) . '</abbr>';
+                break;
+            case 'last_updated':
+                return __( 'Updated' ) . '<br><abbr title="' . $item['last_updated'] . '">' . date('Y/m/d', strtotime($item['last_updated'])) . '</abbr>';
+                break;
+            default:
 				return print_r( $item[ $column_name ], true );
 				break;
 		}

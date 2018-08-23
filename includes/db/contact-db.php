@@ -165,13 +165,9 @@ function wpfn_insert_new_contact( $email, $first='', $last='', $owner_id='', $us
     if ( ! $email || ! is_string( $email ) )
         return false;
 
-    $email = stripslashes( strtolower( $email ) );
+    $email = sanitize_email( stripslashes( strtolower( $email ) ) );
     if ( ! $email )
         return false;
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return false;
-    }
 
     $success = $wpdb->insert(
         $wpdb->prefix . WPFN_CONTACTS,

@@ -224,6 +224,18 @@ class WPFN_Settings_Page
                 'section' => 'compliance',
                 'page' => 'groundhogg_marketing_settings'
             ),
+            array(
+                'label' => 'Enable GDPR features.',
+                'id' => 'gh_enable_gdpr',
+                'type' => 'radio',
+                'desc' => 'This will add a consent box to your forms as well as a "Delete Everything" Button to your email preferences page.',
+                'section' => 'compliance',
+                'page' => 'groundhogg_marketing_settings',
+                'options' => array(
+                    'on' => 'On',
+                    'off' => 'Off',
+                ),
+            ),
 
 		);
 		foreach( $fields as $field ){
@@ -241,13 +253,18 @@ class WPFN_Settings_Page
                 if( ! empty ( $field['options'] ) && is_array( $field['options'] ) ) {
                     $options_markup = '';
                     $iterator = 0;
+
+                    if ( ! is_array( $value ) ){
+                        $value = array( $value );
+                    }
+
                     foreach( $field['options'] as $key => $label ) {
                         $iterator++;
                         $options_markup.= sprintf('<label for="%1$s_%6$s"><input id="%1$s_%6$s" name="%1$s[]" type="%2$s" value="%3$s" %4$s /> %5$s</label><br/>',
                             $field['id'],
                             $field['type'],
                             $key,
-                            checked($value[array_search($key, $value, true)], $key, false),
+                            checked( $value[array_search($key, $value, true)], $key, false ),
                             $label,
                             $iterator
                         );

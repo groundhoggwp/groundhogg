@@ -25,6 +25,11 @@ class WPFN_Funnels_Page
 
 			add_action( 'init' , array( $this, 'process_action' )  );
 
+            foreach ( glob( dirname( __FILE__ ) . "/elements/*/*.php" ) as $filename )
+            {
+                include $filename;
+            }
+
 		}
 	}
 
@@ -183,7 +188,7 @@ class WPFN_Funnels_Page
 		if ( ! isset( $_REQUEST['_wpnonce'] ) )
 			return false;
 
-		return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() );
+		return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-funnels' ) ;
 	}
 
 	function table()

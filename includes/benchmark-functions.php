@@ -149,19 +149,19 @@ add_action( 'set_user_role', 'wpfn_run_user_role_changed_benchmark', 10, 3 );
  *
  * @param $post_object object post object goes unused.
  */
-function wpfn_complete_page_view_benchmark( $post_object )
+function wpfn_complete_page_visited_benchmark()
 {
     if ( is_admin() )
         return;
 
-    $contact = wpfn_get_the_contact();
+    $contact = wpfn_get_current_contact();
 
     if ( ! $contact )
         return;
 
     $contact_id = $contact->getId();
 
-    $benchmarks = wpfn_get_funnel_steps_by_type( 'page_view' );
+    $benchmarks = wpfn_get_funnel_steps_by_type( 'page_visited' );
 
     if ( ! $benchmarks )
         return;
@@ -170,17 +170,27 @@ function wpfn_complete_page_view_benchmark( $post_object )
 
         $step_id = intval( $benchmark['ID'] );
         $step_order = intval( $benchmark['funnelstep_order'] );
-        $funnel_id = intval( $benchmarks['funnel_id'] );
+        $funnel_id = intval( $benchmark['funnel_id'] );
 
-        $page_id = wpfn_get_step_meta( $step_id, 'page_id', true );
+        if ( wpfn_is_funnel_active( $funnel_id ) ){
 
-        if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $page_id === get_the_ID() ){
-            wpfn_complete_benchmark( $step_id, $contact_id );
+            $match_type = wpfn_get_step_meta( $step_id, 'match_type', true );
+            $match_url = wpfn_get_step_meta( $step_id, 'url_match', true );
+
+            if ( $match_type === 'exact' ){
+                $is_page = site_url( $_SERVER['REQUEST_URI'] ) === $match_url;
+            } else {
+                $is_page = strpos( site_url( $_SERVER['REQUEST_URI'] ), $match_url ) !== false;
+            }
+
+            if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $is_page ){
+                wpfn_complete_benchmark( $step_id, $contact_id );
+            }
         }
     }
 }
 
-add_action( 'the_post', 'wpfn_complete_page_view_benchmark' );
+add_action( 'wp_head', 'wpfn_complete_page_visited_benchmark' );
 
 /**
  * Complete the tag removed benchmark
@@ -199,7 +209,7 @@ function wpfn_complete_tag_removed_benchmark( $contact_id, $tag_id )
 
         $step_id = intval( $benchmark['ID'] );
         $step_order = intval( $benchmark['funnelstep_order'] );
-        $funnel_id = intval( $benchmarks['funnel_id'] );
+        $funnel_id = intval( $benchmark['funnel_id'] );
 
         $tags = wpfn_get_step_meta( $step_id, 'tags', true );
 
@@ -228,7 +238,7 @@ function wpfn_complete_tag_applied_benchmark( $contact_id, $tag_id )
 
         $step_id = intval( $benchmark['ID'] );
         $step_order = intval( $benchmark['funnelstep_order'] );
-        $funnel_id = intval( $benchmarks['funnel_id'] );
+        $funnel_id = intval( $benchmark['funnel_id'] );
 
         $tags = wpfn_get_step_meta( $step_id, 'tags', true );
 

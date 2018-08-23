@@ -617,6 +617,8 @@ function wpfn_save_funnel( $funnel_id )
     if ( empty( $_POST ) )
         return;
 
+    //wp_die( 'made-it-here' );
+
 //    do_action( 'wpfn_save_funnel', $funnel_id );
 
     $title = sanitize_text_field( stripslashes( $_POST[ 'funnel_title' ] ) );
@@ -643,13 +645,19 @@ function wpfn_save_funnel( $funnel_id )
 
     foreach ( $steps as $i => $stepId )
     {
+
+        //wp_die( 'made-it-here' );
+
         $stepId = intval( $stepId );
         //quick Order Hack to get the proper order of a step...
         $order = $i + 1;
         wpfn_update_funnel_step( $stepId, 'funnelstep_order', $order );
 
         $title = sanitize_text_field( stripslashes( $_POST[ wpfn_prefix_step_meta( $stepId, 'title' ) ] ) );
+
         wpfn_update_funnel_step( $stepId, 'funnelstep_title', $title );
+
+        wpfn_update_funnel_step( $stepId, 'funnelstep_status', 'ready' );
 
         $step_type = wpfn_get_step_type( $stepId );
 

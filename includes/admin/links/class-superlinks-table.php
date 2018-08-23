@@ -45,8 +45,9 @@ class WPFN_Superlinks_Table extends WP_List_Table {
             'name'    => _x( 'Name', 'Column label', 'groundhogg' ),
             'replacement'    => _x( 'Replacement Code', 'Column label', 'groundhogg' ),
             'target'    => _x( 'Target Url', 'Column label', 'groundhogg' ),
+            'source'    => _x( 'Source Url', 'Column label', 'groundhogg' ),
             'tags'   => _x( 'Tags', 'Column label', 'groundhogg' ),
-            'clicks' => _x( 'Clicks', 'Column label', 'groundhogg' ),
+            //'clicks' => _x( 'Clicks', 'Column label', 'groundhogg' ),
         );
         return $columns;
     }
@@ -102,6 +103,8 @@ class WPFN_Superlinks_Table extends WP_List_Table {
 
                 return implode( ', ', $tags );
                 break;
+            case 'source':
+                return site_url( 'superlinks/link/' . $item['ID'] );
             case 'clicks':
                 return ! empty( $item['clicks'] ) ? $item['clicks'] : '0';
             default:

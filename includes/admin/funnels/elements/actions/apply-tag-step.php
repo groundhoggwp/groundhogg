@@ -47,15 +47,6 @@ function wpfn_apply_tag_funnel_step_html( $step_id )
 
 add_action( 'wpfn_get_step_settings_apply_tag', 'wpfn_apply_tag_funnel_step_html' );
 
-function wpfn_apply_tag_icon_html()
-{
-    ?>
-    <div class="dashicons dashicons-tag"></div><p><?php _e( 'Apply Tag', 'groundhogg' ); ?></p>
-    <?php
-}
-
-add_action( 'wpfn_action_element_icon_html_apply_tag', 'wpfn_apply_tag_icon_html' );
-
 /**
  * Save the apply tag step
  *

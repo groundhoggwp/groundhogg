@@ -57,14 +57,13 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     if ( $step_id && is_int( $step_id ) )
         $link_args['step'] = absint( $step_id );
 
-    //$link_args['enc_contact_id'] = wpfn_encrypt( $contact_id ); //todo create the encryption algo for the contact for later reference.
-    $link_args['contact'] = $contact_id; //todo remove this line
+    $link_args['contact'] = wpfn_encrypt_decrypt( $contact_id, 'e' );
     $link_args['email'] = $email_id;
 
     /**
      * @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to.
      */
-    $ref_link = add_query_arg( $link_args, site_url( 'gh-tracking/' ) ) . '&ref=';
+    $ref_link = add_query_arg( $link_args, site_url( 'gh-tracking/via/email/' ) ) . '&ref=';
 
     $email = wpfn_get_email_by_id( $email_id );
 
@@ -79,7 +78,7 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     $pre_header = wpfn_do_replacements( $contact_id, $email->pre_header );
     $content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
     $email_footer_text = wpfn_get_email_footer_text();
-//    $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
+    $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
     $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
     if ( $alignment === 'left' ){
         $margins = "margin-left:0;margin-right:auto;";
@@ -453,8 +452,6 @@ function wpfn_send_test_email( $email_id )
         wpfn_send_email( $test_email_uid, $email_id );
 
         do_action( 'wpfn_after_send_test_email', $email_id );
-
-        ?><div class="notice notice-success is-dismissible"><p>Successfully sent test email!</p></div><?php
     }
 }
 
@@ -525,18 +522,31 @@ function wpfn_email_status( $id )
 /**
  * Perform the stats collection when a contact clicks a link in an email.
  */
-function wpfn_do_email_tracking()
+function wpfn_process_email_tracking()
 {
-    if ( strpos( $_SERVER[ 'REQUEST_URI' ], 'gh-tracking' ) < 0 )
+    if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/via/email/' ) === false )
         return;
 
     //todo click thru rate, open rate, etc...
 
-    $ref = urldecode( $_GET[ 'ref' ] );
+    if ( ! isset( $_GET['ref'] ) || empty( $_GET['ref'] ) )
+        $ref = site_url();
+    else
+        $ref = urldecode( $_GET[ 'ref' ] );
+
+    $contact = wpfn_get_the_contact();
+
+    if ( ! $contact ){
+        /* do not do tracking if there is no contact to track */
+        wp_redirect( $ref );
+        die();
+    }
+
+    wpfn_set_the_contact( $contact->getId() );
 
     /* send to original destination. */
     wp_redirect( $ref );
     die();
 }
 
-//add_action( 'plugins_loaded', 'wpfn_do_email_tracking' );
+add_action( 'init', 'wpfn_process_email_tracking' );

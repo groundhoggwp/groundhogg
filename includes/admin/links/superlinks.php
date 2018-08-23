@@ -151,7 +151,7 @@ class WPFN_Superlinks_Page
 		if ( ! isset( $_REQUEST['_wpnonce'] ) )
 			return false;
 
-		return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() );
+		return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-superlinks' );
 	}
 
 	function table()
