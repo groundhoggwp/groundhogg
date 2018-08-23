@@ -211,73 +211,6 @@ class WPFN_Funnels_Table extends WP_List_Table {
 
         return apply_filters( 'wpfn_email_bulk_actions', $actions );
     }
-    /**
-     * Handle bulk actions.
-     *
-     * @see $this->prepare_items()
-     */
-    protected function process_bulk_action() {
-        // Detect when a bulk action is being triggered.
-        global $wpdb;
-
-        if ( ! isset( $_REQUEST[ 'funnel' ] ) )
-            return;
-
-        $items = $_REQUEST[ 'funnel' ];
-
-        if ( ! is_array( $items ) || empty( $items ) )
-            return;
-
-        $sendback = remove_query_arg( 'action' , wp_get_referer() );
-
-        switch ( $this->current_action() ){
-            case 'delete':
-
-                foreach ( $items as $id ){
-                    do_action( 'wpfn_funnel_deleted', $id );
-                    wpfn_delete_funnel( intval( $id ) );
-                }
-
-                $sendback = add_query_arg( array(
-                    'notice' => 'deleted',
-                    'funnels' => urlencode( implode( ',', $items ) )
-                ), $sendback );
-
-                break;
-            case 'restore':
-
-                foreach ( $items as $id ){
-                    do_action( 'wpfn_funnel_restored', $id );
-                    wpfn_update_funnel( intval( $id ), 'funnel_status', 'inactive' );
-                }
-
-                $sendback = add_query_arg( array(
-                    'notice' => 'restored',
-                    'funnels' => urlencode( implode( ',', $items ) )
-                ), $sendback );
-
-                break;
-            case 'archive':
-
-                foreach ( $items as $id ){
-                    do_action( 'wpfn_funnel_archived', $id );
-                    wpfn_update_funnel( intval( $id ), 'funnel_status', 'archived' );
-                }
-
-                $sendback = add_query_arg( array(
-                    'notice' => 'archived',
-                    'funnels' => urlencode( implode( ',', $items ) )
-                ), $sendback );
-
-                break;
-            default:
-                do_action( 'wpfn_funnels_process_bulk_action_' . $this->current_action() );
-                break;
-        }
-
-        wp_redirect( $sendback );
-        die();
-    }
 
     /**
      * Prepares the list of items for displaying.
@@ -302,8 +235,6 @@ class WPFN_Funnels_Table extends WP_List_Table {
         $sortable = $this->get_sortable_columns();
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
-
-        $this->process_bulk_action();
 
         $table_name = $wpdb->prefix . WPFN_FUNNELS;
 

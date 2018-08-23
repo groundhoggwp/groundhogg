@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Contact_Tags_Table extends WP_List_Table {
+class WPFN_Tags_Table extends WP_List_Table {
     /**
      * TT_Example_List_Table constructor.
      *
@@ -68,7 +68,7 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
     protected function column_default( $item, $column_name ) {
         switch ( $column_name ) {
             case 'tag_name':
-                $editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag_id=' . $item['tag_id'] );
+                $editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $item['tag_id'] );
                 $html  = '<div id="inline_' .$item['tag_id']. '" class="hidden">';
                 $html .= '  <div class="name">' .$item['tag_name']. '</div>';
                 $html .= '  <div class="description">' .$item['tag_description']. '</div>';
@@ -79,7 +79,7 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
                 break;
             case 'contact_count':
                 $count = wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] );
-                return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag_id='.$item['tag_id']).'">'. wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) .'</a>' : '0';
+                return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$item['tag_id']).'">'. wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) .'</a>' : '0';
                 break;
             case 'tag_description':
                 return ! empty( $item['tag_description'] ) ? $item['tag_description'] : '&#x2014;';
@@ -109,42 +109,6 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
         );
 
         return apply_filters( 'wpfn_contact_tag_bulk_actions', $actions );
-    }
-    /**
-     * Handle bulk actions.
-     *
-     * Optional. You can handle your bulk actions anywhere or anyhow you prefer.
-     * For this example package, we will handle it in the class to keep things
-     * clean and organized.
-     *
-     * @see $this->prepare_items()
-     */
-    protected function process_bulk_action() {
-        // Detect when a bulk action is being triggered.
-        global $wpdb;
-
-        $doaction = $this->current_action();
-        $sendback = remove_query_arg( array( 'deleted' ), wp_get_referer() );
-
-        if ($doaction && isset($_REQUEST['tag'])) {
-            $ids = $_REQUEST['tag'];
-            switch ( $this->current_action() ){
-                case 'delete':
-                    $deleted = 0;
-                    if(!empty($ids)) {
-                        foreach ($ids as $id) {
-                            wpfn_delete_tag( intval( $id ) );
-                            $deleted++;
-                        }
-                    }
-                    $sendback = add_query_arg( array( 'notice' => 'deleted', 'tags' => urlencode( implode( ',', $ids ) ) ) , $sendback);
-                    break;
-                default:
-            }
-
-            wp_redirect( $sendback );
-            exit();
-        }
     }
 
     /**
@@ -181,11 +145,7 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
          * for sortable columns.
          */
         $this->_column_headers = array( $columns, $hidden, $sortable );
-        /**
-         * Optional. You can handle your bulk actions however you see fit. In this
-         * case, we'll handle them within our package just to keep things clean.
-         */
-        $this->process_bulk_action();
+
         /*
          * GET THE DATA!
          *
@@ -294,14 +254,14 @@ class WPFN_Contact_Tags_Table extends WP_List_Table {
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',
             /* translators: %s: title */
-            admin_url( 'admin.php?page=gh_tags&action=edit&tag_id=' . $item['tag_id'] ),
+            admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $item['tag_id'] ),
             esc_attr( sprintf( __( 'Edit' ), $title ) ),
             __( 'Edit' )
         );
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_tags&tad_id='. $item['tag_id'].'&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_tags&tag='. $item['tag_id'].'&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )

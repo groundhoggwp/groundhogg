@@ -11,6 +11,9 @@ class WPFN_Admin_Menu
 
 	var $settings_page;
 	var $emails_page;
+	var $funnels_page;
+	var $superlink_page;
+	var $tags_page;
 
 	function __construct() {
 
@@ -19,10 +22,25 @@ class WPFN_Admin_Menu
 
 		$this->settings_page = new WPFN_Settings_Page();
 
-		if ( ! class_exists( 'WPFN_Emails' ) )
+		if ( ! class_exists( 'WPFN_Emails_Page' ) )
             include dirname( __FILE__ ) . '/admin/emails/emails.php';
 
 		$this->emails_page = new WPFN_Emails_Page();
+
+		if ( ! class_exists( 'WPFN_Funnels_Page' ) )
+			include dirname( __FILE__ ) . '/admin/funnels/funnels.php';
+
+		$this->funnels_page = new WPFN_Funnels_Page();
+
+		if ( ! class_exists( 'WPFN_Superlinks_Page' ) )
+			include dirname( __FILE__ ) . '/admin/links/superlinks.php';
+
+		$this->superlink_page = new WPFN_Superlinks_Page();
+
+		if ( ! class_exists( 'WPFN_Tags_Page' ) )
+			include dirname( __FILE__ ) . '/admin/tags/tags.php';
+
+		$this->tags_page = new WPFN_Tags_Page();
 
 		add_action( 'admin_menu', array( $this, 'setup_menu_items' ) );
 
@@ -63,7 +81,7 @@ class WPFN_Admin_Menu
             'Tags',
             'manage_options',
             'gh_tags',
-            array( $this, 'tags_callback' )
+            array( $this->tags_page, 'page' )
         );
 
         $superlinks_admin_add = add_submenu_page(
@@ -72,7 +90,7 @@ class WPFN_Admin_Menu
             'Superlinks',
             'manage_options',
             'gh_superlinks',
-            array( $this, 'superlinks_callback' )
+            array( $this->superlink_page, 'page' )
         );
 
 		$email_admin_add = add_submenu_page(
@@ -92,7 +110,7 @@ class WPFN_Admin_Menu
 			'Funnels',
 			'manage_options',
 			'gh_funnels',
-			array( $this, 'funnels_callback' )
+			array( $this->funnels_page, 'page' )
 		);
 
         add_action( "load-" . $funnel_admin_add, array( $this, 'funnels_help_bar' ) );

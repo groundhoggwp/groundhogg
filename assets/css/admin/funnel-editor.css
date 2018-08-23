@@ -1,0 +1,177 @@
+.wpfn-element{
+    height: 112px;
+    text-align: center;
+}
+
+.step-icon img{
+    margin: 0 auto 0 auto;
+    width:80%;
+}
+
+.wpfn-element div{
+    box-sizing: border-box;
+    display: inline-block;
+    width: 100%;
+    /*padding-top: 10px;*/
+    /*padding-bottom: 70px;*/
+}
+.wpfn-element p{
+    margin: -12px 0 0 0;
+}
+
+.hndle label {
+    margin: 0 10px 0 0;
+}
+
+.wpfn-element.ui-draggable-dragging .dashicons,
+#actions .dashicons,
+#benchmarks .dashicons{
+    font-size: 60px;
+}
+
+#actions table,
+#benchmarks table{
+    box-sizing: border-box;
+    width: 100%;
+    border-spacing: 7px;
+}
+
+#actions table td,
+#benchmarks table td{
+    text-align: center;
+    border: 1px solid #F1F1F1;
+
+}
+
+#actions table td .wpfn-element,
+#benchmarks table td .wpfn-element,
+.wpfn-element p{
+    text-align: center;
+    cursor: move;
+}
+
+.wpfn-element.ui-draggable-dragging {
+    width: 120px;
+    background: #FFFFFF;
+    border: 1px solid #F1F1F1;
+}
+
+.funnel-editor .sortable-placeholder {
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.funnel-editor .postbox.action .hndle{
+    background-color: rgb(241, 253, 243);
+}
+
+.funnel-editor .postbox.benchmark .hndle{
+    background-color: rgb(255, 254, 218);
+    border-radius: 20px 20px 0 0;
+}
+
+.funnel-editor .postbox.action {
+    /*background-color: rgb(241, 253, 243);*/
+    width: 620px;
+    border-radius: 0px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.funnel-editor .postbox.benchmark{
+    /*background-color: rgb(255, 254, 218);*/
+    width: 580px;
+    border-radius: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+select {
+    vertical-align: top;
+}
+
+#postbox-container-2{
+    padding: 40px 0 40px 0;
+
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, #e5e5e5 1px, transparent 1px), linear-gradient(to bottom, #e5e5e5 1px, transparent 1px);
+}
+
+.onoffswitch {
+    position: relative; width: 110px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    visibility: hidden;
+    position: absolute;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 1px solid #999999; border-radius: 4px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    font-size: 14px; color: white;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    text-shadow: 0 -1px 1px #006799, 1px 0 1px #006799, 0 1px 1px #006799, -1px 0 1px #006799;
+    content: "Reporting";
+    padding-left: 10px;
+    background-color: #008ec2; color: #FFFFFF;
+}
+
+#status-toggle-switch .onoffswitch-inner:before{
+    content: "Active";
+}
+
+.onoffswitch-inner:after {
+    content: "Editing";
+    padding-right: 10px;
+    background-color: #EEEEEE; color: #999999;
+    text-align: right;
+}
+
+#status-toggle-switch .onoffswitch-inner:after{
+    content: "Inactive";
+}
+
+.onoffswitch-switch {
+    display: block; width: 21px; margin: 4.5px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 78px;
+    border: 1px solid #999999; border-radius: 4px;
+    transition: all 0.3s ease-in 0s;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+}
+
+.step-reporting p,
+.report {
+    text-align: center;
+    font-size: 16px;
+}
+
+.hndle input {
+    vertical-align: top;
+}
+
+.hndle .hndle-icon{
+    border-radius: 100%;
+    background: #FFF;
+    margin-left: -38px;
+    margin-right: 10px;
+    margin-top: 12px;
+    margin-bottom: -37px;
+    border: 1px solid #e5e5e5;
+}

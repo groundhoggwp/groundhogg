@@ -617,7 +617,7 @@ function wpfn_save_funnel( $funnel_id )
     if ( empty( $_POST ) )
         return;
 
-    do_action( 'wpfn_save_funnel', $funnel_id );
+//    do_action( 'wpfn_save_funnel', $funnel_id );
 
     $title = sanitize_text_field( stripslashes( $_POST[ 'funnel_title' ] ) );
     wpfn_update_funnel( $funnel_id, 'funnel_title', $title );
@@ -656,15 +656,10 @@ function wpfn_save_funnel( $funnel_id )
         do_action( 'wpfn_save_step_' . $step_type, $stepId );
 
     }
-
-    do_action( 'wpfn_save_funnel_after', $funnel_id );
-
-    ?>
-    <div class="notice notice-success is-dismissible"><p><?php echo esc_html__( 'Funnel updated!', 'groundhogg' ); ?></p></div>
-    <?php
+//    do_action( 'wpfn_save_funnel_after', $funnel_id );
 }
 
-add_action( 'wpfn_funnel_editor_before_everything', 'wpfn_save_funnel' );
+add_action( 'wpfn_update_funnel', 'wpfn_save_funnel' );
 
 /**
  * Auto save the funnel steps. nothing else
@@ -707,9 +702,6 @@ add_action( 'wp_ajax_wpfn_auto_save_funnel_via_ajax', 'wpfn_auto_save_funnel' );
  */
 function wpfn_create_new_funnel()
 {
-    if ( ! isset( $_POST['add_new_funnel_nonce'] ) || ! wp_verify_nonce( $_POST['add_new_funnel_nonce'], 'add_new_funnel' ) )
-        return;
-
     if ( isset( $_POST[ 'funnel_template' ] ) ){
 
         include dirname(__FILE__) . '/templates/funnel-templates.php';
@@ -743,6 +735,8 @@ function wpfn_create_new_funnel()
 
         //todo copy and duplicate steps from old funnel...
 
+        //todo import from files...
+
     } else {
 
         ?><div class="notice notice-error"><p><?php _e( 'Could not create funnel. PLease select a template.', 'groundhogg' ); ?></p></div><?php
@@ -755,7 +749,7 @@ function wpfn_create_new_funnel()
     die();
 }
 
-add_action( 'wpfn_before_new_funnel', 'wpfn_create_new_funnel' );
+add_action( 'wpfn_add_funnel', 'wpfn_create_new_funnel' );
 
 /**
  * Return whether the contact is in a certain funnel.

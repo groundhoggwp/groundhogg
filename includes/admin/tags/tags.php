@@ -14,64 +14,153 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' ) {
-    if ( isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'delete' ) ){
-        wpfn_delete_tag( intval( $_GET[ 'tag_id' ] ) );
-    }
-    $sendback = remove_query_arg( array('action','_wpnonce'), wp_get_referer() );
-    wp_redirect( add_query_arg( array( 'notice' => 'deleted', 'tags' => intval( $_GET[ 'tag_id' ] ) ), $sendback ) );
-    die();
-} else if ( isset( $_GET['action'] ) && $_GET['action'] === 'edit' ) {
 
-    include dirname( __FILE__ ) . '/edit-tag.php';
+class WPFN_Tags_Page
+{
+	function __construct()
+	{
+		if ( $_GET[ 'page' ] === 'gh_tags' ){
 
-} else if (  isset( $_POST[ 'add_tag' ] ) ) {
+			add_action( 'init' , array( $this, 'process_action' )  );
 
-    if ( ! wp_verify_nonce( $_POST[ '_wpnonce' ] ) )
-        wp_die( wpfn_get_random_groundhogday_quote() );
+		}
+	}
 
-    $sendback = remove_query_arg( array('notice','_wpnonce'), wp_get_referer() );
+	function get_tags()
+	{
+		$tags = isset( $_REQUEST['tag'] ) ? $_REQUEST['tag'] : null;
 
-    if ( isset( $_POST['bulk_add'] ) ){
+		if ( ! $tags )
+			return false;
 
-        $tag_names = explode( PHP_EOL, trim( sanitize_textarea_field( wp_unslash( $_POST['bulk_tags'] ) ) ) );
+		return is_array( $tags )? array_map( 'intval', $tags ) : array( intval( $tags ) );
+	}
 
-        foreach ($tag_names as $name)
-        {
-            $tagid = wpfn_insert_tag( $name );
-            $tags[] = $tagid;
-        }
-        wp_redirect( add_query_arg( array( 'notice' => 'added', 'tags' => urlencode( implode( ',', $tags ) ) ), $sendback ) );
-    } else {
-        $tagname = sanitize_text_field( wp_unslash( $_POST['tag_name'] ) );
-        $tagdesc = sanitize_text_field( wp_unslash( $_POST['tag_description'] ) );
-        $tagid = wpfn_insert_tag( $tagname, $tagdesc );
-        wp_redirect( add_query_arg( array( 'notice' => 'added', 'tags' => $tagid ), $sendback ) );
-    }
+	function get_action()
+	{
+		if ( isset( $_REQUEST['filter_action'] ) && ! empty( $_REQUEST['filter_action'] ) )
+			return false;
 
-    die();
-} else {
-    if ( ! class_exists( 'WPFN_Emails_Table' ) ){
-        include dirname( __FILE__ ) . '/class-tags-table.php';
-    }
-    $tags_table = new WPFN_Contact_Tags_Table();
-    ?>
-    <div class="wrap">
-        <h1 class="wp-heading-inline"><?php echo __('Contact Tags', 'groundhogg');?></h1>
-        <?php $notice = isset( $_GET[ 'notice' ] )? $_GET[ 'notice' ] : '';
-        $item_count = isset( $_GET['tags'] )? count( explode( ',', urldecode( $_GET['tags'] ) ) ) : 0;
-        switch ( $notice ):
-            case 'deleted':
-                ?><div class="notice notice-success is-dismissible"><p><strong><?php echo $item_count . ' ' . __( 'tags deleted permanently.', 'groundhogg' );?></strong></p></div><?php
-                break;
-            case 'added':
-                ?><div class="notice notice-success is-dismissible">
-                <p><strong><?php _e( 'Created ' . $item_count . ' Tags.' ); ?></strong></p>
-                </div><?php
-                break;
-            default:
-        endswitch; ?>
-        <hr class="wp-header-end">
+		if ( isset( $_REQUEST['action'] ) && -1 != $_REQUEST['action'] )
+			return $_REQUEST['action'];
+
+		if ( isset( $_REQUEST['action2'] ) && -1 != $_REQUEST['action2'] )
+			return $_REQUEST['action2'];
+
+		return false;
+	}
+
+	function get_previous_action()
+	{
+		$action = get_transient( 'gh_last_action' );
+
+		delete_transient( 'gh_last_action' );
+
+		return $action;
+	}
+
+	function get_title()
+	{
+		switch ( $this->get_action() ){
+			case 'edit':
+				_e( 'Edit Tag' , 'groundhogg' );
+				break;
+			default:
+				_e( 'Tags', 'groundhogg' );
+		}
+	}
+
+	function get_notice()
+	{
+		$ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
+
+		$count = count( $ids );
+
+		switch ( $this->get_previous_action() )
+		{
+			case 'add':
+
+				?><div class="notice notice-success is-dismissible"><p><?php _e( 'Tag Created!' ); ?></p></div><?php
+
+				break;
+			case 'delete':
+
+				?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' tags deleted.' ); ?></p></div><?php
+
+				break;
+
+			case 'edit':
+				if ( isset( $_POST ) ){
+					?><div class="notice notice-success is-dismissible"><p><?php _e( 'Tag Updated.' ); ?></p></div><?php
+				}
+				break;
+		}
+	}
+
+	function process_action()
+	{
+		if ( ! $this->get_action() || ! $this->verify_action() )
+			return;
+
+		$base_url = remove_query_arg( array( '_wpnonce', 'action' ), wp_get_referer() );
+
+		switch ( $this->get_action() )
+		{
+			case 'add':
+
+				if ( isset( $_POST ) )
+				{
+					do_action( 'wpfn_add_tag' );
+				}
+
+				break;
+
+			case 'delete':
+
+				foreach ( $this->get_tags() as $id ){
+					wpfn_delete_tag( $id );
+				}
+
+				do_action( 'wpfn_delete_tags' );
+
+				break;
+
+			case 'edit':
+
+				if ( isset( $_POST ) ){
+					do_action( 'wpfn_update_tag', intval( $_GET[ 'tag' ] ) );
+				}
+
+				break;
+		}
+
+		set_transient( 'gh_last_action', $this->get_action(), 30 );
+
+		if ( $this->get_action() === 'edit' || $this->get_action() === 'add' )
+			return;
+
+		$base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_tags() ) ), $base_url );
+
+		wp_redirect( $base_url );
+		die();
+	}
+
+
+	function verify_action()
+	{
+		if ( ! isset( $_REQUEST['_wpnonce'] ) )
+			return false;
+
+		return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() );
+	}
+
+	function table()
+	{
+		if ( ! class_exists( 'WPFN_Tags_Table' ) ){
+			include dirname( __FILE__ ) . '/class-tags-table.php';
+		}
+
+		$tags_table = new WPFN_Tags_Table(); ?>
         <form method="get" class="search-form wp-clearfix">
             <!-- search form -->
             <p class="search-box">
@@ -86,7 +175,8 @@ if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' ) {
                     <div class="form-wrap">
                         <h2><?php _e( 'Add New Tag', 'groundhogg' ) ?></h2>
                         <form id="addtag" method="post" action="">
-                            <?php wp_nonce_field(); ?>
+                            <input type="hidden" name="action" value="add">
+							<?php wp_nonce_field(); ?>
                             <div class="form-field term-name-wrap">
                                 <label for="tag-name"><?php _e( 'Tag Name', 'groundhogg' ) ?></label>
                                 <input name="tag_name" id="tag-name" type="text" value="" size="40">
@@ -120,7 +210,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' ) {
                                     });
                                 });
                             </script>
-                            <?php submit_button( __( 'Add New Tag', 'groundhogg' ), 'primary', 'add_tag' ); ?>
+							<?php submit_button( __( 'Add New Tag', 'groundhogg' ), 'primary', 'add_tag' ); ?>
                         </form>
                     </div>
                 </div>
@@ -128,14 +218,36 @@ if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' ) {
             <div id="col-right">
                 <div class="col-wrap">
                     <form id="posts-filter" method="post">
-                        <?php wp_nonce_field(); ?>
-                        <?php $tags_table->prepare_items(); ?>
-                        <?php $tags_table->display(); ?>
+						<?php wp_nonce_field(); ?>
+						<?php $tags_table->prepare_items(); ?>
+						<?php $tags_table->display(); ?>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
-    <?php
+		<?php
+	}
 
+	function edit()
+	{
+		include dirname( __FILE__ ) . '/edit-tag.php';
+	}
+
+	function page()
+	{
+		?>
+        <div class="wrap">
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_tags' ); ?>"><?php _e( 'Add New' ); ?></a>
+			<?php $this->get_notice(); ?>
+            <hr class="wp-header-end">
+			<?php switch ( $this->get_action() ){
+				case 'edit':
+					$this->edit();
+					break;
+				default:
+					$this->table();
+			} ?>
+        </div>
+		<?php
+	}
 }

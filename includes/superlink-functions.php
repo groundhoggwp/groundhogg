@@ -49,3 +49,25 @@ function wpfn_filter_out_http_superlink_prefix( $content )
 
 add_filter( 'wpfn_the_email_content', 'wpfn_filter_out_http_superlink_prefix' );
 add_filter( 'wpfn_sanitize_email_content', 'wpfn_filter_out_http_superlink_prefix' );
+
+function wpfn_add_superlink()
+{
+	$superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
+	$superlink_target = sanitize_text_field( wp_unslash( $_POST['superlink_target'] ) );
+	$superlink_tags = isset( $_POST['superlink_tags'] ) ? $_POST['superlink_tags'] : array() ;
+	$superlink_id = wpfn_insert_new_superlink( $superlink_name, $superlink_target, $superlink_tags );
+}
+
+add_action( 'wpfn_add_superlink', 'wpfn_add_superlink' );
+
+function wpfn_save_superlink( $id )
+{
+	$superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
+	$superlink_target = sanitize_text_field( wp_unslash( $_POST['superlink_target'] ) );
+	$superlink_tags = $_POST['superlink_tags'];
+	wpfn_update_superlink( $id, 'name', $superlink_name );
+	wpfn_update_superlink( $id, 'target', $superlink_target );
+	wpfn_update_superlink( $id, 'tags', $superlink_tags );
+}
+
+add_action( 'wpfn_update_superlink', 'wpfn_save_superlink' );

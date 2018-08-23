@@ -143,6 +143,42 @@ function wpfn_get_the_contact()
 }
 
 /**
+ * Add a tag from the add tag form.
+ */
+function wpfn_add_tag()
+{
+	if ( isset( $_POST['bulk_add'] ) ){
+
+		$tag_names = explode( PHP_EOL, trim( sanitize_textarea_field( wp_unslash( $_POST['bulk_tags'] ) ) ) );
+
+		foreach ($tag_names as $name)
+		{
+			$tagid = wpfn_insert_tag( $name );
+		}
+	} else {
+		$tagname = sanitize_text_field( wp_unslash( $_POST['tag_name'] ) );
+		$tagdesc = sanitize_text_field( wp_unslash( $_POST['tag_description'] ) );
+		$tagid = wpfn_insert_tag( $tagname, $tagdesc );
+	}
+}
+
+add_action( 'wpfn_add_tag', 'wpfn_add_tag' );
+
+/**
+ * update a tag
+ */
+function wpfn_save_tag( $id )
+{
+	$tag_name = sanitize_text_field( wp_unslash( $_POST[ 'name' ] ) );
+	$tag_description = sanitize_textarea_field( wp_unslash( $_POST[ 'description' ] ) );
+
+	wpfn_update_tag( $id, 'tag_description', $tag_description );
+	wpfn_update_tag( $id, 'tag_name', $tag_name );
+}
+
+add_action( 'wpfn_update_tag', 'wpfn_save_tag' );
+
+/**
  * Wrapper function to see if a contact has a particluar tag.
  *
  * @param $contact_id int the ID of the contact
@@ -248,7 +284,7 @@ function wpfn_dropdown_tags( $args )
 
     $defaults = array(
         'selected' => array(), 'echo' => 1,
-        'name' => 'tags[]', 'id' => '',
+        'name' => 'tags[]', 'id' => 'tags',
         'width' => '100%', 'class' => '',
         'show_option_none' => '', 'show_option_no_change' => '',
         'option_none_value' => ''

@@ -199,7 +199,7 @@ class WPFN_Emails_Page
             <p class="search-box">
                 <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Emails ', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="Search Contacts">
+                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Emails ', 'groundhogg'); ?>">
             </p>
             <?php $emails_table->prepare_items(); ?>
             <?php $emails_table->display(); ?>
