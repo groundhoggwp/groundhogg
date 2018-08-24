@@ -21,7 +21,7 @@ function wpfn_contact_replacement_shortcode( $atts )
         return __( 'Friend', 'groundhogg' );
 
     if ( substr( $a['field'], 0, 1) === '_' ) {
-        $new_replacement = $contact->getFieldMeta( substr( $a['field'], 1) );
+        $new_replacement = $contact->get_meta( substr( $a['field'], 1) );
     } else {
 
         if ( strpos( $a['field'], '.' ) > 0 ){
@@ -52,7 +52,7 @@ add_shortcode( 'gh_contact', 'wpfn_contact_replacement_shortcode' );
 function wpfn_merge_replacements_shortcode( $atts, $content = '' )
 {
     $contact = wpfn_get_the_contact();
-    return wpfn_do_replacements( $contact->getId(), $contact );
+    return wpfn_do_replacements( $contact->get_id(), $contact );
 }
 
 /**
@@ -82,7 +82,7 @@ function wpfn_do_replacements( $contact_id, $content )
         $replacement = substr( $pattern, 1, -1);
 
         if ( substr($replacement, 0, 1) === '_' ) {
-            $new_replacement = $contact->getFieldMeta( substr($replacement, 1) );
+            $new_replacement = $contact->get_meta( substr($replacement, 1) );
         } else {
 
             if ( strpos( $replacement, '.' ) > 0 ){
@@ -113,7 +113,7 @@ function wpfn_do_replacements( $contact_id, $content )
  */
 function wpfn_replacement_first_name( $contact )
 {
-    return $contact->getFirst();
+    return $contact->get_first();
 }
 
 add_filter( 'wpfn_replacement_first_name', 'wpfn_replacement_first_name' );
@@ -127,7 +127,7 @@ add_filter( 'wpfn_replacement_first', 'wpfn_replacement_first_name' );
  */
 function wpfn_replacement_last_name( $contact )
 {
-    return $contact->getLast();
+    return $contact->get_last();
 }
 
 add_filter( 'wpfn_replacement_last_name', 'wpfn_replacement_last_name' );
@@ -141,7 +141,7 @@ add_filter( 'wpfn_replacement_last', 'wpfn_replacement_last_name' );
  */
 function wpfn_replacement_email( $contact )
 {
-    return $contact->getEmail();
+    return $contact->get_email();
 }
 
 add_filter( 'wpfn_replacement_email', 'wpfn_replacement_email' );

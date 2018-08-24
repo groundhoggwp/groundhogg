@@ -63,7 +63,7 @@ $contact = new WPFN_Contact( $contact_id );
 ?>
 
 <div class="wrap">
-	<h1><?php printf( '%s', $contact->getFullName() ); ?></h1>
+	<h1><?php printf( '%s', $contact->get_full() ); ?></h1>
 	<?php do_action( 'wpfn_contact_record_before', $contact_id ); ?>
     <form method="post">
 
@@ -99,26 +99,26 @@ $contact = new WPFN_Contact( $contact_id );
                 <tbody>
                     <tr>
                         <th><label for="first_name"><?php echo __( 'First Name', 'groundhogg' )?></label></th>
-                        <td><?php echo wpfn_admin_text_input_field( 'first_name', 'first_name', $contact->getFirst() );?></td>
+                        <td><?php echo wpfn_admin_text_input_field( 'first_name', 'first_name', $contact->get_first() );?></td>
                     </tr>
                     <tr>
                         <th><label for="last_name"><?php echo __( 'Last Name', 'groundhogg' )?></label></th>
-                        <td><?php echo wpfn_admin_text_input_field( 'last_name', 'last_name', $contact->getLast() );?></td>
+                        <td><?php echo wpfn_admin_text_input_field( 'last_name', 'last_name', $contact->get_last() );?></td>
                     </tr>
                     <tr>
                         <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
                         <td>
-                            <?php echo wpfn_admin_text_input_field( 'email', 'email', $contact->getEmail() );?>
-                            <p><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpfn_get_optin_status_text( $contact->getOptInStatus() ); ?></p>
+                            <?php echo wpfn_admin_text_input_field( 'email', 'email', $contact->get_email() );?>
+                            <p><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpfn_get_optin_status_text( $contact->get_optin_status() ); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'groundhogg' )?></label></th>
-                        <td><?php echo wpfn_admin_text_input_field( 'primary_phone', 'meta[primary_phone]', $contact->getPhone() );?></td>
+                        <td><?php echo wpfn_admin_text_input_field( 'primary_phone', 'meta[primary_phone]', $contact->get_phone() );?></td>
                     </tr>
                     <tr>
                         <th><label for="primary_phone_extension"><?php echo __( 'Phone Extension', 'groundhogg' )?></label></th>
-                        <td><?php echo wpfn_admin_text_input_field( 'primary_phone_extension', 'meta[primary_phone_extension]', $contact->getPhoneExtension() );?></td>
+                        <td><?php echo wpfn_admin_text_input_field( 'primary_phone_extension', 'meta[primary_phone_extension]', $contact->get_phone_extension() );?></td>
                     </tr>
                 </tbody>
             </table>
@@ -141,7 +141,7 @@ $contact = new WPFN_Contact( $contact_id );
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $entries = $contact->getParsedActivity(); ?>
+                    <?php $entries = $contact->get_parsed_activity(); ?>
                     <?php if ( $entries ): foreach ( $entries as $entry ): ?>
                     <tr>
                         <?php if ( isset( $entry[0] ) && isset( $entry[1] ) ): ?>

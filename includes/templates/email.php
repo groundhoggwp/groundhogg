@@ -45,5 +45,6 @@
         </td>
     </tr>
 </table>
+<img style="visibility: hidden" width="0" height="0" src="<?php echo $tracking_link; ?>">
 </body>
 </html>

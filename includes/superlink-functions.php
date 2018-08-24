@@ -32,7 +32,7 @@ function wpfn_process_superlink()
 
         foreach ( $tags as $tag_id )
         {
-            wpfn_apply_tag( $contact->getId(), $tag_id );
+            wpfn_apply_tag( $contact->get_id(), $tag_id );
         }
     }
 

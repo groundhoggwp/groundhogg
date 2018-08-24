@@ -91,7 +91,6 @@ class WPFN_Contacts_Table extends WP_List_Table {
                 break;
             case 'user_id':
                 $user = get_user_by( 'email', $item[ 'email' ] );
-
                 return $user ? '<a href="'.admin_url('user-edit.php?user_id='.$user->ID ).'">'.$user->display_name.'</a>' :  '&#x2014;';
                 break;
             case 'owner':
@@ -254,8 +253,8 @@ class WPFN_Contacts_Table extends WP_List_Table {
                 }
                 break;
             case 'tag':
-                if ( isset( $_REQUEST[ 'tag_id'] ) ){
-                    $tag_id = $_GET['tag_id'];
+                if ( isset( $_REQUEST[ 'tag'] ) ){
+                    $tag_id = $_GET['tag'];
                     $sql = $wpdb->prepare(
                         "SELECT t.*, c.* FROM "
                         .$wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS . " t "

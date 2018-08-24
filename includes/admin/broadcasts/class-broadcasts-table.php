@@ -1,11 +1,11 @@
 <?php
 /**
- * Emails Table Class
+ * Broadcasts Table Class
  *
- * This class shows the data table for accessing information about an email.
+ * This class shows the data table for accessing information about an broadcast.
  *
  * @package     groundhogg
- * @subpackage  Includes/Emails
+ * @subpackage  Includes/Broadcasts
  * @copyright   Copyright (c) 2018, Adrian Tobey
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.1
@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Emails_Table extends WP_List_Table {
+class WPFN_Broadcasts_Table extends WP_List_Table {
 
 	/**
 	 * TT_Example_List_Table constructor.
@@ -30,8 +30,8 @@ class WPFN_Emails_Table extends WP_List_Table {
 	public function __construct() {
 		// Set parent defaults.
 		parent::__construct( array(
-			'singular' => 'email',     // Singular name of the listed records.
-			'plural'   => 'emails',    // Plural name of the listed records.
+			'singular' => 'broadcast',     // Singular name of the listed records.
+			'plural'   => 'broadcasts',    // Plural name of the listed records.
 			'ajax'     => false,       // Does this table support ajax?
 		) );
 	}
@@ -47,10 +47,11 @@ class WPFN_Emails_Table extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'subject'    => _x( 'Subject', 'Column label', 'groundhogg' ),
-			'from_user'   => _x( 'From User', 'Column label', 'groundhogg' ),
-			'author'   => _x( 'Author', 'Column label', 'groundhogg' ),
-            'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
+			'email_id'    => _x( 'Email', 'Column label', 'groundhogg' ),
+			'from_user'   => _x( 'Scheduled By', 'Column label', 'groundhogg' ),
+			'send_at'   => _x( 'Scheduled Run Date', 'Column label', 'groundhogg' ),
+            'send_to_tags' => _x( 'Send To Tags', 'Column label', 'groundhogg' ),
+            'stats' => _x( 'Stats', 'Column label', 'groundhogg' ),
             'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 		return $columns;
@@ -65,17 +66,16 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 */
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
-			'subject'    => array( 'subject', false ),
-			'from_user' => array( 'from_name', false ),
-			'author' => array( 'from_name', false ),
-			'last_updated' => array( 'last_updated', false ),
+			'email_id'    => array( 'email_id', false ),
+			'from_user' => array( 'from_user', false ),
+			'send_at' => array( 'sent_at', false ),
 			'date_created' => array( 'date_created', false )
 		);
 		return $sortable_columns;
 	}
 
     /**
-     * Get the views for the emails, all, ready, unready, trash
+     * Get the views for the broadcasts, all, ready, unready, trash
      *
      * @return array
      */
@@ -83,15 +83,15 @@ class WPFN_Emails_Table extends WP_List_Table {
     {
         $views =  array();
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_email_items() . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_broadcast_items() . ")</span>" . "</a>";
 
-        $views['ready'] = "<a class='" .  print_r( ( $this->get_view() === 'ready' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'ready' ) . ")</span>" . "</a>";
+        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=sent' ) . "'>" . __( 'Sent' ) . " <span class='count'>(" . wpfn_count_broadcast_items( 'broadcast_status', 'sent' ) . ")</span>" . "</a>";
 
-        $views['draft'] = "<a class='" .  print_r( ( $this->get_view() === 'draft' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'draft' ) . ")</span>" . "</a>";
+        $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=scheduled' ) . "'>" . __( 'Scheduled' ) . " <span class='count'>(" . wpfn_count_broadcast_items( 'broadcast_status', 'scheduled' ) . ")</span>" . "</a>";
 
-        $views['trash'] = "<a class='" .  print_r( ( $this->get_view() === 'trash' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'trash' ) . ")</span>" . "</a>";
+        $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=cancelled' ) . "'>" . __( 'Cancelled' ) . " <span class='count'>(" . wpfn_count_broadcast_items( 'broadcast_status', 'cancelled' ) . ")</span>" . "</a>";
 
-        return apply_filters(  'wpfn_email_views', $views );
+        return apply_filters(  'wpfn_broadcast_views', $views );
     }
 
     protected function get_view()
@@ -107,16 +107,14 @@ class WPFN_Emails_Table extends WP_List_Table {
      */
 	protected function get_row_actions( $id )
     {
-        if ( $this->get_view() === 'trash' )
+
+        $broadcast = wpfn_get_broadcast_by_id( $id );
+
+        if ( $this->get_view() !== 'cancelled' )
         {
-            return array(
-                "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>",
-                "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=delete&email='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
-            );
-        } else {
-            return apply_filters( 'wpfn_email_row_actions', array(
-                "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email='. $id ). "'>" . __( 'Edit' ) . "</a></span>",
-                "<span class='trash'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email='. $id ), 'trash' ). "'>" . __( 'Trash' ) . "</a></span>",
+            return apply_filters( 'wpfn_broadcast_row_actions', array(
+                "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email='. $broadcast['email_id'] ). "'>" . __( 'Edit Email' ) . "</a></span>",
+                "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast='. $id ), 'cancel' ). "'>" . __( 'Cancel' ) . "</a></span>",
             ));
         }
     }
@@ -131,44 +129,63 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 */
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
-			case 'subject':
-			    $subject = ( ! $item[ $column_name ] )? '(' . __( 'no subject' ) . ')' : $item[ $column_name ] ;
-				$editUrl = admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $item['ID'] );
+			case 'email_id':
+			    $email = wpfn_get_email_by_id( intval( $item['email_id'] ) );
 
-				if ( $this->get_view() === 'trash' ){
+			    $subject = ( ! $email->subject )? '(' . __( 'no email' ) . ')' : $email->subject;
+				$editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . $item['ID'] );
+
+				if ( $this->get_view() === 'cancelled' ){
 				    $html = "<strong>{$subject}</strong>";
                 } else {
 				    $html = "<strong>";
 
                     $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
 
-                    if ( $item['email_status'] === 'draft' ){
-                        $html .= " — " . "<span class='post-state'>(" . __( 'Draft' ) . ")</span>";
+                    if ( $item['broadcast_status'] === 'scheduled' ){
+                        $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Scheduled' ) . ")</span>";
                     }
                 }
                 $html .= "</strong>";
-
                 $html .= $this->row_actions( $this->get_row_actions( $item['ID'] ) );
-
                 return $html;
-
 				break;
+
             case 'from_user':
                 $user = get_userdata( intval( ( $item['from_user'] ) ) );
-                $from_user = esc_html( $user->display_name . ' <' . $user->user_email . '>' );
-                $queryUrl = admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=' . $item['from_user'] );
+                $from_user = esc_html( $user->display_name );
+                $queryUrl = admin_url( 'admin.php?page=gh_broadcasts&view=from_user&from_user=' . $item['from_user'] );
                 return "<a href='$queryUrl'>$from_user</a>";
-            case 'author':
-                $user = get_userdata( intval( ( $item['author'] ) ) );
-                $from_user = esc_html( $user->user_login );
-                $queryUrl = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $item['author'] );
-                return "<a href='$queryUrl'>$from_user</a>";
+                break;
+            case 'stats':
+
+                if ( $item[ 'broadcast_status' ] !== 'sent' )
+                    return '&#x2014;';
+
+                break;
+            case 'send_at':
+                $time = $item['send_at'];
+
+                if ( $time >= time() )
+                    $text = 'Send At';
+                else
+                    $text = 'Sent';
+
+                return __( $text, 'groundhogg' ) . '<br><abbr title="' . date( DATE_ISO8601, $item['send_at'] ) . '">' . date('Y/m/d', $item['send_at'] ) . '</abbr>';
+                break;
+
             case 'date_created':
                 return __( 'Created' ) . '<br><abbr title="' . $item['date_created'] . '">' . date('Y/m/d', strtotime($item['date_created'])) . '</abbr>';
                 break;
-            case 'last_updated':
-                return __( 'Updated' ) . '<br><abbr title="' . $item['last_updated'] . '">' . date('Y/m/d', strtotime($item['last_updated'])) . '</abbr>';
+
+            case 'send_to_tags':
+                $tags = $item[ 'send_to_tags' ] ? maybe_unserialize( $item[ 'send_to_tags' ] ) : array();
+                foreach ( $tags as $i => $tag_id ){
+                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . wpfn_get_tag_name( $tag_id ). '</a>';
+                }
+                return implode( ', ', $tags );
                 break;
+
             default:
 				return print_r( $item[ $column_name ], true );
 				break;
@@ -195,20 +212,14 @@ class WPFN_Emails_Table extends WP_List_Table {
 	 * @return array An associative array containing all the bulk actions.
 	 */
 	protected function get_bulk_actions() {
-        if ( $this->get_view() === 'trash' )
+        if ( $this->get_view() !== 'cancelled' )
         {
             $actions = array(
-                'delete' => _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' ),
-                'restore' => _x( 'Restore', 'List table bulk action', 'groundhogg' )
-            );
-
-        } else {
-            $actions = array(
-                'trash' => _x( 'Trash', 'List table bulk action', 'groundhogg' )
+                'cancel' => _x( 'Cancel Broadcast', 'List table bulk action', 'groundhogg' ),
             );
         }
 
-        return apply_filters( 'wpfn_email_bulk_actions', $actions );
+        return apply_filters( 'wpfn_broadcast_bulk_actions', $actions );
 	}
 
 	/**
@@ -237,34 +248,39 @@ class WPFN_Emails_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$table_name = $wpdb->prefix . WPFN_EMAILS;
+		$table_emails = $wpdb->prefix . WPFN_EMAILS;
+		$table_broadcasts = $wpdb->prefix . WPFN_BROADCASTS;
 
-		$query = "SELECT * FROM $table_name WHERE ";
+//		$query = "SELECT * FROM $table_broadcasts WHERE ";
+		$query = "SELECT b.*, e.subject FROM $table_broadcasts b LEFT JOIN $table_emails e ON b.email_id = e.ID WHERE ";
 
         if ( isset( $_REQUEST[ 's' ] ) ){
 
             $pattern = '%' . $wpdb->esc_like( sanitize_text_field( $_REQUEST[ 's' ] ) ) . '%' ;
-            $query .= $wpdb->prepare( "(subject LIKE %s OR content LIKE %s OR pre_header LIKE %s) AND ", $pattern , $pattern , $pattern );
+            $query .= $wpdb->prepare( "( e.subject LIKE %s OR e.content LIKE %s OR e.pre_header LIKE %s) AND ", $pattern , $pattern , $pattern );
 
         }
 
-        if ( $this->get_view() === 'trash' ){
+        if ( $this->get_view() === 'scheduled' ){
 
-            $query .= $wpdb->prepare( '( email_status = %s )', 'trash' );
+            $query .= $wpdb->prepare( '( b.broadcast_status = %s )', 'scheduled' );
 
-        } else if ( $this->get_view() === 'ready' ) {
+        } else if ( $this->get_view() === 'cancelled' ) {
 
-            $query .= $wpdb->prepare( '( email_status = %s )', 'ready' );
+            $query .= $wpdb->prepare( '( b.broadcast_status = %s )', 'cancelled' );
 
-        } else if ( $this->get_view() === 'draft' ) {
+        } else if ( $this->get_view() === 'sent' ) {
 
-            $query .= $wpdb->prepare( '( email_status = %s )', 'draft' );
+            $query .= $wpdb->prepare( '( b.broadcast_status = %s )', 'sent' );
 
         } else {
 
-            $query .= $wpdb->prepare( '( email_status = %s OR email_status = %s OR email_status = %s )', 'ready', 'draft', '' );
+            $query .= $wpdb->prepare( '( b.broadcast_status = %s OR b.broadcast_status = %s )', 'sent', 'scheduled' );
 
         }
+
+//        $query.= " ORDER BY ID DESC";
+        $query.= " ORDER BY b.ID DESC";
 
         $data = $wpdb->get_results( $query, ARRAY_A );
 
@@ -274,29 +290,13 @@ class WPFN_Emails_Table extends WP_List_Table {
 		usort( $data, array( $this, 'usort_reorder' ) );
 
 
-		/*
-		 * REQUIRED for pagination. Let's figure out what page the user is currently
-		 * looking at. We'll need this later, so you should always include it in
-		 * your own package classes.
-		 */
+
 		$current_page = $this->get_pagenum();
-		/*
-		 * REQUIRED for pagination. Let's check how many items are in our data array.
-		 * In real-world use, this would be the total number of items in your database,
-		 * without filtering. We'll need this later, so you should always include it
-		 * in your own package classes.
-		 */
+
 		$total_items = count( $data );
-		/*
-		 * The WP_List_Table class does not handle pagination for us, so we need
-		 * to ensure that the data is trimmed to only the current page. We can use
-		 * array_slice() to do that.
-		 */
+
 		$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
-		/*
-		 * REQUIRED. Now we can add our *sorted* data to the items property, where
-		 * it can be used by the rest of the class.
-		 */
+
 		$this->items = $data;
 		/**
 		 * REQUIRED. We also have to register our pagination options & calculations.

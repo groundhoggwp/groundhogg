@@ -33,7 +33,7 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
                     <div id="titlediv">
                         <div id="titlewrap">
                             <label class="screen-reader-text" id="title-prompt-text" for="title"><?php echo __('Enter Contact Name Here', 'groundhogg');?></label>
-                            <input placeholder="<?php echo __('Enter Contact Name Here', 'groundhogg');?>" type="text" name="contact_name" size="30" value="<?php echo $contact->getFullName(); ?>" id="title" spellcheck="true" autocomplete="off">
+                            <input placeholder="<?php echo __('Enter Contact Name Here', 'groundhogg');?>" type="text" name="contact_name" size="30" value="<?php echo $contact->get_full(); ?>" id="title" spellcheck="true" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -86,26 +86,26 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
                                 <tbody>
                                 <tr>
                                     <th><label for="first_name"><?php echo __( 'First Name', 'groundhogg' )?></label></th>
-                                    <td><?php echo wpfn_admin_text_input_field( 'first_name', 'first_name', $contact->getFirst() );?></td>
+                                    <td><?php echo wpfn_admin_text_input_field( 'first_name', 'first_name', $contact->get_first() );?></td>
                                 </tr>
                                 <tr>
                                     <th><label for="last_name"><?php echo __( 'Last Name', 'groundhogg' )?></label></th>
-                                    <td><?php echo wpfn_admin_text_input_field( 'last_name', 'last_name', $contact->getLast() );?></td>
+                                    <td><?php echo wpfn_admin_text_input_field( 'last_name', 'last_name', $contact->get_last() );?></td>
                                 </tr>
                                 <tr>
                                     <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
                                     <td>
-                                        <?php echo wpfn_admin_text_input_field( 'email', 'email', $contact->getEmail() );?>
-                                        <p><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpfn_get_optin_status_text( $contact->getOptInStatus() ); ?></p>
+                                        <?php echo wpfn_admin_text_input_field( 'email', 'email', $contact->get_email() );?>
+                                        <p><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpfn_get_optin_status_text( $contact->get_optin_status() ); ?></p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'groundhogg' )?></label></th>
-                                    <td><?php echo wpfn_admin_text_input_field( 'primary_phone', 'meta[primary_phone]', $contact->getPhone() );?></td>
+                                    <td><?php echo wpfn_admin_text_input_field( 'primary_phone', 'meta[primary_phone]', $contact->get_phone() );?></td>
                                 </tr>
                                 <tr>
                                     <th><label for="primary_phone_extension"><?php echo __( 'Phone Extension', 'groundhogg' )?></label></th>
-                                    <td><?php echo wpfn_admin_text_input_field( 'primary_phone_extension', 'meta[primary_phone_extension]', $contact->getPhoneExtension() );?></td>
+                                    <td><?php echo wpfn_admin_text_input_field( 'primary_phone_extension', 'meta[primary_phone_extension]', $contact->get_phone_extension() );?></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -126,7 +126,7 @@ do_action( 'wpfn_contact_record_before_everything', $contact_id );
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <?php $entries = $contact->getParsedActivity(); ?>
+                                <?php $entries = $contact->get_parsed_activity(); ?>
                                 <?php if ( $entries ): foreach ( $entries as $entry ): ?>
                                     <tr>
                                         <?php if ( isset( $entry[0] ) && isset( $entry[1] ) ): ?>

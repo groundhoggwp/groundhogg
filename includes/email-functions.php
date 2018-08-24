@@ -52,7 +52,7 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     $link_args = array();
 
     if ( $funnel_id && is_int( $funnel_id ) )
-        $link_args['funnel'] = absint( $step_id );
+        $link_args['funnel'] = absint( $funnel_id );
 
     if ( $step_id && is_int( $step_id ) )
         $link_args['step'] = absint( $step_id );
@@ -63,7 +63,8 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     /**
      * @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to.
      */
-    $ref_link = add_query_arg( $link_args, site_url( 'gh-tracking/via/email/' ) ) . '&ref=';
+    $ref_link = add_query_arg( $link_args, site_url( 'gh-tracking/email/click/' ) ) . '&ref=';
+    $tracking_link = add_query_arg( $link_args, site_url( 'gh-tracking/email/open/' ) );
 
     $email = wpfn_get_email_by_id( $email_id );
 
@@ -106,7 +107,7 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     if ( isset( $_POST['send_test'] ) )
         $to_email = get_userdata( $contact_id )->user_email;
     else
-        $to_email = $contact->getEmail();
+        $to_email = $contact->get_email();
 
     $headers = array();
     $headers[ 'from' ] = 'From: ' . $from_user->display_name . ' <' . $from_user->user_email . '>';
@@ -286,7 +287,7 @@ function wpfn_dropdown_emails( $args )
         'name' => 'email_id', 'id' => '',
         'class' => '', 'width' => '100%',
         'show_option_none' => '', 'show_option_no_change' => '',
-        'option_none_value' => ''
+        'option_none_value' => '', 'required' => false
     );
 
     $r = wp_parse_args( $args, $defaults );
@@ -305,7 +306,9 @@ function wpfn_dropdown_emails( $args )
             $class = " class='" . esc_attr( $r['class'] ) . "'";
         }
 
-        $output = "<select style='width:" . esc_attr( $r['width'] ) . ";' name='" . esc_attr( $r['name'] ) . "'" . $class . " id='" . esc_attr( $r['id'] ) . "'>\n";
+        $required = ( $r['required'] === true )? "required" : "";
+
+        $output = "<select style='width:" . esc_attr( $r['width'] ) . ";' name='" . esc_attr( $r['name'] ) . "'" . $class . " id='" . esc_attr( $r['id'] ) . "' " . $required . ">\n";
         if ( $r['show_option_no_change'] ) {
             $output .= "\t<option value=\"-1\">" . $r['show_option_no_change'] . "</option>\n";
         }
@@ -519,16 +522,56 @@ function wpfn_email_status( $id )
     }
 }
 
+
+/**
+ * Set a cookie to track which step they came from...
+ *
+ * @param $id int the ID of the step
+ *
+ * @return int|false the given ID
+ */
+function wpfn_set_the_email( $id )
+{
+    if ( ! is_numeric( $id )  )
+        return false;
+
+    setcookie( 'gh_email', wpfn_encrypt_decrypt( absint( $id ), 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+
+    return $id;
+}
+
+/**
+ * Get the funnel step the user came from
+ *
+ * @return bool
+ */
+function wpfn_get_current_email()
+{
+    if ( is_admin() )
+        return false;
+
+    if ( isset( $_COOKIE[ 'gh_email' ] ) ){
+        return intval( wpfn_encrypt_decrypt( $_COOKIE[ 'gh_email' ], 'd' ) );
+    } else if ( isset( $_GET['email'] ) ) {
+        return intval( $_GET['email'] );
+    }
+
+    return false;
+}
+
 /**
  * Perform the stats collection when a contact clicks a link in an email.
  */
-function wpfn_process_email_tracking()
+function wpfn_process_email_click()
 {
-    if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/via/email/' ) === false )
+    if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/click/' ) === false )
         return;
 
-    //todo click thru rate, open rate, etc...
+    $funnel = wpfn_set_the_funnel( wpfn_get_current_funnel() );
+    $step = wpfn_set_the_step( wpfn_get_current_step() );
+    $email = wpfn_set_the_email( wpfn_get_current_email() );
 
+    /* get the link target */
     if ( ! isset( $_GET['ref'] ) || empty( $_GET['ref'] ) )
         $ref = site_url();
     else
@@ -537,16 +580,56 @@ function wpfn_process_email_tracking()
     $contact = wpfn_get_the_contact();
 
     if ( ! $contact ){
-        /* do not do tracking if there is no contact to track */
+        /* do not do tracking if there is no contact to associate */
         wp_redirect( $ref );
         die();
     }
 
-    wpfn_set_the_contact( $contact->getId() );
+    /* set the contact cookie */
+    wpfn_set_the_contact( $contact->get_id() );
+
+    /* if the open is not tracked, track it now. */
+    if ( ! wpfn_activity_exists( $contact->get_id(), $funnel, $step, 'email_opened', $email ) ){
+        wpfn_log_activity( $contact->get_id(), $funnel, $step, 'email_opened', $email );
+    }
+
+    /* track the click every time */
+    wpfn_log_activity( $contact->get_id(), $funnel, $step, 'email_link_click', $email, $ref );
 
     /* send to original destination. */
+
+    do_action( 'wpfn_email_link_click', $contact->get_id(), $email, $step, $funnel );
+
     wp_redirect( $ref );
     die();
 }
 
-add_action( 'init', 'wpfn_process_email_tracking' );
+add_action( 'init', 'wpfn_process_email_click' );
+
+/**
+ * Process the email open tracking. Add activity and attributions.
+ */
+function wpfn_process_email_open()
+{
+    if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/open/' ) === false )
+        return;
+
+    $contact = wpfn_get_current_contact();
+
+    $funnel_id = wpfn_get_current_funnel() ? wpfn_get_current_funnel() : 0;
+
+    $step_id = wpfn_get_current_step() ? wpfn_get_current_step() : 0;
+
+    $email_id = wpfn_get_current_email();
+
+    /* if the open is not tracked, track it now. */
+    if ( ! wpfn_activity_exists( $contact->get_id(), $funnel_id, $step_id, 'email_opened', $email_id ) ){
+        wpfn_log_activity( $contact->get_id(), $funnel_id, $step_id, 'email_opened', $email_id );
+    }
+
+    do_action( 'wpfn_email_opened', $contact, $email_id, $step_id, $funnel_id );
+
+    die();
+}
+
+add_action( 'init', 'wpfn_process_email_open' );

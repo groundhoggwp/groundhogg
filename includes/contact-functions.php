@@ -231,6 +231,33 @@ function wpfn_get_current_contact()
 }
 
 /**
+ * Get a list of WPFN_contacts given a tag ID
+ *
+ * @param $tag_id int the Id of thre tag
+ * @return bool|array list of contacts or false on failure
+ */
+function wpfn_get_contacts_by_tag( $tag_id )
+{
+    $ids = wpfn_get_contact_ids_by_tag( $tag_id );
+
+    if ( ! $ids )
+        return false;
+
+    $contacts = array();
+
+    foreach ( $ids as $relationship ){
+
+        $contact_id = intval( $relationship[ 'contact_id' ] );
+
+        $contacts[ $contact_id ] = new WPFN_Contact( $contact_id );
+
+    }
+
+    return $contacts;
+}
+
+
+/**
  * Add a tag from the add tag form.
  */
 function wpfn_add_tag()
@@ -375,7 +402,7 @@ function wpfn_dropdown_tags( $args )
         'name' => 'tags[]', 'id' => 'tags',
         'width' => '100%', 'class' => '',
         'show_option_none' => '', 'show_option_no_change' => '',
-        'option_none_value' => ''
+        'option_none_value' => '', 'required' => false
     );
 
     $r = wp_parse_args( $args, $defaults );
@@ -394,7 +421,9 @@ function wpfn_dropdown_tags( $args )
             $class = " class='" . esc_attr( $r['class'] ) . "'";
         }
 
-        $output = "<select style='width:" . esc_attr( $r['width'] ) . ";' name='" . esc_attr( $r['name'] ) . "'" . $class . " id='" . esc_attr( $r['id'] ) . "' multiple>\n";
+        $required = ( $r['required'] === true )? "required" : "";
+
+        $output = "<select style='width:" . esc_attr( $r['width'] ) . ";' name='" . esc_attr( $r['name'] ) . "'" . $class . " id='" . esc_attr( $r['id'] ) . "' " . $required . " multiple>\n";
         if ( $r['show_option_no_change'] ) {
             $output .= "\t<option value=\"-1\">" . $r['show_option_no_change'] . "</option>\n";
         }
@@ -448,11 +477,11 @@ function wpfn_process_email_confirmation()
     if ( ! $contact )
         return;
 
-    wpfn_update_contact( $contact->getId(), 'optin_status', 1 );
+    wpfn_update_contact( $contact->get_id(), 'optin_status', 1 );
 
     $conf_page = get_permalink( get_option( 'gh_confirmation_page' ) );
 
-    do_action( 'wpfn_email_confirmed', $contact->getId() );
+    do_action( 'wpfn_email_confirmed', $contact->get_id() );
 
     wp_redirect( $conf_page );
     die();

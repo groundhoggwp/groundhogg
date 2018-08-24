@@ -11,6 +11,78 @@
  * @since       0.1
  */
 
+/**
+ * Set a cookie to track which funnel the contact came from
+ *
+ * @param $id int the ID of the funnel
+ *
+ * @return int|false the given ID
+ */
+function wpfn_set_the_funnel( $id )
+{
+    if ( ! is_numeric( $id )  )
+        return false;
+
+    setcookie( 'gh_funnel', wpfn_encrypt_decrypt( $id, 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+
+    return $id;
+}
+
+/**
+ * Get the funnel the user came from
+ *
+ * @return bool
+ */
+function wpfn_get_current_funnel()
+{
+    if ( is_admin() )
+        return false;
+
+    if ( isset( $_COOKIE[ 'gh_funnel' ] ) ){
+        return intval( wpfn_encrypt_decrypt( $_COOKIE[ 'gh_funnel' ], 'd' ) );
+    } else if ( isset( $_GET['funnel'] ) ){
+        return intval( $_GET['funnel'] );
+    }
+
+    return false;
+}
+
+/**
+ * Set a cookie to track which step they came from...
+ *
+ * @param $id int the ID of the step
+ *
+ * @return int|false the given ID
+ */
+function wpfn_set_the_step( $id )
+{
+    if ( ! is_numeric( $id )  )
+        return false;
+
+    setcookie( 'gh_step', wpfn_encrypt_decrypt( $id, 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+
+    return $id;
+}
+
+/**
+ * Get the funnel step the user came from
+ *
+ * @return bool
+ */
+function wpfn_get_current_step()
+{
+    if ( is_admin() )
+        return false;
+
+    if ( isset( $_COOKIE[ 'gh_step' ] ) ){
+        return intval( wpfn_encrypt_decrypt( $_COOKIE[ 'gh_step' ], 'd' ) );
+    } else if ( isset( $_GET['step'] ) ) {
+        return intval( $_GET['step'] );
+    }
+
+    return false;
+}
+
 
 /**
  *Add easy way for devs to register new funnel actions and benchmarks
@@ -492,7 +564,7 @@ function wpfn_get_step_html( $step_id )
                     <p class="report"><?php _e('Waiting', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
                 <?php endif; ?>
 
-                <?php do_action( 'wpfn_get_step_report_' . wpfn_get_step_type( $step_id ) ); ?>
+                <?php do_action( 'wpfn_get_step_report_' . wpfn_get_step_type( $step_id ), $step_id, $start, $ends ); ?>
 
                 <?php do_action( 'wpfn_step_reporting_after' ); ?>
             </div>

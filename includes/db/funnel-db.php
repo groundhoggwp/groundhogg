@@ -260,7 +260,7 @@ function wpfn_create_funnels_db()
         return;
 
     $sql = "CREATE TABLE $table_name (
-      ID bigint(20) NOT NULL AUTO_INCREMENT,
+      ID bigint(20) NOT NULL AUTO_INCREMENT = 2,
       funnel_title text NOT NULL,
       funnel_status varchar(20) NOT NULL,
       last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,

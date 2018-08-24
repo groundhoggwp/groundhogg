@@ -85,6 +85,78 @@ function wpfn_dequeue_events( $time_from, $time_to )
  * Since funnels are linear, we can simply remove any existing funnel events.
  * There should only be one event per contact per funnel, but we'll delete multiple if necessary
  *
+ * @param $funnel_id  int The funnel's ID
+ *
+ * @return int|false The number or events deleted, or false if there were no rows affected.
+ */
+function wpfn_dequeue_funnel_events( $funnel_id )
+{
+    global $wpdb;
+
+    if ( ! $funnel_id || ! is_int( $funnel_id ) )
+        return false;
+
+    $funnel_id = absint( $funnel_id );
+
+    if ( ! $funnel_id )
+        return false;
+
+    $table_name = $wpdb->prefix . WPFN_EVENTS;
+
+    return $wpdb->query(
+        $wpdb->prepare(
+            "
+         UPDATE $table_name
+         SET status = %s
+		 WHERE funnel_id = %d AND status = %s
+		",
+            'skipped', $funnel_id, 'waiting'
+        )
+    );
+}
+
+/**
+ * Remove specific funnel events for a contact from the queue.
+ * Since funnels are linear, we can simply remove any existing funnel events.
+ * There should only be one event per contact per funnel, but we'll delete multiple if necessary
+ *
+ * @param $step_id int The step's ID
+ * @param $funnel_id  int The funnel's ID
+ *
+ * @return int|false The number or events deleted, or false if there were no rows affected.
+ */
+function wpfn_dequeue_funnel_step_events( $funnel_id, $step_id )
+{
+    global $wpdb;
+
+    if ( ! $step_id || ! is_int( $step_id ) || ! $funnel_id || ! is_int( $funnel_id ) )
+        return false;
+
+    $step_id = absint( $step_id );
+    $funnel_id = absint( $funnel_id );
+
+    if ( ! $step_id || ! $funnel_id )
+        return false;
+
+    $table_name = $wpdb->prefix . WPFN_EVENTS;
+
+    return $wpdb->query(
+        $wpdb->prepare(
+            "
+         UPDATE $table_name
+         SET status = %s
+		 WHERE step_id = %d AND funnel_id = %d AND status = %s
+		",
+            'skipped', $step_id, $funnel_id, 'waiting'
+        )
+    );
+}
+
+/**
+ * Remove specific funnel events for a contact from the queue.
+ * Since funnels are linear, we can simply remove any existing funnel events.
+ * There should only be one event per contact per funnel, but we'll delete multiple if necessary
+ *
  * @param $contact_id int The contact's ID
  * @param $funnel_id  int The funnel's ID
  *
@@ -156,7 +228,7 @@ function wpfn_enqueue_event( $time, $funnel_id, $step_id, $contact_id, $callback
 }
 
 define( 'WPFN_EVENTS', 'event_queue' );
-define( 'WPFN_EVENTS_DB_VERSION', '0.2' );
+define( 'WPFN_EVENTS_DB_VERSION', '0.3' );
 
 /**
  * Create the events database table.
@@ -183,7 +255,11 @@ function wpfn_create_events_db()
       arg1 text NOT NULL,
       arg2 text NOT NULL,
       arg3 text NOT NULL,
-      PRIMARY KEY (time)
+      PRIMARY KEY (time,funnel_id,step_id,contact_id),
+      KEY time (time),
+      KEY funnel_id (funnel_id),
+      KEY step_id (step_id),
+      KEY contact_id (contact_id)
     ) $charset_collate;";
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

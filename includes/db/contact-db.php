@@ -162,30 +162,30 @@ function wpfn_insert_new_contact( $email, $first='', $last='', $owner_id='', $us
 {
     global $wpdb;
 
-    if ( ! $email || ! is_string( $email ) )
-        return false;
+        if ( ! $email || ! is_string( $email ) )
+            return false;
 
-    $email = sanitize_email( stripslashes( strtolower( $email ) ) );
-    if ( ! $email )
-        return false;
+        $email = sanitize_email( stripslashes( strtolower( $email ) ) );
+        if ( ! $email )
+            return false;
 
-    $success = $wpdb->insert(
-        $wpdb->prefix . WPFN_CONTACTS,
-        array(
-            'email' => $email,
-            'first_name' => $first,
-            'last_name' => $last,
-            'owner_id' => $owner_id,
-            'user_id' => $user_id,
-            'optin_status' => 0,
-            'date_created' => current_time( 'mysql' ),
-        )
-    );
+        $success = $wpdb->insert(
+            $wpdb->prefix . WPFN_CONTACTS,
+            array(
+                'email' => $email,
+                'first_name' => $first,
+                'last_name' => $last,
+                'owner_id' => $owner_id,
+                'user_id' => $user_id,
+                'optin_status' => 0,
+                'date_created' => current_time( 'mysql' ),
+            )
+        );
 
-    if ( $success ){
-        return $wpdb->insert_id;
-    } else {
-        return false;
+        if ( $success ){
+            return $wpdb->insert_id;
+        } else {
+            return false;
     }
 }
 
@@ -329,7 +329,8 @@ function wpfn_create_contacts_db()
       user_id bigint(20) NOT NULL,
       optin_status int NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-      PRIMARY KEY  (ID)
+      PRIMARY KEY  (ID),
+      KEY email (email)
     ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -412,6 +413,45 @@ function wpfn_get_tags()
     $table_name = $wpdb->prefix . WPFN_CONTACT_TAGS;
 
     return $wpdb->get_results( "SELECT * FROM $table_name ORDER BY tag_id DESC", ARRAY_A );
+}
+
+/**
+ * Return ALL the tags related to a contact...
+ * @param $contact_id int ID of the contact
+ *
+ * @return array list of tags...
+ */
+function wpfn_get_contact_tags( $contact_id )
+{
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS;
+
+    return $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM $table_name WHERE contact_id = %d ORDER BY tag_id DESC"
+            , $contact_id), ARRAY_A
+    );
+}
+
+
+/**
+ * Return ALL the tags related to a contact...
+ * @param $tag_id int ID of the tag
+ *
+ * @return array list of contact Ids...
+ */
+function wpfn_get_contact_ids_by_tag( $tag_id )
+{
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS;
+
+    return $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM $table_name WHERE tag_id = %d ORDER BY contact_id DESC"
+            , $tag_id), ARRAY_A
+    );
 }
 
 /**
@@ -702,7 +742,7 @@ function wpfn_count_contact_tag_relationships( $by, $id )
 }
 
 define( 'WPFN_CONTACT_TAGS', 'contact_tags' );
-define( 'WPFN_CONTACT_TAGS_DB_VERSION', '0.1' );
+define( 'WPFN_CONTACT_TAGS_DB_VERSION', '0.2' );
 
 function wpfn_create_contact_tags_db()
 {
@@ -717,9 +757,9 @@ function wpfn_create_contact_tags_db()
         return;
 
     $sql = "CREATE TABLE $table_name (
-      tag_id bigint(20) NOT NULL AUTO_INCREMENT,
-      tag_name varchar(200)	 NOT NULL,
-      tag_description text NOT NULL,
+      tag_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      tag_name varchar(200) NOT NULL DEFAULT '',
+      tag_description longtext NOT NULL,
       PRIMARY KEY  (tag_id)
     ) $charset_collate;";
 
@@ -731,7 +771,7 @@ function wpfn_create_contact_tags_db()
 }
 
 define( 'WPFN_CONTACT_TAG_RELATIONSHIPS', 'contact_tag_relationships' );
-define( 'WPFN_CONTACT_TAG_RELATIONSHIPS_DB_VERSION', '0.1' );
+define( 'WPFN_CONTACT_TAG_RELATIONSHIPS_DB_VERSION', '0.3' );
 
 function wpfn_create_contact_tag_relationships_db()
 {
@@ -746,10 +786,10 @@ function wpfn_create_contact_tag_relationships_db()
         return;
 
     $sql = "CREATE TABLE $table_name (
-      tag_id bigint(20) NOT NULL,
-      contact_id bigint(20) NOT NULL,
-      KEY tag (tag_id),
-      KEY contact (contact_id)
+      tag_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      contact_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      PRIMARY KEY (contact_id,tag_id),
+      KEY tag_id (tag_id)
     ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

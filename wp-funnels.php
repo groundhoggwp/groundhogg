@@ -34,6 +34,9 @@ function wpfn_activation()
 	wpfn_create_contact_meta_db();
 
 	wpfn_create_emails_db();
+
+	wpfn_create_broadcasts_db();
+
 	wpfn_create_email_meta_db();
 
 	wpfn_create_events_db();
@@ -48,6 +51,8 @@ function wpfn_activation()
 	wpfn_create_contact_tag_relationships_db();
 
 	wpfn_create_superlinks_db();
+
+	wpfn_create_activity_db();
 
 	/* create endpoints */
 	/* confirmation page */

@@ -86,7 +86,7 @@ function wpfn_run_account_created_benchmark_action( $userId )
         $contact_id = wpfn_quick_add_contact( $user_info->user_email, $_POST['first_name'], $_POST['last_name'] );
     } else {
         $contact = new WPFN_Contact( $user_info->user_email );
-        $contact_id = $contact->getId();
+        $contact_id = $contact->get_id();
     }
 
     $benchmarks = wpfn_get_funnel_steps_by_type( 'account_created' );
@@ -120,10 +120,10 @@ function wpfn_run_user_role_changed_benchmark( $userId, $cur_role, $old_roles )
 
     $contact = new WPFN_Contact( $user_info->user_email );
 
-    if ( ! $contact->getEmail() )
+    if ( ! $contact->get_email() )
         return;
 
-    $contact_id = $contact->getId();
+    $contact_id = $contact->get_id();
 
     $benchmarks = wpfn_get_funnel_steps_by_type( 'role_changed' );
 
@@ -159,7 +159,7 @@ function wpfn_complete_page_visited_benchmark()
     if ( ! $contact )
         return;
 
-    $contact_id = $contact->getId();
+    $contact_id = $contact->get_id();
 
     $benchmarks = wpfn_get_funnel_steps_by_type( 'page_visited' );
 
@@ -178,9 +178,9 @@ function wpfn_complete_page_visited_benchmark()
             $match_url = wpfn_get_step_meta( $step_id, 'url_match', true );
 
             if ( $match_type === 'exact' ){
-                $is_page = site_url( $_SERVER['REQUEST_URI'] ) === $match_url;
+                $is_page = $_SERVER['REQUEST_URI'] === parse_url( $match_url, PHP_URL_PATH );
             } else {
-                $is_page = strpos( site_url( $_SERVER['REQUEST_URI'] ), $match_url ) !== false;
+                $is_page = strpos( $_SERVER['REQUEST_URI'] ,  parse_url( $match_url, PHP_URL_PATH ) ) !== false;
             }
 
             if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $is_page ){

@@ -94,18 +94,27 @@ function wpfn_do_queued_events()
         $arg2       = maybe_unserialize( $event_args['arg2'] );
         $arg3       = maybe_unserialize( $event_args['arg3'] );
 
-        $step_type = wpfn_get_step_type( $step_id );
+        if ( $funnel_id === WPFN_BROADCAST ){
 
-        do_action( 'wpfn_do_action_' . $step_type, $step_id, $contact_id );
+            do_action( 'wpfn_do_action_broadcast', $step_id, $contact_id );
+
+        } else {
+
+            $step_type = wpfn_get_step_type( $step_id );
+
+            do_action( 'wpfn_do_action_' . $step_type, $step_id, $contact_id );
+
+            /* run the next step only if the funnel is active. */
+            if ( wpfn_is_funnel_active( $funnel_id ) ){
+                $next_step_id = wpfn_enqueue_next_funnel_action( $step_id, $contact_id );
+                do_action( 'wpfn_step_queued', $next_step_id );
+            }
+        }
 
         if ( $callback )
             call_user_func( $callback, $contact_id, $arg1, $arg2, $arg3 );
 
-        /* run the next step only if the funnel is active. */
-        if ( wpfn_is_funnel_active( $funnel_id ) ){
-            $next_step_id = wpfn_enqueue_next_funnel_action( $step_id, $contact_id );
-            do_action( 'wpfn_step_queued', $next_step_id );
-        }
+
     }
 
     /* allow a restart of the event queue by signaling new processes this it's available. */

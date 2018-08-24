@@ -52,15 +52,6 @@ function wpfn_send_email_funnel_step_html( $step_id )
 
 add_action( 'wpfn_get_step_settings_send_email', 'wpfn_send_email_funnel_step_html' );
 
-function wpfn_send_email_icon_html()
-{
-    ?>
-    <div class="dashicons dashicons-email-alt"></div><p><?php echo esc_html__( 'Send Email', 'groundhogg' ); ?></p>
-    <?php
-}
-
-add_action( 'wpfn_action_element_icon_html_send_email', 'wpfn_send_email_icon_html' );
-
 /**
  * Save the email type step
  *
@@ -74,3 +65,37 @@ function wpfn_save_send_email_step( $step_id )
 }
 
 add_action( 'wpfn_save_step_send_email', 'wpfn_save_send_email_step' );
+
+
+function wpfn_send_email_reporting( $step_id, $start, $end )
+{
+
+    $funnel = wpfn_get_step_funnel( $step_id );
+    $email = wpfn_get_step_meta( $step_id, 'email_id', true );
+
+    global $wpdb;
+
+    $table = $wpdb->prefix . WPFN_ACTIVITY;
+
+    $opens = $wpdb->get_var( $wpdb->prepare(
+        "SELECT count(*) FROM $table
+        WHERE funnel_id = %d AND step_id = %d AND object_id = %d AND %d <= timestamp AND timestamp <= %d AND activity_type = %s",
+        $funnel, $step_id, $email, $start, $end, 'email_opened'
+    ) );
+
+    $clicks = $wpdb->get_var( $wpdb->prepare(
+        "SELECT count(*) FROM $table
+        WHERE funnel_id = %d AND step_id = %d AND object_id = %d AND %d <= timestamp AND timestamp <= %d AND activity_type = %s",
+        $funnel, $step_id, $email, $start, $end, 'email_link_click'
+    ) );
+
+    ?>
+    <hr>
+    <p class="report">
+        <span class="opens"><?php _e( 'Opens: '); ?><strong><?php echo $opens; ?></strong></span> | <span class="clicks"><?php _e( 'Clicks: ' ); ?><strong><?php echo $clicks; ?></strong></span> | <span class="ctr"><?php _e( 'CTR: '); ?><strong><?php echo round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ); ?></strong>%</span>
+    </p>
+    <?php
+
+}
+
+add_action( 'wpfn_get_step_report_send_email', 'wpfn_send_email_reporting', 10, 3 );

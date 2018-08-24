@@ -15,6 +15,7 @@ class WPFN_Admin_Menu
     var $superlink_page;
     var $tags_page;
     var $contacts_page;
+    var $broadcasts_page;
 
     function __construct()
     {
@@ -23,6 +24,11 @@ class WPFN_Admin_Menu
             include dirname(__FILE__) . '/admin/settings/settings.php';
 
         $this->settings_page = new WPFN_Settings_Page();
+
+        if (!class_exists('WPFN_Broadcasts_Page'))
+            include dirname(__FILE__) . '/admin/broadcasts/broadcasts.php';
+
+        $this->broadcasts_page = new WPFN_Broadcasts_Page();
 
         if (!class_exists('WPFN_Emails_Page'))
             include dirname(__FILE__) . '/admin/emails/emails.php';
@@ -101,6 +107,15 @@ class WPFN_Admin_Menu
         );
 
         add_action("load-" . $superlinks_admin_add, array($this, 'superlinks_help_bar'));
+
+        $broadcasts_admin_add = add_submenu_page(
+            'groundhogg',
+            'Broadcasts',
+            'Broadcasts',
+            'manage_options',
+            'gh_broadcasts',
+            array($this->broadcasts_page, 'page')
+        );
 
         $email_admin_add = add_submenu_page(
             'groundhogg',

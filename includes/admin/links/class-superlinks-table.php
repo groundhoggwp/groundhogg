@@ -98,7 +98,7 @@ class WPFN_Superlinks_Table extends WP_List_Table {
                 $tags = $item[ 'tags' ] ? maybe_unserialize( $item[ 'tags' ] ) : array();
 
                 foreach ( $tags as $i => $tag_id ){
-                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag_id='.$tag_id).'">' . wpfn_get_tag_name( $tag_id ). '</a>';
+                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . wpfn_get_tag_name( $tag_id ). '</a>';
                 }
 
                 return implode( ', ', $tags );

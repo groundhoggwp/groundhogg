@@ -81,7 +81,6 @@ class WPFN_Contact
 		$this->first_name = ucfirst( $contact['first_name'] );
 		$this->last_name = ucfirst( $contact['last_name'] );
 		$this->optin_status = intval( $contact['optin_status'] );
-		$this->tags = wpfn_get_contact_meta( $this->ID, 'tags', true );
 		$this->activity = wpfn_get_contact_meta( $this->ID, 'activity_log', true );
 		$this->date_created = $contact['date_created'];
 	}
@@ -91,7 +90,7 @@ class WPFN_Contact
 	 *
 	 * @return int the Id of the contact
 	 */
-	function getId()
+	function get_id()
 	{
 		return $this->ID;
 	}
@@ -101,7 +100,7 @@ class WPFN_Contact
 	 *
 	 * @return string
 	 */
-	function getFirst()
+	function get_first()
 	{
 		return $this->first_name;
 	}
@@ -111,7 +110,7 @@ class WPFN_Contact
 	 *
 	 * @return string
 	 */
-	function getLast()
+	function get_last()
 	{
 		return $this->last_name;
 	}
@@ -121,7 +120,7 @@ class WPFN_Contact
 	 *
 	 * @return string
 	 */
-	function getFullName()
+	function get_full()
 	{
 		return $this->first_name . ' ' . $this->last_name;
 	}
@@ -131,7 +130,7 @@ class WPFN_Contact
 	 *
 	 * @return string
 	 */
-	function getEmail()
+	function get_email()
 	{
 		return $this->email;
 	}
@@ -141,7 +140,7 @@ class WPFN_Contact
 	 *
 	 * @return string the phone number
 	 */
-	function getPhone()
+	function get_phone()
 	{
 		return wpfn_get_contact_meta( $this->ID, 'primary_phone', true );
 	}
@@ -151,7 +150,7 @@ class WPFN_Contact
 	 *
 	 * @return string the extension of the contact's phone #
 	 */
-	function getPhoneExtension()
+	function get_phone_extension()
 	{
 		return wpfn_get_contact_meta( $this->ID, 'primary_phone_extension', true );
 	}
@@ -161,9 +160,9 @@ class WPFN_Contact
 	 *
 	 * @return string
 	 */
-	function getPhoneWithExtension()
+	function get_phone_with_extension()
 	{
-		return $this->getPhone() . ' x' . $this->getPhoneExtension();
+		return $this->get_phone() . ' x' . $this->get_phone_extension();
 	}
 
 	/**
@@ -171,7 +170,7 @@ class WPFN_Contact
 	 *
 	 * @return int
 	 */
-	function getOptInStatus()
+	function get_optin_status()
 	{
 		return $this->optin_status;
 	}
@@ -181,7 +180,7 @@ class WPFN_Contact
 	 *
 	 * @return string
 	 */
-	function getActivity()
+	function get_activity()
 	{
 		return $this->activity;
 	}
@@ -191,7 +190,7 @@ class WPFN_Contact
 	 *
 	 * @return array|false the activity in an array format
 	 */
-	function getParsedActivity()
+	function get_parsed_activity()
 	{
 		if ( empty( $this->activity ) )
 			return false;
@@ -209,9 +208,9 @@ class WPFN_Contact
 	 *
 	 * @return array|mixed
 	 */
-	function getTags()
+	function get_tags()
 	{
-		return $this->tags;
+		return wpfn_get_contact_tags( $this->ID );
 	}
 
 	/**
@@ -221,20 +220,9 @@ class WPFN_Contact
 	 *
 	 * @return bool
 	 */
-	function hasTag( $tag_id_or_name )
+	function has_tag( $tag_id_or_name )
 	{
-
-		if ( ! $tag_id_or_name )
-			return false;
-
-		if ( is_numeric( $tag_id_or_name ) ){
-			$tag_id = absint( $tag_id_or_name );
-		} else {
-			//todo, implement tags and come back here and get the tag Id given a tag name.
-			$tag_id = wpfn_get_tag_id( $tag_id_or_name );
-		}
-
-		return in_array( $tag_id, $this->tags );
+	    return wpfn_has_tag( $this->ID, $tag_id_or_name );
 	}
 
 	/**
@@ -244,14 +232,14 @@ class WPFN_Contact
 	 *
 	 * @return mixed
 	 */
-	function getFieldMeta( $meta_key )
+	function get_meta( $meta_key )
 	{
 		return wpfn_get_contact_meta( $this->ID, $meta_key, true );
 	}
 
 	function __toString()
     {
-        return $this->getEmail();
+        return $this->get_email();
     }
 
 }
