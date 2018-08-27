@@ -7,6 +7,7 @@
                 wpActiveEditor = true; //we need to override this var as the link dialogue is expecting an actual wp_editor instance
                 wpLink.active = $(this).attr('data-target');
                 wpLink.open(wpLink.active); //open the link popup
+                $('#wp-link-url').val( $( '#' + wpLink.active ).val() );
                 return false;
             });
         });

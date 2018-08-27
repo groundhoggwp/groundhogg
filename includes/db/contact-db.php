@@ -495,7 +495,7 @@ function wpfn_insert_tag( $tag_name, $tag_description='' )
     if ( ! $tag_name || ! is_string( $tag_name ) )
         return false;
 
-    $tag_name = sanitize_text_field( stripslashes( $tag_name ) );
+    $tag_name = str_replace( ',', '', sanitize_text_field( stripslashes( $tag_name ) ) );
     if ( ! $tag_name )
         return false;
 

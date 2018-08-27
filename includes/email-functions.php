@@ -43,12 +43,25 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     if ( ! $contact_id || ! $email_id  )
         return false;
 
-    $contact_id = absint( intval( $contact_id ) );
     $email_id = absint( intval( $email_id ) );
 
-    /**
-     * @var $link_args array array of $_GET args that will be used to run analytics actions on the site
-     */
+    $contact = new WPFN_Contact( $contact_id );
+
+    /* if the email is a dud, give up. */
+    if ( ! is_email( $contact->get_email() ) )
+        return false;
+
+    /* this contact has unsubscribed and thus don't send them any email. */
+    if ( $contact->get_optin_status() === WPFN_UNSUBSCRIBED )
+        return false;
+
+    $email = wpfn_get_email_by_id( $email_id );
+
+    /* don't send if the email is marked as unready. */
+    if ( $email->email_status !== 'ready' )
+        return false;
+
+    /* @var $link_args array array of $_GET args that will be used to run analytics actions on the site */
     $link_args = array();
 
     if ( $funnel_id && is_int( $funnel_id ) )
@@ -57,27 +70,21 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     if ( $step_id && is_int( $step_id ) )
         $link_args['step'] = absint( $step_id );
 
-    $link_args['contact'] = wpfn_encrypt_decrypt( $contact_id, 'e' );
+    $link_args['contact'] = wpfn_encrypt_decrypt( $contact->get_id(), 'e' );
     $link_args['email'] = $email_id;
 
-    /**
-     * @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to.
-     */
+    /* @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to. */
+
     $ref_link = add_query_arg( $link_args, site_url( 'gh-tracking/email/click/' ) ) . '&ref=';
     $tracking_link = add_query_arg( $link_args, site_url( 'gh-tracking/email/open/' ) );
 
-    $email = wpfn_get_email_by_id( $email_id );
-
-    /* don't send if the email is marked as unready. */
-    if ( $email->email_status !== 'ready' )
-        return false;
-
-
     /* merge in email content into default template */
     $title = get_bloginfo( 'name' );
-    $subject_line = wpfn_do_replacements( $contact_id, $email->subject );
-    $pre_header = wpfn_do_replacements( $contact_id, $email->pre_header );
-    $content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact_id, $email->content ) );
+    $subject_line = wpfn_do_replacements( $contact->get_id(), $email->subject );
+    $pre_header = wpfn_do_replacements( $contact->get_id(), $email->pre_header );
+
+    $content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact->get_id(), $email->content ) );
+
     $email_footer_text = wpfn_get_email_footer_text();
     $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
     $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
@@ -99,26 +106,44 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     $email_content = preg_replace_callback( '/(href=")([^"]*)(")/i', 'wpfn_urlencode_email_links' , $email_content );
     $email_content = preg_replace( '/(href=")([^"]*)(")/i', '${1}' . $ref_link . '${2}${3}' , $email_content );
 
-    $contact = new WPFN_Contact( $contact_id );
-
     $from_user = get_userdata( $email->from_user );
 
-    /* todo find better way to send test emails, different function? */
-    if ( isset( $_POST['send_test'] ) )
-        $to_email = get_userdata( $contact_id )->user_email;
-    else
-        $to_email = $contact->get_email();
+    /* use groundhogg API mail service */
+    if ( get_option( 'gh_mail_server', false ) === 'groundhogg' ){
 
-    $headers = array();
-    $headers[ 'from' ] = 'From: ' . $from_user->display_name . ' <' . $from_user->user_email . '>';
-    $headers[ 'reply_to' ] = 'Reply-To: ' . $from_user->user_email;
-    $headers[ 'content_type' ] = 'Content-Type: text/html; charset=UTF-8';
+        $body = array(
+            'from_name' => $from_user->display_name,
+            'from_email' => $from_user->user_email,
+            'to'   => $contact->get_email(),
+            'subject_line' => $subject_line,
+            'content' => $email_content
+        );
 
-    $headers = apply_filters( 'wpfn_email_headers', $headers );
+        $will_send = GH_Account::$instance->post( 'email', $body );
 
-    add_filter( 'wp_mail_content_type', 'wpfn_send_html_email' );
+        if ( is_wp_error( $will_send ) )
+        {
+            return false;
+        }
+    } else {
+        /* Use default mail-server */
+        $headers = array();
+        $headers[ 'from' ] = 'From: ' . $from_user->display_name . ' <' . $from_user->user_email . '>';
+        $headers[ 'reply_to' ] = 'Reply-To: ' . $from_user->user_email;
+        $headers[ 'content_type' ] = 'Content-Type: text/html; charset=UTF-8';
 
-    return wp_mail( $to_email , $subject_line, $email_content, $headers );
+        $headers = apply_filters( 'wpfn_email_headers', $headers );
+
+        add_filter( 'wp_mail_content_type', 'wpfn_send_html_email' );
+
+        $sent = wp_mail( $contact->get_email() , $subject_line, $email_content, $headers );
+
+        if ( is_wp_error( $sent ) || ! $sent ){
+            return false;
+        }
+    }
+
+    return true;
 }
 
 
@@ -452,7 +477,7 @@ function wpfn_send_test_email( $email_id )
         $test_email_uid =  ( isset( $_POST['test_email'] ) )? intval( $_POST['test_email'] ): '';
         wpfn_update_email_meta( $email_id, 'test_email', $test_email_uid );
 
-        wpfn_send_email( $test_email_uid, $email_id );
+        wpfn_send_email( get_userdata( $test_email_uid )->user_email, $email_id );
 
         do_action( 'wpfn_after_send_test_email', $email_id );
     }
@@ -627,7 +652,7 @@ function wpfn_process_email_open()
         wpfn_log_activity( $contact->get_id(), $funnel_id, $step_id, 'email_opened', $email_id );
     }
 
-    do_action( 'wpfn_email_opened', $contact, $email_id, $step_id, $funnel_id );
+    do_action( 'wpfn_email_opened', $contact->get_id(), $email_id, $step_id, $funnel_id );
 
     die();
 }

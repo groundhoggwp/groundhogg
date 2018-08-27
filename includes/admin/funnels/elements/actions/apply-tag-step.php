@@ -36,7 +36,7 @@ function wpfn_apply_tag_funnel_step_html( $step_id )
             <th><?php echo esc_html__( 'Select Tags to Apply:', 'groundhogg' ); ?></th>
             <td>
                 <?php wpfn_dropdown_tags( $dropdown_args ); ?>
-                <p><a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_tags' ); ?>"><?php _e( 'Add New Tag' ); ?></a></p>
+                <p class="description"><?php _e( 'Add new tags be hitting [enter] or by typing a [comma].', 'groundhogg' ); ?></p>
             </td>
         </tr>
         </tbody>
@@ -54,9 +54,12 @@ add_action( 'wpfn_get_step_settings_apply_tag', 'wpfn_apply_tag_funnel_step_html
  */
 function wpfn_save_apply_tag_step( $step_id )
 {
+//    print_r( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] );
+//    wp_die();
+
     //no need to check the validation as it's already been done buy the main funnel.
     if ( isset( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] ) ){
-        $tags = $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ];
+        $tags = wpfn_validate_tags( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] );
         wpfn_update_step_meta( $step_id, 'tags', $tags );
     }
 }

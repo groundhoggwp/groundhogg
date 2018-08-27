@@ -19,12 +19,15 @@ class WPFN_Settings_Page
 		<div class="wrap">
 			<h1>Groundhogg <?php _e( 'Settings' ); ?></h1>
 			<?php settings_errors(); ?>
+            <?php if ( isset( $_GET[ 'token' ] ) ) :
+                ?><div class="notice notice-success is-dismissible"><p><strong><?php _e( 'Connected to Groundhogg!', 'groundhogg' ); ?></strong></p></div><?php
+            endif; ?>
 			<form method="POST" action="options.php">
                 <?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'general'; ?>
                 <h2 class="nav-tab-wrapper">
                     <a href="?page=groundhogg&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php _e( 'General', 'groundhogg'); ?></a>
-                    <a href="?page=groundhogg&tab=marketing" class="nav-tab <?php echo $active_tab == 'marketing' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Marketing', 'groundhogg'); ?></a>
-                    <a href="?page=groundhogg&tab=emails" class="nav-tab <?php echo $active_tab == 'emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Emails', 'groundhogg'); ?></a>
+                    <a href="?page=groundhogg&tab=marketing" class="nav-tab <?php echo $active_tab == 'marketing' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Compliance', 'groundhogg'); ?></a>
+                    <a href="?page=groundhogg&tab=emails" class="nav-tab <?php echo $active_tab == 'emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Email', 'groundhogg'); ?></a>
                     <a href="?page=groundhogg&tab=tools" class="nav-tab <?php echo $active_tab == 'tools' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Tools', 'groundhogg'); ?></a>
                     <a href="?page=groundhogg&tab=extensions" class="nav-tab <?php echo $active_tab == 'extensions' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Extensions', 'groundhogg'); ?></a>
                 </h2>
@@ -32,32 +35,68 @@ class WPFN_Settings_Page
                     case 'general':
                         settings_fields( 'groundhogg_business_settings' );
                         do_settings_sections( 'groundhogg_business_settings' );
+                        submit_button();
+
                         break;
                     case 'marketing':
                         settings_fields( 'groundhogg_marketing_settings' );
                         do_settings_sections( 'groundhogg_marketing_settings' );
+                        submit_button();
+
                         break;
                     case 'emails':
+
+                        GH_Account::$instance->connect_button();
+
                         settings_fields( 'groundhogg_email_settings' );
                         do_settings_sections( 'groundhogg_email_settings' );
+                        submit_button();
+
                         break;
                     case 'tools':
+                        ?>
+                        <div id="poststuff">
+                            <div class="postbox">
+                                <h2 class="hndle"><?php _e( 'Import Contacts', 'groundhogg' ); ?></h2>
+                                <div class="inside">
+                                    <p>
+                                        <input type="file" accept=".csv" >
+                                    </p>
+                                    <?php $tag_args = array();
+                                    $tag_args[ 'id' ] = 'superlink_tags';
+                                    $tag_args[ 'name' ] = 'superlink_tags[]';
+                                    $tag_args[ 'width' ] = '100%';
+                                    $tag_args[ 'class' ] = 'hidden'; ?>
+                                    <?php wpfn_dropdown_tags( $tag_args ); ?>
+                                    <p class="description"><?php _e( 'Select tags to apply tags to this import', 'groundhogg' ); ?></p>
+                                    <?php submit_button( 'Import' ); ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php
+
+
                         break;
                     case 'extensions':
+
+                        GH_Account::$instance->connect_button();
+
                         settings_fields( 'groundhogg_extensions_settings' );
                         do_settings_sections( 'groundhogg_extensions_settings' );
+                        submit_button();
+
                         break;
 
                     default:
 
                         do_action( 'grounhogg_' . $active_tab . '_settings'  );
+                        submit_button();
 
                         break;
 
                     endswitch;
-
-					submit_button();
-				?>
+                    ?>
 			</form>
 		</div> <?php
 	}
@@ -72,6 +111,9 @@ class WPFN_Settings_Page
 //        add_settings_section('confirmation_page', 'Confirmation Page', array(), 'groundhogg_marketing_settings');
 //        add_settings_section('email_preferences_page', 'Email Preferences Page', array(), 'groundhogg_marketing_settings');
         add_settings_section('compliance', __( 'Compliance Settings', 'groundhogg' ), array(), 'groundhogg_marketing_settings');
+
+
+        add_settings_section( 'default_mail_settings', 'Default Mail Settings', array(), 'groundhogg_email_settings' );
     }
 
 	public function wpfn_setup_fields()
@@ -236,6 +278,19 @@ class WPFN_Settings_Page
                     'off' => 'Off',
                 ),
             ),
+            array(
+                'label' => 'Send mail with default SMTP provider or Groundhogg Mail',
+                'id' => 'gh_mail_server',
+                'type' => 'radio',
+                'desc' => 'You may choose to send mail using your default provider (your own server) or you can use Groundhogg to send mail. 
+                Groundhogg Mail is an inexpensive and monitored mail service designed to get your email to the inbox.',
+                'section' => 'default_mail_settings',
+                'page' => 'groundhogg_email_settings',
+                'options' => array(
+                    'groundhogg' => 'Groundhogg Mail',
+                    'default' => 'Default Mail Service',
+                ),
+            ),
 
 		);
 		foreach( $fields as $field ){
@@ -290,7 +345,7 @@ class WPFN_Settings_Page
                 $args['id'] = $field['id'];
 
                 wp_dropdown_pages( $args );
-                printf( '<script>jQuery(function(){jQuery( "#%1$s" ).select2()});</script>',
+                printf( '<script>jQuery(function($){$( "#%1$s" ).width(200);$( "#%1$s" ).select2()});</script>',
                     $field['id']
                 );
 

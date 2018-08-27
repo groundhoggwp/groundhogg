@@ -36,7 +36,7 @@ function wpfn_email_opened_funnel_step_html( $step_id )
         <tr>
             <th><?php esc_html_e( 'Email being opened:', 'groundhogg' ); ?></th>
             <td>
-                <select id="<?php wpfn_prefix_step_meta_e( $step_id, 'emails' ); ?>" name="<?php wpfn_prefix_step_meta_e( $step_id, 'emails[]' ); ?>" multiple>
+                <select class="hidden" style="width:100%;" id="<?php wpfn_prefix_step_meta_e( $step_id, 'emails' ); ?>" name="<?php wpfn_prefix_step_meta_e( $step_id, 'emails[]' ); ?>" multiple>
                     <?php foreach ( $email_steps as $step ):
 
                         ?><option value="<?php echo $step['ID']; ?>" <?php if ( in_array( $step['ID'], $selected_emails ) ) echo 'selected="selected"'; ?> ><?php esc_html_e( $step[ 'funnelstep_title' ] ); ?></option><?php

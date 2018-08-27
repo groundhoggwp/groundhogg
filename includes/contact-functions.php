@@ -387,6 +387,25 @@ function wpfn_do_remove_tag_action( $step_id, $contact_id )
 add_action( 'wpfn_do_action_remove_tag', 'wpfn_do_remove_tag_action', 10, 2 );
 
 /**
+ * Iterate through a list of supposed tags.
+ * If the tag exists, then great, otherwise create it for simplicity.
+ *
+ * @param $maybe_tags array list of supposed tags.
+ * @return mixed
+ */
+function wpfn_validate_tags( $maybe_tags )
+{
+    foreach ( $maybe_tags as $i => $maybe_tag_id )
+    {
+        if ( ! wpfn_tag_exists( $maybe_tag_id ) )
+        {
+            $maybe_tags[$i] = wpfn_insert_tag( $maybe_tag_id );
+        }
+    }
+    return $maybe_tags;
+}
+
+/**
  * Get a tag selector to select tags...
  *
  * @param $args array args for the tag selector
@@ -394,8 +413,9 @@ add_action( 'wpfn_do_action_remove_tag', 'wpfn_do_remove_tag_action', 10, 2 );
  */
 function wpfn_dropdown_tags( $args )
 {
-    wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css' );
-    wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js' );
+    wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css' );
+    //wp_enqueue_style( 'select2-bootstrap', 'https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.9/select2-bootstrap.min.css' );
+    wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js', array( 'jquery' ) );
 
     $defaults = array(
         'selected' => array(), 'echo' => 1,
@@ -443,7 +463,7 @@ function wpfn_dropdown_tags( $args )
         $output .= "</select>\n";
     }
 
-    $output .= "<script>jQuery(document).ready(function(){jQuery( '#" . esc_attr( $r['id'] ) . "' ).select2()});</script>";
+    $output .= "<script>jQuery(document).ready(function(){jQuery( '#" . esc_attr( $r['id'] ) . "' ).select2({tags:true,tokenSeparators: ['/',',',';']})});</script>";
 
     /**
      * Filters the HTML output of a list of pages as a drop down.

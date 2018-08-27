@@ -190,7 +190,7 @@ function wpfn_complete_page_visited_benchmark()
     }
 }
 
-add_action( 'wp_head', 'wpfn_complete_page_visited_benchmark' );
+add_action( 'init', 'wpfn_complete_page_visited_benchmark' );
 
 /**
  * Complete the tag removed benchmark
@@ -266,3 +266,33 @@ function wpfn_complete_form_fill_benchmark( $step_id, $contact_id )
 }
 
 add_action( 'wpfn_form_submit' , 'wpfn_complete_form_fill_benchmark' , 10, 2 );
+
+/**
+ * When an email is opened complete the followup benchmarks.
+ *
+ * @param $contact_id int ID of the contact which complete the step
+ * @param $email_id int the ID of the email which was opened
+ * @param $email_step_id int the ID of the associated Email step
+ * @param $funnel_id int ID of the associated funnel
+ */
+function wpfn_complete_email_opened_benchmark( $contact_id, $email_id, $email_step_id, $funnel_id )
+{
+    $benchmarks = wpfn_get_funnel_steps_by_type( 'email_opened' );
+
+    if ( ! $benchmarks )
+        return;
+
+    foreach ( $benchmarks as $benchmark ) {
+
+        $step_id = intval( $benchmark['ID'] );
+        $step_order = intval( $benchmark['funnelstep_order'] );
+        $funnel_id = intval( $benchmark['funnel_id'] );
+
+        $steps = wpfn_get_step_meta( $step_id, 'emails', true );
+
+        if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $email_step_id, $steps ) ){
+            wpfn_complete_benchmark( $step_id, $contact_id );
+        }
+    }}
+
+add_action( 'wpfn_email_opened', 'wpfn_complete_email_opened_benchmark', 10, 4 );

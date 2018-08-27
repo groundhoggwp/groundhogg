@@ -24,8 +24,8 @@ wp_enqueue_script( 'jquery-ui-datepicker' );
 wp_enqueue_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
 wp_enqueue_script( 'link-picker', WPFN_ASSETS_FOLDER . '/js/admin/link-picker.js' );
 //wp_enqueue_script( 'sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-admin-sidebar.js' );
-wp_enqueue_script( 'sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-sidebar.js' );
-wp_enqueue_script( 'jquery-sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/jquery.sticky-sidebar.js' );
+wp_enqueue_script( 'sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-sidebar/sticky-sidebar.js' );
+wp_enqueue_script( 'jquery-sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
 wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
 wp_enqueue_style( 'funnel-editor', WPFN_ASSETS_FOLDER . '/css/admin/funnel-editor.css' );
 

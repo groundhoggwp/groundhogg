@@ -36,7 +36,7 @@ function wpfn_remove_tag_funnel_step_html( $step_id )
             <th><?php echo esc_html__( 'Select Tags to Remove:', 'groundhogg' ); ?></th>
             <td>
                 <?php wpfn_dropdown_tags( $dropdown_args ); ?>
-                <p><a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_tags' ); ?>"><?php _e( 'Add New Tag' ); ?></a></p>
+                <p class="description"><?php _e( 'Add new tags be hitting [enter] or by typing a [comma].', 'groundhogg' ); ?></p>
             </td>
         </tr>
         </tbody>
@@ -65,7 +65,7 @@ function wpfn_save_remove_tag_step( $step_id )
 {
     //no need to check the validation as it's already been done buy the main funnel.
     if ( isset( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] ) ){
-        $tags = $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ];
+        $tags = wpfn_validate_tags( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] );
         wpfn_update_step_meta( $step_id, 'tags', $tags );
     }
 }

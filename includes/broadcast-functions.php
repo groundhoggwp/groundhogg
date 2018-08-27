@@ -83,3 +83,45 @@ function wpfn_send_broadcast( $broadcast_id, $contact_id )
 }
 
 add_action( 'wpfn_do_action_broadcast', 'wpfn_send_broadcast' );
+
+/**
+ * Get the number of opens for a broadcast email
+ *
+ * @param $broadcast_id int the broadcast ID
+ * @return null|string
+ */
+function wpfn_get_broadcast_opens( $broadcast_id )
+{
+    global $wpdb;
+
+    $table = $wpdb->prefix . WPFN_ACTIVITY;
+
+    $opens = $wpdb->get_var( $wpdb->prepare(
+        "SELECT count(*) FROM $table
+        WHERE funnel_id = %d AND step_id = %d AND activity_type = %s",
+        WPFN_BROADCAST, $broadcast_id, 'email_opened'
+    ) );
+
+    return $opens;
+}
+
+/**
+ * Get the number of clicks for a broadcast link click
+ *
+ * @param $broadcast_id int the broadcast ID
+ * @return null|string
+ */
+function wpfn_get_broadcast_clicks( $broadcast_id )
+{
+    global $wpdb;
+
+    $table = $wpdb->prefix . WPFN_ACTIVITY;
+
+    $opens = $wpdb->get_var( $wpdb->prepare(
+        "SELECT count(*) FROM $table
+        WHERE funnel_id = %d AND step_id = %d AND activity_type = %s",
+        WPFN_BROADCAST, $broadcast_id, 'email_link_click'
+    ) );
+
+    return $opens;
+}

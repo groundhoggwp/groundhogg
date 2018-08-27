@@ -92,7 +92,7 @@ function wpfn_add_superlink()
 {
 	$superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
 	$superlink_target = sanitize_text_field( wp_unslash( $_POST['superlink_target'] ) );
-	$superlink_tags = isset( $_POST['superlink_tags'] ) ? $_POST['superlink_tags'] : array() ;
+	$superlink_tags = isset( $_POST['superlink_tags'] ) ? wpfn_validate_tags( $_POST['superlink_tags'] ): array() ;
 	$superlink_id = wpfn_insert_new_superlink( $superlink_name, $superlink_target, $superlink_tags );
 }
 
@@ -102,7 +102,7 @@ function wpfn_save_superlink( $id )
 {
 	$superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
 	$superlink_target = sanitize_text_field( wp_unslash( $_POST['superlink_target'] ) );
-	$superlink_tags = $_POST['superlink_tags'];
+	$superlink_tags = wpfn_validate_tags( $_POST['superlink_tags'] );
 	wpfn_update_superlink( $id, 'name', $superlink_name );
 	wpfn_update_superlink( $id, 'target', $superlink_target );
 	wpfn_update_superlink( $id, 'tags', $superlink_tags );

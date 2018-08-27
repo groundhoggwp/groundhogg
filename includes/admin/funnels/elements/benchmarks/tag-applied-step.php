@@ -35,7 +35,9 @@ function wpfn_tag_applied_funnel_step_html( $step_id )
         <tbody>
         <tr>
             <th><?php esc_html_e( 'Run when any of these tags are applied:', 'groundhogg' ); ?></th>
-            <td><?php wpfn_dropdown_tags( $dropdown_args ); ?></td>
+            <td><?php wpfn_dropdown_tags( $dropdown_args ); ?>
+                <p class="description"><?php _e( 'Add new tags be hitting [enter] or by typing a [comma].', 'groundhogg' ); ?></p>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -44,15 +46,6 @@ function wpfn_tag_applied_funnel_step_html( $step_id )
 }
 
 add_action( 'wpfn_get_step_settings_tag_applied', 'wpfn_tag_applied_funnel_step_html' );
-
-function wpfn_tag_applied_icon_html()
-{
-    ?>
-    <div class="dashicons dashicons-tag"></div><p><?php _e( 'Tag Applied' ); ?></p>
-    <?php
-}
-
-add_action( 'wpfn_benchmark_element_icon_html_tag_applied', 'wpfn_tag_applied_icon_html' );
 
 /**
  * Save the apply tag step
@@ -63,7 +56,7 @@ function wpfn_save_tag_applied_step( $step_id )
 {
     //no need to check the validation as it's already been done buy the main funnel.
     if ( isset( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] ) ){
-        $tags = $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ];
+        $tags = wpfn_validate_tags( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] );
         wpfn_update_step_meta( $step_id, 'tags', $tags );
     }
 }

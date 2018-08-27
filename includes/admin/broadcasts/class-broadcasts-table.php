@@ -162,6 +162,15 @@ class WPFN_Broadcasts_Table extends WP_List_Table {
                 if ( $item[ 'broadcast_status' ] !== 'sent' )
                     return '&#x2014;';
 
+                $opens = wpfn_get_broadcast_opens( $item['ID'] );
+                $clicks = wpfn_get_broadcast_opens( $item['ID'] );
+
+                $html = "Opens: <strong>" . $opens . "</strong><br>";
+                $html.= "Clicks: <strong>" . $clicks . "</strong><br>";
+                $html.= "CTR: <strong>" . round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) . "</strong><br>";
+
+                return $html;
+
                 break;
             case 'send_at':
                 $time = $item['send_at'];

@@ -49,7 +49,7 @@ $superlink = wpfn_get_superlink_by_id( $id );
                 }
                 ?>
                 <?php wpfn_dropdown_tags( $tag_args ); ?>
-                <p class="description"><?php _e( 'These tags will be applied to a contact whenever this link is clicked.', 'groundhogg' ); ?></p>
+                <p class="description"><?php _e( 'These tags will be applied to a contact whenever this link is clicked. To create a new tag hit [enter] or [comma]', 'groundhogg' ); ?></p>
             </td>
         </tr>
         </tbody>

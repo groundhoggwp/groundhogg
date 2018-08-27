@@ -19,7 +19,7 @@ class WPFN_Superlinks_Page
 {
 	function __construct()
 	{
-		if ( $_GET[ 'page' ] === 'gh_superlinks' ){
+		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_superlinks' ){
 
 			add_action( 'init' , array( $this, 'process_action' )  );
 
@@ -72,9 +72,11 @@ class WPFN_Superlinks_Page
 
 	function get_notice()
 	{
-		$ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
-
-		$count = count( $ids );
+        if ( isset( $_REQUEST['ids'] ) )
+        {
+            $ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
+            $count = count( $ids );
+        }
 
 		switch ( $this->get_previous_action() )
 		{
@@ -200,7 +202,7 @@ class WPFN_Superlinks_Page
                                 $tag_args[ 'width' ] = '100%';
                                 $tag_args[ 'class' ] = 'hidden'; ?>
                                 <?php wpfn_dropdown_tags( $tag_args ); ?>
-                                <p><?php _e( 'These tags will be applied to a contact whenever this link is clicked.', 'groundhogg' ); ?></p>
+                                <p><?php _e( 'These tags will be applied to a contact whenever this link is clicked. To create a new tag hit [enter] or [comma]', 'groundhogg' ); ?></p>
                             </div>
                             <?php submit_button( __( 'Add New Superlink', 'groundhogg' ), 'primary', 'add_superlink' ); ?>
                         </form>
@@ -231,10 +233,6 @@ class WPFN_Superlinks_Page
 		wp_enqueue_script('wplink');
 		wp_enqueue_style('editor-buttons');
 		wp_enqueue_script( 'link-picker', WPFN_ASSETS_FOLDER . '/js/admin/link-picker.js' );
-
-		print_r( $this->get_superlinks() );
-
-		print_r( $_REQUEST['_wpnonce'] );
 		
 		?>
         <div class="wrap">

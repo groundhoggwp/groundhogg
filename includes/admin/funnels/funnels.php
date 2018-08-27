@@ -21,7 +21,7 @@ class WPFN_Funnels_Page
 {
 	function __construct()
 	{
-		if ( $_GET[ 'page' ] === 'gh_funnels' ){
+		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' ){
 
 			add_action( 'init' , array( $this, 'process_action' )  );
 
@@ -82,9 +82,11 @@ class WPFN_Funnels_Page
 
 	function get_notice()
 	{
-		$ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
-
-		$count = count( $ids );
+	    if ( isset( $_REQUEST['ids'] ) )
+        {
+            $ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
+            $count = count( $ids );
+        }
 
 		switch ( $this->get_previous_action() )
 		{

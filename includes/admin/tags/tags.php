@@ -19,7 +19,7 @@ class WPFN_Tags_Page
 {
 	function __construct()
 	{
-		if ( $_GET[ 'page' ] === 'gh_tags' ){
+		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_tags' ){
 
 			add_action( 'init' , array( $this, 'process_action' )  );
 
@@ -72,9 +72,11 @@ class WPFN_Tags_Page
 
 	function get_notice()
 	{
-		$ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
-
-		$count = count( $ids );
+        if ( isset( $_REQUEST['ids'] ) )
+        {
+            $ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
+            $count = count( $ids );
+        }
 
 		switch ( $this->get_previous_action() )
 		{
