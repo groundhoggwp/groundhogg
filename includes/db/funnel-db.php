@@ -161,9 +161,9 @@ function wpfn_count_funnel_items( $where='', $clause='' )
     $table_name = $wpdb->prefix . WPFN_FUNNELS;
 
     if ( $where && $clause ){
-        return $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE $where LIKE %s", $clause ) );
+        return intval( $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE $where LIKE %s", $clause ) ) );
     } else {
-        return $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE funnel_status LIKE %s OR funnel_status LIKE %s OR funnel_status LIKE %s", 'active', 'inactive', '' ) );
+        return intval( $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE funnel_status LIKE %s OR funnel_status LIKE %s OR funnel_status LIKE %s", 'active', 'inactive', '' ) ) );
     }
 }
 
@@ -260,7 +260,7 @@ function wpfn_create_funnels_db()
         return;
 
     $sql = "CREATE TABLE $table_name (
-      ID bigint(20) NOT NULL AUTO_INCREMENT = 2,
+      ID bigint(20) NOT NULL AUTO_INCREMENT,
       funnel_title text NOT NULL,
       funnel_status varchar(20) NOT NULL,
       last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
@@ -270,6 +270,8 @@ function wpfn_create_funnels_db()
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
+
+    $wpdb->query( "ALTER TABLE $table_name AUTO_INCREMENT = 2" );
 
     update_option( 'wpfn_funnels_db_version', WPFN_FUNNELS_DB_VERSION );
 }

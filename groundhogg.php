@@ -33,22 +33,21 @@ function wpfn_activation()
 	wpfn_create_contacts_db();
 	wpfn_create_contact_meta_db();
 
+	wpfn_create_contact_tags_db();
+    wpfn_create_contact_tag_relationships_db();
+
 	wpfn_create_emails_db();
+    wpfn_create_email_meta_db();
 
-	wpfn_create_broadcasts_db();
+    wpfn_create_broadcasts_db();
 
-	wpfn_create_email_meta_db();
-
-	wpfn_create_events_db();
+    wpfn_create_events_db();
 
 	wpfn_create_funnels_db();
 	wpfn_create_funnel_meta_db();
 
 	wpfn_create_funnelsteps_db();
 	wpfn_create_funnelstep_meta_db();
-
-	wpfn_create_contact_tags_db();
-	wpfn_create_contact_tag_relationships_db();
 
 	wpfn_create_superlinks_db();
 
@@ -93,6 +92,21 @@ function wpfn_activation()
         $id = wp_insert_post( $email_preferences_args );
         update_option( 'gh_email_preferences_page', $id );
     }
+
+    /* convert users to contacts */
+    $args = array(
+        'fields' => 'all_with_meta'
+    );
+
+    $users = get_users( $args );
+
+    /* @var $wp_user WP_User */
+    foreach ( $users as $wp_user )
+    {
+        $cid = wpfn_quick_add_contact( $wp_user->user_email, $wp_user->user_firstname, $wp_user->user_lastname );
+        //todo log how created.
+    }
+
 }
 
 register_activation_hook( __FILE__, 'wpfn_activation');

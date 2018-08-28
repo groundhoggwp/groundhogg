@@ -92,7 +92,7 @@ function wpfn_form_shortcode( $atts )
 
         $form .= '<label>';
         $form .= ' <input class="gh-form-input" type="checkbox" name="gdpr_consent" id="' . $id . '" title="' . __( 'Explicit Consent', 'groundhogg' ) . '" required> ';
-        $form .=  __( 'I consent to receive marketing & transactional information from ' . get_bloginfo( 'name' ) . '.' , 'groundhogg' ) . '</label>';
+        $form .=  __( 'I consent to receive marketing & transactional information from ' . get_option( 'gh_business_name' ) . '.' , 'groundhogg' ) . '</label>';
 
         $form .= '</p></div>';
     }

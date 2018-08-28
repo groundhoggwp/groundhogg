@@ -306,7 +306,7 @@ function wpfn_integrate_contacts_wpdb()
 }
 
 define( 'WPFN_CONTACTS', 'contacts' );
-define( 'WPFN_CONTACTS_DB_VERSION', '0.4' );
+define( 'WPFN_CONTACTS_DB_VERSION', '0.7' );
 
 function wpfn_create_contacts_db()
 {
@@ -320,17 +320,19 @@ function wpfn_create_contacts_db()
     if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_contacts_db_version'), WPFN_CONTACTS_DB_VERSION, '==' ) )
         return;
 
+    $max_index_length = 191;
+
     $sql = "CREATE TABLE $table_name (
-      ID bigint(20) NOT NULL AUTO_INCREMENT,
-      email tinytext NOT NULL,
-      first_name tinytext NOT NULL,
-      last_name tinytext NOT NULL,
-      owner_id bigint(20) NOT NULL,
-      user_id bigint(20) NOT NULL,
-      optin_status int NOT NULL,
+      ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      email text NOT NULL,
+      first_name text NOT NULL,
+      last_name text NOT NULL,
+      owner_id bigint(20) unsigned NOT NULL,
+      user_id bigint(20) unsigned NOT NULL,
+      optin_status int unsigned  NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-      PRIMARY KEY  (ID),
-      KEY email (email)
+      PRIMARY KEY (ID),
+      KEY email (email($max_index_length))
     ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -370,7 +372,6 @@ function wpfn_create_contact_meta_db()
     dbDelta( $install_query );
 
     update_option( 'wpfn_contact_meta_db_version', WPFN_CONTACT_META_DB_VERSION );
-
 }
 
 /**
@@ -742,7 +743,7 @@ function wpfn_count_contact_tag_relationships( $by, $id )
 }
 
 define( 'WPFN_CONTACT_TAGS', 'contact_tags' );
-define( 'WPFN_CONTACT_TAGS_DB_VERSION', '0.2' );
+define( 'WPFN_CONTACT_TAGS_DB_VERSION', '0.3' );
 
 function wpfn_create_contact_tags_db()
 {

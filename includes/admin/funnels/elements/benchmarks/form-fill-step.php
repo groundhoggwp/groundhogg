@@ -25,7 +25,7 @@ function wpfn_form_fill_funnel_step_html( $step_id )
             <th>
                 <?php esc_attr_e( 'Copy & Paste:', 'groundhogg' ); ?>
             </th>
-            <td><p><strong><input class="regular-text" type="text" value='[gh_form id="<?php echo $step_id; ?>" fields="first,last,email,phone" submit="submit" success="/thank-you/" labels="off"]' readonly></strong></p>
+            <td><p><strong><input class="regular-text" type="text" value='[gh_form id="<?php echo $step_id; ?>" fields="first,last,email,phone,terms" submit="submit" success="<?php echo esc_url( site_url( '/thank-you/' ) );?>" labels="off"]' readonly></strong></p>
             </td>
         </tr>
     </table>

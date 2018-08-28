@@ -784,12 +784,17 @@ function wpfn_create_new_funnel()
 {
     if ( isset( $_POST[ 'funnel_template' ] ) ){
 
-        include dirname(__FILE__) . '/templates/funnel-templates.php';
+        include dirname(__FILE__ ) . '/templates/funnel-templates.php';
 
         /* @var $funnel_templates array included from funnel-templates.php*/
+        //print_r($funnel_templates);
+        //wp_die( $funnel_templates );
         $funnel = $funnel_templates[ $_POST[ 'funnel_template' ] ];
 
         $funnel_id = wpfn_insert_new_funnel( $funnel['title'], 'inactive' );
+
+        if ( ! $funnel_id )
+            wp_die( 'Error creating funnel.' );
 
         foreach ( $funnel['steps'] as $i => $step )
         {

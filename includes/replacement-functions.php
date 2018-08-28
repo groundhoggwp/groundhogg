@@ -71,7 +71,7 @@ function wpfn_do_replacements( $contact_id, $content )
 
     do_action( 'wpfn_load_replacements' );
 
-    preg_match_all( '/{[\w\d.]+}/', $content, $matches );
+    preg_match_all( '/{[^{}]+}/', $content, $matches );
     $actual_matches = $matches[0];
 
     $contact = new WPFN_Contact( $contact_id );
@@ -82,7 +82,7 @@ function wpfn_do_replacements( $contact_id, $content )
         $replacement = substr( $pattern, 1, -1);
 
         if ( substr($replacement, 0, 1) === '_' ) {
-            $new_replacement = $contact->get_meta( substr($replacement, 1) );
+            $new_replacement = $contact->get_meta( substr( $replacement, 1 ) );
         } else {
 
             if ( strpos( $replacement, '.' ) > 0 ){
@@ -98,7 +98,7 @@ function wpfn_do_replacements( $contact_id, $content )
             }
         }
 
-        $content = preg_replace( '/' . $pattern . '/', $new_replacement, $content );
+        $content = preg_replace( sprintf( "/%s/", $pattern ), $new_replacement, $content );
     }
 
     return $content;
@@ -162,3 +162,22 @@ function wpfn_replacement_confirmation_link( $contact )
 }
 
 add_filter( 'wpfn_replacement_confirmation_link', 'wpfn_replacement_confirmation_link' );
+
+function wpfn_replacement_date( $time_string, $contact )
+{
+
+    $parts = explode( ';', $time_string );
+
+    if ( count( $parts ) === 1 ){
+        $format = 'l jS \of F Y';
+        $when = $parts[0];
+    } else {
+        $format = $parts[0];
+        $when = $parts[1];
+    }
+
+    return date( $format, strtotime( $when ) );
+
+}
+
+add_filter( 'wpfn_replacement_date', 'wpfn_replacement_date', 10, 2 );

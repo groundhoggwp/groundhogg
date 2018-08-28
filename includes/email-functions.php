@@ -159,6 +159,7 @@ function wpfn_get_email_footer_text()
     if ( get_option( 'gh_business_name' ) )
         $footer .= "&copy; " . get_option( 'gh_business_name' ) . "<br/>" ;
 
+    $address = array();
     if ( get_option( 'gh_street_address_1' ) )
         $address[] = get_option( 'gh_street_address_1' ) . ' ' . get_option( 'gh_street_address_2' );
     if ( get_option( 'gh_city' ) )
@@ -172,6 +173,7 @@ function wpfn_get_email_footer_text()
 
     $footer .= implode( ', ', $address ) . "<br/>";
 
+    $sub = array();
     if ( get_option( 'gh_phone', 0 ) )
         $sub[] = "<a href='tel:" . esc_attr( get_option( 'gh_phone' ) ) . "'>" . esc_attr( get_option( 'gh_phone' ) ) . "</a>";
     if ( get_option( 'gh_privacy_policy' ) )
@@ -477,7 +479,10 @@ function wpfn_send_test_email( $email_id )
         $test_email_uid =  ( isset( $_POST['test_email'] ) )? intval( $_POST['test_email'] ): '';
         wpfn_update_email_meta( $email_id, 'test_email', $test_email_uid );
 
-        wpfn_send_email( get_userdata( $test_email_uid )->user_email, $email_id );
+        $sent = wpfn_send_email( get_userdata( $test_email_uid )->user_email, $email_id );
+
+        if ( ! $sent )
+            wp_die( 'Could not send test.' );
 
         do_action( 'wpfn_after_send_test_email', $email_id );
     }
