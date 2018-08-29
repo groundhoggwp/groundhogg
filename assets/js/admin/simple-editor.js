@@ -665,6 +665,7 @@
                         //unwrap(elm[0]);
                         return true;
                     }
+                    jQuery(elm).attr('style', '');
                     return exec(formatBlock, '<p>');
                 }
             },

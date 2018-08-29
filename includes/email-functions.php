@@ -400,7 +400,23 @@ function wpfn_create_new_email()
     }
 
     $email_id = wpfn_insert_new_email( $email_content, '', '', get_current_user_id(), get_current_user_id() );
-    wp_redirect( admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id ) );
+
+    if ( isset( $_GET['step'] ) ){
+
+        $step_id = intval( $_GET['step'] );
+
+        wpfn_update_step_meta( $step_id, 'email_id', $email_id );
+
+        $funnel_id = wpfn_get_step_funnel( $step_id );
+
+        wp_redirect( admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id . '&return_funnel=' . $funnel_id ) );
+
+    } else {
+
+        wp_redirect( admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id ) );
+
+    }
+
     die();
 }
 

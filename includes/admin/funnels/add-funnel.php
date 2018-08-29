@@ -48,10 +48,10 @@ do_action( 'wpfn_before_new_funnel' );
         <div class="upload-pluing-wrap">
             <div class="upload-plugin">
                 <p class="install-help"><?php _e( 'If you have a funnel import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
-                <form enctype="multipart/form-data" class="wp-upload-form">
+                <form method="post" enctype="multipart/form-data" class="wp-upload-form">
                     <?php wp_nonce_field(); ?>
 
-                    <input type="file" name="funnel_template" id="funnel_template" accept=".funnel" multiple>
+                    <input type="file" name="funnel_template" id="funnel_template" accept=".funnel">
 
                     <button class="button-primary" name="funnel_inport" value="import"><?php _e('Import Funnels', 'groundhogg'); ?></button>
 

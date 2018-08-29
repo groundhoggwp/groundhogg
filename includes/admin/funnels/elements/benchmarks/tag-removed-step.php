@@ -36,7 +36,7 @@ function wpfn_tag_removed_funnel_step_html( $step_id )
             <th><?php echo esc_html__( 'Run when any of these tags are removed', 'groundhogg' ); ?>:</th>
             <td>
                 <?php wpfn_dropdown_tags( $dropdown_args ); ?>
-                <p class="description"><?php _e( 'Add new tags be hitting [enter] or by typing a [comma].', 'groundhogg' ); ?></p>
+                <p class="description"><?php _e( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ); ?></p>
             </td>
         </tr>
         </tbody>

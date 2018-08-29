@@ -21,10 +21,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     .email-container h1{ font-weight: bold; padding: 0;margin: 0.67em 0 0.67em 0;}
     .email-container h2{ font-weight: bold; padding: 0;margin: 0.83em 0 0.83em 0;}
 </style>
+<?php $from_funnel = ( isset( $_GET['step'] ) )? '&step=' . $_GET['step']: ''; ?>
 <?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'templates'; ?>
 <h2 class="nav-tab-wrapper">
-    <a href="?page=gh_emails&action=add&tab=templates" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Email Templates', 'groundhogg'); ?></a>
-    <a href="?page=gh_emails&action=add&tab=my-emails" class="nav-tab <?php echo $active_tab == 'my-emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Emails', 'groundhogg'); ?></a>
+    <a href="?page=gh_emails&action=add&tab=templates<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Email Templates', 'groundhogg'); ?></a>
+    <a href="?page=gh_emails&action=add&tab=my-emails<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'my-emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Emails', 'groundhogg'); ?></a>
 </h2>
 <form method="post" id="poststuff" >
     <!-- search form -->

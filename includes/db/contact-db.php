@@ -377,27 +377,15 @@ function wpfn_create_contact_meta_db()
 /**
  * Get the name of a tag
  *
- * @param $id int the Id of the tag
+ * @param $id_or_slug int|string the Id of the tag
  * @return string the name of the tag
  */
-function wpfn_get_tag_name( $id )
+function wpfn_get_tag_name( $id_or_slug )
 {
-    global $wpdb;
+    $tag = wpfn_get_tag( $id_or_slug );
 
-    if ( ! $id || ! is_numeric( $id ) )
+    if ( ! $tag )
         return false;
-
-    $id = absint( $id );
-    if ( ! $id )
-        return false;
-
-    $table = $wpdb->prefix . WPFN_CONTACT_TAGS;
-
-    $tag = $wpdb->get_row(
-        $wpdb->prepare(
-            "SELECT * FROM $table WHERE tag_id = %d", $id
-        ), ARRAY_A
-    );
 
     return $tag['tag_name'];
 }
@@ -458,28 +446,47 @@ function wpfn_get_contact_ids_by_tag( $tag_id )
 /**
  * Check if a tag exists, if it does return it.
  *
- * @param $id int the ID of a given tag
+ * @param $id_or_slug int|string the ID or slug a given tag
  * @return array|false the tag or false on failure
  */
-function wpfn_tag_exists( $id )
+function wpfn_get_tag( $id_or_slug )
 {
     global $wpdb;
 
-    if ( ! $id || ! is_numeric( $id ) )
-        return false;
-
-    $id = absint( $id );
-    if ( ! $id )
+    if (!$id_or_slug)
         return false;
 
     $table = $wpdb->prefix . WPFN_CONTACT_TAGS;
 
-    return $wpdb->get_row(
-        $wpdb->prepare(
-            "SELECT * FROM $table WHERE tag_id = %d", $id
-        ), ARRAY_A
-    );
+    if (is_numeric($id_or_slug))
+    {
+        return $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM $table WHERE tag_id = %d", $id_or_slug
+            ), ARRAY_A
+        );
+    } else if ( is_string( $id_or_slug ) ) {
+        return $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM $table WHERE tag_slug = %s", $id_or_slug
+            ), ARRAY_A
+        );
+    }
 
+    return false;
+}
+
+/**
+ * Return whether a tag exists
+ *
+ * @param $id_or_slug int|string the tag in question
+ * @return bool whether it exists
+ */
+function wpfn_tag_exists( $id_or_slug )
+{
+    $tag = wpfn_get_tag( $id_or_slug );
+
+    return ( ! empty( $tag ) );
 }
 
 /**
@@ -500,12 +507,19 @@ function wpfn_insert_tag( $tag_name, $tag_description='' )
     if ( ! $tag_name )
         return false;
 
-    $tag_description = sanitize_text_field( $tag_description );
+    $tag_description = sanitize_textarea_field( $tag_description );
+    $tag_slug = sanitize_title( $tag_name );
+
+    if ( wpfn_tag_exists( $tag_slug ) ){
+        $tag = wpfn_get_tag( $tag_slug );
+        return intval( $tag['tag_id'] );
+    }
 
     $success = $wpdb->insert(
         $wpdb->prefix . WPFN_CONTACT_TAGS,
         array(
             'tag_name' => $tag_name,
+            'tag_slug' => $tag_slug,
             'tag_description' => $tag_description
         )
     );
@@ -743,7 +757,7 @@ function wpfn_count_contact_tag_relationships( $by, $id )
 }
 
 define( 'WPFN_CONTACT_TAGS', 'contact_tags' );
-define( 'WPFN_CONTACT_TAGS_DB_VERSION', '0.3' );
+define( 'WPFN_CONTACT_TAGS_DB_VERSION', '0.4' );
 
 function wpfn_create_contact_tags_db()
 {
@@ -760,8 +774,10 @@ function wpfn_create_contact_tags_db()
     $sql = "CREATE TABLE $table_name (
       tag_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
       tag_name varchar(200) NOT NULL DEFAULT '',
+      tag_slug varchar(200) NOT NULL DEFAULT '',
       tag_description longtext NOT NULL,
-      PRIMARY KEY  (tag_id)
+      PRIMARY KEY  (tag_id),
+      KEY slug (tag_slug)
     ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

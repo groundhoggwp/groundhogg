@@ -289,6 +289,7 @@ function wpfn_save_tag( $id )
 
 	wpfn_update_tag( $id, 'tag_description', $tag_description );
 	wpfn_update_tag( $id, 'tag_name', $tag_name );
+	wpfn_update_tag( $id, 'tag_slug', sanitize_title( $tag_name ) );
 }
 
 add_action( 'wpfn_update_tag', 'wpfn_save_tag' );
@@ -400,6 +401,9 @@ function wpfn_validate_tags( $maybe_tags )
         if ( ! wpfn_tag_exists( $maybe_tag_id ) )
         {
             $maybe_tags[$i] = wpfn_insert_tag( $maybe_tag_id );
+        } else {
+            $tag = wpfn_get_tag( $maybe_tag_id );
+            $maybe_tags[$i] = intval( $tag['tag_id'] );
         }
     }
     return $maybe_tags;

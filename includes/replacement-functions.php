@@ -181,3 +181,10 @@ function wpfn_replacement_date( $time_string, $contact )
 }
 
 add_filter( 'wpfn_replacement_date', 'wpfn_replacement_date', 10, 2 );
+
+function wpfn_replacement_business_name()
+{
+    return get_option( 'gh_business_name' );
+}
+
+add_filter( 'wpfn_replacement_business_name', 'wpfn_replacement_business_name' );

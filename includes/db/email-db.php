@@ -78,7 +78,7 @@ function wpfn_get_emails()
 
     $table_name = $wpdb->prefix . WPFN_EMAILS;
 
-    return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name WHERE email_status LIKE %s ORDER BY ID DESC", 'ready' ), ARRAY_A );
+    return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name WHERE email_status LIKE %s OR email_status LIKE %s ORDER BY ID DESC", 'ready', 'draft' ), ARRAY_A );
 }
 
 /**

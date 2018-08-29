@@ -114,6 +114,12 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                 <table class="form-table">
                                     <tbody>
                                     <tr>
+                                        <th><label for="funnel_export"><?php echo __( 'Export', 'groundhogg' );?></label></th>
+                                        <td>
+                                            <a href="<?php echo esc_url( add_query_arg( 'export', 1 , $_SERVER['REQUEST_URI'] ) ); ?>" class="button button-secondary"><?php _e( 'Export Funnel', 'groundhogg'); ?></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <th><label for="funnel_status"><?php echo __( 'Status', 'groundhogg' );?></label></th>
                                         <td>
                                             <input type="hidden" name="funnel_status" id="funnel-status" value="<?php echo wpfn_get_funnel_status( $funnel_id );?> ">

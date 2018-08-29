@@ -121,9 +121,9 @@ function wpfn_get_funnel_benchmarks()
 //    $benchmarks['link_clicked'] = array( 'title' => __('Link Clicked', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/' );
     $benchmarks['tag_applied']  = array( 'title' => __('Tag Applied', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/tag-applied.png' );
     $benchmarks['tag_removed']  = array( 'title' => __('Tag Removed', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/tag-removed.png' );
-    $benchmarks['page_visited'] = array( 'title' => __('Page Visited', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/page-visited.png' );
     $benchmarks['account_created'] = array( 'title' => __('Account Created', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/account-created.png' );
     $benchmarks['role_changed']    = array( 'title' => __('Role Changed', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/role-changed.png' );
+    $benchmarks['page_visited'] = array( 'title' => __('Page Visited', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/page-visited.png' );
 
     return apply_filters( 'wpfn_funnel_benchmarks', $benchmarks );
 }
@@ -141,10 +141,10 @@ function wpfn_get_funnel_actions()
     $actions['apply_note']  = array( 'title' => __( 'Apply Note', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/apply-a-note.png' );
     $actions['apply_tag']   = array( 'title' => __( 'Apply Tag', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/apply-tag.png' );
     $actions['remove_tag']  = array( 'title' => __( 'Remove Tag', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/remove-tag.png' );
-    $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/create-account.png' );
 //    $actions['delete_user'] = array( 'title' => __( '', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/.png' );
     $actions['date_timer']  = array( 'title' => __( 'Date Timer', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/date-timer.png' );
     $actions['delay_timer'] = array( 'title' => __( 'Delay Timer', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/delay-timer.png' );
+    $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/create-account.png' );
 
     return apply_filters( 'wpfn_funnel_actions', $actions );
 }
@@ -818,16 +818,21 @@ function wpfn_create_new_funnel()
 
     } else if ( isset( $_POST[ 'funnel_id' ] ) ) {
 
-        //todo copy and duplicate steps from old funnel...
+        $from_funnel = intval( $_POST[ 'funnel_id' ] );
+        $json = wpfn_convert_funnel_to_json( $from_funnel );
+        $funnel_id = wpfn_import_funnel( json_decode( $json, true ) );
 
-        //todo import from files...
+    } else if ( isset( $_FILES[ 'funnel_template' ] ) ) {
 
+        if ($_FILES['funnel_template']['error'] == UPLOAD_ERR_OK && is_uploaded_file( $_FILES['funnel_template']['tmp_name'] ) ) {
+
+            $json = file_get_contents($_FILES['funnel_template']['tmp_name'] );
+            $funnel_id = wpfn_import_funnel( json_decode( $json, true ) );
+        }
     } else {
 
         ?><div class="notice notice-error"><p><?php _e( 'Could not create funnel. PLease select a template.', 'groundhogg' ); ?></p></div><?php
-
         return;
-
     }
 
     wp_redirect( admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' .  $funnel_id ) );
@@ -861,28 +866,5 @@ function wpfn_contact_is_in_funnel( $contact_id, $funnel_id )
         ) );
 
     return ! empty( $results );
-
-}
-
-/**
- * Convert the funnel into a json object so it can be duplicated fairly easily.
- *
- * @param $funnel_id int the ID of the funnel to convert.
- * @return false|string the json string of a converted funnel or false on failure.
- */
-function wpfn_convert_funnel_to_json( $funnel_id )
-{
-
-    if ( ! $funnel_id || is_int( $funnel_id) )
-        return false;
-
-    $funnel = wpfn_get_funnel_step_by_id( $funnel_id );
-
-    if ( ! $funnel )
-        return false;
-
-    $funnelArray = array();
-
-    $funnelArray['title'] = $funnel->funnel_title;
 
 }
