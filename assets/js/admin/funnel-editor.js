@@ -63,6 +63,19 @@ jQuery( function($) {
         topSpacing: 40,
         bottomSpacing: 40
     });
+
+    $('a').click( function( e ){
+        e.preventDefault();
+        /* auto save before redirect */
+        wpfn_auto_save_funnel();
+        window.location = this.href;
+    });
+
+    /* Auto save funnels */
+    setInterval(
+        wpfn_auto_save_funnel,
+        20000
+    );
 });
 
 function wpfn_delete_funnel_step()
@@ -112,7 +125,6 @@ function wpfn_auto_save_funnel()
         data : fd,
         success: function( result )
         {
-            console.log(result);
             wpfnDoingAutoSave = false;
         }
     });

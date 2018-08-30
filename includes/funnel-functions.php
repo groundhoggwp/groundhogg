@@ -124,6 +124,7 @@ function wpfn_get_funnel_benchmarks()
     $benchmarks['account_created'] = array( 'title' => __('Account Created', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/account-created.png' );
     $benchmarks['role_changed']    = array( 'title' => __('Role Changed', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/role-changed.png' );
     $benchmarks['page_visited'] = array( 'title' => __('Page Visited', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/page-visited.png' );
+    $benchmarks['email_confirmed'] = array( 'title' => __('Email Confirmed', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/email-confirmed.png' );
 
     return apply_filters( 'wpfn_funnel_benchmarks', $benchmarks );
 }
@@ -753,8 +754,14 @@ function wpfn_auto_save_funnel()
 
     $steps = $_POST['steps'];
 
-    if ( ! $steps )
+    if ( ! $steps || ! is_array( $steps ) )
         wp_die('No steps present.');
+
+    /* load save functions */
+    foreach ( glob( dirname( __FILE__ ) . '/admin/funnels/elements/*/*.php' ) as $filename )
+    {
+        include $filename;
+    }
 
     foreach ( $steps as $i => $stepId )
     {
@@ -787,34 +794,10 @@ function wpfn_create_new_funnel()
         include dirname(__FILE__ ) . '/templates/funnel-templates.php';
 
         /* @var $funnel_templates array included from funnel-templates.php*/
-        //print_r($funnel_templates);
-        //wp_die( $funnel_templates );
-        $funnel = $funnel_templates[ $_POST[ 'funnel_template' ] ];
 
-        $funnel_id = wpfn_insert_new_funnel( $funnel['title'], 'inactive' );
+        $json = file_get_contents( $funnel_templates[ $_POST['funnel_template'] ]['file'] );
 
-        if ( ! $funnel_id )
-            wp_die( 'Error creating funnel.' );
-
-        foreach ( $funnel['steps'] as $i => $step )
-        {
-
-            $step_id = wpfn_insert_new_funnel_step(
-                $funnel_id,
-                $step['title'],
-                'ready',
-                $step['group'],
-                $step['type'],
-                $i + 1
-            );
-
-            foreach ( $step[ 'meta' ] as $meta_key => $meta_value )
-            {
-                wpfn_update_step_meta( $step_id , $meta_key, $meta_value );
-            }
-
-        }
-
+        $funnel_id = wpfn_import_funnel( json_decode( $json, true ) );
 
     } else if ( isset( $_POST[ 'funnel_id' ] ) ) {
 
@@ -829,11 +812,15 @@ function wpfn_create_new_funnel()
             $json = file_get_contents($_FILES['funnel_template']['tmp_name'] );
             $funnel_id = wpfn_import_funnel( json_decode( $json, true ) );
         }
+
     } else {
 
         ?><div class="notice notice-error"><p><?php _e( 'Could not create funnel. PLease select a template.', 'groundhogg' ); ?></p></div><?php
         return;
     }
+
+    if ( ! $funnel_id )
+        wp_die( 'Error creating funnel.' );
 
     wp_redirect( admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' .  $funnel_id ) );
     die();

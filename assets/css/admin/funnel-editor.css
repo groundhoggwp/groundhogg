@@ -179,3 +179,11 @@ select {
     margin-bottom: -37px;
     border: 1px solid #e5e5e5;
 }
+
+.row-actions{
+    margin: 3px 0 0 3px;
+}
+
+.row-actions a{
+    text-decoration: none;
+}

@@ -296,3 +296,29 @@ function wpfn_complete_email_opened_benchmark( $contact_id, $email_id, $email_st
     }}
 
 add_action( 'wpfn_email_opened', 'wpfn_complete_email_opened_benchmark', 10, 4 );
+
+/**
+ * When an email address is confirmed complete the followup benchmarks.
+ *
+ * @param $contact_id int ID of the contact which complete the step
+ * @param $in_funnel_id int ID of the associated funnel
+ */
+function wpfn_complete_email_confirmed_benchmark( $contact_id, $in_funnel_id )
+{
+    $benchmarks = wpfn_get_funnel_steps_by_type( 'email_confirmed' );
+
+    if ( ! $benchmarks )
+        return;
+
+    foreach ( $benchmarks as $benchmark ) {
+
+        $step_id = intval( $benchmark['ID'] );
+        $step_order = intval( $benchmark['funnelstep_order'] );
+        $funnel_id = intval( $benchmark['funnel_id'] );
+
+        if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $in_funnel_id === $funnel_id ){
+            wpfn_complete_benchmark( $step_id, $contact_id );
+        }
+    }}
+
+add_action( 'wpfn_email_confirmed', 'wpfn_complete_email_confirmed_benchmark', 10, 2 );

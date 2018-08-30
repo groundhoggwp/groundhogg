@@ -51,14 +51,14 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     if ( ! is_email( $contact->get_email() ) )
         return false;
 
-    /* this contact has unsubscribed and thus don't send them any email. */
-    if ( $contact->get_optin_status() === WPFN_UNSUBSCRIBED )
+    /* don't send email depending on their optin status */
+    if ( ! wpfn_can_send_email( $contact->get_id() ) )
         return false;
 
     $email = wpfn_get_email_by_id( $email_id );
 
     /* don't send if the email is marked as unready. */
-    if ( $email->email_status !== 'ready' )
+    if ( $email->email_status !== 'ready' && ! isset( $_POST['send_test'] ) )
         return false;
 
     /* @var $link_args array array of $_GET args that will be used to run analytics actions on the site */
@@ -76,18 +76,24 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     /* @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to. */
 
     $ref_link = add_query_arg( $link_args, site_url( 'gh-tracking/email/click/' ) ) . '&ref=';
-    $tracking_link = add_query_arg( $link_args, site_url( 'gh-tracking/email/open/' ) );
 
     /* merge in email content into default template */
-    $title = get_bloginfo( 'name' );
+    $tracking_link = add_query_arg( $link_args, site_url( 'gh-tracking/email/open/' ) );
+
+    $title = get_option( 'gh_business_name' );
+
     $subject_line = wpfn_do_replacements( $contact->get_id(), $email->subject );
+
     $pre_header = wpfn_do_replacements( $contact->get_id(), $email->pre_header );
 
     $content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact->get_id(), $email->content ) );
 
     $email_footer_text = wpfn_get_email_footer_text();
+
     $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
+
     $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
+
     if ( $alignment === 'left' ){
         $margins = "margin-left:0;margin-right:auto;";
     } else {
@@ -409,7 +415,7 @@ function wpfn_create_new_email()
 
         $funnel_id = wpfn_get_step_funnel( $step_id );
 
-        wp_redirect( admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id . '&return_funnel=' . $funnel_id ) );
+        wp_redirect( admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id . '&return_funnel=' . $funnel_id . '&return_step=' . $step_id ) );
 
     } else {
 

@@ -3,12 +3,30 @@
 /* Groundhogg Settings Page */
 class WPFN_Settings_Page
 {
+
 	public function __construct()
     {
 		//add_action( 'admin_menu', array( $this, 'wpfn_create_settings' ) );
 		add_action( 'admin_init', array( $this, 'wpfn_setup_sections' ) );
 		add_action( 'admin_init', array( $this, 'wpfn_setup_fields' ) );
-	}
+
+        if ( ! class_exists( 'WPFN_Extensions_Manager' ) )
+            include dirname( __FILE__ ) . '/../extensions/module-manager.php';
+
+        //todo find new file to put this line.
+        add_action( 'admin_init', array( 'WPFN_Extension_Manager', 'check_for_updates' ) );
+
+        if ( isset( $_GET['page'] ) && $_GET['page'] === 'groundhogg' )
+        {
+            add_action( 'admin_init', array( 'WPFN_Extension_Manager', 'perform_activation' ) );
+            add_action( 'admin_init', array( $this, 'perform_tools' ) );
+        }
+    }
+
+    public function perform_tools()
+    {
+        do_action( 'gh_settings_tools' );
+    }
 
 	public function wpfn_settings_content()
     {
@@ -22,14 +40,35 @@ class WPFN_Settings_Page
             <?php if ( isset( $_GET[ 'token' ] ) ) :
                 ?><div class="notice notice-success is-dismissible"><p><strong><?php _e( 'Connected to Groundhogg!', 'groundhogg' ); ?></strong></p></div><?php
             endif; ?>
-			<form method="POST" action="options.php">
-                <?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'general'; ?>
+            <?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'general'; ?>
+            <?php
+
+            switch ( $active_tab ){
+                case 'extensions':
+                case 'tools':
+                    $action = '';
+                    break;
+                default:
+                    $action = 'options.php';
+                    break;
+            }
+
+            $tabs = array(
+                'general'       => 'General',
+                'marketing'     => 'Marketing',
+//                'emails'        => 'Email',
+                'tools'         => 'Tools',
+                'extensions'    => 'Licenses'
+            );
+
+            $tabs = apply_filters( 'gh_settings_tabs', $tabs );
+            ?>
+
+			<form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
                 <h2 class="nav-tab-wrapper">
-                    <a href="?page=groundhogg&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php _e( 'General', 'groundhogg'); ?></a>
-                    <a href="?page=groundhogg&tab=marketing" class="nav-tab <?php echo $active_tab == 'marketing' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Compliance', 'groundhogg'); ?></a>
-                    <a href="?page=groundhogg&tab=emails" class="nav-tab <?php echo $active_tab == 'emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Email', 'groundhogg'); ?></a>
-                    <a href="?page=groundhogg&tab=tools" class="nav-tab <?php echo $active_tab == 'tools' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Tools', 'groundhogg'); ?></a>
-                    <a href="?page=groundhogg&tab=extensions" class="nav-tab <?php echo $active_tab == 'extensions' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Extensions', 'groundhogg'); ?></a>
+                    <?php foreach ( $tabs as $tab_id => $tab_name ): ?>
+                        <a href="?page=groundhogg&tab=<?php echo $tab_id; ?>" class="nav-tab <?php echo $active_tab == $tab_id ? 'nav-tab-active' : ''; ?>"><?php _e( $tab_name, 'groundhogg'); ?></a>
+                    <?php endforeach; ?>
                 </h2>
                 <?php switch ( $active_tab ):
                     case 'general':
@@ -46,7 +85,7 @@ class WPFN_Settings_Page
                         break;
                     case 'emails':
 
-                        GH_Account::$instance->connect_button();
+//                        GH_Account::$instance->connect_button();
 
                         settings_fields( 'groundhogg_email_settings' );
                         do_settings_sections( 'groundhogg_email_settings' );
@@ -56,22 +95,42 @@ class WPFN_Settings_Page
                     case 'tools':
                         ?>
                         <div id="poststuff">
+                            <!-- Begin Import Tool -->
                             <div class="postbox">
                                 <h2 class="hndle"><?php _e( 'Import Contacts', 'groundhogg' ); ?></h2>
                                 <div class="inside">
                                     <p>
-                                        <input type="file" accept=".csv" >
+                                        <input type="file" id="contacts" name="contacts" accept=".csv" >
                                     </p>
+                                    <p class="description"><?php _e( 'Columns: first_name, last_name, email, custom_field, another_custom_field...' ) ?></p>
                                     <?php $tag_args = array();
-                                    $tag_args[ 'id' ] = 'superlink_tags';
-                                    $tag_args[ 'name' ] = 'superlink_tags[]';
+                                    $tag_args[ 'id' ] = 'import_tags';
+                                    $tag_args[ 'name' ] = 'import_tags[]';
                                     $tag_args[ 'width' ] = '100%';
                                     $tag_args[ 'class' ] = 'hidden'; ?>
                                     <?php wpfn_dropdown_tags( $tag_args ); ?>
-                                    <p class="description"><?php _e( 'Select tags to apply tags to this import', 'groundhogg' ); ?></p>
-                                    <?php submit_button( 'Import' ); ?>
+                                    <p class="description"><?php _e( 'These tags will be applied to the contacts upon importing.', 'groundhogg' ); ?></p>
+                                    <?php submit_button( 'Import', 'primary', 'import_contacts', false ); ?>
                                 </div>
                             </div>
+                            <!-- End Import Tool -->
+
+                            <!-- Begin Export Tool -->
+                            <div class="postbox">
+                                <h2 class="hndle"><?php _e( 'Export Contacts', 'groundhogg' ); ?></h2>
+                                <div class="inside">
+                                    <p class="description"><?php _e( 'Export contacts to a .CSV file. This will download to your browser.', 'groundhogg' ); ?></p>
+                                    <?php $tag_args = array();
+                                    $tag_args[ 'id' ] = 'export_tags';
+                                    $tag_args[ 'name' ] = 'export_tags[]';
+                                    $tag_args[ 'width' ] = '100%';
+                                    $tag_args[ 'class' ] = 'hidden'; ?>
+                                    <?php wpfn_dropdown_tags( $tag_args ); ?>
+                                    <p class="description"><?php _e( 'Contacts with these tags will be exported.', 'groundhogg' ); ?></p>
+                                    <?php submit_button( 'Export', 'primary', 'export_contacts', false ); ?>
+                                </div>
+                            </div>
+                            <!-- End Export Tool -->
                         </div>
 
                         <?php
@@ -80,11 +139,7 @@ class WPFN_Settings_Page
                         break;
                     case 'extensions':
 
-                        GH_Account::$instance->connect_button();
-
-                        settings_fields( 'groundhogg_extensions_settings' );
-                        do_settings_sections( 'groundhogg_extensions_settings' );
-                        submit_button();
+                        WPFN_Extension_Manager::extension_page();
 
                         break;
 
@@ -103,16 +158,9 @@ class WPFN_Settings_Page
 
 	public function wpfn_setup_sections()
     {
-        /* general */
-        add_settings_section('business_info', 'Edit Business Settings', array(), 'groundhogg_business_settings');
-
-        /* marketing */
-        add_settings_section('contact_endpoints', __ ( 'Contact Endpoints' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
-//        add_settings_section('confirmation_page', 'Confirmation Page', array(), 'groundhogg_marketing_settings');
-//        add_settings_section('email_preferences_page', 'Email Preferences Page', array(), 'groundhogg_marketing_settings');
-        add_settings_section('compliance', __( 'Compliance Settings', 'groundhogg' ), array(), 'groundhogg_marketing_settings');
-
-
+        add_settings_section( 'business_info', 'Edit Business Settings', array(), 'groundhogg_business_settings');
+        add_settings_section( 'contact_endpoints', __ ( 'Contact Endpoints' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
+        add_settings_section( 'compliance', __( 'Compliance Settings', 'groundhogg' ), array(), 'groundhogg_marketing_settings');
         add_settings_section( 'default_mail_settings', 'Default Mail Settings', array(), 'groundhogg_email_settings' );
     }
 
@@ -207,15 +255,6 @@ class WPFN_Settings_Page
                 'section' => 'contact_endpoints',
                 'page' => 'groundhogg_marketing_settings'
             ),
-//            array(
-//                'label' => 'Email Confirmation Text',
-//                'id' => 'gh_email_confirmation_text',
-//                'type' => 'textarea',
-//                'placeholder' => 'Thank you for confirming your email.',
-//                'desc' => 'What the contact sees when they confirm their email address',
-//                'section' => 'confirmation_page',
-//                'page' => 'groundhogg_marketing_settings'
-//            ),
             array(
                 'label' => 'Unsubscribe Page',
                 'id' => 'gh_unsubscribe_page',
@@ -224,15 +263,6 @@ class WPFN_Settings_Page
                 'section' => 'contact_endpoints',
                 'page' => 'groundhogg_marketing_settings'
             ),
-//            array(
-//                'label' => 'Unsubscribe Text',
-//                'id' => 'gh_unsubscribe_text',
-//                'type' => 'textarea',
-//                'placeholder' => 'We\'re sorry to see you go. We hope you come back soon!',
-//                'desc' => 'What the contact sees when they unsubscribe.',
-//                'section' => 'unsubscribe_page',
-//                'page' => 'groundhogg_marketing_settings'
-//            ),
             array(
                 'label' => 'Email Preferences Page',
                 'id' => 'gh_email_preferences_page',
@@ -241,15 +271,6 @@ class WPFN_Settings_Page
                 'section' => 'contact_endpoints',
                 'page' => 'groundhogg_marketing_settings'
             ),
-//            array(
-//                'label' => 'Email Preferences Text',
-//                'id' => 'gh_email_preferences_text',
-//                'type' => 'textarea',
-//                'placeholder' => 'Manage your email preferences below.',
-//                'desc' => 'What the contact sees before the email preferences form.',
-//                'section' => 'email_preferences_page',
-//                'page' => 'groundhogg_marketing_settings'
-//            ),
             array(
                 'label' => 'Privacy Policy',
                 'id' => 'gh_privacy_policy',

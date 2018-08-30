@@ -230,3 +230,83 @@ add_action( 'wpfn_import_'. 'apply_tag', 'wpfn_import_tags', 10, 2 );
 add_action( 'wpfn_import_'. 'remove_tag', 'wpfn_import_tags', 10, 2 );
 add_action( 'wpfn_import_'. 'tag_applied', 'wpfn_import_tags', 10, 2 );
 add_action( 'wpfn_import_'. 'tag_removed', 'wpfn_import_tags', 10, 2 );
+
+/**
+ * import contacts with a CSV.
+ */
+function wpfn_import_contacts()
+{
+    if ( ! isset( $_POST[ 'import_contacts' ] ) )
+        return;
+
+    if ( ! isset( $_FILES['contacts'] ) ){
+        wp_die( 'No contacts supplied!' );
+    }
+
+    if ( $_FILES['contacts']['error'] == UPLOAD_ERR_OK && is_uploaded_file( $_FILES['contacts']['tmp_name'] ) ) {
+
+        $row = 0;
+        if ( ( $handle = fopen( $_FILES['contacts']['tmp_name'], "r" ) ) !== FALSE ) {
+
+            $columns = fgetcsv( $handle, 1000, "," );
+
+            $first_index = array_search( 'first_name', $columns );
+            $last_index  = array_search( 'last_name', $columns );
+            $email_index = array_search( 'email', $columns );
+
+            $row++;
+
+            while ( ( $data = fgetcsv( $handle, 1000, "," ) ) !== FALSE ) {
+
+                $first_name = $data[ $first_index ];
+                $last_name  = $data[ $last_index ];
+                $email      = $data[ $email_index ];
+
+                $cid = wpfn_quick_add_contact( $email, $first_name, $last_name );
+
+                if ( ! $cid )
+                    continue;
+
+                unset( $data[ $first_index ] );
+                unset( $data[ $last_index ] );
+                unset( $data[ $email_index ] );
+
+                foreach ( $data as $i => $attr ){
+                    $meta_key = sanitize_key( $columns[$i] );
+                    wpfn_update_contact_meta( $cid, $meta_key, sanitize_text_field( $attr ) );
+                }
+
+                $tags = $_POST[ 'import_tags' ];
+
+                $tags = wpfn_validate_tags( $tags );
+
+                foreach ( $tags as $tag_id )
+                {
+                    wpfn_apply_tag( $cid, $tag_id );
+                }
+
+                $row++;
+            }
+
+            fclose($handle);
+        }
+
+        add_settings_error( 'import', esc_attr( 'imported' ), __( 'Imported Contacts' ), 'updated' );
+
+    }
+}
+
+add_action( 'gh_settings_tools', 'wpfn_import_contacts' );
+
+/**
+ * import contacts with a CSV.
+ */
+function wpfn_export_contacts()
+{
+    if ( ! isset( $_POST[ 'export_contacts' ] ) )
+        return;
+
+
+
+
+}

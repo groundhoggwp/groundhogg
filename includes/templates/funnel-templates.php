@@ -8,169 +8,39 @@
 
 $funnel_templates = array();
 
-/* template template
-
-$funnel_templates[ '' ][ 'title' ] = '';
-$funnel_templates[ '' ][ 'description' ] = '';
-$funnel_templates[ '' ][ 'src' ] = 'https://via.placeholder.com/350x350';
-$funnel_templates[ '' ][ 'steps' ] = array(
-    array(
-        'group' => 'benchmark',
-        'type' => '',
-        'title' => '',
-        'meta' => array(
-            '' => ''
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => '',
-        'title' => '',
-        'meta' => array(
-            '' => ''
-        )
-    )
-);
-
-*/
-
 /* Welcome Series */
 
 $funnel_templates[ 'welcome' ][ 'title' ] = 'Welcome Series';
 $funnel_templates[ 'welcome' ][ 'description' ] = 'A nice way to welcome new subscribers into your community.';
-$funnel_templates[ 'welcome' ][ 'src' ] = 'https://via.placeholder.com/350x350';
-$funnel_templates[ 'welcome' ][ 'steps' ] = array(
-    array(
-        'group' => 'benchmark',
-        'type' => 'account_created',
-        'title' => 'New subscriber',
-        'meta' => array(
-            'role' => 'subscriber'
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'send_email',
-        'title' => 'Send Welcome Email',
-        'meta' => array(
-            '' => ''
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'delay_timer',
-        'title' => 'Wait 1 day',
-        'meta' => array(
-            'delay_amount' => 1,
-            'delay_type'   => 'days',
-            'run_when'     => 'now'
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'send_email',
-        'title' => 'Follow Up',
-        'meta' => array(
-            '' => ''
-        )
-    ),
-);
+$funnel_templates[ 'welcome' ][ 'src' ] = 'https://via.placeholder.com/350x250';
+$funnel_templates[ 'welcome' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/new-subscriber-welcome.funnel';
 
 /* Hype Series */
 
 $funnel_templates[ 'hype' ][ 'title' ] = 'Hype Series';
 $funnel_templates[ 'hype' ][ 'description' ] = 'Get your list excited for an event or product launch';
-$funnel_templates[ 'hype' ][ 'src' ] = 'https://via.placeholder.com/350x350';
-$funnel_templates[ 'hype' ][ 'steps' ] = array(
-    array(
-        'group' => 'benchmark',
-        'type' => 'tag_applied',
-        'title' => 'Start Series',
-        'meta' => array(
-            '' => ''
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'delay_timer',
-        'title' => 'Wait Till Morning',
-        'meta' => array(
-            'delay_amount' => 1,
-            'delay_type'   => 'hours',
-            'run_when'     => 'later',
-            'run_time'     => '09:30'
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'send_email',
-        'title' => 'Let them know something is coming...',
-        'meta' => array(
-            '' => ''
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'delay_timer',
-        'title' => 'Wait 1 Day',
-        'meta' => array(
-            'delay_amount' => 1,
-            'delay_type'   => 'days',
-            'run_when'     => 'now'
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'send_email',
-        'title' => 'Give them a hint about the big thing',
-        'meta' => array(
-            '' => ''
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'delay_timer',
-        'title' => 'Wait 1 Day',
-        'meta' => array(
-            'delay_amount' => 1,
-            'delay_type'   => 'days',
-            'run_when'     => 'now'
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'send_email',
-        'title' => 'Tell the the details about the thing',
-        'meta' => array(
-            '' => ''
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'delay_timer',
-        'title' => 'Wait 1 Day',
-        'meta' => array(
-            'delay_amount' => 1,
-            'delay_type'   => 'days',
-            'run_when'     => 'now'
-        )
-    ),
-    array(
-        'group' => 'action',
-        'type' => 'send_email',
-        'title' => 'Send them a link to the big thing',
-        'meta' => array(
-            '' => ''
-        )
-    ),
-    array(
-        'group' => 'benchmark',
-        'type' => 'page_visited',
-        'title' => 'Saw the big thing',
-        'meta' => array(
-            '' => ''
-        )
-    )
-);
+$funnel_templates[ 'hype' ][ 'src' ] = 'https://via.placeholder.com/350x250';
+$funnel_templates[ 'hype' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/hype-series.funnel';
+
+/* Long term Nurture */
+
+$funnel_templates[ 'long_term_nurture' ][ 'title' ] = 'Long Term Nurture';
+$funnel_templates[ 'long_term_nurture' ][ 'description' ] = 'For when you need to put the conversation on hold.';
+$funnel_templates[ 'long_term_nurture' ][ 'src' ] = 'https://via.placeholder.com/350x250';
+$funnel_templates[ 'long_term_nurture' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/long-term-nurture.funnel';
+
+/* Webinar Registration */
+
+$funnel_templates[ 'webinar_registration' ][ 'title' ] = 'Webinar Registration';
+$funnel_templates[ 'webinar_registration' ][ 'description' ] = 'Collect leads, send reminders, and follow up with this!';
+$funnel_templates[ 'webinar_registration' ][ 'src' ] = 'https://via.placeholder.com/350x250';
+$funnel_templates[ 'webinar_registration' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/webinar-registration.funnel';
+
+/* Feedback Request */
+
+$funnel_templates[ 'feedback_request' ][ 'title' ] = 'Feedback Request';
+$funnel_templates[ 'feedback_request' ][ 'description' ] = 'Looking to generate some reviews? This is what you need.';
+$funnel_templates[ 'feedback_request' ][ 'src' ] = 'https://via.placeholder.com/350x250';
+$funnel_templates[ 'feedback_request' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/feedback-request.funnel';
 
 $funnel_templates = apply_filters( 'wpfn_funnel_templates', $funnel_templates );

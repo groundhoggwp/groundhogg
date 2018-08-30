@@ -14,6 +14,7 @@ define( 'WPFN_CONFIRMED', 1 );
 define( 'WPFN_UNSUBSCRIBED', 2 );
 define( 'WPFN_WEEKLY', 3 );
 define( 'WPFN_MONTHLY', 4 );
+define( 'WPFN_HARD_BOUNCE', 5 );
 
 /**
  * Get the text explanation for the optin status of a contact
@@ -50,6 +51,9 @@ function wpfn_get_optin_status_text( $status )
         case WPFN_MONTHLY:
             return __( 'This contact will only receive emails monthly.', 'groundhogg' );
             break;
+        case WPFN_HARD_BOUNCE:
+            return __( 'This email bounced, further emails will not be sent.', 'groundhogg' );
+            break;
 		default:
 			return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
 			break;
@@ -59,20 +63,43 @@ function wpfn_get_optin_status_text( $status )
 /**
  * Whether we can send emails to this contact.
  *
- * @param int $status OptIn stats of a contact
+ * @param int $contact_id ID of the contact.
  *
  * @return bool
  */
-function wpfn_can_send_emails_to_contact( $status )
+function wpfn_can_send_email( $contact_id )
 {
-	if ( ! $status || ! is_numeric( $status ) )
-		return false;
+    if (!$contact_id || !is_numeric($contact_id))
+        return false;
 
-	$status = absint( $status );
-	if ( ! $status )
-		return false;
+    $contact_id = absint($contact_id);
+    if (!$contact_id)
+        return false;
 
-	return $status === 1 || $status === 0;
+    $contact = new WPFN_Contact($contact_id);
+
+    switch ( $contact->get_optin_status() )
+    {
+        case WPFN_UNCONFIRMED:
+        case WPFN_CONFIRMED:
+            return true;
+            break;
+        case WPFN_HARD_BOUNCE;
+        case WPFN_UNSUBSCRIBED:
+            return false;
+            break;
+        case WPFN_WEEKLY:
+            $last_sent = wpfn_get_contact_meta( $contact_id, 'last_sent', true );
+            return ( time() - intval( $last_sent ) ) > 7 * 24 * HOUR_IN_SECONDS;
+            break;
+        case WPFN_MONTHLY:
+            $last_sent = wpfn_get_contact_meta( $contact_id, 'last_sent', true );
+            return ( time() - intval( $last_sent ) ) > 30 * 24 * HOUR_IN_SECONDS;
+            break;
+        default:
+            return true;
+            break;
+    }
 }
 
 /**
@@ -120,9 +147,26 @@ function wpfn_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 {
 	$contact_exists = wpfn_get_contact_by_email( $email );
 
+	/* update the contact instead */
 	if ( $contact_exists ){
-		return intval( $contact_exists[ 'ID' ] );
+
+	    $id = intval( $contact_exists[ 'ID' ] );
+
+	    if ( ! empty( $first ) )
+	        wpfn_update_contact( $id, 'first_name', $first );
+        if ( ! empty( $last ) )
+            wpfn_update_contact( $id, 'last_name', $last );
+
+        if ( ! empty( $phone ) )
+            wpfn_update_contact_meta( $id, 'primary_phone', $phone );
+        if ( ! empty( $extension ) )
+            wpfn_update_contact_meta( $id, 'primary_phone_extension', $extension );
+
+        return $id;
 	}
+
+	if ( ! $email )
+	    return false;
 
 	$id = wpfn_insert_new_contact( $email, $first, $last );
 
@@ -396,17 +440,29 @@ add_action( 'wpfn_do_action_remove_tag', 'wpfn_do_remove_tag_action', 10, 2 );
  */
 function wpfn_validate_tags( $maybe_tags )
 {
-    foreach ( $maybe_tags as $i => $maybe_tag_id )
+
+    $tags = array();
+
+    foreach ( $maybe_tags as $i => $tag_id_or_string )
     {
-        if ( ! wpfn_tag_exists( $maybe_tag_id ) )
-        {
-            $maybe_tags[$i] = wpfn_insert_tag( $maybe_tag_id );
+
+        if ( is_int( $tag_id_or_string ) ){
+            if ( wpfn_tag_exists( $tag_id_or_string ) ) {
+                $tags[] = $tag_id_or_string;
+            }
         } else {
-            $tag = wpfn_get_tag( $maybe_tag_id );
-            $maybe_tags[$i] = intval( $tag['tag_id'] );
+            $slug = sanitize_title( $tag_id_or_string );
+
+            if ( wpfn_tag_exists( $slug ) ) {
+                $tag = wpfn_get_tag( $slug );
+                $tags[] = intval( $tag['tag_id'] );
+            } else {
+                $tags[] = wpfn_insert_tag( $tag_id_or_string );
+            }
         }
     }
-    return $maybe_tags;
+
+    return $tags;
 }
 
 /**
@@ -505,7 +561,7 @@ function wpfn_process_email_confirmation()
 
     $conf_page = get_permalink( get_option( 'gh_confirmation_page' ) );
 
-    do_action( 'wpfn_email_confirmed', $contact->get_id() );
+    do_action( 'wpfn_email_confirmed', $contact->get_id(), wpfn_get_current_funnel() );
 
     wp_redirect( $conf_page );
     die();

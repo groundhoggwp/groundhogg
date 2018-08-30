@@ -47,7 +47,7 @@ $email = wpfn_get_email_by_id( $email_id );
     <?php do_action('wpfn_edit_email_form_before'); ?>
     <?php if ( isset( $_REQUEST['return_funnel'] ) ): ?>
     <div class="notice notice-info is-dismissible">
-        <p><a href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $_REQUEST['return_funnel'] ); ?>"><?php  _e( '&larr; Back to editing funnel' ); ?></a></p>
+        <p><a href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $_REQUEST['return_funnel'] . '#' . $_REQUEST['return_step'] ); ?>"><?php  _e( '&larr; Back to editing funnel' ); ?></a></p>
     </div>
     <?php endif; ?>
     <div id='poststuff' class="wpfn-funnel-builder">
@@ -368,12 +368,6 @@ $email = wpfn_get_email_by_id( $email_id );
                 </div
             </div>
             <!-- End elements area-->
-
-            <!-- main email editing area -->
-            <div id="postbox-container-2" class="postbox-container funnel-editor">
-
-            </div>
-            <!-- end main email editing area -->
         </div>
     </div>
 </form>

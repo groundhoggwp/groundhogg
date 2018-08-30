@@ -1,0 +1,26 @@
+.gh-extension{
+    background: #FFFFFF;
+    width: 400px;
+    /*height: 450px;*/
+    vertical-align: top;
+    padding: 10px;
+    box-sizing: border-box;
+    margin: 20px 0 0 20px;
+    /*box-shadow: 0 0 5px #c4c4c4;*/
+    display: inline-block;
+}
+
+.gh-image-container{
+    box-sizing: border-box;
+}
+
+.gh-extension-image{
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #dddddd;
+}
+
+.gh-description-container{
+    padding: 10px;
+    box-sizing: border-box;
+}
