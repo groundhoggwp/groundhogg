@@ -245,6 +245,12 @@ function wpfn_get_the_contact()
     if ( isset( $_COOKIE[ 'gh_contact' ] ) ){
         /* if the contact cookie has been set. */
         $id = wpfn_encrypt_decrypt( sanitize_text_field( $_COOKIE[ 'gh_contact' ] ), 'd' );
+    } else if ( is_user_logged_in() ) {
+    	$user = wp_get_current_user();
+    	$contact = wpfn_get_contact_by_email( $user->user_email );
+    	if ( ! $contact )
+    		return false;
+    	$id = intval( $contact['ID'] );
     } else if ( isset( $_GET[ 'contact' ] ) ){
         /* if the contact is coming from an email link */
         $id = wpfn_encrypt_decrypt( urldecode( $_REQUEST[ 'contact' ] ), 'd' );

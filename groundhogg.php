@@ -110,3 +110,5 @@ function wpfn_activation()
 }
 
 register_activation_hook( __FILE__, 'wpfn_activation');
+
+do_action( 'groundhogg_loaded' );
