@@ -32,7 +32,6 @@ wp_enqueue_style( 'funnel-editor', WPFN_ASSETS_FOLDER . '/css/admin/funnel-edito
 do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
 ?>
-
 <form method="post">
     <?php wp_nonce_field(); ?>
     <div id='poststuff' class="wpfn-funnel-builder" style="overflow: hidden">
@@ -177,22 +176,23 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
                             $i = 0;
 
+                            ?><tr><?php
+
                             foreach ( $elements as  $element => $args  ):
 
-                                if ( ( $i % 2 ) == 0 ):
-                                    ?><tr><?php
+                                if ( ( $i % 3 ) == 0 ):
+                                    ?></tr><tr><?php
                                 endif;
 
-                                ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
-
-                                if ( $i & 1 ):
-                                    ?></tr><?php
-                                endif;
+                                ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
 
                                 $i++;
 
                             endforeach;
-                            ?>
+
+                            ?></tr><?php
+
+                                ?>
                             </tbody>
                         </table>
                         <?php do_action( 'wpfn_benchmark_icons_after' ); ?>
@@ -213,22 +213,23 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
 
                             $i = 0;
 
+                            ?><tr><?php
+
                             foreach ( $elements as  $element => $args  ):
 
-                                if ( ( $i % 2 ) == 0 ):
-                                    ?><tr><?php
+                                if ( ( $i % 3 ) == 0 ):
+                                ?></tr><tr><?php
                                 endif;
 
-                                ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
-
-                                if ( $i & 1 ):
-                                    ?></tr><?php
-                                endif;
+                                ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
 
                                 $i++;
 
                             endforeach;
-                            ?>
+
+                            ?></tr><?php
+
+                                ?>
                             </tbody>
                         </table>
                         <?php do_action( 'wpfn_action_icons_after' ); ?>
@@ -243,8 +244,8 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
             </div>
             <!-- End elements area-->
             <!-- main funnel editing area -->
-            <div id="postbox-container-2" class="postbox-container funnel-editor">
-                <div id="normal-sortables" class="meta-box-sortables ui-sortable">
+            <div  id="postbox-container-2" class="postbox-container funnel-editor">
+                <div style="visibility: hidden" id="normal-sortables" class="meta-box-sortables ui-sortable">
                     <?php do_action('wpfn_funnel_steps_before' ); ?>
 
                     <?php $steps = wpfn_get_funnel_steps( $funnel_id );
@@ -269,6 +270,9 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                     <?php do_action('wpfn_funnel_steps_after' ); ?>
                 </div>
             </div>
+            <script>
+                jQuery(function($){$('#normal-sortables').css( 'visibility', 'visible' )})
+            </script>
             <!-- end main funnel editing area -->
             <div style="clear: both;"></div>
         </div>

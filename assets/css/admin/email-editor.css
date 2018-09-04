@@ -3,6 +3,17 @@ wpfn-toolbar{
     position: relative;
 }
 
+.active wpfn-toolbar hr {
+    border-top: none;
+    border-bottom-color: #FFF;
+}
+
+ wpfn-toolbar hr{
+    border-bottom-color: #555d66;
+     width: 50%;
+
+ }
+
 #from_user, #test_email{
     width: 100%;
 }
@@ -100,6 +111,10 @@ select {
     margin: 0.83em 0 0.83em 0;
 }
 
+#editor{
+    min-height: 500px;
+}
+
 #editor-actions {
     border-right: 1px solid rgb(238, 238, 238);
     min-height: 50px;
@@ -110,8 +125,8 @@ select {
     box-shadow: none;
 }
 
-.text_block .simple-editor-content{
-    margin: 5px;
+.text_block{
+    padding: 5px;
 }
 
 .text_block p{
@@ -146,8 +161,8 @@ select {
 
 .ui-sortable-helper .action-icons, .row:hover .action-icons {
     display: block;
-    width: 100px;
-    margin-top: -30px;
+    width: 35px;
+    margin-right: -33px;
     float: right;
     background-color: #EAEAEA;
     text-align: center;

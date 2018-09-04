@@ -239,21 +239,24 @@ function wpfn_set_the_contact( $id )
  */
 function wpfn_get_the_contact()
 {
-    if ( is_admin() )
+    if ( is_admin() && ! wp_doing_ajax() )
         return false;
 
     if ( isset( $_COOKIE[ 'gh_contact' ] ) ){
         /* if the contact cookie has been set. */
         $id = wpfn_encrypt_decrypt( sanitize_text_field( $_COOKIE[ 'gh_contact' ] ), 'd' );
+
     } else if ( is_user_logged_in() ) {
     	$user = wp_get_current_user();
     	$contact = wpfn_get_contact_by_email( $user->user_email );
     	if ( ! $contact )
     		return false;
     	$id = intval( $contact['ID'] );
+
     } else if ( isset( $_GET[ 'contact' ] ) ){
         /* if the contact is coming from an email link */
-        $id = wpfn_encrypt_decrypt( urldecode( $_REQUEST[ 'contact' ] ), 'd' );
+        $id = wpfn_encrypt_decrypt( urldecode( $_GET[ 'contact' ] ), 'd' );
+
     } else if ( isset( $_REQUEST[ 'email' ] ) ) {
         /* possibly they are in the process of a form submission and the cookie has yet to be sent.*/
         if ( is_email( sanitize_email( $_REQUEST['email'] ) ) ){
@@ -263,9 +266,11 @@ function wpfn_get_the_contact()
             }
         }
     } else {
-        return false;
+        $id = apply_filters( 'gh_get_current_contact', false );
     }
 
+    if ( ! $id )
+        return false;
 
     return new WPFN_Contact( $id ) ;
 }

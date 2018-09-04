@@ -178,13 +178,6 @@ function wpfn_form_submit_listener()
 
     do_action( 'wpfn_form_submit', $step, $id );
 
-    /* set the contact cookie */
-    wpfn_set_the_contact( $id );
-    /* set the active funnel cookie*/
-    wpfn_set_the_funnel( wpfn_get_step_funnel( $step ) );
-    /* set the funnel step cookie*/
-    wpfn_set_the_step( $step );
-
     /* redirect to ensure cookie is set and can be used on the following page*/
     wp_redirect( $_SERVER['REQUEST_URI'] );
     die();

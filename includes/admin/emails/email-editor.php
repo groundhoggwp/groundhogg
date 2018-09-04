@@ -245,7 +245,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                 </div>
                             </div>
                         </div>
-                        <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto; overflow:hidden;">
+                        <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto; overflow:visible;">
                             <?php
 
                             $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
@@ -269,11 +269,13 @@ $email = wpfn_get_email_by_id( $email_id );
                                 <?php endif; ?>
                             </div>
                         </div>
+                        <div style="clear: both;"></div>
                     </div>
                 </div>
                 <div class="hidden">
                     <textarea id="content" name="content"><?php echo $email->content; ?></textarea>
                 </div>
+
             </div>
             <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sticky">

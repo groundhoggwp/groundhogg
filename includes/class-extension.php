@@ -38,9 +38,9 @@ class GH_Extension
 		add_filter( 'get_gh_extensions', array( $this, 'register' ) );
 	}
 
-	function register()
+	function register( $extensions )
 	{
-		$extensions[ 1 ] = array(
+		$extensions[ $this->id ] = array(
 			'item_name'     => $this->name,
 			'item_id'       => $this->id,
 			'file'          => $this->file,

@@ -30,8 +30,16 @@ class WPFN_Funnels_Page
                 include $filename;
             }
 
+            $this->set_headers();
 		}
 	}
+
+	function set_headers()
+    {
+        header("Cache-Control: no-cache, no-store, must-revalidate");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+    }
 
 	function get_funnels()
 	{

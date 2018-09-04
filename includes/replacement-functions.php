@@ -182,9 +182,38 @@ function wpfn_replacement_date( $time_string, $contact )
 
 add_filter( 'wpfn_replacement_date', 'wpfn_replacement_date', 10, 2 );
 
-function wpfn_replacement_business_name()
+function wpfn_replacement_business_name( $contact )
 {
     return get_option( 'gh_business_name' );
 }
 
 add_filter( 'wpfn_replacement_business_name', 'wpfn_replacement_business_name' );
+
+function wpfn_replacement_business_phone( $contact )
+{
+    return get_option( 'gh_phone' );
+}
+
+add_filter( 'wpfn_replacement_business_phone', 'wpfn_replacement_business_phone' );
+
+function wpfn_replacement_business_address( $contact )
+{
+    $address = array();
+
+    if ( get_option( 'gh_street_address_1' ) )
+        $address[] = get_option( 'gh_street_address_1' ) . ' ' . get_option( 'gh_street_address_2' );
+    if ( get_option( 'gh_city' ) )
+        $address[] = get_option( 'gh_city' );
+    if ( get_option( 'gh_region' ) )
+        $address[] = get_option( 'gh_region' );
+    if ( get_option( 'gh_country' ) )
+        $address[] = get_option( 'gh_country' );
+    if ( get_option( 'gh_zip_or_postal' ) )
+        $address[] = strtoupper( get_option( 'gh_zip_or_postal' ) );
+
+    $address = implode( ', ', $address );
+
+    return $address;
+}
+
+add_filter( 'wpfn_replacement_business_address', 'wpfn_replacement_business_address' );

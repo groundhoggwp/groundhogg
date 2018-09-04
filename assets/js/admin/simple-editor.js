@@ -354,7 +354,7 @@
 
         var actionBar = createElement('div');
         actionBar.className = classes.actionbar;
-        appendChild(settings.element, actionBar);
+        appendChild(settings.element.parentNode, actionBar);
         appendChild(settings.element, colorPickerDiv);
 
         var existing;

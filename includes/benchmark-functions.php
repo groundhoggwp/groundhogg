@@ -34,6 +34,13 @@ function wpfn_complete_benchmark( $benchmark_id, $contact_id )
     /* Rather than juist starting the next action, enter this benchmark into the queue for easy goal reporting */
     wpfn_enqueue_event( strtotime('now'), wpfn_get_step_funnel( $benchmark_id ), $benchmark_id, $contact_id );
 
+    /* set the active contact */
+    wpfn_set_the_contact( $contact_id );
+    /* set the active funnel cookie*/
+    wpfn_set_the_funnel( $funnel_id );
+    /* set the funnel step cookie*/
+    wpfn_set_the_step( $benchmark_id );
+
     do_action( 'wpfn_complete_benchmark_after', $benchmark_id );
 }
 
@@ -59,7 +66,7 @@ function wpfn_is_starting( $benchmark_id  )
 
         $step =  wpfn_get_funnel_step_by_order( $funnel_id, $step_order );
 
-        if ( $step['group'] === 'action' ){
+        if ( $step['funnelstep_group'] === 'action' ){
             return false;
         }
 

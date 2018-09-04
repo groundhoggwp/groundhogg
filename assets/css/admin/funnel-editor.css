@@ -1,5 +1,9 @@
+.full-width{
+    width: 100%;
+}
+
 .wpfn-element{
-    height: 112px;
+    /*height: 112px;*/
     text-align: center;
 }
 
@@ -39,7 +43,7 @@
 #actions table td,
 #benchmarks table td{
     text-align: center;
-    border: 1px solid #F1F1F1;
+    /*border: 1px solid #F1F1F1;*/
 
 }
 

@@ -30,7 +30,7 @@ class WPFN_Extension_Manager
         $extensions = apply_filters( 'get_gh_extensions', array() );
 
         foreach ( $extensions as $extension_args ){
-            if ( self::has_license( $extension_args['item_id'] ) & self::get_license_status( $extension_args['item_id']  ) !== 'invalid' ){
+            if ( self::has_license( $extension_args['item_id'] ) && self::get_license_status( $extension_args['item_id']  ) !== 'invalid' ){
                 $updater = new EDD_SL_Plugin_Updater( WPFN_Extension_Manager::$storeUrl, $extension_args['file'], array(
                         'version' 	=> $extension_args['version'], 		// current version number
                         'license' 	=> trim( self::get_license( $extension_args['item_id'] ) ), 	// license key (used get_option above to retrieve from DB)
@@ -72,7 +72,12 @@ class WPFN_Extension_Manager
 	    if ( empty( static::$extensions ) )
 		    static::$extensions = get_option( "gh_extensions", array() );
 
-        return static::$extensions[$item_id]['status'];
+	    if ( isset( static::$extensions[ $item_id ] ) ){
+            return static::$extensions[ $item_id ][ 'status' ];
+        }
+
+        return false;
+
     }
 
     public static function update_license_status( $item_id, $status )

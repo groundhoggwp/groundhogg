@@ -2,7 +2,7 @@
 
     $.fn.wpfnToolBar = function() {
 
-        var html = '<wpfn-toolbar class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span> | <span class="dashicons dashicons-move handle"></span> | <span class="dashicons dashicons-trash"></span></div></wpfn-toolbar>';
+        var html = '<wpfn-toolbar class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span><hr/><span class="dashicons dashicons-move handle"></span><hr/><span class="dashicons dashicons-trash"></span></div></wpfn-toolbar>';
 
         this.each(function() {
 

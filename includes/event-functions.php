@@ -114,8 +114,28 @@ function wpfn_do_queued_events()
 
     }
 
+    /* schedule the next cron run in 11 minutes... its 11 so that it doesnt get caught by the 10 minute minimum.
+    also has the affect of not allowing an ajax request to ALSO interfere with the CRON schedule. */
+    if ( defined( 'DOING_CRON' ) ){
+        wp_schedule_single_event( time() + ( 11 * MINUTE_IN_SECONDS ), 'wpfn_cron_event' );
+    }
+
     /* allow a restart of the event queue by signaling new processes this it's available. */
     delete_transient( 'wpfn_doing_events' );
 
     return key( $events ) + 1;
 }
+
+add_action( 'wpfn_cron_event', 'wpfn_do_queued_events' );
+
+/**
+ * Kickstart the cron job for the event queue.
+ */
+function wpfn_cron_run_events()
+{
+    if ( ! wp_next_scheduled( 'wpfn_cron_event' ) ) {
+        wp_schedule_single_event( time() + ( 10 * MINUTE_IN_SECONDS ), 'wpfn_cron_event' );
+    }
+}
+
+add_action( 'init', 'wpfn_cron_run_events' );

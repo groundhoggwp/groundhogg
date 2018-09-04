@@ -83,10 +83,11 @@ function wpfn_delete_funnel_step( $id )
  * Get an funnelstep row via the ID of the funnelstep
  *
  * @param int $id Email Id
+ * @param $output string output type, array or object by default
  *
  * @return object|false the Email, false on failure.
  */
-function wpfn_get_funnel_step_by_id( $id )
+function wpfn_get_funnel_step_by_id( $id, $output=OBJECT )
 {
     global $wpdb;
 
@@ -100,7 +101,7 @@ function wpfn_get_funnel_step_by_id( $id )
     $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
 
     $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE ID = %d", $id);
-    $funnelstep = $wpdb->get_row( $sql_prep1 );
+    $funnelstep = $wpdb->get_row( $sql_prep1, $output );
 
     return $funnelstep;
 }

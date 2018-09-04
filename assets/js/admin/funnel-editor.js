@@ -78,6 +78,23 @@ jQuery( function($) {
     );
 });
 
+function wpfn_duplicate_step()
+{
+    var el = jQuery( this );
+    var id = el.parent().attr( 'id' );
+
+    var ajaxCall = jQuery.ajax({
+        type : "post",
+        url : ajaxurl,
+        data : {action: "wpfn_duplicate_funnel_step", step_id: id },
+        success: function( html )
+        {
+           jQuery( html ).insertBefore( el.parent() )
+        }
+    });
+
+}
+
 function wpfn_delete_funnel_step()
 {
     var el = this;

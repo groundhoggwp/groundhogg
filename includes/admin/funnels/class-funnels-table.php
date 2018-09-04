@@ -113,7 +113,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
             );
         } else {
             return apply_filters( 'wpfn_email_row_actions', array(
-                "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_funnels&action=edit&funnel='. $id ). "'>" . __( 'Edit' ) . "</a></span>",
+                "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_funnels&action=edit&funnel='. $id ). "'>" . __( 'Build' ) . "</a></span>",
                 "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive' ) . "</a></span>",
             ));
         }

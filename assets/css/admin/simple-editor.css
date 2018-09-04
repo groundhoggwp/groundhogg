@@ -1,6 +1,10 @@
 .simple-editor-actionbar {
-    border-bottom: 1px solid #ddd;
+    border: solid #ddd;
+    border-width: 1px 1px 0 1px;
     background: #f5f5f5;
+    z-index: 9999;
+    margin-top: -35px;
+    position: absolute;
 }
 
 .simple-editor-button-wrapper {
