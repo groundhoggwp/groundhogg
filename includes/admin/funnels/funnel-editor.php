@@ -274,3 +274,8 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
         </div>
     </div>
 </form>
+<div>
+    <div class="save-notification">
+	    <?php _e( 'Auto Saved...', '' ); ?>
+    </div>
+</div>

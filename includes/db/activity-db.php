@@ -92,7 +92,7 @@ function wpfn_create_activity_db()
       activity_type VARCHAR(20) NOT NULL,
       object_id bigint(20) NOT NULL,
       referer text NOT NULL,
-      PRIMARY KEY  (timestamp,contact_id),
+      PRIMARY KEY  (timestamp,contact_id,activity_type),
       KEY timestamp (timestamp),
       KEY contact_id (contact_id),
       KEY funnel_id (funnel_id),

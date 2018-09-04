@@ -187,3 +187,16 @@ select {
 .row-actions a{
     text-decoration: none;
 }
+
+.save-notification{
+    display: none;
+    position: fixed;
+    bottom: 10px;
+    margin: auto auto auto 10px;
+    color: #FFF;
+    font-weight: bold;
+    text-align: center;
+    background: #3ed920;
+    padding: 10px 20px;
+    border-radius: 5px;
+}

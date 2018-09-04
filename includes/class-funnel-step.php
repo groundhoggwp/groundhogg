@@ -6,71 +6,90 @@
  * Time: 12:32 PM
  */
 
-class WPFN_Funnel_Step
+interface WPFN_Funnel_Step_Interface
+{
+	function __construct( $name, $type, $icon );
+	function settings( $id );
+	function save( $id );
+	function run( $id );
+}
+
+class WPFN_Funnel_Step implements WPFN_Funnel_Step_Interface
 {
 
+	/**
+	 * @var $type string the type of action
+	 */
     var $type;
 
+	/**
+	 * @var $name string the Display name of the action
+	 */
     var $name;
 
-    var $group;
-
-    var $settings_callback;
-
-    var $action_callback;
-
-    var $save_callback;
-
+	/**
+	 * @var $icon string url to icon.
+	 */
     var $icon;
 
-    function __construct(
-        $name,
-        $group,
-        $type,
-        $settings_callback,
-        $save_callback,
-        $action_callback,
-        $icon)
+    function __construct( $name, $type, $icon )
     {
 
-        if ( $this->group === 'benchmarks' ){
-            add_filter( 'wpfn_funnel_benchmarks', array( $this, 'register_type' ) );
-        } else {
-            add_filter( 'wpfn_funnel_actions', array( $this, 'register_type' ) );
-        }
+    	$this->type = $type;
+    	$this->name = $name;
+    	$this->icon = $icon;
 
-        add_filter( 'wpfn_builder_icons', array( $this, 'register_icon') );
+//    	add_filter( 'wpfn_funnel_actions', array( $this, 'register' ) );
 
+	    add_action( 'wpfn_get_step_settings_' . $this->type, array( $this, 'settings' ) );
+    	add_action( 'wpfn_save_step_' . $this->type, array( $this, 'save' ) );
     }
 
-    /**
-     * Add the step type to the actions/benchmarks array
-     *
-     * @param $array array Array of funnel actions/benchmarks
-     * @return array
-     */
-    function register_type( $array )
+    function register( $array )
     {
-        $array[] = $this->type;
+		$array[ $this->type ] = array(
+			'title' => $this->name,
+			'icon'  => $this->icon
+		);
 
-        return $array;
+		return $array;
     }
 
-    function register_icon( $array )
+    function settings( $id )
     {
-        $array[ $this->type ] = $this->icon;
+        _e( 'Settings not defined by child class...' );
     }
 
-    function register_callbacks()
+    function save( $id )
     {
-        if ( $this->group === 'benchmarks' ){
-
-
-
-        } else {
-
-        }
+        //do nothing
     }
 
+    function run( $id )
+    {
+    	//do nothing
+    }
+}
 
+class WPFN_Funnel_Action extends WPFN_Funnel_Step
+{
+	function __construct( $name, $type, $icon ) {
+
+		parent::__construct( $name, $type, $icon );
+
+		add_filter( 'wpfn_funnel_actions', array( $this, 'register' ) );
+		add_action( 'wpfn_do_action_' . $this->type, array( $this, 'run' ) );
+
+	}
+
+}
+
+class WPFN_Funnel_Benchmark extends WPFN_Funnel_Step
+{
+	function __construct( $name, $type, $icon ) {
+		parent::__construct( $name, $type, $icon );
+
+		add_filter( 'wpfn_funnel_benchmarks', array( $this, 'register' ) );
+		add_action( 'wpfn_do_action_' . $this->type, array( $this, 'run' ) );
+	}
 }

@@ -21,29 +21,26 @@ function wpfn_enqueue_event_scripts()
     wp_localize_script( 'wpfn-event-doer', 'wpfn_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
 
-add_action( 'wp_enqueue_scripts', 'wpfn_enqueue_event_scripts' );
-add_action( 'admin_enqueue_scripts', 'wpfn_enqueue_event_scripts' );
+//add_action( 'wp_enqueue_scripts', 'wpfn_enqueue_event_scripts' );
+//add_action( 'admin_enqueue_scripts', 'wpfn_enqueue_event_scripts' );
 
 /**
- * Do the ajax function for running events.
+ * Do the ajax function for running events. only run asynchronously while doing an ajax request.
  */
 function wpfn_process_queue_ajax()
 {
-    //todo security check.
     if ( ! wp_doing_ajax() )
-        wp_die( wpfn_get_random_groundhogday_quote() );
+        return;
 
     $ran = wpfn_do_queued_events();
 
-    if ( $ran )
-        wp_die( $ran );
-    else
-        wp_die( wpfn_get_random_groundhogday_quote() );
-
+    return;
 }
 
-add_action( 'wp_ajax_wpfn_event_queue_start', 'wpfn_process_queue_ajax' );
-add_action( 'wp_ajax_nopriv_wpfn_event_queue_start', 'wpfn_process_queue_ajax' );
+add_action( 'admin_init', 'wpfn_process_queue_ajax' );
+
+//add_action( 'wp_ajax_wpfn_event_queue_start', 'wpfn_process_queue_ajax' );
+//add_action( 'wp_ajax_nopriv_wpfn_event_queue_start', 'wpfn_process_queue_ajax' );
 
 /**
  * Run all events that have yet to be run.

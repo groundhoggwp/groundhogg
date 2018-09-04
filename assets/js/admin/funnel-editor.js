@@ -126,6 +126,10 @@ function wpfn_auto_save_funnel()
         success: function( result )
         {
             wpfnDoingAutoSave = false;
+            jQuery( '.save-notification' ).fadeIn();
+            setTimeout( function(){
+                jQuery( '.save-notification' ).fadeOut()
+            }, 3000);
         }
     });
 }

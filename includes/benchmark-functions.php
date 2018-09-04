@@ -144,6 +144,19 @@ function wpfn_run_user_role_changed_benchmark( $userId, $cur_role, $old_roles )
 add_action( 'set_user_role', 'wpfn_run_user_role_changed_benchmark', 10, 3 );
 
 /**
+ * Enqueue the scripts for the event runner process.
+ * Appears on front-end & backend as it will be run by traffic to the site.
+ */
+function wpfn_enqueue_page_view_scripts()
+{
+	wp_enqueue_script( 'wpfn-page-view', WPFN_ASSETS_FOLDER . '/js/page-view.js' , array('jquery') );
+	wp_localize_script( 'wpfn-page-view', 'wpfn_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+}
+
+add_action( 'wp_enqueue_scripts', 'wpfn_enqueue_page_view_scripts' );
+//add_action( 'admin_enqueue_scripts', 'wpfn_enqueue_page_view_scripts' );
+
+/**
  * Complete the Page View benchmark.
  * todo Review this goal. The hook needs to be changed probably...
  *
@@ -151,7 +164,7 @@ add_action( 'set_user_role', 'wpfn_run_user_role_changed_benchmark', 10, 3 );
  */
 function wpfn_complete_page_visited_benchmark()
 {
-    if ( is_admin() )
+    if ( ! wp_doing_ajax() )
         return;
 
     $contact = wpfn_get_current_contact();
@@ -178,9 +191,9 @@ function wpfn_complete_page_visited_benchmark()
             $match_url = wpfn_get_step_meta( $step_id, 'url_match', true );
 
             if ( $match_type === 'exact' ){
-                $is_page = $_SERVER['REQUEST_URI'] === parse_url( $match_url, PHP_URL_PATH );
+                $is_page = wp_get_referer() === $match_url;
             } else {
-                $is_page = strpos( $_SERVER['REQUEST_URI'] ,  parse_url( $match_url, PHP_URL_PATH ) ) !== false;
+                $is_page = strpos( wp_get_referer(), $match_url ) !== false;
             }
 
             if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $is_page ){
@@ -188,9 +201,12 @@ function wpfn_complete_page_visited_benchmark()
             }
         }
     }
+
+    wp_die();
 }
 
-add_action( 'init', 'wpfn_complete_page_visited_benchmark' );
+add_action( 'wp_ajax_wpfn_page_view', 'wpfn_complete_page_visited_benchmark' );
+add_action( 'wp_ajax_nopriv_wpfn_page_view', 'wpfn_complete_page_visited_benchmark' );
 
 /**
  * Complete the tag removed benchmark
@@ -319,6 +335,7 @@ function wpfn_complete_email_confirmed_benchmark( $contact_id, $in_funnel_id )
         if ( ( wpfn_is_starting( $step_id ) || wpfn_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && $in_funnel_id === $funnel_id ){
             wpfn_complete_benchmark( $step_id, $contact_id );
         }
-    }}
+    }
+}
 
 add_action( 'wpfn_email_confirmed', 'wpfn_complete_email_confirmed_benchmark', 10, 2 );

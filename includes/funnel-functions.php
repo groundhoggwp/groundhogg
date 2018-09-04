@@ -697,23 +697,24 @@ function wpfn_save_funnel( $funnel_id )
     $title = sanitize_text_field( stripslashes( $_POST[ 'funnel_title' ] ) );
     wpfn_update_funnel( $funnel_id, 'funnel_title', $title );
 
-    $status = sanitize_text_field( $_POST[ 'funnel_status' ] );
-    if ( $status !== 'active' && $status !== 'inactive' )
-        $status = 'inactive';
 
-    //do not update the status to inactive if it's not confirmed
-    if ( ( $status === 'inactive' && isset( $_POST['confirm'] ) && $_POST['confirm'] === 'yes' ) || $status === 'active' ){
-        wpfn_update_funnel( $funnel_id, 'funnel_status', $status );
+    /* do NOT update status during an autosave... */
+    if ( ! wp_doing_ajax() ){
+	    $status = sanitize_text_field( $_POST[ 'funnel_status' ] );
+	    if ( $status !== 'active' && $status !== 'inactive' )
+		    $status = 'inactive';
+
+	    //do not update the status to inactive if it's not confirmed
+	    if ( ( $status === 'inactive' && isset( $_POST['confirm'] ) && $_POST['confirm'] === 'yes' ) || $status === 'active' ){
+		    wpfn_update_funnel( $funnel_id, 'funnel_status', $status );
+	    }
     }
 
     //get all the steps in the funnel.
     $steps = $_POST['steps'];
 
     if ( ! $steps ){
-        ?>
-        <div class="notice notice-error is-dismissible"><p><?php echo esc_html__( 'No funnel steps present. Please add some automation.', 'groundhogg' ); ?></p></div>
-        <?php
-        return;
+        wp_die( 'Please add automation first.' );
     }
 
     foreach ( $steps as $i => $stepId )
