@@ -6,7 +6,7 @@
  * Time: 12:37 PM
  */
 
-class WPFN_Event_Report
+class WPGH_Event_Report
 {
 
     /**
@@ -52,7 +52,7 @@ class WPFN_Event_Report
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . WPFN_EVENTS;
+        $table_name = $wpdb->prefix . WPGH_EVENTS;
 
         return $wpdb->get_results(
             $wpdb->prepare(
@@ -75,7 +75,7 @@ class WPFN_Event_Report
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . WPFN_EVENTS;
+        $table_name = $wpdb->prefix . WPGH_EVENTS;
 
         return $wpdb->get_var(
             $wpdb->prepare(
@@ -97,7 +97,7 @@ class WPFN_Event_Report
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . WPFN_EVENTS;
+        $table_name = $wpdb->prefix . WPGH_EVENTS;
 
         return $wpdb->get_results(
             $wpdb->prepare(
@@ -119,7 +119,7 @@ class WPFN_Event_Report
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . WPFN_EVENTS;
+        $table_name = $wpdb->prefix . WPGH_EVENTS;
 
         return $wpdb->get_var(
             $wpdb->prepare(

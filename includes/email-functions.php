@@ -16,7 +16,7 @@
  *
  * @return array the allowed HTML in emails
  */
-function wpfn_emails_allowed_html()
+function wpgh_emails_allowed_html()
 {
 	//todo define custom HTML array.
 
@@ -37,7 +37,7 @@ function wpfn_emails_allowed_html()
  *
  * @return bool true on success, false on failure
  */
-function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null )
+function wpgh_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null )
 {
 
     if ( ! $contact_id || ! $email_id  )
@@ -45,17 +45,17 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
 
     $email_id = absint( intval( $email_id ) );
 
-    $contact = new WPFN_Contact( $contact_id );
+    $contact = new WPGH_Contact( $contact_id );
 
     /* if the email is a dud, give up. */
     if ( ! is_email( $contact->get_email() ) )
         return false;
 
     /* don't send email depending on their optin status */
-    if ( ! wpfn_can_send_email( $contact->get_id() ) )
+    if ( ! wpgh_can_send_email( $contact->get_id() ) )
         return false;
 
-    $email = wpfn_get_email_by_id( $email_id );
+    $email = wpgh_get_email_by_id( $email_id );
 
     /* don't send if the email is marked as unready. */
     if ( $email->email_status !== 'ready' && ! isset( $_POST['send_test'] ) )
@@ -70,7 +70,7 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     if ( $step_id && is_int( $step_id ) )
         $link_args['step'] = absint( $step_id );
 
-    $link_args['contact'] = wpfn_encrypt_decrypt( $contact->get_id(), 'e' );
+    $link_args['contact'] = wpgh_encrypt_decrypt( $contact->get_id(), 'e' );
     $link_args['email'] = $email_id;
 
     /* @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to. */
@@ -82,17 +82,17 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
 
     $title = get_option( 'gh_business_name' );
 
-    $subject_line = wpfn_do_replacements( $contact->get_id(), $email->subject );
+    $subject_line = wpgh_do_replacements( $contact->get_id(), $email->subject );
 
-    $pre_header = wpfn_do_replacements( $contact->get_id(), $email->pre_header );
+    $pre_header = wpgh_do_replacements( $contact->get_id(), $email->pre_header );
 
-    $content = apply_filters( 'wpfn_the_email_content', wpfn_do_replacements( $contact->get_id(), $email->content ) );
+    $content = apply_filters( 'wpgh_the_email_content', wpgh_do_replacements( $contact->get_id(), $email->content ) );
 
-    $email_footer_text = wpfn_get_email_footer_text();
+    $email_footer_text = wpgh_get_email_footer_text();
 
     $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
 
-    $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
+    $alignment = wpgh_get_email_meta( $email_id, 'alignment', true );
 
     if ( $alignment === 'left' ){
         $margins = "margin-left:0;margin-right:auto;";
@@ -109,7 +109,7 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     ob_end_clean();
 
     /* Filter the links to include data about the email, campaign, and funnel steps... */
-    $email_content = preg_replace_callback( '/(href=")([^"]*)(")/i', 'wpfn_urlencode_email_links' , $email_content );
+    $email_content = preg_replace_callback( '/(href=")([^"]*)(")/i', 'wpgh_urlencode_email_links' , $email_content );
     $email_content = preg_replace( '/(href=")([^"]*)(")/i', '${1}' . $ref_link . '${2}${3}' , $email_content );
 
     $from_user = get_userdata( $email->from_user );
@@ -138,9 +138,9 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
         $headers[ 'reply_to' ] = 'Reply-To: ' . $from_user->user_email;
         $headers[ 'content_type' ] = 'Content-Type: text/html; charset=UTF-8';
 
-        $headers = apply_filters( 'wpfn_email_headers', $headers );
+        $headers = apply_filters( 'wpgh_email_headers', $headers );
 
-        add_filter( 'wp_mail_content_type', 'wpfn_send_html_email' );
+        add_filter( 'wp_mail_content_type', 'wpgh_send_html_email' );
 
         $sent = wp_mail( $contact->get_email() , $subject_line, $email_content, $headers );
 
@@ -148,6 +148,8 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
             return false;
         }
     }
+
+    wpgh_update_contact_meta( $contact->get_id(), 'last_sent', time() );
 
     return true;
 }
@@ -158,7 +160,7 @@ function wpfn_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
  *
  * @return string the email footer
  */
-function wpfn_get_email_footer_text()
+function wpgh_get_email_footer_text()
 {
     $footer = "";
 
@@ -189,7 +191,7 @@ function wpfn_get_email_footer_text()
 
     $footer .= implode( ' | ', $sub ) ;
 
-    $footer = apply_filters( 'wpfn_email_footer', $footer );
+    $footer = apply_filters( 'wpgh_email_footer', $footer );
 
     return $footer;
 }
@@ -200,7 +202,7 @@ function wpfn_get_email_footer_text()
  * @param $matches array
  * @return string
  */
-function wpfn_urlencode_email_links( $matches )
+function wpgh_urlencode_email_links( $matches )
 {
     return $matches[1] . urlencode( $matches[2] ) . $matches[3];
 }
@@ -210,7 +212,7 @@ function wpfn_urlencode_email_links( $matches )
  *
  * @return string the content type for the email
  */
-function wpfn_send_html_email()
+function wpgh_send_html_email()
 {
     return 'text/html';
 }
@@ -222,13 +224,13 @@ function wpfn_send_html_email()
  *
  * @return string the new email content.
  */
-function wpfn_remove_builder_toolbar( $content )
+function wpgh_remove_builder_toolbar( $content )
 {
-    return preg_replace( '/<wpfn-toolbar\b[^>]*>(.*?)<\/wpfn-toolbar>/', '', $content );
+    return preg_replace( '/<wpgh-toolbar\b[^>]*>(.*?)<\/wpgh-toolbar>/', '', $content );
 }
 
-add_filter( 'wpfn_the_email_content', 'wpfn_remove_builder_toolbar' );
-add_filter( 'wpfn_sanitize_email_content', 'wpfn_remove_builder_toolbar' );
+add_filter( 'wpgh_the_email_content', 'wpgh_remove_builder_toolbar' );
+add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_builder_toolbar' );
 
 
 /**
@@ -237,12 +239,12 @@ add_filter( 'wpfn_sanitize_email_content', 'wpfn_remove_builder_toolbar' );
  * @param $content string email HTML
  * @return string the filtered email content.
  */
-function wpfn_remove_content_editable( $content )
+function wpgh_remove_content_editable( $content )
 {
     return str_replace( 'contenteditable="true" ', '', $content );
 }
 
-add_filter( 'wpfn_the_email_content', 'wpfn_remove_content_editable' );
+add_filter( 'wpgh_the_email_content', 'wpgh_remove_content_editable' );
 
 /**
  * Strip out irrelevant whitespace form the html.
@@ -250,7 +252,7 @@ add_filter( 'wpfn_the_email_content', 'wpfn_remove_content_editable' );
  * @param $content string
  * @return string
  */
-function wpfn_minify_html( $content )
+function wpgh_minify_html( $content )
 {
     $search = array(
         '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
@@ -271,7 +273,7 @@ function wpfn_minify_html( $content )
     return $buffer;
 }
 
-add_filter( 'wpfn_the_email_content', 'wpfn_minify_html' );
+add_filter( 'wpgh_the_email_content', 'wpgh_minify_html' );
 
 /**
  * Queue the email in the event queue. Does Basically it runs immediately but is queued for the sake of semantics.
@@ -279,13 +281,13 @@ add_filter( 'wpfn_the_email_content', 'wpfn_minify_html' );
  * @param $step_id int The Id of the step
  * @param $contact_id int the Contact's ID
  */
-function wpfn_enqueue_send_email_action( $step_id, $contact_id )
+function wpgh_enqueue_send_email_action( $step_id, $contact_id )
 {
-    $funnel_id = wpfn_get_step_funnel( $step_id );
-    wpfn_enqueue_event( strtotime( 'now' ) + 10, $funnel_id,  $step_id, $contact_id );
+    $funnel_id = wpgh_get_step_funnel( $step_id );
+    wpgh_enqueue_event( time() + 10, $funnel_id,  $step_id, $contact_id );
 }
 
-add_action( 'wpfn_enqueue_next_funnel_action_send_email', 'wpfn_enqueue_send_email_action', 10, 2 );
+add_action( 'wpgh_enqueue_next_funnel_action_send_email', 'wpgh_enqueue_send_email_action', 10, 2 );
 
 /**
  * Process the email action step sending and then queue up the next action in the funnel.
@@ -295,13 +297,13 @@ add_action( 'wpfn_enqueue_next_funnel_action_send_email', 'wpfn_enqueue_send_ema
  *
  * @return bool, whether the email was sent successfully
  */
-function wpfn_do_send_email_action( $step_id, $contact_id )
+function wpgh_do_send_email_action( $step_id, $contact_id )
 {
-    $email_id = wpfn_get_step_meta( $step_id, 'email_id', true );
-    return wpfn_send_email( intval( $contact_id ), intval( $email_id ), wpfn_get_step_funnel( $step_id ), $step_id );
+    $email_id = wpgh_get_step_meta( $step_id, 'email_id', true );
+    return wpgh_send_email( intval( $contact_id ), intval( $email_id ), wpgh_get_step_funnel( $step_id ), $step_id );
 }
 
-add_action( 'wpfn_do_action_send_email', 'wpfn_do_send_email_action', 10, 2 );
+add_action( 'wpgh_do_action_send_email', 'wpgh_do_send_email_action', 10, 2 );
 
 
 /**
@@ -310,7 +312,7 @@ add_action( 'wpfn_do_action_send_email', 'wpfn_do_send_email_action', 10, 2 );
  *
  * @return array list of available emails
  */
-function wpfn_dropdown_emails( $args )
+function wpgh_dropdown_emails( $args )
 {
     wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css' );
     wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js' );
@@ -325,7 +327,7 @@ function wpfn_dropdown_emails( $args )
 
     $r = wp_parse_args( $args, $defaults );
 
-    $emails = wpfn_get_emails();
+    $emails = wpgh_get_emails();
 
     $output = '';
     // Back-compat with old system where both id and name were based on $name argument
@@ -355,7 +357,7 @@ function wpfn_dropdown_emails( $args )
 
             $selected = ( intval( $item['ID'] ) === intval( $r['selected'] ) )? "selected='selected'" : '' ;
 
-            $output .= "<option value=\"" . $item['ID'] . "\" $selected >" . $item['subject'] . " (" . wpfn_email_status( $item['ID'] ).  ")</option>";
+            $output .= "<option value=\"" . $item['ID'] . "\" $selected >" . $item['subject'] . " (" . wpgh_email_status( $item['ID'] ).  ")</option>";
         }
 
         $output .= "</select>\n";
@@ -373,7 +375,7 @@ function wpfn_dropdown_emails( $args )
      * @param array  $r      The parsed arguments array.
      * @param array  $pages  List of WP_Post objects returned by `get_pages()`
      */
-    $html = apply_filters( 'wpfn_dropdown_emails', $output, $r, $emails );
+    $html = apply_filters( 'wpgh_dropdown_emails', $output, $r, $emails );
 
     if ( $r['echo'] ) {
         echo $html;
@@ -385,7 +387,7 @@ function wpfn_dropdown_emails( $args )
 /**
  * Create a new email and redirect to the email editor.
  */
-function wpfn_create_new_email()
+function wpgh_create_new_email()
 {
     if ( isset( $_POST[ 'email_template' ] ) ){
 
@@ -395,7 +397,7 @@ function wpfn_create_new_email()
 
     } else if ( isset( $_POST[ 'email_id' ] ) ) {
 
-        $email = wpfn_get_email_by_id( intval( $_POST['email_id'] ) );
+        $email = wpgh_get_email_by_id( intval( $_POST['email_id'] ) );
         $email_content = $email->content;
 
     } else {
@@ -405,15 +407,15 @@ function wpfn_create_new_email()
 
     }
 
-    $email_id = wpfn_insert_new_email( $email_content, '', '', get_current_user_id(), get_current_user_id() );
+    $email_id = wpgh_insert_new_email( $email_content, '', '', get_current_user_id(), get_current_user_id() );
 
     if ( isset( $_GET['step'] ) ){
 
         $step_id = intval( $_GET['step'] );
 
-        wpfn_update_step_meta( $step_id, 'email_id', $email_id );
+        wpgh_update_step_meta( $step_id, 'email_id', $email_id );
 
-        $funnel_id = wpfn_get_step_funnel( $step_id );
+        $funnel_id = wpgh_get_step_funnel( $step_id );
 
         wp_redirect( admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id . '&return_funnel=' . $funnel_id . '&return_step=' . $step_id ) );
 
@@ -426,40 +428,40 @@ function wpfn_create_new_email()
     die();
 }
 
-add_action( 'wpfn_add_email', 'wpfn_create_new_email' );
+add_action( 'wpgh_add_email', 'wpgh_create_new_email' );
 
 /**
  * Save and update an email
  *
  * @param $email_id int, the Email's ID
  */
-function wpfn_save_email( $email_id )
+function wpgh_save_email( $email_id )
 {
-    do_action( 'wpfn_email_update_before', $email_id );
+    do_action( 'wpgh_email_update_before', $email_id );
 
     $status = ( isset( $_POST['status'] ) )? sanitize_text_field( trim( stripslashes( $_POST['status'] ) ) ): 'draft';
-    wpfn_update_email( $email_id, 'email_status', $status );
+    wpgh_update_email( $email_id, 'email_status', $status );
 
     $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
-    wpfn_update_email( $email_id, 'from_user', $from_user );
+    wpgh_update_email( $email_id, 'from_user', $from_user );
 
     $subject =  ( isset( $_POST['subject'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['subject'] ) ) ) ): '';
-    wpfn_update_email( $email_id, 'subject', $subject );
+    wpgh_update_email( $email_id, 'subject', $subject );
 
     $pre_header =  ( isset( $_POST['pre_header'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['pre_header'] ) ) ) ): '';
-    wpfn_update_email( $email_id, 'pre_header', $pre_header );
+    wpgh_update_email( $email_id, 'pre_header', $pre_header );
 
     $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
-    wpfn_update_email_meta( $email_id, 'alignment', $alignment );
+    wpgh_update_email_meta( $email_id, 'alignment', $alignment );
 
-    $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpfn_sanitize_email_content', wpfn_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
-//        $content =  ( isset( $_POST['content'] ) )? wp_kses( stripslashes( $_POST['content'] ), wpfn_emails_allowed_html() ): '';
-    wpfn_update_email( $email_id, 'content', $content );
+    $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpgh_sanitize_email_content', wpgh_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
+//        $content =  ( isset( $_POST['content'] ) )? wp_kses( stripslashes( $_POST['content'] ), wpgh_emails_allowed_html() ): '';
+    wpgh_update_email( $email_id, 'content', $content );
 
-    do_action( 'wpfn_email_update_after', $email_id );
+    do_action( 'wpgh_email_update_after', $email_id );
 }
 
-add_action( 'wpfn_update_email', 'wpfn_save_email' );
+add_action( 'wpgh_update_email', 'wpgh_save_email' );
 
 /**
  * Remove script tags from the email content
@@ -467,12 +469,12 @@ add_action( 'wpfn_update_email', 'wpfn_save_email' );
  * @param $content string the email content
  * @return string, sanitized email content
  */
-function wpfn_strip_script_tags( $content )
+function wpgh_strip_script_tags( $content )
 {
     return preg_replace( '/<script\b[^>]*>(.*?)<\/script>/', '', $content );
 }
 
-add_filter( 'wpfn_sanitize_email_content', 'wpfn_strip_script_tags' );
+add_filter( 'wpgh_sanitize_email_content', 'wpgh_strip_script_tags' );
 
 /**
  * Remove form tags from emails.
@@ -480,37 +482,37 @@ add_filter( 'wpfn_sanitize_email_content', 'wpfn_strip_script_tags' );
  * @param $content string the email content
  * @return string, sanitized email content
  */
-function wpfn_strip_form_tags( $content )
+function wpgh_strip_form_tags( $content )
 {
     return preg_replace( '/<form\b[^>]*>(.*?)<\/form>/', '', $content );
 }
 
-add_filter( 'wpfn_sanitize_email_content', 'wpfn_strip_form_tags' );
+add_filter( 'wpgh_sanitize_email_content', 'wpgh_strip_form_tags' );
 
 /**
  * Send a test email
  *
  * @param $email_id int the ID pf the email
  */
-function wpfn_send_test_email( $email_id )
+function wpgh_send_test_email( $email_id )
 {
     if ( isset( $_POST['send_test'] ) ){
 
-        do_action( 'wpfn_before_send_test_email', $email_id );
+        do_action( 'wpgh_before_send_test_email', $email_id );
 
         $test_email_uid =  ( isset( $_POST['test_email'] ) )? intval( $_POST['test_email'] ): '';
-        wpfn_update_email_meta( $email_id, 'test_email', $test_email_uid );
+        wpgh_update_email_meta( $email_id, 'test_email', $test_email_uid );
 
-        $sent = wpfn_send_email( get_userdata( $test_email_uid )->user_email, $email_id );
+        $sent = wpgh_send_email( get_userdata( $test_email_uid )->user_email, $email_id );
 
         if ( ! $sent )
             wp_die( 'Could not send test.' );
 
-        do_action( 'wpfn_after_send_test_email', $email_id );
+        do_action( 'wpgh_after_send_test_email', $email_id );
     }
 }
 
-add_action( 'wpfn_email_update_after', 'wpfn_send_test_email' );
+add_action( 'wpgh_email_update_after', 'wpgh_send_test_email' );
 
 
 /**
@@ -519,11 +521,11 @@ add_action( 'wpfn_email_update_after', 'wpfn_send_test_email' );
  * @param $string string
  * @return string
  */
-function wpfn_suffix_emails( $string )
+function wpgh_suffix_emails( $string )
 {
     $regex = '#(<a href=")([^"]*)("[^>]*?>)#i';
 
-    return preg_replace_callback( $regex, 'wpfn_email_suffix_callback', $string );
+    return preg_replace_callback( $regex, 'wpgh_email_suffix_callback', $string );
 }
 
 /**
@@ -532,7 +534,7 @@ function wpfn_suffix_emails( $string )
  * @param $match string
  * @return string
  */
-function wpfn_email_suffix_callback( $match )
+function wpgh_email_suffix_callback( $match )
 {
     $url = $match[2];
 
@@ -551,9 +553,9 @@ function wpfn_email_suffix_callback( $match )
  * @param $id int the ID of the email
  * @return string thhe email status
  */
-function wpfn_email_status( $id )
+function wpgh_email_status( $id )
 {
-    $email = wpfn_get_email_by_id( intval( $id) );
+    $email = wpgh_get_email_by_id( intval( $id) );
 
     if ( ! $email )
         return false;
@@ -582,12 +584,12 @@ function wpfn_email_status( $id )
  *
  * @return int|false the given ID
  */
-function wpfn_set_the_email( $id )
+function wpgh_set_the_email( $id )
 {
     if ( ! is_numeric( $id )  )
         return false;
 
-    setcookie( 'gh_email', wpfn_encrypt_decrypt( absint( $id ), 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+    setcookie( 'gh_email', wpgh_encrypt_decrypt( absint( $id ), 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
 
     return $id;
 }
@@ -597,13 +599,13 @@ function wpfn_set_the_email( $id )
  *
  * @return bool
  */
-function wpfn_get_current_email()
+function wpgh_get_current_email()
 {
     if ( is_admin() )
         return false;
 
     if ( isset( $_COOKIE[ 'gh_email' ] ) ){
-        return intval( wpfn_encrypt_decrypt( $_COOKIE[ 'gh_email' ], 'd' ) );
+        return intval( wpgh_encrypt_decrypt( $_COOKIE[ 'gh_email' ], 'd' ) );
     } else if ( isset( $_GET['email'] ) ) {
         return intval( $_GET['email'] );
     }
@@ -614,14 +616,14 @@ function wpfn_get_current_email()
 /**
  * Perform the stats collection when a contact clicks a link in an email.
  */
-function wpfn_process_email_click()
+function wpgh_process_email_click()
 {
     if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/click/' ) === false )
         return;
 
-    $funnel = wpfn_set_the_funnel( wpfn_get_current_funnel() );
-    $step = wpfn_set_the_step( wpfn_get_current_step() );
-    $email = wpfn_set_the_email( wpfn_get_current_email() );
+    $funnel = wpgh_set_the_funnel( wpgh_get_current_funnel() );
+    $step = wpgh_set_the_step( wpgh_get_current_step() );
+    $email = wpgh_set_the_email( wpgh_get_current_email() );
 
     /* get the link target */
     if ( ! isset( $_GET['ref'] ) || empty( $_GET['ref'] ) )
@@ -629,7 +631,7 @@ function wpfn_process_email_click()
     else
         $ref = urldecode( $_GET[ 'ref' ] );
 
-    $contact = wpfn_get_the_contact();
+    $contact = wpgh_get_the_contact();
 
     if ( ! $contact ){
         /* do not do tracking if there is no contact to associate */
@@ -638,50 +640,50 @@ function wpfn_process_email_click()
     }
 
     /* set the contact cookie */
-    wpfn_set_the_contact( $contact->get_id() );
+    wpgh_set_the_contact( $contact->get_id() );
 
     /* if the open is not tracked, track it now. */
-    if ( ! wpfn_activity_exists( $contact->get_id(), $funnel, $step, 'email_opened', $email ) ){
-        wpfn_log_activity( $contact->get_id(), $funnel, $step, 'email_opened', $email );
+    if ( ! wpgh_activity_exists( $contact->get_id(), $funnel, $step, 'email_opened', $email ) ){
+        wpgh_log_activity( $contact->get_id(), $funnel, $step, 'email_opened', $email );
     }
 
     /* track the click every time */
-    wpfn_log_activity( $contact->get_id(), $funnel, $step, 'email_link_click', $email, $ref );
+    wpgh_log_activity( $contact->get_id(), $funnel, $step, 'email_link_click', $email, $ref );
 
     /* send to original destination. */
 
-    do_action( 'wpfn_email_link_click', $contact->get_id(), $email, $step, $funnel );
+    do_action( 'wpgh_email_link_click', $contact->get_id(), $email, $step, $funnel );
 
     wp_redirect( $ref );
     die();
 }
 
-add_action( 'init', 'wpfn_process_email_click' );
+add_action( 'init', 'wpgh_process_email_click' );
 
 /**
  * Process the email open tracking. Add activity and attributions.
  */
-function wpfn_process_email_open()
+function wpgh_process_email_open()
 {
     if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/open/' ) === false )
         return;
 
-    $contact = wpfn_get_current_contact();
+    $contact = wpgh_get_current_contact();
 
-    $funnel_id = wpfn_get_current_funnel() ? wpfn_get_current_funnel() : 0;
+    $funnel_id = wpgh_get_current_funnel() ? wpgh_get_current_funnel() : 0;
 
-    $step_id = wpfn_get_current_step() ? wpfn_get_current_step() : 0;
+    $step_id = wpgh_get_current_step() ? wpgh_get_current_step() : 0;
 
-    $email_id = wpfn_get_current_email();
+    $email_id = wpgh_get_current_email();
 
     /* if the open is not tracked, track it now. */
-    if ( ! wpfn_activity_exists( $contact->get_id(), $funnel_id, $step_id, 'email_opened', $email_id ) ){
-        wpfn_log_activity( $contact->get_id(), $funnel_id, $step_id, 'email_opened', $email_id );
+    if ( ! wpgh_activity_exists( $contact->get_id(), $funnel_id, $step_id, 'email_opened', $email_id ) ){
+        wpgh_log_activity( $contact->get_id(), $funnel_id, $step_id, 'email_opened', $email_id );
     }
 
-    do_action( 'wpfn_email_opened', $contact->get_id(), $email_id, $step_id, $funnel_id );
+    do_action( 'wpgh_email_opened', $contact->get_id(), $email_id, $step_id, $funnel_id );
 
     die();
 }
 
-add_action( 'init', 'wpfn_process_email_open' );
+add_action( 'init', 'wpgh_process_email_open' );

@@ -16,7 +16,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-class WPFN_Broadcasts_Page
+class WPGH_Broadcasts_Page
 {
     function __construct()
     {
@@ -108,19 +108,19 @@ class WPFN_Broadcasts_Page
 
                 if ( isset( $_POST ) )
                 {
-                    do_action( 'wpfn_add_broadcast' );
+                    do_action( 'wpgh_add_broadcast' );
                 }
 
                 break;
 
             case 'cancel':
                 foreach ( $this->get_broadcasts() as $id ){
-                    $s = wpfn_update_broadcast( $id, 'broadcast_status', 'cancelled' );
+                    $s = wpgh_update_broadcast( $id, 'broadcast_status', 'cancelled' );
 
                     if ( ! $s )
                         wp_die( __( 'Could not cancel.', 'groundhogg' ) );
 
-                    wpfn_dequeue_funnel_step_events( WPFN_BROADCAST, $id );
+                    wpgh_dequeue_funnel_step_events( WPGH_BROADCAST, $id );
                 }
                 break;
         }
@@ -146,11 +146,11 @@ class WPFN_Broadcasts_Page
 
     function table()
     {
-        if ( ! class_exists( 'WPFN_Broadcasts_Table' ) ){
+        if ( ! class_exists( 'WPGH_Broadcasts_Table' ) ){
             include dirname( __FILE__ ) . '/class-broadcasts-table.php';
         }
 
-        $broadcasts_table = new WPFN_Broadcasts_Table();
+        $broadcasts_table = new WPGH_Broadcasts_Table();
 
         $broadcasts_table->views(); ?>
         <form method="post" class="search-form wp-clearfix" >

@@ -1,4 +1,4 @@
-var wpfnDoingAutoSave = false;
+var wpghDoingAutoSave = false;
 
 jQuery( function($) {
 
@@ -40,7 +40,7 @@ jQuery( function($) {
                 var ajaxCall = jQuery.ajax({
                     type : "post",
                     url : ajaxurl,
-                    data : {action: "wpfn_get_step_html", step_type: step_type, step_order: order },
+                    data : {action: "wpgh_get_step_html", step_type: step_type, step_order: order },
                     success: function( html )
                     {
                         jQuery('#normal-sortables').find('.replace-me').replaceWith( html );
@@ -52,11 +52,11 @@ jQuery( function($) {
 
 
     funnelSortables.on( 'sortupdate', function( e, ui ){
-        $( '.email_opened' ).each( wpfn_update_inside_contents );
+        $( '.email_opened' ).each( wpgh_update_inside_contents );
     });
     funnelSortables.on( 'sortupdate', function( e, ui ){
-        wpfn_update_funnel_step_order();
-        wpfn_auto_save_funnel();
+        wpgh_update_funnel_step_order();
+        wpgh_auto_save_funnel();
     });
 
     $('.sidebar').stickySidebar({
@@ -67,18 +67,18 @@ jQuery( function($) {
     $('a').click( function( e ){
         e.preventDefault();
         /* auto save before redirect */
-        wpfn_auto_save_funnel();
+        wpgh_auto_save_funnel();
         window.location = this.href;
     });
 
     /* Auto save funnels */
     setInterval(
-        wpfn_auto_save_funnel,
+        wpgh_auto_save_funnel,
         20000
     );
 });
 
-function wpfn_duplicate_step()
+function wpgh_duplicate_step()
 {
     var el = jQuery( this );
     var id = el.parent().attr( 'id' );
@@ -86,7 +86,7 @@ function wpfn_duplicate_step()
     var ajaxCall = jQuery.ajax({
         type : "post",
         url : ajaxurl,
-        data : {action: "wpfn_duplicate_funnel_step", step_id: id },
+        data : {action: "wpgh_duplicate_funnel_step", step_id: id },
         success: function( html )
         {
            jQuery( html ).insertBefore( el.parent() )
@@ -95,7 +95,7 @@ function wpfn_duplicate_step()
 
 }
 
-function wpfn_delete_funnel_step()
+function wpgh_delete_funnel_step()
 {
     var el = this;
     var id = el.parentNode.id;
@@ -104,7 +104,7 @@ function wpfn_delete_funnel_step()
         var ajaxCall = jQuery.ajax({
             type : "post",
             url : ajaxurl,
-            data : {action: "wpfn_delete_funnel_step",step_id: id },
+            data : {action: "wpgh_delete_funnel_step",step_id: id },
             success: function( result )
             {
                 el.parentNode.remove();
@@ -112,10 +112,10 @@ function wpfn_delete_funnel_step()
         });
     }
 
-    wpfn_auto_save_funnel();
+    wpgh_auto_save_funnel();
 }
 
-function wpfn_update_funnel_step_order()
+function wpgh_update_funnel_step_order()
 {
     jQuery( "input[name$='_order']" ).each(
         function( index ){
@@ -124,16 +124,16 @@ function wpfn_update_funnel_step_order()
     );
 }
 
-function wpfn_auto_save_funnel()
+function wpgh_auto_save_funnel()
 {
-    if ( wpfnDoingAutoSave )
+    if ( wpghDoingAutoSave )
         return;
 
-    wpfnDoingAutoSave = true;
+    wpghDoingAutoSave = true;
 
     var fd = jQuery('form').serialize();
 
-    fd = fd +  '&action=wpfn_auto_save_funnel_via_ajax';
+    fd = fd +  '&action=wpgh_auto_save_funnel_via_ajax';
 
     var ajaxCall = jQuery.ajax({
         type : "post",
@@ -142,7 +142,7 @@ function wpfn_auto_save_funnel()
         data : fd,
         success: function( result )
         {
-            wpfnDoingAutoSave = false;
+            wpghDoingAutoSave = false;
             jQuery( '.save-notification' ).fadeIn();
             setTimeout( function(){
                 jQuery( '.save-notification' ).fadeOut()
@@ -151,7 +151,7 @@ function wpfn_auto_save_funnel()
     });
 }
 
-function wpfn_update_inside_contents()
+function wpgh_update_inside_contents()
 {
     var order = jQuery( '.step' ).index( jQuery( this ) ) + 1;
 
@@ -160,7 +160,7 @@ function wpfn_update_inside_contents()
     var ajaxCall = jQuery.ajax({
         type : "post",
         url : ajaxurl,
-        data : {action: "wpfn_get_step_html_inside", step_id: e.attr( 'id' ) , step_order: order },
+        data : {action: "wpgh_get_step_html_inside", step_id: e.attr( 'id' ) , step_order: order },
         success: function( html )
         {
             e.find( '.custom-settings' ).html( html );

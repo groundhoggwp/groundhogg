@@ -2,7 +2,7 @@
     width: 100%;
 }
 
-.wpfn-element{
+.wpgh-element{
     /*height: 112px;*/
     text-align: center;
 }
@@ -12,14 +12,14 @@
     width:80%;
 }
 
-.wpfn-element div{
+.wpgh-element div{
     box-sizing: border-box;
     display: inline-block;
     width: 100%;
     /*padding-top: 10px;*/
     /*padding-bottom: 70px;*/
 }
-.wpfn-element p{
+.wpgh-element p{
     margin: -12px 0 0 0;
 }
 
@@ -27,7 +27,7 @@
     margin: 0 10px 0 0;
 }
 
-.wpfn-element.ui-draggable-dragging .dashicons,
+.wpgh-element.ui-draggable-dragging .dashicons,
 #actions .dashicons,
 #benchmarks .dashicons{
     font-size: 60px;
@@ -47,14 +47,14 @@
 
 }
 
-#actions table td .wpfn-element,
-#benchmarks table td .wpfn-element,
-.wpfn-element p{
+#actions table td .wpgh-element,
+#benchmarks table td .wpgh-element,
+.wpgh-element p{
     text-align: center;
     cursor: move;
 }
 
-.wpfn-element.ui-draggable-dragging {
+.wpgh-element.ui-draggable-dragging {
     width: 120px;
     background: #FFFFFF;
     border: 1px solid #F1F1F1;

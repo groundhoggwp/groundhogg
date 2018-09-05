@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 </h2>
 <form method="post" id="poststuff" >
     <!-- search form -->
-    <?php do_action('wpfn_add_new_email_form_before'); ?>
+    <?php do_action('wpgh_add_new_email_form_before'); ?>
     <?php wp_nonce_field(); ?>
 
     <?php if ( $active_tab === 'templates' ): ?>
@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
     <?php else: ?>
 
-    <?php $emails = wpfn_get_emails(); ?>
+    <?php $emails = wpgh_get_emails(); ?>
 
     <?php foreach ( $emails as $email ): ?>
 
@@ -72,7 +72,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
     <?php endif; ?>
 
-    <?php do_action('wpfn_add_new_email_form_after'); ?>
+    <?php do_action('wpgh_add_new_email_form_after'); ?>
 </form>
 <?php
 

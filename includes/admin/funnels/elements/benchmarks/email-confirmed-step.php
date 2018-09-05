@@ -11,7 +11,7 @@
  * @since       0.1
  */
 
-function wpfn_email_confirmed_funnel_step_html( $step_id )
+function wpgh_email_confirmed_funnel_step_html( $step_id )
 {
     ?>
     <table class="form-table">
@@ -24,4 +24,4 @@ function wpfn_email_confirmed_funnel_step_html( $step_id )
     <?php
 }
 
-add_action( 'wpfn_get_step_settings_email_confirmed', 'wpfn_email_confirmed_funnel_step_html' );
+add_action( 'wpgh_get_step_settings_email_confirmed', 'wpgh_email_confirmed_funnel_step_html' );

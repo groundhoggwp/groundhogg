@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Contacts_Table extends WP_List_Table {
+class WPGH_Contacts_Table extends WP_List_Table {
 
     /**
      * TT_Example_List_Table constructor.
@@ -131,7 +131,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
             'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'wp-funnels')
         );
 
-        return apply_filters( 'wpfn_contact_bulk_actions', $actions );
+        return apply_filters( 'wpgh_contact_bulk_actions', $actions );
     }
     /**
      * Handle bulk actions.
@@ -154,7 +154,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
                     $deleted = 0;
                     if(!empty($ids)) {
                         foreach ($ids as $id) {
-                            wpfn_delete_contact($id);
+                            wpgh_delete_contact($id);
                             $deleted++;
                         }
                     }
@@ -184,7 +184,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
 
         $view = isset($_REQUEST['optin_status']) ? $_REQUEST['optin_status'] : 'all';
 
-        $table_name = $wpdb->prefix . WPFN_CONTACTS;
+        $table_name = $wpdb->prefix . WPGH_CONTACTS;
 
         $count = array(
             'unconfirmed' => count($wpdb->get_results("SELECT ID FROM $table_name WHERE optin_status = 0")),
@@ -246,7 +246,7 @@ class WPFN_Contacts_Table extends WP_List_Table {
                             break;
                     }
                     $sql = $wpdb->prepare(
-                        "SELECT c.* FROM " . $wpdb->prefix . WPFN_CONTACTS . " c
+                        "SELECT c.* FROM " . $wpdb->prefix . WPGH_CONTACTS . " c
                         WHERE c.optin_status = %d $search
                         ORDER BY c.date_created DESC" , $view
                     );
@@ -257,8 +257,8 @@ class WPFN_Contacts_Table extends WP_List_Table {
                     $tag_id = $_GET['tag'];
                     $sql = $wpdb->prepare(
                         "SELECT t.*, c.* FROM "
-                        .$wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS . " t "
-                        . " LEFT JOIN " .$wpdb->prefix . WPFN_CONTACTS . " c ON t.contact_id = c.ID 
+                        .$wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS . " t "
+                        . " LEFT JOIN " .$wpdb->prefix . WPGH_CONTACTS . " c ON t.contact_id = c.ID 
                         WHERE t.tag_id = %d $search
                         ORDER BY c.date_created DESC"
                     , $tag_id);
@@ -267,8 +267,8 @@ class WPFN_Contacts_Table extends WP_List_Table {
             case 'report':
 
                 $sql = "SELECT DISTINCT e.contact_id, c.*
-                FROM " . $wpdb->prefix . WPFN_EVENTS ." e 
-                LEFT JOIN " . $wpdb->prefix . WPFN_CONTACTS . " c ON e.contact_id = c.ID 
+                FROM " . $wpdb->prefix . WPGH_EVENTS ." e 
+                LEFT JOIN " . $wpdb->prefix . WPGH_CONTACTS . " c ON e.contact_id = c.ID 
                 WHERE (1=1 ";
                 if ( isset( $_REQUEST['status'] ) ) {
                     $status = $_REQUEST['status'];
@@ -297,13 +297,13 @@ class WPFN_Contacts_Table extends WP_List_Table {
             case 'owner':
                 if ( isset( $_REQUEST['owner'] ) ){
                     $owner = intval( $_REQUEST['owner'] );
-                    $sql = $wpdb->prepare( "SELECT c.* FROM " . $wpdb->prefix . WPFN_CONTACTS . " c
+                    $sql = $wpdb->prepare( "SELECT c.* FROM " . $wpdb->prefix . WPGH_CONTACTS . " c
                     WHERE c.owner_id = %d $search
                     c.date_created DESC", $owner );
                 }
                 break;
             default:
-                $sql = "SELECT c.* FROM " . $wpdb->prefix . WPFN_CONTACTS . " c
+                $sql = "SELECT c.* FROM " . $wpdb->prefix . WPGH_CONTACTS . " c
                 WHERE 1=1 $search
                 ORDER BY c.date_created DESC";
                 break;

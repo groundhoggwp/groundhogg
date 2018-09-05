@@ -26,31 +26,31 @@ wp_enqueue_style( 'wp-color-picker' );
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 //custom scripts
-wp_enqueue_script( 'email-editor', WPFN_ASSETS_FOLDER . '/js/admin/email-editor.js', array( 'wp-color-picker' ) );
-wp_enqueue_style('email-editor', WPFN_ASSETS_FOLDER . '/css/admin/email-editor.css' );
+wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . '/js/admin/email-editor.js', array( 'wp-color-picker' ) );
+wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . '/css/admin/email-editor.css' );
 
-wp_enqueue_script('media-picker', WPFN_ASSETS_FOLDER . '/js/admin/media-picker.js' );
+wp_enqueue_script('media-picker', WPGH_ASSETS_FOLDER . '/js/admin/media-picker.js' );
 
-wp_enqueue_script('simple-editor', WPFN_ASSETS_FOLDER . '/js/admin/simple-editor.js' );
-wp_enqueue_style('simple-editor', WPFN_ASSETS_FOLDER . '/css/admin/simple-editor.css' );
+wp_enqueue_script('simple-editor', WPGH_ASSETS_FOLDER . '/js/admin/simple-editor.js' );
+wp_enqueue_style('simple-editor', WPGH_ASSETS_FOLDER . '/css/admin/simple-editor.css' );
 //for select 2
 wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css' );
 wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js' );
 
 $email_id = intval( $_GET['email'] );
-$email = wpfn_get_email_by_id( $email_id );
+$email = wpgh_get_email_by_id( $email_id );
 
 ?>
 
 <form method="post">
     <?php wp_nonce_field(); ?>
-    <?php do_action('wpfn_edit_email_form_before'); ?>
+    <?php do_action('wpgh_edit_email_form_before'); ?>
     <?php if ( isset( $_REQUEST['return_funnel'] ) ): ?>
     <div class="notice notice-info is-dismissible">
         <p><a href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $_REQUEST['return_funnel'] . '#' . $_REQUEST['return_step'] ); ?>"><?php  _e( '&larr; Back to editing funnel' ); ?></a></p>
     </div>
     <?php endif; ?>
-    <div id='poststuff' class="wpfn-funnel-builder">
+    <div id='poststuff' class="wpgh-funnel-builder">
         <div id="post-body" class="metabox-holder columns-2">
             <div id="post-body-content">
                 <div id="titlediv">
@@ -78,7 +78,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'H1 Font'); ?>:</th>
-                                                    <td><?php wpfn_font_select( 'h1-font', 'h1-font' ); ?></td>
+                                                    <td><?php wpgh_font_select( 'h1-font', 'h1-font' ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'H2 Size'); ?>:</th>
@@ -86,7 +86,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'H2 Font'); ?>:</th>
-                                                    <td><?php wpfn_font_select( 'h2-font', 'h2-font' ); ?></td>
+                                                    <td><?php wpgh_font_select( 'h2-font', 'h2-font' ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Paragraph Size'); ?>:</th>
@@ -94,7 +94,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Paragraph Font'); ?>:</th>
-                                                    <td><?php wpfn_font_select( 'p-font', 'p-font' ); ?></td>
+                                                    <td><?php wpgh_font_select( 'p-font', 'p-font' ); ?></td>
                                                 </tr>
                                             </table>
                                         </div>
@@ -115,15 +115,15 @@ $email = wpfn_get_email_by_id( $email_id );
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Button Font'); ?>:</th>
-                                                    <td><?php wpfn_font_select( 'button-font', 'button-font' ); ?></td>
+                                                    <td><?php wpgh_font_select( 'button-font', 'button-font' ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Button Color'); ?>:</th>
-                                                    <td><?php wpfn_color_select( 'button-color', 'button-color', '#dd9933' ); ?></td>
+                                                    <td><?php wpgh_color_select( 'button-color', 'button-color', '#dd9933' ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Text Color'); ?>:</th>
-                                                    <td><?php wpfn_color_select( 'button-text-color', 'button-text-color', '#FFFFFF' ); ?></td>
+                                                    <td><?php wpgh_color_select( 'button-text-color', 'button-text-color', '#FFFFFF' ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Button Link'); ?>:</th>
@@ -234,8 +234,8 @@ $email = wpfn_get_email_by_id( $email_id );
                                                     <th><?php _e( 'Alignment'); ?></th>
                                                     <td>
                                                         <select id="email-align" name="email_alignment">
-                                                            <option value="left" <?php if ( wpfn_get_email_meta( $email_id, 'alignment', true ) === 'left' ) echo 'selected' ; ?> ><?php _e('Left'); ?></option>
-                                                            <option value="center" <?php if ( wpfn_get_email_meta( $email_id, 'alignment', true ) === 'center' ) echo 'selected' ; ?>><?php _e('Center'); ?></option>
+                                                            <option value="left" <?php if ( wpgh_get_email_meta( $email_id, 'alignment', true ) === 'left' ) echo 'selected' ; ?> ><?php _e('Left'); ?></option>
+                                                            <option value="center" <?php if ( wpgh_get_email_meta( $email_id, 'alignment', true ) === 'center' ) echo 'selected' ; ?>><?php _e('Center'); ?></option>
                                                         </select>
                                                     </td>
                                                 </tr>
@@ -248,7 +248,7 @@ $email = wpfn_get_email_by_id( $email_id );
                         <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto; overflow:visible;">
                             <?php
 
-                            $alignment = wpfn_get_email_meta( $email_id, 'alignment', true );
+                            $alignment = wpgh_get_email_meta( $email_id, 'alignment', true );
                             if ( $alignment === 'center' ){
                                 $margins = "margin-left:auto;margin-right:auto;";
                             } else {
@@ -258,12 +258,12 @@ $email = wpfn_get_email_by_id( $email_id );
                             ?>
                             <div id="email-inside" class="email-sortable" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
                                 <?php if ( empty( $email->content ) ): ?>
-                                    <?php wpfn_get_email_block( 'image_block' ); ?>
-                                    <?php wpfn_get_email_block( 'text_block' ); ?>
-                                    <?php wpfn_get_email_block( 'divider_block' ); ?>
-                                    <?php wpfn_get_email_block( 'button_block') ; ?>
-                                    <?php wpfn_get_email_block( 'divider_block' ); ?>
-                                    <?php wpfn_get_email_block( 'text_block' ); ?>
+                                    <?php wpgh_get_email_block( 'image_block' ); ?>
+                                    <?php wpgh_get_email_block( 'text_block' ); ?>
+                                    <?php wpgh_get_email_block( 'divider_block' ); ?>
+                                    <?php wpgh_get_email_block( 'button_block') ; ?>
+                                    <?php wpgh_get_email_block( 'divider_block' ); ?>
+                                    <?php wpgh_get_email_block( 'text_block' ); ?>
                                 <?php else: ?>
                                     <?php echo $email->content; ?>
                                 <?php endif; ?>
@@ -284,7 +284,7 @@ $email = wpfn_get_email_by_id( $email_id );
                     <div class="inside">
                         <div class="submitbox">
                             <div id="minor-publishing-actions">
-                                <?php do_action( 'wpfn_email_actions_before' ); ?>
+                                <?php do_action( 'wpgh_email_actions_before' ); ?>
                                 <table class="form-table">
                                     <tbody>
                                     <tr>
@@ -320,7 +320,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                     </tr>
                                     <tr id="send-to" class="hidden">
                                         <th><?php _e( 'To:' ); ?></th>
-                                        <?php $args = array( 'id' => 'test_email', 'name' => 'test_email', 'selected' => wpfn_get_email_meta( $email_id, 'test_email', true ) ); ?>
+                                        <?php $args = array( 'id' => 'test_email', 'name' => 'test_email', 'selected' => wpgh_get_email_meta( $email_id, 'test_email', true ) ); ?>
                                         <td><?php wp_dropdown_users( $args ); ?><script>jQuery(document).ready(function(){jQuery( '#test_email' ).select2()});</script></td>
                                     </tr>
                                     <script>
@@ -330,7 +330,7 @@ $email = wpfn_get_email_by_id( $email_id );
                                     </script>
                                     </tbody>
                                 </table>
-                                <?php do_action( 'wpfn_email_actions_after' ); ?>
+                                <?php do_action( 'wpgh_email_actions_after' ); ?>
                             </div>
                             <div id="major-publishing-actions">
                                 <div id="delete-action">
@@ -345,24 +345,24 @@ $email = wpfn_get_email_by_id( $email_id );
                         </div>
                     </div>
                 </div>
-                <?php do_action( 'wpfn_email_side_actions_after' ); ?>
-                <?php do_action( 'wpfn_email_blocks_before' ); ?>
+                <?php do_action( 'wpgh_email_side_actions_after' ); ?>
+                <?php do_action( 'wpgh_email_blocks_before' ); ?>
                 <div id='blocks' class="postbox">
                     <h2 class="hndle"><?php echo __( 'Blocks', 'groundhogg' );?></h2>
                     <div class="inside">
                         <table>
                             <tbody>
                             <tr>
-                                <td><div id='text_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/text-block.png'; ?>"></div><p><?php _e( 'Text', 'groundhogg' ); ?></p></div></td>
-                                <td><div id='spacer_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/spacer-block.png'; ?>"></div><p><?php _e( 'Spacer', 'groundhogg' ); ?></p></div></td>
+                                <td><div id='text_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/text-block.png'; ?>"></div><p><?php _e( 'Text', 'groundhogg' ); ?></p></div></td>
+                                <td><div id='spacer_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/spacer-block.png'; ?>"></div><p><?php _e( 'Spacer', 'groundhogg' ); ?></p></div></td>
                             </tr>
                             <tr>
-                                <td><div id='divider_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/divider.png'; ?>"></div><p><?php _e( 'Divider', 'groundhogg' ); ?></p></div></td>
-                                <td><div id='image_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/image-block.png'; ?>"></div><p><?php _e( 'Image', 'groundhogg' ); ?></p></div></td>
+                                <td><div id='divider_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/divider.png'; ?>"></div><p><?php _e( 'Divider', 'groundhogg' ); ?></p></div></td>
+                                <td><div id='image_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/image-block.png'; ?>"></div><p><?php _e( 'Image', 'groundhogg' ); ?></p></div></td>
                             </tr>
                             <tr>
-                                <td><div id='button_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/button.png'; ?>"></div><p><?php _e( 'Button', 'groundhogg' ); ?></p></div></td>
-                                <td><div id='code_block' class="wpfn-element email-draggable"><div class="builder-icon"><img src="<?php echo WPFN_ASSETS_FOLDER . '/images/email-icons/html-block.png'; ?>"></div><p><?php _e( 'HTML', 'groundhogg' ); ?></p></div></td>
+                                <td><div id='button_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/button.png'; ?>"></div><p><?php _e( 'Button', 'groundhogg' ); ?></p></div></td>
+                                <td><div id='code_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/html-block.png'; ?>"></div><p><?php _e( 'HTML', 'groundhogg' ); ?></p></div></td>
                             </tr>
                             </tbody>
                         </table>

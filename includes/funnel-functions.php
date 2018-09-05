@@ -18,12 +18,12 @@
  *
  * @return int|false the given ID
  */
-function wpfn_set_the_funnel( $id )
+function wpgh_set_the_funnel( $id )
 {
     if ( ! is_numeric( $id )  )
         return false;
 
-    setcookie( 'gh_funnel', wpfn_encrypt_decrypt( $id, 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+    setcookie( 'gh_funnel', wpgh_encrypt_decrypt( $id, 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
 
     return $id;
 }
@@ -33,13 +33,13 @@ function wpfn_set_the_funnel( $id )
  *
  * @return bool
  */
-function wpfn_get_current_funnel()
+function wpgh_get_current_funnel()
 {
     if ( is_admin() )
         return false;
 
     if ( isset( $_COOKIE[ 'gh_funnel' ] ) ){
-        return intval( wpfn_encrypt_decrypt( $_COOKIE[ 'gh_funnel' ], 'd' ) );
+        return intval( wpgh_encrypt_decrypt( $_COOKIE[ 'gh_funnel' ], 'd' ) );
     } else if ( isset( $_GET['funnel'] ) ){
         return intval( $_GET['funnel'] );
     }
@@ -54,12 +54,12 @@ function wpfn_get_current_funnel()
  *
  * @return int|false the given ID
  */
-function wpfn_set_the_step( $id )
+function wpgh_set_the_step( $id )
 {
     if ( ! is_numeric( $id )  )
         return false;
 
-    setcookie( 'gh_step', wpfn_encrypt_decrypt( $id, 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+    setcookie( 'gh_step', wpgh_encrypt_decrypt( $id, 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
 
     return $id;
 }
@@ -69,13 +69,13 @@ function wpfn_set_the_step( $id )
  *
  * @return bool
  */
-function wpfn_get_current_step()
+function wpgh_get_current_step()
 {
     if ( is_admin() )
         return false;
 
     if ( isset( $_COOKIE[ 'gh_step' ] ) ){
-        return intval( wpfn_encrypt_decrypt( $_COOKIE[ 'gh_step' ], 'd' ) );
+        return intval( wpgh_encrypt_decrypt( $_COOKIE[ 'gh_step' ], 'd' ) );
     } else if ( isset( $_GET['step'] ) ) {
         return intval( $_GET['step'] );
     }
@@ -94,7 +94,7 @@ function wpfn_get_current_step()
  * @param $action_callback string the callback to perform the action
  * @param $icon string a link or class to the icon of the new action.
  */
-function wpfn_register_custom_action
+function wpgh_register_custom_action
 (
         $name,
         $type,
@@ -112,21 +112,21 @@ function wpfn_register_custom_action
  *
  * @return array
  */
-function wpfn_get_funnel_benchmarks()
+function wpgh_get_funnel_benchmarks()
 {
     $benchmarks = array();
 
-    $benchmarks['form_fill'] = array( 'title' => __('Form Filled'), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/form-filled.png' );
-    $benchmarks['email_opened'] = array( 'title' => __('Email opened', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/opened-email.png' );
-    $benchmarks['email_confirmed'] = array( 'title' => __('Email Confirmed', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/email-confirmed.png' );
-//    $benchmarks['link_clicked'] = array( 'title' => __('Link Clicked', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/' );
-    $benchmarks['page_visited'] = array( 'title' => __('Page Visited', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/page-visited.png' );
-    $benchmarks['tag_applied']  = array( 'title' => __('Tag Applied', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/tag-applied.png' );
-    $benchmarks['tag_removed']  = array( 'title' => __('Tag Removed', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/tag-removed.png' );
-    $benchmarks['account_created'] = array( 'title' => __('Account Created', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/account-created.png' );
-    $benchmarks['role_changed']    = array( 'title' => __('Role Changed', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/role-changed.png' );
+    $benchmarks['form_fill'] = array( 'title' => __('Form Filled'), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/form-filled.png' );
+    $benchmarks['email_opened'] = array( 'title' => __('Email opened', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/opened-email.png' );
+    $benchmarks['email_confirmed'] = array( 'title' => __('Email Confirmed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/email-confirmed.png' );
+//    $benchmarks['link_clicked'] = array( 'title' => __('Link Clicked', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/' );
+    $benchmarks['page_visited'] = array( 'title' => __('Page Visited', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/page-visited.png' );
+    $benchmarks['tag_applied']  = array( 'title' => __('Tag Applied', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/tag-applied.png' );
+    $benchmarks['tag_removed']  = array( 'title' => __('Tag Removed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/tag-removed.png' );
+    $benchmarks['account_created'] = array( 'title' => __('Account Created', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/account-created.png' );
+    $benchmarks['role_changed']    = array( 'title' => __('Role Changed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/role-changed.png' );
 
-    return apply_filters( 'wpfn_funnel_benchmarks', $benchmarks );
+    return apply_filters( 'wpgh_funnel_benchmarks', $benchmarks );
 }
 
 /**
@@ -134,20 +134,20 @@ function wpfn_get_funnel_benchmarks()
  *
  * @return array()
  */
-function wpfn_get_funnel_actions()
+function wpgh_get_funnel_actions()
 {
     $actions = array();
 
-    $actions['send_email']  = array( 'title' => __( 'Send Email', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/send-email.png' );
-    $actions['apply_note']  = array( 'title' => __( 'Apply Note', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/apply-a-note.png' );
-    $actions['apply_tag']   = array( 'title' => __( 'Apply Tag', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/apply-tag.png' );
-    $actions['remove_tag']  = array( 'title' => __( 'Remove Tag', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/remove-tag.png' );
-//    $actions['delete_user'] = array( 'title' => __( '', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/.png' );
-    $actions['date_timer']  = array( 'title' => __( 'Date Timer', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/date-timer.png' );
-    $actions['delay_timer'] = array( 'title' => __( 'Delay Timer', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/delay-timer.png' );
-    $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPFN_ASSETS_FOLDER . '/images/builder-icons/create-account.png' );
+    $actions['send_email']  = array( 'title' => __( 'Send Email', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/send-email.png' );
+    $actions['apply_note']  = array( 'title' => __( 'Apply Note', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/apply-a-note.png' );
+    $actions['apply_tag']   = array( 'title' => __( 'Apply Tag', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/apply-tag.png' );
+    $actions['remove_tag']  = array( 'title' => __( 'Remove Tag', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/remove-tag.png' );
+//    $actions['delete_user'] = array( 'title' => __( '', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/.png' );
+    $actions['date_timer']  = array( 'title' => __( 'Date Timer', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/date-timer.png' );
+    $actions['delay_timer'] = array( 'title' => __( 'Delay Timer', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/delay-timer.png' );
+    $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/create-account.png' );
 
-    return apply_filters( 'wpfn_funnel_actions', $actions );
+    return apply_filters( 'wpgh_funnel_actions', $actions );
 }
 
 /**
@@ -156,22 +156,22 @@ function wpfn_get_funnel_actions()
  * @param $step_id int the Id of the step
  * @return string the URL of the icon.
  */
-function wpfn_get_step_icon( $step_id )
+function wpgh_get_step_icon( $step_id )
 {
 
-    $step_group = wpfn_get_step_group( $step_id );
+    $step_group = wpgh_get_step_group( $step_id );
 
-    $step_type = wpfn_get_step_type( $step_id );
+    $step_type = wpgh_get_step_type( $step_id );
 
     if ( $step_group === 'benchmark' ){
 
-        $benchmarks = wpfn_get_funnel_benchmarks();
+        $benchmarks = wpgh_get_funnel_benchmarks();
 
         return $benchmarks[$step_type]['icon'];
 
     } else {
 
-        $actions = wpfn_get_funnel_actions();
+        $actions = wpgh_get_funnel_actions();
 
         return $actions[$step_type]['icon'];
 
@@ -184,9 +184,9 @@ function wpfn_get_step_icon( $step_id )
  *
  * @return int|false the Name of the funnel or false if the funnel DNE
  */
-function wpfn_get_funnel_name( $funnel_id )
+function wpgh_get_funnel_name( $funnel_id )
 {
-    $funnel = wpfn_get_funnel_by_id( $funnel_id );
+    $funnel = wpgh_get_funnel_by_id( $funnel_id );
 
     if ( ! $funnel )
         return false;
@@ -201,9 +201,9 @@ function wpfn_get_funnel_name( $funnel_id )
  *
  * @return int|false the Name of the funnel or false if the funnel DNE
  */
-function wpfn_get_funnel_status( $funnel_id )
+function wpgh_get_funnel_status( $funnel_id )
 {
-    $funnel = wpfn_get_funnel_by_id( $funnel_id );
+    $funnel = wpgh_get_funnel_by_id( $funnel_id );
 
     if ( ! $funnel )
         return false;
@@ -217,9 +217,9 @@ function wpfn_get_funnel_status( $funnel_id )
  * @param $funnel_id int the ID of the funnel
  * @return array|false an array of step IDs, false on failure
  */
-function wpfn_get_funnel_steps( $funnel_id )
+function wpgh_get_funnel_steps( $funnel_id )
 {
-    $steps = wpfn_get_funnel_steps_by_funnel_id( $funnel_id );
+    $steps = wpgh_get_funnel_steps_by_funnel_id( $funnel_id );
 
     if ( ! $steps )
         return false;
@@ -244,11 +244,11 @@ function wpfn_get_funnel_steps( $funnel_id )
  *
  * @return string the step's handle
  */
-function wpfn_get_step_hndle( $step_id )
+function wpgh_get_step_hndle( $step_id )
 {
     //todo Set up some sort of easy way, hardcode?
 
-    $step = wpfn_get_funnel_step_by_id( $step_id );
+    $step = wpgh_get_funnel_step_by_id( $step_id );
 
     if ( ! $step )
         return false;
@@ -263,7 +263,7 @@ function wpfn_get_step_hndle( $step_id )
  *
  * @param $step_id int the ID of the step.
  */
-function wpfn_get_step_settings( $step_id )
+function wpgh_get_step_settings( $step_id )
 {
     //todo, replaced with an action instead? May need later and will keep for now
 }
@@ -275,9 +275,9 @@ function wpfn_get_step_settings( $step_id )
  *
  * @return int|false the Name of the funnel or false if the funnel DNE
  */
-function wpfn_get_step_type( $step_id )
+function wpgh_get_step_type( $step_id )
 {
-    $step = wpfn_get_funnel_step_by_id( $step_id );
+    $step = wpgh_get_funnel_step_by_id( $step_id );
 
     if ( ! $step )
         return false;
@@ -291,9 +291,9 @@ function wpfn_get_step_type( $step_id )
  * @param $step_id int the ID of the step
  * @return bool|string the group of the step or false on failure
  */
-function wpfn_get_step_group( $step_id )
+function wpgh_get_step_group( $step_id )
 {
-    $step = wpfn_get_funnel_step_by_id( $step_id );
+    $step = wpgh_get_funnel_step_by_id( $step_id );
 
     if ( ! $step )
         return false;
@@ -307,9 +307,9 @@ function wpfn_get_step_group( $step_id )
  * @param $step_id int the ID of the step
  * @return bool|int the order of the step of false on failure
  */
-function wpfn_get_step_order( $step_id )
+function wpgh_get_step_order( $step_id )
 {
-    $step = wpfn_get_funnel_step_by_id( $step_id );
+    $step = wpgh_get_funnel_step_by_id( $step_id );
 
     if ( ! $step )
         return false;
@@ -323,9 +323,9 @@ function wpfn_get_step_order( $step_id )
  * @param $step_id int the ID of the step
  * @return bool|int the Id of the funnel or false on failure
  */
-function wpfn_get_step_funnel( $step_id )
+function wpgh_get_step_funnel( $step_id )
 {
-    $step = wpfn_get_funnel_step_by_id( $step_id );
+    $step = wpgh_get_funnel_step_by_id( $step_id );
 
     if ( ! $step )
         return false;
@@ -339,13 +339,13 @@ function wpfn_get_step_funnel( $step_id )
  * @param $step_id int the ID of the step
  * @return false|int the Id of the next step, or false if there is not next action or the next step is a benchmark
  */
-function wpfn_get_next_funnel_action( $step_id )
+function wpgh_get_next_funnel_action( $step_id )
 {
-    $funnel_id = wpfn_get_step_funnel( $step_id );
-    $step_order = wpfn_get_step_order( $step_id );
-    $step_group = wpfn_get_step_group( $step_id );
+    $funnel_id = wpgh_get_step_funnel( $step_id );
+    $step_order = wpgh_get_step_order( $step_id );
+    $step_group = wpgh_get_step_group( $step_id );
 
-    $next_steps = wpfn_get_funnel_steps_by_order( $funnel_id, $step_order );
+    $next_steps = wpgh_get_funnel_steps_by_order( $funnel_id, $step_order );
 
     //var_dump( $next_steps );
 
@@ -375,14 +375,14 @@ function wpfn_get_next_funnel_action( $step_id )
  *
  * @return int|false the ID of the next action to run, false on failure.
  */
-function wpfn_enqueue_next_funnel_action( $last_step_id, $contact_id )
+function wpgh_enqueue_next_funnel_action( $last_step_id, $contact_id )
 {
-    $next_action_id = wpfn_get_next_funnel_action( $last_step_id );
+    $next_action_id = wpgh_get_next_funnel_action( $last_step_id );
 
     if ( ! $next_action_id )
         return false;
 
-    $next_action = wpfn_get_funnel_step_by_id( $next_action_id );
+    $next_action = wpgh_get_funnel_step_by_id( $next_action_id );
 
     $next_action_type = $next_action->funnelstep_type;
 
@@ -390,7 +390,7 @@ function wpfn_enqueue_next_funnel_action( $last_step_id, $contact_id )
      * @var $next_action_id int the step_id of the action
      * @var $contact_id int the Id of the contact
      */
-    do_action( 'wpfn_enqueue_next_funnel_action_' . $next_action_type, $next_action_id, $contact_id );
+    do_action( 'wpgh_enqueue_next_funnel_action_' . $next_action_type, $next_action_id, $contact_id );
 
     return $next_action_id;
 }
@@ -406,9 +406,9 @@ function wpfn_enqueue_next_funnel_action( $last_step_id, $contact_id )
  *
  * @return int|false the new step ID, false on failure
  */
-function wpfn_add_funnel_step( $funnel_id, $title, $group, $type, $order )
+function wpgh_add_funnel_step( $funnel_id, $title, $group, $type, $order )
 {
-    $funnel = wpfn_get_funnel_by_id( $funnel_id );
+    $funnel = wpgh_get_funnel_by_id( $funnel_id );
 
     if ( ! $funnel )
         return false;
@@ -416,13 +416,13 @@ function wpfn_add_funnel_step( $funnel_id, $title, $group, $type, $order )
     switch ( $group ):
         case 'action':
 
-            $actions = wpfn_get_funnel_actions();
+            $actions = wpgh_get_funnel_actions();
 
             if ( ! isset( $actions[ $type ] ) )
                 return false;
             break;
         case 'benchmark':
-            $benchmarks = wpfn_get_funnel_benchmarks();
+            $benchmarks = wpgh_get_funnel_benchmarks();
 
             if ( ! isset( $benchmarks[ $type ] ) )
                 return false;
@@ -433,7 +433,7 @@ function wpfn_add_funnel_step( $funnel_id, $title, $group, $type, $order )
 
     $order = absint( intval( $order ) );
 
-    return wpfn_insert_new_funnel_step( $funnel_id, $title, 'inactive' , $group, $type, $order );
+    return wpgh_insert_new_funnel_step( $funnel_id, $title, 'inactive' , $group, $type, $order );
 }
 
 /**
@@ -443,9 +443,9 @@ function wpfn_add_funnel_step( $funnel_id, $title, $group, $type, $order )
  *
  * @return bool, true if is a benchmark, false otherwise
  */
-function wpfn_is_benchmark( $element )
+function wpgh_is_benchmark( $element )
 {
-    $benchmarks = wpfn_get_funnel_benchmarks();
+    $benchmarks = wpgh_get_funnel_benchmarks();
 
     return isset( $benchmarks[$element] );
 }
@@ -456,9 +456,9 @@ function wpfn_is_benchmark( $element )
  * @param $funnel_id int Funnel ID
  * @return bool whether the funnel is active.
  */
-function wpfn_is_funnel_active( $funnel_id )
+function wpgh_is_funnel_active( $funnel_id )
 {
-    $status = wpfn_get_funnel_status( $funnel_id );
+    $status = wpgh_get_funnel_status( $funnel_id );
 
     return $status === 'active';
 }
@@ -470,7 +470,7 @@ function wpfn_is_funnel_active( $funnel_id )
  *
  * @return int|false the funnel ID, false otherwise
  */
-function wpfn_url_to_funnel_id( $link )
+function wpgh_url_to_funnel_id( $link )
 {
 
     $queryString = parse_url( $link, PHP_URL_QUERY );
@@ -494,7 +494,7 @@ function wpfn_url_to_funnel_id( $link )
  *
  * @return string
  */
-function wpfn_get_the_report_range()
+function wpgh_get_the_report_range()
 {
     return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ;
 }
@@ -505,7 +505,7 @@ function wpfn_get_the_report_range()
  * @param $range
  * @return false|int
  */
-function wpfn_get_report_start( $range )
+function wpgh_get_report_start( $range )
 {
     switch ( $range ):
         case 'last_24';
@@ -534,23 +534,23 @@ function wpfn_get_report_start( $range )
  * @param $range
  * @return false|int
  */
-function wpfn_get_report_end( $range )
+function wpgh_get_report_end( $range )
 {
     switch ( $range ):
         case 'last_24';
-            $end = strtotime( 'now' );
+            $end = time();
             break;
         case 'last_7';
-            $end = strtotime( 'now' );
+            $end = time();
             break;
         case 'last_30';
-            $end = strtotime( 'now' );
+            $end = time();
             break;
         case 'custom';
             $end = strtotime( $_POST['custom_date_range_end'] );
             break;
         default:
-            $end = strtotime( 'now' );
+            $end = time();
             break;
     endswitch;
 
@@ -562,56 +562,56 @@ function wpfn_get_report_end( $range )
  *
  * @param $step_id int the ID of a step
  */
-function wpfn_get_step_html( $step_id )
+function wpgh_get_step_html( $step_id )
 {
     ?>
-    <div title="<?php echo wpfn_get_step_hndle( $step_id ) ?>" id="<?php echo $step_id; ?>" class="postbox step <?php echo wpfn_get_step_group( $step_id ); ?> <?php echo wpfn_get_step_type( $step_id ); ?>">
+    <div title="<?php echo wpgh_get_step_hndle( $step_id ) ?>" id="<?php echo $step_id; ?>" class="postbox step <?php echo wpgh_get_step_group( $step_id ); ?> <?php echo wpgh_get_step_type( $step_id ); ?>">
         <button title="Delete" type="button" class="handlediv delete-step-<?php echo $step_id;?>">
             <span class="dashicons dashicons-trash"></span>
             <script>
-                jQuery(function(){jQuery('.delete-step-<?php echo $step_id;?>').click( wpfn_delete_funnel_step )})
+                jQuery(function(){jQuery('.delete-step-<?php echo $step_id;?>').click( wpgh_delete_funnel_step )})
             </script>
         </button>
         <button title="Duplicate" type="button" class="handlediv duplicate-step-<?php echo $step_id;?>">
             <span class="dashicons dashicons-admin-page"></span>
             <script>
-                jQuery(function(){jQuery('.duplicate-step-<?php echo $step_id;?>').click( wpfn_duplicate_step )})
+                jQuery(function(){jQuery('.duplicate-step-<?php echo $step_id;?>').click( wpgh_duplicate_step )})
             </script>
         </button>
-        <h2 class="hndle ui-sortable-handle"><img class="hndle-icon" width="50" src="<?php echo esc_url( wpfn_get_step_icon( $step_id ) ); ?>"><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpfn_get_step_hndle( $step_id ), 'groundhogg' ); ?>"> :<?php echo $step_id; ?></h2>
+        <h2 class="hndle ui-sortable-handle"><img class="hndle-icon" width="50" src="<?php echo esc_url( wpgh_get_step_icon( $step_id ) ); ?>"><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpgh_get_step_hndle( $step_id ), 'groundhogg' ); ?>"> :<?php echo $step_id; ?></h2>
         <div class="inside">
             <div class="step-edit">
-                <input type="hidden" name="<?php echo wpfn_prefix_step_meta( $step_id, 'order' ); ?>" value="<?php wpfn_get_step_order( $step_id ) ?>" >
+                <input type="hidden" name="<?php echo wpgh_prefix_step_meta( $step_id, 'order' ); ?>" value="<?php wpgh_get_step_order( $step_id ) ?>" >
                 <input type="hidden" name="steps[]" value="<?php echo $step_id; ?>">
                 <div class="custom-settings">
-                    <?php do_action( 'wpfn_step_settings_before' ); ?>
-                    <?php do_action( 'wpfn_get_step_settings_' . wpfn_get_step_type( $step_id ), $step_id ); ?>
-                    <?php do_action( 'wpfn_step_settings_after' ); ?>
+                    <?php do_action( 'wpgh_step_settings_before' ); ?>
+                    <?php do_action( 'wpgh_get_step_settings_' . wpgh_get_step_type( $step_id ), $step_id ); ?>
+                    <?php do_action( 'wpgh_step_settings_after' ); ?>
                 </div>
             </div>
             <div class="step-reporting hidden">
-                <?php do_action( 'wpfn_step_reporting_before' );
+                <?php do_action( 'wpgh_step_reporting_before' );
 
-                $range = wpfn_get_the_report_range();
+                $range = wpgh_get_the_report_range();
 
-                $start = wpfn_get_report_start( $range );
-                $end   = wpfn_get_report_end( $range);
+                $start = wpgh_get_report_start( $range );
+                $end   = wpgh_get_report_end( $range);
 
-                $report = new WPFN_Event_Report( wpfn_get_step_funnel( $step_id ), $step_id, $start, $end );
+                $report = new WPGH_Event_Report( wpgh_get_step_funnel( $step_id ), $step_id, $start, $end );
 
                 ?>
 
-                <?php if ( wpfn_get_step_group( $step_id ) === 'benchmark'): ?>
-                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
+                <?php if ( wpgh_get_step_group( $step_id ) === 'benchmark'): ?>
+                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . wpgh_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
                 <?php else: ?>
-                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
+                    <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . wpgh_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
                     <hr>
-                    <p class="report"><?php _e('Waiting', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . wpfn_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
+                    <p class="report"><?php _e('Waiting', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . wpgh_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
                 <?php endif; ?>
 
-                <?php do_action( 'wpfn_get_step_report_' . wpfn_get_step_type( $step_id ), $step_id, $start, $end ); ?>
+                <?php do_action( 'wpgh_get_step_report_' . wpgh_get_step_type( $step_id ), $step_id, $start, $end ); ?>
 
-                <?php do_action( 'wpfn_step_reporting_after' ); ?>
+                <?php do_action( 'wpgh_step_reporting_after' ); ?>
             </div>
         </div>
     </div>
@@ -624,14 +624,14 @@ function wpfn_get_step_html( $step_id )
  * @var $step_type string the typeof step to create
  * @var $
  */
-function wpfn_get_step_html_via_ajax()
+function wpgh_get_step_html_via_ajax()
 {
 
     $step_type = $_POST['step_type'];
     $step_order = intval( $_POST['step_order'] );
-    $funnel_id = wpfn_url_to_funnel_id( wp_get_referer() );
+    $funnel_id = wpgh_url_to_funnel_id( wp_get_referer() );
 
-    $step_group = ( wpfn_is_benchmark( $step_type ) )? 'benchmark' : 'action' ;
+    $step_group = ( wpgh_is_benchmark( $step_type ) )? 'benchmark' : 'action' ;
 //    wp_die( 'made-it-here' );
 
     foreach ( glob( dirname( __FILE__ ) . "/admin/funnels/elements/*/*.php" ) as $filename )
@@ -640,18 +640,18 @@ function wpfn_get_step_html_via_ajax()
     }
 
     if ( $step_group === 'benchmark' ){
-        $benchmarks = wpfn_get_funnel_benchmarks();
+        $benchmarks = wpgh_get_funnel_benchmarks();
         $title = $benchmarks[ $step_type ][ 'title' ];
     } else {
-        $actions = wpfn_get_funnel_actions();
+        $actions = wpgh_get_funnel_actions();
         $title = $actions[ $step_type ][ 'title' ];
     }
 
-    $step_id = wpfn_add_funnel_step( $funnel_id, $title, $step_group, $step_type, $step_order );
+    $step_id = wpgh_add_funnel_step( $funnel_id, $title, $step_group, $step_type, $step_order );
 
     ob_start();
 
-    wpfn_get_step_html( $step_id );
+    wpgh_get_step_html( $step_id );
 
     $content = ob_get_contents();
 
@@ -660,14 +660,14 @@ function wpfn_get_step_html_via_ajax()
     wp_die( $content );
 }
 
-add_action( 'wp_ajax_wpfn_get_step_html', 'wpfn_get_step_html_via_ajax' );
+add_action( 'wp_ajax_wpgh_get_step_html', 'wpgh_get_step_html_via_ajax' );
 
-function wpfn_get_step_html_inside()
+function wpgh_get_step_html_inside()
 {
     $step_id = intval( $_POST['step_id'] );
     $step_order = intval( $_POST['step_order'] );
 
-    wpfn_update_funnel_step( $step_id, 'funnelstep_order', $step_order );
+    wpgh_update_funnel_step( $step_id, 'funnelstep_order', $step_order );
 
     foreach ( glob( dirname( __FILE__ ) . "/admin/funnels/elements/*/*.php" ) as $filename )
     {
@@ -676,9 +676,9 @@ function wpfn_get_step_html_inside()
 
     ob_start();
 
-    do_action( 'wpfn_step_settings_before' );
-    do_action( 'wpfn_get_step_settings_' . wpfn_get_step_type( $step_id ), $step_id );
-    do_action( 'wpfn_step_settings_after' );
+    do_action( 'wpgh_step_settings_before' );
+    do_action( 'wpgh_get_step_settings_' . wpgh_get_step_type( $step_id ), $step_id );
+    do_action( 'wpgh_step_settings_after' );
 
     $content = ob_get_contents();
 
@@ -687,51 +687,51 @@ function wpfn_get_step_html_inside()
     wp_die( $content );
 }
 
-add_action( 'wp_ajax_wpfn_get_step_html_inside', 'wpfn_get_step_html_inside' );
+add_action( 'wp_ajax_wpgh_get_step_html_inside', 'wpgh_get_step_html_inside' );
 
 /**
  * Delete the funnel step by it's ID
  */
-function wpfn_delete_funnel_step_via_ajax()
+function wpgh_delete_funnel_step_via_ajax()
 {
     if ( ! isset( $_POST['step_id'] ) )
         wp_die( 'No Step.' );
 
     $stepid = absint( intval( $_POST['step_id'] ) );
 
-    wp_die( wpfn_delete_funnel_step( $stepid ) );
+    wp_die( wpgh_delete_funnel_step( $stepid ) );
 }
 
-add_action( 'wp_ajax_wpfn_delete_funnel_step', 'wpfn_delete_funnel_step_via_ajax' );
+add_action( 'wp_ajax_wpgh_delete_funnel_step', 'wpgh_delete_funnel_step_via_ajax' );
 
 
 /**
  * Duplicate a funnel step
  */
-function wpfn_duplicate_funnel_step_via_ajax()
+function wpgh_duplicate_funnel_step_via_ajax()
 {
     if ( ! isset( $_POST['step_id'] ) )
         wp_die( 'No Step.' );
 
     $step_id = absint( intval( $_POST['step_id'] ) );
 
-    $step = wpfn_get_funnel_step_by_id( $step_id, OBJECT );
+    $step = wpgh_get_funnel_step_by_id( $step_id, OBJECT );
 
     if ( ! $step || empty( $step->funnel_id ) )
         wp_die( 'Could not find step...' );
 
-    $newID = wpfn_insert_new_funnel_step( intval( $step->funnel_id ), $step->funnelstep_title, 'ready', $step->funnelstep_group, $step->funnelstep_type, intval( $step->funnelstep_order ) - 1 );
+    $newID = wpgh_insert_new_funnel_step( intval( $step->funnel_id ), $step->funnelstep_title, 'ready', $step->funnelstep_group, $step->funnelstep_type, intval( $step->funnelstep_order ) - 1 );
 
     if ( ! $newID )
         wp_die( 'Oops' );
 
-    $meta = wpfn_get_step_meta( $step_id );
+    $meta = wpgh_get_step_meta( $step_id );
 
 //    wp_die( json_encode( $meta ) );
 
     foreach ( $meta as $key => $value )
     {
-        wpfn_update_step_meta( $newID, $key, $value[0] );
+        wpgh_update_step_meta( $newID, $key, $value[0] );
     }
 
     foreach ( glob( dirname( __FILE__ ) . "/admin/funnels/elements/*/*.php" ) as $filename )
@@ -741,7 +741,7 @@ function wpfn_duplicate_funnel_step_via_ajax()
 
     ob_start();
 
-    wpfn_get_step_html( $newID );
+    wpgh_get_step_html( $newID );
 
     $content = ob_get_contents();
 
@@ -750,7 +750,7 @@ function wpfn_duplicate_funnel_step_via_ajax()
     wp_die( $content );
 }
 
-add_action( 'wp_ajax_wpfn_duplicate_funnel_step', 'wpfn_duplicate_funnel_step_via_ajax' );
+add_action( 'wp_ajax_wpgh_duplicate_funnel_step', 'wpgh_duplicate_funnel_step_via_ajax' );
 
 /**
  * Wrapper function for smaller file sizes lol...
@@ -760,7 +760,7 @@ add_action( 'wp_ajax_wpfn_duplicate_funnel_step', 'wpfn_duplicate_funnel_step_vi
  */
 function gh_meta_e( $step_id, $attr )
 {
-    wpfn_prefix_step_meta_e( $step_id, $attr );
+    wpgh_prefix_step_meta_e( $step_id, $attr );
 }
 
 /**
@@ -771,7 +771,7 @@ function gh_meta_e( $step_id, $attr )
  *
  * @return string the prefixed meta attribute.
  */
-function wpfn_prefix_step_meta( $step_id, $atter )
+function wpgh_prefix_step_meta( $step_id, $atter )
 {
     return intval( $step_id ) . '_' . esc_attr( $atter );
 }
@@ -784,9 +784,9 @@ function wpfn_prefix_step_meta( $step_id, $atter )
  *
  * @return void
  */
-function wpfn_prefix_step_meta_e( $step_id, $atter )
+function wpgh_prefix_step_meta_e( $step_id, $atter )
 {
-	echo wpfn_prefix_step_meta( $step_id, $atter );
+	echo wpgh_prefix_step_meta( $step_id, $atter );
 }
 
 /**
@@ -794,7 +794,7 @@ function wpfn_prefix_step_meta_e( $step_id, $atter )
  *
  * @param $funnel_id
  */
-function wpfn_save_funnel( $funnel_id )
+function wpgh_save_funnel( $funnel_id )
 {
     //todo user validation & permissions...
 
@@ -803,10 +803,10 @@ function wpfn_save_funnel( $funnel_id )
 
     //wp_die( 'made-it-here' );
 
-    do_action( 'wpfn_before_save_funnel', $funnel_id );
+    do_action( 'wpgh_before_save_funnel', $funnel_id );
 
     $title = sanitize_text_field( stripslashes( $_POST[ 'funnel_title' ] ) );
-    wpfn_update_funnel( $funnel_id, 'funnel_title', $title );
+    wpgh_update_funnel( $funnel_id, 'funnel_title', $title );
 
 
     /* do NOT update status during an autosave... */
@@ -817,7 +817,7 @@ function wpfn_save_funnel( $funnel_id )
 
 	    //do not update the status to inactive if it's not confirmed
 	    if ( ( $status === 'inactive' && isset( $_POST['confirm'] ) && $_POST['confirm'] === 'yes' ) || $status === 'active' ){
-		    wpfn_update_funnel( $funnel_id, 'funnel_status', $status );
+		    wpgh_update_funnel( $funnel_id, 'funnel_status', $status );
 	    }
     }
 
@@ -836,49 +836,49 @@ function wpfn_save_funnel( $funnel_id )
         $stepId = intval( $stepId );
         //quick Order Hack to get the proper order of a step...
         $order = $i + 1;
-        wpfn_update_funnel_step( $stepId, 'funnelstep_order', $order );
+        wpgh_update_funnel_step( $stepId, 'funnelstep_order', $order );
 
-        $title = sanitize_text_field( stripslashes( $_POST[ wpfn_prefix_step_meta( $stepId, 'title' ) ] ) );
+        $title = sanitize_text_field( stripslashes( $_POST[ wpgh_prefix_step_meta( $stepId, 'title' ) ] ) );
 
-        wpfn_update_funnel_step( $stepId, 'funnelstep_title', $title );
+        wpgh_update_funnel_step( $stepId, 'funnelstep_title', $title );
 
-        wpfn_update_funnel_step( $stepId, 'funnelstep_status', 'ready' );
+        wpgh_update_funnel_step( $stepId, 'funnelstep_status', 'ready' );
 
-        $step_type = wpfn_get_step_type( $stepId );
+        $step_type = wpgh_get_step_type( $stepId );
 
-        do_action( 'wpfn_save_step_' . $step_type, $stepId );
+        do_action( 'wpgh_save_step_' . $step_type, $stepId );
 
     }
 
-    do_action( 'wpfn_save_funnel_after', $funnel_id );
+    do_action( 'wpgh_save_funnel_after', $funnel_id );
 }
 
-add_action( 'wpfn_update_funnel', 'wpfn_save_funnel' );
+add_action( 'wpgh_update_funnel', 'wpgh_save_funnel' );
 
 /**
  * Auto save the funnel steps. nothing else
  */
-function wpfn_auto_save_funnel()
+function wpgh_auto_save_funnel()
 {
     if ( ! wp_doing_ajax() )
         wp_die('You should not be running this function without an ajax request.');
 
     //todo user permissions
 
-    $funnel_id = wpfn_url_to_funnel_id( wp_get_referer() );
+    $funnel_id = wpgh_url_to_funnel_id( wp_get_referer() );
 
-    wpfn_save_funnel( $funnel_id );
+    wpgh_save_funnel( $funnel_id );
 
     wp_die('Auto Saved' );
 
 }
 
-add_action( 'wp_ajax_wpfn_auto_save_funnel_via_ajax', 'wpfn_auto_save_funnel' );
+add_action( 'wp_ajax_wpgh_auto_save_funnel_via_ajax', 'wpgh_auto_save_funnel' );
 
 /**
  * Create a new funnel and redirect to the email editor.
  */
-function wpfn_create_new_funnel()
+function wpgh_create_new_funnel()
 {
     if ( isset( $_POST[ 'funnel_template' ] ) ){
 
@@ -888,20 +888,20 @@ function wpfn_create_new_funnel()
 
         $json = file_get_contents( $funnel_templates[ $_POST['funnel_template'] ]['file'] );
 
-        $funnel_id = wpfn_import_funnel( json_decode( $json, true ) );
+        $funnel_id = wpgh_import_funnel( json_decode( $json, true ) );
 
     } else if ( isset( $_POST[ 'funnel_id' ] ) ) {
 
         $from_funnel = intval( $_POST[ 'funnel_id' ] );
-        $json = wpfn_convert_funnel_to_json( $from_funnel );
-        $funnel_id = wpfn_import_funnel( json_decode( $json, true ) );
+        $json = wpgh_convert_funnel_to_json( $from_funnel );
+        $funnel_id = wpgh_import_funnel( json_decode( $json, true ) );
 
     } else if ( isset( $_FILES[ 'funnel_template' ] ) ) {
 
         if ($_FILES['funnel_template']['error'] == UPLOAD_ERR_OK && is_uploaded_file( $_FILES['funnel_template']['tmp_name'] ) ) {
 
             $json = file_get_contents($_FILES['funnel_template']['tmp_name'] );
-            $funnel_id = wpfn_import_funnel( json_decode( $json, true ) );
+            $funnel_id = wpgh_import_funnel( json_decode( $json, true ) );
         }
 
     } else {
@@ -917,7 +917,7 @@ function wpfn_create_new_funnel()
     die();
 }
 
-add_action( 'wpfn_add_funnel', 'wpfn_create_new_funnel' );
+add_action( 'wpgh_add_funnel', 'wpgh_create_new_funnel' );
 
 /**
  * Return whether the contact is in a certain funnel.
@@ -928,11 +928,11 @@ add_action( 'wpfn_add_funnel', 'wpfn_create_new_funnel' );
  * @param $funnel_id int the ID of the funnel
  * @return true|false whether the contact is in the funnel
  */
-function wpfn_contact_is_in_funnel( $contact_id, $funnel_id )
+function wpgh_contact_is_in_funnel( $contact_id, $funnel_id )
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . WPFN_EVENTS;
+    $table_name = $wpdb->prefix . WPGH_EVENTS;
 
     $results = $wpdb->get_results(
         $wpdb->prepare(

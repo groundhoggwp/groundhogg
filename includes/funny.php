@@ -12,7 +12,7 @@
  *
  * @return mixed
  */
-function wpfn_get_random_groundhogday_quote()
+function wpgh_get_random_groundhogday_quote()
 {
     $quotes = array();
 

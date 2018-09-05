@@ -7,13 +7,13 @@
  */
 
 /* for semantics the BROADCAST tool is the FUNNEL with ID 1 */
-define( 'WPFN_BROADCAST', 1 );
+define( 'WPGH_BROADCAST', 1 );
 
 /**
  * Schedule a broadcast after adding it in the Admin.
  *
  */
-function wpfn_schedule_broadcast()
+function wpgh_schedule_broadcast()
 {
     $email = isset( $_POST['email_id'] )? intval( $_POST[ 'email_id' ] ) : null;
 
@@ -31,15 +31,15 @@ function wpfn_schedule_broadcast()
 
     $send_at = strtotime( $time_string );
 
-    $broadcast_id = wpfn_insert_broadcast( $email, $tags, $send_at );
+    $broadcast_id = wpgh_insert_broadcast( $email, $tags, $send_at );
 
     if ( ! $broadcast_id )
         wp_die( 'Something went wrong' );
 
     global $wpdb;
 
-    $contacts_table = $wpdb->prefix . WPFN_CONTACTS;
-    $tags_table = $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS;
+    $contacts_table = $wpdb->prefix . WPGH_CONTACTS;
+    $tags_table = $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS;
 
     foreach ( $tags as $tag_id )
     {
@@ -59,11 +59,11 @@ function wpfn_schedule_broadcast()
 
     foreach ( $contacts as $i => $contact )
     {
-        wpfn_enqueue_event( $send_at, WPFN_BROADCAST, $broadcast_id, intval( $contact['ID'] ) );
+        wpgh_enqueue_event( $send_at, WPGH_BROADCAST, $broadcast_id, intval( $contact['ID'] ) );
     }
 }
 
-add_action( 'wpfn_add_broadcast', 'wpfn_schedule_broadcast' );
+add_action( 'wpgh_add_broadcast', 'wpgh_schedule_broadcast' );
 
 /**
  * Send the email to the contact VIA the broadcast function.
@@ -71,18 +71,18 @@ add_action( 'wpfn_add_broadcast', 'wpfn_schedule_broadcast' );
  * @param $broadcast_id
  * @param $contact_id
  */
-function wpfn_send_broadcast( $broadcast_id, $contact_id )
+function wpgh_send_broadcast( $broadcast_id, $contact_id )
 {
-    $broadcast = wpfn_get_broadcast_by_id( $broadcast_id );
+    $broadcast = wpgh_get_broadcast_by_id( $broadcast_id );
 
     $email_id =  intval( $broadcast['email_id'] );
     /* send the email */
-    wpfn_send_email( $contact_id, $email_id, WPFN_BROADCAST, $broadcast_id );
+    wpgh_send_email( $contact_id, $email_id, WPGH_BROADCAST, $broadcast_id );
     /* change status to sent once emails for this broadcast start going out. */
-    wpfn_update_broadcast( $broadcast_id, 'broadcast_status', 'sent' );
+    wpgh_update_broadcast( $broadcast_id, 'broadcast_status', 'sent' );
 }
 
-add_action( 'wpfn_do_action_broadcast', 'wpfn_send_broadcast' );
+add_action( 'wpgh_do_action_broadcast', 'wpgh_send_broadcast' );
 
 /**
  * Get the number of opens for a broadcast email
@@ -90,16 +90,16 @@ add_action( 'wpfn_do_action_broadcast', 'wpfn_send_broadcast' );
  * @param $broadcast_id int the broadcast ID
  * @return null|string
  */
-function wpfn_get_broadcast_opens( $broadcast_id )
+function wpgh_get_broadcast_opens( $broadcast_id )
 {
     global $wpdb;
 
-    $table = $wpdb->prefix . WPFN_ACTIVITY;
+    $table = $wpdb->prefix . WPGH_ACTIVITY;
 
     $opens = $wpdb->get_var( $wpdb->prepare(
         "SELECT count(*) FROM $table
         WHERE funnel_id = %d AND step_id = %d AND activity_type = %s",
-        WPFN_BROADCAST, $broadcast_id, 'email_opened'
+        WPGH_BROADCAST, $broadcast_id, 'email_opened'
     ) );
 
     return $opens;
@@ -111,16 +111,16 @@ function wpfn_get_broadcast_opens( $broadcast_id )
  * @param $broadcast_id int the broadcast ID
  * @return null|string
  */
-function wpfn_get_broadcast_clicks( $broadcast_id )
+function wpgh_get_broadcast_clicks( $broadcast_id )
 {
     global $wpdb;
 
-    $table = $wpdb->prefix . WPFN_ACTIVITY;
+    $table = $wpdb->prefix . WPGH_ACTIVITY;
 
     $opens = $wpdb->get_var( $wpdb->prepare(
         "SELECT count(*) FROM $table
         WHERE funnel_id = %d AND step_id = %d AND activity_type = %s",
-        WPFN_BROADCAST, $broadcast_id, 'email_link_click'
+        WPGH_BROADCAST, $broadcast_id, 'email_link_click'
     ) );
 
     return $opens;

@@ -16,7 +16,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-class WPFN_Events_Page
+class WPGH_Events_Page
 {
     function __construct()
     {
@@ -115,49 +115,29 @@ class WPFN_Events_Page
         {
             case 'cancel':
 
-                if ( isset( $_POST ) )
-                {
-                    do_action( 'wpfn_cancel_event' );
+                foreach ( $this->get_events() as $id ){
+                    wpgh_delete_event( $id );
                 }
 
                 break;
 
-            case 'trash':
+            case 'execute':
 
                 foreach ( $this->get_events() as $id ) {
-                    wpfn_update_event($id, 'event_status', 'trash');
+                    wpgh_update_event($id, 'event_status', 'trash');
                 }
 
-                do_action( 'wpfn_trash_events' );
+                do_action( 'wpgh_trash_events' );
 
                 break;
 
-            case 'cancel':
+            case 're_execute':
 
                 foreach ( $this->get_events() as $id ){
-                    wpfn_delete_event( $id );
+                    wpgh_delete_event( $id );
                 }
 
-                do_action( 'wpfn_delete_events' );
-
-                break;
-
-            case 'restore':
-
-                foreach ( $this->get_events() as $id )
-                {
-                    wpfn_update_event( $id, 'event_status', 'draft' );
-                }
-
-                do_action( 'wpfn_restore_events' );
-
-                break;
-
-            case 'edit':
-
-                if ( isset( $_POST ) ){
-                    do_action( 'wpfn_update_event', intval( $_GET[ 'event' ] ) );
-                }
+                do_action( 'wpgh_delete_events' );
 
                 break;
         }
@@ -184,11 +164,11 @@ class WPFN_Events_Page
 
     function table()
     {
-        if ( ! class_exists( 'WPFN_Events_Table' ) ){
+        if ( ! class_exists( 'WPGH_Events_Table' ) ){
             include dirname( __FILE__ ) . '/class-events-table.php';
         }
 
-        $events_table = new WPFN_Events_Table();
+        $events_table = new WPGH_Events_Table();
 
         $events_table->views(); ?>
         <form method="post" class="search-form wp-clearfix" >
@@ -205,34 +185,14 @@ class WPFN_Events_Page
         <?php
     }
 
-    function edit()
-    {
-        include dirname( __FILE__ ) . '/event-editor.php';
-
-    }
-
-    function add()
-    {
-        include dirname( __FILE__ ) . '/add-event.php';
-    }
-
     function page()
     {
         ?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_events&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
             <?php $this->get_notice(); ?>
             <hr class="wp-header-end">
-            <?php switch ( $this->get_action() ){
-                case 'add':
-                    $this->add();
-                    break;
-                case 'edit':
-                    $this->edit();
-                    break;
-                default:
-                    $this->table();
-            } ?>
+            <?php  $this->table(); ?>
         </div>
         <?php
     }

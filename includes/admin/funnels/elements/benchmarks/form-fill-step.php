@@ -11,10 +11,10 @@
  * @since       0.1
  */
 
-function wpfn_form_fill_funnel_step_html( $step_id )
+function wpgh_form_fill_funnel_step_html( $step_id )
 {
 
-    $step = wpfn_get_funnel_step_by_id( $step_id );
+    $step = wpgh_get_funnel_step_by_id( $step_id );
     //$title = $step[ 'funnelstep_title' ];
 
     ?>
@@ -33,6 +33,6 @@ function wpfn_form_fill_funnel_step_html( $step_id )
     <?php
 }
 
-add_action( 'wpfn_get_step_settings_form_fill', 'wpfn_form_fill_funnel_step_html' );
+add_action( 'wpgh_get_step_settings_form_fill', 'wpgh_form_fill_funnel_step_html' );
 
 

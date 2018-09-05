@@ -23,7 +23,7 @@
  *
  * @return bool|int the ID of the new funnelstep or false
  */
-function wpfn_insert_new_funnel_step( $funnel_id, $title, $status, $group, $type, $order )
+function wpgh_insert_new_funnel_step( $funnel_id, $title, $status, $group, $type, $order )
 {
     global $wpdb;
 
@@ -35,7 +35,7 @@ function wpfn_insert_new_funnel_step( $funnel_id, $title, $status, $group, $type
         return false;
 
     $success = $wpdb->insert(
-        $wpdb->prefix . WPFN_FUNNELSTEPS,
+        $wpdb->prefix . WPGH_FUNNELSTEPS,
         array(
             'funnel_id'         => $funnel_id,
             'funnelstep_title'  => $title,
@@ -61,7 +61,7 @@ function wpfn_insert_new_funnel_step( $funnel_id, $title, $status, $group, $type
  *
  * @return false|int the number of rows updated, false on failure
  */
-function wpfn_delete_funnel_step( $id )
+function wpgh_delete_funnel_step( $id )
 {
     global $wpdb;
 
@@ -72,7 +72,7 @@ function wpfn_delete_funnel_step( $id )
     if ( ! $id )
         return false;
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELSTEPS;
 
     $delete_step = $wpdb->delete( $table_name, array( 'ID' => $id ), array( '%d' ) );
 
@@ -87,7 +87,7 @@ function wpfn_delete_funnel_step( $id )
  *
  * @return object|false the Email, false on failure.
  */
-function wpfn_get_funnel_step_by_id( $id, $output=OBJECT )
+function wpgh_get_funnel_step_by_id( $id, $output=OBJECT )
 {
     global $wpdb;
 
@@ -98,7 +98,7 @@ function wpfn_get_funnel_step_by_id( $id, $output=OBJECT )
     if ( ! $id )
         return false;
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELSTEPS;
 
     $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE ID = %d", $id);
     $funnelstep = $wpdb->get_row( $sql_prep1, $output );
@@ -113,7 +113,7 @@ function wpfn_get_funnel_step_by_id( $id, $output=OBJECT )
  *
  * @return array|false list of funnel steps, false on failure.
  */
-function wpfn_get_funnel_steps_by_funnel_id( $funnel_id )
+function wpgh_get_funnel_steps_by_funnel_id( $funnel_id )
 {
     global $wpdb;
 
@@ -125,7 +125,7 @@ function wpfn_get_funnel_steps_by_funnel_id( $funnel_id )
     if ( ! $funnel_id )
         return false;
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELSTEPS;
 
     return $wpdb->get_results(
         $wpdb->prepare(
@@ -146,7 +146,7 @@ function wpfn_get_funnel_steps_by_funnel_id( $funnel_id )
  * @param $order int the Order of a particular step
  * @return array|false list of steps, false on error
  */
-function wpfn_get_funnel_steps_by_order( $funnel_id, $order )
+function wpgh_get_funnel_steps_by_order( $funnel_id, $order )
 {
     global $wpdb;
 
@@ -159,7 +159,7 @@ function wpfn_get_funnel_steps_by_order( $funnel_id, $order )
     if ( ! $funnel_id )
         return false;
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELSTEPS;
 
     return $wpdb->get_results(
         $wpdb->prepare(
@@ -179,7 +179,7 @@ function wpfn_get_funnel_steps_by_order( $funnel_id, $order )
  * @param $order int the Order of a particular step
  * @return array|false list of steps, false on error
  */
-function wpfn_get_funnel_step_by_order( $funnel_id, $order )
+function wpgh_get_funnel_step_by_order( $funnel_id, $order )
 {
     global $wpdb;
 
@@ -192,7 +192,7 @@ function wpfn_get_funnel_step_by_order( $funnel_id, $order )
     if ( ! $funnel_id )
         return false;
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELSTEPS;
 
     return $wpdb->get_row(
         $wpdb->prepare(
@@ -211,16 +211,16 @@ function wpfn_get_funnel_step_by_order( $funnel_id, $order )
  *
  * @return array|false list of funnel steps, false on failure.
  */
-function wpfn_get_funnel_steps_by_type( $step_type )
+function wpgh_get_funnel_steps_by_type( $step_type )
 {
     global $wpdb;
 
-    $benchmarks = wpfn_get_funnel_benchmarks();
+    $benchmarks = wpgh_get_funnel_benchmarks();
 
     if ( ! isset( $benchmarks[ $step_type ] ) )
         return false;
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELSTEPS;
 
     return $wpdb->get_results(
         $wpdb->prepare(
@@ -243,7 +243,7 @@ function wpfn_get_funnel_steps_by_type( $step_type )
  *
  * @return false|int funnelstep ID in success, false on failure
  */
-function wpfn_update_funnel_step( $id, $key, $value )
+function wpgh_update_funnel_step( $id, $key, $value )
 {
     global $wpdb;
 
@@ -256,7 +256,7 @@ function wpfn_update_funnel_step( $id, $key, $value )
         return false;
 
     return $wpdb->update(
-        $wpdb->prefix . WPFN_FUNNELSTEPS,
+        $wpdb->prefix . WPGH_FUNNELSTEPS,
         array(
             $key => $value
         ),
@@ -277,7 +277,7 @@ function wpfn_update_funnel_step( $id, $key, $value )
  * @param bool   $unique     Optional, default is false. Whether the same key should not be added.
  * @return int|false Meta ID on success, false on failure.
  */
-function wpfn_add_step_meta($funnelstep_id, $meta_key, $meta_value, $unique = false) {
+function wpgh_add_step_meta($funnelstep_id, $meta_key, $meta_value, $unique = false) {
     return add_metadata('funnelstep', $funnelstep_id, $meta_key, $meta_value, $unique);
 }
 
@@ -293,7 +293,7 @@ function wpfn_add_step_meta($funnelstep_id, $meta_key, $meta_value, $unique = fa
  * @param mixed  $meta_value Optional. Metadata value.
  * @return bool True on success, false on failure.
  */
-function wpfn_delete_step_meta($funnelstep_id, $meta_key, $meta_value = '') {
+function wpgh_delete_step_meta($funnelstep_id, $meta_key, $meta_value = '') {
     return delete_metadata('funnelstep', $funnelstep_id, $meta_key, $meta_value);
 }
 
@@ -305,7 +305,7 @@ function wpfn_delete_step_meta($funnelstep_id, $meta_key, $meta_value = '') {
  * @param bool   $single  Whether to return a single value.
  * @return mixed Will be an array if $single is false. Will be value of meta data field if $single is true.
  */
-function wpfn_get_step_meta( $funnelstep_id, $key = '', $single = true ) {
+function wpgh_get_step_meta( $funnelstep_id, $key = '', $single = true ) {
     return get_metadata('funnelstep', $funnelstep_id, $key, $single );
 }
 
@@ -323,16 +323,16 @@ function wpfn_get_step_meta( $funnelstep_id, $key = '', $single = true ) {
  * @param mixed  $prev_value Optional. Previous value to check before removing.
  * @return int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
  */
-function wpfn_update_step_meta($funnelstep_id, $meta_key, $meta_value, $prev_value = '') {
+function wpgh_update_step_meta($funnelstep_id, $meta_key, $meta_value, $prev_value = '') {
     return update_metadata('funnelstep', $funnelstep_id, $meta_key, $meta_value, $prev_value);
 }
 
-add_action( 'plugins_loaded', 'wpfn_integrate_funnelsteps_wpdb' );
+add_action( 'plugins_loaded', 'wpgh_integrate_funnelsteps_wpdb' );
 
 /**
  * add support for the metadata API so I don't have to code it myself.
  */
-function wpfn_integrate_funnelsteps_wpdb()
+function wpgh_integrate_funnelsteps_wpdb()
 {
     global $wpdb;
 
@@ -342,22 +342,22 @@ function wpfn_integrate_funnelsteps_wpdb()
     return;
 }
 
-define( 'WPFN_FUNNELSTEPS', 'funnelsteps' );
-define( 'WPFN_FUNNELSTEPS_DB_VERSION', '0.1' );
+define( 'WPGH_FUNNELSTEPS', 'funnelsteps' );
+define( 'WPGH_FUNNELSTEPS_DB_VERSION', '0.1' );
 
 /**
  * Create the funnelsteps database table.
  */
-function wpfn_create_funnelsteps_db()
+function wpgh_create_funnelsteps_db()
 {
 
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELSTEPS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELSTEPS;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_funnelsteps_db_version'), WPFN_FUNNELSTEPS_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_funnelsteps_db_version'), WPGH_FUNNELSTEPS_DB_VERSION, '==' ) )
         return;
 
     $sql = "CREATE TABLE $table_name (
@@ -375,21 +375,21 @@ function wpfn_create_funnelsteps_db()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
-    update_option( 'wpfn_funnelsteps_db_version', WPFN_FUNNELSTEPS_DB_VERSION );
+    update_option( 'wpgh_funnelsteps_db_version', WPGH_FUNNELSTEPS_DB_VERSION );
 }
 
-define( 'WPFN_FUNNELSTEP_META', 'funnelstepmeta' );
-define( 'WPFN_FUNNELSTEP_META_DB_VERSION', '0.2' );
+define( 'WPGH_FUNNELSTEP_META', 'funnelstepmeta' );
+define( 'WPGH_FUNNELSTEP_META_DB_VERSION', '0.2' );
 
-function wpfn_create_funnelstep_meta_db()
+function wpgh_create_funnelstep_meta_db()
 {
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELSTEP_META;
+    $table_name = $wpdb->prefix . WPGH_FUNNELSTEP_META;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_funnelstep_meta_db_version'), WPFN_FUNNELSTEP_META_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_funnelstep_meta_db_version'), WPGH_FUNNELSTEP_META_DB_VERSION, '==' ) )
         return;
 
     $max_index_length = 191;
@@ -407,6 +407,6 @@ function wpfn_create_funnelstep_meta_db()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $install_query );
 
-    update_option( 'wpfn_funnelstep_meta_db_version', WPFN_FUNNELSTEP_META_DB_VERSION );
+    update_option( 'wpgh_funnelstep_meta_db_version', WPGH_FUNNELSTEP_META_DB_VERSION );
 
 }

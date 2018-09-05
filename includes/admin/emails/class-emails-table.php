@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Emails_Table extends WP_List_Table {
+class WPGH_Emails_Table extends WP_List_Table {
 
 	/**
 	 * TT_Example_List_Table constructor.
@@ -83,15 +83,15 @@ class WPFN_Emails_Table extends WP_List_Table {
     {
         $views =  array();
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_email_items() . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpgh_count_email_items() . ")</span>" . "</a>";
 
-        $views['ready'] = "<a class='" .  print_r( ( $this->get_view() === 'ready' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'ready' ) . ")</span>" . "</a>";
+        $views['ready'] = "<a class='" .  print_r( ( $this->get_view() === 'ready' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . wpgh_count_email_items( 'email_status', 'ready' ) . ")</span>" . "</a>";
 
-        $views['draft'] = "<a class='" .  print_r( ( $this->get_view() === 'draft' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'draft' ) . ")</span>" . "</a>";
+        $views['draft'] = "<a class='" .  print_r( ( $this->get_view() === 'draft' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . wpgh_count_email_items( 'email_status', 'draft' ) . ")</span>" . "</a>";
 
-        $views['trash'] = "<a class='" .  print_r( ( $this->get_view() === 'trash' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . wpfn_count_email_items( 'email_status', 'trash' ) . ")</span>" . "</a>";
+        $views['trash'] = "<a class='" .  print_r( ( $this->get_view() === 'trash' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . wpgh_count_email_items( 'email_status', 'trash' ) . ")</span>" . "</a>";
 
-        return apply_filters(  'wpfn_email_views', $views );
+        return apply_filters(  'wpgh_email_views', $views );
     }
 
     protected function get_view()
@@ -114,7 +114,7 @@ class WPFN_Emails_Table extends WP_List_Table {
                 "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=delete&email='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
             );
         } else {
-            return apply_filters( 'wpfn_email_row_actions', array(
+            return apply_filters( 'wpgh_email_row_actions', array(
                 "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email='. $id ). "'>" . __( 'Edit' ) . "</a></span>",
                 "<span class='trash'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email='. $id ), 'trash' ). "'>" . __( 'Trash' ) . "</a></span>",
             ));
@@ -208,7 +208,7 @@ class WPFN_Emails_Table extends WP_List_Table {
             );
         }
 
-        return apply_filters( 'wpfn_email_bulk_actions', $actions );
+        return apply_filters( 'wpgh_email_bulk_actions', $actions );
 	}
 
 	/**
@@ -237,7 +237,7 @@ class WPFN_Emails_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$table_name = $wpdb->prefix . WPFN_EMAILS;
+		$table_name = $wpdb->prefix . WPGH_EMAILS;
 
 		$query = "SELECT * FROM $table_name WHERE ";
 

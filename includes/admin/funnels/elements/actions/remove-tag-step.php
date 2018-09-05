@@ -11,7 +11,7 @@
  * @since       0.1
  */
 
-function wpfn_remove_tag_funnel_step_html( $step_id )
+function wpgh_remove_tag_funnel_step_html( $step_id )
 {
 
     $tag_dropdown_id = $step_id . '_tags';
@@ -23,7 +23,7 @@ function wpfn_remove_tag_funnel_step_html( $step_id )
     $dropdown_args[ 'width' ] = '100%';
     $dropdown_args[ 'class' ] = 'hidden';
 
-    $previously_selected = wpfn_get_step_meta( $step_id, 'tags', true );
+    $previously_selected = wpgh_get_step_meta( $step_id, 'tags', true );
 
     if ( $previously_selected )
         $dropdown_args['selected'] = $previously_selected;
@@ -35,7 +35,7 @@ function wpfn_remove_tag_funnel_step_html( $step_id )
         <tr>
             <th><?php echo esc_html__( 'Select Tags to Remove:', 'groundhogg' ); ?></th>
             <td>
-                <?php wpfn_dropdown_tags( $dropdown_args ); ?>
+                <?php wpgh_dropdown_tags( $dropdown_args ); ?>
                 <p class="description"><?php _e( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ); ?></p>
             </td>
         </tr>
@@ -45,29 +45,29 @@ function wpfn_remove_tag_funnel_step_html( $step_id )
     <?php
 }
 
-add_action( 'wpfn_get_step_settings_remove_tag', 'wpfn_remove_tag_funnel_step_html' );
+add_action( 'wpgh_get_step_settings_remove_tag', 'wpgh_remove_tag_funnel_step_html' );
 
-function wpfn_remove_tag_icon_html()
+function wpgh_remove_tag_icon_html()
 {
     ?>
     <div class="dashicons dashicons-tag"></div><p><?php _e( 'Remove Tag', 'groundhogg' ); ?></p>
     <?php
 }
 
-add_action( 'wpfn_action_element_icon_html_remove_tag', 'wpfn_remove_tag_icon_html' );
+add_action( 'wpgh_action_element_icon_html_remove_tag', 'wpgh_remove_tag_icon_html' );
 
 /**
  * Save the apply tag step
  *
  * @param $step_id int ID of the step we're saving.
  */
-function wpfn_save_remove_tag_step( $step_id )
+function wpgh_save_remove_tag_step( $step_id )
 {
     //no need to check the validation as it's already been done buy the main funnel.
-    if ( isset( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] ) ){
-        $tags = wpfn_validate_tags( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] );
-        wpfn_update_step_meta( $step_id, 'tags', $tags );
+    if ( isset( $_POST[ wpgh_prefix_step_meta( $step_id, 'tags' ) ] ) ){
+        $tags = wpgh_validate_tags( $_POST[ wpgh_prefix_step_meta( $step_id, 'tags' ) ] );
+        wpgh_update_step_meta( $step_id, 'tags', $tags );
     }
 }
 
-add_action( 'wpfn_save_step_remove_tag', 'wpfn_save_remove_tag_step' );
+add_action( 'wpgh_save_step_remove_tag', 'wpgh_save_remove_tag_step' );

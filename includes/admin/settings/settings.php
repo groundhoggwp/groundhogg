@@ -1,24 +1,24 @@
 <?php
 
 /* Groundhogg Settings Page */
-class WPFN_Settings_Page
+class WPGH_Settings_Page
 {
 
 	public function __construct()
     {
-		//add_action( 'admin_menu', array( $this, 'wpfn_create_settings' ) );
-		add_action( 'admin_init', array( $this, 'wpfn_setup_sections' ) );
-		add_action( 'admin_init', array( $this, 'wpfn_setup_fields' ) );
+		//add_action( 'admin_menu', array( $this, 'wpgh_create_settings' ) );
+		add_action( 'admin_init', array( $this, 'wpgh_setup_sections' ) );
+		add_action( 'admin_init', array( $this, 'wpgh_setup_fields' ) );
 
-        if ( ! class_exists( 'WPFN_Extensions_Manager' ) )
+        if ( ! class_exists( 'WPGH_Extensions_Manager' ) )
             include dirname( __FILE__ ) . '/../extensions/module-manager.php';
 
         //todo find new file to put this line.
-        add_action( 'admin_init', array( 'WPFN_Extension_Manager', 'check_for_updates' ) );
+        add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'check_for_updates' ) );
 
         if ( isset( $_GET['page'] ) && $_GET['page'] === 'groundhogg' )
         {
-            add_action( 'admin_init', array( 'WPFN_Extension_Manager', 'perform_activation' ) );
+            add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );
             add_action( 'admin_init', array( $this, 'perform_tools' ) );
         }
     }
@@ -28,7 +28,7 @@ class WPFN_Settings_Page
         do_action( 'gh_settings_tools' );
     }
 
-	public function wpfn_settings_content()
+	public function wpgh_settings_content()
     {
         wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css' );
         wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js' );
@@ -108,7 +108,7 @@ class WPFN_Settings_Page
                                     $tag_args[ 'name' ] = 'import_tags[]';
                                     $tag_args[ 'width' ] = '100%';
                                     $tag_args[ 'class' ] = 'hidden'; ?>
-                                    <?php wpfn_dropdown_tags( $tag_args ); ?>
+                                    <?php wpgh_dropdown_tags( $tag_args ); ?>
                                     <p class="description"><?php _e( 'These tags will be applied to the contacts upon importing.', 'groundhogg' ); ?></p>
                                     <?php submit_button( 'Import', 'primary', 'import_contacts', false ); ?>
                                 </div>
@@ -125,7 +125,7 @@ class WPFN_Settings_Page
                                     $tag_args[ 'name' ] = 'export_tags[]';
                                     $tag_args[ 'width' ] = '100%';
                                     $tag_args[ 'class' ] = 'hidden'; ?>
-                                    <?php wpfn_dropdown_tags( $tag_args ); ?>
+                                    <?php wpgh_dropdown_tags( $tag_args ); ?>
                                     <p class="description"><?php _e( 'Contacts with these tags will be exported.', 'groundhogg' ); ?></p>
                                     <?php submit_button( 'Export', 'primary', 'export_contacts', false ); ?>
                                 </div>
@@ -139,7 +139,7 @@ class WPFN_Settings_Page
                         break;
                     case 'extensions':
 
-                        WPFN_Extension_Manager::extension_page();
+                        WPGH_Extension_Manager::extension_page();
 
                         break;
 
@@ -156,7 +156,7 @@ class WPFN_Settings_Page
 		</div> <?php
 	}
 
-	public function wpfn_setup_sections()
+	public function wpgh_setup_sections()
     {
         add_settings_section( 'business_info', 'Edit Business Settings', array(), 'groundhogg_business_settings');
         add_settings_section( 'contact_endpoints', __ ( 'Contact Endpoints' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
@@ -164,7 +164,7 @@ class WPFN_Settings_Page
         add_settings_section( 'default_mail_settings', 'Default Mail Settings', array(), 'groundhogg_email_settings' );
     }
 
-	public function wpfn_setup_fields()
+	public function wpgh_setup_fields()
     {
 		$fields = array(
 			array(
@@ -315,12 +315,12 @@ class WPFN_Settings_Page
 
 		);
 		foreach( $fields as $field ){
-			add_settings_field( $field['id'], $field['label'], array( $this, 'wpfn_field_callback' ), $field['page'] , $field['section'], $field );
+			add_settings_field( $field['id'], $field['label'], array( $this, 'wpgh_field_callback' ), $field['page'] , $field['section'], $field );
 			register_setting( $field['page'], $field['id'] );
 		}
 	}
 
-	public function wpfn_field_callback( $field )
+	public function wpgh_field_callback( $field )
     {
 		$value = get_option( $field['id'] );
 		switch ( $field['type'] ) {

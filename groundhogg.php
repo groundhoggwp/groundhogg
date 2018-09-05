@@ -10,8 +10,8 @@ Text Domain: groundhogg
 Domain Path: /languages
 */
 
-define ( 'WPFN_ASSETS_FOLDER', plugins_url( 'assets', __FILE__ ) );
-define ( 'WPFN_INCLUDES_FOLDER', dirname( __FILE__ ) . '/includes/' );
+define ( 'WPGH_ASSETS_FOLDER', plugins_url( 'assets', __FILE__ ) );
+define ( 'WPGH_INCLUDES_FOLDER', dirname( __FILE__ ) . '/includes/' );
 
 //include dirname( __FILE__ ) . '/includes/admin/settings/settings.php';
 
@@ -26,32 +26,32 @@ foreach ( glob( dirname( __FILE__ ) . "/includes/db/*.php" ) as $filename )
 }
 
 /* Init groundhogg tables and options. */
-function wpfn_activation()
+function wpgh_activation()
 {
 
     /* create tables */
-	wpfn_create_contacts_db();
-	wpfn_create_contact_meta_db();
+	wpgh_create_contacts_db();
+	wpgh_create_contact_meta_db();
 
-	wpfn_create_contact_tags_db();
-    wpfn_create_contact_tag_relationships_db();
+	wpgh_create_contact_tags_db();
+    wpgh_create_contact_tag_relationships_db();
 
-	wpfn_create_emails_db();
-    wpfn_create_email_meta_db();
+	wpgh_create_emails_db();
+    wpgh_create_email_meta_db();
 
-    wpfn_create_broadcasts_db();
+    wpgh_create_broadcasts_db();
 
-    wpfn_create_events_db();
+    wpgh_create_events_db();
 
-	wpfn_create_funnels_db();
-	wpfn_create_funnel_meta_db();
+	wpgh_create_funnels_db();
+	wpgh_create_funnel_meta_db();
 
-	wpfn_create_funnelsteps_db();
-	wpfn_create_funnelstep_meta_db();
+	wpgh_create_funnelsteps_db();
+	wpgh_create_funnelstep_meta_db();
 
-	wpfn_create_superlinks_db();
+	wpgh_create_superlinks_db();
 
-	wpfn_create_activity_db();
+	wpgh_create_activity_db();
 
 	/* create endpoints */
 	/* confirmation page */
@@ -103,12 +103,12 @@ function wpfn_activation()
     /* @var $wp_user WP_User */
     foreach ( $users as $wp_user )
     {
-        $cid = wpfn_quick_add_contact( $wp_user->user_email, $wp_user->user_firstname, $wp_user->user_lastname );
+        $cid = wpgh_quick_add_contact( $wp_user->user_email, $wp_user->user_firstname, $wp_user->user_lastname );
         //todo log how created.
     }
 
 }
 
-register_activation_hook( __FILE__, 'wpfn_activation');
+register_activation_hook( __FILE__, 'wpgh_activation');
 
 do_action( 'groundhogg_loaded' );

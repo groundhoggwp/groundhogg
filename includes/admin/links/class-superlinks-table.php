@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Superlinks_Table extends WP_List_Table {
+class WPGH_Superlinks_Table extends WP_List_Table {
     /**
      * TT_Example_List_Table constructor.
      *
@@ -98,7 +98,7 @@ class WPFN_Superlinks_Table extends WP_List_Table {
                 $tags = $item[ 'tags' ] ? maybe_unserialize( $item[ 'tags' ] ) : array();
 
                 foreach ( $tags as $i => $tag_id ){
-                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . wpfn_get_tag_name( $tag_id ). '</a>';
+                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . wpgh_get_tag_name( $tag_id ). '</a>';
                 }
 
                 return implode( ', ', $tags );
@@ -132,7 +132,7 @@ class WPFN_Superlinks_Table extends WP_List_Table {
             'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
         );
 
-        return apply_filters( 'wpfn_superlink_bulk_actions', $actions );
+        return apply_filters( 'wpgh_superlink_bulk_actions', $actions );
     }
 
     /**
@@ -157,7 +157,7 @@ class WPFN_Superlinks_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $table_name = $wpdb->prefix . WPFN_SUPER_LINKS;
+        $table_name = $wpdb->prefix . WPGH_SUPER_LINKS;
 
         if ( isset( $_REQUEST['s'] ) ){
             $data = $wpdb->get_results(

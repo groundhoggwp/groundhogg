@@ -23,7 +23,7 @@ wp_enqueue_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothn
                 $dropdown_args[ 'class' ] = 'hidden';
                 $dropdown_args[ 'required' ] = true;
 
-                wpfn_dropdown_emails( $dropdown_args ); ?>
+                wpgh_dropdown_emails( $dropdown_args ); ?>
                 <p class="description"><?php _e( 'THe Broadcast tool uses your global emails.', 'groundhogg' ) ?></p>
             </td>
         </tr>
@@ -36,7 +36,7 @@ wp_enqueue_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothn
                 $tag_args[ 'class' ] = 'hidden';
                 $tag_args[ 'required' ] = true;
                 ?>
-                <?php wpfn_dropdown_tags( $tag_args ); ?>
+                <?php wpgh_dropdown_tags( $tag_args ); ?>
                 <p class="description"><?php _e( 'This broadcast will be sent to contacts with these tags.', 'groundhogg' ); ?></p>
             </td>
         </tr>

@@ -608,8 +608,8 @@
                     }
                     
                     var n = exec(formatBlock, '<h1>');
-                    WPFNEmailEditor.h1Font.apply();
-                    WPFNEmailEditor.h1Size.apply();
+                    WPGHEmailEditor.h1Font.apply();
+                    WPGHEmailEditor.h1Size.apply();
                     
                     return n;
                 }
@@ -627,8 +627,8 @@
                         return true;
                     }
                     var n = exec(formatBlock, '<h2>');
-                    WPFNEmailEditor.h2Font.apply();
-                    WPFNEmailEditor.h2Size.apply();
+                    WPGHEmailEditor.h2Font.apply();
+                    WPGHEmailEditor.h2Size.apply();
 
                     return n;
                 }

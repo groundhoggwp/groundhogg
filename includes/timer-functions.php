@@ -17,13 +17,13 @@
  * @param $step_id int the timer steps ID
  * @param $contact_id int the Contact ID
  */
-function wpfn_enqueue_delay_timer_action( $step_id, $contact_id )
+function wpgh_enqueue_delay_timer_action( $step_id, $contact_id )
 {
     //todo sanitize and evaluate data...
-    $amount = wpfn_get_step_meta( $step_id, 'delay_amount', true );
-    $type = wpfn_get_step_meta( $step_id, 'delay_type', true );
-    $run_when = wpfn_get_step_meta( $step_id, 'run_when', true );
-    $run_time = wpfn_get_step_meta( $step_id, 'run_time', true );
+    $amount = wpgh_get_step_meta( $step_id, 'delay_amount', true );
+    $type = wpgh_get_step_meta( $step_id, 'delay_type', true );
+    $run_when = wpgh_get_step_meta( $step_id, 'run_when', true );
+    $run_time = wpgh_get_step_meta( $step_id, 'run_time', true );
 
     if ( $run_when == 'now' ){
         $time_string = '+ ' . $amount . ' ' . $type;
@@ -38,12 +38,12 @@ function wpfn_enqueue_delay_timer_action( $step_id, $contact_id )
         }
     }
 
-    $funnel_id = wpfn_get_step_funnel( $step_id );
+    $funnel_id = wpgh_get_step_funnel( $step_id );
 
-    wpfn_enqueue_event( strtotime( $time_string ), $funnel_id, $step_id, $contact_id );
+    wpgh_enqueue_event( strtotime( $time_string ), $funnel_id, $step_id, $contact_id );
 }
 
-add_action( 'wpfn_enqueue_next_funnel_action_delay_timer', 'wpfn_enqueue_delay_timer_action', 10, 2 );
+add_action( 'wpgh_enqueue_next_funnel_action_delay_timer', 'wpgh_enqueue_delay_timer_action', 10, 2 );
 
 /**
  * Translate the date timer settings into a timestamp and enqueue the action so it runs eventually.
@@ -51,19 +51,19 @@ add_action( 'wpfn_enqueue_next_funnel_action_delay_timer', 'wpfn_enqueue_delay_t
  * @param $step_id int the timer steps ID
  * @param $contact_id int the Contact ID
  */
-function wpfn_enqueue_date_timer_action( $step_id, $contact_id )
+function wpgh_enqueue_date_timer_action( $step_id, $contact_id )
 {
     //todo sanitize and evaluate data...
-    $run_when = wpfn_get_step_meta( $step_id, 'run_date', true );
-    $run_time = wpfn_get_step_meta( $step_id, 'run_time', true );
+    $run_when = wpgh_get_step_meta( $step_id, 'run_date', true );
+    $run_time = wpgh_get_step_meta( $step_id, 'run_time', true );
 
     $time_string = $run_when . ' ' . $run_time;
-    $funnel_id = wpfn_get_step_funnel( $step_id );
+    $funnel_id = wpgh_get_step_funnel( $step_id );
 
-    wpfn_enqueue_event( strtotime( $time_string ), $funnel_id, $step_id, $contact_id );
+    wpgh_enqueue_event( strtotime( $time_string ), $funnel_id, $step_id, $contact_id );
 }
 
-add_action( 'wpfn_enqueue_next_funnel_action_date_timer', 'wpfn_enqueue_date_timer_action', 10, 2 );
+add_action( 'wpgh_enqueue_next_funnel_action_date_timer', 'wpgh_enqueue_date_timer_action', 10, 2 );
 
 /**
  * run the timer events, we use this function for both the date timer and the delay timer.
@@ -71,11 +71,11 @@ add_action( 'wpfn_enqueue_next_funnel_action_date_timer', 'wpfn_enqueue_date_tim
  * @param $step_id int the timer's step ID
  * @param $contact_id int the Contact's ID
  */
-function wpfn_run_timer_event_function( $step_id, $contact_id )
+function wpgh_run_timer_event_function( $step_id, $contact_id )
 {
     //todo
     //does nothing for now, will probably log some form of reporting...
 }
 
-add_action( 'wpfn_do_action_delay_timer', 'wpfn_run_timer_event_function', 10, 2 );
-add_action( 'wpfn_do_action_date_timer', 'wpfn_run_timer_event_function', 10, 2 );
+add_action( 'wpgh_do_action_delay_timer', 'wpgh_run_timer_event_function', 10, 2 );
+add_action( 'wpgh_do_action_date_timer', 'wpgh_run_timer_event_function', 10, 2 );

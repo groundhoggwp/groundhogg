@@ -17,7 +17,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-class WPFN_Funnels_Page
+class WPGH_Funnels_Page
 {
 	function __construct()
 	{
@@ -137,27 +137,27 @@ class WPFN_Funnels_Page
 
 				if ( isset( $_POST ) )
 				{
-					do_action( 'wpfn_add_funnel' );
+					do_action( 'wpgh_add_funnel' );
 				}
 				break;
 
 			case 'archive':
 
 				foreach ( $this->get_funnels() as $id ) {
-					wpfn_update_funnel($id, 'funnel_status', 'archived');
+					wpgh_update_funnel($id, 'funnel_status', 'archived');
 				}
 
-				do_action( 'wpfn_archive_funnels' );
+				do_action( 'wpgh_archive_funnels' );
 
 				break;
 
 			case 'delete':
 
 				foreach ( $this->get_funnels() as $id ){
-					wpfn_delete_funnel( $id );
+					wpgh_delete_funnel( $id );
 				}
 
-				do_action( 'wpfn_delete_funnels' );
+				do_action( 'wpgh_delete_funnels' );
 
 				break;
 
@@ -165,17 +165,17 @@ class WPFN_Funnels_Page
 
 				foreach ( $this->get_funnels() as $id )
 				{
-					wpfn_update_funnel( $id, 'funnel_status', 'inactive' );
+					wpgh_update_funnel( $id, 'funnel_status', 'inactive' );
 				}
 
-				do_action( 'wpfn_restore_funnels' );
+				do_action( 'wpgh_restore_funnels' );
 
 				break;
 
 			case 'edit':
 
 				if ( isset( $_POST ) ){
-					do_action( 'wpfn_update_funnel', intval( $_GET[ 'funnel' ] ) );
+					do_action( 'wpgh_update_funnel', intval( $_GET[ 'funnel' ] ) );
 				}
 
 				break;
@@ -203,11 +203,11 @@ class WPFN_Funnels_Page
 
 	function table()
 	{
-		if ( ! class_exists( 'WPFN_Funnels_Table' ) ){
+		if ( ! class_exists( 'WPGH_Funnels_Table' ) ){
 			include dirname( __FILE__ ) . '/class-funnels-table.php';
 		}
 
-		$funnels_table = new WPFN_Funnels_Table();
+		$funnels_table = new WPGH_Funnels_Table();
 
 		$funnels_table->views(); ?>
         <form method="post" class="search-form wp-clearfix" >

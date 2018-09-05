@@ -43,4 +43,4 @@ $funnel_templates[ 'feedback_request' ][ 'description' ] = 'Looking to generate 
 $funnel_templates[ 'feedback_request' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'feedback_request' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/feedback-request.funnel';
 
-$funnel_templates = apply_filters( 'wpfn_funnel_templates', $funnel_templates );
+$funnel_templates = apply_filters( 'wpgh_funnel_templates', $funnel_templates );

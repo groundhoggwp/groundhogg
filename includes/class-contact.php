@@ -14,7 +14,7 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPFN_Contact
+class WPGH_Contact
 {
 
 	/**
@@ -58,7 +58,7 @@ class WPFN_Contact
 	public $optin_status;
 
 	/**
-	 * WPFN_Contact constructor.
+	 * WPGH_Contact constructor.
 	 *
 	 * @param string|int $email_or_id either the email or the id of the contact to retrieve
 	 */
@@ -69,11 +69,11 @@ class WPFN_Contact
 
 		if ( is_numeric( $email_or_id ) ) {
 			$id = absint( $email_or_id );
-			$contact = wpfn_get_contact_by_id( $id );
+			$contact = wpgh_get_contact_by_id( $id );
 		} elseif ( is_string( $email_or_id ) ) {
-			$contact = wpfn_get_contact_by_email( $email_or_id );
+			$contact = wpgh_get_contact_by_email( $email_or_id );
 		} else {
-			$contact = wpfn_get_contact_by_id( $email_or_id );
+			$contact = wpgh_get_contact_by_id( $email_or_id );
 		}
 
 		$this->ID = intval( $contact['ID'] );
@@ -81,7 +81,7 @@ class WPFN_Contact
 		$this->first_name = ucfirst( $contact['first_name'] );
 		$this->last_name = ucfirst( $contact['last_name'] );
 		$this->optin_status = intval( $contact['optin_status'] );
-		$this->activity = wpfn_get_contact_meta( $this->ID, 'activity_log', true );
+		$this->activity = wpgh_get_contact_meta( $this->ID, 'activity_log', true );
 		$this->date_created = $contact['date_created'];
 	}
 
@@ -142,7 +142,7 @@ class WPFN_Contact
 	 */
 	function get_phone()
 	{
-		return wpfn_get_contact_meta( $this->ID, 'primary_phone', true );
+		return wpgh_get_contact_meta( $this->ID, 'primary_phone', true );
 	}
 
 	/**
@@ -152,7 +152,7 @@ class WPFN_Contact
 	 */
 	function get_phone_extension()
 	{
-		return wpfn_get_contact_meta( $this->ID, 'primary_phone_extension', true );
+		return wpgh_get_contact_meta( $this->ID, 'primary_phone_extension', true );
 	}
 
 	/**
@@ -210,7 +210,7 @@ class WPFN_Contact
 	 */
 	function get_tags()
 	{
-		return wpfn_get_contact_tags( $this->ID );
+		return wpgh_get_contact_tags( $this->ID );
 	}
 
 	/**
@@ -222,7 +222,7 @@ class WPFN_Contact
 	 */
 	function has_tag( $tag_id_or_name )
 	{
-	    return wpfn_has_tag( $this->ID, $tag_id_or_name );
+	    return wpgh_has_tag( $this->ID, $tag_id_or_name );
 	}
 
 	/**
@@ -234,7 +234,7 @@ class WPFN_Contact
 	 */
 	function get_meta( $meta_key )
 	{
-		return wpfn_get_contact_meta( $this->ID, $meta_key, true );
+		return wpgh_get_contact_meta( $this->ID, $meta_key, true );
 	}
 
 	function __toString()

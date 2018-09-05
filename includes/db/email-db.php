@@ -22,12 +22,12 @@
  *
  * @return bool|int the ID of the new Email, false on failure.
  */
-function wpfn_insert_new_email( $content, $subject, $pre_header, $from_user, $author )
+function wpgh_insert_new_email( $content, $subject, $pre_header, $from_user, $author )
 {
 	global $wpdb;
 
 	$success = $wpdb->insert(
-		$wpdb->prefix . WPFN_EMAILS,
+		$wpdb->prefix . WPGH_EMAILS,
 		array(
 			'content'       => $content,
 			'subject'       => $subject,
@@ -54,11 +54,11 @@ function wpfn_insert_new_email( $content, $subject, $pre_header, $from_user, $au
  * @param $clause string the value
  * @return int the count of items
  */
-function wpfn_count_email_items( $where='', $clause='' )
+function wpgh_count_email_items( $where='', $clause='' )
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . WPFN_EMAILS;
+    $table_name = $wpdb->prefix . WPGH_EMAILS;
 
     if ( $where && $clause ){
         return $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE $where LIKE %s", $clause ) );
@@ -72,11 +72,11 @@ function wpfn_count_email_items( $where='', $clause='' )
  *
  * @return array associative list of emails to their respective IDs
  */
-function wpfn_get_emails()
+function wpgh_get_emails()
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . WPFN_EMAILS;
+    $table_name = $wpdb->prefix . WPGH_EMAILS;
 
     return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name WHERE email_status LIKE %s OR email_status LIKE %s ORDER BY ID DESC", 'ready', 'draft' ), ARRAY_A );
 }
@@ -88,7 +88,7 @@ function wpfn_get_emails()
  *
  * @return object|false the Email, false on failure.
  */
-function wpfn_get_email_by_id( $id )
+function wpgh_get_email_by_id( $id )
 {
 	global $wpdb;
 
@@ -99,7 +99,7 @@ function wpfn_get_email_by_id( $id )
 	if ( ! $id )
 		return false;
 
-	$table_name = $wpdb->prefix . WPFN_EMAILS;
+	$table_name = $wpdb->prefix . WPGH_EMAILS;
 
 	$sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE ID = %d", $id);
 	$email = $wpdb->get_row( $sql_prep1 );
@@ -116,7 +116,7 @@ function wpfn_get_email_by_id( $id )
  *
  * @return false|int email ID in success, false on failure
  */
-function wpfn_update_email( $id, $key, $value )
+function wpgh_update_email( $id, $key, $value )
 {
 	global $wpdb;
 
@@ -128,7 +128,7 @@ function wpfn_update_email( $id, $key, $value )
 		return false;
 
 	return $wpdb->update(
-		$wpdb->prefix . WPFN_EMAILS,
+		$wpdb->prefix . WPGH_EMAILS,
 		array(
 			$key => $value,
             'last_updated' => current_time( 'mysql' )
@@ -148,7 +148,7 @@ function wpfn_update_email( $id, $key, $value )
  * @param $id int thi ID of the email
  * @return bool whether the deletion of the email was successful.
  */
-function wpfn_delete_email( $id )
+function wpgh_delete_email( $id )
 {
     global $wpdb;
 
@@ -159,7 +159,7 @@ function wpfn_delete_email( $id )
     if ( ! $id )
         return false;
 
-    $table = $wpdb->prefix . WPFN_EMAILS;
+    $table = $wpdb->prefix . WPGH_EMAILS;
 
     $email = $wpdb->delete(
         $table,
@@ -185,7 +185,7 @@ function wpfn_delete_email( $id )
  * @param bool   $unique     Optional, default is false. Whether the same key should not be added.
  * @return int|false Meta ID on success, false on failure.
  */
-function wpfn_add_email_meta($email_id, $meta_key, $meta_value, $unique = false) {
+function wpgh_add_email_meta($email_id, $meta_key, $meta_value, $unique = false) {
 	return add_metadata('email', $email_id, $meta_key, $meta_value, $unique);
 }
 
@@ -201,7 +201,7 @@ function wpfn_add_email_meta($email_id, $meta_key, $meta_value, $unique = false)
  * @param mixed  $meta_value Optional. Metadata value.
  * @return bool True on success, false on failure.
  */
-function wpfn_delete_email_meta($email_id, $meta_key, $meta_value = '') {
+function wpgh_delete_email_meta($email_id, $meta_key, $meta_value = '') {
 	return delete_metadata('email', $email_id, $meta_key, $meta_value);
 }
 
@@ -213,7 +213,7 @@ function wpfn_delete_email_meta($email_id, $meta_key, $meta_value = '') {
  * @param bool   $single  Whether to return a single value.
  * @return mixed Will be an array if $single is false. Will be value of meta data field if $single is true.
  */
-function wpfn_get_email_meta( $email_id, $key = '', $single = true ) {
+function wpgh_get_email_meta( $email_id, $key = '', $single = true ) {
 	return get_metadata('email', $email_id, $key, $single );
 }
 
@@ -231,16 +231,16 @@ function wpfn_get_email_meta( $email_id, $key = '', $single = true ) {
  * @param mixed  $prev_value Optional. Previous value to check before removing.
  * @return int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
  */
-function wpfn_update_email_meta($email_id, $meta_key, $meta_value, $prev_value = '') {
+function wpgh_update_email_meta($email_id, $meta_key, $meta_value, $prev_value = '') {
 	return update_metadata('email', $email_id, $meta_key, $meta_value, $prev_value);
 }
 
-add_action( 'plugins_loaded', 'wpfn_integrate_emails_wpdb' );
+add_action( 'plugins_loaded', 'wpgh_integrate_emails_wpdb' );
 
 /**
  * add support for the metadata API so I don't have to code it myself.
  */
-function wpfn_integrate_emails_wpdb()
+function wpgh_integrate_emails_wpdb()
 {
 	global $wpdb;
 
@@ -250,22 +250,22 @@ function wpfn_integrate_emails_wpdb()
 	return;
 }
 
-define( 'WPFN_EMAILS', 'emails' );
-define( 'WPFN_EMAILS_DB_VERSION', '0.3' );
+define( 'WPGH_EMAILS', 'emails' );
+define( 'WPGH_EMAILS_DB_VERSION', '0.3' );
 
 /**
  * Create the emails database table.
  */
-function wpfn_create_emails_db()
+function wpgh_create_emails_db()
 {
 
 	global $wpdb;
 
 	$charset_collate = $wpdb->get_charset_collate();
 
-	$table_name = $wpdb->prefix . WPFN_EMAILS;
+	$table_name = $wpdb->prefix . WPGH_EMAILS;
 
-	if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_emails_db_version'), WPFN_EMAILS_DB_VERSION, '==' ) )
+	if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_emails_db_version'), WPGH_EMAILS_DB_VERSION, '==' ) )
 		return;
 
 	$sql = "CREATE TABLE $table_name (
@@ -284,21 +284,21 @@ function wpfn_create_emails_db()
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 	dbDelta( $sql );
 
-	update_option( 'wpfn_emails_db_version', WPFN_EMAILS_DB_VERSION );
+	update_option( 'wpgh_emails_db_version', WPGH_EMAILS_DB_VERSION );
 }
 
-define( 'WPFN_EMAIL_META', 'emailmeta' );
-define( 'WPFN_EMAIL_META_DB_VERSION', '0.2' );
+define( 'WPGH_EMAIL_META', 'emailmeta' );
+define( 'WPGH_EMAIL_META_DB_VERSION', '0.2' );
 
-function wpfn_create_email_meta_db()
+function wpgh_create_email_meta_db()
 {
 	global $wpdb;
 
 	$charset_collate = $wpdb->get_charset_collate();
 
-	$table_name = $wpdb->prefix . WPFN_EMAIL_META;
+	$table_name = $wpdb->prefix . WPGH_EMAIL_META;
 
-	if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_email_meta_db_version'), WPFN_EMAIL_META_DB_VERSION, '==' ) )
+	if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_email_meta_db_version'), WPGH_EMAIL_META_DB_VERSION, '==' ) )
 		return;
 
 	$max_index_length = 191;
@@ -316,6 +316,6 @@ function wpfn_create_email_meta_db()
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 	dbDelta( $install_query );
 
-	update_option( 'wpfn_email_meta_db_version', WPFN_EMAIL_META_DB_VERSION );
+	update_option( 'wpgh_email_meta_db_version', WPGH_EMAIL_META_DB_VERSION );
 
 }

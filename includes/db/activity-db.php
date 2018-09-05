@@ -18,7 +18,7 @@
  * @param $ref      string the referer URL or destination URL
  * @return bool|false|int
  */
-function wpfn_log_activity( $contact, $funnel, $step, $activity, $subject, $ref='' )
+function wpgh_log_activity( $contact, $funnel, $step, $activity, $subject, $ref='' )
 {
     if ( ! is_int( $contact ) || ! is_int( $subject ) )
         return false;
@@ -26,7 +26,7 @@ function wpfn_log_activity( $contact, $funnel, $step, $activity, $subject, $ref=
     global $wpdb;
 
     return $wpdb->insert(
-        $wpdb->prefix . WPFN_ACTIVITY,
+        $wpdb->prefix . WPGH_ACTIVITY,
         array(
             'timestamp'     => time(),
             'contact_id'    => absint( $contact ),
@@ -49,11 +49,11 @@ function wpfn_log_activity( $contact, $funnel, $step, $activity, $subject, $ref=
  * @param $subject int ID of the subject matter.
  * @return bool whether the activity exists.
  */
-function wpfn_activity_exists( $contact, $funnel, $step, $activity, $subject )
+function wpgh_activity_exists( $contact, $funnel, $step, $activity, $subject )
 {
     global $wpdb;
 
-    $table = $wpdb->prefix . WPFN_ACTIVITY;
+    $table = $wpdb->prefix . WPGH_ACTIVITY;
 
     $query = $wpdb->prepare(
         "SELECT * FROM $table
@@ -65,23 +65,23 @@ function wpfn_activity_exists( $contact, $funnel, $step, $activity, $subject )
     return ! empty( $results );
 }
 
-define( 'WPFN_ACTIVITY', 'activity_log' );
-define( 'WPFN_ACTIVITY_DB_VERSION', '0.2' );
+define( 'WPGH_ACTIVITY', 'activity_log' );
+define( 'WPGH_ACTIVITY_DB_VERSION', '0.2' );
 
 /**
  * Create the activity database table.
  * Activity will contain items such as Email Opens, Link clinks, Unsubscribes, form fills etc...
  */
-function wpfn_create_activity_db()
+function wpgh_create_activity_db()
 {
 
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_ACTIVITY;
+    $table_name = $wpdb->prefix . WPGH_ACTIVITY;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option( 'wpfn_activity_db_version' ), WPFN_ACTIVITY_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option( 'wpgh_activity_db_version' ), WPGH_ACTIVITY_DB_VERSION, '==' ) )
         return;
 
     $sql = "CREATE TABLE $table_name (
@@ -104,5 +104,5 @@ function wpfn_create_activity_db()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
-    update_option( 'wpfn_activity_db_version', WPFN_ACTIVITY_DB_VERSION );
+    update_option( 'wpgh_activity_db_version', WPGH_ACTIVITY_DB_VERSION );
 }

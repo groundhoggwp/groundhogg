@@ -20,7 +20,7 @@
  * @param bool   $unique     Optional, default is false. Whether the same key should not be added.
  * @return int|false Meta ID on success, false on failure.
  */
-function wpfn_add_contact_meta($contact_id, $meta_key, $meta_value, $unique = false) {
+function wpgh_add_contact_meta($contact_id, $meta_key, $meta_value, $unique = false) {
     return add_metadata('contact', $contact_id, $meta_key, $meta_value, $unique);
 }
 
@@ -36,7 +36,7 @@ function wpfn_add_contact_meta($contact_id, $meta_key, $meta_value, $unique = fa
  * @param mixed  $meta_value Optional. Metadata value.
  * @return bool True on success, false on failure.
  */
-function wpfn_delete_contact_meta($contact_id, $meta_key, $meta_value = '') {
+function wpgh_delete_contact_meta($contact_id, $meta_key, $meta_value = '') {
     return delete_metadata('contact', $contact_id, $meta_key, $meta_value);
 }
 
@@ -48,7 +48,7 @@ function wpfn_delete_contact_meta($contact_id, $meta_key, $meta_value = '') {
  * @param bool   $single  Whether to return a single value.
  * @return mixed Will be an array if $single is false. Will be value of meta data field if $single is true.
  */
-function wpfn_get_contact_meta( $contact_id, $key = '', $single = true ) {
+function wpgh_get_contact_meta( $contact_id, $key = '', $single = true ) {
     return get_metadata('contact', $contact_id, $key, $single );
 }
 
@@ -66,7 +66,7 @@ function wpfn_get_contact_meta( $contact_id, $key = '', $single = true ) {
  * @param mixed  $prev_value Optional. Previous value to check before removing.
  * @return int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
  */
-function wpfn_update_contact_meta($contact_id, $meta_key, $meta_value, $prev_value = '') {
+function wpgh_update_contact_meta($contact_id, $meta_key, $meta_value, $prev_value = '') {
     return update_metadata('contact', $contact_id, $meta_key, $meta_value, $prev_value);
 }
 
@@ -77,7 +77,7 @@ function wpfn_update_contact_meta($contact_id, $meta_key, $meta_value, $prev_val
  *
  * @return array|bool
  */
-function wpfn_get_contact_by_id( $id )
+function wpgh_get_contact_by_id( $id )
 {
     global $wpdb;
 
@@ -88,7 +88,7 @@ function wpfn_get_contact_by_id( $id )
     if ( ! $id )
         return false;
 
-    $table_name = $wpdb->prefix . WPFN_CONTACTS;
+    $table_name = $wpdb->prefix . WPGH_CONTACTS;
 
     $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE ID = %d", $id);
     $contact = $wpdb->get_row( $sql_prep1, ARRAY_A );
@@ -103,7 +103,7 @@ function wpfn_get_contact_by_id( $id )
  *
  * @return array|bool
  */
-function wpfn_get_contact_by_email( $email )
+function wpgh_get_contact_by_email( $email )
 {
     global $wpdb;
 
@@ -118,7 +118,7 @@ function wpfn_get_contact_by_email( $email )
         return false;
     }
 
-    $table_name = $wpdb->prefix . WPFN_CONTACTS;
+    $table_name = $wpdb->prefix . WPGH_CONTACTS;
 
     $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE email = %s", $email);
     $contact = $wpdb->get_row( $sql_prep1, ARRAY_A );
@@ -126,7 +126,7 @@ function wpfn_get_contact_by_email( $email )
     return $contact;
 }
 
-function wpfn_get_user_by_email( $email )
+function wpgh_get_user_by_email( $email )
 {
     global $wpdb;
 
@@ -158,7 +158,7 @@ function wpfn_get_user_by_email( $email )
  *
  * @return false|int the contact ID on success, false on failure.
  */
-function wpfn_insert_new_contact( $email, $first='', $last='', $owner_id='', $user_id='')
+function wpgh_insert_new_contact( $email, $first='', $last='', $owner_id='', $user_id='')
 {
     global $wpdb;
 
@@ -170,7 +170,7 @@ function wpfn_insert_new_contact( $email, $first='', $last='', $owner_id='', $us
             return false;
 
         $success = $wpdb->insert(
-            $wpdb->prefix . WPFN_CONTACTS,
+            $wpdb->prefix . WPGH_CONTACTS,
             array(
                 'email' => $email,
                 'first_name' => $first,
@@ -198,7 +198,7 @@ function wpfn_insert_new_contact( $email, $first='', $last='', $owner_id='', $us
  *
  * @return false|int contact ID in success, false on failure
  */
-function wpfn_update_contact( $id, $key, $value )
+function wpgh_update_contact( $id, $key, $value )
 {
     global $wpdb;
 
@@ -209,10 +209,10 @@ function wpfn_update_contact( $id, $key, $value )
     if ( ! $id )
         return false;
 
-    do_action( 'wpfn_update_contact_before', $id );
+    do_action( 'wpgh_update_contact_before', $id );
 
     return $wpdb->update(
-        $wpdb->prefix . WPFN_CONTACTS,
+        $wpdb->prefix . WPGH_CONTACTS,
         array(
             $key => $value
         ),
@@ -230,7 +230,7 @@ function wpfn_update_contact( $id, $key, $value )
  * @param $id int ID of the contact
  * @return true
  */
-function wpfn_delete_contact( $id )
+function wpgh_delete_contact( $id )
 {
     global $wpdb;
 
@@ -241,11 +241,11 @@ function wpfn_delete_contact( $id )
     if ( ! $id )
         return false;
 
-    do_action( 'wpfn_delete_contact_before', $id );
+    do_action( 'wpgh_delete_contact_before', $id );
 
     //delete contact from contacts table
     $wpdb->delete(
-        $wpdb->prefix . WPFN_CONTACTS,
+        $wpdb->prefix . WPGH_CONTACTS,
         array( 'ID' => $id ),
         array( '%d' )
     );
@@ -257,7 +257,7 @@ function wpfn_delete_contact( $id )
         array( '%d' )
     );
 
-    do_action( 'wpfn_delete_contact_after' );
+    do_action( 'wpgh_delete_contact_after' );
 
     return true;
 
@@ -271,7 +271,7 @@ function wpfn_delete_contact( $id )
  *
  * @return bool|false ID on success, false on failure
  */
-function wpfn_update_contact_email( $id, $email )
+function wpgh_update_contact_email( $id, $email )
 {
     if ( ! $email || ! is_string( $email ) )
         return false;
@@ -284,15 +284,15 @@ function wpfn_update_contact_email( $id, $email )
         return false;
     }
 
-    return wpfn_update_contact( $id, 'email', $email );
+    return wpgh_update_contact( $id, 'email', $email );
 }
 
-add_action( 'plugins_loaded', 'wpfn_integrate_contacts_wpdb' );
+add_action( 'plugins_loaded', 'wpgh_integrate_contacts_wpdb' );
 
 /**
  * add support for the metadata API so I don't have to code it myself.
  */
-function wpfn_integrate_contacts_wpdb()
+function wpgh_integrate_contacts_wpdb()
 {
     global $wpdb;
 
@@ -305,19 +305,19 @@ function wpfn_integrate_contacts_wpdb()
     return;
 }
 
-define( 'WPFN_CONTACTS', 'contacts' );
-define( 'WPFN_CONTACTS_DB_VERSION', '0.7' );
+define( 'WPGH_CONTACTS', 'contacts' );
+define( 'WPGH_CONTACTS_DB_VERSION', '0.7' );
 
-function wpfn_create_contacts_db()
+function wpgh_create_contacts_db()
 {
 
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_CONTACTS;
+    $table_name = $wpdb->prefix . WPGH_CONTACTS;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_contacts_db_version'), WPFN_CONTACTS_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_contacts_db_version'), WPGH_CONTACTS_DB_VERSION, '==' ) )
         return;
 
     $max_index_length = 191;
@@ -338,22 +338,22 @@ function wpfn_create_contacts_db()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
-    update_option( 'wpfn_contacts_db_version', WPFN_CONTACTS_DB_VERSION );
+    update_option( 'wpgh_contacts_db_version', WPGH_CONTACTS_DB_VERSION );
 
 }
 
-define( 'WPFN_CONTACT_META', 'contactmeta' );
-define( 'WPFN_CONTACT_META_DB_VERSION', '0.2' );
+define( 'WPGH_CONTACT_META', 'contactmeta' );
+define( 'WPGH_CONTACT_META_DB_VERSION', '0.2' );
 
-function wpfn_create_contact_meta_db()
+function wpgh_create_contact_meta_db()
 {
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_CONTACT_META;
+    $table_name = $wpdb->prefix . WPGH_CONTACT_META;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_contact_meta_db_version'), WPFN_CONTACT_META_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_contact_meta_db_version'), WPGH_CONTACT_META_DB_VERSION, '==' ) )
         return;
 
     $max_index_length = 191;
@@ -371,7 +371,7 @@ function wpfn_create_contact_meta_db()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $install_query );
 
-    update_option( 'wpfn_contact_meta_db_version', WPFN_CONTACT_META_DB_VERSION );
+    update_option( 'wpgh_contact_meta_db_version', WPGH_CONTACT_META_DB_VERSION );
 }
 
 /**
@@ -380,9 +380,9 @@ function wpfn_create_contact_meta_db()
  * @param $id_or_slug int|string the Id of the tag
  * @return string the name of the tag
  */
-function wpfn_get_tag_name( $id_or_slug )
+function wpgh_get_tag_name( $id_or_slug )
 {
-    $tag = wpfn_get_tag( $id_or_slug );
+    $tag = wpgh_get_tag( $id_or_slug );
 
     if ( ! $tag )
         return false;
@@ -395,11 +395,11 @@ function wpfn_get_tag_name( $id_or_slug )
  *
  * @return array list of tags...
  */
-function wpfn_get_tags()
+function wpgh_get_tags()
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . WPFN_CONTACT_TAGS;
+    $table_name = $wpdb->prefix . WPGH_CONTACT_TAGS;
 
     return $wpdb->get_results( "SELECT * FROM $table_name ORDER BY tag_id DESC", ARRAY_A );
 }
@@ -410,11 +410,11 @@ function wpfn_get_tags()
  *
  * @return array list of tags...
  */
-function wpfn_get_contact_tags( $contact_id )
+function wpgh_get_contact_tags( $contact_id )
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS;
+    $table_name = $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS;
 
     return $wpdb->get_results(
         $wpdb->prepare(
@@ -430,11 +430,11 @@ function wpfn_get_contact_tags( $contact_id )
  *
  * @return array list of contact Ids...
  */
-function wpfn_get_contact_ids_by_tag( $tag_id )
+function wpgh_get_contact_ids_by_tag( $tag_id )
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS;
+    $table_name = $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS;
 
     return $wpdb->get_results(
         $wpdb->prepare(
@@ -449,14 +449,14 @@ function wpfn_get_contact_ids_by_tag( $tag_id )
  * @param $id_or_slug int|string the ID or slug a given tag
  * @return array|false the tag or false on failure
  */
-function wpfn_get_tag( $id_or_slug )
+function wpgh_get_tag( $id_or_slug )
 {
     global $wpdb;
 
     if (!$id_or_slug)
         return false;
 
-    $table = $wpdb->prefix . WPFN_CONTACT_TAGS;
+    $table = $wpdb->prefix . WPGH_CONTACT_TAGS;
 
     if (is_numeric($id_or_slug))
     {
@@ -482,9 +482,9 @@ function wpfn_get_tag( $id_or_slug )
  * @param $id_or_slug int|string the tag in question
  * @return bool whether it exists
  */
-function wpfn_tag_exists( $id_or_slug )
+function wpgh_tag_exists( $id_or_slug )
 {
-    $tag = wpfn_get_tag( $id_or_slug );
+    $tag = wpgh_get_tag( $id_or_slug );
 
     return ( ! empty( $tag ) );
 }
@@ -496,7 +496,7 @@ function wpfn_tag_exists( $id_or_slug )
  * @param string $tag_description string Description of the tag
  * @return bool|int the ID of the new tag or false on failure.
  */
-function wpfn_insert_tag( $tag_name, $tag_description='' )
+function wpgh_insert_tag( $tag_name, $tag_description='' )
 {
     global $wpdb;
 
@@ -510,13 +510,13 @@ function wpfn_insert_tag( $tag_name, $tag_description='' )
     $tag_description = sanitize_textarea_field( $tag_description );
     $tag_slug = sanitize_title( $tag_name );
 
-    if ( wpfn_tag_exists( $tag_slug ) ){
-        $tag = wpfn_get_tag( $tag_slug );
+    if ( wpgh_tag_exists( $tag_slug ) ){
+        $tag = wpgh_get_tag( $tag_slug );
         return intval( $tag['tag_id'] );
     }
 
     $success = $wpdb->insert(
-        $wpdb->prefix . WPFN_CONTACT_TAGS,
+        $wpdb->prefix . WPGH_CONTACT_TAGS,
         array(
             'tag_name' => $tag_name,
             'tag_slug' => $tag_slug,
@@ -539,7 +539,7 @@ function wpfn_insert_tag( $tag_name, $tag_description='' )
  * @param string $value the value to update the column to
  * @return bool whether the update was successful.
  */
-function wpfn_update_tag( $id, $column, $value='' )
+function wpgh_update_tag( $id, $column, $value='' )
 {
     global $wpdb;
 
@@ -551,7 +551,7 @@ function wpfn_update_tag( $id, $column, $value='' )
         return false;
 
     $success = $wpdb->update(
-        $wpdb->prefix . WPFN_CONTACT_TAGS,
+        $wpdb->prefix . WPGH_CONTACT_TAGS,
         array(
             $column => $value
         ),
@@ -570,7 +570,7 @@ function wpfn_update_tag( $id, $column, $value='' )
  *
  * @return bool whether the deletion was fully successful.
  */
-function wpfn_delete_tag( $id )
+function wpgh_delete_tag( $id )
 {
     global $wpdb;
 
@@ -582,7 +582,7 @@ function wpfn_delete_tag( $id )
         return false;
 
     $a = $wpdb->delete(
-        $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS,
+        $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS,
         array(
             'tag_id' => $id
         ),
@@ -592,7 +592,7 @@ function wpfn_delete_tag( $id )
     );
 
     $b = $wpdb->delete(
-        $wpdb->prefix . WPFN_CONTACT_TAGS,
+        $wpdb->prefix . WPGH_CONTACT_TAGS,
         array(
             'tag_id' => $id
         ),
@@ -611,7 +611,7 @@ function wpfn_delete_tag( $id )
  * @param $tag_id int the ID of the tag
  * @return array the relationship.
  */
-function wpfn_get_contact_tag_relationship( $contact_id, $tag_id )
+function wpgh_get_contact_tag_relationship( $contact_id, $tag_id )
 {
     global $wpdb;
 
@@ -624,7 +624,7 @@ function wpfn_get_contact_tag_relationship( $contact_id, $tag_id )
         return false;
 
     return $wpdb->get_row( $wpdb->prepare(
-        "SELECT * FROM " . $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS . "
+        "SELECT * FROM " . $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS . "
         WHERE tag_id = %d AND contact_id = %d", $tag_id, $contact_id ), ARRAY_A
     );
 }
@@ -636,7 +636,7 @@ function wpfn_get_contact_tag_relationship( $contact_id, $tag_id )
  * @param $tag_id int the ID of the tag
  * @return int 1
  */
-function wpfn_insert_contact_tag_relationship( $contact_id, $tag_id )
+function wpgh_insert_contact_tag_relationship( $contact_id, $tag_id )
 {
     global $wpdb;
 
@@ -648,11 +648,11 @@ function wpfn_insert_contact_tag_relationship( $contact_id, $tag_id )
     if ( ! $contact_id || ! $tag_id )
         return false;
 
-    if ( wpfn_get_contact_tag_relationship( $contact_id, $tag_id ) )
+    if ( wpgh_get_contact_tag_relationship( $contact_id, $tag_id ) )
         return false;
 
     return $wpdb->insert(
-        $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS,
+        $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS,
         array(
             'contact_id' => $contact_id,
             'tag_id'     => $tag_id
@@ -671,7 +671,7 @@ function wpfn_insert_contact_tag_relationship( $contact_id, $tag_id )
  * @param $tag_id int the ID of the tag
  * @return int 1
  */
-function wpfn_delete_contact_tag_relationship( $contact_id, $tag_id )
+function wpgh_delete_contact_tag_relationship( $contact_id, $tag_id )
 {
     global $wpdb;
 
@@ -684,7 +684,7 @@ function wpfn_delete_contact_tag_relationship( $contact_id, $tag_id )
         return false;
 
     return $wpdb->delete(
-        $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS,
+        $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS,
         array(
             'contact_id' => $contact_id,
             'tag_id'     => $tag_id
@@ -716,7 +716,7 @@ function wpdn_delete_contact_tag_relationship(  $contact_id, $tag_id )
         return false;
 
     return $wpdb->delete(
-        $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS,
+        $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS,
         array(
             'contact_id' => $contact_id,
             'tag_id'     => $tag_id
@@ -735,7 +735,7 @@ function wpdn_delete_contact_tag_relationship(  $contact_id, $tag_id )
  * @param $id int the ID of the object to query, tag or contact
  * @return int|false, the number or relationships or false on failure.
  */
-function wpfn_count_contact_tag_relationships( $by, $id )
+function wpgh_count_contact_tag_relationships( $by, $id )
 {
     global $wpdb;
 
@@ -746,7 +746,7 @@ function wpfn_count_contact_tag_relationships( $by, $id )
     if ( ! $id )
         return false;
 
-    $table = $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS;
+    $table = $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS;
 
     return $wpdb->get_var(
         $wpdb->prepare(
@@ -756,19 +756,19 @@ function wpfn_count_contact_tag_relationships( $by, $id )
     );
 }
 
-define( 'WPFN_CONTACT_TAGS', 'contact_tags' );
-define( 'WPFN_CONTACT_TAGS_DB_VERSION', '0.4' );
+define( 'WPGH_CONTACT_TAGS', 'contact_tags' );
+define( 'WPGH_CONTACT_TAGS_DB_VERSION', '0.4' );
 
-function wpfn_create_contact_tags_db()
+function wpgh_create_contact_tags_db()
 {
 
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_CONTACT_TAGS;
+    $table_name = $wpdb->prefix . WPGH_CONTACT_TAGS;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_contact_tags_db_version'), WPFN_CONTACT_TAGS_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_contact_tags_db_version'), WPGH_CONTACT_TAGS_DB_VERSION, '==' ) )
         return;
 
     $sql = "CREATE TABLE $table_name (
@@ -783,23 +783,23 @@ function wpfn_create_contact_tags_db()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
-    update_option( 'wpfn_contact_tags_db_version', WPFN_CONTACT_TAGS_DB_VERSION );
+    update_option( 'wpgh_contact_tags_db_version', WPGH_CONTACT_TAGS_DB_VERSION );
 
 }
 
-define( 'WPFN_CONTACT_TAG_RELATIONSHIPS', 'contact_tag_relationships' );
-define( 'WPFN_CONTACT_TAG_RELATIONSHIPS_DB_VERSION', '0.3' );
+define( 'WPGH_CONTACT_TAG_RELATIONSHIPS', 'contact_tag_relationships' );
+define( 'WPGH_CONTACT_TAG_RELATIONSHIPS_DB_VERSION', '0.3' );
 
-function wpfn_create_contact_tag_relationships_db()
+function wpgh_create_contact_tag_relationships_db()
 {
 
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_CONTACT_TAG_RELATIONSHIPS;
+    $table_name = $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_contact_tag_relationships_db_version'), WPFN_CONTACT_TAG_RELATIONSHIPS_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_contact_tag_relationships_db_version'), WPGH_CONTACT_TAG_RELATIONSHIPS_DB_VERSION, '==' ) )
         return;
 
     $sql = "CREATE TABLE $table_name (
@@ -812,6 +812,6 @@ function wpfn_create_contact_tag_relationships_db()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
-    update_option( 'wpfn_contact_tag_relationships_db_version', WPFN_CONTACT_TAG_RELATIONSHIPS_DB_VERSION );
+    update_option( 'wpgh_contact_tag_relationships_db_version', WPGH_CONTACT_TAG_RELATIONSHIPS_DB_VERSION );
 
 }

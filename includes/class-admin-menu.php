@@ -6,7 +6,7 @@
  * Time: 8:06 PM
  */
 
-class WPFN_Admin_Menu
+class WPGH_Admin_Menu
 {
 
     var $settings_page;
@@ -16,44 +16,50 @@ class WPFN_Admin_Menu
     var $tags_page;
     var $contacts_page;
     var $broadcasts_page;
+    var $events_page;
 
     function __construct()
     {
 
-        if (!class_exists('WPFN_Settings_page'))
+        if (!class_exists('WPGH_Settings_page'))
             include dirname(__FILE__) . '/admin/settings/settings.php';
 
-        $this->settings_page = new WPFN_Settings_Page();
+        $this->settings_page = new WPGH_Settings_Page();
 
-        if (!class_exists('WPFN_Broadcasts_Page'))
+        if (!class_exists('WPGH_Broadcasts_Page'))
             include dirname(__FILE__) . '/admin/broadcasts/broadcasts.php';
 
-        $this->broadcasts_page = new WPFN_Broadcasts_Page();
+        $this->broadcasts_page = new WPGH_Broadcasts_Page();
 
-        if (!class_exists('WPFN_Emails_Page'))
+        if (!class_exists('WPGH_Emails_Page'))
             include dirname(__FILE__) . '/admin/emails/emails.php';
 
-        $this->emails_page = new WPFN_Emails_Page();
+        $this->emails_page = new WPGH_Emails_Page();
 
-        if (!class_exists('WPFN_Funnels_Page'))
+        if (!class_exists('WPGH_Funnels_Page'))
             include dirname(__FILE__) . '/admin/funnels/funnels.php';
 
-        $this->funnels_page = new WPFN_Funnels_Page();
+        $this->funnels_page = new WPGH_Funnels_Page();
 
-        if (!class_exists('WPFN_Superlinks_Page'))
+        if (!class_exists('WPGH_Superlinks_Page'))
             include dirname(__FILE__) . '/admin/links/superlinks.php';
 
-        $this->superlink_page = new WPFN_Superlinks_Page();
+        $this->superlink_page = new WPGH_Superlinks_Page();
 
-        if (!class_exists('WPFN_Tags_Page'))
+        if (!class_exists('WPGH_Tags_Page'))
             include dirname(__FILE__) . '/admin/tags/tags.php';
 
-        $this->tags_page = new WPFN_Tags_Page();
+        $this->tags_page = new WPGH_Tags_Page();
 
-        if (!class_exists('WPFN_Contacts_Page'))
+        if (!class_exists('WPGH_Contacts_Page'))
             include dirname(__FILE__) . '/admin/contacts/contacts.php';
 
-        $this->contacts_page = new WPFN_Contacts_Page();
+        $this->contacts_page = new WPGH_Contacts_Page();
+
+        if (!class_exists('WPGH_Events_Page'))
+            include dirname(__FILE__) . '/admin/events/events.php';
+
+        $this->events_page = new WPGH_Events_Page();
 
         add_action('admin_menu', array($this, 'setup_menu_items'));
 
@@ -65,7 +71,7 @@ class WPFN_Admin_Menu
         $menu_title = 'Groundhogg';
         $capability = 'manage_options';
         $slug = 'groundhogg';
-        $callback = array($this->settings_page, 'wpfn_settings_content');
+        $callback = array($this->settings_page, 'wpgh_settings_content');
         $icon = 'dashicons-email-alt';
         $position = 2;
 
@@ -145,7 +151,16 @@ class WPFN_Admin_Menu
             'Settings',
             'manage_options',
             'groundhogg',
-            array($this->settings_page, 'wpfn_settings_content')
+            array($this->settings_page, 'wpgh_settings_content')
+        );
+
+        add_submenu_page(
+            'groundhogg',
+            'Events',
+            'Events',
+            'manage_options',
+            'gh_events',
+            array($this->events_page, 'page')
         );
 
         remove_submenu_page('groundhogg', 'groundhogg');
@@ -250,4 +265,4 @@ class WPFN_Admin_Menu
 
 }
 
-new WPFN_Admin_Menu();
+new WPGH_Admin_Menu();

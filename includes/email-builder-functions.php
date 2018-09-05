@@ -11,7 +11,7 @@
  *
  * @return array list of html building blocks.
  */
-function wpfn_get_email_html_blocks()
+function wpgh_get_email_html_blocks()
 {
     $blocks = array();
 
@@ -24,37 +24,37 @@ function wpfn_get_email_html_blocks()
     $blocks['video_block'] = 'dashicons-video-alt3';
     $blocks['html_block'] = 'dashicons-editor-code';
 
-    return apply_filters( 'wpfn_email_blocks', $blocks );
+    return apply_filters( 'wpgh_email_blocks', $blocks );
 }
 
-function wpfn_email_text_block()
+function wpgh_email_text_block()
 {
     ?>
     <p><?php echo esc_html__( 'Customize this section by editing the text, adding your own copy, using the options above to bold, italicize, or create links and bullets, or use the options in the "Design" panel on the left to change the font styles of your email.', 'groundhogg' );?></p>
     <?php
 }
 
-add_action( 'wpfn_email_block_html_text_block', 'wpfn_email_text_block' );
+add_action( 'wpgh_email_block_html_text_block', 'wpgh_email_text_block' );
 
-function wpfn_email_spacer_block()
+function wpgh_email_spacer_block()
 {
     ?>
     <div class="spacer" style="margin: 5px 0 5px 0; height: 15px;"></div>
     <?php
 }
 
-add_action( 'wpfn_email_block_html_spacer_block', 'wpfn_email_spacer_block' );
+add_action( 'wpgh_email_block_html_spacer_block', 'wpgh_email_spacer_block' );
 
-function wpfn_email_divider_block()
+function wpgh_email_divider_block()
 {
     ?>
     <div style="margin: 5px 0 5px 0"><hr style="width:80%;"/></div>
     <?php
 }
 
-add_action( 'wpfn_email_block_html_divider_block', 'wpfn_email_divider_block' );
+add_action( 'wpgh_email_block_html_divider_block', 'wpgh_email_divider_block' );
 
-function wpfn_email_image_block()
+function wpgh_email_image_block()
 {
     $src = 'https://via.placeholder.com/350x150';
     ?>
@@ -62,9 +62,9 @@ function wpfn_email_image_block()
     <?php
 }
 
-add_action( 'wpfn_email_block_html_image_block', 'wpfn_email_image_block' );
+add_action( 'wpgh_email_block_html_image_block', 'wpgh_email_image_block' );
 
-function wpfn_email_button_block()
+function wpgh_email_button_block()
 {
     ?>
     <!--Button-->
@@ -82,38 +82,38 @@ function wpfn_email_button_block()
     <?php
 }
 
-add_action( 'wpfn_email_block_html_button_block', 'wpfn_email_button_block' );
+add_action( 'wpgh_email_block_html_button_block', 'wpgh_email_button_block' );
 
-function wpfn_email_code_block()
+function wpgh_email_code_block()
 {
     ?>
     <div><p>This is some custom HTML which you can edit on the right. You may enter any valid HTML tags, but they may get filtered out as some email browsers to not support certain HTML.</p></div>
     <?php
 }
 
-add_action( 'wpfn_email_block_html_code_block', 'wpfn_email_code_block' );
+add_action( 'wpgh_email_block_html_code_block', 'wpgh_email_code_block' );
 
-function wpfn_get_email_block( $type )
+function wpgh_get_email_block( $type )
 {
     ?>
     <div class="row">
         <div class="content-wrapper <?php echo $type; ?>">
             <div class="content-inside inner-content text-content" style="padding: 5px;">
-                <?php do_action( 'wpfn_email_block_html_' . $type ); ?>
+                <?php do_action( 'wpgh_email_block_html_' . $type ); ?>
             </div>
         </div>
     </div>
     <?php
 }
 
-function wpfn_get_email_block_ajax()
+function wpgh_get_email_block_ajax()
 {
 
     $block_type = $_POST['block_type'];
 
     ob_start();
 
-    wpfn_get_email_block( $block_type );
+    wpgh_get_email_block( $block_type );
 
     $content = ob_get_contents();
 
@@ -122,4 +122,4 @@ function wpfn_get_email_block_ajax()
     wp_die( $content );
 }
 
-add_action( 'wp_ajax_get_email_block_html', 'wpfn_get_email_block_ajax' );
+add_action( 'wp_ajax_get_email_block_html', 'wpgh_get_email_block_ajax' );

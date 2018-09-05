@@ -19,7 +19,7 @@
  *
  * @return bool|int the ID of the new funnel or the
  */
-function wpfn_insert_new_funnel( $title, $status )
+function wpgh_insert_new_funnel( $title, $status )
 {
     global $wpdb;
 
@@ -27,7 +27,7 @@ function wpfn_insert_new_funnel( $title, $status )
         return false;
 
     $success = $wpdb->insert(
-        $wpdb->prefix . WPFN_FUNNELS,
+        $wpdb->prefix . WPGH_FUNNELS,
         array(
             'funnel_title'  => $title,
             'funnel_status' => $status,
@@ -50,7 +50,7 @@ function wpfn_insert_new_funnel( $title, $status )
  *
  * @return object|false the Email, false on failure.
  */
-function wpfn_get_funnel_by_id( $id )
+function wpgh_get_funnel_by_id( $id )
 {
     global $wpdb;
 
@@ -61,7 +61,7 @@ function wpfn_get_funnel_by_id( $id )
     if ( ! $id )
         return false;
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELS;
 
     $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE ID = %d", $id);
     $funnel = $wpdb->get_row( $sql_prep1 );
@@ -78,7 +78,7 @@ function wpfn_get_funnel_by_id( $id )
  *
  * @return false|int funnel ID in success, false on failure
  */
-function wpfn_update_funnel( $id, $key, $value )
+function wpgh_update_funnel( $id, $key, $value )
 {
     global $wpdb;
 
@@ -90,7 +90,7 @@ function wpfn_update_funnel( $id, $key, $value )
         return false;
 
     return $wpdb->update(
-        $wpdb->prefix . WPFN_FUNNELS,
+        $wpdb->prefix . WPGH_FUNNELS,
         array(
             $key => $value,
             'last_updated' => current_time( 'mysql' )
@@ -110,7 +110,7 @@ function wpfn_update_funnel( $id, $key, $value )
  * @param $id int the ID of the funnel to delete
  * @return bool whether the funnel was delete successfully.
  */
-function wpfn_delete_funnel( $id )
+function wpgh_delete_funnel( $id )
 {
     global $wpdb;
 
@@ -131,14 +131,14 @@ function wpfn_delete_funnel( $id )
 
     /* delete steps */
 
-    $steps = wpfn_get_funnel_steps( $id );
+    $steps = wpgh_get_funnel_steps( $id );
 
     foreach ( $steps as $args ){
-        $b = wpfn_delete_funnel_step( $args[ 'ID' ] );
+        $b = wpgh_delete_funnel_step( $args[ 'ID' ] );
     }
 
     $c = $wpdb->delete(
-        $wpdb->prefix . WPFN_FUNNELS,
+        $wpdb->prefix . WPGH_FUNNELS,
         array( 'ID' => $id ),
         array( '%d' )
     );
@@ -154,11 +154,11 @@ function wpfn_delete_funnel( $id )
  * @param $clause string the value
  * @return int the count of items
  */
-function wpfn_count_funnel_items( $where='', $clause='' )
+function wpgh_count_funnel_items( $where='', $clause='' )
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELS;
 
     if ( $where && $clause ){
         return intval( $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE $where LIKE %s", $clause ) ) );
@@ -176,7 +176,7 @@ function wpfn_count_funnel_items( $where='', $clause='' )
  * @param bool   $unique     Optional, default is false. Whether the same key should not be added.
  * @return int|false Meta ID on success, false on failure.
  */
-function wpfn_add_funnel_meta($funnel_id, $meta_key, $meta_value, $unique = false) {
+function wpgh_add_funnel_meta($funnel_id, $meta_key, $meta_value, $unique = false) {
     return add_metadata('funnel', $funnel_id, $meta_key, $meta_value, $unique);
 }
 
@@ -192,7 +192,7 @@ function wpfn_add_funnel_meta($funnel_id, $meta_key, $meta_value, $unique = fals
  * @param mixed  $meta_value Optional. Metadata value.
  * @return bool True on success, false on failure.
  */
-function wpfn_delete_funnel_meta($funnel_id, $meta_key, $meta_value = '') {
+function wpgh_delete_funnel_meta($funnel_id, $meta_key, $meta_value = '') {
     return delete_metadata('funnel', $funnel_id, $meta_key, $meta_value);
 }
 
@@ -204,7 +204,7 @@ function wpfn_delete_funnel_meta($funnel_id, $meta_key, $meta_value = '') {
  * @param bool   $single  Whether to return a single value.
  * @return mixed Will be an array if $single is false. Will be value of meta data field if $single is true.
  */
-function wpfn_get_funnel_meta( $funnel_id, $key = '', $single = true ) {
+function wpgh_get_funnel_meta( $funnel_id, $key = '', $single = true ) {
     return get_metadata('funnel', $funnel_id, $key, $single );
 }
 
@@ -222,16 +222,16 @@ function wpfn_get_funnel_meta( $funnel_id, $key = '', $single = true ) {
  * @param mixed  $prev_value Optional. Previous value to check before removing.
  * @return int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
  */
-function wpfn_update_funnel_meta($funnel_id, $meta_key, $meta_value, $prev_value = '') {
+function wpgh_update_funnel_meta($funnel_id, $meta_key, $meta_value, $prev_value = '') {
     return update_metadata('funnel', $funnel_id, $meta_key, $meta_value, $prev_value);
 }
 
-add_action( 'plugins_loaded', 'wpfn_integrate_funnels_wpdb' );
+add_action( 'plugins_loaded', 'wpgh_integrate_funnels_wpdb' );
 
 /**
  * add support for the metadata API so I don't have to code it myself.
  */
-function wpfn_integrate_funnels_wpdb()
+function wpgh_integrate_funnels_wpdb()
 {
     global $wpdb;
 
@@ -241,22 +241,22 @@ function wpfn_integrate_funnels_wpdb()
     return;
 }
 
-define( 'WPFN_FUNNELS', 'funnels' );
-define( 'WPFN_FUNNELS_DB_VERSION', '0.2' );
+define( 'WPGH_FUNNELS', 'funnels' );
+define( 'WPGH_FUNNELS_DB_VERSION', '0.2' );
 
 /**
  * Create the funnels database table.
  */
-function wpfn_create_funnels_db()
+function wpgh_create_funnels_db()
 {
 
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_FUNNELS;
+    $table_name = $wpdb->prefix . WPGH_FUNNELS;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_funnels_db_version'), WPFN_FUNNELS_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_funnels_db_version'), WPGH_FUNNELS_DB_VERSION, '==' ) )
         return;
 
     $sql = "CREATE TABLE $table_name (
@@ -273,21 +273,21 @@ function wpfn_create_funnels_db()
 
     $wpdb->query( "ALTER TABLE $table_name AUTO_INCREMENT = 2" );
 
-    update_option( 'wpfn_funnels_db_version', WPFN_FUNNELS_DB_VERSION );
+    update_option( 'wpgh_funnels_db_version', WPGH_FUNNELS_DB_VERSION );
 }
 
-define( 'WPFN_FUNNEL_META', 'funnelmeta' );
-define( 'WPFN_FUNNEL_META_DB_VERSION', '0.2' );
+define( 'WPGH_FUNNEL_META', 'funnelmeta' );
+define( 'WPGH_FUNNEL_META_DB_VERSION', '0.2' );
 
-function wpfn_create_funnel_meta_db()
+function wpgh_create_funnel_meta_db()
 {
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_FUNNEL_META;
+    $table_name = $wpdb->prefix . WPGH_FUNNEL_META;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpfn_funnel_meta_db_version'), WPFN_FUNNEL_META_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option('wpgh_funnel_meta_db_version'), WPGH_FUNNEL_META_DB_VERSION, '==' ) )
         return;
 
     $max_index_length = 191;
@@ -305,6 +305,6 @@ function wpfn_create_funnel_meta_db()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $install_query );
 
-    update_option( 'wpfn_funnel_meta_db_version', WPFN_FUNNEL_META_DB_VERSION );
+    update_option( 'wpgh_funnel_meta_db_version', WPGH_FUNNEL_META_DB_VERSION );
 
 }

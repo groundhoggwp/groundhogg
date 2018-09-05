@@ -11,7 +11,7 @@
  * @since       0.1
  */
 
-function wpfn_apply_tag_funnel_step_html( $step_id )
+function wpgh_apply_tag_funnel_step_html( $step_id )
 {
 
     $tag_dropdown_id = $step_id . '_tags';
@@ -23,7 +23,7 @@ function wpfn_apply_tag_funnel_step_html( $step_id )
     $dropdown_args[ 'width' ] = '100%';
     $dropdown_args[ 'class' ] = 'hidden';
 
-    $previously_selected = wpfn_get_step_meta( $step_id, 'tags', true );
+    $previously_selected = wpgh_get_step_meta( $step_id, 'tags', true );
 
     if ( $previously_selected )
         $dropdown_args['selected'] = $previously_selected;
@@ -35,7 +35,7 @@ function wpfn_apply_tag_funnel_step_html( $step_id )
         <tr>
             <th><?php echo esc_html__( 'Select Tags to Apply:', 'groundhogg' ); ?></th>
             <td>
-                <?php wpfn_dropdown_tags( $dropdown_args ); ?>
+                <?php wpgh_dropdown_tags( $dropdown_args ); ?>
                 <p class="description"><?php _e( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ); ?></p>
             </td>
         </tr>
@@ -45,23 +45,23 @@ function wpfn_apply_tag_funnel_step_html( $step_id )
     <?php
 }
 
-add_action( 'wpfn_get_step_settings_apply_tag', 'wpfn_apply_tag_funnel_step_html' );
+add_action( 'wpgh_get_step_settings_apply_tag', 'wpgh_apply_tag_funnel_step_html' );
 
 /**
  * Save the apply tag step
  *
  * @param $step_id int ID of the step we're saving.
  */
-function wpfn_save_apply_tag_step( $step_id )
+function wpgh_save_apply_tag_step( $step_id )
 {
-//    print_r( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] );
+//    print_r( $_POST[ wpgh_prefix_step_meta( $step_id, 'tags' ) ] );
 //    wp_die();
 
     //no need to check the validation as it's already been done buy the main funnel.
-    if ( isset( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] ) ){
-        $tags = wpfn_validate_tags( $_POST[ wpfn_prefix_step_meta( $step_id, 'tags' ) ] );
-        wpfn_update_step_meta( $step_id, 'tags', $tags );
+    if ( isset( $_POST[ wpgh_prefix_step_meta( $step_id, 'tags' ) ] ) ){
+        $tags = wpgh_validate_tags( $_POST[ wpgh_prefix_step_meta( $step_id, 'tags' ) ] );
+        wpgh_update_step_meta( $step_id, 'tags', $tags );
     }
 }
 
-add_action( 'wpfn_save_step_apply_tag', 'wpfn_save_apply_tag_step' );
+add_action( 'wpgh_save_step_apply_tag', 'wpgh_save_apply_tag_step' );

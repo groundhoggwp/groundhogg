@@ -14,7 +14,7 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-do_action( 'wpfn_before_new_funnel' );
+do_action( 'wpgh_before_new_funnel' );
 
 ?>
 <?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'templates'; ?>
@@ -23,7 +23,7 @@ do_action( 'wpfn_before_new_funnel' );
     <a href="?page=gh_funnels&action=add&tab=import" class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Import Funnel', 'groundhogg'); ?></a>
 </h2>
 <!-- search form -->
-<?php do_action('wpfn_add_new_funnel_form_before'); ?>
+<?php do_action('wpgh_add_new_funnel_form_before'); ?>
 
 <?php if ( 'templates' === $active_tab ): ?>
     <form method="post" id="poststuff" >
@@ -60,7 +60,7 @@ do_action( 'wpfn_before_new_funnel' );
         </div>
     </div>
 <?php endif;?>
-<?php do_action('wpfn_add_new_funnel_form_after'); ?>
+<?php do_action('wpgh_add_new_funnel_form_after'); ?>
 <?php
 
 

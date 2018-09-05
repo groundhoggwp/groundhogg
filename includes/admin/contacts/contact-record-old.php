@@ -27,49 +27,49 @@ if ( isset( $_POST['update_contact_nonce'] ) && wp_verify_nonce( $_POST['update_
 		?><div class="notice notice-error"><p>An email is required to update the contact.</p></div><?php
 	} else {
 
-	    do_action( 'wpfn_contact_update_before' );
+	    do_action( 'wpgh_contact_update_before' );
 
 	    $email = sanitize_text_field( $_POST['email'] );
 
-	    wpfn_update_contact_email( $contact_id, $email );
+	    wpgh_update_contact_email( $contact_id, $email );
 
 		$first_name = ( isset($_POST['first_name']) )? sanitize_text_field( $_POST['first_name'] ) : '';
 
-		wpfn_update_contact( $contact_id, 'first_name', $first_name );
+		wpgh_update_contact( $contact_id, 'first_name', $first_name );
 
 		$last_name =  ( isset($_POST['last_name']) )? sanitize_text_field( $_POST['last_name'] ): '';
 
-		wpfn_update_contact( $contact_id, 'last_name', $last_name );
+		wpgh_update_contact( $contact_id, 'last_name', $last_name );
 
 		if ( isset( $_POST['meta'] ) && is_array( $_POST['meta'] ) )
         {
             foreach ( $_POST['meta'] as $key => $value )
             {
-                wpfn_update_contact_meta( $contact_id, $key, $value );
+                wpgh_update_contact_meta( $contact_id, $key, $value );
             }
         }
 
-        do_action( 'wpfn_contact_update_after' );
+        do_action( 'wpgh_contact_update_after' );
 
-		wpfn_log_contact_activity( $contact_id, 'User ' . wp_get_current_user()->user_login . ' Updated Contact Via Admin.')
+		wpgh_log_contact_activity( $contact_id, 'User ' . wp_get_current_user()->user_login . ' Updated Contact Via Admin.')
 
 		?><div class="notice notice-success"><p>Successfully updated contact!</p></div><?php
 
 	}
 }
 
-$contact = new WPFN_Contact( $contact_id );
+$contact = new WPGH_Contact( $contact_id );
 
 ?>
 
 <div class="wrap">
 	<h1><?php printf( '%s', $contact->get_full() ); ?></h1>
-	<?php do_action( 'wpfn_contact_record_before', $contact_id ); ?>
+	<?php do_action( 'wpgh_contact_record_before', $contact_id ); ?>
     <form method="post">
 
         <?php wp_nonce_field('update_contact', 'update_contact_nonce' ); ?>
 
-        <?php do_action( 'wpfn_contact_record_form_before', $contact_id );?>
+        <?php do_action( 'wpgh_contact_record_form_before', $contact_id );?>
 
         <?php
 	    if( isset( $_GET[ 'tab' ] ) ) {
@@ -85,7 +85,7 @@ $contact = new WPFN_Contact( $contact_id );
             <a href="?page=gh_contacts&ID=<?php echo $contact_id; ?>&tab=funnels" class="nav-tab <?php echo $active_tab == 'funnels' ? 'nav-tab-active' : ''; ?>">Funnels</a>
             <a href="?page=gh_contacts&ID=<?php echo $contact_id; ?>&tab=tags" class="nav-tab <?php echo $active_tab == 'tags' ? 'nav-tab-active' : ''; ?>">Tags</a>
             <a href="?page=gh_contacts&ID=<?php echo $contact_id; ?>&tab=orders" class="nav-tab <?php echo $active_tab == 'orders' ? 'nav-tab-active' : ''; ?>">Orders</a>
-            <?php do_action('wpfn_contact_record_tabs_after', $contact_id ); ?>
+            <?php do_action('wpgh_contact_record_tabs_after', $contact_id ); ?>
         </h2>
 
         <?php switch ( $active_tab ):
@@ -94,36 +94,36 @@ $contact = new WPFN_Contact( $contact_id );
 
             <h3><?php echo __( 'General Information', 'groundhogg' ); ?></h3>
 
-            <?php do_action( 'wpfn_contact_record_general_before', $contact_id ); ?>
+            <?php do_action( 'wpgh_contact_record_general_before', $contact_id ); ?>
             <table class="form-table">
                 <tbody>
                     <tr>
                         <th><label for="first_name"><?php echo __( 'First Name', 'groundhogg' )?></label></th>
-                        <td><?php echo wpfn_admin_text_input_field( 'first_name', 'first_name', $contact->get_first() );?></td>
+                        <td><?php echo wpgh_admin_text_input_field( 'first_name', 'first_name', $contact->get_first() );?></td>
                     </tr>
                     <tr>
                         <th><label for="last_name"><?php echo __( 'Last Name', 'groundhogg' )?></label></th>
-                        <td><?php echo wpfn_admin_text_input_field( 'last_name', 'last_name', $contact->get_last() );?></td>
+                        <td><?php echo wpgh_admin_text_input_field( 'last_name', 'last_name', $contact->get_last() );?></td>
                     </tr>
                     <tr>
                         <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
                         <td>
-                            <?php echo wpfn_admin_text_input_field( 'email', 'email', $contact->get_email() );?>
-                            <p><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpfn_get_optin_status_text( $contact->get_optin_status() ); ?></p>
+                            <?php echo wpgh_admin_text_input_field( 'email', 'email', $contact->get_email() );?>
+                            <p><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpgh_get_optin_status_text( $contact->get_optin_status() ); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'groundhogg' )?></label></th>
-                        <td><?php echo wpfn_admin_text_input_field( 'primary_phone', 'meta[primary_phone]', $contact->get_phone() );?></td>
+                        <td><?php echo wpgh_admin_text_input_field( 'primary_phone', 'meta[primary_phone]', $contact->get_phone() );?></td>
                     </tr>
                     <tr>
                         <th><label for="primary_phone_extension"><?php echo __( 'Phone Extension', 'groundhogg' )?></label></th>
-                        <td><?php echo wpfn_admin_text_input_field( 'primary_phone_extension', 'meta[primary_phone_extension]', $contact->get_phone_extension() );?></td>
+                        <td><?php echo wpgh_admin_text_input_field( 'primary_phone_extension', 'meta[primary_phone_extension]', $contact->get_phone_extension() );?></td>
                     </tr>
                 </tbody>
             </table>
 
-            <?php do_action( 'wpfn_contact_record_general_after', $contact_id ); ?>
+            <?php do_action( 'wpgh_contact_record_general_after', $contact_id ); ?>
 
             <?php submit_button( 'Save Changes', 'primary' ); ?>
 
@@ -173,7 +173,7 @@ $contact = new WPFN_Contact( $contact_id );
 
         <?php default: ?>
 
-            <?php do_action( 'wpfn_contact_record_tab_' . $active_tab ); ?>
+            <?php do_action( 'wpgh_contact_record_tab_' . $active_tab ); ?>
 
         <?php break; ?>
 

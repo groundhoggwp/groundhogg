@@ -1,8 +1,8 @@
 (function( $ ) {
 
-    $.fn.wpfnToolBar = function() {
+    $.fn.wpghToolBar = function() {
 
-        var html = '<wpfn-toolbar class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span><hr/><span class="dashicons dashicons-move handle"></span><hr/><span class="dashicons dashicons-trash"></span></div></wpfn-toolbar>';
+        var html = '<wpgh-toolbar class="action-icons"><div style="margin: 5px 3px 5px 3px;"><span class="dashicons dashicons-admin-page"></span><hr/><span class="dashicons dashicons-move handle"></span><hr/><span class="dashicons dashicons-trash"></span></div></wpgh-toolbar>';
 
         this.each(function() {
 
@@ -32,7 +32,7 @@ jQuery(function($) {
             },
             handle: '.handle',
             stop: function (e, ui) {
-                //wpfn_update_funnel_step_order();
+                //wpgh_update_funnel_step_order();
             }
         });
     //emailSortables.disableSelection();
@@ -53,7 +53,7 @@ jQuery(function($) {
                 data : {action: "get_email_block_html", block_type: block_type },
                 success: function( html )
                 {
-                    jQuery('#email-content').find('.replace-me').replaceWith( $( html ).wpfnToolBar() );
+                    jQuery('#email-content').find('.replace-me').replaceWith( $( html ).wpghToolBar() );
                 }
             });
         }
@@ -87,76 +87,76 @@ jQuery(function($) {
 
     }
 
-    $( '.row' ).wpfnToolBar();
+    $( '.row' ).wpghToolBar();
 });
 
-var WPFNEmailEditor = {};
+var WPGHEmailEditor = {};
 
-WPFNEmailEditor.init = function () {
+WPGHEmailEditor.init = function () {
     this.content = jQuery( '#email-body' );
     this.actions = jQuery( '#editor-actions' );
     this.contentInside = jQuery( '#email-inside' );
     this.textarea = jQuery( '#content' );
     this.form = jQuery('form');
-    this.form.on('submit', WPFNEmailEditor.switchContent );
+    this.form.on('submit', WPGHEmailEditor.switchContent );
 };
 
-WPFNEmailEditor.switchContent = function( e ){
+WPGHEmailEditor.switchContent = function( e ){
     e.preventDefault();
     jQuery('.spinner').css('visibility','visible');
     jQuery('.row').removeClass('active');
-    jQuery('wpfn-toolbar').remove();
-    if ( WPFNEmailEditor.richText ){
-        WPFNEmailEditor.richText.simpleEditor().destroy();
+    jQuery('wpgh-toolbar').remove();
+    if ( WPGHEmailEditor.richText ){
+        WPGHEmailEditor.richText.simpleEditor().destroy();
     }
-    WPFNEmailEditor.textarea.val( WPFNEmailEditor.contentInside.html() );
-    WPFNEmailEditor.form.unbind( 'submit' ).submit();
+    WPGHEmailEditor.textarea.val( WPGHEmailEditor.contentInside.html() );
+    WPGHEmailEditor.form.unbind( 'submit' ).submit();
 };
 
-WPFNEmailEditor.getActive = function () {
+WPGHEmailEditor.getActive = function () {
   return this.content.find( '.active' );
 };
 
-WPFNEmailEditor.hideActions = function (){
+WPGHEmailEditor.hideActions = function (){
   this.actions.find( '.postbox' ).addClass( 'hidden' );
 };
 
 // paragraphs
-WPFNEmailEditor.pFont = jQuery( '#p-font' );
-WPFNEmailEditor.pFont.update = function () { WPFNEmailEditor.pFont.val( WPFNEmailEditor.getActive().find('.simple-editor-content').css( 'font-family' ).replace(/"/g, '') );};
-WPFNEmailEditor.pFont.apply = function() { WPFNEmailEditor.getActive().find('.simple-editor-content').css('font-family', WPFNEmailEditor.pFont.val() ) };
-WPFNEmailEditor.pFont.on( 'change', WPFNEmailEditor.pFont.apply );
+WPGHEmailEditor.pFont = jQuery( '#p-font' );
+WPGHEmailEditor.pFont.update = function () { WPGHEmailEditor.pFont.val( WPGHEmailEditor.getActive().find('.simple-editor-content').css( 'font-family' ).replace(/"/g, '') );};
+WPGHEmailEditor.pFont.apply = function() { WPGHEmailEditor.getActive().find('.simple-editor-content').css('font-family', WPGHEmailEditor.pFont.val() ) };
+WPGHEmailEditor.pFont.on( 'change', WPGHEmailEditor.pFont.apply );
 
-WPFNEmailEditor.pSize = jQuery( '#p-size' );
-WPFNEmailEditor.pSize.update = function () {WPFNEmailEditor.pSize.val( WPFNEmailEditor.getActive().find('.simple-editor-content').css( 'font-size' ).replace('px', '') );};
-WPFNEmailEditor.pSize.apply = function() { WPFNEmailEditor.getActive().find('.simple-editor-content').css('font-size', WPFNEmailEditor.pSize.val() + 'px' ) };
-WPFNEmailEditor.pSize.on( 'change', WPFNEmailEditor.pSize.apply );
+WPGHEmailEditor.pSize = jQuery( '#p-size' );
+WPGHEmailEditor.pSize.update = function () {WPGHEmailEditor.pSize.val( WPGHEmailEditor.getActive().find('.simple-editor-content').css( 'font-size' ).replace('px', '') );};
+WPGHEmailEditor.pSize.apply = function() { WPGHEmailEditor.getActive().find('.simple-editor-content').css('font-size', WPGHEmailEditor.pSize.val() + 'px' ) };
+WPGHEmailEditor.pSize.on( 'change', WPGHEmailEditor.pSize.apply );
 
 // h1
-WPFNEmailEditor.h1Font = jQuery( '#h1-font' );
-WPFNEmailEditor.h1Font.apply = function() {WPFNEmailEditor.getActive().find('h1').css('font-family', WPFNEmailEditor.h1Font.val() )};
-WPFNEmailEditor.h1Font.update = function () { try{ WPFNEmailEditor.h1Font.val( WPFNEmailEditor.getActive().find('h1').css( 'font-family' ).replace(/"/g, '') ); } catch (e){}};
-WPFNEmailEditor.h1Font.on( 'change', WPFNEmailEditor.h1Font.apply );
+WPGHEmailEditor.h1Font = jQuery( '#h1-font' );
+WPGHEmailEditor.h1Font.apply = function() {WPGHEmailEditor.getActive().find('h1').css('font-family', WPGHEmailEditor.h1Font.val() )};
+WPGHEmailEditor.h1Font.update = function () { try{ WPGHEmailEditor.h1Font.val( WPGHEmailEditor.getActive().find('h1').css( 'font-family' ).replace(/"/g, '') ); } catch (e){}};
+WPGHEmailEditor.h1Font.on( 'change', WPGHEmailEditor.h1Font.apply );
 
 
-WPFNEmailEditor.h1Size = jQuery( '#h1-size' );
-WPFNEmailEditor.h1Size.apply = function(){ WPFNEmailEditor.getActive().find('h1').css('font-size', WPFNEmailEditor.h1Size.val() + 'px' );};
-WPFNEmailEditor.h1Size.update = function () { try{ WPFNEmailEditor.h1Size.val( WPFNEmailEditor.getActive().find('h1').css( 'font-size' ).replace('px', '') ); } catch (e){}};
-WPFNEmailEditor.h1Size.on( 'change', WPFNEmailEditor.h1Size.apply );
+WPGHEmailEditor.h1Size = jQuery( '#h1-size' );
+WPGHEmailEditor.h1Size.apply = function(){ WPGHEmailEditor.getActive().find('h1').css('font-size', WPGHEmailEditor.h1Size.val() + 'px' );};
+WPGHEmailEditor.h1Size.update = function () { try{ WPGHEmailEditor.h1Size.val( WPGHEmailEditor.getActive().find('h1').css( 'font-size' ).replace('px', '') ); } catch (e){}};
+WPGHEmailEditor.h1Size.on( 'change', WPGHEmailEditor.h1Size.apply );
 
 // h2
-WPFNEmailEditor.h2Font = jQuery( '#h2-font' );
-WPFNEmailEditor.h2Font.apply = function(){ WPFNEmailEditor.getActive().find('h2').css('font-family', WPFNEmailEditor.h2Font.val() ); };
-WPFNEmailEditor.h2Font.update = function () { try{ WPFNEmailEditor.h2Font.val( WPFNEmailEditor.getActive().find('h2').css( 'font-family' ).replace(/"/g, '') );} catch (e){}};
-WPFNEmailEditor.h2Font.on( 'change', WPFNEmailEditor.h2Font.apply );
+WPGHEmailEditor.h2Font = jQuery( '#h2-font' );
+WPGHEmailEditor.h2Font.apply = function(){ WPGHEmailEditor.getActive().find('h2').css('font-family', WPGHEmailEditor.h2Font.val() ); };
+WPGHEmailEditor.h2Font.update = function () { try{ WPGHEmailEditor.h2Font.val( WPGHEmailEditor.getActive().find('h2').css( 'font-family' ).replace(/"/g, '') );} catch (e){}};
+WPGHEmailEditor.h2Font.on( 'change', WPGHEmailEditor.h2Font.apply );
 
-WPFNEmailEditor.h2Size = jQuery( '#h2-size' );
-WPFNEmailEditor.h2Size.apply = function(){ WPFNEmailEditor.getActive().find('h2').css('font-size', WPFNEmailEditor.h2Size.val() + 'px' ); };
-WPFNEmailEditor.h2Size.update = function () { try{ WPFNEmailEditor.h2Size.val( WPFNEmailEditor.getActive().find('h2').css( 'font-size' ).replace('px', '') || 30 ); } catch(e) {}};
-WPFNEmailEditor.h2Size.on( 'change', WPFNEmailEditor.h2Size.apply );
+WPGHEmailEditor.h2Size = jQuery( '#h2-size' );
+WPGHEmailEditor.h2Size.apply = function(){ WPGHEmailEditor.getActive().find('h2').css('font-size', WPGHEmailEditor.h2Size.val() + 'px' ); };
+WPGHEmailEditor.h2Size.update = function () { try{ WPGHEmailEditor.h2Size.val( WPGHEmailEditor.getActive().find('h2').css( 'font-size' ).replace('px', '') || 30 ); } catch(e) {}};
+WPGHEmailEditor.h2Size.on( 'change', WPGHEmailEditor.h2Size.apply );
 
-WPFNEmailEditor.textOptions = jQuery( '#text_block-editor' );
-WPFNEmailEditor.showTextOptions = function () {
+WPGHEmailEditor.textOptions = jQuery( '#text_block-editor' );
+WPGHEmailEditor.showTextOptions = function () {
     this.showOptions( this.textOptions );
 
     this.pFont.update();
@@ -168,31 +168,31 @@ WPFNEmailEditor.showTextOptions = function () {
 };
 
 //buttons
-WPFNEmailEditor.buttonSize = jQuery( '#button-size' );
-WPFNEmailEditor.buttonSize.on( 'change', function(){WPFNEmailEditor.getActive().find('a').css('font-size', WPFNEmailEditor.buttonSize.val() + 'px' );});
-WPFNEmailEditor.buttonSize.update = function () { WPFNEmailEditor.buttonSize.val( WPFNEmailEditor.getActive().find('a').css( 'font-size' ).replace('px', '') );};
+WPGHEmailEditor.buttonSize = jQuery( '#button-size' );
+WPGHEmailEditor.buttonSize.on( 'change', function(){WPGHEmailEditor.getActive().find('a').css('font-size', WPGHEmailEditor.buttonSize.val() + 'px' );});
+WPGHEmailEditor.buttonSize.update = function () { WPGHEmailEditor.buttonSize.val( WPGHEmailEditor.getActive().find('a').css( 'font-size' ).replace('px', '') );};
 
-WPFNEmailEditor.buttonFont = jQuery( '#button-font' );
-WPFNEmailEditor.buttonFont.on( 'change', function( ){WPFNEmailEditor.getActive().find('a').css('font-family', WPFNEmailEditor.buttonFont.val() );});
-WPFNEmailEditor.buttonFont.update = function () { WPFNEmailEditor.buttonFont.val( WPFNEmailEditor.getActive().find('a').css( 'font-family' ).replace(/"/g, '') );};
+WPGHEmailEditor.buttonFont = jQuery( '#button-font' );
+WPGHEmailEditor.buttonFont.on( 'change', function( ){WPGHEmailEditor.getActive().find('a').css('font-family', WPGHEmailEditor.buttonFont.val() );});
+WPGHEmailEditor.buttonFont.update = function () { WPGHEmailEditor.buttonFont.val( WPGHEmailEditor.getActive().find('a').css( 'font-family' ).replace(/"/g, '') );};
 
-WPFNEmailEditor.buttonColor = jQuery( '#button-color' );
-WPFNEmailEditor.buttonColor.wpColorPicker({change: function (event, ui) {WPFNEmailEditor.getActive().find('.email-button').attr('bgcolor', WPFNEmailEditor.buttonColor.val() );}});
+WPGHEmailEditor.buttonColor = jQuery( '#button-color' );
+WPGHEmailEditor.buttonColor.wpColorPicker({change: function (event, ui) {WPGHEmailEditor.getActive().find('.email-button').attr('bgcolor', WPGHEmailEditor.buttonColor.val() );}});
 
-WPFNEmailEditor.buttonTextColor = jQuery( '#button-text-color' );
-WPFNEmailEditor.buttonTextColor.wpColorPicker({change: function (event, ui) {WPFNEmailEditor.getActive().find('a').css('color', WPFNEmailEditor.buttonTextColor.val() );}});
+WPGHEmailEditor.buttonTextColor = jQuery( '#button-text-color' );
+WPGHEmailEditor.buttonTextColor.wpColorPicker({change: function (event, ui) {WPGHEmailEditor.getActive().find('a').css('color', WPGHEmailEditor.buttonTextColor.val() );}});
 
-WPFNEmailEditor.buttonLink = jQuery( '#button-link' );
-WPFNEmailEditor.buttonLink.on( 'change', function( ){WPFNEmailEditor.getActive().find('a').attr('href', WPFNEmailEditor.buttonLink.val() );});
-WPFNEmailEditor.buttonLink.update = function () { WPFNEmailEditor.buttonLink.val( WPFNEmailEditor.getActive().find('a').attr( 'href' ));};
+WPGHEmailEditor.buttonLink = jQuery( '#button-link' );
+WPGHEmailEditor.buttonLink.on( 'change', function( ){WPGHEmailEditor.getActive().find('a').attr('href', WPGHEmailEditor.buttonLink.val() );});
+WPGHEmailEditor.buttonLink.update = function () { WPGHEmailEditor.buttonLink.val( WPGHEmailEditor.getActive().find('a').attr( 'href' ));};
 
-WPFNEmailEditor.buttonText = jQuery( '#button-text' );
-WPFNEmailEditor.buttonText.on( 'change', function( ){WPFNEmailEditor.getActive().find('a').html( WPFNEmailEditor.buttonText.val() );});
-WPFNEmailEditor.buttonText.update = function () { WPFNEmailEditor.buttonText.val( WPFNEmailEditor.getActive().find('a').html());};
+WPGHEmailEditor.buttonText = jQuery( '#button-text' );
+WPGHEmailEditor.buttonText.on( 'change', function( ){WPGHEmailEditor.getActive().find('a').html( WPGHEmailEditor.buttonText.val() );});
+WPGHEmailEditor.buttonText.update = function () { WPGHEmailEditor.buttonText.val( WPGHEmailEditor.getActive().find('a').html());};
 
 
-WPFNEmailEditor.buttonOptions = jQuery( '#button_block-editor' );
-WPFNEmailEditor.showButtonOptions = function() {
+WPGHEmailEditor.buttonOptions = jQuery( '#button_block-editor' );
+WPGHEmailEditor.showButtonOptions = function() {
     this.showOptions( this.buttonOptions );
 
     this.buttonFont.update();
@@ -202,48 +202,48 @@ WPFNEmailEditor.showButtonOptions = function() {
 };
 
 //spacer
-WPFNEmailEditor.spacerSize = jQuery( '#spacer-size' );
-WPFNEmailEditor.spacerSize.on( 'change', function(){WPFNEmailEditor.getActive().find('.spacer').css('height', WPFNEmailEditor.spacerSize.val() + 'px' );});
-WPFNEmailEditor.spacerSize.update = function () { WPFNEmailEditor.spacerSize.val( WPFNEmailEditor.getActive().find('.spacer').height() );};
+WPGHEmailEditor.spacerSize = jQuery( '#spacer-size' );
+WPGHEmailEditor.spacerSize.on( 'change', function(){WPGHEmailEditor.getActive().find('.spacer').css('height', WPGHEmailEditor.spacerSize.val() + 'px' );});
+WPGHEmailEditor.spacerSize.update = function () { WPGHEmailEditor.spacerSize.val( WPGHEmailEditor.getActive().find('.spacer').height() );};
 
 //divider
-WPFNEmailEditor.dividerWidth = jQuery( '#divider-width' );
-WPFNEmailEditor.dividerWidth.on( 'change', function(){WPFNEmailEditor.getActive().find('hr').css('width', WPFNEmailEditor.dividerWidth.val() + '%' );});
-WPFNEmailEditor.dividerWidth.update = function () { WPFNEmailEditor.dividerWidth.val( Math.ceil( ( WPFNEmailEditor.getActive().find('hr').width() / WPFNEmailEditor.getActive().find('hr').closest('div').width() ) * 100 ) );};
+WPGHEmailEditor.dividerWidth = jQuery( '#divider-width' );
+WPGHEmailEditor.dividerWidth.on( 'change', function(){WPGHEmailEditor.getActive().find('hr').css('width', WPGHEmailEditor.dividerWidth.val() + '%' );});
+WPGHEmailEditor.dividerWidth.update = function () { WPGHEmailEditor.dividerWidth.val( Math.ceil( ( WPGHEmailEditor.getActive().find('hr').width() / WPGHEmailEditor.getActive().find('hr').closest('div').width() ) * 100 ) );};
 
-WPFNEmailEditor.dividerOptions = jQuery( '#divider_block-editor' );
-WPFNEmailEditor.showDividerOptions = function() {
+WPGHEmailEditor.dividerOptions = jQuery( '#divider_block-editor' );
+WPGHEmailEditor.showDividerOptions = function() {
     this.showOptions( this.dividerOptions );
     this.dividerWidth.update();
 };
 
 //images
-WPFNEmailEditor.imageSRC = jQuery( '#image-src' );
-WPFNEmailEditor.imageSRC.on( 'change', function(){WPFNEmailEditor.getActive().find('img').attr('src', WPFNEmailEditor.imageSRC.val() );});
-WPFNEmailEditor.imageSRC.update = function () {WPFNEmailEditor.imageSRC.val( WPFNEmailEditor.getActive().find('img').attr('src') );};
+WPGHEmailEditor.imageSRC = jQuery( '#image-src' );
+WPGHEmailEditor.imageSRC.on( 'change', function(){WPGHEmailEditor.getActive().find('img').attr('src', WPGHEmailEditor.imageSRC.val() );});
+WPGHEmailEditor.imageSRC.update = function () {WPGHEmailEditor.imageSRC.val( WPGHEmailEditor.getActive().find('img').attr('src') );};
 
-WPFNEmailEditor.imageLink = jQuery( '#image-link' );
-WPFNEmailEditor.imageLink.on( 'change', function(){WPFNEmailEditor.getActive().find('a').attr('href', WPFNEmailEditor.imageLink.val() );});
-WPFNEmailEditor.imageLink.update = function () {WPFNEmailEditor.imageLink.val( WPFNEmailEditor.getActive().find('a').attr('href') );};
+WPGHEmailEditor.imageLink = jQuery( '#image-link' );
+WPGHEmailEditor.imageLink.on( 'change', function(){WPGHEmailEditor.getActive().find('a').attr('href', WPGHEmailEditor.imageLink.val() );});
+WPGHEmailEditor.imageLink.update = function () {WPGHEmailEditor.imageLink.val( WPGHEmailEditor.getActive().find('a').attr('href') );};
 
-WPFNEmailEditor.imageAltText = jQuery( '#image-alt' );
-WPFNEmailEditor.imageAltText.on( 'change', function(){WPFNEmailEditor.getActive().find('img').attr('alt', WPFNEmailEditor.imageAltText.val() );});
-WPFNEmailEditor.imageAltText.update = function () {WPFNEmailEditor.imageAltText.val( WPFNEmailEditor.getActive().find('img').attr('alt') );};
+WPGHEmailEditor.imageAltText = jQuery( '#image-alt' );
+WPGHEmailEditor.imageAltText.on( 'change', function(){WPGHEmailEditor.getActive().find('img').attr('alt', WPGHEmailEditor.imageAltText.val() );});
+WPGHEmailEditor.imageAltText.update = function () {WPGHEmailEditor.imageAltText.val( WPGHEmailEditor.getActive().find('img').attr('alt') );};
 
-WPFNEmailEditor.imageTitle = jQuery( '#image-title' );
-WPFNEmailEditor.imageTitle.on( 'change', function( ){WPFNEmailEditor.getActive().find('img').attr('title', WPFNEmailEditor.imageTitle.val() );});
-WPFNEmailEditor.imageTitle.update = function () {WPFNEmailEditor.imageTitle.val( WPFNEmailEditor.getActive().find('img').attr('title') );};
+WPGHEmailEditor.imageTitle = jQuery( '#image-title' );
+WPGHEmailEditor.imageTitle.on( 'change', function( ){WPGHEmailEditor.getActive().find('img').attr('title', WPGHEmailEditor.imageTitle.val() );});
+WPGHEmailEditor.imageTitle.update = function () {WPGHEmailEditor.imageTitle.val( WPGHEmailEditor.getActive().find('img').attr('title') );};
 
-WPFNEmailEditor.imageWidth = jQuery( '#image-width' );
-WPFNEmailEditor.imageWidth.on( 'change', function( ){WPFNEmailEditor.getActive().find('img').css('width', WPFNEmailEditor.imageWidth.val() + '%' );});
-WPFNEmailEditor.imageWidth.update = function () { WPFNEmailEditor.imageWidth.val( Math.ceil( ( WPFNEmailEditor.getActive().find('img').width() / WPFNEmailEditor.getActive().find('img').closest('div').width() ) * 100 ) );};
+WPGHEmailEditor.imageWidth = jQuery( '#image-width' );
+WPGHEmailEditor.imageWidth.on( 'change', function( ){WPGHEmailEditor.getActive().find('img').css('width', WPGHEmailEditor.imageWidth.val() + '%' );});
+WPGHEmailEditor.imageWidth.update = function () { WPGHEmailEditor.imageWidth.val( Math.ceil( ( WPGHEmailEditor.getActive().find('img').width() / WPGHEmailEditor.getActive().find('img').closest('div').width() ) * 100 ) );};
 
-WPFNEmailEditor.imageAlignment = jQuery( '#image-align' );
-WPFNEmailEditor.imageAlignment.on( 'change', function( ){WPFNEmailEditor.getActive().find('.image-wrapper').css('text-align', WPFNEmailEditor.imageAlignment.val() );});
-WPFNEmailEditor.imageAlignment.update = function () {WPFNEmailEditor.imageAlignment.val( WPFNEmailEditor.getActive().find('.image-wrapper').css('text-align') );};
+WPGHEmailEditor.imageAlignment = jQuery( '#image-align' );
+WPGHEmailEditor.imageAlignment.on( 'change', function( ){WPGHEmailEditor.getActive().find('.image-wrapper').css('text-align', WPGHEmailEditor.imageAlignment.val() );});
+WPGHEmailEditor.imageAlignment.update = function () {WPGHEmailEditor.imageAlignment.val( WPGHEmailEditor.getActive().find('.image-wrapper').css('text-align') );};
 
-WPFNEmailEditor.imageOptions = jQuery( '#image_block-editor' );
-WPFNEmailEditor.showImageOptions = function() {
+WPGHEmailEditor.imageOptions = jQuery( '#image_block-editor' );
+WPGHEmailEditor.showImageOptions = function() {
     this.showOptions( this.imageOptions );
 
     this.imageSRC.update();
@@ -254,26 +254,26 @@ WPFNEmailEditor.showImageOptions = function() {
     this.imageTitle.update();
 };
 
-WPFNEmailEditor.htmlContent = jQuery( '#custom-html-content' );
-WPFNEmailEditor.htmlContent.on( 'change', function( ){WPFNEmailEditor.getActive().find('.content-inside').html( WPFNEmailEditor.htmlContent.val().trim() );});
-WPFNEmailEditor.htmlContent.update = function () {WPFNEmailEditor.htmlContent.val( WPFNEmailEditor.getActive().find('.content-inside').html().trim() );};
+WPGHEmailEditor.htmlContent = jQuery( '#custom-html-content' );
+WPGHEmailEditor.htmlContent.on( 'change', function( ){WPGHEmailEditor.getActive().find('.content-inside').html( WPGHEmailEditor.htmlContent.val().trim() );});
+WPGHEmailEditor.htmlContent.update = function () {WPGHEmailEditor.htmlContent.val( WPGHEmailEditor.getActive().find('.content-inside').html().trim() );};
 
-WPFNEmailEditor.codeOptions = jQuery( '#code_block-editor' );
-WPFNEmailEditor.showCodeOptions = function() {
+WPGHEmailEditor.codeOptions = jQuery( '#code_block-editor' );
+WPGHEmailEditor.showCodeOptions = function() {
     this.showOptions( this.codeOptions );
     this.htmlContent.update();
 };
 
-WPFNEmailEditor.spacerOptions = jQuery( '#spacer_block-editor' );
-WPFNEmailEditor.showSpacerOptions = function() {
+WPGHEmailEditor.spacerOptions = jQuery( '#spacer_block-editor' );
+WPGHEmailEditor.showSpacerOptions = function() {
     this.showOptions( this.spacerOptions );
 
     this.spacerSize.update();
 };
 
 
-WPFNEmailEditor.emailAlignment = jQuery( '#email-align' );
-WPFNEmailEditor.emailAlignment.apply = function(){
+WPGHEmailEditor.emailAlignment = jQuery( '#email-align' );
+WPGHEmailEditor.emailAlignment.apply = function(){
 
     if ( jQuery( this ).val() === 'left' ){
         jQuery( '#email-inside' ).css( 'margin-left', '0' );
@@ -284,20 +284,20 @@ WPFNEmailEditor.emailAlignment.apply = function(){
     }
 
 };
-WPFNEmailEditor.emailAlignment.change( WPFNEmailEditor.emailAlignment.apply );
+WPGHEmailEditor.emailAlignment.change( WPGHEmailEditor.emailAlignment.apply );
 
 
-WPFNEmailEditor.emailOptions = jQuery( '#email-editor' );
-WPFNEmailEditor.showEmailOptions = function () {
+WPGHEmailEditor.emailOptions = jQuery( '#email-editor' );
+WPGHEmailEditor.showEmailOptions = function () {
     this.showOptions( this.emailOptions );
 };
 
-WPFNEmailEditor.showOptions = function( el ){
+WPGHEmailEditor.showOptions = function( el ){
     this.actions.find( '.postbox' ).addClass( 'hidden' );
     el.removeClass( 'hidden' );
 };
 
-WPFNEmailEditor.makeActive = function ( el ) {
+WPGHEmailEditor.makeActive = function ( el ) {
     if ( el.closest('#email-body').length ){
         jQuery('.row').removeClass("active");
     }
@@ -306,23 +306,23 @@ WPFNEmailEditor.makeActive = function ( el ) {
     this.active = el.closest('.row');
 };
 
-WPFNEmailEditor.richText = null;
-WPFNEmailEditor.active = null;
+WPGHEmailEditor.richText = null;
+WPGHEmailEditor.active = null;
 
-WPFNEmailEditor.action = function( e )
+WPGHEmailEditor.action = function( e )
 {
     e.preventDefault();
 
-    WPFNEmailEditor.active = el;
+    WPGHEmailEditor.active = el;
 
     var el = jQuery(e.target);
 
     if ( el.hasClass('dashicons-trash') ){
         el.closest('.row').remove();
-        WPFNEmailEditor.showEmailOptions();
+        WPGHEmailEditor.showEmailOptions();
 
     } else if ( el.hasClass('dashicons-admin-page') ){
-        WPFNEmailEditor.richText.simpleEditor().destroy();
+        WPGHEmailEditor.richText.simpleEditor().destroy();
         el.closest('.row').removeClass('active');
         el.closest('.row').clone().insertAfter( el.closest('.row') );
     } else {
@@ -330,54 +330,54 @@ WPFNEmailEditor.action = function( e )
         if ( el.closest('.row').hasClass('active') )
             return true;
 
-        WPFNEmailEditor.makeActive( el );
+        WPGHEmailEditor.makeActive( el );
 
-        if ( WPFNEmailEditor.richText ){
-            WPFNEmailEditor.richText.simpleEditor().destroy();
+        if ( WPGHEmailEditor.richText ){
+            WPGHEmailEditor.richText.simpleEditor().destroy();
         }
 
         if ( el.closest( '.text_block' ).length ){
 
-            WPFNEmailEditor.richText = el.closest('.content-wrapper');
+            WPGHEmailEditor.richText = el.closest('.content-wrapper');
 
-            WPFNEmailEditor.richText.simpleEditor({
+            WPGHEmailEditor.richText.simpleEditor({
                 defaultParagraphSeparator: 'p',
                 actions: ["heading1", "heading2", "paragraph", "bold", "italic",  "underline", "color", "strikethrough", "alignLeft", "alignCenter", "alignRight", "olist", "ulist","link", "unlink"]
             });
 
-            WPFNEmailEditor.showTextOptions();
+            WPGHEmailEditor.showTextOptions();
 
         } else if ( el.closest( '.button_block' ).length ){
 
-            WPFNEmailEditor.showButtonOptions();
+            WPGHEmailEditor.showButtonOptions();
 
         } else if ( el.closest( '.spacer_block' ).length ){
 
-            WPFNEmailEditor.showSpacerOptions();
+            WPGHEmailEditor.showSpacerOptions();
 
         } else if ( el.closest( '.image_block' ).length ){
 
-            WPFNEmailEditor.showImageOptions();
+            WPGHEmailEditor.showImageOptions();
 
         } else if ( el.closest( '.divider_block' ).length ){
 
-            WPFNEmailEditor.showDividerOptions();
+            WPGHEmailEditor.showDividerOptions();
 
         } else if ( el.closest( '.code_block' ).length ){
 
-            WPFNEmailEditor.showCodeOptions();
+            WPGHEmailEditor.showCodeOptions();
 
         } else if ( el.closest( '#editor' ).length ) {
 
             jQuery('.row').removeClass('active');
 
-            WPFNEmailEditor.showEmailOptions();
+            WPGHEmailEditor.showEmailOptions();
 
         }
     }
 };
 
 jQuery(function() {
-    WPFNEmailEditor.init();
-    WPFNEmailEditor.content.on("click", WPFNEmailEditor.action );
+    WPGHEmailEditor.init();
+    WPGHEmailEditor.content.on("click", WPGHEmailEditor.action );
 });

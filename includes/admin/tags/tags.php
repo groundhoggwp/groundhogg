@@ -15,7 +15,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-class WPFN_Tags_Page
+class WPGH_Tags_Page
 {
 	function __construct()
 	{
@@ -112,7 +112,7 @@ class WPFN_Tags_Page
 
 				if ( isset( $_POST ) )
 				{
-					do_action( 'wpfn_add_tag' );
+					do_action( 'wpgh_add_tag' );
 				}
 
 				break;
@@ -120,17 +120,17 @@ class WPFN_Tags_Page
 			case 'delete':
 
 				foreach ( $this->get_tags() as $id ){
-					wpfn_delete_tag( $id );
+					wpgh_delete_tag( $id );
 				}
 
-				do_action( 'wpfn_delete_tags' );
+				do_action( 'wpgh_delete_tags' );
 
 				break;
 
 			case 'edit':
 
 				if ( isset( $_POST ) ){
-					do_action( 'wpfn_update_tag', intval( $_GET[ 'tag' ] ) );
+					do_action( 'wpgh_update_tag', intval( $_GET[ 'tag' ] ) );
 				}
 
 				break;
@@ -160,11 +160,11 @@ class WPFN_Tags_Page
 
 	function table()
 	{
-		if ( ! class_exists( 'WPFN_Tags_Table' ) ){
+		if ( ! class_exists( 'WPGH_Tags_Table' ) ){
 			include dirname( __FILE__ ) . '/class-tags-table.php';
 		}
 
-		$tags_table = new WPFN_Tags_Table(); ?>
+		$tags_table = new WPGH_Tags_Table(); ?>
         <form method="get" class="search-form wp-clearfix">
             <!-- search form -->
             <p class="search-box">

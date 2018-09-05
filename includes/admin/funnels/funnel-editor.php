@@ -22,25 +22,25 @@ wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 wp_enqueue_script( 'jquery-ui-datepicker' );
 wp_enqueue_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
-wp_enqueue_script( 'link-picker', WPFN_ASSETS_FOLDER . '/js/admin/link-picker.js' );
-//wp_enqueue_script( 'sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-admin-sidebar.js' );
-wp_enqueue_script( 'sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-sidebar/sticky-sidebar.js' );
-wp_enqueue_script( 'jquery-sticky-sidebar', WPFN_ASSETS_FOLDER . '/js/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
-wp_enqueue_script( 'funnel-editor', WPFN_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
-wp_enqueue_style( 'funnel-editor', WPFN_ASSETS_FOLDER . '/css/admin/funnel-editor.css' );
+wp_enqueue_script( 'link-picker', WPGH_ASSETS_FOLDER . '/js/admin/link-picker.js' );
+//wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/js/lib/sticky-admin-sidebar.js' );
+wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/js/lib/sticky-sidebar/sticky-sidebar.js' );
+wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/js/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
+wp_enqueue_script( 'funnel-editor', WPGH_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
+wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css' );
 
-do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
+do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
 
 ?>
 <form method="post">
     <?php wp_nonce_field(); ?>
-    <div id='poststuff' class="wpfn-funnel-builder" style="overflow: hidden">
+    <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
             <div id="post-body-content">
                 <div id="titlediv">
                     <div id="titlewrap">
                         <label class="screen-reader-text" id="title-prompt-text" for="title"><?php echo __('Enter Funnel Name Here', 'groundhogg');?></label>
-                        <input placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo wpfn_get_funnel_name( $funnel_id ); ?>" id="title" spellcheck="true" autocomplete="off">
+                        <input placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo wpgh_get_funnel_name( $funnel_id ); ?>" id="title" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
                 <div class="postbox">
@@ -109,7 +109,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                     <div class="inside">
                         <div class="submitbox">
                             <div id="minor-publishing-actions">
-                                <?php do_action( 'wpfn_funnel_status_before' ); ?>
+                                <?php do_action( 'wpgh_funnel_status_before' ); ?>
                                 <table class="form-table">
                                     <tbody>
                                     <tr>
@@ -121,9 +121,9 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                     <tr>
                                         <th><label for="funnel_status"><?php echo __( 'Status', 'groundhogg' );?></label></th>
                                         <td>
-                                            <input type="hidden" name="funnel_status" id="funnel-status" value="<?php echo wpfn_get_funnel_status( $funnel_id );?> ">
+                                            <input type="hidden" name="funnel_status" id="funnel-status" value="<?php echo wpgh_get_funnel_status( $funnel_id );?> ">
                                             <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
-                                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="status-toggle" <?php if ( wpfn_get_funnel_status( $funnel_id ) == 'active' ) echo 'checked'; ?>>
+                                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="status-toggle" <?php if ( wpgh_get_funnel_status( $funnel_id ) == 'active' ) echo 'checked'; ?>>
                                                 <label class="onoffswitch-label" for="status-toggle">
                                                     <span class="onoffswitch-inner"></span>
                                                     <span class="onoffswitch-switch"></span>
@@ -133,7 +133,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                     </tr>
                                     </tbody>
                                 </table>
-                                <?php do_action( 'wpfn_funnel_status_after' ); ?>
+                                <?php do_action( 'wpgh_funnel_status_after' ); ?>
                                 <div style="text-align: left" id="confirm" class="hidden">
                                     <p>
                                         <label for="confirm-inactive"><input type="checkbox" value="yes" id="confirm-inactive" name="confirm"><?php _e('Are you sure? Setting the status to inactive will stop any automation present or future from happening.', 'groundhogg' ); ?></label></td>
@@ -169,10 +169,10 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                 <div id='benchmarks' class="postbox">
                     <h3 class="hndle"><?php echo __( 'Benchmarks', 'groundhogg' );?></h3>
                     <div class="elements-inner inside">
-                        <?php do_action( 'wpfn_benchmark_icons_before' ); ?>
+                        <?php do_action( 'wpgh_benchmark_icons_before' ); ?>
                         <table>
                             <tbody>
-                            <?php $elements = wpfn_get_funnel_benchmarks();
+                            <?php $elements = wpgh_get_funnel_benchmarks();
 
                             $i = 0;
 
@@ -184,7 +184,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                     ?></tr><tr><?php
                                 endif;
 
-                                ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
+                                ?><td><div id='<?php echo $element; ?>' class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
 
                                 $i++;
 
@@ -195,7 +195,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                 ?>
                             </tbody>
                         </table>
-                        <?php do_action( 'wpfn_benchmark_icons_after' ); ?>
+                        <?php do_action( 'wpgh_benchmark_icons_after' ); ?>
                         <p>
                             <?php echo esc_html__( 'Benchmarks start and stop automation actions for a contact.','groundhogg' ); ?>
                         </p>
@@ -206,10 +206,10 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                 <div id='actions' class="postbox">
                     <h2 class="hndle"><?php echo __( 'Actions', 'groundhogg' );?></h2>
                     <div class="inside">
-                        <?php do_action( 'wpfn_action_icons_before' ); ?>
+                        <?php do_action( 'wpgh_action_icons_before' ); ?>
                         <table>
                             <tbody>
-                            <?php $elements = wpfn_get_funnel_actions();
+                            <?php $elements = wpgh_get_funnel_actions();
 
                             $i = 0;
 
@@ -221,7 +221,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                 ?></tr><tr><?php
                                 endif;
 
-                                ?><td><div id='<?php echo $element; ?>' class="wpfn-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
+                                ?><td><div id='<?php echo $element; ?>' class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
 
                                 $i++;
 
@@ -232,7 +232,7 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                                 ?>
                             </tbody>
                         </table>
-                        <?php do_action( 'wpfn_action_icons_after' ); ?>
+                        <?php do_action( 'wpgh_action_icons_after' ); ?>
 
                         <p>
                             <?php echo esc_html__( 'Actions are launched whenever a contact completes a benchmark.','groundhogg' ); ?>
@@ -246,9 +246,9 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
             <!-- main funnel editing area -->
             <div  id="postbox-container-2" class="postbox-container funnel-editor">
                 <div style="visibility: hidden" id="normal-sortables" class="meta-box-sortables ui-sortable">
-                    <?php do_action('wpfn_funnel_steps_before' ); ?>
+                    <?php do_action('wpgh_funnel_steps_before' ); ?>
 
-                    <?php $steps = wpfn_get_funnel_steps( $funnel_id );
+                    <?php $steps = wpgh_get_funnel_steps( $funnel_id );
 
                     if ( empty( $steps ) ): ?>
                         <div class="">
@@ -256,18 +256,18 @@ do_action( 'wpfn_funnel_editor_before_everything', $funnel_id );
                         </div>
                     <?php else:
 
-                        if ( wpfn_get_step_group( $steps[0] ) !== 'benchmark' ){
+                        if ( wpgh_get_step_group( $steps[0] ) !== 'benchmark' ){
                             ?>
                             <div class="notice notice-error is-dismissible"><p>Funnels should start with benchmarks, otherwise actions cannot be triggered. Please use a benchmark to trigger automation.</p></div>
                             <?php
                         }
 
                         foreach ( $steps as $i => $step_id ):
-                            wpfn_get_step_html( $step_id );
+                            wpgh_get_step_html( $step_id );
                         endforeach;
 
                     endif; ?>
-                    <?php do_action('wpfn_funnel_steps_after' ); ?>
+                    <?php do_action('wpgh_funnel_steps_after' ); ?>
                 </div>
             </div>
             <script>

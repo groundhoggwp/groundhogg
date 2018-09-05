@@ -23,12 +23,12 @@
  * @param $send_at int the time to send
  * @return bool|int false on failure or the id of the new broadcast
  */
-function wpfn_insert_broadcast( $email_id, $tags, $send_at )
+function wpgh_insert_broadcast( $email_id, $tags, $send_at )
 {
     global $wpdb;
 
     $success = $wpdb->insert(
-        $wpdb->prefix . WPFN_BROADCASTS,
+        $wpdb->prefix . WPGH_BROADCASTS,
         array(
             'email_id' => $email_id,
             'from_user' => get_current_user_id(),
@@ -55,7 +55,7 @@ function wpfn_insert_broadcast( $email_id, $tags, $send_at )
  *
  * @return false|int contact ID in success, false on failure
  */
-function wpfn_update_broadcast( $id, $key, $value )
+function wpgh_update_broadcast( $id, $key, $value )
 {
     global $wpdb;
 
@@ -66,10 +66,10 @@ function wpfn_update_broadcast( $id, $key, $value )
     if ( ! $id )
         return false;
 
-    do_action( 'wpfn_update_broadcast_before', $id );
+    do_action( 'wpgh_update_broadcast_before', $id );
 
     return $wpdb->update(
-        $wpdb->prefix . WPFN_BROADCASTS,
+        $wpdb->prefix . WPGH_BROADCASTS,
         array(
             $key => $value
         ),
@@ -87,7 +87,7 @@ function wpfn_update_broadcast( $id, $key, $value )
  * @param $id int ID of the broadcast
  * @return array|false the broadcast or false on failure.
  */
-function wpfn_get_broadcast_by_id( $id )
+function wpgh_get_broadcast_by_id( $id )
 {
     global $wpdb;
 
@@ -98,7 +98,7 @@ function wpfn_get_broadcast_by_id( $id )
     if ( ! $id )
         return false;
 
-    $table_name = $wpdb->prefix . WPFN_BROADCASTS;
+    $table_name = $wpdb->prefix . WPGH_BROADCASTS;
 
     $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE ID = %d", $id);
     $broadcast = $wpdb->get_row( $sql_prep1, ARRAY_A );
@@ -116,11 +116,11 @@ function wpfn_get_broadcast_by_id( $id )
  * @param $clause string the value
  * @return int the count of items
  */
-function wpfn_count_broadcast_items( $where='', $clause='' )
+function wpgh_count_broadcast_items( $where='', $clause='' )
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . WPFN_BROADCASTS;
+    $table_name = $wpdb->prefix . WPGH_BROADCASTS;
 
     if ( $where && $clause ){
         return (int) $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE $where LIKE %s", $clause ) );
@@ -129,22 +129,22 @@ function wpfn_count_broadcast_items( $where='', $clause='' )
     }
 }
 
-define( 'WPFN_BROADCASTS', 'broadcasts' );
-define( 'WPFN_BROADCASTS_DB_VERSION', '0.1' );
+define( 'WPGH_BROADCASTS', 'broadcasts' );
+define( 'WPGH_BROADCASTS_DB_VERSION', '0.1' );
 
 /**
  * Create the broadcasts database table.
  */
-function wpfn_create_broadcasts_db()
+function wpgh_create_broadcasts_db()
 {
 
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $table_name = $wpdb->prefix . WPFN_BROADCASTS;
+    $table_name = $wpdb->prefix . WPGH_BROADCASTS;
 
-    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option( 'wpfn_broadcasts_db_version' ), WPFN_EMAILS_DB_VERSION, '==' ) )
+    if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name && version_compare( get_option( 'wpgh_broadcasts_db_version' ), WPGH_EMAILS_DB_VERSION, '==' ) )
         return;
 
     $sql = "CREATE TABLE $table_name (
@@ -161,5 +161,5 @@ function wpfn_create_broadcasts_db()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta( $sql );
 
-    update_option( 'wpfn_broadcasts_db_version', WPFN_EMAILS_DB_VERSION );
+    update_option( 'wpgh_broadcasts_db_version', WPGH_EMAILS_DB_VERSION );
 }

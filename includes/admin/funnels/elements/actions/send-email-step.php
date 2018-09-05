@@ -16,7 +16,7 @@
  *
  * @param $step_id
  */
-function wpfn_send_email_funnel_step_html( $step_id )
+function wpgh_send_email_funnel_step_html( $step_id )
 {
 
     $email_dropdown_id = $step_id . '_email_id';
@@ -27,12 +27,12 @@ function wpfn_send_email_funnel_step_html( $step_id )
     $dropdown_args[ 'name' ] = $email_dropdown_name;
     $dropdown_args[ 'class' ] = 'hidden';
 
-    $previously_selected = intval( wpfn_get_step_meta( $step_id, 'email_id', true ) );
+    $previously_selected = intval( wpgh_get_step_meta( $step_id, 'email_id', true ) );
 
     if ( $previously_selected )
         $dropdown_args['selected'] = $previously_selected;
 
-    $return_funnel = wpfn_get_step_funnel( $step_id );
+    $return_funnel = wpgh_get_step_funnel( $step_id );
 
     $editPath = admin_url( 'admin.php?page=gh_emails&action=edit&return_funnel=' . $return_funnel . '&return_step=' . $step_id . '&email=' );
 
@@ -43,11 +43,11 @@ function wpfn_send_email_funnel_step_html( $step_id )
             <tr>
                 <th><?php echo esc_html__( 'Select an email to send:', 'groundhogg' ); ?></th>
                 <td>
-                    <?php wpfn_dropdown_emails( $dropdown_args ); ?>
+                    <?php wpgh_dropdown_emails( $dropdown_args ); ?>
                     <div class="row-actions">
-                        <a class="editinline" id="<?php echo wpfn_prefix_step_meta( $step_id, 'edit_email' ); ?>" target="_blank" href="<?php echo $editPath . $previously_selected;?>"><?php esc_html_e( 'Edit Email', 'groundhogg' );?></a> | <a href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add&step=' . $step_id );?>"><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>
+                        <a class="editinline" id="<?php echo wpgh_prefix_step_meta( $step_id, 'edit_email' ); ?>" target="_blank" href="<?php echo $editPath . $previously_selected;?>"><?php esc_html_e( 'Edit Email', 'groundhogg' );?></a> | <a href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add&step=' . $step_id );?>"><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>
                     </div>
-                    <script>jQuery(function($){$('#<?php echo $email_dropdown_id;?>').change(function(){$('#<?php echo wpfn_prefix_step_meta( $step_id, 'edit_email' ); ?>').attr('href', '<?php echo $editPath ?>' + $(this).val())})});</script>
+                    <script>jQuery(function($){$('#<?php echo $email_dropdown_id;?>').change(function(){$('#<?php echo wpgh_prefix_step_meta( $step_id, 'edit_email' ); ?>').attr('href', '<?php echo $editPath ?>' + $(this).val())})});</script>
                 </td>
             </tr>
         </tbody>
@@ -56,32 +56,32 @@ function wpfn_send_email_funnel_step_html( $step_id )
     <?php
 }
 
-add_action( 'wpfn_get_step_settings_send_email', 'wpfn_send_email_funnel_step_html' );
+add_action( 'wpgh_get_step_settings_send_email', 'wpgh_send_email_funnel_step_html' );
 
 /**
  * Save the email type step
  *
  * @param $step_id int ID of the step we're saving.
  */
-function wpfn_save_send_email_step( $step_id )
+function wpgh_save_send_email_step( $step_id )
 {
     //no need to check the validation as it's already been done buy the main funnel.
-    $email_id = intval( $_POST[ wpfn_prefix_step_meta( $step_id, 'email_id' ) ] );
-    wpfn_update_step_meta( $step_id, 'email_id', $email_id );
+    $email_id = intval( $_POST[ wpgh_prefix_step_meta( $step_id, 'email_id' ) ] );
+    wpgh_update_step_meta( $step_id, 'email_id', $email_id );
 }
 
-add_action( 'wpfn_save_step_send_email', 'wpfn_save_send_email_step' );
+add_action( 'wpgh_save_step_send_email', 'wpgh_save_send_email_step' );
 
 
-function wpfn_send_email_reporting( $step_id, $start, $end )
+function wpgh_send_email_reporting( $step_id, $start, $end )
 {
 
-    $funnel = wpfn_get_step_funnel( $step_id );
-    $email = wpfn_get_step_meta( $step_id, 'email_id', true );
+    $funnel = wpgh_get_step_funnel( $step_id );
+    $email = wpgh_get_step_meta( $step_id, 'email_id', true );
 
     global $wpdb;
 
-    $table = $wpdb->prefix . WPFN_ACTIVITY;
+    $table = $wpdb->prefix . WPGH_ACTIVITY;
 
     $opens = $wpdb->get_var( $wpdb->prepare(
         "SELECT count(*) FROM $table
@@ -104,4 +104,4 @@ function wpfn_send_email_reporting( $step_id, $start, $end )
 
 }
 
-add_action( 'wpfn_get_step_report_send_email', 'wpfn_send_email_reporting', 10, 3 );
+add_action( 'wpgh_get_step_report_send_email', 'wpgh_send_email_reporting', 10, 3 );

@@ -15,7 +15,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-class WPFN_Superlinks_Page
+class WPGH_Superlinks_Page
 {
 	function __construct()
 	{
@@ -112,7 +112,7 @@ class WPFN_Superlinks_Page
 
 				if ( isset( $_POST ) )
 				{
-					do_action( 'wpfn_add_superlink' );
+					do_action( 'wpgh_add_superlink' );
 				}
 				
 				break;
@@ -120,17 +120,17 @@ class WPFN_Superlinks_Page
 			case 'delete':
 
 				foreach ( $this->get_superlinks() as $id ){
-					wpfn_delete_superlink( $id );
+					wpgh_delete_superlink( $id );
 				}
 
-				do_action( 'wpfn_delete_superlinks' );
+				do_action( 'wpgh_delete_superlinks' );
 
 				break;
 				
 			case 'edit':
 
 				if ( isset( $_POST ) ){
-					do_action( 'wpfn_update_superlink', intval( $_GET[ 'superlink' ] ) );
+					do_action( 'wpgh_update_superlink', intval( $_GET[ 'superlink' ] ) );
 				}
 
 				break;
@@ -158,11 +158,11 @@ class WPFN_Superlinks_Page
 
 	function table()
 	{
-		if ( ! class_exists( 'WPFN_Superlinks_Table' ) ){
+		if ( ! class_exists( 'WPGH_Superlinks_Table' ) ){
 			include dirname( __FILE__ ) . '/class-superlinks-table.php';
 		}
 
-		$superlinks_table = new WPFN_Superlinks_Table(); ?>
+		$superlinks_table = new WPGH_Superlinks_Table(); ?>
         <form method="get" class="search-form wp-clearfix">
         <!-- search form -->
             <p class="search-box">
@@ -201,7 +201,7 @@ class WPFN_Superlinks_Page
                                 $tag_args[ 'name' ] = 'superlink_tags[]';
                                 $tag_args[ 'width' ] = '100%';
                                 $tag_args[ 'class' ] = 'hidden'; ?>
-                                <?php wpfn_dropdown_tags( $tag_args ); ?>
+                                <?php wpgh_dropdown_tags( $tag_args ); ?>
                                 <p><?php _e( 'These tags will be applied to a contact whenever this link is clicked. To create a new tag hit [enter] or [comma]', 'groundhogg' ); ?></p>
                             </div>
                             <?php submit_button( __( 'Add New Superlink', 'groundhogg' ), 'primary', 'add_superlink' ); ?>
@@ -232,7 +232,7 @@ class WPFN_Superlinks_Page
 		wp_enqueue_editor();
 		wp_enqueue_script('wplink');
 		wp_enqueue_style('editor-buttons');
-		wp_enqueue_script( 'link-picker', WPFN_ASSETS_FOLDER . '/js/admin/link-picker.js' );
+		wp_enqueue_script( 'link-picker', WPGH_ASSETS_FOLDER . '/js/admin/link-picker.js' );
 		
 		?>
         <div class="wrap">

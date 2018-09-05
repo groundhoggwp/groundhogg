@@ -16,7 +16,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-class WPFN_Contacts_Page
+class WPGH_Contacts_Page
 {
     function __construct()
     {
@@ -123,27 +123,27 @@ class WPFN_Contacts_Page
 
                 if ( isset( $_POST ) )
                 {
-                    do_action( 'wpfn_add_contact' );
+                    do_action( 'wpgh_add_contact' );
                 }
                 break;
 
             case 'trash':
 
                 foreach ( $this->get_contacts() as $id ) {
-                    wpfn_update_contact($id, 'contact_status', 'trash');
+                    wpgh_update_contact($id, 'contact_status', 'trash');
                 }
 
-                do_action( 'wpfn_trash_contacts' );
+                do_action( 'wpgh_trash_contacts' );
 
                 break;
 
             case 'delete':
 
                 foreach ( $this->get_contacts() as $id ){
-                    wpfn_delete_contact( $id );
+                    wpgh_delete_contact( $id );
                 }
 
-                do_action( 'wpfn_delete_contacts' );
+                do_action( 'wpgh_delete_contacts' );
 
                 break;
 
@@ -151,17 +151,17 @@ class WPFN_Contacts_Page
 
                 foreach ( $this->get_contacts() as $id )
                 {
-                    wpfn_update_contact( $id, 'contact_status', 'draft' );
+                    wpgh_update_contact( $id, 'contact_status', 'draft' );
                 }
 
-                do_action( 'wpfn_restore_contacts' );
+                do_action( 'wpgh_restore_contacts' );
 
                 break;
 
             case 'edit':
 
                 if ( isset( $_POST ) ){
-                    do_action( 'wpfn_update_contact', intval( $_GET[ 'contact' ] ) );
+                    do_action( 'wpgh_update_contact', intval( $_GET[ 'contact' ] ) );
                 }
 
                 break;
@@ -189,11 +189,11 @@ class WPFN_Contacts_Page
 
     function table()
     {
-        if ( ! class_exists( 'WPFN_Contacts_Table' ) ){
+        if ( ! class_exists( 'WPGH_Contacts_Table' ) ){
             include dirname( __FILE__ ) . '/class-contacts-table.php';
         }
 
-        $contacts_table = new WPFN_Contacts_Table();
+        $contacts_table = new WPGH_Contacts_Table();
 
         $contacts_table->views(); ?>
         <form method="post" class="search-form wp-clearfix" >

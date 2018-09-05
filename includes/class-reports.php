@@ -14,7 +14,7 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPFN_Report
+class WPGH_Report
 {
 
     /**

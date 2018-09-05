@@ -5,7 +5,7 @@
  *
  * @return bool, whether it's enable or not.
  */
-function wpfn_is_gdpr()
+function wpgh_is_gdpr()
 {
     return in_array( 'on', get_option( 'gh_enable_gdpr', array() ) );
 }
@@ -16,7 +16,7 @@ function wpfn_is_gdpr()
  * @param $atts array the shortcode attributes
  * @return string the form html
  */
-function wpfn_form_shortcode( $atts )
+function wpgh_form_shortcode( $atts )
 {
     $a = shortcode_atts( array(
         'fields' => 'first,last,email,phone,terms',
@@ -86,7 +86,7 @@ function wpfn_form_shortcode( $atts )
         $form .= '</p></div>';
     }
 
-    if ( wpfn_is_gdpr() )
+    if ( wpgh_is_gdpr() )
     {
         $form .= '<div class="gh-consent-field"><p>';
 
@@ -97,7 +97,7 @@ function wpfn_form_shortcode( $atts )
         $form .= '</p></div>';
     }
 
-    $form = apply_filters( 'wpfn_form_shortcode', $form );
+    $form = apply_filters( 'wpgh_form_shortcode', $form );
 
     $form .= "<div class='gh-submit-field'><p><input type='submit' name='submit' value='" . $a['submit'] . "'></p></div>";
     $form .= '</form>';
@@ -106,13 +106,13 @@ function wpfn_form_shortcode( $atts )
     return $form;
 }
 
-add_shortcode( 'gh_form', 'wpfn_form_shortcode' );
+add_shortcode( 'gh_form', 'wpgh_form_shortcode' );
 
 
 /**
  * Listens for basic contact information whenever the post variable is exists.
  */
-function wpfn_form_submit_listener()
+function wpgh_form_submit_listener()
 {
     /* verify real user */
     if ( ! isset( $_POST[ 'gh_submit_nonce' ] ) )
@@ -121,7 +121,7 @@ function wpfn_form_submit_listener()
     if( ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) )
         wp_redirect( wp_get_referer() );
 
-    if ( wpfn_is_gdpr() ){
+    if ( wpgh_is_gdpr() ){
         if ( ! isset( $_POST[ 'gdpr_consent' ] ) )
             wp_redirect( wp_get_referer() );
     }
@@ -152,48 +152,48 @@ function wpfn_form_submit_listener()
         'phone' => '',
     ));
 
-    $id = wpfn_quick_add_contact( $args['email'], $args['first'], $args['last'], $args['phone'] );
+    $id = wpgh_quick_add_contact( $args['email'], $args['first'], $args['last'], $args['phone'] );
 
-    $contact = new WPFN_Contact( $id );
+    $contact = new WPGH_Contact( $id );
     /* if gdpr is enabled, make sure that the consent box is checked */
-    if ( wpfn_is_gdpr() )
-        wpfn_update_contact_meta( $id, 'gdpr_consent', 'yes' );
+    if ( wpgh_is_gdpr() )
+        wpgh_update_contact_meta( $id, 'gdpr_consent', 'yes' );
 
     /* Set the IP address of the contact */
-    wpfn_update_contact_meta( $id, 'ip_address', wpfn_get_visitor_ip() );
+    wpgh_update_contact_meta( $id, 'ip_address', wpgh_get_visitor_ip() );
 
     /* Set the Leadsource if it doesn't exist */
-    if ( ! wpfn_get_contact_meta( $id, 'source_page', true) )
-        wpfn_update_contact_meta( $id, 'source_page', wp_get_referer() );
+    if ( ! wpgh_get_contact_meta( $id, 'source_page', true) )
+        wpgh_update_contact_meta( $id, 'source_page', wp_get_referer() );
 
     /* if the contact previously unsubscribed, set them to unconfirmed. */
-    if ( $contact->get_optin_status() === WPFN_UNSUBSCRIBED )
-        wpfn_update_contact( $id, 'optin_status', WPFN_UNCONFIRMED );
+    if ( $contact->get_optin_status() === WPGH_UNSUBSCRIBED )
+        wpgh_update_contact( $id, 'optin_status', WPGH_UNCONFIRMED );
 
     $step = intval( $_POST[ 'step_id' ] );
 
     /* make sure the funnel for the step is active*/
-    if ( ! wpfn_get_funnel_step_by_id( $step ) || ! wpfn_is_funnel_active( wpfn_get_step_funnel( $step ) ) )
+    if ( ! wpgh_get_funnel_step_by_id( $step ) || ! wpgh_is_funnel_active( wpgh_get_step_funnel( $step ) ) )
         wp_die( __( 'This form is not accepting submissions right now.', 'groundhogg' ) );
 
-    do_action( 'wpfn_form_submit', $step, $id );
+    do_action( 'wpgh_form_submit', $step, $id );
 
     /* redirect to ensure cookie is set and can be used on the following page*/
     wp_redirect( $_SERVER['REQUEST_URI'] );
     die();
 }
 
-add_action( 'init', 'wpfn_form_submit_listener' );
+add_action( 'init', 'wpgh_form_submit_listener' );
 
 /**
  * Ouput the html for the email preferences form.
  *
  * @return string
  */
-function wpfn_email_preferences_form()
+function wpgh_email_preferences_form()
 {
 
-    $contact = wpfn_get_the_contact();
+    $contact = wpgh_get_the_contact();
 
     if ( ! $contact )
         return __( 'No email to manage.' );
@@ -233,7 +233,7 @@ function wpfn_email_preferences_form()
             <div class="gh-form-field">
                 <p>
                     <input type='submit' name='change_preferences' value='<?php _e('Change Preferences','groundhogg'); ?>' >
-                    <?php if ( wpfn_is_gdpr() ):?>
+                    <?php if ( wpgh_is_gdpr() ):?>
                         <input type='submit' name='delete_everything' value='<?php _e('Delete Everything You Know About Me', 'groundhogg'); ?>' >
                     <?php endif; ?>
                 </p>
@@ -251,17 +251,17 @@ function wpfn_email_preferences_form()
 
 }
 
-add_shortcode( 'gh_email_preferences', 'wpfn_email_preferences_form' );
+add_shortcode( 'gh_email_preferences', 'wpgh_email_preferences_form' );
 
 /**
  * Process changes to the subscription status of a contact.
  */
-function wpfn_process_email_preferences_changes()
+function wpgh_process_email_preferences_changes()
 {
     if ( ! isset( $_POST[ 'email_preferences_nonce' ] ) || ! wp_verify_nonce( $_POST[ 'email_preferences_nonce' ], 'change_email_preferences' ) )
         return;
 
-    $contact = wpfn_get_the_contact();
+    $contact = wpgh_get_the_contact();
 
     if ( ! $contact )
         return;
@@ -269,13 +269,13 @@ function wpfn_process_email_preferences_changes()
     if ( isset( $_POST[ 'delete_everything' ] ) )
     {
 
-        do_action( 'wpfn_delete_everything', $contact->get_id() );
+        do_action( 'wpgh_delete_everything', $contact->get_id() );
 
-        wpfn_delete_contact( $contact->get_id() );
+        wpgh_delete_contact( $contact->get_id() );
 
         $unsub_page = get_permalink( get_option( 'gh_unsubscribe_page' ) );
 
-        do_action( 'wpfn_preference_unsubscribe', $contact->get_id() );
+        do_action( 'wpgh_preference_unsubscribe', $contact->get_id() );
 
         wp_redirect( $unsub_page );
         die();
@@ -286,32 +286,32 @@ function wpfn_process_email_preferences_changes()
     switch ( $preference ){
         case 'none':
 
-            wpfn_update_contact( $contact->get_id(), 'optin_status', WPFN_CONFIRMED );
+            wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_CONFIRMED );
 
-            do_action( 'wpfn_preference_none', $contact->get_id() );
+            do_action( 'wpgh_preference_none', $contact->get_id() );
 
             break;
         case 'weekly':
 
-            wpfn_update_contact( $contact->get_id(), 'optin_status', WPFN_WEEKLY );
+            wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_WEEKLY );
 
-            do_action( 'wpfn_preference_weekly', $contact->get_id() );
+            do_action( 'wpgh_preference_weekly', $contact->get_id() );
 
             break;
         case 'monthly':
 
-            wpfn_update_contact( $contact->get_id(), 'optin_status', WPFN_MONTHLY );
+            wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_MONTHLY );
 
-            do_action( 'wpfn_preference_monthly', $contact->get_id() );
+            do_action( 'wpgh_preference_monthly', $contact->get_id() );
 
             break;
         case 'unsubscribe':
 
-            wpfn_update_contact( $contact->get_id(), 'optin_status', WPFN_UNSUBSCRIBED );
+            wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_UNSUBSCRIBED );
 
             $unsub_page = get_permalink( get_option( 'gh_unsubscribe_page' ) );
 
-            do_action( 'wpfn_preference_unsubscribe', $contact->get_id() );
+            do_action( 'wpgh_preference_unsubscribe', $contact->get_id() );
 
             wp_redirect( $unsub_page );
             die();
@@ -319,4 +319,4 @@ function wpfn_process_email_preferences_changes()
     }
 }
 
-add_action( 'init', 'wpfn_process_email_preferences_changes' );
+add_action( 'init', 'wpgh_process_email_preferences_changes' );

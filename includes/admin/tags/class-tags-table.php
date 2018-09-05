@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Tags_Table extends WP_List_Table {
+class WPGH_Tags_Table extends WP_List_Table {
     /**
      * TT_Example_List_Table constructor.
      *
@@ -72,14 +72,14 @@ class WPFN_Tags_Table extends WP_List_Table {
                 $html  = '<div id="inline_' .$item['tag_id']. '" class="hidden">';
                 $html .= '  <div class="name">' .$item['tag_name']. '</div>';
                 $html .= '  <div class="description">' .$item['tag_description']. '</div>';
-                $html .= '  <div class="count">' . wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) . '</div>';
+                $html .= '  <div class="count">' . wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) . '</div>';
                 $html .= '</div>';
                 $html .= "<a class='row-title' href='$editUrl'>{$item[ $column_name ]}</a>";
                 return $html;
                 break;
             case 'contact_count':
-                $count = wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] );
-                return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$item['tag_id']).'">'. wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) .'</a>' : '0';
+                $count = wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] );
+                return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$item['tag_id']).'">'. wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) .'</a>' : '0';
                 break;
             case 'tag_description':
                 return ! empty( $item['tag_description'] ) ? $item['tag_description'] : '&#x2014;';
@@ -108,7 +108,7 @@ class WPFN_Tags_Table extends WP_List_Table {
             'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
         );
 
-        return apply_filters( 'wpfn_contact_tag_bulk_actions', $actions );
+        return apply_filters( 'wpgh_contact_tag_bulk_actions', $actions );
     }
 
     /**
@@ -163,7 +163,7 @@ class WPFN_Tags_Table extends WP_List_Table {
          * For information on making queries in WordPress, see this Codex entry:
          * http://codex.wordpress.org/Class_Reference/wpdb
          */
-        $table_name = $wpdb->prefix . WPFN_CONTACT_TAGS;
+        $table_name = $wpdb->prefix . WPGH_CONTACT_TAGS;
 
         if ( isset( $_REQUEST['s'] ) ){
             $data = $wpdb->get_results(

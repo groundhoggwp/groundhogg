@@ -1,14 +1,14 @@
-wpfn-toolbar{
+wpgh-toolbar{
     z-index: 9999;
     position: relative;
 }
 
-.active wpfn-toolbar hr {
+.active wpgh-toolbar hr {
     border-top: none;
     border-bottom-color: #FFF;
 }
 
- wpfn-toolbar hr{
+ wpgh-toolbar hr{
     border-bottom-color: #555d66;
      width: 50%;
 
@@ -33,13 +33,13 @@ select {
     background-color: #fff;
 }
 
-.wpfn-element div {
+.wpgh-element div {
     box-sizing: border-box;
     display: inline-block;
     width: 100%;
 }
 
-.wpfn-element p{
+.wpgh-element p{
     margin: 0 0 5px 0;
 }
 
@@ -47,7 +47,7 @@ select {
     margin: 0 10px 0 0;
 }
 
-.wpfn-element.ui-draggable-dragging .dashicons, #blocks .dashicons {
+.wpgh-element.ui-draggable-dragging .dashicons, #blocks .dashicons {
     font-size: 60px;
 }
 
@@ -61,12 +61,12 @@ select {
     border: 1px solid #F1F1F1;
 }
 
-#blocks table td .wpfn-element, .wpfn-element p {
+#blocks table td .wpgh-element, .wpgh-element p {
     text-align: center;
     cursor: move;
 }
 
-.wpfn-element.ui-draggable-dragging {
+.wpgh-element.ui-draggable-dragging {
     font-size: 60px;
     width: 120px;
     height: 120px;

@@ -16,7 +16,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-class WPFN_Emails_Page
+class WPGH_Emails_Page
 {
     function __construct()
     {
@@ -123,27 +123,27 @@ class WPFN_Emails_Page
 
                 if ( isset( $_POST ) )
                 {
-                    do_action( 'wpfn_add_email' );
+                    do_action( 'wpgh_add_email' );
                 }
                 break;
 
             case 'trash':
 
                 foreach ( $this->get_emails() as $id ) {
-                    wpfn_update_email($id, 'email_status', 'trash');
+                    wpgh_update_email($id, 'email_status', 'trash');
                 }
 
-                do_action( 'wpfn_trash_emails' );
+                do_action( 'wpgh_trash_emails' );
 
                 break;
 
             case 'delete':
 
                 foreach ( $this->get_emails() as $id ){
-                    wpfn_delete_email( $id );
+                    wpgh_delete_email( $id );
                 }
 
-                do_action( 'wpfn_delete_emails' );
+                do_action( 'wpgh_delete_emails' );
 
                 break;
 
@@ -151,17 +151,17 @@ class WPFN_Emails_Page
 
                 foreach ( $this->get_emails() as $id )
                 {
-                    wpfn_update_email( $id, 'email_status', 'draft' );
+                    wpgh_update_email( $id, 'email_status', 'draft' );
                 }
 
-                do_action( 'wpfn_restore_emails' );
+                do_action( 'wpgh_restore_emails' );
 
                 break;
 
             case 'edit':
 
                 if ( isset( $_POST ) ){
-                    do_action( 'wpfn_update_email', intval( $_GET[ 'email' ] ) );
+                    do_action( 'wpgh_update_email', intval( $_GET[ 'email' ] ) );
                 }
 
                 break;
@@ -189,11 +189,11 @@ class WPFN_Emails_Page
 
     function table()
     {
-        if ( ! class_exists( 'WPFN_Emails_Table' ) ){
+        if ( ! class_exists( 'WPGH_Emails_Table' ) ){
             include dirname( __FILE__ ) . '/class-emails-table.php';
         }
 
-        $emails_table = new WPFN_Emails_Table();
+        $emails_table = new WPGH_Emails_Table();
 
         $emails_table->views(); ?>
         <form method="post" class="search-form wp-clearfix" >

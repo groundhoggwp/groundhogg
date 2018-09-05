@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Events_Table extends WP_List_Table {
+class WPGH_Events_Table extends WP_List_Table {
 
     /**
      * TT_Example_List_Table constructor.
@@ -77,57 +77,72 @@ class WPFN_Events_Table extends WP_List_Table {
         switch ( $column_name ) {
             case 'contact':
 
-            	$contact = new WPFN_Contact( intval( $item[ 'contact_id' ] ) );
+            	$contact = new WPGH_Contact( intval( $item[ 'contact_id' ] ) );
 
             	if ( ! $contact )
 		            return __( 'No Contact' );
 
-                $html = "<span class='row-title'>" . $contact->get_email() . "</span>";
+                $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
+                    admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $contact->get_id() ),
+                    $contact->get_email()
+                );
+
                 return $html;
                 break;
             case 'funnel':
 
             	$funnel_id = intval( $item['funnel_id'] );
 
-            	if ( $funnel_id === WPFN_BROADCAST ) {
-	            	$funnel_title = __( 'Broadcast' );
+            	if ( $funnel_id === WPGH_BROADCAST ) {
+	            	$funnel_title = __( 'Broadcast Email' );
 	            } else {
-		            $funnel = wpfn_get_funnel_by_id( $funnel_id );
+		            $funnel = wpgh_get_funnel_by_id( $funnel_id );
 		            $funnel_title = $funnel->funnel_title;
 	            }
 
-	            return $funnel_title;
+	            return sprintf( "<a href='%s'>%s</a>",
+                    admin_url( 'admin.php?page=gh_events&view=funnel&funnel=' . $item['funnel_id'] ),
+                    $funnel_title);
 
                 break;
             case 'step':
+
 	            $funnel_id = intval( $item['funnel_id'] );
 	            $step_id = intval( $item['step_id'] );
 
-	            if ( $funnel_id === WPFN_BROADCAST ) {
-		            $broadcast = wpfn_get_broadcast_by_id( $step_id );
-		            $email = wpfn_get_email_by_id( intval( $broadcast['email_id'] ) );
+	            if ( $funnel_id === WPGH_BROADCAST ) {
+		            $broadcast = wpgh_get_broadcast_by_id( $step_id );
+		            $email = wpgh_get_email_by_id( intval( $broadcast['email_id'] ) );
 		            $step_title = $email->subject;
 	            } else {
-		            $step_title = wpfn_get_step_hndle( $step_id );
+		            $step_title = wpgh_get_step_hndle( $step_id );
 	            }
 
-	            return $step_title;
+	            if ( ! $step_title )
+	                return sprintf( "<strong>%s</strong>", __( '(step deleted)' ) );
+
+	            return sprintf( "<a href='%s'>%s</a>",
+                    admin_url( 'admin.php?page=gh_events&view=step&step=' . $item['step_id'] ),
+                    $step_title);
 
 	            break;
             case 'time':
 
-            	$time = intval( $item[ 'time' ] );
+                /* convert to local time. */
+            	$time = intval( $item[ 'time' ] ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 
             	$html = '';
 
-            	if ( $time > time() )
+            	if ( $time > current_time( 'timestamp' ) )
 	            {
 	            	$html.= __( 'Scheduled For' );
 	            } else {
-		            $html.= __( 'Executed' );
+		            $html.= __( 'Executed On' );
 	            }
 
-                return $html . '<br><abbr title="' . date( DATE_ISO8601, $time ) . '">' . date('Y/m/d', $time ) . '</abbr>';
+                $timezone_format = _x('Y/m/d \@ h:i A', 'timezone date format');
+
+                return $html . '<br><abbr title="' . date_i18n( DATE_ISO8601, $time ) . '">' . date_i18n( $timezone_format, $time, false ) . '</abbr>';
             default:
                 return ! empty( $item[ $column_name ] ) ? print_r( $item[ $column_name ], true ) : '&#x2014;' ;
                 break;
@@ -155,12 +170,11 @@ class WPFN_Events_Table extends WP_List_Table {
      */
     protected function get_bulk_actions() {
         $actions = array(
-	        'execute' => _x( 'Execute', 'List table bulk action', 'wp-funnels'),
-	        're_execute' => _x( 'Re Execute', 'List table bulk action', 'wp-funnels' ),
+	        'execute' => _x( 'Run', 'List table bulk action', 'wp-funnels'),
 	        'cancel' => _x( 'Cancel', 'List table bulk action', 'wp-funnels' ),
         );
 
-        return apply_filters( 'wpfn_event_bulk_actions', $actions );
+        return apply_filters( 'wpgh_event_bulk_actions', $actions );
     }
 
     protected function get_view()
@@ -174,21 +188,21 @@ class WPFN_Events_Table extends WP_List_Table {
 
         $view = isset($_REQUEST['optin_status']) ? $_REQUEST['optin_status'] : 'all';
 
-        $table_name = $wpdb->prefix . WPFN_EVENTS;
+        $table_name = $wpdb->prefix . WPGH_EVENTS;
 
         $count = array(
             'waiting' => count($wpdb->get_results("SELECT status FROM $table_name WHERE status = 'waiting'")),
             'skipped' => count($wpdb->get_results("SELECT status FROM $table_name WHERE status = 'skipped'")),
             'cancelled' => count($wpdb->get_results("SELECT status FROM $table_name WHERE status = 'cancelled'")),
-            'completed' => count($wpdb->get_results("SELECT status FROM $table_name WHERE status = 'completed'")),
+            'completed' => count($wpdb->get_results("SELECT status FROM $table_name WHERE status = 'complete'")),
         );
 
         return apply_filters( 'gh_event_views', array(
             'all' => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_events' ) . "'>" . __( 'All <span class="count">('. array_sum($count) . ')</span>' ) . "</a>",
-            'waiting' => "<a class='" . ($view === 'waiting' ? 'current' : '') . "' href='" . $base_url . "waiting" . "'>" . __( 'Waiting <span class="count">('.$count['unconfirmed'].')</span>' ) . "</a>",
-            'skipped' => "<a class='" . ($view === 'skipped' ? 'current' : '') . "' href='" . $base_url . "skipped" . "'>" . __( 'Skipped <span class="count">('.$count['confirmed'].')</span>' ) . "</a>",
-            'cancelled' => "<a class='" . ($view === 'cancelled' ? 'current' : '') . "' href='" . $base_url . "cancelled" . "'>" . __( 'Cancelled <span class="count">('.$count['opted_out'].')</span>' ) . "</a>",
-            'completed' => "<a class='" . ($view === 'completed' ? 'current' : '') . "' href='" . $base_url . "completed" . "'>" . __( 'Completed <span class="count">('.$count['opted_out'].')</span>' ) . "</a>"
+            'waiting' => "<a class='" . ($view === 'waiting' ? 'current' : '') . "' href='" . $base_url . "waiting" . "'>" . __( 'Waiting <span class="count">('.$count['waiting'].')</span>' ) . "</a>",
+            'skipped' => "<a class='" . ($view === 'skipped' ? 'current' : '') . "' href='" . $base_url . "skipped" . "'>" . __( 'Skipped <span class="count">('.$count['skipped'].')</span>' ) . "</a>",
+            'cancelled' => "<a class='" . ($view === 'cancelled' ? 'current' : '') . "' href='" . $base_url . "cancelled" . "'>" . __( 'Cancelled <span class="count">('.$count['cancelled'].')</span>' ) . "</a>",
+            'completed' => "<a class='" . ($view === 'completed' ? 'current' : '') . "' href='" . $base_url . "completed" . "'>" . __( 'Completed <span class="count">('.$count['completed'].')</span>' ) . "</a>"
         ) );
     }
 
@@ -220,7 +234,7 @@ class WPFN_Events_Table extends WP_List_Table {
             case 'status':
                 if ( isset( $_REQUEST['status'] ) ){
                     $sql = $wpdb->prepare(
-                        "SELECT e.* FROM " . $wpdb->prefix . WPFN_EVENTS . " e
+                        "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e
                         WHERE e.status = %s
                         ORDER BY e.time DESC" , $_REQUEST['status']
                     );
@@ -229,7 +243,7 @@ class WPFN_Events_Table extends WP_List_Table {
             case 'contact':
 	            if ( isset( $_REQUEST['contact'] ) ){
 		            $sql = $wpdb->prepare(
-			            "SELECT e.* FROM " . $wpdb->prefix . WPFN_EVENTS . " e
+			            "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e
                         WHERE e.contact_id = %d
                         ORDER BY e.time DESC" , intval( $_REQUEST['contact'] )
 		            );
@@ -238,7 +252,7 @@ class WPFN_Events_Table extends WP_List_Table {
             case 'funnel':
 	            if ( isset( $_REQUEST['funnel'] ) ){
 		            $sql = $wpdb->prepare(
-			            "SELECT e.* FROM " . $wpdb->prefix . WPFN_EVENTS . " e
+			            "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e
                         WHERE e.funnel_id = %d
                         ORDER BY e.time DESC" , intval( $_REQUEST['funnel'] )
 		            );
@@ -247,14 +261,14 @@ class WPFN_Events_Table extends WP_List_Table {
 	        case 'step':
 		        if ( isset( $_REQUEST['step'] ) ){
 			        $sql = $wpdb->prepare(
-				        "SELECT e.* FROM " . $wpdb->prefix . WPFN_EVENTS . " e
-                        WHERE e.funnel_id = %d
+				        "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e
+                        WHERE e.step_id = %d
                         ORDER BY e.time DESC" , intval( $_REQUEST['step'] )
 			        );
 		        }
 		        break;
             default:
-	            $sql = "SELECT e.* FROM " . $wpdb->prefix . WPFN_EVENTS . " e ORDER BY e.time DESC";
+	            $sql = "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e ORDER BY e.time DESC";
                 break;
         }
 
@@ -290,7 +304,7 @@ class WPFN_Events_Table extends WP_List_Table {
      */
     protected function usort_reorder( $a, $b ) {
         // If no sort, default to title.
-        $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'date_created'; // WPCS: Input var ok.
+        $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'time'; // WPCS: Input var ok.
         // If no order, default to asc.
         $order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
         // Determine sort order.
@@ -312,21 +326,44 @@ class WPFN_Events_Table extends WP_List_Table {
         }
 
         $actions = array();
-        $title = $item['email'];
 
-        $actions['inline hide-if-no-js'] = sprintf(
-            '<a href="#" class="editinline" aria-label="%s">%s</a>',
-            /* translators: %s: title */
-            esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $title ) ),
-            __( 'Quick&nbsp;Edit' )
-        );
+        $time = intval( $item[ 'time' ] );
 
-        $actions['delete'] = sprintf(
-            '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_events&event[]='. $item['ID'].'&action=delete')),
-            /* translators: %s: title */
-            esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
-            __( 'Delete Permanently' )
+        $html = '';
+
+        if ( $time > current_time( 'timestamp' ) )
+        {
+            $actions['execute'] = sprintf(
+                '<a href="%s" class="edit" aria-label="%s">%s</a>',
+                /* translators: %s: title */
+                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $item['time'] . '&action=execute' ) ) ),
+                esc_attr( __( 'Execute' ) ),
+                __( 'Run Now' )
+            );
+
+            $actions['delete'] = sprintf(
+                '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+                esc_url( wp_nonce_url(admin_url('admin.php?page=gh_events&event='. $item['time'].'&action=cancel') ) ),
+                /* translators: %s: title */
+                esc_attr( __( 'Cancel' ) ),
+                __( 'Cancel' )
+            );
+        } else {
+
+            $actions['re_execute'] = sprintf(
+                '<a href="%s" class="edit" aria-label="%s">%s</a>',
+                /* translators: %s: title */
+                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $item['time'] . '&action=re_execute' ) ) ),
+                esc_attr( __( 'Re-execute' ) ),
+                __( 'Run Again' )
+            );
+
+        }
+
+        $actions[ 'view' ] = sprintf( "<a class='edit' href='%s'>%s</a>",
+            admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $item[ 'contact_id' ] ),
+            esc_attr( __( 'View Contact' ) ),
+            __( 'View Contact' )
         );
 
         return $this->row_actions( $actions );

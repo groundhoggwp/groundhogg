@@ -9,12 +9,12 @@
  * @since       0.1
  */
 
-define( 'WPFN_UNCONFIRMED', 0 );
-define( 'WPFN_CONFIRMED', 1 );
-define( 'WPFN_UNSUBSCRIBED', 2 );
-define( 'WPFN_WEEKLY', 3 );
-define( 'WPFN_MONTHLY', 4 );
-define( 'WPFN_HARD_BOUNCE', 5 );
+define( 'WPGH_UNCONFIRMED', 0 );
+define( 'WPGH_CONFIRMED', 1 );
+define( 'WPGH_UNSUBSCRIBED', 2 );
+define( 'WPGH_WEEKLY', 3 );
+define( 'WPGH_MONTHLY', 4 );
+define( 'WPGH_HARD_BOUNCE', 5 );
 
 /**
  * Get the text explanation for the optin status of a contact
@@ -26,7 +26,7 @@ define( 'WPFN_HARD_BOUNCE', 5 );
  *
  * @return bool|string
  */
-function wpfn_get_optin_status_text( $status )
+function wpgh_get_optin_status_text( $status )
 {
 
 	if ( ! is_numeric( $status ) )
@@ -36,22 +36,22 @@ function wpfn_get_optin_status_text( $status )
 
 	switch ( $status ){
 
-		case WPFN_UNCONFIRMED:
+		case WPGH_UNCONFIRMED:
 			return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
 			break;
-		case WPFN_CONFIRMED:
+		case WPGH_CONFIRMED:
 			return __( 'Confirmed. They will receive emails.', 'groundhogg' );
 			break;
-		case WPFN_UNSUBSCRIBED:
+		case WPGH_UNSUBSCRIBED:
 			return __( 'Unsubscribed. They will not receive emails.', 'groundhogg' );
 			break;
-        case WPFN_WEEKLY:
+        case WPGH_WEEKLY:
             return __( 'This contact will only receive emails weekly.', 'groundhogg' );
             break;
-        case WPFN_MONTHLY:
+        case WPGH_MONTHLY:
             return __( 'This contact will only receive emails monthly.', 'groundhogg' );
             break;
-        case WPFN_HARD_BOUNCE:
+        case WPGH_HARD_BOUNCE:
             return __( 'This email bounced, further emails will not be sent.', 'groundhogg' );
             break;
 		default:
@@ -67,7 +67,7 @@ function wpfn_get_optin_status_text( $status )
  *
  * @return bool
  */
-function wpfn_can_send_email( $contact_id )
+function wpgh_can_send_email( $contact_id )
 {
     if (!$contact_id || !is_numeric($contact_id))
         return false;
@@ -76,24 +76,24 @@ function wpfn_can_send_email( $contact_id )
     if (!$contact_id)
         return false;
 
-    $contact = new WPFN_Contact($contact_id);
+    $contact = new WPGH_Contact($contact_id);
 
     switch ( $contact->get_optin_status() )
     {
-        case WPFN_UNCONFIRMED:
-        case WPFN_CONFIRMED:
+        case WPGH_UNCONFIRMED:
+        case WPGH_CONFIRMED:
             return true;
             break;
-        case WPFN_HARD_BOUNCE;
-        case WPFN_UNSUBSCRIBED:
+        case WPGH_HARD_BOUNCE;
+        case WPGH_UNSUBSCRIBED:
             return false;
             break;
-        case WPFN_WEEKLY:
-            $last_sent = wpfn_get_contact_meta( $contact_id, 'last_sent', true );
+        case WPGH_WEEKLY:
+            $last_sent = wpgh_get_contact_meta( $contact_id, 'last_sent', true );
             return ( time() - intval( $last_sent ) ) > 7 * 24 * HOUR_IN_SECONDS;
             break;
-        case WPFN_MONTHLY:
-            $last_sent = wpfn_get_contact_meta( $contact_id, 'last_sent', true );
+        case WPGH_MONTHLY:
+            $last_sent = wpgh_get_contact_meta( $contact_id, 'last_sent', true );
             return ( time() - intval( $last_sent ) ) > 30 * 24 * HOUR_IN_SECONDS;
             break;
         default:
@@ -110,16 +110,16 @@ function wpfn_can_send_email( $contact_id )
  *
  * @return bool True on success, false on failure
  */
-function wpfn_log_contact_activity( $contact_id, $activity )
+function wpgh_log_contact_activity( $contact_id, $activity )
 {
 	if ( ! $activity || ! is_string( $activity ) )
 		return false;
 
-	$date_time = date( 'Y-m-d H:i:s', strtotime( 'now' ) );
+	$date_time = date_i18n( get_option( 'date_format' ) );
 
 	$activity = sanitize_text_field( $activity );
 
-	$last_activity = wpfn_get_contact_meta( $contact_id, 'activity_log', true );
+	$last_activity = wpgh_get_contact_meta( $contact_id, 'activity_log', true );
 
 	if ( ! $last_activity ){
 		$last_activity = '';
@@ -127,9 +127,9 @@ function wpfn_log_contact_activity( $contact_id, $activity )
 
 	$new_activity = $date_time . ' | ' . $activity . PHP_EOL . $last_activity;
 
-	do_action( 'wpfn_contact_activity_logged', $contact_id );
+	do_action( 'wpgh_contact_activity_logged', $contact_id );
 
-	return wpfn_update_contact_meta( $contact_id, 'activity_log', $new_activity );
+	return wpgh_update_contact_meta( $contact_id, 'activity_log', $new_activity );
 }
 
 /**
@@ -143,9 +143,9 @@ function wpfn_log_contact_activity( $contact_id, $activity )
  *
  * @return int|bool contact ID on success, false on failure
  */
-function wpfn_quick_add_contact( $email, $first='', $last='', $phone='', $extension='' )
+function wpgh_quick_add_contact( $email, $first='', $last='', $phone='', $extension='' )
 {
-	$contact_exists = wpfn_get_contact_by_email( $email );
+	$contact_exists = wpgh_get_contact_by_email( $email );
 
 	/* update the contact instead */
 	if ( $contact_exists ){
@@ -153,14 +153,14 @@ function wpfn_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 	    $id = intval( $contact_exists[ 'ID' ] );
 
 	    if ( ! empty( $first ) )
-	        wpfn_update_contact( $id, 'first_name', $first );
+	        wpgh_update_contact( $id, 'first_name', $first );
         if ( ! empty( $last ) )
-            wpfn_update_contact( $id, 'last_name', $last );
+            wpgh_update_contact( $id, 'last_name', $last );
 
         if ( ! empty( $phone ) )
-            wpfn_update_contact_meta( $id, 'primary_phone', $phone );
+            wpgh_update_contact_meta( $id, 'primary_phone', $phone );
         if ( ! empty( $extension ) )
-            wpfn_update_contact_meta( $id, 'primary_phone_extension', $extension );
+            wpgh_update_contact_meta( $id, 'primary_phone_extension', $extension );
 
         return $id;
 	}
@@ -168,17 +168,17 @@ function wpfn_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 	if ( ! $email )
 	    return false;
 
-	$id = wpfn_insert_new_contact( $email, $first, $last );
+	$id = wpgh_insert_new_contact( $email, $first, $last );
 
 	if ( ! $id ){
 		return false;
 	}
 
-	wpfn_add_contact_meta( $id, 'primary_phone', $phone );
-	wpfn_add_contact_meta( $id, 'primary_phone_extension', $extension );
+	wpgh_add_contact_meta( $id, 'primary_phone', $phone );
+	wpgh_add_contact_meta( $id, 'primary_phone_extension', $extension );
 
 	if ( is_admin() ){
-		wpfn_log_contact_activity( $id, 'Contact Created Via Admin.' );
+		wpgh_log_contact_activity( $id, 'Contact Created Via Admin.' );
 	}
 
 	return $id;
@@ -186,7 +186,7 @@ function wpfn_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 }
 
 
-function wpfn_encrypt_decrypt( $string, $action = 'e' ) {
+function wpgh_encrypt_decrypt( $string, $action = 'e' ) {
     // you may change these values to your own
     $encrypt_method = "AES-256-CBC";
 
@@ -227,40 +227,40 @@ function wpfn_encrypt_decrypt( $string, $action = 'e' ) {
  *
  * @param $id int the ID of the contact
  */
-function wpfn_set_the_contact( $id )
+function wpgh_set_the_contact( $id )
 {
-    setcookie( 'gh_contact', wpfn_encrypt_decrypt( $id, 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+    setcookie( 'gh_contact', wpgh_encrypt_decrypt( $id, 'e' ) , time() + 24 * HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
 }
 
 /**
  * Return the contact ID of the current contact, perhaps if they are broswing the site based on a cookie.
  *
- * @return WPFN_Contact|false the ID of the contact, false if a contact ID doesn't exist
+ * @return WPGH_Contact|false the ID of the contact, false if a contact ID doesn't exist
  */
-function wpfn_get_the_contact()
+function wpgh_get_the_contact()
 {
     if ( is_admin() && ! wp_doing_ajax() )
         return false;
 
     if ( isset( $_COOKIE[ 'gh_contact' ] ) ){
         /* if the contact cookie has been set. */
-        $id = wpfn_encrypt_decrypt( sanitize_text_field( $_COOKIE[ 'gh_contact' ] ), 'd' );
+        $id = wpgh_encrypt_decrypt( sanitize_text_field( $_COOKIE[ 'gh_contact' ] ), 'd' );
 
     } else if ( is_user_logged_in() ) {
     	$user = wp_get_current_user();
-    	$contact = wpfn_get_contact_by_email( $user->user_email );
+    	$contact = wpgh_get_contact_by_email( $user->user_email );
     	if ( ! $contact )
     		return false;
     	$id = intval( $contact['ID'] );
 
     } else if ( isset( $_GET[ 'contact' ] ) ){
         /* if the contact is coming from an email link */
-        $id = wpfn_encrypt_decrypt( urldecode( $_GET[ 'contact' ] ), 'd' );
+        $id = wpgh_encrypt_decrypt( urldecode( $_GET[ 'contact' ] ), 'd' );
 
     } else if ( isset( $_REQUEST[ 'email' ] ) ) {
         /* possibly they are in the process of a form submission and the cookie has yet to be sent.*/
         if ( is_email( sanitize_email( $_REQUEST['email'] ) ) ){
-            $contact = wpfn_get_contact_by_email( sanitize_email( $_REQUEST['email'] ) );
+            $contact = wpgh_get_contact_by_email( sanitize_email( $_REQUEST['email'] ) );
             if ( ! empty( $contact ) ){
                 $id = intval( $contact['ID'] );
             }
@@ -272,28 +272,28 @@ function wpfn_get_the_contact()
     if ( ! $id )
         return false;
 
-    return new WPFN_Contact( $id ) ;
+    return new WPGH_Contact( $id ) ;
 }
 
 /**
- * wrapper function for wpfn_get_the_contact
+ * wrapper function for wpgh_get_the_contact
  *
- * @return false|WPFN_Contact the contact instance or false on failure.
+ * @return false|WPGH_Contact the contact instance or false on failure.
  */
-function wpfn_get_current_contact()
+function wpgh_get_current_contact()
 {
-    return wpfn_get_the_contact();
+    return wpgh_get_the_contact();
 }
 
 /**
- * Get a list of WPFN_contacts given a tag ID
+ * Get a list of WPGH_contacts given a tag ID
  *
  * @param $tag_id int the Id of thre tag
  * @return bool|array list of contacts or false on failure
  */
-function wpfn_get_contacts_by_tag( $tag_id )
+function wpgh_get_contacts_by_tag( $tag_id )
 {
-    $ids = wpfn_get_contact_ids_by_tag( $tag_id );
+    $ids = wpgh_get_contact_ids_by_tag( $tag_id );
 
     if ( ! $ids )
         return false;
@@ -304,7 +304,7 @@ function wpfn_get_contacts_by_tag( $tag_id )
 
         $contact_id = intval( $relationship[ 'contact_id' ] );
 
-        $contacts[ $contact_id ] = new WPFN_Contact( $contact_id );
+        $contacts[ $contact_id ] = new WPGH_Contact( $contact_id );
 
     }
 
@@ -315,7 +315,7 @@ function wpfn_get_contacts_by_tag( $tag_id )
 /**
  * Add a tag from the add tag form.
  */
-function wpfn_add_tag()
+function wpgh_add_tag()
 {
 	if ( isset( $_POST['bulk_add'] ) ){
 
@@ -323,31 +323,31 @@ function wpfn_add_tag()
 
 		foreach ($tag_names as $name)
 		{
-			$tagid = wpfn_insert_tag( $name );
+			$tagid = wpgh_insert_tag( $name );
 		}
 	} else {
 		$tagname = sanitize_text_field( wp_unslash( $_POST['tag_name'] ) );
 		$tagdesc = sanitize_text_field( wp_unslash( $_POST['tag_description'] ) );
-		$tagid = wpfn_insert_tag( $tagname, $tagdesc );
+		$tagid = wpgh_insert_tag( $tagname, $tagdesc );
 	}
 }
 
-add_action( 'wpfn_add_tag', 'wpfn_add_tag' );
+add_action( 'wpgh_add_tag', 'wpgh_add_tag' );
 
 /**
  * update a tag
  */
-function wpfn_save_tag( $id )
+function wpgh_save_tag( $id )
 {
 	$tag_name = sanitize_text_field( wp_unslash( $_POST[ 'name' ] ) );
 	$tag_description = sanitize_textarea_field( wp_unslash( $_POST[ 'description' ] ) );
 
-	wpfn_update_tag( $id, 'tag_description', $tag_description );
-	wpfn_update_tag( $id, 'tag_name', $tag_name );
-	wpfn_update_tag( $id, 'tag_slug', sanitize_title( $tag_name ) );
+	wpgh_update_tag( $id, 'tag_description', $tag_description );
+	wpgh_update_tag( $id, 'tag_name', $tag_name );
+	wpgh_update_tag( $id, 'tag_slug', sanitize_title( $tag_name ) );
 }
 
-add_action( 'wpfn_update_tag', 'wpfn_save_tag' );
+add_action( 'wpgh_update_tag', 'wpgh_save_tag' );
 
 /**
  * Wrapper function to see if a contact has a particluar tag.
@@ -356,9 +356,9 @@ add_action( 'wpfn_update_tag', 'wpfn_save_tag' );
  * @param $tag_id int the Id of the tag
  * @return bool whether the contact has the tag.
  */
-function wpfn_has_tag( $contact_id, $tag_id )
+function wpgh_has_tag( $contact_id, $tag_id )
 {
-    return 1 && wpfn_get_contact_tag_relationship( intval( $contact_id ), intval( $tag_id ) );
+    return 1 && wpgh_get_contact_tag_relationship( intval( $contact_id ), intval( $tag_id ) );
 }
 
 /**
@@ -368,9 +368,9 @@ function wpfn_has_tag( $contact_id, $tag_id )
  * @param $tag_id int the ID of the tag
  * @return bool whether the application was successful
  */
-function wpfn_apply_tag( $contact_id, $tag_id )
+function wpgh_apply_tag( $contact_id, $tag_id )
 {
-    return wpfn_insert_contact_tag_relationship( intval( $contact_id ), intval( $tag_id ) );
+    return wpgh_insert_contact_tag_relationship( intval( $contact_id ), intval( $tag_id ) );
 }
 
 /**
@@ -380,9 +380,9 @@ function wpfn_apply_tag( $contact_id, $tag_id )
  * @param $tag_id int the ID of the tag
  * @return bool whether the deletion was successful
  */
-function wpfn_remove_tag( $contact_id, $tag_id  )
+function wpgh_remove_tag( $contact_id, $tag_id  )
 {
-    return wpfn_delete_contact_tag_relationship(intval( $contact_id ), intval( $tag_id ) );
+    return wpgh_delete_contact_tag_relationship(intval( $contact_id ), intval( $tag_id ) );
 }
 
 /**
@@ -392,14 +392,14 @@ function wpfn_remove_tag( $contact_id, $tag_id  )
  * @param $step_id int The Id of the step
  * @param $contact_id int the Contact's ID
  */
-function wpfn_enqueue_apply_tag_action( $step_id, $contact_id )
+function wpgh_enqueue_apply_tag_action( $step_id, $contact_id )
 {
-    $funnel_id = wpfn_get_step_funnel( $step_id );
-    wpfn_enqueue_event( strtotime( 'now' ) + 10, $funnel_id,  $step_id, $contact_id );
+    $funnel_id = wpgh_get_step_funnel( $step_id );
+    wpgh_enqueue_event( time() + 10, $funnel_id,  $step_id, $contact_id );
 }
 
-add_action( 'wpfn_enqueue_next_funnel_action_apply_tag', 'wpfn_enqueue_apply_tag_action', 10, 2 );
-add_action( 'wpfn_enqueue_next_funnel_action_remove_tag', 'wpfn_enqueue_apply_tag_action', 10, 2 );
+add_action( 'wpgh_enqueue_next_funnel_action_apply_tag', 'wpgh_enqueue_apply_tag_action', 10, 2 );
+add_action( 'wpgh_enqueue_next_funnel_action_remove_tag', 'wpgh_enqueue_apply_tag_action', 10, 2 );
 
 /**
  * Process the apply tag action
@@ -408,19 +408,19 @@ add_action( 'wpfn_enqueue_next_funnel_action_remove_tag', 'wpfn_enqueue_apply_ta
  * @param $contact_id int The contact's ID
  * @return void
  */
-function wpfn_do_apply_tag_action( $step_id, $contact_id )
+function wpgh_do_apply_tag_action( $step_id, $contact_id )
 {
-    $tags = wpfn_get_step_meta( $step_id, 'tags', true );
+    $tags = wpgh_get_step_meta( $step_id, 'tags', true );
 
     foreach ( $tags as $tag_id ){
-        if ( wpfn_tag_exists( intval( $tag_id ) ) && wpfn_get_contact_by_id( $contact_id ) && ! wpfn_has_tag( $contact_id, intval( $tag_id ) ) ){
-            wpfn_apply_tag( $contact_id, intval( $tag_id ) );
-            do_action( 'wpfn_tag_applied', $contact_id, intval( $tag_id ) );
+        if ( wpgh_tag_exists( intval( $tag_id ) ) && wpgh_get_contact_by_id( $contact_id ) && ! wpgh_has_tag( $contact_id, intval( $tag_id ) ) ){
+            wpgh_apply_tag( $contact_id, intval( $tag_id ) );
+            do_action( 'wpgh_tag_applied', $contact_id, intval( $tag_id ) );
         }
     }
 }
 
-add_action( 'wpfn_do_action_apply_tag', 'wpfn_do_apply_tag_action', 10, 2 );
+add_action( 'wpgh_do_action_apply_tag', 'wpgh_do_apply_tag_action', 10, 2 );
 
 /**
  * Process the apply tag action
@@ -429,18 +429,18 @@ add_action( 'wpfn_do_action_apply_tag', 'wpfn_do_apply_tag_action', 10, 2 );
  * @param $contact_id int The contact's ID
  * @return void
  */
-function wpfn_do_remove_tag_action( $step_id, $contact_id )
+function wpgh_do_remove_tag_action( $step_id, $contact_id )
 {
-    $tags = wpfn_get_step_meta( $step_id, 'tags', true );
+    $tags = wpgh_get_step_meta( $step_id, 'tags', true );
     foreach ( $tags as $tag_id ){
-        if ( wpfn_tag_exists( intval( $tag_id ) ) && wpfn_get_contact_by_id( $contact_id ) && wpfn_has_tag( $contact_id, intval( $tag_id ) ) ){
-            wpfn_remove_tag( $contact_id, intval( $tag_id ) );
-            do_action( 'wpfn_tag_removed', $contact_id, intval( $tag_id ) );
+        if ( wpgh_tag_exists( intval( $tag_id ) ) && wpgh_get_contact_by_id( $contact_id ) && wpgh_has_tag( $contact_id, intval( $tag_id ) ) ){
+            wpgh_remove_tag( $contact_id, intval( $tag_id ) );
+            do_action( 'wpgh_tag_removed', $contact_id, intval( $tag_id ) );
         }
     }
 }
 
-add_action( 'wpfn_do_action_remove_tag', 'wpfn_do_remove_tag_action', 10, 2 );
+add_action( 'wpgh_do_action_remove_tag', 'wpgh_do_remove_tag_action', 10, 2 );
 
 /**
  * Iterate through a list of supposed tags.
@@ -449,7 +449,7 @@ add_action( 'wpfn_do_action_remove_tag', 'wpfn_do_remove_tag_action', 10, 2 );
  * @param $maybe_tags array list of supposed tags.
  * @return mixed
  */
-function wpfn_validate_tags( $maybe_tags )
+function wpgh_validate_tags( $maybe_tags )
 {
 
     $tags = array();
@@ -458,17 +458,17 @@ function wpfn_validate_tags( $maybe_tags )
     {
 
         if ( is_int( $tag_id_or_string ) ){
-            if ( wpfn_tag_exists( $tag_id_or_string ) ) {
+            if ( wpgh_tag_exists( $tag_id_or_string ) ) {
                 $tags[] = $tag_id_or_string;
             }
         } else {
             $slug = sanitize_title( $tag_id_or_string );
 
-            if ( wpfn_tag_exists( $slug ) ) {
-                $tag = wpfn_get_tag( $slug );
+            if ( wpgh_tag_exists( $slug ) ) {
+                $tag = wpgh_get_tag( $slug );
                 $tags[] = intval( $tag['tag_id'] );
             } else {
-                $tags[] = wpfn_insert_tag( $tag_id_or_string );
+                $tags[] = wpgh_insert_tag( $tag_id_or_string );
             }
         }
     }
@@ -482,7 +482,7 @@ function wpfn_validate_tags( $maybe_tags )
  * @param $args array args for the tag selector
  * @return string html content for the selector
  */
-function wpfn_dropdown_tags( $args )
+function wpgh_dropdown_tags( $args )
 {
     wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css' );
     //wp_enqueue_style( 'select2-bootstrap', 'https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.9/select2-bootstrap.min.css' );
@@ -498,7 +498,7 @@ function wpfn_dropdown_tags( $args )
 
     $r = wp_parse_args( $args, $defaults );
 
-    $tags = wpfn_get_tags();
+    $tags = wpgh_get_tags();
 
     $output = '';
     // Back-compat with old system where both id and name were based on $name argument
@@ -528,7 +528,7 @@ function wpfn_dropdown_tags( $args )
 
             $selected = in_array( $item['tag_id'], $r['selected'] )? "selected='selected'" : '' ;
 
-            $output .= "<option value=\"" . $item['tag_id'] . "\" $selected >" . $item['tag_name'] . " (" . wpfn_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ). ")</option>";
+            $output .= "<option value=\"" . $item['tag_id'] . "\" $selected >" . $item['tag_name'] . " (" . wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ). ")</option>";
         }
 
         $output .= "</select>\n";
@@ -546,7 +546,7 @@ function wpfn_dropdown_tags( $args )
      * @param array  $r      The parsed arguments array.
      * @param array  $pages  List of WP_Post objects returned by `get_pages()`
      */
-    $html = apply_filters( 'wpfn_dropdown_tags', $output, $r, $tags );
+    $html = apply_filters( 'wpgh_dropdown_tags', $output, $r, $tags );
 
     if ( $r['echo'] ) {
         echo $html;
@@ -558,34 +558,34 @@ function wpfn_dropdown_tags( $args )
 /**
  * If the contact is visiting the confirmation page then confirm the email address!
  */
-function wpfn_process_email_confirmation()
+function wpgh_process_email_confirmation()
 {
     if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-confirmation/via/email' ) === false )
         return;
 
-    $contact = wpfn_get_the_contact();
+    $contact = wpgh_get_the_contact();
 
     if ( ! $contact )
         return;
 
-    wpfn_update_contact( $contact->get_id(), 'optin_status', 1 );
+    wpgh_update_contact( $contact->get_id(), 'optin_status', 1 );
 
     $conf_page = get_permalink( get_option( 'gh_confirmation_page' ) );
 
-    do_action( 'wpfn_email_confirmed', $contact->get_id(), wpfn_get_current_funnel() );
+    do_action( 'wpgh_email_confirmed', $contact->get_id(), wpgh_get_current_funnel() );
 
     wp_redirect( $conf_page );
     die();
 }
 
-add_action( 'init', 'wpfn_process_email_confirmation' );
+add_action( 'init', 'wpgh_process_email_confirmation' );
 
 /**
  * Get the IP address of the current visiotor
  *
  * @return string the IP of a vsitor.
  */
-function wpfn_get_visitor_ip() {
+function wpgh_get_visitor_ip() {
     if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
         //check ip from share internet
         $ip = $_SERVER['HTTP_CLIENT_IP'];
@@ -595,5 +595,5 @@ function wpfn_get_visitor_ip() {
     } else {
         $ip = $_SERVER['REMOTE_ADDR'];
     }
-    return apply_filters( 'wpfn_get_ip', $ip );
+    return apply_filters( 'wpgh_get_ip', $ip );
 }

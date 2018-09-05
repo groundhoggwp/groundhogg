@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Broadcasts_Table extends WP_List_Table {
+class WPGH_Broadcasts_Table extends WP_List_Table {
 
 	/**
 	 * TT_Example_List_Table constructor.
@@ -83,15 +83,15 @@ class WPFN_Broadcasts_Table extends WP_List_Table {
     {
         $views =  array();
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_broadcast_items() . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpgh_count_broadcast_items() . ")</span>" . "</a>";
 
-        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=sent' ) . "'>" . __( 'Sent' ) . " <span class='count'>(" . wpfn_count_broadcast_items( 'broadcast_status', 'sent' ) . ")</span>" . "</a>";
+        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=sent' ) . "'>" . __( 'Sent' ) . " <span class='count'>(" . wpgh_count_broadcast_items( 'broadcast_status', 'sent' ) . ")</span>" . "</a>";
 
-        $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=scheduled' ) . "'>" . __( 'Scheduled' ) . " <span class='count'>(" . wpfn_count_broadcast_items( 'broadcast_status', 'scheduled' ) . ")</span>" . "</a>";
+        $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=scheduled' ) . "'>" . __( 'Scheduled' ) . " <span class='count'>(" . wpgh_count_broadcast_items( 'broadcast_status', 'scheduled' ) . ")</span>" . "</a>";
 
-        $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=cancelled' ) . "'>" . __( 'Cancelled' ) . " <span class='count'>(" . wpfn_count_broadcast_items( 'broadcast_status', 'cancelled' ) . ")</span>" . "</a>";
+        $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=cancelled' ) . "'>" . __( 'Cancelled' ) . " <span class='count'>(" . wpgh_count_broadcast_items( 'broadcast_status', 'cancelled' ) . ")</span>" . "</a>";
 
-        return apply_filters(  'wpfn_broadcast_views', $views );
+        return apply_filters(  'wpgh_broadcast_views', $views );
     }
 
     protected function get_view()
@@ -108,11 +108,11 @@ class WPFN_Broadcasts_Table extends WP_List_Table {
 	protected function get_row_actions( $id )
     {
 
-        $broadcast = wpfn_get_broadcast_by_id( $id );
+        $broadcast = wpgh_get_broadcast_by_id( $id );
 
         if ( $this->get_view() !== 'cancelled' )
         {
-            return apply_filters( 'wpfn_broadcast_row_actions', array(
+            return apply_filters( 'wpgh_broadcast_row_actions', array(
                 "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email='. $broadcast['email_id'] ). "'>" . __( 'Edit Email' ) . "</a></span>",
                 "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast='. $id ), 'cancel' ). "'>" . __( 'Cancel' ) . "</a></span>",
             ));
@@ -130,7 +130,7 @@ class WPFN_Broadcasts_Table extends WP_List_Table {
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			case 'email_id':
-			    $email = wpfn_get_email_by_id( intval( $item['email_id'] ) );
+			    $email = wpgh_get_email_by_id( intval( $item['email_id'] ) );
 
 			    $subject = ( ! $email->subject )? '(' . __( 'no email' ) . ')' : $email->subject;
 				$editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . $item['ID'] );
@@ -162,8 +162,8 @@ class WPFN_Broadcasts_Table extends WP_List_Table {
                 if ( $item[ 'broadcast_status' ] !== 'sent' )
                     return '&#x2014;';
 
-                $opens = wpfn_get_broadcast_opens( $item['ID'] );
-                $clicks = wpfn_get_broadcast_opens( $item['ID'] );
+                $opens = wpgh_get_broadcast_opens( $item['ID'] );
+                $clicks = wpgh_get_broadcast_opens( $item['ID'] );
 
                 $html = "Opens: <strong>" . $opens . "</strong><br>";
                 $html.= "Clicks: <strong>" . $clicks . "</strong><br>";
@@ -190,7 +190,7 @@ class WPFN_Broadcasts_Table extends WP_List_Table {
             case 'send_to_tags':
                 $tags = $item[ 'send_to_tags' ] ? maybe_unserialize( $item[ 'send_to_tags' ] ) : array();
                 foreach ( $tags as $i => $tag_id ){
-                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . wpfn_get_tag_name( $tag_id ). '</a>';
+                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . wpgh_get_tag_name( $tag_id ). '</a>';
                 }
                 return implode( ', ', $tags );
                 break;
@@ -228,7 +228,7 @@ class WPFN_Broadcasts_Table extends WP_List_Table {
             );
         }
 
-        return apply_filters( 'wpfn_broadcast_bulk_actions', $actions );
+        return apply_filters( 'wpgh_broadcast_bulk_actions', $actions );
 	}
 
 	/**
@@ -257,8 +257,8 @@ class WPFN_Broadcasts_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$table_emails = $wpdb->prefix . WPFN_EMAILS;
-		$table_broadcasts = $wpdb->prefix . WPFN_BROADCASTS;
+		$table_emails = $wpdb->prefix . WPGH_EMAILS;
+		$table_broadcasts = $wpdb->prefix . WPGH_BROADCASTS;
 
 //		$query = "SELECT * FROM $table_broadcasts WHERE ";
 		$query = "SELECT b.*, e.subject FROM $table_broadcasts b LEFT JOIN $table_emails e ON b.email_id = e.ID WHERE ";

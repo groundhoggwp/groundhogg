@@ -6,7 +6,7 @@ if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) ){
     include dirname(__FILE__) . '/updater/EDD_SL_Plugin_Updater.php';
 }
 
-class WPFN_Extension_Manager
+class WPGH_Extension_Manager
 {
     static $extensions = array(); // array( item_id => array( license, status ) )
     static $storeUrl = "https://groundhogg.io";
@@ -31,7 +31,7 @@ class WPFN_Extension_Manager
 
         foreach ( $extensions as $extension_args ){
             if ( self::has_license( $extension_args['item_id'] ) && self::get_license_status( $extension_args['item_id']  ) !== 'invalid' ){
-                $updater = new EDD_SL_Plugin_Updater( WPFN_Extension_Manager::$storeUrl, $extension_args['file'], array(
+                $updater = new EDD_SL_Plugin_Updater( WPGH_Extension_Manager::$storeUrl, $extension_args['file'], array(
                         'version' 	=> $extension_args['version'], 		// current version number
                         'license' 	=> trim( self::get_license( $extension_args['item_id'] ) ), 	// license key (used get_option above to retrieve from DB)
                         'item_id'   => $extension_args['item_id'], 	// id of this product in EDD
@@ -209,7 +209,7 @@ class WPFN_Extension_Manager
 
 	public static function extension_page()
 	{
-        wp_enqueue_style( 'gh-extensions-style', WPFN_ASSETS_FOLDER . '/css/admin/extensions.css' );
+        wp_enqueue_style( 'gh-extensions-style', WPGH_ASSETS_FOLDER . '/css/admin/extensions.css' );
 
         //use a filter instead of the member variable so that it goes away when plugin is deactivated.
 		$extensions = apply_filters( 'get_gh_extensions', array() );
@@ -223,7 +223,7 @@ class WPFN_Extension_Manager
                     <?php
                 } else {
                     foreach ( $extensions as $extensionId => $args ){
-                        echo new WPFN_Extension( $extensionId, $args );
+                        echo new WPGH_Extension( $extensionId, $args );
                     }
                 }
                 ?>
@@ -232,7 +232,7 @@ class WPFN_Extension_Manager
 	}
 }
 
-class WPFN_Extension
+class WPGH_Extension
 {
     var $item_id;
     var $item_name;
@@ -249,22 +249,22 @@ class WPFN_Extension
 
     public function license_exists()
     {
-        return isset( WPFN_Extension_Manager::$extensions[ $this->item_id ] );
+        return isset( WPGH_Extension_Manager::$extensions[ $this->item_id ] );
     }
 
     public function get_license()
     {
-        return WPFN_Extension_Manager::$extensions[ $this->item_id ]['license'];
+        return WPGH_Extension_Manager::$extensions[ $this->item_id ]['license'];
     }
 
     public function get_license_status()
     {
-        return WPFN_Extension_Manager::$extensions[ $this->item_id ]['status'];
+        return WPGH_Extension_Manager::$extensions[ $this->item_id ]['status'];
     }
 
     public function get_expiry()
     {
-    	return isset( WPFN_Extension_Manager::$extensions[ $this->item_id ]['expiry'] )? WPFN_Extension_Manager::$extensions[ $this->item_id ]['expiry'] : __( 'No data. See your account at Groundhogg.io' );
+    	return isset( WPGH_Extension_Manager::$extensions[ $this->item_id ]['expiry'] )? WPGH_Extension_Manager::$extensions[ $this->item_id ]['expiry'] : __( 'No data. See your account at Groundhogg.io' );
     }
 
     public function __toString()

@@ -18,7 +18,7 @@
  *
  * @return string
  */
-function wpfn_contact_record_input_field( $type, $id, $name, $value, $classes='' )
+function wpgh_contact_record_input_field( $type, $id, $name, $value, $classes='' )
 {
 	return "<input type='$type' id='$id' name='$name' class='regular-text $classes' value='$value' />";
 }
@@ -32,9 +32,9 @@ function wpfn_contact_record_input_field( $type, $id, $name, $value, $classes=''
  *
  * @return string
  */
-function wpfn_admin_text_input_field( $id, $name, $value, $classes='' )
+function wpgh_admin_text_input_field( $id, $name, $value, $classes='' )
 {
-	return wpfn_contact_record_input_field( 'text', $id, $name, $value, $classes );
+	return wpgh_contact_record_input_field( 'text', $id, $name, $value, $classes );
 }
 
 /**
@@ -45,12 +45,12 @@ function wpfn_admin_text_input_field( $id, $name, $value, $classes='' )
  *
  * @return string
  */
-function wpfn_admin_email_input_field( $id, $name, $value, $classes='' )
+function wpgh_admin_email_input_field( $id, $name, $value, $classes='' )
 {
-	return wpfn_contact_record_input_field( 'email', $id, $name, $value, $classes );
+	return wpgh_contact_record_input_field( 'email', $id, $name, $value, $classes );
 }
 
-function wpfn_font_select( $id, $name )
+function wpgh_font_select( $id, $name )
 {
 	?>
 	<select name="<?php echo $name?>" id="<?php echo $id?>">
@@ -71,9 +71,9 @@ function wpfn_font_select( $id, $name )
 	<?php
 }
 
-function wpfn_color_select( $id, $name, $default='' )
+function wpgh_color_select( $id, $name, $default='' )
 {
 	?>
-	<input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" class="wpfn-color" data-default-color="<?php echo $default;?>" />
+	<input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" class="wpgh-color" data-default-color="<?php echo $default;?>" />
 	<?php
 }

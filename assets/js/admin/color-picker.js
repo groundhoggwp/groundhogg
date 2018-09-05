@@ -1,3 +1,3 @@
 jQuery(document).ready(function($){
-    $('.wpfn-color').wpColorPicker();
+    $('.wpgh-color').wpColorPicker();
 });

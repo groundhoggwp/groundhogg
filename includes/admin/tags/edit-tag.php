@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $id = intval( $_GET[ 'tag' ] );
 
-$tag = wpfn_tag_exists( $id );
+$tag = wpgh_tag_exists( $id );
 ?>
 
 <form name="edittag" id="edittag" method="post" action="" class="validate">

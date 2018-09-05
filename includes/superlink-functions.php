@@ -10,7 +10,7 @@
 /**
  * If the link is pobviously a superlink, then perform the request actions...
  */
-function wpfn_process_superlink()
+function wpgh_process_superlink()
 {
     if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/superlinks/link/' ) === false )
         return;
@@ -19,12 +19,12 @@ function wpfn_process_superlink()
     $link_parts = explode( '/', $link_path );
     $link_id = intval( $link_parts[ count( $link_parts) -1 ] );
 
-    $link = wpfn_get_superlink_by_id( $link_id );
+    $link = wpgh_get_superlink_by_id( $link_id );
 
     if ( ! $link )
         return;
 
-    $contact = wpfn_get_the_contact();
+    $contact = wpgh_get_the_contact();
 
     if ( $link[ 'tags' ] && $contact )
     {
@@ -32,7 +32,7 @@ function wpfn_process_superlink()
 
         foreach ( $tags as $tag_id )
         {
-            wpfn_apply_tag( $contact->get_id(), $tag_id );
+            wpgh_apply_tag( $contact->get_id(), $tag_id );
         }
     }
 
@@ -42,24 +42,24 @@ function wpfn_process_superlink()
     wp_redirect( esc_url_raw( $link['target'] ) );
 }
 
-add_action( 'init', 'wpfn_process_superlink' );
+add_action( 'init', 'wpgh_process_superlink' );
 
 
 /**
  * Do the link replacement...
  *
  * @param $linkId int the ID of the link
- * @param $contact WPFN_Contact the contact
+ * @param $contact WPGH_Contact the contact
  *
  * @return string the superlink url
  */
-function wpfn_superlink_replacement_callback( $linkId, $contact )
+function wpgh_superlink_replacement_callback( $linkId, $contact )
 {
     $linkId = absint( intval( $linkId ) );
     return site_url( 'superlinks/link/' . $linkId );
 }
 
-add_filter( 'wpfn_replacement_superlink', 'wpfn_superlink_replacement_callback', 10, 2 );
+add_filter( 'wpgh_replacement_superlink', 'wpgh_superlink_replacement_callback', 10, 2 );
 
 /**
  * Filter out http://http:// as a result of wpLink enforcing http:// even when using {replacements} which is really annoying.
@@ -67,7 +67,7 @@ add_filter( 'wpfn_replacement_superlink', 'wpfn_superlink_replacement_callback',
  * @param $content
  * @return string, the email content
  */
-function wpfn_filter_out_double_http( $content )
+function wpgh_filter_out_double_http( $content )
 {
     $schema = is_ssl()? 'https://' : 'http://';
 
@@ -77,35 +77,35 @@ function wpfn_filter_out_double_http( $content )
     return $content;
 }
 
-add_filter( 'wpfn_the_email_content', 'wpfn_filter_out_double_http' );
-add_filter( 'wpfn_sanitize_email_content', 'wpfn_filter_out_double_http' );
+add_filter( 'wpgh_the_email_content', 'wpgh_filter_out_double_http' );
+add_filter( 'wpgh_sanitize_email_content', 'wpgh_filter_out_double_http' );
 
-function wpfn_filter_out_http_superlink_prefix( $content )
+function wpgh_filter_out_http_superlink_prefix( $content )
 {
     return preg_replace( '/http:\/\/({superlink\.\d})/', '${1}', $content );
 }
 
-add_filter( 'wpfn_the_email_content', 'wpfn_filter_out_http_superlink_prefix' );
-add_filter( 'wpfn_sanitize_email_content', 'wpfn_filter_out_http_superlink_prefix' );
+add_filter( 'wpgh_the_email_content', 'wpgh_filter_out_http_superlink_prefix' );
+add_filter( 'wpgh_sanitize_email_content', 'wpgh_filter_out_http_superlink_prefix' );
 
-function wpfn_add_superlink()
+function wpgh_add_superlink()
 {
 	$superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
 	$superlink_target = sanitize_text_field( wp_unslash( $_POST['superlink_target'] ) );
-	$superlink_tags = isset( $_POST['superlink_tags'] ) ? wpfn_validate_tags( $_POST['superlink_tags'] ): array() ;
-	$superlink_id = wpfn_insert_new_superlink( $superlink_name, $superlink_target, $superlink_tags );
+	$superlink_tags = isset( $_POST['superlink_tags'] ) ? wpgh_validate_tags( $_POST['superlink_tags'] ): array() ;
+	$superlink_id = wpgh_insert_new_superlink( $superlink_name, $superlink_target, $superlink_tags );
 }
 
-add_action( 'wpfn_add_superlink', 'wpfn_add_superlink' );
+add_action( 'wpgh_add_superlink', 'wpgh_add_superlink' );
 
-function wpfn_save_superlink( $id )
+function wpgh_save_superlink( $id )
 {
 	$superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
 	$superlink_target = sanitize_text_field( wp_unslash( $_POST['superlink_target'] ) );
-	$superlink_tags = wpfn_validate_tags( $_POST['superlink_tags'] );
-	wpfn_update_superlink( $id, 'name', $superlink_name );
-	wpfn_update_superlink( $id, 'target', $superlink_target );
-	wpfn_update_superlink( $id, 'tags', $superlink_tags );
+	$superlink_tags = wpgh_validate_tags( $_POST['superlink_tags'] );
+	wpgh_update_superlink( $id, 'name', $superlink_name );
+	wpgh_update_superlink( $id, 'target', $superlink_target );
+	wpgh_update_superlink( $id, 'tags', $superlink_tags );
 }
 
-add_action( 'wpfn_update_superlink', 'wpfn_save_superlink' );
+add_action( 'wpgh_update_superlink', 'wpgh_save_superlink' );

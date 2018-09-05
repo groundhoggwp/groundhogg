@@ -19,7 +19,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class WPFN_Funnels_Table extends WP_List_Table {
+class WPGH_Funnels_Table extends WP_List_Table {
 
     /**
      * TT_Example_List_Table constructor.
@@ -81,15 +81,15 @@ class WPFN_Funnels_Table extends WP_List_Table {
     {
         $views =  array();
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpfn_count_funnel_items() . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . wpgh_count_funnel_items() . ")</span>" . "</a>";
 
-        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=active' ) . "'>" . __( 'Active' ) . " <span class='count'>(" . wpfn_count_funnel_items( 'funnel_status', 'active' ) . ")</span>" . "</a>";
+        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=active' ) . "'>" . __( 'Active' ) . " <span class='count'>(" . wpgh_count_funnel_items( 'funnel_status', 'active' ) . ")</span>" . "</a>";
 
-        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=inactive' ) . "'>" . __( 'Inactive' ) . " <span class='count'>(" . wpfn_count_funnel_items( 'funnel_status', 'inactive' ) . ")</span>" . "</a>";
+        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=inactive' ) . "'>" . __( 'Inactive' ) . " <span class='count'>(" . wpgh_count_funnel_items( 'funnel_status', 'inactive' ) . ")</span>" . "</a>";
 
-        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=archived' ) . "'>" . __( 'Archived' ) . " <span class='count'>(" . wpfn_count_funnel_items( 'funnel_status', 'archived' ) . ")</span>" . "</a>";
+        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=archived' ) . "'>" . __( 'Archived' ) . " <span class='count'>(" . wpgh_count_funnel_items( 'funnel_status', 'archived' ) . ")</span>" . "</a>";
 
-        return apply_filters(  'wpfn_funnel_views', $views );
+        return apply_filters(  'wpgh_funnel_views', $views );
     }
 
     protected function get_view()
@@ -112,7 +112,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
                 "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
             );
         } else {
-            return apply_filters( 'wpfn_email_row_actions', array(
+            return apply_filters( 'wpgh_email_row_actions', array(
                 "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_funnels&action=edit&funnel='. $id ). "'>" . __( 'Build' ) . "</a></span>",
                 "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive' ) . "</a></span>",
             ));
@@ -155,7 +155,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
             case 'active_contacts':
                 global $wpdb;
 
-                $table_name = $wpdb->prefix . WPFN_EVENTS;
+                $table_name = $wpdb->prefix . WPGH_EVENTS;
 
                 $count = $wpdb->get_var(
                     $wpdb->prepare(
@@ -215,7 +215,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
             );
         }
 
-        return apply_filters( 'wpfn_email_bulk_actions', $actions );
+        return apply_filters( 'wpgh_email_bulk_actions', $actions );
     }
 
     /**
@@ -242,7 +242,7 @@ class WPFN_Funnels_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $table_name = $wpdb->prefix . WPFN_FUNNELS;
+        $table_name = $wpdb->prefix . WPGH_FUNNELS;
 
         $query = "SELECT * FROM $table_name WHERE ";
 

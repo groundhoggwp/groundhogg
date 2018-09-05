@@ -11,10 +11,10 @@
  * @since       0.1
  */
 
-function wpfn_account_created_funnel_step_html( $step_id )
+function wpgh_account_created_funnel_step_html( $step_id )
 {
 
-    $account_role = wpfn_get_step_meta( $step_id, 'role', true );
+    $account_role = wpgh_get_step_meta( $step_id, 'role', true );
 
     $args = array();
 
@@ -28,10 +28,10 @@ function wpfn_account_created_funnel_step_html( $step_id )
         <tr>
             <th><?php echo esc_html__( 'Run when the following type of account is created', 'groundhogg' ); ?>:</th>
             <td>
-                <select name="<?php echo wpfn_prefix_step_meta( $step_id, 'role' ); ?>" id="<?php echo wpfn_prefix_step_meta( $step_id, 'role' ); ?>">
+                <select name="<?php echo wpgh_prefix_step_meta( $step_id, 'role' ); ?>" id="<?php echo wpgh_prefix_step_meta( $step_id, 'role' ); ?>">
                     <?php wp_dropdown_roles( $account_role ); ?>
                 </select>
-                <script>jQuery(document).ready(function(){jQuery( '#<?php echo wpfn_prefix_step_meta( $step_id, 'role' ); ?>' ).select2()});</script>
+                <script>jQuery(document).ready(function(){jQuery( '#<?php echo wpgh_prefix_step_meta( $step_id, 'role' ); ?>' ).select2()});</script>
             </td>
         </tr>
         </tbody>
@@ -40,21 +40,21 @@ function wpfn_account_created_funnel_step_html( $step_id )
     <?php
 }
 
-add_action( 'wpfn_get_step_settings_account_created', 'wpfn_account_created_funnel_step_html' );
+add_action( 'wpgh_get_step_settings_account_created', 'wpgh_account_created_funnel_step_html' );
 
-function wpfn_account_created_icon_html()
+function wpgh_account_created_icon_html()
 {
     ?>
     <div class="dashicons dashicons-admin-users"></div><p>User Created</p>
     <?php
 }
 
-add_action( 'wpfn_benchmark_element_icon_html_account_created', 'wpfn_account_created_icon_html' );
+add_action( 'wpgh_benchmark_element_icon_html_account_created', 'wpgh_account_created_icon_html' );
 
-function wpfn_save_account_created_funnel_step( $step_id )
+function wpgh_save_account_created_funnel_step( $step_id )
 {
-    $role = sanitize_text_field( $_POST[ wpfn_prefix_step_meta( $step_id, 'role' ) ] );
-    wpfn_update_step_meta( $step_id, 'role', $role );
+    $role = sanitize_text_field( $_POST[ wpgh_prefix_step_meta( $step_id, 'role' ) ] );
+    wpgh_update_step_meta( $step_id, 'role', $role );
 }
 
-add_action( 'wpfn_save_step_account_created', 'wpfn_save_account_created_funnel_step' );
+add_action( 'wpgh_save_step_account_created', 'wpgh_save_account_created_funnel_step' );

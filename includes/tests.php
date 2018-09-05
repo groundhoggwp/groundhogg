@@ -11,7 +11,7 @@
 function test_event_queue()
 {
 
-    $step_id = wpfn_enqueue_next_funnel_action( 43, 5 );
+    $step_id = wpgh_enqueue_next_funnel_action( 43, 5 );
 
     var_dump( $step_id );
 
@@ -22,7 +22,7 @@ function test_event_queue()
 
 function test_email()
 {
-    wpfn_send_email( 5, 2 );
+    wpgh_send_email( 5, 2 );
 }
 
 

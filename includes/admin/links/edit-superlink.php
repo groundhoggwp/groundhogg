@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $id = intval( $_GET[ 'superlink' ] );
 
-$superlink = wpfn_get_superlink_by_id( $id );
+$superlink = wpgh_get_superlink_by_id( $id );
 
 ?>
 <form name="edittag" id="edittag" method="post" action="">
@@ -48,7 +48,7 @@ $superlink = wpfn_get_superlink_by_id( $id );
                     $tag_args['selected'] = $superlink['tags'];
                 }
                 ?>
-                <?php wpfn_dropdown_tags( $tag_args ); ?>
+                <?php wpgh_dropdown_tags( $tag_args ); ?>
                 <p class="description"><?php _e( 'These tags will be applied to a contact whenever this link is clicked. To create a new tag hit [enter] or [comma]', 'groundhogg' ); ?></p>
             </td>
         </tr>
