@@ -53,7 +53,7 @@ class WPGH_Emails_Table extends WP_List_Table {
             'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
             'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
-		return $columns;
+		return apply_filters( 'wpgh_email_columns', $columns );
 	}
 	/**
 	 * Get a list of sortable columns. The format is:
@@ -66,12 +66,12 @@ class WPGH_Emails_Table extends WP_List_Table {
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
 			'subject'    => array( 'subject', false ),
-			'from_user' => array( 'from_name', false ),
-			'author' => array( 'from_name', false ),
+			'from_user' => array( 'from_user', false ),
+			'author' => array( 'author', false ),
 			'last_updated' => array( 'last_updated', false ),
 			'date_created' => array( 'date_created', false )
 		);
-		return $sortable_columns;
+		return apply_filters( 'wpgh_email_sortable_columns', $sortable_columns );
 	}
 
     /**
@@ -103,22 +103,92 @@ class WPGH_Emails_Table extends WP_List_Table {
      * Get default row actions...
      *
      * @param $id int an item ID
-     * @return array a list of actions
+     * @return string a list of actions
      */
-	protected function get_row_actions( $id )
+	protected function handle_row_actions( $item, $column_name, $primary )
     {
-        if ( $this->get_view() === 'trash' )
-        {
-            return array(
-                "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>",
-                "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=delete&email='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
-            );
-        } else {
-            return apply_filters( 'wpgh_email_row_actions', array(
-                "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email='. $id ). "'>" . __( 'Edit' ) . "</a></span>",
-                "<span class='trash'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email='. $id ), 'trash' ). "'>" . __( 'Trash' ) . "</a></span>",
-            ));
+        if ( $primary !== $column_name ) {
+            return '';
         }
+
+        $actions = array();
+        $id = $item['ID'];
+
+        if ( $this->get_view() === 'archived' )
+        {
+            $actions[ 'restore' ] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>";
+            $actions[ 'delete' ] = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=archived&action=delete&email='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>";
+        } else {
+            $actions[ 'edit' ] = "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email='. $id ). "'>" . __( 'Edit' ) . "</a></span>";
+            $actions[ 'trash' ] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email='. $id ), 'trash' ). "'>" . __( 'Trash' ) . "</a></span>";
+        }
+
+        return $this->row_actions( apply_filters( 'wpgh_email_row_actions', $actions, $item, $column_name ) );
+    }
+
+    protected function column_subject( $item )
+    {
+        $subject = ( ! $item[ 'subject' ] )? '(' . __( 'no subject' ) . ')' : $item[ 'subject' ] ;
+        $editUrl = admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $item['ID'] );
+
+        if ( $this->get_view() === 'trash' ){
+            $html = "<strong>{$subject}</strong>";
+        } else {
+            $html = "<strong>";
+
+            $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+
+            if ( $item['email_status'] === 'draft' ){
+                $html .= " — " . "<span class='post-state'>(" . __( 'Draft' ) . ")</span>";
+            }
+        }
+        $html .= "</strong>";
+
+        return $html;
+    }
+
+    protected function column_from_user( $item )
+    {
+        $user = get_userdata( intval( ( $item['from_user'] ) ) );
+        $from_user = esc_html( $user->display_name . ' <' . $user->user_email . '>' );
+        $queryUrl = admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=' . $item['from_user'] );
+        return "<a href='$queryUrl'>$from_user</a>";
+    }
+
+    protected function column_author( $item )
+    {
+        $user = get_userdata( intval( ( $item['author'] ) ) );
+        $from_user = esc_html( $user->user_login );
+        $queryUrl = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $item['author'] );
+        return "<a href='$queryUrl'>$from_user</a>";
+    }
+
+    protected function column_date_created( $item )
+    {
+        $dc_time = mysql2date( 'U', $item['date_created'] );
+        $cur_time = (int) current_time( 'timestamp' );
+        $time_diff = $dc_time - $cur_time;
+        $time_prefix = __( 'Created' );
+        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+            $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
+        } else {
+            $time = sprintf( "%s ago", human_time_diff( $dc_time, $cur_time ) );
+        }
+        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
+    }
+
+    protected function column_last_updated( $item )
+    {
+        $lu_time = mysql2date( 'U', $item['last_updated'] );
+        $cur_time = (int) current_time( 'timestamp' );
+        $time_diff = $lu_time - $cur_time;
+        $time_prefix = __( 'Updated' );
+        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+            $time = date_i18n( 'Y/m/d \@ h:i A', intval( $lu_time ) );
+        } else {
+            $time = sprintf( "%s ago", human_time_diff( $lu_time, $cur_time ) );
+        }
+        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $lu_time ) ) . '">' . $time . '</abbr>';
     }
 
 	/**
@@ -130,49 +200,10 @@ class WPGH_Emails_Table extends WP_List_Table {
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
 	protected function column_default( $item, $column_name ) {
-		switch ( $column_name ) {
-			case 'subject':
-			    $subject = ( ! $item[ $column_name ] )? '(' . __( 'no subject' ) . ')' : $item[ $column_name ] ;
-				$editUrl = admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $item['ID'] );
 
-				if ( $this->get_view() === 'trash' ){
-				    $html = "<strong>{$subject}</strong>";
-                } else {
-				    $html = "<strong>";
+	    do_action( 'wpgh_email_custom_column', $item, $column_name );
 
-                    $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
-
-                    if ( $item['email_status'] === 'draft' ){
-                        $html .= " — " . "<span class='post-state'>(" . __( 'Draft' ) . ")</span>";
-                    }
-                }
-                $html .= "</strong>";
-
-                $html .= $this->row_actions( $this->get_row_actions( $item['ID'] ) );
-
-                return $html;
-
-				break;
-            case 'from_user':
-                $user = get_userdata( intval( ( $item['from_user'] ) ) );
-                $from_user = esc_html( $user->display_name . ' <' . $user->user_email . '>' );
-                $queryUrl = admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=' . $item['from_user'] );
-                return "<a href='$queryUrl'>$from_user</a>";
-            case 'author':
-                $user = get_userdata( intval( ( $item['author'] ) ) );
-                $from_user = esc_html( $user->user_login );
-                $queryUrl = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $item['author'] );
-                return "<a href='$queryUrl'>$from_user</a>";
-            case 'date_created':
-                return __( 'Created' ) . '<br><abbr title="' . $item['date_created'] . '">' . date('Y/m/d', strtotime($item['date_created'])) . '</abbr>';
-                break;
-            case 'last_updated':
-                return __( 'Updated' ) . '<br><abbr title="' . $item['last_updated'] . '">' . date('Y/m/d', strtotime($item['last_updated'])) . '</abbr>';
-                break;
-            default:
-				return print_r( $item[ $column_name ], true );
-				break;
-		}
+	    return '';
 	}
 	/**
 	 * Get value for checkbox column.

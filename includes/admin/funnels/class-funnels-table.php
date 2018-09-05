@@ -45,14 +45,16 @@ class WPGH_Funnels_Table extends WP_List_Table {
      * @return array An associative array containing column information.
      */
     public function get_columns() {
+
         $columns = array(
-            'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
-            'title'    => _x( 'Title', 'Column label', 'groundhogg' ),
+            'cb'                => '<input type="checkbox" />', // Render a checkbox instead of text.
+            'title'             => _x( 'Title', 'Column label', 'groundhogg' ),
             'active_contacts'   => _x( 'Active Contacts', 'Column label', 'groundhogg' ),
-            'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
-            'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
+            'last_updated'      => _x( 'Last Updated', 'Column label', 'groundhogg' ),
+            'date_created'      => _x( 'Date Created', 'Column label', 'groundhogg' ),
         );
-        return $columns;
+
+        return apply_filters( 'wpgh_funnels_get_columns', $columns );
     }
     /**
      * Get a list of sortable columns. The format is:
@@ -63,13 +65,15 @@ class WPGH_Funnels_Table extends WP_List_Table {
      * @return array An associative array containing all the columns that should be sortable.
      */
     protected function get_sortable_columns() {
+
         $sortable_columns = array(
-            'title'    => array( 'title', false ),
-            'active_contacts' => array( 'active_contacts', false ),
-            'last_updated' => array( 'last_updated', false ),
-            'date_created' => array( 'date_created', false )
+            'title'             => array( 'title', false ),
+            'active_contacts'   => array( 'active_contacts', false ),
+            'last_updated'      => array( 'last_updated', false ),
+            'date_created'      => array( 'date_created', false )
         );
-        return $sortable_columns;
+
+        return apply_filters( 'wpgh_funnels_get_sortable_columns', $sortable_columns );
     }
 
     /**
@@ -101,22 +105,96 @@ class WPGH_Funnels_Table extends WP_List_Table {
      * Get default row actions...
      *
      * @param $id int an item ID
-     * @return array a list of actions
+     * @return string a list of actions
      */
-    protected function get_row_actions( $id )
+    protected function handle_row_actions( $item, $column_name, $primary )
     {
+        if ( $primary !== $column_name ) {
+            return '';
+        }
+
+        $actions = array();
+        $id = $item['ID'];
+
         if ( $this->get_view() === 'archived' )
         {
-            return array(
-                "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>",
-                "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>",
-            );
+            $actions[ 'restore' ] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>";
+            $actions[ 'delete' ] = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>";
         } else {
-            return apply_filters( 'wpgh_email_row_actions', array(
-                "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_funnels&action=edit&funnel='. $id ). "'>" . __( 'Build' ) . "</a></span>",
-                "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive' ) . "</a></span>",
-            ));
+            $actions[ 'edit' ] = "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_funnels&action=edit&funnel='. $id ). "'>" . __( 'Build' ) . "</a></span>";
+            $actions[ 'trash' ] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive' ) . "</a></span>";
         }
+
+        return $this->row_actions( apply_filters( 'wpgh_funnel_row_actions', $actions, $item, $column_name ) );
+    }
+
+    protected function column_title( $item )
+    {
+        $subject = ( ! $item[ 'funnel_title' ] )? '(' . __( 'no title' ) . ')' : $item[ 'funnel_title' ] ;
+        $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $item['ID'] );
+
+        if ( $this->get_view() === 'archived' ){
+            $html = "<strong>{$subject}</strong>";
+        } else {
+            $html = "<strong>";
+
+            $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+
+            if ( $item['funnel_status'] === 'inactive' ){
+                $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Inactive', 'groundhogg' ) . ")</span>";
+            }
+        }
+        $html .= "</strong>";
+
+        return $html;
+    }
+
+    protected function column_active_contacts( $item )
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . WPGH_EVENTS;
+
+        $count = $wpdb->get_var(
+            $wpdb->prepare(
+                "
+                         SELECT COUNT(*) FROM $table_name
+                         WHERE funnel_id = %d AND status = %s
+                        ",
+                $item['ID'], 'waiting'
+            )
+        );
+
+        $queryUrl = admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . $item['ID'] );
+        return "<a href='$queryUrl'>$count</a>";
+    }
+
+    protected function column_last_updated( $item )
+    {
+        $lu_time = mysql2date( 'U', $item['last_updated'] );
+        $cur_time = (int) current_time( 'timestamp' );
+        $time_diff = $lu_time - $cur_time;
+        $time_prefix = __( 'Updated' );
+        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+            $time = date_i18n( 'Y/m/d \@ h:i A', intval( $lu_time ) );
+        } else {
+            $time = sprintf( "%s ago", human_time_diff( $lu_time, $cur_time ) );
+        }
+        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $lu_time ) ) . '">' . $time . '</abbr>';
+    }
+
+    protected function column_date_created( $item )
+    {
+        $dc_time = mysql2date( 'U', $item['date_created'] );
+        $cur_time = (int) current_time( 'timestamp' );
+        $time_diff = $dc_time - $cur_time;
+        $time_prefix = __( 'Created' );
+        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+            $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
+        } else {
+            $time = sprintf( "%s ago", human_time_diff( $dc_time, $cur_time ) );
+        }
+        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
     }
 
     /**
@@ -128,58 +206,13 @@ class WPGH_Funnels_Table extends WP_List_Table {
      * @return string Text or HTML to be placed inside the column <td>.
      */
     protected function column_default( $item, $column_name ) {
-        switch ( $column_name ) {
-            case 'title':
-                $subject = ( ! $item[ 'funnel_title' ] )? '(' . __( 'no title' ) . ')' : $item[ 'funnel_title' ] ;
-                $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $item['ID'] );
 
-                if ( $this->get_view() === 'archived' ){
-                    $html = "<strong>{$subject}</strong>";
-                } else {
-                    $html = "<strong>";
+        do_action( 'wpgh_funnels_custom_column', $item, $column_name );
 
-                    $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+        return '';
 
-                    if ( $item['funnel_status'] === 'inactive' ){
-                        $html .= " — " . "<span class='post-state'>(" . __( 'Inactive', 'groundhogg' ) . ")</span>";
-                    }
-                }
-                $html .= "</strong>";
-
-                $html .= $this->row_actions( $this->get_row_actions( $item['ID'] ) );
-
-
-                return $html;
-
-                break;
-            case 'active_contacts':
-                global $wpdb;
-
-                $table_name = $wpdb->prefix . WPGH_EVENTS;
-
-                $count = $wpdb->get_var(
-                    $wpdb->prepare(
-                        "
-                         SELECT COUNT(*) FROM $table_name
-                         WHERE funnel_id = %d AND status = %s
-                        ",
-                        $item['ID'], 'waiting'
-                    )
-                );
-
-                $queryUrl = admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . $item['ID'] );
-                return "<a href='$queryUrl'>$count</a>";
-            case 'date_created':
-                return __( 'Created' ) . '<br><abbr title="' . $item['date_created'] . '">' . date('Y/m/d', strtotime($item['date_created'])) . '</abbr>';
-                break;
-            case 'last_updated':
-                return __( 'Updated' ) . '<br><abbr title="' . $item['last_updated'] . '">' . date('Y/m/d', strtotime($item['last_updated'])) . '</abbr>';
-                break;
-            default:
-                return print_r( $item[ $column_name ], true );
-                break;
-        }
     }
+
     /**
      * Get value for checkbox column.
      *

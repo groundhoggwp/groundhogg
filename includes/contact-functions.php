@@ -181,6 +181,8 @@ function wpgh_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 		wpgh_log_contact_activity( $id, 'Contact Created Via Admin.' );
 	}
 
+	do_action( 'wpgh_contact_created', $id );
+
 	return $id;
 
 }
@@ -485,7 +487,6 @@ function wpgh_validate_tags( $maybe_tags )
 function wpgh_dropdown_tags( $args )
 {
     wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css' );
-    //wp_enqueue_style( 'select2-bootstrap', 'https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.9/select2-bootstrap.min.css' );
     wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js', array( 'jquery' ) );
 
     $defaults = array(
@@ -568,7 +569,7 @@ function wpgh_process_email_confirmation()
     if ( ! $contact )
         return;
 
-    wpgh_update_contact( $contact->get_id(), 'optin_status', 1 );
+    wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_CONFIRMED );
 
     $conf_page = get_permalink( get_option( 'gh_confirmation_page' ) );
 
@@ -586,6 +587,7 @@ add_action( 'init', 'wpgh_process_email_confirmation' );
  * @return string the IP of a vsitor.
  */
 function wpgh_get_visitor_ip() {
+
     if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
         //check ip from share internet
         $ip = $_SERVER['HTTP_CLIENT_IP'];
@@ -596,4 +598,5 @@ function wpgh_get_visitor_ip() {
         $ip = $_SERVER['REMOTE_ADDR'];
     }
     return apply_filters( 'wpgh_get_ip', $ip );
+
 }

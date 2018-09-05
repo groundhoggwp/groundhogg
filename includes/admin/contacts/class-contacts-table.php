@@ -49,7 +49,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
             'owner' => _x( 'Owner', 'Column label', 'wp-funnels' ),
             'date_created' => _x( 'Date', 'Column label', 'wp-funnels' ),
         );
-        return $columns;
+        return apply_filters( 'wpgh_contact_columns', $columns );
     }
     /**
      * Get a list of sortable columns. The format is:
@@ -69,8 +69,47 @@ class WPGH_Contacts_Table extends WP_List_Table {
             'owner' => array( 'owner', false ),
             'date_created' => array( 'date_created', false )
         );
-        return $sortable_columns;
+        return apply_filters( 'wpgh_contact_sortable_columns', $sortable_columns );
     }
+
+    protected function column_email( $item )
+    {
+        $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $item['ID'] );
+        $html  = '<div id="inline_' .$item['ID']. '" class="hidden">';
+        $html .= '  <div class="email">' .$item['email']. '</div>';
+        $html .= '  <div class="first_name">' .$item['first_name']. '</div>';
+        $html .= '  <div class="last_name">' .$item['last_name']. '</div>';
+        $html .= '</div>';
+        $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $item[ 'email' ] ) . "</a>";
+        return $html;
+    }
+
+    protected function column_user_id( $item )
+    {
+        $user = get_user_by( 'email', $item[ 'email' ] );
+        return $user ? '<a href="'.admin_url('user-edit.php?user_id='.$user->ID ).'">'.$user->display_name.'</a>' :  '&#x2014;';
+    }
+
+    protected function column_owner( $item )
+    {
+        $owner = get_userdata( $item['owner_id'] );
+        return ! empty( $item['owner_id'] ) ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=owner&owner=' .$item['owner_id'] ).'">'. $owner->user_login .'</a>' :  '&#x2014;';
+    }
+
+    protected function column_date_created( $item )
+    {
+        $dc_time = mysql2date( 'U', $item['date_created'] );
+        $cur_time = (int) current_time( 'timestamp' );
+        $time_diff = $dc_time - $cur_time;
+        $time_prefix = __( 'Created' );
+        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+            $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
+        } else {
+            $time = sprintf( "%s ago", human_time_diff( $dc_time, $cur_time ) );
+        }
+        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
+    }
+
     /**
      * Get default column value.
      * @param object $item        A singular item (one full row's worth of data).
@@ -78,31 +117,10 @@ class WPGH_Contacts_Table extends WP_List_Table {
      * @return string Text or HTML to be placed inside the column <td>.
      */
     protected function column_default( $item, $column_name ) {
-        switch ( $column_name ) {
-            case 'email':
-                $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $item['ID'] );
-                $html  = '<div id="inline_' .$item['ID']. '" class="hidden">';
-                $html .= '  <div class="email">' .$item['email']. '</div>';
-                $html .= '  <div class="first_name">' .$item['first_name']. '</div>';
-                $html .= '  <div class="last_name">' .$item['last_name']. '</div>';
-                $html .= '</div>';
-                $html .= "<a class='row-title' href='$editUrl'>{$item[ $column_name ]}</a>";
-                return $html;
-                break;
-            case 'user_id':
-                $user = get_user_by( 'email', $item[ 'email' ] );
-                return $user ? '<a href="'.admin_url('user-edit.php?user_id='.$user->ID ).'">'.$user->display_name.'</a>' :  '&#x2014;';
-                break;
-            case 'owner':
-                $owner = get_userdata( $item['owner_id'] );
-                return ! empty( $item['owner_id'] ) ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=owner&owner=' .$item['owner_id'] ).'">'. $owner->user_login .'</a>' :  '&#x2014;';
-                break;
-            case 'date_created':
-                return __( 'Created' ) . '<br><abbr title="' . $item['date_created'] . '">' . date('Y/m/d', strtotime($item['date_created'])) . '</abbr>';
-            default:
-                return ! empty( $item[ $column_name ] ) ? print_r( $item[ $column_name ], true ) : '&#x2014;' ;
-                break;
-        }
+
+        do_action( 'wpgh_contacts_custom_column', $item, $column_name );
+
+        return '';
     }
     /**
      * Get value for checkbox column.
@@ -132,45 +150,6 @@ class WPGH_Contacts_Table extends WP_List_Table {
         );
 
         return apply_filters( 'wpgh_contact_bulk_actions', $actions );
-    }
-    /**
-     * Handle bulk actions.
-     * @see $this->prepare_items()
-     */
-    protected function process_bulk_action() {
-        // Detect when a bulk action is being triggered.
-        global $wpdb;
-        $doaction = $this->current_action();
-        $sendback = remove_query_arg( array('trashed', 'untrashed', 'deleted', 'locked', 'ids'), wp_get_referer() );
-
-        if ($doaction && isset($_REQUEST['contact'])) {
-            $ids = $_REQUEST['contact'];
-
-            switch ( $this->current_action() ){
-                case 'export':
-                    //todo
-                    break;
-                case 'delete':
-                    $deleted = 0;
-                    if(!empty($ids)) {
-                        foreach ($ids as $id) {
-                            wpgh_delete_contact($id);
-                            $deleted++;
-                        }
-                    }
-                    $sendback = add_query_arg('deleted', $deleted, $sendback);
-                    break;
-                case 'apply_tag':
-                    //todo
-                    break;
-                case 'remove_tag':
-                    //todo
-                    break;
-            }
-
-            wp_redirect($sendback);
-            exit();
-        }
     }
 
     protected function get_view()
@@ -223,8 +202,6 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $this->process_bulk_action();
-
         $search = isset( $_REQUEST['s'] )? $wpdb->prepare( "AND ( c.first_name LIKE %s OR c.last_name LIKE %s OR c.email LIKE %s)", "%" . $wpdb->esc_like( $_REQUEST['s'] ) . "%", "%" . $wpdb->esc_like( $_REQUEST['s'] ) . "%", "%" . $wpdb->esc_like( $_REQUEST['s'] ) . "%" ) : '';
 
         switch ( $this->get_view() )
@@ -233,18 +210,19 @@ class WPGH_Contacts_Table extends WP_List_Table {
                 if ( isset( $_REQUEST['optin_status'] ) ){
                     switch ( $_REQUEST['optin_status'] ){
                         case 'unconfirmed':
-                            $view = 0;
+                            $view = WPGH_UNCONFIRMED;
                             break;
                         case 'confirmed':
-                            $view = 1;
+                            $view = WPGH_CONFIRMED;
                             break;
                         case 'opted_out':
-                            $view = 2;
+                            $view = WPGH_UNSUBSCRIBED;
                             break;
                         default:
-                            $view = 0;
+                            $view = WPGH_UNCONFIRMED;
                             break;
                     }
+
                     $sql = $wpdb->prepare(
                         "SELECT c.* FROM " . $wpdb->prefix . WPGH_CONTACTS . " c
                         WHERE c.optin_status = %d $search
@@ -380,6 +358,6 @@ class WPGH_Contacts_Table extends WP_List_Table {
             __( 'Delete Permanently' )
         );
 
-        return $this->row_actions( $actions );
+        return $this->row_actions( apply_filters( 'wpgh_contact_row_actions', $actions, $item, $column_name ) );
     }
 }

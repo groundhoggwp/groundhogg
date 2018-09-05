@@ -47,7 +47,8 @@ class WPGH_Events_Table extends WP_List_Table {
             'step' => _x( 'Step', 'Column label', 'wp-funnels' ),
             'time' => _x( 'Time', 'Column label', 'wp-funnels' ),
         );
-        return $columns;
+
+        return apply_filters( 'wpgh_event_columns', $columns );
     }
     /**
      * Get a list of sortable columns. The format is:
@@ -65,8 +66,106 @@ class WPGH_Events_Table extends WP_List_Table {
             'step' => array( 'step', false ),
             'time' => array( 'time', false ),
         );
-        return $sortable_columns;
+        return apply_filters( 'wpgh_event_sortable_columns', $sortable_columns );
     }
+
+    protected function column_contact( $item )
+    {
+        $contact = new WPGH_Contact( intval( $item[ 'contact_id' ] ) );
+
+        if ( ! $contact )
+            return __( 'No Contact' );
+
+        $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
+            admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $contact->get_id() ),
+            $contact->get_email()
+        );
+
+        return $html;
+    }
+
+    protected function column_funnel( $item)
+    {
+        $funnel_id = intval( $item['funnel_id'] );
+
+        if ( $funnel_id === WPGH_BROADCAST ) {
+            $funnel_title = __( 'Broadcast Email' );
+        } else {
+            $funnel = wpgh_get_funnel_by_id( $funnel_id );
+            $funnel_title = $funnel->funnel_title;
+        }
+
+        return sprintf( "<a href='%s'>%s</a>",
+            admin_url( 'admin.php?page=gh_events&view=funnel&funnel=' . $item['funnel_id'] ),
+            $funnel_title);
+    }
+
+    protected function column_step( $item )
+    {
+        $funnel_id = intval( $item['funnel_id'] );
+        $step_id = intval( $item['step_id'] );
+
+        if ( $funnel_id === WPGH_BROADCAST ) {
+            $broadcast = wpgh_get_broadcast_by_id( $step_id );
+            $email = wpgh_get_email_by_id( intval( $broadcast['email_id'] ) );
+            $step_title = $email->subject;
+        } else {
+            $step_title = wpgh_get_step_hndle( $step_id );
+        }
+
+        if ( ! $step_title )
+            return sprintf( "<strong>%s</strong>", __( '(step deleted)' ) );
+
+        return sprintf( "<a href='%s'>%s</a>",
+            admin_url( 'admin.php?page=gh_events&view=step&step=' . $item['step_id'] ),
+            $step_title);
+
+    }
+
+    protected function column_time( $item )
+    {
+        $p_time = intval( $item[ 'time' ] ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+
+        $cur_time = (int) current_time( 'timestamp' );
+
+        $time_diff = $p_time - $cur_time;
+
+        $status = $item[ 'status' ];
+
+        switch ( $status ){
+            case 'waiting':
+                $time_prefix = __( 'Will run' );
+                break;
+            case 'cancelled':
+                $time_prefix = __( 'Cancelled' );
+                break;
+            case 'skipped':
+                $time_prefix = __( 'Skipped' );
+                break;
+            case 'complete':
+                $time_prefix = __( 'Processed' );
+                break;
+        }
+
+        if ( $time_diff < 0 ){
+            /* The event has passed */
+            if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+                $time = date_i18n( 'jS F, Y \@ h:i A', intval( $p_time ) );
+            } else {
+                $time = sprintf( "%s ago", human_time_diff( $p_time, $cur_time ) );
+            }
+        } else {
+            /* the event is scheduled */
+            if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+                $time = sprintf( "on %s", date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+            } else {
+                $time = sprintf( "in %s", human_time_diff( $p_time, $cur_time ) );
+            }
+        }
+
+        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+    }
+
     /**
      * Get default column value.
      * @param object $item        A singular item (one full row's worth of data).
@@ -74,79 +173,11 @@ class WPGH_Events_Table extends WP_List_Table {
      * @return string Text or HTML to be placed inside the column <td>.
      */
     protected function column_default( $item, $column_name ) {
-        switch ( $column_name ) {
-            case 'contact':
 
-            	$contact = new WPGH_Contact( intval( $item[ 'contact_id' ] ) );
+        do_action( 'wpgh_events_custom_column', $item, $column_name );
 
-            	if ( ! $contact )
-		            return __( 'No Contact' );
+        return '';
 
-                $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
-                    admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $contact->get_id() ),
-                    $contact->get_email()
-                );
-
-                return $html;
-                break;
-            case 'funnel':
-
-            	$funnel_id = intval( $item['funnel_id'] );
-
-            	if ( $funnel_id === WPGH_BROADCAST ) {
-	            	$funnel_title = __( 'Broadcast Email' );
-	            } else {
-		            $funnel = wpgh_get_funnel_by_id( $funnel_id );
-		            $funnel_title = $funnel->funnel_title;
-	            }
-
-	            return sprintf( "<a href='%s'>%s</a>",
-                    admin_url( 'admin.php?page=gh_events&view=funnel&funnel=' . $item['funnel_id'] ),
-                    $funnel_title);
-
-                break;
-            case 'step':
-
-	            $funnel_id = intval( $item['funnel_id'] );
-	            $step_id = intval( $item['step_id'] );
-
-	            if ( $funnel_id === WPGH_BROADCAST ) {
-		            $broadcast = wpgh_get_broadcast_by_id( $step_id );
-		            $email = wpgh_get_email_by_id( intval( $broadcast['email_id'] ) );
-		            $step_title = $email->subject;
-	            } else {
-		            $step_title = wpgh_get_step_hndle( $step_id );
-	            }
-
-	            if ( ! $step_title )
-	                return sprintf( "<strong>%s</strong>", __( '(step deleted)' ) );
-
-	            return sprintf( "<a href='%s'>%s</a>",
-                    admin_url( 'admin.php?page=gh_events&view=step&step=' . $item['step_id'] ),
-                    $step_title);
-
-	            break;
-            case 'time':
-
-                /* convert to local time. */
-            	$time = intval( $item[ 'time' ] ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
-
-            	$html = '';
-
-            	if ( $time > current_time( 'timestamp' ) )
-	            {
-	            	$html.= __( 'Scheduled For' );
-	            } else {
-		            $html.= __( 'Executed On' );
-	            }
-
-                $timezone_format = _x('Y/m/d \@ h:i A', 'timezone date format');
-
-                return $html . '<br><abbr title="' . date_i18n( DATE_ISO8601, $time ) . '">' . date_i18n( $timezone_format, $time, false ) . '</abbr>';
-            default:
-                return ! empty( $item[ $column_name ] ) ? print_r( $item[ $column_name ], true ) : '&#x2014;' ;
-                break;
-        }
     }
 
     /**
@@ -202,7 +233,7 @@ class WPGH_Events_Table extends WP_List_Table {
             'waiting' => "<a class='" . ($view === 'waiting' ? 'current' : '') . "' href='" . $base_url . "waiting" . "'>" . __( 'Waiting <span class="count">('.$count['waiting'].')</span>' ) . "</a>",
             'skipped' => "<a class='" . ($view === 'skipped' ? 'current' : '') . "' href='" . $base_url . "skipped" . "'>" . __( 'Skipped <span class="count">('.$count['skipped'].')</span>' ) . "</a>",
             'cancelled' => "<a class='" . ($view === 'cancelled' ? 'current' : '') . "' href='" . $base_url . "cancelled" . "'>" . __( 'Cancelled <span class="count">('.$count['cancelled'].')</span>' ) . "</a>",
-            'completed' => "<a class='" . ($view === 'completed' ? 'current' : '') . "' href='" . $base_url . "completed" . "'>" . __( 'Completed <span class="count">('.$count['completed'].')</span>' ) . "</a>"
+            'completed' => "<a class='" . ($view === 'completed' ? 'current' : '') . "' href='" . $base_url . "complete" . "'>" . __( 'Completed <span class="count">('.$count['completed'].')</span>' ) . "</a>"
         ) );
     }
 
@@ -331,7 +362,7 @@ class WPGH_Events_Table extends WP_List_Table {
 
         $html = '';
 
-        if ( $time > current_time( 'timestamp' ) )
+        if ( $time > time() )
         {
             $actions['execute'] = sprintf(
                 '<a href="%s" class="edit" aria-label="%s">%s</a>',
@@ -366,6 +397,6 @@ class WPGH_Events_Table extends WP_List_Table {
             __( 'View Contact' )
         );
 
-        return $this->row_actions( $actions );
+        return $this->row_actions( apply_filters( 'wpgh_event_row_actions', $actions, $item, $column_name ) );
     }
 }

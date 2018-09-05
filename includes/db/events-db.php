@@ -245,6 +245,8 @@ function wpgh_enqueue_event( $time, $funnel_id, $step_id, $contact_id, $callback
 {
 	global $wpdb;
 
+	$time = intval( $time );
+
 	if ( ! $time || ! is_int( $time ) || ! $funnel_id || ! is_int( $funnel_id ) || ! $step_id || ! is_int( $step_id ) || ! $contact_id || ! is_int( $contact_id ) )
 		return false;
 

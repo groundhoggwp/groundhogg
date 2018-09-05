@@ -12,19 +12,6 @@
  */
 
 /**
- * Enqueue the scripts for the event runner process.
- * Appears on front-end & backend as it will be run by traffic to the site.
- */
-function wpgh_enqueue_event_scripts()
-{
-    wp_enqueue_script( 'wpgh-event-doer', WPGH_ASSETS_FOLDER . '/js/event-doer.js' , array('jquery') );
-    wp_localize_script( 'wpgh-event-doer', 'wpgh_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-}
-
-//add_action( 'wp_enqueue_scripts', 'wpgh_enqueue_event_scripts' );
-//add_action( 'admin_enqueue_scripts', 'wpgh_enqueue_event_scripts' );
-
-/**
  * Do the ajax function for running events. only run asynchronously while doing an ajax request.
  */
 function wpgh_process_queue_ajax()
@@ -38,9 +25,6 @@ function wpgh_process_queue_ajax()
 }
 
 add_action( 'admin_init', 'wpgh_process_queue_ajax' );
-
-//add_action( 'wp_ajax_wpgh_event_queue_start', 'wpgh_process_queue_ajax' );
-//add_action( 'wp_ajax_nopriv_wpgh_event_queue_start', 'wpgh_process_queue_ajax' );
 
 /**
  * Run all events that have yet to be run.
@@ -136,11 +120,11 @@ add_action( 'wpgh_cron_event_plus_50', 'wpgh_do_queued_events' );
 
 function wpgh_schedule_single_cron_events()
 {
-    wp_schedule_single_event( time() + ( 10 * MINUTE_IN_SECONDS ), 'wpgh_cron_event_plus_10' );
-    wp_schedule_single_event( time() + ( 20 * MINUTE_IN_SECONDS ), 'wpgh_cron_event_plus_20' );
-    wp_schedule_single_event( time() + ( 30 * MINUTE_IN_SECONDS ), 'wpgh_cron_event_plus_30' );
-    wp_schedule_single_event( time() + ( 40 * MINUTE_IN_SECONDS ), 'wpgh_cron_event_plus_40' );
-    wp_schedule_single_event( time() + ( 50 * MINUTE_IN_SECONDS ), 'wpgh_cron_event_plus_50' );
+    wp_schedule_single_event( time() + 10 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_10' );
+    wp_schedule_single_event( time() + 20 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_20' );
+    wp_schedule_single_event( time() + 30 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_30' );
+    wp_schedule_single_event( time() + 40 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_40' );
+    wp_schedule_single_event( time() + 50 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_50' );
 }
 
 add_action( 'wpgh_cron_event', 'wpgh_schedule_single_cron_events' );
@@ -151,7 +135,7 @@ add_action( 'wpgh_cron_event', 'wpgh_schedule_single_cron_events' );
 function wpgh_schedule_cron_event()
 {
     if ( ! wp_next_scheduled( 'wpgh_cron_event' ) ) {
-        wp_schedule_single_event( time() + ( 10 * MINUTE_IN_SECONDS ), 'wpgh_cron_event' );
+        wp_schedule_event( time(), 'hourly', 'wpgh_cron_event' );
     }
 }
 

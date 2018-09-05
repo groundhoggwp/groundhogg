@@ -59,6 +59,30 @@ class WPGH_Tags_Table extends WP_List_Table {
         );
         return $sortable_columns;
     }
+
+    protected function column_tag_name( $item )
+    {
+        $editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $item['tag_id'] );
+        $html  = '<div id="inline_' .$item['tag_id']. '" class="hidden">';
+        $html .= '  <div class="name">' .$item['tag_name']. '</div>';
+        $html .= '  <div class="description">' .$item['tag_description']. '</div>';
+        $html .= '  <div class="count">' . wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) . '</div>';
+        $html .= '</div>';
+        $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $item[ 'tag_name' ] ) . "</a>";
+        return $html;
+    }
+
+    protected function column_contact_count( $item )
+    {
+        $count = wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] );
+        return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$item['tag_id']).'">'. wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) .'</a>' : '0';
+    }
+
+    protected function column_tag_description( $item )
+    {
+        return ! empty( $item['tag_description'] ) ? $item['tag_description'] : '&#x2014;';
+    }
+
     /**
      * Get default column value.
      * @param object $item        A singular item (one full row's worth of data).
@@ -66,27 +90,9 @@ class WPGH_Tags_Table extends WP_List_Table {
      * @return string Text or HTML to be placed inside the column <td>.
      */
     protected function column_default( $item, $column_name ) {
-        switch ( $column_name ) {
-            case 'tag_name':
-                $editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $item['tag_id'] );
-                $html  = '<div id="inline_' .$item['tag_id']. '" class="hidden">';
-                $html .= '  <div class="name">' .$item['tag_name']. '</div>';
-                $html .= '  <div class="description">' .$item['tag_description']. '</div>';
-                $html .= '  <div class="count">' . wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) . '</div>';
-                $html .= '</div>';
-                $html .= "<a class='row-title' href='$editUrl'>{$item[ $column_name ]}</a>";
-                return $html;
-                break;
-            case 'contact_count':
-                $count = wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] );
-                return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$item['tag_id']).'">'. wpgh_count_contact_tag_relationships( 'tag_id', $item['tag_id'] ) .'</a>' : '0';
-                break;
-            case 'tag_description':
-                return ! empty( $item['tag_description'] ) ? $item['tag_description'] : '&#x2014;';
-            default:
-                return print_r( $item[ $column_name ], true );
-                break;
-        }
+
+        return print_r( $item[ $column_name ], true );
+
     }
     /**
      * @param object $item A singular item (one full row's worth of data).

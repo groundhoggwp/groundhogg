@@ -147,20 +147,20 @@ class WPGH_Admin_Menu
 
         add_submenu_page(
             'groundhogg',
-            'Settings',
-            'Settings',
-            'manage_options',
-            'groundhogg',
-            array($this->settings_page, 'wpgh_settings_content')
-        );
-
-        add_submenu_page(
-            'groundhogg',
             'Events',
             'Events',
             'manage_options',
             'gh_events',
             array($this->events_page, 'page')
+        );
+        
+        add_submenu_page(
+            'groundhogg',
+            'Settings',
+            'Settings',
+            'manage_options',
+            'groundhogg',
+            array($this->settings_page, 'wpgh_settings_content')
         );
 
         remove_submenu_page('groundhogg', 'groundhogg');

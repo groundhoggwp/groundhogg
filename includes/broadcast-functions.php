@@ -17,19 +17,33 @@ function wpgh_schedule_broadcast()
 {
     $email = isset( $_POST['email_id'] )? intval( $_POST[ 'email_id' ] ) : null;
 
-    $tags = isset( $_POST[ 'tags' ] )? $_POST['tags'] : array();
+    $tags = isset( $_POST[ 'tags' ] )? wpgh_validate_tags( $_POST['tags'] ): array();
 
     if ( empty( $tags ) || ! is_array( $tags ) )
     {
-        wp_die( __( 'Please select a tag to send this broadcast to.', 'groundhogg' ) );
+        wp_die( __( 'Please select one or more tags to send this broadcast to.', 'groundhogg' ) );
     }
 
-    $send_date = isset( $_POST['date'] )? $_POST['date'] : date( 'd-m-Y', strtotime( 'tomorrow' ) );
+    $contact_sum = 0;
+    foreach ( $tags as $tag ){
+        $tag = wpgh_get_tag( $tag );
+        $contact_sum += wpgh_count_contact_tag_relationships( 'tag_id', intval( $tag[ 'tag_id' ] ) );
+    }
+
+    if ( $contact_sum === 0 )
+        wp_die( __( 'Please select a tag with one or more associated contacts.' ) );
+
+    $send_date = isset( $_POST['date'] )? $_POST['date'] : date( 'Y/m/d', strtotime( 'tomorrow' ) );
     $send_time = isset( $_POST['time'] )? $_POST['time'] : '09:30';
 
     $time_string = $send_date . ' ' . $send_time;
 
-    $send_at = strtotime( $time_string );
+    /* convert to UTC */
+
+    $send_at = strtotime( $time_string ) - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+
+    if ( $send_at < time() )
+        wp_die( __( 'Please send at a time in the future!' ) );
 
     $broadcast_id = wpgh_insert_broadcast( $email, $tags, $send_at );
 

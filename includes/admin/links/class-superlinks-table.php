@@ -64,6 +64,49 @@ class WPGH_Superlinks_Table extends WP_List_Table {
         );
         return $sortable_columns;
     }
+
+    protected function column_name( $item )
+    {
+        $tags = $item[ 'tags' ] ? maybe_unserialize( $item[ 'tags' ] ) : array();
+
+        $editUrl = admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $item['ID'] );
+        $html  = '<div id="inline_' .$item['ID'] . '" class="hidden">';
+        $html .= '  <div class="name">' . $item['name'] . '</div>';
+        $html .= '  <div class="target">' . $item['target'] . '</div>';
+        $html .= '  <div class="replacement">' . '{superlink.' . $item['ID'] . '}</div>';
+        $html .= '  <div class="tags">' . implode(', ', $tags ) . '</div>';
+        $html .= '  <div class="clicks">' . $item['clicks'] . '</div>';
+        $html .= '</div>';
+        $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $item[ 'name' ] ) . "</a>";
+        return $html;
+    }
+
+    protected function column_target( $item )
+    {
+        return '<a target="_blank" href="' . esc_url_raw( $item['target'] ) . '">' . esc_url( $item['target'] ) . '</a>';
+    }
+
+    protected function column_replacement( $item )
+    {
+        return '{superlink.' . $item['ID'] . '}';
+    }
+
+    protected function column_source( $item )
+    {
+        return site_url( 'superlinks/link/' . $item['ID'] );
+    }
+
+    protected function column_tags( $item )
+    {
+        $tags = $item[ 'tags' ] ? maybe_unserialize( $item[ 'tags' ] ) : array();
+
+        foreach ( $tags as $i => $tag_id ){
+            $tags[ $i ] = '<a href="'. admin_url( 'admin.php?page=gh_contacts&view=tag&tag=' . $tag_id ) . '">' . wpgh_get_tag_name( $tag_id ). '</a>';
+        }
+
+        return implode( ', ', $tags );
+    }
+
     /**
      * Get default column value.
      * @param object $item        A singular item (one full row's worth of data).
@@ -71,46 +114,9 @@ class WPGH_Superlinks_Table extends WP_List_Table {
      * @return string Text or HTML to be placed inside the column <td>.
      */
     protected function column_default( $item, $column_name ) {
-        switch ( $column_name ) {
-            case 'name':
 
-	            $tags = $item[ 'tags' ] ? maybe_unserialize( $item[ 'tags' ] ) : array();
+        return print_r( $item[ $column_name ], true );
 
-	            $editUrl = admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $item['ID'] );
-                $html  = '<div id="inline_' .$item['ID'] . '" class="hidden">';
-                $html .= '  <div class="name">' . $item['name'] . '</div>';
-                $html .= '  <div class="target">' . $item['target'] . '</div>';
-                $html .= '  <div class="replacement">' . '{superlink.' . $item['ID'] . '}</div>';
-                $html .= '  <div class="tags">' . implode(', ', $tags ) . '</div>';
-                $html .= '  <div class="clicks">' . $item['clicks'] . '</div>';
-                $html .= '</div>';
-                $html .= "<a class='row-title' href='$editUrl'>{$item[ $column_name ]}</a>";
-                return $html;
-                break;
-            case 'target':
-                return '<a target="_blank" href="' . esc_url_raw( $item['target'] ) . '">' . esc_url( $item['target'] ) . '</a>';
-                break;
-            case 'replacement':
-                return '{superlink.' . $item['ID'] . '}';
-                break;
-            case 'tags':
-
-                $tags = $item[ 'tags' ] ? maybe_unserialize( $item[ 'tags' ] ) : array();
-
-                foreach ( $tags as $i => $tag_id ){
-                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . wpgh_get_tag_name( $tag_id ). '</a>';
-                }
-
-                return implode( ', ', $tags );
-                break;
-            case 'source':
-                return site_url( 'superlinks/link/' . $item['ID'] );
-            case 'clicks':
-                return ! empty( $item['clicks'] ) ? $item['clicks'] : '0';
-            default:
-                return print_r( $item[ $column_name ], true );
-                break;
-        }
     }
     /**
      * @param object $item A singular item (one full row's worth of data).

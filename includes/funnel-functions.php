@@ -938,9 +938,9 @@ function wpgh_contact_is_in_funnel( $contact_id, $funnel_id )
         $wpdb->prepare(
             "
          SELECT * FROM $table_name
-		 WHERE contact_id = %d AND funnel_id = %d AND status = %s
+		 WHERE contact_id = %d AND funnel_id = %d AND ( status = %s OR status = %s )
 		",
-            $contact_id, $funnel_id, 'complete'
+            $contact_id, $funnel_id, 'complete', 'waiting'
         ) );
 
     return ! empty( $results );

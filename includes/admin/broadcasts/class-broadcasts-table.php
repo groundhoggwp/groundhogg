@@ -54,7 +54,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
             'stats' => _x( 'Stats', 'Column label', 'groundhogg' ),
             'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
-		return $columns;
+		return apply_filters( 'wpgh_broadcast_columns', $columns );
 	}
 	/**
 	 * Get a list of sortable columns. The format is:
@@ -71,7 +71,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 			'send_at' => array( 'sent_at', false ),
 			'date_created' => array( 'date_created', false )
 		);
-		return $sortable_columns;
+		return apply_filters( 'wpgh_broadcast_sortable_columns', $sortable_columns );
 	}
 
     /**
@@ -103,20 +103,124 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
      * Get default row actions...
      *
      * @param $id int an item ID
-     * @return array a list of actions
+     * @return string a list of actions
      */
-	protected function get_row_actions( $id )
+	protected function handle_row_actions( $item, $column_name, $primary )
     {
+        if ( $primary !== $column_name ) {
+            return '';
+        }
+
+        $actions = array();
+        $id = intval( $item['ID'] );
 
         $broadcast = wpgh_get_broadcast_by_id( $id );
 
-        if ( $this->get_view() !== 'cancelled' )
-        {
-            return apply_filters( 'wpgh_broadcast_row_actions', array(
-                "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email='. $broadcast['email_id'] ). "'>" . __( 'Edit Email' ) . "</a></span>",
-                "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast='. $id ), 'cancel' ). "'>" . __( 'Cancel' ) . "</a></span>",
-            ));
+        if ( $this->get_view() !== 'cancelled' ) {
+            $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast['email_id']) . "'>" . __('Edit Email') . "</a></span>";
+            $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $id), 'cancel') . "'>" . __('Cancel') . "</a></span>";
         }
+
+        return $this->row_actions( apply_filters( 'wpgh_broadcast_row_actions', $actions, $item, $column_name ) );
+    }
+
+    protected function column_email_id( $item )
+    {
+        $email = wpgh_get_email_by_id( intval( $item['email_id'] ) );
+
+        $subject = ( ! $email->subject )? '(' . __( 'no email' ) . ')' : $email->subject;
+        $editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . $item['ID'] );
+
+        if ( $this->get_view() === 'cancelled' ){
+            $html = "<strong>{$subject}</strong>";
+        } else {
+            $html = "<strong>";
+
+            $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+
+            if ( $item['broadcast_status'] === 'scheduled' ){
+                $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Scheduled' ) . ")</span>";
+            }
+        }
+        $html .= "</strong>";
+
+        return $html;
+    }
+
+    protected function column_from_user( $item )
+    {
+        $user = get_userdata( intval( ( $item['from_user'] ) ) );
+        $from_user = esc_html( $user->display_name );
+        $queryUrl = admin_url( 'admin.php?page=gh_broadcasts&view=from_user&from_user=' . $item['from_user'] );
+        return "<a href='$queryUrl'>$from_user</a>";
+    }
+
+    protected function column_stats( $item )
+    {
+        if ( $item[ 'broadcast_status' ] !== 'sent' )
+            return '&#x2014;';
+
+        $opens = wpgh_get_broadcast_opens( $item['ID'] );
+        $clicks = wpgh_get_broadcast_opens( $item['ID'] );
+
+        $html = __( "Opens" ) . ": <strong>" . $opens . "</strong><br>";
+        $html.= __( "Clicks" ) . ": <strong>" . $clicks . "</strong><br>";
+        $html.= __( "CTR" ) . ": <strong>" . round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) . "</strong><br>";
+
+        return $html;
+    }
+
+    protected function column_send_at( $item )
+    {
+        /* convert to local time. */
+        $p_time = intval( $item[ 'send_at' ] ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+
+        $cur_time = (int) current_time( 'timestamp' );
+
+        $time_diff = $p_time - $cur_time;
+
+        if ( $time_diff < 0 ){
+            $time_prefix = __( 'Sent' );
+            /* The event has passed */
+            if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+                $time = date_i18n( 'jS F, Y \@ h:i A', intval( $p_time ) );
+            } else {
+                $time = sprintf( "%s ago", human_time_diff( $p_time, $cur_time ) );
+            }
+        } else {
+            $time_prefix = __( 'Will send' );
+            /* the event is scheduled */
+            if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+                $time = sprintf( "on %s", date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+            } else {
+                $time = sprintf( "in %s", human_time_diff( $p_time, $cur_time ) );
+            }
+        }
+
+        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+    }
+
+    protected function column_date_created( $item )
+    {
+        $dc_time = mysql2date( 'U', $item['date_created'] );
+        $cur_time = (int) current_time( 'timestamp' );
+        $time_diff = $dc_time - $cur_time;
+        $time_prefix = __( 'Created' );
+        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+            $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
+        } else {
+            $time = sprintf( "%s ago", human_time_diff( $dc_time, $cur_time ) );
+        }
+        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
+    }
+
+    protected function column_send_to_tags( $item )
+    {
+        $tags = $item[ 'send_to_tags' ] ? maybe_unserialize( $item[ 'send_to_tags' ] ) : array();
+        foreach ( $tags as $i => $tag_id ){
+            $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . wpgh_get_tag_name( $tag_id ). '</a>';
+        }
+        return implode( ', ', $tags );
     }
 
 	/**
@@ -128,78 +232,12 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
 	protected function column_default( $item, $column_name ) {
-		switch ( $column_name ) {
-			case 'email_id':
-			    $email = wpgh_get_email_by_id( intval( $item['email_id'] ) );
 
-			    $subject = ( ! $email->subject )? '(' . __( 'no email' ) . ')' : $email->subject;
-				$editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . $item['ID'] );
+	    do_action( 'wpgh_broadcasts_custom_columns', $item, $column_name );
 
-				if ( $this->get_view() === 'cancelled' ){
-				    $html = "<strong>{$subject}</strong>";
-                } else {
-				    $html = "<strong>";
-
-                    $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
-
-                    if ( $item['broadcast_status'] === 'scheduled' ){
-                        $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Scheduled' ) . ")</span>";
-                    }
-                }
-                $html .= "</strong>";
-                $html .= $this->row_actions( $this->get_row_actions( $item['ID'] ) );
-                return $html;
-				break;
-
-            case 'from_user':
-                $user = get_userdata( intval( ( $item['from_user'] ) ) );
-                $from_user = esc_html( $user->display_name );
-                $queryUrl = admin_url( 'admin.php?page=gh_broadcasts&view=from_user&from_user=' . $item['from_user'] );
-                return "<a href='$queryUrl'>$from_user</a>";
-                break;
-            case 'stats':
-
-                if ( $item[ 'broadcast_status' ] !== 'sent' )
-                    return '&#x2014;';
-
-                $opens = wpgh_get_broadcast_opens( $item['ID'] );
-                $clicks = wpgh_get_broadcast_opens( $item['ID'] );
-
-                $html = "Opens: <strong>" . $opens . "</strong><br>";
-                $html.= "Clicks: <strong>" . $clicks . "</strong><br>";
-                $html.= "CTR: <strong>" . round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) . "</strong><br>";
-
-                return $html;
-
-                break;
-            case 'send_at':
-                $time = $item['send_at'];
-
-                if ( $time >= time() )
-                    $text = 'Send At';
-                else
-                    $text = 'Sent';
-
-                return __( $text, 'groundhogg' ) . '<br><abbr title="' . date( DATE_ISO8601, $item['send_at'] ) . '">' . date('Y/m/d', $item['send_at'] ) . '</abbr>';
-                break;
-
-            case 'date_created':
-                return __( 'Created' ) . '<br><abbr title="' . $item['date_created'] . '">' . date('Y/m/d', strtotime($item['date_created'])) . '</abbr>';
-                break;
-
-            case 'send_to_tags':
-                $tags = $item[ 'send_to_tags' ] ? maybe_unserialize( $item[ 'send_to_tags' ] ) : array();
-                foreach ( $tags as $i => $tag_id ){
-                    $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . wpgh_get_tag_name( $tag_id ). '</a>';
-                }
-                return implode( ', ', $tags );
-                break;
-
-            default:
-				return print_r( $item[ $column_name ], true );
-				break;
-		}
+	    return '';
 	}
+
 	/**
 	 * Get value for checkbox column.
 	 *
@@ -226,6 +264,8 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
             $actions = array(
                 'cancel' => _x( 'Cancel Broadcast', 'List table bulk action', 'groundhogg' ),
             );
+        } else {
+            $actions = array();
         }
 
         return apply_filters( 'wpgh_broadcast_bulk_actions', $actions );
@@ -297,8 +337,6 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 		 * Sort the data
 		 */
 		usort( $data, array( $this, 'usort_reorder' ) );
-
-
 
 		$current_page = $this->get_pagenum();
 

@@ -45,12 +45,12 @@ wp_enqueue_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothn
                 <label for="date"><?php _e( 'Send On:' ); ?></label>
             </th>
             <td>
-                <input style="height:29px;width: 100px" class="input" placeholder="d-m-yy" type="text" id="date" name="date" value="" required><input type="time" id="time" name="time" value="09:15" required>
+                <input style="height:29px;width: 100px" class="input" placeholder="Y/m/d" type="text" id="date" name="date" value="" required><input type="time" id="time" name="time" value="09:15" required>
                     <script>jQuery(function($){$('#date').datepicker({
                     changeMonth: true,
                     changeYear: true,
                     minDate:0,
-                    dateFormat:'d-m-yy'
+                    dateFormat:'yy/m/d'
                 })});</script>
                 <p class="description"><?php _e( 'The day the broadcast will be sent.', 'groundhogg' ); ?></p>
             </td>

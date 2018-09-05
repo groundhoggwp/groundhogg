@@ -137,3 +137,13 @@ class GH_Account
 }
 
 GH_Account::$instance = new GH_Account();
+
+/**
+ *
+ *
+ * @return GH_Account
+ */
+function wpgh_account()
+{
+    return GH_Account::$instance;
+}
