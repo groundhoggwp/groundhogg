@@ -57,7 +57,7 @@ function wpfn_dequeue_events( $time_from, $time_to )
 {
 	global $wpdb;
 
-	if ( ! $time_from || ! is_int( $time_from) || ! $time_to || ! is_int( $time_to ) )
+	if ( ! $time_from || ! is_int( $time_from ) || ! $time_to || ! is_int( $time_to ) )
 		return false;
 
 	$time_from = absint( $time_from );
@@ -185,6 +185,43 @@ function wpfn_dequeue_contact_funnel_events( $contact_id, $funnel_id )
 		 WHERE contact_id = %d AND funnel_id = %d AND status = %s
 		",
             'skipped', $contact_id, $funnel_id, 'waiting'
+		)
+	);
+}
+
+/**
+ * Cancel a single event for a particular contact.
+ *
+ * @param $time
+ * @param $funnel_id
+ * @param $step_id
+ * @param $contact_id
+ *
+ * @return int|bool
+ */
+function wpfn_cancel_event( $time, $funnel_id, $step_id, $contact_id )
+{
+	global $wpdb;
+
+	if ( ! $contact_id || ! is_int( $contact_id ) || ! $funnel_id || ! is_int( $funnel_id ) )
+		return false;
+
+	$contact_id = absint( $contact_id );
+	$funnel_id = absint( $funnel_id );
+
+	if ( ! $contact_id || ! $funnel_id )
+		return false;
+
+	$table_name = $wpdb->prefix . WPFN_EVENTS;
+
+	return $wpdb->query(
+		$wpdb->prepare(
+			"
+         UPDATE $table_name
+         SET status = %s
+		 WHERE time = %d AND contact_id = %d AND funnel_id = %d AND step_id = %d AND status = %s
+		",
+			'cancelled', $time, $contact_id, $funnel_id, $step_id, 'waiting'
 		)
 	);
 }
