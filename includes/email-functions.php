@@ -314,8 +314,8 @@ add_action( 'wpgh_do_action_send_email', 'wpgh_do_send_email_action', 10, 2 );
  */
 function wpgh_dropdown_emails( $args )
 {
-    wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css' );
-    wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js' );
+    wp_enqueue_style( 'select2' );
+    wp_enqueue_script( 'select2' );
 
     $defaults = array(
         'selected' => 0, 'echo' => 1,

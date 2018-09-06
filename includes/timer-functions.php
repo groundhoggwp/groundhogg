@@ -39,8 +39,9 @@ function wpgh_enqueue_delay_timer_action( $step_id, $contact_id )
     }
 
     $funnel_id = wpgh_get_step_funnel( $step_id );
-
-    wpgh_enqueue_event( strtotime( $time_string ), $funnel_id, $step_id, $contact_id );
+    /* convert to utc */
+    $final_time = strtotime( $time_string ) - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+    wpgh_enqueue_event( $final_time, $funnel_id, $step_id, $contact_id );
 }
 
 add_action( 'wpgh_enqueue_next_funnel_action_delay_timer', 'wpgh_enqueue_delay_timer_action', 10, 2 );
@@ -56,11 +57,11 @@ function wpgh_enqueue_date_timer_action( $step_id, $contact_id )
     //todo sanitize and evaluate data...
     $run_when = wpgh_get_step_meta( $step_id, 'run_date', true );
     $run_time = wpgh_get_step_meta( $step_id, 'run_time', true );
-
     $time_string = $run_when . ' ' . $run_time;
     $funnel_id = wpgh_get_step_funnel( $step_id );
-
-    wpgh_enqueue_event( strtotime( $time_string ), $funnel_id, $step_id, $contact_id );
+    /* convert to UTC */
+    $final_time = strtotime( $time_string ) - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+    wpgh_enqueue_event( $final_time, $funnel_id, $step_id, $contact_id );
 }
 
 add_action( 'wpgh_enqueue_next_funnel_action_date_timer', 'wpgh_enqueue_date_timer_action', 10, 2 );

@@ -32,7 +32,7 @@ function wpgh_contact_record_input_field( $type, $id, $name, $value, $classes=''
  *
  * @return string
  */
-function wpgh_admin_text_input_field( $id, $name, $value, $classes='' )
+function wpgh_admin_text_input_field( $id, $name, $value='', $classes='' )
 {
 	return wpgh_contact_record_input_field( 'text', $id, $name, $value, $classes );
 }
@@ -45,7 +45,7 @@ function wpgh_admin_text_input_field( $id, $name, $value, $classes='' )
  *
  * @return string
  */
-function wpgh_admin_email_input_field( $id, $name, $value, $classes='' )
+function wpgh_admin_email_input_field( $id, $name, $value='', $classes='' )
 {
 	return wpgh_contact_record_input_field( 'email', $id, $name, $value, $classes );
 }

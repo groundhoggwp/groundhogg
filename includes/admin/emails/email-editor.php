@@ -34,8 +34,8 @@ wp_enqueue_script('media-picker', WPGH_ASSETS_FOLDER . '/js/admin/media-picker.j
 wp_enqueue_script('simple-editor', WPGH_ASSETS_FOLDER . '/js/admin/simple-editor.js' );
 wp_enqueue_style('simple-editor', WPGH_ASSETS_FOLDER . '/css/admin/simple-editor.css' );
 //for select 2
-wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css' );
-wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js' );
+wp_enqueue_style( 'select2' );
+wp_enqueue_script( 'select2' );
 
 $email_id = intval( $_GET['email'] );
 $email = wpgh_get_email_by_id( $email_id );
@@ -312,7 +312,7 @@ $email = wpgh_get_email_by_id( $email_id );
                                     <tr>
                                         <th><?php _e( 'From User:' ); ?></th>
                                         <?php $args = array( 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user); ?>
-                                        <td><?php wp_dropdown_users( $args); ?><script>jQuery(document).ready(function(){jQuery( '#from_user' ).select2()});</script></td>
+                                        <td><?php wp_dropdown_users( $args ); ?><script>jQuery(document).ready(function(){jQuery( '#from_user' ).select2()});</script></td>
                                     </tr>
                                     <tr>
                                         <th><label for="send_test"><?php _e( 'Send Test:' ); ?></label></th>

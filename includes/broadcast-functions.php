@@ -39,7 +39,6 @@ function wpgh_schedule_broadcast()
     $time_string = $send_date . ' ' . $send_time;
 
     /* convert to UTC */
-
     $send_at = strtotime( $time_string ) - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 
     if ( $send_at < time() )

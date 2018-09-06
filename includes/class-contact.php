@@ -57,6 +57,11 @@ class WPGH_Contact
 	 */
 	public $optin_status;
 
+    /**
+     * @var int the owner ID
+     */
+	public $owner;
+
 	/**
 	 * WPGH_Contact constructor.
 	 *
@@ -81,6 +86,7 @@ class WPGH_Contact
 		$this->first_name = ucfirst( $contact['first_name'] );
 		$this->last_name = ucfirst( $contact['last_name'] );
 		$this->optin_status = intval( $contact['optin_status'] );
+		$this->owner = intval( $contact['owner_id'] );
 		$this->activity = wpgh_get_contact_meta( $this->ID, 'activity_log', true );
 		$this->date_created = $contact['date_created'];
 	}
@@ -134,6 +140,16 @@ class WPGH_Contact
 	{
 		return $this->email;
 	}
+
+    /**
+     * Get the owner of the contact
+     *
+     * @return string
+     */
+    function get_owner()
+    {
+        return $this->owner;
+    }
 
 	/**
 	 * Get the phone number of the contact
@@ -210,7 +226,13 @@ class WPGH_Contact
 	 */
 	function get_tags()
 	{
-		return wpgh_get_contact_tags( $this->ID );
+	    $tags = array();
+		$array = wpgh_get_contact_tags( $this->ID );
+		foreach ( $array as $object )
+        {
+            $tags[] = intval( intval( $object[ 'tag_id' ] ) );
+        }
+		return $tags;
 	}
 
 	/**

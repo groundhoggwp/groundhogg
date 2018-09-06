@@ -15,6 +15,7 @@ define( 'WPGH_UNSUBSCRIBED', 2 );
 define( 'WPGH_WEEKLY', 3 );
 define( 'WPGH_MONTHLY', 4 );
 define( 'WPGH_HARD_BOUNCE', 5 );
+define( 'WPGH_SPAM', 6 );
 
 /**
  * Get the text explanation for the optin status of a contact
@@ -187,7 +188,181 @@ function wpgh_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 
 }
 
+/**
+ * Update the contact
+ *
+ * @param $id
+ */
+function wpgh_save_contact( $id )
+{
+    if ( ! $id ){
+        return;
+    }
 
+    $contact = new WPGH_Contact( $id );
+
+    //todo security check
+
+    /* Save the meta first... as actual fields might overwrite it later... */
+    $cur_meta = wpgh_get_contact_meta( $id );
+    $posted_meta = $_POST[ 'meta' ];
+
+    foreach ( $cur_meta as $key => $value ){
+        if ( isset( $posted_meta[ $key ] ) ){
+            wpgh_update_contact_meta( $id, $key, sanitize_text_field( $posted_meta[ $key ] ), $value[0] );
+        } else {
+            wpgh_delete_contact_meta( $id, $key );
+        }
+    }
+
+    /* add new meta */
+    if ( isset( $_POST[ 'newmetakey' ] ) && isset( $_POST[ 'newmetavalue' ] ) ){
+        $new_meta_keys = $_POST[ 'newmetakey' ];
+        $new_meta_vals = $_POST[ 'newmetavalue' ];
+
+        foreach ( $new_meta_keys as $i => $new_meta_key ){
+            wpgh_update_contact_meta( $id, sanitize_key( $new_meta_key ), sanitize_text_field( $new_meta_vals[ $i ] ) );
+        }
+    }
+
+
+    if ( isset( $_POST[ 'email' ] ) )
+    {
+        wpgh_update_contact_email( $id, sanitize_email(  $_POST[ 'email' ] ) );
+    }
+
+    if ( isset( $_POST['first_name'] ) ){
+        wpgh_update_contact( $id, 'first_name', sanitize_text_field( $_POST['first_name'] ) );
+    }
+
+    if ( isset( $_POST['last_name'] ) ){
+        wpgh_update_contact( $id, 'last_name', sanitize_text_field( $_POST['last_name'] ) );
+    }
+
+    if ( isset( $_POST['primary_phone'] ) ){
+        wpgh_update_contact_meta( $id, 'primary_phone', sanitize_text_field( $_POST['primary_phone'] ) );
+    }
+
+    if ( isset( $_POST['primary_phone_extension'] ) ){
+        wpgh_update_contact_meta( $id, 'primary_phone_extension', sanitize_text_field( $_POST['primary_phone_extension'] ) );
+    }
+
+    if ( isset( $_POST[ 'notes' ] ) ){
+        wpgh_update_contact_meta( $id, 'notes', sanitize_textarea_field( $_POST['notes'] ) );
+    }
+
+    if ( isset( $_POST[ 'tags' ] ) ){
+        $tags = wpgh_validate_tags( $_POST['tags' ] );
+        $cur_tags = $contact->get_tags();
+        $new_tags = $tags;
+
+        $delete_tags = array_diff( $cur_tags, $new_tags );
+        if ( ! empty( $delete_tags ) ) {
+            foreach ( $delete_tags as $tag )
+            {
+                wpgh_remove_tag( $id, $tag );
+            }
+        }
+
+        $add_tags = array_diff( $new_tags, $cur_tags );
+        if ( ! empty( $add_tags ) ){
+            foreach ( $add_tags as $tag )
+            {
+                wpgh_apply_tag( $id, $tag );
+            }
+        }
+    }
+}
+
+add_action( 'wpgh_update_contact', 'wpgh_save_contact' );
+
+/**
+ * Save function for inline editing...
+ */
+function wpgh_save_contact_inline()
+{
+    if ( ! wp_doing_ajax() )
+        wp_die( 'should not be calling this function' );
+
+    //todo security check
+
+    $id             = (int) $_POST['ID'];
+    $email          = sanitize_email( $_POST['email'] );
+    $first_name     = sanitize_text_field( $_POST['first_name'] );
+    $last_name      = sanitize_text_field( $_POST['last_name'] );
+    $optin_status   = intval( $_POST['optin_status' ] );
+    $owner          = intval( $_POST['owner' ] );
+    $tags           = wpgh_validate_tags( $_POST['tags' ] );
+
+    $err = array();
+
+    if( !$email ) {
+        $err[] = 'Email can not be blank';
+    } else if ( ! is_email( $email ) ) {
+        $err[] = 'Invalid email address';
+    }
+
+    if( !$first_name ) {
+        $err[] = 'First name can not be blank';
+    }
+
+    if( $err ) {
+        echo implode(', ', $err);
+        exit;
+    }
+
+    wpgh_update_contact_email( $id, $email );
+
+    wpgh_update_contact($id, 'first_name', $first_name );
+    wpgh_update_contact($id, 'last_name', $last_name );
+    wpgh_update_contact($id, 'owner_id', $owner );
+
+    $contact = new WPGH_Contact( $id );
+    $cur_tags = $contact->get_tags();
+    $new_tags = $tags;
+
+    $delete_tags = array_diff( $cur_tags, $new_tags );
+    if ( ! empty( $delete_tags ) ) {
+        foreach ( $delete_tags as $tag )
+        {
+            wpgh_remove_tag( $id, $tag );
+        }
+    }
+
+    $add_tags = array_diff( $new_tags, $cur_tags );
+    if ( ! empty( $add_tags ) ){
+        foreach ( $add_tags as $tag )
+        {
+            wpgh_apply_tag( $id, $tag );
+        }
+    }
+
+    if ( ! $contact->get_optin_status() !== WPGH_UNSUBSCRIBED && $optin_status !== WPGH_CONFIRMED )
+    {
+        wpgh_update_contact($id, 'optin_status', $optin_status );
+    }
+
+    do_action( 'wpgh_contact_inline_edit', $id );
+
+    if ( ! class_exists( 'WPGH_Contacts_Table' ) )
+    {
+        include dirname( __FILE__ ) . '/admin/contacts/class-contacts-table.php';
+    }
+
+    $contactTable = new WPGH_Contacts_Table;
+    wp_die( $contactTable->single_row( wpgh_get_contact_by_id( $id, ARRAY_A ) ) );
+}
+
+add_action('wp_ajax_wpgh_inline_save_contacts', 'wpgh_save_contact_inline');
+
+
+/**
+ * Provides a quick way to instill a contact session and tie events to a particluar contact.
+ *
+ * @param $string|int the thing to encrypt/decrypt
+ * @param string $action whether to encrypt or decrypt
+ * @return bool|string false if failur, the result and success.
+ */
 function wpgh_encrypt_decrypt( $string, $action = 'e' ) {
     // you may change these values to your own
     $encrypt_method = "AES-256-CBC";
@@ -372,7 +547,11 @@ function wpgh_has_tag( $contact_id, $tag_id )
  */
 function wpgh_apply_tag( $contact_id, $tag_id )
 {
-    return wpgh_insert_contact_tag_relationship( intval( $contact_id ), intval( $tag_id ) );
+    $rel = wpgh_insert_contact_tag_relationship( intval( $contact_id ), intval( $tag_id ) );
+    if ( $rel )
+        do_action( 'wpgh_tag_applied', $contact_id, intval( $tag_id ) );
+
+    return $rel;
 }
 
 /**
@@ -384,7 +563,12 @@ function wpgh_apply_tag( $contact_id, $tag_id )
  */
 function wpgh_remove_tag( $contact_id, $tag_id  )
 {
-    return wpgh_delete_contact_tag_relationship(intval( $contact_id ), intval( $tag_id ) );
+    $rel = wpgh_delete_contact_tag_relationship(intval( $contact_id ), intval( $tag_id ) );
+
+    if ( $rel )
+        do_action( 'wpgh_tag_removed', $contact_id, intval( $tag_id ) );
+
+    return $rel;
 }
 
 /**
@@ -417,7 +601,6 @@ function wpgh_do_apply_tag_action( $step_id, $contact_id )
     foreach ( $tags as $tag_id ){
         if ( wpgh_tag_exists( intval( $tag_id ) ) && wpgh_get_contact_by_id( $contact_id ) && ! wpgh_has_tag( $contact_id, intval( $tag_id ) ) ){
             wpgh_apply_tag( $contact_id, intval( $tag_id ) );
-            do_action( 'wpgh_tag_applied', $contact_id, intval( $tag_id ) );
         }
     }
 }
@@ -437,7 +620,6 @@ function wpgh_do_remove_tag_action( $step_id, $contact_id )
     foreach ( $tags as $tag_id ){
         if ( wpgh_tag_exists( intval( $tag_id ) ) && wpgh_get_contact_by_id( $contact_id ) && wpgh_has_tag( $contact_id, intval( $tag_id ) ) ){
             wpgh_remove_tag( $contact_id, intval( $tag_id ) );
-            do_action( 'wpgh_tag_removed', $contact_id, intval( $tag_id ) );
         }
     }
 }
@@ -486,15 +668,13 @@ function wpgh_validate_tags( $maybe_tags )
  */
 function wpgh_dropdown_tags( $args )
 {
-    wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css' );
-    wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js', array( 'jquery' ) );
-
     $defaults = array(
         'selected' => array(), 'echo' => 1,
         'name' => 'tags[]', 'id' => 'tags',
         'width' => '100%', 'class' => '',
         'show_option_none' => '', 'show_option_no_change' => '',
-        'option_none_value' => '', 'required' => false
+        'option_none_value' => '', 'required' => false,
+        'select2' => true
     );
 
     $r = wp_parse_args( $args, $defaults );
@@ -535,7 +715,14 @@ function wpgh_dropdown_tags( $args )
         $output .= "</select>\n";
     }
 
-    $output .= "<script>jQuery(document).ready(function(){jQuery( '#" . esc_attr( $r['id'] ) . "' ).select2({tags:true,tokenSeparators: ['/',',',';']})});</script>";
+    if ( $r[ 'select2' ] === true ){
+
+        wp_enqueue_style( 'select2' );
+        wp_enqueue_script( 'select2' );
+
+        $output .= "<script>jQuery(document).ready(function(){jQuery( '#" . esc_attr( $r['id'] ) . "' ).select2({tags:true,tokenSeparators: ['/',',',';']})});</script>";
+    }
+
 
     /**
      * Filters the HTML output of a list of pages as a drop down.

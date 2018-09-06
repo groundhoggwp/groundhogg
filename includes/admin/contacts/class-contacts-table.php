@@ -74,14 +74,33 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
     protected function column_email( $item )
     {
+        $contact = new WPGH_Contact( intval( $item['ID'] ) );
+
         $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $item['ID'] );
-        $html  = '<div id="inline_' .$item['ID']. '" class="hidden">';
-        $html .= '  <div class="email">' .$item['email']. '</div>';
-        $html .= '  <div class="first_name">' .$item['first_name']. '</div>';
-        $html .= '  <div class="last_name">' .$item['last_name']. '</div>';
+        $html  = '<div id="inline_' . intval( $item['ID'] ). '" class="hidden">';
+        $html .= '  <div class="email">' . esc_html( $contact->get_email() ). '</div>';
+        $html .= '  <div class="first_name">' . esc_html( $contact->get_first() ). '</div>';
+        $html .= '  <div class="last_name">' . esc_html( $contact->get_last() ). '</div>';
+        $html .= '  <div class="optin_status">' . esc_html( $contact->get_optin_status() ). '</div>';
+        $html .= '  <div class="owner">' . esc_html( $contact->get_owner() ). '</div>';
+        $html .= '  <div class="tags">' . esc_html( json_encode( $contact->get_tags() ) ). '</div>';
         $html .= '</div>';
-        $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $item[ 'email' ] ) . "</a>";
+        $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->get_email() ) . "</a>";
         return $html;
+    }
+
+    protected function column_first_name( $item )
+    {
+        $contact = new WPGH_Contact( intval( $item['ID'] ) );
+
+        return $contact->get_first() ? $contact->get_first() : '&#x2014;' ;
+    }
+
+    protected function column_last_name( $item )
+    {
+        $contact = new WPGH_Contact( intval( $item['ID'] ) );
+
+        return $contact->get_last() ? $contact->get_last() : '&#x2014;' ;
     }
 
     protected function column_user_id( $item )
@@ -277,7 +296,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
                     $owner = intval( $_REQUEST['owner'] );
                     $sql = $wpdb->prepare( "SELECT c.* FROM " . $wpdb->prefix . WPGH_CONTACTS . " c
                     WHERE c.owner_id = %d $search
-                    c.date_created DESC", $owner );
+                    ORDER BY c.date_created DESC", $owner );
                 }
                 break;
             default:
@@ -350,6 +369,13 @@ class WPGH_Contacts_Table extends WP_List_Table {
             __( 'Quick&nbsp;Edit' )
         );
 
+        $actions['edit'] = sprintf(
+            '<a href="#" class="edit" aria-label="%s">%s</a>',
+            /* translators: %s: title */
+            esc_attr(  __( 'Edit' ) ),
+            __( 'Edit' )
+        );
+
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
             wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $item['ID'].'&action=delete')),
@@ -359,5 +385,103 @@ class WPGH_Contacts_Table extends WP_List_Table {
         );
 
         return $this->row_actions( apply_filters( 'wpgh_contact_row_actions', $actions, $item, $column_name ) );
+    }
+
+    /**
+     * @param object $item
+     * @param int $level
+     */
+    public function single_row($item, $level = 0)
+    {
+        ?>
+        <tr id="contact-<?php echo $item['ID']; ?>">
+            <?php $this->single_row_columns( $item ); ?>
+        </tr>
+        <?php
+    }
+
+    /**
+     * Outputs the hidden row displayed when inline editing
+     *
+     * @global string $mode List table view mode.
+     */
+    public function inline_edit()
+    {
+        ?>
+        <table style="display: none">
+            <tbody id="inlineedit">
+            <tr id="inline-edit" class="inline-edit-row inline-edit-row-post quick-edit-row quick-edit-row-post inline-edit-post inline-editor" style="display: none">
+                <td colspan="<?php echo $this->get_column_count(); ?>" class="colspanchange">
+                    <fieldset class="inline-edit-col-left">
+                        <legend class="inline-edit-legend"><?php echo __('Quick Edit'); ?></legend>
+                        <div class="inline-edit-col">
+                            <label>
+                                <span class="title"><?php _e('Email'); ?></span>
+                                <span class="input-text-wrap"><input type="text" name="email" class="cemail regular-text" value=""/></span>
+                            </label>
+                        </div>
+                        <div class="inline-edit-col">
+                            <label>
+                                <span class="title"><?php _e('First Name'); ?></span>
+                                <span class="input-text-wrap"><input type="text" name="first_name" class="cfirst_name regular-text" value=""/></span>
+                            </label>
+                        </div>
+                        <div class="inline-edit-col">
+                            <label>
+                                <span class="title"><?php _e('Last Name'); ?></span>
+                                <span class="input-text-wrap"><input type="text" name="last_name" class="clast_name regular-text" value=""/></span>
+                            </label>
+                        </div>
+                        <div class="inline-edit-col">
+                            <label>
+                                <span class="title"><?php _e('Owner'); ?></span>
+                                <span class="input-text-wrap">
+                                    <?php $args = array( 'show_option_none' => __( 'Select an owner' ), 'id' => 'owner', 'name' => 'owner', 'role' => 'administrator', 'class' => 'cowner' ); ?>
+                                    <?php wp_dropdown_users( $args ) ?>
+                                </span>
+                            </label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="inline-edit-col-center">
+                        <div class="inline-edit-col">
+                            <label class="inline-edit-tags">
+                                <span class="title"><?php _e('Tags'); ?></span>
+                            </label>
+                            <?php wpgh_dropdown_tags( array( 'select2' => false ) ); ?>
+                        </div>
+                    </fieldset>
+                    <fieldset class="inline-edit-col-right">
+                        <legend class="inline-edit-legend"></legend>
+                        <div class="inline-edit-col">
+                            <label>
+                                <span class="title"><?php _e('Change Optin Status'); ?></span>
+                                <span class="input-text-wrap">
+                                    <select name="optin_status">
+                                        <option value=""><?php _e( 'Select an Optin Status' ); ?></option>
+                                        <option value="<?php echo WPGH_WEEKLY; ?>"><?php _e( 'Send emails weekly', 'groundhogg' ); ?></option>
+                                        <option value="<?php echo WPGH_MONTHLY; ?>"><?php _e( 'Send emails monthly', 'groundhogg' ); ?></option>
+                                        <option value="<?php echo WPGH_UNSUBSCRIBED; ?>"><?php _e( 'Unsubscribe', 'groundhogg' ); ?></option>
+                                    </select>
+                                </span>
+                                <span class="title"><?php _e('Once you set the status to Unsubscribed you cannot change it back.' , 'groundhogg' ); ?></span>
+                            </label>
+                            <?php do_action( 'wpgh_contact_inline_edit_fields' ); ?>
+                        </div>
+                    </fieldset>
+                    <div class="submit inline-edit-save">
+                        <button type="button" class="button cancel alignleft"><?php _e('Cancel'); ?></button>
+                        <?php wp_nonce_field('inlineeditnonce', '_inline_edit' ); ?>
+                        <button type="button" class="button button-primary save alignright"><?php _e('Update'); ?></button>
+                        <span class="spinner"></span>
+                        <br class="clear"/>
+                        <div class="notice notice-error notice-alt inline hidden">
+                            <p class="error"></p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <?php
     }
 }

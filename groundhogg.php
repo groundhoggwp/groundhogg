@@ -111,4 +111,12 @@ function wpgh_activation()
 
 register_activation_hook( __FILE__, 'wpgh_activation');
 
+function wpgh_register_scripts()
+{
+    wp_register_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css' );
+    wp_register_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js', array( 'jquery' ) );
+}
+
+add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
+
 do_action( 'groundhogg_loaded' );

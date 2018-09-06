@@ -74,10 +74,11 @@ function wpgh_update_contact_meta($contact_id, $meta_key, $meta_value, $prev_val
  * Get a contact row via the ID of the contact
  *
  * @param int $id Contact Id
+ * @param string how to output the results.
  *
- * @return array|bool
+ * @return object|array|bool
  */
-function wpgh_get_contact_by_id( $id )
+function wpgh_get_contact_by_id( $id, $type=ARRAY_A )
 {
     global $wpdb;
 
@@ -91,7 +92,7 @@ function wpgh_get_contact_by_id( $id )
     $table_name = $wpdb->prefix . WPGH_CONTACTS;
 
     $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE ID = %d", $id);
-    $contact = $wpdb->get_row( $sql_prep1, ARRAY_A );
+    $contact = $wpdb->get_row( $sql_prep1, $type );
 
     return $contact;
 }
@@ -253,7 +254,21 @@ function wpgh_delete_contact( $id )
     //delete the contact meta
     $wpdb->delete(
         $wpdb->contactmeta,
-        array( 'ID' => $id ),
+        array( 'contact_id' => $id ),
+        array( '%d' )
+    );
+
+    //cleanup tags
+    $wpdb->delete(
+        $wpdb->prefix . WPGH_CONTACT_TAG_RELATIONSHIPS,
+        array( 'contact_id' => $id ),
+        array( '%d' )
+    );
+
+    //cancel events
+    $wpdb->delete(
+        $wpdb->prefix . WPGH_EVENTS,
+        array( 'contact_id' => $id ),
         array( '%d' )
     );
 
@@ -281,6 +296,14 @@ function wpgh_update_contact_email( $id, $email )
         return false;
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return false;
+    }
+
+    $other_contact = wpgh_get_contact_by_email( $email );
+
+    /* don't update if another contact with this email already exisits */
+    if ( $other_contact )
+    {
         return false;
     }
 

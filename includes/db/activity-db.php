@@ -40,6 +40,37 @@ function wpgh_log_activity( $contact, $funnel, $step, $activity, $subject, $ref=
 }
 
 /**
+ * Return a row of activity.
+ *
+ * @param $contact
+ * @param $funnel
+ * @param $step
+ * @param $activity
+ * @param $subject
+ * @return object
+ */
+function wpgh_get_activity( $contact, $funnel, $step, $activity, $subject )
+{
+    global $wpdb;
+
+    $contact = intval( $contact );
+    $funnel = intval( $funnel );
+    $step = intval( $step );
+    $subject = intval( $subject );
+
+    $table = $wpdb->prefix . WPGH_ACTIVITY;
+
+    $query = $wpdb->prepare(
+        "SELECT * FROM $table
+        WHERE contact_id = %d AND funnel_id = %d AND step_id = %d AND activity_type = %s AND object_id = %d"
+        , $contact, $funnel, $step, $activity, $subject );
+
+    return $wpdb->get_row( $query );
+
+
+}
+
+/**
  * Returns true if a similar activity for the contact given has occurred in the past.
  *
  * @param $contact int ID of the contact

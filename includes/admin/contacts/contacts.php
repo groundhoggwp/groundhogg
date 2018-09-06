@@ -84,21 +84,21 @@ class WPGH_Contacts_Page
 
         switch ( $this->get_previous_action() )
         {
-            case 'trash':
+            case 'spam':
 
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' contacts trashed.' ); ?></p></div><?php
+                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' contacts marked as spam.' ); ?></p></div><?php
+
+                break;
+
+            case 'unspam':
+
+                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' contacts marked as unconfirmed.' ); ?></p></div><?php
 
                 break;
 
             case 'delete':
 
                 ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' contacts deleted.' ); ?></p></div><?php
-
-                break;
-
-            case 'restore':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' contacts restored.' ); ?></p></div><?php
 
                 break;
 
@@ -125,12 +125,14 @@ class WPGH_Contacts_Page
                 {
                     do_action( 'wpgh_add_contact' );
                 }
+
                 break;
 
-            case 'trash':
+            case 'spam':
 
                 foreach ( $this->get_contacts() as $id ) {
-                    wpgh_update_contact($id, 'contact_status', 'trash');
+                    //todo revisit this as an unsubscribed contact can be marked and then unmarked as spam to set as unconfirmed.
+                    wpgh_update_contact( $id, 'optin_status', WPGH_SPAM );
                 }
 
                 do_action( 'wpgh_trash_contacts' );
@@ -147,11 +149,11 @@ class WPGH_Contacts_Page
 
                 break;
 
-            case 'restore':
+            case 'unspam':
 
                 foreach ( $this->get_contacts() as $id )
                 {
-                    wpgh_update_contact( $id, 'contact_status', 'draft' );
+                    wpgh_update_contact( $id, 'contact_status', WPGH_UNCONFIRMED );
                 }
 
                 do_action( 'wpgh_restore_contacts' );
@@ -193,6 +195,10 @@ class WPGH_Contacts_Page
             include dirname( __FILE__ ) . '/class-contacts-table.php';
         }
 
+        wp_enqueue_style( 'select2' );
+        wp_enqueue_script( 'select2' );
+        wp_enqueue_script( 'wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . '/js/admin/inline-edit-contacts.js' );
+
         $contacts_table = new WPGH_Contacts_Table();
 
         $contacts_table->views(); ?>
@@ -205,6 +211,10 @@ class WPGH_Contacts_Page
             </p>
             <?php $contacts_table->prepare_items(); ?>
             <?php $contacts_table->display(); ?>
+            <?php
+            if ( $contacts_table->has_items())
+                $contacts_table->inline_edit();
+            ?>
         </form>
 
         <?php

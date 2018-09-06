@@ -30,8 +30,8 @@ class WPGH_Settings_Page
 
 	public function wpgh_settings_content()
     {
-        wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css' );
-        wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js' );
+        wp_enqueue_style( 'select2' );
+        wp_enqueue_script( 'select2' );
 
         ?>
 		<div class="wrap">

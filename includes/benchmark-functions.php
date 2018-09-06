@@ -265,6 +265,11 @@ function wpgh_complete_tag_applied_benchmark( $contact_id, $tag_id )
 
         $tags = wpgh_get_step_meta( $step_id, 'tags', true );
 
+        if ( ! $tags )
+            continue;
+
+        $tags = array_map( 'intval', $tags );
+
         if ( ( wpgh_is_starting( $step_id ) || wpgh_contact_is_in_funnel( $contact_id,  $funnel_id ) ) && in_array( $tag_id, $tags ) ){
             wpgh_complete_benchmark( $step_id, $contact_id );
         }

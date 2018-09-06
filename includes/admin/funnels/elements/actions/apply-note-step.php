@@ -27,7 +27,7 @@ function wpgh_apply_note_funnel_step_html( $step_id )
         <tbody>
         <tr>
             <th><?php echo esc_html__( 'Note Text', 'groundhogg' ); ?></th>
-            <td><textarea cols="64" rows="4" id="<?php echo wpgh_prefix_step_meta( $step_id, 'note_text'); ?> name="<?php echo wpgh_prefix_step_meta( $step_id, 'note_text'); ?>"><?php echo $note; ?></textarea></td>
+            <td><textarea cols="64" rows="4" id="<?php echo wpgh_prefix_step_meta( $step_id, 'note_text'); ?>" name="<?php echo wpgh_prefix_step_meta( $step_id, 'note_text'); ?>"><?php echo $note; ?></textarea></td>
         </tr>
         </tbody>
     </table>
@@ -37,11 +37,11 @@ function wpgh_apply_note_funnel_step_html( $step_id )
 
 add_action( 'wpgh_get_step_settings_apply_note', 'wpgh_apply_note_funnel_step_html' );
 
-function wpgh_apply_note_icon_html()
+function wpgh_save_apply_note_step( $step_id )
 {
-    ?>
-    <div class="dashicons dashicons-id-alt"></div><p>Add Note</p>
-    <?php
+    if ( isset( $_POST[ wpgh_prefix_step_meta( $step_id, 'note_text') ] ) ){
+        wpgh_update_step_meta( $step_id, 'note_text', sanitize_textarea_field( $_POST[ wpgh_prefix_step_meta( $step_id, 'note_text') ] ) );
+    }
 }
 
-add_action( 'wpgh_action_element_icon_html_apply_note', 'wpgh_apply_note_icon_html' );
+add_action( 'wpgh_save_step_apply_note', 'wpgh_save_apply_note_step' );
