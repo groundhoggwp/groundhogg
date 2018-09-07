@@ -52,6 +52,10 @@ add_shortcode( 'gh_contact', 'wpgh_contact_replacement_shortcode' );
 function wpgh_merge_replacements_shortcode( $atts, $content = '' )
 {
     $contact = wpgh_get_the_contact();
+
+    if ( ! $contact )
+        return '';
+
     return wpgh_do_replacements( $contact->get_id(), $contact );
 }
 
@@ -90,7 +94,14 @@ function wpgh_do_replacements( $contact_id, $content )
                 $parts = explode( '.', $replacement );
 
                 $function = $parts[0];
-                $arg = $parts[1];
+
+                if ( ! isset( $parts[1] ) )
+                {
+                    $arg = false;
+                } else {
+                    $arg = $parts[1];
+                }
+
                 $new_replacement = apply_filters( 'wpgh_replacement_' . $function, $arg, $contact );
 
             } else {
@@ -104,6 +115,23 @@ function wpgh_do_replacements( $contact_id, $content )
     return $content;
 
 }
+
+/**
+ * Return he contact meta
+ *
+ * @param $contact WPGH_Contact
+ * @param $arg string the meta key
+ * @return mixed|string
+ */
+function wpgh_replacement_meta( $contact, $arg )
+{
+    if ( ! $arg )
+        return '';
+
+    return print_r( wpgh_get_contact_meta( $contact->get_id(), $arg, true ) , true );
+}
+
+add_filter( 'wpgh_replacement_meta', 'wpgh_replacement_meta' );
 
 /**
  * Return back the first name ot the contact.
@@ -145,6 +173,66 @@ function wpgh_replacement_email( $contact )
 }
 
 add_filter( 'wpgh_replacement_email', 'wpgh_replacement_email' );
+
+/**
+ * Return back the email address of the contact owner.
+ *
+ * @param $contact WPGH_Contact the contact
+ * @return string the owner's email
+ */
+function wpgh_replacement_owner_email( $contact )
+{
+    $owner = $contact->get_owner();
+
+    if ( ! $owner )
+        return get_bloginfo( 'admin_email' );
+
+    $user = get_userdata( $owner );
+
+    return $user->user_email;
+}
+
+add_filter( 'wpgh_replacement_owner_email', 'wpgh_replacement_owner_email' );
+
+/**
+ * Return back the first name of the contact owner.
+ *
+ * @param $contact WPGH_Contact the contact
+ * @return string the owner's name
+ */
+function wpgh_replacement_owner_first_name( $contact )
+{
+    $owner = $contact->get_owner();
+
+    if ( ! $owner )
+        return get_bloginfo( 'admin_email' );
+
+    $user = get_userdata( $owner );
+
+    return $user->first_name;
+}
+
+add_filter( 'wpgh_replacement_owner_first_name', 'wpgh_replacement_owner_first_name' );
+
+/**
+ * Return back the first name of the contact owner.
+ *
+ * @param $contact WPGH_Contact the contact
+ * @return string the owner's name
+ */
+function wpgh_replacement_owner_last_name( $contact )
+{
+    $owner = $contact->get_owner();
+
+    if ( ! $owner )
+        return get_bloginfo( 'admin_email' );
+
+    $user = get_userdata( $owner );
+
+    return $user->last_name;
+}
+
+add_filter( 'wpgh_replacement_owner_last_name', 'wpgh_replacement_owner_last_name' );
 
 /**
  * Return a confirmation link for the contact

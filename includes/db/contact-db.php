@@ -266,9 +266,11 @@ function wpgh_delete_contact( $id )
     );
 
     //cancel events
-    $wpdb->delete(
+    $wpdb->update(
         $wpdb->prefix . WPGH_EVENTS,
+        array( 'status' => 'cancelled' ),
         array( 'contact_id' => $id ),
+        array( '%s' ),
         array( '%d' )
     );
 

@@ -88,6 +88,9 @@ function wpgh_form_shortcode( $atts )
 
     if ( wpgh_is_gdpr() )
     {
+
+        $id = uniqid( 'gh-' );
+
         $form .= '<div class="gh-consent-field"><p>';
 
         $form .= '<label>';

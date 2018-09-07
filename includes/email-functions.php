@@ -276,20 +276,6 @@ function wpgh_minify_html( $content )
 add_filter( 'wpgh_the_email_content', 'wpgh_minify_html' );
 
 /**
- * Queue the email in the event queue. Does Basically it runs immediately but is queued for the sake of semantics.
- *
- * @param $step_id int The Id of the step
- * @param $contact_id int the Contact's ID
- */
-function wpgh_enqueue_send_email_action( $step_id, $contact_id )
-{
-    $funnel_id = wpgh_get_step_funnel( $step_id );
-    wpgh_enqueue_event( time() + 10, $funnel_id,  $step_id, $contact_id );
-}
-
-add_action( 'wpgh_enqueue_next_funnel_action_send_email', 'wpgh_enqueue_send_email_action', 10, 2 );
-
-/**
  * Process the email action step sending and then queue up the next action in the funnel.
  *
  * @param $step_id int the email step's id

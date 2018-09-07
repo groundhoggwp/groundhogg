@@ -12,6 +12,28 @@
  */
 
 /**
+ * Return a list of slugs for the available benchmarks in the funnel builder
+ *
+ * @return array
+ */
+function wpgh_get_funnel_benchmarks()
+{
+    $benchmarks = array();
+
+    $benchmarks['form_fill'] = array( 'title' => __('Form Filled'), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/form-filled.png' );
+    $benchmarks['email_opened'] = array( 'title' => __('Email opened', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/opened-email.png' );
+    $benchmarks['email_confirmed'] = array( 'title' => __('Email Confirmed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/email-confirmed.png' );
+//    $benchmarks['link_clicked'] = array( 'title' => __('Link Clicked', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/' );
+    $benchmarks['page_visited'] = array( 'title' => __('Page Visited', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/page-visited.png' );
+    $benchmarks['tag_applied']  = array( 'title' => __('Tag Applied', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/tag-applied.png' );
+    $benchmarks['tag_removed']  = array( 'title' => __('Tag Removed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/tag-removed.png' );
+    $benchmarks['account_created'] = array( 'title' => __('Account Created', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/account-created.png' );
+    $benchmarks['role_changed']    = array( 'title' => __('Role Changed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/role-changed.png' );
+
+    return apply_filters( 'wpgh_funnel_benchmarks', $benchmarks );
+}
+
+/**
  * Complete the benchmark and queue up the next action in the event queue
  * Also dequeues any previously enqueued events.
  *

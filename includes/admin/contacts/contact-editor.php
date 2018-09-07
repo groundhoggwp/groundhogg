@@ -42,8 +42,11 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <tbody>
         <tr>
             <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_email_input_field( 'email', 'email', $contact->get_email() );?>
-                <p><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpgh_get_optin_status_text( $contact->get_optin_status() ); ?></p>
+            <td><?php echo wpgh_admin_email_input_field( 'email', 'email', $contact->get_email() );?><label>
+                <p class="submit"><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpgh_get_optin_status_text( $contact->get_optin_status() ); ?></p>
+                <?php if ( $contact->get_optin_status() !== WPGH_UNSUBSCRIBED ): ?>
+                    <input type="checkbox" name="unsubscribe" value="1"><?php _e( 'Mark as unsubscribed.' )?></label>
+                <?php endif; ?>
             </td>
         </tr>
         <tr>
@@ -116,6 +119,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
             <tr id="meta-<?php esc_attr_e( $meta_key )?>">
                 <th>
                    <?php esc_html_e( $meta_key ); ?>
+                    <p class="description">{_<?php esc_html_e( $meta_key ); ?>}</p>
                 </th>
                 <td>
                     <input type="text" id="<?php esc_attr_e( $meta_key )?>" name="meta[<?php esc_attr_e( $meta_key ); ?>]" class="regular-text" value="<?php esc_attr_e( $value ); ?>">
@@ -355,8 +359,8 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
     <p class="description"><?php _e( 'This is where you can check if this contact is interacting with your emails.', 'groundhogg' ); ?></p>
     <?php do_action( 'wpgh_contact_edit_after', $id ); ?>
     <div class="edit-contact-actions">
-        <p>
-            <?php submit_button(null, 'primary', null, false ); ?>
+        <p class="submit">
+            <?php submit_button('Update Contact', 'primary', null, false ); ?>
             <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
         </p>
     </div>

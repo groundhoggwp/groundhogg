@@ -236,6 +236,8 @@ add_action( 'wpgh_import_'. 'tag_removed', 'wpgh_import_tags', 10, 2 );
  */
 function wpgh_import_contacts()
 {
+    //todo security check...
+
     if ( ! isset( $_POST[ 'import_contacts' ] ) )
         return;
 
@@ -244,6 +246,10 @@ function wpgh_import_contacts()
     }
 
     if ( $_FILES['contacts']['error'] == UPLOAD_ERR_OK && is_uploaded_file( $_FILES['contacts']['tmp_name'] ) ) {
+
+        if ( strpos( $_FILES['contacts']['name'], '.csv' ) === false ){
+            wp_die( 'You did not upload a csv!' );
+        }
 
         $row = 0;
         if ( ( $handle = fopen( $_FILES['contacts']['tmp_name'], "r" ) ) !== FALSE ) {
@@ -289,10 +295,13 @@ function wpgh_import_contacts()
             }
 
             fclose($handle);
+
+            add_settings_error( 'import', esc_attr( 'imported' ), __( 'Imported Contacts' ), 'updated' );
+        } else {
+            wp_die('Oops, something went wrong.');
         }
-
-        add_settings_error( 'import', esc_attr( 'imported' ), __( 'Imported Contacts' ), 'updated' );
-
+    } else {
+        wp_die( 'Please upload a proper file!' );
     }
 }
 

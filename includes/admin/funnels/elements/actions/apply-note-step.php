@@ -19,7 +19,7 @@ function wpgh_apply_note_funnel_step_html( $step_id )
     $note = wpgh_get_step_meta( $step_id, 'note_text', true );
 
     if ( ! $note )
-        $note = "This contact is super awesome!";
+        $note = __( "This contact is super awesome!", 'groundhogg' );
 
     ?>
 
@@ -27,7 +27,8 @@ function wpgh_apply_note_funnel_step_html( $step_id )
         <tbody>
         <tr>
             <th><?php echo esc_html__( 'Note Text', 'groundhogg' ); ?></th>
-            <td><textarea cols="64" rows="4" id="<?php echo wpgh_prefix_step_meta( $step_id, 'note_text'); ?>" name="<?php echo wpgh_prefix_step_meta( $step_id, 'note_text'); ?>"><?php echo $note; ?></textarea></td>
+            <td><textarea cols="64" rows="4" id="<?php echo wpgh_prefix_step_meta( $step_id, 'note_text'); ?>" name="<?php echo wpgh_prefix_step_meta( $step_id, 'note_text'); ?>"><?php echo $note; ?></textarea>
+                <p class="description"><?php _e( 'Use any valid replacement codes.' ) ?></p></td>
         </tr>
         </tbody>
     </table>

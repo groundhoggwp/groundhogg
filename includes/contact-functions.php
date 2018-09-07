@@ -225,6 +225,10 @@ function wpgh_save_contact( $id )
         }
     }
 
+    if ( isset( $_POST[ 'unsubscribe' ] ) )
+    {
+        wpgh_update_contact( $id, 'optin_status', WPGH_UNSUBSCRIBED );
+    }
 
     if ( isset( $_POST[ 'email' ] ) )
     {
@@ -233,6 +237,10 @@ function wpgh_save_contact( $id )
 
     if ( isset( $_POST['first_name'] ) ){
         wpgh_update_contact( $id, 'first_name', sanitize_text_field( $_POST['first_name'] ) );
+    }
+
+    if ( isset( $_POST['owner'] ) ){
+        wpgh_update_contact( $id, 'owner_id', intval( $_POST['owner'] ) );
     }
 
     if ( isset( $_POST['last_name'] ) ){
@@ -337,7 +345,7 @@ function wpgh_save_contact_inline()
         }
     }
 
-    if ( ! $contact->get_optin_status() !== WPGH_UNSUBSCRIBED && $optin_status !== WPGH_CONFIRMED )
+    if ( $contact->get_optin_status() !== WPGH_UNSUBSCRIBED && $optin_status !== WPGH_CONFIRMED )
     {
         wpgh_update_contact($id, 'optin_status', $optin_status );
     }
@@ -533,8 +541,14 @@ add_action( 'wpgh_update_tag', 'wpgh_save_tag' );
  * @param $tag_id int the Id of the tag
  * @return bool whether the contact has the tag.
  */
-function wpgh_has_tag( $contact_id, $tag_id )
+function wpgh_has_tag( $contact_id, $tag_id_or_slug )
 {
+    if ( ! is_numeric( $tag_id_or_slug ) )
+    {
+        $tag = wpgh_get_tag( $tag_id_or_slug );
+        $tag_id = $tag[ 'tag_id' ];
+    }
+
     return 1 && wpgh_get_contact_tag_relationship( intval( $contact_id ), intval( $tag_id ) );
 }
 
@@ -570,22 +584,6 @@ function wpgh_remove_tag( $contact_id, $tag_id  )
 
     return $rel;
 }
-
-/**
- * Queue the tag event in the event queue. Basically it runs immediately but is queued for the sake of semantics and reporting.
- * Used for both apply and remove tag since they are essentially the same thing.
- *
- * @param $step_id int The Id of the step
- * @param $contact_id int the Contact's ID
- */
-function wpgh_enqueue_apply_tag_action( $step_id, $contact_id )
-{
-    $funnel_id = wpgh_get_step_funnel( $step_id );
-    wpgh_enqueue_event( time() + 10, $funnel_id,  $step_id, $contact_id );
-}
-
-add_action( 'wpgh_enqueue_next_funnel_action_apply_tag', 'wpgh_enqueue_apply_tag_action', 10, 2 );
-add_action( 'wpgh_enqueue_next_funnel_action_remove_tag', 'wpgh_enqueue_apply_tag_action', 10, 2 );
 
 /**
  * Process the apply tag action

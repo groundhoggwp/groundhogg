@@ -257,6 +257,8 @@ class WPGH_Tags_Table extends WP_List_Table {
         $actions = array();
         $title = $item['tag_name'];
 
+        $actions[ 'id' ] = 'ID: ' . $item[ 'tag_id' ];
+
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',
             /* translators: %s: title */

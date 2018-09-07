@@ -108,49 +108,6 @@ function wpgh_register_custom_action
 }
 
 /**
- * Return a list of slugs for the available benchmarks in the funnel builder
- *
- * @return array
- */
-function wpgh_get_funnel_benchmarks()
-{
-    $benchmarks = array();
-
-    $benchmarks['form_fill'] = array( 'title' => __('Form Filled'), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/form-filled.png' );
-    $benchmarks['email_opened'] = array( 'title' => __('Email opened', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/opened-email.png' );
-    $benchmarks['email_confirmed'] = array( 'title' => __('Email Confirmed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/email-confirmed.png' );
-//    $benchmarks['link_clicked'] = array( 'title' => __('Link Clicked', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/' );
-    $benchmarks['page_visited'] = array( 'title' => __('Page Visited', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/page-visited.png' );
-    $benchmarks['tag_applied']  = array( 'title' => __('Tag Applied', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/tag-applied.png' );
-    $benchmarks['tag_removed']  = array( 'title' => __('Tag Removed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/tag-removed.png' );
-    $benchmarks['account_created'] = array( 'title' => __('Account Created', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/account-created.png' );
-    $benchmarks['role_changed']    = array( 'title' => __('Role Changed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/role-changed.png' );
-
-    return apply_filters( 'wpgh_funnel_benchmarks', $benchmarks );
-}
-
-/**
- * Return a list of slugs for the available funnel actions
- *
- * @return array()
- */
-function wpgh_get_funnel_actions()
-{
-    $actions = array();
-
-    $actions['send_email']  = array( 'title' => __( 'Send Email', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/send-email.png' );
-    $actions['apply_note']  = array( 'title' => __( 'Apply Note', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/apply-a-note.png' );
-    $actions['apply_tag']   = array( 'title' => __( 'Apply Tag', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/apply-tag.png' );
-    $actions['remove_tag']  = array( 'title' => __( 'Remove Tag', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/remove-tag.png' );
-//    $actions['delete_user'] = array( 'title' => __( '', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/.png' );
-    $actions['date_timer']  = array( 'title' => __( 'Date Timer', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/date-timer.png' );
-    $actions['delay_timer'] = array( 'title' => __( 'Delay Timer', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/delay-timer.png' );
-    $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/create-account.png' );
-
-    return apply_filters( 'wpgh_funnel_actions', $actions );
-}
-
-/**
  * Get the icon for a step
  *
  * @param $step_id int the Id of the step

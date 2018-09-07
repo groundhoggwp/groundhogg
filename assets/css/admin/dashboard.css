@@ -1,0 +1,8 @@
+.wpgh-dashboard-widget table.stats {
+    width: 100%;
+}
+
+.wpgh-dashboard-widget table.stats th,
+.wpgh-dashboard-widget table.stats td {
+    padding: 10px;
+}
