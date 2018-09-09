@@ -29,17 +29,8 @@ class WPGH_Funnels_Page
             {
                 include $filename;
             }
-
-            $this->set_headers();
 		}
 	}
-
-	function set_headers()
-    {
-        header("Cache-Control: no-cache, no-store, must-revalidate");
-        header("Pragma: no-cache");
-        header("Expires: 0");
-    }
 
 	function get_funnels()
 	{
@@ -88,42 +79,6 @@ class WPGH_Funnels_Page
 		}
 	}
 
-	function get_notice()
-	{
-	    if ( isset( $_REQUEST['ids'] ) )
-        {
-            $ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
-            $count = count( $ids );
-        }
-
-		switch ( $this->get_previous_action() )
-		{
-			case 'archive':
-
-				?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' funnels archived.' ); ?></p></div><?php
-
-				break;
-
-			case 'delete':
-
-				?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' funnels deleted.' ); ?></p></div><?php
-
-				break;
-
-			case 'restore':
-
-				?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' funnels restored.' ); ?></p></div><?php
-
-				break;
-
-			case 'edit':
-				if ( isset( $_POST ) ){
-					?><div class="notice notice-success is-dismissible"><p><?php _e( 'Funnel Updated.' ); ?></p></div><?php
-				}
-				break;
-		}
-	}
-
 	function process_action()
 	{
 		if ( ! $this->get_action() || ! $this->verify_action() )
@@ -137,8 +92,11 @@ class WPGH_Funnels_Page
 
 				if ( isset( $_POST ) )
 				{
+					wpgh_add_notice( esc_attr( 'created' ), __( 'Funnel Created', 'groundhogg' ), 'success' );
+
 					do_action( 'wpgh_add_funnel' );
 				}
+
 				break;
 
 			case 'archive':
@@ -146,6 +104,15 @@ class WPGH_Funnels_Page
 				foreach ( $this->get_funnels() as $id ) {
 					wpgh_update_funnel($id, 'funnel_status', 'archived');
 				}
+
+				wpgh_add_notice(
+                    esc_attr( 'archived' ),
+                    sprintf( "%s %d %s",
+                        __( 'Archived', 'groundhogg' ),
+                        count( $this->get_funnels() ),
+                        'Funnels' ),
+                    'success'
+                );
 
 				do_action( 'wpgh_archive_funnels' );
 
@@ -156,6 +123,15 @@ class WPGH_Funnels_Page
 				foreach ( $this->get_funnels() as $id ){
 					wpgh_delete_funnel( $id );
 				}
+
+				wpgh_add_notice(
+					esc_attr( 'deleted' ),
+					sprintf( "%s %d %s",
+						__( 'Deleted', 'groundhogg' ),
+						count( $this->get_funnels() ),
+						'Funnels' ),
+					'success'
+				);
 
 				do_action( 'wpgh_delete_funnels' );
 
@@ -168,6 +144,15 @@ class WPGH_Funnels_Page
 					wpgh_update_funnel( $id, 'funnel_status', 'inactive' );
 				}
 
+				wpgh_add_notice(
+					esc_attr( 'restored' ),
+					sprintf( "%s %d %s",
+						__( 'Restored', 'groundhogg' ),
+						count( $this->get_funnels() ),
+						'Funnels' ),
+					'success'
+				);
+
 				do_action( 'wpgh_restore_funnels' );
 
 				break;
@@ -176,6 +161,7 @@ class WPGH_Funnels_Page
 
 				if ( isset( $_POST ) ){
 					do_action( 'wpgh_update_funnel', intval( $_GET[ 'funnel' ] ) );
+					wpgh_add_notice( esc_attr( 'updated' ), __( 'Funnel Updated', 'groundhogg' ), 'success' );
 				}
 
 				break;
@@ -191,7 +177,6 @@ class WPGH_Funnels_Page
 		wp_redirect( $base_url );
 		die();
 	}
-
 
 	function verify_action()
 	{
@@ -240,7 +225,7 @@ class WPGH_Funnels_Page
 		?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
-			<?php $this->get_notice(); ?>
+			<?php wpgh_notices(); ?>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){
 				case 'add':

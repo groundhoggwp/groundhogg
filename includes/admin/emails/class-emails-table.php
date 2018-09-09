@@ -51,7 +51,7 @@ class WPGH_Emails_Table extends WP_List_Table {
 			'from_user'   => _x( 'From User', 'Column label', 'groundhogg' ),
 			'author'   => _x( 'Author', 'Column label', 'groundhogg' ),
             'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
-            'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
+            //'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 		return apply_filters( 'wpgh_email_columns', $columns );
 	}
@@ -69,7 +69,7 @@ class WPGH_Emails_Table extends WP_List_Table {
 			'from_user' => array( 'from_user', false ),
 			'author' => array( 'author', false ),
 			'last_updated' => array( 'last_updated', false ),
-			'date_created' => array( 'date_created', false )
+			//'date_created' => array( 'date_created', false )
 		);
 		return apply_filters( 'wpgh_email_sortable_columns', $sortable_columns );
 	}

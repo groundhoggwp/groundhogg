@@ -228,6 +228,11 @@ function wpgh_save_contact( $id )
     if ( isset( $_POST[ 'unsubscribe' ] ) )
     {
         wpgh_update_contact( $id, 'optin_status', WPGH_UNSUBSCRIBED );
+	    wpgh_add_notice(
+		    esc_attr( 'unsubscribed' ),
+		    __( 'This contact will no longer receive email communication', 'groundhogg' ),
+		    'info'
+	    );
     }
 
     if ( isset( $_POST[ 'email' ] ) )

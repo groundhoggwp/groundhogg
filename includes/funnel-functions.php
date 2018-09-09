@@ -83,30 +83,6 @@ function wpgh_get_current_step()
     return false;
 }
 
-
-/**
- *Add easy way for devs to register new funnel actions and benchmarks
- *
- * @param $name string the Name of the new action
- * @param $type string the identifier
- * @param $settings_callback string callback for the settings of the new action
- * @param $save_callback string callback to save the new settings
- * @param $action_callback string the callback to perform the action
- * @param $icon string a link or class to the icon of the new action.
- */
-function wpgh_register_custom_action
-(
-        $name,
-        $type,
-        $settings_callback,
-        $save_callback,
-        $action_callback,
-        $icon
-)
-{
-    //todo
-}
-
 /**
  * Get the icon for a step
  *
@@ -806,6 +782,11 @@ function wpgh_save_funnel( $funnel_id )
         do_action( 'wpgh_save_step_' . $step_type, $stepId );
 
     }
+
+	/* if it's not a bench mark then the funnel cant actually ever run */
+	if ( ! wpgh_is_benchmark( wpgh_get_step_type( intval( $steps[0] ) ) ) ){
+		wpgh_add_notice( 'bad-funnel', __( 'Funnels must start with 1 or more benchmarks', 'groundhogg' ), 'error' );
+	}
 
     do_action( 'wpgh_save_funnel_after', $funnel_id );
 }

@@ -120,11 +120,16 @@ add_action( 'wpgh_cron_event_plus_50', 'wpgh_do_queued_events' );
 
 function wpgh_schedule_single_cron_events()
 {
-    wp_schedule_single_event( time() + 10 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_10' );
-    wp_schedule_single_event( time() + 20 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_20' );
-    wp_schedule_single_event( time() + 30 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_30' );
-    wp_schedule_single_event( time() + 40 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_40' );
-    wp_schedule_single_event( time() + 50 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_50' );
+	if ( ! wp_next_scheduled( 'wpgh_cron_event_plus_10' ) )
+        wp_schedule_single_event( time() + 10 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_10' );
+	if ( ! wp_next_scheduled( 'wpgh_cron_event_plus_20' ) )
+        wp_schedule_single_event( time() + 20 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_20' );
+	if ( ! wp_next_scheduled( 'wpgh_cron_event_plus_30' ) )
+		wp_schedule_single_event( time() + 30 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_30' );
+	if ( ! wp_next_scheduled( 'wpgh_cron_event_plus_40' ) )
+		wp_schedule_single_event( time() + 40 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_40' );
+	if ( ! wp_next_scheduled( 'wpgh_cron_event_plus_50' ) )
+		wp_schedule_single_event( time() + 50 * MINUTE_IN_SECONDS, 'wpgh_cron_event_plus_50' );
 }
 
 add_action( 'wpgh_cron_event', 'wpgh_schedule_single_cron_events' );

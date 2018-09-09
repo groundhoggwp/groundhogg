@@ -74,42 +74,6 @@ class WPGH_Emails_Page
         }
     }
 
-    function get_notice()
-    {
-        if ( isset( $_REQUEST['ids'] ) )
-        {
-            $ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
-            $count = count( $ids );
-        }
-
-        switch ( $this->get_previous_action() )
-        {
-            case 'trash':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' emails trashed.' ); ?></p></div><?php
-
-                break;
-
-            case 'delete':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' emails deleted.' ); ?></p></div><?php
-
-                break;
-
-            case 'restore':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' emails restored.' ); ?></p></div><?php
-
-                break;
-
-            case 'edit':
-                if ( isset( $_POST ) ){
-                    ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Email Updated.' ); ?></p></div><?php
-                }
-                break;
-        }
-    }
-
     function process_action()
     {
         if ( ! $this->get_action() || ! $this->verify_action() )
@@ -133,6 +97,15 @@ class WPGH_Emails_Page
                     wpgh_update_email($id, 'email_status', 'trash');
                 }
 
+	            wpgh_add_notice(
+		            esc_attr( 'trashed' ),
+		            sprintf( "%s %d %s",
+			            __( 'Trashed' ),
+			            count( $this->get_emails() ),
+			            __( 'Emails', 'groundhogg' ) ),
+		            'success'
+	            );
+
                 do_action( 'wpgh_trash_emails' );
 
                 break;
@@ -142,6 +115,15 @@ class WPGH_Emails_Page
                 foreach ( $this->get_emails() as $id ){
                     wpgh_delete_email( $id );
                 }
+
+	            wpgh_add_notice(
+		            esc_attr( 'deleted' ),
+		            sprintf( "%s %d %s",
+			            __( 'Deleted' ),
+			            count( $this->get_emails() ),
+			            __( 'Emails', 'groundhogg' ) ),
+		            'success'
+	            );
 
                 do_action( 'wpgh_delete_emails' );
 
@@ -154,6 +136,15 @@ class WPGH_Emails_Page
                     wpgh_update_email( $id, 'email_status', 'draft' );
                 }
 
+	            wpgh_add_notice(
+		            esc_attr( 'restored' ),
+		            sprintf( "%s %d %s",
+			            __( 'Restored' ),
+			            count( $this->get_emails() ),
+			            __( 'Emails', 'groundhogg' ) ),
+		            'success'
+	            );
+
                 do_action( 'wpgh_restore_emails' );
 
                 break;
@@ -162,6 +153,13 @@ class WPGH_Emails_Page
 
                 if ( isset( $_POST ) ){
                     do_action( 'wpgh_update_email', intval( $_GET[ 'email' ] ) );
+	                wpgh_add_notice(
+		                esc_attr( 'trashed' ),
+		                sprintf( "%s %s",
+			                __( 'Email', 'groundhogg' ),
+		                __( 'Updated' ) ),
+		                'success'
+	                );
                 }
 
                 break;
@@ -226,10 +224,7 @@ class WPGH_Emails_Page
         ?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
-            <?php $this->get_notice(); ?>
-            <?php if( isset( $_POST['send_test'] ) ): ?>
-                <div class="notice notice-success is-dismissible"><p><?php _e( 'Sent test email.', 'groundhogg' ); ?></p></div>
-            <?php endif; ?>
+            <?php wpgh_notices(); ?>
             <hr class="wp-header-end">
             <?php switch ( $this->get_action() ){
                 case 'add':

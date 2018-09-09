@@ -235,7 +235,7 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                         <?php do_action( 'wpgh_action_icons_after' ); ?>
 
                         <p>
-                            <?php echo esc_html__( 'Actions are launched whenever a contact completes a benchmark.','groundhogg' ); ?>
+                            <?php esc_html_e( 'Actions are launched whenever a contact completes a benchmark.','groundhogg' ); ?>
                         </p>
                     </div>
 
@@ -252,15 +252,9 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
 
                     if ( empty( $steps ) ): ?>
                         <div class="">
-                            Drag in new steps to build the ultimate sales machine!
+                            <?php esc_html_e( 'Drag in new steps to build the ultimate sales machine!' , 'groundhogg'); ?>
                         </div>
                     <?php else:
-
-                        if ( wpgh_get_step_group( $steps[0] ) !== 'benchmark' ){
-                            ?>
-                            <div class="notice notice-error is-dismissible"><p>Funnels should start with benchmarks, otherwise actions cannot be triggered. Please use a benchmark to trigger automation.</p></div>
-                            <?php
-                        }
 
                         foreach ( $steps as $i => $step_id ):
                             wpgh_get_step_html( $step_id );

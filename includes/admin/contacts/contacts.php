@@ -74,42 +74,6 @@ class WPGH_Contacts_Page
         }
     }
 
-    function get_notice()
-    {
-        if ( isset( $_REQUEST['ids'] ) )
-        {
-            $ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
-            $count = count( $ids );
-        }
-
-        switch ( $this->get_previous_action() )
-        {
-            case 'spam':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' contacts marked as spam.' ); ?></p></div><?php
-
-                break;
-
-            case 'unspam':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' contacts marked as unconfirmed.' ); ?></p></div><?php
-
-                break;
-
-            case 'delete':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' contacts deleted.' ); ?></p></div><?php
-
-                break;
-
-            case 'edit':
-                if ( isset( $_POST ) ){
-                    ?><div class="notice notice-success is-dismissible"><p><?php _e( 'Contact Updated.' ); ?></p></div><?php
-                }
-                break;
-        }
-    }
-
     function process_action()
     {
         if ( ! $this->get_action() || ! $this->verify_action() )
@@ -124,6 +88,15 @@ class WPGH_Contacts_Page
                 if ( isset( $_POST ) )
                 {
                     do_action( 'wpgh_add_contact' );
+	                wpgh_add_notice(
+		                esc_attr( 'updated' ),
+		                sprintf( "%s %s",
+			                __( 'Contact', 'groundhogg' ),
+			                __( 'Updated' ) ),
+		                'success'
+	                );
+
+	                do_action( 'wpgh_admin_add_contact' );
                 }
 
                 break;
@@ -135,7 +108,16 @@ class WPGH_Contacts_Page
                     wpgh_update_contact( $id, 'optin_status', WPGH_SPAM );
                 }
 
-                do_action( 'wpgh_trash_contacts' );
+	            wpgh_add_notice(
+		            esc_attr( 'spammed' ),
+		            sprintf( "%s %d %s",
+			            __( 'Marked', 'groundhogg' ),
+			            count( $this->get_contacts() ),
+			            __( 'contacts as spam', 'groundhogg' ) ),
+		            'success'
+	            );
+
+                do_action( 'wpgh_spam_contacts' );
 
                 break;
 
@@ -144,6 +126,15 @@ class WPGH_Contacts_Page
                 foreach ( $this->get_contacts() as $id ){
                     wpgh_delete_contact( $id );
                 }
+
+	            wpgh_add_notice(
+		            esc_attr( 'deleted' ),
+		            sprintf( "%s %d %s",
+			            __( 'Deleted', 'groundhogg' ),
+			            count( $this->get_contacts() ),
+			            __( 'Contacts', 'groundhogg' ) ),
+		            'success'
+	            );
 
                 do_action( 'wpgh_delete_contacts' );
 
@@ -156,7 +147,16 @@ class WPGH_Contacts_Page
                     wpgh_update_contact( $id, 'contact_status', WPGH_UNCONFIRMED );
                 }
 
-                do_action( 'wpgh_restore_contacts' );
+	            wpgh_add_notice(
+		            esc_attr( 'unspam' ),
+		            sprintf( "%s %d %s",
+			            __( 'Approved', 'groundhogg' ),
+			            count( $this->get_contacts() ),
+			            __( 'Contacts', 'groundhogg' ) ),
+		            'success'
+	            );
+
+                do_action( 'wpgh_unspam_contacts' );
 
                 break;
 
@@ -164,6 +164,13 @@ class WPGH_Contacts_Page
 
                 if ( isset( $_POST ) ){
                     do_action( 'wpgh_update_contact', intval( $_GET[ 'contact' ] ) );
+	                wpgh_add_notice(
+		                esc_attr( 'updated' ),
+		                sprintf( "%s %s",
+			                __( 'Contact', 'groundhogg' ),
+			                __( 'Updated' ) ),
+		                'success'
+	                );
                 }
 
                 break;
@@ -236,7 +243,7 @@ class WPGH_Contacts_Page
         ?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_contacts&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
-            <?php $this->get_notice(); ?>
+            <?php wpgh_notices(); ?>
             <hr class="wp-header-end">
             <?php switch ( $this->get_action() ){
                 case 'add':

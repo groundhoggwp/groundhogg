@@ -46,7 +46,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
             'first_name'   => _x( 'First Name', 'Column label', 'wp-funnels' ),
             'last_name' => _x( 'Last Name', 'Column label', 'wp-funnels' ),
             'user_id' => _x( 'Username', 'Column label', 'wp-funnels' ),
-            'owner' => _x( 'Owner', 'Column label', 'wp-funnels' ),
+            'owner_id' => _x( 'Owner', 'Column label', 'wp-funnels' ),
             'date_created' => _x( 'Date', 'Column label', 'wp-funnels' ),
         );
         return apply_filters( 'wpgh_contact_columns', $columns );
@@ -66,7 +66,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
             'first_name' => array( 'first_name', false ),
             'last_name' => array( 'last_name', false ),
             'user_id' => array( 'user_id', false ),
-            'owner' => array( 'owner', false ),
+            'owner_id' => array( 'owner_id', false ),
             'date_created' => array( 'date_created', false )
         );
         return apply_filters( 'wpgh_contact_sortable_columns', $sortable_columns );
@@ -109,7 +109,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
         return $user ? '<a href="'.admin_url('user-edit.php?user_id='.$user->ID ).'">'.$user->display_name.'</a>' :  '&#x2014;';
     }
 
-    protected function column_owner( $item )
+    protected function column_owner_id( $item )
     {
         $owner = get_userdata( $item['owner_id'] );
         return ! empty( $item['owner_id'] ) ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=owner&owner=' .$item['owner_id'] ).'">'. $owner->user_login .'</a>' :  '&#x2014;';

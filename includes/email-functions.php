@@ -494,6 +494,14 @@ function wpgh_send_test_email( $email_id )
         if ( ! $sent )
             wp_die( 'Could not send test.' );
 
+	    wpgh_add_notice(
+		    esc_attr( 'sent-test' ),
+		    sprintf( "%s %s",
+			    __( 'Sent test email to', 'groundhogg' ),
+			    get_userdata( $test_email_uid )->user_email ),
+		    'success'
+	    );
+
         do_action( 'wpgh_after_send_test_email', $email_id );
     }
 }
