@@ -7,42 +7,6 @@
  */
 
 /**
- * Process the contact shortcode
- */
-function wpgh_contact_replacement_shortcode( $atts )
-{
-    $a = shortcode_atts( array(
-        'field' => 'first'
-    ), $atts );
-
-    $contact = wpgh_get_the_contact();
-
-    if ( ! $contact )
-        return __( 'Friend', 'groundhogg' );
-
-    if ( substr( $a['field'], 0, 1) === '_' ) {
-        $new_replacement = $contact->get_meta( substr( $a['field'], 1) );
-    } else {
-
-        if ( strpos( $a['field'], '.' ) > 0 ){
-
-            $parts = explode( '.', $a['field'] );
-
-            $function = $parts[0];
-            $arg = $parts[1];
-            $new_replacement = apply_filters( 'wpgh_replacement_' . $function, $arg, $contact );
-
-        } else {
-            $new_replacement = apply_filters( 'wpgh_replacement_' . $a['field'], $contact );
-        }
-    }
-
-    return $new_replacement;
-}
-
-add_shortcode( 'gh_contact', 'wpgh_contact_replacement_shortcode' );
-
-/**
  * Mere contact replacements into page content with this shortcode.
  *
  * @param $atts array should be empty

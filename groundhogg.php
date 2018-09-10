@@ -10,8 +10,12 @@ Text Domain: groundhogg
 Domain Path: /languages
 */
 
-define ( 'WPGH_ASSETS_FOLDER', plugins_url( 'assets', __FILE__ ) );
-define ( 'WPGH_INCLUDES_FOLDER', dirname( __FILE__ ) . '/includes/' );
+define( 'WPGH_ASSETS_FOLDER', plugins_url( 'assets', __FILE__ ) );
+define( 'WPGH_INCLUDES_FOLDER', dirname( __FILE__ ) . '/includes/' );
+
+define( 'WPGH_ID', 292 );
+define( 'WPGH_NAME', 'groundhogg' );
+define( 'WPGH_VERSION', '0.1' );
 
 //include dirname( __FILE__ ) . '/includes/admin/settings/settings.php';
 
@@ -118,5 +122,3 @@ function wpgh_register_scripts()
 }
 
 add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
-
-do_action( 'groundhogg_loaded' );
