@@ -205,6 +205,7 @@ class WPGH_Contacts_Page
         wp_enqueue_style( 'select2' );
         wp_enqueue_script( 'select2' );
         wp_enqueue_script( 'wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . '/js/admin/inline-edit-contacts.js' );
+        wp_enqueue_style( 'wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . '/css/admin/contacts.css'  );
 
         $contacts_table = new WPGH_Contacts_Table();
 

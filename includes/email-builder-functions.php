@@ -73,7 +73,7 @@ function wpgh_email_button_block()
             <td>
                 <table border="0" cellspacing="0" cellpadding="0" style="margin-right: auto;margin-left: auto;">
                     <tr>
-                        <td class="email-button" bgcolor="#EB7035" style="padding: 12px 18px 12px 18px; border-radius:3px" align="center"><a contenteditable="true" href="http://litmus.com" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; font-weight: normal; color: #ffffff; text-decoration: none; display: inline-block;">I am a button &rarr;</a></td>
+                        <td class="email-button" bgcolor="#EB7035" style="padding: 12px 18px 12px 18px; border-radius:3px" align="center"><b><a href="<?php echo site_url(); ?>" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; font-weight: bold; color: #ffffff; text-decoration: none; display: inline-block;"><?php _e('I am a button &rarr;'); ?></a></b></td>
                     </tr>
                 </table>
             </td>

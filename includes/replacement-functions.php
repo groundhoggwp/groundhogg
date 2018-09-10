@@ -7,23 +7,6 @@
  */
 
 /**
- * Mere contact replacements into page content with this shortcode.
- *
- * @param $atts array should be empty
- * @param string $content the content to perfotm the merge fields
- * @return string the updated content,.
- */
-function wpgh_merge_replacements_shortcode( $atts, $content = '' )
-{
-    $contact = wpgh_get_the_contact();
-
-    if ( ! $contact )
-        return '';
-
-    return wpgh_do_replacements( $contact->get_id(), $contact );
-}
-
-/**
  * Substitute the replacement codes with actual contact information.
  *
  * @param $contact_id int    The Contact's ID
@@ -228,7 +211,10 @@ function wpgh_replacement_date( $time_string, $contact )
         $when = $parts[1];
     }
 
-    return date( $format, strtotime( $when ) );
+    /* convert to local time */
+    $time = strtotime( $when ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+
+    return date_i18n( $format, $time );
 
 }
 

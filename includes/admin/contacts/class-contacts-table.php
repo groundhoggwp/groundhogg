@@ -410,7 +410,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
         ?>
         <table style="display: none">
             <tbody id="inlineedit">
-            <tr id="inline-edit" class="inline-edit-row inline-edit-row-post quick-edit-row quick-edit-row-post inline-edit-post inline-editor" style="display: none">
+            <tr id="inline-edit" class="inline-edit-row inline-edit-row-contact quick-edit-row quick-edit-row-contact inline-edit-contact inline-editor" style="display: none">
                 <td colspan="<?php echo $this->get_column_count(); ?>" class="colspanchange">
                     <fieldset class="inline-edit-col-left">
                         <legend class="inline-edit-legend"><?php echo __('Quick Edit'); ?></legend>
@@ -419,20 +419,14 @@ class WPGH_Contacts_Table extends WP_List_Table {
                                 <span class="title"><?php _e('Email'); ?></span>
                                 <span class="input-text-wrap"><input type="text" name="email" class="cemail regular-text" value=""/></span>
                             </label>
-                        </div>
-                        <div class="inline-edit-col">
                             <label>
                                 <span class="title"><?php _e('First Name'); ?></span>
                                 <span class="input-text-wrap"><input type="text" name="first_name" class="cfirst_name regular-text" value=""/></span>
                             </label>
-                        </div>
-                        <div class="inline-edit-col">
                             <label>
                                 <span class="title"><?php _e('Last Name'); ?></span>
                                 <span class="input-text-wrap"><input type="text" name="last_name" class="clast_name regular-text" value=""/></span>
                             </label>
-                        </div>
-                        <div class="inline-edit-col">
                             <label>
                                 <span class="title"><?php _e('Owner'); ?></span>
                                 <span class="input-text-wrap">
@@ -440,32 +434,17 @@ class WPGH_Contacts_Table extends WP_List_Table {
                                     <?php wp_dropdown_users( $args ) ?>
                                 </span>
                             </label>
+                            <label>
+                                <input type="checkbox" name="unsubscribe"><?php _e( 'Unsubscribe this contact.', 'groundhogg' ); ?>
+                            </label>
                         </div>
                     </fieldset>
-                    <fieldset class="inline-edit-col-center">
+                    <fieldset class="inline-edit-col-right">
                         <div class="inline-edit-col">
                             <label class="inline-edit-tags">
                                 <span class="title"><?php _e('Tags'); ?></span>
                             </label>
                             <?php wpgh_dropdown_tags( array( 'select2' => false ) ); ?>
-                        </div>
-                    </fieldset>
-                    <fieldset class="inline-edit-col-right">
-                        <legend class="inline-edit-legend"></legend>
-                        <div class="inline-edit-col">
-                            <label>
-                                <span class="title"><?php _e('Change Optin Status'); ?></span>
-                                <span class="input-text-wrap">
-                                    <select name="optin_status">
-                                        <option value=""><?php _e( 'Select an Optin Status' ); ?></option>
-                                        <option value="<?php echo WPGH_WEEKLY; ?>"><?php _e( 'Send emails weekly', 'groundhogg' ); ?></option>
-                                        <option value="<?php echo WPGH_MONTHLY; ?>"><?php _e( 'Send emails monthly', 'groundhogg' ); ?></option>
-                                        <option value="<?php echo WPGH_UNSUBSCRIBED; ?>"><?php _e( 'Unsubscribe', 'groundhogg' ); ?></option>
-                                    </select>
-                                </span>
-                                <span class="title"><?php _e('Once you set the status to Unsubscribed you cannot change it back.' , 'groundhogg' ); ?></span>
-                            </label>
-                            <?php do_action( 'wpgh_contact_inline_edit_fields' ); ?>
                         </div>
                     </fieldset>
                     <div class="submit inline-edit-save">

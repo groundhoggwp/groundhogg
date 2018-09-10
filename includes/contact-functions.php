@@ -350,9 +350,11 @@ function wpgh_save_contact_inline()
         }
     }
 
-    if ( $contact->get_optin_status() !== WPGH_UNSUBSCRIBED && $optin_status !== WPGH_CONFIRMED )
-    {
-        wpgh_update_contact($id, 'optin_status', $optin_status );
+    if ( isset( $_POST['unsubscribe'] ) ){
+        if ( $contact->get_optin_status() !== WPGH_UNSUBSCRIBED )
+        {
+            wpgh_update_contact($id, 'optin_status', WPGH_UNSUBSCRIBED );
+        }
     }
 
     do_action( 'wpgh_contact_inline_edit', $id );
@@ -543,7 +545,7 @@ add_action( 'wpgh_update_tag', 'wpgh_save_tag' );
  * Wrapper function to see if a contact has a particluar tag.
  *
  * @param $contact_id int the ID of the contact
- * @param $tag_id int the Id of the tag
+ * @param $tag_id_or_slug int the Id of the tag
  * @return bool whether the contact has the tag.
  */
 function wpgh_has_tag( $contact_id, $tag_id_or_slug )
@@ -551,10 +553,15 @@ function wpgh_has_tag( $contact_id, $tag_id_or_slug )
     if ( ! is_numeric( $tag_id_or_slug ) )
     {
         $tag = wpgh_get_tag( $tag_id_or_slug );
-        $tag_id = $tag[ 'tag_id' ];
+
+        if ( ! $tag ){
+            return false;
+        }
+
+        $tag_id_or_slug = $tag[ 'tag_id' ];
     }
 
-    return 1 && wpgh_get_contact_tag_relationship( intval( $contact_id ), intval( $tag_id ) );
+    return 1 && wpgh_get_contact_tag_relationship( intval( $contact_id ), intval( $tag_id_or_slug ) );
 }
 
 /**

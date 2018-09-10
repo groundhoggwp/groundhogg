@@ -34,9 +34,9 @@ do_action( 'wpgh_before_new_funnel' );
                 <h2 class="hndle"><?php echo $funnel_args['title']; ?></h2>
                 <div class="inside">
                     <p><?php echo $funnel_args['description']; ?></p>
-                    <div class="postbox">
+                    <!-- <div class="postbox">
                         <img src="<?php echo $funnel_args['src']; ?>" width="100%">
-                    </div>
+                    </div> -->
                     <button class="button-primary" name="funnel_template" value="<?php echo $id ?>"><?php _e('Start Building', 'groundhogg'); ?></button>
                 </div>
             </div>

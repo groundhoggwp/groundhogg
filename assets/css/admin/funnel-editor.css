@@ -1,3 +1,13 @@
+
+.arrow-down {
+    width: 0;
+    height: 0;
+    border-left: 100px solid transparent;
+    border-right: 100px solid transparent;
+    border-top: 30px solid #ffffff;
+    position: absolute;
+}
+
 .full-width{
     width: 100%;
 }

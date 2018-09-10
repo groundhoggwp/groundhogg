@@ -40,6 +40,7 @@ function wpgh_process_superlink()
         return;
 
     wp_redirect( esc_url_raw( $link['target'] ) );
+    die();
 }
 
 add_action( 'init', 'wpgh_process_superlink' );

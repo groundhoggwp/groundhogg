@@ -122,3 +122,5 @@ function wpgh_register_scripts()
 }
 
 add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
+
+do_action( 'groundhogg_loaded' );

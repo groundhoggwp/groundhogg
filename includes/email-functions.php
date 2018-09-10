@@ -37,7 +37,7 @@ function wpgh_emails_allowed_html()
  *
  * @return bool true on success, false on failure
  */
-function wpgh_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null )
+function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
 {
 
     if ( ! $contact_id || ! $email_id  )
@@ -61,44 +61,32 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
     if ( $email->email_status !== 'ready' && ! isset( $_POST['send_test'] ) )
         return false;
 
-    /* @var $link_args array array of $_GET args that will be used to run analytics actions on the site */
-    $link_args = array();
+    /* /gh-tracking/email/click/email/contact/token/funnel/step/?ref=url */
 
-    if ( $funnel_id && is_int( $funnel_id ) )
-        $link_args['funnel'] = absint( $funnel_id );
+    $ref_link = site_url( sprintf(
+        "gh-tracking/email/click/%s/%s/%s/%s/?ref=",
+        wpgh_encrypt_decrypt( $contact->get_id(), 'e' ),
+        $email_id,
+        $funnel_id,
+        $step_id
+    ) );
 
-    if ( $step_id && is_int( $step_id ) )
-        $link_args['step'] = absint( $step_id );
-
-    $link_args['contact'] = wpgh_encrypt_decrypt( $contact->get_id(), 'e' );
-    $link_args['email'] = $email_id;
-
-    /* @var $ref_link string link containing all relevant tracking info, prepared to be appended with a url encoded link that the contact was originally intended to be sent to. */
-
-    $ref_link = add_query_arg( $link_args, site_url( 'gh-tracking/email/click/' ) ) . '&ref=';
-
-    /* merge in email content into default template */
-    $tracking_link = add_query_arg( $link_args, site_url( 'gh-tracking/email/open/' ) );
+    $tracking_link = site_url( sprintf(
+        "gh-tracking/email/open/%s/%s/%s/%s/",
+        wpgh_encrypt_decrypt( $contact->get_id(), 'e' ),
+        $email_id,
+        $funnel_id,
+        $step_id
+    ) );
 
     $title = get_option( 'gh_business_name' );
-
     $subject_line = wpgh_do_replacements( $contact->get_id(), $email->subject );
-
     $pre_header = wpgh_do_replacements( $contact->get_id(), $email->pre_header );
-
     $content = apply_filters( 'wpgh_the_email_content', wpgh_do_replacements( $contact->get_id(), $email->content ) );
-
     $email_footer_text = wpgh_get_email_footer_text();
-
     $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
-
     $alignment = wpgh_get_email_meta( $email_id, 'alignment', true );
-
-    if ( $alignment === 'left' ){
-        $margins = "margin-left:0;margin-right:auto;";
-    } else {
-        $margins = "margin-left:auto;margin-right:auto;";
-    }
+    $margins = ( $alignment === 'left'  )? "margin-left:0;margin-right:auto;" : "margin-left:auto;margin-right:auto;";
 
     ob_start();
 
@@ -153,7 +141,6 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=null, $step_id=null
 
     return true;
 }
-
 
 /**
  * Get the can spam compliant email footer.
@@ -388,7 +375,7 @@ function wpgh_create_new_email()
 
     } else {
 
-        ?><div class="notice notice-error"><p><?php _e( 'Could not create email. PLease select a template.', 'groundhogg' ); ?></p></div><?php
+        wpgh_add_notice( 'ooops', __( 'could not create email.', 'groundhogg' ), 'error' );
         return;
 
     }
@@ -545,7 +532,7 @@ function wpgh_email_suffix_callback( $match )
  * Retutn the status of an email...
  *
  * @param $id int the ID of the email
- * @return string thhe email status
+ * @return string the email status
  */
 function wpgh_email_status( $id )
 {
@@ -615,9 +602,24 @@ function wpgh_process_email_click()
     if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/click/' ) === false )
         return;
 
-    $funnel = wpgh_set_the_funnel( wpgh_get_current_funnel() );
-    $step = wpgh_set_the_step( wpgh_get_current_step() );
-    $email = wpgh_set_the_email( wpgh_get_current_email() );
+    $parts = explode( '/', $_SERVER[ 'REQUEST_URI' ] );
+
+    /* /gh-tracking/email/click/email/contact/funnel/step/?ref=url */
+    /*      0        1      2     3     4       5     6     7      */
+
+    $offset = 0;
+
+    if ( $parts[ 0 ] !== 'gh-tracking' )
+        $offset++;
+
+    /* email id */
+    $email = intval( $parts[ $offset + 3 ] );
+    /* contact_id*/
+    $contact_id = wpgh_encrypt_decrypt( $parts[ $offset + 4 ], 'd' );
+    /* funnel Id */
+    $funnel = intval( $parts[ $offset + 6 ] );
+    /* step id */
+    $step = intval( $parts[ $offset + 7 ] );
 
     /* get the link target */
     if ( ! isset( $_GET['ref'] ) || empty( $_GET['ref'] ) )
@@ -625,29 +627,31 @@ function wpgh_process_email_click()
     else
         $ref = urldecode( $_GET[ 'ref' ] );
 
-    $contact = wpgh_get_the_contact();
-
+    /* check if the contact exists */
+    $contact = wpgh_get_contact_by_id( $contact_id );
     if ( ! $contact ){
         /* do not do tracking if there is no contact to associate */
         wp_redirect( $ref );
         die();
     }
 
-    /* set the contact cookie */
-    wpgh_set_the_contact( $contact->get_id() );
+    /* set cookies */
+    wpgh_set_the_contact( $contact_id );
+    wpgh_set_the_email( $email );
+    wpgh_set_the_funnel( $funnel );
+    wpgh_set_the_step( $step );
 
     /* if the open is not tracked, track it now. */
-    if ( ! wpgh_activity_exists( $contact->get_id(), $funnel, $step, 'email_opened', $email ) ){
-        wpgh_log_activity( $contact->get_id(), $funnel, $step, 'email_opened', $email );
+    if ( ! wpgh_activity_exists( $contact_id, $funnel, $step, 'email_opened', $email ) ){
+        wpgh_log_activity( $contact_id, $funnel, $step, 'email_opened', $email );
     }
 
     /* track the click every time */
-    wpgh_log_activity( $contact->get_id(), $funnel, $step, 'email_link_click', $email, $ref );
+    wpgh_log_activity( $contact_id, $funnel, $step, 'email_link_click', $email, $ref );
+
+    do_action( 'wpgh_email_link_click', $contact_id, $email, $step, $funnel );
 
     /* send to original destination. */
-
-    do_action( 'wpgh_email_link_click', $contact->get_id(), $email, $step, $funnel );
-
     wp_redirect( $ref );
     die();
 }
@@ -662,20 +666,39 @@ function wpgh_process_email_open()
     if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/open/' ) === false )
         return;
 
-    $contact = wpgh_get_current_contact();
+    $parts = explode( '/', $_SERVER[ 'REQUEST_URI' ] );
 
-    $funnel_id = wpgh_get_current_funnel() ? wpgh_get_current_funnel() : 0;
+    /* /gh-tracking/email/open/email/contact/funnel/step/?ref=url */
+    /*      0        1      2     3     4       5     6     7    */
 
-    $step_id = wpgh_get_current_step() ? wpgh_get_current_step() : 0;
+    $offset = 0;
 
-    $email_id = wpgh_get_current_email();
+    if ( $parts[ 0 ] !== 'gh-tracking' )
+        $offset++;
 
-    /* if the open is not tracked, track it now. */
-    if ( ! wpgh_activity_exists( $contact->get_id(), $funnel_id, $step_id, 'email_opened', $email_id ) ){
-        wpgh_log_activity( $contact->get_id(), $funnel_id, $step_id, 'email_opened', $email_id );
+    /* email id */
+    $email_id = intval( $parts[ $offset + 3 ] );
+    /* funnel Id */
+    $funnel_id = intval( $parts[ $offset + 5 ] );
+    /* step id */
+    $step_id = intval( $parts[ $offset + 6 ] );
+    /* contact_id*/
+    $contact_id = wpgh_encrypt_decrypt( $parts[ $offset + 4 ], 'd' );
+    /* token */
+
+    /* check if the contact exists */
+    $contact = wpgh_get_contact_by_id( $contact_id );
+    if ( ! $contact ){
+        /* do not do tracking if there is no contact to associate */
+        die();
     }
 
-    do_action( 'wpgh_email_opened', $contact->get_id(), $email_id, $step_id, $funnel_id );
+    /* if the open is not tracked, track it now. */
+    if ( ! wpgh_activity_exists( $contact_id, $funnel_id, $step_id, 'email_opened', $email_id ) ){
+        wpgh_log_activity( $contact_id, $funnel_id, $step_id, 'email_opened', $email_id );
+    }
+
+    do_action( 'wpgh_email_opened', $contact_id, $email_id, $step_id, $funnel_id );
 
     die();
 }

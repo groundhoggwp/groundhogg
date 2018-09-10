@@ -511,7 +511,7 @@ function wpgh_get_step_html( $step_id )
                 jQuery(function(){jQuery('.duplicate-step-<?php echo $step_id;?>').click( wpgh_duplicate_step )})
             </script>
         </button>
-        <h2 class="hndle ui-sortable-handle"><img class="hndle-icon" width="50" src="<?php echo esc_url( wpgh_get_step_icon( $step_id ) ); ?>"><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpgh_get_step_hndle( $step_id ), 'groundhogg' ); ?>"> :<?php echo $step_id; ?></h2>
+        <h2 class="hndle ui-sortable-handle"><img class="hndle-icon" width="50" src="<?php echo esc_url( wpgh_get_step_icon( $step_id ) ); ?>"><input title="step title" type="text" id="<?php echo $step_id; ?>_title" name="<?php echo $step_id; ?>_title" class="regular-text" value="<?php echo __( wpgh_get_step_hndle( $step_id ), 'groundhogg' ); ?>"></h2>
         <div class="inside">
             <div class="step-edit">
                 <input type="hidden" name="<?php echo wpgh_prefix_step_meta( $step_id, 'order' ); ?>" value="<?php wpgh_get_step_order( $step_id ) ?>" >
@@ -524,27 +524,19 @@ function wpgh_get_step_html( $step_id )
             </div>
             <div class="step-reporting hidden">
                 <?php do_action( 'wpgh_step_reporting_before' );
-
                 $range = wpgh_get_the_report_range();
-
                 $start = wpgh_get_report_start( $range );
                 $end   = wpgh_get_report_end( $range);
-
                 $report = new WPGH_Event_Report( wpgh_get_step_funnel( $step_id ), $step_id, $start, $end );
-
-                ?>
-
-                <?php if ( wpgh_get_step_group( $step_id ) === 'benchmark'): ?>
+                if ( wpgh_get_step_group( $step_id ) === 'benchmark'): ?>
                     <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . wpgh_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
                 <?php else: ?>
                     <p class="report"><?php _e('Completed', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . wpgh_get_step_funnel( $step_id ) . '&step=' . $step_id . '&start=' . $start . '&end=' . $end ); ?>"><b><?php echo $report->getCompletedEventsCount(); ?></b></a></p>
                     <hr>
                     <p class="report"><?php _e('Waiting', 'groundhogg') ?>: <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . wpgh_get_step_funnel( $step_id ) . '&step=' . $step_id ); ?>"><b><?php echo $report->getQueuedEventsCount(); ?></b></a></p>
-                <?php endif; ?>
-
-                <?php do_action( 'wpgh_get_step_report_' . wpgh_get_step_type( $step_id ), $step_id, $start, $end ); ?>
-
-                <?php do_action( 'wpgh_step_reporting_after' ); ?>
+                <?php endif;
+                do_action( 'wpgh_get_step_report_' . wpgh_get_step_type( $step_id ), $step_id, $start, $end );
+                do_action( 'wpgh_step_reporting_after' ); ?>
             </div>
         </div>
     </div>

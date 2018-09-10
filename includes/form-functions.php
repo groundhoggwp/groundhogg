@@ -207,7 +207,7 @@ function wpgh_email_preferences_form()
     <div class="gh-form-wrapper">
         <p><?php _e( 'Hi' )?> <strong><?php echo $contact->get_first(); ?></strong>,</p>
         <p><?php _e( 'You are managing your email preferences for the email address: ', 'groundhogg' ) ?> <strong><?php echo $contact->get_email(); ?></strong></p>
-        <form class="gh-form" method="post" action="">
+        <form id="email-preferences" class="gh-form" method="post" action="">
             <?php wp_nonce_field( 'change_email_preferences', 'email_preferences_nonce' ) ?>
             <?php if ( ! empty( $_POST ) ):
                 ?><div class="gh-notice"><p><?php _e( 'Preferences Updated!', 'groundhogg' ); ?></p></div><?php
@@ -215,22 +215,22 @@ function wpgh_email_preferences_form()
             ?>
             <div class="gh-form-field">
                 <p>
-                    <label><input type="radio" name="preference" value="none"> <?php _e( 'I love you guys. Send email whenever you want!' ); ?></label>
+                    <label><input type="radio" name="preference" value="none" required> <?php _e( 'I love you guys. Send email whenever you want!' ); ?></label>
                 </p>
             </div>
             <div class="gh-form-field">
                 <p>
-                    <label><input type="radio" name="preference" value="weekly"> <?php _e( 'It\'s a bit much. Start sending me emails weekly.' ); ?></label>
+                    <label><input type="radio" name="preference" value="weekly" > <?php _e( 'It\'s a bit much. Start sending me emails weekly.' ); ?></label>
                 </p>
             </div>
             <div class="gh-form-field">
                 <p>
-                    <label><input type="radio" name="preference" value="monthly"> <?php _e( 'Distance makes the heart grow fonder. Only send emails monthly.' ); ?></label>
+                    <label><input type="radio" name="preference" value="monthly" > <?php _e( 'Distance makes the heart grow fonder. Only send emails monthly.' ); ?></label>
                 </p>
             </div>
             <div class="gh-form-field">
                 <p>
-                    <label><input type="radio" name="preference" value="unsubscribe"> <?php _e( 'I no longer wish to receive any emails. Unsubscribe me!' ); ?></label>
+                    <label><input type="radio" name="preference" value="unsubscribe" > <?php _e( 'I no longer wish to receive any emails. Unsubscribe me!' ); ?></label>
                 </p>
             </div>
             <div class="gh-form-field">
@@ -269,6 +269,8 @@ function wpgh_process_email_preferences_changes()
     if ( ! $contact )
         return;
 
+
+
     if ( isset( $_POST[ 'delete_everything' ] ) )
     {
 
@@ -284,7 +286,7 @@ function wpgh_process_email_preferences_changes()
         die();
     }
 
-    $preference = $_POST[ 'preference' ];
+    $preference = isset( $_POST[ 'preference' ] ) ? $_POST[ 'preference' ] : '';
 
     switch ( $preference ){
         case 'none':

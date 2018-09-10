@@ -7,6 +7,25 @@
  */
 
 /**
+ * Mere contact replacements into page content with this shortcode.
+ *
+ * @param $atts array should be empty
+ * @param string $content the content to perfotm the merge fields
+ * @return string the updated content,.
+ */
+function wpgh_merge_replacements_shortcode( $atts, $content = '' )
+{
+    $contact = wpgh_get_the_contact();
+
+    if ( ! $contact )
+        return '';
+
+    return wpgh_do_replacements( $contact->get_id(), $content );
+}
+
+add_shortcode( 'gh_replacements', 'wpgh_merge_replacements_shortcode' );
+
+/**
  * Process the contact shortcode
  */
 function wpgh_contact_replacement_shortcode( $atts )
@@ -45,7 +64,7 @@ add_shortcode( 'gh_contact', 'wpgh_contact_replacement_shortcode' );
 /**
  * Output content if and only if the current visitor is a contact.
  *
- * @param $atts
+ * @param $atts[]
  * @param string $content
  * @return string
  */
@@ -106,7 +125,7 @@ function wpgh_contact_has_tag_shortcode( $atts, $content='' )
         return '';
     }
 
-    switch ( $a[ 'needs' ] ){
+    switch ( $a[ 'has' ] ){
         case 'all':
             foreach ( $tags as $tag ){
                 if ( ! $contact->has_tag( $tag ) ) {
