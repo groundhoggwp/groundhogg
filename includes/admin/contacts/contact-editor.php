@@ -202,8 +202,13 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                         </td>
                         <td>
                             <div class="row-actions">
-                                <span class="run"><a class="run"><?php _e( 'Run now', 'groundhogg' ); ?></a></span> |
-                                <span class="delete"><a class="delete"><?php _e( 'Cancel', 'groundhogg' ); ?></a></span>
+                                <?php $item = (array) $active_event;
+                                $args = array($item[ 'time' ], $item[ 'contact_id' ], $item[ 'step_id' ], $item[ 'funnel_id' ]);
+                                $parts = implode( '-', $args );
+                                $run = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $parts . '&action=execute' ), 'execute' ) );
+                                $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $parts . '&action=cancel' ), 'cancel' ) ); ?>
+                                <span class="run"><a href="<?php echo $run; ?>" class="run"><?php _e( 'Run now', 'groundhogg' ); ?></a></span> |
+                                <span class="delete"><a href="<?php echo $cancel; ?>" class="delete"><?php _e( 'Cancel', 'groundhogg' ); ?></a></span>
                             </div>
                         </td>
                     </tr><?php
@@ -281,7 +286,11 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                     </td>
                     <td>
                         <div class="row-actions">
-                            <span class="run"><a class="run"><?php _e( 'Run again', 'groundhogg' ); ?></a></span>
+                            <?php $item = (array) $active_event;
+                            $args = array($item[ 'time' ], $item[ 'contact_id' ], $item[ 'step_id' ], $item[ 'funnel_id' ]);
+                            $parts = implode( '-', $args );
+                            $action = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $parts . '&action=execute' ), 'execute' ) ); ?>
+                            <span class="run"><a href="<?php echo $action; ?>" class="run"><?php _e( 'Run again', 'groundhogg' ); ?></a></span>
                         </div>
                     </td>
                 </tr><?php

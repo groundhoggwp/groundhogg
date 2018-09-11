@@ -180,6 +180,19 @@ class WPGH_Events_Table extends WP_List_Table {
 
     }
 
+    protected function event_parts( $item )
+    {
+        $args = array(
+          $item[ 'time' ],
+          $item[ 'contact_id' ],
+          $item[ 'step_id' ],
+          $item[ 'funnel_id' ],
+        );
+
+
+        return implode( '-', $args );
+    }
+
     /**
      * Get value for checkbox column.
      *
@@ -190,7 +203,7 @@ class WPGH_Events_Table extends WP_List_Table {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $item['time']                // The value of the checkbox should be the record's ID.
+            $this->event_parts( $item )             // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -367,14 +380,14 @@ class WPGH_Events_Table extends WP_List_Table {
             $actions['execute'] = sprintf(
                 '<a href="%s" class="edit" aria-label="%s">%s</a>',
                 /* translators: %s: title */
-                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $item['time'] . '&action=execute' ) ) ),
+                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $this->event_parts( $item ) . '&action=execute' ) ) ),
                 esc_attr( __( 'Execute' ) ),
                 __( 'Run Now' )
             );
 
             $actions['delete'] = sprintf(
                 '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-                esc_url( wp_nonce_url(admin_url('admin.php?page=gh_events&event='. $item['time'].'&action=cancel') ) ),
+                esc_url( wp_nonce_url(admin_url('admin.php?page=gh_events&event='. $this->event_parts( $item ) .'&action=cancel') ) ),
                 /* translators: %s: title */
                 esc_attr( __( 'Cancel' ) ),
                 __( 'Cancel' )
@@ -384,7 +397,7 @@ class WPGH_Events_Table extends WP_List_Table {
             $actions['re_execute'] = sprintf(
                 '<a href="%s" class="edit" aria-label="%s">%s</a>',
                 /* translators: %s: title */
-                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $item['time'] . '&action=re_execute' ) ) ),
+                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $this->event_parts( $item ) . '&action=execute' ) ) ),
                 esc_attr( __( 'Re-execute' ) ),
                 __( 'Run Again' )
             );

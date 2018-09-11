@@ -34,7 +34,7 @@ class WPGH_Events_Page
         if ( ! $events )
             return false;
 
-        return is_array( $events )? array_map( 'intval', $events ) : array( intval( $events ) );
+        return is_array( $events )? $events : array( $events );
     }
 
     function get_action()
@@ -74,80 +74,89 @@ class WPGH_Events_Page
         }
     }
 
-    function get_notice()
-    {
-        if ( isset( $_REQUEST['ids'] ) )
-        {
-            $ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
-            $count = count( $ids );
-        }
-
-        switch ( $this->get_previous_action() )
-        {
-            case 'cancel':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' events cancelled.' ); ?></p></div><?php
-
-                break;
-
-            case 'execute':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' events executed.' ); ?></p></div><?php
-
-                break;
-
-            case 're_execute':
-
-                ?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' events re-executed.' ); ?></p></div><?php
-
-                break;
-        }
-    }
-
     function process_action()
     {
         if ( ! $this->get_action() || ! $this->verify_action() )
             return;
 
-        $base_url = remove_query_arg( array( '_wpnonce', 'action' ), wp_get_referer() );
+        $base_url = remove_query_arg( array( '_wpnonce' ), wp_get_referer() );
+
+        global $wpdb;
 
         switch ( $this->get_action() )
         {
             case 'cancel':
 
-                foreach ( $this->get_events() as $id ){
-                    wpgh_delete_event( $id );
+                foreach ( $this->get_events() as $parts ){
+
+                    $parts = array_map( 'intval', explode( '-', $parts ) );
+
+                    $wpdb->update(
+                        $wpdb->prefix . WPGH_EVENTS,
+                        array(
+                            'status' => 'cancelled'
+                        ),
+                        array(
+                            'time'          => $parts[0],
+                            'contact_id'    => $parts[1],
+                            'step_id'       => $parts[2],
+                            'funnel_id'     => $parts[3],
+                        ),
+                        array( '%s' ),
+                        array(
+                            '%d',
+                            '%d',
+                            '%d',
+                            '%d',
+                        )
+                    );
                 }
+
+                wpgh_add_notice( 'cancelled', sprintf( "%d %s", count( $this->get_events() ) ,__( "events cancelled", 'groundhogg' ) ) );
+
+                do_action( 'wpgh_cancel_events' );
 
                 break;
 
             case 'execute':
 
-                foreach ( $this->get_events() as $id ) {
-                    wpgh_update_event($id, 'event_status', 'trash');
+                foreach ( $this->get_events() as $parts )
+                {
+                    $parts = array_map( 'intval', explode( '-', $parts ) );
+
+                    $wpdb->update(
+                        $wpdb->prefix . WPGH_EVENTS,
+                        array(
+                            'status' => 'waiting',
+                            'time'   => time()
+                        ),
+                        array(
+                            'time'          => $parts[0],
+                            'contact_id'    => $parts[1],
+                            'step_id'       => $parts[2],
+                            'funnel_id'     => $parts[3],
+                        ),
+                        array(
+                            '%s',
+                            '%d'
+                        ),
+                        array(
+                            '%d',
+                            '%d',
+                            '%d',
+                            '%d',
+                        )
+                    );
                 }
 
-                do_action( 'wpgh_trash_events' );
+                do_action( 'wpgh_execute_events' );
 
-                break;
-
-            case 're_execute':
-
-                foreach ( $this->get_events() as $id ){
-                    wpgh_delete_event( $id );
-                }
-
-                do_action( 'wpgh_delete_events' );
+                wpgh_add_notice( 'scheduled', sprintf( "%d %s", count( $this->get_events() ) ,__( "events rescheduled", 'groundhogg' ) ) );
 
                 break;
         }
 
         set_transient( 'gh_last_action', $this->get_action(), 30 );
-
-        if ( $this->get_action() === 'edit' || $this->get_action() === 'add' )
-            return;
-
-        $base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_events() ) ), $base_url );
 
         wp_redirect( $base_url );
         die();
@@ -190,9 +199,9 @@ class WPGH_Events_Page
         ?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
-            <?php $this->get_notice(); ?>
+            <?php wpgh_notices(); ?>
             <hr class="wp-header-end">
-            <?php  $this->table(); ?>
+            <?php $this->table(); ?>
         </div>
         <?php
     }
