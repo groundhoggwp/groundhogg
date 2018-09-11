@@ -373,3 +373,4 @@ $email = wpgh_get_email_by_id( $email_id );
         </div>
     </div>
 </form>
+<div id="temp-html" style="display: none"></div>

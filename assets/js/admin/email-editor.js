@@ -39,23 +39,22 @@ jQuery(function($) {
     var emailDraggables = jQuery( ".email-draggable" ).draggable({
         connectToSortable: ".email-sortable",
         helper: "clone",
-        stop: function (e, ui ) {
-
+        start: function ( e, ui ) {
             var el = this;
             var block_type = el.id;
-
-            jQuery('#email-content').find('.email-draggable').replaceWith( "<div class='replace-me'></div>" );
-
-
-            var ajaxCall = jQuery.ajax({
+            var ajaxCall = $.ajax({
                 type : "post",
                 url : ajaxurl,
                 data : {action: "get_email_block_html", block_type: block_type },
                 success: function( html )
                 {
-                    jQuery('#email-content').find('.replace-me').replaceWith( $( html ).wpghToolBar() );
+                    $('#temp-html').html( $( html ).wpghToolBar() );
+
                 }
             });
+        },
+        stop: function ( e, ui ) {
+            $('#email-content').find('.email-draggable').replaceWith( $('#temp-html').html() );
         }
     });
 
