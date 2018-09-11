@@ -114,7 +114,7 @@ class WPGH_Emails_Table extends WP_List_Table {
         $actions = array();
         $id = $item['ID'];
 
-        if ( $this->get_view() === 'archived' )
+        if ( $this->get_view() === 'trash' )
         {
             $actions[ 'restore' ] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>";
             $actions[ 'delete' ] = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=archived&action=delete&email='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>";
@@ -291,6 +291,8 @@ class WPGH_Emails_Table extends WP_List_Table {
 
             $query .= $wpdb->prepare( '( email_status = %s )', 'draft' );
 
+        } else if ( $this->get_view() === 'from_user' ) {
+            $query .= $wpdb->prepare( '( from_user = %d )', intval( $_REQUEST[ 'from_user' ] ) );
         } else {
 
             $query .= $wpdb->prepare( '( email_status = %s OR email_status = %s OR email_status = %s )', 'ready', 'draft', '' );

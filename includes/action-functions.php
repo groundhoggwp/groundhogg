@@ -144,6 +144,8 @@ function wpgh_send_admin_notification( $step_id, $contact_id )
     $note = wpgh_get_step_meta( $step_id, 'note_text', true );
     $finished_note = sanitize_textarea_field( wpgh_do_replacements( $contact_id, $note ) );
 
+    $finished_note .= sprintf( "\n\n%s: %s", __( 'Manage Contact', 'groundhogg' ), admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact_id ) );
+
     $subject = wpgh_get_step_meta( $step_id, 'subject', true );
     $subject = sanitize_text_field(  wpgh_do_replacements( $contact_id, $subject ) );
 
