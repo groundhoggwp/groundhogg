@@ -73,8 +73,8 @@ class WPGH_Events_Table extends WP_List_Table {
     {
         $contact = new WPGH_Contact( intval( $item[ 'contact_id' ] ) );
 
-        if ( ! $contact )
-            return __( 'No Contact' );
+        if ( ! $contact->get_email() )
+            return sprintf( "<strong>(%s)</strong>",  __( 'contact deleted', 'groundhogg' ) );
 
         $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
             admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $contact->get_id() ),
@@ -150,14 +150,14 @@ class WPGH_Events_Table extends WP_List_Table {
         if ( $time_diff < 0 ){
             /* The event has passed */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = date_i18n( 'jS F, Y \@ h:i A', intval( $p_time ) );
+                $time = date_i18n( 'Y/m/d \@ h:i A', intval( $p_time ) );
             } else {
                 $time = sprintf( "%s ago", human_time_diff( $p_time, $cur_time ) );
             }
         } else {
             /* the event is scheduled */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = sprintf( "on %s", date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+                $time = sprintf( "on %s", date_i18n( 'Y/m/d \@ h:i A', intval( $p_time )  ) );
             } else {
                 $time = sprintf( "in %s", human_time_diff( $p_time, $cur_time ) );
             }
@@ -273,13 +273,15 @@ class WPGH_Events_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
+        $sql = "SELECT e.*,c.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e LEFT JOIN " . $wpdb->prefix . WPGH_CONTACTS . " c ON e.contact_id = c.ID";
+
         switch ( $this->get_view() )
         {
             case 'status':
                 if ( isset( $_REQUEST['status'] ) ){
                     $sql = $wpdb->prepare(
-                        "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e
-                        WHERE e.status = %s
+                        "$sql
+                        WHERE e.status = %s AND c.email IS NOT NULL
                         ORDER BY e.time DESC" , $_REQUEST['status']
                     );
                 }
@@ -287,8 +289,8 @@ class WPGH_Events_Table extends WP_List_Table {
             case 'contact':
 	            if ( isset( $_REQUEST['contact'] ) ){
 		            $sql = $wpdb->prepare(
-			            "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e
-                        WHERE e.contact_id = %d
+			            "
+                        WHERE e.contact_id = %d 
                         ORDER BY e.time DESC" , intval( $_REQUEST['contact'] )
 		            );
 	            }
@@ -296,8 +298,8 @@ class WPGH_Events_Table extends WP_List_Table {
             case 'funnel':
 	            if ( isset( $_REQUEST['funnel'] ) ){
 		            $sql = $wpdb->prepare(
-			            "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e
-                        WHERE e.funnel_id = %d
+			            "$sql
+                        WHERE e.funnel_id = %d AND c.email IS NOT NULL
                         ORDER BY e.time DESC" , intval( $_REQUEST['funnel'] )
 		            );
 	            }
@@ -305,14 +307,16 @@ class WPGH_Events_Table extends WP_List_Table {
 	        case 'step':
 		        if ( isset( $_REQUEST['step'] ) ){
 			        $sql = $wpdb->prepare(
-				        "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e
-                        WHERE e.step_id = %d
+				        "$sql
+                        WHERE e.step_id = %d AND c.email IS NOT NULL
                         ORDER BY e.time DESC" , intval( $_REQUEST['step'] )
 			        );
 		        }
 		        break;
             default:
-	            $sql = "SELECT e.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e ORDER BY e.time DESC";
+	            $sql = "$sql
+	             WHERE c.email IS NOT NULL
+	             ORDER BY e.time DESC";
                 break;
         }
 
@@ -404,11 +408,14 @@ class WPGH_Events_Table extends WP_List_Table {
 
         }
 
-        $actions[ 'view' ] = sprintf( "<a class='edit' href='%s'>%s</a>",
-            admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $item[ 'contact_id' ] ),
-            esc_attr( __( 'View Contact' ) ),
-            __( 'View Contact' )
-        );
+        if ( wpgh_get_contact_by_id( intval( $item[ 'contact_id' ] ) ) ){
+            $actions[ 'view' ] = sprintf( "<a class='edit' href='%s'>%s</a>",
+                admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $item[ 'contact_id' ] ),
+                esc_attr( __( 'View Contact' ) ),
+                __( 'View Contact' )
+            );
+        }
+
 
         return $this->row_actions( apply_filters( 'wpgh_event_row_actions', $actions, $item, $column_name ) );
     }

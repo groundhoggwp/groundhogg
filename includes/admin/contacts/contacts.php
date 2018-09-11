@@ -87,16 +87,7 @@ class WPGH_Contacts_Page
 
                 if ( isset( $_POST ) )
                 {
-                    do_action( 'wpgh_add_contact' );
-	                wpgh_add_notice(
-		                esc_attr( 'updated' ),
-		                sprintf( "%s %s",
-			                __( 'Contact', 'groundhogg' ),
-			                __( 'Updated' ) ),
-		                'success'
-	                );
-
-	                do_action( 'wpgh_admin_add_contact' );
+                    do_action( 'wpgh_admin_add_contact' );
                 }
 
                 break;
@@ -104,8 +95,22 @@ class WPGH_Contacts_Page
             case 'spam':
 
                 foreach ( $this->get_contacts() as $id ) {
-                    //todo revisit this as an unsubscribed contact can be marked and then unmarked as spam to set as unconfirmed.
+
+                    /* todo revisit this as an unsubscribed contact can be marked and then unmarked as spam to set as unconfirmed. */
+
                     wpgh_update_contact( $id, 'optin_status', WPGH_SPAM );
+
+                    $ipaddress = wpgh_get_contact_meta( $id, 'ip_address', true );
+
+                    if ( $ipaddress )
+                    {
+                        $blacklist = get_option( 'blacklist_keys' );
+                        $blacklist .= "\n" . $ipaddress;
+                        $blacklist = sanitize_textarea_field( $blacklist );
+                        update_option( 'blacklist_keys', $blacklist );
+                    }
+
+                    do_action( 'wpgh_contact_marked_as_spam', $id );
                 }
 
 	            wpgh_add_notice(
@@ -124,7 +129,10 @@ class WPGH_Contacts_Page
             case 'delete':
 
                 foreach ( $this->get_contacts() as $id ){
+
+                    do_action( 'wpgh_deleted_contact', $id );
                     wpgh_delete_contact( $id );
+
                 }
 
 	            wpgh_add_notice(
@@ -144,7 +152,7 @@ class WPGH_Contacts_Page
 
                 foreach ( $this->get_contacts() as $id )
                 {
-                    wpgh_update_contact( $id, 'contact_status', WPGH_UNCONFIRMED );
+                    wpgh_update_contact( $id, 'optin_status', WPGH_UNCONFIRMED );
                 }
 
 	            wpgh_add_notice(

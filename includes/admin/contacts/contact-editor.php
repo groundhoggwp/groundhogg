@@ -18,11 +18,18 @@ $id = intval( $_GET[ 'contact' ] );
 
 $contact = new WPGH_Contact( $id );
 
+if ( ! $contact->get_email() )
+{
+    wp_die( __( 'This contact no has been deleted.', 'groundhogg' ) );
+}
+
 wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-editor.js' )
 ?>
 
 <form method="post" class="">
     <?php wp_nonce_field( 'edit' ); ?>
+
+    <!-- GENERAL NAME INFO -->
     <h2><?php _e( 'Name' ) ?></h2>
     <table class="form-table">
         <tbody>
@@ -37,6 +44,8 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <?php do_action( 'wpgh_contact_edit_name', $id ); ?>
         </tbody>
     </table>
+
+    <!-- GENERAL CONTACT INFO -->
     <h2><?php _e( 'Contact Info' ); ?></h2>
     <table class="form-table">
         <tbody>
@@ -60,13 +69,38 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <?php do_action( 'wpgh_contact_edit_contact_info', $id ); ?>
         </tbody>
     </table>
+
+    <!-- MARKETING COMPLIANCE INFORMATION -->
+    <h2><?php _e( 'Compliance' ); ?></h2>
+    <table class="form-table">
+        <tbody>
+            <tr>
+                <th><?php _e( 'Agreed To Terms' ); ?></th>
+                <td><?php echo ( wpgh_get_contact_meta( $contact->get_id(), 'terms_agreement', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( 'terms_agreement_date' ) ): '&#x2014;'; ?></td>
+            </tr>
+            <?php if ( wpgh_is_gdpr() ): ?>
+                <tr>
+                    <th><?php _e( 'GDPR Consent' ); ?></th>
+                    <td><?php echo ( wpgh_get_contact_meta( $contact->get_id(), 'gdpr_consent', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( 'gdpr_consent_date' ) ) : '&#x2014;'; ?></td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+    <!-- SEGMENTATION AND LEADSOURCE -->
     <h2><?php _e( 'Segmentation' ); ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php _e( 'Owner', 'grounhhogg' ); ?></th>
+            <th><?php _e( 'Owner', 'groundhogg' ); ?></th>
             <td><?php $args = array( 'show_option_none' => __( 'Select an owner' ), 'id' => 'owner', 'name' => 'owner', 'role' => 'administrator', 'class' => 'cowner', 'selected' => $contact->get_owner() ); ?>
                 <?php wp_dropdown_users( $args ) ?></td>
+        </tr>
+        <tr>
+            <th><?php _e( 'Source Page', 'groundhogg' ); ?></th>
+            <td><?php $source = wpgh_get_contact_meta( $id, 'source_page' );?>
+            <input type="text" class="regular-text" name="page_source" id="page_source" title="<?php esc_attr_e( 'Page Source' );?>" value="<?php echo esc_url( $source ); ?>"><span class="row-actions"><a style="text-decoration: none" target="_blank" href="<?php echo esc_url( $source ); ?>"><span class="dashicons dashicons-external"></span></a></span>
+            <p class="description"><?php _e( "This is the page which the contact first submitted a form.", 'groundhogg' ); ?></p></td>
         </tr>
         <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
@@ -75,6 +109,8 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <?php do_action( 'wpgh_contact_edit_tags', $id ); ?>
         </tbody>
     </table>
+
+    <!-- NOTES -->
     <h2><?php _e( 'Notes' ); ?></h2>
     <table>
         <tbody>
@@ -85,6 +121,8 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <?php do_action( 'wpgh_contact_edit_notes', $id ); ?>
         </tbody>
     </table>
+
+    <!-- META -->
     <h2><?php _e( 'Custom Meta' ); ?></h2>
     <table class="form-table" >
         <tr>
@@ -134,6 +172,8 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         </tbody>
     </table>
     <?php do_action( 'wpgh_contact_edit_before_history', $id ); ?>
+
+    <!-- UPCOMING EVENTS -->
     <h2><?php _e( 'Upcoming Events' ); ?></h2>
     <table style="width: 700px" class="wp-list-table widefat fixed striped active-funnels">
         <thead>
@@ -156,22 +196,15 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
             } else {
                 foreach ( $active_events as $active_event ) {
                     ?><tr>
-                        <td>
-                            <?php
-                            $funnel_id = intval( $active_event->funnel_id );
-
+                        <td><?php $funnel_id = intval( $active_event->funnel_id );
                             if ( $funnel_id === WPGH_BROADCAST ) {
                                 $funnel_title = __( 'Broadcast Email' );
                             } else {
                                 $funnel = wpgh_get_funnel_by_id( $funnel_id );
                                 $funnel_title = $funnel->funnel_title;
                             }
-
-                            esc_html_e( $funnel_title );?>
-                        </td>
-                        <td>
-                            <?php $step_id = intval( $active_event->step_id );
-
+                            esc_html_e( $funnel_title );?></td>
+                        <td><?php $step_id = intval( $active_event->step_id );
                             if ( $funnel_id === WPGH_BROADCAST ) {
                                 $broadcast = wpgh_get_broadcast_by_id( $step_id );
                                 $email = wpgh_get_email_by_id( intval( $broadcast['email_id'] ) );
@@ -179,29 +212,21 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                             } else {
                                 $step_title = wpgh_get_step_hndle( $step_id );
                             }
-
                             if ( ! $step_title )
                                 echo sprintf( "<strong>%s</strong>", __( '(step deleted)' ) );
-
-                            esc_html_e( $step_title ); ?>
-                        </td>
-                        <td>
-                            <?php
+                            esc_html_e( $step_title ); ?></td>
+                        <td><?php
                             $p_time = intval( $active_event->time ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
                             $cur_time = (int) current_time( 'timestamp' );
                             $time_diff = $p_time - $cur_time;
-
                             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
                                 $time = sprintf( "On %s", date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
                             } else {
                                 $time = sprintf( "In %s", human_time_diff( $p_time, $cur_time ) );
                             }
 
-                            echo '<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
-                            ?>
-                        </td>
-                        <td>
-                            <div class="row-actions">
+                            echo '<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>'; ?></td>
+                        <td><div class="row-actions">
                                 <?php $item = (array) $active_event;
                                 $args = array($item[ 'time' ], $item[ 'contact_id' ], $item[ 'step_id' ], $item[ 'funnel_id' ]);
                                 $parts = implode( '-', $args );
@@ -209,16 +234,13 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                                 $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $parts . '&action=cancel' ), 'cancel' ) ); ?>
                                 <span class="run"><a href="<?php echo $run; ?>" class="run"><?php _e( 'Run now', 'groundhogg' ); ?></a></span> |
                                 <span class="delete"><a href="<?php echo $cancel; ?>" class="delete"><?php _e( 'Cancel', 'groundhogg' ); ?></a></span>
-                            </div>
-                        </td>
-                    </tr><?php
-                }
-            }
-
-            ?>
+                            </div></td>
+                    </tr><?php }} ?>
         </tbody>
     </table>
     <p class="description"><?php _e( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'groundhogg' ); ?></p>
+
+    <!-- FUNNNEL HISTORY -->
     <h2><?php _e( 'Recent Funnel History' ); ?></h2>
     <table style="width: 700px" class="wp-list-table widefat fixed striped funnels-history">
         <thead>
@@ -230,35 +252,25 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         </tr>
         </thead>
         <tbody>
-        <?php
-
-        global $wpdb;
+        <?php global $wpdb;
         $table = $wpdb->prefix . WPGH_EVENTS;
         $active_events = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE contact_id = %d AND status = %s ORDER BY time DESC LIMIT 20", $id, 'complete' ) );
-
         if ( empty( $active_events ) ){
             ?> <tr><td colspan="4"><?php _e( 'This contact has no funnel history.', 'groundhogg' ) ?></td></tr> <?php
         } else {
             foreach ( $active_events as $active_event ) {
                 ?><tr>
                     <td>
-                        <?php
-                            $funnel_id = intval( $active_event->funnel_id );
-
+                        <?php $funnel_id = intval( $active_event->funnel_id );
                             if ( $funnel_id === WPGH_BROADCAST ) {
                                 $funnel_title = __( 'Broadcast Email' );
                             } else {
                                 $funnel = wpgh_get_funnel_by_id( $funnel_id );
                                 $funnel_title = $funnel->funnel_title;
                             }
-
-                            esc_html_e( $funnel_title );
-                        ?>
-                    </td>
-                    <td>
-                        <?php
+                            esc_html_e( $funnel_title ); ?></td>
+                    <td><?php
                         $step_id = intval( $active_event->step_id );
-
                         if ( $funnel_id === WPGH_BROADCAST ) {
                             $broadcast = wpgh_get_broadcast_by_id( $step_id );
                             $email = wpgh_get_email_by_id( intval( $broadcast['email_id'] ) );
@@ -266,14 +278,11 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                         } else {
                             $step_title = wpgh_get_step_hndle( $step_id );
                         }
-
                         if ( ! $step_title )
                             echo sprintf( "<strong>%s</strong>", __( '(step deleted)' ) );
 
-                        esc_html_e( $step_title ); ?>
-                    </td>
-                    <td>
-                        <?php $p_time = intval( $active_event->time ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+                        esc_html_e( $step_title ); ?></td>
+                    <td><?php $p_time = intval( $active_event->time ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
                         $cur_time = (int) current_time( 'timestamp' );
                         $time_diff = $p_time - $cur_time;
                         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
@@ -282,10 +291,8 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                             $time = sprintf( "%s ago", human_time_diff( $p_time, $cur_time ) );
                         }
                         echo '<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
-                        ?>
-                    </td>
-                    <td>
-                        <div class="row-actions">
+                        ?></td>
+                    <td><div class="row-actions">
                             <?php $item = (array) $active_event;
                             $args = array($item[ 'time' ], $item[ 'contact_id' ], $item[ 'step_id' ], $item[ 'funnel_id' ]);
                             $parts = implode( '-', $args );
@@ -293,15 +300,13 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                             <span class="run"><a href="<?php echo $action; ?>" class="run"><?php _e( 'Run again', 'groundhogg' ); ?></a></span>
                         </div>
                     </td>
-                </tr><?php
-            }
-        }
-
-        ?>
+                </tr><?php }} ?>
         </tbody>
     </table>
     <p class="description"><?php _e( 'Any previous funnel steps will show up here. You can choose run them again.<br/>
     This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'groundhogg' ); ?></p>
+
+    <!-- EMAIL HISTORY -->
     <h2><?php _e( 'Recent Email History' ); ?></h2>
     <table style="width: 700px" class="wp-list-table widefat fixed striped funnels-history">
         <thead>
@@ -312,9 +317,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         </tr>
         </thead>
         <tbody>
-        <?php
-
-        global $wpdb;
+        <?php global $wpdb;
         $events = $wpdb->prefix . WPGH_EVENTS;
         $steps = $wpdb->prefix . WPGH_FUNNELSTEPS;
         $email_events = $wpdb->get_results( $wpdb->prepare(
@@ -322,50 +325,38 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                         LEFT JOIN $steps s ON e.step_id = s.ID 
                         WHERE e.contact_id = %d AND e.status = %s AND s.funnelstep_type = %s
                         ORDER BY time DESC LIMIT 20"
-                , $id, 'complete', 'send_email' )
-        );
+                , $id, 'complete', 'send_email' ));
 
         if ( empty( $email_events ) ){
             ?> <tr><td colspan="4"><?php _e( 'This contact has no email history.', 'groundhogg' ) ?></td></tr> <?php
         } else {
             foreach ( $email_events as $email_event ) {
                 ?><tr>
-                    <td>
-                        <?php
-
+                    <td><?php
                         $funnel_id = intval( $email_event->funnel_id );
-
                         if ( $funnel_id === WPGH_BROADCAST ) {
                             $broadcast = wpgh_get_broadcast_by_id( $email_event->step_id );
                             $email_id = intval( $broadcast['email_id'] );
                         } else {
                             $email_id = wpgh_get_step_meta( $email_event->step_id, 'email_id', true );
                         }
-
                         $email = wpgh_get_email_by_id( intval( $email_id ) );
-                        echo $email->subject; ?>
-                    </td>
-                    <td>
-                        <?php if ( wpgh_activity_exists( $contact->get_id(), $email_event->funnel_id, $email_event->step_id, 'email_opened', $email_id ) )
+                        echo $email->subject; ?></td>
+                    <td><?php if ( wpgh_activity_exists( $contact->get_id(), $email_event->funnel_id, $email_event->step_id, 'email_opened', $email_id ) )
                             _e( 'Yes' );
                         else
-                            echo '&#x2014;'
-                        ?>
-                    </td>
-                    <td>
-                        <?php $activity = wpgh_get_activity( $contact->get_id(), $email_event->funnel_id, $email_event->step_id, 'email_link_click', $email_id );
+                            echo '&#x2014;' ?></td>
+                    <td><?php $activity = wpgh_get_activity( $contact->get_id(), $email_event->funnel_id, $email_event->step_id, 'email_link_click', $email_id );
                         if ( $activity )
                             echo '<a target="_blank" href="' . esc_url( $activity->referer ) . '">' . esc_url( $activity->referer ) . '</a>';
                         else
-                            echo '&#x2014;';
-                        ?>
-                    </td>
-                </tr><?php
-            }
-        } ?>
+                            echo '&#x2014;'; ?></td>
+                </tr><?php }} ?>
         </tbody>
     </table>
     <p class="description"><?php _e( 'This is where you can check if this contact is interacting with your emails.', 'groundhogg' ); ?></p>
+
+    <!-- THE END -->
     <?php do_action( 'wpgh_contact_edit_after', $id ); ?>
     <div class="edit-contact-actions">
         <p class="submit">

@@ -127,39 +127,18 @@ function wpgh_get_contact_by_email( $email )
     return $contact;
 }
 
-function wpgh_get_user_by_email( $email )
-{
-    global $wpdb;
-
-    if ( ! $email || ! is_string( $email ) )
-        return false;
-
-    $email = stripslashes( strtolower( $email ) );
-    if ( ! $email )
-        return false;
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return false;
-    }
-
-    $table_name = $wpdb->prefix . users;
-
-    $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE user_email = %s", $email);
-    $contact = $wpdb->get_row( $sql_prep1, ARRAY_A );
-
-    return $contact;
-}
-
 /**
  * Insert a new contact into the DB.
  *
  * @param $email string Contact's email
  * @param string $first First name
  * @param string $last Last Name
+ * @param int $owner_id
+ * @param int $user_id
  *
  * @return false|int the contact ID on success, false on failure.
  */
-function wpgh_insert_new_contact( $email, $first='', $last='', $owner_id='', $user_id='')
+function wpgh_insert_new_contact( $email, $first='', $last='', $owner_id=0, $user_id=0)
 {
     global $wpdb;
 
@@ -184,6 +163,9 @@ function wpgh_insert_new_contact( $email, $first='', $last='', $owner_id='', $us
         );
 
         if ( $success ){
+
+            do_action( 'wpgh_contact_created', $wpdb->insert_id );
+
             return $wpdb->insert_id;
         } else {
             return false;

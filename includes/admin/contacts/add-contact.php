@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 ?>
 
 <form method="post" class="">
-    <?php wp_nonce_field( 'edit' ); ?>
+    <?php wp_nonce_field( 'add' ); ?>
     <h2><?php _e( 'Name' ) ?></h2>
     <table class="form-table">
         <tbody>

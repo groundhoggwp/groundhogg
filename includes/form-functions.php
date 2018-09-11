@@ -157,10 +157,14 @@ function wpgh_form_submit_listener()
 
     $id = wpgh_quick_add_contact( $args['email'], $args['first'], $args['last'], $args['phone'] );
 
+    if ( ! $id ) {
+        wp_die( __( 'Something went wrong... ' ) );
+    }
+
+    if ( is_wp_error( $id ) )
+        wp_die( $id );
+
     $contact = new WPGH_Contact( $id );
-    /* if gdpr is enabled, make sure that the consent box is checked */
-    if ( wpgh_is_gdpr() )
-        wpgh_update_contact_meta( $id, 'gdpr_consent', 'yes' );
 
     /* Set the IP address of the contact */
     wpgh_update_contact_meta( $id, 'ip_address', wpgh_get_visitor_ip() );
@@ -172,6 +176,18 @@ function wpgh_form_submit_listener()
     /* if the contact previously unsubscribed, set them to unconfirmed. */
     if ( $contact->get_optin_status() === WPGH_UNSUBSCRIBED )
         wpgh_update_contact( $id, 'optin_status', WPGH_UNCONFIRMED );
+
+    /* get the terms agreement */
+    if ( isset( $_POST[ 'agree_terms' ] ) ){
+        wpgh_update_contact_meta( $id, 'terms_agreement', 'yes' );
+        wpgh_update_contact_meta( $id, 'terms_agreement_date', date_i18n( get_option( 'date_format' ) ) );
+    }
+
+    /* if gdpr is enabled, make sure that the consent box is checked */
+    if ( wpgh_is_gdpr() && isset( $_POST[ 'gdpr_consent' ] ) ){
+        wpgh_update_contact_meta( $id, 'gdpr_consent', 'yes' );
+        wpgh_update_contact_meta( $id, 'gdpr_consent_date', date_i18n( get_option( 'date_format' ) ) );
+    }
 
     $step = intval( $_POST[ 'step_id' ] );
 
@@ -268,8 +284,6 @@ function wpgh_process_email_preferences_changes()
 
     if ( ! $contact )
         return;
-
-
 
     if ( isset( $_POST[ 'delete_everything' ] ) )
     {

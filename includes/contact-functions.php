@@ -55,6 +55,9 @@ function wpgh_get_optin_status_text( $status )
         case WPGH_HARD_BOUNCE:
             return __( 'This email bounced, further emails will not be sent.', 'groundhogg' );
             break;
+        case WPGH_SPAM:
+            return __( 'This contact was marked as spam. Emails will not be sent.', 'groundhogg' );
+            break;
 		default:
 			return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
 			break;
@@ -85,6 +88,7 @@ function wpgh_can_send_email( $contact_id )
         case WPGH_CONFIRMED:
             return true;
             break;
+        case WPGH_SPAM;
         case WPGH_HARD_BOUNCE;
         case WPGH_UNSUBSCRIBED:
             return false;
@@ -107,30 +111,30 @@ function wpgh_can_send_email( $contact_id )
  * Log activity of the client. Simple text meta field for easy manipulation.
  *
  * @param $contact_id int The Contact's ID
- * @param $activity string The activity to log
+ * @param $note string The note to add
  *
  * @return bool True on success, false on failure
  */
-function wpgh_log_contact_activity( $contact_id, $activity )
+function wpgh_add_note( $contact_id, $note )
 {
-	if ( ! $activity || ! is_string( $activity ) )
+	if ( ! $note || ! is_string( $note ) )
 		return false;
 
-	$date_time = date_i18n( get_option( 'date_format' ) );
+    $note = sanitize_textarea_field( $note );
 
-	$activity = sanitize_text_field( $activity );
+    $current_notes = wpgh_get_contact_meta( $contact_id, 'notes', true );
 
-	$last_activity = wpgh_get_contact_meta( $contact_id, 'activity_log', true );
+    $new_notes = sprintf( "===== %s =====\n\n", date_i18n( get_option( 'date_format' ) ) );
+    $new_notes .= sprintf( "%s\n\n", $note );
+    $new_notes .= $current_notes;
 
-	if ( ! $last_activity ){
-		$last_activity = '';
-	}
+    $new_notes = sanitize_textarea_field( $new_notes );
 
-	$new_activity = $date_time . ' | ' . $activity . PHP_EOL . $last_activity;
+    wpgh_update_contact_meta( $contact_id, 'notes', $new_notes );
 
-	do_action( 'wpgh_contact_activity_logged', $contact_id );
+	do_action( 'wpgh_contact_note_added', $contact_id );
 
-	return wpgh_update_contact_meta( $contact_id, 'activity_log', $new_activity );
+	return true;
 }
 
 /**
@@ -142,10 +146,33 @@ function wpgh_log_contact_activity( $contact_id, $activity )
  * @param $phone string Phone Number
  * @param $extension string Phone Extension
  *
- * @return int|bool contact ID on success, false on failure
+ * @return int|bool|WP_Error contact ID on success, false on failure, or a WP error in case of spam.
  */
 function wpgh_quick_add_contact( $email, $first='', $last='', $phone='', $extension='' )
 {
+
+    do_action( 'wpgh_quick_add_contact_before' );
+
+    /* do a spam check based on the comment blacklist of WP. */
+    $blacklist = get_option( 'blacklist_keys', false );
+
+    if ( $blacklist ){
+        $keys = explode( PHP_EOL, $blacklist );
+
+        foreach ( $keys as $key ) {
+            if ( strpos( $email, $key ) !== false
+            || strpos( $first, $key ) !== false
+            || strpos( $last, $key ) !== false
+            || strpos( wpgh_get_visitor_ip(), $key ) !== false
+            ){
+                do_action( 'wpgh_quick_add_spam_filter' );
+
+                return new WP_Error( 'SPAMMED', __( 'You are blacklisted.' ) );
+            }
+        }
+    }
+
+
 	$contact_exists = wpgh_get_contact_by_email( $email );
 
 	/* update the contact instead */
@@ -179,10 +206,10 @@ function wpgh_quick_add_contact( $email, $first='', $last='', $phone='', $extens
 	wpgh_add_contact_meta( $id, 'primary_phone_extension', $extension );
 
 	if ( is_admin() ){
-		wpgh_log_contact_activity( $id, 'Contact Created Via Admin.' );
+		wpgh_add_note( $id, 'Contact Created Via Admin.' );
 	}
 
-	do_action( 'wpgh_contact_created', $id );
+	do_action( 'wpgh_quick_add_contact_after', $id );
 
 	return $id;
 
@@ -200,6 +227,8 @@ function wpgh_save_contact( $id )
     }
 
     $contact = new WPGH_Contact( $id );
+
+    do_action( 'wpgh_admin_update_contact_before', $id );
 
     //todo security check
 
@@ -285,6 +314,9 @@ function wpgh_save_contact( $id )
             }
         }
     }
+
+    do_action( 'wpgh_admin_update_contact_after', $id );
+
 }
 
 add_action( 'wpgh_update_contact', 'wpgh_save_contact' );
@@ -300,6 +332,9 @@ function wpgh_save_contact_inline()
     //todo security check
 
     $id             = (int) $_POST['ID'];
+
+    do_action( 'wpgh_inline_update_contact_before', $id );
+
     $email          = sanitize_email( $_POST['email'] );
     $first_name     = sanitize_text_field( $_POST['first_name'] );
     $last_name      = sanitize_text_field( $_POST['last_name'] );
@@ -357,7 +392,7 @@ function wpgh_save_contact_inline()
         }
     }
 
-    do_action( 'wpgh_contact_inline_edit', $id );
+    do_action( 'wpgh_inline_update_contact_after', $id );
 
     if ( ! class_exists( 'WPGH_Contacts_Table' ) )
     {
@@ -365,11 +400,74 @@ function wpgh_save_contact_inline()
     }
 
     $contactTable = new WPGH_Contacts_Table;
-    wp_die( $contactTable->single_row( wpgh_get_contact_by_id( $id, ARRAY_A ) ) );
+    $contactTable->single_row( wpgh_get_contact_by_id( $id, ARRAY_A ) );
+    wp_die();
 }
 
 add_action('wp_ajax_wpgh_inline_save_contacts', 'wpgh_save_contact_inline');
 
+/**
+ * Save the contact details form the admin add form
+ */
+function wpgh_admin_add_contact()
+{
+    do_action( 'wpgh_admin_add_contact_before' );
+
+    if ( ! isset( $_POST['email'] ) ){
+        wpgh_add_notice( 'NO_EMAIL', __( "Please enter a valid email address", 'groundhogg' ), 'error' );
+        return;
+    }
+
+    if ( isset( $_POST[ 'first_name' ] ) )
+        $args['first'] = sanitize_text_field( $_POST[ 'first_name' ] );
+
+    if ( isset( $_POST[ 'last_name' ] ) )
+        $args['last'] = sanitize_text_field( $_POST[ 'last_name' ] );
+
+    if ( isset( $_POST[ 'email' ] ) )
+        $args['email'] = sanitize_email( $_POST[ 'email' ] );
+
+    if ( isset( $_POST[ 'primary_phone' ] ) )
+        $args['phone'] = sanitize_text_field( $_POST[ 'primary_phone' ] );
+
+    if ( isset( $_POST[ 'primary_phone_extension' ] ) )
+        $args['ext'] = sanitize_text_field( $_POST[ 'primary_phone_extension' ] );
+
+    if ( ! is_email( $args['email'] ) ){
+        wpgh_add_notice( 'BAD_EMAIL', __( "Please enter a valid email address", 'groundhogg' ), 'error' );
+        return;
+    }
+
+    $args = wp_parse_args( $args, array(
+        'first' => '',
+        'last'  => '',
+        'email' => '',
+        'phone' => '',
+        'ext'   => ''
+    ));
+
+    $id = wpgh_quick_add_contact( $args['email'], $args['first'], $args['last'], $args['phone'], $args['ext'] );
+
+    if ( isset( $_POST[ 'notes' ] ) ){
+        wpgh_add_note( $id, $_POST[ 'notes' ] );
+    }
+
+    if ( isset( $_POST[ 'tags' ] ) ) {
+        $tags = wpgh_validate_tags($_POST['tags']);
+        foreach ($tags as $tag) {
+            wpgh_apply_tag($id, $tag);
+        }
+    }
+
+    wpgh_add_notice( 'created', __( "Contact created!", 'groundhogg' ), 'success' );
+
+    do_action( 'wpgh_admin_add_contact_after', $id );
+
+    wp_redirect( admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $id ) );
+    die();
+}
+
+add_action( 'wpgh_admin_add_contact', 'wpgh_admin_add_contact' );
 
 /**
  * Provides a quick way to instill a contact session and tie events to a particluar contact.

@@ -117,17 +117,10 @@ add_action( 'wpgh_enqueue_next_funnel_action_create_user', 'wpgh_enqueue_immedia
  */
 function wpgh_apply_note_to_contact( $step_id, $contact_id  )
 {
-
     $note = wpgh_get_step_meta( $step_id, 'note_text', true );
     $finished_note = wpgh_do_replacements( $contact_id, $note );
-    $current_notes = wpgh_get_contact_meta( $contact_id, 'notes', true );
 
-    $current_notes .= "\n\n===== " . date_i18n( 'Y-m-d h:i A' ) . " =====\n\n";
-    $current_notes .= $finished_note;
-
-    $current_notes = sanitize_textarea_field( $current_notes );
-
-    wpgh_update_contact_meta( $contact_id, 'notes', $current_notes );
+    wpgh_add_note( $contact_id, $finished_note );
 }
 
 add_action( 'wpgh_do_action_apply_note', 'wpgh_apply_note_to_contact', 10, 2 );
