@@ -257,7 +257,10 @@ function wpgh_save_contact( $id )
     if ( isset( $_POST[ 'unsubscribe' ] ) )
     {
         wpgh_update_contact( $id, 'optin_status', WPGH_UNSUBSCRIBED );
-	    wpgh_add_notice(
+
+        do_action( 'wpgh_preference_unsubscribe', $id );
+
+        wpgh_add_notice(
 		    esc_attr( 'unsubscribed' ),
 		    __( 'This contact will no longer receive email communication', 'groundhogg' ),
 		    'info'
@@ -396,6 +399,7 @@ function wpgh_save_contact_inline()
     if ( isset( $_POST['unsubscribe'] ) ){
         if ( $contact->get_optin_status() !== WPGH_UNSUBSCRIBED )
         {
+            do_action( 'wpgh_preference_unsubscribe', $id );
             wpgh_update_contact($id, 'optin_status', WPGH_UNSUBSCRIBED );
         }
     }
