@@ -163,11 +163,11 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
             return '&#x2014;';
 
         $opens = wpgh_get_broadcast_opens( $item['ID'] );
-        $clicks = wpgh_get_broadcast_opens( $item['ID'] );
+        $clicks = wpgh_get_broadcast_clicks( $item['ID'] );
 
         $html = __( "Opens" ) . ": <strong>" . $opens . "</strong><br>";
         $html.= __( "Clicks" ) . ": <strong>" . $clicks . "</strong><br>";
-        $html.= __( "CTR" ) . ": <strong>" . round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) . "</strong><br>";
+        $html.= __( "CTR" ) . ": <strong>" . round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) . "%</strong><br>";
 
         return $html;
     }
