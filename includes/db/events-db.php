@@ -267,7 +267,7 @@ function wpgh_enqueue_event( $time, $funnel_id, $step_id, $contact_id, $callback
 }
 
 define( 'WPGH_EVENTS', 'event_queue' );
-define( 'WPGH_EVENTS_DB_VERSION', '0.3' );
+define( 'WPGH_EVENTS_DB_VERSION', '0.7' );
 
 /**
  * Create the events database table.
@@ -285,16 +285,16 @@ function wpgh_create_events_db()
 		return;
 
 	$sql = "CREATE TABLE $table_name (
-      time bigint(20) NOT NULL,
-      funnel_id bigint(20) NOT NULL,
-      step_id bigint(20) NOT NULL,
-      contact_id bigint(20) NOT NULL,
+	  ID bigint(20)	unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      time bigint(20) unsigned NOT NULL,
+      funnel_id bigint(20) unsigned NOT NULL,
+      step_id bigint(20) unsigned NOT NULL,
+      contact_id bigint(20) unsigned NOT NULL,
       status varchar(20) NOT NULL,
       callback text NOT NULL,
       arg1 text NOT NULL,
       arg2 text NOT NULL,
       arg3 text NOT NULL,
-      PRIMARY KEY (time,funnel_id,step_id,contact_id),
       KEY time (time),
       KEY funnel_id (funnel_id),
       KEY step_id (step_id),
@@ -303,6 +303,8 @@ function wpgh_create_events_db()
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 	dbDelta( $sql );
+
+	//wp_die();
 
 	update_option( 'wpgh_events_db_version', WPGH_EVENTS_DB_VERSION );
 }

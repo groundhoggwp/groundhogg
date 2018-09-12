@@ -130,7 +130,7 @@ function wpgh_count_broadcast_items( $where='', $clause='' )
 }
 
 define( 'WPGH_BROADCASTS', 'broadcasts' );
-define( 'WPGH_BROADCASTS_DB_VERSION', '0.1' );
+define( 'WPGH_BROADCASTS_DB_VERSION', '0.3' );
 
 /**
  * Create the broadcasts database table.
@@ -148,10 +148,10 @@ function wpgh_create_broadcasts_db()
         return;
 
     $sql = "CREATE TABLE $table_name (
-      ID bigint(20) NOT NULL AUTO_INCREMENT,
-      email_id bigint(20) NOT NULL,
-      from_user bigint(20) NOT NULL,
-      send_at bigint(20) NOT NULL,
+      ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      email_id bigint(20) unsigned NOT NULL,
+      from_user bigint(20) unsigned NOT NULL,
+      send_at bigint(20) unsigned NOT NULL,
       send_to_tags longtext NOT NULL,
       broadcast_status VARCHAR(20) NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,

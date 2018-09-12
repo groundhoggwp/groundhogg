@@ -140,7 +140,7 @@ function wpgh_delete_superlink( $id )
 }
 
 define( 'WPGH_SUPER_LINKS', 'superlinks' );
-define( 'WPGH_SUPER_LINKS_DB_VERSION', '0.1' );
+define( 'WPGH_SUPER_LINKS_DB_VERSION', '0.3' );
 
 function wpgh_create_superlinks_db()
 {
@@ -155,7 +155,7 @@ function wpgh_create_superlinks_db()
         return;
 
     $sql = "CREATE TABLE $table_name (
-      ID bigint(20) NOT NULL AUTO_INCREMENT,
+      ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
       name VARCHAR(100) NOT NULL,
       target VARCHAR(100) NOT NULL,
       tags longtext NOT NULL,

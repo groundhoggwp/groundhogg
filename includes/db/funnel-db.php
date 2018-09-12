@@ -242,7 +242,7 @@ function wpgh_integrate_funnels_wpdb()
 }
 
 define( 'WPGH_FUNNELS', 'funnels' );
-define( 'WPGH_FUNNELS_DB_VERSION', '0.2' );
+define( 'WPGH_FUNNELS_DB_VERSION', '0.3' );
 
 /**
  * Create the funnels database table.
@@ -260,7 +260,7 @@ function wpgh_create_funnels_db()
         return;
 
     $sql = "CREATE TABLE $table_name (
-      ID bigint(20) NOT NULL AUTO_INCREMENT,
+      ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
       funnel_title text NOT NULL,
       funnel_status varchar(20) NOT NULL,
       last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
