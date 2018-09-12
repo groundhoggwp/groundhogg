@@ -11,6 +11,16 @@ function wpgh_is_gdpr()
 }
 
 /**
+ * Check if Recaptcha is enabled throughout the plugin.
+ *
+ * @return bool, whether it's enable or not.
+ */
+function wpgh_is_recaptcha_enabled()
+{
+    return in_array( 'on', get_option( 'gh_enable_recaptcha', array() ) );
+}
+
+/**
  * Output the form html based on the settings.
  *
  * @param $atts array the shortcode attributes
@@ -100,6 +110,14 @@ function wpgh_form_shortcode( $atts )
         $form .= '</p></div>';
     }
 
+    if ( wpgh_is_recaptcha_enabled() )
+    {
+        wp_enqueue_script( 'google-recaptcha-v2', 'https://www.google.com/recaptcha/api.js' );
+        $form .= '<div class="gh-recaptcha-field"><p>';
+        $form .= sprintf( '<div class="g-recaptcha" data-sitekey="%s"></div>', get_option( 'gh_recaptcha_site_key', '' ) );
+        $form .= '</p></div>';
+    }
+
     $form = apply_filters( 'wpgh_form_shortcode', $form );
 
     $form .= "<div class='gh-submit-field'><p><input type='submit' name='submit' value='" . $a['submit'] . "'></p></div>";
@@ -126,7 +144,21 @@ function wpgh_form_submit_listener()
 
     if ( wpgh_is_gdpr() ){
         if ( ! isset( $_POST[ 'gdpr_consent' ] ) )
+            wp_die( __( 'You must consent to sign up.', 'groundhogg' ) );
+    }
+
+    if ( wpgh_is_recaptcha_enabled() )
+    {
+        if ( ! isset( $_POST[ 'g-recaptcha-response' ] ) )
             wp_redirect( wp_get_referer() );
+
+        $file_name = sprintf( "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s", get_option( 'gh_recaptcha_secret_key' ), $_POST['g-recaptcha-response'] );
+
+        $verifyResponse = file_get_contents( $file_name );
+        $responseData = json_decode( $verifyResponse );
+        if( $responseData->success == false ){
+            wp_die( __( 'You did not pass the robot test.', 'groundhogg' ) );
+        }
     }
 
     /* verify email exists */
@@ -184,12 +216,14 @@ function wpgh_form_submit_listener()
     if ( isset( $_POST[ 'agree_terms' ] ) ){
         wpgh_update_contact_meta( $id, 'terms_agreement', 'yes' );
         wpgh_update_contact_meta( $id, 'terms_agreement_date', date_i18n( get_option( 'date_format' ) ) );
+        do_action( 'wpgh_agreed_to_terms', $contact->get_id() );
     }
 
     /* if gdpr is enabled, make sure that the consent box is checked */
     if ( wpgh_is_gdpr() && isset( $_POST[ 'gdpr_consent' ] ) ){
         wpgh_update_contact_meta( $id, 'gdpr_consent', 'yes' );
         wpgh_update_contact_meta( $id, 'gdpr_consent_date', date_i18n( get_option( 'date_format' ) ) );
+        do_action( 'wpgh_gdpr_consented', $contact->get_id() );
     }
 
     $step = intval( $_POST[ 'step_id' ] );

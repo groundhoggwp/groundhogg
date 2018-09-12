@@ -160,6 +160,7 @@ class WPGH_Settings_Page
     {
         add_settings_section( 'business_info', 'Edit Business Settings', array(), 'groundhogg_business_settings');
         add_settings_section( 'contact_endpoints', __ ( 'Contact Endpoints' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
+        add_settings_section( 'form_settings', __ ( 'Form Settings' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
         add_settings_section( 'compliance', __( 'Compliance Settings', 'groundhogg' ), array(), 'groundhogg_marketing_settings');
         add_settings_section( 'default_mail_settings', 'Default Mail Settings', array(), 'groundhogg_email_settings' );
     }
@@ -290,13 +291,12 @@ class WPGH_Settings_Page
             array(
                 'label' => 'Enable GDPR features.',
                 'id' => 'gh_enable_gdpr',
-                'type' => 'radio',
+                'type' => 'checkbox',
                 'desc' => 'This will add a consent box to your forms as well as a "Delete Everything" Button to your email preferences page.',
                 'section' => 'compliance',
                 'page' => 'groundhogg_marketing_settings',
                 'options' => array(
                     'on' => 'On',
-                    'off' => 'Off',
                 ),
             ),
             array(
@@ -307,6 +307,43 @@ class WPGH_Settings_Page
                 Groundhogg Mail is an inexpensive and monitored mail service designed to get your email to the inbox.',
                 'section' => 'default_mail_settings',
                 'page' => 'groundhogg_email_settings',
+                'options' => array(
+                    'groundhogg' => 'Groundhogg Mail',
+                    'default' => 'Default Mail Service',
+                ),
+            ),
+            array(
+                'label' => 'Enable Recaptcha on forms',
+                'id' => 'gh_enable_recaptcha',
+                'type' => 'checkbox',
+                'desc' => 'Add a google recaptcha to all your forms made with the [gh_form] shortcode',
+                'section' => 'form_settings',
+                'page' => 'groundhogg_marketing_settings',
+                'options' => array(
+                    'on' => 'On',
+                ),
+            ),
+            array(
+                'label' => 'Recaptcha Site Key',
+                'id' => 'gh_recaptcha_site_key',
+                'type' => 'text',
+                'placeholder' => '',
+                'desc' => 'This is the key which faces the users on the front-end',
+                'section' => 'form_settings',
+                'page' => 'groundhogg_marketing_settings',
+                'options' => array(
+                    'groundhogg' => 'Groundhogg Mail',
+                    'default' => 'Default Mail Service',
+                ),
+            ),
+            array(
+                'label' => 'Recaptcha Secret Key',
+                'id' => 'gh_recaptcha_secret_key',
+                'type' => 'text',
+                'desc' => 'Never ever ever share this with anyone!',
+                'placeholder' => '',
+                'section' => 'form_settings',
+                'page' => 'groundhogg_marketing_settings',
                 'options' => array(
                     'groundhogg' => 'Groundhogg Mail',
                     'default' => 'Default Mail Service',
