@@ -76,12 +76,12 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <tbody>
             <tr>
                 <th><?php _e( 'Agreed To Terms' ); ?></th>
-                <td><?php echo ( wpgh_get_contact_meta( $contact->get_id(), 'terms_agreement', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( 'terms_agreement_date' ) ): '&#x2014;'; ?></td>
+                <td><?php echo ( wpgh_get_contact_meta( $contact->get_id(), 'terms_agreement', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( $id, 'terms_agreement_date' , true ) ): '&#x2014;'; ?></td>
             </tr>
             <?php if ( wpgh_is_gdpr() ): ?>
                 <tr>
                     <th><?php _e( 'GDPR Consent' ); ?></th>
-                    <td><?php echo ( wpgh_get_contact_meta( $contact->get_id(), 'gdpr_consent', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( 'gdpr_consent_date' ) ) : '&#x2014;'; ?></td>
+                    <td><?php echo ( wpgh_get_contact_meta( $contact->get_id(), 'gdpr_consent', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( $id, 'gdpr_consent_date' , true ) ) : '&#x2014;'; ?></td>
                 </tr>
             <?php endif; ?>
         </tbody>
