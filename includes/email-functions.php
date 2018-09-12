@@ -228,10 +228,11 @@ add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_builder_toolbar' );
  */
 function wpgh_remove_content_editable( $content )
 {
-    return str_replace( 'contenteditable="true" ', '', $content );
+    return preg_replace( "/contenteditable=\"true\"/", '', $content );
 }
 
 add_filter( 'wpgh_the_email_content', 'wpgh_remove_content_editable' );
+add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_content_editable' );
 
 /**
  * Strip out irrelevant whitespace form the html.
