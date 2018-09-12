@@ -209,7 +209,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                                 $funnel = wpgh_get_funnel_by_id( $funnel_id );
                                 $funnel_title = $funnel->funnel_title;
                             }
-                            esc_html_e( $funnel_title );?></td>
+                            echo sprintf( "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel_id ) ,$funnel_title);?></td>
                         <td><?php $step_id = intval( $active_event->step_id );
                             if ( $funnel_id === WPGH_BROADCAST ) {
                                 $broadcast = wpgh_get_broadcast_by_id( $step_id );
@@ -220,7 +220,8 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                             }
                             if ( ! $step_title )
                                 echo sprintf( "<strong>%s</strong>", __( '(step deleted)' ) );
-                            esc_html_e( $step_title ); ?></td>
+                            else
+                                echo sprintf( "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel_id . '#' . $step_id ) , $step_title );?></td>
                         <td><?php
                             $p_time = intval( $active_event->time ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
                             $cur_time = (int) current_time( 'timestamp' );
@@ -274,7 +275,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                                 $funnel = wpgh_get_funnel_by_id( $funnel_id );
                                 $funnel_title = $funnel->funnel_title;
                             }
-                            esc_html_e( $funnel_title ); ?></td>
+                        echo sprintf( "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel_id ) ,$funnel_title);?></td>
                     <td><?php
                         $step_id = intval( $active_event->step_id );
                         if ( $funnel_id === WPGH_BROADCAST ) {
@@ -286,8 +287,8 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                         }
                         if ( ! $step_title )
                             echo sprintf( "<strong>%s</strong>", __( '(step deleted)' ) );
-
-                        esc_html_e( $step_title ); ?></td>
+                        else
+                            echo sprintf( "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel_id . '#' . $step_id ) , $step_title );?></td>
                     <td><?php $p_time = intval( $active_event->time ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
                         $cur_time = (int) current_time( 'timestamp' );
                         $time_diff = $p_time - $cur_time;
