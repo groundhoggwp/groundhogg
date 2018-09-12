@@ -82,9 +82,29 @@ function wpgh_can_send_email( $contact_id )
 
     $contact = new WPGH_Contact($contact_id);
 
+    /* check for strict GDPR settings */
+    if ( wpgh_is_gdpr() && in_array( 'on', get_option( 'gh_strict_gdpr', array() ) ) )
+    {
+        $consent = wpgh_get_contact_meta( $contact_id, 'gdpr_consent', true );
+
+        if ( $consent !== 'yes' )
+            return false;
+    }
+
     switch ( $contact->get_optin_status() )
     {
         case WPGH_UNCONFIRMED:
+            /* check for grace period if necessary */
+            if ( in_array( 'on', get_option( 'gh_strict_confirmation', array() ) ) )
+            {
+                $grace = intval( get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
+                $time_passed = time() - strtotime( $contact->date_created );
+                if ( $time_passed > $grace )
+                    return false;
+            }
+
+            return true;
+            break;
         case WPGH_CONFIRMED:
             return true;
             break;

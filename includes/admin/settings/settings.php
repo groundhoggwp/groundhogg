@@ -289,6 +289,26 @@ class WPGH_Settings_Page
                 'page' => 'groundhogg_marketing_settings'
             ),
             array(
+                'label' => 'Only send to confirmed emails.',
+                'id' => 'gh_strict_confirmation',
+                'type' => 'checkbox',
+                'desc' => 'This will stop emails being sent to contacts who do not have confirmed emails outside of the below grace period.',
+                'section' => 'compliance',
+                'page' => 'groundhogg_marketing_settings',
+                'options' => array(
+                    'on' => 'Enable',
+                ),
+            ),
+            array(
+                'label' => 'Email confirmation grace Period',
+                'id' => 'gh_confirmation_grace_period',
+                'type' => 'number',
+                'desc' => 'The number of days for which you can send an email to a contact after they are created but their email has not been confirmed. The default is 14 days.',
+                'placeholder' => '14',
+                'section' => 'compliance',
+                'page' => 'groundhogg_marketing_settings',
+            ),
+            array(
                 'label' => 'Enable GDPR features.',
                 'id' => 'gh_enable_gdpr',
                 'type' => 'checkbox',
@@ -296,7 +316,18 @@ class WPGH_Settings_Page
                 'section' => 'compliance',
                 'page' => 'groundhogg_marketing_settings',
                 'options' => array(
-                    'on' => 'On',
+                    'on' => 'Enable',
+                ),
+            ),
+            array(
+                'label' => 'Do not send email without consent.',
+                'id' => 'gh_strict_gdpr',
+                'type' => 'checkbox',
+                'desc' => 'This will prevent your system from sending emails to contacts for which you do not have explicit consent. Only works if GDPR features are enabled.',
+                'section' => 'compliance',
+                'page' => 'groundhogg_marketing_settings',
+                'options' => array(
+                    'on' => 'Enable',
                 ),
             ),
             array(
@@ -320,7 +351,7 @@ class WPGH_Settings_Page
                 'section' => 'form_settings',
                 'page' => 'groundhogg_marketing_settings',
                 'options' => array(
-                    'on' => 'On',
+                    'on' => 'Enable',
                 ),
             ),
             array(
