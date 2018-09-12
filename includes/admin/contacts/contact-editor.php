@@ -98,9 +98,15 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         </tr>
         <tr>
             <th><?php _e( 'Source Page', 'groundhogg' ); ?></th>
-            <td><?php $source = wpgh_get_contact_meta( $id, 'source_page' );?>
+            <td><?php $source = wpgh_get_contact_meta( $id, 'source_page', true );?>
             <input type="text" class="regular-text" name="page_source" id="page_source" title="<?php esc_attr_e( 'Page Source' );?>" value="<?php echo esc_url( $source ); ?>"><span class="row-actions"><a style="text-decoration: none" target="_blank" href="<?php echo esc_url( $source ); ?>"><span class="dashicons dashicons-external"></span></a></span>
             <p class="description"><?php _e( "This is the page which the contact first submitted a form.", 'groundhogg' ); ?></p></td>
+        </tr>
+        <tr>
+            <th><?php _e( 'Lead Source', 'groundhogg' ); ?></th>
+            <td><?php $source = wpgh_get_contact_meta( $id, 'leadsource', true );?>
+                <input type="text" class="regular-text" name="leadsource" id="leadsource" title="<?php esc_attr_e( 'Lead Source' );?>" value="<?php echo esc_url( $source ); ?>"><span class="row-actions"><a style="text-decoration: none" target="_blank" href="<?php echo esc_url( $source ); ?>"><span class="dashicons dashicons-external"></span></a></span>
+                <p class="description"><?php _e( "This is where the contact originated from.", 'groundhogg' ); ?></p></td>
         </tr>
         <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>

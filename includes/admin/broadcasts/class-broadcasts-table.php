@@ -118,7 +118,9 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 
         if ( $this->get_view() !== 'cancelled' ) {
             $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast['email_id']) . "'>" . __('Edit Email') . "</a></span>";
-            $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $id), 'cancel') . "'>" . __('Cancel') . "</a></span>";
+            if ( intval( $item[ 'send_at' ] ) > time() ){
+                $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $id), 'cancel') . "'>" . __('Cancel') . "</a></span>";
+            }
         }
 
         return $this->row_actions( apply_filters( 'wpgh_broadcast_row_actions', $actions, $item, $column_name ) );

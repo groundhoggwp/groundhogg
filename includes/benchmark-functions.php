@@ -187,7 +187,6 @@ add_action( 'wp_enqueue_scripts', 'wpgh_enqueue_page_view_scripts' );
 
 /**
  * Complete the Page View benchmark.
- * todo Review this goal. The hook needs to be changed probably...
  *
  * @param $post_object object post object goes unused.
  */

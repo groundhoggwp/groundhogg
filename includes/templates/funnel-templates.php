@@ -43,4 +43,11 @@ $funnel_templates[ 'feedback_request' ][ 'description' ] = 'Looking to generate 
 $funnel_templates[ 'feedback_request' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'feedback_request' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/feedback-request.funnel';
 
+/* Start from scratch */
+
+$funnel_templates[ 'scratch' ][ 'title' ] = 'Start From Scratch';
+$funnel_templates[ 'scratch' ][ 'description' ] = 'Have some inspiration? Use this blank canvas!';
+$funnel_templates[ 'scratch' ][ 'src' ] = 'https://via.placeholder.com/350x250';
+$funnel_templates[ 'scratch' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/start-from-scratch.funnel';
+
 $funnel_templates = apply_filters( 'wpgh_funnel_templates', $funnel_templates );

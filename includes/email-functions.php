@@ -702,6 +702,8 @@ function wpgh_process_email_open()
 
     do_action( 'wpgh_email_opened', $contact_id, $email_id, $step_id, $funnel_id );
 
+    header("content-type:image/gif");
+
     die();
 }
 

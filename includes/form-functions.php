@@ -173,6 +173,9 @@ function wpgh_form_submit_listener()
     if ( ! wpgh_get_contact_meta( $id, 'source_page', true) )
         wpgh_update_contact_meta( $id, 'source_page', wp_get_referer() );
 
+    if ( isset( $_COOKIE[ 'gh_leadsource' ] ) )
+        wpgh_update_contact_meta( $id, 'leadsource', esc_url_raw( $_COOKIE[ 'gh_leadsource' ] ) );
+
     /* if the contact previously unsubscribed, set them to unconfirmed. */
     if ( $contact->get_optin_status() === WPGH_UNSUBSCRIBED )
         wpgh_update_contact( $id, 'optin_status', WPGH_UNCONFIRMED );

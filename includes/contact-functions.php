@@ -293,6 +293,14 @@ function wpgh_save_contact( $id )
         wpgh_update_contact_meta( $id, 'notes', sanitize_textarea_field( $_POST['notes'] ) );
     }
 
+    if ( isset( $_POST[ 'leadsource' ] ) ){
+        wpgh_update_contact_meta( $id, 'leadsource', esc_url_raw( $_POST['leadsource'] ) );
+    }
+
+    if ( isset( $_POST[ 'page_source' ] ) ){
+        wpgh_update_contact_meta( $id, 'page_source', esc_url_raw( $_POST['page_source'] ) );
+    }
+
     if ( isset( $_POST[ 'tags' ] ) ){
         $tags = wpgh_validate_tags( $_POST['tags' ] );
         $cur_tags = $contact->get_tags();
