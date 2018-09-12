@@ -304,6 +304,35 @@ class WPGH_Contacts_Table extends WP_List_Table {
                     ORDER BY c.date_created DESC", $owner );
                 }
                 break;
+            case 'activity':
+                $sql = "SELECT DISTINCT a.contact_id, c.*
+                FROM " . $wpdb->prefix . WPGH_ACTIVITY ." a 
+                LEFT JOIN " . $wpdb->prefix . WPGH_CONTACTS . " c ON a.contact_id = c.ID 
+                WHERE (1=1 ";
+                if ( isset( $_REQUEST['activity_type'] ) ) {
+                    $activity_type = $_REQUEST['activity_type'];
+                    $sql .= $wpdb->prepare(' AND a.activity_type = %s', $activity_type);
+                }
+                if ( isset( $_REQUEST['funnel'] ) ){
+                    $funnel = intval ( $_REQUEST['funnel'] );
+                    $sql .= $wpdb->prepare( ' AND a.funnel_id = %d', $funnel );
+                }
+                if ( isset(  $_REQUEST['step'] ) ){
+                    $step = intval ( $_REQUEST['step'] );
+                    $sql .= $wpdb->prepare( ' AND a.step_id = %d', $step );
+                }
+                if ( isset( $_REQUEST['start'] ) ){
+                    $start = intval ( $_REQUEST['start'] );
+                    $sql .= $wpdb->prepare( ' AND %d <= a.timestamp', $start );
+                }
+                if ( isset( $_REQUEST['end'] ) ){
+                    $end = intval ( $_REQUEST['end'] );
+                    $sql .= $wpdb->prepare( ' AND a.timestamp <= %d', $end );
+                }
+
+                $sql .= ") $search
+                ORDER BY a.timestamp DESC";
+                break;
             default:
                 $sql = "SELECT c.* FROM " . $wpdb->prefix . WPGH_CONTACTS . " c
                 WHERE 1=1 $search

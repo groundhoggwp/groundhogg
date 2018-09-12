@@ -41,7 +41,10 @@ $email_id = intval( $_GET['email'] );
 $email = wpgh_get_email_by_id( $email_id );
 
 ?>
-
+<span class="hidden" id="new-title"><?php echo $email->subject; ?> &lsaquo; </span>
+<script>
+    document.title = jQuery( '#new-title' ).text() + document.title;
+</script>
 <form method="post">
     <?php wp_nonce_field(); ?>
     <?php do_action('wpgh_edit_email_form_before'); ?>

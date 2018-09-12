@@ -32,6 +32,10 @@ wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-edito
 do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
 
 ?>
+<span class="hidden" id="new-title"><?php echo wpgh_get_funnel_name( $funnel_id ); ?> &lsaquo; </span>
+<script>
+    document.title = jQuery( '#new-title' ).text() + document.title;
+</script>
 <form method="post">
     <?php wp_nonce_field(); ?>
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">

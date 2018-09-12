@@ -165,8 +165,15 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $opens = wpgh_get_broadcast_opens( $item['ID'] );
         $clicks = wpgh_get_broadcast_clicks( $item['ID'] );
 
-        $html = sprintf( "%s: <strong>%d</strong><br/>", __( "Opens" ), $opens );
-        $html.= sprintf( "%s: <strong>%d</strong><br/>", __( "Clicks" ), $clicks );
+        $html = sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
+            __( "Opens" ),
+            admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $item['ID'], 'email_opened', 0, time() ) ),
+            $opens
+        );
+        $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
+            __( "Clicks" ),
+            admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $item['ID'], 'email_link_click', 0, time() ) ),
+            $clicks );
         $html.= sprintf( "%s: <strong>%d%%</strong><br/>", __( "CTR" ), round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) );
 
         return $html;

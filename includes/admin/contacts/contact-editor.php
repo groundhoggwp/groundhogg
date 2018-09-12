@@ -25,7 +25,10 @@ if ( ! $contact->get_email() )
 
 wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-editor.js' )
 ?>
-
+<span class="hidden" id="new-title"><?php echo $contact->get_full(); ?> &lsaquo; </span>
+<script>
+    document.title = jQuery( '#new-title' ).text() + document.title;
+</script>
 <form method="post" class="">
     <?php wp_nonce_field( 'edit' ); ?>
 
