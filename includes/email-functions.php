@@ -604,22 +604,23 @@ function wpgh_process_email_click()
 
     $parts = explode( '/', $_SERVER[ 'REQUEST_URI' ] );
 
-    /* /gh-tracking/email/click/email/contact/funnel/step/?ref=url */
+    /* /gh-tracking/email/click/contact/email/funnel/step/?ref=url */
     /*      0        1      2     3     4       5     6     7      */
 
-    $offset = 0;
+    /* offset is one because explode gives empty string as object in first array */
+    $offset = 1;
 
-    if ( $parts[ 0 ] !== 'gh-tracking' )
+    if ( $parts[ 1 ] !== 'gh-tracking' )
         $offset++;
 
-    /* email id */
-    $email = intval( $parts[ $offset + 3 ] );
     /* contact_id*/
-    $contact_id = wpgh_encrypt_decrypt( $parts[ $offset + 4 ], 'd' );
+    $contact_id = intval( wpgh_encrypt_decrypt( $parts[ $offset + 3 ], 'd' ) );
+    /* email id */
+    $email = intval( $parts[ $offset + 4 ] );
     /* funnel Id */
-    $funnel = intval( $parts[ $offset + 6 ] );
+    $funnel = intval( $parts[ $offset + 5 ] );
     /* step id */
-    $step = intval( $parts[ $offset + 7 ] );
+    $step = intval( $parts[ $offset + 6 ] );
 
     /* get the link target */
     if ( ! isset( $_GET['ref'] ) || empty( $_GET['ref'] ) )
@@ -629,8 +630,10 @@ function wpgh_process_email_click()
 
     /* check if the contact exists */
     $contact = wpgh_get_contact_by_id( $contact_id );
+
     if ( ! $contact ){
         /* do not do tracking if there is no contact to associate */
+        wp_die( 'OOPS' );
         wp_redirect( $ref );
         die();
     }
@@ -668,23 +671,22 @@ function wpgh_process_email_open()
 
     $parts = explode( '/', $_SERVER[ 'REQUEST_URI' ] );
 
-    /* /gh-tracking/email/open/email/contact/funnel/step/?ref=url */
+    /* /gh-tracking/email/open/contact/email/funnel/step/?ref=url */
     /*      0        1      2     3     4       5     6     7    */
 
-    $offset = 0;
+    $offset = 1;
 
-    if ( $parts[ 0 ] !== 'gh-tracking' )
+    if ( $parts[ 1 ] !== 'gh-tracking' )
         $offset++;
 
+    /* contact_id*/
+    $contact_id = intval( wpgh_encrypt_decrypt( $parts[ $offset + 3 ], 'd' ) );
     /* email id */
-    $email_id = intval( $parts[ $offset + 3 ] );
+    $email_id = intval( $parts[ $offset + 4 ] );
     /* funnel Id */
     $funnel_id = intval( $parts[ $offset + 5 ] );
     /* step id */
     $step_id = intval( $parts[ $offset + 6 ] );
-    /* contact_id*/
-    $contact_id = wpgh_encrypt_decrypt( $parts[ $offset + 4 ], 'd' );
-    /* token */
 
     /* check if the contact exists */
     $contact = wpgh_get_contact_by_id( $contact_id );

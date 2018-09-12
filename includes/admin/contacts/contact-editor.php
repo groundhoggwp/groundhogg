@@ -342,10 +342,19 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                         }
                         $email = wpgh_get_email_by_id( intval( $email_id ) );
                         echo $email->subject; ?></td>
-                    <td><?php if ( wpgh_activity_exists( $contact->get_id(), $email_event->funnel_id, $email_event->step_id, 'email_opened', $email_id ) )
-                            _e( 'Yes' );
-                        else
-                            echo '&#x2014;' ?></td>
+                    <td><?php if ( $activity = wpgh_get_activity( $contact->get_id(), $email_event->funnel_id, $email_event->step_id, 'email_opened', $email_id ) ):
+                            $p_time = intval( $activity->timestamp ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+                            $cur_time = (int) current_time( 'timestamp' );
+                            $time_diff = $p_time - $cur_time;
+                            if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
+                                $time = sprintf( "On %s", date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+                            } else {
+                                $time = sprintf( "%s ago", human_time_diff( $p_time, $cur_time ) );
+                            }
+                            echo '<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+                        else:
+                            echo '&#x2014;';
+                        endif;?></td>
                     <td><?php $activity = wpgh_get_activity( $contact->get_id(), $email_event->funnel_id, $email_event->step_id, 'email_link_click', $email_id );
                         if ( $activity )
                             echo '<a target="_blank" href="' . esc_url( $activity->referer ) . '">' . esc_url( $activity->referer ) . '</a>';
