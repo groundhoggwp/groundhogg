@@ -289,7 +289,7 @@ class WPGH_Events_Table extends WP_List_Table {
             case 'contact':
 	            if ( isset( $_REQUEST['contact'] ) ){
 		            $sql = $wpdb->prepare(
-			            "
+			            "$sql
                         WHERE e.contact_id = %d 
                         ORDER BY e.time DESC" , intval( $_REQUEST['contact'] )
 		            );

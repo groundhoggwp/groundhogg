@@ -93,9 +93,11 @@ function wpgh_send_broadcast( $broadcast_id, $contact_id )
     wpgh_send_email( $contact_id, $email_id, WPGH_BROADCAST, $broadcast_id );
     /* change status to sent once emails for this broadcast start going out. */
     wpgh_update_broadcast( $broadcast_id, 'broadcast_status', 'sent' );
+    //todo remove eventually
+    wpgh_add_note( $contact_id, "Sent Broadcast" );
 }
 
-add_action( 'wpgh_do_action_broadcast', 'wpgh_send_broadcast' );
+add_action( 'wpgh_do_action_broadcast', 'wpgh_send_broadcast', 10, 2 );
 
 /**
  * Get the number of opens for a broadcast email

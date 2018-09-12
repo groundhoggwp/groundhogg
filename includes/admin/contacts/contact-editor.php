@@ -329,9 +329,9 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         $email_events = $wpdb->get_results( $wpdb->prepare(
                 "SELECT e.*,s.funnelstep_type FROM $table e 
                         LEFT JOIN $steps s ON e.step_id = s.ID 
-                        WHERE e.contact_id = %d AND e.status = %s AND s.funnelstep_type = %s
+                        WHERE e.contact_id = %d AND e.status = %s AND ( s.funnelstep_type = %s OR e.funnel_id = %d )
                         ORDER BY time DESC LIMIT 20"
-                , $id, 'complete', 'send_email' ));
+                , $id, 'complete', 'send_email', WPGH_BROADCAST ));
 
         if ( empty( $email_events ) ){
             ?> <tr><td colspan="4"><?php _e( 'This contact has no email history.', 'groundhogg' ) ?></td></tr> <?php
