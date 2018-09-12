@@ -101,7 +101,10 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                                     $('.step-reporting').addClass('hidden');
                                     $('.step-edit').removeClass('hidden');
                                 }
-                            })});
+                            });if($("#reporting-toggle").is( ':checked')){
+                                $('.step-reporting').removeClass('hidden');
+                                $('.step-edit').addClass('hidden');
+                            }});
                         </script>
                     </div>
                 </div>
