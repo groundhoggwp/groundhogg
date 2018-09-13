@@ -58,6 +58,30 @@ function wpgh_is_confirmation_strict()
 }
 
 /**
+ * Return whether the given contact is within the strict confirmation grace period
+ *
+ * @param $contact_id
+ * @return bool
+ */
+function wpgh_is_in_grace_period( $contact_id )
+{
+    $contact = new WPGH_Contact( $contact_id );
+
+    $grace = intval( get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
+
+    $base = wpgh_get_contact_meta( $contact_id, 'last_optin', true );
+
+    if ( ! $base )
+    {
+        $base = strtotime( $contact->date_created );
+    }
+
+    $time_passed = time() - $base;
+
+    return $time_passed < $grace;
+}
+
+/**
  * Get the text explanation for the optin status of a contact
  * 0 = unconfirmed, can send email
  * 1 = confirmed, can send email
@@ -91,9 +115,7 @@ function wpgh_get_optin_status_text( $id_or_email )
 
             if ( wpgh_is_confirmation_strict() )
             {
-                $grace = intval( get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
-                $time_passed = time() - wpgh_get_contact_meta( $contact->ID, 'last_optin', true );
-                if ( $time_passed > $grace )
+                if ( ! wpgh_is_in_grace_period( $contact->ID ) )
                     return __( 'Unconfirmed. This contact will not receive emails, they are passed the email confirmation grace period.', 'groundhogg' );
             }
 
@@ -156,9 +178,7 @@ function wpgh_can_send_email( $contact_id )
             /* check for grace period if necessary */
             if ( wpgh_is_confirmation_strict() )
             {
-                $grace = intval( get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
-                $time_passed = time() - wpgh_get_contact_meta( $contact_id, 'last_optin', true );
-                if ( $time_passed > $grace )
+                if ( ! wpgh_is_in_grace_period( $contact_id ) )
                     return false;
             }
 
