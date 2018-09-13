@@ -20,17 +20,18 @@ function wpgh_get_funnel_actions()
 {
     $actions = array();
 
-    $actions['send_email']  = array( 'title' => __( 'Send Email', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/send-email.png' );
-    $actions['apply_note']  = array( 'title' => __( 'Apply Note', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/apply-a-note.png' );
-    $actions['notification']  = array( 'title' => __( 'Notification', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/admin-notification.png' );
-    $actions['apply_tag']   = array( 'title' => __( 'Apply Tag', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/apply-tag.png' );
-    $actions['remove_tag']  = array( 'title' => __( 'Remove Tag', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/remove-tag.png' );
+    $actions['send_email']    = array( 'title' => __( 'Send Email', 'groundhogg' ),     'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/send-email.png' );
+    $actions['apply_note']    = array( 'title' => __( 'Apply Note', 'groundhogg' ),     'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/apply-a-note.png' );
+    $actions['notification']  = array( 'title' => __( 'Notification', 'groundhogg' ),   'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/admin-notification.png' );
+    $actions['apply_tag']     = array( 'title' => __( 'Apply Tag', 'groundhogg' ),      'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/apply-tag.png' );
+    $actions['remove_tag']    = array( 'title' => __( 'Remove Tag', 'groundhogg' ),     'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/remove-tag.png' );
 //    $actions['delete_user'] = array( 'title' => __( '', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/.png' );
-    $actions['date_timer']  = array( 'title' => __( 'Date Timer', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/date-timer.png' );
-    $actions['delay_timer'] = array( 'title' => __( 'Delay Timer', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/delay-timer.png' );
-    $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/create-account.png' );
-    $actions['edit_meta']   = array( 'title' => __( 'Edit Meta', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/edit-contact.png' );
-    $actions['apply_owner']   = array( 'title' => __( 'Set Owner', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/edit-contact.png' );
+    $actions['date_timer']    = array( 'title' => __( 'Date Timer', 'groundhogg' ),     'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/date-timer.png' );
+    $actions['delay_timer']   = array( 'title' => __( 'Delay Timer', 'groundhogg' ),    'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/delay-timer.png' );
+    $actions['create_user']   = array( 'title' => __( 'Create User', 'groundhogg' ),    'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/create-account.png' );
+    $actions['edit_meta']     = array( 'title' => __( 'Edit Meta', 'groundhogg' ),      'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/edit-contact.png' );
+    $actions['apply_owner']   = array( 'title' => __( 'Set Owner', 'groundhogg' ),      'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/apply-an-owner.png' );
+    $actions['http_post']     = array( 'title' => __( 'HTTP Post', 'groundhogg' ),      'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/http.png' );
 
     return apply_filters( 'wpgh_funnel_actions', $actions );
 }
@@ -112,6 +113,7 @@ add_action( 'wpgh_enqueue_next_funnel_action_remove_tag', 'wpgh_enqueue_immediat
 add_action( 'wpgh_enqueue_next_funnel_action_create_user', 'wpgh_enqueue_immediate_action', 10, 2 );
 add_action( 'wpgh_enqueue_next_funnel_action_edit_meta', 'wpgh_enqueue_immediate_action', 10, 2 );
 add_action( 'wpgh_enqueue_next_funnel_action_apply_owner', 'wpgh_enqueue_immediate_action', 10, 2 );
+add_action( 'wpgh_enqueue_next_funnel_action_http_post', 'wpgh_enqueue_immediate_action', 10, 2 );
 
 /**
  * Applies a note to the contact from a funnel step.
@@ -201,3 +203,41 @@ function wpgh_apply_owner_action( $step_id, $contact_id )
 }
 
 add_action( 'wpgh_do_action_apply_owner', 'wpgh_apply_owner_action', 10, 2 );
+
+/**
+ * Send an http post to the url given and the data given.
+ *
+ * @param $step_id
+ * @param $contact_id
+ */
+function wpgh_http_post_step_action( $step_id, $contact_id )
+{
+	$post_keys = wpgh_get_step_meta( $step_id, 'post_keys', true );
+	$post_values = wpgh_get_step_meta( $step_id, 'post_values', true );
+
+	if ( ! is_array( $post_keys ) || ! is_array( $post_values ) || empty( $post_keys ) || empty( $post_values ) ){
+		return;
+	}
+
+	$post_array = array();
+
+	foreach ( $post_keys as $i => $key )
+	{
+		if ( ! empty( $key ) ){
+			$post_array[ sanitize_key( $key ) ] = wpgh_do_replacements( $contact_id, sanitize_text_field( $post_values[ $i ] ) );
+		}
+	}
+
+	$post_url = wpgh_get_step_meta( $step_id, 'post_url', true );
+	$post_url = wpgh_do_replacements( $contact_id, esc_url_raw( $post_url ) );
+
+	$response = wp_remote_post( $post_url, array(
+		'body' => $post_array
+	) );
+
+	if ( is_wp_error( $response ) ) {
+		wpgh_add_note( $contact_id, sanitize_text_field( $response->get_error_message() ) );
+	}
+}
+
+add_action( 'wpgh_do_action_http_post', 'wpgh_http_post_step_action', 10, 2 );

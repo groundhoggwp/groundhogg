@@ -27,8 +27,8 @@ function wpgh_edit_meta_funnel_step_html( $step_id )
         <tbody>
         <?php foreach ( $meta_keys as $i => $meta_key): ?>
             <tr>
-                <td><label><?php _e( 'Key: ' ); ?><input type="text" name="<?php gh_meta_e( $step_id, 'meta_keys' ); ?>[]" value="<?php echo sanitize_key( $meta_key );?>"></label></td>
-                <td><label><?php _e( 'Value: ' ); ?><input type="text" name="<?php gh_meta_e( $step_id, 'meta_values' ); ?>[]" value="<?php echo esc_html( $meta_values[ $i ] );?>"></label></td>
+                <td><label><strong><?php _e( 'Key: ' ); ?></strong><input type="text" name="<?php gh_meta_e( $step_id, 'meta_keys' ); ?>[]" value="<?php echo sanitize_key( $meta_key );?>"></label></td>
+                <td><label><strong><?php _e( 'Value: ' ); ?></strong><input type="text" name="<?php gh_meta_e( $step_id, 'meta_values' ); ?>[]" value="<?php echo esc_html( $meta_values[ $i ] );?>"></label></td>
                 <td>
                     <span class="row-actions">
                         <span class="add"><a style="text-decoration: none" href="javascript:void(0)" class="addmeta"><span class="dashicons dashicons-plus"></span></a></span> |
