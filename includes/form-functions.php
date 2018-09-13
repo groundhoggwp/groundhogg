@@ -1,16 +1,6 @@
 <?php
 
 /**
- * Check if GDPR is enabled throughout the plugin.
- *
- * @return bool, whether it's enable or not.
- */
-function wpgh_is_gdpr()
-{
-    return in_array( 'on', get_option( 'gh_enable_gdpr', array() ) );
-}
-
-/**
  * Check if Recaptcha is enabled throughout the plugin.
  *
  * @return bool, whether it's enable or not.

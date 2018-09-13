@@ -18,6 +18,46 @@ define( 'WPGH_HARD_BOUNCE', 5 );
 define( 'WPGH_SPAM', 6 );
 
 /**
+ * Check if GDPR is enabled throughout the plugin.
+ *
+ * @return bool, whether it's enable or not.
+ */
+function wpgh_is_gdpr()
+{
+    $is_gdpr =  get_option( 'gh_enable_gdpr', array() );
+
+    if ( ! is_array( $is_gdpr ) )
+        return false;
+
+    return in_array( 'on', $is_gdpr );
+}
+
+/**
+ * check if the GDPR strict option is enabled
+ *
+ * @return bool
+ */
+function wpgh_is_gdpr_strict()
+{
+    $is_gdpr_strict =  get_option( 'gh_strict_gdpr', array() );
+
+    if ( ! is_array( $is_gdpr_strict ) )
+        return false;
+
+    return in_array( 'on', $is_gdpr_strict );
+}
+
+function wpgh_is_confirmation_strict()
+{
+    $is_confirmation_strict =  get_option( 'gh_strict_confirmation', array() );
+
+    if ( ! is_array( $is_confirmation_strict ) )
+        return false;
+
+    return in_array( 'on', $is_confirmation_strict );
+}
+
+/**
  * Get the text explanation for the optin status of a contact
  * 0 = unconfirmed, can send email
  * 1 = confirmed, can send email
@@ -35,7 +75,9 @@ function wpgh_get_optin_status_text( $id_or_email )
     if ( ! $contact->get_email() )
         return __( 'No Contact' );
 
-    if ( wpgh_is_gdpr() && in_array( 'on', get_option( 'gh_strict_gdpr', array() ) ) )
+    get_option( 'gh_strict_gdpr', array( 'no' ) );
+
+    if ( wpgh_is_gdpr() && wpgh_is_gdpr_strict() )
     {
         $consent = wpgh_get_contact_meta( $contact->ID, 'gdpr_consent', true );
 
@@ -47,7 +89,7 @@ function wpgh_get_optin_status_text( $id_or_email )
 
 		case WPGH_UNCONFIRMED:
 
-            if ( in_array( 'on', get_option( 'gh_strict_confirmation', array() ) ) )
+            if ( wpgh_is_confirmation_strict() )
             {
                 $grace = intval( get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
                 $time_passed = time() - wpgh_get_contact_meta( $contact->ID, 'last_optin', true );

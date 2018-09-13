@@ -433,6 +433,11 @@ function wpgh_save_email( $email_id )
     $status = ( isset( $_POST['status'] ) )? sanitize_text_field( trim( stripslashes( $_POST['status'] ) ) ): 'draft';
     wpgh_update_email( $email_id, 'email_status', $status );
 
+    if ( $status === 'draft' )
+    {
+        wpgh_add_notice( 'email-in-draft-mode', __( 'This email will not be sent while in DRAFT mode.', 'groundhogg' ), 'info' );
+    }
+
     $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
     wpgh_update_email( $email_id, 'from_user', $from_user );
 
