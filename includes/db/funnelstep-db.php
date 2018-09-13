@@ -343,7 +343,7 @@ function wpgh_integrate_funnelsteps_wpdb()
 }
 
 define( 'WPGH_FUNNELSTEPS', 'funnelsteps' );
-define( 'WPGH_FUNNELSTEPS_DB_VERSION', '0.1' );
+define( 'WPGH_FUNNELSTEPS_DB_VERSION', '0.2' );
 
 /**
  * Create the funnelsteps database table.
@@ -361,8 +361,8 @@ function wpgh_create_funnelsteps_db()
         return;
 
     $sql = "CREATE TABLE $table_name (
-      ID bigint(20) NOT NULL AUTO_INCREMENT,
-      funnel_id bigint(20) NOT NULL,
+      ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      funnel_id bigint(20) unsigned NOT NULL,
       funnelstep_title text NOT NULL,
       funnelstep_status varchar(20) NOT NULL,
       funnelstep_group varchar(20) NOT NULL,

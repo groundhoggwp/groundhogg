@@ -251,7 +251,7 @@ function wpgh_integrate_emails_wpdb()
 }
 
 define( 'WPGH_EMAILS', 'emails' );
-define( 'WPGH_EMAILS_DB_VERSION', '0.3' );
+define( 'WPGH_EMAILS_DB_VERSION', '0.4' );
 
 /**
  * Create the emails database table.
@@ -269,12 +269,12 @@ function wpgh_create_emails_db()
 		return;
 
 	$sql = "CREATE TABLE $table_name (
-      ID bigint(20) NOT NULL AUTO_INCREMENT,
+      ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
       content longtext NOT NULL,
       subject text NOT NULL,
       pre_header text NOT NULL,
-      from_user bigint(20) NOT NULL,
-      author bigint(20) NOT NULL,   
+      from_user bigint(20) unsigned NOT NULL,
+      author bigint(20) unsigned NOT NULL,   
       last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       email_status VARCHAR(20) NOT NULL,
@@ -288,7 +288,7 @@ function wpgh_create_emails_db()
 }
 
 define( 'WPGH_EMAIL_META', 'emailmeta' );
-define( 'WPGH_EMAIL_META_DB_VERSION', '0.2' );
+define( 'WPGH_EMAIL_META_DB_VERSION', '0.3' );
 
 function wpgh_create_email_meta_db()
 {

@@ -97,7 +97,7 @@ function wpgh_activity_exists( $contact, $funnel, $step, $activity, $subject )
 }
 
 define( 'WPGH_ACTIVITY', 'activity_log' );
-define( 'WPGH_ACTIVITY_DB_VERSION', '0.2' );
+define( 'WPGH_ACTIVITY_DB_VERSION', '0.6' );
 
 /**
  * Create the activity database table.
@@ -105,7 +105,6 @@ define( 'WPGH_ACTIVITY_DB_VERSION', '0.2' );
  */
 function wpgh_create_activity_db()
 {
-
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
@@ -116,14 +115,14 @@ function wpgh_create_activity_db()
         return;
 
     $sql = "CREATE TABLE $table_name (
-      timestamp bigint(20) NOT NULL,
-      contact_id bigint(20) NOT NULL,
-      funnel_id bigint(20) NOT NULL,
-      step_id bigint(20) NOT NULL,
+	  ID bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      timestamp bigint(20) unsigned NOT NULL,
+      contact_id bigint(20) unsigned NOT NULL,
+      funnel_id bigint(20) unsigned NOT NULL,
+      step_id bigint(20) unsigned NOT NULL,
       activity_type VARCHAR(20) NOT NULL,
-      object_id bigint(20) NOT NULL,
+      object_id bigint(20) unsigned NOT NULL,
       referer text NOT NULL,
-      PRIMARY KEY  (timestamp,contact_id,activity_type),
       KEY timestamp (timestamp),
       KEY contact_id (contact_id),
       KEY funnel_id (funnel_id),
