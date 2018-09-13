@@ -51,9 +51,12 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
     if ( ! is_email( $contact->get_email() ) )
         return false;
 
+    /* bypass if testing. */
+    if ( ! isset( $_POST[ 'send_test' ]  ) ){
+        if ( ! wpgh_can_send_email( $contact->get_id() ) )
+            return false;
+    }
     /* don't send email depending on their optin status */
-    if ( ! wpgh_can_send_email( $contact->get_id() ) )
-        return false;
 
     $email = wpgh_get_email_by_id( $email_id );
 
