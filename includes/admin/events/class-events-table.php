@@ -61,9 +61,9 @@ class WPGH_Events_Table extends WP_List_Table {
      */
     protected function get_sortable_columns() {
         $sortable_columns = array(
-            'contact' => array( 'contact', false ),
-            'funnel' => array( 'funnel', false ),
-            'step' => array( 'step', false ),
+            'contact' => array( 'contact_id', false ),
+            'funnel' => array( 'funnel_id', false ),
+            'step' => array( 'step_id', false ),
             'time' => array( 'time', false ),
         );
         return apply_filters( 'wpgh_event_sortable_columns', $sortable_columns );
@@ -203,7 +203,7 @@ class WPGH_Events_Table extends WP_List_Table {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $this->event_parts( $item )             // The value of the checkbox should be the record's ID.
+            $item[ 'ID' ]            // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -273,7 +273,7 @@ class WPGH_Events_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $sql = "SELECT e.*,c.* FROM " . $wpdb->prefix . WPGH_EVENTS . " e LEFT JOIN " . $wpdb->prefix . WPGH_CONTACTS . " c ON e.contact_id = c.ID";
+        $sql = "SELECT e.*,c.email FROM " . $wpdb->prefix . WPGH_EVENTS . " e LEFT JOIN " . $wpdb->prefix . WPGH_CONTACTS . " c ON e.contact_id = c.ID";
 
         switch ( $this->get_view() )
         {
@@ -384,14 +384,14 @@ class WPGH_Events_Table extends WP_List_Table {
             $actions['execute'] = sprintf(
                 '<a href="%s" class="edit" aria-label="%s">%s</a>',
                 /* translators: %s: title */
-                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $this->event_parts( $item ) . '&action=execute' ) ) ),
+                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $item[ 'ID' ] . '&action=execute' ) ) ),
                 esc_attr( __( 'Execute' ) ),
                 __( 'Run Now' )
             );
 
             $actions['delete'] = sprintf(
                 '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-                esc_url( wp_nonce_url(admin_url('admin.php?page=gh_events&event='. $this->event_parts( $item ) .'&action=cancel') ) ),
+                esc_url( wp_nonce_url(admin_url('admin.php?page=gh_events&event='. $item[ 'ID' ] .'&action=cancel') ) ),
                 /* translators: %s: title */
                 esc_attr( __( 'Cancel' ) ),
                 __( 'Cancel' )
@@ -401,7 +401,7 @@ class WPGH_Events_Table extends WP_List_Table {
             $actions['re_execute'] = sprintf(
                 '<a href="%s" class="edit" aria-label="%s">%s</a>',
                 /* translators: %s: title */
-                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $this->event_parts( $item ) . '&action=execute' ) ) ),
+                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $item[ 'ID' ] . '&action=execute' ) ) ),
                 esc_attr( __( 'Re-execute' ) ),
                 __( 'Run Again' )
             );

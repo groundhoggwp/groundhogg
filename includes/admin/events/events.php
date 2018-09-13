@@ -34,7 +34,7 @@ class WPGH_Events_Page
         if ( ! $events )
             return false;
 
-        return is_array( $events )? $events : array( $events );
+        return is_array( $events )? array_map( 'intval', $events ): array( intval ( $events ) );
     }
 
     function get_action()
@@ -87,9 +87,7 @@ class WPGH_Events_Page
         {
             case 'cancel':
 
-                foreach ( $this->get_events() as $parts ){
-
-                    $parts = array_map( 'intval', explode( '-', $parts ) );
+                foreach ( $this->get_events() as $eid ){
 
                     $wpdb->update(
                         $wpdb->prefix . WPGH_EVENTS,
@@ -97,16 +95,10 @@ class WPGH_Events_Page
                             'status' => 'cancelled'
                         ),
                         array(
-                            'time'          => $parts[0],
-                            'contact_id'    => $parts[1],
-                            'step_id'       => $parts[2],
-                            'funnel_id'     => $parts[3],
+                            'ID'          => $eid,
                         ),
                         array( '%s' ),
                         array(
-                            '%d',
-                            '%d',
-                            '%d',
                             '%d',
                         )
                     );
@@ -120,9 +112,8 @@ class WPGH_Events_Page
 
             case 'execute':
 
-                foreach ( $this->get_events() as $parts )
+                foreach ( $this->get_events() as $eid )
                 {
-                    $parts = array_map( 'intval', explode( '-', $parts ) );
 
                     $wpdb->update(
                         $wpdb->prefix . WPGH_EVENTS,
@@ -131,19 +122,10 @@ class WPGH_Events_Page
                             'time'   => time()
                         ),
                         array(
-                            'time'          => $parts[0],
-                            'contact_id'    => $parts[1],
-                            'step_id'       => $parts[2],
-                            'funnel_id'     => $parts[3],
+                            'ID'          => $eid,
                         ),
+                        array( '%s' ),
                         array(
-                            '%s',
-                            '%d'
-                        ),
-                        array(
-                            '%d',
-                            '%d',
-                            '%d',
                             '%d',
                         )
                     );
