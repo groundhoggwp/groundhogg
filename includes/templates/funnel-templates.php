@@ -43,6 +43,13 @@ $funnel_templates[ 'feedback_request' ][ 'description' ] = 'Looking to generate 
 $funnel_templates[ 'feedback_request' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'feedback_request' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/feedback-request.funnel';
 
+/* Feedback Request */
+
+$funnel_templates[ 'lead_magnet' ][ 'title' ] = 'Lead Magnet Download';
+$funnel_templates[ 'lead_magnet' ][ 'description' ] = 'Giving away a lead magnet? Make it irresistible.';
+$funnel_templates[ 'lead_magnet' ][ 'src' ] = 'https://via.placeholder.com/350x250';
+$funnel_templates[ 'lead_magnet' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/lead-magnet-download.funnel';
+
 /* Start from scratch */
 
 $funnel_templates[ 'scratch' ][ 'title' ] = 'Start From Scratch';

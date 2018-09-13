@@ -125,8 +125,9 @@ add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
 
 function remove_footer_admin ( $text ) {
 
-    $gh = sprintf( __( 'Find a bug in Groundhogg? <a href="%s">Report It</a>!' ), __( 'https://www.facebook.com/groups/274900800010203/' ) );
-
+    $gh = sprintf( __( 'Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!' ), __( 'https://www.facebook.com/groups/274900800010203/' ) );
+    $text = sprintf( __( 'Thank you for creating with <a href="%s">WordPress</a>.' ), __( 'https://wordpress.org/' ) );
+    
     return '<span id="footer-thankyou">' . $text . ' | ' . $gh . '</span>';
 
 }
