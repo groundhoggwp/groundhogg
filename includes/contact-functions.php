@@ -23,21 +23,38 @@ define( 'WPGH_SPAM', 6 );
  * 1 = confirmed, can send email
  * 2 = opted out, can't send email
  *
- * @param int $status OptIn Status Int of a contact
+ * @param $id_or_email int|string the contact in question
  *
  * @return bool|string
  */
-function wpgh_get_optin_status_text( $status )
+function wpgh_get_optin_status_text( $id_or_email )
 {
 
-	if ( ! is_numeric( $status ) )
-		return false;
+    $contact = new WPGH_Contact( $id_or_email );
 
-	$status = absint( $status );
+    if ( ! $contact->get_email() )
+        return __( 'No Contact' );
 
-	switch ( $status ){
+    if ( wpgh_is_gdpr() && in_array( 'on', get_option( 'gh_strict_gdpr', array() ) ) )
+    {
+        $consent = wpgh_get_contact_meta( $contact->ID, 'gdpr_consent', true );
+
+        if ( $consent !== 'yes' )
+            return __( 'This contact has not agreed to receive email marketing from you.', 'groundhogg' );
+    }
+
+	switch ( $contact->get_optin_status() ){
 
 		case WPGH_UNCONFIRMED:
+
+            if ( in_array( 'on', get_option( 'gh_strict_confirmation', array() ) ) )
+            {
+                $grace = intval( get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
+                $time_passed = time() - wpgh_get_contact_meta( $contact->ID, 'last_optin', true );
+                if ( $time_passed > $grace )
+                    return __( 'Unconfirmed. This contact will not receive emails, they are passed the email confirmation grace period.', 'groundhogg' );
+            }
+
 			return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
 			break;
 		case WPGH_CONFIRMED:
@@ -98,7 +115,7 @@ function wpgh_can_send_email( $contact_id )
             if ( in_array( 'on', get_option( 'gh_strict_confirmation', array() ) ) )
             {
                 $grace = intval( get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
-                $time_passed = time() - strtotime( $contact->date_created );
+                $time_passed = time() - wpgh_get_contact_meta( $contact_id, 'last_optin', true );
                 if ( $time_passed > $grace )
                     return false;
             }

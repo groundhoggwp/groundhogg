@@ -226,6 +226,9 @@ function wpgh_form_submit_listener()
         do_action( 'wpgh_gdpr_consented', $contact->get_id() );
     }
 
+    /* set the last optin date */
+    wpgh_update_contact_meta( $id, 'last_optin', time() );
+
     $step = intval( $_POST[ 'step_id' ] );
 
     /* make sure the funnel for the step is active*/

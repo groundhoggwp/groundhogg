@@ -149,10 +149,19 @@ class WPGH_Emails_Table extends WP_List_Table {
 
     protected function column_from_user( $item )
     {
-        $user = get_userdata( intval( ( $item['from_user'] ) ) );
-        $from_user = esc_html( $user->display_name . ' <' . $user->user_email . '>' );
-        $queryUrl = admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=' . $item['from_user'] );
-        return "<a href='$queryUrl'>$from_user</a>";
+        $from = intval( ( $item['from_user'] ) );
+
+        if ( $from ){
+            $user = get_userdata( $from );
+            $from_user = esc_html( $user->display_name . ' <' . $user->user_email . '>' );
+            $queryUrl = admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=' . $from );
+            return "<a href='$queryUrl'>$from_user</a>";
+        } else {
+            return sprintf("<a href='%s'>%s</a>",
+                admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=0' ),
+                __( 'The Contact\'s Owner', 'groundhogg' )
+            );
+        }
     }
 
     protected function column_author( $item )

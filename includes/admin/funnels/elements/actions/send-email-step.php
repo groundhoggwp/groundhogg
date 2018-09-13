@@ -35,9 +35,7 @@ function wpgh_send_email_funnel_step_html( $step_id )
     $return_funnel = wpgh_get_step_funnel( $step_id );
 
     $editPath = admin_url( 'admin.php?page=gh_emails&action=edit&return_funnel=' . $return_funnel . '&return_step=' . $step_id . '&email=' );
-
     ?>
-
     <table class="form-table">
         <tbody>
             <tr>
@@ -66,12 +64,21 @@ add_action( 'wpgh_get_step_settings_send_email', 'wpgh_send_email_funnel_step_ht
 function wpgh_save_send_email_step( $step_id )
 {
     //no need to check the validation as it's already been done buy the main funnel.
-    $email_id = intval( $_POST[ wpgh_prefix_step_meta( $step_id, 'email_id' ) ] );
-    wpgh_update_step_meta( $step_id, 'email_id', $email_id );
+    if ( isset( $_POST[ wpgh_prefix_step_meta( $step_id, 'email_id' ) ] ) ){
+        $email_id = intval( $_POST[ wpgh_prefix_step_meta( $step_id, 'email_id' ) ] );
+        wpgh_update_step_meta( $step_id, 'email_id', $email_id );
+
+        $email = wpgh_get_email_by_id( $email_id );
+
+        $funnel = wpgh_get_step_funnel( $step_id );
+
+        if ( $email && $email->email_status == 'draft' && wpgh_get_funnel_status( $funnel ) === 'active' ){
+            wpgh_add_notice( 'email-draft-mode', __( 'Some steps are sending emails which are still in DRAFT mode. Please ensure all emails are marked as READY.' ), 'info' );
+        }
+    }
 }
 
 add_action( 'wpgh_save_step_send_email', 'wpgh_save_send_email_step' );
-
 
 function wpgh_send_email_reporting( $step_id, $start, $end )
 {

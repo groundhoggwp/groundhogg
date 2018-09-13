@@ -100,7 +100,7 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
     $email_content = preg_replace_callback( '/(href=")([^"]*)(")/i', 'wpgh_urlencode_email_links' , $email_content );
     $email_content = preg_replace( '/(href=")([^"]*)(")/i', '${1}' . $ref_link . '${2}${3}' , $email_content );
 
-    if ( $email->from_user ){
+    if ( intval( $email->from_user ) ){
         $from_user = get_userdata( $email->from_user );
         $from_name = $from_user->display_name;
         $from_email = $from_user->user_email;

@@ -55,7 +55,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <tr>
             <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
             <td><?php echo wpgh_admin_email_input_field( 'email', 'email', $contact->get_email() );?><label>
-                <p class="submit"><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpgh_get_optin_status_text( $contact->get_optin_status() ); ?></p>
+                <p class="submit"><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpgh_get_optin_status_text( $contact->ID ); ?></p>
                 <?php if ( $contact->get_optin_status() !== WPGH_UNSUBSCRIBED ): ?>
                     <input type="checkbox" name="unsubscribe" value="1"><?php _e( 'Mark as unsubscribed.' )?></label>
                 <?php endif; ?>
