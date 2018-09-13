@@ -314,7 +314,7 @@ $email = wpgh_get_email_by_id( $email_id );
                                     </tr>
                                     <tr>
                                         <th><?php _e( 'From User:' ); ?></th>
-                                        <?php $args = array( 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user); ?>
+                                        <?php $args = array( 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user, 'role' => 'administrator' ); ?>
                                         <td><?php wp_dropdown_users( $args ); ?><script>jQuery(document).ready(function(){jQuery( '#from_user' ).select2()});</script></td>
                                     </tr>
                                     <tr>
@@ -323,7 +323,7 @@ $email = wpgh_get_email_by_id( $email_id );
                                     </tr>
                                     <tr id="send-to" class="hidden">
                                         <th><?php _e( 'To:' ); ?></th>
-                                        <?php $args = array( 'id' => 'test_email', 'name' => 'test_email', 'selected' => wpgh_get_email_meta( $email_id, 'test_email', true ) ); ?>
+                                        <?php $args = array( 'id' => 'test_email', 'name' => 'test_email', 'selected' => wpgh_get_email_meta( $email_id, 'test_email', true ), 'role' => 'administrator' ); ?>
                                         <td><?php wp_dropdown_users( $args ); ?><script>jQuery(document).ready(function(){jQuery( '#test_email' ).select2()});</script></td>
                                     </tr>
                                     <script>
