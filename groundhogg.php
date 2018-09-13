@@ -123,4 +123,14 @@ function wpgh_register_scripts()
 
 add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
 
+function remove_footer_admin ( $text ) {
+
+    $gh = sprintf( __( 'Find a bug in Groundhogg? <a href="%s">Report It</a>!' ), __( 'https://www.facebook.com/groups/274900800010203/' ) );
+
+    return '<span id="footer-thankyou">' . $text . ' | ' . $gh . '</span>';
+
+}
+
+add_filter('admin_footer_text', 'remove_footer_admin');
+
 do_action( 'groundhogg_loaded' );
