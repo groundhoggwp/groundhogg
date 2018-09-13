@@ -13,9 +13,7 @@
 
 function wpgh_apply_note_funnel_step_html( $step_id )
 {
-
     //todo finish function
-
     $note = wpgh_get_step_meta( $step_id, 'note_text', true );
 
     if ( ! $note )

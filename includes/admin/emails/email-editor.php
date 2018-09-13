@@ -314,7 +314,7 @@ $email = wpgh_get_email_by_id( $email_id );
                                     </tr>
                                     <tr>
                                         <th><?php _e( 'From User:' ); ?></th>
-                                        <?php $args = array( 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user, 'role' => 'administrator' ); ?>
+                                        <?php $args = array( 'show_option_none' => __( 'The Contact\'s Owner' ), 'option_none_value' =>  0 , 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user, 'role' => 'administrator' ); ?>
                                         <td><?php wp_dropdown_users( $args ); ?><script>jQuery(document).ready(function(){jQuery( '#from_user' ).select2()});</script></td>
                                     </tr>
                                     <tr>

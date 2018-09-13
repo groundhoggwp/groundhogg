@@ -76,26 +76,18 @@ function wpgh_do_queued_events()
         $arg3       = maybe_unserialize( $event_args['arg3'] );
 
         if ( $funnel_id === WPGH_BROADCAST ){
-
             do_action( 'wpgh_do_action_broadcast', $step_id, $contact_id );
-
         } else {
-
             $step_type = wpgh_get_step_type( $step_id );
-
             do_action( 'wpgh_do_action_' . $step_type, $step_id, $contact_id );
-
             /* run the next step only if the funnel is active. */
             if ( wpgh_is_funnel_active( $funnel_id ) ){
                 $next_step_id = wpgh_enqueue_next_funnel_action( $step_id, $contact_id );
                 do_action( 'wpgh_step_queued', $next_step_id );
             }
         }
-
         if ( $callback )
             call_user_func( $callback, $contact_id, $arg1, $arg2, $arg3 );
-
-
     }
 
     /* schedule the next cron run in 11 minutes... its 11 so that it doesnt get caught by the 10 minute minimum.

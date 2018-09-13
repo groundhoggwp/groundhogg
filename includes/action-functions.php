@@ -29,6 +29,8 @@ function wpgh_get_funnel_actions()
     $actions['date_timer']  = array( 'title' => __( 'Date Timer', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/date-timer.png' );
     $actions['delay_timer'] = array( 'title' => __( 'Delay Timer', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/delay-timer.png' );
     $actions['create_user'] = array( 'title' => __( 'Create User', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/create-account.png' );
+    $actions['edit_meta']   = array( 'title' => __( 'Edit Meta', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/edit-contact.png' );
+    $actions['apply_owner']   = array( 'title' => __( 'Set Owner', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/edit-contact.png' );
 
     return apply_filters( 'wpgh_funnel_actions', $actions );
 }
@@ -108,6 +110,8 @@ add_action( 'wpgh_enqueue_next_funnel_action_send_email', 'wpgh_enqueue_immediat
 add_action( 'wpgh_enqueue_next_funnel_action_apply_tag', 'wpgh_enqueue_immediate_action', 10, 2 );
 add_action( 'wpgh_enqueue_next_funnel_action_remove_tag', 'wpgh_enqueue_immediate_action', 10, 2 );
 add_action( 'wpgh_enqueue_next_funnel_action_create_user', 'wpgh_enqueue_immediate_action', 10, 2 );
+add_action( 'wpgh_enqueue_next_funnel_action_edit_meta', 'wpgh_enqueue_immediate_action', 10, 2 );
+add_action( 'wpgh_enqueue_next_funnel_action_apply_owner', 'wpgh_enqueue_immediate_action', 10, 2 );
 
 /**
  * Applies a note to the contact from a funnel step.
@@ -156,3 +160,44 @@ function wpgh_send_admin_notification( $step_id, $contact_id )
 }
 
 add_action( 'wpgh_do_action_notification', 'wpgh_send_admin_notification', 10, 2 );
+
+/**
+ * Update the contact with the new meta keys and values.
+ *
+ * @param $step_id
+ * @param $contact_id
+ */
+function wpgh_edit_meta_step_action( $step_id, $contact_id )
+{
+    $meta_keys = wpgh_get_step_meta( $step_id, 'meta_keys', true );
+    $meta_values = wpgh_get_step_meta( $step_id, 'meta_values', true );
+
+    if ( ! is_array( $meta_keys ) || ! is_array( $meta_values ) || empty( $meta_keys ) || empty( $meta_values ) ){
+        return;
+    }
+
+    foreach ( $meta_keys as $i => $meta_key ){
+        wpgh_update_contact_meta( $contact_id, sanitize_key( $meta_key ), sanitize_text_field( wpgh_do_replacements( $contact_id, $meta_values[ $i ] ) ) );
+    }
+}
+
+add_action( 'wpgh_do_action_edit_meta', 'wpgh_edit_meta_step_action', 10, 2 );
+
+/**
+ * Apply the given owner to the contact
+ *
+ * @param $step_id
+ * @param $contact_id
+ */
+function wpgh_apply_owner_action( $step_id, $contact_id )
+{
+    $owner = wpgh_get_step_meta( $step_id, 'owner_id', true );
+
+    $owner = intval( $owner );
+
+    if ( $owner ){
+        wpgh_update_contact( $contact_id, 'owner_id', $owner );
+    }
+}
+
+add_action( 'wpgh_do_action_apply_owner', 'wpgh_apply_owner_action', 10, 2 );

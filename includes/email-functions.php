@@ -100,14 +100,31 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
     $email_content = preg_replace_callback( '/(href=")([^"]*)(")/i', 'wpgh_urlencode_email_links' , $email_content );
     $email_content = preg_replace( '/(href=")([^"]*)(")/i', '${1}' . $ref_link . '${2}${3}' , $email_content );
 
-    $from_user = get_userdata( $email->from_user );
+    if ( $email->from_user ){
+        $from_user = get_userdata( $email->from_user );
+        $from_name = $from_user->display_name;
+        $from_email = $from_user->user_email;
+
+    } else {
+        $owner = $contact->get_owner();
+        if ( $owner ) {
+            $from_user = get_userdata( $owner );
+            $from_name = $from_user->display_name;
+            $from_email = $from_user->user_email;
+        } else {
+            $from_name = get_bloginfo( 'name' );
+            $from_email = get_bloginfo( 'admin_email' );
+        }
+
+    }
+
 
     /* use groundhogg API mail service */
     if ( get_option( 'gh_mail_server', false ) === 'groundhogg' ){
 
         $body = array(
-            'from_name' => $from_user->display_name,
-            'from_email' => $from_user->user_email,
+            'from_name' => $from_name,
+            'from_email' => $from_email,
             'to'   => $contact->get_email(),
             'subject_line' => $subject_line,
             'content' => $email_content
@@ -122,8 +139,8 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
     } else {
         /* Use default mail-server */
         $headers = array();
-        $headers[ 'from' ] = 'From: ' . $from_user->display_name . ' <' . $from_user->user_email . '>';
-        $headers[ 'reply_to' ] = 'Reply-To: ' . $from_user->user_email;
+        $headers[ 'from' ] = 'From: ' . $from_name . ' <' . $from_email . '>';
+        $headers[ 'reply_to' ] = 'Reply-To: ' . $from_email;
         $headers[ 'content_type' ] = 'Content-Type: text/html; charset=UTF-8';
 
         $headers = apply_filters( 'wpgh_email_headers', $headers );
