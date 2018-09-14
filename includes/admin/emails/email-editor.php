@@ -242,6 +242,10 @@ $email = wpgh_get_email_by_id( $email_id );
                                                         </select>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <th><?php _e( 'Enable Browser View'); ?></th>
+                                                    <td><input type="checkbox" name="browser_view" value="1" <?php if ( wpgh_get_email_meta( $email_id, 'browser_view', true ) == 1 ) echo 'checked' ; ?>></td>
+                                                </tr>
                                             </table>
                                         </div>
                                     </div>

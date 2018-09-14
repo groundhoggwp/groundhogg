@@ -82,6 +82,8 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
         $step_id
     ) );
 
+    $browser_link = site_url( sprintf( "gh-email/%d/", $email_id ) );
+
     $title = get_option( 'gh_business_name' );
     $subject_line = wpgh_do_replacements( $contact->get_id(), $email->subject );
     $pre_header = wpgh_do_replacements( $contact->get_id(), $email->pre_header );
@@ -89,6 +91,7 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
     $email_footer_text = wpgh_get_email_footer_text();
     $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
     $alignment = wpgh_get_email_meta( $email_id, 'alignment', true );
+    $browser_view = intval( wpgh_get_email_meta( $email_id, 'browser_view', true ) );
     $margins = ( $alignment === 'left'  )? "margin-left:0;margin-right:auto;" : "margin-left:auto;margin-right:auto;";
 
     ob_start();
@@ -453,6 +456,9 @@ function wpgh_save_email( $email_id )
     $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
     wpgh_update_email_meta( $email_id, 'alignment', $alignment );
 
+	$browser_view =  ( isset( $_POST['browser_view'] ) )? 1 : false;
+	wpgh_update_email_meta( $email_id, 'browser_view', $browser_view );
+
     $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpgh_sanitize_email_content', wpgh_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
 //        $content =  ( isset( $_POST['content'] ) )? wp_kses( stripslashes( $_POST['content'] ), wpgh_emails_allowed_html() ): '';
     wpgh_update_email( $email_id, 'content', $content );
@@ -734,3 +740,48 @@ function wpgh_process_email_open()
 }
 
 add_action( 'init', 'wpgh_process_email_open' );
+
+/**
+ * Ouput the contents of an email if clicking the view in browser link.
+ */
+function wpgh_view_email_in_browser()
+{
+	if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-email/' ) === false )
+		return;
+
+	$parts = explode( '/', $_SERVER[ 'REQUEST_URI' ] );
+
+	/* /gh-email/email-id/ */
+	/*      0        1     */
+
+	$offset = 1;
+
+	if ( $parts[ 1 ] !== 'gh-email' )
+		$offset++;
+
+	$email_id = intval( $parts[ $offset + 1 ] );
+
+	$contact = wpgh_get_the_contact();
+
+	if ( ! $contact || ! $contact->email )
+	{
+		wp_die( 'no contact' );
+		return;
+	}
+
+	$email = wpgh_get_email_by_id( $email_id );
+
+	if ( ! $email )
+	{
+		wp_die( 'no email' );
+		return;
+	}
+
+	$email_content = wpgh_do_replacements( $contact->ID, $email->content );
+	$email_subject = wpgh_do_replacements( $contact->ID, $email->subject );
+
+	wp_die( $email_content, $email_subject );
+}
+
+add_action( 'template_redirect', 'wpgh_view_email_in_browser' );
+

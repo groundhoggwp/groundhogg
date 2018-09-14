@@ -22,6 +22,11 @@
                 <!-- START PREHEADER -->
                 <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;"><?php echo $pre_header; ?></span>
                 <!-- END PREHEADER -->
+                <?php if ( $browser_view ): ?>
+                    <div class="header" style="text-align: center;margin-bottom: 25px;">
+                        <span class="apple-link" style="color: #999999; font-size: 13px; text-align: center;"><a href="<?php echo $browser_link; ?>"><?php _e( 'View In Browser', 'groundhogg' ); ?></a></span>
+                    </div>
+                <?php endif; ?>
                 <!-- START CONTENT -->
                 <?php echo $content; ?>
                 <!-- END CONTENT -->
