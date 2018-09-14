@@ -354,7 +354,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                         }
                         $email = wpgh_get_email_by_id( intval( $email_id ) );
                         echo sprintf(  "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email_id ), $email->subject ); ?></td>
-                    <td><?php if ( $activity = wpgh_get_activity( $contact->get_id(), $email_event->funnel_id, $email_event->step_id, 'email_opened', $email_id ) ):
+                    <td><?php if ( $activity = wpgh_get_activity( $contact->get_id(), $funnel_id, $email_event->step_id, 'email_opened', $email_id ) ):
                             $p_time = intval( $activity->timestamp ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
                             $cur_time = (int) current_time( 'timestamp' );
                             $time_diff = $p_time - $cur_time;

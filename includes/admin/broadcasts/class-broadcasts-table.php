@@ -68,7 +68,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 		$sortable_columns = array(
 			'email_id'    => array( 'email_id', false ),
 			'from_user' => array( 'from_user', false ),
-			'send_at' => array( 'sent_at', false ),
+			'send_at' => array( 'send_at', false ),
 			'date_created' => array( 'date_created', false )
 		);
 		return apply_filters( 'wpgh_broadcast_sortable_columns', $sortable_columns );

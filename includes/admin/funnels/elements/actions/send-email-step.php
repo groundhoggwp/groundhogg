@@ -91,7 +91,7 @@ function wpgh_send_email_reporting( $step_id, $start, $end )
     $table = $wpdb->prefix . WPGH_ACTIVITY;
 
     $opens = $wpdb->get_var( $wpdb->prepare(
-        "SELECT count(*) FROM $table
+        "SELECT count(contact_id) FROM $table
         WHERE funnel_id = %d AND step_id = %d AND object_id = %d AND %d <= timestamp AND timestamp <= %d AND activity_type = %s",
         $funnel, $step_id, $email, $start, $end, 'email_opened'
     ) );
@@ -107,12 +107,24 @@ function wpgh_send_email_reporting( $step_id, $start, $end )
     <p class="report">
         <span class="opens"><?php _e( 'Opens: '); ?>
             <strong>
-                <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $funnel, $step_id, 'email_opened', $start, $end ) );?>" target="_blank"><?php echo $opens; ?></a>
+                <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s',
+                    $funnel,
+                    $step_id,
+                    'email_opened',
+                    $start,
+                    $end )
+                );?>" target="_blank"><?php echo $opens; ?></a>
             </strong>
         </span> |
         <span class="clicks"><?php _e( 'Clicks: ' ); ?>
             <strong>
-                <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $funnel, $step_id, 'email_link_click', $start, $end ) );?>" target="_blank"><?php echo $clicks; ?></a>
+                <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s',
+                    $funnel,
+                    $step_id,
+                    'email_link_click',
+                    $start,
+                    $end )
+                );?>" target="_blank"><?php echo $clicks; ?></a>
             </strong>
         </span> |
         <span class="ctr"><?php _e( 'CTR: '); ?><strong><?php echo round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ); ?></strong>%</span>
