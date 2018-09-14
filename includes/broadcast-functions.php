@@ -131,7 +131,7 @@ function wpgh_get_broadcast_clicks( $broadcast_id )
     $table = $wpdb->prefix . WPGH_ACTIVITY;
 
     $opens = $wpdb->get_var( $wpdb->prepare(
-        "SELECT count(*) FROM $table
+        "SELECT COUNT(DISTINCT contact_id) FROM $table
         WHERE funnel_id = %d AND step_id = %d AND activity_type = %s",
         WPGH_BROADCAST, $broadcast_id, 'email_link_click'
     ) );

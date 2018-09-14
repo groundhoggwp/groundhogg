@@ -168,11 +168,11 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 
         $tags = isset( $item[ 'send_to_tags' ] )? wpgh_validate_tags( maybe_unserialize( $item['send_to_tags'] ) ): array();
 
-        $contact_sum = 0;
-        foreach ( $tags as $tag ){
-            $tag = wpgh_get_tag( $tag );
-            $contact_sum += wpgh_count_contact_tag_relationships( 'tag_id', intval( $tag[ 'tag_id' ] ) );
-        }
+        global $wpdb;
+
+        $table = $wpdb-> prefix . WPGH_EVENTS;
+
+        $contact_sum = $wpdb->get_var( $wpdb->prepare( "SELECT count(*) FROM $table WHERE funnel_id = %d AND step_id = %d", WPGH_BROADCAST, intval( $item['ID'] ) ) );
 
         $html = sprintf( "%s: <strong>%d</strong><br/>",
             __( "Sent" ),
