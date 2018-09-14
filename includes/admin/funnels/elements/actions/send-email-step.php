@@ -97,7 +97,7 @@ function wpgh_send_email_reporting( $step_id, $start, $end )
     ) );
 
     $clicks = $wpdb->get_var( $wpdb->prepare(
-        "SELECT count(*) FROM $table
+        "SELECT COUNT(DISTINCT contact_id) FROM $table
         WHERE funnel_id = %d AND step_id = %d AND object_id = %d AND %d <= timestamp AND timestamp <= %d AND activity_type = %s",
         $funnel, $step_id, $email, $start, $end, 'email_link_click'
     ) );
