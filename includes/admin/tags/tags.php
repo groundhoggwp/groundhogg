@@ -70,35 +70,6 @@ class WPGH_Tags_Page
 		}
 	}
 
-	function get_notice()
-	{
-        if ( isset( $_REQUEST['ids'] ) )
-        {
-            $ids = explode( ',', urldecode( $_REQUEST['ids'] ) );
-            $count = count( $ids );
-        }
-
-		switch ( $this->get_previous_action() )
-		{
-			case 'add':
-
-				?><div class="notice notice-success is-dismissible"><p><?php _e( 'Tag Created!' ); ?></p></div><?php
-
-				break;
-			case 'delete':
-
-				?><div class="notice notice-success is-dismissible"><p><?php _e( $count .' tags deleted.' ); ?></p></div><?php
-
-				break;
-
-			case 'edit':
-				if ( isset( $_POST ) ){
-					?><div class="notice notice-success is-dismissible"><p><?php _e( 'Tag Updated.' ); ?></p></div><?php
-				}
-				break;
-		}
-	}
-
 	function process_action()
 	{
 		if ( ! $this->get_action() || ! $this->verify_action() )
@@ -113,6 +84,8 @@ class WPGH_Tags_Page
 				if ( isset( $_POST ) )
 				{
 					do_action( 'wpgh_add_tag' );
+
+					wpgh_add_notice( 'create', __( 'Tag Created' ) );
 				}
 
 				break;
@@ -123,6 +96,8 @@ class WPGH_Tags_Page
 					wpgh_delete_tag( $id );
 				}
 
+				wpgh_add_notice( 'seleted', sprintf( '%d %s', count( $this->get_tags() ), __( 'tags deleted' ) ) );
+
 				do_action( 'wpgh_delete_tags' );
 
 				break;
@@ -131,6 +106,8 @@ class WPGH_Tags_Page
 
 				if ( isset( $_POST ) ){
 					do_action( 'wpgh_update_tag', intval( $_GET[ 'tag' ] ) );
+
+					wpgh_add_notice( 'create', __( 'Tag updated' ) );
 				}
 
 				break;
@@ -241,7 +218,7 @@ class WPGH_Tags_Page
 		?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_tags' ); ?>"><?php _e( 'Add New' ); ?></a>
-			<?php $this->get_notice(); ?>
+			<?php wpgh_notices(); ?>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){
 				case 'edit':
