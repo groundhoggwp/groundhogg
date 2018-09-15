@@ -68,7 +68,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 		$sortable_columns = array(
 			'email_id'    => array( 'email_id', false ),
 			'from_user' => array( 'from_user', false ),
-			'send_at' => array( 'sent_at', false ),
+			'send_at' => array( 'send_at', false ),
 			'date_created' => array( 'date_created', false )
 		);
 		return apply_filters( 'wpgh_broadcast_sortable_columns', $sortable_columns );
@@ -165,15 +165,31 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $opens = wpgh_get_broadcast_opens( $item['ID'] );
         $clicks = wpgh_get_broadcast_clicks( $item['ID'] );
 
-        $html = sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
+
+        $tags = isset( $item[ 'send_to_tags' ] )? wpgh_validate_tags( maybe_unserialize( $item['send_to_tags'] ) ): array();
+
+        global $wpdb;
+
+        $table = $wpdb-> prefix . WPGH_EVENTS;
+
+        $contact_sum = $wpdb->get_var( $wpdb->prepare( "SELECT count(*) FROM $table WHERE funnel_id = %d AND step_id = %d", WPGH_BROADCAST, intval( $item['ID'] ) ) );
+
+        $html = sprintf( "%s: <strong>%d</strong><br/>",
+            __( "Sent" ),
+            $contact_sum
+        );
+
+        $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
             __( "Opens" ),
             admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $item['ID'], 'email_opened', 0, time() ) ),
             $opens
         );
+
         $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
             __( "Clicks" ),
             admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $item['ID'], 'email_link_click', 0, time() ) ),
             $clicks );
+
         $html.= sprintf( "%s: <strong>%d%%</strong><br/>", __( "CTR" ), round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) );
 
         return $html;

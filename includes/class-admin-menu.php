@@ -94,6 +94,8 @@ class WPGH_Admin_Menu
             array($this->contacts_page, 'page')
         );
 
+        add_action("load-" . $contacts_admin_add, array($this, 'contacts_help_bar'));
+
         $tags_admin_add = add_submenu_page(
             'groundhogg',
             'Tags',
@@ -248,6 +250,35 @@ class WPGH_Admin_Menu
             )
         );
 
+    }
+
+    function contacts_help_bar()
+    {
+        $screen = get_current_screen();
+
+        $screen->add_help_tab(
+            array(
+                'id' => 'gh_overview',
+                'title' => __('Overview'),
+                'content' => '<p>' . __( "This is where you can manage and view your contacts. Click the quick edit to quickly change contact details.", 'groundhogg' ) . '</p>'
+            )
+        );
+
+        $screen->add_help_tab(
+            array(
+                'id' => 'gh_edit',
+                'title' => __('Editing'),
+                'content' => '<p>' . __( "While editing a contact you can modify any of their personal information. There are several points of interest...", 'groundhogg' ) . '</p>'
+                . '<ul> '
+                    . '<li>' . __( 'Manually unsubscribe a contact by checking the "mark as unsubscribed" button.', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'Make sure your in compliance by ensuring the terms of agreement and GDPR consent are both checked under the compliance section.', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'View the origin of the contact by looking at the lead source field.', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'Add or remove custom information about the contact by enabling the "Edit Meta" section. Each meta also includes a replacement code to include it in an email.', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'Re-run or cancel events for this contact by viewing the "Upcoming Events" or "Recent History" Section', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'Monitor their engagement by looking in the "Recent Email History" section.', 'groundhogg' ) . '</li>'
+                . '</ul>'
+            )
+        );
     }
 
     function superlinks_help_bar()
