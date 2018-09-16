@@ -410,22 +410,22 @@ class WPGH_Contacts_Table extends WP_List_Table {
             __( 'Edit' )
         );
 
-        if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] !== 'spam' ){
-            $actions['spam'] = sprintf(
-                '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-                wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $item['ID'].'&action=spam')),
-                /* translators: %s: title */
-                esc_attr( sprintf( __( 'Mark %s as spam' ), $title ) ),
-                __( 'Spam' )
-            );
-        } else {
+        if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] === 'spam' ){
             $actions['unspam'] = sprintf(
-                '<a href="%s" class="unspam" aria-label="%s">%s</a>',
-                wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $item['ID'].'&action=unspam')),
-                /* translators: %s: title */
-                esc_attr( sprintf( __( 'Mark %s as approved' ), $title ) ),
-                __( 'Approve' )
-            );
+		        '<a href="%s" class="unspam" aria-label="%s">%s</a>',
+		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $item['ID'].'&action=unspam')),
+		        /* translators: %s: title */
+		        esc_attr( sprintf( __( 'Mark %s as approved' ), $title ) ),
+		        __( 'Approve' )
+	        );
+        } else {
+	        $actions['spam'] = sprintf(
+		        '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $item['ID'].'&action=spam')),
+		        /* translators: %s: title */
+		        esc_attr( sprintf( __( 'Mark %s as spam' ), $title ) ),
+		        __( 'Spam' )
+	        );
         }
 
         $actions['delete'] = sprintf(

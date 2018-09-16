@@ -271,7 +271,6 @@ function wpgh_quick_add_contact( $email, $first='', $last='', $phone='', $extens
         }
     }
 
-
 	$contact_exists = wpgh_get_contact_by_email( $email );
 
 	/* update the contact instead */
