@@ -17,8 +17,6 @@ define( 'WPGH_ID', 292 );
 define( 'WPGH_NAME', 'groundhogg' );
 define( 'WPGH_VERSION', '0.1' );
 
-//include dirname( __FILE__ ) . '/includes/admin/settings/settings.php';
-
 foreach ( glob( dirname( __FILE__ ) . "/includes/*.php" ) as $filename )
 {
 	include $filename;
@@ -111,6 +109,25 @@ function wpgh_activation()
         //todo log how created.
     }
 
+    /* setup permissions */
+
+	$gh_all_caps = array(
+		'gh_manage_contacts',
+		'gh_manage_funnels',
+		'gh_manage_emails',
+		'gh_manage_tags',
+		'gh_manage_broadcasts',
+		'gh_manage_superlinks',
+		'gh_manage_events',
+		'gh_manage_settings'
+	);
+
+	$role = get_role( 'administrator' );
+
+	foreach ( $gh_all_caps as $cap )
+	{
+		$role->add_cap( $cap );
+	}
 }
 
 register_activation_hook( __FILE__, 'wpgh_activation');

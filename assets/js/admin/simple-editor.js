@@ -539,7 +539,8 @@
                 result: function result() {
                     stopHide = true;
                     lastSelection = saveSelection(content);
-                    $colorPickerDiv.css('left', $element.find('.simple-editor-color-picker-handle').parents('.simple-editor-button-wrapper:first').position().left);
+                    $colorPickerDiv.css('left', $('.simple-editor-color-picker-handle').parents('.simple-editor-button-wrapper:first').position().left);
+                    $colorPickerDiv.css('top', 0 );
                     $colorPickerDiv.show();
                     return true;
                 }

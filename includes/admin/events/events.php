@@ -76,7 +76,7 @@ class WPGH_Events_Page
 
     function process_action()
     {
-        if ( ! $this->get_action() || ! $this->verify_action() )
+        if ( ! $this->get_action() || ! $this->verify_action() || ! current_user_can( 'gh_manage_events' ) )
             return;
 
         $base_url = remove_query_arg( array( '_wpnonce' ), wp_get_referer() );

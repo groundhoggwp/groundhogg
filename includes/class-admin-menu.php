@@ -89,7 +89,7 @@ class WPGH_Admin_Menu
             'groundhogg',
             'Contacts',
             'Contacts',
-            'manage_options',
+            'gh_manage_contacts',
             'gh_contacts',
             array($this->contacts_page, 'page')
         );
@@ -100,7 +100,7 @@ class WPGH_Admin_Menu
             'groundhogg',
             'Tags',
             'Tags',
-            'manage_options',
+            'gh_manage_tags',
             'gh_tags',
             array($this->tags_page, 'page')
         );
@@ -109,7 +109,7 @@ class WPGH_Admin_Menu
             'groundhogg',
             'Superlinks',
             'Superlinks',
-            'manage_options',
+            'gh_manage_superlinks',
             'gh_superlinks',
             array($this->superlink_page, 'page')
         );
@@ -120,7 +120,7 @@ class WPGH_Admin_Menu
             'groundhogg',
             'Broadcasts',
             'Broadcasts',
-            'manage_options',
+            'gh_manage_broadcasts',
             'gh_broadcasts',
             array($this->broadcasts_page, 'page')
         );
@@ -129,7 +129,7 @@ class WPGH_Admin_Menu
             'groundhogg',
             'Emails',
             'Emails',
-            'manage_options',
+            'gh_manage_emails',
             'gh_emails',
             array($this->emails_page, 'page')
         );
@@ -140,7 +140,7 @@ class WPGH_Admin_Menu
             'groundhogg',
             'Funnels',
             'Funnels',
-            'manage_options',
+            'gh_manage_funnels',
             'gh_funnels',
             array($this->funnels_page, 'page')
         );
@@ -151,7 +151,7 @@ class WPGH_Admin_Menu
             'groundhogg',
             'Events',
             'Events',
-            'manage_options',
+            'gh_manage_events',
             'gh_events',
             array($this->events_page, 'page')
         );
@@ -160,7 +160,7 @@ class WPGH_Admin_Menu
             'groundhogg',
             'Settings',
             'Settings',
-            'manage_options',
+            'gh_manage_settings',
             'groundhogg',
             array($this->settings_page, 'wpgh_settings_content')
         );
