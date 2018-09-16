@@ -163,10 +163,17 @@ class WPGH_Contacts_Table extends WP_List_Table {
     protected function get_bulk_actions() {
         $actions = array(
             'delete' => _x( 'Delete', 'List table bulk action', 'wp-funnels' ),
-            'export' => _x( 'Export', 'List table bulk action', 'wp-funnels' ),
-            'apply_tag' => _x( 'Apply Tag', 'List table bulk action', 'wp-funnels'),
-            'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'wp-funnels')
+//            'export' => _x( 'Export', 'List table bulk action', 'wp-funnels' ),
+//            'apply_tag' => _x( 'Apply Tag', 'List table bulk action', 'wp-funnels'),
+//            'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'wp-funnels')
         );
+
+        if ( $this->get_view() === 'spam' ){
+            $actions[ 'unspam' ] = _x( 'Approve', 'List table bulk action', 'wp-funnels' );
+        }  else {
+	        $actions[ 'spam' ] = _x( 'Mark as Spam', 'List table bulk action', 'wp-funnels' );
+        }
+
 
         return apply_filters( 'wpgh_contact_bulk_actions', $actions );
     }
