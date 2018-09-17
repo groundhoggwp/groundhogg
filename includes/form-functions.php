@@ -267,29 +267,29 @@ function wpgh_email_preferences_form()
             ?>
             <div class="gh-form-field">
                 <p>
-                    <label><input type="radio" name="preference" value="none" required> <?php _e( 'I love you guys. Send email whenever you want!' ); ?></label>
+                    <label><input type="radio" name="preference" value="none" required> <?php _e( apply_filters( 'gh_no_limits_preferences_text', 'I love you guys. Send email whenever you want!' ), 'groundhogg' ); ?></label>
                 </p>
             </div>
             <div class="gh-form-field">
                 <p>
-                    <label><input type="radio" name="preference" value="weekly" > <?php _e( 'It\'s a bit much. Start sending me emails weekly.' ); ?></label>
+                    <label><input type="radio" name="preference" value="weekly" > <?php _e( apply_filters( 'gh_weekly_preferences_text', 'It\'s a bit much. Start sending me emails weekly.' ), 'groundhogg' ); ?></label>
                 </p>
             </div>
             <div class="gh-form-field">
                 <p>
-                    <label><input type="radio" name="preference" value="monthly" > <?php _e( 'Distance makes the heart grow fonder. Only send emails monthly.' ); ?></label>
+                    <label><input type="radio" name="preference" value="monthly" > <?php _e( apply_filters( 'gh_monthly_preferences_text','Distance makes the heart grow fonder. Only send emails monthly.'), 'groundhogg' ); ?></label>
                 </p>
             </div>
             <div class="gh-form-field">
                 <p>
-                    <label><input type="radio" name="preference" value="unsubscribe" > <?php _e( 'I no longer wish to receive any emails. Unsubscribe me!' ); ?></label>
+                    <label><input type="radio" name="preference" value="unsubscribe" > <?php _e( apply_filters( 'gh_unsubscribe_preferences_text','I no longer wish to receive any emails. Unsubscribe me!'), 'groundhogg' ); ?></label>
                 </p>
             </div>
             <div class="gh-form-field">
                 <p>
-                    <input type='submit' name='change_preferences' value='<?php _e('Change Preferences','groundhogg'); ?>' >
+                    <input type='submit' name='change_preferences' value='<?php _e( apply_filters( 'gh_change_preferences_text', 'Change Preferences' ),'groundhogg'); ?>' >
                     <?php if ( wpgh_is_gdpr() ):?>
-                        <input type='submit' name='delete_everything' value='<?php _e('Delete Everything You Know About Me', 'groundhogg'); ?>' >
+                        <input type='submit' name='delete_everything' value='<?php _e(apply_filters( 'gh_gdpr_delete_prteferences_text', 'Delete Everything You Know About Me' ), 'groundhogg'); ?>' >
                     <?php endif; ?>
                 </p>
             </div>

@@ -195,9 +195,9 @@ function wpgh_get_email_footer_text()
     if ( get_option( 'gh_phone', 0 ) )
         $sub[] = "<a href='tel:" . esc_attr( get_option( 'gh_phone' ) ) . "'>" . esc_attr( get_option( 'gh_phone' ) ) . "</a>";
     if ( get_option( 'gh_privacy_policy' ) )
-        $sub[] = "<a href=\"" . esc_attr( get_permalink( get_option( 'gh_privacy_policy' ) ) ) . "\">" . __( 'Privacy Policy', 'groundhogg' ) . "</a>";
+        $sub[] = "<a href=\"" . esc_attr( get_permalink( get_option( 'gh_privacy_policy' ) ) ) . "\">" . __( apply_filters( 'gh_privacy_policy_footer_text', 'Privacy Policy' ), 'groundhogg' ) . "</a>";
     if ( get_option( 'gh_terms', 0 ) )
-        $sub[] = "<a href=\"" . esc_attr( get_permalink( get_option( 'gh_terms' ) ) ) . "\">" . __( 'Terms', 'groundhogg' ) . "</a>";
+        $sub[] = "<a href=\"" . esc_attr( get_permalink( get_option( 'gh_terms' ) ) ) . "\">" . __( apply_filters( 'gh_terms_footer_text', 'Terms'), 'groundhogg' ) . "</a>";
 
     $footer .= implode( ' | ', $sub ) ;
 

@@ -87,7 +87,7 @@ add_action( 'wpgh_email_block_html_button_block', 'wpgh_email_button_block' );
 function wpgh_email_code_block()
 {
     ?>
-    <div><p>This is some custom HTML which you can edit on the right. You may enter any valid HTML tags, but they may get filtered out as some email browsers to not support certain HTML.</p></div>
+    <div><p><?php _e('This is some custom HTML which you can edit on the right. You may enter any valid HTML tags, but they may get filtered out as some email browsers to not support certain HTML.', 'groundhogg'); ?></p></div>
     <?php
 }
 

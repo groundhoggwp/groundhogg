@@ -24,7 +24,7 @@
                 <!-- END PREHEADER -->
                 <?php if ( $browser_view ): ?>
                     <div class="header" style="text-align: center;margin-bottom: 25px;">
-                        <span class="apple-link" style="color: #999999; font-size: 13px; text-align: center;"><a href="<?php echo $browser_link; ?>"><?php _e( 'View In Browser', 'groundhogg' ); ?></a></span>
+                        <span class="apple-link" style="color: #999999; font-size: 13px; text-align: center;"><a href="<?php echo $browser_link; ?>"><?php _e( apply_filters( 'gh_view_in_broswer_text', 'View In Browser' ), 'groundhogg' ); ?></a></span>
                     </div>
                 <?php endif; ?>
                 <!-- START CONTENT -->
@@ -40,7 +40,7 @@
                         </tr>
                         <tr>
                             <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 13px; color: #999999; text-align: center;">
-                                <span style="color: #999999; font-size: 13px; text-align: center;"><?php _e( "Don't want these emails?", 'groundhogg'); ?> <a href="<?php echo $unsubscribe_link; ?>"><?php _e( "Unsubscribe", 'groundhogg'); ?></a>.</span>
+                                <span style="color: #999999; font-size: 13px; text-align: center;"><?php _e( apply_filters( 'gh_unsubscribe_footer_text', "Don't want these emails?" ), 'groundhogg'); ?> <a href="<?php echo $unsubscribe_link; ?>"><?php _e( apply_filters( 'gh_unsubscribe_text', "Unsubscribe" ), 'groundhogg'); ?></a>.</span>
                             </td>
                         </tr>
                     </table>
