@@ -26,7 +26,13 @@ function wpgh_form_shortcode( $atts )
         'labels' => 'on',
         'id' => 0,
         'gdpr' => 'off',
-        'classes' => ''
+        'classes' => '',
+        'first' => __( 'First Name' ),
+        'last' => __( 'Last Name' ),
+        'email' => __( 'Email' ),
+        'phone' => __( 'Phone' ),
+        'terms' =>__( 'I agree to the Terms of Service.' , 'groundhogg' ),
+        'gdpr' => __( 'I consent to receive marketing & transactional information from ' . get_option( 'gh_business_name' ) . '.' , 'groundhogg' )
     ), $atts );
 
     $fields = array_map( 'trim', explode( ',', $a['fields'] ) );
@@ -51,36 +57,36 @@ function wpgh_form_shortcode( $atts )
         switch ( $type ) {
             case 'first':
                 if ( $a['labels'] === 'on' )
-                    $form .= '<label>' . __( 'First Name' );
-                $form .= ' <input class="gh-form-input" type="text" name="first_name" id="' . $id . '" pattern="[A-Za-z \-\']+" title="' . __( 'Do not include numbers or special characters.', 'groundhogg' ) . '" placeholder="' . __( 'First Name' ). '" '.$required. '>';
+                    $form .= '<label>' . $a[ 'first' ];
+                $form .= ' <input class="gh-form-input" type="text" name="first_name" id="' . $id . '" pattern="[A-Za-z \-\']+" title="' . __( 'Do not include numbers or special characters.', 'groundhogg' ) . '" placeholder="' . $a[ 'first' ] . '" '.$required. '>';
                 if ( $a['labels'] === 'on' )
                     $form .= '</label>';
                 break;
             case 'last':
                 if ( $a['labels'] === 'on' )
-                    $form .= '<label>' . __( 'Last Name' );
-                $form .= ' <input class="gh-form-input" type="text" name="last_name" id="' . $id . '" pattern="[A-Za-z \-\']+" title="' . __( 'Do not include numbers or special characters.', 'groundhogg' ) . '" placeholder="' . __( 'Last Name' ). '" '.$required. '>';
+                    $form .= '<label>' .  $a[ 'last' ];
+                $form .= ' <input class="gh-form-input" type="text" name="last_name" id="' . $id . '" pattern="[A-Za-z \-\']+" title="' . __( 'Do not include numbers or special characters.', 'groundhogg' ) . '" placeholder="' . $a[ 'last' ]. '" '.$required. '>';
                 if ( $a['labels'] === 'on' )
                     $form .= '</label>';
                 break;
             case 'email':
                 if ( $a['labels'] === 'on' )
-                    $form .= '<label>' . __( 'Email' );
-                $form .= ' <input class="gh-form-input" type="email" name="email" id="' . $id . '" title="' . __( 'Email' ) . '" placeholder="' . __( 'Email' ). '" '.$required. '>';
+                    $form .= '<label>' . $a[ 'email' ];
+                $form .= ' <input class="gh-form-input" type="email" name="email" id="' . $id . '" title="' . $a[ 'email' ] . '" placeholder="' . $a[ 'email' ] . '" '.$required. '>';
                 if ( $a['labels'] === 'on' )
                     $form .= '</label>';
                 break;
             case 'phone':
                 if ( $a['labels'] === 'on' )
-                    $form .= '<label>' . __( 'Phone' );
-                $form .= ' <input class="gh-form-input" type="tel" name="phone" id="' . $id . '" title="' . __( 'Phone' ) . '" placeholder="' . __( 'Phone' ). '" '.$required. '>';
+                    $form .= '<label>' . $a[ 'phone' ];
+                $form .= ' <input class="gh-form-input" type="tel" name="phone" id="' . $id . '" title="' . __( 'Phone' ) . '" placeholder="' . $a[ 'phone' ] . '" '.$required. '>';
                 if ( $a['labels'] === 'on' )
                     $form .= '</label>';
                 break;
             case 'terms':
                 $form .= '<label>';
                 $form .= ' <input class="gh-form-input" type="checkbox" name="agree_terms" id="' . $id . '" title="' . __( 'Terms Agreement' ) . '" '.$required. '> ';
-                $form .=  __( 'I agree to the Terms of Service.' , 'groundhogg' ) . '</label>';
+                $form .=  $a[ 'terms' ] . '</label>';
                 break;
         }
         $form .= '</p></div>';
@@ -95,7 +101,7 @@ function wpgh_form_shortcode( $atts )
 
         $form .= '<label>';
         $form .= ' <input class="gh-form-input" type="checkbox" name="gdpr_consent" id="' . $id . '" title="' . __( 'Explicit Consent', 'groundhogg' ) . '" required> ';
-        $form .=  __( 'I consent to receive marketing & transactional information from ' . get_option( 'gh_business_name' ) . '.' , 'groundhogg' ) . '</label>';
+        $form .=  $a[ 'gdpr' ] . '</label>';
 
         $form .= '</p></div>';
     }
