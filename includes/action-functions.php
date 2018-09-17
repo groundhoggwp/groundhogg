@@ -149,8 +149,9 @@ function wpgh_send_admin_notification( $step_id, $contact_id )
     $subject = sanitize_text_field(  wpgh_do_replacements( $contact_id, $subject ) );
 
     $send_to = wpgh_get_step_meta( $step_id, 'send_to', true );
+
     if ( ! is_email( $send_to ) ){
-        $send_to = sanitize_email( wpgh_do_replacements( $contact_id, $send_to ) );
+        $send_to = wpgh_do_replacements( $contact_id, $send_to );
     }
 
     if ( ! $send_to )

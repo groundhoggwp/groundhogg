@@ -57,7 +57,22 @@ function wpgh_save_notification_step( $step_id )
 {
     if ( isset( $_POST[ wpgh_prefix_step_meta( $step_id, 'send_to') ] ) ){
         $send_to = sanitize_text_field( $_POST[ wpgh_prefix_step_meta( $step_id, 'send_to') ] );
-        $send_to = ( $send_to === '{owner_email}' )? '{owner_email}' : sanitize_email( $send_to );
+
+        if ( strpos( $send_to, ',' ) !== false ){
+            $emails = array_map( 'trim', explode( ',', $send_to ) );
+
+            $sanitized_emails = array();
+
+            foreach ( $emails as $email ){
+                $sanitized_emails[] = ( $email === '{owner_email}' )? '{owner_email}' : sanitize_email( $email );
+            }
+
+            $send_to = implode( ',', $sanitized_emails );
+
+        } else {
+            $send_to = ( $send_to === '{owner_email}' )? '{owner_email}' : sanitize_email( $send_to );
+        }
+
 
         wpgh_update_step_meta( $step_id, 'send_to', $send_to );
     }
