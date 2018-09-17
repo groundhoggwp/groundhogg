@@ -25,7 +25,6 @@ function wpgh_form_shortcode( $atts )
         'success' => '',
         'labels' => 'on',
         'id' => 0,
-        'gdpr' => 'off',
         'classes' => '',
         'first' => __( 'First Name' ),
         'last' => __( 'Last Name' ),
