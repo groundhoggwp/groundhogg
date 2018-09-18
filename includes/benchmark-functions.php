@@ -20,7 +20,7 @@ function wpgh_get_funnel_benchmarks()
 {
     $benchmarks = array();
 
-    $benchmarks['form_fill'] = array( 'title' => __('Form Filled'), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/form-filled.png' );
+    $benchmarks['form_fill'] = array( 'title' => __('Form Filled'), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/form.png' );
     $benchmarks['email_opened'] = array( 'title' => __('Email opened', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/opened-email.png' );
     $benchmarks['email_confirmed'] = array( 'title' => __('Email Confirmed', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/email-confirmed.png' );
 //    $benchmarks['link_clicked'] = array( 'title' => __('Link Clicked', 'groundhogg' ), 'icon' => WPGH_ASSETS_FOLDER . '/images/builder-icons/' );

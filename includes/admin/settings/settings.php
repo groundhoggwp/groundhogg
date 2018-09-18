@@ -139,8 +139,10 @@ class WPGH_Settings_Page
                         break;
                     case 'extensions':
 
+                        ?><div id="poststuff">
+                        <p><?php _e( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license.</a>' ); ?></p><?php
                         WPGH_Extension_Manager::extension_page();
-
+                        ?></div><?php
                         break;
 
                     default:

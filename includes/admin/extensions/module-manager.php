@@ -270,29 +270,29 @@ class WPGH_Extension
     public function __toString()
     {
         //head container
-        $content = "<div class=\"gh-extension postbox\">";
+        $content = "<div style='width: 400px;margin:10px;display: inline-block;vertical-align: top' class=\"postbox\">";
         //image
-        $content.= "<div class=\"gh-image-container\">";
-        $content.= "<img width='380' class=\"gh-extension-image\" src=\"{$this->img_source}\">";
-        $content.= "</div>";
+//        $content.= "<div class=\"gh-image-container\">";
+//        $content.= "<img width='380' class=\"gh-extension-image\" src=\"{$this->img_source}\">";
+//        $content.= "</div>";
         //description
-        $content.= "<div class=\"gh-description-container\">";
-        $content.= "<h2>{$this->item_name}</h2>";
-        $content.= "<p>{$this->description}</p>";
+        $content.= "<h2 class='hndle'>{$this->item_name}</h2>";
+        $content.= "<div class=\"inside\">";
 
-        $content.= "<form method='post' action=''>";
+//        $content.= "<p>{$this->description}</p>";
+
         if ( $this->license_exists() ){
-            $content.= "<input type='text' style='margin-right: 10px;' placeholder='License' name='licenses[{$this->item_id}]' value='{$this->get_license()}'>";
+            $content.= "<input class='regular-text' type='text' style='margin-right: 10px;' placeholder='License' name='licenses[{$this->item_id}]' value='{$this->get_license()}'>";
         } else {
-            $content.= "<input type='text' style='margin-right: 10px;' placeholder='License' name='licenses[{$this->item_id}]'>";
+            $content.= "<input class='regular-text' type='text' style='margin-right: 10px;' placeholder='License' name='licenses[{$this->item_id}]'>";
         }
-        $content.= "<input type='submit' class='button button-primary' name='gh_activate_license' value='" . __( "Activate Extension", 'groundhogg' ) . " '>";
-        if ( $this->license_exists() ){
-	        $content.= "<p>" . __( 'License is currently: ' ) . $this->get_license_status() . "<br/>";
-	        $content.= __( "Expires: ") . $this->get_expiry() . "</p>";
 
+        $content.= "<p class='submit'><input type='submit' class='button button-primary' name='gh_activate_license' value='" . __( "Activate Extension", 'groundhogg' ) . "'></p>";
+
+        if ( $this->license_exists() ){
+	        $content .= sprintf( __( "<p>Your license expires on %s</p>" ), $this->get_expiry() );
         }
-        $content.= "</form>";
+
         $content.= "</div>";
         $content.= "</div>";
         return $content;
