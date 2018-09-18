@@ -237,12 +237,19 @@ add_action( 'wpgh_import_'. 'tag_removed', 'wpgh_import_tags', 10, 2 );
 function wpgh_import_contacts()
 {
     //todo security check...
+    if ( ! isset( $_POST[ 'import_contacts' ] ))
+            return;
 
-    if ( ! isset( $_POST[ 'import_contacts' ] ) )
-        return;
+    if ( ! current_user_can( 'gh_manage_contacts' ) ){
+        wp_die( 'You do not have permission to do that.' );
+    }
 
     if ( ! isset( $_FILES['contacts'] ) ){
         wp_die( 'No contacts supplied!' );
+    }
+
+    if ( isset(  $_POST[ 'import_tags' ] ) ){
+        $tags = wpgh_validate_tags( $_POST[ 'import_tags' ] );
     }
 
     if ( $_FILES['contacts']['error'] == UPLOAD_ERR_OK && is_uploaded_file( $_FILES['contacts']['tmp_name'] ) ) {
@@ -281,10 +288,6 @@ function wpgh_import_contacts()
                     $meta_key = sanitize_key( $columns[$i] );
                     wpgh_update_contact_meta( $cid, $meta_key, sanitize_text_field( $attr ) );
                 }
-
-                $tags = $_POST[ 'import_tags' ];
-
-                $tags = wpgh_validate_tags( $tags );
 
                 foreach ( $tags as $tag_id )
                 {

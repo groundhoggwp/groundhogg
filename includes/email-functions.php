@@ -147,6 +147,7 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
         $headers = array();
         $headers[ 'from' ] = 'From: ' . $from_name . ' <' . $from_email . '>';
         $headers[ 'reply_to' ] = 'Reply-To: ' . $from_email;
+        $headers[ 'return_path' ] = 'Return-Path: ' . get_option( 'gh_bounce_inbox', $from_email );
         $headers[ 'content_type' ] = 'Content-Type: text/html; charset=UTF-8';
 
         $headers = apply_filters( 'wpgh_email_headers', $headers );
@@ -164,6 +165,18 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
 
     return true;
 }
+
+/**
+ * Set the correct value of the return address in case of bounce emails.
+ *
+ * @param $phpmailer
+ */
+function wpgh_mail_returnpath_phpmailer_init( $phpmailer ) {
+    // Set the Sender (return-path) if it is not already set
+    $phpmailer->Sender = get_option( 'gh_bounce_inbox', $phpmailer->From );
+}
+
+add_action('phpmailer_init','wpgh_mail_returnpath_phpmailer_init');
 
 /**
  * Get the can spam compliant email footer.
@@ -785,3 +798,81 @@ function wpgh_view_email_in_browser()
 
 add_action( 'template_redirect', 'wpgh_view_email_in_browser' );
 
+/*
+ * Parse bounced emails every hour.
+ */
+function wpgh_parse_bounces()
+{
+
+    if ( ! get_option( 'gh_bounce_inbox', false ) || ! get_option( 'gh_bounce_inbox_password', false ) )
+        return;
+
+    include dirname( __FILE__ ) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
+
+    $bounce_handler = new BounceHandler();
+
+    $username = get_option( 'gh_bounce_inbox' );
+    $password = get_option( 'gh_bounce_inbox_password' );
+
+    $domain = explode( '@', $username );
+    $domain = $domain[1];
+
+    $hostname = sprintf( '{%s:993/imap/ssl/novalidate-cert}INBOX', $domain );
+    /* try to connect */
+    $inbox = imap_open( $hostname, $username, $password, OP_READONLY );
+
+    if ( ! $inbox ){
+        wp_die( imap_last_error() );
+        return;
+    }
+
+    /* grab emails, for now assume these messages go unread */
+    $emails = imap_search( $inbox, sprintf( 'SINCE "%s" UNSEEN', date( 'j F Y', strtotime( '1 day ago' ) ) ) );
+
+    //print_r( $bounce_handler->bouncelist );
+
+    foreach( $emails as $email_number ) {
+
+        /* get information specific to this email */
+        $message = imap_fetchbody( $inbox, $email_number,"" );
+        $multiArray = $bounce_handler->get_the_facts( $message );
+
+        foreach( $multiArray as $the ){
+
+            $contact  = new WPGH_Contact( $the['recipient'] );
+
+            if ( ! $contact->get_email() ){
+                continue;
+            }
+
+            switch( $the['action'] ){
+                case 'failed':
+                    //do something
+                    if ( $contact->get_optin_status() !== WPGH_HARD_BOUNCE ){
+                        wpgh_add_note( $contact->ID, sprintf( $bounce_handler->fetch_status_messages( $the['status'] ) ) );
+                        wpgh_update_contact( $contact->ID, 'optin_status', WPGH_HARD_BOUNCE );
+                    }
+                    break;
+                case 'transient':
+                    //do something else
+                    break;
+                case 'autoreply':
+                    //do something different
+                    break;
+                default:
+                    //don't do anything
+                    break;
+            }
+        }
+    }
+
+    imap_close( $inbox );
+}
+
+/* run on cron jobs */
+add_action( 'wpgh_cron_event', 'wpgh_parse_bounces' );
+add_action( 'wpgh_cron_event_plus_10', 'wpgh_parse_bounces' );
+add_action( 'wpgh_cron_event_plus_20', 'wpgh_parse_bounces' );
+add_action( 'wpgh_cron_event_plus_30', 'wpgh_parse_bounces' );
+add_action( 'wpgh_cron_event_plus_40', 'wpgh_parse_bounces' );
+add_action( 'wpgh_cron_event_plus_50', 'wpgh_parse_bounces' );

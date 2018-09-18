@@ -56,7 +56,7 @@ class WPGH_Settings_Page
             $tabs = array(
                 'general'       => 'General',
                 'marketing'     => 'Marketing',
-//                'emails'        => 'Email',
+                'email'        => 'Email',
                 'tools'         => 'Tools',
                 'extensions'    => 'Licenses'
             );
@@ -83,7 +83,7 @@ class WPGH_Settings_Page
                         submit_button();
 
                         break;
-                    case 'emails':
+                    case 'email':
 
 //                        GH_Account::$instance->connect_button();
 
@@ -162,7 +162,8 @@ class WPGH_Settings_Page
         add_settings_section( 'contact_endpoints', __ ( 'Contact Endpoints' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
         add_settings_section( 'form_settings', __ ( 'Form Settings' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
         add_settings_section( 'compliance', __( 'Compliance Settings', 'groundhogg' ), array(), 'groundhogg_marketing_settings');
-        add_settings_section( 'default_mail_settings', 'Default Mail Settings', array(), 'groundhogg_email_settings' );
+//        add_settings_section( 'default_mail_settings', 'Default Mail Settings', array(), 'groundhogg_email_settings' );
+        add_settings_section( 'email_bounces', 'Email Bounces', array(), 'groundhogg_email_settings' );
     }
 
 	public function wpgh_setup_fields()
@@ -362,10 +363,6 @@ class WPGH_Settings_Page
                 'desc' => 'This is the key which faces the users on the front-end',
                 'section' => 'form_settings',
                 'page' => 'groundhogg_marketing_settings',
-                'options' => array(
-                    'groundhogg' => 'Groundhogg Mail',
-                    'default' => 'Default Mail Service',
-                ),
             ),
             array(
                 'label' => 'Recaptcha Secret Key',
@@ -375,10 +372,25 @@ class WPGH_Settings_Page
                 'placeholder' => '',
                 'section' => 'form_settings',
                 'page' => 'groundhogg_marketing_settings',
-                'options' => array(
-                    'groundhogg' => 'Groundhogg Mail',
-                    'default' => 'Default Mail Service',
-                ),
+            ),
+            array(
+                'label' => 'Bounce Inbox',
+                'id' => 'gh_bounce_inbox',
+                'type' => 'text',
+                'placeholder' => 'bounce@' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ?  substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
+                'desc' => 'This is the inbox which emails will be sent to.',
+                'section' => 'email_bounces',
+                'page' => 'groundhogg_email_settings',
+                'class' => 'regular-text'
+            ),
+            array(
+                'label' => 'Bounce Inbox Password',
+                'id' => 'gh_bounce_inbox_password',
+                'type' => 'password',
+                'placeholder' => '1234',
+                'desc' => 'This password to access the inbox.',
+                'section' => 'email_bounces',
+                'page' => 'groundhogg_email_settings',
             ),
 
 		);
@@ -440,7 +452,7 @@ class WPGH_Settings_Page
 
                 break;
 			default:
-				printf( '<input name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" />',
+				printf( '<input class="regular-text" name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" />',
 					$field['id'],
 					$field['type'],
 					$field['placeholder'],

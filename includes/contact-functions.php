@@ -271,12 +271,21 @@ function wpgh_quick_add_contact( $email, $first='', $last='', $phone='', $extens
         }
     }
 
-	$contact_exists = wpgh_get_contact_by_email( $email );
+    $contact_exists = wpgh_get_contact_by_email( $email );
 
-	/* update the contact instead */
-	if ( $contact_exists ){
+    /* break up first name into first and last */
+    if ( strpos( $first, ' ' ) !== false ){
 
-	    $id = intval( $contact_exists[ 'ID' ] );
+        $name = explode( ' ', $first );
+        $first = $name[ 0 ];
+        $last  = $name[ 1 ];
+
+    }
+
+    /* update the contact instead */
+    if ( $contact_exists ){
+
+        $id = intval( $contact_exists[ 'ID' ] );
 
 	    if ( ! empty( $first ) )
 	        wpgh_update_contact( $id, 'first_name', $first );
@@ -447,7 +456,6 @@ function wpgh_save_contact_inline()
     $email          = sanitize_email( $_POST['email'] );
     $first_name     = sanitize_text_field( $_POST['first_name'] );
     $last_name      = sanitize_text_field( $_POST['last_name'] );
-    $optin_status   = intval( $_POST['optin_status' ] );
     $owner          = intval( $_POST['owner' ] );
     $tags           = wpgh_validate_tags( $_POST['tags' ] );
 
@@ -497,8 +505,8 @@ function wpgh_save_contact_inline()
     if ( isset( $_POST['unsubscribe'] ) ){
         if ( $contact->get_optin_status() !== WPGH_UNSUBSCRIBED )
         {
-            do_action( 'wpgh_preference_unsubscribe', $id );
             wpgh_update_contact($id, 'optin_status', WPGH_UNSUBSCRIBED );
+            do_action( 'wpgh_contact_unsubscribed', $id );
         }
     }
 
