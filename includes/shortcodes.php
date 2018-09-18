@@ -202,3 +202,37 @@ function wpgh_contact_does_not_have_tag_shortcode( $atts, $content='' )
 }
 
 add_shortcode( 'gh_does_not_have_tags', 'wpgh_contact_does_not_have_tag_shortcode' );
+
+/**
+ * Return contents if and only if the contact is logged in
+ *
+ * @param $atts
+ * @param $content
+ *
+ * @return string
+ */
+function wpgh_is_logged_in( $atts, $content )
+{
+    if ( is_user_logged_in() )
+        return do_shortcode( $content );
+    else
+        return '';
+}
+
+add_shortcode( 'gh_is_logged_in', 'wpgh_is_logged_in' );
+
+/**
+ * Return content if user is no logged in.
+ *
+ * @param $atts
+ * @param $content
+ * @return string
+ */
+function wpgh_is_not_logged_in( $atts, $content ){
+    if ( ! is_user_logged_in() )
+        return do_shortcode( $content );
+    else
+        return '';
+}
+
+add_shortcode( 'gh_is_not_logged_in', 'wpgh_is_not_logged_in' );

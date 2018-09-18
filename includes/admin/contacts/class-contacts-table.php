@@ -196,14 +196,16 @@ class WPGH_Contacts_Table extends WP_List_Table {
             'confirmed' => count($wpdb->get_results("SELECT ID FROM $table_name WHERE optin_status = " . WPGH_CONFIRMED ) ),
             'opted_out' => count($wpdb->get_results("SELECT ID FROM $table_name WHERE optin_status = " . WPGH_UNSUBSCRIBED ) ),
             'spam' => count($wpdb->get_results("SELECT ID FROM $table_name WHERE optin_status = " . WPGH_SPAM ) ),
+            'bounce' => count($wpdb->get_results("SELECT ID FROM $table_name WHERE optin_status = " . WPGH_HARD_BOUNCE ) ),
         );
 
         return apply_filters( 'contact_views', array(
-            'all' => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . __( 'All <span class="count">('.array_sum($count).')</span>' ) . "</a>",
-            'unconfirmed' => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . __( 'Unconfirmed <span class="count">('.$count['unconfirmed'].')</span>' ) . "</a>",
-            'confirmed' => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . __( 'Confirmed <span class="count">('.$count['confirmed'].')</span>' ) . "</a>",
-            'opted_out' => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . __( 'Unsubscribed <span class="count">('.$count['opted_out'].')</span>' ) . "</a>",
-            'spam' => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . "spam" . "'>" . __( 'Spam <span class="count">('.$count['spam'].')</span>' ) . "</a>"
+            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . __( 'All <span class="count">('.array_sum($count).')</span>' ) . "</a>",
+            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . __( 'Unconfirmed <span class="count">('.$count['unconfirmed'].')</span>' ) . "</a>",
+            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . __( 'Confirmed <span class="count">('.$count['confirmed'].')</span>' ) . "</a>",
+            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . __( 'Unsubscribed <span class="count">('.$count['opted_out'].')</span>' ) . "</a>",
+            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . "spam" . "'>" . __( 'Spam <span class="count">('.$count['spam'].')</span>' ) . "</a>",
+            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . "bounce" . "'>" . __( 'Bounced <span class="count">('.$count['bounce'].')</span>' ) . "</a>"
         ) );
     }
 
@@ -248,6 +250,9 @@ class WPGH_Contacts_Table extends WP_List_Table {
                             break;
                         case 'spam':
                             $view = WPGH_SPAM;
+                            break;
+                        case 'bounce':
+                            $view = WPGH_HARD_BOUNCE;
                             break;
                         default:
                             $view = WPGH_UNCONFIRMED;
