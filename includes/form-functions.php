@@ -7,7 +7,7 @@
  */
 function wpgh_is_recaptcha_enabled()
 {
-    return in_array( 'on', get_option( 'gh_enable_recaptcha', array() ) );
+    return ( 'on' == get_option( 'gh_enable_recaptcha', '' ) );
 }
 
 /**
