@@ -158,10 +158,10 @@ class WPGH_Funnels_Table extends WP_List_Table {
         $count = $wpdb->get_var(
             $wpdb->prepare(
                 "
-                         SELECT COUNT(*) FROM $table_name
-                         WHERE funnel_id = %d AND status = %s
+                         SELECT COUNT( DISTINCT contact_id) FROM $table_name
+                         WHERE funnel_id = %d AND time >= %d
                         ",
-                $item['ID'], 'waiting'
+                $item['ID'], strtotime( '30 days ago' )
             )
         );
 
