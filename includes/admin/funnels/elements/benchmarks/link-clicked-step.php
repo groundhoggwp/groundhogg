@@ -41,12 +41,3 @@ function wpgh_link_clicked_funnel_step_html( $step_id )
 }
 
 add_action( 'wpgh_get_step_settings_link_clicked', 'wpgh_link_clicked_funnel_step_html' );
-
-function wpgh_link_clicked_icon_html()
-{
-    ?>
-    <div class="dashicons dashicons-admin-links"></div><p>Link Clicked</p>
-    <?php
-}
-
-add_action( 'wpgh_benchmark_element_icon_html_link_clicked', 'wpgh_link_clicked_icon_html' );

@@ -72,15 +72,6 @@ function wpgh_delay_timer_funnel_step_html( $step_id )
 
 add_action( 'wpgh_get_step_settings_delay_timer', 'wpgh_delay_timer_funnel_step_html' );
 
-function wpgh_delay_timer_icon_html()
-{
-    ?>
-    <div class="dashicons dashicons-clock"></div><p><?php echo esc_html__('Delay Timer', 'groundhogg' ); ?></p>
-    <?php
-}
-
-add_action( 'wpgh_action_element_icon_html_delay_timer', 'wpgh_delay_timer_icon_html' );
-
 function wpgh_save_delay_timer_step( $step_id )
 {
     $amount = $_POST[ wpgh_prefix_step_meta( $step_id, 'delay_amount' ) ];

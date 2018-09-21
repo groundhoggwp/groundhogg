@@ -42,15 +42,6 @@ function wpgh_account_created_funnel_step_html( $step_id )
 
 add_action( 'wpgh_get_step_settings_account_created', 'wpgh_account_created_funnel_step_html' );
 
-function wpgh_account_created_icon_html()
-{
-    ?>
-    <div class="dashicons dashicons-admin-users"></div><p>User Created</p>
-    <?php
-}
-
-add_action( 'wpgh_benchmark_element_icon_html_account_created', 'wpgh_account_created_icon_html' );
-
 function wpgh_save_account_created_funnel_step( $step_id )
 {
     $role = sanitize_text_field( $_POST[ wpgh_prefix_step_meta( $step_id, 'role' ) ] );
