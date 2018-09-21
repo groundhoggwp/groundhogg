@@ -8,7 +8,8 @@
 
             var row = $( this );
 
-            row.prepend( html );
+            if ( row.find( 'wpgh-toolbar' ).length === 0 )
+                row.prepend( html );
 
         });
 
@@ -42,16 +43,8 @@ jQuery(function($) {
         start: function ( e, ui ) {
             var el = this;
             var block_type = el.id;
-            var ajaxCall = $.ajax({
-                type : "post",
-                url : ajaxurl,
-                data : {action: "get_email_block_html", block_type: block_type },
-                success: function( html )
-                {
-                    $('#temp-html').html( $( html ).wpghToolBar() );
-
-                }
-            });
+            var html = jQuery( '.' + block_type + '_template' ).children().first().clone();
+            $('#temp-html').html( html );
         },
         stop: function ( e, ui ) {
             $('#email-content').find('.email-draggable').replaceWith( $('#temp-html').html() );

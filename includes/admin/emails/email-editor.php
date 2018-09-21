@@ -374,10 +374,18 @@ $email = wpgh_get_email_by_id( $email_id );
                             </tbody>
                         </table>
                     </div>
+                    <div class="hidden">
+                        <div class="text_block_template"><?php wpgh_get_email_block( 'text_block' ); ?></div>
+                        <div class="spacer_block_template"><?php wpgh_get_email_block( 'spacer_block' ); ?></div>
+                        <div class="divider_block_template"><?php wpgh_get_email_block( 'divider_block' ); ?></div>
+                        <div class="image_block_template"><?php wpgh_get_email_block( 'image_block' ); ?></div>
+                        <div class="button_block_template"><?php wpgh_get_email_block('button_block' ); ?></div>
+                        <div class="code_block_template"><?php wpgh_get_email_block( 'code_block' ); ?></div>
+                    </div>
+                    <div id="temp-html" class="hidden"></div>
                 </div
             </div>
             <!-- End elements area-->
         </div>
     </div>
 </form>
-<div id="temp-html" style="display: none"></div>
