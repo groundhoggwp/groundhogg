@@ -140,15 +140,11 @@ function wpgh_register_scripts()
 
 add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
 
-function remove_footer_admin ( $text ) {
-
-    $gh = sprintf( __( 'Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!' ), __( 'https://www.facebook.com/groups/274900800010203/' ) );
-    $text = sprintf( __( 'Thank you for creating with <a href="%s">WordPress</a>.' ), __( 'https://wordpress.org/' ) );
-
-    return '<span id="footer-thankyou">' . $text . ' | ' . $gh . '</span>';
-
+function wpgh_remove_footer_admin ( $text )
+{
+    return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
 }
 
-add_filter('admin_footer_text', 'remove_footer_admin');
+add_filter('admin_footer_text', 'wpgh_remove_footer_admin');
 
 do_action( 'groundhogg_loaded' );

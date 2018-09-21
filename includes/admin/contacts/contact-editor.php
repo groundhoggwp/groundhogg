@@ -198,7 +198,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
 
             global $wpdb;
             $table = $wpdb->prefix . WPGH_EVENTS;
-            $active_events = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE contact_id = %d AND status = %s ORDER BY time ASC LIMIT 20", $id, 'waiting' ) );
+            $active_events = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE contact_id = %d AND status = %s ORDER BY time ASC LIMIT 10", $id, 'waiting' ) );
 
             if ( empty( $active_events ) ){
                 ?> <tr><td colspan="4"><?php _e( 'This contact is not currently active in any funnels.', 'groundhogg' ) ?></td></tr> <?php
@@ -266,7 +266,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <tbody>
         <?php global $wpdb;
         $table = $wpdb->prefix . WPGH_EVENTS;
-        $active_events = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE contact_id = %d AND status = %s ORDER BY time DESC LIMIT 20", $id, 'complete' ) );
+        $active_events = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE contact_id = %d AND status = %s ORDER BY time DESC LIMIT 10", $id, 'complete' ) );
         if ( empty( $active_events ) ){
             ?> <tr><td colspan="4"><?php _e( 'This contact has no funnel history.', 'groundhogg' ) ?></td></tr> <?php
         } else {
@@ -336,7 +336,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                 "SELECT e.*,s.funnelstep_type FROM $table e 
                         LEFT JOIN $steps s ON e.step_id = s.ID 
                         WHERE e.contact_id = %d AND e.status = %s AND ( s.funnelstep_type = %s OR e.funnel_id = %d )
-                        ORDER BY time DESC LIMIT 20"
+                        ORDER BY time DESC LIMIT 10"
                 , $id, 'complete', 'send_email', WPGH_BROADCAST ));
 
         if ( empty( $email_events ) ){
