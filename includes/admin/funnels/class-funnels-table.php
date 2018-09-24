@@ -165,7 +165,7 @@ class WPGH_Funnels_Table extends WP_List_Table {
             )
         );
 
-        $queryUrl = admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . $item['ID'] );
+        $queryUrl = admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%d&start=%d', $item[ 'ID' ], strtotime( '30 days ago' ) ) );
         return "<a href='$queryUrl'>$count</a>";
     }
 

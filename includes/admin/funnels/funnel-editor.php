@@ -13,6 +13,7 @@
 
 $funnel_id = intval( $_GET['funnel'] );
 
+//print_r($_POST);
 
 wp_enqueue_style('editor-buttons');
 wp_enqueue_style( 'jquery-ui' );
@@ -88,7 +89,7 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                         <?php do_action( 'funnel_sate_range_filters_after' ); ?>
                         <div style="float: right; display: inline-block;">
                             <div class="onoffswitch">
-                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="reporting-toggle" <?php if( isset( $_POST[ 'change_reporting' ] ) ) echo 'checked="checked"'; ?> >
+                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="reporting-toggle" value="1" <?php if( isset( $_REQUEST[ 'change_reporting' ] ) ) echo 'checked'; ?> >
                                 <label class="onoffswitch-label" for="reporting-toggle">
                                     <span class="onoffswitch-inner"></span>
                                     <span class="onoffswitch-switch"></span>
