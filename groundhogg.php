@@ -141,11 +141,11 @@ function wpgh_register_scripts()
 
 add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
 
-function wpgh_remove_footer_admin ( $text )
+function wpgh_add_bug_report_prompt( $text )
 {
     return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
 }
 
-add_filter('admin_footer_text', 'wpgh_remove_footer_admin');
+add_filter('admin_footer_text', 'wpgh_add_bug_report_prompt');
 
 do_action( 'groundhogg_loaded' );
