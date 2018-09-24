@@ -54,10 +54,11 @@ add_action( 'wpgh_get_step_settings_date_timer', 'wpgh_date_timer_funnel_step_ht
 
 function wpgh_save_date_timer_step( $step_id )
 {
-    $amount = $_POST[ wpgh_prefix_step_meta( $step_id, 'run_date' ) ];
-    wpgh_update_step_meta( $step_id, 'run_date', $amount );
+    $amount = sanitize_text_field(  $_POST[ wpgh_prefix_step_meta( $step_id, 'run_date' ) ] );
+    $date = date( 'Y-m-d', strtotime( $amount ) );
+    wpgh_update_step_meta( $step_id, 'run_date', $date );
 
-    $type = $_POST[ wpgh_prefix_step_meta( $step_id, 'run_time' ) ];
+    $type = sanitize_text_field( $_POST[ wpgh_prefix_step_meta( $step_id, 'run_time' ) ] );
     wpgh_update_step_meta( $step_id, 'run_time', $type );
 }
 

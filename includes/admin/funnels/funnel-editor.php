@@ -13,21 +13,22 @@
 
 $funnel_id = intval( $_GET['funnel'] );
 
+
+wp_enqueue_style('editor-buttons');
+wp_enqueue_style( 'jquery-ui' );
+wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css' );
+
 //for link editor
 wp_enqueue_editor();
 wp_enqueue_script('wplink');
-wp_enqueue_style('editor-buttons');
 
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 wp_enqueue_script( 'jquery-ui-datepicker' );
-wp_enqueue_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
 wp_enqueue_script( 'link-picker', WPGH_ASSETS_FOLDER . '/js/admin/link-picker.js' );
-//wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/js/lib/sticky-admin-sidebar.js' );
 wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/js/lib/sticky-sidebar/sticky-sidebar.js' );
 wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/js/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
 wp_enqueue_script( 'funnel-editor', WPGH_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
-wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css' );
 
 do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
 

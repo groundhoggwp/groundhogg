@@ -74,16 +74,16 @@ add_action( 'wpgh_get_step_settings_delay_timer', 'wpgh_delay_timer_funnel_step_
 
 function wpgh_save_delay_timer_step( $step_id )
 {
-    $amount = $_POST[ wpgh_prefix_step_meta( $step_id, 'delay_amount' ) ];
+    $amount = intval( $_POST[ wpgh_prefix_step_meta( $step_id, 'delay_amount' ) ] );
     wpgh_update_step_meta( $step_id, 'delay_amount', $amount );
 
-    $type = $_POST[ wpgh_prefix_step_meta( $step_id, 'delay_type' ) ];
+    $type = sanitize_text_field( $_POST[ wpgh_prefix_step_meta( $step_id, 'delay_type' ) ] );
     wpgh_update_step_meta( $step_id, 'delay_type', $type );
 
-    $run_time = $_POST[ wpgh_prefix_step_meta( $step_id, 'run_when' ) ];
+    $run_time = sanitize_text_field( $_POST[ wpgh_prefix_step_meta( $step_id, 'run_when' ) ] );
     wpgh_update_step_meta( $step_id, 'run_when', $run_time );
 
-    $run_time = $_POST[ wpgh_prefix_step_meta( $step_id, 'run_time' ) ];
+    $run_time = sanitize_text_field( $_POST[ wpgh_prefix_step_meta( $step_id, 'run_time' ) ] );
     wpgh_update_step_meta( $step_id, 'run_time', $run_time );
 }
 

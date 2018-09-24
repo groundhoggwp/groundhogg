@@ -134,8 +134,9 @@ register_activation_hook( __FILE__, 'wpgh_activation');
 
 function wpgh_register_scripts()
 {
-    wp_register_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css' );
-    wp_register_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js', array( 'jquery' ) );
+    wp_register_style( 'jquery-ui', plugins_url( 'assets/lib/jquery-ui/jquery-ui.min.css', __FILE__ ) );
+    wp_register_style( 'select2', plugins_url( 'assets/lib/select2/css/select2.min.css', __FILE__ ) );
+    wp_register_script( 'select2', plugins_url( 'assets/lib/select2/js/select2.min.js', __FILE__ ) , array( 'jquery' ) );
 }
 
 add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
