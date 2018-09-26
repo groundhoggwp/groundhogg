@@ -139,7 +139,7 @@ function wpgh_delete_superlink( $id )
 
 }
 
-define( 'WPGH_SUPER_LINKS', 'superlinks' );
+define( 'WPGH_SUPER_LINKS', 'gh_superlinks' );
 define( 'WPGH_SUPER_LINKS_DB_VERSION', '0.3' );
 
 function wpgh_create_superlinks_db()

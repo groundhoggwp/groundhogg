@@ -312,7 +312,7 @@ function wpgh_integrate_contacts_wpdb()
     return;
 }
 
-define( 'WPGH_CONTACTS', 'contacts' );
+define( 'WPGH_CONTACTS', 'gh_contacts' );
 define( 'WPGH_CONTACTS_DB_VERSION', '0.7' );
 
 function wpgh_create_contacts_db()
@@ -349,7 +349,7 @@ function wpgh_create_contacts_db()
 
 }
 
-define( 'WPGH_CONTACT_META', 'contactmeta' );
+define( 'WPGH_CONTACT_META', 'gh_contactmeta' );
 define( 'WPGH_CONTACT_META_DB_VERSION', '0.2' );
 
 function wpgh_create_contact_meta_db()
@@ -763,7 +763,7 @@ function wpgh_count_contact_tag_relationships( $by, $id )
     );
 }
 
-define( 'WPGH_CONTACT_TAGS', 'contact_tags' );
+define( 'WPGH_CONTACT_TAGS', 'gh_contact_tags' );
 define( 'WPGH_CONTACT_TAGS_DB_VERSION', '0.4' );
 
 function wpgh_create_contact_tags_db()
@@ -794,7 +794,7 @@ function wpgh_create_contact_tags_db()
 
 }
 
-define( 'WPGH_CONTACT_TAG_RELATIONSHIPS', 'contact_tag_relationships' );
+define( 'WPGH_CONTACT_TAG_RELATIONSHIPS', 'gh_contact_tag_relationships' );
 define( 'WPGH_CONTACT_TAG_RELATIONSHIPS_DB_VERSION', '0.3' );
 
 function wpgh_create_contact_tag_relationships_db()

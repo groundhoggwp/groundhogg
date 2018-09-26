@@ -129,7 +129,7 @@ function wpgh_count_broadcast_items( $where='', $clause='' )
     }
 }
 
-define( 'WPGH_BROADCASTS', 'broadcasts' );
+define( 'WPGH_BROADCASTS', 'gh_broadcasts' );
 define( 'WPGH_BROADCASTS_DB_VERSION', '0.3' );
 
 /**

@@ -336,13 +336,13 @@ function wpgh_integrate_funnelsteps_wpdb()
 {
     global $wpdb;
 
-    $wpdb->funnelstepmeta = $wpdb->prefix . 'funnelstepmeta';
+    $wpdb->funnelstepmeta = $wpdb->prefix . 'gh_funnelstepmeta';
     $wpdb->tables[] = 'funnelstepmeta';
 
     return;
 }
 
-define( 'WPGH_FUNNELSTEPS', 'funnelsteps' );
+define( 'WPGH_FUNNELSTEPS', 'gh_funnelsteps' );
 define( 'WPGH_FUNNELSTEPS_DB_VERSION', '0.2' );
 
 /**
@@ -378,7 +378,7 @@ function wpgh_create_funnelsteps_db()
     update_option( 'wpgh_funnelsteps_db_version', WPGH_FUNNELSTEPS_DB_VERSION );
 }
 
-define( 'WPGH_FUNNELSTEP_META', 'funnelstepmeta' );
+define( 'WPGH_FUNNELSTEP_META', 'gh_funnelstepmeta' );
 define( 'WPGH_FUNNELSTEP_META_DB_VERSION', '0.2' );
 
 function wpgh_create_funnelstep_meta_db()

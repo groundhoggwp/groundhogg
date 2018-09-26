@@ -266,7 +266,7 @@ function wpgh_enqueue_event( $time, $funnel_id, $step_id, $contact_id, $callback
 	);
 }
 
-define( 'WPGH_EVENTS', 'event_queue' );
+define( 'WPGH_EVENTS', 'gh_event_queue' );
 define( 'WPGH_EVENTS_DB_VERSION', '0.7' );
 
 /**

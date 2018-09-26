@@ -16,16 +16,20 @@ define( 'WPGH_INCLUDES_FOLDER', dirname( __FILE__ ) . '/includes/' );
 define( 'WPGH_ID', 292 );
 define( 'WPGH_NAME', 'groundhogg' );
 define( 'WPGH_VERSION', '0.1' );
+define( 'WPGH_FILE', __FILE__ );
+
+//include dirname( __FILE__ ) . '/blocks/register-blocks.php';
 
 foreach ( glob( dirname( __FILE__ ) . "/includes/*.php" ) as $filename )
 {
-	include $filename;
+    include $filename;
 }
 
 foreach ( glob( dirname( __FILE__ ) . "/includes/db/*.php" ) as $filename )
 {
     include $filename;
 }
+
 
 /* Init groundhogg tables and options. */
 function wpgh_activation()

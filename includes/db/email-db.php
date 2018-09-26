@@ -244,13 +244,13 @@ function wpgh_integrate_emails_wpdb()
 {
 	global $wpdb;
 
-	$wpdb->emailmeta = $wpdb->prefix . 'emailmeta';
+	$wpdb->emailmeta = $wpdb->prefix . 'gh_emailmeta';
 	$wpdb->tables[] = 'emailmeta';
 
 	return;
 }
 
-define( 'WPGH_EMAILS', 'emails' );
+define( 'WPGH_EMAILS', 'gh_emails' );
 define( 'WPGH_EMAILS_DB_VERSION', '0.4' );
 
 /**
@@ -287,7 +287,7 @@ function wpgh_create_emails_db()
 	update_option( 'wpgh_emails_db_version', WPGH_EMAILS_DB_VERSION );
 }
 
-define( 'WPGH_EMAIL_META', 'emailmeta' );
+define( 'WPGH_EMAIL_META', 'gh_emailmeta' );
 define( 'WPGH_EMAIL_META_DB_VERSION', '0.3' );
 
 function wpgh_create_email_meta_db()

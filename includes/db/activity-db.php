@@ -96,7 +96,7 @@ function wpgh_activity_exists( $contact, $funnel, $step, $activity, $subject )
     return ! empty( $results );
 }
 
-define( 'WPGH_ACTIVITY', 'activity_log' );
+define( 'WPGH_ACTIVITY', 'gh_activity_log' );
 define( 'WPGH_ACTIVITY_DB_VERSION', '0.6' );
 
 /**
