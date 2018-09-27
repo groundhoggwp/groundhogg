@@ -14,9 +14,10 @@ function register_form_category( $categories, $post ) {
     );
 }
 
-add_filter( 'block_categories',  __NAMESPACE__ . '\register_form_category', 10, 2 );
+//add_filter( 'block_categories',  __NAMESPACE__ . '\register_form_category', 10, 2 );
 
-add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\enqueue_block_editor_assets' );
+//add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\enqueue_block_editor_assets' );
+
 /**
  * Enqueue block editor only JavaScript and CSS.
  */
@@ -42,7 +43,8 @@ function enqueue_block_editor_assets() {
     );
 }
 
-add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_assets' );
+//add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_assets' );
+
 /**
  * Enqueue front end and editor JavaScript and CSS assets.
  */
@@ -56,7 +58,8 @@ function enqueue_assets() {
     );
 }
 
-add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_frontend_assets' );
+//add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_frontend_assets' );
+
 /**
  * Enqueue frontend JavaScript and CSS assets.
  */
