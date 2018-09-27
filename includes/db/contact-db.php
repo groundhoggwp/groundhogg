@@ -303,10 +303,10 @@ function wpgh_integrate_contacts_wpdb()
 {
     global $wpdb;
 
-    $wpdb->contacts = $wpdb->prefix . 'contacts';
+    $wpdb->contacts = $wpdb->prefix . 'gh_contacts';
     $wpdb->tables[] = 'contacts';
 
-    $wpdb->contactmeta = $wpdb->prefix . 'contactmeta';
+    $wpdb->contactmeta = $wpdb->prefix . 'gh_contactmeta';
     $wpdb->tables[] = 'contactmeta';
 
     return;
