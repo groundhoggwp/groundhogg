@@ -45,6 +45,8 @@ class WPGH_Form
             'id'        => ''
         ), $atts);
 
+        $this->id = intval( $this->a[ 'id' ] );
+
         $this->content = $content;
     }
 
@@ -749,6 +751,8 @@ function wpgh_form_submit_listener()
     $post_id = url_to_postid( wp_get_referer() );
     $expected_fields = get_post_meta( $post_id, 'gh_fields_' . $step, true );
 
+    if ( ! is_array( $expected_fields ) )
+        wp_die( 'Something unexpected happened...' );
 
     if ( wpgh_is_gdpr() && in_array( 'gdpr_consent', $expected_fields ) ){
         if ( ! isset( $_POST[ 'gdpr_consent' ] ) )
