@@ -75,7 +75,7 @@ function wpgh_replacement_meta( $contact, $arg )
     if ( ! $arg )
         return '';
 
-    return print_r( wpgh_get_contact_meta( $contact->get_id(), $arg, true ) , true );
+    return print_r( wpgh_get_contact_meta( $contact->ID, $arg, true ) , true );
 }
 
 add_filter( 'wpgh_replacement_meta', 'wpgh_replacement_meta' );
@@ -88,7 +88,7 @@ add_filter( 'wpgh_replacement_meta', 'wpgh_replacement_meta' );
  */
 function wpgh_replacement_first_name( $contact )
 {
-    return $contact->get_first();
+    return $contact->first_name;
 }
 
 add_filter( 'wpgh_replacement_first_name', 'wpgh_replacement_first_name' );
@@ -102,7 +102,7 @@ add_filter( 'wpgh_replacement_first', 'wpgh_replacement_first_name' );
  */
 function wpgh_replacement_last_name( $contact )
 {
-    return $contact->get_last();
+    return $contact->last_name;
 }
 
 add_filter( 'wpgh_replacement_last_name', 'wpgh_replacement_last_name' );
@@ -116,7 +116,7 @@ add_filter( 'wpgh_replacement_last', 'wpgh_replacement_last_name' );
  */
 function wpgh_replacement_email( $contact )
 {
-    return $contact->get_email();
+    return $contact->email;
 }
 
 add_filter( 'wpgh_replacement_email', 'wpgh_replacement_email' );
@@ -129,7 +129,7 @@ add_filter( 'wpgh_replacement_email', 'wpgh_replacement_email' );
  */
 function wpgh_replacement_owner_email( $contact )
 {
-    $owner = $contact->get_owner();
+    $owner = $contact->owner;
 
     if ( ! $owner )
         return get_bloginfo( 'admin_email' );
@@ -149,7 +149,7 @@ add_filter( 'wpgh_replacement_owner_email', 'wpgh_replacement_owner_email' );
  */
 function wpgh_replacement_owner_first_name( $contact )
 {
-    $owner = $contact->get_owner();
+    $owner = $contact->owner;
 
     if ( ! $owner )
         return get_bloginfo( 'admin_email' );
@@ -169,7 +169,7 @@ add_filter( 'wpgh_replacement_owner_first_name', 'wpgh_replacement_owner_first_n
  */
 function wpgh_replacement_owner_last_name( $contact )
 {
-    $owner = $contact->get_owner();
+    $owner = $contact->owner;
 
     if ( ! $owner )
         return get_bloginfo( 'admin_email' );
@@ -198,6 +198,13 @@ function wpgh_replacement_confirmation_link( $contact )
 
 add_filter( 'wpgh_replacement_confirmation_link', 'wpgh_replacement_confirmation_link' );
 
+/**
+ * Return the date replacement
+ *
+ * @param $time_string
+ * @param $contact
+ * @return string
+ */
 function wpgh_replacement_date( $time_string, $contact )
 {
 

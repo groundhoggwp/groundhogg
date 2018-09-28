@@ -32,7 +32,7 @@ function wpgh_process_superlink()
 
         foreach ( $tags as $tag_id )
         {
-            wpgh_apply_tag( $contact->get_id(), $tag_id );
+            wpgh_apply_tag( $contact->ID, $tag_id );
         }
     }
 
@@ -81,6 +81,12 @@ function wpgh_filter_out_double_http( $content )
 add_filter( 'wpgh_the_email_content', 'wpgh_filter_out_double_http' );
 add_filter( 'wpgh_sanitize_email_content', 'wpgh_filter_out_double_http' );
 
+/**
+ * When inserting superlinks via the link picker it adds a http:// in front. Stop this before sending.
+ *
+ * @param $content
+ * @return null|string|string[]
+ */
 function wpgh_filter_out_http_superlink_prefix( $content )
 {
     return preg_replace( '/http:\/\/({superlink\.\d})/', '${1}', $content );
@@ -89,6 +95,9 @@ function wpgh_filter_out_http_superlink_prefix( $content )
 add_filter( 'wpgh_the_email_content', 'wpgh_filter_out_http_superlink_prefix' );
 add_filter( 'wpgh_sanitize_email_content', 'wpgh_filter_out_http_superlink_prefix' );
 
+/**
+ * Add a superlink via the amin area
+ */
 function wpgh_add_superlink()
 {
 	$superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
@@ -99,6 +108,11 @@ function wpgh_add_superlink()
 
 add_action( 'wpgh_add_superlink', 'wpgh_add_superlink' );
 
+/**
+ * Save superlinks
+ *
+ * @param $id
+ */
 function wpgh_save_superlink( $id )
 {
 	$superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );

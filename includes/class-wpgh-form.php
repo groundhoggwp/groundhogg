@@ -690,37 +690,6 @@ class WPGH_Form
 
 }
 
-/**
- * Alternate form shortcode
- *
- * @param $atts
- * @param $content
- *
- * @return string
- */
-function wpgh_custom_form_shortcode( $atts, $content )
-{
-    $form = new WPGH_Form( $atts, $content );
-
-    return sprintf( "%s", $form );
-}
-
-add_shortcode( 'gh_form', 'wpgh_custom_form_shortcode' );
-
-/**
- * Prevent the shortcode API from texturizing the contents of [gh_form_alt]
- *
- * @param $list
- * @return array
- */
-function wpgh_no_texturize_form( $list )
-{
-    $list[] = 'gh_form';
-    return $list;
-}
-
-add_filter( 'no_texturize_shortcodes', 'wpgh_no_texturize_form' );
-
 
 /**
  * Check if Recaptcha is enabled throughout the plugin.
@@ -831,7 +800,7 @@ function wpgh_form_submit_listener()
         wpgh_update_contact_meta( $id, 'leadsource', esc_url_raw( $_COOKIE[ 'gh_leadsource' ] ) );
 
     /* if the contact previously unsubscribed, set them to unconfirmed. */
-    if ( $contact->get_optin_status() === WPGH_UNSUBSCRIBED )
+    if ( $contact->optin_status === WPGH_UNSUBSCRIBED )
         wpgh_update_contact( $id, 'optin_status', WPGH_UNCONFIRMED );
 
     /* get the terms agreement */
@@ -839,7 +808,7 @@ function wpgh_form_submit_listener()
 
         wpgh_update_contact_meta( $id, 'terms_agreement', 'yes' );
         wpgh_update_contact_meta( $id, 'terms_agreement_date', date_i18n( get_option( 'date_format' ) ) );
-        do_action( 'wpgh_agreed_to_terms', $contact->get_id() );
+        do_action( 'wpgh_agreed_to_terms', $contact->ID );
 
         unset( $_POST[ 'agree_terms' ] );
     }
@@ -849,7 +818,7 @@ function wpgh_form_submit_listener()
 
         wpgh_update_contact_meta( $id, 'gdpr_consent', 'yes' );
         wpgh_update_contact_meta( $id, 'gdpr_consent_date', date_i18n( get_option( 'date_format' ) ) );
-        do_action( 'wpgh_gdpr_consented', $contact->get_id() );
+        do_action( 'wpgh_gdpr_consented', $contact->ID );
 
         unset( $_POST[ 'gdpr_consent' ] );
     }
@@ -897,8 +866,8 @@ function wpgh_email_preferences_form()
 
     ?>
     <div class="gh-form-wrapper">
-        <p><?php _e( 'Hi' )?> <strong><?php echo $contact->get_first(); ?></strong>,</p>
-        <p><?php _e( 'You are managing your email preferences for the email address: ', 'groundhogg' ) ?> <strong><?php echo $contact->get_email(); ?></strong></p>
+        <p><?php _e( 'Hi' )?> <strong><?php echo $contact->first_name; ?></strong>,</p>
+        <p><?php _e( 'You are managing your email preferences for the email address: ', 'groundhogg' ) ?> <strong><?php echo $contact->email; ?></strong></p>
         <form id="email-preferences" class="gh-form" method="post" action="">
             <?php wp_nonce_field( 'change_email_preferences', 'email_preferences_nonce' ) ?>
             <?php if ( ! empty( $_POST ) ):
@@ -964,13 +933,13 @@ function wpgh_process_email_preferences_changes()
     if ( isset( $_POST[ 'delete_everything' ] ) )
     {
 
-        do_action( 'wpgh_delete_everything', $contact->get_id() );
+        do_action( 'wpgh_delete_everything', $contact->ID );
 
-        wpgh_delete_contact( $contact->get_id() );
+        wpgh_delete_contact( $contact->ID );
 
         $unsub_page = get_permalink( get_option( 'gh_unsubscribe_page' ) );
 
-        do_action( 'wpgh_preference_unsubscribe', $contact->get_id() );
+        do_action( 'wpgh_preference_unsubscribe', $contact->ID );
 
         wp_redirect( $unsub_page );
         die();
@@ -981,32 +950,32 @@ function wpgh_process_email_preferences_changes()
     switch ( $preference ){
         case 'none':
 
-            wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_CONFIRMED );
+            wpgh_update_contact( $contact->ID, 'optin_status', WPGH_CONFIRMED );
 
-            do_action( 'wpgh_preference_none', $contact->get_id() );
+            do_action( 'wpgh_preference_none', $contact->ID );
 
             break;
         case 'weekly':
 
-            wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_WEEKLY );
+            wpgh_update_contact( $contact->ID, 'optin_status', WPGH_WEEKLY );
 
-            do_action( 'wpgh_preference_weekly', $contact->get_id() );
+            do_action( 'wpgh_preference_weekly', $contact->ID );
 
             break;
         case 'monthly':
 
-            wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_MONTHLY );
+            wpgh_update_contact( $contact->ID, 'optin_status', WPGH_MONTHLY );
 
-            do_action( 'wpgh_preference_monthly', $contact->get_id() );
+            do_action( 'wpgh_preference_monthly', $contact->ID );
 
             break;
         case 'unsubscribe':
 
-            wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_UNSUBSCRIBED );
+            wpgh_update_contact( $contact->ID, 'optin_status', WPGH_UNSUBSCRIBED );
 
             $unsub_page = get_permalink( get_option( 'gh_unsubscribe_page' ) );
 
-            do_action( 'wpgh_preference_unsubscribe', $contact->get_id() );
+            do_action( 'wpgh_preference_unsubscribe', $contact->ID );
 
             wp_redirect( $unsub_page );
             die();

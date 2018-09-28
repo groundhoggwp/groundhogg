@@ -115,7 +115,7 @@ function wpgh_run_account_created_benchmark_action( $userId )
         $contact_id = wpgh_quick_add_contact( $user_info->user_email, $_POST['first_name'], $_POST['last_name'] );
     } else {
         $contact = new WPGH_Contact( $user_info->user_email );
-        $contact_id = $contact->get_id();
+        $contact_id = $contact->ID;
     }
 
     $benchmarks = wpgh_get_funnel_steps_by_type( 'account_created' );
@@ -149,10 +149,10 @@ function wpgh_run_user_role_changed_benchmark( $userId, $cur_role, $old_roles )
 
     $contact = new WPGH_Contact( $user_info->user_email );
 
-    if ( ! $contact->get_email() )
+    if ( ! $contact->email )
         return;
 
-    $contact_id = $contact->get_id();
+    $contact_id = $contact->ID;
 
     $benchmarks = wpgh_get_funnel_steps_by_type( 'role_changed' );
 
@@ -200,7 +200,7 @@ function wpgh_complete_page_visited_benchmark()
     if ( ! $contact )
         return;
 
-    $contact_id = $contact->get_id();
+    $contact_id = $contact->ID;
 
     $benchmarks = wpgh_get_funnel_steps_by_type( 'page_visited' );
 

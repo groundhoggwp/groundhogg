@@ -7,6 +7,37 @@
  */
 
 /**
+ * Alternate form shortcode
+ *
+ * @param $atts
+ * @param $content
+ *
+ * @return string
+ */
+function wpgh_custom_form_shortcode( $atts, $content )
+{
+    $form = new WPGH_Form( $atts, $content );
+
+    return sprintf( "%s", $form );
+}
+
+add_shortcode( 'gh_form', 'wpgh_custom_form_shortcode' );
+
+/**
+ * Prevent the shortcode API from texturizing the contents of [gh_form_alt]
+ *
+ * @param $list
+ * @return array
+ */
+function wpgh_no_texturize_form( $list )
+{
+    $list[] = 'gh_form';
+    return $list;
+}
+
+add_filter( 'no_texturize_shortcodes', 'wpgh_no_texturize_form' );
+
+/**
  * Mere contact replacements into page content with this shortcode.
  *
  * @param $atts array should be empty
@@ -20,7 +51,7 @@ function wpgh_merge_replacements_shortcode( $atts, $content = '' )
     if ( ! $contact )
         return '';
 
-    return wpgh_do_replacements( $contact->get_id(), $content );
+    return wpgh_do_replacements( $contact->ID, $content );
 }
 
 add_shortcode( 'gh_replacements', 'wpgh_merge_replacements_shortcode' );

@@ -18,14 +18,14 @@ $id = intval( $_GET[ 'contact' ] );
 
 $contact = new WPGH_Contact( $id );
 
-if ( ! $contact->get_email() )
+if ( ! $contact->email )
 {
     wp_die( __( 'This contact no has been deleted.', 'groundhogg' ) );
 }
 
 wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-editor.js' )
 ?>
-<span class="hidden" id="new-title"><?php echo $contact->get_full(); ?> &lsaquo; </span>
+<span class="hidden" id="new-title"><?php echo $contact->full_name; ?> &lsaquo; </span>
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
@@ -38,11 +38,11 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <tbody>
         <tr>
             <th><label for="first_name"><?php echo __( 'First Name', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_text_input_field( 'first_name', 'first_name', $contact->get_first() );?></td>
+            <td><?php echo wpgh_admin_text_input_field( 'first_name', 'first_name', $contact->first_name );?></td>
         </tr>
         <tr>
             <th><label for="last_name"><?php echo __( 'Last Name', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_text_input_field( 'last_name', 'last_name', $contact->get_last() );?></td>
+            <td><?php echo wpgh_admin_text_input_field( 'last_name', 'last_name', $contact->last_name );?></td>
         </tr>
         <?php do_action( 'wpgh_contact_edit_name', $id ); ?>
         </tbody>
@@ -54,20 +54,20 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <tbody>
         <tr>
             <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_email_input_field( 'email', 'email', $contact->get_email() );?><label><span class="row-actions"><a style="text-decoration: none" target="_blank" href="<?php echo esc_url(substr(  $contact->get_email(), strpos( $contact->email, '@' ) ) ); ?>"><span class="dashicons dashicons-external"></span></a></span>
+            <td><?php echo wpgh_admin_email_input_field( 'email', 'email', $contact->email );?><label><span class="row-actions"><a style="text-decoration: none" target="_blank" href="<?php echo esc_url(substr(  $contact->email, strpos( $contact->email, '@' ) ) ); ?>"><span class="dashicons dashicons-external"></span></a></span>
                 <p class="submit"><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpgh_get_optin_status_text( $contact->ID ); ?></p>
-                <?php if ( $contact->get_optin_status() !== WPGH_UNSUBSCRIBED ): ?>
+                <?php if ( $contact->optin_status !== WPGH_UNSUBSCRIBED ): ?>
                     <input type="checkbox" name="unsubscribe" value="1"><?php _e( 'Mark as unsubscribed.' )?></label>
                 <?php endif; ?>
             </td>
         </tr>
         <tr>
             <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_text_input_field( 'primary_phone', 'primary_phone', $contact->get_phone() );?></td>
+            <td><?php echo wpgh_admin_text_input_field( 'primary_phone', 'primary_phone', $contact->primary_phone );?></td>
         </tr>
         <tr>
             <th><label for="phone_extension"><?php echo __( 'Phone Extension', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_text_input_field( 'primary_phone_extension', 'primary_phone_extension', $contact->get_phone_extension() );?></td>
+            <td><?php echo wpgh_admin_text_input_field( 'primary_phone_extension', 'primary_phone_extension', $contact->primary_phone_extension );?></td>
         </tr>
         <?php do_action( 'wpgh_contact_edit_contact_info', $id ); ?>
         </tbody>
@@ -79,12 +79,12 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <tbody>
             <tr>
                 <th><?php _e( 'Agreed To Terms' ); ?></th>
-                <td><?php echo ( wpgh_get_contact_meta( $contact->get_id(), 'terms_agreement', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( $id, 'terms_agreement_date' , true ) ): '&#x2014;'; ?></td>
+                <td><?php echo ( wpgh_get_contact_meta( $contact->ID, 'terms_agreement', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( $id, 'terms_agreement_date' , true ) ): '&#x2014;'; ?></td>
             </tr>
             <?php if ( wpgh_is_gdpr() ): ?>
                 <tr>
                     <th><?php _e( 'GDPR Consent' ); ?></th>
-                    <td><?php echo ( wpgh_get_contact_meta( $contact->get_id(), 'gdpr_consent', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( $id, 'gdpr_consent_date' , true ) ) : '&#x2014;'; ?></td>
+                    <td><?php echo ( wpgh_get_contact_meta( $contact->ID, 'gdpr_consent', true ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ), wpgh_get_contact_meta( $id, 'gdpr_consent_date' , true ) ) : '&#x2014;'; ?></td>
                 </tr>
             <?php endif; ?>
         </tbody>
@@ -96,7 +96,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         <tbody>
         <tr>
             <th><?php _e( 'Owner', 'groundhogg' ); ?></th>
-            <td><?php $args = array( 'show_option_none' => __( 'Select an owner' ), 'id' => 'owner', 'name' => 'owner', 'role' => 'administrator', 'class' => 'cowner', 'selected' => $contact->get_owner() ); ?>
+            <td><?php $args = array( 'show_option_none' => __( 'Select an owner' ), 'id' => 'owner', 'name' => 'owner', 'role' => 'administrator', 'class' => 'cowner', 'selected' => $contact->owner ); ?>
                 <?php wp_dropdown_users( $args ) ?></td>
         </tr>
         <tr>
@@ -113,7 +113,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
         </tr>
         <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
-            <td><?php wpgh_dropdown_tags( array( 'width' => '400px', 'class' => 'hidden', 'selected' => $contact->get_tags() ) );?></td>
+            <td><?php wpgh_dropdown_tags( array( 'width' => '400px', 'class' => 'hidden', 'selected' => $contact->tags ) );?></td>
         </tr>
         <?php do_action( 'wpgh_contact_edit_tags', $id ); ?>
         </tbody>
@@ -158,7 +158,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
             </th>
         </tr>
             <?php
-            $meta = wpgh_get_contact_meta( $contact->get_id() );
+            $meta = wpgh_get_contact_meta( $contact->ID );
             foreach ( $meta as $meta_key => $value )
             {
                 $value = $value[ 0 ];
@@ -354,7 +354,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                         }
                         $email = wpgh_get_email_by_id( intval( $email_id ) );
                         echo sprintf(  "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email_id ), $email->subject ); ?></td>
-                    <td><?php if ( $activity = wpgh_get_activity( $contact->get_id(), $funnel_id, $email_event->step_id, 'email_opened', $email_id ) ):
+                    <td><?php if ( $activity = wpgh_get_activity( $contact->ID, $funnel_id, $email_event->step_id, 'email_opened', $email_id ) ):
                             $p_time = intval( $activity->timestamp ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
                             $cur_time = (int) current_time( 'timestamp' );
                             $time_diff = $p_time - $cur_time;
@@ -367,7 +367,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . '/js/admin/contact-edi
                         else:
                             echo '&#x2014;';
                         endif;?></td>
-                    <td><?php $activity = wpgh_get_activity( $contact->get_id(), $email_event->funnel_id, $email_event->step_id, 'email_link_click', $email_id );
+                    <td><?php $activity = wpgh_get_activity( $contact->ID, $email_event->funnel_id, $email_event->step_id, 'email_link_click', $email_id );
                         if ( $activity )
                             echo '<a target="_blank" href="' . esc_url( $activity->referer ) . '">' . esc_url( $activity->referer ) . '</a>';
                         else

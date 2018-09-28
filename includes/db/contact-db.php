@@ -128,6 +128,34 @@ function wpgh_get_contact_by_email( $email )
 }
 
 /**
+ * Get a contact row via the email of the contact
+ *
+ * @param string $field the db field
+ * @param string $value Contact's Email
+ *
+ * @return array|bool
+ */
+function wpgh_get_contact_by( $field, $value )
+{
+    global $wpdb;
+
+    if ( ! $field || ! is_string( $value ) )
+        return false;
+
+    $table_name = $wpdb->prefix . WPGH_CONTACTS;
+
+    if ( is_numeric( $value ) ){
+        $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE $field = %s", $value );
+    } else {
+        $sql_prep1 = $wpdb->prepare("SELECT * FROM $table_name WHERE $field = %s", $value );
+    }
+
+    $contact = $wpdb->get_row( $sql_prep1, ARRAY_A );
+
+    return $contact;
+}
+
+/**
  * Insert a new contact into the DB.
  *
  * @param $email string Contact's email
@@ -425,7 +453,7 @@ function wpgh_get_contact_tags( $contact_id )
 
     return $wpdb->get_results(
         $wpdb->prepare(
-            "SELECT * FROM $table_name WHERE contact_id = %d ORDER BY tag_id DESC"
+            "SELECT tag_id FROM $table_name WHERE contact_id = %d ORDER BY tag_id DESC"
             , $contact_id), ARRAY_A
     );
 }

@@ -96,7 +96,7 @@ function wpgh_get_optin_status_text( $id_or_email )
 
     $contact = new WPGH_Contact( $id_or_email );
 
-    if ( ! $contact->get_email() )
+    if ( ! $contact->email )
         return __( 'No Contact' );
 
     get_option( 'gh_strict_gdpr', array( 'no' ) );
@@ -109,7 +109,7 @@ function wpgh_get_optin_status_text( $id_or_email )
             return __( 'This contact has not agreed to receive email marketing from you.', 'groundhogg' );
     }
 
-	switch ( $contact->get_optin_status() ){
+	switch ( $contact->optin_status ){
 
 		case WPGH_UNCONFIRMED:
 
@@ -172,7 +172,7 @@ function wpgh_can_send_email( $contact_id )
             return false;
     }
 
-    switch ( $contact->get_optin_status() )
+    switch ( $contact->optin_status )
     {
         case WPGH_UNCONFIRMED:
             /* check for grace period if necessary */
@@ -413,7 +413,7 @@ function wpgh_save_contact( $id )
 
     if ( isset( $_POST[ 'tags' ] ) ){
         $tags = wpgh_validate_tags( $_POST['tags' ] );
-        $cur_tags = $contact->get_tags();
+        $cur_tags = $contact->tags;
         $new_tags = $tags;
 
         $delete_tags = array_diff( $cur_tags, $new_tags );
@@ -483,7 +483,7 @@ function wpgh_save_contact_inline()
     wpgh_update_contact($id, 'owner_id', $owner );
 
     $contact = new WPGH_Contact( $id );
-    $cur_tags = $contact->get_tags();
+    $cur_tags = $contact->tags;
     $new_tags = $tags;
 
     $delete_tags = array_diff( $cur_tags, $new_tags );
@@ -503,7 +503,7 @@ function wpgh_save_contact_inline()
     }
 
     if ( isset( $_POST['unsubscribe'] ) ){
-        if ( $contact->get_optin_status() !== WPGH_UNSUBSCRIBED )
+        if ( $contact->optin_status !== WPGH_UNSUBSCRIBED )
         {
             wpgh_update_contact($id, 'optin_status', WPGH_UNSUBSCRIBED );
             do_action( 'wpgh_contact_unsubscribed', $id );
@@ -982,11 +982,11 @@ function wpgh_process_email_confirmation()
     if ( ! $contact )
         return;
 
-    wpgh_update_contact( $contact->get_id(), 'optin_status', WPGH_CONFIRMED );
+    wpgh_update_contact( $contact->ID, 'optin_status', WPGH_CONFIRMED );
 
     $conf_page = get_permalink( get_option( 'gh_confirmation_page' ) );
 
-    do_action( 'wpgh_email_confirmed', $contact->get_id(), wpgh_get_current_funnel() );
+    do_action( 'wpgh_email_confirmed', $contact->ID, wpgh_get_current_funnel() );
 
     wp_redirect( $conf_page );
     die();

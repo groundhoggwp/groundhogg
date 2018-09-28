@@ -48,12 +48,12 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
     $contact = new WPGH_Contact( $contact_id );
 
     /* if the email is a dud, give up. */
-    if ( ! is_email( $contact->get_email() ) )
+    if ( ! is_email( $contact->email ) )
         return false;
 
     /* bypass if testing. */
     if ( ! isset( $_POST[ 'send_test' ]  ) ){
-        if ( ! wpgh_can_send_email( $contact->get_id() ) )
+        if ( ! wpgh_can_send_email( $contact->ID ) )
             return false;
     }
     /* don't send email depending on their optin status */
@@ -68,7 +68,7 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
 
     $ref_link = site_url( sprintf(
         "gh-tracking/email/click/%s/%s/%s/%s/?ref=",
-        wpgh_encrypt_decrypt( $contact->get_id(), 'e' ),
+        wpgh_encrypt_decrypt( $contact->ID, 'e' ),
         $email_id,
         $funnel_id,
         $step_id
@@ -76,7 +76,7 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
 
     $tracking_link = site_url( sprintf(
         "gh-tracking/email/open/%s/%s/%s/%s/",
-        wpgh_encrypt_decrypt( $contact->get_id(), 'e' ),
+        wpgh_encrypt_decrypt( $contact->ID, 'e' ),
         $email_id,
         $funnel_id,
         $step_id
@@ -85,9 +85,9 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
     $browser_link = site_url( sprintf( "gh-email/%d/", $email_id ) );
 
     $title = get_option( 'gh_business_name' );
-    $subject_line = wpgh_do_replacements( $contact->get_id(), $email->subject );
-    $pre_header = wpgh_do_replacements( $contact->get_id(), $email->pre_header );
-    $content = apply_filters( 'wpgh_the_email_content', wpgh_do_replacements( $contact->get_id(), $email->content ) );
+    $subject_line = wpgh_do_replacements( $contact->ID, $email->subject );
+    $pre_header = wpgh_do_replacements( $contact->ID, $email->pre_header );
+    $content = apply_filters( 'wpgh_the_email_content', wpgh_do_replacements( $contact->ID, $email->content ) );
     $email_footer_text = wpgh_get_email_footer_text();
     $unsubscribe_link = get_permalink( get_option( 'gh_email_preferences_page' ) );
     $alignment = wpgh_get_email_meta( $email_id, 'alignment', true );
@@ -112,7 +112,7 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
         $from_email = $from_user->user_email;
 
     } else {
-        $owner = $contact->get_owner();
+        $owner = $contact->owner;
         if ( $owner ) {
             $from_user = get_userdata( $owner );
             $from_name = $from_user->display_name;
@@ -131,7 +131,7 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
         $body = array(
             'from_name' => $from_name,
             'from_email' => $from_email,
-            'to'   => $contact->get_email(),
+            'to'   => $contact->email,
             'subject_line' => $subject_line,
             'content' => $email_content
         );
@@ -154,14 +154,14 @@ function wpgh_send_email( $contact_id, $email_id, $funnel_id=0, $step_id=0 )
 
         add_filter( 'wp_mail_content_type', 'wpgh_send_html_email' );
 
-        $sent = wp_mail( $contact->get_email() , $subject_line, $email_content, $headers );
+        $sent = wp_mail( $contact->email , $subject_line, $email_content, $headers );
 
         if ( is_wp_error( $sent ) || ! $sent ){
             return false;
         }
     }
 
-    wpgh_update_contact_meta( $contact->get_id(), 'last_sent', time() );
+    wpgh_update_contact_meta( $contact->ID, 'last_sent', time() );
 
     return true;
 }
@@ -841,14 +841,14 @@ function wpgh_parse_bounces()
 
             $contact  = new WPGH_Contact( $the['recipient'] );
 
-            if ( ! $contact->get_email() ){
+            if ( ! $contact->email ){
                 continue;
             }
 
             switch( $the['action'] ){
                 case 'failed':
                     //do something
-                    if ( $contact->get_optin_status() !== WPGH_HARD_BOUNCE ){
+                    if ( $contact->optin_status !== WPGH_HARD_BOUNCE ){
                         wpgh_add_note( $contact->ID, sprintf( $bounce_handler->fetch_status_messages( $the['status'] ) ) );
                         wpgh_update_contact( $contact->ID, 'optin_status', WPGH_HARD_BOUNCE );
                     }

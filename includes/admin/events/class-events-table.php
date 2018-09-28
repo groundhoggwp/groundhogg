@@ -73,12 +73,12 @@ class WPGH_Events_Table extends WP_List_Table {
     {
         $contact = new WPGH_Contact( intval( $item[ 'contact_id' ] ) );
 
-        if ( ! $contact->get_email() )
+        if ( ! $contact->email )
             return sprintf( "<strong>(%s)</strong>",  __( 'contact deleted', 'groundhogg' ) );
 
         $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
-            admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $contact->get_id() ),
-            $contact->get_email()
+            admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $contact->ID ),
+            $contact->email
         );
 
         return $html;

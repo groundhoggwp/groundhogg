@@ -78,14 +78,14 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
         $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $item['ID'] );
         $html  = '<div id="inline_' . intval( $item['ID'] ). '" class="hidden">';
-        $html .= '  <div class="email">' . esc_html( $contact->get_email() ). '</div>';
-        $html .= '  <div class="first_name">' . esc_html( $contact->get_first() ). '</div>';
-        $html .= '  <div class="last_name">' . esc_html( $contact->get_last() ). '</div>';
-        $html .= '  <div class="optin_status">' . esc_html( $contact->get_optin_status() ). '</div>';
-        $html .= '  <div class="owner">' . esc_html( $contact->get_owner() ). '</div>';
-        $html .= '  <div class="tags">' . esc_html( json_encode( $contact->get_tags() ) ). '</div>';
+        $html .= '  <div class="email">' . esc_html( $contact->email ). '</div>';
+        $html .= '  <div class="first_name">' . esc_html( $contact->first_name ). '</div>';
+        $html .= '  <div class="last_name">' . esc_html( $contact->last_name ). '</div>';
+        $html .= '  <div class="optin_status">' . esc_html( $contact->optin_status ). '</div>';
+        $html .= '  <div class="owner">' . esc_html( $contact->owner ). '</div>';
+        $html .= '  <div class="tags">' . esc_html( json_encode( $contact->tags ) ). '</div>';
         $html .= '</div>';
-        $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->get_email() ) . "</a>";
+        $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->email ) . "</a>";
         return $html;
     }
 
@@ -93,14 +93,14 @@ class WPGH_Contacts_Table extends WP_List_Table {
     {
         $contact = new WPGH_Contact( intval( $item['ID'] ) );
 
-        return $contact->get_first() ? $contact->get_first() : '&#x2014;' ;
+        return $contact->first_name ? $contact->first_name : '&#x2014;' ;
     }
 
     protected function column_last_name( $item )
     {
         $contact = new WPGH_Contact( intval( $item['ID'] ) );
 
-        return $contact->get_last() ? $contact->get_last() : '&#x2014;' ;
+        return $contact->last_name ? $contact->last_name : '&#x2014;' ;
     }
 
     protected function column_user_id( $item )
