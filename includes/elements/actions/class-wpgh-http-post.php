@@ -164,12 +164,12 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
         foreach ( $post_keys as $i => $key )
         {
             if ( ! empty( $key ) ){
-                $post_array[ sanitize_key( $key ) ] = WPGH()->replacements->do( sanitize_text_field( $post_values[ $i ] ), $contact->ID );
+                $post_array[ sanitize_key( $key ) ] = WPGH()->replacements->process( sanitize_text_field( $post_values[ $i ] ), $contact->ID );
             }
         }
 
         $post_url = $event->step->get_meta( 'post_url' );
-        $post_url = WPGH()->replacements->do( esc_url_raw( $post_url ), $contact->ID );
+        $post_url = WPGH()->replacements->process( esc_url_raw( $post_url ), $contact->ID );
 
         $response = wp_remote_post( $post_url, array(
             'body' => $post_array

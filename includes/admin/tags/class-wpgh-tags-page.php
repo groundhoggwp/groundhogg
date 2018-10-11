@@ -164,9 +164,9 @@ class WPGH_Tags_Page
         $tag_description = sanitize_textarea_field( wp_unslash( $_POST[ 'description' ] ) );
 
         $args = array(
-            'tag_description'   => $tag_description,
             'tag_name'          => $tag_name,
-            'tag_slug'          => sanitize_title( $tag_name )
+            'tag_slug'          => sanitize_title( $tag_name ),
+            'tag_description'   => $tag_description,
         );
 
         WPGH()->tags->update( intval( $_GET[ 'tag' ] ), $args );
@@ -193,7 +193,7 @@ class WPGH_Tags_Page
 		}
 
 		$tags_table = new WPGH_Tags_Table(); ?>
-        <form method="get" class="search-form wp-clearfix">
+        <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
             <p class="search-box">
                 <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Tags ', 'groundhogg'); ?>:</label>

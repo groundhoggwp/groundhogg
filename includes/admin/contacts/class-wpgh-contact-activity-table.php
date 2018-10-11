@@ -72,6 +72,7 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
      */
     protected function column_email( $event )
     {
+
         if ( $event->is_broadcast_event() ) {
 
             $email = $event->step->email;
@@ -98,8 +99,10 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
             'step_id'       => $event->step->ID,
             'activity_type' => 'email_opened',
             'contact_id'    => $event->contact->ID,
-            'event_id'      => $event->ID
+//            'event_id'      => $event->ID
         ) );
+
+//        print_r( $activity );
 
         if( empty( $activity ) ){
             return '&#x2014;';
@@ -132,7 +135,7 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
             'step_id'       => $event->step->ID,
             'activity_type' => 'email_link_click',
             'contact_id'    => $event->contact->ID,
-            'event_id'      => $event->ID
+//            'event_id'      => $event->ID
         ) );
 
         if( empty( $activity ) ){
@@ -141,7 +144,7 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
 
         $activity = array_shift( $activity );
 
-        return '<a target="_blank" href="' . esc_url( $activity->referrer ) . '">' . esc_url( $activity->referrer ) . '</a>';
+        return '<a target="_blank" href="' . esc_url( $activity->referer ) . '">' . esc_url( $activity->referer ) . '</a>';
 
     }
 
@@ -199,6 +202,8 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
      * @return int
      */
     protected function usort_reorder( $a, $b ) {
+        $a = (array) $a;
+        $b = (array) $b;
         // If no sort, default to title.
         $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'time'; // WPCS: Input var ok.
         // If no order, default to asc.

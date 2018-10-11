@@ -85,8 +85,11 @@ class WPGH_Contacts_Table extends WP_List_Table {
         $html .= '  <div class="first_name">' . esc_html( $contact->first_name ). '</div>';
         $html .= '  <div class="last_name">' . esc_html( $contact->last_name ). '</div>';
         $html .= '  <div class="optin_status">' . esc_html( $contact->optin_status ). '</div>';
-        $html .= '  <div class="owner">' . esc_html( $contact->owner ). '</div>';
+        if ( $contact->owner ){
+            $html .= '  <div class="owner">' . esc_html( $contact->owner->ID ). '</div>';
+        }
         $html .= '  <div class="tags">' . esc_html( json_encode( $contact->tags ) ). '</div>';
+        $html .= '  <div class="tags-data">' . esc_html( json_encode( wpgh_format_tags_for_select2( $contact->tags ) ) ) . '</div>';
         $html .= '</div>';
         $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->email ) . "</a>";
         return $html;
@@ -398,6 +401,9 @@ class WPGH_Contacts_Table extends WP_List_Table {
      */
     protected function usort_reorder( $a, $b ) {
         // If no sort, default to title.
+        $a = (array) $a;
+        $b = (array) $b;
+
         $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'date_created'; // WPCS: Input var ok.
         // If no order, default to asc.
         $order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
@@ -522,7 +528,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
                             <label class="inline-edit-tags">
                                 <span class="title"><?php _e('Tags'); ?></span>
                             </label>
-                            <?php wpgh_dropdown_tags( array( 'select2' => false ) ); ?>
+                            <?php echo WPGH()->html->dropdown( array( 'id' => 'tags', 'name' => 'tags[]' ) ); ?>
                         </div>
                     </fieldset>
                     <div class="submit inline-edit-save">

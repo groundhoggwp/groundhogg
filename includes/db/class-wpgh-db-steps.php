@@ -64,11 +64,11 @@ class WPGH_DB_Steps extends WPGH_DB  {
         return array(
             'ID'             => '%d',
             'funnel_id'      => '%d',
-            'title'     => '%s',
-            'status'    => '%s',
-            'type'      => '%s',
-            'group'     => '%s',
-            'order'     => '%d',
+            'step_title'     => '%s',
+            'step_status'    => '%s',
+            'step_type'      => '%s',
+            'step_group'     => '%s',
+            'step_order'     => '%d',
         );
     }
 
@@ -82,11 +82,11 @@ class WPGH_DB_Steps extends WPGH_DB  {
         return array(
             'ID'             => 0,
             'funnel_id'      => 0,
-            'title'     => __( 'New Step' ),
-            'status'    => 'ready',
-            'type'      => 'send_email',
-            'group'     => 'action',
-            'order'     => 0,
+            'step_title'     => __( 'New Step' ),
+            'step_status'    => 'ready',
+            'step_type'      => 'send_email',
+            'step_group'     => 'action',
+            'step_order'     => 0,
         );
     }
 
@@ -318,11 +318,11 @@ class WPGH_DB_Steps extends WPGH_DB  {
         $sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 		funnel_id bigint(20) unsigned NOT NULL,
-		title mediumtext NOT NULL,
-		type varchar(50) NOT NULL,
-		group varchar(20) NOT NULL,
-		status varchar(20) NOT NULL,
-		order int unsigned NOT NULL,
+		step_title mediumtext NOT NULL,
+		step_type varchar(50) NOT NULL,
+		step_group varchar(20) NOT NULL,
+		step_status varchar(20) NOT NULL,
+		step_order int unsigned NOT NULL,
 		PRIMARY KEY  (ID)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 

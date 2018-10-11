@@ -108,6 +108,9 @@ class WPGH_Tag_Applied extends WPGH_Funnel_Step
 
         $steps = WPGH()->steps->get_steps( array( 'type' => $this->type, 'group' => $this->group ) );
 
+        if ( empty( $steps ) )
+            return;
+
         foreach ( $steps as $step ){
 
             $step = new WPGH_Step( $step->ID );

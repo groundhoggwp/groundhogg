@@ -34,7 +34,7 @@ class WPGH_Bounce_Checker
         if ( ! get_option( 'gh_bounce_inbox', false ) || ! get_option( 'gh_bounce_inbox_password', false ) )
             return;
 
-        include dirname( __FILE__ ) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
+        include_once dirname( __FILE__ ) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
 
         $this->bounce_handler = new BounceHandler();
 

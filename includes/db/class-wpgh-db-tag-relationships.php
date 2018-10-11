@@ -70,9 +70,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
     public function add( $tag_id = 0, $contact_id = 0 ) {
 
         if ( ! WPGH()->tags->exists( $tag_id ) || ! WPGH()->contacts->exists( $contact_id, 'ID' ) ) {
-
             return false;
-
         }
 
         $data = array(
@@ -204,7 +202,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 
         global $wpdb;
 
-        $results = $wpdb->get_results("SELECT $return FROM $this->table_name WHERE $column LIKE $value ORDER BY $this->primary_key DESC" );
+        $results = $wpdb->get_col("SELECT $return FROM $this->table_name WHERE $column LIKE $value ORDER BY $this->primary_key DESC" );
 
         if ( empty( $results ) ) {
 

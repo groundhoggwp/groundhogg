@@ -216,18 +216,6 @@ class WPGH_Replacements
     }
 
     /**
-     * Alias for Process
-     *
-     * @param $content
-     * @param null $contact_id
-     * @return string
-     */
-    public function do( $content, $contact_id=null )
-    {
-        return $this->process( $content, $contact_id );
-    }
-
-    /**
      * Process the given replacement code
      *
      * @param $m

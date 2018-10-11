@@ -31,9 +31,9 @@ var GH = {
         });
     },
     init: function(){
-        var referrer = this.getCookie( this.leadSource );
-        if ( ! referrer ){
-            this.setCookie( this.leadSource, document.referrer, 3 )
+        var referer = this.getCookie( this.leadSource );
+        if ( ! referer ){
+            this.setCookie( this.leadSource, document.referer, 3 )
         }
         this.pageView();
     }

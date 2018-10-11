@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 0.1.0
+Version: 0.2.0
 Author: Adrian Tobey
 Author URI: http://health-check-team.example.com
 Text Domain: groundhogg
@@ -19,8 +19,12 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         /**
          * @var $instance Groundhogg instance
          */
-        private static $instance;
+        public static $instance;
 
+        /**
+         * @var bool Dummy vairable to snusre GH was infact setup.
+         */
+        public static $is_setup = false;
 
         /**
          * Funnel actions/benchmarks
@@ -189,68 +193,63 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $replacements;
 
         /**
-         * Groundhogg constructor.
-         */
-        public function __construct()
-        {
-            $this->setup_constants();
-
-            $this->includes();
-
-
-            $this->contacts     = new WPGH_DB_Contacts();
-            $this->contact_meta = new WPGH_DB_Contact_Meta();
-
-            $this->tags                 = new WPGH_DB_Tags();
-            $this->tag_relationships    = new WPGH_DB_Tag_Relationships();
-
-            $this->funnels      = new WPGH_DB_Funnels();
-
-            $this->steps        = new WPGH_DB_Steps();
-            $this->step_meta    = new WPGH_DB_Step_Meta();
-
-            $this->emails       = new WPGH_DB_Emails();
-            $this->email_meta   = new WPGH_DB_Email_Meta();
-
-            $this->broadcasts   = new WPGH_DB_Broadcasts();
-
-            $this->activity     = new WPGH_DB_Activity();
-            $this->events       = new WPGH_DB_Events();
-            $this->superlinks   = new WPGH_DB_Superlinks();
-
-
-            $this->tracking     = new WPGH_Tracking();
-            $this->event_queue  = new WPGH_Event_Queue();
-
-            $this->replacements = new WPGH_Replacements();
-            $this->notices      = new WPGH_Notices();
-            $this->submission   = new WPGH_Submission();
-            $this->superlink    = new WPGH_Superlink();
-            $this->html         = new WPGH_HTML();
-
-            $this->bounce_checker   = new WPGH_Bounce_Checker();
-            $this->template_loader  = new WPGH_Template_Loader();
-
-            $this->elements     = new WPGH_Elements();
-
-            if ( is_admin() ){
-                $this->menu     = new WPGH_Admin_Menu();
-            }
-
-        }
-
-        /**
          * Returns the instance on Groundhogg.
          *
          * @return Groundhogg
          */
         public static function instance()
         {
-            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Groundhogg ) ) {
+            if ( ! self::$is_setup ) {
 
-                self::$instance = new Groundhogg();
+//                echo 'not setup ';
+                self::$is_setup = true;
+                self::$instance = new Groundhogg;
+
+                self::$instance->setup_constants();
+
+                self::$instance->includes();
+
+                self::$instance->contacts     = new WPGH_DB_Contacts();
+                self::$instance->contact_meta = new WPGH_DB_Contact_Meta();
+
+                self::$instance->tags                 = new WPGH_DB_Tags();
+                self::$instance->tag_relationships    = new WPGH_DB_Tag_Relationships();
+
+                self::$instance->funnels      = new WPGH_DB_Funnels();
+
+                self::$instance->steps        = new WPGH_DB_Steps();
+                self::$instance->step_meta    = new WPGH_DB_Step_Meta();
+
+                self::$instance->emails       = new WPGH_DB_Emails();
+                self::$instance->email_meta   = new WPGH_DB_Email_Meta();
+
+                self::$instance->broadcasts   = new WPGH_DB_Broadcasts();
+
+                self::$instance->activity     = new WPGH_DB_Activity();
+                self::$instance->events       = new WPGH_DB_Events();
+                self::$instance->superlinks   = new WPGH_DB_Superlinks();
+
+
+                self::$instance->tracking     = new WPGH_Tracking();
+                self::$instance->event_queue  = new WPGH_Event_Queue();
+//
+                self::$instance->replacements = new WPGH_Replacements();
+                self::$instance->notices      = new WPGH_Notices();
+                self::$instance->submission   = new WPGH_Submission();
+                self::$instance->superlink    = new WPGH_Superlink();
+                self::$instance->html         = new WPGH_HTML();
+//
+                self::$instance->bounce_checker   = new WPGH_Bounce_Checker();
+                self::$instance->template_loader  = new WPGH_Template_Loader();
+//
+                self::$instance->elements     = new WPGH_Elements();
+//
+                if ( is_admin() ){
+                    self::$instance->menu     = new WPGH_Admin_Menu();
+                }
 
             }
+
 
             return self::$instance;
         }

@@ -44,6 +44,7 @@ class WPGH_Event_Queue
         add_action( 'init', array( $this, 'setup_cron_jobs' ) );
         add_filter( 'cron_schedules', array( $this, 'setup_cron_schedules' ) );
         add_action( self::ACTION , array( $this, 'process' ) );
+        add_action( 'admin_init', array( $this, 'ajax_process' ) );
 
     }
 
@@ -91,6 +92,16 @@ class WPGH_Event_Queue
 
 
         return $this->events;
+    }
+
+    /**
+     * Hook into ALL ajax requests to process events
+     */
+    public function ajax_process()
+    {
+        if ( wp_doing_ajax() )
+            $this->process();
+
     }
 
 

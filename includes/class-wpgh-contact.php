@@ -50,7 +50,7 @@ class WPGH_Contact
 	/**
 	 * @var array $tags list of tag ids the contact has
 	 */
-	public $tags;
+	public $tags = array();
 
 	/**
 	 * @var string $activity an account of all activity associated with the contact.
@@ -173,7 +173,13 @@ class WPGH_Contact
 
         $this->full_name = sprintf( "%s %s", $this->first_name, $this->last_name );
 
-        $this->tags = array_map( 'intval', WPGH()->tag_relationships->get_tags_by_contact( $this->ID ) );
+        $tags = WPGH()->tag_relationships->get_tags_by_contact( $this->ID );
+
+        if ( is_array( $tags ) ){
+            $this->tags = array_map( 'intval', $tags );
+        } else {
+            $this->tags = array();
+        }
 
         $this->notes = $this->get_meta('notes' );
 
@@ -307,7 +313,7 @@ class WPGH_Contact
      */
     public function get_meta( $key )
     {
-         return WPGH()->contact_meta->get_meta( $this->ID, $key );
+         return WPGH()->contact_meta->get_meta( $this->ID, $key, true );
 //        return wpgh_get_contact_meta( $this->ID, $key );
     }
 
@@ -391,7 +397,7 @@ class WPGH_Contact
 
         if ( ! is_array( $tag_id_or_array ) ){
 
-            $tags = array( $tag_id_or_array );
+            $tags = array( intval( $tag_id_or_array ) );
 
         } else if( is_array( $tag_id_or_array ) ){
 
@@ -411,16 +417,17 @@ class WPGH_Contact
 
                 $this->tags[] = $tag_id;
 
-                WPGH()->tag_relationships->add( $this->ID, $tag_id );
+                $result = WPGH()->tag_relationships->add( $this->ID, $tag_id );
 
-                do_action( 'wpgh_tag_applied', $this, $tag_id );
+                if ( $result ){
+                    do_action( 'wpgh_tag_applied', $this, $tag_id );
+                }
 
             }
 
         }
 
         return true;
-
 
     }
 
@@ -455,9 +462,11 @@ class WPGH_Contact
 
                 unset( $this->tags[ array_search( $tag_id, $this->tags ) ] );
 
-                WPGH()->tag_relationships->delete( array( 'tag_id' => $tag_id, 'contact_id' => $this->ID ) );
+                $result = WPGH()->tag_relationships->delete( array( 'tag_id' => $tag_id, 'contact_id' => $this->ID ) );
 
-                do_action( 'wpgh_tag_removed', $this, $tag_id );
+                if ( $result ){
+                    do_action( 'wpgh_tag_removed', $this, $tag_id );
+                }
 
             }
 
@@ -476,8 +485,7 @@ class WPGH_Contact
 	function has_tag( $tag_id_or_name )
 	{
 
-	    if ( ! is_numeric( $tag_id_or_name ) )
-        {
+	    if ( ! is_numeric( $tag_id_or_name ) ) {
 
             $tag = (object) WPGH()->tags->get_tag_by( 'tag_slug', $tag_id_or_name );
 

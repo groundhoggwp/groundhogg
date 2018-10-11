@@ -51,7 +51,7 @@ function wpgh_merge_replacements_shortcode( $atts, $content = '' )
     if ( ! $contact )
         return '';
 
-    return WPGH()->replacements->do( $content, $contact->ID );
+    return WPGH()->replacements->process( $content, $contact->ID );
 }
 
 add_shortcode( 'gh_replacements', 'wpgh_merge_replacements_shortcode' );
@@ -72,7 +72,7 @@ function wpgh_contact_replacement_shortcode( $atts )
 
 	$content = sprintf( '{%s}', $a[ 'field' ] );
 
-	return WPGH()->replacements->do( $contact->ID, $content );
+	return WPGH()->replacements->process( $contact->ID, $content );
 }
 
 add_shortcode( 'gh_contact', 'wpgh_contact_replacement_shortcode' );

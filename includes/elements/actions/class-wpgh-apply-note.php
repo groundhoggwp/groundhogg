@@ -98,7 +98,7 @@ class WPGH_Apply_Note extends WPGH_Funnel_Step
 
         $note = $event->step->get_meta( 'note_text' );
 
-        $finished_note = WPGH()->replacements->do( $note, $contact->ID );
+        $finished_note = WPGH()->replacements->process( $note, $contact->ID );
 
         $contact->add_note( $finished_note );
 

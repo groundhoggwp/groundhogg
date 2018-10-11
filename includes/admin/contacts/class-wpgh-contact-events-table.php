@@ -141,19 +141,21 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
         $run = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ), 'execute' ) );
         $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=cancel' ), 'cancel' ) );
 
-        $html = "<div class=\"row-actions\">";
+//        $html = "<div class=\"row-actions\">";
+
+        $actions = array();
 
         if ( $event->time > time() ){
-            $html .= sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span> | ", $run, __( 'Run Now' ) );
-            $html .= sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, __( 'Cancel' ) );
+            $actions[] =  sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, __( 'Run Now' ) );
+            $actions[] =  sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, __( 'Cancel' ) );
         } else {
-            $html .= sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span> | ", $run, __( 'Run Again' ) );
+            $actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, __( 'Run Again' ) );
         }
 
 
-        $html .= "</div>";
+//        $html .= "</div>";
 
-        return $html;
+        return $this->row_actions( $actions );
     }
 
     /**
@@ -180,6 +182,10 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
         $data = $this->data;
+
+        if ( ! $data ){
+            $data = array();
+        }
 
         /*
          * Sort the data
@@ -211,6 +217,9 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
      */
     protected function usort_reorder( $a, $b ) {
         // If no sort, default to title.
+
+        $a = (array) $a;
+        $b = (array) $b;
         $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'time'; // WPCS: Input var ok.
         // If no order, default to asc.
         $order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.

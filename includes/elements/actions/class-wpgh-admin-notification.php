@@ -166,18 +166,18 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
 
         $note = $event->step->get_meta( 'note_text' );
 
-        $finished_note = sanitize_textarea_field( WPGH()->replacements->do( $note, $event->contact->ID ) );
+        $finished_note = sanitize_textarea_field( WPGH()->replacements->process( $note, $event->contact->ID ) );
 
         $finished_note .= sprintf( "\n\n%s: %s", __( 'Manage Contact', 'groundhogg' ), admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $event->contact->ID  ) );
 
         $subject = $event->step->get_meta('subject' );
-        $subject = sanitize_text_field(  WPGH()->replacements->do( $subject, $event->contact->ID ) );
+        $subject = sanitize_text_field(  WPGH()->replacements->process( $subject, $event->contact->ID ) );
 
         $send_to = $event->step->get_meta( 'send_to' );
 
         if ( ! is_email( $send_to ) ){
 
-            $send_to = WPGH()->replacements->do( $send_to, $event->contact->ID );
+            $send_to = WPGH()->replacements->process( $send_to, $event->contact->ID );
 
         }
 

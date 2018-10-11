@@ -6,6 +6,7 @@
  * Time: 5:10 PM
  */
 
+define( 'WPGH_BROADCAST'    , 1 );
 define( 'WPGH_UNCONFIRMED'  , 0 );
 define( 'WPGH_CONFIRMED'    , 1 );
 define( 'WPGH_UNSUBSCRIBED' , 2 );
@@ -426,10 +427,12 @@ add_action( 'template_redirect', 'wpgh_view_email_in_browser' );
 
 function wpgh_register_scripts()
 {
-    wp_register_style( 'jquery-ui', WPGH_ASSETS_FOLDER . 'assets/lib/jquery-ui/jquery-ui.min.css' );
-    wp_register_style( 'select2',   WPGH_ASSETS_FOLDER . 'assets/lib/select2/css/select2.min.css' );
-    wp_register_script( 'select2',  WPGH_ASSETS_FOLDER . 'assets/lib/select2/js/select2.min.js'   , array( 'jquery' ) );
+    wp_register_style( 'jquery-ui', WPGH_ASSETS_FOLDER . 'lib/jquery-ui/jquery-ui.min.css' );
+    wp_register_style( 'select2',   WPGH_ASSETS_FOLDER . 'lib/select2/css/select2.min.css' );
+    wp_register_script( 'select2',  WPGH_ASSETS_FOLDER . 'lib/select2/js/select2.full.js'   , array( 'jquery' ) );
+    wp_register_script( 'wpgh-admin-js',   WPGH_ASSETS_FOLDER . 'js/admin/admin.js' );
 }
+
 add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
 
 function wpgh_add_bug_report_prompt( $text )
@@ -437,3 +440,29 @@ function wpgh_add_bug_report_prompt( $text )
     return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
 }
 add_filter('admin_footer_text', 'wpgh_add_bug_report_prompt');
+
+/**
+ * Converts an array of tag IDs to a Select 2 friendly format.
+ *
+ * @param array $tags
+ * @return array|false
+ */
+function wpgh_format_tags_for_select2( $tags=array() )
+{
+
+    if ( ! is_array( $tags ) )
+        return false;
+
+    $json = array();
+
+    foreach ( $tags as $i => $tag ) {
+        $tag = WPGH()->tags->get_tag( $tag );
+        $json[] = array(
+            'id' => $tag->tag_id,
+            'text' => sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count )
+        );
+    }
+
+    return $json;
+
+}

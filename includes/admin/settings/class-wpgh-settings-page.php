@@ -11,7 +11,7 @@ class WPGH_Settings_Page
 		add_action( 'admin_init', array( $this, 'wpgh_setup_fields' ) );
 
         if ( ! class_exists( 'WPGH_Extensions_Manager' ) )
-            include dirname( __FILE__ ) . '/../extensions/module-manager.php';
+            include_once dirname( __FILE__ ) . '/../extensions/module-manager.php';
 
         //todo find new file to put this line.
         add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'check_for_updates' ) );

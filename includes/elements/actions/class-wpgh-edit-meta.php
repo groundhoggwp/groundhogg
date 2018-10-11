@@ -140,7 +140,7 @@ class WPGH_Edit_Meta extends WPGH_Funnel_Step
         }
 
         foreach ( $meta_keys as $i => $meta_key ){
-            $contact->update_meta( sanitize_key( $meta_key ), sanitize_text_field( WPGH()->replacements->do( $meta_values[ $i ], $contact->ID ) ) );
+            $contact->update_meta( sanitize_key( $meta_key ), sanitize_text_field( WPGH()->replacements->process( $meta_values[ $i ], $contact->ID ) ) );
         }
 
         return true;

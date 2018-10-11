@@ -60,7 +60,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
             'contact_id'    => '%d',
             'event_id'      => '%d',
             'activity_type' => '%s',
-            'referrer'      => '%s',
+            'referer'      => '%s',
         );
     }
 
@@ -79,7 +79,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
             'contact_id'    => 0,
             'event_id'      => 0,
             'activity_type' => '',
-            'referrer'      => '',
+            'referer'      => '',
         );
     }
 
@@ -163,10 +163,8 @@ class WPGH_DB_Activity extends WPGH_DB  {
 
         global  $wpdb;
 
-        if ( ! is_object( $data ) || ! is_array( $data ) )
+        if ( ! is_array( $data ) )
             return false;
-
-        $data = (array) $data;
 
         $other = '';
 
@@ -201,7 +199,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
 
         }
 
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $other ORDER BY `$order` DESC" );
+        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $other ORDER BY $order DESC" );
 
         return $results;
 
@@ -216,7 +214,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
     public function count( $args = array() )
     {
 
-        return count( $this->get_events( $args ) );
+        return count( $this->get_activity( $args ) );
 
     }
 

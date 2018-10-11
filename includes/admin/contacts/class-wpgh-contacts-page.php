@@ -26,10 +26,11 @@ class WPGH_Contacts_Page
 
     public function __construct()
     {
+        add_action('wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
+
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_contacts' ){
 
             add_action( 'init' , array( $this, 'process_action' )  );
-            add_action('wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
 
             $this->notices = WPGH()->notices;
 
@@ -106,6 +107,7 @@ class WPGH_Contacts_Page
      */
     public function process_action()
     {
+
         if ( ! $this->get_action() || ! $this->verify_action() || ! current_user_can( 'gh_manage_contacts' ) )
             return;
 
@@ -115,7 +117,7 @@ class WPGH_Contacts_Page
         {
             case 'add':
 
-                if ( isset( $_POST ) )
+                if ( ! empty( $_POST ) )
                 {
                     $this->add_contact();
                 }
@@ -124,7 +126,7 @@ class WPGH_Contacts_Page
 
             case 'edit':
 
-                if ( isset( $_POST ) ){
+                if ( ! empty( $_POST ) ){
 
                     $this->update_contact();
 
@@ -252,6 +254,7 @@ class WPGH_Contacts_Page
         }
 
         $id = WPGH()->contacts->add( $args );
+
         $contact = new WPGH_Contact( $id );
 
         if ( isset( $_POST[ 'primary_phone' ] ) ){
@@ -385,7 +388,9 @@ class WPGH_Contacts_Page
         }
 
         if ( isset( $_POST[ 'tags' ] ) ){
-            $tags = wpgh_validate_tags( $_POST['tags' ] );
+
+            $tags = WPGH()->tags->validate( $_POST['tags' ] );
+
             $cur_tags = $contact->tags;
             $new_tags = $tags;
 
@@ -396,7 +401,14 @@ class WPGH_Contacts_Page
 
             $add_tags = array_diff( $new_tags, $cur_tags );
             if ( ! empty( $add_tags ) ){
-                $contact->add_tag( $add_tags );
+
+                print_r( $add_tags );
+
+                $result = $contact->add_tag( $add_tags );
+
+                if ( ! $result ){
+                    $this->notices->add( 'bad-tag', 'Hmm, looks like we couldn\'t add the new tags...' );
+                }
             }
         }
 
@@ -448,6 +460,8 @@ class WPGH_Contacts_Page
 
         $tags = WPGH()->tags->validate( $_POST['tags' ] );
 
+//        wp_die( print_r( $tags ) );
+
         $cur_tags = $contact->tags;
         $new_tags = $tags;
 
@@ -464,13 +478,13 @@ class WPGH_Contacts_Page
 
         do_action( 'wpgh_inline_update_contact_after', $id );
 
-        if ( ! class_exists( 'WPGH_Contacts_Table' ) )
-        {
-            include dirname(__FILE__) . '/admin/contacts/class-wpgh-contacts-table.php';
+        if ( ! class_exists( 'WPGH_Contacts_Table' ) ) {
+            include_once 'class-wpgh-contacts-table.php';
         }
 
         $contactTable = new WPGH_Contacts_Table;
         $contactTable->single_row( WPGH()->contacts->get( $id ) );
+
         wp_die();
     }
 
@@ -481,10 +495,10 @@ class WPGH_Contacts_Page
      */
     function verify_action()
     {
-        if ( ! isset( $_REQUEST['_wpnonce'] ) )
+        if ( ! isset( $_REQUEST['_wpnonce'] ) && ! isset( $_REQUEST[ '_edit_contact_nonce' ] ) )
             return false;
 
-        return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() )|| wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-contacts' );
+        return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_edit_contact_nonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-contacts' );
     }
 
     /**

@@ -101,7 +101,23 @@ var inlineEditContact;
             }
 
             var tags = $( '#tags' );
-            tags.select2({tags:true,tokenSeparators: ['/',',',';']});
+            tags.css( 'width', '100%' );
+            tags.select2({
+                tags:true,
+                multiple: true,
+                tokenSeparators: ['/',',',';'],
+                data:  JSON.parse( $('.tags-data', rowData ).html() ),
+                ajax: {
+                    url: ajaxurl + '?action=gh_get_tags',
+                    dataType: 'json',
+                    results: function(data, page) {
+                        return {
+                            results: data.results
+                        };
+                    }
+                }
+            });
+
             tags.val( JSON.parse( $('.tags', rowData ).html() ) );
             tags.trigger( 'change' );
 

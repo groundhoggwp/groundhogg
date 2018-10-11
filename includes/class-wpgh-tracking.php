@@ -102,9 +102,9 @@ class WPGH_Tracking
 
             $this->deconstruct_cookie();
 
-            if ( isset( $_COOKIE[ 'gh_referrer' ] ) )
+            if ( isset( $_COOKIE[ 'gh_referer' ] ) )
             {
-                $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referrer' ] );
+                $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referer' ] );
             }
 
         }
@@ -191,7 +191,7 @@ class WPGH_Tracking
      */
     public function deconstruct_cookie()
     {
-        if ( isset( $_COOKIE[ self::COOKIE ] ) )
+        if ( ! isset( $_COOKIE[ self::COOKIE ] ) )
             return false;
 
         $cookie = wpgh_encrypt_decrypt( $_COOKIE[ self::COOKIE ], 'd' );

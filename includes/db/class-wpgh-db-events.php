@@ -28,7 +28,7 @@ class WPGH_DB_Events extends WPGH_DB  {
      * @since  2.8
      * @var string
      */
-    public $cache_group = 'activity';
+    public $cache_group = 'events';
 
     /**
      * Get things started
@@ -175,10 +175,8 @@ class WPGH_DB_Events extends WPGH_DB  {
 
         global  $wpdb;
 
-        if ( ! is_object( $data ) || ! is_array( $data ) )
+        if ( ! is_array( $data ) )
             return false;
-
-        $data = (array) $data;
 
         $other = '';
 
@@ -186,14 +184,14 @@ class WPGH_DB_Events extends WPGH_DB  {
         if ( isset( $data[ 'start' ] ) ){
 
             $other .= sprintf( " AND time >= %d", $data[ 'start' ] );
-
+            unset( $data[ 'start' ] );
         }
 
         /* allow for special handling of time based search */
         if ( isset( $data[ 'end' ] ) ){
 
             $other .= sprintf( " AND time <= %d", $data[ 'end' ] );
-
+            unset( $data[ 'end' ] );
         }
 
         // Initialise column format array
@@ -213,7 +211,7 @@ class WPGH_DB_Events extends WPGH_DB  {
 
         }
 
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $other ORDER BY `$order` DESC" );
+        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $other ORDER BY $order DESC" );
 
         return $results;
 

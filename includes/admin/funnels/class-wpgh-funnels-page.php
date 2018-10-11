@@ -358,11 +358,11 @@ class WPGH_Funnels_Page
 
             $args = array(
                 'funnel_id' => $funnel_id,
-                'title'     => $step_title,
-                'status'    => 'ready',
-                'group'     => $step_group,
-                'type'      => $step_type,
-                'order'     => $i+1,
+                'step_title'     => $step_title,
+                'step_status'    => 'ready',
+                'step_group'     => $step_group,
+                'step_type'      => $step_type,
+                'step_order'     => $i+1,
             );
 
             $step_id = WPGH()->steps->add( $args );
@@ -437,9 +437,9 @@ class WPGH_Funnels_Page
             $title = sanitize_text_field( wp_unslash( $_POST[ $step->prefix( 'title' ) ] ) );
 
             $args = array(
-                'title'     =>  $title,
-                'order'     =>  $order,
-                'status'    =>  'ready',
+                'step_title'     =>  $title,
+                'step_order'     =>  $order,
+                'step_status'    =>  'ready',
             );
 
             $step->update( $args );
@@ -494,9 +494,9 @@ class WPGH_Funnels_Page
 
         $step_id = WPGH()->steps->add( array(
             'funnel_id' => $funnel_id,
-            'title'     => $title,
-            'group'     => $step_group,
-            'order'     => $step_order,
+            'step_title'     => $title,
+            'step_group'     => $step_group,
+            'step_order'     => $step_order,
         ));
 
         if ( $step_id ){
@@ -531,11 +531,11 @@ class WPGH_Funnels_Page
 
         $newID = WPGH()->steps->add( array(
             'funnel_id' => $step->funnel_id,
-            'title'     => $step->title,
-            'type'      => $step->type,
-            'group'     => $step->group,
-            'status'    => 'ready',
-            'order'     => $step->order + 1,
+            'step_title'     => $step->title,
+            'step_type'      => $step->type,
+            'step_group'     => $step->group,
+            'step_status'    => 'ready',
+            'step_order'     => $step->order + 1,
         ) );
 
         if ( ! $newID )

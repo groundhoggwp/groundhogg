@@ -43,7 +43,7 @@ class WPGH_DB_Tags extends WPGH_DB
             'tag_id'             => '%d',
             'tag_name'           => '%s',
             'tag_slug'           => '%s',
-            'tag_description'    => '%d',
+            'tag_description'    => '%s',
             'contact_count'      => '%d',
         );
     }
@@ -75,9 +75,9 @@ class WPGH_DB_Tags extends WPGH_DB
 
         foreach ( $maybe_tags as $i => $tag_id_or_string ) {
 
-            if ( is_int( $tag_id_or_string ) ){
+            if ( is_numeric( $tag_id_or_string ) ){
 
-                $tag_id = $tag_id_or_string;
+                $tag_id = intval( $tag_id_or_string );
 
                 if ( $this->exists( $tag_id ) ) {
                     $tags[] = $tag_id;
@@ -307,8 +307,7 @@ class WPGH_DB_Tags extends WPGH_DB
     public function increase_contact_count( $tag_id )
     {
 
-        if ( $this->exists( $tag_id ) )
-        {
+        if ( ! $this->exists( $tag_id ) ) {
             return;
         }
 
@@ -328,8 +327,7 @@ class WPGH_DB_Tags extends WPGH_DB
     public function decrease_contact_count( $tag_id )
     {
 
-        if ( $this->exists( $tag_id ) )
-        {
+        if ( ! $this->exists( $tag_id ) ) {
             return;
         }
 

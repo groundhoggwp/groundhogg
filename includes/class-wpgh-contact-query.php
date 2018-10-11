@@ -233,7 +233,7 @@ class WPGH_Contact_Query {
         $this->cache_group      = $this->wpgh_db_contacts->cache_group;
 
         $this->query_var_defaults = array(
-            'number'        => 20,
+            'number'        => -1,
             'offset'        => 0,
             'orderby'       => 'ID',
             'order'         => 'DESC',

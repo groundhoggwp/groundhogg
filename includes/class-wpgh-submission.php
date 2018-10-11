@@ -25,7 +25,7 @@ class WPGH_Submission
     private $fields;
 
     /**
-     * @var string this is set to the referrer which is also the source page
+     * @var string this is set to the referer which is also the source page
      */
     private $source;
 

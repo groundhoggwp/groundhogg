@@ -203,6 +203,9 @@ class WPGH_Tags_Table extends WP_List_Table {
      * @return int
      */
     protected function usort_reorder( $a, $b ) {
+        $a = (array) $a;
+        $b = (array) $b;
+
         // If no sort, default to title.
         $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'tag_id'; // WPCS: Input var ok.
         // If no order, default to asc.

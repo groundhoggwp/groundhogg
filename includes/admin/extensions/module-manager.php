@@ -223,7 +223,7 @@ class WPGH_Extension_Manager
                     <?php
                 } else {
                     foreach ( $extensions as $extensionId => $args ){
-                        echo new WPGH_Extension( $extensionId, $args );
+                        echo new WPGH_Extension_Box( $extensionId, $args );
                     }
                 }
                 ?>
@@ -232,7 +232,7 @@ class WPGH_Extension_Manager
 	}
 }
 
-class WPGH_Extension
+class WPGH_Extension_Box
 {
     var $item_id;
     var $item_name;

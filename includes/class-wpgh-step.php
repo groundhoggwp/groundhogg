@@ -65,12 +65,12 @@ class WPGH_Step
      */
     public function __construct( $id )
     {
-        $step = WPGH()->steps->get( $id );
+        $this->ID = intval( $id );
+
+        $step = WPGH()->steps->get( $this->ID );
 
         if ( ! $step )
             return false;
-
-        $this->ID = intval( $id );
 
         $this->setup_step( $step );
     }
@@ -90,10 +90,11 @@ class WPGH_Step
 
         }
 
+        $this->title        = $step->step_title;
         $this->funnel_id    = intval( $step->funnel_id );
-        $this->order        = intval( $step->order );
-        $this->type         = $step->type;
-        $this->group        = $step->group;
+        $this->order        = intval( $step->step_order );
+        $this->type         = $step->step_type;
+        $this->group        = $step->step_group;
 
         return ! empty( $this->type   ) && ! empty( $this->group  );
 

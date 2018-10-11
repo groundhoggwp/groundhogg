@@ -88,10 +88,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         </tr>
         <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
-            <td><?php $args = array(
-                    'id'        => 'tags',
-                    'name'      => 'tags',
-                ); echo WPGH()->html->tag_picker( $args ); ?>
+            <td><?php $args = array(); echo WPGH()->html->tag_picker( $args ); ?>
             </td>
         </tr>
         <?php do_action( 'wpgh_contact_add_new_tags' ); ?>
@@ -104,7 +101,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
             <td><?php $args = array(
                     'id'    => 'notes',
                     'name'  => 'notes',
-                    'value' => $contact->get_meta( 'notes' ),
+                    'value' => '',
                 );
                 echo WPGH()->html->textarea( $args ); ?></td>
         </tr>

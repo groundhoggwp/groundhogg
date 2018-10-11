@@ -22,8 +22,8 @@ if ( ! $contact->exists() ) {
     wp_die( __( 'This contact has been deleted.', 'groundhogg' ) );
 }
 
-include "class-wpgh-contact-activity-table.php";
-include "class-wpgh-contact-events-table.php";
+include_once "class-wpgh-contact-activity-table.php";
+include_once "class-wpgh-contact-events-table.php";
 
 wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-editor.js' )
 ?>
@@ -36,7 +36,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
 <!--/ Title -->
 
 <form method="post" class="">
-    <?php wp_nonce_field( 'edit' ); ?>
+    <?php wp_nonce_field( 'edit', '_edit_contact_nonce' ); ?>
 
     <!-- GENERAL NAME INFO -->
     <h2><?php _e( 'Name' ) ?></h2>
@@ -137,7 +137,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
                     'name'              => 'owner',
                     'role'              => 'administrator',
                     'class'             => 'cowner',
-                    'selected'          => $contact->owner
+                    'selected'          => ( $contact->owner ) ?  $contact->owner->ID : 0
                 ); wp_dropdown_users( $args ); ?>
             </td>
         </tr>
@@ -173,11 +173,16 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
         </tr>
         <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
-            <td><?php $args = array(
+            <td><?php
+
+                //print_r( $contact->tags );
+
+                $args = array(
                     'id'        => 'tags',
-                    'name'      => 'tags',
+                    'name'      => 'tags[]',
                     'selected'  => $contact->tags,
                 ); echo WPGH()->html->tag_picker( $args ); ?>
+                <p class="description"><?php _e( 'Add new tags by hitting [Enter] or by typing a [,].', 'groundhogg' ); ?></p>
             </td>
         </tr>
         <?php do_action( 'wpgh_contact_edit_tags', $id ); ?>
@@ -250,6 +255,8 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
 
     <!-- UPCOMING EVENTS -->
     <h2><?php _e( 'Upcoming Events' ); ?></h2>
+    <div style="max-width: 800px">
+
     <?php $events = WPGH()->events->get_events( array( 'contact_id' => $contact->ID, 'status' => 'waiting' ) );
 
     $table = new WPGH_Contact_Events_Table();
@@ -262,7 +269,13 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
 
     <!-- FUNNNEL HISTORY -->
     <h2><?php _e( 'Recent Funnel History' ); ?></h2>
-    <?php $events = WPGH()->events->get_events( array( 'contact_id' => $contact->ID, 'status' => 'complete' ) );
+    <div style="max-width: 800px">
+    </div>
+    <?php
+
+//    $events = WPGH()->events->get_events( array( 'contact_id' => $contact->ID, 'status' => 'complete' ) );
+    $events = WPGH()->events->get_events( array( 'contact_id' => $contact->ID, 'status' => 'complete' ) );
+
 
     $table = new WPGH_Contact_Events_Table();
     $table->data = $events;
@@ -272,29 +285,32 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
 
     <p class="description"><?php _e( 'Any previous funnel steps will show up here. You can choose run them again.<br/>
     This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'groundhogg' ); ?></p>
-
+    </div>
     <!-- EMAIL HISTORY -->
     <h2><?php _e( 'Recent Email History' ); ?></h2>
+    <div style="max-width: 800px">
     <?php global $wpdb;
 
-        $events = WPGH()->events->table_name;
-        $steps = WPGH()->steps->table_name;
+        $events_table = WPGH()->events->table_name;
+        $steps_table = WPGH()->steps->table_name;
 
         $events = $wpdb->get_results( $wpdb->prepare(
-                "SELECT e.*,s.funnelstep_type FROM $table e 
-                        LEFT JOIN $steps s ON e.step_id = s.ID 
-                        WHERE e.contact_id = %d AND e.status = %s AND ( s.funnelstep_type = %s OR e.funnel_id = %d )
+                "SELECT e.*,s.step_type FROM $events_table e 
+                        LEFT JOIN $steps_table s ON e.step_id = s.ID 
+                        WHERE e.contact_id = %d AND e.status = %s AND ( s.step_type = %s OR e.funnel_id = %d )
                         ORDER BY time DESC"
                 , $id, 'complete', 'send_email', WPGH_BROADCAST )
         );
 
         $table = new WPGH_Contact_Activity_Table();
         $table->data = $events;
+
+//        print_r( $events );
         $table->prepare_items();
         $table->display(); ?>
 
     <p class="description"><?php _e( 'This is where you can check if this contact is interacting with your emails.', 'groundhogg' ); ?></p>
-
+    </div>
     <!-- THE END -->
     <?php do_action( 'wpgh_contact_edit_after', $id ); ?>
     <div class="edit-contact-actions">

@@ -98,10 +98,12 @@ class WPGH_HTML
         $a = wp_parse_args( $args, array(
             'name'  => '',
             'id'    => '',
-            'class' => 'regular-text',
+            'class' => '',
             'value' => '',
             'cols'  => '100',
             'rows'  => '7',
+            'placeholder'   => '',
+            'attributes'    => ''
         ) );
 
         $html = sprintf(
@@ -136,6 +138,7 @@ class WPGH_HTML
             'selected'          => '',
             'multiple'          => false,
             'option_none'       => 'Please Select One',
+            'attributes'        => '',
             'option_none_value' => '',
         ) );
 
@@ -199,18 +202,17 @@ class WPGH_HTML
         $a = wp_parse_args( $args, array(
             'name'              => '',
             'id'                => '',
-            'class'             => '',
-            'ajax'              => false,
+            'class'             => 'gh-select2',
             'data'              => array(),
             'selected'          => array(),
             'multiple'          => false,
             'placeholder'       => 'Please Select One',
+            'attributes'        => '',
             'tags'              => false,
         ) );
 
         $multiple           = $a[ 'multiple' ]              ? 'multiple'             : '';
         $tags               = $a[ 'tags' ]                  ? 'data-tags="true"'     : '';
-        $ajax               = $a[ 'ajax' ]                  ? sprintf( 'data-ajax--url="%s"', $a[ 'ajax' ] ) : '';
         $a[ 'selected' ]    = is_array( $a[ 'selected' ] )  ? $a[ 'selected' ]  : array( $a[ 'selected' ] );
 
         $optionHTML = '';
@@ -235,16 +237,19 @@ class WPGH_HTML
         }
 
         $html = sprintf(
-            "<select name='%s' id='%s' class='gh-select2 %s' %s %s %s>%s</select>",
+            "<select name='%s' id='%s' class='%s' %s %s %s>%s</select>",
             esc_attr( $a[ 'name' ] ),
             esc_attr( $a[ 'id' ] ),
             esc_attr( $a[ 'class' ] ),
             $a[ 'attributes' ],
             $tags,
-            $ajax,
             $multiple,
             $optionHTML
         );
+
+        wp_enqueue_script( 'select2' );
+        wp_enqueue_style( 'select2' );
+        wp_enqueue_script( 'wpgh-admin-js' );
 
         return apply_filters( 'wpgh_html_select2', $html, $args );
 
@@ -255,17 +260,20 @@ class WPGH_HTML
      */
     public function gh_get_tags()
     {
-        if ( ! is_user_logged_in() || ! current_user_can( 'edit_tags' ) )
+        if ( ! is_user_logged_in() || ! current_user_can( 'gh_manage_tags' ) )
             wp_die( 'No access to tags.' );
 
-        $value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
+        $value = isset( $_REQUEST[ 'q' ] ) ? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
 
-        $tags = WPGH()->tags->search( $value );
+        if ( empty( $value ) ){
+            $tags = WPGH()->tags->get_tags();
+        } else {
+            $tags = WPGH()->tags->search( $value );
+        }
 
         $json = array();
 
-        foreach ( $tags as $i => $tag )
-        {
+        foreach ( $tags as $i => $tag ) {
 
             $json[] = array(
                 'id' => $tag->tag_id,
@@ -274,7 +282,9 @@ class WPGH_HTML
 
         }
 
-        wp_die( json_encode( $json ) );
+        $results = array( 'results' => $json, 'more' => false );
+
+        wp_die( json_encode( $results ) );
     }
 
 
@@ -292,23 +302,26 @@ class WPGH_HTML
             'class'             => 'gh-tag-picker',
             'data'              => array(),
             'selected'          => array(),
-            'ajax'              => admin_url( 'admin-ajax.php?action=gh_get_tags' ),
             'multiple'          => true,
             'placeholder'       => __( 'Please Select One Or More Tags', 'groundhogg' ),
             'tags'              => true,
         ) );
 
-        foreach ( $args[ 'selected' ] as $tag_id ){
+        if ( is_array( $a[ 'selected' ] ) ){
 
-            if ( WPGH()->tags->exists( $tag_id ) ){
+            foreach ( $a[ 'selected' ] as $tag_id ){
 
-                $tag = WPGH()->tags->get( $tag_id );
+                if ( WPGH()->tags->exists( $tag_id ) ){
 
-                $args[ 'data' ][ $tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
+                    $tag = WPGH()->tags->get( $tag_id );
+
+                    $a[ 'data' ][ $tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
+
+                }
 
             }
-
         }
+
 
         return $this->select2( $a );
     }
@@ -361,13 +374,13 @@ class WPGH_HTML
             'tags'              => false,
         ) );
 
-        foreach ( $args[ 'selected' ] as $contact_id ){
+        foreach ( $a[ 'selected' ] as $contact_id ){
 
             $contact = new WPGH_Contact( $contact_id );
 
             if ( $contact->exists() ) {
 
-                $args[ 'data' ][ $contact_id ] = sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email );
+                $a[ 'data' ][ $contact_id ] = sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email );
 
             }
 
@@ -426,11 +439,11 @@ class WPGH_HTML
             'tags'              => false,
         ) );
 
-        foreach ( $args[ 'selected' ] as $email_id ){
+        foreach ( $a[ 'selected' ] as $email_id ){
 
             if ( WPGH()->emails->exists( $email_id ) ){
 
-                $args[ 'data' ][ $email_id ] = WPGH()->emails->get_column_by( 'subject', 'ID', $email_id );
+                $a[ 'data' ][ $email_id ] = WPGH()->emails->get_column_by( 'subject', 'ID', $email_id );
 
             }
 

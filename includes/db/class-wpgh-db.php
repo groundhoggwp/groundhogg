@@ -51,6 +51,10 @@ abstract class WPGH_DB {
         if (!empty($args) && is_array($args)) {
             foreach ($args as $key => $value) {
 
+                if ( is_string( $value ) ){
+                    $value = "'" . $value . "'";
+                }
+
                 if ( strpos( $value, '%' ) !== false ){
                     $where[] = $key . " LIKE " . $value;
                 } else {
@@ -276,10 +280,10 @@ abstract class WPGH_DB {
         $where = array_intersect_key( $where, $column_formats );
 
         // Reorder $column_formats to match the order of columns given in $data
-        $data_keys = array_keys( $data );
-        $column_formats = array_merge( array_flip( $data_keys ), $column_formats );
+//        $data_keys = array_keys( $data );
+//        $column_formats = array_merge( array_flip( $data_keys ), );
 
-        if ( false === $wpdb->update( $this->table_name, $data, $where, $column_formats ) ) {
+        if ( false === $wpdb->update( $this->table_name, $data, $where ) ) {
             return false;
         }
 
