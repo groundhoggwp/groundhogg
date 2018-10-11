@@ -78,9 +78,14 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
             'contact_id' => $contact_id
         );
 
-        WPGH()->tags->increase_contact_count( $tag_id );
 
-        return $this->insert( $data, 'contact_tag_relationship' );
+        $result = $this->insert( $data, 'contact_tag_relationship' );
+
+        if ( $result ){
+            WPGH()->tags->increase_contact_count( $tag_id );
+        }
+
+        return $result;
     }
 
     /**
@@ -157,6 +162,10 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 
         if ( false === $wpdb->delete( $this->table_name, $data, $column_formats ) ) {
             return false;
+        }
+
+        if ( isset( $args[ 'tag_id' ] ) && isset( $args[ 'contact_id' ] ) ){
+            WPGH()->tags->decrease_contact_count( $args[ 'tag_id' ] );
         }
 
         return true;
