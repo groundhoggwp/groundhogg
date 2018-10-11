@@ -23,11 +23,19 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         <tbody>
         <tr>
             <th><label for="first_name"><?php echo __( 'First Name', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_text_input_field( 'first_name', 'first_name' );?></td>
+            <td><?php $args = array(
+                    'id'    => 'first_name',
+                    'name'  => 'first_name',
+                );
+                echo WPGH()->html->input( $args ); ?></td>
         </tr>
         <tr>
             <th><label for="last_name"><?php echo __( 'Last Name', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_text_input_field( 'last_name', 'last_name' );?></td>
+            <td><?php $args = array(
+                    'id'    => 'last_name',
+                    'name'  => 'last_name',
+                );
+                echo WPGH()->html->input( $args ); ?></td>
         </tr>
         <?php do_action( 'wpgh_contact_add_new_name' ); ?>
         </tbody>
@@ -37,15 +45,29 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         <tbody>
         <tr>
             <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_email_input_field( 'email', 'email' );?></td>
+            <td><?php $args = array(
+                    'type'  => 'email',
+                    'id'    => 'email',
+                    'name'  => 'email',
+                );
+                echo WPGH()->html->input( $args ); ?></td>
         </tr>
         <tr>
             <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_text_input_field( 'primary_phone', 'primary_phone' );?></td>
+            <td><?php $args = array(
+                    'type'  => 'tel',
+                    'id'    => 'primary_phone',
+                    'name'  => 'primary_phone',
+                );
+                echo WPGH()->html->input( $args ); ?></td>
         </tr>
         <tr>
             <th><label for="phone_extension"><?php echo __( 'Phone Extension', 'groundhogg' )?></label></th>
-            <td><?php echo wpgh_admin_text_input_field( 'primary_phone_extension', 'primary_phone_extension');?></td>
+            <td><?php $args = array(
+                    'id'    => 'primary_phone_extension',
+                    'name'  => 'primary_phone_extension',
+                );
+                echo WPGH()->html->input( $args ); ?></td>
         </tr>
         <?php do_action( 'wpgh_contact_add_new_contact_info' ); ?>
         </tbody>
@@ -54,8 +76,23 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     <table class="form-table">
         <tbody>
         <tr>
+            <th><?php _e( 'Owner', 'groundhogg' ); ?></th>
+            <td><?php $args = array(
+                    'show_option_none'  => __( 'Select an owner' ),
+                    'id'                => 'owner',
+                    'name'              => 'owner',
+                    'role'              => 'administrator',
+                    'class'             => 'cowner',
+                ); wp_dropdown_users( $args ); ?>
+            </td>
+        </tr>
+        <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
-            <td><?php wpgh_dropdown_tags( array( 'width' => '400px', 'class' => 'hidden' ) );?></td>
+            <td><?php $args = array(
+                    'id'        => 'tags',
+                    'name'      => 'tags',
+                ); echo WPGH()->html->tag_picker( $args ); ?>
+            </td>
         </tr>
         <?php do_action( 'wpgh_contact_add_new_tags' ); ?>
         </tbody>
@@ -64,7 +101,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     <table>
         <tbody>
         <tr>
-            <td><textarea style="width: 700px" rows="6" name="notes" id="notes" placeholder="<?php esc_attr_e( 'Enter some details about this contact...', 'grounshogg' ); ?>"></textarea></td>
+            <td><?php $args = array(
+                    'id'    => 'notes',
+                    'name'  => 'notes',
+                    'value' => $contact->get_meta( 'notes' ),
+                );
+                echo WPGH()->html->textarea( $args ); ?></td>
         </tr>
         <?php do_action( 'wpgh_contact_add_new_notes' ); ?>
         </tbody>

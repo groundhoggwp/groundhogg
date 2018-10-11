@@ -9,147 +9,381 @@ Author URI: http://health-check-team.example.com
 Text Domain: groundhogg
 Domain Path: /languages
 */
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'WPGH_ASSETS_FOLDER', plugins_url( 'assets', __FILE__ ) );
-define( 'WPGH_INCLUDES_FOLDER', dirname( __FILE__ ) . '/includes/' );
+if ( ! class_exists( 'Groundhogg' ) ) :
 
-define( 'WPGH_ID', 292 );
-define( 'WPGH_NAME', 'groundhogg' );
-define( 'WPGH_VERSION', '0.1' );
-define( 'WPGH_FILE', __FILE__ );
-
-//include dirname( __FILE__ ) . '/blocks/register-blocks.php';
-
-foreach ( glob( dirname( __FILE__ ) . "/includes/*.php" ) as $filename )
-{
-    include $filename;
-}
-
-foreach ( glob( dirname( __FILE__ ) . "/includes/db/*.php" ) as $filename )
-{
-    include $filename;
-}
-
-
-/* Init groundhogg tables and options. */
-function wpgh_activation()
-{
-
-    /* create tables */
-	wpgh_create_contacts_db();
-	wpgh_create_contact_meta_db();
-
-	wpgh_create_contact_tags_db();
-    wpgh_create_contact_tag_relationships_db();
-
-	wpgh_create_emails_db();
-    wpgh_create_email_meta_db();
-
-    wpgh_create_broadcasts_db();
-
-    wpgh_create_events_db();
-
-	wpgh_create_funnels_db();
-	wpgh_create_funnel_meta_db();
-
-	wpgh_create_funnelsteps_db();
-	wpgh_create_funnelstep_meta_db();
-
-	wpgh_create_superlinks_db();
-
-	wpgh_create_activity_db();
-
-	/* create endpoints */
-	/* confirmation page */
-	if ( ! get_option( 'gh_confirmation_page', false ) ){
-        $confirmation_args = array(
-            'post_title' => __( 'Email Confirmed', 'groundhogg' ),
-            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been confirmed.</h2><p>Thank you! Return to your inbox to receive further communication.</p>', 'groundhogg' ),
-            'post_type' => 'page',
-            'post_status' => 'publish',
-            'post_author' => get_current_user_id(),
-        );
-        $id = wp_insert_post( $confirmation_args );
-        update_option( 'gh_confirmation_page', $id );
-    }
-
-    /* unbsubscribed page */
-    if ( ! get_option( 'gh_unsubscribe_page', false ) ){
-        $unsubscribed_args = array(
-            'post_title' => __( 'Unsubscribed', 'groundhogg' ),
-            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been unsubscribed.</h2><p>This means you will not receive any further marketing communication from us, but you may receive transactional emails related to billing.</p><p>Note that opting in again to any optin form or program on our site is implied consent and may result in starting to receive email communication again.</p>', 'groundhogg' ),
-            'post_type' => 'page',
-            'post_status' => 'publish',
-            'post_author' => get_current_user_id(),
-        );
-        $id = wp_insert_post( $unsubscribed_args );
-        update_option( 'gh_unsubscribe_page', $id );
-    }
-
-    /* email preferences page */
-    if ( ! get_option( 'gh_email_preferences_page', false ) ){
-        $email_preferences_args = array(
-            'post_title' => __( 'Email Preferences', 'groundhogg' ),
-            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_email_preferences]</p>', 'groundhogg' ),
-            'post_type' => 'page',
-            'post_status' => 'publish',
-            'post_author' => get_current_user_id(),
-        );
-        $id = wp_insert_post( $email_preferences_args );
-        update_option( 'gh_email_preferences_page', $id );
-    }
-
-    /* convert users to contacts */
-    $args = array(
-        'fields' => 'all_with_meta'
-    );
-
-    $users = get_users( $args );
-
-    /* @var $wp_user WP_User */
-    foreach ( $users as $wp_user )
+    final class Groundhogg
     {
-        $cid = wpgh_quick_add_contact( $wp_user->user_email, $wp_user->user_firstname, $wp_user->user_lastname );
-        //todo log how created.
+
+        /**
+         * @var $instance Groundhogg instance
+         */
+        private static $instance;
+
+
+        /**
+         * Funnel actions/benchmarks
+         *
+         * @var WPGH_Elements
+         */
+        public $elements;
+
+
+        /**
+         * GH roles object //todo
+         *
+         * @var object|WPGH_Roles
+         */
+        public $roles;
+
+
+        /**
+         * GH API object //todo
+         *
+         * @var object|WPGH_API
+         */
+        public $api;
+
+        /**
+         * GH HTML Helper Class
+         *
+         * @var object|WPGH_HTML
+         */
+        public $html;
+
+        /**
+         * @var WPGH_DB_Broadcasts
+         */
+        public $broadcasts;
+
+        /**
+         * GH Emails DB
+         *
+         * @var object|WPGH_DB_Emails
+         */
+        public $emails;
+
+        /**
+         * @var WPGH_DB_Email_Meta
+         */
+        public $email_meta;
+
+        /**
+         * GH Contact DB
+         *
+         * @var object|WPGH_DB_Contacts
+         */
+        public $contacts;
+
+        /**
+         * GH Contact Meta DB
+         *
+         * @var object|WPGH_DB_Contact_Meta
+         */
+        public $contact_meta;
+
+        /**
+         * GH Funnel DB
+         *
+         * @var object|WPGH_DB_Funnels
+         */
+        public $funnels;
+
+        /**
+         * GH Funnel Steps
+         *
+         * @var object|WPGH_DB_Steps
+         */
+        public $steps;
+
+        /**
+         * GH Step Meta
+         *
+         * @var object|WPGH_DB_Step_Meta
+         */
+        public $step_meta;
+
+        /**
+         * GH Tags
+         *
+         * @var object|WPGH_DB_Tags
+         */
+        public $tags;
+
+        /**
+         * GH Tag Relationships
+         *
+         * @var object|WPGH_DB_Tag_Relationships
+         */
+        public $tag_relationships;
+
+
+        /**
+         * GH Superlinks
+         *
+         * @var object|WPGH_DB_Superlinks
+         */
+        public $superlinks;
+
+        /**
+         *
+         * @var WPGH_Superlink
+         */
+        public $superlink;
+
+        /**
+         * The tracking class
+         *
+         * @var object|WPGH_Tracking
+         */
+        public $tracking;
+
+        /**
+         * If a form submission is in progress access it via this
+         *
+         * @var WPGH_Submission
+         */
+        public $submission;
+
+        /**
+         * The event queue
+         *
+         * @var object|WPGH_Event_Queue
+         */
+        public $event_queue;
+
+        /**
+         * @var WPGH_DB_Events
+         */
+        public $events;
+
+        /**
+         * @var WPGH_Bounce_Checker
+         */
+        public $bounce_checker;
+
+        /**
+         * @var WPGH_Template_Loader
+         */
+        public $template_loader;
+
+        /**
+         * @var WPGH_Notices
+         */
+        public $notices;
+
+        /**
+         * @var WPGH_Admin_Menu
+         */
+        public $menu;
+
+        /**
+         * @var WPGH_DB_Activity
+         */
+        public $activity;
+
+        /**
+         * @var WPGH_Replacements
+         */
+        public $replacements;
+
+        /**
+         * Groundhogg constructor.
+         */
+        public function __construct()
+        {
+            $this->setup_constants();
+
+            $this->includes();
+
+
+            $this->contacts     = new WPGH_DB_Contacts();
+            $this->contact_meta = new WPGH_DB_Contact_Meta();
+
+            $this->tags                 = new WPGH_DB_Tags();
+            $this->tag_relationships    = new WPGH_DB_Tag_Relationships();
+
+            $this->funnels      = new WPGH_DB_Funnels();
+
+            $this->steps        = new WPGH_DB_Steps();
+            $this->step_meta    = new WPGH_DB_Step_Meta();
+
+            $this->emails       = new WPGH_DB_Emails();
+            $this->email_meta   = new WPGH_DB_Email_Meta();
+
+            $this->broadcasts   = new WPGH_DB_Broadcasts();
+
+            $this->activity     = new WPGH_DB_Activity();
+            $this->events       = new WPGH_DB_Events();
+            $this->superlinks   = new WPGH_DB_Superlinks();
+
+
+            $this->tracking     = new WPGH_Tracking();
+            $this->event_queue  = new WPGH_Event_Queue();
+
+            $this->replacements = new WPGH_Replacements();
+            $this->notices      = new WPGH_Notices();
+            $this->submission   = new WPGH_Submission();
+            $this->superlink    = new WPGH_Superlink();
+            $this->html         = new WPGH_HTML();
+
+            $this->bounce_checker   = new WPGH_Bounce_Checker();
+            $this->template_loader  = new WPGH_Template_Loader();
+
+            $this->elements     = new WPGH_Elements();
+
+            if ( is_admin() ){
+                $this->menu     = new WPGH_Admin_Menu();
+            }
+
+        }
+
+        /**
+         * Returns the instance on Groundhogg.
+         *
+         * @return Groundhogg
+         */
+        public static function instance()
+        {
+            if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Groundhogg ) ) {
+
+                self::$instance = new Groundhogg();
+
+            }
+
+            return self::$instance;
+        }
+
+        /**
+         * Throw error on object clone.
+         *
+         * The whole idea of the singleton design pattern is that there is a single
+         * object therefore, we don't want the object to be cloned.
+         *
+         * @since 1.6
+         * @access protected
+         * @return void
+         */
+        public function __clone() {
+            // Cloning instances of the class is forbidden.
+            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'groundhogg' ), '1.6' );
+        }
+
+        /**
+         * Disable unserializing of the class.
+         *
+         * @since 1.6
+         * @access protected
+         * @return void
+         */
+        public function __wakeup() {
+            // Unserializing instances of the class is forbidden.
+            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'groundhogg' ), '1.6' );
+        }
+
+
+        /**
+         * Setup plugin constants.
+         *
+         * @access private
+         * @since 1.4
+         * @return void
+         */
+        private function setup_constants() {
+
+            if ( ! defined( 'WPGH_VERSION' ) ){
+                define( 'WPGH_VERSION', '0.2' );
+            }
+
+            if ( ! defined( 'WPGH_PLUGIN_DIR' ) ){
+                define( 'WPGH_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+            }
+
+            if ( ! defined( 'WPGH_PLUGIN_URL' ) ){
+                define( 'WPGH_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+            }
+
+            if ( ! defined( 'WPGH_PLUGIN_FILE' ) ){
+                define( 'WPGH_PLUGIN_FILE', __FILE__ );
+            }
+
+            if ( ! defined( 'WPGH_ASSETS_FOLDER' ) ){
+                define( 'WPGH_ASSETS_FOLDER', plugin_dir_url( __FILE__ ) . 'assets/' );
+            }
+        }
+
+
+        /**
+         * Include required filed
+         *
+         * @return void
+         */
+        private function includes()
+        {
+            /* DB */
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-activity.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-broadcasts.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-contactmeta.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-contacts.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-emailmeta.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-emails.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-events.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-funnels.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-stepmeta.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-steps.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-superlinks.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-tag-relationships.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-tags.php';
+
+            /* Admin Files */
+            if ( is_admin() ){
+                include_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-menu.php';
+                include_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
+                include_once WPGH_PLUGIN_DIR . 'includes/email-blocks.php';
+            }
+
+            /* Core Files */
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-bounce-checker.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-broadcast.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-contact.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-contact-query.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-elements.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-email.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-event.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-event-queue.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-extension.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-form.php';
+//            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-funnel.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-html.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-notices.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-replacements.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-step.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-submission.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-superlink.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-template-loader.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-tracking.php';
+
+            require_once WPGH_PLUGIN_DIR . 'includes/functions.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/install.php';
+
+        }
     }
 
-    /* setup permissions */
+endif;
 
-	$gh_all_caps = array(
-		'gh_manage_contacts',
-		'gh_manage_funnels',
-		'gh_manage_emails',
-		'gh_manage_tags',
-		'gh_manage_broadcasts',
-		'gh_manage_superlinks',
-		'gh_manage_events',
-		'gh_manage_settings'
-	);
-
-	$role = get_role( 'administrator' );
-
-	foreach ( $gh_all_caps as $cap )
-	{
-		$role->add_cap( $cap );
-	}
-}
-
-register_activation_hook( __FILE__, 'wpgh_activation');
-
-function wpgh_register_scripts()
+/**
+ * Get the groundhogg instance. Can be used simliar to a global variable.
+ *
+ * @return Groundhogg
+ */
+function WPGH()
 {
-    wp_register_style( 'jquery-ui', plugins_url( 'assets/lib/jquery-ui/jquery-ui.min.css', __FILE__ ) );
-    wp_register_style( 'select2', plugins_url( 'assets/lib/select2/css/select2.min.css', __FILE__ ) );
-    wp_register_script( 'select2', plugins_url( 'assets/lib/select2/js/select2.min.js', __FILE__ ) , array( 'jquery' ) );
+    return Groundhogg::instance();
 }
 
-add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
-
-function wpgh_add_bug_report_prompt( $text )
-{
-    return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
-}
-
-add_filter('admin_footer_text', 'wpgh_add_bug_report_prompt');
+WPGH();
 
 do_action( 'groundhogg_loaded' );

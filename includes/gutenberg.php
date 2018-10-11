@@ -29,17 +29,17 @@ function enqueue_block_editor_assets() {
     // Enqueue the bundled block JS file
     wp_enqueue_script(
         'groundhogg-blocks',
-        plugin_dir_url( WPGH_FILE ) . $block_path,
+        WPGH_PLUGIN_URL  . $block_path,
         [ 'wp-i18n', 'wp-element', 'wp-blocks', 'wp-components' ],
-        filemtime( plugin_dir_path( WPGH_FILE ) . $block_path )
+        filemtime( WPGH_PLUGIN_DIR . $block_path )
     );
 
     // Enqueue optional editor only styles
     wp_enqueue_style(
         'groundhogg-blocks-editor-css',
-        plugin_dir_url( WPGH_FILE ) . $style_path,
+        WPGH_PLUGIN_URL . $style_path,
         [ 'wp-blocks' ],
-        filemtime( plugin_dir_path( WPGH_FILE ) . $style_path )
+        filemtime( WPGH_PLUGIN_DIR . $style_path )
     );
 }
 
@@ -52,9 +52,9 @@ function enqueue_assets() {
     $style_path = 'assets/css/blocks.style.css';
     wp_enqueue_style(
         'groundhogg-blocks',
-        plugin_dir_url( WPGH_FILE ) . $style_path,
+        WPGH_PLUGIN_URL . $style_path,
         [ 'wp-blocks' ],
-        filemtime( plugin_dir_path( WPGH_FILE ) . $style_path )
+        filemtime( WPGH_PLUGIN_DIR . $style_path )
     );
 }
 
@@ -73,8 +73,8 @@ function enqueue_frontend_assets() {
     $block_path = 'assets/js/frontend.blocks.js';
     wp_enqueue_script(
         'groundhogg-blocks-frontend',
-        plugin_dir_url( WPGH_FILE ) . $block_path,
+        WPGH_PLUGIN_URL . $block_path,
         [],
-        filemtime( plugin_dir_path( WPGH_FILE ) . $block_path )
+        filemtime( WPGH_PLUGIN_DIR . $block_path )
     );
 }

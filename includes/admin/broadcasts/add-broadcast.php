@@ -17,14 +17,13 @@ wp_enqueue_style( 'jquery-ui' );
     <table class="form-table">
         <tbody><tr class="form-field term-email-wrap">
             <th scope="row"><label for="email_id"><?php _e( 'Select an email to send.' ) ?></label></th>
-            <td><?php $dropdown_args = array();
-                $dropdown_args[ 'id' ] = 'email_id';
-                $dropdown_args[ 'name' ] = 'email_id';
-                $dropdown_args[ 'class' ] = 'hidden';
-                $dropdown_args[ 'required' ] = true;
+            <td><?php $args = array();
+                $args[ 'id' ] = 'email_id';
+                $args[ 'name' ] = 'email_id';
+                $args[ 'required' ] = true;
 
-                wpgh_dropdown_emails( $dropdown_args ); ?>
-                <p class="description"><?php _e( 'THe Broadcast tool uses your global emails.', 'groundhogg' ) ?></p>
+                echo WPGH()->html->dropdown_emails( $args ); ?>
+                <p class="description"><?php _e( 'The Broadcast tool uses your global emails.', 'groundhogg' ) ?></p>
             </td>
         </tr>
         <tr class="form-field term-tags-wrap">
@@ -32,11 +31,9 @@ wp_enqueue_style( 'jquery-ui' );
             <td><?php $tag_args = array();
                 $tag_args[ 'id' ] = 'tags';
                 $tag_args[ 'name' ] = 'tags[]';
-                $tag_args[ 'width' ] = '100%';
-                $tag_args[ 'class' ] = 'hidden';
                 $tag_args[ 'required' ] = true;
-                ?>
-                <?php wpgh_dropdown_tags( $tag_args ); ?>
+
+                echo WPGH()->html->tag_picker( $tag_args ); ?>
                 <p class="description"><?php _e( 'This broadcast will be sent to contacts with these tags.', 'groundhogg' ); ?></p>
             </td>
         </tr>

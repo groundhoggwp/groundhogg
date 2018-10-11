@@ -35,32 +35,46 @@ wp_enqueue_script( 'funnel-editor', WPGH_ASSETS_FOLDER . '/js/admin/funnel-edito
 
 do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
 
+$funnel = WPGH()->funnels->get( $funnel_id );
+
 ?>
-<span class="hidden" id="new-title"><?php echo wpgh_get_funnel_name( $funnel_id ); ?> &lsaquo; </span>
+<span class="hidden" id="new-title"><?php echo $funnel->title; ?> &lsaquo; </span>
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
 <form method="post">
     <?php wp_nonce_field(); ?>
+    <?php $args = array(
+        'type' => 'hidden',
+        'name' => 'funnel',
+        'id'    => 'funnel',
+        'value' => $funnel_id
+    ); echo WPGH()->html->input( $args ); ?>
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
             <div id="post-body-content">
                 <div id="titlediv">
                     <div id="titlewrap">
                         <label class="screen-reader-text" id="title-prompt-text" for="title"><?php echo __('Enter Funnel Name Here', 'groundhogg');?></label>
-                        <input placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo wpgh_get_funnel_name( $funnel_id ); ?>" id="title" spellcheck="true" autocomplete="off">
+                        <input placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo $funnel->title; ?>" id="title" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
                 <div class="postbox">
                     <h2 class="hndle"><?php _e("Reporting", 'groundhogg'); ?></h2>
                     <div class="inside">
-                        <select class="input" name="date_range" id="date_range">
-                            <?php $selected = ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ; ?>
-                            <option value="last_24" <?php if ( $selected == 'last_24' ) echo 'selected'; ?> ><?php _e( "Last 24 Hours", 'groundhogg' );?></option>
-                            <option value="last_7" <?php if ( $selected == 'last_7' ) echo 'selected'; ?>><?php _e( "Last 7 Days", 'groundhogg' );?></option>
-                            <option value="last_30" <?php if ( $selected == 'last_30' ) echo 'selected'; ?>><?php _e( "Last 30 Days", 'groundhogg' );?></option>
-                            <option value="custom" <?php if ( $selected == 'custom' ) echo 'selected'; ?>><?php _e( "Custom Range", 'groundhogg' );?></option>
-                        </select>
+                        <?php $args = array(
+                            'name'      => 'date_range',
+                            'id'        => 'date_range',
+                            'options'   => array(
+                                    'last_24' => __( 'Last 24 Hours' ),
+                                    'last_7' => __( 'Last 7 Days' ),
+                                    'last_30' => __( 'Last 30 Days' ),
+                                    'custom' => __( 'Custom Range' ),
+                            ),
+                            'selected' => ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24',
+                        ); echo WPGH()->html->dropdown( $args ); ?>
+
+                        <?php $selected = ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ; ?>
                         <input autocomplete="off" placeholder="<?php esc_attr_e('From:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_start" name="custom_date_range_start" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_start' ] ) ) echo $_POST['custom_date_range_start']; ?>">
                         <script>jQuery(function($){$('#custom_date_range_start').datepicker({
                                 changeMonth: true,
@@ -126,15 +140,15 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                                     <tr>
                                         <th><label for="funnel_export"><?php echo __( 'Export', 'groundhogg' );?></label></th>
                                         <td>
-                                            <a href="<?php echo esc_url( add_query_arg( 'export', 1 , $_SERVER['REQUEST_URI'] ) ); ?>" class="button button-secondary"><?php _e( 'Export Funnel', 'groundhogg'); ?></a>
+                                            <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _e( 'Export Funnel', 'groundhogg'); ?></a>
                                         </td>
                                     </tr>
                                     <tr>
                                         <th><label for="funnel_status"><?php echo __( 'Status', 'groundhogg' );?></label></th>
                                         <td>
-                                            <input type="hidden" name="funnel_status" id="funnel-status" value="<?php echo wpgh_get_funnel_status( $funnel_id );?> ">
+                                            <input type="hidden" name="funnel_status" id="funnel-status" value="<?php echo $funnel->status; ?> ">
                                             <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
-                                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="status-toggle" <?php if ( wpgh_get_funnel_status( $funnel_id ) == 'active' ) echo 'checked'; ?>>
+                                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="status-toggle" <?php if ( $funnel->status == 'active' ) echo 'checked'; ?>>
                                                 <label class="onoffswitch-label" for="status-toggle">
                                                     <span class="onoffswitch-inner"></span>
                                                     <span class="onoffswitch-switch"></span>
@@ -147,7 +161,7 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                                 <?php do_action( 'wpgh_funnel_status_after' ); ?>
                                 <div style="text-align: left" id="confirm" class="hidden">
                                     <p>
-                                        <label for="confirm-inactive"><input type="checkbox" value="yes" id="confirm-inactive" name="confirm"><?php _e('Are you sure? Setting the status to inactive will stop any automation present or future from happening.', 'groundhogg' ); ?></label></td>
+                                        <label for="confirm-inactive"><input type="checkbox" value="yes" id="confirm-inactive" name="confirm"><?php _e('Are you sure? Setting the status to inactive will stop any automation present or future from happening.', 'groundhogg' ); ?></label>
                                     </p>
                                     <script>jQuery(function($){
                                             $( '#status-toggle' ).change(function(){
@@ -183,7 +197,7 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                         <?php do_action( 'wpgh_benchmark_icons_before' ); ?>
                         <table>
                             <tbody>
-                            <?php $elements = wpgh_get_funnel_benchmarks();
+                            <?php $elements = WPGH()->elements->get_benchmarks();
 
                             $i = 0;
 
@@ -208,11 +222,11 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                         </table>
                         <?php do_action( 'wpgh_benchmark_icons_after' ); ?>
                         <p>
-                            <?php echo esc_html__( 'Benchmarks start and stop automation actions for a contact.','groundhogg' ); ?>
+                            <?php echo esc_html__( 'Benchmarks start and stop automation elements for a contact.','groundhogg' ); ?>
                         </p>
                     </div>
                 </div>
-                <!-- End Benckmark Icons-->
+                <!-- End Benchmark Icons-->
                 <!-- Begin Action Icons-->
                 <div id='actions' class="postbox">
                     <h2 class="hndle"><?php echo __( 'Actions', 'groundhogg' );?></h2>
@@ -220,7 +234,7 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                         <?php do_action( 'wpgh_action_icons_before' ); ?>
                         <table>
                             <tbody>
-                            <?php $elements = wpgh_get_funnel_actions();
+                            <?php $elements = WPGH()->elements->get_actions();
 
                             $i = 0;
 
@@ -259,7 +273,7 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                 <div style="visibility: hidden" id="normal-sortables" class="meta-box-sortables ui-sortable">
                     <?php do_action('wpgh_funnel_steps_before' ); ?>
 
-                    <?php $steps = wpgh_get_funnel_steps( $funnel_id );
+                    <?php $steps = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id ) );
 
                     if ( empty( $steps ) ): ?>
                         <div class="">
@@ -268,7 +282,12 @@ do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
                     <?php else:
 
                         foreach ( $steps as $i => $step_id ):
-                            wpgh_get_step_html( $step_id );
+
+                            $step = new WPGH_Step( $step_id );
+
+                            $step->html();
+                            // echo $step;
+
                         endforeach;
 
                     endif; ?>

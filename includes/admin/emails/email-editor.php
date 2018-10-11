@@ -26,50 +26,75 @@ wp_enqueue_style( 'wp-color-picker' );
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
 //custom scripts
-wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . '/js/admin/email-editor.js', array( 'wp-color-picker' ) );
-wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . '/css/admin/email-editor.css' );
+wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.js', array( 'wp-color-picker' ) );
+wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . 'css/admin/email-editor.css' );
 
-wp_enqueue_script('media-picker', WPGH_ASSETS_FOLDER . '/js/admin/media-picker.js' );
+wp_enqueue_script('media-picker', WPGH_ASSETS_FOLDER . 'js/admin/media-picker.js' );
 
-wp_enqueue_script('simple-editor', WPGH_ASSETS_FOLDER . '/js/admin/simple-editor.js' );
-wp_enqueue_style('simple-editor', WPGH_ASSETS_FOLDER . '/css/admin/simple-editor.css' );
+wp_enqueue_script('simple-editor', WPGH_ASSETS_FOLDER . 'js/admin/simple-editor.js' );
+wp_enqueue_style('simple-editor', WPGH_ASSETS_FOLDER . 'css/admin/simple-editor.css' );
 //for select 2
 wp_enqueue_style( 'select2' );
 wp_enqueue_script( 'select2' );
 
 $email_id = intval( $_GET['email'] );
-$email = wpgh_get_email_by_id( $email_id );
+$email = new WPGH_Email( $email_id );
 
 ?>
+
+<!-- RETURN PATH NOTICE-->
+<?php if ( isset( $_REQUEST['return_funnel'] ) ): ?>
+    <div class="notice notice-info is-dismissible">
+        <p><a href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $_REQUEST['return_funnel'] . '#' . $_REQUEST['return_step'] ); ?>"><?php  _e( '&larr; Back to editing funnel' ); ?></a></p>
+    </div>
+<?php endif; ?>
+<!-- /RETURN PATH -->
+
+<!-- NEW EMAIL TAB TITLE -->
 <span class="hidden" id="new-title"><?php echo $email->subject; ?> &lsaquo; </span>
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
+<!-- /END TITLE -->
+
+
 <form method="post">
+
+    <!-- Before-->
     <?php wp_nonce_field(); ?>
     <?php do_action('wpgh_edit_email_form_before'); ?>
-    <?php if ( isset( $_REQUEST['return_funnel'] ) ): ?>
-    <div class="notice notice-info is-dismissible">
-        <p><a href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $_REQUEST['return_funnel'] . '#' . $_REQUEST['return_step'] ); ?>"><?php  _e( '&larr; Back to editing funnel' ); ?></a></p>
-    </div>
-    <?php endif; ?>
+
+    <!-- Main -->
     <div id='poststuff' class="wpgh-funnel-builder">
         <div id="post-body" class="metabox-holder columns-2">
             <div id="post-body-content">
+
+                <!-- Title Content -->
                 <div id="titlediv">
                     <div id="titlewrap">
+
+                        <!-- Subject Line -->
                         <label class="screen-reader-text" id="title-prompt-text" for="subject"><?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?></label>
                         <input placeholder="<?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?>" type="text" name="subject" size="30" value="<?php echo  $email->subject; ?>" id="subject" spellcheck="true" autocomplete="off" required>
+
+                        <!-- Pre Header-->
                         <label class="screen-reader-text" id="title-prompt-text" for="pre_header"><?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?></label>
                         <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo  $email->pre_header; ?>" id="pre_header" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
+                <!-- / Title Content -->
+
+                <!-- Editor -->
                 <div id="email-content" class="postbox">
                     <h3 class="hndle"><?php _e( 'Email Editor'); ?></h3>
                     <div id="editor" class="editor" style="display: flex;">
+
+                        <!-- Block Options -->
                         <div id="editor-actions" style="display: inline-block;width: 280px;float: left">
                             <div style="width: 280px;"></div>
                             <div class="editor-actions-inner">
+
+                                <!-- Text Block Otions -->
                                 <div id="text_block-editor" class="postbox hidden">
                                     <h3 class="hndle"><?php _e( 'Text'); ?></h3>
                                     <div class="inside">
@@ -81,7 +106,7 @@ $email = wpgh_get_email_by_id( $email_id );
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'H1 Font'); ?>:</th>
-                                                    <td><?php wpgh_font_select( 'h1-font', 'h1-font' ); ?></td>
+                                                    <td><?php echo WPGH()->html->font_picker( array( 'id' => 'h1-font', 'name' => 'h1-font' ) ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'H2 Size'); ?>:</th>
@@ -89,7 +114,7 @@ $email = wpgh_get_email_by_id( $email_id );
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'H2 Font'); ?>:</th>
-                                                    <td><?php wpgh_font_select( 'h2-font', 'h2-font' ); ?></td>
+                                                    <td><?php echo WPGH()->html->font_picker( array( 'name' => 'h2-font', 'id' => 'h2-font' ) ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Paragraph Size'); ?>:</th>
@@ -97,12 +122,14 @@ $email = wpgh_get_email_by_id( $email_id );
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Paragraph Font'); ?>:</th>
-                                                    <td><?php wpgh_font_select( 'p-font', 'p-font' ); ?></td>
+                                                    <td><?php echo WPGH()->html->font_picker( array( 'name' => 'p-font', 'id' => 'p-font' ) ); ?></td>
                                                 </tr>
                                             </table>
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Button Options -->
                                 <div id="button_block-editor" class="postbox hidden">
                                     <h3 class="hndle"><?php _e( 'Button'); ?></h3>
                                     <div class="inside">
@@ -118,15 +145,15 @@ $email = wpgh_get_email_by_id( $email_id );
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Button Font'); ?>:</th>
-                                                    <td><?php wpgh_font_select( 'button-font', 'button-font' ); ?></td>
+                                                    <td><?php echo WPGH()->html->font_picker( array( 'name' => 'button-font', 'id' => 'button-font' ) ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Button Color'); ?>:</th>
-                                                    <td><?php wpgh_color_select( 'button-color', 'button-color', '#dd9933' ); ?></td>
+                                                    <td><?php echo WPGH()->html->color_picker( array( 'name' => 'button-color', 'id' => 'button-color', 'default' => '#dd9933' ) ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Text Color'); ?>:</th>
-                                                    <td><?php wpgh_color_select( 'button-text-color', 'button-text-color', '#FFFFFF' ); ?></td>
+                                                    <td><?php echo WPGH()->html->color_picker( array( 'name' => 'button-text-color', 'id' => 'button-text-color', 'default' => '#FFFFFF' ) ); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Button Link'); ?>:</th>
@@ -144,6 +171,8 @@ $email = wpgh_get_email_by_id( $email_id );
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Spacer Options -->
                                 <div id="spacer_block-editor" class="postbox hidden">
                                     <h3 class="hndle"><?php _e( 'Spacer'); ?></h3>
                                     <div class="inside">
@@ -157,6 +186,8 @@ $email = wpgh_get_email_by_id( $email_id );
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Divider Options -->
                                 <div id="divider_block-editor" class="postbox hidden">
                                     <h3 class="hndle"><?php _e( 'Divider'); ?></h3>
                                     <div class="inside">
@@ -170,6 +201,8 @@ $email = wpgh_get_email_by_id( $email_id );
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Image Options -->
                                 <div id="image_block-editor" class="postbox hidden">
                                     <h3 class="hndle"><?php _e( 'Image'); ?></h3>
                                     <div class="inside">
@@ -213,6 +246,8 @@ $email = wpgh_get_email_by_id( $email_id );
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Code Block Options -->
                                 <div id="code_block-editor" class="postbox hidden">
                                     <h3 class="hndle"><?php _e( 'Custom HTML'); ?></h3>
                                     <div class="inside">
@@ -228,6 +263,8 @@ $email = wpgh_get_email_by_id( $email_id );
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Main Content Options -->
                                 <div id="email-editor" class="postbox">
                                     <h3 class="hndle"><?php _e( 'Email Options'); ?></h3>
                                     <div class="inside">
@@ -237,14 +274,14 @@ $email = wpgh_get_email_by_id( $email_id );
                                                     <th><?php _e( 'Alignment'); ?></th>
                                                     <td>
                                                         <select id="email-align" name="email_alignment">
-                                                            <option value="left" <?php if ( wpgh_get_email_meta( $email_id, 'alignment', true ) === 'left' ) echo 'selected' ; ?> ><?php _e('Left'); ?></option>
-                                                            <option value="center" <?php if ( wpgh_get_email_meta( $email_id, 'alignment', true ) === 'center' ) echo 'selected' ; ?>><?php _e('Center'); ?></option>
+                                                            <option value="left" <?php if ( $email->get_meta( 'alignment' ) === 'left' ) echo 'selected' ; ?> ><?php _e('Left'); ?></option>
+                                                            <option value="center" <?php if ( $email->get_meta( 'alignment' ) === 'center' ) echo 'selected' ; ?>><?php _e('Center'); ?></option>
                                                         </select>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th><?php _e( 'Enable Browser View'); ?></th>
-                                                    <td><input type="checkbox" name="browser_view" value="1" <?php if ( wpgh_get_email_meta( $email_id, 'browser_view', true ) == 1 ) echo 'checked' ; ?>></td>
+                                                    <td><input type="checkbox" name="browser_view" value="1" <?php if ( $email->get_meta( 'browser_view' ) == 1 ) echo 'checked' ; ?>></td>
                                                 </tr>
                                             </table>
                                         </div>
@@ -253,18 +290,17 @@ $email = wpgh_get_email_by_id( $email_id );
                             </div>
                         </div>
                         <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto; overflow:visible;">
-                            <?php
-
-                            $alignment = wpgh_get_email_meta( $email_id, 'alignment', true );
+                            <?php $alignment = $email->get_meta( 'alignment' );
                             if ( $alignment === 'center' ){
                                 $margins = "margin-left:auto;margin-right:auto;";
                             } else {
                                 $margins = "margin-left:0;margin-right:auto;";
-                            }
+                            } ?>
 
-                            ?>
+                            <!-- Editor Content -->
                             <div id="email-inside" class="email-sortable" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
                                 <?php if ( empty( $email->content ) ): ?>
+                                    <!-- Empty content -->
                                     <?php wpgh_get_email_block( 'image_block' ); ?>
                                     <?php wpgh_get_email_block( 'text_block' ); ?>
                                     <?php wpgh_get_email_block( 'divider_block' ); ?>
@@ -279,11 +315,14 @@ $email = wpgh_get_email_by_id( $email_id );
                         <div style="clear: both;"></div>
                     </div>
                 </div>
+
+                <!-- Saved Content -->
                 <div class="hidden">
                     <textarea id="content" name="content"><?php echo $email->content; ?></textarea>
                 </div>
 
             </div>
+
             <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sticky">
                 <div id="submitdiv" class="postbox">
@@ -297,9 +336,9 @@ $email = wpgh_get_email_by_id( $email_id );
                                     <tr>
                                         <th><?php _e( 'Status:' ); ?></th>
                                         <td>
-                                            <input type="hidden" id="status" name="status" value="<?php echo $email->email_status; ?>" >
+                                            <input type="hidden" id="status" name="status" value="<?php echo $email->status; ?>" >
                                             <div class="onoffswitch" style="text-align: left;">
-                                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="status-toggle" <?php if ( $email->email_status === 'ready' ) echo 'checked'; ?> >
+                                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="status-toggle" <?php if ( $email->status === 'ready' ) echo 'checked'; ?> >
                                                 <label class="onoffswitch-label" for="status-toggle">
                                                     <span class="onoffswitch-inner"></span>
                                                     <span class="onoffswitch-switch"></span>
@@ -327,7 +366,7 @@ $email = wpgh_get_email_by_id( $email_id );
                                     </tr>
                                     <tr id="send-to" class="hidden">
                                         <th><?php _e( 'To:' ); ?></th>
-                                        <?php $args = array( 'id' => 'test_email', 'name' => 'test_email', 'selected' => wpgh_get_email_meta( $email_id, 'test_email', true ), 'role' => 'administrator' ); ?>
+                                        <?php $args = array( 'id' => 'test_email', 'name' => 'test_email', 'selected' => $email->get_meta( 'test_email' ), 'role' => 'administrator' ); ?>
                                         <td><?php wp_dropdown_users( $args ); ?><script>jQuery(document).ready(function(){jQuery( '#test_email' ).select2()});</script></td>
                                     </tr>
                                     <script>
@@ -386,6 +425,7 @@ $email = wpgh_get_email_by_id( $email_id );
                 </div
             </div>
             <!-- End elements area-->
+
         </div>
     </div>
 </form>

@@ -1,0 +1,189 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: adria
+ * Date: 2018-10-01
+ * Time: 3:48 PM
+ */
+
+class WPGH_Event_Queue
+{
+
+    const ACTION = 'wpgh_cron_event';
+
+    /**
+     * @var WPGH_Contact the current contact in the event
+     */
+    public $contact;
+
+    /**
+     * @var object|WPGH_Event the current event
+     */
+    public $cur_event;
+
+    /**
+     * All the events queued for processing
+     *
+     * @var array of events
+     */
+    public $events;
+
+    /**
+     * @var bool whether the queue is being processed or nah
+     */
+    private $doing_queue = false;
+
+    /**
+     * Setup the cron jobs
+     * Add new short term schedule
+     * setup the action for the cron job
+     */
+    public function construct()
+    {
+
+        add_action( 'init', array( $this, 'setup_cron_jobs' ) );
+        add_filter( 'cron_schedules', array( $this, 'setup_cron_schedules' ) );
+        add_action( self::ACTION , array( $this, 'process' ) );
+
+    }
+
+    /**
+     * Add the new 10 minute schedule to the list of schedules
+     *
+     * @param $schedules array of cron schedules
+     * @return mixed
+     */
+    public function setup_cron_schedules( $schedules )
+    {
+        $schedules[ 'every_5_minutes' ] = array(
+          'interval'    => 5 * MINUTE_IN_SECONDS,
+          'display'     => __( 'Every 5 Minutes', 'groundhogg' )
+        );
+
+        return $schedules;
+    }
+
+    /**
+     * Add the event cron job
+     */
+    public function setup_cron_jobs()
+    {
+        if ( ! wp_next_scheduled( self::ACTION ) ){
+            wp_schedule_event( time(), 'every_5_minutes', self::ACTION );
+        }
+    }
+
+    /**
+     * Get a list of events that are up for completion
+     */
+    public function prepare_events()
+    {
+
+        //todo decide whether to get the whole object or just the event ID
+        $events = WPGH()->events->get_queued_events();
+
+        foreach ( $events as $event ) {
+
+            $this->events[] = new WPGH_Event( $event->ID );
+//            $this->events[] = new WPGH_Event( $event );
+
+        }
+
+
+        return $this->events;
+    }
+
+
+    /**
+     * Iterate through the list of events and process them via the EVENTS API
+     * For now just uses the standard plugins API
+     *
+     * @return bool whether the queue was processed or not
+     */
+    public function process()
+    {
+
+        $this->prepare_events();
+
+        if ( empty( $this->events ) ){
+
+            return false;
+
+        }
+
+        do_action( 'wpgh_process_event_queue_before', $this );
+
+        $this->doing_queue = true;
+
+        while ( $this->has_events() ) {
+
+            $this->cur_event = $this->get_next();
+
+            $this->cur_event->run();
+
+        }
+
+        $this->doing_queue = false;
+
+        do_action( 'wpgh_process_event_queue_after', $this );
+
+        return true;
+    }
+
+    /**
+     * Get the next event in the queue to run.
+     */
+    public function get_next()
+    {
+
+        return array_pop( $this->events );
+
+    }
+
+    /**
+     * Is the queue empty of nah?
+     *
+     * @return bool whether the event array is empty
+     */
+    public function has_events()
+    {
+
+       return ! empty( $this->events );
+
+    }
+
+    /**
+     * Add an event to the event queue
+     *
+     * @param $event array of event attributes
+     *
+     * @return int the ID of the new event
+     */
+    public function add( $event )
+    {
+        $e = wp_parse_args( $event, array(
+            'time'          => 0,
+            'contact_id'    => 0,
+            'step_id'       => 0,
+            'funnel_id'     => 0,
+        ) );
+
+        return WPGH()->events->add( $e );
+    }
+
+    /**
+     * Return whether a similar event exists
+     *
+     * @param $event array of event attributes
+     *
+     * @return bool whether the event exists
+     */
+    public function exists( $event )
+    {
+
+        //todo does this make sense?
+        return WPGH()->events->event_exists( $event );
+
+    }
+
+}

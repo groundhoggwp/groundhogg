@@ -659,7 +659,7 @@
                 }
             },
             link: {
-                icon: '<span class="dashicons link-manager dashicons-admin-links"></span>',
+                icon: '<span class="dashicons link-manager dashicons-admin-superlinks"></span>',
                 title: 'Link',
                 state: function state() {
                     return getSelectionContainerElement().is('a');

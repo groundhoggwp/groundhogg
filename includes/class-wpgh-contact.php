@@ -63,7 +63,9 @@ class WPGH_Contact
 	public $optin_status;
 
     /**
-     * @var int the owner ID
+     * The contact owner
+     *
+     * @var WP_User
      */
 	public $owner;
 
@@ -77,11 +79,11 @@ class WPGH_Contact
 	/**
 	 * WPGH_Contact constructor.
 	 *
-	 * @param string|int $_id_or_email either the email or the id of the contact to retrieve
+	 * @param string|int|bool $_id_or_email either the email or the id of the contact to retrieve
+     * @param $by_user_id bool
      * @param bool get contact via the User ID
 	 */
-    public function __construct( $_id_or_email = false, $by_user_id = false ) {
-
+    public function __construct( $_id_or_email = false, $by_user_id = false ){
 
         if ( false === $_id_or_email || ( is_numeric( $_id_or_email ) && (int) $_id_or_email !== absint( $_id_or_email ) ) ) {
             return false;
@@ -95,14 +97,25 @@ class WPGH_Contact
             $field = 'email';
         }
 
-        //$contact = WPGH()->contacts->get_contact_by( $field, $_id_or_email );
-        $contact = wpgh_get_contact_by( $field, $_id_or_email );
+        $contact = WPGH()->contacts->get_contact_by( $field, $_id_or_email );
+//        $contact = wpgh_get_contact_by( $field, $_id_or_email );
 
         if ( empty( $contact ) || ! is_object( $contact ) ) {
             return false;
         }
 
         $this->setup_contact( $contact );
+    }
+
+    /**
+     * Whether the contact is active in a certain funnel
+     *
+     * @param $funnel_id
+     * @return bool
+     */
+    public function in_funnel( $funnel_id )
+    {
+        return WPGH()->events->count( array( 'funnel_id' => $funnel_id, 'contact_id' => $this->ID ) ) > 0;
     }
 
     /**
@@ -141,9 +154,9 @@ class WPGH_Contact
                     $this->optin_status = intval( $contact->optin_status );
 
                     break;
-                case 'owner':
+                case 'owner_id':
 
-                    $this->owner = intval( $contact->owner );
+                    $this->owner = get_userdata( $contact->owner_id );
 
                     break;
                 case 'date_created':
@@ -160,12 +173,20 @@ class WPGH_Contact
 
         $this->full_name = sprintf( "%s %s", $this->first_name, $this->last_name );
 
-        $this->tags = array_map( 'intval', wpgh_get_contact_tags( $this->ID ) );
-//        $this->tags = array_map( 'intval', WPGH->tag_relationships->get_column_by( 'contact_id', $this->ID, 'tag_id' ) );
+        $this->tags = array_map( 'intval', WPGH()->tag_relationships->get_tags_by_contact( $this->ID ) );
 
         $this->notes = $this->get_meta('notes' );
 
     }
+
+    /**
+     * Return whether the contact actually exists
+     */
+    public function exists()
+    {
+        return is_email( $this->email );
+    }
+
 
     /**
      * Update the contact with the given information
@@ -185,13 +206,10 @@ class WPGH_Contact
 
         $updated = false;
 
-//        if ( WPGH()->contacts->update( $this->ID, $data ) )
-        if ( wpgh_update_contact( $this->ID, $data ) )
-        {
+        if ( WPGH()->contacts->update( $this->ID, $data ) ) {
 
-            $contact = wpgh_get_contact_by( 'ID', $this->ID );
-            //$contact = $this->db->get_contact_by( 'ID', $this->ID );
-            $this->setup_contact( $contact);
+            $contact = WPGH()->contacts->get_contact_by( $this->ID, 'ID' );
+            $this->setup_contact( $contact );
 
             $updated = true;
 
@@ -289,8 +307,8 @@ class WPGH_Contact
      */
     public function get_meta( $key )
     {
-        // return WPGH()->contact_meta->get_meta( $this->ID, $key );
-        return wpgh_get_contact_meta( $this->ID, $key );
+         return WPGH()->contact_meta->get_meta( $this->ID, $key );
+//        return wpgh_get_contact_meta( $this->ID, $key );
     }
 
     /**
@@ -303,8 +321,8 @@ class WPGH_Contact
      */
     public function update_meta( $key, $value )
     {
-        // return WPGH()->contact_meta->update_meta( $this->ID, $key, $value );
-        return wpgh_update_contact_meta( $this->ID, $key, $value );
+         return WPGH()->contact_meta->update_meta( $this->ID, $key, $value );
+//        return wpgh_update_contact_meta( $this->ID, $key, $value );
     }
 
     /**
@@ -317,8 +335,8 @@ class WPGH_Contact
      */
     public function add_meta( $key, $value )
     {
-        // return WPGH()->contact_meta->add_meta( $this->ID, $key, $value );
-        return wpgh_add_contact_meta( $this->ID, $key, $value );
+         return WPGH()->contact_meta->add_meta( $this->ID, $key, $value );
+//        return wpgh_add_contact_meta( $this->ID, $key, $value );
     }
 
     /**
@@ -329,8 +347,8 @@ class WPGH_Contact
      */
     public function delete_meta( $key )
     {
-        // return WPGH()->contact_meta->delete_meta( $this->ID, $key );
-        return wpgh_delete_contact_meta( $this->ID, $key );
+         return WPGH()->contact_meta->delete_meta( $this->ID, $key );
+//        return wpgh_delete_contact_meta( $this->ID, $key );
     }
 
 
@@ -370,43 +388,40 @@ class WPGH_Contact
      */
     public function add_tag( $tag_id_or_array )
     {
-        if ( is_array( $tag_id_or_array ) ){
 
-            // $tags = WPGH()->tags->validate( $tag_id_or_array );
-            $tags = wpgh_validate_tags( $tag_id_or_array );
+        if ( ! is_array( $tag_id_or_array ) ){
 
-            foreach ( $tags as $tag_id )
-            {
+            $tags = array( $tag_id_or_array );
 
-                if ( ! $this->has_tag( $tag_id ) ){
+        } else if( is_array( $tag_id_or_array ) ){
 
-                    $this->tags[] = $tag_id;
+            $tags = $tag_id_or_array;
 
-                    // WPGH()->tag_relationships->add( $this->ID, $tag_id );
-                    wpgh_insert_contact_tag_relationship( $this->ID, $tag_id );
+        } else {
 
-                }
+            return false;
 
-            }
+        }
 
-            return true;
+        $tags = WPGH()->tags->validate( $tags );
 
-        } else if ( is_numeric( $tag_id_or_array ) ) {
+        foreach ( $tags as $tag_id ) {
 
-            $tag_id = absint( $tag_id_or_array );
+            if ( ! $this->has_tag( $tag_id ) ){
 
-            if ( wpgh_tag_exists( $tag_id ) && ! $this->has_tag( $tag_id ) )
-            {
                 $this->tags[] = $tag_id;
 
-                // return WPGH()->tag_relationships->add( $this->ID, $tag_id );
-                return wpgh_insert_contact_tag_relationship( $this->ID, $tag_id );
+                WPGH()->tag_relationships->add( $this->ID, $tag_id );
+
+                do_action( 'wpgh_tag_applied', $this, $tag_id );
 
             }
 
         }
 
-        return false;
+        return true;
+
+
     }
 
 
@@ -418,46 +433,37 @@ class WPGH_Contact
      */
     public function remove_tag( $tag_id_or_array )
     {
-        if ( is_array( $tag_id_or_array ) ){
+        if ( ! is_array( $tag_id_or_array ) ){
 
-            // $tags = WPGH()->tags->validate( $tag_id_or_array );
-            $tags = wpgh_validate_tags( $tag_id_or_array );
+            $tags = array( $tag_id_or_array );
 
-            foreach ( $tags as $tag_id )
-            {
+        } else if( is_array( $tag_id_or_array ) ){
 
-                if ( $this->has_tag( $tag_id ) ){
+            $tags = $tag_id_or_array;
 
-                    if (($key = array_search($tag_id, $this->tags)) !== false) {
-                        unset($this->tags[$key]);
-                        // WPGH()->tag_relationships->delete( $this->ID, $tag_id );
-                        wpgh_delete_contact_tag_relationship( $this->ID, $tag_id );
-                    }
+        } else {
 
-                }
+            return false;
 
-            }
+        }
 
-            return true;
+        $tags = WPGH()->tags->validate( $tags );
 
-        } else if ( is_numeric( $tag_id_or_array ) ) {
+        foreach ( $tags as $tag_id ) {
 
-            $tag_id = absint( $tag_id_or_array );
+            if ( $this->has_tag( $tag_id ) ){
 
-            // WPGH()->tags->exists( $tag_id );
-            if ( wpgh_tag_exists( $tag_id ) && ! $this->has_tag( $tag_id ) )
-            {
-                if (($key = array_search($tag_id, $this->tags)) !== false) {
-                    unset($this->tags[$key]);
-                    // return WPGH()->tag_relationships->delete( $this->ID, $tag_id );
-                    return wpgh_delete_contact_tag_relationship( $this->ID, $tag_id );
-                }
+                unset( $this->tags[ array_search( $tag_id, $this->tags ) ] );
+
+                WPGH()->tag_relationships->delete( array( 'tag_id' => $tag_id, 'contact_id' => $this->ID ) );
+
+                do_action( 'wpgh_tag_removed', $this, $tag_id );
 
             }
 
         }
 
-        return false;
+        return true;
     }
 
 	/**
@@ -473,7 +479,7 @@ class WPGH_Contact
 	    if ( ! is_numeric( $tag_id_or_name ) )
         {
 
-            $tag = (object) wpgh_get_tag( $tag_id_or_name );
+            $tag = (object) WPGH()->tags->get_tag_by( 'tag_slug', $tag_id_or_name );
 
             $tag_id = intval( $tag->tag_id );
 

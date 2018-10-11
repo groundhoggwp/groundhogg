@@ -46,12 +46,12 @@ add_filter( 'no_texturize_shortcodes', 'wpgh_no_texturize_form' );
  */
 function wpgh_merge_replacements_shortcode( $atts, $content = '' )
 {
-    $contact = wpgh_get_the_contact();
+    $contact = WPGH()->tracking->get_contact();
 
     if ( ! $contact )
         return '';
 
-    return wpgh_do_replacements( $contact->ID, $content );
+    return WPGH()->replacements->do( $content, $contact->ID );
 }
 
 add_shortcode( 'gh_replacements', 'wpgh_merge_replacements_shortcode' );
@@ -65,29 +65,14 @@ function wpgh_contact_replacement_shortcode( $atts )
 		'field' => 'first'
 	), $atts );
 
-	$contact = wpgh_get_the_contact();
+    $contact = WPGH()->tracking->get_contact();
 
 	if ( ! $contact )
 		return __( 'Friend', 'groundhogg' );
 
-	if ( substr( $a['field'], 0, 1) === '_' ) {
-		$new_replacement = $contact->get_meta( substr( $a['field'], 1) );
-	} else {
+	$content = sprintf( '{%s}', $a[ 'field' ] );
 
-		if ( strpos( $a['field'], '.' ) > 0 ){
-
-			$parts = explode( '.', $a['field'] );
-
-			$function = $parts[0];
-			$arg = $parts[1];
-			$new_replacement = apply_filters( 'wpgh_replacement_' . $function, $arg, $contact );
-
-		} else {
-			$new_replacement = apply_filters( 'wpgh_replacement_' . $a['field'], $contact );
-		}
-	}
-
-	return $new_replacement;
+	return WPGH()->replacements->do( $contact->ID, $content );
 }
 
 add_shortcode( 'gh_contact', 'wpgh_contact_replacement_shortcode' );
@@ -101,7 +86,7 @@ add_shortcode( 'gh_contact', 'wpgh_contact_replacement_shortcode' );
  */
 function wpgh_is_contact_shortcode( $atts, $content='' )
 {
-    $contact = wpgh_get_current_contact();
+    $contact = WPGH()->tracking->get_contact();
 
     if ( $contact ) {
         return $content;
@@ -121,7 +106,7 @@ add_shortcode( 'gh_is_contact', 'wpgh_is_contact_shortcode' );
  */
 function wpgh_is_not_contact_shortcode( $atts, $content='' )
 {
-    $contact = wpgh_get_current_contact();
+    $contact = WPGH()->tracking->get_contact();
 
     if ( $contact ) {
         return '';
@@ -150,7 +135,7 @@ function wpgh_contact_has_tag_shortcode( $atts, $content='' )
     $tags = array_map( 'trim', $tags );
     $tags = array_map( 'intval', $tags );
 
-    $contact = wpgh_get_current_contact();
+    $contact = WPGH()->tracking->get_contact();
 
     if ( ! $contact ) {
         return '';
@@ -202,7 +187,7 @@ function wpgh_contact_does_not_have_tag_shortcode( $atts, $content='' )
     $tags = array_map( 'trim', $tags );
     $tags = array_map( 'intval', $tags );
 
-    $contact = wpgh_get_current_contact();
+    $contact = WPGH()->tracking->get_contact();
 
     if ( ! $contact ) {
         return '';
