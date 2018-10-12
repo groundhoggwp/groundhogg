@@ -239,7 +239,7 @@ class WPGH_DB_Funnels extends WPGH_DB  {
 
         global  $wpdb;
 
-        if ( ! is_object( $data ) || ! is_array( $data ) )
+        if ( ! is_array( $data ) )
             return false;
 
         $data = (array) $data;
@@ -322,14 +322,14 @@ class WPGH_DB_Funnels extends WPGH_DB  {
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-		  ID            bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-          title         text NOT NULL,
-          status        varchar(20) NOT NULL,
-          author        bigint(20) unsigned NOT NULL,
-          active_contacts bigint(20) unsigned NOT NULL,
-          last_updated  datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-          date_created  datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-          PRIMARY KEY ID
+		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        title text NOT NULL,
+        status varchar(20) NOT NULL,
+        author bigint(20) unsigned NOT NULL,
+        active_contacts bigint(20) unsigned NOT NULL,
+        last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        PRIMARY KEY (ID)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
         dbDelta( $sql );

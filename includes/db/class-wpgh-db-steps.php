@@ -103,7 +103,7 @@ class WPGH_DB_Steps extends WPGH_DB  {
             $this->get_column_defaults()
         );
 
-        if( empty( $args['type'] ) ) {
+        if( empty( $args['step_type'] ) ) {
             return false;
         }
 
@@ -229,11 +229,11 @@ class WPGH_DB_Steps extends WPGH_DB  {
      * @access  public
      * @since   2.1
      */
-    public function get_steps( $data = array(), $order = 'order' ) {
+    public function get_steps( $data = array(), $order = 'step_order' ) {
 
         global  $wpdb;
 
-        if ( ! is_object( $data ) || ! is_array( $data ) )
+        if ( ! is_array( $data ) )
             return false;
 
         $data = (array) $data;

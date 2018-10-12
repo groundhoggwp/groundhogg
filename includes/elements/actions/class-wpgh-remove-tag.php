@@ -49,7 +49,7 @@ class WPGH_Remove_Tag extends WPGH_Funnel_Step
                 </th>
                 <?php $args = array(
                     'id' => $step->prefix( 'tags' ),
-                    'name' => $step->prefix( 'tags' ),
+                    'name' => $step->prefix( 'tags' ) . '[]',
                     'selected' => $tags
                 ); ?>
                 <td>

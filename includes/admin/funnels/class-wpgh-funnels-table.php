@@ -157,7 +157,17 @@ class WPGH_Funnels_Table extends WP_List_Table {
 
     protected function column_active_contacts( $funnel )
     {
-        $count = $funnel->active_contacts;
+
+        $query  = new WPGH_Contact_Query();
+
+        $count = $query->query( array(
+            'count'  => true,
+            'report' => array(
+                'start'     => strtotime( '30 days ago' ),
+                'funnel'    => $funnel->ID
+            )
+        ) );
+
         $queryUrl = admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%d&start=%d', $funnel->ID, strtotime( '30 days ago' ) ) );
         return "<a href='$queryUrl'>$count</a>";
     }
@@ -334,6 +344,8 @@ class WPGH_Funnels_Table extends WP_List_Table {
      * @return int
      */
     protected function usort_reorder( $a, $b ) {
+        $a = (array) $a;
+        $b = (array) $b;
         // If no sort, default to title.
         $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'date_created'; // WPCS: Input var ok.
         // If no order, default to asc.

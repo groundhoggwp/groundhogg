@@ -76,7 +76,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
             'scheduled_by'      => 0,
             'send_time'         => 0,
             'tags'              => '',
-            'status'            => 'waiting',
+            'status'            => 'scheduled',
             'date_scheduled'    => current_time( 'mysql' ),
         );
     }
@@ -108,9 +108,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
     private function unserialize_tags( $obj = null )
     {
         if ( is_object( $obj ) && isset( $obj->tags ) ){
-
             $obj->tags = maybe_unserialize( $obj->tags );
-
         }
 
         return $obj;
@@ -259,7 +257,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
 
         global  $wpdb;
 
-        if ( ! is_object( $data ) || ! is_array( $data ) )
+        if ( ! is_array( $data ) )
             return false;
 
         $data = (array) $data;
@@ -276,12 +274,14 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
         $where = $this->generate_where( $data );
 
         if ( empty( $where ) ){
-
             $where = "1=1";
-
         }
 
-        $results = array_map( array( $this, 'unserialize_tags' ), $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where ORDER BY send_time DESC" ) );
+        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where ORDER BY send_time DESC" );
+
+        if ( is_array( $results ) ){
+            $results = array_map( array( $this, 'unserialize_tags' ), $results );
+        }
 
         return $results;
     }
@@ -342,14 +342,14 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-		  ID                bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-          email_id          bigint(20) unsigned NOT NULL,
-          scheduled_by      bigint(20) unsigned NOT NULL,
-          send_time         bigint(20) unsigned NOT NULL,
-          tags              longtext NOT NULL,
-          status            VARCHAR(20) NOT NULL,
-          date_scheduled    datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-          PRIMARY KEY  (ID)
+		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        email_id bigint(20) unsigned NOT NULL,
+        scheduled_by bigint(20) unsigned NOT NULL,
+        send_time bigint(20) unsigned NOT NULL,
+        tags longtext NOT NULL,
+        status VARCHAR(20) NOT NULL,
+        date_scheduled datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        PRIMARY KEY (ID)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
         dbDelta( $sql );

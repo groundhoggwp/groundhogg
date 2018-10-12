@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
     <?php if ( $active_tab === 'templates' ): ?>
 
-    <?php include WPGH_PLUGIN_DIR . 'includes/templates/email-templates.php'; ?>
+    <?php include WPGH_PLUGIN_DIR . 'templates/email-templates.php'; ?>
 
     <?php foreach ( $email_templates as $id => $email_args ): ?>
 

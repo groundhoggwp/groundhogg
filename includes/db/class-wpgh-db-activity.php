@@ -275,16 +275,19 @@ class WPGH_DB_Activity extends WPGH_DB  {
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-		  ID            bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-          timestamp     bigint(20) unsigned NOT NULL,
-          contact_id    bigint(20) unsigned NOT NULL,
-          funnel_id     bigint(20) unsigned NOT NULL,
-          step_id       bigint(20) unsigned NOT NULL,
-          activity_type VARCHAR(20) NOT NULL,
-          event_id      bigint(20) unsigned NOT NULL,
-          referer       text NOT NULL,
-          PRIMARY KEY ID,
-          KEY timestamp (timestamp)
+        ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        timestamp bigint(20) unsigned NOT NULL,
+        contact_id bigint(20) unsigned NOT NULL,
+        funnel_id bigint(20) unsigned NOT NULL,
+        step_id bigint(20) unsigned NOT NULL,
+        activity_type VARCHAR(20) NOT NULL,
+        event_id bigint(20) unsigned NOT NULL,
+        referer text NOT NULL,
+        PRIMARY KEY (ID),
+        KEY timestamp (timestamp),
+        KEY funnel_id (funnel_id),
+        KEY step_id (step_id),
+        KEY event_id (event_id)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
         dbDelta( $sql );

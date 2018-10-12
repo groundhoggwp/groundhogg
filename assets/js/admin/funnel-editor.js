@@ -1,169 +1,170 @@
 var wpghDoingAutoSave = false;
 
-jQuery( function($) {
+var wpghFunnelEditor;
 
-    jQuery('form').on('submit', function( e ){
-        //e.preventDefault();
-        jQuery('.spinner').css('visibility','visible');
-        //jQuery('form').unbind( 'submit' ).submit();
-    });
-    
-    var funnelSortables = jQuery( ".ui-sortable" ).sortable({
-        placeholder: "sortable-placeholder",
-        connectWith: ".ui-sortable",
-        axis: 'y',
-        start: function(e, ui){
-            ui.helper.css( 'left', ( ui.item.parent().width() - ui.item.width() ) / 2 );
-            ui.placeholder.height(ui.item.height());
-            ui.placeholder.width(ui.item.width());
-        }
-    });
+( function( $ ) {
 
-    funnelSortables.disableSelection();
+    wpghFunnelEditor = {
 
-    var funnelDraggables = jQuery( ".ui-draggable" ).draggable({
-        connectToSortable: ".ui-sortable",
-        helper: "clone",
-        stop: function ( e, ui ){
-            var el = this;
-            var step_type = el.id;
+        editorID: '#normal-sortables',
+        editor: null,
+        sortables: null,
+        draggables: null,
+        curStep: null,
+        curHTML: null,
+        curOrder: 0,
 
-            var sortables = jQuery('#normal-sortables');
+        init: function () {
 
-            sortables.find('.ui-draggable').replaceWith(
+            /* Create Editor */
+            this.editor = $( this.editorID );
+
+            /* Bind Delete */
+            this.editor.on( 'click', 'button.delete-step', function ( e ) {
+                wpghFunnelEditor.deleteStep( this );
+            } );
+
+            /* Bind Duplicate */
+            this.editor.on( 'click', 'button.duplicate-step', function ( e ) {
+                wpghFunnelEditor.duplicateStep( this );
+            } );
+
+            /* init sidebar */
+            $('.sidebar').stickySidebar({
+                topSpacing: 40,
+                bottomSpacing: 40
+            });
+
+            /* Activate Spinner */
+            $('form').on('submit', function( e ){
+                $('.spinner').css('visibility','visible');
+            });
+
+            this.makeSortable();
+            this.makeDraggable();
+
+        },
+
+        save: function () {
+
+        },
+
+        /**
+         * Inserts a dummy step wherever the given class is
+         *
+         * @param e string class name
+         */
+        insertDummyStep: function (e) {
+            this.editor.find(e).replaceWith(
                 '<div id="temp-step" class="postbox step replace-me" style="width: 500px;margin-right: auto;margin-left: auto;"><h3 class="hndle">Please Wait...</h3><div class="inside">Loading content...</div></div>'
             );
+        },
 
-            var order = $( '.step' ).index( $( '#temp-step' ) ) + 1;
+        /**
+         * Replaces the dummy step with the given html
+         *
+         * @param html
+         */
+        replaceDummyStep: function (html) {
+            this.editor.find('.replace-me').replaceWith(html);
+            $(document).trigger('wpghAddedStep');
+        },
 
-            if ( sortables.find( '.replace-me' ).length ){
-                var ajaxCall = jQuery.ajax({
-                    type : "post",
-                    url : ajaxurl,
-                    data : {action: "wpgh_get_step_html", step_type: step_type, step_order: order },
-                    success: function( html )
-                    {
-                        jQuery('#normal-sortables').find('.replace-me').replaceWith( html );
+        /**
+         * The callback when the draggable event is finished. Dragging in a new step
+         *
+         * @param e
+         */
+        convertDraggableToStep: function ( e ) {
+            var step_type = e.id;
+            this.insertDummyStep('.ui-draggable');
+            var order = $('.step').index($('#temp-step')) + 1;
+            var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order};
+            this.getStepHtml(data);
+        },
+
+        /**
+         * Initializes the draggable state of the steps
+         */
+        makeDraggable: function () {
+            this.draggables = $(".ui-draggable").draggable({
+                connectToSortable: ".ui-sortable",
+                helper: "clone",
+                stop: function () {
+                    wpghFunnelEditor.convertDraggableToStep( this )
+                }
+            });
+        },
+
+        makeSortable: function () {
+            this.sortables = $(".ui-sortable").sortable({
+                placeholder: "sortable-placeholder",
+                connectWith: ".ui-sortable",
+                axis: 'y',
+                start: function (e, ui) {
+                    ui.helper.css('left', (ui.item.parent().width() - ui.item.width()) / 2);
+                    ui.placeholder.height(ui.item.height());
+                    ui.placeholder.width(ui.item.width());
+                }
+            });
+
+            this.sortables.disableSelection();
+        },
+
+        /**
+         * Given an element delete it
+         *
+         * @param e node
+         */
+        deleteStep: function (e) {
+            var step = $(e).closest('.step');
+            var result = confirm("Are you sure you want to delete this step?");
+            if (result) {
+                var ajaxCall = $.ajax({
+                    type: "post",
+                    url: ajaxurl,
+                    data: {action: "wpgh_delete_funnel_step", step_id: step.attr( 'id' ) },
+                    success: function (result) {
+                        console.log(step.attr( 'id' ));
+                        step.remove();
                     }
                 });
             }
-        }
-    });
+        },
 
+        /**
+         * Given an element, duplicate the step and
+         * Add it to the funnel
+         *
+         * @param e node
+         */
+        duplicateStep: function ( e ) {
+            var step = $(e).closest('.step');
 
-    funnelSortables.on( 'sortupdate', function( e, ui ){
-        $( '.email_opened' ).each( wpgh_update_inside_contents );
-    });
-    funnelSortables.on( 'sortupdate', function( e, ui ){
-        wpgh_update_funnel_step_order();
-        wpgh_auto_save_funnel();
-    });
+            $('<div class="replace-me"></div>').insertAfter( step );
+            this.insertDummyStep( '.replace-me' );
 
-    $('.sidebar').stickySidebar({
-        topSpacing: 40,
-        bottomSpacing: 40
-    });
+            var data = {action: "wpgh_duplicate_funnel_step", step_id: step.attr( 'id' ) };
+            this.getStepHtml( data )
 
-    $('a').click( function( e ){
-        e.preventDefault();
-        /* auto save before redirect */
-        wpgh_auto_save_funnel();
-        window.location = this.href;
-    });
+        },
 
-    /* Auto save funnels */
-    setInterval(
-        wpgh_auto_save_funnel,
-        20000
-    );
-});
-
-function wpgh_duplicate_step()
-{
-    var el = jQuery( this );
-    var id = el.parent().attr( 'id' );
-
-    var ajaxCall = jQuery.ajax({
-        type : "post",
-        url : ajaxurl,
-        data : {action: "wpgh_duplicate_funnel_step", step_id: id },
-        success: function( html )
-        {
-           jQuery( html ).insertBefore( el.parent() )
-        }
-    });
-
-}
-
-function wpgh_delete_funnel_step()
-{
-    var el = this;
-    var id = el.parentNode.id;
-    var result = confirm("Are you sure you want to delete this step?");
-    if ( result ){
-        var ajaxCall = jQuery.ajax({
-            type : "post",
-            url : ajaxurl,
-            data : {action: "wpgh_delete_funnel_step",step_id: id },
-            success: function( result )
-            {
-                el.parentNode.remove();
-            }
-        });
-    }
-
-    wpgh_auto_save_funnel();
-}
-
-function wpgh_update_funnel_step_order()
-{
-    jQuery( "input[name$='_order']" ).each(
-        function( index ){
-            jQuery( this ).val( index + 1 );
-        }
-    );
-}
-
-function wpgh_auto_save_funnel()
-{
-    if ( wpghDoingAutoSave )
-        return;
-
-    wpghDoingAutoSave = true;
-
-    var fd = jQuery('form').serialize();
-
-    fd = fd +  '&action=wpgh_auto_save_funnel_via_ajax';
-
-    var ajaxCall = jQuery.ajax({
-        type : "post",
-        url : ajaxurl,
-        //data : fd,
-        data : fd,
-        success: function( result )
-        {
-            wpghDoingAutoSave = false;
-            jQuery( '.save-notification' ).fadeIn();
-            setTimeout( function(){
-                jQuery( '.save-notification' ).fadeOut()
-            }, 3000);
-        }
-    });
-}
-
-function wpgh_update_inside_contents()
-{
-    var order = jQuery( '.step' ).index( jQuery( this ) ) + 1;
-
-    var e = jQuery( this );
-
-    var ajaxCall = jQuery.ajax({
-        type : "post",
-        url : ajaxurl,
-        data : {action: "wpgh_get_step_html_inside", step_id: e.attr( 'id' ) , step_order: order },
-        success: function( html )
-        {
-            e.find( '.custom-settings' ).html( html );
-        }
-    });
-}
+        /**
+         * Performs an ajax call and replaces
+         *
+         * @param obj
+         */
+        getStepHtml: function (obj) {
+            var ajaxCall = $.ajax({
+                type: "post",
+                url: ajaxurl,
+                data: obj,
+                success: function (html) {
+                    wpghFunnelEditor.curHTML = html;
+                    wpghFunnelEditor.replaceDummyStep(html);
+                }
+            });
+        },
+    };
+    $(function(){wpghFunnelEditor.init();})
+})( jQuery );

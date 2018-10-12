@@ -41,8 +41,6 @@ $superlink = WPGH()->superlinks->get_superlink( $id );
                 <?php $tag_args = array();
                 $tag_args[ 'id' ] = 'superlink_tags';
                 $tag_args[ 'name' ] = 'superlink_tags[]';
-                $tag_args[ 'width' ] = '100%';
-                $tag_args[ 'class' ] = 'hidden';
 
                 if ( !empty ( $superlink->tags ) ){
                     $tag_args['selected'] = $superlink->tags;

@@ -41,8 +41,8 @@ class WPGH_Event_Queue
     public function construct()
     {
 
-        add_action( 'init', array( $this, 'setup_cron_jobs' ) );
         add_filter( 'cron_schedules', array( $this, 'setup_cron_schedules' ) );
+        add_action( 'init', array( $this, 'setup_cron_jobs' ) );
         add_action( self::ACTION , array( $this, 'process' ) );
         add_action( 'admin_init', array( $this, 'ajax_process' ) );
 
@@ -56,9 +56,9 @@ class WPGH_Event_Queue
      */
     public function setup_cron_schedules( $schedules )
     {
-        $schedules[ 'every_5_minutes' ] = array(
-          'interval'    => 5 * MINUTE_IN_SECONDS,
-          'display'     => __( 'Every 5 Minutes', 'groundhogg' )
+        $schedules[ 'every_10_minutes' ] = array(
+          'interval'    => 10 * MINUTE_IN_SECONDS,
+          'display'     => __( 'Every 10 Minutes', 'groundhogg' )
         );
 
         return $schedules;
@@ -70,7 +70,7 @@ class WPGH_Event_Queue
     public function setup_cron_jobs()
     {
         if ( ! wp_next_scheduled( self::ACTION ) ){
-            wp_schedule_event( time(), 'every_5_minutes', self::ACTION );
+            wp_schedule_event( time(), 'every_10_minutes', self::ACTION );
         }
     }
 
@@ -80,7 +80,6 @@ class WPGH_Event_Queue
     public function prepare_events()
     {
 
-        //todo decide whether to get the whole object or just the event ID
         $events = WPGH()->events->get_queued_events();
 
         foreach ( $events as $event ) {
@@ -89,7 +88,6 @@ class WPGH_Event_Queue
 //            $this->events[] = new WPGH_Event( $event );
 
         }
-
 
         return $this->events;
     }

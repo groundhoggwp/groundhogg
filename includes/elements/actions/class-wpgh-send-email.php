@@ -40,10 +40,11 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
         if ( ! $email_id ){
             /* If this is for example a NEW step, the lets just set a default email */
-            $email_id = array_shift( WPGH()->emails->get_emails() )->ID;
+            $emails = WPGH()->emails->get_emails();
+            $email_id = array_shift( $emails )->ID;
         }
 
-        $return_path = admin_url( 'admin.php?page=gh_emails&action=add&return_funnel=' . $step->funnel_id . '&return_step=' . $step->ID );
+        $return_path = admin_url( 'admin.php?page=gh_emails&return_funnel=' . $step->funnel_id . '&return_step=' . $step->ID );
 
         ?>
         <table class="form-table">
@@ -59,16 +60,16 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                         'selected'  => array( $email_id ),
                     );
 
-                    echo WPGH()->html->dropdown_emails( $args ) ?>
+                    echo WPGH()->html->dropdown_emails( $args ); ?>
                     <div class="row-actions">
                         <a
                             class="editinline"
                             id="<?php echo $step->prefix( 'edit_email' ); ?>"
                             target="_blank"
-                            href="<?php echo $return_path . '&email=' . $email_id  ;?>"
+                            href="<?php echo $return_path . '&email=' . $email_id . '&action=edit' ;?>"
                         ><?php esc_html_e( 'Edit Email', 'groundhogg' );?></a>
                         |
-                        <a href="<?php echo $return_path;?>" ><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>
+                        <a href="<?php echo $return_path . '&action=add' ;?>" ><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>
                         <script>
                             jQuery(
                                 function($){
@@ -99,25 +100,29 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
         $start_time = WPGH()->menu->funnels_page->reporting_start_time;
         $end_time   = WPGH()->menu->funnels_page->reporting_end_time;
 
-        $search  = array(
-            'activity_type'     => 'email_opened',
-            'step_id'           => $step->ID,
-            'funnel_id'         => $step->funnel_id,
-            'start'             => $start_time,
-            'end'               => $end_time,
-        );
+        $cquery = new WPGH_Contact_Query();
 
-        $num_opens = WPGH()->activity->count( $search );
+        $num_opens = $cquery->query( array(
+            'count' => true,
+            'activity' => array(
+                'start' => $start_time,
+                'end'   => $end_time,
+                'step'  => $step->ID,
+                'funnel'=> $step->funnel_id,
+                'activity_type'  => 'email_opened'
+            )
+        ) );
 
-        $search  = array(
-            'activity_type'     => 'email_link_click',
-            'step_id'           => $step->ID,
-            'funnel_id'         => $step->funnel_id,
-            'start'             => $start_time,
-            'end'               => $end_time,
-        );
-
-        $num_clicks = WPGH()->activity->count( $search );
+        $num_clicks = $cquery->query( array(
+            'count' => true,
+            'activity' => array(
+                'start' => $start_time,
+                'end'   => $end_time,
+                'step'  => $step->ID,
+                'funnel'=> $step->funnel_id,
+                'activity_type'  => 'email_link_click'
+            )
+        ) );
 
         ?>
         <hr>

@@ -288,14 +288,17 @@ class WPGH_DB_Events extends WPGH_DB  {
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-		  ID            bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-          time          bigint(20) unsigned NOT NULL,
-          contact_id    bigint(20) unsigned NOT NULL,
-          funnel_id     bigint(20) unsigned NOT NULL,
-          step_id       bigint(20) unsigned NOT NULL,
-          status        varchar(20) NOT NULL,
-          PRIMARY KEY ID,
-          KEY time (time)
+        ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        time bigint(20) unsigned NOT NULL,
+        contact_id bigint(20) unsigned NOT NULL,
+        funnel_id bigint(20) unsigned NOT NULL,
+        step_id bigint(20) unsigned NOT NULL,
+        status varchar(20) NOT NULL,
+        PRIMARY KEY (ID),
+        KEY time (time),
+        KEY contact_id (contact_id),
+        KEY funnel_id (funnel_id),
+        KEY step_id (step_id)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
         dbDelta( $sql );

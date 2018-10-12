@@ -340,8 +340,7 @@ class WPGH_HTML
 
         $json = array();
 
-        foreach ( $contacts as $i => $contact )
-        {
+        foreach ( $contacts as $i => $contact ) {
 
             $json[] = array(
                 'id' => $contact->ID,
@@ -350,8 +349,9 @@ class WPGH_HTML
 
         }
 
-        wp_die( json_encode( $json ) );
-    }
+        $results = array( 'results' => $json, 'more' => false );
+
+        wp_die( json_encode( $results ) );    }
 
 
     /**
@@ -368,7 +368,6 @@ class WPGH_HTML
             'class'             => 'gh-contact-picker',
             'data'              => array(),
             'selected'          => array(),
-            'ajax'              => admin_url( 'admin-ajax.php?action=gh_get_contacts' ),
             'multiple'          => false,
             'placeholder'       => __( 'Please Select a Contact', 'groundhogg' ),
             'tags'              => false,
@@ -396,7 +395,7 @@ class WPGH_HTML
     public function gh_get_emails()
     {
 
-        if ( ! is_user_logged_in() || ! current_user_can( 'edit_emails' ) )
+        if ( ! is_user_logged_in() || ! current_user_can( 'gh_manage_emails' ) )
             wp_die( 'No access to emails.' );
 
         $value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
@@ -405,18 +404,18 @@ class WPGH_HTML
 
         $json = array();
 
-        foreach ( $emails as $i => $email )
-        {
+        foreach ( $emails as $i => $email ) {
 
             $json[] = array(
                 'id' => $email->ID,
-                'text' => $email->subject . ' (' . $email->email_status . ')'
+                'text' => $email->subject . ' (' . $email->status . ')'
             );
 
         }
 
-        wp_die( json_encode( $json ) );
+        $results = array( 'results' => $json, 'more' => false );
 
+        wp_die( json_encode( $results ) );
     }
 
     /**
@@ -433,7 +432,6 @@ class WPGH_HTML
             'class'             => 'gh-email-picker',
             'data'              => array(),
             'selected'          => array(),
-            'ajax'              => admin_url( 'admin-ajax.php?action=gh_get_emails' ),
             'multiple'          => false,
             'placeholder'       => __( 'Please Select an Email', 'groundhogg' ),
             'tags'              => false,

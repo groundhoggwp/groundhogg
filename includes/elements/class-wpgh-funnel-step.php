@@ -151,39 +151,42 @@ class WPGH_Funnel_Step
         $start_time = WPGH()->menu->funnels_page->reporting_start_time;
         $end_time   = WPGH()->menu->funnels_page->reporting_end_time;
 
+        $cquery = new WPGH_Contact_Query();
+
         if ( $this->group === 'action' ):
 
-            $search  = array(
-              'status'      => 'waiting',
-              'step_id'     => $step->ID,
-              'funnel_id'   => $step->funnel_id
-            );
-
-            $num_events_waiting = WPGH()->events->count( $search );
+            $num_events_waiting = $cquery->query( array(
+                'count' => true,
+                'report' => array(
+                    'step'  => $step->ID,
+                    'funnel'=> $step->funnel_id,
+                    'status'=> 'waiting'
+                )
+            ) );
 
             ?>
-                <hr>
                 <p class="report">
                     <?php _e('Waiting:', 'groundhogg') ?>
                     <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . $step->funnel_id . '&step=' . $step->ID ); ?>">
                         <b><?php echo $num_events_waiting; ?></b>
                     </a>
                 </p>
+            <hr>
             <?php
         endif;
 
-        $search  = array(
-            'status'      => 'complete',
-            'step_id'     => $step->ID,
-            'funnel_id'   => $step->funnel_id,
-            'start'       => $start_time,
-            'end'         => $end_time,
-        );
-
-        $num_events_completed = WPGH()->events->count( $search );
+        $num_events_completed = $cquery->query( array(
+            'count' => true,
+            'report' => array(
+                'start' => $start_time,
+                'end'   => $end_time,
+                'step'  => $step->ID,
+                'funnel'=> $step->funnel_id,
+                'status'=> 'complete'
+            )
+        ) );
 
         ?>
-        <hr>
         <p class="report">
             <?php _e('Completed:', 'groundhogg') ?>
             <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . $step->funnel_id . '&step=' . $step->ID . '&start=' . $start_time . '&end=' . $end_time ); ?>">

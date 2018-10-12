@@ -28,7 +28,7 @@ do_action( 'wpgh_before_new_funnel' );
 <?php if ( 'templates' === $active_tab ): ?>
     <form method="post" id="poststuff" >
         <?php wp_nonce_field(); ?>
-        <?php include dirname(__FILE__) . '/../../templates/funnel-templates.php'; ?>
+        <?php include WPGH_PLUGIN_DIR . 'templates/funnel-templates.php'; ?>
         <?php foreach ( $funnel_templates as $id => $funnel_args ): ?>
             <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
                 <h2 class="hndle"><?php echo $funnel_args['title']; ?></h2>

@@ -37,4 +37,5 @@ class WPGH_Template_Loader extends Gamajo_Template_Loader {
      */
     protected $plugin_directory = WPGH_PLUGIN_DIR;
 
+
 }

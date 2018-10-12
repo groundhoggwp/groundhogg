@@ -130,7 +130,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $actions = array();
 
         if ( $this->get_view() !== 'cancelled' ) {
-            $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast['email_id']) . "'>" . __('Edit Email') . "</a></span>";
+            $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast->email->ID ) . "'>" . __('Edit Email') . "</a></span>";
             if ( intval( $broadcast->send_time ) > time() ){
                 $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->ID ), 'cancel') . "'>" . __('Cancel') . "</a></span>";
             }
@@ -285,7 +285,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 
         foreach ( $broadcast->tags as $i => $tag_id ){
             $tag = WPGH()->tags->get( $tag_id );
-            $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . $tag->tag_name . '</a>';
+            $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . $tag->tag_name . ' ('  . $tag->contact_count . ')</a>';
         }
         return implode( ', ', $tags );
     }
@@ -377,7 +377,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
                 $data = WPGH()->broadcasts->get_broadcasts( $query_args );
                 break;
 
-            case 'draft':
+            case 'cancelled':
                 $query_args[ 'status' ] = 'cancelled';
                 $data = WPGH()->broadcasts->get_broadcasts( $query_args );
                 break;
@@ -389,16 +389,20 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 
             default:
 
-                $query_args[ 'status' ] = 'scheduled';
-                $data = WPGH()->emails->get_emails( $query_args );
+                $data = WPGH()->broadcasts->get_broadcasts( array( 'status' => 'sent' ) );
+                $data = $data ? $data: array();
 
-                $query_args[ 'status' ] = 'sent';
-                $data2 = WPGH()->emails->get_emails( $query_args );
+                $data2 = WPGH()->broadcasts->get_broadcasts( array( 'status' => 'scheduled' ) );
+                $data2 = $data2 ? $data2: array();
 
                 $data = array_merge( $data, $data2 );
 
                 break;
         }
+
+//        if ( empty( $data ) ){
+//            $data = array();
+//        }
 
 		/*
 		 * Sort the data
@@ -431,6 +435,9 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 	 * @return int
 	 */
 	protected function usort_reorder( $a, $b ) {
+        $a = (array) $a;
+        $b = (array) $b;
+
 		// If no sort, default to title.
 		$orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'date_scheduled'; // WPCS: Input var ok.
 		// If no order, default to asc.

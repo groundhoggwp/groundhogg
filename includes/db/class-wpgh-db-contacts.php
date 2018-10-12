@@ -121,12 +121,11 @@ class WPGH_DB_Contacts extends WPGH_DB  {
             return false;
         }
 
-        $contact = $this->get_contact_by( 'email', $args['email'] );
-
-        if( $contact ) {
+        if( $this->exists( $args['email'], 'email' ) ) {
             // update an existing contact
 
-            $this->update( $contact->ID, $args );
+            $contact = $this->get_contact_by( 'email', $args[ 'email' ] );
+            $this->update( $contact->ID, $data );
 
             return $contact->ID;
 
@@ -163,6 +162,7 @@ class WPGH_DB_Contacts extends WPGH_DB  {
      * @return  bool
      */
     public function update( $row_id, $data = array(), $where = '' ) {
+
         $result = parent::update( $row_id, $data, $where );
 
         if ( $result ) {
@@ -220,11 +220,14 @@ class WPGH_DB_Contacts extends WPGH_DB  {
     public function exists( $value = '', $field = 'email' ) {
 
         $columns = $this->get_columns();
+
         if ( ! array_key_exists( $field, $columns ) ) {
             return false;
         }
 
-        return (bool) $this->get_column_by( 'ID', $field, $value );
+        $contact = $this->get_contact_by( $field, $value );
+
+        return ! empty( $contact );
 
     }
 
@@ -278,58 +281,7 @@ class WPGH_DB_Contacts extends WPGH_DB  {
             return NULL;
         }
 
-        if ( 'ID' == $field || 'user_id' == $field ) {
-            // Make sure the value is numeric to avoid casting objects, for example,
-            // to int 1.
-            if ( ! is_numeric( $value ) ) {
-                return false;
-            }
-
-            $value = intval( $value );
-
-            if ( $value < 1 ) {
-                return false;
-            }
-
-        } elseif ( 'email' === $field ) {
-
-            if ( ! is_email( $value ) ) {
-                return false;
-            }
-
-            $value = trim( $value );
-        }
-
-        if ( ! $value ) {
-            return false;
-        }
-
-        $args = array( 'number' => 1 );
-
-        switch ( $field ) {
-            case 'ID':
-                $db_field = 'ID';
-                $args['include'] = array( $value );
-                break;
-            case 'email':
-                $args['email'] = sanitize_text_field( $value );
-                break;
-            case 'user_id':
-                $args['users_include'] = array( $value );
-                break;
-            default:
-                return false;
-        }
-
-        $query = new WPGH_Contact_Query( '', $this );
-
-        $results = $query->query( $args );
-
-        if ( empty( $results ) ) {
-            return false;
-        }
-
-        return array_shift( $results );
+        return parent::get_by( $field, $value );
     }
 
     /**
@@ -471,15 +423,15 @@ class WPGH_DB_Contacts extends WPGH_DB  {
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-		ID              bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-		email           varchar(50) unsigned NOT NULL,
-		first_name      mediumtext NOT NULL,
-		last_name       mediumtext NOT NULL,
-		user_id         bigint(20) unsigned NOT NULL,
-		owner_id        bigint(20) unsigned NOT NULL,
-		optin_status    int unsigned NOT NULL,
-		date_created    datetime NOT NULL,
-		PRIMARY KEY  (ID),
+		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+		email varchar(50) NOT NULL,
+		first_name mediumtext NOT NULL,
+		last_name mediumtext NOT NULL,
+		user_id bigint(20) unsigned NOT NULL,
+		owner_id bigint(20) unsigned NOT NULL,
+		optin_status int unsigned NOT NULL,
+		date_created datetime NOT NULL,
+		PRIMARY KEY (ID),
 		UNIQUE KEY email (email),
 		KEY user (user_id)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";

@@ -163,7 +163,6 @@ class WPGH_Superlinks_Table extends WP_List_Table {
             $data = WPGH()->superlinks->get_superlinks();
         }
 
-
         /*
          * Sort the data
          */
@@ -193,6 +192,8 @@ class WPGH_Superlinks_Table extends WP_List_Table {
      * @return int
      */
     protected function usort_reorder( $a, $b ) {
+        $a = (array) $a;
+        $b = (array) $b;
         // If no sort, default to title.
         $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'ID'; // WPCS: Input var ok.
         // If no order, default to asc.
@@ -228,7 +229,7 @@ class WPGH_Superlinks_Table extends WP_List_Table {
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_superlinks&tad_id='. $superlink->ID . '&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_superlinks&superlink='. $superlink->ID . '&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )

@@ -11,6 +11,6 @@
 
 <div>
     <p>
-        <?php __( 'The broadcast reporting view is currently in development and will be available upon the next major release of Groundhogg.', 'groundhogg' ); ?>
+        <?php _e( 'The broadcast reporting view is currently in development and will be available upon the next major release of Groundhogg.', 'groundhogg' ); ?>
     </p>
 </div>

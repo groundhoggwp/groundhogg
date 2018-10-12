@@ -30,7 +30,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
     public $name    = 'Admin Notification';
 
     /**
-     * @param WPGH_Step
+     * @param $step WPGH_Step
      */
     public function settings( $step )
     {
@@ -60,8 +60,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
                             'id'    => $step->prefix( 'send_to' ),
                             'name'  => $step->prefix( 'send_to' ),
                             'value' => $send_to
-                        ); ?>
-                        <?php WPGH()->html->input( $args ) ?>
+                        ); echo WPGH()->html->input( $args ); ?>
                         <p class="description">
                             <?php _e( 'Use any email address or the {owner_email} replacement code.', 'groundhogg' ); ?>
                         </p>
@@ -76,8 +75,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
                             'id'    => $step->prefix( 'subject' ),
                             'name'  => $step->prefix( 'subject' ),
                             'value' => $subject
-                        ); ?>
-                        <?php WPGH()->html->input( $args ) ?>
+                        ); echo WPGH()->html->input( $args ) ?>
                         <p class="description">
                             <?php _e( 'Use any valid replacement codes.', 'groundhogg' ); ?>
                         </p>

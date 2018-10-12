@@ -116,7 +116,7 @@ class WPGH_Emails_Page
         {
             case 'add':
 
-                if ( ! isset( $_POST ) ) {
+                if ( ! empty( $_POST ) ) {
 
                     $this->add_email();
 
@@ -126,7 +126,7 @@ class WPGH_Emails_Page
 
             case 'edit':
 
-                if ( isset( $_POST ) ){
+                if ( ! empty( $_POST ) ){
 
                     $this->update_email();
 
@@ -217,11 +217,11 @@ class WPGH_Emails_Page
     {
         if ( isset( $_POST[ 'email_template' ] ) ){
 
-            include_once WPGH_PLUGIN_DIR . '/includes/templates/email-templates.php';
+            include_once WPGH_PLUGIN_DIR . '/templates/email-templates.php';
 
             /**
              * @var $email_templates array
-             * @see /includes/templates/email-templates.php
+             * @see /templates/email-templates.php
              */
             $email_content = $email_templates[ $_POST[ 'email_template' ] ][ 'content' ];
 
@@ -284,12 +284,10 @@ class WPGH_Emails_Page
         $args = array();
 
         $status = ( isset( $_POST['status'] ) )? sanitize_text_field( trim( stripslashes( $_POST['status'] ) ) ): 'draft';
-        $args[ 'email_status' ] = $status;
+        $args[ 'status' ] = $status;
 
         if ( $status === 'draft' ) {
-
             $this->notices->add( 'email-in-draft-mode', __( 'This email will not be sent while in DRAFT mode.', 'groundhogg' ), 'info' );
-
         }
 
         $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
@@ -316,7 +314,7 @@ class WPGH_Emails_Page
 
         do_action( 'wpgh_email_update_after', $id );
 
-        $this->notices->add( 'email-updated', __( 'Emailed Updated.', 'groundhogg' ), 'info' );
+        $this->notices->add( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
 
         if ( isset( $_POST['send_test'] ) ){
 
@@ -326,9 +324,14 @@ class WPGH_Emails_Page
             WPGH()->email_meta->update_meta( $id, 'test_email', $test_email_uid );
 
             $email = new WPGH_Email( $id );
+
             $email->enable_test_mode();
-            $contact = new WPGH_Contact( $test_email_uid, true );
-            $sent = $email->send( $contact );
+
+            $user = get_userdata( $test_email_uid );
+
+            $contact = new WPGH_Contact( $user->user_email );
+
+            $sent = $contact->exists() ? $email->send( $contact ) : false;
 
             if ( ! $sent ){
                 wp_die( 'Could not send test.' );

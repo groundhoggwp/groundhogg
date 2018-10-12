@@ -15,24 +15,24 @@ class WPGH_Submission
      *
      * @var array
      */
-    private $data;
+    public $data;
 
     /**
      * These are the EXPECTED Fields given by the form shortcode present
      *
      * @var array
      */
-    private $fields;
+    public $fields;
 
     /**
      * @var string this is set to the referer which is also the source page
      */
-    private $source;
+    public $source;
 
     /**
      * @var int this ends up being the ID of the form
      */
-    private $id;
+    public $id;
 
     /**
      * @var WPGH_Contact
@@ -47,37 +47,44 @@ class WPGH_Submission
      */
     public function __construct()
     {
-        if ( isset( $_POST[ 'gh_submit_nonce' ] ) )
-        {
-
-            $this->data = $_POST;
-
-            $this->source = wp_get_referer();
-
-            /* set the expected fields for the submission */
-            $this->fields = get_post_meta(
-                url_to_postid( $this->source ),
-                'gh_fields_' . $this->id,
-                true
-
-            );
-
-            /* set the form ID as the submission ID */
-
-            if ( isset( $this->step_id ) ) {
-
-                $this->id = $this->step_id;
-
-                unset( $this->step_id );
-
-            } else {
-
-                $this->die();
-
-            }
-
+        if ( isset( $_POST[ 'gh_submit_nonce' ] ) ) {
+            add_action( 'init', array( $this, 'setup' ) );
             add_action( 'init', array( $this, 'process' ) );
+        }
+    }
 
+    /**
+     * Setup the vars.
+     */
+    public function setup(){
+
+        $this->data = $_POST;
+
+        $this->source = wp_get_referer();
+
+        /* set the form ID as the submission ID */
+
+        if ( isset( $this->step_id ) ) {
+
+            $this->id = $this->step_id;
+
+            unset( $this->step_id );
+
+        } else {
+
+            $this->leave( 'No ID given.' );
+
+        }
+
+        /* set the expected fields for the submission */
+        $this->fields = get_post_meta(
+            url_to_postid( $this->source ),
+            'gh_fields_' . $this->id,
+            true
+        );
+
+        if ( empty( $this->fields ) ){
+            $this->leave( 'No fields available.' );
         }
     }
 
@@ -149,7 +156,7 @@ class WPGH_Submission
     {
         if( ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) ) {
 
-            $this->leave();
+            $this->leave( 'Failed security verification.' );
             // or $this->go_back();
 
         }
@@ -158,7 +165,7 @@ class WPGH_Submission
 
         if ( empty( $this->fields ) ) {
 
-            $this->leave();
+            $this->leave( 'Expected a list of valid fields but got none.' );
 
         }
 
@@ -309,16 +316,43 @@ class WPGH_Submission
      */
     public function create_contact()
     {
+        $email = sanitize_email( $this->email );
 
-        $cid = WPGH()->contacts->add( $this->data );
-
-        if ( ! $cid ){
-
-            $this->leave();
-
+        if ( empty( $email ) ){
+            $this->leave( 'Please provide a valid email address' );
         }
 
-        $this->contact = new WPGH_Contact( $cid );
+        $args = array(
+            'email' => $email,
+            'first_name' => sanitize_text_field( $this->first_name ),
+            'last_name' => sanitize_text_field( $this->last_name )
+        );
+
+        if ( is_user_logged_in() ){
+            $args[ 'user_id' ] = get_current_user_id();
+        } else {
+            $user = get_user_by( 'email', $email );
+            if ( $user ){
+                $args[ 'user_id' ] = $user->ID;
+            }
+        }
+
+        if ( WPGH()->contacts->exists( $email ) ){
+
+//            var_dump( $args );
+
+            $this->contact = new WPGH_Contact( $email );
+            $this->contact->update( $args );
+
+        } else{
+            $cid = WPGH()->contacts->add( $args );
+
+            if ( ! $cid ){
+                $this->leave();
+            }
+
+            $this->contact = new WPGH_Contact( $cid );
+        }
 
         //unset used DATA from the data prop
         unset( $this->first_name );
@@ -326,26 +360,6 @@ class WPGH_Submission
         unset( $this->email );
 
         return $this->contact;
-
-    }
-
-    /**
-     * Link a user record to the contact if it exists.
-     */
-    public function link_user()
-    {
-
-        $user = get_user_by( 'email', $this->email );
-
-        if ( $user ){
-
-            $this->contact->update( array( 'user_id', $user->ID ) );
-
-        } else if ( is_user_logged_in() ) {
-
-            $this->contact->update( array( 'user_id', get_current_user_id() ) );
-
-        }
 
     }
 
@@ -372,8 +386,6 @@ class WPGH_Submission
         }
 
         $c = $this->create_contact();
-
-        $this->link_user();
 
         $c->update_meta( 'ip_address', wpgh_get_visitor_ip() );
 

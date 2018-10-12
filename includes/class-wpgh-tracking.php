@@ -76,18 +76,14 @@ class WPGH_Tracking
 
         if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/click/' ) !== false ){
 
-            add_action( 'init', array( $this, 'email_link_clicked' ) );
-
-            $this->setup_url_vars();
-
+            add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
+            add_action( 'template_redirect', array( $this, 'email_link_clicked' ) );
             $this->doing_click = true;
 
         } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/open/' ) !== false  ) {
 
-            add_action( 'init', array( $this, 'email_opened' ) );
-
-            $this->setup_url_vars();
-
+            add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
+            add_action( 'template_redirect', array( $this, 'email_opened' ) );
             $this->doing_open = true;
 
         } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-confirmation/via/email/' ) !== false ) {
@@ -100,10 +96,8 @@ class WPGH_Tracking
 
         } else {
 
-            $this->deconstruct_cookie();
-
-            if ( isset( $_COOKIE[ 'gh_referer' ] ) )
-            {
+            add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
+            if ( isset( $_COOKIE[ 'gh_referer' ] ) ) {
                 $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referer' ] );
             }
 
@@ -136,22 +130,22 @@ class WPGH_Tracking
 
             $event = WPGH()->events->get( $eid );
 
-            if ( $event->funnel_id ){
+            if ( $event ){
 
-                $this->event = $event;
-
+                $this->event = new WPGH_Event( $event->ID );
                 $this->funnel = WPGH()->funnels->get( $event->funnel_id );
                 $this->step   = WPGH()->steps->get( $event->step_id );
-                $this->email  = new WPGH_Email( WPGH()->stepmeta->get_meta( $this->step->ID, 'email_id' ) );
+                $this->email  = new WPGH_Email( WPGH()->step_meta->get_meta( $this->step->ID, 'email_id' ) );
 
             }
         }
 
-        if ( isset( $_REQUEST[ 'ref' ] ) )
-        {
-
+        if ( isset( $_REQUEST[ 'ref' ] ) ) {
             $this->ref = esc_url_raw( urldecode( $_REQUEST[ 'ref' ] ) );
 
+            if ( empty( $this->ref ) ){
+                $this->ref = site_url();
+            }
         }
 
     }
@@ -169,6 +163,27 @@ class WPGH_Tracking
             'event'     => $this->event->ID,
             'email'     => $this->email->ID,
         );
+
+
+        if ( $this->contact ){
+            $cookie[ 'contact' ] = $this->contact->ID;
+        }
+
+        if ( $this->funnel ){
+            $cookie[ 'funnel' ] = $this->funnel->ID;
+        }
+
+        if ( $this->step ){
+            $cookie[ 'step' ] = $this->step->ID;
+        }
+
+        if ( $this->event ){
+            $cookie[ 'event' ] = $this->event->ID;
+        }
+
+        if ( $this->email ){
+            $cookie[ 'email' ] = $this->email->ID;
+        }
 
         $cookie = json_encode( $cookie );
         $cookie = wpgh_encrypt_decrypt( $cookie, 'e' );
@@ -197,11 +212,25 @@ class WPGH_Tracking
         $cookie = wpgh_encrypt_decrypt( $_COOKIE[ self::COOKIE ], 'd' );
         $cookie = json_decode( $cookie );
 
-        $this->contact  = new WPGH_Contact( $cookie->contact );
-        $this->email    = new WPGH_Email( $cookie->email );
-        $this->step     = WPGH()->steps->get( $cookie->step );
-        $this->event    = WPGH()->events->get( $cookie->event );
-        $this->funnel   = WPGH()->funnels->get( $cookie->funnel );
+        if ( isset( $cookie->contact ) ){
+            $this->contact  = new WPGH_Contact( $cookie->contact );
+        }
+
+        if ( isset( $cookie->email ) ){
+            $this->email    = new WPGH_Email( $cookie->email );
+        }
+
+        if ( isset( $cookie->event ) ){
+            $this->event    = WPGH()->events->get( $cookie->event );
+        }
+
+        if ( isset( $cookie->step ) ){
+            $this->step     = WPGH()->steps->get( $cookie->step );
+        }
+
+        if ( isset( $cookie->funnel ) ){
+            $this->funnel   = WPGH()->funnels->get( $cookie->funnel );
+        }
 
         return true;
     }
@@ -330,6 +359,10 @@ class WPGH_Tracking
     public function email_opened()
     {
 
+        if ( ! $this->event ){
+            return;
+        }
+
         $args = array(
             //'timestamp'     => time(),
             'contact_id'    => $this->contact->ID,
@@ -340,8 +373,7 @@ class WPGH_Tracking
             'referer'       => ''
         );
 
-        if ( ! $this->exists( $args ) )
-        {
+        if ( ! $this->exists( $args ) ) {
             $args[ 'timestamp' ] = time();
 
             $this->add(
@@ -367,6 +399,13 @@ class WPGH_Tracking
     {
         /* track every click as an open */
         $this->email_opened();
+
+        if ( ! $this->event ){
+            /* thanks for coming! */
+            wp_redirect( $this->ref );
+
+            die();
+        }
 
         $args = array(
             'timestamp'     => time(),

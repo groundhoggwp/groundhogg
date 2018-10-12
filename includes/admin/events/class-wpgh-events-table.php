@@ -136,7 +136,7 @@ class WPGH_Events_Table extends WP_List_Table {
             return sprintf( "<strong>%s</strong>", __( '(step deleted)' ) );
 
         return sprintf( "<a href='%s'>%s</a>",
-            admin_url( 'admin.php?page=gh_events&view=step&step=' . $event->ID ),
+            admin_url( 'admin.php?page=gh_events&view=step&step=' . $event->step->ID ),
             $step_title );
 
     }
@@ -342,6 +342,8 @@ class WPGH_Events_Table extends WP_List_Table {
      * @return int
      */
     protected function usort_reorder( $a, $b ) {
+        $a = (array) $a;
+        $b = (array) $b;
         // If no sort, default to title.
         $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'time'; // WPCS: Input var ok.
         // If no order, default to asc.
@@ -366,32 +368,32 @@ class WPGH_Events_Table extends WP_List_Table {
 
         $actions = array();
 
-        $time = intval( $event->time );
-
-        if ( $time > time() ) {
-            $actions['execute'] = sprintf(
-                '<a href="%s" class="edit" aria-label="%s">%s</a>',
-                /* translators: %s: title */
-                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ) ) ),
-                esc_attr( __( 'Execute' ) ),
-                __( 'Run Now' )
-            );
-
-            $actions['delete'] = sprintf(
-                '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-                esc_url( wp_nonce_url(admin_url('admin.php?page=gh_events&event='. $event->ID .'&action=cancel') ) ),
-                /* translators: %s: title */
-                esc_attr( __( 'Cancel' ) ),
-                __( 'Cancel' )
-            );
-        } else {
-            $actions['re_execute'] = sprintf(
-                '<a href="%s" class="edit" aria-label="%s">%s</a>',
-                /* translators: %s: title */
-                esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ) ) ),
-                esc_attr( __( 'Re-execute' ) ),
-                __( 'Run Again' )
-            );
+        switch ( $event->status ){
+            case 'waiting':
+                $actions['execute'] = sprintf(
+                    '<a href="%s" class="edit" aria-label="%s">%s</a>',
+                    /* translators: %s: title */
+                    esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ) ) ),
+                    esc_attr( __( 'Execute' ) ),
+                    __( 'Run Now' )
+                );
+                $actions['delete'] = sprintf(
+                    '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+                    esc_url( wp_nonce_url(admin_url('admin.php?page=gh_events&event='. $event->ID .'&action=cancel') ) ),
+                    /* translators: %s: title */
+                    esc_attr( __( 'Cancel' ) ),
+                    __( 'Cancel' )
+                );
+                break;
+            default:
+                $actions['re_execute'] = sprintf(
+                    '<a href="%s" class="edit" aria-label="%s">%s</a>',
+                    /* translators: %s: title */
+                    esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ) ) ),
+                    esc_attr( __( 'Re-execute' ) ),
+                    __( 'Run Again' )
+                );
+                break;
 
         }
 

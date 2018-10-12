@@ -61,7 +61,7 @@ if ( ! class_exists( 'Gamajo_Template_Loader' ) ) {
          *
          * Can either be a defined constant, or a relative reference from where the subclass lives.
          *
-         * e.g. 'templates' or 'includes/templates', etc.
+         * e.g. 'templates' or 'templates', etc.
          *
          * @since 1.1.0
          *

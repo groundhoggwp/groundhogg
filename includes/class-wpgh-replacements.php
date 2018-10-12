@@ -40,12 +40,22 @@ class WPGH_Replacements
         $replacements = array(
             array(
                 'code'        => 'first',
-                'callback'    => 'wpgh_replacement_first.',
+                'callback'    => 'wpgh_replacement_first_name',
+                'description' => __( 'The contact\'s first name', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'first_name',
+                'callback'    => 'wpgh_replacement_first_name',
                 'description' => __( 'The contact\'s first name', 'groundhogg' ),
             ),
             array(
                 'code'        => 'last',
-                'callback'    => 'wpgh_replacement_last',
+                'callback'    => 'wpgh_replacement_last_name',
+                'description' => __( 'The contact\'s last name.', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'last_name',
+                'callback'    => 'wpgh_replacement_last_name',
                 'description' => __( 'The contact\'s last name.', 'groundhogg' ),
             ),
             array(
@@ -252,11 +262,11 @@ class WPGH_Replacements
 
             }
 
-            $text = call_user_func( $this->replacements[ $code ]['func'], $arg, $this->contact_id, $code );
+            $text = call_user_func( $this->replacements[ $code ]['callback'], $arg, $this->contact_id, $code );
 
         } else {
 
-            $text = call_user_func( $this->replacements[ $code ]['func'], $this->contact_id, $code );
+            $text = call_user_func( $this->replacements[ $code ]['callback'], $this->contact_id, $code );
 
         }
 

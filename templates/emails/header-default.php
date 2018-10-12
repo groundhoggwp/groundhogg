@@ -75,7 +75,7 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title><?php echo get_bloginfo( 'name' );?></title>
-</head>.
+</head>
 <!-- /HEAD -->
 
 <!-- BODY -->

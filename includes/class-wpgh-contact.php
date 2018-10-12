@@ -210,14 +210,12 @@ class WPGH_Contact
 
         do_action( 'wpgh_contact_pre_update', $this->ID, $data );
 
-        $updated = false;
 
-        if ( WPGH()->contacts->update( $this->ID, $data ) ) {
+        if ( $updated = WPGH()->contacts->update( $this->ID, $data, 'ID' ) ) {
 
             $contact = WPGH()->contacts->get_contact_by( $this->ID, 'ID' );
-            $this->setup_contact( $contact );
 
-            $updated = true;
+            $this->setup_contact( $contact );
 
         }
 
@@ -417,7 +415,7 @@ class WPGH_Contact
 
                 $this->tags[] = $tag_id;
 
-                $result = WPGH()->tag_relationships->add( $this->ID, $tag_id );
+                $result = WPGH()->tag_relationships->add( $tag_id, $this->ID );
 
                 if ( $result ){
                     do_action( 'wpgh_tag_applied', $this, $tag_id );

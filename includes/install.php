@@ -43,6 +43,8 @@ function wpgh_install( $network_wide = false ) {
 
     }
 
+    file_put_contents( __DIR__ . '/my_loggg.html', ob_get_contents() );
+
 }
 
 register_activation_hook( WPGH_PLUGIN_FILE, 'wpgh_install' );
@@ -109,12 +111,7 @@ function wpgh_run_install() {
         update_option( 'gh_email_preferences_page', $id );
     }
 
-    $merged_options = array_merge( $wpgh_options, $options );
-    $wpgh_options    = $merged_options;
-
-    update_option( 'wpgh_settings', $merged_options );
     update_option( 'wpgh_version', WPGH_VERSION );
-
 
     // Create the databases
     @WPGH()->activity->create_table();
@@ -137,6 +134,9 @@ function wpgh_run_install() {
     @WPGH()->tags->create_table();
     @WPGH()->tag_relationships->create_table();
 
+    /* Setup the cron event */
+    @WPGH()->event_queue->setup_cron_jobs();
+
     /* convert users to contacts */
     $args = array(
         'fields' => 'all_with_meta'
@@ -145,15 +145,24 @@ function wpgh_run_install() {
     $users = get_users( $args );
 
     /* @var $wp_user WP_User */
-    foreach ( $users as $wp_user )
-    {
-        $cid = WPGH()->contacts->add( array(
-            'first_name'    => $wp_user->first_name,
-            'last_name'     => $wp_user->last_name,
-            'email'         => $wp_user->user_email,
-            'user_id'       => $wp_user->ID,
-        ) );
+    foreach ( $users as $wp_user ) {
+        if ( ! WPGH()->contacts->exists( $wp_user->user_email, 'email' ) ){
+            $cid = WPGH()->contacts->add( array(
+                'first_name'    => $wp_user->first_name,
+                'last_name'     => $wp_user->last_name,
+                'email'         => $wp_user->user_email,
+                'user_id'       => $wp_user->ID,
+            ) );
+        }
         //todo log how created.
+    }
+
+    /* Recount tag relationships */
+    $tags = WPGH()->tags->get_tags();
+
+    foreach ( $tags as $tag ){
+        $count = WPGH()->tag_relationships->count( $tag->tag_id, 'tag_id' );
+        WPGH()->tags->update( $tag->tag_id, array( 'contact_count' => $count ) );
     }
 
     /* setup permissions */

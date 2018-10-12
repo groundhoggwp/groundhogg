@@ -164,14 +164,14 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $sql = "CREATE TABLE {$this->table_name} (
-			meta_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-			email_id bigint(20) unsigned NOT NULL,
-			meta_key varchar(255) DEFAULT NULL,
-			meta_value longtext,
-			PRIMARY KEY  (meta_id),
-			KEY email_id (email_id),
-			KEY meta_key (meta_key)
-			) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		meta_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+		email_id bigint(20) unsigned NOT NULL,
+		meta_key varchar(255) DEFAULT NULL,
+		meta_value longtext,
+		PRIMARY KEY  (meta_id),
+		KEY email_id (email_id),
+		KEY meta_key (meta_key)
+		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
         dbDelta( $sql );
 

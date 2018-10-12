@@ -402,7 +402,7 @@ class WPGH_Contacts_Page
             $add_tags = array_diff( $new_tags, $cur_tags );
             if ( ! empty( $add_tags ) ){
 
-                print_r( $add_tags );
+//                print_r( $add_tags );
 
                 $result = $contact->add_tag( $add_tags );
 

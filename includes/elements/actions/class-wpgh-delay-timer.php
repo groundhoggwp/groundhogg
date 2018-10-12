@@ -61,6 +61,7 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
                     <?php $args = array(
                         'name'  => $step->prefix( 'delay_amount' ),
                         'id'    => $step->prefix( 'delay_amount' ),
+                        'class' => 'input',
                         'value' => $amount,
                         'min'   => 0,
                         'max'   => 9999,
@@ -98,8 +99,8 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
                     );
 
                     $args = array(
-                        'name'          => $step->prefix( 'delay_type' ),
-                        'id'            => $step->prefix( 'delay_type' ),
+                        'name'          => $step->prefix( 'run_when' ),
+                        'id'            => $step->prefix( 'run_when' ),
                         'options'       => $when_types,
                         'selected'      => $run_when,
                         'option_none'   => false,

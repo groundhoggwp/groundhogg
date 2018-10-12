@@ -28,7 +28,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
         global $wpdb;
 
         $this->table_name  = $wpdb->prefix . 'gh_tag_relationships';
-        $this->primary_key = 'tag_id';
+        $this->primary_key = 'tag_id,contact_id';
         $this->version     = '1.0';
 
         add_action( 'wpgh_delete_contact', array( $this, 'contact_deleted' ) );
@@ -73,11 +73,14 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
             return false;
         }
 
+        global $wpdb;
+
+        $wpdb->show_errors();
+
         $data = array(
             'tag_id' => $tag_id,
             'contact_id' => $contact_id
         );
-
 
         $result = $this->insert( $data, 'contact_tag_relationship' );
 
@@ -96,7 +99,30 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
      * @return  int
      */
     public function insert( $data, $type = '' ) {
-        $result = parent::insert( $data, $type );
+
+        global $wpdb;
+
+        // Set default values
+        $data = wp_parse_args( $data, $this->get_column_defaults() );
+
+        do_action( 'wpgh_pre_insert_' . $type, $data );
+
+        // Initialise column format array
+        $column_formats = $this->get_columns();
+
+        // Force fields to lower case
+        $data = array_change_key_case( $data );
+
+        // White list columns
+        $data = array_intersect_key( $data, $column_formats );
+
+        // Reorder $column_formats to match the order of columns given in $data
+        $data_keys = array_keys( $data );
+        $column_formats = array_merge( array_flip( $data_keys ), $column_formats );
+
+        $result = $wpdb->insert( $this->table_name, $data, $column_formats );
+
+        do_action( 'wpgh_post_insert_' . $type, $data );
 
         if ( $result ) {
             $this->set_last_changed();
@@ -302,11 +328,11 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-		    tag_id          bigint(20) unsigned NOT NULL,
-		    contact_id      bigint(20) unsigned NOT NULL,
-		    PRIMARY KEY  (tag_id, contact_id),
-		    KEY tag_id (tag_id)
-		    KEY contact_id (contact_id)
+		tag_id bigint(20) unsigned NOT NULL,
+		contact_id bigint(20) unsigned NOT NULL,
+		PRIMARY KEY (tag_id,contact_id),
+		KEY tag_id (tag_id),
+		KEY contact_id (contact_id)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
         dbDelta( $sql );

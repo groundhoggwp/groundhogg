@@ -153,8 +153,12 @@ class WPGH_Broadcasts_Page
         }
 
         $contact_sum = 0;
+
         foreach ( $tags as $tag ){
-            $contact_sum += WPGH()->tags->get( intval( $tag[ 'tag_id' ] ) )->contact_count;
+            $tag = WPGH()->tags->get_tag( intval( $tag ) );
+            if ( $tag ){
+                $contact_sum += $tag->contact_count;
+            }
         }
 
         if ( $contact_sum === 0 ){
@@ -176,7 +180,8 @@ class WPGH_Broadcasts_Page
             'email_id'  => $email,
             'tags'      => $tags,
             'send_time' => $send_time,
-            'scheduled_by' => get_current_user_id()
+            'scheduled_by' => get_current_user_id(),
+            'status'    => 'scheduled'
         );
 
         $broadcast_id = WPGH()->broadcasts->add( $args );

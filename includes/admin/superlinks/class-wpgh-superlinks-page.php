@@ -191,7 +191,7 @@ class WPGH_Superlinks_Page
 		}
 
 		$superlinks_table = new WPGH_Superlinks_Table(); ?>
-        <form method="get" class="search-form wp-clearfix">
+        <form method="post" class="search-form wp-clearfix">
         <!-- search form -->
             <p class="search-box">
                 <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search superlinks ', 'groundhogg'); ?>:</label>
@@ -227,8 +227,7 @@ class WPGH_Superlinks_Page
                                 <?php $tag_args = array();
                                 $tag_args[ 'id' ] = 'superlink_tags';
                                 $tag_args[ 'name' ] = 'superlink_tags[]';
-//                                $tag_args[ 'width' ] = '100%';
-                                $tag_args[ 'class' ] = 'hidden'; ?>
+//                                $tag_args[ 'width' ] = '100%'; ?>
                                 <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
                                 <p><?php _e( 'These tags will be applied to a contact whenever this link is clicked. To create a new tag hit [Enter] or [,]', 'groundhogg' ); ?></p>
                             </div>

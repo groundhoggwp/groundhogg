@@ -350,7 +350,7 @@ class WPGH_Step
 
             $step = array_shift( $steps );
 
-            if ( $step->group === 'action' ){
+            if ( $step->step_group === 'action' ){
                 return false;
             }
 

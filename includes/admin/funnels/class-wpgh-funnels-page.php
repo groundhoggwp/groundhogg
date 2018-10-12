@@ -38,12 +38,18 @@ class WPGH_Funnels_Page
 
     function __construct()
 	{
+
+	    if ( is_admin() ){
+            //add_action( 'wp_ajax_wpgh_auto_save_funnel_via_ajax', array( $this, 'autosave_funnel' ) );
+            add_action( 'wp_ajax_wpgh_get_step_html', array( $this, 'add_step' ) );
+            add_action( 'wp_ajax_wpgh_delete_funnel_step',  array( $this, 'delete_step' ) );
+            add_action( 'wp_ajax_wpgh_duplicate_funnel_step',  array( $this, 'duplicate_step' ) );
+        }
+
+
 		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' ){
 
 			add_action( 'init' , array( $this, 'process_action' )  );
-            add_action( 'wp_ajax_wpgh_auto_save_funnel_via_ajax', array( $this, 'autosave_funnel' ) );
-            add_action( 'wp_ajax_wpgh_get_step_html', array( $this, 'add_step' ) );
-            add_action( 'wp_ajax_wpgh_delete_funnel_step',  array( $this, 'delete_step' ) );
 
             $this->notices = WPGH()->notices;
 
@@ -285,7 +291,7 @@ class WPGH_Funnels_Page
     {
         if ( isset( $_POST[ 'funnel_template' ] ) ){
 
-            include WPGH_PLUGIN_DIR . '/includes/templates/funnel-templates.php';
+            include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
 
             /* @var $funnel_templates array included from funnel-templates.php */
 
@@ -486,20 +492,22 @@ class WPGH_Funnels_Page
         $step_type = $_POST['step_type'];
         $step_order = intval( $_POST['step_order'] );
 
-        $funnel_id = intval( $_REQUEST[ 'funnel' ] );
+        $funnel_id = intval( wpgh_extract_query_arg( wp_get_referer(), 'funnel' ) );
 
         $elements = WPGH()->elements->get_elements();
         $title = $elements[ $step_type ][ 'title' ];
         $step_group = $elements[ $step_type ][ 'group' ];
 
         $step_id = WPGH()->steps->add( array(
-            'funnel_id' => $funnel_id,
-            'step_title'     => $title,
-            'step_group'     => $step_group,
-            'step_order'     => $step_order,
+            'funnel_id'     => $funnel_id,
+            'step_title'    => $title,
+            'step_type'     => $step_type,
+            'step_group'    => $step_group,
+            'step_order'    => $step_order,
         ));
 
         if ( $step_id ){
+
             $step = new WPGH_Step( $step_id );
 
             ob_start();
@@ -529,6 +537,8 @@ class WPGH_Funnels_Page
         if ( ! $step || empty( $step->funnel_id ) )
             wp_die( 'Could not find step...' );
 
+        $content = '';
+
         $newID = WPGH()->steps->add( array(
             'funnel_id' => $step->funnel_id,
             'step_title'     => $step->title,
@@ -547,9 +557,18 @@ class WPGH_Funnels_Page
             WPGH()->step_meta->update_meta( $newID, $key, $value[0] );
         }
 
-        $new_step = new WPGH_Step( $newID );
+        if ( $newID ){
 
-        wp_die( $new_step );
+            $step = new WPGH_Step( $step_id );
+
+            ob_start();
+
+            $step->html();
+
+            $content = ob_get_clean();
+        }
+
+        wp_die( $content );
     }
 
     /**

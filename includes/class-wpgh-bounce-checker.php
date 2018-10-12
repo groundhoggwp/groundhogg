@@ -63,6 +63,9 @@ class WPGH_Bounce_Checker
         /* grab emails, for now assume these messages go unread */
         $emails = imap_search( $inbox, sprintf( 'SINCE "%s" UNSEEN', date( 'j F Y', strtotime( '1 day ago' ) ) ) );
 
+        if ( ! $emails )
+            return;
+
         //print_r( $bounce_handler->bouncelist );
 
         foreach( $emails as $email_number ) {

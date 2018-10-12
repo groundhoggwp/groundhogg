@@ -281,9 +281,9 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         </div>
                     <?php else:
 
-                        foreach ( $steps as $i => $step_id ):
+                        foreach ( $steps as $i => $step ):
 
-                            $step = new WPGH_Step( $step_id );
+                            $step = new WPGH_Step( $step->ID );
 
                             $step->html();
                             // echo $step;

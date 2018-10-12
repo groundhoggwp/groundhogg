@@ -65,9 +65,10 @@ class WPGH_DB_Emails extends WPGH_DB  {
             'ID'            => '%d',
             'subject'       => '%s',
             'pre_header'    => '%s',
+            'content'       => '%s',
             'author'        => '%d',
             'from_user'     => '%d',
-            'status'        => '%d',
+            'status'        => '%s',
             'last_updated'  => '%s',
             'date_created'  => '%s',
         );
@@ -84,6 +85,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
             'ID'            => 0,
             'subject'       => '',
             'pre_header'    => '',
+            'content'       => '',
             'author'        => 0,
             'from_user'     => 0,
             'status'        => 'draft',
@@ -231,7 +233,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
 
         global  $wpdb;
 
-        if ( ! is_object( $data ) || ! is_array( $data ) )
+        if ( ! is_array( $data ) )
             return false;
 
         $data = (array) $data;
@@ -314,16 +316,16 @@ class WPGH_DB_Emails extends WPGH_DB  {
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-		  ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-          content longtext NOT NULL,
-          subject text NOT NULL,
-          pre_header text NOT NULL,
-          from_user bigint(20) unsigned NOT NULL,
-          author bigint(20) unsigned NOT NULL,   
-          status VARCHAR(20) NOT NULL,
-          last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-          date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-          PRIMARY KEY  (ID)
+		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        content longtext NOT NULL,
+        subject text NOT NULL,
+        pre_header text NOT NULL,
+        from_user bigint(20) unsigned NOT NULL,
+        author bigint(20) unsigned NOT NULL,   
+        status VARCHAR(20) NOT NULL,
+        last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        PRIMARY KEY  (ID)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
         dbDelta( $sql );

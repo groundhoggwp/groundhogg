@@ -95,12 +95,10 @@ class WPGH_Events_Page
 
                 foreach ( $this->get_events() as $eid ){
 
-                    WPGH()->events->mass_update(
+                    WPGH()->events->update(
+                        $eid,
                         array(
                             'status' => 'cancelled'
-                        ),
-                        array(
-                            'ID' => $eid
                         )
                     );
 

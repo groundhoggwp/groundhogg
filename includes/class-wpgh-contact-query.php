@@ -465,10 +465,10 @@ class WPGH_Contact_Query {
      */
     protected function construct_request_fields() {
         if ( $this->query_vars['count'] ) {
-            return "COUNT($this->primary_key) AS count";
+            return "COUNT(DISTINCT $this->table_name.$this->primary_key) AS count";
         }
 
-        return "$this->table_name.*";
+        return "DISTINCT $this->table_name.*";
     }
 
     /**
@@ -495,11 +495,11 @@ class WPGH_Contact_Query {
         }
 
         if ( ( ! empty( $this->query_vars['tags_include'] ) || ! empty( $this->query_vars['tags_exclude'] ) ) ) {
-            $tags_table = WPGH()->tags->table_name;
+            $tags_table = WPGH()->tag_relationships->table_name;
 
             $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
 
-            $join .= " $join_type $tags_table AS c_tags ON $this->table_name.$this->primary_key = c_tags.{$this->meta_type}_id}";
+            $join .= " $join_type $tags_table AS c_tags ON $this->table_name.$this->primary_key = c_tags.{$this->meta_type}_id";
         }
 
         if ( ! empty( $this->query_vars[ 'report' ] ) ){
@@ -507,7 +507,7 @@ class WPGH_Contact_Query {
 
             $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
 
-            $join .= " $join_type $events_table AS events ON $this->table_name.$this->primary_key = event.{$this->meta_type}_id}";
+            $join .= " $join_type $events_table AS events ON $this->table_name.$this->primary_key = events.{$this->meta_type}_id";
         }
 
         if ( ! empty( $this->query_vars[ 'activity' ] ) ){
@@ -515,7 +515,7 @@ class WPGH_Contact_Query {
 
             $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
 
-            $join .= " $join_type $activity_table AS activity ON $this->table_name.$this->primary_key = activity.{$this->meta_type}_id}";
+            $join .= " $join_type $activity_table AS activity ON $this->table_name.$this->primary_key = activity.{$this->meta_type}_id";
         }
 
         return $join;
@@ -596,6 +596,11 @@ class WPGH_Contact_Query {
                 $where['report_funnel'] = "events.funnel_id IN ( $funnel_id )";
             }
 
+            if ( !empty( $this->query_vars[ 'report' ][ 'status' ] ) ){
+                $status = $this->query_vars[ 'report' ][ 'status' ];
+                $where['report_funnel'] = "events.status LIKE '$status'";
+            }
+
             if ( !empty( $this->query_vars[ 'report' ][ 'step' ] ) ){
                 $step_id = $this->query_vars[ 'report' ][ 'step' ];
                 $where['report_step'] = "events.step_id IN ( $step_id )";
@@ -615,7 +620,7 @@ class WPGH_Contact_Query {
         if ( $this->query_vars['activity'] && is_array( $this->query_vars['activity'] ) ) {
             if ( !empty( $this->query_vars[ 'activity' ][ 'activity_type' ] ) ){
                 $type = $this->query_vars[ 'activity' ][ 'activity_type' ];
-                $where['report_type'] = "activity.time = '$type'";
+                $where['report_type'] = "activity.activity_type = '$type'";
             }
 
             if ( !empty( $this->query_vars[ 'activity' ][ 'funnel' ] ) ){

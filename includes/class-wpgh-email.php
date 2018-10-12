@@ -324,7 +324,7 @@ class WPGH_Email
         $content = apply_filters( 'wpgh_email_template_make_clickable', true ) ? make_clickable( $content ) : $content;
         $content = str_replace( '&#038;', '&amp;', $content );
 
-        return apply_filters( 'wpgh_the_email_content', $content );
+        return $content;
     }
 
     /**
@@ -358,7 +358,7 @@ class WPGH_Email
      *
      * @return string
      */
-    public function get_footer_text($content)
+    public function get_footer_text( $content )
     {
         $footer = "";
 
@@ -394,7 +394,9 @@ class WPGH_Email
             );
         }
 
-        $footer .= implode(' | ', $sub);
+        $footer .= implode(' | ', $sub );
+
+        $footer = WPGH()->replacements->process( $footer, $this->contact->ID );
 
         return apply_filters( 'wpgh_email_footer', $footer );
     }
@@ -459,49 +461,45 @@ class WPGH_Email
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
              */
-
             do_action( 'wpgh_email_template_header_' . $this->get_template() , $this );
 
         } else {
-
             $templates->get_template_part( 'emails/header', $this->get_template() );
-
         }
 
         if ( has_action( 'wpgh_email_template_body_' . $this->get_template() ) ){
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
              */
-
             do_action( 'wpgh_email_template_body_' . $this->get_template() , $this );
-
         } else {
-
             $templates->get_template_part( 'emails/body', $this->get_template() );
-
         }
 
         if ( has_action( 'wpgh_email_template_footer_' . $this->get_template() ) ){
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
              */
-
             do_action( 'wpgh_email_template_footer_' . $this->get_template() , $this );
 
         } else {
-
             $templates->get_template_part( 'emails/footer', $this->get_template() );
 
         }
 
-        $content = ob_end_clean();
+        $content = ob_get_clean();
+
+        if ( empty( $content ) )
+            $content = 'No content...';
+
+
         $content = $this->minify( $content );
         $content = $this->convert_to_tracking_links( $content );
 
         $this->remove_filters();
 
         return apply_filters( 'wpgh_the_email_content', $content );
-
+//        return $content;
     }
 
     /**

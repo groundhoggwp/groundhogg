@@ -61,12 +61,12 @@ class WPGH_Tag_Applied extends WPGH_Funnel_Step
                 </th>
                 <?php $args = array(
                     'id' => $step->prefix( 'tags' ),
-                    'name' => $step->prefix( 'tags' ),
+                    'name' => $step->prefix( 'tags' ) . '[]',
                     'selected' => $tags
                 ); ?>
                 <td>
                     <?php echo WPGH()->html->tag_picker( $args ); ?>
-                    <p class="description"><?php _e( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ); ?></p>
+                    <p class="description"><?php _e( 'Add new tags by hitting [Enter] or by typing a [,].', 'groundhogg' ); ?></p>
                 </td>
             </tr>
             </tbody>

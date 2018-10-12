@@ -101,7 +101,7 @@
     margin-right: auto;
 }
 
-select {
+.step .inside select {
     vertical-align: top;
 }
 

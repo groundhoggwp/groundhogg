@@ -226,7 +226,6 @@ abstract class WPGH_DB {
 
         global $wpdb;
 
-        // Row ID must be positive integer
         $row_id = absint( $row_id );
 
         if( empty( $row_id ) ) {
@@ -249,6 +248,7 @@ abstract class WPGH_DB {
         // Reorder $column_formats to match the order of columns given in $data
         $data_keys = array_keys( $data );
         $column_formats = array_merge( array_flip( $data_keys ), $column_formats );
+
 
         if ( false === $wpdb->update( $this->table_name, $data, array( $where => $row_id ), $column_formats ) ) {
             return false;

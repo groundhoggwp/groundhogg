@@ -22,17 +22,17 @@ class WPGH_Elements
         $this->includes();
 
         /* actions */
+        $this->elements[] = new WPGH_Send_Email();
         $this->elements[] = new WPGH_Admin_Notification();
         $this->elements[] = new WPGH_Apply_Note();
-        $this->elements[] = new WPGH_Apply_Owner();
         $this->elements[] = new WPGH_Apply_Tag();
-        $this->elements[] = new WPGH_Create_User();
+        $this->elements[] = new WPGH_Remove_Tag();
+        $this->elements[] = new WPGH_Apply_Owner();
         $this->elements[] = new WPGH_Date_Timer();
         $this->elements[] = new WPGH_Delay_Timer();
+        $this->elements[] = new WPGH_Create_User();
         $this->elements[] = new WPGH_Edit_Meta();
         $this->elements[] = new WPGH_HTTP_Post();
-        $this->elements[] = new WPGH_Remove_Tag();
-        $this->elements[] = new WPGH_Send_Email();
 
         /* Benchmarks */
         $this->elements[] = new WPGH_Account_Created();
@@ -88,7 +88,7 @@ class WPGH_Elements
      */
     public function get_benchmarks()
     {
-        return apply_filters( 'wpgh_funnel_actions', array() );
+        return apply_filters( 'wpgh_funnel_benchmarks', array() );
     }
 
     /**
@@ -98,7 +98,7 @@ class WPGH_Elements
      */
     public function get_actions()
     {
-        return apply_filters( 'wpgh_funnel_benchmarks', array() );
+        return apply_filters( 'wpgh_funnel_actions', array() );
     }
 
     /**

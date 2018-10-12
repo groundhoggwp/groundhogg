@@ -215,7 +215,9 @@ class WPGH_DB_Tags extends WPGH_DB
             return false;
         }
 
-        return (bool) $this->get_column_by( 'tag_id', $field, $value );
+        $tag = $this->get_tag_by( $field, $value );
+
+        return ! empty( $tag ) ;
 
     }
 
@@ -394,13 +396,13 @@ class WPGH_DB_Tags extends WPGH_DB
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-            tag_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            tag_slug varchar(50) NOT NULL,
-            tag_name mediumtext NOT NULL,
-            tag_description text NOT NULL,
-            contact_count bigint(20) unsigned NOT NULL,
-            PRIMARY KEY  (tag_id),
-            UNIQUE KEY slug (tag_slug)
+        tag_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        tag_slug varchar(50) NOT NULL,
+        tag_name mediumtext NOT NULL,
+        tag_description text NOT NULL,
+        contact_count bigint(20) unsigned NOT NULL,
+        PRIMARY KEY (tag_id),
+        UNIQUE KEY tag_slug (tag_slug)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
         dbDelta( $sql );
