@@ -69,7 +69,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                             href="<?php echo $return_path . '&email=' . $email_id . '&action=edit' ;?>"
                         ><?php esc_html_e( 'Edit Email', 'groundhogg' );?></a>
                         |
-                        <a href="<?php echo $return_path . '&action=add' ;?>" ><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>
+                        <a target="_blank" href="<?php echo $return_path . '&action=add' ;?>" ><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>
                         <script>
                             jQuery(
                                 function($){
@@ -164,9 +164,17 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
         if ( isset( $_POST[ $step->prefix( 'email_id' ) ] ) ){
 
-            $note_text = intval(  $_POST[ $step->prefix( 'email_id' ) ] );
+            $email_id = intval(  $_POST[ $step->prefix( 'email_id' ) ] );
 
-            $step->update_meta( 'email_id', $note_text );
+            $step->update_meta( 'email_id', $email_id );
+
+            $email = WPGH()->emails->get( $email_id );
+
+            if ( $email->status === 'draft' && $step->is_active() ){
+
+                WPGH()->menu->funnels_page->notices->add( 'contains-drafts', 'Your funnel contains email steps which are in draft mode. Please ensure all your emails are marked as ready.', 'info' );
+
+            }
 
         }
 

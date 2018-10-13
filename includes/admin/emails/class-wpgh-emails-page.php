@@ -255,12 +255,14 @@ class WPGH_Emails_Page
 
         $return_path = admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id );
 
-        if ( isset( $_GET['step'] ) ){
+        if ( isset( $_GET['return_step'] ) ){
 
             /* Make it easy to return back to the funnel editing screen */
-            $step_id = intval( $_GET['step'] );
-            $step = new WPGH_Step( $step_id );
-            $return_path .= sprintf( "&return_funnel=%s&return_step=%s", $step->funnel_id, $step->ID );
+            $step_id = intval( $_GET['return_step'] );
+            $funnel_id = intval( $_GET['return_funnel'] );
+            $return_path .= sprintf( "&return_funnel=%s&return_step=%s", $funnel_id, $step_id );
+
+            WPGH()->step_meta->update_meta( $step_id, 'email_id', $email_id );
 
         }
 

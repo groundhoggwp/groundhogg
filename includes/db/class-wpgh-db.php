@@ -78,23 +78,34 @@ abstract class WPGH_DB {
     {
         global $wpdb;
 
-        $where_args = array();
-
-        foreach ( $this->get_columns() as $column => $type ){
-
-            if ( $type === '%s' ){
-
-                $where_args[ $column ] = "%" . $wpdb->esc_like( $s ) . "%";
-
-            }
-
-        }
-
-        $where = $this->generate_where( $where_args, "OR" );
+        $where = $this->generate_search( $s );
 
         return $wpdb->get_results(
             "SELECT * FROM $this->table_name WHERE $where ORDER BY $this->primary_key DESC"
         );
+    }
+
+    /**
+     * Generates the search WHERE Clause
+     * @param $s
+     *
+     * @return string
+     */
+    public function generate_search( $s ='' )
+    {
+        global $wpdb;
+
+        $where_args = array();
+
+        foreach ( $this->get_columns() as $column => $type ){
+            if ( $type === '%s' ){
+                $where_args[ $column ] = "%" . $wpdb->esc_like( $s ) . "%";
+            }
+        }
+
+        $where = $this->generate_where( $where_args, "OR" );
+
+        return $where;
     }
 
     /**

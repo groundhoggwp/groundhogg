@@ -30,7 +30,7 @@ class WPGH_Apply_Note extends WPGH_Funnel_Step
     public $name    = 'Apply Note';
 
     /**
-     * @param WPGH_Step
+     * @param $step WPGH_Step
      */
     public function settings( $step )
     {

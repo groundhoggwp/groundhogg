@@ -277,6 +277,12 @@ class WPGH_Funnels_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
+        if ( isset( $_REQUEST[ 's' ] ) ){
+
+            $query_args[ 'search' ] = $_REQUEST[ 's' ];
+
+        }
+
         switch ( $this->get_view() ){
 
             case 'active':
@@ -302,16 +308,6 @@ class WPGH_Funnels_Table extends WP_List_Table {
                 );
 
                 break;
-
-        }
-
-        if ( isset( $_REQUEST[ 's' ] ) ){
-
-            $search_items = WPGH()->funnels->search( $_REQUEST[ 's' ] );
-
-            $data = array_uintersect($data, $search_items, function($a, $b) {
-                return strcmp(spl_object_hash($a), spl_object_hash($b));
-            });
 
         }
 

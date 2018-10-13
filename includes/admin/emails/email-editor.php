@@ -321,6 +321,18 @@ $email = new WPGH_Email( $email_id );
                     <textarea id="content" name="content"><?php echo $email->content; ?></textarea>
                 </div>
 
+                <div class="postbox" id="replacements">
+                    <h2 class="hndle"><?php _e( 'Replacements', 'groudhogg' ); ?></h2>
+                    <div class="inside">
+
+                        <?php foreach ( WPGH()->replacements->get_replacements() as $replacement ): ?>
+                        <div>
+                            <input style="border: none;outline: none;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}"> <span><?php echo $replacement[ 'description' ]; ?></span>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
             </div>
 
             <!-- begin elements area -->

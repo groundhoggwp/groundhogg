@@ -71,6 +71,7 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
 
                             <?php $args = array(
                                 'name'  => $step->prefix( 'post_keys' ) . '[]',
+                                'class' => 'input',
                                 'value' => sanitize_key( $post_key )
                             );
 
@@ -81,6 +82,7 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
                     <td>
                         <label><strong><?php _e( 'Value: ' ); ?></strong> <?php $args = array(
                                 'name'  => $step->prefix( 'post_values' ) . '[]',
+                                'class' => 'input',
                                 'value' => esc_html( $post_values[$i] )
                             );
 

@@ -116,7 +116,7 @@ class WPGH_Replacements
             array(
                 'code'        => 'date',
                 'callback'    => 'wpgh_replacement_date',
-                'description' => __( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-,-d|+2 days}', 'groundhogg' ),
+                'description' => __( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'groundhogg' ),
             ),
         );
 

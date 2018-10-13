@@ -55,6 +55,7 @@ class WPGH_Edit_Meta extends WPGH_Funnel_Step
 
                             <?php $args = array(
                                 'name'  => $step->prefix( 'meta_keys' ) . '[]',
+                                'class' => 'input',
                                 'value' => sanitize_key( $post_key )
                             );
 
@@ -65,6 +66,7 @@ class WPGH_Edit_Meta extends WPGH_Funnel_Step
                     <td>
                         <label><strong><?php _e( 'Value: ' ); ?></strong> <?php $args = array(
                                 'name'  => $step->prefix( 'meta_values' ) . '[]',
+                                'class' => 'input',
                                 'value' => esc_html( $post_values[$i] )
                             );
 

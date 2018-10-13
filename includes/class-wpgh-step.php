@@ -181,7 +181,7 @@ class WPGH_Step
 
         }
 
-        if ( $items[ $i ]->group === 'action' ){
+        if ( $items[ $i ]->step_group === 'action' ){
 
             /* regardless of whether the current step is an action
             or a benchmark we can run the next step if it's an action */
@@ -194,7 +194,7 @@ class WPGH_Step
             //todo verify comparison
             while ( $i < count( $items ) ) {
 
-                if ( $items[ $i ]->group === 'action' ) {
+                if ( $items[ $i ]->step_group === 'action' ) {
 
                     return new WPGH_Step( $items[ $i ]->ID );
 
@@ -220,10 +220,10 @@ class WPGH_Step
         $time = apply_filters( 'wpgh_step_enqueue_time_' . $this->type, $this );
 
         if ( ! is_numeric( $time ) ) {
-            $time = 10;
+            $time = time() + 10;
         }
 
-        return time() + $time;
+        return $time;
     }
 
     /**

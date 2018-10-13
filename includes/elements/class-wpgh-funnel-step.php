@@ -76,7 +76,7 @@ class WPGH_Funnel_Step
     public function enqueue( $step )
     {
 
-        return $this->delay_time;
+        return time() + $this->delay_time;
 
     }
 

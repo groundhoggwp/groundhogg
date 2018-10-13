@@ -99,7 +99,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                                 $('#custom_date_range_start').addClass('hidden');
                             }})});
                         </script>
-                        <?php submit_button( 'Filter', 'secondary', 'change_reporting', false ); ?>
+                        <?php submit_button( 'Refresh', 'secondary', 'change_reporting', false ); ?>
                         <?php do_action( 'funnel_sate_range_filters_after' ); ?>
                         <div style="float: right; display: inline-block;">
                             <div class="onoffswitch">

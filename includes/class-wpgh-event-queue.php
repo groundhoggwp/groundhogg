@@ -38,13 +38,20 @@ class WPGH_Event_Queue
      * Add new short term schedule
      * setup the action for the cron job
      */
-    public function construct()
+    public function __construct()
     {
 
         add_filter( 'cron_schedules', array( $this, 'setup_cron_schedules' ) );
         add_action( 'init', array( $this, 'setup_cron_jobs' ) );
         add_action( self::ACTION , array( $this, 'process' ) );
         add_action( 'admin_init', array( $this, 'ajax_process' ) );
+
+        if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
+
+            add_action( 'admin_init' , array( $this, 'process' ) );
+//            wp_die();
+
+        }
 
     }
 
@@ -88,6 +95,9 @@ class WPGH_Event_Queue
 //            $this->events[] = new WPGH_Event( $event );
 
         }
+
+//        var_dump( $events );
+//        wp_die();
 
         return $this->events;
     }

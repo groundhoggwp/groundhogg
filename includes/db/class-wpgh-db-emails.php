@@ -238,6 +238,14 @@ class WPGH_DB_Emails extends WPGH_DB  {
 
         $data = (array) $data;
 
+        $extra = '';
+
+        if ( isset( $data[ 'search' ] ) ){
+
+            $extra .= sprintf( " AND (%s)", $this->generate_search( $data[ 'search' ] ) );
+
+        }
+
         // Initialise column format array
         $column_formats = $this->get_columns();
 
@@ -255,7 +263,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
 
         }
 
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where" );
+        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY $this->primary_key DESC" );
 
         return $results;
     }

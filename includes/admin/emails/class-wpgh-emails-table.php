@@ -328,6 +328,12 @@ class WPGH_Emails_Table extends WP_List_Table {
 
         $query_args = array();
 
+        if ( isset( $_REQUEST[ 's' ] ) ){
+
+            $query_args[ 'search' ] = $_REQUEST[ 's' ];
+
+        }
+
         switch ( $this->get_view() )
         {
             case 'trash':
@@ -361,16 +367,6 @@ class WPGH_Emails_Table extends WP_List_Table {
                 $data = array_merge( $data, $data2 );
 
                 break;
-        }
-
-        if ( isset( $_REQUEST[ 's' ] ) ){
-
-            $search_items = WPGH()->emails->search(  $_REQUEST[ 's' ] );
-
-            $data = array_uintersect($data, $search_items, function($a, $b) {
-                return strcmp(spl_object_hash($a), spl_object_hash($b));
-            });
-
         }
 
 		/*
@@ -425,7 +421,7 @@ class WPGH_Emails_Table extends WP_List_Table {
         $a = (array) $a;
         $b = (array) $b;
 		// If no sort, default to title.
-		$orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'date_created'; // WPCS: Input var ok.
+		$orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'ID'; // WPCS: Input var ok.
 		// If no order, default to asc.
 		$order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
 		// Determine sort order.

@@ -518,7 +518,7 @@ class WPGH_Email
 
             $owner = $this->contact->owner;
 
-            if ( is_email( $owner->user_email ) ) {
+            if ( $owner && is_email( $owner->user_email ) ) {
 
                 return $owner->display_name;
 
@@ -547,7 +547,7 @@ class WPGH_Email
 
             $owner = $this->contact->owner;
 
-            if ( is_email( $owner->user_email ) ) {
+            if ( $owner && is_email( $owner->user_email ) ) {
 
                 return $owner->user_email;
 

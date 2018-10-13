@@ -51,8 +51,8 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
                                     <td class="content-block" style="<?php echo $footer_content; ?>">
                                         <span style="<?php echo $apple_link; ?>">
                                             <?php _e( apply_filters( 'gh_unsubscribe_footer_text', "Don't want these emails?" ), 'groundhogg'); ?> <a href="<?php echo esc_url_raw( apply_filters( 'wpgh_email_unsubscribe_link', site_url() ) ); ?>">
-                                                <?php _e( apply_filters( 'gh_unsubscribe_text', "Unsubscribe" ), 'groundhogg'); ?>
-                                            </a>.
+                                                <?php _e( apply_filters( 'gh_unsubscribe_text', "Unsubscribe." ), 'groundhogg'); ?>
+                                            </a>
                                         </span>
                                     </td>
                                 </tr>
