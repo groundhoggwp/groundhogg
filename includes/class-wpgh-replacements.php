@@ -262,7 +262,7 @@ class WPGH_Replacements
 
             }
 
-            $text = call_user_func( $this->replacements[ $code ]['callback'], $arg, $this->contact_id, $code );
+            $text = call_user_func( $this->replacements[ $code ]['callback'], $this->contact_id, $arg, $code );
 
         } else {
 
@@ -270,7 +270,7 @@ class WPGH_Replacements
 
         }
 
-        return apply_filters( 'wpgh_replacement_' . $code, $text );
+        return apply_filters( 'wpgh_filter_replacement_' . $code, $text );
 
     }
 

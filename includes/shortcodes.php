@@ -41,7 +41,7 @@ add_filter( 'no_texturize_shortcodes', 'wpgh_no_texturize_form' );
  * Mere contact replacements into page content with this shortcode.
  *
  * @param $atts array should be empty
- * @param string $content the content to perfotm the merge fields
+ * @param string $content the content to perform the merge fields
  * @return string the updated content,.
  */
 function wpgh_merge_replacements_shortcode( $atts, $content = '' )
@@ -72,7 +72,7 @@ function wpgh_contact_replacement_shortcode( $atts )
 
 	$content = sprintf( '{%s}', $a[ 'field' ] );
 
-	return WPGH()->replacements->process( $contact->ID, $content );
+	return WPGH()->replacements->process( $content, $contact->ID );
 }
 
 add_shortcode( 'gh_contact', 'wpgh_contact_replacement_shortcode' );

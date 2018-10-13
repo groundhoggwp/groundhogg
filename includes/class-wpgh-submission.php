@@ -34,6 +34,12 @@ class WPGH_Submission
      */
     public $id;
 
+	/**
+	 * @var WPGH_Step the funnel's step, mostly here to use the is_active()
+	 *
+	 */
+    public $step;
+
     /**
      * @var WPGH_Contact
      */
@@ -48,7 +54,7 @@ class WPGH_Submission
     public function __construct()
     {
         if ( isset( $_POST[ 'gh_submit_nonce' ] ) ) {
-            add_action( 'init', array( $this, 'setup' ) );
+//            add_action( 'init', array( $this, 'setup' ) );
             add_action( 'init', array( $this, 'process' ) );
         }
     }
@@ -68,12 +74,18 @@ class WPGH_Submission
 
             $this->id = $this->step_id;
 
+            $this->step = new WPGH_Step( $this->id );
+
             unset( $this->step_id );
 
         } else {
 
             $this->leave( 'No ID given.' );
 
+        }
+
+        if ( ! $this->step->is_active() ){
+        	$this->leave( 'This form is not accepting submissions.' );
         }
 
         /* set the expected fields for the submission */
@@ -378,11 +390,10 @@ class WPGH_Submission
      */
     public function process()
     {
+    	$this->setup();
 
         if ( ! $this->verify() ) {
-
             $this->leave();
-
         }
 
         $c = $this->create_contact();

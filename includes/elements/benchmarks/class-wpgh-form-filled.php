@@ -102,17 +102,27 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
      * @param $step_id
      * @param $contact WPGH_Contact
      * @param $submission int
+     *
+     * @return bool
      */
     public function complete( $step_id, $contact, $submission )
     {
 
-        $step = new WPGH_Step( $step_id );
 
-        if ( $step->can_complete( $contact ) ){
+	    $step = new WPGH_Step( $step_id );
 
-            $step->enqueue( $contact );
+	    $success = false;
 
-        }
+	    if ( $step->can_complete( $contact ) ){
+
+		    $success = $step->enqueue( $contact );
+
+	    }
+
+	    /*var_dump( $success );
+	    wp_die( 'made-it-here' );*/
+
+	    return $success;
 
     }
 

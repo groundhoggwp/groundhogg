@@ -97,11 +97,14 @@ class WPGH_Tracking
         } else {
 
             add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
+
             if ( isset( $_COOKIE[ 'gh_referer' ] ) ) {
                 $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referer' ] );
             }
 
         }
+
+        add_action( 'wpgh_form_submit', array( $this, 'form_filled' ), 10, 3 );
 
     }
 
@@ -156,14 +159,7 @@ class WPGH_Tracking
     public function build_cookie()
     {
 
-        $cookie = array(
-            'contact'   => $this->contact->ID,
-            'funnel'    => $this->funnel->ID,
-            'step'      => $this->step->ID,
-            'event'     => $this->event->ID,
-            'email'     => $this->email->ID,
-        );
-
+    	$cookie = array();
 
         if ( $this->contact ){
             $cookie[ 'contact' ] = $this->contact->ID;
@@ -185,13 +181,18 @@ class WPGH_Tracking
             $cookie[ 'email' ] = $this->email->ID;
         }
 
+//        var_dump( $cookie );
+//        wp_die();
+//
         $cookie = json_encode( $cookie );
         $cookie = wpgh_encrypt_decrypt( $cookie, 'e' );
 
-        setcookie(
+        $expiry = apply_filters( 'wpgh_tracking_cookie_expiry', $this->cookie_expiry ) * DAY_IN_SECONDS;
+
+        return setcookie(
             self::COOKIE,
             $cookie,
-            apply_filters( 'wpgh_tracking_cookie_expiry', $this->cookie_expiry ) * DAY_IN_SECONDS,
+            time() + $expiry,
             COOKIEPATH,
             COOKIE_DOMAIN,
             is_ssl()
@@ -211,6 +212,9 @@ class WPGH_Tracking
 
         $cookie = wpgh_encrypt_decrypt( $_COOKIE[ self::COOKIE ], 'd' );
         $cookie = json_decode( $cookie );
+
+//        var_dump( $cookie );
+//        wp_die( );
 
         if ( isset( $cookie->contact ) ){
             $this->contact  = new WPGH_Contact( $cookie->contact );
@@ -429,6 +433,24 @@ class WPGH_Tracking
         wp_redirect( $this->ref );
 
         die();
+    }
+
+	/**
+	 * Sets the cookie upon a form fill.
+	 *
+	 * @param $step_id int
+	 * @param $contact WPGH_Contact
+	 * @param $submission WPGH_Submission
+	 */
+    public function form_filled( $step_id, $contact, $submission )
+    {
+    	$step = new WPGH_Step( $step_id );
+
+    	$this->funnel = WPGH()->funnels->get( $step->funnel_id );
+    	$this->step = $step;
+    	$this->contact = $contact;
+
+    	$this->build_cookie();
     }
 
     /**

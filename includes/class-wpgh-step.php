@@ -220,10 +220,10 @@ class WPGH_Step
         $time = apply_filters( 'wpgh_step_enqueue_time_' . $this->type, $this );
 
         if ( ! is_numeric( $time ) ) {
-            $time = time() + 10;
+            $time = 10;
         }
 
-        return $time;
+        return time() + $time;
     }
 
     /**
@@ -264,6 +264,8 @@ class WPGH_Step
      * Create an event and add it to the queue
      *
      * @param $contact WPGH_Contact
+     *
+     * @return bool
      */
     public function enqueue( $contact )
     {
@@ -288,7 +290,7 @@ class WPGH_Step
             'contact_id'    => $contact->ID
         );
 
-        WPGH()->event_queue->add( $event );
+        return (bool) WPGH()->event_queue->add( $event );
     }
 
     /**
