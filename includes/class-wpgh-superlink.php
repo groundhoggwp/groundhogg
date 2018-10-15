@@ -44,6 +44,13 @@ class WPGH_Superlink
             return;
         }
 
+        add_action( 'init', array( $this, 'setup' ) );
+        add_action( 'template_redirect', array( $this, 'process' ) );
+
+    }
+
+    public function setup()
+    {
         $link_path  = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
         $link_parts = explode( '/', $link_path );
         $this->ID   = intval( $link_parts[ count( $link_parts ) - 1 ] );
@@ -57,10 +64,8 @@ class WPGH_Superlink
         $this->tags = maybe_unserialize( $link->tags );
 
         $this->contact_id = WPGH()->tracking->get_contact()->ID;
-
-        add_action( 'template_redirect', array( $this, 'process' ) );
-
     }
+
 
     /**
      * Whether the current process will result in a redirect to the new target.

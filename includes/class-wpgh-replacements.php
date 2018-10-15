@@ -237,6 +237,12 @@ class WPGH_Replacements
         // Get tag
         $code = $m[1];
 
+        /* make sure that if it's a dynamic code to remove anything after the period */
+        if ( strpos( $code, '.' ) > 0 ) {
+            $parts = explode( '.', $code );
+            $code = $parts[0];
+        }
+
         // Return tag if tag not set
         if ( ! $this->has_replacement( $code ) ) {
             return $m[0];
@@ -262,7 +268,7 @@ class WPGH_Replacements
 
             }
 
-            $text = call_user_func( $this->replacements[ $code ]['callback'], $this->contact_id, $arg, $code );
+            $text = call_user_func( $this->replacements[ $code ]['callback'], $arg, $this->contact_id, $code );
 
         } else {
 
