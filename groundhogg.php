@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 0.2.0
+Version: 0.9
 Author: Adrian Tobey
 Author URI: http://health-check-team.example.com
 Text Domain: groundhogg
