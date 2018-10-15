@@ -78,9 +78,9 @@ class WPGH_DB_Contacts extends WPGH_DB  {
             'email'          => '%s',
             'first_name'     => '%s',
             'last_name'      => '%s',
-            'optin_status'   => '%d',
             'user_id'        => '%d',
             'owner_id'       => '%d',
+            'optin_status'   => '%d',
             'date_created'   => '%s',
         );
     }

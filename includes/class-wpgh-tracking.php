@@ -88,6 +88,7 @@ class WPGH_Tracking
 
         } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-confirmation/via/email/' ) !== false ) {
 
+            add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
             add_action( 'init', array( $this, 'email_confirmed' ) );
 
 //            $this->setup_url_vars();
@@ -462,9 +463,11 @@ class WPGH_Tracking
     {
 
         if ( ! $this->contact )
-            return;
+            wp_die( 'You do not exist... ');
 
         $this->contact->update( array( 'optin_status' => WPGH_CONFIRMED ) );
+
+//        wp_die();
 
         $conf_page = get_permalink( get_option( 'gh_confirmation_page' ) );
 
