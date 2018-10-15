@@ -160,9 +160,11 @@ function wpgh_run_install() {
     /* Recount tag relationships */
     $tags = WPGH()->tags->get_tags();
 
-    foreach ( $tags as $tag ){
-        $count = WPGH()->tag_relationships->count( $tag->tag_id, 'tag_id' );
-        WPGH()->tags->update( $tag->tag_id, array( 'contact_count' => $count ) );
+    if ( ! empty( $tags ) ){
+        foreach ( $tags as $tag ){
+            $count = WPGH()->tag_relationships->count( $tag->tag_id, 'tag_id' );
+            WPGH()->tags->update( $tag->tag_id, array( 'contact_count' => $count ) );
+        }
     }
 
     /* setup permissions */

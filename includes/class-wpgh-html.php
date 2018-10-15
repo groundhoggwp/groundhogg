@@ -398,6 +398,10 @@ class WPGH_HTML
         if ( ! is_user_logged_in() || ! current_user_can( 'gh_manage_emails' ) )
             wp_die( 'No access to emails.' );
 
+        if ( isset(  $_REQUEST[ 'q' ] ) ){
+            $_REQUEST[ 'search' ] = $_REQUEST[ 'q' ];
+        }
+
         $query_args[ 'status' ] = 'ready';
         $data = WPGH()->emails->get_emails( $query_args );
 
@@ -405,16 +409,6 @@ class WPGH_HTML
         $data2 = WPGH()->emails->get_emails( $query_args );
 
         $data = array_merge( $data, $data2 );
-
-        $value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
-
-        if ( $value ){
-            $search_items = WPGH()->emails->search( $value );
-
-            $data = array_uintersect($data, $search_items, function($a, $b) {
-                return strcmp(spl_object_hash($a), spl_object_hash($b));
-            });
-        }
 
         $json = array();
 
