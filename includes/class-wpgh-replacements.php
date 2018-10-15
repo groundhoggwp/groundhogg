@@ -248,6 +248,9 @@ class WPGH_Replacements
             return $m[0];
         }
 
+        /* reset code */
+        $code = $m[1];
+
         if ( substr( $code, 0, 1) === '_' ) {
 
             $text = WPGH()->contact_meta->get_meta( $this->contact_id, substr( $code, 1 ) );

@@ -236,12 +236,12 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
 
                 self::$instance->tracking     = new WPGH_Tracking();
+                self::$instance->superlink    = new WPGH_Superlink();
                 self::$instance->event_queue  = new WPGH_Event_Queue();
 //
                 self::$instance->replacements = new WPGH_Replacements();
                 self::$instance->notices      = new WPGH_Notices();
                 self::$instance->submission   = new WPGH_Submission();
-                self::$instance->superlink    = new WPGH_Superlink();
                 self::$instance->html         = new WPGH_HTML();
 //
                 self::$instance->bounce_checker   = new WPGH_Bounce_Checker();

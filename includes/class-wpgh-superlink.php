@@ -55,15 +55,19 @@ class WPGH_Superlink
         $link_parts = explode( '/', $link_path );
         $this->ID   = intval( $link_parts[ count( $link_parts ) - 1 ] );
 
-        if ( ! WPGH()->superlinks->exists( $this->ID ) )
+        if ( ! WPGH()->superlinks->exists( $this->ID ) ){
+            remove_action(  'template_redirect', array( $this, 'process' )  );
             return;
+        }
 
         $link = WPGH()->superlinks->get_superlink( $this->ID );
 
-        $this->target = esc_url_raw( WPGH()->replacements->process( $link->target ) );
+        $this->contact_id = WPGH()->tracking->get_contact()->ID;
+
+        $this->target = esc_url_raw( WPGH()->replacements->process( $link->target, $this->contact_id ) );
+
         $this->tags = maybe_unserialize( $link->tags );
 
-        $this->contact_id = WPGH()->tracking->get_contact()->ID;
     }
 
 

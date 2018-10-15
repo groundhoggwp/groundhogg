@@ -145,7 +145,7 @@ class WPGH_Events_Table extends WP_List_Table {
     {
         ?>
         <div class="alignleft actions">
-            <a class="button action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php _e( 'Process Events', 'groundhogg' ); ?></a>
+            <a class="button button-secondary action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php _e( 'Process Events', 'groundhogg' ); ?></a>
         </div>
         <?php
     }
