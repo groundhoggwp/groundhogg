@@ -138,6 +138,11 @@ class WPGH_Event
 
         }
 
+        /* special handling fot the broadcast event. Make sure it's status is update to sent... */
+        if ( $this->is_broadcast_event() && $this->step->status !== 'sent' ){
+           $this->step->update( array( 'status' => 'sent' ) );
+        }
+
         do_action( 'wpgh_event_run_after', $this );
 
         return true;
