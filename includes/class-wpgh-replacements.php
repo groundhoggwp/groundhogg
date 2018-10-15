@@ -41,12 +41,12 @@ class WPGH_Replacements
             array(
                 'code'        => 'first',
                 'callback'    => 'wpgh_replacement_first_name',
-                'description' => __( 'The contact\'s first name', 'groundhogg' ),
+                'description' => __( 'The contact\'s first name.', 'groundhogg' ),
             ),
             array(
                 'code'        => 'first_name',
                 'callback'    => 'wpgh_replacement_first_name',
-                'description' => __( 'The contact\'s first name', 'groundhogg' ),
+                'description' => __( 'The contact\'s first name.', 'groundhogg' ),
             ),
             array(
                 'code'        => 'last',

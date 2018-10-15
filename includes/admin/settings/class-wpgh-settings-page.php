@@ -105,10 +105,8 @@ class WPGH_Settings_Page
                                     <p class="description"><?php _e( 'Columns: first_name, last_name, email, custom_field, another_custom_field...' ) ?></p>
                                     <?php $tag_args = array();
                                     $tag_args[ 'id' ] = 'import_tags';
-                                    $tag_args[ 'name' ] = 'import_tags[]';
-                                    $tag_args[ 'width' ] = '100%';
-                                    $tag_args[ 'class' ] = 'hidden'; ?>
-                                    <?php wpgh_dropdown_tags( $tag_args ); ?>
+                                    $tag_args[ 'name' ] = 'import_tags[]'; ?>
+                                    <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
                                     <p class="description"><?php _e( 'These tags will be applied to the contacts upon importing.', 'groundhogg' ); ?></p>
                                     <?php submit_button( 'Import', 'primary', 'import_contacts', false ); ?>
                                 </div>
@@ -122,11 +120,9 @@ class WPGH_Settings_Page
                                     <p class="description"><?php _e( 'Export contacts to a .CSV file. This will download to your browser.', 'groundhogg' ); ?></p>
                                     <?php $tag_args = array();
                                     $tag_args[ 'id' ] = 'export_tags';
-                                    $tag_args[ 'name' ] = 'export_tags[]';
-                                    $tag_args[ 'width' ] = '100%';
-                                    $tag_args[ 'class' ] = 'hidden'; ?>
-                                    <?php wpgh_dropdown_tags( $tag_args ); ?>
-                                    <p class="description"><?php _e( 'Contacts with these tags will be exported.', 'groundhogg' ); ?></p>
+                                    $tag_args[ 'name' ] = 'export_tags[]';?>
+                                    <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
+                                    <p class="description"><?php _e( 'Contacts with these tags will be exported. Leave blank to export ALL contacts.', 'groundhogg' ); ?></p>
                                     <?php submit_button( 'Export', 'primary', 'export_contacts', false ); ?>
                                 </div>
                             </div>

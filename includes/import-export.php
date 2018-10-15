@@ -24,7 +24,7 @@ function wpgh_import_contacts()
     }
 
     if ( isset(  $_POST[ 'import_tags' ] ) ){
-        $tags = wpgh_validate_tags( $_POST[ 'import_tags' ] );
+        $tags = WPGH()->tags->validate( $_POST[ 'import_tags' ] );
     }
 
     if ( $_FILES['contacts']['error'] == UPLOAD_ERR_OK && is_uploaded_file( $_FILES['contacts']['tmp_name'] ) ) {

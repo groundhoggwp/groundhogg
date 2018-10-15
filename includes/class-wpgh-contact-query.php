@@ -566,7 +566,7 @@ class WPGH_Contact_Query {
             if ( is_array( $this->query_vars['email'] ) ) {
                 $email_placeholders = implode( ', ', array_fill( 0, count( $this->query_vars['email'] ), '%s' ) );
 
-                $where['email'] = $wpdb->prepare( "email IN( $email_placeholders )", $this->query_vars['email'] );
+                $where['email'] = "email IN( $email_placeholders )";
             } else {
                 $where['email'] = $wpdb->prepare( "( ( email_mt.meta_key = 'additional_email' AND email_mt.meta_value = %s ) OR email = %s )", $this->query_vars['email'], $this->query_vars['email'] );
             }

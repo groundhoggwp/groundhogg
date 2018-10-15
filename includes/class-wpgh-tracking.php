@@ -133,13 +133,11 @@ class WPGH_Tracking
 
             $event = WPGH()->events->get( $eid );
 
-            if ( $event ){
-
+            if ( is_object( $event ) ){
                 $this->event = new WPGH_Event( $event->ID );
                 $this->funnel = WPGH()->funnels->get( $event->funnel_id );
-                $this->step   = WPGH()->steps->get( $event->step_id );
-                $this->email  = new WPGH_Email( WPGH()->step_meta->get_meta( $this->step->ID, 'email_id' ) );
-
+                $this->step   = new WPGH_Step( $event->step_id );
+                $this->email  = new WPGH_Email( $this->step->get_meta( 'email_id' ) );
             }
         }
 
@@ -377,6 +375,8 @@ class WPGH_Tracking
             'referer'       => ''
         );
 
+        //wp_die();
+
         if ( ! $this->exists( $args ) ) {
             $args[ 'timestamp' ] = time();
 
@@ -403,6 +403,8 @@ class WPGH_Tracking
     {
         /* track every click as an open */
         $this->email_opened();
+
+        //wp_die();
 
         if ( ! $this->event ){
             /* thanks for coming! */
