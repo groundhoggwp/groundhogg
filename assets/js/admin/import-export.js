@@ -18,6 +18,11 @@ var wpghImportExport;
                 wpghImportExport.load();
             } );
 
+            $( '.export' ).on( 'click', function () {
+                wpghImportExport.export();
+            } );
+
+
             this.status = $( '.import-status' );
 
             console.log( 'Importer Ready' );
@@ -95,10 +100,12 @@ var wpghImportExport;
          */
         send: function( data ) {
 
+            var tags = $( '#import_tags' ).val();
+
             $.ajax({
                 type: "post",
                 url: ajaxurl,
-                data: { action: 'wpgh_import_contacts', data: data }
+                data: { action: 'wpgh_import_contacts', data: data, tags: tags }
             });
 
         },
@@ -108,6 +115,53 @@ var wpghImportExport;
             var p = Math.ceil( this.completedRows / this.allRows ) * 100;
             this.status.html( 'Status: ' + p + '%' );
             console.log( 'Status: ' + p + '%' );
+        },
+        
+        export: function() {
+
+            var tags = $( '#export_tags' ).val();
+            this.retrieve( tags );
+
+        },
+        
+        retrieve: function ( tags ) {
+            $.ajax({
+                type: "post",
+                url: ajaxurl,
+                dataType: 'json',
+                data: { action: 'wpgh_export_contacts', tags: tags },
+                success: function ( json ) {
+                    var CSV = Papa.unparse( json, {
+                        quotes: false,
+                        quoteChar: '"',
+                        escapeChar: '"',
+                        delimiter: ",",
+                        header: true,
+                        newline: "\r\n"
+                    } );
+
+                    wpghImportExport.makeFile( CSV );
+                }
+            });
+        },
+
+        makeFile : function (text) {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+
+            var today = new Date();
+            var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            var dateTime = date+' '+time;
+
+            element.setAttribute('download', 'contacts-' + dateTime + '.csv' );
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
         }
 
     };

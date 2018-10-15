@@ -15,6 +15,7 @@ class WPGH_Importer
         $this->db = WPGH()->contacts;
 
         add_action( 'wp_ajax_wpgh_import_contacts', array( $this, 'import' ) );
+        add_action( 'wp_ajax_wpgh_export_contacts', array( $this, 'export' ) );
 
         if ( did_action( 'admin_enqueue_scripts' ) ){
             $this->scripts();
@@ -29,6 +30,33 @@ class WPGH_Importer
         wp_enqueue_script( 'papaparse', WPGH_ASSETS_FOLDER . 'lib/papa-parse/papaparse.js' );
         wp_enqueue_script( 'wpgh-import-export', WPGH_ASSETS_FOLDER . 'js/admin/import-export.js' );
         //wp_die( 'scripts' );
+    }
+
+    public function export()
+    {
+
+        global $wpdb;
+
+        if ( empty( $_POST[ 'tags' ] ) ){
+
+            $contacts = WPGH()->contacts->get_contacts();
+
+            wp_die( json_encode( $contacts ) );
+
+        } else {
+
+            $tags = WPGH()->tags->validate( $_POST[ 'tags' ] );
+
+            $query = new WPGH_Contact_Query();
+
+            $contacts = $query->query(array(
+                'tags_include' => $tags
+            ));
+
+            wp_die( json_encode( $contacts ) );
+
+        }
+
     }
 
     public function import()
@@ -105,6 +133,14 @@ class WPGH_Importer
             $contact->add_tag( $tags );
             unset( $args[ 'tags' ] );
 
+        }
+
+        /* handle tags from the tag form. */
+        if ( isset( $_POST[ 'tags' ] ) ){
+//            $tags = explode( ',',  $args[ 'tags' ]  );
+            $tags = array_map( 'intval', $_POST[ 'tags' ] );
+            $tags = WPGH()->tags->validate( $tags );
+            $contact->add_tag( $tags );
         }
 
         /*let's just quickly process the meta and get out for now */

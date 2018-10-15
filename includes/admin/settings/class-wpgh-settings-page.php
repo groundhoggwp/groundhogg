@@ -107,7 +107,34 @@ class WPGH_Settings_Page
                                     <p>
                                         <input type="file" id="contacts" name="contacts" accept=".csv" >
                                     </p>
-                                    <p class="description"><?php _e( 'Columns: first_name, last_name, email, custom_field, another_custom_field...' ) ?></p>
+                                    <p class="description"><?php _e( "Use the following column format to import your contacts. Any custom information added into your data will be treated as custom meta data for the contact.", 'groundhogg' ); ?></p>
+                                    <table class="wp-list-table widefat fixed striped">
+                                        <thead>
+                                            <tr>
+                                                <th>First Name</th>
+                                                <th>Last Name</th>
+                                                <th>Email</th>
+                                                <th>Primary Phone</th>
+                                                <th>Notes</th>
+                                                <th>Meta Key</th>
+                                                <th>Another Meta Key</th>
+                                                <th>...</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>ExampleFirst</td>
+                                                <td>ExampleLast</td>
+                                                <td>Email@email.com</td>
+                                                <td>555-555-5555</td>
+                                                <td>Interesting Info</td>
+                                                <td>Meta Value</td>
+                                                <td>Another Meta Value</td>
+                                                <td>...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <hr>
                                     <?php $tag_args = array();
                                     $tag_args[ 'id' ] = 'import_tags';
                                     $tag_args[ 'name' ] = 'import_tags[]'; ?>
@@ -129,7 +156,7 @@ class WPGH_Settings_Page
                                     $tag_args[ 'name' ] = 'export_tags[]';?>
                                     <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
                                     <p class="description"><?php _e( 'Contacts with these tags will be exported. Leave blank to export ALL contacts.', 'groundhogg' ); ?></p>
-                                    <?php submit_button( 'Export', 'primary', 'export_contacts', false ); ?>
+                                    <button class="export button button-primary" id="export" type="button"><?php _e( 'Export Contacts' ); ?></button>
                                 </div>
                             </div>
                             <!-- End Export Tool -->
