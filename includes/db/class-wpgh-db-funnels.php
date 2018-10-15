@@ -342,6 +342,8 @@ class WPGH_DB_Funnels extends WPGH_DB  {
 
         dbDelta( $sql );
 
+        $wpdb->query( "ALTER TABLE $this->table_name AUTO_INCREMENT = 2" );
+
         update_option( $this->table_name . '_db_version', $this->version );
     }
 
