@@ -185,11 +185,13 @@ class WPGH_DB_Contacts extends WPGH_DB  {
         }
 
         $column   = is_email( $_id_or_email ) ? 'email' : 'ID';
-        $contact = $this->get_contact_by( $column, $_id_or_email );
+//        $contact = $this->get_contact_by( $column, $_id_or_email );
 
-        if ( $contact->ID > 0 ) {
+        if ( $this->exists( $_id_or_email, $column ) ) {
 
             global $wpdb;
+
+            $contact = $this->get_contact_by( $column, $_id_or_email );
 
             /* delete tag relationships */
             $result = $wpdb->delete( $this->table_name, array( 'ID' => $contact->ID ), array( '%d' ) );

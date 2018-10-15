@@ -74,6 +74,11 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $email_meta;
 
         /**
+         * @var WPGH_Importer
+         */
+        public $importer;
+
+        /**
          * GH Contact DB
          *
          * @var object|WPGH_DB_Contacts
@@ -245,7 +250,8 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->elements     = new WPGH_Elements();
 //
                 if ( is_admin() ){
-                    self::$instance->menu     = new WPGH_Admin_Menu();
+                    self::$instance->menu       = new WPGH_Admin_Menu();
+                    self::$instance->importer   = new WPGH_Importer();
                 }
 
             }
@@ -339,6 +345,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             /* Admin Files */
             if ( is_admin() ){
                 include_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-menu.php';
+                require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-importer.php';
                 include_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
                 include_once WPGH_PLUGIN_DIR . 'includes/email-blocks.php';
             }

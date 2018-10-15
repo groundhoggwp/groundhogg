@@ -16,11 +16,17 @@ class WPGH_Settings_Page
         //todo find new file to put this line.
         add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'check_for_updates' ) );
 
-        if ( isset( $_GET['page'] ) && $_GET['page'] === 'groundhogg' )
-        {
+        if ( isset( $_GET['page'] ) && $_GET['page'] === 'groundhogg' ) {
+
             add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );
             add_action( 'admin_init', array( $this, 'perform_tools' ) );
+
         }
+    }
+
+    public function active_tab()
+    {
+        return isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'general';
     }
 
     public function perform_tools()
@@ -40,10 +46,9 @@ class WPGH_Settings_Page
             <?php if ( isset( $_GET[ 'token' ] ) ) :
                 ?><div class="notice notice-success is-dismissible"><p><strong><?php _e( 'Connected to Groundhogg!', 'groundhogg' ); ?></strong></p></div><?php
             endif; ?>
-            <?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'general'; ?>
             <?php
 
-            switch ( $active_tab ){
+            switch ( $this->active_tab() ){
                 case 'extensions':
                 case 'tools':
                     $action = '';
@@ -67,10 +72,10 @@ class WPGH_Settings_Page
 			<form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
                 <h2 class="nav-tab-wrapper">
                     <?php foreach ( $tabs as $tab_id => $tab_name ): ?>
-                        <a href="?page=groundhogg&tab=<?php echo $tab_id; ?>" class="nav-tab <?php echo $active_tab == $tab_id ? 'nav-tab-active' : ''; ?>"><?php _e( $tab_name, 'groundhogg'); ?></a>
+                        <a href="?page=groundhogg&tab=<?php echo $tab_id; ?>" class="nav-tab <?php echo $this->active_tab() == $tab_id ? 'nav-tab-active' : ''; ?>"><?php _e( $tab_name, 'groundhogg'); ?></a>
                     <?php endforeach; ?>
                 </h2>
-                <?php switch ( $active_tab ):
+                <?php switch ( $this->active_tab() ):
                     case 'general':
                         settings_fields( 'groundhogg_business_settings' );
                         do_settings_sections( 'groundhogg_business_settings' );
@@ -107,8 +112,9 @@ class WPGH_Settings_Page
                                     $tag_args[ 'id' ] = 'import_tags';
                                     $tag_args[ 'name' ] = 'import_tags[]'; ?>
                                     <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
+                                    <div><span class="import-status"></span></div>
                                     <p class="description"><?php _e( 'These tags will be applied to the contacts upon importing.', 'groundhogg' ); ?></p>
-                                    <?php submit_button( 'Import', 'primary', 'import_contacts', false ); ?>
+                                    <button class="import button button-primary" id="import" type="button"><?php _e( 'Import Contacts' ); ?></button>
                                 </div>
                             </div>
                             <!-- End Import Tool -->
@@ -143,7 +149,7 @@ class WPGH_Settings_Page
 
                     default:
 
-                        do_action( 'grounhogg_' . $active_tab . '_settings'  );
+                        do_action( 'grounhogg_' . $this->active_tab() . '_settings'  );
                         submit_button();
 
                         break;

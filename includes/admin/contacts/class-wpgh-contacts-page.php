@@ -250,7 +250,7 @@ class WPGH_Contacts_Page
         }
 
         if ( isset( $_POST['owner'] ) ){
-            $args[ 'owner_id' ] = intval( $_POST['first_name'] );
+            $args[ 'owner_id' ] = intval( $_POST['owner'] );
         }
 
         $id = WPGH()->contacts->add( $args );
@@ -258,15 +258,11 @@ class WPGH_Contacts_Page
         $contact = new WPGH_Contact( $id );
 
         if ( isset( $_POST[ 'primary_phone' ] ) ){
-
             $contact->update_meta( 'primary_phone', sanitize_text_field( $_POST[ 'primary_phone' ] ) );
-
         }
 
         if ( isset( $_POST[ 'primary_phone_extension' ] ) ){
-
-            $contact->update_meta( 'primary_phone', sanitize_text_field( $_POST[ 'primary_phone_extension' ] ) );
-
+            $contact->update_meta( 'primary_phone_extension', sanitize_text_field( $_POST[ 'primary_phone_extension' ] ) );
         }
 
         if ( isset( $_POST[ 'notes' ] ) ){
@@ -498,7 +494,7 @@ class WPGH_Contacts_Page
         if ( ! isset( $_REQUEST['_wpnonce'] ) && ! isset( $_REQUEST[ '_edit_contact_nonce' ] ) )
             return false;
 
-        return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_edit_contact_nonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-contacts' );
+        return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-contacts' ) || wp_verify_nonce( $_REQUEST[ '_edit_contact_nonce' ], $this->get_action() ) ;
     }
 
     /**
