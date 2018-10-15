@@ -348,7 +348,7 @@ class WPGH_Step
 
         while ( $step_order > 0 ){
 
-            $steps =  WPGH()->steps->get_steps( array( 'funnel_id' => $this->funnel_id, 'order' => $step_order ) );
+            $steps =  WPGH()->steps->get_steps( array( 'funnel_id' => $this->funnel_id, 'step_order' => $step_order ) );
 
             $step = array_shift( $steps );
 

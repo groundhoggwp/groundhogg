@@ -255,17 +255,12 @@ class WPGH_Replacements
         } else if ( strpos( $code, '.' ) > 0 ) {
 
             $parts = explode( '.', $code );
-
             $code = $parts[0];
 
             if ( ! isset( $parts[1] ) ) {
-
                 $arg = false;
-
             } else {
-
                 $arg = $parts[1];
-
             }
 
             $text = call_user_func( $this->replacements[ $code ]['callback'], $arg, $this->contact_id, $code );

@@ -142,7 +142,7 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
         if ( ! $contact )
             die;
 
-        $steps = WPGH()->steps->get_steps( array( 'type' => $this->type, 'group' => $this->group ) );
+        $steps = WPGH()->steps->get_steps( array( 'step_type' => $this->type, 'step_group' => $this->group ) );
 
         if ( empty( $steps ) )
             die;
