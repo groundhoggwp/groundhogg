@@ -83,7 +83,7 @@ class WPGH_Tracking
         } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/open/' ) !== false  ) {
 
             add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
-            add_action( 'template_redirect', array( $this, 'email_opened' ) );
+            add_action( 'init', array( $this, 'email_opened' ) );
             $this->doing_open = true;
 
         } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-confirmation/via/email/' ) !== false ) {
@@ -136,7 +136,11 @@ class WPGH_Tracking
 
             if ( is_object( $event ) ){
                 $this->event = new WPGH_Event( $event->ID );
-                $this->funnel = WPGH()->funnels->get( $event->funnel_id );
+
+                if ( ! $this->event->funnel_id !== WPGH_BROADCAST ){
+                    $this->funnel = WPGH()->funnels->get( $event->funnel_id );
+                }
+
                 $this->step   = new WPGH_Step( $event->step_id );
                 $this->email  = new WPGH_Email( $this->step->get_meta( 'email_id' ) );
             }
@@ -369,10 +373,10 @@ class WPGH_Tracking
         $args = array(
             //'timestamp'     => time(),
             'contact_id'    => $this->contact->ID,
-            'funnel_id'     => $this->funnel->ID,
+            'funnel_id'     => ( $this->funnel )? $this->funnel->ID : WPGH_BROADCAST,
             'step_id'       => $this->step->ID,
             'activity_type' => 'email_opened',
-            'object_id'     => $this->email->ID,
+            'event_id'      => $this->event->ID,
             'referer'       => ''
         );
 
@@ -417,10 +421,10 @@ class WPGH_Tracking
         $args = array(
             'timestamp'     => time(),
             'contact_id'    => $this->contact->ID,
-            'funnel_id'     => $this->funnel->ID,
+            'funnel_id'     => ( $this->funnel )? $this->funnel->ID : WPGH_BROADCAST,
             'step_id'       => $this->step->ID,
             'activity_type' => 'email_link_click',
-            'object_id'     => $this->email->ID,
+            'event_id'      => $this->event->ID,
             'referer'       => $this->ref
         );
 
