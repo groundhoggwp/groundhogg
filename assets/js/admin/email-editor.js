@@ -51,33 +51,10 @@ jQuery(function($) {
         }
     });
 
-    var $sticky = $('.editor-actions-inner');
-    $sticky.css( 'height', 'auto' );
-    $sticky.css( 'width', $sticky.parent().width() );
-    // var $stickyrStopper = $('#sidebar-stop');
-    if (!!$sticky.offset()) { // make sure ".sticky" element exists
-
-        var generalSidebarHeight = $sticky.innerHeight();
-        var stickyTop = $sticky.offset().top;
-        var stickOffset = 32;
-        // var stickyStopperPosition = $stickyrStopper.offset().top;
-        // var stopPoint = stickyStopperPosition - generalSidebarHeight - stickOffset;
-        // var diff = stopPoint + stickOffset;
-
-        $(window).scroll(function(){ // scroll event
-            var windowTop = $(window).scrollTop(); // returns number
-
-            // if (stopPoint < windowTop) {
-            //     $sticky.css({ position: 'absolute', top: diff });
-            // } else if (stickyTop < windowTop+stickOffset) {
-            if (stickyTop < windowTop+stickOffset) {
-                $sticky.css({ position: 'fixed', top: stickOffset });
-            } else {
-                $sticky.css({position: 'absolute', top: 'initial'});
-            }
-        });
-
-    }
+    $('.editor-actions-inner').stickySidebar({
+        topSpacing: 32,
+        bottomSpacing: 0
+    });
 
     $( '.row' ).wpghToolBar();
 

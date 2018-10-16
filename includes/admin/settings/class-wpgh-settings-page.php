@@ -190,6 +190,7 @@ class WPGH_Settings_Page
 	public function wpgh_setup_sections()
     {
         add_settings_section( 'business_info', 'Edit Business Settings', array(), 'groundhogg_business_settings');
+        add_settings_section( 'misc', 'Misc Settings', array(), 'groundhogg_business_settings');
         add_settings_section( 'contact_endpoints', __ ( 'Contact Endpoints' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
         add_settings_section( 'form_settings', __ ( 'Form Settings' , 'grounhogg' ), array(), 'groundhogg_marketing_settings');
         add_settings_section( 'compliance', __( 'Compliance Settings', 'groundhogg' ), array(), 'groundhogg_marketing_settings');
@@ -422,6 +423,17 @@ class WPGH_Settings_Page
                 'desc' => 'This password to access the inbox.',
                 'section' => 'email_bounces',
                 'page' => 'groundhogg_email_settings',
+            ),
+            array(
+                'label' => 'Delete Groundhogg Data',
+                'id' => 'gh_uninstall_on_delete',
+                'type' => 'checkbox',
+                'desc' => 'Delete all information when uninstalling. This cannot be undone.',
+                'section' => 'misc',
+                'page' => 'groundhogg_business_settings',
+                'options' => array(
+                    'on' => 'Enable',
+                ),
             ),
 
 		);
