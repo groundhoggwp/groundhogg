@@ -80,6 +80,12 @@ jQuery(function($) {
     }
 
     $( '.row' ).wpghToolBar();
+
+    /* init sidebar */
+    $('.sidebar').stickySidebar({
+        topSpacing: 40,
+        bottomSpacing: 40
+    });
 });
 
 var WPGHEmailEditor = {};

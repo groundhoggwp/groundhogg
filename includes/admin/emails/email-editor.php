@@ -33,6 +33,9 @@ wp_enqueue_script('media-picker', WPGH_ASSETS_FOLDER . 'js/admin/media-picker.js
 
 wp_enqueue_script('simple-editor', WPGH_ASSETS_FOLDER . 'js/admin/simple-editor.js' );
 wp_enqueue_style('simple-editor', WPGH_ASSETS_FOLDER . 'css/admin/simple-editor.css' );
+
+wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/sticky-sidebar.js' );
+wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
 //for select 2
 wp_enqueue_style( 'select2' );
 wp_enqueue_script( 'select2' );
@@ -65,8 +68,9 @@ $email = new WPGH_Email( $email_id );
     <?php do_action('wpgh_edit_email_form_before'); ?>
 
     <!-- Main -->
-    <div id='poststuff' class="wpgh-funnel-builder">
-        <div id="post-body" class="metabox-holder columns-2">
+    <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
+        <div id="post-body" class="metabox-holder columns-2" style="clear: both">
+
             <div id="post-body-content">
 
                 <!-- Title Content -->
@@ -350,9 +354,8 @@ $email = new WPGH_Email( $email_id );
                 </div>
 
             </div>
-
             <!-- begin elements area -->
-            <div id="postbox-container-1" class="postbox-container sticky">
+            <div id="postbox-container-1" class="postbox-container sidebar">
                 <div id="submitdiv" class="postbox">
                     <h3 class="hndle"><?php echo __( 'Email Actions', 'groundhogg' );?></h3>
                     <div class="inside">
@@ -450,9 +453,11 @@ $email = new WPGH_Email( $email_id );
                         <div class="code_block_template"><?php wpgh_get_email_block( 'code_block' ); ?></div>
                     </div>
                     <div id="temp-html" class="hidden"></div>
-                </div
+                </div>
             </div>
+            <!-- HI -->
             <!-- End elements area-->
+            <div style="clear: both;"></div>
 
         </div>
     </div>
