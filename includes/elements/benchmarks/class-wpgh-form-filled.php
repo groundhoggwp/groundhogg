@@ -108,8 +108,11 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
     public function complete( $step_id, $contact, $submission )
     {
 
-
 	    $step = new WPGH_Step( $step_id );
+
+	    /* Double check that the wpgh_form_submit action isn't being fired by another benchmark */
+	    if ( $step->type !== $this->type )
+	        return false;
 
 	    $success = false;
 
