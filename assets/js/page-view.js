@@ -1,5 +1,5 @@
 var GH = {
-    leadSource: 'gh_leadsource',
+    leadSource: 'gh_referer',
     setCookie: function(cname, cvalue, exdays){
         var d = new Date();
         d.setTime(d.getTime() + (exdays*24*60*60*1000));

@@ -78,15 +78,11 @@ class WPGH_Submission
 
             unset( $this->step_id );
 
-        } else {
-
-            $this->leave( 'No ID given.' );
-
+            if ( ! $this->step->is_active() ){
+                $this->leave( 'This form is not accepting submissions.' );
+            }
         }
 
-        if ( ! $this->step->is_active() ){
-        	$this->leave( 'This form is not accepting submissions.' );
-        }
 
         /* set the expected fields for the submission */
         $this->fields = get_post_meta(
@@ -463,7 +459,9 @@ class WPGH_Submission
 
         }
 
-        do_action( 'wpgh_form_submit', $this->id, $c, $this );
+        if ( $this->id ){
+            do_action( 'wpgh_form_submit', $this->id, $c, $this );
+        }
 
         /* redirect to ensure cookie is set and can be used on the following page*/
         wp_redirect( $_SERVER['REQUEST_URI'] );
