@@ -353,7 +353,7 @@ class WPGH_Tracking
     /**
      * Return the object related to the current event in progress
      *
-     * @return object
+     * @return object|WPGH_Event
      */
     public function get_event()
     {

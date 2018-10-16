@@ -152,6 +152,8 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
             <span class="ctr"><?php _e( 'CTR: '); ?><strong><?php echo round( ( $num_clicks / ( ( $num_opens > 0 )? $num_opens : 1 ) * 100 ), 2 ); ?></strong>%</span>
         </p>
         <?php
+
+        do_action( 'wpgh_email_reporting_after', $step );
     }
 
     /**

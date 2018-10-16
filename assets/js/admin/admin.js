@@ -1,7 +1,7 @@
 const wpgh = {
 
     buildSelect2: function(){
-      jQuery('.gh-select2' ).select2();
+      jQuery('.gh-select2' ).css( 'width', '100%' ).select2();
     },
 
     buildTagPicker: function() {
