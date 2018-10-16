@@ -325,11 +325,27 @@ $email = new WPGH_Email( $email_id );
                     <h2 class="hndle"><?php _e( 'Replacements', 'groudhogg' ); ?></h2>
                     <div class="inside">
 
-                        <?php foreach ( WPGH()->replacements->get_replacements() as $replacement ): ?>
-                        <div>
-                            <input style="border: none;outline: none;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}"> <span><?php echo $replacement[ 'description' ]; ?></span>
-                        </div>
-                        <?php endforeach; ?>
+                        <table class="wp-list-table widefat fixed striped">
+                            <thead>
+                            <tr>
+                                <th><?php _e( 'Code' ); ?></th>
+                                <th><?php _e( 'Description' ); ?></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <?php foreach ( WPGH()->replacements->get_replacements() as $replacement ): ?>
+                                <tr>
+                                    <td>
+                                        <input style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}">
+                                    </td>
+                                    <td>
+                                        <span><?php echo $replacement[ 'description' ]; ?></span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
