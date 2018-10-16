@@ -395,7 +395,7 @@ class WPGH_Contact
 
         if ( ! is_array( $tag_id_or_array ) ){
 
-            $tags = array( intval( $tag_id_or_array ) );
+            $tags = array( $tag_id_or_array );
 
         } else if( is_array( $tag_id_or_array ) ){
 
