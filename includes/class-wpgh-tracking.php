@@ -395,8 +395,7 @@ class WPGH_Tracking
         /* only fire if actually doing an open as this may be called by the email_link_clicked method */
         if ( $this->doing_open ){
             /* thanks for coming! */
-            header("content-type:image/gif");
-
+            wp_redirect( WPGH_ASSETS_FOLDER . 'images/email-open.png' );
             die();
         }
     }
