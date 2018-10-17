@@ -176,6 +176,21 @@ class WPGH_Funnels_Page
 
                 break;
 
+            case 'duplicate':
+
+                foreach ( $this->get_funnels() as $id ){
+                    $json = wpgh_convert_funnel_to_json( $id );
+                    $newId = $this->import_funnel( $json );
+                }
+
+                $this->notices->add(
+                    esc_attr( 'duplicated' ),
+                    __( 'Funnel Duplicated', 'groundhogg' ),
+                    'success'
+                );
+
+                break;
+
             case 'archive':
 
 				foreach ( $this->get_funnels() as $id ) {
@@ -335,11 +350,15 @@ class WPGH_Funnels_Page
     /**
      * Deconstructs the given array and builds a full funnel.
      *
-     * @param $import array
+     * @param $import array|string
      * @return bool|int whether the import was successful or the ID
      */
     private function import_funnel( $import = array() )
     {
+        if ( is_string( $import ) ){
+            $import = json_decode( $import, true );
+        }
+
         if ( ! is_array( $import ) )
             return false;
 

@@ -288,7 +288,7 @@ class WPGH_Replacements
  * @param $arg string the meta key
  * @return mixed|string
  */
-function wpgh_replacement_meta( $contact_id, $arg='' )
+function wpgh_replacement_meta( $arg, $contact_id )
 {
     if ( empty( $arg ) )
         return '';

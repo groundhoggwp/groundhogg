@@ -105,9 +105,9 @@ function wpgh_convert_funnel_to_json( $funnel_id )
     if ( ! $steps )
         return false;
 
-    foreach ( $steps as $i => $step_id )
+    foreach ( $steps as $i => $step )
     {
-        $step = new WPGH_Step( $step_id );
+        $step = new WPGH_Step( $step->ID );
 
         $export['steps'][$i] = array();
         $export['steps'][$i]['title'] = $step->title;

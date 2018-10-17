@@ -74,6 +74,17 @@ class WPGH_Emails_Table extends WP_List_Table {
 		return apply_filters( 'wpgh_email_sortable_columns', $sortable_columns );
 	}
 
+	public function extra_tablenav($which)
+    {
+        if ( $this->get_view() !== 'trash' )
+            return;
+        ?>
+        <div class="alignleft">
+            <a class="button" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
+        </div>
+        <?php
+    }
+
     /**
      * Get the views for the emails, all, ready, unready, trash
      *

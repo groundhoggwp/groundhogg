@@ -437,6 +437,9 @@ class WPGH_Settings_Page
             ),
 
 		);
+
+		$fields = apply_filters( 'wpgh_plugin_settings', $fields );
+
 		foreach( $fields as $field ){
 			add_settings_field( $field['id'], $field['label'], array( $this, 'wpgh_field_callback' ), $field['page'] , $field['section'], $field );
 			register_setting( $field['page'], $field['id'] );

@@ -176,6 +176,25 @@ class WPGH_Emails_Page
 
                 break;
 
+            case 'empty_trash':
+
+                $emails = WPGH()->emails->get_emails( array( 'status' => 'trash' ) );
+
+                foreach ( $emails as $email ){
+                    WPGH()->emails->delete( $email->ID );
+                }
+
+                $this->notices->add(
+                    esc_attr( 'deleted' ),
+                    sprintf( "%s %d %s",
+                        __( 'Deleted' ),
+                        count( $emails ),
+                        __( 'Emails', 'groundhogg' ) ),
+                    'success'
+                );
+
+                break;
+
             case 'restore':
 
                 foreach ( $this->get_emails() as $id )
@@ -204,7 +223,11 @@ class WPGH_Emails_Page
         if ( $this->get_action() === 'edit' || $this->get_action() === 'add' )
             return;
 
-        $base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_emails() ) ), $base_url );
+        $this->get_emails();
+
+        if ( $this->get_emails() ){
+            $base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_emails() ) ), $base_url );
+        }
 
         wp_redirect( $base_url );
         die();

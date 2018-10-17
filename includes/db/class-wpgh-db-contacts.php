@@ -127,13 +127,17 @@ class WPGH_DB_Contacts extends WPGH_DB  {
             $contact = $this->get_contact_by( 'email', $args[ 'email' ] );
             $this->update( $contact->ID, $data );
 
-            return $contact->ID;
+            $result = $contact->ID;
 
         } else {
 
-            return $this->insert( $args, 'contact' );
+            $result = $this->insert( $args, 'contact' );
+
+            do_action( 'wpgh_contact_created', $result );
 
         }
+
+        return $result;
 
     }
 
