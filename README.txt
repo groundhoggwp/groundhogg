@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.3 =
+* Moved is recaptcha enabled check to functions.php
+* fixed returning string instead of array when doing recaptcha check.
+* get_tags() will now return an empty array instead of false.
+
 = 0.9.2 =
 * Add option to remove ALL data from WP when uninstalling Groundhogg
 * Fixed gh_referer not being set when leadsource tracking

@@ -292,11 +292,6 @@ class WPGH_DB_Tags extends WPGH_DB
 
         $results = $wpdb->get_results("SELECT * FROM $this->table_name ORDER BY $this->primary_key DESC" );
 
-        if ( empty( $results ) )
-        {
-            return false;
-        }
-
         return $results;
 
     }

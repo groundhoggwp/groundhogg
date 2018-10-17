@@ -466,3 +466,13 @@ function wpgh_format_tags_for_select2( $tags=array() )
     return $json;
 
 }
+
+/**
+ * Check if Recaptcha is enabled throughout the plugin.
+ *
+ * @return bool, whether it's enable or not.
+ */
+function wpgh_is_recaptcha_enabled(){
+    $recaptcha = get_option( 'gh_enable_recaptcha', array() );
+    return is_array( $recaptcha ) && in_array( 'on', $recaptcha );
+}

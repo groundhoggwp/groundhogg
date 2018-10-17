@@ -764,23 +764,3 @@ jQuery( function($){
     }
 
 }
-
-/**
- * Check if Recaptcha is enabled throughout the plugin.
- *
- * @return bool, whether it's enable or not.
- */
-function wpgh_is_recaptcha_enabled()
-{
-    return in_array( 'on', get_option( 'gh_enable_recaptcha', array() ) );
-}
-
-/**
- * Process changes to the subscription status of a contact.
- */
-function wpgh_process_email_preferences_changes()
-{
-
-}
-
-add_action( 'init', 'wpgh_process_email_preferences_changes' );
