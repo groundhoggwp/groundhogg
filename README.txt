@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.2 =
+* Add option to remove ALL data from WP when uninstalling Groundhogg
+* Fixed gh_referer not being set when leadsource tracking
+
 = 0.9.1 =
 * Pre-release with some bug fixes
 
