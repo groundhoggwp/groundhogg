@@ -106,6 +106,10 @@ We follow all best WordPress security practices. Plus it's open source, so we ha
 Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & privacy legislation.
 
 == Changelog ==
+
+= 0.9.5 =
+* introduction of complex roles and caps
+
 = 0.9.4 =
 * fixed {meta} not provided meta data
 * fixed exporting funnel throwing errors
