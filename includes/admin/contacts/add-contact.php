@@ -89,7 +89,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
             <td>
-                <div style="max-width: 500px;">
+                <div style="max-width: 400px;">
                     <?php $args = array(); echo WPGH()->html->tag_picker( $args ); ?>
                 </div>
 

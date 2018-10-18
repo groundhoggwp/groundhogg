@@ -173,7 +173,9 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
         </tr>
         <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
-            <td><?php
+            <td>
+                <div style="max-width: 400px;">
+                    <?php
 
                 //print_r( $contact->tags );
 
@@ -183,6 +185,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
                     'selected'  => $contact->tags,
                 ); echo WPGH()->html->tag_picker( $args ); ?>
                 <p class="description"><?php _e( 'Add new tags by hitting [Enter] or by typing a [,].', 'groundhogg' ); ?></p>
+                </div>
             </td>
         </tr>
         <?php do_action( 'wpgh_contact_edit_tags', $id ); ?>
