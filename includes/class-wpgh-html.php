@@ -277,10 +277,11 @@ class WPGH_HTML
         }
 
         $html = sprintf(
-            "<select name='%s' id='%s' class='%s' %s %s %s>%s</select>",
+            "<select name='%s' id='%s' class='%s' data-placeholder='%s' %s %s %s>%s</select>",
             esc_attr( $a[ 'name' ] ),
             esc_attr( $a[ 'id' ] ),
             esc_attr( $a[ 'class' ] ),
+            esc_attr( $a[ 'placeholder' ] ),
             $a[ 'attributes' ],
             $tags,
             $multiple,
