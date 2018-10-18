@@ -436,6 +436,14 @@ class WPGH_Contacts_Page
             }
         }
 
+        if ( isset( $_POST[ 'send_email' ] ) && isset( $_POST[ 'email_id' ] ) && current_user_can( 'send_emails' ) ){
+
+            $mail = new WPGH_Email( intval( $_POST[ 'email_id' ] ) );
+            if ( $mail->send( $contact ) ){
+                $this->notices->add( 'sent', __( "Email Sent!", 'groundhogg' ), 'info' );
+            }
+        }
+
         $this->notices->add( 'update', __( "Contact updated!", 'groundhogg' ), 'success' );
 
         do_action( 'wpgh_admin_update_contact_after', $id );

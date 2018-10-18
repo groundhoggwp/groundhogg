@@ -210,6 +210,21 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
         </tbody>
     </table>
 
+    <!-- ACTIONS -->
+    <h2><?php _e( 'Actions' ); ?></h2>
+    <table class="form-table" >
+        <tr>
+            <th><?php _e( 'Send Email' ); ?></th>
+            <td><div style="max-width: 400px">
+                    <?php echo WPGH()->html->dropdown_emails( array() );?>
+                    <div class="row-actions">
+                        <button type="submit" name="send_email" value="send" class="button"><?php _e( 'Send' ); ?></button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
     <!-- META -->
     <h2><?php _e( 'Custom Meta' ); ?></h2>
     <table class="form-table" >

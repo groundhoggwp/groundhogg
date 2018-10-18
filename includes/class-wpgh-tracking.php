@@ -367,7 +367,13 @@ class WPGH_Tracking
     {
 
         if ( ! $this->event ){
-            return;
+            if ( $this->doing_open ){
+                /* thanks for coming! */
+                wp_redirect( WPGH_ASSETS_FOLDER . 'images/email-open.png' );
+                die();
+            } else {
+                return;
+            }
         }
 
         $args = array(

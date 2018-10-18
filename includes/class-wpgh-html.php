@@ -399,7 +399,7 @@ class WPGH_HTML
             wp_die( 'No access to emails.' );
 
         if ( isset(  $_REQUEST[ 'q' ] ) ){
-            $_REQUEST[ 'search' ] = $_REQUEST[ 'q' ];
+            $query_args[ 'search' ] = $_REQUEST[ 'q' ];
         }
 
         $query_args[ 'status' ] = 'ready';

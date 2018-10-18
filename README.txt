@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.7 =
+* Added send email function to contact record.
+* Fixed Email Search Bug when searching in select2 email picker.
+
 = 0.9.6 =
 * Fixed bug when deleting contacts with no tags caused a warning.
 * Added emails send plaintext version as well as HTML for better spam score.
