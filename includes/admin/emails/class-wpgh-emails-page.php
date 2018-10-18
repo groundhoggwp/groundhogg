@@ -107,7 +107,7 @@ class WPGH_Emails_Page
      */
     function process_action()
     {
-        if ( ! $this->get_action() || ! $this->verify_action() || ! current_user_can( 'gh_manage_emails' ) )
+        if ( ! $this->get_action() || ! $this->verify_action() )
             return;
 
         $base_url = remove_query_arg( array( '_wpnonce', 'action' ), wp_get_referer() );
