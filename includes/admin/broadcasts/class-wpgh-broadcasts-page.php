@@ -25,6 +25,9 @@ class WPGH_Broadcasts_Page
 
     function __construct()
     {
+
+        add_action( 'admin_menu', array( $this, 'register' ) );
+
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_broadcasts' ){
 
             add_action( 'init' , array( $this, 'process_action' )  );
@@ -32,6 +35,27 @@ class WPGH_Broadcasts_Page
             $this->notices = WPGH()->notices;
 
         }
+    }
+
+    public function register()
+    {
+        $page = add_submenu_page(
+            'groundhogg',
+            'Broadcasts',
+            'Broadcasts',
+            'view_broadcasts',
+            'gh_broadcasts',
+            array($this, 'page')
+        );
+
+        add_action("load-" . $page, array($this, 'help'));
+
+
+    }
+
+    public function help()
+    {
+        //todo
     }
 
     /**

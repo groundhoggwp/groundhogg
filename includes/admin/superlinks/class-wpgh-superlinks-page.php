@@ -25,6 +25,9 @@ class WPGH_Superlinks_Page
 
 	function __construct()
 	{
+
+	    add_action( 'admin_menu', array( $this, 'register' ) );
+
 		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_superlinks' ){
 
 			add_action( 'init' , array( $this, 'process_action' )  );
@@ -32,6 +35,35 @@ class WPGH_Superlinks_Page
 			$this->notices = WPGH()->notices;
 		}
 	}
+
+	/* Register the page */
+	public function register()
+    {
+        $page = add_submenu_page(
+            'groundhogg',
+            'Superlinks',
+            'Superlinks',
+            'edit_superlinks',
+            'gh_superlinks',
+            array($this, 'page')
+        );
+
+        add_action("load-" . $page, array($this, 'help'));
+    }
+
+    /* Register the help bar */
+    public function help()
+    {
+        $screen = get_current_screen();
+
+        $screen->add_help_tab(
+            array(
+                'id' => 'gh_overview',
+                'title' => __('Overview'),
+                'content' => '<p>' . __( "Superlinks are special superlinks that allow you to apply/remove tags whenever clicked and then take the contact to a page of your choice. To use them, just copy the replacement code and paste in in email, button, or link.", 'groundhogg' ) . '</p>'
+            )
+        );
+    }
 
 	function get_superlinks()
 	{

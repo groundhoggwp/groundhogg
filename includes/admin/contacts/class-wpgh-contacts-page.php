@@ -26,6 +26,8 @@ class WPGH_Contacts_Page
 
     public function __construct()
     {
+        add_action( 'admin_menu', array( $this, 'register' ) );
+
         add_action('wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
 
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_contacts' ){
@@ -36,6 +38,52 @@ class WPGH_Contacts_Page
 
         }
     }
+
+    /* Register the page */
+    public function register()
+    {
+        $page = add_submenu_page(
+            'groundhogg',
+            'Contacts',
+            'Contacts',
+            'view_contacts',
+            'gh_contacts',
+            array($this, 'page')
+        );
+
+        add_action("load-" . $page, array($this, 'help'));
+    }
+
+    /* help bar */
+    public function help()
+    {
+        $screen = get_current_screen();
+
+        $screen->add_help_tab(
+            array(
+                'id' => 'gh_overview',
+                'title' => __('Overview'),
+                'content' => '<p>' . __( "This is where you can manage and view your contacts. Click the quick edit to quickly change contact details.", 'groundhogg' ) . '</p>'
+            )
+        );
+
+        $screen->add_help_tab(
+            array(
+                'id' => 'gh_edit',
+                'title' => __('Editing'),
+                'content' => '<p>' . __( "While editing a contact you can modify any of their personal information. There are several points of interest...", 'groundhogg' ) . '</p>'
+                    . '<ul> '
+                    . '<li>' . __( 'Manually unsubscribe a contact by checking the "mark as unsubscribed" button.', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'Make sure your in compliance by ensuring the terms of agreement and GDPR consent are both checked under the compliance section.', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'View the origin of the contact by looking at the lead source field.', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'Add or remove custom information about the contact by enabling the "Edit Meta" section. Each meta also includes a replacement code to include it in an email.', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'Re-run or cancel events for this contact by viewing the "Upcoming Events" or "Recent History" Section', 'groundhogg' ) . '</li>'
+                    . '<li>' . __( 'Monitor their engagement by looking in the "Recent Email History" section.', 'groundhogg' ) . '</li>'
+                    . '</ul>'
+            )
+        );
+    }
+
 
     /**
      * Get the affected contacts

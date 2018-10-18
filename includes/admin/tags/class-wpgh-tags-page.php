@@ -25,6 +25,8 @@ class WPGH_Tags_Page
 
 	function __construct()
 	{
+	    add_action( 'admin_menu', array( $this, 'register' ) );
+
 		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_tags' ){
 
 			add_action( 'init' , array( $this, 'process_action' )  );
@@ -33,6 +35,28 @@ class WPGH_Tags_Page
 
 		}
 	}
+
+	/* Register the page */
+	function register()
+    {
+        $page = add_submenu_page(
+            'groundhogg',
+            'Tags',
+            'Tags',
+            'edit_tags',
+            'gh_tags',
+            array($this, 'page')
+        );
+
+        add_action("load-" . $page, array($this, 'help'));
+
+    }
+
+    /* Help */
+    function help()
+    {
+        //todo
+    }
 
 	function get_tags()
 	{

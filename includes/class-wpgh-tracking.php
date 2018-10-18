@@ -98,6 +98,7 @@ class WPGH_Tracking
         } else {
 
             add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
+            add_action( 'plugins_loaded', array( $this, 'extract_from_login' ) );
 
             if ( isset( $_COOKIE[ 'gh_referer' ] ) ) {
                 $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referer' ] );
@@ -238,6 +239,33 @@ class WPGH_Tracking
         if ( isset( $cookie->funnel ) ){
             $this->funnel   = WPGH()->funnels->get( $cookie->funnel );
         }
+
+        return true;
+    }
+
+    /**
+     * Setup the tracking cookie based on login info from a logged in user
+     */
+    public function extract_from_login()
+    {
+        /* exit out if we have a contact or the user is not logged in */
+        if ( ! is_user_logged_in() || $this->contact instanceof WPGH_Contact ){
+            return;
+        }
+
+        /* we have a user, get the associated contact record if it exists */
+
+        $user = wp_get_current_user();
+
+        $contact = new WPGH_Contact( $user->user_email );
+
+        if ( ! $contact->exists() ){
+            return;
+        }
+
+        $this->contact = $contact;
+
+        $this->build_cookie();
 
         return true;
     }

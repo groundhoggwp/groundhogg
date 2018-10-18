@@ -26,6 +26,9 @@ class WPGH_Events_Page
 
     function __construct()
     {
+
+        add_action( 'admin_menu', array( $this , 'register' ) );
+
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_events' ){
 
             add_action( 'init' , array( $this, 'process_action' )  );
@@ -33,6 +36,27 @@ class WPGH_Events_Page
             $this->notices = WPGH()->notices;
 
         }
+    }
+
+
+    public function register()
+    {
+        $page = add_submenu_page(
+            'groundhogg',
+            'Events',
+            'Events',
+            'view_events',
+            'gh_events',
+            array($this, 'page')
+        );
+
+        add_action("load-" . $page, array($this, 'help'));
+
+    }
+
+    public function help()
+    {
+        //todo
     }
 
     function get_events()

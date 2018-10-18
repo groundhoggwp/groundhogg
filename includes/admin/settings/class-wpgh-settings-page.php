@@ -6,7 +6,9 @@ class WPGH_Settings_Page
 
 	public function __construct()
     {
-		//add_action( 'admin_menu', array( $this, 'wpgh_create_settings' ) );
+
+		add_action( 'admin_menu', array( $this, 'register' ) );
+
 		add_action( 'admin_init', array( $this, 'wpgh_setup_sections' ) );
 		add_action( 'admin_init', array( $this, 'wpgh_setup_fields' ) );
 
@@ -22,6 +24,28 @@ class WPGH_Settings_Page
             add_action( 'admin_init', array( $this, 'perform_tools' ) );
 
         }
+    }
+
+    /* Register the page */
+    public function register()
+    {
+        $page = add_submenu_page(
+            'groundhogg',
+            'Settings',
+            'Settings',
+            'manage_options',
+            'gh_settings',
+            array( $this, 'wpgh_settings_content' )
+        );
+
+        add_action( "load-" . $page, array( $this, 'help' ) );
+
+    }
+
+    /* Display the help bar */
+    public function help()
+    {
+        //todo
     }
 
     public function active_tab()
