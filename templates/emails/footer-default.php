@@ -63,6 +63,6 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
                 </td>
             </tr>
         </table>
-        <img style="visibility: hidden" width="0" height="0" src="<?php echo esc_url_raw( apply_filters( 'wpgh_email_open_tracking_link', '' ) ); ?>">
+        <img alt="" style="visibility: hidden" width="0" height="0" src="<?php echo esc_url_raw( apply_filters( 'wpgh_email_open_tracking_link', '' ) ); ?>">
     </body>
 </html>

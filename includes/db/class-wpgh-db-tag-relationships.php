@@ -155,6 +155,10 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 
         $tags = $this->get_tags_by_contact( $contact_id );
 
+        if ( empty( $tags ) ){
+            return false;
+        }
+
         foreach ( $tags as $tag ) {
             WPGH()->tags->decrease_contact_count( $tag );
         }

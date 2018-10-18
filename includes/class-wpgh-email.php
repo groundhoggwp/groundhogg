@@ -114,6 +114,11 @@ class WPGH_Email
     public $template = 'default';
 
     /**
+     * @var string
+     */
+    protected $previous_altbody;
+
+    /**
      * WPGH_Email constructor.
      * @param $id
      */
@@ -574,6 +579,7 @@ class WPGH_Email
         $headers['reply_to']        = 'Reply-To: ' . $this->get_from_email();
         $headers['return_path']     = 'Return-Path: ' . get_option( 'gh_bounce_inbox', $this->get_from_email() );
         $headers['content_type']    = 'Content-Type: text/html; charset=UTF-8';
+        $headers['unsub']           = sprintf( 'List-Unsubscribe: <%s%s>', $this->get_click_tracking_link(), urlencode( $this->get_unsubscribe_link( '' ) ) );
 
         return apply_filters( 'wpgh_email_headers', $headers );
     }
@@ -634,6 +640,7 @@ class WPGH_Email
 
         /* Additional settings */
         add_action( 'phpmailer_init', array( $this, 'set_bounce_return_path' ) );
+        add_action( 'phpmailer_init', array( $this, 'set_plaintext_body' ) );
         add_filter( 'wp_mail_content_type', array( $this, 'send_in_html' ) );
 
         $sent = wp_mail(
@@ -671,8 +678,6 @@ class WPGH_Email
 
     }
 
-
-
     /**
      * Specify that we are sending an HTML email
      *
@@ -691,6 +696,76 @@ class WPGH_Email
     public function set_bounce_return_path( $phpmailer )
     {
         $phpmailer->Sender = get_option( 'gh_bounce_inbox', $phpmailer->From );
+    }
+
+    /**
+     * Set the plain text version of the email
+     *
+     * @param $phpmailer PHPMailer
+     */
+    public function set_plaintext_body( $phpmailer ) {
+
+        // don't run if sending plain text email already
+        if( $phpmailer->ContentType === 'text/plain' ) {
+            return;
+        }
+
+        // don't run if altbody is set (by other plugin)
+        if( ! empty( $phpmailer->AltBody ) && $phpmailer->AltBody !== $this->previous_altbody ) {
+            return;
+        }
+
+        // set AltBody
+        $text_message = $this->strip_html_tags( $phpmailer->Body );
+        $phpmailer->AltBody = $text_message;
+        $this->previous_altbody = $text_message;
+    }
+
+    /**
+     * Remove HTML tags, including invisible text such as style and
+     * script code, and embedded objects.  Add line breaks around
+     * block-level tags to prevent word joining after tag removal.
+     */
+	private function strip_html_tags( $text ) {
+        $text = preg_replace(
+            array(
+                // Remove invisible content
+                '@<head[^>]*?>.*?</head>@siu',
+                '@<style[^>]*?>.*?</style>@siu',
+                '@<script[^>]*?.*?</script>@siu',
+                '@<object[^>]*?.*?</object>@siu',
+                '@<embed[^>]*?.*?</embed>@siu',
+                '@<noscript[^>]*?.*?</noscript>@siu',
+                '@<noembed[^>]*?.*?</noembed>@siu',
+                '@\t+@siu',
+                '@\n+@siu'
+            ),
+            '',
+            $text );
+
+        // replace certain elements with a line-break
+        $text = preg_replace(
+            array(
+                '@</?((div)|(h[1-9])|(/tr)|(p)|(pre))@iu'
+            ),
+            "\n\$0",
+            $text );
+
+        // replace other elements with a space
+        $text = preg_replace(
+            array(
+                '@</((td)|(th))@iu'
+            ),
+            " \$0",
+            $text );
+
+        // strip all remaining HTML tags
+        $text = strip_tags( $text );
+
+        // trim text
+        $text = trim( $text );
+
+        return $text;
     }
 
     /**

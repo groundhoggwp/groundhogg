@@ -107,8 +107,15 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.6 =
+* Fixed bug when deleting contacts with no tags caused a warning.
+* Added emails send plaintext version as well as HTML for better spam score.
+* Added alt tag to tracking image
+* Added List-Unsubscribe header
+
 = 0.9.5 =
 * introduction of complex roles and caps
+* Minor UI fixes regarding select2 library
 
 = 0.9.4 =
 * fixed {meta} not provided meta data
