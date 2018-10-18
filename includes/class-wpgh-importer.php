@@ -37,7 +37,7 @@ class WPGH_Importer
 
         global $wpdb;
 
-        if ( ! current_user_can( 'gh_manage_contacts' ) )
+        if ( ! current_user_can( 'export_contacts' ) )
             wp_die( 'You cannot manage contacts.' );
 
         if ( empty( $_POST[ 'tags' ] ) ){
@@ -65,7 +65,7 @@ class WPGH_Importer
     public function import()
     {
 
-        if ( ! current_user_can( 'gh_manage_contacts' ) )
+        if ( ! current_user_can( 'import_contacts' ) )
             wp_die( 'You cannot manage contacts.' );
 
         $contacts = $_POST[ 'data' ];
