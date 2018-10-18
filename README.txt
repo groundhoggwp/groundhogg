@@ -110,6 +110,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 = 0.9.7 =
 * Added send email function to contact record.
 * Fixed Email Search Bug when searching in select2 email picker.
+* New HTML Helper "dropdown_owners"
+* Owner field now extended to include new roles "Marketer" & "Sales Manager"
+* Fixed Saving Contact owner not working when adding new contact
 
 = 0.9.6 =
 * Fixed bug when deleting contacts with no tags caused a warning.

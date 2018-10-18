@@ -77,13 +77,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         <tbody>
         <tr>
             <th><?php _e( 'Owner', 'groundhogg' ); ?></th>
-            <td><?php $args = array(
-                    'show_option_none'  => __( 'Select an owner' ),
-                    'id'                => 'owner',
-                    'name'              => 'owner',
-                    'role'              => 'administrator',
-                    'class'             => 'cowner',
-                ); wp_dropdown_users( $args ); ?>
+            <td><?php echo WPGH()->html->dropdown_owners(); ?>
             </td>
         </tr>
         <tr>

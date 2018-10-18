@@ -273,8 +273,8 @@ class WPGH_Contacts_Page
             return;
         }
 
-        if ( isset( $_POST['owner'] ) ){
-            $args[ 'owner_id' ] = intval( $_POST['owner'] );
+        if ( isset( $_POST['owner_id'] ) ){
+            $args[ 'owner_id' ] = intval( $_POST['owner_id'] );
         }
 
         $id = WPGH()->contacts->add( $args );
@@ -385,8 +385,8 @@ class WPGH_Contacts_Page
             $args[ 'last_name' ] = sanitize_text_field( $_POST['last_name'] );
         }
 
-        if ( isset( $_POST['owner'] ) ){
-            $args[ 'owner_id' ] = intval( $_POST['first_name'] );
+        if ( isset( $_POST['owner_id'] ) ){
+            $args[ 'owner_id' ] = intval( $_POST['owner_id'] );
         }
 
         $contact->update( $args );

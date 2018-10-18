@@ -388,8 +388,8 @@ $email = new WPGH_Email( $email_id );
                                     </tr>
                                     <tr>
                                         <th><?php _e( 'From User:' ); ?></th>
-                                        <?php $args = array( 'show_option_none' => __( 'The Contact\'s Owner' ), 'option_none_value' =>  0 , 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user, 'role' => 'administrator' ); ?>
-                                        <td><?php wp_dropdown_users( $args ); ?><script>jQuery(document).ready(function(){jQuery( '#from_user' ).select2()});</script></td>
+                                        <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user ); ?>
+                                        <td><?php echo WPGH()->html->dropdown_owners( $args ); ?></td>
                                     </tr>
                                     <tr>
                                         <th><label for="send_test"><?php _e( 'Send Test:' ); ?></label></th>

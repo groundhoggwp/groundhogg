@@ -188,6 +188,46 @@ class WPGH_HTML
     }
 
     /**
+     * Provide a dropdown for possible contact owners.
+     * Includes all ADMINs, MARKETERS, and SALES MANAGERs
+     *
+     * @param $args
+     * @return string
+     */
+    public function dropdown_owners( $args=array() )
+    {
+
+        $a = wp_parse_args( $args, array(
+            'name'              => 'owner_id',
+            'id'                => 'owner_id',
+            'class'             => 'gh-owners',
+            'options'           => array(),
+            'selected'          => '',
+            'multiple'          => false,
+            'option_none'       => 'Please Select an Owner',
+            'attributes'        => '',
+            'option_none_value' => 0,
+        ) );
+
+        if ( empty( $a[ 'options' ] ) ){
+
+            $owners = get_users( array( 'role__in' => array( 'administrator', 'marketer', 'sales_manager' ) ) );
+
+            /**
+             * @var $owner WP_User
+             */
+            foreach ( $owners as $owner ){
+
+                $a[ 'options' ][ $owner->ID ] = sprintf( '%s (%s)', $owner->display_name, $owner->user_email );
+
+            }
+
+        }
+
+        return $this->dropdown( $a );
+    }
+
+    /**
      * Select 2 html input
      *
      * @param $args

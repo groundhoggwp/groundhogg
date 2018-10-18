@@ -131,14 +131,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
         <tbody>
         <tr>
             <th><?php _e( 'Owner', 'groundhogg' ); ?></th>
-            <td><?php $args = array(
-                    'show_option_none'  => __( 'Select an owner' ),
-                    'id'                => 'owner',
-                    'name'              => 'owner',
-                    'role'              => 'administrator',
-                    'class'             => 'cowner',
-                    'selected'          => ( $contact->owner ) ?  $contact->owner->ID : 0
-                ); wp_dropdown_users( $args ); ?>
+            <td><?php echo WPGH()->html->dropdown_owners( array( 'selected' => $contact->owner->ID ) ); ?>
             </td>
         </tr>
         <tr>

@@ -47,15 +47,8 @@ class WPGH_Apply_Owner extends WPGH_Funnel_Step
                 <th>
                     <?php echo esc_html__( 'Note Text:', 'groundhogg' ); ?>
                 </th>
-                <?php $args = array(
-                    'show_option_none' => __( 'Select an owner' ),
-                    'id' => $step->prefix( 'owner_id' ),
-                    'name' => $step->prefix( 'owner_id' ),
-                    'role' => 'administrator',
-                    'selected' => $owner
-                ); ?>
                 <td>
-                    <?php wp_dropdown_users( $args ); ?>
+                    <?php echo WPGH()->html->dropdown_owners( array( 'selected' => $owner ) ); ?>
                 </td>
             </tr>
             </tbody>
