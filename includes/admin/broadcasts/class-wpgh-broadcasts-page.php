@@ -101,7 +101,7 @@ class WPGH_Broadcasts_Page
      */
     function process_action()
     {
-        if ( ! $this->get_action() || ! $this->verify_action() || ! current_user_can( 'gh_manage_broadcasts' ) )
+        if ( ! $this->get_action() || ! $this->verify_action() )
             return;
 
         $base_url = remove_query_arg( array( '_wpnonce', 'action' ), wp_get_referer() );
@@ -110,14 +110,21 @@ class WPGH_Broadcasts_Page
         {
             case 'add':
 
-                if ( isset( $_POST ) )
-                {
+                if ( ! current_user_can( 'schedule_broadcasts' ) ){
+                    wp_die( WPGH()->roles->error( 'schedule_broadcasts' ) );
+                }
+
+                if ( isset( $_POST ) ) {
                     $this->add_broadcast();
                 }
 
                 break;
 
             case 'cancel':
+
+                if ( ! current_user_can( 'cancel_broadcasts' ) ){
+                    wp_die( WPGH()->roles->error( 'cancel_broadcasts' ) );
+                }
 
                 foreach ( $this->get_broadcasts() as $id ){
                     $broadcast = new WPGH_Broadcast( $id );
@@ -144,6 +151,10 @@ class WPGH_Broadcasts_Page
      */
     function add_broadcast()
     {
+        if ( ! current_user_can( 'schedule_broadcasts' ) ){
+            wp_die( WPGH()->roles->error( 'schedule_broadcasts' ) );
+        }
+
         $email = isset( $_POST['email_id'] )? intval( $_POST[ 'email_id' ] ) : null;
 
         $tags = isset( $_POST[ 'tags' ] )? WPGH()->tags->validate( $_POST['tags'] ): array();
@@ -258,6 +269,10 @@ class WPGH_Broadcasts_Page
      */
     function add()
     {
+        if ( ! current_user_can( 'schedule_broadcasts' ) ){
+            wp_die( WPGH()->roles->error( 'schedule_broadcasts' ) );
+        }
+
         include dirname(__FILE__) . '/add-broadcast.php';
     }
 
@@ -266,6 +281,10 @@ class WPGH_Broadcasts_Page
      */
     function report()
     {
+        if ( ! current_user_can( 'view_broadcasts' ) ){
+            wp_die( WPGH()->roles->error( 'view_broadcasts' ) );
+        }
+
         include dirname( __FILE__ ) . '/broadcast-report.php';
     }
 

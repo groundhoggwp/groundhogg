@@ -236,7 +236,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->events       = new WPGH_DB_Events();
                 self::$instance->superlinks   = new WPGH_DB_Superlinks();
 
-
+                self::$instance->roles        = new WPGH_Roles();
                 self::$instance->tracking     = new WPGH_Tracking();
                 self::$instance->superlink    = new WPGH_Superlink();
                 self::$instance->event_queue  = new WPGH_Event_Queue();
@@ -367,6 +367,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-html.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-notices.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-replacements.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-roles.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-step.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-submission.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-superlink.php';

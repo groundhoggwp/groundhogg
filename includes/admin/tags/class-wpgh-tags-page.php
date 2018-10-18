@@ -89,6 +89,10 @@ class WPGH_Tags_Page
 		{
 			case 'add':
 
+                if ( ! current_user_can( 'add_tags' ) ){
+                    wp_die( WPGH()->roles->error( 'add_tags' ) );
+                }
+
 				if ( isset( $_POST ) ) {
 					$this->add_tag();
 				}
@@ -96,6 +100,10 @@ class WPGH_Tags_Page
 				break;
 
             case 'edit':
+
+                if ( ! current_user_can( 'edit_tags' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_tags' ) );
+                }
 
                 if ( isset( $_POST ) ){
 
@@ -106,6 +114,10 @@ class WPGH_Tags_Page
                 break;
 
             case 'delete':
+
+                if ( ! current_user_can( 'delete_tags' ) ){
+                    wp_die( WPGH()->roles->error( 'delete_tags' ) );
+                }
 
                 foreach ( $this->get_tags() as $id ){
 
@@ -132,6 +144,10 @@ class WPGH_Tags_Page
 	}
 
 	private function add_tag(){
+
+        if ( ! current_user_can( 'add_tags' ) ){
+            wp_die( WPGH()->roles->error( 'add_tags' ) );
+        }
 
         if ( isset( $_POST['bulk_add'] ) ){
 
@@ -160,6 +176,11 @@ class WPGH_Tags_Page
     }
 
     private function edit_tag(){
+
+        if ( ! current_user_can( 'edit_tags' ) ){
+            wp_die( WPGH()->roles->error( 'edit_tags' ) );
+        }
+
         $tag_name = sanitize_text_field( wp_unslash( $_POST[ 'name' ] ) );
         $tag_description = sanitize_textarea_field( wp_unslash( $_POST[ 'description' ] ) );
 
@@ -261,6 +282,10 @@ class WPGH_Tags_Page
 
 	function edit()
 	{
+        if ( ! current_user_can( 'edit_tags' ) ){
+            wp_die( WPGH()->roles->error( 'edit_tags' ) );
+        }
+
 		include dirname( __FILE__ ) . '/edit-tag.php';
 	}
 

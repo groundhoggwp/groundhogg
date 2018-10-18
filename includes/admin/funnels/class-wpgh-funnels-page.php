@@ -162,6 +162,10 @@ class WPGH_Funnels_Page
 		{
 			case 'add':
 
+                if ( ! current_user_can( 'add_funnels' ) ){
+                    wp_die( WPGH()->roles->error( 'add_funnels' ) );
+                }
+
 				if ( isset( $_POST ) ) {
                     $this->add_funnel();
                 }
@@ -170,6 +174,10 @@ class WPGH_Funnels_Page
 
             case 'edit':
 
+                if ( ! current_user_can( 'edit_funnels' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_funnels' ) );
+                }
+
                 if ( isset( $_POST ) ){
                     $this->save_funnel();
                 }
@@ -177,6 +185,10 @@ class WPGH_Funnels_Page
                 break;
 
             case 'duplicate':
+
+                if ( ! current_user_can( 'add_funnels' ) ){
+                    wp_die( WPGH()->roles->error( 'add_funnels' ) );
+                }
 
                 foreach ( $this->get_funnels() as $id ){
                     $json = wpgh_convert_funnel_to_json( $id );
@@ -192,6 +204,10 @@ class WPGH_Funnels_Page
                 break;
 
             case 'archive':
+
+                if ( ! current_user_can( 'edit_funnels' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_funnels' ) );
+                }
 
 				foreach ( $this->get_funnels() as $id ) {
 				    $args = array( 'status' => 'archived' );
@@ -213,6 +229,10 @@ class WPGH_Funnels_Page
 
             case 'delete':
 
+                if ( ! current_user_can( 'delete_funnels' ) ){
+                    wp_die( WPGH()->roles->error( 'delete_funnels' ) );
+                }
+
 				foreach ( $this->get_funnels() as $id ){
 					WPGH()->funnels->delete( $id );
 				}
@@ -231,6 +251,10 @@ class WPGH_Funnels_Page
 				break;
 
             case 'restore':
+
+                if ( ! current_user_can( 'edit_funnels' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_funnels' ) );
+                }
 
 				foreach ( $this->get_funnels() as $id )
 				{
@@ -252,6 +276,10 @@ class WPGH_Funnels_Page
 				break;
 
             case 'export':
+
+                if ( ! current_user_can( 'export_funnels' ) ){
+                    wp_die( WPGH()->roles->error( 'export_funnels' ) );
+                }
 
                 $this->export_funnel();
 
@@ -275,6 +303,11 @@ class WPGH_Funnels_Page
      */
 	private function export_funnel()
     {
+
+        if ( ! current_user_can( 'export_funnels' ) ){
+            wp_die( WPGH()->roles->error( 'export_funnels' ) );
+        }
+
         $id = intval( $_GET['funnel'] );
 
         $funnel = WPGH()->funnels->get_funnel( $id );
@@ -304,6 +337,11 @@ class WPGH_Funnels_Page
 
 	private function add_funnel()
     {
+
+        if ( ! current_user_can( 'add_funnels' ) ){
+            wp_die( WPGH()->roles->error( 'add_funnels' ) );
+        }
+
         if ( isset( $_POST[ 'funnel_template' ] ) ){
 
             include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
@@ -355,6 +393,11 @@ class WPGH_Funnels_Page
      */
     private function import_funnel( $import = array() )
     {
+
+        if ( ! current_user_can( 'import_funnels' ) ){
+            wp_die( WPGH()->roles->error( 'import_funnels' ) );
+        }
+
         if ( is_string( $import ) ){
             $import = json_decode( $import, true );
         }
@@ -416,6 +459,9 @@ class WPGH_Funnels_Page
 
     private function save_funnel()
     {
+        if ( ! current_user_can( 'edit_funnels' ) ){
+            wp_die( WPGH()->roles->error( 'edit_funnels' ) );
+        }
 
         if ( empty( $_POST ) )
             return;
@@ -501,6 +547,11 @@ class WPGH_Funnels_Page
 
     public function add_step()
     {
+
+        if ( ! current_user_can( 'edit_funnels' ) ){
+            wp_die( WPGH()->roles->error( 'edit_funnels' ) );
+        }
+
         /* exit out if not doing ajax */
         if ( ! wp_doing_ajax() ){
             return;
@@ -541,6 +592,11 @@ class WPGH_Funnels_Page
 
     public function duplicate_step()
     {
+
+        if ( ! current_user_can( 'edit_funnels' ) ){
+            wp_die( WPGH()->roles->error( 'edit_funnels' ) );
+        }
+
         /* exit out if not doing ajax */
         if ( ! wp_doing_ajax() ){
             return;
@@ -595,6 +651,10 @@ class WPGH_Funnels_Page
      */
     public function delete_step()
     {
+        if ( ! current_user_can( 'edit_funnels' ) ){
+            wp_die( WPGH()->roles->error( 'edit_funnels' ) );
+        }
+
         /* exit out if not doing ajax */
         if ( ! wp_doing_ajax() ){
             return;
@@ -645,11 +705,19 @@ class WPGH_Funnels_Page
 	}
 
 	private function edit(){
+        if ( ! current_user_can( 'edit_funnels' ) ){
+            wp_die( WPGH()->roles->error( 'edit_funnels' ) );
+        }
+
 		include dirname( __FILE__ ) . '/funnel-editor.php';
 
 	}
 
 	private function add(){
+        if ( ! current_user_can( 'add_funnels' ) ){
+            wp_die( WPGH()->roles->error( 'add_funnels' ) );
+        }
+
 		include dirname( __FILE__ ) . '/add-funnel.php';
 	}
 

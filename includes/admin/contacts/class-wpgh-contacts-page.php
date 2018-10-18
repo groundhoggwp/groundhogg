@@ -117,6 +117,10 @@ class WPGH_Contacts_Page
         {
             case 'add':
 
+                if ( ! current_user_can( 'add_contacts' ) ){
+                    wp_die( WPGH()->roles->error( 'add_contacts' ) );
+                }
+
                 if ( ! empty( $_POST ) )
                 {
                     $this->add_contact();
@@ -125,6 +129,10 @@ class WPGH_Contacts_Page
                 break;
 
             case 'edit':
+
+                if ( ! current_user_can( 'edit_contacts' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                }
 
                 if ( ! empty( $_POST ) ){
 
@@ -135,6 +143,10 @@ class WPGH_Contacts_Page
                 break;
 
             case 'spam':
+
+                if ( ! current_user_can( 'edit_contacts' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                }
 
                 foreach ( $this->get_contacts() as $id ) {
 
@@ -169,6 +181,10 @@ class WPGH_Contacts_Page
 
             case 'delete':
 
+                if ( ! current_user_can( 'delete_contacts' ) ){
+                    wp_die( WPGH()->roles->error( 'delete_contacts' ) );
+                }
+
                 foreach ( $this->get_contacts() as $id ){
 
                     do_action( 'wpgh_deleted_contact', $id );
@@ -190,6 +206,10 @@ class WPGH_Contacts_Page
                 break;
 
             case 'unspam':
+
+                if ( ! current_user_can( 'edit_contacts' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                }
 
                 foreach ( $this->get_contacts() as $id ) {
                     $contact = new WPGH_Contact( $id );
@@ -228,6 +248,10 @@ class WPGH_Contacts_Page
      */
     private function add_contact()
     {
+        if ( ! current_user_can( 'add_contacts' ) ){
+            wp_die( WPGH()->roles->error( 'add_contacts' ) );
+        }
+
         do_action( 'wpgh_admin_add_contact_before' );
 
         if ( ! isset( $_POST['email'] ) ){
@@ -286,6 +310,10 @@ class WPGH_Contacts_Page
      */
     private function update_contact()
     {
+
+        if ( ! current_user_can( 'edit_contacts' ) ){
+            wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+        }
 
         $id = intval( $_GET[ 'contact' ] );
 
@@ -419,12 +447,18 @@ class WPGH_Contacts_Page
      */
     public function save_inline()
     {
-        if ( ! wp_doing_ajax() )
+
+        if ( ! wp_doing_ajax() ){
             wp_die( 'should not be calling this function' );
+        }
+
+        if ( ! current_user_can( 'edit_contacts' ) ){
+            wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+        }
 
         //todo security check
 
-        $id             = (int) $_POST['ID'];
+        $id = (int) $_POST['ID'];
 
         $contact = new WPGH_Contact( $id );
 
@@ -502,6 +536,11 @@ class WPGH_Contacts_Page
      */
     function table()
     {
+
+        if ( ! current_user_can( 'view_contacts' ) ){
+            wp_die( WPGH()->roles->error( 'view_contacts' ) );
+        }
+
         if ( ! class_exists( 'WPGH_Contacts_Table' ) ){
             include dirname(__FILE__) . '/class-wpgh-contacts-table.php';
         }
@@ -537,6 +576,11 @@ class WPGH_Contacts_Page
      */
     function edit()
     {
+
+        if ( ! current_user_can( 'view_contacts' ) ){
+            wp_die( WPGH()->roles->error( 'view_contacts' ) );
+        }
+
         include dirname( __FILE__ ) . '/contact-editor.php';
 
     }
@@ -546,6 +590,10 @@ class WPGH_Contacts_Page
      */
     function add()
     {
+        if ( ! current_user_can( 'add_contacts' ) ){
+            wp_die( WPGH()->roles->error( 'add_contacts' ) );
+        }
+
         include dirname( __FILE__ ) . '/add-contact.php';
     }
 

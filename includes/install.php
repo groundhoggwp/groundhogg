@@ -167,23 +167,9 @@ function wpgh_run_install() {
         }
     }
 
-    /* setup permissions */
-    $gh_all_caps = array(
-        'gh_manage_contacts',
-        'gh_manage_funnels',
-        'gh_manage_emails',
-        'gh_manage_tags',
-        'gh_manage_broadcasts',
-        'gh_manage_superlinks',
-        'gh_manage_events',
-        'gh_manage_settings'
-    );
-
-    $role = get_role( 'administrator' );
-
-    foreach ( $gh_all_caps as $cap ) {
-        $role->add_cap( $cap );
-    }
+    $roles = new WPGH_Roles;
+    $roles->add_roles();
+    $roles->add_caps();
 
     // Add a temporary option to note that WPGH pages have been created
     set_transient( '_wpgh_installed', true, 30 );
@@ -334,24 +320,11 @@ function wpgh_install_roles_on_network() {
     }
 
 
-    if( empty( $wp_roles->roles ) || ! get_role( 'administrator' )->has_cap( 'gh_manage_contacts' ) ) {
+    if( empty( $wp_roles->roles ) || ! array_key_exists( 'sales_manager', $wp_roles->roles ) ) {
 
-        $gh_all_caps = array(
-            'gh_manage_contacts',
-            'gh_manage_funnels',
-            'gh_manage_emails',
-            'gh_manage_tags',
-            'gh_manage_broadcasts',
-            'gh_manage_superlinks',
-            'gh_manage_events',
-            'gh_manage_settings'
-        );
-
-        $role = get_role( 'administrator' );
-
-        foreach ( $gh_all_caps as $cap ) {
-            $role->add_cap( $cap );
-        }
+        $roles = new WPGH_Roles;
+        $roles->add_roles();
+        $roles->add_caps();
 
     }
 

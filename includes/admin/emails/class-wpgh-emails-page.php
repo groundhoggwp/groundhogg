@@ -116,6 +116,10 @@ class WPGH_Emails_Page
         {
             case 'add':
 
+                if ( ! current_user_can( 'add_emails' ) ){
+                    wp_die( WPGH()->roles->error( 'add_emails' ) );
+                }
+
                 if ( ! empty( $_POST ) ) {
 
                     $this->add_email();
@@ -126,6 +130,10 @@ class WPGH_Emails_Page
 
             case 'edit':
 
+                if ( ! current_user_can( 'edit_emails' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_emails' ) );
+                }
+
                 if ( ! empty( $_POST ) ){
 
                     $this->update_email();
@@ -135,6 +143,10 @@ class WPGH_Emails_Page
                 break;
 
             case 'trash':
+
+                if ( ! current_user_can( 'edit_emails' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_emails' ) );
+                }
 
                 foreach ( $this->get_emails() as $id ) {
 
@@ -159,6 +171,10 @@ class WPGH_Emails_Page
 
             case 'delete':
 
+                if ( ! current_user_can( 'delete_emails' ) ){
+                    wp_die( WPGH()->roles->error( 'delete_emails' ) );
+                }
+
                 foreach ( $this->get_emails() as $id ){
                     WPGH()->emails->delete( $id );
                 }
@@ -178,6 +194,10 @@ class WPGH_Emails_Page
 
             case 'empty_trash':
 
+                if ( ! current_user_can( 'delete_emails' ) ){
+                    wp_die( WPGH()->roles->error( 'delete_emails' ) );
+                }
+
                 $emails = WPGH()->emails->get_emails( array( 'status' => 'trash' ) );
 
                 foreach ( $emails as $email ){
@@ -196,6 +216,10 @@ class WPGH_Emails_Page
                 break;
 
             case 'restore':
+
+                if ( ! current_user_can( 'edit_emails' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_emails' ) );
+                }
 
                 foreach ( $this->get_emails() as $id )
                 {
@@ -238,6 +262,10 @@ class WPGH_Emails_Page
      */
     private function add_email()
     {
+        if ( ! current_user_can( 'add_emails' ) ){
+            wp_die( WPGH()->roles->error( 'add_emails' ) );
+        }
+
         if ( isset( $_POST[ 'email_template' ] ) ){
 
             include_once WPGH_PLUGIN_DIR . '/templates/email-templates.php';
@@ -301,6 +329,9 @@ class WPGH_Emails_Page
      */
     private function update_email()
     {
+        if ( ! current_user_can( 'edit_emails' ) ){
+            wp_die( WPGH()->roles->error( 'edit_emails' ) );
+        }
 
         $id = intval( $_GET[ 'email' ] );
 
@@ -342,6 +373,10 @@ class WPGH_Emails_Page
         $this->notices->add( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
 
         if ( isset( $_POST['send_test'] ) ){
+
+            if ( ! current_user_can( 'send_emails' ) ){
+                wp_die( WPGH()->roles->error( 'send_emails' ) );
+            }
 
             do_action( 'wpgh_before_send_test_email', $id );
 
@@ -408,17 +443,30 @@ class WPGH_Emails_Page
 
     function edit()
     {
+
+        if ( ! current_user_can( 'edit_emails' ) ){
+            wp_die( WPGH()->roles->error( 'edit_emails' ) );
+        }
+
         include dirname( __FILE__ ) . '/email-editor.php';
 
     }
 
     function add()
     {
+        if ( ! current_user_can( 'add_emails' ) ){
+            wp_die( WPGH()->roles->error( 'add_emails' ) );
+        }
+
         include dirname( __FILE__ ) . '/add-email.php';
     }
 
     function page()
     {
+        if ( ! current_user_can( 'edit_emails' ) ){
+            wp_die( WPGH()->roles->error( 'edit_emails' ) );
+        }
+
         ?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>

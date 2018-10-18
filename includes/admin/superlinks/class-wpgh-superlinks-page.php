@@ -88,6 +88,10 @@ class WPGH_Superlinks_Page
 		{
 			case 'add':
 
+                if ( ! current_user_can( 'add_superlinks' ) ){
+                    wp_die( WPGH()->roles->error( 'add_superlinks' ) );
+                }
+
 				if ( isset( $_POST ) ) {
 					$this->add_superlink();
 				}
@@ -96,6 +100,10 @@ class WPGH_Superlinks_Page
 
             case 'edit':
 
+                if ( ! current_user_can( 'edit_superlinks' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_superlinks' ) );
+                }
+
                 if ( isset( $_POST ) ){
                     $this->edit_superlink();
                 }
@@ -103,6 +111,10 @@ class WPGH_Superlinks_Page
                 break;
 
             case 'delete':
+
+                if ( ! current_user_can( 'delete_superlinks' ) ){
+                    wp_die( WPGH()->roles->error( 'delete_superlinks' ) );
+                }
 
 				foreach ( $this->get_superlinks() as $id ){
 
@@ -130,6 +142,10 @@ class WPGH_Superlinks_Page
 
 	private function add_superlink()
     {
+        if ( ! current_user_can( 'add_superlinks' ) ){
+            wp_die( WPGH()->roles->error( 'add_superlinks' ) );
+        }
+
         $superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
         $superlink_target = sanitize_text_field( wp_unslash( $_POST['superlink_target'] ) );
 
@@ -153,6 +169,10 @@ class WPGH_Superlinks_Page
 
     private function edit_superlink()
     {
+        if ( ! current_user_can( 'edit_superlinks' ) ){
+            wp_die( WPGH()->roles->error( 'edit_superlinks' ) );
+        }
+
         $id = intval( $_GET[ 'superlink' ] );
 
         $superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
@@ -250,6 +270,10 @@ class WPGH_Superlinks_Page
 
 	function edit()
 	{
+        if ( ! current_user_can( 'edit_superlinks' ) ){
+            wp_die( WPGH()->roles->error( 'edit_superlinks' ) );
+        }
+
 		include dirname( __FILE__ ) . '/edit-superlink.php';
 	}
 

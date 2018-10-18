@@ -80,6 +80,18 @@ class WPGH_Roles {
 		) );
 	}
 
+    /**
+     * Remove the roles from WPGH
+     */
+	public function remove_roles()
+    {
+        $roles = array( 'marketer', 'sales_manager' );
+        foreach ( $roles as $role ) {
+            remove_role( $role );
+        }
+    }
+
+
     ###################
     ### DEFINE CAPS ###
     ###################
@@ -169,8 +181,8 @@ class WPGH_Roles {
     public function get_broadcast_caps()
     {
         $caps = array(
-            'schedule_broadcast',
-            'cancel_broadcast',
+            'schedule_broadcasts',
+            'cancel_broadcasts',
             'view_broadcasts',
         );
 
@@ -244,9 +256,28 @@ class WPGH_Roles {
             'execute_events',
             'cancel_events',
             'schedule_events',
+            'view_events',
         );
 
         return apply_filters( 'wpgh_event_caps', $caps );
+    }
+
+    /**
+     * Returns a list of all the caps added by GH
+     */
+    public function get_gh_caps()
+    {
+        $caps = array_merge(
+            $this->get_broadcast_caps(),
+            $this->get_contact_caps(),
+            $this->get_email_caps(),
+            $this->get_event_caps(),
+            $this->get_funnel_caps(),
+            $this->get_superlink_caps(),
+            $this->get_tag_caps()
+        );
+
+        return $caps;
     }
 
 	/**
@@ -256,7 +287,8 @@ class WPGH_Roles {
 	 * @global WP_Roles $wp_roles
 	 * @return void
 	 */
-	public function add_caps() {
+	public function add_caps()
+    {
 		global $wp_roles;
 
 		if ( class_exists('WP_Roles') ) {
@@ -266,86 +298,35 @@ class WPGH_Roles {
 		}
 
 		if ( is_object( $wp_roles ) ) {
-			$wp_roles->add_cap( 'sales_manager', 'gh_manage_contacts' );
-			$wp_roles->add_cap( 'sales_manager', 'gh_manage_tags' );
-			$wp_roles->add_cap( 'shop_manager', 'export_shop_reports' );
-			$wp_roles->add_cap( 'shop_manager', 'manage_shop_settings' );
-			$wp_roles->add_cap( 'shop_manager', 'manage_shop_discounts' );
 
-			$wp_roles->add_cap( 'administrator', 'view_shop_reports' );
-			$wp_roles->add_cap( 'administrator', 'view_shop_sensitive_data' );
-			$wp_roles->add_cap( 'administrator', 'export_shop_reports' );
-			$wp_roles->add_cap( 'administrator', 'manage_shop_discounts' );
-			$wp_roles->add_cap( 'administrator', 'manage_shop_settings' );
+            $caps = $this->get_gh_caps();
 
-			// Add the main post type capabilities
-			$capabilities = $this->get_core_caps();
-			foreach ( $capabilities as $cap_group ) {
-				foreach ( $cap_group as $cap ) {
-					$wp_roles->add_cap( 'shop_manager', $cap );
-					$wp_roles->add_cap( 'administrator', $cap );
-					$wp_roles->add_cap( 'shop_worker', $cap );
-				}
-			}
+            /* Add all roles to the Admin levels */
+            foreach ( $caps as $cap ){
 
-			$wp_roles->add_cap( 'shop_accountant', 'edit_products' );
-			$wp_roles->add_cap( 'shop_accountant', 'read_private_products' );
-			$wp_roles->add_cap( 'shop_accountant', 'view_shop_reports' );
-			$wp_roles->add_cap( 'shop_accountant', 'export_shop_reports' );
-			$wp_roles->add_cap( 'shop_accountant', 'edit_shop_payments' );
+                $wp_roles->add_cap( 'administrator', $cap );
+                $wp_roles->add_cap( 'marketer', $cap );
 
-			$wp_roles->add_cap( 'shop_vendor', 'edit_product' );
-			$wp_roles->add_cap( 'shop_vendor', 'edit_products' );
-			$wp_roles->add_cap( 'shop_vendor', 'delete_product' );
-			$wp_roles->add_cap( 'shop_vendor', 'delete_products' );
-			$wp_roles->add_cap( 'shop_vendor', 'publish_products' );
-			$wp_roles->add_cap( 'shop_vendor', 'edit_published_products' );
-			$wp_roles->add_cap( 'shop_vendor', 'upload_files' );
-			$wp_roles->add_cap( 'shop_vendor', 'assign_product_terms' );
+            }
+
+            /* Sales manager Role */
+
+            /* Contacts*/
+            $wp_roles->add_cap( 'sales_manager', 'add_contacts' );
+            $wp_roles->add_cap( 'sales_manager', 'edit_contacts' );
+            $wp_roles->add_cap( 'sales_manager', 'view_contacts' );
+
+            /* Tags */
+            $wp_roles->add_cap( 'sales_manager', 'manage_tags' );
+
+            /* Events */
+            $wp_roles->add_cap( 'sales_manager', 'execute_events' );
+            $wp_roles->add_cap( 'sales_manager', 'cancel_events' );
+            $wp_roles->add_cap( 'sales_manager', 'schedule_events' );
+            $wp_roles->add_cap( 'sales_manager', 'view_events' );
+
+
 		}
-	}
-
-	/**
-	 * Gets the core post type capabilities
-	 *
-	 * @since  1.4.4
-	 * @return array $capabilities Core post type capabilities
-	 */
-	public function get_core_caps() {
-		$capabilities = array();
-
-		$capability_types = array( 'product', 'shop_payment', 'shop_discount' );
-
-		foreach ( $capability_types as $capability_type ) {
-			$capabilities[ $capability_type ] = array(
-				// Post type
-				"edit_{$capability_type}",
-				"read_{$capability_type}",
-				"delete_{$capability_type}",
-				"edit_{$capability_type}s",
-				"edit_others_{$capability_type}s",
-				"publish_{$capability_type}s",
-				"read_private_{$capability_type}s",
-				"delete_{$capability_type}s",
-				"delete_private_{$capability_type}s",
-				"delete_published_{$capability_type}s",
-				"delete_others_{$capability_type}s",
-				"edit_private_{$capability_type}s",
-				"edit_published_{$capability_type}s",
-
-				// Terms
-				"manage_{$capability_type}_terms",
-				"edit_{$capability_type}_terms",
-				"delete_{$capability_type}_terms",
-				"assign_{$capability_type}_terms",
-
-				// Custom
-				"view_{$capability_type}_stats",
-				"import_{$capability_type}s",
-			);
-		}
-
-		return $capabilities;
 	}
 
 	/**
@@ -355,26 +336,6 @@ class WPGH_Roles {
 	 * @return array $caps
 	 */
 	public function meta_caps( $caps, $cap, $user_id, $args ) {
-
-		switch( $cap ) {
-
-			case 'view_product_stats' :
-
-				if( empty( $args[0] ) ) {
-					break;
-				}
-
-				$download = get_post( $args[0] );
-				if ( empty( $download ) ) {
-					break;
-				}
-
-				if( user_can( $user_id, 'view_shop_reports' ) || $user_id == $download->post_author ) {
-					$caps = array();
-				}
-
-				break;
-		}
 
 		return $caps;
 
@@ -397,45 +358,50 @@ class WPGH_Roles {
 		}
 
 		if ( is_object( $wp_roles ) ) {
-			/** Shop Manager Capabilities */
-			$wp_roles->remove_cap( 'shop_manager', 'view_shop_reports' );
-			$wp_roles->remove_cap( 'shop_manager', 'view_shop_sensitive_data' );
-			$wp_roles->remove_cap( 'shop_manager', 'export_shop_reports' );
-			$wp_roles->remove_cap( 'shop_manager', 'manage_shop_discounts' );
-			$wp_roles->remove_cap( 'shop_manager', 'manage_shop_settings' );
 
-			/** Site Administrator Capabilities */
-			$wp_roles->remove_cap( 'administrator', 'view_shop_reports' );
-			$wp_roles->remove_cap( 'administrator', 'view_shop_sensitive_data' );
-			$wp_roles->remove_cap( 'administrator', 'export_shop_reports' );
-			$wp_roles->remove_cap( 'administrator', 'manage_shop_discounts' );
-			$wp_roles->remove_cap( 'administrator', 'manage_shop_settings' );
+			/* Shop Manager Capabilities */
+            $caps = $this->get_gh_caps();
 
-			/** Remove the Main Post Type Capabilities */
-			$capabilities = $this->get_core_caps();
+            /* Add all roles to the Admin levels */
+            foreach ( $caps as $cap ){
 
-			foreach ( $capabilities as $cap_group ) {
-				foreach ( $cap_group as $cap ) {
-					$wp_roles->remove_cap( 'shop_manager', $cap );
-					$wp_roles->remove_cap( 'administrator', $cap );
-					$wp_roles->remove_cap( 'shop_worker', $cap );
-				}
-			}
+                $wp_roles->remove_cap( 'administrator', $cap );
+                $wp_roles->remove_cap( 'marketer', $cap );
 
-			/** Shop Accountant Capabilities */
-			$wp_roles->remove_cap( 'shop_accountant', 'edit_products' );
-			$wp_roles->remove_cap( 'shop_accountant', 'read_private_products' );
-			$wp_roles->remove_cap( 'shop_accountant', 'view_shop_reports' );
-			$wp_roles->remove_cap( 'shop_accountant', 'export_shop_reports' );
+            }
 
-			/** Shop Vendor Capabilities */
-			$wp_roles->remove_cap( 'shop_vendor', 'edit_product' );
-			$wp_roles->remove_cap( 'shop_vendor', 'edit_products' );
-			$wp_roles->remove_cap( 'shop_vendor', 'delete_product' );
-			$wp_roles->remove_cap( 'shop_vendor', 'delete_products' );
-			$wp_roles->remove_cap( 'shop_vendor', 'publish_products' );
-			$wp_roles->remove_cap( 'shop_vendor', 'edit_published_products' );
-			$wp_roles->remove_cap( 'shop_vendor', 'upload_files' );
+            /* Sales manager Role */
+
+            /* Contacts*/
+            $wp_roles->remove_cap( 'sales_manager', 'add_contacts' );
+            $wp_roles->remove_cap( 'sales_manager', 'edit_contacts' );
+            $wp_roles->remove_cap( 'sales_manager', 'view_contacts' );
+
+            /* Tags */
+            $wp_roles->remove_cap( 'sales_manager', 'manage_tags' );
+
+            /* Events */
+            $wp_roles->remove_cap( 'sales_manager', 'execute_events' );
+            $wp_roles->remove_cap( 'sales_manager', 'cancel_events' );
+            $wp_roles->remove_cap( 'sales_manager', 'schedule_events' );
+            $wp_roles->remove_cap( 'sales_manager', 'view_events' );
 		}
 	}
+
+    /**
+     * Get the appropriate message for when a user doesn't have a cap.
+     *
+     * @param $cap string
+     * @return string
+     */
+	public function error( $cap ){
+
+	    $error_str = str_replace( '_', ' ',  $cap  );
+
+	    $error = sprintf( __( 'Your user role does not have the required permissions to %s.', 'groundhogg' ), $error_str );
+
+        return $error;
+
+    }
+
 }

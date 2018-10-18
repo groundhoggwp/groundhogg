@@ -93,6 +93,10 @@ class WPGH_Events_Page
         {
             case 'cancel':
 
+                if ( ! current_user_can( 'cancel_events' ) ){
+                    wp_die( WPGH()->roles->error( 'cancel_events' ) );
+                }
+
                 foreach ( $this->get_events() as $eid ){
 
                     WPGH()->events->update(
@@ -111,6 +115,10 @@ class WPGH_Events_Page
                 break;
 
             case 'execute':
+
+                if ( ! current_user_can( 'execute_events' ) ){
+                    wp_die( WPGH()->roles->error( 'execute_events' ) );
+                }
 
                 foreach ( $this->get_events() as $eid )
                 {
@@ -148,6 +156,10 @@ class WPGH_Events_Page
 
     function table()
     {
+        if ( ! current_user_can( 'view_events' ) ){
+            wp_die( WPGH()->roles->error( 'view_events' ) );
+        }
+
         if ( ! class_exists( 'WPGH_Events_Table' ) ){
             include dirname(__FILE__) . '/class-wpgh-events-table.php';
         }
