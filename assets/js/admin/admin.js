@@ -5,7 +5,7 @@ const wpgh = {
     },
 
     buildTagPicker: function() {
-        jQuery('.gh-tag-picker' ).width(400).select2({
+        jQuery('.gh-tag-picker' ).css( 'width', '100%' ).select2({
           tags:true,
           multiple: true,
           tokenSeparators: ['/',',',';'],
@@ -22,7 +22,7 @@ const wpgh = {
     },
 
     buildEmailPicker: function() {
-        jQuery('.gh-email-picker' ).width(400).select2({
+        jQuery('.gh-email-picker' ).css( 'width', '100%' ).select2({
             ajax: {
                 url: ajaxurl + '?action=gh_get_emails',
                 dataType: 'json',
@@ -36,7 +36,7 @@ const wpgh = {
     },
 
     buildContactPicker: function (){
-        jQuery('.gh-contact-picker' ).width(400).select2({
+        jQuery('.gh-contact-picker' ).css( 'width', '100%' ).select2({
             ajax: {
                 url: ajaxurl + '?action=gh_get_contacts',
                 dataType: 'json',

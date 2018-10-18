@@ -260,7 +260,7 @@ class WPGH_HTML
      */
     public function gh_get_tags()
     {
-        if ( ! is_user_logged_in() || ! current_user_can( 'gh_manage_tags' ) )
+        if ( ! is_user_logged_in() || ! current_user_can( 'manage_tags' ) )
             wp_die( 'No access to tags.' );
 
         $value = isset( $_REQUEST[ 'q' ] ) ? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
@@ -331,7 +331,7 @@ class WPGH_HTML
      */
     public function gh_get_contacts()
     {
-        if ( ! is_user_logged_in() || ! current_user_can( 'edit_contacts' ) )
+        if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
             wp_die( 'No access to contacts.' );
 
         $value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
@@ -395,7 +395,7 @@ class WPGH_HTML
     public function gh_get_emails()
     {
 
-        if ( ! is_user_logged_in() || ! current_user_can( 'gh_manage_emails' ) )
+        if ( ! is_user_logged_in() || ! current_user_can( 'edit_emails' ) )
             wp_die( 'No access to emails.' );
 
         if ( isset(  $_REQUEST[ 'q' ] ) ){
