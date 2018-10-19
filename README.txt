@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.8 =
+* Added Welcome Page
+* Changed menu structure
+* Added assets
+
 = 0.9.7 =
 * Added send email function to contact record.
 * Fixed Email Search Bug when searching in select2 email picker.
