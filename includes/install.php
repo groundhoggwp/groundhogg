@@ -176,6 +176,15 @@ function wpgh_run_install() {
 
 }
 
+function wpgh_redirect_to_welcome( $plugin )
+{
+    if( $plugin == plugin_basename( WPGH_PLUGIN_FILE ) ) {
+        exit( wp_redirect( admin_url( 'admin.php?page=groundhogg' ) ) );
+    }
+}
+
+add_action( 'activated_plugin', 'wpgh_redirect_to_welcome' );
+
 
 /**
  * When a new Blog is created in multisite, see if WPGH is network activated, and run the installer

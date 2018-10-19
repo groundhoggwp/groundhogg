@@ -25,6 +25,10 @@ class WPGH_Welcome_Page
 
             $this->notices = WPGH()->notices;
 
+            $this->notices->add(
+              'wip', __( 'This page is currently a work in progress! You should move on from it for now. Complete videos, links, and extensions coming soon.' ), 'info'
+            );
+
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
 
         }
@@ -243,6 +247,8 @@ class WPGH_Welcome_Page
     {
 
         $user = wp_get_current_user();
+
+        $this->notices->notices();
 
         ?>
         <img class="phil" src="<?php echo WPGH_ASSETS_FOLDER . 'images/phil-340x340.png'; ?>" width="340" height="340">

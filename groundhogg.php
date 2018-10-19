@@ -379,6 +379,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';
 
         }
+
     }
 
 endif;
