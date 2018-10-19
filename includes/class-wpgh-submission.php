@@ -66,7 +66,7 @@ class WPGH_Submission
 
         $this->data = $_POST;
 
-        $this->source = wp_get_referer();
+        $this->source = ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . wp_get_referer();
 
         /* set the form ID as the submission ID */
 
@@ -92,7 +92,7 @@ class WPGH_Submission
         );
 
         if ( empty( $this->fields ) ){
-            $this->leave( 'No fields available.' );
+            $this->leave( 'No fields available. gh_fields_' . $this->id . ' ' . $this->source );
         }
     }
 

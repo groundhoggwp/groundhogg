@@ -845,8 +845,16 @@ jQuery( function($){
         $form .= '</div>';
 
         /* Save the expected field to post meta so we can access them on the POST end */
-        if ( get_the_ID() )
+        if ( get_the_ID() ){
             update_post_meta(  get_the_ID(), 'gh_fields_' . $this->id , $this->fields );
+        } else {
+            /* try to get it via the URL */
+
+            $actual_link = ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+            $id = url_to_postid( $actual_link );
+            update_post_meta(  $id, 'gh_fields_' . $this->id , $this->fields );
+
+        }
 
         $form = apply_filters( 'wpgh_form_shortcode', $form );
 
