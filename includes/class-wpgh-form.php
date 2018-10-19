@@ -60,6 +60,7 @@ class WPGH_Form
         add_shortcode( 'gh_last_name',  array( $this, 'last_name'   ) );
         add_shortcode( 'gh_email',      array( $this, 'email'       ) );
         add_shortcode( 'gh_phone',      array( $this, 'phone'       ) );
+        add_shortcode( 'gh_address',    array( $this, 'address'     ) );
         add_shortcode( 'gh_text',       array( $this, 'text'        ) );
         add_shortcode( 'gh_textarea',   array( $this, 'textarea'    ) );
         add_shortcode( 'gh_number',     array( $this, 'number'      ) );
@@ -83,6 +84,7 @@ class WPGH_Form
         remove_shortcode( 'gh_last_name'    );
         remove_shortcode( 'gh_email'        );
         remove_shortcode( 'gh_phone'        );
+        remove_shortcode( 'gh_address'      );
         remove_shortcode( 'gh_text'         );
         remove_shortcode( 'gh_number'       );
         remove_shortcode( 'gh_select'       );
@@ -257,6 +259,104 @@ class WPGH_Form
         ), $atts );
 
         return $this->input_base( $a );
+    }
+
+    /**
+     * Return a simple address block
+     *
+     * @param $atts
+     * @return string
+     */
+    public function address( $atts )
+    {
+        $a = shortcode_atts( array(
+            'label'         => __( 'Address *', 'groundhogg' ),
+            'class'         => 'gh-address',
+            'enabled'       => 'all',
+            'required'      => true,
+        ), $atts );
+
+        $section = sprintf( "<div class='%s'><label class='gh-input-label'>%s</label>", $a[ 'class' ], $a[ 'label' ] );
+
+        $section.= $this->input_base(
+            array(
+                'type'          => 'text',
+                'label'         => __( 'Street Address 1', 'groundhogg' ),
+                'name'          => 'street_address_1',
+                'id'            => 'street_address_1',
+                'placeholder'   => '123 Any St.',
+                'title'         => __( 'Street Address 1', 'groundhogg' ),
+                'required'      => $a[ 'required' ],
+            )
+        );
+
+        $section.= $this->input_base(
+            array(
+                'type'          => 'text',
+                'label'         => __( 'Street Address 2', 'groundhogg' ),
+                'name'          => 'street_address_2',
+                'id'            => 'street_address_2',
+                'placeholder'   => '123 Any St.',
+                'title'         => __( 'Street Address 2', 'groundhogg' ),
+                'required'      => $a[ 'required' ],
+            )
+        );
+
+        $section.= $this->input_base(
+            array(
+                'type'          => 'text',
+                'label'         => __( 'City', 'groundhogg' ),
+                'name'          => 'city',
+                'id'            => 'city',
+                'placeholder'   => 'New York',
+                'title'         => __( 'City', 'groundhogg' ),
+                'required'      => $a[ 'required' ],
+            )
+        );
+
+        $section.= $this->input_base(
+            array(
+                'type'          => 'text',
+                'label'         => __( 'State/Province', 'groundhogg' ),
+                'name'          => 'region',
+                'id'            => 'region',
+                'placeholder'   => 'New York',
+                'title'         => __( 'State/Province', 'groundhogg' ),
+                'required'      => $a[ 'required' ],
+            )
+        );
+
+        $section.= $this->input_base(
+            array(
+                'type'          => 'text',
+                'label'         => __( 'Postal/Zip Code', 'groundhogg' ),
+                'name'          => 'postal_zip',
+                'id'            => 'postal_zip',
+                'placeholder'   => 'New York',
+                'title'         => __( 'Postal/Zip Code', 'groundhogg' ),
+                'required'      => $a[ 'required' ],
+            )
+        );
+
+        $section.= $this->select(
+            array(
+                'label'         => __( 'Country *', 'groundhogg' ),
+                'name'          => 'country',
+                'id'            => 'country',
+                'class'         => '',
+                'options'       => wpgh_get_countries_list(),
+                'attributes'    => '',
+                'title'         => __( 'Country' ),
+                'default'       => __( 'Please select a country', 'groundhogg' ),
+                'multiple'      => false,
+                'required'      => $a[ 'required' ],
+            )
+        );
+
+        $section.= "</div>";
+
+        return $section;
+
     }
 
     /**

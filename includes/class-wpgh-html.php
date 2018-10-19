@@ -253,6 +253,7 @@ class WPGH_HTML
 
         $multiple           = $a[ 'multiple' ]              ? 'multiple'             : '';
         $tags               = $a[ 'tags' ]                  ? 'data-tags="true"'     : '';
+
         $a[ 'selected' ]    = is_array( $a[ 'selected' ] )  ? $a[ 'selected' ]  : array( $a[ 'selected' ] );
 
         $optionHTML = '';
@@ -260,6 +261,11 @@ class WPGH_HTML
         if ( ! empty( $a[ 'data' ] ) && is_array( $a[ 'data' ] ) )
         {
             $options = array_map( 'trim', $a[ 'data' ] );
+
+            $optionHTML .= sprintf(
+                "<option value=''>%s</option>",
+                $a[ 'placeholder' ]
+            );
 
             foreach ( $options as $value => $name ){
 

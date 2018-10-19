@@ -112,6 +112,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * Changed menu structure
 * Added image assets
 * Added address section to contact record.
+* Added replacement codes {phone}, {phone_ext} & {address}
+* Added locations functions to get lists of known geographic areas
 * Fixed bug where clicking the confirmation link in tracking history resulted in a db error.
 
 = 0.9.7 =

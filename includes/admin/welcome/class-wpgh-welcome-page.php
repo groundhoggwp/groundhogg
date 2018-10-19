@@ -231,7 +231,7 @@ class WPGH_Welcome_Page
             ),
             array(
                 'title' => 'Easy Digital Downloads',
-                'desc'  => 'Connect Groundhogg to Easy Digital Downlaods and increase your sales with abandonment funnels.',
+                'desc'  => 'Connect Groundhogg to Easy Digital Downloads and increase your sales with abandonment funnels.',
                 'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/edd-722x361.png',
                 'link'  => 'https://www.groundhogg.io/downloads/easy-digital-downloads/'
             ),
@@ -322,6 +322,9 @@ class WPGH_Welcome_Page
                             <div class="inside">
                                 <h3><?php _e( 'Support Articles', 'Groundhogg' ); ?></h3>
                                 <p><?php _e( "Don't know where to start? Checkout these articles and learn how to make Groundhogg work for you.", 'groundhogg' ); ?></p>
+                                <p style="text-align: center">
+                                    <a class="button button-primary" href="https://groundhogg.io/support/" target="_blank"><?php _e( 'View All!' ); ?></a>
+                                </p>
                             </div>
                         </div>
 
@@ -345,6 +348,9 @@ class WPGH_Welcome_Page
                             <div class="inside">
                                 <h3><?php _e( 'Awesome Extensions', 'Groundhogg' ); ?></h3>
                                 <p><?php _e( "Need more functionality? Need to connect Groundhogg to your store? We have an extension for that!", 'groundhogg' ); ?></p>
+                                <p style="text-align: center">
+                                    <a class="button button-primary" href="https://groundhogg.io/downloads/" target="_blank"><?php _e( 'View All!' ); ?></a>
+                                </p>
                             </div>
                         </div>
 

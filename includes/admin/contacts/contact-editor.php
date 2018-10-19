@@ -164,12 +164,16 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
         </tr>
         <tr>
             <th><label for="country"><?php echo __( 'Country', 'groundhogg' )?></label></th>
-            <td><?php $args = array(
-                    'id'    => 'country',
-                    'name'  => 'country',
-                    'value' => $contact->get_meta( 'country' ),
-                );
-                echo WPGH()->html->input( $args ); ?>
+            <td><div style="max-width: 338px">
+                    <?php $args = array(
+                        'id'    => 'country',
+                        'name'  => 'country',
+                        'selected' => $contact->get_meta( 'country' ),
+                        'data'  => wpgh_get_countries_list(),
+                        'placeholder'   => __( 'Select a Country', 'groundhogg' ),
+                    );
+                    echo WPGH()->html->select2( $args ); ?>
+                </div>
             </td>
         </tr>
         <?php do_action( 'wpgh_contact_edit_address', $id ); ?>

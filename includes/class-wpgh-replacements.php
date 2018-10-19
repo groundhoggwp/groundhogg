@@ -64,6 +64,21 @@ class WPGH_Replacements
                 'description' => __( 'The contact\'s email address.', 'groundhogg' ),
             ),
             array(
+                'code'        => 'phone',
+                'callback'    => 'wpgh_replacement_phone',
+                'description' => __( 'The contact\'s phone number.', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'phone_ext',
+                'callback'    => 'wpgh_replacement_phone_ext',
+                'description' => __( 'The contact\'s phone number extension.', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'address',
+                'callback'    => 'wpgh_replacement_address',
+                'description' => __( 'The contact\'s full address.', 'groundhogg' ),
+            ),
+            array(
                 'code'        => 'meta',
                 'callback'    => 'wpgh_replacement_meta',
                 'description' => __( 'Any meta data related to the contact. Usage: {meta.attribute}', 'groundhogg' ),
@@ -327,6 +342,64 @@ function wpgh_replacement_last_name( $contact_id )
 function wpgh_replacement_email( $contact_id )
 {
     return WPGH()->contacts->get_column_by( 'email', 'ID', $contact_id );
+}
+
+/**
+ * Return back the phone # ot the contact.
+ *
+ * @param $contact_id int the contact_id
+ * @return string the first name
+ */
+function wpgh_replacement_phone( $contact_id )
+{
+    return WPGH()->contact_meta->get_meta( $contact_id, 'primary_phone', true );
+}
+
+/**
+ * Return back the phone # ext the contact.
+ *
+ * @param $contact_id int the contact_id
+ * @return string the first name
+ */
+function wpgh_replacement_phone_ext( $contact_id )
+{
+    return WPGH()->contact_meta->get_meta( $contact_id, 'primary_phone_extension', true );
+}
+
+/**
+ * Return back the address of the contact.
+ *
+ * @param $contact_id int the contact_id
+ * @return string the first name
+ */
+function wpgh_replacement_address( $contact_id )
+{
+
+    $contact = new WPGH_Contact( $contact_id );
+
+    $address = array();
+
+    if ( $contact->get_meta( 'gh_street_address_1' ) )
+        $address[] = $contact->get_meta( 'gh_street_address_1' );
+    if ( $contact->get_meta( 'gh_street_address_2' ) )
+        $address[] = ' ' . $contact->get_meta( 'gh_street_address_2' );
+    if ( $contact->get_meta( 'city' ) )
+        $address[] = $contact->get_meta( 'city' );
+    if ( $contact->get_meta( 'region' ) )
+        $address[] = $contact->get_meta( 'region' );
+
+    if ( $contact->get_meta( 'country' ) ){
+        $countries  = wpgh_get_countries_list();
+        $address[] = $countries[ $contact->get_meta( 'country' ) ];
+    }
+
+    if ( $contact->get_meta( 'zip_postal' ) )
+        $address[] = strtoupper( $contact->get_meta( 'zip_postal' ) );
+
+    $address = implode( ', ', $address );
+
+    return $address;
+
 }
 
 /**
