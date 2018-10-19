@@ -1,0 +1,72 @@
+#wpwrap{
+    /*noinspection CssUnknownTarget*/
+    background-image: url("/wp-content/plugins/groundhogg/assets/images/groundhogg-bg.jpg");
+}
+
+.phil{
+    position: fixed;
+    bottom: -80px;
+    right: -80px;
+    transform: rotate(-20deg);
+}
+
+#wpcontent{
+    padding: 0;
+    background-color: rgba(169, 169, 169, 0.25);
+}
+
+#wpfooter{
+    background-color: #F1F1F1;
+}
+
+#welcome-page{
+    max-width: 1000px;
+    margin: auto;
+    white-space: nowrap;
+}
+
+.welcome-header{
+    text-align: center;
+}
+
+.welcome-header h1{
+    font-size: 50px;
+    color: white;
+    font-family: "Arial Black";
+    text-shadow: 2px 2px 2px rgba(43, 43, 43, 0.63);
+}
+
+.progress h2{
+    font-size: 30px !important;
+    color: black;
+    font-family: "Arial Black";
+    text-shadow: 2px 2px 2px rgba(43, 43, 43, 0.21);
+}
+
+.right-col,
+.left-col{
+    white-space: normal;
+    box-sizing: border-box;
+    vertical-align: top;
+    display: inline-block;
+    width: 50%;
+    padding: 10px;
+    margin: 0;
+}
+
+.support{
+
+    border-radius: 5px ;
+
+}
+
+.col h3{
+    text-align: center;
+    font-family: "Arial Black";
+    text-transform: uppercase;
+}
+
+.postbox .hndle{
+    font-family: "Arial Black";
+    text-transform: uppercase;
+}

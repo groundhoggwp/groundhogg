@@ -18,7 +18,7 @@ class WPGH_Settings_Page
         //todo find new file to put this line.
         add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'check_for_updates' ) );
 
-        if ( isset( $_GET['page'] ) && $_GET['page'] === 'groundhogg' ) {
+        if ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) {
 
             add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );
             add_action( 'admin_init', array( $this, 'perform_tools' ) );

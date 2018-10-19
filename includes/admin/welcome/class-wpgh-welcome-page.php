@@ -21,11 +21,11 @@ class WPGH_Welcome_Page
 
         add_action('admin_menu', array($this, 'register'));
 
-        if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_welcome' ){
+        if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'groundhogg' ){
 
             $this->notices = WPGH()->notices;
 
-            add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
+            add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
 
         }
     }
@@ -36,22 +36,14 @@ class WPGH_Welcome_Page
     public function register()
     {
 
-        $page_title = 'welcome';
-        $menu_title = 'Groundhogg';
-        $capability = 'view_contacts';
-        $slug = 'groundhogg';
-        $callback = array( $this, 'page' );
-        $icon = 'dashicons-email-alt';
-        $position = 2;
-
         $page = add_menu_page(
-            $page_title,
-            $menu_title,
-            $capability,
-            $slug,
-            $callback,
-            $icon,
-            $position
+            'Welcome',
+            'Groundhogg',
+            'view_contacts',
+            'groundhogg',
+            array( $this, 'page' ),
+            'dashicons-email-alt',
+            2
         );
 
         add_action("load-" . $page, array($this, 'help'));
@@ -70,7 +62,7 @@ class WPGH_Welcome_Page
     /* Enque JS or CSS */
     public function scripts()
     {
-        //todo
+        wp_enqueue_style( 'welcome-page', WPGH_ASSETS_FOLDER . 'css/admin/welcome.css', filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/welcome.css' ) );
     }
 
     /**
@@ -87,26 +79,26 @@ class WPGH_Welcome_Page
             array(
                 'title' => __( 'What\'s Included?', 'groundhogg' ),
                 'desc'  => __( 'Get a general overview of all Groundhogg\'s features.', 'groundhogg' ),
-                'vidId' => '',
+                'vidId' => '235215203',
                 'link'  => 'https://groundhogg.io'
             ),
             array(
                 'title' => __( "Managing Contacts", 'groundhogg' ),
                 'desc'  => __( "Learn about managing and segmenting your contacts so you can keep things in order.", 'groundhogg' ),
-                'vidId' => '',
-                'link'  => ''
+                'vidId' => '235215203',
+                'link'  => 'https://groundhogg.io'
             ),
             array(
                 'title' => __( "Create Your First Funnel", 'groundhogg' ),
                 'desc'  => __( "Dive into funnel building and using our suite of tools to build automated customer journeys.", 'groundhogg' ),
-                'vidId' => '',
-                'link'  => ''
+                'vidId' => '235215203',
+                'link'  => 'https://groundhogg.io'
             ),
             array(
-                'title' => __( "", 'groundhogg' ),
-                'desc'  => __( "", 'groundhogg' ),
-                'vidId' => '',
-                'link'  => ''
+                'title' => __( "How To Build Forms", 'groundhogg' ),
+                'desc'  => __( "Groundhogg comes with a fairly versatile, but not obvious shortcode powered form builder.", 'groundhogg' ),
+                'vidId' => '235215203',
+                'link'  => 'https://groundhogg.io'
             ),
         );
 
@@ -134,17 +126,21 @@ class WPGH_Welcome_Page
             <div class="inside">
                 <?php if ( $article->vidId ): ?>
                 <div class="video-container">
-                    <iframe src="https://player.vimeo.com/video/<?php echo $article->vidId; ?>" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                    <iframe src="https://player.vimeo.com/video/<?php echo $article->vidId; ?>" width="444" height="249" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
                 </div>
+
+                <hr/>
                 <?php endif; ?>
                 <?php if ( $article->desc ): ?>
                 <div class="article-description">
                     <?php echo $article->desc; ?>
                 </div>
+                <hr/>
+
                 <?php endif; ?>
                 <?php if ( $article->link ): ?>
-                <p class="submit">
-                    <a class="button" href="<?php echo esc_url_raw( $article->link ); ?>" target="_blank"><?php _e( 'Read More...' ); ?></a>
+                <p>
+                    <a class="button button-primary" href="<?php echo esc_url_raw( $article->link ); ?>" target="_blank"><?php _e( 'Read More...' ); ?></a>
                 </p>
                 <?php endif; ?>
             </div>
@@ -163,10 +159,34 @@ class WPGH_Welcome_Page
     {
         $extensions = array(
             array(
-                'title' => '',
-                'desc'  => '',
-                'img'   => '',
-                'link'  => ''
+                'title' => 'Contracts',
+                'desc'  => 'Have your contacts sign legally binding contracts through Groundhogg. No third party apps required.',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/contracts-722x361.png',
+                'link'  => 'https://www.groundhogg.io/downloads/contracts/'
+            ),
+            array(
+                'title' => 'Contact Form 7',
+                'desc'  => 'Start collecting lead information through Contact Form 7, no setup required. Works instantly!',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/contact-form-7-722x361.png',
+                'link'  => 'https://www.groundhogg.io/downloads/contact-form-7/'
+            ),
+            array(
+                'title' => 'Gravity Forms',
+                'desc'  => 'Start collecting leads through Gravity Forms, no setup required. Adds the Gravity forms Benchmark to your funnels for increased automation capabilities!',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/gravity.png',
+                'link'  => 'https://www.groundhogg.io/downloads/'
+            ),
+            array(
+                'title' => 'Easy Digital Downloads',
+                'desc'  => 'Connect Groundhogg to Easy Digital Downlaods and increase your sales with abandonment funnels.',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/edd-722x361.png',
+                'link'  => 'https://www.groundhogg.io/downloads/easy-digital-downloads/'
+            ),
+            array(
+                'title' => 'Woocommerce',
+                'desc'  => 'Connect Groundhogg to Woocommerce and increase your sales with cart abandonment & followup funnels.',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/08/deafult-download-image-1-520x260.png',
+                'link'  => 'https://www.groundhogg.io/downloads/woocommerce/'
             ),
         );
 
@@ -196,15 +216,17 @@ class WPGH_Welcome_Page
                     <div class="img-container">
                         <img src="<?php echo $extension->img; ?>" style="width: 100%;max-width: 100%;">
                     </div>
+                <hr/>
                 <?php endif; ?>
                 <?php if ( $extension->desc ): ?>
                     <div class="article-description">
                         <?php echo $extension->desc; ?>
                     </div>
+                <hr/>
                 <?php endif; ?>
                 <?php if ( $extension->link ): ?>
-                    <p class="submit">
-                        <a class="button" href="<?php echo esc_url_raw( $extension->link ); ?>" target="_blank"><?php _e( 'Buy Now!' ); ?></a>
+                    <p>
+                        <a class="button button-primary" href="<?php echo esc_url_raw( $extension->link ); ?>" target="_blank"><?php _e( 'Buy Now!' ); ?></a>
                     </p>
                 <?php endif; ?>
             </div>
@@ -223,40 +245,67 @@ class WPGH_Welcome_Page
         $user = wp_get_current_user();
 
         ?>
-
-        <div id="poststuff">
-            <div class="welcome-header">
-                <?php echo sprintf( __( 'Welcome %s', 'groundhogg' ), $user->first_name ); ?>
-            </div>
-            <div class="left-col">
-
-                <div id="support-articles">
-
-                    <?php
-
-                    foreach ( $this->get_articles() as $article ):
-
-                        $this->article_to_html( $article );
-
-                    endforeach;
-
-                    ?>
-
+        <img class="phil" src="<?php echo WPGH_ASSETS_FOLDER . 'images/phil-340x340.png'; ?>" width="340" height="340">
+        <div id="welcome-page" class="welcome-page">
+            <div id="poststuff">
+                <div class="welcome-header">
+                    <h1><?php echo sprintf( __( 'Welcome %s!', 'groundhogg' ), $user->first_name ); ?></h1>
                 </div>
-            </div>
-            <div class="right-col">
-                <div id="extensions">
 
-                    <?php
+<!--                <div id="main">-->
+<!--                    <div class="postbox support progress">-->
+<!--                        <div class="inside">-->
+<!--                            <h2>--><?php //_e( 'Setup Progress', 'Groundhogg' ); ?><!--</h2>-->
+<!--                            <hr/>-->
+<!---->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+                <div class="left-col col">
 
-                    foreach ( $this->get_extensions() as $extension ):
+                    <div id="support-articles">
 
-                        $this->extension_to_html( $extension );
+                        <div class="postbox support">
+                            <div class="inside">
+                                <h3><?php _e( 'Support Articles', 'Groundhogg' ); ?></h3>
+                                <p><?php _e( "Don't know where to start? Checkout these articles and learn how to make Groundhogg work for you.", 'groundhogg' ); ?></p>
+                            </div>
+                        </div>
 
-                    endforeach;
+                        <?php
 
-                    ?>
+                        foreach ( $this->get_articles() as $article ):
 
+                            $this->article_to_html( $article );
+
+                        endforeach;
+
+                        ?>
+
+                    </div>
+                </div>
+                <div class="right-col col">
+
+                    <div id="extensions">
+
+                        <div class="postbox support">
+                            <div class="inside">
+                                <h3><?php _e( 'Awesome Extensions', 'Groundhogg' ); ?></h3>
+                                <p><?php _e( "Need more functionality? Need to connect Groundhogg to your store? We have an extension for that!", 'groundhogg' ); ?></p>
+                            </div>
+                        </div>
+
+                        <?php
+
+                        foreach ( $this->get_extensions() as $extension ):
+
+                            $this->extension_to_html( $extension );
+
+                        endforeach;
+
+                        ?>
+
+                    </div>
                 </div>
             </div>
         </div>
