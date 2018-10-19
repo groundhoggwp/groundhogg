@@ -29,9 +29,58 @@ class WPGH_Welcome_Page
               'wip', __( 'This page is currently a work in progress! You should move on from it for now. Complete videos, links, and extensions coming soon.' ), 'info'
             );
 
+            add_action( 'admin_init', array( $this, 'status_check' ) );
+
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
 
         }
+    }
+
+    public function status_check()
+    {
+        $this->check_settings();
+        $this->check_funnels();
+        $this->check_settings();
+    }
+
+
+    /**
+     * Check to see if the settings are complete
+     */
+    public function check_settings()
+    {
+        if ( ! get_option( 'gh_business_name' ) ){
+            $this->notices->add(
+                'incomplete_settings', __( 'It appears you have incomplete settings! Go to <a href="?page=gh_settings">the settings page</a> and fill out all your business information.' ), 'warning'
+            );
+        }
+    }
+
+    /**
+     * Check to see if there are any active funnels
+     */
+    public function check_funnels()
+    {
+        $funnels = WPGH()->funnels->get_funnels();
+
+        if ( empty( $funnels ) ){
+            $this->notices->add(
+                'no_active_funnels', __( 'You have no active funnels! Go to <a href="?page=gh_funnels&action=add">the funnels page</a> and create your first funnel!' ), 'warning'
+            );
+        }
+
+    }
+
+    public function check_contacts()
+    {
+        $contacts = WPGH()->contacts->count();
+
+        if ( $contacts < 10 ){
+            $this->notices->add(
+                'no_contacts', __( 'Seams like you need some more contacts. Go to the <a href="?page=gh_settings&tab=tools">tools area</a> and import your mailing list!' ), 'warning'
+            );
+        }
+
     }
 
     /**
@@ -247,9 +296,6 @@ class WPGH_Welcome_Page
     {
 
         $user = wp_get_current_user();
-
-        $this->notices->notices();
-
         ?>
         <img class="phil" src="<?php echo WPGH_ASSETS_FOLDER . 'images/phil-340x340.png'; ?>" width="340" height="340">
         <div id="welcome-page" class="welcome-page">
@@ -257,6 +303,7 @@ class WPGH_Welcome_Page
                 <div class="welcome-header">
                     <h1><?php echo sprintf( __( 'Welcome %s!', 'groundhogg' ), $user->first_name ); ?></h1>
                 </div>
+                <?php $this->notices->notices(); ?>
 
 <!--                <div id="main">-->
 <!--                    <div class="postbox support progress">-->

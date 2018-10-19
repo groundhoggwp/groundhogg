@@ -96,7 +96,7 @@ class WPGH_Settings_Page
 			<form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
                 <h2 class="nav-tab-wrapper">
                     <?php foreach ( $tabs as $tab_id => $tab_name ): ?>
-                        <a href="?page=groundhogg&tab=<?php echo $tab_id; ?>" class="nav-tab <?php echo $this->active_tab() == $tab_id ? 'nav-tab-active' : ''; ?>"><?php _e( $tab_name, 'groundhogg'); ?></a>
+                        <a href="?page=gh_settings&tab=<?php echo $tab_id; ?>" class="nav-tab <?php echo $this->active_tab() == $tab_id ? 'nav-tab-active' : ''; ?>"><?php _e( $tab_name, 'groundhogg'); ?></a>
                     <?php endforeach; ?>
                 </h2>
                 <?php switch ( $this->active_tab() ):
