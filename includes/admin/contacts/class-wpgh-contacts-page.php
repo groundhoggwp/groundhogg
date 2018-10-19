@@ -378,18 +378,20 @@ class WPGH_Contacts_Page
         /* Save the meta first... as actual fields might overwrite it later... */
         $cur_meta = WPGH()->contact_meta->get_meta( $id );
 
-        $posted_meta = $_POST[ 'meta' ];
+        if ( isset( $_POST[ 'meta' ] ) ){
+            $posted_meta = $_POST[ 'meta' ];
 
-        foreach ( $cur_meta as $key => $value ){
+            foreach ( $cur_meta as $key => $value ){
 
-            if ( isset( $posted_meta[ $key ] ) ){
+                if ( isset( $posted_meta[ $key ] ) ){
 
-                $contact->update_meta( $key, sanitize_text_field( $posted_meta[ $key ] ) );
+                    $contact->update_meta( $key, sanitize_text_field( $posted_meta[ $key ] ) );
 
-            } else {
+                } else {
 
-                $contact->delete_meta( $key );
+                    $contact->delete_meta( $key );
 
+                }
             }
         }
 
@@ -445,6 +447,29 @@ class WPGH_Contacts_Page
 
         if ( isset( $_POST['primary_phone_extension'] ) ){
             $contact->update_meta( 'primary_phone_extension', sanitize_text_field( $_POST['primary_phone_extension'] ) );
+        }
+
+        if ( isset( $_POST['street_address_1'] ) ){
+            $contact->update_meta( 'street_address_1', sanitize_text_field( $_POST['street_address_1'] ) );
+        }
+
+        if ( isset( $_POST['street_address_2'] ) ){
+            $contact->update_meta( 'street_address_2', sanitize_text_field( $_POST['street_address_2'] ) );
+        }
+        if ( isset( $_POST['city'] ) ){
+            $contact->update_meta( 'city', sanitize_text_field( $_POST['city'] ) );
+        }
+
+        if ( isset( $_POST['postal_zip'] ) ){
+            $contact->update_meta( 'postal_zip', sanitize_text_field( $_POST['postal_zip'] ) );
+        }
+
+        if ( isset( $_POST['region'] ) ){
+            $contact->update_meta( 'region', sanitize_text_field( $_POST['region'] ) );
+        }
+
+        if ( isset( $_POST['country'] ) ){
+            $contact->update_meta( 'country', sanitize_text_field( $_POST['country'] ) );
         }
 
         if ( isset( $_POST[ 'notes' ] ) ){

@@ -108,6 +108,74 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
         </tbody>
     </table>
 
+    <!-- ADDRESS -->
+    <h2><?php _e( 'Address' ); ?></h2>
+    <table class="form-table">
+        <tbody>
+        <tr>
+            <th><label for="street_address_1"><?php echo __( 'Street Address 1', 'groundhogg' )?></label></th>
+            <td><?php $args = array(
+                    'id'    => 'street_address_1',
+                    'name'  => 'street_address_1',
+                    'value' => $contact->get_meta( 'street_address_1' ),
+                );
+                echo WPGH()->html->input( $args ); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="street_address_2"><?php echo __( 'Street Address 2', 'groundhogg' )?></label></th>
+            <td><?php $args = array(
+                    'id'    => 'street_address_2',
+                    'name'  => 'street_address_2',
+                    'value' => $contact->get_meta( 'street_address_2' ),
+                );
+                echo WPGH()->html->input( $args ); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="city"><?php echo __( 'City', 'groundhogg' )?></label></th>
+            <td><?php $args = array(
+                    'id'    => 'city',
+                    'name'  => 'city',
+                    'value' => $contact->get_meta( 'city' ),
+                );
+                echo WPGH()->html->input( $args ); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="postal_zip"><?php echo __( 'Postal/Zip Code', 'groundhogg' )?></label></th>
+            <td><?php $args = array(
+                    'id'    => 'postal_zip',
+                    'name'  => 'postal_zip',
+                    'value' => $contact->get_meta( 'postal_zip' ),
+                );
+                echo WPGH()->html->input( $args ); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="region"><?php echo __( 'State/Province', 'groundhogg' )?></label></th>
+            <td><?php $args = array(
+                    'id'    => 'region',
+                    'name'  => 'region',
+                    'value' => $contact->get_meta( 'region' ),
+                );
+                echo WPGH()->html->input( $args ); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="country"><?php echo __( 'Country', 'groundhogg' )?></label></th>
+            <td><?php $args = array(
+                    'id'    => 'country',
+                    'name'  => 'country',
+                    'value' => $contact->get_meta( 'country' ),
+                );
+                echo WPGH()->html->input( $args ); ?>
+            </td>
+        </tr>
+        <?php do_action( 'wpgh_contact_edit_address', $id ); ?>
+        </tbody>
+    </table>
+
     <!-- MARKETING COMPLIANCE INFORMATION -->
     <h2><?php _e( 'Compliance' ); ?></h2>
     <table class="form-table">

@@ -110,7 +110,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 = 0.9.8 =
 * Added Welcome Page
 * Changed menu structure
-* Added assets
+* Added image assets
+* Added address section to contact record.
+* Fixed bug where clicking the confirmation link in tracking history resulted in a db error.
 
 = 0.9.7 =
 * Added send email function to contact record.

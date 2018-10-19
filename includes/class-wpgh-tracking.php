@@ -512,7 +512,10 @@ class WPGH_Tracking
          * @type $contact WPGH_Contact
          * @type $funnel_id int
          */
-        do_action( 'wpgh_email_confirmed', $this->contact, $this->funnel->ID );
+
+        if ( $this->funnel ){
+            do_action( 'wpgh_email_confirmed', $this->contact, $this->funnel->ID );
+        }
 
         wp_redirect( $conf_page );
         die();
