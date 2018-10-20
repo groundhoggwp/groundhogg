@@ -58,13 +58,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     <?php foreach ( $emails as $email ): ?>
 
         <div class="postbox" style="margin-right:20px;width: 550px;display: inline-block;">
-            <h2 class="hndle"><?php echo $email['subject']; ?></h2>
+            <h2 class="hndle"><?php echo $email->subject; ?></h2>
             <div class="inside">
-                <p><?php echo empty( $email['pre_header'] )? __( 'Custom Email', 'groundhogg' ) :  $email['pre_header']; ?></p>
+                <p><?php echo empty( $email->pre_header )? __( 'Custom Email', 'groundhogg' ) :  $email->pre_header; ?></p>
                 <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $id; ?> " class="email-container postbox">
-                    <?php echo $email['content']; ?>
+                    <?php echo $email->content; ?>
                 </div>
-                <button class="button-primary" name="email_id" value="<?php echo $email[ 'ID' ]; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+                <button class="button-primary" name="email_id" value="<?php echo $email->ID; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
             </div>
         </div>
 

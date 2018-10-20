@@ -81,9 +81,30 @@ class WPGH_Create_User extends WPGH_Funnel_Step
      */
     public function run( $contact, $event )
     {
-        //todo implement
+	    $username = $contact->email;
 
-        return false;
+	    $password = wp_generate_password();
+	    $email_address = $contact->email;
+
+	    $role = $event->step->get_meta( 'role' );
+
+	    if ( ! username_exists( $username ) && ! email_exists( $email_address ) ) {
+
+	        $user_id = wp_create_user( $username, $password, $email_address );
+		    $user = new WP_User( $user_id );
+		    $user->set_role( $role );
+
+		    $user->first_name = $contact->first_name;
+
+		    wp_update_user( $user );
+
+		    wp_new_user_notification( $user_id, null, 'user' );
+
+		    $contact->update( array( 'user_id', $user_id ) );
+
+	    }
+
+	    return true;
     }
 
 }
