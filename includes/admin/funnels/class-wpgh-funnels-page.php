@@ -51,11 +51,12 @@ class WPGH_Funnels_Page
 
 		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' ){
 
+			$this->setup_reporting();
+
 			add_action( 'init' , array( $this, 'process_action' )  );
 
-            $this->notices = WPGH()->notices;
+			$this->notices = WPGH()->notices;
 
-            $this->setup_reporting();
 		}
 	}
 
@@ -116,7 +117,7 @@ class WPGH_Funnels_Page
 
     }
 
-    private function get_reporting_range()
+    public function get_reporting_range()
     {
         return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ;
     }

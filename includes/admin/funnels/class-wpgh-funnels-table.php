@@ -107,7 +107,60 @@ class WPGH_Funnels_Table extends WP_List_Table {
         return ( isset( $_GET['view'] ) )? $_GET['view'] : 'all';
     }
 
-    /**
+    protected function extra_tablenav( $which ) {
+
+		if ( $which !== 'top' ){
+			return;
+		}
+
+	    wp_enqueue_style(  'jquery-ui' );
+	    wp_enqueue_script( 'jquery-ui-datepicker' );
+
+		?>
+	    <div class="alignleft actions">
+		    <?php $args = array(
+			    'name'      => 'date_range',
+			    'id'        => 'date_range',
+			    'options'   => array(
+				    'last_24'   => __( 'Last 24 Hours' ),
+				    'last_7'    => __( 'Last 7 Days' ),
+				    'last_30'   => __( 'Last 30 Days' ),
+				    'custom'    => __( 'Custom Range' ),
+			    ),
+			    'selected' => WPGH()->menu->funnels_page->get_reporting_range(),
+		    ); echo WPGH()->html->dropdown( $args ); ?>
+
+		    <?php $selected = WPGH()->menu->funnels_page->get_reporting_range(); ?>
+		    <input autocomplete="off" placeholder="<?php esc_attr_e('From:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_start" name="custom_date_range_start" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_start' ] ) ) echo $_POST['custom_date_range_start']; ?>">
+		    <script>jQuery(function($){$('#custom_date_range_start').datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    maxDate:0,
+                    dateFormat:'d-m-yy'
+                })});</script>
+		    <input autocomplete="off" placeholder="<?php esc_attr_e('To:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_end" name="custom_date_range_end" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_end' ] ) ) echo $_POST['custom_date_range_end']; ?>">
+		    <script>jQuery(function($){$('#custom_date_range_end').datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    maxDate:0,
+                    dateFormat:'d-m-yy'
+                })});</script>
+
+		    <script>jQuery(function($){$('#date_range').change(function(){
+                    if($(this).val() === 'custom'){
+                        $('#custom_date_range_end').removeClass('hidden');
+                        $('#custom_date_range_start').removeClass('hidden');
+                    } else {
+                        $('#custom_date_range_end').addClass('hidden');
+                        $('#custom_date_range_start').addClass('hidden');
+                    }})});
+		    </script>
+		    <?php submit_button( 'Refresh', 'secondary', 'change_reporting', false ); ?>
+	    </div>
+		<?php
+    }
+
+	/**
      * Get default row elements...
      *
      * @param $funnel object
@@ -164,7 +217,8 @@ class WPGH_Funnels_Table extends WP_List_Table {
         $count = $query->query( array(
             'count'  => true,
             'report' => array(
-                'start'     => strtotime( '30 days ago' ),
+                'start'     => WPGH()->menu->funnels_page->reporting_start_time,
+                'end'       => WPGH()->menu->funnels_page->reporting_end_time,
                 'funnel'    => $funnel->ID
             )
         ) );
