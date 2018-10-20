@@ -107,6 +107,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.9 =
+* Finished implementing the Create User Action.
+* Fixed bug where add from gives a warning.
+* Tracking now uses the Logged in user as a contact if it exists so that if you're logged in replacement codes
+* among other functionality will work on the front end.
+
 = 0.9.8 =
 * Added Welcome Page
 * Changed menu structure
