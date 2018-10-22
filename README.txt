@@ -109,7 +109,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 0.9.9 =
 * Finished implementing the Create User Action.
-* Fixed bug where add from gives a warning.
+* Fixed bug where add from previous emails gives a warning.
 * Tracking now uses the Logged in user as a contact if it exists so that if you're logged in replacement codes
 among other functionality will work on the front end.
 * Added reporting ranges to the active contacts column in funnel list
