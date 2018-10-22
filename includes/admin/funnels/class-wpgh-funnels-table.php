@@ -223,7 +223,7 @@ class WPGH_Funnels_Table extends WP_List_Table {
             )
         ) );
 
-        $queryUrl = admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%d&start=%d', $funnel->ID, strtotime( '30 days ago' ) ) );
+        $queryUrl = admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%d&start=%d', $funnel->ID, WPGH()->menu->funnels_page->reporting_start_time ) );
         return "<a href='$queryUrl'>$count</a>";
     }
 
