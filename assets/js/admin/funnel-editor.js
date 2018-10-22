@@ -55,9 +55,17 @@ var wpghFunnelEditor;
          * @param e string class name
          */
         insertDummyStep: function (e) {
-            this.editor.find(e).replaceWith(
-                '<div id="temp-step" class="postbox step replace-me" style="width: 500px;margin-right: auto;margin-left: auto;"><h3 class="hndle">Please Wait...</h3><div class="inside">Loading content...</div></div>'
-            );
+            /* Check if we actually dropped it in */
+            if ( this.editor.find(e).length > 0 ){
+
+                this.editor.find(e).replaceWith(
+                    '<div id="temp-step" class="postbox step replace-me" style="width: 500px;margin-right: auto;margin-left: auto;"><h3 class="hndle">Please Wait...</h3><div class="inside">Loading content...</div></div>'
+                );
+
+                return true;
+            }
+
+            return false
         },
 
         /**
@@ -77,10 +85,13 @@ var wpghFunnelEditor;
          */
         convertDraggableToStep: function ( e ) {
             var step_type = e.id;
-            this.insertDummyStep('.ui-draggable');
-            var order = $('.step').index($('#temp-step')) + 1;
-            var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order};
-            this.getStepHtml(data);
+            if ( this.insertDummyStep('.ui-draggable') ){
+
+                var order = $('.step').index($('#temp-step')) + 1;
+                var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order};
+                this.getStepHtml(data);
+
+            }
         },
 
         /**
