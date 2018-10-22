@@ -176,10 +176,10 @@ class WPGH_Emails_Table extends WP_List_Table {
             $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
 
             if ( $email->status === 'draft' ){
-                $html .= " — " . "<span class='post-state'>(" . __( 'Draft' ) . ")</span>";
+                $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Draft' ) . ")</span>";
             }
+	        $html .= "</strong>";
         }
-        $html .= "</strong>";
 
         return $html;
     }

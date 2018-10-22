@@ -236,7 +236,15 @@ class WPGH_DB_Steps extends WPGH_DB  {
         if ( ! is_array( $data ) )
             return false;
 
-        $data = (array) $data;
+	    $data = (array) $data;
+
+	    $extra = '';
+
+	    if ( isset( $data[ 'search' ] ) ){
+
+		    $extra .= sprintf( " AND (%s)", $this->generate_search( $data[ 'search' ] ) );
+
+	    }
 
         // Initialise column format array
         $column_formats = $this->get_columns();
@@ -255,7 +263,7 @@ class WPGH_DB_Steps extends WPGH_DB  {
 
         }
 
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where ORDER BY `$order` ASC" );
+        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY `$order` ASC" );
 
         return $results;
     }

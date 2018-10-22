@@ -16,6 +16,16 @@ define( 'WPGH_HARD_BOUNCE'  , 5 );
 define( 'WPGH_SPAM'         , 6 );
 
 /**
+ * Return the FULL URI from wp_get_referer for string comparisons
+ *
+ * @return string
+ */
+function wpgh_get_referer()
+{
+	return ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . wp_get_referer();
+}
+
+/**
  * Get the text explanation for the optin status of a contact
  * 0 = unconfirmed, can send email
  * 1 = confirmed, can send email

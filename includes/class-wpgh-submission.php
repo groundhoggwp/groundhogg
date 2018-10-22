@@ -66,7 +66,7 @@ class WPGH_Submission
 
         $this->data = $_POST;
 
-        $this->source = ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . wp_get_referer();
+        $this->source = wpgh_get_referer();
 
         /* set the form ID as the submission ID */
 

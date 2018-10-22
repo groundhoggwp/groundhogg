@@ -7,7 +7,15 @@
                 wpActiveEditor = true; //we need to override this var as the link dialogue is expecting an actual wp_editor instance
                 wpLink.active = $(this).attr('data-target');
                 wpLink.open(wpLink.active); //open the link popup
-                $('#wp-link-url').val( $( '#' + wpLink.active ).val() );
+
+                var active = $( '#' + wpLink.active);
+
+                if ( active.prop('tagName') !== 'TEXTAREA' ) {
+
+                    $('#wp-link-url').val( active.val() );
+
+                }
+
                 return false;
             });
         });
@@ -24,7 +32,14 @@ jQuery(function ($) {
 
     $('body').on('click', '#wp-link-submit', function(event) {
         var linkAtts = wpLink.getAttrs();//the superlinks attributes (href, target) are stored in an object, which can be access via  wpLink.getAttrs()
-        $( '#' + wpLink.active ).val(linkAtts.href);//get the href attribute and add to a textfield, or use as you see fit
+        var active = $( '#' + wpLink.active );
+
+        if ( active.prop('tagName') === 'TEXTAREA' ) {
+            active.val( active.val() + linkAtts.href + '\n' );//get the href attribute and add to a textfield, or use as you see fit
+        } else {
+            active.val(linkAtts.href);//get the href attribute and add to a textfield, or use as you see fit
+        }
+
         wpLink.textarea = $('body'); //to close the link dialogue, it is again expecting an wp_editor instance, so you need to give it something to set focus back to. In this case, I'm using body, but the textfield with the URL would be fine
         wpLink.close();//close the dialogue
 //trap any events

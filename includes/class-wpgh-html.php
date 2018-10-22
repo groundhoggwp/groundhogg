@@ -20,6 +20,7 @@ class WPGH_HTML
         add_action( 'wp_ajax_gh_get_contacts', array( $this, 'gh_get_contacts' ) );
         add_action( 'wp_ajax_gh_get_emails', array( $this, 'gh_get_emails' ) );
         add_action( 'wp_ajax_gh_get_tags', array( $this, 'gh_get_tags' ) );
+        add_action( 'wp_ajax_gh_get_benchmarks', array( $this, 'gh_get_benchmarks' ) );
 
     }
 
@@ -505,6 +506,74 @@ class WPGH_HTML
 
         return $this->select2( $a );
     }
+
+	/**
+	 * Get json email results for email picker
+	 */
+	public function gh_get_benchmarks()
+	{
+
+		if ( ! is_user_logged_in() || ! current_user_can( 'edit_funnels' ) )
+			wp_die( 'No access to benchmarks.' );
+
+		if ( isset(  $_REQUEST[ 'q' ] ) ){
+			$query_args[ 'search' ] = $_REQUEST[ 'q' ];
+		}
+
+		$query_args[ 'step_group' ] = 'benchmark';
+		$data = WPGH()->steps->get_steps( $query_args );
+
+		$json = array();
+
+		foreach ( $data as $i => $step ) {
+
+			$json[] = array(
+				'id' => $step->ID,
+				'text' => $step->step_title . ' (' . str_replace( '_', ' ', $step->step_type ) . ')'
+			);
+
+		}
+
+		$results = array( 'results' => $json, 'more' => false );
+
+		wp_die( json_encode( $results ) );
+	}
+
+	/**
+	 * Returns a picker for benchmarks.
+	 * Included in core so that we don't need to include it in every extension we write.
+	 *
+	 * @param $args
+	 *
+	 * @return string
+	 */
+	public function benchmark_picker( $args )
+	{
+
+		$a = wp_parse_args( $args, array(
+			'name'              => 'benchmarks[]',
+			'id'                => 'benchmarks',
+			'class'             => 'gh-benchmark-picker',
+			'data'              => array(),
+			'selected'          => array(),
+			'multiple'          => true,
+			'placeholder'       => __( 'Please Select 1 or more Benchmarks', 'groundhogg' ),
+			'tags'              => false,
+		) );
+
+		foreach ( $a[ 'selected' ] as $benchmark_id ){
+
+			if ( WPGH()->steps->exists( $benchmark_id ) ){
+
+				$step = new WPGH_Step( $benchmark_id );
+				$a[ 'data' ][ $benchmark_id ] = $step->title . ' (' . str_replace( '_', ' ', $step->type ) . ')';
+
+			}
+
+		}
+
+		return $this->select2( $a );
+	}
 
     /**
      * Return HTML for a color picker

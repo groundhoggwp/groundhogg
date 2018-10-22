@@ -49,12 +49,27 @@ const wpgh = {
         });
     },
 
+    buildBenchmarkPicker: function(){
+        jQuery('.gh-benchmark-picker' ).css( 'width', '100%' ).select2({
+            ajax: {
+                url: ajaxurl + '?action=gh_get_benchmarks',
+                dataType: 'json',
+                results: function(data, page) {
+                    return {
+                        results: data.results
+                    };
+                }
+            }
+        });
+    },
+
     init:  function () {
 
         this.buildSelect2();
         this.buildEmailPicker();
         this.buildContactPicker();
         this.buildTagPicker();
+        this.buildBenchmarkPicker();
     },
 
 };
