@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.10 =
+* Fixed email preferences not working AT ALL, oops...
+* Added last_optin to submission
+
 = 0.9.9 =
 * Finished implementing the Create User Action.
 * Fixed bug where add from previous emails gives a warning.

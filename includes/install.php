@@ -102,7 +102,7 @@ function wpgh_run_install() {
     if ( ! get_option( 'gh_email_preferences_page', false ) ){
         $email_preferences_args = array(
             'post_title' => __( 'Email Preferences', 'groundhogg' ),
-            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form][gh_email_preferences][/gh_form]</p>', 'groundhogg' ),
+            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form success=""][gh_email_preferences][/gh_form]</p>', 'groundhogg' ),
             'post_type' => 'page',
             'post_status' => 'publish',
             'post_author' => get_current_user_id(),

@@ -81,6 +81,8 @@ class WPGH_Submission
             if ( ! $this->step->is_active() ){
                 $this->leave( 'This form is not accepting submissions.' );
             }
+        } else {
+            $this->id = 0;
         }
 
 
@@ -92,7 +94,7 @@ class WPGH_Submission
         );
 
         if ( empty( $this->fields ) ){
-            $this->leave( 'No fields available. gh_fields_' . $this->id . ' ' . $this->source );
+            $this->leave( 'No fields available. gh_fields_' . $this->id . ' Source:' . $this->source );
         }
     }
 
@@ -320,54 +322,70 @@ class WPGH_Submission
     /**
      * Create the contact record and return back the contact ID
      *
-     * @return WPGH_Contact $contact the $contact
+     * @return WPGH_Contact|bool $contact the $contact
+     *
      */
     public function create_contact()
     {
-        $email = sanitize_email( $this->email );
+        if ( isset( $this->email ) ){
+            $email = sanitize_email( $this->email );
 
-        if ( empty( $email ) ){
-            $this->leave( 'Please provide a valid email address' );
-        }
-
-        $args = array(
-            'email' => $email,
-            'first_name' => sanitize_text_field( $this->first_name ),
-            'last_name' => sanitize_text_field( $this->last_name )
-        );
-
-        if ( is_user_logged_in() ){
-            $args[ 'user_id' ] = get_current_user_id();
-        } else {
-            $user = get_user_by( 'email', $email );
-            if ( $user ){
-                $args[ 'user_id' ] = $user->ID;
+            if ( empty( $email ) ){
+                $this->leave( 'Please provide a valid email address' );
             }
-        }
 
-        if ( WPGH()->contacts->exists( $email ) ){
+            $args = array(
+                'email' => $email,
+                'first_name' => sanitize_text_field( $this->first_name ),
+                'last_name' => sanitize_text_field( $this->last_name )
+            );
+
+            if ( is_user_logged_in() ){
+                $args[ 'user_id' ] = get_current_user_id();
+            } else {
+                $user = get_user_by( 'email', $email );
+                if ( $user ){
+                    $args[ 'user_id' ] = $user->ID;
+                }
+            }
+
+            if ( WPGH()->contacts->exists( $email ) ){
 
 //            var_dump( $args );
 
-            $this->contact = new WPGH_Contact( $email );
-            $this->contact->update( $args );
+                $this->contact = new WPGH_Contact( $email );
+                $this->contact->update( $args );
 
-        } else{
-            $cid = WPGH()->contacts->add( $args );
+            } else{
+                $cid = WPGH()->contacts->add( $args );
 
-            if ( ! $cid ){
-                $this->leave();
+                if ( ! $cid ){
+                    $this->leave();
+                }
+
+                $this->contact = new WPGH_Contact( $cid );
             }
 
-            $this->contact = new WPGH_Contact( $cid );
+            //unset used DATA from the data prop
+            unset( $this->first_name );
+            unset( $this->last_name );
+            unset( $this->email );
+
+            return $this->contact;
+
+        } else if ( WPGH()->tracking->get_contact() instanceof WPGH_Contact) {
+
+            $this->contact = WPGH()->tracking->get_contact();
+
+            return $this->contact;
+
+        } else {
+
+            wp_die( 'Could not access or create a contact record.' );
+
         }
 
-        //unset used DATA from the data prop
-        unset( $this->first_name );
-        unset( $this->last_name );
-        unset( $this->email );
-
-        return $this->contact;
+        return false;
 
     }
 
@@ -393,6 +411,10 @@ class WPGH_Submission
         }
 
         $c = $this->create_contact();
+
+        if ( ! $c ){
+            wp_die( 'Oops' );
+        }
 
         $c->update_meta( 'ip_address', wpgh_get_visitor_ip() );
 
@@ -440,6 +462,8 @@ class WPGH_Submission
 
         }
 
+        $c->update_meta( 'last_optin', time() );
+
         foreach ( $this->data as $key => $value ) {
 
             $key = sanitize_key( $key );
@@ -483,6 +507,8 @@ class WPGH_Submission
         if ( ! $contact )
             return;
 
+        $contact->update_meta( 'preferences_changed', time() );
+
         if ( isset( $_POST[ 'delete_everything' ] ) && $_POST[ 'delete_everything' ] === 'yes' ) {
 
             do_action( 'wpgh_delete_everything', $contact->ID );
@@ -503,15 +529,17 @@ class WPGH_Submission
         switch ( $preference ){
             case 'none':
 
-                $args = array( 'optin_status' => WPGH_UNCONFIRMED );
-                $contact->update( $args );
-
-                do_action( 'wpgh_preference_none', $contact->ID );
+                if ( $contact->optin_status !== WPGH_CONFIRMED ){
+                    /* If they already confirmed DON'T CHANGE IT! */
+                    $args = array( 'optin_status' => WPGH_UNCONFIRMED );
+                    $contact->update( $args );
+                    do_action( 'wpgh_preference_none', $contact->ID );
+                }
 
                 break;
             case 'weekly':
 
-                $args = array( 'optin_status' => WPGH_MONTHLY );
+                $args = array( 'optin_status' => WPGH_WEEKLY );
                 $contact->update( $args );
 
                 do_action( 'wpgh_preference_weekly', $contact->ID );
@@ -539,6 +567,7 @@ class WPGH_Submission
 
                 break;
         }
+
     }
 
 

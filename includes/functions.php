@@ -22,7 +22,10 @@ define( 'WPGH_SPAM'         , 6 );
  */
 function wpgh_get_referer()
 {
-	return ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . wp_get_referer();
+    if ( ! isset( $_POST[ '_wp_http_referer' ]  ) )
+        return wp_get_referer();
+
+	return ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
 }
 
 /**

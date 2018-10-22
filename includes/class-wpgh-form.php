@@ -42,7 +42,7 @@ class WPGH_Form
         $this->a = shortcode_atts(array(
             'success'   => '',
             'class'     => '',
-            'id'        => ''
+            'id'        => 0
         ), $atts);
 
         $this->id = intval( $this->a[ 'id' ] );
@@ -103,7 +103,9 @@ class WPGH_Form
      */
     private function is_form()
     {
-        return !empty( $this->a[ 'id' ] );
+//        return !empty( $this->a[ 'id' ] );
+
+        return true;
     }
 
     private function field_wrap( $content )
@@ -575,10 +577,10 @@ class WPGH_Form
 
                 $value = is_string( $i ) ? $i : $option;
 
-                $optionHTML .= sprintf( "<div class='gh-radio-wrapper %s'><label><input type='radio' name='%s' id='%s' value='%s' %s> %s</label></div>",
+                $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label><input class='%s' type='radio' name='%s' id='%s' value='%s' %s> %s</label></div>",
                     esc_attr( $a[ 'class' ] ),
                     esc_attr( $a[ 'name' ] ),
-                    esc_attr( $a[ 'id' ] ),
+                    esc_attr( $a[ 'id' ] ) . '-' . $i,
                     esc_attr( $value ),
                     $required,
                     $option
@@ -731,7 +733,17 @@ class WPGH_Form
         }
 
         $html = "<div class='gh-email-preferences-form'>";
-        $html .= wp_nonce_field( 'change_email_preferences', 'email_preferences_nonce', true, false );
+        $html .= wp_nonce_field( 'change_email_preferences', 'email_preferences_nonce', false, false );
+
+        $last_change = $contact->get_meta( 'preferences_changed' );
+
+        if ( $last_change && ( time() - $last_change ) < 30 ){
+
+            $html.= sprintf( "<div class='notice' style='color: white; background: #3ed920;padding: 6px;margin-bottom: 10px;'>%s</div>",
+                __( 'Your preferences have been changed!', 'groundhogg' )
+            );
+
+        }
 
         $options = array(
             'none'          => __( 'I love this company, you can communicate with me whenever you feel like.', 'groundhogg'),
@@ -756,27 +768,30 @@ class WPGH_Form
         $html .= $this->radio( $args );
 
         /* Delete Everything Option */
-        $args = array(
-            'label'     => __( ' Please also delete all personal information on record.', 'groundhogg' ),
-            'id'        => 'delete_everything',
-            'name'      => 'delete_everything',
-            'value'     => 'yes',
-        );
 
-        $html .= $this->checkbox( $args );
+        if ( wpgh_is_gdpr() ){
+            $args = array(
+                'label'     => __( ' Please also delete all personal information on record.', 'groundhogg' ),
+                'id'        => 'delete_everything',
+                'name'      => 'delete_everything',
+                'value'     => 'yes',
+            );
+            $html .= $this->checkbox( $args );
 
-        /* only show checkbox if unsubscribing */
-        $html .= "<script>
+            /* only show checkbox if unsubscribing */
+            $html .= "<script>
 jQuery( function($){ 
-    $( '#delete_everything' ).fadeOut();
-    $('.email-preference').change( function(){ 
-        if ( $(this).is( ':selected' ) && $(this).val() === 'unsubscribe' ){ 
-            $( '#delete_everything' ).fadeIn() 
+    $( '#delete_everything' ).parent().css( 'display', 'none' );
+    $('input[name=email_preferences]').on( 'change', function(){ 
+        if ( $(this).is( ':checked' ) && $(this).val() === 'unsubscribe' ){ 
+            $( '#delete_everything' ).parent().fadeIn() 
         } else { 
-            $( '#delete_everything' ).fadeOut() 
+            $( '#delete_everything' ).parent().fadeOut() 
         } 
     } ) 
 })</script>";
+        }
+
 
         $html .= "</div>";
 
@@ -830,7 +845,9 @@ jQuery( function($){
 
         $form .= wp_nonce_field( 'gh_submit', 'gh_submit_nonce', true, false );
 
-        $form .= "<input type='hidden' name='step_id' value='" . $this->a['id'] . "'>";
+        if ( ! empty( $this->a[ 'id' ] ) ){
+            $form .= "<input type='hidden' name='step_id' value='" . $this->a['id'] . "'>";
+        }
 
         $this->setup_shortcodes();
 
@@ -852,7 +869,10 @@ jQuery( function($){
 
             $actual_link = ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
             $id = url_to_postid( $actual_link );
-            update_post_meta(  $id, 'gh_fields_' . $this->id , $this->fields );
+
+            if ( $id ){
+                update_post_meta(  $id, 'gh_fields_' . $this->id , $this->fields );
+            }
 
         }
 

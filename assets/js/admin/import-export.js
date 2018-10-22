@@ -36,19 +36,12 @@ var wpghImportExport;
             $('input[type=file]').parse({
                 config: {
                     download: true,
-                    quotes: false,
-                    quoteChar: '"',
-                    escapeChar: '"',
                     delimiter: ",",
                     header: true,
-                    newline: "\r\n",
                     complete: function(results, file) {
-
                         console.log("This file done:", file, results);
-
                         wpghImportExport.allRows = results.data.length;
                         wpghImportExport.results = results.data;
-
                     }
                 },
                 before: function(file, inputElem)
@@ -65,7 +58,7 @@ var wpghImportExport;
                 {
                     wpghImportExport.import();
 
-                    alert( 'Import Complete!' );
+                    alert( 'Import Complete! Imported ' + wpghImportExport.allRows + ' contacts!' );
                 }
             });
         },
