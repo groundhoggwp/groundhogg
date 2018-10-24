@@ -3,8 +3,6 @@
 /**
  * Form
  *
- * //todo revisit implementation
- *
  * @package     Includes
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
@@ -514,7 +512,7 @@ class WPGH_Form
 
         if ( ! empty( $a[ 'options' ] ) )
         {
-            $options = explode( ',', $a[ 'options' ] );
+            $options = is_array( $a[ 'options' ] )? $a[ 'options' ] : explode( ',', $a[ 'options' ] );
             $options = array_map( 'trim', $options );
 
             foreach ( $options as $option ){
@@ -561,7 +559,6 @@ class WPGH_Form
             'id'            => '',
             'class'         => '',
             'options'       => '',
-            'multiple'      => false,
             'required'      => true,
         ), $atts );
 

@@ -47,7 +47,16 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
         parent::__construct();
 
         add_action( 'wpgh_form_submit', array( $this, 'complete' ), 10, 3 );
+        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ));
     }
+
+    public function scripts()
+    {
+
+        wp_enqueue_script( 'wpgh-form-builder', WPGH_ASSETS_FOLDER . 'js/admin/form-builder.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/form-builder.js' ) );
+
+    }
+
 
     /**
      * @param $step WPGH_Step
@@ -121,7 +130,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                     <p class="description">
                         <a href="#" data-target="<?php echo $step->prefix( 'success_page' ) ?>" id="<?php echo $step->prefix( 'add_link' ); ?>">
                             <?php _e( 'Insert Link' , 'groundhogg' ); ?>
-                        </a> | <?php _e('Does not match query string.', 'groundhogg' ); ?>
+                        </a>
                     </p>
                     <script>
                         jQuery(function($){
@@ -130,23 +139,114 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                     </script>
                 </td>
             </tr>
+            </tbody>
+        </table>
+        <table>
+            <tbody>
             <tr>
-                <th>
-                    <?php esc_attr_e( 'Fields:', 'groundhogg' ); ?>
-                </th>
                 <td>
-                    <?php $args = array(
-                        'id'    => $step->prefix( 'form' ),
-                        'name'  => $step->prefix( 'form' ),
-                        'value' => $form,
-                        'class' => 'code',
-                        'cols'  => 50,
-                        'rows'  => 4
-                    ); ?>
-                    <?php echo WPGH()->html->textarea( $args ) ?>
-                    <p class="description">
-                        <?php _e( 'The form editor is a work in progress, to learn how to build forms for now go <a target="_blank" href="https://www.groundhogg.io/2018/09/27/update-to-the-form-shortcode/">here</a>.', 'groundhogg' ); ?>
-                    </p>
+                    <div class="form-editor">
+                        <div class="form-buttons">
+                            <?php
+
+                            $buttons = array(
+                                array(
+                                    'text' => __( 'First' ),
+                                    'class' => 'button button-secondary first'
+                                ),
+                                array(
+                                    'text' => __( 'Last' ),
+                                    'class' => 'button button-secondary last'
+
+                                ),
+                                array(
+                                    'text' => __( 'Email' ),
+                                    'class' => 'button button-secondary email'
+
+                                ),
+                                array(
+                                    'text' => __( 'Phone' ),
+                                    'class' => 'button button-secondary phone'
+
+                                ),
+                                array(
+                                    'text' => __( 'GDPR' ),
+                                    'class' => 'button button-secondary gdpr'
+
+                                ),
+                                array(
+                                    'text' => __( 'Terms' ),
+                                    'class' => 'button button-secondary terms'
+
+                                ),
+                                array(
+                                    'text' => __( 'ReCaptcha' ),
+                                    'class' => 'button button-secondary recaptcha'
+
+                                ),
+                                array(
+                                    'text' => __( 'Submit' ),
+                                    'class' => 'button button-secondary submit-button'
+
+                                ),
+                                array(
+                                    'text' => __( 'Text' ),
+                                    'class' => 'button button-secondary text'
+
+                                ),
+                                array(
+                                    'text' => __( 'Textarea' ),
+                                    'class' => 'button button-secondary textarea'
+
+                                ),
+                                array(
+                                    'text' => __( 'Number' ),
+                                    'class' => 'button button-secondary number'
+
+                                ),
+                                array(
+                                    'text' => __( 'Dropdown' ),
+                                    'class' => 'button button-secondary dropdown'
+
+                                ),
+                                array(
+                                    'text' => __( 'Radio' ),
+                                    'class' => 'button button-secondary radio'
+
+                                ),
+                                array(
+                                    'text' => __( 'Checkbox' ),
+                                    'class' => 'button button-secondary checkbox'
+
+                                ),
+                                array(
+                                    'text' => __( 'Address' ),
+                                    'class' => 'button button-secondary address'
+
+                                ),
+                            );
+
+                            foreach ( $buttons as $button ){
+                                echo WPGH()->html->button( $button );
+                            } ?>
+                        </div>
+
+                        <?php
+
+                        $args = array(
+                            'id'    => $step->prefix( 'form' ),
+                            'name'  => $step->prefix( 'form' ),
+                            'value' => $form,
+                            'class' => 'code form-html',
+                            'cols'  => 64,
+                            'rows'  => 4
+                        ); ?>
+
+                        <?php echo WPGH()->html->textarea( $args ) ?>
+                        <p class="description">
+                            <?php _e( 'The form editor is a work in progress, to learn how to build forms for now go <a target="_blank" href="https://www.groundhogg.io/2018/09/27/update-to-the-form-shortcode/">here</a>.', 'groundhogg' ); ?>
+                        </p>
+                    </div>
                 </td>
             </tr>
         </table>

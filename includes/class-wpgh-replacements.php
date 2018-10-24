@@ -267,7 +267,7 @@ class WPGH_Replacements
         }
 
         // Return tag if tag not set
-        if ( ! $this->has_replacement( $code ) ) {
+        if ( ! $this->has_replacement( $code ) && substr( $code, 0, 1 ) !== '_' ) {
             return $m[0];
         }
 

@@ -21,7 +21,7 @@ $funnel_id = intval( $_GET['funnel'] );
 wp_enqueue_style('editor-buttons');
 wp_enqueue_style( 'jquery-ui' );
 
-wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css' );
+wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/funnel-editor.css') );
 
 //for link editor
 wp_enqueue_editor();

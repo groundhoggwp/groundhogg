@@ -31,6 +31,32 @@ class WPGH_HTML
 
     }
 
+    public function button($args )
+    {
+        $a = wp_parse_args( $args, array(
+            'type'      => 'button',
+            'text'      => '',
+            'name'      => '',
+            'id'        => '',
+            'class'     => 'button button-secondary',
+            'value'     => '',
+            'attributes' => '',
+        ) );
+
+        $html = sprintf(
+            "<button type='%s' id='%s' class='%s' name='%s' value='%s' %s>%s</button>",
+            esc_attr( $a[ 'type'    ] ),
+            esc_attr( $a[ 'id'      ] ),
+            esc_attr( $a[ 'class'   ] ),
+            esc_attr( $a[ 'name'    ] ),
+            esc_attr( $a[ 'value'   ] ),
+            esc_attr( $a[ 'attributes'  ] ),
+            esc_attr( $a[ 'text'  ] )
+        );
+
+        return apply_filters( 'wpgh_html_input', $html, $args );
+    }
+
     /**
      * Output a simple input field
      *

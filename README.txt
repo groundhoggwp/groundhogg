@@ -107,7 +107,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
-= 0.9.12 =
+= 0.9.13 =
+* Added simple editor to the form fill benchmark. Buttons now allow the user to quickly add standard fields to the forms without the need to view complete documentation.
+* Fixed bug in form address field that caused a warning
+* Fixed {_blah} replacement code not working because of unregistered code
+
+= 0.9.12 / 0.9.11 =
 * Updated bounce checker Library. Has a few bugs that were incompatible with PHP 7.0 +
 * Fixed function name formlift_ to wpgh_ in locations.php
 * Fixed meta not being saved via custom form fields

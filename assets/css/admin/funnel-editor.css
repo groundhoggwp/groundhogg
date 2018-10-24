@@ -1,3 +1,9 @@
+.form-buttons .button{
+    margin: 2px;
+}
+.form-buttons {
+    margin: 0 0 5px 0;
+}
 
 .arrow-down {
     width: 0;
