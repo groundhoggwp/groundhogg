@@ -113,6 +113,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * Fixed meta not being saved via custom form fields
 * Added security and copyright to all file headers
 * Added .htaccess to templates/funnels
+* Added email preferences funnel template
+* Changed the form shortcode to be a text editor in the step itself, needs updated documentation.
 
 = 0.9.10 =
 * Fixed email preferences not working AT ALL, oops...
