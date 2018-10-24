@@ -1,6 +1,20 @@
 <?php
+/**
+ * Plugin Settings
+ *
+ * This  is your fairly typical settigns page.
+ * It's a BIT of a mess, but I digress.
+ *
+ * @package     Admin
+ * @subpackage  Admin/Settings
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
+ */
 
-/* Groundhogg Settings Page */
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 class WPGH_Settings_Page
 {
 

@@ -1,10 +1,19 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-04
- * Time: 5:42 PM
+ * Admin Notification
+ *
+ * Registers the admin notification step in the funnel builder.
+ * USes WP_MAIL to send all notifications
+ *
+ * @package     Elements
+ * @subpackage  Elements/Actions
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Admin_Notification extends WPGH_Funnel_Step
 {

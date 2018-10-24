@@ -1,10 +1,19 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-04
- * Time: 5:42 PM
+ * Send Email
+ *
+ * This will send an email to the contact using WP_MAIL
+ *
+ * @package     Elements
+ * @subpackage  Elements/Actions
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @see         WPGH_Email::send()
+ * @since       File available since Release 0.9
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Send_Email extends WPGH_Funnel_Step
 {

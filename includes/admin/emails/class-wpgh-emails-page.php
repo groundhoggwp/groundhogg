@@ -3,12 +3,14 @@
  * View Emails
  *
  * Allow the user to view & edit the emails
+ * Contains add, save, delete, etc for the admin functions...
  *
- * @package     groundhogg
- * @subpackage  Includes/Emails
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Emails
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 
@@ -499,12 +501,53 @@ class WPGH_Emails_Page
         <?php
     }
 
+    /**
+     * Include the blocks...
+     */
+    private function include_blocks()
+    {
+        require_once dirname( __FILE__ ) . '/blocks/wpgh-email-block.php';
+        require_once dirname( __FILE__ ) . '/blocks/wpgh-text-block.php';
+        require_once dirname( __FILE__ ) . '/blocks/wpgh-image-block.php';
+        require_once dirname( __FILE__ ) . '/blocks/wpgh-divider-block.php';
+        require_once dirname( __FILE__ ) . '/blocks/wpgh-spacer-block.php';
+        require_once dirname( __FILE__ ) . '/blocks/wpgh-button-block.php';
+        require_once dirname( __FILE__ ) . '/blocks/wpgh-html-block.php';
+    }
+
+    /**
+     * init the blocks
+     *
+     * @return array
+     */
+    private function get_blocks()
+    {
+
+        $blocks = array();
+
+        $blocks[] = new WPGH_Text_Block();
+        $blocks[] = new WPGH_Image_Block();
+        $blocks[] = new WPGH_Divider_Block();
+        $blocks[] = new WPGH_Spacer_Block();
+        $blocks[] = new WPGH_Button_Block();
+        $blocks[] = new WPGH_HTML_Block();
+
+        return $blocks;
+
+    }
+
     function edit()
     {
 
         if ( ! current_user_can( 'edit_emails' ) ){
             wp_die( WPGH()->roles->error( 'edit_emails' ) );
         }
+
+        wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.js' ) );
+        wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . 'css/admin/email-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/email-editor.css' ) );
+
+        $this->include_blocks();
+        $this->get_blocks();
 
         include dirname( __FILE__ ) . '/email-editor.php';
 

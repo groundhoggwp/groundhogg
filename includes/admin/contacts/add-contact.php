@@ -1,14 +1,28 @@
 <?php
 /**
- * Add contact
+ * Add a contact via the Admin "ADD NEW" button
  *
- * Allows the easy addition of contacts from the admin menu.
+ * I recommend leaving this file alone and adding any custom sections to the edit screen rather than this screen
+ * But if you MUST then what you can do is the following.
  *
- * @package     groundhogg
- * @subpackage  includes/admin/Contacts
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * add_action( 'wpgh_add_new_contact_form_after', 'my_custom_section' );
+ *
+ * To output your custom settings.
+ *
+ * To do something with those settings you will need to access the save API method...
+ *
+ * add_action( 'wpgh_admin_add_contact_after', 'my_add_function' ); ($id)
+ *
+ * and access the $_POST directly. By that point the contact will have already been added
+ * to the DB so the hook passes the $id of the contact
+ *
+ * @package     Admin
+ * @subpackage  Admin/Contacts
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @see         WPGH_Contacts_Page::add()
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly

@@ -1,10 +1,21 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-09-28
- * Time: 2:55 PM
+ * Bounce Checker
+ *
+ * This will add an action to the recurring WPGH_cron_event o check the bounce inbox (if given) for bounced email addresses
+ *
+ * We have HEAVILY modified the BounceHandler class as it was incompatible at the time of implementation with modern PHP 7
+ *
+ * @uses BounceHandler
+ *
+ * @package     Include
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Bounce_Checker
 {

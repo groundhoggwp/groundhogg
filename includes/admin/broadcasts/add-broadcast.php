@@ -1,9 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-08-17
- * Time: 3:11 PM
+ * This is the page which allows the user to schedule a broadcast.
+ *
+ * Broadcasts are a closed process and thus have very limited hooks to modify the functionality.
+ * If you are looking to extend the broadcast experience you are better off designing your own page to schedule broadcasts.
+ *
+ * @package     Admin
+ * @subpackage  Admin/Broadcasts
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @see         WPGH_Broadcasts_Page::add()
+ * @since       File available since Release 0.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;

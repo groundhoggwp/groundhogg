@@ -1,10 +1,28 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-08-20
- * Time: 12:32 PM
+ * Funnel Step Parent
+ *
+ * Provides an easy way to add new funnel steps to the funnel builder.
+ * Just extend this class and overwrite the following functions
+ *
+ * save()
+ * run()
+ *
+ * if it's a benchmark, make a call to __construct() and add the function
+ *
+ * complete()
+ *
+ * @see WPGH_Form_Filled for an example.
+ *
+ * @package     Elements
+ * @subpackage  Elements/Benchmarks
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Funnel_Step
 {

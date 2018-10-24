@@ -1,14 +1,18 @@
 <?php
 /**
- * View Broadcasts
+ * The page gh_broadcasts
  *
- * Allow the user to view & edit the broadcasts
+ * This class adds the broadcasts page to the menu and renders the output for the broadcasts page
+ * IT also contains the private functions add() and cancel()
+ * These are made private for good reason as the broadcasts function was decided to be kept a closed process.
+ * If you are a developer, simply BUGGER OFF!
  *
- * @package     groundhogg
- * @subpackage  Includes/Broadcasts
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Broadcasts
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 

@@ -2,13 +2,22 @@
 /**
  * Add Email
  *
- * Allows the easy addition of emails from the admin menu.
+ * This provides a screen of email templates to choose from when creating a new email.
+ * You can add your own email templates if you want, but they should obey the markup of the email editor or they wont be very useful.
+ * The easiest way to ensure that is to design the email in the editor first, then add it to the templates.
  *
- * @package     groundhogg
- * @subpackage  Includes/Emails
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * To add your own email templates see templates/email-templates.php
+ *
+ * Alternatively we provide a tab to view all your previously written emails and allow you to copy the content from it to your new email.
+ * //todo
+ * Create pagination so that 100s of emails do not bog down the process.
+ *
+ * @package     Admin
+ * @subpackage  Admin/Emails
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly

@@ -1,14 +1,33 @@
 <?php
 /**
- * Contact Record
+ * Edit a contact record via the Admin
  *
- * Allow the user to edit the contact details and contact fields
+ * This page is AWESOME. It has 3 main functions....
+ * 1. Provide a simple UI for editing the import contact details.
+ * 2. Provide a simple UI for editing contact meta data (custom fields)
+ * 3. Provide a simple UI for managing funnel events related to the contact.
  *
- * @package     groundhogg
- * @subpackage  Includes/Contacts
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * To add your own settings section there are a multitude of hooks to choose from.
+ * The API to add settings sections is not complicated, but as a result you will be responsible for your own CSS & HTML
+ * Your best option would be to do something like this...
+ *
+ * add_action( 'wpgh_contact_edit_before_history', 'my_settings_section' ); ( $id )
+ *
+ * This will add your section right above the funnel events history section.
+ *
+ * To save your custom information you will need to hook into the save method which you do by...
+ *
+ * add_action( 'wpgh_admin_update_contact_after', 'my_save_function' ); ($id)
+ *
+ * And accessing the $_POST directly.
+ *
+ * @package     Admin
+ * @subpackage  Admin/Contacts
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @see         WPGH_Contacts_Page::edit()
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly
@@ -354,11 +373,7 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
     <h2><?php _e( 'Recent Funnel History' ); ?></h2>
     <div style="max-width: 800px">
     </div>
-    <?php
-
-//    $events = WPGH()->events->get_events( array( 'contact_id' => $contact->ID, 'status' => 'complete' ) );
-    $events = WPGH()->events->get_events( array( 'contact_id' => $contact->ID, 'status' => 'complete' ) );
-
+    <?php $events = WPGH()->events->get_events( array( 'contact_id' => $contact->ID, 'status' => 'complete' ) );
 
     $table = new WPGH_Contact_Events_Table();
     $table->data = $events;
@@ -372,26 +387,9 @@ wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-edit
     <!-- EMAIL HISTORY -->
     <h2><?php _e( 'Recent Email History' ); ?></h2>
     <div style="max-width: 800px">
-    <?php global $wpdb;
-
-        $events_table = WPGH()->events->table_name;
-        $steps_table = WPGH()->steps->table_name;
-
-        $events = $wpdb->get_results( $wpdb->prepare(
-                "SELECT e.*,s.step_type FROM $events_table e 
-                        LEFT JOIN $steps_table s ON e.step_id = s.ID 
-                        WHERE e.contact_id = %d AND e.status = %s AND ( s.step_type = %s OR e.funnel_id = %d )
-                        ORDER BY time DESC"
-                , $id, 'complete', 'send_email', WPGH_BROADCAST )
-        );
-
-        $table = new WPGH_Contact_Activity_Table();
-        $table->data = $events;
-
-//        print_r( $events );
+    <?php $table = new WPGH_Contact_Activity_Table();
         $table->prepare_items();
         $table->display(); ?>
-
     <p class="description"><?php _e( 'This is where you can check if this contact is interacting with your emails.', 'groundhogg' ); ?></p>
     </div>
     <!-- THE END -->

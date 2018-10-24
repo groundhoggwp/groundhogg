@@ -3,7 +3,7 @@
 # Mapping of bounce responses to RFC3463 codes
 #
 #
-
+if ( ! defined( 'ABSPATH' ) ) exit;
 # text in messages from which to figure out what kind of bounce
 $bouncelist = array(
     '[45]\d\d[- ]#?([45]\.\d\.\d{1,2})'                              => 'x',         # use the code from the regex

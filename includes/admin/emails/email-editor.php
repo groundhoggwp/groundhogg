@@ -3,45 +3,30 @@
  * Email Editor
  *
  * Allow the user to edit the email
+ * rather than just hardcoded.
  *
- * @package     groundhogg
- * @subpackage  Includes/Emails
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Emails
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-//for media picker
-wp_enqueue_media();
-//for link editor
-wp_enqueue_editor();
-wp_enqueue_script('wplink');
-wp_enqueue_style('editor-buttons');
-//for color picker
-wp_enqueue_style( 'wp-color-picker' );
-//for drag & drop
+
 wp_enqueue_script( 'jquery-ui-sortable' );
 wp_enqueue_script( 'jquery-ui-draggable' );
-//custom scripts
-wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.js', array( 'wp-color-picker' ) );
-wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . 'css/admin/email-editor.css' );
-
-wp_enqueue_script('media-picker', WPGH_ASSETS_FOLDER . 'js/admin/media-picker.js' );
-
-wp_enqueue_script('simple-editor', WPGH_ASSETS_FOLDER . 'js/admin/simple-editor.js' );
-wp_enqueue_style('simple-editor', WPGH_ASSETS_FOLDER . 'css/admin/simple-editor.css' );
 
 wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/sticky-sidebar.js' );
 wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
-//for select 2
-wp_enqueue_style( 'select2' );
-wp_enqueue_script( 'select2' );
 
 $email_id = intval( $_GET['email'] );
 $email = new WPGH_Email( $email_id );
+
+$blocks = apply_filters( 'wpgh_email_blocks', array() );
 
 ?>
 
@@ -98,175 +83,15 @@ $email = new WPGH_Email( $email_id );
                             <div style="width: 280px;"></div>
                             <div class="editor-actions-inner">
 
-                                <!-- Text Block Otions -->
-                                <div id="text_block-editor" class="postbox hidden">
-                                    <h3 class="hndle"><?php _e( 'Text'); ?></h3>
-                                    <div class="inside">
-                                        <div class="options">
-                                            <table class="form-table">
-                                                <tr>
-                                                    <th><?php _e( 'H1 Size'); ?>:</th>
-                                                    <td><input class="input" type="number" id="h1-size" min="10" max="40" value="30"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'H1 Font'); ?>:</th>
-                                                    <td><?php echo WPGH()->html->font_picker( array( 'id' => 'h1-font', 'name' => 'h1-font' ) ); ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'H2 Size'); ?>:</th>
-                                                    <td><input class="input" type="number" id="h2-size" min="10" max="40" value="20"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'H2 Font'); ?>:</th>
-                                                    <td><?php echo WPGH()->html->font_picker( array( 'name' => 'h2-font', 'id' => 'h2-font' ) ); ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Paragraph Size'); ?>:</th>
-                                                    <td><input class="input" type="number" id="p-size" min="10" max="40" value="16"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Paragraph Font'); ?>:</th>
-                                                    <td><?php echo WPGH()->html->font_picker( array( 'name' => 'p-font', 'id' => 'p-font' ) ); ?></td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                                <?php
 
-                                <!-- Button Options -->
-                                <div id="button_block-editor" class="postbox hidden">
-                                    <h3 class="hndle"><?php _e( 'Button'); ?></h3>
-                                    <div class="inside">
-                                        <div class="options">
-                                            <table class="form-table">
-                                                <tr>
-                                                    <th><?php _e( 'Button Text'); ?>:</th>
-                                                    <td><input type="text" id="button-text" name="button-text" value=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Text Size'); ?>:</th>
-                                                    <td><input class="input" type="number" id="button-size" min="10" max="40" value=""></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Button Font'); ?>:</th>
-                                                    <td><?php echo WPGH()->html->font_picker( array( 'name' => 'button-font', 'id' => 'button-font' ) ); ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Button Color'); ?>:</th>
-                                                    <td><?php echo WPGH()->html->color_picker( array( 'name' => 'button-color', 'id' => 'button-color', 'default' => '#dd9933' ) ); ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Text Color'); ?>:</th>
-                                                    <td><?php echo WPGH()->html->color_picker( array( 'name' => 'button-text-color', 'id' => 'button-text-color', 'default' => '#FFFFFF' ) ); ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Button Link'); ?>:</th>
-                                                    <td><input type="text" id="button-link" name="button-link" value="">
-                                                        <!--
-                                                    <p><a href="#" id="insert-link" data-target="button-link"><?php _e( 'Insert Link' ); ?></a></p>
-                                                    <script>
-                                                        jQuery( function($){
-                                                            $( '#insert-link' ).linkPicker();
-                                                        });
-                                                    </script> -->
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                                foreach ( $blocks as $block_type => $block ){
 
-                                <!-- Spacer Options -->
-                                <div id="spacer_block-editor" class="postbox hidden">
-                                    <h3 class="hndle"><?php _e( 'Spacer'); ?></h3>
-                                    <div class="inside">
-                                        <div class="options">
-                                            <table class="form-table">
-                                                <tr>
-                                                    <th><?php _e( 'Spacer Height'); ?>:</th>
-                                                    <td><input class="input" type="number" id="spacer-size" min="10" max="40" value=""></td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                                    do_action( 'wpgh_' . $block_type . '_block_settings' );
 
-                                <!-- Divider Options -->
-                                <div id="divider_block-editor" class="postbox hidden">
-                                    <h3 class="hndle"><?php _e( 'Divider'); ?></h3>
-                                    <div class="inside">
-                                        <div class="options">
-                                            <table class="form-table">
-                                                <tr>
-                                                    <th><?php _e( 'Divider width'); ?>:</th>
-                                                    <td><input class="input" type="number" id="divider-width" min="10" max="100" value=""></td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                                }
 
-                                <!-- Image Options -->
-                                <div id="image_block-editor" class="postbox hidden">
-                                    <h3 class="hndle"><?php _e( 'Image'); ?></h3>
-                                    <div class="inside">
-                                        <div class="options">
-                                            <table class="form-table">
-                                                <tr>
-                                                    <th><?php _e( 'Image'); ?>:</th>
-                                                    <td>
-                                                        <input id="upload_image_button" type="button" class="button" value="<?php _e( 'Upload Image' ); ?>" />
-
-                                                        <input style="margin-top: 10px;" type='url' name='image-src' id='image-src'>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Image Width'); ?></th>
-                                                    <td><input class="input" type="number" id="image-width" name="image-width" min="0" max="100"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Alignment'); ?></th>
-                                                    <td>
-                                                        <select id="image-align" name="image-align">
-                                                            <option value="left"><?php _e('Left'); ?></option>
-                                                            <option value="center"><?php _e('Center'); ?></option>
-                                                            <option value="right"><?php _e('Right'); ?></option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Alt Text'); ?></th>
-                                                    <td><input class="input" type="text" id="image-alt" name="image-alt"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Image title'); ?></th>
-                                                    <td><input class="input" type="text" id="image-title" name="image-title"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Image Link'); ?></th>
-                                                    <td><input type="text" id="image-link" name="image-link" value=""></td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Code Block Options -->
-                                <div id="code_block-editor" class="postbox hidden">
-                                    <h3 class="hndle"><?php _e( 'Custom HTML'); ?></h3>
-                                    <div class="inside">
-                                        <div class="options">
-                                            <table class="form-table">
-                                                <tr>
-                                                    <th><?php _e( 'HTML Content'); ?>:</th>
-                                                </tr>
-                                                <tr>
-                                                    <td><textarea class="input" rows="20" style="width: 100%;" id="custom-html-content"></textarea></td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                                ?>
 
                                 <!-- Main Content Options -->
                                 <div id="email-editor" class="postbox">
@@ -294,6 +119,7 @@ $email = new WPGH_Email( $email_id );
                             </div>
                         </div>
                         <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto; overflow:visible;">
+
                             <?php $alignment = $email->get_meta( 'alignment' );
                             if ( $alignment === 'center' ){
                                 $margins = "margin-left:auto;margin-right:auto;";
@@ -303,17 +129,7 @@ $email = new WPGH_Email( $email_id );
 
                             <!-- Editor Content -->
                             <div id="email-inside" class="email-sortable" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
-                                <?php if ( empty( $email->content ) ): ?>
-                                    <!-- Empty content -->
-                                    <?php wpgh_get_email_block( 'image_block' ); ?>
-                                    <?php wpgh_get_email_block( 'text_block' ); ?>
-                                    <?php wpgh_get_email_block( 'divider_block' ); ?>
-                                    <?php wpgh_get_email_block( 'button_block') ; ?>
-                                    <?php wpgh_get_email_block( 'divider_block' ); ?>
-                                    <?php wpgh_get_email_block( 'text_block' ); ?>
-                                <?php else: ?>
-                                    <?php echo $email->content; ?>
-                                <?php endif; ?>
+                                <?php echo $email->content; ?>
                             </div>
                         </div>
                         <div style="clear: both;"></div>
@@ -397,8 +213,8 @@ $email = new WPGH_Email( $email_id );
                                     </tr>
                                     <tr id="send-to" class="hidden">
                                         <th><?php _e( 'To:' ); ?></th>
-                                        <?php $args = array( 'id' => 'test_email', 'name' => 'test_email', 'selected' => $email->get_meta( 'test_email' ), 'role' => 'administrator' ); ?>
-                                        <td><?php wp_dropdown_users( $args ); ?><script>jQuery(document).ready(function(){jQuery( '#test_email' ).select2()});</script></td>
+                                        <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'test_email', 'name' => 'test_email', 'selected' => $email->from_user ); ?>
+                                        <td><?php echo WPGH()->html->dropdown_owners( $args ); ?></td>
                                     </tr>
                                     <script>
                                         jQuery(function($){$("#send_test").on( 'input', function(){
@@ -429,30 +245,54 @@ $email = new WPGH_Email( $email_id );
                     <div class="inside">
                         <table>
                             <tbody>
-                            <tr>
-                                <td><div id='text_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/text-block.png'; ?>"></div><p><?php _e( 'Text', 'groundhogg' ); ?></p></div></td>
-                                <td><div id='spacer_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/spacer-block.png'; ?>"></div><p><?php _e( 'Spacer', 'groundhogg' ); ?></p></div></td>
-                            </tr>
-                            <tr>
-                                <td><div id='divider_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/divider.png'; ?>"></div><p><?php _e( 'Divider', 'groundhogg' ); ?></p></div></td>
-                                <td><div id='image_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/image-block.png'; ?>"></div><p><?php _e( 'Image', 'groundhogg' ); ?></p></div></td>
-                            </tr>
-                            <tr>
-                                <td><div id='button_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/button.png'; ?>"></div><p><?php _e( 'Button', 'groundhogg' ); ?></p></div></td>
-                                <td><div id='code_block' class="wpgh-element email-draggable"><div class="builder-icon"><img src="<?php echo WPGH_ASSETS_FOLDER . '/images/email-icons/html-block.png'; ?>"></div><p><?php _e( 'HTML', 'groundhogg' ); ?></p></div></td>
-                            </tr>
+
+                            <?php
+
+                            $i = 0;
+
+                            ?><tr><?php
+
+                                foreach ( $blocks as $block_type => $block ):
+
+                                if ( ( $i % 2 ) == 0 ):
+                                ?></tr><tr><?php
+                                endif;
+
+                                ?>
+                                <td>
+                                    <div id='<?php echo $block[ 'name' ]; ?>-block' data-block-type="<?php echo $block[ 'name' ]; ?>" class="wpgh-element email-draggable">
+                                        <div class="builder-icon">
+                                            <img src="<?php echo $block[ 'icon' ]; ?>"></div>
+                                        <p><?php echo $block[ 'title' ]; ?></p>
+                                    </div>
+                                </td>
+                                <?php
+
+                                $i++;
+
+                                endforeach;
+
+                                ?></tr><?php
+
+                            ?>
                             </tbody>
                         </table>
+                        <div class="hidden">
+
+                            <?php
+
+                            foreach ( $blocks as $block_type => $block ){
+
+                                ?><div class="<?php echo $block[ 'name' ]; ?>-template"><?php
+                                do_action( 'wpgh_' . $block_type . '_block_html' );
+                                ?></div> <?php
+
+                            }
+
+                            ?>
+                            <div id="temp-html" class="hidden"></div>
+                        </div>
                     </div>
-                    <div class="hidden">
-                        <div class="text_block_template"><?php wpgh_get_email_block( 'text_block' ); ?></div>
-                        <div class="spacer_block_template"><?php wpgh_get_email_block( 'spacer_block' ); ?></div>
-                        <div class="divider_block_template"><?php wpgh_get_email_block( 'divider_block' ); ?></div>
-                        <div class="image_block_template"><?php wpgh_get_email_block( 'image_block' ); ?></div>
-                        <div class="button_block_template"><?php wpgh_get_email_block('button_block' ); ?></div>
-                        <div class="code_block_template"><?php wpgh_get_email_block( 'code_block' ); ?></div>
-                    </div>
-                    <div id="temp-html" class="hidden"></div>
                 </div>
             </div>
             <!-- HI -->

@@ -1,10 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-08-07
- * Time: 3:52 PM
+ * Replacements
+ *
+ * The inspiration for this class came from EDD_Email_Tags by easy digital downloads.
+ * But ours is better because it allows for dynamic arguments passed with the replacements code.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Replacements
 {

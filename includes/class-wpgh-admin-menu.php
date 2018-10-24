@@ -1,10 +1,19 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Adrian
- * Date: 2018-08-16
- * Time: 8:06 PM
+ * Admin Menu
+ *
+ * This will init the admin menu, you can also access public menu item methods via this class.
+ * If you are adding your own menu Item do not look here, just add a submenu item to the slug 'groundhogg'
+ * and call it a day.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Admin_Menu
 {

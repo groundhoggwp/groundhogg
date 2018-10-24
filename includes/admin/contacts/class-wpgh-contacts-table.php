@@ -4,11 +4,13 @@
  *
  * This class shows the data table for accessing information about a customer.
  *
- * @package     groundhogg
- * @subpackage  Modules/Contacts
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Contacts
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @see         WP_List_Table, contact-editor.php
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly

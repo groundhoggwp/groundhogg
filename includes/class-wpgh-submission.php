@@ -1,11 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-02
- * Time: 8:24 AM
+ * Submission
+ *
+ * Process a from submission if a form submission is in progress.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
 
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Submission
 {
@@ -467,7 +474,7 @@ class WPGH_Submission
         foreach ( $this->data as $key => $value ) {
 
             $key = sanitize_key( $key );
-            $value = sanitize_textarea_field( $key );
+            $value = sanitize_textarea_field( $value );
 
             if ( $this->has_field( $key ) ) {
 

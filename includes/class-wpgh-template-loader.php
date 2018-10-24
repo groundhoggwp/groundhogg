@@ -1,11 +1,19 @@
 <?php
 
 /**
- * Template loader for WPGH
+ * Template Loader
  *
- * Only need to specify class properties here.
+ * Load templates
  *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( ! class_exists( 'Gamajo_Template_Loader' ) ){
     require_once dirname( __FILE__ ) . '/lib/class-template-loader.php';

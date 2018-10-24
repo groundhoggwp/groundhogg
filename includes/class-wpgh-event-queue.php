@@ -1,10 +1,20 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-01
- * Time: 3:48 PM
+ * Event Queue
+ *
+ * This adds the cron schdule and cron job to process events every 10 minutes.
+ * Also, since most AJAX is async, we can hook in to ALL ajax reuests and process events that way.
+ * Assuming there are never thousands of events which need to be run at once since the addition of an event generally means the execution of at least 1 past event, this is a viable solution.
+ * The only way this could be totally bogged down is by adding a broadcast for 1000s of people.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Event_Queue
 {
@@ -200,7 +210,8 @@ class WPGH_Event_Queue
     public function exists( $event )
     {
 
-        //todo does this make sense?
+        // does this make sense?
+        /* Yes it does... */
         return WPGH()->events->event_exists( $event );
 
     }

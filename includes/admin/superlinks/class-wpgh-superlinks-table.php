@@ -1,14 +1,15 @@
 <?php
 /**
- * Contacts Table Class
+ * Superlinks Table
  *
- * This class shows the data table for accessing information about a customer.
+ * This is the Superlinks table, has basic actions and shows basic info about a superlink.
  *
- * @package     groundhogg
- * @subpackage  Modules/Contacts
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Supperlinks
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly

@@ -3,12 +3,15 @@
  * View Events
  *
  * Allow the user to view & edit the events
+ * This allows one to manage all the events associated with funnels, broadcasts, and funnels.
+ * This was included as a page for the convenience of the end user. Although only advanced users will use it probably.
  *
- * @package     groundhogg
- * @subpackage  Includes/Events
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Events
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 

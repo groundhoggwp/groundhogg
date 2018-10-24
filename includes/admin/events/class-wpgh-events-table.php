@@ -2,13 +2,14 @@
 /**
  * Events Table Class
  *
- * This class shows the data table for accessing information about a customer.
+ * This class shows the events queue with bulk options to manage events or 1 at a time.
  *
- * @package     wp-funnels
- * @subpackage  Modules/Events
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Emails
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly

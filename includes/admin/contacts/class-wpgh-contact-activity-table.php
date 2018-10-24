@@ -1,14 +1,17 @@
 <?php
 /**
- * Contacts Table Class
+ * Activity table view
  *
- * This class shows the data table for accessing information about a customer.
+ * This is an extension of the WP_List_Table, it shows the recent email activity of a contact at the bottom of the contact record
+ * Shows the subject line of the email sent, the date it was opened and the link they clicked if they click a link
  *
- * @package     groundhogg
- * @subpackage  Modules/Contacts
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Contacts
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @see         WP_List_Table, contact-editor.php
+ * @since       File available since Release 0.9
  */
 
 // Exit if accessed directly
@@ -159,7 +162,6 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
      * @uses $this->set_pagination_args()
      */
     function prepare_items() {
-        global $wpdb; //This is used only if making any database queries
         /*
          * First, lets decide how many records per page to show
          */
@@ -171,7 +173,20 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $data = $this->data;
+        global $wpdb;
+
+        $events_table = WPGH()->events->table_name;
+        $steps_table = WPGH()->steps->table_name;
+
+        $id = intval( $_REQUEST[ 'id' ] );
+
+        $data = $wpdb->get_results( $wpdb->prepare(
+            "SELECT e.*,s.step_type FROM $events_table e 
+                        LEFT JOIN $steps_table s ON e.step_id = s.ID 
+                        WHERE e.contact_id = %d AND e.status = %s AND ( s.step_type = %s OR e.funnel_id = %d )
+                        ORDER BY time DESC"
+            , $id, 'complete', 'send_email', WPGH_BROADCAST )
+        );
 
         /*
          * Sort the data

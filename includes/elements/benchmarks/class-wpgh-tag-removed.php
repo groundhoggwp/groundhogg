@@ -1,10 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-04
- * Time: 5:42 PM
+ * Tag removed
+ *
+ * This will run whenever a tag is removed from a contact
+ *
+ * @package     Elements
+ * @subpackage  Elements/Benchmarks
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Tag_Removed extends WPGH_Funnel_Step
 {

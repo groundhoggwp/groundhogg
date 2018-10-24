@@ -1,10 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-09-28
- * Time: 11:55 AM
+ * HTML
+ *
+ * Helper class for reusable html markup. Mostly input elements and form elements.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_HTML
 {
@@ -598,6 +605,8 @@ class WPGH_HTML
             esc_attr( $a[ 'default' ] )
         );
 
+        wp_enqueue_style( 'wp-color-picker' );
+
         return apply_filters( 'wpgh_html_color_picker', $html, $args );
     }
 
@@ -630,6 +639,52 @@ class WPGH_HTML
 
         return $this->dropdown( $a );
 
+    }
+
+    public function image_picker( $args )
+    {
+        $a = wp_parse_args( $args, array(
+            'id'        => '',
+            'name'      => '',
+            'class'     => '',
+            'value'     => '',
+        ) );
+
+        $html = $this->input( array(
+            'id'            => $a[ 'id' ],
+            'name'          => $a[ 'id' ],
+            'type'          => 'button',
+            'value'         => __( 'Upload Image' ),
+            'class'         => 'button gh-image-picker',
+        ));
+
+        $html.="<div style='margin-top: 10px;'></div>";
+
+        $html .= $this->input( array(
+            'id'    => $a[ 'id' ] . '-src',
+            'name'  => $a[ 'id' ] . '-src',
+            'placeholder' => __( 'Src' ),
+            'class' => $a[ 'class' ]
+        ) );
+
+        $html .= $this->input( array(
+            'id'    => $a[ 'id' ] . '-alt',
+            'name'  => $a[ 'id' ] . '-alt',
+            'placeholder' => __( 'Alt Tag' ),
+            'class' => $a[ 'class' ]
+        ) );
+
+        $html .= $this->input( array(
+            'id'    => $a[ 'id' ] . '-title',
+            'name'  => $a[ 'id' ] . '-title',
+            'placeholder' => __( 'Title' ),
+            'class' => $a[ 'class' ]
+        ) );
+
+        wp_enqueue_media();
+        wp_enqueue_script('gh-media-picker', WPGH_ASSETS_FOLDER . 'js/admin/media-picker.js', filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/media-picker.js' ) );
+
+        return $html;
     }
 
 }

@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * Importer
+ *
+ * This class contains function for importing and exporting contact information from the tools page.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
+ */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 class WPGH_Importer
 {
 

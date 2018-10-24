@@ -1,10 +1,22 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-09-21
- * Time: 10:35 AM
+ * Email
+ *
+ * Lots of helper methods... also where the actual sending of emails occurs.
+ *
+ * One thing to note is the template.
+ *
+ * You may add your own email templates by defining, email-template.php in your theme.
+ * The default template is email-default.php
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Email
 {

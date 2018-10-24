@@ -1,10 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-04
- * Time: 5:42 PM
+ * Account Created
+ *
+ * This will run proceeding actions whenever a WordPRess acount is created
+ *
+ * @package     Elements
+ * @subpackage  Elements/Benchmarks
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Account_Created extends WPGH_Funnel_Step
 {

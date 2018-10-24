@@ -1,10 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-09
- * Time: 10:49 AM
+ * Elements
+ *
+ * This exists solely to init the basic elements. Do not look here for adding you own elements. Extending the WPGH_Funnel_Step class is enough.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Elements
 {

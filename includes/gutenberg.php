@@ -1,6 +1,7 @@
-<?php
+<?php namespace Groundhogg\Form_Blocks;
 
-namespace Groundhogg\Form_Blocks;
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 function register_form_category( $categories, $post ) {
     return array_merge(

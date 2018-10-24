@@ -1,16 +1,16 @@
 <?php
 /**
- * Contacts Class
+ * Contact
  *
- * This class is a readonly format for easily access data of a customer.
+ * Lost going on here, to much to cover. Essentially, you have a contact, lost of help methods, cool stuff.
+ * This was originally modified from the EDD_Customer class by easy digital downloads, but quickly came into it's own.
  *
- * @package     groundhogg
- * @subpackage  Includes/Contacts
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
-
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 

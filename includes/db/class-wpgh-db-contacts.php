@@ -1,14 +1,15 @@
 <?php
 /**
- * Contacts DB class
+ * Contact DB
  *
- * This class is for interacting with the contacts' database table
+ * Store contact info
  *
- * @package     EDD
- * @subpackage  Classes/DB Contacts
- * @copyright   Copyright (c) 2018, Adrian Tobey (Modified From EDD)
- * @license     http://opensource.org/licenses/gpl-3.0 GNU Public License
- * @since       0.1
+ * @package     Includes
+ * @subpackage  includes/DB
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly

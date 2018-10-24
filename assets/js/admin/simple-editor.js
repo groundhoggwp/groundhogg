@@ -375,7 +375,7 @@
 
         content = settings.element.content = existing;
         content.contentEditable = true;
-        content.className = classes.content;
+        $(content).addClass( classes.content );
 
         destroyCallbacks.push(function () {
             $(content).removeClass('simple-editor-content');
@@ -609,8 +609,8 @@
                     }
                     
                     var n = exec(formatBlock, '<h1>');
-                    WPGHEmailEditor.h1Font.apply();
-                    WPGHEmailEditor.h1Size.apply();
+                    wpghTextBlock.h1Font.trigger( 'change' );
+                    wpghTextBlock.h1Size.trigger( 'change' );
                     
                     return n;
                 }
@@ -628,8 +628,8 @@
                         return true;
                     }
                     var n = exec(formatBlock, '<h2>');
-                    WPGHEmailEditor.h2Font.apply();
-                    WPGHEmailEditor.h2Size.apply();
+                    wpghTextBlock.h2Font.trigger( 'change' );
+                    wpghTextBlock.h2Size.trigger( 'change' );
 
                     return n;
                 }

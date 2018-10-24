@@ -1,10 +1,19 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-01
- * Time: 2:14 PM
+ * Tracking
+ *
+ * Maintain information about the contact, events, funnels, etc...
+ * Uses cookies.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Tracking
 {

@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 0.9.10
+Version: 0.9.11
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '0.9.10';
+        public $version = '0.9.11';
 
         /**
          * @var $instance Groundhogg instance
@@ -346,10 +346,10 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
             /* Admin Files */
             if ( is_admin() ){
-                include_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-menu.php';
+                require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-menu.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-importer.php';
-                include_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
-                include_once WPGH_PLUGIN_DIR . 'includes/email-blocks.php';
+                require_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
+//                include_once WPGH_PLUGIN_DIR . 'includes/email-blocks.php';
             }
 
             /* Core Files */

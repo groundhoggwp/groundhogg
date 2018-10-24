@@ -1,9 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-08-17
- * Time: 3:11 PM
+ * Edit Tag
+ *
+ * @package     Admin
+ * @subpackage  Admin/Tags
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;

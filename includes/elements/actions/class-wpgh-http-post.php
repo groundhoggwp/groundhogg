@@ -1,10 +1,19 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-04
- * Time: 5:42 PM
+ * HTTP Post
+ *
+ * This allows the user send an http post with contact information to any specified URL.
+ * The URL must be HTTPS
+ *
+ * @package     Elements
+ * @subpackage  Elements/Actions
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_HTTP_Post extends WPGH_Funnel_Step
 {

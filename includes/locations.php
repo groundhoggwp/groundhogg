@@ -1,10 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Adrian
- * Date: 2018-05-08
- * Time: 7:05 PM
+ * Locations
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 function wpgh_get_countries_list()
 {
@@ -257,7 +264,7 @@ function wpgh_get_countries_list()
     );
 }
 
-function formlift_get_american_states_list()
+function wpgh_get_american_states_list()
 {
     return array(
         'AL'=>'Alabama',

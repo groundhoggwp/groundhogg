@@ -1,4 +1,7 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 //error_reporting(0);// turn off PHP Notices
 
 /* BOUNCE HANDLER Class, Version 7.4
@@ -430,7 +433,7 @@ class BounceHandler{
         $hash = $this->standard_parser($headers);
         if(isset($hash['Content-type'])) {//preg_match('/Multipart\/Report/i', $hash['Content-type'])){
             $multipart_report = explode (';', $hash['Content-type']);
-            $hash['Content-type']='';
+            $hash['Content-type']=array();
             $hash['Content-type']['type'] = strtolower($multipart_report[0]);
             foreach($multipart_report as $mr){
                 if(preg_match('/([^=.]*?)=(.*)/i', $mr, $matches)){
@@ -530,13 +533,13 @@ class BounceHandler{
         $hash['per_message'] = isset($hash['per_message']) ? $this->standard_parser($hash['per_message']) : array();
         if(isset($hash['per_message']['X-postfix-sender'])){
             $arr = explode (';', $hash['per_message']['X-postfix-sender']);
-            $hash['per_message']['X-postfix-sender']='';
+            $hash['per_message']['X-postfix-sender']=array();
             $hash['per_message']['X-postfix-sender']['type'] = @trim($arr[0]);
             $hash['per_message']['X-postfix-sender']['addr'] = @trim($arr[1]);
         }
         if(isset($hash['per_message']['Reporting-mta'])){
             $arr = explode (';', $hash['per_message']['Reporting-mta']);
-            $hash['per_message']['Reporting-mta']='';
+            $hash['per_message']['Reporting-mta']=array();
             $hash['per_message']['Reporting-mta']['type'] = @trim($arr[0]);
             $hash['per_message']['Reporting-mta']['addr'] = @trim($arr[1]);
         }
@@ -639,7 +642,7 @@ class BounceHandler{
 
     // Take a line like "4.2.12 This is an error" and return  "4.2.12" and "This is an error"
     function format_status_code($code) {
-        $ret = "";
+        $ret = array();
         if(preg_match('/([245]\.[01234567]\.\d{1,2})\s*(.*)/', $code, $matches)) {
             $ret['code'] = $matches[1];
             $ret['text'] = $matches[2];
@@ -652,7 +655,7 @@ class BounceHandler{
     }
 
     function fetch_status_messages($code){
-        include_once ("bounce_statuscodes.php");
+        require_once dirname( __FILE__ ) . "/bounce_statuscodes.php";
         $ret = $this->format_status_code($code);
         $arr = explode('.', $ret['code']);
         $str = "<p><b>". $status_code_classes[$arr[0]]['title'] . "</b> - " .$status_code_classes[$arr[0]]['descr']. "  <b>". $status_code_subclasses[$arr[1].".".$arr[2]]['title'] . "</b> - " .$status_code_subclasses[$arr[1].".".$arr[2]]['descr']. "</p>";

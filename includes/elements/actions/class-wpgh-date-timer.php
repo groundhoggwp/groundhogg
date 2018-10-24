@@ -1,10 +1,19 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-04
- * Time: 5:42 PM
+ * Date Timer
+ *
+ * This allows the adition of an event which "does nothing" but runs at the specified time according to the date provided.
+ * Essentially delaying proceeding events.
+ *
+ * @package     Elements
+ * @subpackage  Elements/Actions
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Date_Timer extends WPGH_Funnel_Step
 {

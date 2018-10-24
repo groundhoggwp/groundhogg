@@ -4,11 +4,10 @@
  *
  * This class should be used for querying contacts.
  *
- * @package     WPGH
- * @subpackage  Classes/Contact Query
- * @copyright   Copyright (c) 2018, Adrian Tobey (modified from EDD)
+ * @package     Includes
+ * @copyright   Copyright (c) 2018, Groundhogg Inc. (modified from EDD)
  * @license     http://opensource.org/licenses/gpl-3.0 GNU Public License
- * @since       2.8
+ * @since       0.9
  */
 
 // Exit if accessed directly

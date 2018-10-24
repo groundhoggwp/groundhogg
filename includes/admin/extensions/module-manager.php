@@ -1,9 +1,21 @@
 <?php
+/**
+ * Module Manager
+ *
+ * This class is a helper class for the settigns page. it essentially provides an API with Groundhogg.io for managing premium extension licenses.
+ *
+ * @package     Admin
+ * @subpackage  Admin/Settings
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
+ */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) ){
-    include dirname(__FILE__) . '/updater/EDD_SL_Plugin_Updater.php';
+    require_once dirname(__FILE__) . '/updater/EDD_SL_Plugin_Updater.php';
 }
 
 class WPGH_Extension_Manager

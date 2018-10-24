@@ -1,10 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-09-07
- * Time: 11:39 AM
+ * Shortcodes
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
  * Alternate form shortcode

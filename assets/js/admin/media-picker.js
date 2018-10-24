@@ -2,7 +2,10 @@ jQuery( document ).ready( function( $ ) {
     // Uploading files
     var file_frame;
 
-    jQuery('#upload_image_button').on('click', function( event ){
+    $('.gh-image-picker').on('click', function( event ){
+
+        var picker = $(this);
+
         event.preventDefault();
         // If the media frame already exists, reopen it.
         if ( file_frame ) {
@@ -27,11 +30,11 @@ jQuery( document ).ready( function( $ ) {
             // $( '#image-preview' ).attr( 'src', attachment.url );
             var content = jQuery( '#email-body' );
 
-            $( '#image-src' ).val( attachment.url );
+            $( '#' + picker.prop( 'id' ) + '-src' ).val( attachment.url );
             content.find('.active').find('img').attr('src', attachment.url );
-            $( '#image-alt' ).val( attachment.alt );
+            $( '#' + picker.prop( 'id' ) + '-alt' ).val( attachment.alt );
             content.find('.active').find('img').attr('alt', attachment.alt );
-            $( '#image-title' ).val( attachment.title );
+            $( '#' + picker.prop( 'id' ) + '-title' ).val( attachment.title );
             content.find('.active').find('img').attr('title', attachment.title );
         });
         // Finally, open the modal

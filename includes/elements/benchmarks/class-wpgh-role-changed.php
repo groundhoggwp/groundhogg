@@ -1,10 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-04
- * Time: 5:42 PM
+ * Role Changed
+ *
+ * This will run whenever a user's role is changed to the specified role
+ *
+ * @package     Elements
+ * @subpackage  Elements/Benchmarks
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Role_Changed extends WPGH_Funnel_Step
 {

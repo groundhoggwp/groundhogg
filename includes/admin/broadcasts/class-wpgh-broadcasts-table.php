@@ -1,15 +1,20 @@
 <?php
 /**
- * Broadcasts Table Class
+ * The table for Broadcasts
  *
- * This class shows the data table for accessing information about an broadcast.
+ * This just displays all the broadcast information in a WP_List_Table
+ * Columns display basic information about the broadcast including send time
+ * and basic reports.
  *
- * @package     groundhogg
- * @subpackage  Includes/Broadcasts
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Broadcasts
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @see         WP_List_Table
+ * @since       File available since Release 0.1
  */
+
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;

@@ -1,10 +1,14 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-11
- * Time: 9:14 AM
+ * Install
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;

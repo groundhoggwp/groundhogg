@@ -1,10 +1,15 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-08-15
- * Time: 5:21 PM
+ * Email Templates
+ *
+ * @package     Templates
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 $email_templates = array();
 

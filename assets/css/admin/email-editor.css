@@ -125,10 +125,12 @@ select {
     box-shadow: none;
 }
 
+[data-block="text"] .content-wrapper,
 .text_block{
     padding: 5px;
 }
 
+[data-block="text"] p,
 .text_block p{
     font-family: inherit;
     font-size: inherit;

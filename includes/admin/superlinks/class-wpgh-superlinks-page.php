@@ -1,14 +1,15 @@
 <?php
 /**
- * View superlinks
+ * Superlinks Page
  *
- * Allow the user to view & edit the superlinks
+ * This is the superlinks page, it also contains the add form since it's the same layout as the terms.php
  *
- * @package     groundhogg
- * @subpackage  Includes/Superlinks
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Supperlinks
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly

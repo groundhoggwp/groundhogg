@@ -1,14 +1,23 @@
 <?php
 /**
- * View Contacts
+ * Page gh_contacts
  *
- * Allow the user to view & edit the contacts
+ * This class registers the page with the admin menu, contains the private scripts to add contacts,
+ * delete contacts, and manage contacts in the admin area
  *
- * @package     groundhogg
- * @subpackage  Includes/Contacts
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * There are several hooks you can use to add your own functionality to manage a contact in the default admin view.
+ * The most relevant will likely be the following...
+ *
+ * add_action( 'wpgh_admin_update_contact_after', 'my_save_function' ); ($id)
+ *
+ * When saving custom information or doing something else. Runs after the admin saves a contact via the admin screen.
+ *
+ * @package     Admin
+ * @subpackage  Admin/Contacts
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 

@@ -1,9 +1,16 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-18
- * Time: 3:30 PM
+ * Welcome Page
+ *
+ * Introducing the welcome page, the user is directly brought here upon activating Groundhogg.
+ * It includes links to tutorials and extensions.
+ *
+ * @package     Admin
+ * @subpackage  Admin/Welcome
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;

@@ -1,10 +1,18 @@
 <?php
 /**
- * Class WPGH_Notices
+ * Notices
  *
- * Add notices and display notices related to groundhogg.
+ * Easy implementation for notices on admin pages in Groundhogg.
+ * This class is used by all admin page classes, thus all notices will appear on any admin page.
  *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Notices
 {

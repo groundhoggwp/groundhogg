@@ -1,10 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-04
- * Time: 5:42 PM
+ * Edit Meta
+ *
+ * This allows the user to add information to a contact depeding on where they are in their customer journey. Potentially using them as merge fields later on.
+ *
+ * @package     Elements
+ * @subpackage  Elements/Actions
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.9
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Edit_Meta extends WPGH_Funnel_Step
 {

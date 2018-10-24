@@ -1,10 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Adrian
- * Date: 2018-09-19
- * Time: 11:07 AM
+ * Tags DB
+ *
+ * Store tags
+ *
+ * @package     Includes
+ * @subpackage  includes/DB
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_DB_Tags extends WPGH_DB
 {

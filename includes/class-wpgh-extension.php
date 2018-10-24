@@ -1,11 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Adrian
- * Date: 2018-08-30
- * Time: 9:47 PM
+ * Extension
+ *
+ * Helper class for extensions with Groundhogg.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Extension
 {

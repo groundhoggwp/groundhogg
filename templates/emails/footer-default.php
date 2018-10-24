@@ -1,10 +1,14 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-09-28
- * Time: 4:21 PM
+ * Email Footer
+ *
+ * @package     Templates/Emails
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 $footer = apply_filters( 'wpgh_email_footer_css', "
     clear: both; 

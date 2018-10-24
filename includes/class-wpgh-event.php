@@ -1,10 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-03
- * Time: 10:47 AM
+ * Event
+ *
+ * This is an event from the event queue. it contains info about the step, broadcast, funnel, contact etc... that is necessary for processing the event.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class WPGH_Event
 {
@@ -80,7 +87,8 @@ class WPGH_Event
         $this->time = intval( $event->time );
         $this->status = $event->status;
 
-        //todo, do I NEED the funnel accessible as an object?
+        //do I NEED the funnel accessible as an object?
+        /* No, no I don't */
         $this->funnel_id = intval( $event->funnel_id );
 
         //definitely need this...

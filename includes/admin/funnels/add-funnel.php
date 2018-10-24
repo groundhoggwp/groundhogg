@@ -1,14 +1,16 @@
 <?php
 /**
- * Add Email
+ * Add Funnel
  *
- * Allows the easy addition of emails from the admin menu.
+ * Similar to the Email add page, this allows one to select a funnel from some pre-installed defaults.
+ * Or upload their own funnel if they purchased one from us or another provider
  *
- * @package     groundhogg
- * @subpackage  Includes/Emails
- * @copyright   Copyright (c) 2018, Adrian Tobey
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @package     Admin
+ * @subpackage  Admin/Funnels
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
  */
 
 // Exit if accessed directly
