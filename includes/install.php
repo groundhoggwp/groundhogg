@@ -77,46 +77,6 @@ function wpgh_run_install() {
 
     $current_options = get_option( 'wpgh_settings', array() );
 
-    if ( ! get_option( 'gh_confirmation_page', false ) ){
-        $confirmation_args = array(
-            'post_title' => __( 'Email Confirmed', 'groundhogg' ),
-            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been confirmed.</h2><p>Thank you! Return to your inbox to receive further communication.</p>', 'groundhogg' ),
-            'post_type' => 'page',
-            'post_status' => 'publish',
-            'post_author' => get_current_user_id(),
-        );
-        $id = wp_insert_post( $confirmation_args );
-        update_option( 'gh_confirmation_page', $id );
-    }
-
-    /* unbsubscribed page */
-    if ( ! get_option( 'gh_unsubscribe_page', false ) ){
-        $unsubscribed_args = array(
-            'post_title' => __( 'Unsubscribed', 'groundhogg' ),
-            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been unsubscribed.</h2><p>This means you will not receive any further marketing communication from us, but you may receive transactional emails related to billing.</p><p>Note that opting in again to any optin form or program on our site is implied consent and may result in starting to receive email communication again.</p>', 'groundhogg' ),
-            'post_type' => 'page',
-            'post_status' => 'publish',
-            'post_author' => get_current_user_id(),
-        );
-        $id = wp_insert_post( $unsubscribed_args );
-        update_option( 'gh_unsubscribe_page', $id );
-    }
-
-    /* email preferences page */
-    if ( ! get_option( 'gh_email_preferences_page', false ) ){
-        $email_preferences_args = array(
-            'post_title' => __( 'Email Preferences', 'groundhogg' ),
-            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form success=""][gh_email_preferences][/gh_form]</p>', 'groundhogg' ),
-            'post_type' => 'page',
-            'post_status' => 'publish',
-            'post_author' => get_current_user_id(),
-        );
-        $id = wp_insert_post( $email_preferences_args );
-        update_option( 'gh_email_preferences_page', $id );
-    }
-
-    update_option( 'wpgh_version', WPGH_VERSION );
-
     // Create the databases
     @WPGH()->activity->create_table();
     @WPGH()->broadcasts->create_table();
@@ -174,6 +134,57 @@ function wpgh_run_install() {
     $roles = new WPGH_Roles;
     $roles->add_roles();
     $roles->add_caps();
+
+    if ( ! WPGH()->funnels->count() ){
+        /* Install the email preferences center */
+        include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
+        /* @var $funnel_templates array included from funnel-templates.php */
+        $json = file_get_contents( $funnel_templates[ 'email_preferences' ]['file'] );
+        $funnel_id = $this->import_funnel( json_decode( $json, true ) );
+        WPGH()->funnels->update( $funnel_id, array( 'status' => 'active' ) );
+        $forms = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_type' => 'form_fill' ) );
+        $form = array_shift( $forms );
+    }
+
+    if ( ! get_option( 'gh_confirmation_page', false ) ){
+        $confirmation_args = array(
+            'post_title' => __( 'Email Confirmed', 'groundhogg' ),
+            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been confirmed.</h2><p>Thank you! Return to your inbox to receive further communication.</p>', 'groundhogg' ),
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'post_author' => get_current_user_id(),
+        );
+        $id = wp_insert_post( $confirmation_args );
+        update_option( 'gh_confirmation_page', $id );
+    }
+
+    /* unbsubscribed page */
+    if ( ! get_option( 'gh_unsubscribe_page', false ) ){
+        $unsubscribed_args = array(
+            'post_title' => __( 'Unsubscribed', 'groundhogg' ),
+            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been unsubscribed.</h2><p>This means you will not receive any further marketing communication from us, but you may receive transactional emails related to billing.</p><p>Note that opting in again to any optin form or program on our site is implied consent and may result in starting to receive email communication again.</p>', 'groundhogg' ),
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'post_author' => get_current_user_id(),
+        );
+        $id = wp_insert_post( $unsubscribed_args );
+        update_option( 'gh_unsubscribe_page', $id );
+    }
+
+    /* email preferences page */
+    if ( ! get_option( 'gh_email_preferences_page', false ) && isset( $form ) ){
+        $email_preferences_args = array(
+            'post_title' => __( 'Email Preferences', 'groundhogg' ),
+            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form id="' . $form->ID . '" title="' . $form->step_title . '"]</p>', 'groundhogg' ),
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'post_author' => get_current_user_id(),
+        );
+        $id = wp_insert_post( $email_preferences_args );
+        update_option( 'gh_email_preferences_page', $id );
+    }
+
+    update_option( 'wpgh_version', WPGH_VERSION );
 
     // Add a temporary option to note that WPGH pages have been created
     set_transient( '_wpgh_installed', true, 30 );

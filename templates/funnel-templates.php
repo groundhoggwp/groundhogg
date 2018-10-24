@@ -62,4 +62,10 @@ $funnel_templates[ 'scratch' ][ 'description' ] = 'Have some inspiration? Use th
 $funnel_templates[ 'scratch' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'scratch' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/start-from-scratch.funnel';
 
+/* Email Preferences */
+$funnel_templates[ 'email_preferences' ][ 'title' ] = 'Email Preferences';
+$funnel_templates[ 'email_preferences' ][ 'description' ] = 'Setup an email preferences center!';
+$funnel_templates[ 'email_preferences' ][ 'src' ] = 'https://via.placeholder.com/350x250';
+$funnel_templates[ 'email_preferences' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/email-preferences.funnel';
+
 $funnel_templates = apply_filters( 'wpgh_funnel_templates', $funnel_templates );

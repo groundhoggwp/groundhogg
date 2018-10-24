@@ -51,17 +51,14 @@ class WPGH_Form
      */
     var $rendered;
 
-    public function __construct( $atts, $content )
+    public function __construct( $atts )
     {
         $this->a = shortcode_atts(array(
-            'success'   => '',
             'class'     => '',
             'id'        => 0
         ), $atts);
 
         $this->id = intval( $this->a[ 'id' ] );
-
-        $this->content = $content;
     }
 
     /**
@@ -70,22 +67,22 @@ class WPGH_Form
      */
     private function setup_shortcodes()
     {
-        add_shortcode( 'gh_first_name', array( $this, 'first_name'  ) );
-        add_shortcode( 'gh_last_name',  array( $this, 'last_name'   ) );
-        add_shortcode( 'gh_email',      array( $this, 'email'       ) );
-        add_shortcode( 'gh_phone',      array( $this, 'phone'       ) );
-        add_shortcode( 'gh_address',    array( $this, 'address'     ) );
-        add_shortcode( 'gh_text',       array( $this, 'text'        ) );
-        add_shortcode( 'gh_textarea',   array( $this, 'textarea'    ) );
-        add_shortcode( 'gh_number',     array( $this, 'number'      ) );
-        add_shortcode( 'gh_select',     array( $this, 'select'      ) );
-        add_shortcode( 'gh_radio',      array( $this, 'radio'       ) );
-        add_shortcode( 'gh_checkbox',   array( $this, 'checkbox'    ) );
-        add_shortcode( 'gh_terms',      array( $this, 'terms'       ) );
-        add_shortcode( 'gh_gdpr',       array( $this, 'gdpr'        ) );
-        add_shortcode( 'gh_recaptcha',  array( $this, 'recaptcha'   ) );
-        add_shortcode( 'gh_submit',     array( $this, 'submit'      ) );
-        add_shortcode( 'gh_email_preferences',  array( $this, 'email_preferences' ) );
+        add_shortcode( 'first_name', array( $this, 'first_name'  ) );
+        add_shortcode( 'last_name',  array( $this, 'last_name'   ) );
+        add_shortcode( 'email',      array( $this, 'email'       ) );
+        add_shortcode( 'phone',      array( $this, 'phone'       ) );
+        add_shortcode( 'address',    array( $this, 'address'     ) );
+        add_shortcode( 'text',       array( $this, 'text'        ) );
+        add_shortcode( 'textarea',   array( $this, 'textarea'    ) );
+        add_shortcode( 'number',     array( $this, 'number'      ) );
+        add_shortcode( 'select',     array( $this, 'select'      ) );
+        add_shortcode( 'radio',      array( $this, 'radio'       ) );
+        add_shortcode( 'checkbox',   array( $this, 'checkbox'    ) );
+        add_shortcode( 'terms',      array( $this, 'terms'       ) );
+        add_shortcode( 'gdpr',       array( $this, 'gdpr'        ) );
+        add_shortcode( 'recaptcha',  array( $this, 'recaptcha'   ) );
+        add_shortcode( 'submit',     array( $this, 'submit'      ) );
+        add_shortcode( 'email_preferences',  array( $this, 'email_preferences' ) );
     }
 
     /**
@@ -94,20 +91,20 @@ class WPGH_Form
      */
     private function destroy_shortcodes()
     {
-        remove_shortcode( 'gh_first_name'   );
-        remove_shortcode( 'gh_last_name'    );
-        remove_shortcode( 'gh_email'        );
-        remove_shortcode( 'gh_phone'        );
-        remove_shortcode( 'gh_address'      );
-        remove_shortcode( 'gh_text'         );
-        remove_shortcode( 'gh_number'       );
-        remove_shortcode( 'gh_select'       );
-        remove_shortcode( 'gh_radio'        );
-        remove_shortcode( 'gh_checkbox'     );
-        remove_shortcode( 'gh_terms'        );
-        remove_shortcode( 'gh_recaptcha'    );
-        remove_shortcode( 'gh_email_preferences'    );
-        remove_shortcode( 'gh_submit'       );
+        remove_shortcode( 'first_name'   );
+        remove_shortcode( 'last_name'    );
+        remove_shortcode( 'email'        );
+        remove_shortcode( 'phone'        );
+        remove_shortcode( 'address'      );
+        remove_shortcode( 'text'         );
+        remove_shortcode( 'number'       );
+        remove_shortcode( 'select'       );
+        remove_shortcode( 'radio'        );
+        remove_shortcode( 'checkbox'     );
+        remove_shortcode( 'terms'        );
+        remove_shortcode( 'recaptcha'    );
+        remove_shortcode( 'email_preferences'    );
+        remove_shortcode( 'submit'       );
     }
 
     /**
@@ -855,7 +852,7 @@ jQuery( function($){
 //        $form .= htmlentities( $this->content );
 //        $form .= htmlentities( "\"hi\"" );
 
-        $form .= "<form method='post' class='gh-form " . $this->a[ 'class' ] ."' action='" . esc_url_raw( $this->a['success'] ) . "'>";
+        $form .= "<form method='post' class='gh-form " . $this->a[ 'class' ] ."'>";
 
         $form .= wp_nonce_field( 'gh_submit', 'gh_submit_nonce', true, false );
 
@@ -865,28 +862,28 @@ jQuery( function($){
 
         $this->setup_shortcodes();
 
-        $form .= do_shortcode( $this->content );
+        if ( $this->id && WPGH()->steps->exists( $this->id ) ){
 
-//        $form .= do_shortcode( wp_unslash( $this->content ) );
+            $content = WPGH()->step_meta->get_meta( $this->id, 'form', true );
 
-        //$this->destroy_shortcodes();
+        } else {
+
+            $content = '';
+
+        }
+
+        $form .= do_shortcode( $content );
+
+        $this->destroy_shortcodes();
 
         $form .= '</form>';
 
         $form .= '</div>';
 
         /* Save the expected field to post meta so we can access them on the POST end */
-        if ( get_the_ID() ){
-            update_post_meta(  get_the_ID(), 'gh_fields_' . $this->id , $this->fields );
-        } else {
-            /* try to get it via the URL */
+        if ( $this->id && WPGH()->steps->exists( $this->id ) ){
 
-            $actual_link = ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-            $id = url_to_postid( $actual_link );
-
-            if ( $id ){
-                update_post_meta(  $id, 'gh_fields_' . $this->id , $this->fields );
-            }
+            WPGH()->step_meta->update_meta( $this->id, 'expected_fields', $this->fields );
 
         }
 
