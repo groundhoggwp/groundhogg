@@ -178,7 +178,7 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
         $events_table = WPGH()->events->table_name;
         $steps_table = WPGH()->steps->table_name;
 
-        $id = intval( $_REQUEST[ 'id' ] );
+        $id = intval( $_REQUEST[ 'contact' ] );
 
         $data = $wpdb->get_results( $wpdb->prepare(
             "SELECT e.*,s.step_type FROM $events_table e 
