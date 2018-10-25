@@ -152,6 +152,11 @@ var wpghEmailEditor;
             /* Make Current Block Active*/
             var block = $( e ).closest( '.row' );
 
+            /* check if already active */
+            if ( block.hasClass( 'active' ) ){
+                return;
+            }
+
             // console.log( {e: block} );
 
             if ( ! block.hasClass( 'row' ) ){
@@ -209,6 +214,7 @@ var wpghEmailEditor;
          * @param e
          */
         duplicateBlock: function( e ){
+            $(document).trigger( 'duplicateBlock' );
             $(e).closest('.row').removeClass('active');
             $(e).closest('.row').clone().insertAfter( $(e).closest('.row') );
         },

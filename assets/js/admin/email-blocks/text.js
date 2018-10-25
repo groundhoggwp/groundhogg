@@ -62,11 +62,8 @@ var wpghTextBlock;
 
             });
 
-            $(document).on( 'madeInactive', function ( e ) {
-
-                wpghTextBlock.destroyEditor();
-
-            });
+            $(document).on( 'madeInactive', function ( e ) {wpghTextBlock.destroyEditor();});
+            $(document).on( 'duplicateBlock', function ( e ) {wpghTextBlock.destroyEditor();});
 
         },
 

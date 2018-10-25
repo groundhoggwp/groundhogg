@@ -542,6 +542,7 @@
                     $colorPickerDiv.css('left', $('.simple-editor-color-picker-handle').parents('.simple-editor-button-wrapper:first').position().left);
                     $colorPickerDiv.css('top', 0 );
                     $colorPickerDiv.show();
+                    // console.log({e: $colorPickerDiv.show()});
                     return true;
                 }
             },

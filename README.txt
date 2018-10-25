@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.14 =
+* Fixed text color picker from simple editor not working, again.
+* Added filter to email blocks to make it easier to add custom blocks.
+
 = 0.9.13 =
 * Added simple editor to the form fill benchmark. Buttons now allow the user to quickly add standard fields to the forms without the need to view complete documentation.
 * Fixed bug in form address field that caused a warning
