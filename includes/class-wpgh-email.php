@@ -131,6 +131,11 @@ class WPGH_Email
     protected $previous_altbody;
 
     /**
+     * @var string
+     */
+    public $error_message;
+
+    /**
      * WPGH_Email constructor.
      * @param $id
      */
@@ -602,7 +607,7 @@ class WPGH_Email
      *
      * @param $contact WPGH_Contact|int
      * @param $event object the of the associated event
-     * @return bool
+     * @return bool|WP_Error
      */
     public function send( $contact, $event = null )
     {
@@ -615,7 +620,7 @@ class WPGH_Email
         }
 
         if ( ! is_object( $contact )  )
-            return false;
+            return new WP_Error( 'BAD_CONTACT', __( 'No contact given...' ) );
 
         $this->contact = $contact;
 
@@ -636,21 +641,13 @@ class WPGH_Email
 
         }
 
-        if ( ! wpgh_should_if_multisite() ){
-            switch_to_blog( get_network()->site_id );
-        }
-
         if ( ! $this->testing ){
             /* Skip if testing */
 
             if ( ! $contact->is_marketable() ){
 
-                if ( ! wpgh_should_if_multisite() ){
-                    restore_current_blog();
-                }
-
                 /* The contact is unmarketable so exit out. */
-                return false;
+                return new WP_Error( 'NON_MARKETABLE', __( 'Contact is not marketable.' ) );
 
             }
 
@@ -661,32 +658,35 @@ class WPGH_Email
         /* Additional settings */
         add_action( 'phpmailer_init', array( $this, 'set_bounce_return_path' ) );
         add_action( 'phpmailer_init', array( $this, 'set_plaintext_body' ) );
+        add_action( 'wp_mail_failed', array( $this, 'mail_failed' ) );
         add_filter( 'wp_mail_content_type', array( $this, 'send_in_html' ) );
 
+        if ( ! wpgh_should_if_multisite() ){
+            switch_to_blog( get_network()->site_id );
+        }
+
+        $to = $this->get_to();
+        $subject = $this->get_subject_line();
+        $content = $this->build();
+        $headers = $this->get_headers();
+
+        if ( ! wpgh_should_if_multisite() ){
+            restore_current_blog();
+        }
+
         $sent = wp_mail(
-            $this->get_to(),
-            $this->get_subject_line(),
-            $this->build(),
-            $this->get_headers()
+            $to,
+            $subject,
+            $content,
+            $headers
         );
 
         remove_action( 'phpmailer_init', array( $this, 'set_bounce_return_path' ) );
+        remove_action( 'phpmailer_init', array( $this, 'set_plaintext_body' ) );
+        remove_action( 'wp_mail_failed', array( $this, 'mail_failed' ) );
         remove_filter( 'wp_mail_content_type', array( $this, 'send_in_html' ) );
 
         if ( ! $sent ){
-
-            $message = sprintf(
-                __( "Email from Groundhogg failed to send.\nSend time: %s\nTo: %s\nSubject: %s\n\n", 'groundhogg' ),
-                date_i18n( 'F j Y H:i:s', current_time( 'timestamp' ) ),
-                $contact->email,
-                $this->subject
-            );
-
-            $contact->add_note(
-                $message
-            );
-
-            error_log( $message );
 
             do_action( 'wpgh_email_send_failed', $this );
 
@@ -694,12 +694,40 @@ class WPGH_Email
 
         do_action( 'wpgh_after_email_send', $this );
 
-        if ( ! wpgh_should_if_multisite() ){
-            restore_current_blog();
-        }
-
         return $sent;
 
+    }
+
+    /**
+     * Log failures
+     *
+     * @param $error WP_Error
+     */
+    public function mail_failed( $error )
+    {
+        $message = sprintf(
+            __( "Email from Groundhogg failed to send.\nSend time: %s\nTo: %s\nSubject: %s\n\nError: %s", 'groundhogg' ),
+            date_i18n( 'F j Y H:i:s', current_time( 'timestamp' ) ),
+            $this->contact->email,
+            $this->subject,
+            $error->get_error_message()
+        );
+
+        $this->contact->add_note(
+            $message
+        );
+
+        error_log( $message );
+
+        $this->error_message = $error->get_error_message();
+    }
+
+    /**
+     * @return string
+     */
+    public function get_error_message()
+    {
+        return $this->error_message;
     }
 
     /**

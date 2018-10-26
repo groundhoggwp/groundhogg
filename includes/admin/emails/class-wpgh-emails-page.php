@@ -453,17 +453,21 @@ class WPGH_Emails_Page
 
             $sent = $contact->exists() ? $email->send( $contact ) : false;
 
-            if ( ! $sent ){
-                wp_die( 'Could not send test.' );
+            if ( ! $sent || is_wp_error( $sent ) ){
+                if ( is_wp_error( $sent ) ){
+                    $this->notices->add( 'oops', __( 'Failed to send test: ' . $sent->get_error_message() ), 'error' );
+                } else {
+                    $this->notices->add( 'oops', __( 'Failed to send test: ' . $email->get_error_message() ), 'error' );
+                }
+            } else {
+                $this->notices->add(
+                    esc_attr( 'sent-test' ),
+                    sprintf( "%s %s",
+                        __( 'Sent test email to', 'groundhogg' ),
+                        get_userdata( $test_email_uid )->user_email ),
+                    'success'
+                );
             }
-
-            $this->notices->add(
-                esc_attr( 'sent-test' ),
-                sprintf( "%s %s",
-                    __( 'Sent test email to', 'groundhogg' ),
-                    get_userdata( $test_email_uid )->user_email ),
-                'success'
-            );
 
             do_action( 'wpgh_after_send_test_email', $id );
         }

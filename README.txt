@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.16 =
+* Fixed global multisite bugs where restore current was never being called resulting in weird behaviour.
+
 = 0.9.15 =
 * Fixed activation fatal error.
 * Added multisite functionality. Use the same info across all subsites in the event you have a multisite setup.

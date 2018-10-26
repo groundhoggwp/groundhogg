@@ -47,7 +47,7 @@ function wpgh_install( $network_wide = false ) {
 
     }
 
-    file_put_contents( __DIR__ . '/my_loggg.html', ob_get_contents() );
+    file_put_contents( __DIR__ . '/my_log.html', ob_get_contents() );
 
 }
 
@@ -135,7 +135,7 @@ function wpgh_run_install() {
     $roles->add_roles();
     $roles->add_caps();
 
-    if ( ! WPGH()->funnels->count() ){
+    if ( ! WPGH()->funnels->count() && is_admin() ){
         /* Install the email preferences center */
         include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
         /* @var $funnel_templates array included from funnel-templates.php */
