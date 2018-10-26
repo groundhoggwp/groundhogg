@@ -35,7 +35,12 @@ class WPGH_DB_Tags extends WPGH_DB
 
         global $wpdb;
 
-        $this->table_name  = $wpdb->prefix . 'gh_tags';
+        if ( wpgh_should_if_multisite() ){
+            $this->table_name  = $wpdb->prefix . 'gh_tags';
+        } else {
+            $this->table_name  = $wpdb->base_prefix . 'gh_tags';
+        }
+
         $this->primary_key = 'tag_id';
         $this->version     = '1.0';
     }

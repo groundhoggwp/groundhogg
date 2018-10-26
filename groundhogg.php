@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 0.9.14
+Version: 0.9.15
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '0.9.14';
+        public $version = '0.9.15';
 
         /**
          * @var $instance Groundhogg instance
@@ -200,6 +200,11 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $replacements;
 
         /**
+         * @var WPGH_Network_Settings_Page
+         */
+        public $network_options;
+
+        /**
          * Returns the instance on Groundhogg.
          *
          * @return Groundhogg
@@ -240,20 +245,24 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->tracking     = new WPGH_Tracking();
                 self::$instance->superlink    = new WPGH_Superlink();
                 self::$instance->event_queue  = new WPGH_Event_Queue();
-//
+
                 self::$instance->replacements = new WPGH_Replacements();
                 self::$instance->notices      = new WPGH_Notices();
                 self::$instance->submission   = new WPGH_Submission();
                 self::$instance->html         = new WPGH_HTML();
-//
+
                 self::$instance->bounce_checker   = new WPGH_Bounce_Checker();
                 self::$instance->template_loader  = new WPGH_Template_Loader();
-//
+
                 self::$instance->elements     = new WPGH_Elements();
-//
+
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
                     self::$instance->importer   = new WPGH_Importer();
+
+                    if ( is_multisite() ){
+                        self::$instance->network_options = new WPGH_Network_Settings_Page();
+                    }
                 }
 
             }
@@ -350,6 +359,10 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-importer.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
 //                include_once WPGH_PLUGIN_DIR . 'includes/email-blocks.php';
+
+                if ( is_multisite() ){
+                    require_once WPGH_PLUGIN_DIR . 'includes/admin/multisite/class-wpgh-network-settings-page.php';
+                }
             }
 
             /* Core Files */

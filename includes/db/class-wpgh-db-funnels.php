@@ -41,7 +41,12 @@ class WPGH_DB_Funnels extends WPGH_DB  {
 
         global $wpdb;
 
-        $this->table_name  = $wpdb->prefix . 'gh_funnels';
+        if ( wpgh_should_if_multisite() ){
+            $this->table_name  = $wpdb->prefix . 'gh_funnels';
+        } else {
+            $this->table_name  = $wpdb->base_prefix . 'gh_funnels';
+        }
+
         $this->primary_key = 'ID';
         $this->version     = '1.0';
         

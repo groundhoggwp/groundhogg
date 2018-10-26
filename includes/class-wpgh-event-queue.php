@@ -132,6 +132,11 @@ class WPGH_Event_Queue
     public function process()
     {
 
+        if ( ! wpgh_should_if_multisite() ){
+            //switch to main blog for this process.
+            switch_to_blog( get_network()->site_id );
+        }
+
         $this->prepare_events();
 
         if ( empty( $this->events ) ){
@@ -155,6 +160,11 @@ class WPGH_Event_Queue
         $this->doing_queue = false;
 
         do_action( 'wpgh_process_event_queue_after', $this );
+
+        if ( ! wpgh_should_if_multisite() ){
+            //switch back to current blog
+            restore_current_blog();
+        }
 
         return true;
     }

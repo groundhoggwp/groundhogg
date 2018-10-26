@@ -79,7 +79,13 @@ class WPGH_Admin_Menu
         $this->emails_page      = new WPGH_Emails_Page();
         $this->funnels_page     = new WPGH_Funnels_Page();
         $this->events_page      = new WPGH_Events_Page();
-        $this->settings_page    = new WPGH_Settings_Page();
+
+        /**
+         * Add multisite compat
+         */
+        if ( wpgh_should_if_multisite() ){
+            $this->settings_page = new WPGH_Settings_Page();
+        }
 
     }
 

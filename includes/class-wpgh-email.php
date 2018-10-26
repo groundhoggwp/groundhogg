@@ -636,10 +636,18 @@ class WPGH_Email
 
         }
 
+        if ( ! wpgh_should_if_multisite() ){
+            switch_to_blog( get_network()->site_id );
+        }
+
         if ( ! $this->testing ){
             /* Skip if testing */
 
             if ( ! $contact->is_marketable() ){
+
+                if ( ! wpgh_should_if_multisite() ){
+                    restore_current_blog();
+                }
 
                 /* The contact is unmarketable so exit out. */
                 return false;
@@ -685,6 +693,10 @@ class WPGH_Email
         }
 
         do_action( 'wpgh_after_email_send', $this );
+
+        if ( ! wpgh_should_if_multisite() ){
+            restore_current_blog();
+        }
 
         return $sent;
 

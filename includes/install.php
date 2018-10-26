@@ -140,7 +140,7 @@ function wpgh_run_install() {
         include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
         /* @var $funnel_templates array included from funnel-templates.php */
         $json = file_get_contents( $funnel_templates[ 'email_preferences' ]['file'] );
-        $funnel_id = $this->import_funnel( json_decode( $json, true ) );
+        $funnel_id = WPGH()->menu->funnels_page->import_funnel( json_decode( $json, true ) );
         WPGH()->funnels->update( $funnel_id, array( 'status' => 'active' ) );
         $forms = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_type' => 'form_fill' ) );
         $form = array_shift( $forms );

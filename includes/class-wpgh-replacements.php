@@ -227,6 +227,7 @@ class WPGH_Replacements
      */
     public function process( $content, $contact_id=null )
     {
+
         if ( empty( $contact_id ) )
             $contact_id = WPGH()->tracking->get_contact()->ID;
 
@@ -238,11 +239,19 @@ class WPGH_Replacements
             return $content;
         }
 
+        if ( ! wpgh_should_if_multisite() ){
+            //switch to main blog for this process.
+            switch_to_blog( get_network()->site_id );
+        }
+
         $this->contact_id = $contact_id;
-
         $new_content = preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
-
         $this->contact_id = null;
+
+        if ( ! wpgh_should_if_multisite() ){
+            //switch to main blog for this process.
+            restore_current_blog();
+        }
 
         return $new_content;
 

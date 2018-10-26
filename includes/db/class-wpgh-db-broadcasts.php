@@ -41,7 +41,12 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
 
         global $wpdb;
 
-        $this->table_name  = $wpdb->prefix . 'gh_broadcasts';
+        if ( wpgh_should_if_multisite() ){
+            $this->table_name  = $wpdb->prefix . 'gh_broadcasts';
+        } else {
+            $this->table_name  = $wpdb->base_prefix . 'gh_broadcasts';
+        }
+
         $this->primary_key = 'ID';
         $this->version     = '1.0';
     }

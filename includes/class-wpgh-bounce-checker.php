@@ -42,6 +42,14 @@ class WPGH_Bounce_Checker
 
     public function __construct()
     {
+
+        /**
+         * Don't do if from sub site... only run from main.
+         */
+        if ( ! wpgh_should_if_multisite() ){
+            return;
+        }
+
         if ( ! get_option( 'gh_bounce_inbox', false ) || ! get_option( 'gh_bounce_inbox_password', false ) )
             return;
 

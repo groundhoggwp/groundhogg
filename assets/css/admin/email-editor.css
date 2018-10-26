@@ -149,8 +149,10 @@ select {
     display: none;
 }
 
-.active .action-icons {
+.active .action-icons .dashicons{
     background-color: #35afe6 !important;
+    padding: 5px;
+    border-radius: 50%;
 }
 
 .action-icons .dashicons:hover {
@@ -166,9 +168,16 @@ select {
     width: 35px;
     margin-right: -33px;
     float: right;
-    background-color: #EAEAEA;
+    /*background-color: #EAEAEA;*/
     text-align: center;
     vertical-align: center;
+}
+
+.ui-sortable-helper .action-icons .dashicons, .row:hover .action-icons .dashicons{
+    margin-top: 5px;
+    background-color: #EAEAEA;
+    padding: 5px;
+    border-radius: 50%;
 }
 
 .ui-sortable-helper .content-wrapper, .content-wrapper:hover {

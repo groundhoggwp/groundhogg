@@ -4,11 +4,9 @@
 
         var html =
         '<wpgh-toolbar class="action-icons">' +
-            '<div style="margin: 5px 3px 5px 3px;">' +
+            '<div style="margin: 5px 3px 5px 7px;padding-bottom: 20px;">' +
                 '<span class="dashicons dashicons-admin-page"></span>' +
-                '<hr/>' +
                 '<span class="dashicons dashicons-move handle"></span>' +
-                '<hr/>' +
                 '<span class="dashicons dashicons-trash"></span>' +
             '</div>' +
         '</wpgh-toolbar>';

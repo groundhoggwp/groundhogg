@@ -26,7 +26,11 @@ class WPGH_DB_Contact_Meta extends WPGH_DB {
     public function __construct() {
         global $wpdb;
 
-        $this->table_name  = $wpdb->prefix . 'gh_contactmeta';
+        if (wpgh_should_if_multisite()){
+            $this->table_name  = $wpdb->prefix . 'gh_contactmeta';
+        } else {
+            $this->table_name = $wpdb->base_prefix . 'gh_contactmeta';
+        }
         $this->primary_key = 'meta_id';
         $this->version     = '1.0';
 

@@ -50,7 +50,12 @@ class WPGH_DB_Steps extends WPGH_DB  {
 
         global $wpdb;
 
-        $this->table_name  = $wpdb->prefix . 'gh_steps';
+        if ( wpgh_should_if_multisite() ){
+            $this->table_name  = $wpdb->prefix . 'gh_steps';
+        } else {
+            $this->table_name  = $wpdb->base_prefix . 'gh_steps';
+        }
+
         $this->primary_key = 'ID';
         $this->version     = '1.0';
     }

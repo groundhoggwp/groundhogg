@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.15 =
+* Fixed activation fatal error.
+* Added multisite functionality. Use the same info across all subsites in the event you have a multisite setup.
+
 = 0.9.14 =
 * Fixed text color picker from simple editor not working, again.
 * Added filter to email blocks to make it easier to add custom blocks.

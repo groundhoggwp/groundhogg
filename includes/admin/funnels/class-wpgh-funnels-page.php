@@ -449,7 +449,7 @@ class WPGH_Funnels_Page
      * @param $import array|string
      * @return bool|int whether the import was successful or the ID
      */
-    private function import_funnel( $import = array() )
+    public function import_funnel( $import = array() )
     {
 
         if ( ! current_user_can( 'import_funnels' ) ){

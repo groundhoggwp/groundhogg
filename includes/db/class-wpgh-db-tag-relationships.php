@@ -35,7 +35,12 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 
         global $wpdb;
 
-        $this->table_name  = $wpdb->prefix . 'gh_tag_relationships';
+        if ( wpgh_should_if_multisite() ){
+            $this->table_name  = $wpdb->prefix . 'gh_tag_relationships';
+        } else {
+            $this->table_name  = $wpdb->base_prefix . 'gh_tag_relationships';
+        }
+
         $this->primary_key = 'tag_id,contact_id';
         $this->version     = '1.0';
 

@@ -209,7 +209,16 @@ function wpgh_get_visitor_ip() {
  */
 function wpgh_is_gdpr()
 {
+
+    if ( ! wpgh_should_if_multisite() ){
+        switch_to_blog( get_network()->site_id );
+    }
+
     $is_gdpr =  get_option( 'gh_enable_gdpr', array() );
+
+    if ( ! wpgh_should_if_multisite() ){
+        restore_current_blog();
+    }
 
     if ( ! is_array( $is_gdpr ) )
         return false;
@@ -224,7 +233,15 @@ function wpgh_is_gdpr()
  */
 function wpgh_is_gdpr_strict()
 {
+    if ( ! wpgh_should_if_multisite() ){
+        switch_to_blog( get_network()->site_id );
+    }
+
     $is_gdpr_strict =  get_option( 'gh_strict_gdpr', array() );
+
+    if ( ! wpgh_should_if_multisite() ){
+        restore_current_blog();
+    }
 
     if ( ! is_array( $is_gdpr_strict ) )
         return false;
@@ -234,7 +251,15 @@ function wpgh_is_gdpr_strict()
 
 function wpgh_is_confirmation_strict()
 {
+    if ( ! wpgh_should_if_multisite() ){
+        switch_to_blog( get_network()->site_id );
+    }
+
     $is_confirmation_strict =  get_option( 'gh_strict_confirmation', array() );
+
+    if ( ! wpgh_should_if_multisite() ){
+        restore_current_blog();
+    }
 
     if ( ! is_array( $is_confirmation_strict ) )
         return false;
@@ -250,9 +275,18 @@ function wpgh_is_confirmation_strict()
  */
 function wpgh_is_in_grace_period( $contact_id )
 {
+
     $contact = new WPGH_Contact( $contact_id );
 
+    if ( ! wpgh_should_if_multisite() ){
+        switch_to_blog( get_network()->site_id );
+    }
+
     $grace = intval( get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
+
+    if ( ! wpgh_should_if_multisite() ){
+        restore_current_blog();
+    }
 
     $base = WPGH()->contact_meta->get_meta( $contact_id, 'last_optin', true );
 
@@ -490,6 +524,40 @@ function wpgh_format_tags_for_select2( $tags=array() )
  * @return bool, whether it's enable or not.
  */
 function wpgh_is_recaptcha_enabled(){
+
+    if ( ! wpgh_should_if_multisite() ){
+        switch_to_blog( get_network()->site_id );
+    }
+
     $recaptcha = get_option( 'gh_enable_recaptcha', array() );
+
+    if ( ! wpgh_should_if_multisite() ){
+        restore_current_blog();
+    }
+
     return is_array( $recaptcha ) && in_array( 'on', $recaptcha );
+}
+
+/**
+ * Protect MAIN functionality by this multisite check.
+ *
+ * @return bool
+ */
+function wpgh_should_if_multisite()
+{
+
+    if ( ! is_multisite() ){
+        return true;
+    }
+
+    if ( is_multisite() && ! get_site_option( 'gh_global_db_enabled' ) ){
+        return true;
+    }
+
+    if ( is_multisite() && get_site_option( 'gh_global_db_enabled' ) && is_main_site() ){
+        return true;
+    }
+
+    return false;
+
 }

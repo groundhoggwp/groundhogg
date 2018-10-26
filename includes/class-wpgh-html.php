@@ -31,6 +31,37 @@ class WPGH_HTML
 
     }
 
+    public function checkbox( $args )
+    {
+        $a = shortcode_atts( array(
+            'label'         => '',
+            'name'          => '',
+            'id'            => '',
+            'class'         => '',
+            'value'         => '1',
+            'checked'       => false,
+            'title'         => '',
+            'attributes'    => '',
+            'required'      => false,
+        ), $args );
+
+        $required = $a[ 'required' ] ? 'required' : '';
+        $checked = $a[ 'checked' ] ? 'checked' : '';
+
+        return sprintf(
+            "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='%s' value='%s' title='%s' %s %s %s> %s</label>",
+            esc_attr( $a[ 'name' ] ),
+            esc_attr( $a[ 'id' ] ),
+            esc_attr( $a[ 'class' ] ),
+            esc_attr( $a[ 'value' ] ),
+            esc_attr( $a[ 'title' ] ),
+            $a[ 'attributes' ],
+            $checked,
+            $required,
+            $a[ 'label' ]
+        );
+    }
+
     public function button($args )
     {
         $a = wp_parse_args( $args, array(
