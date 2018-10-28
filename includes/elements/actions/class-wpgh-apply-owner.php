@@ -46,17 +46,21 @@ class WPGH_Apply_Owner extends WPGH_Funnel_Step
         $owner = $step->get_meta( 'owner_id' );
 
         if ( ! $owner )
-            $owner = __( "This contact is super awesome!", 'groundhogg' );
+            $owner = get_current_user_id();
 
         ?>
         <table class="form-table">
             <tbody>
             <tr>
                 <th>
-                    <?php echo esc_html__( 'Note Text:', 'groundhogg' ); ?>
+                    <?php echo esc_html__( 'Apply Owner:', 'groundhogg' ); ?>
                 </th>
                 <td>
-                    <?php echo WPGH()->html->dropdown_owners( array( 'selected' => $owner ) ); ?>
+                    <?php echo WPGH()->html->dropdown_owners( array(
+                        'selected'  => $owner,
+                        'name'      => $step->prefix( 'owner_id' ),
+                        'id'        => $step->prefix( 'owner_id' ),
+                    ) ); ?>
                 </td>
             </tr>
             </tbody>

@@ -40,21 +40,19 @@ class WPGH_Funnels_Page
 	    add_action( 'admin_menu', array( $this, 'register' ) );
 
 	    if ( is_admin() ){
-            //add_action( 'wp_ajax_wpgh_auto_save_funnel_via_ajax', array( $this, 'autosave_funnel' ) );
+            add_action( 'wp_ajax_gh_save_funnel_via_ajax', array( $this, 'ajax_save_funnel' ) );
             add_action( 'wp_ajax_wpgh_get_step_html', array( $this, 'add_step' ) );
             add_action( 'wp_ajax_wpgh_delete_funnel_step',  array( $this, 'delete_step' ) );
             add_action( 'wp_ajax_wpgh_duplicate_funnel_step',  array( $this, 'duplicate_step' ) );
         }
 
+		$this->notices = WPGH()->notices;
 
 		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' ){
 
 			$this->setup_reporting();
 
 			add_action( 'init' , array( $this, 'process_action' )  );
-
-			$this->notices = WPGH()->notices;
-
 		}
 	}
 
@@ -515,6 +513,30 @@ class WPGH_Funnels_Page
         return $funnel_id;
     }
 
+	/**
+	 * Save the funnel via ajax...
+	 */
+    public function ajax_save_funnel()
+    {
+
+
+	    if ( ! wp_doing_ajax() ){
+		    return;
+	    }
+
+	    $this->save_funnel();
+//	    wp_die( 'hi' );
+
+	    ob_start();
+
+        $this->notices->notices();
+
+        $notices = ob_get_clean();
+
+        wp_die( $notices );
+
+    }
+
     private function save_funnel()
     {
         if ( ! current_user_can( 'edit_funnels' ) ){
@@ -532,17 +554,16 @@ class WPGH_Funnels_Page
 
         $args[ 'title' ] = $title;
 
-        /* do NOT update status during an autosave... */
-        if ( ! wp_doing_ajax() ){
-            $status = sanitize_text_field( $_POST[ 'funnel_status' ] );
-            if ( $status !== 'active' && $status !== 'inactive' )
-                $status = 'inactive';
 
-            //do not update the status to inactive if it's not confirmed
-            if ( ( $status === 'inactive' && isset( $_POST['confirm'] ) && $_POST['confirm'] === 'yes' ) || $status === 'active' ){
-                $args[ 'status' ] = $status;
-            }
+        $status = sanitize_text_field( $_POST[ 'funnel_status' ] );
+        if ( $status !== 'active' && $status !== 'inactive' )
+            $status = 'inactive';
+
+        //do not update the status to inactive if it's not confirmed
+        if ( ( $status === 'inactive' && isset( $_POST['confirm'] ) && $_POST['confirm'] === 'yes' ) || $status === 'active' ){
+            $args[ 'status' ] = $status;
         }
+
 
         $args[ 'last_updated' ] = current_time( 'mysql' );
 
@@ -784,7 +805,9 @@ class WPGH_Funnels_Page
 		?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
-			<?php $this->notices->notices(); ?>
+            <div id="notices">
+	            <?php $this->notices->notices(); ?>
+            </div>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){
 				case 'add':

@@ -37,7 +37,7 @@ var wpghFunnelEditor;
 
             /* Activate Spinner */
             $('form').on('submit', function( e ){
-                $('.spinner').css('visibility','visible');
+                wpghFunnelEditor.save( e );
             });
 
             this.makeSortable();
@@ -45,8 +45,38 @@ var wpghFunnelEditor;
 
         },
 
-        save: function () {
+        save: function ( e ) {
 
+            e.preventDefault();
+
+            $('.spinner').css('visibility','visible');
+
+            var fd = $('form').serialize();
+
+            fd = fd +  '&action=gh_save_funnel_via_ajax';
+
+            var ajaxCall = $.ajax({
+                type: "post",
+                url: ajaxurl,
+                data: fd,
+                success: function ( messages ) {
+                    $( '#notices' ).html( messages );
+                    $( '#confirm' ).fadeOut( 300 );
+                    $( '.spinner' ).css( 'visibility','hidden' );
+                    wpghFunnelEditor.makeDismissible();
+                }
+            });
+
+        },
+
+        makeDismissible: function()
+        {
+            $( "<button type='button' class='notice-dismiss'><span class='screen-reader-text'>Dismiss This Notice</span></button>" ).appendTo( '.is-dismissible' );
+            $( '.notice-dismiss' ).on( 'click', function ( e ) {
+                $(this).parent().fadeOut( 500, function () {
+                    $(this).remove();
+                } );
+            } )
         },
 
         /**

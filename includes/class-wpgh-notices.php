@@ -57,7 +57,7 @@ class WPGH_Notices
             <?php
         }
 
-        delete_transient( 'wpgh_notices' );
+	    delete_transient( 'wpgh_notices' );
     }
 
 }
