@@ -38,6 +38,11 @@ class WPGH_Apply_Tag extends WPGH_Funnel_Step
     public $name    = 'Apply Tag';
 
     /**
+     * @var string
+     */
+    public $description = 'Add a tag to a contact.';
+
+    /**
      * @param $step WPGH_Step
      */
     public function settings( $step )

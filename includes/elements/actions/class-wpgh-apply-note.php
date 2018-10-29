@@ -37,6 +37,11 @@ class WPGH_Apply_Note extends WPGH_Funnel_Step
     public $name    = 'Apply Note';
 
     /**
+     * @var string
+     */
+    public $description = 'Add a note to the notes section of a contact.';
+
+    /**
      * @param $step WPGH_Step
      */
     public function settings( $step )

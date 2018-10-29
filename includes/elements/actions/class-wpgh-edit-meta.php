@@ -38,6 +38,11 @@ class WPGH_Edit_Meta extends WPGH_Funnel_Step
     public $name    = 'Edit Meta';
 
     /**
+     * @var string
+     */
+    public $description = 'Directly edit the meta data of the contact.';
+
+    /**
      * Display the settings
      *
      * @param $step WPGH_Step

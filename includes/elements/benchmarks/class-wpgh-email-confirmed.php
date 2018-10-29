@@ -44,6 +44,8 @@ class WPGH_Email_Confirmed extends WPGH_Funnel_Step
      */
     public function __construct()
     {
+        $this->description = __( 'Runs whenever a contact confirms their email.', 'groundhogg' );
+
         parent::__construct();
 
         add_action( 'wpgh_email_confirmed', array( $this, 'complete' ), 10, 2 );

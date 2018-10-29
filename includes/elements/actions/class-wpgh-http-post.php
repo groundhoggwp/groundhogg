@@ -39,6 +39,11 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
     public $name    = 'HTTP Post';
 
     /**
+     * @var string
+     */
+    public $description = 'Send an HTTP Post t your favorite external software';
+
+    /**
      * Display the settings
      *
      * @param $step WPGH_Step

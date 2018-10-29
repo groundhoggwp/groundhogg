@@ -44,6 +44,8 @@ class WPGH_Role_Changed extends WPGH_Funnel_Step
      */
     public function __construct()
     {
+        $this->description = __( 'Runs whenever a user\'s role is changed.', 'groundhogg' );
+
         parent::__construct();
 
         add_action( 'set_user_role', array( $this, 'complete' ), 10, 3 );

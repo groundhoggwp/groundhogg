@@ -44,6 +44,8 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
      */
     public function __construct()
     {
+        $this->description = __( 'Use this form builder to create forms and display them on your site with shortcodes.', 'groundhogg' );
+
         parent::__construct();
 
         add_action( 'wpgh_form_submit', array( $this, 'complete' ), 10, 3 );

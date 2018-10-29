@@ -44,6 +44,8 @@ class WPGH_Account_Created extends WPGH_Funnel_Step
      */
     public function __construct()
     {
+        $this->description = __( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'groundhogg' );
+
         parent::__construct();
 
         add_action( 'user_register', array( $this, 'complete' ) );
@@ -121,6 +123,10 @@ class WPGH_Account_Created extends WPGH_Funnel_Step
             $cid = WPGH()->contacts->add( $new_contact );
 
             $contact = new WPGH_Contact( $cid );
+
+        } else {
+
+            $contact->update( array( 'user_id' => $userId ) );
 
         }
 

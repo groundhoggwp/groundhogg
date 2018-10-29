@@ -39,6 +39,11 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
     public $name    = 'Delay Timer';
 
     /**
+     * @var string
+     */
+    public $description = 'Pause for the specified amount of time.';
+
+    /**
      * @param $step WPGH_Step
      */
     public function settings( $step )

@@ -38,6 +38,11 @@ class WPGH_Apply_Owner extends WPGH_Funnel_Step
     public $name    = 'Apply Owner';
 
     /**
+     * @var string
+     */
+    public $description = 'Set the contact owner to the specified user account';
+
+    /**
      * @param $step WPGH_Step
      */
     public function settings( $step )

@@ -39,6 +39,11 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
     public $name    = 'Send Email';
 
     /**
+     * @var string
+     */
+    public $description = 'Send an email to a contact.';
+
+    /**
      * Display the settings
      *
      * @param $step WPGH_Step

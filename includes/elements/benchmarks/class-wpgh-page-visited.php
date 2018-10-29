@@ -45,6 +45,8 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
     public function __construct()
     {
 
+        $this->description = __( 'Runs whenever the specified page is visited.', 'groundhogg' );
+
         parent::__construct();
 
         add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );

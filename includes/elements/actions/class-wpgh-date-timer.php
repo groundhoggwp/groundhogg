@@ -39,6 +39,11 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
     public $name    = 'Date Timer';
 
     /**
+     * @var string
+     */
+    public $description = 'Pause until a specific date & time.';
+
+    /**
      * @param $step WPGH_Step
      */
     public function settings( $step )
