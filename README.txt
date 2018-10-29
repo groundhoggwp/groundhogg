@@ -1,5 +1,5 @@
 === Groundhogg ===
-Contributors: trainingbusinesspros, groundhogg
+Contributors: trainingbusinesspros, groundhogg, dhrumit
 Tags: marketing, email, contacts, contact, CRM, marketing automation, email automation, funnels, marketing funnels, marketing campaigns, campaigns
 Donate link: https://groundhogg.io
 Requires at least: 4.9
