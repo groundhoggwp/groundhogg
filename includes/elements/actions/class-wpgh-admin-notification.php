@@ -39,6 +39,11 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
     public $name    = 'Admin Notification';
 
     /**
+     * @var string
+     */
+    public $description = 'Send an email notification to any email or list of emails.';
+
+    /**
      * @param $step WPGH_Step
      */
     public function settings( $step )

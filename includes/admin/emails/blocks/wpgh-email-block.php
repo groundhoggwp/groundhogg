@@ -3,7 +3,7 @@
  * Email block
  *
  * Basic Email Block Template
- * Not many people no JS yet, so we're going to go with a standard PHP email block API system.
+ * Not many people no JS yet, so we're going to go with a standard PHP email block api system.
  *
  * Extend this class to create your own blocks!
  *
@@ -114,7 +114,7 @@ class WPGH_Email_Block
 
     /**
      * Register the settings for this particular block.
-     * It uses an API to the HTML helper class...
+     * It uses an api to the HTML helper class...
      *
      * @see WPGH_HTML
      * @return array

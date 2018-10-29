@@ -107,6 +107,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.17 =
+* Fixed Checkbox required="false" still required
+* Fixed {_meta} replacement code showing as Array
+* Changed form buttons adding to bottom of text
+* Changed funnels save via AJAX instead of from POST
+
 = 0.9.16 =
 * Fixed global multisite bugs where restore current was never being called resulting in weird behaviour.
 

@@ -2,7 +2,7 @@
 /**
  * Email Meta DB
  *
- * Allows for the use of metadata API usage
+ * Allows for the use of metadata api usage
  *
  * @package     Includes
  * @subpackage  includes/DB

@@ -9,7 +9,7 @@
  *
  * To output your custom settings.
  *
- * To do something with those settings you will need to access the save API method...
+ * To do something with those settings you will need to access the save api method...
  *
  * add_action( 'wpgh_admin_add_contact_after', 'my_add_function' ); ($id)
  *

@@ -249,7 +249,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                                 ?></tr><tr><?php
                                 endif;
 
-                                ?><td><div id='<?php echo $element; ?>' class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
+                                ?><td><div id='<?php echo $element; ?>' title="<?php esc_attr_e( $args['desc'] ); ?>" class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
 
                                 $i++;
 

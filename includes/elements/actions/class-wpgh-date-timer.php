@@ -52,6 +52,8 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
         if ( ! $run_time )
             $run_time = '09:30';
 
+        $checked = $step->get_meta( 'disable' );
+
         ?>
 
         <table class="form-table">
@@ -60,6 +62,7 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
                 <th><?php echo esc_html__( 'Wait till:', 'groundhogg' ); ?></th>
                 <td>
                     <?php $args = array(
+                        'class'         => 'input',
                         'name'          => $step->prefix( 'run_date' ),
                         'id'            => $step->prefix( 'run_date' ),
                         'value'         => $run_date,
@@ -67,7 +70,17 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
                     );
 
                     echo WPGH()->html->input( $args ); ?>
+                    <?php
 
+                    $args = array(
+                        'type'  => 'time',
+                        'class' => 'input',
+                        'name'  => $step->prefix( 'run_time' ),
+                        'id'    => $step->prefix( 'run_time' ),
+                        'value' => $run_time,
+                    );
+
+                    echo WPGH()->html->input( $args ); ?>
                     <script>jQuery(function($){$('#<?php echo $step->prefix( 'run_date' ); ?>').datepicker({
                         changeMonth: true,
                         changeYear: true,
@@ -76,20 +89,21 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
                     })});</script>
             </tr>
             <tr>
-                <th><?php echo esc_html__( 'And run at:', 'groundhogg' ); ?></th>
-                <td>
-                    <?php
-
-                    echo WPGH()->html->dropdown( $args );
-
+                <th>
+                    <?php echo esc_html__( 'Disable Temporarily:', 'groundhogg' ); ?>
+                </th>
+                <td><?php
                     $args = array(
-                        'type'  => 'time',
-                        'name'  => $step->prefix( 'run_time' ),
-                        'id'    => $step->prefix( 'run_time' ),
-                        'value' => $run_time,
+//                    'type'  => 'time',
+//                    'class' => 'input',
+                        'name'  => $step->prefix( 'disable' ),
+                        'id'    => $step->prefix( 'disable' ),
+                        'value' => 1,
+                        'checked' => $checked,
+                        'label' => __( 'Disable', 'groundhogg' )
                     );
 
-                    echo WPGH()->html->input( $args ); ?>
+                    echo WPGH()->html->checkbox( $args ); ?>
                 </td>
             </tr>
             </tbody>
@@ -113,6 +127,12 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
         $type = sanitize_text_field( $_POST[ $step->prefix( 'run_time' ) ] );
         $step->update_meta( 'run_time', $type );
 
+        if ( isset( $_POST[ $step->prefix( 'disable' ) ] ) ){
+            $step->update_meta( 'disable', 1 );
+        } else {
+            $step->delete_meta( 'disable' );
+        }
+
     }
 
     /**
@@ -123,6 +143,10 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
      */
     public function enqueue( $step )
     {
+        if ( $step->get_meta( 'disable' ) ){
+            return parent::enqueue( $step );
+        }
+
         $run_date = $step->get_meta( 'run_date' );
         if ( ! $run_date )
             $run_date = date( 'Y-m-d', strtotime( '+1 day' ) );

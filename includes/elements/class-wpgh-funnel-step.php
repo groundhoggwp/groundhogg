@@ -48,6 +48,13 @@ class WPGH_Funnel_Step
     public $group = '';
 
     /**
+     * Description of the step
+     *
+     * @var string
+     */
+    public $description = '';
+
+    /**
      * The current step
      *
      * @var WPGH_Step
@@ -125,7 +132,8 @@ class WPGH_Funnel_Step
 		$array[ $this->type ] = array(
 			'title' =>__( $this->name, 'groundhogg' ),
 			'icon'  => $this->icon(),
-            'group' => $this->group
+            'group' => $this->group,
+            'desc'  => $this->description
 		);
 
 		return $array;

@@ -43,6 +43,7 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
      */
     public function settings( $step )
     {
+        $checked = $step->get_meta( 'disable' );
 
         $amount = $step->get_meta( 'delay_amount');
         if ( ! $amount )
@@ -134,6 +135,24 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
                     </script>
                 </td>
             </tr>
+            <tr>
+                <th>
+                    <?php echo esc_html__( 'Disable Temporarily:', 'groundhogg' ); ?>
+                </th>
+                <td><?php
+                    $args = array(
+//                    'type'  => 'time',
+//                    'class' => 'input',
+                        'name'  => $step->prefix( 'disable' ),
+                        'id'    => $step->prefix( 'disable' ),
+                        'value' => 1,
+                        'checked' => $checked,
+                        'label' => __( 'Disable', 'groundhogg' )
+                    );
+
+                    echo WPGH()->html->checkbox( $args ); ?>
+                </td>
+            </tr>
             </tbody>
         </table>
 
@@ -160,6 +179,13 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
         $run_time = sanitize_text_field( $_POST[ $step->prefix( 'run_time' ) ] );
         $step->update_meta( 'run_time', $run_time );
 
+        if ( isset( $_POST[ $step->prefix( 'disable' ) ] ) ){
+            $step->update_meta( 'disable', 1 );
+        } else {
+            $step->delete_meta( 'disable' );
+        }
+
+
     }
 
     /**
@@ -170,6 +196,11 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
      */
     public function enqueue( $step )
     {
+
+        if ( $step->get_meta( 'disable' ) ){
+            return parent::enqueue( $step );
+        }
+
         $amount     = $step->get_meta( 'delay_amount' );
         $type       = $step->get_meta( 'delay_type' );
         $run_when   = $step->get_meta( 'run_when' );

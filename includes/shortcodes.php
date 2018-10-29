@@ -31,7 +31,7 @@ function wpgh_custom_form_shortcode( $atts, $content )
 add_shortcode( 'gh_form', 'wpgh_custom_form_shortcode' );
 
 /**
- * Prevent the shortcode API from texturizing the contents of [gh_form_alt]
+ * Prevent the shortcode api from texturizing the contents of [gh_form_alt]
  *
  * @param $list
  * @return array

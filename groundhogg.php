@@ -45,9 +45,9 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
 
         /**
-         * GH API object //todo
+         * GH api object //todo
          *
-         * @var object|WPGH_API
+         * @var object|WPGH_API_V1
          */
         public $api;
 
@@ -265,6 +265,8 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                     }
                 }
 
+                self::$instance->api = new WPGH_API_V1();
+
             }
 
 
@@ -391,6 +393,9 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';
             require_once WPGH_PLUGIN_DIR . 'includes/locations.php';
+
+            //API
+            require_once WPGH_PLUGIN_DIR . 'api/v1/class-wpgh-api-v1.php';
 
         }
 

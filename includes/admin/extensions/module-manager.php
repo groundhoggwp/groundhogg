@@ -2,7 +2,7 @@
 /**
  * Module Manager
  *
- * This class is a helper class for the settigns page. it essentially provides an API with Groundhogg.io for managing premium extension licenses.
+ * This class is a helper class for the settigns page. it essentially provides an api with Groundhogg.io for managing premium extension licenses.
  *
  * @package     Admin
  * @subpackage  Admin/Settings
@@ -133,7 +133,7 @@ class WPGH_Extension_Manager
             'url'        => home_url(),
 	        'beta'      => false
 		);
-		// Call the custom API.
+		// Call the custom api.
 		$response = wp_remote_post( static::$storeUrl, array( 'timeout' => 15, 'sslverify' => true, 'body' => $api_params ) );
 		// make sure the response came back okay
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {

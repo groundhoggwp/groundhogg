@@ -3,7 +3,7 @@
  * Broadcast
  *
  * This is a simple class that inits a broadcast like object for easy use and manipulation.
- * Also contains some API methods for the event queue
+ * Also contains some api methods for the event queue
  *
  * @package     Includes
  * @author      Adrian Tobey <info@groundhogg.io>

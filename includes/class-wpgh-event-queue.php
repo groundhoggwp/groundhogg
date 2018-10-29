@@ -124,8 +124,8 @@ class WPGH_Event_Queue
 
 
     /**
-     * Iterate through the list of events and process them via the EVENTS API
-     * For now just uses the standard plugins API
+     * Iterate through the list of events and process them via the EVENTS api
+     * For now just uses the standard plugins api
      *
      * @return bool whether the queue was processed or not
      */

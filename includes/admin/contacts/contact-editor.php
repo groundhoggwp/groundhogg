@@ -8,7 +8,7 @@
  * 3. Provide a simple UI for managing funnel events related to the contact.
  *
  * To add your own settings section there are a multitude of hooks to choose from.
- * The API to add settings sections is not complicated, but as a result you will be responsible for your own CSS & HTML
+ * The api to add settings sections is not complicated, but as a result you will be responsible for your own CSS & HTML
  * Your best option would be to do something like this...
  *
  * add_action( 'wpgh_contact_edit_before_history', 'my_settings_section' ); ( $id )
