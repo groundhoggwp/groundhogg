@@ -285,7 +285,7 @@ class WPGH_Replacements
 
         if ( substr( $code, 0, 1) === '_' ) {
 
-            $text = WPGH()->contact_meta->get_meta( $this->contact_id, substr( $code, 1 ) );
+            $text = WPGH()->contact_meta->get_meta( $this->contact_id, substr( $code, 1 ), true );
 
         } else if ( strpos( $code, '.' ) > 0 ) {
 

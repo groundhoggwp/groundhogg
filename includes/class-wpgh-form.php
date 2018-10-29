@@ -159,7 +159,7 @@ class WPGH_Form
 
         $this->fields[] = $a[ 'name' ];
 
-        $required = $a[ 'required' ] ? 'required' : '';
+        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $field = sprintf(
             "<label class='gh-input-label'>%s <input type='%s' name='%s' id='%s' class='%s' value='%s' placeholder='%s' title='%s' %s %s></label>",
@@ -417,7 +417,7 @@ class WPGH_Form
 
         $this->fields[] = $a[ 'name' ];
 
-        $required = $a[ 'required' ] ? 'required' : '';
+        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $field = sprintf(
             "<label class='gh-input-label'>%s <textarea name='%s' id='%s' class='%s' placeholder='%s' title='%s' %s %s>%s</textarea></label>",
@@ -505,7 +505,7 @@ class WPGH_Form
 
         $this->fields[] = $a[ 'name' ];
 
-        $required = $a[ 'required' ] ? 'required' : '';
+        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
         $multiple = $a[ 'multiple' ] ? 'multiple' : '';
 
         $optionHTML = sprintf( "<option value=''>%s</option>", $a[ 'default' ] );
@@ -572,7 +572,7 @@ class WPGH_Form
 
         $this->fields[] = $a[ 'name' ];
 
-        $required = $a[ 'required' ] ? 'required' : '';
+        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $optionHTML = '';
 
@@ -642,7 +642,7 @@ class WPGH_Form
 
         $this->fields[] = $a[ 'name' ];
 
-        $required = $a[ 'required' ] ? 'required' : '';
+        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $field = sprintf(
             "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='%s' value='%s' title='%s' %s %s> %s</label>",

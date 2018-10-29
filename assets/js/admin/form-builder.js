@@ -95,7 +95,7 @@ var wpghFormBuilder;
             }
 
             //MOZILLA and others
-            else if (myField.selectionStart || myField.selectionStart == '0') {
+            else if ( myField.selectionStart ) {
                 var startPos = myField.selectionStart;
                 var endPos = myField.selectionEnd;
                 myField.value = myField.value.substring(0, startPos)
