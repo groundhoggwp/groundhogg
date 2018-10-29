@@ -219,34 +219,35 @@ class WPGH_Welcome_Page
     {
         $extensions = array(
             array(
+                'title' => 'Social Proof',
+                'desc'  => 'Increase your conversion rate by showing how many people are engaging with your business. Show engagement by connecting your Proof to any funnel.',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/social-proof.png',
+                'link'  => 'https://www.groundhogg.io/downloads/proof/'
+            ),
+            array(
+                'title' => 'Email Countdown Timer',
+                'desc'  => 'Create more engagement from emails by adding countdown timers to your emails.',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/countdown-timers.png',
+                'link'  => 'https://www.groundhogg.io/downloads/countdown/'
+            ),
+            array(
                 'title' => 'Contracts',
                 'desc'  => 'Have your contacts sign legally binding contracts through Groundhogg. No third party apps required.',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/contracts-722x361.png',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/contracts.png',
                 'link'  => 'https://www.groundhogg.io/downloads/contracts/'
             ),
             array(
                 'title' => 'Contact Form 7',
                 'desc'  => 'Start collecting lead information through Contact Form 7, no setup required. Works instantly!',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/contact-form-7-722x361.png',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/contact-form-7.png',
                 'link'  => 'https://www.groundhogg.io/downloads/contact-form-7/'
             ),
-            array(
-                'title' => 'Gravity Forms',
-                'desc'  => 'Start collecting leads through Gravity Forms, no setup required. Adds the Gravity forms Benchmark to your funnels for increased automation capabilities!',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/gravity.png',
-                'link'  => 'https://www.groundhogg.io/downloads/'
-            ),
+
             array(
                 'title' => 'Easy Digital Downloads',
                 'desc'  => 'Connect Groundhogg to Easy Digital Downloads and increase your sales with abandonment funnels.',
                 'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/edd-722x361.png',
                 'link'  => 'https://www.groundhogg.io/downloads/easy-digital-downloads/'
-            ),
-            array(
-                'title' => 'Woocommerce',
-                'desc'  => 'Connect Groundhogg to Woocommerce and increase your sales with cart abandonment & followup funnels.',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/08/deafult-download-image-1-520x260.png',
-                'link'  => 'https://www.groundhogg.io/downloads/woocommerce/'
             ),
         );
 

@@ -108,6 +108,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 0.9.17 =
+* Fixed Apply owner step not saving.
+* Fixed date timer select box for no reason.
+* Added disable toggles to delay and date timers for testing
 * Fixed Checkbox required="false" still required
 * Fixed {_meta} replacement code showing as Array
 * Changed form buttons adding to bottom of text
