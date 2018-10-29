@@ -44,15 +44,27 @@ if ( ! $contact->exists() ) {
 include_once "class-wpgh-contact-activity-table.php";
 include_once "class-wpgh-contact-events-table.php";
 
-wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-editor.js' )
+wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-editor.js' );
+
+/* Quit if */
+if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
+    if ( $contact->owner->ID !== get_current_user_id() ){
+
+        wp_die( __( 'You are not the owner of this contact.', 'groundhogg' ) );
+
+    }
+}
+
 ?>
 
+<?php if ( ! empty( $contact->full_name) ):?>
 <!-- Title -->
 <span class="hidden" id="new-title"><?php echo $contact->full_name; ?> &lsaquo; </span>
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
 <!--/ Title -->
+<?php endif; ?>
 
 <form method="post" class="">
     <?php wp_nonce_field( 'edit', '_edit_contact_nonce' ); ?>

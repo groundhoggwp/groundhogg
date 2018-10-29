@@ -63,6 +63,21 @@ const wpgh = {
         });
     },
 
+    buildMetaKeyPicker: function(){
+        jQuery('.gh-metakey-picker' ).css( 'width', '100%' ).select2({
+            ajax: {
+                url: ajaxurl + '?action=gh_get_meta_keys',
+                dataType: 'json',
+                results: function(data, page) {
+                    return {
+                        results: data.results
+                    };
+                }
+            }
+        });
+    },
+
+
     init:  function () {
 
         this.buildSelect2();
@@ -70,6 +85,8 @@ const wpgh = {
         this.buildContactPicker();
         this.buildTagPicker();
         this.buildBenchmarkPicker();
+        this.buildMetaKeyPicker();
+
     },
 
 };

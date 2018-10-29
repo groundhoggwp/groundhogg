@@ -43,10 +43,10 @@
     margin: 0 10px 0 0;
 }
 
-.wpgh-element.ui-draggable-dragging .dashicons,
-#actions .dashicons,
-#benchmarks .dashicons{
-    font-size: 60px;
+.wpgh-element.ui-draggable-dragging {
+    width: 100px;
+    height: 120px;
+    border-radius: 5px;
 }
 
 #actions table,

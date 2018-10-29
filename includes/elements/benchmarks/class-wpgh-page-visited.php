@@ -107,10 +107,10 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
                     echo WPGH()->html->input( $args );
 
                     ?>
-                    <p>
+                    <p class="description">
                         <a href="#" data-target="<?php echo $step->prefix( 'url_match' ) ?>" id="<?php echo $step->prefix( 'add_link' ); ?>">
                             <?php _e( 'Insert Link' , 'groundhogg' ); ?>
-                        </a> | <?php _e('Does not match query string.', 'groundhogg' ); ?>
+                        </a>
                     </p>
                     <script>
                         jQuery(function($){

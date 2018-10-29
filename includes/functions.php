@@ -561,3 +561,28 @@ function wpgh_should_if_multisite()
     return false;
 
 }
+
+/**
+ * Return the current user role.
+ *
+ * @return array|bool
+ */
+function wpgh_get_current_user_roles()
+{
+
+    if ( ! is_user_logged_in() )
+        return false;
+
+    $user = wp_get_current_user();
+
+    $roles = (array) $user->roles;
+
+//    if ( count( $roles ) === 1 ){
+//
+//        return $roles[0];
+//
+//    }
+
+    return $roles;
+
+}

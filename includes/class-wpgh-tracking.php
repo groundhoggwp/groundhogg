@@ -108,6 +108,7 @@ class WPGH_Tracking
 
             add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
             add_action( 'plugins_loaded', array( $this, 'extract_from_login' ) );
+            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
 
             if ( isset( $_COOKIE[ 'gh_referer' ] ) ) {
                 $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referer' ] );
@@ -278,6 +279,41 @@ class WPGH_Tracking
 
         return true;
     }
+
+    /**
+     * IF the URL contains UTM variables save them to meta.
+     *
+     * @return bool
+     */
+    public function parse_utm()
+    {
+
+        if ( ! $this->contact instanceof WPGH_Contact ){
+            return false;
+        }
+
+        if ( isset( $_GET[ 'utm_source ' ] ) ){
+            $this->contact->update_meta( 'utm_source', sanitize_text_field( urldecode( $_GET[ 'utm_source ' ] ) ) );
+        }
+
+        if ( isset( $_GET[ 'utm_medium ' ] ) ){
+            $this->contact->update_meta( 'utm_medium', sanitize_text_field( urldecode( $_GET[ 'utm_medium ' ] ) ) );
+        }
+
+        if ( isset( $_GET[ 'utm_campaign ' ] ) ){
+            $this->contact->update_meta( 'utm_campaign', sanitize_text_field( urldecode( $_GET[ 'utm_campaign ' ] ) ) );
+        }
+
+        if ( isset( $_GET[ 'utm_term ' ] ) ){
+            $this->contact->update_meta( 'utm_term', sanitize_text_field( urldecode( $_GET[ 'utm_term ' ] ) ) );
+        }
+
+        if ( isset( $_GET[ 'utm_content ' ] ) ){
+            $this->contact->update_meta( 'utm_content', sanitize_text_field( urldecode( $_GET[ 'utm_content ' ] ) ) );
+        }
+
+    }
+
 
     /**
      * Return the step contact

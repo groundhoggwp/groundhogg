@@ -154,6 +154,9 @@ class WPGH_Contacts_Page
             case 'edit':
                 _e( 'Edit Contact' , 'groundhogg' );
                 break;
+            case 'search':
+                _e( 'Search Contacts' , 'groundhogg' );
+                break;
             default:
                 _e( 'Contacts', 'groundhogg' );
         }
@@ -687,6 +690,15 @@ class WPGH_Contacts_Page
         include dirname( __FILE__ ) . '/add-contact.php';
     }
 
+    function search()
+    {
+        if ( ! current_user_can( 'view_contacts' ) ){
+            wp_die( WPGH()->roles->error( 'view_contacts' ) );
+        }
+
+        include dirname( __FILE__ ) . '/search.php';
+    }
+
     /**
      * Display the title and dependent action include the appropriate page content
      */
@@ -703,6 +715,9 @@ class WPGH_Contacts_Page
                     break;
                 case 'edit':
                     $this->edit();
+                    break;
+                case 'search':
+                    $this->search();
                     break;
                 default:
                     $this->table();

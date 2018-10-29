@@ -28,6 +28,7 @@ class WPGH_HTML
         add_action( 'wp_ajax_gh_get_emails', array( $this, 'gh_get_emails' ) );
         add_action( 'wp_ajax_gh_get_tags', array( $this, 'gh_get_tags' ) );
         add_action( 'wp_ajax_gh_get_benchmarks', array( $this, 'gh_get_benchmarks' ) );
+        add_action( 'wp_ajax_gh_get_meta_keys', array( $this, 'get_meta_keys' ) );
 
     }
 
@@ -290,6 +291,43 @@ class WPGH_HTML
         }
 
         return $this->dropdown( $a );
+    }
+
+    /**
+     * @param array $args
+     *
+     * @return string
+     */
+    public function round_robin( $args=array() )
+    {
+        $a = wp_parse_args( $args, array(
+            'name'              => 'round_robin',
+            'id'                => 'round_robin',
+            'class'             => 'gh-select2',
+            'data'              => array(),
+            'selected'          => '',
+            'multiple'          => true,
+            'option_none'       => 'Please Select 1 or More Owners',
+            'attributes'        => '',
+            'option_none_value' => 0,
+        ) );
+
+        if ( empty( $a[ 'data' ] ) ){
+
+            $owners = get_users( array( 'role__in' => array( 'administrator', 'marketer', 'sales_manager' ) ) );
+
+            /**
+             * @var $owner WP_User
+             */
+            foreach ( $owners as $owner ){
+
+                $a[ 'data' ][ $owner->ID ] = sprintf( '%s (%s)', $owner->display_name, $owner->user_email );
+
+            }
+
+        }
+
+        return $this->select2( $a );
     }
 
     /**
@@ -611,7 +649,7 @@ class WPGH_HTML
 	 *
 	 * @return string
 	 */
-	public function benchmark_picker( $args )
+	public function benchmark_picker( $args=array() )
 	{
 
 		$a = wp_parse_args( $args, array(
@@ -638,6 +676,58 @@ class WPGH_HTML
 
 		return $this->select2( $a );
 	}
+
+    /**
+     * Returns a select 2 compatible json object with contact data meta keys
+     */
+	public function get_meta_keys(){
+        if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
+            wp_die( 'No access to contacts.' );
+
+        $json = array();
+
+        $data = WPGH()->contact_meta->get_keys();
+
+        foreach ( $data as $i => $key ) {
+
+            $json[] = array(
+                'id' => $key,
+                'text' => $key
+            );
+
+        }
+
+        $results = array( 'results' => $json, 'more' => false );
+
+        wp_die( json_encode( $results ) );
+    }
+
+    /**
+     * Get a meta key picker. useful for searching.
+     *
+     * @param array $args
+     * @return string
+     */
+	public function meta_key_picker( $args=array() ){
+        $a = wp_parse_args( $args, array(
+            'name'              => 'key',
+            'id'                => 'key',
+            'class'             => 'gh-metakey-picker',
+            'data'              => array(),
+            'selected'          => array(),
+            'multiple'          => false,
+            'placeholder'       => __( 'Please Select 1 or more keys', 'groundhogg' ),
+            'tags'              => false,
+        ) );
+
+        foreach ( $a[ 'selected' ] as $key ){
+
+            $a[ 'data' ][ $key ] = $key;
+
+        }
+
+        return $this->select2( $a );
+    }
 
     /**
      * Return HTML for a color picker

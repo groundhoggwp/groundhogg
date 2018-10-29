@@ -264,6 +264,10 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
         }
 
+        if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
+            $query[ 'owner' ] = get_current_user_id();
+        }
+
         switch ( $this->get_view() )
         {
             case 'optin_status':

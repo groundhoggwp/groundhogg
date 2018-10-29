@@ -304,6 +304,7 @@ class WPGH_Welcome_Page
     {
 
         $user = wp_get_current_user();
+
         ?>
         <img class="phil" src="<?php echo WPGH_ASSETS_FOLDER . 'images/phil-340x340.png'; ?>" width="340" height="340">
         <div id="welcome-page" class="welcome-page">
@@ -331,7 +332,7 @@ class WPGH_Welcome_Page
                                 <h3><?php _e( 'Support Articles', 'Groundhogg' ); ?></h3>
                                 <p><?php _e( "Don't know where to start? Checkout these articles and learn how to make Groundhogg work for you.", 'groundhogg' ); ?></p>
                                 <p style="text-align: center">
-                                    <a class="button button-primary" href="https://groundhogg.io/support/" target="_blank"><?php _e( 'View All!' ); ?></a>
+                                    <a class="button button-primary" href="https://www.groundhogg.io/category/support/" target="_blank"><?php _e( 'View All!' ); ?></a>
                                 </p>
                             </div>
                         </div>

@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 0.9.18 =
+* Added round robin functionality to Apply Owner step.
+* Sales Managers can only see contacts they are the owner of.
+
 = 0.9.17 =
 * Fixed Apply owner step not saving.
 * Fixed date timer select box for no reason.

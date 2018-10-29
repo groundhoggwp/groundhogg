@@ -159,6 +159,24 @@ class WPGH_DB_Contact_Meta extends WPGH_DB {
     }
 
     /**
+     * Returns an array of all the meta keys in a table.
+     *
+     * @return array
+     */
+    public function get_keys()
+    {
+
+        global $wpdb;
+
+        $keys = $wpdb->get_col(
+            "SELECT DISTINCT meta_key FROM $this->table_name ORDER BY meta_key DESC"
+        );
+
+        return $keys;
+
+    }
+
+    /**
      * Create the table
      *
      * @access  public

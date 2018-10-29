@@ -63,9 +63,12 @@ class WPGH_Apply_Owner extends WPGH_Funnel_Step
                 <td>
                     <?php echo WPGH()->html->dropdown_owners( array(
                         'selected'  => $owner,
-                        'name'      => $step->prefix( 'owner_id' ),
+                        'multiple'  => true,
+                        'class'     => 'gh-select2',
+                        'name'      => $step->prefix( 'owner_id[]' ),
                         'id'        => $step->prefix( 'owner_id' ),
                     ) ); ?>
+                    <p class="description"><?php _e( 'Selecting more than 1 owner will treat the step as a round robin.', 'groundhogg' ) ?></p>
                 </td>
             </tr>
             </tbody>
@@ -84,7 +87,7 @@ class WPGH_Apply_Owner extends WPGH_Funnel_Step
 
         if ( isset( $_POST[ $step->prefix( 'owner_id' ) ] ) ){
 
-            $owner_id = intval(  $_POST[ $step->prefix( 'owner_id' ) ] );
+            $owner_id = array_map( 'intval', $_POST[ $step->prefix( 'owner_id' ) ] );
 
             $step->update_meta( 'owner_id', $owner_id );
 
@@ -105,11 +108,34 @@ class WPGH_Apply_Owner extends WPGH_Funnel_Step
 
         $owner = $event->step->get_meta( 'owner_id' );
 
-        $owner = intval( $owner );
+        /* backwards compat */
+        if ( is_numeric( $owner ) ){
 
-        if ( $owner ){
+            $event->contact->update( array( 'owner_id' => intval( $owner ) ) );
 
-            $event->contact->update( array( 'owner_id' => $owner ) );
+        } else if ( is_array( $owner ) ){
+
+            if ( count( $owner ) === 1 ){
+
+                $event->contact->update( array( 'owner_id' => intval( $owner[0] ) ) );
+
+            } else {
+
+                $i = $event->step->get_meta( 'index' );
+
+                if ( ! $i || $i >= count( $owner ) ){
+
+                    $i = 0;
+
+                }
+
+                $event->contact->update( array( 'owner_id' => intval( $owner[ $i ] ) ) );
+
+                $i++;
+
+                $event->step->update_meta( 'index', $i );
+
+            }
 
         }
 
