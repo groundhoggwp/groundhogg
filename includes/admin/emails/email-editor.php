@@ -39,10 +39,12 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
 <!-- /RETURN PATH -->
 
 <!-- NEW EMAIL TAB TITLE -->
+<?php if ( ! empty( $email->subject ) ): ?>
 <span class="hidden" id="new-title"><?php echo $email->subject; ?> &lsaquo; </span>
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
+<?php endif; ?>
 <!-- /END TITLE -->
 
 

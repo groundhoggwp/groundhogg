@@ -6,6 +6,7 @@
     'use strict';
     var $ = window.jQuery || window.$;
     var editorId = 0;
+    var nID = 0;
 
     var colorPickerHtml = '   <table class="simple-editor-color-grid" role="list" cellspacing="0">  ' +
         '       <tbody>  ' +
@@ -194,7 +195,7 @@
     var saveSelection, restoreSelection;
 
     if (window.getSelection && document.createRange) {
-        saveSelection = function(containerEl) {
+        saveSelection = function (containerEl) {
             var doc = containerEl.ownerDocument, win = doc.defaultView;
             var range = win.getSelection().getRangeAt(0);
             var preSelectionRange = range.cloneRange();
@@ -208,7 +209,7 @@
             };
         };
 
-        restoreSelection = function(containerEl, savedSel) {
+        restoreSelection = function (containerEl, savedSel) {
             var doc = containerEl.ownerDocument, win = doc.defaultView;
             var charIndex = 0, range = doc.createRange();
             range.setStart(containerEl, 0);
@@ -240,7 +241,7 @@
             sel.addRange(range);
         };
     } else if (document.selection) {
-        saveSelection = function(containerEl) {
+        saveSelection = function (containerEl) {
             var doc = containerEl.ownerDocument, win = doc.defaultView || doc.parentWindow;
             var selectedTextRange = doc.selection.createRange();
             var preSelectionTextRange = doc.body.createTextRange();
@@ -254,7 +255,7 @@
             };
         };
 
-        restoreSelection = function(containerEl, savedSel) {
+        restoreSelection = function (containerEl, savedSel) {
             var doc = containerEl.ownerDocument, win = doc.defaultView || doc.parentWindow;
             var textRange = doc.body.createTextRange();
             textRange.moveToElementText(containerEl);
@@ -334,7 +335,7 @@
      * @return function that destroys the editor
      */
     var init = function init(settings) {
-        editorId ++;
+        editorId++;
         var defaultClasses = {
             actionbar: 'simple-editor-actionbar',
             button: 'simple-editor-button',
@@ -354,7 +355,8 @@
 
         var actionBar = createElement('div');
         actionBar.className = classes.actionbar;
-        appendChild(settings.element.parentNode, actionBar);
+        //appendChild(settings.element.parentNode, actionBar);
+        $element.before($(actionBar));
         appendChild(settings.element, colorPickerDiv);
 
         var existing;
@@ -375,7 +377,7 @@
 
         content = settings.element.content = existing;
         content.contentEditable = true;
-        $(content).addClass( classes.content );
+        $(content).addClass(classes.content);
 
         destroyCallbacks.push(function () {
             $(content).removeClass('simple-editor-content');
@@ -425,9 +427,34 @@
         $colorPickerDiv.hide();
         appendChild(settings.element, colorPickerDiv);
 
+        var ddropdown = createElement("div");
+        ddropdown.className = 'simple-editor-dropdown';
+        ddropdown.innerHTML = '<div class="simple-editor-dropdown-inner"></div>';
+        var dropdown = $(ddropdown);
+        dropdown.hide();
+        appendChild(settings.element, ddropdown);
+
+        dropdown.on('click', '.simple-editor-dropdown-item', function (ev) {
+            var target = $(this).attr('data-target');
+            var action = defaultActions[target];
+            ev.preventDefault();
+            var t = action.result() && content.focus();
+            runAll();
+            return t;
+        });
+
+        var appearDropdown = function (ref, items) {
+            stopHide = true;
+            dropdown.find('.simple-editor-dropdown-inner').html(items);
+            dropdown.css('left', ref.position().left);
+            dropdown.css('top', 0);
+            dropdown.show();
+        };
+
         var hideColorPickerDiv = function () {
             stopHide = false;
             $colorPickerDiv.hide();
+            dropdown.hide();
         };
 
         $colorPickerDiv.on('click', '.simple-editor-grid-cell div', function () {
@@ -440,7 +467,7 @@
                 el.removeAttr('color');
                 settings.onChange.call($element, content.innerHTML);
             }
-            $('.color-preview').css( 'background', color );
+            $('.color-preview').css('background', color);
             hideColorPickerDiv();
         });
 
@@ -452,7 +479,7 @@
                     return;
                 }
                 var $target = $(ev.target);
-                if ($target.is('.simple-editor-font-color') || $target.parents('.simple-editor-font-color:first').length) {
+                if ($target.is('.simple-editor-dropdown') || $target.parents('.simple-editor-dropdown:first').length || $target.is('.simple-editor-font-color') || $target.parents('.simple-editor-font-color:first').length) {
                     return;
                 }
                 hideColorPickerDiv();
@@ -462,6 +489,7 @@
 
         destroyCallbacks.push(function () {
             $colorPickerDiv.remove();
+            dropdown.remove();
         });
 
 
@@ -498,6 +526,68 @@
             return state;
         };
 
+
+        var makeResponsive = function (icon, title, groups) {
+            var resp = {
+                groups: groups,
+                icon: icon.join(" "),
+                title: title,
+                getIcon: function () {
+                    resp.groups.forEach(function (value) {
+                        var act = defaultActions[value];
+                        if ($(act.wrapper).hasClass(classes.selected)) {
+                            $(resp.wrapper).find('button').html($(act.wrapper).find('button').html() + " " + icon[1]);
+                        }
+                    });
+                },
+                extraClass: 'simple-editor-responsive-button',
+                state: function state() {
+                    var allTruth = false;
+                    resp.groups.forEach(function (value) {
+                        var act = defaultActions[value];
+                        if (act.state()) {
+                            allTruth = true;
+                        }
+                    });
+                    return allTruth;
+                },
+                result: function result() {
+                    var html = [];
+                    resp.groups.forEach(function (value) {
+                        html.push('<div class="simple-editor-dropdown-item" data-target="' + value + '">' + defaultActions[value].wrapper.outerHTML + '</div>');
+                    });
+                    appearDropdown($(resp.wrapper), html.join(""));
+                }
+            };
+            return resp;
+        };
+
+        var makeHeading = function (level) {
+            var el = 'h' + level;
+            return {
+                icon: '<b>H<sub>' + level + '</sub></b>',
+                extraClass: 'simple-editor-hsc',
+                title: 'Heading ' + level,
+                state: function state() {
+                    return getSelectionContainerElement().is(el) || getSelectionContainerElement().parents(el + ':first').length;
+                },
+                result: function result() {
+                    var elm = getSelectionContainerElement();
+                    if (getSelectionContainerElement().is(el) || getSelectionContainerElement().parents(el + ':first').length) {
+                        //unwrap(elm[0]);
+                        return true;
+                    }
+
+                    var n = exec(formatBlock, '<' + el + '>');
+                    if (window.wpghTextBlock) {
+                        wpghTextBlock.h1Font.trigger('change');
+                        wpghTextBlock.h1Size.trigger('change');
+                    }
+
+                    return n;
+                }
+            };
+        };
 
         var defaultActions = {
             bold: {
@@ -540,7 +630,7 @@
                     stopHide = true;
                     lastSelection = saveSelection(content);
                     $colorPickerDiv.css('left', $('.simple-editor-color-picker-handle').parents('.simple-editor-button-wrapper:first').position().left);
-                    $colorPickerDiv.css('top', 0 );
+                    $colorPickerDiv.css('top', 0);
                     $colorPickerDiv.show();
                     // console.log({e: $colorPickerDiv.show()});
                     return true;
@@ -559,6 +649,7 @@
             alignLeft: {
                 icon: '<span class="dashicons dashicons-editor-alignleft"></span>',
                 title: 'Left alignment',
+                extraClass: 'simple-editor-hsc',
                 state: function state() {
                     return queryCommandState('justifyLeft');
                 },
@@ -569,6 +660,7 @@
             alignRight: {
                 icon: '<span class="dashicons dashicons-editor-alignright"></span>',
                 title: 'Right alignment',
+                extraClass: 'simple-editor-hsc',
                 state: function state() {
                     return queryCommandState('justifyRight');
                 },
@@ -579,6 +671,7 @@
             alignCenter: {
                 icon: '<span class="dashicons dashicons-editor-aligncenter"></span>',
                 title: 'Center alignment',
+                extraClass: 'simple-editor-hsc',
                 state: function state() {
                     return queryCommandState('justifyCenter');
                 },
@@ -589,6 +682,7 @@
             alignJustify: {
                 icon: '<span class="dashicons dashicons-editor-justify"></span>',
                 title: 'Justify alignment',
+                extraClass: 'simple-editor-hsc',
                 state: function state() {
                     return queryCommandState('justifyFull');
                 },
@@ -596,45 +690,8 @@
                     return exec('justifyFull');
                 }
             },
-            heading1: {
-                icon: '<b>H<sub>1</sub></b>',
-                title: 'Heading 1',
-                state: function state() {
-                    return getSelectionContainerElement().is('h1');
-                },
-                result: function result() {
-                    var elm = getSelectionContainerElement();
-                    if (getSelectionContainerElement().is('h1')) {
-                        //unwrap(elm[0]);
-                        return true;
-                    }
-                    
-                    var n = exec(formatBlock, '<h1>');
-                    wpghTextBlock.h1Font.trigger( 'change' );
-                    wpghTextBlock.h1Size.trigger( 'change' );
-                    
-                    return n;
-                }
-            },
-            heading2: {
-                icon: '<b>H<sub>2</sub></b>',
-                title: 'Heading 2',
-                state: function state() {
-                    return getSelectionContainerElement().is('h2');
-                },
-                result: function result() {
-                    var elm = getSelectionContainerElement();
-                    if (getSelectionContainerElement().is('h2')) {
-                        //unwrap(elm[0]);
-                        return true;
-                    }
-                    var n = exec(formatBlock, '<h2>');
-                    wpghTextBlock.h2Font.trigger( 'change' );
-                    wpghTextBlock.h2Size.trigger( 'change' );
-
-                    return n;
-                }
-            },
+            heading1: makeHeading("1"),
+            heading2: makeHeading("2"),
             olist: {
                 icon: '<span class="dashicons dashicons-editor-ol"></span>',
                 title: 'Ordered List',
@@ -658,16 +715,17 @@
             paragraph: {
                 icon: '&#182;',
                 title: 'Paragraph',
+                extraClass: 'simple-editor-hsc',
                 state: function state() {
-                    return getSelectionContainerElement().is('p');
+                    return getSelectionContainerElement().is('p') || getSelectionContainerElement().parents('p:first').length;
                 },
                 result: function result() {
                     var elm = getSelectionContainerElement();
-                    if (getSelectionContainerElement().is('p')) {
+                    if (getSelectionContainerElement().is('p') || getSelectionContainerElement().parents('p:first').length) {
                         //unwrap(elm[0]);
                         return true;
                     }
-                    jQuery(elm).attr('style', '');
+                    $(elm).attr('style', '');
                     return exec(formatBlock, '<p>');
                 }
             },
@@ -715,12 +773,12 @@
                             wpLink.open(tmptextid, existing, title);
 
                             var unbind = function () {
-                                $(document).off( 'wplink-open', appear);
+                                $(document).off('wplink-open', appear);
                                 $('body').off('click', '#wp-link-submit', submit).off('click', '#wp-link-cancel, #wp-link-close', close);
                                 settings.onChange.call($element, content.innerHTML);
                             };
 
-                            var submit = function(event) {
+                            var submit = function (event) {
                                 var linkAtts = $.parseHTML($tmptextarea.val());
                                 $tmptextarea.val('');
                                 var item = null;
@@ -753,7 +811,7 @@
                                 return false;
                             };
 
-                            var close = function(event) {
+                            var close = function (event) {
                                 restoreSelection(content, lastSelectionBeforeLinkEdit);
                                 unbind();
                                 wpLink.close();
@@ -786,6 +844,7 @@
             unlink: {
                 icon: '<span class="dashicons link-manager-unlink dashicons-editor-unlink"></span>',
                 title: 'Unlink',
+                extraClass: 'simple-editor-unlink-c',
                 state: function state() {
                     var state = getSelectionContainerElement().is('a');
                     var el = $(settings.element).find('.link-manager-unlink').parents('.simple-editor-button-wrapper:first');
@@ -803,7 +862,9 @@
                     }
                     return true;
                 }
-            }
+            },
+            responsiveHeadings: makeResponsive(['<b>H<sub>1</sub></b>', '<span class="dashicons dicon-sm dashicons-arrow-down-alt2"></span>'], 'Headings', ["paragraph", "heading1", "heading2"]),
+            responsiveAlign: makeResponsive(['<span class="dashicons dashicons-editor-alignleft"></span>', '<span class="dashicons dicon-sm dashicons-arrow-down-alt2"></span>'], 'Alignments', ["alignLeft", "alignRight", "alignCenter", "alignJustify"])
         };
 
 
@@ -826,7 +887,10 @@
         };
         actions.reverse();
         actions.forEach(function (action) {
+            nID++;
+            action.nextId = nID;
             var button = createElement('button');
+            var clx = 'simple-editor-action-t-' + action.nextId;
             button.className = classes.button;
             button.innerHTML = action.icon;
             button.title = action.title;
@@ -835,13 +899,26 @@
                 return action.result() && content.focus();
             });
             var wrapper = createElement('div');
-            wrapper.className = defaultClasses.wrapper;
+            wrapper.className = defaultClasses.wrapper + ' ' + clx;
+
+            if (action.extraClass) {
+                wrapper.className += ' ' + action.extraClass;
+            }
             wrapper.appendChild(button);
             var handler;
             if (action.state) {
                 handler = function handler() {
-                    button.classList[action.state() ? 'add' : 'remove'](classes.selected);
-                    return wrapper.classList[action.state() ? 'add' : 'remove'](classes.selected);
+                    $('.' + clx).each(function () {
+                        var el = $(this)[action.state() ? 'addClass' : 'removeClass'](classes.selected);
+                        el.find('button')[action.state() ? 'addClass' : 'removeClass'](classes.selected);
+                    });
+
+                    if (action.getIcon) {
+                        action.getIcon();
+                    }
+
+                    //button.classList[action.state() ? 'add' : 'remove'](classes.selected);
+                    //return wrapper.classList[action.state() ? 'add' : 'remove'](classes.selected);
                 };
                 handlers.push(handler);
                 destroyCallbacks.push(addEventListener(content, 'keyup', runAll));
@@ -849,12 +926,19 @@
                 destroyCallbacks.push(addEventListener(button, 'click', runAll));
             }
 
+            action.wrapper = wrapper;
+
 
             appendChild(actionBar, wrapper);
 
             if (handler) {
                 handler();
             }
+
+            if (action.getIcon) {
+                action.getIcon();
+            }
+
         });
 
         if (settings.styleWithCSS) {

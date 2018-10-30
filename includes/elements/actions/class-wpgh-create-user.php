@@ -115,7 +115,13 @@ class WPGH_Create_User extends WPGH_Funnel_Step
 
 		    $contact->update( array( 'user_id', $user_id ) );
 
-	    }
+	    } else {
+
+	        $user = get_user_by_email( $username );
+
+	        $contact->update( array( 'user_id' => $user->ID ) );
+
+        }
 
 	    return true;
     }

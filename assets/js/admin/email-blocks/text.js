@@ -72,7 +72,7 @@ var wpghTextBlock;
             this.richText = editor.getActive().find('.content-wrapper');
             this.richText.simpleEditor({
                 defaultParagraphSeparator: 'p',
-                actions: ["heading1", "heading2", "paragraph", "bold", "italic",  "underline", "color", "strikethrough", "alignLeft", "alignCenter", "alignRight", "olist", "ulist","link", "unlink"]
+                actions: ["bold", "italic", "underline", "color", "strikethrough", "responsiveAlign", "alignLeft", "alignCenter", "alignRight", "alignJustify", "responsiveHeadings", "heading1", "heading2", "olist", "ulist", "paragraph", "link", "unlink"]
             });
             // console.log({richText:this.richText, message:'Editor Created'});
 

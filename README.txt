@@ -109,7 +109,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 0.9.18 =
 * Added round robin functionality to Apply Owner step.
-* Sales Managers can only see contacts they are the owner of.
+* Changed Sales Managers can only see contacts they are the owner of.
+* Fixed the create user step now links a user record to a contact if it exists... may be redundant but it's best to make sure.
+* Fixed [attributes] arg in HTML class being escaped when it shouldn't be
+* Fixed funnel stast refresh not working as a result of new ajax save.
+* Fixed the phone field not saving to primary phone.
+* Simplified the email editor text bar.
 
 = 0.9.17 =
 * Fixed Apply owner step not saving.

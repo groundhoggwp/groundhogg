@@ -58,9 +58,13 @@ var wpghFunnelEditor;
             var ajaxCall = $.ajax({
                 type: "post",
                 url: ajaxurl,
+                dataType: 'json',
                 data: fd,
-                success: function ( messages ) {
-                    $( '#notices' ).html( messages );
+                success: function ( response ) {
+                    // response = JSON.parse(response);
+                    console.log( response );
+                    $( '#notices' ).html( response.notices );
+                    $( '#normal-sortables' ).html( response.steps );
                     $( '#confirm' ).fadeOut( 300 );
                     $( '.spinner' ).css( 'visibility','hidden' );
                     wpghFunnelEditor.makeDismissible();

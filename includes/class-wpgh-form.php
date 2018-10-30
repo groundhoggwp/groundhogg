@@ -260,8 +260,8 @@ class WPGH_Form
         $a = shortcode_atts( array(
             'type'          => 'tel',
             'label'         => __( 'Phone *', 'groundhogg' ),
-            'name'          => 'phone',
-            'id'            => 'phone',
+            'name'          => 'primary_phone',
+            'id'            => 'primary_phone',
             'class'         => 'gh-tel',
             'value'         => '',
             'placeholder'   => '',

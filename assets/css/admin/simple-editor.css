@@ -1,5 +1,20 @@
+.color-preview {
+    display: block;
+    position: absolute;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    top: auto;
+    bottom: 2px;
+    left: 6px;
+    height: 3px;
+    width: 20px;
+    background: #555d66;
+}
+
 .simple-editor-actionbar {
     border: solid #ddd;
+    display: inline-block;
     border-width: 1px 1px 0 1px;
     background: #f5f5f5;
     z-index: 9999;
@@ -47,20 +62,6 @@
     border-radius: 2px;
 }
 
-.color-preview {
-    display: block;
-    position: absolute;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    top: auto;
-    bottom: 2px;
-    left: 6px;
-    height: 3px;
-    width: 20px;
-    background: #555d66;
-}
-
 .simple-editor-content {
     background: white;
     outline: none;
@@ -101,7 +102,7 @@
     height: 28px;
 }
 
-.simple-editor-font-color {
+.simple-editor-font-color, .simple-editor-dropdown {
     position: absolute;
     top: 35px;
     border-color: rgba(0,0,0,.15);
@@ -149,3 +150,35 @@ table.simple-editor-color-grid {
     position: relative;
 }
 
+.simple-editor-responsive-button {
+    display:inline-block;
+}
+
+.simple-editor-hsc {
+    display:none;
+}
+
+.simple-editor-dropdown-inner {
+    margin: 0px;
+}
+
+.simple-editor-dropdown-inner .simple-editor-hsc {
+    display: block;
+    margin: 0;
+    border-radius: 0px;
+}
+
+.dicon-sm {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+}
+
+.simple-editor-unlink-c {
+    display: none;
+}
+
+.simple-editor-unlink-c.simple-editor-button-selected {
+    display:inline-block;
+}

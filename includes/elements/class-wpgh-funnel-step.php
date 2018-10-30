@@ -244,7 +244,7 @@ class WPGH_Funnel_Step
     {
         _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the RUN method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
 
-        return false;
+        return true;
     }
 
     /**

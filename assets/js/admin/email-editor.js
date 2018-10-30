@@ -148,6 +148,10 @@ var wpghEmailEditor;
             // console.log( {e: e} );
 
             /* Make Current Block Active*/
+            if ( e.parentNode === null ){
+                return;
+            }
+
             var block = $( e ).closest( '.row' );
 
             /* check if already active */
