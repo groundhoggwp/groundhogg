@@ -68,6 +68,8 @@ var wpghFunnelEditor;
                     $( '#confirm' ).fadeOut( 300 );
                     $( '.spinner' ).css( 'visibility','hidden' );
                     wpghFunnelEditor.makeDismissible();
+                    $(document).trigger('wpghAddedStep');
+
                 }
             });
 
