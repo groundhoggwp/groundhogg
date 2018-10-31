@@ -35,6 +35,7 @@ class WPGH_DB_Contact_Meta extends WPGH_DB {
         $this->version     = '1.0';
 
         add_action( 'plugins_loaded', array( $this, 'register_table' ), 11 );
+        add_action( 'wpgh_delete_contact', array( $this, 'delete_contact_meta_on_delete' ) );
 
     }
 
@@ -62,6 +63,22 @@ class WPGH_DB_Contact_Meta extends WPGH_DB {
     public function register_table() {
         global $wpdb;
         $wpdb->contactmeta = $this->table_name;
+    }
+
+    /**
+     * Clean up contact Meta if contact get's delete
+     *
+     * @param $id int the ID of the contact
+     * @return false|int
+     */
+    public function delete_contact_meta_on_delete( $id ){
+
+        global $wpdb;
+
+        $result = $wpdb->delete( $this->table_name, array( 'contact_id' => $id ), array( '%d' ) );
+
+        return $result;
+
     }
 
     /**
