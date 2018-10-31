@@ -128,15 +128,13 @@ class WPGH_Tracking
 
         if ( isset( $_REQUEST[ 'u' ] ) )
         {
-            $uid = hexdec( $_REQUEST[ 'u' ] );
+            $uid = absint( intval( hexdec( $_REQUEST[ 'u' ] ) ) );
 
-            $contact = new WPGH_Contact( $uid );
-
-            if ( $contact->exists() ){
-
+            if ( WPGH()->contacts->exists( $uid, 'ID' ) ){
+                $contact = new WPGH_Contact( $uid );
                 $this->contact = $contact;
-
             }
+
         }
 
         if ( isset( $_REQUEST[ 'e' ] ) )
@@ -546,7 +544,7 @@ class WPGH_Tracking
     {
 
         if ( ! $this->contact )
-            wp_die( 'You do not exist... ');
+            wp_die( 'Hmmm, something went wrong. Please make sure you have cookies enabled.' );
 
         $this->contact->update( array( 'optin_status' => WPGH_CONFIRMED ) );
 

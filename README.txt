@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0 =
+* Stricter checking of whether a contact exists or not.
+
 = 0.9.18 =
 * Added round robin functionality to Apply Owner step.
 * Changed Sales Managers can only see contacts they are the owner of.

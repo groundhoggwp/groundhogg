@@ -190,7 +190,7 @@ class WPGH_Contact
      */
     public function exists()
     {
-        return is_email( $this->email );
+        return WPGH()->contacts->exists( $this->ID, 'ID' );
     }
 
 
