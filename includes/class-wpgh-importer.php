@@ -169,6 +169,9 @@ class WPGH_Importer
             $contact->update_meta( $key, sanitize_text_field( $value ) );
         }
 
+        //todo, not sure about this
+        $contact->update_meta( 'last_optin', time() );
+
         return $contact;
 
     }
