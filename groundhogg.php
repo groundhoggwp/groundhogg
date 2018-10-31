@@ -52,6 +52,11 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $api;
 
         /**
+         * @var WPGH_DB_API_Tokens
+         */
+        public $tokens;
+
+        /**
          * GH HTML Helper Class
          *
          * @var object|WPGH_HTML
@@ -205,6 +210,11 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $network_options;
 
         /**
+         * @var WPGH_User_Token_Section
+         */
+        public $tokens_section;
+
+        /**
          * Returns the instance on Groundhogg.
          *
          * @return Groundhogg
@@ -240,6 +250,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->activity     = new WPGH_DB_Activity();
                 self::$instance->events       = new WPGH_DB_Events();
                 self::$instance->superlinks   = new WPGH_DB_Superlinks();
+                self::$instance->tokens       = new WPGH_DB_API_Tokens();
 
                 self::$instance->roles        = new WPGH_Roles();
                 self::$instance->tracking     = new WPGH_Tracking();
@@ -258,6 +269,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
+                    self::$instance->tokens_section       = new WPGH_User_Token_Section();
                     self::$instance->importer   = new WPGH_Importer();
 
                     if ( is_multisite() ){
@@ -354,12 +366,14 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-superlinks.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-tag-relationships.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-tags.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-api-tokens.php';
 
             /* Admin Files */
             if ( is_admin() ){
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-menu.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-importer.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
+                require_once WPGH_PLUGIN_DIR . 'includes/admin/user/class-wpgh-user-tokens-section.php';
 //                include_once WPGH_PLUGIN_DIR . 'includes/email-blocks.php';
 
                 if ( is_multisite() ){

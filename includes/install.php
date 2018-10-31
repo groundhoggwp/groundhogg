@@ -98,6 +98,8 @@ function wpgh_run_install() {
     @WPGH()->tags->create_table();
     @WPGH()->tag_relationships->create_table();
 
+    @WPGH()->tokens->create_table();
+
     /* Setup the cron event */
     @WPGH()->event_queue->setup_cron_jobs();
 
@@ -254,6 +256,7 @@ function wpgh_wpmu_drop_tables( $tables, $blog_id ) {
         $tables[] = WPGH()->activity->table_name;
         $tables[] = WPGH()->steps->table_name;
         $tables[] = WPGH()->step_meta->table_name;
+        $tables[] = WPGH()->tokens->table_name;
     }
 
     restore_current_blog();
@@ -308,6 +311,8 @@ function wpgh_after_install() {
             @WPGH()->tags->create_table();
             @WPGH()->tag_relationships->create_table();
 
+            @WPGH()->tokens->create_table();
+
             do_action( 'wpgh_after_install', $wpgh_options );
         }
 
@@ -324,6 +329,21 @@ function wpgh_after_install() {
 }
 
 add_action( 'admin_init', 'wpgh_after_install' );
+
+/**
+ * Update to add table, amke sure it exists....
+ */
+function wpgh_api_table_check(){
+
+    if ( ! @WPGH()->tokens->installed() ){
+
+        @WPGH()->tokens->create_table();
+
+    }
+
+}
+
+add_action( 'admin_init', 'wpgh_api_table_check' );
 
 /**
  * Install user roles on sub-sites of a network
