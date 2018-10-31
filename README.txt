@@ -115,6 +115,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * Fixed funnel stast refresh not working as a result of new ajax save.
 * Fixed the phone field not saving to primary phone.
 * Simplified the email editor text bar.
+* Fixed extensions errors when licensing new extensions
+* Fixed multisite config by retrieving options with get_blog_option rather than switch_to_blog
+* Began Adding API Stuff.
 
 = 0.9.17 =
 * Fixed Apply owner step not saving.

@@ -5,6 +5,7 @@
  * Date: 10/29/2018
  * Time: 11:44 AM
  */
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class wpgh_api_v1_contacts
 {

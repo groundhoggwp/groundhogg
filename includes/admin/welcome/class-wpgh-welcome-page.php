@@ -36,6 +36,10 @@ class WPGH_Welcome_Page
               'wip', __( 'This page is currently a work in progress! You should move on from it for now. Complete videos, links, and extensions coming soon.' ), 'info'
             );
 
+            $this->notices->add(
+              'affiliate', __( 'You can get our entire extension library for $1 if <a href="https://www.groundhogg.io/referral-partner-sign-up/" target="_blank">you refer a friend.</a>' ), 'info'
+            );
+
             add_action( 'admin_init', array( $this, 'status_check' ) );
 
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
@@ -48,6 +52,19 @@ class WPGH_Welcome_Page
         $this->check_settings();
         $this->check_funnels();
         $this->check_settings();
+        $this->check_plugins();
+    }
+
+    /**
+     * Check to see if some plugins are active.
+     */
+    public function check_plugins()
+    {
+        if ( ! is_plugin_active( 'wp-mail-smtp/wp_mail_smtp.php' ) ){
+            $this->notices->add(
+                'smtp', __( 'While we work on an SMTP solution for you that is builtin, there are other ones out there. We recommend you install <a href="https://en-ca.wordpress.org/plugins/wp-mail-smtp/">WP Mail SMTP</a> to increase your deliverability.' ), 'info'
+            );
+        }
     }
 
 
@@ -84,7 +101,7 @@ class WPGH_Welcome_Page
 
         if ( $contacts < 10 ){
             $this->notices->add(
-                'no_contacts', __( 'Seams like you need some more contacts. Go to the <a href="?page=gh_settings&tab=tools">tools area</a> and import your mailing list!' ), 'warning'
+                'no_contacts', __( 'Seems like you need some more contacts. Go to the <a href="?page=gh_settings&tab=tools">tools area</a> and import your mailing list!' ), 'warning'
             );
         }
 
@@ -313,16 +330,6 @@ class WPGH_Welcome_Page
                     <h1><?php echo sprintf( __( 'Welcome %s!', 'groundhogg' ), $user->first_name ); ?></h1>
                 </div>
                 <?php $this->notices->notices(); ?>
-
-<!--                <div id="main">-->
-<!--                    <div class="postbox support progress">-->
-<!--                        <div class="inside">-->
-<!--                            <h2>--><?php //_e( 'Setup Progress', 'Groundhogg' ); ?><!--</h2>-->
-<!--                            <hr/>-->
-<!---->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
                 <div class="left-col col">
 
                     <div id="support-articles">

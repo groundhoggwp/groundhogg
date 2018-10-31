@@ -68,6 +68,8 @@ if( wpgh_get_option( 'gh_uninstall_on_delete', false ) ) {
     @WPGH()->tags->drop();
     @WPGH()->tag_relationships->drop();
 
+    @WPGH()->tokens->drop();
+
     /** Cleanup Cron Events */
     wp_clear_scheduled_hook( 'wpgh_cron_event' );
 

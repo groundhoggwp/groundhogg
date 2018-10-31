@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 0.9.17
+Version: 0.9.18
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '0.9.17';
+        public $version = '0.9.18';
 
         /**
          * @var $instance Groundhogg instance
@@ -37,7 +37,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
 
         /**
-         * GH roles object //todo
+         * GH roles object
          *
          * @var object|WPGH_Roles
          */
@@ -45,7 +45,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
 
         /**
-         * GH api object //todo
+         * GH api object //todo in progress
          *
          * @var object|WPGH_API_V1
          */
@@ -269,7 +269,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
-                    self::$instance->tokens_section       = new WPGH_User_Token_Section();
+//                    self::$instance->tokens_section       = new WPGH_User_Token_Section();
                     self::$instance->importer   = new WPGH_Importer();
 
                     if ( is_multisite() ){
@@ -277,7 +277,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                     }
                 }
 
-                self::$instance->api = new WPGH_API_V1();
+//                self::$instance->api = new WPGH_API_V1();
 
             }
 
@@ -373,8 +373,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-menu.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-importer.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
-                require_once WPGH_PLUGIN_DIR . 'includes/admin/user/class-wpgh-user-tokens-section.php';
-//                include_once WPGH_PLUGIN_DIR . 'includes/email-blocks.php';
+//                require_once WPGH_PLUGIN_DIR . 'includes/admin/user/class-wpgh-user-tokens-section.php';
 
                 if ( is_multisite() ){
                     require_once WPGH_PLUGIN_DIR . 'includes/admin/multisite/class-wpgh-network-settings-page.php';
@@ -409,7 +408,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/locations.php';
 
             //API
-            require_once WPGH_PLUGIN_DIR . 'api/v1/class-wpgh-api-v1.php';
+//            require_once WPGH_PLUGIN_DIR . 'api/v1/class-wpgh-api-v1.php';
 
         }
 
