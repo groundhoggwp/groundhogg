@@ -501,7 +501,7 @@ function wpgh_should_if_multisite()
         return true;
     }
 
-    if ( is_multisite() && get_site_option( 'gh_global_db_enabled' ) && is_main_site() && ! ms_is_switched() ){
+    if ( is_multisite() && get_site_option( 'gh_global_db_enabled' ) && is_main_site() ){
         return true;
     }
 

@@ -116,7 +116,11 @@ class WPGH_Extension_Manager
             foreach ( $licenses as $item_id => $license ){
                 $license = trim( $license );
                 $item_id = intval( trim( $item_id ) );
-                self::activate_license( $license, $item_id );
+
+                if ( ! empty( $license ) ){
+                    self::activate_license( $license, $item_id );
+                }
+
             }
 
 
@@ -176,13 +180,13 @@ class WPGH_Extension_Manager
             $status = 'invalid';
             $expiry = "unknown";
 
-            add_settings_error( 'license', esc_attr( 'license_failed' ), __( $message ), 'error' );
+            WPGH()->notices->add( esc_attr( 'license_failed' ), __( $message ), 'error' );
 
         } else {
 			$status = 'valid';
 			$expiry = $license_data->expires;
 
-            add_settings_error( 'license', esc_attr( 'license_activated' ), __( 'License Activated' ), 'updated' );
+            WPGH()->notices->add( esc_attr( 'license_activated' ), __( 'License Activated' ), 'success' );
 
         }
 

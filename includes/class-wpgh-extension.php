@@ -50,6 +50,7 @@ class WPGH_Extension
 			'item_name'     => $this->name,
 			'item_id'       => $this->id,
 			'file'          => $this->file,
+			'author'        => $this->author,
 			'version'       => $this->version,
 			'img_source'    => $this->img,
 			'description'   => $this->description

@@ -81,6 +81,7 @@ class WPGH_Settings_Page
 		<div class="wrap">
 			<h1>Groundhogg <?php _e( 'Settings' ); ?></h1>
 			<?php settings_errors(); ?>
+			<?php WPGH()->notices->notices(); ?>
             <?php if ( isset( $_GET[ 'token' ] ) ) :
                 ?><div class="notice notice-success is-dismissible"><p><strong><?php _e( 'Connected to Groundhogg!', 'groundhogg' ); ?></strong></p></div><?php
             endif; ?>

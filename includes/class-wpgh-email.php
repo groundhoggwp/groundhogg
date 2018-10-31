@@ -431,7 +431,7 @@ class WPGH_Email
      */
     public function get_unsubscribe_link( $url )
     {
-        return get_permalink( wpgh_get_option( 'gh_email_preferences_page', 0 ) );
+        return get_permalink( wpgh_get_option( 'gh_email_preferences_page' ) );
     }
 
     /**
