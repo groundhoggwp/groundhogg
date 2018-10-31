@@ -210,7 +210,7 @@ class WPGH_Broadcasts_Page
         $time_string = $send_date . ' ' . $send_time;
 
         /* convert to UTC */
-        $send_time = strtotime( $time_string ) - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $send_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 
         if ( $send_time < time() )
             wp_die( __( 'Please send at a time in the future!' ) );

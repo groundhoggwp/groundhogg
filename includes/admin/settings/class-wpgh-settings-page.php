@@ -486,7 +486,7 @@ class WPGH_Settings_Page
 
 	public function wpgh_field_callback( $field )
     {
-		$value = get_option( $field['id'] );
+		$value = wpgh_get_option( $field['id'] );
 		switch ( $field['type'] ) {
             case 'radio':
             case 'checkbox':

@@ -73,7 +73,7 @@ class WPGH_Superlink
 
         $this->contact_id = WPGH()->tracking->get_contact()->ID;
 
-        $this->target = esc_url_raw( WPGH()->replacements->process( $link->target, $this->contact_id ) );
+        $this->target = esc_url_raw( urldecode( WPGH()->replacements->process( $link->target, $this->contact_id ) ) );
 
         $this->tags = maybe_unserialize( $link->tags );
 

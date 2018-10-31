@@ -437,6 +437,10 @@
         dropdown.on('click', '.simple-editor-dropdown-item', function (ev) {
             var target = $(this).attr('data-target');
             var action = defaultActions[target];
+            if (lastSelection) {
+                restoreSelection(content, lastSelection);
+                lastSelection = null;
+            }
             ev.preventDefault();
             var t = action.result() && content.focus();
             runAll();
@@ -552,6 +556,7 @@
                     return allTruth;
                 },
                 result: function result() {
+                    lastSelection = saveSelection(content);
                     var html = [];
                     resp.groups.forEach(function (value) {
                         html.push('<div class="simple-editor-dropdown-item" data-target="' + value + '">' + defaultActions[value].wrapper.outerHTML + '</div>');
@@ -717,15 +722,39 @@
                 title: 'Paragraph',
                 extraClass: 'simple-editor-hsc',
                 state: function state() {
-                    return getSelectionContainerElement().is('p') || getSelectionContainerElement().parents('p:first').length;
+                    var elm = getSelectionContainerElement();
+                    return elm.is('p') || elm.parents('p:first').length;
                 },
                 result: function result() {
                     var elm = getSelectionContainerElement();
-                    if (getSelectionContainerElement().is('p') || getSelectionContainerElement().parents('p:first').length) {
+                    if (elm.is('p') || elm.parents('p:first').length) {
                         //unwrap(elm[0]);
                         return true;
                     }
-                    $(elm).attr('style', '');
+
+                    var processed = false;
+
+                    ["ul", "ol"].forEach(function (t) {
+                        var rl = elm.parents(t + ':first');
+                        if (!rl.length) {
+                            rl = elm.find(t);
+                        }
+                        if (rl.length) {
+                            processed = true;
+                            var ht = '';
+                            var lis = rl.find('li').each(function () {
+                                ht += $(this).html();
+                            });
+                            rl.wrap('<p>');
+                            rl.parents('p:first').html(ht);
+
+                        }
+                    });
+
+                    elm.attr('style', '');
+                    if (processed) {
+                        return true;
+                    }
                     return exec(formatBlock, '<p>');
                 }
             },

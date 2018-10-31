@@ -27,12 +27,12 @@ include_once( 'groundhogg.php' );
 
 global $wpdb, $wp_roles;
 
-if( get_option( 'gh_uninstall_on_delete', false ) ) {
+if( wpgh_get_option( 'gh_uninstall_on_delete', false ) ) {
 
     /** Delete the Plugin Pages */
     $wpgh_created_pages = array( 'gh_confirmation_page', 'gh_unsubscribe_page', 'gh_email_preferences_page' );
     foreach ( $wpgh_created_pages as $p ) {
-        $page = get_option( $p, false );
+        $page = wpgh_get_option( $p, false );
         if ( $page ) {
             wp_delete_post( $page, true );
         }

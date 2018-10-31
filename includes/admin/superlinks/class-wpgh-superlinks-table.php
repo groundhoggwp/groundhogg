@@ -85,7 +85,7 @@ class WPGH_Superlinks_Table extends WP_List_Table {
 
     protected function column_source( $superlink )
     {
-        return site_url( 'superlinks/link/' . $superlink->ID );
+        return sprintf( '<a target="_blank" href="%s">%s</a>',site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ) );
     }
 
     protected function column_tags( $superlink )

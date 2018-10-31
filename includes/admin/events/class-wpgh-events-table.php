@@ -157,7 +157,7 @@ class WPGH_Events_Table extends WP_List_Table {
      */
     protected function column_time( $event )
     {
-        $p_time = intval( $event->time ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $p_time = intval( $event->time ) + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 
         $cur_time = (int) current_time( 'timestamp' );
 

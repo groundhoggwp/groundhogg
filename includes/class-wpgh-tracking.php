@@ -159,6 +159,7 @@ class WPGH_Tracking
 
         if ( isset( $_REQUEST[ 'ref' ] ) ) {
             $this->ref = esc_url_raw( urldecode( $_REQUEST[ 'ref' ] ) );
+            $this->ref = str_replace( 'amp;', '', $this->ref );
 
             if ( empty( $this->ref ) ){
                 $this->ref = site_url();
@@ -551,7 +552,7 @@ class WPGH_Tracking
 
 //        wp_die();
 
-        $conf_page = get_permalink( get_option( 'gh_confirmation_page' ) );
+        $conf_page = get_permalink( wpgh_get_option( 'gh_confirmation_page' ) );
 
         /**
          * @type $contact WPGH_Contact

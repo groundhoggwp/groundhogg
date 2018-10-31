@@ -384,34 +384,34 @@ class WPGH_Email
     {
         $footer = "";
 
-        if ( get_option( 'gh_business_name' ) )
+        if ( wpgh_get_option( 'gh_business_name' ) )
             $footer .= "&copy; {business_name}<br/>";
 
-        if ( get_option( 'gh_street_address_1' ) )
+        if ( wpgh_get_option( 'gh_street_address_1' ) )
             $footer .= "{business_address}<br/>";
 
         $sub = array();
 
-        if ( get_option( 'gh_phone', 0 ) ) {
+        if ( wpgh_get_option( 'gh_phone', 0 ) ) {
             $sub[] = sprintf(
                 "<a href='tel:%s'>%s</a>",
-                esc_attr( get_option('gh_phone') ),
-                esc_attr( get_option('gh_phone') )
+                esc_attr( wpgh_get_option('gh_phone') ),
+                esc_attr( wpgh_get_option('gh_phone') )
             );
         }
 
-        if ( get_option( 'gh_privacy_policy' ) ) {
+        if ( wpgh_get_option( 'gh_privacy_policy' ) ) {
             $sub[] = sprintf(
                 "<a href='%s'>%s</a>",
-                esc_attr( get_permalink( get_option( 'gh_privacy_policy' ) ) ),
+                esc_attr( get_permalink( wpgh_get_option( 'gh_privacy_policy' ) ) ),
                 apply_filters( 'gh_privacy_policy_footer_text', __( 'Privacy Policy', 'groundhogg' ) )
             );
         }
 
-        if ( get_option( 'gh_terms' ) ) {
+        if ( wpgh_get_option( 'gh_terms' ) ) {
             $sub[] = sprintf(
                 "<a href='%s'>%s</a>",
-                esc_attr( get_permalink( get_option( 'gh_terms' ) ) ),
+                esc_attr( get_permalink( wpgh_get_option( 'gh_terms' ) ) ),
                 apply_filters( 'gh_terms_footer_text', __( 'Terms', 'groundhogg' ) )
             );
         }
@@ -431,7 +431,7 @@ class WPGH_Email
      */
     public function get_unsubscribe_link( $url )
     {
-        return get_permalink( get_option( 'gh_email_preferences_page', 0 ) );
+        return get_permalink( wpgh_get_option( 'gh_email_preferences_page', 0 ) );
     }
 
     /**
@@ -546,7 +546,7 @@ class WPGH_Email
 
             } else {
 
-                return get_option( 'gh_business_name' );
+                return wpgh_get_option( 'gh_business_name' );
 
             }
 
@@ -575,7 +575,7 @@ class WPGH_Email
 
             } else {
 
-                return get_option( 'admin_email' );
+                return wpgh_get_option( 'admin_email' );
 
             }
 
@@ -594,7 +594,7 @@ class WPGH_Email
 
         $headers['from']            = 'From: ' . $this->get_from_name() . ' <' . $this->get_from_email() . '>';
         $headers['reply_to']        = 'Reply-To: ' . $this->get_from_email();
-        $headers['return_path']     = 'Return-Path: ' . get_option( 'gh_bounce_inbox', $this->get_from_email() );
+        $headers['return_path']     = 'Return-Path: ' . wpgh_get_option( 'gh_bounce_inbox', $this->get_from_email() );
         $headers['content_type']    = 'Content-Type: text/html; charset=UTF-8';
         $headers['unsub']           = sprintf( 'List-Unsubscribe: <%s%s>', $this->get_click_tracking_link(), urlencode( $this->get_unsubscribe_link( '' ) ) );
 
@@ -661,18 +661,10 @@ class WPGH_Email
         add_action( 'wp_mail_failed', array( $this, 'mail_failed' ) );
         add_filter( 'wp_mail_content_type', array( $this, 'send_in_html' ) );
 
-        if ( ! wpgh_should_if_multisite() ){
-            switch_to_blog( get_network()->site_id );
-        }
-
         $to = $this->get_to();
         $subject = $this->get_subject_line();
         $content = $this->build();
         $headers = $this->get_headers();
-
-        if ( ! wpgh_should_if_multisite() ){
-            restore_current_blog();
-        }
 
         $sent = wp_mail(
             $to,
@@ -747,7 +739,7 @@ class WPGH_Email
      */
     public function set_bounce_return_path( $phpmailer )
     {
-        $phpmailer->Sender = get_option( 'gh_bounce_inbox', $phpmailer->From );
+        $phpmailer->Sender = wpgh_get_option( 'gh_bounce_inbox', $phpmailer->From );
     }
 
     /**

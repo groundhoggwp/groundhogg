@@ -717,7 +717,7 @@ class WPGH_Form
         if ( ! is_admin() )
             wp_enqueue_script( 'google-recaptcha-v2', 'https://www.google.com/recaptcha/api.js' );
 
-        $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s"></div>', get_option( 'gh_recaptcha_site_key', '' ) );
+        $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ) );
 
         $this->fields[] = 'g-recaptcha';
 
