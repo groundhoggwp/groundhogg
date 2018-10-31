@@ -33,6 +33,11 @@ class WPGH_Funnels_Page
      */
     public $reporting_end_time;
 
+    /**
+     * @var
+     */
+    public $reporting_enabled = false;
+
 
     function __construct()
 	{
@@ -48,9 +53,9 @@ class WPGH_Funnels_Page
 
 		$this->notices = WPGH()->notices;
 
-		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' ){
+        $this->setup_reporting();
 
-			$this->setup_reporting();
+        if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' ){
 
 			add_action( 'init' , array( $this, 'process_action' )  );
 		}
@@ -119,6 +124,10 @@ class WPGH_Funnels_Page
     }
 
     private function setup_reporting(){
+
+        if ( isset( $_POST[ 'reporting_on' ] ) ){
+            $this->reporting_enabled = true;
+        }
 
         switch ( $this->get_reporting_range() ):
             case 'last_24';
@@ -533,7 +542,38 @@ class WPGH_Funnels_Page
 
         $notices = ob_get_clean();
 
-        wp_die( $notices );
+        ob_start();
+
+        do_action('wpgh_funnel_steps_before' ); ?>
+
+        <?php $steps = WPGH()->steps->get_steps( array( 'funnel_id' => intval( $_REQUEST[ 'funnel' ] ) ) );
+
+        if ( empty( $steps ) ): ?>
+            <div class="">
+                <?php esc_html_e( 'Drag in new steps to build the ultimate sales machine!' , 'groundhogg'); ?>
+            </div>
+        <?php else:
+
+            foreach ( $steps as $i => $step ):
+
+                $step = new WPGH_Step( $step->ID );
+
+                $step->html();
+                // echo $step;
+
+            endforeach;
+
+        endif; ?>
+        <?php do_action('wpgh_funnel_steps_after' );
+
+        $steps = ob_get_clean();
+
+        $response = array(
+            'notices'   => $notices,
+            'steps'     => $steps
+        );
+
+        wp_die( json_encode( $response ) );
 
     }
 

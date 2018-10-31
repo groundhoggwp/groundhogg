@@ -365,6 +365,7 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
         <?php do_action( 'wpgh_contact_edit_meta', $id ); ?>
         </tbody>
     </table>
+
     <?php do_action( 'wpgh_contact_edit_before_history', $id ); ?>
 
     <!-- UPCOMING EVENTS -->

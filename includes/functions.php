@@ -49,7 +49,7 @@ function wpgh_get_optin_status_text( $id_or_email )
     if ( ! $contact->email )
         return __( 'No Contact' );
 
-    get_option( 'gh_strict_gdpr', array( 'no' ) );
+    wpgh_get_option( 'gh_strict_gdpr', array( 'no' ) );
 
     if ( wpgh_is_gdpr() && wpgh_is_gdpr_strict() )
     {
@@ -150,15 +150,15 @@ function wpgh_encrypt_decrypt( $string, $action = 'e' ) {
     // you may change these values to your own
     $encrypt_method = "AES-256-CBC";
 
-    if ( ! get_option( 'gh_secret_key', false ) )
+    if ( ! wpgh_get_option( 'gh_secret_key', false ) )
         update_option( 'gh_secret_key', wp_generate_password() );
 
-    if ( ! get_option( 'gh_secret_iv', false ) )
+    if ( ! wpgh_get_option( 'gh_secret_iv', false ) )
         update_option( 'gh_secret_iv', wp_generate_password() );
 
     if ( in_array( $encrypt_method, openssl_get_cipher_methods()) ){
-        $secret_key = get_option( 'gh_secret_key' );
-        $secret_iv = get_option( 'gh_secret_iv' );
+        $secret_key = wpgh_get_option( 'gh_secret_key' );
+        $secret_iv = wpgh_get_option( 'gh_secret_iv' );
 
         $output = false;
         $key = hash( 'sha256', $secret_key );
@@ -209,16 +209,7 @@ function wpgh_get_visitor_ip() {
  */
 function wpgh_is_gdpr()
 {
-
-    if ( ! wpgh_should_if_multisite() ){
-        switch_to_blog( get_network()->site_id );
-    }
-
-    $is_gdpr =  get_option( 'gh_enable_gdpr', array() );
-
-    if ( ! wpgh_should_if_multisite() ){
-        restore_current_blog();
-    }
+    $is_gdpr =  wpgh_get_option( 'gh_enable_gdpr', array() );
 
     if ( ! is_array( $is_gdpr ) )
         return false;
@@ -233,15 +224,8 @@ function wpgh_is_gdpr()
  */
 function wpgh_is_gdpr_strict()
 {
-    if ( ! wpgh_should_if_multisite() ){
-        switch_to_blog( get_network()->site_id );
-    }
 
-    $is_gdpr_strict =  get_option( 'gh_strict_gdpr', array() );
-
-    if ( ! wpgh_should_if_multisite() ){
-        restore_current_blog();
-    }
+    $is_gdpr_strict =  wpgh_get_option( 'gh_strict_gdpr', array() );
 
     if ( ! is_array( $is_gdpr_strict ) )
         return false;
@@ -251,15 +235,8 @@ function wpgh_is_gdpr_strict()
 
 function wpgh_is_confirmation_strict()
 {
-    if ( ! wpgh_should_if_multisite() ){
-        switch_to_blog( get_network()->site_id );
-    }
 
-    $is_confirmation_strict =  get_option( 'gh_strict_confirmation', array() );
-
-    if ( ! wpgh_should_if_multisite() ){
-        restore_current_blog();
-    }
+    $is_confirmation_strict =  wpgh_get_option( 'gh_strict_confirmation', array() );
 
     if ( ! is_array( $is_confirmation_strict ) )
         return false;
@@ -278,15 +255,7 @@ function wpgh_is_in_grace_period( $contact_id )
 
     $contact = new WPGH_Contact( $contact_id );
 
-    if ( ! wpgh_should_if_multisite() ){
-        switch_to_blog( get_network()->site_id );
-    }
-
-    $grace = intval( get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
-
-    if ( ! wpgh_should_if_multisite() ){
-        restore_current_blog();
-    }
+    $grace = intval( wpgh_get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
 
     $base = WPGH()->contact_meta->get_meta( $contact_id, 'last_optin', true );
 
@@ -325,39 +294,6 @@ function wpgh_extract_query_arg( $link, $arg = '' )
     }
 
     return false;
-}
-
-/**
- * Return a random quote from the movie groundhog day staring bill murray.
- * Also the movie of which branding is based upon.
- *
- * @return mixed
- */
-function wpgh_get_random_groundhogday_quote()
-{
-    $quotes = array();
-
-    $quotes[] = "I'm not going to live by their rules anymore.";
-    $quotes[] = "When Chekhov saw the long winter, he saw a winter bleak and dark and bereft of hope. Yet we know that winter is just another step in the cycle of life. But standing here among the people of Punxsutawney and basking in the warmth of their hearths and hearts, I couldn't imagine a better fate than a long and lustrous winter.";
-    $quotes[] = "Hi, three cheeseburgers, two large fries, two milkshakes, and one large coke.";;
-    $quotes[] = "It's the same thing every day, Clean up your room, stand up straight, pick up your feet, take it like a man, be nice to your sister, don't mix beer and wine ever, Oh yeah, don't drive on the railroad tracks.";
-    $quotes[] = "I'm a god, I'm not the God. I don't think.";
-    $quotes[] = "Don't drive angry! Don't drive angry!";
-    $quotes[] = "I'm betting he's going to swerve first.";
-    $quotes[] = "You want a prediction about the weather? You're asking the wrong Phil. I'm going to give you a prediction about this winter? It's going to be cold, it's going to be dark and it's going to last you for the rest of your lives!";
-    $quotes[] = "We mustn't keep our audience waiting.";
-    $quotes[] = "Okay campers, rise and shine, and don't forget your booties cause its cold out there...its cold out there every day.";
-    $quotes[] = "I peg you as a glass half empty kinda guy.";
-    $quotes[] = "Why would anybody steal a groundhog? I can probably think of a couple of reasons... pervert.";
-    $quotes[] = "Well, what if there is no tomorrow? There wasn't one today.";
-    $quotes[] = "Did he actually refer to himself as \"the talent\"?";
-    $quotes[] = "Did you sleep well Mr. Connors?";
-
-    $quotes = apply_filters( 'add_movie_quotes', $quotes );
-
-    $quote = rand( 0, count( $quotes ) - 1 );
-
-    return $quotes[ $quote ];
 }
 
 /**
@@ -525,17 +461,28 @@ function wpgh_format_tags_for_select2( $tags=array() )
  */
 function wpgh_is_recaptcha_enabled(){
 
-    if ( ! wpgh_should_if_multisite() ){
-        switch_to_blog( get_network()->site_id );
-    }
-
-    $recaptcha = get_option( 'gh_enable_recaptcha', array() );
-
-    if ( ! wpgh_should_if_multisite() ){
-        restore_current_blog();
-    }
+    $recaptcha = wpgh_get_option( 'gh_enable_recaptcha', array() );
 
     return is_array( $recaptcha ) && in_array( 'on', $recaptcha );
+}
+
+/**
+ * Swicth between the main site options if on a multisite network.
+ *
+ * @param $key
+ * @param bool $default
+ *
+ * @return mixed
+ */
+function wpgh_get_option( $key, $default=false )
+{
+
+    if ( wpgh_should_if_multisite() ){
+        return get_option( $key, $default );
+    } else {
+        return get_blog_option( get_network()->site_id, $key, $default );
+    }
+
 }
 
 /**

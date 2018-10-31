@@ -141,6 +141,11 @@ class WPGH_Replacements
                 'callback'    => 'wpgh_replacement_date',
                 'description' => __( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'groundhogg' ),
             ),
+            array(
+                'code'        => 'groundhogg_day_quote',
+                'callback'    => 'wpgh_get_random_groundhogday_quote',
+                'description' => __( 'Inserts a random quote from the movie Groundhogg Day featuring Bill Murray', 'groundhogg' ),
+            )
         );
 
         $replacements = apply_filters( 'wpgh_replacement_defaults', $replacements );
@@ -239,19 +244,9 @@ class WPGH_Replacements
             return $content;
         }
 
-        if ( ! wpgh_should_if_multisite() ){
-            //switch to main blog for this process.
-            switch_to_blog( get_network()->site_id );
-        }
-
         $this->contact_id = $contact_id;
         $new_content = preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
         $this->contact_id = null;
-
-        if ( ! wpgh_should_if_multisite() ){
-            //switch to main blog for this process.
-            restore_current_blog();
-        }
 
         return $new_content;
 
@@ -492,7 +487,7 @@ function wpgh_replacement_owner_last_name( $contact_id )
  */
 function wpgh_replacement_confirmation_link()
 {
-    $link_text = get_option( 'gh_confirmation_text', __( 'Confirm your email.', 'groundhogg' ) );
+    $link_text = wpgh_get_option( 'gh_confirmation_text', __( 'Confirm your email.', 'groundhogg' ) );
     $link_url = site_url( 'gh-confirmation/via/email/' );
 
     return sprintf( "<a href=\"%s\" target=\"_blank\">%s</a>", $link_url, $link_text );
@@ -532,7 +527,7 @@ function wpgh_replacement_date( $time_string )
     }
 
     /* convert to local time */
-    $time = strtotime( $when ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+    $time = strtotime( $when ) + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 
     return date_i18n( $format, $time );
 
@@ -545,7 +540,7 @@ function wpgh_replacement_date( $time_string )
  */
 function wpgh_replacement_business_name()
 {
-    return get_option( 'gh_business_name' );
+    return wpgh_get_option( 'gh_business_name' );
 }
 
 /**
@@ -555,7 +550,7 @@ function wpgh_replacement_business_name()
  */
 function wpgh_replacement_business_phone()
 {
-    return get_option( 'gh_phone' );
+    return wpgh_get_option( 'gh_phone' );
 }
 
 /**
@@ -567,18 +562,51 @@ function wpgh_replacement_business_address()
 {
     $address = array();
 
-    if ( get_option( 'gh_street_address_1' ) )
-        $address[] = get_option( 'gh_street_address_1' ) . ' ' . get_option( 'gh_street_address_2' );
-    if ( get_option( 'gh_city' ) )
-        $address[] = get_option( 'gh_city' );
-    if ( get_option( 'gh_region' ) )
-        $address[] = get_option( 'gh_region' );
-    if ( get_option( 'gh_country' ) )
-        $address[] = get_option( 'gh_country' );
-    if ( get_option( 'gh_zip_or_postal' ) )
-        $address[] = strtoupper( get_option( 'gh_zip_or_postal' ) );
+    if ( wpgh_get_option( 'gh_street_address_1' ) )
+        $address[] = wpgh_get_option( 'gh_street_address_1' ) . ' ' . wpgh_get_option( 'gh_street_address_2' );
+    if ( wpgh_get_option( 'gh_city' ) )
+        $address[] = wpgh_get_option( 'gh_city' );
+    if ( wpgh_get_option( 'gh_region' ) )
+        $address[] = wpgh_get_option( 'gh_region' );
+    if ( wpgh_get_option( 'gh_country' ) )
+        $address[] = wpgh_get_option( 'gh_country' );
+    if ( wpgh_get_option( 'gh_zip_or_postal' ) )
+        $address[] = strtoupper( wpgh_get_option( 'gh_zip_or_postal' ) );
 
     $address = implode( ', ', $address );
 
     return $address;
+}
+
+/**
+ * Return a random quote from the movie groundhog day staring bill murray.
+ * Also the movie of which branding is based upon.
+ *
+ * @return mixed
+ */
+function wpgh_get_random_groundhogday_quote()
+{
+    $quotes = array();
+
+    $quotes[] = "I'm not going to live by their rules anymore.";
+    $quotes[] = "When Chekhov saw the long winter, he saw a winter bleak and dark and bereft of hope. Yet we know that winter is just another step in the cycle of life. But standing here among the people of Punxsutawney and basking in the warmth of their hearths and hearts, I couldn't imagine a better fate than a long and lustrous winter.";
+    $quotes[] = "Hi, three cheeseburgers, two large fries, two milkshakes, and one large coke.";;
+    $quotes[] = "It's the same thing every day, Clean up your room, stand up straight, pick up your feet, take it like a man, be nice to your sister, don't mix beer and wine ever, Oh yeah, don't drive on the railroad tracks.";
+    $quotes[] = "I'm a god, I'm not the God. I don't think.";
+    $quotes[] = "Don't drive angry! Don't drive angry!";
+    $quotes[] = "I'm betting he's going to swerve first.";
+    $quotes[] = "You want a prediction about the weather? You're asking the wrong Phil. I'm going to give you a prediction about this winter? It's going to be cold, it's going to be dark and it's going to last you for the rest of your lives!";
+    $quotes[] = "We mustn't keep our audience waiting.";
+    $quotes[] = "Okay campers, rise and shine, and don't forget your booties cause its cold out there...its cold out there every day.";
+    $quotes[] = "I peg you as a glass half empty kinda guy.";
+    $quotes[] = "Why would anybody steal a groundhog? I can probably think of a couple of reasons... pervert.";
+    $quotes[] = "Well, what if there is no tomorrow? There wasn't one today.";
+    $quotes[] = "Did he actually refer to himself as \"the talent\"?";
+    $quotes[] = "Did you sleep well Mr. Connors?";
+
+    $quotes = apply_filters( 'add_movie_quotes', $quotes );
+
+    $quote = rand( 0, count( $quotes ) - 1 );
+
+    return $quotes[ $quote ];
 }

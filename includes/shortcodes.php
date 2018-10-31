@@ -58,7 +58,7 @@ function wpgh_merge_replacements_shortcode( $atts, $content = '' )
     if ( ! $contact )
         return '';
 
-    return WPGH()->replacements->process( $content, $contact->ID );
+    return WPGH()->replacements->process( do_shortcode( $content ), $contact->ID );
 }
 
 add_shortcode( 'gh_replacements', 'wpgh_merge_replacements_shortcode' );
@@ -91,12 +91,12 @@ add_shortcode( 'gh_contact', 'wpgh_contact_replacement_shortcode' );
  * @param string $content
  * @return string
  */
-function wpgh_is_contact_shortcode( $atts, $content='' )
+function wpgh_is_contact_shortcode( $atts, $content )
 {
     $contact = WPGH()->tracking->get_contact();
 
     if ( $contact ) {
-        return $content;
+        return do_shortcode( $content );
     } else {
         return '';
     }
@@ -111,14 +111,14 @@ add_shortcode( 'gh_is_contact', 'wpgh_is_contact_shortcode' );
  * @param string $content
  * @return string
  */
-function wpgh_is_not_contact_shortcode( $atts, $content='' )
+function wpgh_is_not_contact_shortcode( $atts, $content )
 {
     $contact = WPGH()->tracking->get_contact();
 
     if ( $contact ) {
         return '';
     } else {
-        return $content;
+        return do_shortcode( $content );
     }
 }
 
@@ -131,7 +131,7 @@ add_shortcode( 'gh_is_not_contact', 'wpgh_is_not_contact_shortcode' );
  * @param string $content
  * @return string
  */
-function wpgh_contact_has_tag_shortcode( $atts, $content='' )
+function wpgh_contact_has_tag_shortcode( $atts, $content )
 {
     $a = shortcode_atts( array(
         'tags' => '',
@@ -155,14 +155,14 @@ function wpgh_contact_has_tag_shortcode( $atts, $content='' )
                     return '';
                 }
             }
-            return $content;
+            return do_shortcode( $content );
             break;
         case 'one':
         case 'single':
         case '1':
             foreach ( $tags as $tag ){
                 if ( $contact->has_tag( $tag ) ) {
-                    return $content;
+                    return do_shortcode( $content );
                 }
             }
             return '';
@@ -183,7 +183,7 @@ add_shortcode( 'gh_has_tags', 'wpgh_contact_has_tag_shortcode' );
  * @param string $content
  * @return string
  */
-function wpgh_contact_does_not_have_tag_shortcode( $atts, $content='' )
+function wpgh_contact_does_not_have_tag_shortcode( $atts, $content )
 {
     $a = shortcode_atts( array(
         'tags' => '',
@@ -207,20 +207,20 @@ function wpgh_contact_does_not_have_tag_shortcode( $atts, $content='' )
                     return '';
                 }
             }
-            return $content;
+            return do_shortcode( $content );
             break;
         case 'one':
         case 'single':
         case '1':
             foreach ( $tags as $tag ){
                 if ( ! $contact->has_tag( $tag ) ) {
-                    return $content;
+                    return do_shortcode( $content );
                 }
             }
             return '';
             break;
         default:
-            return $content;
+            return do_shortcode( $content );
     }
 }
 

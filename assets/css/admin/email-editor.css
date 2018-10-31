@@ -165,22 +165,25 @@ select {
 
 .ui-sortable-helper .action-icons, .row:hover .action-icons {
     display: block;
-    width: 35px;
-    margin-right: -33px;
+    /* position: absolute; */
+    right: 0;
+    padding: 5px;
+    margin-top: -40px;
     float: right;
-    /*background-color: #EAEAEA;*/
-    text-align: center;
+    /* background-color: #EAEAEA; */
+    /* text-align: center; */
     vertical-align: center;
 }
 
 .ui-sortable-helper .action-icons .dashicons, .row:hover .action-icons .dashicons{
-    margin-top: 5px;
+    /*margin-top: 5px;*/
     background-color: #EAEAEA;
     padding: 5px;
+    margin-left: 5px;
     border-radius: 50%;
 }
 
-.ui-sortable-helper .content-wrapper, .content-wrapper:hover {
+.ui-sortable-helper .content-wrapper, .row:hover .content-wrapper {
     border: 2px dashed #EAEAEA;
     background-color: #FFF;
 }

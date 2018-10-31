@@ -26,7 +26,7 @@ class WPGH_Extension_Manager
     public static function add_extension( $item_id, $license, $status, $expiry )
     {
         if ( empty( static::$extensions ) )
-            static::$extensions = get_option( "gh_extensions", array() );
+            static::$extensions = wpgh_get_option( "gh_extensions", array() );
 
         static::$extensions[ $item_id ] = array(
             'license' => $license,
@@ -45,7 +45,7 @@ class WPGH_Extension_Manager
             if ( self::has_license( $extension_args['item_id'] ) && self::get_license_status( $extension_args['item_id']  ) !== 'invalid' ){
                 $updater = new EDD_SL_Plugin_Updater( WPGH_Extension_Manager::$storeUrl, $extension_args['file'], array(
                         'version' 	=> $extension_args['version'], 		// current version number
-                        'license' 	=> trim( self::get_license( $extension_args['item_id'] ) ), 	// license key (used get_option above to retrieve from DB)
+                        'license' 	=> trim( self::get_license( $extension_args['item_id'] ) ), 	// license key (used wpgh_get_option above to retrieve from DB)
                         'item_id'   => $extension_args['item_id'], 	// id of this product in EDD
                         'author' 	=> $extension_args['author'],  // author of this plugin
                         'url'       => home_url()
@@ -58,7 +58,7 @@ class WPGH_Extension_Manager
     public static function has_extensions()
     {
         if ( empty( static::$extensions ) )
-            static::$extensions = get_option( "gh_extensions", array() );
+            static::$extensions = wpgh_get_option( "gh_extensions", array() );
 
         return ! empty( static::$extensions );
     }
@@ -66,7 +66,7 @@ class WPGH_Extension_Manager
     public static function has_license( $item_id )
     {
 	    if ( empty( static::$extensions ) )
-		    static::$extensions = get_option( "gh_extensions", array() );
+		    static::$extensions = wpgh_get_option( "gh_extensions", array() );
 
         return isset( static::$extensions[$item_id]['license'] );
     }
@@ -74,7 +74,7 @@ class WPGH_Extension_Manager
     public static function get_license( $item_id )
     {
     	if ( empty( static::$extensions ) )
-    		static::$extensions = get_option( "gh_extensions", array() );
+    		static::$extensions = wpgh_get_option( "gh_extensions", array() );
 
         return static::$extensions[$item_id]['license'];
     }
@@ -82,7 +82,7 @@ class WPGH_Extension_Manager
     public static function get_license_status( $item_id )
     {
 	    if ( empty( static::$extensions ) )
-		    static::$extensions = get_option( "gh_extensions", array() );
+		    static::$extensions = wpgh_get_option( "gh_extensions", array() );
 
 	    if ( isset( static::$extensions[ $item_id ] ) ){
             return static::$extensions[ $item_id ][ 'status' ];
@@ -145,7 +145,7 @@ class WPGH_Extension_Manager
                     case 'expired' :
                         $message = sprintf(
                             __( 'Your license key expired on %s.' ),
-                            date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) )
+                            date_i18n( wpgh_get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) )
                         );
                         break;
                     case 'revoked' :

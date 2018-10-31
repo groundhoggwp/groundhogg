@@ -235,7 +235,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
     protected function column_send_time( $broadcast )
     {
         /* convert to local time. */
-        $p_time = intval( $broadcast->send_time ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $p_time = intval( $broadcast->send_time ) + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 
         $cur_time = (int) current_time( 'timestamp' );
 

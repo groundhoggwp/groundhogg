@@ -267,7 +267,7 @@ class WPGH_Superlinks_Page
                             </div>
                             <div class="form-field term-target-wrap">
                                 <label for="superlink-target"><?php _e( 'Target URL', 'groundhogg' ) ?></label>
-                                <input name="superlink_target" id="superlink-target" type="url" value="" maxlength="100" autocomplete="off" required>
+                                <input name="superlink_target" id="superlink-target" type="url" value="" autocomplete="off" required>
                                 <p><a href="#" id="insert-link" data-target="superlink-target"><?php _e( 'Insert Link' ); ?></a> | <?php _e( 'Insert a url that this link will direct to. This link can contain simple replacement codes.', 'groundhogg' ); ?></p>
                                 <script>
                                     jQuery( function($){

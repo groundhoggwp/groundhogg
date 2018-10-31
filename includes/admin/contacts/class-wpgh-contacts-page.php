@@ -217,7 +217,7 @@ class WPGH_Contacts_Page
                     $ip_address = $contact->get_meta('ip_address' );
 
                     if ( $ip_address ) {
-                        $blacklist = get_option( 'blacklist_keys' );
+                        $blacklist = wpgh_get_option( 'blacklist_keys' );
                         $blacklist .= "\n" . $ip_address;
                         $blacklist = sanitize_textarea_field( $blacklist );
                         update_option( 'blacklist_keys', $blacklist );

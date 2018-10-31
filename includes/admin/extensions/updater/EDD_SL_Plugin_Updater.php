@@ -487,7 +487,7 @@ class EDD_SL_Plugin_Updater {
             $cache_key = $this->cache_key;
         }
 
-        $cache = get_option( $cache_key );
+        $cache = wpgh_get_option( $cache_key );
 
         if( empty( $cache['timeout'] ) || time() > $cache['timeout'] ) {
             return false; // Cache is expired

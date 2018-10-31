@@ -204,7 +204,7 @@ class WPGH_Submission
 
             $file_name = sprintf(
                 "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
-                get_option( 'gh_recaptcha_secret_key' ),
+                wpgh_get_option( 'gh_recaptcha_secret_key' ),
                 $this->data[ 'g-recaptcha-response' ]
             );
 
@@ -299,7 +299,7 @@ class WPGH_Submission
      */
     public function is_spam( $value )
     {
-        $blacklist = get_option( 'blacklist_keys', false );
+        $blacklist = wpgh_get_option( 'blacklist_keys', false );
 
         if ( ! empty( $blacklist ) ) {
 
@@ -435,7 +435,7 @@ class WPGH_Submission
         if ( isset( $this->agree_terms ) ){
 
             $c->update_meta( 'terms_agreement', 'yes' );
-            $c->update_meta( 'terms_agreement_date', date_i18n( get_option( 'date_format' ) ) );
+            $c->update_meta( 'terms_agreement_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
 
             do_action( 'wpgh_agreed_to_terms', $c, $this );
 
@@ -446,7 +446,7 @@ class WPGH_Submission
         if ( isset( $this->gdpr_consent ) ){
 
             $c->update_meta( 'gdpr_consent', 'yes' );
-            $c->update_meta( 'gdpr_consent_date', date_i18n( get_option( 'date_format' ) ) );
+            $c->update_meta( 'gdpr_consent_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
 
             do_action( 'wpgh_gdpr_consented', $c, $this );
 
@@ -519,7 +519,7 @@ class WPGH_Submission
 
             WPGH()->contacts->delete( $contact->ID );
 
-            $unsub_page = get_permalink( get_option( 'gh_unsubscribe_page' ) );
+            $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
 
             do_action( 'wpgh_preference_unsubscribe', $contact->ID );
 
@@ -562,7 +562,7 @@ class WPGH_Submission
                 $args = array( 'optin_status' => WPGH_UNSUBSCRIBED );
                 $contact->update( $args );
 
-                $unsub_page = get_permalink( get_option( 'gh_unsubscribe_page' ) );
+                $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
 
                 do_action( 'wpgh_preference_unsubscribe', $contact->ID );
 

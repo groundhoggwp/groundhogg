@@ -56,7 +56,7 @@ class WPGH_Welcome_Page
      */
     public function check_settings()
     {
-        if ( ! get_option( 'gh_business_name' ) ){
+        if ( ! wpgh_get_option( 'gh_business_name' ) ){
             $this->notices->add(
                 'incomplete_settings', __( 'It appears you have incomplete settings! Go to <a href="?page=gh_settings">the settings page</a> and fill out all your business information.' ), 'warning'
             );

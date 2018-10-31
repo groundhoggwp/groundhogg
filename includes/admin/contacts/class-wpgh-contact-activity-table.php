@@ -113,7 +113,7 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
 
         $activity = array_shift( $activity );
 
-        $p_time = intval( $activity->timestamp ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $p_time = intval( $activity->timestamp ) + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $p_time - $cur_time;
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){

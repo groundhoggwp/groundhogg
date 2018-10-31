@@ -82,7 +82,7 @@ class WPGH_HTML
             esc_attr( $a[ 'class'   ] ),
             esc_attr( $a[ 'name'    ] ),
             esc_attr( $a[ 'value'   ] ),
-            esc_attr( $a[ 'attributes'  ] ),
+             $a[ 'attributes'  ],
             esc_attr( $a[ 'text'  ] )
         );
 
@@ -115,7 +115,7 @@ class WPGH_HTML
             esc_attr( $a[ 'name'    ] ),
             esc_attr( $a[ 'value'   ] ),
             esc_attr( $a[ 'placeholder' ] ),
-            esc_attr( $a[ 'attributes'  ] )
+            $a[ 'attributes'  ]
         );
 
         return apply_filters( 'wpgh_html_input', $html, $args );

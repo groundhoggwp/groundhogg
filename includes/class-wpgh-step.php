@@ -511,7 +511,7 @@ class WPGH_Step
                 <input type="hidden" name="steps[]" value="<?php echo $this->ID; ?>">
 
                 <!-- SETTINGS -->
-                <div class="step-edit">
+                <div class="step-edit <?php echo WPGH()->menu->funnels_page->reporting_enabled ? 'hidden' : '' ; ?>">
 
                     <div class="custom-settings">
                         <?php do_action( 'wpgh_step_settings_before', $this ); ?>
@@ -522,7 +522,7 @@ class WPGH_Step
                 </div>
 
                 <!-- REPORTING  -->
-                <div class="step-reporting hidden">
+                <div class="step-reporting <?php echo WPGH()->menu->funnels_page->reporting_enabled ? '' : 'hidden' ; ?>">
                     <?php do_action( 'wpgh_step_reporting_before' ); ?>
                     <?php $this->reporting(); ?>
                     <?php do_action( 'wpgh_step_reporting_after' ); ?>

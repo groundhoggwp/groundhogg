@@ -289,7 +289,7 @@ class WPGH_Contact
 
         $current_notes = $this->notes;
 
-        $new_notes = sprintf( "===== %s =====\n\n", date_i18n( get_option( 'date_format' ) ) );
+        $new_notes = sprintf( "===== %s =====\n\n", date_i18n( wpgh_get_option( 'date_format' ) ) );
         $new_notes .= sprintf( "%s\n\n", $note );
         $new_notes .= $current_notes;
 

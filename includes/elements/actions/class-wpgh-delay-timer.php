@@ -225,7 +225,7 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
             }
 
             /* convert to utc */
-            $final_time = strtotime( $time_string ) - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+            $final_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
         }
 
         return $final_time;

@@ -43,22 +43,15 @@ class WPGH_Bounce_Checker
     public function __construct()
     {
 
-        /**
-         * Don't do if from sub site... only run from main.
-         */
-        if ( ! wpgh_should_if_multisite() ){
-            return;
-        }
-
-        if ( ! get_option( 'gh_bounce_inbox', false ) || ! get_option( 'gh_bounce_inbox_password', false ) )
+        if ( ! wpgh_get_option( 'gh_bounce_inbox', false ) || ! wpgh_get_option( 'gh_bounce_inbox_password', false ) )
             return;
 
         include_once dirname( __FILE__ ) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
 
         $this->bounce_handler = new BounceHandler();
 
-        $this->inbox    = get_option( 'gh_bounce_inbox' );
-        $this->password = get_option( 'gh_bounce_inbox_password' );
+        $this->inbox    = wpgh_get_option( 'gh_bounce_inbox' );
+        $this->password = wpgh_get_option( 'gh_bounce_inbox_password' );
 
         /* run whenever these jobs are run */
         add_action( 'wpgh_cron_event', array( $this, 'check' ) );
