@@ -7,18 +7,16 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class wpgh_api_v1_contacts
+class wpgh_api_v1_contacts extends WPGH_API_V1
 {
 
-
-    public function __construct()
-    {
-
-    }
-
     public function update($data)
-    {// use to update a contact details
-        //
+    {
+        // use to update a contact details
+
+        if ( ! $this->user->has_cap( 'edit_contacts' ) ){
+            return new WP_Error( 'INVALID_PERMISSIONS', __( WPGH()->roles->error( 'edit_contacts' ) ) );
+        }
 
         if (isset ($data->contact_id)) {// check user enter contact id for operation
             $contact_id = $data->contact_id;
@@ -58,17 +56,15 @@ class wpgh_api_v1_contacts
                     return array(
                         'contact' => $contact,
                         'meta' => $contact_meta,
-
-
                     );
                 }
 
             } else {
-                return array('message' => 'No contact found with contact_id ' . $contact_id);
+                return new WP_Error( 'INVALID_ID', __( 'No contact exists with the given ID.' ) );
             }
 
         } else {// response to enter contact_id
-            return array('message' => $data->email . 'please enter contact_id');
+            return new WP_Error( 'INVALID_ID', __( 'Please provide a contact ID.' ) );
         }
     }
 

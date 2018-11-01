@@ -908,10 +908,16 @@
         });
 
         var handlers = [];
+        var t = null;
         var runAll = function () {
-            handlers.forEach(function (hand) {
-                hand();
-            });
+            if (t) {
+                clearTimeout(t);
+            }
+            t = setTimeout(function () {
+                handlers.forEach(function (hand) {
+                    hand();
+                });
+            }, 100);
             return true;
         };
         actions.reverse();

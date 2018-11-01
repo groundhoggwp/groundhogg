@@ -12,6 +12,8 @@ class WPGH_API_V1
 {
 
     /**
+     * The user during an auth request.
+     *
      * @var WP_User
      */
     protected $user;
@@ -100,156 +102,127 @@ class WPGH_API_V1
 
 
     /**
-     * This is where you decide what //todo
+     * This is where you decide what todo
      */
     public function process()
     {
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-       // $parts = explode( '/', $request );
+            $json = file_get_contents('php://input');
+            //echo $json;
 
-        /*
-         * array(
-         *
-         * 'api', 'v1', 'contacts', 'add'
-         * 'api', 'v1', 'contacts', 'delete', '1234'
-         *
-         * )
-         *
-         *
-         * */
+            $params = json_decode($json);
 
-        /* get json */
+            if (isset($params->token) && isset($params->domain)) {
 
-        /* extract token */
+                if ( $this->user = $this->is_valid_token($params->token, $params->domain ) ) {
 
-        /* get the user */
+                    $module = $params->module;
 
+                    if (file_exists(dirname(__FILE__) . '/class-wpgh-api-v1-' . $module . '.php')) {
 
-        /* perform request... */
+                        require_once dirname(__FILE__) . '/class-wpgh-api-v1-' . $module . '.php';
 
-        // $this->user = get_user_by( 'ID', '' );
+                        $class = 'wpgh_api_v1_' . $module;
 
-//        echo $_SERVER[ 'HTTP_REFERER' ];
-//        die();
+                        $api = new $class();
+                        if (method_exists($api, $params->method)) {
 
-       // $domain = parse_url( $_SERVER[ 'HTTP_REFERER' ], PHP_URL_HOST );
+                            $result = call_user_func(array($api, $params->method), $params->data);
 
-         if ($_SERVER['REQUEST_METHOD']==='POST')
-         {
+                            if ( is_wp_error( $result ) ){
 
-             $json = file_get_contents('php://input');
-             //echo $json;
+                                $response = array(
+                                    'success' => false,
+                                    'error' => $result->get_error_message()
+                                );
 
-             $params = json_decode($json);
+                            } else {
 
-             //check users has a token
-             if (isset($params->token) && isset($params->domain) )
-             {
-                    // $user = WPGH()->tokens->get_tokens(array('token' => $params->token ,'domain' => $params->domain));
-                     if ($this->is_valid_token($params->token,$params->domain))
-                     {// valid token
-                         //authorise user to perform operation
+                                $response = array(
+                                    'success' => true,
+                                    'data' => $result
+                                );
 
-                         // return user
-                         //$user = WPGH()->tokens->get_tokens(array('token' => $params->token , 'domain' => $params->domain));
+                            }
 
+                        } else {
 
-                         $module = $params->module;
+                            $response = array(
+                                'success' => false,
+                                'error' => __('The requested method does not exist for module: ' . $module . '.')
+                            );
 
-                         if ( file_exists( dirname( __FILE__ ) . '/class-wpgh-api-v1-' . $module . '.php' ) ){
+                        }
 
-                             require_once  dirname( __FILE__ ) . '/class-wpgh-api-v1-' . $module . '.php';
+                    } else {
 
-                             $class = 'wpgh_api_v1_' . $module;
+                        $response = array(
+                            'success' => false,
+                            'error' => __('The requested module does not exist.')
+                        );
+                    }
 
-                             $api = new $class();
+                } else {// invalid token
+                    $response = array(
+                        'success' => true,
+                        'error' => __('Your token is invalid.')
+                    );
+                }
 
-                             if ( method_exists( $api, $params->method ) ){
-
-                                $result = call_user_func( array( $api,$params->method), $params->data );
-//                                 $result = $api->$params->method( $params->data );
-
-
-                                 $response = array(
-                                     'success' => true,
-                                     'data' =>$result
-                                 );
-
-                                 echo json_encode( $response );
-                                 die();
-
-                             }
-
-                         }
-
-                         /* END */
-
-                        // echo $user[0]->user_id; // code to get userid
-
-
-
-                     }
-                     else
-                     {// invalid token
-                         $response = array(
-                             'success' => true,
-                             'data' => 'Your Token is Invalid '
-                         );
-                         echo json_encode($response);
-                     }
-             }
-             else
-             {
-                 $response = array(
-                     'success' => false,
-                     'data' => "please Eneter token"
-                 );
-
-                 echo json_encode($response);
-             }
-         }
-
-        elseif ($_SERVER['REQUEST_METHOD']==='GET'||$_SERVER['REQUEST_METHOD']==='PUT'||$_SERVER['REQUEST_METHOD']==='DELETE')
-        {
-
+            } else {
                 $response = array(
                     'success' => false,
-                    'message' => "please use POST method to use API."
+                    'error' => __("Please provide a token.")
                 );
-
-                echo json_encode($response);
-                // get list of contats from user_id
-
-                // $user = WPGH()->tokens->get_tokens(array('token' => $params->token , 'domain' => $params->domain));
-
-                //$contacts  = WPGH()->contacts->get_contacts();
-
             }
-            die();
+
+        } else if ($_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] === 'DELETE') {
+
+            $response = array(
+                'success' => false,
+                'error' => __("Please use POST method to use API. ")
+            );
+
+        }
+
+        if (!isset($response)) {
+            $response = array(
+                'success' => false,
+                'error' => __("Something went wrong, but we do not know what.")
+            );
+        }
+
+        echo json_encode($response);
+        die();
 
     }
 
-
-    public function is_valid_token($token,$domain)
+    /**
+     * Verify a given token is valid.
+     *
+     * @param $token string the given token.
+     * @param $domain string the given domain which the token should be valid for.
+     * @return false|WP_User The user if the token is valid, false otherwise
+     */
+    public function is_valid_token( $token, $domain )
     {
 
-        if (WPGH()->tokens->count(array('token'=> $token , 'domain' =>$domain))>0)
-        {// valid token
+        if ( WPGH()->tokens->count( array( 'token'=> $token , 'domain' =>$domain ) ) > 0 ) {// valid token
 
-            return true;
+            $token = WPGH()->tokens->get_tokens(array('token' => $token, 'domain' => $domain));
+            $token = array_pop($token);
+
+            $user = get_userdata(intval($token->user_id));
+
+            if ($user && ! is_wp_error($user)) {
+                return $user;
+            }
+
         }
-        else
-        {
-            $response = array(
-                'success' => false,
-                'data' => 'In Valid token'  ,
 
-            );
-
-            echo json_encode($response);
-            die();
-        }
+        return false;
 
     }
 
