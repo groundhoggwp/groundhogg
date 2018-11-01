@@ -115,7 +115,11 @@
     padding: 40px 0 40px 0;
 
     background-size: 40px 40px;
+    border-right: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
     background-image: linear-gradient(to right, #e5e5e5 1px, transparent 1px), linear-gradient(to bottom, #e5e5e5 1px, transparent 1px);
+    overflow: auto;
+    height: 1600px;
 }
 
 .onoffswitch {

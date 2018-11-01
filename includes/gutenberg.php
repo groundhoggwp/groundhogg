@@ -15,9 +15,9 @@ function register_form_category( $categories, $post ) {
     );
 }
 
-//add_filter( 'block_categories',  __NAMESPACE__ . '\register_form_category', 10, 2 );
+add_filter( 'block_categories',  __NAMESPACE__ . '\register_form_category', 10, 2 );
 
-//add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\enqueue_block_editor_assets' );
+add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\enqueue_block_editor_assets' );
 
 /**
  * Enqueue block editor only JavaScript and CSS.
@@ -42,9 +42,12 @@ function enqueue_block_editor_assets() {
         [ 'wp-blocks' ],
         filemtime( WPGH_PLUGIN_DIR . $style_path )
     );
+
+    wp_enqueue_script('wpgh-admin-js' );
+
 }
 
-//add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_assets' );
+add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_assets' );
 
 /**
  * Enqueue front end and editor JavaScript and CSS assets.
@@ -59,7 +62,7 @@ function enqueue_assets() {
     );
 }
 
-//add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_frontend_assets' );
+add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_frontend_assets' );
 
 /**
  * Enqueue frontend JavaScript and CSS assets.
@@ -79,3 +82,59 @@ function enqueue_frontend_assets() {
         filemtime( WPGH_PLUGIN_DIR . $block_path )
     );
 }
+
+function render_block_wpgh_form( $attributes, $content ) {
+
+    $forms = WPGH()->steps->get_steps( array( 'step_type' => 'form_fill' ) );
+
+    $options = array();
+
+    foreach ( $forms as $form ){
+
+        $step = new \WPGH_Step( $form->ID );
+
+        if ( $step->is_active() ){
+            $options[ $step->ID ] = $step->title;
+        }
+    }
+
+    $args = array(
+        'id' => 'form-picker',
+        'name' => 'form-picker',
+        'options' => $options,
+        'class' => 'form-picker'
+    );
+
+    ob_start()
+
+    ?>
+    <?php echo WPGH()->html->dropdown( $args ); ?>
+    <?php
+
+    return ob_get_clean();
+}
+
+function render_block_wpgh_form_save( $attributes, $content ){
+
+    ob_start();
+
+    echo do_shortcode( sprintf( '[wpgh_form id="%s"]', $attributes[ 'id' ] ) );
+
+    return ob_get_clean();
+
+}
+
+function register_wpgh_blocks(){
+
+//    if ( function_exists( 'register_block_type' ) ){
+    register_block_type( 'groundhogg/form', array(
+        'render_callback' => __NAMESPACE__ . '\render_block_wpgh_form',
+    ) );
+
+    register_block_type( 'groundhogg/form-saved', array(
+        'render_callback' => __NAMESPACE__ . '\render_block_wpgh_form_saved',
+    ) );
+//    }
+}
+
+add_action( 'init', __NAMESPACE__ . '\register_wpgh_blocks' );

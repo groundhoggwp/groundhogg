@@ -62,73 +62,6 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         <input placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo $funnel->title; ?>" id="title" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
-                <div class="postbox">
-                    <h2 class="hndle"><?php _e("Reporting", 'groundhogg'); ?></h2>
-                    <div class="inside">
-                        <?php $args = array(
-                            'name'      => 'date_range',
-                            'id'        => 'date_range',
-                            'options'   => array(
-                                    'last_24' => __( 'Last 24 Hours' ),
-                                    'last_7' => __( 'Last 7 Days' ),
-                                    'last_30' => __( 'Last 30 Days' ),
-                                    'custom' => __( 'Custom Range' ),
-                            ),
-                            'selected' => ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24',
-                        ); echo WPGH()->html->dropdown( $args ); ?>
-
-                        <?php $selected = ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ; ?>
-                        <input autocomplete="off" placeholder="<?php esc_attr_e('From:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_start" name="custom_date_range_start" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_start' ] ) ) echo $_POST['custom_date_range_start']; ?>">
-                        <script>jQuery(function($){$('#custom_date_range_start').datepicker({
-                                changeMonth: true,
-                                changeYear: true,
-                                maxDate:0,
-                                dateFormat:'d-m-yy'
-                            })});</script>
-                        <input autocomplete="off" placeholder="<?php esc_attr_e('To:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_end" name="custom_date_range_end" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_end' ] ) ) echo $_POST['custom_date_range_end']; ?>">
-                        <script>jQuery(function($){$('#custom_date_range_end').datepicker({
-                                changeMonth: true,
-                                changeYear: true,
-                                maxDate:0,
-                                dateFormat:'d-m-yy'
-                            })});</script>
-
-                        <script>jQuery(function($){$('#date_range').change(function(){
-                            if($(this).val() === 'custom'){
-                                $('#custom_date_range_end').removeClass('hidden');
-                                $('#custom_date_range_start').removeClass('hidden');
-                            } else {
-                                $('#custom_date_range_end').addClass('hidden');
-                                $('#custom_date_range_start').addClass('hidden');
-                            }})});
-                        </script>
-                        <?php submit_button( 'Refresh', 'secondary', 'change_reporting', false ); ?>
-                        <?php do_action( 'funnel_sate_range_filters_after' ); ?>
-                        <div style="float: right; display: inline-block;">
-                            <div class="onoffswitch">
-                                <input type="checkbox" name="reporting_on" class="onoffswitch-checkbox" id="reporting-toggle" value="1" <?php if( isset( $_REQUEST[ 'change_reporting' ] ) ) echo 'checked'; ?> >
-                                <label class="onoffswitch-label" for="reporting-toggle">
-                                    <span class="onoffswitch-inner"></span>
-                                    <span class="onoffswitch-switch"></span>
-                                </label>
-                            </div>
-                        </div>
-                        <script>
-                            jQuery(function($){$("#reporting-toggle").on( 'input', function(){
-                                if ( $(this).is(':checked')){
-                                    $('.step-reporting').removeClass('hidden');
-                                    $('.step-edit').addClass('hidden');
-                                } else {
-                                    $('.step-reporting').addClass('hidden');
-                                    $('.step-edit').removeClass('hidden');
-                                }
-                            });if($("#reporting-toggle").is( ':checked')){
-                                $('.step-reporting').removeClass('hidden');
-                                $('.step-edit').addClass('hidden');
-                            }});
-                        </script>
-                    </div>
-                </div>
             </div>
             <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sidebar">
@@ -193,6 +126,86 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         </div>
                     </div>
                 </div>
+                <div class="postbox">
+                    <h2 class="hndle"><?php _e("Reporting", 'groundhogg'); ?></h2>
+                    <div class="inside">
+                        <table class="form-table">
+                            <tbody>
+                            <tr>
+                                <th>
+                                    <?php _e( 'Toggle Reporting View' ); ?>
+                                </th>
+                                <td>
+                                    <div class="onoffswitch">
+                                        <input type="checkbox" name="reporting_on" class="onoffswitch-checkbox" id="reporting-toggle" value="1" <?php if( isset( $_REQUEST[ 'change_reporting' ] ) ) echo 'checked'; ?> >
+                                        <label class="onoffswitch-label" for="reporting-toggle">
+                                            <span class="onoffswitch-inner"></span>
+                                            <span class="onoffswitch-switch"></span>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+
+                        <script>
+                            jQuery(function($){$("#reporting-toggle").on( 'input', function(){
+                                if ( $(this).is(':checked')){
+                                    $('.step-reporting').removeClass('hidden');
+                                    $('.step-edit').addClass('hidden');
+                                } else {
+                                    $('.step-reporting').addClass('hidden');
+                                    $('.step-edit').removeClass('hidden');
+                                }
+                            });if($("#reporting-toggle").is( ':checked')){
+                                $('.step-reporting').removeClass('hidden');
+                                $('.step-edit').addClass('hidden');
+                            }});
+                        </script>
+
+                        <?php $args = array(
+                            'name'      => 'date_range',
+                            'id'        => 'date_range',
+                            'options'   => array(
+                                'last_24' => __( 'Last 24 Hours' ),
+                                'last_7' => __( 'Last 7 Days' ),
+                                'last_30' => __( 'Last 30 Days' ),
+                                'custom' => __( 'Custom Range' ),
+                            ),
+                            'selected' => ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24',
+                        ); echo WPGH()->html->dropdown( $args ); ?>
+
+                        <?php $selected = ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ; ?>
+                        <input autocomplete="off" placeholder="<?php esc_attr_e('From:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_start" name="custom_date_range_start" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_start' ] ) ) echo $_POST['custom_date_range_start']; ?>">
+                        <script>jQuery(function($){$('#custom_date_range_start').datepicker({
+                                changeMonth: true,
+                                changeYear: true,
+                                maxDate:0,
+                                dateFormat:'d-m-yy'
+                            })});</script>
+                        <input autocomplete="off" placeholder="<?php esc_attr_e('To:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_end" name="custom_date_range_end" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_end' ] ) ) echo $_POST['custom_date_range_end']; ?>">
+                        <script>jQuery(function($){$('#custom_date_range_end').datepicker({
+                                changeMonth: true,
+                                changeYear: true,
+                                maxDate:0,
+                                dateFormat:'d-m-yy'
+                            })});</script>
+
+                        <script>jQuery(function($){$('#date_range').change(function(){
+                                if($(this).val() === 'custom'){
+                                    $('#custom_date_range_end').removeClass('hidden');
+                                    $('#custom_date_range_start').removeClass('hidden');
+                                } else {
+                                    $('#custom_date_range_end').addClass('hidden');
+                                    $('#custom_date_range_start').addClass('hidden');
+                                }})});
+                        </script>
+                        <?php submit_button( 'Refresh', 'secondary', 'change_reporting', false ); ?>
+                        <?php do_action( 'funnel_sate_range_filters_after' ); ?>
+                    </div>
+                </div>
+
                 <!-- Begin Benckmark Icons-->
                 <div id='benchmarks' class="postbox">
                     <h3 class="hndle"><?php echo __( 'Benchmarks', 'groundhogg' );?></h3>

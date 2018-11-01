@@ -27,7 +27,7 @@
 }( jQuery ));
 
 jQuery(function ($) {
-    jQuery( '.wp-link-text-field' ).css( 'display', 'none' );
+    jQuery( '.wp-link-form' ).css( 'display', 'none' );
     jQuery( '.link-target' ).css( 'display', 'none' );
 
     $('body').on('click', '#wp-link-submit', function(event) {

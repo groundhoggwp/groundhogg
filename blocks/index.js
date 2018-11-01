@@ -16,9 +16,9 @@ import './i18n.js';
 // import './11-url-input-conditional';
 // import './12-dynamic';
 // import './14-meta-box';
-
-import './first-name';
-import './last-name';
-import './email';
-import './text-field';
-import './submit'
+//
+// import './first-name';
+// import './last-name';
+// import './email';
+// import './submit'
+import './form';

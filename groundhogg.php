@@ -406,6 +406,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';
             require_once WPGH_PLUGIN_DIR . 'includes/locations.php';
+//            require_once WPGH_PLUGIN_DIR . 'includes/gutenberg.php';
 
             //API
 //            require_once WPGH_PLUGIN_DIR . 'api/v1/class-wpgh-api-v1.php';
