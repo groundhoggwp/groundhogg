@@ -271,7 +271,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
 
         if ( isset( $_POST[ $step->prefix( 'form' ) ] ) ){
 
-            $step->update_meta( 'form', sanitize_textarea_field( $_POST[  $step->prefix( 'form' ) ] ) );
+            $step->update_meta( 'form', wp_kses_post( $_POST[  $step->prefix( 'form' ) ] ) );
 
         }
     }

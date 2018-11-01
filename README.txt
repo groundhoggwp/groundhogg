@@ -109,6 +109,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.0 =
 * Stricter checking of whether a contact exists or not.
+* Fixed wonky text editing in email editor.
+* Allowed for HTML and richtext in the form element.
 
 = 0.9.18 =
 * Added round robin functionality to Apply Owner step.
