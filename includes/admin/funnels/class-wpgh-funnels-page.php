@@ -72,7 +72,9 @@ class WPGH_Funnels_Page
             array($this, 'page')
         );
 
-        add_action("load-" . $page, array($this, 'help'));
+        if ( $this->get_action() !== 'edit' ){
+            add_action("load-" . $page, array($this, 'help'));
+        }
 
     }
 
@@ -842,24 +844,32 @@ class WPGH_Funnels_Page
 
 	public function page()
 	{
-		?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
-            <div id="notices">
-	            <?php $this->notices->notices(); ?>
+
+	    if ( $this->get_action() === 'edit' ){
+            $this->edit();
+
+        } else {
+            ?>
+            <div class="wrap">
+                <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+                <div id="notices">
+                    <?php $this->notices->notices(); ?>
+                </div>
+                <hr class="wp-header-end">
+                <?php switch ( $this->get_action() ){
+                    case 'add':
+                        $this->add();
+                        break;
+                    case 'edit':
+                        $this->edit();
+                        break;
+                    default:
+                        $this->table();
+                } ?>
             </div>
-            <hr class="wp-header-end">
-			<?php switch ( $this->get_action() ){
-				case 'add':
-					$this->add();
-					break;
-				case 'edit':
-					$this->edit();
-					break;
-				default:
-					$this->table();
-			} ?>
-        </div>
-		<?php
+            <?php
+        }
+
+
 	}
 }

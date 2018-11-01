@@ -1,3 +1,48 @@
+
+/* NEW STUFF */
+#wpcontent {
+    padding-left: 0 !important;
+}
+
+.funnel-editor-header{
+    box-sizing: border-box;
+    /*position: fixed;*/
+    height: 47px;
+    padding: 8px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #e2e4e7;
+    display: block;
+    width: 100%;
+}
+
+.funnel-editor-header div{
+    display: inline-block;
+    vertical-align: top;
+}
+
+.funnel-editor-header .status-options{
+    float: right;
+    margin-right: 20px;
+}
+
+.funnel-editor-header #title{
+    border: none;
+    width: 300px;
+    font-size: 18px;
+    box-shadow: none;
+}
+
+.funnel-editor-header #reporting input[type='text']{
+    vertical-align: top;
+    max-width: 100px;
+}
+
+#reporting select{
+    vertical-align: top;
+}
+
+/* END NEW STUFF */
+
 .form-buttons .button{
     margin: 2px;
 }
@@ -121,63 +166,67 @@
     overflow: auto;
     height: 1600px;
 }
-
 .onoffswitch {
-    position: relative; width: 110px;
+    position: relative; width: 106px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
 .onoffswitch-checkbox {
-    visibility: hidden;
-    position: absolute;
+    display: none !important;
 }
 .onoffswitch-label {
     display: block; overflow: hidden; cursor: pointer;
-    border: 1px solid #999999; border-radius: 4px;
+    border: 1px solid #E3E3E3; border-radius: 3px;
 }
 .onoffswitch-inner {
     display: block; width: 200%; margin-left: -100%;
     transition: margin 0.3s ease-in 0s;
 }
 .onoffswitch-inner:before, .onoffswitch-inner:after {
-    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    display: block; float: left; width: 50%; height: 27px; padding: 0; line-height: 23px;
     font-size: 14px; color: white;
     box-sizing: border-box;
+    border: 2px solid transparent;
+    background-clip: padding-box;
 }
 .onoffswitch-inner:before {
-    text-shadow: 0 -1px 1px #006799, 1px 0 1px #006799, 0 1px 1px #006799, -1px 0 1px #006799;
-    content: "Reporting";
-    padding-left: 10px;
-    background-color: #008ec2; color: #FFFFFF;
-}
-
-#status-toggle-switch .onoffswitch-inner:before{
     content: "Active";
+    padding-left: 10px;
+    background-color: #FFFFFF; color: #000000;
 }
-
+#reporting .onoffswitch-inner:before {
+    content: "Reporting";
+}
 .onoffswitch-inner:after {
-    content: "Editing";
+    content: "Inactive";
     padding-right: 10px;
-    background-color: #EEEEEE; color: #999999;
+    background-color: #FFFFFF; color: #666666;
     text-align: right;
 }
-
-#status-toggle-switch .onoffswitch-inner:after{
-    content: "Inactive";
+#reporting .onoffswitch-inner:after {
+    content: "Editing";
 }
 
 .onoffswitch-switch {
-    display: block; width: 21px; margin: 4.5px;
-    background: #FFFFFF;
+    display: block; width: 24px; margin: 0px;
+    background: #f7f7f7;
     position: absolute; top: 0; bottom: 0;
-    right: 78px;
-    border: 1px solid #999999; border-radius: 4px;
+    right: 82px;
+    height: 26px;
+    border-width: 1px;
+    border-style: solid;
     transition: all 0.3s ease-in 0s;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 #ccc;
+    border-color: #ccc;
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
     margin-left: 0;
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px;
+    background-color: #0085ba;
+    box-shadow: 0 1px 0 #006799;
+    border-color: #0073aa #006799 #006799;
 }
 
 .step-reporting p,
