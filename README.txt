@@ -110,6 +110,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 = 1.0.1 =
 * Changed to a vastly superior layout in the funnel editor.
 * Fixed load funnel editor scripts in head rather than in footer.
+* Changed editing view for emails to make similar to new Funnel Editor layout.
+* Fixed load email editor scripts in head instead of footer.
 
 = 1.0 =
 * Stricter checking of whether a contact exists or not.
