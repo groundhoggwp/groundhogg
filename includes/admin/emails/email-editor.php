@@ -17,26 +17,12 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-wp_enqueue_script( 'jquery-ui-sortable' );
-wp_enqueue_script( 'jquery-ui-draggable' );
-
-wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/sticky-sidebar.js' );
-wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
-
 $email_id = intval( $_GET['email'] );
 $email = new WPGH_Email( $email_id );
 
 $blocks = apply_filters( 'wpgh_email_blocks', array() );
 
 ?>
-
-<!-- RETURN PATH NOTICE-->
-<?php if ( isset( $_REQUEST['return_funnel'] ) ): ?>
-    <div class="notice notice-info is-dismissible">
-        <p><a href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $_REQUEST['return_funnel'] . '#' . $_REQUEST['return_step'] ); ?>"><?php  _e( '&larr; Back to editing funnel' ); ?></a></p>
-    </div>
-<?php endif; ?>
-<!-- /RETURN PATH -->
 
 <!-- NEW EMAIL TAB TITLE -->
 <?php if ( ! empty( $email->subject ) ): ?>
@@ -53,6 +39,29 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
     <!-- Before-->
     <?php wp_nonce_field(); ?>
     <?php do_action('wpgh_edit_email_form_before'); ?>
+
+    <?php echo WPGH()->html->input( array( 'type' => 'hidden', 'name' => 'email', 'value' => $email_id ) ); ?>
+
+    <div class="header-wrap">
+        <div class="funnel-editor-header">
+            <span id="title"><?php _e( 'Edit Email' ); ?></span><a class="button" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+            <div class="status-options">
+                <div id="status">
+                    <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
+                        <input type="checkbox" name="email_status" class="onoffswitch-checkbox" value="ready" id="status-toggle" <?php if ( $email->status == 'ready' ) echo 'checked'; ?>>
+                        <label class="onoffswitch-label" for="status-toggle">
+                            <span class="onoffswitch-inner"></span>
+                            <span class="onoffswitch-switch"></span>
+                        </label>
+                    </div>
+                </div>
+                <div id="save">
+                    <span class="spinner" style="float: left"></span>
+                    <?php submit_button( 'Update', 'primary', 'update', false ) ?>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main -->
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
@@ -73,11 +82,20 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                         <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo  $email->pre_header; ?>" id="pre_header" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
+                <!-- RETURN PATH NOTICE-->
+                <?php if ( isset( $_REQUEST['return_funnel'] ) ): ?>
+                    <div class="notice notice-info is-dismissible">
+                        <p><a href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $_REQUEST['return_funnel'] . '#' . $_REQUEST['return_step'] ); ?>"><?php  _e( '&larr; Back to editing funnel' ); ?></a></p>
+                    </div>
+                <?php endif; ?>
+                <!-- /RETURN PATH -->
+                <div id="notices">
+
+                </div>
                 <!-- / Title Content -->
 
                 <!-- Editor -->
-                <div id="email-content" class="postbox">
-                    <h3 class="hndle"><?php _e( 'Email Editor'); ?></h3>
+                <div id="email-content">
                     <div id="editor" class="editor" style="display: flex;">
 
                         <!-- Block Options -->
@@ -120,7 +138,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                                 </div>
                             </div>
                         </div>
-                        <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto; overflow:visible;">
+                        <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto;">
 
                             <?php $alignment = $email->get_meta( 'alignment' );
                             if ( $alignment === 'center' ){
@@ -143,67 +161,17 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                     <textarea id="content" name="content"><?php echo $email->content; ?></textarea>
                 </div>
 
-                <div class="postbox" id="replacements">
-                    <h2 class="hndle"><?php _e( 'Replacements', 'groudhogg' ); ?></h2>
-                    <div class="inside">
-
-                        <table class="wp-list-table widefat fixed striped">
-                            <thead>
-                            <tr>
-                                <th><?php _e( 'Code' ); ?></th>
-                                <th><?php _e( 'Description' ); ?></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            <?php foreach ( WPGH()->replacements->get_replacements() as $replacement ): ?>
-                                <tr>
-                                    <td>
-                                        <input style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}">
-                                    </td>
-                                    <td>
-                                        <span><?php echo $replacement[ 'description' ]; ?></span>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
             </div>
             <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sidebar">
                 <div id="submitdiv" class="postbox">
-                    <h3 class="hndle"><?php echo __( 'Email Actions', 'groundhogg' );?></h3>
+                    <h3 class="hndle"><?php echo __( 'Sender', 'groundhogg' );?></h3>
                     <div class="inside">
                         <div class="submitbox">
                             <div id="minor-publishing-actions">
                                 <?php do_action( 'wpgh_email_actions_before' ); ?>
                                 <table class="form-table">
                                     <tbody>
-                                    <tr>
-                                        <th><?php _e( 'Status:' ); ?></th>
-                                        <td>
-                                            <input type="hidden" id="status" name="status" value="<?php echo $email->status; ?>" >
-                                            <div class="onoffswitch" style="text-align: left;">
-                                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="status-toggle" <?php if ( $email->status === 'ready' ) echo 'checked'; ?> >
-                                                <label class="onoffswitch-label" for="status-toggle">
-                                                    <span class="onoffswitch-inner"></span>
-                                                    <span class="onoffswitch-switch"></span>
-                                                </label>
-                                            </div>
-                                            <script>
-                                                jQuery(function($){$("#status-toggle").on( 'input', function(){
-                                                    if ( $(this).is(':checked')){
-                                                        $('#status').val('ready');
-                                                    } else {
-                                                        $('#status').val('draft');
-                                                    }
-                                                })});
-                                            </script>
-                                        </td>
-                                    </tr>
                                     <tr>
                                         <th><?php _e( 'From User:' ); ?></th>
                                         <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user ); ?>
@@ -215,7 +183,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                                     </tr>
                                     <tr id="send-to" class="hidden">
                                         <th><?php _e( 'To:' ); ?></th>
-                                        <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'test_email', 'name' => 'test_email', 'selected' => $email->from_user ); ?>
+                                        <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'test_email', 'name' => 'test_email', 'selected' => $email->get_meta( 'test_email' ) ); ?>
                                         <td><?php echo WPGH()->html->dropdown_owners( $args ); ?></td>
                                     </tr>
                                     <script>
@@ -226,16 +194,6 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                                     </tbody>
                                 </table>
                                 <?php do_action( 'wpgh_email_actions_after' ); ?>
-                            </div>
-                            <div id="major-publishing-actions">
-                                <div id="delete-action">
-                                    <a class="submitdelete deletion" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_emails&action=trash&email=' . $email_id ), 'trash' ) ); ?>"><?php echo esc_html__( 'Move To Trash' ); ?></a>
-                                </div>
-                                <div id="publishing-action">
-                                    <span class="spinner"></span>
-                                    <?php submit_button('Update Email', 'primary', 'update_email', false ); ?>
-                                </div>
-                                <div class="clear"></div>
                             </div>
                         </div>
                     </div>
@@ -300,7 +258,28 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
             <!-- HI -->
             <!-- End elements area-->
             <div style="clear: both;"></div>
-
         </div>
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+            <tr>
+                <th><?php _e( 'Replacement Code' ); ?></th>
+                <th><?php _e( 'Description' ); ?></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <?php foreach ( WPGH()->replacements->get_replacements() as $replacement ): ?>
+                <tr>
+                    <td>
+                        <input style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}">
+                    </td>
+                    <td>
+                        <span><?php echo $replacement[ 'description' ]; ?></span>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+
     </div>
 </form>

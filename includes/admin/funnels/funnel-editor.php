@@ -18,24 +18,6 @@ $funnel_id = intval( $_GET['funnel'] );
 
 //print_r($_POST);
 
-wp_enqueue_style('editor-buttons');
-wp_enqueue_style( 'jquery-ui' );
-
-wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/funnel-editor.css') );
-
-//for link editor
-wp_enqueue_editor();
-wp_enqueue_script('wplink');
-
-wp_enqueue_script( 'jquery-ui-sortable' );
-wp_enqueue_script( 'jquery-ui-draggable' );
-wp_enqueue_script( 'jquery-ui-datepicker' );
-
-wp_enqueue_script( 'link-picker', WPGH_ASSETS_FOLDER . '/js/admin/link-picker.js' );
-wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/sticky-sidebar.js' );
-wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
-wp_enqueue_script( 'funnel-editor', WPGH_ASSETS_FOLDER . '/js/admin/funnel-editor.js' );
-
 do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
 
 $funnel = WPGH()->funnels->get( $funnel_id );
@@ -53,73 +35,53 @@ $funnel = WPGH()->funnels->get( $funnel_id );
         'id'    => 'funnel',
         'value' => $funnel_id
     ); echo WPGH()->html->input( $args ); ?>
-    <div class="funnel-editor-header">
-        <div class="title">
-            <input class="title" placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo $funnel->title; ?>" id="title" spellcheck="true" autocomplete="off">
-        </div>
-        <div id="reporting">
-            <?php $args = array(
-                'name'      => 'date_range',
-                'id'        => 'date_range',
-                'options'   => array(
-                    'last_24' => __( 'Last 24 Hours' ),
-                    'last_7' => __( 'Last 7 Days' ),
-                    'last_30' => __( 'Last 30 Days' ),
-                    'custom' => __( 'Custom Range' ),
-                ),
-                'selected' => ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24',
-            ); echo WPGH()->html->dropdown( $args ); ?>
-
-            <?php $selected = ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ; ?>
-            <input autocomplete="off" placeholder="<?php esc_attr_e('From:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_start" name="custom_date_range_start" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_start' ] ) ) echo $_POST['custom_date_range_start']; ?>">
-            <script>jQuery(function($){$('#custom_date_range_start').datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    maxDate:0,
-                    dateFormat:'d-m-yy'
-                })});</script>
-            <input autocomplete="off" placeholder="<?php esc_attr_e('To:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_end" name="custom_date_range_end" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_end' ] ) ) echo $_POST['custom_date_range_end']; ?>">
-            <script>jQuery(function($){$('#custom_date_range_end').datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    maxDate:0,
-                    dateFormat:'d-m-yy'
-                })});</script>
-
-            <script>jQuery(function($){$('#date_range').change(function(){
-                    if($(this).val() === 'custom'){
-                        $('#custom_date_range_end').removeClass('hidden');
-                        $('#custom_date_range_start').removeClass('hidden');
-                    } else {
-                        $('#custom_date_range_end').addClass('hidden');
-                        $('#custom_date_range_start').addClass('hidden');
-                    }})});
-            </script>
-            <?php submit_button( 'Refresh', 'secondary', 'change_reporting', false ); ?>
-            <div class="onoffswitch">
-                <input type="checkbox" name="reporting_on" class="onoffswitch-checkbox" id="reporting-toggle" value="1" <?php if( isset( $_REQUEST[ 'change_reporting' ] ) ) echo 'checked'; ?> >
-                <label class="onoffswitch-label" for="reporting-toggle">
-                    <span class="onoffswitch-inner"></span>
-                    <span class="onoffswitch-switch"></span>
-                </label>
+    <div class="header-wrap">
+        <div class="funnel-editor-header">
+            <div class="title">
+                <input class="title" placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo $funnel->title; ?>" id="title" spellcheck="true" autocomplete="off">
             </div>
-        </div>
-        <div class="status-options">
-            <div id="export">
-                <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _e( 'Export Funnel', 'groundhogg'); ?></a>
-            </div>
-            <div id="status">
-                <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
-                    <input type="checkbox" name="funnel_status" class="onoffswitch-checkbox" id="status-toggle" <?php if ( $funnel->status == 'active' ) echo 'checked'; ?>>
-                    <label class="onoffswitch-label" for="status-toggle">
+            <div id="reporting">
+                <?php $args = array(
+                    'name'      => 'date_range',
+                    'id'        => 'date_range',
+                    'options'   => array(
+                        'last_24' => __( 'Last 24 Hours' ),
+                        'last_7' => __( 'Last 7 Days' ),
+                        'last_30' => __( 'Last 30 Days' ),
+                        'custom' => __( 'Custom Range' ),
+                    ),
+                    'selected' => ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24',
+                ); echo WPGH()->html->dropdown( $args ); ?>
+
+                <?php $selected = ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ; ?>
+                <input autocomplete="off" placeholder="<?php esc_attr_e('From:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_start" name="custom_date_range_start" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_start' ] ) ) echo $_POST['custom_date_range_start']; ?>">
+                <input autocomplete="off" placeholder="<?php esc_attr_e('To:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_end" name="custom_date_range_end" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_end' ] ) ) echo $_POST['custom_date_range_end']; ?>">
+                <?php submit_button( 'Refresh', 'secondary', 'change_reporting', false ); ?>
+                <div class="onoffswitch">
+                    <input type="checkbox" name="reporting_on" class="onoffswitch-checkbox" id="reporting-toggle" value="1" <?php if( isset( $_REQUEST[ 'change_reporting' ] ) ) echo 'checked'; ?> >
+                    <label class="onoffswitch-label" for="reporting-toggle">
                         <span class="onoffswitch-inner"></span>
                         <span class="onoffswitch-switch"></span>
                     </label>
                 </div>
             </div>
-            <div id="save">
-                <span class="spinner" style="float: left"></span>
-                <?php submit_button( 'Update', 'primary', 'update', false ) ?>
+            <div class="status-options">
+                <div id="export">
+                    <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _e( 'Export Funnel', 'groundhogg'); ?></a>
+                </div>
+                <div id="status">
+                    <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
+                        <input type="checkbox" name="funnel_status" class="onoffswitch-checkbox" value="active" id="status-toggle" <?php if ( $funnel->status == 'active' ) echo 'checked'; ?>>
+                        <label class="onoffswitch-label" for="status-toggle">
+                            <span class="onoffswitch-inner"></span>
+                            <span class="onoffswitch-switch"></span>
+                        </label>
+                    </div>
+                </div>
+                <div id="save">
+                    <span class="spinner" style="float: left"></span>
+                    <?php submit_button( 'Update', 'primary', 'update', false ) ?>
+                </div>
             </div>
         </div>
     </div>
@@ -206,6 +168,9 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             </div>
             <!-- End elements area-->
             <!-- main funnel editing area -->
+            <div id="notices">
+
+            </div>
             <div  id="postbox-container-2" class="postbox-container funnel-editor">
                 <div style="visibility: hidden" id="normal-sortables" class="meta-box-sortables ui-sortable">
                     <?php do_action('wpgh_funnel_steps_before' ); ?>

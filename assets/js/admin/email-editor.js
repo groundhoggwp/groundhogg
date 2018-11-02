@@ -67,24 +67,18 @@ var wpghEmailEditor;
 
             /* Activate Spinner */
             $('form').on( 'submit', function( e ){
-                e.preventDefault();
-                $('.spinner').css('visibility','visible');
-                jQuery('.row').removeClass('active');
-                jQuery('wpgh-toolbar').remove();
-                wpghTextBlock.destroyEditor();
-                $('#content').val( $('#email-inside').html() );
-                $(this).unbind( 'submit' ).submit();
+                wpghEmailEditor.save( e );
             });
 
-            $('.sidebar').stickySidebar({
-                topSpacing: 40,
-                bottomSpacing: 40
-            });
-
-            $('.editor-actions-inner').stickySidebar({
-                topSpacing: 32,
-                bottomSpacing: 0
-            });
+            // $('.sidebar').stickySidebar({
+            //     topSpacing: 40,
+            //     bottomSpacing: 40
+            // });
+            //
+            // $('.editor-actions-inner').stickySidebar({
+            //     topSpacing: 32,
+            //     bottomSpacing: 0
+            // });
 
             $( '.row' ).wpghToolBar();
 
@@ -98,8 +92,62 @@ var wpghEmailEditor;
                     email.css( 'margin-left', 'auto' );
                     email.css( 'margin-right', 'auto' );
                 }
-            } )
+            } );
 
+            this.editorSizing();
+            $( window ).resize(function() {
+                wpghEmailEditor.editorSizing();
+            });
+
+        },
+
+        save: function ( e ) {
+
+            e.preventDefault();
+
+            $('.spinner').css('visibility','visible');
+
+            $('.row').removeClass('active');
+            $('wpgh-toolbar').remove();
+
+            wpghTextBlock.destroyEditor();
+            $('#content').val( $('#email-inside').html() );
+
+            var fd = $('form').serialize();
+
+            fd = fd +  '&action=gh_update_email';
+
+            var ajaxCall = $.ajax({
+                type: "post",
+                url: ajaxurl,
+                dataType: 'json',
+                data: fd,
+                success: function ( response ) {
+                    // response = JSON.parse(response);
+                    console.log( response );
+                    $( '#notices' ).html( response.notices );
+                    $( '.spinner' ).css( 'visibility','hidden' );
+                    wpghEmailEditor.makeDismissible();
+                    $( '.row' ).wpghToolBar();
+
+                }
+            });
+
+        },
+
+        makeDismissible: function()
+        {
+            $( "<button type='button' class='notice-dismiss'><span class='screen-reader-text'>Dismiss This Notice</span></button>" ).appendTo( '.is-dismissible' );
+            $( '.notice-dismiss' ).on( 'click', function ( e ) {
+                $(this).parent().fadeOut( 500, function () {
+                    $(this).remove();
+                } );
+            } )
+        },
+
+        editorSizing: function (){
+            $('.funnel-editor-header').width( $('#poststuff').width() );
+            $('#email-body').height( $('#postbox-container-1').height() - 106 );
         },
 
         /**

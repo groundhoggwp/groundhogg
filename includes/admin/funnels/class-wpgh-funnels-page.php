@@ -58,8 +58,36 @@ class WPGH_Funnels_Page
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' ){
 
 			add_action( 'init' , array( $this, 'process_action' )  );
+			add_action( 'admin_enqueue_scripts' , array( $this, 'scripts' )  );
 		}
 	}
+
+    /**
+     * enqueue editor scripts
+     */
+	public function scripts()
+    {
+       if ( $this->get_action() === 'edit' ){
+           wp_enqueue_style('editor-buttons');
+           wp_enqueue_style( 'jquery-ui' );
+
+
+           wp_enqueue_editor();
+           wp_enqueue_script('wplink');
+
+           wp_enqueue_script( 'jquery-ui-sortable' );
+           wp_enqueue_script( 'jquery-ui-draggable' );
+           wp_enqueue_script( 'jquery-ui-datepicker' );
+
+           wp_enqueue_script( 'link-picker', WPGH_ASSETS_FOLDER . '/js/admin/link-picker.js' );
+//           wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/sticky-sidebar.js' );
+//           wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
+
+           wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/funnel-editor.css') );
+           wp_enqueue_script( 'funnel-editor', WPGH_ASSETS_FOLDER . '/js/admin/funnel-editor.js', filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/funnel-editor.js') );
+       }
+    }
+
 
     public function register()
     {
@@ -596,16 +624,21 @@ class WPGH_Funnels_Page
 
         $args[ 'title' ] = $title;
 
-
-        $status = sanitize_text_field( $_POST[ 'funnel_status' ] );
-        if ( $status !== 'active' && $status !== 'inactive' )
+        if ( isset( $_POST[ 'funnel_status' ] ) ){
+            $status = sanitize_text_field( $_POST[ 'funnel_status' ] );
+            if ( $status !== 'active' ){
+                $status = 'inactive';
+            }
+        } else {
             $status = 'inactive';
 
-        //do not update the status to inactive if it's not confirmed
-        if ( ( $status === 'inactive' && isset( $_POST['confirm'] ) && $_POST['confirm'] === 'yes' ) || $status === 'active' ){
-            $args[ 'status' ] = $status;
+            $this->notices->add( esc_attr( 'inactive' ), __( 'Funnel no longer active.', 'groundhogg' ), 'info' );
         }
 
+        //do not update the status to inactive if it's not confirmed
+        if ( $status === 'inactive' || $status === 'active' ){
+            $args[ 'status' ] = $status;
+        }
 
         $args[ 'last_updated' ] = current_time( 'mysql' );
 

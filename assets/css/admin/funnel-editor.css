@@ -1,18 +1,48 @@
 
 /* NEW STUFF */
+
+#wpbody-content{
+    /*height: 100vh;*/
+}
 #wpcontent {
     padding-left: 0 !important;
+    box-sizing: border-box;
 }
 
+#poststuff {
+    padding-top: 0px;
+    margin-top: 47px;
+}
+
+.header-wrap{
+    width:100%;
+}
+
+#post-body.columns-2 #postbox-container-1 {
+    float: right;
+    margin-right: -300px;
+    width: 300px;
+}
+
+#postbox-container-1 .postbox{
+    border: none;
+    box-shadow: none;
+    border-bottom: 1px solid #e5e5e5;
+    margin: 0;
+}
+
+
 .funnel-editor-header{
+    z-index: 99999;
+    top: 32px;
     box-sizing: border-box;
-    /*position: fixed;*/
+    position: fixed;
     height: 47px;
     padding: 8px;
     background: #FFFFFF;
     border-bottom: 1px solid #e2e4e7;
     display: block;
-    width: 100%;
+    width: inherit;
 }
 
 .funnel-editor-header div{
@@ -41,6 +71,9 @@
     vertical-align: top;
 }
 
+.notice {
+    margin: 0;
+}
 /* END NEW STUFF */
 
 .form-buttons .button{
@@ -158,13 +191,14 @@
 
 #postbox-container-2{
     padding: 40px 0 40px 0;
-
     background-size: 40px 40px;
     border-right: 1px solid #e5e5e5;
     border-bottom: 1px solid #e5e5e5;
+    margin-top: -1px;
     background-image: linear-gradient(to right, #e5e5e5 1px, transparent 1px), linear-gradient(to bottom, #e5e5e5 1px, transparent 1px);
+    box-sizing: border-box;
     overflow: auto;
-    height: 1600px;
+    /*height: 90vh;*/
 }
 .onoffswitch {
     position: relative; width: 106px;

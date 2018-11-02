@@ -43,7 +43,26 @@ var wpghFunnelEditor;
             this.makeSortable();
             this.makeDraggable();
 
-            $("#reporting-toggle").on( 'input', function(){
+            this.initReporting();
+
+            this.editorSizing();
+            $( window ).resize(function() {
+                wpghFunnelEditor.editorSizing();
+            });
+
+
+        },
+
+        editorSizing: function (){
+            $('.funnel-editor-header').width( $('#poststuff').width() );
+            $('#postbox-container-2').height( $('#postbox-container-1').height() - 80 );
+        },
+
+        initReporting: function(){
+
+            var $reporting = $("#reporting-toggle");
+
+            $reporting.on( 'input', function(){
                 if ( $(this).is(':checked')){
                     $('.step-reporting').removeClass('hidden');
                     $('.step-edit').addClass('hidden');
@@ -53,11 +72,33 @@ var wpghFunnelEditor;
                 }
             });
 
-            if($("#reporting-toggle").is( ':checked')){
+            if($reporting.is( ':checked')){
                 $('.step-reporting').removeClass('hidden');
                 $('.step-edit').addClass('hidden');
             }
 
+            $('#custom_date_range_start').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                maxDate:0,
+                dateFormat:'d-m-yy'
+            });
+
+            $('#custom_date_range_end').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                maxDate:0,
+                dateFormat:'d-m-yy'
+            });
+
+            $('#date_range').change(function(){
+                if($(this).val() === 'custom'){
+                    $('#custom_date_range_end').removeClass('hidden');
+                    $('#custom_date_range_start').removeClass('hidden');
+                } else {
+                    $('#custom_date_range_end').addClass('hidden');
+                    $('#custom_date_range_start').addClass('hidden');
+                }});
         },
 
         save: function ( e ) {

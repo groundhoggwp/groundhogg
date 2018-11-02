@@ -33,14 +33,34 @@ class WPGH_Emails_Page
 
         add_action( 'admin_menu', array( $this, 'register' ) );
 
+        add_action( 'wp_ajax_gh_update_email', array( $this, 'update_email_ajax' ) );
+
+        $this->notices = WPGH()->notices;
+
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_emails' ){
 
-            $this->notices = WPGH()->notices;
-
             add_action( 'init' , array( $this, 'process_action' )  );
+            add_action( 'admin_enqueue_scripts' , array( $this, 'scripts' )  );
 
         }
     }
+
+    public function scripts()
+    {
+        if ( $this->get_action() === 'edit' ){
+
+            wp_enqueue_script( 'jquery-ui-sortable' );
+            wp_enqueue_script( 'jquery-ui-draggable' );
+
+            wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/sticky-sidebar.js' );
+            wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
+
+            wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.js' ) );
+            wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . 'css/admin/email-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/email-editor.css' ) );
+
+        }
+    }
+
 
     public function register()
     {
@@ -384,6 +404,31 @@ class WPGH_Emails_Page
         die();
     }
 
+    public function update_email_ajax()
+    {
+
+        if ( ! wp_doing_ajax() ){
+            return;
+        }
+
+        $this->update_email();
+
+        ob_start();
+
+        $this->notices->notices();
+
+        $notices = ob_get_clean();
+
+        ob_start();
+
+        $response = array(
+            'notices'   => $notices
+        );
+
+        wp_die( json_encode( $response ) );
+
+    }
+
     /**
      * Update the current email
      */
@@ -393,13 +438,15 @@ class WPGH_Emails_Page
             wp_die( WPGH()->roles->error( 'edit_emails' ) );
         }
 
-        $id = intval( $_GET[ 'email' ] );
+        $id = intval( $_REQUEST[ 'email' ] );
+
+
 
         do_action( 'wpgh_email_update_before', $id );
 
         $args = array();
 
-        $status = ( isset( $_POST['status'] ) )? sanitize_text_field( trim( stripslashes( $_POST['status'] ) ) ): 'draft';
+        $status = ( isset( $_POST['email_status'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_status'] ) ) ): 'draft';
         $args[ 'status' ] = $status;
 
         if ( $status === 'draft' ) {
@@ -547,9 +594,6 @@ class WPGH_Emails_Page
             wp_die( WPGH()->roles->error( 'edit_emails' ) );
         }
 
-        wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.js' ) );
-        wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . 'css/admin/email-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/email-editor.css' ) );
-
         $this->include_blocks();
         $this->get_blocks();
 
@@ -572,22 +616,28 @@ class WPGH_Emails_Page
             wp_die( WPGH()->roles->error( 'edit_emails' ) );
         }
 
-        ?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
-            <?php $this->notices->notices(); ?>
-            <hr class="wp-header-end">
-            <?php switch ( $this->get_action() ){
-                case 'add':
-                    $this->add();
-                    break;
-                case 'edit':
-                    $this->edit();
-                    break;
-                default:
-                    $this->table();
-            } ?>
-        </div>
-        <?php
+        if ( $this->get_action() === 'edit' ){
+
+            $this->edit();
+
+        } else {
+            ?>
+            <div class="wrap">
+                <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+                <?php $this->notices->notices(); ?>
+                <hr class="wp-header-end">
+                <?php switch ( $this->get_action() ){
+                    case 'add':
+                        $this->add();
+                        break;
+                    case 'edit':
+                        $this->edit();
+                        break;
+                    default:
+                        $this->table();
+                } ?>
+            </div>
+            <?php
+        }
     }
 }

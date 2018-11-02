@@ -74,6 +74,8 @@ var wpghTextBlock;
                 defaultParagraphSeparator: 'p',
                 actions: ["bold", "italic", "underline", "color", "strikethrough", "responsiveAlign", "alignLeft", "alignCenter", "alignRight", "alignJustify", "responsiveHeadings", "heading1", "heading2", "olist", "ulist", "paragraph", "link", "unlink"]
             });
+            $( '.simple-editor-actionbar' ).width( $( '#email-body' ).width() );
+            $( '.simple-editor-actionbar' ).css( 'top', $( '#editor' ).offset().top - 32 );
             // console.log({richText:this.richText, message:'Editor Created'});
 
         },
