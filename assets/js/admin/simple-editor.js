@@ -357,7 +357,8 @@
         actionBar.className = classes.actionbar;
         //appendChild(settings.element.parentNode, actionBar);
         $element.before($(actionBar));
-        appendChild(settings.element, colorPickerDiv);
+        var $actionBar = $(actionBar);
+        // appendChild(settings.element, colorPickerDiv);
 
         var existing;
         [].forEach.call(settings.element.children, function (item) {
@@ -425,14 +426,15 @@
 
         var $colorPickerDiv = $(colorPickerDiv);
         $colorPickerDiv.hide();
-        appendChild(settings.element, colorPickerDiv);
+        $actionBar.append( colorPickerDiv );
 
         var ddropdown = createElement("div");
         ddropdown.className = 'simple-editor-dropdown';
         ddropdown.innerHTML = '<div class="simple-editor-dropdown-inner"></div>';
         var dropdown = $(ddropdown);
         dropdown.hide();
-        appendChild(settings.element, ddropdown);
+        $actionBar.append( ddropdown );
+        // appendChild(settings.element, ddropdown);
 
         dropdown.on('click', '.simple-editor-dropdown-item', function (ev) {
             var target = $(this).attr('data-target');
@@ -451,7 +453,7 @@
             stopHide = true;
             dropdown.find('.simple-editor-dropdown-inner').html(items);
             dropdown.css('left', ref.position().left);
-            dropdown.css('top', 0);
+            dropdown.css('top', '35px' );
             dropdown.show();
         };
 
@@ -635,7 +637,7 @@
                     stopHide = true;
                     lastSelection = saveSelection(content);
                     $colorPickerDiv.css('left', $('.simple-editor-color-picker-handle').parents('.simple-editor-button-wrapper:first').position().left);
-                    $colorPickerDiv.css('top', 0);
+                    $colorPickerDiv.css('top', '35px' );
                     $colorPickerDiv.show();
                     // console.log({e: $colorPickerDiv.show()});
                     return true;
