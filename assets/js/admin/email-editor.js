@@ -75,10 +75,11 @@ var wpghEmailEditor;
             //     bottomSpacing: 40
             // });
             //
-            // $('.editor-actions-inner').stickySidebar({
-            //     topSpacing: 32,
-            //     bottomSpacing: 0
-            // });
+
+            $('.editor-actions-inner').stickySidebar({
+                topSpacing: 32,
+                bottomSpacing: 0
+            });
 
             $( '.row' ).wpghToolBar();
 
