@@ -36,7 +36,8 @@ var wpghEmailEditor;
         editor:     null,
         actions:    null,
         active:     null,
-        alignment: null,
+        alignment:  null,
+        sidebar:    null,
 
         /**
          * Initialize the editor
@@ -76,7 +77,7 @@ var wpghEmailEditor;
             // });
             //
 
-            $('.editor-actions-inner').stickySidebar({
+            this.sidebar = new StickySidebar('.editor-actions-inner', {
                 topSpacing: 32,
                 bottomSpacing: 0
             });
@@ -245,8 +246,9 @@ var wpghEmailEditor;
             this.actions.find( '#' + blockType + '-block-editor' ).removeClass( 'hidden' );
 
             $(document).trigger( 'madeActive', [ block, blockType ] );
-
             // console.log( { block_type: blockType, block: block });
+
+            this.sidebar.updateSticky();
 
         },
 
