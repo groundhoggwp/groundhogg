@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.2 =
+* Added WPGH_Form instance to wpgh_form_code filter
+* Added Columns and Rows to the Funnel Form Editor
+* Added base class CSS for frontend forms
+
 = 1.0.1 =
 * Changed to a vastly superior layout in the funnel editor.
 * Fixed load funnel editor scripts in head rather than in footer.
