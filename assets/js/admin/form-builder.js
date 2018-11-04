@@ -76,6 +76,13 @@ var wpghFormBuilder;
                 case 'address':
                     code = '[address label="Address *" required="true"]';
                     break;
+                case 'row':
+                    code = '[row][/row]';
+                    break;
+                case 'column':
+                    code = '[col size="1/2"][/col]';
+                    break;
+
 
             }
 

@@ -745,7 +745,7 @@ class WPGH_HTML
         ) );
 
         $html = sprintf(
-            "<input type=\"text\" id=\"%s\" name=\%s\" class=\"wpgh-color\" value=\"%s\" data-default-color=\"%s\" />",
+            "<input type=\"text\" id=\"%s\" name=\"%s\" class=\"wpgh-color\" value=\"%s\" data-default-color=\"%s\" />",
             esc_attr( $a[ 'id'      ] ),
             esc_attr( $a[ 'name'    ] ),
             esc_attr( $a[ 'value'   ] ),

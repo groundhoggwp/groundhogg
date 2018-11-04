@@ -57,6 +57,13 @@ class WPGH_Form
         ), $atts);
 
         $this->id = intval( $this->a[ 'id' ] );
+
+        $this->add_scripts();
+    }
+
+    private function add_scripts()
+    {
+    	wp_enqueue_style( 'wpgh-frontend', WPGH_ASSETS_FOLDER . 'css/frontend.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/frontend.css' ) );
     }
 
     /**
@@ -65,7 +72,9 @@ class WPGH_Form
      */
     private function setup_shortcodes()
     {
-        add_shortcode( 'first_name', array( $this, 'first_name'  ) );
+	    add_shortcode( 'col',        array( $this, 'column'     ) );
+	    add_shortcode( 'row',        array( $this, 'row'        ) );
+	    add_shortcode( 'first_name', array( $this, 'first_name'  ) );
         add_shortcode( 'last_name',  array( $this, 'last_name'   ) );
         add_shortcode( 'email',      array( $this, 'email'       ) );
         add_shortcode( 'phone',      array( $this, 'phone'       ) );
@@ -89,8 +98,10 @@ class WPGH_Form
      */
     private function destroy_shortcodes()
     {
-        remove_shortcode( 'first_name'   );
-        remove_shortcode( 'last_name'    );
+	    remove_shortcode( 'row'          );
+	    remove_shortcode( 'col'          );
+	    remove_shortcode( 'last_name'    );
+	    remove_shortcode( 'first_name'   );
         remove_shortcode( 'email'        );
         remove_shortcode( 'phone'        );
         remove_shortcode( 'address'      );
@@ -101,7 +112,7 @@ class WPGH_Form
         remove_shortcode( 'checkbox'     );
         remove_shortcode( 'terms'        );
         remove_shortcode( 'recaptcha'    );
-        remove_shortcode( 'email_preferences'    );
+        remove_shortcode( 'email_preferences' );
         remove_shortcode( 'submit'       );
     }
 
@@ -119,7 +130,47 @@ class WPGH_Form
 
     private function field_wrap( $content )
     {
-        return sprintf( "<div class='gh-form-field'><p>%s</p></div>", $content );
+        return sprintf( "<div class='gh-form-field'>%s</div>", $content );
+    }
+
+    public function row( $atts, $content ){
+
+    	return sprintf( "<div class='gh-form-row'>%s</div>", do_shortcode( $content ) );
+
+    }
+    public function column( $atts, $content ){
+
+    	$a = shortcode_atts( $atts, array( 'size' => '1/2' ) );
+
+//    	$a[ 'size' ] = intval( $a[ 'size' ] );
+
+    	switch ( $a[ 'size' ] ){
+
+		    case '1/1':
+		    	$width = 'col-1-of-1';
+		    	break;
+		    case '1/2':
+			    $width = 'col-1-of-2';
+			    break;
+		    case '1/3':
+			    $width = 'col-1-of-3';
+			    break;
+		    case '2/3':
+			    $width = 'col-2-of-3';
+			    break;
+		    case '1/4':
+			    $width = 'col-1-of-4';
+			    break;
+		    case '3/4':
+			    $width = 'col-3-of-4';
+			    break;
+		    default:
+			    $width = 'col-1-of-2';
+			    break;
+	    }
+
+	    return sprintf( "<div class='gh-form-column %s'>%s</div>", $width, do_shortcode( $content ) );
+
     }
 
     /**
@@ -162,7 +213,7 @@ class WPGH_Form
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $field = sprintf(
-            "<label class='gh-input-label'>%s <input type='%s' name='%s' id='%s' class='%s' value='%s' placeholder='%s' title='%s' %s %s></label>",
+            "<label class='gh-input-label'>%s <input type='%s' name='%s' id='%s' class='gh-input %s' value='%s' placeholder='%s' title='%s' %s %s></label>",
             $a[ 'label' ],
             esc_attr( $a[ 'type' ] ),
             esc_attr( $a[ 'name' ] ),
@@ -420,7 +471,7 @@ class WPGH_Form
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $field = sprintf(
-            "<label class='gh-input-label'>%s <textarea name='%s' id='%s' class='%s' placeholder='%s' title='%s' %s %s>%s</textarea></label>",
+            "<label class='gh-input-label'>%s <textarea name='%s' id='%s' class='gh-input %s' placeholder='%s' title='%s' %s %s>%s</textarea></label>",
             $a[ 'label' ],
             esc_attr( $a[ 'name' ] ),
             esc_attr( $a[ 'id' ] ),
@@ -524,7 +575,7 @@ class WPGH_Form
         }
 
         $field = sprintf(
-            "<label class='gh-input-label'>%s <select name='%s' id='%s' class='%s' title='%s' %s %s %s>%s</select></label>",
+            "<label class='gh-input-label'>%s <select name='%s' id='%s' class='gh-input %s' title='%s' %s %s %s>%s</select></label>",
             $a[ 'label' ],
             esc_attr( $a[ 'name' ] ),
             esc_attr( $a[ 'id' ] ),
@@ -585,7 +636,7 @@ class WPGH_Form
 
                 $value = is_string( $i ) ? $i : $option;
 
-                $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label><input class='%s' type='radio' name='%s' id='%s' value='%s' %s> %s</label></div>",
+                $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s> %s</label></div>",
                     esc_attr( $a[ 'class' ] ),
                     esc_attr( $a[ 'name' ] ),
                     esc_attr( $a[ 'id' ] ) . '-' . $i,
@@ -645,7 +696,7 @@ class WPGH_Form
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $field = sprintf(
-            "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='%s' value='%s' title='%s' %s %s> %s</label>",
+            "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='gh-checkbox %s' value='%s' title='%s' %s %s> %s</label>",
             esc_attr( $a[ 'name' ] ),
             esc_attr( $a[ 'id' ] ),
             esc_attr( $a[ 'class' ] ),
@@ -825,12 +876,14 @@ jQuery( function($){
             $content = __( 'Submit' );
         }
 
-        return sprintf(
-                "<button type='submit' id='%s' class='gh-submit-button %s'>%s</button>",
+        $html = sprintf(
+                "<div class='gh-button-wrapper'><button type='submit' id='%s' class='gh-submit-button %s'>%s</button></div>",
             esc_attr( $a[ 'id' ] ),
             esc_attr( $a[ 'class' ] ),
             do_shortcode( $content )
         );
+
+        return $this->field_wrap( $html );
 
     }
 
@@ -884,7 +937,7 @@ jQuery( function($){
 
         }
 
-        $form = apply_filters( 'wpgh_form_shortcode', $form );
+        $form = apply_filters( 'wpgh_form_shortcode', $form, $this );
 
         return $form;
     }

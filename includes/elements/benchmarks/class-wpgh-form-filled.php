@@ -226,6 +226,18 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                                     'class' => 'button button-secondary address'
 
                                 ),
+
+	                            array(
+		                            'text' => __( 'Row' ),
+		                            'class' => 'button button-secondary row'
+
+	                            ),
+
+	                            array(
+		                            'text' => __( 'Col' ),
+		                            'class' => 'button button-secondary column'
+
+	                            ),
                             );
 
                             foreach ( $buttons as $button ){
