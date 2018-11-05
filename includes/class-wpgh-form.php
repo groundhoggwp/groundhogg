@@ -928,6 +928,13 @@ jQuery( function($){
 
         $form .= '</form>';
 
+        if ( is_user_logged_in() && current_user_can( 'edit_funnels' ) ){
+
+        	$funnel_id = WPGH()->steps->get_column_by( 'funnel_id', 'ID', $this->id );
+
+        	$form .= sprintf( "<p><a href='%s'>%s</a></p>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel_id ), __( '(Edit Form)' ) );
+        }
+
         $form .= '</div>';
 
         /* Save the expected field to post meta so we can access them on the POST end */
