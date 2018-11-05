@@ -958,7 +958,7 @@
                     //return wrapper.classList[action.state() ? 'add' : 'remove'](classes.selected);
                 };
                 handlers.push(handler);
-                destroyCallbacks.push(addEventListener(content, 'keyup', runAll));
+                // destroyCallbacks.push(addEventListener(content, 'keyup', runAll));
                 destroyCallbacks.push(addEventListener(content, 'mouseup', runAll));
                 destroyCallbacks.push(addEventListener(button, 'click', runAll));
             }

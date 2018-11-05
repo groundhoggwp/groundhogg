@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.2 =
+* Added WPGH_Form instance to wpgh_form_code filter
+* Added Columns and Rows to the Funnel Form Editor
+* Added base class CSS for frontend forms
+
 = 1.0.1 =
 * Changed to a vastly superior layout in the funnel editor.
 * Fixed load funnel editor scripts in head rather than in footer.
@@ -123,7 +128,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * Changed Sales Managers can only see contacts they are the owner of.
 * Fixed the create user step now links a user record to a contact if it exists... may be redundant but it's best to make sure.
 * Fixed [attributes] arg in HTML class being escaped when it shouldn't be
-* Fixed funnel stast refresh not working as a result of new ajax save.
+* Fixed funnel stats refresh not working as a result of new ajax save.
 * Fixed the phone field not saving to primary phone.
 * Simplified the email editor text bar.
 * Fixed extensions errors when licensing new extensions
