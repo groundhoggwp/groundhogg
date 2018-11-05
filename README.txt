@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.3 =
+* Changed WPGH_Contact_Query can now accept optin_status as an array of status options.
+* Added the broadcast reporting view
+* Fixed email preferences form not being installed correctly.
+
 = 1.0.2 =
 * Added WPGH_Form instance to wpgh_form_code filter
 * Added Columns and Rows to the Funnel Form Editor

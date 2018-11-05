@@ -554,7 +554,12 @@ class WPGH_Contact_Query {
         }
 
         if ( $this->query_vars[ 'optin_status' ]  !== 'any' ) {
-            $where['optin_status'] = "optin_status LIKE '{$this->query_vars['optin_status']}'";
+
+            if ( is_array( $this->query_vars[ 'optin_status' ] ) ){
+                $this->query_vars[ 'optin_status' ] = implode( ',', $this->query_vars[ 'optin_status' ] );
+            }
+
+            $where['optin_status'] = "optin_status in ( {$this->query_vars['optin_status']} )";
         }
 
         if ( $this->query_vars[ 'owner' ] ) {
@@ -625,6 +630,11 @@ class WPGH_Contact_Query {
             if ( !empty( $this->query_vars[ 'activity' ][ 'funnel' ] ) ){
                 $funnel_id = $this->query_vars[ 'activity' ][ 'funnel' ];
                 $where['report_funnel'] = "activity.funnel_id IN ( $funnel_id )";
+            }
+
+            if ( !empty( $this->query_vars[ 'activity' ][ 'referer' ] ) ){
+                $referer = $this->query_vars[ 'activity' ][ 'referer' ];
+                $where['report_referer'] = "activity.referer LIKE '$referer'";
             }
 
             if ( !empty( $this->query_vars[ 'activity' ][ 'step' ] ) ){

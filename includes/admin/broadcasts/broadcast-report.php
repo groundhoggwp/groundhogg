@@ -15,10 +15,136 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-?>
+$id = intval( $_GET[ 'broadcast' ] );
 
-<div>
-    <p>
-        <?php _e( 'The broadcast reporting view is currently in development and will be available upon the next major release of Groundhogg.', 'groundhogg' ); ?>
-    </p>
-</div>
+$broadcast = new WPGH_Broadcast( $id );
+
+if ( $broadcast->status !== 'sent' ):
+
+    _e( 'Stats will show once the broadcast has been sent.', 'groundhogg' );
+
+else:
+
+    ?>
+<h2><?php _e( 'Stats', 'groundhogg'  ); ?></h2>
+<table class="form-table">
+
+    <tbody>
+
+    <tr>
+        <th><?php _e( 'Total Delivered', 'groundhogg' ); ?></th>
+        <td><?php
+
+            $contact_sum = WPGH()->events->count( array(
+                'funnel_id'     => WPGH_BROADCAST,
+                'step_id'       => $broadcast->ID
+            ) );
+
+            echo sprintf( "<strong><a href='%s' target='_blank' >%d</a></strong></strong>",
+                admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 0, time() ) ),
+                $contact_sum
+            );
+
+            ?></td>
+    </tr>
+    <tr>
+        <th><?php _e( 'Opens', 'groundhogg' ); ?></th>
+        <td><?php
+
+            $opens = WPGH()->activity->count( array(
+                'funnel_id'     => WPGH_BROADCAST,
+                'step_id'       => $broadcast->ID,
+                'activity_type' => 'email_opened'
+            ) );
+
+            echo sprintf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
+                admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
+                $opens,
+                ( $opens / $contact_sum ) * 100
+            );
+
+            ?></td>
+    </tr>
+    <tr>
+        <th><?php _e( 'Clicks', 'groundhogg' ); ?></th>
+        <td><?php
+            $clicks = WPGH()->activity->count( array(
+                'funnel_id'     => WPGH_BROADCAST,
+                'step_id'       => $broadcast->ID,
+                'activity_type' => 'email_link_click'
+            ) );
+
+            echo sprintf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
+                admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) ),
+                $clicks,
+                ( $clicks / $contact_sum ) * 100
+            );
+
+            ?></td>
+    </tr>
+    <tr>
+        <th><?php _e( 'Click Through Rate', 'groundhogg' ); ?></th>
+        <td><?php echo sprintf("<strong>%d%%</strong>", ( $clicks / $opens ) * 100 ); ?></td>
+    </tr>
+    <tr>
+        <th><?php _e( 'Unopened', 'groundhogg' ); ?></th>
+        <td><?php echo sprintf("<strong>%d (%d%%)</strong>", $contact_sum - $opens,  ( ( $contact_sum - $opens ) / $contact_sum ) * 100 ); ?></td>
+
+    </tr>
+
+    </tbody>
+
+</table>
+
+<h2><?php _e( 'Links Clicked', 'groundhogg'  ); ?></h2>
+<?php
+
+    $activity = WPGH()->activity->get_activity( array(
+        'funnel_id'     => WPGH_BROADCAST,
+        'step_id'       => $broadcast->ID,
+        'activity_type' => 'email_link_click'
+    ) );
+
+
+    $links = array();
+
+    foreach ( $activity as $event ){
+
+        if ( isset( $links[ $event->referer ] ) ){
+            $links[ $event->referer ] += 1;
+        } else {
+            $links[ $event->referer ] = 1;
+        }
+
+    }
+
+    ?>
+    <table class="wp-list-table widefat fixed striped" style="max-width: 700px;">
+    <thead>
+        <tr>
+            <th><?php _e( 'Link' ); ?></th>
+            <th><?php _e( 'Clicks' ); ?></th>
+        </tr>
+    </thead><tbody><?php
+
+    if ( empty( $links ) ){
+
+        ?>
+        <tr>
+            <td colspan="2"><?php _e( 'No Links Clicked...', 'groundhogg' ); ?></td>
+        </tr>
+        <?php
+
+    }
+
+    foreach ( $links as $link => $clicks ):
+    ?>
+    <tr>
+        <td><?php echo sprintf( "<a href='%s' target='_blank' >%s</a>", $link, $link ) ?></td>
+        <td><?php echo sprintf( "<a href='%s' target='_blank' >%d</a>", admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&referer=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', $link, 0, time() ) ), $clicks ); ?></td>
+    </tr>
+    <?php
+    endforeach;
+    ?></tbody></table><?php
+endif; ?>
+

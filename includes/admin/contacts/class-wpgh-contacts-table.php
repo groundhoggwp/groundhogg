@@ -268,6 +268,11 @@ class WPGH_Contacts_Table extends WP_List_Table {
             $query[ 'owner' ] = get_current_user_id();
         }
 
+        $query[ 'optin_status' ] = array(
+            WPGH_CONFIRMED,
+            WPGH_UNCONFIRMED
+        );
+
         switch ( $this->get_view() )
         {
             case 'optin_status':
@@ -354,6 +359,9 @@ class WPGH_Contacts_Table extends WP_List_Table {
                 }
                 if ( isset( $_REQUEST['funnel'] ) ){
                     $report[ 'funnel' ] = intval ( $_REQUEST['funnel'] );
+                }
+                if ( isset( $_REQUEST['referer'] ) ){
+                    $report[ 'referer' ] = urldecode( $_REQUEST['referer'] );
                 }
                 if ( isset(  $_REQUEST['step'] ) ){
                     $report[ 'step' ] = intval ( $_REQUEST['step'] );

@@ -146,6 +146,7 @@ function wpgh_run_install() {
         WPGH()->funnels->update( $funnel_id, array( 'status' => 'active' ) );
         $forms = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_type' => 'form_fill' ) );
         $form = array_shift( $forms );
+        WPGH()->step_meta->update_meta( $form->ID, 'form', '[email_preferences][submit]Change Preferences[/submit]' );
     }
 
     if ( ! wpgh_get_option( 'gh_confirmation_page', false ) ){
