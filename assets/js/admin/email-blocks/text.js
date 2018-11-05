@@ -88,7 +88,7 @@ var wpghTextBlock;
             $actionBAr.width( $( '#email-body' ).width() );
             $actionBAr.css( 'top', $( '#editor' ).offset().top - 32 );
 
-            if ( window.pageYOffset > $( '#editor' ).offset().top ){
+            if ( window.pageYOffset > $( '#editor' ).offset().top - 80 ){
                 $actionBAr.css( 'position', 'fixed' );
                 $actionBAr.css( 'top', '78px');
             } else {

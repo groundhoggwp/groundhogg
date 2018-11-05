@@ -111,6 +111,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * Added WPGH_Form instance to wpgh_form_code filter
 * Added Columns and Rows to the Funnel Form Editor
 * Added base class CSS for frontend forms
+* Fixed text editor bar is now sticky when scrolling.
 
 = 1.0.1 =
 * Changed to a vastly superior layout in the funnel editor.
