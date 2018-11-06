@@ -319,6 +319,37 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
                 </div>
             </td>
         </tr>
+        <tr>
+            <th><?php _e( 'Add To Funnel' ); ?></th>
+            <td><div style="max-width: 400px">
+                    <?php
+
+                    $steps = WPGH()->steps->get_steps( array( 'step_group' => 'action' ) );
+                    $options = array();
+                    foreach ( $steps as $step ){
+                        $step = new WPGH_Step( $step->ID );
+                        if ($step->is_active() ){
+                            $funnel_name = WPGH()->funnels->get_column_by( 'title', 'ID', $step->funnel_id );
+                            $options[ $funnel_name ][ $step->ID ] = sprintf( "%d. %s (%s)", $step->order, $step->title, str_replace( '_', ' ', $step->type ) );
+                        }
+                    }
+
+//                    sort( $options );
+
+                    echo WPGH()->html->select2( array(
+                        'name'              => 'add_contacts_to_funnel_step_picker',
+                        'id'                => 'add_contacts_to_funnel_step_picker',
+                        'data'              => $options,
+                        'multiple'          => false,
+                    ) );
+
+                    ?>
+                    <div class="row-actions">
+                        <button type="submit" name="start_funnel" value="start" class="button"><?php _e( 'Start' ); ?></button>
+                    </div>
+                </div>
+            </td>
+        </tr>
     </table>
 
     <!-- META -->

@@ -529,6 +529,14 @@ class WPGH_Contacts_Page
             }
         }
 
+        if ( isset( $_POST[ 'start_funnel' ] ) && isset( $_POST[ 'add_contacts_to_funnel_step_picker' ] ) && current_user_can( 'edit_contacts' ) ){
+
+            $step = new WPGH_Step( intval( $_POST[ 'add_contacts_to_funnel_step_picker' ] ) );
+            if ( $step->enqueue( $contact ) ){
+                $this->notices->add( 'started', __( "Contact added to funnel.", 'groundhogg' ), 'info' );
+            }
+        }
+
         $this->notices->add( 'update', __( "Contact updated!", 'groundhogg' ), 'success' );
 
         do_action( 'wpgh_admin_update_contact_after', $id );

@@ -104,7 +104,10 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                                         $steps = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_group' => 'action' ) );
                                         $options = array();
                                         foreach ( $steps as $step ){
-                                            $options[ $step->ID ] = $step->step_title . ' (' . str_replace( '_', ' ', $step->step_type ) . ')';
+                                            $step = new WPGH_Step( $step->ID );
+                                            if ($step->is_active() ){
+                                                $options[ $step->ID ] = $step->title . ' (' . str_replace( '_', ' ', $step->type ) . ')';
+                                            }
                                         }
 
                                         echo WPGH()->html->select2( array(

@@ -363,7 +363,7 @@ class WPGH_HTML
 
         if ( ! empty( $a[ 'data' ] ) && is_array( $a[ 'data' ] ) )
         {
-            $options = array_map( 'trim', $a[ 'data' ] );
+            $options = $a[ 'data' ];
 
             $optionHTML .= sprintf(
                 "<option value=''>%s</option>",
@@ -372,14 +372,39 @@ class WPGH_HTML
 
             foreach ( $options as $value => $name ){
 
-                $selected = ( in_array( $value, $a[ 'selected' ] ) ) ? 'selected' : '';
+                /* Include optgroup support */
+                if ( is_array( $name ) ){
 
-                $optionHTML .= sprintf(
-                    "<option value='%s' %s>%s</option>",
-                    esc_attr( $value ),
-                    $selected,
-                    sanitize_text_field( $name )
-                );
+                    /* Redefine */
+                    $inner_options = $name;
+                    $label = $value;
+
+                    $optionHTML .= sprintf( "<optgroup label='%s'>", $label );
+
+                    foreach ( $inner_options as $inner_value => $inner_name ){
+
+                        $selected = ( in_array( $inner_value, $a[ 'selected' ] ) ) ? 'selected' : '';
+
+                        $optionHTML .= sprintf(
+                            "<option value='%s' %s>%s</option>",
+                            esc_attr( $inner_value ),
+                            $selected,
+                            sanitize_text_field( $inner_name )
+                        );
+                    }
+
+                    $optionHTML .= "</optgroup>";
+
+                } else {
+                    $selected = ( in_array( $value, $a[ 'selected' ] ) ) ? 'selected' : '';
+
+                    $optionHTML .= sprintf(
+                        "<option value='%s' %s>%s</option>",
+                        esc_attr( $value ),
+                        $selected,
+                        sanitize_text_field( $name )
+                    );
+                }
 
             }
 
