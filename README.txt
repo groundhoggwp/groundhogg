@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.4 =
+* If a label is not present in a custom text field then use the placeholder as that is the next likely place.
+
 = 1.0.3 =
 * Changed WPGH_Contact_Query can now accept optin_status as an array of status options.
 * Added the broadcast reporting view

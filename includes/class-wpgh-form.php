@@ -201,11 +201,12 @@ class WPGH_Form
         ), $atts );
 
         if ( empty( $a[ 'name' ] ) ){
-            $a[ 'name' ] = sanitize_key( $a[ 'label' ] );
+
+            $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
         }
 
         if ( empty( $a[ 'id' ] ) ){
-            $a[ 'id' ] = sanitize_key( $a[ 'label' ] );
+            $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
         }
 
         $this->fields[] = $a[ 'name' ];
@@ -459,11 +460,11 @@ class WPGH_Form
         ), $atts );
 
         if ( empty( $a[ 'name' ] ) ){
-            $a[ 'name' ] = sanitize_key( $a[ 'label' ] );
+            $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
         }
 
         if ( empty( $a[ 'id' ] ) ){
-            $a[ 'id' ] = sanitize_key( $a[ 'label' ] );
+            $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
         }
 
         $this->fields[] = $a[ 'name' ];
@@ -547,11 +548,11 @@ class WPGH_Form
         ), $atts );
 
         if ( empty( $a[ 'name' ] ) ){
-            $a[ 'name' ] = sanitize_key( $a[ 'label' ] );
+            $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'default' ] );
         }
 
         if ( empty( $a[ 'id' ] ) ){
-            $a[ 'id' ] = sanitize_key( $a[ 'label' ] );
+            $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'default' ] );
         }
 
         $this->fields[] = $a[ 'name' ];
@@ -636,7 +637,7 @@ class WPGH_Form
 
                 $value = is_string( $i ) ? $i : $option;
 
-                $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s> %s</label></div>",
+                $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label class='gh-radio-label'><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s> %s</label></div>",
                     esc_attr( $a[ 'class' ] ),
                     esc_attr( $a[ 'name' ] ),
                     esc_attr( $a[ 'id' ] ) . '-' . $i,
