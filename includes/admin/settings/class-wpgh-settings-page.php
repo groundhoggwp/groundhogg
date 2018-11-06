@@ -18,6 +18,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class WPGH_Settings_Page
 {
 
+    /**
+     * @var WPGH_Bulk_Contact_Manager
+     */
+    private $importer;
+
 	public function __construct()
     {
 
@@ -38,6 +43,11 @@ class WPGH_Settings_Page
             add_action( 'admin_init', array( $this, 'perform_tools' ) );
 
         }
+
+        if ( ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) || wp_doing_ajax() ){
+            $this->importer = new WPGH_Bulk_Contact_Manager();
+        }
+
     }
 
     /* Register the page */
@@ -178,9 +188,12 @@ class WPGH_Settings_Page
                                     $tag_args[ 'id' ] = 'import_tags';
                                     $tag_args[ 'name' ] = 'import_tags[]'; ?>
                                     <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
-                                    <div><span class="import-status"></span></div>
+                                    <div class="import-status-wrapper"><p><strong><span class="import-status"></span></strong></p></div>
                                     <p class="description"><?php _e( 'These tags will be applied to the contacts upon importing.', 'groundhogg' ); ?></p>
-                                    <button class="import button button-primary" id="import" type="button"><?php _e( 'Import Contacts' ); ?></button>
+                                    <p class="submit">
+                                        <button style="float: left" class="import button button-primary" id="import" type="button"><?php _e( 'Import Contacts' ); ?></button>
+                                        <span class="spinner spinner-import" style="float: left"></span>
+                                    </p>
                                 </div>
                             </div>
                             <!-- End Import Tool -->
@@ -195,7 +208,26 @@ class WPGH_Settings_Page
                                     $tag_args[ 'name' ] = 'export_tags[]';?>
                                     <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
                                     <p class="description"><?php _e( 'Contacts with these tags will be exported. Leave blank to export ALL contacts.', 'groundhogg' ); ?></p>
-                                    <button class="export button button-primary" id="export" type="button"><?php _e( 'Export Contacts' ); ?></button>
+                                    <p class="submit">
+                                    <button style="float: left" class="export button button-primary" id="export" type="button"><?php _e( 'Export Contacts' ); ?></button>
+                                    <span class="spinner spinner-export" style="float: left"></span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="postbox">
+                                <h2 class="hndle"><?php _e( 'Bulk Delete Contacts', 'groundhogg' ); ?></h2>
+                                <div class="inside">
+                                    <p class="description"><?php _e( 'Bulk delete contacts.', 'groundhogg' ); ?></p>
+                                    <?php $tag_args = array();
+                                    $tag_args[ 'id' ] = 'delete_tags';
+                                    $tag_args[ 'name' ] = 'delete_tags[]';?>
+                                    <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
+                                    <p class="description"><?php _e( 'Contacts with these tags will be delete. Leave blank to delete ALL contacts.', 'groundhogg' ); ?></p>
+                                    <p class="submit">
+                                    <button style="float: left" class="delete button button-primary" id="delete" type="button"><?php _e( 'Delete Contacts' ); ?></button>
+                                    <span class="spinner spinner-delete" style="float: left"></span>
+                                    </p>
                                 </div>
                             </div>
                             <!-- End Export Tool -->

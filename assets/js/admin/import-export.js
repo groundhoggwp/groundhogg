@@ -22,6 +22,9 @@ var wpghImportExport;
                 wpghImportExport.export();
             } );
 
+            $( '.delete' ).on( 'click', function () {
+                wpghImportExport.bulkDelete();
+            } );
 
             this.status = $( '.import-status' );
 
@@ -42,23 +45,12 @@ var wpghImportExport;
                         console.log("This file done:", file, results);
                         wpghImportExport.allRows = results.data.length;
                         wpghImportExport.results = results.data;
+                        wpghImportExport.completedRows = 0;
                     }
-                },
-                before: function(file, inputElem)
-                {
-                    // executed before parsing each file begins;
-                    // what you return here controls the flow
-                },
-                error: function(err, file, inputElem, reason)
-                {
-                    // executed if an error occurs while loading the file,
-                    // or if before callback aborted for some reason
                 },
                 complete: function()
                 {
                     wpghImportExport.import();
-
-                    alert( 'Import Complete! Imported ' + wpghImportExport.allRows + ' contacts!' );
                 }
             });
         },
@@ -68,20 +60,15 @@ var wpghImportExport;
          */
         import: function() {
 
+            var $spinner = $( '.spinner-import' );
+            $spinner.css( 'visibility', 'visible' );
             while ( this.results.length > 0 ){
-
                 var end = 50;
                 if ( this.results.length < 50 ){
                     end  = this.results.length;
                 }
-
                 var toImport = this.results.splice( 0, end );
-
                 this.send( toImport );
-
-                this.completedRows += end;
-                this.updateStatus();
-
             }
 
         },
@@ -98,26 +85,42 @@ var wpghImportExport;
             $.ajax({
                 type: "post",
                 url: ajaxurl,
-                data: { action: 'wpgh_import_contacts', data: data, tags: tags }
+                dataType: 'json',
+                data: { action: 'wpgh_import_contacts', data: data, tags: tags },
+                success: function( response ){
+                    if ( typeof response.contacts !== "undefined" ){
+
+                        wpghImportExport.completedRows += response.contacts;
+                        wpghImportExport.updateStatus();
+
+                    }
+                }
             });
 
         },
 
         updateStatus: function () {
 
-            var p = Math.ceil( this.completedRows / this.allRows ) * 100;
+            var p = Math.ceil( ( this.completedRows / this.allRows )  * 100 );
             this.status.html( 'Status: ' + p + '%' );
             console.log( 'Status: ' + p + '%' );
+
+            if ( p >= 100 ){
+                var $spinner = $( '.spinner-import' );
+                $spinner.css( 'visibility', 'hidden' );
+            }
+
         },
         
         export: function() {
-
             var tags = $( '#export_tags' ).val();
             this.retrieve( tags );
 
         },
         
         retrieve: function ( tags ) {
+            var $spinner = $( '.spinner-export' );
+            $spinner.css( 'visibility', 'visible' );
             $.ajax({
                 type: "post",
                 url: ajaxurl,
@@ -134,6 +137,7 @@ var wpghImportExport;
                     } );
 
                     wpghImportExport.makeFile( CSV );
+                    $spinner.css( 'visibility', 'hidden' );
                 }
             });
         },
@@ -155,6 +159,22 @@ var wpghImportExport;
             element.click();
 
             document.body.removeChild(element);
+        },
+
+        bulkDelete : function () {
+            var tags = $( '#delete_tags' ).val();
+            var $spinner = $( '.spinner-delete' );
+            $spinner.css( 'visibility', 'visible' );
+            $.ajax({
+                type: "post",
+                url: ajaxurl,
+                data: { action: 'wpgh_bulk_delete_contacts', tags: tags },
+                success: function ( msg ) {
+                    alert( msg );
+                    $("#delete_tags").val('').change();
+                    $spinner.css( 'visibility', 'hidden' );
+                }
+            });
         }
 
     };

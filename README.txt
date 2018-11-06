@@ -111,8 +111,14 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * If a label is not present in a custom text field then use the placeholder as that is the next likely place.
 * Added Popup modal from Styling extension to core instead.
 * Added ability to add contacts to a funnel via the edit funnel UI.
-* Added mailto: option in List-Unsubscribe header.
-
+* Added ability to add contact to a funnel via the edit contact UI.
+* Added "mailto" option in List-Unsubscribe header.
+* Added "Import Y-m-d H:i:s" added to contacts when imported.
+* Added spinners next to import/export buttons.
+* Added BULK delete by tag to the tools.
+* Changed class WPGH_Impoter to WPGH_Bulk_Contact_Manager
+* Fixed import status showing 100% when actually not done.
+* Fixed import/export js loading on every page, no only loads on tools page
 
 = 1.0.3 =
 * Changed WPGH_Contact_Query can now accept optin_status as an array of status options.

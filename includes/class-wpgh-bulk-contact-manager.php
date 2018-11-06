@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Importer
+class WPGH_Bulk_Contact_Manager
 {
 
     /**
@@ -22,6 +22,19 @@ class WPGH_Importer
      */
     public $db;
 
+    /**
+     * The time of importing.
+     *
+     * @var int
+     */
+    public $import_time;
+
+    /**
+     * The tag for the given import.
+     *
+     * @var int
+     */
+    public $import_tag;
 
     public function __construct()
     {
@@ -30,6 +43,7 @@ class WPGH_Importer
 
         add_action( 'wp_ajax_wpgh_import_contacts', array( $this, 'import' ) );
         add_action( 'wp_ajax_wpgh_export_contacts', array( $this, 'export' ) );
+        add_action( 'wp_ajax_wpgh_bulk_delete_contacts', array( $this, 'delete' ) );
 
         if ( did_action( 'admin_enqueue_scripts' ) ){
             $this->scripts();
@@ -42,7 +56,7 @@ class WPGH_Importer
     public function scripts()
     {
         wp_enqueue_script( 'papaparse', WPGH_ASSETS_FOLDER . 'lib/papa-parse/papaparse.js' );
-        wp_enqueue_script( 'wpgh-import-export', WPGH_ASSETS_FOLDER . 'js/admin/import-export.js' );
+        wp_enqueue_script( 'wpgh-import-export', WPGH_ASSETS_FOLDER . 'js/admin/import-export.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/import-export.js' ) );
         //wp_die( 'scripts' );
     }
 
@@ -76,6 +90,41 @@ class WPGH_Importer
 
     }
 
+    /**
+     * Bulk delete contacts
+     */
+    public function delete()
+    {
+
+        global $wpdb;
+
+        if ( ! current_user_can( 'delete_contacts' ) )
+            wp_die( 'You cannot manage contacts.' );
+
+        if ( empty( $_POST[ 'tags' ] ) ){
+
+            wp_die( __( 'Please select at least 1 tag.', 'groundhogg' ) );
+
+        } else {
+
+            $tags = WPGH()->tags->validate( $_POST[ 'tags' ] );
+
+            $query = new WPGH_Contact_Query();
+
+            $contacts = $query->query(array(
+                'tags_include' => $tags
+            ));
+
+            foreach ( $contacts as $contact ){
+                WPGH()->contacts->delete( $contact->ID );
+            }
+
+        }
+
+        wp_die( sprintf( __( 'Deleted %d Contacts.', 'groundhogg' ), count( $contacts )  ));
+
+    }
+
     public function import()
     {
 
@@ -85,12 +134,29 @@ class WPGH_Importer
         $contacts = $_POST[ 'data' ];
 
         //wp_die( json_encode( $contacts ) );
+        if ( get_transient( 'wpgh_import_tag' ) ){
+            $this->import_tag = get_transient( 'wpgh_import_tag' );
+        } else {
+            $this->import_time = time();
+            $this->import_tag = WPGH()->tags->add( array(
+                'tag_name' => sprintf( '%s %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s', $this->import_time ) ),
+            ) );
+            set_transient( 'wpgh_import_tag', $this->import_tag, MINUTE_IN_SECONDS );
+        }
+
+        $contact_count = 0;
 
         foreach ( $contacts as $contact ){
             $contact = $this->generate( $contact );
+
+            if ( $contact && $contact->exists() ){
+                $contact->add_tag( $this->import_tag );
+                $contact_count += 1;
+            }
+            /* Add a tag to the contact to find post import. */
         }
 
-        wp_die( 'Finished.' );
+        wp_die( json_encode( array( 'contacts' => $contact_count ) ) );
 
     }
 
@@ -158,8 +224,8 @@ class WPGH_Importer
         /* handle tags from the tag form. */
         if ( isset( $_POST[ 'tags' ] ) ){
 //            $tags = explode( ',',  $args[ 'tags' ]  );
-            $tags = array_map( 'intval', $_POST[ 'tags' ] );
-            $tags = WPGH()->tags->validate( $tags );
+//            $tags = array_map( 'intval', $_POST[ 'tags' ] );
+            $tags = WPGH()->tags->validate( $_POST[ 'tags' ] );
             $contact->add_tag( $tags );
         }
 

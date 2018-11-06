@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 1.0.3
+Version: 1.0.4
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.0.3';
+        public $version = '1.0.4';
 
         /**
          * @var $instance Groundhogg instance
@@ -81,7 +81,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $email_meta;
 
         /**
-         * @var WPGH_Importer
+         * @var WPGH_Bulk_Contact_Manager
          */
         public $importer;
 
@@ -270,7 +270,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
 //                    self::$instance->tokens_section       = new WPGH_User_Token_Section();
-                    self::$instance->importer   = new WPGH_Importer();
+//                    self::$instance->importer   = new WPGH_Importer();
 
                     if ( is_multisite() ){
                         self::$instance->network_options = new WPGH_Network_Settings_Page();
@@ -371,7 +371,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             /* Admin Files */
             if ( is_admin() ){
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-menu.php';
-                require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-importer.php';
+                require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-bulk-contact-manager.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
 //                require_once WPGH_PLUGIN_DIR . 'includes/admin/user/class-wpgh-user-tokens-section.php';
 
