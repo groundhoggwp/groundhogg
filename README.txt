@@ -119,6 +119,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * Changed class WPGH_Impoter to WPGH_Bulk_Contact_Manager
 * Fixed import status showing 100% when actually not done.
 * Fixed import/export js loading on every page, no only loads on tools page
+* Fixed superlinks not redirecting on multisite.
 
 = 1.0.3 =
 * Changed WPGH_Contact_Query can now accept optin_status as an array of status options.

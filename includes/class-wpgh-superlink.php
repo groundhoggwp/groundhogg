@@ -49,7 +49,7 @@ class WPGH_Superlink
      */
     function __construct() {
 
-        if ( strpos( $_SERVER['REQUEST_URI'], '/superlinks/link/' ) === false ) {
+        if ( strpos( $_SERVER['REQUEST_URI'], 'superlinks/link' ) === false ) {
             return;
         }
 
@@ -60,7 +60,7 @@ class WPGH_Superlink
 
     public function setup()
     {
-        $link_path  = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+        $link_path  = untrailingslashit( parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
         $link_parts = explode( '/', $link_path );
         $this->ID   = intval( $link_parts[ count( $link_parts ) - 1 ] );
 
