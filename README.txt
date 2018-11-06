@@ -1,6 +1,6 @@
 === Groundhogg ===
 Contributors: trainingbusinesspros, groundhogg, dhrumit
-Tags: marketing, email, contacts, contact, CRM, marketing automation, email automation, funnels, marketing funnels, marketing campaigns, campaigns
+Tags: marketing, email, contacts, contact, CRM, marketing automation, email automation, funnels, marketing funnels, marketing campaigns, campaigns, broadcast, contacts, contact management
 Donate link: https://groundhogg.io
 Requires at least: 4.9
 Tested up to: 4.9.8
@@ -109,6 +109,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.0.4 =
 * If a label is not present in a custom text field then use the placeholder as that is the next likely place.
+* Added Popup modal from Styling extension to core instead.
+* Added ability to add contacts to a funnel via the edit funnel UI.
+* Added mailto: option in List-Unsubscribe header.
+
 
 = 1.0.3 =
 * Changed WPGH_Contact_Query can now accept optin_status as an array of status options.

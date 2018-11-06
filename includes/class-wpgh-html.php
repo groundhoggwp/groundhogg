@@ -661,6 +661,7 @@ class WPGH_HTML
 			'multiple'          => true,
 			'placeholder'       => __( 'Please Select 1 or more Benchmarks', 'groundhogg' ),
 			'tags'              => false,
+            'include_actions'   => false,
 		) );
 
 		foreach ( $a[ 'selected' ] as $benchmark_id ){
@@ -673,6 +674,12 @@ class WPGH_HTML
 			}
 
 		}
+
+		if ( $a[ 'include_actions' ] ){
+
+		    $a[ 'attributes' ] = " data-actions='include'";
+
+        }
 
 		return $this->select2( $a );
 	}

@@ -66,6 +66,66 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                 </div>
             </div>
             <div class="status-options">
+                <div id="add-contacts">
+                    <a title="<?php _e( 'Add Contacts', 'groundhogg' ); ?>" href="#source=add-contact-modal&footer=false" class="button trigger-popup"><?php _e( 'Add Contacts', 'groundhogg' ) ?></a>
+<!--                    <div class="hidden" id="add-contact-modal" style="">-->
+                    <div class="hidden" id="add-contact-modal" style="display: none;">
+                        <div>
+                            <div class="add-contacts-response hidden"></div>
+                            <table class="add-contact-form" style="width: 100%;">
+                                <tbody>
+                                <tr>
+                                    <th>
+                                        <?php _e( 'Select contacts to add into funnel:', 'groundhogg' ); ?>
+                                    </th>
+
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <?php
+
+                                        echo WPGH()->html->tag_picker( array(
+                                            'name'  => 'add_contacts_to_funnel_tag_picker[]',
+                                            'id'    => 'add_contacts_to_funnel_tag_picker',
+                                        ) );
+
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <?php _e( 'Select where to start:', 'groundhogg' ); ?>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <?php
+
+                                        $steps = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_group' => 'action' ) );
+                                        $options = array();
+                                        foreach ( $steps as $step ){
+                                            $options[ $step->ID ] = $step->step_title . ' (' . str_replace( '_', ' ', $step->step_type ) . ')';
+                                        }
+
+                                        echo WPGH()->html->select2( array(
+                                            'name'              => 'add_contacts_to_funnel_step_picker',
+                                            'id'                => 'add_contacts_to_funnel_step_picker',
+                                            'data'              => $options,
+                                            'multiple'          => false,
+                                        ) );
+
+                                        ?>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="submit">
+                            <button type="button" id="add-contacts-button" class="button button-primary" style="float: left"><?php _e( 'Add Contacts' ); ?></button>
+                            <span class="spinner" style="float: left"></span>
+                        </p>
+                    </div>
+                </div>
                 <div id="export">
                     <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _e( 'Export Funnel', 'groundhogg'); ?></a>
                 </div>

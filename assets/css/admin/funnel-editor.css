@@ -307,3 +307,12 @@
     padding: 10px 20px;
     border-radius: 5px;
 }
+
+.add-contact-form{
+    width: 100%;
+    margin-top: 30px;
+}
+
+.add-contact-form td {
+    padding-bottom: 30px;
+}

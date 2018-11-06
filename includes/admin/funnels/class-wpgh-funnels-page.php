@@ -38,6 +38,11 @@ class WPGH_Funnels_Page
      */
     public $reporting_enabled = false;
 
+    /**
+     * @var WPGH_Popup
+     */
+    public $popup;
+
 
     function __construct()
 	{
@@ -49,6 +54,7 @@ class WPGH_Funnels_Page
             add_action( 'wp_ajax_wpgh_get_step_html', array( $this, 'add_step' ) );
             add_action( 'wp_ajax_wpgh_delete_funnel_step',  array( $this, 'delete_step' ) );
             add_action( 'wp_ajax_wpgh_duplicate_funnel_step',  array( $this, 'duplicate_step' ) );
+            add_action( 'wp_ajax_gh_add_contacts_to_funnel',  array( $this, 'add_contacts_to_funnel' ) );
         }
 
 		$this->notices = WPGH()->notices;
@@ -59,6 +65,14 @@ class WPGH_Funnels_Page
 
 			add_action( 'init' , array( $this, 'process_action' )  );
 			add_action( 'admin_enqueue_scripts' , array( $this, 'scripts' )  );
+
+
+			if ( $this->get_action() === 'edit' ){
+
+			    /* just need to enqueue it... */
+			    $this->popup = new WPGH_Popup();
+
+            }
 		}
 	}
 
@@ -820,6 +834,42 @@ class WPGH_Funnels_Page
         $stepid = absint( intval( $_POST['step_id'] ) );
 
         wp_die( WPGH()->steps->delete( $stepid ) );
+    }
+
+    /**
+     * Quickly add contacts to a funnel VIQ the funnel editor UI
+     */
+    public function add_contacts_to_funnel()
+    {
+
+        if ( ! current_user_can( 'edit_contacts' ) ){
+            wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+        }
+
+        $tags = array_map( 'intval', $_POST[ 'tags' ] );
+
+        $query = new WPGH_Contact_Query();
+        $contacts = $query->query( array( 'tags_include'  => $tags ) );
+
+        $step = new WPGH_Step( intval( $_POST[ 'step' ] ) );
+
+        foreach ( $contacts as $contact ){
+
+            $contact = new WPGH_Contact( $contact->ID );
+            $step->enqueue( $contact );
+
+        }
+
+        $this->notices->add( 'contacts-added', sprintf( __( '%d contacts added to funnel!', 'groundhogg' ), count( $contacts ) ), 'success' );
+
+        ob_start();
+
+        $this->notices->notices();
+
+        $content = ob_get_clean();
+
+        wp_die( $content );
+
     }
 
     /**

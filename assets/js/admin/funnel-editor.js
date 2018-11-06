@@ -50,6 +50,10 @@ var wpghFunnelEditor;
                 wpghFunnelEditor.editorSizing();
             });
 
+            $( '#add-contacts-button' ).click( function(){
+                wpghFunnelEditor.addContacts();
+            });
+
 
         },
 
@@ -268,6 +272,43 @@ var wpghFunnelEditor;
                 }
             });
         },
+
+        addContacts: function () {
+
+            var tags    = $( '#add_contacts_to_funnel_tag_picker' ).val();
+
+            if ( ! tags ){
+
+                alert( 'Please select at least 1 tag.' );
+                return;
+
+            }
+
+            var stepId = $( '#add_contacts_to_funnel_step_picker' ).val();
+
+            if ( ! stepId ){
+
+                alert( 'Please select at funnel step.' );
+                return;
+
+            }
+
+            $('.spinner').css('visibility','visible');
+
+            var ajaxCall = $.ajax({
+                type: "post",
+                url: ajaxurl,
+                data: { action: 'gh_add_contacts_to_funnel', tags: tags, step: stepId },
+                success: function ( response ) {
+                    $( '.spinner' ).css( 'visibility','hidden' );
+                    $( '.add-contacts-response' ).html( response );
+                    $( '.add-contacts-response' ).removeClass( 'hidden' );
+                    wpghFunnelEditor.makeDismissible();
+                }
+            });
+
+        }
+
     };
     $(function(){wpghFunnelEditor.init();})
 })( jQuery );

@@ -97,3 +97,6 @@ jQuery( function () {
 jQuery( document ).on( 'wpghAddedStep', function () {
     wpgh.init()
 } );
+// jQuery( document ).on( 'wpghModalContentPulled', function () {
+//     wpgh.init()
+// } );

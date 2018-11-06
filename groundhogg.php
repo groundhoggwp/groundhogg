@@ -401,6 +401,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-superlink.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-template-loader.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-tracking.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-popup.php';
 
             require_once WPGH_PLUGIN_DIR . 'includes/functions.php';
             require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
