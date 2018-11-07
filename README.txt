@@ -108,8 +108,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.0.5 =
-* Changed WP_Popup to be a singleton class. Enqueue with wpgh_enqueue_modal();
-* Added WP_Popup support for source from URLS. Use #source=https://myurl.com
+* Changed WP_Popup to be a singleton class. Enqueue with wpgh_enqueue_modal(); Calling new WPGH_Popup() will throw an error.
+* Added WP_Popup support for source from URLS. Use #source=<?php urlencode( 'https://mysite.com' ) ?>
 * Added WP_Popup support for width and height from init href. Use #source=id&width=400&height=500
 * Fixed links which trigger the popup now prevent default behaviour
 * Changed editing emails in funnels to open up the modal with an iFrame of he editing screen rather than opening up a new tab for better UX.
