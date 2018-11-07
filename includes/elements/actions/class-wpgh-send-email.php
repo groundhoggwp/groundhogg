@@ -59,6 +59,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
         }
 
         $return_path = admin_url( 'admin.php?page=gh_emails&return_funnel=' . $step->funnel_id . '&return_step=' . $step->ID );
+        $basic_path = admin_url( 'admin.php?page=gh_emails' );
 
         ?>
         <table class="form-table">
@@ -77,10 +78,11 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                     echo WPGH()->html->dropdown_emails( $args ); ?>
                     <div class="row-actions">
                         <a
-                            class="editinline"
+                            class="editinline trigger-popup"
                             id="<?php echo $step->prefix( 'edit_email' ); ?>"
                             target="_blank"
-                            href="<?php echo $return_path . '&email=' . $email_id . '&action=edit' ;?>"
+                            title="<?php _e( 'Edit Email' ); ?>"
+                            href="#source=<?php echo urlencode( $basic_path . '&email=' . $email_id . '&action=edit' ) . '&&height=900&width=1500' ;?>"
                         ><?php esc_html_e( 'Edit Email', 'groundhogg' );?></a>
                         |
                         <a target="_blank" href="<?php echo $return_path . '&action=add' ;?>" ><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>

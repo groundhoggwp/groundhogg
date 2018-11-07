@@ -9,7 +9,12 @@
 class WPGH_Popup
 {
 
-	public function __construct() {
+    /**
+     * @var WPGH_Popup
+     */
+    public static $instance;
+
+	private function __construct() {
 
 		add_action( 'admin_footer', array( $this, 'popup' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
@@ -36,8 +41,10 @@ class WPGH_Popup
 					</button>
 				</div>
 			</div>
+            <div class="iframe-loader-wrapper hidden">
+                <div class="iframe-loader"></div>
+            </div>
 			<div class="popup-content">
-
 			</div>
 			<div class="popup-footer">
 				<button class="popup-save button button-primary" type="button"><?php _e( 'Save Changes' ); ?></button>
@@ -47,4 +54,20 @@ class WPGH_Popup
 
 	}
 
+	public static function instance()
+    {
+
+        if ( ! self::$instance instanceof WPGH_Popup ){
+            self::$instance = new WPGH_Popup();
+        }
+
+        return self::$instance;
+
+    }
+
+}
+
+function wpgh_enqueue_modal()
+{
+    return WPGH_Popup::instance();
 }

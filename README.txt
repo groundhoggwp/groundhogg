@@ -107,6 +107,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.5 =
+* Changed WP_Popup to be a singleton class. Enqueue with wpgh_enqueue_modal();
+* Added WP_Popup support for source from URLS. Use #source=https://myurl.com
+* Added WP_Popup support for width and height from init href. Use #source=id&width=400&height=500
+* Fixed links which trigger the popup now prevent default behaviour
+* Changed editing emails in funnels to open up the modal with an iFrame of he editing screen rather than opening up a new tab for better UX.
+
 = 1.0.4 =
 * If a label is not present in a custom text field then use the placeholder as that is the next likely place.
 * Added Popup modal from Styling extension to core instead.
@@ -116,7 +123,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * Added "Import Y-m-d H:i:s" added to contacts when imported.
 * Added spinners next to import/export buttons.
 * Added BULK delete by tag to the tools.
-* Changed class WPGH_Impoter to WPGH_Bulk_Contact_Manager
+* Changed class WPGH_Importer to WPGH_Bulk_Contact_Manager
 * Fixed import status showing 100% when actually not done.
 * Fixed import/export js loading on every page, no only loads on tools page
 * Fixed superlinks not redirecting on multisite.

@@ -86,14 +86,23 @@ var wpghTextBlock;
         placeActionBar: function(){
             var $actionBAr = $( '.simple-editor-actionbar' );
             $actionBAr.width( $( '#email-body' ).width() );
-            $actionBAr.css( 'top', $( '#editor' ).offset().top - 32 );
 
-            if ( window.pageYOffset > $( '#editor' ).offset().top - 80 ){
+            var offset;
+
+            if ( ! wpghEmailEditor.inFrame() ){
+                offset = 32;
+            } else {
+                offset = 0;
+            }
+
+            $actionBAr.css( 'top', $( '#editor' ).offset().top - offset );
+
+            if ( window.pageYOffset > $( '#editor' ).offset().top - ( 48 + offset ) ){
                 $actionBAr.css( 'position', 'fixed' );
-                $actionBAr.css( 'top', '78px');
+                $actionBAr.css( 'top',  ( 46 + offset ) + 'px');
             } else {
                 $actionBAr.css( 'position', 'absolute' );
-                $actionBAr.css( 'top', $( '#editor' ).offset().top - 32 );
+                $actionBAr.css( 'top', $( '#editor' ).offset().top - offset );
             }
         },
 

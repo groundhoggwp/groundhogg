@@ -40,6 +40,10 @@ var wpghFunnelEditor;
                 wpghFunnelEditor.save( e );
             });
 
+            $( '.popup-save ').on('click', function( e ){
+                wpghFunnelEditor.save( e );
+            });
+
             this.makeSortable();
             this.makeDraggable();
 

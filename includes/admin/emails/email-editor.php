@@ -44,7 +44,9 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
 
     <div class="header-wrap">
         <div class="funnel-editor-header">
-            <span id="title"><?php _e( 'Edit Email' ); ?></span><a class="button" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+            <div class="title-wrap">
+                <span id="title"><?php _e( 'Edit Email' ); ?></span><a class="button" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+            </div>
             <div class="status-options">
                 <div id="status">
                     <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">

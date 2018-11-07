@@ -70,7 +70,7 @@ class WPGH_Funnels_Page
 			if ( $this->get_action() === 'edit' ){
 
 			    /* just need to enqueue it... */
-			    $this->popup = new WPGH_Popup();
+			    $this->popup = wpgh_enqueue_modal();
 
             }
 		}
@@ -98,7 +98,7 @@ class WPGH_Funnels_Page
 //           wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
 
            wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/funnel-editor.css') );
-           wp_enqueue_script( 'funnel-editor', WPGH_ASSETS_FOLDER . '/js/admin/funnel-editor.js', filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/funnel-editor.js') );
+           wp_enqueue_script( 'funnel-editor', WPGH_ASSETS_FOLDER . '/js/admin/funnel-editor.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/funnel-editor.js') );
        }
     }
 
