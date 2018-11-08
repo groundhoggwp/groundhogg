@@ -533,3 +533,15 @@ function wpgh_get_current_user_roles()
     return $roles;
 
 }
+
+/**
+ * Simple function to get a contact
+ *
+ * @since 1.0.6
+ *
+ * @param $id_or_email string|int
+ * @return WPGH_Contact
+ */
+function wpgh_get_contact( $id_or_email ){
+    return new WPGH_Contact( $id_or_email );
+}

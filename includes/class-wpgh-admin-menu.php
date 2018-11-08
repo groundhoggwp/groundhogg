@@ -102,4 +102,22 @@ class WPGH_Admin_Menu
         require_once dirname( __FILE__ ). '/admin/welcome/class-wpgh-welcome-page.php';
     }
 
+    public function current_page()
+    {
+        if ( isset( $_GET['page'] ) ){
+            return $_GET['page'];
+        }
+
+        return false;
+    }
+
+    public function current_action()
+    {
+        if ( isset( $_GET['action'] ) ){
+            return $_GET['action'];
+        }
+
+        return false;
+    }
+
 }

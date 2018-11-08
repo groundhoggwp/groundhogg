@@ -107,6 +107,14 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.6 =
+* Added Funnel updates automatically when the modal closes.
+* Added Contacts which have unconfirmed emails will show as (Unconfirmed) int he table view
+* Added new wpgh_get_contact( $id_or_email ) function instead of new WPGH_Contact
+* Fixed removed console.log() calls.
+* Added form CSS to auto style some elements for compatibility with the from styling extension.
+* Changed the benchmark picker to be order by OPT GROUP and only include active steps.
+
 = 1.0.5 =
 * Changed WP_Popup to be a singleton class. Enqueue with wpgh_enqueue_modal(); Calling new WPGH_Popup() will throw an error.
 * Added WP_Popup support for source from URLS. Use #source=<?php urlencode( 'https://mysite.com' ) ?>

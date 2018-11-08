@@ -273,7 +273,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
             <?php foreach ( WPGH()->replacements->get_replacements() as $replacement ): ?>
                 <tr>
                     <td>
-                        <input style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}">
+                        <input style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}" readonly>
                     </td>
                     <td>
                         <span><?php echo $replacement[ 'description' ]; ?></span>

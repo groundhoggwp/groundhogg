@@ -654,14 +654,34 @@ class WPGH_HTML
 
 		foreach ( $data as $i => $step ) {
 
-			$json[] = array(
-				'id' => $step->ID,
-				'text' => $step->step_title . ' (' . str_replace( '_', ' ', $step->step_type ) . ')'
-			);
+            $step = new WPGH_Step( $step->ID );
+
+            if ( $step->is_active() ){
+
+                $funnel_name = WPGH()->funnels->get_column_by( 'title', 'ID', $step->funnel_id );
+
+                if ( isset( $json[ $funnel_name ] ) ){
+                    $json[ $funnel_name ][ 'children' ][] = array(
+                        'text' => sprintf( '%d. %s (%s)', $step->order, $step->title, str_replace( '_', ' ', $step->type ) ),
+                        'id'   => $step->ID
+                    );
+                } else {
+                    $json[ $funnel_name ] = array(
+                        'text' => $funnel_name,
+                        'children' => array(
+                            array(
+                                'text' => sprintf( '%d. %s (%s)', $step->order, $step->title, str_replace( '_', ' ', $step->type ) ),
+                                'id'   => $step->ID
+                            )
+                        )
+                    );
+                }
+
+            }
 
 		}
 
-		$results = array( 'results' => $json, 'more' => false );
+		$results = array( 'results' => array_values( $json ), 'more' => false );
 
 		wp_die( json_encode( $results ) );
 	}
@@ -686,25 +706,20 @@ class WPGH_HTML
 			'multiple'          => true,
 			'placeholder'       => __( 'Please Select 1 or more Benchmarks', 'groundhogg' ),
 			'tags'              => false,
-            'include_actions'   => false,
 		) );
+
+//		$data = array();
 
 		foreach ( $a[ 'selected' ] as $benchmark_id ){
 
-			if ( WPGH()->steps->exists( $benchmark_id ) ){
+		    $step = new WPGH_Step( $benchmark_id );
 
-				$step = new WPGH_Step( $benchmark_id );
-				$a[ 'data' ][ $benchmark_id ] = $step->title . ' (' . str_replace( '_', ' ', $step->type ) . ')';
-
+			if ( WPGH()->steps->exists( $benchmark_id ) && $step->is_active() ){
+                $funnel_name = WPGH()->funnels->get_column_by( 'title', 'ID', $step->funnel_id );
+                $a[ 'data' ][ $funnel_name ][ $step->ID ] = sprintf( "%d. %s (%s)", $step->order, $step->title, str_replace( '_', ' ', $step->type ) );
 			}
 
 		}
-
-		if ( $a[ 'include_actions' ] ){
-
-		    $a[ 'attributes' ] = " data-actions='include'";
-
-        }
 
 		return $this->select2( $a );
 	}

@@ -336,6 +336,8 @@ class WPGH_Submission
                 $this->leave( 'Please provide a valid email address' );
             }
 
+//            if ( strpos( $this->first_name, ' ' ) !== false )
+
             $args = array(
                 'email' => $email,
                 'first_name' => sanitize_text_field( $this->first_name ),

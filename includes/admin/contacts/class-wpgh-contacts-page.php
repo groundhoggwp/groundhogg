@@ -294,8 +294,9 @@ class WPGH_Contacts_Page
 
         set_transient( 'gh_last_action', $this->get_action(), 30 );
 
-        if ( $this->get_action() === 'edit' || $this->get_action() === 'add' )
-            return;
+        if ( $this->get_action() === 'edit' || $this->get_action() === 'add' ){
+            return true;
+        }
 
         $base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_contacts() ) ), $base_url );
 
@@ -540,7 +541,6 @@ class WPGH_Contacts_Page
         $this->notices->add( 'update', __( "Contact updated!", 'groundhogg' ), 'success' );
 
         do_action( 'wpgh_admin_update_contact_after', $id );
-
     }
 
     /**

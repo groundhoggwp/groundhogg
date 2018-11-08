@@ -1,11 +1,15 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Adrian
- * Date: 2018-11-03
- * Time: 5:10 PM
+ * Modal
+ *
+ * An alternative to thickbox. This provides an easy modal system to display contact over the screen.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 1.0.5
  */
-
 class WPGH_Popup
 {
 
@@ -67,6 +71,13 @@ class WPGH_Popup
 
 }
 
+/**
+ * Enqueues the modal scripts
+ *
+ * @return WPGH_Popup
+ *
+ * @since 1.0.5
+ */
 function wpgh_enqueue_modal()
 {
     return WPGH_Popup::instance();

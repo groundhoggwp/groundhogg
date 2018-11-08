@@ -324,7 +324,7 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
             <td><div style="max-width: 400px">
                     <?php
 
-                    $steps = WPGH()->steps->get_steps( array( 'step_group' => 'action' ) );
+                    $steps = WPGH()->steps->get_steps();
                     $options = array();
                     foreach ( $steps as $step ){
                         $step = new WPGH_Step( $step->ID );
@@ -440,7 +440,7 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
     <?php do_action( 'wpgh_contact_edit_after', $id ); ?>
     <div class="edit-contact-actions">
         <p class="submit">
-            <?php submit_button('Update Contact', 'primary', null, false ); ?>
+            <?php submit_button('Update Contact', 'primary', 'update', false ); ?>
             <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
         </p>
     </div>

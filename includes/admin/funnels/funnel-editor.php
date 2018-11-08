@@ -101,7 +101,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                                     <td>
                                         <?php
 
-                                        $steps = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_group' => 'action' ) );
+                                        $steps = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id ) );
                                         $options = array();
                                         foreach ( $steps as $step ){
                                             $step = new WPGH_Step( $step->ID );

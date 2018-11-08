@@ -93,7 +93,18 @@ class WPGH_Contacts_Table extends WP_List_Table {
         $html .= '  <div class="tags">' . esc_html( json_encode( $contact->tags ) ). '</div>';
         $html .= '  <div class="tags-data">' . esc_html( json_encode( wpgh_format_tags_for_select2( $contact->tags ) ) ) . '</div>';
         $html .= '</div>';
+
+
+        $html .= "<strong>";
+
         $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->email ) . "</a>";
+
+        if ( $contact->optin_status === WPGH_UNCONFIRMED && ( ! isset( $_REQUEST[ 'optin_status' ] ) || $_REQUEST[ 'optin_status' ] !== 'unconfirmed' ) ){
+            $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Unconfirmed', 'groundhogg' ) . ")</span>";
+        }
+
+        $html .= "</strong>";
+
         return $html;
 
     }
@@ -272,6 +283,11 @@ class WPGH_Contacts_Table extends WP_List_Table {
             WPGH_CONFIRMED,
             WPGH_UNCONFIRMED
         );
+
+        if ( isset( $_REQUEST[ 'meta_key' ] ) && isset( $_REQUEST[ 'meta_value' ] ) ){
+            $query[ 'meta_key' ] = sanitize_key( $_REQUEST[ 'meta_key' ] );
+            $query[ 'meta_value' ] = urldecode( $_REQUEST[ 'meta_value' ] );
+        }
 
         switch ( $this->get_view() )
         {

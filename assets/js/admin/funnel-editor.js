@@ -37,11 +37,13 @@ var wpghFunnelEditor;
 
             /* Activate Spinner */
             $('form').on('submit', function( e ){
-                wpghFunnelEditor.save( e );
+                e.preventDefault();
+                wpghFunnelEditor.save();
             });
 
-            $( '.popup-save ').on('click', function( e ){
-                wpghFunnelEditor.save( e );
+            $( document ).on('wpghModalClosed', function( e ){
+                e.preventDefault();
+                wpghFunnelEditor.save();
             });
 
             this.makeSortable();
@@ -109,9 +111,8 @@ var wpghFunnelEditor;
                 }});
         },
 
-        save: function ( e ) {
-
-            e.preventDefault();
+        save: function () {
+            // e.preventDefault();
 
             $('.spinner').css('visibility','visible');
 
@@ -126,7 +127,7 @@ var wpghFunnelEditor;
                 data: fd,
                 success: function ( response ) {
                     // response = JSON.parse(response);
-                    console.log( response );
+                    // console.log( response );
                     $( '#notices' ).html( response.notices );
                     $( '#normal-sortables' ).html( response.steps );
                     $( '#confirm' ).fadeOut( 300 );
@@ -236,7 +237,7 @@ var wpghFunnelEditor;
                     url: ajaxurl,
                     data: {action: "wpgh_delete_funnel_step", step_id: step.attr( 'id' ) },
                     success: function (result) {
-                        console.log(step.attr( 'id' ));
+                        // console.log(step.attr( 'id' ));
                         step.remove();
                     }
                 });

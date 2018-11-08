@@ -91,12 +91,14 @@ var wpghModal;
 		open: function(){
     		this.pullContent();
     		this.showPopUp();
-		},
+            $(document).trigger( 'wpghModalOpened' );
+        },
 
         close: function(){
             this.pushContent();
             this.hidePopUp();
             this.reset();
+            $(document).trigger( 'wpghModalClosed' );
         },
 
         pullFrame: function( iframe )
@@ -117,13 +119,13 @@ var wpghModal;
         /* Switch the content In the source and target between */
         pullContent: function(){
         	this.content.append( this.source.children() );
-        	console.log( this.content.children() );
+        	// console.log( this.content.children() );
             $( document ).trigger( 'wpghModalContentPulled' );
         },
 
         pushContent: function(){
             this.source.append( this.content.children() );
-            console.log( this.source.children() );
+            // console.log( this.source.children() );
             $( document ).trigger( 'wpghModalContentPushed' );
         },
 

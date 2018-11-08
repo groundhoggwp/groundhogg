@@ -1,15 +1,18 @@
-.gh-form-wrapper *
-{
+.gh-form-wrapper * {
     box-sizing: border-box;
 }
 
-.gh-form-field
-{
+
+.gh-form-field {
     margin: 10px 0;
 }
 
 label{
     cursor: pointer;
+}
+
+.gh-form-wrapper .gh-input{
+    height: auto;
 }
 
 .gh-form-column {
