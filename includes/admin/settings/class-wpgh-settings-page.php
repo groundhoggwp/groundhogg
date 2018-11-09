@@ -506,6 +506,15 @@ class WPGH_Settings_Page
                     'on' => 'Enable',
                 ),
             ),
+            array(
+                'label' => 'Max Queued Events',
+                'id' => 'gh_max_events',
+                'type' => 'number',
+                'placeholder' => '100',
+                'desc' => 'The maximum number of events that can be run during a single process of the event queue. For larger lists you may want to set this at a lower number for performance reasons.',
+                'section' => 'misc',
+                'page' => 'groundhogg_business_settings',
+            ),
 
 		);
 

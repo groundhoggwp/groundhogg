@@ -384,6 +384,10 @@ class WPGH_Email
     {
         $footer = "";
 
+        if ( ! wpgh_should_if_multisite() ){
+            switch_to_blog( get_site()->site_id );
+        }
+
         if ( wpgh_get_option( 'gh_business_name' ) )
             $footer .= "&copy; {business_name}<br/>";
 
@@ -420,6 +424,10 @@ class WPGH_Email
 
         $footer = WPGH()->replacements->process( $footer, $this->contact->ID );
 
+        if ( ms_is_switched() ){
+            restore_current_blog();
+        }
+
         return apply_filters( 'wpgh_email_footer', $footer );
     }
 
@@ -431,7 +439,18 @@ class WPGH_Email
      */
     public function get_unsubscribe_link( $url )
     {
-        return get_permalink( wpgh_get_option( 'gh_email_preferences_page' ) );
+        if ( ! wpgh_should_if_multisite() ){
+            switch_to_blog( get_site()->site_id );
+        }
+
+        $url = get_permalink( wpgh_get_option( 'gh_email_preferences_page' ) );
+
+        if ( ms_is_switched() ){
+            restore_current_blog();
+        }
+
+        return $url;
+
     }
 
     /**

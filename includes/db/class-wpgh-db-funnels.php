@@ -180,6 +180,8 @@ class WPGH_DB_Funnels extends WPGH_DB  {
                 $this->set_last_changed();
             }
 
+            do_action( 'wpgh_delete_funnel', $id );
+
             return $result;
 
         } else {

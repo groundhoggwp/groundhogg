@@ -108,6 +108,9 @@ var wpghEmailEditor;
                 $( '#wpfooter' ).addClass( 'hidden' );
                 $( '.title-wrap' ).css( 'display', 'none' );
                 $( '.funnel-editor-header' ).css( 'top', 0 );
+                $(  '.popup-save', parent.document ).on( 'click', function( e ){
+                    wpghEmailEditor.save( e );
+                } );
 
             }
 

@@ -122,6 +122,43 @@ class WPGH_Event_Queue
 
     }
 
+    /**
+     * Return whether the queue is currently running
+     *
+     * @return mixed
+     */
+    public function is_running()
+    {
+        if ( is_multisite() ){
+            $running = get_site_transient( 'wpgh_doing_event_queue' );
+        } else {
+            $running = get_transient( 'wpgh_doing_event_queue' );
+        }
+
+        return $running;
+    }
+
+    /**
+     * Set the queue to running. Don't allow other instances to start the queue
+     */
+    public function make_running()
+    {
+        if ( is_multisite() ){
+            set_site_transient( 'wpgh_doing_event_queue', true, HOUR_IN_SECONDS );
+        } else {
+            set_transient( 'wpgh_doing_event_queue', true, HOUR_IN_SECONDS );
+        }
+    }
+
+    public function make_not_running()
+    {
+        if ( is_multisite() ){
+            delete_site_transient( 'wpgh_doing_event_queue' );
+        } else {
+            delete_transient( 'wpgh_doing_event_queue' );
+        }
+    }
+
 
     /**
      * Iterate through the list of events and process them via the EVENTS api
@@ -131,6 +168,13 @@ class WPGH_Event_Queue
      */
     public function process()
     {
+
+        if ( $this->is_running() ){
+
+            return false;
+
+        }
+
         $this->prepare_events();
 
         if ( empty( $this->events ) ){
@@ -139,21 +183,45 @@ class WPGH_Event_Queue
 
         }
 
+        $this->make_running();
+
+        /* Get 'er done */
+        set_time_limit(0);
+
         do_action( 'wpgh_process_event_queue_before', $this );
 
         $this->doing_queue = true;
 
-        while ( $this->has_events() ) {
+
+        $i = 0;
+
+        $max_events = intval( wpgh_get_option( 'gh_max_events', 9999999999 ) );
+
+        while ( $this->has_events() && $i < $max_events ) {
 
             $this->cur_event = $this->get_next();
 
-            $this->cur_event->run();
+            if ( $this->cur_event->run() && ! $this->cur_event->is_broadcast_event() ){
+
+                $next_step = $this->cur_event->step->get_next_step();
+
+                if ( $next_step instanceof WPGH_Step && $next_step->is_active() ){
+
+                    $next_step->enqueue( $this->cur_event->contact );
+
+                }
+
+            }
+
+            $i++;
 
         }
 
         $this->doing_queue = false;
 
         do_action( 'wpgh_process_event_queue_after', $this );
+
+        $this->make_not_running();
 
         return true;
     }

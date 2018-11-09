@@ -171,8 +171,6 @@ class WPGH_Step
             'funnel_id' => $this->funnel_id,
         ) );
 
-
-
         if (  empty( $items ) ){
 
             /* something went wrong or there are no more steps*/
@@ -256,15 +254,6 @@ class WPGH_Step
 
         do_action( 'wpgh_doing_funnel_step_' . $this->type . '_after', $this  );
 
-        //todo enqueue next step.
-        $next_step = $this->get_next_step();
-
-        if ( $next_step instanceof WPGH_Step && $next_step->is_active() ){
-
-            $next_step->enqueue( $contact );
-
-        }
-
         return $result;
     }
 
@@ -279,6 +268,22 @@ class WPGH_Step
     {
 
         //contact should NOT be present in the same funnel twice...
+
+        /* Check if a similar event such as this already exists FIRST */
+
+        $similar_events = WPGH()->events->get_events(
+            array(
+                'start'         => time() - 60,
+                'end'           => time() + 60,
+                'funnel_id'     => $this->funnel_id,
+                'step_id'       => $this->ID,
+                'contact_id'    => $contact->ID
+            )
+        );
+
+        if ( $similar_events && count( $similar_events ) > 0 ){
+            return false;
+        }
 
         WPGH()->events->mass_update(
             array(
@@ -299,6 +304,43 @@ class WPGH_Step
         );
 
         return (bool) WPGH()->event_queue->add( $event );
+    }
+
+    /**
+     * Return whether or not the current action can run.
+     * This was implement so that WPMU could be effectively implemented with the GLOBAL DB option enabled.
+     *
+     * Alwasy return true if not a multisite or mutisite gloable is not enabled
+     * otherwise compare the current blog ID to the blg ID associated with the step.
+     */
+    public function can_run()
+    {
+
+        if ( wpgh_is_global_multisite() ){
+
+            $blog_id = $this->get_meta( 'blog_id' );
+
+            /* all blogs */
+            if ( ! $blog_id ){
+
+                return true;
+
+            /* Current blog */
+            } else if ( $blog_id === get_current_blog_id() ){
+
+                return true;
+
+            /* Wrong Blog */
+            } else {
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
     }
 
     /**
@@ -437,7 +479,7 @@ class WPGH_Step
      */
     public function icon()
     {
-        return apply_filters( 'wpgh_step_icon_' . $this->type, '' );
+        return apply_filters( 'wpgh_step_icon_' . $this->type, WPGH_ASSETS_FOLDER . 'images/funnel-icons/no-icon.png' );
     }
 
     /**
@@ -490,10 +532,39 @@ class WPGH_Step
                     'name'  => $this->prefix( 'title' ),
                     'id'    => $this->prefix( 'title' ),
                     'value' => __( $this->title, 'groundhogg' ),
-                    'title' => __( 'Step Title', 'groundhogg' )
+                    'title' => __( 'Step Title', 'groundhogg' ),
                 );
 
                 echo WPGH()->html->input( $args ); ?>
+
+                <?php if( wpgh_is_global_multisite() ): ?>
+                    <!-- MULTISITE BLOG OPTION -->
+                    <div class="wpmu-options">
+                        <label style="padding-left: 30px">
+                            <?php _e( 'Run on which blog?' ); ?>
+                            <?php
+
+                            $sites = get_sites();
+
+                            $options = array();
+                            foreach ( $sites as $site ){
+                                $options[ $site->blog_id ] = get_blog_details($site->blog_id)->blogname;
+                            }
+
+                            echo WPGH()->html->dropdown( array(
+                                'name'   => $this->prefix( 'blog_id' ),
+                                'id'     => $this->prefix( 'blog_id' ),
+                                'options' => $options,
+                                'selected' => $this->get_meta( 'blog_id' ),
+                                'option_none' => __( 'Any Blog' )
+                            ) );
+
+                            ?>
+                        </label>
+
+                    </div>
+
+                <?php endif; ?>
 
             </h2>
 

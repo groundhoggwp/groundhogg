@@ -58,6 +58,8 @@ class WPGH_DB_Steps extends WPGH_DB  {
 
         $this->primary_key = 'ID';
         $this->version     = '1.0';
+
+        add_action( 'wpgh_delete_funnel', array( $this, 'delete_steps' ) );
     }
 
     /**
@@ -179,6 +181,31 @@ class WPGH_DB_Steps extends WPGH_DB  {
         } else {
             return false;
         }
+
+    }
+
+    /**
+     * Delete steps when a funnel is deleted...
+     *
+     * @param bool $id
+     * @return bool|false|int
+     */
+    public function delete_steps( $id = false ){
+
+        if ( empty( $id ) ) {
+            return false;
+        }
+
+        global $wpdb;
+
+        $result = $wpdb->delete( $this->table_name, array( 'funnel_id' => $id ), array( '%d' ) );
+
+        if ( $result ) {
+            $this->set_last_changed();
+        }
+
+        return $result;
+
 
     }
 

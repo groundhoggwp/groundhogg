@@ -85,18 +85,21 @@ class WPGH_Tracking
 
         if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/click/' ) !== false ){
 
+            add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
             add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
             add_action( 'template_redirect', array( $this, 'email_link_clicked' ) );
             $this->doing_click = true;
 
         } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/open/' ) !== false  ) {
 
+            add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
             add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
             add_action( 'init', array( $this, 'email_opened' ) );
             $this->doing_open = true;
 
         } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-confirmation/via/email/' ) !== false ) {
 
+            add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
             add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
             add_action( 'init', array( $this, 'email_confirmed' ) );
 
@@ -117,6 +120,26 @@ class WPGH_Tracking
         }
 
         add_action( 'wpgh_form_submit', array( $this, 'form_filled' ), 10, 3 );
+
+    }
+
+    /**
+     * For some reason emails are being sent out with http instead of https...
+     * Redirect to ssl if https is in the url.
+     */
+    public function fix_tracking_ssl()
+    {
+
+        $site = get_option( 'siteurl' );
+
+        if ( strpos( $site, 'https://' ) !== false && ! is_ssl() ){
+
+            $actual_link = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+            wp_redirect( $actual_link );
+            die();
+
+        }
 
     }
 
@@ -548,9 +571,15 @@ class WPGH_Tracking
 
         $this->contact->update( array( 'optin_status' => WPGH_CONFIRMED ) );
 
-//        wp_die();
+        if ( wpgh_is_global_multisite() ){
+            switch_to_blog( get_site()->site_id );
+        }
 
         $conf_page = get_permalink( wpgh_get_option( 'gh_confirmation_page' ) );
+
+        if ( ms_is_switched() ){
+            restore_current_blog();
+        }
 
         /**
          * @type $contact WPGH_Contact

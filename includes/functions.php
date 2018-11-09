@@ -509,6 +509,19 @@ function wpgh_should_if_multisite()
 
 }
 
+function wpgh_is_global_multisite()
+{
+    if ( ! is_multisite() ){
+        return false;
+    }
+
+    if ( is_multisite() && ! get_site_option( 'gh_global_db_enabled' ) ){
+        return false;
+    }
+
+    return true;
+}
+
 /**
  * Return the current user role.
  *
@@ -544,4 +557,20 @@ function wpgh_get_current_user_roles()
  */
 function wpgh_get_contact( $id_or_email ){
     return new WPGH_Contact( $id_or_email );
+}
+
+/**
+ * Recount the contacts per tag...
+ */
+function wpgh_recount_tag_contacts_count()
+{
+    /* Recount tag relationships */
+    $tags = WPGH()->tags->get_tags();
+
+    if ( ! empty( $tags ) ){
+        foreach ( $tags as $tag ){
+            $count = WPGH()->tag_relationships->count( $tag->tag_id, 'tag_id' );
+            WPGH()->tags->update( $tag->tag_id, array( 'contact_count' => $count ) );
+        }
+    }
 }

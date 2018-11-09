@@ -234,6 +234,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             <div id="notices">
 
             </div>
+            <div class="funnel-saving hidden"></div>
             <div  id="postbox-container-2" class="postbox-container funnel-editor">
                 <div style="visibility: hidden" id="normal-sortables" class="meta-box-sortables ui-sortable">
                     <?php do_action('wpgh_funnel_steps_before' ); ?>

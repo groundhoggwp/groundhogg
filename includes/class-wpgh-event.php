@@ -126,7 +126,7 @@ class WPGH_Event
     public function run()
     {
 
-        if ( ! $this->is_waiting() || ! $this->is_time() )
+        if ( ! $this->is_waiting() || ! $this->is_time() || ! $this->step->can_run() )
             return false;
 
         do_action( 'wpgh_event_run_before', $this );
@@ -138,7 +138,9 @@ class WPGH_Event
             /* handle event failure */
             do_action( 'wpgh_event_run_failed', $this );
 
-            $this->skip();
+            $this->fail();
+
+            return false;
 
         } else {
 
@@ -146,7 +148,7 @@ class WPGH_Event
 
         }
 
-        /* special handling fot the broadcast event. Make sure it's status is update to sent... */
+        /* special handling for the broadcast event. Make sure it's status is update to sent... */
         if ( $this->is_broadcast_event() && $this->step->status !== 'sent' ){
            $this->step->update( array( 'status' => 'sent' ) );
         }
@@ -195,6 +197,13 @@ class WPGH_Event
     {
         return $this->update( array(
             'status' => 'cancelled'
+        ) );
+    }
+
+    public function fail()
+    {
+        return $this->update( array(
+            'status' => 'failed'
         ) );
     }
 

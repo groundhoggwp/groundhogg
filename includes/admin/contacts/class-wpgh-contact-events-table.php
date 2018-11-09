@@ -88,9 +88,20 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
         } else {
 
             $funnel_title = WPGH()->funnels->get_column_by( 'title', 'ID', $event->funnel_id );
-            return sprintf( "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $event->funnel_id ) ,$funnel_title);
+
+            if ( ! $funnel_title ){
+
+                return __( '<strong>(funnel deleted)</strong>' );
+
+            } else{
+
+                return sprintf( "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $event->funnel_id ) ,$funnel_title);
+
+            }
+
 
         }
+
     }
 
     /**

@@ -59,6 +59,15 @@ class WPGH_Tags_Table extends WP_List_Table {
         return $sortable_columns;
     }
 
+    protected function extra_tablenav($which)
+    {
+        ?>
+        <div class="alignleft actions">
+            <a class="button button-secondary action" href="<?php echo add_query_arg( 'recount_contacts', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php _e( 'Recount Contacts', 'groundhogg' ); ?></a>
+        </div>
+        <?php
+    }
+
     protected function column_tag_name( $tag )
     {
         $editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->tag_id );

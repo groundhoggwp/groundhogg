@@ -410,6 +410,7 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
 
     $table->prepare_items();
     $table->display(); ?>
+    <a href="<?php echo admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $id ); ?>"><?php _e( 'View All Events' ); ?></a>
 
     <p class="description"><?php _e( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'groundhogg' ); ?></p>
 
@@ -424,7 +425,7 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
 
     $table->prepare_items();
     $table->display(); ?>
-
+    <a href="<?php echo admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $id ); ?>"><?php _e( 'View All Events' ); ?></a>
     <p class="description"><?php _e( 'Any previous funnel steps will show up here. You can choose run them again.<br/>
     This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'groundhogg' ); ?></p>
     </div>

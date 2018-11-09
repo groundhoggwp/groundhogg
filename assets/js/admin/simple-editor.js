@@ -589,6 +589,8 @@
                     if (window.wpghTextBlock) {
                         wpghTextBlock.h1Font.trigger('change');
                         wpghTextBlock.h1Size.trigger('change');
+                        wpghTextBlock.h2Font.trigger('change');
+                        wpghTextBlock.h2Size.trigger('change');
                     }
 
                     return n;

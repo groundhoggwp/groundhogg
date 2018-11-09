@@ -49,6 +49,7 @@ class WPGH_Create_User extends WPGH_Funnel_Step
     {
 
         $account_role = $step->get_meta( 'role' );
+        $blog_id = $step->get_meta( 'add_to_blog_id' );
 
         if ( ! $account_role )
             $account_role = 'subscriber'
@@ -65,6 +66,34 @@ class WPGH_Create_User extends WPGH_Funnel_Step
                     </select>
                 </td>
             </tr>
+            <?php if ( is_multisite() ): ?>
+            <tr>
+                <th>
+                    <?php _e( 'Which Blog?' ); ?>
+                </th>
+                <td>
+                   <?php
+
+                   $sites = get_sites();
+                   $options = array();
+
+                   foreach ( $sites as $site ){
+                       $options[ $site->blog_id ] = get_blog_details($site->blog_id)->blogname;
+                   }
+
+                   echo WPGH()->html->dropdown( array(
+                       'name'   => $step->prefix( 'add_to_blog_id' ),
+                       'id'     => $step->prefix( 'add_to_blog_id' ),
+                       'options' => $options,
+                       'selected' => $blog_id,
+                       'option_none' => __( 'Add to all blogs' )
+                   ) );
+
+                   ?>
+                </td>
+
+            </tr>
+            <?php endif; ?>
             </tbody>
         </table>
 
@@ -81,6 +110,14 @@ class WPGH_Create_User extends WPGH_Funnel_Step
 
         $role = sanitize_text_field( $_POST[ $step->prefix( 'role' ) ] );
         $step->update_meta( 'role', $role );
+
+        if ( isset( $_POST[ $step->prefix( 'add_to_blog_id' ) ] ) ){
+            $blog = intval( $_POST[ $step->prefix( 'add_to_blog_id' ) ] );
+            $step->update_meta( 'add_to_blog_id', $blog );
+
+        } else {
+            $step->delete_meta( 'add_to_blog_id' );
+        }
 
     }
 
@@ -113,14 +150,28 @@ class WPGH_Create_User extends WPGH_Funnel_Step
 
 		    wp_new_user_notification( $user_id, null, 'user' );
 
-		    $contact->update( array( 'user_id', $user_id ) );
+		    $contact->update( array( 'user_id',  ) );
 
 	    } else {
 
 	        $user = get_user_by_email( $username );
+            $user_id = $user->ID;
+	        $contact->update( array( 'user_id' => $user_id ) );
 
-	        $contact->update( array( 'user_id' => $user->ID ) );
+        }
 
+        if ( is_multisite() ){
+            if( $event->step->get_meta( 'add_to_blog_id' ) ){
+                add_user_to_blog( $event->step->get_meta( 'add_to_blog_id' ), $user_id, $role );
+            } else {
+
+                $sites = get_sites();
+
+                foreach ( $sites as $site ){
+                    add_user_to_blog( $site->blog_id, $user_id, $role );
+                }
+
+            }
         }
 
 	    return true;

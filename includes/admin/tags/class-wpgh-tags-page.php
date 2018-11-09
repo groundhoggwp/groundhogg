@@ -32,8 +32,18 @@ class WPGH_Tags_Page
 
 			$this->notices = WPGH()->notices;
 
+			if ( isset( $_GET[ 'recount_contacts' ] ) ){
+                add_action( 'init' , array( $this, 'recount' )  );
+
+            }
+
 		}
 	}
+
+	public function recount()
+    {
+        wpgh_recount_tag_contacts_count();
+    }
 
 	/* Register the page */
 	function register()

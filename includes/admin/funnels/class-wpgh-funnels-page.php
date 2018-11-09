@@ -683,6 +683,10 @@ class WPGH_Funnels_Page
 
             $step->update( $args );
 
+            if ( isset( $_POST[ $step->prefix( 'blog_id' ) ] ) ){
+                $step->update_meta( 'blog_id', intval( $_POST[ $step->prefix( 'blog_id' ) ] ) );
+            }
+
             do_action( 'wpgh_save_step_' . $step->type, $step );
 
         }
@@ -802,7 +806,7 @@ class WPGH_Funnels_Page
 
         if ( $newID ){
 
-            $step = new WPGH_Step( $step_id );
+            $step = new WPGH_Step( $newID );
 
             ob_start();
 

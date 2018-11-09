@@ -155,4 +155,16 @@ class WPGH_Broadcast
         return $result;
     }
 
+    /**
+     * Just return true for now cuz I'm lazy...
+     *
+     * @return bool
+     */
+    public function can_run()
+    {
+
+        return true;
+
+    }
+
 }
