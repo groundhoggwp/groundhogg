@@ -36,6 +36,13 @@ class WPGH_Bulk_Contact_Manager
      */
     public $import_tag;
 
+    /**
+     * The ID of the current import.
+     *
+     * @var int
+     */
+    public $import_id;
+
     public function __construct()
     {
 
@@ -125,6 +132,26 @@ class WPGH_Bulk_Contact_Manager
 
     }
 
+    /**
+     * Sets the import tag
+     *
+     * @return bool|int|mixed
+     */
+    public function get_import_tag()
+    {
+        if ( get_transient( 'wpgh_import_' . $this->import_id . '_tag' ) ){
+            $this->import_tag = get_transient( 'wpgh_import_' . $this->import_id . '_tag'  );
+        } else {
+            $this->import_time = time();
+            $this->import_tag = WPGH()->tags->add( array(
+                'tag_name' => sprintf( '%s %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s', $this->import_time ) ),
+            ) );
+            set_transient( 'wpgh_import_' . $this->import_id . '_tag', $this->import_tag, HOUR_IN_SECONDS );
+        }
+
+        return $this->import_tag;
+    }
+
     public function import()
     {
 
@@ -133,16 +160,9 @@ class WPGH_Bulk_Contact_Manager
 
         $contacts = $_POST[ 'data' ];
 
-        //wp_die( json_encode( $contacts ) );
-        if ( get_transient( 'wpgh_import_tag' ) ){
-            $this->import_tag = get_transient( 'wpgh_import_tag' );
-        } else {
-            $this->import_time = time();
-            $this->import_tag = WPGH()->tags->add( array(
-                'tag_name' => sprintf( '%s %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s', $this->import_time ) ),
-            ) );
-            set_transient( 'wpgh_import_tag', $this->import_tag, MINUTE_IN_SECONDS );
-        }
+        $this->import_id = $_POST[ 'import_id' ];
+
+        $this->get_import_tag();
 
         $contact_count = 0;
 
@@ -156,7 +176,7 @@ class WPGH_Bulk_Contact_Manager
             /* Add a tag to the contact to find post import. */
         }
 
-        wp_die( json_encode( array( 'contacts' => $contact_count ) ) );
+        wp_die( json_encode( array( 'contacts' => $contact_count, 'import_tag' => $this->import_tag ) ) );
 
     }
 
@@ -236,7 +256,7 @@ class WPGH_Bulk_Contact_Manager
         }
 
         //todo, not sure about this
-        $contact->update_meta( 'last_optin', time() );
+        $contact->update_meta( 'last_optin', $this->import_time );
 
         return $contact;
 

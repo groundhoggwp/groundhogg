@@ -8,6 +8,7 @@ var wpghImportExport;
         allRows: 0,
         status: null,
         results: null,
+        import_id: null,
 
         /**
          * Setup the button click event
@@ -50,6 +51,7 @@ var wpghImportExport;
                 },
                 complete: function()
                 {
+                    wpghImportExport.import_id = wpghImportExport.guidGenerator();
                     wpghImportExport.import();
                 }
             });
@@ -86,7 +88,7 @@ var wpghImportExport;
                 type: "post",
                 url: ajaxurl,
                 dataType: 'json',
-                data: { action: 'wpgh_import_contacts', data: data, tags: tags },
+                data: { action: 'wpgh_import_contacts', data: data, tags: tags, import_id: this.import_id },
                 success: function( response ){
                     if ( typeof response.contacts !== "undefined" ){
 
@@ -175,6 +177,13 @@ var wpghImportExport;
                     $spinner.css( 'visibility', 'hidden' );
                 }
             });
+        },
+
+        guidGenerator : function () {
+            var S4 = function() {
+                return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+            };
+            return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
         }
 
     };

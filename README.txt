@@ -109,14 +109,16 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.0.7 =
 * FIXED Emails were not updating from the funnel editor when click the "save changes button" in the modal. Click said button will now update the email.
-* TWEAKED The create user step will now ask which blog you want to add the user too if on multisite.
 * FIXED Implemented the queue not being able to be started by two different requests.
 * FIXED multisite bugs
 * FIXED Tracking will force ssl if SSL is present in the blog url option.
-* TWEAKED if global multisite setting is enabled you can choose to only run an event if the associated step can be run by the current blog.
 * FIXED duplicating steps in funnel literally duplicating the step which helps no one.
+* FIXED contact count not updating properly when contacts deleted.
+* FIXED longer imports using different import tag.
+* TWEAKED The create user step will now ask which blog you want to add the user too if on multisite.
 * TWEAKED if the funnel step is not available for the funnel builder than show an unkown question mark.
 * TWEAKED an event cannot be added to the queue if there is a similar event within 60 seconds of the time its being added.
+* TWEAKED if global multisite setting is enabled you can choose to only run an event if the associated step can be run by the current blog.
 
 = 1.0.6 =
 * Added Funnel updates automatically when the modal closes.

@@ -207,7 +207,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
             return false;
         }
 
-        if ( isset( $args[ 'tag_id' ] ) && isset( $args[ 'contact_id' ] ) ){
+        if ( isset( $args[ 'tag_id' ] ) ){
             WPGH()->tags->decrease_contact_count( $args[ 'tag_id' ] );
         }
 
