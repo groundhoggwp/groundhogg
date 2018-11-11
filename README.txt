@@ -110,6 +110,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 = 1.0.8 =
 * FIXED multisite funnel capability comparing string to int.
 * TWEAKED adding emails is also now done through the admin modal system.
+* TWEAKED better handling of edit email link when email changes.
 
 = 1.0.7 =
 * FIXED Emails were not updating from the funnel editor when click the "save changes button" in the modal. Click said button will now update the email.
