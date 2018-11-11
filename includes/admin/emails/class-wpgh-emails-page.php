@@ -58,6 +58,8 @@ class WPGH_Emails_Page
             wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.js' ) );
             wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . 'css/admin/email-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/email-editor.css' ) );
 
+        } else if ( $this->get_action() === 'add' ){
+	        wp_enqueue_script( 'iframe-checker', WPGH_ASSETS_FOLDER . 'js/admin/iframe-checker.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/iframe-checker.js' ) );
         }
     }
 

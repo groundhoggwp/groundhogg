@@ -1,0 +1,30 @@
+/*$( 'html' ).css( 'padding-top', 0 );*/
+/*$( '#wpcontent' ).css( 'margin', 0 );*/
+/*$( '#wpadminbar' ).addClass( 'hidden' );*/
+/*$( '#adminmenuwrap' ).addClass( 'hidden' );*/
+/*$( '#adminmenuback' ).addClass( 'hidden' );*/
+/*$( '#wpfooter' ).addClass( 'hidden' );*/
+
+html {
+    padding-top: 0;
+}
+
+#wpcontent {
+    margin: 0;
+}
+
+#wpadminbar {
+    display: none;
+}
+
+#adminmenuwrap {
+    display: none;
+}
+
+#adminmenuback {
+    display: none;
+}
+
+#wpfooter{
+    display: none;
+}

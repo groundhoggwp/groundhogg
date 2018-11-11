@@ -326,7 +326,7 @@ class WPGH_Step
                 return true;
 
             /* Current blog */
-            } else if ( $blog_id === get_current_blog_id() ){
+            } else if ( intval( $blog_id ) === get_current_blog_id() ){
 
                 return true;
 

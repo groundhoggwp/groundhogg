@@ -20,6 +20,7 @@ var wpghModal;
 		content: null,
 		title: null,
 		source: null,
+        frameUrl: '',
         args: { height: 500, width:500 },
 
 		init: function ( title, href ) {
@@ -111,9 +112,26 @@ var wpghModal;
 
         prepareFrame: function( iframe ){
             var $iframe = $(iframe);
+            this.content.removeClass( 'hidden' );
             this.content.css( 'padding', 0 );
             $iframe.removeClass( 'hidden' );
             this.loader.addClass( 'hidden' );
+
+            //if a link is clicked reload the frame.
+            $iframe.contents().find( 'a' ).click( function () {
+                wpghModal.frameReload();
+            });
+
+            //special handling for email builder.
+            $iframe.contents().find( '.choose-template' ).click( function () {
+                wpghModal.frameReload();
+            });
+        },
+
+        frameReload: function()
+        {
+            this.content.addClass( 'hidden' );
+            this.loader.removeClass( 'hidden' );
         },
 
         /* Switch the content In the source and target between */

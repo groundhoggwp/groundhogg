@@ -47,14 +47,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
     <?php foreach ( $email_templates as $id => $email_args ): ?>
 
-    <div class="postbox" style="margin-right:20px;width: 550px;display: inline-block;">
+    <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
         <h2 class="hndle"><?php echo $email_args['title']; ?></h2>
         <div class="inside">
             <p><?php echo $email_args['description']; ?></p>
             <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $id; ?> " class="email-container postbox">
                 <?php echo $email_args['content']; ?>
             </div>
-            <button class="button-primary" name="email_template" value="<?php echo $id ?>"><?php _e('Start Writing'); ?></button>
+            <button class="choose-template button-primary" name="email_template" value="<?php echo $id ?>"><?php _e('Start Writing'); ?></button>
         </div>
     </div>
 
@@ -66,14 +66,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
     <?php foreach ( $emails as $email ): ?>
 
-        <div class="postbox" style="margin-right:20px;width: 550px;display: inline-block;">
+        <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
             <h2 class="hndle"><?php echo $email->subject; ?></h2>
             <div class="inside">
                 <p><?php echo empty( $email->pre_header )? __( 'Custom Email', 'groundhogg' ) :  $email->pre_header; ?></p>
                 <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $id; ?> " class="email-container postbox">
                     <?php echo $email->content; ?>
                 </div>
-                <button class="button-primary" name="email_id" value="<?php echo $email->ID; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+                <button class="choose-template button-primary" name="email_id" value="<?php echo $email->ID; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
             </div>
         </div>
 

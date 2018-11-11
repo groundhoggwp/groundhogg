@@ -43,7 +43,28 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
      */
     public $description = 'Send an email to a contact.';
 
-    /**
+    public function __construct() {
+
+        parent::__construct();
+
+        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
+
+    }
+
+    public function scripts(){
+        wp_enqueue_script(
+            'wpgh-email-element',
+            WPGH_ASSETS_FOLDER . 'js/admin/funnel-elements/email.js',
+            array(),
+            filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/funnel-elements/email.js' )
+        );
+
+        wp_localize_script('wpgh-email-element', 'wpghEmailsBase', array(
+            'path' =>  admin_url( 'admin.php?page=gh_emails' )
+        ) );
+    }
+
+	/**
      * Display the settings
      *
      * @param $step WPGH_Step
@@ -78,23 +99,14 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                     echo WPGH()->html->dropdown_emails( $args ); ?>
                     <div class="row-actions">
                         <a
-                            class="editinline trigger-popup"
+                            class="editinline trigger-popup edit-email"
                             id="<?php echo $step->prefix( 'edit_email' ); ?>"
                             target="_blank"
                             title="<?php _e( 'Edit Email' ); ?>"
-                            href="#source=<?php echo urlencode( $basic_path . '&email=' . $email_id . '&action=edit' ) . '&&height=900&width=1500' ;?>"
+                            href="#source=<?php echo urlencode( $basic_path . '&email=' . $email_id . '&action=edit' ) . '&height=900&width=1500' ;?>"
                         ><?php esc_html_e( 'Edit Email', 'groundhogg' );?></a>
-                        |
-                        <a target="_blank" href="<?php echo $return_path . '&action=add' ;?>" ><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>
-                        <script>
-                            jQuery(
-                                function($){
-                                    $('#<?php echo $step->prefix( 'email_id' ); ?>').change(
-                                        function(){
-                                            $('#<?php echo $step->prefix( 'edit_email' ); ?>').attr( 'href', '<?php echo $return_path . '&email='; ?>' + $(this).val() )
-                                        })
-                                });
-                        </script>
+                        <?php echo '|'; ?>
+                        <a target="_blank" class="add-email trigger-popup" title="<?php _e( 'Add Email' ); ?>" href="#source=<?php echo urlencode( $return_path . '&action=add' ) . '&height=900&width=1500' ;?>" ><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>
                     </div>
                 </td>
             </tr>
