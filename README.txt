@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.8.1 =
+* FIXED queue failsafe bug
+
 = 1.0.8 =
 * FIXED could not use function in right context fatal error.
 * FIXED multisite funnel capability comparing string to int.

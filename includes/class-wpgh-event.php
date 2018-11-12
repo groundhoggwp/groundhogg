@@ -126,7 +126,7 @@ class WPGH_Event
     public function run()
     {
 
-        if ( ! $this->is_waiting() || ! $this->is_time() || $this->has_similar() || ! $this->step->can_run()  )
+        if ( ! $this->is_waiting() || $this->has_run() || $this->has_similar() || ! $this->is_time() || ! $this->step->can_run()  )
             return false;
 
         do_action( 'wpgh_event_run_before', $this );
@@ -159,6 +159,23 @@ class WPGH_Event
     }
 
     /**
+     * Due to the nature of WP and cron, let's DOUBLE check that at the time of running this event has not been run by another instance of the queue.
+     *
+     * @return bool whether the event has run or not
+     */
+    public function has_run()
+    {
+        $event = WPGH()->events->get( $this->ID );
+
+        if ( $event->status === 'complete' ){
+            return true;
+        }
+
+        return false;
+
+    }
+
+    /**
      * Check if an event similar to this one has run in the last 5 minutes.
      * If it has, SKIP IT!!!!!!!!!!!!!!
      *
@@ -171,7 +188,7 @@ class WPGH_Event
                 'start'         => $this->time - ( 5 * 60 ),
                 'end'           => $this->time + ( 5 * 60 ),
                 'funnel_id'     => $this->funnel_id,
-                'step_id'       => $this->ID,
+                'step_id'       => $this->step->ID,
                 'contact_id'    => $this->contact->ID,
                 'status'        => 'complete'
             )
@@ -179,7 +196,12 @@ class WPGH_Event
 
         if ( $similar_events && count( $similar_events ) > 0 ){
 
-            $this->skip();
+            //double check this event...
+            $event = WPGH()->events->get( $this->ID );
+
+            if ( $event->status !== 'complete' ){
+                $this->skip();
+            }
 
             return true;
         }

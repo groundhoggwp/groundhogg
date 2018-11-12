@@ -713,7 +713,7 @@ class WPGH_Email
             );
         } else {
         /* Send with default WP */
-            $sent = $this->sent_with_wp(
+            $sent = $this->send_with_wp(
                 $to,
                 $subject,
                 $content,
@@ -752,7 +752,7 @@ class WPGH_Email
      * @param $headers
      * @return bool
      */
-    private function sent_with_wp( $to,$subject,$content,$headers )
+    private function send_with_wp( $to,$subject,$content,$headers )
     {
         return wp_mail(
             $to,
@@ -806,7 +806,15 @@ class WPGH_Email
         if ( $result->status === 'failed' ){
             /* mail failed */
 
-            do_action( 'wp_mail_failed' ,new WP_Error( 'MAIL_FAILED', $result->message ) );
+            do_action( 'wp_mail_failed' ,new WP_Error( 'API_MAIL_FAILED', $result->message ) );
+
+            /* Fall back to default WP */
+            $this->send_with_wp(
+                $to,
+                $subject,
+                $content,
+                $headers
+            );
 
             return false;
 
