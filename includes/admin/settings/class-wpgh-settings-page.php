@@ -267,6 +267,7 @@ class WPGH_Settings_Page
         add_settings_section( 'compliance', __( 'Compliance Settings', 'groundhogg' ), array(), 'groundhogg_marketing_settings');
 //        add_settings_section( 'default_mail_settings', 'Default Mail Settings', array(), 'groundhogg_email_settings' );
         add_settings_section( 'email_bounces', 'Email Bounces', array(), 'groundhogg_email_settings' );
+        add_settings_section( 'gh_email_api', 'Groundhogg Email Service', array(), 'groundhogg_email_settings' );
     }
 
 	public function wpgh_setup_fields()
@@ -494,6 +495,26 @@ class WPGH_Settings_Page
                 'desc' => 'This password to access the inbox.',
                 'section' => 'email_bounces',
                 'page' => 'groundhogg_email_settings',
+            ),
+            array(
+                'label' => 'Email Service Token',
+                'id' => 'gh_email_token',
+                'type' => 'password',
+                'placeholder' => '1234',
+                'desc' => 'Get this key from your Groundhogg Account Page.',
+                'section' => 'gh_email_api',
+                'page' => 'groundhogg_email_settings',
+            ),
+            array(
+                'label' => 'Send Email With Groundhogg',
+                'id' => 'gh_send_with_gh_api',
+                'type' => 'checkbox',
+                'desc' => 'Choose to send email with API.',
+                'section' => 'gh_email_api',
+                'page' => 'groundhogg_email_settings',
+                'options' => array(
+                    'on' => 'Enable',
+                ),
             ),
             array(
                 'label' => 'Delete Groundhogg Data',

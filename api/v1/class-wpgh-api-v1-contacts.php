@@ -14,99 +14,106 @@ class wpgh_api_v1_contacts extends WPGH_API_V1
     {
         // use to update a contact details
 
-        if ( ! $this->user->has_cap( 'edit_contacts' ) ){
-            return new WP_Error( 'INVALID_PERMISSIONS', __( WPGH()->roles->error( 'edit_contacts' ) ) );
-        }
+        if (!$this->user->has_cap('edit_contacts')) {
+            return new WP_Error('INVALID_PERMISSIONS', __(WPGH()->roles->error('edit_contacts')));
 
-        if (isset ($data->contact_id)) {// check user enter contact id for operation
-            $contact_id = $data->contact_id;
-            unset($data->contact_id);
-            //$contact = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
-            if (WPGH()->contacts->count(array('ID' => $contact_id)) > 0) { //check id exist in databse
+        } else {
 
-                if ( (isset($data->email) ) && (WPGH()->contacts->exists($data->email)) )
-                {//if email already exist in database and user wants to update it..
-                    unset($data->email);
-                }
+            if (isset ($data->contact_id)) {// check user enter contact id for operation
+                $contact_id = $data->contact_id;
+                unset($data->contact_id);
+                //$contact = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
+                if (WPGH()->contacts->count(array('ID' => $contact_id)) > 0) { //check id exist in databse
 
-                if (isset($data->meta)) {// update meta
-                    //$data_meta = $data->meta;
-                    foreach ($data->meta as $key => $value) {
-                        WPGH()->contact_meta->update_meta($contact_id, sanitize_key($key), sanitize_text_field($value));
+                    if ((isset($data->email)) && (WPGH()->contacts->exists($data->email))) {//if email already exist in database and user wants to update it..
+                        unset($data->email);
                     }
-                    unset($data->meta);
+
+                    if (isset($data->meta)) {// update meta
+                        //$data_meta = $data->meta;
+                        foreach ($data->meta as $key => $value) {
+                            WPGH()->contact_meta->update_meta($contact_id, sanitize_key($key), sanitize_text_field($value));
+                        }
+                        unset($data->meta);
+                    }
+
+
+                    //update contact table
+                    $data_array = (array)$data;
+
+                    unset($data_array['meta']);
+
+                    $data_array = array_map('sanitize_text_field', $data_array);
+
+                    if (count($data_array) > 0) {
+                        // update data only if there is a data
+                        WPGH()->contacts->update($contact_id, $data_array);
+                    }
+                    //fetch and send new updated data
+                    $contact = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
+                    if (count($contact) > 0) {
+                        $contact_meta = $this->get_meta($contact_id);
+                        return array(
+                            'contact' => $contact,
+                            'meta' => $contact_meta,
+                        );
+                    }
+
+                } else {
+                    return new WP_Error('INVALID_ID', __('No contact exists with the given ID.'));
                 }
 
-
-                //update contact table
-                $data_array = (array) $data;
-
-                unset( $data_array[ 'meta' ] );
-
-                $data_array = array_map( 'sanitize_text_field', $data_array );
-
-                if(count($data_array) > 0) {
-                    // update data only if there is a data
-                    WPGH()->contacts->update($contact_id, $data_array);
-                }
-                //fetch and send new updated data
-                $contact = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
-                if (count($contact) > 0) {
-                    $contact_meta = $this->get_meta($contact_id);
-                    return array(
-                        'contact' => $contact,
-                        'meta' => $contact_meta,
-                    );
-                }
-
-            } else {
-                return new WP_Error( 'INVALID_ID', __( 'No contact exists with the given ID.' ) );
+            } else {// response to enter contact_id
+                return new WP_Error('INVALID_ID', __('Please provide a contact ID.'));
             }
-
-        } else {// response to enter contact_id
-            return new WP_Error( 'INVALID_ID', __( 'Please provide a contact ID.' ) );
         }
     }
 
     public function add($data)
     {// create a new user
 
-        if (isset($data->email)) {
-            //  ---------------  Insert operation --------
-
-            $data_array = (array) $data;
-
-            unset( $data_array[ 'meta' ] );
-
-            $data_array = array_map( 'sanitize_text_field', $data_array );
-
-
-            //adding data in contact table
-            $contact_id = WPGH()->contacts->add($data_array);
-
-            // insert data in contact meta table if users send meta data
-            if (isset($data->meta)) {
-                //$data_meta = $data->meta;
-                foreach ($data->meta as $key => $value) {
-                    WPGH()->contact_meta->add_meta($contact_id, $key, $value);
-                }
-            }
-
-            //--------------- Fetch and Display operation
-
-            $contact = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
-            if (count($contact) > 0) {
-                $contact_meta = $this->get_meta($contact_id);
-                return array(
-                    'contact' => $contact,
-                    'meta' => $contact_meta
-                );
-            }
+        if (!$this->user->has_cap('edit_contacts')) {
+            return new WP_Error('INVALID_PERMISSIONS', __(WPGH()->roles->error('edit_contacts')));
 
         } else {
-            return array('message' => $data->email . 'please enter user email.');
-        }
 
+            if (isset($data->email)) {
+                //  ---------------  Insert operation --------
+
+                $data_array = (array)$data;
+
+                unset($data_array['meta']);
+
+                $data_array = array_map('sanitize_text_field', $data_array);
+
+
+                //adding data in contact table
+                $contact_id = WPGH()->contacts->add($data_array);
+
+                // insert data in contact meta table if users send meta data
+                if (isset($data->meta)) {
+                    //$data_meta = $data->meta;
+                    foreach ($data->meta as $key => $value) {
+                        WPGH()->contact_meta->add_meta($contact_id, $key, $value);
+                    }
+                }
+
+                //--------------- Fetch and Display operation
+
+                $contact = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
+                if (count($contact) > 0) {
+                    $contact_meta = $this->get_meta($contact_id);
+                    return array(
+                        'contact' => $contact,
+                        'meta' => $contact_meta
+                    );
+                }
+
+            } else {
+                return array('message' => $data->email . 'please enter user email.');
+            }
+
+        }
     }
 
     public function get($data)
@@ -114,29 +121,33 @@ class wpgh_api_v1_contacts extends WPGH_API_V1
         // 1. to get all the contact pass all
         // 2. to get specific contact passs contact specified id
 
-        if (isset($data->contact_id)) {//check contact id is set or not
-            $contact_id = $data->contact_id;
-            if ($contact_id == "all") {//return all the contacts
-                $contacts = WPGH()->contacts->get_contacts();
-                return $contacts;
-            } else {
-                //
-                if (WPGH()->contacts->count(array('ID' => $contact_id)) > 0) {
-                    //Featchig contact meta and adding in contact
-                    $contact = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
-                    $contact_meta = $this->get_meta($contact_id);
-                    return array(
-                        'contact' => $contact,
-                        'meta' => $contact_meta
-                    );
+        return array('message' => 'get');
+
+            if (isset($data->contact_id)) {//check contact id is set or not
+                $contact_id = $data->contact_id;
+                if ($contact_id == "all") {//return all the contacts
+                    $contacts = WPGH()->contacts->get_contacts();
+                    return $contacts;
                 } else {
-                    return array('message' => 'No contact found with contact_id ' . $contact_id);
+                    //
+                    if (WPGH()->contacts->count(array('ID' => $contact_id)) > 0) {
+                        //Featchig contact meta and adding in contact
+                        $contact = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
+                        $contact_meta = $this->get_meta($contact_id);
+                        return array(
+                            'contact' => $contact,
+                            'meta' => $contact_meta
+                        );
+                    } else {
+                        return array('message' => 'No contact found with contact_id ' . $contact_id);
+                    }
                 }
+                return $contact_id;
+            } else {
+                return array('message' => 'please enter contact_id to request.');
             }
-            return $contact_id;
-        } else {
-            return array('message' => 'please enter contact_id to request.');
-        }
+
+
     }
 
     public function get_meta($contact_id)
@@ -151,26 +162,25 @@ class wpgh_api_v1_contacts extends WPGH_API_V1
     public function delete($data)
     {// function invoked if user wants to delete one contact
 
-        if(isset($data->contact_id))
-        {
-            $contact_id = $data->contact_id;
-            // ----------- code to delete contact
+        if (!$this->user->has_cap('edit_contacts')) {
+            return new WP_Error('INVALID_PERMISSIONS', __(WPGH()->roles->error('edit_contacts')));
 
-            if(WPGH()->contacts->count(array('ID' => $contact_id))>0 )
-            {
-                if (WPGH()->contacts->delete(array('ID'=>$contact_id)))
-                {
-                    return array('message' => 'contact deleted successfully.');
+        } else {
+            if (isset($data->contact_id)) {
+                $contact_id = $data->contact_id;
+                // ----------- code to delete contact
+
+                if (WPGH()->contacts->count(array('ID' => $contact_id)) > 0) {
+                    if (WPGH()->contacts->delete(array('ID' => $contact_id))) {
+                        return array('message' => 'contact deleted successfully.');
+                    } else {
+                        return array('message' => 'Contact failed to delete.');
+                    }
                 }
-                else
-                {
-                    return array('message' => 'Contact failed to delete.');
-                }
+            } else {
+
+                return array('message' => 'please enter contact_id');
             }
-        }
-        else{
-
-            return array('message' => 'please enter contact_id');
         }
 
     }

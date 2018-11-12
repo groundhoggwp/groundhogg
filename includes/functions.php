@@ -534,6 +534,31 @@ function wpgh_is_recaptcha_enabled(){
 }
 
 /**
+ * Check if the email API is enabled throughout the plugin.
+ *
+ * @return bool, whether it's enable or not.
+ */
+function wpgh_is_email_api_enabled(){
+
+    $recaptcha = wpgh_get_option( 'gh_send_with_gh_api', array() );
+
+    return is_array( $recaptcha ) && in_array( 'on', $recaptcha );
+}
+
+/**
+ * Generic function for checking checkboxes from the Groundhogg settings.
+ *
+ * @param string $key
+ * @return bool
+ */
+function wpgh_is_option_enabled( $key = '' )
+{
+    $option = wpgh_get_option( 'key', array() );
+
+    return is_array( $option ) && in_array( 'on', $option );
+}
+
+/**
  * Swicth between the main site options if on a multisite network.
  *
  * @param $key

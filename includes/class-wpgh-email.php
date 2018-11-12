@@ -685,12 +685,24 @@ class WPGH_Email
         $content = $this->build();
         $headers = $this->get_headers();
 
-        $sent = wp_mail(
-            $to,
-            $subject,
-            $content,
-            $headers
-        );
+        /* Send with API */
+        if ( wpgh_is_email_api_enabled() ){
+            $sent = $this->send_with_gh(
+                $to,
+                $subject,
+                $content,
+                $headers
+            );
+        } else {
+        /* Send with default WP */
+            $sent = $this->sent_with_wp(
+                $to,
+                $subject,
+                $content,
+                $headers
+            );
+        }
+
 
         remove_action( 'phpmailer_init', array( $this, 'set_bounce_return_path' ) );
         remove_action( 'phpmailer_init', array( $this, 'set_plaintext_body' ) );
@@ -706,6 +718,79 @@ class WPGH_Email
         do_action( 'wpgh_after_email_send', $this );
 
         return $sent;
+
+    }
+
+    /**
+     * Send with generic WP mail
+     *
+     * @param $to
+     * @param $subject
+     * @param $content
+     * @param $headers
+     * @return bool
+     */
+    private function sent_with_wp( $to,$subject,$content,$headers )
+    {
+        return wp_mail(
+            $to,
+            $subject,
+            $content,
+            $headers
+        );
+    }
+
+    /**
+     * Send to Groundhogg
+     *
+     * @param $to
+     * @param $subject
+     * @param $content
+     * @param $headers
+     *
+     * @return bool|wp_error
+     */
+    private function send_with_gh( $to, $subject, $content, $headers )
+    {
+
+        //send to groundhogg
+
+        $sender = $this->get_from_email();
+        $domain = explode( '@', $sender )[ 1 ];
+
+        $data = array(
+
+            'sender'    => $sender,
+            'recipient' => $to,
+            'subject'   => $subject,
+            'content'   => $content,
+            'gh_key'    => wpgh_get_option( 'gh_email_token' ),
+            'domain'    => $domain,
+        );
+
+// validate domain and senders email address before making sending request
+
+
+        $url = 'https://www.groundhogg.io';
+        $req = array(
+            'send_ses_email' => 'send_email',
+            'data' => $data,
+        );
+
+        $request    = wp_remote_post( $url, array( 'body' => $req ) );
+        $result     = wp_remote_retrieve_body( $request );
+        $result     = json_decode( $result );
+
+        if ( $result->status === 'failed' ){
+            /* mail failed */
+
+            do_action( 'wp_mail_failed' ,new WP_Error( 'MAIL_FAILED', $result->message ) );
+
+            return false;
+
+        }
+
+        return true;
 
     }
 
