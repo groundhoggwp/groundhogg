@@ -141,7 +141,7 @@ class WPGH_Extension_Manager
 		$response = wp_remote_post( static::$storeUrl, array( 'timeout' => 15, 'sslverify' => true, 'body' => $api_params ) );
 		// make sure the response came back okay
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-            $message =  ( is_wp_error( $response ) && ! empty( $response->get_error_message() ) ) ? $response->get_error_message() : __( 'An error occurred, please try again.' );
+            $message =  ( is_wp_error( $response ) && $response->get_error_message() ) ? $response->get_error_message() : __( 'An error occurred, please try again.' );
         } else {
             $license_data = json_decode( wp_remote_retrieve_body( $response ) );
             if ( false === $license_data->success ) {

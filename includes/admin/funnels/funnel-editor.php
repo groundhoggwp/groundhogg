@@ -260,11 +260,6 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                     <?php do_action('wpgh_funnel_steps_after' ); ?>
                 </div>
             </div>
-
-            <script>
-                jQuery(function($){$('#normal-sortables').css( 'visibility', 'visible' )})
-            </script>
-            <!-- end main funnel editing area -->
             <div style="clear: both;"></div>
         </div>
     </div>

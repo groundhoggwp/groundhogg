@@ -52,6 +52,7 @@ var wpghFunnelEditor;
             this.initReporting();
 
             this.editorSizing();
+
             $( window ).resize(function() {
                 wpghFunnelEditor.editorSizing();
             });
@@ -64,8 +65,9 @@ var wpghFunnelEditor;
         },
 
         editorSizing: function (){
-            $('.funnel-editor-header').width( $('#poststuff').width() );
-            $('#postbox-container-2').height( $('#postbox-container-1').height() - 80 );
+            $( '.funnel-editor-header').width( $('#poststuff').width() );
+            $( '#postbox-container-2').height( $('#postbox-container-1').height() - 80 );
+            $( '#normal-sortables' ).css( 'visibility', 'visible' );
         },
 
         initReporting: function(){

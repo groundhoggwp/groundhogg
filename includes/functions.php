@@ -140,6 +140,73 @@ function wpgh_convert_funnel_to_json( $funnel_id )
 }
 
 /**
+ * Import a funnel
+ *
+ * @return bool|int
+ */
+function wpgh_import_funnel( $import )
+{
+    if ( is_string( $import ) ){
+        $import = json_decode( $import, true );
+    }
+
+    if ( ! is_array( $import ) )
+        return false;
+
+    $title = $import[ 'title' ];
+
+    $funnel_id = WPGH()->funnels->add( array( 'title' => $title, 'status' => 'inactive', 'author' => get_current_user_id() ) );
+
+    $steps = $import[ 'steps' ];
+
+    $valid_actions = WPGH()->elements->get_actions();
+    $valid_benchmarks = WPGH()->elements->get_benchmarks();
+
+    foreach ( $steps as $i => $step_args )
+    {
+
+        $step_title = $step_args['title'];
+        $step_group = $step_args['group'];
+        $step_type  = $step_args['type'];
+
+        if ( ! isset( $valid_actions[$step_type] ) && ! isset( $valid_benchmarks[$step_type] ) )
+            continue;
+
+        $args = array(
+            'funnel_id' => $funnel_id,
+            'step_title'     => $step_title,
+            'step_status'    => 'ready',
+            'step_group'     => $step_group,
+            'step_type'      => $step_type,
+            'step_order'     => $i+1,
+        );
+
+        $step_id = WPGH()->steps->add( $args );
+
+        $step_meta = $step_args['meta'];
+
+        foreach ( $step_meta as $key => $value )
+        {
+            if ( is_array( $value ) ){
+                WPGH()->step_meta->update_meta( $step_id, $key, $value[0] );
+            } else {
+                WPGH()->step_meta->update_meta( $step_id, $key, $value );
+            }
+        }
+
+        $import_args = $step_args[ 'args' ];
+
+        $step = new WPGH_Step( $step_id );
+
+        do_action( 'wpgh_import_step_' . $step_type, $import_args, $step );
+
+    }
+
+    return $funnel_id;
+}
+
+
+/**
  * Provides a quick way to instill a contact session and tie events to a particluar contact.
  *
  * @param $string|int the thing to encrypt/decrypt

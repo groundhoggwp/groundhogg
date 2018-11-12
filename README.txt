@@ -97,7 +97,7 @@ No, Groundhogg is a completely standalone, lightweight marketing system designed
 No, you can use Groundhogg for free forever. Groundhogg is a Open Source project designed to democratize email marketing and provide simple easy to use tools to new and none tech savvy business owners.
 
 = Will it connect to Woocommerce or other plugins? =
-Yes, you can find our Official [Woocomerce](https://groundhogg.io/downloads/woocommerce) extension on our site among other extensions for other popular plugins.
+Yes, you can find our Official [Woocommerce](https://groundhogg.io/downloads/woocommerce) extension on our site among other extensions for other popular plugins.
 
 = Is it secure? =
 We follow all best WordPress security practices. Plus it's open source, so we have a large community looking out for potential weaknesses when it comes to your data.
@@ -108,9 +108,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.0.8 =
+* FIXED could not use function in right context fatal error.
 * FIXED multisite funnel capability comparing string to int.
 * TWEAKED adding emails is also now done through the admin modal system.
 * TWEAKED better handling of edit email link when email changes.
+* FIXED activation error "you do not have permissions..."
 
 = 1.0.7 =
 * FIXED Emails were not updating from the funnel editor when click the "save changes button" in the modal. Click said button will now update the email.
