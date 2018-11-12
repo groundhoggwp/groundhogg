@@ -48,6 +48,10 @@ class WPGH_DB_Events extends WPGH_DB  {
         }
         $this->primary_key = 'ID';
         $this->version     = '1.0';
+
+        add_action( 'wpgh_delete_contact',  array( $this, 'contact_deleted' ) );
+        add_action( 'wpgh_delete_funnel',   array( $this, 'funnel_deleted' ) );
+        add_action( 'wpgh_delete_step',     array( $this, 'step_deleted' ) );
     }
 
     /**
@@ -221,6 +225,55 @@ class WPGH_DB_Events extends WPGH_DB  {
         return $results;
 
     }
+
+    /**
+     * Helper function to bulk delete events in the event associated things happen.
+     *
+     * @param array $args
+     * @return false|int
+     */
+    public function bulk_delete( $data = array(), $where= array( '%d' ) )
+    {
+        global $wpdb;
+
+        $column_formats = $this->get_columns();
+        $data = array_intersect_key( $data, $column_formats );
+
+        $result = $wpdb->delete( $this->table_name, $data );
+
+        return $result;
+    }
+
+    /**
+     * Delete events for a contact that was just deleted...
+     *
+     * @param $id
+     * @return false|int
+     */
+    public function contact_deleted( $id ){
+        return $this->bulk_delete(  array( 'contact_id' => $id ) );
+    }
+
+    /**
+     * Delete events for a funnel that was just deleted...
+     *
+     * @param $id
+     * @return false|int
+     */
+    public function funnel_deleted( $id ){
+        return $this->bulk_delete(  array( 'funnel_id' => $id ) );
+    }
+
+    /**
+     * Delete events for a step that was just deleted...
+     *
+     * @param $id
+     * @return false|int
+     */
+    public function step_deleted( $id ){
+        return $this->bulk_delete(  array( 'step_id' => $id ) );
+    }
+
 
     /**
      * Count the number of rows

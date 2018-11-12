@@ -113,6 +113,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED adding emails is also now done through the admin modal system.
 * TWEAKED better handling of edit email link when email changes.
 * FIXED activation error "you do not have permissions..."
+* TWEAKED DBs now clean themselves whenever stuff is deleted...
+* ADDED GH email sender API!
 
 = 1.0.7 =
 * FIXED Emails were not updating from the funnel editor when click the "save changes button" in the modal. Click said button will now update the email.

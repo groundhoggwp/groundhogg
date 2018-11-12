@@ -176,6 +176,8 @@ class WPGH_DB_Steps extends WPGH_DB  {
                 $this->set_last_changed();
             }
 
+            do_action( 'wpgh_delete_step', $id );
+
             return $result;
 
         } else {
@@ -187,7 +189,7 @@ class WPGH_DB_Steps extends WPGH_DB  {
     /**
      * Delete steps when a funnel is deleted...
      *
-     * @param bool $id
+     * @param bool|int $id Funnel ID
      * @return bool|false|int
      */
     public function delete_steps( $id = false ){
@@ -196,12 +198,14 @@ class WPGH_DB_Steps extends WPGH_DB  {
             return false;
         }
 
-        global $wpdb;
+        $steps = $this->get_steps( array( 'funnel_id' => $id ) );
 
-        $result = $wpdb->delete( $this->table_name, array( 'funnel_id' => $id ), array( '%d' ) );
+        $result = 0;
 
-        if ( $result ) {
-            $this->set_last_changed();
+        if ( $steps ){
+            foreach ( $steps as $step ){
+                $result = $this->delete( $step->ID );
+            }
         }
 
         return $result;

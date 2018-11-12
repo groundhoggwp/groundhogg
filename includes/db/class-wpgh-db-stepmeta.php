@@ -36,6 +36,7 @@ class WPGH_DB_Step_Meta extends WPGH_DB {
         $this->version     = '1.0';
 
         add_action( 'plugins_loaded', array( $this, 'register_table' ), 11 );
+        add_action( 'wpgh_delete_step', array( $this, 'delete_step_meta_on_delete' ) );
 
     }
 
@@ -63,6 +64,22 @@ class WPGH_DB_Step_Meta extends WPGH_DB {
     public function register_table() {
         global $wpdb;
         $wpdb->stepmeta = $this->table_name;
+    }
+
+    /**
+     * Clean up contact Meta if steps gets delete
+     *
+     * @param $id int the ID of the step
+     * @return false|int
+     */
+    public function delete_step_meta_on_delete( $id ){
+
+        global $wpdb;
+
+        $result = $wpdb->delete( $this->table_name, array( 'step_id' => $id ), array( '%d' ) );
+
+        return $result;
+
     }
 
     /**
