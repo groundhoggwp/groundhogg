@@ -629,6 +629,8 @@ class WPGH_Funnels_Page
 
             if ( isset( $_POST[ $step->prefix( 'blog_id' ) ] ) ){
                 $step->update_meta( 'blog_id', intval( $_POST[ $step->prefix( 'blog_id' ) ] ) );
+            } else {
+                $step->delete_meta( 'blog_id' );
             }
 
             do_action( 'wpgh_save_step_' . $step->type, $step );
