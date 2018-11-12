@@ -577,7 +577,7 @@ class WPGH_Tracking
 
         $conf_page = get_permalink( wpgh_get_option( 'gh_confirmation_page' ) );
 
-        if ( ms_is_switched() ){
+        if ( is_multisite() && ms_is_switched() ){
             restore_current_blog();
         }
 

@@ -126,7 +126,7 @@ class WPGH_Event
     public function run()
     {
 
-        if ( ! $this->is_waiting() || ! $this->is_time() || ! $this->step->can_run() )
+        if ( ! $this->is_waiting() || ! $this->is_time() || $this->has_similar() || ! $this->step->can_run()  )
             return false;
 
         do_action( 'wpgh_event_run_before', $this );
@@ -156,6 +156,36 @@ class WPGH_Event
         do_action( 'wpgh_event_run_after', $this );
 
         return true;
+    }
+
+    /**
+     * Check if an event similar to this one has run in the last 5 minutes.
+     * If it has, SKIP IT!!!!!!!!!!!!!!
+     *
+     * @return bool
+     */
+    public function has_similar(){
+
+        $similar_events = WPGH()->events->get_events(
+            array(
+                'start'         => $this->time - ( 5 * 60 ),
+                'end'           => $this->time + ( 5 * 60 ),
+                'funnel_id'     => $this->funnel_id,
+                'step_id'       => $this->ID,
+                'contact_id'    => $this->contact->ID,
+                'status'        => 'complete'
+            )
+        );
+
+        if ( $similar_events && count( $similar_events ) > 0 ){
+
+            $this->skip();
+
+            return true;
+        }
+
+        return false;
+
     }
 
     /**

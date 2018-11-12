@@ -384,7 +384,7 @@ class WPGH_Email
     {
         $footer = "";
 
-        if ( ! wpgh_should_if_multisite() ){
+        if ( wpgh_is_global_multisite() ){
             switch_to_blog( get_site()->site_id );
         }
 
@@ -424,7 +424,7 @@ class WPGH_Email
 
         $footer = WPGH()->replacements->process( $footer, $this->contact->ID );
 
-        if ( ms_is_switched() ){
+        if ( is_multisite() && ms_is_switched() ){
             restore_current_blog();
         }
 
@@ -439,13 +439,13 @@ class WPGH_Email
      */
     public function get_unsubscribe_link( $url )
     {
-        if ( ! wpgh_should_if_multisite() ){
+        if ( wpgh_is_global_multisite() ){
             switch_to_blog( get_site()->site_id );
         }
 
         $url = get_permalink( wpgh_get_option( 'gh_email_preferences_page' ) );
 
-        if ( ms_is_switched() ){
+        if ( is_multisite() && ms_is_switched() ){
             restore_current_blog();
         }
 
@@ -498,6 +498,8 @@ class WPGH_Email
 
         ob_start();
 
+//        wp_die( 'HI!' );
+
         if ( has_action( 'wpgh_email_template_header_' . $this->get_template() ) ){
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
@@ -508,6 +510,7 @@ class WPGH_Email
             $templates->get_template_part( 'emails/header', $this->get_template() );
         }
 
+//        wp_die( 'HI!' );
         if ( has_action( 'wpgh_email_template_body_' . $this->get_template() ) ){
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
@@ -528,10 +531,12 @@ class WPGH_Email
 
         }
 
+
         $content = ob_get_clean();
+//        return ob_get_clean();
 
         if ( empty( $content ) )
-            $content = 'No content...';
+        $content = 'No content...';
 
 
         $content = $this->minify( $content );
@@ -672,6 +677,16 @@ class WPGH_Email
 
         }
 
+        if ( $contact->get_meta( 'last_sent' ) ){
+
+            $last_sent = intval( $contact->get_meta( 'last_sent' ) );
+
+            if ( ( time() - $last_sent ) <= 30 ){
+                return new WP_Error( 'TOO_MANY_EMAILS', __( 'There must be a minimum 30 seconds before a contact can receive another email.' ) );
+            }
+
+        }
+
         do_action( 'wpgh_before_email_send', $this );
 
         /* Additional settings */
@@ -683,6 +698,9 @@ class WPGH_Email
         $to = $this->get_to();
         $subject = $this->get_subject_line();
         $content = $this->build();
+
+//                wp_die( 'HI!' );
+
         $headers = $this->get_headers();
 
         /* Send with API */
@@ -712,6 +730,10 @@ class WPGH_Email
         if ( ! $sent ){
 
             do_action( 'wpgh_email_send_failed', $this );
+
+        } else {
+
+            $contact->update_meta( 'last_sent', time() );
 
         }
 

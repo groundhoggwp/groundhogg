@@ -273,8 +273,8 @@ class WPGH_Step
 
         $similar_events = WPGH()->events->get_events(
             array(
-                'start'         => time() - 60,
-                'end'           => time() + 60,
+                'start'         => $this->get_delay_time() - ( 5 * 60 ),
+                'end'           => $this->get_delay_time() + ( 5 * 60 ),
                 'funnel_id'     => $this->funnel_id,
                 'step_id'       => $this->ID,
                 'contact_id'    => $contact->ID

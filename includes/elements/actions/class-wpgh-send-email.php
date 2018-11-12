@@ -39,6 +39,13 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
     public $name    = 'Send Email';
 
     /**
+     * The time delay before this step can be run.
+     *
+     * @var int
+     */
+    public $delay_time = 30;
+
+    /**
      * @var string
      */
     public $description = 'Send an email to a contact.';
@@ -64,7 +71,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
         ) );
     }
 
-	/**
+    /**
      * Display the settings
      *
      * @param $step WPGH_Step

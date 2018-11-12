@@ -421,8 +421,6 @@ class WPGH_Emails_Page
 
         $notices = ob_get_clean();
 
-        ob_start();
-
         $response = array(
             'notices'   => $notices
         );
@@ -441,8 +439,6 @@ class WPGH_Emails_Page
         }
 
         $id = intval( $_REQUEST[ 'email' ] );
-
-
 
         do_action( 'wpgh_email_update_before', $id );
 

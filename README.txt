@@ -115,6 +115,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * FIXED activation error "you do not have permissions..."
 * TWEAKED DBs now clean themselves whenever stuff is deleted...
 * ADDED GH email sender API!
+* TWEAKED added failsafe event running to ensure that no event is run TWICE within 5 minutes...
 
 = 1.0.7 =
 * FIXED Emails were not updating from the funnel editor when click the "save changes button" in the modal. Click said button will now update the email.
