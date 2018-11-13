@@ -703,8 +703,8 @@ class WPGH_Email
 
         $headers = $this->get_headers();
 
-        /* Send with API */
-        if ( wpgh_is_email_api_enabled() ){
+        /* Send with API. Do not send with API while in TEST MODE */
+        if ( wpgh_is_email_api_enabled() && ! $this->testing ){
             $sent = $this->send_with_gh(
                 $to,
                 $subject,

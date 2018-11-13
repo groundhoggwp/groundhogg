@@ -5,26 +5,26 @@
 /*$( '#adminmenuback' ).addClass( 'hidden' );*/
 /*$( '#wpfooter' ).addClass( 'hidden' );*/
 
-html {
+.iframed html {
     padding-top: 0;
 }
 
-#wpcontent {
+.iframed  #wpcontent {
     margin: 0;
 }
 
-#wpadminbar {
+.iframed #wpadminbar {
     display: none;
 }
 
-#adminmenuwrap {
+.iframed #adminmenuwrap {
     display: none;
 }
 
-#adminmenuback {
+.iframed #adminmenuback {
     display: none;
 }
 
-#wpfooter{
+.iframed #wpfooter{
     display: none;
 }

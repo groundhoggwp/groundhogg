@@ -289,9 +289,18 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $tags = array();
 
         foreach ( $broadcast->tags as $i => $tag_id ){
-            $tag = WPGH()->tags->get( $tag_id );
-            $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . $tag->tag_name . ' ('  . $tag->contact_count . ')</a>';
+
+            if ( WPGH()->tags->exists( $tag_id ) ){
+                $tag = WPGH()->tags->get( $tag_id );
+                $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . $tag->tag_name . ' ('  . $tag->contact_count . ')</a>';
+            }
+
         }
+
+        if ( empty( $tags ) ){
+            return '&#x2014;';
+        }
+
         return implode( ', ', $tags );
     }
 

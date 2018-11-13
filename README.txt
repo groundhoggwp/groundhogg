@@ -107,6 +107,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.8.2 =
+* ADDED Share link to allow the sharing of funnels via links.
+* TWEAKED Disabled autocomplete for broadcast date picker.
+* FIXED Clicking image or button in email editor cause page reload.
+* FIXED PHP warning if a tag is deleted but a broadcast report is trying to access it.
+
 = 1.0.8.1 =
 * FIXED queue failsafe bug
 

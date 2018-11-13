@@ -130,6 +130,8 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                     </div>
                 </div>
                 <div id="export">
+                    <a id="copy-share-link" style="text-decoration: none; display: inline-block" href="#"><span style="padding: 5px;" title="Copy Share Link" class="dashicons dashicons-share"></span></a>
+                    <input id="share-link" type="hidden" value="<?php echo add_query_arg( 'funnel_share', wpgh_encrypt_decrypt( $funnel_id, 'e' ), site_url() ); ?>">
                     <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _e( 'Export Funnel', 'groundhogg'); ?></a>
                 </div>
                 <div id="status">

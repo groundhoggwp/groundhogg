@@ -61,6 +61,10 @@ var wpghFunnelEditor;
                 wpghFunnelEditor.addContacts();
             });
 
+            $( '#copy-share-link' ).click( function ( e ) {
+                e.preventDefault();
+                prompt( "Copy This Link", $('#share-link').val() );
+            })
 
         },
 

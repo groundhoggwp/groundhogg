@@ -118,9 +118,9 @@ var wpghModal;
             this.loader.addClass( 'hidden' );
 
             //if a link is clicked reload the frame.
-            $iframe.contents().find( 'a' ).click( function () {
-                wpghModal.frameReload();
-            });
+            // $iframe.contents().find( 'a' ).click( function () {
+            //     wpghModal.frameReload();
+            // });
 
             //special handling for email builder.
             $iframe.contents().find( '.choose-template' ).click( function () {

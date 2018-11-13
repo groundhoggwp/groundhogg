@@ -666,3 +666,42 @@ function wpgh_recount_tag_contacts_count()
         }
     }
 }
+
+
+function wpgh_funnel_share_listen()
+{
+    if ( isset( $_GET[ 'funnel_share' ] ) ) {
+
+        $key = urldecode( $_GET[ 'funnel_share' ] );
+        $id = intval( wpgh_encrypt_decrypt( $key, 'd' ) );
+        if ( WPGH()->funnels->exists( $id ) ){
+
+            $funnel = WPGH()->funnels->get_funnel( $id );
+
+            if ( ! $funnel )
+                return;
+
+            $export_string = wpgh_convert_funnel_to_json( $id );
+
+            if ( ! $export_string )
+                return;
+
+            $filename = $funnel->title . ' - '. date("Y-m-d_H-i", time() );
+
+            header("Content-type: text/plain");
+
+            header( "Content-disposition: attachment; filename=".$filename.".funnel");
+
+            $file = fopen('php://output', 'w');
+
+            fputs( $file, $export_string );
+
+            fclose($file);
+
+            exit();
+        }
+
+    }
+}
+
+add_action( 'init', 'wpgh_funnel_share_listen' );

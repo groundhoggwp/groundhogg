@@ -35,4 +35,8 @@ var wpghIframeChecker;
         wpghIframeChecker.init();
     });
 
+    if ( wpghIframeChecker.inFrame() ){
+        $( 'html' ).addClass( 'iframed' );
+    }
+
 })(jQuery);

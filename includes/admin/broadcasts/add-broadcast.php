@@ -50,7 +50,7 @@ wp_enqueue_style( 'jquery-ui' );
                 <label for="date"><?php _e( 'Send On:' ); ?></label>
             </th>
             <td>
-                <input style="height:29px;width: 100px" class="input" placeholder="Y/m/d" type="text" id="date" name="date" value="" required><input type="time" id="time" name="time" value="09:15" required>
+                <input style="height:29px;width: 100px" class="input" placeholder="Y/m/d" type="text" id="date" name="date" value="" autocomplete="off" required><input type="time" id="time" ame="time" value="09:15" autocomplete="off" required>
                     <script>jQuery(function($){$('#date').datepicker({
                     changeMonth: true,
                     changeYear: true,
