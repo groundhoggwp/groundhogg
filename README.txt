@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.9 =
+* TWEAKED Steps now have their own status. Inactive steps will be skipped.
+* TWEAKED Email step now defaults to most recent email instead of oldest email.
+
 = 1.0.8.2 =
 * ADDED Share link to allow the sharing of funnels via links.
 * TWEAKED Disabled autocomplete for broadcast date picker.
@@ -295,7 +299,7 @@ among other functionality will work on the front end.
 * Pre-release with some bug fixes
 
 = 0.9 =
-* Pre-release for testing instalation from repo
+* Pre-release for testing installation from repo
 
 = 0.1 =
 * First Commit

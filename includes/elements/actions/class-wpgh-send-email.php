@@ -83,7 +83,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
         if ( ! $email_id ){
             /* If this is for example a NEW step, the lets just set a default email */
             $emails = WPGH()->emails->get_emails();
-            $email_id = array_shift( $emails )->ID;
+            $email_id = array_pop( $emails )->ID;
         }
 
         $return_path = admin_url( 'admin.php?page=gh_emails&return_funnel=' . $step->funnel_id . '&return_step=' . $step->ID );
