@@ -525,20 +525,6 @@ class WPGH_Step
                 <span class="dashicons dashicons-admin-page"></span>
             </button>
 
-            <button title="ready" type="button" class="handlediv ready-step"><label>
-
-                <?php
-
-                echo WPGH()->html->checkbox( array(
-                    'name' => $this->prefix( 'status' ),
-                    'value' => 'ready',
-                    'label' => __( 'Ready?' ),
-                ) );
-
-                ?>
-                </label>
-            </button>
-
             <!-- HNDLE -->
             <h2 class="hndle ui-sortable-handle">
                 <img class="hndle-icon" width="50" src="<?php echo $this->icon(); ?>">

@@ -829,10 +829,12 @@
                                         el.text(text);
                                     } else {
                                         exec('createLink', newHref);
+
                                         if (selected.is('a')) {
                                             selected.text(text);
                                         } else {
-                                            selected.find('a').text(text);
+                                            //selected.find('a:last').text(text);
+                                            getSelectionContainerElement().text(text);
                                         }
                                     }
                                 }
@@ -960,7 +962,7 @@
                     //return wrapper.classList[action.state() ? 'add' : 'remove'](classes.selected);
                 };
                 handlers.push(handler);
-                // destroyCallbacks.push(addEventListener(content, 'keyup', runAll));
+                destroyCallbacks.push(addEventListener(content, 'keyup', runAll));
                 destroyCallbacks.push(addEventListener(content, 'mouseup', runAll));
                 destroyCallbacks.push(addEventListener(button, 'click', runAll));
             }

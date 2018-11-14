@@ -108,8 +108,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.0.9 =
-* TWEAKED Steps now have their own status. Inactive steps will be skipped.
 * TWEAKED Email step now defaults to most recent email instead of oldest email.
+* FIXED Link picker in email builder not working after multiple uses of the link picker.
+* ADDED System Report
 
 = 1.0.8.2 =
 * ADDED Share link to allow the sharing of funnels via links.

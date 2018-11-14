@@ -40,8 +40,7 @@ class WPGH_Settings_Page
         if ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) {
 
             add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );
-            add_action( 'admin_init', array( $this, 'perform_tools' ) );
-
+//            add_action( 'admin_init', array( $this, 'perform_tools' ) );
         }
 
         if ( ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) || wp_doing_ajax() ){
@@ -149,90 +148,10 @@ class WPGH_Settings_Page
                     case 'tools':
                         ?>
                         <div id="poststuff">
-                            <!-- Begin Import Tool -->
-                            <div class="postbox">
-                                <h2 class="hndle"><?php _e( 'Import Contacts', 'groundhogg' ); ?></h2>
-                                <div class="inside">
-                                    <p>
-                                        <input type="file" id="contacts" name="contacts" accept=".csv" >
-                                    </p>
-                                    <p class="description"><?php _e( "Use the following column format to import your contacts. Any custom information added into your data will be treated as custom meta data for the contact.", 'groundhogg' ); ?></p>
-                                    <table class="wp-list-table widefat fixed striped">
-                                        <thead>
-                                            <tr>
-                                                <th>First Name</th>
-                                                <th>Last Name</th>
-                                                <th>Email</th>
-                                                <th>Primary Phone</th>
-                                                <th>Notes</th>
-                                                <th>Meta Key</th>
-                                                <th>Another Meta Key</th>
-                                                <th>...</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>ExampleFirst</td>
-                                                <td>ExampleLast</td>
-                                                <td>Email@email.com</td>
-                                                <td>555-555-5555</td>
-                                                <td>Interesting Info</td>
-                                                <td>Meta Value</td>
-                                                <td>Another Meta Value</td>
-                                                <td>...</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <hr>
-                                    <?php $tag_args = array();
-                                    $tag_args[ 'id' ] = 'import_tags';
-                                    $tag_args[ 'name' ] = 'import_tags[]'; ?>
-                                    <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
-                                    <div class="import-status-wrapper"><p><strong><span class="import-status"></span></strong></p></div>
-                                    <p class="description"><?php _e( 'These tags will be applied to the contacts upon importing.', 'groundhogg' ); ?></p>
-                                    <p class="submit">
-                                        <button style="float: left" class="import button button-primary" id="import" type="button"><?php _e( 'Import Contacts' ); ?></button>
-                                        <span class="spinner spinner-import" style="float: left"></span>
-                                    </p>
-                                </div>
-                            </div>
-                            <!-- End Import Tool -->
 
-                            <!-- Begin Export Tool -->
-                            <div class="postbox">
-                                <h2 class="hndle"><?php _e( 'Export Contacts', 'groundhogg' ); ?></h2>
-                                <div class="inside">
-                                    <p class="description"><?php _e( 'Export contacts to a .CSV file. This will download to your browser.', 'groundhogg' ); ?></p>
-                                    <?php $tag_args = array();
-                                    $tag_args[ 'id' ] = 'export_tags';
-                                    $tag_args[ 'name' ] = 'export_tags[]';?>
-                                    <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
-                                    <p class="description"><?php _e( 'Contacts with these tags will be exported. Leave blank to export ALL contacts.', 'groundhogg' ); ?></p>
-                                    <p class="submit">
-                                    <button style="float: left" class="export button button-primary" id="export" type="button"><?php _e( 'Export Contacts' ); ?></button>
-                                    <span class="spinner spinner-export" style="float: left"></span>
-                                    </p>
-                                </div>
-                            </div>
+                            <?php $this->perform_tools(); ?>
 
-                            <div class="postbox">
-                                <h2 class="hndle"><?php _e( 'Bulk Delete Contacts', 'groundhogg' ); ?></h2>
-                                <div class="inside">
-                                    <p class="description"><?php _e( 'Bulk delete contacts.', 'groundhogg' ); ?></p>
-                                    <?php $tag_args = array();
-                                    $tag_args[ 'id' ] = 'delete_tags';
-                                    $tag_args[ 'name' ] = 'delete_tags[]';?>
-                                    <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
-                                    <p class="description"><?php _e( 'Contacts with these tags will be delete. Leave blank to delete ALL contacts.', 'groundhogg' ); ?></p>
-                                    <p class="submit">
-                                    <button style="float: left" class="delete button button-primary" id="delete" type="button"><?php _e( 'Delete Contacts' ); ?></button>
-                                    <span class="spinner spinner-delete" style="float: left"></span>
-                                    </p>
-                                </div>
-                            </div>
-                            <!-- End Export Tool -->
                         </div>
-
                         <?php
 
 

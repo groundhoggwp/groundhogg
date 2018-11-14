@@ -373,6 +373,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-menu.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-bulk-contact-manager.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
+                require_once WPGH_PLUGIN_DIR . 'includes/tools.php';
 //                require_once WPGH_PLUGIN_DIR . 'includes/admin/user/class-wpgh-user-tokens-section.php';
 
                 if ( is_multisite() ){
