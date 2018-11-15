@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.9.1 =
+* FIXED Email link picker bug replacing line before with link picker text if adding link at the beginning of a text block.
+
 = 1.0.9 =
 * TWEAKED Email step now defaults to most recent email instead of oldest email.
 * FIXED Link picker in email builder not working after multiple uses of the link picker.

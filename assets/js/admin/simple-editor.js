@@ -828,13 +828,16 @@
                                         el.attr('href', newHref);
                                         el.text(text);
                                     } else {
+                                        var selection = document.getSelection();
+
                                         exec('createLink', newHref);
 
                                         if (selected.is('a')) {
                                             selected.text(text);
                                         } else {
                                             //selected.find('a:last').text(text);
-                                            getSelectionContainerElement().text(text);
+                                            $(selection.anchorNode).text(text);
+                                            console.log(selected, selection.anchorNode);
                                         }
                                     }
                                 }
