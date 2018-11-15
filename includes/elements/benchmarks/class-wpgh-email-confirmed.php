@@ -89,6 +89,10 @@ class WPGH_Email_Confirmed extends WPGH_Funnel_Step
     public function complete( $contact, $funnel_id )
     {
 
+        if ( $contact->optin_status !== WPGH_CONFIRMED ){
+            return;
+        }
+
         $steps = WPGH()->steps->get_steps( array( 'step_type' => $this->type, 'step_group' => $this->group, 'funnel_id' => $funnel_id ) );
 
         foreach ( $steps as $step ){

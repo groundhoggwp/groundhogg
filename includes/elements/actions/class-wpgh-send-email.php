@@ -86,6 +86,8 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
             $email_id = array_pop( $emails )->ID;
         }
 
+        $email = new WPGH_Email( $email_id );
+
         $return_path = admin_url( 'admin.php?page=gh_emails&return_funnel=' . $step->funnel_id . '&return_step=' . $step->ID );
         $basic_path = admin_url( 'admin.php?page=gh_emails' );
 
@@ -117,6 +119,18 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                     </div>
                 </td>
             </tr>
+            <?php if ( $email->is_confirmation_email() ): ?>
+            <tr>
+                <th><?php _e( 'Skip if confirmed?' ) ?></th>
+                <td><?php echo WPGH()->html->checkbox( array(
+                        'name'  => $step->prefix( 'skip_if_confirmed' ),
+                        'id'    => $step->prefix( 'skip_if_confirmed' ),
+                        'value' => 1,
+                        'label' => __( 'Skip this email if the contact\'s email is already confirmed.', 'Groundhogg' ),
+                        'checked' => $step->get_meta( 'skip_if_confirmed' ),
+                    ) ); ?></td>
+            </tr>
+            <?php endif; ?>
             </tbody>
         </table>
 
@@ -215,6 +229,16 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
         }
 
+        if ( isset( $_POST[ $step->prefix( 'skip_if_confirmed' ) ] ) ){
+
+            $step->update_meta( 'skip_if_confirmed', 1 );
+
+        } else {
+
+            $step->delete_meta( 'skip_if_confirmed' );
+
+        }
+
     }
 
     /**
@@ -231,6 +255,19 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
         $email_id = $event->step->get_meta( 'email_id' );
 
         $email = new WPGH_Email( $email_id );
+
+        if ( $email->is_confirmation_email() ){
+
+            if ( $event->step->get_meta( 'skip_if_confirmed' ) && $contact->optin_status === WPGH_CONFIRMED ){
+
+                /* This will simply get the upcoming email confirmed step and complete it. No muss not fuss */
+                do_action( 'wpgh_email_confirmed', $contact, $event->funnel_id );
+
+                return true;
+
+            }
+
+        }
 
         return $email->send( $contact, $event );
 

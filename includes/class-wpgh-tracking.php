@@ -340,11 +340,14 @@ class WPGH_Tracking
     /**
      * Return the step contact
      *
-     * @return WPGH_Contact
+     * @return WPGH_Contact | false
      */
     public function get_contact()
     {
-        return $this->contact;
+        if ( $this->contact instanceof WPGH_Contact )
+            return $this->contact;
+
+        return false;
     }
 
     /**

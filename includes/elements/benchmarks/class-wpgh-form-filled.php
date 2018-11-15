@@ -35,7 +35,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
     /**
      * @var string
      */
-    public $name    = 'Form Filled';
+    public $name    = 'Web Form';
 
     /**
      * Add the completion action
@@ -49,13 +49,102 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
         parent::__construct();
 
         add_action( 'wpgh_form_submit', array( $this, 'complete' ), 10, 3 );
-        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ));
+
+        if ( is_admin() && isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' && isset($_REQUEST[ 'action' ]) && $_REQUEST[ 'action' ] === 'edit' ){
+            add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ));
+        }
+
+        add_action( 'wp_ajax_wpgh_form_impression', array( $this, 'track_impression' ) );
+        add_action( 'wp_ajax_nopriv_wpgh_form_impression', array( $this, 'track_impression' ) );
     }
 
+    /**
+     * Enqueue the form builder JS in the admin area
+     */
     public function scripts()
     {
 
         wp_enqueue_script( 'wpgh-form-builder', WPGH_ASSETS_FOLDER . 'js/admin/form-builder.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/form-builder.js' ) );
+
+    }
+
+    /**
+     * Track a form impression from the frontend.
+     */
+    public function track_impression()
+    {
+
+        if( !class_exists( 'Browser' ) )
+            require_once WPGH_PLUGIN_DIR . 'includes/lib/browser.php';
+
+        $browser = new Browser();
+        if ( $browser->isRobot() || $browser->isAol() ){
+            wp_die( json_encode( array( 'error' => 'No Track Robots.' ) ) );
+        }
+
+        $ID = intval( $_POST[ 'id' ] );
+
+        if ( ! WPGH()->steps->exists( $ID ) ){
+            wp_die( json_encode( array( 'error' => 'Form DNE.' ) ) );
+        }
+
+        $step = new WPGH_Step( $ID );
+
+        $response = array();
+
+        /*
+         * Is Contact
+         */
+        if ( $contact = WPGH()->tracking->get_contact() ) {
+
+            $db = WPGH()->activity;
+
+            /* Check if impression for contact exists... */
+            $args = array(
+                'funnel_id'     => $step->funnel_id,
+                'step_id'       => $step->ID,
+                'contact_id'    => $contact->ID,
+                'activity_type' => 'form_impression',
+            );
+
+            $response[ 'cid' ] = $contact->ID;
+
+        } else {
+            /*
+            * Not a Contact
+            */
+
+            /* validate against viewers IP? Cookie? TBD */
+            $db = WPGH()->activity;
+
+            /* Check if impression for contact exists... */
+            if ( isset( $_COOKIE[ 'gh_ref_id' ] ) ){
+                $ref_id = sanitize_key( $_COOKIE[ 'gh_ref_id' ] );
+            } else {
+                $ref_id = uniqid( 'g' );
+            }
+
+            $args = array(
+                'funnel_id'     => $step->funnel_id,
+                'step_id'       => $step->ID,
+                'activity_type' => 'form_impression',
+                'ref'           => $ref_id
+            );
+
+            $response[ 'ref_id' ] = $ref_id;
+
+        }
+
+        if ( ! $db->activity_exists( $args ) ){
+
+            $args[ 'timestamp' ] = time();
+            $db->add( $args );
+
+            $response[ 'result' ] = 'success';
+
+        }
+
+        wp_die( json_encode( $response ) );
 
     }
 
@@ -265,6 +354,50 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
             </tr>
         </table>
 
+        <?php
+    }
+
+
+    /**
+     * Extend the Form reporting VIEW with impressions vs. submissions...
+     *
+     * @param $step WPGH_Step
+     */
+    public function reporting($step)
+    {
+        $start_time = WPGH()->menu->funnels_page->reporting_start_time;
+        $end_time   = WPGH()->menu->funnels_page->reporting_end_time;
+
+        $cquery = new WPGH_Contact_Query();
+
+        $num_events_completed = $cquery->query( array(
+            'count' => true,
+            'report' => array(
+                'start' => $start_time,
+                'end'   => $end_time,
+                'step'  => $step->ID,
+                'funnel'=> $step->funnel_id,
+                'status'=> 'complete'
+            )
+        ) );
+
+        $num_impressions = WPGH()->activity->count(array(
+            'start'     => $start_time,
+            'end'       => $end_time,
+            'step_id'   => $step->ID,
+            'activity_type' => 'form_impression'
+        ));
+
+        ?>
+        <p class="report">
+            <span class="impressions"><?php _e( 'Views: '); ?>
+                <strong>
+                    <?php echo $num_impressions; ?>
+                </strong>
+            </span> |
+                <span class="submissions"><?php _e( 'Fills: ' ); ?><strong><a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . $step->funnel_id . '&step=' . $step->ID . '&start=' . $start_time . '&end=' . $end_time ); ?>"><?php echo $num_events_completed; ?></a></strong></span> |
+            <span class="cvr" title="<?php _e( 'Conversion Rate' ); ?>"><?php _e( 'CVR: '); ?><strong><?php echo round( ( $num_events_completed / ( ( $num_impressions > 0 )? $num_impressions : 1 ) * 100 ), 2 ); ?></strong>%</span>
+        </p>
         <?php
     }
 

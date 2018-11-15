@@ -223,6 +223,16 @@ class WPGH_Email
     }
 
     /**
+     * Whether the current email contains a confirmation link.
+     *
+     * @return bool
+     */
+    public function is_confirmation_email()
+    {
+        return strpos( $this->content, '{confirmation_link}' ) !== false;
+    }
+
+    /**
      * Return the browser view option for this email.
      *
      * @param $link

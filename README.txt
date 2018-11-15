@@ -108,7 +108,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.0.9.1 =
+* ADDED Conversion Rate Reporting for the Form Fill Step.
+* ADDED Skip Confirmation emails if already confirmed.
 * FIXED Email link picker bug replacing line before with link picker text if adding link at the beginning of a text block.
+* TWEAKED "Form Fill" step now called "Web Form" step.
 
 = 1.0.9 =
 * TWEAKED Email step now defaults to most recent email instead of oldest email.
