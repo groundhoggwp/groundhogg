@@ -406,7 +406,6 @@ function wpgh_tools_sysinfo_get() {
 
     // Session stuff
     $return .= "\n" . '-- Session Configuration' . "\n\n";
-//    $return .= 'EDD Use Sessions:         ' . ( defined( 'EDD_USE_PHP_SESSIONS' ) && EDD_USE_PHP_SESSIONS ? 'Enforced' : ( EDD()->session->use_php_sessions() ? 'Enabled' : 'Disabled' ) ) . "\n";
     $return .= 'Session:                  ' . ( isset( $_SESSION ) ? 'Enabled' : 'Disabled' ) . "\n";
 
     // The rest of this is only relevant is session is enabled
