@@ -44,7 +44,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
         $this->primary_key = 'tag_id,contact_id';
         $this->version     = '1.0';
 
-        add_action( 'wpgh_delete_contact', array( $this, 'contact_deleted' ) );
+        add_action( 'wpgh_post_delete_contact', array( $this, 'contact_deleted' ) );
         add_action( 'wpgh_delete_tag', array( $this, 'tag_deleted' ) );
     }
 

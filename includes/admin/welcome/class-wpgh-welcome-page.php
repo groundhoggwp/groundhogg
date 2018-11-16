@@ -236,15 +236,21 @@ class WPGH_Welcome_Page
     {
         $extensions = array(
             array(
-                'title' => 'Social Proof',
-                'desc'  => 'Increase your conversion rate by showing how many people are engaging with your business. Show engagement by connecting your Proof to any funnel.',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/social-proof.png',
-                'link'  => 'https://www.groundhogg.io/downloads/proof/'
+                'title' => 'All Access Pass',
+                'desc'  => 'Get every Groundhogg extension at one low price!',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/all-access.png',
+                'link'  => 'https://www.groundhogg.io/downloads/all-access-pass/'
+            ),
+            array(
+                'title' => 'Form Styling',
+                'desc'  => 'Quickly style forms without having to code with CSS!',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/11/form-styling.png',
+                'link'  => 'https://www.groundhogg.io/downloads/form-styling/'
             ),
             array(
                 'title' => 'Email Countdown Timer',
                 'desc'  => 'Create more engagement from emails by adding countdown timers to your emails.',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/countdown-timers.png',
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/11/countdown-timers-new.png',
                 'link'  => 'https://www.groundhogg.io/downloads/countdown/'
             ),
             array(
@@ -258,13 +264,6 @@ class WPGH_Welcome_Page
                 'desc'  => 'Start collecting lead information through Contact Form 7, no setup required. Works instantly!',
                 'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/contact-form-7.png',
                 'link'  => 'https://www.groundhogg.io/downloads/contact-form-7/'
-            ),
-
-            array(
-                'title' => 'Easy Digital Downloads',
-                'desc'  => 'Connect Groundhogg to Easy Digital Downloads and increase your sales with abandonment funnels.',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/edd-722x361.png',
-                'link'  => 'https://www.groundhogg.io/downloads/easy-digital-downloads/'
             ),
         );
 

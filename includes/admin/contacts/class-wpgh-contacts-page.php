@@ -247,8 +247,13 @@ class WPGH_Contacts_Page
 
                 foreach ( $this->get_contacts() as $id ){
 
-                    do_action( 'wpgh_deleted_contact', $id );
-                    WPGH()->contacts->delete( $id );
+                    do_action( 'wpgh_pre_admin_delete_contact', $id );
+
+                    $result = WPGH()->contacts->delete( $id );
+
+                    if ( $result ){
+                        do_action( 'wpgh_post_admin_delete_contact', $id );
+                    }
 
                 }
 

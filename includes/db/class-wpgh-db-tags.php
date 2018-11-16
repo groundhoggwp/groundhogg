@@ -84,7 +84,12 @@ class WPGH_DB_Tags extends WPGH_DB
      * @return array $tags
      */
     public function validate( $maybe_tags=array() ){
+
         $tags = array();
+
+        if ( ! is_array( $maybe_tags ) ){
+            $maybe_tags = array( $maybe_tags );
+        }
 
         foreach ( $maybe_tags as $i => $tag_id_or_string ) {
 

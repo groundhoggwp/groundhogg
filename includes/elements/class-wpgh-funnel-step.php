@@ -81,12 +81,12 @@ class WPGH_Funnel_Step
             add_filter( 'wpgh_funnel_' . $this->group . 's', array( $this, 'register' ) );
             add_action( 'wpgh_get_step_settings_' . $this->type, array( $this, 'settings' ) );
             add_action( 'wpgh_get_step_reporting_' . $this->type, array( $this, 'reporting' ) );
-            add_action( 'wpgh_import_step_' . $this->type, array( $this, 'import' ), 10, 2 );
-            add_filter( 'wpgh_export_step_' . $this->type, array( $this, 'export' ), 10, 2 );
             add_action( 'wpgh_save_step_' . $this->type, array( $this, 'save' ) );
             add_filter( 'wpgh_step_icon_' . $this->type, array( $this, 'icon' ) );
         }
 
+        add_action( 'wpgh_import_step_' . $this->type, array( $this, 'import' ), 10, 2 );
+        add_filter( 'wpgh_export_step_' . $this->type, array( $this, 'export' ), 10, 2 );
         add_filter( 'wpgh_step_enqueue_time_' . $this->type, array( $this, 'enqueue' ) );
         add_filter( 'wpgh_doing_funnel_step_' . $this->type, array( $this, 'run' ), 10, 2 );
     }

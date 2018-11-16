@@ -115,6 +115,9 @@ class WPGH_Remove_Tag extends WPGH_Funnel_Step
      */
     public function import($args, $step)
     {
+        if ( empty(  $args[ 'tags' ] ) )
+            return;
+
         $tags = WPGH()->tags->validate( $args[ 'tags' ] );
 
         $step->update_meta( 'tags', $tags );

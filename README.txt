@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.9.1 =
+* FIXED Share link not exporting emails or tags.
+* TWEAKED Hooks for deleting and saving contacts
+
 = 1.0.9 =
 * ADDED System Report
 * ADDED Conversion Rate Reporting for the Form Fill Step.

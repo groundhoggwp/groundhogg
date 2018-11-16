@@ -50,7 +50,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
         $this->primary_key = 'ID';
         $this->version     = '1.0';
 
-        add_action( 'wpgh_delete_contact',  array( $this, 'contact_deleted' ) );
+        add_action( 'wpgh_post_delete_contact',  array( $this, 'contact_deleted' ) );
         add_action( 'wpgh_delete_funnel',   array( $this, 'funnel_deleted' ) );
         add_action( 'wpgh_delete_step',     array( $this, 'step_deleted' ) );
     }

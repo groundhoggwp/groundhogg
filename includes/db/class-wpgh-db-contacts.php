@@ -203,6 +203,8 @@ class WPGH_DB_Contacts extends WPGH_DB  {
 
             $contact = $this->get_contact_by( $column, $_id_or_email );
 
+            do_action( 'wpgh_pre_delete_contact', $contact->ID );
+
             /* delete tag relationships */
             $result = $wpdb->delete( $this->table_name, array( 'ID' => $contact->ID ), array( '%d' ) );
 
@@ -211,7 +213,7 @@ class WPGH_DB_Contacts extends WPGH_DB  {
 
                 $this->set_last_changed();
 
-                do_action( 'wpgh_delete_contact', $contact->ID );
+                do_action( 'wpgh_post_delete_contact', $contact->ID );
 
             }
 
