@@ -44,6 +44,13 @@ class WPGH_Event_Queue
     private $doing_queue = false;
 
     /**
+     * This is going to be a unique ID for the thread which is processing the queue.
+     *
+     * @var string
+     */
+    private $thread;
+
+    /**
      * Setup the cron jobs
      * Add new short term schedule
      * setup the action for the cron job
@@ -74,8 +81,8 @@ class WPGH_Event_Queue
     public function setup_cron_schedules( $schedules )
     {
         $schedules[ 'every_10_minutes' ] = array(
-          'interval'    => 10 * MINUTE_IN_SECONDS,
-          'display'     => __( 'Every 10 Minutes', 'groundhogg' )
+            'interval'    => 10 * MINUTE_IN_SECONDS,
+            'display'     => __( 'Every 10 Minutes', 'groundhogg' )
         );
 
         return $schedules;
@@ -117,8 +124,14 @@ class WPGH_Event_Queue
      */
     public function ajax_process()
     {
-        if ( wp_doing_ajax() )
-            $this->process();
+        if ( wp_doing_ajax() ){
+
+            /* Provide arg to skip the queue if no_porcess present in $_GET or $_POST*/
+            if ( ! isset( $_REQUEST[ 'no_process' ] ) ){
+                $this->process();
+            }
+
+        }
 
     }
 
@@ -129,13 +142,29 @@ class WPGH_Event_Queue
      */
     public function is_running()
     {
-        if ( is_multisite() ){
+        if ( wpgh_is_global_multisite() ){
             $running = get_site_transient( 'wpgh_doing_event_queue' );
         } else {
             $running = get_transient( 'wpgh_doing_event_queue' );
         }
 
-        return $running;
+        return $running === $this->thread;
+    }
+
+    /**
+     * Return whether another instance of the queue is currently running
+     *
+     * @return mixed
+     */
+    public function another_is_running()
+    {
+        if ( wpgh_is_global_multisite() ){
+            $running = get_site_transient( 'wpgh_doing_event_queue' );
+        } else {
+            $running = get_transient( 'wpgh_doing_event_queue' );
+        }
+
+        return ! empty( $running );
     }
 
     /**
@@ -143,16 +172,16 @@ class WPGH_Event_Queue
      */
     public function make_running()
     {
-        if ( is_multisite() ){
-            set_site_transient( 'wpgh_doing_event_queue', true, HOUR_IN_SECONDS );
+        if ( wpgh_is_global_multisite() ){
+            set_site_transient( 'wpgh_doing_event_queue', $this->thread, HOUR_IN_SECONDS );
         } else {
-            set_transient( 'wpgh_doing_event_queue', true, HOUR_IN_SECONDS );
+            set_transient( 'wpgh_doing_event_queue', $this->thread, HOUR_IN_SECONDS );
         }
     }
 
     public function make_not_running()
     {
-        if ( is_multisite() ){
+        if ( wpgh_is_global_multisite() ){
             delete_site_transient( 'wpgh_doing_event_queue' );
         } else {
             delete_transient( 'wpgh_doing_event_queue' );
@@ -169,11 +198,16 @@ class WPGH_Event_Queue
     public function process()
     {
 
-        if ( $this->is_running() ){
+        $this->thread = uniqid( 'queue_', true );
+
+        /* Check if for some weird reason the queue is running in another request. */
+        if ( $this->is_running() || $this->another_is_running() ){
 
             return false;
 
         }
+
+        $this->make_running();
 
         $this->prepare_events();
 
@@ -183,8 +217,6 @@ class WPGH_Event_Queue
 
         }
 
-        $this->make_running();
-
         /* Get 'er done */
         set_time_limit(0);
 
@@ -192,12 +224,11 @@ class WPGH_Event_Queue
 
         $this->doing_queue = true;
 
-
         $i = 0;
 
         $max_events = intval( wpgh_get_option( 'gh_max_events', 9999999999 ) );
 
-        while ( $this->has_events() && $i < $max_events ) {
+        while ( $this->has_events() && $i < $max_events && $this->is_running() ) {
 
             $this->cur_event = $this->get_next();
 
@@ -244,7 +275,7 @@ class WPGH_Event_Queue
     public function has_events()
     {
 
-       return ! empty( $this->events );
+        return ! empty( $this->events );
 
     }
 
