@@ -162,7 +162,8 @@ class WPGH_Funnel_Step
      */
     public function settings( $step )
     {
-        _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the SETTINGS method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
+//        _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the SETTINGS method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
+        _e( 'This step has no registered settings.' );
     }
 
     /**
@@ -229,7 +230,7 @@ class WPGH_Funnel_Step
      */
     public function save( $step )
     {
-        _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the SAVE method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
+//        _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the SAVE method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
     }
 
     /**
@@ -242,7 +243,7 @@ class WPGH_Funnel_Step
      */
     public function run( $contact, $event )
     {
-        _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the RUN method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
+//        _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the RUN method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
 
         return true;
     }

@@ -213,7 +213,7 @@ class WPGH_Contact
 
         if ( $updated = WPGH()->contacts->update( $this->ID, $data, 'ID' ) ) {
 
-            $contact = WPGH()->contacts->get_contact_by( $this->ID, 'ID' );
+            $contact = WPGH()->contacts->get_contact_by( 'ID', $this->ID );
 
             $this->setup_contact( $contact );
 

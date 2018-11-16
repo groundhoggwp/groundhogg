@@ -107,6 +107,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.9.2 =
+* FIXED contact->update() method not updating properties
+* TWEAKED parent methods in WPGH_Funnel_Step no longer call __doing_it_wrong
+* TWEAKED Queue now gives a thread ID to check on each while loop if the queue is the only one in action.
+* TWEAKED Queue will spawn separately on multisite unless global multisite usage is enabled.
+
 = 1.0.9.1 =
 * FIXED Share link not exporting emails or tags.
 * TWEAKED Hooks for deleting and saving contacts
