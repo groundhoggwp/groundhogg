@@ -65,8 +65,13 @@ class WPGH_Event_Queue
 
         if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
 
+            if ( $this->another_is_running() ){
+
+                $this->make_not_running();
+
+            }
+
             add_action( 'admin_init' , array( $this, 'process' ) );
-//            wp_die();
 
         }
 
@@ -173,9 +178,9 @@ class WPGH_Event_Queue
     public function make_running()
     {
         if ( wpgh_is_global_multisite() ){
-            set_site_transient( 'wpgh_doing_event_queue', $this->thread, HOUR_IN_SECONDS );
+            set_site_transient( 'wpgh_doing_event_queue', $this->thread, MINUTE_IN_SECONDS );
         } else {
-            set_transient( 'wpgh_doing_event_queue', $this->thread, HOUR_IN_SECONDS );
+            set_transient( 'wpgh_doing_event_queue', $this->thread, MINUTE_IN_SECONDS );
         }
     }
 
@@ -201,9 +206,10 @@ class WPGH_Event_Queue
         $this->thread = uniqid( 'queue_', true );
 
         /* Check if for some weird reason the queue is running in another request. */
-        if ( $this->is_running() || $this->another_is_running() ){
+        if ( $this->another_is_running() ){
 
-            return false;
+            /* The newest Queue always wins. */
+            $this->make_not_running();
 
         }
 
@@ -228,6 +234,7 @@ class WPGH_Event_Queue
 
         $max_events = intval( wpgh_get_option( 'gh_max_events', 9999999999 ) );
 
+        /* Check to see if the current queue is still the most recent queue. If it's not Then finish up. */
         while ( $this->has_events() && $i < $max_events && $this->is_running() ) {
 
             $this->cur_event = $this->get_next();
@@ -252,7 +259,9 @@ class WPGH_Event_Queue
 
         do_action( 'wpgh_process_event_queue_after', $this );
 
-        $this->make_not_running();
+        if ( $this->is_running() ){
+            $this->make_not_running();
+        }
 
         return true;
     }
