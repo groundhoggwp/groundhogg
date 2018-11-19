@@ -30,6 +30,7 @@ class WPGH_Elements
 
         /* actions */
         $this->elements[] = new WPGH_Send_Email();
+        $this->elements[] = new WPGH_Send_SMS();
         $this->elements[] = new WPGH_Admin_Notification();
         $this->elements[] = new WPGH_Apply_Note();
         $this->elements[] = new WPGH_Apply_Tag();
@@ -74,6 +75,7 @@ class WPGH_Elements
         include_once $action_path . 'class-wpgh-http-post.php';
         include_once $action_path . 'class-wpgh-remove-tag.php';
         include_once $action_path . 'class-wpgh-send-email.php';
+        include_once $action_path . 'class-wpgh-send-sms.php';
 
         /* Benchmarks */
         $benchmark_path = dirname( __FILE__ ) . '/elements/benchmarks/';
