@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.10 =
+* ADDED SMS messaging step. Uses the same credit system as emails.
+* Misc bug fixes.
+
 = 1.0.9.2 =
 * FIXED contact->update() method not updating properties
 * TWEAKED parent methods in WPGH_Funnel_Step no longer call __doing_it_wrong
