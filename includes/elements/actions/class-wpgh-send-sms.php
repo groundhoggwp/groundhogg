@@ -101,9 +101,13 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
             //send to groundhogg
 
             $phone = $contact->get_meta( 'primary_phone' );
+
+            if ( ! $phone ){
+                return false;
+            }
+
             $message = $event->step->get_meta( 'text_message' );
 
-            /* implement the rest */
             $domain = parse_url( site_url(), PHP_URL_HOST );
 
             $data = array(
@@ -136,6 +140,7 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
 
             return true;
         }
+
         return false;
 
     }
