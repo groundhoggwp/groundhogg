@@ -310,7 +310,7 @@ class WPGH_Step
      * Return whether or not the current action can run.
      * This was implement so that WPMU could be effectively implemented with the GLOBAL DB option enabled.
      *
-     * Alwasy return true if not a multisite or mutisite gloable is not enabled
+     * Alwasy return true if not a multisite or multisite global is not enabled
      * otherwise compare the current blog ID to the blg ID associated with the step.
      */
     public function can_run()
