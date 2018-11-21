@@ -2,21 +2,6 @@ var wpgh;
 
 (function ($) {
     wpgh = {
-
-        setQueueTimer:function()
-        {
-            GH.processQueue();
-            setInterval(GH.processQueue, 30000);
-        },
-
-        processQueue: function(){
-            $.ajax({
-                type: "post",
-                url: ajaxurl,
-                data: {action: 'gh_process_queue' }
-            });
-        },
-
         buildSelect2: function(){
             $('.gh-select2' ).css( 'width', '100%' ).select2();
         },
@@ -96,15 +81,12 @@ var wpgh;
 
 
         init:  function () {
-
             this.buildSelect2();
             this.buildEmailPicker();
             this.buildContactPicker();
             this.buildTagPicker();
             this.buildBenchmarkPicker();
             this.buildMetaKeyPicker();
-            this.setQueueTimer();
-
         },
 
     };

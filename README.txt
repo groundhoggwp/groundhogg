@@ -107,12 +107,14 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
-= 1.0.11 =
+= 1.0.10.1 =
 * Fixed bug where broadcasts were always being schedules for 9:30 AM despite other settings.
+* TWEAKED Cleaned up some event queue code
+* TWEAKED Switched back to an older method of queue traversal. There is now only a single ajax request that can process the event queue every 30 seconds to avoid queue collisions.
 
 = 1.0.10 =
 * ADDED SMS messaging step. Uses the same credit system as emails.
-* Misc bug fixes.
+* FIXED Misc bug fixes.
 
 = 1.0.9.2 =
 * FIXED contact->update() method not updating properties

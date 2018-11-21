@@ -484,7 +484,8 @@ function wpgh_register_scripts()
     wp_register_style( 'jquery-ui', WPGH_ASSETS_FOLDER . 'lib/jquery-ui/jquery-ui.min.css' );
     wp_register_style( 'select2',   WPGH_ASSETS_FOLDER . 'lib/select2/css/select2.min.css' );
     wp_register_script( 'select2',  WPGH_ASSETS_FOLDER . 'lib/select2/js/select2.full.js'   , array( 'jquery' ) );
-    wp_register_script( 'wpgh-admin-js',   WPGH_ASSETS_FOLDER . 'js/admin/admin.js' );
+    wp_register_script( 'wpgh-admin-js',   WPGH_ASSETS_FOLDER . 'js/admin/admin.js', array( 'jquery' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/admin.js' ) );
+    wp_register_script( 'wpgh-queue',   WPGH_ASSETS_FOLDER . 'js/admin/queue.js', array( 'jquery' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/queue.js' ) );
 }
 
 add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
@@ -569,12 +570,69 @@ function wpgh_is_option_enabled( $key = '' )
 function wpgh_get_option( $key, $default=false )
 {
 
-    if ( wpgh_should_if_multisite() ){
-        return get_option( $key, $default );
-    } else {
+    if ( wpgh_is_global_multisite() ){
         return get_blog_option( get_network()->site_id, $key, $default );
+    } else {
+        return get_option( $key, $default );
     }
 
+}
+
+/**
+ * update option wrapper
+ *
+ * @return mixed
+ */
+function wpgh_update_option( $key, $value ){
+    if ( wpgh_is_global_multisite() ){
+        return update_blog_option( get_network()->site_id, $key, $value );
+    } else {
+        return update_option( $key, $value );
+    }
+}
+
+/**
+ * get_transient wrapper
+ *
+ * @param $key
+ * @return mixed
+ */
+function wpgh_get_transient( $key ){
+    if ( wpgh_is_global_multisite() ){
+        return get_site_transient( $key );
+    } else {
+        return get_transient( $key );
+    }
+}
+
+/**
+ * delete_transient wrapper
+ *
+ * @param $key
+ * @return mixed
+ */
+function wpgh_delete_transient( $key ){
+    if ( wpgh_is_global_multisite() ){
+        return delete_site_transient( $key );
+    } else {
+        return delete_transient( $key );
+    }
+}
+
+/**
+ * Set transient wrapper
+ *
+ * @param $key
+ * @param $value
+ * @param $exp
+ * @return bool
+ */
+function wpgh_set_transient( $key, $value, $exp ){
+    if ( wpgh_is_global_multisite() ){
+        return set_site_transient( $key, $value, $exp );
+    } else {
+        return set_transient( $key, $value, $exp );
+    }
 }
 
 /**

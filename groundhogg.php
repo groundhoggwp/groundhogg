@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 1.0.10
+Version: 1.0.10.1
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.0.10';
+        public $version = '1.0.10.1';
 
         /**
          * @var $instance Groundhogg instance
@@ -24,7 +24,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public static $instance;
 
         /**
-         * @var bool Dummy vairable to snusre GH was infact setup.
+         * @var bool Dummy variable to ensure GH was in fact setup.
          */
         public static $is_setup = false;
 

@@ -65,6 +65,7 @@ class WPGH_Event_Queue
 //        add_action( 'admin_init', array( $this, 'ajax_process' ) );
         add_action( 'wp_ajax_nopriv_gh_process_queue', array( $this, 'ajax_process' ) );
         add_action( 'wp_ajax_gh_process_queue', array( $this, 'ajax_process' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
 
         if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
 
@@ -72,6 +73,11 @@ class WPGH_Event_Queue
 
         }
 
+    }
+
+    public function scripts()
+    {
+        wp_enqueue_script( 'wpgh-queue' );
     }
 
     /**
@@ -130,7 +136,13 @@ class WPGH_Event_Queue
 
             /* Provide arg to skip the queue if no_process present in $_GET or $_POST*/
             if ( ! isset( $_REQUEST[ 'no_process' ] ) ){
-                $this->process();
+                if ( $i = $this->process() ) {
+
+                    /* $i is the number of events run */
+
+                    wp_die( $i );
+
+                }
             }
 
         }
@@ -144,12 +156,7 @@ class WPGH_Event_Queue
      */
     public function is_running()
     {
-        if ( wpgh_is_global_multisite() ){
-            $running = get_site_transient( 'wpgh_doing_event_queue' );
-        } else {
-            $running = get_transient( 'wpgh_doing_event_queue' );
-        }
-
+        $running = wpgh_get_transient( 'wpgh_doing_event_queue' );
         return $running === $this->thread;
     }
 
@@ -160,12 +167,7 @@ class WPGH_Event_Queue
      */
     public function another_is_running()
     {
-        if ( wpgh_is_global_multisite() ){
-            $running = get_site_transient( 'wpgh_doing_event_queue' );
-        } else {
-            $running = get_transient( 'wpgh_doing_event_queue' );
-        }
-
+        $running = wpgh_get_transient( 'wpgh_doing_event_queue' );
         return ! empty( $running );
     }
 
@@ -174,20 +176,12 @@ class WPGH_Event_Queue
      */
     public function make_running()
     {
-        if ( wpgh_is_global_multisite() ){
-            set_site_transient( 'wpgh_doing_event_queue', $this->thread, MINUTE_IN_SECONDS );
-        } else {
-            set_transient( 'wpgh_doing_event_queue', $this->thread, MINUTE_IN_SECONDS );
-        }
+        wpgh_set_transient( 'wpgh_doing_event_queue', $this->thread, MINUTE_IN_SECONDS );
     }
 
     public function make_not_running()
     {
-        if ( wpgh_is_global_multisite() ){
-            delete_site_transient( 'wpgh_doing_event_queue' );
-        } else {
-            delete_transient( 'wpgh_doing_event_queue' );
-        }
+        wpgh_delete_transient( 'wpgh_doing_event_queue' );
     }
 
 
@@ -260,7 +254,7 @@ class WPGH_Event_Queue
             $this->make_not_running();
         }
 
-        return true;
+        return $i;
     }
 
     /**
