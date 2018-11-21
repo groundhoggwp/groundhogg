@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.11 =
+* Fixed bug where broadcasts were always being schedules for 9:30 AM despite other settings.
+
 = 1.0.10 =
 * ADDED SMS messaging step. Uses the same credit system as emails.
 * Misc bug fixes.

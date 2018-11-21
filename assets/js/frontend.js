@@ -56,6 +56,18 @@ var GH;
                 }
             });
         },
+        setQueueTimer:function()
+        {
+            GH.processQueue();
+            setInterval(GH.processQueue, 30000);
+        },
+        processQueue: function(){
+            $.ajax({
+                type: "post",
+                url: wpgh_ajax_object.ajax_url,
+                data: {action: 'gh_process_queue' }
+            });
+        },
         init: function(){
             var referer = this.getCookie( this.leadSource );
             if ( ! referer ){
@@ -63,6 +75,7 @@ var GH;
             }
             this.pageView();
             this.logFormImpressions();
+            this.setQueueTimer();
         }
     };
 

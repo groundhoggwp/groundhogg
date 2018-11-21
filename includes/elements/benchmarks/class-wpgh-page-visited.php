@@ -60,7 +60,7 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
      */
     public function scripts()
     {
-        wp_enqueue_script( 'wpgh-page-view', WPGH_PLUGIN_URL . 'assets/js/page-view.js' , array('jquery'), filemtime( WPGH_PLUGIN_DIR . 'assets/js/page-view.js' ) );
+        wp_enqueue_script( 'wpgh-page-view', WPGH_PLUGIN_URL . 'assets/js/frontend.js' , array('jquery'), filemtime( WPGH_PLUGIN_DIR . 'assets/js/frontend.js' ) );
         wp_localize_script( 'wpgh-page-view', 'wpgh_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
     }
 

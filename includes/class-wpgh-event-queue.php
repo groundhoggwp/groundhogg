@@ -61,15 +61,12 @@ class WPGH_Event_Queue
         add_filter( 'cron_schedules', array( $this, 'setup_cron_schedules' ) );
         add_action( 'init', array( $this, 'setup_cron_jobs' ) );
         add_action( self::ACTION , array( $this, 'process' ) );
-        add_action( 'admin_init', array( $this, 'ajax_process' ) );
+
+//        add_action( 'admin_init', array( $this, 'ajax_process' ) );
+        add_action( 'wp_ajax_nopriv_gh_process_queue', array( $this, 'ajax_process' ) );
+        add_action( 'wp_ajax_gh_process_queue', array( $this, 'ajax_process' ) );
 
         if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
-
-            if ( $this->another_is_running() ){
-
-                $this->make_not_running();
-
-            }
 
             add_action( 'admin_init' , array( $this, 'process' ) );
 
@@ -131,7 +128,7 @@ class WPGH_Event_Queue
     {
         if ( wp_doing_ajax() ){
 
-            /* Provide arg to skip the queue if no_porcess present in $_GET or $_POST*/
+            /* Provide arg to skip the queue if no_process present in $_GET or $_POST*/
             if ( ! isset( $_REQUEST[ 'no_process' ] ) ){
                 $this->process();
             }
