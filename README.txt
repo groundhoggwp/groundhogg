@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.10.2 =
+* TWEAKED Groundhogg email service no sends email along with sender name + sender email
+* TWEAKED Event quueue locking using semaphore if it exists as a library.
+
 = 1.0.10.1 =
 * Fixed bug where broadcasts were always being schedules for 9:30 AM despite other settings.
 * TWEAKED Cleaned up some event queue code
