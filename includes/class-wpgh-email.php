@@ -793,6 +793,7 @@ class WPGH_Email
         $data = array(
 
             'sender'    => $sender,
+            'from'      => $this->get_from_name(),
             'recipient' => $to,
             'subject'   => $subject,
             'content'   => $content,
