@@ -60,7 +60,7 @@ class WPGH_Event_Queue
 
         add_filter( 'cron_schedules', array( $this, 'setup_cron_schedules' ) );
         add_action( 'init', array( $this, 'setup_cron_jobs' ) );
-        add_action( self::ACTION , array( $this, 'process' ) );
+        add_action( self::ACTION , array( $this, 'run_queue' ) );
 
 //        add_action( 'admin_init', array( $this, 'ajax_process' ) );
         add_action( 'wp_ajax_nopriv_gh_process_queue', array( $this, 'ajax_process' ) );
