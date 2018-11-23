@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 10.0.10.3 =
+* Added some mobile compatibility for the funnel view. Mostly just for basic edits and funnel reporting purposes.
+* Fixed bug where cron was called a private function.
+
 = 1.0.10.2 =
 * TWEAKED Groundhogg email service no sends email along with sender name + sender email
 * TWEAKED Event quueue locking using semaphore if it exists as a library.
