@@ -46,8 +46,10 @@ var wpghFunnelEditor;
                 wpghFunnelEditor.save();
             });
 
-            this.makeSortable();
-            this.makeDraggable();
+            if ( window.innerWidth > 600 ){
+                this.makeSortable();
+                this.makeDraggable();
+            }
 
             this.initReporting();
 

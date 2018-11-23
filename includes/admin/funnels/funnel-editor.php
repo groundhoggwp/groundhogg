@@ -150,7 +150,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             </div>
         </div>
     </div>
-    <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
+    <div id='poststuff' class="wpgh-funnel-builder">
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
             <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sidebar">
