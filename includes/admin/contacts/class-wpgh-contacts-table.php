@@ -465,9 +465,12 @@ class WPGH_Contacts_Table extends WP_List_Table {
             __( 'Quick&nbsp;Edit' )
         );
 
+        $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->ID );
+
         $actions['edit'] = sprintf(
-            '<a href="#" class="edit" aria-label="%s">%s</a>',
+            '<a href="%s" class="edit" aria-label="%s">%s</a>',
             /* translators: %s: title */
+            $editUrl,
             esc_attr(  __( 'Edit' ) ),
             __( 'Edit' )
         );

@@ -60,7 +60,7 @@ class WPGH_Event_Queue
 
         add_filter( 'cron_schedules', array( $this, 'setup_cron_schedules' ) );
         add_action( 'init', array( $this, 'setup_cron_jobs' ) );
-        add_action( self::ACTION , array( $this, 'process' ) );
+        add_action( self::ACTION , array( $this, 'run_queue' ) );
 
 //        add_action( 'admin_init', array( $this, 'ajax_process' ) );
         add_action( 'wp_ajax_nopriv_gh_process_queue', array( $this, 'ajax_process' ) );
@@ -69,7 +69,7 @@ class WPGH_Event_Queue
 
         if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
 
-            add_action( 'admin_init' , array( $this, 'process' ) );
+            add_action( 'admin_init' , array( $this, 'run_queue' ) );
 
         }
 
@@ -136,7 +136,7 @@ class WPGH_Event_Queue
 
             /* Provide arg to skip the queue if no_process present in $_GET or $_POST*/
             if ( ! isset( $_REQUEST[ 'no_process' ] ) ){
-                if ( $i = $this->process() ) {
+                if ( $i = $this->run_queue() ) {
 
                     /* $i is the number of events run */
 
@@ -184,6 +184,40 @@ class WPGH_Event_Queue
         wpgh_delete_transient( 'wpgh_doing_event_queue' );
     }
 
+    /**
+     * Decide which process to use...
+     */
+    public function run_queue()
+    {
+        if ( function_exists( 'ftok' ) ){
+            return $this->semaphore_process();
+        } else {
+            return $this->process();
+        }
+    }
+
+    /**
+     * Process the queue within a semaphore lock...
+     */
+    private function semaphore_process()
+    {
+        $key = ftok(__FILE__, 'G' );
+
+        $semaphore = sem_get($key, 1);
+
+        $result = 0;
+
+        if (sem_acquire($semaphore, 1) !== false) {
+
+            $result = $this->process();
+
+            sem_release($semaphore) ;
+
+        }
+
+        return $result;
+
+    }
 
     /**
      * Iterate through the list of events and process them via the EVENTS api
@@ -191,7 +225,7 @@ class WPGH_Event_Queue
      *
      * @return bool whether the queue was processed or not
      */
-    public function process()
+    private function process()
     {
 
         $this->thread = uniqid( 'queue_', true );

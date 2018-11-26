@@ -11,7 +11,7 @@ formliftPopUpContent
 
 var wpghModal;
 
-( function ( $ ) {
+( function ( $,defaults ) {
 
     wpghModal = {
 
@@ -21,9 +21,11 @@ var wpghModal;
 		title: null,
 		source: null,
         frameUrl: '',
-        args: { height: 500, width:500 },
+        args: {},
 
 		init: function ( title, href ) {
+
+    	    this.args = this.getDefaults();
 
     	    this.parseArgs( href );
 
@@ -55,6 +57,10 @@ var wpghModal;
     		    $( '.popup-footer' ).removeClass( 'hidden' );
             }
 
+            if ( typeof this.args.footertext !== "undefined" ) {
+                $( '.popup-save' ).text( this.args.footertext );
+            }
+
         },
 
         parseArgs: function(queryArgs){
@@ -63,7 +69,7 @@ var wpghModal;
             listArgs = listArgs.split('&');
             for( var i = 0; i < listArgs.length; i++ ){
                 var args = listArgs[ i ].split( '=' );
-                this.args[ args[ 0 ] ] = decodeURIComponent( args[ 1 ] );
+                this.args[ args[ 0 ] ] = decodeURIComponent( args[ 1 ].replace( '+', ' ' ) );
             }
             return this.args;
         },
@@ -72,7 +78,7 @@ var wpghModal;
             /*top: calc(50% - 250px);*/
             /*left: calc(50% - 250px);*/
             var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-            var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+            var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
             if ( this.args.height > h ){
                 this.args.height = h - 50;
@@ -98,8 +104,12 @@ var wpghModal;
         close: function(){
             this.pushContent();
             this.hidePopUp();
+
+            if ( this.args.preventSave === undefined ){
+                $(document).trigger( 'wpghModalClosed' );
+            }
+
             this.reset();
-            $(document).trigger( 'wpghModalClosed' );
         },
 
         pullFrame: function( iframe )
@@ -161,9 +171,14 @@ var wpghModal;
             this.overlay.addClass( 'hidden' );
         },
 
+        getDefaults: function()
+        {
+            return JSON.parse(JSON.stringify(defaults));
+        },
+
         reset: function()
         {
-            this.args = { height: 500, width:500 };
+            this.args = this.getDefaults();
             this.content.css( 'padding', '0 20px' );
         },
 
@@ -201,4 +216,4 @@ var wpghModal;
         $( '.wpgh-color' ).wpColorPicker();
     });
 
-} )(jQuery);
+} )(jQuery,wpghModalDefaults);

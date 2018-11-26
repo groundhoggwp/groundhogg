@@ -107,6 +107,17 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 10.0.10.4 =
+* Introduced funnel warnings for date timers with descending dates and dates that are in the past.
+
+= 10.0.10.3 =
+* Added some mobile compatibility for the funnel view. Mostly just for basic edits and funnel reporting purposes.
+* Fixed bug where cron was called a private function.
+
+= 1.0.10.2 =
+* TWEAKED Groundhogg email service no sends email along with sender name + sender email
+* TWEAKED Event quueue locking using semaphore if it exists as a library.
+
 = 1.0.10.1 =
 * Fixed bug where broadcasts were always being schedules for 9:30 AM despite other settings.
 * TWEAKED Cleaned up some event queue code

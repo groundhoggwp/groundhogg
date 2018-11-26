@@ -1,9 +1,19 @@
-
 /* NEW STUFF */
-
 #wpbody-content{
     /*height: 100vh;*/
 }
+
+
+.button.button-secondary.submit.trigger-popup{
+    background: #f7f7f7 !important;
+    border-color: #ccc !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    float: none !important;
+    padding: 0 10px 1px !important;
+    margin: 2px !important;
+}
+
 #wpcontent {
     padding-left: 0 !important;
     box-sizing: border-box;
@@ -315,4 +325,74 @@
 
 .add-contact-form td {
     padding-bottom: 30px;
+}
+
+.wpgh-funnel-builder{
+    overflow: auto;
+}
+/* MOBILE STUFF */
+
+@media only screen and (max-width: 600px) {
+    #postbox-container-1{
+        display: none;
+    }
+
+    .title{
+        padding: 10px;
+    }
+
+    .funnel-editor-header{
+        /*z-index: 99999;*/
+        width: 100%;
+        top: 0;
+        box-sizing: border-box;
+        position: initial;
+        height: auto;
+        padding: 0;
+        background: #FFFFFF;
+        border-bottom: 1px solid #e2e4e7;
+        display: block;
+    }
+
+    .wpgh-funnel-builder{
+        overflow: initial;
+    }
+
+    .funnel-editor .postbox.action,
+    .funnel-editor .postbox.benchmark{
+        max-width: 85%;
+    }
+
+    .hndle input{
+        max-width: 90%;
+        margin-left: 10px;
+    }
+
+    .funnel-editor-header div{
+        /*display: block;*/
+        vertical-align: top;
+        float: none;
+    }
+
+    #export,
+    #add-contacts{
+        display: none;
+    }
+
+    .funnel-editor-header .status-options{
+        float: none;
+    }
+
+    .status-options,
+    #reporting{
+        border-top: 1px solid #e2e4e7;
+        padding: 10px;
+        display: block !important;
+        margin: 0 !important;
+    }
+
+    .onoffswitch {
+        margin-top: 5px;
+    }
+
 }

@@ -118,6 +118,24 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
     }
 
     /**
+     * Compare timers to see if one which date comes first compared to the order of appearance
+     *
+     * @param $step1 WPGH_Step
+     * @param $step2 WPGH_Step
+     *
+     * @return int;
+     */
+    public function compare_timer( $step1, $step2 )
+    {
+
+        $step1_run_time = $this->enqueue( $step1 );
+        $step2_run_time = $this->enqueue( $step2 );
+
+        return $step2_run_time - $step1_run_time;
+
+    }
+
+    /**
      * Save the step settings
      *
      * @param $step WPGH_Step
@@ -136,6 +154,26 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
             $step->update_meta( 'disable', 1 );
         } else {
             $step->delete_meta( 'disable' );
+        }
+
+        $date_timers = WPGH()->steps->get_steps( array( 'step_type' => 'date_timer', 'funnel_id' => $step->funnel_id ) );
+
+        foreach ( $date_timers as $date_timer ){
+
+            $date_timer = new WPGH_Step( $date_timer->ID );
+
+            if ( $date_timer->order < $step->order && $this->compare_timer( $date_timer, $step ) < 0 ){
+
+                WPGH()->notices->add( 'timer-error', sprintf( __( 'You have date timers with descending dates! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->ID, $step->title ), 'warning' );
+
+            }
+
+        }
+
+        if ( $this->enqueue( $step ) < time() ){
+
+            WPGH()->notices->add( 'timer-error', sprintf( __( 'You have date timers with dates in the past! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->ID, $step->title ), 'warning' );
+
         }
 
     }

@@ -5,88 +5,263 @@ var wpghFormBuilder;
     wpghFormBuilder = {
 
         activeEditor: null,
+        active: false,
+        currentType: null,
 
-        init: function(){
+        init: function () {
 
-            $(document).on( 'click', 'div.form-buttons', function ( e ) {
+            $(document).on('click', 'div.form-buttons', function (e) {
 
-                wpghFormBuilder.setup( this );
-                wpghFormBuilder.addField( e.target );
+                wpghFormBuilder.setup(this);
+                wpghFormBuilder.getForm(e.target);
 
-            } );
+            });
+
+            $( '.popup-save' ).click( function (e) {
+                if ( wpghFormBuilder.active ){
+                    wpghFormBuilder.makeField();
+                }
+            });
+
+            $( '#field-name' ).change( function () {
+                $(this).val( wpghFormBuilder.sanitizeKey( $(this).val() ) );
+            });
+            $( '#field-id' ).change( function () {
+                $(this).val( wpghFormBuilder.sanitizeKey( $(this).val() ) );
+            });
 
         },
 
-        setup: function( dom  ){
+        sanitizeKey: function( key )
+        {
+            return key.toLowerCase().replace( /[^a-z0-9\-_]/g, '' );
+        },
 
-            this.activeEditor = $(dom).closest( '.form-editor' ).find( '.code' )[0];
+        setup: function (dom) {
+
+            this.activeEditor = $(dom).closest('.form-editor').find('.code')[0];
 
         },
 
-        addField: function( button ){
+        getForm: function (button) {
 
-            var type = button.className.replace( 'button button-secondary ', '' );
-            //console.log( type );
+            wpghModal.args.preventSave = true;
+            this.active = true;
+
+            var type = button.className.split(' ')[2];
+            this.currentType = type;
 
             var code;
+            var fields = [];
 
-            switch ( type ) {
+            switch (type) {
                 case 'first':
-                    code = '[first_name label="First Name *" placeholder="" required="true"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'placeholder',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'last':
-                    code = '[last_name label="Last Name*" placeholder="" required="true"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'placeholder',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'email':
-                    code = '[email label="Email *" placeholder="" required="true"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'placeholder',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'phone':
-                    code = '[phone label="Phone *" placeholder="" required="true"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'placeholder',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'gdpr':
-                    code = '[gdpr]\n';
+                    fields = [
+                        'label',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'terms':
-                    code = '[terms]\n';
+                    fields = [
+                        'label',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'recaptcha':
-                    code = '[recaptcha]\n';
+                    fields = [
+                        'captcha-theme',
+                        'captcha-size',
+                        'id',
+                        'class'
+                    ];
                     break;
-                case 'submit-button':
-                    code = '[submit]Submit[/submit]\n';
+                case 'submit':
+                    fields = [
+                        'text',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'text':
-                    code = '[text label="Pet Name *" placeholder="Pluto" required="true"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'placeholder',
+                        'name',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'textarea':
-                    code = '[textarea label="Pet Description *" placeholder="" required="true"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'placeholder',
+                        'name',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'number':
-                    code = '[number label="Pet Age *" placeholder="" required="true"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'name',
+                        'min',
+                        'max',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'dropdown':
-                    code = '[select label="Pet Breed*" default="Please select One!" options="Terrier,Mastiff" required="true"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'name',
+                        'default',
+                        'options',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'radio':
-                    code = '[radio label="Pet Gender *" options="Male,Female,Other" required="true"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'name',
+                        'options',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'checkbox':
-                    code = '[checkbox label="Likes Treats? *" value="Yes" required="false"]\n';
+                    fields = [
+                        'required',
+                        'label',
+                        'name',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'address':
-                    code = '[address label="Address *" required="true"]';
+                    fields = [
+                        'required',
+                        'label',
+                        'id',
+                        'class'
+                    ];
                     break;
                 case 'row':
-                    code = '[row][/row]';
+                    fields = [
+                        'id',
+                        'class'
+                    ];
                     break;
-                case 'column':
-                    code = '[col size="1/2"][/col]';
+                case 'col':
+                    fields = [
+                        'width',
+                        'id',
+                        'class'
+                    ];
                     break;
+            }
 
+            this.hideFields();
+            this.showFields( fields );
+
+        },
+
+        hideFields: function () {
+            $('.form-field-form').find( 'tr' ).addClass('hidden');
+        },
+
+        showFields: function (fields){
+            for (var i = 0; i < fields.length; i++) {
+                $('#gh-field-' + fields[i]).removeClass('hidden');
+            }
+        },
+
+        buildCode: function()
+        {
+
+            var $form = $( '#form-field-form' );
+
+            var attrs = $form.serializeArray();
+
+            var code = '[' + this.currentType;
+            var ignore = [
+                'col',
+                'row',
+                'gdpr',
+                'recaptcha',
+                'submit',
+            ];
+
+            for( var i=0;i<attrs.length;i++){
+
+                if ( attrs[i].value !== "" ){
+                    code += ' ' + attrs[i].name + '="' + attrs[i].value.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n/g, ',') + '"'
+                } else if ( attrs[i].name === "label" && ignore.indexOf( this.currentType ) === -1 ){
+                    code += ' label=""';
+                }
 
             }
 
-            this.insert( code );
+
+
+            if ( code.search( 'required' ) === -1 && ignore.indexOf( this.currentType ) === -1 ){
+                code += ' required="false"';
+            }
+
+            code += ']';
+
+            if ( this.currentType === 'col' ){
+                code += '[/col]';
+            } else if ( this.currentType === 'row' ){
+                code += '[/row]';
+            }
+
+            $form.trigger( 'reset' );
+
+            return code;
 
         },
 
@@ -113,6 +288,12 @@ var wpghFormBuilder;
             } else {
                 myField.value += myValue;
             }
+        },
+
+        makeField: function () {
+            var code = this.buildCode();
+            this.insert( code );
+            this.active = false;
         }
 
     };
