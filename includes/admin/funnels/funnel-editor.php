@@ -65,6 +65,8 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                     </label>
                 </div>
             </div>
+
+
             <div class="status-options">
                 <div id="add-contacts">
                     <a title="<?php _e( 'Add Contacts', 'groundhogg' ); ?>" href="#source=add-contact-modal&footer=false" class="button trigger-popup"><?php _e( 'Add Contacts', 'groundhogg' ) ?></a>
@@ -150,11 +152,13 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             </div>
         </div>
     </div>
+
+
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
             <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sidebar">
-                                <!-- Begin Benckmark Icons-->
+                <!-- Begin Benckmark Icons-->
                 <div id='benchmarks' class="postbox">
                     <h3 class="hndle"><?php echo __( 'Benchmarks', 'groundhogg' );?></h3>
                     <div class="elements-inner inside">
@@ -233,12 +237,18 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             </div>
             <!-- End elements area-->
             <!-- main funnel editing area -->
+
             <div id="notices">
 
             </div>
+
             <div class="funnel-saving hidden"></div>
+            <?php include_once dirname( __FILE__ ) . '/reporting.php' ; ?>
+
             <div  id="postbox-container-2" class="postbox-container funnel-editor">
+
                 <div style="visibility: hidden" id="normal-sortables" class="meta-box-sortables ui-sortable">
+
                     <?php do_action('wpgh_funnel_steps_before' ); ?>
 
                     <?php $steps = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id ) );

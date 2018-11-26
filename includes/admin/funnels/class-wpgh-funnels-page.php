@@ -199,7 +199,6 @@ class WPGH_Funnels_Page
 
                 break;
         endswitch;
-
     }
 
 	private function get_funnels()
@@ -515,9 +514,7 @@ class WPGH_Funnels_Page
 	 */
     public function ajax_save_funnel()
     {
-
-
-	    if ( ! wp_doing_ajax() ){
+        if ( ! wp_doing_ajax() ){
 		    return;
 	    }
 
@@ -558,12 +555,51 @@ class WPGH_Funnels_Page
 
         $response = array(
             'notices'   => $notices,
-            'steps'     => $steps
+            'steps'     => $steps,
+            'chartData' => $this->get_chart_data(),
+
         );
 
         wp_die( json_encode( $response ) );
 
     }
+
+    private function get_chart_data()
+    {
+        /* Pass funnel ID to get Steps */
+        $steps = WPGH()->steps->get_steps( array(
+            'funnel_id' => intval(  $_REQUEST[ 'funnel' ] )
+        ) );
+
+        //$count = array();
+
+        $array = array();
+        $array['cols'][] = array('type' => 'string' , 'label' => 'Event');
+        $array['cols'][] = array('type' => 'number' , 'label' => 'Number Of Contact');
+
+        foreach ( $steps as $step ) {
+
+            $query = new WPGH_Contact_Query();
+
+            $args = array(
+                'report' => array(
+                    'funnel' => intval(  $_REQUEST[ 'funnel' ] ),
+                    'step' => $step->ID,
+                    'status' => 'complete',
+                    'start' => WPGH()->menu->funnels_page->reporting_start_time,
+                    'end' => WPGH()->menu->funnels_page->reporting_end_time,
+                )
+            );
+
+            $count = count($query->query($args));
+            $array['rows'][]['c'] = array(
+                array('v' => $step->step_title),
+                array('v' => $count)
+            );
+        }
+        return $array;
+    }
+
 
     private function save_funnel()
     {
