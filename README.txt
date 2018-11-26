@@ -107,12 +107,17 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 10.0.11 =
+* ADDED New Funnel Reporting Graph at top of funnel when in reporting mode.
+* ADDED compatibility for modal outside of funnel editor.
+* TWEAKED New form build improvements. Popup UI for adding fields in the form builder.
+
 = 10.0.10.4 =
-* Introduced funnel warnings for date timers with descending dates and dates that are in the past.
+* ADDED Introduced funnel warnings for date timers with descending dates and dates that are in the past.
 
 = 10.0.10.3 =
-* Added some mobile compatibility for the funnel view. Mostly just for basic edits and funnel reporting purposes.
-* Fixed bug where cron was called a private function.
+* ADDED some mobile compatibility for the funnel view. Mostly just for basic edits and funnel reporting purposes.
+* FIXED bug where cron was called a private function.
 
 = 1.0.10.2 =
 * TWEAKED Groundhogg email service no sends email along with sender name + sender email

@@ -12,7 +12,7 @@
 
     (function ($) {
         $( '#reporting-toggle' ).on( 'change', function (e) {
-            if ( $(this).is( ':checked' ) ){
+            if ( $(this).is( ':checked' ) && ! wpghFunnelEditor.reportData ){
                 drawChart();
             }
         } );

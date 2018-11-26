@@ -13,6 +13,7 @@ var wpghFunnelEditor;
         curStep: null,
         curHTML: null,
         curOrder: 0,
+        reportData: null,
 
         init: function () {
 
@@ -145,6 +146,7 @@ var wpghFunnelEditor;
                     $(document).trigger('wpghAddedStep');
 
                     /* Display Google Chart */
+                    wpghFunnelEditor.reportData = response.chartData;
                     var data = new google.visualization.DataTable(response.chartData);
                     var options = {
                         title: 'Funnel Report',

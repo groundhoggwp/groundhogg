@@ -575,7 +575,7 @@ class WPGH_Funnels_Page
 
         $array = array();
         $array['cols'][] = array('type' => 'string' , 'label' => 'Event');
-        $array['cols'][] = array('type' => 'number' , 'label' => 'Number Of Contact');
+        $array['cols'][] = array('type' => 'number' , 'label' => 'Number Of Contacts');
 
         foreach ( $steps as $step ) {
 

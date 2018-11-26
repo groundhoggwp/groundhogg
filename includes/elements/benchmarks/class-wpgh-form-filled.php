@@ -358,9 +358,6 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                         ); ?>
 
                         <?php echo WPGH()->html->textarea( $args ) ?>
-                        <p class="description">
-                            <?php _e( 'The form editor is a work in progress, to learn how to build forms for now go <a target="_blank" href="https://www.groundhogg.io/2018/09/27/update-to-the-form-shortcode/">here</a>.', 'groundhogg' ); ?>
-                        </p>
                     </div>
                 </td>
             </tr>
@@ -371,17 +368,6 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
 
     public function modal_form()
     {
-        /*
-         * Label
-         * Name
-         * Max
-         * Min
-         * Options
-         * Required
-         * Value
-         * CSS ID
-         * CSS Class
-         */
         ?>
         <div id="form-field-editor" class="form-field-editor hidden">
             <form class="form-field-form" id="form-field-form" method="post" action="">
