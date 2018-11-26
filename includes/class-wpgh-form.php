@@ -890,9 +890,9 @@ jQuery( function($){
             'text'          => __( 'Submit' ),
         ), $atts );
 
-        if ( empty( $content ) )
+        if ( ! empty( $content ) )
         {
-            $content = __( 'Submit' );
+            $a['text'] = $content;
         }
 
         $html = sprintf(
