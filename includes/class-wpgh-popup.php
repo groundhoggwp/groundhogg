@@ -28,7 +28,14 @@ class WPGH_Popup
 	public function scripts()
 	{
 		wp_enqueue_script( 'wpgh-modal', WPGH_ASSETS_FOLDER . 'js/admin/modal.js', array( 'wp-color-picker' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/modal.js' ) );
-		wp_enqueue_style( 'wpgh-modal', WPGH_ASSETS_FOLDER . 'css/admin/modal.css', array( 'wp-color-picker' ), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/modal.css' ) );
+        wp_localize_script('wpgh-email-element', 'wpghModalDefaults', array(
+            'title'     => 'Modal',
+            'footertext' => __( 'Save Changes' ),
+            'height'    => 500,
+            'width'     => 500,
+            'footer'    => 'true',
+        ) );
+        wp_enqueue_style( 'wpgh-modal', WPGH_ASSETS_FOLDER . 'css/admin/modal.css', array( 'wp-color-picker' ), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/modal.css' ) );
 	}
 
 	public function popup()

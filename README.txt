@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 10.0.10.4 =
+* Introduced funnel warnings for date timers with descending dates and dates that are in the past.
+
 = 10.0.10.3 =
 * Added some mobile compatibility for the funnel view. Mostly just for basic edits and funnel reporting purposes.
 * Fixed bug where cron was called a private function.

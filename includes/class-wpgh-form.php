@@ -75,7 +75,9 @@ class WPGH_Form
 	    add_shortcode( 'col',        array( $this, 'column'     ) );
 	    add_shortcode( 'row',        array( $this, 'row'        ) );
 	    add_shortcode( 'first_name', array( $this, 'first_name'  ) );
+	    add_shortcode( 'first',      array( $this, 'first_name'  ) );
         add_shortcode( 'last_name',  array( $this, 'last_name'   ) );
+        add_shortcode( 'last',       array( $this, 'last_name'   ) );
         add_shortcode( 'email',      array( $this, 'email'       ) );
         add_shortcode( 'phone',      array( $this, 'phone'       ) );
         add_shortcode( 'address',    array( $this, 'address'     ) );
@@ -101,6 +103,8 @@ class WPGH_Form
 	    remove_shortcode( 'row'          );
 	    remove_shortcode( 'col'          );
 	    remove_shortcode( 'last_name'    );
+	    remove_shortcode( 'last'         );
+	    remove_shortcode( 'first'        );
 	    remove_shortcode( 'first_name'   );
         remove_shortcode( 'email'        );
         remove_shortcode( 'phone'        );
@@ -135,14 +139,21 @@ class WPGH_Form
 
     public function row( $atts, $content ){
 
-    	return sprintf( "<div class='gh-form-row'>%s</div>", do_shortcode( $content ) );
+        $a = shortcode_atts( array(
+            'id'    => '',
+            'class' => ''
+        ), $atts );
+
+    	return sprintf( "<div id='%s' class='gh-form-row %s'>%s</div>", $a['id'], $a['class'], do_shortcode( $content ) );
 
     }
     public function column( $atts, $content ){
 
-    	$a = shortcode_atts( $atts, array( 'size' => '1/2' ) );
-
-//    	$a[ 'size' ] = intval( $a[ 'size' ] );
+    	$a = shortcode_atts( array(
+    	    'size'  => '1/2',
+            'id'    => '',
+            'class' => ''
+        ), $atts );
 
     	switch ( $a[ 'size' ] ){
 
@@ -169,7 +180,7 @@ class WPGH_Form
 			    break;
 	    }
 
-	    return sprintf( "<div class='gh-form-column %s'>%s</div>", $width, do_shortcode( $content ) );
+	    return sprintf( "<div id='%s' class='gh-form-column %s %s'>%s</div>", $a['id'], $a['class'], $width, do_shortcode( $content ) );
 
     }
 
@@ -197,7 +208,7 @@ class WPGH_Form
             'placeholder'   => '',
             'title'         => '',
             'attributes'    => '',
-            'required'      => true,
+            'required'      => false,
         ), $atts );
 
         if ( empty( $a[ 'name' ] ) ){
@@ -469,7 +480,7 @@ class WPGH_Form
 
         $this->fields[] = $a[ 'name' ];
 
-        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
+        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false"  && $a[ 'required' ] !== "0" ) ? 'required' : '';
 
         $field = sprintf(
             "<label class='gh-input-label'>%s <textarea name='%s' id='%s' class='gh-input %s' placeholder='%s' title='%s' %s %s>%s</textarea></label>",
@@ -758,7 +769,7 @@ class WPGH_Form
      *
      * @return string
      */
-    public function recaptcha()
+    public function recaptcha( $atts )
     {
         /* return nothing if the form doesn't exist */
         if ( ! $this->is_form() )
@@ -766,10 +777,16 @@ class WPGH_Form
             return '';
         }
 
+        $a = shortcode_atts( array(
+            'theme'         => 'light',
+            'size'          => 'normal',
+        ), $atts );
+
+
         if ( ! is_admin() )
             wp_enqueue_script( 'google-recaptcha-v2', 'https://www.google.com/recaptcha/api.js' );
 
-        $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ) );
+        $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ), $a[ 'theme'], $a['size'] );
 
         $this->fields[] = 'g-recaptcha';
 
@@ -865,11 +882,12 @@ jQuery( function($){
      * @param $content
      * @return string
      */
-    public function submit( $atts, $content )
+    public function submit( $atts, $content = '' )
     {
         $a = shortcode_atts( array(
             'id'            => 'submit',
             'class'         => 'gh-submit',
+            'text'          => __( 'Submit' ),
         ), $atts );
 
         if ( empty( $content ) )
@@ -881,7 +899,7 @@ jQuery( function($){
                 "<div class='gh-button-wrapper'><button type='submit' id='%s' class='gh-submit-button %s'>%s</button></div>",
             esc_attr( $a[ 'id' ] ),
             esc_attr( $a[ 'class' ] ),
-            do_shortcode( $content )
+            $a[ 'text' ]
         );
 
         return $this->field_wrap( $html );

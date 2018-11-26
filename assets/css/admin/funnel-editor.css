@@ -2,6 +2,18 @@
 #wpbody-content{
     /*height: 100vh;*/
 }
+
+
+.button.button-secondary.submit.trigger-popup{
+    background: #f7f7f7 !important;
+    border-color: #ccc !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    float: none !important;
+    padding: 0 10px 1px !important;
+    margin: 2px !important;
+}
+
 #wpcontent {
     padding-left: 0 !important;
     box-sizing: border-box;

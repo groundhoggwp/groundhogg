@@ -86,7 +86,41 @@ class WPGH_HTML
             esc_attr( $a[ 'text'  ] )
         );
 
-        return apply_filters( 'wpgh_html_input', $html, $args );
+        return apply_filters( 'wpgh_html_button', $html, $args );
+    }
+
+    /**
+     * Generate a modal link quickly
+     */
+    public function modal_link( $args = array() )
+    {
+        $a = wp_parse_args( $args, array(
+            'title'     => 'Modal',
+            'text'      => __( 'Open Modal' ),
+            'footer_button_text' => __( 'Save Changes' ),
+            'id'        => '',
+            'name'      => '',
+            'class'     => 'button button-secondary',
+            'source'    => '',
+            'height'    => 500,
+            'width'     => 500,
+            'footer'    => 'true',
+        ) );
+
+        $html = sprintf(
+            "<a title='%s' id='%s' class='%s trigger-popup' href='#source=%s&footer=%s&width=%d&height=%d&footertext=%s' >%s</a>",
+            esc_attr( $a[ 'title'  ] ),
+            esc_attr( $a[ 'id'     ] ),
+            esc_attr( $a[ 'class'  ] ),
+            urlencode( $a[ 'source' ] ),
+            esc_attr( $a[ 'footer' ] ),
+            intval( $a[ 'width'    ] ),
+            intval( $a[ 'height'   ] ),
+            urlencode( $a[ 'footer_button_text' ] ),
+            $a[ 'text' ]
+        );
+
+        return apply_filters( 'wpgh_html_modal_link', $html, $args );
     }
 
     /**
