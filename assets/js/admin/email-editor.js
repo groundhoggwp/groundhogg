@@ -158,6 +158,7 @@ var wpghEmailEditor;
                     wpghEmailEditor.makeDismissible();
                     $( '.row' ).wpghToolBar();
 
+
                 }
             });
 
