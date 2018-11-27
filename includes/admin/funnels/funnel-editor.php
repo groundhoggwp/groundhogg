@@ -233,12 +233,11 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             </div>
             <!-- End elements area-->
             <!-- main funnel editing area -->
-            <div id="notices">
+            <div id="notices"></div>
 
+            <div style="width: 100%">
+                <?php include_once dirname( __FILE__ ) . '/reporting.php'; ?>
             </div>
-
-            <?php include_once dirname( __FILE__ ) . '/reporting.php'; ?>
-
             <div class="funnel-saving hidden"></div>
             <div  id="postbox-container-2" class="postbox-container funnel-editor">
                 <div style="visibility: hidden" id="normal-sortables" class="meta-box-sortables ui-sortable">
