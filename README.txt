@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 10.0.11.1 =
+* FIXED Line which included the report missing
+* TWEAKED added new code for the default form.
+
 = 10.0.11 =
 * ADDED New Funnel Reporting Graph at top of funnel when in reporting mode.
 * ADDED compatibility for modal outside of funnel editor.

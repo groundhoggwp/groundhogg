@@ -161,19 +161,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
         $form = $step->get_meta( 'form' );
 
         if ( empty( $form ) ){
-            $form = "[first_name]\n";
-            $form .= "[last_name]\n";
-            $form .= "[email]\n";
-            $form .= "[phone]\n";
-            $form .= "[terms]\n";
-
-            if ( wpgh_is_gdpr() )
-                $form .= "[gdpr]\n";
-
-            if ( wpgh_is_recaptcha_enabled() )
-                $form .= "[recaptcha]\n";
-
-            $form .= "[submit]Submit[/submit]";
+            $form = "[row]\n[col size=\"1/2\"]\n[first required=\"1\" label=\"First Name *\" placeholder=\"John\"]\n[/col]\n[col size=\"1/2\"]\n[last required=\"1\" label=\"Last Name *\" placeholder=\"Doe\"]\n[/col]\n[/row]\n[row]\n[email required=\"1\" label=\"Email *\" placeholder=\"email@example.com\"]\n[/row]\n[submit text=\"Submit\"]";
         }
 
         $ty_page = $step->get_meta( 'success_page' );
