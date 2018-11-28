@@ -184,22 +184,9 @@ class WPGH_Report
                             }).appendTo("body").fadeIn(200);
                         }
 
-
-
-
                         /* PLOT CHART */
                         $.plot($("#graph-<?php echo sanitize_key($this->name); ?>"), dataset, options);
                         $("#graph-<?php echo sanitize_key($this->name); ?>").UseTooltip();
-
-
-
-
-
-
-
-
-
-
 
                     });
                 </script>

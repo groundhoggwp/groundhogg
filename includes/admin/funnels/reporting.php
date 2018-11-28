@@ -7,61 +7,103 @@
  */
 
 ?>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
+<div class="postbox hidden step-reporting" style="margin-bottom: 0;">
+    <div class="inside">
+        <script type="text/javascript">
 
-    (function ($) {
-        $( '#reporting-toggle' ).on( 'change', function (e) {
-            if ( $(this).is( ':checked' ) && ! wpghFunnelEditor.reportData ){
-                drawChart();
-            }
-        } );
-    })(jQuery);
+            var funnelChart;
 
-    google.charts.load('current', {'packages':['corechart', 'line']});
-    // google.charts.setOnLoadCallback( drawChart );
+            (function ($) {
 
-    function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-            ['Event', 'Number Of Contacts'],
-            <?php
-            /* Pass funnel ID to get Steps */
-            $steps = WPGH()->steps->get_steps( array(
-                'funnel_id' => $funnel_id
-            ) );
-            foreach ( $steps as $step ) {
-                $query = new WPGH_Contact_Query();
-                $args = array(
-                    'report' => array(
-                        'funnel' => $funnel_id,
-                        'step' => $step->ID,
-                        'status' => 'complete',
-                        'start' => WPGH()->menu->funnels_page->reporting_start_time,
-                        'end' => WPGH()->menu->funnels_page->reporting_end_time,
-                    )
-                );
-                $count = count($query->query($args));
-                //echo '['. $count . ' , "'.$step->step_title.'"],';
-                echo  '["'.$step->step_title.'",'.$count.'],';
-            }
-            ?>
-        ]);
-        var options = {
-            title: 'Funnel Report',
-            // curveType: 'function',
-            // legend: { position: 'bottom' }
-            "vAxis": {"minValue": "0", baseline: 0},
-            "hAxis": {"slantedTextAngle": "45", "slantedText": "true"}, "legend": {"position": "top"},
-            animation: {
-                duration: 1000,
-                easing: 'out',
-                startup: true,
-            }
-        };
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-        chart.draw(data, options);
+                var previousPoint = null, previousLabel = null;
 
-    }
-    window.addEventListener('resize', drawChart, false);
-</script>
-<div id="curve_chart" class="step-reporting hidden" style="height: 370px;></div>
+                $.fn.UseTooltip = function () {
+                    $(this).bind("plothover", function (event, pos, item) {
+                        if (item) {
+                            if ((previousLabel != item.series.label) || (previousPoint != item.dataIndex)) {
+                                previousPoint = item.dataIndex;
+                                previousLabel = item.series.label;
+                                $("#tooltip").remove();
+
+                                var x = item.datapoint[0];
+                                var y = item.datapoint[1];
+
+                                var color = item.series.color;
+                                showTooltip(item.pageX, item.pageY, color, "<strong>" + item.series.label + "</strong>: " + y );
+                            }
+                        } else {
+                            $("#tooltip").remove();
+                            previousPoint = null;
+                        }
+                    });
+                };
+
+                function showTooltip(x, y, color, contents) {
+                    $('<div id="tooltip">' + contents + '</div>').css({
+                        position: 'absolute',
+                        display: 'none',
+                        top: y - 40,
+                        left: x - 120,
+                        border: '2px solid ' + color,
+                        padding: '3px',
+                        'font-size': '9px',
+                        'border-radius': '5px',
+                        'background-color': '#fff',
+                        'font-family': 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                        opacity: 0.9
+                    }).appendTo("body").fadeIn(200);
+                }
+
+                funnelChart = {
+
+                    data: <?php echo json_encode( WPGH()->menu->funnels_page->get_chart_data() ); ?>,
+                    options: {
+                        series: {
+                            lines: {show: true},
+                            points: {
+                                radius: 3,
+                                show: true
+                            }
+                        },
+                        grid: {
+                            hoverable: true
+                        },
+                        xaxes: [ { mode: 'categories' } ],
+
+                    },
+
+                    init: function()
+                    {
+                        this.draw();
+                    },
+
+                    draw : function () {
+
+                        var $chart = $("#funnel-chart");
+
+                        $chart.plot( this.data, this.options);
+                        $chart.UseTooltip();
+
+                    }
+
+                };
+
+                $( function () {
+                    funnelChart.init();
+                });
+
+                $( '#reporting-toggle' ).on( 'change', function (e) {
+
+                    if ( $(this).is( ':checked' ) && ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
+
+                        funnelChart.draw();
+
+                    }
+
+                } );
+
+            })(jQuery);
+        </script>
+        <div id="funnel-chart" style="width: auto;height: 250px"></div>
+    </div>
+</div>

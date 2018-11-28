@@ -50,7 +50,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         'last_30' => __( 'Last 30 Days' ),
                         'custom' => __( 'Custom Range' ),
                     ),
-                    'selected' => ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24',
+                    'selected' => WPGH()->menu->funnels_page->get_reporting_range(),
                 ); echo WPGH()->html->dropdown( $args ); ?>
 
                 <?php $selected = ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ; ?>

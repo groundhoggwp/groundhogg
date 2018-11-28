@@ -144,28 +144,8 @@ var wpghFunnelEditor;
                     $( '.spinner' ).css( 'visibility','hidden' );
                     wpghFunnelEditor.makeDismissible();
                     $(document).trigger('wpghAddedStep');
-                    drawChart();
-                    function drawChart() {
-                        /* Display Google Chart */
-                        wpghFunnelEditor.reportData = response.chartData;
-                        var data = new google.visualization.DataTable(response.chartData);
-                        var options = {
-                            title: 'Funnel Report',
-                            // curveType: 'function',
-                            // legend: { position: 'bottom' }
-                            "vAxis": {"minValue": "0", baseline: 0},
-                            "hAxis": {"slantedTextAngle": "45", "slantedText": "true"}, "legend": {"position": "top"},
-                            animation: {
-                                duration: 1000,
-                                easing: 'out',
-                                startup: true,
-                            }
-                        };
-
-                         var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-                         chart.draw(data, options);
-                    }
-                    window.addEventListener('resize', drawChart, false);
+                    funnelChart.data = response.chartData;
+                    funnelChart.draw();
                 }
             });
 

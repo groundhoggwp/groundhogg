@@ -98,6 +98,10 @@ class WPGH_Funnels_Page
 
            wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/funnel-editor.css') );
            wp_enqueue_script( 'funnel-editor', WPGH_ASSETS_FOLDER . '/js/admin/funnel-editor.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/funnel-editor.js') );
+
+           wp_enqueue_script( 'wpgh-flot-chart', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
+           wp_enqueue_script( 'wpgh-flot-chart-categories', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.categories.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.categories.js') );
+
        }
     }
 
@@ -163,7 +167,7 @@ class WPGH_Funnels_Page
 
     public function get_reporting_range()
     {
-        return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_24' ;
+        return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_30' ;
     }
 
     private function setup_reporting(){
@@ -563,20 +567,16 @@ class WPGH_Funnels_Page
 
     }
 
-    private function get_chart_data()
+    public function get_chart_data()
     {
         /* Pass funnel ID to get Steps */
         $steps = WPGH()->steps->get_steps( array(
             'funnel_id' => intval(  $_REQUEST[ 'funnel' ] )
         ) );
 
-        //$count = array();
+        $dataset1 = array();
 
-        $array = array();
-        $array['cols'][] = array('type' => 'string' , 'label' => 'Event');
-        $array['cols'][] = array('type' => 'number' , 'label' => 'Number Of Contacts');
-
-        foreach ( $steps as $step ) {
+        foreach ( $steps as $i => $step ) {
 
             $query = new WPGH_Contact_Query();
 
@@ -591,12 +591,33 @@ class WPGH_Funnels_Page
             );
 
             $count = count($query->query($args));
-            $array['rows'][]['c'] = array(
-                array('v' => $step->step_title),
-                array('v' => $count)
+
+            $dataset1[] = array( ( $i + 1 ) .'. '. $step->step_title , $count );
+
+            $args = array(
+                'report' => array(
+                    'funnel' => intval(  $_REQUEST[ 'funnel' ] ),
+                    'step' => $step->ID,
+                    'status' => 'waiting'
+                )
             );
+
+            $count = count($query->query($args));
+
+            $dataset2[] = array( ( $i + 1 ) .'. '. $step->step_title , $count );
+
         }
-        return $array;
+
+        $ds[] = array(
+            'label' => __( 'Active Contacts' ),
+            'data'  => $dataset1
+        ) ;
+        $ds[] = array(
+            'label' => __( 'Waiting Contacts' ),
+            'data'  => $dataset2
+        ) ;
+
+        return $ds;
     }
 
 
