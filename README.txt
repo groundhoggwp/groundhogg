@@ -107,8 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
-= 10.0.11.2 =
-* TWEAKED Form Address Field to include proper placholder information
+= 10.0.12 =
+* ADDED Interactive Broadcast pie chart.
+* ADDED Dashboard Reports.
+* TWEAKED Form Address Field to include proper placeholder information
 * TWEAKED Form Address Field to have better condensed layout
 * TWEAKED Report to use the jquery Flot library
 * TWEAKED Import contact trimming column headers
