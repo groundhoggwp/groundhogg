@@ -113,6 +113,8 @@ class WPGH_Report
             <div class="inside">
                 <script type="text/javascript">
                     jQuery(function($) {
+
+                        /* DATA OPERATION */
                         var dataset = <?php echo $jsondata; ?>;
                         var options = {
                             series: {
@@ -132,7 +134,73 @@ class WPGH_Report
                                 // axisLabel: "Date",
                             }
                         };
+
+                        /* TOOL TIP */
+                        var previousPoint = null, previousLabel = null;
+
+                        $.fn.UseTooltip = function () {
+                            $(this).bind("plothover", function (event, pos, item) {
+                                if (item) {
+                                    if ((previousLabel != item.series.label) || (previousPoint != item.dataIndex)) {
+                                        previousPoint = item.dataIndex;
+                                        previousLabel = item.series.label;
+                                        $("#tooltip").remove();
+
+                                        var x = item.datapoint[0];
+                                        var y = item.datapoint[1];
+
+                                        var color = item.series.color;
+                                        var date =  new Date(x).toDateString();
+                                        //var date1 =  new Date(x).getMonth();
+
+                                        var unit = "";
+
+
+                                        showTooltip(item.pageX, item.pageY, color,
+                                            "<strong>" + item.series.label + "</strong>: " + y +
+                                            "<br/>" + date);
+                                    }
+                                } else {
+                                    $("#tooltip").remove();
+                                    previousPoint = null;
+                                }
+                            });
+                        };
+
+
+                        function showTooltip(x, y, color, contents) {
+                            $('<div id="tooltip">' + contents + '</div>').css({
+                                position: 'absolute',
+                                display: 'none',
+                                top: y - 40,
+                                left: x - 120,
+                                border: '2px solid ' + color,
+                                padding: '3px',
+                                'font-size': '9px',
+                                'border-radius': '5px',
+                                'background-color': '#fff',
+                                'font-family': 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                                opacity: 0.9
+                            }).appendTo("body").fadeIn(200);
+                        }
+
+
+
+
+                        /* PLOT CHART */
                         $.plot($("#graph-<?php echo sanitize_key($this->name); ?>"), dataset, options);
+                        $("#graph-<?php echo sanitize_key($this->name); ?>").UseTooltip();
+
+
+
+
+
+
+
+
+
+
+
                     });
                 </script>
 
