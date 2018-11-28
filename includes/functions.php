@@ -772,7 +772,6 @@ add_action( 'init', 'wpgh_funnel_share_listen' );
  */
 function wpgh_convert_to_utc_0( $time )
 {
-
     if ( is_string( $time ) ){
         $time = strtotime( $time );
     }
@@ -804,11 +803,28 @@ function convert_to_local_time( $time )
  */
 function wpgh_round_to_hour( $time ){
 
-    $minutes = $time % 3600; # pulls the remainder of the hour.
+    $minutes = $time % HOUR_IN_SECONDS; # pulls the remainder of the hour.
 
     $time -= $minutes; # just start off rounded down.
 
-    if ($minutes >= 1800) $time += 3600; # add one hour if 30 mins or higher.
+    if ($minutes >= ( HOUR_IN_SECONDS / 2 ) ) $time += HOUR_IN_SECONDS; # add one hour if 30 mins or higher.
+
+    return $time;
+}
+
+/**
+ * Round time to the nearest hour.
+ *
+ * @param $time int
+ * @return int
+ */
+function wpgh_round_to_day( $time ){
+
+    $minutes = $time % DAY_IN_SECONDS; # pulls the remainder of the hour.
+
+    $time -= $minutes; # just start off rounded down.
+
+    if ($minutes >= ( DAY_IN_SECONDS / 2 ) ) $time += DAY_IN_SECONDS; # add one hour if 30 mins or higher.
 
     return $time;
 }

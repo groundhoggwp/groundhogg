@@ -72,26 +72,21 @@ class WPGH_Dashboard_Page
 
         switch ( $this->get_reporting_range() ):
             case 'last_24';
-                $this->reporting_start_time = strtotime( '1 day ago' );
+                $this->reporting_start_time = time() - DAY_IN_SECONDS;
                 $this->reporting_end_time   = time();
                 break;
             case 'last_7';
-                $this->reporting_start_time = strtotime( '7 days ago' );
+                $this->reporting_start_time = time() - ( 7 * DAY_IN_SECONDS );
                 $this->reporting_end_time   = time();
-
                 break;
+            default:
             case 'last_30';
-                $this->reporting_start_time = strtotime( '30 days ago' );
+                $this->reporting_start_time = time() - ( 30 * DAY_IN_SECONDS );
                 $this->reporting_end_time   = time();
-
                 break;
             case 'custom';
                 $this->reporting_start_time = strtotime( $_POST['custom_date_range_start'] );
                 $this->reporting_end_time   = strtotime( $_POST['custom_date_range_end'] );
-                break;
-            default:
-                $this->reporting_start_time = strtotime( '1 day ago' );
-                $this->reporting_end_time   = time();
                 break;
         endswitch;
     }
@@ -106,8 +101,8 @@ class WPGH_Dashboard_Page
 
     private function create_reports()
     {
-        $new_contact = new WPGH_Report_Optins('New Contacts' , 'new_contacts' );
-        $send_emails =  new WPGH_Report_Send_Emails( 'Send Emails', 'send_email' );
+        $new_contact = new WPGH_Report_Optins( __( 'New Contacts' ), 'new_contacts' );
+        $send_emails =  new WPGH_Report_Send_Emails( __( "Email Report" ), 'send_email' );
     }
 
     public function page()
