@@ -39,18 +39,10 @@ class WPGH_Dashboard_Page
      */
     public function scripts()
     {
-        ?>
-
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script type="text/javascript">
-            google.charts.load('current', {'packages': ['corechart']});
-        </script>
-        <?php
         wp_enqueue_style( 'dashboard', WPGH_ASSETS_FOLDER . '/css/admin/dashboard.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/dashboard.css') );
         wp_enqueue_script( 'wpgh-flot-chart', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
         wp_enqueue_script( 'wpgh-flot-chart-categories', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.categories.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.categories.js') );
         wp_enqueue_script( 'wpgh-flot-chart-time', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.time.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.time.js') );
-//        wp_enqueue_script( 'wpgh-flot-chart-time', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.axislabels.time.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.axislabels.time.js') );
     }
 
 
