@@ -52,7 +52,7 @@ else:
         </td>
     </tr>
     <tr>
-        <th><?php $open =  _e( 'Opens', 'groundhogg' ); ?></th>
+        <th><?php _e( 'Opens', 'groundhogg' ); ?></th>
         <td><?php
 
             $opens = WPGH()->activity->count( array(
@@ -105,22 +105,33 @@ else:
         $dataset  =  array();
 
         $dataset[] = array(
-        'label' => __('opens'),
-        'data' => $opens
+            'label' => __('Opens Not clicked'),
+            'data' => $opens - $clicks,
+            'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
+        ) ;
+        $dataset[] = array(
+            'label' => __('Opens And Clicked'),
+            'data' => $clicks,
+            'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) )
+        ) ;
+        $dataset[] = array(
+            'label' => __('Unopened'),
+            'data' => $contact_sum - $opens,
+            'url'  => '#'
+
         ) ;
 
-        $dataset[] = array(
-        'label' => __('Unopened'),
-        'data' => $contact_sum - $opens
-        ) ;
     ?>
 
     <tr  colspan="2">
         <script type="text/javascript" >
             jQuery(function($) {
                 var dataSet = <?php echo json_encode($dataset)?>;
-
                 $.plot('#placeholder', dataSet, {
+                    grid : {
+                        clickable : true,
+                        hoverable : true
+                    },
                     series: {
                         pie: {
                             innerRadius : 0.5,
@@ -138,9 +149,13 @@ else:
                                     opacity: 0.8,
                                     color: '#000'
                                 }
-                            }
+                            },
                         }
                     }
+                });
+
+                $('#placeholder').bind("plotclick", function(event,pos,obj) {
+                    window.location.replace(dataSet[obj.seriesIndex].url);
                 });
             });
 
@@ -202,8 +217,6 @@ else:
     </tr>
     <?php
     endforeach;
-
-
     ?>
 
 
