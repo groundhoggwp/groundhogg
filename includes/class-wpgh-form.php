@@ -352,7 +352,7 @@ class WPGH_Form
 
         $section = sprintf( "<div class='%s'><label class='gh-input-label'>%s</label>", $a[ 'class' ], $a[ 'label' ] );
 
-        $section.= $this->input_base(
+        $section .= $this->row( array(), $this->column( array( 'size' => '2/3' ), $this->input_base(
             array(
                 'type'          => 'text',
                 'label'         => __( 'Street Address 1', 'groundhogg' ),
@@ -362,21 +362,21 @@ class WPGH_Form
                 'title'         => __( 'Street Address 1', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
-        );
+        ) ) .
 
-        $section.= $this->input_base(
+        $this->column( array( 'size' => '1/3' ), $this->input_base(
             array(
                 'type'          => 'text',
                 'label'         => __( 'Street Address 2', 'groundhogg' ),
                 'name'          => 'street_address_2',
                 'id'            => 'street_address_2',
-                'placeholder'   => '123 Any St.',
+                'placeholder'   => 'Unit A',
                 'title'         => __( 'Street Address 2', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
-        );
+        ) ) );
 
-        $section.= $this->input_base(
+        $section .= $this->row( array(),  $this->input_base(
             array(
                 'type'          => 'text',
                 'label'         => __( 'City', 'groundhogg' ),
@@ -386,9 +386,9 @@ class WPGH_Form
                 'title'         => __( 'City', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
-        );
+        ) );
 
-        $section.= $this->input_base(
+        $section .= $this->row( array(), $this->column( array( 'size' => '1/2' ),$this->input_base(
             array(
                 'type'          => 'text',
                 'label'         => __( 'State/Province', 'groundhogg' ),
@@ -398,21 +398,7 @@ class WPGH_Form
                 'title'         => __( 'State/Province', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
-        );
-
-        $section.= $this->input_base(
-            array(
-                'type'          => 'text',
-                'label'         => __( 'Postal/Zip Code', 'groundhogg' ),
-                'name'          => 'postal_zip',
-                'id'            => 'postal_zip',
-                'placeholder'   => 'New York',
-                'title'         => __( 'Postal/Zip Code', 'groundhogg' ),
-                'required'      => $a[ 'required' ],
-            )
-        );
-
-        $section.= $this->select(
+        ) ) . $this->column( array( 'size' => '1/2' ), $this->select(
             array(
                 'label'         => __( 'Country *', 'groundhogg' ),
                 'name'          => 'country',
@@ -423,6 +409,18 @@ class WPGH_Form
                 'title'         => __( 'Country' ),
                 'default'       => __( 'Please select a country', 'groundhogg' ),
                 'multiple'      => false,
+                'required'      => $a[ 'required' ],
+            ) )
+        ) );
+
+        $section.= $this->input_base(
+            array(
+                'type'          => 'text',
+                'label'         => __( 'Postal/Zip Code', 'groundhogg' ),
+                'name'          => 'postal_zip',
+                'id'            => 'postal_zip',
+                'placeholder'   => '10001',
+                'title'         => __( 'Postal/Zip Code', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
         );

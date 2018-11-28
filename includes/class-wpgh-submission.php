@@ -539,6 +539,17 @@ class WPGH_Submission
                     /* If they already confirmed DON'T CHANGE IT! */
                     $args = array( 'optin_status' => WPGH_UNCONFIRMED );
                     $contact->update( $args );
+
+                    WPGH()->activity->add( array(
+                        'contact_id'    => $contact->ID,
+                        'funnel_id'     => WPGH()->tracking->get_funnel() ? WPGH()->tracking->get_funnel()->ID : WPGH_BROADCAST,
+                        'step_id'       => WPGH()->tracking->get_step() ? WPGH()->tracking->get_step()->ID : 0,
+                        'activity_type' => 'unsubscribed',
+                        'event_id'      => WPGH()->tracking->get_event() ? WPGH()->tracking->get_event()->ID : 0,
+                        'referer'       => $this->source
+
+                    ));
+
                     do_action( 'wpgh_preference_none', $contact->ID );
                 }
 
