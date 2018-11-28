@@ -44,11 +44,11 @@ class WPGH_Superlinks_Table extends WP_List_Table {
         $columns = array(
             'cb'            => '<input type="checkbox" />', // Render a checkbox instead of text.
             'name'          => _x( 'Name', 'Column label', 'groundhogg' ),
-            'replacement'   => _x( 'Replacement Code', 'Column label', 'groundhogg' ),
-            'target'        => _x( 'Target Url', 'Column label', 'groundhogg' ),
             'source'        => _x( 'Source Url', 'Column label', 'groundhogg' ),
+            'replacement'   => _x( 'Replacement Code', 'Column label', 'groundhogg' ),
             'tags'          => _x( 'Tags', 'Column label', 'groundhogg' ),
             //'clicks' => _x( 'Clicks', 'Column label', 'groundhogg' ),
+            'target'        => _x( 'Target Url', 'Column label', 'groundhogg' ),
         );
         return $columns;
     }
@@ -80,12 +80,12 @@ class WPGH_Superlinks_Table extends WP_List_Table {
 
     protected function column_replacement( $superlink )
     {
-        return '{superlink.' . $superlink->ID . '}';
+        return sprintf( '<input type="text" value="%s" onfocus="this.select()" readonly>', '{superlink.' . $superlink->ID . '}');
     }
 
     protected function column_source( $superlink )
     {
-        return sprintf( '<a target="_blank" href="%s">%s</a>',site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ) );
+        return sprintf( '<input style="max-width: 100%%;" class="regular-text" type="text" value="%s" onfocus="this.select()" readonly><p><a target="_blank" href="%s">%s</a></p>', site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ) );
     }
 
     protected function column_tags( $superlink )
@@ -94,9 +94,10 @@ class WPGH_Superlinks_Table extends WP_List_Table {
 
         foreach ( $superlink->tags as $i => $tag_id ){
 
-            $tag = WPGH()->tags->get( $tag_id );
-
-            $tags[ $i ] = '<a href="'. admin_url( 'admin.php?page=gh_contacts&view=tag&tag=' . $tag_id ) . '">' . $tag->tag_name . '</a>';
+            if ( WPGH()->tags->exists( $tag_id ) ){
+                $tag = WPGH()->tags->get( $tag_id );
+                $tags[ $i ] = '<a href="'. admin_url( 'admin.php?page=gh_contacts&view=tag&tag=' . $tag_id ) . '">' . $tag->tag_name . '</a>';
+            }
         }
 
         return implode( ', ', $tags );
