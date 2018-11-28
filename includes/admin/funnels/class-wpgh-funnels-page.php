@@ -46,7 +46,6 @@ class WPGH_Funnels_Page
 
     function __construct()
 	{
-
 	    add_action( 'admin_menu', array( $this, 'register' ) );
 
 	    if ( is_admin() ){

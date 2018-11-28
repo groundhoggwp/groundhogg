@@ -763,3 +763,52 @@ function wpgh_funnel_share_listen()
 }
 
 add_action( 'init', 'wpgh_funnel_share_listen' );
+
+/**
+ * Convert a unix timestamp to UTC-0 time
+ *
+ * @param $time
+ * @return int
+ */
+function wpgh_convert_to_utc_0( $time )
+{
+
+    if ( is_string( $time ) ){
+        $time = strtotime( $time );
+    }
+
+    return $time - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+
+}
+
+/**
+ * Convert a unix timestamp to local time
+ *
+ * @param $time
+ * @return int
+ */
+function convert_to_local_time( $time )
+{
+    if ( is_string( $time ) ){
+        $time = strtotime( $time );
+    }
+
+    return $time + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+}
+
+/**
+ * Round time to the nearest hour.
+ *
+ * @param $time int
+ * @return int
+ */
+function wpgh_round_to_hour( $time ){
+
+    $minutes = $time % 3600; # pulls the remainder of the hour.
+
+    $time -= $minutes; # just start off rounded down.
+
+    if ($minutes >= 1800) $time += 3600; # add one hour if 30 mins or higher.
+
+    return $time;
+}
