@@ -25,14 +25,16 @@ if ( $broadcast->status !== 'sent' ):
 
 else:
 
+
     ?>
 <h2><?php _e( 'Stats', 'groundhogg'  ); ?></h2>
 <table class="form-table">
 
     <tbody>
 
+
     <tr>
-        <th><?php _e( 'Total Delivered', 'groundhogg' ); ?></th>
+        <th><?php  _e( 'Total Delivered', 'groundhogg' ); ?></th>
         <td><?php
 
             $contact_sum = WPGH()->events->count( array(
@@ -45,10 +47,12 @@ else:
                 $contact_sum
             );
 
-            ?></td>
+
+            ?>
+        </td>
     </tr>
     <tr>
-        <th><?php _e( 'Opens', 'groundhogg' ); ?></th>
+        <th><?php $open =  _e( 'Opens', 'groundhogg' ); ?></th>
         <td><?php
 
             $opens = WPGH()->activity->count( array(
@@ -57,7 +61,7 @@ else:
                 'activity_type' => 'email_opened'
             ) );
 
-            echo sprintf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
+                echo sprintf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
                 admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
                 $opens,
                 ( $opens / $contact_sum ) * 100
@@ -89,6 +93,59 @@ else:
     <tr>
         <th><?php _e( 'Unopened', 'groundhogg' ); ?></th>
         <td><?php echo sprintf("<strong>%d (%d%%)</strong>", $contact_sum - $opens,  ( ( $contact_sum - $opens ) / $contact_sum ) * 100 ); ?></td>
+
+    </tr>
+
+    <?php
+
+        /*
+        * create array  of data ..
+        */
+
+        $dataset  =  array();
+
+        $dataset[] = array(
+        'label' => __('opens'),
+        'data' => $opens
+        ) ;
+
+        $dataset[] = array(
+        'label' => __('Unopened'),
+        'data' => $contact_sum - $opens
+        ) ;
+    ?>
+
+    <tr  colspan="2">
+        <script type="text/javascript" >
+            jQuery(function($) {
+                var dataSet = <?php echo json_encode($dataset)?>;
+
+                $.plot('#placeholder', dataSet, {
+                    series: {
+                        pie: {
+                            innerRadius : 0.5,
+                            show: true,
+                            label: {
+                                show:true,
+                                radius: 0.8,
+                                formatter: function (label, series) {
+                                    return '<div style="border:1px solid grey;font-size:8pt;text-align:center;padding:5px;color:white;">' +
+                                        label + ' : ' +
+                                        Math.round(series.percent) +
+                                        '%</div>';
+                                },
+                                background: {
+                                    opacity: 0.8,
+                                    color: '#000'
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+        </script>
+        <div id="placeholder" style="width:400px;height:300px"></div>
 
     </tr>
 
@@ -145,6 +202,14 @@ else:
     </tr>
     <?php
     endforeach;
-    ?></tbody></table><?php
+
+
+    ?>
+
+
+
+
+
+    </tbody></table><?php
 endif; ?>
 

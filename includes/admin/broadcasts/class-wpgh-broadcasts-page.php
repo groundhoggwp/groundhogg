@@ -36,9 +36,23 @@ class WPGH_Broadcasts_Page
 
             add_action( 'init' , array( $this, 'process_action' )  );
 
+            add_action( 'admin_enqueue_scripts' , array( $this, 'scripts' )  );
+
+
             $this->notices = WPGH()->notices;
 
         }
+    }
+
+    /**
+     * enqueue editor scripts
+     */
+    public function scripts()
+    {
+
+        wp_enqueue_script( 'wpgh-flot-chart', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
+        wp_enqueue_script( 'wpgh-flot-chart-pie', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.pie.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.pie.js') );
+
     }
 
     public function register()
