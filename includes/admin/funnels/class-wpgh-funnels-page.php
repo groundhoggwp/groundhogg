@@ -609,7 +609,7 @@ class WPGH_Funnels_Page
         }
 
         $ds[] = array(
-            'label' => __( 'Active Contacts' ),
+            'label' => __( 'Completed Events' ),
             'data'  => $dataset1
         ) ;
         $ds[] = array(
