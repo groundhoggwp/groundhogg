@@ -409,6 +409,12 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                             echo WPGH()->html->textarea( array( 'id' => 'field-options', 'name' => 'options', 'cols' => 50, 'rows' => '5' ) );
                             ?><p class="description"><?php _e( 'Enter 1 option per line.' ) ?></p></td>
                     </tr>
+                    <tr id="gh-field-multiple">
+                        <th><?php _e( 'Allow Multiple Selections', 'groundhogg' ) ?></th>
+                        <td><?php
+                            echo WPGH()->html->checkbox( array( 'id' => 'field-multiple', 'name' => 'multiple', 'label' => __( 'Yes' ) ) );
+                            ?></td>
+                    </tr>
                     <tr id="gh-field-default">
                         <th><?php _e( 'Default', 'groundhogg' ) ?></th>
                         <td><?php

@@ -107,6 +107,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 10.0.11.2 =
+* TWEAKED Form Address Field to include proper placholder information
+* TWEAKED Form Address Field to have better condensed layout
+* TWEAKED Report to use the jquery Flot library
+* TWEAKED Import contact trimming column headers
+* TWEAKED Better error reporting when contact import fails.
+
 = 10.0.11.1 =
 * FIXED Line which included the report missing
 * TWEAKED added new code for the default form.

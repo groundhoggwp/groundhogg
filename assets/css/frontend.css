@@ -8,6 +8,7 @@
 
 .gh-form-field {
     margin: 10px 0;
+    white-space: normal;
 }
 
 label{
@@ -18,8 +19,13 @@ label{
     height: auto;
 }
 
+.gh-form-row {
+    white-space: nowrap;
+}
+
 .gh-form-column {
     display: inline-block;
+    white-space: normal;
 }
 
 .gh-form-column {
@@ -39,6 +45,7 @@ label{
 
 /*  GO FULL WIDTH BELOW 480 PIXELS */
 @media only screen and (max-width: 480px) {
+    .gh-form-row {white-space: normal;}
     .gh-form-column.col-1-of-1{width: 100%;}
     .gh-form-column.col-1-of-2{width: 100%;}
     .gh-form-column.col-1-of-3{width: 100%;}

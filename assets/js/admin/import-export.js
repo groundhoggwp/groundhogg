@@ -95,6 +95,11 @@ var wpghImportExport;
                         wpghImportExport.completedRows += response.contacts;
                         wpghImportExport.updateStatus();
 
+                    } else {
+                        console.log( response );
+                        alert( response );
+                        var $spinner = $( '.spinner-import' );
+                        $spinner.css( 'visibility', 'hidden' );
                     }
                 }
             });

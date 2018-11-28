@@ -214,7 +214,7 @@ class WPGH_Bulk_Contact_Manager
         }
 
         if ( ! is_email( $data['email'] ) ){
-            wp_die( sprintf( 'Invalid data given: %s', json_encode( $data ) ) );
+            wp_die( sprintf( __( 'Could not complete import for %s. Email field not present.' ), $data[ 'first_name' ] ) );
         }
 
         if ( isset( $args['owner'] ) ){
@@ -268,9 +268,9 @@ class WPGH_Bulk_Contact_Manager
 
         foreach ( $args as $key => $arg){
 
-            $new_key = sanitize_key( str_replace( ' ', '_', strtolower( $key ) ) );
+            $new_key = sanitize_key( str_replace( ' ', '_', strtolower( trim( $key ) ) ) );
 
-            $sanitized_args[ $new_key ] = sanitize_text_field( $arg );
+            $sanitized_args[ $new_key ] = sanitize_text_field( trim( $arg ) );
         }
 
         return $sanitized_args;

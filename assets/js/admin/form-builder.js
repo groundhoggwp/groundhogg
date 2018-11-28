@@ -158,6 +158,7 @@ var wpghFormBuilder;
                         'name',
                         'default',
                         'options',
+                        'multiple',
                         'id',
                         'class'
                     ];
