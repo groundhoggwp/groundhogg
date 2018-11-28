@@ -42,7 +42,7 @@
                     $('<div id="tooltip">' + contents + '</div>').css({
                         position: 'absolute',
                         display: 'none',
-                        top: y - 40,
+                        top: y + 10,
                         left: x - 120,
                         border: '2px solid ' + color,
                         padding: '3px',
@@ -87,10 +87,6 @@
                     }
 
                 };
-
-                $( function () {
-                    funnelChart.init();
-                });
 
                 $( '#reporting-toggle' ).on( 'change', function (e) {
 

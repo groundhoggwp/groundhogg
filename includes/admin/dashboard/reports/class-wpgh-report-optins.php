@@ -25,7 +25,7 @@ class WPGH_Report_Optins extends WPGH_Report
 
             $num_contacts = $wpdb->get_var( "SELECT COUNT(email) FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'" );
 
-            $col = convert_to_local_time(  $this->start_range ) * 1000;
+            $col = convert_to_local_time( $this->end_range ) * 1000;
 
             $dataset1[] = array( $col, $num_contacts );
 
