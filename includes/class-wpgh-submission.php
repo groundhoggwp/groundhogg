@@ -227,11 +227,18 @@ class WPGH_Submission
 
         }
 
+        if( !class_exists( 'Browser' ) )
+            require_once WPGH_PLUGIN_DIR . 'includes/lib/browser.php';
+
+        $browser = new Browser();
+
+        if ( $browser->isRobot() || $browser->isAol() ){
+            $this->leave( 'Are you a robot? It sure seems like it...' );
+        }
+
         // Check the IP against the spam list
         if ( $this->is_spam( wpgh_get_visitor_ip() ) ) {
-
             $this->leave();
-
         }
 
         // Check all the POST data against the blacklist
