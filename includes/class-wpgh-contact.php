@@ -256,6 +256,7 @@ class WPGH_Contact
                 return true;
                 break;
             case WPGH_SPAM;
+            case WPGH_COMPLAINED;
             case WPGH_HARD_BOUNCE;
             case WPGH_UNSUBSCRIBED:
                 return false;

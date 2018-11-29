@@ -57,5 +57,4 @@ class WPGH_Report_Send_Emails extends WPGH_Report
 
         return json_encode($ds);
     }
-
 }

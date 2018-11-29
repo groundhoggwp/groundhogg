@@ -18,6 +18,7 @@ define( 'WPGH_WEEKLY'       , 3 );
 define( 'WPGH_MONTHLY'      , 4 );
 define( 'WPGH_HARD_BOUNCE'  , 5 );
 define( 'WPGH_SPAM'         , 6 );
+define( 'WPGH_COMPLAINED'   , 7 );
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons
@@ -69,28 +70,31 @@ function wpgh_get_optin_status_text( $id_or_email )
                     return __( 'Unconfirmed. This contact will not receive emails, they are passed the email confirmation grace period.', 'groundhogg' );
             }
 
-            return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
+            return __( 'Unconfirmed. They will receive marketing.', 'groundhogg' );
             break;
         case WPGH_CONFIRMED:
-            return __( 'Confirmed. They will receive emails.', 'groundhogg' );
+            return __( 'Confirmed. They will receive marketing.', 'groundhogg' );
             break;
         case WPGH_UNSUBSCRIBED:
-            return __( 'Unsubscribed. They will not receive emails.', 'groundhogg' );
+            return __( 'Unsubscribed. They will not receive marketing.', 'groundhogg' );
             break;
         case WPGH_WEEKLY:
-            return __( 'This contact will only receive emails weekly.', 'groundhogg' );
+            return __( 'This contact will only receive marketing weekly.', 'groundhogg' );
             break;
         case WPGH_MONTHLY:
-            return __( 'This contact will only receive emails monthly.', 'groundhogg' );
+            return __( 'This contact will only receive marketing monthly.', 'groundhogg' );
             break;
         case WPGH_HARD_BOUNCE:
-            return __( 'This email bounced, further emails will not be sent.', 'groundhogg' );
+            return __( 'This email address bounced, they will not receive marketing.', 'groundhogg' );
             break;
         case WPGH_SPAM:
-            return __( 'This contact was marked as spam. Emails will not be sent.', 'groundhogg' );
+            return __( 'This contact was marked as spam. They will not receive marketing.', 'groundhogg' );
+            break;
+        case WPGH_COMPLAINED:
+            return __( 'This contact complained about your emails. They will not receive marketing.', 'groundhogg' );
             break;
         default:
-            return __( 'Unconfirmed. They will receive emails.', 'groundhogg' );
+            return __( 'Unconfirmed. They will receive marketing.', 'groundhogg' );
             break;
     }
 }

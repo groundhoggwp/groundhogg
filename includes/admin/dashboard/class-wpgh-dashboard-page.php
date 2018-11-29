@@ -45,8 +45,6 @@ class WPGH_Dashboard_Page
         wp_enqueue_script( 'wpgh-flot-chart-time', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.time.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.time.js') );
     }
 
-
-
     public function register()
     {
 
@@ -60,7 +58,6 @@ class WPGH_Dashboard_Page
         );
 
     }
-
 
     public function get_reporting_range()
     {
@@ -97,12 +94,14 @@ class WPGH_Dashboard_Page
         include_once dirname( __FILE__ ) . '/class-wpgh-report.php';
         include_once dirname( __FILE__ ) . '/reports/class-wpgh-report-optins.php';
         include_once dirname(__FILE__) . '/reports/class-wpgh-report-send-emails.php';
+        include_once dirname(__FILE__) . '/reports/class-wpgh-report-form-activity.php';
     }
 
     private function create_reports()
     {
         $new_contact = new WPGH_Report_Optins( __( 'New Contacts' ), 'new_contacts' );
         $send_emails =  new WPGH_Report_Send_Emails( __( "Email Report" ), 'send_email' );
+        $form_activity =  new WPGH_Report_Form_Activity( __( "Form Activity" ), 'form_activity' );
     }
 
     public function page()

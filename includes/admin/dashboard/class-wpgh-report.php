@@ -135,9 +135,6 @@ class WPGH_Report
                             },
                             xaxis: {
                                 mode: "time",
-                                // tickSize: [3, "day"],
-                                // tickLength: 0,
-                                // axisLabel: "Date",
                             }
                         };
 
@@ -157,14 +154,10 @@ class WPGH_Report
 
                                         var color = item.series.color;
                                         var date =  new Date(x).toDateString();
-                                        //var date1 =  new Date(x).getMonth();
 
-                                        var unit = "";
+                                        console.log( item );
 
-
-                                        showTooltip(item.pageX, item.pageY, color,
-                                            "<strong>" + item.series.label + "</strong>: " + y +
-                                            "<br/>" + date);
+                                        showTooltip(item.pageX, item.pageY, color, "<strong>" + item.series.label + "</strong>: " + y + "<br/>" + date );
                                     }
                                 } else {
                                     $("#tooltip").remove();
@@ -172,7 +165,6 @@ class WPGH_Report
                                 }
                             });
                         };
-
 
                         function showTooltip(x, y, color, contents) {
                             $('<div id="tooltip">' + contents + '</div>').css({

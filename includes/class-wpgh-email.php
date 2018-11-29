@@ -803,7 +803,6 @@ class WPGH_Email
 
 // validate domain and senders email address before making sending request
 
-
         $url = 'https://www.groundhogg.io';
         $req = array(
             'send_ses_email' => 'send_email',
@@ -828,6 +827,18 @@ class WPGH_Email
             );
 
             return false;
+
+        } else if ( $result->status === 'bounced' ){
+
+            do_action( 'wp_mail_failed' ,new WP_Error( 'EMAIL_BOUNCED', $result->message ) );
+
+            $this->contact->update( array( 'optin_status' => WPGH_HARD_BOUNCE ) );
+
+        } else if ( $result->status === 'complaint' ){
+
+            do_action( 'wp_mail_failed' ,new WP_Error( 'EMAIL_BOUNCED', $result->message ) );
+
+            $this->contact->update( array( 'optin_status' => WPGH_COMPLAINED ) );
 
         }
 
