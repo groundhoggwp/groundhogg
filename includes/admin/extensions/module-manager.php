@@ -231,7 +231,8 @@ class WPGH_Extension_Manager
 		$extensions = apply_filters( 'get_gh_extensions', array() );
 
 		?>
-            <div>
+            <div id="poststuff">
+                <p><?php _e( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license.</a>' ); ?></p>
                 <?php
                 if ( empty( $extensions ) ){
                     ?>
@@ -247,6 +248,8 @@ class WPGH_Extension_Manager
         <?php
 	}
 }
+
+add_action( 'gh_tab_extensions', array( 'WPGH_Extension_Manager', 'extension_page' ) );
 
 class WPGH_Extension_Box
 {

@@ -10,6 +10,20 @@
  */
 
 /**
+ * Output content for the tools
+ */
+function wpgh_tools_page()
+{
+    ?>
+    <div id="poststuff">
+        <?php do_action('gh_settings_tools'); ?>
+    </div>
+    <?php
+}
+
+add_action( 'gh_tab_tools', 'wpgh_tools_page' );
+
+/**
  * Display the bulk import tool
  *
  * @since       1.0.9
