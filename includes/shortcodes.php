@@ -259,3 +259,57 @@ function wpgh_is_not_logged_in( $atts, $content ){
 }
 
 add_shortcode( 'gh_is_not_logged_in', 'wpgh_is_not_logged_in' );
+
+
+/*
+ * The below code is meant to handle the view_in_browser function of emails.
+ */
+
+add_action( 'wp_ajax_gh_get_email', 'wpgh_get_browser_html_content' );
+add_action( 'wp_ajax_nopriv_gh_get_email', 'wpgh_get_browser_html_content' );
+
+function wpgh_get_browser_html_content()
+{
+    $email_id = wpgh_extract_query_arg( wpgh_get_referer(), 'email' );
+
+    if ( ! $email_id ){
+        wp_die( 'No email given.' );
+    }
+
+    if ( ! WPGH()->emails->exists( $email_id, 'ID' ) ){
+        wp_die( 'No email was found.' );
+    }
+
+    $contact = WPGH()->tracking->get_contact();
+
+    if ( ! $contact ){
+        wp_die( 'No contact was found.' );
+    }
+
+    $email = new WPGH_Email( $email_id );
+    $email->contact = $contact;
+    $email->event = WPGH()->tracking->get_event();
+    echo $email->build();
+    die();
+}
+
+/**
+ * View email in browser
+ */
+function wpgh_view_in_browser_shortcode()
+{
+
+    wp_enqueue_script( 'wpgh-email', WPGH_PLUGIN_URL . 'assets/js/email.js', array( 'jquery' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/email.js' ) );
+
+    ob_start();
+    ?>
+    <iframe src="<?php echo admin_url( 'admin-ajax.php?action=gh_get_email' ); ?>" style="margin-top:20px;" id="browser-email-view" onload="emailIframe.resize()"></iframe>
+    <?php
+
+    $content = ob_get_clean();
+
+    return $content;
+}
+
+add_shortcode( 'browser_email', 'wpgh_view_in_browser_shortcode' );
+

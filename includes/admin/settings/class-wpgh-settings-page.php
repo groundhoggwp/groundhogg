@@ -297,6 +297,14 @@ class WPGH_Settings_Page
                 'page' => 'groundhogg_marketing_settings'
             ),
             array(
+                'label' => 'View Email In Browser Page',
+                'id' => 'gh_view_in_browser_page',
+                'type' => 'page',
+                'desc' => 'Page containing the shortcode [browser_view] so contacts can view an email in the browser in the event their email client looks funky.',
+                'section' => 'contact_endpoints',
+                'page' => 'groundhogg_marketing_settings'
+            ),
+            array(
                 'label' => 'Privacy Policy',
                 'id' => 'gh_privacy_policy',
                 'type' => 'page',

@@ -14,15 +14,13 @@ $footer = apply_filters( 'wpgh_email_footer_css', "
     clear: both; 
     Margin-top: 10px; 
     text-align: center; 
-    width: 100%;
-" );
+    width: 100%;" );
 
 $footer_container = apply_filters( 'wpgh_email_footer_container_css', "
     border-collapse: separate;
     mso-table-lspace: 0pt; 
     mso-table-rspace: 0pt; 
-    width: 100%;
-" );
+    width: 100%;" );
 
 $footer_content = apply_filters( 'wpgh_email_footer_content_css', "
     font-family: sans-serif; 
@@ -31,14 +29,12 @@ $footer_content = apply_filters( 'wpgh_email_footer_content_css', "
     padding-top: 10px; 
     font-size: 13px; 
     color: #999999; 
-    text-align: center;
-" );
+    text-align: center;" );
 
 $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
     color: #999999; 
     font-size: 13px; 
-    text-align: center;
-" );
+    text-align: center;" );
 ?>
 
                         <!-- START FOOTER -->

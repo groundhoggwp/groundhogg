@@ -239,9 +239,20 @@ class WPGH_Email
      *
      * @return string
      */
-    public function browser_link($link)
+    public function browser_link( $link )
     {
-        return site_url(sprintf('gh-email/?email=%s', $this->ID));
+
+        if ( wpgh_is_global_multisite() ){
+            switch_to_blog( get_site()->site_id );
+        }
+
+        $url = get_permalink( wpgh_get_option( 'gh_view_in_browser_page' ) ) . '?email=' . $this->ID ;
+
+        if ( is_multisite() && ms_is_switched() ){
+            restore_current_blog();
+        }
+
+        return $url;
     }
 
     /**

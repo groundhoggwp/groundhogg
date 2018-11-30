@@ -20,16 +20,14 @@ $body = apply_filters( 'wpgh_email_body_css', "
 	margin: 0; 
 	padding: 0; 
 	-ms-text-size-adjust: 100%; 
-	-webkit-text-size-adjust: 100%;
-" );
+	-webkit-text-size-adjust: 100%;" );
 
 $wrapper = apply_filters( 'wpgh_email_wrapper_css', "
 	border-collapse: separate; 
 	mso-table-lspace: 0pt; 
 	mso-table-rspace: 0pt; 
 	width: 100%; 
-	background-color: #FFFFFF;
-" );
+	background-color: #FFFFFF;" );
 
 $template_container = apply_filters( 'wpgh_email_container_css', "
 	font-family: sans-serif; 
@@ -38,16 +36,14 @@ $template_container = apply_filters( 'wpgh_email_container_css', "
 	display: block; 
 	max-width: 580px; 
 	padding: 0px; 
-	width: 580px;
-" );
+	width: 580px;" );
 
 $template_content = apply_filters( 'wpgh_email_content_css', "
     box-sizing: border-box; 
     display: block; 
     Margin: 0 auto; 
     max-width: 580px; 
-    padding: 5px;
-" );
+    padding: 5px;" );
 
 $preheader = apply_filters( 'wpgh_email_preheader_css', "
     color: transparent; 
@@ -59,14 +55,12 @@ $preheader = apply_filters( 'wpgh_email_preheader_css', "
     overflow: hidden; 
     mso-hide: all; 
     visibility: hidden; 
-    width: 0;
-" );
+    width: 0;" );
 
 $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
     color: #999999; 
     font-size: 13px; 
-    text-align: center;
-");
+    text-align: center;");
 
 ?>
 <!doctype html>
@@ -81,7 +75,7 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
 <!-- /HEAD -->
 
 <!-- BODY -->
-<body class="" style="<?php echo $body; ?>">
+<body class="email" style="<?php echo $body; ?>">
 <table border="0" cellpadding="0" cellspacing="0" class="body" style="<?php echo $wrapper; ?>">
     <tr>
         <td class="container" style="<?php echo $template_container; ?>">

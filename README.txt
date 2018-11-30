@@ -107,9 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
-= 1.0.12.1 =
+= 1.0.13 =
 * ADDED code to prepare for bounce responses from AWS
 * ADDED new graph for form activity.
+* TWEAKED View email in browser now has a shortcode and a specific page to use.
 * TWEAKED there is now a check to see if a "robot" is submitting form. All robots will fail.
 * ADDED Replacement Codes Popup
 
