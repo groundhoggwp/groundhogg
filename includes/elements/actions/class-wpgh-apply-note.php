@@ -58,6 +58,9 @@ class WPGH_Apply_Note extends WPGH_Funnel_Step
             <tr>
                 <th>
                     <?php echo esc_html__( 'Note Text:', 'groundhogg' ); ?>
+                    <p>
+                        <?php WPGH()->replacements->show_replacements_button(); ?>
+                    </p>
                 </th>
                 <?php $args = array(
                     'id'    => $step->prefix( 'note_text' ),

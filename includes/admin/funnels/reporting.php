@@ -7,7 +7,7 @@
  */
 
 ?>
-<div class="postbox hidden step-reporting" style="margin-bottom: 0;">
+<div id="funnel-chart" class="postbox hidden step-reporting" style="margin-bottom: 0;">
     <div class="inside">
         <script type="text/javascript">
 
@@ -79,7 +79,7 @@
 
                     draw : function () {
 
-                        var $chart = $("#funnel-chart");
+                        var $chart = $("#reporting-chart");
 
                         $chart.plot( this.data, this.options);
                         $chart.UseTooltip();
@@ -100,6 +100,6 @@
 
             })(jQuery);
         </script>
-        <div id="funnel-chart" style="width: auto;height: 250px"></div>
+        <div id="reporting-chart" style="width: auto;height: 250px"></div>
     </div>
 </div>

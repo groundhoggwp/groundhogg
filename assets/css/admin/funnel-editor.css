@@ -3,6 +3,9 @@
     /*height: 100vh;*/
 }
 
+.trigger-popup{
+    font-weight: normal;
+}
 
 .button.button-secondary.submit.trigger-popup{
     background: #f7f7f7 !important;

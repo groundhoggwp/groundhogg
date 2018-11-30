@@ -46,6 +46,9 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
             <tr>
                 <th>
                     <?php echo esc_html__( 'Text Message:', 'groundhogg' ); ?>
+                    <p>
+                        <?php WPGH()->replacements->show_replacements_button(); ?>
+                    </p>
                 </th>
                 <?php $args = array(
                     'id'    => $step->prefix( 'text_message' ),

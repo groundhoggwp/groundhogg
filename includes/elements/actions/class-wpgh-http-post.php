@@ -112,6 +112,9 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
             <?php endforeach; ?>
             </tbody>
         </table>
+        <p>
+            <?php WPGH()->replacements->show_replacements_button(); ?>
+        </p>
         <script>
             jQuery(function($){
                 var table = $( "#meta-table-<?php echo $step->ID; ?>" );

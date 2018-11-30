@@ -261,27 +261,6 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
             <!-- End elements area-->
             <div style="clear: both;"></div>
         </div>
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
-            <tr>
-                <th><?php _e( 'Replacement Code' ); ?></th>
-                <th><?php _e( 'Description' ); ?></th>
-            </tr>
-            </thead>
-            <tbody>
-
-            <?php foreach ( WPGH()->replacements->get_replacements() as $replacement ): ?>
-                <tr>
-                    <td>
-                        <input style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}" readonly>
-                    </td>
-                    <td>
-                        <span><?php echo $replacement[ 'description' ]; ?></span>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
-
+        <?php WPGH()->replacements->get_table(); ?>
     </div>
 </form>

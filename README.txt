@@ -107,6 +107,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.12.1 =
+* ADDED code to prepare for bounce responses from AWS
+* ADDED new graph for form activity.
+* TWEAKED there is now a check to see if a "robot" is submitting form. All robots will fail.
+* ADDED Replacement Codes Popup
+
 = 10.0.12 =
 * ADDED Interactive Broadcast pie chart.
 * ADDED Dashboard Reports.

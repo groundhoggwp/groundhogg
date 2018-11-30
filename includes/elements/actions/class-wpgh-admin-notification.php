@@ -98,6 +98,9 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
                 <tr>
                     <th>
                         <?php echo esc_html__( 'Notification Text:', 'groundhogg' ); ?>
+                        <p>
+                            <?php WPGH()->replacements->show_replacements_button(); ?>
+                        </p>
                     </th>
                     <?php $args = array(
                         'id'    => $step->prefix( 'note_text' ),
@@ -109,7 +112,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
                     <td>
                         <?php echo WPGH()->html->textarea( $args ) ?>
                         <p class="description">
-                            <?php _e( 'Use any valid replacement codes', 'groundhogg' ); ?>
+                            <?php _e( 'Use any valid replacement codes.', 'groundhogg' ); ?>
                         </p>
                     </td>
                 </tr>

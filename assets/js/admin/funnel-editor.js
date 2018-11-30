@@ -145,7 +145,10 @@ var wpghFunnelEditor;
                     wpghFunnelEditor.makeDismissible();
                     $(document).trigger('wpghAddedStep');
                     funnelChart.data = response.chartData;
-                    funnelChart.draw();
+
+                    if( ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
+                        funnelChart.draw();
+                    }
                 }
             });
 

@@ -189,6 +189,11 @@ var wpghModal;
                     e.preventDefault();
                     //console.log(this.href);
                     wpghModal.init( this.title, this.href );
+
+                    if ( $(this).hasClass( 'no-padding' ) ){
+                        $( '.popup-content' ).css( 'padding', '0' )
+                    }
+
                     wpghModal.open();
                 }
             );

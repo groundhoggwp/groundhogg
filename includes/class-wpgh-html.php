@@ -99,16 +99,16 @@ class WPGH_HTML
             'text'      => __( 'Open Modal' ),
             'footer_button_text' => __( 'Save Changes' ),
             'id'        => '',
-            'name'      => '',
             'class'     => 'button button-secondary',
             'source'    => '',
             'height'    => 500,
             'width'     => 500,
             'footer'    => 'true',
+            'preventSave'    => 'true',
         ) );
 
         $html = sprintf(
-            "<a title='%s' id='%s' class='%s trigger-popup' href='#source=%s&footer=%s&width=%d&height=%d&footertext=%s' >%s</a>",
+            "<a title='%s' id='%s' class='%s trigger-popup' href='#source=%s&footer=%s&width=%d&height=%d&footertext=%s&preventSave=%s' >%s</a>",
             esc_attr( $a[ 'title'  ] ),
             esc_attr( $a[ 'id'     ] ),
             esc_attr( $a[ 'class'  ] ),
@@ -117,6 +117,7 @@ class WPGH_HTML
             intval( $a[ 'width'    ] ),
             intval( $a[ 'height'   ] ),
             urlencode( $a[ 'footer_button_text' ] ),
+            esc_attr( $a[ 'preventSave' ] ),
             $a[ 'text' ]
         );
 
