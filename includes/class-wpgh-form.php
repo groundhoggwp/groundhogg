@@ -85,6 +85,7 @@ class WPGH_Form
         add_shortcode( 'textarea',   array( $this, 'textarea'    ) );
         add_shortcode( 'number',     array( $this, 'number'      ) );
         add_shortcode( 'select',     array( $this, 'select'      ) );
+        add_shortcode( 'dropdown',   array( $this, 'select'      ) );
         add_shortcode( 'radio',      array( $this, 'radio'       ) );
         add_shortcode( 'checkbox',   array( $this, 'checkbox'    ) );
         add_shortcode( 'terms',      array( $this, 'terms'       ) );
@@ -112,6 +113,7 @@ class WPGH_Form
         remove_shortcode( 'text'         );
         remove_shortcode( 'number'       );
         remove_shortcode( 'select'       );
+        remove_shortcode( 'dropdown'     );
         remove_shortcode( 'radio'        );
         remove_shortcode( 'checkbox'     );
         remove_shortcode( 'terms'        );
@@ -660,7 +662,7 @@ class WPGH_Form
         }
 
         $field = sprintf(
-            "<label class='gh-radio-label'>%s</label>%s",
+            "<label class='gh-input-label'>%s</label>%s",
             $a[ 'label' ],
             $optionHTML
         );

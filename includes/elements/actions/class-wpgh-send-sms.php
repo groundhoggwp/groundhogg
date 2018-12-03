@@ -55,12 +55,13 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
                     'name'  => $step->prefix( 'text_message' ),
                     'value' => $mesg,
                     'cols'  => 64,
-                    'rows'  => 4
+                    'rows'  => 4,
+                    'attributes' => ' maxlength="140"'
                 ); ?>
                 <td>
                     <?php echo WPGH()->html->textarea( $args ) ?>
                     <p class="description">
-                        <?php _e( 'Use any valid replacement codes in your text message. Do not use html!', 'groundhogg' ); ?>
+                        <?php _e( 'Use any valid replacement codes in your text message. Do not use html! Limit 140 characters.', 'groundhogg' ); ?>
                     </p>
                 </td>
             </tr>
@@ -110,6 +111,10 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
             }
 
             $message = $event->step->get_meta( 'text_message' );
+
+            if ( strlen( $message > 140 ) ){
+                $message = substr( $message, 0, 140 );
+            }
 
             $domain = parse_url( site_url(), PHP_URL_HOST );
 
