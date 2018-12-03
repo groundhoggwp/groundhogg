@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.13.1 =
+* Forgot some critical files
+
 = 1.0.13 =
 * ADDED code to prepare for bounce responses from AWS
 * ADDED new graph for form activity.
