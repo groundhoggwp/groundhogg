@@ -83,21 +83,28 @@ class WPGH_Tracking
     public function __construct()
     {
 
-        if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/click/' ) !== false ){
+        if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/click' ) !== false ){
 
             add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
             add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
             add_action( 'template_redirect', array( $this, 'email_link_clicked' ) );
             $this->doing_click = true;
 
-        } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/open/' ) !== false  ) {
+        } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/link/click' ) !== false ){
+
+            add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
+            add_action( 'plugins_loaded', array( $this, 'extract_from_login' ) );
+            add_action( 'template_redirect', array( $this, 'link_clicked' ) );
+            $this->doing_click = true;
+
+        } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/open' ) !== false  ) {
 
             add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
             add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
             add_action( 'init', array( $this, 'email_opened' ) );
             $this->doing_open = true;
 
-        } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-confirmation/via/email/' ) !== false ) {
+        } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-confirmation/via/email' ) !== false ) {
 
             add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
             add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
@@ -502,6 +509,31 @@ class WPGH_Tracking
             wp_redirect( WPGH_ASSETS_FOLDER . 'images/email-open.png' );
             die();
         }
+    }
+
+    /**
+     * Tracking for the link click benchmark.
+     */
+    public function link_clicked()
+    {
+
+        if ( ! isset( $_REQUEST[ 'id' ] ) ){
+            return;
+        }
+
+        $step_id = intval( $_REQUEST[ 'id' ] );
+
+        $step = new WPGH_Step( $step_id );
+
+        if ( $this->get_contact() ){
+            do_action( 'wpgh_link_clicked', $step, $this->get_contact() );
+            $redirect_to = WPGH()->replacements->process( $step->get_meta( 'redirect_to' ), $this->get_contact()->ID );
+        } else {
+            $redirect_to = $step->get_meta( 'redirect_to' );
+        }
+
+        wp_redirect( $redirect_to );
+        die();
     }
 
     /**

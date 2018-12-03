@@ -47,6 +47,7 @@ class WPGH_Elements
 	    $this->elements[] = new WPGH_Role_Changed();
 	    $this->elements[] = new WPGH_Email_Confirmed();
 	    $this->elements[] = new WPGH_Form_Filled();
+	    $this->elements[] = new WPGH_Link_Clicked();
 	    $this->elements[] = new WPGH_Tag_Applied();
 	    $this->elements[] = new WPGH_Tag_Removed();
 	    $this->elements[] = new WPGH_Page_Visited();
@@ -83,6 +84,7 @@ class WPGH_Elements
         include_once $benchmark_path . 'class-wpgh-account-created.php';
         include_once $benchmark_path . 'class-wpgh-email-confirmed.php';
         include_once $benchmark_path . 'class-wpgh-form-filled.php';
+        include_once $benchmark_path . 'class-wpgh-link-clicked.php';
         include_once $benchmark_path . 'class-wpgh-page-visited.php';
         include_once $benchmark_path . 'class-wpgh-role-changed.php';
         include_once $benchmark_path . 'class-wpgh-tag-applied.php';

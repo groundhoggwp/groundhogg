@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.13.2 =
+* ADDED New link click benchmark
+
 = 1.0.13.1 =
 * Forgot some critical files
 
