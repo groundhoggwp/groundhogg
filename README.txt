@@ -110,9 +110,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 = 1.0.13 =
 * ADDED code to prepare for bounce responses from AWS
 * ADDED new graph for form activity.
-* TWEAKED View email in browser now has a shortcode and a specific page to use.
-* TWEAKED there is now a check to see if a "robot" is submitting form. All robots will fail.
 * ADDED Replacement Codes Popup
+* TWEAKED View email in browser now has a shortcode and a specific page to use.
+* TWEAKED the settings page is now much more extendable  for extra plugins.
+* TWEAKED there is now a check to see if a "robot" is submitting form. All robots will fail.
+* FIXED Form builder was using dropdown shortcode but that shortcode wasn't actually registered...
 
 = 10.0.12 =
 * ADDED Interactive Broadcast pie chart.
