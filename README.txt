@@ -109,6 +109,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.0.13.2 =
 * ADDED New link click benchmark
+* ADDED Exclude list for scheduling broadcasts
+* FIXED Settings bug where privacy_policy and terms were overwriting each other.
 
 = 1.0.13.1 =
 * Forgot some critical files

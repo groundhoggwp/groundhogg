@@ -205,6 +205,8 @@ class WPGH_Broadcasts_Page
             wp_die( __( 'Please select one or more tags to send this broadcast to.', 'groundhogg' ) );
         }
 
+        $exclude_tags = isset( $_POST[ 'exclude_tags' ] )? WPGH()->tags->validate( $_POST['exclude_tags'] ): array();
+
         $contact_sum = 0;
 
         foreach ( $tags as $tag ){
@@ -246,7 +248,8 @@ class WPGH_Broadcasts_Page
         $query = new WPGH_Contact_Query();
 
         $args = array(
-            'tags_include' => $tags
+            'tags_include' => $tags,
+            'tag_exclude' => $exclude_tags
         );
 
         $contacts = $query->query( $args );

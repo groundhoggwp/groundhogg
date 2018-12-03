@@ -45,6 +45,17 @@ wp_enqueue_style( 'jquery-ui' );
                 <p class="description"><?php _e( 'This broadcast will be sent to contacts with these tags.', 'groundhogg' ); ?></p>
             </td>
         </tr>
+        <tr class="form-field term-exclude-tags-wrap">
+            <th scope="row"><label for="description"><?php _e( 'Exclude These Contacts:' ); ?></label></th>
+            <td><?php $tag_args = array();
+                $tag_args[ 'id' ] = 'exclude_tags';
+                $tag_args[ 'name' ] = 'exclude_tags[]';
+                $tag_args[ 'required' ] = false;
+
+                echo WPGH()->html->tag_picker( $tag_args ); ?>
+                <p class="description"><?php _e( 'These contacts will be excluded.', 'groundhogg' ); ?></p>
+            </td>
+        </tr>
         <tr class="form-field term-date-wrap">
             <th scope="row">
                 <label for="date"><?php _e( 'Send On:' ); ?></label>

@@ -384,8 +384,8 @@ class WPGH_Settings_Page
                 'desc'      => __( 'Link to your terms & conditions.', 'groundhogg' ),
                 'type'      => 'select2',
                 'atts'      => array(
-                    'name'  => 'gh_privacy_policy',
-                    'id'    => 'gh_privacy_policy',
+                    'name'  => 'gh_terms',
+                    'id'    => 'gh_terms',
                     'data'  => $pops,
                 ),
             ),
