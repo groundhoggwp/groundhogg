@@ -240,8 +240,8 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
         <tr>
             <th><?php _e( 'Source Page', 'groundhogg' ); ?></th>
             <td><?php $args = array(
-                    'id'    => 'page_source',
-                    'name'  => 'page_source',
+                    'id'    => 'source_page',
+                    'name'  => 'source_page',
                     'value' => $contact->get_meta( 'source_page' ),
                 );
                 echo WPGH()->html->input( $args ); ?>

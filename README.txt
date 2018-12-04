@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.13.3 =
+* ADDED Go back button in broadcast report if the broadcast has yet to be sent.
+* TWEAKED Export function now exports all the contact meta as well.
+* FIXED mixing source_page & page_source, now just page_source
+
 = 1.0.13.2 =
 * ADDED New link click benchmark
 * ADDED Exclude list for scheduling broadcasts

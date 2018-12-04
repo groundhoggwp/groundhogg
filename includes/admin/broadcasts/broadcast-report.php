@@ -21,18 +21,21 @@ $broadcast = new WPGH_Broadcast( $id );
 
 if ( $broadcast->status !== 'sent' ):
 
-    _e( 'Stats will show once the broadcast has been sent.', 'groundhogg' );
+?>
+<p>
+    <?php _e( 'Stats will show once the broadcast has been sent.', 'groundhogg' ); ?>
+</p>
+<p class="submit">
+    <a href="javascript:history.go(-1)" class="button button-primary">Go Back</a>
+</p>
+<?php
 
 else:
-
 
     ?>
 <h2><?php _e( 'Stats', 'groundhogg'  ); ?></h2>
 <table class="form-table">
-
     <tbody>
-
-
     <tr>
         <th><?php  _e( 'Total Delivered', 'groundhogg' ); ?></th>
         <td><?php
@@ -46,7 +49,6 @@ else:
                 admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 0, time() ) ),
                 $contact_sum
             );
-
 
             ?>
         </td>
@@ -218,10 +220,6 @@ else:
     <?php
     endforeach;
     ?>
-
-
-
-
 
     </tbody></table><?php
 endif; ?>

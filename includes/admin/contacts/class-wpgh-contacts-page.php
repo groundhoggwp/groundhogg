@@ -498,8 +498,8 @@ class WPGH_Contacts_Page
             $contact->update_meta( 'lead_source', esc_url_raw( $_POST['lead_source'] ) );
         }
 
-        if ( isset( $_POST[ 'page_source' ] ) ){
-            $contact->update_meta( 'page_source', esc_url_raw( $_POST['page_source'] ) );
+        if ( isset( $_POST[ 'source_page' ] ) ){
+            $contact->update_meta( 'source_page', esc_url_raw( $_POST['source_page'] ) );
         }
 
         if ( isset( $_POST[ 'tags' ] ) ){

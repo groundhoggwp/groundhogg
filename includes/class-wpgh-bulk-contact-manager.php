@@ -43,6 +43,9 @@ class WPGH_Bulk_Contact_Manager
      */
     public $import_id;
 
+    /**
+     * WPGH_Bulk_Contact_Manager constructor.
+     */
     public function __construct()
     {
 
@@ -60,6 +63,9 @@ class WPGH_Bulk_Contact_Manager
 
     }
 
+    /**
+     * Enqueue the import-export js
+     */
     public function scripts()
     {
         wp_enqueue_script( 'papaparse', WPGH_ASSETS_FOLDER . 'lib/papa-parse/papaparse.js' );
@@ -67,19 +73,17 @@ class WPGH_Bulk_Contact_Manager
         //wp_die( 'scripts' );
     }
 
+    /**
+     * Export a list of contacts.
+     */
     public function export()
     {
-
-        global $wpdb;
-
         if ( ! current_user_can( 'export_contacts' ) )
             wp_die( 'You cannot manage contacts.' );
 
         if ( empty( $_POST[ 'tags' ] ) ){
 
             $contacts = WPGH()->contacts->get_contacts();
-
-            wp_die( json_encode( $contacts ) );
 
         } else {
 
@@ -91,9 +95,21 @@ class WPGH_Bulk_Contact_Manager
                 'tags_include' => $tags
             ));
 
-            wp_die( json_encode( $contacts ) );
+        }
+
+        $keys = WPGH()->contact_meta->get_keys();
+
+        foreach ( $contacts as $contact ){
+
+            foreach ( $keys as $key ){
+
+                $contact->$key = WPGH()->contact_meta->get_meta( $contact->ID, $key, true );
+
+            }
 
         }
+
+        wp_die( json_encode( $contacts ) );
 
     }
 
@@ -152,6 +168,9 @@ class WPGH_Bulk_Contact_Manager
         return $this->import_tag;
     }
 
+    /**
+     * Perform the importing of contacts
+     */
     public function import()
     {
 
@@ -262,6 +281,12 @@ class WPGH_Bulk_Contact_Manager
 
     }
 
+    /**
+     * MAke sure all the arguments are clean
+     *
+     * @param $args
+     * @return array
+     */
     public function prepare( $args )
     {
         $sanitized_args = array();
