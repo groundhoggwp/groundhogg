@@ -81,7 +81,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
 
                         <!-- Pre Header-->
                         <label class="screen-reader-text" id="title-prompt-text" for="pre_header"><?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?></label>
-                        <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo  $email->pre_header; ?>" id="pre_header" spellcheck="true" autocomplete="off">
+                        <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo esc_attr( $email->pre_header ); ?>" id="pre_header" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
                 <!-- RETURN PATH NOTICE-->
