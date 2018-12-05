@@ -1,0 +1,57 @@
+.onoffswitch {
+    position: relative; width: 106px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none !important;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 1px solid #E3E3E3; border-radius: 3px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 27px; padding: 0; line-height: 23px;
+    font-size: 14px; color: white;
+    box-sizing: border-box;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+.onoffswitch-inner:before {
+    content: "Edit";
+    padding-left: 10px;
+    background-color: #FFFFFF; color: #000000;
+}
+
+.onoffswitch-inner:after {
+    content: "Hide";
+    padding-right: 10px;
+    background-color: #FFFFFF; color: #666666;
+    text-align: right;
+}
+
+.onoffswitch-switch {
+    display: block; width: 24px; margin: 0px;
+    background: #f7f7f7;
+    position: absolute; top: 0; bottom: 0;
+    right: 82px;
+    height: 26px;
+    border-width: 1px;
+    border-style: solid;
+    transition: all 0.3s ease-in 0s;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 #ccc;
+    border-color: #ccc;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+    background-color: #0085ba;
+    box-shadow: 0 1px 0 #006799;
+    border-color: #0073aa #006799 #006799;
+}

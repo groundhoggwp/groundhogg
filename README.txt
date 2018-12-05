@@ -107,6 +107,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.14 =
+* ADDED HTML editing capability in the email editor. You can switch between views now.
+* FIXED slashes appearing when saving contact names with the ['] of ["] symbol.
+* FIXED quotes escaped in email subject line and preheader.
+* TWEAKED better handling of changing email addresses for a contact.
+* TWEAKED exclude meta list so that meta data does not appear moe than once
+
 = 1.0.13.4 =
 * ADDED support articles to support articles column on welcome page
 * TWEAKED double check semaphore locking is enabled

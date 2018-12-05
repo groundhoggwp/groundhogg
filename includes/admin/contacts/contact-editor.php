@@ -357,7 +357,15 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
     <table class="form-table" >
         <tr>
             <th><label for="edit_meta"><?php _e( 'Edit Meta' ); ?></label></th>
-            <td><input type="checkbox" name="edit_meta" id="edit_meta" value="1"></td>
+            <td>
+                <div id="meta-toggle-switch" class="onoffswitch" style="text-align: left">
+                    <input type="checkbox" name="view_meta" class="onoffswitch-checkbox" value="ready" id="edit_meta" <?php ?> >
+                    <label class="onoffswitch-label" for="edit_meta">
+                        <span class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+            </td>
         </tr>
     </table>
     <script>
@@ -379,20 +387,69 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
             </th>
         </tr>
             <?php
+
+            //this meta data will not be shown in the meta data section.
+            $meta_exclude_list = apply_filters( 'wpgh_exclude_meta_list', array(
+                'lead_source',
+                'source_page',
+                'page_source',
+                'terms_agreement',
+                'terms_agreement_date',
+                'gdpr_consent',
+                'gdpr_consent_date',
+                'primary_phone',
+                'primary_phone_extension',
+                'street_address_1',
+                'street_address_2',
+                'city',
+                'postal_zip',
+                'region',
+                'country',
+                'notes'
+            ) );
+
             $meta = WPGH()->contact_meta->get_meta( $contact->ID );
+
             foreach ( $meta as $meta_key => $value ):
-                $value = $value[ 0 ]; ?>
+
+                if ( ! in_array( $meta_key, $meta_exclude_list ) ):
+                    $value = $value[ 0 ]; ?>
             <tr id="meta-<?php esc_attr_e( $meta_key )?>">
                 <th>
                    <?php esc_html_e( $meta_key ); ?>
                     <p class="description">{_<?php esc_html_e( $meta_key ); ?>}</p>
                 </th>
                 <td>
-                    <input type="text" id="<?php esc_attr_e( $meta_key )?>" name="meta[<?php esc_attr_e( $meta_key ); ?>]" class="regular-text" value="<?php esc_attr_e( $value ); ?>">
+                    <?php
+
+                    if ( strpos( $value, PHP_EOL  ) !== false ){
+
+                        $args = array(
+                            'name' => 'meta[' . $meta_key . ']',
+                            'id'   => $meta_key,
+                            'value' => $value
+                        );
+
+                        echo WPGH()->html->textarea( $args );
+
+                    } else {
+
+                        $args = array(
+                            'name' => 'meta[' . $meta_key . ']',
+                            'id'   => $meta_key,
+                            'value' => $value
+                        );
+
+                        echo WPGH()->html->input( $args );
+
+                    }
+                    ?>
+
                     <span class="row-actions"><span class="delete"><a style="text-decoration: none" href="javascript:void(0)" class="deletemeta"><span class="dashicons dashicons-trash"></span></a></span></span>
                 </td>
             </tr>
-            <?php endforeach; ?>
+                <?php endif;
+            endforeach; ?>
         <?php do_action( 'wpgh_contact_edit_meta', $id ); ?>
         </tbody>
     </table>

@@ -347,8 +347,8 @@ class WPGH_Submission
 
             $args = array(
                 'email' => $email,
-                'first_name' => sanitize_text_field( $this->first_name ),
-                'last_name' => sanitize_text_field( $this->last_name )
+                'first_name' => sanitize_text_field( stripslashes( $this->first_name ) ),
+                'last_name' => sanitize_text_field( stripslashes( $this->last_name ) )
             );
 
             if ( is_user_logged_in() ){
@@ -478,7 +478,12 @@ class WPGH_Submission
         foreach ( $this->data as $key => $value ) {
 
             $key = sanitize_key( $key );
-            $value = sanitize_textarea_field( $value );
+
+            if ( strpos( $value, PHP_EOL  ) !== false ){
+                $value = sanitize_textarea_field( stripslashes( $value ) );
+            } else {
+                $value = sanitize_text_field( stripslashes( $value ) );
+            }
 
             if ( $this->has_field( $key ) ) {
 
