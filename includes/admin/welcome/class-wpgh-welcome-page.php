@@ -154,28 +154,28 @@ class WPGH_Welcome_Page
     {
         $articles = array(
             array(
-                'title' => __( 'What\'s Included?', 'groundhogg' ),
-                'desc'  => __( 'Get a general overview of all Groundhogg\'s features.', 'groundhogg' ),
-                'vidId' => '235215203',
-                'link'  => 'https://groundhogg.io'
+                'title' => __( 'Full Walkthrough', 'groundhogg' ),
+                'desc'  => __( 'Watch this full walkthrough of setting up Groundhogg and building your first funnel.', 'groundhogg' ),
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/12/Full-Demo.png',
+                'link'  => 'https://groundhogg.io/demo/'
             ),
             array(
-                'title' => __( "Managing Contacts", 'groundhogg' ),
-                'desc'  => __( "Learn about managing and segmenting your contacts so you can keep things in order.", 'groundhogg' ),
-                'vidId' => '235215203',
-                'link'  => 'https://groundhogg.io'
+                'title' => __( "Managing Users", 'groundhogg' ),
+                'desc'  => __( "If you have sales people you need to read how you can give them only specific access to your CRM.", 'groundhogg' ),
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/user-roles-722x361.png',
+                'link'  => 'https://www.groundhogg.io/support/how-to-manage-user-roles/'
             ),
             array(
-                'title' => __( "Create Your First Funnel", 'groundhogg' ),
-                'desc'  => __( "Dive into funnel building and using our suite of tools to build automated customer journeys.", 'groundhogg' ),
-                'vidId' => '235215203',
-                'link'  => 'https://groundhogg.io'
+                'title' => __( "How To Remain Compliant ", 'groundhogg' ),
+                'desc'  => __( "Learn about the tools Groundhogg provides so you can remain complaint in countries around the world.", 'groundhogg' ),
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/compliance-722x361.png',
+                'link'  => 'https://www.groundhogg.io/support/compliance/'
             ),
             array(
-                'title' => __( "How To Build Forms", 'groundhogg' ),
-                'desc'  => __( "Groundhogg comes with a fairly versatile, but not obvious shortcode powered form builder.", 'groundhogg' ),
-                'vidId' => '235215203',
-                'link'  => 'https://groundhogg.io'
+                'title' => __( "Send Marketing With Groundhogg", 'groundhogg' ),
+                'desc'  => __( "Get your first 1000 credits free when you sign up! Send SMS and Email with Groundhogg.", 'groundhogg' ),
+                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/11/email-credits-722x361.png',
+                'link'  => 'https://www.groundhogg.io/downloads/email-credits/'
             ),
         );
 
@@ -198,27 +198,25 @@ class WPGH_Welcome_Page
 
         <div class="postbox">
             <?php if ( $article->title ): ?>
-            <h2 class="hndle"><?php echo $article->title; ?></h2>
+                <h2 class="hndle"><?php echo $article->title; ?></h2>
             <?php endif; ?>
             <div class="inside">
-                <?php if ( $article->vidId ): ?>
-                <div class="video-container">
-                    <iframe src="https://player.vimeo.com/video/<?php echo $article->vidId; ?>" width="444" height="249" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-                </div>
-
-                <hr/>
+                <?php if ( $article->img ): ?>
+                    <div class="img-container">
+                        <img src="<?php echo $article->img; ?>" style="width: 100%;max-width: 100%;">
+                    </div>
+                    <hr/>
                 <?php endif; ?>
                 <?php if ( $article->desc ): ?>
-                <div class="article-description">
-                    <?php echo $article->desc; ?>
-                </div>
-                <hr/>
-
+                    <div class="article-description">
+                        <?php echo $article->desc; ?>
+                    </div>
+                    <hr/>
                 <?php endif; ?>
                 <?php if ( $article->link ): ?>
-                <p>
-                    <a class="button button-primary" href="<?php echo esc_url_raw( $article->link ); ?>" target="_blank"><?php _e( 'Read More...' ); ?></a>
-                </p>
+                    <p>
+                        <a class="button button-primary" href="<?php echo esc_url_raw( $article->link ); ?>" target="_blank"><?php _e( 'Read More...' ); ?></a>
+                    </p>
                 <?php endif; ?>
             </div>
         </div>

@@ -103,7 +103,7 @@ class WPGH_Admin_Menu
         require_once dirname( __FILE__ ). '/admin/emails/class-wpgh-emails-page.php';
         require_once dirname( __FILE__ ). '/admin/events/class-wpgh-events-page.php';
         require_once dirname( __FILE__ ). '/admin/funnels/class-wpgh-funnels-page.php';
-        require_once dirname( __FILE__ ). '/admin/settings/class-wpgh-settings-page-new.php';
+        require_once dirname( __FILE__ ). '/admin/settings/class-wpgh-settings-page.php';
         require_once dirname( __FILE__ ). '/admin/superlinks/class-wpgh-superlinks-page.php';
         require_once dirname( __FILE__ ). '/admin/tags/class-wpgh-tags-page.php';
         require_once dirname( __FILE__ ). '/admin/welcome/class-wpgh-welcome-page.php';

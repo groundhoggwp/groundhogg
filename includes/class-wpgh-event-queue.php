@@ -189,7 +189,7 @@ class WPGH_Event_Queue
      */
     public function run_queue()
     {
-        if ( function_exists( 'ftok' ) ){
+        if ( function_exists( 'ftok' ) && function_exists( 'sem_acquire' ) ){
             return $this->semaphore_process();
         } else {
             return $this->process();
