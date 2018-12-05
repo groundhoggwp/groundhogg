@@ -183,8 +183,11 @@ select {
 
 #email-body {
     min-height: 20px;
-    padding: 10px;
     overflow: auto;
+}
+
+#email-inside{
+    padding: 10px;
 }
 
 #email-body ul {
@@ -316,17 +319,20 @@ select {
     padding-left: 10px;
     background-color: #FFFFFF; color: #000000;
 }
-#reporting .onoffswitch-inner:before {
-    content: "Reporting";
+
+#editor-toggle-switch .onoffswitch-inner:before {
+    content: "HTML";
 }
+
 .onoffswitch-inner:after {
     content: "Draft";
     padding-right: 10px;
     background-color: #FFFFFF; color: #666666;
     text-align: right;
 }
-#reporting .onoffswitch-inner:after {
-    content: "Editing";
+
+#editor-toggle-switch .onoffswitch-inner:after {
+    content: "Visual";
 }
 
 .onoffswitch-switch {

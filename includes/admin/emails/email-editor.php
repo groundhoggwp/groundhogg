@@ -49,6 +49,13 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
             </div>
             <div class="status-options">
                 <div id="status">
+                    <div id="editor-toggle-switch" class="onoffswitch" style="text-align: left">
+                        <input type="checkbox" name="editor_view" class="onoffswitch-checkbox" value="ready" id="editor-toggle">
+                        <label class="onoffswitch-label" for="editor-toggle">
+                            <span class="onoffswitch-inner"></span>
+                            <span class="onoffswitch-switch"></span>
+                        </label>
+                    </div>
                     <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
                         <input type="checkbox" name="email_status" class="onoffswitch-checkbox" value="ready" id="status-toggle" <?php if ( $email->status == 'ready' ) echo 'checked'; ?>>
                         <label class="onoffswitch-label" for="status-toggle">
@@ -69,6 +76,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
         <div id="post-body" class="metabox-holder columns-2" style="clear: both">
 
+
             <div id="post-body-content">
 
                 <!-- Title Content -->
@@ -81,7 +89,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
 
                         <!-- Pre Header-->
                         <label class="screen-reader-text" id="title-prompt-text" for="pre_header"><?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?></label>
-                        <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo esc_attr( $email->pre_header ); ?>" id="pre_header" spellcheck="true" autocomplete="off">
+                        <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo  $email->pre_header; ?>" id="pre_header" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
                 <!-- RETURN PATH NOTICE-->
@@ -153,17 +161,21 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                             <div id="email-inside" class="email-sortable" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
                                 <?php echo $email->content; ?>
                             </div>
+
                         </div>
                         <div style="clear: both;"></div>
                     </div>
                 </div>
-
+                <div id="html-editor">
+                    <textarea style="width: 100%;"  id="html-code" ></textarea>
+                </div>
                 <!-- Saved Content -->
                 <div class="hidden">
                     <textarea id="content" name="content"><?php echo $email->content; ?></textarea>
                 </div>
 
             </div>
+
             <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sidebar">
                 <div id="submitdiv" class="postbox">
