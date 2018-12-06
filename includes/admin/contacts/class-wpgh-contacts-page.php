@@ -58,6 +58,7 @@ class WPGH_Contacts_Page
 
         if ( $this->get_action() === 'edit' || $this->get_action() === 'add'  ){
             wp_enqueue_style( 'contact-editor', WPGH_ASSETS_FOLDER . 'css/admin/contact-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/contact-editor.css' ) );
+            wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-editor.js' );
         } else {
             wp_enqueue_style( 'select2' );
             wp_enqueue_script( 'select2' );

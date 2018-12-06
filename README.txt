@@ -108,6 +108,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.0.14.1 =
+* ADDED Email browser page auto created on install
+* FIXED email preferences form sometimes not created properly
 * FIXED steps being added if dragged in but not dropped.
 * TWEAKED notice if max_input_vars to small for funnel.
 * TWEAKED removed step_order input arg from funnel editor to conserve max_input_vars since it wasn't being ued.

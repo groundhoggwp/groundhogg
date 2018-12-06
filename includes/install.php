@@ -120,7 +120,6 @@ function wpgh_run_install() {
                 'user_id'       => $wp_user->ID,
             ) );
         }
-        //todo log how created.
     }
 
     /* Recount tag relationships */
@@ -138,15 +137,18 @@ function wpgh_run_install() {
     $roles->add_caps();
 
     if ( ! WPGH()->funnels->count() && is_admin() ){
+
         /* Install the email preferences center */
+
         include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
+
         /* @var $funnel_templates array included from funnel-templates.php */
         $json = file_get_contents( $funnel_templates[ 'email_preferences' ]['file'] );
         $funnel_id = wpgh_import_funnel( json_decode( $json, true ) );
         WPGH()->funnels->update( $funnel_id, array( 'status' => 'active' ) );
         $forms = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_type' => 'form_fill' ) );
         $form = array_shift( $forms );
-        WPGH()->step_meta->update_meta( $form->ID, 'form', '[email_preferences][submit]Change Preferences[/submit]' );
+
     }
 
     if ( ! wpgh_get_option( 'gh_confirmation_page', false ) ){
@@ -185,6 +187,18 @@ function wpgh_run_install() {
         );
         $id = wp_insert_post( $email_preferences_args );
         update_option( 'gh_email_preferences_page', $id );
+    }
+
+    if ( ! wpgh_get_option( 'gh_view_in_browser_page', false ) ){
+        $email_preferences_args = array(
+            'post_title' => __( 'Emails', 'groundhogg' ),
+            'post_content' => __( '[browser_view]', 'groundhogg' ),
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'post_author' => get_current_user_id(),
+        );
+        $id = wp_insert_post( $email_preferences_args );
+        update_option( 'gh_view_in_browser_page', $id );
     }
 
     update_option( 'wpgh_version', WPGH_VERSION );

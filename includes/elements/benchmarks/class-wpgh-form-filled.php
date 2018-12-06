@@ -157,7 +157,6 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
     {
         $shortcode = sprintf('[gh_form id="%d" title="%s"]', $step->ID, $step->title );
 
-
         $form = $step->get_meta( 'form' );
 
         if ( empty( $form ) ){
