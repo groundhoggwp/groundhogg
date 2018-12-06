@@ -109,13 +109,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.0.14.1 =
 * ADDED Email browser page auto created on install
-* FIXED email preferences form sometimes not created properly
+* FIXED Meta data tables not registered during plugin activation causing email preferences funnel to not register correctly.
 * FIXED steps being added if dragged in but not dropped.
 * TWEAKED notice if max_input_vars to small for funnel.
 * TWEAKED removed step_order input arg from funnel editor to conserve max_input_vars since it wasn't being ued.
 
 = 1.0.14 =
-* ADDED HTML editing capability in the email editor. You can switch between views now.
 * FIXED slashes appearing when saving contact names with the ['] of ["] symbol.
 * FIXED quotes escaped in email subject line and preheader.
 * TWEAKED better handling of changing email addresses for a contact.
