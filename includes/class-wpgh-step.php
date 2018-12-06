@@ -571,14 +571,6 @@ class WPGH_Step
             <!-- INSIDE -->
             <div class="inside">
 
-                <!-- DEFAULT ATTRIBUTES -->
-                <?php $args = array(
-                    'type'  => 'hidden',
-                    'name'  => $this->prefix( 'order' ),
-                    'id'    => $this->prefix( 'order' ),
-                    'value' => $this->order,
-                );
-                echo WPGH()->html->input( $args ); ?>
                 <input type="hidden" name="steps[]" value="<?php echo $this->ID; ?>">
 
                 <!-- SETTINGS -->

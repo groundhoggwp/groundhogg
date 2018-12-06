@@ -199,7 +199,9 @@ var wpghFunnelEditor;
          * @param e
          */
         convertDraggableToStep: function ( e ) {
+
             var step_type = e.id;
+
             if ( this.insertDummyStep('.ui-draggable') ){
 
                 var order = $('.step').index($('#temp-step')) + 1;
@@ -216,8 +218,13 @@ var wpghFunnelEditor;
             this.draggables = $(".ui-draggable").draggable({
                 connectToSortable: ".ui-sortable",
                 helper: "clone",
-                stop: function () {
-                    wpghFunnelEditor.convertDraggableToStep( this )
+                stop: function ( e, ui ) {
+                    /* double check we dropped in a step... */
+                    if ( ui.helper.closest( '#normal-sortables' ).length > 0 ){
+                        console.log( ui.helper.parent() );
+                        wpghFunnelEditor.convertDraggableToStep( this )
+                    }
+
                 }
             });
         },

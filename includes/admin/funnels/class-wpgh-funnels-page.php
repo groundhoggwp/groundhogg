@@ -620,7 +620,9 @@ class WPGH_Funnels_Page
         return $ds;
     }
 
-
+    /**
+     * Save the funnel
+     */
     private function save_funnel()
     {
         if ( ! current_user_can( 'edit_funnels' ) ){
@@ -629,6 +631,11 @@ class WPGH_Funnels_Page
 
         if ( empty( $_POST ) )
             return;
+
+        /* check if funnel is to big... */
+        if ( count( $_POST, COUNT_RECURSIVE ) >= intval( ini_get( 'max_input_vars' ) ) ){
+            $this->notices->add( 'post_too_big', __( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.' ), 'warning' );
+        }
 
         $funnel_id = intval( $_REQUEST[ 'funnel' ] );
 

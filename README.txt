@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.14.1 =
+* FIXED steps being added if dragged in but not dropped.
+* TWEAKED notice if max_input_vars to small for funnel.
+* TWEAKED removed step_order input arg from funnel editor to conserve max_input_vars since it wasn't being ued.
+
 = 1.0.14 =
 * ADDED HTML editing capability in the email editor. You can switch between views now.
 * FIXED slashes appearing when saving contact names with the ['] of ["] symbol.
