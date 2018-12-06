@@ -23,11 +23,11 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit;
 
 // Load WPGH file.
-include_once( 'groundhogg.php' );
+include_once dirname( __FILE__ ) . '/groundhogg.php' ;
 
 global $wpdb, $wp_roles;
 
-if( wpgh_get_option( 'gh_uninstall_on_delete', false ) ) {
+if( wpgh_is_option_enabled( 'gh_uninstall_on_delete' ) ) {
 
     /** Delete the Plugin Pages */
     $wpgh_created_pages = array( 'gh_confirmation_page', 'gh_unsubscribe_page', 'gh_email_preferences_page' );
@@ -44,31 +44,31 @@ if( wpgh_get_option( 'gh_uninstall_on_delete', false ) ) {
     delete_option( 'wpgh_version' );
 
     /* delete permissions */
-    @WPGH()->roles->remove_caps();
-    @WPGH()->roles->remove_roles();
+    WPGH()->roles->remove_caps();
+    WPGH()->roles->remove_roles();
 
     // Delete the databases
-    @WPGH()->activity->drop();
-    @WPGH()->broadcasts->drop();
+    WPGH()->activity->drop();
+    WPGH()->broadcasts->drop();
 
-    @WPGH()->contacts->drop();
-    @WPGH()->contact_meta->drop();
+    WPGH()->contacts->drop();
+    WPGH()->contact_meta->drop();
 
-    @WPGH()->emails->drop();
-    @WPGH()->email_meta->drop();
+    WPGH()->emails->drop();
+    WPGH()->email_meta->drop();
 
-    @WPGH()->events->drop();
+    WPGH()->events->drop();
 
-    @WPGH()->steps->drop();
-    @WPGH()->step_meta->drop();
+    WPGH()->steps->drop();
+    WPGH()->step_meta->drop();
 
-    @WPGH()->funnels->drop();
-    @WPGH()->superlinks->drop();
+    WPGH()->funnels->drop();
+    WPGH()->superlinks->drop();
 
-    @WPGH()->tags->drop();
-    @WPGH()->tag_relationships->drop();
+    WPGH()->tags->drop();
+    WPGH()->tag_relationships->drop();
 
-    @WPGH()->tokens->drop();
+    WPGH()->tokens->drop();
 
     /** Cleanup Cron Events */
     wp_clear_scheduled_hook( 'wpgh_cron_event' );
@@ -78,4 +78,7 @@ if( wpgh_get_option( 'gh_uninstall_on_delete', false ) ) {
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_wpgh\_%'" );
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_timeout\_wpgh\_%'" );
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_timeout\_wpgh\_%'" );
+
+    file_put_contents( __DIR__ . '/../uninstall-errors.txt', ob_get_contents() );
+
 }

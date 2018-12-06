@@ -187,12 +187,13 @@ function wpgh_import_funnel( $import )
 
         $step_id = WPGH()->steps->add( $args );
 
-        $step_meta = $step_args['meta'];
+        $step_meta = $step_args[ 'meta' ];
 
-        foreach ( $step_meta as $key => $value )
-        {
+//        var_dump( $step_meta );
+
+        foreach ( $step_meta as $key => $value ) {
             if ( is_array( $value ) ){
-                WPGH()->step_meta->update_meta( $step_id, $key, $value[0] );
+                WPGH()->step_meta->update_meta( $step_id, $key, array_shift( $value ) );
             } else {
                 WPGH()->step_meta->update_meta( $step_id, $key, $value );
             }
@@ -558,8 +559,7 @@ function wpgh_is_email_api_enabled(){
  */
 function wpgh_is_option_enabled( $key = '' )
 {
-    $option = wpgh_get_option( 'key', array() );
-
+    $option = wpgh_get_option( $key, array() );
     return is_array( $option ) && in_array( 'on', $option );
 }
 

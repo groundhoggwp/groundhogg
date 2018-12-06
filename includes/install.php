@@ -47,7 +47,7 @@ function wpgh_install( $network_wide = false ) {
 
     }
 
-    file_put_contents( __DIR__ . '/my_log.html', ob_get_contents() );
+    file_put_contents( __DIR__ . '/install-errors.txt', ob_get_contents() );
 
 }
 
@@ -61,6 +61,9 @@ register_activation_hook( WPGH_PLUGIN_FILE, 'wpgh_install' );
  * @return void
  */
 function wpgh_run_install() {
+
+    do_action( 'installing_groundhogg' );
+
     global $wpdb, $wpgh_options;
 
     // Add Upgraded From Option
@@ -70,38 +73,31 @@ function wpgh_run_install() {
         update_option( 'wpgh_version_upgraded_from', $current_version );
     }
 
-    // Setup some default options
-    $options = array();
-
-    // Pull options from WP, not WPGH's global
-
-    $current_options = wpgh_get_option( 'wpgh_settings', array() );
-
     // Create the databases
-    @WPGH()->activity->create_table();
-    @WPGH()->broadcasts->create_table();
+    WPGH()->activity->create_table();
+    WPGH()->broadcasts->create_table();
 
-    @WPGH()->contacts->create_table();
-    @WPGH()->contact_meta->create_table();
+    WPGH()->contacts->create_table();
+    WPGH()->contact_meta->create_table();
 
-    @WPGH()->emails->create_table();
-    @WPGH()->email_meta->create_table();
+    WPGH()->emails->create_table();
+    WPGH()->email_meta->create_table();
 
-    @WPGH()->events->create_table();
+    WPGH()->events->create_table();
 
-    @WPGH()->steps->create_table();
-    @WPGH()->step_meta->create_table();
+    WPGH()->steps->create_table();
+    WPGH()->step_meta->create_table();
 
-    @WPGH()->funnels->create_table();
-    @WPGH()->superlinks->create_table();
+    WPGH()->funnels->create_table();
+    WPGH()->superlinks->create_table();
 
-    @WPGH()->tags->create_table();
-    @WPGH()->tag_relationships->create_table();
+    WPGH()->tags->create_table();
+    WPGH()->tag_relationships->create_table();
 
-    @WPGH()->tokens->create_table();
+    WPGH()->tokens->create_table();
 
     /* Setup the cron event */
-    @WPGH()->event_queue->setup_cron_jobs();
+    WPGH()->event_queue->setup_cron_jobs();
 
     /* convert users to contacts */
     $args = array(
@@ -136,19 +132,20 @@ function wpgh_run_install() {
     $roles->add_roles();
     $roles->add_caps();
 
-    if ( ! WPGH()->funnels->count() && is_admin() ){
-
-        /* Install the email preferences center */
+    /* Install the email preferences center */
+    if ( ! WPGH()->funnels->count() ){
 
         include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
 
         /* @var $funnel_templates array included from funnel-templates.php */
         $json = file_get_contents( $funnel_templates[ 'email_preferences' ]['file'] );
         $funnel_id = wpgh_import_funnel( json_decode( $json, true ) );
-        WPGH()->funnels->update( $funnel_id, array( 'status' => 'active' ) );
-        $forms = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_type' => 'form_fill' ) );
-        $form = array_shift( $forms );
 
+        if ( $funnel_id ){
+            WPGH()->funnels->update( $funnel_id, array( 'status' => 'active' ) );
+            $forms = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_type' => 'form_fill' ) );
+            $form = array_shift( $forms );
+        }
     }
 
     if ( ! wpgh_get_option( 'gh_confirmation_page', false ) ){
@@ -205,6 +202,8 @@ function wpgh_run_install() {
 
     // Add a temporary option to note that WPGH pages have been created
     set_transient( '_wpgh_installed', true, 30 );
+
+    do_action( 'done_installing_groundhogg' );
 
 }
 
@@ -340,7 +339,6 @@ function wpgh_after_install() {
         delete_transient( '_wpgh_installed' );
     }
 
-
 }
 
 add_action( 'admin_init', 'wpgh_after_install' );
@@ -388,4 +386,5 @@ function wpgh_install_roles_on_network() {
     }
 
 }
+
 add_action( 'admin_init', 'wpgh_install_roles_on_network' );

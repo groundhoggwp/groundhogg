@@ -36,6 +36,7 @@ class WPGH_DB_Step_Meta extends WPGH_DB {
         $this->version     = '1.0';
 
         add_action( 'plugins_loaded', array( $this, 'register_table' ), 11 );
+        add_action( 'installing_groundhogg', array( $this, 'register_table' ) );
         add_action( 'wpgh_delete_step', array( $this, 'delete_step_meta_on_delete' ) );
 
     }
