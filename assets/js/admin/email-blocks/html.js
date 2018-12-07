@@ -58,8 +58,8 @@ var wpghHTMLBlock;
 
             }
 
-            // this.htmlCode.setSize( this.content.parent().width(), this.content.parent().height() );
-            this.htmlCode.setSize( this.content.parent().width(), null );
+            this.htmlCode.setSize( this.content.parent().width(), this.content.parent().height() );
+            // this.htmlCode.setSize( this.content.parent().width(), null );
             // this.content.val( block.find('.content-inside').html().trim() );
             this.htmlCode.setValue( block.find('.content-inside').html().trim() );
 

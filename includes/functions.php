@@ -134,7 +134,20 @@ function wpgh_convert_funnel_to_json( $funnel_id )
         $export['steps'][$i]['title'] = $step->title;
         $export['steps'][$i]['group'] = $step->group;
         $export['steps'][$i]['type']  = $step->type;
-        $export['steps'][$i]['meta']  = WPGH()->step_meta->get_meta( $step->ID );
+
+        $meta = WPGH()->step_meta->get_meta( $step->ID );
+
+        foreach ( $meta as $j => $item ){
+
+            if ( is_array( $item ) ){
+                $meta[ $j ] = array( maybe_unserialize( array_shift( $item ) ) );
+            } else {
+                $meta[ $j ] = maybe_unserialize( $item ) ;
+            }
+
+        }
+
+        $export['steps'][$i]['meta']  = $meta;
         $export['steps'][$i]['args']  = apply_filters( 'wpgh_export_step_' . $step->type, array(), $step );
         /* allow other plugins to modify */
         $export['steps'][$i] = apply_filters( 'wpgh_step_export_args', $export['steps'][$i], $step );
