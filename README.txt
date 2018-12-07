@@ -107,6 +107,14 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.15 =
+* ADDED Gutenberg Form Block
+* TWEAKED HTML block in email builder support code-mirror now
+* TWEAKED minified ALL js files for faster performance
+* TWEAKED checkbox field now has visible value option in form builder
+* FIXED Email HTML editor view not working when editing emails in the funnel builder
+* FIXED serialized meta was not being duplicated properly when duplicating campaigns
+
 = 1.0.14.1 =
 * ADDED Email browser page auto created on install
 * FIXED Meta data tables not registered during plugin activation causing email preferences funnel to not register correctly.
