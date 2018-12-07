@@ -31,7 +31,7 @@ class WPGH_Image_Block extends WPGH_Email_Block
         $this->title = __( 'Image', 'groundhogg' );
 
         wp_enqueue_script( 'wp-color-picker' );
-        wp_enqueue_script( 'wpgh-image-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/image.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/image.js' ) );
+        wp_enqueue_script( 'wpgh-image-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/image.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/image.min.js' ) );
 
         parent::__construct();
 

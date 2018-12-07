@@ -1,11 +1,9 @@
 var wpgh;
-
-(function ($) {
+(function($) {
     wpgh = {
         buildSelect2: function(){
             $('.gh-select2' ).css( 'width', '100%' ).select2();
         },
-
         buildTagPicker: function() {
             $('.gh-tag-picker' ).css( 'width', '100%' ).select2({
                 tags:true,
@@ -22,7 +20,6 @@ var wpgh;
                 }
             });
         },
-
         buildEmailPicker: function() {
             $('.gh-email-picker' ).css( 'width', '100%' ).select2({
                 ajax: {
@@ -36,7 +33,6 @@ var wpgh;
                 }
             });
         },
-
         buildContactPicker: function (){
             $('.gh-contact-picker' ).css( 'width', '100%' ).select2({
                 ajax: {
@@ -50,7 +46,6 @@ var wpgh;
                 }
             });
         },
-
         buildBenchmarkPicker: function(){
             $('.gh-benchmark-picker' ).css( 'width', '100%' ).select2({
                 ajax: {
@@ -64,7 +59,6 @@ var wpgh;
                 }
             });
         },
-
         buildMetaKeyPicker: function(){
             $('.gh-metakey-picker' ).css( 'width', '100%' ).select2({
                 ajax: {
@@ -79,7 +73,6 @@ var wpgh;
             });
         },
 
-
         init:  function () {
             this.buildSelect2();
             this.buildEmailPicker();
@@ -88,7 +81,6 @@ var wpgh;
             this.buildBenchmarkPicker();
             this.buildMetaKeyPicker();
         },
-
     };
 
     $( function () {

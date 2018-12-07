@@ -54,9 +54,7 @@ var wpghImageBlock;
                     // console.log( {in:'text', blockType: blockType} );
                     wpghImageBlock.parse( block );
                 }
-
             });
-
         },
 
         /**

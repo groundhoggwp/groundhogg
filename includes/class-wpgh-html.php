@@ -911,7 +911,7 @@ class WPGH_HTML
         ) );
 
         wp_enqueue_media();
-        wp_enqueue_script('gh-media-picker', WPGH_ASSETS_FOLDER . 'js/admin/media-picker.js', filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/media-picker.js' ) );
+        wp_enqueue_script('gh-media-picker', WPGH_ASSETS_FOLDER . 'js/admin/media-picker.min.js', filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/media-picker.min.js' ) );
 
         return $html;
     }

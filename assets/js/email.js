@@ -5,12 +5,10 @@ var emailIframe;
     emailIframe = {
 
         init: function () {
-
             this.resize();
             $( window ).resize(function() {
                 emailIframe.resize()
             });
-
         },
 
         resize: function ( content ) {

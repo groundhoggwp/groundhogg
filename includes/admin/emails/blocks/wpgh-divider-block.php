@@ -30,7 +30,7 @@ class WPGH_Divider_Block extends WPGH_Email_Block
         $this->name = 'divider';
         $this->title = __( 'Divider', 'groundhogg' );
 
-        wp_enqueue_script( 'wpgh-divider-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/divider.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/divider.js' ) );
+        wp_enqueue_script( 'wpgh-divider-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/divider.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/divider.min.js' ) );
 
         parent::__construct();
 

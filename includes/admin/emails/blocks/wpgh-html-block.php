@@ -30,7 +30,7 @@ class WPGH_HTML_Block extends WPGH_Email_Block
         $this->name = 'html';
         $this->title = __( 'HTML', 'groundhogg' );
 
-        wp_enqueue_script( 'wpgh-html-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/html.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/html.js' ) );
+        wp_enqueue_script( 'wpgh-html-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/html.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/html.min.js' ) );
 
         parent::__construct();
 
@@ -67,14 +67,40 @@ class WPGH_HTML_Block extends WPGH_Email_Block
                 'atts'  => array(
                     'id'    => 'html-content',
                     'name'  => 'html-content',
-                    'rows'  => 20,
-                    'cols'  => 25,
+                    'rows'  => 30,
+                    'cols'  => 37,
                 ),
             ),
         );
 
         return parent::register_settings();
 
+    }
+
+    /**
+     * Build the settings panel for the block
+     */
+    public function settings_panel()
+    {
+
+        $block_settings = $this->register_settings();
+
+        $html = sprintf( "<div id=\"%s-block-editor\" data-block-settings=\"%s\" class=\"postbox hidden\">", $this->name, $this->name );
+        $html.= sprintf( "<h3 class=\"hndle\">%s</h3>", $this->title );
+        $html.= "<div class=\"inside\" style='margin:0;padding:0;'><div class=\"options\">";
+        foreach ( $block_settings as $i => $settings ){
+
+            if ( isset( $settings[ 'type' ] ) && method_exists( WPGH()->html, $settings[ 'type' ] ) ){
+                $html .= sprintf( "<td>%s</td>", call_user_func( array( WPGH()->html, $settings[ 'type' ] ), $settings[ 'atts' ] ) );
+            }
+        }
+
+        $html .= '</table>';
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+
+        echo $html;
     }
 
 

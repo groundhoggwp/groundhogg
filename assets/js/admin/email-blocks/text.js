@@ -6,7 +6,6 @@ var wpghTextBlock;
     wpghTextBlock = {
 
         blockType: 'text',
-
         pFont: null,
         pSize: null,
         h1Font: null,

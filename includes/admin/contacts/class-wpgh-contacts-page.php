@@ -55,15 +55,14 @@ class WPGH_Contacts_Page
      */
     public function scripts()
     {
-
         if ( $this->get_action() === 'edit' || $this->get_action() === 'add'  ){
             wp_enqueue_style( 'contact-editor', WPGH_ASSETS_FOLDER . 'css/admin/contact-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/contact-editor.css' ) );
-            wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-editor.js' );
+            wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-editor.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/contact-editor.min.js' )  );
         } else {
             wp_enqueue_style( 'select2' );
             wp_enqueue_script( 'select2' );
-            wp_enqueue_script( 'wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . '/js/admin/inline-edit-contacts.js' );
-            wp_enqueue_style( 'wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . '/css/admin/contacts.css'  );
+            wp_enqueue_style( 'wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . 'css/admin/contacts.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/contacts.css' ) );
+            wp_enqueue_script( 'wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . 'js/admin/inline-edit-contacts.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/inline-edit-contacts.min.js' ) );
         }
     }
 

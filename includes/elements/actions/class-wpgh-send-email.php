@@ -61,9 +61,9 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
     public function scripts(){
         wp_enqueue_script(
             'wpgh-email-element',
-            WPGH_ASSETS_FOLDER . 'js/admin/funnel-elements/email.js',
+            WPGH_ASSETS_FOLDER . 'js/admin/funnel-elements/email.min.js',
             array(),
-            filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/funnel-elements/email.js' )
+            filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/funnel-elements/email.min.js' )
         );
 
         wp_localize_script('wpgh-email-element', 'wpghEmailsBase', array(

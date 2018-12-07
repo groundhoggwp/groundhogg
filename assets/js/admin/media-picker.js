@@ -3,7 +3,7 @@ jQuery( document ).ready( function( $ ) {
     var file_frame;
 
     $('.gh-image-picker').on('click', function( event ){
-
+        
         var picker = $(this);
 
         event.preventDefault();

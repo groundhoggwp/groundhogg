@@ -1,7 +1,6 @@
-var GH;
-
+var Groundhogg;
 (function ($) {
-    GH = {
+    Groundhogg = {
         leadSource: 'gh_referer',
         refID: 'gh_ref_id',
         setCookie: function(cname, cvalue, exdays){
@@ -38,7 +37,7 @@ var GH;
             var forms = $( '.gh-form' );
             $.each( forms, function ( i, e ) {
                 var fId = $(e).find( 'input[name="step_id"]' ).val();
-                GH.formImpression( fId );
+                Groundhogg.formImpression( fId );
             });
         },
         formImpression : function( id ){
@@ -51,15 +50,15 @@ var GH;
                     if ( typeof response.error !== 'undefined' ){
                         console.log( response.error );
                     } else if( typeof response.ref_id !== 'undefined' ) {
-                        GH.setCookie( GH.refID, response.ref_id, 30 );
+                        Groundhogg.setCookie( Groundhogg.refID, response.ref_id, 30 );
                     }
                 }
             });
         },
         setQueueTimer:function()
         {
-            GH.processQueue();
-            setInterval(GH.processQueue, 30000);
+            Groundhogg.processQueue();
+            setInterval(Groundhogg.processQueue, 30000);
         },
         processQueue: function(){
             $.ajax({
@@ -78,9 +77,8 @@ var GH;
             this.setQueueTimer();
         }
     };
-
     $(function(){
-        GH.init();
+        Groundhogg.init();
     });
 })(jQuery);
 

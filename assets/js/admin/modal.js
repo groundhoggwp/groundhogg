@@ -2,11 +2,6 @@
 Grab a container via the ID of the container and load that content into the box.
 Display the box in the correct position of the screen.
 close the thickbox and put the content back where it came from.
-
-formliftPopUpOverlay
-formliftPopUpWindow
-formliftPopUpTitle
-formliftPopUpContent
 */
 
 var wpghModal;
@@ -35,7 +30,7 @@ var wpghModal;
     		this.title   = $( '.popup-title' );
     		this.loader  = $( '.iframe-loader-wrapper' );
 
-    		var exp =/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+    		var exp =/(https|http)?:\/\/((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6})|(localhost)\b([-a-zA-Z0-9@:%_\+.~#?&\/=]*)/;
             var urlRegex = new RegExp( exp );
 
             this.sizeup();
@@ -207,6 +202,7 @@ var wpghModal;
             $( document ).on( 'click', '.popup-save',
                 function(){
                     wpghModal.close();
+                    $(document).trigger( 'wpghModalSaved' );
                 }
             );
         }

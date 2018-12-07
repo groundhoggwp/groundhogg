@@ -28,7 +28,6 @@ var wpghIframeChecker;
                 return true;
             }
         },
-
     };
 
     $(function () {

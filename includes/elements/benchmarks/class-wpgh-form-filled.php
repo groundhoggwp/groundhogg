@@ -64,9 +64,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
      */
     public function scripts()
     {
-
-        wp_enqueue_script( 'wpgh-form-builder', WPGH_ASSETS_FOLDER . 'js/admin/form-builder.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/form-builder.js' ) );
-
+        wp_enqueue_script( 'wpgh-form-builder', WPGH_ASSETS_FOLDER . 'js/admin/form-builder.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/form-builder.min.js' ) );
     }
 
     /**
@@ -401,6 +399,12 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                         <td><?php
                             echo WPGH()->html->number( array( 'id' => 'field-max', 'name' => 'max', 'class' => 'input' ) );
                             ?><p class="description"><?php _e( 'The max number a user can enter.' ); ?></p></td>
+                    </tr>
+                    <tr id="gh-field-value">
+                        <th><?php _e( 'Value', 'groundhogg' ) ?></th>
+                        <td><?php
+                            echo WPGH()->html->input( array( 'id' => 'field-value', 'name' => 'value' ) );
+                            ?><p class="description"><?php _e( 'The default value of the field.' ); ?></p></td>
                     </tr>
                     <tr id="gh-field-options">
                         <th><?php _e( 'Options', 'groundhogg' ) ?></th>

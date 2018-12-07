@@ -30,12 +30,6 @@ var wpghFunnelEditor;
                 wpghFunnelEditor.duplicateStep( this );
             } );
 
-            /* init sidebar */
-            // $('.sidebar').stickySidebar({
-            //     topSpacing: 40,
-            //     bottomSpacing: 40
-            // });
-
             /* Activate Spinner */
             $('form').on('submit', function( e ){
                 e.preventDefault();
@@ -151,7 +145,6 @@ var wpghFunnelEditor;
                     }
                 }
             });
-
         },
 
         makeDismissible: function()
@@ -304,19 +297,15 @@ var wpghFunnelEditor;
             var tags    = $( '#add_contacts_to_funnel_tag_picker' ).val();
 
             if ( ! tags ){
-
                 alert( 'Please select at least 1 tag.' );
                 return;
-
             }
 
             var stepId = $( '#add_contacts_to_funnel_step_picker' ).val();
 
             if ( ! stepId ){
-
                 alert( 'Please select at funnel step.' );
                 return;
-
             }
 
             $('.spinner').css('visibility','visible');
@@ -332,9 +321,7 @@ var wpghFunnelEditor;
                     wpghFunnelEditor.makeDismissible();
                 }
             });
-
         }
-
     };
     $(function(){wpghFunnelEditor.init();})
 })( jQuery );

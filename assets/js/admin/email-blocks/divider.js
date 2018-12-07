@@ -19,14 +19,10 @@ var wpghDividerBlock;
             $(document).on( 'madeActive', function (e, block, blockType ) {
 
                 if ( wpghDividerBlock.blockType === blockType ){
-
-                    // wpghDividerBlock.createEditor();
-                    // console.log( {in:'text', blockType: blockType} );
                     wpghDividerBlock.parse( block );
                 }
 
             });
-
         },
 
         /**

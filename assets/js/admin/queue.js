@@ -1,5 +1,4 @@
 var ghQueue;
-
 (function ($) {
     ghQueue = {
         setQueueTimer:function()

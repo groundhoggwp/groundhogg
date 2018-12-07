@@ -62,7 +62,7 @@ class WPGH_Emails_Page
             wp_enqueue_script( 'codemirror-mode-js', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/javascript.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/javascript.js') );
             wp_enqueue_script( 'codemirror-mode-html', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/htmlmixed.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/htmlmixed.js') );
 
-            wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.js' ) );
+            wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.min.js' ) );
             wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . 'css/admin/email-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/email-editor.css' ) );
 
             // adding beautify js
@@ -72,7 +72,7 @@ class WPGH_Emails_Page
 
 
         } else if ( $this->get_action() === 'add' || $this->get_action() === 'edit' ){
-	        wp_enqueue_script( 'iframe-checker', WPGH_ASSETS_FOLDER . 'js/admin/iframe-checker.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/iframe-checker.js' ) );
+	        wp_enqueue_script( 'iframe-checker', WPGH_ASSETS_FOLDER . 'js/admin/iframe-checker.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/iframe-checker.min.js' ) );
 	        wp_enqueue_style( 'iframe-checker', WPGH_ASSETS_FOLDER . 'css/admin/iframe.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/iframe.css' ) );
         }
     }

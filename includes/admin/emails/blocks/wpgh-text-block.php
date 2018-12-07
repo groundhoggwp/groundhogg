@@ -33,9 +33,9 @@ class WPGH_Text_Block extends WPGH_Email_Block
         wp_enqueue_editor();
         wp_enqueue_script('wplink');
         wp_enqueue_style('editor-buttons');
-        wp_enqueue_script('simple-editor', WPGH_ASSETS_FOLDER . 'js/admin/simple-editor.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/simple-editor.js' ) );
         wp_enqueue_style('simple-editor', WPGH_ASSETS_FOLDER . 'css/admin/simple-editor.css' );
-        wp_enqueue_script( 'wpgh-text-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/text.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/text.js' ) );
+        wp_enqueue_script('simple-editor', WPGH_ASSETS_FOLDER . 'js/admin/simple-editor.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/simple-editor.min.js' ) );
+        wp_enqueue_script( 'wpgh-text-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/text.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/text.min.js' ) );
 
         parent::__construct();
 

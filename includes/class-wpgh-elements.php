@@ -47,10 +47,10 @@ class WPGH_Elements
 	    $this->elements[] = new WPGH_Role_Changed();
 	    $this->elements[] = new WPGH_Email_Confirmed();
 	    $this->elements[] = new WPGH_Form_Filled();
-	    $this->elements[] = new WPGH_Link_Clicked();
-	    $this->elements[] = new WPGH_Tag_Applied();
-	    $this->elements[] = new WPGH_Tag_Removed();
-	    $this->elements[] = new WPGH_Page_Visited();
+        $this->elements[] = new WPGH_Tag_Applied();
+        $this->elements[] = new WPGH_Tag_Removed();
+        $this->elements[] = new WPGH_Page_Visited();
+        $this->elements[] = new WPGH_Link_Clicked();
 
     }
 

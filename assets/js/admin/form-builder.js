@@ -178,6 +178,7 @@ var wpghFormBuilder;
                         'required',
                         'label',
                         'name',
+                        'value',
                         'id',
                         'class'
                     ];
@@ -245,8 +246,6 @@ var wpghFormBuilder;
                 }
 
             }
-
-
 
             if ( code.search( 'required' ) === -1 && ignore.indexOf( this.currentType ) === -1 ){
                 code += ' required="false"';

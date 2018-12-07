@@ -30,7 +30,6 @@ var wpghImportExport;
             this.status = $( '.import-status' );
 
             console.log( 'Importer Ready' );
-
         },
 
         /**

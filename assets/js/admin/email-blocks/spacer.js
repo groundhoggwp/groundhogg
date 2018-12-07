@@ -4,11 +4,8 @@ var wpghSpacerBlock;
 ( function( $, editor ) {
 
     wpghSpacerBlock = {
-
         blockType: 'spacer',
-
         height: null,
-
         init : function () {
 
             this.height  = $( '#spacer-size' );
@@ -26,7 +23,6 @@ var wpghSpacerBlock;
                 }
 
             });
-
         },
 
         /**

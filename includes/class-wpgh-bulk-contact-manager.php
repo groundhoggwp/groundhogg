@@ -69,7 +69,7 @@ class WPGH_Bulk_Contact_Manager
     public function scripts()
     {
         wp_enqueue_script( 'papaparse', WPGH_ASSETS_FOLDER . 'lib/papa-parse/papaparse.js' );
-        wp_enqueue_script( 'wpgh-import-export', WPGH_ASSETS_FOLDER . 'js/admin/import-export.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/import-export.js' ) );
+        wp_enqueue_script( 'wpgh-import-export', WPGH_ASSETS_FOLDER . 'js/admin/import-export.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/import-export.min.js' ) );
         //wp_die( 'scripts' );
     }
 

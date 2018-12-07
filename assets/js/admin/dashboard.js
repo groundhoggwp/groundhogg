@@ -3,8 +3,7 @@ var dashboard;
 (function ($) {
     dashboard = {
        init: function () {
-
-
+           console.log( 'dashboard' );
        }
     };
 
