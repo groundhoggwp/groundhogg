@@ -1,1 +1,1 @@
-wp.i18n.setLocaleData( { '': {} }, 'groundhogg' );
+wp.i18n.setLocaleData( { '': {} }, 'jsforwphowto' );

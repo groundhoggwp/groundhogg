@@ -1,140 +1,108 @@
-<?php namespace Groundhogg\Form_Blocks;
+<?php
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+add_action( 'init', 'wpgh_register_block' );
+add_action( 'enqueue_block_editor_assets',  'wpgh_enqueue_block_editor_assets' );
 
-function register_form_category( $categories, $post ) {
-    return array_merge(
-        $categories,
-        array(
-            array(
-                'slug' => 'groundhogg',
-                'title' => __( 'Groundhogg Form Elements', 'groundhogg' ),
+/**
+ * Register Groundhogg Gutenberg block on the backend.
+ *
+ * @since 1.4.8
+ */
+
+if ( function_exists( 'register_block_type' ) ){
+    function wpgh_register_block()
+    {
+        wp_register_style(
+            'groundhogg-form-styling-frontend',
+            plugins_url( '../assets/css/frontend.css', __FILE__ ),
+            array( 'wp-edit-blocks' )
+        );
+
+        register_block_type( 'groundhogg/forms', array(
+            'attributes'      => array(
+                'formId'       => array(
+                    'type' => 'string',
+                ),
+                'displayTitle' => array(
+                    'type' => 'boolean',
+                ),
+                'displayDesc'  => array(
+                    'type' => 'boolean',
+                ),
             ),
+            'editor_style'    => 'groundhogg-gutenberg-form-selector',
+            'render_callback' => 'wpgh_get_gutenberg_form_html' ,
+        ) );
+    }
+}
+
+
+/**
+ * Load Groundhogg Gutenberg block scripts.
+ *
+ * @since 1.4.8
+ */
+function wpgh_enqueue_block_editor_assets() {
+
+    $i18n = array(
+        'title'            => esc_html__( 'Groundhogg', 'groundhogg' ),
+        'description'      => esc_html__( 'Select and display one of your forms.', 'groundhogg' ),
+        'form_select'      => esc_html__( 'Select a Form', 'groundhogg' ),
+        'form_settings'    => esc_html__( 'Form Settings', 'groundhogg' ),
+        'form_selected'    => esc_html__( 'Form', 'groundhogg' ),
+        'show_title'       => esc_html__( 'Show Title', 'groundhogg' ),
+        'show_description' => esc_html__( 'Show Description', 'groundhogg' ),
+    );
+
+    $blockPath = '../assets/js/editor.blocks.js';
+
+    wp_enqueue_script(
+        'groundhogg-gutenberg-form-selector',
+        plugins_url( $blockPath, __FILE__ ),
+        array( 'wp-blocks', 'wp-i18n', 'wp-element' ,'wp-editor', 'wp-components'  ),
+        filemtime( plugin_dir_path( __FILE__ ) . $blockPath )
+    );
+
+    $forms = WPGH()->steps->get_steps( array(
+        'step_type' => 'form_fill'
+    ) );
+
+    wp_localize_script(
+        'groundhogg-gutenberg-form-selector',
+        'groundhogg_gutenberg_form_selector',
+        array(
+            'logo_url' =>   plugins_url('../assets/images/phil-340x340.png',__FILE__),
+            'forms'    => ! empty( $forms ) ? $forms : array(),
+            'i18n'     => $i18n,
         )
     );
 }
 
-add_filter( 'block_categories',  __NAMESPACE__ . '\register_form_category', 10, 2 );
-
-add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\enqueue_block_editor_assets' );
-
 /**
- * Enqueue block editor only JavaScript and CSS.
+ * Get form HTML to display in a Groundhogg Gutenberg block.
+ *
+ * @param array $attr Attributes passed by WPForms Gutenberg block.
+ *
+ * @since 1.4.8
+ *
+ * @return string
  */
-function enqueue_block_editor_assets() {
-    // Make paths variables so we don't write em twice ;)
-    $block_path = 'assets/js/editor.blocks.js';
-    $style_path = 'assets/css/blocks.editor.css';
+function wpgh_get_gutenberg_form_html( $attr ) {
 
-    // Enqueue the bundled block JS file
-    wp_enqueue_script(
-        'groundhogg-blocks',
-        WPGH_PLUGIN_URL  . $block_path,
-        [ 'wp-i18n', 'wp-element', 'wp-blocks', 'wp-components' ],
-        filemtime( WPGH_PLUGIN_DIR . $block_path )
-    );
+    $id = ! empty( $attr['formId'] ) ? absint( $attr['formId'] ) : 0;
 
-    // Enqueue optional editor only styles
-    wp_enqueue_style(
-        'groundhogg-blocks-editor-css',
-        WPGH_PLUGIN_URL . $style_path,
-        [ 'wp-blocks' ],
-        filemtime( WPGH_PLUGIN_DIR . $style_path )
-    );
-
-    wp_enqueue_script('wpgh-admin-js' );
-
-}
-
-add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_assets' );
-
-/**
- * Enqueue front end and editor JavaScript and CSS assets.
- */
-function enqueue_assets() {
-    $style_path = 'assets/css/blocks.style.css';
-    wp_enqueue_style(
-        'groundhogg-blocks',
-        WPGH_PLUGIN_URL . $style_path,
-        [ 'wp-blocks' ],
-        filemtime( WPGH_PLUGIN_DIR . $style_path )
-    );
-}
-
-add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_frontend_assets' );
-
-/**
- * Enqueue frontend JavaScript and CSS assets.
- */
-function enqueue_frontend_assets() {
-
-    // If in the backend, bail out.
-    if ( is_admin() ) {
-        return;
+    if ( empty( $id ) ) {
+        return '';
     }
 
-    $block_path = 'assets/js/frontend.blocks.js';
-    wp_enqueue_script(
-        'groundhogg-blocks-frontend',
-        WPGH_PLUGIN_URL . $block_path,
-        [],
-        filemtime( WPGH_PLUGIN_DIR . $block_path )
-    );
-}
-
-function render_block_wpgh_form( $attributes, $content ) {
-
-    $forms = WPGH()->steps->get_steps( array( 'step_type' => 'form_fill' ) );
-
-    $options = array();
-
-    foreach ( $forms as $form ){
-
-        $step = new \WPGH_Step( $form->ID );
-
-        if ( $step->is_active() ){
-            $options[ $step->ID ] = $step->title;
-        }
+    $title = ! empty( $attr['displayTitle'] ) ? true : false;
+    if ( empty( $id ) ) {
+        return '';
     }
-
-    $args = array(
-        'id' => 'form-picker',
-        'name' => 'form-picker',
-        'options' => $options,
-        'class' => 'form-picker'
-    );
-
-    ob_start()
-
-    ?>
-    <?php echo WPGH()->html->dropdown( $args ); ?>
-    <?php
-
-    return ob_get_clean();
-}
-
-function render_block_wpgh_form_save( $attributes, $content ){
 
     ob_start();
 
-    echo do_shortcode( sprintf( '[wpgh_form id="%s"]', $attributes[ 'id' ] ) );
+    echo do_shortcode( ' [gh_form id="'.$id.'" title="'.$title.'"] ' );
 
     return ob_get_clean();
-
 }
-
-function register_wpgh_blocks(){
-
-//    if ( function_exists( 'register_block_type' ) ){
-    register_block_type( 'groundhogg/form', array(
-        'render_callback' => __NAMESPACE__ . '\render_block_wpgh_form',
-    ) );
-
-    register_block_type( 'groundhogg/form-saved', array(
-        'render_callback' => __NAMESPACE__ . '\render_block_wpgh_form_saved',
-    ) );
-//    }
-}
-
-add_action( 'init', __NAMESPACE__ . '\register_wpgh_blocks' );
