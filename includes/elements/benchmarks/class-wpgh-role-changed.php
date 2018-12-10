@@ -35,7 +35,7 @@ class WPGH_Role_Changed extends WPGH_Funnel_Step
     /**
      * @var string
      */
-    public $name    = 'Role Changed';
+    public $name    = 'Role Added/Changed';
 
     /**
      * Add the completion action
@@ -49,6 +49,7 @@ class WPGH_Role_Changed extends WPGH_Funnel_Step
         parent::__construct();
 
         add_action( 'set_user_role', array( $this, 'complete' ), 10, 3 );
+        add_action( 'add_user_role', array( $this, 'complete' ), 10, 3 );
     }
 
     /**
@@ -66,7 +67,7 @@ class WPGH_Role_Changed extends WPGH_Funnel_Step
         <table class="form-table">
             <tbody>
             <tr>
-                <th><?php echo esc_html__( 'Run this access is given:', 'groundhogg' ); ?></th>
+                <th><?php echo esc_html__( 'Run when this access is given:', 'groundhogg' ); ?></th>
                 <td>
                     <select name="<?php echo $step->prefix( 'role' ); ?>" id="<?php echo $step->prefix( 'role' ); ?>">
                         <?php wp_dropdown_roles( $account_role ); ?>

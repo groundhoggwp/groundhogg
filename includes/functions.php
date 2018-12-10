@@ -573,6 +573,13 @@ function wpgh_is_email_api_enabled(){
 function wpgh_is_option_enabled( $key = '' )
 {
     $option = wpgh_get_option( $key, array() );
+
+    if ( ! is_array( $option ) && $option ){
+        return true;
+    }
+
+    //backwards compat
+
     return is_array( $option ) && in_array( 'on', $option );
 }
 

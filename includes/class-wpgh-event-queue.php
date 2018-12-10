@@ -140,7 +140,15 @@ class WPGH_Event_Queue
 
                     /* $i is the number of events run */
 
+                    if ( is_wp_error( $i ) ){
+                        wp_die( $i->get_error_message() );
+                    }
+
                     wp_die( $i );
+
+                } else {
+
+                    wp_die( __( 'Could not process queue for unknown reason.' ) );
 
                 }
             }
@@ -194,6 +202,8 @@ class WPGH_Event_Queue
         } else {
             return $this->process();
         }
+
+
     }
 
     /**
@@ -223,7 +233,7 @@ class WPGH_Event_Queue
      * Iterate through the list of events and process them via the EVENTS api
      * For now just uses the standard plugins api
      *
-     * @return bool whether the queue was processed or not
+     * @return bool|WP_Error|int the number of events process, or WP_Error, or false
      */
     private function process()
     {
@@ -244,7 +254,7 @@ class WPGH_Event_Queue
 
         if ( empty( $this->events ) ){
 
-            return false;
+            return new WP_Error( 'NO_EVENTS', __( 'No events are available to process.' ) );
 
         }
 
@@ -257,7 +267,12 @@ class WPGH_Event_Queue
 
         $i = 0;
 
-        $max_events = intval( wpgh_get_option( 'gh_max_events', 9999999999 ) );
+        $max_events = intval( wpgh_get_option( 'gh_max_events', 9999 ) );
+
+        /* double check event setting */
+        if ( $max_events === 0 ){
+            $max_events = 9999;
+        }
 
         /* Check to see if the current queue is still the most recent queue. If it's not Then finish up. */
         while ( $this->has_events() && $i < $max_events && $this->is_running() ) {
