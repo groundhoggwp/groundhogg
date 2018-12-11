@@ -19,7 +19,7 @@ class WPGH_Upgrade{
     /**
      * @var string the version which is set by the plugin
      */
-    public $curent_version;
+    public $current_version;
 
     /**
      * WPGH_Upgrade constructor.
