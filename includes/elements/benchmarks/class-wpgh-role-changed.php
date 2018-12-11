@@ -105,29 +105,8 @@ class WPGH_Role_Changed extends WPGH_Funnel_Step
      */
     public function complete( $userId, $cur_role, $old_roles )
     {
-
-        //todo list of possible funnel steps.
-        $user_info = get_userdata( $userId );
-
-        $contact = new WPGH_Contact( $user_info->user_email );
-
-        if ( ! $contact->exists() ){
-
-            /* create the contact */
-            $new_contact = array(
-                'first_name'    => $user_info->first_name,
-                'last_name'     => $user_info->last_name,
-                'email'         => $user_info->user_email,
-                'user_id'       => $userId,
-                'optin_status'  => WPGH_UNCONFIRMED,
-                'date_created'  => current_time( 'mysql' )
-            );
-
-            $cid = WPGH()->contacts->add( $new_contact );
-
-            $contact = new WPGH_Contact( $cid );
-
-        }
+        $user = get_userdata( $userId );
+        $contact = wpgh_create_contact_from_user( $user );
 
         if ( ! is_admin() ){
 

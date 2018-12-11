@@ -108,25 +108,11 @@ function wpgh_run_install() {
 
     /* @var $wp_user WP_User */
     foreach ( $users as $wp_user ) {
-        if ( ! WPGH()->contacts->exists( $wp_user->user_email, 'email' ) ){
-            $cid = WPGH()->contacts->add( array(
-                'first_name'    => $wp_user->first_name,
-                'last_name'     => $wp_user->last_name,
-                'email'         => $wp_user->user_email,
-                'user_id'       => $wp_user->ID,
-            ) );
-        }
+        wpgh_create_contact_from_user( $wp_user );
     }
 
     /* Recount tag relationships */
-    $tags = WPGH()->tags->get_tags();
-
-    if ( ! empty( $tags ) ){
-        foreach ( $tags as $tag ){
-            $count = WPGH()->tag_relationships->count( $tag->tag_id, 'tag_id' );
-            WPGH()->tags->update( $tag->tag_id, array( 'contact_count' => $count ) );
-        }
-    }
+    wpgh_recount_tag_contacts_count();
 
     $roles = new WPGH_Roles;
     $roles->add_roles();

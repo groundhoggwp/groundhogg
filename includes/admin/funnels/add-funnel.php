@@ -48,53 +48,73 @@ do_action( 'wpgh_before_new_funnel' );
     </form>
 <?php elseif ( 'marketplace' === $active_tab ):
     ?>
-    <form>
-        <input type="text" id="search_funnel" placeholder="Search Here.."  class="" style="margin-top : 2% ; width: 100%; margin-bottom: 2%" />
-
-    </form>
-    <div style="text-align: center" id="spinner">
-        <span class="spinner" style="float: none"></span>
+<style>
+    .wp-filter-search{
+        box-sizing: border-box;
+        width: 100%;
+        font-size: 16px;
+        padding: 6px;
+    }
+</style>
+    <div id="poststuff">
+        <div class="postbox">
+            <div class="inside">
+                <p style="float: left"><?php _e( 'Search for templates from our marketplace.', 'groundhogg' ); ?></p>
+                <p style="float: right" class="description"><?php _e( 'Want to share your funnel with the world? <a target="_blank" href="https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/">Get Started Now!</a>', 'groundhogg' ); ?></p>
+                <form class="search-form" method="get">
+                    <input type="text" id="search_funnel" placeholder="<?php esc_attr_e( 'Type in a search term like "Webinar"...', 'groundhogg' ) ;?>"  class="wp-filter-search" />
+                </form>
+            </div>
+        </div>
+        <div style="text-align: center;" id="spinner">
+            <span class="spinner" style="float: none; visibility: visible"></span>
+        </div>
+        <div id="downloads">
+            <?php WPGH()->menu->funnels_page->display_funnel_templates(); ?>
+        </div>
     </div>
+
     <script type="text/javascript">
         (function ($) {
 
             //setup before functions
             var typingTimer;                //timer identifier
             var doneTypingInterval = 500;  //time in ms, 5 second for example
-            var $input = $('#search_funnel');
+            var $search     = $('#search_funnel');
+            var $downloads  = $('#downloads');
+            var $spinner    = $('#spinner');
 
-            $("#search_funnel").keyup(function(){
+            $spinner.hide();
 
+            $search.keyup(function(){
                 clearTimeout(typingTimer);
                 typingTimer = setTimeout(ajaxCall, doneTypingInterval);
             });
 
-            $("#search_funnel").keydown(function(){
+            $search.keydown(function(){
                 clearTimeout(typingTimer);
             });
 
             function ajaxCall() {
-                $("#poststuff").hide();
-                $(".spinner").css( 'visibility', 'visible' );
+                $downloads.hide();
+                $spinner.show();
+                // $(".spinner").css( 'visibility', 'visible' );
                 var ajaxCall = $.ajax({
                     type: "post",
                     url: ajaxurl,
                     dataType: 'json',
                     data: { action: 'gh_get_templates', s: $( '#search_funnel' ).val()},
                     success: function ( response ) {
-                        $(".spinner").css( 'visibility', 'hidden' );
-                        $("#poststuff").show();
-                        $("#poststuff").html( response.html ) ;
+                        // $(".spinner").css( 'visibility', 'hidden' );
+                        $spinner.hide();
+                        $downloads.show();
+                        $downloads.html( response.html ) ;
 
                     }
                 });
             }
         })(jQuery);
-
     </script>
-    <div id="poststuff">
-        <?php WPGH()->menu->funnels_page->display_funnel_templates(); ?>
-    </div>
 
 <?php else: ?>
     <div class="show-upload-view">
@@ -103,11 +123,8 @@ do_action( 'wpgh_before_new_funnel' );
                 <p class="install-help"><?php _e( 'If you have a funnel import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
                 <form method="post" enctype="multipart/form-data" class="wp-upload-form">
                     <?php wp_nonce_field(); ?>
-
                     <input type="file" name="funnel_template" id="funnel_template" accept=".funnel">
-
                     <button class="button-primary" name="funnel_inport" value="import"><?php _e('Import Funnels', 'groundhogg'); ?></button>
-
                 </form>
             </div>
         </div>

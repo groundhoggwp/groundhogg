@@ -107,6 +107,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.16 =
+* ADDED introduction of the Marketplace
+* ADDED user roles re auto converted to tags and applies to the contact so sending broadcasts to specific users becomes easier
+* ADDED the standard create_contact_from_user function that can be used in multiple contexts...
+* ADDED upgrade class to handle updates
+
 = 1.0.15.1 =
 * TWEAKED Role Changed benchmark now also supports add_user_role as well.
 * TWEAKED Double check max event setting so as not to imply it could be 0

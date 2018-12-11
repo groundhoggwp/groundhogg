@@ -386,6 +386,17 @@ class WPGH_Contact
     }
 
     /**
+     * Wrapper function for add_tag to make it easier
+     *
+     * @param $tag_id_or_array
+     * @return bool
+     */
+    public function apply_tag( $tag_id_or_array )
+    {
+        return $this->add_tag( $tag_id_or_array );
+    }
+
+    /**
      * Add a list of tags or a single tag top the contact
      *
      * @param $tag_id_or_array array|int
