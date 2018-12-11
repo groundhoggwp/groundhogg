@@ -42,6 +42,10 @@ class WPGH_Emails_Page
             add_action( 'init' , array( $this, 'process_action' )  );
             add_action( 'admin_enqueue_scripts' , array( $this, 'scripts' )  );
 
+            if ( $this->get_action() === 'edit' ){
+                add_action( 'in_admin_header' , array( $this, 'prevent_notices' )  );
+            }
+
         }
     }
 
@@ -620,6 +624,16 @@ class WPGH_Emails_Page
         }
 
         include dirname( __FILE__ ) . '/add-email.php';
+    }
+
+    /**
+     * Prevent notices from other plugins appearing on the edit funnel screen as the break the format.
+     */
+    public function prevent_notices()
+    {
+        remove_all_actions( 'network_admin_notices' );
+        remove_all_actions( 'user_admin_notices' );
+        remove_all_actions( 'admin_notices' );
     }
 
     function page()

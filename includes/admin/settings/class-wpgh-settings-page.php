@@ -332,15 +332,15 @@ class WPGH_Settings_Page
                     'placeholder'   => '999999'
                 ),
             ),
-            'gh_email_confirmation_page' => array(
-                'id'        => 'gh_email_confirmation_page',
+            'gh_confirmation_page' => array(
+                'id'        => 'gh_confirmation_page',
                 'section'   => 'pages',
                 'label'     => __( 'Email Confirmation Page', 'groundhogg' ),
                 'desc'      => __( 'Page contacts see when they confirm their email.', 'groundhogg' ),
                 'type'      => 'select2',
                 'atts'      => array(
-                    'name'  => 'gh_email_confirmation_page',
-                    'id'    => 'gh_email_confirmation_page',
+                    'name'  => 'gh_confirmation_page',
+                    'id'    => 'gh_confirmation_page',
                     'data'  => $pops,
                 ),
             ),

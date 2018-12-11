@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.15.1 =
+* TWEAKED Role Changed benchmark now also supports add_user_role as well.
+* TWEAKED Double check max event setting so as not to imply it could be 0
+* FIXED wrong setting name for Email Confirmation page
+
 = 1.0.15 =
 * ADDED Gutenberg Form Block
 * TWEAKED HTML block in email builder support code-mirror now
