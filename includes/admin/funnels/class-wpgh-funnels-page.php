@@ -49,6 +49,7 @@ class WPGH_Funnels_Page
 	    add_action( 'admin_menu', array( $this, 'register' ) );
 
 	    if ( is_admin() ){
+            add_action( 'wp_ajax_gh_get_templates', array( $this, 'get_funnel_templates_ajax' ) );
             add_action( 'wp_ajax_gh_save_funnel_via_ajax', array( $this, 'ajax_save_funnel' ) );
             add_action( 'wp_ajax_wpgh_get_step_html', array( $this, 'add_step' ) );
             add_action( 'wp_ajax_wpgh_delete_funnel_step',  array( $this, 'delete_step' ) );
@@ -965,6 +966,113 @@ class WPGH_Funnels_Page
             <?php
         }
 
-
 	}
+
+    /**
+     * Get template HTML via ajax
+     */
+	public function get_funnel_templates_ajax( )
+    {
+
+
+        $args = array();
+        $args =  array( 'category' => 'templates' );
+        $args = array( 's' => $_POST[ 's' ]);
+        ob_start();
+        $this->display_funnel_templates( $args );
+        $html = ob_get_clean();
+
+        $response = array(
+            'html'  => $html
+        );
+
+       wp_die( json_encode( $response ) );
+
+    }
+
+    /**
+     * @param array $args
+     * @return array|mixed|object
+     */
+	public function get_funnel_templates( $args=array() )
+    {
+        $args = wp_parse_args( $args, array(
+            //'category' => 'templates',
+            'category' => '',
+            'tag'      => '',
+            's'        => '',
+            'page'     => '',
+            'number'   => '-1'
+        ) );
+
+        $url = 'https://groundhogg.io/edd-api/v2/products/';
+
+        $response = wp_remote_get( add_query_arg( $args, $url ) );
+        $products = json_decode( wp_remote_retrieve_body( $response ) );
+
+        return $products;
+    }
+
+    public function display_funnel_templates( $args = array() )
+    {
+        $page = isset( $_REQUEST[ 'p' ] ) ? intval( $_REQUEST[ 'p' ] ) : '1';
+        $args[ 'page' ] = $page ;
+
+        if ( isset( $_REQUEST[ 'tag' ] ) ){
+            $args[ 'tag' ] = urlencode( $_REQUEST[ 'tag' ] );
+        }
+
+        if ( isset( $_REQUEST[ 's' ] ) ){
+            $args[ 's' ] = urlencode( $_REQUEST[ 's' ] );
+        }
+
+        $products = $this->get_funnel_templates( $args );
+
+        if ( count($products->products) > 0 ) {
+
+            foreach ($products->products as $product):
+                ?>
+                <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
+                    <div class="">
+                        <img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
+                    </div>
+                    <h2 class="hndle"><?php echo $product->info->title; ?></h2>
+                    <div class="inside">
+                        <p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
+
+                        <?php $pricing = (array)$product->pricing;
+                        if (count($pricing) > 1) {
+
+                            $price1 = min($pricing);
+                            $price2 = max($pricing);
+
+                            ?>
+                            <a class="button-primary" target="_blank"
+                               href="<?php echo $product->info->link; ?>"> <?php _e('Buy Now ($' . $price1 . ' - $' . $price2 . ')', 'groundhogg'); ?></a>
+                            <?php
+                        } else {
+
+                            $price = array_pop($pricing);
+
+                            if ($price > 0.00) {
+                                ?>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $product->info->link; ?>"> <?php _e('Buy Now ($' . $price . ')', 'groundhogg'); ?></a>
+                                <?php
+                            } else {
+                                ?>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $product->info->link; ?>"> <?php _e('Download', 'groundhogg'); ?></a>
+                                <?php
+                            }
+                        }
+
+                        ?>
+                    </div>
+                </div>
+            <?php endforeach;
+        } else {
+            ?> <h1>No results found.</h1> <?php
+        }
+    }
 }
