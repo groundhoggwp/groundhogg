@@ -112,6 +112,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED user roles re auto converted to tags and applies to the contact so sending broadcasts to specific users becomes easier
 * ADDED the standard create_contact_from_user function that can be used in multiple contexts...
 * ADDED upgrade class to handle updates
+* ADDED better API structure and authentication
+* FIXED Email block toolbar disappearing after save
 
 = 1.0.15.1 =
 * TWEAKED Role Changed benchmark now also supports add_user_role as well.

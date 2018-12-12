@@ -171,15 +171,10 @@ var wpghEmailEditor;
         save: function ( e ) {
 
             e.preventDefault();
-
             $('.spinner').css('visibility','visible');
-
-            wpghEmailEditor.prepareEmailHTML();
-
+            this.prepareEmailHTML();
             $('#content').val( $('#email-inside').html() );
-
             var fd = $('form').serialize();
-
             fd = fd +  '&action=gh_update_email';
 
             var ajaxCall = $.ajax({
@@ -193,6 +188,7 @@ var wpghEmailEditor;
                     console.log( response );
                     $( '#notices' ).html( response.notices );
                     $( '.spinner' ).css( 'visibility','hidden' );
+                    $( '.row' ).wpghToolBar();
                     wpghEmailEditor.makeDismissible();
 
                 }
