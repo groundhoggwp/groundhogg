@@ -274,7 +274,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
-//                    self::$instance->upgrader   = new WPGH_Upgrade();
+                    self::$instance->upgrader   = new WPGH_Upgrade();
 //                    self::$instance->tokens_section       = new WPGH_User_Token_Section();
 //                    self::$instance->importer   = new WPGH_Importer();
 
