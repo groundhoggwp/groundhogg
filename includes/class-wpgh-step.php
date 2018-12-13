@@ -67,6 +67,15 @@ class WPGH_Step
     public $queue_delay = 10;
 
     /**
+     * This is only used when the step is enqueuing itself...
+     *
+     * @since 1.0.16
+     *
+     * @var WPGH_Contact
+     */
+    public $enqueued_contact;
+
+    /**
      * WPGH_Step constructor.
      *
      * @param $id int ID of the step
@@ -270,6 +279,8 @@ class WPGH_Step
         //contact should NOT be present in the same funnel twice...
 
         /* Check if a similar event such as this already exists FIRST */
+
+        $this->enqueued_contact = $contact;
 
         $similar_events = WPGH()->events->get_events(
             array(

@@ -386,6 +386,17 @@ class WPGH_Contact
     }
 
     /**
+     * Wrapper function for add_tag to make it easier
+     *
+     * @param $tag_id_or_array
+     * @return bool
+     */
+    public function apply_tag( $tag_id_or_array )
+    {
+        return $this->add_tag( $tag_id_or_array );
+    }
+
+    /**
      * Add a list of tags or a single tag top the contact
      *
      * @param $tag_id_or_array array|int
@@ -498,6 +509,36 @@ class WPGH_Contact
 
 	    return in_array( $tag_id, $this->tags );
 	}
+
+    /**
+     * Change the marketing preferences of a contact.
+     *
+     * @param $preference
+     */
+	function change_marketing_preference( $preference )
+    {
+        if ( $preference === WPGH_UNSUBSCRIBED ){
+
+            $this->unsubscribe();
+
+        } else {
+
+            $this->update( array( 'optin_status' => $preference ) );
+
+        }
+
+        do_action( 'wpgh_contact_marketing_preference_updated', $this->ID, $preference );
+
+    }
+
+    /**
+     * Unsubscribe a contact
+     */
+	function unsubscribe()
+    {
+        $this->update( array( 'optin_status' => WPGH_UNSUBSCRIBED ) );
+        do_action( 'wpgh_contact_unsubscribed', $this->ID );
+    }
 
     /**
      * Output a contact. Just give the email back

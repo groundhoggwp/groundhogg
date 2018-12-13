@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 1.0.15.1
+Version: 1.0.16
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.0.15.1';
+        public $version = '1.0.16';
 
         /**
          * @var $instance Groundhogg instance
@@ -215,6 +215,11 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $tokens_section;
 
         /**
+         * @var WPGH_Upgrade
+         */
+        public $upgrader;
+
+        /**
          * Returns the instance on Groundhogg.
          *
          * @return Groundhogg
@@ -269,6 +274,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
+                    self::$instance->upgrader   = new WPGH_Upgrade();
 //                    self::$instance->tokens_section       = new WPGH_User_Token_Section();
 //                    self::$instance->importer   = new WPGH_Importer();
 
@@ -377,6 +383,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-bulk-contact-manager.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/tools.php';
+                require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-upgrade.php';
 //                require_once WPGH_PLUGIN_DIR . 'includes/admin/user/class-wpgh-user-tokens-section.php';
 
                 if ( is_multisite() ){
@@ -406,8 +413,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-template-loader.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-tracking.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-popup.php';
-
-
             require_once WPGH_PLUGIN_DIR . 'includes/functions.php';
             require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';
@@ -416,6 +421,34 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/gutenberg.php';
             require_once WPGH_PLUGIN_DIR . 'api/v2/class-wpgh-api-v2.php';
 
+        }
+
+        /**
+         * @param array $args
+         * @return array|mixed|object
+         */
+        public function get_store_products( $args=array() )
+        {
+            $args = wp_parse_args( $args, array(
+                //'category' => 'templates',
+                'category' => '',
+                'tag'      => '',
+                's'        => '',
+                'page'     => '',
+                'number'   => '-1'
+            ) );
+
+            $url = 'https://groundhogg.io/edd-api/v2/products/';
+
+            $response = wp_remote_get( add_query_arg( $args, $url ) );
+
+            if ( is_wp_error( $response ) ){
+                return $response->get_error_message();
+            }
+
+            $products = json_decode( wp_remote_retrieve_body( $response ) );
+
+            return $products;
         }
 
     }

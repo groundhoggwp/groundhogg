@@ -683,6 +683,11 @@ function wpgh_should_if_multisite()
 
 }
 
+/**
+ * Check if the site is gloabl multisite enabled
+ *
+ * @return bool
+ */
 function wpgh_is_global_multisite()
 {
     if ( ! is_multisite() ){
@@ -727,10 +732,20 @@ function wpgh_get_current_user_roles()
  * @since 1.0.6
  *
  * @param $id_or_email string|int
+ * @param $by_user_id bool
  * @return WPGH_Contact
  */
-function wpgh_get_contact( $id_or_email ){
-    return new WPGH_Contact( $id_or_email );
+function wpgh_get_contact( $id_or_email, $by_user_id=false ){
+
+    $contact = new WPGH_Contact( $id_or_email, $by_user_id );
+
+    if ( $by_user_id ){
+        if( ! $contact->exists() ){
+            $contact = wpgh_create_contact_from_user( get_userdata( $id_or_email ) );
+        }
+    }
+
+    return $contact;
 }
 
 /**
@@ -852,3 +867,158 @@ function wpgh_round_to_day( $time ){
 
     return $time;
 }
+
+/**
+ * Create a contact quickly from a user account.
+ *
+ * @param $user WP_User|int
+ * @return WPGH_Contact|false|WP_Error the new contact, false on failure, or WP_Error on error
+ */
+function wpgh_create_contact_from_user( $user )
+{
+
+    if ( is_int( $user ) ) {
+        $user = get_userdata( $user );
+        if ( ! $user ){
+            return false;
+        }
+    }
+
+    if ( ! $user instanceof WP_User ){
+        return false;
+    }
+
+    $contact = wpgh_get_contact( $user->ID, true );
+
+    /**
+     * Do not continue if the contact already exists. Just return it...
+     */
+    if ( $contact->exists() ){
+        return $contact;
+    }
+
+    /**
+     * Setup the initial args..
+     */
+    $args = array(
+        'first_name'    => $user->first_name,
+        'last_name'     => $user->last_name,
+        'email'         => $user->user_email,
+        'user_id'       => $user->ID,
+        'optin_status'  => WPGH_UNCONFIRMED
+    );
+
+    $id = WPGH()->contacts->add( $args );
+
+    if ( ! $id ){
+        return new WP_Error( 'BAD_ARGS', __( 'Could not create contact.', 'groundhogg' ) );
+    }
+
+    $contact = wpgh_get_contact( $id );
+
+    /**
+     * Apply roles as tags
+     */
+    $roles = wpgh_get_roles_pretty_names( $user->roles );
+    $contact->add_tag( $roles );
+
+    return $contact;
+}
+
+/**
+ * Convert an array of roles to n array of display roles
+ *
+ * @param $roles array an array of user roles...
+ * @return array an array of pretty role names.
+ */
+function wpgh_get_roles_pretty_names( $roles )
+{
+    $pretty_roles = array();
+
+    foreach ( $roles as $role ){
+        $pretty_roles[] = wpgh_get_role_pretty_name( $role );
+    }
+
+    return $pretty_roles;
+}
+
+/**
+ * Get the pretty name of a role
+ *
+ * @param $role string
+ * @return string
+ */
+function wpgh_get_role_pretty_name( $role )
+{
+    global $wp_roles;
+    return translate_user_role( $wp_roles->roles[ $role ]['name'] );
+}
+
+/**
+ * Convert a role to a tag name
+ *
+ * @param $role string the user role
+ * @return int the ID of the tag
+ */
+function wpgh_convert_role_to_tag( $role )
+{
+    $tags = WPGH()->tags->validate( wpgh_get_role_pretty_name( $role ) );
+    return array_shift( $tags );
+}
+
+/**
+ * When a role is added also add the tag
+ *
+ * @param $user_id int
+ * @param $role string
+ */
+function wpgh_apply_tags_to_contact_from_new_roles( $user_id, $role )
+{
+    $contact = wpgh_get_contact( $user_id, true );
+    $role = wpgh_get_role_pretty_name( $role );
+    $contact->add_tag( $role );
+}
+
+add_action( 'add_user_role', 'wpgh_apply_tags_to_contact_from_roles', 10, 2 );
+
+/**
+ * When a role is remove also remove the tag
+ *
+ * @param $user_id int
+ * @param $role string
+ */
+function wpgh_remove_tags_to_contact_from_remove_roles( $user_id, $role )
+{
+    $contact = wpgh_get_contact( $user_id, true );
+    $role = wpgh_get_role_pretty_name( $role );
+    $contact->remove_tag( $role );
+}
+
+add_action( 'remove_user_role', 'wpgh_remove_tags_to_contact_from_remove_roles', 10, 2 );
+
+/**
+ * When a role is set also set the tag
+ *
+ * @param $user_id int
+ * @param $role string
+ * @param $old_roles string[]
+ */
+function wpgh_apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_roles )
+{
+    $contact = wpgh_get_contact( $user_id, true );
+
+    /**
+     * Convert list of roles to a list of tags and remove them...
+     */
+    $roles = wpgh_get_roles_pretty_names( $old_roles );
+    $contact->remove_tag( $roles );
+
+    /**
+     * Add the new role as a tag
+     */
+    $role = wpgh_get_role_pretty_name( $role );
+    $contact->add_tag( $role );
+}
+
+add_action( 'set_user_role', 'wpgh_apply_tags_to_contact_from_changed_roles', 10, 2, 3 );
+

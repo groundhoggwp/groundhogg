@@ -462,9 +462,7 @@ class WPGH_Contacts_Page
 
         if ( isset( $_POST[ 'unsubscribe' ] ) ) {
 
-            $args[ 'optin_status' ] = WPGH_UNSUBSCRIBED;
-
-            do_action( 'wpgh_preference_unsubscribe', $id );
+            $contact->unsubscribe();
 
             $this->notices->add(
                 esc_attr( 'unsubscribed' ),
@@ -615,8 +613,6 @@ class WPGH_Contacts_Page
         if ( ! current_user_can( 'edit_contacts' ) ){
             wp_die( WPGH()->roles->error( 'edit_contacts' ) );
         }
-
-        //todo security check
 
         $id = (int) $_POST['ID'];
 

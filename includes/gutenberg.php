@@ -1,8 +1,5 @@
 <?php
 
-add_action( 'init', 'wpgh_register_block' );
-add_action( 'enqueue_block_editor_assets',  'wpgh_enqueue_block_editor_assets' );
-
 /**
  * Register Groundhogg Gutenberg block on the backend.
  *
@@ -10,6 +7,10 @@ add_action( 'enqueue_block_editor_assets',  'wpgh_enqueue_block_editor_assets' )
  */
 
 if ( function_exists( 'register_block_type' ) ){
+
+    add_action( 'init', 'wpgh_register_block' );
+    add_action( 'enqueue_block_editor_assets',  'wpgh_enqueue_block_editor_assets' );
+
     function wpgh_register_block()
     {
         wp_register_style(

@@ -190,7 +190,15 @@ class WPGH_DB_Contact_Meta extends WPGH_DB {
             "SELECT DISTINCT meta_key FROM $this->table_name ORDER BY meta_key DESC"
         );
 
-        return $keys;
+        $key_array = array();
+
+        foreach ( $keys as $key ){
+
+            $key_array[ $key ] = $key;
+
+        }
+
+        return $key_array;
 
     }
 

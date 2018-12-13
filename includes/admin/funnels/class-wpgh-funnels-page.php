@@ -1000,29 +1000,6 @@ class WPGH_Funnels_Page
 
     }
 
-    /**
-     * @param array $args
-     * @return array|mixed|object
-     */
-	public function get_funnel_templates( $args=array() )
-    {
-        $args = wp_parse_args( $args, array(
-            //'category' => 'templates',
-            'category' => '',
-            'tag'      => '',
-            's'        => '',
-            'page'     => '',
-            'number'   => '-1'
-        ) );
-
-        $url = 'https://groundhogg.io/edd-api/v2/products/';
-
-        $response = wp_remote_get( add_query_arg( $args, $url ) );
-        $products = json_decode( wp_remote_retrieve_body( $response ) );
-
-        return $products;
-    }
-
     public function display_funnel_templates( $args = array() )
     {
         $page = isset( $_REQUEST[ 'p' ] ) ? intval( $_REQUEST[ 'p' ] ) : '1';
@@ -1036,9 +1013,11 @@ class WPGH_Funnels_Page
             $args[ 's' ] = urlencode( $_REQUEST[ 's' ] );
         }
 
-        $products = $this->get_funnel_templates( $args );
+        $args[ 'category' ] = 'templates';
 
-        if ( count($products->products) > 0 ) {
+        $products = WPGH()->get_store_products( $args );
+
+        if ( is_object( $products ) && count( $products->products ) > 0 ) {
 
             foreach ($products->products as $product):
                 ?>
@@ -1082,7 +1061,7 @@ class WPGH_Funnels_Page
                 </div>
             <?php endforeach;
         } else {
-            ?> <h1>No results found.</h1> <?php
+            ?> <p style="text-align: center;font-size: 24px;"><?php _e( 'Sorry, no templates were found.', 'groundhogg' ); ?></p> <?php
         }
     }
 }
