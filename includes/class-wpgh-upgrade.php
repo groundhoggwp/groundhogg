@@ -24,7 +24,7 @@ class WPGH_Upgrade{
     /**
      * WPGH_Upgrade constructor.
      */
-    function __construct()
+    public function __construct()
     {
 
         $this->db_version = get_option( 'wpgh_last_upgrade_version' );
