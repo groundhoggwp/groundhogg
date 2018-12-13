@@ -271,7 +271,7 @@ class WPGH_Field_Timer extends WPGH_Funnel_Step
             return parent::enqueue( $step );
         }
 
-        $amount     = $step->get_meta( 'delay_amount' );
+        $amount     = intval( $step->get_meta( 'delay_amount' ) );
         $type       = $step->get_meta( 'delay_type' );
         $run_when   = $step->get_meta( 'run_when' );
         $run_time   = $step->get_meta( 'run_time' );
@@ -280,23 +280,54 @@ class WPGH_Field_Timer extends WPGH_Funnel_Step
 
 
         /* Get the date from the field string... */
+        $date = $contact->get_meta( $date_field );
+        if ( ! $date ){
+            $date = date( 'Y-m-d', time() );
+        }
 
+        /* Calculate as if there is no delay... */
 
         if ( $run_when == 'now' ){
-            $time_string = '+ ' . $amount . ' ' . $type;
-            $final_time = strtotime( $time_string );
+            $time_string = $date . ' ' . date( 'H:i:s', convert_to_local_time( time() ) ) ;
+            $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
         } else {
-            $time_string = '+ ' . $amount . ' ' . $type;
-            $base_time = strtotime( $time_string );
-            $formatted_date = date( 'Y-m-d', $base_time );
-            $time_string = $formatted_date . ' ' . $run_time;
+            $time_string = $date . ' ' . $run_time;
             if ( strtotime( $time_string ) < time() ){
                 $formatted_date = date( 'Y-m-d', strtotime( 'tomorrow' ) );
                 $time_string = $formatted_date . ' ' . $run_time;
             }
 
             /* convert to utc */
-            $final_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+            $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
+        }
+
+        /* Now calculate delay time */
+
+        switch ( $type ){
+            case 'minutes':
+                $diff = $amount * MINUTE_IN_SECONDS;
+                break;
+
+            case 'hours':
+                $diff = $amount * HOUR_IN_SECONDS;
+                break;
+
+            case 'days':
+                $diff = $amount * DAY_IN_SECONDS;
+                break;
+
+            case 'months':
+                $diff = $amount * MONTH_IN_SECONDS;
+                break;
+
+            case 'no_delay':
+            default:
+                $diff = 0;
+                break;
+        }
+
+        if ( $diff > 0 ){
+            $final_time = ( $before_or_after === 'before' ) ? $final_time - $diff : $final_time + $diff;
         }
 
         return $final_time;
