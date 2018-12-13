@@ -736,15 +736,7 @@ function wpgh_get_current_user_roles()
  * @return WPGH_Contact
  */
 function wpgh_get_contact( $id_or_email, $by_user_id=false ){
-
     $contact = new WPGH_Contact( $id_or_email, $by_user_id );
-
-    if ( $by_user_id ){
-        if( ! $contact->exists() ){
-            $contact = wpgh_create_contact_from_user( get_userdata( $id_or_email ) );
-        }
-    }
-
     return $contact;
 }
 
