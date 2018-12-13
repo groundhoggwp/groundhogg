@@ -510,3 +510,38 @@ function wpgh_tools_sysinfo_download() {
 }
 
 add_action( 'admin_init', 'wpgh_tools_sysinfo_download' );
+
+/**
+ * Show the api keys table
+ */
+function wpgh_api_keys_table()
+{
+    if ( ! wpgh_is_option_enabled( 'gh_enable_api' ) ){
+        return;
+    }
+
+    ?>
+    </form>
+    <?php
+
+
+    do_action( 'wpgh_tools_api_keys_before' );
+
+    require_once WPGH_PLUGIN_DIR . 'includes/admin/settings/class-wpgh-api-keys-table.php';
+
+    $api_keys_table = new WPGH_API_Keys_Table();
+    $api_keys_table->prepare_items();
+    $api_keys_table->display();
+    ?>
+    <p>
+        <?php _e( 'These API keys allow you to use the REST API to retrieve store data in JSON for external applications or devices.', 'groundhogg' ); ?>
+    </p>
+    <form>
+    <?php
+
+    do_action( 'wpgh_tools_api_keys_after' );
+
+
+}
+
+add_action( 'gh_tab_api_tab', 'wpgh_api_keys_table' );

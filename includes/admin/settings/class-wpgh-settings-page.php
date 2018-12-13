@@ -123,6 +123,10 @@ class WPGH_Settings_Page
                 'id'    => 'extensions',
                 'title' => __( 'Licenses' )
             ),
+            'api_tab'   =>  array(
+                'id'    => 'api_tab',
+                'title' => __( 'API' )
+            ),
         );
     }
 
@@ -168,6 +172,11 @@ class WPGH_Settings_Page
                 'id'    => 'service',
                 'title' => __( 'Groundhogg Email Service' ),
                 'tab'   => 'email'
+            ),
+            'api_settings' => array(
+                'id'    => 'api_settings',
+                'title' => __( 'API Settings' ),
+                'tab'   => 'api_tab'
             ),
         );
     }
@@ -543,6 +552,19 @@ class WPGH_Settings_Page
                     //keep brackets for backwards compat
                     'name'          => 'gh_send_with_gh_api[]',
                     'id'            => 'gh_send_with_gh_api',
+                    'value'         => 'on',
+                ),
+            ),
+            'gh_enable_api' => array(
+                'id'        => 'gh_enable_api',
+                'section'   => 'api_settings',
+                'label'     => __( 'Enable the Groundhogg API', 'groundhogg' ),
+                'desc'      => __( 'Enabling this will allow other platforms to access information on this site.', 'groundhogg' ),
+                'type'      => 'checkbox',
+                'atts' => array(
+                    'label'         => __( 'Enable' ),
+                    'name'          => 'gh_enable_api',
+                    'id'            => 'gh_enable_api',
                     'value'         => 'on',
                 ),
             ),

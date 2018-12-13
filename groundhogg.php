@@ -47,7 +47,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         /**
          * GH api object //todo in progress
          *
-         * @var object|WPGH_API_V1
+         * @var object|WPGH_API_V2
          */
         public $api;
 
@@ -277,7 +277,10 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                     }
                 }
 
-//                self::$instance->api = new WPGH_API_V1();
+                if ( wpgh_is_option_enabled( 'gh_enable_api' ) ){
+                    self::$instance->api = new WPGH_API_V2();
+                }
+
 
             }
 
@@ -411,9 +414,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/locations.php';
 
             require_once WPGH_PLUGIN_DIR . 'includes/gutenberg.php';
-
-            //API
-//            require_once WPGH_PLUGIN_DIR . 'api/v1/class-wpgh-api-v1.php';
+            require_once WPGH_PLUGIN_DIR . 'api/v2/class-wpgh-api-v2.php';
 
         }
 
