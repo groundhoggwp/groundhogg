@@ -34,7 +34,7 @@ class WPGH_Upgrade{
             update_option( 'wpgh_last_upgrade_version', $this->db_version );
         }
 
-        $this->curent_version = WPGH()->version;
+        $this->current_version = WPGH()->version;
 
         add_action( 'admin_init', array( $this, 'do_upgrades' ) );
 
@@ -43,14 +43,14 @@ class WPGH_Upgrade{
     /**
      * Check whether upgrades should happen or not.
      */
-    function do_upgrades()
+    public function do_upgrades()
     {
         /**
          * Check if the current version is larger than the version last checked by the upgrader
          */
-        if ( version_compare( $this->curent_version, $this->db_version, '>' ) ){
+        if ( version_compare( $this->current_version, $this->db_version, '>' ) ){
             $this->upgrade_path();
-            update_option( 'wpgh_last_upgrade_version', $this->curent_version );
+            update_option( 'wpgh_last_upgrade_version', $this->current_version );
         }
 
     }
@@ -58,7 +58,7 @@ class WPGH_Upgrade{
     /**
      * This function is nice and all you have to do is just enter the version you want to update to.
      */
-    function upgrade_path()
+    private function upgrade_path()
     {
         $this->update_to_version( '1.0.16' );
     }
@@ -69,7 +69,7 @@ class WPGH_Upgrade{
      * @param $version string
      * @return bool|string
      */
-    function convert_version_to_function( $version )
+    private function convert_version_to_function( $version )
     {
 
         $nums = explode( '.', $version );
@@ -83,7 +83,7 @@ class WPGH_Upgrade{
 
     }
 
-    function update_to_version( $version )
+    private function update_to_version( $version )
     {
         /**
          * Check if the version we want to update to is greater than that of the db_version

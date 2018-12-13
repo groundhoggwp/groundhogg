@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.16.1 =
+* FIXED Upgrader class causing 500 error in admin
+* TWEAKD MAX Ajax queue calls is 5 per page view to limit server load.
+* FIXED Form Shortcode calling class constructor with to many arguments.
+
 = 1.0.16 =
 * ADDED introduction of the Marketplace
 * ADDED user roles re auto converted to tags and applies to the contact so sending broadcasts to specific users becomes easier

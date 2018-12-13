@@ -21,9 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @return string
  */
-function wpgh_custom_form_shortcode( $atts, $content )
+function wpgh_custom_form_shortcode( $atts )
 {
-    $form = new WPGH_Form( $atts, $content );
+    $form = new WPGH_Form( $atts );
 
     return sprintf( "%s", $form );
 }
