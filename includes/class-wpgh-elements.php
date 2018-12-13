@@ -35,9 +35,10 @@ class WPGH_Elements
         $this->elements[] = new WPGH_Apply_Note();
         $this->elements[] = new WPGH_Apply_Tag();
         $this->elements[] = new WPGH_Remove_Tag();
-        $this->elements[] = new WPGH_Apply_Owner();
         $this->elements[] = new WPGH_Date_Timer();
+        $this->elements[] = new WPGH_Field_Timer();
         $this->elements[] = new WPGH_Delay_Timer();
+        $this->elements[] = new WPGH_Apply_Owner();
         $this->elements[] = new WPGH_Create_User();
         $this->elements[] = new WPGH_Edit_Meta();
         $this->elements[] = new WPGH_HTTP_Post();
@@ -71,6 +72,7 @@ class WPGH_Elements
         include_once $action_path . 'class-wpgh-apply-tag.php';
         include_once $action_path . 'class-wpgh-create-user.php';
         include_once $action_path . 'class-wpgh-date-timer.php';
+        include_once $action_path . 'class-wpgh-field-timer.php';
         include_once $action_path . 'class-wpgh-delay-timer.php';
         include_once $action_path . 'class-wpgh-edit-meta.php';
         include_once $action_path . 'class-wpgh-http-post.php';

@@ -546,51 +546,21 @@ class WPGH_Submission
 
         switch ( $preference ){
             case 'none':
-
                 if ( $contact->optin_status !== WPGH_CONFIRMED ){
                     /* If they already confirmed DON'T CHANGE IT! */
-                    $args = array( 'optin_status' => WPGH_UNCONFIRMED );
-                    $contact->update( $args );
-
-                    WPGH()->activity->add( array(
-                        'contact_id'    => $contact->ID,
-                        'funnel_id'     => WPGH()->tracking->get_funnel() ? WPGH()->tracking->get_funnel()->ID : WPGH_BROADCAST,
-                        'step_id'       => WPGH()->tracking->get_step() ? WPGH()->tracking->get_step()->ID : 0,
-                        'activity_type' => 'unsubscribed',
-                        'event_id'      => WPGH()->tracking->get_event() ? WPGH()->tracking->get_event()->ID : 0,
-                        'referer'       => $this->source
-
-                    ));
-
-                    do_action( 'wpgh_preference_none', $contact->ID );
+                    $contact->change_marketing_preference( WPGH_UNCONFIRMED );
                 }
 
                 break;
             case 'weekly':
-
-                $args = array( 'optin_status' => WPGH_WEEKLY );
-                $contact->update( $args );
-
-                do_action( 'wpgh_preference_weekly', $contact->ID );
-
+                $contact->change_marketing_preference( WPGH_WEEKLY );
                 break;
             case 'monthly':
-
-                $args = array( 'optin_status' => WPGH_MONTHLY );
-                $contact->update( $args );
-
-                do_action( 'wpgh_preference_monthly', $contact->ID );
-
+                $contact->change_marketing_preference( WPGH_MONTHLY );
                 break;
             case 'unsubscribe':
-
-                $args = array( 'optin_status' => WPGH_UNSUBSCRIBED );
-                $contact->update( $args );
-
+                $contact->unsubscribe();
                 $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
-
-                do_action( 'wpgh_preference_unsubscribe', $contact->ID );
-
                 wp_redirect( $unsub_page );
                 die();
 

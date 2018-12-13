@@ -511,6 +511,36 @@ class WPGH_Contact
 	}
 
     /**
+     * Change the marketing preferences of a contact.
+     *
+     * @param $preference
+     */
+	function change_marketing_preference( $preference )
+    {
+        if ( $preference === WPGH_UNSUBSCRIBED ){
+
+            $this->unsubscribe();
+
+        } else {
+
+            $this->update( array( 'optin_status' => $preference ) );
+
+        }
+
+        do_action( 'wpgh_contact_marketing_preference_updated', $this->ID, $preference );
+
+    }
+
+    /**
+     * Unsubscribe a contact
+     */
+	function unsubscribe()
+    {
+        $this->update( array( 'optin_status' => WPGH_UNSUBSCRIBED ) );
+        do_action( 'wpgh_contact_unsubscribed', $this->ID );
+    }
+
+    /**
      * Output a contact. Just give the email back
      *
      * @return string

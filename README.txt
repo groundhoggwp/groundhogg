@@ -113,6 +113,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED the standard create_contact_from_user function that can be used in multiple contexts...
 * ADDED upgrade class to handle updates
 * ADDED better API structure and authentication
+* ADDED API tab in settings area
+* ADDED Standardized method for updating email marketing preferences
+* ADDED Field timer for dynamic delay times.
 * FIXED Email block toolbar disappearing after save
 
 = 1.0.15.1 =
