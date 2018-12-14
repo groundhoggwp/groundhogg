@@ -24,6 +24,11 @@ var wpghContactEditor;
                 $('#meta-table').find( 'tbody' ).prepend( $newMeta );
 
             });
+
+
+            $( '.create-user-account' ).click( function () {
+                $( '#create-user-form' ).submit();
+            });
         }
     };
 

@@ -53,6 +53,9 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
     }
 }
 
+/* Auto link the account before we see the create account form. */
+$contact->auto_link_account();
+
 ?>
 
 <?php if ( ! empty( $contact->full_name) ):?>
@@ -90,9 +93,36 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
                 );
                 echo WPGH()->html->input( $args ); ?></td>
         </tr>
+        <?php if ( isset( $contact->user->user_login ) ): ?>
+
+            <tr>
+                <th><label for="username"><?php echo __( 'Username' )?></label></th>
+                <td><?php printf( "<a href='%s'>%s</a>", admin_url( 'user-edit.php?user_id=' . $contact->user->ID ), $contact->user->user_login ); ?></td>
+            </tr>
+
+        <?php endif; ?>
         <?php do_action( 'wpgh_contact_edit_name', $id ); ?>
         </tbody>
     </table>
+
+    <?php if ( ! $contact->user ): ?>
+
+    <h2><?php _e( 'Create User Account' ); ?></h2>
+    <table class="form-table">
+        <tr>
+            <th><label for="create_account"><?php echo __( 'Create New Account?', 'groundhogg' )?></label></th>
+            <td><button type="button" class="button button-secondary create-user-account"><?php _e( 'Create User Account' ); ?></button>
+            <p class="description"><?php _e('This contact does not have an associated user account? Would you like to create one?', 'groundhogg' ); ?></p></td>
+        </tr>
+        <tr>
+            <th><label for="link_existing"><?php echo __( 'Link Existing Account?', 'groundhogg' )?></label></th>
+            <td><?php wp_dropdown_users( array( 'show_option_none' => __( 'Select a User Account (optional)', 'groundhogg' ) ) ); ?>
+                <p class="description"><?php _e('You can link an existing user account to this contact.', 'groundhogg' ); ?></p>
+            </td>
+        </tr>
+
+    </table>
+    <?php endif; ?>
 
     <!-- GENERAL CONTACT INFO -->
     <h2><?php _e( 'Contact Info' ); ?></h2>
@@ -501,3 +531,12 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
         </p>
     </div>
 </form>
+<?php if ( ! $contact->user ): ?>
+<form id="create-user-form" action="<?php echo admin_url( 'user-new.php' ); ?>" method="post">
+    <input type="hidden" name="createuser" value="1">
+    <input type="hidden" name="first_name" value="<?php esc_attr_e( $contact->first_name ); ?>">
+    <input type="hidden" name="last_name" value="<?php esc_attr_e( $contact->last_name ); ?>">
+    <input type="hidden" name="email" value="<?php esc_attr_e( $contact->email ); ?>">
+    <input type="hidden" name="user_login" value="<?php esc_attr_e( $contact->email ); ?>">
+</form>
+<?php endif; ?>

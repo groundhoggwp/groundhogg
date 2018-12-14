@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.16.3=
+* ADDED Account Creation button in contact record if the contact does not have an associated user account.
+* TWEAKED API V2 Improvements in json responses
+* TWEAKED default method for hooking into the user_register hook that in turn triggers the Account Created benchmark
+
 = 1.0.16.2 =
 * FIXED Nested function loop
 

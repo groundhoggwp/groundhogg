@@ -1014,3 +1014,30 @@ function wpgh_apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_ro
 
 add_action( 'set_user_role', 'wpgh_apply_tags_to_contact_from_changed_roles', 10, 2, 3 );
 
+/**
+ * Provides a global hook not requireing the benchmark anymore.
+ *
+ * @param $userId int the Id of the user
+ */
+function wpgh_convert_user_to_contact_when_user_registered( $userId )
+{
+    $user = get_userdata( $userId );
+    $contact = wpgh_create_contact_from_user( $user );
+
+    if ( ! is_admin() ){
+
+        /* register front end which is technically an optin */
+        $contact->update_meta( 'last_optin', time() );
+
+    }
+
+    /**
+     * Provide hook for the Account Created benchmark and other functionality
+     *
+     * @param $user WP_User
+     * @param $contact WPGH_Contact
+     */
+    do_action( 'wpgh_user_created', $user, $contact );
+}
+
+add_action( 'user_register', 'wpgh_convert_user_to_contact_when_user_registered' );
