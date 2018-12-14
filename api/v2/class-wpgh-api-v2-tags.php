@@ -127,13 +127,6 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     public function create_tags(WP_REST_Request $request)
     {
 
-
-
-//
-//        foreach (){
-//            $id = WPGH()->tags->add( array( 'tag_name' => $name ) );
-//        }
-
         if ( ! user_can( $request['wpgh_user_id'], 'add_tags' ) ){
             return new WP_Error('error', __('you are not eligible to perform this operation.'));
         }
@@ -168,9 +161,13 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
 
             }
 
-            return rest_ensure_response(array(
-                'message' => $insert_count.' tags added successfully.'
-            ));
+            if ($insert_count > 0 ) {
+
+                return rest_ensure_response(array(
+                    'code' => 'success',
+                    'message' => $insert_count.' tags added successfully.'
+                ));
+            }
 
 
         } else {
@@ -198,7 +195,6 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
 
                     if(isset( $parameters['tags']['tag_name'] ) ){
 
-
                         $result  = WPGH()->tags->update( $parameters['tags']['tag_id'] , array(
                             'tag_name' => sanitize_text_field($parameters['tags']['tag_name']),
 
@@ -213,6 +209,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                     if($result){
 
                         return rest_ensure_response(array(
+                            'code' => 'success',
                             'message' => 'Tag updated successfully.'
                         ));
                     } else {
@@ -250,7 +247,10 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
             if ( !( WPGH()->tags->get_tag( $tag_id ) === false) ) {
 
                 if ( WPGH()->tags->delete($tag_id) ) {
-                    return rest_ensure_response(array('message' => 'tag deleted successfully.'));
+                    return rest_ensure_response(array(
+                        'code' => 'success',
+                        'message' => 'tag deleted successfully.'
+                    ));
                 } else {
                     return new WP_Error('error', __('Something went wrong'));
                 }

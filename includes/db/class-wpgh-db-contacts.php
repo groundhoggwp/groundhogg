@@ -353,11 +353,6 @@ class WPGH_DB_Contacts extends WPGH_DB  {
             unset( $args['user_id'] );
         }
 
-        if ( ! empty( $args['name'] ) ) {
-            $args['search'] = '***' . $args['name'] . '***';
-            unset( $args['name'] );
-        }
-
         if ( ! empty( $args['date'] ) ) {
             $date_query = array( 'relation' => 'AND' );
 
