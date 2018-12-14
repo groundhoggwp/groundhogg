@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.16.2 =
+* FIXED Nested function loop
+
 = 1.0.16.1 =
 * FIXED Upgrader class causing 500 error in admin
 * TWEAKD MAX Ajax queue calls is 5 per page view to limit server load.
