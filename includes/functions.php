@@ -236,17 +236,17 @@ function wpgh_encrypt_decrypt( $string, $action = 'e' ) {
     $encrypt_method = "AES-256-CBC";
 
     if ( ! wpgh_get_option( 'gh_secret_key', false ) )
-        update_option( 'gh_secret_key', wp_generate_password() );
+        update_option( 'gh_secret_key', bin2hex( openssl_random_pseudo_bytes( 32 ) ) );
 
     if ( ! wpgh_get_option( 'gh_secret_iv', false ) )
-        update_option( 'gh_secret_iv', wp_generate_password() );
+        update_option( 'gh_secret_iv', bin2hex( openssl_random_pseudo_bytes( 16 ) ) );
 
     if ( in_array( $encrypt_method, openssl_get_cipher_methods()) ){
-        $secret_key = wpgh_get_option( 'gh_secret_key' );
-        $secret_iv = wpgh_get_option( 'gh_secret_iv' );
+        $secret_key = hex2bin( wpgh_get_option( 'gh_secret_key' ) );
+        $secret_iv = hex2bin( wpgh_get_option( 'gh_secret_iv' ) );
 
         $output = false;
-        $key = hash( 'sha256', $secret_key );
+        $key = substr( hash( 'sha256', $secret_key ), 0, 32 );
         $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
 
         if( $action == 'e' ) {

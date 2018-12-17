@@ -616,9 +616,22 @@ class WPGH_Submission
         }
 
         if ( $this->contact ){
-            $mydir .= '/' . $this->contact->ID;
+
+            $mydir .= '/' . wpgh_encrypt_decrypt( $this->contact->email );
+
+        } else if ( isset( $_GET[ 'id' ] ) ) {
+
+            $id = intval( $_GET[ 'id' ] );
+
+            $contact = wpgh_get_contact( $id );
+
+            $mydir .= '/' . wpgh_encrypt_decrypt( $contact->email );
+
         } else {
-            $mydir .= '/admin';
+
+            $user = wp_get_current_user();
+            $mydir .= '/' . wpgh_encrypt_decrypt( $user->user_email );
+
         }
 
         $param['path'] = $param['basedir'] . $mydir;
