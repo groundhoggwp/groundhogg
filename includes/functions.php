@@ -243,8 +243,14 @@ function wpgh_encrypt_decrypt( $string, $action = 'e' ) {
 
     if ( in_array( $encrypt_method, openssl_get_cipher_methods()) ){
 
-        $secret_key = hex2bin( wpgh_get_option( 'gh_secret_key' ) );
-        $secret_iv = hex2bin( wpgh_get_option( 'gh_secret_iv' ) );
+        $secret_key = wpgh_get_option( 'gh_secret_key' );
+        $secret_iv = wpgh_get_option( 'gh_secret_iv' );
+
+        //backwards compat
+        if ( ctype_xdigit( $secret_key ) ){
+            $secret_key = hex2bin( $secret_key );
+            $secret_iv = hex2bin( $secret_iv );
+        }
 
         $output = false;
         $key = substr( hash( 'sha256', $secret_key ), 0, 32 );
