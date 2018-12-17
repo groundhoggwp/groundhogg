@@ -25,6 +25,8 @@ class WPGH_API_V2
 
         $this->contacts = new WPGH_API_V2_CONTACTS();
         $this->tags     = new WPGH_API_V2_TAGS();
+        $this->emails   = new WPGH_API_V2_EMAILS();
+
     }
 
     private function includes()
@@ -33,6 +35,7 @@ class WPGH_API_V2
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-base.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-contacts.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-tags.php';
+        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-emails.php';
 
     }
 

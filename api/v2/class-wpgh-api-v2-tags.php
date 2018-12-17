@@ -41,48 +41,40 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'tags_id' => array(
                         'required'    => false,
-                        'description' => 'The ID of tag you want to retrieve.',
+                        'description' => __( 'The ID of tag you want to retrieve.','groundhogg' ),
                     )
                 )
             ),
             array(
-                // By using this constant we ensure that when the WP_REST_Server changes, our create endpoints will work as intended.
                 'methods' => WP_REST_Server::CREATABLE,
-                // Here we register our callback. The callback is fired when this endpoint is matched by the WP_REST_Server class.
                 'callback' => array($this, 'create_tags'),
                 'permission_callback' => array($this, 'rest_authentication'),
                 'args'=> array(
                     'tags' => array(
                         'required'    => true,
-                        'description' => 'contains array of tags details user wants to create.',
+                        'description' => __('Contains array of tags which user wants to create.','groundhogg'),
                     )
                 )
-
             ),
-
             array(
-                // By using this constant we ensure that when the WP_REST_Server changes, our create endpoints will work as intended.
                 'methods' => WP_REST_Server::DELETABLE,
-                // Here we register our callback. The callback is fired when this endpoint is matched by the WP_REST_Server class.
                 'callback' => array($this, 'delete_tags'),
                 'permission_callback' => array($this, 'rest_authentication'),
                 'args'=> array(
                     'tag_id' => array(
                         'required'    => true,
-                        'description' => 'The ID of tag you want to delete.',
+                        'description' => __('The ID of tag you want to delete.','groundhogg'),
                     )
                 )
             ),
             array(
-                // By using this constant we ensure that when the WP_REST_Server changes, our create endpoints will work as intended.
                 'methods' => 'PUT, PATCH',
-                // Here we register our callback. The callback is fired when this endpoint is matched by the WP_REST_Server class.
                 'callback' => array($this, 'update_tags'),
                 'permission_callback' => array($this, 'rest_authentication'),
                 'args'=> array(
                     'tags' => array(
                         'required'    => true,
-                        'description' => 'contains array of tags details user wants to update with tag_id argument.',
+                        'description' => __('Contains array of tags which user wants to update with tag_id argument.','groundhogg'),
                     )
                 )
             ),
@@ -94,7 +86,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     public function get_tags(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'edit_tags' ) ){
-            return new WP_Error('error', __('you are not eligible to perform this operation.'));
+            return new WP_Error('error', __( 'You are not eligible to perform this operation.','groundhogg' ) );
         }
         $tag_id = null;
         $tags = null;
@@ -103,15 +95,15 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
             if ( !( WPGH()->tags->get_tag( $tag_id ) === false) ) {
                 $tags = WPGH()->tags->get_tag( $tag_id );
             } else {
-                return new WP_Error('error', __('no tag found with provided tag id.'), array('status' => 404));
+                return new WP_Error('error', __( 'No tag found with entered tag id.','groundhogg' ) );
             }
         } else {
             $tags = WPGH()->tags->get_tags();
         }
         if ( $tags != null ) {
-            return rest_ensure_response(array('tags' => $tags));
+            return rest_ensure_response( array( 'tags' => $tags ) );
         } else {
-            return new WP_Error('error', 'No tags found.');
+            return new WP_Error('error', __( 'No tags found.' ,'groundhogg') );
         }
     }
 
@@ -119,7 +111,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     public function create_tags(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'add_tags' ) ){
-            return new WP_Error('error', __('you are not eligible to perform this operation.'));
+            return new WP_Error('error', __('You are not eligible to perform this operation.', 'groundhogg' ) );
         }
         $parameters = $request->get_json_params();
         if ( isset ( $parameters['tags'] ) ) {
@@ -149,11 +141,11 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
             if ( $insert_count > 0 ) {
                 return rest_ensure_response(array(
                     'code' => 'success',
-                    'message' => $insert_count.' tags added successfully.'
+                    'message' => __( $insert_count.' tags added successfully.','groundhogg')
                 ));
             }
         } else {
-            return new WP_Error('error', __('Please enter tags.'));
+            return new WP_Error('error', __('Please enter tags.','groundhogg'));
         }
     }
 
@@ -161,7 +153,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     public function update_tags(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'edit_tags' ) ){
-            return new WP_Error('error', __('you are not eligible to perform this operation.'));
+            return new WP_Error('error', __('You are not eligible to perform this operation.' ,'groundhogg'));
         }
         $parameters = $request->get_json_params();
         if ( isset ( $parameters['tags'] ) ) {
@@ -180,19 +172,19 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                     if( $result ){
                         return rest_ensure_response(array(
                             'code' => 'success',
-                            'message' => 'Tag updated successfully.'
+                            'message' => __('Tag updated successfully.','groundhogg')
                         ));
                     } else {
-                        return new WP_Error('error', __('Something went wrong'));
+                        return new WP_Error('error', __('Something went wrong' , 'groundhogg' ));
                     }
                 } else {
-                    return new WP_Error('error', __('no tag found with provided tag id.'), array('status' => 404));
+                    return new WP_Error('error', __( 'No tag found with entered tag id.', 'groundhogg' ) );
                 }
             } else {
-                return new WP_Error('error', __('This operation needs tag_id argument.'));
+                return new WP_Error('error', __( 'This operation needs tag_id argument.','groundhogg' ) );
             }
         } else {
-            return new WP_Error('error', __('Please enter tag block to perform this operation.'), array('status' => 404));
+            return new WP_Error('error', __( 'Please enter tag block to perform this operation.' ,'groundhogg' ) );
         }
     }
 
@@ -200,7 +192,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     public function delete_tags( WP_REST_Request $request)
     {// function invoked if user wants to delete one contact
         if ( ! user_can( $request['wpgh_user_id'], 'delete_tags' ) ){
-            return new WP_Error('error', __('you are not eligible to perform this operation.'));
+            return new WP_Error('error', __( 'You are not eligible to perform this operation.','groundhogg' ) );
         }
         if( isset( $request['tag_id'] ) ) {
             $tag_id = intval( $request['tag_id'] );
@@ -209,17 +201,17 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                 if ( WPGH()->tags->delete( $tag_id ) ) {
                     return rest_ensure_response( array(
                         'code' => 'success',
-                        'message' => 'tag deleted successfully.'
+                        'message' => __('Tag deleted successfully.','groundhogg')
                     ));
                 } else {
-                    return new WP_Error('error', __('Something went wrong'));
+                    return new WP_Error('error', __('Something went wrong','groundhogg') );
                 }
             } else {
 
-                return new WP_Error('error', __('no tag found with provided tag id.'), array('status' => 404));
+                return new WP_Error('error', __('No tag found with entered tag id.','groundhogg') );
             }
         } else {
-            return new WP_Error('error', __('Please enter tag_id to perform this operation.'), array('status' => 404));
+            return new WP_Error('error', __('Please enter tag_id to perform this operation.' , 'groundhogg') );
         }
 
     }

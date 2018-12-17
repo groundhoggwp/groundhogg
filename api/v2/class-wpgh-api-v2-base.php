@@ -39,14 +39,14 @@ class WPGH_API_V2_BASE {
                     $request['wpgh_user_id'] = $user;
                     return  true;
                 } else {
-                    return new WP_Error( 'error','Invalid Authentication.'  );
+                    return new WP_Error( 'error',__( 'Invalid Authentication.' ,'groundhogg') );
                 }
             } else {
-                return new WP_Error( 'error','API key is not valid.',array('user' => $user) );
+                return new WP_Error( 'error',__( 'API key is not valid.','groundhogg') );
             }
 
         } else {
-            return new WP_Error( 'error','Please Enter Token and Key for API.' );
+            return new WP_Error( 'error',__( 'Please Enter Token and Key for API.' ,'groundhogg'));
         }
 
         return true;
