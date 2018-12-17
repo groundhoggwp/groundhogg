@@ -104,23 +104,63 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
         if ( ! user_can( $request['wpgh_user_id'], 'view_contacts' ) ){
             return new WP_Error('error', __('you are not eligible to perform this operation.'));
         }
+
         $returncontact = array();
         // method to get contact from  GroundHogg
-        $contact_id = null;
+
+        $search_args = array();
+
         if (isset ($request['contact_id'])) {
-            $contact_id = $request['contact_id'];
+            $search_args[ 'ID' ] = intval( $request['contact_id'] );
         }
 
-        $contacts = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
+        if (isset ($request['email'])) {
+            $search_args[ 'email' ] = sanitize_email( $request['email'] );
+        }
+
+        if (isset ($request['first_name'])) {
+            $search_args[ 'first_name' ] = sanitize_text_field( $request['first_name'] );
+        }
+
+        if (isset ($request['last_name'])) {
+            $search_args[ 'last_name' ] = sanitize_text_field( $request['last_name'] );
+        }
+
+        if (isset ($request['optin_status'])) {
+            $search_args[ 'optin_status' ] = intval( $request['optin_status'] );
+        }
+
+        if (isset ($request['owner'])) {
+            $search_args[ 'owner' ] = intval( $request['owner'] );
+        }
+
+        if (isset ($request['user_id'])) {
+            $search_args[ 'user_id' ] = intval( $request['user_id'] );
+        }
+
+        if ( isset( $request[ 'query' ] ) ){
+            $search_args = $request[ 'query' ];
+        }
+
+        $contacts = WPGH()->contacts->get_contacts( $search_args );
+
         if (count($contacts) > 0) {
 
             foreach ($contacts as $contact) {
                 $contact_meta = WPGH()->contact_meta->get_meta($contact->ID);
-                $returncontact[] = array(
-                    'contact' => $contact,
-                    'contact_meta' => $contact_meta
-                );
 
+                foreach ( $contact_meta as $key => $value ){
+                    $contact_meta[ $key ] = array_pop( $value );
+                }
+
+                $contact->contact_meta = $contact_meta;
+                $returncontact[] = array(
+                    'contact' => $contact
+                );
+            }
+
+            if ( count( $returncontact ) === 1 ){
+                $returncontact = array_pop( $returncontact );
             }
             return rest_ensure_response($returncontact);
 
@@ -170,6 +210,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                 }
             }
             return rest_ensure_response(array(
+                'code' => 'success',
                 'message' => __('Contact Added successfully.'),
                 'contact_id' => $contact_id
             ));
@@ -199,7 +240,10 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                         $contact = wpgh_get_contact( $parameters['apply_tags']['contact_id']);
                         $result = $contact->add_tag( $parameters['apply_tags']['tags'] );
                         if ( $result ) {
-                            return rest_ensure_response(array('message' => 'tag(s) applied successfully.'));
+                            return rest_ensure_response(array(
+                                'code' => 'success',
+                                'message' => 'tag(s) applied successfully.'
+                            ));
                         } else {
                             return new WP_Error('error', __('something went wrong!'));
                         }
@@ -223,7 +267,10 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                         $contact = wpgh_get_contact( $parameters['remove_tags']['contact_id']);
                         $result = $contact->remove_tag( $parameters['remove_tags']['tags'] );
                         if ( $result ) {
-                            return rest_ensure_response(array('message' => 'tag(s) remove successfully.'));
+                            return rest_ensure_response(array(
+                                'code' => 'success',
+                                'message' => 'tag(s) removed successfully.'
+                            ));
                         } else {
                             return new WP_Error('error', __('something went wrong!'));
                         }
@@ -253,11 +300,13 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
 
                     unset($parameters['contact']['email']);
                 }
+                $update = 0 ;
 
                 if (isset($parameters['contact']['contact_meta'])) {// update meta
                     //$data_meta = $data->meta;
                     foreach ($parameters['contact']['contact_meta'] as $key => $value) {
                         WPGH()->contact_meta->update_meta($contact_id, sanitize_key($key), sanitize_text_field($value));
+                        $update++;
                     }
                     unset($parameters['contact']['contact_meta']);
                 }
@@ -271,7 +320,11 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                 if (count($data_array) > 0) {
                     // update data only if there is a data
                     WPGH()->contacts->update($contact_id, $data_array);
+                    $update++;
+                }
+                if($update > 0) {
                     return rest_ensure_response(array(
+                        'code' => 'success',
                         'message' => 'Contact Updated successfully.'
                     ));
                 }
@@ -298,7 +351,10 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
             // ----------- code to delete contact
             if (WPGH()->contacts->count(array('ID' => $contact_id)) > 0) {
                 if (WPGH()->contacts->delete(array('ID' => $contact_id))) {
-                    return rest_ensure_response(array('message' => 'contact deleted successfully.'));
+                    return rest_ensure_response(array(
+                        'code' => 'success',
+                        'message' => 'contact deleted successfully.'
+                    ));
                 } else {
                     return new WP_Error('error', __('Something went wrong'));
                 }

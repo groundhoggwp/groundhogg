@@ -248,6 +248,8 @@ class WPGH_Contact_Query {
             'activity'      => false,
             'email'         => '',
             'search'        => '',
+            'first_name'    => '',
+            'last_name'     => '',
             'search_columns'    => array(),
             'meta_key'      => '',
             'meta_value'    => '',
@@ -657,11 +659,20 @@ class WPGH_Contact_Query {
             if ( ! empty( $this->query_vars['search_columns'] ) ) {
                 $search_columns = array_map( 'sanitize_key', (array) $this->query_vars['search_columns'] );
             } else {
-                $search_columns = array( 'first_name' );
+                $search_columns = array( 'first_name', 'last_name', 'email' );
             }
 
             $where['search'] = $this->get_search_sql( $this->query_vars['search'], $search_columns );
         }
+
+        if ( strlen( $this->query_vars['first_name'] ) ){
+            $where['first_name'] = $this->get_search_sql( $this->query_vars['first_name'], array( 'first_name' ) );
+        }
+
+        if ( strlen( $this->query_vars['last_name'] ) ){
+            $where['last_name'] = $this->get_search_sql( $this->query_vars['last_name'], array( 'last_name' ) );
+        }
+
 
         if ( $this->date_query ) {
             $where['date_query'] = preg_replace( '/^\s*AND\s*/', '', $this->date_query->get_sql() );
