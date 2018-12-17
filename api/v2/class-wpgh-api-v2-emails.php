@@ -110,7 +110,7 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
             if( $status ) {
                 return rest_ensure_response(array(
                     'code' => 'success',
-                    'message' => __( 'Email sent successfully to %s.', 'groundhogg' )
+                    'message' => __( 'Email sent successfully to contact.', 'groundhogg' )
                 ));
             } else {
                 return new WP_Error('error', __('Email not sent.', 'groundhogg' ));
