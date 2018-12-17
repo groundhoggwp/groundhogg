@@ -48,7 +48,7 @@ class WPGH_Account_Created extends WPGH_Funnel_Step
 
         parent::__construct();
 
-        add_action( 'user_register', array( $this, 'complete' ) );
+        add_action( 'wpgh_user_created', array( $this, 'complete' ), 10, 2 );
     }
 
     /**
@@ -98,19 +98,11 @@ class WPGH_Account_Created extends WPGH_Funnel_Step
     /**
      * Whenever a form is filled complete the benchmark.
      *
-     * @param $userId
+     * @param $user WP_User
+     * @param $contact WPGH_Contact
      */
-    public function complete( $userId )
+    public function complete( $user, $contact )
     {
-        $user = get_userdata( $userId );
-        $contact = wpgh_create_contact_from_user( $user );
-
-        if ( ! is_admin() ){
-
-            /* register front end which is technically an optin */
-            $contact->update_meta( 'last_optin', time() );
-
-        }
 
         $steps = WPGH()->steps->get_steps( array( 'step_type' => $this->type, 'step_group' => $this->group ) );
 

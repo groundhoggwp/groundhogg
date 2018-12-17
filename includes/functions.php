@@ -236,17 +236,24 @@ function wpgh_encrypt_decrypt( $string, $action = 'e' ) {
     $encrypt_method = "AES-256-CBC";
 
     if ( ! wpgh_get_option( 'gh_secret_key', false ) )
-        update_option( 'gh_secret_key', wp_generate_password() );
+        update_option( 'gh_secret_key', bin2hex( openssl_random_pseudo_bytes( 32 ) ) );
 
     if ( ! wpgh_get_option( 'gh_secret_iv', false ) )
-        update_option( 'gh_secret_iv', wp_generate_password() );
+        update_option( 'gh_secret_iv', bin2hex( openssl_random_pseudo_bytes( 16 ) ) );
 
     if ( in_array( $encrypt_method, openssl_get_cipher_methods()) ){
+
         $secret_key = wpgh_get_option( 'gh_secret_key' );
         $secret_iv = wpgh_get_option( 'gh_secret_iv' );
 
+        //backwards compat
+        if ( ctype_xdigit( $secret_key ) ){
+            $secret_key = hex2bin( $secret_key );
+            $secret_iv = hex2bin( $secret_iv );
+        }
+
         $output = false;
-        $key = hash( 'sha256', $secret_key );
+        $key = substr( hash( 'sha256', $secret_key ), 0, 32 );
         $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
 
         if( $action == 'e' ) {
@@ -1013,4 +1020,32 @@ function wpgh_apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_ro
 }
 
 add_action( 'set_user_role', 'wpgh_apply_tags_to_contact_from_changed_roles', 10, 2, 3 );
+
+/**
+ * Provides a global hook not requireing the benchmark anymore.
+ *
+ * @param $userId int the Id of the user
+ */
+function wpgh_convert_user_to_contact_when_user_registered( $userId )
+{
+    $user = get_userdata( $userId );
+    $contact = wpgh_create_contact_from_user( $user );
+
+    if ( ! is_admin() ){
+
+        /* register front end which is technically an optin */
+        $contact->update_meta( 'last_optin', time() );
+
+    }
+
+    /**
+     * Provide hook for the Account Created benchmark and other functionality
+     *
+     * @param $user WP_User
+     * @param $contact WPGH_Contact
+     */
+    do_action( 'wpgh_user_created', $user, $contact );
+}
+
+add_action( 'user_register', 'wpgh_convert_user_to_contact_when_user_registered' );
 

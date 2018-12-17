@@ -53,6 +53,9 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
     }
 }
 
+/* Auto link the account before we see the create account form. */
+$contact->auto_link_account();
+
 ?>
 
 <?php if ( ! empty( $contact->full_name) ):?>
@@ -64,7 +67,7 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
 <!--/ Title -->
 <?php endif; ?>
 
-<form method="post" class="">
+<form method="post" class="" enctype="multipart/form-data">
     <?php wp_nonce_field( 'edit', '_edit_contact_nonce' ); ?>
 
     <!-- GENERAL NAME INFO -->
@@ -90,9 +93,36 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
                 );
                 echo WPGH()->html->input( $args ); ?></td>
         </tr>
+        <?php if ( isset( $contact->user->user_login ) ): ?>
+
+            <tr>
+                <th><label for="username"><?php echo __( 'Username' )?></label></th>
+                <td><?php printf( "<a href='%s'>%s</a>", admin_url( 'user-edit.php?user_id=' . $contact->user->ID ), $contact->user->user_login ); ?></td>
+            </tr>
+
+        <?php endif; ?>
         <?php do_action( 'wpgh_contact_edit_name', $id ); ?>
         </tbody>
     </table>
+
+    <?php if ( ! $contact->user ): ?>
+
+    <h2><?php _e( 'Create User Account' ); ?></h2>
+    <table class="form-table">
+        <tr>
+            <th><label for="create_account"><?php echo __( 'Create New Account?', 'groundhogg' )?></label></th>
+            <td><button type="button" class="button button-secondary create-user-account"><?php _e( 'Create User Account' ); ?></button>
+            <p class="description"><?php _e('This contact does not have an associated user account? Would you like to create one?', 'groundhogg' ); ?></p></td>
+        </tr>
+        <tr>
+            <th><label for="link_existing"><?php echo __( 'Link Existing Account?', 'groundhogg' )?></label></th>
+            <td><?php wp_dropdown_users( array( 'show_option_none' => __( 'Select a User Account (optional)', 'groundhogg' ) ) ); ?>
+                <p class="description"><?php _e('You can link an existing user account to this contact.', 'groundhogg' ); ?></p>
+            </td>
+        </tr>
+
+    </table>
+    <?php endif; ?>
 
     <!-- GENERAL CONTACT INFO -->
     <h2><?php _e( 'Contact Info' ); ?></h2>
@@ -350,6 +380,65 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
         </tr>
     </table>
 
+    <!-- BEGIN FILES -->
+    <h2><?php _e( 'Files' ); ?></h2>
+    <div style="max-width: 800px;">
+        <table class="wp-list-table widefat fixed striped files">
+            <thead>
+            <tr>
+                <th><?php _e( 'Name', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Size', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Type', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Replacement Code', 'groundhogg' ); ?></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php
+
+            $files = $contact->get_meta( 'files' );
+
+            if ( empty( $files ) ):
+                ?>
+                <tr><td colspan="4"><?php _e( 'This contact has no files...', 'groundhogg' ); ?></td></tr>
+            <?php
+            else:
+
+                foreach ($files as $key => $item ):
+
+                    if ( ! isset( $item[ 'file' ] ) ){
+                        continue;
+                    }
+
+                    $info = pathinfo( $item[ 'file' ] );
+                    ?>
+                    <tr>
+                        <td><?php printf( "<a href='%s' target='_blank'>%s</a>", $item[ 'url' ], esc_html( $info[ 'basename' ] ) ); ?></td>
+                        <td><?php esc_html_e( size_format( filesize( $item[ 'file' ] ) ) ); ?></td>
+                        <td><?php esc_html_e( $info[ 'extension' ] ); ?></td>
+                        <td><?php esc_html_e( '{files.' . $key . '}' ); ?></td>
+                    </tr>
+                <?php
+                endforeach;
+            endif;
+            ?>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th><?php _e( 'Name', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Size', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Type', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Replacement Code', 'groundhogg' ); ?></th>
+            </tr>
+            </tfoot>
+        </table>
+        <div>
+            <p class="description"><?php _e( 'Upload files: ' ); ?><input type="file" name="files[]" multiple></p>
+        </div>
+    </div>
+    <!-- END FILES -->
+
+    <?php do_action( 'wpgh_contact_edit_before_meta', $id ); ?>
+
     <!-- META -->
     <h2><?php _e( 'Custom Meta' ); ?></h2>
     <table class="form-table" >
@@ -403,7 +492,8 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
                 'postal_zip',
                 'region',
                 'country',
-                'notes'
+                'notes',
+                'files'
             ) );
 
             $meta = WPGH()->contact_meta->get_meta( $contact->ID );
@@ -501,3 +591,12 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
         </p>
     </div>
 </form>
+<?php if ( ! $contact->user ): ?>
+<form id="create-user-form" action="<?php echo admin_url( 'user-new.php' ); ?>" method="post">
+    <input type="hidden" name="createuser" value="1">
+    <input type="hidden" name="first_name" value="<?php esc_attr_e( $contact->first_name ); ?>">
+    <input type="hidden" name="last_name" value="<?php esc_attr_e( $contact->last_name ); ?>">
+    <input type="hidden" name="email" value="<?php esc_attr_e( $contact->email ); ?>">
+    <input type="hidden" name="user_login" value="<?php esc_attr_e( $contact->email ); ?>">
+</form>
+<?php endif; ?>

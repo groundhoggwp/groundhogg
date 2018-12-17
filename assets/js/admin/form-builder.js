@@ -7,6 +7,7 @@ var wpghFormBuilder;
         activeEditor: null,
         active: false,
         currentType: null,
+        types: {},
 
         init: function () {
 
@@ -30,6 +31,32 @@ var wpghFormBuilder;
                 $(this).val( wpghFormBuilder.sanitizeKey( $(this).val() ) );
             });
 
+            this.initTypes();
+
+        },
+
+        initTypes: function()
+        {
+            this.types.first        = ['required','label','placeholder','id','class'];
+            this.types.last         = ['required','label','placeholder','id','class'];
+            this.types.email        = ['required','label','placeholder','id','class'];
+            this.types.phone        = ['required','label','placeholder','id','class'];
+            this.types.gdpr         = ['label','id','class'];
+            this.types.terms        = ['label','id','class'];
+            this.types.recaptcha    = ['captcha-theme','captcha-size','id','class'];
+            this.types.submit       = ['text','id','class'];
+            this.types.text         = ['required','label','placeholder','name','id','class'];
+            this.types.extarea      = ['required','label','placeholder','name','id','class'];
+            this.types.number       = ['required','label','name','min','max','id','class'];
+            this.types.dropdown     = ['required','label','name','default','options','multiple','id','class'];
+            this.types.radio        = ['required','label','name','options','id','class'];
+            this.types.checkbox     = ['required','label','name','value','id','class'];
+            this.types.address      = ['required','label','id','class'];
+            this.types.row          = ['id','class'];
+            this.types.col          = ['width','id','class'];
+            this.types.date         = ['required','label','name','min-date','max-date','id','class'];
+            this.types.time         = ['required','label','name','min-time','max-time','id','class'];
+            this.types.file         = ['required','label','name','max-upload-size','file-types','id','class'];
         },
 
         sanitizeKey: function( key )
@@ -48,164 +75,9 @@ var wpghFormBuilder;
             wpghModal.args.preventSave = true;
             this.active = true;
 
-            var type = button.className.split(' ')[2];
-            this.currentType = type;
+            this.currentType = button.className.split(' ')[2];
 
-            var code;
-            var fields = [];
-
-            switch (type) {
-                case 'first':
-                    fields = [
-                        'required',
-                        'label',
-                        'placeholder',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'last':
-                    fields = [
-                        'required',
-                        'label',
-                        'placeholder',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'email':
-                    fields = [
-                        'required',
-                        'label',
-                        'placeholder',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'phone':
-                    fields = [
-                        'required',
-                        'label',
-                        'placeholder',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'gdpr':
-                    fields = [
-                        'label',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'terms':
-                    fields = [
-                        'label',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'recaptcha':
-                    fields = [
-                        'captcha-theme',
-                        'captcha-size',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'submit':
-                    fields = [
-                        'text',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'text':
-                    fields = [
-                        'required',
-                        'label',
-                        'placeholder',
-                        'name',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'textarea':
-                    fields = [
-                        'required',
-                        'label',
-                        'placeholder',
-                        'name',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'number':
-                    fields = [
-                        'required',
-                        'label',
-                        'name',
-                        'min',
-                        'max',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'dropdown':
-                    fields = [
-                        'required',
-                        'label',
-                        'name',
-                        'default',
-                        'options',
-                        'multiple',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'radio':
-                    fields = [
-                        'required',
-                        'label',
-                        'name',
-                        'options',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'checkbox':
-                    fields = [
-                        'required',
-                        'label',
-                        'name',
-                        'value',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'address':
-                    fields = [
-                        'required',
-                        'label',
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'row':
-                    fields = [
-                        'id',
-                        'class'
-                    ];
-                    break;
-                case 'col':
-                    fields = [
-                        'width',
-                        'id',
-                        'class'
-                    ];
-                    break;
-            }
-
+            var fields = this.types[ this.currentType ];
             this.hideFields();
             this.showFields( fields );
 

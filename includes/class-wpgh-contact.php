@@ -70,6 +70,13 @@ class WPGH_Contact
 	public $owner;
 
     /**
+     * The associated user account
+     *
+     * @var WP_USER
+     */
+	public $user;
+
+    /**
      * The contact notes
      *
      * @var string
@@ -157,6 +164,11 @@ class WPGH_Contact
                 case 'owner_id':
 
                     $this->owner = get_userdata( $contact->owner_id );
+
+                    break;
+                case 'user_id':
+
+                    $this->user = get_userdata( $contact->user_id );
 
                     break;
                 case 'date_created':
@@ -538,6 +550,29 @@ class WPGH_Contact
     {
         $this->update( array( 'optin_status' => WPGH_UNSUBSCRIBED ) );
         do_action( 'wpgh_contact_unsubscribed', $this->ID );
+    }
+
+    /**
+     * This will find a WP account with the same email and update the user_id accordingly
+     *
+     * @return bool true if we found a relevant user account, false otherwise.
+     */
+    function auto_link_account()
+    {
+
+        if ( $this->user ){
+            return true;
+        }
+
+        $user = get_user_by( 'email', $this->email );
+
+        if ( $user ){
+            $this->update( array( 'user_id', $user->ID ) );
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

@@ -234,86 +234,82 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                                 array(
                                     'text' => __( 'Last' ),
                                     'class' => 'button button-secondary last'
-
                                 ),
                                 array(
                                     'text' => __( 'Email' ),
                                     'class' => 'button button-secondary email'
-
                                 ),
                                 array(
                                     'text' => __( 'Phone' ),
                                     'class' => 'button button-secondary phone'
-
-                                ),
-                                array(
-                                    'text' => __( 'GDPR' ),
-                                    'class' => 'button button-secondary gdpr'
-
-                                ),
-                                array(
-                                    'text' => __( 'Terms' ),
-                                    'class' => 'button button-secondary terms'
-
-                                ),
-                                array(
-                                    'text' => __( 'ReCaptcha' ),
-                                    'class' => 'button button-secondary recaptcha'
-
-                                ),
-                                array(
-                                    'text' => __( 'Submit' ),
-                                    'class' => 'button button-secondary submit'
-
-                                ),
-                                array(
-                                    'text' => __( 'Text' ),
-                                    'class' => 'button button-secondary text'
-
-                                ),
-                                array(
-                                    'text' => __( 'Textarea' ),
-                                    'class' => 'button button-secondary textarea'
-
-                                ),
-                                array(
-                                    'text' => __( 'Number' ),
-                                    'class' => 'button button-secondary number'
-
-                                ),
-                                array(
-                                    'text' => __( 'Dropdown' ),
-                                    'class' => 'button button-secondary dropdown'
-
-                                ),
-                                array(
-                                    'text' => __( 'Radio' ),
-                                    'class' => 'button button-secondary radio'
-
-                                ),
-                                array(
-                                    'text' => __( 'Checkbox' ),
-                                    'class' => 'button button-secondary checkbox'
-
                                 ),
                                 array(
                                     'text' => __( 'Address' ),
                                     'class' => 'button button-secondary address'
-
                                 ),
-
-	                            array(
-		                            'text' => __( 'Row' ),
-		                            'class' => 'button button-secondary row'
-
-	                            ),
-
-	                            array(
-		                            'text' => __( 'Col' ),
-		                            'class' => 'button button-secondary col'
-
-	                            ),
+                                array(
+                                    'text' => __( 'Submit' ),
+                                    'class' => 'button button-secondary submit'
+                                ),
+                                array(
+                                    'text' => __( 'Row' ),
+                                    'class' => 'button button-secondary row'
+                                ),
+                                array(
+                                    'text' => __( 'Col' ),
+                                    'class' => 'button button-secondary col'
+                                ),
+                                array(
+                                    'text' => __( 'ReCaptcha' ),
+                                    'class' => 'button button-secondary recaptcha'
+                                ),
+                                array(
+                                    'text' => __( 'GDPR' ),
+                                    'class' => 'button button-secondary gdpr'
+                                ),
+                                array(
+                                    'text' => __( 'Terms' ),
+                                    'class' => 'button button-secondary terms'
+                                ),
+                                array(
+                                    'text' => __( 'Text' ),
+                                    'class' => 'button button-secondary text'
+                                ),
+                                array(
+                                    'text' => __( 'Textarea' ),
+                                    'class' => 'button button-secondary textarea'
+                                ),
+                                array(
+                                    'text' => __( 'Number' ),
+                                    'class' => 'button button-secondary number'
+                                ),
+                                array(
+                                    'text' => __( 'Dropdown' ),
+                                    'class' => 'button button-secondary dropdown'
+                                ),
+                                array(
+                                    'text' => __( 'Radio' ),
+                                    'class' => 'button button-secondary radio'
+                                ),
+                                array(
+                                    'text' => __( 'Checkbox' ),
+                                    'class' => 'button button-secondary checkbox'
+                                ),
+                                array(
+                                    'text' => __( 'Date' ),
+                                    'class' => 'button button-secondary date'
+                                ),
+                                array(
+                                    'text' => __( 'Time' ),
+                                    'class' => 'button button-secondary time'
+                                ),
+                                array(
+                                    'text' => __( 'File' ),
+                                    'class' => 'button button-secondary file'
+                                ),
                             );
+
+                            $buttons = apply_filters( 'wpgh_form_builder_buttons', $buttons );
 
                             foreach ( $buttons as $button ){
 
@@ -388,6 +384,8 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                             echo WPGH()->html->input( array( 'id' => 'field-name', 'name' => 'name' ) );
                             ?><p class="description"><?php _e( 'This will be the custom field name. I.E. {meta.name}' ) ?></p></td>
                     </tr>
+
+                    <!--BEGIN NUMBER OPTIONS -->
                     <tr id="gh-field-min">
                         <th><?php _e( 'Min', 'groundhogg' ) ?></th>
                         <td><?php
@@ -400,12 +398,15 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                             echo WPGH()->html->number( array( 'id' => 'field-max', 'name' => 'max', 'class' => 'input' ) );
                             ?><p class="description"><?php _e( 'The max number a user can enter.' ); ?></p></td>
                     </tr>
+                    <!-- END NUMBER OPTIONS -->
+
                     <tr id="gh-field-value">
                         <th><?php _e( 'Value', 'groundhogg' ) ?></th>
                         <td><?php
                             echo WPGH()->html->input( array( 'id' => 'field-value', 'name' => 'value' ) );
                             ?><p class="description"><?php _e( 'The default value of the field.' ); ?></p></td>
                     </tr>
+
                     <tr id="gh-field-options">
                         <th><?php _e( 'Options', 'groundhogg' ) ?></th>
                         <td><?php
@@ -424,6 +425,8 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                             echo WPGH()->html->input( array( 'id' => 'field-default', 'name' => 'default', 'cols' => 50, 'rows' => '5' ) );
                             ?><p class="description"><?php _e( 'The blank option which appears at the top of the list.' ) ?></p></td>
                     </tr>
+
+                    <!-- BEGIN COLUMN OPTIONS -->
                     <tr id="gh-field-width">
                         <th><?php _e( 'Width', 'groundhogg' ) ?></th>
                         <td><?php
@@ -440,6 +443,9 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                                 ) ) );
                             ?><p class="description"><?php _e( 'The width of the column.' ); ?></p></td>
                     </tr>
+                    <!-- END COLUMN OPTIONS -->
+
+                    <!-- BEGIN CAPTCHA OPTIONS -->
                     <tr id="gh-field-captcha-theme">
                         <th><?php _e( 'Theme', 'groundhogg' ) ?></th>
                         <td><?php
@@ -458,6 +464,58 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                                 ) ) );
                             ?><p class="description"><?php _e( 'The Captcha Size.' ) ?></p></td>
                     </tr>
+                    <!-- END CAPTCHA OPTIONS -->
+
+                    <!-- BEGIN DATE OPTIONS -->
+                    <tr id="gh-field-min-date">
+                        <th><?php _e( 'Min Date', 'groundhogg' ) ?></th>
+                        <td><?php
+                            echo WPGH()->html->input( array( 'type' => 'date', 'id' => 'field-date-min', 'name' => 'min_date', 'placeholder' => __( 'YYY-MM-DD or +3 days or -1 days' ) ) );
+                            ?><p class="description"><?php _e( 'The minimum date a user can enter. You can enter a dynamic date or static date.' ) ?></p></td>
+                    </tr>
+                    <tr id="gh-field-max-date">
+                        <th><?php _e( 'Max Date', 'groundhogg' ) ?></th>
+                        <td><?php
+                            echo WPGH()->html->input( array( 'type' => 'date', 'id' => 'field-date-max', 'name' => 'max_date', 'placeholder' => __( 'YYY-MM-DD or +3 days or -1 days' ) ) );
+                            ?><p class="description"><?php _e( 'The maximum date a user can enter. You can enter a dynamic date or static date.' ) ?></p></td>
+                    </tr>
+                    <!-- END DATE OPTIONS -->
+
+                    <!-- BEGIN TIME OPTIONS -->
+                    <tr id="gh-field-min-time">
+                        <th><?php _e( 'Min Time', 'groundhogg' ) ?></th>
+                        <td><?php
+                            echo WPGH()->html->input( array( 'type' => 'time', 'id' => 'field-time-min', 'name' => 'min_time', 'placeholder' => __( 'YYY-MM-DD or +3 days or -1 days' ) ) );
+                            ?><p class="description"><?php _e( 'The minimum time a user can enter. You can enter a dynamic time or static time.' ) ?></p></td>
+                    </tr>
+                    <tr id="gh-field-max-time">
+                        <th><?php _e( 'Max Time', 'groundhogg' ) ?></th>
+                        <td><?php
+                            echo WPGH()->html->input( array( 'type' => 'time', 'id' => 'field-time-max', 'name' => 'max_time', 'placeholder' => __( 'YYY-MM-DD or +3 days or -1 days' ) ) );
+                            ?><p class="description"><?php _e( 'The maximum time a user can enter. You can enter a dynamic time or static time.' ) ?></p></td>
+                    </tr>
+                    <!-- END TIME OPTIONS -->
+
+                    <!-- BEGIN FILE OPTIONS -->
+                    <tr id="gh-field-max-upload-size">
+                        <th><?php _e( 'Max File Size', 'groundhogg' ) ?></th>
+                        <td><?php
+                            echo WPGH()->html->number( array( 'id' => 'max-upload-size', 'name' => 'max_file_size', 'placeholder' => '1000000', 'min' => 0, 'max' => wp_max_upload_size() * 1000000 ) );
+                            ?><p class="description"><?php _e( 'Maximum size a file can be <b>in Bytes</b>. Your max upload size is ' . wp_max_upload_size() . ' Bytes.' ) ?></p></td>
+                    </tr>
+                    <tr id="gh-field-file-types">
+                        <th><?php _e( 'Accepted File Types', 'groundhogg' ) ?></th>
+                        <td><?php
+                            echo WPGH()->html->input( array( 'id' => 'field-file-types', 'name' => 'file_types', 'placeholder' => __( '.pdf,.txt,.doc,.docx' ) ) );
+                            ?><p class="description"><?php _e( 'The types of files a user may upload (comma separated).' ) ?></p></td>
+                    </tr>
+                    <!-- END FILE OPTIONS -->
+
+                    <!-- BEGIN EXTENSION PLUGIN CUSTOM OPTIONS -->
+                    <?php do_action(  'wpgh_extra_form_settings' ); ?>
+                    <!-- END EXTENSION PLUGIN CUSTOM OPTIONS -->
+
+                    <!-- BEGIN CSS OPTIONS -->
                     <tr id="gh-field-id">
                         <th><?php _e( 'CSS ID', 'groundhogg' ) ?></th>
                         <td><?php
@@ -470,6 +528,8 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                             echo WPGH()->html->input( array( 'id' => 'field-class', 'name' => 'class' ) );
                             ?><p class="description"><?php _e( 'Use to apply CSS.' ) ?></p></td>
                     </tr>
+                    <!-- END CSS OPTIONS -->
+
                     </tbody>
                 </table>
             </form>

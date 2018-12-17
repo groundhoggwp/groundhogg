@@ -148,6 +148,11 @@ class WPGH_Replacements
                 'description' => __( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'groundhogg' ),
             ),
             array(
+                'code'        => 'files',
+                'callback'    => 'wpgh_replacement_files',
+                'description' => __( 'Insert a download link for a file. Usage {files.key}. Example: {files.custom_files}. Do find the key for a file see the contact record and copy the relevant replacement code.', 'groundhogg' ),
+            ),
+            array(
                 'code'        => 'groundhogg_day_quote',
                 'callback'    => 'wpgh_get_random_groundhogday_quote',
                 'description' => __( 'Inserts a random quote from the movie Groundhogg Day featuring Bill Murray', 'groundhogg' ),
@@ -635,6 +640,71 @@ function wpgh_replacement_business_address()
     $address = implode( ', ', $address );
 
     return $address;
+}
+
+/**
+ * Get a file download link from a contact record.
+ *
+ * @param $key string|int the key for the file
+ * @param $contact_id int
+ *
+ * @return string
+ */
+function wpgh_replacement_files( $key = '', $contact_id = null )
+{
+
+    /**
+     * IF the key was not passed than the key will be gthe contact ID so we check if the contact_id is the code or null.
+     */
+    if ( ! $contact_id || WPGH()->replacements->has_replacement( $contact_id ) ){
+        $contact_id = intval( $key );
+        $key = false;
+    } else {
+
+        $key = is_numeric( $key ) ? intval( $key ) : sanitize_key( $key );
+
+    }
+
+    $contact = wpgh_get_contact( $contact_id );
+
+    $files = $contact->get_meta( 'files' );
+
+    if ( ! $files || ! is_array( $files ) ){
+        return __( 'No files found.', 'groundhogg' );
+    }
+
+    /*Return all files*/
+    if ( ! $key ){
+
+        $html = '';
+
+        foreach ( $files as $i => $file ){
+
+            $info = pathinfo( $file[ 'file' ] );
+
+            if ( ! file_exists( $file[ 'file' ] ) ){
+                continue;
+            }
+
+            $html .= sprintf( '<li><a href="%s">%s</a></li>', $file[ 'url' ] , esc_html( $info[ 'basename' ] ) );
+        }
+
+        return sprintf( '<ul>%s</ul>', $html );
+
+        /* Return 1 file */
+    } else if ( isset( $files[ $key ] ) ) {
+        $file = $files[ $key ];
+        $info = pathinfo( $file[ 'file' ] );
+
+        if ( ! file_exists( $file[ 'file' ] ) ){
+            return __( 'No files found.', 'groundhogg' );
+        }
+
+        return sprintf( '<a href="%s">%s</a>', $file[ 'url' ] , esc_html( $info[ 'basename' ] ) );
+    }
+
+    return __( 'No files found.', 'groundhogg' );
+
 }
 
 /**

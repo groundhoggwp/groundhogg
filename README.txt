@@ -107,12 +107,23 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.17 =
+* ADDED Contact File Management. Upload files from both admin and Frontend to contact record.
+* ADDED email management and sending via the REST API.
+* ADDED Date and Time form fields
+* FIXED grammer and spelling mistakes returned via the REST API.
+
+= 1.0.16.3 =
+* ADDED Account Creation button in contact record if the contact does not have an associated user account.
+* TWEAKED API V2 Improvements in json responses
+* TWEAKED default method for hooking into the user_register hook that in turn triggers the Account Created benchmark
+
 = 1.0.16.2 =
-* FIXED Nested function loop
+* FIXED Nested function loop causing 500 level error
 
 = 1.0.16.1 =
-* FIXED Upgrader class causing 500 error in admin
 * TWEAKD MAX Ajax queue calls is 5 per page view to limit server load.
+* FIXED Upgrader class causing 500 error in admin
 * FIXED Form Shortcode calling class constructor with to many arguments.
 
 = 1.0.16 =
