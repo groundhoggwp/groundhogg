@@ -1041,3 +1041,4 @@ function wpgh_convert_user_to_contact_when_user_registered( $userId )
 }
 
 add_action( 'user_register', 'wpgh_convert_user_to_contact_when_user_registered' );
+

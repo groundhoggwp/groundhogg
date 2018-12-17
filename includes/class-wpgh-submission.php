@@ -32,6 +32,13 @@ class WPGH_Submission
     public $fields;
 
     /**
+     * The form config array object
+     *
+     * @var array
+     */
+    public $config;
+
+    /**
      * @var string this is set to the referer which is also the source page
      */
     public $source;
@@ -90,6 +97,7 @@ class WPGH_Submission
             }
 
             $this->fields = $this->step->get_meta( 'expected_fields' );
+            $this->config = $this->step->get_meta( 'config' );
 
         } else {
             $this->id = 0;
@@ -265,6 +273,17 @@ class WPGH_Submission
     private function has_field( $field )
     {
         return in_array( trim( $field ), $this->fields );
+    }
+
+    /**
+     * Return the config object or false if it doesn't exist
+     *
+     * @param $field
+     * @return bool|mixed
+     */
+    private function get_field_config( $field )
+    {
+        return isset( $this->config[$field] )? $this->config[$field] : false;
     }
 
     /**
@@ -479,6 +498,10 @@ class WPGH_Submission
 
             $key = sanitize_key( $key );
 
+            if ( is_array( $value ) ){
+                $value = implode( ', ', $value );
+            }
+
             if ( strpos( $value, PHP_EOL  ) !== false ){
                 $value = sanitize_textarea_field( stripslashes( $value ) );
             } else {
@@ -487,16 +510,22 @@ class WPGH_Submission
 
             if ( $this->has_field( $key ) ) {
 
-                $c->update_meta( $key, $value );
+                /* NEW: Pass the field's config object to a filter to sanitize it */
+                if( $config = $this->get_field_config( $key ) ){
+                    $value = apply_filters( 'wpgh_sanitize_submit_value', $value, $config );
+                    $c->update_meta( $key, $value );
+                }
 
             }
 
         }
 
+        if ( ! empty( $_FILES ) ){
+            $this->upload_files();
+        }
+
         if ( isset( $_POST[ 'email_preferences_nonce' ] ) ){
-
             $this->process_email_preference_changes();
-
         }
 
         if ( $this->id ){
@@ -509,6 +538,185 @@ class WPGH_Submission
         wp_redirect( $success_page );
 
         die();
+
+    }
+
+    /**
+     * Process any file uploads tht may be present.
+     *
+     * @return bool
+     */
+    public function upload_files()
+    {
+
+        if ( empty( $_FILES ) ){
+            return false;
+        }
+
+        foreach ( $_FILES as $key => $file ) {
+
+            $key = sanitize_key( $key );
+
+            if ($this->has_field( $key ) ) {
+
+                if ($config = $this->get_field_config($key)) {
+
+                    if ($config['type'] === 'file') {
+
+                        if ( $file = $this->handle_file_upload( $key, $config ) ) {
+
+                            if ( is_wp_error($file) || ! is_array( $file ) ) {
+                                wp_die($file);
+                            }
+
+                            $files = $this->contact->get_meta('files');
+
+                            if (!$files) {
+                                $files = array();
+                            }
+
+                            $file[ 'key' ] = $key;
+                            /* Compat for local host WP filesystems */
+                            $file = array_map( 'wp_normalize_path', $file );
+
+                            $files[ $key ] = $file;
+                            $this->contact->update_meta('files', $files);
+                            $this->contact->update_meta($key, $file['url']);
+
+                        } else {
+
+                            wp_die( __( 'Could not upload file.' ) );
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Change the default upload directory
+     *
+     * @param $param
+     * @return mixed
+     */
+    public function files_upload_dir( $param )
+    {
+        $mydir = '/groundhogg';
+
+        if ( is_multisite() ){
+            $mydir .= '/' . get_current_blog_id();
+        }
+
+        if ( $this->contact ){
+            $mydir .= '/' . $this->contact->ID;
+        } else {
+            $mydir .= '/admin';
+        }
+
+        $param['path'] = $param['basedir'] . $mydir;
+        $param['url'] = $param['baseurl'] . $mydir;
+        $param['subdir'] = $mydir;
+        /* Compat for windows file systems */
+//        $param = array_map( 'wp_normalize_path', $param );
+
+        return $param;
+    }
+
+    /**
+     * Upload a file to the Groundhogg file directory
+     *
+     * @param $key
+     * @param $config
+     * @return array|bool|WP_Error
+     */
+    private function handle_file_upload( $key, $config )
+    {
+        $file = $_FILES[ $key ];
+        $size = $file[ 'size' ];
+
+        if ( intval( $size ) > intval( $config[ 'max_file_size' ] ) ){
+            return new WP_Error( 'FILE_TOO_BIG', __( 'The file you have uploaded is too big.' ) );
+        }
+
+        $extension = wp_check_filetype( $file[ 'name' ] );
+        $mimes = explode( ',', $config[ 'file_types' ] );
+
+        if ( ! in_array( '.' . $extension[ 'ext' ], $mimes ) ){
+            return new WP_Error( 'INCORRECT_MIME', __( 'You are not permitted to upload this type of file.' ) );
+        }
+
+        $upload_overrides = array( 'test_form' => false );
+
+        if ( !function_exists('wp_handle_upload') ) {
+            require_once( ABSPATH . '/wp-admin/includes/file.php' );
+        }
+
+        add_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
+        $mfile = wp_handle_upload( $file, $upload_overrides );
+        remove_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
+
+        if( isset( $mfile['error'] ) ) {
+
+            if ( empty( $mfile[ 'error' ] ) ){
+                $mfile[ 'error' ] = __( 'Could not upload file.' );
+            }
+
+            return new WP_Error( 'BAD_UPLOAD', $mfile['error'] );
+        }
+
+        return $mfile;
+    }
+
+    /**
+     * Get an array of allowed mime types for WP
+     *
+     * @param array $file_extensions
+     * @return array
+     */
+    private function get_allow_mime_types( $file_extensions=array() )
+    {
+
+        $mimes = array();
+
+        $wp_mimes = get_allowed_mime_types();
+
+        if ( ! empty( $file_extensions ) ){
+
+            foreach ( $file_extensions as $ext ){
+
+                $ext = str_replace(  '.', '', $ext );
+
+                foreach ( $wp_mimes as $exts => $mime ){
+
+                    if ( preg_match( '/' . $ext . '/', $exts ) ){
+
+                        $mimes[ $exts ] = $mime;
+
+                    }
+
+                    break;
+
+                }
+
+                $mimes[ $ext ] = 'application/text';
+
+            }
+
+            return $mimes;
+
+        } else {
+
+            return $wp_mimes;
+
+        }
 
     }
 

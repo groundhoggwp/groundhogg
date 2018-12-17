@@ -424,19 +424,19 @@ class WPGH_Contacts_Page
         /* Save the meta first... as actual fields might overwrite it later... */
         $cur_meta = WPGH()->contact_meta->get_meta( $id );
 
+        $exclude_meta_list = array(
+            'files'
+        );
+
         if ( isset( $_POST[ 'meta' ] ) ){
             $posted_meta = $_POST[ 'meta' ];
-
             foreach ( $cur_meta as $key => $value ){
-
                 if ( isset( $posted_meta[ $key ] ) ){
-
                     $contact->update_meta( $key, sanitize_text_field( $posted_meta[ $key ] ) );
-
                 } else {
-
-                    $contact->delete_meta( $key );
-
+                    if ( ! in_array( $key, $exclude_meta_list ) ) {
+                        $contact->delete_meta( $key );
+                    }
                 }
             }
         }
@@ -597,7 +597,72 @@ class WPGH_Contacts_Page
 
         $this->notices->add( 'update', __( "Contact updated!", 'groundhogg' ), 'success' );
 
+        if ( ! empty( $_FILES ) ){
+            $this->upload_files();
+        }
+
         do_action( 'wpgh_admin_update_contact_after', $id );
+    }
+
+    /**
+     * Upload files to a contact if uploaded from the admin page
+     */
+    private function upload_files()
+    {
+        $id = intval( $_GET[ 'contact' ] );
+        $contact = wpgh_get_contact( $id );
+
+        if ( ! isset($_FILES[ 'files' ] ) || empty( $_FILES[ 'files' ] ) ){
+            return false;
+        }
+
+        $files = $_FILES[ 'files' ];
+
+        $num_files = count( $files[ 'name' ] );
+
+        $upload_overrides = array( 'test_form' => false );
+
+        for( $i=0; $i < $num_files; $i++ ){
+
+            $ifile = array(
+                'name'      => $files[ 'name' ][$i],
+                'type'      => $files[ 'type' ][$i],
+                'tmp_name'  => $files[ 'tmp_name' ][$i],
+                'error'     => $files[ 'error' ][$i],
+                'size'      => $files[ 'size' ][$i],
+            );
+
+            if ( !function_exists('wp_handle_upload') ) {
+                require_once( ABSPATH . '/wp-admin/includes/file.php' );
+            }
+
+            add_filter( 'upload_dir', array( WPGH()->submission, 'files_upload_dir' ) );
+            $mfile = wp_handle_upload( $ifile, $upload_overrides );
+            remove_filter( 'upload_dir', array( WPGH()->submission, 'files_upload_dir' ) );
+
+            if( isset( $mfile['error'] ) ) {
+                if ( empty( $mfile[ 'error' ] ) ) {
+                    $mfile['error'] = __('Could not upload file.');
+                }
+                $this->notices->add( 'BAD_UPLOAD', $mfile['error'], 'error' );
+            } else {
+                $files = $contact->get_meta('files' );
+                if (!$files) {
+                    $files = array();
+                }
+                $j = count( $files ) + 1 ;
+                $mfile[ 'key' ] = $j;
+                $mfile = array_map( 'wp_normalize_path', $mfile );
+                $files[ $j ] = $mfile;
+                $contact->update_meta( 'files', $files );
+                /* Compat for local host WP filesystems */
+            }
+
+        }
+
+//        wp_die();
+
+        return true;
     }
 
     /**

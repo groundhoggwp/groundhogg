@@ -43,6 +43,13 @@ class WPGH_Form
     var $fields = array();
 
     /**
+     * This will contain a config object and all the settings of the form to compare against for security checks later on...
+     *
+     * @var array
+     */
+    var $config = array();
+
+    /**
      * Full rendering of the form
      *
      * @var string
@@ -78,6 +85,9 @@ class WPGH_Form
 	    add_shortcode( 'first',      array( $this, 'first_name'  ) );
         add_shortcode( 'last_name',  array( $this, 'last_name'   ) );
         add_shortcode( 'last',       array( $this, 'last_name'   ) );
+        add_shortcode( 'file',       array( $this, 'file'        ) );
+        add_shortcode( 'date',       array( $this, 'date'        ) );
+        add_shortcode( 'time',       array( $this, 'time'        ) );
         add_shortcode( 'email',      array( $this, 'email'       ) );
         add_shortcode( 'phone',      array( $this, 'phone'       ) );
         add_shortcode( 'address',    array( $this, 'address'     ) );
@@ -105,6 +115,9 @@ class WPGH_Form
 	    remove_shortcode( 'col'          );
 	    remove_shortcode( 'last_name'    );
 	    remove_shortcode( 'last'         );
+	    remove_shortcode( 'file'         );
+	    remove_shortcode( 'date'         );
+	    remove_shortcode( 'time'         );
 	    remove_shortcode( 'first'        );
 	    remove_shortcode( 'first_name'   );
         remove_shortcode( 'email'        );
@@ -224,6 +237,10 @@ class WPGH_Form
 
         $this->fields[] = $a[ 'name' ];
 
+        if ( ! isset( $this->config[ $a[ 'name' ] ] ) ){
+            $this->config[ $a[ 'name' ] ] = $a;
+        }
+
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $field = sprintf(
@@ -264,6 +281,8 @@ class WPGH_Form
             'required'      => true,
         ), $atts );
 
+        $this->config[ $a[ 'name' ] ] = $a ;
+
         return $this->input_base( $a );
     }
 
@@ -288,6 +307,8 @@ class WPGH_Form
             'required'      => true,
         ), $atts );
 
+        $this->config[ $a[ 'name' ] ] = $a ;
+
         return $this->input_base( $a );
     }
 
@@ -311,6 +332,8 @@ class WPGH_Form
             'required'      => true,
         ), $atts );
 
+        $this->config[ $a[ 'name' ] ] = $a ;
+
         return $this->input_base( $a );
     }
 
@@ -333,6 +356,106 @@ class WPGH_Form
             'attributes'    => '',
             'required'      => true,
         ), $atts );
+
+        $this->config[ $a[ 'name' ] ] = $a;
+
+        return $this->input_base( $a );
+    }
+
+    /**
+     * Return HTML for a file input
+     *
+     * @param $atts
+     * @return string
+     */
+    public function file( $atts )
+    {
+        $a = shortcode_atts( array(
+            'type'          => 'file',
+            'label'         => __( 'File *', 'groundhogg' ),
+            'name'          => '',
+            'id'            => '',
+            'class'         => '',
+            'max_file_size' => 0,
+            'file_types'    => '',
+            'required'      => true,
+            'attributes'    => '',
+
+        ), $atts );
+
+        if ( ! empty( $a[ 'file_types' ] ) ){
+            $a[ 'attributes' ] .= sprintf( ' accept="%s"', esc_attr( $a[ 'file_types' ] ) );
+        }
+
+        $this->config[ $a[ 'name' ] ] = $a;
+
+        return $this->input_base( $a );
+    }
+
+    /**
+     * Return HTML for a date input
+     *
+     * @param $atts
+     * @return string
+     */
+    public function date( $atts )
+    {
+        $a = shortcode_atts( array(
+            'type'          => 'date',
+            'label'         => __( 'Date *', 'groundhogg' ),
+            'name'          => '',
+            'id'            => '',
+            'class'         => '',
+            'max_date'      => '',
+            'min_date'      => '',
+            'required'      => true,
+            'attributes'    => '',
+
+        ), $atts );
+
+        if ( ! empty( $a[ 'max_date' ] ) ){
+            $a[ 'attributes' ] .= sprintf( ' max="%s"', esc_attr( $a[ 'max_date' ] ) );
+        }
+
+        if ( ! empty( $a[ 'min_date' ] ) ){
+            $a[ 'attributes' ] .= sprintf( ' min="%s"', esc_attr( $a[ 'min_date' ] ) );
+        }
+
+        $this->config[ $a[ 'name' ] ] = $a;
+
+        return $this->input_base( $a );
+    }
+
+    /**
+     * Return HTML for a time input
+     *
+     * @param $atts
+     * @return string
+     */
+    public function time( $atts )
+    {
+        $a = shortcode_atts( array(
+            'type'          => 'time',
+            'label'         => __( 'Time *', 'groundhogg' ),
+            'name'          => '',
+            'id'            => '',
+            'class'         => '',
+            'max_time'      => '',
+            'min_time'      => '',
+            'required'      => true,
+            'attributes'    => '',
+
+        ), $atts );
+
+        if ( ! empty( $a[ 'max_time' ] ) ){
+            $a[ 'attributes' ] .= sprintf( ' max="%s"', esc_attr( $a[ 'max_time' ] ) );
+        }
+
+        if ( ! empty( $a[ 'min_time' ] ) ){
+            $a[ 'attributes' ] .= sprintf( ' min="%s"', esc_attr( $a[ 'min_time' ] ) );
+        }
+
+        $this->config[ $a[ 'name' ] ] = $a;
 
         return $this->input_base( $a );
     }
@@ -479,6 +602,7 @@ class WPGH_Form
         }
 
         $this->fields[] = $a[ 'name' ];
+        $this->config[ $a[ 'name' ] ] = $a;
 
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false"  && $a[ 'required' ] !== "0" ) ? 'required' : '';
 
@@ -567,6 +691,7 @@ class WPGH_Form
         }
 
         $this->fields[] = $a[ 'name' ];
+        $this->config[ $a[ 'name' ] ] = $a ;
 
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
         $multiple = $a[ 'multiple' ] ? 'multiple' : '';
@@ -634,6 +759,7 @@ class WPGH_Form
         }
 
         $this->fields[] = $a[ 'name' ];
+        $this->config[ $a[ 'name' ] ] = $a ;
 
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
@@ -704,6 +830,7 @@ class WPGH_Form
         }
 
         $this->fields[] = $a[ 'name' ];
+        $this->config[ $a[ 'name' ] ] = $a ;
 
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
@@ -789,6 +916,7 @@ class WPGH_Form
         $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ), $a[ 'theme'], $a['size'] );
 
         $this->fields[] = 'g-recaptcha';
+        $this->config[ $a[ 'g-recaptcha' ] ] = $a ;
 
         return $this->field_wrap( $html );
     }
@@ -921,7 +1049,7 @@ jQuery( function($){
 //        $form .= htmlentities( $this->content );
 //        $form .= htmlentities( "\"hi\"" );
 
-        $form .= "<form method='post' class='gh-form " . $this->a[ 'class' ] ."'>";
+        $form .= "<form method='post' class='gh-form " . $this->a[ 'class' ] ."' enctype=\"multipart/form-data\">";
 
         $form .= wp_nonce_field( 'gh_submit', 'gh_submit_nonce', true, false );
 
@@ -960,6 +1088,7 @@ jQuery( function($){
         if ( $this->id && WPGH()->steps->exists( $this->id ) ){
 
             WPGH()->step_meta->update_meta( $this->id, 'expected_fields', $this->fields );
+            WPGH()->step_meta->update_meta( $this->id, 'config', $this->config );
 
         }
 

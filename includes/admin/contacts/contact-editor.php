@@ -67,7 +67,7 @@ $contact->auto_link_account();
 <!--/ Title -->
 <?php endif; ?>
 
-<form method="post" class="">
+<form method="post" class="" enctype="multipart/form-data">
     <?php wp_nonce_field( 'edit', '_edit_contact_nonce' ); ?>
 
     <!-- GENERAL NAME INFO -->
@@ -380,6 +380,65 @@ $contact->auto_link_account();
         </tr>
     </table>
 
+    <!-- BEGIN FILES -->
+    <h2><?php _e( 'Files' ); ?></h2>
+    <div style="max-width: 800px;">
+        <table class="wp-list-table widefat fixed striped files">
+            <thead>
+            <tr>
+                <th><?php _e( 'Name', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Size', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Type', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Replacement Code', 'groundhogg' ); ?></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php
+
+            $files = $contact->get_meta( 'files' );
+
+            if ( empty( $files ) ):
+                ?>
+                <tr><td colspan="4"><?php _e( 'This contact has no files...', 'groundhogg' ); ?></td></tr>
+            <?php
+            else:
+
+                foreach ($files as $key => $item ):
+
+                    if ( ! isset( $item[ 'file' ] ) ){
+                        continue;
+                    }
+
+                    $info = pathinfo( $item[ 'file' ] );
+                    ?>
+                    <tr>
+                        <td><?php printf( "<a href='%s' target='_blank'>%s</a>", $item[ 'url' ], esc_html( $info[ 'basename' ] ) ); ?></td>
+                        <td><?php esc_html_e( size_format( filesize( $item[ 'file' ] ) ) ); ?></td>
+                        <td><?php esc_html_e( $info[ 'extension' ] ); ?></td>
+                        <td><?php esc_html_e( '{files.' . $key . '}' ); ?></td>
+                    </tr>
+                <?php
+                endforeach;
+            endif;
+            ?>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th><?php _e( 'Name', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Size', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Type', 'groundhogg' ); ?></th>
+                <th><?php _e( 'Replacement Code', 'groundhogg' ); ?></th>
+            </tr>
+            </tfoot>
+        </table>
+        <div>
+            <p class="description"><?php _e( 'Upload files: ' ); ?><input type="file" name="files[]" multiple></p>
+        </div>
+    </div>
+    <!-- END FILES -->
+
+    <?php do_action( 'wpgh_contact_edit_before_meta', $id ); ?>
+
     <!-- META -->
     <h2><?php _e( 'Custom Meta' ); ?></h2>
     <table class="form-table" >
@@ -433,7 +492,8 @@ $contact->auto_link_account();
                 'postal_zip',
                 'region',
                 'country',
-                'notes'
+                'notes',
+                'files'
             ) );
 
             $meta = WPGH()->contact_meta->get_meta( $contact->ID );
