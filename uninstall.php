@@ -73,6 +73,10 @@ if( wpgh_is_option_enabled( 'gh_uninstall_on_delete' ) ) {
     /** Cleanup Cron Events */
     wp_clear_scheduled_hook( 'wpgh_cron_event' );
 
+    //delete api keys from user_meta
+    delete_metadata('user',0,'wpgh_user_public_key','',true);
+    delete_metadata('user',0,'wpgh_user_secret_key','',true);
+
     // Remove any transients we've left behind
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_wpgh\_%'" );
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_wpgh\_%'" );
