@@ -23,12 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
 {
-
     public function __construct()
     {
         //initialize api if user check the api section
         add_action('rest_api_init', array( $this, 'register_routs' ) );
-
     }
 
     public function register_routs()
@@ -95,27 +93,21 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     //GET METHOD
     public function get_tags(WP_REST_Request $request)
     {
-//        if ( ! user_can( $request['wpgh_user_id'], 'view_contacts' ) ){
-//            return new WP_Error('error', __('you are not eligible to perform this operation.'));
-//        }
-
-        // method to get contact from  GroundHogg
-
-
+        if ( ! user_can( $request['wpgh_user_id'], 'edit_tags' ) ){
+            return new WP_Error('error', __('you are not eligible to perform this operation.'));
+        }
         $tag_id = null;
         $tags = null;
         if (isset ($request['tag_id'])) {
-            $tag_id = ( integer) $request['tag_id'];
+            $tag_id = intval( $request['tag_id'] );
             if ( !( WPGH()->tags->get_tag( $tag_id ) === false) ) {
-                $tags = WPGH()->tags->get_tag($tag_id);
+                $tags = WPGH()->tags->get_tag( $tag_id );
             } else {
                 return new WP_Error('error', __('no tag found with provided tag id.'), array('status' => 404));
             }
-
         } else {
             $tags = WPGH()->tags->get_tags();
         }
-
         if ( $tags != null ) {
             return rest_ensure_response(array('tags' => $tags));
         } else {
@@ -126,16 +118,12 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     //POST METHOD
     public function create_tags(WP_REST_Request $request)
     {
-
         if ( ! user_can( $request['wpgh_user_id'], 'add_tags' ) ){
             return new WP_Error('error', __('you are not eligible to perform this operation.'));
         }
         $parameters = $request->get_json_params();
-
-
         if ( isset ( $parameters['tags'] ) ) {
-
-            $tags =  $parameters['tags'];
+            $tags = array_map('sanitize_text_field', $parameters['tags'] );
             $insert_count = 0;
             foreach ($tags as $tag)
             {
@@ -146,7 +134,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                         //chcek for description
                         $desc  = sanitize_text_field( $tag['tag_description'] ) ;
                         $id = WPGH()->tags->add( array(
-                            'tag_name' => sanitize_text_field($tag['tag_name']),
+                            'tag_name' => sanitize_text_field( $tag['tag_name'] ),
                             'tag_description' => $desc
                         ) );
                         $insert_count ++;
@@ -156,25 +144,17 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                         ) );
                         $insert_count ++;
                     }
-
                 }
-
             }
-
-            if ($insert_count > 0 ) {
-
+            if ( $insert_count > 0 ) {
                 return rest_ensure_response(array(
                     'code' => 'success',
                     'message' => $insert_count.' tags added successfully.'
                 ));
             }
-
-
         } else {
-
             return new WP_Error('error', __('Please enter tags.'));
         }
-
     }
 
     //PUT METHOD
@@ -183,71 +163,51 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
         if ( ! user_can( $request['wpgh_user_id'], 'edit_tags' ) ){
             return new WP_Error('error', __('you are not eligible to perform this operation.'));
         }
-
         $parameters = $request->get_json_params();
-
-
         if ( isset ( $parameters['tags'] ) ) {
-
-            if(isset($parameters['tags']['tag_id'] ) )  {
-
-                if ( !( WPGH()->tags->get_tag( $parameters['tags']['tag_id'] ) === false) ) {
-
-                    if(isset( $parameters['tags']['tag_name'] ) ){
-
-                        $result  = WPGH()->tags->update( $parameters['tags']['tag_id'] , array(
-                            'tag_name' => sanitize_text_field($parameters['tags']['tag_name']),
-
+            if( isset( $parameters['tags']['tag_id'] ) )  {
+                if ( !( WPGH()->tags->get_tag( $parameters['tags']['tag_id'] ) === false ) ) {
+                    if( isset( $parameters['tags']['tag_name'] ) ){
+                        $result  = WPGH()->tags->update( intval( $parameters['tags']['tag_id'] ) , array(
+                            'tag_name' => sanitize_text_field( $parameters['tags']['tag_name'] ),
                         ) );
                     }
-                    if(isset($parameters['tags']['tag_description'])){
-                        $result  = WPGH()->tags->update( $parameters['tags']['tag_id'] , array(
-                            'tag_description' => sanitize_text_field($parameters['tags']['tag_description']),
+                    if( isset( $parameters['tags']['tag_description'] ) ) {
+                        $result  = WPGH()->tags->update( intval( $parameters['tags']['tag_id'] ) , array(
+                            'tag_description' => sanitize_text_field( $parameters['tags']['tag_description'] ),
                         ) );
                     }
-
-                    if($result){
-
+                    if( $result ){
                         return rest_ensure_response(array(
                             'code' => 'success',
                             'message' => 'Tag updated successfully.'
                         ));
                     } else {
-
                         return new WP_Error('error', __('Something went wrong'));
                     }
-
                 } else {
-
                     return new WP_Error('error', __('no tag found with provided tag id.'), array('status' => 404));
                 }
             } else {
                 return new WP_Error('error', __('This operation needs tag_id argument.'));
             }
-
-
         } else {
-
             return new WP_Error('error', __('Please enter tag block to perform this operation.'), array('status' => 404));
         }
-
     }
 
     //DELETE METHOD
-    public function delete_tags(WP_REST_Request $request)
+    public function delete_tags( WP_REST_Request $request)
     {// function invoked if user wants to delete one contact
-
         if ( ! user_can( $request['wpgh_user_id'], 'delete_tags' ) ){
             return new WP_Error('error', __('you are not eligible to perform this operation.'));
         }
-
-        if (isset($request['tag_id'])) {
-            $tag_id = $request['tag_id'];
+        if( isset( $request['tag_id'] ) ) {
+            $tag_id = intval( $request['tag_id'] );
             // ----------- code to delete contact
             if ( !( WPGH()->tags->get_tag( $tag_id ) === false) ) {
-
-                if ( WPGH()->tags->delete($tag_id) ) {
-                    return rest_ensure_response(array(
+                if ( WPGH()->tags->delete( $tag_id ) ) {
+                    return rest_ensure_response( array(
                         'code' => 'success',
                         'message' => 'tag deleted successfully.'
                     ));
@@ -258,9 +218,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
 
                 return new WP_Error('error', __('no tag found with provided tag id.'), array('status' => 404));
             }
-
         } else {
-
             return new WP_Error('error', __('Please enter tag_id to perform this operation.'), array('status' => 404));
         }
 

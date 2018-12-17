@@ -26,7 +26,7 @@ class WPGH_API_V2_BASE {
     public function rest_authentication( WP_REST_Request $request )
     {
         // validate user and set user id for contact operations..
-        if( isset($request['token']) && isset($request['key']) ) {
+        if( isset( $request['token'] ) && isset( $request['key'] ) ) {
             //validate user
             global $wpdb;
             $token      = $request['token'];
@@ -41,13 +41,11 @@ class WPGH_API_V2_BASE {
                 } else {
                     return new WP_Error( 'error','Invalid Authentication.'  );
                 }
-
             } else {
                 return new WP_Error( 'error','API key is not valid.',array('user' => $user) );
             }
 
         } else {
-
             return new WP_Error( 'error','Please Enter Token and Key for API.' );
         }
 
@@ -58,11 +56,4 @@ class WPGH_API_V2_BASE {
         return hash_equals( md5( $secret . $public ), $token );
     }
 
-    public function example_permissions_check( $user_id ){
-
-        if ( ! user_can( $user_id, 'edit_contacts' ) ){
-            //error
-        }
-
-    }
 }
