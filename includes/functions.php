@@ -242,6 +242,7 @@ function wpgh_encrypt_decrypt( $string, $action = 'e' ) {
         update_option( 'gh_secret_iv', bin2hex( openssl_random_pseudo_bytes( 16 ) ) );
 
     if ( in_array( $encrypt_method, openssl_get_cipher_methods()) ){
+
         $secret_key = hex2bin( wpgh_get_option( 'gh_secret_key' ) );
         $secret_iv = hex2bin( wpgh_get_option( 'gh_secret_iv' ) );
 
