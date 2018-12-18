@@ -112,6 +112,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED email management and sending via the REST API.
 * ADDED Date and Time form fields
 * FIXED grammer and spelling mistakes returned via the REST API.
+* FIXED Bug where user role tags were not being applied properly.
 
 = 1.0.16.3 =
 * ADDED Account Creation button in contact record if the contact does not have an associated user account.

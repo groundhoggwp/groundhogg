@@ -978,7 +978,7 @@ function wpgh_apply_tags_to_contact_from_new_roles( $user_id, $role )
     $contact->add_tag( $role );
 }
 
-add_action( 'add_user_role', 'wpgh_apply_tags_to_contact_from_roles', 10, 2 );
+add_action( 'add_user_role', 'wpgh_apply_tags_to_contact_from_new_roles', 10, 2 );
 
 /**
  * When a role is remove also remove the tag
@@ -1019,7 +1019,7 @@ function wpgh_apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_ro
     $contact->add_tag( $role );
 }
 
-add_action( 'set_user_role', 'wpgh_apply_tags_to_contact_from_changed_roles', 10, 2, 3 );
+add_action( 'set_user_role', 'wpgh_apply_tags_to_contact_from_changed_roles', 10, 3 );
 
 /**
  * Provides a global hook not requireing the benchmark anymore.

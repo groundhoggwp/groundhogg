@@ -49,7 +49,7 @@ class WPGH_Role_Changed extends WPGH_Funnel_Step
         parent::__construct();
 
         add_action( 'set_user_role', array( $this, 'complete' ), 10, 3 );
-        add_action( 'add_user_role', array( $this, 'complete' ), 10, 3 );
+        add_action( 'add_user_role', array( $this, 'complete' ), 10, 2 );
     }
 
     /**
@@ -103,7 +103,7 @@ class WPGH_Role_Changed extends WPGH_Funnel_Step
      * @param $cur_role string the new role of the user
      * @param $old_roles array list of previous user roles.
      */
-    public function complete( $userId, $cur_role, $old_roles )
+    public function complete( $userId, $cur_role, $old_roles=array() )
     {
         $user = get_userdata( $userId );
         $contact = wpgh_create_contact_from_user( $user );
