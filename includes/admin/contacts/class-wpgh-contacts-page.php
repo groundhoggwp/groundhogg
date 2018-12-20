@@ -39,10 +39,10 @@ class WPGH_Contacts_Page
 
         add_action('wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
 
-        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
 
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_contacts' ){
 
+            add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
             add_action( 'init' , array( $this, 'process_action' )  );
 
             $this->notices = WPGH()->notices;
