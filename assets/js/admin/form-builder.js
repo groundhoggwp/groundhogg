@@ -46,7 +46,7 @@ var wpghFormBuilder;
             this.types.recaptcha    = ['captcha-theme','captcha-size','id','class'];
             this.types.submit       = ['text','id','class'];
             this.types.text         = ['required','label','placeholder','name','id','class'];
-            this.types.extarea      = ['required','label','placeholder','name','id','class'];
+            this.types.textarea     = ['required','label','placeholder','name','id','class'];
             this.types.number       = ['required','label','name','min','max','id','class'];
             this.types.dropdown     = ['required','label','name','default','options','multiple','id','class'];
             this.types.radio        = ['required','label','name','options','id','class'];

@@ -300,6 +300,11 @@
     border: 1px solid #e5e5e5;
 }
 
+.postbox.closed .hndle .hndle-icon{
+    margin-top: -3px;
+    margin-bottom: -8px;
+}
+
 .row-actions{
     margin: 3px 0 0 3px;
 }

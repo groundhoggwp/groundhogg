@@ -526,6 +526,8 @@ class WPGH_Step
         ?>
         <div title="<?php echo $this->title ?>" id="<?php echo $this->ID; ?>" class="postbox step <?php echo $this->group; ?> <?php echo $this->type; ?>">
 
+            <button type="button" class="handlediv collapse"><span class="toggle-indicator" aria-hidden="true"></span></button>
+
             <!-- DELETE -->
             <button title="Delete" type="button" class="handlediv delete-step">
                 <span class="dashicons dashicons-trash"></span>

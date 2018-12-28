@@ -26,12 +26,18 @@ label{
 
 .gh-form-column {
     display: inline-block;
+    float: left;
+    clear: none;
     white-space: normal;
 }
 
 .gh-form-column {
     padding-right: 10px;
 }
+
+/*.gh-form-column:nth-last-child(2){*/
+    /*padding-right: 0;*/
+/*}*/
 
 .gh-form-column:last-child{
     padding-right: 0;

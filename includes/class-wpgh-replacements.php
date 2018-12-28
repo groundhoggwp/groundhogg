@@ -114,12 +114,12 @@ class WPGH_Replacements
             ),
             array(
                 'code'        => 'owner_first_name',
-                'callback'    => 'wpgh_replacement_owner_name',
+                'callback'    => 'wpgh_replacement_owner_first_name',
                 'description' => __( 'The contact owner\'s name.', 'groundhogg' ),
             ),
             array(
                 'code'        => 'owner_last_name',
-                'callback'    => 'wpgh_replacement_owner_name',
+                'callback'    => 'wpgh_replacement_owner_last_name',
                 'description' => __( 'The contact owner\'s name.', 'groundhogg' ),
             ),
             array(

@@ -61,7 +61,16 @@ var wpghFunnelEditor;
             $( '#copy-share-link' ).click( function ( e ) {
                 e.preventDefault();
                 prompt( "Copy This Link", $('#share-link').val() );
-            })
+            });
+
+            $( '.postbox' ).on( 'click', '.collapse', function ( e ) {
+                var $step = $( this.parentNode );
+                if ( $step.hasClass( 'closed' ) ){
+                    wpghFunnelEditor.expandStep( $step );
+                } else {
+                    wpghFunnelEditor.collapseStep( $step );
+                }
+            } );
 
         },
 
@@ -321,6 +330,32 @@ var wpghFunnelEditor;
                     wpghFunnelEditor.makeDismissible();
                 }
             });
+        },
+
+        /**
+         * Collapse a step
+         *
+         * @param $step jQuery object
+         */
+        collapseStep: function( $step ) {
+
+            console.log( $step );
+
+            $step.addClass( 'closed' );
+            $step.find( '.inside' ).addClass( 'hidden' )
+
+        },
+
+        /**
+         * Expand a step
+         *
+         * @param $step jQuery object
+         */
+        expandStep: function( $step ) {
+
+            $step.removeClass( 'closed' );
+            $step.find( '.inside' ).removeClass( 'hidden' )
+
         }
     };
     $(function(){wpghFunnelEditor.init();})

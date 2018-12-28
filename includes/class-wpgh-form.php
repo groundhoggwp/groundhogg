@@ -159,7 +159,8 @@ class WPGH_Form
             'class' => ''
         ), $atts );
 
-    	return sprintf( "<div id='%s' class='gh-form-row %s'>%s</div>", $a['id'], $a['class'], do_shortcode( $content ) );
+//    	return sprintf( "<div id='%s' class='gh-form-row %s'>%s<div style=\"clear:both;\"></div></div>", $a['id'], $a['class'], do_shortcode( $content ) );
+    	return sprintf( "<div id='%s' class='gh-form-row clearfix %s'>%s</div>", $a['id'], $a['class'], do_shortcode( $content ) );
 
     }
     public function column( $atts, $content ){

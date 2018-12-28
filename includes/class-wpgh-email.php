@@ -380,7 +380,7 @@ class WPGH_Email
     public function convert_to_tracking_links( $content )
     {
         /* Filter the superlinks to include data about the email, campaign, and funnel steps... */
-        return preg_replace_callback( '/(href=")([^"]*)(")/i', array( $this, 'tracking_link_callback' ) , $content );
+        return preg_replace_callback( '/(href=")(?!mailto)([^"]*)(")/i', array( $this, 'tracking_link_callback' ) , $content );
     }
 
     /**

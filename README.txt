@@ -107,6 +107,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.18 =
+* ADDED replacement codes {owner_first_name} & {owner_last_name}
+* TWEAKED steps are now collapsible for better ui
+* TWEAKED Form layout CSS for better compatibility
+* TWEAKED Ignore tracking link replacement on mailto: links
+* FIXED Textarea in form builder not showing options
+
 = 1.0.17.1 =
 * Fixed Contact Scrips breaking quick edit links in admin area
 
