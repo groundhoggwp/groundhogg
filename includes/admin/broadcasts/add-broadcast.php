@@ -61,13 +61,11 @@ wp_enqueue_style( 'jquery-ui' );
                 <label for="date"><?php _e( 'Send On:' ); ?></label>
             </th>
             <td>
-                <input style="height:29px;width: 100px" class="input" placeholder="Y/m/d" type="text" id="date" name="date" value="" autocomplete="off" required><input type="time" id="time" name="time" value="09:00" autocomplete="off" required>
-                    <script>jQuery(function($){$('#date').datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    minDate:0,
-                    dateFormat:'yy/m/d'
-                })});</script>
+<!--                <input style="height:29px;width: 100px" class="input" placeholder="Y/m/d" type="text" id="date" name="date" value="" autocomplete="off" required>-->
+                <div style="display: inline-block; width: 100px;">
+                    <?php echo WPGH()->html->date_picker( array( 'name' => 'date', 'id' => 'date', 'class' => 'input' ) ); ?>
+                </div>
+                <input type="time" id="time" name="time" value="09:00" autocomplete="off" required>
                 <p class="description"><?php _e( 'The day the broadcast will be sent.', 'groundhogg' ); ?></p>
             </td>
         </tr>

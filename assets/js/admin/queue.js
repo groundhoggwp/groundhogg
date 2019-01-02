@@ -1,26 +1,47 @@
-var ghQueue;
-(function ($) {
-    ghQueue = {
+(function ($,q) {
+    q = Object.assign( q, {
+
+        tabIsActive: true,
+        interval:null,
+
         setQueueTimer:function()
         {
-            ghQueue.processQueue();
-            setInterval(ghQueue.processQueue, 30000);
+            this.interval = setTimeout( this.processQueue, this.timeInterval );
         },
 
         processQueue: function(){
-            $.ajax({
-                type: "post",
-                url: ajaxurl,
-                data: {action: 'gh_process_queue' }
-            });
+            if ( q.tabIsActive ){
+                $.ajax({
+                    type: "post",
+                    url: q.ajax_url,
+                    dataType: 'json',
+                    data: {action: 'gh_process_queue' },
+                    success: function (response) {
+                        console.log( response.eventsCompleted );
+                        q.timeInterval = parseInt( response.nextRequestTime );
+                        q.lastRun = response.lastRun;
+                        q.setQueueTimer();
+                    }
+                });
+            }
         },
 
         init: function () {
-            this.setQueueTimer();
+            $(window).focus(function() {
+                q.tabIsActive = true;
+
+                if ( ! q.interval ){
+                    q.setQueueTimer();
+                }
+            });
+
+            $(window).blur(function() {
+                q.tabIsActive = false;
+            });
         }
-    };
+    } );
 
     $(function () {
-        ghQueue.init();
+        q.init();
     })
-})(jQuery);
+})(jQuery,wpghQueue);

@@ -3,8 +3,6 @@ var Groundhogg;
     Groundhogg = {
         leadSource: 'gh_referer',
         refID: 'gh_ref_id',
-        iterations: 0,
-        interval: 0,
         setCookie: function(cname, cvalue, exdays){
             var d = new Date();
             d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -57,24 +55,6 @@ var Groundhogg;
                 }
             });
         },
-        setQueueTimer:function()
-        {
-            this.processQueue();
-            this.interval = setInterval(Groundhogg.processQueue, 30000);
-
-        },
-        processQueue: function(){
-            $.ajax({
-                type: "post",
-                url: wpgh_ajax_object.ajax_url,
-                data: {action: 'gh_process_queue' }
-            });
-
-            this.iterations++;
-            if (this.iterations >= 5){
-                clearInterval(this.interval);
-            }
-        },
         init: function(){
             var referer = this.getCookie( this.leadSource );
             if ( ! referer ){
@@ -82,7 +62,6 @@ var Groundhogg;
             }
             this.pageView();
             this.logFormImpressions();
-            this.setQueueTimer();
         }
     };
     $(function(){

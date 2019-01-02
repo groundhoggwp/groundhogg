@@ -109,9 +109,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.0.18 =
 * ADDED replacement codes {owner_first_name} & {owner_last_name}
+* ADDED date_picker generator to the HTML helper class
 * TWEAKED steps are now collapsible for better ui
 * TWEAKED Form layout CSS for better compatibility
 * TWEAKED Ignore tracking link replacement on mailto: links
+* TWEAKED Removed the ajax process functionality for queue events altogether because it was eating up too many resources and causing server timeouts in edge cases, implementation has been left included in the event someone comes up with a better way to tackle it. The best way to ensure events go out on time is to set up the server scheduler
 * FIXED Textarea in form builder not showing options
 
 = 1.0.17.1 =

@@ -537,6 +537,46 @@ class WPGH_HTML
     }
 
     /**
+     * Output a simple Jquery UI date picker
+     *
+     * @param $args
+     * @return string HTML
+     */
+    public function date_picker( $args )
+    {
+        $a = wp_parse_args( $args, array(
+            'name'  => '',
+            'id'    => uniqid( 'date-' ),
+            'class' => 'regular-text',
+            'value' => '',
+            'attributes' => '',
+            'placeholder' => '',
+            'min-date' => date( 'Y-m-d', strtotime( 'today' ) ),
+            'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
+            'format' => 'yy-mm-dd'
+        ) );
+
+        $html = sprintf(
+            "<input type='text' id='%s' class='%s' name='%s' value='%s' placeholder='%s' autocomplete='off' %s><script>jQuery(function($){\$('#%s').datepicker({changeMonth: true,changeYear: true,minDate: '%s', maxDate: '%s',dateFormat:'%s'})});</script>",
+            esc_attr( $a[ 'id'      ] ),
+            esc_attr( $a[ 'class'   ] ),
+            esc_attr( $a[ 'name'    ] ),
+            esc_attr( $a[ 'value'   ] ),
+            esc_attr( $a[ 'placeholder' ] ),
+            $a[ 'attributes'  ],
+            esc_attr( $a[ 'id'      ] ),
+            esc_attr( $a[ 'min-date' ] ),
+            esc_attr( $a[ 'max-date' ] ),
+            esc_attr( $a[ 'format' ] )
+        );
+
+        wp_enqueue_script( 'jquery-ui-datepicker' );
+        wp_enqueue_style( 'jquery-ui' );
+
+        return apply_filters( 'wpgh_html_date_picker', $html, $args );
+    }
+
+    /**
      * Get json contact results for contact picker
      */
     public function gh_get_contacts()

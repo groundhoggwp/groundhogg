@@ -63,9 +63,10 @@ class WPGH_Event_Queue
         add_action( self::ACTION , array( $this, 'run_queue' ) );
 
 //        add_action( 'admin_init', array( $this, 'ajax_process' ) );
-        add_action( 'wp_ajax_nopriv_gh_process_queue', array( $this, 'ajax_process' ) );
-        add_action( 'wp_ajax_gh_process_queue', array( $this, 'ajax_process' ) );
-        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
+//        add_action( 'wp_ajax_nopriv_gh_process_queue', array( $this, 'ajax_process' ) );
+//        add_action( 'wp_ajax_gh_process_queue', array( $this, 'ajax_process' ) );
+//        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
+//        add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
 
         if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
 
@@ -75,9 +76,50 @@ class WPGH_Event_Queue
 
     }
 
+    /**
+     * Get the time interval in between queue requests when processing via ajax...
+     */
+    private function get_interval()
+    {
+
+        $last_request_time = intval( get_transient( 'gh_queue_last_request_time' ) );
+
+        if ( ! $last_request_time ){
+            /* in milliseconds */
+            return 0;
+        }
+
+        $diff = time() - $last_request_time;
+
+        /* If the difference is less than 60 seconds */
+        if ( $diff < 60 ){
+
+            return ( ( 60 - $diff ) + 60 ) * 1000;
+
+        } else {
+
+            return 0;
+
+        }
+
+    }
+
     public function scripts()
     {
+        $last_request_time = intval( get_transient( 'gh_queue_last_request_time' ) );
+
+        if ( ! $last_request_time ){
+            /* in milliseconds */
+             $last_request_time = time();
+        }
+
+        wp_register_script( 'wpgh-queue',   WPGH_ASSETS_FOLDER . 'js/admin/queue.min.js', array( 'jquery' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/queue.min.js' ) );
         wp_enqueue_script( 'wpgh-queue' );
+        wp_localize_script( 'wpgh-queue', 'wpghQueue', array(
+            'ajax_url'      => admin_url( 'admin-ajax.php' ),
+            'timeInterval'  => $this->get_interval(),
+            'lastRun'       => date( 'Y-m-d H:i:s', $last_request_time )
+        ) );
     }
 
     /**
@@ -89,8 +131,18 @@ class WPGH_Event_Queue
     public function setup_cron_schedules( $schedules )
     {
         $schedules[ 'every_10_minutes' ] = array(
-            'interval'    => 10 * MINUTE_IN_SECONDS,
+            'interval'    => MINUTE_IN_SECONDS,
             'display'     => __( 'Every 10 Minutes', 'groundhogg' )
+        );
+
+        $schedules[ 'every_5_minutes' ] = array(
+            'interval'    => MINUTE_IN_SECONDS,
+            'display'     => __( 'Every 5 Minutes', 'groundhogg' )
+        );
+
+        $schedules[ 'every_1_minutes' ] = array(
+            'interval'    => MINUTE_IN_SECONDS,
+            'display'     => __( 'Every 1 Minutes', 'groundhogg' )
         );
 
         return $schedules;
@@ -102,7 +154,7 @@ class WPGH_Event_Queue
     public function setup_cron_jobs()
     {
         if ( ! wp_next_scheduled( self::ACTION ) ){
-            wp_schedule_event( time(), 'every_10_minutes', self::ACTION );
+            wp_schedule_event( time(), apply_filters( 'wpgh_queue_interval', 'every_5_minutes' ), self::ACTION );
         }
     }
 
@@ -115,14 +167,8 @@ class WPGH_Event_Queue
         $events = WPGH()->events->get_queued_events();
 
         foreach ( $events as $event ) {
-
             $this->events[] = new WPGH_Event( $event->ID );
-//            $this->events[] = new WPGH_Event( $event );
-
         }
-
-//        var_dump( $events );
-//        wp_die();
 
         return $this->events;
     }
@@ -144,7 +190,13 @@ class WPGH_Event_Queue
                         wp_die( $i->get_error_message() );
                     }
 
-                    wp_die( $i );
+                    $response = array(
+                        'eventsCompleted' => $i,
+                        'nextRequestTime' => $this->get_interval(),
+                        'lastRun'         => date( 'Y-m-d H:i:s', time() )
+                    );
+
+                    wp_die( json_encode( $response ) );
 
                 } else {
 
@@ -237,6 +289,8 @@ class WPGH_Event_Queue
      */
     private function process()
     {
+
+        set_transient( 'gh_queue_last_request_time', time(), HOUR_IN_SECONDS );
 
         $this->thread = uniqid( 'queue_', true );
 
