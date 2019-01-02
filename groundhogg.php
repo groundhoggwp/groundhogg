@@ -260,7 +260,12 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->roles        = new WPGH_Roles();
                 self::$instance->tracking     = new WPGH_Tracking();
                 self::$instance->superlink    = new WPGH_Superlink();
-                self::$instance->event_queue  = new WPGH_Event_Queue();
+
+	            /**
+	             * Replaced Queue with Queue V2 @since 1.0.18
+	             */
+                self::$instance->event_queue  = new WPGH_Event_Queue_V2();
+//                self::$instance->event_queue  = new WPGH_Event_Queue();
 
                 self::$instance->replacements = new WPGH_Replacements();
                 self::$instance->notices      = new WPGH_Notices();
@@ -275,9 +280,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
                     self::$instance->upgrader   = new WPGH_Upgrade();
-//                    self::$instance->tokens_section       = new WPGH_User_Token_Section();
-//                    self::$instance->importer   = new WPGH_Importer();
-
                     if ( is_multisite() ){
                         self::$instance->network_options = new WPGH_Network_Settings_Page();
                     }
@@ -399,7 +401,8 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-elements.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-email.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-event.php';
-            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-event-queue.php';
+//            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-event-queue.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-event-queue-v2.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-extension.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-form.php';
 //            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-funnel.php';

@@ -84,7 +84,7 @@ class WPGH_Bounce_Checker
 
             /* get information specific to this email */
             $message = imap_fetchbody( $inbox, $email_number,"" );
-            $multiArray = $this->bounce_handler->get_the_facts( $message );
+	        $multiArray = $this->bounce_handler->get_the_facts( $message );
 
             foreach( $multiArray as $the ){
 
