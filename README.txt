@@ -118,7 +118,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * FIXED Textarea in form builder not showing options
 
 = 1.0.17.1 =
-* Fixed Contact Scrips breaking quick edit links in admin area
+* Fixed Contact Scripts breaking quick edit links in admin area
 
 = 1.0.17 =
 * ADDED Contact File Management. Upload files from both admin and Frontend to contact record.
