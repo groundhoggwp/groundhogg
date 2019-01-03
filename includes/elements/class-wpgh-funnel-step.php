@@ -66,7 +66,7 @@ class WPGH_Funnel_Step
      *
      * @var int
      */
-    protected $delay_time = 10;
+    protected $delay_time = 0;
 
     /**
      * Setup all of the filters and actions to register this step and save it.

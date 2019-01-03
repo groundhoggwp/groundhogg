@@ -50,7 +50,7 @@ class WPGH_Event_Queue_v2
 
         if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
 
-            add_action( 'admin_init' , array( $this, 'run_queue' ) );
+            add_action( 'admin_init' , array( $this, 'run_queue_manually' ) );
 
         }
 
@@ -108,6 +108,13 @@ class WPGH_Event_Queue_v2
     }
 
     /**
+     * Run the queue Manually and provide a notice.
+     */
+    public function run_queue_manually(){
+        WPGH()->notices->add( 'queue-complete', sprintf( "%d events have been completed.", $this->run_queue() ) );
+    }
+
+    /**
      * Decide which process to use...
      */
     public function run_queue()
@@ -152,6 +159,9 @@ class WPGH_Event_Queue_v2
     private function process()
     {
 
+        /* Get 'er done */
+        set_time_limit(0 );
+
         $this->prepare_events();
 
         if ( empty( $this->events ) ){
@@ -159,9 +169,6 @@ class WPGH_Event_Queue_v2
             return 0;
 
         }
-
-        /* Get 'er done */
-        set_time_limit(0);
 
         do_action( 'wpgh_process_event_queue_before', $this );
 

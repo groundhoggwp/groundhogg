@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.18.1 =
+* TWEAKED the delay time between consecutive events ha been changed from 10 seconds to 0 to allow for recursive and immediate queue iteration.
+
 = 1.0.18 =
 * ADDED replacement codes {owner_first_name} & {owner_last_name}
 * ADDED date_picker generator to the HTML helper class

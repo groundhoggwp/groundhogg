@@ -64,7 +64,7 @@ class WPGH_Step
      *
      * @var int
      */
-    public $queue_delay = 10;
+    public $queue_delay = 0;
 
     /**
      * This is only used when the step is enqueuing itself...
@@ -235,7 +235,7 @@ class WPGH_Step
         $time = apply_filters( 'wpgh_step_enqueue_time_' . $this->type, $this );
 
         if ( ! is_numeric( $time ) ) {
-            $time = time() + 10;
+            $time = time();
         }
 
         return $time;
