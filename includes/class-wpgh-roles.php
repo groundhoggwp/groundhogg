@@ -263,6 +263,25 @@ class WPGH_Roles {
     }
 
     /**
+     * Reports
+     *  - View Reports
+     *  - Export Reports
+     *
+     * Get caps related to managing reports
+     *
+     * @return array
+     */
+    public function get_report_caps()
+    {
+        $caps = array(
+            'view_reports',
+            'export_reports',
+        );
+
+        return apply_filters( 'wpgh_report_caps', $caps );
+    }
+
+    /**
      * Returns a list of all the caps added by GH
      */
     public function get_gh_caps()
@@ -274,7 +293,8 @@ class WPGH_Roles {
             $this->get_event_caps(),
             $this->get_funnel_caps(),
             $this->get_superlink_caps(),
-            $this->get_tag_caps()
+            $this->get_tag_caps(),
+            $this->get_report_caps()
         );
 
         return $caps;

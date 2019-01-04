@@ -91,8 +91,8 @@ class WPGH_Dashboard_Page
 
     private function include_reports()
     {
-        include_once dirname( __FILE__ ) . '/class-wpgh-report.php';
-        include_once dirname( __FILE__ ) . '/reports/class-wpgh-report-optins.php';
+        include_once dirname(__FILE__) . '/class-wpgh-report.php';
+        include_once dirname(__FILE__) . '/reports/class-wpgh-report-optins.php';
         include_once dirname(__FILE__) . '/reports/class-wpgh-report-send-emails.php';
         include_once dirname(__FILE__) . '/reports/class-wpgh-report-form-activity.php';
     }

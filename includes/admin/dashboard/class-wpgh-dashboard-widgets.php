@@ -1,0 +1,78 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: adria
+ * Date: 2019-01-03
+ * Time: 1:54 PM
+ */
+
+class WPGH_Dashboard_Widgets
+{
+
+    /**
+     * @var array an array of all the available widgets
+     */
+    public $widgets = array();
+
+    /**
+     * WPGH_Dashboard_Widgets constructor.
+     */
+    public function __construct()
+    {
+        add_action('admin_init', array( $this,'setup_widgets') );
+        add_action('wp_dashboard_setup', array( $this,'scripts') );
+    }
+
+    public function setup_widgets()
+    {
+
+        if ( ! current_user_can( 'view_reports' ) ){
+            return;
+        }
+
+        $this->includes();
+
+        $this->widgets[] = new WPGH_Time_Range_Widget();
+        $this->widgets[] = new WPGH_Report_Send_Emails();
+        $this->widgets[] = new WPGH_Report_Form_Activity();
+        $this->widgets[] = new WPGH_Report_Optins();
+        $this->widgets[] = new WPGH_Most_Active_Funnels_Widget();
+        $this->widgets[] = new WPGH_Funnel_Breakdown_Widget();
+        $this->widgets[] = new WPGH_Lead_Source_Widget();
+    }
+
+    public function scripts(){
+
+        if ( ! current_user_can( 'view_reports' ) ){
+            return;
+        }
+
+        wp_enqueue_style( 'wpgh-dashboard-widgets', WPGH_ASSETS_FOLDER . 'css/admin/dashboard.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/dashboard.css') );
+    }
+
+    /**
+     * @param $widget WPGH_Dashboard_Widget
+     */
+    public function add_widget( $widget )
+    {
+        $this->widgets[] = $widget;
+    }
+
+    /**
+     * include all nthe report files...
+     */
+    public function includes()
+    {
+        include_once dirname( __FILE__ ) . '/class-wpgh-dashboard-widget.php';
+        include_once dirname( __FILE__ ) . '/class-wpgh-reporting-widget.php';
+        include_once dirname( __FILE__ ) . '/class-wpgh-line-graph-report-v2.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-time-range-widget.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-most-active-funnels.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-funnel-breakdown-widget.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-report-optins.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-report-send-emails.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-report-form-activity.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-lead-source-widget.php';
+    }
+
+}

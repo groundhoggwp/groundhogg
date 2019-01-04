@@ -254,6 +254,7 @@ class WPGH_Contact_Query {
             'meta_key'      => '',
             'meta_value'    => '',
             'meta_query'    => '',
+            'meta_compare'  => '=',
             'date_query'    => null,
             'count'         => false,
             'no_found_rows' => true,
@@ -425,6 +426,7 @@ class WPGH_Contact_Query {
         $this->sql_clauses['limits']  = $limits;
 
         $this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$where} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
+
         $results       = $wpdb->get_results( $this->request );
 
         return $results;

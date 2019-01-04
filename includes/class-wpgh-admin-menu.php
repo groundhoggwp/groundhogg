@@ -77,7 +77,7 @@ class WPGH_Admin_Menu
         $this->includes();
 
         $this->welcome_page     = new WPGH_Welcome_Page();
-        $this->dashboard        = new WPGH_Dashboard_Page();
+        $this->dashboard        = new WPGH_Dashboard_Widgets();
         $this->contacts_page    = new WPGH_Contacts_Page();
         $this->tags_page        = new WPGH_Tags_Page();
         $this->superlink_page   = new WPGH_Superlinks_Page();
@@ -98,7 +98,8 @@ class WPGH_Admin_Menu
     public function includes()
     {
         require_once dirname( __FILE__ ). '/admin/broadcasts/class-wpgh-broadcasts-page.php';
-        require_once dirname( __FILE__ ). '/admin/dashboard/class-wpgh-dashboard-page.php';
+//        require_once dirname( __FILE__ ). '/admin/dashboard/class-wpgh-dashboard-page.php';
+        require_once dirname( __FILE__ ). '/admin/dashboard/class-wpgh-dashboard-widgets.php';
         require_once dirname( __FILE__ ). '/admin/contacts/class-wpgh-contacts-page.php';
         require_once dirname( __FILE__ ). '/admin/emails/class-wpgh-emails-page.php';
         require_once dirname( __FILE__ ). '/admin/events/class-wpgh-events-page.php';

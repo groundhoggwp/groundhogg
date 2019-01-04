@@ -850,18 +850,18 @@ function wpgh_round_to_hour( $time ){
 }
 
 /**
- * Round time to the nearest hour.
+ * Round time to the nearest day.
  *
  * @param $time int
  * @return int
  */
 function wpgh_round_to_day( $time ){
 
-    $minutes = $time % DAY_IN_SECONDS; # pulls the remainder of the hour.
+    $hours = $time % DAY_IN_SECONDS; # pulls the remainder of the hour.
 
-    $time -= $minutes; # just start off rounded down.
+    $time -= $hours; # just start off rounded down.
 
-    if ($minutes >= ( DAY_IN_SECONDS / 2 ) ) $time += DAY_IN_SECONDS; # add one hour if 30 mins or higher.
+    if ($hours >= ( DAY_IN_SECONDS / 2 ) ) $time += DAY_IN_SECONDS; # add one day if 12 hours or higher.
 
     return $time;
 }
@@ -1048,3 +1048,59 @@ function wpgh_convert_user_to_contact_when_user_registered( $userId )
 
 add_action( 'user_register', 'wpgh_convert_user_to_contact_when_user_registered' );
 
+/**
+ * Get quarter $start & end dates...
+ *
+ * @see https://stackoverflow.com/questions/21185924/get-startdate-and-enddate-for-current-quarter-php
+ *
+ * @param string $quarter
+ * @param null $year
+ * @param null $format
+ * @return int[]
+ * @throws Exception
+ */
+function wpgh_get_dates_of_quarter($quarter = 'current', $year = null, $format = null)
+{
+    if ( !is_int($year) ) {
+        $year = (new DateTime)->format('Y');
+    }
+    $current_quarter = ceil((new DateTime)->format('n') / 3);
+    switch (  strtolower($quarter) ) {
+        case 'this':
+        case 'current':
+            $quarter = ceil((new DateTime)->format('n') / 3);
+            break;
+
+        case 'previous':
+            $year = (new DateTime)->format('Y');
+            if ($current_quarter == 1) {
+                $quarter = 4;
+                $year--;
+            } else {
+                $quarter =  $current_quarter - 1;
+            }
+            break;
+
+        case 'first':
+            $quarter = 1;
+            break;
+
+        case 'last':
+            $quarter = 4;
+            break;
+
+        default:
+            $quarter = (!is_int($quarter) || $quarter < 1 || $quarter > 4) ? $current_quarter : $quarter;
+            break;
+    }
+    if ( $quarter === 'this' ) {
+        $quarter = ceil((new DateTime)->format('n') / 3);
+    }
+    $start = new DateTime($year.'-'.(3*$quarter-2).'-1 00:00:00');
+    $end = new DateTime($year.'-'.(3*$quarter).'-'.($quarter == 1 || $quarter == 4 ? 31 : 30) .' 23:59:59');
+
+    return array(
+        'start' => $start->getTimestamp(),
+        'end'   => $end->getTimestamp(),
+    );
+}

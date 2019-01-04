@@ -35,7 +35,6 @@ class WPGH_Upgrade{
         }
 
         $this->current_version = WPGH()->version;
-
         add_action( 'admin_init', array( $this, 'do_upgrades' ) );
 
     }
@@ -61,6 +60,7 @@ class WPGH_Upgrade{
     private function upgrade_path()
     {
         $this->update_to_version( '1.0.16' );
+        $this->update_to_version( '1.0.18.1' );
     }
 
     /**
@@ -128,5 +128,20 @@ class WPGH_Upgrade{
         }
 
     }
+
+    /**
+     * Add New Reports Roles to Administrator and Marketer
+     */
+    public function version_1_0_18_1()
+    {
+        global $wp_roles;
+
+        $wp_roles->add_cap( 'administrator', 'view_reports' );
+        $wp_roles->add_cap( 'administrator', 'export_reports' );
+        $wp_roles->add_cap( 'marketer', 'view_reports' );
+        $wp_roles->add_cap( 'marketer', 'export_reports' );
+
+    }
+
 
 }

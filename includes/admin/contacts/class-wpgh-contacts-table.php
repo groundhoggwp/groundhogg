@@ -254,6 +254,8 @@ class WPGH_Contacts_Table extends WP_List_Table {
      */
     function prepare_items() {
 
+        global $wpdb;
+
         $per_page = 30;
 
         $columns  = $this->get_columns();
@@ -287,7 +289,19 @@ class WPGH_Contacts_Table extends WP_List_Table {
         if ( isset( $_REQUEST[ 'meta_key' ] ) && isset( $_REQUEST[ 'meta_value' ] ) ){
             $query[ 'meta_key' ] = sanitize_key( $_REQUEST[ 'meta_key' ] );
             $query[ 'meta_value' ] = urldecode( $_REQUEST[ 'meta_value' ] );
+            if ( isset( $_REQUEST[ 'meta_compare' ] ) ){
+                $query['meta_compare'] = strtoupper( sanitize_key(  $_REQUEST[ 'meta_compare' ]  ) );
+            }
         }
+
+        if ( isset( $_REQUEST[ 'date_after' ] ) ){
+            $query[ 'date_query' ][ 'after' ] = stripslashes( $_REQUEST[ 'date_after' ] );
+        }
+
+        if ( isset( $_REQUEST[ 'date_before' ] ) ){
+            $query[ 'date_query' ][ 'before' ] = stripslashes( $_REQUEST[ 'date_before' ] );
+        }
+
 
         switch ( $this->get_view() )
         {

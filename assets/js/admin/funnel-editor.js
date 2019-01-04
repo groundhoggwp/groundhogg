@@ -63,7 +63,7 @@ var wpghFunnelEditor;
                 prompt( "Copy This Link", $('#share-link').val() );
             });
 
-            $( '.postbox' ).on( 'click', '.collapse', function ( e ) {
+            $( document ).on( 'click', '.postbox .collapse', function ( e ) {
                 var $step = $( this.parentNode );
                 if ( $step.hasClass( 'closed' ) ){
                     wpghFunnelEditor.expandStep( $step );

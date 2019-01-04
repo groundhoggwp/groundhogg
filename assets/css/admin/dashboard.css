@@ -1,9 +1,24 @@
 
-.chart
-{
-    margin: 5px;
-    height: 1000px;
-    background-color: #3ed920;
-    margin-top: 1000px;
-
+table.chart-summary,table.wpgh-most-active-funnels{width: 100%;}
+table.wpgh-most-active-funnels * {white-space: nowrap;}
+table.wpgh-most-active-funnels th,
+table.chart-summary th {
+    text-align: left;
+    font-weight: 500;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #cccccc;
 }
+table.chart-summary th,table.chart-summary td{ text-align: center}
+table.chart-summary th:first-child,table.chart-summary td:first-child{ text-align: left}
+table.wpgh-most-active-funnels th:last-child{text-align: center;}
+table.chart-summary td,table.wpgh-most-active-funnels td{padding-top: 10px;}
+table.wpgh-most-active-funnels td.funnel-title{width: 70%;}
+table.chart-summary .summary-total, table.wpgh-most-active-funnels td.active-contacts{
+    text-align: center;
+    font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+table.wpgh-most-active-funnels td.active-contacts{width: 30%;}
+.export-button{display: none;}
+.postbox:hover .export-button{display: block;}

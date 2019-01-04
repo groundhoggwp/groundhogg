@@ -108,7 +108,17 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.0.18.1 =
-* TWEAKED the delay time between consecutive events ha been changed from 10 seconds to 0 to allow for recursive and immediate queue iteration.
+* ADDED Export ability to reporting widgets
+* ADDED several new default reporting time ranges.
+* ADDED funnel breakdown report widget
+* ADDED Active Funnels report widget
+* ADDED Lead Source Activity report
+* ADDED reporting capabilities for admin and marketers
+* ADDED Compare option for META_QUERY in WPGH_CONTACT_QUERY class
+* FIXED could not collapse step if newly added.
+* TWEAKED moved dashboard reporting to widgets in the WP admin dashboard
+* TWEAKED the delay time between consecutive events have been changed from 10 seconds to 0 to allow for recursive and immediate queue iteration.
+* REMOVED Dashboard page
 
 = 1.0.18 =
 * ADDED replacement codes {owner_first_name} & {owner_last_name}
