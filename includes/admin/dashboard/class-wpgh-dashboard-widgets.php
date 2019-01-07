@@ -52,10 +52,18 @@ class WPGH_Dashboard_Widgets
 
     /**
      * @param $widget WPGH_Dashboard_Widget
+     *
+     * @return bool whether the widget was added or not.
      */
     public function add_widget( $widget )
     {
+        if ( ! current_user_can( 'view_reports' ) ){
+            return false;
+        }
+
         $this->widgets[] = $widget;
+
+        return true;
     }
 
     /**

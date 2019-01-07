@@ -696,6 +696,12 @@ class WPGH_Funnels_Page
                 $step->delete_meta( 'blog_id' );
             }
 
+            if ( isset( $_POST[ $step->prefix( 'closed' ) ] ) && ! empty(  $_POST[ $step->prefix( 'closed' ) ] ) ){
+                $step->update_meta( 'is_closed', 1 );
+            } else {
+                $step->delete_meta( 'is_closed' );
+            }
+
             do_action( 'wpgh_save_step_' . $step->type, $step );
 
         }

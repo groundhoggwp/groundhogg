@@ -53,7 +53,7 @@ class WPGH_Most_Active_Funnels_Widget extends WPGH_Reporting_Widget
 //            $ordered = array_slice( $ordered, 0, 5 );
 //        }
 
-        ?><table class="wpgh-most-active-funnels">
+        ?><table class="chart-summary">
         <thead>
         <tr>
             <th><?php _e( 'Funnel', 'groundhogg' ); ?></th>
@@ -67,8 +67,8 @@ class WPGH_Most_Active_Funnels_Widget extends WPGH_Reporting_Widget
 
             ?>
             <tr>
-                <td class="funnel-title"><?php printf( '<a href="%s">%s</a>', admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID ), $funnel->title ); ?></td>
-                <td class="active-contacts"><?php echo $count ?></td>
+                <td><?php printf( '<a href="%s">%s</a>', admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID ), $funnel->title ); ?></td>
+                <td class="summary-total"><?php echo $count ?></td>
             </tr>
             <?php
 

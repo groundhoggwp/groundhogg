@@ -172,14 +172,41 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
             case 'custom';
                 $this->start_time   = wpgh_round_to_day( strtotime( $this->get_url_var( 'custom_date_range_start' ) ) );
                 $this->end_time     = wpgh_round_to_day( strtotime( $this->get_url_var( 'custom_date_range_end' ) ) );
-                $this->points = ( $this->end_time - $this->start_time ) / DAY_IN_SECONDS;
-                $this->difference = DAY_IN_SECONDS;
+
+                $range = $this->end_time - $this->start_time;
+
+                $this->points       = ceil( $range  / $this->get_time_diff( $range ) );
+                $this->difference   = $this->get_time_diff( $range );
+
                 break;
 
         }
 
         $this->start_range  = $this->start_time;
         $this->end_range = $this->start_range + $this->difference;
+    }
+
+    /**
+     * Get the differnece in time between points given a time range...
+     *
+     * @param $range
+     * @return int
+     */
+    private function get_time_diff( $range )
+    {
+
+        if ( $range <= DAY_IN_SECONDS ){
+            return HOUR_IN_SECONDS;
+        } else if ( $range <= WEEK_IN_SECONDS ) {
+            return DAY_IN_SECONDS;
+        } else if ( $range <= MONTH_IN_SECONDS ){
+            return WEEK_IN_SECONDS;
+        } else if ( $range <= YEAR_IN_SECONDS ){
+            return MONTH_IN_SECONDS;
+        }
+
+        return DAY_IN_SECONDS;
+
     }
 
     /**

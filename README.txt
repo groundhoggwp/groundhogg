@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.18.3 =
+* FIXED Collapse status of steps saved.
+* FIXED Bugs where collapsed report widgets caused JS Errors.
+
 = 1.0.18.2 =
 * ADDED time to next queue run in the events table
 * FIXED manually process events button CSS

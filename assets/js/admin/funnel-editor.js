@@ -342,7 +342,7 @@ var wpghFunnelEditor;
             console.log( $step );
 
             $step.addClass( 'closed' );
-            $step.find( '.inside' ).addClass( 'hidden' )
+            $step.find( '.collapse-input' ).val( '1' )
 
         },
 
@@ -354,7 +354,8 @@ var wpghFunnelEditor;
         expandStep: function( $step ) {
 
             $step.removeClass( 'closed' );
-            $step.find( '.inside' ).removeClass( 'hidden' )
+            $step.find( '.collapse-input' ).val( '' )
+
 
         }
     };

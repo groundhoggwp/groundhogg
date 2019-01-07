@@ -70,15 +70,10 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
                                     previousPoint = item.dataIndex;
                                     previousLabel = item.series.label;
                                     $("#tooltip").remove();
-
                                     var x = item.datapoint[0];
                                     var y = item.datapoint[1];
-
                                     var color = item.series.color;
                                     var date =  new Date(x).toDateString();
-
-                                    console.log( item );
-
                                     showTooltip(item.pageX, item.pageY, color, "<strong>" + item.series.label + "</strong>: " + y + "<br/>" + date );
                                 }
                             } else {
@@ -105,12 +100,15 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
                     }
 
                     /* PLOT CHART */
-                    $.plot($("#graph-<?php echo sanitize_key($this->name); ?>"), dataset, options);
-                    $("#graph-<?php echo sanitize_key($this->name); ?>").UseTooltip();
+
+                    if ( $( "#graph-<?php echo sanitize_key($this->name); ?>" ).width() > 0 ){
+                        $.plot($("#graph-<?php echo sanitize_key($this->name); ?>"), dataset, options);
+                        $("#graph-<?php echo sanitize_key($this->name); ?>").UseTooltip();
+                    }
 
                 });
             </script>
-            <div id="graph-<?php echo sanitize_key($this->name); ?>" style="width: auto;height: 250px"></div>
+            <div id="graph-<?php echo sanitize_key($this->name); ?>" style="width:auto;height: 250px;"></div>
        </div>
     <?php
         echo $this->extra_widget_info();

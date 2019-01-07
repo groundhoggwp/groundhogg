@@ -522,11 +522,12 @@ class WPGH_Step
      */
     public function html()
     {
+        $closed = $this->get_meta( 'is_closed' ) ? 'closed' : '' ;
 
         ?>
-        <div title="<?php echo $this->title ?>" id="<?php echo $this->ID; ?>" class="postbox step <?php echo $this->group; ?> <?php echo $this->type; ?>">
-
+        <div title="<?php echo $this->title ?>" id="<?php echo $this->ID; ?>" class="postbox step <?php echo $this->group; ?> <?php echo $this->type; ?> <?php echo $closed; ?>">
             <button type="button" class="handlediv collapse"><span class="toggle-indicator" aria-hidden="true"></span></button>
+            <input type="hidden" class="collapse-input" name="<?php echo $this->prefix( 'closed' ); ?>" value="<?php echo $this->get_meta( 'is_closed' ); ?>">
 
             <!-- DELETE -->
             <button title="Delete" type="button" class="handlediv delete-step">
