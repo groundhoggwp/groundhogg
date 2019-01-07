@@ -116,6 +116,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED reporting capabilities for admin and marketers
 * ADDED Compare option for META_QUERY in WPGH_CONTACT_QUERY class
 * FIXED could not collapse step if newly added.
+* FIXED could not delete all tags from a contact
+* FIXED file upload error on contact editor page when no files uploaded
 * TWEAKED moved dashboard reporting to widgets in the WP admin dashboard
 * TWEAKED the delay time between consecutive events have been changed from 10 seconds to 0 to allow for recursive and immediate queue iteration.
 * REMOVED Dashboard page

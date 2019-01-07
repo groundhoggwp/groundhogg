@@ -574,9 +574,12 @@ class WPGH_Contacts_Page
                 $result = $contact->add_tag( $add_tags );
 
                 if ( ! $result ){
-                    $this->notices->add( 'bad-tag', 'Hmm, looks like we couldn\'t add the new tags...' );
+                    $this->notices->add( 'bad-tag', __( 'Hmm, looks like we couldn\'t add the new tags...' , 'groundhogg' ) );
                 }
             }
+        } else {
+            //delete all tags...
+            $contact->remove_tag( $contact->tags );
         }
 
         if ( isset( $_POST[ 'send_email' ] ) && isset( $_POST[ 'email_id' ] ) && current_user_can( 'send_emails' ) ){
@@ -597,7 +600,10 @@ class WPGH_Contacts_Page
 
         $this->notices->add( 'update', __( "Contact updated!", 'groundhogg' ), 'success' );
 
-        if ( ! empty( $_FILES ) ){
+        if ( ! empty( $_FILES[ 'files' ][ 'tmp_name' ][ 0 ] ) ){
+
+            var_dump( $_FILES );
+
             $this->upload_files();
         }
 
@@ -612,7 +618,7 @@ class WPGH_Contacts_Page
         $id = intval( $_GET[ 'contact' ] );
         $contact = wpgh_get_contact( $id );
 
-        if ( ! isset($_FILES[ 'files' ] ) || empty( $_FILES[ 'files' ] ) ){
+        if ( ! isset( $_FILES[ 'files' ][ 'tmp_name' ][ 0 ] ) || empty( $_FILES[ 'files' ][ 'tmp_name' ][ 0 ] ) ){
             return false;
         }
 
