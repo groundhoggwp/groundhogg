@@ -120,6 +120,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * FIXED file upload error on contact editor page when no files uploaded
 * TWEAKED moved dashboard reporting to widgets in the WP admin dashboard
 * TWEAKED the delay time between consecutive events have been changed from 10 seconds to 0 to allow for recursive and immediate queue iteration.
+* TWEAKED Cron schedule changed from every 10 minutes to every 5 minutes.
 * REMOVED Dashboard page
 
 = 1.0.18 =

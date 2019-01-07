@@ -136,10 +136,14 @@ class WPGH_Upgrade{
     {
         global $wp_roles;
 
+        //add new roles for reports
         $wp_roles->add_cap( 'administrator', 'view_reports' );
         $wp_roles->add_cap( 'administrator', 'export_reports' );
         $wp_roles->add_cap( 'marketer', 'view_reports' );
         $wp_roles->add_cap( 'marketer', 'export_reports' );
+
+        //clear the cron event from the old 10 minute schedule and put it on the 5 minute schedule.
+        wp_clear_scheduled_hook( 'wpgh_cron_event' );
 
     }
 
