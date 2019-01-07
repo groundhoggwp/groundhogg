@@ -144,9 +144,12 @@ class WPGH_Events_Table extends WP_List_Table {
 
     protected function extra_tablenav($which)
     {
+        $next_run_in = wp_next_scheduled( 'wpgh_cron_event' );
+        $next_run_in = human_time_diff( time(), $next_run_in );
+
         ?>
-        <div class="alignleft actions">
-            <a class="button button-secondary action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php _e( 'Process Events', 'groundhogg' ); ?></a>
+        <div class="alignleft">
+            <a class="button button-secondary action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php printf( __( 'Process Events (Auto Runs In %s)', 'groundhogg' ), $next_run_in ); ?></a>
         </div>
         <?php
     }

@@ -65,12 +65,12 @@ class WPGH_Event_Queue_v2
     public function setup_cron_schedules( $schedules )
     {
         $schedules[ 'every_10_minutes' ] = array(
-            'interval'    => MINUTE_IN_SECONDS,
+            'interval'    => 10 * MINUTE_IN_SECONDS,
             'display'     => __( 'Every 10 Minutes', 'groundhogg' )
         );
 
         $schedules[ 'every_5_minutes' ] = array(
-            'interval'    => MINUTE_IN_SECONDS,
+            'interval'    => 5 * MINUTE_IN_SECONDS,
             'display'     => __( 'Every 5 Minutes', 'groundhogg' )
         );
 

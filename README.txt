@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.18.2 =
+* ADDED time to next queue run in the events table
+* FIXED manually process events button CSS
+
 = 1.0.18.1 =
 * ADDED Export ability to reporting widgets
 * ADDED several new default reporting time ranges.
