@@ -117,46 +117,64 @@ class WPGH_Funnels_Table extends WP_List_Table {
 	    wp_enqueue_script( 'jquery-ui-datepicker' );
 
 		?>
-	    <div class="alignleft actions">
-		    <?php $args = array(
-			    'name'      => 'date_range',
-			    'id'        => 'date_range',
-			    'options'   => array(
-				    'last_24'   => __( 'Last 24 Hours' ),
-				    'last_7'    => __( 'Last 7 Days' ),
-				    'last_30'   => __( 'Last 30 Days' ),
-				    'custom'    => __( 'Custom Range' ),
-			    ),
-			    'selected' => WPGH()->menu->funnels_page->get_reporting_range(),
-		    ); echo WPGH()->html->dropdown( $args ); ?>
+        <div class="alignleft actions bulkactions">
+            <?php $args = array(
+                'name'      => 'date_range',
+                'id'        => 'date_range',
+                'options'   => array(
+                    'today'     => __( 'Today' ),
+                    'yesterday' => __( 'Yesterday' ),
+                    'this_week' => __( 'This Week' ),
+                    'last_week' => __( 'Last Week' ),
+                    'last_30'   => __( 'Last 30 Days' ),
+                    'this_month'   => __( 'This Month' ),
+                    'last_month'   => __( 'Last Month' ),
+                    'this_quarter' => __( 'This Quarter' ),
+                    'last_quarter' => __( 'Last Quarter' ),
+                    'this_year' => __( 'This Year' ),
+                    'last_year' => __( 'Last Year' ),
+                    'custom'    => __( 'Custom Range' ),
+                ),
+                'selected' => WPGH()->menu->funnels_page->get_url_var( 'date_range', 'this_week' ),
+            ); echo WPGH()->html->dropdown( $args );
 
-		    <?php $selected = WPGH()->menu->funnels_page->get_reporting_range(); ?>
-		    <input autocomplete="off" placeholder="<?php esc_attr_e('From:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_start" name="custom_date_range_start" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_start' ] ) ) echo $_POST['custom_date_range_start']; ?>">
-		    <script>jQuery(function($){$('#custom_date_range_start').datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    maxDate:0,
-                    dateFormat:'d-m-yy'
-                })});</script>
-		    <input autocomplete="off" placeholder="<?php esc_attr_e('To:'); ?>" class="input <?php if ( $selected !== 'custom' ) echo 'hidden'; ?>" id="custom_date_range_end" name="custom_date_range_end" type="text" value="<?php if ( isset(  $_POST[ 'custom_date_range_end' ] ) ) echo $_POST['custom_date_range_end']; ?>">
-		    <script>jQuery(function($){$('#custom_date_range_end').datepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    maxDate:0,
-                    dateFormat:'d-m-yy'
-                })});</script>
+            submit_button( 'Refresh', 'secondary', 'change_reporting', false );
 
-		    <script>jQuery(function($){$('#date_range').change(function(){
+            $class = WPGH()->menu->funnels_page->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden';
+
+            ?><div class="custom-range <?php echo $class ?> alignleft actions"><?php
+
+                echo WPGH()->html->date_picker(array(
+                    'name'  => 'custom_date_range_start',
+                    'id'    => 'custom_date_range_start',
+                    'class' => 'input',
+                    'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_start' ),
+                    'attributes' => '',
+                    'placeholder' => 'YYY-MM-DD',
+                    'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
+                    'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
+                    'format' => 'yy-mm-dd'
+                ));
+                echo WPGH()->html->date_picker(array(
+                    'name'  => 'custom_date_range_end',
+                    'id'    => 'custom_date_range_end',
+                    'class' => 'input',
+                    'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_end' ),
+                    'attributes' => '',
+                    'placeholder' => 'YYY-MM-DD',
+                    'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
+                    'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
+                    'format' => 'yy-mm-dd'
+                )); ?>
+            </div>
+            <script>jQuery(function($){$('#date_range').change(function(){
                     if($(this).val() === 'custom'){
-                        $('#custom_date_range_end').removeClass('hidden');
-                        $('#custom_date_range_start').removeClass('hidden');
+                        $('.custom-range').removeClass('hidden');
                     } else {
-                        $('#custom_date_range_end').addClass('hidden');
-                        $('#custom_date_range_start').addClass('hidden');
+                        $('.custom-range').addClass('hidden');
                     }})});
-		    </script>
-		    <?php submit_button( 'Refresh', 'secondary', 'change_reporting', false ); ?>
-	    </div>
+            </script>
+        </div>
 		<?php
     }
 

@@ -3,6 +3,7 @@ table.chart-summary,table.wpgh-most-active-funnels{width: 100%;border-collapse: 
 table.wpgh-most-active-funnels * {white-space: nowrap;}
 table.wpgh-most-active-funnels th,
 table.chart-summary thead th {font-weight: 500;padding-bottom: 10px;text-align: center;}
+table.chart-summary tbody th {font-weight: 500;}
 table.chart-summary tfoot td{padding-top: 10px;}
 table.chart-summary tbody tr:last-child td{padding-bottom: 10px;}
 table.chart-summary tfoot th{font-weight: 500;padding-top: 10px;text-align: center;}

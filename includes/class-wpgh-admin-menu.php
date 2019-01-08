@@ -63,7 +63,7 @@ class WPGH_Admin_Menu
     var $welcome_page;
 
     /**
-     * @var WPGH_Dashboard_Page
+     * @var WPGH_Dashboard_Widgets
      */
     var $dashboard;
 

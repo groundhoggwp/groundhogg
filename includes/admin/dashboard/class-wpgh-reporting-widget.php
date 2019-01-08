@@ -100,7 +100,6 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
 //        date_default_timezone_set( 'UTC' );
 
         switch ( $this->range ){
-            default:
             case 'today';
                 $this->start_time   = strtotime( 'today' );
                 $this->end_time     = $this->start_time + DAY_IN_SECONDS;
@@ -113,6 +112,7 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
                 $this->points       = 24;
                 $this->difference   = HOUR_IN_SECONDS;
                 break;
+            default:
             case 'this_week';
                 $this->start_time   = mktime(0, 0, 0, date("n"), date("j") - date("N") + 1);
                 $this->end_time     = $this->start_time + WEEK_IN_SECONDS;

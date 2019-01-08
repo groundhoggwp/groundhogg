@@ -67,6 +67,11 @@ class WPGH_Emails_Page
             wp_enqueue_script( 'codemirror-mode-html', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/htmlmixed.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/htmlmixed.js') );
 
             wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.min.js' ) );
+
+            wp_localize_script( 'email-editor', 'email', array(
+                'id' => intval( $_GET[ 'email' ] ),
+            ) );
+
             wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . 'css/admin/email-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/email-editor.css' ) );
 
             // adding beautify js

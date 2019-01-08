@@ -39,6 +39,8 @@ class WPGH_Dashboard_Widgets
         $this->widgets[] = new WPGH_Most_Active_Funnels_Widget();
         $this->widgets[] = new WPGH_Funnel_Breakdown_Widget();
         $this->widgets[] = new WPGH_Lead_Source_Widget();
+        $this->widgets[] = new WPGH_Social_Media_Widget();
+        $this->widgets[] = new WPGH_Search_Engines_Widget();
     }
 
     public function scripts(){
@@ -81,6 +83,8 @@ class WPGH_Dashboard_Widgets
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-report-send-emails.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-report-form-activity.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-lead-source-widget.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-social-media-widget.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-search-engines-widget.php';
     }
 
 }

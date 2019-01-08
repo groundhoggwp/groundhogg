@@ -63,6 +63,10 @@
     vertical-align: top;
 }
 
+.funnel-editor-header div.hidden{
+    display: none;
+}
+
 .funnel-editor-header .status-options{
     float: right;
     margin-right: 20px;

@@ -36,13 +36,17 @@ class WPGH_Most_Active_Funnels_Widget extends WPGH_Reporting_Widget
         /* Get all events within time range */
         foreach ( $funnels as $funnel ){
 
-            $num_events = WPGH()->events->count( array(
-                'funnel_id' => $funnel->ID,
-                'start'     => $this->start_time,
-                'end'       => $this->end_time,
+            $query = new WPGH_Contact_Query();
+            $contacts = $query->query( array(
+                'report' => array(
+                    'start' => $this->start_time,
+                    'end'   => $this->end_time,
+                    'funnel' => $funnel->ID
+                )
             ) );
 
-            $ordered[ $num_events ] = $funnel;
+            $num_contacts = count( $contacts );
+            $ordered[ $num_contacts ] = $funnel;
 
         }
 

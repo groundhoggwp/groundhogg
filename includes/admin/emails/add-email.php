@@ -30,7 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     .email-container h1{ font-weight: bold; padding: 0;margin: 0.67em 0 0.67em 0;}
     .email-container h2{ font-weight: bold; padding: 0;margin: 0.83em 0 0.83em 0;}
 </style>
-<?php $from_funnel = ( isset( $_GET['step'] ) )? '&step=' . $_GET['step']: ''; ?>
+<?php $from_funnel = ( isset( $_GET['return_funnel'] ) )? '&return_funnel=' . $_GET['return_funnel']: ''; ?>
+<?php $from_funnel .= ( isset( $_GET['return_step'] ) )? '&return_step=' . $_GET['return_step']: ''; ?>
 <?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'templates'; ?>
 <h2 class="nav-tab-wrapper">
     <a href="?page=gh_emails&action=add&tab=templates<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Email Templates', 'groundhogg'); ?></a>

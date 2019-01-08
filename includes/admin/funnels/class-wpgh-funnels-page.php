@@ -167,7 +167,7 @@ class WPGH_Funnels_Page
 
     public function get_reporting_range()
     {
-        return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'last_30' ;
+        return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'this_week' ;
     }
 
     private function setup_reporting(){
@@ -177,31 +177,74 @@ class WPGH_Funnels_Page
         }
 
         switch ( $this->get_reporting_range() ):
-            case 'last_24';
-                $this->reporting_start_time = strtotime( '1 day ago' );
-                $this->reporting_end_time   = time();
+            case 'today';
+                $this->reporting_start_time   = strtotime( 'today' );
+                $this->reporting_end_time     = $this->reporting_start_time + DAY_IN_SECONDS;
                 break;
-            case 'last_7';
-                $this->reporting_start_time = strtotime( '7 days ago' );
-                $this->reporting_end_time   = time();
-
-                break;
-            case 'last_30';
-                $this->reporting_start_time = strtotime( '30 days ago' );
-                $this->reporting_end_time   = time();
-
-                break;
-            case 'custom';
-                $this->reporting_start_time = strtotime( $_POST['custom_date_range_start'] );
-                $this->reporting_end_time   = strtotime( $_POST['custom_date_range_end'] );
-
+            case 'yesterday';
+                $this->reporting_start_time   = strtotime( 'yesterday' );
+                $this->reporting_end_time     = $this->reporting_start_time + DAY_IN_SECONDS;
                 break;
             default:
-                $this->reporting_start_time = strtotime( '1 day ago' );
-                $this->reporting_end_time   = time();
-
+            case 'this_week';
+                $this->reporting_start_time   = mktime(0, 0, 0, date("n"), date("j") - date("N") + 1);
+                $this->reporting_end_time     = $this->reporting_start_time + WEEK_IN_SECONDS;
                 break;
-        endswitch;
+            case 'last_week';
+                $this->reporting_start_time   = mktime(0, 0, 0, date("n"), date("j") - date("N") + 1) - WEEK_IN_SECONDS;
+                $this->reporting_end_time     = $this->reporting_start_time + WEEK_IN_SECONDS;
+                break;
+            case 'last_30';
+                $this->reporting_start_time   = wpgh_round_to_day( time() - MONTH_IN_SECONDS );
+                $this->reporting_end_time     = wpgh_round_to_day( time() );
+                break;
+            case 'last_month';
+                $this->reporting_start_time   = strtotime( 'first day of ' . date( 'F Y' , TIME() - MONTH_IN_SECONDS ) );
+                $this->reporting_end_time     = $this->reporting_start_time + MONTH_IN_SECONDS;
+                break;
+            case 'this_month';
+                $this->reporting_start_time   = strtotime( 'first day of ' . date( 'F Y') );
+                $this->reporting_end_time     = $this->reporting_start_time + MONTH_IN_SECONDS;
+                break;
+            case 'this_quarter';
+                $quarter            = wpgh_get_dates_of_quarter();
+                $this->reporting_start_time   = $quarter[ 'start' ];
+                $this->reporting_end_time     = $quarter[ 'end' ];
+                break;
+            case 'last_quarter';
+                $quarter            = wpgh_get_dates_of_quarter( 'previous' );
+                $this->reporting_start_time   = $quarter[ 'start' ];
+                $this->reporting_end_time     = $quarter[ 'end' ];
+                break;
+            case 'this_year';
+                $this->reporting_start_time   = mktime(0, 0, 0, 1, 1, date( 'Y' ) );
+                $this->reporting_end_time     = $this->reporting_start_time + YEAR_IN_SECONDS;
+                break;
+            case 'last_year';
+                $this->reporting_start_time   = mktime(0, 0, 0, 1, 1, date( 'Y' , time() - YEAR_IN_SECONDS ));
+                $this->reporting_end_time     = $this->reporting_start_time + YEAR_IN_SECONDS;
+                break;
+            case 'custom';
+                $this->reporting_start_time   = wpgh_round_to_day( strtotime( $this->get_url_var( 'custom_date_range_start' ) ) );
+                $this->reporting_end_time     = wpgh_round_to_day( strtotime( $this->get_url_var( 'custom_date_range_end' ) ) );
+                break;
+            endswitch;
+    }
+
+    /**
+     * Get a query var
+     *
+     * @param $var
+     * @param $default
+     * @return string
+     */
+    public function get_url_var( $var, $default = false )
+    {
+        if ( isset( $_REQUEST[ $var ] ) && ! empty( $_REQUEST[ $var ] ) ){
+            return sanitize_text_field( urldecode( $_REQUEST[ $var ] ) );
+        }
+
+        return $default;
     }
 
 	private function get_funnels()

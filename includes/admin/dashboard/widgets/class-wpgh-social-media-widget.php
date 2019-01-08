@@ -5,18 +5,33 @@
  * Date: 11/27/2018
  * Time: 9:13 AM
  */
-class WPGH_Lead_Source_Widget extends WPGH_Reporting_Widget
+class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
 {
+
+    private $social_networks = array();
 
     /**
      * WPGH_Report_V2 constructor.
      */
     public function __construct()
     {
-        $this->wid = 'groundhogg_lead_source_widget';
-        $this->name = __( 'Lead Source Report', 'groundhogg' );
+        $this->wid = 'groundhogg_social_media_widget';
+        $this->name = __( 'Social Media Report', 'groundhogg' );
+        $this->setup_social_networks();
 
         parent::__construct();
+    }
+
+    /**
+     * Setup the social_netwrks array from the yaml file in lib
+     */
+    public function setup_social_networks()
+    {
+        if ( ! class_exists( 'Spyc' ) ){
+            include_once WPGH_PLUGIN_DIR . 'includes/lib/yaml/Spyc.php';
+        }
+
+        $this->social_networks = Spyc::YAMLLoad( WPGH_PLUGIN_DIR . 'includes/lib/potential-known-leadsources/Socials.yml' );
     }
 
     /**
@@ -25,6 +40,8 @@ class WPGH_Lead_Source_Widget extends WPGH_Reporting_Widget
     public function widget()
     {
         global $wpdb;
+
+//        var_dump( $this->social_networks );
 
         $table = WPGH()->contacts->table_name;
         $start_date = date('Y-m-d H:i:s', $this->start_time);
@@ -44,21 +61,25 @@ class WPGH_Lead_Source_Widget extends WPGH_Reporting_Widget
 
                     /* TO avoid long lists of specifics, limit to just the root domin. */
                     $lead_source = parse_url( $lead_source, PHP_URL_HOST );
+                    $lead_source = str_replace( 'www.', '', $lead_source );
 
+                    foreach ( $this->social_networks as $network_name => $network_urls ){
+
+                        if ( in_array( $lead_source, $network_urls ) )
+
+                        if ( isset($sources[$network_name]) ){
+                            $sources[$network_name]++;
+                        } else {
+                            $sources[$network_name] = 1;
+                        }
+                    }
                 }
-
-                if ( isset($sources[$lead_source]) ){
-                    $sources[$lead_source]++;
-                } else {
-                    $sources[$lead_source] = 1;
-                }
-
             }
 
         }
 
         if ( empty( $sources ) ){
-            printf( '<p class="description">%s</p>', __( 'No new lead sources to report.', 'groundhogg' ) );
+            printf( '<p class="description">%s</p>', __( 'No new social media sources to report.', 'groundhogg' ) );
             return;
         }
 
@@ -69,7 +90,7 @@ class WPGH_Lead_Source_Widget extends WPGH_Reporting_Widget
         <table class="chart-summary">
         <thead>
         <tr>
-            <th><?php _e( 'Lead Source', 'groundhogg' ); ?></th>
+            <th><?php _e( 'Social Media Site', 'groundhogg' ); ?></th>
             <th><?php _e( 'Contacts', 'groundhogg' ); ?></th>
         </tr>
         </thead>
@@ -80,7 +101,7 @@ class WPGH_Lead_Source_Widget extends WPGH_Reporting_Widget
 
             ?>
             <tr>
-                <td class=""><?php printf( '<a href="%s">%s</a>', admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=%s&meta_value=%s&meta_compare=RLIKE&date_after=%s&date_before=%s', 'lead_source', urlencode( $source ), date( 'Y-m-d', $this->start_time), date( 'Y-m-d', $this->end_time ) ) ), $source ); ?></td>
+                <td class=""><?php printf( '<a href="%s">%s</a>', admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=%s&meta_value=%s&meta_compare=RLIKE&date_after=%s&date_before=%s', 'lead_source', urlencode( strtolower( $source ) ), date( 'Y-m-d', $this->start_time), date( 'Y-m-d', $this->end_time ) ) ), $source ); ?></td>
                 <td class="summary-total"><?php printf( '%d', $num_contacts ); ?></td>
             </tr>
         <?php
@@ -93,11 +114,19 @@ class WPGH_Lead_Source_Widget extends WPGH_Reporting_Widget
         <?php
 
         $this->export_button();
+
     }
 
+    /**
+     * Return export info in friendly format
+     *
+     * @return array|string
+     */
     protected function get_export_data()
     {
         global $wpdb;
+
+//        var_dump( $this->social_networks );
 
         $table = WPGH()->contacts->table_name;
         $start_date = date('Y-m-d H:i:s', $this->start_time);
@@ -117,21 +146,25 @@ class WPGH_Lead_Source_Widget extends WPGH_Reporting_Widget
 
                     /* TO avoid long lists of specifics, limit to just the root domin. */
                     $lead_source = parse_url( $lead_source, PHP_URL_HOST );
+                    $lead_source = str_replace( 'www.', '', $lead_source );
 
+                    foreach ( $this->social_networks as $network_name => $network_urls ){
+
+                        if ( in_array( $lead_source, $network_urls ) )
+
+                            if ( isset($sources[$network_name]) ){
+                                $sources[$network_name]++;
+                            } else {
+                                $sources[$network_name] = 1;
+                            }
+                    }
                 }
-
-                if ( isset($sources[$lead_source]) ){
-                    $sources[$lead_source]++;
-                } else {
-                    $sources[$lead_source] = 1;
-                }
-
             }
 
         }
 
         if ( empty( $sources ) ){
-            return __( 'No new lead sources to report.', 'groundhogg' );
+            return __( 'No new social media sources to report.', 'groundhogg' );
         }
 
         asort( $sources );
@@ -141,17 +174,13 @@ class WPGH_Lead_Source_Widget extends WPGH_Reporting_Widget
 
         foreach ( $sources as $source => $num_contacts ):
 
-           $export_info[] = array(
-               __( 'Lead Source URL', 'groundhogg' ) => $source,
-               __( 'Number of Contacts', 'groundhogg' ) => $num_contacts,
-           );
+            $export_info[] = array(
+                __( 'Social Media Source', 'groundhogg' ) => $source,
+                __( 'Number of Contacts', 'groundhogg' ) => $num_contacts,
+            );
 
         endforeach;
 
         return $export_info;
-
-
     }
-
-
 }
