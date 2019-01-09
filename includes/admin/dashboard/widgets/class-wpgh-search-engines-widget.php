@@ -140,6 +140,8 @@ class WPGH_Search_Engines_Widget extends WPGH_Reporting_Widget
         </tbody>
         </table>
         <?php
+
+        $this->export_button();
     }
 
     protected function get_export_data()
