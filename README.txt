@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.19.1 =
+* FIXED Create user step setting optin status to unconfirmed by accident.
+
 = 1.0.19 =
 * ADDED New Contacts By Social Media Source Report
 * ADDED New Contacts By Search Engine Source Report

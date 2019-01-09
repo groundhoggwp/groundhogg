@@ -150,7 +150,7 @@ class WPGH_Create_User extends WPGH_Funnel_Step
 
 		    wp_new_user_notification( $user_id, null, 'user' );
 
-		    $contact->update( array( 'user_id',  ) );
+		    $contact->update( array( 'user_id' => $user_id  ) );
 
 	    } else {
 

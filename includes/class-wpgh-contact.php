@@ -218,7 +218,7 @@ class WPGH_Contact
             return false;
         }
 
-        //$data = $this->sanitize_columns( $data );
+//        $data = $this->sanitize_columns( $data );
 
         do_action( 'wpgh_contact_pre_update', $this->ID, $data );
 
@@ -256,8 +256,7 @@ class WPGH_Contact
         {
             case WPGH_UNCONFIRMED:
                 /* check for grace period if necessary */
-                if ( wpgh_is_confirmation_strict() )
-                {
+                if ( wpgh_is_confirmation_strict() ) {
                     if ( ! wpgh_is_in_grace_period( $this->ID ) )
                         return false;
                 }
@@ -530,15 +529,11 @@ class WPGH_Contact
 	function change_marketing_preference( $preference )
     {
         if ( $preference === WPGH_UNSUBSCRIBED ){
-
             $this->unsubscribe();
-
         } else {
-
             $this->update( array( 'optin_status' => $preference ) );
-
         }
-
+        $this->update_meta( 'preferences_changed', time() );
         do_action( 'wpgh_contact_marketing_preference_updated', $this->ID, $preference );
 
     }

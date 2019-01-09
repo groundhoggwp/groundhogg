@@ -482,14 +482,9 @@ class WPGH_Submission
 
         }
 
-        if ( ! $this->contact->optin_status === WPGH_UNSUBSCRIBED ) {
-
-            $this->contact->update(
-                array(
-                    'optin_status' => WPGH_UNCONFIRMED
-                )
-            );
-
+        /* If the contact previously unsubed then reopt them back in.  */
+        if ( $this->contact->optin_status === WPGH_UNSUBSCRIBED ) {
+            $this->contact->change_marketing_preference(WPGH_UNCONFIRMED );
         }
 
         $c->update_meta( 'last_optin', time() );
@@ -746,7 +741,7 @@ class WPGH_Submission
         if ( ! $contact )
             return;
 
-        $contact->update_meta( 'preferences_changed', time() );
+        //$contact->update_meta( 'preferences_changed', time() );
 
         if ( isset( $_POST[ 'delete_everything' ] ) && $_POST[ 'delete_everything' ] === 'yes' ) {
 
