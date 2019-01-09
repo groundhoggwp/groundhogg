@@ -439,7 +439,7 @@ class WPGH_DB_Contacts extends WPGH_DB  {
 		user_id bigint(20) unsigned NOT NULL,
 		owner_id bigint(20) unsigned NOT NULL,
 		optin_status int unsigned NOT NULL,
-		date_created datetime NOT NULL,
+		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY (ID),
 		UNIQUE KEY email (email),
 		KEY user (user_id)

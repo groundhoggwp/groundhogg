@@ -107,12 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
-= 1.0.18.4 =
+= 1.0.19 =
 * ADDED New Contacts By Social Media Source Report
 * ADDED New Contacts By Search Engine Source Report
 * TWEAKED Added new reporting times to funnel reporting view in correlation with the dashboard
-
-= 1.0.18.3 =
 * FIXED Collapse status of steps saved.
 * FIXED Bugs where collapsed report widgets caused JS Errors.
 

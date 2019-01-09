@@ -175,6 +175,7 @@ class WPGH_HTML
             'placeholder' => '',
             'min'       => 0,
             'max'       => 99999,
+            'step'      => 1
         ) );
 
         if ( ! empty( $a[ 'max' ] ) ){
@@ -184,6 +185,11 @@ class WPGH_HTML
         if ( ! empty( $a[ 'min' ] ) ){
             $a[ 'attributes' ] .= sprintf( ' min="%d"', $a[ 'min' ] );
         }
+
+        if ( ! empty( $a[ 'step' ] ) ){
+            $a[ 'attributes' ] .= sprintf( ' step="%s"', $a[ 'step' ] );
+        }
+
 
         return $this->input( $a );
     }
