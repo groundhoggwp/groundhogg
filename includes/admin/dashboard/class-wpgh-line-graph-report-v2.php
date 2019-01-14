@@ -27,6 +27,7 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
         wp_enqueue_script( 'wpgh-flot-chart', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
         wp_enqueue_script( 'wpgh-flot-chart-categories', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.categories.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.categories.js') );
         wp_enqueue_script( 'wpgh-flot-chart-time', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.time.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.time.js') );
+//        wp_enqueue_script( 'wpgh-flot-date', WPGH_ASSETS_FOLDER . 'lib/flot/date.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/date.min.js') );
     }
 
     /**
@@ -57,6 +58,9 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
                         },
                         xaxis: {
                             mode: "time",
+                            localTimezone: true
+                            // timezone: "browser"
+                            // timezone: "America/Chicago"
                         }
                     };
 

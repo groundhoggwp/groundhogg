@@ -73,6 +73,11 @@ class WPGH_Replacements
                 'description' => __( 'The contact\'s last name.', 'groundhogg' ),
             ),
             array(
+                'code'   => 'username',
+                'callback'    => 'wpgh_replacement_username',
+                'description' => __( 'The contact\'s last name.', 'groundhogg' ),
+            ),
+            array(
                 'code'        => 'email',
                 'callback'    => 'wpgh_replacement_email',
                 'description' => __( 'The contact\'s email address.', 'groundhogg' ),
@@ -407,6 +412,23 @@ function wpgh_replacement_first_name( $contact_id )
 function wpgh_replacement_last_name( $contact_id )
 {
     return WPGH()->contacts->get_column_by( 'last_name', 'ID', $contact_id );
+}
+
+/**
+ * Return the username of the contact if one exists.
+ *
+ * @param $contact_id int the contact's id
+ * @return string
+ */
+function wpgh_replacement_username( $contact_id )
+{
+    $uid = WPGH()->contacts->get_column_by( 'user_id', 'ID', $contact_id );
+    if ( $uid ){
+        $user = get_userdata( $uid );
+        return $user->user_login;
+    }
+
+    return '';
 }
 
 /**

@@ -184,10 +184,15 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
 
         $this->start_range  = $this->start_time;
         $this->end_range = $this->start_range + $this->difference;
+
+//        $this->start_time = convert_to_local_time( $this->start_time );
+//        $this->end_time = convert_to_local_time( $this->end_time );
+//        $this->start_range = convert_to_local_time( $this->start_range );
+//        $this->end_range = convert_to_local_time( $this->end_range );
     }
 
     /**
-     * Get the differnece in time between points given a time range...
+     * Get the difference in time between points given a time range...
      *
      * @param $range
      * @return int

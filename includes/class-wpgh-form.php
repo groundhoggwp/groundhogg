@@ -917,7 +917,7 @@ class WPGH_Form
         $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ), $a[ 'theme'], $a['size'] );
 
         $this->fields[] = 'g-recaptcha';
-        $this->config[ $a[ 'g-recaptcha' ] ] = $a ;
+        $this->config[ 'g-recaptcha' ] = $a ;
 
         return $this->field_wrap( $html );
     }

@@ -41,6 +41,7 @@ class WPGH_Dashboard_Widgets
         $this->widgets[] = new WPGH_Lead_Source_Widget();
         $this->widgets[] = new WPGH_Social_Media_Widget();
         $this->widgets[] = new WPGH_Search_Engines_Widget();
+        $this->widgets[] = new WPGH_Source_Page_Widget();
     }
 
     public function scripts(){
@@ -85,6 +86,7 @@ class WPGH_Dashboard_Widgets
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-lead-source-widget.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-social-media-widget.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-search-engines-widget.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-source-page-widget.php';
     }
 
 }

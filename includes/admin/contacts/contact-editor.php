@@ -56,16 +56,16 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
 /* Auto link the account before we see the create account form. */
 $contact->auto_link_account();
 
+$title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->email;
+
 ?>
 
-<?php if ( ! empty( $contact->full_name) ):?>
 <!-- Title -->
-<span class="hidden" id="new-title"><?php echo $contact->full_name; ?> &lsaquo; </span>
+<span class="hidden" id="new-title"><?php echo $title ?> &lsaquo; </span>
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
 <!--/ Title -->
-<?php endif; ?>
 
 <form method="post" class="" enctype="multipart/form-data">
     <?php wp_nonce_field( 'edit', '_edit_contact_nonce' ); ?>

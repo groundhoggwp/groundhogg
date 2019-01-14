@@ -102,7 +102,7 @@ class WPGH_Settings_Page
      */
     private function get_default_tabs()
     {
-        return array(
+        return apply_filters( 'wpgh_settings_tabs', array(
             'general'      => array(
                 'id'    => 'general',
                 'title' => __( 'General' )
@@ -127,7 +127,7 @@ class WPGH_Settings_Page
                 'id'    => 'api_tab',
                 'title' => __( 'API' )
             ),
-        );
+        ) );
     }
 
     /**
@@ -137,7 +137,7 @@ class WPGH_Settings_Page
      */
     private function get_default_sections()
     {
-        return array(
+        return apply_filters( 'wpgh_settings_sections', array(
             'business_info' => array(
                 'id'    => 'business_info',
                 'title' => __( 'Business Settings' ),
@@ -178,7 +178,7 @@ class WPGH_Settings_Page
                 'title' => __( 'API Settings' ),
                 'tab'   => 'api_tab'
             ),
-        );
+        ) );
     }
 
     /**
@@ -217,7 +217,7 @@ class WPGH_Settings_Page
             }
         }
 
-        return array(
+        return apply_filters( 'wpgh_settings_settings', array(
             'gh_business_name' => array(
                 'id'        => 'gh_business_name',
                 'section'   => 'business_info',
@@ -568,8 +568,7 @@ class WPGH_Settings_Page
                     'value'         => 'on',
                 ),
             ),
-
-        );
+        ) );
     }
 
     /**
