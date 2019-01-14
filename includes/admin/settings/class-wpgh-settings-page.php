@@ -46,14 +46,8 @@ class WPGH_Settings_Page
 
     public function __construct()
     {
-
-
-        $this->tabs     = $this->get_default_tabs();
-        $this->sections = $this->get_default_sections();
-        $this->settings = $this->get_default_settings();
-
-
         add_action( 'admin_menu', array( $this, 'register' ) );
+        add_action( 'admin_init', array( $this, 'init_defaults' ) );
         add_action( 'admin_init', array( $this, 'register_sections' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
 
@@ -63,7 +57,6 @@ class WPGH_Settings_Page
         add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'check_for_updates' ) );
 
         if ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) {
-
             add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );
         }
 
@@ -71,6 +64,18 @@ class WPGH_Settings_Page
             $this->importer = new WPGH_Bulk_Contact_Manager();
         }
 
+    }
+
+    /**
+     * Init the default settings & sections.
+     */
+    public function init_defaults()
+    {
+        $this->tabs     = $this->get_default_tabs();
+        $this->sections = $this->get_default_sections();
+        $this->settings = $this->get_default_settings();
+
+        do_action( 'wpgh_settings_post_defaults_init', $this );
     }
 
     /* Register the page */
@@ -186,6 +191,10 @@ class WPGH_Settings_Page
      */
     public function register_sections()
     {
+
+        do_action( 'wpgh_settings_pre_register_sections', $this );
+
+//        var_dump( $this->sections );
 
         foreach ( $this->sections as $id => $section ){
             add_settings_section( 'gh_' . $section[ 'id' ], $section[ 'title' ], array(), 'gh_' . $section[ 'tab' ] );
@@ -576,6 +585,9 @@ class WPGH_Settings_Page
      */
     public function register_settings()
     {
+
+        do_action( 'wpgh_settings_pre_register_settings', $this );
+
         foreach( $this->settings as $id => $setting ){
 //            print_r($setting[ 'section' ]);
             add_settings_field( $setting['id'], $setting['label'], array( $this, 'settings_callback' ), 'gh_' . $this->sections[ $setting[ 'section' ] ][ 'tab' ], 'gh_' . $setting[ 'section' ], $setting );
@@ -652,7 +664,7 @@ class WPGH_Settings_Page
             return false;
         }
 
-        $this->sections[ $setting[ 'id' ] ] = $setting;
+        $this->settings[ $setting[ 'id' ] ] = $setting;
 
         return true;
     }

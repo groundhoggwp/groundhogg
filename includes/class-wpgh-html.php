@@ -881,6 +881,7 @@ class WPGH_HTML
         );
 
         wp_enqueue_style( 'wp-color-picker' );
+        wp_enqueue_script( 'wpgh-color-picker', WPGH_ASSETS_FOLDER . 'js/admin/color-picker.js', array( 'jquery', 'wp-color-picker' ), filemtime( WPGH_PLUGIN_DIR  . 'assets/js/admin/color-picker.js' ) );
 
         return apply_filters( 'wpgh_html_color_picker', $html, $args );
     }

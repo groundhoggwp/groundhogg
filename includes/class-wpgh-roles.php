@@ -30,7 +30,6 @@ class WPGH_Roles {
 	 * @since 1.4.4
 	 */
 	public function __construct() {
-
 		add_filter( 'map_meta_cap', array( $this, 'meta_caps' ), 10, 4 );
 	}
 

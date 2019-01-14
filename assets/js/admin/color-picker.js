@@ -1,3 +1,5 @@
-jQuery(document).ready(function($){
-    $('.wpgh-color').wpColorPicker();
-});
+( function ($) {
+    $(function () {
+        $('.wpgh-color').wpColorPicker();
+    });
+})(jQuery);
