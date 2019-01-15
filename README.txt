@@ -110,6 +110,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 = 1.0.19.2 =
 * ADDED Source Page report to dashboard.
 * FIXED Bug where empty title showing on contact record with no first or last name.
+* FIXED Settings page setup so that extensions can add option easier.
 
 = 1.0.19.1 =
 * FIXED Create user step setting optin status to unconfirmed by accident.
