@@ -821,10 +821,39 @@ class WPGH_Email
         );
 
         $request    = wp_remote_post( $url, array( 'body' => $req ) );
+
+        if ( ! $request || is_wp_error( $request ) ){
+            do_action( 'wp_mail_failed' ,new WP_Error( 'API_MAIL_FAILED', $request->get_error_message() ) );
+
+            /* Fall back to default WP */
+            $this->send_with_wp(
+                $to,
+                $subject,
+                $content,
+                $headers
+            );
+
+            return false;
+        }
+
         $result     = wp_remote_retrieve_body( $request );
         $result     = json_decode( $result );
 
-        if ( $result->status === 'failed' ){
+        if ( ! is_object( $result ) ){
+
+            do_action( 'wp_mail_failed' ,new WP_Error( 'API_MAIL_FAILED', __( 'An unknown error occurred.', 'groudhogg' ) ) );
+
+            /* Fall back to default WP */
+            $this->send_with_wp(
+                $to,
+                $subject,
+                $content,
+                $headers
+            );
+
+            return false;
+
+        } else if ( $result->status === 'failed' ){
             /* mail failed */
 
             do_action( 'wp_mail_failed' ,new WP_Error( 'API_MAIL_FAILED', $result->message ) );
