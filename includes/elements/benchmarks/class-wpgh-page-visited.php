@@ -97,7 +97,6 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
                     echo WPGH()->html->dropdown( $args );
 
                     $args = array(
-                        'type'      => 'url',
                         'id'        => $step->prefix( 'url_match' ),
                         'name'      => $step->prefix( 'url_match' ),
                         'title'     => __( 'Match Url' ),

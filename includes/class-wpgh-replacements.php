@@ -98,6 +98,21 @@ class WPGH_Replacements
                 'description' => __( 'The contact\'s full address.', 'groundhogg' ),
             ),
             array(
+                'code'        => 'company_name',
+                'callback'    => 'wpgh_replacement_company_name',
+                'description' => __( 'The contact\'s company name.', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'job_title',
+                'callback'    => 'wpgh_replacement_job_title',
+                'description' => __( 'The contact\'s job title.', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'company_address',
+                'callback'    => 'wpgh_replacement_company_address',
+                'description' => __( 'The contact\'s company address.', 'groundhogg' ),
+            ),
+            array(
                 'code'        => 'meta',
                 'callback'    => 'wpgh_replacement_meta',
                 'description' => __( 'Any meta data related to the contact. Usage: {meta.attribute}', 'groundhogg' ),
@@ -498,6 +513,39 @@ function wpgh_replacement_address( $contact_id )
 
     return $address;
 
+}
+
+/**
+ * Get the company name of a contact
+ *
+ * @param $contact_id
+ * @return mixed
+ */
+function wpgh_replacement_company_name( $contact_id )
+{
+    return WPGH()->contact_meta->get_meta( $contact_id, 'company_name', true );
+}
+
+/**
+ * Get the company address of a contact
+ *
+ * @param $contact_id
+ * @return mixed
+ */
+function wpgh_replacement_company_address( $contact_id )
+{
+    return WPGH()->contact_meta->get_meta( $contact_id, 'address', true );
+}
+
+/**
+ * Get the job title of a contact
+ *
+ * @param $contact_id
+ * @return mixed
+ */
+function wpgh_replacement_job_title( $contact_id )
+{
+    return WPGH()->contact_meta->get_meta( $contact_id, 'job_title', true );
 }
 
 /**

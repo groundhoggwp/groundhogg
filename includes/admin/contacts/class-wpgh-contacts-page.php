@@ -313,6 +313,18 @@ class WPGH_Contacts_Page
 
                 break;
 
+            case 'search':
+
+                if ( ! current_user_can( 'edit_contacts' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                }
+
+                if ( ! empty( $_POST ) ){
+                    $search = $this->do_search();
+                }
+
+                break;
+
         }
 
         set_transient( 'gh_last_action', $this->get_action(), 30 );
@@ -513,6 +525,18 @@ class WPGH_Contacts_Page
 
         if ( isset( $_POST['primary_phone'] ) ){
             $contact->update_meta( 'primary_phone', sanitize_text_field( $_POST['primary_phone'] ) );
+        }
+
+        if ( isset( $_POST['company_name'] ) ){
+            $contact->update_meta( 'company_name', sanitize_text_field( $_POST['company_name'] ) );
+        }
+
+        if ( isset( $_POST['job_title'] ) ){
+            $contact->update_meta( 'job_title', sanitize_text_field( $_POST['job_title'] ) );
+        }
+
+        if ( isset( $_POST['company_address'] ) ){
+            $contact->update_meta( 'company_address', sanitize_text_field( $_POST['company_address'] ) );
         }
 
         if ( isset( $_POST['primary_phone_extension'] ) ){
@@ -846,6 +870,142 @@ class WPGH_Contacts_Page
         }
 
         include dirname( __FILE__ ) . '/search.php';
+    }
+
+    /**
+     * @param $key
+     * @param $comp
+     * @param $value
+     *
+     * @return string
+     */
+    private function generate_comparison_statement( $key, $comp, $value )
+    {
+        global $wpdb;
+
+        if ( is_array( $value ) ){
+            $value = sprintf( '(%s)', implode( ',', $value ) );
+        } else if ( is_numeric( $value ) ){
+            $value = intval( $value );
+        }
+
+        $insert = is_int( $value ) ? '%d' : '%s';
+        $statement = '';
+
+        /*
+         * '='             => __( 'Equals', 'groundhogg' ),
+            '!='            => __( 'Not Equals', 'groundhogg' ),
+            'LIKE sw'       => __( 'Starts With', 'groundhogg' ),
+            'LIKE ew'       => __( 'Ends With', 'groundhogg' ),
+            'LIKE c'        => __( 'Contains', 'groundhogg' ),
+            'NOT LIKE c'    => __( 'Does Not Contain', 'groundhogg' ),
+            'EMPTY'         => __( 'Is Empty', 'groundhogg' ),
+            'NOT EMPTY'     => __( 'Is Filled', 'groundhogg' ),
+         */
+
+        switch ( $comp ){
+            default:
+            case '=':
+                $statement = $wpdb->prepare( "$key = $insert", $value );
+                break;
+            case '!=':
+                $statement = $wpdb->prepare( "$key = $insert", $value );
+                break;
+            case 'LIKE sw':
+                $statement = $wpdb->prepare( "$key LIKE '%s'", $value . '%' );
+                break;
+            case 'LIKE ew':
+                $statement = $wpdb->prepare( "$key LIKE '%s'", '%' . $value );
+                break;
+            case 'LIKE c':
+                $statement = $wpdb->prepare( "$key LIKE '%s'", '%' . $value . '%' );
+                break;
+            case 'NOT LIKE c':
+                $statement = $wpdb->prepare( "$key NOT LIKE '%s'", '%' . $value . '%' );
+                break;
+            case 'EMPTY':
+                $statement = "$key IS EMPTY";
+                break;
+            case 'NOT EMPTY':
+                $statement =  "$key IS NOT EMPTY";
+                break;
+        }
+
+        return $statement;
+
+
+    }
+
+    /**
+     * From the search.php page access the POST and generate a WHERE clause...
+     */
+    private function do_search()
+    {
+
+        global $wpdb;
+
+        $contacts       = WPGH()->contacts->table_name;
+        $contact_meta   = WPGH()->contact_meta->table_name;
+        $tags           = WPGH()->tag_relationships->table_name;
+
+        $SELECT = "SELECT DISTINCT c.* FROM $contacts AS c LEFT JOIN $contact_meta AS meta ON c.ID = meta.contact_id LEFT JOIN $tags AS tags ON c.ID = tags.contact_id";
+        $WHERE = "WHERE ";
+        $CLAUSES = array();
+
+        $general = $_POST[ 'c' ];
+        $meta    = $_POST[ 'meta' ];
+        $custom  = $_POST[ 'c_meta' ];
+        $tags    = $_POST[ 'tags' ];
+//        $tags_2    = $_POST[ 'tags_2' ];
+
+        foreach ( $general as $key => $args ){
+
+            if ( ! empty( $args[ 'search' ] ) && ! empty( $args[ 'comp' ] ) ){
+
+                $search = $wpdb->esc_like( sanitize_text_field( stripslashes( $args[ 'search' ] ) ) );
+                $CLAUSES[] = $this->generate_comparison_statement( 'c.' . $key, $args[ 'comp' ], $search );
+
+            }
+
+        }
+
+        foreach ( $meta as $key => $args ){
+
+            if ( ! empty( $args[ 'search' ] ) && ! empty( $args[ 'comp' ] ) ){
+
+                $search = $wpdb->esc_like( sanitize_text_field( stripslashes( $args[ 'search' ] ) ) );
+                $CLAUSES[] = $this->generate_comparison_statement( 'meta.meta_key', '=', sanitize_key( $key ) );
+                $CLAUSES[] = $this->generate_comparison_statement( 'meta.meta_value', $args[ 'comp' ], $search );
+
+            }
+
+        }
+
+        foreach ( $custom as $key => $args ){
+
+            if ( ! empty( $args[ 'key' ] ) && ! empty( $args[ 'search' ] ) && ! empty( $args[ 'comp' ] ) ){
+
+                $search = $wpdb->esc_like( sanitize_text_field( stripslashes( $args[ 'search' ] ) ) );
+                $CLAUSES[] = $this->generate_comparison_statement( 'meta.meta_key', '=', sanitize_key( $args[ 'key' ] ) );
+                $CLAUSES[] = $this->generate_comparison_statement( 'meta.meta_value', $args[ 'comp' ], $search );
+
+            }
+
+        }
+
+        $tags_1 = wp_parse_id_list( $tags[ 'tags_1' ]['tags'] );
+        $tags_2 = wp_parse_id_list( $tags[ 'tags_2' ]['tags'] );
+
+
+
+
+        $SQL = sprintf( '%s %s %s', $SELECT, $WHERE, implode( ' AND ', $CLAUSES ) );
+
+        var_dump($SQL);
+        $results = $wpdb->get_results( $SQL );
+        var_dump( $results );
+        die();
+
     }
 
     /**

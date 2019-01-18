@@ -1099,6 +1099,38 @@ jQuery( function($){
     }
 
     /**
+     * Show review version of the form
+     */
+    public function preview()
+    {
+        $form = '<div class="gh-form-wrapper">';
+
+        $this->setup_shortcodes();
+
+        if ( $this->id && WPGH()->steps->exists( $this->id ) ){
+
+            $content = WPGH()->step_meta->get_meta( $this->id, 'form', true );
+
+        } else {
+
+            $content = '';
+
+        }
+
+        $form .= do_shortcode( $content );
+
+        $this->destroy_shortcodes();
+
+        $form .= '</div>';
+
+        $form = str_replace( 'required', '', $form );
+        $form = apply_filters( 'wpgh_form_shortcode', $form, $this );
+        $form = apply_filters( 'wpgh_form_shortcode_preview', $form, $this );
+
+        return $form;
+    }
+
+    /**
      * Just return the shortcode
      *
      * @return string

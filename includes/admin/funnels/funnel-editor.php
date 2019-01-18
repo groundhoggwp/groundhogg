@@ -40,7 +40,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             <div class="title alignleft">
                 <input class="title" placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo $funnel->title; ?>" id="title" spellcheck="true" autocomplete="off">
             </div>
-            <div id="reporting alignleft">
+            <div id="reporting" class="alignleft">
                 <?php $args = array(
                     'name'      => 'date_range',
                     'id'        => 'date_range',

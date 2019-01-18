@@ -65,6 +65,31 @@ class WPGH_Tracking
     public $lead_source = '';
 
     /**
+     * @var string the UTM campaign
+     */
+    public $utm_campaign = '';
+
+    /**
+     * @var string  the UTM source
+     */
+    public $utm_source = '';
+
+    /**
+     * @var string the UTM medium
+     */
+    public $utm_medium = '';
+
+    /**
+     * @var string the UTM content
+     */
+    public $utm_content = '';
+
+    /**
+     * @var string the UTM term
+     */
+    public $utm_term = '';
+
+    /**
      * Two vars to tell which is the current action being taken by the contact
      *
      * @var bool
@@ -87,6 +112,7 @@ class WPGH_Tracking
 
             add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
             add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
+            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
             add_action( 'template_redirect', array( $this, 'email_link_clicked' ) );
             $this->doing_click = true;
 
@@ -94,6 +120,7 @@ class WPGH_Tracking
 
             add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
             add_action( 'plugins_loaded', array( $this, 'extract_from_login' ) );
+            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
             add_action( 'template_redirect', array( $this, 'link_clicked' ) );
             $this->doing_click = true;
 
@@ -101,6 +128,7 @@ class WPGH_Tracking
 
             add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
             add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
+            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
             add_action( 'init', array( $this, 'email_opened' ) );
             $this->doing_open = true;
 
@@ -108,10 +136,8 @@ class WPGH_Tracking
 
             add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
             add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
+            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
             add_action( 'init', array( $this, 'email_confirmed' ) );
-
-//            $this->setup_url_vars();
-
             $this->doing_confirmation = true;
 
         } else {
@@ -224,6 +250,22 @@ class WPGH_Tracking
             $cookie[ 'email' ] = $this->email->ID;
         }
 
+        $utm = array(
+            'utm_campaign',
+            'utm_content',
+            'utm_source',
+            'utm_medium',
+            'utm_term',
+        );
+
+        foreach ( $utm as $utm_var ){
+
+            if ( $this->$utm_var ){
+                $cookie[ $utm_var ] = $this->$utm_var;
+            }
+
+        }
+
 //        var_dump( $cookie );
 //        wp_die();
 //
@@ -279,6 +321,22 @@ class WPGH_Tracking
             $this->funnel   = WPGH()->funnels->get( $cookie->funnel );
         }
 
+        $utm = array(
+            'utm_campaign',
+            'utm_content',
+            'utm_source',
+            'utm_medium',
+            'utm_term',
+        );
+
+        foreach ( $utm as $utm_var ){
+
+            if ( isset( $cookie->$utm_var ) ){
+                $this->$utm_var = $cookie->$utm_var;
+            }
+
+        }
+
         return true;
     }
 
@@ -310,6 +368,50 @@ class WPGH_Tracking
     }
 
     /**
+     * @param $key
+     * @param bool $default
+     *
+     * @return string
+     */
+    private function get_url_var( $key, $default=false )
+    {
+        if ( wp_doing_ajax() ){
+            $url = wp_get_referer();
+
+            $val = wpgh_extract_query_arg( $url, $key );
+
+            if ( $val ){
+                return $val;
+            }
+
+        } else {
+
+            if ( isset( $_GET[ 'key' ] ) ){
+                return sanitize_text_field( stripslashes( urldecode( $_GET[ $key ] ) ) );
+            }
+
+        }
+
+
+        return $default;
+    }
+
+    /**
+     * Check if the URL has UTM vars
+     *
+     * @return bool
+     */
+    private function url_has_utm()
+    {
+        if ( wp_doing_ajax() ){
+            return strpos( wp_get_referer(),'utm_' ) !== false;
+        } else {
+            $query = implode( '|', array_keys( $_GET ) );
+            return strpos( $query,'utm_' ) !== false;
+        }
+    }
+
+    /**
      * IF the URL contains UTM variables save them to meta.
      *
      * @return bool
@@ -317,30 +419,38 @@ class WPGH_Tracking
     public function parse_utm()
     {
 
+        if ( $this->url_has_utm() ){
+            /* Set props */
+            $this->utm_campaign = $this->get_url_var( 'utm_campaign' );
+            $this->utm_source   = $this->get_url_var( 'utm_source' );
+            $this->utm_medium   = $this->get_url_var( 'utm_medium' );
+            $this->utm_content  = $this->get_url_var( 'utm_content' );
+            $this->utm_term     = $this->get_url_var( 'utm_term' );
+
+        }
+
         if ( ! $this->contact instanceof WPGH_Contact ){
             return false;
         }
 
-        if ( isset( $_GET[ 'utm_source ' ] ) ){
-            $this->contact->update_meta( 'utm_source', sanitize_text_field( urldecode( $_GET[ 'utm_source ' ] ) ) );
+        $utm = array(
+            'utm_campaign' => $this->utm_campaign,
+            'utm_content'  => $this->utm_content,
+            'utm_source'   => $this->utm_source,
+            'utm_medium'   => $this->utm_medium,
+            'utm_term'     => $this->utm_term,
+        );
+
+        $utm_string = implode( '', $utm );
+        if ( ! empty( $utm_string ) ){
+            foreach ( $utm as $utm_var => $utm_val ){
+                if ( $utm_val ){
+                    $this->contact->update_meta( $utm_var, $utm_val );
+                }
+            }
         }
 
-        if ( isset( $_GET[ 'utm_medium ' ] ) ){
-            $this->contact->update_meta( 'utm_medium', sanitize_text_field( urldecode( $_GET[ 'utm_medium ' ] ) ) );
-        }
-
-        if ( isset( $_GET[ 'utm_campaign ' ] ) ){
-            $this->contact->update_meta( 'utm_campaign', sanitize_text_field( urldecode( $_GET[ 'utm_campaign ' ] ) ) );
-        }
-
-        if ( isset( $_GET[ 'utm_term ' ] ) ){
-            $this->contact->update_meta( 'utm_term', sanitize_text_field( urldecode( $_GET[ 'utm_term ' ] ) ) );
-        }
-
-        if ( isset( $_GET[ 'utm_content ' ] ) ){
-            $this->contact->update_meta( 'utm_content', sanitize_text_field( urldecode( $_GET[ 'utm_content ' ] ) ) );
-        }
-
+        return true;
     }
 
 

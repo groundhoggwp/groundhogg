@@ -167,6 +167,41 @@ $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->emai
         </tbody>
     </table>
 
+    <!-- Company info -->
+    <h2><?php _e( 'Company Info', 'groundhogg' ); ?></h2>
+    <table class="form-table">
+        <tr>
+            <th><label for="company_name"><?php echo __( 'Company Name', 'groundhogg' )?></label></th>
+            <td><?php $args = array(
+                    'id'    => 'company_name',
+                    'name'  => 'company_name',
+                    'value' => $contact->get_meta( 'company_name' ),
+                );
+                echo WPGH()->html->input( $args ); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="job_title"><?php echo __( 'Job Title', 'groundhogg' )?></label></th>
+            <td><?php $args = array(
+                    'id'    => 'job_title',
+                    'name'  => 'job_title',
+                    'value' => $contact->get_meta( 'job_title' ),
+                );
+                echo WPGH()->html->input( $args ); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="company_address"><?php echo __( 'Full Company Address', 'groundhogg' )?></label></th>
+            <td><?php $args = array(
+                    'id'    => 'company_address',
+                    'name'  => 'company_address',
+                    'value' => $contact->get_meta( 'company_address' ),
+                );
+                echo WPGH()->html->input( $args ); ?>
+            </td>
+        </tr>
+    </table>
+
     <!-- ADDRESS -->
     <h2><?php _e( 'Address' ); ?></h2>
     <table class="form-table">
@@ -493,7 +528,10 @@ $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->emai
                 'region',
                 'country',
                 'notes',
-                'files'
+                'files',
+                'company_name',
+                'company_address',
+                'job_title'
             ) );
 
             $meta = WPGH()->contact_meta->get_meta( $contact->ID );

@@ -107,6 +107,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.19.3 =
+* ADDED UTM Reporting
+* ADDED Preview modal for the form builder.
+* TWEAKED better tracking support for UTM variables
+* FIXED partial match URL not accepting partial match strings.
+* FIXED wrong verbage for reporting toggle caused by altered css ID
+
 = 1.0.19.2 =
 * ADDED Source Page report to dashboard.
 * FIXED Bug where empty title showing on contact record with no first or last name.

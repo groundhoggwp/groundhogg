@@ -176,15 +176,39 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                     <?php esc_attr_e( 'Shortcode:', 'groundhogg' ); ?>
                 </th>
                 <td>
+
+                    <strong>
+                    <input
+                            type="text"
+                            onfocus="this.select()"
+                            class="regular-text code"
+                            value="<?php echo esc_attr( $shortcode ); ?>"
+                            readonly>
+                    </strong>
                     <p>
-                        <strong>
-                        <input
-                                onfocus="this.select()"
-                                class="regular-text code"
-                                value="<?php echo esc_attr( $shortcode ); ?>"
-                                readonly>
-                        </strong>
+                        <?php echo WPGH()->html->modal_link( array(
+                            'title'     => __( 'Preview' ),
+                            'text'      => __( 'Preview' ),
+                            'footer_button_text' => __( 'Close' ),
+                            'id'        => '',
+                            'class'     => 'button button-secondary',
+                            'source'    => $step->prefix( 'preview' ),
+                            'height'    => 700,
+                            'width'     => 600,
+                            'footer'    => 'true',
+                            'preventSave'    => 'true',
+                        ) );
+                        ?>
                     </p>
+                    <div class="hidden" id="<?php echo $step->prefix( 'preview' ); ?>" >
+                        <div style="padding-top: 30px;">
+                            <div class="notice notice-warning">
+                                <p><?php _e( 'Not all CSS rules are loaded in the admin area. Frontend results may differ.', 'groundhogg' ); ?></p>
+                            </div>
+                            <?php $preview = new WPGH_Form( array( 'id' => $step->ID ) );
+                            echo $preview->preview(); ?>
+                        </div>
+                    </div>
                 </td>
             </tr><tr>
                 <th>
@@ -648,5 +672,4 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
 
         return true;
     }
-
 }
