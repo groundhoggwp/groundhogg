@@ -253,7 +253,7 @@ var wpghFunnelEditor;
          */
         deleteStep: function (e) {
             var step = $(e).closest('.step');
-            var result = confirm("Are you sure you want to delete this step?");
+            var result = confirm( "Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action." );
             if (result) {
                 var ajaxCall = $.ajax({
                     type: "post",

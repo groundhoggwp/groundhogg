@@ -894,6 +894,15 @@ class WPGH_Funnels_Page
             wp_die( 'No Step.' );
 
         $stepid = absint( intval( $_POST['step_id'] ) );
+        $step = new WPGH_Step( $stepid );
+        if ( $contacts = $step->get_waiting_contacts() ){
+            $next_step = $step->get_next_step();
+            if ( $next_step instanceof WPGH_Step && $next_step->is_active() ){
+                 foreach ( $contacts as $contact ){
+                     $next_step->enqueue( $contact );
+                 }
+            }
+        }
 
         wp_die( WPGH()->steps->delete( $stepid ) );
     }

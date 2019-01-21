@@ -149,6 +149,51 @@ class WPGH_Step
         return $updated;
     }
 
+    /**
+     * Get an array of contacts which are "waiting'
+     * @return WPGH_Contact[] | false
+     */
+    public function get_waiting_contacts()
+    {
+        $contacts = array();
+        $events = $this->get_waiting_events();
+
+        if ( ! $events ){
+            return false;
+        }
+
+        foreach ( $events as $event ){
+            $contacts[] = $event->contact;
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * Get an array of waiting events
+     * @return WPGH_Event[]|false
+     */
+    public function get_waiting_events()
+    {
+        $events = WPGH()->events->get_events( array(
+            'status' => 'waiting',
+            'step_id' => $this->ID,
+            'funnel_id' => $this->funnel_id,
+        ) );
+
+        $prepped = array();
+
+        if ( ! $events ){
+            return false;
+        }
+
+        foreach ( $events as $event ) {
+            $prepped[] = new WPGH_Event( $event->ID );
+        }
+
+        return $prepped;
+    }
+
 
     /**
      * @return bool whether the step is a benchmark

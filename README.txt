@@ -111,6 +111,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED UTM Reporting
 * ADDED Preview modal for the form builder.
 * TWEAKED better tracking support for UTM variables
+* TWEAKED events belonging to a deleted step get move forward to the next available action.
 * FIXED partial match URL not accepting partial match strings.
 * FIXED wrong verbage for reporting toggle caused by altered css ID
 
