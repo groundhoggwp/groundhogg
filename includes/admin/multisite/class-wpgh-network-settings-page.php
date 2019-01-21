@@ -83,6 +83,8 @@ class WPGH_Network_Settings_Page
                     </tbody>
                 </table>
 
+                <?php do_action( 'wpgh_multisite_options' ); ?>
+
                 <p class="submit">
                     <?php submit_button( __('Save Changes') ); ?>
                 </p>
@@ -100,6 +102,8 @@ class WPGH_Network_Settings_Page
         } else {
             delete_site_option( 'gh_global_db_enabled' );
         }
+
+        do_action( 'wpgh_save_multisite_options' );
 
         $this->notices->add( 'updated', __( 'Settings Updated!' ) );
 

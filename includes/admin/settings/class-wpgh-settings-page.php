@@ -350,6 +350,22 @@ class WPGH_Settings_Page
                     'placeholder'   => '999999'
                 ),
             ),
+            'gh_queue_interval' => array(
+                'id'        => 'gh_queue_interval',
+                'section'   => 'misc_info',
+                'label'     => __( 'Queue Interval', 'groundhogg' ),
+                'desc'      => __( 'The time interval in between iterations of when the event queue is processed.', 'groundhogg' ),
+                'type'      => 'dropdown',
+                'atts'      => array(
+                    'id'            => 'gh_queue_interval',
+                    'name'          => 'gh_queue_interval',
+                    'options'       => array(
+                        'every_1_minutes' => 'Every 1 Minutes',
+                        'every_5_minutes' => 'Every 5 Minutes',
+                        'every_10_minutes' => 'Every 10 Minutes',
+                    ),
+                ),
+            ),
             'gh_confirmation_page' => array(
                 'id'        => 'gh_confirmation_page',
                 'section'   => 'pages',
@@ -743,6 +759,9 @@ class WPGH_Settings_Page
 
             case 'select2':
                 $field[ 'atts' ][ 'selected' ] = array( $value );
+                break;
+            case 'dropdown':
+                $field[ 'atts' ][ 'selected' ] = $value;
                 break;
             case 'checkbox':
                 $field[ 'atts' ][ 'checked' ] = (bool) $value;

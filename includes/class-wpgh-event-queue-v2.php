@@ -87,8 +87,14 @@ class WPGH_Event_Queue_v2
      */
     public function setup_cron_jobs()
     {
-        if ( ! wp_next_scheduled( self::ACTION ) ){
-            wp_schedule_event( time(), apply_filters( 'wpgh_queue_interval', 'every_5_minutes' ), self::ACTION );
+
+        $settings_queue_interval = wpgh_get_option( 'gh_queue_interval', 'every_5_minutes' );
+        $real_queue_interval = wpgh_get_option( 'gh_real_queue_interval' );
+
+        if ( ! wp_next_scheduled( self::ACTION ) || $settings_queue_interval !== $real_queue_interval ){
+            wp_clear_scheduled_hook( 'wpgh_cron_event' );
+            update_option( 'gh_real_queue_interval', $settings_queue_interval );
+            wp_schedule_event( time(), apply_filters( 'wpgh_queue_interval', $settings_queue_interval ), self::ACTION );
         }
     }
 

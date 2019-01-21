@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.19.4 =
+* ADDED Option to change the queue interval time.
+* ADDED plugin API to the multisite options page.
+* TWEAKED CSS for inputs & text areas hardened to not be overwritten by WC.
+
 = 1.0.19.3 =
 * ADDED UTM Reporting
 * ADDED Preview modal for the form builder.

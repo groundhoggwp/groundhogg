@@ -363,3 +363,7 @@ select {
 .builder-icon img{
     width: 80%;
 }
+
+input, select, textarea{
+    max-width: 100% !important;
+}
