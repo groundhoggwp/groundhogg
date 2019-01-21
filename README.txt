@@ -110,6 +110,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 = 1.0.19.3 =
 * ADDED UTM Reporting
 * ADDED Preview modal for the form builder.
+* ADDED White labelling support
 * TWEAKED better tracking support for UTM variables
 * TWEAKED events belonging to a deleted step get move forward to the next available action.
 * FIXED partial match URL not accepting partial match strings.
