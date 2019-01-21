@@ -426,6 +426,11 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
         }
 
+        public function brand()
+        {
+            return apply_filters( 'wpgh_brand_name', 'Groundhogg' );
+        }
+
         /**
          * @param array $args
          * @return array|mixed|object

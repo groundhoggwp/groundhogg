@@ -703,7 +703,7 @@ class WPGH_Settings_Page
             }
         </style>
         <div class="wrap">
-            <h1>Groundhogg <?php _e( 'Settings' ); ?></h1>
+            <h1><?php printf( '%s %s' , WPGH()->brand(), __( 'Settings' ) ); ?></h1>
             <?php
             settings_errors();
             WPGH()->notices->notices();

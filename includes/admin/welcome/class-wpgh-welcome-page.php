@@ -26,23 +26,17 @@ class WPGH_Welcome_Page
     function __construct()
     {
 
-        add_action('admin_menu', array($this, 'register'));
+        add_action( 'admin_menu', array( $this, 'register' ) );
 
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'groundhogg' ){
 
             $this->notices = WPGH()->notices;
-
             $this->notices->add(
-              'wip', __( 'This page is currently a work in progress! You should move on from it for now. Complete videos, links, and extensions coming soon.' ), 'info'
+              'affiliate', __( 'You can get our entire extension library for $1 if <a href="https://www.groundhogg.io/partner/" target="_blank">you refer a friend.</a>' ), 'info'
             );
-
-            $this->notices->add(
-              'affiliate', __( 'You can get our entire extension library for $1 if <a href="https://www.groundhogg.io/referral-partner-sign-up/" target="_blank">you refer a friend.</a>' ), 'info'
-            );
-
             add_action( 'admin_init', array( $this, 'status_check' ) );
-
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
+            add_action( 'admin_footer', array( $this, 'bg_image' ) );
 
         }
     }
@@ -52,7 +46,7 @@ class WPGH_Welcome_Page
         $this->check_settings();
         $this->check_funnels();
         $this->check_settings();
-        $this->check_plugins();
+//        $this->check_plugins();
     }
 
     /**
@@ -115,7 +109,7 @@ class WPGH_Welcome_Page
 
         $page = add_menu_page(
             'Welcome',
-            'Groundhogg',
+            WPGH()->brand(),
             'view_contacts',
             'groundhogg',
             array( $this, 'page' ),
@@ -139,7 +133,7 @@ class WPGH_Welcome_Page
     /* Enque JS or CSS */
     public function scripts()
     {
-        wp_enqueue_style( 'welcome-page', WPGH_ASSETS_FOLDER . 'css/admin/welcome.css', filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/welcome.css' ) );
+        wp_enqueue_style( 'wpgh-welcome-page', WPGH_ASSETS_FOLDER . 'css/admin/welcome.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/welcome.css' ) );
     }
 
     /**
@@ -320,13 +314,21 @@ class WPGH_Welcome_Page
         $user = wp_get_current_user();
 
         ?>
-        <img class="phil" src="<?php echo WPGH_ASSETS_FOLDER . 'images/phil-340x340.png'; ?>" width="340" height="340">
+
+        <?php if ( apply_filters( 'wpgh_show_phil_on_welcome_page', true ) ): ?>
+            <img class="phil" src="<?php echo WPGH_ASSETS_FOLDER . 'images/phil-340x340.png'; ?>" width="340" height="340">
+        <?php endif; ?>
         <div id="welcome-page" class="welcome-page">
             <div id="poststuff">
                 <div class="welcome-header">
                     <h1><?php echo sprintf( __( 'Welcome %s!', 'groundhogg' ), $user->first_name ); ?></h1>
                 </div>
                 <?php $this->notices->notices(); ?>
+
+                <?php do_action( 'wpgh_welcome_page_custom_content' ); ?>
+
+                <?php if ( apply_filters( 'wpgh_show_main_welcome_page_content', true ) ): ?>
+
                 <div class="left-col col">
 
                     <div id="support-articles">
@@ -379,9 +381,28 @@ class WPGH_Welcome_Page
 
                     </div>
                 </div>
+
+                <?php endif; ?>
+
             </div>
         </div>
         <?php
     }
+
+    public function bg_image()
+    {
+        ?>
+<style>
+    #wpwrap {
+        background-image: url( '<?php echo apply_filters( 'wpgh_welcome_bg_image', WPGH_ASSETS_FOLDER . 'images/groundhogg-bg.jpg' ); ?>' );
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        position: relative;
+    }
+</style>
+<?php
+    }
+
 
 }
