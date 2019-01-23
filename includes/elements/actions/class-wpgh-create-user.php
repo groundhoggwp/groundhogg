@@ -155,7 +155,13 @@ class WPGH_Create_User extends WPGH_Funnel_Step
 	    } else {
 
 	        $user = get_user_by_email( $username );
-            $user_id = $user->ID;
+
+	        /**
+	         * @since 1.0.19.4 update the user role if a user account already exists...
+	         */
+	        $user->add_role( $role );
+
+	        $user_id = $user->ID;
 	        $contact->update( array( 'user_id' => $user_id ) );
 
         }

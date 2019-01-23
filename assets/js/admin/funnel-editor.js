@@ -76,8 +76,9 @@ var wpghFunnelEditor;
 
         editorSizing: function (){
             $( '.funnel-editor-header').width( $('#poststuff').width() );
-            $( '#postbox-container-2').height( $('#postbox-container-1').height() - 80 );
+            $( '#postbox-container-2').height( $('#wpbody').height() - 80 );
             $( '#normal-sortables' ).css( 'visibility', 'visible' );
+            $( '#postbox-container-1' ).stickySidebar({topSpacing:78});
         },
 
         initReporting: function(){

@@ -94,8 +94,7 @@ var wpghTextBlock;
                 offset = 0;
             }
 
-            $actionBAr.css( 'top', $( '#editor' ).offset().top - offset );
-
+            // $actionBAr.css( 'top', $( '#editor' ).offset().top - offset );
             if ( window.pageYOffset > $( '#editor' ).offset().top - ( 48 + offset ) ){
                 $actionBAr.css( 'position', 'fixed' );
                 $actionBAr.css( 'top',  ( 46 + offset ) + 'px');
@@ -103,6 +102,9 @@ var wpghTextBlock;
                 $actionBAr.css( 'position', 'absolute' );
                 $actionBAr.css( 'top', $( '#editor' ).offset().top - offset );
             }
+
+            $actionBAr.css( 'left', '291px' );
+
         },
 
         destroyEditor: function(){

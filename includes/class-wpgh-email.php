@@ -702,8 +702,8 @@ class WPGH_Email
 
             $last_sent = intval( $contact->get_meta( 'last_sent' ) );
 
-            if ( ( time() - $last_sent ) <= 30 ){
-                return new WP_Error( 'TOO_MANY_EMAILS', __( 'There must be a minimum 30 seconds before a contact can receive another email.' ) );
+            if ( ( time() - $last_sent ) <= 5 ){
+                return new WP_Error( 'TOO_MANY_EMAILS', __( 'There must be a minimum 5 seconds before a contact can receive another email.' ) );
             }
 
         }

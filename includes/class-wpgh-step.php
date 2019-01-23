@@ -359,7 +359,9 @@ class WPGH_Step
             'contact_id'    => $contact->ID
         );
 
-        return (bool) WPGH()->event_queue->add( $event );
+        $success = (bool) WPGH()->event_queue->add( $event );
+
+        return $success;
     }
 
     /**

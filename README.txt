@@ -107,6 +107,14 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.19.5 =
+* ADDED Raw email confirmation link that can be put in buttons.
+* TWEAKED Create user step will now update a users level if the user already exists instead of adding another action to do so.
+* TWEAKED Renamed the cron job to wpgh_process_queue for better semantics.
+* TWEAKED Checking bounces now occurs hourly rather than with the queue process to avoid anything breaking being buggy.
+* TWEAKED Some benchmarks process the queue instantly. The following benchmarks are Forms, Link Clicks, Page Views & Email Confirmations
+* FIXED when creating a new email in a funnel you had to select the email after creating it which was annoying. The email is now auto updated as expected.
+
 = 1.0.19.4 =
 * ADDED Option to change the queue interval time.
 * ADDED plugin API to the multisite options page.

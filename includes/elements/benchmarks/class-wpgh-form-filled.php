@@ -648,7 +648,8 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
 	    if ( $step->can_complete( $contact ) ){
 
 		    $success = $step->enqueue( $contact );
-
+            /* Process the queue immediately */
+            do_action( 'wpgh_process_queue' );
 	    }
 
 	    /*var_dump( $success );

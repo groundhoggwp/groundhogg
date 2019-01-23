@@ -100,7 +100,7 @@ var wpghModal;
             this.pushContent();
             this.hidePopUp();
 
-            if ( this.args.preventSave === undefined ){
+            if ( this.args.preventSave === undefined || this.args.preventSave === false || this.args.preventSave === 'false' ){
                 $(document).trigger( 'wpghModalClosed' );
             }
 

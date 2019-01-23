@@ -101,9 +101,11 @@ var wpghEmailEditor;
                 $( '#wpfooter' ).addClass( 'hidden' );
                 $( '.title-wrap' ).css( 'display', 'none' );
                 $( '.funnel-editor-header' ).css( 'top', 0 );
-                $(  '.popup-save', parent.document ).on( 'click', function( e ){
+                $(  parent.document ).on( 'click','.popup-save', function( e ){
                     wpghEmailEditor.save( e );
                 } );
+
+                parent.wpghEmailElement.ID = email.id;
             }
 
             this.editorSizing();
@@ -344,4 +346,4 @@ var wpghEmailEditor;
         wpghEmailEditor.init();
     })
 
-} )( jQuery );
+} )( jQuery, wpghEmailEditor );

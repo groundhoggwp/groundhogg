@@ -67,7 +67,8 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
         );
 
         wp_localize_script('wpgh-email-element', 'wpghEmailsBase', array(
-            'path' =>  admin_url( 'admin.php?page=gh_emails' )
+            'path' =>  admin_url( 'admin.php?page=gh_emails' ),
+            'dontSaveChangesMsg'    => __( "You have changes which have not been saved. Are you sure you want to exit?", 'groundhogg' ),
         ) );
     }
 
@@ -107,15 +108,31 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
                     echo WPGH()->html->dropdown_emails( $args ); ?>
                     <div class="row-actions">
-                        <a
-                            class="editinline trigger-popup edit-email"
-                            id="<?php echo $step->prefix( 'edit_email' ); ?>"
-                            target="_blank"
-                            title="<?php _e( 'Edit Email' ); ?>"
-                            href="#source=<?php echo urlencode( $basic_path . '&email=' . $email_id . '&action=edit' ) . '&height=900&width=1500' ;?>"
-                        ><?php esc_html_e( 'Edit Email', 'groundhogg' );?></a>
-                        <?php echo '|'; ?>
-                        <a target="_blank" class="add-email trigger-popup" title="<?php _e( 'Add Email' ); ?>" href="#source=<?php echo urlencode( $return_path . '&action=add' ) . '&height=900&width=1500' ;?>" ><?php esc_html_e( 'Create New Email', 'groundhogg' );?></a>
+
+                        <?php echo WPGH()->html->modal_link( array(
+                            'title'     => 'Edit Email',
+                            'text'      => __( 'Edit Email' ),
+                            'footer_button_text' => __( 'Close' ),
+                            'id'        => '',
+                            'class'     => 'button button-primary edit-email',
+                            'source'    => $basic_path . '&email=' . $email_id . '&action=edit',
+                            'height'    => 900,
+                            'width'     => 1500,
+                            'footer'    => 'true',
+                            'preventSave'    => 'false',
+                        )); ?>
+                        <?php echo WPGH()->html->modal_link( array(
+                            'title'     => 'Create New Email',
+                            'text'      => __( 'Create New Email' ),
+                            'footer_button_text' => __( 'Close' ),
+                            'id'        => '',
+                            'class'     => 'button button-secondary add-email',
+                            'source'    => $return_path . '&action=add',
+                            'height'    => 900,
+                            'width'     => 1500,
+                            'footer'    => 'true',
+                            'preventSave'    => 'false',
+                        )); ?>
                     </div>
                 </td>
             </tr>
@@ -133,6 +150,16 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
             <?php endif; ?>
             </tbody>
         </table>
+
+        <?php echo WPGH()->html->input( array(
+            'type'  => 'hidden',
+            'name'  => $step->prefix( 'add_email_override' ),
+            'id'    => $step->prefix( 'add_email_override' ),
+            'class' => 'add-email-override',
+            'value' => '',
+            'attributes' => '',
+            'placeholder' => ''
+        ) ); ?>
 
         <?php
     }
@@ -216,6 +243,13 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
         if ( isset( $_POST[ $step->prefix( 'email_id' ) ] ) ){
 
             $email_id = intval(  $_POST[ $step->prefix( 'email_id' ) ] );
+
+            /**
+             * Hack for adding new emails and saving.
+             */
+            if ( isset( $_POST[ $step->prefix( 'add_email_override' ) ] ) && ! empty( $_POST[ $step->prefix( 'add_email_override' ) ] ) ){
+                $email_id = intval(  $_POST[ $step->prefix( 'add_email_override' ) ] );
+            }
 
             $step->update_meta( 'email_id', $email_id );
 
