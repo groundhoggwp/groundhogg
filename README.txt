@@ -114,6 +114,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED Checking bounces now occurs hourly rather than with the queue process to avoid anything breaking being buggy.
 * TWEAKED Some benchmarks process the queue instantly. The following benchmarks are Forms, Link Clicks, Page Views & Email Confirmations
 * FIXED when creating a new email in a funnel you had to select the email after creating it which was annoying. The email is now auto updated as expected.
+* FIXED When editing an email and clicking "Save Changes" in the funnel builder not working.
 
 = 1.0.19.4 =
 * ADDED Option to change the queue interval time.
