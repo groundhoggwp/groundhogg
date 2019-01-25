@@ -101,6 +101,11 @@ var wpghEmailEditor;
                 $( '#wpfooter' ).addClass( 'hidden' );
                 $( '.title-wrap' ).css( 'display', 'none' );
                 $( '.funnel-editor-header' ).css( 'top', 0 );
+
+                $( document ).on( 'change keydown keyup', function ( e ) {
+                    parent.wpghEmailElement.changesSaved = false;
+                } );
+
                 $(  parent.document ).on( 'click','.popup-save', function( e ){
                     wpghEmailEditor.save( e );
                 } );
@@ -109,6 +114,7 @@ var wpghEmailEditor;
             }
 
             this.editorSizing();
+
             $( window ).resize(function() {
                 wpghEmailEditor.editorSizing();
             });
@@ -186,8 +192,10 @@ var wpghEmailEditor;
                 data: fd,
                 success: function ( response ) {
 
-                    // response = JSON.parse(response);
-                    console.log( response );
+                    if ( wpghEmailEditor.inFrame() ){
+                        parent.wpghEmailElement.changesSaved = true;
+                    }
+
                     $( '#notices' ).html( response.notices );
                     $( '.spinner' ).css( 'visibility','hidden' );
                     $( '.row' ).wpghToolBar();

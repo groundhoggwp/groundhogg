@@ -364,6 +364,11 @@ select {
     width: 80%;
 }
 
+.form-table th {
+    width: auto;
+    max-width: 120px;
+}
+
 input, select, textarea{
     max-width: 100% !important;
 }
