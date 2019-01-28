@@ -313,6 +313,31 @@ class WPGH_Contacts_Page
 
                 break;
 
+            case 'unbounce':
+
+                if ( ! current_user_can( 'edit_contacts' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                }
+
+                foreach ( $this->get_contacts() as $id ) {
+                    $contact = new WPGH_Contact( $id );
+                    $args = array( 'optin_status' => WPGH_UNCONFIRMED );
+                    $contact->update( $args );
+                }
+
+	            $this->notices->add(
+		            esc_attr( 'unbounce' ),
+		            sprintf( "%s %d %s",
+			            __( 'Approved', 'groundhogg' ),
+			            count( $this->get_contacts() ),
+			            __( 'Contacts', 'groundhogg' ) ),
+		            'success'
+	            );
+
+                do_action( 'wpgh_unbounce_contacts' );
+
+                break;
+
             case 'search':
 
                 if ( ! current_user_can( 'edit_contacts' ) ){

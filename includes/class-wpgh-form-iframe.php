@@ -52,6 +52,8 @@ class WPGH_Form_Iframe
             'id' => $form_id
         ) );
 
+        $this->form->set_iframe_compat( true );
+
         $this->step = new WPGH_Step( $form_id );
 
         $this->add_actions();

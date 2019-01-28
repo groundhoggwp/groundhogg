@@ -38,7 +38,7 @@
 </div>
 </body>
 <footer>
-<!--    --><?php //do_action( 'wp_footer' ); ?>
+<?php //do_action( 'wp_footer' ); ?>
 </footer>
 </html>
 

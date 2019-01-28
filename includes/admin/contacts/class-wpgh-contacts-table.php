@@ -494,8 +494,16 @@ class WPGH_Contacts_Table extends WP_List_Table {
 		        '<a href="%s" class="unspam" aria-label="%s">%s</a>',
 		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=unspam')),
 		        /* translators: %s: title */
-		        esc_attr( sprintf( __( 'Mark %s as approved' ), $title ) ),
+		        esc_attr( sprintf( __( 'Mark %s as approved.' ), $title ) ),
 		        __( 'Approve' )
+	        );
+        } else if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] === 'bounce' ){
+	        $actions['unbounce'] = sprintf(
+		        '<a href="%s" class="unbounce" aria-label="%s">%s</a>',
+		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=unbounce')),
+		        /* translators: %s: title */
+		        esc_attr( sprintf( __( 'Mark %s as a valid email.' ), $title ) ),
+		        __( 'Valid Email' )
 	        );
         } else {
 	        $actions['spam'] = sprintf(

@@ -56,6 +56,11 @@ class WPGH_Form
      */
     var $rendered;
 
+	/**
+	 * @var bool
+	 */
+    var $iframe_compat = false;
+
     public function __construct( $atts )
     {
         $this->a = shortcode_atts(array(
@@ -68,6 +73,18 @@ class WPGH_Form
         $this->add_scripts();
     }
 
+	/**
+	 * Set whether the form should have Iframe compatibility.
+	 *
+	 * @param $bool
+	 */
+    public function set_iframe_compat( $bool ){
+    	$this->iframe_compat = (bool) $bool;
+    }
+
+	/**
+	 * Add relevant form scripts.
+	 */
     private function add_scripts()
     {
     	wp_enqueue_style( 'wpgh-frontend', WPGH_ASSETS_FOLDER . 'css/frontend.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/frontend.css' ) );
@@ -1049,8 +1066,9 @@ jQuery( function($){
 //        $form .= esc_html( $this->content );
 //        $form .= htmlentities( $this->content );
 //        $form .= htmlentities( "\"hi\"" );
+	    $target = $this->iframe_compat ? "target=\"_parent\"" : "";
 
-        $form .= "<form method='post' class='gh-form " . $this->a[ 'class' ] ."' enctype=\"multipart/form-data\">";
+        $form .= "<form method='post' class='gh-form " . $this->a[ 'class' ] . "' " . $target . " enctype=\"multipart/form-data\" >";
 
         $form .= wp_nonce_field( 'gh_submit', 'gh_submit_nonce', true, false );
 
