@@ -275,7 +275,7 @@ class WPGH_Event
     public function complete()
     {
         return $this->update( array(
-            'status' => 'complete'
+            'status' => 'complete',
         ) );
     }
 

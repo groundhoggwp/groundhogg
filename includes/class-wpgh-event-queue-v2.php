@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class WPGH_Event_Queue_v2
 {
 
-    const ACTION = 'wpgh_cron_event';
+    const ACTION = 'wpgh_process_queue';
 
     /**
      * @var WPGH_Contact the current contact in the event

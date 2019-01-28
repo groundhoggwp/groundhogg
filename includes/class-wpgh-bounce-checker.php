@@ -54,7 +54,15 @@ class WPGH_Bounce_Checker
         $this->password = wpgh_get_option( 'gh_bounce_inbox_password' );
 
         /* run whenever these jobs are run */
-        add_action( 'wpgh_cron_event', array( $this, 'check' ) );
+        add_action( 'init', array( $this, 'setup_cron' ) );
+        add_action( 'wpgh_check_bounces', array( $this, 'check' )  );
+    }
+
+    public function setup_cron()
+    {
+        if ( ! wp_next_scheduled( 'wpgh_check_bounces' )  ){
+            wp_schedule_event( time(), 'hourly' , 'wpgh_check_bounces' );
+        }
     }
 
     public function check()
@@ -68,7 +76,6 @@ class WPGH_Bounce_Checker
         $inbox = imap_open( $hostname, $this->inbox, $this->password, OP_READONLY );
 
         if ( ! $inbox ){
-            wp_die( imap_last_error() );
             return;
         }
 

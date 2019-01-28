@@ -144,7 +144,7 @@ class WPGH_Events_Table extends WP_List_Table {
 
     protected function extra_tablenav($which)
     {
-        $next_run_in = wp_next_scheduled( 'wpgh_cron_event' );
+        $next_run_in = wp_next_scheduled( 'wpgh_process_queue' );
         $next_run_in = human_time_diff( time(), $next_run_in );
 
         ?>

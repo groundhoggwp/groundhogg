@@ -158,6 +158,11 @@ class WPGH_Replacements
                 'description' => __( 'A link to confirm the email address of a contact.', 'groundhogg' ),
             ),
             array(
+                'code'        => 'confirmation_link_raw',
+                'callback'    => 'wpgh_replacement_confirmation_link_raw',
+                'description' => __( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'groundhogg' ),
+            ),
+            array(
                 'code'        => 'superlink',
                 'callback'    => 'wpgh_replacement_superlink',
                 'description' => __( 'A superlink code. Usage: {superlink.id}', 'groundhogg' ),
@@ -625,6 +630,18 @@ function wpgh_replacement_confirmation_link()
     $link_url = site_url( 'gh-confirmation/via/email/' );
 
     return sprintf( "<a href=\"%s\" target=\"_blank\">%s</a>", $link_url, $link_text );
+}
+
+/**
+ * Return a raw confirmation link for the contact that can be placed in a button.
+ * This just gets the Optin Page link for now.
+ *
+ * @return string the optin link
+ */
+function wpgh_replacement_confirmation_link_raw()
+{
+    $link_url = site_url( 'gh-confirmation/via/email/' );
+    return $link_url;
 }
 
 /**

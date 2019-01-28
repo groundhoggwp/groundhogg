@@ -156,6 +156,8 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
         if ( empty( $steps ) )
             die;
 
+        $s = false;
+
         foreach ( $steps as $step ) {
 
             $step = new WPGH_Step( $step->ID );
@@ -173,10 +175,15 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
 
                 if ( $is_page ){
 
-                    $step->enqueue( $contact );
+                   $s = $step->enqueue( $contact );
 
                 }
             }
+        }
+
+        if ( $s ){
+            /* Process the queue immediately */
+            do_action( 'wpgh_process_queue' );
         }
 
         wp_die();

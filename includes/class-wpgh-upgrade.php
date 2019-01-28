@@ -147,5 +147,13 @@ class WPGH_Upgrade{
 
     }
 
+    /**
+     * Remove old cron job and make way for better naming.
+     */
+    public function version_1_0_19_5()
+    {
+        wp_clear_scheduled_hook( 'wpgh_cron_event' );
+    }
+
 
 }
