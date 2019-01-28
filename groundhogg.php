@@ -220,6 +220,11 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $upgrader;
 
         /**
+         * @var WPGH_Form_Iframe;
+         */
+        public $iframe_listener;
+
+        /**
          * Returns the instance on Groundhogg.
          *
          * @return Groundhogg
@@ -276,6 +281,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->template_loader  = new WPGH_Template_Loader();
 
                 self::$instance->elements     = new WPGH_Elements();
+                self::$instance->iframe_listener = new WPGH_Form_Iframe();
 
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
@@ -416,6 +422,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-template-loader.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-tracking.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-popup.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-form-iframe.php';
             require_once WPGH_PLUGIN_DIR . 'includes/functions.php';
             require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';
