@@ -286,7 +286,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
     public function run( $contact, $event )
     {
 
-        $email_id = $event->step->get_meta( 'email_id' );
+        $email_id = apply_filters( 'wpgh_step_run_send_email_id', $event->step->get_meta( 'email_id' ), $event );
 
         $email = new WPGH_Email( $email_id );
 

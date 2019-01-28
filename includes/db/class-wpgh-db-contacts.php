@@ -443,7 +443,7 @@ class WPGH_DB_Contacts extends WPGH_DB  {
 		PRIMARY KEY (ID),
 		UNIQUE KEY email (email),
 		KEY user (user_id)
-		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );
 

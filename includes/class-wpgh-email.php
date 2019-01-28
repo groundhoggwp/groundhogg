@@ -263,9 +263,10 @@ class WPGH_Email
     public function get_open_tracking_link()
     {
         return site_url(sprintf(
-            "gh-tracking/email/open/?u=%s&e=%s",
+            "gh-tracking/email/open/?u=%s&e=%s&i=%s",
             dechex($this->contact->ID),
-            dechex($this->event->ID)
+            dechex($this->event->ID),
+            dechex($this->ID)
         ));
     }
 
@@ -277,9 +278,10 @@ class WPGH_Email
     public function get_click_tracking_link()
     {
         return site_url(
-            sprintf( 'gh-tracking/email/click/?u=%s&e=%s&ref=',
+            sprintf( 'gh-tracking/email/click/?u=%s&e=%s&i=%s&ref=',
                 dechex($this->contact->ID),
-                dechex($this->event->ID)
+                dechex($this->event->ID),
+                dechex($this->ID)
             )
         );
     }

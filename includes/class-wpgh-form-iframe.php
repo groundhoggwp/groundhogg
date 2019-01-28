@@ -26,11 +26,26 @@ class WPGH_Form_Iframe
             add_action( 'template_redirect', array( $this, 'get_iframe_code' ) );
         }
 
+        if ( isset( $_GET[ 'ghFormIframeJS' ] ) ){
+            add_action( 'template_redirect', array( $this, 'get_iframe_js' ) );
+        }
+
     }
 
+    /**
+     * Get the Iframe JS code.
+     */
+    public function get_iframe_js()
+    {
+        include WPGH_PLUGIN_DIR . 'templates/form-iframe.js.php';
+        die();
+    }
+
+    /**
+     * Gets the Iframe Form Code
+     */
     public function get_iframe_code()
     {
-
         $form_id = intval( $_GET[ 'formId' ] );
 
         $this->form = new WPGH_Form( array(

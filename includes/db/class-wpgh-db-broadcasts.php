@@ -356,7 +356,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
         status VARCHAR(20) NOT NULL,
         date_scheduled datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         PRIMARY KEY (ID)
-		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );
 

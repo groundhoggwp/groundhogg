@@ -207,9 +207,20 @@ class WPGH_Tracking
                 }
 
                 $this->step   = new WPGH_Step( $event->step_id );
-                $this->email  = new WPGH_Email( $this->step->get_meta( 'email_id' ) );
             }
         }
+
+        if ( isset( $_REQUEST[ 'i' ] ) )
+        {
+            $eid = hexdec( $_REQUEST[ 'i' ] );
+
+            $email = WPGH()->emails->get( $eid );
+
+            if ( is_object( $email ) && ! empty( $email ) ){
+                $this->email = new WPGH_Email( $email->ID );
+            }
+        }
+
 
         if ( isset( $_REQUEST[ 'ref' ] ) ) {
             $this->ref = esc_url_raw( urldecode( $_REQUEST[ 'ref' ] ) );
@@ -597,6 +608,7 @@ class WPGH_Tracking
             'funnel_id'     => ( $this->funnel )? $this->funnel->ID : WPGH_BROADCAST,
             'step_id'       => $this->step->ID,
             'activity_type' => 'email_opened',
+            'email_id'      => $this->email->ID,
             'event_id'      => $this->event->ID,
             'referer'       => ''
         );
@@ -667,6 +679,7 @@ class WPGH_Tracking
             'timestamp'     => time(),
             'contact_id'    => $this->contact->ID,
             'funnel_id'     => ( $this->funnel )? $this->funnel->ID : WPGH_BROADCAST,
+            'email_id'      => $this->email->ID,
             'step_id'       => $this->step->ID,
             'activity_type' => 'email_link_click',
             'event_id'      => $this->event->ID,

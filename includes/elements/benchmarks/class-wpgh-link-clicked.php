@@ -129,7 +129,7 @@ class WPGH_Link_Clicked extends WPGH_Funnel_Step
         if ( $step->can_complete( $contact ) ){
 
             $step->enqueue( $contact );
-            do_action( 'wpgh_process_queue' );
+//            do_action( 'wpgh_process_queue' );
 
         }
 

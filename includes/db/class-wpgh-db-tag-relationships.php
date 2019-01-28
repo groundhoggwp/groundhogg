@@ -350,7 +350,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 		PRIMARY KEY (tag_id,contact_id),
 		KEY tag_id (tag_id),
 		KEY contact_id (contact_id)
-		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );
 

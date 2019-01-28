@@ -154,6 +154,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
     public function settings( $step )
     {
         $shortcode = sprintf('[gh_form id="%d" title="%s"]', $step->ID, $step->title );
+        $script    = sprintf('<script id="%s" type="text/javascript" src="%s?ghFormIframeJS=1&formId=%s"></script>', 'ghFrame' . $step->ID, site_url(), $step->ID );
 
         $form = $step->get_meta( 'form' );
 
@@ -174,6 +175,9 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
             <tr>
                 <th>
                     <?php esc_attr_e( 'Shortcode:', 'groundhogg' ); ?>
+                    <br/>
+                    <br/>
+                    <?php esc_attr_e( 'JS Script:', 'groundhogg' ); ?>
                 </th>
                 <td>
 
@@ -183,6 +187,13 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                             onfocus="this.select()"
                             class="regular-text code"
                             value="<?php echo esc_attr( $shortcode ); ?>"
+                            readonly>
+                    </strong>
+                    <input
+                            type="text"
+                            onfocus="this.select()"
+                            class="regular-text code"
+                            value="<?php echo esc_attr( $script ); ?>"
                             readonly>
                     </strong>
                     <p>
@@ -652,7 +663,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
 
 		    $success = $step->enqueue( $contact );
             /* Process the queue immediately */
-            do_action( 'wpgh_process_queue' );
+//            do_action( 'wpgh_process_queue' );
 	    }
 
 	    /*var_dump( $success );

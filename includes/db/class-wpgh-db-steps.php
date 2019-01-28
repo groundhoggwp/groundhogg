@@ -369,7 +369,7 @@ class WPGH_DB_Steps extends WPGH_DB  {
 		step_status varchar(20) NOT NULL,
 		step_order int unsigned NOT NULL,
 		PRIMARY KEY  (ID)
-		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );
 

@@ -195,7 +195,7 @@ class WPGH_DB_Step_Meta extends WPGH_DB {
 		PRIMARY KEY  (meta_id),
 		KEY step_id (step_id),
 		KEY meta_key (meta_key)
-		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );
 

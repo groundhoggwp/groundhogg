@@ -53,6 +53,23 @@ abstract class WPGH_DB {
     public $primary_key;
 
     /**
+     * @var string
+     */
+    public $charset;
+
+    /**
+     * Get the charset
+     *
+     * @return string
+     */
+    public function get_charset_collate()
+    {
+        global $wpdb;
+        return $wpdb->get_charset_collate();
+    }
+
+
+    /**
      * Create a where clause given an array
      *
      * @param array $args

@@ -61,6 +61,7 @@ class WPGH_Upgrade{
     {
         $this->update_to_version( '1.0.16' );
         $this->update_to_version( '1.0.18.1' );
+        $this->update_to_version( '1.0.20' );
     }
 
     /**
@@ -153,6 +154,16 @@ class WPGH_Upgrade{
     public function version_1_0_19_5()
     {
         wp_clear_scheduled_hook( 'wpgh_cron_event' );
+    }
+
+    /**
+     * Upgrade Activity DB to include Email ID for tracking purposes.
+     */
+    public function version_1_0_20()
+    {
+
+        WPGH()->activity->create_table();
+
     }
 
 

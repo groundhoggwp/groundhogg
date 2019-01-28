@@ -69,8 +69,9 @@ class WPGH_DB_Activity extends WPGH_DB  {
             'step_id'       => '%d',
             'contact_id'    => '%d',
             'event_id'      => '%d',
+            'email_id'      => '%d',
             'activity_type' => '%s',
-            'referer'      => '%s',
+            'referer'       => '%s',
         );
     }
 
@@ -88,6 +89,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
             'step_id'       => 0,
             'contact_id'    => 0,
             'event_id'      => 0,
+            'email_id'      => 0,
             'activity_type' => '',
             'referer'      => '',
         );
@@ -332,6 +334,8 @@ class WPGH_DB_Activity extends WPGH_DB  {
 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
+        $charset_collate = $wpdb->get_charset_collate();
+
         $sql = "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         timestamp bigint(20) unsigned NOT NULL,
@@ -340,13 +344,14 @@ class WPGH_DB_Activity extends WPGH_DB  {
         step_id bigint(20) unsigned NOT NULL,
         activity_type VARCHAR(20) NOT NULL,
         event_id bigint(20) unsigned NOT NULL,
+        email_id bigint(20) unsigned NOT NULL,
         referer text NOT NULL,
         PRIMARY KEY (ID),
         KEY timestamp (timestamp),
         KEY funnel_id (funnel_id),
         KEY step_id (step_id),
         KEY event_id (event_id)
-		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		) $charset_collate;";
 
         dbDelta( $sql );
 

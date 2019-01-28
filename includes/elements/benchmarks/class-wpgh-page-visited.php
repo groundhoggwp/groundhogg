@@ -181,10 +181,10 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
             }
         }
 
-        if ( $s ){
-            /* Process the queue immediately */
-            do_action( 'wpgh_process_queue' );
-        }
+//        if ( $s ){
+//            /* Process the queue immediately */
+//            do_action( 'wpgh_process_queue' );
+//        }
 
         wp_die();
     }

@@ -416,7 +416,7 @@ class WPGH_DB_Tags extends WPGH_DB
         contact_count bigint(20) unsigned NOT NULL,
         PRIMARY KEY (tag_id),
         UNIQUE KEY tag_slug (tag_slug)
-		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );
 

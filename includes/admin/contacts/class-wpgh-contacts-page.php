@@ -609,9 +609,27 @@ class WPGH_Contacts_Page
         if ( isset( $_POST[ 'send_email' ] ) && isset( $_POST[ 'email_id' ] ) && current_user_can( 'send_emails' ) ){
 
             $mail = new WPGH_Email( intval( $_POST[ 'email_id' ] ) );
-            if ( $mail->send( $contact ) ){
-                $this->notices->add( 'sent', __( "Email Sent!", 'groundhogg' ), 'info' );
+
+            if ( $mail->exists() ){
+
+//                //$ars;
+//
+//                $args = array(
+//                    'time'          => time(),
+//                    'contact_id'    => $contact->ID,
+//                    'funnel_id'     => WPGH_BROADCAST,
+//                    'step_id'       => ,
+//                    'status'        => 'waiting'
+//                );
+
+                WPGH()->events->add( $args );
+
+                if ( $mail->send( $contact ) ){
+                    $this->notices->add( 'sent', __( "Email will be sent momentarily!", 'groundhogg' ), 'info' );
+                }
             }
+
+
         }
 
         if ( isset( $_POST[ 'start_funnel' ] ) && isset( $_POST[ 'add_contacts_to_funnel_step_picker' ] ) && current_user_can( 'edit_contacts' ) ){

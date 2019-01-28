@@ -284,7 +284,7 @@ class WPGH_DB_API_Tokens extends WPGH_DB  {
         domain mediumtext NOT NULL,
         PRIMARY KEY (ID),
         KEY token (token)
-		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );
 

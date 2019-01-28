@@ -375,7 +375,7 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
         tags longtext NOT NULL,
         clicks bigint(20) NOT NULL,
         PRIMARY KEY  (ID)
-		) CHARACTER SET utf8 COLLATE utf8_general_ci;";
+		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );
 
