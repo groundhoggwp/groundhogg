@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.20 =
+* ADDED Iframe support for Forms! You can now paste forms into your CRM on any site anywhere.
+
 = 1.0.19.5 =
 * ADDED Raw email confirmation link that can be put in buttons.
 * TWEAKED Create user step will now update a users level if the user already exists instead of adding another action to do so.
