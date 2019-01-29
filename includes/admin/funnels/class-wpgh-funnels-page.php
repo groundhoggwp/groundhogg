@@ -498,7 +498,7 @@ class WPGH_Funnels_Page
 
         if ( isset( $_POST[ 'funnel_template' ] ) ){
 
-            include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
+            include WPGH_PLUGIN_DIR . 'templates/funnel-templates.php';
 
             /* @var $funnel_templates array included from funnel-templates.php */
 

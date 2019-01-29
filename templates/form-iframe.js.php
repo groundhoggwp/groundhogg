@@ -1,15 +1,28 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2019-01-28
- * Time: 12:34 PM
+ * Responsive Form Iframe JS Template
+ *
+ * @package     Templates
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 1.0.20
  */
 
 header("Content-Type: application/javascript");
 header("Cache-Control: max-age=604800, public");
 
 ?>
+/**
+ * Responsive Form Iframe JS Template
+ *
+ * @package     Templates
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 1.0.20
+ */
+
 (function() {
     if (window.ghFormClient) {
         return;
@@ -31,10 +44,6 @@ header("Cache-Control: max-age=604800, public");
     } else {
         referrer = document.URL;
     }
-    //
-    //if (startsWith(referrer, "file")) {
-    //    document.write("<style>body {margin:0;}</style>");
-    //}
 
     function addEvent( event, callback ){
         if (!window.addEventListener) { // This listener will not be valid in < IE9
@@ -79,7 +88,16 @@ header("Cache-Control: max-age=604800, public");
         hasIframeToLoad = true;
         formId = forms.length;
         forms.push({url:url, id:formId, iframeLoaded:false, iframeLoading:false});
-        document.write('<div id="' + idPrefix + 'Div_' + formId + '"></div>');
+
+        if ( document.currentScript ){
+            var d = document.createElement( 'div' );
+            d.id = idPrefix + 'Div_' + formId;
+            document.currentScript.parentNode.insertBefore( d, document.currentScript );
+        } else {
+            document.write('<div id="' + idPrefix + 'Div_' + formId + '"></div>');
+        }
+
+
         if (formId == 0) {
             addFormIframe(formId, url);
         }
@@ -100,7 +118,7 @@ header("Cache-Control: max-age=604800, public");
             forms[id].iframeLoading = true;
 
             div.innerHTML = '<iframe id="' + idPrefix + 'Iframe_' + id + '" name="infFormId=' + id + '&url=' + escape(location.href) +
-                '" allowtransparency="true" src="' + url + '&referrer=' + escape(referrer) + queryStr +
+                '" allowtransparency="true" src="' + url + '&referrer=' + escape(referrer) + escape( queryStr ) +
                 '" frameborder="0" scrolling="no" style="overflow:hidden; border:none; width:100%;' +
                 '" height="450px"></iframe>';
         }

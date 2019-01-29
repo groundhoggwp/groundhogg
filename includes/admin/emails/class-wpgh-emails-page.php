@@ -488,7 +488,12 @@ class WPGH_Emails_Page
 
         $args[ 'last_updated' ] = current_time( 'mysql' );
 
-        WPGH()->emails->update( $id, $args );
+        if ( WPGH()->emails->update( $id, $args ) ){
+            $this->notices->add( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
+        } else {
+            $this->notices->add( 'email-update-error', __( 'Something went wrong.', 'groundhogg' ), 'error' );
+
+        }
 
         $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
         WPGH()->email_meta->update_meta( $id, 'alignment', $alignment );
@@ -497,8 +502,6 @@ class WPGH_Emails_Page
         WPGH()->email_meta->update_meta( $id, 'browser_view', $browser_view );
 
         do_action( 'wpgh_email_update_after', $id );
-
-        $this->notices->add( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
 
         if ( isset( $_POST['send_test'] ) ){
 

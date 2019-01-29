@@ -7,4 +7,4 @@ import './i18n.js';
  * Import registerBlockType blocks
  */
 
-import './form/';
+import './gutenberg/form/';

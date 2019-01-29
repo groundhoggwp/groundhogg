@@ -1,8 +1,15 @@
 <?php
 
 /**
- * This is a template for the Form iframe functionality
+ * Responsive Form Iframe Template
+ *
+ * @package     Templates
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 1.0.20
  */
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,26 +18,18 @@
     <?php do_action( 'wp_head' ); ?>
     <script>
         window.addEventListener('message', function (event) {
-
-            // Need to check for safty as we are going to process only our messages
-            // So Check whether event with data(which contains any object) contains our message here its "FrameHeight"
             if ( typeof event.data.action !== "undefined" && event.data.action === "getFrameSize") {
-
-                //event.source contains parent page window object
-                //which we are going to use to send message back to main page here "abc.com/page"
-                //parentSourceWindow = event.source;
-                //Calculate the maximum height of the page
-
                 var body = document.body, html = document.documentElement;
                 var height = Math.max(body.scrollHeight, body.offsetHeight,
                     html.clientHeight, html.scrollHeight, html.offsetHeight);
-
                 var width = '100%';
-                // Send height back to parent page "abc.com/page"
                 event.source.postMessage({ height: height, width: width, id:event.data.id }, "*");
             }
         });
     </script>
+    <style>
+        html,body{background-color: transparent !important;margin: 0!important}
+    </style>
 </head>
 <body>
 <div class="formPadding" style="padding: 20px">

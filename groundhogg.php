@@ -225,6 +225,13 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $iframe_listener;
 
         /**
+         * Custom blocks...
+         *
+         * @var array
+         */
+        public $blocks = array();
+
+        /**
          * Returns the instance on Groundhogg.
          *
          * @return Groundhogg
@@ -295,6 +302,8 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                     self::$instance->api = new WPGH_API_V2();
                 }
 
+                self::$instance->register_blocks();
+
 
             }
 
@@ -358,6 +367,15 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             if ( ! defined( 'WPGH_ASSETS_FOLDER' ) ){
                 define( 'WPGH_ASSETS_FOLDER', plugin_dir_url( __FILE__ ) . 'assets/' );
             }
+        }
+
+        /**
+         * Include custom blocks for page builders.
+         */
+        private function register_blocks()
+        {
+            require_once dirname( __FILE__ ) . '/blocks/elementor/class-wpgh-elementor-blocks.php';
+            $this->blocks[] = new WPGH_Elementor_Blocks();
         }
 
 
