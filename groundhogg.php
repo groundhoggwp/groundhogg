@@ -375,7 +375,9 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         private function register_blocks()
         {
             require_once dirname( __FILE__ ) . '/blocks/elementor/class-wpgh-elementor-blocks.php';
-            $this->blocks[] = new WPGH_Elementor_Blocks();
+            require_once dirname( __FILE__ ) . '/blocks/beaver-builder/class-wpgh-beaver-builder-blocks.php';
+            $this->blocks[ 'elementor' ] = new WPGH_Elementor_Blocks();
+            $this->blocks[ 'beaver-builder' ] = new WPGH_Beaver_Builder_Blocks();
         }
 
 
