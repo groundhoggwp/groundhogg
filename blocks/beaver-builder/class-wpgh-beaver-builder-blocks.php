@@ -20,9 +20,30 @@ class WPGH_Beaver_Builder_Blocks
     }
 
     public function widgets_registered() {
+
         if ( class_exists( 'FLBuilder' ) ){
             include_once dirname(__FILE__) . '/widget/class-wpgh-beaver-builder-widget.php';
+
+            /**
+             * Register the module and its form settings.
+             */
+            FLBuilder::register_module( 'WPGH_Beaver_Builder_Widget', array(
+                'select-form'      => array(
+                    'title'         => __( 'Select Form', 'groundhogg' ),
+                    'sections'      => array(
+                        'groundhogg-forms'  => array(
+                            'title'         => __( 'Groundhogg Form', 'groundhogg' ),
+                            'fields'        => array(
+                                'groundhogg_form_id' => array(
+                                    'type'          => 'select',
+                                    'label'         => __( 'Select Form', 'groundhogg' ),
+                                    'options'       => wpgh_get_form_list()
+                                ),
+                            )
+                        )
+                    )
+                )
+            ) );
         }
     }
-
 }

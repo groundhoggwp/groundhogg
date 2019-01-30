@@ -1106,3 +1106,23 @@ function wpgh_get_dates_of_quarter($quarter = 'current', $year = null, $format =
         'end'   => $end->getTimestamp(),
     );
 }
+
+/**
+ * Used for blocks...
+ *
+ * @return array
+ */
+function wpgh_get_form_list() {
+
+    $forms = WPGH()->steps->get_steps( array(
+        'step_type' => 'form_fill'
+    ) );
+    $form_options = array();
+    $default = 0;
+    foreach ( $forms as $form ){
+        if ( ! $default ){$default = $form->ID;}
+        $step = new WPGH_Step( $form->ID );
+        if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
+    }
+    return $form_options;
+}
