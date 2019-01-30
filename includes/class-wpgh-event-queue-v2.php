@@ -37,14 +37,24 @@ class WPGH_Event_Queue_v2
     public $events;
 
     /**
+     * @var int
+     */
+    public $time_till_process;
+
+    /**
+     * @var array()
+     */
+    public $schedules = array();
+
+    /**
      * Setup the cron jobs
      * Add new short term schedule
      * setup the action for the cron job
      */
     public function __construct()
     {
-
-        add_filter( 'cron_schedules', array( $this, 'setup_cron_schedules' ) );
+        add_action( 'plugins_loaded', array( $this, 'setup_cron_schedules' ) );
+        add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
         add_action( 'init', array( $this, 'setup_cron_jobs' ) );
         add_action( self::ACTION , array( $this, 'run_queue' ) );
 
@@ -58,32 +68,41 @@ class WPGH_Event_Queue_v2
 
     /**
      * Add the new 10 minute schedule to the list of schedules
-     *
-     * @param $schedules array of cron schedules
-     * @return mixed
-     */
-    public function setup_cron_schedules( $schedules )
+     **/
+    public function setup_cron_schedules()
     {
-        $schedules[ 'every_10_minutes' ] = array(
+        $this->schedules[ 'every_10_minutes' ] = array(
             'interval'    => 10 * MINUTE_IN_SECONDS,
             'display'     => __( 'Every 10 Minutes', 'groundhogg' )
         );
 
-        $schedules[ 'every_5_minutes' ] = array(
+        $this->schedules[ 'every_5_minutes' ] = array(
             'interval'    => 5 * MINUTE_IN_SECONDS,
             'display'     => __( 'Every 5 Minutes', 'groundhogg' )
         );
 
-        $schedules[ 'every_1_minutes' ] = array(
+        $this->schedules[ 'every_1_minutes' ] = array(
             'interval'    => MINUTE_IN_SECONDS,
             'display'     => __( 'Every 1 Minutes', 'groundhogg' )
         );
+    }
 
+    /**
+     * Add the scheules
+     *
+     * @param $schedules
+     * @return array
+     */
+    public function add_cron_schedules( $schedules )
+    {
+        $schedules = array_merge( $schedules, $this->schedules );
         return $schedules;
     }
 
     /**
      * Add the event cron job
+     *
+     * @since 1.0.20.1 Added notice to check if there is something wrong with the cron system.
      */
     public function setup_cron_jobs()
     {
@@ -96,6 +115,29 @@ class WPGH_Event_Queue_v2
             update_option( 'gh_real_queue_interval', $settings_queue_interval );
             wp_schedule_event( time(), apply_filters( 'wpgh_queue_interval', $settings_queue_interval ), self::ACTION );
         }
+
+        $this->time_till_process = wp_next_scheduled( 'wpgh_process_queue' ) - time();
+
+        $expected_max_time = $this->schedules[ $real_queue_interval ][ 'interval' ];
+        $expected_max_time_display = $this->schedules[ $real_queue_interval ][ 'display' ];
+
+        if ( $this->time_till_process > $expected_max_time + 1 ){
+
+            $actual_time = human_time_diff( time(), $this->time_till_process );
+
+            WPGH()->notices->add(
+                'CRON_OVERRIDE',
+                sprintf(
+                    __(
+                        'Event Queue Error: It appears that something is overriding the default timing of the event queue. The queue is expected to run %s but will not run for at least %s.',
+                        'groundhogg'
+                    ),
+                    $expected_max_time_display,
+                    $actual_time ),
+                'warning'
+            );
+        }
+
     }
 
     /**

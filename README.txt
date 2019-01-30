@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.20.1 =
+* TWEAKED Test Email selection will now default to the current user.
+* TWEAKED More proper error messages when now test email is selected.
+* FIXED Contact => Account linking was not working properly.
+
 = 1.0.20 =
 * ADDED Iframe support for Forms! You can now paste forms into your CRM on any site anywhere.
 * ADDED Support for custom page builder blocks. Elementor is the first to be added. Others will come later.

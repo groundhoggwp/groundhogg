@@ -492,7 +492,6 @@ class WPGH_Emails_Page
             $this->notices->add( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
         } else {
             $this->notices->add( 'email-update-error', __( 'Something went wrong.', 'groundhogg' ), 'error' );
-
         }
 
         $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
@@ -512,35 +511,47 @@ class WPGH_Emails_Page
             do_action( 'wpgh_before_send_test_email', $id );
 
             $test_email_uid =  ( isset( $_POST['test_email'] ) )? intval( $_POST['test_email'] ): '';
-            WPGH()->email_meta->update_meta( $id, 'test_email', $test_email_uid );
 
-            $email = new WPGH_Email( $id );
+            if ( $test_email_uid ){
+                WPGH()->email_meta->update_meta( $id, 'test_email', $test_email_uid );
 
-            $email->enable_test_mode();
+                $email = new WPGH_Email( $id );
 
-            $user = get_userdata( $test_email_uid );
+                $email->enable_test_mode();
 
-            $contact = new WPGH_Contact( $user->user_email );
+                $user = get_userdata( $test_email_uid );
 
-            $sent = $contact->exists() ? $email->send( $contact ) : false;
-
-            if ( ! $sent || is_wp_error( $sent ) ){
-                if ( is_wp_error( $sent ) ){
-                    $this->notices->add( 'oops', __( 'Failed to send test: ' . $sent->get_error_message() ), 'error' );
-                } else {
-                    $this->notices->add( 'oops', __( 'Failed to send test: ' . $email->get_error_message() ), 'error' );
+                if ( ! WPGH()->contacts->exists( $user->user_email ) ){
+                    wpgh_create_contact_from_user( $user );
                 }
+
+                $contact = new WPGH_Contact( $user->user_email );
+
+                $sent = $contact->exists() ? $email->send( $contact ) : false;
+
+                if ( ! $sent || is_wp_error( $sent ) ){
+                    if ( is_wp_error( $sent ) ){
+                        $this->notices->add( 'oops', __( 'Failed to send test: ' . $sent->get_error_message() ), 'error' );
+                    } else {
+                        $this->notices->add( 'oops', __( 'Failed to send test: ' . $email->get_error_message() ), 'error' );
+                    }
+                } else {
+                    $this->notices->add(
+                        esc_attr( 'sent-test' ),
+                        sprintf( "%s %s",
+                            __( 'Sent test email to', 'groundhogg' ),
+                            get_userdata( $test_email_uid )->user_email ),
+                        'success'
+                    );
+                }
+
+                do_action( 'wpgh_after_send_test_email', $id );
             } else {
-                $this->notices->add(
-                    esc_attr( 'sent-test' ),
-                    sprintf( "%s %s",
-                        __( 'Sent test email to', 'groundhogg' ),
-                        get_userdata( $test_email_uid )->user_email ),
-                    'success'
-                );
+
+                $this->notices->add( 'oops', __( 'Failed to send test: ', 'groundhogg' ) . __( 'No user selected. PLease select a user to send the test to.', 'groundhogg' ) , 'error' );
+
             }
 
-            do_action( 'wpgh_after_send_test_email', $id );
         }
 
     }

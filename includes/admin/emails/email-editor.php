@@ -197,7 +197,8 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                                     </tr>
                                     <tr id="send-to" class="hidden">
                                         <th><?php _e( 'To:' ); ?></th>
-                                        <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'test_email', 'name' => 'test_email', 'selected' => $email->get_meta( 'test_email' ) ); ?>
+                                        <?php $to = $email->get_meta( 'test_email' ) ? $email->get_meta( 'test_email' ) : get_current_user_id(); ?>
+                                        <?php $args = array( 'option_none' => __( 'Please Select One.' ) , 'id' => 'test_email', 'name' => 'test_email', 'selected' => $to ); ?>
                                         <td><?php echo WPGH()->html->dropdown_owners( $args ); ?></td>
                                     </tr>
                                     <script>
