@@ -121,7 +121,7 @@ class WPGH_Event_Queue_v2
         $expected_max_time = $this->schedules[ $real_queue_interval ][ 'interval' ];
         $expected_max_time_display = $this->schedules[ $real_queue_interval ][ 'display' ];
 
-        if ( $this->time_till_process > $expected_max_time + 1 ){
+        if ( ( $this->time_till_process > $expected_max_time + 1 ) && ( ! defined( 'DISABLE_WP_CRON' ) ||  DISABLE_WP_CRON === false ) ){
 
             $actual_time = human_time_diff( time(), $this->time_till_process );
 
