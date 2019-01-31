@@ -304,6 +304,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
                 self::$instance->register_blocks();
 
+                add_action( 'init', array( self::$instance, 'load_text_domain' ) );
 
             }
 
@@ -454,6 +455,12 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/gutenberg.php';
             require_once WPGH_PLUGIN_DIR . 'api/v2/class-wpgh-api-v2.php';
 
+        }
+
+        public function load_text_domain()
+        {
+            $plugin_rel_path = dirname( __FILE__ ) . '/languages'; /* Relative to WP_PLUGIN_DIR */
+            load_plugin_textdomain( 'groundhogg', false, $plugin_rel_path );
         }
 
         public function brand()

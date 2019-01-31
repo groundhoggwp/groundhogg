@@ -108,6 +108,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.0.20.2=
+* ADDED Translations for es_ES, fr_FR, fr_CA, ja, pt_BR, ro_RO
 * TWEAKED Base API Class
 
 = 1.0.20.1 =
