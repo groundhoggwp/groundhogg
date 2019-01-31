@@ -18,6 +18,17 @@ class WPGH_API_V2
      */
     public $tags;
 
+    /**
+     * @var WPGH_API_V2_EMAILS
+     */
+    public $emails;
+
+    /**
+     * @var WPGH_API_V2_BASE[]
+     */
+    public $extension_apis = array();
+
+
     public function __construct()
     {
 
@@ -27,8 +38,42 @@ class WPGH_API_V2
         $this->tags     = new WPGH_API_V2_TAGS();
         $this->emails   = new WPGH_API_V2_EMAILS();
 
+//        $this->load_extension_apis();
+
     }
 
+    /**
+     * Get API class
+     *
+     * @param $name
+     * @return mixed | WPGH_API_V2_BASE
+     */
+    public function __get($name)
+    {
+        if ( property_exists( $this, $name ) ){
+
+            return $this->$name;
+
+        } else if ( isset( $this->extension_apis[ $name ] ) ){
+
+            return $this->extension_apis[ $name ];
+
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Filter for extensions to add their implementations of the API class
+     */
+    private function load_extension_apis()
+    {
+        $this->extension_apis = apply_filters( 'wpgh_api_add_extension', $this->extension_apis );
+    }
+
+    /**
+     * Include base files.
+     */
     private function includes()
     {
 
@@ -36,6 +81,8 @@ class WPGH_API_V2
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-contacts.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-tags.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-emails.php';
+
+        do_action( 'wpgh_api_include_extensions', $this );
 
     }
 

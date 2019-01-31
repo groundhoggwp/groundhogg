@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.20.2=
+* TWEAKED Base API Class
+
 = 1.0.20.1 =
 * ADDED Beaver Builder form block.
 * TWEAKED Test Email selection will now default to the current user.

@@ -51,7 +51,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'contact' => array(
                         'required'    => true,
-                        'description' => __('Contains list of contact argument. Please visit www.groundhogg.io for full list of accepted argument.','groundhogg')
+                        'description' => __('Contains list of contact arguments. Please visit www.groundhogg.io for full list of accepted argument.','groundhogg')
                     )
                 )
             ),
@@ -169,9 +169,9 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
         }
         $contact_meta = null;
         $parameters = $request->get_json_params();
-        if ( isset( $parameters['contact']['contact_meta'] ) ) {
-            $contact_meta = $parameters['contact']['contact_meta'];
-            unset($parameters['contact']['contact_meta']);
+        if ( isset( $parameters['contact']['meta'] ) ) {
+            $contact_meta = $parameters['contact']['meta'];
+            unset($parameters['contact']['meta']);
         }
         $contact_detail = $parameters['contact'];
         if( isset( $parameters['contact']['email'] ) ) {
@@ -275,13 +275,13 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                     unset( $parameters['contact']['email'] );
                 }
                 $update = 0 ;
-                if ( isset( $parameters['contact']['contact_meta'] ) ) {// update meta
+                if ( isset( $parameters['contact']['meta'] ) ) {// update meta
                     //$data_meta = $data->meta;
-                    foreach ($parameters['contact']['contact_meta'] as $key => $value) {
+                    foreach ($parameters['contact']['meta'] as $key => $value) {
                         WPGH()->contact_meta->update_meta($contact_id, sanitize_key($key), sanitize_text_field($value));
                         $update++;
                     }
-                    unset($parameters['contact']['contact_meta']);
+                    unset($parameters['contact']['meta']);
                 }
                 //update contact table
                 $data_array = $parameters['contact'];

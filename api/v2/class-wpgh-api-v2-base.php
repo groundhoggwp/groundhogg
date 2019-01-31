@@ -26,18 +26,24 @@ class WPGH_API_V2_BASE {
     public function rest_authentication( WP_REST_Request $request )
     {
         // validate user and set user id for contact operations..
-        if( isset( $request['token'] ) && isset( $request['key'] ) ) {
+
+        $token = $request->get_param( 'token' );
+        $key = $request->get_param( 'key' );
+
+        if( $token && $key ) {
+
             //validate user
             global $wpdb;
-            $token      = $request['token'];
-            $public_key = $request['key'];
-            $user       = $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'wpgh_user_public_key' AND meta_value = %s LIMIT 1", $public_key ) );
+
+            $user = $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'wpgh_user_public_key' AND meta_value = %s LIMIT 1", $key ) );
+
             if ( $user != NULL ) {
                 $secret = get_user_meta($user,'wpgh_user_secret_key',true);
-                $valid = $this->check_keys( $secret, $public_key, $token );
+                $valid = $this->check_keys( $secret, $key, $token );
                 if ( $valid ) {
-                    $request['wpgh_user_id'] = $user;
-                    return  true;
+
+                    $request->set_param( 'wpgh_user_id', $user );
+
                 } else {
                     return new WP_Error( 'error',__( 'Invalid Authentication.' ,'groundhogg') );
                 }
@@ -46,8 +52,14 @@ class WPGH_API_V2_BASE {
             }
 
         } else {
+
             return new WP_Error( 'error',__( 'Please Enter Token and Key for API.' ,'groundhogg'));
+
         }
+
+        $request->set_param( 'token', '*****' . substr( $token, strlen( $token ) - 5 ) );
+        $request->set_param( 'key', '*****' . substr( $key, strlen( $key ) - 5 ) );
+
 
         return true;
     }
