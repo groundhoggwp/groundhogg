@@ -898,7 +898,7 @@ function wpgh_create_contact_from_user( $user )
     /**
      * Do not continue if the contact already exists. Just return it...
      */
-    if ( $contact->exists() ){
+    if ( $contact && $contact->exists() ){
         $contact->update( array( 'user_id' => $user->ID ) );
         return $contact;
     }
