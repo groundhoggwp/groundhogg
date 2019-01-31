@@ -1,0 +1,5313 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Groundhogg\n"
+"POT-Creation-Date: 2019-01-31 15:56-0500\n"
+"PO-Revision-Date: 2019-01-31 16:01-0500\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.1\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: groundhogg.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: api/v1/class-wpgh-api-v1-contacts.php:63
+#, fuzzy
+msgid "No contact exists with the given ID."
+msgstr "Nenhum contato existe com a ID fornecida."
+
+#: api/v1/class-wpgh-api-v1-contacts.php:67
+#, fuzzy
+msgid "Please provide a contact ID."
+msgstr "Por favor, forneça um ID de contato."
+
+#: api/v1/class-wpgh-api-v1.php:154
+#, fuzzy
+msgid "The requested method does not exist for module: "
+msgstr "O método solicitado não existe para o módulo:"
+
+#: api/v1/class-wpgh-api-v1.php:163
+#, fuzzy
+msgid "The requested module does not exist."
+msgstr "O módulo solicitado não existe."
+
+#: api/v1/class-wpgh-api-v1.php:170
+#, fuzzy
+msgid "Your token is invalid."
+msgstr "Seu token é inválido."
+
+#: api/v1/class-wpgh-api-v1.php:177
+#, fuzzy
+msgid "Please provide a token."
+msgstr "Por favor, forneça um token."
+
+#: api/v1/class-wpgh-api-v1.php:185
+#, fuzzy
+msgid "Please use POST method to use API. "
+msgstr "Por favor use o método POST para usar a API."
+
+#: api/v1/class-wpgh-api-v1.php:193
+#, fuzzy
+msgid "Something went wrong, but we do not know what."
+msgstr "Algo deu errado, mas não sabemos o quê."
+
+#: api/v2/class-wpgh-api-v2-base.php:48
+#, fuzzy
+msgid "Invalid Authentication."
+msgstr "Autenticação inválida."
+
+#: api/v2/class-wpgh-api-v2-base.php:51
+#, fuzzy
+msgid "API key is not valid."
+msgstr "A chave de API não é válida."
+
+#: api/v2/class-wpgh-api-v2-base.php:56
+#, fuzzy
+msgid "Please enter a API valid token and public key."
+msgstr "Insira um token válido da API e uma chave pública."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:43
+#, fuzzy
+msgid "The ID of contact you want to retrieve."
+msgstr "A identificação do contato que você deseja recuperar."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:54
+#: api/v2/class-wpgh-api-v2-contacts.php:77
+#, fuzzy
+msgid ""
+"Contains list of contact arguments. Please visit www.groundhogg.io for full "
+"list of accepted arguments."
+msgstr ""
+"Contém lista de argumentos de contato. Por favor, visite www.groundhogg.io "
+"para obter a lista completa de argumentos aceitos."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:66
+#, fuzzy
+msgid "ID of the contact which you want to delete."
+msgstr "ID do contacto que pretende eliminar."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:80
+#, fuzzy
+msgid ""
+"Contains array of tag ids/slugs for which you want to apply to the contact."
+msgstr ""
+"Contém matriz de identificações de marca/slugs para o qual você deseja "
+"aplicar ao contato."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:83
+#, fuzzy
+msgid ""
+"Contains array of tag ids/slugs for which you want to remove from the "
+"contact."
+msgstr ""
+"Contém matriz de identificações de marca/slugs para o qual você deseja "
+"remover do contato."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:95
+#: api/v2/class-wpgh-api-v2-contacts.php:168
+#: api/v2/class-wpgh-api-v2-contacts.php:206
+#: api/v2/class-wpgh-api-v2-contacts.php:312
+#: api/v2/class-wpgh-api-v2-tags.php:89 api/v2/class-wpgh-api-v2-tags.php:114
+#: api/v2/class-wpgh-api-v2-tags.php:156 api/v2/class-wpgh-api-v2-tags.php:195
+#, fuzzy
+msgid "You are not eligible to perform this operation."
+msgstr "Você não é elegível para executar esta operação."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:159
+#: api/v2/class-wpgh-api-v2-contacts.php:226
+#: api/v2/class-wpgh-api-v2-contacts.php:232
+#: api/v2/class-wpgh-api-v2-contacts.php:254
+#: api/v2/class-wpgh-api-v2-contacts.php:260
+#: api/v2/class-wpgh-api-v2-contacts.php:301
+#: api/v2/class-wpgh-api-v2-contacts.php:304
+#: api/v2/class-wpgh-api-v2-contacts.php:328
+#: api/v2/class-wpgh-api-v2-contacts.php:333
+#, fuzzy
+msgid "Please provide a valid contact ID."
+msgstr "Por favor, forneça um ID de contato válido."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:180
+#: api/v2/class-wpgh-api-v2-contacts.php:273
+msgid "Please provide a valid email address."
+msgstr "Por favor, forneça um e-mail válido."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:195
+#, fuzzy
+msgid "Contact added successfully."
+msgstr "Contato adicionado com sucesso."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:199
+#: includes/admin/contacts/class-wpgh-contacts-page.php:367
+msgid "Please enter a valid email address."
+msgstr "Por favor insira um endereço de e-mail válido."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:220
+#, fuzzy
+msgid "Tags applied successfully."
+msgstr "Marcas aplicadas com êxito."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:223
+#: api/v2/class-wpgh-api-v2-contacts.php:251
+msgid "Something went wrong!"
+msgstr "Algo deu errado!"
+
+#: api/v2/class-wpgh-api-v2-contacts.php:229
+#: api/v2/class-wpgh-api-v2-contacts.php:257
+#: api/v2/class-wpgh-api-v2-tags.php:187
+#, fuzzy
+msgid "Please provide a valid array of tags."
+msgstr "Forneça um array válido de Tags."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:248
+#, fuzzy
+msgid "Tags removed successfully."
+msgstr "Tags removidas com sucesso."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:297
+#, fuzzy
+msgid "Contact updated successfully."
+msgstr "Contato atualizado com êxito."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:321
+#, fuzzy
+msgid "Contact deleted successfully."
+msgstr "Contato excluído com sucesso."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:324
+#: includes/admin/emails/class-wpgh-emails-page.php:494
+msgid "Something went wrong."
+msgstr "Algo deu errado."
+
+#: api/v2/class-wpgh-api-v2-emails.php:53
+#, fuzzy
+msgid "Contact ID which you want to send to."
+msgstr "ID de contato que você deseja enviar para."
+
+#: api/v2/class-wpgh-api-v2-emails.php:57
+#, fuzzy
+msgid "Email ID which you want to send."
+msgstr "ID de E-mail que você deseja enviar."
+
+#: api/v2/class-wpgh-api-v2-emails.php:91
+msgid "No emails found."
+msgstr "Nenhum email encontrado."
+
+#: api/v2/class-wpgh-api-v2-emails.php:103
+#, fuzzy, php-format
+msgid "Email with ID %d not found."
+msgstr "Email com ID% d não encontrado."
+
+#: api/v2/class-wpgh-api-v2-emails.php:106
+#, fuzzy, php-format
+msgid "Contact with ID %d not found."
+msgstr "Contato com ID% d não encontrado."
+
+#: api/v2/class-wpgh-api-v2-emails.php:113
+#, fuzzy
+msgid "Email sent successfully to contact."
+msgstr "E-mail enviado com sucesso para contato."
+
+#: api/v2/class-wpgh-api-v2-emails.php:116
+#, fuzzy
+msgid "Email not sent."
+msgstr "E-mail não enviado."
+
+#: api/v2/class-wpgh-api-v2-emails.php:120
+#, fuzzy
+msgid "email_id and contact_id are required to perform this operation."
+msgstr "email_id e contact_id são necessários para executar esta operação."
+
+#: api/v2/class-wpgh-api-v2-tags.php:44
+#, fuzzy
+msgid "The ID of tag to retrieve."
+msgstr "A identificação da marca para recuperar."
+
+#: api/v2/class-wpgh-api-v2-tags.php:55
+#, fuzzy
+msgid "Array of tag names."
+msgstr "Matriz de nomes de marca."
+
+#: api/v2/class-wpgh-api-v2-tags.php:66
+#, fuzzy
+msgid "The ID of the tag to delete."
+msgstr "A identificação da marca para excluir."
+
+#: api/v2/class-wpgh-api-v2-tags.php:77
+#, fuzzy
+msgid "Contains array of tags to update."
+msgstr "Contém a matriz de marcas para atualizar."
+
+#: api/v2/class-wpgh-api-v2-tags.php:98 api/v2/class-wpgh-api-v2-tags.php:181
+#: api/v2/class-wpgh-api-v2-tags.php:184 api/v2/class-wpgh-api-v2-tags.php:211
+#: api/v2/class-wpgh-api-v2-tags.php:214
+#, fuzzy
+msgid "Please provide a valid tag ID."
+msgstr "Forneça um ID de tag válido."
+
+#: api/v2/class-wpgh-api-v2-tags.php:106
+msgid "No tags found."
+msgstr "Nenhuma tag encontrada."
+
+#: api/v2/class-wpgh-api-v2-tags.php:144
+#, fuzzy
+msgid " tags added successfully."
+msgstr "Tags adicionadas com êxito."
+
+#: api/v2/class-wpgh-api-v2-tags.php:148
+#, fuzzy
+msgid "Please enter tags."
+msgstr "Por favor, digite Tags."
+
+#: api/v2/class-wpgh-api-v2-tags.php:175
+#, fuzzy
+msgid "Tag updated successfully."
+msgstr "Marca atualizada com êxito."
+
+#: api/v2/class-wpgh-api-v2-tags.php:178 api/v2/class-wpgh-api-v2-tags.php:207
+msgid "Something went wrong"
+msgstr "Algo deu errado"
+
+#: api/v2/class-wpgh-api-v2-tags.php:204
+#, fuzzy
+msgid "Tag deleted successfully."
+msgstr "Tag excluído com sucesso."
+
+#: blocks/beaver-builder/class-wpgh-beaver-builder-blocks.php:32
+#: blocks/beaver-builder/class-wpgh-beaver-builder-blocks.php:39
+msgid "Select a form"
+msgstr "Selecione um formulário"
+
+#: blocks/beaver-builder/class-wpgh-beaver-builder-blocks.php:35
+#: blocks/beaver-builder/widget/class-wpgh-beaver-builder-widget.php:11
+#: blocks/elementor/class-wpgh-elementor-form-widget.php:12
+#, fuzzy
+msgid "Groundhogg Forms"
+msgstr "Formas Groundhogg"
+
+#: blocks/beaver-builder/widget/class-wpgh-beaver-builder-widget.php:12
+#, fuzzy
+msgid "Use Groundhogg forms to collect leads and launch automation!"
+msgstr "Use formas Groundhogg para coletar leads e automação de lançamento!"
+
+#: blocks/beaver-builder/widget/class-wpgh-beaver-builder-widget.php:14
+msgid "Forms"
+msgstr "Formulários"
+
+#: blocks/elementor/class-wpgh-elementor-form-widget.php:30
+#: blocks/visual-composer/class-wpgh-visual-composer-blocks.php:49
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:76
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:162
+#: includes/admin/emails/blocks/wpgh-html-block.php:66
+msgid "Content"
+msgstr "Conteúdo"
+
+#: blocks/elementor/class-wpgh-elementor-form-widget.php:50
+#: includes/gutenberg.php:51
+msgid "Select a Form"
+msgstr "Selecione um Formulário"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-blocks.php:46
+#, fuzzy
+msgid "new_shortcode"
+msgstr "new_shortcode"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:28
+#, fuzzy
+msgid "VC Informationbox"
+msgstr "VC Informationbox"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:30
+#, fuzzy
+msgid "A simple VC box"
+msgstr "Uma caixa de VC simples"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:31
+#, fuzzy
+msgid "My Own Custom Elements"
+msgstr "Meus próprios elementos personalizados"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:39
+#: includes/class-wpgh-html.php:956
+msgid "Title"
+msgstr "Título"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:41
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:54
+msgid "Default value"
+msgstr "Valor padrão"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:42
+msgid "Box Title"
+msgstr "Título da Caixa"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:52
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:313
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:408
+msgid "Text"
+msgstr "Texto"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:55
+#, fuzzy
+msgid "Box Text"
+msgstr "Caixa de texto"
+
+#: groundhogg.php:326 groundhogg.php:338
+msgid "Cheatin huh?"
+msgstr "O que houve, hein?"
+
+#: includes/admin/broadcasts/add-broadcast.php:27
+#, fuzzy
+msgid "Select an email to send."
+msgstr "Selecione um e-mail para enviar."
+
+#: includes/admin/broadcasts/add-broadcast.php:34
+#, fuzzy
+msgid "The Broadcast tool uses your global emails."
+msgstr "A ferramenta Broadcast usa seus emails globais."
+
+#: includes/admin/broadcasts/add-broadcast.php:38
+#: includes/elements/actions/class-wpgh-admin-notification.php:70
+#, fuzzy
+msgid "Send To:"
+msgstr "Enviar para:"
+
+#: includes/admin/broadcasts/add-broadcast.php:45
+#, fuzzy
+msgid "This broadcast will be sent to contacts with these tags."
+msgstr "Esta transmissão será enviada para os contactos com estas etiquetas."
+
+#: includes/admin/broadcasts/add-broadcast.php:49
+#, fuzzy
+msgid "Exclude These Contacts:"
+msgstr "Excluir esses contatos:"
+
+#: includes/admin/broadcasts/add-broadcast.php:56
+#, fuzzy
+msgid "These contacts will be excluded."
+msgstr "Estes contactos serão excluídos."
+
+#: includes/admin/broadcasts/add-broadcast.php:61
+#, fuzzy
+msgid "Send On:"
+msgstr "Enviar em:"
+
+#: includes/admin/broadcasts/add-broadcast.php:69
+#, fuzzy
+msgid "The day the broadcast will be sent."
+msgstr "O dia em que a transmissão será enviada."
+
+#: includes/admin/broadcasts/add-broadcast.php:75
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:134
+#, fuzzy
+msgid "Schedule Broadcast"
+msgstr "Agendar transmissão"
+
+#: includes/admin/broadcasts/broadcast-report.php:26
+#, fuzzy
+msgid "Stats will show once the broadcast has been sent."
+msgstr "Stats mostrará uma vez que a transmissão foi enviada."
+
+#: includes/admin/broadcasts/broadcast-report.php:36
+msgid "Stats"
+msgstr "Estatísticas"
+
+#: includes/admin/broadcasts/broadcast-report.php:40
+#, fuzzy
+msgid "Total Delivered"
+msgstr "Total entregue"
+
+#: includes/admin/broadcasts/broadcast-report.php:57
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:216
+msgid "Opens"
+msgstr "Abertos"
+
+#: includes/admin/broadcasts/broadcast-report.php:75
+#: includes/admin/broadcasts/broadcast-report.php:200
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:222
+msgid "Clicks"
+msgstr "Cliques"
+
+#: includes/admin/broadcasts/broadcast-report.php:92
+#, fuzzy
+msgid "Click Through Rate"
+msgstr "Clique em taxa"
+
+#: includes/admin/broadcasts/broadcast-report.php:96
+#: includes/admin/broadcasts/broadcast-report.php:120
+#, fuzzy
+msgid "Unopened"
+msgstr "Fechada"
+
+#: includes/admin/broadcasts/broadcast-report.php:110
+#, fuzzy
+msgid "Opens, did not click"
+msgstr "Abre, não clicou em"
+
+#: includes/admin/broadcasts/broadcast-report.php:115
+#, fuzzy
+msgid "Opens and clicked"
+msgstr "Abre e clica em"
+
+#: includes/admin/broadcasts/broadcast-report.php:173
+#, fuzzy
+msgid "Links Clicked"
+msgstr "Links clicados"
+
+#: includes/admin/broadcasts/broadcast-report.php:199
+#: includes/admin/emails/blocks/wpgh-image-block.php:99
+msgid "Link"
+msgstr "Link"
+
+#: includes/admin/broadcasts/broadcast-report.php:208
+#, fuzzy
+msgid "No Links Clicked..."
+msgstr "Nenhum link clicado..."
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:137
+msgid "Broadcasts"
+msgstr "Transmissão"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:176
+#, fuzzy
+msgid " Broadcast(s) Cancelled."
+msgstr "Broadcast (s) cancelado."
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:205
+#, fuzzy
+msgid "Please select one or more tags to send this broadcast to."
+msgstr ""
+"Por favor, selecione uma ou mais Tags para enviar esta transmissão para."
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:220
+#, fuzzy
+msgid "Please select a tag with one or more associated contacts."
+msgstr "Por favor, selecione uma tag com um ou mais contatos associados."
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:232
+#, fuzzy
+msgid "Please send at a time in the future!"
+msgstr "Por favor, envie em um momento no futuro!"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:270
+#, fuzzy
+msgid "Broadcast Scheduled!"
+msgstr "Broadcast programado!"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:301
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:303
+#, fuzzy
+msgid "Search Broadcasts "
+msgstr "Transmissões de pesquisa"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:343
+#: includes/admin/contacts/class-wpgh-contacts-page.php:1049
+#: includes/admin/emails/class-wpgh-emails-page.php:120
+#: includes/admin/emails/class-wpgh-emails-page.php:671
+#: includes/admin/emails/email-editor.php:48
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1018
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:323
+#: includes/admin/tags/class-wpgh-tags-page.php:329
+msgid "Add New"
+msgstr "Adicionar Novo"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:55
+#: includes/admin/contacts/class-wpgh-contact-activity-table.php:52
+#: includes/admin/contacts/class-wpgh-contacts-table.php:47
+msgctxt "Column label"
+msgid "Email"
+msgstr "E-mail"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:56
+msgctxt "Column label"
+msgid "Scheduled By"
+msgstr "Agendado por"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:57
+#, fuzzy
+msgctxt "Column label"
+msgid "Scheduled Run Date"
+msgstr "Data de execução agendada"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:58
+#, fuzzy
+msgctxt "Column label"
+msgid "Send To Tags"
+msgstr "Enviar para Tags"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:59
+msgctxt "Column label"
+msgid "Stats"
+msgstr "Estatísticas"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:60
+#, fuzzy
+msgctxt "Column label"
+msgid "Date Scheduled"
+msgstr "Data agendada"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:95
+#: includes/admin/emails/class-wpgh-emails-table.php:104
+#: includes/admin/funnels/class-wpgh-funnels-table.php:94
+msgid "All"
+msgstr "Todos"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:97
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:211
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:245
+msgid "Sent"
+msgstr "Enviado"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:99
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:164
+msgid "Scheduled"
+msgstr "Agendado"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:101
+#: includes/admin/events/class-wpgh-events-table.php:176
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:138
+#: includes/admin/emails/class-wpgh-emails-page.php:203
+#: includes/admin/emails/email-editor.php:48
+#: includes/elements/actions/class-wpgh-send-email.php:114
+msgid "Edit Email"
+msgstr "Editar Email"
+
+#. translators: %s: title
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:140
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:174
+#: includes/admin/contacts/class-wpgh-contacts-table.php:590
+#: includes/admin/events/class-wpgh-events-table.php:397
+#: includes/admin/events/class-wpgh-events-table.php:398
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:153
+#, fuzzy
+msgid "no email"
+msgstr "nenhum e-mail"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:226
+msgid "CTR"
+msgstr "CTR"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:253
+#, fuzzy
+msgid "Will send"
+msgstr "Enviará"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:274
+#: includes/admin/contacts/class-wpgh-contacts-table.php:158
+#: includes/admin/emails/class-wpgh-emails-table.php:230
+#: includes/admin/funnels/class-wpgh-funnels-table.php:267
+msgid "Created"
+msgstr "Criado"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:346
+#, fuzzy
+msgctxt "List table bulk action"
+msgid "Cancel Broadcast"
+msgstr "Cancelar transmissão"
+
+#: includes/admin/contacts/add-contact.php:35
+#: includes/admin/contacts/contact-editor.php:74
+#: includes/admin/contacts/contact-editor.php:424
+#: includes/admin/contacts/contact-editor.php:462
+#: includes/admin/tags/edit-tag.php:25
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:420
+#, fuzzy
+msgid "Name"
+msgstr "Nome"
+
+#: includes/admin/contacts/add-contact.php:39
+#: includes/admin/contacts/class-wpgh-contacts-table.php:562
+#: includes/admin/contacts/contact-editor.php:78
+#: includes/admin/contacts/search.php:92
+msgid "First Name"
+msgstr "Nome"
+
+#: includes/admin/contacts/add-contact.php:47
+#: includes/admin/contacts/class-wpgh-contacts-table.php:566
+#: includes/admin/contacts/contact-editor.php:88
+#: includes/admin/contacts/search.php:93
+msgid "Last Name"
+msgstr "Sobrenome"
+
+#: includes/admin/contacts/add-contact.php:57
+#: includes/admin/contacts/contact-editor.php:128
+msgid "Contact Info"
+msgstr "Informações de Contato"
+
+#: includes/admin/contacts/add-contact.php:61
+#: includes/admin/contacts/class-wpgh-contacts-table.php:558
+#: includes/admin/contacts/contact-editor.php:132
+#: includes/admin/contacts/search.php:94
+#: includes/admin/settings/class-wpgh-settings-page.php:121
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:277
+msgid "Email"
+msgstr "E-mail"
+
+#: includes/admin/contacts/add-contact.php:70
+#: includes/admin/contacts/contact-editor.php:148
+msgid "Primary Phone"
+msgstr "Telefone Principal"
+
+#: includes/admin/contacts/add-contact.php:79
+#: includes/admin/contacts/contact-editor.php:158
+#, fuzzy
+msgid "Phone Extension"
+msgstr "Extensão do telefone"
+
+#: includes/admin/contacts/add-contact.php:89
+#: includes/admin/contacts/contact-editor.php:295
+#: includes/admin/contacts/search.php:133
+#, fuzzy
+msgid "Segmentation"
+msgstr "Segmentação"
+
+#: includes/admin/contacts/add-contact.php:93
+#: includes/admin/contacts/class-wpgh-contacts-table.php:570
+#: includes/admin/contacts/contact-editor.php:299
+#: includes/admin/contacts/search.php:136
+msgid "Owner"
+msgstr "Proprietário"
+
+#: includes/admin/contacts/add-contact.php:98
+#: includes/admin/contacts/class-wpgh-contacts-table.php:584
+#: includes/admin/contacts/contact-editor.php:334
+#: includes/admin/contacts/search.php:155
+#: includes/admin/tags/class-wpgh-tags-page.php:110
+msgid "Tags"
+msgstr "Tags"
+
+#: includes/admin/contacts/add-contact.php:109
+#: includes/admin/contacts/contact-editor.php:355
+msgid "Notes"
+msgstr "Notas"
+
+#: includes/admin/contacts/class-wpgh-contact-activity-table.php:53
+msgctxt "Column label"
+msgid "Opened"
+msgstr "Aberto"
+
+#: includes/admin/contacts/class-wpgh-contact-activity-table.php:54
+msgctxt "Column label"
+msgid "Clicked"
+msgstr "Clicado"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:56
+#: includes/admin/events/class-wpgh-events-table.php:47
+#, fuzzy
+msgctxt "Column label"
+msgid "Funnel"
+msgstr "Funil"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:57
+#: includes/admin/events/class-wpgh-events-table.php:48
+msgctxt "Column label"
+msgid "Step"
+msgstr "Passo"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:58
+#: includes/admin/events/class-wpgh-events-table.php:49
+msgctxt "Column label"
+msgid "Time"
+msgstr "Tempo"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:59
+msgctxt "Column label"
+msgid "Actions"
+msgstr "Ações"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:85
+#: includes/admin/events/class-wpgh-events-table.php:108
+#, fuzzy
+msgid "Broadcast Email"
+msgstr "E-mail Broadcast"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:94
+#, fuzzy
+msgid "funnel deleted"
+msgstr "funil excluído"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:127
+#, fuzzy
+msgid "step deleted"
+msgstr "passo excluído"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:173
+#: includes/admin/events/class-wpgh-events-table.php:391
+msgid "Run Now"
+msgstr "Executar Agora"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:176
+#: includes/admin/events/class-wpgh-events-table.php:407
+#, fuzzy
+msgid "Run Again"
+msgstr "Executar novamente"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:92
+#: includes/admin/emails/class-wpgh-emails-page.php:111
+#: includes/admin/funnels/class-wpgh-funnels-page.php:133
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:63
+msgid "Overview"
+msgstr "Visão geral"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:93
+#, fuzzy
+msgid ""
+"This is where you can manage and view your contacts. Click the quick edit to "
+"quickly change contact details."
+msgstr ""
+"É aqui que pode gerir e ver os seus contactos. Clique na edição rápida para "
+"alterar rapidamente os detalhes de contato."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:100
+#: includes/admin/emails/class-wpgh-emails-page.php:128
+#: includes/admin/funnels/class-wpgh-funnels-page.php:150
+msgid "Editing"
+msgstr "Editando"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:101
+#, fuzzy
+msgid ""
+"While editing a contact you can modify any of their personal information. "
+"There are several points of interest..."
+msgstr ""
+"Ao editar um contato você pode modificar qualquer uma de suas informações "
+"pessoais. Há vários pontos de interesse..."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:103
+#, fuzzy
+msgid ""
+"Manually unsubscribe a contact by checking the \"mark as unsubscribed\" "
+"button."
+msgstr ""
+"Cancelar manualmente um contato marcando o botão \"marcar como não inscrito"
+"\"."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:104
+#, fuzzy
+msgid ""
+"Make sure your in compliance by ensuring the terms of agreement and GDPR "
+"consent are both checked under the compliance section."
+msgstr ""
+"Certifique-se de sua conformidade, garantindo os termos de acordo e "
+"consentimento GDPR são ambos verificados na seção de conformidade."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:105
+#, fuzzy
+msgid "View the origin of the contact by looking at the lead source field."
+msgstr "Exiba a origem do contato examinando o campo de origem do Lead."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:106
+#, fuzzy
+msgid ""
+"Add or remove custom information about the contact by enabling the \"Edit "
+"Meta\" section. Each meta also includes a replacement code to include it in "
+"an email."
+msgstr ""
+"Adicionar ou remover informações personalizadas sobre o contato, habilitando "
+"a seção \"Editar meta\". Cada meta também inclui um código de substituição "
+"para incluí-lo em um e-mail."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:107
+#, fuzzy
+msgid ""
+"Re-run or cancel events for this contact by viewing the \"Upcoming Events\" "
+"or \"Recent History\" Section"
+msgstr ""
+"Reexecutar ou cancelar eventos para este contacto visualizando a secção "
+"\"eventos futuros\" ou \"histórico recente\""
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:108
+#, fuzzy
+msgid ""
+"Monitor their engagement by looking in the \"Recent Email History\" section."
+msgstr ""
+"Monitore seu engajamento examinando a seção \"histórico de emails recentes\"."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:170
+msgid "Add Contact"
+msgstr "Adicionar contato"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:173
+msgid "Edit Contact"
+msgstr "Editar Contato"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:176
+msgid "Search Contacts"
+msgstr "Pesquisar contatos"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:179
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:85
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:179
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:73
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:115
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:122
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:94
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:73
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:78
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:164
+msgid "Contacts"
+msgstr "Contatos"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:249
+#, fuzzy, php-format
+msgid "Marked %d contacts as spam."
+msgstr "Marcado% d contatos como spam."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:277
+#: includes/class-wpgh-bulk-contact-manager.php:147
+#, fuzzy, php-format
+msgid "Deleted %d contacts."
+msgstr "Excluído% d contatos."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:299
+#: includes/admin/contacts/class-wpgh-contacts-page.php:321
+#, fuzzy, php-format
+msgid "Approved %d contacts."
+msgstr "Aprovado% d contatos."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:384
+#: includes/admin/contacts/class-wpgh-contacts-page.php:516
+#: includes/admin/contacts/class-wpgh-contacts-page.php:776
+#, fuzzy, php-format
+msgid "Sorry, the email %s already belongs to another contact."
+msgstr "Desculpe, o e-mail %s já pertence a outro contato."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:391
+msgid "Please enter a valid email address"
+msgstr "Por favor insira um endereço de e-mail válido"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:419
+#, fuzzy
+msgid "Contact created!"
+msgstr "Contato criado!"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:494
+#, fuzzy
+msgid "This contact will no longer receive marketing."
+msgstr "Este contato deixará de receber marketing."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:512
+#: includes/admin/contacts/class-wpgh-contacts-page.php:772
+#, fuzzy, php-format
+msgid ""
+"The email address of this contact has been changed to %s. Their optin status "
+"has been changed to [unconfirmed] to reflect the change as well."
+msgstr ""
+"O endereço de e-mail deste contato foi alterado para %s. Seu estado de Optin "
+"foi mudado para [não confirmado] para refletir a mudança também."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:614
+#, fuzzy
+msgid "Hmm, looks like we couldn't add the new tags..."
+msgstr "Hmm, parece que não poderíamos adicionar as novas Tags..."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:641
+#, fuzzy
+msgid "Email will be sent momentarily!"
+msgstr "E-mail será enviado momentaneamente!"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:652
+#, fuzzy
+msgid "Contact added to funnel."
+msgstr "Contato adicionado ao funil."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:656
+#, fuzzy
+msgid "Contact updated!"
+msgstr "Contato atualizado!"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:706
+#: includes/class-wpgh-submission.php:583
+#: includes/class-wpgh-submission.php:677
+#, fuzzy
+msgid "Could not upload file."
+msgstr "Não foi possível carregar o arquivo."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:758
+#, fuzzy
+msgid "Email cannot be blank."
+msgstr "O email não pode estar em branco."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:760
+msgid "Invalid email address."
+msgstr "Email inválido."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:783
+#, fuzzy
+msgid "First name cannot be blank."
+msgstr "O primeiro nome não pode estar em branco."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:856
+#: includes/admin/contacts/class-wpgh-contacts-page.php:858
+#, fuzzy
+msgid "Search Contacts "
+msgstr "Pesquisar contatos"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:48
+msgctxt "Column label"
+msgid "First Name"
+msgstr "Nome"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:49
+msgctxt "Column label"
+msgid "Last Name"
+msgstr "Sobrenome"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:50
+msgctxt "Column label"
+msgid "Username"
+msgstr "Nome de usuário"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:51
+msgctxt "Column label"
+msgid "Owner"
+msgstr "Proprietário"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:52
+msgctxt "Column label"
+msgid "Date"
+msgstr "Data"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:103
+msgid "Unconfirmed"
+msgstr "Despublicar"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:200
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:134
+#: includes/admin/tags/class-wpgh-tags-table.php:117
+msgctxt "List table bulk action"
+msgid "Delete"
+msgstr "Excluir"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:207
+msgctxt "List table bulk action"
+msgid "Approve"
+msgstr "Aprovar"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:209
+msgctxt "List table bulk action"
+msgid "Mark as Spam"
+msgstr "Marcar como spam"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:236
+#: includes/admin/events/class-wpgh-events-table.php:266
+#, fuzzy
+msgid "All <span class=\"count\">("
+msgstr "Todos < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:237
+#, fuzzy
+msgid "Unconfirmed <span class=\"count\">("
+msgstr "Não confirmado < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:238
+#, fuzzy
+msgid "Confirmed <span class=\"count\">("
+msgstr "Confirmado < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:239
+#, fuzzy
+msgid "Unsubscribed <span class=\"count\">("
+msgstr "Não subscrito < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:240
+#, fuzzy
+msgid "Spam <span class=\"count\">("
+msgstr "Spam < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:241
+#, fuzzy
+msgid "Bounced <span class=\"count\">("
+msgstr "Saltou < span class = \"count\" > ("
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:478
+#, fuzzy, php-format
+msgid "Quick edit &#8220;%s&#8221; inline"
+msgstr "Edição rápida & #8220; %s & #8221; inline"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:479
+msgid "Quick&nbsp;Edit"
+msgstr "Edição&nbsp;rápida"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:488
+#: includes/admin/contacts/class-wpgh-contacts-table.php:489
+#: includes/admin/emails/class-wpgh-emails-table.php:156
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:228
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:229
+#: includes/admin/tags/class-wpgh-tags-table.php:248
+#: includes/admin/tags/class-wpgh-tags-table.php:249
+msgid "Edit"
+msgstr "Editar"
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:497
+#, fuzzy, php-format
+msgid "Mark %s as approved."
+msgstr "Marcar %s conforme aprovado."
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:498
+msgid "Approve"
+msgstr "Aprovar"
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:505
+#, fuzzy, php-format
+msgid "Mark %s as a valid email."
+msgstr "Marque %s como um email válido."
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:506
+#, fuzzy
+msgid "Valid Email"
+msgstr "Email válido"
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:513
+#, fuzzy, php-format
+msgid "Mark %s as spam"
+msgstr "Marcar %s como spam"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:514
+msgid "Spam"
+msgstr "Spam"
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:522
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:236
+#: includes/admin/tags/class-wpgh-tags-table.php:256
+#, php-format
+msgid "Delete &#8220;%s&#8221; permanently"
+msgstr "Excluir &#8220;%s&#8221; Permanentemente"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:523
+#: includes/admin/emails/class-wpgh-emails-table.php:154
+#: includes/admin/funnels/class-wpgh-funnels-table.php:199
+msgid "Delete Permanently"
+msgstr "Excluir Permanentemente"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:555
+msgid "Quick Edit"
+msgstr "Edição rápida"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:572
+#, fuzzy
+msgid "Select an owner"
+msgstr "Selecione um proprietário"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:577
+#, fuzzy
+msgid "Unsubscribe this contact."
+msgstr "Cancele o contato."
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:592
+#: includes/admin/superlinks/edit-superlink.php:61
+#: includes/admin/tags/edit-tag.php:39
+msgid "Update"
+msgstr "Atualizar"
+
+#: includes/admin/contacts/contact-editor.php:41
+#, fuzzy
+msgid "This contact has been deleted."
+msgstr "Este contacto foi eliminado."
+
+#: includes/admin/contacts/contact-editor.php:51
+#, fuzzy
+msgid "You are not the owner of this contact."
+msgstr "Você não é o proprietário deste contato."
+
+#: includes/admin/contacts/contact-editor.php:99
+#: includes/admin/settings/class-wpgh-api-keys-table.php:162
+msgid "Username"
+msgstr "Nome de usuário"
+
+#: includes/admin/contacts/contact-editor.php:110
+#: includes/admin/contacts/contact-editor.php:114
+#, fuzzy
+msgid "Create User Account"
+msgstr "Criar conta de usuário"
+
+#: includes/admin/contacts/contact-editor.php:113
+#, fuzzy
+msgid "Create New Account?"
+msgstr "Criar nova conta?"
+
+#: includes/admin/contacts/contact-editor.php:115
+#, fuzzy
+msgid ""
+"This contact does not have an associated user account? Would you like to "
+"create one?"
+msgstr ""
+"Esse contato não tem uma conta de usuário associada? Gostaria de criar um?"
+
+#: includes/admin/contacts/contact-editor.php:118
+#, fuzzy
+msgid "Link Existing Account?"
+msgstr "Vincular conta existente?"
+
+#: includes/admin/contacts/contact-editor.php:119
+#, fuzzy
+msgid "Select a User Account (optional)"
+msgstr "Selecione uma conta de usuário (opcional)"
+
+#: includes/admin/contacts/contact-editor.php:120
+#, fuzzy
+msgid "You can link an existing user account to this contact."
+msgstr "Você pode vincular uma conta de usuário existente a esse contato."
+
+#: includes/admin/contacts/contact-editor.php:141
+msgid "Email Status"
+msgstr "Status de E-mail"
+
+#: includes/admin/contacts/contact-editor.php:143
+#, fuzzy
+msgid "Mark as unsubscribed."
+msgstr "Marque como não inscrito."
+
+#: includes/admin/contacts/contact-editor.php:171
+msgid "Company Info"
+msgstr "Informações da Empresa"
+
+#: includes/admin/contacts/contact-editor.php:174
+#: includes/admin/contacts/search.php:99
+msgid "Company Name"
+msgstr "Nome da Empresa"
+
+#: includes/admin/contacts/contact-editor.php:184
+#: includes/admin/contacts/search.php:100
+msgid "Job Title"
+msgstr "Cargo"
+
+#: includes/admin/contacts/contact-editor.php:194
+#, fuzzy
+msgid "Full Company Address"
+msgstr "Endereço completo da empresa"
+
+#: includes/admin/contacts/contact-editor.php:206
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:285
+msgid "Address"
+msgstr "Endereço"
+
+#: includes/admin/contacts/contact-editor.php:210
+#: includes/admin/contacts/search.php:102
+#: includes/admin/settings/class-wpgh-settings-page.php:245
+#: includes/class-wpgh-form.php:501 includes/class-wpgh-form.php:505
+msgid "Street Address 1"
+msgstr "Endereço 1"
+
+#: includes/admin/contacts/contact-editor.php:220
+#: includes/admin/contacts/search.php:103
+#: includes/admin/settings/class-wpgh-settings-page.php:257
+#: includes/class-wpgh-form.php:513 includes/class-wpgh-form.php:517
+#, fuzzy
+msgid "Street Address 2"
+msgstr "Endereço 2 da rua"
+
+#: includes/admin/contacts/contact-editor.php:230
+#: includes/admin/contacts/search.php:104
+#: includes/admin/settings/class-wpgh-settings-page.php:269
+#: includes/class-wpgh-form.php:525 includes/class-wpgh-form.php:529
+msgid "City"
+msgstr "Cidade"
+
+#: includes/admin/contacts/contact-editor.php:240
+#: includes/admin/contacts/search.php:105
+#: includes/admin/settings/class-wpgh-settings-page.php:281
+#: includes/class-wpgh-form.php:562 includes/class-wpgh-form.php:566
+msgid "Postal/Zip Code"
+msgstr "CEP"
+
+#: includes/admin/contacts/contact-editor.php:250
+#: includes/admin/contacts/search.php:106 includes/class-wpgh-form.php:537
+#: includes/class-wpgh-form.php:541
+msgid "State/Province"
+msgstr "Estado"
+
+#: includes/admin/contacts/contact-editor.php:260
+#: includes/admin/contacts/search.php:107
+#: includes/admin/settings/class-wpgh-settings-page.php:305
+#: includes/class-wpgh-form.php:552
+msgid "Country"
+msgstr "País"
+
+#: includes/admin/contacts/contact-editor.php:267
+msgid "Select a Country"
+msgstr "Selecione o País"
+
+#: includes/admin/contacts/contact-editor.php:278
+#: includes/admin/settings/class-wpgh-settings-page.php:168
+msgid "Compliance"
+msgstr "Auditoria"
+
+#: includes/admin/contacts/contact-editor.php:282
+#, fuzzy
+msgid "Agreed To Terms"
+msgstr "Acordo com os termos"
+
+#: includes/admin/contacts/contact-editor.php:283
+#: includes/admin/contacts/contact-editor.php:288
+#, fuzzy
+msgid "Agreed"
+msgstr "Concordou"
+
+#: includes/admin/contacts/contact-editor.php:287
+msgid "GDPR Consent"
+msgstr "Consentimento GDPR"
+
+#: includes/admin/contacts/contact-editor.php:304
+#: includes/admin/contacts/search.php:144
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:72
+#, fuzzy
+msgid "Source Page"
+msgstr "Página de origem"
+
+#: includes/admin/contacts/contact-editor.php:315
+#, fuzzy
+msgid "This is the page which the contact first submitted a form."
+msgstr "Esta é a página que o contato submeteu primeiramente um formulário."
+
+#: includes/admin/contacts/contact-editor.php:320
+#: includes/admin/contacts/search.php:149
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:72
+#, fuzzy
+msgid "Lead Source"
+msgstr "Fonte de chumbo"
+
+#: includes/admin/contacts/contact-editor.php:330
+#, fuzzy
+msgid "This is where the contact originated from."
+msgstr "Este é o lugar de origem do contato."
+
+#: includes/admin/contacts/contact-editor.php:346
+#: includes/elements/benchmarks/class-wpgh-tag-applied.php:79
+#: includes/elements/benchmarks/class-wpgh-tag-removed.php:79
+#, fuzzy
+msgid "Add new tags by hitting [Enter] or by typing a [,]."
+msgstr "Adicione novas Tags batendo [Enter] ou digitando um [,]."
+
+#: includes/admin/contacts/contact-editor.php:373
+#: includes/admin/funnels/funnel-editor.php:236
+msgid "Actions"
+msgstr "Ações"
+
+#: includes/admin/contacts/contact-editor.php:376
+msgid "Send Email"
+msgstr "Enviar Email"
+
+#: includes/admin/contacts/contact-editor.php:380
+msgid "Send"
+msgstr "Enviar"
+
+#: includes/admin/contacts/contact-editor.php:386
+#, fuzzy
+msgid "Add To Funnel"
+msgstr "Adicionar ao funil"
+
+#: includes/admin/contacts/contact-editor.php:411
+msgid "Start"
+msgstr "Iniciar"
+
+#: includes/admin/contacts/contact-editor.php:419
+msgid "Files"
+msgstr "Arquivos"
+
+#: includes/admin/contacts/contact-editor.php:425
+#: includes/admin/contacts/contact-editor.php:463
+msgid "Size"
+msgstr "Tamanho"
+
+#: includes/admin/contacts/contact-editor.php:426
+#: includes/admin/contacts/contact-editor.php:464
+msgid "Type"
+msgstr "Tipo"
+
+#: includes/admin/contacts/contact-editor.php:427
+#: includes/admin/contacts/contact-editor.php:465
+#: includes/class-wpgh-replacements.php:350
+#, fuzzy
+msgid "Replacement Code"
+msgstr "Código de substituição"
+
+#: includes/admin/contacts/contact-editor.php:437
+#, fuzzy
+msgid "This contact has no files..."
+msgstr "Este contato não tem arquivos..."
+
+#: includes/admin/contacts/contact-editor.php:453
+#, fuzzy
+msgid "{files."
+msgstr "arquivos."
+
+#: includes/admin/contacts/contact-editor.php:470
+#, fuzzy
+msgid "Upload files: "
+msgstr "Upload de arquivos:"
+
+#: includes/admin/contacts/contact-editor.php:478
+#, fuzzy
+msgid "Custom Meta"
+msgstr "Meta personalizada"
+
+#: includes/admin/contacts/contact-editor.php:481
+#, fuzzy
+msgid "Edit Meta"
+msgstr "Editar meta"
+
+#: includes/admin/contacts/contact-editor.php:504
+#, fuzzy
+msgid "Add Meta"
+msgstr "Adicionar meta"
+
+#: includes/admin/contacts/contact-editor.php:506
+msgid "Key"
+msgstr "Chave"
+
+#: includes/admin/contacts/contact-editor.php:507
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:442
+msgid "Value"
+msgstr "Valor"
+
+#: includes/admin/contacts/contact-editor.php:586
+msgid "Upcoming Events"
+msgstr "Próximos Eventos"
+
+#: includes/admin/contacts/contact-editor.php:596
+#: includes/admin/contacts/contact-editor.php:611
+#, fuzzy
+msgid "View All Events"
+msgstr "Ver todos os eventos"
+
+#: includes/admin/contacts/contact-editor.php:598
+#, fuzzy
+msgid ""
+"Any upcoming funnel steps will show up here. you can choose to cancel them "
+"or to run them immediately."
+msgstr ""
+"Todos os próximos passos funil vai aparecer aqui. Você pode optar por "
+"cancelá-los ou executá-los imediatamente."
+
+#: includes/admin/contacts/contact-editor.php:601
+#, fuzzy
+msgid "Recent Funnel History"
+msgstr "História recente do funil"
+
+#: includes/admin/contacts/contact-editor.php:612
+#, fuzzy
+msgid ""
+"Any previous funnel steps will show up here. You can choose run them again."
+"<br/>\n"
+"    This report only shows the 20 most recent events, to see more you can "
+"see all this contact's history in the event queue."
+msgstr ""
+"Quaisquer etapas anteriores do funil serão exibido aqui. Você pode escolher "
+"executá-los novamente. <br/>\n"
+"    Este relatório mostra apenas os 20 eventos mais recentes, para ver mais "
+"você pode ver o histórico de todos os contatos na fila de eventos."
+
+#: includes/admin/contacts/contact-editor.php:616
+#, fuzzy
+msgid "Recent Email History"
+msgstr "Histórico de emails recentes"
+
+#: includes/admin/contacts/contact-editor.php:621
+#, fuzzy
+msgid ""
+"This is where you can check if this contact is interacting with your emails."
+msgstr ""
+"Este é o lugar onde você pode verificar se este contato está interagindo com "
+"seus e-mails."
+
+#: includes/admin/contacts/contact-editor.php:628
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:237
+#: includes/admin/superlinks/edit-superlink.php:62
+#: includes/admin/tags/class-wpgh-tags-table.php:257
+#: includes/admin/tags/edit-tag.php:40
+msgid "Delete"
+msgstr "Excluir"
+
+#: includes/admin/contacts/search.php:21
+msgid "Equals"
+msgstr "Iguais"
+
+#: includes/admin/contacts/search.php:22
+#, fuzzy
+msgid "Not Equals"
+msgstr "Não é igual a"
+
+#: includes/admin/contacts/search.php:23
+#, fuzzy
+msgid "Starts With"
+msgstr "Começa com"
+
+#: includes/admin/contacts/search.php:24
+#, fuzzy
+msgid "Ends With"
+msgstr "Termina com"
+
+#: includes/admin/contacts/search.php:25
+msgid "Contains"
+msgstr "Contém"
+
+#: includes/admin/contacts/search.php:26
+#, fuzzy
+msgid "Does Not Contain"
+msgstr "Não contém"
+
+#: includes/admin/contacts/search.php:27
+msgid "Is Empty"
+msgstr "Está vazio"
+
+#: includes/admin/contacts/search.php:28
+#, fuzzy
+msgid "Is Filled"
+msgstr "É preenchido"
+
+#: includes/admin/contacts/search.php:98
+#: includes/admin/settings/class-wpgh-settings-page.php:317
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:281
+msgid "Phone"
+msgstr "Telefone"
+
+#: includes/admin/contacts/search.php:101
+msgid "Company Address"
+msgstr "Endereço da Empresa"
+
+#: includes/admin/contacts/search.php:112
+msgid "General Information"
+msgstr "Informações Gerais"
+
+#: includes/admin/contacts/search.php:162
+#: includes/admin/contacts/search.php:186
+#, fuzzy
+msgid "Has ALL of these tags"
+msgstr "Tem todas essas Tags"
+
+#: includes/admin/contacts/search.php:163
+#: includes/admin/contacts/search.php:187
+#, fuzzy
+msgid "Has ANY of these tags"
+msgstr "Tem alguma dessas Tags"
+
+#: includes/admin/contacts/search.php:164
+#: includes/admin/contacts/search.php:188
+#, fuzzy
+msgid "Does not have ALL of these tags"
+msgstr "Não tem todas essas Tags"
+
+#: includes/admin/contacts/search.php:165
+#: includes/admin/contacts/search.php:189
+#, fuzzy
+msgid "Does not have ANY of these tags"
+msgstr "Não tem nenhuma dessas Tags"
+
+#: includes/admin/contacts/search.php:179
+msgid "And"
+msgstr "E"
+
+#: includes/admin/contacts/search.php:206
+#, fuzzy
+msgid "Custom Data (Meta)"
+msgstr "Dados personalizados (meta)"
+
+#: includes/admin/dashboard/class-wpgh-reporting-widget.php:231
+#, fuzzy
+msgid "You cannot export reports!"
+msgstr "Não é possível exportar relatórios!"
+
+#: includes/admin/dashboard/class-wpgh-reporting-widget.php:254
+#, fuzzy
+msgid "Export Report"
+msgstr "Relatório de exportação"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:102
+#, fuzzy
+msgid "New Contacts"
+msgstr "Novos contatos"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:103
+msgid "Email Report"
+msgstr "Relatório por e-mail"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:104
+#, fuzzy
+msgid "Form Activity"
+msgstr "Atividade de formulário"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:115
+msgid "Dashboard"
+msgstr "Painel"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:124
+msgid "Last 24 Hours"
+msgstr "Últimas 24 horas"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:125
+msgid "Last 7 Days"
+msgstr "Últimos 7 dias"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:126
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:36
+#: includes/admin/funnels/class-wpgh-funnels-table.php:129
+#: includes/admin/funnels/funnel-editor.php:53
+msgid "Last 30 Days"
+msgstr "Últimos 30 dias"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:127
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:43
+#: includes/admin/funnels/class-wpgh-funnels-table.php:136
+#: includes/admin/funnels/funnel-editor.php:60
+msgid "Custom Range"
+msgstr "Personalizado"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:133
+msgid "From:"
+msgstr "De:"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:140
+#: includes/admin/emails/email-editor.php:199
+msgid "To:"
+msgstr "Para:"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:17
+#, fuzzy
+msgid "Funnel Breakdown"
+msgstr "Repartição do funil"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:29
+#: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:29
+#, fuzzy
+msgid "You have no active funnels."
+msgstr "Você não tem funis ativos."
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:84
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:178
+msgid "Benchmark"
+msgstr "Benchmark"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:86
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:180
+#, fuzzy
+msgid "/ Total"
+msgstr "/Total"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:87
+#, fuzzy
+msgid "/ Previous Step"
+msgstr "/Etapa anterior"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:142
+#, fuzzy
+msgid "Please select a funnel first."
+msgstr "Por favor, selecione um funil primeiro."
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:151
+#, fuzzy
+msgid "This funnel has no benchmarks."
+msgstr "Este funil não tem benchmarks."
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:181
+msgid "/ Previous"
+msgstr "/ Anterior"
+
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:17
+#, fuzzy
+msgid "Lead Source Report"
+msgstr "Relatório de fonte de chumbo"
+
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:61
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:134
+#, fuzzy
+msgid "No new lead sources to report."
+msgstr "Não há novas fontes de chumbo para relatar."
+
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:145
+#, fuzzy
+msgid "Lead Source URL"
+msgstr "URL da fonte de chumbo"
+
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:146
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:202
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:179
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:146
+#, fuzzy
+msgid "Number of Contacts"
+msgstr "Número de contatos"
+
+#: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:17
+#, fuzzy
+msgid "Most Active Funnels"
+msgstr "Funis mais ativos"
+
+#: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:63
+#, fuzzy
+msgid "Funnel"
+msgstr "Funil"
+
+#: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:64
+#, fuzzy
+msgid "Active Contacts"
+msgstr "Contatos ativos"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:15
+#, fuzzy
+msgid "Form Activity Report"
+msgstr "Relatório de atividade de formulário"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:53
+#, fuzzy
+msgid "Form Fills"
+msgstr "Preenchimentos de formulário"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:57
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:124
+#, fuzzy
+msgid "Form Impressions"
+msgstr "Impressões de formulário"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:84
+msgid "Total Impressions"
+msgstr "Total de Impressões"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:85
+msgid "Total Submissions"
+msgstr "Total de envios"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:86
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:126
+#, fuzzy
+msgid "Average Conversion Rate"
+msgstr "Taxa de conversão média"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:122
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:113
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:134
+msgid "From"
+msgstr "De"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:123
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:114
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:135
+msgid "To"
+msgstr "Para"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:125
+msgid "Form Submissions"
+msgstr "Registros"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:14
+#, fuzzy
+msgid "New Contacts Report"
+msgstr "Novo relatório de contatos"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:45
+#, fuzzy
+msgid "Optins"
+msgstr "Optins"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:75
+#, fuzzy
+msgid "Total Contacts"
+msgstr "Total de contatos"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:76
+#, fuzzy
+msgid "Previous Period"
+msgstr "Período anterior"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:14
+#, fuzzy
+msgid "Email Activity Report"
+msgstr "Relatório de atividades de E-mail"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:52
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:136
+msgid "Emails Sent"
+msgstr "Emails enviados"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:56
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:137
+#, fuzzy
+msgid "Emails Opened"
+msgstr "E-mails abertos"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:60
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:138
+#, fuzzy
+msgid "Emails Clicked"
+msgstr "Emails clicados"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:91
+msgid "Total Sent"
+msgstr "Total Enviado"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:92
+#, fuzzy
+msgid "Total Opened"
+msgstr "Total aberto"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:93
+#, fuzzy
+msgid "Total Clicked"
+msgstr "Total clicado"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:96
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:139
+#, fuzzy
+msgid "Average Open Rate"
+msgstr "Tarifa média aberta"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:97
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:140
+#, fuzzy
+msgid "Average Click Through Rate"
+msgstr "Taxa média de cliques"
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:19
+#, fuzzy
+msgid "Search Engine Report"
+msgstr "Relatório do Search Engine"
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:110
+#, fuzzy
+msgid "No new search engine sources to report."
+msgstr "Nenhuma fonte nova do Search Engine a relatar."
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:121
+msgid "Search Engine"
+msgstr "Mecanismo de busca"
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:190
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:82
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:167
+#, fuzzy
+msgid "No new social media sources to report."
+msgstr "Não há novas fontes de mídia social para relatar."
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:201
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:178
+#, fuzzy
+msgid "Social Media Source"
+msgstr "Fonte de mídia social"
+
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:19
+#, fuzzy
+msgid "Social Media Report"
+msgstr "Relatório de mídias sociais"
+
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:93
+#, fuzzy
+msgid "Social Media Site"
+msgstr "Site de mídias sociais"
+
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:17
+#, fuzzy
+msgid "Source Page Report"
+msgstr "Relatório de página de origem"
+
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:61
+#, fuzzy
+msgid "No new pages to report."
+msgstr "Não há novas páginas para relatar."
+
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:134
+#, fuzzy
+msgid "No new sources to report."
+msgstr "Não há novas fontes para relatar."
+
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:145
+#, fuzzy
+msgid "Source Page URL"
+msgstr "URL da página de origem"
+
+#: includes/admin/dashboard/widgets/class-wpgh-summary-widget.php:17
+#, fuzzy
+msgid "Groundhogg Summary"
+msgstr "Groundhogg Sumário"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:18
+#, fuzzy
+msgid "Reporting Time Range"
+msgstr "Intervalo de tempo de relatório"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:32
+#: includes/admin/funnels/class-wpgh-funnels-table.php:125
+#: includes/admin/funnels/funnel-editor.php:49
+msgid "Today"
+msgstr "Hoje"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:33
+#: includes/admin/funnels/class-wpgh-funnels-table.php:126
+#: includes/admin/funnels/funnel-editor.php:50
+msgid "Yesterday"
+msgstr "Ontem"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:34
+#: includes/admin/funnels/class-wpgh-funnels-table.php:127
+#: includes/admin/funnels/funnel-editor.php:51
+msgid "This Week"
+msgstr "Esta Semana"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:35
+#: includes/admin/funnels/class-wpgh-funnels-table.php:128
+#: includes/admin/funnels/funnel-editor.php:52
+msgid "Last Week"
+msgstr "Última semana"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:37
+#: includes/admin/funnels/class-wpgh-funnels-table.php:130
+#: includes/admin/funnels/funnel-editor.php:54
+msgid "This Month"
+msgstr "Este mês"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:38
+#: includes/admin/funnels/class-wpgh-funnels-table.php:131
+#: includes/admin/funnels/funnel-editor.php:55
+msgid "Last Month"
+msgstr "Mês Passado"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:39
+#: includes/admin/funnels/class-wpgh-funnels-table.php:132
+#: includes/admin/funnels/funnel-editor.php:56
+msgid "This Quarter"
+msgstr "Este Trimestre"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:40
+#: includes/admin/funnels/class-wpgh-funnels-table.php:133
+#: includes/admin/funnels/funnel-editor.php:57
+msgid "Last Quarter"
+msgstr "Último Trimestre"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:41
+#: includes/admin/funnels/class-wpgh-funnels-table.php:134
+#: includes/admin/funnels/funnel-editor.php:58
+msgid "This Year"
+msgstr "Este ano"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:42
+#: includes/admin/funnels/class-wpgh-funnels-table.php:135
+#: includes/admin/funnels/funnel-editor.php:59
+msgid "Last Year"
+msgstr "Último ano"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:86
+#, fuzzy
+msgid ""
+"Use this form to quickly change the reporting time for any Groundhogg "
+"reports that use it."
+msgstr ""
+"Use este formulário para alterar rapidamente o tempo de relatório para "
+"quaisquer relatórios do Groundhogg que o utilizem."
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:17
+#, fuzzy
+msgid "UTM Campaign Report"
+msgstr "Relatório de campanha da UTM"
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:62
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:146
+#, fuzzy
+msgid "Nothing new to report."
+msgstr "Nada de novo para relatar."
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:73
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:159
+msgid "Campaign"
+msgstr "Campanha"
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:74
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:160
+msgid "Source"
+msgstr "Fonte"
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:75
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:161
+msgid "Medium"
+msgstr "Médio"
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:77
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:163
+msgid "Term"
+msgstr "Termo"
+
+#: includes/admin/emails/add-email.php:37
+msgid "Email Templates"
+msgstr "Modelos de e-mail"
+
+#: includes/admin/emails/add-email.php:38
+msgid "My Emails"
+msgstr "Meus E-mails"
+
+#: includes/admin/emails/add-email.php:58
+#: includes/admin/emails/add-email.php:77
+msgid "Start Writing"
+msgstr "Começar a Escrever"
+
+#: includes/admin/emails/add-email.php:73
+msgid "Custom Email"
+msgstr "E-mail personalizado"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:31
+msgid "Button"
+msgstr "Botão"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:55
+#, fuzzy
+msgid "I am a button &rarr;"
+msgstr "Eu sou um botão &rarr;"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:78
+msgid "Button Text"
+msgstr "Texto do Botão"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:87
+msgid "Button Link"
+msgstr "Link do Botão"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:96
+msgid "Button Color"
+msgstr "Cor do Botão"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:105
+msgid "Font Color"
+msgstr "Cor da Fonte"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:114
+msgid "Font Size"
+msgstr "Tamanho da fonte"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:126
+msgid "Button Font"
+msgstr "Fonte do botão"
+
+#: includes/admin/emails/blocks/wpgh-divider-block.php:31
+msgid "Divider"
+msgstr "Divisor"
+
+#: includes/admin/emails/blocks/wpgh-divider-block.php:66
+#: includes/admin/emails/blocks/wpgh-image-block.php:77
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:469
+msgid "Width"
+msgstr "Largura"
+
+#: includes/admin/emails/blocks/wpgh-html-block.php:31
+msgid "HTML"
+msgstr "HTML"
+
+#: includes/admin/emails/blocks/wpgh-html-block.php:49
+#, fuzzy
+msgid ""
+"This is some custom HTML which you can edit on the right. You may enter any "
+"valid HTML tags, but they may get filtered out as some email browsers to not "
+"support certain HTML."
+msgstr ""
+"Este é algum HTML personalizado que você pode editar à direita. Você pode "
+"inserir quaisquer Tags HTML válidas, mas elas podem ser filtradas como "
+"alguns navegadores de e-mail para não suportarem determinados HTML."
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:31
+#: includes/admin/emails/blocks/wpgh-image-block.php:68
+msgid "Image"
+msgstr "Imagem"
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:86
+#: includes/admin/emails/email-editor.php:133
+msgid "Alignment"
+msgstr "Alinhamento"
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:91
+#: includes/admin/emails/email-editor.php:136
+msgid "Left"
+msgstr "Esquerda"
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:92
+#: includes/admin/emails/email-editor.php:137
+msgid "Center"
+msgstr "Centro"
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:93
+msgid "Right"
+msgstr "Direita"
+
+#: includes/admin/emails/blocks/wpgh-spacer-block.php:31
+msgid "Spacer"
+msgstr "Espaçador"
+
+#: includes/admin/emails/blocks/wpgh-spacer-block.php:67
+#, fuzzy
+msgid "Spacer Height"
+msgstr "Altura do espaçador"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:31
+msgid "Text Block"
+msgstr "Bloco de Texto"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:53
+#, fuzzy
+msgid ""
+"Customize this section by editing the text, adding your own copy, \n"
+"            using the options above to bold, italicize, or create links and "
+"bullets, \n"
+"            or use the options in the \"Design\" panel on the left to "
+"change \n"
+"            the font styles of your email."
+msgstr ""
+"Personalize esta seção editando o texto, adicionando sua própria cópia, "
+"usando as opções acima para bold (realce), italicize, ou críe ligações e "
+"balas, ou use as opções no painel do \"projeto\" à esquerda para mudar os "
+"estilos da pia batismal de seu email."
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:71
+msgid "H1 Size"
+msgstr "H1 Tamanho"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:83
+msgid "H1 Font"
+msgstr "Fonte H1"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:91
+msgid "H2 Size"
+msgstr "H2 Size"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:103
+msgid "H2 Font"
+msgstr "Fonte H2"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:111
+msgid "Paragraph Size"
+msgstr "Tamanho do parágrafo"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:123
+msgid "Paragraph Font"
+msgstr "Fonte do parágrafo"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:112
+#, fuzzy
+msgid ""
+"Unlike most marketing automation platforms Groundhogg made the decision to "
+"<strong>store emails globally</strong>. That means that you can use the same "
+"email across different funnels without ever having to re-write it.\n"
+"                From this screen you can <strong>View/Edit/Delete</strong> "
+"emails and see their respective open rates across different funnels."
+msgstr ""
+"Ao contrário da maioria das plataformas de automação de marketing Groundhogg "
+"tomou a decisão de <strong> armazenar e-mails globalmente </strong>. Isso "
+"significa que você pode usar o mesmo e-mail em diferentes funis sem nunca "
+"ter que re-escrevê-lo.\n"
+"                A partir desta tela você pode <strong> View/Edit/Delete </"
+"strong> e-mails e ver suas respectivas taxas abertas em diferentes funis."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:121
+#, fuzzy
+msgid ""
+"When you add a new email you can either select a pre-written email template "
+"created by our in house digital marketing specialists or you can select one "
+"of your own past written emails to copy."
+msgstr ""
+"Quando você adicionar um novo e-mail você pode selecionar um modelo de e-"
+"mail pré-escrito criado por nossos especialistas em marketing digital em "
+"casa ou você pode selecionar um dos seus próprios e-mails escritos passados "
+"para copiar."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:129
+#, fuzzy, php-format
+msgid ""
+"When you are editing an email, you can drag in new blocks from the right "
+"hand side into your email content. You can edit the appearance of the email "
+"with the settings on the left hand side of the email content. When designing "
+"our\n"
+"                email builder we made the decision to keep features sparse. "
+"Hence no columns and no frilly html stuff. Just the basics. The reason for "
+"this being 80% of email is read on mobile, so our email builder is optimized "
+"for better mobile consumption."
+msgstr ""
+"Quando você está editando um email, você pode arrastar em blocos novos do "
+"lado direito em seu índice do email. Você pode editar a aparência do e-mail "
+"com as configurações no lado esquerdo do conteúdo do e-mail. Ao projetar "
+"nosso construtor do email nós fizemos a decisão para manter características "
+"esparsas. Portanto, sem colunas e não frilly coisas HTML. Apenas o básico. A "
+"razão para isso ser 80% de e-mail é lido no celular, para que o nosso "
+"Construtor de e-mail é otimizado para um melhor consumo móvel."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:131
+#, fuzzy
+msgid ""
+"When you believe an email is ready for sending set the status to "
+"<strong>Ready</strong> and then you can use it in any broadcast or funnel. "
+"An email which is in draft mode will not be sent."
+msgstr ""
+"Quando você acredita que um e-mail está pronto para enviar definir o status "
+"para <strong> Ready </strong> e, em seguida, você pode usá-lo em qualquer "
+"transmissão ou funil. Um e-mail que está no modo de rascunho não será "
+"enviado."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:138
+msgid "Testing"
+msgstr "Testando"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:139
+#, fuzzy
+msgid ""
+"To test an email simply check off the <strong>Send Test</strong> checkbox "
+"and select the user account you'd like to send the test to. For best "
+"results, use a minimal number of images, make text easy to read and write "
+"good content. Tests will be sent regardless of the email's current status."
+msgstr ""
+"Para testar um email, simplesmente marque a caixa de seleção <strong> Send "
+"Test </strong> e selecione a conta de usuário para a qual deseja enviar o "
+"teste. Para obter melhores resultados, use um número mínimo de imagens, "
+"tornar o texto fácil de ler e escrever um bom conteúdo. Os testes serão "
+"enviados independentemente do status atual do e-mail."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:200
+msgid "Add Email"
+msgstr "Adicionar E-mail"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:206
+#: includes/admin/emails/class-wpgh-emails-page.php:269
+#: includes/admin/emails/class-wpgh-emails-page.php:292
+#: includes/admin/emails/class-wpgh-emails-page.php:317
+#: includes/admin/emails/class-wpgh-emails-page.php:340
+#: includes/install.php:177
+msgid "Emails"
+msgstr "E-mails"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:267
+msgid "Trashed"
+msgstr "Na Lixeira"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:290
+#: includes/admin/emails/class-wpgh-emails-page.php:315
+#: includes/admin/funnels/class-wpgh-funnels-page.php:397
+msgid "Deleted"
+msgstr "Excluído"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:338
+#: includes/admin/funnels/class-wpgh-funnels-page.php:422
+msgid "Restored"
+msgstr "Restaurado"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:391
+#: includes/admin/emails/class-wpgh-emails-page.php:407
+#, fuzzy
+msgid "Could not create email."
+msgstr "Não foi possível criar e-mail."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:474
+#, fuzzy
+msgid "This email will not be sent while in DRAFT mode."
+msgstr "Este e-mail não será enviado no modo rascunho."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:492
+#, fuzzy
+msgid "Email Updated."
+msgstr "E-mail atualizado."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:534
+#: includes/admin/emails/class-wpgh-emails-page.php:536
+#: includes/admin/emails/class-wpgh-emails-page.php:551
+#, fuzzy
+msgid "Failed to send test: "
+msgstr "Falha ao enviar teste:"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:542
+#, fuzzy
+msgid "Sent test email to"
+msgstr "Enviar e-mail de teste para"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:551
+#, fuzzy
+msgid "No user selected. PLease select a user to send the test to."
+msgstr ""
+"Nenhum usuário selecionado. Por favor, selecione um usuário para enviar o "
+"teste para."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:579
+#: includes/admin/emails/class-wpgh-emails-page.php:581
+#, fuzzy
+msgid "Search Emails "
+msgstr "Pesquisar E-mails"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:51
+msgctxt "Column label"
+msgid "Subject"
+msgstr "Assunto"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:52
+msgctxt "Column label"
+msgid "From User"
+msgstr "Do Usuário"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:53
+msgctxt "Column label"
+msgid "Author"
+msgstr "Autor"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:54
+#: includes/admin/funnels/class-wpgh-funnels-table.php:53
+msgctxt "Column label"
+msgid "Last Updated"
+msgstr "Última Atualização"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:84
+msgid "Empty Trash"
+msgstr "Esvaziar lixeira"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:106
+msgid "Ready"
+msgstr "Pronto"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:108
+#: includes/admin/emails/class-wpgh-emails-table.php:180
+msgid "Draft"
+msgstr "Rascunho"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:110
+#: includes/admin/emails/class-wpgh-emails-table.php:157
+msgid "Trash"
+msgstr "Lixeira"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:153
+#: includes/admin/funnels/class-wpgh-funnels-table.php:198
+msgid "Restore"
+msgstr "Restaurar"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:169
+msgid "no subject"
+msgstr "sem assunto"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:204
+#: includes/admin/emails/email-editor.php:191
+#, fuzzy
+msgid "The Contact's Owner"
+msgstr "O proprietário do contato"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:250
+#: includes/admin/funnels/class-wpgh-funnels-table.php:253
+msgid "Updated"
+msgstr "Atualizado"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:300
+#: includes/admin/funnels/class-wpgh-funnels-table.php:317
+msgctxt "List table bulk action"
+msgid "Delete Permanently"
+msgstr "Excluir Permanentemente"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:301
+#: includes/admin/funnels/class-wpgh-funnels-table.php:318
+msgctxt "List table bulk action"
+msgid "Restore"
+msgstr "Restaurar"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:307
+msgctxt "List table bulk action"
+msgid "Trash"
+msgstr "Lixeira"
+
+#: includes/admin/emails/email-editor.php:87
+#: includes/admin/emails/email-editor.php:88
+#, fuzzy
+msgid "Subject Line: Used to capture the attention of the reader."
+msgstr "Linha de assunto: usado para captar a atenção do leitor."
+
+#: includes/admin/emails/email-editor.php:91
+#: includes/admin/emails/email-editor.php:92
+#, fuzzy
+msgid "Pre Header Text: Used to summarize the content of the email."
+msgstr "Texto de cabeçalho anterior: usado para resumir o conteúdo do e-mail."
+
+#: includes/admin/emails/email-editor.php:98
+#, fuzzy
+msgid "&larr; Back to editing funnel"
+msgstr "&larr; Voltar à edição do funil"
+
+#: includes/admin/emails/email-editor.php:128
+msgid "Email Options"
+msgstr "Opções de E-mail"
+
+#: includes/admin/emails/email-editor.php:142
+#, fuzzy
+msgid "Enable Browser View"
+msgstr "Habilitar exibição do navegador"
+
+#: includes/admin/emails/email-editor.php:182
+msgid "Sender"
+msgstr "Remetente"
+
+#: includes/admin/emails/email-editor.php:190
+msgid "From User:"
+msgstr "Do Usuário:"
+
+#: includes/admin/emails/email-editor.php:195
+#, fuzzy
+msgid "Send Test:"
+msgstr "Enviar teste:"
+
+#: includes/admin/emails/email-editor.php:201
+#, fuzzy
+msgid "Please Select One."
+msgstr "Por favor, selecione um."
+
+#: includes/admin/emails/email-editor.php:219
+msgid "Blocks"
+msgstr "Blocos"
+
+#: includes/admin/events/class-wpgh-events-page.php:102
+msgid "Add Event"
+msgstr "Adicionar Evento"
+
+#: includes/admin/events/class-wpgh-events-page.php:105
+msgid "Edit Event"
+msgstr "Editar Evento"
+
+#: includes/admin/events/class-wpgh-events-page.php:108
+msgid "Events"
+msgstr "Eventos"
+
+#: includes/admin/events/class-wpgh-events-page.php:138
+#, fuzzy
+msgid "events cancelled"
+msgstr "eventos cancelados"
+
+#: includes/admin/events/class-wpgh-events-page.php:164
+#, fuzzy
+msgid "events rescheduled"
+msgstr "eventos reagendadas"
+
+#: includes/admin/events/class-wpgh-events-page.php:200
+#: includes/admin/events/class-wpgh-events-page.php:202
+#, fuzzy
+msgid "Search Events "
+msgstr "Pesquisar eventos"
+
+#: includes/admin/events/class-wpgh-events-table.php:46
+msgctxt "Column label"
+msgid "Contact"
+msgstr "Contato"
+
+#: includes/admin/events/class-wpgh-events-table.php:89
+#, fuzzy
+msgid "contact deleted"
+msgstr "contato excluído"
+
+#: includes/admin/events/class-wpgh-events-table.php:111
+msgid "deleted"
+msgstr "excluído"
+
+#: includes/admin/events/class-wpgh-events-table.php:137
+#, fuzzy
+msgid "(step deleted)"
+msgstr "(passo eliminado)"
+
+#: includes/admin/events/class-wpgh-events-table.php:152
+#, fuzzy, php-format
+msgid "Process Events (Auto Runs In %s)"
+msgstr "Eventos de processo (execuções automáticas em %s)"
+
+#: includes/admin/events/class-wpgh-events-table.php:173
+#, fuzzy
+msgid "Will run"
+msgstr "Será executado"
+
+#: includes/admin/events/class-wpgh-events-table.php:179
+msgid "Skipped"
+msgstr "Ignorado"
+
+#: includes/admin/events/class-wpgh-events-table.php:182
+msgid "Processed"
+msgstr "Processado"
+
+#: includes/admin/events/class-wpgh-events-table.php:240
+msgctxt "List table bulk action"
+msgid "Run"
+msgstr "Executar"
+
+#: includes/admin/events/class-wpgh-events-table.php:241
+msgctxt "List table bulk action"
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: includes/admin/events/class-wpgh-events-table.php:267
+#, fuzzy
+msgid "Waiting <span class=\"count\">("
+msgstr "Waiting < span class = \"count\" > ("
+
+#: includes/admin/events/class-wpgh-events-table.php:268
+#, fuzzy
+msgid "Skipped <span class=\"count\">("
+msgstr "Ignorado < span class = \"count\" > ("
+
+#: includes/admin/events/class-wpgh-events-table.php:269
+#, fuzzy
+msgid "Cancelled <span class=\"count\">("
+msgstr "Cancelado < span class = \"count\" > ("
+
+#: includes/admin/events/class-wpgh-events-table.php:270
+#, fuzzy
+msgid "Completed <span class=\"count\">("
+msgstr "Concluído < span class = \"count\" > ("
+
+#: includes/admin/events/class-wpgh-events-table.php:390
+msgid "Execute"
+msgstr "Executar"
+
+#: includes/admin/events/class-wpgh-events-table.php:406
+#, fuzzy
+msgid "Re-execute"
+msgstr "Executar novamente"
+
+#: includes/admin/events/class-wpgh-events-table.php:416
+#: includes/admin/events/class-wpgh-events-table.php:417
+msgid "View Contact"
+msgstr "Veja Contato"
+
+#: includes/admin/extensions/module-manager.php:144
+#: includes/admin/extensions/module-manager.php:172
+msgid "An error occurred, please try again."
+msgstr "Ocorreu um erro, tente novamente mais tarde."
+
+#: includes/admin/extensions/module-manager.php:151
+#, php-format
+msgid "Your license key expired on %s."
+msgstr "A sua licença expirou em %s."
+
+#: includes/admin/extensions/module-manager.php:156
+msgid "Your license key has been disabled."
+msgstr "A sua licença foi desativada."
+
+#: includes/admin/extensions/module-manager.php:159
+msgid "Invalid license."
+msgstr "Licença inválida."
+
+#: includes/admin/extensions/module-manager.php:163
+msgid "Your license is not active for this URL."
+msgstr "A sua licença não está ativa para este URL."
+
+#: includes/admin/extensions/module-manager.php:166
+#, fuzzy
+msgid "This appears to be an invalid license key"
+msgstr "Esta parece ser uma chave de licença inválida"
+
+#: includes/admin/extensions/module-manager.php:169
+msgid "Your license key has reached its activation limit."
+msgstr "A sua licença atingiu o limite de ativações."
+
+#: includes/admin/extensions/module-manager.php:189
+msgid "License Activated"
+msgstr "Licença Ativada"
+
+#: includes/admin/extensions/module-manager.php:235
+#, fuzzy
+msgid ""
+"Enter your extension license keys here to receive updates for purchased "
+"extensions. If your license key has expired, <a href=\"https://groundhogg.io/"
+"account/\">please renew your license.</a>"
+msgstr ""
+"Digite suas chaves de licença de extensão aqui para receber atualizações "
+"para extensões compradas. Se a sua chave de licença expirou, < a href = "
+"\"https://groundhogg.io/account/\" > por favor, renovar sua licença. </a>"
+
+#: includes/admin/extensions/module-manager.php:239
+#, fuzzy
+msgid "You have no extensions installed. Want some?"
+msgstr "Você não tem extensões instaladas. Quer um pouco?"
+
+#: includes/admin/extensions/module-manager.php:239
+#, fuzzy
+msgid "Get your first extension!"
+msgstr "Obtenha sua primeira extensão!"
+
+#: includes/admin/extensions/module-manager.php:286
+#, fuzzy
+msgid "No data. See your account at Groundhogg.io"
+msgstr "Não há dados. Veja a sua conta em Groundhogg.io"
+
+#: includes/admin/extensions/module-manager.php:309
+#, fuzzy
+msgid "Activate Extension"
+msgstr "Ativar extensão"
+
+#: includes/admin/extensions/module-manager.php:312
+#, fuzzy, php-format
+msgid "<p>Your license expires on %s</p>"
+msgstr "<p> sua licença expira em %s </p>"
+
+#: includes/admin/extensions/updater/EDD_SL_Plugin_Updater.php:235
+#, php-format
+msgid ""
+"There is a new version of %1$s available. %2$sView version %3$s details%4$s."
+msgstr ""
+"Existe uma nova versão do %1$s disponível. %2$s Ver versão %3$s detalhes "
+"%4$s."
+
+#: includes/admin/extensions/updater/EDD_SL_Plugin_Updater.php:243
+#, php-format
+msgid ""
+"There is a new version of %1$s available. %2$sView version %3$s details%4$s "
+"or %5$supdate now%6$s."
+msgstr ""
+"Existe uma nova versão do %1$s disponível. %2$s Ver versão %3$s detalhes%4$s "
+"ou %5$satualize agora%6$s."
+
+#: includes/admin/extensions/updater/EDD_SL_Plugin_Updater.php:433
+msgid "You do not have permission to install plugin updates"
+msgstr "Você não tem permissão para instalar atualizações de plugins"
+
+#: includes/admin/extensions/updater/EDD_SL_Plugin_Updater.php:433
+msgid "Error"
+msgstr "Erro"
+
+#: includes/admin/funnels/add-funnel.php:24
+#, fuzzy
+msgid "Funnel Templates"
+msgstr "Modelos de funil"
+
+#: includes/admin/funnels/add-funnel.php:25
+msgid "Marketplace"
+msgstr "Mercado"
+
+#: includes/admin/funnels/add-funnel.php:26
+#, fuzzy
+msgid "Import Funnel"
+msgstr "Funil de importação"
+
+#: includes/admin/funnels/add-funnel.php:43
+#, fuzzy
+msgid "Start Building"
+msgstr "Comece a construir"
+
+#: includes/admin/funnels/add-funnel.php:62
+#, fuzzy
+msgid "Search for templates from our marketplace."
+msgstr "Pesquise modelos do nosso mercado."
+
+#: includes/admin/funnels/add-funnel.php:63
+#, fuzzy
+msgid ""
+"Want to share your funnel with the world? <a target=\"_blank\" href="
+"\"https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/"
+"\">Get Started Now!</a>"
+msgstr ""
+"Quer compartilhar seu funil com o mundo? < a target = \"_ blank\" href = "
+"\"https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/\" "
+"> comece agora! </a>"
+
+#: includes/admin/funnels/add-funnel.php:65
+#, fuzzy
+msgid "Type in a search term like \"Webinar\"..."
+msgstr "Digite um termo de pesquisa como \"Webinar\"..."
+
+#: includes/admin/funnels/add-funnel.php:123
+#, fuzzy
+msgid ""
+"If you have a funnel import file (ends in .funnel) you can upload it here!"
+msgstr ""
+"Se você tiver um arquivo de importação de funil (termina em. funil) você "
+"pode carregá-lo aqui!"
+
+#: includes/admin/funnels/add-funnel.php:127
+#, fuzzy
+msgid "Import Funnels"
+msgstr "Funis de importação"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:134
+#, fuzzy
+msgid ""
+"Here you can edit your funnels. A funnel is a set of steps which can run "
+"automation based on contact interactions with your site. You can view the "
+"number of active contacts in each funnel, as well as when it was created and "
+"last updated."
+msgstr ""
+"Aqui você pode editar seus funis. Um funil é um conjunto de etapas que podem "
+"executar a automação com base em interações de contato com seu site. Você "
+"pode exibir o número de contatos ativos em cada funil, bem como quando ele "
+"foi criado e atualizado pela última vez."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:135
+#, fuzzy
+msgid ""
+"Funnels can be either Active/Inactive/Archived. If a funnel is Inactive, no "
+"contacts can enter and any contacts that may have been in the funnel will "
+"stop moving forward. The same goes for Archived funnels which simply do not "
+"show in the main list."
+msgstr ""
+"Funnels pode ser ativo/inativo/arquivado. Se um funil estiver inativo, "
+"nenhum contato poderá entrar e quaisquer contatos que possam estar no funil "
+"pararão de avançar. O mesmo vale para funis arquivados que simplesmente não "
+"aparecem na lista principal."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:142
+#, fuzzy
+msgid "Add A Funnel"
+msgstr "Adicionar um funil"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:143
+#, fuzzy
+msgid ""
+"To create a new funnel, simply click the Add New Button in the top left and "
+"select a pre-built funnel template. If you have a funnel import file you can "
+"click the import tab and upload the funnel file which will auto generate a "
+"funnel for you."
+msgstr ""
+"Para criar um novo funil, basta clicar no botão Adicionar novo no canto "
+"superior esquerdo e selecionar um modelo de funil pré-construído. Se você "
+"tem um arquivo de importação funil você pode clicar na guia de importação e "
+"carregar o arquivo funil que irá gerar automaticamente um funil para você."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:151
+#, fuzzy
+msgid ""
+"When editing a funnel you can add Funnel Steps. Funnel Steps are either "
+"Benchmarks or Actions. Benchmarks are whenever a Contact \"does\" something, "
+"while Actions are doing thing to a contact such as sending an email. Simply "
+"drag in the desired funnel steps in any order."
+msgstr ""
+"Ao editar um funil, você pode adicionar etapas do funil. Etapas do funil são "
+"benchmarks ou ações. Benchmarks são sempre que um contato \"faz\" alguma "
+"coisa, enquanto ações estão fazendo coisa para um contato, como o envio de "
+"um e-mail. Basta arrastar as etapas desejadas funil em qualquer ordem."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:152
+#, fuzzy
+msgid ""
+"Actions are run sequentially, so when an action takes place, it simply loads "
+"the next action. That means if you need to change it you can!"
+msgstr ""
+"Ações são executadas seqüencialmente, portanto, quando uma ação ocorre, ele "
+"simplesmente carrega a próxima ação. Isso significa que se você precisar "
+"mudá-lo você pode!"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:153
+#, fuzzy
+msgid ""
+"Benchmarks are a bit different. If you have several benchmarks in a row, "
+"what happens is once one of them is completed by a contact the first action "
+"found proceeding that benchmark is launched, skipping all other benchmarks. "
+"That way you can have multiple automation triggers. "
+msgstr ""
+"Benchmarks são um pouco diferentes. Se você tiver vários benchmarks em uma "
+"linha, o que acontece é uma vez que um deles é completado por um contato a "
+"primeira ação encontrada procedendo que o benchmark é lançado, ignorando "
+"todos os outros benchmarks. Dessa forma, você pode ter vários gatilhos de "
+"automação."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:154
+#, fuzzy
+msgid ""
+"Once a benchmark is complete all elements that are scheduled before that "
+"benchmark will stop immediately."
+msgstr ""
+"Uma vez que um benchmark é concluído todos os elementos que estão "
+"programados antes que o benchmark vai parar imediatamente."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:161
+msgid "Reporting"
+msgstr "Relatórios"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:162
+#, fuzzy
+msgid ""
+"To view funnel reporting, simply dgo to the editing screen of any funnel, "
+"and then toggle the Reporting/Editing switch in the reporting box. You can "
+"select the time range which you would like to view by using the dropdown on "
+"the left and click the filter button."
+msgstr ""
+"Para exibir relatórios de funil, basta dgo para a tela de edição de qualquer "
+"funil e, em seguida, alternar o relatório/edição switch na caixa de "
+"relatório. Você pode selecionar o intervalo de tempo que você gostaria de "
+"ver usando a lista suspensa à esquerda e clique no botão de filtro."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:295
+#, fuzzy
+msgid "Add Funnel"
+msgstr "Adicionar funil"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:298
+#, fuzzy
+msgid "Edit Funnel"
+msgstr "Editar funil"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:301
+#, fuzzy
+msgid "Funnels"
+msgstr "Funis"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:354
+#, fuzzy
+msgid "Funnel Duplicated"
+msgstr "Funil duplicado"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:374
+#: includes/admin/funnels/class-wpgh-funnels-table.php:100
+msgid "Archived"
+msgstr "Arquivado"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:524
+#, fuzzy
+msgid "Please select a template..."
+msgstr "Por favor, selecione um modelo..."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:535
+#, fuzzy
+msgid "Funnel Created"
+msgstr "Funil criado"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:584
+#: includes/admin/funnels/funnel-editor.php:290
+#, fuzzy
+msgid "Drag in new steps to build the ultimate sales machine!"
+msgstr "Arraste em novas etapas para construir a máquina de vendas final!"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:655
+#, fuzzy
+msgid "Completed Events"
+msgstr "Eventos concluídos"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:659
+#, fuzzy
+msgid "Waiting Contacts"
+msgstr "Contatos de espera"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:680
+#, fuzzy
+msgid ""
+"Your [max_input_vars] is too small for your funnel! You may experience odd "
+"behaviour and your funnel may not save correctly. Please <a target=\"_blank"
+"\" href=\"http://www.google.com/search?q=increase+max_input_vars+php"
+"\">increase your [max_input_vars] to at least double the current size.</a>."
+msgstr ""
+"Seu [max_input_vars] é muito pequeno para o seu funil! Você pode enfrentar "
+"um comportamento estranho e seu funil não pode salvar corretamente. Por "
+"favor < a target = \"_ blank\" href = \"http://www.google.com/search? q = "
+"aumentar + max_input_vars + php\" > aumente o seu [max_input_vars] para pelo "
+"menos o dobro do tamanho atual. </a>."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:699
+#, fuzzy
+msgid "Funnel no longer active."
+msgstr "O funil não está mais ativo."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:757
+#, fuzzy
+msgid "Funnels must start with 1 or more benchmarks"
+msgstr "Funis deve começar com 1 ou mais benchmarks"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:763
+#, fuzzy
+msgid "Funnel Updated"
+msgstr "Funil atualizado"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:934
+#, fuzzy, php-format
+msgid "%d contacts added to funnel!"
+msgstr "% d contatos adicionados ao funil!"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:971
+#: includes/admin/funnels/class-wpgh-funnels-page.php:973
+#, fuzzy
+msgid "Search Funnels "
+msgstr "Funis de pesquisa"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1098
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1107
+#, fuzzy
+msgid "Buy Now ($"
+msgstr "Compre agora ($"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1112
+msgid "Download"
+msgstr "Download"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1122
+#, fuzzy
+msgid "Sorry, no templates were found."
+msgstr "Desculpe, não foram encontrados modelos."
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:51
+msgctxt "Column label"
+msgid "Title"
+msgstr "Título"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:52
+#, fuzzy
+msgctxt "Column label"
+msgid "Active Contacts"
+msgstr "Contatos ativos"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:54
+msgctxt "Column label"
+msgid "Date Created"
+msgstr "Data Criada"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:96
+msgid "Active"
+msgstr "Ativo"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:98
+#: includes/admin/funnels/class-wpgh-funnels-table.php:222
+msgid "Inactive"
+msgstr "Inativo"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:201
+msgid "Build"
+msgstr "Criar"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:202
+msgid "Duplicate"
+msgstr "Duplicar"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:203
+msgid "Archive"
+msgstr "Arquivo"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:211
+msgid "no title"
+msgstr "sem título"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:323
+msgctxt "List table bulk action"
+msgid "Archive"
+msgstr "Arquivo"
+
+#: includes/admin/funnels/funnel-editor.php:41
+#, fuzzy
+msgid "Enter Funnel Name Here"
+msgstr "Digite o nome do funil aqui"
+
+#: includes/admin/funnels/funnel-editor.php:110
+#: includes/admin/funnels/funnel-editor.php:167
+msgid "Add Contacts"
+msgstr "Adicionar Contatos"
+
+#: includes/admin/funnels/funnel-editor.php:119
+#, fuzzy
+msgid "Select contacts to add into funnel:"
+msgstr "Selecione contatos para adicionar ao funil:"
+
+#: includes/admin/funnels/funnel-editor.php:137
+#, fuzzy
+msgid "Select where to start:"
+msgstr "Selecione onde começar:"
+
+#: includes/admin/funnels/funnel-editor.php:175
+#, fuzzy
+msgid "Export Funnel"
+msgstr "Funil de exportação"
+
+#: includes/admin/funnels/funnel-editor.php:199
+#, fuzzy
+msgid "Benchmarks"
+msgstr "Benchmarks"
+
+#: includes/admin/funnels/funnel-editor.php:229
+#, fuzzy
+msgid "Benchmarks start and stop automation elements for a contact."
+msgstr "Benchmarks iniciar e parar elementos de automação para um contato."
+
+#: includes/admin/funnels/funnel-editor.php:267
+#, fuzzy
+msgid "Actions are launched whenever a contact completes a benchmark."
+msgstr "As ações são lançadas sempre que um contato conclui um benchmark."
+
+#: includes/admin/funnels/funnel-editor.php:313
+#, fuzzy
+msgid "Auto Saved..."
+msgstr "Auto Saved..."
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:61
+#: includes/admin/settings/class-wpgh-settings-page.php:722
+msgid "Settings"
+msgstr "Configurações"
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:70
+#, fuzzy
+msgid "Enable Multisite Database"
+msgstr "Habilitar banco de dados multisite"
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:79
+#, fuzzy
+msgid ""
+"This will enable a global database for all your sites in this multisite "
+"installation."
+msgstr ""
+"Isso permitirá que um banco de dados global para todos os seus sites nesta "
+"instalação multissite."
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:80
+#, fuzzy
+msgid ""
+"You will have to manage all plugin settings from your MAIN blog, and any "
+"Groundhogg extensions should be made network active as well."
+msgstr ""
+"Você terá que gerenciar todas as configurações do plugin do seu blog "
+"principal, e quaisquer extensões Groundhogg deve ser feita rede ativa também."
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:89
+#: includes/class-wpgh-html.php:100 includes/class-wpgh-popup.php:33
+#: includes/class-wpgh-popup.php:61
+msgid "Save Changes"
+msgstr "Salvar Alterações"
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:108
+msgid "Settings Updated!"
+msgstr "Configurações salvas"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:52
+msgid "API Key"
+msgstr "Chave API"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:53
+msgid "API Keys"
+msgstr "Chaves de API"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:141
+msgid "Reissue"
+msgstr "Reemitir"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:146
+msgid "Revoke"
+msgstr "Revogar"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:163
+msgid "Public Key"
+msgstr "Chave Pública"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:164
+msgid "Token"
+msgstr "Token"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:165
+msgid "Secret Key"
+msgstr "Chave Secreta"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:198
+#, fuzzy
+msgid "Please Select a User"
+msgstr "Por favor, selecione um usuário"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:199
+#, fuzzy
+msgid "Generate New API Keys"
+msgstr "Gerar novas chaves de API"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:113
+msgid "General"
+msgstr "Geral"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:117
+msgid "Marketing"
+msgstr "Marketing"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:125
+msgid "Tools"
+msgstr "Ferramentas"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:129
+msgid "Licenses"
+msgstr "Licenças"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:133
+msgid "API"
+msgstr "API"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:148
+msgid "Business Settings"
+msgstr "Configurações de Negócios"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:153
+msgid "Misc Settings"
+msgstr "Configurações Misc."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:158
+msgid "Pages"
+msgstr "Páginas"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:163
+msgid "Captcha"
+msgstr "Captcha"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:173
+#, fuzzy
+msgid "Email Bounces"
+msgstr "Email bounces"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:178
+#, fuzzy
+msgid "Groundhogg Email Service"
+msgstr "Groundhogg serviço de E-mail"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:183
+msgid "API Settings"
+msgstr "Configurações de API"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:233
+msgid "Business Name"
+msgstr "Nome da Empresa"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:234
+#, fuzzy
+msgid "Your business name as it appears in the email footer."
+msgstr "Seu nome de negócio como ele aparece no rodapé do email."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:246
+#: includes/admin/settings/class-wpgh-settings-page.php:270
+#: includes/admin/settings/class-wpgh-settings-page.php:282
+#: includes/admin/settings/class-wpgh-settings-page.php:294
+#: includes/admin/settings/class-wpgh-settings-page.php:306
+#: includes/admin/settings/class-wpgh-settings-page.php:318
+#, fuzzy
+msgid "As it should appear in your email footer."
+msgstr "Como deve aparecer no rodapé do seu e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:258
+#, fuzzy
+msgid "(Optional) As it should appear in your email footer."
+msgstr "Opcional Como deve aparecer no rodapé do seu e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:263
+#, fuzzy
+msgid "Unit 42"
+msgstr "Unidade 42"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:275
+#, fuzzy
+msgid "Toronto"
+msgstr "Toronto"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:293
+msgid "State/Province/Region"
+msgstr "Estado/Província/Região"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:330
+#, fuzzy
+msgid "Delete Groundhogg Data"
+msgstr "Excluir dados Groundhogg"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:331
+#, fuzzy
+msgid "Delete all information when uninstalling. This cannot be undone."
+msgstr ""
+"Exclua todas as informações ao desinstalar. Isso não pode ser desfeito."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:334
+#: includes/admin/settings/class-wpgh-settings-page.php:448
+#: includes/admin/settings/class-wpgh-settings-page.php:475
+#: includes/admin/settings/class-wpgh-settings-page.php:489
+#: includes/admin/settings/class-wpgh-settings-page.php:503
+#: includes/admin/settings/class-wpgh-settings-page.php:576
+#: includes/admin/settings/class-wpgh-settings-page.php:590
+msgid "Enable"
+msgstr "Habilitar"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:344
+#, fuzzy
+msgid "Max Queued Events"
+msgstr "Eventos em fila máximo"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:345
+#, fuzzy
+msgid ""
+"The maximum number of events that can be run during a single process of the "
+"event queue. For larger lists you may want to set this at a lower number for "
+"performance reasons."
+msgstr ""
+"O número máximo de eventos que podem ser executados durante um único "
+"processo da fila de eventos. Para listas maiores convém definir isso em um "
+"número menor por motivos de desempenho."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:356
+#, fuzzy
+msgid "Queue Interval"
+msgstr "Intervalo de filas"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:357
+#, fuzzy
+msgid ""
+"The time interval in between iterations of when the event queue is processed."
+msgstr ""
+"O intervalo de tempo entre iterações de quando a fila de eventos é "
+"processada."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:372
+#, fuzzy
+msgid "Email Confirmation Page"
+msgstr "Página de confirmação de E-mail"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:373
+#, fuzzy
+msgid "Page contacts see when they confirm their email."
+msgstr "Os contatos da página veem quando confirmam seu e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:384
+msgid "Unsubscribe Page"
+msgstr "Página de cancelamento de inscrição"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:385
+#, fuzzy
+msgid "Page contacts see when they unsubscribe."
+msgstr "Os contatos da página veem quando cancelam a inscrição."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:396
+#, fuzzy
+msgid "Email Preferences Page"
+msgstr "Página de preferências de E-mail"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:397
+#, fuzzy
+msgid "Page where contacts can manage their email preferences."
+msgstr "Página onde os contatos podem gerenciar suas preferências de e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:408
+#, fuzzy
+msgid "View Email In Browser Page"
+msgstr "Ver E-mail na página do navegador"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:409
+#, fuzzy
+msgid ""
+"Page containing the shortcode [browser_view] so contacts can view an email "
+"in the browser in the event their email client looks funky."
+msgstr ""
+"Página que contém o shortcode [browser_view] para que os contatos podem ver "
+"um e-mail no navegador no caso de seu cliente de e-mail parece funky."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:420
+#: includes/class-wpgh-email.php:434
+msgid "Privacy Policy"
+msgstr "Política de Privacidade"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:421
+#, fuzzy
+msgid "Link to your privacy policy."
+msgstr "Link para a sua política de privacidade."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:432
+#, fuzzy
+msgid "Terms & Conditions (Terms of Service)"
+msgstr "Termos e condições (termos de serviço)"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:433
+#, fuzzy
+msgid "Link to your terms & conditions."
+msgstr "Link para seus termos e condições."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:444
+#, fuzzy
+msgid "Only send to confirmed emails."
+msgstr "Só enviar para e-mails confirmados."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:445
+#, fuzzy
+msgid ""
+"This will stop emails being sent to contacts who do not have confirmed "
+"emails outside of the below grace period."
+msgstr ""
+"Isto irá parar e-mails que estão sendo enviados para os contatos que não têm "
+"confirmado e-mails fora do período de carência abaixo."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:458
+#, fuzzy
+msgid "Email confirmation grace Period"
+msgstr "Confirmação de E-mail período de carência"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:459
+#, fuzzy
+msgid ""
+"The number of days for which you can send an email to a contact after they "
+"are created but their email has not been confirmed. The default is 14 days."
+msgstr ""
+"O número de dias para o qual você pode enviar um e-mail para um contato "
+"depois que eles são criados, mas seu e-mail não foi confirmado. O padrão é "
+"14 dias."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:471
+#, fuzzy
+msgid "Enable GDPR features."
+msgstr "Habilite os recursos do GDPR."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:472
+#, fuzzy
+msgid ""
+"This will add a consent box to your forms as well as a \"Delete Everything\" "
+"Button to your email preferences page."
+msgstr ""
+"Isso adicionará uma caixa de consentimento aos seus formulários, bem como um "
+"botão \"excluir tudo\" à sua página de preferências de e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:485
+#, fuzzy
+msgid "Do not send email without consent."
+msgstr "Não envie e-mail sem consentimento."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:486
+#, fuzzy
+msgid ""
+"This will prevent your system from sending emails to contacts for which you "
+"do not have explicit consent. Only works if GDPR features are enabled."
+msgstr ""
+"Isso impedirá que seu sistema envie emails para contatos para os quais você "
+"não tem consentimento explícito. Só funciona se os recursos do GDPR "
+"estiverem habilitados."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:499
+#, fuzzy
+msgid "Enable Recaptcha on forms"
+msgstr "Habilitar reCAPTCHA em formulários"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:500
+#, fuzzy
+msgid ""
+"Add a google recaptcha to all your forms made with the [gh_form] shortcode"
+msgstr ""
+"Adicionar um reCAPTCHA Google a todos os seus formulários feitos com o "
+"shortcode [gh_form]"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:513
+msgid "Recaptcha Site Key"
+msgstr "Chave do site(Recaptcha)"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:514
+#, fuzzy
+msgid "This is the key which faces the users on the front-end"
+msgstr "Esta é a chave que enfrenta os usuários no front-end"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:524
+msgid "Recaptcha Secret Key"
+msgstr "Chave secreta (Recaptcha)"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:525
+#, fuzzy
+msgid "Never ever ever share this with anyone!"
+msgstr "Nunca jamais compartilhe isso com ninguém!"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:535
+#, fuzzy
+msgid "Bounce Inbox"
+msgstr "Caixa de entrada Bounce"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:536
+#, fuzzy
+msgid "This is the inbox which emails will be sent to."
+msgstr "Esta é a caixa de entrada que e-mails serão enviados para."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:549
+#, fuzzy
+msgid "Bounce Inbox Password"
+msgstr "Bounce senha inbox"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:550
+#, fuzzy
+msgid "This password to access the inbox."
+msgstr "Esta senha para acessar a caixa de entrada."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:560
+#, fuzzy
+msgid "Email Service Token"
+msgstr "Token de serviço de email"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:561
+#, fuzzy
+msgid ""
+"Get this key from your <a target=\"_blank\" href=\"https://www.groundhogg.io/"
+"account/manage/\">Groundhogg Account Page."
+msgstr ""
+"Obter esta chave de seu < a target = \"_ blank\" href = \"https://www."
+"groundhogg.io/account/manage/\" > página da conta Groundhogg."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:572
+#, fuzzy
+msgid "Send Email With Groundhogg"
+msgstr "Enviar E-mail com Groundhogg"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:573
+#, fuzzy
+msgid "Choose to send email with API."
+msgstr "Escolha enviar email com API."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:586
+#, fuzzy
+msgid "Enable the Groundhogg API"
+msgstr "Ativar a API Groundhogg"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:587
+#, fuzzy
+msgid ""
+"Enabling this will allow other platforms to access information on this site."
+msgstr ""
+"Habilitar isso permitirá que outras plataformas acessem informações neste "
+"site."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:64
+#, fuzzy
+msgid ""
+"Superlinks are special superlinks that allow you to apply/remove tags "
+"whenever clicked and then take the contact to a page of your choice. To use "
+"them, just copy the replacement code and paste in in email, button, or link."
+msgstr ""
+"Superlinks são superlinks especiais que permitem que você aplicar/remover "
+"Tags sempre que clicado e, em seguida, tomar o contato para uma página de "
+"sua escolha. Para usá-los, basta copiar o código de substituição e colar no "
+"e-mail, botão ou link."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:106
+#, fuzzy
+msgid "Edit Superlink"
+msgstr "Editar SuperLink"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:109
+#, fuzzy
+msgid "Superlinks"
+msgstr "Super links"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:158
+#, fuzzy
+msgid "superlinks deleted"
+msgstr "superlinks excluído"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:199
+#, fuzzy
+msgid "Superlink created."
+msgstr "SuperLink criado."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:226
+#, fuzzy
+msgid "Updated superlink."
+msgstr "SuperLink atualizado."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:250
+#, fuzzy
+msgid "Search superlinks "
+msgstr "Pesquisar superlinks"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:252
+#, fuzzy
+msgid "Search Superlinks"
+msgstr "Pesquisar Superlinks"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:259
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:287
+#, fuzzy
+msgid "Add New Superlink"
+msgstr "Adicionar novo SuperLink"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:264
+#: includes/admin/superlinks/edit-superlink.php:25
+#, fuzzy
+msgid "Superlink Name"
+msgstr "Nome do SuperLink"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:266
+#: includes/admin/superlinks/edit-superlink.php:27
+#, fuzzy
+msgid "Name a Superlink something simple so you do not forget it."
+msgstr "Nomeie um SuperLink algo simples para que você não esquecê-lo."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:269
+#: includes/admin/superlinks/edit-superlink.php:31
+msgid "Target URL"
+msgstr "URL de Destino"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:271
+#: includes/admin/superlinks/edit-superlink.php:33
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:247
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:97
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:111
+msgid "Insert Link"
+msgstr "Inserir Link"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:271
+#, fuzzy
+msgid ""
+"Insert a url that this link will direct to. This link can contain simple "
+"replacement codes."
+msgstr ""
+"Insira um URL para o qual este link será direto. Este link pode conter "
+"códigos de substituição simples."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:279
+#: includes/admin/superlinks/edit-superlink.php:43
+#, fuzzy
+msgid "Apply Tags When Clicked"
+msgstr "Aplicar marcas quando clicado"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:285
+#, fuzzy
+msgid ""
+"These tags will be applied to a contact whenever this link is clicked. To "
+"create a new tag hit [Enter] or [,]"
+msgstr ""
+"Essas marcas serão aplicadas a um contato sempre que esse link for clicado. "
+"Para criar uma nova marca hit [Enter] ou [,]"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:46
+#: includes/admin/tags/class-wpgh-tags-table.php:44
+#, fuzzy
+msgctxt "Column label"
+msgid "Name"
+msgstr "Nome"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:47
+#, fuzzy
+msgctxt "Column label"
+msgid "Source Url"
+msgstr "URL de origem"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:48
+#, fuzzy
+msgctxt "Column label"
+msgid "Replacement Code"
+msgstr "Código de substituição"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:49
+msgctxt "Column label"
+msgid "Tags"
+msgstr "Tags"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:51
+#, fuzzy
+msgctxt "Column label"
+msgid "Target Url"
+msgstr "URL de destino"
+
+#: includes/admin/superlinks/edit-superlink.php:33
+#, fuzzy
+msgid ""
+"This is the url the contact will be re-directed to after clicking this "
+"Superlink."
+msgstr ""
+"Esta é a URL que o contacto será redireccionado para depois de clicar neste "
+"SuperLink."
+
+#: includes/admin/superlinks/edit-superlink.php:55
+#, fuzzy
+msgid ""
+"These tags will be applied to a contact whenever this link is clicked. To "
+"create a new tag hit [enter] or [comma]"
+msgstr ""
+"Essas marcas serão aplicadas a um contato sempre que esse link for clicado. "
+"Para criar uma nova marca hit [Enter] ou [vírgula]"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:107
+msgid "Edit Tag"
+msgstr "Editar Tag"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:161
+#, fuzzy
+msgid "tags deleted"
+msgstr "Tags excluído"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:206
+#, fuzzy
+msgid "Created new tag!"
+msgstr "Criado novo tag!"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:228
+#, fuzzy
+msgid "Updated tag!"
+msgstr "Tag actualizado!"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:253
+#, fuzzy
+msgid "Search Tags "
+msgstr "Tags de pesquisa"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:255
+msgid "Search Tags"
+msgstr "Tags de Pesquisa"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:262
+#: includes/admin/tags/class-wpgh-tags-page.php:299
+msgid "Add New Tag"
+msgstr "Adicionar Nova Tag"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:267
+msgid "Tag Name"
+msgstr "Nome da Tag"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:269
+#, fuzzy
+msgid "Name a tag something simple so you do not forget it."
+msgstr "Nomeie uma tag algo simples para que você não esquecê-lo."
+
+#: includes/admin/tags/class-wpgh-tags-page.php:272
+#: includes/admin/tags/edit-tag.php:31 includes/class-wpgh-replacements.php:351
+msgid "Description"
+msgstr "Descrição"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:274
+#: includes/admin/tags/edit-tag.php:33
+#, fuzzy
+msgid ""
+"Tag descriptions are only visible to admins and will never be seen by "
+"contacts."
+msgstr ""
+"As descrições de Tags só são visíveis para os administradores e nunca serão "
+"vistas pelos contactos."
+
+#: includes/admin/tags/class-wpgh-tags-page.php:277
+#, fuzzy
+msgid "Bulk Add Tags"
+msgstr "Bulk adicionar tags"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:279
+#, fuzzy
+msgid "Enter 1 tag per line."
+msgstr "Digite 1 tag por linha."
+
+#: includes/admin/tags/class-wpgh-tags-page.php:282
+#, fuzzy
+msgid "Add tags in bulk?"
+msgstr "Adicionar tags em massa?"
+
+#: includes/admin/tags/class-wpgh-tags-table.php:45
+msgctxt "Column label"
+msgid "Description"
+msgstr "Descrição"
+
+#: includes/admin/tags/class-wpgh-tags-table.php:46
+msgctxt "Column label"
+msgid "Count"
+msgstr "Contagem"
+
+#: includes/admin/tags/class-wpgh-tags-table.php:66
+#, fuzzy
+msgid "Recount Contacts"
+msgstr "Recontagem de contatos"
+
+#: includes/admin/tags/edit-tag.php:27
+#, fuzzy
+msgid "A descriptive name of the tag so you remember what it means"
+msgstr "Um nome descritivo da tag para que você se lembre o que significa"
+
+#: includes/admin/user/class-wpgh-user-tokens-section.php:31
+#, fuzzy
+msgid "API Tokens"
+msgstr "Tokens de API"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:35
+#, fuzzy
+msgid ""
+"You can get our entire extension library for $1 if <a href=\"https://www."
+"groundhogg.io/partner/\" target=\"_blank\">you refer a friend.</a>"
+msgstr ""
+"Você pode obter toda a nossa biblioteca de extensão para $1 se < a href = "
+"\"https://www.groundhogg.io/partner/\" target = \"_ blank\" > você indicar "
+"um amigo. </a>"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:59
+#, fuzzy
+msgid ""
+"While we work on an SMTP solution for you that is builtin, there are other "
+"ones out there. We recommend you install <a href=\"https://en-ca.wordpress."
+"org/plugins/wp-mail-smtp/\">WP Mail SMTP</a> to increase your deliverability."
+msgstr ""
+"Enquanto trabalhamos em uma solução SMTP para você que é Builtin, existem "
+"outros lá fora. Recomendamos que você instale < a href = \"https://en-ca."
+"wordpress.org/plugins/wp-mail-smtp/\" > WP mail SMTP </a> para aumentar a "
+"sua capacidade de entrega."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:72
+#, fuzzy
+msgid ""
+"It appears you have incomplete settings! Go to <a href=\"?page=gh_settings"
+"\">the settings page</a> and fill out all your business information."
+msgstr ""
+"Parece que você tem configurações incompletas! Vá para < a href = \"? page = "
+"gh_settings\" > a página de configurações </a> e preencha todas as suas "
+"informações de negócios."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:86
+#, fuzzy
+msgid ""
+"You have no active funnels! Go to <a href=\"?page=gh_funnels&action=add"
+"\">the funnels page</a> and create your first funnel!"
+msgstr ""
+"Você não tem funis ativos! Ir para < a href = \"? página = gh_funnels & "
+"action = adicionar\" > a página funis </a> e criar o seu primeiro funil!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:98
+#, fuzzy
+msgid ""
+"Seems like you need some more contacts. Go to the <a href=\"?"
+"page=gh_settings&tab=tools\">tools area</a> and import your mailing list!"
+msgstr ""
+"Parece que precisa de mais contactos. Vá para o < a href = \"? página = "
+"gh_settings & tab = ferramentas\" > ferramentas área </a> e importar sua "
+"lista de discussão!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:151
+#, fuzzy
+msgid "Full Walkthrough"
+msgstr "Walkthrough completo"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:152
+#, fuzzy
+msgid ""
+"Watch this full walkthrough of setting up Groundhogg and building your first "
+"funnel."
+msgstr ""
+"Assista a esta explicação completa da criação de Groundhogg e construindo o "
+"seu primeiro funil."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:157
+#, fuzzy
+msgid "Managing Users"
+msgstr "Gerenciando usuários"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:158
+#, fuzzy
+msgid ""
+"If you have sales people you need to read how you can give them only "
+"specific access to your CRM."
+msgstr ""
+"Se você tem pessoas de vendas que você precisa para ler como você pode dar-"
+"lhes apenas acesso específico ao seu CRM."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:163
+#, fuzzy
+msgid "How To Remain Compliant "
+msgstr "Como permanecer complacente"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:164
+#, fuzzy
+msgid ""
+"Learn about the tools Groundhogg provides so you can remain complaint in "
+"countries around the world."
+msgstr ""
+"Saiba mais sobre as ferramentas que a Groundhogg fornece para que você possa "
+"continuar reclamando em países ao redor do mundo."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:169
+#, fuzzy
+msgid "Send Marketing With Groundhogg"
+msgstr "Enviar marketing com Groundhogg"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:170
+#, fuzzy
+msgid ""
+"Get your first 1000 credits free when you sign up! Send SMS and Email with "
+"Groundhogg."
+msgstr ""
+"Obtenha seus primeiros 1000 créditos grátis quando você se inscrever! Envie "
+"SMS e E-mail com Groundhogg."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:212
+msgid "Read More..."
+msgstr "Leia Mais..."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:298
+msgid "Buy Now!"
+msgstr "Compre Agora!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:324
+#, php-format
+msgid "Welcome %s!"
+msgstr "Bem-vindo %s!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:338
+#, fuzzy
+msgid "Support Articles"
+msgstr "Artigos de apoio"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:339
+#, fuzzy
+msgid ""
+"Don't know where to start? Checkout these articles and learn how to make "
+"Groundhogg work for you."
+msgstr ""
+"Não sabe por onde começar? Checkout estes artigos e aprender a fazer "
+"Groundhogg trabalho para você."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:341
+#: includes/admin/welcome/class-wpgh-welcome-page.php:367
+#, fuzzy
+msgid "View All!"
+msgstr "Ver todos!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:364
+#, fuzzy
+msgid "Awesome Extensions"
+msgstr "Extensões impressionantes"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:365
+#, fuzzy
+msgid ""
+"Need more functionality? Need to connect Groundhogg to your store? We have "
+"an extension for that!"
+msgstr ""
+"Precisa de mais funcionalidade? Precisa conectar Groundhogg à sua loja? "
+"Temos uma extensão para isso!"
+
+#: includes/class-wpgh-bulk-contact-manager.php:129
+#, fuzzy
+msgid "Please select at least 1 tag."
+msgstr "Por favor, selecione pelo menos 1 tag."
+
+#: includes/class-wpgh-bulk-contact-manager.php:163
+msgid "Import"
+msgstr "Importar"
+
+#: includes/class-wpgh-bulk-contact-manager.php:236
+#, fuzzy, php-format
+msgid "Could not complete import for %s. Email field not present."
+msgstr ""
+"Não foi possível concluir a importação para %s. campo email não presente."
+
+#: includes/class-wpgh-email.php:442
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:309
+msgid "Terms"
+msgstr "Termos"
+
+#: includes/class-wpgh-email.php:670
+#, fuzzy
+msgid "No contact provided..."
+msgstr "Nenhum contato fornecido..."
+
+#: includes/class-wpgh-email.php:697
+#, fuzzy
+msgid "Contact is not marketable."
+msgstr "O contato não é comercializável."
+
+#: includes/class-wpgh-email.php:708
+#, fuzzy
+msgid ""
+"There must be a minimum 5 seconds before a contact can receive another email."
+msgstr ""
+"Deve haver um mínimo de 5 segundos antes de um contato pode receber outro e-"
+"mail."
+
+#: includes/class-wpgh-email.php:846
+msgid "An unknown error occurred."
+msgstr "Ocorreu um erro desconhecido."
+
+#: includes/class-wpgh-email.php:899
+#, fuzzy, php-format
+msgid ""
+"Email failed to send.\n"
+"Send time: %s\n"
+"To: %s\n"
+"Subject: %s\n"
+"\n"
+"Error: %s"
+msgstr ""
+"E-mail falhou ao enviar.\n"
+"Enviar tempo: %s para: %s assunto: %s erro: %s"
+
+#: includes/class-wpgh-event-queue-v2.php:76
+#: includes/class-wpgh-event-queue.php:135
+msgid "Every 10 Minutes"
+msgstr "A cada 10 minutos"
+
+#: includes/class-wpgh-event-queue-v2.php:81
+#: includes/class-wpgh-event-queue.php:140
+msgid "Every 5 Minutes"
+msgstr "A cada 5 minutos"
+
+#: includes/class-wpgh-event-queue-v2.php:86
+#: includes/class-wpgh-event-queue.php:145
+#, fuzzy
+msgid "Every 1 Minutes"
+msgstr "A cada 1 minuto"
+
+#: includes/class-wpgh-event-queue-v2.php:132
+#, fuzzy, php-format
+msgid ""
+"Event Queue Error: It appears that something is overriding the default "
+"timing of the event queue. The queue is expected to run %s but will not run "
+"for at least %s."
+msgstr ""
+"Erro de fila de eventos: parece que algo está substituindo o tempo padrão da "
+"fila de eventos. Espera-se que a fila execute %s, mas não será executada "
+"pelo menos %s."
+
+#: includes/class-wpgh-event-queue.php:203
+#, fuzzy
+msgid "Could not process queue for unknown reason."
+msgstr "Não foi possível processar a fila por motivo desconhecido."
+
+#: includes/class-wpgh-event-queue.php:311
+#, fuzzy
+msgid "No events are available to process."
+msgstr "Nenhum evento está disponível para processar."
+
+#: includes/class-wpgh-form.php:291
+msgid "First Name *"
+msgstr "Nome *"
+
+#: includes/class-wpgh-form.php:298 includes/class-wpgh-form.php:324
+#, fuzzy
+msgid "Do not include numbers or special characters."
+msgstr "Não inclua números ou caracteres especiais."
+
+#: includes/class-wpgh-form.php:317
+msgid "Last Name *"
+msgstr "Sobrenome *"
+
+#: includes/class-wpgh-form.php:343
+msgid "Email *"
+msgstr "E-mail *"
+
+#: includes/class-wpgh-form.php:368
+msgid "Phone *"
+msgstr "Telefone *"
+
+#: includes/class-wpgh-form.php:393
+#, fuzzy
+msgid "File *"
+msgstr "Arquivo"
+
+#: includes/class-wpgh-form.php:423
+#, fuzzy
+msgid "Date *"
+msgstr "Data"
+
+#: includes/class-wpgh-form.php:457
+#, fuzzy
+msgid "Time *"
+msgstr "Tempo"
+
+#: includes/class-wpgh-form.php:490
+msgid "Address *"
+msgstr "Endereço*"
+
+#: includes/class-wpgh-form.php:546
+msgid "Country *"
+msgstr "País *"
+
+#: includes/class-wpgh-form.php:553
+msgid "Please select a country"
+msgstr "Por favor, escolha um país"
+
+#: includes/class-wpgh-form.php:653
+#, fuzzy
+msgid "Number *"
+msgstr "Número"
+
+#: includes/class-wpgh-form.php:691
+#, fuzzy
+msgid "Select *"
+msgstr "Selecione"
+
+#: includes/class-wpgh-form.php:698
+#, fuzzy
+msgid "Please select one"
+msgstr "Por favor, selecione um"
+
+#: includes/class-wpgh-form.php:763
+#, fuzzy
+msgid "Radio *"
+msgstr "Rádio"
+
+#: includes/class-wpgh-form.php:879
+#, fuzzy
+msgid "I agree to the <i>terms of service</i>."
+msgstr "Concordo com os <i> termos de serviço </i>."
+
+#: includes/class-wpgh-form.php:884
+#, fuzzy
+msgid "Please agree to the terms of service."
+msgstr "Por favor, concorde com os termos de serviço."
+
+#: includes/class-wpgh-form.php:900
+#, fuzzy
+msgid ""
+"I consent to having my personal information collected, and to receive "
+"marketing and transactional information related to my request. "
+msgstr ""
+"Eu consinto em ter minhas informações pessoais coletadas, e para receber "
+"informações de marketing e transacional relacionadas ao meu pedido."
+
+#: includes/class-wpgh-form.php:905
+msgid "I Consent"
+msgstr "Eu Consinto"
+
+#: includes/class-wpgh-form.php:954
+#, fuzzy
+msgid "You cannot manage email preferences if no email exists."
+msgstr ""
+"Não é possível gerenciar as preferências de e-mail se nenhum e-mail existir."
+
+#: includes/class-wpgh-form.php:966
+#, fuzzy
+msgid "Your preferences have been changed!"
+msgstr "Suas preferências foram alteradas!"
+
+#: includes/class-wpgh-form.php:972
+#, fuzzy
+msgid ""
+"I love this company, you can communicate with me whenever you feel like."
+msgstr ""
+"Eu amo esta companhia, você pode comunicar-se comigo sempre que você sente "
+"como."
+
+#: includes/class-wpgh-form.php:973
+#, fuzzy
+msgid "It's getting a bit much. Communicate with me weekly."
+msgstr "Está ficando um pouco demais. Comunique-se comigo semanalmente."
+
+#: includes/class-wpgh-form.php:974
+#, fuzzy
+msgid "Distance makes the heart grow fonder. Communicate with me monthly."
+msgstr ""
+"A distância faz o coração crescer mais Fonder. Comunique-se comigo "
+"mensalmente."
+
+#: includes/class-wpgh-form.php:975
+#, fuzzy
+msgid "I no longer wish to receive any form of communication. Unsubscribe me!"
+msgstr "Não desejo mais receber qualquer forma de comunicação. Me cancele!"
+
+#: includes/class-wpgh-form.php:982
+#, fuzzy
+msgid "Manage Email Preferences For <b>"
+msgstr "Gerenciar preferências de E-mail para <b>"
+
+#: includes/class-wpgh-form.php:997
+#, fuzzy
+msgid " Please also delete all personal information on record."
+msgstr "Por favor, também exclua todas as informações pessoais no registro."
+
+#: includes/class-wpgh-form.php:1036
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:289
+msgid "Submit"
+msgstr "Enviar"
+
+#: includes/class-wpgh-form.php:1101
+#, fuzzy
+msgid "(Edit Form)"
+msgstr "(Editar formulário)"
+
+#: includes/class-wpgh-html.php:99
+msgid "Open Modal"
+msgstr "Abra o modal de texto"
+
+#: includes/class-wpgh-html.php:522
+#, fuzzy
+msgid "Please Select One Or More Tags"
+msgstr "Por favor, selecione uma ou mais marcas"
+
+#: includes/class-wpgh-html.php:628
+#, fuzzy
+msgid "Please select a contact"
+msgstr "Por favor, selecione um contato"
+
+#: includes/class-wpgh-html.php:700
+#, fuzzy
+msgid "Please select an email"
+msgstr "Por favor, selecione um e-mail"
+
+#: includes/class-wpgh-html.php:788
+#, fuzzy
+msgid "Please select 1 or more benchmarks"
+msgstr "Por favor, selecione 1 ou mais benchmarks"
+
+#: includes/class-wpgh-html.php:847
+#, fuzzy
+msgid "Please select 1 or more meta keys"
+msgstr "Por favor, selecione 1 ou mais chaves meta"
+
+#: includes/class-wpgh-html.php:933
+msgid "Upload Image"
+msgstr "Enviar Imagem"
+
+#: includes/class-wpgh-html.php:942
+#, fuzzy
+msgid "Src"
+msgstr "Src"
+
+#: includes/class-wpgh-html.php:949
+#, fuzzy
+msgid "Alt Tag"
+msgstr "Alt tag"
+
+#: includes/class-wpgh-replacements.php:58
+#: includes/class-wpgh-replacements.php:63
+#, fuzzy
+msgid "The contact's first name."
+msgstr "O primeiro nome do contato."
+
+#: includes/class-wpgh-replacements.php:68
+#: includes/class-wpgh-replacements.php:73
+#: includes/class-wpgh-replacements.php:78
+#, fuzzy
+msgid "The contact's last name."
+msgstr "O sobrenome do contato."
+
+#: includes/class-wpgh-replacements.php:83
+#, fuzzy
+msgid "The contact's email address."
+msgstr "O endereço de e-mail do contato."
+
+#: includes/class-wpgh-replacements.php:88
+#, fuzzy
+msgid "The contact's phone number."
+msgstr "O número de telefone do contato."
+
+#: includes/class-wpgh-replacements.php:93
+#, fuzzy
+msgid "The contact's phone number extension."
+msgstr "A extensão do número de telefone do contato."
+
+#: includes/class-wpgh-replacements.php:98
+#, fuzzy
+msgid "The contact's full address."
+msgstr "O endereço completo do contato."
+
+#: includes/class-wpgh-replacements.php:103
+#, fuzzy
+msgid "The contact's company name."
+msgstr "O nome da empresa do contato."
+
+#: includes/class-wpgh-replacements.php:108
+#, fuzzy
+msgid "The contact's job title."
+msgstr "O título do trabalho do contato."
+
+#: includes/class-wpgh-replacements.php:113
+#, fuzzy
+msgid "The contact's company address."
+msgstr "O endereço da empresa do contato."
+
+#: includes/class-wpgh-replacements.php:118
+#, fuzzy
+msgid "Any meta data related to the contact. Usage: {meta.attribute}"
+msgstr "Qualquer meta dados relacionados ao contato. Uso: {meta. Attribute}"
+
+#: includes/class-wpgh-replacements.php:123
+#, fuzzy
+msgid "The business name as defined in the settings."
+msgstr "O nome da empresa, conforme definido nas configurações."
+
+#: includes/class-wpgh-replacements.php:128
+#, fuzzy
+msgid "The business phone number as defined in the settings."
+msgstr "O número de telefone comercial, conforme definido nas configurações."
+
+#: includes/class-wpgh-replacements.php:133
+#, fuzzy
+msgid "The business address as defined in the settings."
+msgstr "O endereço comercial conforme definido nas configurações."
+
+#: includes/class-wpgh-replacements.php:138
+#: includes/class-wpgh-replacements.php:143
+#, fuzzy
+msgid "The contact owner's name."
+msgstr "O nome do proprietário do contato."
+
+#: includes/class-wpgh-replacements.php:148
+#, fuzzy
+msgid "The contact owner's email address."
+msgstr "Endereço de e-mail do proprietário do contato."
+
+#: includes/class-wpgh-replacements.php:153
+#, fuzzy
+msgid "The contact owner's phone number."
+msgstr "O número de telefone do proprietário do contato."
+
+#: includes/class-wpgh-replacements.php:158
+#, fuzzy
+msgid "A link to confirm the email address of a contact."
+msgstr "Um link para confirmar o endereço de e-mail de um contato."
+
+#: includes/class-wpgh-replacements.php:163
+#, fuzzy
+msgid ""
+"A link to confirm the email address of a contact which can be placed in a "
+"button or link."
+msgstr ""
+"Um link para confirmar o endereço de e-mail de um contato que pode ser "
+"colocado em um botão ou link."
+
+#: includes/class-wpgh-replacements.php:168
+#, fuzzy
+msgid "A superlink code. Usage: {superlink.id}"
+msgstr "Um código de SuperLink. Uso: {superlink.id}"
+
+#: includes/class-wpgh-replacements.php:173
+#, fuzzy
+msgid ""
+"Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 "
+"days}"
+msgstr ""
+"Inserir uma data dinâmica. Uso {Data. Format | tempo}. Exemplo: {Date. Y-m-d "
+"| + 2 dias}"
+
+#: includes/class-wpgh-replacements.php:178
+#, fuzzy
+msgid ""
+"Insert a download link for a file. Usage {files.key}. Example: {files."
+"custom_files}. Do find the key for a file see the contact record and copy "
+"the relevant replacement code."
+msgstr ""
+"Insira um link de download para um arquivo. Uso {files. Key}. Exemplo: "
+"{files. custom_files}. Encontrar a chave para um arquivo ver o registro de "
+"contato e copie o código de substituição relevante."
+
+#: includes/class-wpgh-replacements.php:183
+#, fuzzy
+msgid ""
+"Inserts a random quote from the movie Groundhogg Day featuring Bill Murray"
+msgstr "Insere uma citação aleatória do filme Groundhogg Day com Bill Murray"
+
+#: includes/class-wpgh-replacements.php:385
+#, fuzzy
+msgid "Insert Replacement"
+msgstr "Inserir substituição"
+
+#: includes/class-wpgh-replacements.php:386
+#: includes/elements/actions/class-wpgh-send-email.php:115
+#: includes/elements/actions/class-wpgh-send-email.php:127
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:203
+msgid "Close"
+msgstr "Fechar"
+
+#: includes/class-wpgh-replacements.php:629
+#, fuzzy
+msgid "Confirm your email."
+msgstr "Confirme o seu e-mail."
+
+#: includes/class-wpgh-replacements.php:760
+#: includes/class-wpgh-replacements.php:787
+#: includes/class-wpgh-replacements.php:793
+#, fuzzy
+msgid "No files found."
+msgstr "Nenhum arquivo encontrado."
+
+#: includes/class-wpgh-roles.php:43
+#, fuzzy
+msgid "Marketer"
+msgstr "Comerciante"
+
+#: includes/class-wpgh-roles.php:74
+#, fuzzy
+msgid "Sales Manager"
+msgstr "Gerente de vendas"
+
+#: includes/class-wpgh-roles.php:420
+#, fuzzy, php-format
+msgid "Your user role does not have the required permissions to %s."
+msgstr "Sua função de usuário não tem as permissões necessárias para %s."
+
+#: includes/class-wpgh-step.php:596
+msgid "Step Title"
+msgstr "Título do Passo"
+
+#: includes/class-wpgh-step.php:605
+#, fuzzy
+msgid "Run on which blog?"
+msgstr "Executar em que blog?"
+
+#: includes/class-wpgh-step.php:620
+#, fuzzy
+msgid "Any blog"
+msgstr "Qualquer blog"
+
+#: includes/class-wpgh-submission.php:315
+#, fuzzy
+msgid "Submission failed..."
+msgstr "A submissão falhou..."
+
+#: includes/class-wpgh-submission.php:654
+#, fuzzy
+msgid "The file you have uploaded is too big."
+msgstr "O arquivo que você carregou é muito grande."
+
+#: includes/class-wpgh-submission.php:661
+#, fuzzy
+msgid "You are not permitted to upload this type of file."
+msgstr "Você não tem permissão para carregar esse tipo de arquivo."
+
+#: includes/db/class-wpgh-db-steps.php:93
+msgid "New Step"
+msgstr "Novo Etapa"
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:57
+#, fuzzy
+msgid "Follow up with {first} {last} tomorrow."
+msgstr "Follow up com {First} {Last} amanhã."
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:63
+#, fuzzy
+msgid "Admin Notification for {first}"
+msgstr "Notificação de admin para {First}"
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:79
+#, fuzzy
+msgid "Use any email address or the {owner_email} replacement code."
+msgstr ""
+"Use qualquer endereço de e-mail ou o código de substituição {owner_email}."
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:85
+msgid "Subject:"
+msgstr "Assunto:"
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:94
+#: includes/elements/actions/class-wpgh-admin-notification.php:115
+#, fuzzy
+msgid "Use any valid replacement codes."
+msgstr "Use quaisquer códigos de substituição válidos."
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:100
+#, fuzzy
+msgid "Notification Text:"
+msgstr "Texto de notificação:"
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:186
+#, fuzzy
+msgid "Manage Contact"
+msgstr "Gerenciar contato"
+
+#: includes/elements/actions/class-wpgh-apply-note.php:53
+#, fuzzy
+msgid "This contact is super awesome!"
+msgstr "Este contato é super incrível!"
+
+#: includes/elements/actions/class-wpgh-apply-note.php:60
+#, fuzzy
+msgid "Note Text:"
+msgstr "Texto da Nota:"
+
+#: includes/elements/actions/class-wpgh-apply-note.php:75
+#, fuzzy
+msgid "Use any valid replacement codes"
+msgstr "Use quaisquer códigos de substituição válidos"
+
+#: includes/elements/actions/class-wpgh-apply-owner.php:61
+#, fuzzy
+msgid "Apply Owner:"
+msgstr "Aplicar proprietário:"
+
+#: includes/elements/actions/class-wpgh-apply-owner.php:71
+#, fuzzy
+msgid "Selecting more than 1 owner will treat the step as a round robin."
+msgstr ""
+"Selecionando mais de 1 proprietário tratará a etapa como um Round Robin."
+
+#: includes/elements/actions/class-wpgh-apply-tag.php:61
+#, fuzzy
+msgid "Apply These Tags:"
+msgstr "Aplique estas Tags:"
+
+#: includes/elements/actions/class-wpgh-apply-tag.php:68
+#: includes/elements/actions/class-wpgh-remove-tag.php:70
+#, fuzzy
+msgid "Add new tags by hitting [enter] or by typing a [comma]."
+msgstr "Adicione novas Tags batendo [Enter] ou digitando um [vírgula]."
+
+#: includes/elements/actions/class-wpgh-create-user.php:62
+#, fuzzy
+msgid "Which account level would you like to grant?"
+msgstr "Que nível de conta você gostaria de conceder?"
+
+#: includes/elements/actions/class-wpgh-create-user.php:72
+#, fuzzy
+msgid "Which Blog?"
+msgstr "Qual blog?"
+
+#: includes/elements/actions/class-wpgh-create-user.php:89
+#, fuzzy
+msgid "Add to all blogs"
+msgstr "Adicionar a todos os Blogs"
+
+#: includes/elements/actions/class-wpgh-date-timer.php:67
+#, fuzzy
+msgid "Wait till:"
+msgstr "Espere até:"
+
+#: includes/elements/actions/class-wpgh-date-timer.php:98
+#: includes/elements/actions/class-wpgh-delay-timer.php:145
+#: includes/elements/actions/class-wpgh-field-timer.php:202
+#, fuzzy
+msgid "Disable Temporarily:"
+msgstr "Desabilitar temporariamente:"
+
+#: includes/elements/actions/class-wpgh-date-timer.php:108
+#: includes/elements/actions/class-wpgh-delay-timer.php:155
+#: includes/elements/actions/class-wpgh-field-timer.php:212
+msgid "Disable"
+msgstr "Desativar"
+
+#: includes/elements/actions/class-wpgh-date-timer.php:167
+#, fuzzy, php-format
+msgid ""
+"You have date timers with descending dates! Your funnel may not work as "
+"expected. See <a href=\"#%d\">%s</a>! Timers with dates in the past will run "
+"immediately."
+msgstr ""
+"Você tem data temporizadores com datas descendentes! O funil pode não "
+"funcionar como esperado. Veja < a href = \"#% d\" > %s </a>! Temporizadores "
+"com datas no passado serão executados imediatamente."
+
+#: includes/elements/actions/class-wpgh-date-timer.php:175
+#, fuzzy, php-format
+msgid ""
+"You have date timers with dates in the past! Your funnel may not work as "
+"expected. See <a href=\"#%d\">%s</a>! Timers with dates in the past will run "
+"immediately."
+msgstr ""
+"Você tem data temporizadores com datas no passado! O funil pode não "
+"funcionar como esperado. Veja < a href = \"#% d\" > %s </a>! Temporizadores "
+"com datas no passado serão executados imediatamente."
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:74
+#: includes/elements/actions/class-wpgh-field-timer.php:77
+#, fuzzy
+msgid "Wait at least:"
+msgstr "Aguarde pelo menos:"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:88
+#: includes/elements/actions/class-wpgh-field-timer.php:91
+msgid "Minutes"
+msgstr "Minutos"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:89
+#: includes/elements/actions/class-wpgh-field-timer.php:92
+msgid "Hours"
+msgstr "Horas"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:90
+#: includes/elements/actions/class-wpgh-field-timer.php:93
+msgid "Days"
+msgstr "Dias"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:91
+#: includes/elements/actions/class-wpgh-field-timer.php:94
+msgid "Weeks"
+msgstr "Semanas"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:92
+#: includes/elements/actions/class-wpgh-field-timer.php:95
+msgid "Months"
+msgstr "Meses"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:107
+#: includes/elements/actions/class-wpgh-field-timer.php:164
+#, fuzzy
+msgid "And run:"
+msgstr "E corra:"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:112
+#: includes/elements/actions/class-wpgh-field-timer.php:169
+msgid "Immediately"
+msgstr "Imediatamente"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:113
+#: includes/elements/actions/class-wpgh-field-timer.php:170
+#, fuzzy
+msgid "At time of day..."
+msgstr "Na hora do dia..."
+
+#: includes/elements/actions/class-wpgh-edit-meta.php:67
+#: includes/elements/actions/class-wpgh-http-post.php:84
+msgid "Key: "
+msgstr "Chave: "
+
+#: includes/elements/actions/class-wpgh-edit-meta.php:80
+#: includes/elements/actions/class-wpgh-http-post.php:97
+msgid "Value: "
+msgstr "Valor: "
+
+#: includes/elements/actions/class-wpgh-field-timer.php:96
+msgid "No Delay"
+msgstr "Sem Atraso"
+
+#: includes/elements/actions/class-wpgh-field-timer.php:113
+msgid "Before"
+msgstr "Antes"
+
+#: includes/elements/actions/class-wpgh-field-timer.php:114
+msgid "After"
+msgstr "Depois"
+
+#: includes/elements/actions/class-wpgh-field-timer.php:146
+#, fuzzy
+msgid "Date Field:"
+msgstr "Data de campo:"
+
+#: includes/elements/actions/class-wpgh-field-timer.php:155
+#, fuzzy
+msgid "Please Select a Field"
+msgstr "Por favor selecione um campo"
+
+#: includes/elements/actions/class-wpgh-http-post.php:68
+#, fuzzy
+msgid "Post Url:"
+msgstr "URL do borne:"
+
+#: includes/elements/actions/class-wpgh-remove-tag.php:61
+#, fuzzy
+msgid "Remove These Tags:"
+msgstr "Remover estas Tags:"
+
+#: includes/elements/actions/class-wpgh-send-email.php:71
+#, fuzzy
+msgid ""
+"You have changes which have not been saved. Are you sure you want to exit?"
+msgstr "Você tem alterações que não foram salvas. Tem certeza que quer sair?"
+
+#: includes/elements/actions/class-wpgh-send-email.php:100
+#, fuzzy
+msgid "Select an email to send:"
+msgstr "Selecione um e-mail para enviar:"
+
+#: includes/elements/actions/class-wpgh-send-email.php:126
+#, fuzzy
+msgid "Create New Email"
+msgstr "Criar novo E-mail"
+
+#: includes/elements/actions/class-wpgh-send-email.php:141
+#, fuzzy
+msgid "Skip if confirmed?"
+msgstr "Pular se confirmado?"
+
+#: includes/elements/actions/class-wpgh-send-email.php:146
+#, fuzzy
+msgid "Skip this email if the contact's email is already confirmed."
+msgstr "Ignore este e-mail se o e-mail do contato já estiver confirmado."
+
+#: includes/elements/actions/class-wpgh-send-email.php:206
+#, fuzzy
+msgid "Opens: "
+msgstr "Abre:"
+
+#: includes/elements/actions/class-wpgh-send-email.php:217
+msgid "Clicks: "
+msgstr "Cliques: "
+
+#: includes/elements/actions/class-wpgh-send-email.php:228
+msgid "CTR: "
+msgstr "CTR: "
+
+#: includes/elements/actions/class-wpgh-send-sms.php:22
+msgid "Send SMS"
+msgstr "Enviar SMS"
+
+#: includes/elements/actions/class-wpgh-send-sms.php:41
+#, fuzzy
+msgid ""
+"SMS uses the <a target=\"_blank\" href=\"https://www.groundhogg.io/downloads/"
+"email-credits/\">Groundhogg Credit System</a> & requires that you have setup "
+"your <a target=\"_blank\" href=\"https://www.groundhogg.io/downloads/email-"
+"credits/\">Groundhogg account</a>."
+msgstr ""
+"SMS usa o < a target = \"_ blank\" href = \"https://www.groundhogg.io/"
+"downloads/email-credits/\" > Groundhogg sistema de crédito </a> e requer que "
+"você tenha configurado o seu < a target = \"_ blank\" href = \"https://www."
+"groundhogg.io/downloads/email-credits/\" > Groundhogg conta </a>."
+
+#: includes/elements/actions/class-wpgh-send-sms.php:48
+#, fuzzy
+msgid "Text Message:"
+msgstr "Mensagem de texto:"
+
+#: includes/elements/actions/class-wpgh-send-sms.php:64
+#, fuzzy
+msgid ""
+"Use any valid replacement codes in your text message. Do not use html! Limit "
+"140 characters."
+msgstr ""
+"Utilize quaisquer códigos de substituição válidos na sua mensagem de texto. "
+"Não use HTML! Limite 140 caracteres."
+
+#: includes/elements/benchmarks/class-wpgh-account-created.php:47
+#, fuzzy
+msgid ""
+"Runs whenever a WordPress account is created. Will create a contact if one "
+"does not exist."
+msgstr ""
+"É executado sempre que uma conta WordPress é criada. Criará um contato se "
+"não existir um."
+
+#: includes/elements/benchmarks/class-wpgh-account-created.php:69
+#, fuzzy
+msgid "Run when the following type of account is created:"
+msgstr "Executar quando o seguinte tipo de conta é criado:"
+
+#: includes/elements/benchmarks/class-wpgh-email-confirmed.php:47
+#, fuzzy
+msgid "Runs whenever a contact confirms their email."
+msgstr "É executado sempre que um contato confirma seu e-mail."
+
+#: includes/elements/benchmarks/class-wpgh-email-confirmed.php:64
+#, fuzzy
+msgid "Runs whenever an email is confirmed while in this funnel"
+msgstr "É executado sempre que um e-mail é confirmado enquanto neste funil"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:47
+#, fuzzy
+msgid ""
+"Use this form builder to create forms and display them on your site with "
+"shortcodes."
+msgstr ""
+"Use este construtor de formulário para criar formulários e exibi-los em seu "
+"site com códigos de atalho."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:177
+msgid "Shortcode:"
+msgstr "Shortcode:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:180
+#, fuzzy
+msgid "JS Script:"
+msgstr "JS script:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:201
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:202
+msgid "Preview"
+msgstr "Visualização"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:220
+#, fuzzy
+msgid ""
+"Not all CSS rules are loaded in the admin area. Frontend results may differ."
+msgstr ""
+"Nem todas as regras CSS são carregadas na área de administração. Os "
+"resultados de frontend podem diferir."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:229
+#, fuzzy
+msgid "Thank You Page:"
+msgstr "Obrigado página:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:238
+msgid "Thank You Page"
+msgstr "Página de agradecimento"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:269
+msgid "First"
+msgstr "Primeiro"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:273
+msgid "Last"
+msgstr "Último"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:293
+msgid "Row"
+msgstr "Linha"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:297
+#, fuzzy
+msgid "Col"
+msgstr "Col"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:301
+msgid "ReCaptcha"
+msgstr "ReCaptcha"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:305
+msgid "GDPR"
+msgstr "GDPR"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:317
+msgid "Textarea"
+msgstr "Área de Texto"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:321
+msgid "Number"
+msgstr "Número"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:325
+msgid "Dropdown"
+msgstr "Dropdown"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:329
+msgid "Radio"
+msgstr "Radio"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:333
+msgid "Checkbox"
+msgstr "Checkbox"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:337
+msgid "Date"
+msgstr "Data"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:341
+msgid "Time"
+msgstr "Tempo"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:345
+msgid "File"
+msgstr "Arquivo"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:355
+msgid "Field"
+msgstr "Campo"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:356
+#, fuzzy
+msgid "Insert Field: "
+msgstr "Inserir campo:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:359
+msgid "Insert Field"
+msgstr "Inserir campo"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:396
+msgid "Required Field"
+msgstr "Campo Obrigatório"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:398
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:457
+msgid "Yes"
+msgstr "Sim"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:402
+msgid "Label"
+msgstr "Rótulo"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:405
+#, fuzzy
+msgid "The field label."
+msgstr "O rótulo de campo."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:411
+#, fuzzy
+msgid "The button text."
+msgstr "O texto do botão."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:414
+msgid "Placeholder"
+msgstr "Placeholder"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:417
+#, fuzzy
+msgid "The ghost text within the field."
+msgstr "O texto fantasma dentro do campo."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:423
+#, fuzzy
+msgid "This will be the custom field name. I.E. {meta.name}"
+msgstr "Este será o nome de campo personalizado. I.E. {meta.name}"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:428
+msgid "Min"
+msgstr "Min"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:431
+#, fuzzy
+msgid "The minimum number a user can enter."
+msgstr "O número mínimo que um usuário pode inserir."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:434
+msgid "Max"
+msgstr "Máx"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:437
+#, fuzzy
+msgid "The max number a user can enter."
+msgstr "O número máximo que um usuário pode inserir."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:445
+#, fuzzy
+msgid "The default value of the field."
+msgstr "O valor padrão do campo."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:449
+msgid "Options"
+msgstr "Opções"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:452
+#, fuzzy
+msgid "Enter 1 option per line."
+msgstr "Digite 1 opção por linha."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:455
+msgid "Allow Multiple Selections"
+msgstr "Permitir Multiplas Seleções"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:461
+msgid "Default"
+msgstr "Padrão"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:464
+#, fuzzy
+msgid "The blank option which appears at the top of the list."
+msgstr "A opção em branco que aparece na parte superior da lista."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:482
+#, fuzzy
+msgid "The width of the column."
+msgstr "A largura da coluna."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:488
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:497
+msgid "Theme"
+msgstr "Tema"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:494
+#, fuzzy
+msgid "The Captcha Theme."
+msgstr "O tema captcha."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:503
+#, fuzzy
+msgid "The Captcha Size."
+msgstr "O tamanho do captcha."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:509
+msgid "Min Date"
+msgstr "Data Mínima"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:511
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:517
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:526
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:532
+#, fuzzy
+msgid "YYY-MM-DD or +3 days or -1 days"
+msgstr "YYY-MM-DD ou + 3 dias ou-1 dias"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:512
+#, fuzzy
+msgid ""
+"The minimum date a user can enter. You can enter a dynamic date or static "
+"date."
+msgstr ""
+"A data mínima que um usuário pode inserir. É possível entrar uma data "
+"dinâmica ou uma data estática."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:515
+msgid "Max Date"
+msgstr "Data Máxima"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:518
+#, fuzzy
+msgid ""
+"The maximum date a user can enter. You can enter a dynamic date or static "
+"date."
+msgstr ""
+"A data máxima que um usuário pode inserir. É possível entrar uma data "
+"dinâmica ou uma data estática."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:524
+msgid "Min Time"
+msgstr "Horário mínimo"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:527
+#, fuzzy
+msgid ""
+"The minimum time a user can enter. You can enter a dynamic time or static "
+"time."
+msgstr ""
+"O tempo mínimo que um usuário pode inserir. Você pode inserir um tempo "
+"dinâmico ou um tempo estático."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:530
+msgid "Max Time"
+msgstr "Horário máximo"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:533
+#, fuzzy
+msgid ""
+"The maximum time a user can enter. You can enter a dynamic time or static "
+"time."
+msgstr ""
+"O tempo máximo que um usuário pode inserir. Você pode inserir um tempo "
+"dinâmico ou um tempo estático."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:539
+#, fuzzy
+msgid "Max File Size"
+msgstr "Tamanho máximo do arquivo"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:542
+#, fuzzy
+msgid "Maximum size a file can be <b>in Bytes</b>. Your max upload size is "
+msgstr ""
+"Tamanho máximo que um arquivo pode ser <b> em bytes </b>. Seu tamanho máximo "
+"de upload é"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:545
+msgid "Accepted File Types"
+msgstr "Arquivos aceitos:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:547
+#, fuzzy
+msgid ".pdf,.txt,.doc,.docx"
+msgstr ". pdf,. txt,. doc,. docx"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:548
+#, fuzzy
+msgid "The types of files a user may upload (comma separated)."
+msgstr ""
+"Os tipos de arquivos que um usuário pode carregar (separados por vírgulas)."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:558
+msgid "CSS ID"
+msgstr "CSS ID"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:561
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:567
+#, fuzzy
+msgid "Use to apply CSS."
+msgstr "Use para aplicar CSS."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:564
+msgid "CSS Class"
+msgstr "Classe CSS"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:611
+msgid "Views: "
+msgstr "Visualizações:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:616
+#, fuzzy
+msgid "Fills: "
+msgstr "Preenche:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:617
+msgid "Conversion Rate"
+msgstr "Taxa de Conversão"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:617
+#, fuzzy
+msgid "CVR: "
+msgstr "Cvr:"
+
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:48
+#, fuzzy
+msgid ""
+"Runs whenever a special link is clicked and redirects the user to another "
+"page."
+msgstr ""
+"É executado sempre que um link especial é clicado e redireciona o usuário "
+"para outra página."
+
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:68
+#, fuzzy
+msgid "Copy This Link:"
+msgstr "Copie este link:"
+
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:75
+#, fuzzy
+msgid ""
+"Paste this link in any email or page. Once a contact clicks it the benchmark "
+"will be completed and the contact will be redirected to the page set below."
+msgstr ""
+"Cole este link em qualquer e-mail ou página. Quando um contato clicar nele, "
+"o benchmark será completado e o contato será redirecionado para a página "
+"abaixo."
+
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:80
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:88
+msgid "Redirect To"
+msgstr "Redirecionar para"
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:48
+#, fuzzy
+msgid "Runs whenever the specified page is visited."
+msgstr "É executado sempre que a página especificada é visitada."
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:81
+msgid "Enter URL"
+msgstr "Insira a URL"
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:86
+#, fuzzy
+msgid "Partial Match"
+msgstr "Correspondência parcial"
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:87
+#, fuzzy
+msgid "Exact Match"
+msgstr "Correspondência exata"
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:102
+#, fuzzy
+msgid "Match Url"
+msgstr "URL do jogo"
+
+#: includes/elements/benchmarks/class-wpgh-role-changed.php:47
+#, fuzzy
+msgid "Runs whenever a user's role is changed."
+msgstr "É executado sempre que a função de um usuário é alterada."
+
+#: includes/elements/benchmarks/class-wpgh-role-changed.php:70
+#, fuzzy
+msgid "Run when this access is given:"
+msgstr "Executar quando este acesso é dado:"
+
+#: includes/elements/benchmarks/class-wpgh-tag-applied.php:47
+#, fuzzy
+msgid "Runs whenever any of the specified tags are added to a contact."
+msgstr ""
+"É executado sempre que qualquer uma das marcas especificadas são adicionadas "
+"a um contato."
+
+#: includes/elements/benchmarks/class-wpgh-tag-applied.php:70
+#, fuzzy
+msgid "Run when any of these tags are applied:"
+msgstr "Executar quando qualquer uma dessas marcas são aplicadas:"
+
+#: includes/elements/benchmarks/class-wpgh-tag-removed.php:47
+#, fuzzy
+msgid "Runs whenever any of the specified tags are removed from a contact."
+msgstr ""
+"É executado sempre que qualquer uma das marcas especificadas é removida de "
+"um contato."
+
+#: includes/elements/benchmarks/class-wpgh-tag-removed.php:70
+#, fuzzy
+msgid "Run when any of these tags are removed:"
+msgstr "Executar quando qualquer uma dessas marcas são removidas:"
+
+#: includes/elements/class-wpgh-funnel-step.php:166
+#, fuzzy
+msgid "This step has no registered settings."
+msgstr "Esta etapa não tem configurações registradas."
+
+#: includes/elements/class-wpgh-funnel-step.php:196
+#, fuzzy
+msgid "Waiting:"
+msgstr "Esperando:"
+
+#: includes/elements/class-wpgh-funnel-step.php:218
+msgid "Completed:"
+msgstr "Concluído:"
+
+#: includes/functions.php:51
+#, fuzzy
+msgid "No Contact"
+msgstr "Sem contato"
+
+#: includes/functions.php:60
+#, fuzzy
+msgid "This contact has not agreed to receive email marketing from you."
+msgstr "Este contato não concordou em receber e-mail marketing de você."
+
+#: includes/functions.php:70
+#, fuzzy
+msgid ""
+"Unconfirmed. This contact will not receive emails, they are passed the email "
+"confirmation grace period."
+msgstr ""
+"Confirmado. Este contato não receberá e-mails, eles são passados a "
+"confirmação de e-mail período de carência."
+
+#: includes/functions.php:73 includes/functions.php:97
+#, fuzzy
+msgid "Unconfirmed. They will receive marketing."
+msgstr "Confirmado. Eles receberão marketing."
+
+#: includes/functions.php:76
+#, fuzzy
+msgid "Confirmed. They will receive marketing."
+msgstr "Confirmou. Eles receberão marketing."
+
+#: includes/functions.php:79
+#, fuzzy
+msgid "Unsubscribed. They will not receive marketing."
+msgstr "Retirado. Eles não receberão marketing."
+
+#: includes/functions.php:82
+#, fuzzy
+msgid "This contact will only receive marketing weekly."
+msgstr "Este contato só vai receber marketing semanal."
+
+#: includes/functions.php:85
+#, fuzzy
+msgid "This contact will only receive marketing monthly."
+msgstr "Este contato só receberá marketing mensal."
+
+#: includes/functions.php:88
+#, fuzzy
+msgid "This email address bounced, they will not receive marketing."
+msgstr "Este endereço de e-mail devolvido, eles não receberão marketing."
+
+#: includes/functions.php:91
+#, fuzzy
+msgid "This contact was marked as spam. They will not receive marketing."
+msgstr "Este contato foi marcado como spam. Eles não receberão marketing."
+
+#: includes/functions.php:94
+#, fuzzy
+msgid ""
+"This contact complained about your emails. They will not receive marketing."
+msgstr "Este contato reclamou sobre seus emails. Eles não receberão marketing."
+
+#: includes/functions.php:519
+#, fuzzy, php-format
+msgid ""
+" | Find a bug in Groundhogg? <a target=\"_blank\" href=\"%s\">Report It</a>!"
+"</span>"
+msgstr ""
+"| Encontrar um bug em Groundhogg? < a target = \"_ blank\" href = \" %s\" > "
+"relate it </a>! </span>"
+
+#: includes/functions.php:519
+#, fuzzy
+msgid "https://www.facebook.com/groups/274900800010203/"
+msgstr "https://www.Facebook.com/groups/274900800010203/"
+
+#: includes/functions.php:920
+#, fuzzy
+msgid "Could not create contact."
+msgstr "Não foi possível criar contato."
+
+#. Plugin Name of the plugin/theme
+#: includes/gutenberg.php:49
+#, fuzzy
+msgid "Groundhogg"
+msgstr "Groundhogg"
+
+#: includes/gutenberg.php:50
+#, fuzzy
+msgid "Select and display one of your forms."
+msgstr "Selecione e exiba um de seus formulários."
+
+#: includes/gutenberg.php:52
+msgid "Form Settings"
+msgstr "Configurações do Formulário"
+
+#: includes/gutenberg.php:53
+msgid "Form"
+msgstr "Formulário"
+
+#: includes/gutenberg.php:54
+msgid "Show Title"
+msgstr "Mostrar Título"
+
+#: includes/gutenberg.php:55
+msgid "Show Description"
+msgstr "Mostre a descrição"
+
+#: includes/install.php:139
+#, fuzzy
+msgid "Email Confirmed"
+msgstr "Email confirmado"
+
+#: includes/install.php:140
+#, fuzzy
+msgid ""
+"<h2>Your email [gh_contact field=\"email\"] has been confirmed.</h2><p>Thank "
+"you! Return to your inbox to receive further communication.</p>"
+msgstr ""
+"<h2>Seu email [gh_contact Field = \"email\"] foi confirmado.</h2> <p> "
+"Obrigado! Retorne à sua caixa de entrada para receber mais comunicação. </p>"
+
+#: includes/install.php:152
+msgid "Unsubscribed"
+msgstr "Descadastrado"
+
+#: includes/install.php:153
+#, fuzzy
+msgid ""
+"<h2>Your email [gh_contact field=\"email\"] has been unsubscribed.</"
+"h2><p>This means you will not receive any further marketing communication "
+"from us, but you may receive transactional emails related to billing.</"
+"p><p>Note that opting in again to any optin form or program on our site is "
+"implied consent and may result in starting to receive email communication "
+"again.</p>"
+msgstr ""
+"<h2>Seu email [gh_contact Field = \"email\"]</h2> foi retirado. <p> isso "
+"significa que você não receberá nenhuma comunicação de marketing adicional "
+"de nós, mas você pode receber e-mails transacionais relacionados ao "
+"faturamento. </p> <p> Note que optar novamente por qualquer forma de Optin "
+"ou programa em nosso site é o consentimento implícito e pode resultar em "
+"começar a receber uma comunicação de e-mail novamente. </p>"
+
+#: includes/install.php:165
+msgid "Email Preferences"
+msgstr "Preferências de E-mail"
+
+#: includes/install.php:166
+#, fuzzy
+msgid ""
+"<h2>Manage your email preferences!</h2><p>Use the form below to manage your "
+"email preferences.</p><p>[gh_form id=\""
+msgstr ""
+"<h2>Gerencie suas preferências de e-mail!</h2> <p> use o formulário abaixo "
+"para gerenciar suas preferências de e-mail. </p> <p> [gh_form ID = \""
+
+#: includes/install.php:178
+#, fuzzy
+msgid "[browser_view]"
+msgstr "[browser_view]"
+
+#: includes/shortcodes.php:78
+msgid "Friend"
+msgstr "Amigo"
+
+#: includes/tools.php:37 includes/tools.php:77
+msgid "Import Contacts"
+msgstr "Contatos importantes"
+
+#: includes/tools.php:42
+#, fuzzy
+msgid ""
+"Use the following column format to import your contacts. Any custom "
+"information added into your data will be treated as custom meta data for the "
+"contact."
+msgstr ""
+"Use o seguinte formato de coluna para importar seus contatos. Qualquer "
+"informação personalizada adicionada aos seus dados será tratada como meta "
+"dados personalizados para o contato."
+
+#: includes/tools.php:75
+#, fuzzy
+msgid "These tags will be applied to the contacts upon importing."
+msgstr "Essas tags serão aplicadas aos contatos na importação."
+
+#: includes/tools.php:99 includes/tools.php:108
+#, fuzzy
+msgid "Export Contacts"
+msgstr "Exportar contatos"
+
+#: includes/tools.php:101
+#, fuzzy
+msgid "Export contacts to a .CSV file. This will download to your browser."
+msgstr ""
+"Exportar contatos para um. Arquivo CSV. Isso irá baixar para o seu navegador."
+
+#: includes/tools.php:106
+#, fuzzy
+msgid ""
+"Contacts with these tags will be exported. Leave blank to export ALL "
+"contacts."
+msgstr ""
+"Os contactos com estas etiquetas serão exportados. Deixe em branco para "
+"exportar todos os contatos."
+
+#: includes/tools.php:131
+#, fuzzy
+msgid "Bulk Delete Contacts"
+msgstr "Excluir contatos em massa"
+
+#: includes/tools.php:133
+#, fuzzy
+msgid "Bulk delete contacts."
+msgstr "Excluir contatos em massa."
+
+#: includes/tools.php:138
+#, fuzzy
+msgid ""
+"Contacts with these tags will be delete. Leave blank to delete ALL contacts."
+msgstr ""
+"Os contatos com essas tags serão excluídos. Deixe em branco para excluir "
+"todos os contatos."
+
+#: includes/tools.php:140
+#, fuzzy
+msgid "Delete Contacts"
+msgstr "Excluir contatos"
+
+#: includes/tools.php:166 includes/tools.php:172
+msgid "Download System Info"
+msgstr "Baixar arquivo com as informações do sistema"
+
+#: includes/tools.php:168
+#, fuzzy
+msgid "Download System Info when requesting support."
+msgstr "Baixe informações do sistema ao solicitar suporte."
+
+#: includes/tools.php:537
+#, fuzzy
+msgid ""
+"These API keys allow you to use the REST API to retrieve store data in JSON "
+"for external applications or devices."
+msgstr ""
+"Essas chaves de API permitem que você use a API REST para recuperar dados de "
+"armazenamento em JSON para aplicativos ou dispositivos externos."
+
+#: templates/email-templates.php:23
+msgid "Call To Action"
+msgstr "Chamada Para Ação"
+
+#: templates/email-templates.php:24
+#, fuzzy
+msgid "Use when you need contacts to take an action, and FAST!"
+msgstr "Use quando você precisa de contatos para tomar uma ação, e FAST!"
+
+#: templates/email-templates.php:35
+msgid "Plain Text"
+msgstr "Texto simples"
+
+#: templates/email-templates.php:36
+#, fuzzy
+msgid "Perfect for easy breezy communication with contacts."
+msgstr "Aperfeiçoe para uma comunicação Breezy fácil com contatos."
+
+#: templates/email-templates.php:47
+msgid "Newsletter"
+msgstr "Newsletter"
+
+#: templates/email-templates.php:48
+#, fuzzy
+msgid "Ideal for when you have a lot to share."
+msgstr "Ideal para quando você tem muito para compartilhar."
+
+#: templates/email-templates.php:59
+#, fuzzy
+msgid "Hype Up"
+msgstr "Hype up"
+
+#: templates/email-templates.php:60
+#, fuzzy
+msgid "Need people excited? This is what you need!"
+msgstr "Precisa de pessoas excitadas? Isto é o que você precisa!"
+
+#: templates/email-templates.php:71
+msgid "Welcome Email"
+msgstr "E-mail de Boas-Vindas"
+
+#: templates/email-templates.php:72
+#, fuzzy
+msgid "New contact? Make the feel at home."
+msgstr "Novo contato? Faça a sensação em casa."
+
+#: templates/email-templates.php:83
+msgid "Confirmation Email"
+msgstr "Ícones coloridos"
+
+#: templates/email-templates.php:84
+#, fuzzy
+msgid "Need to confirm something? Send them this."
+msgstr "Precisa confirmar algo? Mande isto."
+
+#: templates/email-templates.php:95
+#, fuzzy
+msgid "Review Request"
+msgstr "Solicitação de revisão"
+
+#: templates/email-templates.php:96 templates/email-templates.php:108
+#, fuzzy
+msgid "Want feedback? This is the easiest way to get it."
+msgstr "Quer um feedback? Esta é a maneira mais fácil de obtê-lo."
+
+#: templates/email-templates.php:107
+#, fuzzy
+msgid "You're Awesome"
+msgstr "Você é incrível."
+
+#. Plugin URI of the plugin/theme
+#, fuzzy
+msgid "https://wordpress.org/plugins/groundhogg/"
+msgstr "https://WordPress.org/plugins/groundhogg/"
+
+#. Description of the plugin/theme
+#, fuzzy
+msgid "CRM and marketing automation for WordPress"
+msgstr "CRM e automação de marketing para WordPress"
+
+#. Author of the plugin/theme
+#, fuzzy
+msgid "Groundhogg Inc."
+msgstr "Groundhogg Inc."
+
+#. Author URI of the plugin/theme
+#, fuzzy
+msgid "http://www.groundhogg.io"
+msgstr "http://www.groundhogg.Io"

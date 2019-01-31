@@ -1,0 +1,5433 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Groundhogg\n"
+"POT-Creation-Date: 2019-01-31 16:05-0500\n"
+"PO-Revision-Date: 2019-01-31 16:09-0500\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ro_RO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.1\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==0 || (n!=1 && n%100>=1 && n"
+"%100<=19) ? 1 : 2);\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: groundhogg.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: api/v1/class-wpgh-api-v1-contacts.php:63
+#, fuzzy
+msgid "No contact exists with the given ID."
+msgstr "Nu există contact cu ID-ul dat."
+
+#: api/v1/class-wpgh-api-v1-contacts.php:67
+#, fuzzy
+msgid "Please provide a contact ID."
+msgstr "Vă rugăm să furnizați un ID de contact."
+
+#: api/v1/class-wpgh-api-v1.php:154
+#, fuzzy
+msgid "The requested method does not exist for module: "
+msgstr "Metoda solicitată nu există pentru modulul:"
+
+#: api/v1/class-wpgh-api-v1.php:163
+#, fuzzy
+msgid "The requested module does not exist."
+msgstr "Modulul solicitat nu există."
+
+#: api/v1/class-wpgh-api-v1.php:170
+#, fuzzy
+msgid "Your token is invalid."
+msgstr "Simbolul tău nu este valid."
+
+#: api/v1/class-wpgh-api-v1.php:177
+#, fuzzy
+msgid "Please provide a token."
+msgstr "Vă rugăm să furnizați un simbol."
+
+#: api/v1/class-wpgh-api-v1.php:185
+#, fuzzy
+msgid "Please use POST method to use API. "
+msgstr "Vă rugăm să utilizați metoda POST pentru a utiliza API."
+
+#: api/v1/class-wpgh-api-v1.php:193
+#, fuzzy
+msgid "Something went wrong, but we do not know what."
+msgstr "Ceva a mers prost, dar nu știm ce."
+
+#: api/v2/class-wpgh-api-v2-base.php:48
+#, fuzzy
+msgid "Invalid Authentication."
+msgstr "Autentificare nevalidă."
+
+#: api/v2/class-wpgh-api-v2-base.php:51
+#, fuzzy
+msgid "API key is not valid."
+msgstr "Cheia API nu este validă."
+
+#: api/v2/class-wpgh-api-v2-base.php:56
+#, fuzzy
+msgid "Please enter a API valid token and public key."
+msgstr "Introduceți un simbol valid API și o cheie publică."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:43
+#, fuzzy
+msgid "The ID of contact you want to retrieve."
+msgstr "ID-ul contactului pe care doriți să-l recuperați."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:54
+#: api/v2/class-wpgh-api-v2-contacts.php:77
+#, fuzzy
+msgid ""
+"Contains list of contact arguments. Please visit www.groundhogg.io for full "
+"list of accepted arguments."
+msgstr ""
+"Conține lista argumentelor de contact. Vă rugăm să vizitați www.groundhogg."
+"io pentru lista completă a argumentelor acceptate."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:66
+#, fuzzy
+msgid "ID of the contact which you want to delete."
+msgstr "ID-ul contactului pe care doriți să îl ștergeți."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:80
+#, fuzzy
+msgid ""
+"Contains array of tag ids/slugs for which you want to apply to the contact."
+msgstr ""
+"Conține matrice de ID-uri de etichete/melci pentru care doriți să aplicați "
+"contactul."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:83
+#, fuzzy
+msgid ""
+"Contains array of tag ids/slugs for which you want to remove from the "
+"contact."
+msgstr ""
+"Conține matrice de ID-uri de etichete/melci pentru care doriți să eliminați "
+"din contact."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:95
+#: api/v2/class-wpgh-api-v2-contacts.php:168
+#: api/v2/class-wpgh-api-v2-contacts.php:206
+#: api/v2/class-wpgh-api-v2-contacts.php:312
+#: api/v2/class-wpgh-api-v2-tags.php:89 api/v2/class-wpgh-api-v2-tags.php:114
+#: api/v2/class-wpgh-api-v2-tags.php:156 api/v2/class-wpgh-api-v2-tags.php:195
+#, fuzzy
+msgid "You are not eligible to perform this operation."
+msgstr "Nu sunteți eligibil pentru a efectua această operațiune."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:159
+#: api/v2/class-wpgh-api-v2-contacts.php:226
+#: api/v2/class-wpgh-api-v2-contacts.php:232
+#: api/v2/class-wpgh-api-v2-contacts.php:254
+#: api/v2/class-wpgh-api-v2-contacts.php:260
+#: api/v2/class-wpgh-api-v2-contacts.php:301
+#: api/v2/class-wpgh-api-v2-contacts.php:304
+#: api/v2/class-wpgh-api-v2-contacts.php:328
+#: api/v2/class-wpgh-api-v2-contacts.php:333
+#, fuzzy
+msgid "Please provide a valid contact ID."
+msgstr "Vă rugăm să furnizați un ID de contact valid."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:180
+#: api/v2/class-wpgh-api-v2-contacts.php:273
+msgid "Please provide a valid email address."
+msgstr "Va rugam sa introduceti o adresa de email valida"
+
+#: api/v2/class-wpgh-api-v2-contacts.php:195
+#, fuzzy
+msgid "Contact added successfully."
+msgstr "Contactul a fost adăugat cu succes."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:199
+#: includes/admin/contacts/class-wpgh-contacts-page.php:367
+msgid "Please enter a valid email address."
+msgstr "Te rog introdu o adresă email validă."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:220
+#, fuzzy
+msgid "Tags applied successfully."
+msgstr "Etichetele aplicate cu succes."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:223
+#: api/v2/class-wpgh-api-v2-contacts.php:251
+msgid "Something went wrong!"
+msgstr "Ceva nu a functionat cum trebuie!"
+
+#: api/v2/class-wpgh-api-v2-contacts.php:229
+#: api/v2/class-wpgh-api-v2-contacts.php:257
+#: api/v2/class-wpgh-api-v2-tags.php:187
+#, fuzzy
+msgid "Please provide a valid array of tags."
+msgstr "Vă rugăm să furnizați o matrice validă de etichete."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:248
+#, fuzzy
+msgid "Tags removed successfully."
+msgstr "Tag-uri eliminate cu succes."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:297
+#, fuzzy
+msgid "Contact updated successfully."
+msgstr "Contact actualizat cu succes."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:321
+#, fuzzy
+msgid "Contact deleted successfully."
+msgstr "Contactul a fost șters cu succes."
+
+#: api/v2/class-wpgh-api-v2-contacts.php:324
+#: includes/admin/emails/class-wpgh-emails-page.php:494
+msgid "Something went wrong."
+msgstr "Ceva nu a funcționat."
+
+#: api/v2/class-wpgh-api-v2-emails.php:53
+#, fuzzy
+msgid "Contact ID which you want to send to."
+msgstr "ID-ul de contact la care doriți să trimiteți."
+
+#: api/v2/class-wpgh-api-v2-emails.php:57
+#, fuzzy
+msgid "Email ID which you want to send."
+msgstr "ID-ul de E-mail pe care doriți să îl trimiteți."
+
+#: api/v2/class-wpgh-api-v2-emails.php:91
+#, fuzzy
+msgid "No emails found."
+msgstr "Nu e-mailuri găsite."
+
+#: api/v2/class-wpgh-api-v2-emails.php:103
+#, fuzzy, php-format
+msgid "Email with ID %d not found."
+msgstr "E-mail cu ID% d nu a fost găsit."
+
+#: api/v2/class-wpgh-api-v2-emails.php:106
+#, fuzzy, php-format
+msgid "Contact with ID %d not found."
+msgstr "Contact cu ID% d nu a fost găsit."
+
+#: api/v2/class-wpgh-api-v2-emails.php:113
+#, fuzzy
+msgid "Email sent successfully to contact."
+msgstr "E-mail trimis cu succes pentru a contacta."
+
+#: api/v2/class-wpgh-api-v2-emails.php:116
+#, fuzzy
+msgid "Email not sent."
+msgstr "E-mail nu a fost trimis."
+
+#: api/v2/class-wpgh-api-v2-emails.php:120
+#, fuzzy
+msgid "email_id and contact_id are required to perform this operation."
+msgstr ""
+"email_id și contact_id sunt necesare pentru a efectua această operațiune."
+
+#: api/v2/class-wpgh-api-v2-tags.php:44
+#, fuzzy
+msgid "The ID of tag to retrieve."
+msgstr "ID-ul de etichetă pentru a prelua."
+
+#: api/v2/class-wpgh-api-v2-tags.php:55
+#, fuzzy
+msgid "Array of tag names."
+msgstr "Matrice de nume de etichete."
+
+#: api/v2/class-wpgh-api-v2-tags.php:66
+#, fuzzy
+msgid "The ID of the tag to delete."
+msgstr "ID-ul etichetei de șters."
+
+#: api/v2/class-wpgh-api-v2-tags.php:77
+#, fuzzy
+msgid "Contains array of tags to update."
+msgstr "Conține matrice de taguri pentru actualizare."
+
+#: api/v2/class-wpgh-api-v2-tags.php:98 api/v2/class-wpgh-api-v2-tags.php:181
+#: api/v2/class-wpgh-api-v2-tags.php:184 api/v2/class-wpgh-api-v2-tags.php:211
+#: api/v2/class-wpgh-api-v2-tags.php:214
+#, fuzzy
+msgid "Please provide a valid tag ID."
+msgstr "Vă rugăm să furnizați un ID de etichetă valid."
+
+#: api/v2/class-wpgh-api-v2-tags.php:106
+msgid "No tags found."
+msgstr "Nici un criteriu gasit."
+
+#: api/v2/class-wpgh-api-v2-tags.php:144
+#, fuzzy
+msgid " tags added successfully."
+msgstr "etichetele adăugate cu succes."
+
+#: api/v2/class-wpgh-api-v2-tags.php:148
+#, fuzzy
+msgid "Please enter tags."
+msgstr "Vă rugăm să introduceți Tag-uri."
+
+#: api/v2/class-wpgh-api-v2-tags.php:175
+#, fuzzy
+msgid "Tag updated successfully."
+msgstr "Tag actualizat cu succes."
+
+#: api/v2/class-wpgh-api-v2-tags.php:178 api/v2/class-wpgh-api-v2-tags.php:207
+msgid "Something went wrong"
+msgstr "Ceva n-a mers bine"
+
+#: api/v2/class-wpgh-api-v2-tags.php:204
+#, fuzzy
+msgid "Tag deleted successfully."
+msgstr "Tag-ul șters cu succes."
+
+#: blocks/beaver-builder/class-wpgh-beaver-builder-blocks.php:32
+#: blocks/beaver-builder/class-wpgh-beaver-builder-blocks.php:39
+msgid "Select a form"
+msgstr "Selectați un formular"
+
+#: blocks/beaver-builder/class-wpgh-beaver-builder-blocks.php:35
+#: blocks/beaver-builder/widget/class-wpgh-beaver-builder-widget.php:11
+#: blocks/elementor/class-wpgh-elementor-form-widget.php:12
+#, fuzzy
+msgid "Groundhogg Forms"
+msgstr "Forme Groundhogg"
+
+#: blocks/beaver-builder/widget/class-wpgh-beaver-builder-widget.php:12
+#, fuzzy
+msgid "Use Groundhogg forms to collect leads and launch automation!"
+msgstr ""
+"Utilizați forme Groundhogg pentru a colecta conduce și de a lansa "
+"automatizare!"
+
+#: blocks/beaver-builder/widget/class-wpgh-beaver-builder-widget.php:14
+msgid "Forms"
+msgstr "Formulare"
+
+#: blocks/elementor/class-wpgh-elementor-form-widget.php:30
+#: blocks/visual-composer/class-wpgh-visual-composer-blocks.php:49
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:76
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:162
+#: includes/admin/emails/blocks/wpgh-html-block.php:66
+msgid "Content"
+msgstr "Conținut"
+
+#: blocks/elementor/class-wpgh-elementor-form-widget.php:50
+#: includes/gutenberg.php:51
+#, fuzzy
+msgid "Select a Form"
+msgstr "Selectarea unui formular"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-blocks.php:46
+#, fuzzy
+msgid "new_shortcode"
+msgstr "new_shortcode"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:28
+#, fuzzy
+msgid "VC Informationbox"
+msgstr "VC Informationbox"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:30
+#, fuzzy
+msgid "A simple VC box"
+msgstr "O cutie simplă VC"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:31
+#, fuzzy
+msgid "My Own Custom Elements"
+msgstr "Propriile mele elemente personalizate"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:39
+#: includes/class-wpgh-html.php:956
+msgid "Title"
+msgstr "Titlu"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:41
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:54
+msgid "Default value"
+msgstr "Valoarea implicită"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:42
+msgid "Box Title"
+msgstr "Casuta Titlu"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:52
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:313
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:408
+msgid "Text"
+msgstr "Text"
+
+#: blocks/visual-composer/class-wpgh-visual-composer-widgets.php:55
+#, fuzzy
+msgid "Box Text"
+msgstr "Casetă text"
+
+#: groundhogg.php:326 groundhogg.php:338
+#, fuzzy
+msgid "Cheatin huh?"
+msgstr "Cheatin nu-i asa?"
+
+#: includes/admin/broadcasts/add-broadcast.php:27
+#, fuzzy
+msgid "Select an email to send."
+msgstr "Selectați un e-mail de trimis."
+
+#: includes/admin/broadcasts/add-broadcast.php:34
+#, fuzzy
+msgid "The Broadcast tool uses your global emails."
+msgstr "Instrumentul difuzare utilizează e-mailurile globale."
+
+#: includes/admin/broadcasts/add-broadcast.php:38
+#: includes/elements/actions/class-wpgh-admin-notification.php:70
+#, fuzzy
+msgid "Send To:"
+msgstr "Trimitere către:"
+
+#: includes/admin/broadcasts/add-broadcast.php:45
+#, fuzzy
+msgid "This broadcast will be sent to contacts with these tags."
+msgstr "Această difuzare va fi trimisă contactelor cu aceste etichete."
+
+#: includes/admin/broadcasts/add-broadcast.php:49
+#, fuzzy
+msgid "Exclude These Contacts:"
+msgstr "Exclude aceste persoane de contact:"
+
+#: includes/admin/broadcasts/add-broadcast.php:56
+#, fuzzy
+msgid "These contacts will be excluded."
+msgstr "Aceste contacte vor fi excluse."
+
+#: includes/admin/broadcasts/add-broadcast.php:61
+#, fuzzy
+msgid "Send On:"
+msgstr "Trimite pe:"
+
+#: includes/admin/broadcasts/add-broadcast.php:69
+#, fuzzy
+msgid "The day the broadcast will be sent."
+msgstr "În ziua în care va fi trimisă transmisia."
+
+#: includes/admin/broadcasts/add-broadcast.php:75
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:134
+#, fuzzy
+msgid "Schedule Broadcast"
+msgstr "Programare difuzare"
+
+#: includes/admin/broadcasts/broadcast-report.php:26
+#, fuzzy
+msgid "Stats will show once the broadcast has been sent."
+msgstr "Statisticile vor apărea odată ce transmisia a fost trimisă."
+
+#: includes/admin/broadcasts/broadcast-report.php:36
+msgid "Stats"
+msgstr "Statistici"
+
+#: includes/admin/broadcasts/broadcast-report.php:40
+msgid "Total Delivered"
+msgstr "Total Livrat"
+
+#: includes/admin/broadcasts/broadcast-report.php:57
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:216
+#, fuzzy
+msgid "Opens"
+msgstr "Deschide"
+
+#: includes/admin/broadcasts/broadcast-report.php:75
+#: includes/admin/broadcasts/broadcast-report.php:200
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:222
+msgid "Clicks"
+msgstr "Click-uri"
+
+#: includes/admin/broadcasts/broadcast-report.php:92
+#, fuzzy
+msgid "Click Through Rate"
+msgstr "Faceți clic pe rata"
+
+#: includes/admin/broadcasts/broadcast-report.php:96
+#: includes/admin/broadcasts/broadcast-report.php:120
+#, fuzzy
+msgid "Unopened"
+msgstr "Nedeschis"
+
+#: includes/admin/broadcasts/broadcast-report.php:110
+#, fuzzy
+msgid "Opens, did not click"
+msgstr "Se deschide, nu faceți clic pe"
+
+#: includes/admin/broadcasts/broadcast-report.php:115
+#, fuzzy
+msgid "Opens and clicked"
+msgstr "Se deschide și se face clic"
+
+#: includes/admin/broadcasts/broadcast-report.php:173
+#, fuzzy
+msgid "Links Clicked"
+msgstr "Link-uri clic"
+
+#: includes/admin/broadcasts/broadcast-report.php:199
+#: includes/admin/emails/blocks/wpgh-image-block.php:99
+msgid "Link"
+msgstr "Link"
+
+#: includes/admin/broadcasts/broadcast-report.php:208
+#, fuzzy
+msgid "No Links Clicked..."
+msgstr "Nu link-uri clic..."
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:137
+#, fuzzy
+msgid "Broadcasts"
+msgstr "Emisiunilor"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:176
+#, fuzzy
+msgid " Broadcast(s) Cancelled."
+msgstr "Difuzare (e) anulată."
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:205
+#, fuzzy
+msgid "Please select one or more tags to send this broadcast to."
+msgstr ""
+"Selectați una sau mai multe etichete pentru a trimite această difuzare."
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:220
+#, fuzzy
+msgid "Please select a tag with one or more associated contacts."
+msgstr "Selectați o etichetă cu unul sau mai multe contacte asociate."
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:232
+#, fuzzy
+msgid "Please send at a time in the future!"
+msgstr "Vă rugăm să trimiteți la un moment dat în viitor!"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:270
+#, fuzzy
+msgid "Broadcast Scheduled!"
+msgstr "Difuzare programată!"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:301
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:303
+#, fuzzy
+msgid "Search Broadcasts "
+msgstr "Emisiuni de căutare"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:343
+#: includes/admin/contacts/class-wpgh-contacts-page.php:1049
+#: includes/admin/emails/class-wpgh-emails-page.php:120
+#: includes/admin/emails/class-wpgh-emails-page.php:671
+#: includes/admin/emails/email-editor.php:48
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1018
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:323
+#: includes/admin/tags/class-wpgh-tags-page.php:329
+msgid "Add New"
+msgstr "Adaugă nou"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:55
+#: includes/admin/contacts/class-wpgh-contact-activity-table.php:52
+#: includes/admin/contacts/class-wpgh-contacts-table.php:47
+msgctxt "Column label"
+msgid "Email"
+msgstr "Email"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:56
+#, fuzzy
+msgctxt "Column label"
+msgid "Scheduled By"
+msgstr "Programat de"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:57
+#, fuzzy
+msgctxt "Column label"
+msgid "Scheduled Run Date"
+msgstr "Dată de rulare programată"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:58
+#, fuzzy
+msgctxt "Column label"
+msgid "Send To Tags"
+msgstr "Trimitere la etichete"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:59
+msgctxt "Column label"
+msgid "Stats"
+msgstr "Statistici"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:60
+#, fuzzy
+msgctxt "Column label"
+msgid "Date Scheduled"
+msgstr "Data programată"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:95
+#: includes/admin/emails/class-wpgh-emails-table.php:104
+#: includes/admin/funnels/class-wpgh-funnels-table.php:94
+msgid "All"
+msgstr "Toate"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:97
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:211
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:245
+msgid "Sent"
+msgstr "Trimise"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:99
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:164
+msgid "Scheduled"
+msgstr "Programat"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:101
+#: includes/admin/events/class-wpgh-events-table.php:176
+msgid "Cancelled"
+msgstr "Anulat"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:138
+#: includes/admin/emails/class-wpgh-emails-page.php:203
+#: includes/admin/emails/email-editor.php:48
+#: includes/elements/actions/class-wpgh-send-email.php:114
+#, fuzzy
+msgid "Edit Email"
+msgstr "Editare E-mail"
+
+#. translators: %s: title
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:140
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:174
+#: includes/admin/contacts/class-wpgh-contacts-table.php:590
+#: includes/admin/events/class-wpgh-events-table.php:397
+#: includes/admin/events/class-wpgh-events-table.php:398
+msgid "Cancel"
+msgstr "Anulează"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:153
+#, fuzzy
+msgid "no email"
+msgstr "nici un e-mail"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:226
+#, fuzzy
+msgid "CTR"
+msgstr "Ctr"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:253
+#, fuzzy
+msgid "Will send"
+msgstr "Va trimite"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:274
+#: includes/admin/contacts/class-wpgh-contacts-table.php:158
+#: includes/admin/emails/class-wpgh-emails-table.php:230
+#: includes/admin/funnels/class-wpgh-funnels-table.php:267
+msgid "Created"
+msgstr "Creat"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:346
+#, fuzzy
+msgctxt "List table bulk action"
+msgid "Cancel Broadcast"
+msgstr "Revocare difuzare"
+
+#: includes/admin/contacts/add-contact.php:35
+#: includes/admin/contacts/contact-editor.php:74
+#: includes/admin/contacts/contact-editor.php:424
+#: includes/admin/contacts/contact-editor.php:462
+#: includes/admin/tags/edit-tag.php:25
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:420
+msgid "Name"
+msgstr "Nume"
+
+#: includes/admin/contacts/add-contact.php:39
+#: includes/admin/contacts/class-wpgh-contacts-table.php:562
+#: includes/admin/contacts/contact-editor.php:78
+#: includes/admin/contacts/search.php:92
+msgid "First Name"
+msgstr "Prenume"
+
+#: includes/admin/contacts/add-contact.php:47
+#: includes/admin/contacts/class-wpgh-contacts-table.php:566
+#: includes/admin/contacts/contact-editor.php:88
+#: includes/admin/contacts/search.php:93
+msgid "Last Name"
+msgstr "Nume"
+
+#: includes/admin/contacts/add-contact.php:57
+#: includes/admin/contacts/contact-editor.php:128
+msgid "Contact Info"
+msgstr "Informații de contact"
+
+#: includes/admin/contacts/add-contact.php:61
+#: includes/admin/contacts/class-wpgh-contacts-table.php:558
+#: includes/admin/contacts/contact-editor.php:132
+#: includes/admin/contacts/search.php:94
+#: includes/admin/settings/class-wpgh-settings-page.php:121
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:277
+msgid "Email"
+msgstr "Email"
+
+#: includes/admin/contacts/add-contact.php:70
+#: includes/admin/contacts/contact-editor.php:148
+#, fuzzy
+msgid "Primary Phone"
+msgstr "Telefon primar"
+
+#: includes/admin/contacts/add-contact.php:79
+#: includes/admin/contacts/contact-editor.php:158
+#, fuzzy
+msgid "Phone Extension"
+msgstr "Extensie telefon"
+
+#: includes/admin/contacts/add-contact.php:89
+#: includes/admin/contacts/contact-editor.php:295
+#: includes/admin/contacts/search.php:133
+#, fuzzy
+msgid "Segmentation"
+msgstr "Segmentare"
+
+#: includes/admin/contacts/add-contact.php:93
+#: includes/admin/contacts/class-wpgh-contacts-table.php:570
+#: includes/admin/contacts/contact-editor.php:299
+#: includes/admin/contacts/search.php:136
+msgid "Owner"
+msgstr "Proprietar"
+
+#: includes/admin/contacts/add-contact.php:98
+#: includes/admin/contacts/class-wpgh-contacts-table.php:584
+#: includes/admin/contacts/contact-editor.php:334
+#: includes/admin/contacts/search.php:155
+#: includes/admin/tags/class-wpgh-tags-page.php:110
+msgid "Tags"
+msgstr "Etichete"
+
+#: includes/admin/contacts/add-contact.php:109
+#: includes/admin/contacts/contact-editor.php:355
+msgid "Notes"
+msgstr "Note"
+
+#: includes/admin/contacts/class-wpgh-contact-activity-table.php:53
+msgctxt "Column label"
+msgid "Opened"
+msgstr "Deschis"
+
+#: includes/admin/contacts/class-wpgh-contact-activity-table.php:54
+msgctxt "Column label"
+msgid "Clicked"
+msgstr "Clickuit"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:56
+#: includes/admin/events/class-wpgh-events-table.php:47
+#, fuzzy
+msgctxt "Column label"
+msgid "Funnel"
+msgstr "Pâlnie"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:57
+#: includes/admin/events/class-wpgh-events-table.php:48
+msgctxt "Column label"
+msgid "Step"
+msgstr "Etapă"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:58
+#: includes/admin/events/class-wpgh-events-table.php:49
+msgctxt "Column label"
+msgid "Time"
+msgstr "Program"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:59
+msgctxt "Column label"
+msgid "Actions"
+msgstr "Acțiuni"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:85
+#: includes/admin/events/class-wpgh-events-table.php:108
+#, fuzzy
+msgid "Broadcast Email"
+msgstr "Difuzare E-mail"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:94
+#, fuzzy
+msgid "funnel deleted"
+msgstr "pâlnie ștearsă"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:127
+#, fuzzy
+msgid "step deleted"
+msgstr "pas șters"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:173
+#: includes/admin/events/class-wpgh-events-table.php:391
+#, fuzzy
+msgid "Run Now"
+msgstr "Fugi acum"
+
+#: includes/admin/contacts/class-wpgh-contact-events-table.php:176
+#: includes/admin/events/class-wpgh-events-table.php:407
+#, fuzzy
+msgid "Run Again"
+msgstr "Executare din nou"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:92
+#: includes/admin/emails/class-wpgh-emails-page.php:111
+#: includes/admin/funnels/class-wpgh-funnels-page.php:133
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:63
+msgid "Overview"
+msgstr "Prezentare generală"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:93
+#, fuzzy
+msgid ""
+"This is where you can manage and view your contacts. Click the quick edit to "
+"quickly change contact details."
+msgstr ""
+"Aici puteți gestiona și vizualiza contactele. Faceți clic pe Editare rapidă "
+"pentru a modifica rapid detaliile de contact."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:100
+#: includes/admin/emails/class-wpgh-emails-page.php:128
+#: includes/admin/funnels/class-wpgh-funnels-page.php:150
+msgid "Editing"
+msgstr "Editare insigna"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:101
+#, fuzzy
+msgid ""
+"While editing a contact you can modify any of their personal information. "
+"There are several points of interest..."
+msgstr ""
+"În timp ce editați un contact, puteți modifica oricare dintre informațiile "
+"lor personale. Există mai multe puncte de interes..."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:103
+#, fuzzy
+msgid ""
+"Manually unsubscribe a contact by checking the \"mark as unsubscribed\" "
+"button."
+msgstr ""
+"Dezabonați manual un contact verificând butonul \"marchează ca neabonat\"."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:104
+#, fuzzy
+msgid ""
+"Make sure your in compliance by ensuring the terms of agreement and GDPR "
+"consent are both checked under the compliance section."
+msgstr ""
+"Asigurați-vă că, în conformitate cu respectarea termenilor de acord și a "
+"consimțământului GDPR, ambele sunt verificate în conformitate cu secțiunea "
+"de conformitate."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:105
+#, fuzzy
+msgid "View the origin of the contact by looking at the lead source field."
+msgstr ""
+"Vizualizați originea contactului uitându-ne la câmpul sursă client potențial."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:106
+#, fuzzy
+msgid ""
+"Add or remove custom information about the contact by enabling the \"Edit "
+"Meta\" section. Each meta also includes a replacement code to include it in "
+"an email."
+msgstr ""
+"Adăugați sau eliminați informații particularizate despre contactul prin "
+"activarea secțiunii \"Editare meta\". Fiecare Meta include, de asemenea, un "
+"cod de înlocuire pentru a include într-un e-mail."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:107
+#, fuzzy
+msgid ""
+"Re-run or cancel events for this contact by viewing the \"Upcoming Events\" "
+"or \"Recent History\" Section"
+msgstr ""
+"Executați din nou sau anulați evenimente pentru această persoană de contact "
+"vizualizând secțiunea \"evenimente viitoare\" sau \"istoric recent\""
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:108
+#, fuzzy
+msgid ""
+"Monitor their engagement by looking in the \"Recent Email History\" section."
+msgstr ""
+"Monitorizați-le angajamentul căutând în secțiunea \"Istoricul de E-mail "
+"recent\"."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:170
+#, fuzzy
+msgid "Add Contact"
+msgstr "Adăugare persoană de contact"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:173
+#, fuzzy
+msgid "Edit Contact"
+msgstr "Editare contact"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:176
+#, fuzzy
+msgid "Search Contacts"
+msgstr "Căutare contacte"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:179
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:85
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:179
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:73
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:115
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:122
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:94
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:73
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:78
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:164
+msgid "Contacts"
+msgstr "Contacte"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:249
+#, fuzzy, php-format
+msgid "Marked %d contacts as spam."
+msgstr "Marcate% d contacte ca spam."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:277
+#: includes/class-wpgh-bulk-contact-manager.php:147
+#, fuzzy, php-format
+msgid "Deleted %d contacts."
+msgstr "Persoane de contact șterse% d."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:299
+#: includes/admin/contacts/class-wpgh-contacts-page.php:321
+#, fuzzy, php-format
+msgid "Approved %d contacts."
+msgstr "Contacte% d aprobate."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:384
+#: includes/admin/contacts/class-wpgh-contacts-page.php:516
+#: includes/admin/contacts/class-wpgh-contacts-page.php:776
+#, fuzzy, php-format
+msgid "Sorry, the email %s already belongs to another contact."
+msgstr "Ne pare rău, e-mailul %s aparține deja altui contact."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:391
+msgid "Please enter a valid email address"
+msgstr "Introduceti un email valid "
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:419
+#, fuzzy
+msgid "Contact created!"
+msgstr "Contact creat!"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:494
+#, fuzzy
+msgid "This contact will no longer receive marketing."
+msgstr "Această persoană de contact nu va mai primi marketing."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:512
+#: includes/admin/contacts/class-wpgh-contacts-page.php:772
+#, fuzzy, php-format
+msgid ""
+"The email address of this contact has been changed to %s. Their optin status "
+"has been changed to [unconfirmed] to reflect the change as well."
+msgstr ""
+"Adresa de e-mail a acestui contact a fost modificată la %s. Statutul lor de "
+"OptIn a fost schimbat la [neconfirmate] pentru a reflecta schimbarea, de "
+"asemenea."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:614
+#, fuzzy
+msgid "Hmm, looks like we couldn't add the new tags..."
+msgstr "Hmm, se pare ca nu am putut adăuga Tag-uri noi..."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:641
+#, fuzzy
+msgid "Email will be sent momentarily!"
+msgstr "Email-ul va fi trimis momentan!"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:652
+#, fuzzy
+msgid "Contact added to funnel."
+msgstr "Contact adăugat la pâlnie."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:656
+#, fuzzy
+msgid "Contact updated!"
+msgstr "Contact actualizat!"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:706
+#: includes/class-wpgh-submission.php:583
+#: includes/class-wpgh-submission.php:677
+#, fuzzy
+msgid "Could not upload file."
+msgstr "Imposibil de încărcat fișierul."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:758
+#, fuzzy
+msgid "Email cannot be blank."
+msgstr "E-mailul nu poate fi necompletat."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:760
+msgid "Invalid email address."
+msgstr "Adresă de email nevalidă."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:783
+#, fuzzy
+msgid "First name cannot be blank."
+msgstr "Prenumele nu poate fi necompletat."
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:856
+#: includes/admin/contacts/class-wpgh-contacts-page.php:858
+#, fuzzy
+msgid "Search Contacts "
+msgstr "Căutare contacte"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:48
+msgctxt "Column label"
+msgid "First Name"
+msgstr "Prenume"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:49
+msgctxt "Column label"
+msgid "Last Name"
+msgstr "Nume"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:50
+msgctxt "Column label"
+msgid "Username"
+msgstr "Utilizator"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:51
+msgctxt "Column label"
+msgid "Owner"
+msgstr "Proprietar"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:52
+msgctxt "Column label"
+msgid "Date"
+msgstr "Data"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:103
+msgid "Unconfirmed"
+msgstr "Neconfirmat"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:200
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:134
+#: includes/admin/tags/class-wpgh-tags-table.php:117
+msgctxt "List table bulk action"
+msgid "Delete"
+msgstr "Șterge"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:207
+msgctxt "List table bulk action"
+msgid "Approve"
+msgstr "Aproba"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:209
+msgctxt "List table bulk action"
+msgid "Mark as Spam"
+msgstr "Marcheaza ca spam"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:236
+#: includes/admin/events/class-wpgh-events-table.php:266
+#, fuzzy
+msgid "All <span class=\"count\">("
+msgstr "Toate < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:237
+#, fuzzy
+msgid "Unconfirmed <span class=\"count\">("
+msgstr "Neconfirmate < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:238
+#, fuzzy
+msgid "Confirmed <span class=\"count\">("
+msgstr "Confirmat < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:239
+#, fuzzy
+msgid "Unsubscribed <span class=\"count\">("
+msgstr "Unabonat < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:240
+#, fuzzy
+msgid "Spam <span class=\"count\">("
+msgstr "Spam < span class = \"count\" > ("
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:241
+#, fuzzy
+msgid "Bounced <span class=\"count\">("
+msgstr "Bounced < span class = \"count\" > ("
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:478
+#, fuzzy, php-format
+msgid "Quick edit &#8220;%s&#8221; inline"
+msgstr "Editare rapidă & #8220; %s & #8221; inline"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:479
+#, fuzzy
+msgid "Quick&nbsp;Edit"
+msgstr "Modificare &nbsp; rapidă"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:488
+#: includes/admin/contacts/class-wpgh-contacts-table.php:489
+#: includes/admin/emails/class-wpgh-emails-table.php:156
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:228
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:229
+#: includes/admin/tags/class-wpgh-tags-table.php:248
+#: includes/admin/tags/class-wpgh-tags-table.php:249
+msgid "Edit"
+msgstr "Editeaza"
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:497
+#, fuzzy, php-format
+msgid "Mark %s as approved."
+msgstr "Marcați %s conform aprobării."
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:498
+msgid "Approve"
+msgstr "Aproba"
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:505
+#, fuzzy, php-format
+msgid "Mark %s as a valid email."
+msgstr "Marcați %s ca un e-mail valid."
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:506
+#, fuzzy
+msgid "Valid Email"
+msgstr "E-mail valid"
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:513
+#, fuzzy, php-format
+msgid "Mark %s as spam"
+msgstr "Marcare %s ca spam"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:514
+msgid "Spam"
+msgstr "Spam"
+
+#. translators: %s: title
+#: includes/admin/contacts/class-wpgh-contacts-table.php:522
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:236
+#: includes/admin/tags/class-wpgh-tags-table.php:256
+#, fuzzy, php-format
+msgid "Delete &#8220;%s&#8221; permanently"
+msgstr "Ștergeți definitiv & #8220; %s & #8221;"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:523
+#: includes/admin/emails/class-wpgh-emails-table.php:154
+#: includes/admin/funnels/class-wpgh-funnels-table.php:199
+msgid "Delete Permanently"
+msgstr "Sterge definitiv"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:555
+msgid "Quick Edit"
+msgstr "Editeaza rapid"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:572
+#, fuzzy
+msgid "Select an owner"
+msgstr "Selectați un proprietar"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:577
+#, fuzzy
+msgid "Unsubscribe this contact."
+msgstr "Dezabonare această persoană de contact."
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:592
+#: includes/admin/superlinks/edit-superlink.php:61
+#: includes/admin/tags/edit-tag.php:39
+msgid "Update"
+msgstr "Actualizare"
+
+#: includes/admin/contacts/contact-editor.php:41
+#, fuzzy
+msgid "This contact has been deleted."
+msgstr "Această persoană de contact a fost ștearsă."
+
+#: includes/admin/contacts/contact-editor.php:51
+#, fuzzy
+msgid "You are not the owner of this contact."
+msgstr "Nu sunteți proprietarul acestui contact."
+
+#: includes/admin/contacts/contact-editor.php:99
+#: includes/admin/settings/class-wpgh-api-keys-table.php:162
+msgid "Username"
+msgstr "Utilizator"
+
+#: includes/admin/contacts/contact-editor.php:110
+#: includes/admin/contacts/contact-editor.php:114
+#, fuzzy
+msgid "Create User Account"
+msgstr "Creare cont utilizator"
+
+#: includes/admin/contacts/contact-editor.php:113
+#, fuzzy
+msgid "Create New Account?"
+msgstr "Creare cont nou?"
+
+#: includes/admin/contacts/contact-editor.php:115
+#, fuzzy
+msgid ""
+"This contact does not have an associated user account? Would you like to "
+"create one?"
+msgstr ""
+"Această persoană de contact nu are un cont de utilizator asociat? Creați "
+"unul?"
+
+#: includes/admin/contacts/contact-editor.php:118
+#, fuzzy
+msgid "Link Existing Account?"
+msgstr "Link cont existent?"
+
+#: includes/admin/contacts/contact-editor.php:119
+#, fuzzy
+msgid "Select a User Account (optional)"
+msgstr "Selectați un cont de utilizator (opțional)"
+
+#: includes/admin/contacts/contact-editor.php:120
+#, fuzzy
+msgid "You can link an existing user account to this contact."
+msgstr ""
+"Aveți posibilitatea să legați un cont de utilizator existent la această "
+"persoană de contact."
+
+#: includes/admin/contacts/contact-editor.php:141
+msgid "Email Status"
+msgstr "Status email"
+
+#: includes/admin/contacts/contact-editor.php:143
+#, fuzzy
+msgid "Mark as unsubscribed."
+msgstr "Marchează ca neabonat."
+
+#: includes/admin/contacts/contact-editor.php:171
+#, fuzzy
+msgid "Company Info"
+msgstr "Informatii despre companie"
+
+#: includes/admin/contacts/contact-editor.php:174
+#: includes/admin/contacts/search.php:99
+msgid "Company Name"
+msgstr "Numele Companiei"
+
+#: includes/admin/contacts/contact-editor.php:184
+#: includes/admin/contacts/search.php:100
+msgid "Job Title"
+msgstr "Ce este de lucru (titlu job)"
+
+#: includes/admin/contacts/contact-editor.php:194
+#, fuzzy
+msgid "Full Company Address"
+msgstr "Adresa completă a firmei"
+
+#: includes/admin/contacts/contact-editor.php:206
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:285
+msgid "Address"
+msgstr "Adresa"
+
+#: includes/admin/contacts/contact-editor.php:210
+#: includes/admin/contacts/search.php:102
+#: includes/admin/settings/class-wpgh-settings-page.php:245
+#: includes/class-wpgh-form.php:501 includes/class-wpgh-form.php:505
+#, fuzzy
+msgid "Street Address 1"
+msgstr "Adresa străzii 1"
+
+#: includes/admin/contacts/contact-editor.php:220
+#: includes/admin/contacts/search.php:103
+#: includes/admin/settings/class-wpgh-settings-page.php:257
+#: includes/class-wpgh-form.php:513 includes/class-wpgh-form.php:517
+#, fuzzy
+msgid "Street Address 2"
+msgstr "Adresa străzii 2"
+
+#: includes/admin/contacts/contact-editor.php:230
+#: includes/admin/contacts/search.php:104
+#: includes/admin/settings/class-wpgh-settings-page.php:269
+#: includes/class-wpgh-form.php:525 includes/class-wpgh-form.php:529
+msgid "City"
+msgstr "Oraș"
+
+#: includes/admin/contacts/contact-editor.php:240
+#: includes/admin/contacts/search.php:105
+#: includes/admin/settings/class-wpgh-settings-page.php:281
+#: includes/class-wpgh-form.php:562 includes/class-wpgh-form.php:566
+msgid "Postal/Zip Code"
+msgstr "Cod Poștal"
+
+#: includes/admin/contacts/contact-editor.php:250
+#: includes/admin/contacts/search.php:106 includes/class-wpgh-form.php:537
+#: includes/class-wpgh-form.php:541
+msgid "State/Province"
+msgstr "Statul sau Provincia locației"
+
+#: includes/admin/contacts/contact-editor.php:260
+#: includes/admin/contacts/search.php:107
+#: includes/admin/settings/class-wpgh-settings-page.php:305
+#: includes/class-wpgh-form.php:552
+msgid "Country"
+msgstr "Țară"
+
+#: includes/admin/contacts/contact-editor.php:267
+msgid "Select a Country"
+msgstr "Selectaţi Ţara:"
+
+#: includes/admin/contacts/contact-editor.php:278
+#: includes/admin/settings/class-wpgh-settings-page.php:168
+#, fuzzy
+msgid "Compliance"
+msgstr "Conformitate"
+
+#: includes/admin/contacts/contact-editor.php:282
+#, fuzzy
+msgid "Agreed To Terms"
+msgstr "De acord cu termenii"
+
+#: includes/admin/contacts/contact-editor.php:283
+#: includes/admin/contacts/contact-editor.php:288
+#, fuzzy
+msgid "Agreed"
+msgstr "Convenit"
+
+#: includes/admin/contacts/contact-editor.php:287
+#, fuzzy
+msgid "GDPR Consent"
+msgstr "Acordul GDPR"
+
+#: includes/admin/contacts/contact-editor.php:304
+#: includes/admin/contacts/search.php:144
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:72
+#, fuzzy
+msgid "Source Page"
+msgstr "Pagină sursă"
+
+#: includes/admin/contacts/contact-editor.php:315
+#, fuzzy
+msgid "This is the page which the contact first submitted a form."
+msgstr ""
+"Aceasta este pagina pe care persoana de contact a prezentat-o pentru prima "
+"dată un formular."
+
+#: includes/admin/contacts/contact-editor.php:320
+#: includes/admin/contacts/search.php:149
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:72
+msgid "Lead Source"
+msgstr "Sursa lead"
+
+#: includes/admin/contacts/contact-editor.php:330
+#, fuzzy
+msgid "This is where the contact originated from."
+msgstr "De aici provine contactul."
+
+#: includes/admin/contacts/contact-editor.php:346
+#: includes/elements/benchmarks/class-wpgh-tag-applied.php:79
+#: includes/elements/benchmarks/class-wpgh-tag-removed.php:79
+#, fuzzy
+msgid "Add new tags by hitting [Enter] or by typing a [,]."
+msgstr "Adăugați etichete noi apăsând [Enter] sau tastând un [,]."
+
+#: includes/admin/contacts/contact-editor.php:373
+#: includes/admin/funnels/funnel-editor.php:236
+msgid "Actions"
+msgstr "Acțiuni"
+
+#: includes/admin/contacts/contact-editor.php:376
+msgid "Send Email"
+msgstr "Trimite email"
+
+#: includes/admin/contacts/contact-editor.php:380
+msgid "Send"
+msgstr "Trimite"
+
+#: includes/admin/contacts/contact-editor.php:386
+#, fuzzy
+msgid "Add To Funnel"
+msgstr "Adăugare la pâlnie"
+
+#: includes/admin/contacts/contact-editor.php:411
+msgid "Start"
+msgstr "Start"
+
+#: includes/admin/contacts/contact-editor.php:419
+msgid "Files"
+msgstr "Fişiere"
+
+#: includes/admin/contacts/contact-editor.php:425
+#: includes/admin/contacts/contact-editor.php:463
+msgid "Size"
+msgstr "Dimensiune"
+
+#: includes/admin/contacts/contact-editor.php:426
+#: includes/admin/contacts/contact-editor.php:464
+msgid "Type"
+msgstr "Tip"
+
+#: includes/admin/contacts/contact-editor.php:427
+#: includes/admin/contacts/contact-editor.php:465
+#: includes/class-wpgh-replacements.php:350
+#, fuzzy
+msgid "Replacement Code"
+msgstr "Cod de înlocuire"
+
+#: includes/admin/contacts/contact-editor.php:437
+#, fuzzy
+msgid "This contact has no files..."
+msgstr "Acest contact nu are fișiere..."
+
+#: includes/admin/contacts/contact-editor.php:453
+#, fuzzy
+msgid "{files."
+msgstr "fișiere."
+
+#: includes/admin/contacts/contact-editor.php:470
+#, fuzzy
+msgid "Upload files: "
+msgstr "Încărcați fișiere:"
+
+#: includes/admin/contacts/contact-editor.php:478
+#, fuzzy
+msgid "Custom Meta"
+msgstr "Custom meta"
+
+#: includes/admin/contacts/contact-editor.php:481
+#, fuzzy
+msgid "Edit Meta"
+msgstr "Editare meta"
+
+#: includes/admin/contacts/contact-editor.php:504
+#, fuzzy
+msgid "Add Meta"
+msgstr "Adauga meta"
+
+#: includes/admin/contacts/contact-editor.php:506
+msgid "Key"
+msgstr "Cheie"
+
+#: includes/admin/contacts/contact-editor.php:507
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:442
+msgid "Value"
+msgstr "Valoare"
+
+#: includes/admin/contacts/contact-editor.php:586
+msgid "Upcoming Events"
+msgstr "Evenimente Viitoare"
+
+#: includes/admin/contacts/contact-editor.php:596
+#: includes/admin/contacts/contact-editor.php:611
+#, fuzzy
+msgid "View All Events"
+msgstr "Vezi toate evenimentele"
+
+#: includes/admin/contacts/contact-editor.php:598
+#, fuzzy
+msgid ""
+"Any upcoming funnel steps will show up here. you can choose to cancel them "
+"or to run them immediately."
+msgstr ""
+"Orice viitoare pași pâlnie va apărea aici. Puteți alege să le anulați sau să "
+"le rulați imediat."
+
+#: includes/admin/contacts/contact-editor.php:601
+#, fuzzy
+msgid "Recent Funnel History"
+msgstr "Recente pâlnie istorie"
+
+#: includes/admin/contacts/contact-editor.php:612
+#, fuzzy
+msgid ""
+"Any previous funnel steps will show up here. You can choose run them again."
+"<br/>\n"
+"    This report only shows the 20 most recent events, to see more you can "
+"see all this contact's history in the event queue."
+msgstr ""
+"Orice pași anterioare pâlnie va apărea aici. Puteți alege să le executați "
+"din nou. <br/>\n"
+"    Acest raport afișează numai cele mai recente 20 de evenimente, pentru a "
+"vedea mai multe puteți vedea istoricul contactului în coada de evenimente."
+
+#: includes/admin/contacts/contact-editor.php:616
+#, fuzzy
+msgid "Recent Email History"
+msgstr "Istoric E-mail recent"
+
+#: includes/admin/contacts/contact-editor.php:621
+#, fuzzy
+msgid ""
+"This is where you can check if this contact is interacting with your emails."
+msgstr ""
+"Aici puteți verifica dacă această persoană de contact interacționează cu e-"
+"mailurile."
+
+#: includes/admin/contacts/contact-editor.php:628
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:237
+#: includes/admin/superlinks/edit-superlink.php:62
+#: includes/admin/tags/class-wpgh-tags-table.php:257
+#: includes/admin/tags/edit-tag.php:40
+msgid "Delete"
+msgstr "Șterge"
+
+#: includes/admin/contacts/search.php:21
+msgid "Equals"
+msgstr "Equals"
+
+#: includes/admin/contacts/search.php:22
+#, fuzzy
+msgid "Not Equals"
+msgstr "Nu este egal"
+
+#: includes/admin/contacts/search.php:23
+#, fuzzy
+msgid "Starts With"
+msgstr "Începe cu"
+
+#: includes/admin/contacts/search.php:24
+#, fuzzy
+msgid "Ends With"
+msgstr "Se termină cu"
+
+#: includes/admin/contacts/search.php:25
+msgid "Contains"
+msgstr "Conține"
+
+#: includes/admin/contacts/search.php:26
+#, fuzzy
+msgid "Does Not Contain"
+msgstr "Nu conține"
+
+#: includes/admin/contacts/search.php:27
+#, fuzzy
+msgid "Is Empty"
+msgstr "Este goală"
+
+#: includes/admin/contacts/search.php:28
+#, fuzzy
+msgid "Is Filled"
+msgstr "Este umplut"
+
+#: includes/admin/contacts/search.php:98
+#: includes/admin/settings/class-wpgh-settings-page.php:317
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:281
+msgid "Phone"
+msgstr "Telefon"
+
+#: includes/admin/contacts/search.php:101
+msgid "Company Address"
+msgstr "Adresa companiei"
+
+#: includes/admin/contacts/search.php:112
+msgid "General Information"
+msgstr "Informații generale"
+
+#: includes/admin/contacts/search.php:162
+#: includes/admin/contacts/search.php:186
+#, fuzzy
+msgid "Has ALL of these tags"
+msgstr "Are toate aceste Tag-uri"
+
+#: includes/admin/contacts/search.php:163
+#: includes/admin/contacts/search.php:187
+#, fuzzy
+msgid "Has ANY of these tags"
+msgstr "Are oricare dintre aceste Tag-uri"
+
+#: includes/admin/contacts/search.php:164
+#: includes/admin/contacts/search.php:188
+#, fuzzy
+msgid "Does not have ALL of these tags"
+msgstr "Nu are toate aceste Tag-uri"
+
+#: includes/admin/contacts/search.php:165
+#: includes/admin/contacts/search.php:189
+#, fuzzy
+msgid "Does not have ANY of these tags"
+msgstr "Nu are nici una dintre aceste Tag-uri"
+
+#: includes/admin/contacts/search.php:179
+#, fuzzy
+msgid "And"
+msgstr "Şi"
+
+#: includes/admin/contacts/search.php:206
+#, fuzzy
+msgid "Custom Data (Meta)"
+msgstr "Date personalizate (meta)"
+
+#: includes/admin/dashboard/class-wpgh-reporting-widget.php:231
+#, fuzzy
+msgid "You cannot export reports!"
+msgstr "Nu puteți exporta rapoarte!"
+
+#: includes/admin/dashboard/class-wpgh-reporting-widget.php:254
+#, fuzzy
+msgid "Export Report"
+msgstr "Raport de export"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:102
+#, fuzzy
+msgid "New Contacts"
+msgstr "Contacte noi"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:103
+#, fuzzy
+msgid "Email Report"
+msgstr "Raport E-mail"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:104
+#, fuzzy
+msgid "Form Activity"
+msgstr "Activitate formular"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:115
+msgid "Dashboard"
+msgstr "Panou de control"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:124
+#, fuzzy
+msgid "Last 24 Hours"
+msgstr "Ultimele 24 de ore"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:125
+msgid "Last 7 Days"
+msgstr "Ultimele 7 zile"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:126
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:36
+#: includes/admin/funnels/class-wpgh-funnels-table.php:129
+#: includes/admin/funnels/funnel-editor.php:53
+msgid "Last 30 Days"
+msgstr "Ultimele 30 de zile"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:127
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:43
+#: includes/admin/funnels/class-wpgh-funnels-table.php:136
+#: includes/admin/funnels/funnel-editor.php:60
+#, fuzzy
+msgid "Custom Range"
+msgstr "Interval personalizat"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:133
+msgid "From:"
+msgstr "De la:"
+
+#: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:140
+#: includes/admin/emails/email-editor.php:199
+msgid "To:"
+msgstr "La:"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:17
+#, fuzzy
+msgid "Funnel Breakdown"
+msgstr "Cădere pâlnie"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:29
+#: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:29
+#, fuzzy
+msgid "You have no active funnels."
+msgstr "Nu ai niciun pâlnii active."
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:84
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:178
+msgid "Benchmark"
+msgstr "Benchmark-uri"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:86
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:180
+#, fuzzy
+msgid "/ Total"
+msgstr "/Total"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:87
+#, fuzzy
+msgid "/ Previous Step"
+msgstr "/Pasul anterior"
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:142
+#, fuzzy
+msgid "Please select a funnel first."
+msgstr "Vă rugăm să selectați o pâlnie mai întâi."
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:151
+#, fuzzy
+msgid "This funnel has no benchmarks."
+msgstr "Pâlnia asta nu are indicii."
+
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:181
+#, fuzzy
+msgid "/ Previous"
+msgstr "/Anteriorul"
+
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:17
+#, fuzzy
+msgid "Lead Source Report"
+msgstr "Raport sursă client potențial"
+
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:61
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:134
+#, fuzzy
+msgid "No new lead sources to report."
+msgstr "Nici o sursă de plumb noi pentru a raporta."
+
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:145
+#, fuzzy
+msgid "Lead Source URL"
+msgstr "URL sursă client potențial"
+
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:146
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:202
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:179
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:146
+#, fuzzy
+msgid "Number of Contacts"
+msgstr "Număr de contacte"
+
+#: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:17
+#, fuzzy
+msgid "Most Active Funnels"
+msgstr "Cele mai multe pâlnii active"
+
+#: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:63
+#, fuzzy
+msgid "Funnel"
+msgstr "Pâlnie"
+
+#: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:64
+#, fuzzy
+msgid "Active Contacts"
+msgstr "Contacte active"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:15
+#, fuzzy
+msgid "Form Activity Report"
+msgstr "Raport activitate formular"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:53
+#, fuzzy
+msgid "Form Fills"
+msgstr "Umplere formular"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:57
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:124
+#, fuzzy
+msgid "Form Impressions"
+msgstr "Afișări formular"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:84
+#, fuzzy
+msgid "Total Impressions"
+msgstr "Total impresii"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:85
+msgid "Total Submissions"
+msgstr "Total "
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:86
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:126
+#, fuzzy
+msgid "Average Conversion Rate"
+msgstr "Rata medie de conversie"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:122
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:113
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:134
+msgid "From"
+msgstr "De la"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:123
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:114
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:135
+msgid "To"
+msgstr "La"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:125
+#, fuzzy
+msgid "Form Submissions"
+msgstr "Remiteri formular"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:14
+#, fuzzy
+msgid "New Contacts Report"
+msgstr "Raport persoane de contact noi"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:45
+#, fuzzy
+msgid "Optins"
+msgstr "Optins"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:75
+#, fuzzy
+msgid "Total Contacts"
+msgstr "Total contacte"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:76
+#, fuzzy
+msgid "Previous Period"
+msgstr "Perioada precedentă"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:14
+#, fuzzy
+msgid "Email Activity Report"
+msgstr "Raport activitate E-mail"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:52
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:136
+#, fuzzy
+msgid "Emails Sent"
+msgstr "E-mailuri trimise"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:56
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:137
+#, fuzzy
+msgid "Emails Opened"
+msgstr "E-mailuri deschise"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:60
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:138
+#, fuzzy
+msgid "Emails Clicked"
+msgstr "E-mailuri clic"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:91
+msgid "Total Sent"
+msgstr "Total trimise"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:92
+#, fuzzy
+msgid "Total Opened"
+msgstr "Total deschis"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:93
+#, fuzzy
+msgid "Total Clicked"
+msgstr "Total clic"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:96
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:139
+#, fuzzy
+msgid "Average Open Rate"
+msgstr "Rată medie deschisă"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:97
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:140
+#, fuzzy
+msgid "Average Click Through Rate"
+msgstr "Medie faceți clic pe rata"
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:19
+#, fuzzy
+msgid "Search Engine Report"
+msgstr "Motor de cautare raport"
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:110
+#, fuzzy
+msgid "No new search engine sources to report."
+msgstr "Nu noi surse de motor de căutare pentru a raporta."
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:121
+#, fuzzy
+msgid "Search Engine"
+msgstr "Motor de cautare"
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:190
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:82
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:167
+#, fuzzy
+msgid "No new social media sources to report."
+msgstr "Nu noi surse de social media pentru a raporta."
+
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:201
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:178
+#, fuzzy
+msgid "Social Media Source"
+msgstr "Social media Source"
+
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:19
+#, fuzzy
+msgid "Social Media Report"
+msgstr "Social Media raport"
+
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:93
+#, fuzzy
+msgid "Social Media Site"
+msgstr "Social media site-ului"
+
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:17
+#, fuzzy
+msgid "Source Page Report"
+msgstr "Raport pagină sursă"
+
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:61
+#, fuzzy
+msgid "No new pages to report."
+msgstr "Nu sunt pagini noi de raportat."
+
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:134
+#, fuzzy
+msgid "No new sources to report."
+msgstr "Nu sunt surse noi de raportat."
+
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:145
+#, fuzzy
+msgid "Source Page URL"
+msgstr "URL pagină sursă"
+
+#: includes/admin/dashboard/widgets/class-wpgh-summary-widget.php:17
+#, fuzzy
+msgid "Groundhogg Summary"
+msgstr "Groundhogg Sumar"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:18
+#, fuzzy
+msgid "Reporting Time Range"
+msgstr "Interval de timp de raportare"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:32
+#: includes/admin/funnels/class-wpgh-funnels-table.php:125
+#: includes/admin/funnels/funnel-editor.php:49
+msgid "Today"
+msgstr "Astăzi"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:33
+#: includes/admin/funnels/class-wpgh-funnels-table.php:126
+#: includes/admin/funnels/funnel-editor.php:50
+msgid "Yesterday"
+msgstr "Ieri"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:34
+#: includes/admin/funnels/class-wpgh-funnels-table.php:127
+#: includes/admin/funnels/funnel-editor.php:51
+msgid "This Week"
+msgstr "Săptămâna Asta"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:35
+#: includes/admin/funnels/class-wpgh-funnels-table.php:128
+#: includes/admin/funnels/funnel-editor.php:52
+msgid "Last Week"
+msgstr "Săptămăna Trecută"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:37
+#: includes/admin/funnels/class-wpgh-funnels-table.php:130
+#: includes/admin/funnels/funnel-editor.php:54
+msgid "This Month"
+msgstr "Luna aceasta"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:38
+#: includes/admin/funnels/class-wpgh-funnels-table.php:131
+#: includes/admin/funnels/funnel-editor.php:55
+msgid "Last Month"
+msgstr "Luna trecută"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:39
+#: includes/admin/funnels/class-wpgh-funnels-table.php:132
+#: includes/admin/funnels/funnel-editor.php:56
+#, fuzzy
+msgid "This Quarter"
+msgstr "Acest trimestru"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:40
+#: includes/admin/funnels/class-wpgh-funnels-table.php:133
+#: includes/admin/funnels/funnel-editor.php:57
+#, fuzzy
+msgid "Last Quarter"
+msgstr "Ultimul trimestru"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:41
+#: includes/admin/funnels/class-wpgh-funnels-table.php:134
+#: includes/admin/funnels/funnel-editor.php:58
+msgid "This Year"
+msgstr "Anul Acesta"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:42
+#: includes/admin/funnels/class-wpgh-funnels-table.php:135
+#: includes/admin/funnels/funnel-editor.php:59
+msgid "Last Year"
+msgstr "Anul Trecut"
+
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:86
+#, fuzzy
+msgid ""
+"Use this form to quickly change the reporting time for any Groundhogg "
+"reports that use it."
+msgstr ""
+"Utilizați acest formular pentru a modifica rapid timpul de raportare pentru "
+"orice rapoarte Groundhogg care îl utilizează."
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:17
+#, fuzzy
+msgid "UTM Campaign Report"
+msgstr "Raport de campanie UTM"
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:62
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:146
+#, fuzzy
+msgid "Nothing new to report."
+msgstr "Nimic nou de raportat."
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:73
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:159
+#, fuzzy
+msgid "Campaign"
+msgstr "Campanie"
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:74
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:160
+msgid "Source"
+msgstr "Sursă"
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:75
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:161
+msgid "Medium"
+msgstr "Mediu"
+
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:77
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:163
+msgid "Term"
+msgstr "Cuvant"
+
+#: includes/admin/emails/add-email.php:37
+msgid "Email Templates"
+msgstr "Şabloane email"
+
+#: includes/admin/emails/add-email.php:38
+#, fuzzy
+msgid "My Emails"
+msgstr "Meu poștă electronică"
+
+#: includes/admin/emails/add-email.php:58
+#: includes/admin/emails/add-email.php:77
+#, fuzzy
+msgid "Start Writing"
+msgstr "Pornire scriere"
+
+#: includes/admin/emails/add-email.php:73
+#, fuzzy
+msgid "Custom Email"
+msgstr "E-mail personalizat"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:31
+msgid "Button"
+msgstr "Buton"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:55
+#, fuzzy
+msgid "I am a button &rarr;"
+msgstr "Sunt un buton &rarr;"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:78
+msgid "Button Text"
+msgstr "Buton text"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:87
+msgid "Button Link"
+msgstr "Legătură buton"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:96
+msgid "Button Color"
+msgstr "Culoare buton"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:105
+msgid "Font Color"
+msgstr "Culoare font"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:114
+msgid "Font Size"
+msgstr "Mărime Font"
+
+#: includes/admin/emails/blocks/wpgh-button-block.php:126
+msgid "Button Font"
+msgstr "Fontul butonului"
+
+#: includes/admin/emails/blocks/wpgh-divider-block.php:31
+msgid "Divider"
+msgstr "Separator"
+
+#: includes/admin/emails/blocks/wpgh-divider-block.php:66
+#: includes/admin/emails/blocks/wpgh-image-block.php:77
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:469
+msgid "Width"
+msgstr "Lăţime"
+
+#: includes/admin/emails/blocks/wpgh-html-block.php:31
+msgid "HTML"
+msgstr "HTML"
+
+#: includes/admin/emails/blocks/wpgh-html-block.php:49
+#, fuzzy
+msgid ""
+"This is some custom HTML which you can edit on the right. You may enter any "
+"valid HTML tags, but they may get filtered out as some email browsers to not "
+"support certain HTML."
+msgstr ""
+"Acesta este un HTML personalizat pe care îl puteți edita pe dreapta. Puteți "
+"introduce orice etichete HTML valide, dar acestea pot obține filtrate ca "
+"unele browsere de e-mail pentru a nu accepta anumite HTML."
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:31
+#: includes/admin/emails/blocks/wpgh-image-block.php:68
+msgid "Image"
+msgstr "Imagine"
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:86
+#: includes/admin/emails/email-editor.php:133
+msgid "Alignment"
+msgstr "Aliniere"
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:91
+#: includes/admin/emails/email-editor.php:136
+msgid "Left"
+msgstr "Stânga"
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:92
+#: includes/admin/emails/email-editor.php:137
+msgid "Center"
+msgstr "Centru"
+
+#: includes/admin/emails/blocks/wpgh-image-block.php:93
+msgid "Right"
+msgstr "Dreapta"
+
+#: includes/admin/emails/blocks/wpgh-spacer-block.php:31
+msgid "Spacer"
+msgstr "Spacer"
+
+#: includes/admin/emails/blocks/wpgh-spacer-block.php:67
+msgid "Spacer Height"
+msgstr "Inaltime distanţier"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:31
+msgid "Text Block"
+msgstr "Bloheaza textul"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:53
+#, fuzzy
+msgid ""
+"Customize this section by editing the text, adding your own copy, \n"
+"            using the options above to bold, italicize, or create links and "
+"bullets, \n"
+"            or use the options in the \"Design\" panel on the left to "
+"change \n"
+"            the font styles of your email."
+msgstr ""
+"Particularizați această secțiune editând textul, adăugând propria copie, "
+"folosind opțiunile de mai sus pentru a Bold, italicize, sau de a crea link-"
+"uri și marcatori, sau de a folosi opțiunile din panoul \"design\" din stânga "
+"pentru a schimba stilurile fontului de e-mail."
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:71
+msgid "H1 Size"
+msgstr "H1 Mărime Font"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:83
+msgid "H1 Font"
+msgstr "H1 Font"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:91
+#, fuzzy
+msgid "H2 Size"
+msgstr "Dimensiune H2"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:103
+msgid "H2 Font"
+msgstr "H2 Font"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:111
+#, fuzzy
+msgid "Paragraph Size"
+msgstr "Dimensiune paragraf"
+
+#: includes/admin/emails/blocks/wpgh-text-block.php:123
+msgid "Paragraph Font"
+msgstr "Paragraful aliniat"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:112
+#, fuzzy
+msgid ""
+"Unlike most marketing automation platforms Groundhogg made the decision to "
+"<strong>store emails globally</strong>. That means that you can use the same "
+"email across different funnels without ever having to re-write it.\n"
+"                From this screen you can <strong>View/Edit/Delete</strong> "
+"emails and see their respective open rates across different funnels."
+msgstr ""
+"Spre deosebire de cele mai multe platforme de marketing automatizare "
+"Groundhogg a făcut decizia de a <strong> stoca e-mailuri la nivel global </"
+"strong>. Asta înseamnă că puteți utiliza același e-mail pe diferite pâlnii, "
+"fără a avea vreodată să re-scrie.\n"
+"                De pe acest ecran puteți <strong> Vizualizare/Editare/"
+"Ștergere </strong> e-mailuri și a vedea ratele lor deschise respective în "
+"diferite pâlnii."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:121
+#, fuzzy
+msgid ""
+"When you add a new email you can either select a pre-written email template "
+"created by our in house digital marketing specialists or you can select one "
+"of your own past written emails to copy."
+msgstr ""
+"Atunci când adăugați un e-mail nou, puteți selecta fie un șablon de e-mail "
+"pre-scris creat de specialistii nostri in casa de marketing digital sau "
+"puteți selecta unul dintre propriile e-mail-uri scrise din trecut pentru a "
+"copia."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:129
+#, fuzzy, php-format
+msgid ""
+"When you are editing an email, you can drag in new blocks from the right "
+"hand side into your email content. You can edit the appearance of the email "
+"with the settings on the left hand side of the email content. When designing "
+"our\n"
+"                email builder we made the decision to keep features sparse. "
+"Hence no columns and no frilly html stuff. Just the basics. The reason for "
+"this being 80% of email is read on mobile, so our email builder is optimized "
+"for better mobile consumption."
+msgstr ""
+"Când editați un e-mail, puteți trage în blocuri noi din partea dreaptă în "
+"conținutul de e-mail. Puteți edita aspectul e-mailului cu setările din "
+"partea stângă a conținutului de e-mail. La proiectarea nostru de e-mail "
+"Builder am luat decizia de a păstra caracteristici rare. Prin urmare, nu "
+"coloane și nu chestii frilly HTML. Doar elementele de bază. Motivul pentru "
+"aceasta fiind 80% din e-mail este citit pe mobil, astfel încât generatorul "
+"nostru de e-mail este optimizat pentru un consum mai bun de telefonie mobilă."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:131
+#, fuzzy
+msgid ""
+"When you believe an email is ready for sending set the status to "
+"<strong>Ready</strong> and then you can use it in any broadcast or funnel. "
+"An email which is in draft mode will not be sent."
+msgstr ""
+"Când credeți că un e-mail este gata pentru trimiterea setați starea la "
+"<strong> Ready </strong> și apoi îl puteți folosi în orice difuzare sau "
+"pâlnie. Un e-mail care este în modul de proiect nu va fi trimis."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:138
+#, fuzzy
+msgid "Testing"
+msgstr "Testare"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:139
+#, fuzzy
+msgid ""
+"To test an email simply check off the <strong>Send Test</strong> checkbox "
+"and select the user account you'd like to send the test to. For best "
+"results, use a minimal number of images, make text easy to read and write "
+"good content. Tests will be sent regardless of the email's current status."
+msgstr ""
+"Pentru a testa un e-mail, pur și simplu Verificați caseta de selectare "
+"<strong> Send test </strong> și selectați contul de utilizator la care "
+"doriți să trimiteți testul. Pentru cele mai bune rezultate, utilizați un "
+"număr minim de imagini, face textul ușor de citit și de a scrie conținut "
+"bun. Testele vor fi trimise indiferent de starea curentă a e-mailului."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:200
+#, fuzzy
+msgid "Add Email"
+msgstr "Adăugare E-mail"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:206
+#: includes/admin/emails/class-wpgh-emails-page.php:269
+#: includes/admin/emails/class-wpgh-emails-page.php:292
+#: includes/admin/emails/class-wpgh-emails-page.php:317
+#: includes/admin/emails/class-wpgh-emails-page.php:340
+#: includes/install.php:177
+msgid "Emails"
+msgstr ""
+"Emailurile pentru Notițe Client - sunt trimise atunci când adaugi o notită "
+"la o comandă"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:267
+#, fuzzy
+msgid "Trashed"
+msgstr "Distrus"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:290
+#: includes/admin/emails/class-wpgh-emails-page.php:315
+#: includes/admin/funnels/class-wpgh-funnels-page.php:397
+msgid "Deleted"
+msgstr "Șterse"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:338
+#: includes/admin/funnels/class-wpgh-funnels-page.php:422
+#, fuzzy
+msgid "Restored"
+msgstr "Restaurat"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:391
+#: includes/admin/emails/class-wpgh-emails-page.php:407
+#, fuzzy
+msgid "Could not create email."
+msgstr "Imposibil de creat e-mail."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:474
+#, fuzzy
+msgid "This email will not be sent while in DRAFT mode."
+msgstr "Acest e-mail nu va fi trimis în modul DRAFT."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:492
+#, fuzzy
+msgid "Email Updated."
+msgstr "E-mail actualizat."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:534
+#: includes/admin/emails/class-wpgh-emails-page.php:536
+#: includes/admin/emails/class-wpgh-emails-page.php:551
+#, fuzzy
+msgid "Failed to send test: "
+msgstr "Nu s-a reușit trimiterea testului:"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:542
+#, fuzzy
+msgid "Sent test email to"
+msgstr "Trimis e-mail de testare pentru a"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:551
+#, fuzzy
+msgid "No user selected. PLease select a user to send the test to."
+msgstr ""
+"Nici un utilizator selectat. Selectați un utilizator pentru a trimite testul."
+
+#: includes/admin/emails/class-wpgh-emails-page.php:579
+#: includes/admin/emails/class-wpgh-emails-page.php:581
+#, fuzzy
+msgid "Search Emails "
+msgstr "Caută e-mailuri"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:51
+msgctxt "Column label"
+msgid "Subject"
+msgstr "Subiect"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:52
+msgctxt "Column label"
+msgid "From User"
+msgstr ""
+"Ai primit pentru plata escrow suma de: %s de la utilizatorul: <b>%s</b>"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:53
+msgctxt "Column label"
+msgid "Author"
+msgstr "Autor"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:54
+#: includes/admin/funnels/class-wpgh-funnels-table.php:53
+#, fuzzy
+msgctxt "Column label"
+msgid "Last Updated"
+msgstr "Ultima actualizare"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:84
+msgid "Empty Trash"
+msgstr "Goleste cosul de gunoiul"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:106
+msgid "Ready"
+msgstr "Gata"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:108
+#: includes/admin/emails/class-wpgh-emails-table.php:180
+msgid "Draft"
+msgstr "Schita"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:110
+#: includes/admin/emails/class-wpgh-emails-table.php:157
+msgid "Trash"
+msgstr "Gunoi"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:153
+#: includes/admin/funnels/class-wpgh-funnels-table.php:198
+msgid "Restore"
+msgstr "Recupereaza"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:169
+#, fuzzy
+msgid "no subject"
+msgstr "nici un subiect"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:204
+#: includes/admin/emails/email-editor.php:191
+#, fuzzy
+msgid "The Contact's Owner"
+msgstr "Proprietarul contactului"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:250
+#: includes/admin/funnels/class-wpgh-funnels-table.php:253
+msgid "Updated"
+msgstr "Actualizat"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:300
+#: includes/admin/funnels/class-wpgh-funnels-table.php:317
+msgctxt "List table bulk action"
+msgid "Delete Permanently"
+msgstr "Sterge definitiv"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:301
+#: includes/admin/funnels/class-wpgh-funnels-table.php:318
+msgctxt "List table bulk action"
+msgid "Restore"
+msgstr "Recupereaza"
+
+#: includes/admin/emails/class-wpgh-emails-table.php:307
+msgctxt "List table bulk action"
+msgid "Trash"
+msgstr "Gunoi"
+
+#: includes/admin/emails/email-editor.php:87
+#: includes/admin/emails/email-editor.php:88
+#, fuzzy
+msgid "Subject Line: Used to capture the attention of the reader."
+msgstr "Subiect linie: folosit pentru a capta atenția cititorului."
+
+#: includes/admin/emails/email-editor.php:91
+#: includes/admin/emails/email-editor.php:92
+#, fuzzy
+msgid "Pre Header Text: Used to summarize the content of the email."
+msgstr "Pre antet text: folosit pentru a rezuma conținutul de e-mail."
+
+#: includes/admin/emails/email-editor.php:98
+#, fuzzy
+msgid "&larr; Back to editing funnel"
+msgstr "&larr; Înapoi la editarea pâlnie"
+
+#: includes/admin/emails/email-editor.php:128
+msgid "Email Options"
+msgstr "Optiuni email"
+
+#: includes/admin/emails/email-editor.php:142
+#, fuzzy
+msgid "Enable Browser View"
+msgstr "Activare vizualizare browser"
+
+#: includes/admin/emails/email-editor.php:182
+msgid "Sender"
+msgstr "Expeditor"
+
+#: includes/admin/emails/email-editor.php:190
+msgid "From User:"
+msgstr "De la:"
+
+#: includes/admin/emails/email-editor.php:195
+#, fuzzy
+msgid "Send Test:"
+msgstr "Trimite test:"
+
+#: includes/admin/emails/email-editor.php:201
+#, fuzzy
+msgid "Please Select One."
+msgstr "Vă rugăm selectați unul."
+
+#: includes/admin/emails/email-editor.php:219
+#, fuzzy
+msgid "Blocks"
+msgstr "Blocuri"
+
+#: includes/admin/events/class-wpgh-events-page.php:102
+msgid "Add Event"
+msgstr "Adaugă eveniment"
+
+#: includes/admin/events/class-wpgh-events-page.php:105
+msgid "Edit Event"
+msgstr "Editeaza eveniment"
+
+#: includes/admin/events/class-wpgh-events-page.php:108
+msgid "Events"
+msgstr "Evenimente"
+
+#: includes/admin/events/class-wpgh-events-page.php:138
+#, fuzzy
+msgid "events cancelled"
+msgstr "Evenimente anulate"
+
+#: includes/admin/events/class-wpgh-events-page.php:164
+#, fuzzy
+msgid "events rescheduled"
+msgstr "evenimente reprogramate"
+
+#: includes/admin/events/class-wpgh-events-page.php:200
+#: includes/admin/events/class-wpgh-events-page.php:202
+#, fuzzy
+msgid "Search Events "
+msgstr "Căutare evenimente"
+
+#: includes/admin/events/class-wpgh-events-table.php:46
+msgctxt "Column label"
+msgid "Contact"
+msgstr "Contact"
+
+#: includes/admin/events/class-wpgh-events-table.php:89
+#, fuzzy
+msgid "contact deleted"
+msgstr "contact șters"
+
+#: includes/admin/events/class-wpgh-events-table.php:111
+msgid "deleted"
+msgstr "șterse"
+
+#: includes/admin/events/class-wpgh-events-table.php:137
+#, fuzzy
+msgid "(step deleted)"
+msgstr "(pas șters)"
+
+#: includes/admin/events/class-wpgh-events-table.php:152
+#, fuzzy, php-format
+msgid "Process Events (Auto Runs In %s)"
+msgstr "Evenimente proces (auto runs în %s)"
+
+#: includes/admin/events/class-wpgh-events-table.php:173
+#, fuzzy
+msgid "Will run"
+msgstr "Va rula"
+
+#: includes/admin/events/class-wpgh-events-table.php:179
+msgid "Skipped"
+msgstr "Ignorat"
+
+#: includes/admin/events/class-wpgh-events-table.php:182
+#, fuzzy
+msgid "Processed"
+msgstr "Prelucrate"
+
+#: includes/admin/events/class-wpgh-events-table.php:240
+#, fuzzy
+msgctxt "List table bulk action"
+msgid "Run"
+msgstr "Rula"
+
+#: includes/admin/events/class-wpgh-events-table.php:241
+msgctxt "List table bulk action"
+msgid "Cancel"
+msgstr "Anulează"
+
+#: includes/admin/events/class-wpgh-events-table.php:267
+#, fuzzy
+msgid "Waiting <span class=\"count\">("
+msgstr "Așteptare < span class = \"count\" > ("
+
+#: includes/admin/events/class-wpgh-events-table.php:268
+#, fuzzy
+msgid "Skipped <span class=\"count\">("
+msgstr "Omis < span class = \"count\" > ("
+
+#: includes/admin/events/class-wpgh-events-table.php:269
+#, fuzzy
+msgid "Cancelled <span class=\"count\">("
+msgstr "Anulat < span class = \"count\" > ("
+
+#: includes/admin/events/class-wpgh-events-table.php:270
+#, fuzzy
+msgid "Completed <span class=\"count\">("
+msgstr "Finalizat < span class = \"count\" > ("
+
+#: includes/admin/events/class-wpgh-events-table.php:390
+#, fuzzy
+msgid "Execute"
+msgstr "Executa"
+
+#: includes/admin/events/class-wpgh-events-table.php:406
+#, fuzzy
+msgid "Re-execute"
+msgstr "Re-executa"
+
+#: includes/admin/events/class-wpgh-events-table.php:416
+#: includes/admin/events/class-wpgh-events-table.php:417
+#, fuzzy
+msgid "View Contact"
+msgstr "Vizualizare contact"
+
+#: includes/admin/extensions/module-manager.php:144
+#: includes/admin/extensions/module-manager.php:172
+msgid "An error occurred, please try again."
+msgstr "A aparut o eroare, te rugam sa incerci din nou."
+
+#: includes/admin/extensions/module-manager.php:151
+#, fuzzy, php-format
+msgid "Your license key expired on %s."
+msgstr "Cheia de licență a expirat la %s."
+
+#: includes/admin/extensions/module-manager.php:156
+#, fuzzy
+msgid "Your license key has been disabled."
+msgstr "Cheia de licență a fost dezactivată."
+
+#: includes/admin/extensions/module-manager.php:159
+#, fuzzy
+msgid "Invalid license."
+msgstr "Licență nevalidă."
+
+#: includes/admin/extensions/module-manager.php:163
+#, fuzzy
+msgid "Your license is not active for this URL."
+msgstr "Licența nu este activă pentru această adresă URL."
+
+#: includes/admin/extensions/module-manager.php:166
+#, fuzzy
+msgid "This appears to be an invalid license key"
+msgstr "Aceasta pare a fi o cheie de licență nevalidă"
+
+#: includes/admin/extensions/module-manager.php:169
+#, fuzzy
+msgid "Your license key has reached its activation limit."
+msgstr "Cheia de licență a atins limita de activare."
+
+#: includes/admin/extensions/module-manager.php:189
+#, fuzzy
+msgid "License Activated"
+msgstr "Licență activată"
+
+#: includes/admin/extensions/module-manager.php:235
+#, fuzzy
+msgid ""
+"Enter your extension license keys here to receive updates for purchased "
+"extensions. If your license key has expired, <a href=\"https://groundhogg.io/"
+"account/\">please renew your license.</a>"
+msgstr ""
+"Introduceți cheile de licență de extensie aici pentru a primi actualizări "
+"pentru extensiile achiziționate. Dacă cheia de licență a expirat, < a href = "
+"\"https://groundhogg.io/account/\" > vă rugăm să reînnoiți licența. </a>"
+
+#: includes/admin/extensions/module-manager.php:239
+#, fuzzy
+msgid "You have no extensions installed. Want some?"
+msgstr "Nu aveți instalate extensii. Vrei și tu?"
+
+#: includes/admin/extensions/module-manager.php:239
+#, fuzzy
+msgid "Get your first extension!"
+msgstr "Ia prima prelungire!"
+
+#: includes/admin/extensions/module-manager.php:286
+#, fuzzy
+msgid "No data. See your account at Groundhogg.io"
+msgstr "Nu există date. Vezi contul tău la Groundhogg.io"
+
+#: includes/admin/extensions/module-manager.php:309
+#, fuzzy
+msgid "Activate Extension"
+msgstr "Activare extensie"
+
+#: includes/admin/extensions/module-manager.php:312
+#, fuzzy, php-format
+msgid "<p>Your license expires on %s</p>"
+msgstr "<p> licența expiră pe %s </p>"
+
+#: includes/admin/extensions/updater/EDD_SL_Plugin_Updater.php:235
+#, php-format
+msgid ""
+"There is a new version of %1$s available. %2$sView version %3$s details%4$s."
+msgstr ""
+"Există o nouă versiune disponibila a %1$s.  %2$sVedeți detaliile %3$s "
+"versiunii%4$s."
+
+#: includes/admin/extensions/updater/EDD_SL_Plugin_Updater.php:243
+#, php-format
+msgid ""
+"There is a new version of %1$s available. %2$sView version %3$s details%4$s "
+"or %5$supdate now%6$s."
+msgstr ""
+"Există o nouă versiune disponibilă a %1$s.  %2$s Vedeți detaliile %3$s "
+"versiunii%4$s sau %5$sactualizați acum%6$s."
+
+#: includes/admin/extensions/updater/EDD_SL_Plugin_Updater.php:433
+msgid "You do not have permission to install plugin updates"
+msgstr "Nu aveți permisiunea să instalați actualizări ale modulului"
+
+#: includes/admin/extensions/updater/EDD_SL_Plugin_Updater.php:433
+msgid "Error"
+msgstr "Eroare"
+
+#: includes/admin/funnels/add-funnel.php:24
+#, fuzzy
+msgid "Funnel Templates"
+msgstr "Șabloane pâlnie"
+
+#: includes/admin/funnels/add-funnel.php:25
+msgid "Marketplace"
+msgstr "Piaţă"
+
+#: includes/admin/funnels/add-funnel.php:26
+#, fuzzy
+msgid "Import Funnel"
+msgstr "Import pâlnie"
+
+#: includes/admin/funnels/add-funnel.php:43
+#, fuzzy
+msgid "Start Building"
+msgstr "Începe construirea"
+
+#: includes/admin/funnels/add-funnel.php:62
+#, fuzzy
+msgid "Search for templates from our marketplace."
+msgstr "Căutați șabloane de pe piața noastră."
+
+#: includes/admin/funnels/add-funnel.php:63
+#, fuzzy
+msgid ""
+"Want to share your funnel with the world? <a target=\"_blank\" href="
+"\"https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/"
+"\">Get Started Now!</a>"
+msgstr ""
+"Vrei să împarți pâlnia cu lumea? < a target = \"_ blank\" href = \"https://"
+"www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/\" > Începeți "
+"acum! </a>"
+
+#: includes/admin/funnels/add-funnel.php:65
+#, fuzzy
+msgid "Type in a search term like \"Webinar\"..."
+msgstr "Tip într-un termen de căutare ca \"Webinar\"..."
+
+#: includes/admin/funnels/add-funnel.php:123
+#, fuzzy
+msgid ""
+"If you have a funnel import file (ends in .funnel) you can upload it here!"
+msgstr ""
+"Dacă aveți un fișier de import pâlnie (se termină în. pâlnie) puteți încărca "
+"aici!"
+
+#: includes/admin/funnels/add-funnel.php:127
+#, fuzzy
+msgid "Import Funnels"
+msgstr "Import pâlnii"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:134
+#, fuzzy
+msgid ""
+"Here you can edit your funnels. A funnel is a set of steps which can run "
+"automation based on contact interactions with your site. You can view the "
+"number of active contacts in each funnel, as well as when it was created and "
+"last updated."
+msgstr ""
+"Aici puteți edita canalele dvs. O pâlnie este un set de pași care pot rula "
+"automatizare pe baza interacțiunilor de contact cu site-ul dumneavoastră. "
+"Puteți vizualiza numărul contactelor active din fiecare pâlnie, precum și "
+"atunci când a fost creată și actualizată ultima dată."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:135
+#, fuzzy
+msgid ""
+"Funnels can be either Active/Inactive/Archived. If a funnel is Inactive, no "
+"contacts can enter and any contacts that may have been in the funnel will "
+"stop moving forward. The same goes for Archived funnels which simply do not "
+"show in the main list."
+msgstr ""
+"Canalele pot fi fie active/inactive/arhivate. Dacă o pâlnie este inactiv, nu "
+"poate intra niciun contact, iar contactele care ar fi putut fi în pâlnie vor "
+"înceta să avanseze. Același lucru este valabil și pentru canalele arhivate "
+"care pur și simplu nu se afișează în lista principală."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:142
+#, fuzzy
+msgid "Add A Funnel"
+msgstr "Adăugare pâlnie"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:143
+#, fuzzy
+msgid ""
+"To create a new funnel, simply click the Add New Button in the top left and "
+"select a pre-built funnel template. If you have a funnel import file you can "
+"click the import tab and upload the funnel file which will auto generate a "
+"funnel for you."
+msgstr ""
+"Pentru a crea o pâlnie nouă, pur și simplu faceți clic pe butonul Adăugare "
+"nou din partea stângă sus și selectați un șablon de pâlnie pre-construit. "
+"Dacă aveți un fișier de import pâlnie puteți face clic pe fila import și "
+"încărcați fișierul pâlnie care va genera automat o pâlnie pentru tine."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:151
+#, fuzzy
+msgid ""
+"When editing a funnel you can add Funnel Steps. Funnel Steps are either "
+"Benchmarks or Actions. Benchmarks are whenever a Contact \"does\" something, "
+"while Actions are doing thing to a contact such as sending an email. Simply "
+"drag in the desired funnel steps in any order."
+msgstr ""
+"Atunci când editați o pâlnie puteți adăuga pași pâlnie. Pașii pâlnii sunt "
+"fie indici de referință, fie acțiuni. Repere sunt de fiecare dată când un "
+"contact does ceva, în timp ce acțiunile fac lucru la un contact, ar fi "
+"trimiterea unui e-mail. Pur și simplu trageți în pașii dorite pâlnie în "
+"orice ordine."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:152
+#, fuzzy
+msgid ""
+"Actions are run sequentially, so when an action takes place, it simply loads "
+"the next action. That means if you need to change it you can!"
+msgstr ""
+"Acțiunile sunt conduse secvențial, astfel încât atunci când are loc o "
+"acțiune, se încarcă pur și simplu următoarea acțiune. Asta înseamnă că, dacă "
+"aveți nevoie pentru a schimba puteți!"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:153
+#, fuzzy
+msgid ""
+"Benchmarks are a bit different. If you have several benchmarks in a row, "
+"what happens is once one of them is completed by a contact the first action "
+"found proceeding that benchmark is launched, skipping all other benchmarks. "
+"That way you can have multiple automation triggers. "
+msgstr ""
+"Criteriile de referință sunt puțin diferite. Dacă aveți mai multe criterii "
+"de referință într-un rând, ceea ce se întâmplă este o dată una dintre ele "
+"este completat de către un contact prima acțiune a constatat că procedura de "
+"referință este lansat, sărind peste toate celelalte criterii de referință. "
+"În acest fel puteți avea mai multe declanșatoare de automatizare."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:154
+#, fuzzy
+msgid ""
+"Once a benchmark is complete all elements that are scheduled before that "
+"benchmark will stop immediately."
+msgstr ""
+"Odată ce un indice de referință este complet toate elementele care sunt "
+"programate înainte de acest indice de referință se va opri imediat."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:161
+#, fuzzy
+msgid "Reporting"
+msgstr "Raportare"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:162
+#, fuzzy
+msgid ""
+"To view funnel reporting, simply dgo to the editing screen of any funnel, "
+"and then toggle the Reporting/Editing switch in the reporting box. You can "
+"select the time range which you would like to view by using the dropdown on "
+"the left and click the filter button."
+msgstr ""
+"Pentru a vizualiza raportarea pâlnie, pur și simplu DGO la ecranul de "
+"editare de orice pâlnie, și apoi comutați comutatorul de raportare/editare "
+"în caseta de raportare. Puteți selecta intervalul de timp pe care doriți să "
+"îl vizualizați utilizând meniul vertical din stânga și faceți clic pe "
+"butonul filtru."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:295
+#, fuzzy
+msgid "Add Funnel"
+msgstr "Adăugare pâlnie"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:298
+#, fuzzy
+msgid "Edit Funnel"
+msgstr "Editare pâlnie"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:301
+#, fuzzy
+msgid "Funnels"
+msgstr "Pâlnii"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:354
+#, fuzzy
+msgid "Funnel Duplicated"
+msgstr "Pâlnie duplicată"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:374
+#: includes/admin/funnels/class-wpgh-funnels-table.php:100
+#, fuzzy
+msgid "Archived"
+msgstr "Arhivate"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:524
+#, fuzzy
+msgid "Please select a template..."
+msgstr "Vă rugăm să selectați un șablon..."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:535
+#, fuzzy
+msgid "Funnel Created"
+msgstr "Pâlnie creată"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:584
+#: includes/admin/funnels/funnel-editor.php:290
+#, fuzzy
+msgid "Drag in new steps to build the ultimate sales machine!"
+msgstr "Trageți în pași noi pentru a construi masina de vanzare final!"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:655
+#, fuzzy
+msgid "Completed Events"
+msgstr "Evenimente finalizate"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:659
+#, fuzzy
+msgid "Waiting Contacts"
+msgstr "Persoane de contact în așteptare"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:680
+#, fuzzy
+msgid ""
+"Your [max_input_vars] is too small for your funnel! You may experience odd "
+"behaviour and your funnel may not save correctly. Please <a target=\"_blank"
+"\" href=\"http://www.google.com/search?q=increase+max_input_vars+php"
+"\">increase your [max_input_vars] to at least double the current size.</a>."
+msgstr ""
+"Your [max_input_vars] este prea mic pentru pâlnie dvs.! Este posibil să "
+"aveți un comportament ciudat și ca pâlnia să nu se salveze corect. Vă rugăm "
+"să < a target = \"_ blank\" href = \"http://www.google.com/search? q = "
+"mărire + max_input_vars + php\" > măriți-vă [max_input_vars] cel puțin dublu "
+"dimensiunea curentă. </a>."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:699
+#, fuzzy
+msgid "Funnel no longer active."
+msgstr "Pâlnie nu mai este activ."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:757
+#, fuzzy
+msgid "Funnels must start with 1 or more benchmarks"
+msgstr "Canalele trebuie să înceapă cu 1 sau mai multe criterii de referință"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:763
+#, fuzzy
+msgid "Funnel Updated"
+msgstr "Canal actualizat"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:934
+#, fuzzy, php-format
+msgid "%d contacts added to funnel!"
+msgstr "% d contacte adăugate la pâlnie!"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:971
+#: includes/admin/funnels/class-wpgh-funnels-page.php:973
+#, fuzzy
+msgid "Search Funnels "
+msgstr "Căutare pâlnii"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1098
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1107
+#, fuzzy
+msgid "Buy Now ($"
+msgstr "Cumpara acum ($"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1112
+msgid "Download"
+msgstr "Descarcă"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1122
+#, fuzzy
+msgid "Sorry, no templates were found."
+msgstr "Ne pare rău, nu template-uri au fost găsite."
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:51
+msgctxt "Column label"
+msgid "Title"
+msgstr "Titlu"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:52
+#, fuzzy
+msgctxt "Column label"
+msgid "Active Contacts"
+msgstr "Contacte active"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:54
+msgctxt "Column label"
+msgid "Date Created"
+msgstr "Data crearii"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:96
+msgid "Active"
+msgstr "Activ"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:98
+#: includes/admin/funnels/class-wpgh-funnels-table.php:222
+msgid "Inactive"
+msgstr "Inactiv"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:201
+#, fuzzy
+msgid "Build"
+msgstr "Construi"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:202
+msgid "Duplicate"
+msgstr "Duplicare"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:203
+msgid "Archive"
+msgstr "Arhiva"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:211
+msgid "no title"
+msgstr "Titlul"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:323
+msgctxt "List table bulk action"
+msgid "Archive"
+msgstr "Arhiva"
+
+#: includes/admin/funnels/funnel-editor.php:41
+#, fuzzy
+msgid "Enter Funnel Name Here"
+msgstr "Introduceți numele pâlnie aici"
+
+#: includes/admin/funnels/funnel-editor.php:110
+#: includes/admin/funnels/funnel-editor.php:167
+#, fuzzy
+msgid "Add Contacts"
+msgstr "Adăugare contacte"
+
+#: includes/admin/funnels/funnel-editor.php:119
+#, fuzzy
+msgid "Select contacts to add into funnel:"
+msgstr "Selectați contactele de adăugat în pâlnie:"
+
+#: includes/admin/funnels/funnel-editor.php:137
+#, fuzzy
+msgid "Select where to start:"
+msgstr "Selectați de unde să începeți:"
+
+#: includes/admin/funnels/funnel-editor.php:175
+#, fuzzy
+msgid "Export Funnel"
+msgstr "Export pâlnie"
+
+#: includes/admin/funnels/funnel-editor.php:199
+#, fuzzy
+msgid "Benchmarks"
+msgstr "Repere"
+
+#: includes/admin/funnels/funnel-editor.php:229
+#, fuzzy
+msgid "Benchmarks start and stop automation elements for a contact."
+msgstr ""
+"Valorile de referință pornesc și opresc elementele de automatizare pentru un "
+"contact."
+
+#: includes/admin/funnels/funnel-editor.php:267
+#, fuzzy
+msgid "Actions are launched whenever a contact completes a benchmark."
+msgstr ""
+"Acțiunile sunt lansate de fiecare dată când un contact completează un indice "
+"de referință."
+
+#: includes/admin/funnels/funnel-editor.php:313
+#, fuzzy
+msgid "Auto Saved..."
+msgstr "Auto salvate..."
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:61
+#: includes/admin/settings/class-wpgh-settings-page.php:722
+msgid "Settings"
+msgstr "Setări"
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:70
+#, fuzzy
+msgid "Enable Multisite Database"
+msgstr "Activare bază de date multisite"
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:79
+#, fuzzy
+msgid ""
+"This will enable a global database for all your sites in this multisite "
+"installation."
+msgstr ""
+"Acest lucru va permite o bază de date globală pentru toate site-urile în "
+"această instalare multisite."
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:80
+#, fuzzy
+msgid ""
+"You will have to manage all plugin settings from your MAIN blog, and any "
+"Groundhogg extensions should be made network active as well."
+msgstr ""
+"Va trebui să gestioneze toate setările plugin de la blog-ul principal, "
+"precum și orice extensii Groundhogg ar trebui să fie făcute de rețea activă, "
+"de asemenea."
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:89
+#: includes/class-wpgh-html.php:100 includes/class-wpgh-popup.php:33
+#: includes/class-wpgh-popup.php:61
+msgid "Save Changes"
+msgstr "Salvare Modificari"
+
+#: includes/admin/multisite/class-wpgh-network-settings-page.php:108
+#, fuzzy
+msgid "Settings Updated!"
+msgstr "Setări actualizate!"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:52
+msgid "API Key"
+msgstr "API Key"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:53
+msgid "API Keys"
+msgstr "Chei API"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:141
+#, fuzzy
+msgid "Reissue"
+msgstr "Reemiterea"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:146
+#, fuzzy
+msgid "Revoke"
+msgstr "Revoca"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:163
+msgid "Public Key"
+msgstr "Public Key"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:164
+#, fuzzy
+msgid "Token"
+msgstr "Simbol"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:165
+msgid "Secret Key"
+msgstr "Cheie secretă"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:198
+#, fuzzy
+msgid "Please Select a User"
+msgstr "Vă rugăm să selectați un utilizator"
+
+#: includes/admin/settings/class-wpgh-api-keys-table.php:199
+#, fuzzy
+msgid "Generate New API Keys"
+msgstr "Generare chei API noi"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:113
+msgid "General"
+msgstr "General"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:117
+msgid "Marketing"
+msgstr "Marketing"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:125
+msgid "Tools"
+msgstr "Unelte"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:129
+msgid "Licenses"
+msgstr "Licențe"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:133
+msgid "API"
+msgstr "API"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:148
+#, fuzzy
+msgid "Business Settings"
+msgstr "Setări firmă"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:153
+#, fuzzy
+msgid "Misc Settings"
+msgstr "Setări misc"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:158
+msgid "Pages"
+msgstr "Pagini"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:163
+msgid "Captcha"
+msgstr "Captcha"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:173
+#, fuzzy
+msgid "Email Bounces"
+msgstr "E-mail bounces"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:178
+#, fuzzy
+msgid "Groundhogg Email Service"
+msgstr "Serviciul de E-mail Groundhogg"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:183
+msgid "API Settings"
+msgstr "Setări API"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:233
+msgid "Business Name"
+msgstr "Nume afacere"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:234
+#, fuzzy
+msgid "Your business name as it appears in the email footer."
+msgstr "Numele afacerii dvs., așa apare în subsolul de e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:246
+#: includes/admin/settings/class-wpgh-settings-page.php:270
+#: includes/admin/settings/class-wpgh-settings-page.php:282
+#: includes/admin/settings/class-wpgh-settings-page.php:294
+#: includes/admin/settings/class-wpgh-settings-page.php:306
+#: includes/admin/settings/class-wpgh-settings-page.php:318
+#, fuzzy
+msgid "As it should appear in your email footer."
+msgstr "Așa ar trebui să apară în subsolul de e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:258
+#, fuzzy
+msgid "(Optional) As it should appear in your email footer."
+msgstr "Opțional Așa ar trebui să apară în subsolul de e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:263
+#, fuzzy
+msgid "Unit 42"
+msgstr "Unitate 42"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:275
+#, fuzzy
+msgid "Toronto"
+msgstr "Toronto"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:293
+#, fuzzy
+msgid "State/Province/Region"
+msgstr "Stat/provincie/regiune"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:330
+#, fuzzy
+msgid "Delete Groundhogg Data"
+msgstr "Ștergere date Groundhogg"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:331
+#, fuzzy
+msgid "Delete all information when uninstalling. This cannot be undone."
+msgstr ""
+"Ștergeți toate informațiile când dezinstalați. Acest lucru nu poate fi "
+"anulat."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:334
+#: includes/admin/settings/class-wpgh-settings-page.php:448
+#: includes/admin/settings/class-wpgh-settings-page.php:475
+#: includes/admin/settings/class-wpgh-settings-page.php:489
+#: includes/admin/settings/class-wpgh-settings-page.php:503
+#: includes/admin/settings/class-wpgh-settings-page.php:576
+#: includes/admin/settings/class-wpgh-settings-page.php:590
+msgid "Enable"
+msgstr "Permite"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:344
+#, fuzzy
+msgid "Max Queued Events"
+msgstr "Max Queued evenimente"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:345
+#, fuzzy
+msgid ""
+"The maximum number of events that can be run during a single process of the "
+"event queue. For larger lists you may want to set this at a lower number for "
+"performance reasons."
+msgstr ""
+"Numărul maxim de evenimente care se pot executa în timpul unui singur proces "
+"de coadă de evenimente. Pentru liste mai mari, este posibil să doriți să "
+"setați acest lucru la un număr mai mic din motive de performanță."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:356
+#, fuzzy
+msgid "Queue Interval"
+msgstr "Interval coadă"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:357
+#, fuzzy
+msgid ""
+"The time interval in between iterations of when the event queue is processed."
+msgstr ""
+"Intervalul de timp între iterații de când este procesată coada de evenimente."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:372
+#, fuzzy
+msgid "Email Confirmation Page"
+msgstr "Pagina de confirmare a email-ului"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:373
+#, fuzzy
+msgid "Page contacts see when they confirm their email."
+msgstr "Contactele din pagină văd când își confirmă e-mailul."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:384
+msgid "Unsubscribe Page"
+msgstr "Pagina dezabonare"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:385
+#, fuzzy
+msgid "Page contacts see when they unsubscribe."
+msgstr "Contactele din pagină văd când se Dezabonează."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:396
+#, fuzzy
+msgid "Email Preferences Page"
+msgstr "Pagina de preferințe pentru E-mail"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:397
+#, fuzzy
+msgid "Page where contacts can manage their email preferences."
+msgstr "Pagina în care contactele își pot gestiona preferințele de e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:408
+#, fuzzy
+msgid "View Email In Browser Page"
+msgstr "Vizualizare E-mail în pagina browserului"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:409
+#, fuzzy
+msgid ""
+"Page containing the shortcode [browser_view] so contacts can view an email "
+"in the browser in the event their email client looks funky."
+msgstr ""
+"Pagina care conține Shortcode [browser_view] astfel încât contactele pot "
+"vizualiza un e-mail în browser-ul în cazul în care clientul lor de e-mail "
+"Arată funky."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:420
+#: includes/class-wpgh-email.php:434
+msgid "Privacy Policy"
+msgstr "Politică de confidențialitate"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:421
+#, fuzzy
+msgid "Link to your privacy policy."
+msgstr "Link la Politica de confidențialitate."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:432
+#, fuzzy
+msgid "Terms & Conditions (Terms of Service)"
+msgstr "Termeni si conditii (conditii de utilizare)"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:433
+#, fuzzy
+msgid "Link to your terms & conditions."
+msgstr "Leagă-te de termenii și condițiile tale."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:444
+#, fuzzy
+msgid "Only send to confirmed emails."
+msgstr "Trimite doar la e-mailuri confirmate."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:445
+#, fuzzy
+msgid ""
+"This will stop emails being sent to contacts who do not have confirmed "
+"emails outside of the below grace period."
+msgstr ""
+"Acest lucru va opri e-mailuri trimise contactelor care nu au confirmat e-"
+"mailuri în afara perioadei de grație de mai jos."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:458
+#, fuzzy
+msgid "Email confirmation grace Period"
+msgstr "Poștă electronică de confirmare perioada de grație"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:459
+#, fuzzy
+msgid ""
+"The number of days for which you can send an email to a contact after they "
+"are created but their email has not been confirmed. The default is 14 days."
+msgstr ""
+"Numărul de zile pentru care puteți trimite un e-mail la un contact după ce "
+"sunt create, dar e-mailul lor nu a fost confirmat. Valoarea prestabilită "
+"este de 14 zile."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:471
+#, fuzzy
+msgid "Enable GDPR features."
+msgstr "Activați funcțiile GDPR."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:472
+#, fuzzy
+msgid ""
+"This will add a consent box to your forms as well as a \"Delete Everything\" "
+"Button to your email preferences page."
+msgstr ""
+"Acest lucru va adăuga o cutie de consimțământ pentru formularele dvs., "
+"precum și un buton \"ștergeți totul\" la pagina de preferințe de e-mail."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:485
+#, fuzzy
+msgid "Do not send email without consent."
+msgstr "Nu trimiteți e-mail fără consimțământul dvs."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:486
+#, fuzzy
+msgid ""
+"This will prevent your system from sending emails to contacts for which you "
+"do not have explicit consent. Only works if GDPR features are enabled."
+msgstr ""
+"Acest lucru va împiedica sistemul să trimită e-mailuri către contactele "
+"pentru care nu aveți consimțământul explicit. Funcționează numai dacă "
+"funcțiile GDPR sunt activate."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:499
+#, fuzzy
+msgid "Enable Recaptcha on forms"
+msgstr "Activare reCAPTCHA pe formulare"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:500
+#, fuzzy
+msgid ""
+"Add a google recaptcha to all your forms made with the [gh_form] shortcode"
+msgstr ""
+"Adauga un reCAPTCHA Google la toate formularele făcute cu [gh_form] Shortcode"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:513
+#, fuzzy
+msgid "Recaptcha Site Key"
+msgstr "ReCAPTCHA site cheie"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:514
+#, fuzzy
+msgid "This is the key which faces the users on the front-end"
+msgstr "Aceasta este cheia care se confruntă cu utilizatorii de pe front-end"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:524
+#, fuzzy
+msgid "Recaptcha Secret Key"
+msgstr "ReCAPTCHA cheie secretă"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:525
+#, fuzzy
+msgid "Never ever ever share this with anyone!"
+msgstr "Niciodată să nu mai împarți asta cu nimeni!"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:535
+#, fuzzy
+msgid "Bounce Inbox"
+msgstr "Bounce Inbox"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:536
+#, fuzzy
+msgid "This is the inbox which emails will be sent to."
+msgstr "Acesta este Inbox care e-mailuri vor fi trimise la."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:549
+#, fuzzy
+msgid "Bounce Inbox Password"
+msgstr "Bounce parola Inbox"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:550
+#, fuzzy
+msgid "This password to access the inbox."
+msgstr "Această parolă pentru a accesa Inbox."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:560
+#, fuzzy
+msgid "Email Service Token"
+msgstr "Simbol serviciu E-mail"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:561
+#, fuzzy
+msgid ""
+"Get this key from your <a target=\"_blank\" href=\"https://www.groundhogg.io/"
+"account/manage/\">Groundhogg Account Page."
+msgstr ""
+"Obțineți această cheie de la < a target = \"_ blank\" href = \"https://www."
+"groundhogg.io/account/manage/\" > pagina de cont Groundhogg."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:572
+#, fuzzy
+msgid "Send Email With Groundhogg"
+msgstr "Trimite E-mail cu Groundhogg"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:573
+#, fuzzy
+msgid "Choose to send email with API."
+msgstr "Alegeți să trimiteți e-mailuri cu API."
+
+#: includes/admin/settings/class-wpgh-settings-page.php:586
+#, fuzzy
+msgid "Enable the Groundhogg API"
+msgstr "Activați API Groundhogg"
+
+#: includes/admin/settings/class-wpgh-settings-page.php:587
+#, fuzzy
+msgid ""
+"Enabling this will allow other platforms to access information on this site."
+msgstr ""
+"Activarea acestui lucru va permite altor platforme să acceseze informațiile "
+"de pe acest site."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:64
+#, fuzzy
+msgid ""
+"Superlinks are special superlinks that allow you to apply/remove tags "
+"whenever clicked and then take the contact to a page of your choice. To use "
+"them, just copy the replacement code and paste in in email, button, or link."
+msgstr ""
+"Superlinks sunt superlinks speciale care vă permit să se aplice/elimina Tag-"
+"uri de fiecare dată când faceți clic și apoi să ia contactul la o pagină de "
+"alegerea ta. Pentru a le utiliza, copiați doar codul de înlocuire și lipiți "
+"în e-mail, buton, sau link-ul."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:106
+#, fuzzy
+msgid "Edit Superlink"
+msgstr "Editare Superlink"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:109
+#, fuzzy
+msgid "Superlinks"
+msgstr "Superlinkuri"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:158
+#, fuzzy
+msgid "superlinks deleted"
+msgstr "superlinks șterse"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:199
+#, fuzzy
+msgid "Superlink created."
+msgstr "Superlink creat."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:226
+#, fuzzy
+msgid "Updated superlink."
+msgstr "Superlink actualizat."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:250
+#, fuzzy
+msgid "Search superlinks "
+msgstr "Căutare superlinks"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:252
+#, fuzzy
+msgid "Search Superlinks"
+msgstr "Caută Superlinks"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:259
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:287
+#, fuzzy
+msgid "Add New Superlink"
+msgstr "Adăugare Superlink nou"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:264
+#: includes/admin/superlinks/edit-superlink.php:25
+#, fuzzy
+msgid "Superlink Name"
+msgstr "Nume Superlink"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:266
+#: includes/admin/superlinks/edit-superlink.php:27
+#, fuzzy
+msgid "Name a Superlink something simple so you do not forget it."
+msgstr "Denumiți un superlink ceva simplu, astfel încât să nu uitați."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:269
+#: includes/admin/superlinks/edit-superlink.php:31
+msgid "Target URL"
+msgstr "URL țintă"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:271
+#: includes/admin/superlinks/edit-superlink.php:33
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:247
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:97
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:111
+msgid "Insert Link"
+msgstr "Adaugă Link"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:271
+#, fuzzy
+msgid ""
+"Insert a url that this link will direct to. This link can contain simple "
+"replacement codes."
+msgstr ""
+"Inserați un URL la care se va direcționa această legătură. Acest link poate "
+"conține coduri simple de înlocuire."
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:279
+#: includes/admin/superlinks/edit-superlink.php:43
+#, fuzzy
+msgid "Apply Tags When Clicked"
+msgstr "Aplicați etichete când faceți clic pe"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:285
+#, fuzzy
+msgid ""
+"These tags will be applied to a contact whenever this link is clicked. To "
+"create a new tag hit [Enter] or [,]"
+msgstr ""
+"Aceste etichete vor fi aplicate unui contact de fiecare dată când se face "
+"clic pe acest link. Pentru a crea o nouă etichetă de accesare [Enter] sau [,]"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:46
+#: includes/admin/tags/class-wpgh-tags-table.php:44
+msgctxt "Column label"
+msgid "Name"
+msgstr "Nume"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:47
+#, fuzzy
+msgctxt "Column label"
+msgid "Source Url"
+msgstr "URL sursă"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:48
+#, fuzzy
+msgctxt "Column label"
+msgid "Replacement Code"
+msgstr "Cod de înlocuire"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:49
+msgctxt "Column label"
+msgid "Tags"
+msgstr "Etichete"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-table.php:51
+#, fuzzy
+msgctxt "Column label"
+msgid "Target Url"
+msgstr "URL țintă"
+
+#: includes/admin/superlinks/edit-superlink.php:33
+#, fuzzy
+msgid ""
+"This is the url the contact will be re-directed to after clicking this "
+"Superlink."
+msgstr ""
+"Aceasta este URL-ul de contact va fi re-regizat de după ce faceți clic pe "
+"acest superlink."
+
+#: includes/admin/superlinks/edit-superlink.php:55
+#, fuzzy
+msgid ""
+"These tags will be applied to a contact whenever this link is clicked. To "
+"create a new tag hit [enter] or [comma]"
+msgstr ""
+"Aceste etichete vor fi aplicate unui contact de fiecare dată când se face "
+"clic pe acest link. Pentru a crea o nouă etichetă a lovit [Enter] sau "
+"[virgulă]"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:107
+msgid "Edit Tag"
+msgstr "Editare Etichetă"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:161
+#, fuzzy
+msgid "tags deleted"
+msgstr "Tag-uri șterse"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:206
+#, fuzzy
+msgid "Created new tag!"
+msgstr "Creat Tag-ul nou!"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:228
+#, fuzzy
+msgid "Updated tag!"
+msgstr "Actualizat Tag-ul!"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:253
+#, fuzzy
+msgid "Search Tags "
+msgstr "Tag-uri de căutare"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:255
+msgid "Search Tags"
+msgstr "Caută Etichete"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:262
+#: includes/admin/tags/class-wpgh-tags-page.php:299
+msgid "Add New Tag"
+msgstr "Adaugă Etichetă Noă"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:267
+msgid "Tag Name"
+msgstr "Nume Tag nou"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:269
+#, fuzzy
+msgid "Name a tag something simple so you do not forget it."
+msgstr "Denumiți o etichetă ceva simplu, astfel încât să nu uitați."
+
+#: includes/admin/tags/class-wpgh-tags-page.php:272
+#: includes/admin/tags/edit-tag.php:31 includes/class-wpgh-replacements.php:351
+msgid "Description"
+msgstr "Descriere"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:274
+#: includes/admin/tags/edit-tag.php:33
+#, fuzzy
+msgid ""
+"Tag descriptions are only visible to admins and will never be seen by "
+"contacts."
+msgstr ""
+"Descrierile etichetelor sunt vizibile numai pentru administratori și nu vor "
+"fi văzute niciodată de persoane de contact."
+
+#: includes/admin/tags/class-wpgh-tags-page.php:277
+#, fuzzy
+msgid "Bulk Add Tags"
+msgstr "Adăugare etichete în bloc"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:279
+#, fuzzy
+msgid "Enter 1 tag per line."
+msgstr "Introduceți 1 etichetă pe linie."
+
+#: includes/admin/tags/class-wpgh-tags-page.php:282
+#, fuzzy
+msgid "Add tags in bulk?"
+msgstr "Adăugați tag-uri în vrac?"
+
+#: includes/admin/tags/class-wpgh-tags-table.php:45
+msgctxt "Column label"
+msgid "Description"
+msgstr "Descriere"
+
+#: includes/admin/tags/class-wpgh-tags-table.php:46
+msgctxt "Column label"
+msgid "Count"
+msgstr "Numara"
+
+#: includes/admin/tags/class-wpgh-tags-table.php:66
+#, fuzzy
+msgid "Recount Contacts"
+msgstr "Recount contacte"
+
+#: includes/admin/tags/edit-tag.php:27
+#, fuzzy
+msgid "A descriptive name of the tag so you remember what it means"
+msgstr ""
+"Un nume descriptiv al etichetei, astfel încât să vă amintiți ce înseamnă"
+
+#: includes/admin/user/class-wpgh-user-tokens-section.php:31
+#, fuzzy
+msgid "API Tokens"
+msgstr "Token-uri API"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:35
+#, fuzzy
+msgid ""
+"You can get our entire extension library for $1 if <a href=\"https://www."
+"groundhogg.io/partner/\" target=\"_blank\">you refer a friend.</a>"
+msgstr ""
+"Puteți obține întreaga noastră bibliotecă de extensii pentru $1 dacă < a "
+"href = \"https://www.groundhogg.io/partner/\" target = \"_ blank\" > vă "
+"referiți la un prieten. </a>"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:59
+#, fuzzy
+msgid ""
+"While we work on an SMTP solution for you that is builtin, there are other "
+"ones out there. We recommend you install <a href=\"https://en-ca.wordpress."
+"org/plugins/wp-mail-smtp/\">WP Mail SMTP</a> to increase your deliverability."
+msgstr ""
+"În timp ce lucrăm la o soluție SMTP pentru tine, care este Builtin, există "
+"alte cele acolo. Va recomandam sa instalati < a href = \"https://en-ca."
+"wordpress.org/plugins/wp-mail-smtp/\" > WP mail SMTP </a> pentru a va creste "
+"livrabilitatea."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:72
+#, fuzzy
+msgid ""
+"It appears you have incomplete settings! Go to <a href=\"?page=gh_settings"
+"\">the settings page</a> and fill out all your business information."
+msgstr ""
+"Se pare că aveți setări incomplete! Du-te la < a href = \"? page = "
+"gh_settings\" > pagina de setări </a> și completați toate informațiile de "
+"afaceri."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:86
+#, fuzzy
+msgid ""
+"You have no active funnels! Go to <a href=\"?page=gh_funnels&action=add"
+"\">the funnels page</a> and create your first funnel!"
+msgstr ""
+"Nu ai nici o pâlnii active! Mergi la < a href = \"? page = gh_funnels & "
+"action = adaugă\" > pagina pâlpâie </a> și creează-ți primul canal!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:98
+#, fuzzy
+msgid ""
+"Seems like you need some more contacts. Go to the <a href=\"?"
+"page=gh_settings&tab=tools\">tools area</a> and import your mailing list!"
+msgstr ""
+"Se pare că ai nevoie de mai multe contacte. Du-te la < a href = \"? page = "
+"gh_settings & tab = instrumente\" > Instrumente zona </a> și de import lista "
+"de discuții!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:151
+#, fuzzy
+msgid "Full Walkthrough"
+msgstr "Full Walkthrough"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:152
+#, fuzzy
+msgid ""
+"Watch this full walkthrough of setting up Groundhogg and building your first "
+"funnel."
+msgstr ""
+"Uita-te la acest ghid complet de înființare Groundhogg și construirea pâlnie "
+"prima ta."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:157
+#, fuzzy
+msgid "Managing Users"
+msgstr "Gestionarea utilizatorilor"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:158
+#, fuzzy
+msgid ""
+"If you have sales people you need to read how you can give them only "
+"specific access to your CRM."
+msgstr ""
+"Dacă aveți vânzări de persoane pe care trebuie să le citiți le puteți oferi "
+"numai acces specific la CRM."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:163
+#, fuzzy
+msgid "How To Remain Compliant "
+msgstr "să rămână conforme"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:164
+#, fuzzy
+msgid ""
+"Learn about the tools Groundhogg provides so you can remain complaint in "
+"countries around the world."
+msgstr ""
+"Aflați mai multe despre instrumentele Groundhogg prevede astfel încât să "
+"puteți rămâne plângere în țările din întreaga lume."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:169
+#, fuzzy
+msgid "Send Marketing With Groundhogg"
+msgstr "Trimite marketing cu Groundhogg"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:170
+#, fuzzy
+msgid ""
+"Get your first 1000 credits free when you sign up! Send SMS and Email with "
+"Groundhogg."
+msgstr ""
+"Ia-ti primul 1000 credite gratuit atunci când vă înscrieți! Trimite SMS-uri "
+"și E-mail cu Groundhogg."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:212
+msgid "Read More..."
+msgstr "Detalii..."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:298
+#, fuzzy
+msgid "Buy Now!"
+msgstr "Cumpara acum!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:324
+#, fuzzy, php-format
+msgid "Welcome %s!"
+msgstr "Bine ati venit %s!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:338
+#, fuzzy
+msgid "Support Articles"
+msgstr "Articole de suport"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:339
+#, fuzzy
+msgid ""
+"Don't know where to start? Checkout these articles and learn how to make "
+"Groundhogg work for you."
+msgstr ""
+"Nu știu de unde să încep? Checkout aceste articole și să învețe să facă "
+"Groundhogg de lucru pentru tine."
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:341
+#: includes/admin/welcome/class-wpgh-welcome-page.php:367
+#, fuzzy
+msgid "View All!"
+msgstr "Vezi toate!"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:364
+#, fuzzy
+msgid "Awesome Extensions"
+msgstr "Extensii Awesome"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:365
+#, fuzzy
+msgid ""
+"Need more functionality? Need to connect Groundhogg to your store? We have "
+"an extension for that!"
+msgstr ""
+"Aveți nevoie de mai multă funcționalitate? Trebuie să conectez Groundhogg la "
+"magazinul tău? Avem o prelungire pentru asta!"
+
+#: includes/class-wpgh-bulk-contact-manager.php:129
+#, fuzzy
+msgid "Please select at least 1 tag."
+msgstr "Vă rugăm să selectați cel puțin 1 etichetă."
+
+#: includes/class-wpgh-bulk-contact-manager.php:163
+msgid "Import"
+msgstr "Import"
+
+#: includes/class-wpgh-bulk-contact-manager.php:236
+#, fuzzy, php-format
+msgid "Could not complete import for %s. Email field not present."
+msgstr ""
+"Imposibil de finalizat importul pentru %s. câmpul E-mail nu este prezent."
+
+#: includes/class-wpgh-email.php:442
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:309
+msgid "Terms"
+msgstr "Termeni"
+
+#: includes/class-wpgh-email.php:670
+#, fuzzy
+msgid "No contact provided..."
+msgstr "Nici un contact furnizat..."
+
+#: includes/class-wpgh-email.php:697
+#, fuzzy
+msgid "Contact is not marketable."
+msgstr "Contactul nu este negociabil."
+
+#: includes/class-wpgh-email.php:708
+#, fuzzy
+msgid ""
+"There must be a minimum 5 seconds before a contact can receive another email."
+msgstr ""
+"Trebuie să existe minimum 5 secunde înainte ca un contact să primească un "
+"alt e-mail."
+
+#: includes/class-wpgh-email.php:846
+msgid "An unknown error occurred."
+msgstr "S-a produs o eroare necunoscută."
+
+#: includes/class-wpgh-email.php:899
+#, fuzzy, php-format
+msgid ""
+"Email failed to send.\n"
+"Send time: %s\n"
+"To: %s\n"
+"Subject: %s\n"
+"\n"
+"Error: %s"
+msgstr ""
+"E-mail nu a reușit să trimiteți.\n"
+"Timp de expediere: %s la: %s subiect: %s error: %s"
+
+#: includes/class-wpgh-event-queue-v2.php:76
+#: includes/class-wpgh-event-queue.php:135
+#, fuzzy
+msgid "Every 10 Minutes"
+msgstr "La fiecare 10 minute"
+
+#: includes/class-wpgh-event-queue-v2.php:81
+#: includes/class-wpgh-event-queue.php:140
+#, fuzzy
+msgid "Every 5 Minutes"
+msgstr "La fiecare 5 minute"
+
+#: includes/class-wpgh-event-queue-v2.php:86
+#: includes/class-wpgh-event-queue.php:145
+#, fuzzy
+msgid "Every 1 Minutes"
+msgstr "La fiecare 1 minute"
+
+#: includes/class-wpgh-event-queue-v2.php:132
+#, fuzzy, php-format
+msgid ""
+"Event Queue Error: It appears that something is overriding the default "
+"timing of the event queue. The queue is expected to run %s but will not run "
+"for at least %s."
+msgstr ""
+"Eroare coadă evenimente: se pare că ceva este suprascrierea calendarul "
+"implicit de coada de evenimente. Este de așteptat ca coada să ruleze %s, dar "
+"nu se va executa pentru cel puțin %s."
+
+#: includes/class-wpgh-event-queue.php:203
+#, fuzzy
+msgid "Could not process queue for unknown reason."
+msgstr "Imposibil de procesat coada din motive necunoscute."
+
+#: includes/class-wpgh-event-queue.php:311
+#, fuzzy
+msgid "No events are available to process."
+msgstr "Nu sunt disponibile evenimente pentru procesare."
+
+#: includes/class-wpgh-form.php:291
+msgid "First Name *"
+msgstr "Nume *"
+
+#: includes/class-wpgh-form.php:298 includes/class-wpgh-form.php:324
+#, fuzzy
+msgid "Do not include numbers or special characters."
+msgstr "Nu includeți numere sau caractere speciale."
+
+#: includes/class-wpgh-form.php:317
+msgid "Last Name *"
+msgstr "Prenume:"
+
+#: includes/class-wpgh-form.php:343
+msgid "Email *"
+msgstr "Email*"
+
+#: includes/class-wpgh-form.php:368
+msgid "Phone *"
+msgstr "Telefon *"
+
+#: includes/class-wpgh-form.php:393
+#, fuzzy
+msgid "File *"
+msgstr "Fișier"
+
+#: includes/class-wpgh-form.php:423
+#, fuzzy
+msgid "Date *"
+msgstr "Data"
+
+#: includes/class-wpgh-form.php:457
+#, fuzzy
+msgid "Time *"
+msgstr "Timp"
+
+#: includes/class-wpgh-form.php:490
+msgid "Address *"
+msgstr "Adresa *"
+
+#: includes/class-wpgh-form.php:546
+msgid "Country *"
+msgstr "Ţara*"
+
+#: includes/class-wpgh-form.php:553
+msgid "Please select a country"
+msgstr "Selectați o țară"
+
+#: includes/class-wpgh-form.php:653
+#, fuzzy
+msgid "Number *"
+msgstr "Număr"
+
+#: includes/class-wpgh-form.php:691
+#, fuzzy
+msgid "Select *"
+msgstr "Selectați"
+
+#: includes/class-wpgh-form.php:698
+#, fuzzy
+msgid "Please select one"
+msgstr "Vă rugăm să selectați unul"
+
+#: includes/class-wpgh-form.php:763
+#, fuzzy
+msgid "Radio *"
+msgstr "Radio"
+
+#: includes/class-wpgh-form.php:879
+#, fuzzy
+msgid "I agree to the <i>terms of service</i>."
+msgstr "Sunt de acord cu <i> termeni de </i> de servicii."
+
+#: includes/class-wpgh-form.php:884
+#, fuzzy
+msgid "Please agree to the terms of service."
+msgstr "Vă rugăm să acceptați condițiile de utilizare."
+
+#: includes/class-wpgh-form.php:900
+#, fuzzy
+msgid ""
+"I consent to having my personal information collected, and to receive "
+"marketing and transactional information related to my request. "
+msgstr ""
+"Sunt de acord cu datele mele personale colectate și pentru a primi "
+"informații de marketing și tranzacționale legate de cererea mea."
+
+#: includes/class-wpgh-form.php:905
+#, fuzzy
+msgid "I Consent"
+msgstr "Sunt de acord"
+
+#: includes/class-wpgh-form.php:954
+#, fuzzy
+msgid "You cannot manage email preferences if no email exists."
+msgstr ""
+"Nu puteți gestiona preferințele de e-mail dacă nu există niciun e-mail."
+
+#: includes/class-wpgh-form.php:966
+#, fuzzy
+msgid "Your preferences have been changed!"
+msgstr "Preferințele tale au fost schimbate!"
+
+#: includes/class-wpgh-form.php:972
+#, fuzzy
+msgid ""
+"I love this company, you can communicate with me whenever you feel like."
+msgstr "Îmi place compania asta, poți comunica cu mine oricând ai chef."
+
+#: includes/class-wpgh-form.php:973
+#, fuzzy
+msgid "It's getting a bit much. Communicate with me weekly."
+msgstr "Devine un pic cam mult. Comunică cu mine săptămânal."
+
+#: includes/class-wpgh-form.php:974
+#, fuzzy
+msgid "Distance makes the heart grow fonder. Communicate with me monthly."
+msgstr "Distanța face ca inima să crească fonder. Comunică cu mine lunar."
+
+#: includes/class-wpgh-form.php:975
+#, fuzzy
+msgid "I no longer wish to receive any form of communication. Unsubscribe me!"
+msgstr "Nu mai doresc să primesc nicio formă de comunicare. Dezabonare-mă!"
+
+#: includes/class-wpgh-form.php:982
+#, fuzzy
+msgid "Manage Email Preferences For <b>"
+msgstr "Gestionați preferințele de E-mail pentru <b>"
+
+#: includes/class-wpgh-form.php:997
+#, fuzzy
+msgid " Please also delete all personal information on record."
+msgstr ""
+"De asemenea, vă rugăm să ștergeți toate informațiile personale de pe "
+"înregistrare."
+
+#: includes/class-wpgh-form.php:1036
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:289
+msgid "Submit"
+msgstr "Trimite"
+
+#: includes/class-wpgh-form.php:1101
+#, fuzzy
+msgid "(Edit Form)"
+msgstr "(Editare formular)"
+
+#: includes/class-wpgh-html.php:99
+#, fuzzy
+msgid "Open Modal"
+msgstr "Deschidere modal"
+
+#: includes/class-wpgh-html.php:522
+#, fuzzy
+msgid "Please Select One Or More Tags"
+msgstr "Vă rugăm să selectați una sau mai multe Tag-uri"
+
+#: includes/class-wpgh-html.php:628
+#, fuzzy
+msgid "Please select a contact"
+msgstr "Vă rugăm să selectați un contact"
+
+#: includes/class-wpgh-html.php:700
+#, fuzzy
+msgid "Please select an email"
+msgstr "Vă rugăm să selectați un e-mail"
+
+#: includes/class-wpgh-html.php:788
+#, fuzzy
+msgid "Please select 1 or more benchmarks"
+msgstr "Vă rugăm să selectați 1 sau mai multe criterii de referință"
+
+#: includes/class-wpgh-html.php:847
+#, fuzzy
+msgid "Please select 1 or more meta keys"
+msgstr "Vă rugăm să selectați 1 sau mai multe Meta Keys"
+
+#: includes/class-wpgh-html.php:933
+msgid "Upload Image"
+msgstr "Incarcati imagine"
+
+#: includes/class-wpgh-html.php:942
+#, fuzzy
+msgid "Src"
+msgstr "Src"
+
+#: includes/class-wpgh-html.php:949
+#, fuzzy
+msgid "Alt Tag"
+msgstr "Alt Tag"
+
+#: includes/class-wpgh-replacements.php:58
+#: includes/class-wpgh-replacements.php:63
+#, fuzzy
+msgid "The contact's first name."
+msgstr "Prenumele contactului."
+
+#: includes/class-wpgh-replacements.php:68
+#: includes/class-wpgh-replacements.php:73
+#: includes/class-wpgh-replacements.php:78
+#, fuzzy
+msgid "The contact's last name."
+msgstr "Numele de familie al contactului."
+
+#: includes/class-wpgh-replacements.php:83
+#, fuzzy
+msgid "The contact's email address."
+msgstr "Adresa de e-mail a contactului."
+
+#: includes/class-wpgh-replacements.php:88
+#, fuzzy
+msgid "The contact's phone number."
+msgstr "Numărul de telefon al contactului."
+
+#: includes/class-wpgh-replacements.php:93
+#, fuzzy
+msgid "The contact's phone number extension."
+msgstr "Extensia numărului de telefon al contactului."
+
+#: includes/class-wpgh-replacements.php:98
+#, fuzzy
+msgid "The contact's full address."
+msgstr "Adresa completă a contactului."
+
+#: includes/class-wpgh-replacements.php:103
+#, fuzzy
+msgid "The contact's company name."
+msgstr "Numele companiei persoanei de contact."
+
+#: includes/class-wpgh-replacements.php:108
+#, fuzzy
+msgid "The contact's job title."
+msgstr "Titlul postului de contact."
+
+#: includes/class-wpgh-replacements.php:113
+#, fuzzy
+msgid "The contact's company address."
+msgstr "Adresa companiei de contact."
+
+#: includes/class-wpgh-replacements.php:118
+#, fuzzy
+msgid "Any meta data related to the contact. Usage: {meta.attribute}"
+msgstr "Orice meta date legate de contact. Utilizare: {meta. Attribute}"
+
+#: includes/class-wpgh-replacements.php:123
+#, fuzzy
+msgid "The business name as defined in the settings."
+msgstr "Numele firmei, conform definiției din Setări."
+
+#: includes/class-wpgh-replacements.php:128
+#, fuzzy
+msgid "The business phone number as defined in the settings."
+msgstr "Numărul de telefon al afacerii, așa este definit în Setări."
+
+#: includes/class-wpgh-replacements.php:133
+#, fuzzy
+msgid "The business address as defined in the settings."
+msgstr "Adresa de firmă definită în Setări."
+
+#: includes/class-wpgh-replacements.php:138
+#: includes/class-wpgh-replacements.php:143
+#, fuzzy
+msgid "The contact owner's name."
+msgstr "Numele proprietarului contactului."
+
+#: includes/class-wpgh-replacements.php:148
+#, fuzzy
+msgid "The contact owner's email address."
+msgstr "Adresa de e-mail a proprietarului contactului."
+
+#: includes/class-wpgh-replacements.php:153
+#, fuzzy
+msgid "The contact owner's phone number."
+msgstr "Numărul de telefon al proprietarului contactului."
+
+#: includes/class-wpgh-replacements.php:158
+#, fuzzy
+msgid "A link to confirm the email address of a contact."
+msgstr "Un link pentru a confirma adresa de e-mail a unui contact."
+
+#: includes/class-wpgh-replacements.php:163
+#, fuzzy
+msgid ""
+"A link to confirm the email address of a contact which can be placed in a "
+"button or link."
+msgstr ""
+"Un link pentru a confirma adresa de e-mail a unui contact care poate fi "
+"plasat într-un buton sau link-ul."
+
+#: includes/class-wpgh-replacements.php:168
+#, fuzzy
+msgid "A superlink code. Usage: {superlink.id}"
+msgstr "Un cod de superlink. Utilizare: {superlink.id}"
+
+#: includes/class-wpgh-replacements.php:173
+#, fuzzy
+msgid ""
+"Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 "
+"days}"
+msgstr ""
+"Inserați o dată dinamică. Utilizare {date. format | timp}. Exemplu: {data. Y-"
+"m-d | + 2 zile}"
+
+#: includes/class-wpgh-replacements.php:178
+#, fuzzy
+msgid ""
+"Insert a download link for a file. Usage {files.key}. Example: {files."
+"custom_files}. Do find the key for a file see the contact record and copy "
+"the relevant replacement code."
+msgstr ""
+"Inserați un link de descărcare pentru un fișier. Utilizare {Files. Key}. "
+"Exemplu: {Files. custom_files}. Găsiți cheia pentru un fișier Vedeți "
+"înregistrarea de contact și copiați codul de înlocuire relevant."
+
+#: includes/class-wpgh-replacements.php:183
+#, fuzzy
+msgid ""
+"Inserts a random quote from the movie Groundhogg Day featuring Bill Murray"
+msgstr ""
+"Inserează un citat aleatoare din filmul Groundhogg ziua featuring Bill Murray"
+
+#: includes/class-wpgh-replacements.php:385
+#, fuzzy
+msgid "Insert Replacement"
+msgstr "Inserare înlocuire"
+
+#: includes/class-wpgh-replacements.php:386
+#: includes/elements/actions/class-wpgh-send-email.php:115
+#: includes/elements/actions/class-wpgh-send-email.php:127
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:203
+msgid "Close"
+msgstr "Închide"
+
+#: includes/class-wpgh-replacements.php:629
+#, fuzzy
+msgid "Confirm your email."
+msgstr "Confirmați-vă e-mailul."
+
+#: includes/class-wpgh-replacements.php:760
+#: includes/class-wpgh-replacements.php:787
+#: includes/class-wpgh-replacements.php:793
+#, fuzzy
+msgid "No files found."
+msgstr "Nu s-au găsit fișiere."
+
+#: includes/class-wpgh-roles.php:43
+#, fuzzy
+msgid "Marketer"
+msgstr "Marketing"
+
+#: includes/class-wpgh-roles.php:74
+#, fuzzy
+msgid "Sales Manager"
+msgstr "Manager vânzări"
+
+#: includes/class-wpgh-roles.php:420
+#, fuzzy, php-format
+msgid "Your user role does not have the required permissions to %s."
+msgstr "Rolul de utilizator nu are permisiunile necesare pentru %s."
+
+#: includes/class-wpgh-step.php:596
+#, fuzzy
+msgid "Step Title"
+msgstr "Titlu pas"
+
+#: includes/class-wpgh-step.php:605
+#, fuzzy
+msgid "Run on which blog?"
+msgstr "A alerga pe care blog?"
+
+#: includes/class-wpgh-step.php:620
+#, fuzzy
+msgid "Any blog"
+msgstr "Orice blog"
+
+#: includes/class-wpgh-submission.php:315
+#, fuzzy
+msgid "Submission failed..."
+msgstr "Remitere nereușită..."
+
+#: includes/class-wpgh-submission.php:654
+#, fuzzy
+msgid "The file you have uploaded is too big."
+msgstr "Fișierul pe care l-ați încărcat este prea mare."
+
+#: includes/class-wpgh-submission.php:661
+#, fuzzy
+msgid "You are not permitted to upload this type of file."
+msgstr "Nu aveți permisiunea de a încărca acest tip de fișier."
+
+#: includes/db/class-wpgh-db-steps.php:93
+#, fuzzy
+msgid "New Step"
+msgstr "Pasul nou"
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:57
+#, fuzzy
+msgid "Follow up with {first} {last} tomorrow."
+msgstr "Urmați cu {primul} {Last} mâine."
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:63
+#, fuzzy
+msgid "Admin Notification for {first}"
+msgstr "Notificare de administrator pentru {First}"
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:79
+#, fuzzy
+msgid "Use any email address or the {owner_email} replacement code."
+msgstr "Utilizați orice adresă de e-mail sau codul de înlocuire {owner_email}."
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:85
+msgid "Subject:"
+msgstr "Subiect:"
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:94
+#: includes/elements/actions/class-wpgh-admin-notification.php:115
+#, fuzzy
+msgid "Use any valid replacement codes."
+msgstr "Utilizați orice coduri de înlocuire valide."
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:100
+#, fuzzy
+msgid "Notification Text:"
+msgstr "Text de notificare:"
+
+#: includes/elements/actions/class-wpgh-admin-notification.php:186
+#, fuzzy
+msgid "Manage Contact"
+msgstr "Gestionare contact"
+
+#: includes/elements/actions/class-wpgh-apply-note.php:53
+#, fuzzy
+msgid "This contact is super awesome!"
+msgstr "Acest contact este super minunat!"
+
+#: includes/elements/actions/class-wpgh-apply-note.php:60
+#, fuzzy
+msgid "Note Text:"
+msgstr "Notă text:"
+
+#: includes/elements/actions/class-wpgh-apply-note.php:75
+#, fuzzy
+msgid "Use any valid replacement codes"
+msgstr "Utilizați orice coduri de înlocuire valide"
+
+#: includes/elements/actions/class-wpgh-apply-owner.php:61
+#, fuzzy
+msgid "Apply Owner:"
+msgstr "Aplicare proprietar:"
+
+#: includes/elements/actions/class-wpgh-apply-owner.php:71
+#, fuzzy
+msgid "Selecting more than 1 owner will treat the step as a round robin."
+msgstr "Selectarea mai mult de 1 proprietar va trata pas ca un Robin rotund."
+
+#: includes/elements/actions/class-wpgh-apply-tag.php:61
+#, fuzzy
+msgid "Apply These Tags:"
+msgstr "Aplicați aceste Tag-uri:"
+
+#: includes/elements/actions/class-wpgh-apply-tag.php:68
+#: includes/elements/actions/class-wpgh-remove-tag.php:70
+#, fuzzy
+msgid "Add new tags by hitting [enter] or by typing a [comma]."
+msgstr "Adăugați etichete noi prin apăsarea [Enter] sau tastând o [virgulă]."
+
+#: includes/elements/actions/class-wpgh-create-user.php:62
+#, fuzzy
+msgid "Which account level would you like to grant?"
+msgstr "Ce nivel de cont doriți să acordați?"
+
+#: includes/elements/actions/class-wpgh-create-user.php:72
+#, fuzzy
+msgid "Which Blog?"
+msgstr "Care blog?"
+
+#: includes/elements/actions/class-wpgh-create-user.php:89
+#, fuzzy
+msgid "Add to all blogs"
+msgstr "Adauga la toate Blogurile"
+
+#: includes/elements/actions/class-wpgh-date-timer.php:67
+#, fuzzy
+msgid "Wait till:"
+msgstr "Așteptați până la:"
+
+#: includes/elements/actions/class-wpgh-date-timer.php:98
+#: includes/elements/actions/class-wpgh-delay-timer.php:145
+#: includes/elements/actions/class-wpgh-field-timer.php:202
+#, fuzzy
+msgid "Disable Temporarily:"
+msgstr "Dezactivare temporară:"
+
+#: includes/elements/actions/class-wpgh-date-timer.php:108
+#: includes/elements/actions/class-wpgh-delay-timer.php:155
+#: includes/elements/actions/class-wpgh-field-timer.php:212
+msgid "Disable"
+msgstr "Dezactivați"
+
+#: includes/elements/actions/class-wpgh-date-timer.php:167
+#, fuzzy, php-format
+msgid ""
+"You have date timers with descending dates! Your funnel may not work as "
+"expected. See <a href=\"#%d\">%s</a>! Timers with dates in the past will run "
+"immediately."
+msgstr ""
+"Ai cronometre cu date descrescatoare! Este posibil ca pâlnia să nu "
+"funcționeze conform așteptărilor. Vezi < a href = \"#% d\" > %s </a>! "
+"Cronometre cu date în trecut va rula imediat."
+
+#: includes/elements/actions/class-wpgh-date-timer.php:175
+#, fuzzy, php-format
+msgid ""
+"You have date timers with dates in the past! Your funnel may not work as "
+"expected. See <a href=\"#%d\">%s</a>! Timers with dates in the past will run "
+"immediately."
+msgstr ""
+"Ai cronometre cu date în trecut! Este posibil ca pâlnia să nu funcționeze "
+"conform așteptărilor. Vezi < a href = \"#% d\" > %s </a>! Cronometre cu date "
+"în trecut va rula imediat."
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:74
+#: includes/elements/actions/class-wpgh-field-timer.php:77
+#, fuzzy
+msgid "Wait at least:"
+msgstr "Așteptați cel puțin:"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:88
+#: includes/elements/actions/class-wpgh-field-timer.php:91
+msgid "Minutes"
+msgstr "Minute"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:89
+#: includes/elements/actions/class-wpgh-field-timer.php:92
+msgid "Hours"
+msgstr "Ore"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:90
+#: includes/elements/actions/class-wpgh-field-timer.php:93
+msgid "Days"
+msgstr "Zile"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:91
+#: includes/elements/actions/class-wpgh-field-timer.php:94
+msgid "Weeks"
+msgstr "Săptămâni"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:92
+#: includes/elements/actions/class-wpgh-field-timer.php:95
+msgid "Months"
+msgstr "Luni"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:107
+#: includes/elements/actions/class-wpgh-field-timer.php:164
+#, fuzzy
+msgid "And run:"
+msgstr "Și a alerga:"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:112
+#: includes/elements/actions/class-wpgh-field-timer.php:169
+#, fuzzy
+msgid "Immediately"
+msgstr "Imediat"
+
+#: includes/elements/actions/class-wpgh-delay-timer.php:113
+#: includes/elements/actions/class-wpgh-field-timer.php:170
+#, fuzzy
+msgid "At time of day..."
+msgstr "La momentul zilei..."
+
+#: includes/elements/actions/class-wpgh-edit-meta.php:67
+#: includes/elements/actions/class-wpgh-http-post.php:84
+msgid "Key: "
+msgstr "Cheie: "
+
+#: includes/elements/actions/class-wpgh-edit-meta.php:80
+#: includes/elements/actions/class-wpgh-http-post.php:97
+#, fuzzy
+msgid "Value: "
+msgstr "Valoarea:"
+
+#: includes/elements/actions/class-wpgh-field-timer.php:96
+#, fuzzy
+msgid "No Delay"
+msgstr "Fără întârziere"
+
+#: includes/elements/actions/class-wpgh-field-timer.php:113
+msgid "Before"
+msgstr "Înainte"
+
+#: includes/elements/actions/class-wpgh-field-timer.php:114
+msgid "After"
+msgstr "După"
+
+#: includes/elements/actions/class-wpgh-field-timer.php:146
+#, fuzzy
+msgid "Date Field:"
+msgstr "Câmp dată:"
+
+#: includes/elements/actions/class-wpgh-field-timer.php:155
+#, fuzzy
+msgid "Please Select a Field"
+msgstr "Vă rugăm să selectați un câmp"
+
+#: includes/elements/actions/class-wpgh-http-post.php:68
+#, fuzzy
+msgid "Post Url:"
+msgstr "Post URL:"
+
+#: includes/elements/actions/class-wpgh-remove-tag.php:61
+#, fuzzy
+msgid "Remove These Tags:"
+msgstr "Eliminați aceste etichete:"
+
+#: includes/elements/actions/class-wpgh-send-email.php:71
+#, fuzzy
+msgid ""
+"You have changes which have not been saved. Are you sure you want to exit?"
+msgstr "Aveți modificări care nu au fost salvate. Ești sigur că vrei să ieși?"
+
+#: includes/elements/actions/class-wpgh-send-email.php:100
+#, fuzzy
+msgid "Select an email to send:"
+msgstr "Selectați un e-mail pentru a trimite:"
+
+#: includes/elements/actions/class-wpgh-send-email.php:126
+#, fuzzy
+msgid "Create New Email"
+msgstr "Creare E-mail nou"
+
+#: includes/elements/actions/class-wpgh-send-email.php:141
+#, fuzzy
+msgid "Skip if confirmed?"
+msgstr "Skip dacă este confirmat?"
+
+#: includes/elements/actions/class-wpgh-send-email.php:146
+#, fuzzy
+msgid "Skip this email if the contact's email is already confirmed."
+msgstr "Omiteți acest e-mail dacă e-mailul contactului este deja confirmat."
+
+#: includes/elements/actions/class-wpgh-send-email.php:206
+#, fuzzy
+msgid "Opens: "
+msgstr "Deschide:"
+
+#: includes/elements/actions/class-wpgh-send-email.php:217
+#, fuzzy
+msgid "Clicks: "
+msgstr "Clicuri:"
+
+#: includes/elements/actions/class-wpgh-send-email.php:228
+#, fuzzy
+msgid "CTR: "
+msgstr "Ctr:"
+
+#: includes/elements/actions/class-wpgh-send-sms.php:22
+#, fuzzy
+msgid "Send SMS"
+msgstr "Trimite SMS"
+
+#: includes/elements/actions/class-wpgh-send-sms.php:41
+#, fuzzy
+msgid ""
+"SMS uses the <a target=\"_blank\" href=\"https://www.groundhogg.io/downloads/"
+"email-credits/\">Groundhogg Credit System</a> & requires that you have setup "
+"your <a target=\"_blank\" href=\"https://www.groundhogg.io/downloads/email-"
+"credits/\">Groundhogg account</a>."
+msgstr ""
+"SMS utilizează < a target = \"_ blank\" href = \"https://www.groundhogg.io/"
+"downloads/email-credits/\" > sistem de credit Groundhogg </a> & necesită că "
+"aveți setup < a target = \"_ blank\" href = \"https://www.groundhogg.io/"
+"downloads/email-credits/\" > Groundhogg socoteală </a>."
+
+#: includes/elements/actions/class-wpgh-send-sms.php:48
+#, fuzzy
+msgid "Text Message:"
+msgstr "Mesaj text:"
+
+#: includes/elements/actions/class-wpgh-send-sms.php:64
+#, fuzzy
+msgid ""
+"Use any valid replacement codes in your text message. Do not use html! Limit "
+"140 characters."
+msgstr ""
+"Utilizați orice coduri de înlocuire valide în mesajul text. Nu folositi "
+"HTML! Limitați 140 de caractere."
+
+#: includes/elements/benchmarks/class-wpgh-account-created.php:47
+#, fuzzy
+msgid ""
+"Runs whenever a WordPress account is created. Will create a contact if one "
+"does not exist."
+msgstr ""
+"Se execută de fiecare dată când se creează un cont WordPress. Va crea un "
+"contact dacă unul nu există."
+
+#: includes/elements/benchmarks/class-wpgh-account-created.php:69
+#, fuzzy
+msgid "Run when the following type of account is created:"
+msgstr "Executați atunci când se creează următorul tip de cont:"
+
+#: includes/elements/benchmarks/class-wpgh-email-confirmed.php:47
+#, fuzzy
+msgid "Runs whenever a contact confirms their email."
+msgstr "Se execută de fiecare dată când un contact confirmă adresa de e-mail."
+
+#: includes/elements/benchmarks/class-wpgh-email-confirmed.php:64
+#, fuzzy
+msgid "Runs whenever an email is confirmed while in this funnel"
+msgstr ""
+"Se execută de fiecare dată când un e-mail este confirmat în această pâlnie"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:47
+#, fuzzy
+msgid ""
+"Use this form builder to create forms and display them on your site with "
+"shortcodes."
+msgstr ""
+"Utilizați acest constructor de formulare pentru a crea formulare și a le "
+"afișa pe site cu shortcodes."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:177
+#, fuzzy
+msgid "Shortcode:"
+msgstr "Shortcode:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:180
+#, fuzzy
+msgid "JS Script:"
+msgstr "JS script:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:201
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:202
+msgid "Preview"
+msgstr "Previzualizare"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:220
+#, fuzzy
+msgid ""
+"Not all CSS rules are loaded in the admin area. Frontend results may differ."
+msgstr ""
+"Nu toate regulile CSS sunt încărcate în zona de administrare. Rezultatele "
+"frontend pot diferi."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:229
+#, fuzzy
+msgid "Thank You Page:"
+msgstr "Vă mulțumim Page:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:238
+msgid "Thank You Page"
+msgstr "Pagină pentru mulțumire"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:269
+msgid "First"
+msgstr "Primul"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:273
+msgid "Last"
+msgstr "Ultimul"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:293
+msgid "Row"
+msgstr "Rând"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:297
+#, fuzzy
+msgid "Col"
+msgstr "Col"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:301
+#, fuzzy
+msgid "ReCaptcha"
+msgstr "Recaptcha"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:305
+msgid "GDPR"
+msgstr "GDPR"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:317
+msgid "Textarea"
+msgstr "Zonă de text"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:321
+msgid "Number"
+msgstr "Număr"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:325
+msgid "Dropdown"
+msgstr "Lista verticală"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:329
+msgid "Radio"
+msgstr "Radio"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:333
+msgid "Checkbox"
+msgstr "Căsuță de bifat"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:337
+msgid "Date"
+msgstr "Data"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:341
+msgid "Time"
+msgstr "Program"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:345
+msgid "File"
+msgstr "Fişier"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:355
+msgid "Field"
+msgstr "Câmp"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:356
+#, fuzzy
+msgid "Insert Field: "
+msgstr "Inserare câmp:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:359
+#, fuzzy
+msgid "Insert Field"
+msgstr "Inserare câmp"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:396
+msgid "Required Field"
+msgstr "Câmp obligatoriu"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:398
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:457
+msgid "Yes"
+msgstr "Da"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:402
+msgid "Label"
+msgstr "Etichetă"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:405
+#, fuzzy
+msgid "The field label."
+msgstr "Eticheta câmpului."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:411
+#, fuzzy
+msgid "The button text."
+msgstr "Textul butonului."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:414
+msgid "Placeholder"
+msgstr "Înlocuitor"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:417
+#, fuzzy
+msgid "The ghost text within the field."
+msgstr "Textul fantomă din câmp."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:423
+#, fuzzy
+msgid "This will be the custom field name. I.E. {meta.name}"
+msgstr "Acesta va fi numele câmpului particularizat. I.E. {meta.name}"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:428
+msgid "Min"
+msgstr "Min"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:431
+#, fuzzy
+msgid "The minimum number a user can enter."
+msgstr "Numărul minim pe care îl poate introduce un utilizator."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:434
+msgid "Max"
+msgstr "Max"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:437
+#, fuzzy
+msgid "The max number a user can enter."
+msgstr "Numărul maxim pe care îl poate introduce un utilizator."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:445
+#, fuzzy
+msgid "The default value of the field."
+msgstr "Valoarea implicită a câmpului."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:449
+msgid "Options"
+msgstr "Opțiuni"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:452
+#, fuzzy
+msgid "Enter 1 option per line."
+msgstr "Introduceți 1 opțiune pe linie."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:455
+#, fuzzy
+msgid "Allow Multiple Selections"
+msgstr "Se permit selecții multiple"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:461
+msgid "Default"
+msgstr "Implicit"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:464
+#, fuzzy
+msgid "The blank option which appears at the top of the list."
+msgstr "Opțiunea necompletată care apare în partea de sus a listei."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:482
+#, fuzzy
+msgid "The width of the column."
+msgstr "Lățimea coloanei."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:488
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:497
+msgid "Theme"
+msgstr "Temă"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:494
+#, fuzzy
+msgid "The Captcha Theme."
+msgstr "Tema captcha."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:503
+#, fuzzy
+msgid "The Captcha Size."
+msgstr "Dimensiunea captcha."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:509
+#, fuzzy
+msgid "Min Date"
+msgstr "Dată minimă"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:511
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:517
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:526
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:532
+#, fuzzy
+msgid "YYY-MM-DD or +3 days or -1 days"
+msgstr "YYY-MM-DD sau + 3 zile sau-1 zi"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:512
+#, fuzzy
+msgid ""
+"The minimum date a user can enter. You can enter a dynamic date or static "
+"date."
+msgstr ""
+"Data minimă în care poate intra un utilizator. Aveți posibilitatea să "
+"introduceți o dată dinamică sau o dată statică."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:515
+#, fuzzy
+msgid "Max Date"
+msgstr "Data Max"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:518
+#, fuzzy
+msgid ""
+"The maximum date a user can enter. You can enter a dynamic date or static "
+"date."
+msgstr ""
+"Data maximă în care poate intra un utilizator. Aveți posibilitatea să "
+"introduceți o dată dinamică sau o dată statică."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:524
+#, fuzzy
+msgid "Min Time"
+msgstr "Timp min"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:527
+#, fuzzy
+msgid ""
+"The minimum time a user can enter. You can enter a dynamic time or static "
+"time."
+msgstr ""
+"Timpul minim pe care îl poate introduce un utilizator. Aveți posibilitatea "
+"să introduceți un timp dinamic sau un timp static."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:530
+#, fuzzy
+msgid "Max Time"
+msgstr "Timp maxim"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:533
+#, fuzzy
+msgid ""
+"The maximum time a user can enter. You can enter a dynamic time or static "
+"time."
+msgstr ""
+"Timpul maxim pe care îl poate introduce un utilizator. Aveți posibilitatea "
+"să introduceți un timp dinamic sau un timp static."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:539
+#, fuzzy
+msgid "Max File Size"
+msgstr "Dimensiune maximă fișier"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:542
+#, fuzzy
+msgid "Maximum size a file can be <b>in Bytes</b>. Your max upload size is "
+msgstr ""
+"Dimensiunea maximă a unui fișier poate fi <b> în bytes </b>. Dimensiunea "
+"maximă a încărcării este"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:545
+#, fuzzy
+msgid "Accepted File Types"
+msgstr "Tipuri de fișiere acceptate"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:547
+#, fuzzy
+msgid ".pdf,.txt,.doc,.docx"
+msgstr ". pdf,. txt,. doc,. docx"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:548
+#, fuzzy
+msgid "The types of files a user may upload (comma separated)."
+msgstr ""
+"Tipurile de fișiere pe care un utilizator le poate încărca (separate prin "
+"virgulă)."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:558
+#, fuzzy
+msgid "CSS ID"
+msgstr "ID-UL CSS"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:561
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:567
+#, fuzzy
+msgid "Use to apply CSS."
+msgstr "Utilizați pentru a aplica CSS."
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:564
+msgid "CSS Class"
+msgstr "Clasă CSS"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:611
+msgid "Views: "
+msgstr "Vizualizări:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:616
+#, fuzzy
+msgid "Fills: "
+msgstr "Umple:"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:617
+#, fuzzy
+msgid "Conversion Rate"
+msgstr "Rata de conversie"
+
+#: includes/elements/benchmarks/class-wpgh-form-filled.php:617
+#, fuzzy
+msgid "CVR: "
+msgstr "Cvr:"
+
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:48
+#, fuzzy
+msgid ""
+"Runs whenever a special link is clicked and redirects the user to another "
+"page."
+msgstr ""
+"Se execută de fiecare dată când se face clic pe o legătură specială și "
+"redirecționează utilizatorul către o altă pagină."
+
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:68
+#, fuzzy
+msgid "Copy This Link:"
+msgstr "Copiați acest link:"
+
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:75
+#, fuzzy
+msgid ""
+"Paste this link in any email or page. Once a contact clicks it the benchmark "
+"will be completed and the contact will be redirected to the page set below."
+msgstr ""
+"Lipiți acest link în orice e-mail sau pagină. Odată ce un contact face clic "
+"pe acesta, indicele de referință va fi finalizat, iar contactul va fi "
+"Redirecționat către pagina setată mai jos."
+
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:80
+#: includes/elements/benchmarks/class-wpgh-link-clicked.php:88
+#, fuzzy
+msgid "Redirect To"
+msgstr "ReDirecționare la"
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:48
+#, fuzzy
+msgid "Runs whenever the specified page is visited."
+msgstr "Se execută de fiecare dată când este vizitată pagina specificată."
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:81
+msgid "Enter URL"
+msgstr "Introdu URL-ul"
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:86
+#, fuzzy
+msgid "Partial Match"
+msgstr "Potrivire parțială"
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:87
+#, fuzzy
+msgid "Exact Match"
+msgstr "Potrivire exactă"
+
+#: includes/elements/benchmarks/class-wpgh-page-visited.php:102
+#, fuzzy
+msgid "Match Url"
+msgstr "Potrivire URL"
+
+#: includes/elements/benchmarks/class-wpgh-role-changed.php:47
+#, fuzzy
+msgid "Runs whenever a user's role is changed."
+msgstr "Se execută de fiecare dată când se modifică rolul unui utilizator."
+
+#: includes/elements/benchmarks/class-wpgh-role-changed.php:70
+#, fuzzy
+msgid "Run when this access is given:"
+msgstr "Executați atunci când acest acces este dat:"
+
+#: includes/elements/benchmarks/class-wpgh-tag-applied.php:47
+#, fuzzy
+msgid "Runs whenever any of the specified tags are added to a contact."
+msgstr ""
+"Se execută de fiecare dată când oricare dintre etichetele specificate sunt "
+"adăugate la un contact."
+
+#: includes/elements/benchmarks/class-wpgh-tag-applied.php:70
+#, fuzzy
+msgid "Run when any of these tags are applied:"
+msgstr "Executați atunci când oricare dintre aceste etichete sunt aplicate:"
+
+#: includes/elements/benchmarks/class-wpgh-tag-removed.php:47
+#, fuzzy
+msgid "Runs whenever any of the specified tags are removed from a contact."
+msgstr ""
+"Se execută de fiecare dată când vreuna dintre etichetele specificate este "
+"eliminată dintr-o persoană de contact."
+
+#: includes/elements/benchmarks/class-wpgh-tag-removed.php:70
+#, fuzzy
+msgid "Run when any of these tags are removed:"
+msgstr "Executați atunci când oricare dintre aceste etichete sunt eliminate:"
+
+#: includes/elements/class-wpgh-funnel-step.php:166
+#, fuzzy
+msgid "This step has no registered settings."
+msgstr "Acest pas nu are setări înregistrate."
+
+#: includes/elements/class-wpgh-funnel-step.php:196
+#, fuzzy
+msgid "Waiting:"
+msgstr "Aşteptare:"
+
+#: includes/elements/class-wpgh-funnel-step.php:218
+msgid "Completed:"
+msgstr "Nefinalizat:"
+
+#: includes/functions.php:51
+#, fuzzy
+msgid "No Contact"
+msgstr "Nici un contact"
+
+#: includes/functions.php:60
+#, fuzzy
+msgid "This contact has not agreed to receive email marketing from you."
+msgstr ""
+"Această persoană de contact nu a fost de acord să primească e-mail marketing "
+"de la tine."
+
+#: includes/functions.php:70
+#, fuzzy
+msgid ""
+"Unconfirmed. This contact will not receive emails, they are passed the email "
+"confirmation grace period."
+msgstr ""
+"Neconfirmate. Acest contact nu va primi e-mailuri, acestea sunt transmise de "
+"e-mail de confirmare perioada de grație."
+
+#: includes/functions.php:73 includes/functions.php:97
+#, fuzzy
+msgid "Unconfirmed. They will receive marketing."
+msgstr "Neconfirmate. Ei vor primi de marketing."
+
+#: includes/functions.php:76
+#, fuzzy
+msgid "Confirmed. They will receive marketing."
+msgstr "Confirmat. Ei vor primi de marketing."
+
+#: includes/functions.php:79
+#, fuzzy
+msgid "Unsubscribed. They will not receive marketing."
+msgstr "Dezabonat. Ei nu vor primi de marketing."
+
+#: includes/functions.php:82
+#, fuzzy
+msgid "This contact will only receive marketing weekly."
+msgstr "Acest contact va primi doar săptămânal de marketing."
+
+#: includes/functions.php:85
+#, fuzzy
+msgid "This contact will only receive marketing monthly."
+msgstr "Acest contact va primi doar lunar de marketing."
+
+#: includes/functions.php:88
+#, fuzzy
+msgid "This email address bounced, they will not receive marketing."
+msgstr "Această adresă de e-mail bounced, ei nu vor primi de marketing."
+
+#: includes/functions.php:91
+#, fuzzy
+msgid "This contact was marked as spam. They will not receive marketing."
+msgstr ""
+"Această persoană de contact a fost marcată ca spam. Ei nu vor primi de "
+"marketing."
+
+#: includes/functions.php:94
+#, fuzzy
+msgid ""
+"This contact complained about your emails. They will not receive marketing."
+msgstr ""
+"Acest contact s-a plâns de e-mailurile tale. Ei nu vor primi de marketing."
+
+#: includes/functions.php:519
+#, fuzzy, php-format
+msgid ""
+" | Find a bug in Groundhogg? <a target=\"_blank\" href=\"%s\">Report It</a>!"
+"</span>"
+msgstr ""
+"| Ai găsit o insectă în Groundhogg? < a target = \"_ blank\" href = \" %s\" "
+"> raport it </a>! </span>"
+
+#: includes/functions.php:519
+#, fuzzy
+msgid "https://www.facebook.com/groups/274900800010203/"
+msgstr "https://www.Facebook.com/Groups/274900800010203/"
+
+#: includes/functions.php:920
+#, fuzzy
+msgid "Could not create contact."
+msgstr "Imposibil de creat contactul."
+
+#. Plugin Name of the plugin/theme
+#: includes/gutenberg.php:49
+#, fuzzy
+msgid "Groundhogg"
+msgstr "De la Groundhogg"
+
+#: includes/gutenberg.php:50
+#, fuzzy
+msgid "Select and display one of your forms."
+msgstr "Selectați și afișați unul dintre formulare."
+
+#: includes/gutenberg.php:52
+msgid "Form Settings"
+msgstr "Setări formular"
+
+#: includes/gutenberg.php:53
+msgid "Form"
+msgstr "Formular"
+
+#: includes/gutenberg.php:54
+msgid "Show Title"
+msgstr "Subtitlu"
+
+#: includes/gutenberg.php:55
+#, fuzzy
+msgid "Show Description"
+msgstr "Afișare Descriere"
+
+#: includes/install.php:139
+#, fuzzy
+msgid "Email Confirmed"
+msgstr "E-mail confirmat"
+
+#: includes/install.php:140
+#, fuzzy
+msgid ""
+"<h2>Your email [gh_contact field=\"email\"] has been confirmed.</h2><p>Thank "
+"you! Return to your inbox to receive further communication.</p>"
+msgstr ""
+"<h2>Your e-mail [gh_contact Field = \"e-mail\"] a fost confirmată.</h2> <p> "
+"vă mulțumesc! Reveniți la Inbox pentru a primi mai multe comunicări. </p>"
+
+#: includes/install.php:152
+#, fuzzy
+msgid "Unsubscribed"
+msgstr "Dezabonat"
+
+#: includes/install.php:153
+#, fuzzy
+msgid ""
+"<h2>Your email [gh_contact field=\"email\"] has been unsubscribed.</"
+"h2><p>This means you will not receive any further marketing communication "
+"from us, but you may receive transactional emails related to billing.</"
+"p><p>Note that opting in again to any optin form or program on our site is "
+"implied consent and may result in starting to receive email communication "
+"again.</p>"
+msgstr ""
+"<h2>Your e-mail [gh_contact Field = \"e-mail\"] a fost neabonat.</h2> <p> "
+"Aceasta înseamnă că nu veți mai primi nici o comunicare de marketing de la "
+"noi, dar este posibil să primiți e-mailuri tranzacționale legate de "
+"facturare. </p> <p> Notă că optând din nou la orice formă OptIn sau program "
+"de pe site-ul nostru este implicit consimțământul și poate duce la incepand "
+"de a primi e-mail de comunicare din nou. </p>"
+
+#: includes/install.php:165
+#, fuzzy
+msgid "Email Preferences"
+msgstr "Preferințe E-mail"
+
+#: includes/install.php:166
+#, fuzzy
+msgid ""
+"<h2>Manage your email preferences!</h2><p>Use the form below to manage your "
+"email preferences.</p><p>[gh_form id=\""
+msgstr ""
+"<h2>Gestionați preferințele de e-mail!</h2> <p> utilizați formularul de mai "
+"jos pentru a gestiona preferințele de e-mail. </p> <p> [gh_form ID = \""
+
+#: includes/install.php:178
+#, fuzzy
+msgid "[browser_view]"
+msgstr "[browser_view]"
+
+#: includes/shortcodes.php:78
+msgid "Friend"
+msgstr "Prietenă"
+
+#: includes/tools.php:37 includes/tools.php:77
+#, fuzzy
+msgid "Import Contacts"
+msgstr "Import contacte"
+
+#: includes/tools.php:42
+#, fuzzy
+msgid ""
+"Use the following column format to import your contacts. Any custom "
+"information added into your data will be treated as custom meta data for the "
+"contact."
+msgstr ""
+"Utilizați următorul format de coloană pentru a importa contactele. Orice "
+"informație personalizată adăugată în datele dumneavoastră va fi tratată ca "
+"date meta personalizate pentru persoana de contact."
+
+#: includes/tools.php:75
+#, fuzzy
+msgid "These tags will be applied to the contacts upon importing."
+msgstr "Aceste etichete vor fi aplicate contactelor la import."
+
+#: includes/tools.php:99 includes/tools.php:108
+#, fuzzy
+msgid "Export Contacts"
+msgstr "Export contacte"
+
+#: includes/tools.php:101
+#, fuzzy
+msgid "Export contacts to a .CSV file. This will download to your browser."
+msgstr ""
+"Exportați contactele într-o. Fișier CSV. Acest lucru va descărca în browser-"
+"ul dumneavoastră."
+
+#: includes/tools.php:106
+#, fuzzy
+msgid ""
+"Contacts with these tags will be exported. Leave blank to export ALL "
+"contacts."
+msgstr ""
+"Contactele cu aceste etichete vor fi exportate. Lăsați necompletat pentru a "
+"exporta toate contactele."
+
+#: includes/tools.php:131
+#, fuzzy
+msgid "Bulk Delete Contacts"
+msgstr "Ștergere în bloc contacte"
+
+#: includes/tools.php:133
+#, fuzzy
+msgid "Bulk delete contacts."
+msgstr "Ștergeți contactele în bloc."
+
+#: includes/tools.php:138
+#, fuzzy
+msgid ""
+"Contacts with these tags will be delete. Leave blank to delete ALL contacts."
+msgstr ""
+"Contactele cu aceste etichete vor fi șterse. Lăsați necompletat pentru a "
+"șterge toate contactele."
+
+#: includes/tools.php:140
+#, fuzzy
+msgid "Delete Contacts"
+msgstr "Ștergere contacte"
+
+#: includes/tools.php:166 includes/tools.php:172
+msgid "Download System Info"
+msgstr "Descarca Info sistem"
+
+#: includes/tools.php:168
+#, fuzzy
+msgid "Download System Info when requesting support."
+msgstr "Descărcați informații despre sistem atunci când solicitați asistență."
+
+#: includes/tools.php:537
+#, fuzzy
+msgid ""
+"These API keys allow you to use the REST API to retrieve store data in JSON "
+"for external applications or devices."
+msgstr ""
+"Aceste taste API vă permit să utilizați API REST pentru a regăsi datele din "
+"magazin în JSON pentru aplicații sau dispozitive externe."
+
+#: templates/email-templates.php:23
+msgid "Call To Action"
+msgstr "Acțiune"
+
+#: templates/email-templates.php:24
+#, fuzzy
+msgid "Use when you need contacts to take an action, and FAST!"
+msgstr ""
+"Utilizați atunci când aveți nevoie de contacte pentru a lua o acțiune, și "
+"FAST!"
+
+#: templates/email-templates.php:35
+msgid "Plain Text"
+msgstr "Text Simplu"
+
+#: templates/email-templates.php:36
+#, fuzzy
+msgid "Perfect for easy breezy communication with contacts."
+msgstr "Perfect pentru o comunicare ușoară cu contactele."
+
+#: templates/email-templates.php:47
+msgid "Newsletter"
+msgstr "Buletin informativ"
+
+#: templates/email-templates.php:48
+#, fuzzy
+msgid "Ideal for when you have a lot to share."
+msgstr "Ideal pentru atunci când aveți o mulțime de a împărtăși."
+
+#: templates/email-templates.php:59
+#, fuzzy
+msgid "Hype Up"
+msgstr "Hype sus"
+
+#: templates/email-templates.php:60
+#, fuzzy
+msgid "Need people excited? This is what you need!"
+msgstr "Ai nevoie de oameni entuziasmați? De asta ai nevoie!"
+
+#: templates/email-templates.php:71
+#, fuzzy
+msgid "Welcome Email"
+msgstr "E-mail de bun venit"
+
+#: templates/email-templates.php:72
+#, fuzzy
+msgid "New contact? Make the feel at home."
+msgstr "Un nou contact? Simte-te ca acasă."
+
+#: templates/email-templates.php:83
+msgid "Confirmation Email"
+msgstr "E-mail de confirmare"
+
+#: templates/email-templates.php:84
+#, fuzzy
+msgid "Need to confirm something? Send them this."
+msgstr "Trebuie să confirm ceva? Trimite-le asta."
+
+#: templates/email-templates.php:95
+#, fuzzy
+msgid "Review Request"
+msgstr "Cerere de revizuire"
+
+#: templates/email-templates.php:96 templates/email-templates.php:108
+#, fuzzy
+msgid "Want feedback? This is the easiest way to get it."
+msgstr "Vrei feedback? Acesta este cel mai simplu mod de a obține."
+
+#: templates/email-templates.php:107
+#, fuzzy
+msgid "You're Awesome"
+msgstr "Ești minunat."
+
+#. Plugin URI of the plugin/theme
+#, fuzzy
+msgid "https://wordpress.org/plugins/groundhogg/"
+msgstr "https://WordPress.org/plugins/groundhogg/"
+
+#. Description of the plugin/theme
+#, fuzzy
+msgid "CRM and marketing automation for WordPress"
+msgstr "CRM și automatizare de marketing pentru WordPress"
+
+#. Author of the plugin/theme
+#, fuzzy
+msgid "Groundhogg Inc."
+msgstr "Groundhogg Inc."
+
+#. Author URI of the plugin/theme
+#, fuzzy
+msgid "http://www.groundhogg.io"
+msgstr "http://www.groundhogg.io"
