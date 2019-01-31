@@ -200,7 +200,7 @@ class WPGH_Event_Queue
 
                 } else {
 
-                    wp_die( __( 'Could not process queue for unknown reason.' ) );
+                    wp_die( __( 'Could not process queue for unknown reason.', 'groundhogg' ) );
 
                 }
             }
@@ -308,7 +308,7 @@ class WPGH_Event_Queue
 
         if ( empty( $this->events ) ){
 
-            return new WP_Error( 'NO_EVENTS', __( 'No events are available to process.' ) );
+            return new WP_Error( 'NO_EVENTS', __( 'No events are available to process.', 'groundhogg' ) );
 
         }
 

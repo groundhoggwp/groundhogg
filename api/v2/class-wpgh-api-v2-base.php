@@ -53,7 +53,7 @@ class WPGH_API_V2_BASE {
 
         } else {
 
-            return new WP_Error( 'error',__( 'Please Enter Token and Key for API.' ,'groundhogg'));
+            return new WP_Error( 'error',__( 'Please enter a API valid token and public key.' ,'groundhogg'));
 
         }
 

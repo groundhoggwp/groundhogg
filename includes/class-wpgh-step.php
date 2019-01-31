@@ -617,7 +617,7 @@ class WPGH_Step
                                 'id'     => $this->prefix( 'blog_id' ),
                                 'options' => $options,
                                 'selected' => $this->get_meta( 'blog_id' ),
-                                'option_none' => __( 'Any Blog' )
+                                'option_none' => __( 'Any blog', 'groundhogg' )
                             ) );
 
                             ?>

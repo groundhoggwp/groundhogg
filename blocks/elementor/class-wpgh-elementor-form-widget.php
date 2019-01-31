@@ -9,7 +9,7 @@ class WPGH_Elementor_Form_Widget extends  \Elementor\Widget_Base {
     }
 
     public function get_title() {
-        return __( 'Groundhogg Form', 'groundhogg' );
+        return __( 'Groundhogg Forms', 'groundhogg' );
     }
 
     public function get_icon() {

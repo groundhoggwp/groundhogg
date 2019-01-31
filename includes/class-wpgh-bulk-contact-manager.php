@@ -144,7 +144,7 @@ class WPGH_Bulk_Contact_Manager
 
         }
 
-        wp_die( sprintf( __( 'Deleted %d Contacts.', 'groundhogg' ), count( $contacts )  ));
+        wp_die( sprintf( __( 'Deleted %d contacts.', 'groundhogg' ), count( $contacts )  ));
 
     }
 
@@ -233,7 +233,7 @@ class WPGH_Bulk_Contact_Manager
         }
 
         if ( ! is_email( $data['email'] ) ){
-            wp_die( sprintf( __( 'Could not complete import for %s. Email field not present.' ), $data[ 'first_name' ] ) );
+            wp_die( sprintf( __( 'Could not complete import for %s. Email field not present.', 'groundhogg' ), $data[ 'first_name' ] ) );
         }
 
         if ( isset( $args['owner'] ) ){

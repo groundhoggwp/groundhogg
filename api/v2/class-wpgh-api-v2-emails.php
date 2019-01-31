@@ -88,7 +88,7 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
 
             return rest_ensure_response( $response ) ;
         } else {
-            return new WP_Error('error', __( 'No emails found', 'groundhogg' ) );
+            return new WP_Error('error', __( 'No emails found.', 'groundhogg' ) );
         }
     }
 

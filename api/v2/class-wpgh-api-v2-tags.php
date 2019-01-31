@@ -41,7 +41,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'tags_id' => array(
                         'required'    => false,
-                        'description' => __( 'The ID of tag you want to retrieve.','groundhogg' ),
+                        'description' => __( 'The ID of tag to retrieve.','groundhogg' ),
                     )
                 )
             ),
@@ -52,7 +52,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'tags' => array(
                         'required'    => true,
-                        'description' => __('Contains array of tags which user wants to create.','groundhogg'),
+                        'description' => __('Array of tag names.','groundhogg'),
                     )
                 )
             ),
@@ -63,7 +63,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'tag_id' => array(
                         'required'    => true,
-                        'description' => __('The ID of tag you want to delete.','groundhogg'),
+                        'description' => __('The ID of the tag to delete.','groundhogg'),
                     )
                 )
             ),
@@ -74,7 +74,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'tags' => array(
                         'required'    => true,
-                        'description' => __('Contains array of tags which user wants to update with tag_id argument.','groundhogg'),
+                        'description' => __('Contains array of tags to update.','groundhogg'),
                     )
                 )
             ),
@@ -95,7 +95,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
             if ( !( WPGH()->tags->get_tag( $tag_id ) === false) ) {
                 $tags = WPGH()->tags->get_tag( $tag_id );
             } else {
-                return new WP_Error('error', __( 'No tag found with entered tag id.','groundhogg' ) );
+                return new WP_Error('error', __( 'Please provide a valid tag ID.','groundhogg' ) );
             }
         } else {
             $tags = WPGH()->tags->get_tags();
@@ -178,13 +178,13 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                         return new WP_Error('error', __('Something went wrong' , 'groundhogg' ));
                     }
                 } else {
-                    return new WP_Error('error', __( 'No tag found with entered tag id.', 'groundhogg' ) );
+                    return new WP_Error('error', __( 'Please provide a valid tag ID.', 'groundhogg' ) );
                 }
             } else {
-                return new WP_Error('error', __( 'This operation needs tag_id argument.','groundhogg' ) );
+                return new WP_Error('error', __( 'Please provide a valid tag ID.','groundhogg' ) );
             }
         } else {
-            return new WP_Error('error', __( 'Please enter tag block to perform this operation.' ,'groundhogg' ) );
+            return new WP_Error('error', __( 'Please provide a valid array of tags.' ,'groundhogg' ) );
         }
     }
 
@@ -208,10 +208,10 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                 }
             } else {
 
-                return new WP_Error('error', __('No tag found with entered tag id.','groundhogg') );
+                return new WP_Error('error', __('Please provide a valid tag ID.','groundhogg') );
             }
         } else {
-            return new WP_Error('error', __('Please enter tag_id to perform this operation.' , 'groundhogg') );
+            return new WP_Error('error', __('Please provide a valid tag ID.' , 'groundhogg') );
         }
 
     }

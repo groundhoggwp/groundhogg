@@ -323,7 +323,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          */
         public function __clone() {
             // Cloning instances of the class is forbidden.
-            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'groundhogg' ), '1.6' );
+            _doing_it_wrong( __FUNCTION__, __( 'Cheatin huh?', 'groundhogg' ), '1.6' );
         }
 
         /**
@@ -335,7 +335,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          */
         public function __wakeup() {
             // Unserializing instances of the class is forbidden.
-            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'groundhogg' ), '1.6' );
+            _doing_it_wrong( __FUNCTION__, __( 'Cheatin huh?', 'groundhogg' ), '1.6' );
         }
 
 

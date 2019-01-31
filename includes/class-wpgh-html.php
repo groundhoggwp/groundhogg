@@ -96,7 +96,7 @@ class WPGH_HTML
     {
         $a = wp_parse_args( $args, array(
             'title'     => 'Modal',
-            'text'      => __( 'Open Modal' ),
+            'text'      => __( 'Open Modal', 'groundhogg' ),
             'footer_button_text' => __( 'Save Changes' ),
             'id'        => '',
             'class'     => 'button button-secondary',
@@ -625,7 +625,7 @@ class WPGH_HTML
             'data'              => array(),
             'selected'          => array(),
             'multiple'          => false,
-            'placeholder'       => __( 'Please Select a Contact', 'groundhogg' ),
+            'placeholder'       => __( 'Please select a contact', 'groundhogg' ),
             'tags'              => false,
         ) );
 
@@ -697,7 +697,7 @@ class WPGH_HTML
             'data'              => array(),
             'selected'          => array(),
             'multiple'          => false,
-            'placeholder'       => __( 'Please Select an Email', 'groundhogg' ),
+            'placeholder'       => __( 'Please select an email', 'groundhogg' ),
             'tags'              => false,
         ) );
 
@@ -785,7 +785,7 @@ class WPGH_HTML
 			'data'              => array(),
 			'selected'          => array(),
 			'multiple'          => true,
-			'placeholder'       => __( 'Please Select 1 or more Benchmarks', 'groundhogg' ),
+			'placeholder'       => __( 'Please select 1 or more benchmarks', 'groundhogg' ),
 			'tags'              => false,
 		) );
 
@@ -844,7 +844,7 @@ class WPGH_HTML
             'data'              => array(),
             'selected'          => array(),
             'multiple'          => false,
-            'placeholder'       => __( 'Please Select 1 or more keys', 'groundhogg' ),
+            'placeholder'       => __( 'Please select 1 or more meta keys', 'groundhogg' ),
             'tags'              => false,
         ) );
 
