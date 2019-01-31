@@ -367,6 +367,9 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             if ( ! defined( 'WPGH_ASSETS_FOLDER' ) ){
                 define( 'WPGH_ASSETS_FOLDER', plugin_dir_url( __FILE__ ) . 'assets/' );
             }
+            if ( ! defined( 'WPGH_PLUGIN_BASE_DIR' ) ){
+                define( 'WPGH_PLUGIN_BASE_DIR', plugins_url(basename(__DIR__)));
+            }
         }
 
         /**
@@ -376,10 +379,10 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         {
             require_once dirname( __FILE__ ) . '/blocks/elementor/class-wpgh-elementor-blocks.php';
             require_once dirname( __FILE__ ) . '/blocks/beaver-builder/class-wpgh-beaver-builder-blocks.php';
-//            require_once dirname( __FILE__ ) . '/blocks/visual-composer/class-wpgh-visual-composer-blocks.php';
+            require_once dirname( __FILE__ ) . '/blocks/visual-composer/class-wpgh-visual-composer-blocks.php';
             $this->blocks[ 'elementor' ]        = new WPGH_Elementor_Blocks();
             $this->blocks[ 'beaver-builder' ]   = new WPGH_Beaver_Builder_Blocks();
-//            $this->blocks[ 'visual-composer' ]  = new WPGH_Visual_Composer_Blocks();
+            $this->blocks[ 'visual-composer' ]  = new WPGH_Visual_Composer_Blocks();
 
         }
 
