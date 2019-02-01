@@ -87,10 +87,13 @@ var wpghTextBlock;
             $actionBAr.width( $( '#email-body' ).width() );
 
             var offset;
+            var xoffset;
 
             if ( ! wpghEmailEditor.inFrame() ){
                 offset = 32;
+                xoffset = 160;
             } else {
+                xoffset = 0;
                 offset = 0;
             }
 
@@ -98,12 +101,13 @@ var wpghTextBlock;
             if ( window.pageYOffset > $( '#editor' ).offset().top - ( 48 + offset ) ){
                 $actionBAr.css( 'position', 'fixed' );
                 $actionBAr.css( 'top',  ( 46 + offset ) + 'px');
+                $actionBAr.css( 'left', 291 + xoffset + 'px' );
             } else {
                 $actionBAr.css( 'position', 'absolute' );
                 $actionBAr.css( 'top', $( '#editor' ).offset().top - offset );
-            }
+                $actionBAr.css( 'left', '291px' );
 
-            $actionBAr.css( 'left', '291px' );
+            }
 
         },
 

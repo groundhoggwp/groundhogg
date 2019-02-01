@@ -69,17 +69,24 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                 )
             ),
             array(
-                'methods' => 'PUT, PATCH',
+                'methods' => WP_REST_Server::EDITABLE,
                 'callback' => array($this, 'update_contact'),
                 'permission_callback' => array($this, 'rest_authentication'),
                 'args'=> array(
-                    'contact' => array(
-                        'description' => __('Contains list of contact arguments. Please visit www.groundhogg.io for full list of accepted arguments.','groundhogg')
+                    'contact_id' => array(
+                        'required'    => true,
+                        'description' => __('The ID of the contact to update.','groundhogg')
+                    ),
+                    'contact'    => array(
+                        'required'    => false,
+                        'description' => __('Array of updated contact details.','groundhogg')
                     ),
                     'apply_tags' => array(
+                        'required'    => false,
                         'description' => __('Contains array of tag ids/slugs for which you want to apply to the contact.','groundhogg')
                     ),
                     'remove_tags' => array(
+                        'required'    => false,
                         'description' => __('Contains array of tag ids/slugs for which you want to remove from the contact.','groundhogg')
                     )
                 )
@@ -205,7 +212,11 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
         if ( ! user_can( $request['wpgh_user_id'], 'edit_contacts' ) ){
             return new WP_Error('error', __( 'You are not eligible to perform this operation.','groundhogg' ));
         }
-        $parameters = $request->get_json_params();
+
+        $parameters = $request->get_params();
+
+
+
         if ( isset( $parameters['apply_tags'] ) )        {
             if ( isset( $parameters['apply_tags']['contact_id'] ) ) {
                 if ( isset( $parameters['apply_tags']['tags'] ) ) {

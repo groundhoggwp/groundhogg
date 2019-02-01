@@ -204,15 +204,17 @@ class WPGH_Event_Queue_v2
     {
 
         /* Get 'er done */
-        set_time_limit(0 );
+//        set_time_limit(0 );
 
         $this->prepare_events();
+
 
         if ( empty( $this->events ) ){
 
             return 0;
 
         }
+
 
         do_action( 'wpgh_process_event_queue_before', $this );
 
@@ -224,6 +226,7 @@ class WPGH_Event_Queue_v2
         if ( $max_events === 0 ){
             $max_events = 9999;
         }
+
 
         /* Check to see if the current queue is still the most recent queue. If it's not Then finish up. */
         while ( $this->has_events() && $i < $max_events ) {
@@ -245,6 +248,7 @@ class WPGH_Event_Queue_v2
             $i++;
 
         }
+
 
         do_action( 'wpgh_process_event_queue_after', $this );
 
