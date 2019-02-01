@@ -380,10 +380,12 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         {
             require_once dirname( __FILE__ ) . '/blocks/elementor/class-wpgh-elementor-blocks.php';
             require_once dirname( __FILE__ ) . '/blocks/beaver-builder/class-wpgh-beaver-builder-blocks.php';
-            require_once dirname( __FILE__ ) . '/blocks/visual-composer/class-wpgh-visual-composer-blocks.php';
+            require_once dirname( __FILE__ ) . '/blocks/wpbakery/class-wpgh-wpbakery-blocks.php';
+            //require_once dirname( __FILE__ ) . '/blocks/visual-composer/class-wpgh-visual-composer-blocks.php';
             $this->blocks[ 'elementor' ]        = new WPGH_Elementor_Blocks();
             $this->blocks[ 'beaver-builder' ]   = new WPGH_Beaver_Builder_Blocks();
-            $this->blocks[ 'visual-composer' ]  = new WPGH_Visual_Composer_Blocks();
+            //$this->blocks[ 'visual-composer' ]  = new WPGH_Visual_Composer_Blocks();
+            $this->blocks[ 'wpbakery' ]   = new WPGH_WPBakery_Blocks();
 
         }
 
