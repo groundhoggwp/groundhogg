@@ -107,9 +107,15 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
-= 1.0.20.2=
+= 1.0.20.3 =
 * ADDED Translations for es_ES, fr_FR, fr_CA, ja, pt_BR, ro_RO
+* ADDED Translations
+* FIXED PHP Fatal Error when activating for the first time.
+
+= 1.0.20.2 =
 * TWEAKED Base API Class
+* FIXED PHP error from direct accessing unresolved array.
+* FIXED PHP Fatal error when activating.
 
 = 1.0.20.1 =
 * ADDED Beaver Builder form block.

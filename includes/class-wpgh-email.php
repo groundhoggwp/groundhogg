@@ -801,7 +801,8 @@ class WPGH_Email
         //send to groundhogg
 
         $sender = $this->get_from_email();
-        $domain = explode( '@', $sender )[ 1 ];
+        $domain = explode( '@', $sender );
+        $domain = $domain[1];
 
         $data = array(
 
