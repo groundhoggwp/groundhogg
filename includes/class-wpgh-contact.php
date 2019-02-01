@@ -559,7 +559,7 @@ class WPGH_Contact
             return true;
         }
 
-        $user = get_user_by_email( $this->email );
+        $user = get_user_by( 'email', $this->email );
 
         if ( $user ){
             $this->update( array( 'user_id' => $user->ID ) );

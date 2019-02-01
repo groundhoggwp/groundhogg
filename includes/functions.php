@@ -981,6 +981,11 @@ function wpgh_convert_role_to_tag( $role )
 function wpgh_apply_tags_to_contact_from_new_roles( $user_id, $role )
 {
     $contact = wpgh_get_contact( $user_id, true );
+
+    if ( ! $contact || ! $contact->exists() ){
+        return;
+    }
+
     $role = wpgh_get_role_pretty_name( $role );
     $contact->add_tag( $role );
 }

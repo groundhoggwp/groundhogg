@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.20.5 =
+* ADDED WP Bakery block support
+* REMOVED Semaphore usage in the event queue as it was causing problems.
+* FIXED Call to deprecated function get_user_by_email()
+
 = 1.0.20.4 =
 * FIXED Fatal error when adding users or updating user roles.
 
