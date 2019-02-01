@@ -1013,6 +1013,10 @@ function wpgh_apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_ro
 {
     $contact = wpgh_get_contact( $user_id, true );
 
+    if ( ! $contact || ! $contact->exists() ){
+        return;
+    }
+
     /**
      * Convert list of roles to a list of tags and remove them...
      */

@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.20.4 =
+* FIXED Fatal error when adding users or updating user roles.
+
 = 1.0.20.3 =
 * ADDED Translations for es_ES, fr_FR, fr_CA, ja, pt_BR, ro_RO
 * ADDED Translations
