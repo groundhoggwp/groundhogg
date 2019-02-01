@@ -29,14 +29,14 @@ class WPGH_Beaver_Builder_Blocks
              */
             FLBuilder::register_module( 'WPGH_Beaver_Builder_Widget', array(
                 'select-form'      => array(
-                    'title'         => __( 'Select Form', 'groundhogg' ),
+                    'title'         => __( 'Select a form', 'groundhogg' ),
                     'sections'      => array(
                         'groundhogg-forms'  => array(
-                            'title'         => __( 'Groundhogg Form', 'groundhogg' ),
+                            'title'         => __( 'Groundhogg Forms', 'groundhogg' ),
                             'fields'        => array(
                                 'groundhogg_form_id' => array(
                                     'type'          => 'select',
-                                    'label'         => __( 'Select Form', 'groundhogg' ),
+                                    'label'         => __( 'Select a form', 'groundhogg' ),
                                     'options'       => wpgh_get_form_list()
                                 ),
                             )

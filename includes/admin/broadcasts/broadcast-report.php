@@ -107,17 +107,17 @@ else:
         $dataset  =  array();
 
         $dataset[] = array(
-            'label' => __('Opens Not clicked'),
+            'label' => __('Opens, did not click', 'groundhogg'),
             'data' => $opens - $clicks,
             'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
         ) ;
         $dataset[] = array(
-            'label' => __('Opens And Clicked'),
+            'label' => __('Opens and clicked', 'groundhogg'),
             'data' => $clicks,
             'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) )
         ) ;
         $dataset[] = array(
-            'label' => __('Unopened'),
+            'label' => __('Unopened', 'groundhogg'),
             'data' => $contact_sum - $opens,
             'url'  => '#'
 

@@ -735,15 +735,21 @@ function wpgh_get_current_user_roles()
 /**
  * Simple function to get a contact
  *
- * @since 1.0.6
+ * @since 1.0.6 implemented
+ * @since 1.0.20.2 return false if contact does not exist
  *
  * @param $id_or_email string|int
  * @param $by_user_id bool
- * @return WPGH_Contact
+ * @return WPGH_Contact|false
  */
 function wpgh_get_contact( $id_or_email, $by_user_id=false ){
     $contact = new WPGH_Contact( $id_or_email, $by_user_id );
-    return $contact;
+
+    if ( $contact->exists() ){
+        return $contact;
+    }
+
+    return false;
 }
 
 /**
@@ -892,7 +898,7 @@ function wpgh_create_contact_from_user( $user )
     /**
      * Do not continue if the contact already exists. Just return it...
      */
-    if ( $contact->exists() ){
+    if ( $contact && $contact->exists() ){
         $contact->update( array( 'user_id' => $user->ID ) );
         return $contact;
     }
@@ -1006,6 +1012,10 @@ add_action( 'remove_user_role', 'wpgh_remove_tags_to_contact_from_remove_roles',
 function wpgh_apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_roles )
 {
     $contact = wpgh_get_contact( $user_id, true );
+
+    if ( ! $contact || ! $contact->exists() ){
+        return;
+    }
 
     /**
      * Convert list of roles to a list of tags and remove them...

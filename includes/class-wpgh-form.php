@@ -881,7 +881,7 @@ class WPGH_Form
             'id'            => 'agree_terms',
             'class'         => 'gh-terms',
             'value'         => 'yes',
-            'title'         => __( 'Please agree to the terms of service', 'groundhogg' ),
+            'title'         => __( 'Please agree to the terms of service.', 'groundhogg' ),
             'required'      => true,
         ), $atts );
 
@@ -951,7 +951,7 @@ class WPGH_Form
 
         if ( ! $contact || ! $contact->exists() ){
 
-            return __( 'You cannot manage the email preferences if no email exists.', 'groundhogg' );
+            return __( 'You cannot manage email preferences if no email exists.', 'groundhogg' );
 
         }
 

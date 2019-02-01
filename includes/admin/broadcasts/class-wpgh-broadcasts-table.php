@@ -92,13 +92,13 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
             'cancelled' => WPGH()->broadcasts->count( array( 'status' => 'cancelled'    ) ),
         );
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . ( $count[ 'sent' ] + $count[ 'scheduled' ] ) . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=all' ) . "'>" . __( 'All', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'sent' ] + $count[ 'scheduled' ] ) . ")</span>" . "</a>";
 
-        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=sent' ) . "'>" . __( 'Sent' ) . " <span class='count'>(" . $count[ 'sent' ] . ")</span>" . "</a>";
+        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=sent' ) . "'>" . __( 'Sent', 'groundhogg' ) . " <span class='count'>(" . $count[ 'sent' ] . ")</span>" . "</a>";
 
-        $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=scheduled' ) . "'>" . __( 'Scheduled' ) . " <span class='count'>(" . $count[ 'scheduled' ] . ")</span>" . "</a>";
+        $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=scheduled' ) . "'>" . __( 'Scheduled', 'groundhogg' ) . " <span class='count'>(" . $count[ 'scheduled' ] . ")</span>" . "</a>";
 
-        $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=cancelled' ) . "'>" . __( 'Cancelled' ) . " <span class='count'>(" . $count[ 'cancelled' ] . ")</span>" . "</a>";
+        $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=cancelled' ) . "'>" . __( 'Cancelled', 'groundhogg' ) . " <span class='count'>(" . $count[ 'cancelled' ] . ")</span>" . "</a>";
 
         return apply_filters(  'wpgh_broadcast_views', $views );
     }
@@ -135,9 +135,9 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $actions = array();
 
         if ( $this->get_view() !== 'cancelled' ) {
-            $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast->email->ID ) . "'>" . __('Edit Email') . "</a></span>";
+            $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast->email->ID ) . "'>" . __('Edit Email', 'groundhogg') . "</a></span>";
             if ( intval( $broadcast->send_time ) > time() ){
-                $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->ID ), 'cancel') . "'>" . __('Cancel') . "</a></span>";
+                $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->ID ), 'cancel') . "'>" . __('Cancel', 'groundhogg') . "</a></span>";
             }
         }
 
@@ -208,18 +208,18 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         ) );
 
         $html = sprintf( "%s: <strong>%d</strong><br/>",
-            __( "Sent" ),
+            __( "Sent", 'groundhogg' ),
             $contact_sum
         );
 
         $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
-            __( "Opens" ),
+            __( "Opens", 'groundhogg' ),
             admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
             $opens
         );
 
         $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
-            __( "Clicks" ),
+            __( "Clicks", 'groundhogg' ),
             admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) ),
             $clicks );
 

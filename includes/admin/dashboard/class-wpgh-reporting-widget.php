@@ -228,7 +228,7 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
     public function export()
     {
         if ( ! current_user_can( 'export_reports' ) ){
-            $response = __( 'You Cannot Export Reports!', 'groundhogg' );
+            $response = __( 'You cannot export reports!', 'groundhogg' );
             wp_die(  $response  );
         }
 

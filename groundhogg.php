@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 1.0.20
+Version: 1.0.20.4
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.0.20';
+        public $version = '1.0.20.4';
 
         /**
          * @var $instance Groundhogg instance
@@ -304,6 +304,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
                 self::$instance->register_blocks();
 
+                add_action( 'init', array( self::$instance, 'load_text_domain' ) );
 
             }
 
@@ -323,7 +324,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          */
         public function __clone() {
             // Cloning instances of the class is forbidden.
-            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'groundhogg' ), '1.6' );
+            _doing_it_wrong( __FUNCTION__, __( 'Cheatin huh?', 'groundhogg' ), '1.6' );
         }
 
         /**
@@ -335,7 +336,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          */
         public function __wakeup() {
             // Unserializing instances of the class is forbidden.
-            _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'groundhogg' ), '1.6' );
+            _doing_it_wrong( __FUNCTION__, __( 'Cheatin huh?', 'groundhogg' ), '1.6' );
         }
 
 
@@ -457,6 +458,12 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/gutenberg.php';
             require_once WPGH_PLUGIN_DIR . 'api/v2/class-wpgh-api-v2.php';
 
+        }
+
+        public function load_text_domain()
+        {
+            $plugin_rel_path = dirname( __FILE__ ) . '/languages'; /* Relative to WP_PLUGIN_DIR */
+            load_plugin_textdomain( 'groundhogg', false, $plugin_rel_path );
         }
 
         public function brand()

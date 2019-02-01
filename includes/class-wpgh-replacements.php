@@ -382,7 +382,7 @@ class WPGH_Replacements
 
         echo WPGH()->html->modal_link( array(
             'title'     => 'Replacements',
-            'text'      => __( 'Insert Replacement' ),
+            'text'      => __( 'Insert Replacement', 'groundhogg' ),
             'footer_button_text' => __( 'Close' ),
             'id'        => '',
             'class'     => 'button button-secondary no-padding',

@@ -667,7 +667,7 @@ class WPGH_Email
         }
 
         if ( ! is_object( $contact )  )
-            return new WP_Error( 'BAD_CONTACT', __( 'No contact given...' ) );
+            return new WP_Error( 'BAD_CONTACT', __( 'No contact provided...' ) );
 
         $this->contact = $contact;
 
@@ -801,7 +801,8 @@ class WPGH_Email
         //send to groundhogg
 
         $sender = $this->get_from_email();
-        $domain = explode( '@', $sender )[ 1 ];
+        $domain = explode( '@', $sender );
+        $domain = $domain[1];
 
         $data = array(
 
@@ -896,7 +897,7 @@ class WPGH_Email
     public function mail_failed( $error )
     {
         $message = sprintf(
-            __( "Email from Groundhogg failed to send.\nSend time: %s\nTo: %s\nSubject: %s\n\nError: %s", 'groundhogg' ),
+            __( "Email failed to send.\nSend time: %s\nTo: %s\nSubject: %s\n\nError: %s", 'groundhogg' ),
             date_i18n( 'F j Y H:i:s', current_time( 'timestamp' ) ),
             $this->contact->email,
             $this->subject,

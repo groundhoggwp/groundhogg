@@ -82,7 +82,7 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
     {
         if ( $event->is_broadcast_event() ) {
 
-            $funnel_title = __( 'Broadcast Email' );
+            $funnel_title = __( 'Broadcast Email', 'groundhogg' );
             return sprintf( "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . WPGH_BROADCAST ) ,$funnel_title);
 
         } else {
@@ -91,7 +91,7 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
 
             if ( ! $funnel_title ){
 
-                return __( '<strong>(funnel deleted)</strong>' );
+                return sprintf("<strong>(%s)</strong>", __( 'funnel deleted', 'groundhogg' ) );
 
             } else{
 
@@ -124,7 +124,7 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
         } else {
 
             if (!$event->step->title){
-                return sprintf("<strong>%s</strong>", __('(step deleted)'));
+                return sprintf("<strong>(%s)</strong>", __( 'step deleted', 'groundhogg' ) );
             } else {
                 return sprintf("<a href='%s' target='_blank'>%s</a>", admin_url('admin.php?page=gh_funnels&action=edit&funnel=' . $event->funnel_id . '#' . $event->step->ID), $event->step->title);
             }
@@ -170,10 +170,10 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
         $actions = array();
 
         if ( $event->time > time() ){
-            $actions[] =  sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, __( 'Run Now' ) );
-            $actions[] =  sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, __( 'Cancel' ) );
+            $actions[] =  sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, __( 'Run Now', 'groundhogg' ) );
+            $actions[] =  sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, __( 'Cancel', 'groundhogg' ) );
         } else {
-            $actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, __( 'Run Again' ) );
+            $actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, __( 'Run Again', 'groundhogg' ) );
         }
 
 

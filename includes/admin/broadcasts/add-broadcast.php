@@ -72,6 +72,6 @@ wp_enqueue_style( 'jquery-ui' );
         </tbody>
     </table>
     <div class="edit-tag-actions">
-        <?php submit_button( __( 'Schedule Broadcast' ), 'primary', 'update', false ); ?>
+        <?php submit_button( __( 'Schedule Broadcast', 'groundhogg' ), 'primary', 'update', false ); ?>
     </div>
 </form>

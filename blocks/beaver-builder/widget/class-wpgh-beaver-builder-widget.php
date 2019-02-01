@@ -9,7 +9,7 @@ class WPGH_Beaver_Builder_Widget extends  FLBuilderModule
 
         parent::__construct(array(
             'name' => __('Groundhogg Forms', 'groundhogg'),
-            'description' => __('A totally awesome Groundhogg forms!', 'groundhogg'),
+            'description' => __('Use Groundhogg forms to collect leads and launch automation!', 'groundhogg'),
             //'group'           => __( 'Standard Modules', 'fl-builder' ),
             'category' => __('Forms', 'fl-builder'),
             'dir' => WPGH_PLUGIN_DIR . 'blocks/beaver-builder/widget/',

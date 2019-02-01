@@ -246,10 +246,7 @@ class WPGH_Contacts_Page
 
 	            $this->notices->add(
 		            esc_attr( 'spammed' ),
-		            sprintf( "%s %d %s",
-			            __( 'Marked', 'groundhogg' ),
-			            count( $this->get_contacts() ),
-			            __( 'contacts as spam', 'groundhogg' ) ),
+		            sprintf( __( 'Marked %d contacts as spam.','groundhogg' ), count( $this->get_contacts() ) ),
 		            'success'
 	            );
 
@@ -277,10 +274,7 @@ class WPGH_Contacts_Page
 
 	            $this->notices->add(
 		            esc_attr( 'deleted' ),
-		            sprintf( "%s %d %s",
-			            __( 'Deleted', 'groundhogg' ),
-			            count( $this->get_contacts() ),
-			            __( 'Contacts', 'groundhogg' ) ),
+		            sprintf( __( "Deleted %d contacts.", 'groundhogg') , count( $this->get_contacts() ) ),
 		            'success'
 	            );
 
@@ -302,10 +296,7 @@ class WPGH_Contacts_Page
 
 	            $this->notices->add(
 		            esc_attr( 'unspam' ),
-		            sprintf( "%s %d %s",
-			            __( 'Approved', 'groundhogg' ),
-			            count( $this->get_contacts() ),
-			            __( 'Contacts', 'groundhogg' ) ),
+		            sprintf( __( "Approved %d contacts.", 'groundhogg' ), count( $this->get_contacts() ) ),
 		            'success'
 	            );
 
@@ -327,10 +318,7 @@ class WPGH_Contacts_Page
 
 	            $this->notices->add(
 		            esc_attr( 'unbounce' ),
-		            sprintf( "%s %d %s",
-			            __( 'Approved', 'groundhogg' ),
-			            count( $this->get_contacts() ),
-			            __( 'Contacts', 'groundhogg' ) ),
+		            sprintf( __( "Approved %d contacts.", 'groundhogg' ), count( $this->get_contacts() ) ),
 		            'success'
 	            );
 
@@ -376,7 +364,7 @@ class WPGH_Contacts_Page
         do_action( 'wpgh_admin_add_contact_before' );
 
         if ( ! isset( $_POST['email'] ) ){
-            $this->notices->add( 'NO_EMAIL', __( "Please enter a valid email address", 'groundhogg' ), 'error' );
+            $this->notices->add( 'NO_EMAIL', __( "Please enter a valid email address.", 'groundhogg' ), 'error' );
             return;
         }
 
@@ -503,7 +491,7 @@ class WPGH_Contacts_Page
 
             $this->notices->add(
                 esc_attr( 'unsubscribed' ),
-                __( 'This contact will no longer receive email communication', 'groundhogg' ),
+                __( 'This contact will no longer receive marketing.', 'groundhogg' ),
                 'info'
             );
         }
@@ -767,7 +755,7 @@ class WPGH_Contacts_Page
         $err = array();
 
         if( !$email ) {
-            $err[] = __( 'Email can not be blank.', 'groundhogg' );
+            $err[] = __( 'Email cannot be blank.', 'groundhogg' );
         } else if ( ! is_email( $email ) ) {
             $err[] = __( 'Invalid email address.', 'groundhogg' );
         }
@@ -792,7 +780,7 @@ class WPGH_Contacts_Page
         }
 
         if( !$args[ 'first_name' ] ) {
-            $err[] = __( 'First name can not be blank.', 'groundhogg' );
+            $err[] = __( 'First name cannot be blank.', 'groundhogg' );
         }
 
         if( $err ) {

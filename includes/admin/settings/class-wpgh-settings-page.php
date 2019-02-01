@@ -666,8 +666,8 @@ class WPGH_Settings_Page
         $setting = wp_parse_args( $args, array(
                 'id'        => '',
                 'section'   => 'misc',
-                'label'     => __( '', 'groundhogg' ),
-                'desc'      => __( '', 'groundhogg' ),
+                'label'     => '',
+                'desc'      => '',
                 'type'      => 'input',
                 'atts' => array(
                     //keep brackets for backwards compat

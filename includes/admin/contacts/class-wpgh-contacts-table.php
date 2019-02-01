@@ -503,7 +503,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
 		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=unbounce')),
 		        /* translators: %s: title */
 		        esc_attr( sprintf( __( 'Mark %s as a valid email.' ), $title ) ),
-		        __( 'Valid Email' )
+		        __( 'Valid Email', 'groundhogg' )
 	        );
         } else {
 	        $actions['spam'] = sprintf(
