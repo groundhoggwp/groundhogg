@@ -27,10 +27,10 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
     public function __construct()
     {
         //initialize api if user check the api section
-        add_action('rest_api_init', array( $this, 'register_routs' ) );
+        add_action('rest_api_init', array( $this, 'register_routes' ) );
     }
 
-    public function register_routs()
+    public function register_routse()
     {
         register_rest_route('gh/v2', '/contact', array(
             array(
@@ -206,7 +206,15 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
             return new WP_Error('error', __('Please enter a valid email address.','groundhogg' ) );
         }
     }
-    //PUT METHOD
+
+	/**
+	 * Updates a contact given a conatct array
+	 * Can also apply & remove tags
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
     public function update_contact(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'edit_contacts' ) ){
@@ -214,105 +222,72 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
         }
 
         $parameters = $request->get_params();
+        $contact_id = intval( $request->get_param( 'contact_id' ) );
+        $result = false;
 
+        if ( ! $contact_id || ! WPGH()->contacts->exists( $contact_id, 'ID' ) ){
+	        return new WP_Error('INVALID_ID', __( 'Please provide a valid contact ID.','groundhogg' ));
+        }
 
+        $contact = wpgh_get_contact( $contact_id );
 
-        if ( isset( $parameters['apply_tags'] ) )        {
-            if ( isset( $parameters['apply_tags']['contact_id'] ) ) {
-                if ( isset( $parameters['apply_tags']['tags'] ) ) {
-                    if (WPGH()->contacts->count( array( 'ID' =>  intval( $parameters['apply_tags']['contact_id'] ) ) ) > 0) {
-                        $contact = wpgh_get_contact( intval( $parameters['apply_tags']['contact_id'] ) );
-                        $tags = array_map('sanitize_text_field', $parameters['apply_tags']['tags']);
+        /* UPDATE CONTACT */
+        if ( $request->get_param( 'contact' ) ){
 
-                        $result = $contact->add_tag( $tags );
-                        if ( $result ) {
-                            return rest_ensure_response(array(
-                                'code' => 'success',
-                                'message' => __('Tags applied successfully.','groundhogg')
-                            ));
-                        } else {
-                            return new WP_Error('error', __('Something went wrong!','groundhogg' ) );
-                        }
-                    } else {
-                        return new WP_Error('error', __('Please provide a valid contact ID.','groundhogg') );
-                    }
-                } else {
-                    return new WP_Error('error', __('Please provide a valid array of tags.','groundhogg' ) );
-                }
-            } else {
-                return new WP_Error('error', __('Please provide a valid contact ID.','groundhogg' ) );
+        	$updated_contact_args = $request->get_param( 'contact' );
+
+        	/* Update the meta data and the remove it from the general contact query */
+        	if ( isset( $updated_contact_args[ 'meta' ] ) && is_array( $updated_contact_args[ 'meta' ] ) ){
+		        $updated_meta = $updated_contact_args[ 'meta' ];
+
+		        foreach ($updated_meta as $key => $value ){
+		        	$contact->update_meta( sanitize_key( $key ), sanitize_textarea_field( $value ) );
+		        }
+
+		        unset( $updated_contact_args[ 'meta' ] );
+	        }
+
+	        if ( isset( $updated_contact_args[ 'email' ] ) && ! is_email( isset( $updated_contact_args[ 'email' ] ) ) ){
+		        return new WP_Error('INVALID_EMAIL', __( 'Please provide a valid email address.','groundhogg' ));
+	        }
+
+	        /* Check if email address already belongs to another contact */
+	        if ( isset( $updated_contact_args[ 'email' ] ) && $contact->email !== $updated_contact_args[ 'email' ] && WPGH()->contacts->exists( $updated_contact_args[ 'email' ] ) ){
+		        return new WP_Error('EMAIL_IN_USE', __( 'This email address is already being used by another contact.','groundhogg' ));
+	        }
+
+	        $updated_contact_args = array_map( 'sanitize_text_field', $updated_contact_args );
+
+	        $result = $contact->update( $updated_contact_args );
+
+        }
+
+        /* APPLY TAGS */
+        if ( isset( $parameters['apply_tags'] ) ){
+            $tags = array_map('sanitize_text_field', $parameters['apply_tags']);
+            $result = $contact->add_tag( $tags );
+
+            if ( ! $result ) {
+	            return new WP_Error('APPLY_TAG_ERROR', __( 'Could not apply tags.', 'groundhogg' ) );
             }
         }
 
-        if(isset($parameters['remove_tags']))
-        {
-            if (isset($parameters['remove_tags']['contact_id'])) {
-
-                if (isset($parameters['remove_tags']['tags'])) {
-                    if (WPGH()->contacts->count( array( 'ID' => intval( $parameters['remove_tags']['contact_id'] ) ) ) > 0) {
-                        $contact = wpgh_get_contact( intval( $parameters['remove_tags']['contact_id'] ) );
-                        $tags = array_map('sanitize_text_field', $parameters['remove_tags']['tags']);
-                        $result = $contact->remove_tag( $tags );
-                        if ( $result ) {
-                            return rest_ensure_response(array(
-                                'code' => 'success',
-                                'message' => __('Tags removed successfully.','groundhogg')
-                            ));
-                        } else {
-                            return new WP_Error('error', __('Something went wrong!','groundhogg'));
-                        }
-                    } else {
-                        return new WP_Error('error', __('Please provide a valid contact ID.','groundhogg'));
-                    }
-                } else {
-                    return new WP_Error('error', __('Please provide a valid array of tags.','groundhogg'));
-                }
-            } else {
-                return new WP_Error('error', __('Please provide a valid contact ID.','groundhogg'));
+        /* REMOVE TAGS */
+        if(isset($parameters['remove_tags'])) {
+            $tags = array_map('sanitize_text_field', $parameters['remove_tags']['tags']);
+            $result = $contact->remove_tag( $tags );
+            if ( ! $result ) {
+                return new WP_Error('REMOVE_TAG_ERROR', __('Could not remove tags.','groundhogg'));
             }
         }
 
-        if ( isset ($parameters['contact']['contact_id'])) {// check user enter contact id for operation
-            $contact_id = intval( $parameters['contact']['contact_id'] );
-            unset($parameters['contact']['contact_id']);
-            //$contact = WPGH()->contacts->get_contacts(array('ID' => $contact_id));
-            if ( WPGH()->contacts->count( array( 'ID' => $contact_id ) ) > 0 ) { //check id exist in databse
-
-                if ( ( isset($parameters['contact']['email'] ) ) && ( WPGH()->contacts->exists( sanitize_email( $parameters['contact']['email'] ) ) ) ) {//if email already exist in database and user wants to update it..
-                    //validate email address
-                    if( is_email($parameters['contact']['email']) === false ) {
-                        return new WP_Error('error', __('Please provide a valid email address.' ,'groundhogg') );
-                    }
-                    unset( $parameters['contact']['email'] );
-                }
-                $update = 0 ;
-                if ( isset( $parameters['contact']['meta'] ) ) {// update meta
-                    //$data_meta = $data->meta;
-                    foreach ($parameters['contact']['meta'] as $key => $value) {
-                        WPGH()->contact_meta->update_meta($contact_id, sanitize_key($key), sanitize_text_field($value));
-                        $update++;
-                    }
-                    unset($parameters['contact']['meta']);
-                }
-                //update contact table
-                $data_array = $parameters['contact'];
-                $data_array = array_map('sanitize_text_field', $data_array);
-                if (count($data_array) > 0) {
-                    // update data only if there is a data
-                    WPGH()->contacts->update($contact_id, $data_array);
-                    $update++;
-                }
-                if ($update > 0) {
-                    return rest_ensure_response(array(
-                        'code' => 'success',
-                        'message' => __( 'Contact updated successfully.','groundhogg')
-                    ));
-                }
-            } else {
-                return new WP_Error('error', __('Please provide a valid contact ID.','groundhogg'));
-            }
-        } else {// response to enter contact_id
-            return new WP_Error('error', __('Please provide a valid contact ID.','groundhogg'));
+        if ( $result ){
+	        return rest_ensure_response( array(
+		        'code' => 'success',
+		        'message' => __( 'Contact updated successfully.','groundhogg')
+	        ));
+        } else {
+	        return new WP_Error('ERROR', __('Could not update contact.','groundhogg'));
         }
     }
 
