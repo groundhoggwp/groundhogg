@@ -121,7 +121,9 @@ function wpgh_run_install() {
     /* Install the email preferences center */
     if ( ! WPGH()->funnels->count() ){
 
-        include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
+        if ( ! isset( $funnel_templates ) ){
+            include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
+        }
 
         /* @var $funnel_templates array included from funnel-templates.php */
         $json = file_get_contents( $funnel_templates[ 'email_preferences' ]['file'] );
@@ -132,6 +134,19 @@ function wpgh_run_install() {
             $forms = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_type' => 'form_fill' ) );
             $form = array_shift( $forms );
         }
+    }
+
+    /* email preferences page */
+    if ( ! wpgh_get_option( 'gh_email_preferences_page', false ) && isset( $form ) ){
+        $email_preferences_args = array(
+            'post_title' => __( 'Email Preferences', 'groundhogg' ),
+            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form id="' . $form->ID . '" title="' . $form->step_title . '"]</p>', 'groundhogg' ),
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'post_author' => get_current_user_id(),
+        );
+        $id = wp_insert_post( $email_preferences_args );
+        update_option( 'gh_email_preferences_page', $id );
     }
 
     if ( ! wpgh_get_option( 'gh_confirmation_page', false ) ){
@@ -157,19 +172,6 @@ function wpgh_run_install() {
         );
         $id = wp_insert_post( $unsubscribed_args );
         update_option( 'gh_unsubscribe_page', $id );
-    }
-
-    /* email preferences page */
-    if ( ! wpgh_get_option( 'gh_email_preferences_page', false ) && isset( $form ) ){
-        $email_preferences_args = array(
-            'post_title' => __( 'Email Preferences', 'groundhogg' ),
-            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form id="' . $form->ID . '" title="' . $form->step_title . '"]</p>', 'groundhogg' ),
-            'post_type' => 'page',
-            'post_status' => 'publish',
-            'post_author' => get_current_user_id(),
-        );
-        $id = wp_insert_post( $email_preferences_args );
-        update_option( 'gh_email_preferences_page', $id );
     }
 
     if ( ! wpgh_get_option( 'gh_view_in_browser_page', false ) ){
@@ -376,3 +378,44 @@ function wpgh_install_roles_on_network() {
 }
 
 add_action( 'admin_init', 'wpgh_install_roles_on_network' );
+
+/**
+ * Install the email preferences funnel on network if it was unsuccessfully added.
+ *
+ * @since 1.0.21
+ */
+function wpgh_install_email_preferences_center() {
+
+    /* Install the email preferences center */
+    if ( ! WPGH()->funnels->count() ){
+
+        include WPGH_PLUGIN_DIR . '/templates/funnel-templates.php';
+
+        /* @var $funnel_templates array included from funnel-templates.php */
+        $json = file_get_contents( $funnel_templates[ 'email_preferences' ]['file'] );
+        $funnel_id = wpgh_import_funnel( json_decode( $json, true ) );
+
+        if ( $funnel_id ){
+            WPGH()->funnels->update( $funnel_id, array( 'status' => 'active' ) );
+            $forms = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id, 'step_type' => 'form_fill' ) );
+            $form = array_shift( $forms );
+        }
+    }
+
+    /* email preferences page */
+    if ( ! wpgh_get_option( 'gh_email_preferences_page', false ) && isset( $form ) ){
+        $email_preferences_args = array(
+            'post_title' => __( 'Email Preferences', 'groundhogg' ),
+            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form id="' . $form->ID . '" title="' . $form->step_title . '"]</p>', 'groundhogg' ),
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'post_author' => get_current_user_id(),
+        );
+        $id = wp_insert_post( $email_preferences_args );
+        update_option( 'gh_email_preferences_page', $id );
+    }
+
+}
+
+add_action( 'admin_init', 'wpgh_install_email_preferences_center' );
+

@@ -396,7 +396,7 @@ class WPGH_Funnels_Page
 					sprintf( "%s %d %s",
 						__( 'Deleted', 'groundhogg' ),
 						count( $this->get_funnels() ),
-						'Funnels' ),
+						'funnels' ),
 					'success'
 				);
 

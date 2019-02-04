@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.21 =
+* FIXED fatal error on multisite conversion of users to contacts.
+* FIXED email preferences center not being installed on multisite subsites.
+
 = 1.0.20.5 =
 * ADDED WP Bakery block support
 * REMOVED Semaphore usage in the event queue as it was causing problems.

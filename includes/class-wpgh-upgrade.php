@@ -122,7 +122,7 @@ class WPGH_Upgrade{
 
             $contact = wpgh_get_contact( $wp_user->ID, true );
 
-            if ( $contact->exists() ){
+            if ( $contact && $contact->exists() ){
                 $contact->add_tag( wpgh_get_roles_pretty_names( $wp_user->roles ) );
             }
 
