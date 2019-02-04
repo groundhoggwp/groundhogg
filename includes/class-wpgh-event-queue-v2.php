@@ -121,22 +121,22 @@ class WPGH_Event_Queue_v2
         $expected_max_time = $this->schedules[ $settings_queue_interval ][ 'interval' ];
         $expected_max_time_display = $this->schedules[ $settings_queue_interval ][ 'display' ];
 
-        if ( ( $this->time_till_process > $expected_max_time + 1 ) && ( ! defined( 'DISABLE_WP_CRON' ) ||  DISABLE_WP_CRON === false ) ){
-
-            $actual_time = human_time_diff( time(), $this->time_till_process );
-
-            WPGH()->notices->add(
-                'CRON_OVERRIDE',
-                sprintf(
-                    __(
-                        'Event Queue Error: It appears that something is overriding the default timing of the event queue. The queue is expected to run %s but will not run for at least %s.',
-                        'groundhogg'
-                    ),
-                    $expected_max_time_display,
-                    $actual_time ),
-                'warning'
-            );
-        }
+//        if ( ( $this->time_till_process > $expected_max_time + 1 ) && ( ! defined( 'DISABLE_WP_CRON' ) ||  DISABLE_WP_CRON === false ) ){
+//
+//            $actual_time = human_time_diff( time(), $this->time_till_process );
+//
+//            WPGH()->notices->add(
+//                'CRON_OVERRIDE',
+//                sprintf(
+//                    __(
+//                        'Event Queue Error: It appears that something is overriding the default timing of the event queue. The queue is expected to run %s but will not run for at least %s.',
+//                        'groundhogg'
+//                    ),
+//                    $expected_max_time_display,
+//                    $actual_time ),
+//                'warning'
+//            );
+//        }
 
     }
 
