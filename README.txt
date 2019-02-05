@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.22 =
+* UPDATED New REST API method for GH Email & SMS service that significantly improves usage performance and provides superior error reporting.
+
 = 1.0.21.1 =
 * ADDED Failed status to Events table
 * FIXED Rest API function typo.

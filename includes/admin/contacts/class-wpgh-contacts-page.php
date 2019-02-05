@@ -638,7 +638,9 @@ class WPGH_Contacts_Page
                 WPGH()->events->add( $args );
 
                 if ( $mail->send( $contact ) ){
-                    $this->notices->add( 'sent', __( "Email will be sent momentarily!", 'groundhogg' ), 'info' );
+                    $this->notices->add( 'sent', __( "Email sent!", 'groundhogg' ), 'info' );
+                } else {
+                    $this->notices->add( 'not_sent', __( "Email could not be sent.", 'groundhogg' ), 'error' );
                 }
             }
 

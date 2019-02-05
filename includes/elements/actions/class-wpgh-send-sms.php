@@ -119,28 +119,24 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
             $domain = parse_url( site_url(), PHP_URL_HOST );
 
             $data = array(
+                'token' => md5( wpgh_get_option( 'gh_email_token' ) ),
+                'domain' => $domain,//$domain,
                 'number' => $phone,
                 'message' => WPGH()->replacements->process( $message, $contact->ID ),
                 'sender' => wpgh_get_option( 'gh_business_name' ),
-                'gh_key' => wpgh_get_option( 'gh_email_token' ),
-                'domain' => $domain,//$domain,
                 'ip' => $contact->get_meta( 'ip_address' )
             );
 
-            $url = 'https://www.groundhogg.io';
-            $req = array(
-                'send_sns_sms' => 'send_sms',
-                'data' => $data,
-            );
+            $url = 'https://www.groundhogg.io/wp-json/gh/aws/v1/send-sms/';
 
-            $request    = wp_remote_post( $url, array( 'body' => $req ) );
+            $request    = wp_remote_post( $url, array( 'body' => $data ) );
             $result     = wp_remote_retrieve_body( $request );
             $result     = json_decode( $result );
 
-            if ( $result->status === 'failed' ){
+            if ( ! isset( $result->status ) || $result->status !== 'success' ){
                 /* mail failed */
 
-                do_action( 'wpgh_sms_failed' ,new WP_Error( 'API_SMS_FAILED', $result->message ) );
+                do_action( 'wpgh_sms_failed', new WP_Error( $result->code, $result->message ) );
                 $contact->add_note( $result->message );
                 return false;
 

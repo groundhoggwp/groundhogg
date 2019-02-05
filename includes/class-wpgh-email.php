@@ -806,24 +806,20 @@ class WPGH_Email
 
         $data = array(
 
+            'token'     => md5( wpgh_get_option( 'gh_email_token' ) ),
+            'domain'    => $domain,
             'sender'    => $sender,
             'from'      => $this->get_from_name(),
             'recipient' => $to,
             'subject'   => $subject,
             'content'   => $content,
-            'gh_key'    => wpgh_get_option( 'gh_email_token' ),
-            'domain'    => $domain,
         );
 
 // validate domain and senders email address before making sending request
 
-        $url = 'https://www.groundhogg.io';
-        $req = array(
-            'send_ses_email' => 'send_email',
-            'data' => $data,
-        );
+        $url = 'https://www.groundhogg.io/wp-json/gh/aws/v1/send-email/';
 
-        $request    = wp_remote_post( $url, array( 'body' => $req ) );
+        $request = wp_remote_post( $url, array( 'body' => $data ) );
 
         if ( ! $request || is_wp_error( $request ) ){
             do_action( 'wp_mail_failed' ,new WP_Error( 'API_MAIL_FAILED', $request->get_error_message() ) );
@@ -839,8 +835,8 @@ class WPGH_Email
             return false;
         }
 
-        $result     = wp_remote_retrieve_body( $request );
-        $result     = json_decode( $result );
+        $result = wp_remote_retrieve_body( $request );
+        $result = json_decode( $result );
 
         if ( ! is_object( $result ) ){
 
@@ -856,10 +852,23 @@ class WPGH_Email
 
             return false;
 
-        } else if ( $result->status === 'failed' ){
-            /* mail failed */
+            /* Error Code */
+        } else if ( ! isset( $result->status ) || $result->status !== 'success' ){
 
-            do_action( 'wp_mail_failed' ,new WP_Error( 'API_MAIL_FAILED', $result->message ) );
+            switch ( $result->code ){
+
+                case 'EMAIL_COMPLAINT':
+                    do_action( 'wp_mail_failed', new WP_Error( 'EMAIL_COMPLAINT', $result->message ) );
+                    $this->contact->update( array( 'optin_status' => WPGH_COMPLAINED ) );
+                    break;
+                case 'EMAIL_BOUNCED':
+                    do_action( 'wp_mail_failed', new WP_Error( 'EMAIL_BOUNCED', $result->message ) );
+                    $this->contact->update( array( 'optin_status' => WPGH_HARD_BOUNCE ) );
+                    break;
+                DEFAULT:
+                    do_action( 'wp_mail_failed' ,new WP_Error( $result->code, $result->message ) );
+                    break;
+            }
 
             /* Fall back to default WP */
             $this->send_with_wp(
@@ -870,18 +879,6 @@ class WPGH_Email
             );
 
             return false;
-
-        } else if ( $result->status === 'bounced' ){
-
-            do_action( 'wp_mail_failed' ,new WP_Error( 'EMAIL_BOUNCED', $result->message ) );
-
-            $this->contact->update( array( 'optin_status' => WPGH_HARD_BOUNCE ) );
-
-        } else if ( $result->status === 'complaint' ){
-
-            do_action( 'wp_mail_failed' ,new WP_Error( 'EMAIL_BOUNCED', $result->message ) );
-
-            $this->contact->update( array( 'optin_status' => WPGH_COMPLAINED ) );
 
         }
 
