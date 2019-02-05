@@ -169,6 +169,7 @@ class WPGH_Events_Table extends WP_List_Table {
         $status = $event->status;
 
         switch ( $status ){
+            default:
             case 'waiting':
                 $time_prefix = __( 'Will run' );
                 break;
@@ -180,6 +181,9 @@ class WPGH_Events_Table extends WP_List_Table {
                 break;
             case 'complete':
                 $time_prefix = __( 'Processed' );
+                break;
+            case 'failed':
+                $time_prefix = __( 'Failed' );
                 break;
         }
 

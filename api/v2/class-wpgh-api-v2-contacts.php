@@ -30,7 +30,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
         add_action('rest_api_init', array( $this, 'register_routes' ) );
     }
 
-    public function register_routse()
+    public function register_routes()
     {
         register_rest_route('gh/v2', '/contact', array(
             array(
