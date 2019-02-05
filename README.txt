@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.21.1 =
+* ADDED Failed status to Events table
+* FIXED Rest API function typo.
+
 = 1.0.21 =
 * FIXED fatal error on multisite conversion of users to contacts.
 * FIXED email preferences center not being installed on multisite subsites.
