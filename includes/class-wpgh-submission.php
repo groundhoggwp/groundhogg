@@ -523,16 +523,31 @@ class WPGH_Submission
             $this->process_email_preference_changes();
         }
 
-        if ( $this->id ){
-            do_action( 'wpgh_form_submit', $this->id, $c, $this );
+	    $success = apply_filters( 'wpgh_form_submit_feed', true, $this->id, $c, $this );
+
+        if ( $success && ! is_wp_error( $success ) ){
+
+	        if ( $this->id ){
+		        do_action( 'wpgh_form_submit', $this->id, $c, $this );
+	        }
+
+	        /* redirect to ensure cookie is set and can be used on the following page*/
+	        $success_page = $this->step->get_meta('success_page' );
+
+	        wp_redirect( $success_page );
+
+	        die();
+
+        } else if ( is_wp_error( $success ) ){
+
+        	/* Failed: handle WP_Error */
+
+        } else {
+
+        	/* Default failure handling. */
+
         }
 
-        /* redirect to ensure cookie is set and can be used on the following page*/
-        $success_page = $this->step->get_meta('success_page' );
-
-        wp_redirect( $success_page );
-
-        die();
 
     }
 
