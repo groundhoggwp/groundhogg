@@ -120,6 +120,8 @@ class WPGH_Form
         add_shortcode( 'recaptcha',  array( $this, 'recaptcha'   ) );
         add_shortcode( 'submit',     array( $this, 'submit'      ) );
         add_shortcode( 'email_preferences',  array( $this, 'email_preferences' ) );
+
+        do_action( 'wpgh_setup_form_shortcodes', $this );
     }
 
     /**
@@ -150,6 +152,8 @@ class WPGH_Form
         remove_shortcode( 'recaptcha'    );
         remove_shortcode( 'email_preferences' );
         remove_shortcode( 'submit'       );
+
+	    do_action( 'wpgh_destroy_form_shortcodes' );
     }
 
     /**
@@ -490,8 +494,15 @@ class WPGH_Form
             'label'         => __( 'Address *', 'groundhogg' ),
             'class'         => 'gh-address',
             'enabled'       => 'all',
+            'name_prefix'   => '',
             'required'      => true,
         ), $atts );
+
+        $name_prefix = sanitize_key( $a[ 'name_prefix' ] );
+
+        if ( $name_prefix ){
+        	$name_prefix .= '_';
+        }
 
         $section = sprintf( "<div class='%s'><label class='gh-input-label'>%s</label>", $a[ 'class' ], $a[ 'label' ] );
 
@@ -499,8 +510,8 @@ class WPGH_Form
             array(
                 'type'          => 'text',
                 'label'         => __( 'Street Address 1', 'groundhogg' ),
-                'name'          => 'street_address_1',
-                'id'            => 'street_address_1',
+                'name'          => $name_prefix . 'street_address_1',
+                'id'            => $name_prefix . 'street_address_1',
                 'placeholder'   => '123 Any St.',
                 'title'         => __( 'Street Address 1', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
@@ -511,8 +522,8 @@ class WPGH_Form
             array(
                 'type'          => 'text',
                 'label'         => __( 'Street Address 2', 'groundhogg' ),
-                'name'          => 'street_address_2',
-                'id'            => 'street_address_2',
+                'name'          => $name_prefix . 'street_address_2',
+                'id'            => $name_prefix . 'street_address_2',
                 'placeholder'   => 'Unit A',
                 'title'         => __( 'Street Address 2', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
@@ -523,8 +534,8 @@ class WPGH_Form
             array(
                 'type'          => 'text',
                 'label'         => __( 'City', 'groundhogg' ),
-                'name'          => 'city',
-                'id'            => 'city',
+                'name'          => $name_prefix . 'city',
+                'id'            => $name_prefix . 'city',
                 'placeholder'   => 'New York',
                 'title'         => __( 'City', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
@@ -535,8 +546,8 @@ class WPGH_Form
             array(
                 'type'          => 'text',
                 'label'         => __( 'State/Province', 'groundhogg' ),
-                'name'          => 'region',
-                'id'            => 'region',
+                'name'          => $name_prefix . 'region',
+                'id'            => $name_prefix . 'region',
                 'placeholder'   => 'New York',
                 'title'         => __( 'State/Province', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
@@ -544,8 +555,8 @@ class WPGH_Form
         ) ) . $this->column( array( 'size' => '1/2' ), $this->select(
             array(
                 'label'         => __( 'Country *', 'groundhogg' ),
-                'name'          => 'country',
-                'id'            => 'country',
+                'name'          => $name_prefix . 'country',
+                'id'            => $name_prefix . 'country',
                 'class'         => '',
                 'options'       => wpgh_get_countries_list(),
                 'attributes'    => '',
@@ -560,8 +571,8 @@ class WPGH_Form
             array(
                 'type'          => 'text',
                 'label'         => __( 'Postal/Zip Code', 'groundhogg' ),
-                'name'          => 'postal_zip',
-                'id'            => 'postal_zip',
+                'name'          => $name_prefix . 'postal_zip',
+                'id'            => $name_prefix . 'postal_zip',
                 'placeholder'   => '10001',
                 'title'         => __( 'Postal/Zip Code', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
