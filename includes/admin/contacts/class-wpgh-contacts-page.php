@@ -33,20 +33,24 @@ class WPGH_Contacts_Page
      */
     public $notices;
 
+    /**
+     * @var WPGH_Bulk_Contact_Manager
+     */
+    private $exporter;
+
     public function __construct()
     {
         add_action( 'admin_menu', array( $this, 'register' ) );
-
         add_action('wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
 
-
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_contacts' ){
-
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
             add_action( 'init' , array( $this, 'process_action' )  );
-
             $this->notices = WPGH()->notices;
+        }
 
+        if ( ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_contacts' ) || wp_doing_ajax() ){
+            $this->exporter = new WPGH_Bulk_Contact_Manager();
         }
     }
 
@@ -1048,7 +1052,9 @@ class WPGH_Contacts_Page
     {
         ?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_contacts&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
+            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_contacts&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_settings&tab=tools' ); ?>"><?php _e( 'Import' ); ?></a>
             <?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
             <?php switch ( $this->get_action() ){

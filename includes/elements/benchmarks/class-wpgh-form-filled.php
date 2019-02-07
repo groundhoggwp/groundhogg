@@ -52,11 +52,11 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
 
         if ( is_admin() && isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' && isset($_REQUEST[ 'action' ]) && $_REQUEST[ 'action' ] === 'edit' ){
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ));
+            add_action( 'admin_footer', array( $this, 'modal_form' ) );
         }
 
         add_action( 'wp_ajax_wpgh_form_impression', array( $this, 'track_impression' ) );
         add_action( 'wp_ajax_nopriv_wpgh_form_impression', array( $this, 'track_impression' ) );
-        add_action( 'admin_footer', array( $this, 'modal_form' ) );
     }
 
     /**

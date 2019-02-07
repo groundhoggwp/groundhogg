@@ -54,7 +54,9 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
         parent::__construct();
 
-        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
+        if ( is_admin() && isset( $_GET['page'] ) && ( $_GET[ 'page' ] === 'gh_funnels' ||  $_GET[ 'page' ] === 'gh_emails' ) && isset($_REQUEST[ 'action' ]) && $_REQUEST[ 'action' ] === 'edit' ) {
+            add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
+        }
 
     }
 

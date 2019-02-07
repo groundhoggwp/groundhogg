@@ -20,7 +20,11 @@ var wpghImportExport;
             } );
 
             $( '.export' ).on( 'click', function () {
-                wpghImportExport.export();
+                wpghImportExport.export( 'wpgh_export_contacts' );
+            } );
+
+            $( '.query-export' ).on( 'click', function () {
+                wpghImportExport.export( 'wpgh_query_export_contacts' );
             } );
 
             $( '.delete' ).on( 'click', function () {
@@ -118,20 +122,20 @@ var wpghImportExport;
 
         },
         
-        export: function() {
+        export: function( hook ) {
             var tags = $( '#export_tags' ).val();
-            this.retrieve( tags );
+            this.retrieve( hook, tags );
 
         },
         
-        retrieve: function ( tags ) {
+        retrieve: function ( hook, tags ) {
             var $spinner = $( '.spinner-export' );
             $spinner.css( 'visibility', 'visible' );
             $.ajax({
                 type: "post",
                 url: ajaxurl,
                 dataType: 'json',
-                data: { action: 'wpgh_export_contacts', tags: tags },
+                data: { action: hook, tags: tags },
                 success: function ( json ) {
                     var CSV = Papa.unparse( json, {
                         quotes: false,

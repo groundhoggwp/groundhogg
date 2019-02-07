@@ -415,7 +415,9 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
         $data = $c_query->query( $query );
 
-        /*
+        set_transient( 'wpgh_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
+
+        /**
          * Sort the data
          */
         usort( $data, array( $this, 'usort_reorder' ) );
@@ -536,6 +538,19 @@ class WPGH_Contacts_Table extends WP_List_Table {
         <tr id="contact-<?php echo $item->ID; ?>">
             <?php $this->single_row_columns( new WPGH_Contact( $item->ID ) ); ?>
         </tr>
+        <?php
+    }
+
+
+    /**
+     * @param string $which
+     */
+    protected function extra_tablenav($which)
+    {
+        ?>
+        <div class="alignleft">
+            <a class="button button-secondary action query-export" href="javascript:void(0)"><?php printf( __( 'Export %s contacts', 'groundhogg' ), $this->get_pagination_arg( 'total_items' ) ); ?></a>
+        </div>
         <?php
     }
 

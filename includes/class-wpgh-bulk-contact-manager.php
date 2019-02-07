@@ -53,6 +53,7 @@ class WPGH_Bulk_Contact_Manager
 
         add_action( 'wp_ajax_wpgh_import_contacts', array( $this, 'import' ) );
         add_action( 'wp_ajax_wpgh_export_contacts', array( $this, 'export' ) );
+        add_action( 'wp_ajax_wpgh_query_export_contacts', array( $this, 'query_export' ) );
         add_action( 'wp_ajax_wpgh_bulk_delete_contacts', array( $this, 'delete' ) );
 
         if ( did_action( 'admin_enqueue_scripts' ) ){
@@ -96,6 +97,39 @@ class WPGH_Bulk_Contact_Manager
             ));
 
         }
+
+        $keys = WPGH()->contact_meta->get_keys();
+
+        foreach ( $contacts as $contact ){
+
+            foreach ( $keys as $key ){
+
+                $contact->$key = WPGH()->contact_meta->get_meta( $contact->ID, $key, true );
+
+            }
+
+        }
+
+        wp_die( json_encode( $contacts ) );
+
+    }
+
+    /**
+     * Export contacts from the contact page
+     */
+    public function query_export()
+    {
+        if ( ! current_user_can( 'export_contacts' ) )
+            wp_die( new WP_Error( 'INVALID_PERMISSIONS', __( 'You do not have permission export contacts.' ) ) );
+
+        $c_query = new WPGH_Contact_Query();
+        $args = get_transient( 'wpgh_contact_query_args' );
+
+        if ( ! $args || ! is_array( $args ) ){
+            wp_die( new WP_Error( 'NO_QUERY', __( 'no query was present.' ) ));
+        }
+
+        $contacts = $c_query->query( $args );
 
         $keys = WPGH()->contact_meta->get_keys();
 
