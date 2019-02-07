@@ -1042,7 +1042,7 @@ jQuery( function($){
     public function submit( $atts, $content = '' )
     {
         $a = shortcode_atts( array(
-            'id'            => 'submit',
+            'id'            => 'gh-submit',
             'class'         => 'gh-submit',
             'text'          => __( 'Submit' ),
         ), $atts );
@@ -1074,13 +1074,23 @@ jQuery( function($){
     {
         $form = '<div class="gh-form-wrapper">';
 
-//        $form .= esc_html( $this->content );
-//        $form .= htmlentities( $this->content );
-//        $form .= htmlentities( "\"hi\"" );
+        /* Errors from a previous submission */
+        if ( WPGH()->submission->has_errors() ){
+
+            $errors = WPGH()->submission->get_errors();
+            $err_html = "";
+
+            foreach ( $errors as $error ){
+                $err_html .= sprintf( '<li id="%s">%s</li>', $error->get_error_code(), $error->get_error_message() );
+            }
+
+            $err_html = sprintf( "<ul class='gh-form-errors'>%s</ul>", $err_html );
+            $form .= sprintf( "<div class='gh-form-errors-wrapper'>%s</div>", $err_html );
+
+        }
+
 	    $target = $this->iframe_compat ? "target=\"_parent\"" : "";
-
         $form .= "<form method='post' class='gh-form " . $this->a[ 'class' ] . "' " . $target . " enctype=\"multipart/form-data\" >";
-
         $form .= wp_nonce_field( 'gh_submit', 'gh_submit_nonce', true, false );
 
         if ( ! empty( $this->a[ 'id' ] ) ){
@@ -1090,13 +1100,9 @@ jQuery( function($){
         $this->setup_shortcodes();
 
         if ( $this->id && WPGH()->steps->exists( $this->id ) ){
-
             $content = WPGH()->step_meta->get_meta( $this->id, 'form', true );
-
         } else {
-
             $content = '';
-
         }
 
         $form .= do_shortcode( $content );

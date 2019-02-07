@@ -60,6 +60,13 @@ class WPGH_Submission
     public $contact;
 
     /**
+     * Arrray of errors
+     *
+     * @var WP_Error[]
+     */
+    public $errors = array();
+
+    /**
      * WPGH_Submission constructor.
      *
      * If the GH_SUBMIT nonce is active than a from submission is
@@ -68,44 +75,49 @@ class WPGH_Submission
     public function __construct()
     {
         if ( isset( $_POST[ 'gh_submit_nonce' ] ) ) {
-//            add_action( 'init', array( $this, 'setup' ) );
             add_action( 'init', array( $this, 'process' ) );
         }
     }
 
     /**
-     * Setup the vars.
+     * Add a new error
+     *
+     * @param $code string|WP_Error
+     * @param $message string
+     *
+     * @return WP_Error
      */
-    public function setup(){
-
-        $this->data = $_POST;
-
-        $this->source = wpgh_get_referer();
-
-        /* set the form ID as the submission ID */
-
-        if ( isset( $this->step_id ) ) {
-
-            $this->id = $this->step_id;
-
-            $this->step = new WPGH_Step( $this->id );
-
-            unset( $this->step_id );
-
-            if ( ! $this->step->is_active() ){
-                $this->leave( 'This form is not accepting submissions.' );
-            }
-
-            $this->fields = $this->step->get_meta( 'expected_fields' );
-            $this->config = $this->step->get_meta( 'config' );
-
+    public function add_error( $code = '', $message = '' )
+    {
+        if ( is_wp_error( $code ) ){
+            $error = $code;
         } else {
-            $this->id = 0;
+            $error = new WP_Error( $code, $message );
         }
 
-        if ( empty( $this->fields ) ){
-            $this->leave( 'No fields available.' );
-        }
+        $this->errors[ $error->get_error_code() ] = $error;
+
+        return $error;
+    }
+
+    /**
+     * Whether the submission has errors which need to be displayed.
+     *
+     * @return bool
+     */
+    public function has_errors()
+    {
+       return ! empty( $this->errors );
+    }
+
+    /**
+     * Return the list of errors...
+     *
+     * @return WP_Error[]
+     */
+    public function get_errors()
+    {
+        return $this->errors;
     }
 
     /**
@@ -164,262 +176,6 @@ class WPGH_Submission
     }
 
     /**
-     * Verify the visitor with the nonce check
-     * if it fails, return to the previous page.
-     *
-     * Also performs other various checks,
-     * GDPR, reCaptcha & Terms are both checked here as well.
-     *
-     * @return true on success
-     */
-    public function verify()
-    {
-        if( ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) ) {
-
-            $this->leave( 'Failed security verification.' );
-            // or $this->go_back();
-
-        }
-
-        unset( $_POST[ 'gh_submit_nonce' ] );
-
-        if ( empty( $this->fields ) ) {
-
-            $this->leave( 'Expected a list of valid fields but got none.' );
-
-        }
-
-        //todo consider GDPR checking in the future
-        if ( wpgh_is_gdpr()
-            && $this->has_field( 'gdpr_consent' )
-            && ! isset( $this->gdpr_consent )
-        ) {
-
-            $this->leave( 'You must provide consent to sign up.' );
-
-        }
-
-        //todo check recaptcha elsewhere?
-        if ( wpgh_is_recaptcha_enabled()
-            && $this->has_field( 'g-recaptcha' )
-        ) {
-
-            if ( ! isset( $this->data[ 'g-recaptcha-response' ] ) ) {
-
-                $this->leave( 'You did not pass the robot test.' );
-
-            }
-
-            $file_name = sprintf(
-                "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
-                wpgh_get_option( 'gh_recaptcha_secret_key' ),
-                $this->data[ 'g-recaptcha-response' ]
-            );
-
-            $verifyResponse = file_get_contents( $file_name );
-            $responseData = json_decode( $verifyResponse );
-
-            if( $responseData->success == false ){
-
-                $this->leave( 'You did not pass the robot test.' );
-
-            }
-        }
-
-        //todo check terms elswehere?
-        if ( $this->has_field( 'agree_terms' )
-            && ! isset( $this->agree_terms )
-        ){
-
-            $this->leave( 'Your must agree to the terms of service.' );
-
-        }
-
-        if( !class_exists( 'Browser' ) )
-            require_once WPGH_PLUGIN_DIR . 'includes/lib/browser.php';
-
-        $browser = new Browser();
-
-        if ( $browser->isRobot() || $browser->isAol() ){
-            $this->leave( 'Are you a robot? It sure seems like it...' );
-        }
-
-        // Check the IP against the spam list
-        if ( $this->is_spam( wpgh_get_visitor_ip() ) ) {
-            $this->leave();
-        }
-
-        // Check all the POST data against the blacklist
-        foreach ( $this->data as $key => $value ) {
-
-            if ( $this->is_spam( $value ) ){
-
-                $this->leave();
-
-            }
-
-        }
-
-        return apply_filters( 'wpgh_submission_verify_check', true, $this );
-    }
-
-    /**
-     * Return whether the form has a given field
-     *
-     * @param $field string The field in quetion
-     *
-     * @return bool true if field exists, false otherwise
-     */
-    public function has_field( $field )
-    {
-        return in_array( trim( $field ), $this->fields );
-    }
-
-    /**
-     * Return the config object or false if it doesn't exist
-     *
-     * @param $field
-     * @return bool|mixed
-     */
-    public function get_field_config( $field )
-    {
-        return isset( $this->config[$field] )? $this->config[$field] : false;
-    }
-
-    /**
-     * Return to the previous page
-     */
-    private function go_back()
-    {
-        wp_redirect( $this->source );
-
-        die();
-    }
-
-    /**
-     * Exit our of the submission process
-     * Execute WP_DIE with a custom message
-     *
-     * @param $message string
-     */
-    private function leave( $message = '' )
-    {
-
-        if ( empty( $message ) )
-        {
-            $message = 'Unable to complete your request. Please contact the site administrator for assistance.';
-        }
-
-        wp_die(
-            __( $message, 'groundhogg' ),
-            __( 'Submission failed...', 'groundhogg' )
-        );
-    }
-
-    /**
-     * Check a given value for spam.
-     * If it's in the blacklist, mark the contact as spam and die
-     *
-     * @param $value mixed
-     * @return bool true if spam | false if pass
-     */
-    public function is_spam( $value )
-    {
-        $blacklist = wpgh_get_option( 'blacklist_keys', false );
-
-        if ( ! empty( $blacklist ) ) {
-
-            $keys = explode(PHP_EOL, $blacklist );
-
-            foreach ($keys as $key) {
-                if ( strpos( $value, $key ) !== false ){
-
-                    if( apply_filters( 'wpgh_spam_filter', true, $this, $value ) ){
-
-                        return false;
-
-                    }
-                }
-            }
-        }
-
-        return false;
-
-    }
-
-    /**
-     * Create the contact record and return back the contact ID
-     *
-     * @return WPGH_Contact|bool $contact the $contact
-     *
-     */
-    public function create_contact()
-    {
-        if ( isset( $this->email ) ){
-            $email = sanitize_email( $this->email );
-
-            if ( empty( $email ) ){
-                $this->leave( 'Please provide a valid email address' );
-            }
-
-//            if ( strpos( $this->first_name, ' ' ) !== false )
-
-            $args = array(
-                'email' => $email,
-                'first_name' => sanitize_text_field( stripslashes( $this->first_name ) ),
-                'last_name' => sanitize_text_field( stripslashes( $this->last_name ) )
-            );
-
-            if ( is_user_logged_in() ){
-                $args[ 'user_id' ] = get_current_user_id();
-            } else {
-                $user = get_user_by( 'email', $email );
-                if ( $user ){
-                    $args[ 'user_id' ] = $user->ID;
-                }
-            }
-
-            if ( WPGH()->contacts->exists( $email ) ){
-
-//            var_dump( $args );
-
-                $this->contact = new WPGH_Contact( $email );
-                $this->contact->update( $args );
-
-            } else{
-                $cid = WPGH()->contacts->add( $args );
-
-                if ( ! $cid ){
-                    $this->leave();
-                }
-
-                $this->contact = new WPGH_Contact( $cid );
-            }
-
-            //unset used DATA from the data prop
-            unset( $this->first_name );
-            unset( $this->last_name );
-            unset( $this->email );
-
-            return $this->contact;
-
-        } else if ( WPGH()->tracking->get_contact() instanceof WPGH_Contact) {
-
-            $this->contact = WPGH()->tracking->get_contact();
-
-            return $this->contact;
-
-        } else {
-
-            wp_die( 'Could not access or create a contact record.' );
-
-        }
-
-        return false;
-
-    }
-
-    /**
      * Process the submission.
      *
      * Verify the submission should be processed, if not exit out and die.
@@ -434,52 +190,40 @@ class WPGH_Submission
      */
     public function process()
     {
-    	$this->setup();
-
-        if ( ! $this->verify() ) {
-            $this->leave();
+        if ( ! $this->setup() ){
+            return;
         }
 
-        $c = $this->create_contact();
+        if ( ! $this->verify() ) {
+            return;
+        }
 
-        if ( ! $c ){
-            wp_die( 'Oops' );
+        if ( ! ( $c = $this->create_contact() ) ){
+            return;
         }
 
         $c->update_meta( 'ip_address', wpgh_get_visitor_ip() );
 
         if ( ! $c->get_meta( 'lead_source' ) ){
-
             $c->update_meta( 'lead_source', WPGH()->tracking->lead_source );
-
         }
 
         if ( ! $c->get_meta( 'source_page' ) ){
-
             $c->update_meta( 'source_page', $this->source );
-
         }
 
         if ( isset( $this->agree_terms ) ){
-
             $c->update_meta( 'terms_agreement', 'yes' );
             $c->update_meta( 'terms_agreement_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
-
             do_action( 'wpgh_agreed_to_terms', $c, $this );
-
             unset( $this->agree_terms );
-
         }
 
         if ( isset( $this->gdpr_consent ) ){
-
             $c->update_meta( 'gdpr_consent', 'yes' );
             $c->update_meta( 'gdpr_consent_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
-
             do_action( 'wpgh_gdpr_consented', $c, $this );
-
             unset( $this->gdpr_consent );
-
         }
 
         /* If the contact previously unsubed then reopt them back in.  */
@@ -516,51 +260,301 @@ class WPGH_Submission
         }
 
         if ( ! empty( $_FILES ) ){
-            $this->upload_files();
+            if ( ! $this->upload_files() ){
+                return;
+            }
         }
 
         if ( isset( $_POST[ 'email_preferences_nonce' ] ) ){
             $this->process_email_preference_changes();
         }
 
-	    $success = apply_filters( 'wpgh_form_submit_feed', true, $this->id, $c, $this );
+        $feed_response = apply_filters( 'wpgh_form_submit_feed', true, $this->id, $c, $this );
 
-        if ( $success && ! is_wp_error( $success ) ){
+        if ( ! $this->has_errors() ){
 
-	        if ( $this->id ){
-		        do_action( 'wpgh_form_submit', $this->id, $c, $this );
-	        }
+            if ( $this->id ){
+                do_action( 'wpgh_form_submit', $this->id, $c, $this );
+            }
 
-	        /* redirect to ensure cookie is set and can be used on the following page*/
-	        $success_page = $this->step->get_meta('success_page' );
+            /* redirect to ensure cookie is set and can be used on the following page*/
+            $success_page = $this->step->get_meta('success_page' );
+            wp_redirect( $success_page );
+            die();
 
-	        wp_redirect( $success_page );
-
-	        die();
-
-        } else if ( is_wp_error( $success ) ){
-
-        	/* Failed: handle WP_Error */
-
+        } else if ( is_wp_error( $feed_response ) ){
+            $this->add_error( $feed_response );
+            return;
         } else {
-
-        	/* Default failure handling. */
-
+            /* Default failure handling. */
+            $this->add_error( 'UNKNOWN_ERROR', esc_html__( 'Something went wrong.', 'groundhogg' ) );
+            return;
         }
 
 
     }
 
     /**
+     * Setup the vars.
+     *
+     * @return bool whether the setup was successful.
+     */
+    public function setup(){
+
+        $this->data = $_POST;
+
+        $this->source = wpgh_get_referer();
+
+        /* set the form ID as the submission ID */
+
+        if ( isset( $this->step_id ) ) {
+
+            $this->id = $this->step_id;
+
+            $this->step = new WPGH_Step( $this->id );
+
+            unset( $this->step_id );
+
+            if ( ! $this->step->is_active() ){
+                $this->add_error( 'INACTIVE_FORM', esc_html__( 'This form is not accepting submissions.', 'groundhogg' ) );
+                return false;
+            }
+
+            $this->fields = $this->step->get_meta( 'expected_fields' );
+            $this->config = $this->step->get_meta( 'config' );
+
+        } else {
+            $this->id = 0;
+        }
+
+        if ( empty( $this->fields ) ){
+            $this->add_error( 'INVALID_FORM', esc_html__( 'This form is setup incorrectly.', 'groundhogg' ) );
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Verify the visitor with the nonce check
+     * if it fails, return to the previous page.
+     *
+     * Also performs other various checks,
+     * GDPR, reCaptcha & Terms are both checked here as well.
+     *
+     * @return true|false true on success, false otherwise
+     */
+    public function verify()
+    {
+        if( ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) ) {
+            $this->add_error( 'SECURITY_CHECK_FAILED', esc_html__( 'Failed security check.', 'groundhogg' ) );
+            return false;
+        }
+
+        unset( $_POST[ 'gh_submit_nonce' ] );
+
+        if ( empty( $this->fields ) ) {
+            $this->add_error( 'INVALID_FORM', esc_html__( 'This form is setup incorrectly.', 'groundhogg' ) );
+            return false;
+        }
+
+        //todo consider GDPR checking in the future
+        if ( wpgh_is_gdpr()
+            && $this->has_field( 'gdpr_consent' )
+            && ! isset( $this->gdpr_consent )
+        ) {
+            $this->add_error( 'GDPR_CONSENT_REQUIRED', esc_html__( 'You must consent to sign up.', 'groundhogg' ) );
+            return false;
+        }
+
+        //todo check recaptcha elsewhere?
+        if ( wpgh_is_recaptcha_enabled()
+            && $this->has_field( 'g-recaptcha' )
+        ) {
+
+            if ( ! isset( $this->data[ 'g-recaptcha-response' ] ) ) {
+                $this->add_error( 'SECURITY_CHECK_FAILED', esc_html__( 'Failed security check.', 'groundhogg' ) );
+                return false;
+            }
+
+            $file_name = sprintf(
+                "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
+                wpgh_get_option( 'gh_recaptcha_secret_key' ),
+                $this->data[ 'g-recaptcha-response' ]
+            );
+
+            $verifyResponse = file_get_contents( $file_name );
+            $responseData = json_decode( $verifyResponse );
+
+            if( $responseData->success == false ){
+                $this->add_error( 'SECURITY_CHECK_FAILED', esc_html__( 'Failed security check.', 'groundhogg' ) );
+                return false;
+            }
+        }
+
+        //todo check terms elswehere?
+        if ( $this->has_field( 'agree_terms' )
+            && ! isset( $this->agree_terms )
+        ){
+            $this->add_error( 'TERMS_AGREEMENT_REQUIRED', esc_html__( 'You must agree to the terms to sign up.', 'groundhogg' ) );
+            return false;
+        }
+
+        if( ! class_exists( 'Browser' ) ){
+            require_once WPGH_PLUGIN_DIR . 'includes/lib/browser.php';
+        }
+
+        $browser = new Browser();
+
+        if ( $browser->isRobot() || $browser->isAol() ){
+            $this->add_error( 'SPAM_CHECK_FAILED', esc_html__( 'Failed spam check.', 'groundhogg' ) );
+            return false;
+        }
+
+        // Check the IP against the spam list
+        if ( $this->is_spam( wpgh_get_visitor_ip() ) ) {
+            $this->add_error( 'SPAM_CHECK_FAILED', esc_html__( 'Failed spam check.', 'groundhogg' ) );
+            return false;
+        }
+
+        // Check all the POST data against the blacklist
+        foreach ( $this->data as $key => $value ) {
+            if ( $this->is_spam( $value ) ){
+                $this->add_error( 'SPAM_CHECK_FAILED', esc_html__( 'Failed spam check.', 'groundhogg' ) );
+                return false;
+            }
+        }
+
+        return apply_filters( 'wpgh_submission_verify_check', true, $this );
+    }
+
+    /**
+     * Return whether the form has a given field
+     *
+     * @param $field string The field in quetion
+     *
+     * @return bool true if field exists, false otherwise
+     */
+    public function has_field( $field )
+    {
+        return in_array( trim( $field ), $this->fields );
+    }
+
+    /**
+     * Return the config object or false if it doesn't exist
+     *
+     * @param $field
+     * @return bool|mixed
+     */
+    public function get_field_config( $field )
+    {
+        return isset( $this->config[$field] )? $this->config[$field] : false;
+    }
+
+    /**
+     * Check a given value for spam.
+     * If it's in the blacklist, mark the contact as spam and die
+     *
+     * @param $value mixed
+     * @return bool true if spam | false if pass
+     */
+    public function is_spam( $value )
+    {
+        $blacklist = wpgh_get_option( 'blacklist_keys', false );
+
+        if ( ! empty( $blacklist ) ) {
+
+            $keys = explode(PHP_EOL, $blacklist );
+
+            foreach ($keys as $key) {
+                if ( strpos( $value, $key ) !== false ){
+
+                    if( apply_filters( 'wpgh_spam_filter', true, $this, $value ) ){
+
+                        return false;
+
+                    }
+                }
+            }
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Create the contact record and return back the contact ID
+     *
+     * @return WPGH_Contact|false the $contact or false if failure.
+     *
+     */
+    public function create_contact()
+    {
+        if ( isset( $this->email ) ){
+
+            $email = sanitize_email( $this->email );
+
+            if ( empty( $email ) ){
+                $this->add_error( 'INVALID_EMAIL', esc_html__( 'Please provide a valid email address.', 'groundhogg' ) );
+                return false;
+            }
+
+            $args = array(
+                'email' => $email,
+                'first_name' => sanitize_text_field( stripslashes( $this->first_name ) ),
+                'last_name' => sanitize_text_field( stripslashes( $this->last_name ) )
+            );
+
+            if ( is_user_logged_in() ){
+                $args[ 'user_id' ] = get_current_user_id();
+            } else {
+                $user = get_user_by( 'email', $email );
+                if ( $user ){
+                    $args[ 'user_id' ] = $user->ID;
+                }
+            }
+
+            if ( WPGH()->contacts->exists( $email ) ){
+                $this->contact = new WPGH_Contact( $email );
+                $this->contact->update( $args );
+            } else{
+                $cid = WPGH()->contacts->add( $args );
+                if ( ! $cid ){
+                    $this->add_error( 'UNKNOWN_ERROR', esc_html__( 'Something went wrong.', 'groundhogg' ) );
+                    return false;
+                }
+                $this->contact = new WPGH_Contact( $cid );
+            }
+
+            //unset used DATA from the data prop
+            unset( $this->first_name );
+            unset( $this->last_name );
+            unset( $this->email );
+            return $this->contact;
+
+        } else if ( WPGH()->tracking->get_contact() instanceof WPGH_Contact) {
+            $this->contact = WPGH()->tracking->get_contact();
+            return $this->contact;
+        } else {
+            $this->add_error( 'UNKNOWN_ERROR', esc_html__( 'Something went wrong.', 'groundhogg' ) );
+            return false;
+        }
+
+        return false;
+
+    }
+
+    /**
      * Process any file uploads tht may be present.
      *
-     * @return bool
+     * @return bool true if no files or files uploaded, false otherwise.
      */
     public function upload_files()
     {
 
         if ( empty( $_FILES ) ){
-            return false;
+            /* No files present, don't worry about it */
+            return true;
         }
 
         foreach ( $_FILES as $key => $file ) {
@@ -576,7 +570,8 @@ class WPGH_Submission
                         if ( $file = $this->handle_file_upload( $key, $config ) ) {
 
                             if ( is_wp_error($file) || ! is_array( $file ) ) {
-                                wp_die($file);
+                                $this->add_error( $file->get_error_code(), $file->get_error_message() );
+                                return false;
                             }
 
                             $files = $this->contact->get_meta('files');
@@ -595,7 +590,8 @@ class WPGH_Submission
 
                         } else {
 
-                            wp_die( __( 'Could not upload file.' ) );
+                            $this->add_error( 'FILE_UPLOAD_ERROR',  __( 'Could not upload file.', 'groundhogg' ) );
+                            return false;
 
                         }
 

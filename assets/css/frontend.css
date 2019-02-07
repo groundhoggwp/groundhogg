@@ -2,6 +2,21 @@
     box-sizing: border-box;
 }
 
+.gh-form-errors-wrapper{
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    border-radius: 4px;
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+ul.gh-form-errors{
+    padding-left: 20px;
+    margin: 0;
+}
+
 .gh-input{
     outline: none;
     width: 100%;

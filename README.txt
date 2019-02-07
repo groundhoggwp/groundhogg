@@ -111,6 +111,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED Quick export button to contacts view
 * ADDED Import link to contact page
 * ADDED Actions for registering new From builder shortcodes
+* ADDED much better way of handling form errors.
 * UPDATED New REST API method for GH Email & SMS service that significantly improves usage performance and provides superior error reporting.
 * FIXED Some funnel builder assets loading on every page.
 
