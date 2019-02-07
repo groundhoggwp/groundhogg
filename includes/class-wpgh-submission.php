@@ -270,7 +270,7 @@ class WPGH_Submission
      *
      * @return bool true if field exists, false otherwise
      */
-    private function has_field( $field )
+    public function has_field( $field )
     {
         return in_array( trim( $field ), $this->fields );
     }
@@ -281,7 +281,7 @@ class WPGH_Submission
      * @param $field
      * @return bool|mixed
      */
-    private function get_field_config( $field )
+    public function get_field_config( $field )
     {
         return isset( $this->config[$field] )? $this->config[$field] : false;
     }
