@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.23 =
+* ADDED Tabbed contact record sections to cut down on scrolling.
+* FIXED Var dump $_FILES in contact record update.
+
 = 1.0.22 =
 * ADDED Quick export button to contacts view
 * ADDED Import link to contact page
