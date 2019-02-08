@@ -27,7 +27,7 @@ var wpghImportExport;
                 wpghImportExport.export( 'wpgh_query_export_contacts' );
             } );
 
-            $( '.delete' ).on( 'click', function () {
+            $( '.bulk-delete' ).on( 'click', function () {
                 wpghImportExport.bulkDelete();
             } );
 

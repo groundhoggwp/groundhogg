@@ -5,11 +5,13 @@ var wpghContactEditor;
     wpghContactEditor = {
 
         init: function () {
+
             $( '#meta-table' ).click(function( e ){
                 if ( $( e.target ).closest( '.deletemeta' ).length ){
                     $( e.target ).closest( 'tr' ).remove();
                 }
             });
+
             $( '.addmeta' ).click(function(){
 
                 var $newMeta = "<tr>" +
@@ -25,9 +27,23 @@ var wpghContactEditor;
 
             });
 
-
             $( '.create-user-account' ).click( function () {
                 $( '#create-user-form' ).submit();
+            });
+
+
+            $( '.nav-tab' ).click(function (e) {
+
+                var $tab = $(this);
+
+                $( '.nav-tab' ).removeClass( 'nav-tab-active' );
+                $tab.addClass( 'nav-tab-active' );
+
+                $( '.tab-content-wrapper' ).addClass( 'hidden' );
+                $( '#' + $tab.attr( 'id' ) + '_content' ).removeClass( 'hidden' );
+
+                $( '#active-tab' ).val( $tab.attr( 'id' ).replace( 'tab_', '' ) );
+
             });
         }
     };

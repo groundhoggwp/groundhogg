@@ -58,6 +58,17 @@ $contact->auto_link_account();
 
 $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->email;
 
+$tabs = apply_filters( 'wpgh_contact_record_tabs', array(
+    'general'       => __( 'General Info', 'groundhogg' ),
+    'meta_data'     => __( 'Custom Info', 'groundhogg' ),
+    'segmentation'  => __( 'Segmentation', 'groundhogg' ),
+    'notes'         => __( 'Notes', 'groundhogg' ),
+    'files'         => __( 'Files', 'groundhogg' ),
+    'actions'       => __( 'Actions', 'groundhogg' ),
+    'activity'      => __( 'Activity', 'groundhogg' ),
+) );
+
+$active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ] ) ? sanitize_key( $_POST[ 'active_tab' ] ) : 'general';
 ?>
 
 <!-- Title -->
@@ -67,210 +78,237 @@ $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->emai
 </script>
 <!--/ Title -->
 
+<!-- BEGIN TABS -->
+<h2 class="nav-tab-wrapper" style="margin: 1em 0;">
+    <?php foreach ( $tabs as $id => $tab ): ?>
+        <a href="javascript:void(0)" class="nav-tab <?php echo  $active_tab == $id ? 'nav-tab-active' : ''; ?>" id="<?php esc_attr_e( 'tab_' . $id ); ?>"><?php _e( $tab, 'groundhogg'); ?></a>
+    <?php endforeach; ?>
+</h2>
+<!-- END TABS -->
+
 <form method="post" class="" enctype="multipart/form-data">
     <?php wp_nonce_field( 'edit', '_edit_contact_nonce' ); ?>
 
+
+<?php
+
+add_action( 'wpgh_contact_record_tab_general', 'wpgh_contact_record_general_info' );
+
+/**
+ * Contact Info
+ *
+ * @param $contact WPGH_Contact
+ */
+function wpgh_contact_record_general_info( $contact )
+{
+    ?>
+
     <!-- GENERAL NAME INFO -->
-    <h2><?php _e( 'Name' ) ?></h2>
+    <h2><?php _e('Name') ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
-            <th><label for="first_name"><?php echo __( 'First Name', 'groundhogg' )?></label></th>
+            <th><label for="first_name"><?php echo __('First Name', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'first_name',
-                    'name'  => 'first_name',
+                    'id' => 'first_name',
+                    'name' => 'first_name',
                     'value' => $contact->first_name,
                 );
-            echo WPGH()->html->input( $args ); ?>
+                echo WPGH()->html->input($args); ?>
             </td>
         </tr>
         <tr>
-            <th><label for="last_name"><?php echo __( 'Last Name', 'groundhogg' )?></label></th>
+            <th><label for="last_name"><?php echo __('Last Name', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'last_name',
-                    'name'  => 'last_name',
+                    'id' => 'last_name',
+                    'name' => 'last_name',
                     'value' => $contact->last_name,
                 );
-                echo WPGH()->html->input( $args ); ?></td>
+                echo WPGH()->html->input($args); ?></td>
         </tr>
-        <?php if ( isset( $contact->user->user_login ) ): ?>
+        <?php if (isset($contact->user->user_login)): ?>
 
             <tr>
-                <th><label for="username"><?php echo __( 'Username' )?></label></th>
-                <td><?php printf( "<a href='%s'>%s</a>", admin_url( 'user-edit.php?user_id=' . $contact->user->ID ), $contact->user->user_login ); ?></td>
+                <th><label for="username"><?php echo __('Username') ?></label></th>
+                <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->user->ID), $contact->user->user_login); ?></td>
             </tr>
 
         <?php endif; ?>
-        <?php do_action( 'wpgh_contact_edit_name', $id ); ?>
+        <?php do_action('wpgh_contact_edit_name', $contact->ID ); ?>
         </tbody>
     </table>
 
-    <?php if ( ! $contact->user ): ?>
+    <?php if (!$contact->user): ?>
 
-    <h2><?php _e( 'Create User Account' ); ?></h2>
+    <h2><?php _e('Create User Account'); ?></h2>
     <table class="form-table">
         <tr>
-            <th><label for="create_account"><?php echo __( 'Create New Account?', 'groundhogg' )?></label></th>
-            <td><button type="button" class="button button-secondary create-user-account"><?php _e( 'Create User Account' ); ?></button>
-            <p class="description"><?php _e('This contact does not have an associated user account? Would you like to create one?', 'groundhogg' ); ?></p></td>
+            <th><label for="create_account"><?php echo __('Create New Account?', 'groundhogg') ?></label></th>
+            <td>
+                <button type="button"
+                        class="button button-secondary create-user-account"><?php _e('Create User Account'); ?></button>
+                <p class="description"><?php _e('This contact does not have an associated user account? Would you like to create one?', 'groundhogg'); ?></p>
+            </td>
         </tr>
         <tr>
-            <th><label for="link_existing"><?php echo __( 'Link Existing Account?', 'groundhogg' )?></label></th>
-            <td><?php wp_dropdown_users( array( 'show_option_none' => __( 'Select a User Account (optional)', 'groundhogg' ) ) ); ?>
-                <p class="description"><?php _e('You can link an existing user account to this contact.', 'groundhogg' ); ?></p>
+            <th><label for="link_existing"><?php echo __('Link Existing Account?', 'groundhogg') ?></label></th>
+            <td><?php wp_dropdown_users(array('show_option_none' => __('Select a User Account (optional)', 'groundhogg'))); ?>
+                <p class="description"><?php _e('You can link an existing user account to this contact.', 'groundhogg'); ?></p>
             </td>
         </tr>
 
     </table>
-    <?php endif; ?>
+<?php endif; ?>
 
     <!-- GENERAL CONTACT INFO -->
-    <h2><?php _e( 'Contact Info' ); ?></h2>
+    <h2><?php _e('Contact Info'); ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
-            <th><label for="email"><?php echo __( 'Email', 'groundhogg' )?></label></th>
+            <th><label for="email"><?php echo __('Email', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'type'  => 'email',
-                    'id'    => 'email',
-                    'name'  => 'email',
+                    'type' => 'email',
+                    'id' => 'email',
+                    'name' => 'email',
                     'value' => $contact->email,
                 );
-                echo WPGH()->html->input( $args ); ?>
-                <label><span class="row-actions"><a style="text-decoration: none" target="_blank" href="<?php echo esc_url(substr(  $contact->email, strpos( $contact->email, '@' ) ) ); ?>"><span class="dashicons dashicons-external"></span></a></span>
-                <p class="submit"><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpgh_get_optin_status_text( $contact->ID ); ?></p>
-                <?php if ( $contact->optin_status !== WPGH_UNSUBSCRIBED ): ?>
-                    <input type="checkbox" name="unsubscribe" value="1"><?php _e( 'Mark as unsubscribed.' )?></label>
-                <?php endif; ?>
+                echo WPGH()->html->input($args); ?>
+                <label><span class="row-actions"><a style="text-decoration: none" target="_blank"
+                                                    href="<?php echo esc_url(substr($contact->email, strpos($contact->email, '@'))); ?>"><span class="dashicons dashicons-external"></span></a></span>
+                    <p class="submit"><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpgh_get_optin_status_text($contact->ID); ?></p>
+                    <?php if ($contact->optin_status !== WPGH_UNSUBSCRIBED): ?>
+                    <input type="checkbox" name="unsubscribe" value="1"><?php _e('Mark as unsubscribed.') ?></label>
+            <?php endif; ?>
             </td>
         </tr>
         <tr>
-            <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'groundhogg' )?></label></th>
+            <th><label for="primary_phone"><?php echo __('Primary Phone', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'type'  => 'tel',
-                    'id'    => 'primary_phone',
-                    'name'  => 'primary_phone',
-                    'value' => $contact->get_meta( 'primary_phone' ),
+                    'type' => 'tel',
+                    'id' => 'primary_phone',
+                    'name' => 'primary_phone',
+                    'value' => $contact->get_meta('primary_phone'),
                 );
-                echo WPGH()->html->input( $args ); ?></td>
+                echo WPGH()->html->input($args); ?></td>
         </tr>
         <tr>
-            <th><label for="primary_phone_extension"><?php echo __( 'Phone Extension', 'groundhogg' )?></label></th>
+            <th><label for="primary_phone_extension"><?php echo __('Phone Extension', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'primary_phone_extension',
-                    'name'  => 'primary_phone_extension',
-                    'value' => $contact->get_meta( 'primary_phone_extension' ),
+                    'id' => 'primary_phone_extension',
+                    'name' => 'primary_phone_extension',
+                    'value' => $contact->get_meta('primary_phone_extension'),
                 );
-                echo WPGH()->html->input( $args ); ?></td>
+                echo WPGH()->html->input($args); ?></td>
         </tr>
-        <?php do_action( 'wpgh_contact_edit_contact_info', $id ); ?>
+        <?php do_action('wpgh_contact_edit_contact_info', $contact->ID ); ?>
         </tbody>
     </table>
 
     <!-- Company info -->
-    <h2><?php _e( 'Company Info', 'groundhogg' ); ?></h2>
+    <h2><?php _e('Company Info', 'groundhogg'); ?></h2>
     <table class="form-table">
         <tr>
-            <th><label for="company_name"><?php echo __( 'Company Name', 'groundhogg' )?></label></th>
+            <th><label for="company_name"><?php echo __('Company Name', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'company_name',
-                    'name'  => 'company_name',
-                    'value' => $contact->get_meta( 'company_name' ),
+                    'id' => 'company_name',
+                    'name' => 'company_name',
+                    'value' => $contact->get_meta('company_name'),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo WPGH()->html->input($args); ?>
             </td>
         </tr>
         <tr>
-            <th><label for="job_title"><?php echo __( 'Job Title', 'groundhogg' )?></label></th>
+            <th><label for="job_title"><?php echo __('Job Title', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'job_title',
-                    'name'  => 'job_title',
-                    'value' => $contact->get_meta( 'job_title' ),
+                    'id' => 'job_title',
+                    'name' => 'job_title',
+                    'value' => $contact->get_meta('job_title'),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo WPGH()->html->input($args); ?>
             </td>
         </tr>
         <tr>
-            <th><label for="company_address"><?php echo __( 'Full Company Address', 'groundhogg' )?></label></th>
+            <th><label for="company_address"><?php echo __('Full Company Address', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'company_address',
-                    'name'  => 'company_address',
-                    'value' => $contact->get_meta( 'company_address' ),
+                    'id' => 'company_address',
+                    'name' => 'company_address',
+                    'value' => $contact->get_meta('company_address'),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo WPGH()->html->input($args); ?>
             </td>
         </tr>
     </table>
 
     <!-- ADDRESS -->
-    <h2><?php _e( 'Address' ); ?></h2>
+    <h2><?php _e('Address'); ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
-            <th><label for="street_address_1"><?php echo __( 'Street Address 1', 'groundhogg' )?></label></th>
+            <th><label for="street_address_1"><?php echo __('Street Address 1', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'street_address_1',
-                    'name'  => 'street_address_1',
-                    'value' => $contact->get_meta( 'street_address_1' ),
+                    'id' => 'street_address_1',
+                    'name' => 'street_address_1',
+                    'value' => $contact->get_meta('street_address_1'),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo WPGH()->html->input($args); ?>
             </td>
         </tr>
         <tr>
-            <th><label for="street_address_2"><?php echo __( 'Street Address 2', 'groundhogg' )?></label></th>
+            <th><label for="street_address_2"><?php echo __('Street Address 2', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'street_address_2',
-                    'name'  => 'street_address_2',
-                    'value' => $contact->get_meta( 'street_address_2' ),
+                    'id' => 'street_address_2',
+                    'name' => 'street_address_2',
+                    'value' => $contact->get_meta('street_address_2'),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo WPGH()->html->input($args); ?>
             </td>
         </tr>
         <tr>
-            <th><label for="city"><?php echo __( 'City', 'groundhogg' )?></label></th>
+            <th><label for="city"><?php echo __('City', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'city',
-                    'name'  => 'city',
-                    'value' => $contact->get_meta( 'city' ),
+                    'id' => 'city',
+                    'name' => 'city',
+                    'value' => $contact->get_meta('city'),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo WPGH()->html->input($args); ?>
             </td>
         </tr>
         <tr>
-            <th><label for="postal_zip"><?php echo __( 'Postal/Zip Code', 'groundhogg' )?></label></th>
+            <th><label for="postal_zip"><?php echo __('Postal/Zip Code', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'postal_zip',
-                    'name'  => 'postal_zip',
-                    'value' => $contact->get_meta( 'postal_zip' ),
+                    'id' => 'postal_zip',
+                    'name' => 'postal_zip',
+                    'value' => $contact->get_meta('postal_zip'),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo WPGH()->html->input($args); ?>
             </td>
         </tr>
         <tr>
-            <th><label for="region"><?php echo __( 'State/Province', 'groundhogg' )?></label></th>
+            <th><label for="region"><?php echo __('State/Province', 'groundhogg') ?></label></th>
             <td><?php $args = array(
-                    'id'    => 'region',
-                    'name'  => 'region',
-                    'value' => $contact->get_meta( 'region' ),
+                    'id' => 'region',
+                    'name' => 'region',
+                    'value' => $contact->get_meta('region'),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo WPGH()->html->input($args); ?>
             </td>
         </tr>
         <tr>
-            <th><label for="country"><?php echo __( 'Country', 'groundhogg' )?></label></th>
-            <td><div style="max-width: 338px">
+            <th><label for="country"><?php echo __('Country', 'groundhogg') ?></label></th>
+            <td>
+                <div style="max-width: 338px">
                     <?php $args = array(
-                        'id'    => 'country',
-                        'name'  => 'country',
-                        'selected' => $contact->get_meta( 'country' ),
-                        'data'  => wpgh_get_countries_list(),
-                        'placeholder'   => __( 'Select a Country', 'groundhogg' ),
+                        'id' => 'country',
+                        'name' => 'country',
+                        'selected' => $contact->get_meta('country'),
+                        'data' => wpgh_get_countries_list(),
+                        'placeholder' => __('Select a Country', 'groundhogg'),
                     );
-                    echo WPGH()->html->select2( $args ); ?>
+                    echo WPGH()->html->select2($args); ?>
                 </div>
             </td>
         </tr>
-        <?php do_action( 'wpgh_contact_edit_address', $id ); ?>
+        <?php do_action('wpgh_contact_edit_address', $contact->ID ); ?>
         </tbody>
     </table>
 
@@ -278,18 +316,30 @@ $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->emai
     <h2><?php _e( 'Compliance' ); ?></h2>
     <table class="form-table">
         <tbody>
+        <tr>
+            <th><?php _e( 'Agreed To Terms' ); ?></th>
+            <td><?php echo (  $contact->get_meta( 'terms_agreement') === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ),  $contact->get_meta( 'terms_agreement_date' ) ): '&#x2014;'; ?></td>
+        </tr>
+        <?php if ( wpgh_is_gdpr() ): ?>
             <tr>
-                <th><?php _e( 'Agreed To Terms' ); ?></th>
-                <td><?php echo (  $contact->get_meta( 'terms_agreement') === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ),  $contact->get_meta( 'terms_agreement_date' ) ): '&#x2014;'; ?></td>
+                <th><?php _e( 'GDPR Consent' ); ?></th>
+                <td><?php echo (  $contact->get_meta( 'gdpr_consent' ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ),  $contact->get_meta( 'gdpr_consent_date' ) ) : '&#x2014;'; ?></td>
             </tr>
-            <?php if ( wpgh_is_gdpr() ): ?>
-                <tr>
-                    <th><?php _e( 'GDPR Consent' ); ?></th>
-                    <td><?php echo (  $contact->get_meta( 'gdpr_consent' ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ),  $contact->get_meta( 'gdpr_consent_date' ) ) : '&#x2014;'; ?></td>
-                </tr>
-            <?php endif; ?>
+        <?php endif; ?>
         </tbody>
     </table>
+
+    <?php
+}
+
+add_action( 'wpgh_contact_record_tab_segmentation', 'wpgh_contact_record_section_segmentation' );
+
+/**
+ * @param $contact WPGH_Contact
+ */
+function wpgh_contact_record_section_segmentation( $contact )
+{
+    ?>
 
     <!-- SEGMENTATION AND LEADSOURCE -->
     <h2><?php _e( 'Segmentation' ); ?></h2>
@@ -347,10 +397,20 @@ $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->emai
                 </div>
             </td>
         </tr>
-        <?php do_action( 'wpgh_contact_edit_tags', $id ); ?>
+        <?php do_action( 'wpgh_contact_edit_tags', $contact->ID ); ?>
         </tbody>
     </table>
+<?php
+}
 
+add_action( 'wpgh_contact_record_tab_notes', 'wpgh_contact_record_section_notes' );
+
+/**
+ * @param $contact WPGH_Contact
+ */
+function wpgh_contact_record_section_notes( $contact )
+{
+    ?>
     <!-- NOTES -->
     <h2><?php _e( 'Notes' ); ?></h2>
     <table>
@@ -361,96 +421,119 @@ $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->emai
                     'id'    => 'notes',
                     'name'  => 'notes',
                     'value' => $contact->get_meta( 'notes' ),
+                    'rows'  => 30,
                 );
                 echo WPGH()->html->textarea( $args ); ?>
             </td>
         </tr>
-        <?php do_action( 'wpgh_contact_edit_notes', $id ); ?>
+        <?php do_action( 'wpgh_contact_edit_notes', $contact->ID ); ?>
         </tbody>
     </table>
+    <?php
+}
 
+add_action( 'wpgh_contact_record_tab_actions', 'wpgh_contact_record_section_actions' );
+
+/**
+ * @param $contact WPGH_contact
+ */
+function wpgh_contact_record_section_actions( $contact )
+{
+    ?>
     <!-- ACTIONS -->
-    <h2><?php _e( 'Actions' ); ?></h2>
-    <table class="form-table" >
+    <h2><?php _e('Actions'); ?></h2>
+    <table class="form-table">
         <tr>
-            <th><?php _e( 'Send Email' ); ?></th>
-            <td><div style="max-width: 400px">
-                    <?php echo WPGH()->html->dropdown_emails( array() );?>
+            <th><?php _e('Send Email'); ?></th>
+            <td>
+                <div style="max-width: 400px">
+                    <?php echo WPGH()->html->dropdown_emails(array()); ?>
                     <div class="row-actions">
-                        <button type="submit" name="send_email" value="send" class="button"><?php _e( 'Send' ); ?></button>
+                        <button type="submit" name="send_email" value="send" class="button"><?php _e('Send'); ?></button>
                     </div>
                 </div>
             </td>
         </tr>
         <tr>
-            <th><?php _e( 'Add To Funnel' ); ?></th>
-            <td><div style="max-width: 400px">
+            <th><?php _e('Add To Funnel'); ?></th>
+            <td>
+                <div style="max-width: 400px">
                     <?php
 
                     $steps = WPGH()->steps->get_steps();
                     $options = array();
-                    foreach ( $steps as $step ){
-                        $step = new WPGH_Step( $step->ID );
-                        if ($step->is_active() ){
-                            $funnel_name = WPGH()->funnels->get_column_by( 'title', 'ID', $step->funnel_id );
-                            $options[ $funnel_name ][ $step->ID ] = sprintf( "%d. %s (%s)", $step->order, $step->title, str_replace( '_', ' ', $step->type ) );
+                    foreach ($steps as $step) {
+                        $step = new WPGH_Step($step->ID);
+                        if ($step->is_active()) {
+                            $funnel_name = WPGH()->funnels->get_column_by('title', 'ID', $step->funnel_id);
+                            $options[$funnel_name][$step->ID] = sprintf("%d. %s (%s)", $step->order, $step->title, str_replace('_', ' ', $step->type));
                         }
                     }
 
-//                    sort( $options );
-
-                    echo WPGH()->html->select2( array(
-                        'name'              => 'add_contacts_to_funnel_step_picker',
-                        'id'                => 'add_contacts_to_funnel_step_picker',
-                        'data'              => $options,
-                        'multiple'          => false,
-                    ) );
+                    echo WPGH()->html->select2(array(
+                        'name' => 'add_contacts_to_funnel_step_picker',
+                        'id' => 'add_contacts_to_funnel_step_picker',
+                        'data' => $options,
+                        'multiple' => false,
+                    ));
 
                     ?>
                     <div class="row-actions">
-                        <button type="submit" name="start_funnel" value="start" class="button"><?php _e( 'Start' ); ?></button>
+                        <button type="submit" name="start_funnel" value="start" class="button"><?php _e('Start'); ?></button>
                     </div>
                 </div>
             </td>
         </tr>
     </table>
+    <?php
+}
 
+add_action( 'wpgh_contact_record_tab_files', 'wpgh_contact_record_section_files' );
+
+/**
+ * @param $contact WPGH_Contact
+ */
+function wpgh_contact_record_section_files( $contact )
+{
+    ?>
     <!-- BEGIN FILES -->
-    <h2><?php _e( 'Files' ); ?></h2>
+    <h2><?php _e('Files'); ?></h2>
     <div style="max-width: 800px;">
         <table class="wp-list-table widefat fixed striped files">
             <thead>
             <tr>
-                <th><?php _e( 'Name', 'groundhogg' ); ?></th>
-                <th><?php _e( 'Size', 'groundhogg' ); ?></th>
-                <th><?php _e( 'Type', 'groundhogg' ); ?></th>
-                <th><?php _e( 'Replacement Code', 'groundhogg' ); ?></th>
+                <th><?php _e('Name', 'groundhogg'); ?></th>
+                <th><?php _e('Size', 'groundhogg'); ?></th>
+                <th><?php _e('Type', 'groundhogg'); ?></th>
+                <th><?php _e('Replacement Code', 'groundhogg'); ?></th>
             </tr>
             </thead>
             <tbody>
             <?php
 
-            $files = $contact->get_meta( 'files' );
+            $files = $contact->get_meta('files');
 
-            if ( empty( $files ) ):
+            if (empty($files)):
                 ?>
-                <tr><td colspan="4"><?php _e( 'This contact has no files...', 'groundhogg' ); ?></td></tr>
+                <tr>
+                    <td colspan="4"><?php _e('This contact has no files...', 'groundhogg'); ?></td>
+                </tr>
             <?php
             else:
 
-                foreach ($files as $key => $item ):
+                foreach ($files as $key => $item):
 
-                    if ( ! isset( $item[ 'file' ] ) ){
+                    if (!isset($item['file'])) {
                         continue;
                     }
 
-                    $info = pathinfo( $item[ 'file' ] );
+                    $info = pathinfo($item['file']);
                     ?>
                     <tr>
-                        <td><?php printf( "<a href='%s' target='_blank'>%s</a>", $item[ 'url' ], esc_html( $info[ 'basename' ] ) ); ?></td>
-                        <td><?php esc_html_e( size_format( filesize( $item[ 'file' ] ) ) ); ?></td>
-                        <td><?php esc_html_e( $info[ 'extension' ] ); ?></td>
-                        <td><?php esc_html_e( '{files.' . $key . '}' ); ?></td>
+                        <td><?php printf("<a href='%s' target='_blank'>%s</a>", $item['url'], esc_html($info['basename'])); ?></td>
+                        <td><?php esc_html_e(size_format(filesize($item['file']))); ?></td>
+                        <td><?php esc_html_e($info['extension']); ?></td>
+                        <td><?php esc_html_e('{files.' . $key . '}'); ?></td>
                     </tr>
                 <?php
                 endforeach;
@@ -459,45 +542,54 @@ $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->emai
             </tbody>
             <tfoot>
             <tr>
-                <th><?php _e( 'Name', 'groundhogg' ); ?></th>
-                <th><?php _e( 'Size', 'groundhogg' ); ?></th>
-                <th><?php _e( 'Type', 'groundhogg' ); ?></th>
-                <th><?php _e( 'Replacement Code', 'groundhogg' ); ?></th>
+                <th><?php _e('Name', 'groundhogg'); ?></th>
+                <th><?php _e('Size', 'groundhogg'); ?></th>
+                <th><?php _e('Type', 'groundhogg'); ?></th>
+                <th><?php _e('Replacement Code', 'groundhogg'); ?></th>
             </tr>
             </tfoot>
         </table>
         <div>
-            <p class="description"><?php _e( 'Upload files: ' ); ?><input type="file" name="files[]" multiple></p>
+            <p class="description"><?php _e('Upload files: '); ?><input type="file" name="files[]" multiple></p>
         </div>
     </div>
     <!-- END FILES -->
 
-    <?php do_action( 'wpgh_contact_edit_before_meta', $id ); ?>
+    <?php
+}
 
+add_action( 'wpgh_contact_record_tab_meta_data', 'wpgh_contact_record_section_custom_meta' );
+
+/**
+ * @param $contact WPGH_Contact
+ */
+function wpgh_contact_record_section_custom_meta( $contact ){
+    ?>
+    <?php do_action( 'wpgh_contact_edit_before_meta', $contact->ID ); ?>
     <!-- META -->
     <h2><?php _e( 'Custom Meta' ); ?></h2>
-    <table class="form-table" >
-        <tr>
-            <th><label for="edit_meta"><?php _e( 'Edit Meta' ); ?></label></th>
-            <td>
-                <div id="meta-toggle-switch" class="onoffswitch" style="text-align: left">
-                    <input type="checkbox" name="view_meta" class="onoffswitch-checkbox" value="ready" id="edit_meta" <?php ?> >
-                    <label class="onoffswitch-label" for="edit_meta">
-                        <span class="onoffswitch-inner"></span>
-                        <span class="onoffswitch-switch"></span>
-                    </label>
-                </div>
-            </td>
-        </tr>
-    </table>
-    <script>
-        jQuery(function($){
-            $('#edit_meta').change(function(){
-                $('#meta-table').toggleClass( 'hidden' );
-            })
-        });
-    </script>
-    <table id='meta-table' class="form-table hidden" >
+<!--    <table class="form-table" >-->
+<!--        <tr>-->
+<!--            <th><label for="edit_meta">--><?php //_e( 'Edit Meta' ); ?><!--</label></th>-->
+<!--            <td>-->
+<!--                <div id="meta-toggle-switch" class="onoffswitch" style="text-align: left">-->
+<!--                    <input type="checkbox" name="view_meta" class="onoffswitch-checkbox" value="ready" id="edit_meta" --><?php //?><!-- >-->
+<!--                    <label class="onoffswitch-label" for="edit_meta">-->
+<!--                        <span class="onoffswitch-inner"></span>-->
+<!--                        <span class="onoffswitch-switch"></span>-->
+<!--                    </label>-->
+<!--                </div>-->
+<!--            </td>-->
+<!--        </tr>-->
+<!--    </table>-->
+<!--    <script>-->
+<!--        jQuery(function($){-->
+<!--            $('#edit_meta').change(function(){-->
+<!--                $('#meta-table').toggleClass( 'hidden' );-->
+<!--            })-->
+<!--        });-->
+<!--    </script>-->
+    <table id='meta-table' class="form-table" >
         <tbody>
         <tr>
             <th>
@@ -508,118 +600,142 @@ $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->emai
                 </div>
             </th>
         </tr>
-            <?php
+        <?php
 
-            //this meta data will not be shown in the meta data section.
-            $meta_exclude_list = apply_filters( 'wpgh_exclude_meta_list', array(
-                'lead_source',
-                'source_page',
-                'page_source',
-                'terms_agreement',
-                'terms_agreement_date',
-                'gdpr_consent',
-                'gdpr_consent_date',
-                'primary_phone',
-                'primary_phone_extension',
-                'street_address_1',
-                'street_address_2',
-                'city',
-                'postal_zip',
-                'region',
-                'country',
-                'notes',
-                'files',
-                'company_name',
-                'company_address',
-                'job_title'
-            ) );
+        //this meta data will not be shown in the meta data section.
+        $meta_exclude_list = apply_filters( 'wpgh_exclude_meta_list', array(
+            'lead_source',
+            'source_page',
+            'page_source',
+            'terms_agreement',
+            'terms_agreement_date',
+            'gdpr_consent',
+            'gdpr_consent_date',
+            'primary_phone',
+            'primary_phone_extension',
+            'street_address_1',
+            'street_address_2',
+            'city',
+            'postal_zip',
+            'region',
+            'country',
+            'notes',
+            'files',
+            'company_name',
+            'company_address',
+            'job_title'
+        ) );
 
-            $meta = WPGH()->contact_meta->get_meta( $contact->ID );
+        $meta = WPGH()->contact_meta->get_meta( $contact->ID );
 
-            foreach ( $meta as $meta_key => $value ):
+        foreach ( $meta as $meta_key => $value ):
 
-                if ( ! in_array( $meta_key, $meta_exclude_list ) ):
-                    $value = $value[ 0 ]; ?>
-            <tr id="meta-<?php esc_attr_e( $meta_key )?>">
-                <th>
-                   <?php esc_html_e( $meta_key ); ?>
-                    <p class="description">{_<?php esc_html_e( $meta_key ); ?>}</p>
-                </th>
-                <td>
-                    <?php
+            if ( ! in_array( $meta_key, $meta_exclude_list ) ):
+                $value = $value[ 0 ]; ?>
+                <tr id="meta-<?php esc_attr_e( $meta_key )?>">
+                    <th>
+                        <?php esc_html_e( $meta_key ); ?>
+                        <p class="description">{_<?php esc_html_e( $meta_key ); ?>}</p>
+                    </th>
+                    <td>
+                        <?php
 
-                    if ( strpos( $value, PHP_EOL  ) !== false ){
+                        if ( strpos( $value, PHP_EOL  ) !== false ){
 
-                        $args = array(
-                            'name' => 'meta[' . $meta_key . ']',
-                            'id'   => $meta_key,
-                            'value' => $value
-                        );
+                            $args = array(
+                                'name' => 'meta[' . $meta_key . ']',
+                                'id'   => $meta_key,
+                                'value' => $value
+                            );
 
-                        echo WPGH()->html->textarea( $args );
+                            echo WPGH()->html->textarea( $args );
 
-                    } else {
+                        } else {
 
-                        $args = array(
-                            'name' => 'meta[' . $meta_key . ']',
-                            'id'   => $meta_key,
-                            'value' => $value
-                        );
+                            $args = array(
+                                'name' => 'meta[' . $meta_key . ']',
+                                'id'   => $meta_key,
+                                'value' => $value
+                            );
 
-                        echo WPGH()->html->input( $args );
+                            echo WPGH()->html->input( $args );
 
-                    }
-                    ?>
+                        }
+                        ?>
 
-                    <span class="row-actions"><span class="delete"><a style="text-decoration: none" href="javascript:void(0)" class="deletemeta"><span class="dashicons dashicons-trash"></span></a></span></span>
-                </td>
-            </tr>
-                <?php endif;
-            endforeach; ?>
-        <?php do_action( 'wpgh_contact_edit_meta', $id ); ?>
+                        <span class="row-actions"><span class="delete"><a style="text-decoration: none" href="javascript:void(0)" class="deletemeta"><span class="dashicons dashicons-trash"></span></a></span></span>
+                    </td>
+                </tr>
+            <?php endif;
+        endforeach; ?>
+        <?php do_action( 'wpgh_contact_edit_meta', $contact->ID ); ?>
         </tbody>
     </table>
 
-    <?php do_action( 'wpgh_contact_edit_before_history', $id ); ?>
+    <?php
+}
 
+add_action( 'wpgh_contact_record_tab_activity', 'wpgh_contact_record_section_activity' );
+
+
+/**
+ * @param $contact WPGH_Contact
+ */
+function wpgh_contact_record_section_activity( $contact )
+{
+    ?>
+    <?php do_action('wpgh_contact_edit_before_history', $contact->ID ); ?>
     <!-- UPCOMING EVENTS -->
-    <h2><?php _e( 'Upcoming Events' ); ?></h2>
+    <h2><?php _e('Upcoming Events'); ?></h2>
     <div style="max-width: 800px">
 
-    <?php $events = WPGH()->events->get_events( array( 'contact_id' => $contact->ID, 'status' => 'waiting' ) );
+        <?php $events = WPGH()->events->get_events(array('contact_id' => $contact->ID, 'status' => 'waiting'));
 
-    $table = new WPGH_Contact_Events_Table();
-    $table->data = $events;
+        $table = new WPGH_Contact_Events_Table();
+        $table->data = $events;
 
-    $table->prepare_items();
-    $table->display(); ?>
-    <a href="<?php echo admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $id ); ?>"><?php _e( 'View All Events' ); ?></a>
-
-    <p class="description"><?php _e( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'groundhogg' ); ?></p>
-
-    <!-- FUNNNEL HISTORY -->
-    <h2><?php _e( 'Recent Funnel History' ); ?></h2>
-    <div style="max-width: 800px">
-    </div>
-    <?php $events = WPGH()->events->get_events( array( 'contact_id' => $contact->ID, 'status' => 'complete' ) );
-
-    $table = new WPGH_Contact_Events_Table();
-    $table->data = $events;
-
-    $table->prepare_items();
-    $table->display(); ?>
-    <a href="<?php echo admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $id ); ?>"><?php _e( 'View All Events' ); ?></a>
-    <p class="description"><?php _e( 'Any previous funnel steps will show up here. You can choose run them again.<br/>
-    This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'groundhogg' ); ?></p>
-    </div>
-    <!-- EMAIL HISTORY -->
-    <h2><?php _e( 'Recent Email History' ); ?></h2>
-    <div style="max-width: 800px">
-    <?php $table = new WPGH_Contact_Activity_Table();
         $table->prepare_items();
         $table->display(); ?>
-    <p class="description"><?php _e( 'This is where you can check if this contact is interacting with your emails.', 'groundhogg' ); ?></p>
+        <a href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . $contact->ID ); ?>"><?php _e('View All Events'); ?></a>
+
+        <p class="description"><?php _e('Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'groundhogg'); ?></p>
+
+        <!-- FUNNNEL HISTORY -->
+        <h2><?php _e('Recent Funnel History'); ?></h2>
+        <div style="max-width: 800px">
+        </div>
+        <?php $events = WPGH()->events->get_events(array('contact_id' => $contact->ID, 'status' => 'complete'));
+
+        $table = new WPGH_Contact_Events_Table();
+        $table->data = $events;
+
+        $table->prepare_items();
+        $table->display(); ?>
+        <a href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . $contact->ID ); ?>"><?php _e('View All Events'); ?></a>
+        <p class="description"><?php _e('Any previous funnel steps will show up here. You can choose run them again.<br/>
+    This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'groundhogg'); ?></p>
     </div>
+    <!-- EMAIL HISTORY -->
+    <h2><?php _e('Recent Email History'); ?></h2>
+    <div style="max-width: 800px">
+        <?php $table = new WPGH_Contact_Activity_Table();
+        $table->prepare_items();
+        $table->display(); ?>
+        <p class="description"><?php _e('This is where you can check if this contact is interacting with your emails.', 'groundhogg'); ?></p>
+    </div>
+
+    <?php
+}
+
+foreach ( $tabs as $tab => $tab_name ):
+
+    ?><div class="tab-content-wrapper <?php if ( $tab !== $active_tab ){ echo 'hidden'; }; ?>" id="<?php esc_attr_e('tab_' . $tab . '_content' ); ?>">
+    <?php do_action('wpgh_contact_record_tab_' . $tab, $contact); ?>
+    </div><?php
+
+endforeach;
+
+    ?>
     <!-- THE END -->
     <?php do_action( 'wpgh_contact_edit_after', $id ); ?>
     <div class="edit-contact-actions">
@@ -628,6 +744,9 @@ $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->emai
             <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
         </p>
     </div>
+
+    <?php echo WPGH()->html->input( array( 'type' => 'hidden', 'name' => 'active_tab', 'id' => 'active-tab' ) ); ?>
+
 </form>
 <?php if ( ! $contact->user ): ?>
 <form id="create-user-form" action="<?php echo admin_url( 'user-new.php' ); ?>" method="post">

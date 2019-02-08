@@ -174,7 +174,8 @@ class WPGH_Contacts_Page
                 _e( 'Add Contact' , 'groundhogg' );
                 break;
             case 'edit':
-                _e( 'Edit Contact' , 'groundhogg' );
+                $contact = wpgh_get_contact( array_shift( $this->get_contacts() ) );
+                printf( __( 'Edit Contact: %s', 'groundhogg'), $contact->full_name );
                 break;
             case 'search':
                 _e( 'Search Contacts' , 'groundhogg' );
@@ -663,7 +664,7 @@ class WPGH_Contacts_Page
 
         if ( ! empty( $_FILES[ 'files' ][ 'tmp_name' ][ 0 ] ) ){
 
-            var_dump( $_FILES );
+//            var_dump( $_FILES );
 
             $this->upload_files();
         }

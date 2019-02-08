@@ -137,7 +137,7 @@ function wpgh_bulk_delete_contacts_display()
             <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
             <p class="description"><?php _e( 'Contacts with these tags will be delete. Leave blank to delete ALL contacts.', 'groundhogg' ); ?></p>
             <p class="submit">
-                <button class="delete button button-primary" id="delete" type="button"><?php _e( 'Delete Contacts' ); ?></button>
+                <button class="bulk-delete button button-primary" id="delete" type="button"><?php _e( 'Delete Contacts' ); ?></button>
                 <span class="spinner spinner-delete" style="float:none;"></span>
             </p>
         </div>
