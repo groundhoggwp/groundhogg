@@ -175,7 +175,13 @@ class WPGH_Contacts_Page
                 break;
             case 'edit':
                 $contact = wpgh_get_contact( array_shift( $this->get_contacts() ) );
-                printf( __( 'Edit Contact: %s', 'groundhogg'), $contact->full_name );
+
+                if ( $contact ){
+	                printf( __( 'Edit Contact: %s', 'groundhogg'), $contact->full_name );
+                } else {
+	                printf( __( 'Oops!', 'groundhogg'), $contact->full_name );
+                }
+
                 break;
             case 'search':
                 _e( 'Search Contacts' , 'groundhogg' );
