@@ -551,6 +551,7 @@ function wpgh_contact_record_section_files( $contact )
         </table>
         <div>
             <p class="description"><?php _e('Upload files: '); ?><input type="file" name="files[]" multiple></p>
+            <p class="description"><?php _e('Click <b>Update Contact</b> when ready to upload.'); ?></p>
         </div>
     </div>
     <!-- END FILES -->
