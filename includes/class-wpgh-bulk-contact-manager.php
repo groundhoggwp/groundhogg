@@ -211,25 +211,27 @@ class WPGH_Bulk_Contact_Manager
         if ( ! current_user_can( 'import_contacts' ) )
             wp_die( 'You cannot manage contacts.' );
 
-        $contacts = $_POST[ 'data' ];
-
-        $this->import_id = $_POST[ 'import_id' ];
-
+        $data = $_POST[ 'data' ];
+        $this->import_id = sanitize_key( $_POST[ 'import_id' ] );
         $this->get_import_tag();
 
-        $contact_count = 0;
+        $completed = 0;
+        $skipped = 0;
 
-        foreach ( $contacts as $contact ){
+        foreach ( $data as $i => $contact ){
+
             $contact = $this->generate( $contact );
 
             if ( $contact && $contact->exists() ){
                 $contact->add_tag( $this->import_tag );
-                $contact_count += 1;
+                $completed += 1;
+            } else {
+                $skipped += 1;
             }
-            /* Add a tag to the contact to find post import. */
+
         }
 
-        wp_die( json_encode( array( 'contacts' => $contact_count, 'import_tag' => $this->import_tag ) ) );
+        wp_die( json_encode( array( 'completed' => $completed, 'skipped' => $skipped ) ) );
 
     }
 
@@ -241,7 +243,7 @@ class WPGH_Bulk_Contact_Manager
      * }
      *
      * @param $args
-     * @return WPGH_Contact
+     * @return WPGH_Contact|false
      */
     public function generate( $args )
     {
@@ -267,7 +269,7 @@ class WPGH_Bulk_Contact_Manager
         }
 
         if ( ! is_email( $data['email'] ) ){
-            wp_die( sprintf( __( 'Could not complete import for %s. Email field not present.', 'groundhogg' ), $data[ 'first_name' ] ) );
+            return false;
         }
 
         if ( isset( $args['owner'] ) ){
@@ -288,7 +290,6 @@ class WPGH_Bulk_Contact_Manager
 
             $tags = explode( ',',  $args[ 'tags' ]  );
             $tags = array_map( 'trim', $tags );
-            $tags = WPGH()->tags->validate( $tags );
             $contact->add_tag( $tags );
             unset( $args[ 'tags' ] );
 
@@ -296,16 +297,15 @@ class WPGH_Bulk_Contact_Manager
 
         /* handle tags from the tag form. */
         if ( isset( $_POST[ 'tags' ] ) ){
-//            $tags = explode( ',',  $args[ 'tags' ]  );
-//            $tags = array_map( 'intval', $_POST[ 'tags' ] );
-            $tags = WPGH()->tags->validate( $_POST[ 'tags' ] );
-            $contact->add_tag( $tags );
+            $contact->add_tag( $_POST[ 'tags' ] );
         }
 
         /*let's just quickly process the meta and get out for now */
 
         foreach ( $args as $key => $value ){
-            $contact->update_meta( $key, sanitize_text_field( $value ) );
+            if ( ! empty( $value ) ){
+                $contact->update_meta( $key, sanitize_text_field( $value ) );
+            }
         }
 
         //todo, not sure about this

@@ -5,10 +5,13 @@ var wpghImportExport;
     wpghImportExport = {
 
         completedRows: 0,
+        skippedRows: 0,
         allRows: 0,
         status: null,
         results: null,
         import_id: null,
+        tags: null,
+        size: 25,
 
         /**
          * Setup the button click event
@@ -46,14 +49,16 @@ var wpghImportExport;
                     delimiter: ",",
                     header: true,
                     complete: function(results, file) {
-                        console.log("This file done:", file, results);
+                        // console.log("This file done:", file, results);
                         wpghImportExport.allRows = results.data.length;
                         wpghImportExport.results = results.data;
                         wpghImportExport.completedRows = 0;
+                        wpghImportExport.skippedRows = 0;
                     }
                 },
                 complete: function()
                 {
+                    wpghImportExport.tags = $( '#import_tags' ).val();
                     wpghImportExport.import_id = wpghImportExport.guidGenerator();
                     wpghImportExport.import();
                 }
@@ -67,15 +72,33 @@ var wpghImportExport;
 
             var $spinner = $( '.spinner-import' );
             $spinner.css( 'visibility', 'visible' );
+
             while ( this.results.length > 0 ){
-                var end = 50;
-                if ( this.results.length < 50 ){
+                var end = this.size;
+
+                if ( this.results.length < this.size ){
                     end  = this.results.length;
                 }
+
                 var toImport = this.results.splice( 0, end );
+
+                for ( var i = 0; i < toImport.length; i++ ){
+                    this.clean( toImport[ i ] )
+                }
+
                 this.send( toImport );
             }
 
+        },
+
+        clean: function( obj ){
+            var propNames = Object.getOwnPropertyNames(obj);
+            for (var i = 0; i < propNames.length; i++) {
+                var propName = propNames[i];
+                if (obj[propName] === null || obj[propName] === undefined || obj[propName] === '' ) {
+                    delete obj[propName];
+                }
+            }
         },
 
         /**
@@ -85,25 +108,28 @@ var wpghImportExport;
          */
         send: function( data ) {
 
-            var tags = $( '#import_tags' ).val();
-
             $.ajax({
                 type: "post",
                 url: ajaxurl,
                 dataType: 'json',
-                data: { action: 'wpgh_import_contacts', data: data, tags: tags, import_id: this.import_id },
+                data: { action: 'wpgh_import_contacts', data: data, tags: this.tags, import_id: this.import_id },
                 success: function( response ){
-                    if ( typeof response.contacts !== "undefined" ){
-
-                        wpghImportExport.completedRows += response.contacts;
+                    if ( typeof response.completed !== "undefined" ){
+                        wpghImportExport.completedRows += response.completed;
+                        wpghImportExport.skippedRows += response.skipped;
                         wpghImportExport.updateStatus();
-
                     } else {
                         console.log( response );
                         alert( response );
                         var $spinner = $( '.spinner-import' );
                         $spinner.css( 'visibility', 'hidden' );
                     }
+                },
+                error: function ( response ) {
+                    console.log( response );
+                    alert( response );
+                    var $spinner = $( '.spinner-import' );
+                    $spinner.css( 'visibility', 'hidden' );
                 }
             });
 
@@ -111,9 +137,9 @@ var wpghImportExport;
 
         updateStatus: function () {
 
-            var p = Math.ceil( ( this.completedRows / this.allRows )  * 100 );
-            this.status.html( 'Status: ' + p + '%' );
-            console.log( 'Status: ' + p + '%' );
+            var p = Math.ceil( ( ( this.completedRows + this.skippedRows ) / this.allRows )  * 100 );
+            this.status.html( 'Status: ' + p + '% | Completed: ' + this.completedRows + ' | Skipped: ' + this.skippedRows );
+            console.log( { status: p, completed: this.completedRows, skipped: this.skippedRows } );
 
             if ( p >= 100 ){
                 var $spinner = $( '.spinner-import' );

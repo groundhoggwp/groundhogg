@@ -278,8 +278,7 @@ class WPGH_DB_Tags extends WPGH_DB
                 return false;
             }
 
-        } else if ( 'tag_slug' == $field )
-        {
+        } else if ( 'tag_slug' == $field ) {
             if ( ! is_string( $value ) ) {
                 return false;
             }

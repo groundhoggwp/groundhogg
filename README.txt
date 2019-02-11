@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.23.1 =
+* ADDED AR_es locale
+* TWEAKED Import contacts efficiency.
+* FIXED pass by reference notice in contact edit screen.
+
 = 1.0.23 =
 * ADDED Tabbed contact record sections to cut down on scrolling.
 * FIXED Var dump $_FILES in contact record update.

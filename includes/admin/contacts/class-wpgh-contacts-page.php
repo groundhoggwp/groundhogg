@@ -174,8 +174,8 @@ class WPGH_Contacts_Page
                 _e( 'Add Contact' , 'groundhogg' );
                 break;
             case 'edit':
-                $contact = wpgh_get_contact( array_shift( $this->get_contacts() ) );
-
+                $contacts = $this->get_contacts();
+                $contact = wpgh_get_contact( array_shift( $contacts  ) );
                 if ( $contact ){
 	                printf( __( 'Edit Contact: %s', 'groundhogg'), $contact->full_name );
                 } else {
