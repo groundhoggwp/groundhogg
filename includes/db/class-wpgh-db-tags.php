@@ -140,11 +140,9 @@ class WPGH_DB_Tags extends WPGH_DB
         }
 
         $args[ 'tag_slug' ] = sanitize_title( $args[ 'tag_name' ] );
-
         if ( $this->exists( $args[ 'tag_slug' ], 'tag_slug' ) ){
-
-            return $this->get_tag_by( 'tag_slug', $args[ 'tag_slug' ] );
-
+            $tag = $this->get_tag_by( 'tag_slug', $args[ 'tag_slug' ] );
+            return $tag->tag_id;
         }
 
         return $this->insert( $args, 'tag' );
