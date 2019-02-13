@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.0.24 =
+* ADDED Elementor Forms Integration.
+* TWEAKED Upped limit of contacts per request during contact import from 25 to 100 to limit the number of requests.
+* FIXED Import script making concurrent requests causing 503 errors for really large lists. Requests are now consecutive instead.
+
 = 1.0.23.1 =
 * ADDED AR_es locale
 * TWEAKED Import contacts efficiency.

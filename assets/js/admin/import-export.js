@@ -11,7 +11,7 @@ var wpghImportExport;
         results: null,
         import_id: null,
         tags: null,
-        size: 25,
+        size: 100,
 
         /**
          * Setup the button click event
@@ -73,21 +73,19 @@ var wpghImportExport;
             var $spinner = $( '.spinner-import' );
             $spinner.css( 'visibility', 'visible' );
 
-            while ( this.results.length > 0 ){
-                var end = this.size;
+            var end = this.size;
 
-                if ( this.results.length < this.size ){
-                    end  = this.results.length;
-                }
-
-                var toImport = this.results.splice( 0, end );
-
-                for ( var i = 0; i < toImport.length; i++ ){
-                    this.clean( toImport[ i ] )
-                }
-
-                this.send( toImport );
+            if ( this.results.length < this.size ){
+                end  = this.results.length;
             }
+
+            var toImport = this.results.splice( 0, end );
+
+            for ( var i = 0; i < toImport.length; i++ ){
+                this.clean( toImport[ i ] )
+            }
+
+            this.send( toImport );
 
         },
 
@@ -118,6 +116,11 @@ var wpghImportExport;
                         wpghImportExport.completedRows += response.completed;
                         wpghImportExport.skippedRows += response.skipped;
                         wpghImportExport.updateStatus();
+
+                        if ( wpghImportExport.results.length > 0 ){
+                            wpghImportExport.import();
+                        }
+
                     } else {
                         console.log( response );
                         alert( response );

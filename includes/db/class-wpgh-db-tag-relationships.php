@@ -274,7 +274,13 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
      */
     public function count( $value, $column='contact_id' ) {
 
-        return count( $this->get_relationships( $value, $column ) );
+        $results = $this->get_relationships( $value, $column );
+
+        if ( $results ){
+            return count( $results );
+        }
+
+        return 0;
 
     }
 

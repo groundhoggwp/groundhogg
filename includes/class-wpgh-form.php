@@ -962,7 +962,7 @@ class WPGH_Form
 
         if ( ! $contact || ! $contact->exists() ){
 
-            return __( 'You cannot manage email preferences if no email exists.', 'groundhogg' );
+            return __( 'There is no email to manage.', 'groundhogg' );
 
         }
 

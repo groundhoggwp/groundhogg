@@ -100,11 +100,24 @@ class WPGH_Bulk_Contact_Manager
 
         $keys = WPGH()->contact_meta->get_keys();
 
+        $exclude_keys = [
+            'ID',
+            'email',
+            'first_name',
+            'last_name',
+            'user_id',
+            'owner_id',
+            'optin_status',
+            'date_created',
+        ];
+
         foreach ( $contacts as $contact ){
 
             foreach ( $keys as $key ){
 
-                $contact->$key = WPGH()->contact_meta->get_meta( $contact->ID, $key, true );
+                if ( ! in_array( $key, $exclude_keys ) ) {
+                    $contact->$key = WPGH()->contact_meta->get_meta($contact->ID, $key, true);
+                }
 
             }
 
@@ -133,11 +146,25 @@ class WPGH_Bulk_Contact_Manager
 
         $keys = WPGH()->contact_meta->get_keys();
 
+        $exclude_keys = [
+            'ID',
+            'email',
+            'first_name',
+            'last_name',
+            'user_id',
+            'owner_id',
+            'optin_status',
+            'date_created',
+        ];
+
         foreach ( $contacts as $contact ){
 
             foreach ( $keys as $key ){
 
-                $contact->$key = WPGH()->contact_meta->get_meta( $contact->ID, $key, true );
+                if ( ! in_array( $key, $exclude_keys ) ){
+
+                    $contact->$key = WPGH()->contact_meta->get_meta( $contact->ID, $key, true );
+                }
 
             }
 

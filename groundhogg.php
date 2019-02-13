@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.0.23.1';
+        public $version = '1.0.24';
 
         /**
          * @var $instance Groundhogg instance
@@ -303,6 +303,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 }
 
                 self::$instance->register_blocks();
+                self::$instance->register_integrations();
 
                 add_action( 'init', array( self::$instance, 'load_text_domain' ) );
 
@@ -388,6 +389,21 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             $this->blocks[ 'beaver-builder' ]   = new WPGH_Beaver_Builder_Blocks();
             $this->blocks[ 'wpbakery' ]         = new WPGH_WPBakery_Blocks();
 //            $this->blocks[ 'divi' ]         = new WPGH_Divi_Blocks();
+        }
+
+        /**
+         * Register the form actions
+         */
+        private function register_integrations()
+        {
+            add_action( 'elementor_pro/init', function() {
+                // Here its safe to include our action class file
+                include_once dirname( __FILE__ ) . '/integrations/class-wpgh-elementor-form-integration.php';
+                // Instantiate the action class
+                $groundhogg_action = new WPGH_Elementor_Form_Integration();
+                // Register the action with form widget
+                \ElementorPro\Plugin::instance()->modules_manager->get_modules('forms')->add_form_action($groundhogg_action->get_name(), $groundhogg_action);
+            });
         }
 
 
