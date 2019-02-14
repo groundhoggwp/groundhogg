@@ -247,7 +247,7 @@ class WPGH_Emails_Table extends WP_List_Table {
         $lu_time = mysql2date( 'U', $email->last_updated );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $lu_time - $cur_time;
-        $time_prefix = __( 'Updated' );
+        $time_prefix = __( 'Updated', 'groundhogg' );
 
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
             $time = date_i18n( 'Y/m/d \@ h:i A', intval( $lu_time ) );

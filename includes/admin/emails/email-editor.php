@@ -45,7 +45,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
     <div class="header-wrap">
         <div class="funnel-editor-header">
             <div class="title-wrap">
-                <span id="title"><?php _e( 'Edit Email' ); ?></span><a class="button" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+                <span id="title"><?php _e( 'Edit Email', 'groundhogg'  ); ?></span><a class="button" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg'  ); ?></a>
             </div>
             <div class="status-options">
                 <div id="status">
@@ -66,7 +66,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                 </div>
                 <div id="save">
                     <span class="spinner" style="float: left"></span>
-                    <?php submit_button( 'Update', 'primary', 'update', false ) ?>
+                    <?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ) ?>
                 </div>
             </div>
         </div>
@@ -125,12 +125,12 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
 
                                 <!-- Main Content Options -->
                                 <div id="email-editor" class="postbox">
-                                    <h3 class="hndle"><?php _e( 'Email Options'); ?></h3>
+                                    <h3 class="hndle"><?php _e( 'Email Options' , 'groundhogg' ); ?></h3>
                                     <div class="inside">
                                         <div class="options">
                                             <table class="form-table">
                                                 <tr>
-                                                    <th><?php _e( 'Alignment'); ?></th>
+                                                    <th><?php _e( 'Alignment' ); ?></th>
                                                     <td>
                                                         <select id="email-align" name="email_alignment">
                                                             <option value="left" <?php if ( $email->get_meta( 'alignment' ) === 'left' ) echo 'selected' ; ?> ><?php _e('Left'); ?></option>
@@ -139,7 +139,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><?php _e( 'Enable Browser View'); ?></th>
+                                                    <th><?php _e( 'Enable Browser View' , 'groundhogg' ); ?></th>
                                                     <td><input type="checkbox" name="browser_view" value="1" <?php if ( $email->get_meta( 'browser_view' ) == 1 ) echo 'checked' ; ?>></td>
                                                 </tr>
                                             </table>
@@ -187,16 +187,16 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                                 <table class="form-table">
                                     <tbody>
                                     <tr>
-                                        <th><?php _e( 'From User:' ); ?></th>
+                                        <th><?php _e( 'From User:', 'groundhogg'  ); ?></th>
                                         <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user ); ?>
                                         <td><?php echo WPGH()->html->dropdown_owners( $args ); ?></td>
                                     </tr>
                                     <tr>
-                                        <th><label for="send_test"><?php _e( 'Send Test:' ); ?></label></th>
+                                        <th><label for="send_test"><?php _e( 'Send Test:', 'groundhogg'  ); ?></label></th>
                                         <td><input type="checkbox" id="send_test" name="send_test"></td>
                                     </tr>
                                     <tr id="send-to" class="hidden">
-                                        <th><?php _e( 'To:' ); ?></th>
+                                        <th><?php _e( 'To:', 'groundhogg' ); ?></th>
                                         <?php $to = $email->get_meta( 'test_email' ) ? $email->get_meta( 'test_email' ) : get_current_user_id(); ?>
                                         <?php $args = array( 'option_none' => __( 'Please Select One.' ) , 'id' => 'test_email', 'name' => 'test_email', 'selected' => $to ); ?>
                                         <td><?php echo WPGH()->html->dropdown_owners( $args ); ?></td>

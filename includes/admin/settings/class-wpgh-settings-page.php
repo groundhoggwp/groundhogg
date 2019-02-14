@@ -83,8 +83,8 @@ class WPGH_Settings_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            'Settings',
-            'Settings',
+            __( 'Settings' ),
+            __( 'Settings' ),
             'manage_options',
             'gh_settings',
             array( $this, 'settings_content' )
@@ -110,27 +110,27 @@ class WPGH_Settings_Page
         return apply_filters( 'wpgh_settings_tabs', array(
             'general'      => array(
                 'id'    => 'general',
-                'title' => __( 'General' )
+                'title' => _x( 'General', 'settings_tabs', 'groundhogg' )
             ),
             'marketing'    =>  array(
                 'id'    => 'marketing',
-                'title' => __( 'Marketing' )
+                'title' => _x( 'Marketing', 'settings_tabs', 'groundhogg' )
             ),
             'email'        =>  array(
                 'id'    => 'email',
-                'title' => __( 'Email' )
+                'title' => _x( 'Email', 'settings_tabs', 'groundhogg' )
             ),
             'tools'        =>  array(
                 'id'    => 'tools',
-                'title' => __( 'Tools' )
+                'title' => _x( 'Tools', 'settings_tabs', 'groundhogg' )
             ),
             'extensions'   =>  array(
                 'id'    => 'extensions',
-                'title' => __( 'Licenses' )
+                'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' )
             ),
             'api_tab'   =>  array(
                 'id'    => 'api_tab',
-                'title' => __( 'API' )
+                'title' => _x( 'API', 'settings_tabs', 'groundhogg' )
             ),
         ) );
     }
@@ -145,42 +145,42 @@ class WPGH_Settings_Page
         return apply_filters( 'wpgh_settings_sections', array(
             'business_info' => array(
                 'id'    => 'business_info',
-                'title' => __( 'Business Settings' ),
+                'title' => _x( 'Business Settings', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'general'
             ),
             'misc_info' => array(
                 'id'    => 'misc_info',
-                'title' => __( 'Misc Settings' ),
+                'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'general'
             ),
             'pages' => array(
                 'id'    => 'pages',
-                'title' => __( 'Pages' ),
+                'title' => _x( 'Pages', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'marketing'
             ),
             'captcha' => array(
                 'id'    => 'captcha',
-                'title' => __( 'Captcha' ),
+                'title' => _x( 'Captcha', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'marketing'
             ),
             'compliance' => array(
                 'id'    => 'compliance',
-                'title' => __( 'Compliance' ),
+                'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'marketing'
             ),
             'bounces' => array(
                 'id'    => 'bounces',
-                'title' => __( 'Email Bounces' ),
+                'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email'
             ),
             'service' => array(
                 'id'    => 'service',
-                'title' => __( 'Groundhogg Email Service' ),
+                'title' => _x( 'Groundhogg Email Service', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email'
             ),
             'api_settings' => array(
                 'id'    => 'api_settings',
-                'title' => __( 'API Settings' ),
+                'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'api_tab'
             ),
         ) );
@@ -230,8 +230,8 @@ class WPGH_Settings_Page
             'gh_business_name' => array(
                 'id'        => 'gh_business_name',
                 'section'   => 'business_info',
-                'label'     => __( 'Business Name', 'groundhogg' ),
-                'desc'      => __( 'Your business name as it appears in the email footer.' ),
+                'label'     => _x( 'Business Name', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Your business name as it appears in the email footer.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts'      => array(
                     'id'            => 'gh_business_name',
@@ -242,8 +242,8 @@ class WPGH_Settings_Page
             'gh_street_address_1' => array(
                 'id'        => 'gh_street_address_1',
                 'section'   => 'business_info',
-                'label'     => __( 'Street Address 1', 'groundhogg' ),
-                'desc'      => __( 'As it should appear in your email footer.', 'groundhogg' ),
+                'label'     => _x( 'Street Address 1', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'As it should appear in your email footer.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts'      => array(
                     'id'            => 'gh_street_address_1',
@@ -254,8 +254,8 @@ class WPGH_Settings_Page
             'gh_street_address_2' => array(
                 'id'        => 'gh_street_address_2',
                 'section'   => 'business_info',
-                'label'     => __( 'Street Address 2', 'groundhogg' ),
-                'desc'      => __( '(Optional) As it should appear in your email footer.', 'groundhogg' ),
+                'label'     => _x( 'Street Address 2', 'settings', 'groundhogg' ),
+                'desc'      => _x( '(Optional) As it should appear in your email footer.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts'      => array(
                     'id'            => 'gh_street_address_2',
@@ -267,7 +267,7 @@ class WPGH_Settings_Page
                 'id'        => 'gh_city',
                 'section'   => 'business_info',
                 'label'     => __( 'City' ),
-                'desc'      => __( 'As it should appear in your email footer.', 'groundhogg' ),
+                'desc'      => _x( 'As it should appear in your email footer.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts'      => array(
                     'id'            => 'gh_city',
@@ -278,8 +278,8 @@ class WPGH_Settings_Page
             'gh_zip_or_postal' => array(
                 'id'        => 'gh_zip_or_postal',
                 'section'   => 'business_info',
-                'label'     => __( 'Postal/Zip Code', 'groundhogg' ),
-                'desc'      => __( 'As it should appear in your email footer.', 'groundhogg' ),
+                'label'     => _x( 'Postal/Zip Code', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'As it should appear in your email footer.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts'      => array(
                     'id'            => 'gh_zip_or_postal',
@@ -290,8 +290,8 @@ class WPGH_Settings_Page
             'gh_region' => array(
                 'id'        => 'gh_region',
                 'section'   => 'business_info',
-                'label'     => __( 'State/Province/Region', 'groundhogg' ),
-                'desc'      => __( 'As it should appear in your email footer.', 'groundhogg'),
+                'label'     => _x( 'State/Province/Region', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'As it should appear in your email footer.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts'      => array(
                     'id'            => 'gh_region',
@@ -303,7 +303,7 @@ class WPGH_Settings_Page
                 'id'        => 'gh_country',
                 'section'   => 'business_info',
                 'label'     => __( 'Country' ),
-                'desc'      => __( 'As it should appear in your email footer.', 'groundhogg' ),
+                'desc'      => _x( 'As it should appear in your email footer.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts'      => array(
                     'id'            => 'gh_country',
@@ -315,7 +315,7 @@ class WPGH_Settings_Page
                 'id'        => 'gh_phone',
                 'section'   => 'business_info',
                 'label'     => __( 'Phone' ),
-                'desc'      => __( 'As it should appear in your email footer.', 'groundhogg' ),
+                'desc'      => _x( 'As it should appear in your email footer.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts'      => array(
                     'type'          => 'tel',
@@ -327,8 +327,8 @@ class WPGH_Settings_Page
             'gh_uninstall_on_delete' => array(
                 'id'        => 'gh_uninstall_on_delete',
                 'section'   => 'misc_info',
-                'label'     => __( 'Delete Groundhogg Data', 'groundhogg' ),
-                'desc'      => __( 'Delete all information when uninstalling. This cannot be undone.', 'groundhogg' ),
+                'label'     => _x( 'Delete Groundhogg Data', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Delete all information when uninstalling. This cannot be undone.', 'settings', 'groundhogg' ),
                 'type' => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),
@@ -341,8 +341,8 @@ class WPGH_Settings_Page
             'gh_max_events' => array(
                 'id'        => 'gh_max_events',
                 'section'   => 'misc_info',
-                'label'     => __( 'Max Queued Events', 'groundhogg' ),
-                'desc'      => __( 'The maximum number of events that can be run during a single process of the event queue. For larger lists you may want to set this at a lower number for performance reasons.', 'groundhogg' ),
+                'label'     => _x( 'Max Queued Events', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'The maximum number of events that can be run during a single process of the event queue. For larger lists you may want to set this at a lower number for performance reasons.', 'settings', 'groundhogg' ),
                 'type'      => 'number',
                 'atts'      => array(
                     'id'            => 'gh_max_events',
@@ -353,8 +353,8 @@ class WPGH_Settings_Page
             'gh_queue_interval' => array(
                 'id'        => 'gh_queue_interval',
                 'section'   => 'misc_info',
-                'label'     => __( 'Queue Interval', 'groundhogg' ),
-                'desc'      => __( 'The time interval in between iterations of when the event queue is processed.', 'groundhogg' ),
+                'label'     => _x( 'Queue Interval', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'The time interval in between iterations of when the event queue is processed.', 'settings', 'groundhogg' ),
                 'type'      => 'dropdown',
                 'atts'      => array(
                     'id'            => 'gh_queue_interval',
@@ -369,8 +369,8 @@ class WPGH_Settings_Page
             'gh_confirmation_page' => array(
                 'id'        => 'gh_confirmation_page',
                 'section'   => 'pages',
-                'label'     => __( 'Email Confirmation Page', 'groundhogg' ),
-                'desc'      => __( 'Page contacts see when they confirm their email.', 'groundhogg' ),
+                'label'     => _x( 'Email Confirmation Page', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Page contacts see when they confirm their email.', 'settings', 'groundhogg' ),
                 'type'      => 'select2',
                 'atts'      => array(
                     'name'  => 'gh_confirmation_page',
@@ -381,8 +381,8 @@ class WPGH_Settings_Page
             'gh_unsubscribe_page' => array(
                 'id'        => 'gh_unsubscribe_page',
                 'section'   => 'pages',
-                'label'     => __( 'Unsubscribe Page', 'groundhogg' ),
-                'desc'      => __( 'Page contacts see when they unsubscribe.', 'groundhogg' ),
+                'label'     => _x( 'Unsubscribe Page', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Page contacts see when they unsubscribe.', 'settings', 'groundhogg' ),
                 'type'      => 'select2',
                 'atts'      => array(
                     'name'  => 'gh_unsubscribe_page',
@@ -393,8 +393,8 @@ class WPGH_Settings_Page
             'gh_email_preferences_page' => array(
                 'id'        => 'gh_email_preferences_page',
                 'section'   => 'pages',
-                'label'     => __( 'Email Preferences Page', 'groundhogg' ),
-                'desc'      => __( 'Page where contacts can manage their email preferences.', 'groundhogg' ),
+                'label'     => _x( 'Email Preferences Page', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Page where contacts can manage their email preferences.', 'settings', 'groundhogg' ),
                 'type'      => 'select2',
                 'atts'      => array(
                     'name'  => 'gh_email_preferences_page',
@@ -405,8 +405,8 @@ class WPGH_Settings_Page
             'gh_view_in_browser_page' => array(
                 'id'        => 'gh_view_in_browser_page',
                 'section'   => 'pages',
-                'label'     => __( 'View Email In Browser Page', 'groundhogg' ),
-                'desc'      => __( 'Page containing the shortcode [browser_view] so contacts can view an email in the browser in the event their email client looks funky.', 'groundhogg' ),
+                'label'     => _x( 'View Email In Browser Page', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Page containing the shortcode [browser_view] so contacts can view an email in the browser in the event their email client looks funky.', 'settings', 'groundhogg' ),
                 'type'      => 'select2',
                 'atts'      => array(
                     'name'  => 'gh_view_in_browser_page',
@@ -418,7 +418,7 @@ class WPGH_Settings_Page
                 'id'        => 'gh_privacy_policy',
                 'section'   => 'compliance',
                 'label'     => __( 'Privacy Policy' ),
-                'desc'      => __( 'Link to your privacy policy.', 'groundhogg' ),
+                'desc'      => _x( 'Link to your privacy policy.', 'settings', 'groundhogg' ),
                 'type'      => 'select2',
                 'atts'      => array(
                     'name'  => 'gh_privacy_policy',
@@ -429,8 +429,8 @@ class WPGH_Settings_Page
             'gh_terms' => array(
                 'id'        => 'gh_terms',
                 'section'   => 'compliance',
-                'label'     => __( 'Terms & Conditions (Terms of Service)', 'groundogg' ),
-                'desc'      => __( 'Link to your terms & conditions.', 'groundhogg' ),
+                'label'     => _x( 'Terms & Conditions (Terms of Service)', 'settings', 'groundogg' ),
+                'desc'      => _x( 'Link to your terms & conditions.', 'settings', 'groundhogg' ),
                 'type'      => 'select2',
                 'atts'      => array(
                     'name'  => 'gh_terms',
@@ -441,8 +441,8 @@ class WPGH_Settings_Page
             'gh_strict_confirmation' => array(
                 'id'        => 'gh_strict_confirmation',
                 'section'   => 'compliance',
-                'label'     => __( 'Only send to confirmed emails.', 'groundhogg' ),
-                'desc'      => __( 'This will stop emails being sent to contacts who do not have confirmed emails outside of the below grace period.', 'groundhogg' ),
+                'label'     => _x( 'Only send to confirmed emails.', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'This will stop emails being sent to contacts who do not have confirmed emails outside of the below grace period.', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),
@@ -455,8 +455,8 @@ class WPGH_Settings_Page
             'gh_confirmation_grace_period' => array(
                 'id'        => 'gh_confirmation_grace_period',
                 'section'   => 'compliance',
-                'label'     => __( 'Email confirmation grace Period', 'groundhogg' ),
-                'desc'      => __( 'The number of days for which you can send an email to a contact after they are created but their email has not been confirmed. The default is 14 days.', 'groundhogg' ),
+                'label'     => _x( 'Email confirmation grace Period', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'The number of days for which you can send an email to a contact after they are created but their email has not been confirmed. The default is 14 days.', 'settings', 'groundhogg' ),
                 'type'      => 'number',
                 'atts'      => array(
                     'id'            => 'gh_confirmation_grace_period',
@@ -468,8 +468,8 @@ class WPGH_Settings_Page
             'gh_enable_gdpr' => array(
                 'id'        => 'gh_enable_gdpr',
                 'section'   => 'compliance',
-                'label'     => __( 'Enable GDPR features.', 'groundhogg' ),
-                'desc'      => __( 'This will add a consent box to your forms as well as a "Delete Everything" Button to your email preferences page.', 'groundhogg') ,
+                'label'     => _x( 'Enable GDPR features.', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'This will add a consent box to your forms as well as a "Delete Everything" Button to your email preferences page.', 'settings', 'groundhogg' ) ,
                 'type'      => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),
@@ -482,8 +482,8 @@ class WPGH_Settings_Page
             'gh_strict_gdpr' => array(
                 'id'        => 'gh_strict_gdpr',
                 'section'   => 'compliance',
-                'label'     => __( 'Do not send email without consent.', 'groundhogg' ),
-                'desc'      => __( 'This will prevent your system from sending emails to contacts for which you do not have explicit consent. Only works if GDPR features are enabled.', 'groundhogg' ),
+                'label'     => _x( 'Do not send email without consent.', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'This will prevent your system from sending emails to contacts for which you do not have explicit consent. Only works if GDPR features are enabled.', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),
@@ -496,8 +496,8 @@ class WPGH_Settings_Page
             'gh_enable_recaptcha' => array(
                 'id'        => 'gh_enable_recaptcha',
                 'section'   => 'captcha',
-                'label'     => __( 'Enable Recaptcha on forms', 'groundhogg' ),
-                'desc'      => __( 'Add a google recaptcha to all your forms made with the [gh_form] shortcode', 'groundhogg' ),
+                'label'     => _x( 'Enable Recaptcha on forms', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Add a google recaptcha to all your forms made with the [gh_form] shortcode', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),
@@ -510,8 +510,8 @@ class WPGH_Settings_Page
             'gh_recaptcha_site_key' => array(
                 'id'        => 'gh_recaptcha_site_key',
                 'section'   => 'captcha',
-                'label'     => __( 'Recaptcha Site Key', 'groundhogg' ),
-                'desc'      => __( 'This is the key which faces the users on the front-end', 'groundhogg' ),
+                'label'     => _x( 'Recaptcha Site Key', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'This is the key which faces the users on the front-end', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts' => array(
                     'name'  => 'gh_recaptcha_site_key',
@@ -521,8 +521,8 @@ class WPGH_Settings_Page
             'gh_recaptcha_secret_key' => array(
                 'id'        => 'gh_recaptcha_secret_key',
                 'section'   => 'captcha',
-                'label'     => __( 'Recaptcha Secret Key', 'groundhogg' ),
-                'desc'      => __( 'Never ever ever share this with anyone!', 'groundhogg' ),
+                'label'     => _x( 'Recaptcha Secret Key', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Never ever ever share this with anyone!', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts' => array(
                     'name'  => 'gh_recaptcha_secret_key',
@@ -532,8 +532,8 @@ class WPGH_Settings_Page
             'gh_bounce_inbox' => array(
                 'id'        => 'gh_bounce_inbox',
                 'section'   => 'bounces',
-                'label'     => __( 'Bounce Inbox', 'groundhogg' ),
-                'desc'      => __( 'This is the inbox which emails will be sent to.', 'groundhogg' ),
+                'label'     => _x( 'Bounce Inbox', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'This is the inbox which emails will be sent to.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts' => array(
                     'type'  => 'email',
@@ -546,8 +546,8 @@ class WPGH_Settings_Page
                 'id'        => 'gh_bounce_inbox_password',
                 'section'   => 'bounces',
                 'type'      => 'input',
-                'label'     => __( 'Bounce Inbox Password', 'groundhogg' ),
-                'desc'      => __( 'This password to access the inbox.', 'groundhogg' ),
+                'label'     => _x( 'Bounce Inbox Password', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'This password to access the inbox.', 'settings', 'groundhogg' ),
                 'atts' => array(
                     'type'  => 'password',
                     'name'  => 'gh_bounce_inbox_password',
@@ -557,8 +557,8 @@ class WPGH_Settings_Page
             'gh_email_token' => array(
                 'id'        => 'gh_email_token',
                 'section'   => 'service',
-                'label'     => __( 'Email Service Token', 'groundhogg' ),
-                'desc'      => __( 'Get this key from your <a target="_blank" href="https://www.groundhogg.io/account/manage/">Groundhogg Account Page.', 'groundhogg' ),
+                'label'     => _x( 'Email Service Token', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Get this key from your <a target="_blank" href="https://www.groundhogg.io/account/manage/">Groundhogg Account Page.</a>', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts' => array(
                     'type'  => 'password',
@@ -569,8 +569,8 @@ class WPGH_Settings_Page
             'gh_send_with_gh_api' => array(
                 'id'        => 'gh_send_with_gh_api',
                 'section'   => 'service',
-                'label'     => __( 'Send Email With Groundhogg', 'groundhogg' ),
-                'desc'      => __( 'Choose to send email with API.', 'groundhogg' ),
+                'label'     => _x( 'Send Email With Groundhogg', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Choose to send email with API.', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),
@@ -583,8 +583,8 @@ class WPGH_Settings_Page
             'gh_enable_api' => array(
                 'id'        => 'gh_enable_api',
                 'section'   => 'api_settings',
-                'label'     => __( 'Enable the Groundhogg API', 'groundhogg' ),
-                'desc'      => __( 'Enabling this will allow other platforms to access information on this site.', 'groundhogg' ),
+                'label'     => _x( 'Enable the Groundhogg API', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Enabling this will allow other platforms to access information on this site.', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),

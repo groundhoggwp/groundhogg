@@ -50,8 +50,8 @@ class WPGH_Tags_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            'Tags',
-            'Tags',
+            __( 'Tags' ),
+            __( 'Tags' ),
             'edit_tags',
             'gh_tags',
             array($this, 'page')
@@ -250,7 +250,7 @@ class WPGH_Tags_Page
         <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Tags ', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Tags&nbsp;', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
                 <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( __( 'Search Tags' ) )?>">
             </p>
@@ -326,7 +326,7 @@ class WPGH_Tags_Page
 	{
 		?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_tags' ); ?>"><?php _e( 'Add New' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_tags' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
 			<?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){

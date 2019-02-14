@@ -15,7 +15,7 @@ class WPGH_Time_Range_Widget extends WPGH_Reporting_Widget
     public function __construct()
     {
         $this->wid = 'time_range_widget';
-        $this->name = __( 'Reporting Time Range', 'groundhogg' );
+        $this->name = _x( 'Reporting Time Range', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }
@@ -29,23 +29,23 @@ class WPGH_Time_Range_Widget extends WPGH_Reporting_Widget
                     'name'      => 'date_range',
                     'id'        => 'date_range',
                     'options'   => array(
-                        'today'     => __( 'Today' ),
-                        'yesterday' => __( 'Yesterday' ),
-                        'this_week' => __( 'This Week' ),
-                        'last_week' => __( 'Last Week' ),
-                        'last_30'   => __( 'Last 30 Days' ),
-                        'this_month'   => __( 'This Month' ),
-                        'last_month'   => __( 'Last Month' ),
-                        'this_quarter' => __( 'This Quarter' ),
-                        'last_quarter' => __( 'Last Quarter' ),
-                        'this_year' => __( 'This Year' ),
-                        'last_year' => __( 'Last Year' ),
-                        'custom'    => __( 'Custom Range' ),
+                        'today'         => _x( 'Today', 'reporting_range', 'groundhogg' ),
+                        'yesterday'     => _x( 'Yesterday', 'reporting_range', 'groundhogg' ),
+                        'this_week'     => _x( 'This Week', 'reporting_range', 'groundhogg' ),
+                        'last_week'     => _x( 'Last Week', 'reporting_range', 'groundhogg' ),
+                        'last_30'       => _x( 'Last 30 Days', 'reporting_range', 'groundhogg' ),
+                        'this_month'    => _x( 'This Month', 'reporting_range', 'groundhogg' ),
+                        'last_month'    => _x( 'Last Month', 'reporting_range', 'groundhogg' ),
+                        'this_quarter'  => _x( 'This Quarter', 'reporting_range', 'groundhogg' ),
+                        'last_quarter'  => _x( 'Last Quarter', 'reporting_range', 'groundhogg' ),
+                        'this_year'     => _x( 'This Year', 'reporting_range', 'groundhogg' ),
+                        'last_year'     => _x( 'Last Year', 'reporting_range', 'groundhogg' ),
+                        'custom'        => _x( 'Custom Range', 'reporting_range', 'groundhogg' ),
                     ),
                     'selected' => $this->get_url_var( 'date_range', 'this_week' ),
                 ); echo WPGH()->html->dropdown( $args );
 
-                submit_button( 'Refresh', 'secondary', 'change_reporting', false );
+                submit_button( __( 'Refresh', 'groundhogg' ), 'secondary', 'change_reporting', false );
 
                 $class = $this->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden';
 

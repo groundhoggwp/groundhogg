@@ -14,7 +14,7 @@ class WPGH_Most_Active_Funnels_Widget extends WPGH_Reporting_Widget
     public function __construct()
     {
         $this->wid = 'most_active_funnels_widget';
-        $this->name = __( 'Most Active Funnels', 'groundhogg' );
+        $this->name = _x( 'Most Active Funnels', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }

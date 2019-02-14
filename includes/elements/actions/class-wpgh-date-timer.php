@@ -43,6 +43,14 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
      */
     public $description = 'Pause until a specific date & time.';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Date Timer', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Pause until a specific date & time.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * @param $step WPGH_Step
      */

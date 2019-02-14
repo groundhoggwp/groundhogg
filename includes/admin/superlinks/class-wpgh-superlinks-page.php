@@ -42,8 +42,8 @@ class WPGH_Superlinks_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            'Superlinks',
-            'Superlinks',
+            _x( 'Superlinks', 'page_title', 'groundhogg' ),
+            _x( 'Superlinks', 'page_title', 'groundhogg' ),
             'edit_superlinks',
             'gh_superlinks',
             array($this, 'page')
@@ -247,9 +247,9 @@ class WPGH_Superlinks_Page
         <form method="post" class="search-form wp-clearfix">
         <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search superlinks ', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Superlinks ', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( __( 'Search Superlinks' ) )?>">
+                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Superlinks', 'groudhogg' )?>">
             </p>
         </form>
         <div id="col-container" class="wp-clearfix">
@@ -320,7 +320,7 @@ class WPGH_Superlinks_Page
 		
 		?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_superlinks' ); ?>"><?php _e( 'Add New' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_superlinks' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
 			<?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){

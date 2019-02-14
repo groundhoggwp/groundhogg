@@ -16,7 +16,7 @@ class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
     public function __construct()
     {
         $this->wid = 'groundhogg_social_media_widget';
-        $this->name = __( 'Social Media Report', 'groundhogg' );
+        $this->name = _x( 'Social Media Report', 'widget_name', 'groundhogg' );
         $this->setup_social_networks();
 
         parent::__construct();

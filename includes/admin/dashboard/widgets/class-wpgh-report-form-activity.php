@@ -12,7 +12,7 @@ class WPGH_Report_Form_Activity extends WPGH_Line_Graph_Report_V2
     public function __construct()
     {
         $this->wid = 'form_activity_report';
-        $this->name = __( 'Form Activity Report', 'groundhogg' );
+        $this->name = _x( 'Form Activity Report', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }
@@ -50,11 +50,11 @@ class WPGH_Report_Form_Activity extends WPGH_Line_Graph_Report_V2
 
         $ds =  array();
         $ds[] = array(
-            'label' => __( 'Form Fills' ),
+            'label' => __( 'Form Fills', 'groundhogg' ),
             'data'  => $dataset1
         ) ;
         $ds[] = array(
-            'label' => __( 'Form Impressions' ),
+            'label' => __( 'Form Impressions', 'groundhogg' ),
             'data'  => $dataset2
         ) ;
 
@@ -119,11 +119,11 @@ class WPGH_Report_Form_Activity extends WPGH_Line_Graph_Report_V2
             $to = convert_to_local_time( $this->end_range );
 
             $export_info[] = array(
-                __( 'From' ) => date( 'F jS', $from ),
-                __( 'To' ) => date( 'F jS', $to ),
-                __( 'Form Impressions', 'Groundhogg' ) => $num_form_fills,
-                __( 'Form Submissions', 'Groundhogg' ) => $nump_impressions,
-                __( 'Average Conversion Rate', 'Groundhogg' ) => ceil( ( $num_form_fills / max( $nump_impressions, 1 ) ) * 100 ) . '%',
+                __( 'From', 'groundhogg' ) => date( 'F jS', $from ),
+                __( 'To', 'groundhogg' ) => date( 'F jS', $to ),
+                __( 'Form Impressions', 'groundhogg' ) => $num_form_fills,
+                __( 'Form Submissions', 'groundhogg' ) => $nump_impressions,
+                __( 'Average Conversion Rate', 'groundhogg' ) => ceil( ( $num_form_fills / max( $nump_impressions, 1 ) ) * 100 ) . '%',
             );
 
             $this->start_range = $this->end_range;

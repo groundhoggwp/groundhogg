@@ -42,6 +42,14 @@ class WPGH_Apply_Tag extends WPGH_Funnel_Step
      */
     public $description = 'Add a tag to a contact.';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Apply Tag', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Add a tag to a contact.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * @param $step WPGH_Step
      */

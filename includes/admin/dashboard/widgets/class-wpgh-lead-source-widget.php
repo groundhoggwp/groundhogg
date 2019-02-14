@@ -14,7 +14,7 @@ class WPGH_Lead_Source_Widget extends WPGH_Reporting_Widget
     public function __construct()
     {
         $this->wid = 'groundhogg_lead_source_widget';
-        $this->name = __( 'Lead Source Report', 'groundhogg' );
+        $this->name = _x( 'Lead Source Report', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }

@@ -75,8 +75,8 @@ class WPGH_Contacts_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            'Contacts',
-            'Contacts',
+            _x( 'Contacts', 'page_title', 'groundhogg' ),
+            _x( 'Contacts', 'page_title', 'groundhogg' ),
             'view_contacts',
             'gh_contacts',
             array($this, 'page')
@@ -544,6 +544,10 @@ class WPGH_Contacts_Page
             $args[ 'owner_id' ] = intval( $_POST['owner_id'] );
         }
 
+        if ( isset( $_POST['user'] ) ){
+            $args[ 'user_id' ] = intval( $_POST['user'] );
+        }
+
         $args = array_map( 'stripslashes', $args );
         $contact->update( $args );
 
@@ -866,9 +870,9 @@ class WPGH_Contacts_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Contacts ', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Contacts&nbsp;', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Contacts ', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Contacts&nbsp;', 'groundhogg'); ?>">
             </p>
             <?php $contacts_table->prepare_items(); ?>
             <?php $contacts_table->display(); ?>
@@ -1060,7 +1064,7 @@ class WPGH_Contacts_Page
         ?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
-            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_contacts&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_contacts&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
             <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_settings&tab=tools' ); ?>"><?php _e( 'Import' ); ?></a>
             <?php $this->notices->notices(); ?>
             <hr class="wp-header-end">

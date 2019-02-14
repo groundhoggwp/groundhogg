@@ -14,7 +14,7 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
     public function __construct()
     {
         $this->wid = 'groundhogg_source_page_widget';
-        $this->name = __( 'Source Page Report', 'groundhogg' );
+        $this->name = _x( 'Source Page Report', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }

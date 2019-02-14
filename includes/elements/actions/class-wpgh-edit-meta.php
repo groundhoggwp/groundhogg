@@ -42,6 +42,14 @@ class WPGH_Edit_Meta extends WPGH_Funnel_Step
      */
     public $description = 'Directly edit the meta data of the contact.';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Edit Meta', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Directly edit the meta data of the contact.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * Display the settings
      *

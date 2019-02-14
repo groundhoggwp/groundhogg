@@ -42,6 +42,14 @@ class WPGH_Create_User extends WPGH_Funnel_Step
      */
     public $description = 'Create a WP User account at the specified level. Username is the contact\'s email.';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Create User', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Create a WP User account at the specified level. Username is the contact\'s email.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * @param $step WPGH_Step
      */

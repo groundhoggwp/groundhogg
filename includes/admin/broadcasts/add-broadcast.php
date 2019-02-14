@@ -24,18 +24,21 @@ wp_enqueue_style( 'jquery-ui' );
     <?php wp_nonce_field(); ?>
     <table class="form-table">
         <tbody><tr class="form-field term-email-wrap">
-            <th scope="row"><label for="email_id"><?php _e( 'Select an email to send.' ) ?></label></th>
+            <th scope="row"><label for="email_id"><?php _e( 'Select an email to send.', 'groundhogg' ) ?></label></th>
             <td><?php $args = array();
                 $args[ 'id' ] = 'email_id';
                 $args[ 'name' ] = 'email_id';
                 $args[ 'required' ] = true;
 
                 echo WPGH()->html->dropdown_emails( $args ); ?>
+                <div class="row-actions">
+                    <a target="_blank" class="button button-secondary" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Create New Email', 'groundhogg' ); ?></a>
+                </div>
                 <p class="description"><?php _e( 'The Broadcast tool uses your global emails.', 'groundhogg' ) ?></p>
             </td>
         </tr>
         <tr class="form-field term-tags-wrap">
-            <th scope="row"><label for="description"><?php _e( 'Send To:' ); ?></label></th>
+            <th scope="row"><label for="description"><?php _e( 'Send To:', 'groundhogg' ); ?></label></th>
             <td><?php $tag_args = array();
                 $tag_args[ 'id' ] = 'tags';
                 $tag_args[ 'name' ] = 'tags[]';
@@ -46,7 +49,7 @@ wp_enqueue_style( 'jquery-ui' );
             </td>
         </tr>
         <tr class="form-field term-exclude-tags-wrap">
-            <th scope="row"><label for="description"><?php _e( 'Exclude These Contacts:' ); ?></label></th>
+            <th scope="row"><label for="description"><?php _e( 'Exclude These Contacts:', 'groundhogg' ); ?></label></th>
             <td><?php $tag_args = array();
                 $tag_args[ 'id' ] = 'exclude_tags';
                 $tag_args[ 'name' ] = 'exclude_tags[]';
@@ -58,14 +61,24 @@ wp_enqueue_style( 'jquery-ui' );
         </tr>
         <tr class="form-field term-date-wrap">
             <th scope="row">
-                <label for="date"><?php _e( 'Send On:' ); ?></label>
+                <label for="date"><?php _e( 'Send On:', 'groundhogg' ); ?></label>
             </th>
             <td>
 <!--                <input style="height:29px;width: 100px" class="input" placeholder="Y/m/d" type="text" id="date" name="date" value="" autocomplete="off" required>-->
                 <div style="display: inline-block; width: 100px;">
                     <?php echo WPGH()->html->date_picker( array( 'name' => 'date', 'id' => 'date', 'class' => 'input' ) ); ?>
                 </div>
-                <input type="time" id="time" name="time" value="09:00" autocomplete="off" required>
+                <input type="time" id="time" name="time" value="09:00" autocomplete="off" required><?php _e( '&nbsp;or&nbsp;', 'groundhogg' ); ?>
+                <?php echo WPGH()->html->checkbox( array(
+                    'label'         => __( 'Send Now', 'groundhogg' ),
+                    'name'          => 'send_now',
+                    'id'            => 'send_now',
+                    'class'         => '',
+                    'value'         => '1',
+                    'checked'       => false,
+                    'title'         => __( 'Send Now', 'groundhogg' ),
+                    'attributes'    => '',
+                    'required'      => false,) ); ?>
                 <p class="description"><?php _e( 'The day the broadcast will be sent.', 'groundhogg' ); ?></p>
             </td>
         </tr>

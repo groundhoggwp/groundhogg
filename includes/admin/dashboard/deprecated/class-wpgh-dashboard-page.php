@@ -154,7 +154,7 @@ class WPGH_Dashboard_Page
                                 $('#custom_date_range_start').addClass('hidden');
                             }})});
                     </script>
-                    <?php submit_button( 'Refresh', 'secondary', 'change_reporting', false ); ?>
+                    <?php submit_button( __( 'Refresh', 'groundhogg'), 'secondary', 'change_reporting', false ); ?>
                 </div>
             </form>
             <hr class="wp-header-end">

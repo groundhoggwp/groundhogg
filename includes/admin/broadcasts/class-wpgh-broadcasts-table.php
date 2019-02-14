@@ -208,7 +208,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         ) );
 
         $html = sprintf( "%s: <strong>%d</strong><br/>",
-            __( "Sent", 'groundhogg' ),
+            __( "$contact->", 'groundhogg' ),
             $contact_sum
         );
 
@@ -242,20 +242,20 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $time_diff = $p_time - $cur_time;
 
         if ( $time_diff < 0 ){
-            $time_prefix = __( 'Sent' );
+            $time_prefix = __( 'Sent', 'groundhogg' );
             /* The event has passed */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
                 $time = date_i18n( 'jS F, Y \@ h:i A', intval( $p_time ) );
             } else {
-                $time = sprintf( "%s ago", human_time_diff( $p_time, $cur_time ) );
+                $time = sprintf( __( "%s ago", 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
             }
         } else {
-            $time_prefix = __( 'Will send' );
+            $time_prefix = __( 'Will send', 'groundhogg' );
             /* the event is scheduled */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = sprintf( "on %s", date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+                $time = sprintf( __( "on %s", 'groundhogg' ), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
             } else {
-                $time = sprintf( "in %s", human_time_diff( $p_time, $cur_time ) );
+                $time = sprintf( __( "in %s", 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
             }
         }
 
@@ -271,7 +271,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $dc_time = mysql2date( 'U', $broadcast->date_scheduled );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $dc_time - $cur_time;
-        $time_prefix = __( 'Created' );
+        $time_prefix = __( 'Created', 'groundhogg' );
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
             $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
         } else {

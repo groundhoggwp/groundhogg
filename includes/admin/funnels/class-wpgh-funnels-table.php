@@ -91,13 +91,10 @@ class WPGH_Funnels_Table extends WP_List_Table {
             'archived'  => WPGH()->funnels->count( array( 'status' => 'archived' ) )
         );
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . ( $count[ 'active' ] + $count[ 'inactive' ] ) . ")</span>" . "</a>";
-
-        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=active' ) . "'>" . __( 'Active' ) . " <span class='count'>(" . $count[ 'active' ] . ")</span>" . "</a>";
-
-        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=inactive' ) . "'>" . __( 'Inactive' ) . " <span class='count'>(" . $count[ 'inactive' ] . ")</span>" . "</a>";
-
-        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=archived' ) . "'>" . __( 'Archived' ) . " <span class='count'>(" . $count[ 'archived' ] . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=all' ) . "'>" . __( 'All', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'active' ] + $count[ 'inactive' ] ) . ")</span>" . "</a>";
+        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=active' ) . "'>" . __( 'Active', 'groundhogg'  ) . " <span class='count'>(" . $count[ 'active' ] . ")</span>" . "</a>";
+        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=inactive' ) . "'>" . __( 'Inactive', 'groundhogg' ) . " <span class='count'>(" . $count[ 'inactive' ] . ")</span>" . "</a>";
+        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=archived' ) . "'>" . __( 'Archived', 'groundhogg' ) . " <span class='count'>(" . $count[ 'archived' ] . ")</span>" . "</a>";
 
         return apply_filters(  'wpgh_funnel_views', $views );
     }
@@ -122,23 +119,23 @@ class WPGH_Funnels_Table extends WP_List_Table {
                 'name'      => 'date_range',
                 'id'        => 'date_range',
                 'options'   => array(
-                    'today'     => __( 'Today' ),
-                    'yesterday' => __( 'Yesterday' ),
-                    'this_week' => __( 'This Week' ),
-                    'last_week' => __( 'Last Week' ),
-                    'last_30'   => __( 'Last 30 Days' ),
-                    'this_month'   => __( 'This Month' ),
-                    'last_month'   => __( 'Last Month' ),
-                    'this_quarter' => __( 'This Quarter' ),
-                    'last_quarter' => __( 'Last Quarter' ),
-                    'this_year' => __( 'This Year' ),
-                    'last_year' => __( 'Last Year' ),
-                    'custom'    => __( 'Custom Range' ),
+                    'today'         => _x( 'Today', 'reporting_range', 'groundhogg' ),
+                    'yesterday'     => _x( 'Yesterday', 'reporting_range', 'groundhogg' ),
+                    'this_week'     => _x( 'This Week', 'reporting_range', 'groundhogg' ),
+                    'last_week'     => _x( 'Last Week', 'reporting_range', 'groundhogg' ),
+                    'last_30'       => _x( 'Last 30 Days', 'reporting_range', 'groundhogg' ),
+                    'this_month'    => _x( 'This Month', 'reporting_range', 'groundhogg' ),
+                    'last_month'    => _x( 'Last Month', 'reporting_range', 'groundhogg' ),
+                    'this_quarter'  => _x( 'This Quarter', 'reporting_range', 'groundhogg' ),
+                    'last_quarter'  => _x( 'Last Quarter', 'reporting_range', 'groundhogg' ),
+                    'this_year'     => _x( 'This Year', 'reporting_range', 'groundhogg' ),
+                    'last_year'     => _x( 'Last Year', 'reporting_range', 'groundhogg' ),
+                    'custom'        => _x( 'Custom Range', 'reporting_range', 'groundhogg' ),
                 ),
                 'selected' => WPGH()->menu->funnels_page->get_url_var( 'date_range', 'this_week' ),
             ); echo WPGH()->html->dropdown( $args );
 
-            submit_button( 'Refresh', 'secondary', 'change_reporting', false );
+            submit_button( __( 'Refresh', 'groundhogg' ), 'secondary', 'change_reporting', false );
 
             $class = WPGH()->menu->funnels_page->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden';
 
@@ -250,7 +247,7 @@ class WPGH_Funnels_Table extends WP_List_Table {
         $lu_time = mysql2date( 'U', $funnel->last_updated );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $lu_time - $cur_time;
-        $time_prefix = __( 'Updated' );
+        $time_prefix = __( 'Updated', 'groundhogg' );
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
             $time = date_i18n( 'Y/m/d \@ h:i A', intval( $lu_time ) );
         } else {
@@ -264,7 +261,7 @@ class WPGH_Funnels_Table extends WP_List_Table {
         $dc_time = mysql2date( 'U', $funnel->date_created );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $dc_time - $cur_time;
-        $time_prefix = __( 'Created' );
+        $time_prefix = __( 'Created', 'created' );
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
             $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
         } else {

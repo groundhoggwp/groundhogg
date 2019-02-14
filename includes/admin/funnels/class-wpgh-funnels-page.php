@@ -110,8 +110,8 @@ class WPGH_Funnels_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            'Funnels',
-            'Funnels',
+            _x( 'Funnels', 'page_title', 'groundhogg' ),
+            _x( 'Funnels', 'page_title', 'groundhogg' ),
             'edit_funnels',
             'gh_funnels',
             array($this, 'page')
@@ -968,9 +968,9 @@ class WPGH_Funnels_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Funnels ', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Funnels&nbsp;', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Funnels ', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Funnels', 'groundhogg'); ?>">
             </p>
 			<?php $funnels_table->prepare_items(); ?>
 			<?php $funnels_table->display(); ?>

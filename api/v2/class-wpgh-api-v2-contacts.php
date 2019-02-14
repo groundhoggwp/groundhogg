@@ -40,7 +40,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'contact_id' => array(
                         'required'    => false,
-                        'description' => __('The ID of contact you want to retrieve.','groundhogg')
+                        'description' => _x('The ID of contact you want to retrieve.','api','groundhogg')
                     )
                 )
             ),
@@ -51,7 +51,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'contact' => array(
                         'required'    => true,
-                        'description' => __('Contains list of contact arguments. Please visit www.groundhogg.io for full list of accepted arguments.','groundhogg')
+                        'description' => _x('Contains list of contact arguments. Please visit www.groundhogg.io for full list of accepted arguments.', 'api','groundhogg')
                     )
                 )
             ),
@@ -63,7 +63,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'contact_id' => array(
                         'required'    => true,
-                        'description' => __('ID of the contact which you want to delete.','groundhogg')
+                        'description' => _x('ID of the contact which you want to delete.', 'api','groundhogg')
 
                     )
                 )
@@ -75,19 +75,19 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                 'args'=> array(
                     'contact_id' => array(
                         'required'    => true,
-                        'description' => __('The ID of the contact to update.','groundhogg')
+                        'description' => _x('The ID of the contact to update.', 'api','groundhogg')
                     ),
                     'contact'    => array(
                         'required'    => false,
-                        'description' => __('Array of updated contact details.','groundhogg')
+                        'description' => _x('Array of updated contact details.', 'api','groundhogg')
                     ),
                     'apply_tags' => array(
                         'required'    => false,
-                        'description' => __('Contains array of tag ids/slugs for which you want to apply to the contact.','groundhogg')
+                        'description' => _x('Contains array of tag ids/slugs for which you want to apply to the contact.', 'api','groundhogg')
                     ),
                     'remove_tags' => array(
                         'required'    => false,
-                        'description' => __('Contains array of tag ids/slugs for which you want to remove from the contact.','groundhogg')
+                        'description' => _x('Contains array of tag ids/slugs for which you want to remove from the contact.', 'api','groundhogg')
                     )
                 )
             ),
@@ -99,7 +99,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
     public function get_contact(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'view_contacts' ) ){
-            return new WP_Error('error', __( 'You are not eligible to perform this operation.','groundhogg' ) );
+            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api','groundhogg' ) );
         }
 
         $returncontact = array();
@@ -163,7 +163,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
 
         } else {
 
-            return new WP_Error('error', __('Please provide a valid contact ID.','groundhogg' ) );
+            return new WP_Error('error', _x('Please provide a valid contact ID.', 'api','groundhogg' ) );
 
         }
     }
@@ -172,7 +172,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
     public function create_contact(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'add_contacts' ) ){
-            return new WP_Error('error', __('You are not eligible to perform this operation.' ,'groundhogg') );
+            return new WP_Error('error', _x('You are not eligible to perform this operation.' ,'groundhogg') );
         }
         $contact_meta = null;
         $parameters = $request->get_json_params();
@@ -184,7 +184,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
         if( isset( $parameters['contact']['email'] ) ) {
             //validate email address
             if ( is_email($parameters['contact']['email']) === false ) {
-                return new WP_Error('error', __('Please provide a valid email address.','groundhogg') );
+                return new WP_Error('error', _x('Please provide a valid email address.', 'api','groundhogg') );
             }
             //  ---------------  Insert operation --------
             $data_array = array_map('sanitize_text_field', $contact_detail);
@@ -199,11 +199,11 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
             }
             return rest_ensure_response(array(
                 'code' => 'success',
-                'message' => __('Contact added successfully.' ,'groundhogg'),
+                'message' => _x('Contact added successfully.' ,'groundhogg'),
                 'contact_id' => $contact_id
             ));
         } else {
-            return new WP_Error('error', __('Please enter a valid email address.','groundhogg' ) );
+            return new WP_Error('error', _x('Please enter a valid email address.', 'api','groundhogg' ) );
         }
     }
 
@@ -218,7 +218,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
     public function update_contact(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'edit_contacts' ) ){
-            return new WP_Error('error', __( 'You are not eligible to perform this operation.','groundhogg' ));
+            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api','groundhogg' ));
         }
 
         $parameters = $request->get_params();
@@ -226,7 +226,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
         $result = false;
 
         if ( ! $contact_id || ! WPGH()->contacts->exists( $contact_id, 'ID' ) ){
-	        return new WP_Error('INVALID_ID', __( 'Please provide a valid contact ID.','groundhogg' ));
+	        return new WP_Error('INVALID_ID', _x( 'Please provide a valid contact ID.', 'api','groundhogg' ));
         }
 
         $contact = wpgh_get_contact( $contact_id );
@@ -248,12 +248,12 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
 	        }
 
 	        if ( isset( $updated_contact_args[ 'email' ] ) && ! is_email( isset( $updated_contact_args[ 'email' ] ) ) ){
-		        return new WP_Error('INVALID_EMAIL', __( 'Please provide a valid email address.','groundhogg' ));
+		        return new WP_Error('INVALID_EMAIL', _x( 'Please provide a valid email address.', 'api','groundhogg' ));
 	        }
 
 	        /* Check if email address already belongs to another contact */
 	        if ( isset( $updated_contact_args[ 'email' ] ) && $contact->email !== $updated_contact_args[ 'email' ] && WPGH()->contacts->exists( $updated_contact_args[ 'email' ] ) ){
-		        return new WP_Error('EMAIL_IN_USE', __( 'This email address is already being used by another contact.','groundhogg' ));
+		        return new WP_Error('EMAIL_IN_USE', _x( 'This email address is already being used by another contact.', 'api','groundhogg' ));
 	        }
 
 	        $updated_contact_args = array_map( 'sanitize_text_field', $updated_contact_args );
@@ -268,7 +268,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
             $result = $contact->add_tag( $tags );
 
             if ( ! $result ) {
-	            return new WP_Error('APPLY_TAG_ERROR', __( 'Could not apply tags.', 'groundhogg' ) );
+	            return new WP_Error('APPLY_TAG_ERROR', _x( 'Could not apply tags.', 'api', 'groundhogg' ) );
             }
         }
 
@@ -277,17 +277,17 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
             $tags = array_map('sanitize_text_field', $parameters['remove_tags']['tags']);
             $result = $contact->remove_tag( $tags );
             if ( ! $result ) {
-                return new WP_Error('REMOVE_TAG_ERROR', __('Could not remove tags.','groundhogg'));
+                return new WP_Error('REMOVE_TAG_ERROR', _x('Could not remove tags.', 'api','groundhogg'));
             }
         }
 
         if ( $result ){
 	        return rest_ensure_response( array(
 		        'code' => 'success',
-		        'message' => __( 'Contact updated successfully.','groundhogg')
+		        'message' => _x( 'Contact updated successfully.', 'api','groundhogg')
 	        ));
         } else {
-	        return new WP_Error('ERROR', __('Could not update contact.','groundhogg'));
+	        return new WP_Error('ERROR', _x('Could not update contact.', 'api','groundhogg'));
         }
     }
 
@@ -295,7 +295,7 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
     public function delete_contact( WP_REST_Request $request )
     {// function invoked if user wants to delete one contact
         if( ! user_can( $request['wpgh_user_id'], 'delete_contacts' ) ){
-            return new WP_Error('error', __('You are not eligible to perform this operation.'));
+            return new WP_Error('error', _x('You are not eligible to perform this operation.'));
         }
         if( isset( $request['contact_id'] ) ) {
             $contact_id = intval( $request['contact_id'] );
@@ -304,19 +304,19 @@ class WPGH_API_V2_CONTACTS extends WPGH_API_V2_BASE
                 if ( WPGH()->contacts->delete( array('ID' => $contact_id))) {
                     return rest_ensure_response(array(
                         'code' => 'success',
-                        'message' => __('Contact deleted successfully.','groundhogg')
+                        'message' => _x('Contact deleted successfully.', 'api','groundhogg')
                     ));
                 } else {
-                    return new WP_Error('error', __( 'Something went wrong.','groundhogg' ) );
+                    return new WP_Error('error', _x( 'Something went wrong.', 'api','groundhogg' ) );
                 }
             } else {
 
-                return new WP_Error('error', __('Please provide a valid contact ID.','groundhogg') );
+                return new WP_Error('error', _x('Please provide a valid contact ID.', 'api','groundhogg') );
             }
 
         } else {
 
-            return new WP_Error('error', __('Please provide a valid contact ID.','groundhogg'));
+            return new WP_Error('error', _x('Please provide a valid contact ID.', 'api','groundhogg'));
         }
 
     }

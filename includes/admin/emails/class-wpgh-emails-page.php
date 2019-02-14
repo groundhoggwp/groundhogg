@@ -91,8 +91,8 @@ class WPGH_Emails_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            'Emails',
-            'Emails',
+            _x( 'Emails', 'page_title', 'groundhogg' ),
+            _x( 'Emails', 'page_title', 'groundhogg' ),
             'edit_emails',
             'gh_emails',
             array($this, 'page')
@@ -576,9 +576,9 @@ class WPGH_Emails_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Emails ', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Emails&nbsp;', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Emails ', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Emails&nbsp;', 'groundhogg'); ?>">
             </p>
             <?php $emails_table->prepare_items(); ?>
             <?php $emails_table->display(); ?>
@@ -668,7 +668,7 @@ class WPGH_Emails_Page
         } else {
             ?>
             <div class="wrap">
-                <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+                <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
                 <?php $this->notices->notices(); ?>
                 <hr class="wp-header-end">
                 <?php switch ( $this->get_action() ){

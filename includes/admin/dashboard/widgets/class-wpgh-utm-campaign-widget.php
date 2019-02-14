@@ -14,7 +14,7 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
     public function __construct()
     {
         $this->wid = 'groundhogg_utm_campaign_widget';
-        $this->name = __( 'UTM Campaign Report', 'groundhogg' );
+        $this->name = _x( 'UTM Campaign Report', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }

@@ -44,7 +44,8 @@ class WPGH_Email_Confirmed extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-        $this->description = __( 'Runs whenever a contact confirms their email.', 'groundhogg' );
+        $this->name         = _x( 'Email Confirmed', 'element_name', 'groundhogg' );
+        $this->description  = _x( 'Runs whenever a contact confirms their email.', 'element_description', 'groundhogg' );
 
         parent::__construct();
 

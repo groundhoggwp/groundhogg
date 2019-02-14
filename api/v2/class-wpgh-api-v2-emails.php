@@ -50,11 +50,11 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
             'args'=> array(
                 'contact_id' => array(
                     'required'    => true,
-                    'description' => __( 'Contact ID which you want to send to.', 'groundhogg' ),
+                    'description' => _x( 'Contact ID which you want to send to.', 'api', 'groundhogg' ),
                 ),
                 'email_id' => array(
                     'required'    => true,
-                    'description' => __( 'Email ID which you want to send.', 'groundhogg' ),
+                    'description' => _x( 'Email ID which you want to send.', 'api', 'groundhogg' ),
                 )
             )
         ));
@@ -88,7 +88,7 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
 
             return rest_ensure_response( $response ) ;
         } else {
-            return new WP_Error('error', __( 'No emails found.', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'No emails found.', 'api', 'groundhogg' ) );
         }
     }
 
@@ -100,24 +100,24 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
             $contact_id = intval( $request['contact_id'] );
 
             if( !WPGH()->emails->exists( $email_id ) ) {
-                return new WP_Error('error', sprintf( __('Email with ID %d not found.', 'groundhogg'), $email_id ) );
+                return new WP_Error('error', sprintf( _x( 'Email with ID %d not found.', 'api', 'groundhogg' ), $email_id ) );
             }
             if( !WPGH()->contacts->exists( $contact_id , 'ID' ) ) {
-                return new WP_Error('error', sprintf( __('Contact with ID %d not found.', 'groundhogg'), $contact_id ) );
+                return new WP_Error('error', sprintf( _x( 'Contact with ID %d not found.', 'api', 'groundhogg' ), $contact_id ) );
             }
             $email      = new WPGH_Email( $email_id );
             $status     = $email->send( $contact_id );
             if( $status ) {
                 return rest_ensure_response(array(
                     'code' => 'success',
-                    'message' => __( 'Email sent successfully to contact.', 'groundhogg' )
+                    'message' => _x( 'Email sent successfully to contact.', 'api', 'groundhogg' )
                 ));
             } else {
-                return new WP_Error('error', __('Email not sent.', 'groundhogg' ));
+                return new WP_Error('error', _x( 'Email not sent.', 'api', 'groundhogg' ));
             }
 
         } else {
-            return new WP_Error('error', __('email_id and contact_id are required to perform this operation.', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'email_id and contact_id are required to perform this operation.', 'api', 'groundhogg' ) );
         }
 
     }

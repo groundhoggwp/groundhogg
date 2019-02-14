@@ -55,132 +55,132 @@ class WPGH_Replacements
             array(
                 'code'        => 'first',
                 'callback'    => 'wpgh_replacement_first_name',
-                'description' => __( 'The contact\'s first name.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'first_name',
                 'callback'    => 'wpgh_replacement_first_name',
-                'description' => __( 'The contact\'s first name.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'last',
                 'callback'    => 'wpgh_replacement_last_name',
-                'description' => __( 'The contact\'s last name.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'last_name',
                 'callback'    => 'wpgh_replacement_last_name',
-                'description' => __( 'The contact\'s last name.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'   => 'username',
                 'callback'    => 'wpgh_replacement_username',
-                'description' => __( 'The contact\'s last name.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'email',
                 'callback'    => 'wpgh_replacement_email',
-                'description' => __( 'The contact\'s email address.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s email address.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'phone',
                 'callback'    => 'wpgh_replacement_phone',
-                'description' => __( 'The contact\'s phone number.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s phone number.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'phone_ext',
                 'callback'    => 'wpgh_replacement_phone_ext',
-                'description' => __( 'The contact\'s phone number extension.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s phone number extension.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'address',
                 'callback'    => 'wpgh_replacement_address',
-                'description' => __( 'The contact\'s full address.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s full address.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'company_name',
                 'callback'    => 'wpgh_replacement_company_name',
-                'description' => __( 'The contact\'s company name.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s company name.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'job_title',
                 'callback'    => 'wpgh_replacement_job_title',
-                'description' => __( 'The contact\'s job title.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s job title.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'company_address',
                 'callback'    => 'wpgh_replacement_company_address',
-                'description' => __( 'The contact\'s company address.', 'groundhogg' ),
+                'description' => _x( 'The contact\'s company address.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'meta',
                 'callback'    => 'wpgh_replacement_meta',
-                'description' => __( 'Any meta data related to the contact. Usage: {meta.attribute}', 'groundhogg' ),
+                'description' => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'business_name',
                 'callback'    => 'wpgh_replacement_business_name',
-                'description' => __( 'The business name as defined in the settings.', 'groundhogg' ),
+                'description' => _x( 'The business name as defined in the settings.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'business_phone',
                 'callback'    => 'wpgh_replacement_business_phone',
-                'description' => __( 'The business phone number as defined in the settings.', 'groundhogg' ),
+                'description' => _x( 'The business phone number as defined in the settings.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'business_address',
                 'callback'    => 'wpgh_replacement_business_address',
-                'description' => __( 'The business address as defined in the settings.', 'groundhogg' ),
+                'description' => _x( 'The business address as defined in the settings.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'owner_first_name',
                 'callback'    => 'wpgh_replacement_owner_first_name',
-                'description' => __( 'The contact owner\'s name.', 'groundhogg' ),
+                'description' => _x( 'The contact owner\'s name.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'owner_last_name',
                 'callback'    => 'wpgh_replacement_owner_last_name',
-                'description' => __( 'The contact owner\'s name.', 'groundhogg' ),
+                'description' => _x( 'The contact owner\'s name.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'owner_email',
                 'callback'    => 'wpgh_replacement_owner_email',
-                'description' => __( 'The contact owner\'s email address.', 'groundhogg' ),
+                'description' => _x( 'The contact owner\'s email address.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'owner_phone',
                 'callback'    => 'wpgh_replacement_owner_phone',
-                'description' => __( 'The contact owner\'s phone number.', 'groundhogg' ),
+                'description' => _x( 'The contact owner\'s phone number.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'confirmation_link',
                 'callback'    => 'wpgh_replacement_confirmation_link',
-                'description' => __( 'A link to confirm the email address of a contact.', 'groundhogg' ),
+                'description' => _x( 'A link to confirm the email address of a contact.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'confirmation_link_raw',
                 'callback'    => 'wpgh_replacement_confirmation_link_raw',
-                'description' => __( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'groundhogg' ),
+                'description' => _x( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'superlink',
                 'callback'    => 'wpgh_replacement_superlink',
-                'description' => __( 'A superlink code. Usage: {superlink.id}', 'groundhogg' ),
+                'description' => _x( 'A superlink code. Usage: {superlink.id}', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'date',
                 'callback'    => 'wpgh_replacement_date',
-                'description' => __( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'groundhogg' ),
+                'description' => _x( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'files',
                 'callback'    => 'wpgh_replacement_files',
-                'description' => __( 'Insert a download link for a file. Usage {files.key}. Example: {files.custom_files}. Do find the key for a file see the contact record and copy the relevant replacement code.', 'groundhogg' ),
+                'description' => _x( 'Insert a download link for a file. Usage {files.key}. Example: {files.custom_files}. Do find the key for a file see the contact record and copy the relevant replacement code.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code'        => 'groundhogg_day_quote',
                 'callback'    => 'wpgh_get_random_groundhogday_quote',
-                'description' => __( 'Inserts a random quote from the movie Groundhogg Day featuring Bill Murray', 'groundhogg' ),
+                'description' => _x( 'Inserts a random quote from the movie Groundhogg Day featuring Bill Murray', 'replacement', 'groundhogg' ),
             )
         );
 
@@ -382,7 +382,7 @@ class WPGH_Replacements
 
         echo WPGH()->html->modal_link( array(
             'title'     => 'Replacements',
-            'text'      => __( 'Insert Replacement', 'groundhogg' ),
+            'text'      => _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
             'footer_button_text' => __( 'Close' ),
             'id'        => '',
             'class'     => 'button button-secondary no-padding',

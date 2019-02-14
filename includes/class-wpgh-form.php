@@ -292,14 +292,14 @@ class WPGH_Form
     {
         $a = shortcode_atts( array(
             'type'          => 'text',
-            'label'         => __( 'First Name *', 'groundhogg' ),
+            'label'         => _x( 'First Name *', 'form_default', 'groundhogg' ),
             'name'          => 'first_name',
             'id'            => 'first_name',
             'class'         => 'gh-first-name',
             'value'         => '',
             'placeholder'   => '',
             'attributes'    => 'pattern="[A-Za-z \-\']+"',
-            'title'         => __( 'Do not include numbers or special characters.', 'groundhogg' ),
+            'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
             'required'      => true,
         ), $atts );
 
@@ -318,14 +318,14 @@ class WPGH_Form
     {
         $a = shortcode_atts( array(
             'type'          => 'text',
-            'label'         => __( 'Last Name *', 'groundhogg' ),
+            'label'         => _x( 'Last Name *', 'form_default', 'groundhogg' ),
             'name'          => 'last_name',
             'id'            => 'last_name',
             'class'         => 'gh-last-name',
             'value'         => '',
             'placeholder'   => '',
             'attributes'    => 'pattern="[A-Za-z \-\']+"',
-            'title'         => __( 'Do not include numbers or special characters.', 'groundhogg' ),
+            'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
             'required'      => true,
         ), $atts );
 
@@ -344,7 +344,7 @@ class WPGH_Form
     {
         $a = shortcode_atts( array(
             'type'          => 'email',
-            'label'         => __( 'Email *', 'groundhogg' ),
+            'label'         => _x( 'Email *', 'form_default', 'groundhogg' ),
             'name'          => 'email',
             'id'            => 'email',
             'class'         => 'gh-email',
@@ -369,7 +369,7 @@ class WPGH_Form
     {
         $a = shortcode_atts( array(
             'type'          => 'tel',
-            'label'         => __( 'Phone *', 'groundhogg' ),
+            'label'         => _x( 'Phone *', 'form_default', 'groundhogg' ),
             'name'          => 'primary_phone',
             'id'            => 'primary_phone',
             'class'         => 'gh-tel',
@@ -394,7 +394,7 @@ class WPGH_Form
     {
         $a = shortcode_atts( array(
             'type'          => 'file',
-            'label'         => __( 'File *', 'groundhogg' ),
+            'label'         => _x( 'File *', 'form_default', 'groundhogg' ),
             'name'          => '',
             'id'            => '',
             'class'         => '',
@@ -424,7 +424,7 @@ class WPGH_Form
     {
         $a = shortcode_atts( array(
             'type'          => 'date',
-            'label'         => __( 'Date *', 'groundhogg' ),
+            'label'         => _x( 'Date *', 'form_default', 'groundhogg' ),
             'name'          => '',
             'id'            => '',
             'class'         => '',
@@ -458,7 +458,7 @@ class WPGH_Form
     {
         $a = shortcode_atts( array(
             'type'          => 'time',
-            'label'         => __( 'Time *', 'groundhogg' ),
+            'label'         => _x( 'Time *', 'form_default', 'groundhogg' ),
             'name'          => '',
             'id'            => '',
             'class'         => '',
@@ -491,7 +491,7 @@ class WPGH_Form
     public function address( $atts )
     {
         $a = shortcode_atts( array(
-            'label'         => __( 'Address *', 'groundhogg' ),
+            'label'         => _x( 'Address *', 'form_default', 'groundhogg' ),
             'class'         => 'gh-address',
             'enabled'       => 'all',
             'name_prefix'   => '',
@@ -509,11 +509,11 @@ class WPGH_Form
         $section .= $this->row( array(), $this->column( array( 'size' => '2/3' ), $this->input_base(
             array(
                 'type'          => 'text',
-                'label'         => __( 'Street Address 1', 'groundhogg' ),
+                'label'         => _x( 'Street Address 1', 'form_default', 'groundhogg' ),
                 'name'          => $name_prefix . 'street_address_1',
                 'id'            => $name_prefix . 'street_address_1',
                 'placeholder'   => '123 Any St.',
-                'title'         => __( 'Street Address 1', 'groundhogg' ),
+                'title'         => _x( 'Street Address 1', 'form_default', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
         ) ) .
@@ -521,11 +521,11 @@ class WPGH_Form
         $this->column( array( 'size' => '1/3' ), $this->input_base(
             array(
                 'type'          => 'text',
-                'label'         => __( 'Street Address 2', 'groundhogg' ),
+                'label'         => _x( 'Street Address 2', 'form_default', 'groundhogg' ),
                 'name'          => $name_prefix . 'street_address_2',
                 'id'            => $name_prefix . 'street_address_2',
                 'placeholder'   => 'Unit A',
-                'title'         => __( 'Street Address 2', 'groundhogg' ),
+                'title'         => _x( 'Street Address 2', 'form_default', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
         ) ) );
@@ -533,11 +533,11 @@ class WPGH_Form
         $section .= $this->row( array(),  $this->input_base(
             array(
                 'type'          => 'text',
-                'label'         => __( 'City', 'groundhogg' ),
+                'label'         => _x( 'City', 'form_default', 'groundhogg' ),
                 'name'          => $name_prefix . 'city',
                 'id'            => $name_prefix . 'city',
                 'placeholder'   => 'New York',
-                'title'         => __( 'City', 'groundhogg' ),
+                'title'         => _x( 'City', 'form_default', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
         ) );
@@ -545,23 +545,23 @@ class WPGH_Form
         $section .= $this->row( array(), $this->column( array( 'size' => '1/2' ),$this->input_base(
             array(
                 'type'          => 'text',
-                'label'         => __( 'State/Province', 'groundhogg' ),
+                'label'         => _x( 'State/Province', 'form_default', 'groundhogg' ),
                 'name'          => $name_prefix . 'region',
                 'id'            => $name_prefix . 'region',
                 'placeholder'   => 'New York',
-                'title'         => __( 'State/Province', 'groundhogg' ),
+                'title'         => _x( 'State/Province', 'form_default', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
         ) ) . $this->column( array( 'size' => '1/2' ), $this->select(
             array(
-                'label'         => __( 'Country *', 'groundhogg' ),
+                'label'         => _x( 'Country *', 'form_default', 'groundhogg' ),
                 'name'          => $name_prefix . 'country',
                 'id'            => $name_prefix . 'country',
                 'class'         => '',
                 'options'       => wpgh_get_countries_list(),
                 'attributes'    => '',
                 'title'         => __( 'Country' ),
-                'default'       => __( 'Please select a country', 'groundhogg' ),
+                'default'       => _x( 'Please select a country', 'form_default', 'groundhogg' ),
                 'multiple'      => false,
                 'required'      => $a[ 'required' ],
             ) )
@@ -570,11 +570,11 @@ class WPGH_Form
         $section.= $this->input_base(
             array(
                 'type'          => 'text',
-                'label'         => __( 'Postal/Zip Code', 'groundhogg' ),
+                'label'         => _x( 'Postal/Zip Code', 'form_default', 'groundhogg' ),
                 'name'          => $name_prefix . 'postal_zip',
                 'id'            => $name_prefix . 'postal_zip',
                 'placeholder'   => '10001',
-                'title'         => __( 'Postal/Zip Code', 'groundhogg' ),
+                'title'         => _x( 'Postal/Zip Code', 'form_default', 'groundhogg' ),
                 'required'      => $a[ 'required' ],
             )
         );
@@ -661,7 +661,7 @@ class WPGH_Form
     {
         $a = shortcode_atts( array(
             'type'          => 'number',
-            'label'         => __( 'Number *', 'groundhogg' ),
+            'label'         => _x( 'Number *', 'form_default', 'groundhogg' ),
             'name'          => '',
             'id'            => '',
             'class'         => '',
@@ -699,14 +699,14 @@ class WPGH_Form
         }
 
         $a = shortcode_atts( array(
-            'label'         => __( 'Select *', 'groundhogg' ),
+            'label'         => _x( 'Select *', 'form_default', 'groundhogg' ),
             'name'          => '',
             'id'            => '',
             'class'         => '',
             'options'       => '',
             'attributes'    => '',
             'title'         => '',
-            'default'       => __( 'Please select one', 'groundhogg' ),
+            'default'       => _x( 'Please select one', 'form_default', 'groundhogg' ),
             'multiple'      => false,
             'required'      => true,
         ), $atts );
@@ -771,7 +771,7 @@ class WPGH_Form
         }
 
         $a = shortcode_atts( array(
-            'label'         => __( 'Radio *', 'groundhogg' ),
+            'label'         => _x( 'Radio *', 'form_default', 'groundhogg' ),
             'name'          => '',
             'id'            => '',
             'class'         => '',
@@ -887,12 +887,12 @@ class WPGH_Form
     public function terms( $atts )
     {
         $a = shortcode_atts( array(
-            'label'         => __( 'I agree to the <i>terms of service</i>.', 'groundhogg' ),
+            'label'         => _x( 'I agree to the <i>terms of service</i>.', 'form_default', 'groundhogg' ),
             'name'          => 'agree_terms',
             'id'            => 'agree_terms',
             'class'         => 'gh-terms',
             'value'         => 'yes',
-            'title'         => __( 'Please agree to the terms of service.', 'groundhogg' ),
+            'title'         => _x( 'Please agree to the terms of service.', 'form_default', 'groundhogg' ),
             'required'      => true,
         ), $atts );
 
@@ -908,12 +908,12 @@ class WPGH_Form
     public function gdpr( $atts )
     {
         $a = shortcode_atts( array(
-            'label'         => __( 'I consent to having my personal information collected, and to receive marketing and transactional information related to my request. ', 'groundhogg' ),
+            'label'         => _x( 'I consent to having my personal information collected, and to receive marketing and transactional information related to my request.', 'form_default', 'groundhogg' ),
             'name'          => 'gdpr_consent',
             'id'            => 'gdpr_consent',
             'class'         => 'gh-gdpr',
             'value'         => 'yes',
-            'title'         => __( 'I Consent', 'groundhogg' ),
+            'title'         => _x( 'I Consent', 'form_default', 'groundhogg' ),
             'required'      => true,
         ), $atts );
 
@@ -940,7 +940,7 @@ class WPGH_Form
 
 
         if ( ! is_admin() )
-            wp_enqueue_script( 'google-recaptcha-v2', 'https://www.google.com/recaptcha/api.js' );
+            wp_enqueue_script( 'google-recaptcha-v2', 'https://www.google.com/recaptcha/api.js', array(), true );
 
         $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ), $a[ 'theme'], $a['size'] );
 
@@ -962,7 +962,7 @@ class WPGH_Form
 
         if ( ! $contact || ! $contact->exists() ){
 
-            return __( 'There is no email to manage.', 'groundhogg' );
+            return _x( 'There is no email to manage.', 'form_default', 'groundhogg' );
 
         }
 
@@ -974,23 +974,23 @@ class WPGH_Form
         if ( $last_change && ( time() - $last_change ) < 30 ){
 
             $html.= sprintf( "<div class='notice' style='color: white; background: #3ed920;padding: 6px;margin-bottom: 10px;'>%s</div>",
-                __( 'Your preferences have been changed!', 'groundhogg' )
+                _x( 'Your preferences have been changed!', 'form_default', 'groundhogg' )
             );
 
         }
 
         $options = array(
-            'none'          => __( 'I love this company, you can communicate with me whenever you feel like.', 'groundhogg'),
-            'weekly'        => __( 'It\'s getting a bit much. Communicate with me weekly.', 'groundhogg'),
-            'monthly'       => __( 'Distance makes the heart grow fonder. Communicate with me monthly.', 'groundhogg'),
-            'unsubscribe'   => __( 'I no longer wish to receive any form of communication. Unsubscribe me!', 'groundhogg')
+            'none'          => _x( 'I love this company, you can communicate with me whenever you feel like.', 'form_default', 'groundhogg' ),
+            'weekly'        => _x( 'It\'s getting a bit much. Communicate with me weekly.', 'form_default', 'groundhogg' ),
+            'monthly'       => _x( 'Distance makes the heart grow fonder. Communicate with me monthly.', 'form_default', 'groundhogg' ),
+            'unsubscribe'   => _x( 'I no longer wish to receive any form of communication. Unsubscribe me!', 'form_default', 'groundhogg' )
         );
 
         $options = apply_filters( 'wpgh_email_preferences', $options );
 
         /* Email Preference Option */
         $args = array(
-            'label'     => __( 'Manage Email Preferences For <b>' . $contact->email . '</b>:', 'groundhogg' ),
+            'label'     => _x( 'Manage Email Preferences For <b>' . $contact->email . '</b>:', 'form_default', 'groundhogg' ),
             'id'        => 'email_preferences',
             'name'      => 'email_preferences',
             'options'   => $options,
@@ -1005,7 +1005,7 @@ class WPGH_Form
 
         if ( wpgh_is_gdpr() ){
             $args = array(
-                'label'     => __( ' Please also delete all personal information on record.', 'groundhogg' ),
+                'label'     => _x( ' Please also delete all personal information on record.', 'form_default', 'groundhogg' ),
                 'id'        => 'delete_everything',
                 'name'      => 'delete_everything',
                 'value'     => 'yes',

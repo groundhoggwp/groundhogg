@@ -73,17 +73,17 @@ class WPGH_Event_Queue_v2
     {
         $this->schedules[ 'every_10_minutes' ] = array(
             'interval'    => 10 * MINUTE_IN_SECONDS,
-            'display'     => __( 'Every 10 Minutes', 'groundhogg' )
+            'display'     => _x( 'Every 10 Minutes', 'cron_schedule', 'groundhogg' )
         );
 
         $this->schedules[ 'every_5_minutes' ] = array(
             'interval'    => 5 * MINUTE_IN_SECONDS,
-            'display'     => __( 'Every 5 Minutes', 'groundhogg' )
+            'display'     => _x( 'Every 5 Minutes', 'cron_schedule', 'groundhogg' )
         );
 
         $this->schedules[ 'every_1_minutes' ] = array(
             'interval'    => MINUTE_IN_SECONDS,
-            'display'     => __( 'Every 1 Minutes', 'groundhogg' )
+            'display'     => _x( 'Every 1 Minutes', 'cron_schedule', 'groundhogg' )
         );
     }
 
@@ -118,8 +118,8 @@ class WPGH_Event_Queue_v2
 
         $this->time_till_process = wp_next_scheduled( 'wpgh_process_queue' ) - time();
 
-        $expected_max_time = $this->schedules[ $settings_queue_interval ][ 'interval' ];
-        $expected_max_time_display = $this->schedules[ $settings_queue_interval ][ 'display' ];
+//        $expected_max_time = $this->schedules[ $settings_queue_interval ][ 'interval' ];
+//        $expected_max_time_display = $this->schedules[ $settings_queue_interval ][ 'display' ];
 
 //        if ( ( $this->time_till_process > $expected_max_time + 1 ) && ( ! defined( 'DISABLE_WP_CRON' ) ||  DISABLE_WP_CRON === false ) ){
 //

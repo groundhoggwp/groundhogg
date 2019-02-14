@@ -44,7 +44,8 @@ class WPGH_Tag_Removed extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-        $this->description = __( 'Runs whenever any of the specified tags are removed from a contact.', 'groundhogg' );
+        $this->name         = _x( 'Tag Removed', 'element_name', 'groundhogg' );
+        $this->description  = _x( 'Runs whenever any of the specified tags are removed from a contact.', 'element_description', 'groundhogg' );
 
         parent::__construct();
 

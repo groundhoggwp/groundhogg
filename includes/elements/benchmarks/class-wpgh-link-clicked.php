@@ -44,8 +44,8 @@ class WPGH_Link_Clicked extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-
-        $this->description = __( 'Runs whenever a special link is clicked and redirects the user to another page.', 'groundhogg' );
+        $this->name         = _x( 'Link Click', 'element_name', 'groundhogg' );
+        $this->description  = _x( 'Runs whenever a special link is clicked and redirects the user to another page.', 'element_description', 'groundhogg' );
 
         parent::__construct();
 

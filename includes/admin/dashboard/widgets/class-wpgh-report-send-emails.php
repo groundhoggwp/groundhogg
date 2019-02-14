@@ -11,7 +11,7 @@ class WPGH_Report_Send_Emails extends WPGH_Line_Graph_Report_V2
     public function __construct()
     {
         $this->wid = 'sent_activity_report';
-        $this->name = __( 'Email Activity Report', 'groundhogg' );
+        $this->name = _x( 'Email Activity Report', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }
@@ -49,15 +49,15 @@ class WPGH_Report_Send_Emails extends WPGH_Line_Graph_Report_V2
 
         $ds =  array();
         $ds[] = array(
-            'label' => __( 'Emails Sent' ),
+            'label' => __( 'Emails Sent', 'groundhogg' ),
             'data'  => $dataset1
         ) ;
         $ds[] = array(
-            'label' => __( 'Emails Opened' ),
+            'label' => __( 'Emails Opened', 'groundhogg' ),
             'data'  => $dataset2
         ) ;
         $ds[] = array(
-            'label' => __( 'Emails Clicked' ),
+            'label' => __( 'Emails Clicked', 'groundhogg' ),
             'data'  => $dataset3
         ) ;
 

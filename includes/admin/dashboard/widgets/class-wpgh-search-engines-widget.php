@@ -16,7 +16,7 @@ class WPGH_Search_Engines_Widget extends WPGH_Reporting_Widget
     public function __construct()
     {
         $this->wid = 'groundhogg_search_engines_widget';
-        $this->name = __( 'Search Engine Report', 'groundhogg' );
+        $this->name = _x( 'Search Engine Report', 'widget_name', 'groundhogg' );
         $this->setup_social_networks();
 
         parent::__construct();

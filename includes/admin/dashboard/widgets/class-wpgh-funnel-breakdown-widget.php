@@ -14,7 +14,7 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
     public function __construct()
     {
         $this->wid = 'funnel_breakdown_widget';
-        $this->name = __( 'Funnel Breakdown', 'groundhogg' );
+        $this->name = _x( 'Funnel Breakdown', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }

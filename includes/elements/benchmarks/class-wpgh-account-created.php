@@ -44,7 +44,9 @@ class WPGH_Account_Created extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-        $this->description = __( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'groundhogg' );
+
+        $this->name         = _x( 'Account Created', 'element_name', 'groundhogg' );
+        $this->description  = _x( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'element_description', 'groundhogg' );
 
         parent::__construct();
 

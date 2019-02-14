@@ -155,7 +155,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
         $dc_time = mysql2date( 'U', $contact->date_created );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $dc_time - $cur_time;
-        $time_prefix = __( 'Created' );
+        $time_prefix = __( 'Created', 'groundhogg' );
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
             $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
         } else {
@@ -233,12 +233,12 @@ class WPGH_Contacts_Table extends WP_List_Table {
         );
 
         return apply_filters( 'contact_views', array(
-            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . __( 'All <span class="count">('.array_sum($count).')</span>' ) . "</a>",
-            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . __( 'Unconfirmed <span class="count">('.$count['unconfirmed'].')</span>' ) . "</a>",
-            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . __( 'Confirmed <span class="count">('.$count['confirmed'].')</span>' ) . "</a>",
-            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . __( 'Unsubscribed <span class="count">('.$count['opted_out'].')</span>' ) . "</a>",
-            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . "spam" . "'>" . __( 'Spam <span class="count">('.$count['spam'].')</span>' ) . "</a>",
-            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . "bounce" . "'>" . __( 'Bounced <span class="count">('.$count['bounce'].')</span>' ) . "</a>"
+            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . __( 'All <span class="count">('.array_sum($count).')</span>', 'gronudhogg' ) . "</a>",
+            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . __( 'Unconfirmed <span class="count">('.$count['unconfirmed'].')</span>', 'gronudhogg' ) . "</a>",
+            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . __( 'Confirmed <span class="count">('.$count['confirmed'].')</span>', 'gronudhogg' ) . "</a>",
+            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . __( 'Unsubscribed <span class="count">('.$count['opted_out'].')</span>', 'gronudhogg' ) . "</a>",
+            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . "spam" . "'>" . __( 'Spam <span class="count">('.$count['spam'].')</span>', 'gronudhogg' ) . "</a>",
+            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . "bounce" . "'>" . __( 'Bounced <span class="count">('.$count['bounce'].')</span>', 'gronudhogg' ) . "</a>"
         ) );
     }
 

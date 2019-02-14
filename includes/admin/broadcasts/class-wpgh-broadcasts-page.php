@@ -26,6 +26,7 @@ class WPGH_Broadcasts_Page
      * @var WPGH_Notices
      */
     public $notices;
+    public $order;
 
     function __construct()
     {
@@ -59,8 +60,8 @@ class WPGH_Broadcasts_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            'Broadcasts',
-            'Broadcasts',
+            _x( 'Broadcasts', 'page_title', 'groundhogg' ),
+            _x( 'Broadcasts', 'page_title',  'groundhogg' ),
             'view_broadcasts',
             'gh_broadcasts',
             array($this, 'page')
@@ -298,9 +299,9 @@ class WPGH_Broadcasts_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Broadcasts ', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Broadcasts&nbsp;', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Broadcasts ', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Broadcasts&nbsp;', 'groundhogg'); ?>">
             </p>
             <?php $broadcasts_table->prepare_items(); ?>
             <?php $broadcasts_table->display(); ?>
@@ -340,7 +341,7 @@ class WPGH_Broadcasts_Page
     {
         ?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add' ); ?>"><?php _e( 'Add New' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add' ); ?>"><?php _e( 'Schedule New', 'groundhogg' ); ?></a>
             <?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
             <?php switch ( $this->get_action() ){

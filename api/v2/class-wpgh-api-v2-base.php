@@ -45,15 +45,15 @@ class WPGH_API_V2_BASE {
                     $request->set_param( 'wpgh_user_id', $user );
 
                 } else {
-                    return new WP_Error( 'error',__( 'Invalid Authentication.' ,'groundhogg') );
+                    return new WP_Error( 'error',_x( 'Invalid Authentication.', 'api', 'groundhogg' ) );
                 }
             } else {
-                return new WP_Error( 'error',__( 'API key is not valid.','groundhogg') );
+                return new WP_Error( 'error',_x( 'API key is not valid.', 'api', 'groundhogg' ) );
             }
 
         } else {
 
-            return new WP_Error( 'error',__( 'Please enter a API valid token and public key.' ,'groundhogg'));
+            return new WP_Error( 'error',_x( 'Please enter a API valid token and public key.', 'api', 'groundhogg' ));
 
         }
 

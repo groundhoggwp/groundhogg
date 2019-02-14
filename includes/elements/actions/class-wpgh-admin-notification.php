@@ -43,6 +43,14 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
      */
     public $description = 'Send an email notification to any email or list of emails.';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Admin Notification', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Send an email notification to any email or list of emails.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * @param $step WPGH_Step
      */
@@ -67,7 +75,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
             <tbody>
                 <tr>
                     <th>
-                        <?php echo esc_html__( 'Send To:', 'groundhogg' ); ?>
+                        <?php echo esc_html_x( 'Send To:', 'admin_notification_settings', 'groundhogg' ); ?>
                     </th>
                     <td>
                         <?php $args = array(
@@ -82,7 +90,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
                 </tr>
                 <tr>
                     <th>
-                        <?php echo esc_html__( 'Subject:', 'groundhogg' ); ?>
+                        <?php echo esc_html_x( 'Subject:', 'admin_notification_settings', 'groundhogg' ); ?>
                     </th>
                     <td>
                         <?php $args = array(
@@ -97,7 +105,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
                 </tr>
                 <tr>
                     <th>
-                        <?php echo esc_html__( 'Notification Text:', 'groundhogg' ); ?>
+                        <?php echo esc_html_x( 'Notification Text:', 'admin_notification_settings', 'groundhogg' ); ?>
                         <p>
                             <?php WPGH()->replacements->show_replacements_button(); ?>
                         </p>

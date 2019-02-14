@@ -90,7 +90,7 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
                     <div class="header" style="text-align: center;margin-bottom: 25px;">
                         <span class="apple-link" style="<?php echo $apple_link; ?>">
                             <a href="<?php echo esc_url_raw( apply_filters( 'wpgh_email_browser_link', site_url() ) ); ?>">
-                                <?php _e( apply_filters( 'gh_view_in_browser_text', 'View In Browser...' ), 'groundhogg' ); ?>
+                                <?php _e( apply_filters( 'gh_view_in_browser_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
                             </a>
                         </span>
                     </div>

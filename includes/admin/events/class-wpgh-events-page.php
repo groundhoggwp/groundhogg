@@ -46,8 +46,8 @@ class WPGH_Events_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            'Events',
-            'Events',
+            _x( 'Events', 'page_title', 'groundhogg' ),
+            _x( 'Events', 'page_title', 'groundhogg' ),
             'view_events',
             'gh_events',
             array($this, 'page')
@@ -197,9 +197,9 @@ class WPGH_Events_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Events ', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Events&nbsp;', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Events ', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Events&nbsp;', 'groundhogg'); ?>">
             </p>
             <?php $events_table->prepare_items(); ?>
             <?php $events_table->display(); ?>

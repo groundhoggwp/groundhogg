@@ -650,6 +650,22 @@ class WPGH_Tracking
         if ( $this->get_contact() ){
             do_action( 'wpgh_link_clicked', $step, $this->get_contact() );
             $redirect_to = WPGH()->replacements->process( $step->get_meta( 'redirect_to' ), $this->get_contact()->ID );
+
+            /* Check unsub page */
+            if ( wpgh_is_global_multisite() ){
+                switch_to_blog( get_site()->site_id );
+            }
+
+            $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
+            if ( $redirect_to === $unsub_page ){
+                $redirect_to = sprintf( '%s?u=%s', $unsub_page, dechex( $this->contact->ID ) );
+            }
+
+            if ( is_multisite() && ms_is_switched() ){
+                restore_current_blog();
+            }
+
+
         } else {
             $redirect_to = $step->get_meta( 'redirect_to' );
         }
@@ -734,6 +750,7 @@ class WPGH_Tracking
         }
 
         $conf_page = get_permalink( wpgh_get_option( 'gh_confirmation_page' ) );
+        $conf_page = sprintf( '%s?u=%s', $conf_page, dechex( $this->contact->ID ) );
 
         if ( is_multisite() && ms_is_switched() ){
             restore_current_blog();

@@ -305,7 +305,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->register_blocks();
                 self::$instance->register_integrations();
 
-                add_action( 'init', array( self::$instance, 'load_text_domain' ) );
+                add_action( 'plugins_loaded', array( self::$instance, 'load_text_domain' ) );
 
             }
 
@@ -481,8 +481,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
         public function load_text_domain()
         {
-            $plugin_rel_path = dirname( __FILE__ ) . '/languages'; /* Relative to WP_PLUGIN_DIR */
-            load_plugin_textdomain( 'groundhogg', false, $plugin_rel_path );
+            load_plugin_textdomain( 'groundhogg', false, basename( dirname( __FILE__ ) ) . '/languages' );
         }
 
         public function brand()

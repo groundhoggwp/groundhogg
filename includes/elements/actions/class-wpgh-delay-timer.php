@@ -43,6 +43,14 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
      */
     public $description = 'Pause for the specified amount of time.';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Delay Timer', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Pause for the specified amount of time.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * @param $step WPGH_Step
      */

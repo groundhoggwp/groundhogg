@@ -43,6 +43,14 @@ class WPGH_Field_Timer extends WPGH_Funnel_Step
      */
     public $description = 'Pause for the specified amount of time before a date in the meta.';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Field Timer', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Pause for the specified amount of time before a date in the meta.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * @param $step WPGH_Step
      */

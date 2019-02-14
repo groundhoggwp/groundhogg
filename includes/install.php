@@ -73,6 +73,8 @@ function wpgh_run_install() {
         update_option( 'wpgh_version_upgraded_from', $current_version );
     }
 
+    WPGH()->load_text_domain();
+
     // Create the databases
     WPGH()->activity->create_table();
     WPGH()->broadcasts->create_table();
@@ -139,8 +141,8 @@ function wpgh_run_install() {
     /* email preferences page */
     if ( ! wpgh_get_option( 'gh_email_preferences_page', false ) && isset( $form ) ){
         $email_preferences_args = array(
-            'post_title' => __( 'Email Preferences', 'groundhogg' ),
-            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form id="' . $form->ID . '" title="' . $form->step_title . '"]</p>', 'groundhogg' ),
+            'post_title' => _x( 'Email Preferences', 'default_pages', 'groundhogg' ),
+            'post_content' => sprintf( _x( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form id="%d" title="%s"]</p>', 'default_pages', 'groundhogg' ), $form->ID, $form->step_title ),
             'post_type' => 'page',
             'post_status' => 'publish',
             'post_author' => get_current_user_id(),
@@ -151,8 +153,8 @@ function wpgh_run_install() {
 
     if ( ! wpgh_get_option( 'gh_confirmation_page', false ) ){
         $confirmation_args = array(
-            'post_title' => __( 'Email Confirmed', 'groundhogg' ),
-            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been confirmed.</h2><p>Thank you! Return to your inbox to receive further communication.</p>', 'groundhogg' ),
+            'post_title' => _x( 'Email Confirmed', 'default_pages', 'groundhogg' ),
+            'post_content' => _x( '<h2>Your email [gh_contact field="email"] has been confirmed.</h2><p>Thank you! Return to your inbox to receive further communication.</p>', 'default_pages', 'groundhogg' ),
             'post_type' => 'page',
             'post_status' => 'publish',
             'post_author' => get_current_user_id(),
@@ -164,8 +166,8 @@ function wpgh_run_install() {
     /* unbsubscribed page */
     if ( ! wpgh_get_option( 'gh_unsubscribe_page', false ) ){
         $unsubscribed_args = array(
-            'post_title' => __( 'Unsubscribed', 'groundhogg' ),
-            'post_content' => __( '<h2>Your email [gh_contact field="email"] has been unsubscribed.</h2><p>This means you will not receive any further marketing communication from us, but you may receive transactional emails related to billing.</p><p>Note that opting in again to any optin form or program on our site is implied consent and may result in starting to receive email communication again.</p>', 'groundhogg' ),
+            'post_title' => _x( 'Unsubscribed', 'default_pages', 'groundhogg' ),
+            'post_content' => _x( '<h2>Your email [gh_contact field="email"] has been unsubscribed.</h2><p>This means you will not receive any further marketing communication from us, but you may receive transactional emails related to billing.</p><p>Note that opting in again to any optin form or program on our site is implied consent and may result in starting to receive email communication again.</p>', 'default_pages', 'groundhogg' ),
             'post_type' => 'page',
             'post_status' => 'publish',
             'post_author' => get_current_user_id(),
@@ -176,8 +178,8 @@ function wpgh_run_install() {
 
     if ( ! wpgh_get_option( 'gh_view_in_browser_page', false ) ){
         $email_preferences_args = array(
-            'post_title' => __( 'Emails', 'groundhogg' ),
-            'post_content' => __( '[browser_view]', 'groundhogg' ),
+            'post_title' => _x( 'Emails', 'default_pages', 'groundhogg' ),
+            'post_content' => '[browser_view]',
             'post_type' => 'page',
             'post_status' => 'publish',
             'post_author' => get_current_user_id(),
@@ -405,8 +407,8 @@ function wpgh_install_email_preferences_center() {
     /* email preferences page */
     if ( ! wpgh_get_option( 'gh_email_preferences_page', false ) && isset( $form ) ){
         $email_preferences_args = array(
-            'post_title' => __( 'Email Preferences', 'groundhogg' ),
-            'post_content' => __( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form id="' . $form->ID . '" title="' . $form->step_title . '"]</p>', 'groundhogg' ),
+            'post_title' => _x( 'Email Preferences', 'default_pages', 'groundhogg' ),
+            'post_content' => sprintf( _x( '<h2>Manage your email preferences!</h2><p>Use the form below to manage your email preferences.</p><p>[gh_form id="%d" title="%s"]</p>', 'default_pages', 'groundhogg' ), $form->ID, $form->step_title ),
             'post_type' => 'page',
             'post_status' => 'publish',
             'post_author' => get_current_user_id(),

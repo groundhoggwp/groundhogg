@@ -41,7 +41,15 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
     /**
      * @var string
      */
-    public $description = 'Send an HTTP Post t your favorite external software';
+    public $description = 'Send an HTTP Post to your favorite external software.';
+
+    public function __construct()
+    {
+        $this->name = _x( 'HTTP Post', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Send an HTTP Post to your favorite external software.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
 
     /**
      * Display the settings

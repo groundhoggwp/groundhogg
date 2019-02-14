@@ -117,9 +117,9 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $p_time - $cur_time;
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-            $time = sprintf( "On %s", date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+            $time = sprintf( __( "On %s", 'groundhogg' ), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
         } else {
-            $time = sprintf( "%s ago", human_time_diff( $p_time, $cur_time ) );
+            $time = sprintf( __( "%s ago", 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
         }
 
         return '<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';

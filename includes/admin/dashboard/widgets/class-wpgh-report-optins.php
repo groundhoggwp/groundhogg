@@ -11,7 +11,7 @@ class WPGH_Report_Optins extends WPGH_Line_Graph_Report_V2
     public function __construct()
     {
         $this->wid = 'new_contacts_report';
-        $this->name = __( 'New Contacts Report', 'groundhogg' );
+        $this->name = _x( 'New Contacts Report', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }

@@ -42,6 +42,14 @@ class WPGH_Remove_Tag extends WPGH_Funnel_Step
      */
     public $description = 'Remove a tag from a contact.';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Remove Tag', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Remove a tag from a contact.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * @param $step WPGH_Step
      */

@@ -43,21 +43,23 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
      *
      * @var int
      */
-    public $delay_time = 30;
+    public $delay_time = 5;
 
     /**
      * @var string
      */
     public $description = 'Send an email to a contact.';
 
-    public function __construct() {
+    public function __construct()
+    {
+        $this->name = _x( 'Send Email', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Send an email to a contact.', 'element_description', 'groundhogg' );
 
         parent::__construct();
 
         if ( is_admin() && isset( $_GET['page'] ) && ( $_GET[ 'page' ] === 'gh_funnels' ||  $_GET[ 'page' ] === 'gh_emails' ) && isset($_REQUEST[ 'action' ]) && $_REQUEST[ 'action' ] === 'edit' ) {
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
         }
-
     }
 
     public function scripts(){

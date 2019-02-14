@@ -19,7 +19,8 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
         $this->group = 'action';
 
         # This is the name of the benchmark as seen from the funnel builder panel.
-        $this->name = __('Send SMS');
+        $this->name         = _x( 'Send SMS', 'element_name', 'groundhogg' );
+        $this->description  = _x( 'Send a one way text message to the contact.', 'element_description', 'groundhogg' );
 
         # Define a url to the image you'd like to use as an Icon. Square images are reccomended.
         $this->icon = 'send-sms.png';

@@ -15,56 +15,56 @@ $funnel_templates = array();
 
 /* Welcome Series */
 
-$funnel_templates[ 'welcome' ][ 'title' ] = 'Welcome Series';
-$funnel_templates[ 'welcome' ][ 'description' ] = 'A nice way to welcome new subscribers into your community.';
+$funnel_templates[ 'welcome' ][ 'title' ] = _x( 'Welcome Series', 'funnel_template_name', 'groundhogg' );
+$funnel_templates[ 'welcome' ][ 'description' ] = _x( 'A nice way to welcome new subscribers into your community.', 'funnel_template_description', 'groundhogg' );
 $funnel_templates[ 'welcome' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'welcome' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/new-subscriber-welcome.funnel';
 
 /* Hype Series */
 
-$funnel_templates[ 'hype' ][ 'title' ] = 'Hype Series';
-$funnel_templates[ 'hype' ][ 'description' ] = 'Get your list excited for an event or product launch';
+$funnel_templates[ 'hype' ][ 'title' ] = _x( 'Hype Series', 'funnel_template_name', 'groundhogg' );
+$funnel_templates[ 'hype' ][ 'description' ] = _x('Get your list excited for an event or product launch', 'funnel_template_description', 'groundhogg' );
 $funnel_templates[ 'hype' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'hype' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/hype-series.funnel';
 
 /* Long term Nurture */
 
-$funnel_templates[ 'long_term_nurture' ][ 'title' ] = 'Long Term Nurture';
-$funnel_templates[ 'long_term_nurture' ][ 'description' ] = 'For when you need to put the conversation on hold.';
+$funnel_templates[ 'long_term_nurture' ][ 'title' ] = _x( 'Long Term Nurture', 'funnel_template_name', 'groundhogg' );
+$funnel_templates[ 'long_term_nurture' ][ 'description' ] = _x( 'For when you need to put the conversation on hold.', 'funnel_template_description', 'groundhogg' );
 $funnel_templates[ 'long_term_nurture' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'long_term_nurture' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/long-term-nurture.funnel';
 
 /* Webinar Registration */
 
-$funnel_templates[ 'webinar_registration' ][ 'title' ] = 'Webinar Registration';
-$funnel_templates[ 'webinar_registration' ][ 'description' ] = 'Collect leads, send reminders, and follow up with this!';
+$funnel_templates[ 'webinar_registration' ][ 'title' ] = _x( 'Webinar Registration', 'funnel_template_name', 'groundhogg' );
+$funnel_templates[ 'webinar_registration' ][ 'description' ] = _x( 'Collect leads, send reminders, and follow up with this!', 'funnel_template_description', 'groundhogg' );
 $funnel_templates[ 'webinar_registration' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'webinar_registration' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/webinar-registration.funnel';
 
 /* Feedback Request */
 
-$funnel_templates[ 'feedback_request' ][ 'title' ] = 'Feedback Request';
-$funnel_templates[ 'feedback_request' ][ 'description' ] = 'Looking to generate some reviews? This is what you need.';
+$funnel_templates[ 'feedback_request' ][ 'title' ] = _x( 'Feedback Request', 'funnel_template_name', 'groundhogg' );
+$funnel_templates[ 'feedback_request' ][ 'description' ] = _x('Looking to generate some reviews? This is what you need.', 'funnel_template_description', 'groundhogg' );
 $funnel_templates[ 'feedback_request' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'feedback_request' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/feedback-request.funnel';
 
 /* Feedback Request */
 
-$funnel_templates[ 'lead_magnet' ][ 'title' ] = 'Lead Magnet Download';
-$funnel_templates[ 'lead_magnet' ][ 'description' ] = 'Giving away a lead magnet? Make it irresistible.';
+$funnel_templates[ 'lead_magnet' ][ 'title' ] = _x( 'Lead Magnet Download', 'funnel_template_name', 'groundhogg' );
+$funnel_templates[ 'lead_magnet' ][ 'description' ] = _x('Giving away a lead magnet? Make it irresistible.', 'funnel_template_description', 'groundhogg' );
 $funnel_templates[ 'lead_magnet' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'lead_magnet' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/lead-magnet-download.funnel';
 
 /* Start from scratch */
 
-$funnel_templates[ 'scratch' ][ 'title' ] = 'Start From Scratch';
-$funnel_templates[ 'scratch' ][ 'description' ] = 'Have some inspiration? Use this blank canvas!';
+$funnel_templates[ 'scratch' ][ 'title' ] = _x( 'Start From Scratch', 'funnel_template_name', 'groundhogg' );
+$funnel_templates[ 'scratch' ][ 'description' ] = _x( 'Have some inspiration? Use this blank canvas!', 'funnel_template_description', 'groundhogg' );
 $funnel_templates[ 'scratch' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'scratch' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/start-from-scratch.funnel';
 
 /* Email Preferences */
-$funnel_templates[ 'email_preferences' ][ 'title' ] = 'Email Preferences';
-$funnel_templates[ 'email_preferences' ][ 'description' ] = 'Setup an email preferences center!';
+$funnel_templates[ 'email_preferences' ][ 'title' ] = _x( 'Email Preferences', 'funnel_template_name', 'groundhogg' );
+$funnel_templates[ 'email_preferences' ][ 'description' ] = _x( 'Setup an email preferences center!', 'funnel_template_description', 'groundhogg' );
 $funnel_templates[ 'email_preferences' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'email_preferences' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/email-preferences.funnel';
 

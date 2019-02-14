@@ -14,7 +14,7 @@ class WPGH_Summary_Widget extends WPGH_Dashboard_Widget
     public function __construct()
     {
         $this->wid = 'groundhogg_summary_widget';
-        $this->name = __( 'Groundhogg Summary', 'groundhogg' );
+        $this->name = _x( 'Groundhogg Summary', 'widget_name', 'groundhogg' );
 
         parent::__construct();
     }

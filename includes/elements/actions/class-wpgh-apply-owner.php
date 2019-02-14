@@ -42,6 +42,14 @@ class WPGH_Apply_Owner extends WPGH_Funnel_Step
      */
     public $description = 'Set the contact owner to the specified user account';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Apply Owner', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Set the contact owner to the specified user account.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * @param $step WPGH_Step
      */
@@ -58,7 +66,7 @@ class WPGH_Apply_Owner extends WPGH_Funnel_Step
             <tbody>
             <tr>
                 <th>
-                    <?php echo esc_html__( 'Apply Owner:', 'groundhogg' ); ?>
+                    <?php echo esc_html_x( 'Apply Owner:', 'apply_owner_settings', 'groundhogg' ); ?>
                 </th>
                 <td>
                     <?php echo WPGH()->html->dropdown_owners( array(
@@ -68,7 +76,7 @@ class WPGH_Apply_Owner extends WPGH_Funnel_Step
                         'name'      => $step->prefix( 'owner_id[]' ),
                         'id'        => $step->prefix( 'owner_id' ),
                     ) ); ?>
-                    <p class="description"><?php _e( 'Selecting more than 1 owner will treat the step as a round robin.', 'groundhogg' ) ?></p>
+                    <p class="description"><?php echo esc_html_x( 'Selecting more than 1 owner will treat the step as a round robin.', 'apply_owner_settings', 'groundhogg' ) ?></p>
                 </td>
             </tr>
             </tbody>

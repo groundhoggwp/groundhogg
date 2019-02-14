@@ -41,6 +41,14 @@ class WPGH_Apply_Note extends WPGH_Funnel_Step
      */
     public $description = 'Add a note to the notes section of a contact.';
 
+    public function __construct()
+    {
+        $this->name = _x( 'Apply Note', 'element_name', 'groundhogg' );
+        $this->description = _x( 'Add a note to the notes section of a contact.', 'element_description', 'groundhogg' );
+
+        parent::__construct();
+    }
+
     /**
      * @param $step WPGH_Step
      */
@@ -57,7 +65,7 @@ class WPGH_Apply_Note extends WPGH_Funnel_Step
             <tbody>
             <tr>
                 <th>
-                    <?php echo esc_html__( 'Note Text:', 'groundhogg' ); ?>
+                    <?php echo esc_html_x( 'Note Text:', 'apply_note_settings', 'groundhogg' ); ?>
                     <p>
                         <?php WPGH()->replacements->show_replacements_button(); ?>
                     </p>
@@ -72,7 +80,7 @@ class WPGH_Apply_Note extends WPGH_Funnel_Step
                 <td>
                     <?php echo WPGH()->html->textarea( $args ) ?>
                     <p class="description">
-                        <?php _e( 'Use any valid replacement codes', 'groundhogg' ); ?>
+                        <?php echo esc_html_x( 'Use any valid replacement codes', 'apply_note_settings', 'groundhogg' ); ?>
                     </p>
                 </td>
             </tr>

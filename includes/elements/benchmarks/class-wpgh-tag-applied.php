@@ -44,7 +44,8 @@ class WPGH_Tag_Applied extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-        $this->description = __( 'Runs whenever any of the specified tags are added to a contact.', 'groundhogg' );
+        $this->name         = _x( 'Tag Applied', 'element_name', 'groundhogg' );
+        $this->description  = _x( 'Runs whenever any of the specified tags are added to a contact.', 'element_description', 'groundhogg' );
 
         parent::__construct();
 

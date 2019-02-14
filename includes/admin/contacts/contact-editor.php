@@ -38,7 +38,7 @@ $id = intval( $_GET[ 'contact' ] );
 $contact = new WPGH_Contact( $id );
 
 if ( ! $contact->exists() ) {
-    wp_die( __( 'This contact has been deleted.', 'groundhogg' ) );
+    wp_die( _x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );
 }
 
 include_once "class-wpgh-contact-activity-table.php";
@@ -48,7 +48,7 @@ include_once "class-wpgh-contact-events-table.php";
 if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
     if ( $contact->owner->ID !== get_current_user_id() ){
 
-        wp_die( __( 'You are not the owner of this contact.', 'groundhogg' ) );
+        wp_die( _x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
 
     }
 }
@@ -59,13 +59,13 @@ $contact->auto_link_account();
 $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->email;
 
 $tabs = apply_filters( 'wpgh_contact_record_tabs', array(
-    'general'       => __( 'General Info', 'groundhogg' ),
-    'meta_data'     => __( 'Custom Info', 'groundhogg' ),
-    'segmentation'  => __( 'Segmentation', 'groundhogg' ),
-    'notes'         => __( 'Notes', 'groundhogg' ),
-    'files'         => __( 'Files', 'groundhogg' ),
-    'actions'       => __( 'Actions', 'groundhogg' ),
-    'activity'      => __( 'Activity', 'groundhogg' ),
+    'general'       => _x( 'General Info', 'contact_record_tab', 'groundhogg' ),
+    'meta_data'     => _x( 'Custom Info', 'contact_record_tab', 'groundhogg' ),
+    'segmentation'  => _x( 'Segmentation', 'contact_record_tab', 'groundhogg' ),
+    'notes'         => _x( 'Notes', 'contact_record_tab', 'groundhogg' ),
+    'files'         => _x( 'Files', 'contact_record_tab', 'groundhogg' ),
+    'actions'       => _x( 'Actions', 'contact_record_tab', 'groundhogg' ),
+    'activity'      => _x( 'Activity', 'contact_record_tab', 'groundhogg' ),
 ) );
 
 $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ] ) ? sanitize_key( $_POST[ 'active_tab' ] ) : 'general';
@@ -81,7 +81,7 @@ $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ]
 <!-- BEGIN TABS -->
 <h2 class="nav-tab-wrapper" style="margin: 1em 0;">
     <?php foreach ( $tabs as $id => $tab ): ?>
-        <a href="javascript:void(0)" class="nav-tab <?php echo  $active_tab == $id ? 'nav-tab-active' : ''; ?>" id="<?php esc_attr_e( 'tab_' . $id ); ?>"><?php _e( $tab, 'groundhogg'); ?></a>
+        <a href="javascript:void(0)" class="nav-tab <?php echo  $active_tab == $id ? 'nav-tab-active' : ''; ?>" id="<?php echo 'tab_' . esc_attr( $id ); ?>"><?php _e( $tab, 'groundhogg'); ?></a>
     <?php endforeach; ?>
 </h2>
 <!-- END TABS -->
@@ -104,11 +104,11 @@ function wpgh_contact_record_general_info( $contact )
     ?>
 
     <!-- GENERAL NAME INFO -->
-    <h2><?php _e('Name') ?></h2>
+    <h2><?php _e('Name' ) ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
-            <th><label for="first_name"><?php echo __('First Name', 'groundhogg') ?></label></th>
+            <th><label for="first_name"><?php echo _x( 'First Name', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'first_name',
                     'name' => 'first_name',
@@ -118,7 +118,7 @@ function wpgh_contact_record_general_info( $contact )
             </td>
         </tr>
         <tr>
-            <th><label for="last_name"><?php echo __('Last Name', 'groundhogg') ?></label></th>
+            <th><label for="last_name"><?php echo _x( 'Last Name', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'last_name',
                     'name' => 'last_name',
@@ -143,17 +143,17 @@ function wpgh_contact_record_general_info( $contact )
     <h2><?php _e('Create User Account'); ?></h2>
     <table class="form-table">
         <tr>
-            <th><label for="create_account"><?php echo __('Create New Account?', 'groundhogg') ?></label></th>
+            <th><label for="create_account"><?php echo _x( 'Create New Account?', 'contact_record', 'groundhogg' ) ?></label></th>
             <td>
                 <button type="button"
                         class="button button-secondary create-user-account"><?php _e('Create User Account'); ?></button>
-                <p class="description"><?php _e('This contact does not have an associated user account? Would you like to create one?', 'groundhogg'); ?></p>
+                <p class="description"><?php _ex( 'This contact does not have an associated user account? Would you like to create one?', 'contact_record', 'groundhogg' ); ?></p>
             </td>
         </tr>
         <tr>
-            <th><label for="link_existing"><?php echo __('Link Existing Account?', 'groundhogg') ?></label></th>
-            <td><?php wp_dropdown_users(array('show_option_none' => __('Select a User Account (optional)', 'groundhogg'))); ?>
-                <p class="description"><?php _e('You can link an existing user account to this contact.', 'groundhogg'); ?></p>
+            <th><label for="link_existing"><?php echo _x( 'Link Existing Account?', 'contact_record', 'groundhogg' ) ?></label></th>
+            <td><?php wp_dropdown_users(array('show_option_none' => _x( 'Select a User Account (optional)', 'contact_record', 'groundhogg' ))); ?>
+                <p class="description"><?php _ex( 'You can link an existing user account to this contact.', 'contact_record', 'groundhogg' ); ?></p>
             </td>
         </tr>
 
@@ -161,11 +161,11 @@ function wpgh_contact_record_general_info( $contact )
 <?php endif; ?>
 
     <!-- GENERAL CONTACT INFO -->
-    <h2><?php _e('Contact Info'); ?></h2>
+    <h2><?php _e('Contact Info' ); ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
-            <th><label for="email"><?php echo __('Email', 'groundhogg') ?></label></th>
+            <th><label for="email"><?php echo _x( 'Email', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'type' => 'email',
                     'id' => 'email',
@@ -175,14 +175,14 @@ function wpgh_contact_record_general_info( $contact )
                 echo WPGH()->html->input($args); ?>
                 <label><span class="row-actions"><a style="text-decoration: none" target="_blank"
                                                     href="<?php echo esc_url(substr($contact->email, strpos($contact->email, '@'))); ?>"><span class="dashicons dashicons-external"></span></a></span>
-                    <p class="submit"><?php echo '<b>' . __('Email Status', 'groundhogg') . ': </b>' . wpgh_get_optin_status_text($contact->ID); ?></p>
+                    <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' . wpgh_get_optin_status_text($contact->ID); ?></p>
                     <?php if ($contact->optin_status !== WPGH_UNSUBSCRIBED): ?>
-                    <input type="checkbox" name="unsubscribe" value="1"><?php _e('Mark as unsubscribed.') ?></label>
+                    <input type="checkbox" name="unsubscribe" value="1"><?php _ex( 'Mark as unsubscribed.', 'contact_record', 'groundhogg' ); ?></label>
             <?php endif; ?>
             </td>
         </tr>
         <tr>
-            <th><label for="primary_phone"><?php echo __('Primary Phone', 'groundhogg') ?></label></th>
+            <th><label for="primary_phone"><?php echo _x( 'Primary Phone', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'type' => 'tel',
                     'id' => 'primary_phone',
@@ -192,7 +192,7 @@ function wpgh_contact_record_general_info( $contact )
                 echo WPGH()->html->input($args); ?></td>
         </tr>
         <tr>
-            <th><label for="primary_phone_extension"><?php echo __('Phone Extension', 'groundhogg') ?></label></th>
+            <th><label for="primary_phone_extension"><?php echo _x( 'Phone Extension', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'primary_phone_extension',
                     'name' => 'primary_phone_extension',
@@ -205,10 +205,10 @@ function wpgh_contact_record_general_info( $contact )
     </table>
 
     <!-- Company info -->
-    <h2><?php _e('Company Info', 'groundhogg'); ?></h2>
+    <h2><?php _ex( 'Company Info', 'contact_record', 'groundhogg' ); ?></h2>
     <table class="form-table">
         <tr>
-            <th><label for="company_name"><?php echo __('Company Name', 'groundhogg') ?></label></th>
+            <th><label for="company_name"><?php echo _x( 'Company Name', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'company_name',
                     'name' => 'company_name',
@@ -218,7 +218,7 @@ function wpgh_contact_record_general_info( $contact )
             </td>
         </tr>
         <tr>
-            <th><label for="job_title"><?php echo __('Job Title', 'groundhogg') ?></label></th>
+            <th><label for="job_title"><?php echo _x( 'Job Title', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'job_title',
                     'name' => 'job_title',
@@ -228,7 +228,7 @@ function wpgh_contact_record_general_info( $contact )
             </td>
         </tr>
         <tr>
-            <th><label for="company_address"><?php echo __('Full Company Address', 'groundhogg') ?></label></th>
+            <th><label for="company_address"><?php echo _x( 'Full Company Address', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'company_address',
                     'name' => 'company_address',
@@ -240,11 +240,11 @@ function wpgh_contact_record_general_info( $contact )
     </table>
 
     <!-- ADDRESS -->
-    <h2><?php _e('Address'); ?></h2>
+    <h2><?php _ex( 'Address', 'contact_record', 'groundhogg' ); ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
-            <th><label for="street_address_1"><?php echo __('Street Address 1', 'groundhogg') ?></label></th>
+            <th><label for="street_address_1"><?php echo _x( 'Street Address 1', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'street_address_1',
                     'name' => 'street_address_1',
@@ -254,7 +254,7 @@ function wpgh_contact_record_general_info( $contact )
             </td>
         </tr>
         <tr>
-            <th><label for="street_address_2"><?php echo __('Street Address 2', 'groundhogg') ?></label></th>
+            <th><label for="street_address_2"><?php echo _x( 'Street Address 2', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'street_address_2',
                     'name' => 'street_address_2',
@@ -264,7 +264,7 @@ function wpgh_contact_record_general_info( $contact )
             </td>
         </tr>
         <tr>
-            <th><label for="city"><?php echo __('City', 'groundhogg') ?></label></th>
+            <th><label for="city"><?php echo _x( 'City', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'city',
                     'name' => 'city',
@@ -274,7 +274,7 @@ function wpgh_contact_record_general_info( $contact )
             </td>
         </tr>
         <tr>
-            <th><label for="postal_zip"><?php echo __('Postal/Zip Code', 'groundhogg') ?></label></th>
+            <th><label for="postal_zip"><?php echo _x( 'Postal/Zip Code', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'postal_zip',
                     'name' => 'postal_zip',
@@ -284,7 +284,7 @@ function wpgh_contact_record_general_info( $contact )
             </td>
         </tr>
         <tr>
-            <th><label for="region"><?php echo __('State/Province', 'groundhogg') ?></label></th>
+            <th><label for="region"><?php echo _x( 'State/Province', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
                     'id' => 'region',
                     'name' => 'region',
@@ -294,7 +294,7 @@ function wpgh_contact_record_general_info( $contact )
             </td>
         </tr>
         <tr>
-            <th><label for="country"><?php echo __('Country', 'groundhogg') ?></label></th>
+            <th><label for="country"><?php echo _x( 'Country', 'contact_record', 'groundhogg' ) ?></label></th>
             <td>
                 <div style="max-width: 338px">
                     <?php $args = array(
@@ -302,7 +302,7 @@ function wpgh_contact_record_general_info( $contact )
                         'name' => 'country',
                         'selected' => $contact->get_meta('country'),
                         'data' => wpgh_get_countries_list(),
-                        'placeholder' => __('Select a Country', 'groundhogg'),
+                        'placeholder' => _x( 'Select a Country', 'contact_record', 'groundhogg' ),
                     );
                     echo WPGH()->html->select2($args); ?>
                 </div>
@@ -313,11 +313,11 @@ function wpgh_contact_record_general_info( $contact )
     </table>
 
     <!-- MARKETING COMPLIANCE INFORMATION -->
-    <h2><?php _e( 'Compliance' ); ?></h2>
+    <h2><?php _ex( 'Compliance', 'contact_record', 'groundhogg' ); ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php _e( 'Agreed To Terms' ); ?></th>
+            <th><?php _ex( 'Agreed To Terms', 'contact_record', 'groundhogg' ); ?></th>
             <td><?php echo (  $contact->get_meta( 'terms_agreement') === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ),  $contact->get_meta( 'terms_agreement_date' ) ): '&#x2014;'; ?></td>
         </tr>
         <?php if ( wpgh_is_gdpr() ): ?>
@@ -342,16 +342,16 @@ function wpgh_contact_record_section_segmentation( $contact )
     ?>
 
     <!-- SEGMENTATION AND LEADSOURCE -->
-    <h2><?php _e( 'Segmentation' ); ?></h2>
+    <h2><?php _ex( 'Segmentation', 'contact_record', 'groundhogg' ); ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
-            <th><?php _e( 'Owner', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Owner', 'contact_record', 'groundhogg' ); ?></th>
             <td><?php echo WPGH()->html->dropdown_owners( array( 'selected' => ( $contact->owner )? $contact->owner->ID : 0 ) ); ?>
             </td>
         </tr>
         <tr>
-            <th><?php _e( 'Source Page', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Source Page', 'contact_record', 'groundhogg' ); ?></th>
             <td><?php $args = array(
                     'id'    => 'source_page',
                     'name'  => 'source_page',
@@ -367,7 +367,7 @@ function wpgh_contact_record_section_segmentation( $contact )
             </td>
         </tr>
         <tr>
-            <th><?php _e( 'Lead Source', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Lead Source', 'contact_record', 'groundhogg' ); ?></th>
             <td><?php $args = array(
                     'id' => 'lead_source',
                     'name' => 'lead_source',
@@ -381,7 +381,7 @@ function wpgh_contact_record_section_segmentation( $contact )
             </td>
         </tr>
         <tr>
-            <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
+            <th><label for="tags"><?php echo _x( 'Tags', 'contact_record', 'groundhogg' )?></label></th>
             <td>
                 <div style="max-width: 400px;">
                     <?php
@@ -393,7 +393,7 @@ function wpgh_contact_record_section_segmentation( $contact )
                     'name'      => 'tags[]',
                     'selected'  => $contact->tags,
                 ); echo WPGH()->html->tag_picker( $args ); ?>
-                <p class="description"><?php _e( 'Add new tags by hitting [Enter] or by typing a [,].', 'groundhogg' ); ?></p>
+                <p class="description"><?php _ex( 'Add new tags by hitting [Enter] or by typing a [,].', 'contact_record', 'groundhogg' ); ?></p>
                 </div>
             </td>
         </tr>
@@ -444,7 +444,7 @@ function wpgh_contact_record_section_actions( $contact )
     <h2><?php _e('Actions'); ?></h2>
     <table class="form-table">
         <tr>
-            <th><?php _e('Send Email'); ?></th>
+            <th><?php _ex( 'Send Email', 'contact_record', 'groundhogg' ); ?></th>
             <td>
                 <div style="max-width: 400px">
                     <?php echo WPGH()->html->dropdown_emails(array()); ?>
@@ -455,7 +455,7 @@ function wpgh_contact_record_section_actions( $contact )
             </td>
         </tr>
         <tr>
-            <th><?php _e('Add To Funnel'); ?></th>
+            <th><?php _ex( 'Add To Funnel', 'contact_record', 'groundhogg' ); ?></th>
             <td>
                 <div style="max-width: 400px">
                     <?php
@@ -497,15 +497,15 @@ function wpgh_contact_record_section_files( $contact )
 {
     ?>
     <!-- BEGIN FILES -->
-    <h2><?php _e('Files'); ?></h2>
+    <h2><?php _ex( 'Files', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px;">
         <table class="wp-list-table widefat fixed striped files">
             <thead>
             <tr>
-                <th><?php _e('Name', 'groundhogg'); ?></th>
-                <th><?php _e('Size', 'groundhogg'); ?></th>
-                <th><?php _e('Type', 'groundhogg'); ?></th>
-                <th><?php _e('Replacement Code', 'groundhogg'); ?></th>
+                <th><?php _ex( 'Name', 'contact_record', 'groundhogg' ); ?></th>
+                <th><?php _ex( 'Size', 'contact_record', 'groundhogg' ); ?></th>
+                <th><?php _ex( 'Type', 'contact_record', 'groundhogg' ); ?></th>
+                <th><?php _ex( 'Replacement Code', 'contact_record', 'groundhogg' ); ?></th>
             </tr>
             </thead>
             <tbody>
@@ -516,7 +516,7 @@ function wpgh_contact_record_section_files( $contact )
             if (empty($files)):
                 ?>
                 <tr>
-                    <td colspan="4"><?php _e('This contact has no files...', 'groundhogg'); ?></td>
+                    <td colspan="4"><?php _ex( 'This contact has no files...', 'contact_record', 'groundhogg' ); ?></td>
                 </tr>
             <?php
             else:
@@ -533,7 +533,7 @@ function wpgh_contact_record_section_files( $contact )
                         <td><?php printf("<a href='%s' target='_blank'>%s</a>", $item['url'], esc_html($info['basename'])); ?></td>
                         <td><?php esc_html_e(size_format(filesize($item['file']))); ?></td>
                         <td><?php esc_html_e($info['extension']); ?></td>
-                        <td><?php esc_html_e('{files.' . $key . '}'); ?></td>
+                        <td><?php echo '{files.' . intval( $key ) . '}'; ?></td>
                     </tr>
                 <?php
                 endforeach;
@@ -542,16 +542,16 @@ function wpgh_contact_record_section_files( $contact )
             </tbody>
             <tfoot>
             <tr>
-                <th><?php _e('Name', 'groundhogg'); ?></th>
-                <th><?php _e('Size', 'groundhogg'); ?></th>
-                <th><?php _e('Type', 'groundhogg'); ?></th>
-                <th><?php _e('Replacement Code', 'groundhogg'); ?></th>
+                <th><?php _ex( 'Name', 'contact_record', 'groundhogg' ); ?></th>
+                <th><?php _ex( 'Size', 'contact_record', 'groundhogg' ); ?></th>
+                <th><?php _ex( 'Type', 'contact_record', 'groundhogg' ); ?></th>
+                <th><?php _ex( 'Replacement Code', 'contact_record', 'groundhogg' ); ?></th>
             </tr>
             </tfoot>
         </table>
         <div>
-            <p class="description"><?php _e('Upload files: '); ?><input type="file" name="files[]" multiple></p>
-            <p class="description"><?php _e('Click <b>Update Contact</b> when ready to upload.'); ?></p>
+            <p class="description"><?php _ex( 'Upload files: ', 'contact_record', 'groundhogg' ); ?><input type="file" name="files[]" multiple></p>
+            <p class="description"><?php _ex( 'Click <b>Update Contact</b> when ready to upload.', 'contact_record', 'groundhogg' ); ?></p>
         </div>
     </div>
     <!-- END FILES -->
@@ -568,7 +568,7 @@ function wpgh_contact_record_section_custom_meta( $contact ){
     ?>
     <?php do_action( 'wpgh_contact_edit_before_meta', $contact->ID ); ?>
     <!-- META -->
-    <h2><?php _e( 'Custom Meta' ); ?></h2>
+    <h2><?php _ex( 'Custom Meta', 'contact_record', 'groundhogg' ); ?></h2>
 <!--    <table class="form-table" >-->
 <!--        <tr>-->
 <!--            <th><label for="edit_meta">--><?php //_e( 'Edit Meta' ); ?><!--</label></th>-->
@@ -594,7 +594,7 @@ function wpgh_contact_record_section_custom_meta( $contact ){
         <tbody>
         <tr>
             <th>
-                <button type="button" class="button-secondary addmeta"><?php _e( 'Add Meta' ); ?></button>
+                <button type="button" class="button-secondary addmeta"><?php _ex( 'Add Meta', 'contact_record', 'groundhogg' ); ?></button>
                 <div class="hidden">
                     <span class="metakeyplaceholder"><?php esc_attr_e( 'Key' ); ?></span>
                     <span class="metavalueplaceholder"><?php esc_attr_e( 'Value' ); ?></span>
@@ -687,7 +687,7 @@ function wpgh_contact_record_section_activity( $contact )
     ?>
     <?php do_action('wpgh_contact_edit_before_history', $contact->ID ); ?>
     <!-- UPCOMING EVENTS -->
-    <h2><?php _e('Upcoming Events'); ?></h2>
+    <h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px">
 
         <?php $events = WPGH()->events->get_events(array('contact_id' => $contact->ID, 'status' => 'waiting'));
@@ -697,12 +697,12 @@ function wpgh_contact_record_section_activity( $contact )
 
         $table->prepare_items();
         $table->display(); ?>
-        <a href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . $contact->ID ); ?>"><?php _e('View All Events'); ?></a>
+        <a href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . $contact->ID ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
 
-        <p class="description"><?php _e('Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'groundhogg'); ?></p>
+        <p class="description"><?php _ex( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'contact_record', 'groundhogg' ); ?></p>
 
         <!-- FUNNNEL HISTORY -->
-        <h2><?php _e('Recent Funnel History'); ?></h2>
+        <h2><?php _ex( 'Recent Funnel History', 'contact_record', 'groundhogg' ); ?></h2>
         <div style="max-width: 800px">
         </div>
         <?php $events = WPGH()->events->get_events(array('contact_id' => $contact->ID, 'status' => 'complete'));
@@ -712,17 +712,16 @@ function wpgh_contact_record_section_activity( $contact )
 
         $table->prepare_items();
         $table->display(); ?>
-        <a href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . $contact->ID ); ?>"><?php _e('View All Events'); ?></a>
-        <p class="description"><?php _e('Any previous funnel steps will show up here. You can choose run them again.<br/>
-    This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'groundhogg'); ?></p>
+        <a href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . $contact->ID ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
+        <p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
     </div>
     <!-- EMAIL HISTORY -->
-    <h2><?php _e('Recent Email History'); ?></h2>
+    <h2><?php _ex( 'Recent Email History', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px">
         <?php $table = new WPGH_Contact_Activity_Table();
         $table->prepare_items();
         $table->display(); ?>
-        <p class="description"><?php _e('This is where you can check if this contact is interacting with your emails.', 'groundhogg'); ?></p>
+        <p class="description"><?php _ex( 'This is where you can check if this contact is interacting with your emails.', 'contact_record', 'groundhogg' ); ?></p>
     </div>
 
     <?php
@@ -730,7 +729,7 @@ function wpgh_contact_record_section_activity( $contact )
 
 foreach ( $tabs as $tab => $tab_name ):
 
-    ?><div class="tab-content-wrapper <?php if ( $tab !== $active_tab ){ echo 'hidden'; }; ?>" id="<?php esc_attr_e('tab_' . $tab . '_content' ); ?>">
+    ?><div class="tab-content-wrapper <?php if ( $tab !== $active_tab ){ echo 'hidden'; }; ?>" id="<?php echo 'tab_' . esc_attr( $tab ) . '_content'; ?>">
     <?php do_action('wpgh_contact_record_tab_' . $tab, $contact); ?>
     </div><?php
 
@@ -741,7 +740,7 @@ endforeach;
     <?php do_action( 'wpgh_contact_edit_after', $id ); ?>
     <div class="edit-contact-actions">
         <p class="submit">
-            <?php submit_button('Update Contact', 'primary', 'update', false ); ?>
+            <?php submit_button(_x( 'Update Contact', 'contact_record', 'groundhogg' ), 'primary', 'update', false ); ?>
             <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
         </p>
     </div>

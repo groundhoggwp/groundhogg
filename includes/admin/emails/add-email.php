@@ -55,7 +55,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
             <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $id; ?> " class="email-container postbox">
                 <?php echo $email_args['content']; ?>
             </div>
-            <button class="choose-template button-primary" name="email_template" value="<?php echo $id ?>"><?php _e('Start Writing'); ?></button>
+            <button class="choose-template button-primary" name="email_template" value="<?php echo $id ?>"><?php _e('Start Writing', 'groundhogg' ); ?></button>
         </div>
     </div>
 

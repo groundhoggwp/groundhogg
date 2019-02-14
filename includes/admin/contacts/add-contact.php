@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         <?php do_action( 'wpgh_contact_add_new_name' ); ?>
         </tbody>
     </table>
-    <h2><?php _e( 'Contact Info'); ?></h2>
+    <h2><?php _e( 'Contact Info' ); ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
@@ -122,7 +122,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     </table>
     <?php do_action('wpgh_add_new_contact_form_after'); ?>
 
-    <?php submit_button('Add Contact', 'primary', 'add_contact'); ?>
+    <?php submit_button( __( 'Add Contact', 'groundhogg' ), 'primary', 'add_contact'); ?>
 </form>
 
 

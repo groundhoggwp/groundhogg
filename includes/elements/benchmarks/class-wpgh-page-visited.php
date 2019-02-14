@@ -44,8 +44,8 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-
-        $this->description = __( 'Runs whenever the specified page is visited.', 'groundhogg' );
+        $this->name         = _x( 'Page Visited', 'element_name', 'groundhogg' );
+        $this->description  = _x( 'Runs whenever the specified page is visited.', 'element_description', 'groundhogg' );
 
         parent::__construct();
 
@@ -60,7 +60,7 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
      */
     public function scripts()
     {
-        wp_enqueue_script( 'wpgh-page-view', WPGH_PLUGIN_URL . 'assets/js/frontend.min.js' , array('jquery'), filemtime( WPGH_PLUGIN_DIR . 'assets/js/frontend.min.js' ) );
+        wp_enqueue_script( 'wpgh-page-view', WPGH_PLUGIN_URL . 'assets/js/frontend.min.js' , array('jquery'), filemtime( WPGH_PLUGIN_DIR . 'assets/js/frontend.min.js' ), true );
         wp_localize_script( 'wpgh-page-view', 'wpgh_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
     }
 
