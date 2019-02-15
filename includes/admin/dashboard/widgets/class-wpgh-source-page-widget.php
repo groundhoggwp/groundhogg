@@ -58,7 +58,7 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
         }
 
         if ( empty( $sources ) ){
-            printf( '<p class="description">%s</p>', __( 'No new pages to report.', 'groundhogg' ) );
+            printf( '<p class="description">%s</p>', _x( 'No new pages to report.', 'notice', 'groundhogg' ) );
             return;
         }
 
@@ -69,8 +69,8 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
         <table class="chart-summary">
         <thead>
         <tr>
-            <th><?php _e( 'Source Page', 'groundhogg' ); ?></th>
-            <th><?php _e( 'Contacts', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Source Page', 'column_title','groundhogg' ); ?></th>
+            <th><?php _ex( 'Contacts', 'column_title','groundhogg' ); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -131,7 +131,7 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
         }
 
         if ( empty( $sources ) ){
-            return __( 'No new sources to report.', 'groundhogg' );
+            return _x( 'No new sources to report.', 'notice', 'groundhogg' );
         }
 
         asort( $sources );
@@ -142,8 +142,8 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
         foreach ( $sources as $source => $num_contacts ):
 
            $export_info[] = array(
-               __( 'Source Page URL', 'groundhogg' ) => $source,
-               __( 'Number of Contacts', 'groundhogg' ) => $num_contacts,
+               _x( 'Source Page URL','column_title', 'groundhogg' ) => $source,
+               _x( 'Number of Contacts', 'column_title','groundhogg' ) => $num_contacts,
            );
 
         endforeach;

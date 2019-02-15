@@ -70,7 +70,7 @@ wp_enqueue_style( 'jquery-ui' );
                 </div>
                 <input type="time" id="time" name="time" value="09:00" autocomplete="off" required><?php _e( '&nbsp;or&nbsp;', 'groundhogg' ); ?>
                 <?php echo WPGH()->html->checkbox( array(
-                    'label'         => __( 'Send Now', 'groundhogg' ),
+                    'label'         => _x( 'Send Now', 'action', 'groundhogg' ),
                     'name'          => 'send_now',
                     'id'            => 'send_now',
                     'class'         => '',
@@ -85,6 +85,6 @@ wp_enqueue_style( 'jquery-ui' );
         </tbody>
     </table>
     <div class="edit-tag-actions">
-        <?php submit_button( __( 'Schedule Broadcast', 'groundhogg' ), 'primary', 'update', false ); ?>
+        <?php submit_button( _x( 'Schedule Broadcast', 'action', 'groundhogg' ), 'primary', 'update', false ); ?>
     </div>
 </form>

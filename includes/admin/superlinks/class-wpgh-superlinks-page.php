@@ -23,11 +23,12 @@ class WPGH_Superlinks_Page
      * @var WPGH_Notices
      */
     public $notices;
+    public $order = 15;
 
 	function __construct()
 	{
 
-	    add_action( 'admin_menu', array( $this, 'register' ) );
+	    add_action( 'admin_menu', array( $this, 'register' ), $this->order );
 
 		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_superlinks' ){
 
@@ -103,10 +104,10 @@ class WPGH_Superlinks_Page
 	{
 		switch ( $this->get_action() ){
 			case 'edit':
-				_e( 'Edit Superlink' , 'groundhogg' );
+				_ex( 'Edit Superlink', 'page_title', 'groundhogg' );
 				break;
 			default:
-				_e( 'Superlinks', 'groundhogg' );
+				_ex( 'Superlinks', 'page_title','groundhogg' );
 		}
 	}
 
@@ -155,8 +156,7 @@ class WPGH_Superlinks_Page
 
 				}
 
-                $this->notices->add( 'deleted', sprintf( '%d %s', count( $this->get_superlinks() ), __( 'superlinks deleted' ) ) );
-
+                $this->notices->add( 'deleted', sprintf( _nx( '%d superlink deleted', '%d superlinks deleted', count( $this->get_superlinks() ), 'notice', 'groundhogg' ), count( $this->get_superlinks() ) ) );
 
                 break;
 
@@ -196,7 +196,7 @@ class WPGH_Superlinks_Page
         if ( $superlink_id ){
             do_action( 'wpgh_superlink_created', $superlink_id );
 
-            $this->notices->add( 'created', __( 'Superlink created.', 'groundhogg' ) );
+            $this->notices->add( 'created', _x( 'Superlink created', 'notice', 'groundhogg' ) );
         }
     }
 
@@ -223,7 +223,7 @@ class WPGH_Superlinks_Page
         $result = WPGH()->superlinks->update( $id, $args );
 
         if ( $result ) {
-            $this->notices->add( 'updated', __( 'Updated superlink.', 'groundhogg' ) );
+            $this->notices->add( 'updated', _x( 'Updated superlink.', 'notice', 'groundhogg' ) );
             do_action( 'wpgh_superlink_updated', $id );
         }
 
@@ -247,9 +247,9 @@ class WPGH_Superlinks_Page
         <form method="post" class="search-form wp-clearfix">
         <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Superlinks ', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Superlinks', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Superlinks', 'groudhogg' )?>">
+                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Superlinks', 'groundhogg' )?>">
             </p>
         </form>
         <div id="col-container" class="wp-clearfix">
@@ -284,7 +284,7 @@ class WPGH_Superlinks_Page
                                 <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
                                 <p><?php _e( 'These tags will be applied to a contact whenever this link is clicked. To create a new tag hit [Enter] or [,]', 'groundhogg' ); ?></p>
                             </div>
-                            <?php submit_button( __( 'Add New Superlink', 'groundhogg' ), 'primary', 'add_superlink' ); ?>
+                            <?php submit_button( _x( 'Add New Superlink', 'action', 'groundhogg' ), 'primary', 'add_superlink' ); ?>
                         </form>
                     </div>
                 </div>
@@ -320,7 +320,7 @@ class WPGH_Superlinks_Page
 		
 		?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_superlinks' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_superlinks' ); ?>"><?php _ex( 'Add New', 'page_tile_action','groundhogg' ); ?></a>
 			<?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){

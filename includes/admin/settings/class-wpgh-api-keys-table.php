@@ -138,12 +138,12 @@ class WPGH_API_Keys_Table extends WP_List_Table {
         $actions['reissue'] = sprintf(
             '<a href="%s" class="wpgh-regenerate-api-key">%s</a>',
             esc_url( wp_nonce_url( add_query_arg( array( 'user_id' => $item['id'], 'wpgh_action' => 'process_api_key', 'wpgh_api_process' => 'regenerate' ) ), 'wpgh-api-nonce' ) ),
-            __( 'Reissue', 'groundhogg' )
+            _x( 'Reissue', 'action', 'groundhogg' )
         );
         $actions['revoke'] = sprintf(
             '<a href="%s" class="wpgh-revoke-api-key wpgh-delete">%s</a>',
             esc_url( wp_nonce_url( add_query_arg( array( 'user_id' => $item['id'], 'wpgh_action' => 'process_api_key', 'wpgh_api_process' => 'revoke' ) ), 'wpgh-api-nonce' ) ),
-            __( 'Revoke', 'groundhogg' )
+            _x( 'Revoke', 'action', 'groundhogg' )
         );
 
         $actions = apply_filters( 'wpgh_api_row_actions', array_filter( $actions ) );
@@ -159,10 +159,10 @@ class WPGH_API_Keys_Table extends WP_List_Table {
      */
     public function get_columns() {
         $columns = array(
-            'user'   => __( 'Username', 'groundhogg' ),
-            'key'    => __( 'Public Key', 'groundhogg' ),
-            'token'  => __( 'Token', 'groundhogg' ),
-            'secret' => __( 'Secret Key', 'groundhogg' ),
+            'user'   => _x( 'Username', 'column_title', 'groundhogg' ),
+            'key'    => _x( 'Public Key', 'column_title', 'groundhogg' ),
+            'token'  => _x( 'Token', 'column_title', 'groundhogg' ),
+            'secret' => _x( 'Secret Key', 'column_title', 'groundhogg' ),
         );
 
         return $columns;
@@ -182,21 +182,13 @@ class WPGH_API_Keys_Table extends WP_List_Table {
             return;
         }
         ?>
-        <?php
-
-
-
-
-
-
-        ?>
 
         <form id="api-key-generate-form" method="post" action="<?php echo admin_url( 'admin.php?page=gh_settings&tab=api_tab' ); ?>">
             <input type="hidden" name="wpgh_action" value="process_api_key" />
             <input type="hidden" name="wpgh_api_process" value="generate" />
             <?php wp_nonce_field( 'wpgh-api-nonce' ); ?>
             <?php echo WPGH()->html->dropdown_owners( array( 'option_none' => __( 'Please Select a User', 'groundhogg' ) ) ); ?>
-            <?php submit_button( __( 'Generate New API Keys', 'groundhogg' ), 'secondary', 'submit', false );?>
+            <?php submit_button( _x( 'Generate New API Keys', 'action', 'groundhogg' ), 'secondary', 'submit', false );?>
         </form>
         <?php
         $wpgh_api_is_bottom = true;

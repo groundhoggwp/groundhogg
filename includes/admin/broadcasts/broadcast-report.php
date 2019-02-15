@@ -20,11 +20,9 @@ $id = intval( $_GET[ 'broadcast' ] );
 $broadcast = new WPGH_Broadcast( $id );
 
 if ( $broadcast->status !== 'sent' ):
-
+    WPGH()->notices->add( 'unsent', _x( 'Stats will show once the broadcast has been sent.', 'notice', 'groundhogg' ), 'warning' );
+    WPGH()->notices->notices();
 ?>
-<p>
-    <?php _e( 'Stats will show once the broadcast has been sent.', 'groundhogg' ); ?>
-</p>
 <p class="submit">
     <a href="javascript:history.go(-1)" class="button button-primary">Go Back</a>
 </p>
@@ -37,7 +35,7 @@ else:
 <table class="form-table">
     <tbody>
     <tr>
-        <th><?php  _e( 'Total Delivered', 'groundhogg' ); ?></th>
+        <th><?php  _ex( 'Total Delivered', 'stats','groundhogg' ); ?></th>
         <td><?php
 
             $contact_sum = WPGH()->events->count( array(
@@ -54,7 +52,7 @@ else:
         </td>
     </tr>
     <tr>
-        <th><?php _e( 'Opens', 'groundhogg' ); ?></th>
+        <th><?php _ex( 'Opens', 'stats','groundhogg' ); ?></th>
         <td><?php
 
             $opens = WPGH()->activity->count( array(
@@ -72,7 +70,7 @@ else:
             ?></td>
     </tr>
     <tr>
-        <th><?php _e( 'Clicks', 'groundhogg' ); ?></th>
+        <th><?php _ex( 'Clicks', 'stats', 'groundhogg' ); ?></th>
         <td><?php
             $clicks = WPGH()->activity->count( array(
                 'funnel_id'     => WPGH_BROADCAST,
@@ -89,13 +87,12 @@ else:
             ?></td>
     </tr>
     <tr>
-        <th><?php _e( 'Click Through Rate', 'groundhogg' ); ?></th>
+        <th><?php _ex( 'Click Through Rate', 'stats', 'groundhogg' ); ?></th>
         <td><?php echo sprintf("<strong>%d%%</strong>", ( $clicks / $opens ) * 100 ); ?></td>
     </tr>
     <tr>
-        <th><?php _e( 'Unopened', 'groundhogg' ); ?></th>
+        <th><?php _ex( 'Unopened', 'stats','groundhogg' ); ?></th>
         <td><?php echo sprintf("<strong>%d (%d%%)</strong>", $contact_sum - $opens,  ( ( $contact_sum - $opens ) / $contact_sum ) * 100 ); ?></td>
-
     </tr>
 
     <?php
@@ -107,17 +104,17 @@ else:
         $dataset  =  array();
 
         $dataset[] = array(
-            'label' => __('Opens, did not click', 'groundhogg'),
+            'label' => _x('Opens, did not click', 'stats', 'groundhogg'),
             'data' => $opens - $clicks,
             'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
         ) ;
         $dataset[] = array(
-            'label' => __('Opens and clicked', 'groundhogg'),
+            'label' => _x('Opens and clicked', 'stats', 'groundhogg'),
             'data' => $clicks,
             'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) )
         ) ;
         $dataset[] = array(
-            'label' => __('Unopened', 'groundhogg'),
+            'label' => _x('Unopened', 'stats', 'groundhogg'),
             'data' => $contact_sum - $opens,
             'url'  => '#'
 
@@ -163,14 +160,11 @@ else:
 
         </script>
         <div id="placeholder" style="width:400px;height:300px"></div>
-
     </tr>
-
     </tbody>
-
 </table>
 
-<h2><?php _e( 'Links Clicked', 'groundhogg'  ); ?></h2>
+<h2><?php _ex( 'Links Clicked', 'stats', 'groundhogg'  ); ?></h2>
 <?php
 
     $activity = WPGH()->activity->get_activity( array(
@@ -196,8 +190,8 @@ else:
     <table class="wp-list-table widefat fixed striped" style="max-width: 700px;">
     <thead>
         <tr>
-            <th><?php _e( 'Link' ); ?></th>
-            <th><?php _e( 'Clicks' ); ?></th>
+            <th><?php _ex( 'Link', 'column_label', 'groudhogg' ); ?></th>
+            <th><?php _ex( 'Clicks', 'column_label', 'groudhogg' ); ?></th>
         </tr>
     </thead><tbody><?php
 
@@ -205,7 +199,7 @@ else:
 
         ?>
         <tr>
-            <td colspan="2"><?php _e( 'No Links Clicked...', 'groundhogg' ); ?></td>
+            <td colspan="2"><?php _ex( 'No Links Clicked...', 'notice', 'groundhogg' ); ?></td>
         </tr>
         <?php
 

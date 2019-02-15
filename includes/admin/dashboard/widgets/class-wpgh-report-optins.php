@@ -42,7 +42,7 @@ class WPGH_Report_Optins extends WPGH_Line_Graph_Report_V2
 
         $ds =  array();
         $ds[] = array(
-            'label' => __( 'Optins' ),
+            'label' => _x( 'Optins', 'stats', 'groundhogg' ),
             'data'  => $dataset1
         ) ;
 
@@ -72,8 +72,8 @@ class WPGH_Report_Optins extends WPGH_Line_Graph_Report_V2
         <table class="chart-summary">
             <tbody>
             <tr>
-                <td><?php printf('%s: <span class="summary-total">%d</span>', __('Total Contacts', 'groundhogg'), $num_contacts); ?></td>
-                <td><?php printf('%s: <span class="summary-total">%d</span>', __('Previous Period', 'groundhogg'), $previous_period); ?></td>
+                <td><?php printf('%s: <span class="summary-total">%d</span>', _x('Total Contacts', 'stats', 'groundhogg'), $num_contacts); ?></td>
+                <td><?php printf('%s: <span class="summary-total">%d</span>', _x('Previous Period', 'stats', 'groundhogg'), $previous_period); ?></td>
             </tr>
             </tbody>
         </table>
@@ -110,9 +110,9 @@ class WPGH_Report_Optins extends WPGH_Line_Graph_Report_V2
             $to = convert_to_local_time( $this->end_range );
 
             $dataset1[] = array(
-                __( 'From' ) => date( 'F jS', $from ),
-                __( 'To' ) => date( 'F jS', $to ),
-                __( 'Contacts' ) => $num_contacts
+                _x( 'From', 'stats', 'groundhogg' )     => date( 'F jS', $from ),
+                _x( 'To', 'stats', 'groundhogg' )       => date( 'F jS', $to ),
+                _x( 'Contacts', 'stats', 'groundhogg' ) => $num_contacts
             );
 
             $this->start_range = $this->end_range;

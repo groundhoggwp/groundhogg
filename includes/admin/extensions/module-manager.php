@@ -110,7 +110,7 @@ class WPGH_Extension_Manager
     		$licenses = $_POST[ 'licenses' ];
 
     		if ( ! is_array( $licenses ) ){
-    		    wp_die( 'Invalid License Format' );
+    		    wp_die( _x( 'Invalid license format', 'notice', 'groundhogg' ) );
             }
 
             foreach ( $licenses as $item_id => $license ){
@@ -148,28 +148,28 @@ class WPGH_Extension_Manager
                 switch( $license_data->error ) {
                     case 'expired' :
                         $message = sprintf(
-                            __( 'Your license key expired on %s.' ),
+                            _x( 'Your license key expired on %s.', 'notice', 'groundhogg' ),
                             date_i18n( wpgh_get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) )
                         );
                         break;
                     case 'revoked' :
-                        $message = __( 'Your license key has been disabled.' );
+                        $message = _x( 'Your license key has been disabled.', 'notice', 'groundhogg' );
                         break;
                     case 'missing' :
-                        $message = __( 'Invalid license.' );
+                        $message = _x( 'Invalid license.', 'notice', 'groundhogg' );
                         break;
                     case 'invalid' :
                     case 'site_inactive' :
-                        $message = __( 'Your license is not active for this URL.' );
+                        $message = _x( 'Your license is not active for this URL.', 'notice', 'groundhogg' );
                         break;
                     case 'item_name_mismatch' :
-                        $message = sprintf( __( 'This appears to be an invalid license key' ) );
+                        $message = sprintf( _x( 'This appears to be an invalid license key', 'notice', 'groundhogg' ) );
                         break;
                     case 'no_activations_left':
-                        $message = __( 'Your license key has reached its activation limit.' );
+                        $message = _x( 'Your license key has reached its activation limit.' , 'notice', 'groundhogg' );
                         break;
                     default :
-                        $message = __( 'An error occurred, please try again.' );
+                        $message = _x( 'An error occurred, please try again.', 'notice', 'groundhogg' );
                         break;
                 }
             }
@@ -186,7 +186,7 @@ class WPGH_Extension_Manager
 			$status = 'valid';
 			$expiry = $license_data->expires;
 
-            WPGH()->notices->add( esc_attr( 'license_activated' ), __( 'License Activated' ), 'success' );
+            WPGH()->notices->add( esc_attr( 'license_activated' ), _x( 'License activated', 'notice', 'groundhogg' ), 'success' );
 
         }
 
@@ -232,11 +232,11 @@ class WPGH_Extension_Manager
 
 		?>
             <div id="poststuff">
-                <p><?php _e( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license.</a>' ); ?></p>
+                <p><?php _e( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license.</a>', 'groundhogg' ); ?></p>
                 <?php
                 if ( empty( $extensions ) ){
                     ?>
-                    <p><?php _e( 'You have no extensions installed. Want some?' ) ?> <a href="https://groundhogg.io"><?php _e( 'Get your first extension!' ) ?></a></p>
+                    <p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a href="https://groundhogg.io"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a></p>
                     <?php
                 } else {
                     foreach ( $extensions as $extensionId => $args ){
@@ -283,7 +283,7 @@ class WPGH_Extension_Box
 
     public function get_expiry()
     {
-    	return isset( WPGH_Extension_Manager::$extensions[ $this->item_id ]['expiry'] )? WPGH_Extension_Manager::$extensions[ $this->item_id ]['expiry'] : __( 'No data. See your account at Groundhogg.io' );
+    	return isset( WPGH_Extension_Manager::$extensions[ $this->item_id ]['expiry'] )? WPGH_Extension_Manager::$extensions[ $this->item_id ]['expiry'] : _x( 'No data. See your account at groundhogg.io', 'notice', 'groundhogg' );
     }
 
     public function __toString()
@@ -306,10 +306,12 @@ class WPGH_Extension_Box
             $content.= "<input class='regular-text' type='text' style='margin-right: 10px;' placeholder='License' name='licenses[{$this->item_id}]'>";
         }
 
-        $content.= "<p class='submit'><input type='submit' class='button button-primary' name='gh_activate_license' value='" . __( "Activate Extension", 'groundhogg' ) . "'></p>";
+        $content.= "<p class='submit'><input type='submit' class='button button-primary' name='gh_activate_license' value='" . _x( "Activate Extension", 'action', 'groundhogg' ) . "'></p>";
 
         if ( $this->license_exists() ){
-	        $content .= sprintf( __( "<p>Your license expires on %s</p>" ), $this->get_expiry() );
+            $content .= "<p>";
+            $content .= sprintf( __( "Your license expires on %s", 'groundhogg' ), $this->get_expiry() );
+            $content .= "</p>";
         }
 
         $content.= "</div>";

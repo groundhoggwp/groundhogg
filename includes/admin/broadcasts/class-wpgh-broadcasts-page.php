@@ -26,22 +26,16 @@ class WPGH_Broadcasts_Page
      * @var WPGH_Notices
      */
     public $notices;
-    public $order;
+    public $order = 20;
 
     function __construct()
     {
-
-        add_action( 'admin_menu', array( $this, 'register' ) );
+        add_action( 'admin_menu', array( $this, 'register' ), $this->order );
 
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_broadcasts' ){
-
             add_action( 'init' , array( $this, 'process_action' )  );
-
             add_action( 'admin_enqueue_scripts' , array( $this, 'scripts' )  );
-
-
             $this->notices = WPGH()->notices;
-
         }
     }
 
@@ -132,10 +126,11 @@ class WPGH_Broadcasts_Page
     {
         switch ( $this->get_action() ){
             case 'add':
-                _e( 'Schedule Broadcast' , 'groundhogg' );
+                _ex( 'Schedule Broadcast', 'page_title', 'groundhogg' );
                 break;
             default:
-                _e( 'Broadcasts', 'groundhogg' );
+                _ex( 'Broadcasts', 'page_title','groundhogg' );
+                break;
         }
     }
 
@@ -174,7 +169,7 @@ class WPGH_Broadcasts_Page
                     $broadcast->cancel();
                 }
 
-                $this->notices->add( 'cancelled', __( count( $this->get_broadcasts() ) . ' Broadcast(s) Cancelled.', 'groundhogg' ) );
+                $this->notices->add( 'cancelled', _nx( '%d broadcasts cancelled', '%d broadcast cancelled', count( $this->get_broadcasts() ), 'notice', 'groundhogg' ) );
 
                 break;
         }
@@ -203,7 +198,8 @@ class WPGH_Broadcasts_Page
         $tags = isset( $_POST[ 'tags' ] )? WPGH()->tags->validate( $_POST['tags'] ): array();
 
         if ( empty( $tags ) || ! is_array( $tags ) ) {
-            wp_die( __( 'Please select one or more tags to send this broadcast to.', 'groundhogg' ) );
+            $this->notices->add( 'no_tags', _x( 'Please select 1 or more tags to send this broadcast to', 'notice', 'groundhogg' ), 'error' );
+            return;
         }
 
         $exclude_tags = isset( $_POST[ 'exclude_tags' ] )? WPGH()->tags->validate( $_POST['exclude_tags'] ): array();
@@ -218,7 +214,8 @@ class WPGH_Broadcasts_Page
         }
 
         if ( $contact_sum === 0 ){
-            wp_die( __( 'Please select a tag with one or more associated contacts.' ) );
+            $this->notices->add( 'no_contacts', _x( 'Please select a tag with at least 1 contact', 'notice', 'groundhogg' ), 'error' );
+            return;
         }
 
         $send_date = isset( $_POST['date'] )? $_POST['date'] : date( 'Y/m/d', strtotime( 'tomorrow' ) );
@@ -229,8 +226,14 @@ class WPGH_Broadcasts_Page
         /* convert to UTC */
         $send_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 
-        if ( $send_time < time() )
-            wp_die( __( 'Please send at a time in the future!' ) );
+        if ( isset( $_POST[ 'send_now' ] ) ){
+            $send_time = time() + 10;
+        }
+
+        if ( $send_time < time() ){
+            $this->notices->add( 'invalid_date', _x( 'Please select a time in the future', 'notice', 'groundhogg' ), 'error' );
+            return;
+        }
 
         $args = array(
             'email_id'  => $email,
@@ -268,7 +271,7 @@ class WPGH_Broadcasts_Page
             WPGH()->events->add( $args );
         }
 
-        $this->notices->add( 'success', __( 'Broadcast Scheduled!', 'groundhogg' ), 'success' );
+        $this->notices->add( 'success', _x( 'Broadcast scheduled!', 'notice','groundhogg' ), 'success' );
     }
 
     /**
@@ -299,9 +302,9 @@ class WPGH_Broadcasts_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Broadcasts&nbsp;', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _ex( 'Search Broadcasts', 'search','groundhogg'); ?>:&nbsp;</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Broadcasts&nbsp;', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php _ex( 'Search Broadcasts', 'search','groundhogg'); ?>">
             </p>
             <?php $broadcasts_table->prepare_items(); ?>
             <?php $broadcasts_table->display(); ?>
@@ -341,7 +344,7 @@ class WPGH_Broadcasts_Page
     {
         ?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add' ); ?>"><?php _e( 'Schedule New', 'groundhogg' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add' ); ?>"><?php _ex( 'Schedule New', 'page_title_action', 'groundhogg' ); ?></a>
             <?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
             <?php switch ( $this->get_action() ){

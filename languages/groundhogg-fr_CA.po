@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Groundhogg\n"
-"POT-Creation-Date: 2019-02-14 14:43-0500\n"
-"PO-Revision-Date: 2019-02-14 14:55-0500\n"
+"POT-Creation-Date: 2019-02-15 14:32-0500\n"
+"PO-Revision-Date: 2019-02-15 14:45-0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_CA\n"
@@ -20,38 +20,6 @@ msgstr ""
 "_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
-
-#: api/v1/class-wpgh-api-v1-contacts.php:63
-msgid "No contact exists with the given ID."
-msgstr "Aucun contact n'existe avec l'ID donné."
-
-#: api/v1/class-wpgh-api-v1-contacts.php:67
-msgid "Please provide a contact ID."
-msgstr "Aucun contact n'existe avec l'ID donné."
-
-#: api/v1/class-wpgh-api-v1.php:154
-msgid "The requested method does not exist for module: "
-msgstr "La méthode demandée n'existe pas pour le module: "
-
-#: api/v1/class-wpgh-api-v1.php:163
-msgid "The requested module does not exist."
-msgstr "Le module demandé n'existe pas."
-
-#: api/v1/class-wpgh-api-v1.php:170
-msgid "Your token is invalid."
-msgstr "Votre jeton n'est pas valide."
-
-#: api/v1/class-wpgh-api-v1.php:177
-msgid "Please provide a token."
-msgstr "Veuillez fournir un jeton."
-
-#: api/v1/class-wpgh-api-v1.php:185
-msgid "Please use POST method to use API. "
-msgstr "Veuillez utiliser la méthode POST pour utiliser l'API. "
-
-#: api/v1/class-wpgh-api-v1.php:193
-msgid "Something went wrong, but we do not know what."
-msgstr "Quelque chose a mal tourné, mais nous ne savons pas quoi."
 
 #: api/v2/class-wpgh-api-v2-base.php:48
 msgctxt "api"
@@ -258,8 +226,9 @@ msgid "No tags found."
 msgstr "Aucune balise trouvée."
 
 #: api/v2/class-wpgh-api-v2-tags.php:144
-msgid " tags added successfully."
-msgstr " balises ajoutées avec succès."
+#, php-format
+msgid "%d tags added successfully."
+msgstr "% d balises ajoutées avec succès."
 
 #: api/v2/class-wpgh-api-v2-tags.php:148
 msgctxt "api"
@@ -310,8 +279,6 @@ msgstr "Formes"
 
 #: blocks/elementor/class-wpgh-elementor-form-widget.php:30
 #: blocks/wpbakery/class-wpgh-wpbakery-widget.php:46
-#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:76
-#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:162
 #: includes/admin/emails/blocks/wpgh-html-block.php:66
 msgid "Content"
 msgstr "Contenu"
@@ -342,7 +309,6 @@ msgid "Select an email to send."
 msgstr "Sélectionnez un e-mail à envoyer."
 
 #: includes/admin/broadcasts/add-broadcast.php:35
-#: includes/elements/actions/class-wpgh-send-email.php:130
 msgid "Create New Email"
 msgstr "Créer un nouvel E-mail"
 
@@ -371,10 +337,14 @@ msgid "Send On:"
 msgstr "Envoyer sur:"
 
 #: includes/admin/broadcasts/add-broadcast.php:71
-msgid " or "
-msgstr " ou "
+msgid "&nbsp;or&nbsp;"
+msgstr "&nbsp;or&nbsp;"
 
 #: includes/admin/broadcasts/add-broadcast.php:73
+msgctxt "action"
+msgid "Send Now"
+msgstr "Envoyer maintenant"
+
 #: includes/admin/broadcasts/add-broadcast.php:79
 msgid "Send Now"
 msgstr "Envoyer maintenant"
@@ -384,101 +354,129 @@ msgid "The day the broadcast will be sent."
 msgstr "Le jour où la diffusion sera envoyée."
 
 #: includes/admin/broadcasts/add-broadcast.php:88
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:135
+msgctxt "action"
 msgid "Schedule Broadcast"
 msgstr "Programmer la diffusion"
 
-#: includes/admin/broadcasts/broadcast-report.php:26
+#: includes/admin/broadcasts/broadcast-report.php:23
+msgctxt "notice"
 msgid "Stats will show once the broadcast has been sent."
 msgstr "Les statistiques s'affichent une fois l'émission envoyée."
 
-#: includes/admin/broadcasts/broadcast-report.php:36
+#: includes/admin/broadcasts/broadcast-report.php:34
 msgid "Stats"
 msgstr "Statistiques"
 
-#: includes/admin/broadcasts/broadcast-report.php:40
+#: includes/admin/broadcasts/broadcast-report.php:38
+msgctxt "stats"
 msgid "Total Delivered"
 msgstr "Total livré"
 
-#: includes/admin/broadcasts/broadcast-report.php:57
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:216
+#: includes/admin/broadcasts/broadcast-report.php:55
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:213
+#: includes/elements/actions/class-wpgh-send-email.php:210
+msgctxt "stats"
 msgid "Opens"
 msgstr "Ouvertures"
 
-#: includes/admin/broadcasts/broadcast-report.php:75
-#: includes/admin/broadcasts/broadcast-report.php:200
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:222
+#: includes/admin/broadcasts/broadcast-report.php:73
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:219
+#: includes/elements/actions/class-wpgh-send-email.php:221
+msgctxt "stats"
 msgid "Clicks"
 msgstr "Clics"
 
-#: includes/admin/broadcasts/broadcast-report.php:92
+#: includes/admin/broadcasts/broadcast-report.php:90
+msgctxt "stats"
 msgid "Click Through Rate"
 msgstr "Taux de clics"
 
-#: includes/admin/broadcasts/broadcast-report.php:96
-#: includes/admin/broadcasts/broadcast-report.php:120
+#: includes/admin/broadcasts/broadcast-report.php:94
+#: includes/admin/broadcasts/broadcast-report.php:117
+msgctxt "stats"
 msgid "Unopened"
 msgstr "Fermé"
 
-#: includes/admin/broadcasts/broadcast-report.php:110
+#: includes/admin/broadcasts/broadcast-report.php:107
+msgctxt "stats"
 msgid "Opens, did not click"
 msgstr "Ouvre pas cliqué"
 
-#: includes/admin/broadcasts/broadcast-report.php:115
+#: includes/admin/broadcasts/broadcast-report.php:112
+msgctxt "stats"
 msgid "Opens and clicked"
 msgstr "Ouvre et clique sur"
 
-#: includes/admin/broadcasts/broadcast-report.php:173
+#: includes/admin/broadcasts/broadcast-report.php:167
+msgctxt "stats"
 msgid "Links Clicked"
 msgstr "Liens cliqués"
 
-#: includes/admin/broadcasts/broadcast-report.php:199
-#: includes/admin/emails/blocks/wpgh-image-block.php:99
+#: includes/admin/broadcasts/broadcast-report.php:193
+msgctxt "column_label"
 msgid "Link"
 msgstr "Lien"
 
-#: includes/admin/broadcasts/broadcast-report.php:208
+#: includes/admin/broadcasts/broadcast-report.php:194
+msgctxt "column_label"
+msgid "Clicks"
+msgstr "Clics"
+
+#: includes/admin/broadcasts/broadcast-report.php:202
+msgctxt "notice"
 msgid "No Links Clicked..."
 msgstr "Aucun lien cliqué..."
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:63
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:64
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:57
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:58
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:132
 msgctxt "page_title"
 msgid "Broadcasts"
 msgstr "Émissions"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:138
-msgid "Broadcasts"
-msgstr "Émissions"
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:129
+msgctxt "page_title"
+msgid "Schedule Broadcast"
+msgstr "Programmer la diffusion"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:177
-msgid " Broadcast(s) Cancelled."
-msgstr " Diffusion (s) annulée."
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:172
+#, php-format
+msgctxt "notice"
+msgid "%d broadcasts cancelled"
+msgid_plural "%d broadcast cancelled"
+msgstr[0] "%d émissions annulées"
+msgstr[1] "%d émissions annulées"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:206
-msgid "Please select one or more tags to send this broadcast to."
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:201
+msgctxt "notice"
+msgid "Please select 1 or more tags to send this broadcast to"
 msgstr ""
 "Veuillez sélectionner une ou plusieurs balises pour envoyer cette diffusion."
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:221
-msgid "Please select a tag with one or more associated contacts."
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:217
+msgctxt "notice"
+msgid "Please select a tag with at least 1 contact"
 msgstr ""
 "Veuillez sélectionner une balise avec un ou plusieurs contacts associés."
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:233
-msgid "Please send at a time in the future!"
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:234
+msgctxt "notice"
+msgid "Please select a time in the future"
 msgstr "S'il vous plaît envoyer à un moment dans le futur!"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:271
-msgid "Broadcast Scheduled!"
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:274
+msgctxt "notice"
+msgid "Broadcast scheduled!"
 msgstr "Diffusion programmée!"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:302
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:304
-msgid "Search Broadcasts "
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:305
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:307
+msgctxt "search"
+msgid "Search Broadcasts"
 msgstr "Recherche de diffusions"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:344
+#: includes/admin/broadcasts/class-wpgh-broadcasts-page.php:347
+msgctxt "page_title_action"
 msgid "Schedule New"
 msgstr "Planifié"
 
@@ -515,79 +513,108 @@ msgid "Date Scheduled"
 msgstr "Date prévue"
 
 #: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:95
-#: includes/admin/emails/class-wpgh-emails-table.php:104
+#: includes/admin/contacts/class-wpgh-contacts-table.php:236
+#: includes/admin/events/class-wpgh-events-table.php:270
 #: includes/admin/funnels/class-wpgh-funnels-table.php:94
+msgctxt "view"
 msgid "All"
 msgstr "Tous"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:97
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:245
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:96
+msgctxt "view"
 msgid "Sent"
 msgstr "Envoyé"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:99
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:164
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:97
+msgctxt "view"
 msgid "Scheduled"
 msgstr "Planifié"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:101
-#: includes/admin/events/class-wpgh-events-table.php:177
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:98
+#: includes/admin/events/class-wpgh-events-table.php:273
+msgctxt "view"
 msgid "Cancelled"
 msgstr "Annulée"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:138
-#: includes/admin/emails/class-wpgh-emails-page.php:203
-#: includes/admin/emails/email-editor.php:48
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:135
 #: includes/elements/actions/class-wpgh-send-email.php:118
+msgctxt "action"
 msgid "Edit Email"
 msgstr "Modifier le courrier électronique"
 
 #. translators: %s: title
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:140
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:137
 #: includes/admin/contacts/class-wpgh-contact-events-table.php:174
-#: includes/admin/contacts/class-wpgh-contacts-table.php:605
 #: includes/admin/events/class-wpgh-events-table.php:401
 #: includes/admin/events/class-wpgh-events-table.php:402
+msgctxt "action"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:153
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:150
+msgctxt "status"
 msgid "no email"
 msgstr "pas d'email"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:226
-msgid "CTR"
-msgstr "Ctr"
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:161
+msgctxt "status"
+msgid "Scheduled"
+msgstr "Planifié"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:250
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:208
+msgctxt "stats"
+msgid "Sent"
+msgstr "Envoyé"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:223
+#: includes/elements/actions/class-wpgh-send-email.php:232
+msgctxt "stats"
+msgid "C.T.R"
+msgstr ""
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:242
+msgctxt "status"
+msgid "Sent"
+msgstr "Envoyé"
+
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:247
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:275
 #: includes/admin/contacts/class-wpgh-contact-activity-table.php:122
 #: includes/admin/contacts/class-wpgh-contact-events-table.php:151
+#: includes/admin/events/class-wpgh-events-table.php:195
+#: includes/admin/funnels/class-wpgh-funnels-table.php:253
+#: includes/admin/funnels/class-wpgh-funnels-table.php:267
 #, php-format
+msgctxt "status"
 msgid "%s ago"
 msgstr "Il y a %s"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:253
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:250
+msgctxt "status"
 msgid "Will send"
 msgstr "Enverra"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:256
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:253
+#: includes/admin/events/class-wpgh-events-table.php:200
 #, php-format
+msgctxt "status"
 msgid "on %s"
 msgstr "Sur %s"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:258
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:255
+#: includes/admin/events/class-wpgh-events-table.php:202
 #, php-format
+msgctxt "status"
 msgid "in %s"
 msgstr "dans %s"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:274
-#: includes/admin/contacts/class-wpgh-contacts-table.php:158
-#: includes/admin/emails/class-wpgh-emails-table.php:230
-#: includes/admin/funnels/class-wpgh-funnels-table.php:264
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:271
+#: includes/admin/funnels/class-wpgh-funnels-table.php:263
+msgctxt "status"
 msgid "Created"
 msgstr "Créé"
 
-#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:346
+#: includes/admin/broadcasts/class-wpgh-broadcasts-table.php:343
 msgctxt "List table bulk action"
 msgid "Cancel Broadcast"
 msgstr "Annuler la diffusion"
@@ -645,9 +672,9 @@ msgstr "Propriétaire"
 #: includes/admin/contacts/add-contact.php:98
 #: includes/admin/contacts/class-wpgh-contacts-table.php:599
 #: includes/admin/contacts/search.php:155
-#: includes/admin/tags/class-wpgh-tags-page.php:53
 #: includes/admin/tags/class-wpgh-tags-page.php:54
-#: includes/admin/tags/class-wpgh-tags-page.php:110
+#: includes/admin/tags/class-wpgh-tags-page.php:55
+#: includes/admin/tags/class-wpgh-tags-page.php:111
 msgid "Tags"
 msgstr "Mots-clés"
 
@@ -657,7 +684,7 @@ msgid "Notes"
 msgstr "Notes"
 
 #: includes/admin/contacts/add-contact.php:125
-#: includes/admin/contacts/class-wpgh-contacts-page.php:174
+msgctxt "action"
 msgid "Add Contact"
 msgstr "Ajoutez un Contact"
 
@@ -674,6 +701,7 @@ msgstr "Cliqué"
 #: includes/admin/contacts/class-wpgh-contact-activity-table.php:120
 #: includes/admin/contacts/class-wpgh-contact-events-table.php:145
 #, php-format
+msgctxt "status"
 msgid "On %s"
 msgstr "Sur %s"
 
@@ -706,43 +734,51 @@ msgid "Broadcast Email"
 msgstr "Email de diffusion"
 
 #: includes/admin/contacts/class-wpgh-contact-events-table.php:94
+#: includes/admin/events/class-wpgh-events-table.php:111
+msgctxt "status"
 msgid "funnel deleted"
 msgstr "entonnoir supprimé"
 
 #: includes/admin/contacts/class-wpgh-contact-events-table.php:127
+#: includes/admin/events/class-wpgh-events-table.php:137
+msgctxt "status"
 msgid "step deleted"
-msgstr "(étape supprimée)"
+msgstr "étape supprimée"
 
 #: includes/admin/contacts/class-wpgh-contact-events-table.php:149
 #, php-format
+msgctxt "status"
 msgid "In %s"
 msgstr "Dans %s"
 
 #: includes/admin/contacts/class-wpgh-contact-events-table.php:173
 #: includes/admin/events/class-wpgh-events-table.php:395
+msgctxt "action"
 msgid "Run Now"
 msgstr "Courez maintenant"
 
 #: includes/admin/contacts/class-wpgh-contact-events-table.php:176
 #: includes/admin/events/class-wpgh-events-table.php:410
 #: includes/admin/events/class-wpgh-events-table.php:411
+msgctxt "action"
 msgid "Run Again"
 msgstr "Exécuter à nouveau"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:78
-#: includes/admin/contacts/class-wpgh-contacts-page.php:79
+#: includes/admin/contacts/class-wpgh-contacts-page.php:80
+#: includes/admin/contacts/class-wpgh-contacts-page.php:81
+#: includes/admin/contacts/class-wpgh-contacts-page.php:192
 msgctxt "page_title"
 msgid "Contacts"
 msgstr "Contacts"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:96
-#: includes/admin/emails/class-wpgh-emails-page.php:111
-#: includes/admin/funnels/class-wpgh-funnels-page.php:133
-#: includes/admin/superlinks/class-wpgh-superlinks-page.php:63
+#: includes/admin/contacts/class-wpgh-contacts-page.php:98
+#: includes/admin/emails/class-wpgh-emails-page.php:110
+#: includes/admin/funnels/class-wpgh-funnels-page.php:134
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:64
 msgid "Overview"
 msgstr "Aperçu"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:97
+#: includes/admin/contacts/class-wpgh-contacts-page.php:99
 msgid ""
 "This is where you can manage and view your contacts. Click the quick edit to "
 "quickly change contact details."
@@ -750,13 +786,13 @@ msgstr ""
 "C'est là que vous pouvez gérer et afficher vos contacts. Cliquez sur "
 "l'édition rapide pour modifier rapidement les détails des contacts."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:104
-#: includes/admin/emails/class-wpgh-emails-page.php:128
-#: includes/admin/funnels/class-wpgh-funnels-page.php:150
+#: includes/admin/contacts/class-wpgh-contacts-page.php:106
+#: includes/admin/emails/class-wpgh-emails-page.php:127
+#: includes/admin/funnels/class-wpgh-funnels-page.php:151
 msgid "Editing"
 msgstr "Modifier"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:105
+#: includes/admin/contacts/class-wpgh-contacts-page.php:107
 msgid ""
 "While editing a contact you can modify any of their personal information. "
 "There are several points of interest..."
@@ -764,7 +800,7 @@ msgstr ""
 "Lors de l'édition d'un contact, vous pouvez modifier l'une de leurs "
 "informations personnelles. Il y a plusieurs points d'intérêt..."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:107
+#: includes/admin/contacts/class-wpgh-contacts-page.php:109
 msgid ""
 "Manually unsubscribe a contact by checking the \"mark as unsubscribed\" "
 "button."
@@ -772,7 +808,7 @@ msgstr ""
 "Désinscrivez manuellement un contact en cochant le bouton \"marquer comme "
 "désabonné\"."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:108
+#: includes/admin/contacts/class-wpgh-contacts-page.php:110
 msgid ""
 "Make sure your in compliance by ensuring the terms of agreement and GDPR "
 "consent are both checked under the compliance section."
@@ -781,12 +817,12 @@ msgstr ""
 "le consentement GDPR sont tous les deux vérifiés dans la section de "
 "conformité."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:109
+#: includes/admin/contacts/class-wpgh-contacts-page.php:111
 msgid "View the origin of the contact by looking at the lead source field."
 msgstr ""
 "Affichez l'origine du contact en regardant le champ source de prospect."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:110
+#: includes/admin/contacts/class-wpgh-contacts-page.php:112
 msgid ""
 "Add or remove custom information about the contact by enabling the \"Edit "
 "Meta\" section. Each meta also includes a replacement code to include it in "
@@ -796,7 +832,7 @@ msgstr ""
 "activant la section \"Editer meta\". Chaque méta inclut également un code de "
 "remplacement pour l'inclure dans un e-mail."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:111
+#: includes/admin/contacts/class-wpgh-contacts-page.php:113
 msgid ""
 "Re-run or cancel events for this contact by viewing the \"Upcoming Events\" "
 "or \"Recent History\" Section"
@@ -804,82 +840,87 @@ msgstr ""
 "Réexécutez ou annulez des événements pour ce contact en affichant la section "
 "«événements à venir» ou «historique récent»"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:112
+#: includes/admin/contacts/class-wpgh-contacts-page.php:114
 msgid ""
 "Monitor their engagement by looking in the \"Recent Email History\" section."
 msgstr ""
 "Surveillez leur engagement en regardant dans la section «historique des E-"
 "mails récents»."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:180
+#: includes/admin/contacts/class-wpgh-contacts-page.php:176
+msgctxt "page_title"
+msgid "Add Contact"
+msgstr "Ajoutez un Contact"
+
+#: includes/admin/contacts/class-wpgh-contacts-page.php:182
 #, php-format
+msgctxt "page_title"
 msgid "Edit Contact: %s"
 msgstr "Modifier le contact: %s"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:182
+#: includes/admin/contacts/class-wpgh-contacts-page.php:184
+msgctxt "page_title"
 msgid "Oops!"
 msgstr "Oups!"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:187
+#: includes/admin/contacts/class-wpgh-contacts-page.php:189
+msgctxt "page_title"
 msgid "Search Contacts"
 msgstr "Rechercher des contacts"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:190
-#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:85
-#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:179
-#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:73
-#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:115
-#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:122
-#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:94
-#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:73
-#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:78
-#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:164
-msgid "Contacts"
-msgstr "Contacts"
-
-#: includes/admin/contacts/class-wpgh-contacts-page.php:260
+#: includes/admin/contacts/class-wpgh-contacts-page.php:262
 #, php-format
-msgid "Marked %d contacts as spam."
-msgstr "%d contacts comme spam."
+msgctxt "notice"
+msgid "Marked %d contact as spam."
+msgid_plural "Marked %d contact as spam."
+msgstr[0] "%d contacts comme spam."
+msgstr[1] "%d contacts comme spam."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:288
-#: includes/class-wpgh-bulk-contact-manager.php:208
+#: includes/admin/contacts/class-wpgh-contacts-page.php:290
 #, php-format
-msgid "Deleted %d contacts."
-msgstr "Supprimé% d contacts."
+msgctxt "notice"
+msgid "Deleted %d contact"
+msgid_plural "Deleted %d contacts"
+msgstr[0] "Supprimé %d contacts."
+msgstr[1] "Supprimé %d contacts."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:310
-#: includes/admin/contacts/class-wpgh-contacts-page.php:332
+#: includes/admin/contacts/class-wpgh-contacts-page.php:312
+#: includes/admin/contacts/class-wpgh-contacts-page.php:334
 #, php-format
-msgid "Approved %d contacts."
-msgstr "Supprimé% d contacts."
+msgctxt "notice"
+msgid "Approved %d contact"
+msgid_plural "Approved %d contacts"
+msgstr[0] "Supprimé %d contacts."
+msgstr[1] "Supprimé% d contacts."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:378
+#: includes/admin/contacts/class-wpgh-contacts-page.php:380
+#: includes/admin/contacts/class-wpgh-contacts-page.php:404
+msgctxt "notice"
 msgid "Please enter a valid email address."
 msgstr "Veuillez saisir une adresse courriel valide."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:395
-#: includes/admin/contacts/class-wpgh-contacts-page.php:527
-#: includes/admin/contacts/class-wpgh-contacts-page.php:793
+#: includes/admin/contacts/class-wpgh-contacts-page.php:397
+#: includes/admin/contacts/class-wpgh-contacts-page.php:525
+#: includes/admin/contacts/class-wpgh-contacts-page.php:775
 #, php-format
+msgctxt "notice"
 msgid "Sorry, the email %s already belongs to another contact."
 msgstr "Désolé, l'e-mail %s appartient déjà à un autre contact."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:402
-msgid "Please enter a valid email address"
-msgstr "Veuillez saisir une adresse courriel valide"
-
-#: includes/admin/contacts/class-wpgh-contacts-page.php:430
+#: includes/admin/contacts/class-wpgh-contacts-page.php:432
+msgctxt "notice"
 msgid "Contact created!"
 msgstr "Contact créé!"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:505
+#: includes/admin/contacts/class-wpgh-contacts-page.php:507
+msgctxt "notice"
 msgid "This contact will no longer receive marketing."
 msgstr "Ce contact ne recevra que le marketing hebdomadaire."
 
 #: includes/admin/contacts/class-wpgh-contacts-page.php:523
-#: includes/admin/contacts/class-wpgh-contacts-page.php:789
+#: includes/admin/contacts/class-wpgh-contacts-page.php:771
 #, php-format
+msgctxt "notice"
 msgid ""
 "The email address of this contact has been changed to %s. Their optin status "
 "has been changed to [unconfirmed] to reflect the change as well."
@@ -887,61 +928,64 @@ msgstr ""
 "L'adresse e-mail de ce contact a été changée en %s. Leur statut d'optin a "
 "été changé en [non confirmé] pour refléter le changement aussi bien."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:629
-msgid "Hmm, looks like we couldn't add the new tags..."
+#: includes/admin/contacts/class-wpgh-contacts-page.php:624
+msgctxt "notice"
+msgid "Hmm, looks like we could not add the new tags..."
 msgstr "Hmm, semble que nous ne pouvions pas ajouter les nouvelles balises..."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:656
+#: includes/admin/contacts/class-wpgh-contacts-page.php:640
+msgctxt "notice"
 msgid "Email sent!"
 msgstr "E-mails envoyés!"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:658
+#: includes/admin/contacts/class-wpgh-contacts-page.php:642
+msgctxt "notice"
 msgid "Email could not be sent."
 msgstr "Email non envoyé."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:669
+#: includes/admin/contacts/class-wpgh-contacts-page.php:651
+msgctxt "notice"
 msgid "Contact added to funnel."
 msgstr "Contact ajouté à l'entonnoir."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:673
+#: includes/admin/contacts/class-wpgh-contacts-page.php:655
+msgctxt "notice"
 msgid "Contact updated!"
 msgstr "Contact mis à jour!"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:723
+#: includes/admin/contacts/class-wpgh-contacts-page.php:705
 #: includes/class-wpgh-submission.php:593
 #: includes/class-wpgh-submission.php:688
 msgid "Could not upload file."
 msgstr "Impossible de télécharger le fichier."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:775
+#: includes/admin/contacts/class-wpgh-contacts-page.php:757
+msgctxt "notice"
 msgid "Email cannot be blank."
 msgstr "Email ne peut pas être vide."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:777
+#: includes/admin/contacts/class-wpgh-contacts-page.php:759
+msgctxt "notice"
 msgid "Invalid email address."
 msgstr "Adresse courriel invalide."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:800
+#: includes/admin/contacts/class-wpgh-contacts-page.php:782
+msgctxt "notice"
 msgid "First name cannot be blank."
 msgstr "Le prénom ne peut pas être vide."
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:873
-#: includes/admin/contacts/class-wpgh-contacts-page.php:875
-msgid "Search Contacts "
+#: includes/admin/contacts/class-wpgh-contacts-page.php:855
+#: includes/admin/contacts/class-wpgh-contacts-page.php:857
+msgid "Search Contacts"
 msgstr "Rechercher des contacts"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:1067
-#: includes/admin/emails/class-wpgh-emails-page.php:120
-#: includes/admin/emails/class-wpgh-emails-page.php:671
-#: includes/admin/emails/email-editor.php:48
-#: includes/admin/funnels/class-wpgh-funnels-page.php:1018
-#: includes/admin/superlinks/class-wpgh-superlinks-page.php:323
-#: includes/admin/tags/class-wpgh-tags-page.php:329
+#: includes/admin/contacts/class-wpgh-contacts-page.php:1034
+msgctxt "page_title_action"
 msgid "Add New"
 msgstr "Ajouter nouveau"
 
-#: includes/admin/contacts/class-wpgh-contacts-page.php:1068
-#: includes/class-wpgh-bulk-contact-manager.php:224
+#: includes/admin/contacts/class-wpgh-contacts-page.php:1035
+msgctxt "page_title_action"
 msgid "Import"
 msgstr "Importer"
 
@@ -971,8 +1015,14 @@ msgid "Date"
 msgstr "Date"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:103
+msgctxt "status"
 msgid "Unconfirmed"
 msgstr "Non confirmées"
+
+#: includes/admin/contacts/class-wpgh-contacts-table.php:158
+#: includes/admin/emails/class-wpgh-emails-table.php:230
+msgid "Created"
+msgstr "Créé"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:200
 #: includes/admin/superlinks/class-wpgh-superlinks-table.php:134
@@ -991,30 +1041,30 @@ msgctxt "List table bulk action"
 msgid "Mark as Spam"
 msgstr "Marquer comme pourriel"
 
-#: includes/admin/contacts/class-wpgh-contacts-table.php:236
-#: includes/admin/events/class-wpgh-events-table.php:270
-msgid "All <span class=\"count\">("
-msgstr "Tout < span class = \"count\" > ("
-
 #: includes/admin/contacts/class-wpgh-contacts-table.php:237
-msgid "Unconfirmed <span class=\"count\">("
-msgstr "Non confirmée < span class = \"count\" > ("
+msgctxt "view"
+msgid "Unconfirmed"
+msgstr "Non confirmées"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:238
-msgid "Confirmed <span class=\"count\">("
-msgstr "Confirmé < span class = \"count\" > ("
+msgctxt "view"
+msgid "Confirmed"
+msgstr "Non confirmées"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:239
-msgid "Unsubscribed <span class=\"count\">("
-msgstr "Désabonné < span class = \"count\" > ("
+msgctxt "view"
+msgid "Unsubscribed"
+msgstr "Désabonné"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:240
-msgid "Spam <span class=\"count\">("
-msgstr "Spam < span class = \"count\" > ("
+msgctxt "view"
+msgid "Spam"
+msgstr "Indésirable"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:241
-msgid "Bounced <span class=\"count\">("
-msgstr "Bounced < span class = \"count\" > ("
+msgctxt "view"
+msgid "Bounced"
+msgstr "Boîte de réception Bounce"
 
 #. translators: %s: title
 #: includes/admin/contacts/class-wpgh-contacts-table.php:480
@@ -1039,6 +1089,7 @@ msgstr "Modifier"
 #. translators: %s: title
 #: includes/admin/contacts/class-wpgh-contacts-table.php:499
 #, php-format
+msgctxt "action"
 msgid "Mark %s as approved."
 msgstr "Marquer %s comme approuvé."
 
@@ -1049,16 +1100,19 @@ msgstr "Approuver"
 #. translators: %s: title
 #: includes/admin/contacts/class-wpgh-contacts-table.php:507
 #, php-format
+msgctxt "action"
 msgid "Mark %s as a valid email."
 msgstr "Marquer %s comme un e-mail valide."
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:508
+msgctxt "action"
 msgid "Valid Email"
 msgstr "Email valide"
 
 #. translators: %s: title
 #: includes/admin/contacts/class-wpgh-contacts-table.php:515
 #, php-format
+msgctxt "action"
 msgid "Mark %s as spam"
 msgstr "Marquer %s comme spam"
 
@@ -1076,14 +1130,16 @@ msgstr "Supprimer &#8220;%s&#8221; définitivement"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:525
 #: includes/admin/emails/class-wpgh-emails-table.php:154
-#: includes/admin/funnels/class-wpgh-funnels-table.php:196
 msgid "Delete Permanently"
 msgstr "Supprimer Définitivement"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:552
 #, php-format
-msgid "Export %s contacts"
-msgstr "Exporter %s  contacts"
+msgctxt "action"
+msgid "Export %s contact"
+msgid_plural "Export %s contacts"
+msgstr[0] "Exporter %s  contacts"
+msgstr[1] "Exporter %s  contacts"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:570
 msgid "Quick Edit"
@@ -1094,10 +1150,16 @@ msgid "Select an owner"
 msgstr "Sélectionner un propriétaire"
 
 #: includes/admin/contacts/class-wpgh-contacts-table.php:592
+msgctxt "action"
 msgid "Unsubscribe this contact."
 msgstr "Désabonnez-vous à ce contact."
 
+#: includes/admin/contacts/class-wpgh-contacts-table.php:605
+msgid "Cancel"
+msgstr "Annuler"
+
 #: includes/admin/contacts/class-wpgh-contacts-table.php:607
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:63
 #: includes/admin/emails/email-editor.php:69
 #: includes/admin/funnels/funnel-editor.php:188
 #: includes/admin/superlinks/edit-superlink.php:61
@@ -1161,7 +1223,6 @@ msgid "Last Name"
 msgstr "Nom"
 
 #: includes/admin/contacts/contact-editor.php:132
-#: includes/admin/settings/class-wpgh-api-keys-table.php:162
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
@@ -1479,7 +1540,7 @@ msgstr ""
 "C'est là que vous pouvez vérifier si ce contact interagit avec vos e-mails."
 
 #: includes/admin/contacts/contact-editor.php:743
-msgctxt "contact_record"
+msgctxt "action"
 msgid "Update Contact"
 msgstr "Ajoutez un Contact"
 
@@ -1524,7 +1585,7 @@ msgid "Is Filled"
 msgstr "Est remplie"
 
 #: includes/admin/contacts/search.php:98
-#: includes/admin/settings/class-wpgh-settings-page.php:317
+#: includes/admin/settings/class-wpgh-settings-page.php:318
 #: includes/elements/benchmarks/class-wpgh-form-filled.php:282
 msgid "Phone"
 msgstr "Téléphone"
@@ -1550,7 +1611,7 @@ msgid "Street Address 2"
 msgstr "Adresse postale 2"
 
 #: includes/admin/contacts/search.php:104
-#: includes/admin/settings/class-wpgh-settings-page.php:269
+#: includes/admin/settings/class-wpgh-settings-page.php:270
 msgid "City"
 msgstr "Ville"
 
@@ -1563,7 +1624,7 @@ msgid "State/Province"
 msgstr "État/Province"
 
 #: includes/admin/contacts/search.php:107
-#: includes/admin/settings/class-wpgh-settings-page.php:305
+#: includes/admin/settings/class-wpgh-settings-page.php:306
 #: includes/class-wpgh-form.php:563
 msgid "Country"
 msgstr "Pays"
@@ -1573,12 +1634,10 @@ msgid "General Information"
 msgstr "Informations générales"
 
 #: includes/admin/contacts/search.php:144
-#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:72
 msgid "Source Page"
 msgstr "Page source"
 
 #: includes/admin/contacts/search.php:149
-#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:72
 msgid "Lead Source"
 msgstr "Source de plomb"
 
@@ -1611,10 +1670,12 @@ msgid "Custom Data (Meta)"
 msgstr "Données personnalisées (Meta)"
 
 #: includes/admin/dashboard/class-wpgh-reporting-widget.php:231
+msgctxt "notice"
 msgid "You cannot export reports!"
 msgstr "Vous ne pouvez pas exporter les rapports!"
 
 #: includes/admin/dashboard/class-wpgh-reporting-widget.php:254
+msgctxt "action"
 msgid "Export Report"
 msgstr "Rapport d'exportation"
 
@@ -1660,9 +1721,9 @@ msgid "To:"
 msgstr "À:"
 
 #: includes/admin/dashboard/deprecated/class-wpgh-dashboard-page.php:157
-#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:48
 #: includes/admin/funnels/class-wpgh-funnels-table.php:138
 #: includes/admin/funnels/funnel-editor.php:99
+msgctxt "action"
 msgid "Refresh"
 msgstr "Rafraichir"
 
@@ -1673,32 +1734,51 @@ msgstr "Ventilation de l'entonnoir"
 
 #: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:29
 #: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:29
+msgctxt "notice"
 msgid "You have no active funnels."
 msgstr "Vous n'avez pas de entonnoirs actifs."
 
 #: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:84
 #: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:178
+msgctxt "column_title"
 msgid "Benchmark"
 msgstr "Référence"
 
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:85
+#: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:179
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:73
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:122
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:94
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:73
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:78
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:164
+msgctxt "column_title"
+msgid "Contacts"
+msgstr "Contacts"
+
 #: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:86
 #: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:180
+msgctxt "column_title"
 msgid "/ Total"
 msgstr "/Total"
 
 #: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:87
+msgctxt "column_title"
 msgid "/ Previous Step"
 msgstr "/Étape précédente"
 
 #: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:142
+msgctxt "notice"
 msgid "Please select a funnel first."
 msgstr "Veuillez d'abord sélectionner un entonnoir."
 
 #: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:151
+msgctxt "notice"
 msgid "This funnel has no benchmarks."
 msgstr "Cet entonnoir n'a pas de repères."
 
 #: includes/admin/dashboard/widgets/class-wpgh-funnel-breakdown-widget.php:181
+msgctxt "column_title"
 msgid "/ Previous"
 msgstr "/Précédent"
 
@@ -1709,10 +1789,17 @@ msgstr "Rapport de source de plomb"
 
 #: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:61
 #: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:134
+msgctxt "notice"
 msgid "No new lead sources to report."
 msgstr "Pas de nouvelles sources de plomb à signaler."
 
+#: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:72
+msgctxt "column_title"
+msgid "Lead Source"
+msgstr "Source de plomb"
+
 #: includes/admin/dashboard/widgets/class-wpgh-lead-source-widget.php:145
+msgctxt "column_title"
 msgid "Lead Source URL"
 msgstr "URL de source de prospect"
 
@@ -1720,6 +1807,7 @@ msgstr "URL de source de prospect"
 #: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:202
 #: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:179
 #: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:146
+msgctxt "column_title"
 msgid "Number of Contacts"
 msgstr "Nombre de contacts"
 
@@ -1729,10 +1817,12 @@ msgid "Most Active Funnels"
 msgstr "Entonnoirs les plus actifs"
 
 #: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:63
+msgctxt "column_title"
 msgid "Funnel"
 msgstr "Entonnoir"
 
 #: includes/admin/dashboard/widgets/class-wpgh-most-active-funnels.php:64
+msgctxt "column_title"
 msgid "Active Contacts"
 msgstr "Contacts actifs"
 
@@ -1742,40 +1832,46 @@ msgid "Form Activity Report"
 msgstr "Formulaire rapport d'activité"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:53
+msgctxt "stats"
 msgid "Form Fills"
 msgstr "Remplissages de formulaire"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:57
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:124
+msgctxt "stats"
 msgid "Form Impressions"
 msgstr "Impressions de formulaire"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:84
+msgctxt "stats"
 msgid "Total Impressions"
 msgstr "Total impressions"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:85
+msgctxt "stats"
 msgid "Total Submissions"
 msgstr "Total inscriptions "
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:86
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:126
+msgctxt "stats"
 msgid "Average Conversion Rate"
 msgstr "Taux de conversion moyen"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:122
 #: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:113
-#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:134
+msgctxt "stats"
 msgid "From"
 msgstr "De"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:123
 #: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:114
-#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:135
+msgctxt "stats"
 msgid "To"
 msgstr "À"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-form-activity.php:125
+msgctxt "stats"
 msgid "Form Submissions"
 msgstr "Soumissions de formulaires"
 
@@ -1785,16 +1881,24 @@ msgid "New Contacts Report"
 msgstr "Nouveau rapport de contacts"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:45
+msgctxt "stats"
 msgid "Optins"
 msgstr "Optins"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:75
+msgctxt "stats"
 msgid "Total Contacts"
 msgstr "Nombre total de contacts"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:76
+msgctxt "stats"
 msgid "Previous Period"
 msgstr "Période précédente"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-optins.php:115
+msgctxt "stats"
+msgid "Contacts"
+msgstr "Contacts"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:14
 msgctxt "widget_name"
@@ -1802,38 +1906,69 @@ msgid "Email Activity Report"
 msgstr "Rapport d'activité de courrier électronique"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:52
-#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:136
+msgctxt "stats"
 msgid "Emails Sent"
 msgstr "E-mails envoyés"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:56
-#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:137
+msgctxt "stats"
 msgid "Emails Opened"
 msgstr "Emails ouverts"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:60
-#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:138
+msgctxt "stats"
 msgid "Emails Clicked"
 msgstr "E-mails cliqués"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:91
+msgctxt "stats"
 msgid "Total Sent"
 msgstr "Total envoyé"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:92
+msgctxt "stats"
 msgid "Total Opened"
 msgstr "Total ouvert"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:93
+msgctxt "stats"
 msgid "Total Clicked"
 msgstr "Total cliqué"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:96
-#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:139
+msgctxt "stats"
 msgid "Average Open Rate"
 msgstr "Taux d'ouverture moyen"
 
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:97
+msgctxt "stats"
+msgid "Average Click Through Rate"
+msgstr "Taux de clics moyen"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:134
+msgid "From"
+msgstr "De"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:135
+msgid "To"
+msgstr "À"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:136
+msgid "Emails Sent"
+msgstr "E-mails envoyés"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:137
+msgid "Emails Opened"
+msgstr "Emails ouverts"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:138
+msgid "Emails Clicked"
+msgstr "E-mails cliqués"
+
+#: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:139
+msgid "Average Open Rate"
+msgstr "Taux d'ouverture moyen"
+
 #: includes/admin/dashboard/widgets/class-wpgh-report-send-emails.php:140
 msgid "Average Click Through Rate"
 msgstr "Taux de clics moyen"
@@ -1844,32 +1979,37 @@ msgid "Search Engine Report"
 msgstr "Rapport du moteur de recherche"
 
 #: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:110
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:190
+msgctxt "notice"
 msgid "No new search engine sources to report."
 msgstr "Aucune nouvelle source de moteur de recherche à signaler."
 
 #: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:121
+#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:201
+msgctxt "column_title"
 msgid "Search Engine"
 msgstr "Moteur de recherche"
-
-#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:190
-#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:82
-#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:167
-msgid "No new social media sources to report."
-msgstr "Pas de nouvelles sources de médias sociaux à signaler."
-
-#: includes/admin/dashboard/widgets/class-wpgh-search-engines-widget.php:201
-#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:178
-msgid "Social Media Source"
-msgstr "Source des médias sociaux"
 
 #: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:19
 msgctxt "widget_name"
 msgid "Social Media Report"
 msgstr "Rapport sur les médias sociaux"
 
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:82
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:167
+msgctxt "notice"
+msgid "No new social media sources to report."
+msgstr "Pas de nouvelles sources de médias sociaux à signaler."
+
 #: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:93
+msgctxt "column_title"
 msgid "Social Media Site"
 msgstr "Site des médias sociaux"
+
+#: includes/admin/dashboard/widgets/class-wpgh-social-media-widget.php:178
+msgctxt "column_title"
+msgid "Social Media Source"
+msgstr "Source des médias sociaux"
 
 #: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:17
 msgctxt "widget_name"
@@ -1877,14 +2017,22 @@ msgid "Source Page Report"
 msgstr "Rapport de page source"
 
 #: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:61
+msgctxt "notice"
 msgid "No new pages to report."
 msgstr "Pas de nouvelles pages à signaler."
 
+#: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:72
+msgctxt "column_title"
+msgid "Source Page"
+msgstr "Page source"
+
 #: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:134
+msgctxt "notice"
 msgid "No new sources to report."
 msgstr "Pas de nouvelles sources à rapporter."
 
 #: includes/admin/dashboard/widgets/class-wpgh-source-page-widget.php:145
+msgctxt "column_title"
 msgid "Source Page URL"
 msgstr "URL de la page source"
 
@@ -1982,6 +2130,10 @@ msgctxt "reporting_range"
 msgid "Custom Range"
 msgstr "Gamme personnalisée"
 
+#: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:48
+msgid "Refresh"
+msgstr "Rafraichir"
+
 #: includes/admin/dashboard/widgets/class-wpgh-time-range-widget.php:86
 msgid ""
 "Use this form to quickly change the reporting time for any Groundhogg "
@@ -1997,26 +2149,37 @@ msgstr "Rapport de campagne UTM"
 
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:62
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:146
+msgctxt "notice"
 msgid "Nothing new to report."
 msgstr "Rien de nouveau à signaler."
 
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:73
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:159
+msgctxt "column_title"
 msgid "Campaign"
 msgstr "Campagne"
 
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:74
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:160
+msgctxt "column_title"
 msgid "Source"
 msgstr "Source"
 
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:75
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:161
+msgctxt "column_title"
 msgid "Medium"
 msgstr "Moyen"
 
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:76
+#: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:162
+msgctxt "column_title"
+msgid "Content"
+msgstr "Contenu"
+
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:77
 #: includes/admin/dashboard/widgets/class-wpgh-utm-campaign-widget.php:163
+msgctxt "column_title"
 msgid "Term"
 msgstr "Terme"
 
@@ -2118,6 +2281,10 @@ msgstr "Centre"
 msgid "Right"
 msgstr "Droit"
 
+#: includes/admin/emails/blocks/wpgh-image-block.php:99
+msgid "Link"
+msgstr "Lien"
+
 #: includes/admin/emails/blocks/wpgh-spacer-block.php:31
 msgid "Spacer"
 msgstr "Séparateur"
@@ -2168,13 +2335,13 @@ msgstr "Taille de paragraphe"
 msgid "Paragraph Font"
 msgstr "Police de paragraphe"
 
+#: includes/admin/emails/class-wpgh-emails-page.php:93
 #: includes/admin/emails/class-wpgh-emails-page.php:94
-#: includes/admin/emails/class-wpgh-emails-page.php:95
 msgctxt "page_title"
 msgid "Emails"
 msgstr "Courriels"
 
-#: includes/admin/emails/class-wpgh-emails-page.php:112
+#: includes/admin/emails/class-wpgh-emails-page.php:111
 msgid ""
 "Unlike most marketing automation platforms Groundhogg made the decision to "
 "<strong>store emails globally</strong>. That means that you can use the same "
@@ -2190,7 +2357,14 @@ msgstr ""
 "modifier/supprimer </strong> e-mails et voir leurs taux d'ouverture "
 "respectifs sur différents entonnoirs."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:121
+#: includes/admin/emails/class-wpgh-emails-page.php:119
+#: includes/admin/emails/class-wpgh-emails-page.php:670
+#: includes/admin/emails/email-editor.php:48
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1008
+msgid "Add New"
+msgstr "Ajouter nouveau"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:120
 msgid ""
 "When you add a new email you can either select a pre-written email template "
 "created by our in house digital marketing specialists or you can select one "
@@ -2201,7 +2375,7 @@ msgstr ""
 "marketing numérique interne ou vous pouvez sélectionner l'un de vos propres "
 "e-mails écrits passés à copier."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:129
+#: includes/admin/emails/class-wpgh-emails-page.php:128
 #, php-format
 msgid ""
 "When you are editing an email, you can drag in new blocks from the right "
@@ -2223,7 +2397,7 @@ msgstr ""
 "que notre constructeur de messagerie est optimisé pour une meilleure "
 "consommation mobile."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:131
+#: includes/admin/emails/class-wpgh-emails-page.php:130
 msgid ""
 "When you believe an email is ready for sending set the status to "
 "<strong>Ready</strong> and then you can use it in any broadcast or funnel. "
@@ -2233,11 +2407,11 @@ msgstr ""
 "<strong> Ready </strong>, puis vous pouvez l'utiliser dans n'importe quelle "
 "émission ou entonnoir. Un e-mail en mode brouillon ne sera pas envoyé."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:138
+#: includes/admin/emails/class-wpgh-emails-page.php:137
 msgid "Testing"
 msgstr "Test"
 
-#: includes/admin/emails/class-wpgh-emails-page.php:139
+#: includes/admin/emails/class-wpgh-emails-page.php:138
 msgid ""
 "To test an email simply check off the <strong>Send Test</strong> checkbox "
 "and select the user account you'd like to send the test to. For best "
@@ -2250,72 +2424,75 @@ msgstr ""
 "texte facile à lire et à écrire du bon contenu. Les tests seront envoyés "
 "indépendamment de l'état actuel de l'e-mail."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:200
+#: includes/admin/emails/class-wpgh-emails-page.php:199
 msgid "Add Email"
 msgstr "Ajouter un E-mail"
 
-#: includes/admin/emails/class-wpgh-emails-page.php:206
-#: includes/admin/emails/class-wpgh-emails-page.php:269
-#: includes/admin/emails/class-wpgh-emails-page.php:292
-#: includes/admin/emails/class-wpgh-emails-page.php:317
-#: includes/admin/emails/class-wpgh-emails-page.php:340
+#: includes/admin/emails/class-wpgh-emails-page.php:202
+#: includes/admin/emails/email-editor.php:48
+msgid "Edit Email"
+msgstr "Modifier le courrier électronique"
+
+#: includes/admin/emails/class-wpgh-emails-page.php:205
+#: includes/admin/emails/class-wpgh-emails-page.php:268
+#: includes/admin/emails/class-wpgh-emails-page.php:291
+#: includes/admin/emails/class-wpgh-emails-page.php:316
+#: includes/admin/emails/class-wpgh-emails-page.php:339
 msgid "Emails"
 msgstr "Courriels"
 
-#: includes/admin/emails/class-wpgh-emails-page.php:267
+#: includes/admin/emails/class-wpgh-emails-page.php:266
 msgid "Trashed"
 msgstr "Dans la poubelle."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:290
-#: includes/admin/emails/class-wpgh-emails-page.php:315
-#: includes/admin/funnels/class-wpgh-funnels-page.php:397
+#: includes/admin/emails/class-wpgh-emails-page.php:289
+#: includes/admin/emails/class-wpgh-emails-page.php:314
 msgid "Deleted"
 msgstr "Supprimé"
 
-#: includes/admin/emails/class-wpgh-emails-page.php:338
-#: includes/admin/funnels/class-wpgh-funnels-page.php:422
+#: includes/admin/emails/class-wpgh-emails-page.php:337
 msgid "Restored"
 msgstr "Restauré"
 
-#: includes/admin/emails/class-wpgh-emails-page.php:391
-#: includes/admin/emails/class-wpgh-emails-page.php:407
+#: includes/admin/emails/class-wpgh-emails-page.php:390
+#: includes/admin/emails/class-wpgh-emails-page.php:406
 msgid "Could not create email."
 msgstr "Impossible de créer un e-mail."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:474
+#: includes/admin/emails/class-wpgh-emails-page.php:473
 msgid "This email will not be sent while in DRAFT mode."
 msgstr "Cet e-mail ne sera pas envoyé en mode brouillon."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:492
+#: includes/admin/emails/class-wpgh-emails-page.php:491
 msgid "Email Updated."
 msgstr "Courriel mis à jour."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:494
+#: includes/admin/emails/class-wpgh-emails-page.php:493
 #: includes/class-wpgh-submission.php:290
 #: includes/class-wpgh-submission.php:523
 #: includes/class-wpgh-submission.php:539
 msgid "Something went wrong."
 msgstr "Oups! Quelque chose ne va pas."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:534
-#: includes/admin/emails/class-wpgh-emails-page.php:536
-#: includes/admin/emails/class-wpgh-emails-page.php:551
+#: includes/admin/emails/class-wpgh-emails-page.php:533
+#: includes/admin/emails/class-wpgh-emails-page.php:535
+#: includes/admin/emails/class-wpgh-emails-page.php:550
 msgid "Failed to send test: "
 msgstr "Échec de l'envoi du test:"
 
-#: includes/admin/emails/class-wpgh-emails-page.php:542
+#: includes/admin/emails/class-wpgh-emails-page.php:541
 msgid "Sent test email to"
 msgstr "E-mail de test envoyé à"
 
-#: includes/admin/emails/class-wpgh-emails-page.php:551
+#: includes/admin/emails/class-wpgh-emails-page.php:550
 msgid "No user selected. PLease select a user to send the test to."
 msgstr ""
 "Aucun utilisateur sélectionné. Veuillez sélectionner un utilisateur auquel "
 "envoyer le test."
 
-#: includes/admin/emails/class-wpgh-emails-page.php:579
-#: includes/admin/emails/class-wpgh-emails-page.php:581
-msgid "Search Emails "
+#: includes/admin/emails/class-wpgh-emails-page.php:578
+#: includes/admin/emails/class-wpgh-emails-page.php:580
+msgid "Search Emails"
 msgstr "Rechercher des E-mails"
 
 #: includes/admin/emails/class-wpgh-emails-table.php:51
@@ -2343,6 +2520,10 @@ msgstr "Dernière mise à jour"
 msgid "Empty Trash"
 msgstr "Vider la corbeille"
 
+#: includes/admin/emails/class-wpgh-emails-table.php:104
+msgid "All"
+msgstr "Tous"
+
 #: includes/admin/emails/class-wpgh-emails-table.php:106
 msgid "Ready"
 msgstr "Traitée"
@@ -2358,7 +2539,6 @@ msgid "Trash"
 msgstr "Corbeille"
 
 #: includes/admin/emails/class-wpgh-emails-table.php:153
-#: includes/admin/funnels/class-wpgh-funnels-table.php:195
 msgid "Restore"
 msgstr "Restaurer"
 
@@ -2372,18 +2552,17 @@ msgid "The Contact's Owner"
 msgstr "Le propriétaire du contact"
 
 #: includes/admin/emails/class-wpgh-emails-table.php:250
-#: includes/admin/funnels/class-wpgh-funnels-table.php:250
 msgid "Updated"
 msgstr "Mis à jour"
 
 #: includes/admin/emails/class-wpgh-emails-table.php:300
-#: includes/admin/funnels/class-wpgh-funnels-table.php:314
+#: includes/admin/funnels/class-wpgh-funnels-table.php:313
 msgctxt "List table bulk action"
 msgid "Delete Permanently"
 msgstr "Supprimer Définitivement"
 
 #: includes/admin/emails/class-wpgh-emails-table.php:301
-#: includes/admin/funnels/class-wpgh-funnels-table.php:315
+#: includes/admin/funnels/class-wpgh-funnels-table.php:314
 msgctxt "List table bulk action"
 msgid "Restore"
 msgstr "Restaurer"
@@ -2435,35 +2614,32 @@ msgstr "Veuillez sélectionner un."
 msgid "Blocks"
 msgstr "Blocs"
 
+#: includes/admin/events/class-wpgh-events-page.php:48
 #: includes/admin/events/class-wpgh-events-page.php:49
-#: includes/admin/events/class-wpgh-events-page.php:50
+#: includes/admin/events/class-wpgh-events-page.php:101
 msgctxt "page_title"
 msgid "Events"
 msgstr "Événements"
 
-#: includes/admin/events/class-wpgh-events-page.php:102
-msgid "Add Event"
-msgstr "Ajouter événement"
+#: includes/admin/events/class-wpgh-events-page.php:131
+#, php-format
+msgctxt "notice"
+msgid "%d event cancelled"
+msgid_plural "%d events cancelled"
+msgstr[0] "%d événement annulé"
+msgstr[1] "%d événement annulé"
 
-#: includes/admin/events/class-wpgh-events-page.php:105
-msgid "Edit Event"
-msgstr "Edit, événement"
+#: includes/admin/events/class-wpgh-events-page.php:157
+#, php-format
+msgctxt "notice"
+msgid "%d event rescheduled"
+msgid_plural "%d events rescheduled"
+msgstr[0] "%d événements rééchellé"
+msgstr[1] "%d événements rééchellé"
 
-#: includes/admin/events/class-wpgh-events-page.php:108
-msgid "Events"
-msgstr "Événements"
-
-#: includes/admin/events/class-wpgh-events-page.php:138
-msgid "events cancelled"
-msgstr "événements annulés"
-
-#: includes/admin/events/class-wpgh-events-page.php:164
-msgid "events rescheduled"
-msgstr "événements rééchellé"
-
-#: includes/admin/events/class-wpgh-events-page.php:200
-#: includes/admin/events/class-wpgh-events-page.php:202
-msgid "Search Events "
+#: includes/admin/events/class-wpgh-events-page.php:193
+#: includes/admin/events/class-wpgh-events-page.php:195
+msgid "Search Events"
 msgstr "Rechercher des événements"
 
 #: includes/admin/events/class-wpgh-events-table.php:46
@@ -2472,35 +2648,38 @@ msgid "Contact"
 msgstr "Contact"
 
 #: includes/admin/events/class-wpgh-events-table.php:89
+msgctxt "status"
 msgid "contact deleted"
 msgstr "contact supprimé"
 
-#: includes/admin/events/class-wpgh-events-table.php:111
-msgid "deleted"
-msgstr "supprimé"
-
-#: includes/admin/events/class-wpgh-events-table.php:137
-msgid "(step deleted)"
-msgstr "(étape supprimée)"
-
 #: includes/admin/events/class-wpgh-events-table.php:152
 #, php-format
+msgctxt "action"
 msgid "Process Events (Auto Runs In %s)"
 msgstr "Événements de processus (exécutions automatiques dans %s)"
 
 #: includes/admin/events/class-wpgh-events-table.php:174
+msgctxt "status"
 msgid "Will run"
 msgstr "S'exécutera"
 
+#: includes/admin/events/class-wpgh-events-table.php:177
+msgctxt "status"
+msgid "Cancelled"
+msgstr "Annulée"
+
 #: includes/admin/events/class-wpgh-events-table.php:180
+msgctxt "status"
 msgid "Skipped"
 msgstr "Ignoré"
 
 #: includes/admin/events/class-wpgh-events-table.php:183
+msgctxt "status"
 msgid "Processed"
 msgstr "Traitées"
 
 #: includes/admin/events/class-wpgh-events-table.php:186
+msgctxt "status"
 msgid "Failed"
 msgstr "Échec"
 
@@ -2515,62 +2694,79 @@ msgid "Cancel"
 msgstr "Annuler"
 
 #: includes/admin/events/class-wpgh-events-table.php:271
-msgid "Waiting <span class=\"count\">("
-msgstr "Attente < span class = \"count\" > ("
+msgctxt "view"
+msgid "Waiting"
+msgstr "Attente:"
 
 #: includes/admin/events/class-wpgh-events-table.php:272
-msgid "Skipped <span class=\"count\">("
-msgstr "Ignoré < span class = \"count\" > ("
-
-#: includes/admin/events/class-wpgh-events-table.php:273
-msgid "Cancelled <span class=\"count\">("
-msgstr "Annulé < span class = \"count\" > ("
+msgctxt "view"
+msgid "Skipped"
+msgstr "Ignoré"
 
 #: includes/admin/events/class-wpgh-events-table.php:274
-msgid "Completed <span class=\"count\">("
-msgstr "Terminé < span class = \"count\" > ("
+msgctxt "view"
+msgid "Completed"
+msgstr "Terminé:"
 
 #: includes/admin/events/class-wpgh-events-table.php:394
+msgctxt "action"
 msgid "Execute"
 msgstr "Exécuter"
 
 #: includes/admin/events/class-wpgh-events-table.php:420
 #: includes/admin/events/class-wpgh-events-table.php:421
+msgctxt "action"
 msgid "View Contact"
 msgstr "Voir contact"
 
+#: includes/admin/extensions/module-manager.php:113
+msgctxt "notice"
+msgid "Invalid license format"
+msgstr "Licence invalide."
+
 #: includes/admin/extensions/module-manager.php:144
-#: includes/admin/extensions/module-manager.php:172
 msgid "An error occurred, please try again."
 msgstr "Une erreur s'est produite, Veuillez réessayer."
 
 #: includes/admin/extensions/module-manager.php:151
 #, php-format
+msgctxt "notice"
 msgid "Your license key expired on %s."
 msgstr "Votre clé de licence a expiré sur %s."
 
 #: includes/admin/extensions/module-manager.php:156
+msgctxt "notice"
 msgid "Your license key has been disabled."
 msgstr "Votre clé de licence a été désactivée."
 
 #: includes/admin/extensions/module-manager.php:159
+msgctxt "notice"
 msgid "Invalid license."
 msgstr "Licence invalide."
 
 #: includes/admin/extensions/module-manager.php:163
+msgctxt "notice"
 msgid "Your license is not active for this URL."
 msgstr "Votre licence n'est pas active pour cette URL."
 
 #: includes/admin/extensions/module-manager.php:166
+msgctxt "notice"
 msgid "This appears to be an invalid license key"
 msgstr "Il s'agit d'une clé de licence non valide"
 
 #: includes/admin/extensions/module-manager.php:169
+msgctxt "notice"
 msgid "Your license key has reached its activation limit."
 msgstr "Votre clé de licence a atteint sa limite d'activation."
 
+#: includes/admin/extensions/module-manager.php:172
+msgctxt "notice"
+msgid "An error occurred, please try again."
+msgstr "Une erreur s'est produite, Veuillez réessayer."
+
 #: includes/admin/extensions/module-manager.php:189
-msgid "License Activated"
+msgctxt "notice"
+msgid "License activated"
 msgstr "Licence activée"
 
 #: includes/admin/extensions/module-manager.php:235
@@ -2592,17 +2788,19 @@ msgid "Get your first extension!"
 msgstr "Obtenez votre première extension!"
 
 #: includes/admin/extensions/module-manager.php:286
-msgid "No data. See your account at Groundhogg.io"
+msgctxt "notice"
+msgid "No data. See your account at groundhogg.io"
 msgstr "Pas de données. Voir votre compte à Groundhogg.io"
 
 #: includes/admin/extensions/module-manager.php:309
+msgctxt "action"
 msgid "Activate Extension"
 msgstr "Activer l'extension"
 
-#: includes/admin/extensions/module-manager.php:312
+#: includes/admin/extensions/module-manager.php:313
 #, php-format
-msgid "<p>Your license expires on %s</p>"
-msgstr "<p> votre licence expire sur %s </p>"
+msgid "Your license expires on %s"
+msgstr "Votre licence expire sur %s"
 
 #: includes/admin/extensions/updater/EDD_SL_Plugin_Updater.php:235
 #, php-format
@@ -2630,18 +2828,22 @@ msgid "Error"
 msgstr "Erreur"
 
 #: includes/admin/funnels/add-funnel.php:24
+msgctxt "add_funnel_tab"
 msgid "Funnel Templates"
 msgstr "Modèles d'entonnoir"
 
 #: includes/admin/funnels/add-funnel.php:25
+msgctxt "add_funnel_tab"
 msgid "Marketplace"
 msgstr "Marché"
 
 #: includes/admin/funnels/add-funnel.php:26
+msgctxt "add_funnel_tab"
 msgid "Import Funnel"
 msgstr "Entonnoir d'importation"
 
 #: includes/admin/funnels/add-funnel.php:43
+msgctxt "action"
 msgid "Start Building"
 msgstr "Commencer la construction"
 
@@ -2655,13 +2857,13 @@ msgid ""
 "\"https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/"
 "\">Get Started Now!</a>"
 msgstr ""
-"Vous voulez partager votre entonnoir avec le monde? < a target = \"_ blank\" "
-"href = \"https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-"
-"io/\" > Commencez dès maintenant! </a>"
+"Vous voulez partager votre entonnoir avec le monde? <a target=\"_blank\" "
+"href=\"https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-"
+"io/\"> Commencez dès maintenant! </a>"
 
 #: includes/admin/funnels/add-funnel.php:65
-msgid "Type in a search term like \"Webinar\"..."
-msgstr "Tapez dans un terme de recherche comme \"Webinar\"..."
+msgid "Type in a search term like <i>Webinar</i>..."
+msgstr "Tapez dans un terme de recherche comme <i> Webinar </i>..."
 
 #: includes/admin/funnels/add-funnel.php:123
 msgid ""
@@ -2671,16 +2873,18 @@ msgstr ""
 "entonnoir), vous pouvez le télécharger ici!"
 
 #: includes/admin/funnels/add-funnel.php:127
+msgctxt "action"
 msgid "Import Funnels"
 msgstr "Entonnoirs d'importation"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:113
 #: includes/admin/funnels/class-wpgh-funnels-page.php:114
+#: includes/admin/funnels/class-wpgh-funnels-page.php:115
+#: includes/admin/funnels/class-wpgh-funnels-page.php:302
 msgctxt "page_title"
 msgid "Funnels"
 msgstr "Entonnoirs"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:134
+#: includes/admin/funnels/class-wpgh-funnels-page.php:135
 msgid ""
 "Here you can edit your funnels. A funnel is a set of steps which can run "
 "automation based on contact interactions with your site. You can view the "
@@ -2693,7 +2897,7 @@ msgstr ""
 "dans chaque entonnoir, ainsi que lors de sa création et de sa dernière mise "
 "à jour."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:135
+#: includes/admin/funnels/class-wpgh-funnels-page.php:136
 msgid ""
 "Funnels can be either Active/Inactive/Archived. If a funnel is Inactive, no "
 "contacts can enter and any contacts that may have been in the funnel will "
@@ -2706,11 +2910,11 @@ msgstr ""
 "entonnoirs archivés qui ne s'affichent tout simplement pas dans la liste "
 "principale."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:142
+#: includes/admin/funnels/class-wpgh-funnels-page.php:143
 msgid "Add A Funnel"
 msgstr "Ajouter un entonnoir"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:143
+#: includes/admin/funnels/class-wpgh-funnels-page.php:144
 msgid ""
 "To create a new funnel, simply click the Add New Button in the top left and "
 "select a pre-built funnel template. If you have a funnel import file you can "
@@ -2723,7 +2927,7 @@ msgstr ""
 "l'onglet d'importation et télécharger le fichier entonnoir qui va générer "
 "automatiquement un entonnoir pour vous."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:151
+#: includes/admin/funnels/class-wpgh-funnels-page.php:152
 msgid ""
 "When editing a funnel you can add Funnel Steps. Funnel Steps are either "
 "Benchmarks or Actions. Benchmarks are whenever a Contact \"does\" something, "
@@ -2737,7 +2941,7 @@ msgstr ""
 "de faire glisser dans les étapes de l'entonnoir désiré dans n'importe quel "
 "ordre."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:152
+#: includes/admin/funnels/class-wpgh-funnels-page.php:153
 msgid ""
 "Actions are run sequentially, so when an action takes place, it simply loads "
 "the next action. That means if you need to change it you can!"
@@ -2746,7 +2950,7 @@ msgstr ""
 "elle charge simplement l'action suivante. Cela signifie que si vous avez "
 "besoin de le changer, vous pouvez!"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:153
+#: includes/admin/funnels/class-wpgh-funnels-page.php:154
 msgid ""
 "Benchmarks are a bit different. If you have several benchmarks in a row, "
 "what happens is once one of them is completed by a contact the first action "
@@ -2759,7 +2963,7 @@ msgstr ""
 "en sautant tous les autres repères. De cette façon, vous pouvez avoir "
 "plusieurs déclencheurs d'automatisation."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:154
+#: includes/admin/funnels/class-wpgh-funnels-page.php:155
 msgid ""
 "Once a benchmark is complete all elements that are scheduled before that "
 "benchmark will stop immediately."
@@ -2767,11 +2971,11 @@ msgstr ""
 "Une fois qu'une référence est terminée, tous les éléments qui sont "
 "programmés avant cette référence s'arrêtent immédiatement."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:161
+#: includes/admin/funnels/class-wpgh-funnels-page.php:162
 msgid "Reporting"
 msgstr "Rapports"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:162
+#: includes/admin/funnels/class-wpgh-funnels-page.php:163
 msgid ""
 "To view funnel reporting, simply dgo to the editing screen of any funnel, "
 "and then toggle the Reporting/Editing switch in the reporting box. You can "
@@ -2784,50 +2988,72 @@ msgstr ""
 "plage de temps que vous souhaitez afficher en utilisant la liste déroulante "
 "à gauche et cliquez sur le bouton de filtre."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:295
+#: includes/admin/funnels/class-wpgh-funnels-page.php:296
+msgctxt "page_title"
 msgid "Add Funnel"
 msgstr "Ajouter entonnoir"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:298
+#: includes/admin/funnels/class-wpgh-funnels-page.php:299
+msgctxt "page_title"
 msgid "Edit Funnel"
 msgstr "Modifier l'entonnoir"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:301
-msgid "Funnels"
-msgstr "Entonnoirs"
-
-#: includes/admin/funnels/class-wpgh-funnels-page.php:354
-msgid "Funnel Duplicated"
+#: includes/admin/funnels/class-wpgh-funnels-page.php:355
+msgctxt "notice"
+msgid "Funnel duplicated"
 msgstr "Entonnoir dupliqué"
 
 #: includes/admin/funnels/class-wpgh-funnels-page.php:374
-#: includes/admin/funnels/class-wpgh-funnels-table.php:97
-msgid "Archived"
-msgstr "Archivé"
+#, php-format
+msgctxt "notice"
+msgid "Archived %d funnel"
+msgid_plural "Archived %d funnels"
+msgstr[0] "Entonnoir %d archivé"
+msgstr[1] "Entonnoir %d archivé"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:524
+#: includes/admin/funnels/class-wpgh-funnels-page.php:394
+#, php-format
+msgctxt "notice"
+msgid "Deleted %d funnel"
+msgid_plural "Deleted %d funnels"
+msgstr[0] "Supprimé %d contacts."
+msgstr[1] "Supprimé %d contacts."
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:416
+#, php-format
+msgctxt "notice"
+msgid "Restored %d funnel"
+msgid_plural "Deleted %d funnels"
+msgstr[0] "Entonnoir %d restauré"
+msgstr[1] "Entonnoir %d restauré"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:516
+msgctxt "notice"
 msgid "Please select a template..."
 msgstr "Veuillez sélectionner un modèle..."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:535
-msgid "Funnel Created"
+#: includes/admin/funnels/class-wpgh-funnels-page.php:527
+msgctxt "notice"
+msgid "Funnel created"
 msgstr "Entonnoir créé"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:584
+#: includes/admin/funnels/class-wpgh-funnels-page.php:576
 #: includes/admin/funnels/funnel-editor.php:290
 msgid "Drag in new steps to build the ultimate sales machine!"
 msgstr ""
 "Faites glisser les nouvelles étapes pour créer la machine de vente ultime!"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:655
+#: includes/admin/funnels/class-wpgh-funnels-page.php:647
+msgctxt "stats"
 msgid "Completed Events"
 msgstr "Événements terminés"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:659
+#: includes/admin/funnels/class-wpgh-funnels-page.php:651
 msgid "Waiting Contacts"
 msgstr "Contacts en attente"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:680
+#: includes/admin/funnels/class-wpgh-funnels-page.php:672
+msgctxt "notice"
 msgid ""
 "Your [max_input_vars] is too small for your funnel! You may experience odd "
 "behaviour and your funnel may not save correctly. Please <a target=\"_blank"
@@ -2836,42 +3062,57 @@ msgid ""
 msgstr ""
 "Votre [max_input_vars] est trop petit pour votre entonnoir! Vous pouvez "
 "éprouver un comportement impair et votre entonnoir peut ne pas enregistrer "
-"correctement. S'il vous plaît < a target = \"_ blank\" href = \"http://www."
-"google.com/search?q? q = augmenter + max_input_vars + php\" > Augmentez "
-"votre [max_input_vars] à au moins doubler la taille actuelle. </a>."
+"correctement. S'il vous plaît <a target=\"_blank\" href=\"http://www.google."
+"com/search?q=increase+max_input_vars+php\"> Augmentez votre [max_input_vars] "
+"à au moins doubler la taille actuelle. </a>."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:699
-msgid "Funnel no longer active."
+#: includes/admin/funnels/class-wpgh-funnels-page.php:691
+msgctxt "notice"
+msgid "Funnel is currently inactive"
 msgstr "L'entonnoir n'est plus actif."
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:757
+#: includes/admin/funnels/class-wpgh-funnels-page.php:748
+msgctxt "notice"
 msgid "Funnels must start with 1 or more benchmarks"
 msgstr "Les entonnoirs doivent commencer par 1 ou plusieurs repères"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:763
-msgid "Funnel Updated"
+#: includes/admin/funnels/class-wpgh-funnels-page.php:753
+msgctxt "notice"
+msgid "Funnel updated"
 msgstr "Entonnoir mis à jour"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:934
+#: includes/admin/funnels/class-wpgh-funnels-page.php:924
 #, php-format
-msgid "%d contacts added to funnel!"
-msgstr "% d contacts ajoutés à l'entonnoir!"
+msgctxt "notice"
+msgid "%d contact added to funnel"
+msgid_plural "%d contacts added to funnel"
+msgstr[0] "%d contacts ajoutés à l'entonnoir!"
+msgstr[1] "%d contacts ajoutés à l'entonnoir!"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:971
-#: includes/admin/funnels/class-wpgh-funnels-page.php:973
-msgid "Search Funnels "
+#: includes/admin/funnels/class-wpgh-funnels-page.php:961
+#: includes/admin/funnels/class-wpgh-funnels-page.php:963
+msgid "Search Funnels"
 msgstr "Entonnoirs de recherche"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:1098
-#: includes/admin/funnels/class-wpgh-funnels-page.php:1107
-msgid "Buy Now ($"
-msgstr "Acheter maintenant ($"
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1088
+#, php-format
+msgctxt "action"
+msgid "Buy Now ($%s - $%s)"
+msgstr "Acheter maintenant ($%s - $%s)"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:1112
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1097
+#, php-format
+msgctxt "action"
+msgid "Buy Now ($%s)"
+msgstr "Acheter maintenant ($%s)"
+
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1102
+msgctxt "action"
 msgid "Download"
 msgstr "Télécharger"
 
-#: includes/admin/funnels/class-wpgh-funnels-page.php:1122
+#: includes/admin/funnels/class-wpgh-funnels-page.php:1112
+msgctxt "notice"
 msgid "Sorry, no templates were found."
 msgstr "Désolé, aucun modèle n'a été trouvé."
 
@@ -2891,31 +3132,58 @@ msgid "Date Created"
 msgstr "Date de création"
 
 #: includes/admin/funnels/class-wpgh-funnels-table.php:95
+msgctxt "view"
 msgid "Active"
 msgstr "Actif"
 
 #: includes/admin/funnels/class-wpgh-funnels-table.php:96
-#: includes/admin/funnels/class-wpgh-funnels-table.php:219
+msgctxt "view"
 msgid "Inactive"
 msgstr "Inactif"
 
-#: includes/admin/funnels/class-wpgh-funnels-table.php:198
+#: includes/admin/funnels/class-wpgh-funnels-table.php:97
+msgctxt "view"
+msgid "Archived"
+msgstr "Archivé"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:194
+msgctxt "action"
+msgid "Restore"
+msgstr "Restaurer"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:195
+msgctxt "action"
+msgid "Delete Permanently"
+msgstr "Supprimer Définitivement"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:197
 msgid "Build"
 msgstr "Construire"
 
-#: includes/admin/funnels/class-wpgh-funnels-table.php:199
+#: includes/admin/funnels/class-wpgh-funnels-table.php:198
+msgctxt "action"
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: includes/admin/funnels/class-wpgh-funnels-table.php:200
+#: includes/admin/funnels/class-wpgh-funnels-table.php:199
 msgid "Archive"
 msgstr "Archive"
 
-#: includes/admin/funnels/class-wpgh-funnels-table.php:208
+#: includes/admin/funnels/class-wpgh-funnels-table.php:207
 msgid "no title"
 msgstr "pas de titre"
 
-#: includes/admin/funnels/class-wpgh-funnels-table.php:320
+#: includes/admin/funnels/class-wpgh-funnels-table.php:218
+msgctxt "status"
+msgid "Inactive"
+msgstr "Inactif"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:249
+msgctxt "status"
+msgid "Updated"
+msgstr "Mis à jour"
+
+#: includes/admin/funnels/class-wpgh-funnels-table.php:319
 msgctxt "List table bulk action"
 msgid "Archive"
 msgstr "Archive"
@@ -2926,6 +3194,7 @@ msgstr "Entrez le nom de l'entonnoir ici"
 
 #: includes/admin/funnels/funnel-editor.php:110
 #: includes/admin/funnels/funnel-editor.php:167
+msgctxt "action"
 msgid "Add Contacts"
 msgstr "Ajouter des contacts"
 
@@ -2938,6 +3207,7 @@ msgid "Select where to start:"
 msgstr "Sélectionnez l'endroit où commencer:"
 
 #: includes/admin/funnels/funnel-editor.php:175
+msgctxt "action"
 msgid "Export Funnel"
 msgstr "Entonnoir d'exportation"
 
@@ -2956,14 +3226,10 @@ msgid "Actions are launched whenever a contact completes a benchmark."
 msgstr ""
 "Des actions sont lancées chaque fois qu'un contact termine une référence."
 
-#: includes/admin/funnels/funnel-editor.php:313
-msgid "Auto Saved..."
-msgstr "Auto sauvé..."
-
 #: includes/admin/multisite/class-wpgh-network-settings-page.php:61
-#: includes/admin/settings/class-wpgh-settings-page.php:86
 #: includes/admin/settings/class-wpgh-settings-page.php:87
-#: includes/admin/settings/class-wpgh-settings-page.php:722
+#: includes/admin/settings/class-wpgh-settings-page.php:88
+#: includes/admin/settings/class-wpgh-settings-page.php:723
 msgid "Settings"
 msgstr "Paramètres"
 
@@ -2989,8 +3255,7 @@ msgstr ""
 "active ainsi."
 
 #: includes/admin/multisite/class-wpgh-network-settings-page.php:89
-#: includes/class-wpgh-html.php:100 includes/class-wpgh-popup.php:33
-#: includes/class-wpgh-popup.php:61
+msgctxt "action"
 msgid "Save Changes"
 msgstr "Enregistrer les modifications"
 
@@ -3007,185 +3272,196 @@ msgid "API Keys"
 msgstr "Clés API"
 
 #: includes/admin/settings/class-wpgh-api-keys-table.php:141
+msgctxt "action"
 msgid "Reissue"
 msgstr "Réédition"
 
 #: includes/admin/settings/class-wpgh-api-keys-table.php:146
+msgctxt "action"
 msgid "Revoke"
 msgstr "Révoquer"
 
+#: includes/admin/settings/class-wpgh-api-keys-table.php:162
+msgctxt "column_title"
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
 #: includes/admin/settings/class-wpgh-api-keys-table.php:163
+msgctxt "column_title"
 msgid "Public Key"
 msgstr "Clé publique"
 
 #: includes/admin/settings/class-wpgh-api-keys-table.php:164
+msgctxt "column_title"
 msgid "Token"
 msgstr "Jeton"
 
 #: includes/admin/settings/class-wpgh-api-keys-table.php:165
+msgctxt "column_title"
 msgid "Secret Key"
 msgstr "Clé secrète"
 
-#: includes/admin/settings/class-wpgh-api-keys-table.php:198
+#: includes/admin/settings/class-wpgh-api-keys-table.php:190
 msgid "Please Select a User"
 msgstr "Veuillez sélectionner un utilisateur"
 
-#: includes/admin/settings/class-wpgh-api-keys-table.php:199
+#: includes/admin/settings/class-wpgh-api-keys-table.php:191
+msgctxt "action"
 msgid "Generate New API Keys"
 msgstr "Générer de nouvelles clés d'API"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:113
+#: includes/admin/settings/class-wpgh-settings-page.php:114
 msgctxt "settings_tabs"
 msgid "General"
 msgstr "Général"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:117
+#: includes/admin/settings/class-wpgh-settings-page.php:118
 msgctxt "settings_tabs"
 msgid "Marketing"
 msgstr "Marketing"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:121
+#: includes/admin/settings/class-wpgh-settings-page.php:122
 msgctxt "settings_tabs"
 msgid "Email"
 msgstr "Courriel"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:125
+#: includes/admin/settings/class-wpgh-settings-page.php:126
 msgctxt "settings_tabs"
 msgid "Tools"
 msgstr "Outils"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:129
+#: includes/admin/settings/class-wpgh-settings-page.php:130
 msgctxt "settings_tabs"
 msgid "Licenses"
 msgstr "Licences"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:133
+#: includes/admin/settings/class-wpgh-settings-page.php:134
 msgctxt "settings_tabs"
 msgid "API"
 msgstr "Api"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:148
+#: includes/admin/settings/class-wpgh-settings-page.php:149
 msgctxt "settings_sections"
 msgid "Business Settings"
 msgstr "Config. Entreprise"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:153
+#: includes/admin/settings/class-wpgh-settings-page.php:154
 msgctxt "settings_sections"
 msgid "Misc Settings"
 msgstr "Paramètres divers"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:158
+#: includes/admin/settings/class-wpgh-settings-page.php:159
 msgctxt "settings_sections"
 msgid "Pages"
 msgstr "Pages"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:163
+#: includes/admin/settings/class-wpgh-settings-page.php:164
 msgctxt "settings_sections"
 msgid "Captcha"
 msgstr "Captcha"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:168
+#: includes/admin/settings/class-wpgh-settings-page.php:169
 msgctxt "settings_sections"
 msgid "Compliance"
 msgstr "Conformité"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:173
+#: includes/admin/settings/class-wpgh-settings-page.php:174
 msgctxt "settings_sections"
 msgid "Email Bounces"
 msgstr "Rebonds par e-mail"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:178
+#: includes/admin/settings/class-wpgh-settings-page.php:179
 msgctxt "settings_sections"
 msgid "Groundhogg Email Service"
 msgstr "Service de messagerie Groundhogg"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:183
+#: includes/admin/settings/class-wpgh-settings-page.php:184
 msgctxt "settings_sections"
 msgid "API Settings"
 msgstr "Paramètres de l'API"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:233
+#: includes/admin/settings/class-wpgh-settings-page.php:234
 msgctxt "settings"
 msgid "Business Name"
 msgstr "Nom d'entreprise"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:234
+#: includes/admin/settings/class-wpgh-settings-page.php:235
 msgctxt "settings"
 msgid "Your business name as it appears in the email footer."
 msgstr ""
 "Nom de votre entreprise tel qu'il apparaît dans le pied de page de l'e-mail."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:245
+#: includes/admin/settings/class-wpgh-settings-page.php:246
 msgctxt "settings"
 msgid "Street Address 1"
 msgstr "Adresse postale 1"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:246
-#: includes/admin/settings/class-wpgh-settings-page.php:270
-#: includes/admin/settings/class-wpgh-settings-page.php:282
-#: includes/admin/settings/class-wpgh-settings-page.php:294
-#: includes/admin/settings/class-wpgh-settings-page.php:306
-#: includes/admin/settings/class-wpgh-settings-page.php:318
+#: includes/admin/settings/class-wpgh-settings-page.php:247
+#: includes/admin/settings/class-wpgh-settings-page.php:271
+#: includes/admin/settings/class-wpgh-settings-page.php:283
+#: includes/admin/settings/class-wpgh-settings-page.php:295
+#: includes/admin/settings/class-wpgh-settings-page.php:307
+#: includes/admin/settings/class-wpgh-settings-page.php:319
 msgctxt "settings"
 msgid "As it should appear in your email footer."
 msgstr "Comme il devrait apparaître dans votre pied de page e-mail."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:257
+#: includes/admin/settings/class-wpgh-settings-page.php:258
 msgctxt "settings"
 msgid "Street Address 2"
 msgstr "Adresse postale 2"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:258
+#: includes/admin/settings/class-wpgh-settings-page.php:259
 msgctxt "settings"
 msgid "(Optional) As it should appear in your email footer."
 msgstr "Facultatif Comme il devrait apparaître dans votre pied de page e-mail."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:263
+#: includes/admin/settings/class-wpgh-settings-page.php:264
 msgid "Unit 42"
 msgstr "Unité 42"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:275
+#: includes/admin/settings/class-wpgh-settings-page.php:276
 msgid "Toronto"
 msgstr "Toronto"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:281
+#: includes/admin/settings/class-wpgh-settings-page.php:282
 msgctxt "settings"
 msgid "Postal/Zip Code"
 msgstr "Code postal/ZIP"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:293
+#: includes/admin/settings/class-wpgh-settings-page.php:294
 msgctxt "settings"
 msgid "State/Province/Region"
 msgstr "État/province/région"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:330
+#: includes/admin/settings/class-wpgh-settings-page.php:331
 msgctxt "settings"
 msgid "Delete Groundhogg Data"
 msgstr "Supprimer les données Groundhogg"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:331
+#: includes/admin/settings/class-wpgh-settings-page.php:332
 msgctxt "settings"
 msgid "Delete all information when uninstalling. This cannot be undone."
 msgstr ""
 "Supprimez toutes les informations lors de la désinstallation. Cela ne peut "
 "pas être annulée."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:334
-#: includes/admin/settings/class-wpgh-settings-page.php:448
-#: includes/admin/settings/class-wpgh-settings-page.php:475
-#: includes/admin/settings/class-wpgh-settings-page.php:489
-#: includes/admin/settings/class-wpgh-settings-page.php:503
-#: includes/admin/settings/class-wpgh-settings-page.php:576
-#: includes/admin/settings/class-wpgh-settings-page.php:590
+#: includes/admin/settings/class-wpgh-settings-page.php:335
+#: includes/admin/settings/class-wpgh-settings-page.php:449
+#: includes/admin/settings/class-wpgh-settings-page.php:476
+#: includes/admin/settings/class-wpgh-settings-page.php:490
+#: includes/admin/settings/class-wpgh-settings-page.php:504
+#: includes/admin/settings/class-wpgh-settings-page.php:577
+#: includes/admin/settings/class-wpgh-settings-page.php:591
 msgid "Enable"
 msgstr "Activer"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:344
+#: includes/admin/settings/class-wpgh-settings-page.php:345
 msgctxt "settings"
 msgid "Max Queued Events"
 msgstr "Événements Max en file d'attente"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:345
+#: includes/admin/settings/class-wpgh-settings-page.php:346
 msgctxt "settings"
 msgid ""
 "The maximum number of events that can be run during a single process of the "
@@ -3197,12 +3473,12 @@ msgstr ""
 "souhaiterez peut-être définir cette valeur à un nombre inférieur pour des "
 "raisons de performances."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:356
+#: includes/admin/settings/class-wpgh-settings-page.php:357
 msgctxt "settings"
 msgid "Queue Interval"
 msgstr "Intervalle de file d'attente"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:357
+#: includes/admin/settings/class-wpgh-settings-page.php:358
 msgctxt "settings"
 msgid ""
 "The time interval in between iterations of when the event queue is processed."
@@ -3210,42 +3486,42 @@ msgstr ""
 "Intervalle de temps entre les itérations du moment où la file d'attente "
 "d'événements est traitée."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:372
+#: includes/admin/settings/class-wpgh-settings-page.php:373
 msgctxt "settings"
 msgid "Email Confirmation Page"
 msgstr "Page de confirmation par courriel"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:373
+#: includes/admin/settings/class-wpgh-settings-page.php:374
 msgctxt "settings"
 msgid "Page contacts see when they confirm their email."
 msgstr "Les contacts de page voient quand ils confirment leur email."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:384
+#: includes/admin/settings/class-wpgh-settings-page.php:385
 msgctxt "settings"
 msgid "Unsubscribe Page"
 msgstr "Page de désinscription"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:385
+#: includes/admin/settings/class-wpgh-settings-page.php:386
 msgctxt "settings"
 msgid "Page contacts see when they unsubscribe."
 msgstr "Les contacts de page voient quand ils se désinscrire."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:396
+#: includes/admin/settings/class-wpgh-settings-page.php:397
 msgctxt "settings"
 msgid "Email Preferences Page"
 msgstr "Page de préférences de messagerie"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:397
+#: includes/admin/settings/class-wpgh-settings-page.php:398
 msgctxt "settings"
 msgid "Page where contacts can manage their email preferences."
 msgstr "Page où les contacts peuvent gérer leurs préférences de messagerie."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:408
+#: includes/admin/settings/class-wpgh-settings-page.php:409
 msgctxt "settings"
 msgid "View Email In Browser Page"
 msgstr "Afficher l'E-mail dans la page du navigateur"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:409
+#: includes/admin/settings/class-wpgh-settings-page.php:410
 msgctxt "settings"
 msgid ""
 "Page containing the shortcode [browser_view] so contacts can view an email "
@@ -3255,32 +3531,32 @@ msgstr ""
 "afficher un e-mail dans le navigateur dans le cas où leur client de "
 "messagerie semble funky."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:420
+#: includes/admin/settings/class-wpgh-settings-page.php:421
 #: includes/class-wpgh-email.php:434
 msgid "Privacy Policy"
 msgstr "Politique de Confidentialité"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:421
+#: includes/admin/settings/class-wpgh-settings-page.php:422
 msgctxt "settings"
 msgid "Link to your privacy policy."
 msgstr "Lien vers votre politique de confidentialité."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:432
+#: includes/admin/settings/class-wpgh-settings-page.php:433
 msgctxt "settings"
 msgid "Terms & Conditions (Terms of Service)"
 msgstr "Conditions générales (conditions d'utilisation)"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:433
+#: includes/admin/settings/class-wpgh-settings-page.php:434
 msgctxt "settings"
 msgid "Link to your terms & conditions."
 msgstr "Lien avec vos conditions."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:444
+#: includes/admin/settings/class-wpgh-settings-page.php:445
 msgctxt "settings"
 msgid "Only send to confirmed emails."
 msgstr "Envoyer uniquement aux e-mails confirmés."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:445
+#: includes/admin/settings/class-wpgh-settings-page.php:446
 msgctxt "settings"
 msgid ""
 "This will stop emails being sent to contacts who do not have confirmed "
@@ -3289,12 +3565,12 @@ msgstr ""
 "Cela empêchera les e-mails envoyés aux contacts qui n'ont pas de courriels "
 "confirmés en dehors de la période de grâce ci-dessous."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:458
+#: includes/admin/settings/class-wpgh-settings-page.php:459
 msgctxt "settings"
 msgid "Email confirmation grace Period"
 msgstr "Confirmation par courriel période de grâce"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:459
+#: includes/admin/settings/class-wpgh-settings-page.php:460
 msgctxt "settings"
 msgid ""
 "The number of days for which you can send an email to a contact after they "
@@ -3304,12 +3580,12 @@ msgstr ""
 "après leur création, mais leur adresse e-mail n'a pas été confirmée. La "
 "valeur par défaut est 14 jours."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:471
+#: includes/admin/settings/class-wpgh-settings-page.php:472
 msgctxt "settings"
 msgid "Enable GDPR features."
 msgstr "Activez les fonctionnalités RGPD."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:472
+#: includes/admin/settings/class-wpgh-settings-page.php:473
 msgctxt "settings"
 msgid ""
 "This will add a consent box to your forms as well as a \"Delete Everything\" "
@@ -3318,12 +3594,12 @@ msgstr ""
 "Cela ajoutera une boîte de consentement à vos formulaires ainsi qu'un bouton "
 "«tout supprimer» à votre page de préférences de messagerie."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:485
+#: includes/admin/settings/class-wpgh-settings-page.php:486
 msgctxt "settings"
 msgid "Do not send email without consent."
 msgstr "N'envoyez pas d'e-mails sans consentement."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:486
+#: includes/admin/settings/class-wpgh-settings-page.php:487
 msgctxt "settings"
 msgid ""
 "This will prevent your system from sending emails to contacts for which you "
@@ -3333,12 +3609,12 @@ msgstr ""
 "lesquels vous n'avez pas le consentement explicite. Fonctionne uniquement si "
 "les fonctionnalités GDPR sont activées."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:499
+#: includes/admin/settings/class-wpgh-settings-page.php:500
 msgctxt "settings"
 msgid "Enable Recaptcha on forms"
 msgstr "Activer reCAPTCHA sur les formulaires"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:500
+#: includes/admin/settings/class-wpgh-settings-page.php:501
 msgctxt "settings"
 msgid ""
 "Add a google recaptcha to all your forms made with the [gh_form] shortcode"
@@ -3346,77 +3622,77 @@ msgstr ""
 "Ajouter un reCAPTCHA Google à tous vos formulaires faits avec le shortcode "
 "[gh_form]"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:513
+#: includes/admin/settings/class-wpgh-settings-page.php:514
 msgctxt "settings"
 msgid "Recaptcha Site Key"
 msgstr "Clé de site reCAPTCHA"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:514
+#: includes/admin/settings/class-wpgh-settings-page.php:515
 msgctxt "settings"
 msgid "This is the key which faces the users on the front-end"
 msgstr "C'est la clé qui fait face aux utilisateurs sur le front-end"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:524
+#: includes/admin/settings/class-wpgh-settings-page.php:525
 msgctxt "settings"
 msgid "Recaptcha Secret Key"
 msgstr "Clé secrète reCAPTCHA"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:525
+#: includes/admin/settings/class-wpgh-settings-page.php:526
 msgctxt "settings"
 msgid "Never ever ever share this with anyone!"
 msgstr "Ne jamais partager avec qui que ce soit!"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:535
+#: includes/admin/settings/class-wpgh-settings-page.php:536
 msgctxt "settings"
 msgid "Bounce Inbox"
 msgstr "Boîte de réception Bounce"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:536
+#: includes/admin/settings/class-wpgh-settings-page.php:537
 msgctxt "settings"
 msgid "This is the inbox which emails will be sent to."
 msgstr ""
 "Il s'agit de la boîte de réception à laquelle les e-mails seront envoyés."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:549
+#: includes/admin/settings/class-wpgh-settings-page.php:550
 msgctxt "settings"
 msgid "Bounce Inbox Password"
 msgstr "Mot de passe Bounce Inbox"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:550
+#: includes/admin/settings/class-wpgh-settings-page.php:551
 msgctxt "settings"
 msgid "This password to access the inbox."
 msgstr "Ce mot de passe pour accéder à la boîte de réception."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:560
+#: includes/admin/settings/class-wpgh-settings-page.php:561
 msgctxt "settings"
 msgid "Email Service Token"
 msgstr "Jeton de service de messagerie"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:561
+#: includes/admin/settings/class-wpgh-settings-page.php:562
 msgctxt "settings"
 msgid ""
 "Get this key from your <a target=\"_blank\" href=\"https://www.groundhogg.io/"
-"account/manage/\">Groundhogg Account Page."
+"account/manage/\">Groundhogg Account Page.</a>"
 msgstr ""
-"Obtenez cette clé de votre < a target = \"_ blank\" href = \"https://www."
-"groundhogg.io/account/manage/\" > page de compte Groundhogg."
+"Obtenez cette clé de votre <a target=\"_blank\" href=\"https://www."
+"groundhogg.io/account/manage/\"> Groundhogg compte page. </a>"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:572
+#: includes/admin/settings/class-wpgh-settings-page.php:573
 msgctxt "settings"
 msgid "Send Email With Groundhogg"
 msgstr "Envoyer un email avec Groundhogg"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:573
+#: includes/admin/settings/class-wpgh-settings-page.php:574
 msgctxt "settings"
 msgid "Choose to send email with API."
 msgstr "Choisissez d'envoyer un e-mail avec l'API."
 
-#: includes/admin/settings/class-wpgh-settings-page.php:586
+#: includes/admin/settings/class-wpgh-settings-page.php:587
 msgctxt "settings"
 msgid "Enable the Groundhogg API"
 msgstr "Activer l'API Groundhogg"
 
-#: includes/admin/settings/class-wpgh-settings-page.php:587
+#: includes/admin/settings/class-wpgh-settings-page.php:588
 msgctxt "settings"
 msgid ""
 "Enabling this will allow other platforms to access information on this site."
@@ -3424,13 +3700,14 @@ msgstr ""
 "L'activation de cette fonction permettra à d'autres plateformes d'accéder à "
 "des informations sur ce site."
 
-#: includes/admin/superlinks/class-wpgh-superlinks-page.php:45
 #: includes/admin/superlinks/class-wpgh-superlinks-page.php:46
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:47
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:110
 msgctxt "page_title"
 msgid "Superlinks"
 msgstr "Superliens"
 
-#: includes/admin/superlinks/class-wpgh-superlinks-page.php:64
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:65
 msgid ""
 "Superlinks are special superlinks that allow you to apply/remove tags "
 "whenever clicked and then take the contact to a page of your choice. To use "
@@ -3442,36 +3719,35 @@ msgstr ""
 "simplement le code de remplacement et collez-le dans le courrier "
 "électronique, le bouton ou le lien."
 
-#: includes/admin/superlinks/class-wpgh-superlinks-page.php:106
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:107
+msgctxt "page_title"
 msgid "Edit Superlink"
 msgstr "Modifier Superlien"
 
-#: includes/admin/superlinks/class-wpgh-superlinks-page.php:109
-msgid "Superlinks"
-msgstr "Superliens"
-
-#: includes/admin/superlinks/class-wpgh-superlinks-page.php:158
-msgid "superlinks deleted"
-msgstr "superliens supprimés"
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:159
+#, php-format
+msgctxt "notice"
+msgid "%d superlink deleted"
+msgid_plural "%d superlinks deleted"
+msgstr[0] "%d Superlink supprimé"
+msgstr[1] "%d Superlink supprimé"
 
 #: includes/admin/superlinks/class-wpgh-superlinks-page.php:199
-msgid "Superlink created."
+msgctxt "notice"
+msgid "Superlink created"
 msgstr "Superlien créé."
 
 #: includes/admin/superlinks/class-wpgh-superlinks-page.php:226
+msgctxt "notice"
 msgid "Updated superlink."
 msgstr "Mise à jour de Superlien."
 
 #: includes/admin/superlinks/class-wpgh-superlinks-page.php:250
-msgid "Search superlinks "
-msgstr "Rechercher des superliens"
-
 #: includes/admin/superlinks/class-wpgh-superlinks-page.php:252
 msgid "Search Superlinks"
 msgstr "Recherche Superliens"
 
 #: includes/admin/superlinks/class-wpgh-superlinks-page.php:259
-#: includes/admin/superlinks/class-wpgh-superlinks-page.php:287
 msgid "Add New Superlink"
 msgstr "Ajouter un nouveau Superlien"
 
@@ -3521,6 +3797,17 @@ msgstr ""
 "Ces balises seront appliquées à un contact chaque fois que ce lien est "
 "cliqué. Pour créer une nouvelle balise, appuyez sur [ENTER] ou [,]"
 
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:287
+msgctxt "action"
+msgid "Add New Superlink"
+msgstr "Ajouter un nouveau Superlien"
+
+#: includes/admin/superlinks/class-wpgh-superlinks-page.php:323
+#: includes/admin/tags/class-wpgh-tags-page.php:330
+msgctxt "page_tile_action"
+msgid "Add New"
+msgstr "Ajouter nouveau"
+
 #: includes/admin/superlinks/class-wpgh-superlinks-table.php:46
 #: includes/admin/tags/class-wpgh-tags-table.php:44
 msgctxt "Column label"
@@ -3563,50 +3850,60 @@ msgstr ""
 "Ces balises seront appliquées à un contact chaque fois que ce lien est "
 "cliqué. Pour créer une nouvelle balise, appuyez sur [ENTER] ou [Comma]"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:107
+#: includes/admin/tags/class-wpgh-tags-page.php:108
 msgid "Edit Tag"
 msgstr "Éditer le mot-clé"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:161
-msgid "tags deleted"
-msgstr "Mots-clé Deleted"
+#: includes/admin/tags/class-wpgh-tags-page.php:162
+#, php-format
+msgctxt "notice"
+msgid "%d tag deleted"
+msgid_plural "%d tags deleted"
+msgstr[0] "%d balise supprimée"
+msgstr[1] "%d balise supprimée"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:206
-msgid "Created new tag!"
-msgstr "Création d'un nouveau tag!"
+#: includes/admin/tags/class-wpgh-tags-page.php:198
+#, php-format
+msgctxt "notice"
+msgid "%d tag created"
+msgid_plural "%d tags created"
+msgstr[0] "%d balise créée"
+msgstr[1] "%d balise créée"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:228
-msgid "Updated tag!"
-msgstr "Balise mise à jour!"
+#: includes/admin/tags/class-wpgh-tags-page.php:207
+msgctxt "notice"
+msgid "Tag created"
+msgstr "Balise créée"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:253
-msgid "Search Tags "
-msgstr "Balises de recherche"
+#: includes/admin/tags/class-wpgh-tags-page.php:229
+msgctxt "notice"
+msgid "Tag updated"
+msgstr "Balise mise à jour"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:255
+#: includes/admin/tags/class-wpgh-tags-page.php:254
+#: includes/admin/tags/class-wpgh-tags-page.php:256
 msgid "Search Tags"
 msgstr "Mots-clés de recherche"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:262
-#: includes/admin/tags/class-wpgh-tags-page.php:299
+#: includes/admin/tags/class-wpgh-tags-page.php:263
 msgid "Add New Tag"
 msgstr "Ajouter un nouveau mot-clé"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:267
+#: includes/admin/tags/class-wpgh-tags-page.php:268
 msgid "Tag Name"
 msgstr "Nom de la balise"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:269
+#: includes/admin/tags/class-wpgh-tags-page.php:270
 msgid "Name a tag something simple so you do not forget it."
 msgstr ""
 "Nommez une balise quelque chose de simple afin que vous ne l'oubliez pas."
 
-#: includes/admin/tags/class-wpgh-tags-page.php:272
+#: includes/admin/tags/class-wpgh-tags-page.php:273
 #: includes/admin/tags/edit-tag.php:31 includes/class-wpgh-replacements.php:351
 msgid "Description"
 msgstr "Description"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:274
+#: includes/admin/tags/class-wpgh-tags-page.php:275
 #: includes/admin/tags/edit-tag.php:33
 msgid ""
 "Tag descriptions are only visible to admins and will never be seen by "
@@ -3615,17 +3912,22 @@ msgstr ""
 "Les descriptions des balises ne sont visibles que par les administrateurs et "
 "ne seront jamais vues par les contacts."
 
-#: includes/admin/tags/class-wpgh-tags-page.php:277
+#: includes/admin/tags/class-wpgh-tags-page.php:278
 msgid "Bulk Add Tags"
 msgstr "Ajouter des balises en vrac"
 
-#: includes/admin/tags/class-wpgh-tags-page.php:279
+#: includes/admin/tags/class-wpgh-tags-page.php:280
 msgid "Enter 1 tag per line."
 msgstr "Entrez 1 balise par ligne."
 
-#: includes/admin/tags/class-wpgh-tags-page.php:282
+#: includes/admin/tags/class-wpgh-tags-page.php:283
 msgid "Add tags in bulk?"
 msgstr "Ajouter des balises en vrac?"
+
+#: includes/admin/tags/class-wpgh-tags-page.php:300
+msgctxt "action"
+msgid "Add New Tag"
+msgstr "Ajouter un nouveau mot-clé"
 
 #: includes/admin/tags/class-wpgh-tags-table.php:45
 msgctxt "Column label"
@@ -3647,62 +3949,70 @@ msgstr ""
 "Un nom descriptif de la balise de sorte que vous vous souvenez de ce que "
 "cela signifie"
 
-#: includes/admin/user/class-wpgh-user-tokens-section.php:31
-msgid "API Tokens"
-msgstr "Jetons API"
-
-#: includes/admin/welcome/class-wpgh-welcome-page.php:35
+#: includes/admin/welcome/class-wpgh-welcome-page.php:66
+msgctxt "notice"
 msgid ""
 "You can get our entire extension library for $1 if <a href=\"https://www."
 "groundhogg.io/partner/\" target=\"_blank\">you refer a friend.</a>"
 msgstr ""
-"Vous pouvez obtenir toute notre bibliothèque d'extension pour $1 si < a href "
-"= \"https://www.groundhogg.io/partner/\" target = \"_ blank\" > vous "
-"parrainons un ami. </a>"
+"Vous pouvez obtenir toute notre bibliothèque d'extension pour $1 si <a href="
+"\"https://www.groundhogg.io/partner/\" target=\"_blank\"> vous parrainons un "
+"ami. </a>"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:59
+#: includes/admin/welcome/class-wpgh-welcome-page.php:100
+msgctxt "notice"
 msgid ""
-"While we work on an SMTP solution for you that is builtin, there are other "
-"ones out there. We recommend you install <a href=\"https://en-ca.wordpress."
-"org/plugins/wp-mail-smtp/\">WP Mail SMTP</a> to increase your deliverability."
+"We recommend sending email through an SMTP service. <a target=\"_blank\" "
+"href=\"https://www.groundhogg.io/downloads/email-credits/\">Try ours!</a> Or "
+"look for one in <a target=\"_blank\" href=\"https://en-ca.wordpress.org/"
+"plugins/search/smtp/\">the WP repository.</a>"
 msgstr ""
-"Alors que nous travaillons sur une solution SMTP pour vous qui est builtin, "
-"il ya d'autres là-bas. Nous vous recommandons d'installer < a href = "
-"\"https://en-ca.wordpress.org/plugins/wp-mail-smtp/\" > WP mail SMTP </a> "
-"pour augmenter votre délivrabilité."
+"Nous vous recommandons d'envoyer un e-mail via un service SMTP. <a target="
+"\"_blank\" href=\"https://www.groundhogg.io/downloads/email-credits/\"> "
+"essayez le nôtre! </a> Ou recherchez-en un dans <a target=\"_blank\" href="
+"\"https://en-ca.wordpress.org/plugins/search/smtp/\"> le référentiel WP. </a>"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:72
+#: includes/admin/welcome/class-wpgh-welcome-page.php:113
+msgctxt "notice"
 msgid ""
 "It appears you have incomplete settings! Go to <a href=\"?page=gh_settings"
 "\">the settings page</a> and fill out all your business information."
 msgstr ""
-"Il semble que vous avez des paramètres incomplets! Allez à < a href = \"? "
-"page = gh_settings\" > la page des paramètres </a> et remplissez toutes les "
+"Il semble que vous avez des paramètres incomplets! Allez à <a href=\"?"
+"page=gh_settings\"> la page des paramètres </a> et remplissez toutes les "
 "informations de votre entreprise."
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:86
+#: includes/admin/welcome/class-wpgh-welcome-page.php:127
+msgctxt "notice"
 msgid ""
 "You have no active funnels! Go to <a href=\"?page=gh_funnels&action=add"
 "\">the funnels page</a> and create your first funnel!"
 msgstr ""
-"Vous n'avez pas de entonnoirs actifs! Allez à < a href = \"? page = "
-"gh_funnels & action = add\" > la page des entonnoirs </a> et créez votre "
+"Vous n'avez pas de entonnoirs actifs! Allez à <a href=\"?"
+"page=gh_funnels&action=add\" > la page des entonnoirs </a> et créez votre "
 "premier entonnoir!"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:98
+#: includes/admin/welcome/class-wpgh-welcome-page.php:139
+msgctxt "notice"
 msgid ""
 "Seems like you need some more contacts. Go to the <a href=\"?"
 "page=gh_settings&tab=tools\">tools area</a> and import your mailing list!"
 msgstr ""
-"On dirait que vous avez besoin de plus de contacts. Allez à la < a href = "
-"\"? page = gh_settings & tab = tools\" > Outils zone </a> et importez votre "
-"liste de diffusion!"
+"On dirait que vous avez besoin de plus de contacts. Allez à la <a href=\"?"
+"page=gh_settings&tab=tools\">Outils zone </a> et importez votre liste de "
+"diffusion!"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:151
+#: includes/admin/welcome/class-wpgh-welcome-page.php:163
+#: includes/admin/welcome/class-wpgh-welcome-page.php:164
+msgctxt "page_title"
+msgid "Welcome"
+msgstr "Bienvenue"
+
+#: includes/admin/welcome/class-wpgh-welcome-page.php:201
 msgid "Full Walkthrough"
 msgstr "Procédure pas à pas complète"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:152
+#: includes/admin/welcome/class-wpgh-welcome-page.php:202
 msgid ""
 "Watch this full walkthrough of setting up Groundhogg and building your first "
 "funnel."
@@ -3710,11 +4020,11 @@ msgstr ""
 "Regardez cette procédure pas à pas complète de la mise en place Groundhogg "
 "et la construction de votre premier entonnoir."
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:157
+#: includes/admin/welcome/class-wpgh-welcome-page.php:207
 msgid "Managing Users"
 msgstr "Gestion des utilisateurs"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:158
+#: includes/admin/welcome/class-wpgh-welcome-page.php:208
 msgid ""
 "If you have sales people you need to read how you can give them only "
 "specific access to your CRM."
@@ -3722,11 +4032,11 @@ msgstr ""
 "Si vous avez des vendeurs, vous devez lire comment vous pouvez leur donner "
 "un accès spécifique à votre CRM."
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:163
+#: includes/admin/welcome/class-wpgh-welcome-page.php:213
 msgid "How To Remain Compliant "
 msgstr "Comment rester conforme"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:164
+#: includes/admin/welcome/class-wpgh-welcome-page.php:214
 msgid ""
 "Learn about the tools Groundhogg provides so you can remain complaint in "
 "countries around the world."
@@ -3734,11 +4044,11 @@ msgstr ""
 "Apprenez-en plus sur les outils que Groundhogg fournit pour que vous "
 "puissiez rester plainte dans les pays du monde entier."
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:169
+#: includes/admin/welcome/class-wpgh-welcome-page.php:219
 msgid "Send Marketing With Groundhogg"
 msgstr "Envoyer du marketing avec Groundhogg"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:170
+#: includes/admin/welcome/class-wpgh-welcome-page.php:220
 msgid ""
 "Get your first 1000 credits free when you sign up! Send SMS and Email with "
 "Groundhogg."
@@ -3746,24 +4056,24 @@ msgstr ""
 "Obtenez vos premiers crédits 1000 gratuitement lorsque vous vous inscrivez! "
 "Envoyer des SMS et des E-mails avec Groundhogg."
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:212
+#: includes/admin/welcome/class-wpgh-welcome-page.php:262
 msgid "Read More..."
 msgstr "Lire plus…"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:298
+#: includes/admin/welcome/class-wpgh-welcome-page.php:348
 msgid "Buy Now!"
 msgstr "Achetez maintenant!"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:324
+#: includes/admin/welcome/class-wpgh-welcome-page.php:374
 #, php-format
 msgid "Welcome %s!"
 msgstr "Bienvenue %s!"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:338
+#: includes/admin/welcome/class-wpgh-welcome-page.php:388
 msgid "Support Articles"
 msgstr "Articles de soutien"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:339
+#: includes/admin/welcome/class-wpgh-welcome-page.php:389
 msgid ""
 "Don't know where to start? Checkout these articles and learn how to make "
 "Groundhogg work for you."
@@ -3771,16 +4081,16 @@ msgstr ""
 "Vous ne savez pas par où commencer? Commander ces articles et apprendre à "
 "faire Groundhogg travailler pour vous."
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:341
-#: includes/admin/welcome/class-wpgh-welcome-page.php:367
+#: includes/admin/welcome/class-wpgh-welcome-page.php:391
+#: includes/admin/welcome/class-wpgh-welcome-page.php:417
 msgid "View All!"
 msgstr "Tout voir!"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:364
+#: includes/admin/welcome/class-wpgh-welcome-page.php:414
 msgid "Awesome Extensions"
 msgstr "Extensions impressionnantes"
 
-#: includes/admin/welcome/class-wpgh-welcome-page.php:365
+#: includes/admin/welcome/class-wpgh-welcome-page.php:415
 msgid ""
 "Need more functionality? Need to connect Groundhogg to your store? We have "
 "an extension for that!"
@@ -3793,13 +4103,21 @@ msgid "You do not have permission export contacts."
 msgstr "Vous n'êtes pas autorisé à installer les mises à jour du plugin"
 
 #: includes/class-wpgh-bulk-contact-manager.php:142
-#, fuzzy
 msgid "no query was present."
 msgstr "aucune requête n'était présente."
 
 #: includes/class-wpgh-bulk-contact-manager.php:190
 msgid "Please select at least 1 tag."
 msgstr "Veuillez sélectionner au moins 1 balise."
+
+#: includes/class-wpgh-bulk-contact-manager.php:208
+#, php-format
+msgid "Deleted %d contacts."
+msgstr "Supprimé %d contacts."
+
+#: includes/class-wpgh-bulk-contact-manager.php:224
+msgid "Import"
+msgstr "Importer"
 
 #: includes/class-wpgh-email.php:442
 #: includes/elements/benchmarks/class-wpgh-form-filled.php:310
@@ -4057,6 +4375,11 @@ msgstr "(Modifier le formulaire)"
 msgid "Open Modal"
 msgstr "Open modal"
 
+#: includes/class-wpgh-html.php:100 includes/class-wpgh-popup.php:33
+#: includes/class-wpgh-popup.php:61
+msgid "Save Changes"
+msgstr "Enregistrer les modifications"
+
 #: includes/class-wpgh-html.php:522
 msgid "Please Select One Or More Tags"
 msgstr "Veuillez sélectionner une ou plusieurs balises"
@@ -4214,8 +4537,8 @@ msgid ""
 "custom_files}. Do find the key for a file see the contact record and copy "
 "the relevant replacement code."
 msgstr ""
-"Insérez un lien de téléchargement pour un fichier. Utilisation {files. Key}. "
-"Exemple: {files. custom_files}. Trouvez la clé pour un fichier Voir "
+"Insérez un lien de téléchargement pour un fichier. Utilisation {files.key}. "
+"Exemple: {files.custom_files}. Trouvez la clé pour un fichier Voir "
 "l'enregistrement de contact et copiez le code de remplacement pertinent."
 
 #: includes/class-wpgh-replacements.php:183
@@ -4262,6 +4585,7 @@ msgstr "Directeur des ventes"
 
 #: includes/class-wpgh-roles.php:420
 #, php-format
+msgctxt "notice"
 msgid "Your user role does not have the required permissions to %s."
 msgstr "Votre rôle d'utilisateur n'a pas les autorisations requises pour %s."
 
@@ -4278,25 +4602,21 @@ msgid "Any blog"
 msgstr "N'importe quel blog"
 
 #: includes/class-wpgh-submission.php:319
-#, fuzzy
 msgid "This form is not accepting submissions."
 msgstr "Ce formulaire n'accepte pas les soumissions."
 
 #: includes/class-wpgh-submission.php:331
 #: includes/class-wpgh-submission.php:357
-#, fuzzy
 msgid "This form is setup incorrectly."
 msgstr "Ce formulaire est incorrectement configuré."
 
 #: includes/class-wpgh-submission.php:350
 #: includes/class-wpgh-submission.php:376
 #: includes/class-wpgh-submission.php:390
-#, fuzzy
 msgid "Failed security check."
 msgstr "Échec de la vérification de sécurité."
 
 #: includes/class-wpgh-submission.php:366
-#, fuzzy
 msgid "You must consent to sign up."
 msgstr "Vous devez consentir à vous inscrire."
 
@@ -4307,7 +4627,6 @@ msgstr "Veuillez accepter les conditions de service"
 #: includes/class-wpgh-submission.php:410
 #: includes/class-wpgh-submission.php:416
 #: includes/class-wpgh-submission.php:423
-#, fuzzy
 msgid "Failed spam check."
 msgstr "Échec du contrôle du spam."
 
@@ -4339,11 +4658,11 @@ msgstr "Envoyez une notification par e-mail à tout e-mail ou liste d'e-mails."
 
 #: includes/elements/actions/class-wpgh-admin-notification.php:65
 msgid "Follow up with {first} {last} tomorrow."
-msgstr "Suivi avec {First} {Last} demain."
+msgstr "Suivi avec {first} {last} demain."
 
 #: includes/elements/actions/class-wpgh-admin-notification.php:71
 msgid "Admin Notification for {first}"
-msgstr "Notification admin pour {First}"
+msgstr "Notification admin pour {first}"
 
 #: includes/elements/actions/class-wpgh-admin-notification.php:78
 msgctxt "admin_notification_settings"
@@ -4502,9 +4821,8 @@ msgid ""
 "immediately."
 msgstr ""
 "Vous avez des minuteries de date avec des dates descendantes! Votre "
-"entonnoir peut ne pas fonctionner comme prévu. Voir < a href = \"#% d\" > %s "
-"</a>! Les minuteries avec des dates dans le passé s'exécuteront "
-"immédiatement."
+"entonnoir peut ne pas fonctionner comme prévu. Voir <a href=\"#%d\">%s </a>! "
+"Les minuteries avec des dates dans le passé s'exécuteront immédiatement."
 
 #: includes/elements/actions/class-wpgh-date-timer.php:183
 #, php-format
@@ -4514,9 +4832,8 @@ msgid ""
 "immediately."
 msgstr ""
 "Vous avez des minuteries de date avec des dates dans le passé! Votre "
-"entonnoir peut ne pas fonctionner comme prévu. Voir < a href = \"#% d\" > %s "
-"</a>! Les minuteries avec des dates dans le passé s'exécuteront "
-"immédiatement."
+"entonnoir peut ne pas fonctionner comme prévu. Voir <a href=\"#%d\"> %s </"
+"a>! Les minuteries avec des dates dans le passé s'exécuteront immédiatement."
 
 #: includes/elements/actions/class-wpgh-delay-timer.php:48
 msgctxt "element_name"
@@ -4609,7 +4926,7 @@ msgstr "Pas de retard"
 
 #: includes/elements/actions/class-wpgh-field-timer.php:121
 msgid "Before"
-msgstr "Afficher le texte avant le numéro ($, €, #)"
+msgstr "Avant"
 
 #: includes/elements/actions/class-wpgh-field-timer.php:122
 msgid "After"
@@ -4662,6 +4979,7 @@ msgid "Send an email to a contact."
 msgstr "Sélectionnez un e-mail à envoyer."
 
 #: includes/elements/actions/class-wpgh-send-email.php:75
+msgctxt "notice"
 msgid ""
 "You have changes which have not been saved. Are you sure you want to exit?"
 msgstr ""
@@ -4672,6 +4990,11 @@ msgstr ""
 msgid "Select an email to send:"
 msgstr "Sélectionnez un e-mail à envoyer:"
 
+#: includes/elements/actions/class-wpgh-send-email.php:130
+msgctxt "action"
+msgid "Create New Email"
+msgstr "Créer un nouvel E-mail"
+
 #: includes/elements/actions/class-wpgh-send-email.php:145
 msgid "Skip if confirmed?"
 msgstr "Skip si confirmé?"
@@ -4680,17 +5003,12 @@ msgstr "Skip si confirmé?"
 msgid "Skip this email if the contact's email is already confirmed."
 msgstr "Ignorez cet e-mail si l'e-mail du contact est déjà confirmé."
 
-#: includes/elements/actions/class-wpgh-send-email.php:210
-msgid "Opens: "
-msgstr "Ouvre:"
-
-#: includes/elements/actions/class-wpgh-send-email.php:221
-msgid "Clicks: "
-msgstr "Clics:"
-
-#: includes/elements/actions/class-wpgh-send-email.php:232
-msgid "CTR: "
-msgstr "Ctr:"
+#: includes/elements/actions/class-wpgh-send-email.php:264
+msgctxt "notice"
+msgid ""
+"Your funnel contains email steps which are in draft mode. Please ensure all "
+"your emails are marked as ready."
+msgstr ""
 
 #: includes/elements/actions/class-wpgh-send-sms.php:22
 msgctxt "element_name"
@@ -4709,10 +5027,10 @@ msgid ""
 "your <a target=\"_blank\" href=\"https://www.groundhogg.io/downloads/email-"
 "credits/\">Groundhogg account</a>."
 msgstr ""
-"SMS utilise le < a target = \"_ blank\" href = \"https://www.groundhogg.io/"
-"downloads/email-credits/\" > Groundhogg système de crédit </a> & nécessite "
-"que vous avez configuré votre < a target = \"_ blank\" href = \"https://www."
-"groundhogg.io/downloads/email-credits/\" > Groundhogg compte </a>."
+"SMS utilise le <a target=\"_blank\" href=\"https://www.groundhogg.io/"
+"downloads/email-credits/\"> Groundhogg système de crédit </a> & nécessite "
+"que vous avez configuré votre <a target=\"_blank\" href=\"https://www."
+"groundhogg.io/downloads/email-credits/\"> Groundhogg compte </a>."
 
 #: includes/elements/actions/class-wpgh-send-sms.php:49
 msgid "Text Message:"
@@ -5248,8 +5566,8 @@ msgid ""
 " | Find a bug in Groundhogg? <a target=\"_blank\" href=\"%s\">Report It</a>!"
 "</span>"
 msgstr ""
-"| Trouver un bug à Groundhogg? < a target = \"_ blank\" href = \" %s\" > "
-"Signalez-Le </a>! </span>"
+"| Trouver un bug à Groundhogg? <a target=\"_blank\" href=\"%s\">Signalez-Le "
+"</a>! </span>"
 
 #: includes/functions.php:519
 msgid "https://www.facebook.com/groups/274900800010203/"
@@ -5621,6 +5939,134 @@ msgstr "Groundhogg Inc."
 #. Author URI of the plugin/theme
 msgid "http://www.groundhogg.io"
 msgstr "http://www.groundhogg.IO"
+
+#~ msgid "No contact exists with the given ID."
+#~ msgstr "Aucun contact n'existe avec l'ID donné."
+
+#~ msgid "Please provide a contact ID."
+#~ msgstr "Aucun contact n'existe avec l'ID donné."
+
+#~ msgid "The requested method does not exist for module: "
+#~ msgstr "La méthode demandée n'existe pas pour le module: "
+
+#~ msgid "The requested module does not exist."
+#~ msgstr "Le module demandé n'existe pas."
+
+#~ msgid "Your token is invalid."
+#~ msgstr "Votre jeton n'est pas valide."
+
+#~ msgid "Please provide a token."
+#~ msgstr "Veuillez fournir un jeton."
+
+#~ msgid "Please use POST method to use API. "
+#~ msgstr "Veuillez utiliser la méthode POST pour utiliser l'API. "
+
+#~ msgid "Something went wrong, but we do not know what."
+#~ msgstr "Quelque chose a mal tourné, mais nous ne savons pas quoi."
+
+#~ msgid " or "
+#~ msgstr " ou "
+
+#~ msgid "Broadcasts"
+#~ msgstr "Émissions"
+
+#~ msgid "CTR"
+#~ msgstr "Ctr"
+
+#~ msgid "Please enter a valid email address"
+#~ msgstr "Veuillez saisir une adresse courriel valide"
+
+#~ msgid "Search Contacts "
+#~ msgstr "Rechercher des contacts"
+
+#~ msgid "All <span class=\"count\">("
+#~ msgstr "Tout < span class = \"count\" > ("
+
+#~ msgid "Unconfirmed <span class=\"count\">("
+#~ msgstr "Non confirmée < span class = \"count\" > ("
+
+#~ msgid "Confirmed <span class=\"count\">("
+#~ msgstr "Confirmé < span class = \"count\" > ("
+
+#~ msgid "Unsubscribed <span class=\"count\">("
+#~ msgstr "Désabonné < span class = \"count\" > ("
+
+#~ msgid "Spam <span class=\"count\">("
+#~ msgstr "Spam < span class = \"count\" > ("
+
+#~ msgid "Bounced <span class=\"count\">("
+#~ msgstr "Bounced < span class = \"count\" > ("
+
+#~ msgid "Add Event"
+#~ msgstr "Ajouter événement"
+
+#~ msgid "Edit Event"
+#~ msgstr "Edit, événement"
+
+#~ msgid "Events"
+#~ msgstr "Événements"
+
+#~ msgid "deleted"
+#~ msgstr "supprimé"
+
+#~ msgid "(step deleted)"
+#~ msgstr "(étape supprimée)"
+
+#~ msgid "Waiting <span class=\"count\">("
+#~ msgstr "Attente < span class = \"count\" > ("
+
+#~ msgid "Skipped <span class=\"count\">("
+#~ msgstr "Ignoré < span class = \"count\" > ("
+
+#~ msgid "Cancelled <span class=\"count\">("
+#~ msgstr "Annulé < span class = \"count\" > ("
+
+#~ msgid "Completed <span class=\"count\">("
+#~ msgstr "Terminé < span class = \"count\" > ("
+
+#~ msgid "Funnels"
+#~ msgstr "Entonnoirs"
+
+#~ msgid "Auto Saved..."
+#~ msgstr "Auto sauvé..."
+
+#~ msgid "Superlinks"
+#~ msgstr "Superliens"
+
+#~ msgid "Search superlinks "
+#~ msgstr "Rechercher des superliens"
+
+#~ msgid "Created new tag!"
+#~ msgstr "Création d'un nouveau tag!"
+
+#~ msgid "Updated tag!"
+#~ msgstr "Balise mise à jour!"
+
+#~ msgid "Search Tags "
+#~ msgstr "Balises de recherche"
+
+#~ msgid "API Tokens"
+#~ msgstr "Jetons API"
+
+#~ msgid ""
+#~ "While we work on an SMTP solution for you that is builtin, there are "
+#~ "other ones out there. We recommend you install <a href=\"https://en-ca."
+#~ "wordpress.org/plugins/wp-mail-smtp/\">WP Mail SMTP</a> to increase your "
+#~ "deliverability."
+#~ msgstr ""
+#~ "Alors que nous travaillons sur une solution SMTP pour vous qui est "
+#~ "builtin, il ya d'autres là-bas. Nous vous recommandons d'installer < a "
+#~ "href = \"https://en-ca.wordpress.org/plugins/wp-mail-smtp/\" > WP mail "
+#~ "SMTP </a> pour augmenter votre délivrabilité."
+
+#~ msgid "Opens: "
+#~ msgstr "Ouvre:"
+
+#~ msgid "Clicks: "
+#~ msgstr "Clics:"
+
+#~ msgid "CTR: "
+#~ msgstr "Ctr:"
 
 #~ msgid "{files."
 #~ msgstr "fichiers."

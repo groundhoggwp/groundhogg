@@ -91,10 +91,10 @@ class WPGH_Funnels_Table extends WP_List_Table {
             'archived'  => WPGH()->funnels->count( array( 'status' => 'archived' ) )
         );
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=all' ) . "'>" . __( 'All', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'active' ] + $count[ 'inactive' ] ) . ")</span>" . "</a>";
-        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=active' ) . "'>" . __( 'Active', 'groundhogg'  ) . " <span class='count'>(" . $count[ 'active' ] . ")</span>" . "</a>";
-        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=inactive' ) . "'>" . __( 'Inactive', 'groundhogg' ) . " <span class='count'>(" . $count[ 'inactive' ] . ")</span>" . "</a>";
-        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=archived' ) . "'>" . __( 'Archived', 'groundhogg' ) . " <span class='count'>(" . $count[ 'archived' ] . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=all' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'active' ] + $count[ 'inactive' ] ) . ")</span>" . "</a>";
+        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=active' ) . "'>" . _x( 'Active', 'view', 'groundhogg'  ) . " <span class='count'>(" . $count[ 'active' ] . ")</span>" . "</a>";
+        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=inactive' ) . "'>" . _x( 'Inactive', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'inactive' ] . ")</span>" . "</a>";
+        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=archived' ) . "'>" . _x( 'Archived', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'archived' ] . ")</span>" . "</a>";
 
         return apply_filters(  'wpgh_funnel_views', $views );
     }
@@ -135,7 +135,7 @@ class WPGH_Funnels_Table extends WP_List_Table {
                 'selected' => WPGH()->menu->funnels_page->get_url_var( 'date_range', 'this_week' ),
             ); echo WPGH()->html->dropdown( $args );
 
-            submit_button( __( 'Refresh', 'groundhogg' ), 'secondary', 'change_reporting', false );
+            submit_button( _x( 'Refresh', 'action', 'groundhogg' ), 'secondary', 'change_reporting', false );
 
             $class = WPGH()->menu->funnels_page->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden';
 
@@ -190,14 +190,13 @@ class WPGH_Funnels_Table extends WP_List_Table {
         $actions = array();
         $id = $funnel->ID;
 
-        if ( $this->get_view() === 'archived' )
-        {
-            $actions[ 'restore' ] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . __( 'Restore' ) . "</a></span>";
-            $actions[ 'delete' ] = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . __( 'Delete Permanently' ) . "</a></span>";
+        if ( $this->get_view() === 'archived' ) {
+            $actions[ 'restore' ] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . _x( 'Restore', 'action', 'groundhogg'  ) . "</a></span>";
+            $actions[ 'delete' ] = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . _x( 'Delete Permanently', 'action', 'groundhogg'  ) . "</a></span>";
         } else {
             $actions[ 'edit' ] = "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_funnels&action=edit&funnel='. $id ). "'>" . __( 'Build' ) . "</a></span>";
-            $actions[ 'duplicate' ] = "<span class='duplicate'><a href='" .  wp_nonce_url(admin_url( 'admin.php?page=gh_funnels&action=duplicate&funnel='. $id ), 'duplicate' ). "'>" . __( 'Duplicate' ) . "</a></span>";
-            $actions[ 'trash' ] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive' ) . "</a></span>";
+            $actions[ 'duplicate' ] = "<span class='duplicate'><a href='" .  wp_nonce_url(admin_url( 'admin.php?page=gh_funnels&action=duplicate&funnel='. $id ), 'duplicate' ). "'>" . _x( 'Duplicate', 'action', 'groundhogg' ) . "</a></span>";
+            $actions[ 'trash' ] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive', 'action', 'groundhogg' ) . "</a></span>";
         }
 
         return $this->row_actions( apply_filters( 'wpgh_funnel_row_actions', $actions, $funnel, $column_name ) );
@@ -216,7 +215,7 @@ class WPGH_Funnels_Table extends WP_List_Table {
             $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
 
             if ( $funnel->status === 'inactive' ){
-                $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Inactive', 'groundhogg' ) . ")</span>";
+                $html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Inactive', 'status', 'groundhogg' ) . ")</span>";
             }
         }
         $html .= "</strong>";
@@ -247,11 +246,11 @@ class WPGH_Funnels_Table extends WP_List_Table {
         $lu_time = mysql2date( 'U', $funnel->last_updated );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $lu_time - $cur_time;
-        $time_prefix = __( 'Updated', 'groundhogg' );
+        $time_prefix = _x( 'Updated', 'status', 'groundhogg' );
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
             $time = date_i18n( 'Y/m/d \@ h:i A', intval( $lu_time ) );
         } else {
-            $time = sprintf( "%s ago", human_time_diff( $lu_time, $cur_time ) );
+            $time = sprintf( _x( "%s ago" , 'status', 'groundhogg'), human_time_diff( $lu_time, $cur_time ) );
         }
         return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $lu_time ) ) . '">' . $time . '</abbr>';
     }
@@ -261,11 +260,11 @@ class WPGH_Funnels_Table extends WP_List_Table {
         $dc_time = mysql2date( 'U', $funnel->date_created );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $dc_time - $cur_time;
-        $time_prefix = __( 'Created', 'created' );
+        $time_prefix = _x( 'Created', 'status', 'created' );
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
             $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
         } else {
-            $time = sprintf( "%s ago", human_time_diff( $dc_time, $cur_time ) );
+            $time = sprintf(  _x( "%s ago" , 'status', 'groundhogg'), human_time_diff( $dc_time, $cur_time ) );
         }
         return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
     }

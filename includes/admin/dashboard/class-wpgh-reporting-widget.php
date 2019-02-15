@@ -228,7 +228,7 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
     public function export()
     {
         if ( ! current_user_can( 'export_reports' ) ){
-            $response = __( 'You cannot export reports!', 'groundhogg' );
+            $response = _x( 'You cannot export reports!', 'notice', 'groundhogg' );
             wp_die(  $response  );
         }
 
@@ -251,7 +251,7 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
         ?>
         <div class="export-button">
             <hr>
-            <button id="<?php printf( 'export-%s', $this->wid ); ?>" type="button" class="export button button-secondary"><?php _e( 'Export Report' ) ?></button>
+            <button id="<?php printf( 'export-%s', $this->wid ); ?>" type="button" class="export button button-secondary"><?php _ex( 'Export Report', 'action', 'groundhogg' ) ?></button>
             <span class="spinner"></span>
         </div>
         <?php

@@ -92,13 +92,10 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
             'cancelled' => WPGH()->broadcasts->count( array( 'status' => 'cancelled'    ) ),
         );
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=all' ) . "'>" . __( 'All', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'sent' ] + $count[ 'scheduled' ] ) . ")</span>" . "</a>";
-
-        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=sent' ) . "'>" . __( 'Sent', 'groundhogg' ) . " <span class='count'>(" . $count[ 'sent' ] . ")</span>" . "</a>";
-
-        $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=scheduled' ) . "'>" . __( 'Scheduled', 'groundhogg' ) . " <span class='count'>(" . $count[ 'scheduled' ] . ")</span>" . "</a>";
-
-        $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=cancelled' ) . "'>" . __( 'Cancelled', 'groundhogg' ) . " <span class='count'>(" . $count[ 'cancelled' ] . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=all' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'sent' ] + $count[ 'scheduled' ] ) . ")</span>" . "</a>";
+        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=sent' ) . "'>" . _x( 'Sent', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'sent' ] . ")</span>" . "</a>";
+        $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=scheduled' ) . "'>" . _x( 'Scheduled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'scheduled' ] . ")</span>" . "</a>";
+        $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=cancelled' ) . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'cancelled' ] . ")</span>" . "</a>";
 
         return apply_filters(  'wpgh_broadcast_views', $views );
     }
@@ -135,9 +132,9 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $actions = array();
 
         if ( $this->get_view() !== 'cancelled' ) {
-            $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast->email->ID ) . "'>" . __('Edit Email', 'groundhogg') . "</a></span>";
+            $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast->email->ID ) . "'>" . _x( 'Edit Email', 'action', 'groundhogg') . "</a></span>";
             if ( intval( $broadcast->send_time ) > time() ){
-                $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->ID ), 'cancel') . "'>" . __('Cancel', 'groundhogg') . "</a></span>";
+                $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->ID ), 'cancel') . "'>" . _x( 'Cancel', 'action', 'groundhogg') . "</a></span>";
             }
         }
 
@@ -150,7 +147,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
      */
     protected function column_email_id( $broadcast )
     {
-        $subject = ( ! $broadcast->email->subject )? '(' . __( 'no email' ) . ')' : $broadcast->email->subject;
+        $subject = ( ! $broadcast->email->subject )? '(' . _x( 'no email', 'status' ,'groundhogg' ) . ')' : $broadcast->email->subject;
         $editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . $broadcast->ID );
 
         if ( $this->get_view() === 'cancelled' ){
@@ -161,7 +158,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
             $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
 
             if ( $broadcast->status === 'scheduled' ){
-                $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Scheduled' ) . ")</span>";
+                $html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Scheduled', 'status', 'groundhogg' ) . ")</span>";
             }
         }
         $html .= "</strong>";
@@ -208,22 +205,22 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         ) );
 
         $html = sprintf( "%s: <strong>%d</strong><br/>",
-            __( "$contact->", 'groundhogg' ),
+            _x( "Sent", 'stats', 'groundhogg' ),
             $contact_sum
         );
 
         $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
-            __( "Opens", 'groundhogg' ),
+            _x( "Opens", 'stats', 'groundhogg' ),
             admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
             $opens
         );
 
         $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
-            __( "Clicks", 'groundhogg' ),
+            _x( "Clicks", 'stats', 'groundhogg' ),
             admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) ),
             $clicks );
 
-        $html.= sprintf( "%s: <strong>%d%%</strong><br/>", __( "CTR" ), round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) );
+        $html.= sprintf( "%s: <strong>%d%%</strong><br/>", _x( "C.T.R", 'stats', 'groundhogg' ), round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) );
 
         return $html;
     }
@@ -242,20 +239,20 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $time_diff = $p_time - $cur_time;
 
         if ( $time_diff < 0 ){
-            $time_prefix = __( 'Sent', 'groundhogg' );
+            $time_prefix = _x( 'Sent', 'status', 'groundhogg' );
             /* The event has passed */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
                 $time = date_i18n( 'jS F, Y \@ h:i A', intval( $p_time ) );
             } else {
-                $time = sprintf( __( "%s ago", 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
+                $time = sprintf( _x( "%s ago", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
             }
         } else {
-            $time_prefix = __( 'Will send', 'groundhogg' );
+            $time_prefix = _x( 'Will send', 'status', 'groundhogg' );
             /* the event is scheduled */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = sprintf( __( "on %s", 'groundhogg' ), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+                $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
             } else {
-                $time = sprintf( __( "in %s", 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
+                $time = sprintf( _x( "in %s", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
             }
         }
 
@@ -271,11 +268,11 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $dc_time = mysql2date( 'U', $broadcast->date_scheduled );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $dc_time - $cur_time;
-        $time_prefix = __( 'Created', 'groundhogg' );
+        $time_prefix = _x( 'Created', 'status', 'groundhogg' );
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
             $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
         } else {
-            $time = sprintf( "%s ago", human_time_diff( $dc_time, $cur_time ) );
+            $time = sprintf( _x( "%s ago", 'status', 'groundhogg'  ), human_time_diff( $dc_time, $cur_time ) );
         }
         return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
     }

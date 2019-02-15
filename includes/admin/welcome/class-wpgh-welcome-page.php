@@ -26,14 +26,13 @@ class WPGH_Welcome_Page
     function __construct()
     {
 
-        add_action( 'admin_menu', array( $this, 'register' ) );
+        /* Welcome page always comes first */
+        add_action( 'admin_menu', array( $this, 'register' ), 1 );
 
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'groundhogg' ){
 
             $this->notices = WPGH()->notices;
-            $this->notices->add(
-              'affiliate', __( 'You can get our entire extension library for $1 if <a href="https://www.groundhogg.io/partner/" target="_blank">you refer a friend.</a>' ), 'info'
-            );
+
             add_action( 'admin_init', array( $this, 'status_check' ) );
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
             add_action( 'admin_footer', array( $this, 'bg_image' ) );
@@ -41,22 +40,64 @@ class WPGH_Welcome_Page
         }
     }
 
+    /**
+     * Check a bunch of stuff.
+     */
     public function status_check()
     {
-        $this->check_settings();
+        $this->check_smtp_plugins();
         $this->check_funnels();
         $this->check_settings();
-//        $this->check_plugins();
+        $this->other_notices();
+    }
+
+    /**
+     * Show other notices
+     */
+    public function other_notices()
+    {
+
+        /* Hide affiliate notice when extensions are active */
+        if ( ! class_exists( 'WPGH_Extensions_Manager' ) )
+            include_once dirname( __FILE__ ) . '/../extensions/module-manager.php';
+
+        if ( ! WPGH_Extension_Manager::has_extensions() ){
+            $this->notices->add(
+                'affiliate', _x( 'You can get our entire extension library for $1 if <a href="https://www.groundhogg.io/partner/" target="_blank">you refer a friend.</a>', 'notice', 'groundhogg' ), 'info'
+            );
+        }
+
+
     }
 
     /**
      * Check to see if some plugins are active.
      */
-    public function check_plugins()
+    public function check_smtp_plugins()
     {
-        if ( ! is_plugin_active( 'wp-mail-smtp/wp_mail_smtp.php' ) ){
+
+        $smtp_plugins =[
+            'wp-mail-smtp/wp_mail_smtp.php',
+            'wp-ses/wp-ses.php',
+            'wp-amazon-ses-smtp/wp-amazon-ses.php',
+            'easy-wp-smtp/easy-wp-smtp.php',
+            'post-smtp/postman-smtp.php',
+            'wp-mail-bank/wp-mail-bank.php',
+            'gmail-smtp/main.php',
+            'smtp-mailer/main.php',
+        ];
+
+        $has_smtp = false;
+
+        foreach ( $smtp_plugins as $plugin ) {
+            if ( is_plugin_active('wp-mail-smtp/wp_mail_smtp.php' ) ) {
+                $has_smtp = true;
+            }
+        }
+
+        if ( ! $has_smtp ){
             $this->notices->add(
-                'smtp', __( 'While we work on an SMTP solution for you that is builtin, there are other ones out there. We recommend you install <a href="https://en-ca.wordpress.org/plugins/wp-mail-smtp/">WP Mail SMTP</a> to increase your deliverability.' ), 'info'
+                'smtp', _x( 'We recommend sending email through an SMTP service. <a target="_blank" href="https://www.groundhogg.io/downloads/email-credits/">Try ours!</a> Or look for one in <a target="_blank" href="https://en-ca.wordpress.org/plugins/search/smtp/">the WP repository.</a>', 'notice', 'groundhogg' ), 'info'
             );
         }
     }
@@ -69,7 +110,7 @@ class WPGH_Welcome_Page
     {
         if ( ! wpgh_get_option( 'gh_business_name' ) ){
             $this->notices->add(
-                'incomplete_settings', __( 'It appears you have incomplete settings! Go to <a href="?page=gh_settings">the settings page</a> and fill out all your business information.' ), 'warning'
+                'incomplete_settings', _x( 'It appears you have incomplete settings! Go to <a href="?page=gh_settings">the settings page</a> and fill out all your business information.', 'notice', 'groundhogg' ), 'warning'
             );
         }
     }
@@ -81,9 +122,9 @@ class WPGH_Welcome_Page
     {
         $funnels = WPGH()->funnels->get_funnels();
 
-        if ( empty( $funnels ) ){
+        if ( count( $funnels ) <= 1 ){
             $this->notices->add(
-                'no_active_funnels', __( 'You have no active funnels! Go to <a href="?page=gh_funnels&action=add">the funnels page</a> and create your first funnel!' ), 'warning'
+                'no_active_funnels', _x( 'You have no active funnels! Go to <a href="?page=gh_funnels&action=add">the funnels page</a> and create your first funnel!', 'notice', 'groundhogg' ), 'warning'
             );
         }
 
@@ -95,7 +136,7 @@ class WPGH_Welcome_Page
 
         if ( $contacts < 10 ){
             $this->notices->add(
-                'no_contacts', __( 'Seems like you need some more contacts. Go to the <a href="?page=gh_settings&tab=tools">tools area</a> and import your mailing list!' ), 'warning'
+                'no_contacts', _x( 'Seems like you need some more contacts. Go to the <a href="?page=gh_settings&tab=tools">tools area</a> and import your mailing list!', 'notice', 'groundhogg' ), 'warning'
             );
         }
 
@@ -108,13 +149,22 @@ class WPGH_Welcome_Page
     {
 
         $page = add_menu_page(
-            'Welcome',
+            WPGH()->brand(),
             WPGH()->brand(),
             'view_contacts',
             'groundhogg',
             array( $this, 'page' ),
             'dashicons-email-alt',
             2
+        );
+
+        $sub_page = add_submenu_page(
+            'groundhogg',
+            _x( 'Welcome', 'page_title', 'groundhogg' ),
+            _x( 'Welcome', 'page_title', 'groundhogg' ),
+            'view_contacts',
+            'groundhogg',
+            array($this, 'page')
         );
 
         add_action("load-" . $page, array($this, 'help'));

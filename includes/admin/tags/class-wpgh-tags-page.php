@@ -21,10 +21,11 @@ class WPGH_Tags_Page
      * @var WPGH_Notices
      */
     public $notices;
+    public $order = 10;
 
 	function __construct()
 	{
-	    add_action( 'admin_menu', array( $this, 'register' ) );
+	    add_action( 'admin_menu', array( $this, 'register' ), $this->order );
 
 		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_tags' ){
 
@@ -158,7 +159,7 @@ class WPGH_Tags_Page
 
                 }
 
-                $this->notices->add( 'deleted', sprintf( '%d %s', count( $this->get_tags() ), __( 'tags deleted' ) ) );
+                $this->notices->add( 'deleted', sprintf( _nx( '%d tag deleted', '%d tags deleted', count( $this->get_tags() ), 'notice', 'groundhogg' ), count( $this->get_tags() ) ));
 
                 do_action( 'wpgh_delete_tags' );
 
@@ -194,7 +195,7 @@ class WPGH_Tags_Page
 
             }
 
-            $this->notices->add( 'new-tags', __( sprintf( 'Created %s new tags!', count( $tag_names ) ), 'groundhogg' ) );
+            $this->notices->add( 'new-tags', sprintf( _nx( '%d tag created', '%d tags created', count( $tag_names ), 'notice', 'groundhogg' ), count( $tag_names ) ) );
         } else {
 
             $tag_name = sanitize_text_field( wp_unslash( $_POST['tag_name'] ) );
@@ -203,7 +204,7 @@ class WPGH_Tags_Page
 
             do_action( 'wpgh_tag_created', $id );
 
-            $this->notices->add( 'new-tags', __( 'Created new tag!' , 'groundhogg' ) );
+            $this->notices->add( 'new-tags', _x( 'Tag created', 'notice', 'groundhogg' ) );
 
         }
     }
@@ -225,7 +226,7 @@ class WPGH_Tags_Page
 
         WPGH()->tags->update( intval( $_GET[ 'tag' ] ), $args );
 
-        $this->notices->add( 'updated', __( 'Updated tag!' , 'groundhogg' ) );
+        $this->notices->add( 'updated', _x( 'Tag updated', 'notice', 'groundhogg' ) );
 
     }
 
@@ -250,9 +251,9 @@ class WPGH_Tags_Page
         <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Tags&nbsp;', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Tags', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( __( 'Search Tags' ) )?>">
+                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( __( 'Search Tags', 'groundhogg' ) )?>">
             </p>
         </form>
         <div id="col-container" class="wp-clearfix">
@@ -296,7 +297,7 @@ class WPGH_Tags_Page
                                     });
                                 });
                             </script>
-							<?php submit_button( __( 'Add New Tag', 'groundhogg' ), 'primary', 'add_tag' ); ?>
+							<?php submit_button( _x( 'Add New Tag', 'action', 'groundhogg' ), 'primary', 'add_tag' ); ?>
                         </form>
                     </div>
                 </div>
@@ -326,7 +327,7 @@ class WPGH_Tags_Page
 	{
 		?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_tags' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_tags' ); ?>"><?php _ex( 'Add New', 'page_tile_action','groundhogg' ); ?></a>
 			<?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){

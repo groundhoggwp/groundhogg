@@ -25,18 +25,17 @@ class WPGH_Emails_Page
      */
     public $notices;
 
+    public $order = 25;
+
     /**
      * WPGH_Emails_Page constructor.
      */
     function __construct()
     {
 
-        add_action( 'admin_menu', array( $this, 'register' ) );
-
+        add_action( 'admin_menu', array( $this, 'register' ), $this->order );
         add_action( 'wp_ajax_gh_update_email', array( $this, 'update_email_ajax' ) );
-
         $this->notices = WPGH()->notices;
-
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_emails' ){
 
             add_action( 'init' , array( $this, 'process_action' )  );
@@ -576,9 +575,9 @@ class WPGH_Emails_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Emails&nbsp;', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Emails', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Emails&nbsp;', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Emails', 'groundhogg'); ?>">
             </p>
             <?php $emails_table->prepare_items(); ?>
             <?php $emails_table->display(); ?>

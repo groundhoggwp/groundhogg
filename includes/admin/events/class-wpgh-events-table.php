@@ -86,7 +86,7 @@ class WPGH_Events_Table extends WP_List_Table {
 
 
         if ( ! $event->contact->exists() )
-            return sprintf( "<strong>(%s)</strong>",  __( 'contact deleted', 'groundhogg' ) );
+            return sprintf( "<strong>(%s)</strong>",  _x( 'contact deleted', 'status', 'groundhogg' ) );
 
         $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
             admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $event->contact->ID ),
@@ -108,7 +108,7 @@ class WPGH_Events_Table extends WP_List_Table {
             $funnel_title = __( 'Broadcast Email', 'groundhogg' );
         } else {
             $funnel = WPGH()->funnels->get( $funnel_id );
-            $funnel_title = ( $funnel )? $funnel->title : sprintf( '(%s)', __( 'deleted' ) ) ;
+            $funnel_title = ( $funnel )? $funnel->title : sprintf( '(%s)', _x( 'funnel deleted', 'status', 'groundhogg' ) ) ;
         }
 
         return sprintf( "<a href='%s'>%s</a>",
@@ -134,7 +134,7 @@ class WPGH_Events_Table extends WP_List_Table {
         }
 
         if ( ! $step_title )
-            return sprintf( "<strong>%s</strong>", __( '(step deleted)' ) );
+            return sprintf( "<strong>(%s)</strong>", _x( 'step deleted', 'status', 'groundhogg' ) );
 
         return sprintf( "<a href='%s'>%s</a>",
             admin_url( 'admin.php?page=gh_events&view=step&step=' . $event->step->ID ),
@@ -149,7 +149,7 @@ class WPGH_Events_Table extends WP_List_Table {
 
         ?>
         <div class="alignleft">
-            <a class="button button-secondary action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php printf( __( 'Process Events (Auto Runs In %s)', 'groundhogg' ), $next_run_in ); ?></a>
+            <a class="button button-secondary action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php printf( _x( 'Process Events (Auto Runs In %s)', 'action', 'groundhogg' ), $next_run_in ); ?></a>
         </div>
         <?php
     }
@@ -171,19 +171,19 @@ class WPGH_Events_Table extends WP_List_Table {
         switch ( $status ){
             default:
             case 'waiting':
-                $time_prefix = __( 'Will run', 'groundhogg' );
+                $time_prefix = _x( 'Will run', 'status', 'groundhogg' );
                 break;
             case 'cancelled':
-                $time_prefix = __( 'Cancelled', 'groundhogg' );
+                $time_prefix = _x( 'Cancelled', 'status','groundhogg' );
                 break;
             case 'skipped':
-                $time_prefix = __( 'Skipped', 'groundhogg' );
+                $time_prefix = _x( 'Skipped', 'status','groundhogg' );
                 break;
             case 'complete':
-                $time_prefix = __( 'Processed', 'groundhogg' );
+                $time_prefix = _x( 'Processed', 'status','groundhogg' );
                 break;
             case 'failed':
-                $time_prefix = __( 'Failed', 'groundhogg' );
+                $time_prefix = _x( 'Failed', 'status', 'groundhogg' );
                 break;
         }
 
@@ -192,14 +192,14 @@ class WPGH_Events_Table extends WP_List_Table {
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
                 $time = date_i18n( 'Y/m/d \@ h:i A', intval( $p_time ) );
             } else {
-                $time = sprintf( "%s ago", human_time_diff( $p_time, $cur_time ) );
+                $time = sprintf( _x( "%s ago", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
             }
         } else {
             /* the event is scheduled */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = sprintf( "on %s", date_i18n( 'Y/m/d \@ h:i A', intval( $p_time )  ) );
+                $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( 'Y/m/d \@ h:i A', intval( $p_time )  ) );
             } else {
-                $time = sprintf( "in %s", human_time_diff( $p_time, $cur_time ) );
+                $time = sprintf( _x( "in %s", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
             }
         }
 
@@ -267,11 +267,11 @@ class WPGH_Events_Table extends WP_List_Table {
         );
 
         return apply_filters( 'gh_event_views', array(
-            'all'       => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_events' ) . "'>" . __( 'All <span class="count">('. array_sum($count) . ')</span>', 'groundhogg' ) . "</a>",
-            'waiting'   => "<a class='" . ($view === 'waiting' ? 'current' : '') . "' href='" . $base_url . "waiting" . "'>" . __( 'Waiting <span class="count">('.$count['waiting'].')</span>', 'groundhogg' ) . "</a>",
-            'skipped'   => "<a class='" . ($view === 'skipped' ? 'current' : '') . "' href='" . $base_url . "skipped" . "'>" . __( 'Skipped <span class="count">('.$count['skipped'].')</span>', 'groundhogg' ) . "</a>",
-            'cancelled' => "<a class='" . ($view === 'cancelled' ? 'current' : '') . "' href='" . $base_url . "cancelled" . "'>" . __( 'Cancelled <span class="count">('.$count['cancelled'].')</span>', 'groundhogg' ) . "</a>",
-            'completed' => "<a class='" . ($view === 'completed' ? 'current' : '') . "' href='" . $base_url . "complete" . "'>" . __( 'Completed <span class="count">('.$count['completed'].')</span>', 'groundhogg' ) . "</a>"
+            'all'       => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_events' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('. array_sum($count) . ')</span>' . "</a>",
+            'waiting'   => "<a class='" . ($view === 'waiting' ? 'current' : '') . "' href='" . $base_url . "waiting" . "'>" . _x( 'Waiting', 'view', 'groundhogg' ) . ' <span class="count">('.$count['waiting'].')</span>' . "</a>",
+            'skipped'   => "<a class='" . ($view === 'skipped' ? 'current' : '') . "' href='" . $base_url . "skipped" . "'>" . _x( 'Skipped','view','groundhogg') . ' <span class="count">('.$count['skipped'].')</span>' . "</a>",
+            'cancelled' => "<a class='" . ($view === 'cancelled' ? 'current' : '') . "' href='" . $base_url . "cancelled" . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) .' <span class="count">('.$count['cancelled'].')</span>' . "</a>",
+            'completed' => "<a class='" . ($view === 'completed' ? 'current' : '') . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ). ' <span class="count">('.$count['completed'].')</span>' . "</a>"
         ) );
     }
 
@@ -391,15 +391,15 @@ class WPGH_Events_Table extends WP_List_Table {
                     '<a href="%s" class="edit" aria-label="%s">%s</a>',
                     /* translators: %s: title */
                     esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ) ) ),
-                    esc_attr( __( 'Execute', 'groundhogg' ) ),
-                    __( 'Run Now', 'groundhogg' )
+                    esc_attr( _x( 'Execute', 'action', 'groundhogg' ) ),
+                    _x( 'Run Now', 'action', 'groundhogg' )
                 );
                 $actions['delete'] = sprintf(
                     '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
                     esc_url( wp_nonce_url(admin_url('admin.php?page=gh_events&event='. $event->ID .'&action=cancel') ) ),
                     /* translators: %s: title */
-                    esc_attr( __( 'Cancel','groundhogg' ) ),
-                    __( 'Cancel','groundhogg' )
+                    esc_attr( _x( 'Cancel', 'action', 'groundhogg' ) ),
+                    _x( 'Cancel', 'action', 'groundhogg' )
                 );
                 break;
             default:
@@ -407,8 +407,8 @@ class WPGH_Events_Table extends WP_List_Table {
                     '<a href="%s" class="edit" aria-label="%s">%s</a>',
                     /* translators: %s: title */
                     esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ) ) ),
-                    esc_attr( __( 'Run Again','groundhogg' ) ),
-                    __( 'Run Again','groundhogg' )
+                    esc_attr( _x( 'Run Again', 'action', 'groundhogg' ) ),
+                    _x( 'Run Again', 'action', 'groundhogg' )
                 );
                 break;
 
@@ -417,8 +417,8 @@ class WPGH_Events_Table extends WP_List_Table {
         if ( $event->contact->exists() ){
             $actions[ 'view' ] = sprintf( "<a class='edit' href='%s' aria-label='%s'>%s</a>",
                 admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $event->contact->ID ),
-                esc_attr( __( 'View Contact','groundhogg' ) ),
-                __( 'View Contact','groundhogg' )
+                esc_attr( _x( 'View Contact', 'action', 'groundhogg' ) ),
+                _x( 'View Contact', 'action', 'groundhogg' )
             );
         }
 

@@ -107,7 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
-= 1.0.24.1 =
+= 1.0.25 =
+* TWEAKED Improved localization all around.
+* TWEAKED Quick UI improvement for creating emails from the broadcast view.
 * TWEAKED added URL params for pages with dynamic content to help excluding in various caching plugins.
 
 = 1.0.24 =

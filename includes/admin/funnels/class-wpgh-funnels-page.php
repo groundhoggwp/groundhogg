@@ -43,10 +43,11 @@ class WPGH_Funnels_Page
      */
     public $popup;
 
+    public $order = 30;
 
     function __construct()
 	{
-	    add_action( 'admin_menu', array( $this, 'register' ) );
+	    add_action( 'admin_menu', array( $this, 'register' ), $this->order );
 
 	    if ( is_admin() ){
             add_action( 'wp_ajax_gh_get_templates', array( $this, 'get_funnel_templates_ajax' ) );
@@ -292,13 +293,13 @@ class WPGH_Funnels_Page
 	{
 		switch ( $this->get_action() ){
 			case 'add':
-				_e( 'Add Funnel' , 'groundhogg' );
+				_ex( 'Add Funnel', 'page_title', 'groundhogg' );
 				break;
 			case 'edit':
-				_e( 'Edit Funnel' , 'groundhogg' );
+				_ex( 'Edit Funnel', 'page_title', 'groundhogg' );
 				break;
 			default:
-				_e( 'Funnels', 'groundhogg' );
+				_ex( 'Funnels', 'page_title', 'groundhogg' );
 		}
 	}
 
@@ -351,7 +352,7 @@ class WPGH_Funnels_Page
 
                 $this->notices->add(
                     esc_attr( 'duplicated' ),
-                    __( 'Funnel Duplicated', 'groundhogg' ),
+                    _x( 'Funnel duplicated', 'notice', 'groundhogg' ),
                     'success'
                 );
 
@@ -370,10 +371,7 @@ class WPGH_Funnels_Page
 
 				$this->notices->add(
                     esc_attr( 'archived' ),
-                    sprintf( "%s %d %s",
-                        __( 'Archived', 'groundhogg' ),
-                        count( $this->get_funnels() ),
-                        'Funnels' ),
+                    sprintf( _nx( 'Archived %d funnel', 'Archived %d funnels', count( $this->get_funnels() ), 'notice', 'groundhogg' ), count( $this->get_funnels() ) ),
                     'success'
                 );
 
@@ -393,11 +391,8 @@ class WPGH_Funnels_Page
 
                 $this->notices->add(
 					esc_attr( 'deleted' ),
-					sprintf( "%s %d %s",
-						__( 'Deleted', 'groundhogg' ),
-						count( $this->get_funnels() ),
-						'funnels' ),
-					'success'
+                    sprintf( _nx( 'Deleted %d funnel', 'Deleted %d funnels', count( $this->get_funnels() ), 'notice', 'groundhogg' ), count( $this->get_funnels() ) ),
+                    'success'
 				);
 
 				do_action( 'wpgh_delete_funnels' );
@@ -418,11 +413,8 @@ class WPGH_Funnels_Page
 
                 $this->notices->add(
 					esc_attr( 'restored' ),
-					sprintf( "%s %d %s",
-						__( 'Restored', 'groundhogg' ),
-						count( $this->get_funnels() ),
-						'Funnels' ),
-					'success'
+                    sprintf( _nx( 'Restored %d funnel', 'Deleted %d funnels', count( $this->get_funnels() ), 'notice', 'groundhogg' ), count( $this->get_funnels() ) ),
+                    'success'
 				);
 
 				do_action( 'wpgh_restore_funnels' );
@@ -521,7 +513,7 @@ class WPGH_Funnels_Page
 
         } else {
 
-            $this->notices->add( esc_attr( 'error' ), __( 'Please select a template...', 'groundhogg' ), 'error' );
+            $this->notices->add( esc_attr( 'error' ), _x( 'Please select a template...', 'notice', 'groundhogg' ), 'error' );
             return;
 
         }
@@ -532,7 +524,7 @@ class WPGH_Funnels_Page
 
         do_action( 'wpgh_funnel_created', $funnel_id );
 
-        $this->notices->add( esc_attr( 'created' ), __( 'Funnel Created', 'groundhogg' ), 'success' );
+        $this->notices->add( esc_attr( 'created' ), _x( 'Funnel created', 'notice', 'groundhogg' ), 'success' );
 
         wp_redirect( admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' .  $funnel_id ) );
         die();
@@ -652,11 +644,11 @@ class WPGH_Funnels_Page
         }
 
         $ds[] = array(
-            'label' => __( 'Completed Events' ),
+            'label' => _x( 'Completed Events', 'stats', 'groundhogg' ),
             'data'  => $dataset1
         ) ;
         $ds[] = array(
-            'label' => __( 'Waiting Contacts' ),
+            'label' => __( 'Waiting Contacts', 'stats', 'groundhogg' ),
             'data'  => $dataset2
         ) ;
 
@@ -677,7 +669,7 @@ class WPGH_Funnels_Page
 
         /* check if funnel is to big... */
         if ( count( $_POST, COUNT_RECURSIVE ) >= intval( ini_get( 'max_input_vars' ) ) ){
-            $this->notices->add( 'post_too_big', __( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.' ), 'warning' );
+            $this->notices->add( 'post_too_big', _x( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.', 'notice', 'groundhogg' ), 'warning' );
         }
 
         $funnel_id = intval( $_REQUEST[ 'funnel' ] );
@@ -696,7 +688,7 @@ class WPGH_Funnels_Page
         } else {
             $status = 'inactive';
 
-            $this->notices->add( esc_attr( 'inactive' ), __( 'Funnel no longer active.', 'groundhogg' ), 'info' );
+            $this->notices->add( esc_attr( 'inactive' ), _x( 'Funnel is currently inactive', 'notice','groundhogg' ), 'info' );
         }
 
         //do not update the status to inactive if it's not confirmed
@@ -753,14 +745,12 @@ class WPGH_Funnels_Page
 
         /* if it's not a bench mark then the funnel cant actually ever run */
         if ( ! $first_step->is_benchmark() ){
-
-            $this->notices->add( 'bad-funnel', __( 'Funnels must start with 1 or more benchmarks', 'groundhogg' ), 'error' );
-
+            $this->notices->add( 'bad-funnel', _x( 'Funnels must start with 1 or more benchmarks', 'notice', 'groundhogg' ), 'error' );
         }
 
         do_action( 'wpgh_funnel_updated', $funnel_id );
 
-        $this->notices->add( esc_attr( 'updated' ), __( 'Funnel Updated', 'groundhogg' ), 'success' );
+        $this->notices->add( esc_attr( 'updated' ), _x( 'Funnel updated', 'notice', 'groundhogg' ), 'success' );
 
     }
 
@@ -931,7 +921,7 @@ class WPGH_Funnels_Page
 
         }
 
-        $this->notices->add( 'contacts-added', sprintf( __( '%d contacts added to funnel!', 'groundhogg' ), count( $contacts ) ), 'success' );
+        $this->notices->add( 'contacts-added', sprintf( _nx( '%d contact added to funnel', '%d contacts added to funnel', count( $contacts ), 'notice', 'groundhogg' ), count( $contacts ) ), 'success' );
 
         ob_start();
 
@@ -968,7 +958,7 @@ class WPGH_Funnels_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Funnels&nbsp;', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Funnels', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
                 <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Funnels', 'groundhogg'); ?>">
             </p>
@@ -1095,7 +1085,7 @@ class WPGH_Funnels_Page
 
                             ?>
                             <a class="button-primary" target="_blank"
-                               href="<?php echo $product->info->link; ?>"> <?php _e('Buy Now ($' . $price1 . ' - $' . $price2 . ')', 'groundhogg'); ?></a>
+                               href="<?php echo $product->info->link; ?>"> <?php printf( _x('Buy Now ($%s - $%s)', 'action', 'groundhogg'), $price1, $price2 ); ?></a>
                             <?php
                         } else {
 
@@ -1104,12 +1094,12 @@ class WPGH_Funnels_Page
                             if ($price > 0.00) {
                                 ?>
                                 <a class="button-primary" target="_blank"
-                                   href="<?php echo $product->info->link; ?>"> <?php _e('Buy Now ($' . $price . ')', 'groundhogg'); ?></a>
+                                   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action','groundhogg' ), $price ); ?></a>
                                 <?php
                             } else {
                                 ?>
                                 <a class="button-primary" target="_blank"
-                                   href="<?php echo $product->info->link; ?>"> <?php _e('Download', 'groundhogg'); ?></a>
+                                   href="<?php echo $product->info->link; ?>"> <?php _ex('Download', 'action', 'groundhogg'); ?></a>
                                 <?php
                             }
                         }
@@ -1119,7 +1109,7 @@ class WPGH_Funnels_Page
                 </div>
             <?php endforeach;
         } else {
-            ?> <p style="text-align: center;font-size: 24px;"><?php _e( 'Sorry, no templates were found.', 'groundhogg' ); ?></p> <?php
+            ?> <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
         }
     }
 }

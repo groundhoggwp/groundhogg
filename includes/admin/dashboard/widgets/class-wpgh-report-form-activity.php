@@ -50,11 +50,11 @@ class WPGH_Report_Form_Activity extends WPGH_Line_Graph_Report_V2
 
         $ds =  array();
         $ds[] = array(
-            'label' => __( 'Form Fills', 'groundhogg' ),
+            'label' => _x( 'Form Fills', 'stats', 'groundhogg' ),
             'data'  => $dataset1
         ) ;
         $ds[] = array(
-            'label' => __( 'Form Impressions', 'groundhogg' ),
+            'label' => _x( 'Form Impressions', 'stats', 'groundhogg' ),
             'data'  => $dataset2
         ) ;
 
@@ -81,9 +81,9 @@ class WPGH_Report_Form_Activity extends WPGH_Line_Graph_Report_V2
         <table class="chart-summary">
             <tbody>
             <tr>
-                <td><?php printf('%s: <span class="summary-total">%d</span>', __('Total Impressions', 'groundhogg'), $num_impressions); ?></td>
-                <td><?php printf('%s: <span class="summary-total">%d</span>', __('Total Submissions', 'groundhogg'), $num_form_fills); ?></td>
-                <td><?php printf('%s: <span class="summary-total">%d%%</span>', __('Average Conversion Rate', 'groundhogg'), ceil( ( $num_form_fills / max( $num_impressions , 1 ) ) * 100 ) ); ?></td>
+                <td><?php printf('%s: <span class="summary-total">%d</span>', _x('Total Impressions', 'stats', 'groundhogg'), $num_impressions); ?></td>
+                <td><?php printf('%s: <span class="summary-total">%d</span>', _x('Total Submissions', 'stats', 'groundhogg'), $num_form_fills); ?></td>
+                <td><?php printf('%s: <span class="summary-total">%d%%</span>', _x('Average Conversion Rate', 'stats', 'groundhogg'), ceil( ( $num_form_fills / max( $num_impressions , 1 ) ) * 100 ) ); ?></td>
             </tr>
             </tbody>
         </table>
@@ -119,11 +119,11 @@ class WPGH_Report_Form_Activity extends WPGH_Line_Graph_Report_V2
             $to = convert_to_local_time( $this->end_range );
 
             $export_info[] = array(
-                __( 'From', 'groundhogg' ) => date( 'F jS', $from ),
-                __( 'To', 'groundhogg' ) => date( 'F jS', $to ),
-                __( 'Form Impressions', 'groundhogg' ) => $num_form_fills,
-                __( 'Form Submissions', 'groundhogg' ) => $nump_impressions,
-                __( 'Average Conversion Rate', 'groundhogg' ) => ceil( ( $num_form_fills / max( $nump_impressions, 1 ) ) * 100 ) . '%',
+                _x( 'From', 'stats', 'groundhogg' ) => date( 'F jS', $from ),
+                _x( 'To', 'stats', 'groundhogg' ) => date( 'F jS', $to ),
+                _x( 'Form Impressions', 'stats', 'groundhogg' ) => $num_form_fills,
+                _x( 'Form Submissions', 'stats', 'groundhogg' ) => $nump_impressions,
+                _x( 'Average Conversion Rate', 'stats', 'groundhogg' ) => ceil( ( $num_form_fills / max( $nump_impressions, 1 ) ) * 100 ) . '%',
             );
 
             $this->start_range = $this->end_range;

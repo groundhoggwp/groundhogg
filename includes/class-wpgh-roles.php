@@ -417,7 +417,7 @@ class WPGH_Roles {
 
 	    $error_str = str_replace( '_', ' ',  $cap  );
 
-	    $error = sprintf( __( 'Your user role does not have the required permissions to %s.', 'groundhogg' ), $error_str );
+	    $error = sprintf( _x( 'Your user role does not have the required permissions to %s.', 'notice', 'groundhogg' ), $error_str );
 
         return $error;
 

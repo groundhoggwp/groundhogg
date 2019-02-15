@@ -38,9 +38,11 @@ class WPGH_Contacts_Page
      */
     private $exporter;
 
+    public $order = 5;
+
     public function __construct()
     {
-        add_action( 'admin_menu', array( $this, 'register' ) );
+        add_action( 'admin_menu', array( $this, 'register' ), $this->order );
         add_action('wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
 
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_contacts' ){
@@ -171,23 +173,23 @@ class WPGH_Contacts_Page
     {
         switch ( $this->get_action() ){
             case 'add':
-                _e( 'Add Contact' , 'groundhogg' );
+                _ex( 'Add Contact', 'page_title', 'groundhogg' );
                 break;
             case 'edit':
                 $contacts = $this->get_contacts();
                 $contact = wpgh_get_contact( array_shift( $contacts  ) );
                 if ( $contact ){
-	                printf( __( 'Edit Contact: %s', 'groundhogg'), $contact->full_name );
+	                printf( _x( 'Edit Contact: %s', 'page_title', 'groundhogg'), $contact->full_name );
                 } else {
-	                printf( __( 'Oops!', 'groundhogg'), $contact->full_name );
+	                _ex( 'Oops!', 'page_title', 'groundhogg' );
                 }
 
                 break;
             case 'search':
-                _e( 'Search Contacts' , 'groundhogg' );
+                _ex( 'Search Contacts', 'page_title', 'groundhogg' );
                 break;
             default:
-                _e( 'Contacts', 'groundhogg' );
+                _ex( 'Contacts', 'page_title', 'groundhogg' );
         }
     }
 
@@ -257,7 +259,7 @@ class WPGH_Contacts_Page
 
 	            $this->notices->add(
 		            esc_attr( 'spammed' ),
-		            sprintf( __( 'Marked %d contacts as spam.','groundhogg' ), count( $this->get_contacts() ) ),
+		            sprintf( _nx( 'Marked %d contact as spam.','Marked %d contact as spam.', count( $this->get_contacts() ), 'notice', 'groundhogg' ), count( $this->get_contacts() ) ),
 		            'success'
 	            );
 
@@ -285,7 +287,7 @@ class WPGH_Contacts_Page
 
 	            $this->notices->add(
 		            esc_attr( 'deleted' ),
-		            sprintf( __( "Deleted %d contacts.", 'groundhogg') , count( $this->get_contacts() ) ),
+                    sprintf( _nx( 'Deleted %d contact','Deleted %d contacts', count( $this->get_contacts() ), 'notice', 'groundhogg' ), count( $this->get_contacts() ) ),
 		            'success'
 	            );
 
@@ -307,8 +309,8 @@ class WPGH_Contacts_Page
 
 	            $this->notices->add(
 		            esc_attr( 'unspam' ),
-		            sprintf( __( "Approved %d contacts.", 'groundhogg' ), count( $this->get_contacts() ) ),
-		            'success'
+                    sprintf( _nx( 'Approved %d contact','Approved %d contacts', count( $this->get_contacts() ), 'notice', 'groundhogg' ), count( $this->get_contacts() ) ),
+                    'success'
 	            );
 
                 do_action( 'wpgh_unspam_contacts' );
@@ -329,8 +331,8 @@ class WPGH_Contacts_Page
 
 	            $this->notices->add(
 		            esc_attr( 'unbounce' ),
-		            sprintf( __( "Approved %d contacts.", 'groundhogg' ), count( $this->get_contacts() ) ),
-		            'success'
+                    sprintf( _nx( 'Approved %d contact','Approved %d contacts', count( $this->get_contacts() ), 'notice', 'groundhogg' ), count( $this->get_contacts() ) ),
+                    'success'
 	            );
 
                 do_action( 'wpgh_unbounce_contacts' );
@@ -375,7 +377,7 @@ class WPGH_Contacts_Page
         do_action( 'wpgh_admin_add_contact_before' );
 
         if ( ! isset( $_POST['email'] ) ){
-            $this->notices->add( 'NO_EMAIL', __( "Please enter a valid email address.", 'groundhogg' ), 'error' );
+            $this->notices->add( 'NO_EMAIL', _x( "Please enter a valid email address.", 'notice', 'groundhogg' ), 'error' );
             return;
         }
 
@@ -392,14 +394,14 @@ class WPGH_Contacts_Page
             if ( ! WPGH()->contacts->exists( $email ) ){
                 $args[ 'email' ] = $email;
             } else {
-                $this->notices->add( 'email_exists', sprintf( __( 'Sorry, the email %s already belongs to another contact.', 'groundhogg' ), $email ), 'error' );
+                $this->notices->add( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg' ), $email ), 'error' );
                 return;
             }
 
         }
 
         if ( ! is_email( $args['email'] ) ){
-            $this->notices->add( 'BAD_EMAIL', __( "Please enter a valid email address", 'groundhogg' ), 'error' );
+            $this->notices->add( 'NO_EMAIL', _x( "Please enter a valid email address.", 'notice', 'groundhogg' ), 'error' );
             return;
         }
 
@@ -427,7 +429,7 @@ class WPGH_Contacts_Page
             $contact->add_tag( $_POST[ 'tags' ] );
         }
 
-        $this->notices->add( 'created', __( "Contact created!", 'groundhogg' ), 'success' );
+        $this->notices->add( 'created', _x( "Contact created!", 'notice','groundhogg' ), 'success' );
 
         do_action( 'wpgh_admin_add_contact_after', $id );
 
@@ -502,7 +504,7 @@ class WPGH_Contacts_Page
 
             $this->notices->add(
                 esc_attr( 'unsubscribed' ),
-                __( 'This contact will no longer receive marketing.', 'groundhogg' ),
+                _x( 'This contact will no longer receive marketing.', 'notice', 'groundhogg' ),
                 'info'
             );
         }
@@ -512,24 +514,17 @@ class WPGH_Contacts_Page
             $email = sanitize_email( $_POST[ 'email' ] );
 
             //check if it's the current email address.
-            if ( $contact->email !== $email ){
-
+            if ( $contact->email !== $email ) {
                 //check if another email address like it exists...
-                if ( ! WPGH()->contacts->exists( $email ) ){
-                    $args[ 'email' ] = $email;
-
+                if (!WPGH()->contacts->exists($email)) {
+                    $args['email'] = $email;
                     //update new optin status to unconfirmed
-                    $args[ 'optin_status' ] = WPGH_UNCONFIRMED;
-                    $this->notices->add( 'optin_status_updated', sprintf( __( 'The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', $email ), 'groundhogg' ), 'error' );
-
+                    $args['optin_status'] = WPGH_UNCONFIRMED;
+                    $this->notices->add('optin_status_updated', sprintf(_x('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', 'notice', $email), 'groundhogg'), 'error');
                 } else {
-
-                    $this->notices->add( 'email_exists', sprintf( __( 'Sorry, the email %s already belongs to another contact.', 'groundhogg' ), $email ), 'error' );
-
+                    $this->notices->add('email_exists', sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email), 'error');
                 }
-
             }
-
         }
 
         if ( isset( $_POST['first_name'] ) ){
@@ -626,11 +621,10 @@ class WPGH_Contacts_Page
                 $result = $contact->add_tag( $add_tags );
 
                 if ( ! $result ){
-                    $this->notices->add( 'bad-tag', __( 'Hmm, looks like we couldn\'t add the new tags...' , 'groundhogg' ) );
+                    $this->notices->add( 'bad-tag', _x( 'Hmm, looks like we could not add the new tags...', 'notice', 'groundhogg' ) );
                 }
             }
         } else {
-            //delete all tags...
             $contact->remove_tag( $contact->tags );
         }
 
@@ -640,37 +634,25 @@ class WPGH_Contacts_Page
 
             if ( $mail->exists() ){
 
-//                //$ars;
-//
-//                $args = array(
-//                    'time'          => time(),
-//                    'contact_id'    => $contact->ID,
-//                    'funnel_id'     => WPGH_BROADCAST,
-//                    'step_id'       => ,
-//                    'status'        => 'waiting'
-//                );
-
                 WPGH()->events->add( $args );
 
                 if ( $mail->send( $contact ) ){
-                    $this->notices->add( 'sent', __( "Email sent!", 'groundhogg' ), 'info' );
+                    $this->notices->add( 'sent', _x( "Email sent!", 'notice', 'groundhogg' ), 'info' );
                 } else {
-                    $this->notices->add( 'not_sent', __( "Email could not be sent.", 'groundhogg' ), 'error' );
+                    $this->notices->add( 'not_sent', _x( "Email could not be sent.", 'notice', 'groundhogg' ), 'error' );
                 }
             }
-
-
         }
 
         if ( isset( $_POST[ 'start_funnel' ] ) && isset( $_POST[ 'add_contacts_to_funnel_step_picker' ] ) && current_user_can( 'edit_contacts' ) ){
 
             $step = new WPGH_Step( intval( $_POST[ 'add_contacts_to_funnel_step_picker' ] ) );
             if ( $step->enqueue( $contact ) ){
-                $this->notices->add( 'started', __( "Contact added to funnel.", 'groundhogg' ), 'info' );
+                $this->notices->add( 'started', _x( "Contact added to funnel.", 'notice', 'groundhogg' ), 'info' );
             }
         }
 
-        $this->notices->add( 'update', __( "Contact updated!", 'groundhogg' ), 'success' );
+        $this->notices->add( 'update', _x( "Contact updated!", 'notice', 'groundhogg' ), 'success' );
 
         if ( ! empty( $_FILES[ 'files' ][ 'tmp_name' ][ 0 ] ) ){
 
@@ -720,7 +702,7 @@ class WPGH_Contacts_Page
 
             if( isset( $mfile['error'] ) ) {
                 if ( empty( $mfile[ 'error' ] ) ) {
-                    $mfile['error'] = __('Could not upload file.');
+                    $mfile['error'] = __('Could not upload file.', 'notice', 'groundhogg' );
                 }
                 $this->notices->add( 'BAD_UPLOAD', $mfile['error'], 'error' );
             } else {
@@ -750,7 +732,7 @@ class WPGH_Contacts_Page
     {
 
         if ( ! wp_doing_ajax() ){
-            wp_die( 'should not be calling this function' );
+            return;
         }
 
         if ( ! current_user_can( 'edit_contacts' ) ){
@@ -772,9 +754,9 @@ class WPGH_Contacts_Page
         $err = array();
 
         if( !$email ) {
-            $err[] = __( 'Email cannot be blank.', 'groundhogg' );
+            $err[] = _x( 'Email cannot be blank.', 'notice', 'groundhogg' );
         } else if ( ! is_email( $email ) ) {
-            $err[] = __( 'Invalid email address.', 'groundhogg' );
+            $err[] = _x( 'Invalid email address.', 'notice', 'groundhogg' );
         }
 
         //check if it's the current email address.
@@ -786,18 +768,18 @@ class WPGH_Contacts_Page
 
                 //update new optin status to unconfirmed
                 $args['optin_status'] = WPGH_UNCONFIRMED;
-                $err[] = sprintf(__('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', $email), 'groundhogg');
+                $err[] = sprintf(_x('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', 'notice', $email), 'groundhogg');
 
             } else {
 
-                $err[] =  sprintf(__('Sorry, the email %s already belongs to another contact.', 'groundhogg'), $email);
+                $err[] =  sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email);
 
             }
 
         }
 
         if( !$args[ 'first_name' ] ) {
-            $err[] = __( 'First name cannot be blank.', 'groundhogg' );
+            $err[] = _x( 'First name cannot be blank.', 'notice', 'groundhogg' );
         }
 
         if( $err ) {
@@ -870,9 +852,9 @@ class WPGH_Contacts_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Contacts&nbsp;', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Contacts', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Contacts&nbsp;', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Contacts', 'groundhogg'); ?>">
             </p>
             <?php $contacts_table->prepare_items(); ?>
             <?php $contacts_table->display(); ?>
@@ -938,18 +920,6 @@ class WPGH_Contacts_Page
         }
 
         $insert = is_int( $value ) ? '%d' : '%s';
-        $statement = '';
-
-        /*
-         * '='             => __( 'Equals', 'groundhogg' ),
-            '!='            => __( 'Not Equals', 'groundhogg' ),
-            'LIKE sw'       => __( 'Starts With', 'groundhogg' ),
-            'LIKE ew'       => __( 'Ends With', 'groundhogg' ),
-            'LIKE c'        => __( 'Contains', 'groundhogg' ),
-            'NOT LIKE c'    => __( 'Does Not Contain', 'groundhogg' ),
-            'EMPTY'         => __( 'Is Empty', 'groundhogg' ),
-            'NOT EMPTY'     => __( 'Is Filled', 'groundhogg' ),
-         */
 
         switch ( $comp ){
             default:
@@ -1044,9 +1014,6 @@ class WPGH_Contacts_Page
         $tags_1 = wp_parse_id_list( $tags[ 'tags_1' ]['tags'] );
         $tags_2 = wp_parse_id_list( $tags[ 'tags_2' ]['tags'] );
 
-
-
-
         $SQL = sprintf( '%s %s %s', $SELECT, $WHERE, implode( ' AND ', $CLAUSES ) );
 
         var_dump($SQL);
@@ -1064,8 +1031,8 @@ class WPGH_Contacts_Page
         ?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
-            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_contacts&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
-            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_settings&tab=tools' ); ?>"><?php _e( 'Import' ); ?></a>
+            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_contacts&action=add' ); ?>"><?php _ex( 'Add New', 'page_title_action', 'groundhogg' ); ?></a>
+            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_settings&tab=tools' ); ?>"><?php _ex( 'Import', 'page_title_action', 'groundhogg' ); ?></a>
             <?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
             <?php switch ( $this->get_action() ){

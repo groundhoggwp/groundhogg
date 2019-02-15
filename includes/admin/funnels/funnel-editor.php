@@ -96,7 +96,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                             $('.custom-range').addClass('hidden');
                         }})});
                 </script>
-                <?php submit_button( __( 'Refresh', 'groundhogg' ), 'secondary', 'change_reporting', false ); ?>
+                <?php submit_button( _x( 'Refresh', 'action', 'groundhogg' ), 'secondary', 'change_reporting', false ); ?>
                 <div class="onoffswitch">
                     <input type="checkbox" name="reporting_on" class="onoffswitch-checkbox" id="reporting-toggle" value="1" <?php if( isset( $_REQUEST[ 'change_reporting' ] ) ) echo 'checked'; ?> >
                     <label class="onoffswitch-label" for="reporting-toggle">
@@ -107,7 +107,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             </div>
             <div class="status-options">
                 <div id="add-contacts">
-                    <a title="<?php _e( 'Add Contacts', 'groundhogg' ); ?>" href="#source=add-contact-modal&footer=false" class="button trigger-popup"><?php _e( 'Add Contacts', 'groundhogg' ) ?></a>
+                    <a title="<?php _ex( 'Add Contacts', 'action', 'groundhogg' ); ?>" href="#source=add-contact-modal&footer=false" class="button trigger-popup"><?php _ex( 'Add Contacts', 'action', 'groundhogg' ) ?></a>
 <!--                    <div class="hidden" id="add-contact-modal" style="">-->
                     <div class="hidden" id="add-contact-modal" style="display: none;">
                         <div>
@@ -164,7 +164,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                             </table>
                         </div>
                         <p class="submit">
-                            <button type="button" id="add-contacts-button" class="button button-primary" style="float: left"><?php _e( 'Add Contacts' ); ?></button>
+                            <button type="button" id="add-contacts-button" class="button button-primary" style="float: left"><?php _ex( 'Add Contacts', 'action', 'groundhogg' ); ?></button>
                             <span class="spinner" style="float: left"></span>
                         </p>
                     </div>
@@ -172,7 +172,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                 <div id="export">
                     <a id="copy-share-link" style="text-decoration: none; display: inline-block" href="#"><span style="padding: 5px;" title="Copy Share Link" class="dashicons dashicons-share"></span></a>
                     <input id="share-link" type="hidden" value="<?php echo add_query_arg( 'funnel_share', wpgh_encrypt_decrypt( $funnel_id, 'e' ), site_url() ); ?>">
-                    <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _e( 'Export Funnel', 'groundhogg'); ?></a>
+                    <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _ex( 'Export Funnel', 'action','groundhogg'); ?></a>
                 </div>
                 <div id="status">
                     <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
@@ -308,8 +308,3 @@ $funnel = WPGH()->funnels->get( $funnel_id );
         </div>
     </div>
 </form>
-<div>
-    <div class="save-notification">
-	    <?php _e( 'Auto Saved...', '' ); ?>
-    </div>
-</div>

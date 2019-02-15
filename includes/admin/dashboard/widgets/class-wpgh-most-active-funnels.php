@@ -26,7 +26,7 @@ class WPGH_Most_Active_Funnels_Widget extends WPGH_Reporting_Widget
         $funnels = WPGH()->funnels->get_funnels( array( 'status' => 'active' ) );
 
         if ( empty( $funnels ) ){
-            printf( '<p>%s</p>', __( 'You have no active funnels.', 'groundhogg' ) );
+            printf( '<p>%s</p>', _x( 'You have no active funnels.', 'notice', 'groundhogg' ) );
             return;
         }
 
@@ -60,8 +60,8 @@ class WPGH_Most_Active_Funnels_Widget extends WPGH_Reporting_Widget
         ?><table class="chart-summary">
         <thead>
         <tr>
-            <th><?php _e( 'Funnel', 'groundhogg' ); ?></th>
-            <th><?php _e( 'Active Contacts', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Funnel', 'column_title', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Active Contacts', 'column_title', 'groundhogg' ); ?></th>
         </tr>
         </thead>
         <tbody>

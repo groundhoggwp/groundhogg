@@ -59,7 +59,7 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
         }
 
         if ( empty( $sources ) ){
-            printf( '<p class="description">%s</p>', __( 'Nothing new to report.', 'groundhogg' ) );
+            printf( '<p class="description">%s</p>', _x( 'Nothing new to report.', 'notice', 'groundhogg' ) );
             return;
         }
 
@@ -70,12 +70,12 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
         <table class="chart-summary">
         <thead>
         <tr>
-            <th><?php _e( 'Campaign', 'groundhogg' ); ?></th>
-            <th><?php _e( 'Source', 'groundhogg' ); ?></th>
-            <th><?php _e( 'Medium', 'groundhogg' ); ?></th>
-            <th><?php _e( 'Content', 'groundhogg' ); ?></th>
-            <th><?php _e( 'Term', 'groundhogg' ); ?></th>
-            <th><?php _e( 'Contacts', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Campaign','column_title', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Source', 'column_title','groundhogg' ); ?></th>
+            <th><?php _ex( 'Medium', 'column_title','groundhogg' ); ?></th>
+            <th><?php _ex( 'Content','column_title', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Term', 'column_title','groundhogg' ); ?></th>
+            <th><?php _ex( 'Contacts','column_title', 'groundhogg' ); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -143,7 +143,7 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
         }
 
         if ( empty( $sources ) ){
-            return __( 'Nothing new to report.', 'groundhogg' );
+            return _x( 'Nothing new to report.','notice','groundhogg' );
         }
 
         asort( $sources );
@@ -156,12 +156,12 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
             $utm = explode( '|', $source );
 
             $export_info[] = array(
-                __( 'Campaign', 'groundhogg' )  => $utm[0],
-                __( 'Source', 'groundhogg' )    => $utm[1],
-                __( 'Medium', 'groundhogg' )    => $utm[2],
-                __( 'Content', 'groundhogg' )   => $utm[3],
-                __( 'Term', 'groundhogg' )      => $utm[4],
-                __( 'Contacts', 'groundhogg' )  => $num_contacts,
+                _x( 'Campaign', 'column_title','groundhogg' )  => $utm[0],
+                _x( 'Source', 'column_title','groundhogg' )    => $utm[1],
+                _x( 'Medium', 'column_title','groundhogg' )    => $utm[2],
+                _x( 'Content','column_title', 'groundhogg' )   => $utm[3],
+                _x( 'Term', 'column_title','groundhogg' )      => $utm[4],
+                _x( 'Contacts','column_title', 'groundhogg' )  => $num_contacts,
            );
 
         endforeach;

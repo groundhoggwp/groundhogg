@@ -26,7 +26,7 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
         $funnels = WPGH()->funnels->get_funnels( array( 'status' => 'active' ) );
 
         if ( empty( $funnels ) ){
-            printf( '<p>%s</p>', __( 'You have no active funnels.', 'groundhogg' ) );
+            printf( '<p>%s</p>', _x( 'You have no active funnels.', 'notice', 'groundhogg' ) );
             return;
         }
 
@@ -60,7 +60,7 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
                     'selected' => $break_down_funnel_id,
                 ); echo WPGH()->html->dropdown( $args );
 
-                submit_button( 'Update', 'secondary', 'update_funnel_breakdown', false );
+                submit_button( __( 'Update' ), 'secondary', 'update_funnel_breakdown', false );
 
                 ?>
             </form>
@@ -81,10 +81,10 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
         <table class="chart-summary">
         <thead>
         <tr>
-            <th><?php _e( 'Benchmark', 'groundhogg' ); ?></th>
-            <th><?php _e( 'Contacts', 'groundhogg' ); ?></th>
-            <th><?php _e( '/ Total', 'groundhogg' ); ?></th>
-            <th><?php _e( '/ Previous Step', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Benchmark', 'column_title','groundhogg' ); ?></th>
+            <th><?php _ex( 'Contacts', 'column_title', 'groundhogg' ); ?></th>
+            <th><?php _ex( '/ Total', 'column_title', 'groundhogg' ); ?></th>
+            <th><?php _ex( '/ Previous Step', 'column_title', 'groundhogg' ); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -139,7 +139,7 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
         $break_down_funnel_id = $this->get_option( 'breakdown_funnel_id' );
 
         if ( ! $break_down_funnel_id ){
-            return __( 'Please select a funnel first.' , 'groundhogg' );
+            return _x( 'Please select a funnel first.', 'notice', 'groundhogg' );
         }
 
         $benchmarks = WPGH()->steps->get_steps( array(
@@ -148,7 +148,7 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
         ) );
 
         if ( empty( $benchmarks ) ){
-            return __( 'This funnel has no benchmarks.' , 'groundhogg' );
+            return _x( 'This funnel has no benchmarks.', 'notice', 'groundhogg' );
         }
 
         $export_info = array();
@@ -175,10 +175,10 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
             }
 
             $export_info[] = array(
-                __( 'Benchmark', 'groundhogg' )     => $benchmark->step_title,
-                __( 'Contacts', 'groundhogg' )      => $count,
-                __( '/ Total', 'groundhogg' )       => $by_total,
-                __( '/ Previous', 'groundhogg' )    => $by_prev,
+                _x( 'Benchmark', 'column_title', 'groundhogg' )     => $benchmark->step_title,
+                _x( 'Contacts', 'column_title', 'groundhogg' )      => $count,
+                _x( '/ Total', 'column_title', 'groundhogg' )       => $by_total,
+                _x( '/ Previous', 'column_title', 'groundhogg' )    => $by_prev,
             );
 
             $prev_count = $count;

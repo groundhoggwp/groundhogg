@@ -49,15 +49,15 @@ class WPGH_Report_Send_Emails extends WPGH_Line_Graph_Report_V2
 
         $ds =  array();
         $ds[] = array(
-            'label' => __( 'Emails Sent', 'groundhogg' ),
+            'label' => _x( 'Emails Sent', 'stats', 'groundhogg' ),
             'data'  => $dataset1
         ) ;
         $ds[] = array(
-            'label' => __( 'Emails Opened', 'groundhogg' ),
+            'label' => _x( 'Emails Opened', 'stats', 'groundhogg' ),
             'data'  => $dataset2
         ) ;
         $ds[] = array(
-            'label' => __( 'Emails Clicked', 'groundhogg' ),
+            'label' => _x( 'Emails Clicked', 'stats', 'groundhogg' ),
             'data'  => $dataset3
         ) ;
 
@@ -88,13 +88,13 @@ class WPGH_Report_Send_Emails extends WPGH_Line_Graph_Report_V2
         <table class="chart-summary">
             <tbody>
             <tr>
-                <td><?php printf( '%s: <span class="summary-total">%d</span>', __( 'Total Sent', 'groundhogg' ), $num_emails_sent ); ?></td>
-                <td><?php printf( '%s: <span class="summary-total">%d</span>', __( 'Total Opened', 'groundhogg' ), $num_opens ); ?></td>
-                <td style="text-align: right;"><?php printf( '%s: <span class="summary-total">%d</span>', __( 'Total Clicked', 'groundhogg' ), $num_clicks ); ?></td>
+                <td><?php printf( '%s: <span class="summary-total">%d</span>', _x( 'Total Sent', 'stats', 'groundhogg' ), $num_emails_sent ); ?></td>
+                <td><?php printf( '%s: <span class="summary-total">%d</span>', _x( 'Total Opened', 'stats', 'groundhogg' ), $num_opens ); ?></td>
+                <td style="text-align: right;"><?php printf( '%s: <span class="summary-total">%d</span>', _x( 'Total Clicked', 'stats', 'groundhogg' ), $num_clicks ); ?></td>
             </tr>
             <tr>
-                <td><?php printf( '%s: <span class="summary-total">%d%%</span>', __( 'Average Open Rate', 'groundhogg' ), ceil( ( $num_opens / max( $num_emails_sent, 1 ) ) * 100 ) ); ?></td>
-                <td colspan="2" style="text-align: right;"><?php printf( '%s: <span class="summary-total">%d%%</span>', __( 'Average Click Through Rate', 'groundhogg' ), ceil( ( $num_clicks / max( $num_opens, 1 ) ) * 100 ) ); ?></td>
+                <td><?php printf( '%s: <span class="summary-total">%d%%</span>', _x( 'Average Open Rate', 'stats', 'groundhogg' ), ceil( ( $num_opens / max( $num_emails_sent, 1 ) ) * 100 ) ); ?></td>
+                <td colspan="2" style="text-align: right;"><?php printf( '%s: <span class="summary-total">%d%%</span>', _x( 'Average Click Through Rate', 'stats', 'groundhogg' ), ceil( ( $num_clicks / max( $num_opens, 1 ) ) * 100 ) ); ?></td>
             </tr>
             </tbody>
         </table>

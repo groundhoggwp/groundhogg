@@ -91,7 +91,7 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
 
             if ( ! $funnel_title ){
 
-                return sprintf("<strong>(%s)</strong>", __( 'funnel deleted', 'groundhogg' ) );
+                return sprintf("<strong>(%s)</strong>", _x( 'funnel deleted', 'status', 'groundhogg' ) );
 
             } else{
 
@@ -124,7 +124,7 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
         } else {
 
             if (!$event->step->title){
-                return sprintf("<strong>(%s)</strong>", __( 'step deleted', 'groundhogg' ) );
+                return sprintf("<strong>(%s)</strong>", _x( 'step deleted', 'status', 'groundhogg' ) );
             } else {
                 return sprintf("<a href='%s' target='_blank'>%s</a>", admin_url('admin.php?page=gh_funnels&action=edit&funnel=' . $event->funnel_id . '#' . $event->step->ID), $event->step->title);
             }
@@ -142,13 +142,13 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $p_time - $cur_time;
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-            $time = sprintf( __( "On %s", 'groundhogg'), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+            $time = sprintf( _x( "On %s", 'status', 'groundhogg'), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
         } else {
 
             if ( $event->status === 'waiting' ){
-                $time = sprintf( __( "In %s", 'groundhogg'), human_time_diff( $p_time, $cur_time ) );
+                $time = sprintf( _x( "In %s", 'status', 'groundhogg'), human_time_diff( $p_time, $cur_time ) );
             } else {
-                $time = sprintf( __( "%s ago", 'groundhogg'), human_time_diff( $p_time, $cur_time ) );
+                $time = sprintf( _x( "%s ago", 'status', 'groundhogg'), human_time_diff( $p_time, $cur_time ) );
             }
 
         }
@@ -170,10 +170,10 @@ class WPGH_Contact_Events_Table extends WP_List_Table {
         $actions = array();
 
         if ( $event->time > time() ){
-            $actions[] =  sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, __( 'Run Now', 'groundhogg' ) );
-            $actions[] =  sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, __( 'Cancel', 'groundhogg' ) );
+            $actions[] =  sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Now', 'action', 'groundhogg' ) );
+            $actions[] =  sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, _x( 'Cancel', 'action', 'groundhogg' ) );
         } else {
-            $actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, __( 'Run Again', 'groundhogg' ) );
+            $actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Again', 'action', 'groundhogg' ) );
         }
 
 

@@ -740,7 +740,7 @@ endforeach;
     <?php do_action( 'wpgh_contact_edit_after', $id ); ?>
     <div class="edit-contact-actions">
         <p class="submit">
-            <?php submit_button(_x( 'Update Contact', 'contact_record', 'groundhogg' ), 'primary', 'update', false ); ?>
+            <?php submit_button(_x( 'Update Contact', 'action', 'groundhogg' ), 'primary', 'update', false ); ?>
             <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
         </p>
     </div>

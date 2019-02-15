@@ -100,7 +100,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
         $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->email ) . "</a>";
 
         if ( $contact->optin_status === WPGH_UNCONFIRMED && ( ! isset( $_REQUEST[ 'optin_status' ] ) || $_REQUEST[ 'optin_status' ] !== 'unconfirmed' ) ){
-            $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Unconfirmed', 'groundhogg' ) . ")</span>";
+            $html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Unconfirmed', 'status', 'groundhogg' ) . ")</span>";
         }
 
         $html .= "</strong>";
@@ -233,12 +233,12 @@ class WPGH_Contacts_Table extends WP_List_Table {
         );
 
         return apply_filters( 'contact_views', array(
-            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . __( 'All <span class="count">('.array_sum($count).')</span>', 'gronudhogg' ) . "</a>",
-            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . __( 'Unconfirmed <span class="count">('.$count['unconfirmed'].')</span>', 'gronudhogg' ) . "</a>",
-            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . __( 'Confirmed <span class="count">('.$count['confirmed'].')</span>', 'gronudhogg' ) . "</a>",
-            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . __( 'Unsubscribed <span class="count">('.$count['opted_out'].')</span>', 'gronudhogg' ) . "</a>",
-            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . "spam" . "'>" . __( 'Spam <span class="count">('.$count['spam'].')</span>', 'gronudhogg' ) . "</a>",
-            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . "bounce" . "'>" . __( 'Bounced <span class="count">('.$count['bounce'].')</span>', 'gronudhogg' ) . "</a>"
+            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . $base_url . "all" . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('.  ( $count[ 'unconfirmed' ] + $count[ 'confirmed' ] ) .')</span>' . "</a>",
+            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . _x( 'Unconfirmed', 'view', 'groundhogg' ) . ' <span class="count">('.$count['unconfirmed'].')</span>' . "</a>",
+            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . _x( 'Confirmed', 'view', 'groundhogg' ) . ' <span class="count">('.$count['confirmed'].')</span>'. "</a>",
+            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . _x( 'Unsubscribed', 'view', 'groundhogg' ) . ' <span class="count">('.$count['opted_out'].')</span>' . "</a>",
+            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . "spam" . "'>" . _x( 'Spam', 'view', 'groundhogg' ) . ' <span class="count">('.$count['spam'].')</span>' . "</a>",
+            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . "bounce" . "'>" . _x( 'Bounced', 'view', 'groundhogg') .' <span class="count">('.$count['bounce'].')</span>' . "</a>"
         ) );
     }
 
@@ -496,7 +496,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
 		        '<a href="%s" class="unspam" aria-label="%s">%s</a>',
 		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=unspam')),
 		        /* translators: %s: title */
-		        esc_attr( sprintf( __( 'Mark %s as approved.' ), $title ) ),
+		        esc_attr( sprintf( _x( 'Mark %s as approved.', 'action', 'groundhogg' ), $title ) ),
 		        __( 'Approve' )
 	        );
         } else if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] === 'bounce' ){
@@ -504,15 +504,15 @@ class WPGH_Contacts_Table extends WP_List_Table {
 		        '<a href="%s" class="unbounce" aria-label="%s">%s</a>',
 		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=unbounce')),
 		        /* translators: %s: title */
-		        esc_attr( sprintf( __( 'Mark %s as a valid email.' ), $title ) ),
-		        __( 'Valid Email', 'groundhogg' )
+		        esc_attr( sprintf( _x( 'Mark %s as a valid email.', 'action', 'groundhogg' ), $title ) ),
+		        _x( 'Valid Email', 'action', 'groundhogg' )
 	        );
         } else {
 	        $actions['spam'] = sprintf(
 		        '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
 		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=spam')),
 		        /* translators: %s: title */
-		        esc_attr( sprintf( __( 'Mark %s as spam' ), $title ) ),
+		        esc_attr( sprintf( _x( 'Mark %s as spam', 'action', 'groundhogg' ), $title ) ),
 		        __( 'Spam' )
 	        );
         }
@@ -549,7 +549,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
     {
         ?>
         <div class="alignleft">
-            <a class="button button-secondary action query-export" href="javascript:void(0)"><?php printf( __( 'Export %s contacts', 'groundhogg' ), $this->get_pagination_arg( 'total_items' ) ); ?></a>
+            <a class="button button-secondary action query-export" href="javascript:void(0)"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), $this->get_pagination_arg( 'total_items' ) ); ?></a>
         </div>
         <?php
     }
@@ -570,26 +570,26 @@ class WPGH_Contacts_Table extends WP_List_Table {
                         <legend class="inline-edit-legend"><?php echo __('Quick Edit'); ?></legend>
                         <div class="inline-edit-col">
                             <label>
-                                <span class="title"><?php _e('Email'); ?></span>
+                                <span class="title"><?php _e('Email' ); ?></span>
                                 <span class="input-text-wrap"><input type="text" name="email" class="cemail regular-text" value=""/></span>
                             </label>
                             <label>
-                                <span class="title"><?php _e('First Name'); ?></span>
+                                <span class="title"><?php _e('First Name', 'groundhogg' ); ?></span>
                                 <span class="input-text-wrap"><input type="text" name="first_name" class="cfirst_name regular-text" value=""/></span>
                             </label>
                             <label>
-                                <span class="title"><?php _e('Last Name'); ?></span>
+                                <span class="title"><?php _e('Last Name', 'groundhogg' ); ?></span>
                                 <span class="input-text-wrap"><input type="text" name="last_name" class="clast_name regular-text" value=""/></span>
                             </label>
                             <label>
-                                <span class="title"><?php _e('Owner'); ?></span>
+                                <span class="title"><?php _e('Owner', 'groundhogg' ); ?></span>
                                 <span class="input-text-wrap">
                                     <?php $args = array( 'show_option_none' => __( 'Select an owner' ), 'id' => 'owner', 'name' => 'owner', 'role' => 'administrator', 'class' => 'cowner' ); ?>
                                     <?php wp_dropdown_users( $args ) ?>
                                 </span>
                             </label>
                             <label>
-                                <input type="checkbox" name="unsubscribe"><?php _e( 'Unsubscribe this contact.', 'groundhogg' ); ?>
+                                <input type="checkbox" name="unsubscribe"><?php _ex( 'Unsubscribe this contact.', 'action','groundhogg' ); ?>
                             </label>
                         </div>
                     </fieldset>

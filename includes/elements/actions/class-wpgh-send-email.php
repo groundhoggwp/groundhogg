@@ -72,7 +72,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
         wp_localize_script('wpgh-email-element', 'wpghEmailsBase', array(
             'path' =>  admin_url( 'admin.php?page=gh_emails' ),
-            'dontSaveChangesMsg'    => __( "You have changes which have not been saved. Are you sure you want to exit?", 'groundhogg' ),
+            'dontSaveChangesMsg'    => _x( "You have changes which have not been saved. Are you sure you want to exit?", 'notice', 'groundhogg' ),
         ) );
     }
 
@@ -101,7 +101,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
             <tbody>
             <tr>
                 <th>
-                    <?php echo esc_html__( 'Select an email to send:', 'groundhogg' ); ?>
+                    <?php esc_html_e( 'Select an email to send:', 'groundhogg' ); ?>
                 </th>
                 <td>
                     <?php $args = array(
@@ -115,7 +115,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
                         <?php echo WPGH()->html->modal_link( array(
                             'title'     => 'Edit Email',
-                            'text'      => __( 'Edit Email' ),
+                            'text'      => _x( 'Edit Email', 'action', 'groundhogg' ),
                             'footer_button_text' => __( 'Close' ),
                             'id'        => '',
                             'class'     => 'button button-primary edit-email',
@@ -127,7 +127,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                         )); ?>
                         <?php echo WPGH()->html->modal_link( array(
                             'title'     => 'Create New Email',
-                            'text'      => __( 'Create New Email' ),
+                            'text'      => _x( 'Create New Email', 'action', 'groundhogg' ),
                             'footer_button_text' => __( 'Close' ),
                             'id'        => '',
                             'class'     => 'button button-secondary add-email',
@@ -207,7 +207,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
         ?>
         <hr>
         <p class="report">
-        <span class="opens"><?php _e( 'Opens: '); ?>
+        <span class="opens"><?php _ex( 'Opens', 'stats', 'groundhogg' ); ?>:&nbsp;
             <strong>
                 <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s',
                         $step->funnel_id,
@@ -218,7 +218,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                 );?>" target="_blank"><?php echo $num_opens; ?></a>
             </strong>
         </span> |
-            <span class="clicks"><?php _e( 'Clicks: ' ); ?>
+            <span class="clicks"><?php _ex( 'Clicks', 'stats', 'groundhogg' ); ?>:&nbsp;
                 <strong>
                 <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s',
                         $step->funnel_id,
@@ -229,7 +229,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                 );?>" target="_blank"><?php echo $num_clicks; ?></a>
             </strong>
         </span> |
-            <span class="ctr"><?php _e( 'CTR: '); ?><strong><?php echo round( ( $num_clicks / ( ( $num_opens > 0 )? $num_opens : 1 ) * 100 ), 2 ); ?></strong>%</span>
+            <span class="ctr"><?php _ex( 'C.T.R', 'stats', 'groundhogg' ); ?>:&nbsp;<strong><?php echo round( ( $num_clicks / ( ( $num_opens > 0 )? $num_opens : 1 ) * 100 ), 2 ); ?></strong>%</span>
         </p>
         <?php
 
@@ -261,7 +261,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
             if ( $email->status === 'draft' && $step->is_active() ){
 
-                WPGH()->menu->funnels_page->notices->add( 'contains-drafts', 'Your funnel contains email steps which are in draft mode. Please ensure all your emails are marked as ready.', 'info' );
+                WPGH()->menu->funnels_page->notices->add( 'contains-drafts', _x( 'Your funnel contains email steps which are in draft mode. Please ensure all your emails are marked as ready.', 'notice', 'groundhogg' ), 'info' );
 
             }
 

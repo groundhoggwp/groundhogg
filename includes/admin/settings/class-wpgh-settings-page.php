@@ -46,7 +46,8 @@ class WPGH_Settings_Page
 
     public function __construct()
     {
-        add_action( 'admin_menu', array( $this, 'register' ) );
+        /* Settings always come last. */
+        add_action( 'admin_menu', array( $this, 'register' ), 99 );
         add_action( 'admin_init', array( $this, 'init_defaults' ) );
         add_action( 'admin_init', array( $this, 'register_sections' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
@@ -776,7 +777,7 @@ class WPGH_Settings_Page
 
 
         if( isset( $field['desc'] ) && $desc = $field['desc'] ) {
-            printf( '<p class="description">%s </p>', $desc );
+            printf( '<p class="description">%s</p>', $desc );
         }
     }
 }

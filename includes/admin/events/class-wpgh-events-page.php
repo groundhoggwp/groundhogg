@@ -26,16 +26,15 @@ class WPGH_Events_Page
      * @var WPGH_Notices
      */
     public $notices;
+    public $order = 40;
 
     function __construct()
     {
 
-        add_action( 'admin_menu', array( $this , 'register' ) );
-
+        add_action( 'admin_menu', array( $this , 'register' ), $this->order );
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_events' ){
 
             add_action( 'init' , array( $this, 'process_action' )  );
-
             $this->notices = WPGH()->notices;
 
         }
@@ -98,14 +97,8 @@ class WPGH_Events_Page
     function get_title()
     {
         switch ( $this->get_action() ){
-            case 'add':
-                _e( 'Add Event' , 'groundhogg' );
-                break;
-            case 'edit':
-                _e( 'Edit Event' , 'groundhogg' );
-                break;
             default:
-                _e( 'Events', 'groundhogg' );
+                _ex( 'Events', 'page_title', 'groundhogg' );
         }
     }
 
@@ -135,7 +128,7 @@ class WPGH_Events_Page
 
                 }
 
-                $this->notices->add( 'cancelled', sprintf( "%d %s", count( $this->get_events() ) ,__( "events cancelled", 'groundhogg' ) ) );
+                $this->notices->add( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', count( $this->get_events() ), 'notice', 'groundhogg' ), count( $this->get_events() ) ) );
 
                 do_action( 'wpgh_cancel_events' );
 
@@ -161,7 +154,7 @@ class WPGH_Events_Page
 
                 do_action( 'wpgh_execute_events' );
 
-                $this->notices->add( 'scheduled', sprintf( "%d %s", count( $this->get_events() ) ,__( "events rescheduled", 'groundhogg' ) ) );
+                $this->notices->add( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_events() ), 'notice', 'groundhogg' ), count( $this->get_events() ) ) );
 
                 break;
         }
@@ -197,9 +190,9 @@ class WPGH_Events_Page
         <form method="post" class="search-form wp-clearfix" >
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Events&nbsp;', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Events', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Events&nbsp;', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Events', 'groundhogg'); ?>">
             </p>
             <?php $events_table->prepare_items(); ?>
             <?php $events_table->display(); ?>

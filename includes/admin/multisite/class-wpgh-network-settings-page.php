@@ -76,8 +76,8 @@ class WPGH_Network_Settings_Page
                                 'value' => 1,
                                 'checked' => get_site_option( 'gh_global_db_enabled' )
                             )); ?>
-                            <p class="description"><?php _e( 'This will enable a global database for all your sites in this multisite installation.' ) ?></p>
-                            <p class="description"><?php _e( 'You will have to manage all plugin settings from your MAIN blog, and any Groundhogg extensions should be made network active as well.' ) ?></p>
+                            <p class="description"><?php _e( 'This will enable a global database for all your sites in this multisite installation.', 'groundhogg' ) ?></p>
+                            <p class="description"><?php _e( 'You will have to manage all plugin settings from your MAIN blog, and any Groundhogg extensions should be made network active as well.', 'groundhogg' ) ?></p>
                         </td>
                     </tr>
                     </tbody>
@@ -86,7 +86,7 @@ class WPGH_Network_Settings_Page
                 <?php do_action( 'wpgh_multisite_options' ); ?>
 
                 <p class="submit">
-                    <?php submit_button( __('Save Changes') ); ?>
+                    <?php submit_button( _x('Save Changes', 'action', 'groundhogg') ); ?>
                 </p>
 
 			</form>

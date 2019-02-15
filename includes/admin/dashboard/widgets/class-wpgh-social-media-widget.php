@@ -79,7 +79,7 @@ class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
         }
 
         if ( empty( $sources ) ){
-            printf( '<p class="description">%s</p>', __( 'No new social media sources to report.', 'groundhogg' ) );
+            printf( '<p class="description">%s</p>', _x( 'No new social media sources to report.', 'notice', 'groundhogg' ) );
             return;
         }
 
@@ -90,8 +90,8 @@ class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
         <table class="chart-summary">
         <thead>
         <tr>
-            <th><?php _e( 'Social Media Site', 'groundhogg' ); ?></th>
-            <th><?php _e( 'Contacts', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Social Media Site', 'column_title','groundhogg' ); ?></th>
+            <th><?php _ex( 'Contacts', 'column_title','groundhogg' ); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -164,7 +164,7 @@ class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
         }
 
         if ( empty( $sources ) ){
-            return __( 'No new social media sources to report.', 'groundhogg' );
+            return _x( 'No new social media sources to report.', 'notice', 'groundhogg' );
         }
 
         asort( $sources );
@@ -175,8 +175,8 @@ class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
         foreach ( $sources as $source => $num_contacts ):
 
             $export_info[] = array(
-                __( 'Social Media Source', 'groundhogg' ) => $source,
-                __( 'Number of Contacts', 'groundhogg' ) => $num_contacts,
+                _x( 'Social Media Source', 'column_title','groundhogg' ) => $source,
+                _x( 'Number of Contacts', 'column_title','groundhogg' ) => $num_contacts,
             );
 
         endforeach;
