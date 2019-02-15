@@ -111,6 +111,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED Improved localization all around.
 * TWEAKED Quick UI improvement for creating emails from the broadcast view.
 * TWEAKED added URL params for pages with dynamic content to help excluding in various caching plugins.
+* TWEAKED API for ordering sub menu items
+* TWEAKED Renamed groundhogg submenu item to Welcome
+* TWEAKED Various CSS fixes
+* TWEAKED SMTP check now checks for MOST WP SMTP plugins as well as Groundhogg service before publishing notice.
+* TWEAKED Referral prompt is now removed if the installation has active extensions.
 
 = 1.0.24 =
 * ADDED Elementor Forms Integration.

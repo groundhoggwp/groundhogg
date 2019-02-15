@@ -167,6 +167,11 @@ class WPGH_Welcome_Page
             array($this, 'page')
         );
 
+        /* White label compat */
+        if ( apply_filters( 'wpgh_remove_welcome_page', false ) ){
+            remove_submenu_page( 'groundhogg', 'groundhogg' );
+        }
+
         add_action("load-" . $page, array($this, 'help'));
 
     }

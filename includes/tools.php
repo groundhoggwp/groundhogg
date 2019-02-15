@@ -39,33 +39,7 @@ function wpgh_import_contacts_display()
             <p>
                 <input type="file" id="contacts" name="contacts" accept=".csv" >
             </p>
-            <p class="description"><?php _e( "Use the following column format to import your contacts. Any custom information added into your data will be treated as custom meta data for the contact.", 'groundhogg' ); ?></p>
-            <table class="wp-list-table widefat fixed striped">
-                <thead>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Primary Phone</th>
-                    <th>Notes</th>
-                    <th>Meta Key</th>
-                    <th>Another Meta Key</th>
-                    <th>...</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>ExampleFirst</td>
-                    <td>ExampleLast</td>
-                    <td>Email@email.com</td>
-                    <td>555-555-5555</td>
-                    <td>Interesting Info</td>
-                    <td>Meta Value</td>
-                    <td>Another Meta Value</td>
-                    <td>...</td>
-                </tr>
-                </tbody>
-            </table>
+            <p class="description"><a target="_blank" href="https://docs.groundhogg.io/docs/settings/getting-started/import-your-list/"><?php _e( "Learn how to import contacts into Groundhogg.", 'groundhogg' ); ?></a></p>
             <hr>
             <?php $tag_args = array();
             $tag_args[ 'id' ] = 'import_tags';

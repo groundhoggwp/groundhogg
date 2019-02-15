@@ -62,8 +62,8 @@ class WPGH_Tags_Table extends WP_List_Table {
     protected function extra_tablenav($which)
     {
         ?>
-        <div class="alignleft actions">
-            <a class="button button-secondary action" href="<?php echo add_query_arg( 'recount_contacts', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php _e( 'Recount Contacts', 'groundhogg' ); ?></a>
+        <div class="alignleft">
+            <a class="button button-secondary action" href="<?php echo add_query_arg( 'recount_contacts', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php _ex( 'Recount Contacts', 'action','groundhogg' ); ?></a>
         </div>
         <?php
     }
