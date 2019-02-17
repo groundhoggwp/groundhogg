@@ -108,6 +108,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.0.25 =
+* ADDED Prompt to allow anonymous usage tracking.
 * TWEAKED Improved localization all around.
 * TWEAKED Quick UI improvement for creating emails from the broadcast view.
 * TWEAKED added URL params for pages with dynamic content to help excluding in various caching plugins.

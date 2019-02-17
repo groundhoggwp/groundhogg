@@ -37,22 +37,25 @@
     text-shadow: 2px 2px 2px rgba(43, 43, 43, 0.21);
 }
 
-.right-col,
-.left-col{
+.col {
+    padding: 10px;
     white-space: normal;
     box-sizing: border-box;
     vertical-align: top;
+}
+
+.right-col,
+.left-col{
     display: inline-block;
     float: left;
     width: 50%;
-    padding: 10px;
     margin: 0;
 }
-.support{
 
+.col .postbox {
     border-radius: 5px ;
-
 }
+
 .col h3{
     text-align: center;
     font-family: "Arial Black";

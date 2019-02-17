@@ -339,6 +339,20 @@ class WPGH_Settings_Page
                     'value'         => 'on',
                 ),
             ),
+            'gh_opted_in_stats_collection' => array(
+                'id'        => 'gh_opted_in_stats_collection',
+                'section'   => 'misc_info',
+                'label'     => _x( 'Optin to anonymous usage tracking.', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Help us make Groundhogg better by providing anonymous usage information about your site.', 'settings', 'groundhogg' ),
+                'type' => 'checkbox',
+                'atts' => array(
+                    'label'         => __( 'Enable' ),
+                    //keep brackets for backwards compat
+                    'name'          => 'gh_opted_in_stats_collection',
+                    'id'            => 'gh_opted_in_stats_collection',
+                    'value'         => 'on',
+                ),
+            ),
             'gh_max_events' => array(
                 'id'        => 'gh_max_events',
                 'section'   => 'misc_info',

@@ -376,13 +376,27 @@ class WPGH_Welcome_Page
         <div id="welcome-page" class="welcome-page">
             <div id="poststuff">
                 <div class="welcome-header">
-                    <h1><?php echo sprintf( __( 'Welcome %s!', 'groundhogg' ), $user->first_name ); ?></h1>
+                    <h1><?php echo sprintf( __( 'Welcome %s!', 'groundhogg' ), $user->display_name ); ?></h1>
                 </div>
                 <?php $this->notices->notices(); ?>
 
                 <?php do_action( 'wpgh_welcome_page_custom_content' ); ?>
 
                 <?php if ( apply_filters( 'wpgh_show_main_welcome_page_content', true ) ): ?>
+
+                <?php if ( ! wpgh_get_option( 'gh_opted_in_stats_collection' ) ): ?>
+                <div class="col">
+                    <div class="postbox stats-collection">
+                        <div class="inside">
+                            <h3><?php _e( 'GET 30% OFF WHEN YOU HELP US MAKE GROUNDHOGG BETTER', 'Groundhogg' ); ?></h3>
+                            <p><?php _e( "Want sweet discounts and to help us make Groundhogg even better? When you optin to our stats collection you will get a <b>30% discount off</b> any premium extension or service in out store by sharing <b>anonymous</b> data about your site. You can opt out any time from the settings page.", 'groundhogg' ); ?></p>
+                            <p style="text-align: center">
+                                <a class="button button-primary" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=groundhogg&action=opt_in_to_stats' ), 'opt_in_to_stats' ); ?>" ><?php _e( 'Yes, I want to help make Groundhogg better!' ); ?></a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
 
                 <div class="left-col col">
 
@@ -393,7 +407,7 @@ class WPGH_Welcome_Page
                                 <h3><?php _e( 'Support Articles', 'Groundhogg' ); ?></h3>
                                 <p><?php _e( "Don't know where to start? Checkout these articles and learn how to make Groundhogg work for you.", 'groundhogg' ); ?></p>
                                 <p style="text-align: center">
-                                    <a class="button button-primary" href="https://www.groundhogg.io/category/support/" target="_blank"><?php _e( 'View All!' ); ?></a>
+                                    <a class="button button-primary" href="https://docs.groundhogg.io/" target="_blank"><?php _e( 'View All!' ); ?></a>
                                 </p>
                             </div>
                         </div>

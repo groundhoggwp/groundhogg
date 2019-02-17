@@ -78,11 +78,11 @@ class WPGH_Report_Send_Emails extends WPGH_Line_Graph_Report_V2
 
         /* ALL SENDS */
         $num_emails_sent = $wpdb->get_var( "SELECT COUNT(e.ID) FROM $events AS e LEFT JOIN $steps AS s ON e.step_id = s.ID WHERE $this->start_time < e.time AND e.time <= $this->end_time AND ( s.step_type = 'send_email' OR e.funnel_id = 1 ) " );
+        /* ALL OPENS */
         $num_opens = WPGH()->activity->count( array( 'start' => $this->start_time, 'end' => $this->end_time, 'activity_type' => 'email_opened' ) );
+        /* ALL CLICKS */
         $num_clicks = WPGH()->activity->count( array( 'start' => $this->start_time, 'end' => $this->end_time, 'activity_type' => 'email_link_click' ) );
 
-        /* ALL OPENS */
-        /* ALL CLICKS */
 
         ?>
         <table class="chart-summary">

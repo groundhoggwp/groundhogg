@@ -35,14 +35,12 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          */
         public $elements;
 
-
         /**
          * GH roles object
          *
          * @var object|WPGH_Roles
          */
         public $roles;
-
 
         /**
          * GH api object //todo in progress
@@ -232,6 +230,11 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $blocks = array();
 
         /**
+         * @var WPGH_Stats_Collection
+         */
+        public $stats;
+
+        /**
          * Returns the instance on Groundhogg.
          *
          * @return Groundhogg
@@ -297,6 +300,8 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                         self::$instance->network_options = new WPGH_Network_Settings_Page();
                     }
                 }
+
+                self::$instance->stats = new WPGH_Stats_Collection();
 
                 if ( wpgh_is_option_enabled( 'gh_enable_api' ) ){
                     self::$instance->api = new WPGH_API_V2();
@@ -469,6 +474,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-tracking.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-popup.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-form-iframe.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-stats-collection.php';
             require_once WPGH_PLUGIN_DIR . 'includes/functions.php';
             require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';
