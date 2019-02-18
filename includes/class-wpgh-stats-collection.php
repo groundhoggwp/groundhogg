@@ -32,6 +32,10 @@ class WPGH_Stats_Collection
     public function stats_tracking_optin()
     {
 
+    	if ( ! current_user_can( 'manage_options' ) ){
+    		wp_die( new WP_Error( 'invalid_permissions', _x( 'You have invalid permissions to do this.', 'notice', 'groundhogg' ) ) );
+	    }
+
         if ( ! wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'opt_in_to_stats' ) ){
             WPGH()->notices->add( 'oops', _x( 'An unknown error occurred.', 'notice', 'groundhogg' ), 'error' );
             return;
