@@ -23,6 +23,16 @@ class WPGH_Extension_Manager
     static $extensions = array(); // array( item_id => array( license, status ) )
     static $storeUrl = "https://groundhogg.io";
 
+	/**
+     * Add an extension to the extensions options.
+     *
+	 * @param $item_id int
+	 * @param $license string
+	 * @param $status string
+	 * @param $expiry string
+	 *
+	 * @return bool
+	 */
     public static function add_extension( $item_id, $license, $status, $expiry )
     {
         if ( empty( static::$extensions ) )
@@ -35,6 +45,26 @@ class WPGH_Extension_Manager
         );
 
         return update_option( "gh_extensions", static::$extensions );
+    }
+
+	/**
+     * Remove an extension
+	 * @param $item_id int
+	 *
+	 * @return bool
+	 */
+    public static function delete_extension( $item_id )
+    {
+	    if ( empty( static::$extensions ) ){
+		    static::$extensions = wpgh_get_option( "gh_extensions", array() );
+		    if ( empty( static::$extensions ) ){
+		        return false;
+            }
+	    }
+
+	    unset( static::$extensions[ $item_id ] );
+
+	    return update_option( "gh_extensions", static::$extensions );
     }
 
     public static function check_for_updates()
@@ -98,6 +128,9 @@ class WPGH_Extension_Manager
         return update_option( "gh_extensions", static::$extensions );
     }
 
+	/**
+	 * Activate a license
+	 */
     public static function perform_activation()
     {
         if ( isset( $_POST['gh_activate_license'] ) ){
@@ -125,6 +158,26 @@ class WPGH_Extension_Manager
 
 
 	    }
+    }
+
+	/**
+     * Deactivate a license
+     *
+	 * @return bool
+	 */
+    public static function perform_deactivation()
+    {
+	    if ( isset( $_REQUEST['action'] ) && $_REQUEST[ 'action' ] === 'deactivate' && isset( $_REQUEST[ 'item' ] )  ){
+
+		    if ( ! current_user_can('manage_options' ) )
+			    wp_die( "Cannot access this functionality" );
+
+		    $item = intval( $_REQUEST[ 'item' ] );
+
+		    return self::deactivate_license( $item );
+	    }
+
+	    return false;
     }
 
     public static function activate_license( $license, $item_id )
@@ -195,6 +248,51 @@ class WPGH_Extension_Manager
         self::add_extension( $item_id, $license, $status, $expiry );
 
 		return $license_data->success;
+    }
+
+	/**
+     * Deactivate a license
+     *
+	 * @param $license string
+     * @return bool
+	 */
+    public static function deactivate_license( $item_id=0 )
+    {
+
+        $license = self::get_license( $item_id );
+
+	    $api_params = array(
+		    'edd_action' => 'deactivate_license',
+		    'item_id'    => $item_id,
+		    'license'    => $license,
+		    'url'        => home_url(),
+	    );
+// Send the remote request
+	    $response = wp_remote_post( self::$storeUrl, array( 'body' => $api_params, 'timeout' => 15, 'sslverify' => false ) );
+
+	    if ( is_wp_error( $response ) ){
+	        $success = false;
+	        $message = _x( 'Something went wrong.', 'notice', 'groundhogg' );
+        } else {
+
+	        $response = json_decode( wp_remote_retrieve_body( $response ) );
+
+	        if ( $response->success === false ){
+		        $success = false;
+		        $message = _x( 'Something went wrong.', 'notice', 'groundhogg' );
+	        } else {
+		        $success = true;
+		        $message = _x( 'License deactivated.', 'notice', 'groundhogg' );
+		        self::delete_extension( $item_id );
+	        }
+
+        }
+
+
+        $type = $success ? 'success' : 'error';
+	    WPGH()->notices->add( 'license_outcome', $message, $type );
+
+	    return $success;
     }
 
     public static function verify_license( $item_id, $item_name, $license )
@@ -302,13 +400,13 @@ class WPGH_Extension_Box
 
         if ( $this->license_exists() ){
             $content.= "<input class='regular-text' type='text' style='margin-right: 10px;' placeholder='License' name='licenses[{$this->item_id}]' value='{$this->get_license()}'>";
+	        $content.= "<p class='submit'><a class='button button-secondary' href='" . admin_url( 'admin.php?page=gh_settings&tab=extensions&action=deactivate&item=' . $this->item_id ) . "'>" . _x( "Deactivate Extension", 'action', 'groundhogg' ) . "</a></p>";
         } else {
-            $content.= "<input class='regular-text' type='text' style='margin-right: 10px;' placeholder='License' name='licenses[{$this->item_id}]'>";
+	        $content.= "<input class='regular-text' type='text' style='margin-right: 10px;' placeholder='License' name='licenses[{$this->item_id}]'>";
+	        $content.= "<p class='submit'><input type='submit' class='button button-primary' name='gh_activate_license' value='" . _x( "Activate Extension", 'action', 'groundhogg' ) . "'></p>";
         }
 
-        $content.= "<p class='submit'><input type='submit' class='button button-primary' name='gh_activate_license' value='" . _x( "Activate Extension", 'action', 'groundhogg' ) . "'></p>";
-
-        if ( $this->license_exists() ){
+	    if ( $this->license_exists() ){
             $content .= "<p>";
             $content .= sprintf( __( "Your license expires on %s", 'groundhogg' ), $this->get_expiry() );
             $content .= "</p>";

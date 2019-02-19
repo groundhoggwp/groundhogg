@@ -90,9 +90,13 @@ class WPGH_Welcome_Page
         $has_smtp = false;
 
         foreach ( $smtp_plugins as $plugin ) {
-            if ( is_plugin_active('wp-mail-smtp/wp_mail_smtp.php' ) ) {
+            if ( is_plugin_active( $plugin ) ) {
                 $has_smtp = true;
             }
+        }
+
+        if ( wpgh_is_option_enabled( 'gh_send_with_gh_api' ) ){
+	        $has_smtp = true;
         }
 
         if ( ! $has_smtp ){
@@ -392,6 +396,9 @@ class WPGH_Welcome_Page
                             <p><?php _e( "Want sweet discounts and to help us make Groundhogg even better? When you optin to our stats collection you will get a <b>30% discount off</b> any premium extension or service in out store by sharing <b>anonymous</b> data about your site. You can opt out any time from the settings page.", 'groundhogg' ); ?></p>
                             <p style="text-align: center">
                                 <a class="button button-primary" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=groundhogg&action=opt_in_to_stats' ), 'opt_in_to_stats' ); ?>" ><?php _e( 'Yes, I want to help make Groundhogg better!' ); ?></a>
+                            </p>
+                            <p style="text-align: center">
+                                <a href="https://www.groundhogg.io/privacy-policy/#usage-tracking" target="_blank"><?php _e( 'Learn more', 'groundhogg' ); ?></a>
                             </p>
                         </div>
                     </div>

@@ -9,24 +9,28 @@
 class WPGH_Stats_Collection
 {
 
-
     public function __construct()
     {
 
         if ( wpgh_is_option_enabled( 'gh_opted_in_stats_collection' ) ){
-
             add_action( 'admin_init', array( $this, 'init_cron' ) );
             add_action( 'wpgh_do_stats_collection', array( $this, 'send_stats' ) );
-
         }
 
-        if ( isset( $_REQUEST[ 'action' ] ) && $_REQUEST[ 'action' ] === 'opt_in_to_stats' ){
+        if ( is_admin() && isset( $_REQUEST[ 'action' ] ) && $_REQUEST[ 'action' ] === 'opt_in_to_stats' ){
             add_action( 'admin_init', array( $this, 'stats_tracking_optin' ) );
         }
 
     }
 
-    /**
+	public function init_cron()
+	{
+		if ( ! wp_next_scheduled( 'wpgh_do_stats_collection' )  ){
+			wp_schedule_event( time(), 'daily' , 'wpgh_do_stats_collection' );
+		}
+	}
+
+	/**
      * Optin to the stats tracker system
      */
     public function stats_tracking_optin()
@@ -63,13 +67,6 @@ We appreciate your help, best of luck!
         wp_mail( wp_get_current_user()->user_email, __( 'Groundhogg Discount Code', 'groundhogg' ), $message );
     }
 
-    public function init_cron()
-    {
-        if ( ! wp_next_scheduled( 'wpgh_do_stats_collection' )  ){
-            wp_schedule_event( time(), 'daily' , 'wpgh_do_stats_collection' );
-        }
-    }
-
     /**
      * Send the initial request to the GH server and get a response.
      *
@@ -99,7 +96,7 @@ We appreciate your help, best of luck!
                 return new WP_Error( $json->code, $json->message );
             }
 
-            wpgh_update_option( 'gh_site_key', $stats[ 'key' ] );
+            wpgh_update_option( 'gh_site_key', $stats[ 'site_key' ] );
             wpgh_update_option( 'gh_opted_in_stats_collection', 1 );
             update_user_meta( wp_get_current_user()->ID, 'gh_discount_code', $json->discount );
 

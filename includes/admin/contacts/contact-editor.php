@@ -58,15 +58,17 @@ $contact->auto_link_account();
 
 $title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->email;
 
-$tabs = apply_filters( 'wpgh_contact_record_tabs', array(
-    'general'       => _x( 'General Info', 'contact_record_tab', 'groundhogg' ),
-    'meta_data'     => _x( 'Custom Info', 'contact_record_tab', 'groundhogg' ),
-    'segmentation'  => _x( 'Segmentation', 'contact_record_tab', 'groundhogg' ),
-    'notes'         => _x( 'Notes', 'contact_record_tab', 'groundhogg' ),
-    'files'         => _x( 'Files', 'contact_record_tab', 'groundhogg' ),
-    'actions'       => _x( 'Actions', 'contact_record_tab', 'groundhogg' ),
-    'activity'      => _x( 'Activity', 'contact_record_tab', 'groundhogg' ),
-) );
+$tabs = array(
+	'general'       => _x( 'General Info', 'contact_record_tab', 'groundhogg' ),
+	'meta_data'     => _x( 'Custom Info', 'contact_record_tab', 'groundhogg' ),
+	'segmentation'  => _x( 'Segmentation', 'contact_record_tab', 'groundhogg' ),
+	'notes'         => _x( 'Notes', 'contact_record_tab', 'groundhogg' ),
+	'files'         => _x( 'Files', 'contact_record_tab', 'groundhogg' ),
+	'actions'       => _x( 'Actions', 'contact_record_tab', 'groundhogg' ),
+	'activity'      => _x( 'Activity', 'contact_record_tab', 'groundhogg' ),
+);
+$tabs = apply_filters( 'wpgh_contact_record_tabs', $tabs );
+$tabs = apply_filters( 'groundhogg/contact/record/tabs', $tabs );
 
 $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ] ) ? sanitize_key( $_POST[ 'active_tab' ] ) : 'general';
 ?>
@@ -79,7 +81,7 @@ $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ]
 <!--/ Title -->
 
 <!-- BEGIN TABS -->
-<h2 class="nav-tab-wrapper" style="margin: 1em 0;">
+<h2 class="nav-tab-wrapper">
     <?php foreach ( $tabs as $id => $tab ): ?>
         <a href="javascript:void(0)" class="nav-tab <?php echo  $active_tab == $id ? 'nav-tab-active' : ''; ?>" id="<?php echo 'tab_' . esc_attr( $id ); ?>"><?php _e( $tab, 'groundhogg'); ?></a>
     <?php endforeach; ?>
@@ -731,6 +733,7 @@ foreach ( $tabs as $tab => $tab_name ):
 
     ?><div class="tab-content-wrapper <?php if ( $tab !== $active_tab ){ echo 'hidden'; }; ?>" id="<?php echo 'tab_' . esc_attr( $tab ) . '_content'; ?>">
     <?php do_action('wpgh_contact_record_tab_' . $tab, $contact); ?>
+    <?php do_action("groundhogg/contact/record/tab/{$tab}", $contact); ?>
     </div><?php
 
 endforeach;

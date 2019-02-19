@@ -33,7 +33,7 @@
 
 
 .funnel-editor-header{
-    z-index: 99999;
+    z-index: 9999;
     top: 32px;
     box-sizing: border-box;
     position: fixed;
@@ -88,7 +88,7 @@
 /* END NEW STUFF */
 
 wpgh-toolbar{
-    z-index: 99999;
+    z-index: 9998;
     position: relative;
 }
 
@@ -97,11 +97,10 @@ wpgh-toolbar{
     border-bottom-color: #FFF;
 }
 
- wpgh-toolbar hr{
+wpgh-toolbar hr{
     border-bottom-color: #555d66;
-     width: 50%;
-
- }
+    width: 50%;
+}
 
 #from_user, #test_email{
     width: 100%;

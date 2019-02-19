@@ -73,6 +73,7 @@ if( wpgh_is_option_enabled( 'gh_uninstall_on_delete' ) ) {
     /** Cleanup Cron Events */
     wp_clear_scheduled_hook( 'wpgh_process_queue' );
     wp_clear_scheduled_hook( 'wpgh_check_bounces' );
+    wp_clear_scheduled_hook( 'wpgh_do_stats_collection' );
 
     //delete api keys from user_meta
     delete_metadata('user',0,'wpgh_user_public_key','',true);

@@ -540,3 +540,4 @@ function WPGH()
 WPGH();
 
 do_action( 'groundhogg_loaded' );
+do_action( 'groundhogg/init' );

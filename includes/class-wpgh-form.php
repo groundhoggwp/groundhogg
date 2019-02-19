@@ -803,6 +803,16 @@ class WPGH_Form
 
                 $value = is_string( $i ) ? $i : $option;
 
+	            /**
+	             * Check if tag should be applied
+	             *
+	             * @since 1.1
+	             */
+                if ( strpos( $value, '|' ) ){
+                	$parts = explode( '|', $value );
+                	$value = $parts[0];
+                }
+
                 $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label class='gh-radio-label'><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s> %s</label></div>",
                     esc_attr( $a[ 'class' ] ),
                     esc_attr( $a[ 'name' ] ),

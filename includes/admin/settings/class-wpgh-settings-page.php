@@ -57,9 +57,10 @@ class WPGH_Settings_Page
 
         add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'check_for_updates' ) );
 
-        if ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) {
-            add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );
-        }
+	    if ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) {
+		    add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );
+		    add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_deactivation' ) );
+	    }
 
         if ( ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) || wp_doing_ajax() ){
             $this->importer = new WPGH_Bulk_Contact_Manager();

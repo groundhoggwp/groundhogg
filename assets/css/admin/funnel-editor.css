@@ -36,7 +36,9 @@
     margin-right: -300px;
     width: 300px;
 }
-
+#postbox-container-1{
+    /*overflow: auto;*/
+}
 #postbox-container-1 .postbox{
     border: none;
     box-shadow: none;
@@ -44,9 +46,8 @@
     margin: 0;
 }
 
-
 .funnel-editor-header{
-    z-index: 99999;
+    z-index: 9999;
     top: 32px;
     box-sizing: border-box;
     position: fixed;
