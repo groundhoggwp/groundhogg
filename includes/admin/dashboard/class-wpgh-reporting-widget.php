@@ -132,14 +132,16 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
                 $this->difference   = DAY_IN_SECONDS;
                 break;
             case 'this_month';
-                $this->start_time   = strtotime( 'first day of ' . date( 'F Y') );
-                $this->end_time     = $this->start_time + MONTH_IN_SECONDS;
+                $this->start_time   = strtotime( 'first day of ' . date( 'F Y' ) );
+//                var_dump( date( 'Y-m-d H:i:s', $this->start_time ) );
+                $this->end_time     = strtotime( 'first day of ' . date( 'F Y', time() + MONTH_IN_SECONDS ) );
+//                var_dump( date( 'Y-m-d H:i:s', $this->end_time ) );
                 $this->points       = ceil( MONTH_IN_SECONDS / DAY_IN_SECONDS );
                 $this->difference   = DAY_IN_SECONDS;
                 break;
             case 'last_month';
-                $this->start_time   = strtotime( 'first day of ' . date( 'F Y' , TIME() - MONTH_IN_SECONDS ) );
-                $this->end_time     = $this->start_time + MONTH_IN_SECONDS;
+                $this->start_time   = strtotime( 'first day of ' . date( 'F Y' , time() - MONTH_IN_SECONDS ) );
+                $this->end_time     = strtotime( 'last day of ' . date( 'F Y' ) );
                 $this->points       = ceil( MONTH_IN_SECONDS / DAY_IN_SECONDS );
                 $this->difference   = DAY_IN_SECONDS;
                 break;
@@ -172,17 +174,13 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
             case 'custom';
                 $this->start_time   = wpgh_round_to_day( strtotime( $this->get_url_var( 'custom_date_range_start' ) ) );
                 $this->end_time     = wpgh_round_to_day( strtotime( $this->get_url_var( 'custom_date_range_end' ) ) );
-
                 $range = $this->end_time - $this->start_time;
-
                 $this->points       = ceil( $range  / $this->get_time_diff( $range ) );
                 $this->difference   = $this->get_time_diff( $range );
-
                 break;
-
         }
 
-        $this->start_range  = $this->start_time;
+        $this->start_range = $this->start_time;
         $this->end_range = $this->start_range + $this->difference;
 
 //        $this->start_time = convert_to_local_time( $this->start_time );

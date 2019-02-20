@@ -150,7 +150,7 @@ class WPGH_Extension_Manager
                 $license = trim( $license );
                 $item_id = intval( trim( $item_id ) );
 
-                if ( ! empty( $license ) ){
+                if ( ! empty( $license ) && ! self::get_license_status( $license ) ){
                     self::activate_license( $license, $item_id );
                 }
 
