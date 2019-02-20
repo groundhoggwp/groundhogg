@@ -61,6 +61,20 @@ class WPGH_Form
 	 */
     var $iframe_compat = false;
 
+    /**
+     * Whether to auto populate a form
+     *
+     * @var bool
+     */
+    var $auto_populate = false;
+
+    /**
+     * Where contact details are pulled from
+     *
+     * @var null WPGH_Contact
+     */
+    var $source_contact = null;
+
     public function __construct( $atts )
     {
         $this->a = shortcode_atts(array(
@@ -68,8 +82,12 @@ class WPGH_Form
             'id'        => 0
         ), $atts);
 
-        $this->id = intval( $this->a[ 'id' ] );
+        if ( is_admin() && current_user_can( 'edit_contacts' ) && key_exists( 'contact', $_GET ) ){
+            $this->auto_populate = true;
+            $this->source_contact = wpgh_get_contact( intval( $_GET[ 'contact' ] ) );
+        }
 
+        $this->id = intval( $this->a[ 'id' ] );
         $this->add_scripts();
     }
 
@@ -267,6 +285,14 @@ class WPGH_Form
         }
 
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
+
+        /* Auto populate for admin submissions */
+        if ( $this->auto_populate ){
+            $name = $a[ 'name' ];
+            if ( $this->source_contact->$name ){
+                $a[ 'value' ] = $this->source_contact->$name;
+            }
+        }
 
         $field = sprintf(
             "<label class='gh-input-label'>%s <input type='%s' name='%s' id='%s' class='gh-input %s' value='%s' placeholder='%s' title='%s' %s %s></label>",
@@ -638,6 +664,13 @@ class WPGH_Form
 
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false"  && $a[ 'required' ] !== "0" ) ? 'required' : '';
 
+        if ( $this->auto_populate ){
+            $name = $a[ 'name' ];
+            if ( $this->source_contact->$name ){
+                $a[ 'value' ] = $this->source_contact->$name;
+            }
+        }
+
         $field = sprintf(
             "<label class='gh-input-label'>%s <textarea name='%s' id='%s' class='gh-input %s' placeholder='%s' title='%s' %s %s>%s</textarea></label>",
             $a[ 'label' ],
@@ -722,8 +755,6 @@ class WPGH_Form
             $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'default' ] );
         }
 
-
-
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
         $multiple = $a[ 'multiple' ] ? 'multiple' : '';
 
@@ -738,6 +769,14 @@ class WPGH_Form
 
                 $value = is_string( $i ) ? $i : $option;
 
+                $selected = '';
+                if ( $this->auto_populate ){
+                    $name = $a[ 'name' ];
+                    if ( $this->source_contact->$name === $value ){
+                        $selected = 'selected';
+                    }
+                }
+
                 /**
                  * Check if tag should be applied
                  *
@@ -750,7 +789,7 @@ class WPGH_Form
                     $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
                 }
 
-                $optionHTML .= sprintf( "<option value='%s'>%s</option>", esc_attr( $value ), $value );
+                $optionHTML .= sprintf( "<option value='%s' %s>%s</option>", esc_attr( $value ), $selected, $value );
             }
 
         }
@@ -818,6 +857,14 @@ class WPGH_Form
 
                 $value = is_string( $i ) ? $i : $option;
 
+                $checked = '';
+                if ( $this->auto_populate ){
+                    $name = $a[ 'name' ];
+                    if ( $this->source_contact->$name === $value ){
+                        $checked = 'checked';
+                    }
+                }
+
 	            /**
 	             * Check if tag should be applied
 	             *
@@ -835,12 +882,13 @@ class WPGH_Form
                     $option = $parts[0];
                 }
 
-                $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label class='gh-radio-label'><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s> %s</label></div>",
+                $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label class='gh-radio-label'><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s %s> %s</label></div>",
                     esc_attr( $a[ 'class' ] ),
                     esc_attr( $a[ 'name' ] ),
                     esc_attr( $a[ 'id' ] ) . '-' . $i,
                     esc_attr( $value ),
                     $required,
+                    $checked,
                     $option
                 );
 
@@ -895,6 +943,14 @@ class WPGH_Form
 
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
+        $checked = '';
+        if ( $this->auto_populate ){
+            $name = $a[ 'name' ];
+            if ( $this->source_contact->$name === $a[ 'value' ] ){
+                $checked = 'checked';
+            }
+        }
+
         $value = esc_attr( $a[ 'value' ] );
         if ( strpos( $value, '|' ) ){
             $parts = explode( '|', $value );
@@ -907,7 +963,7 @@ class WPGH_Form
         $this->config[ $a[ 'name' ] ] = $a ;
 
         $field = sprintf(
-            "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='gh-checkbox %s' value='%s' title='%s' %s %s> %s</label>",
+            "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='gh-checkbox %s' value='%s' title='%s' %s %s %s> %s</label>",
             esc_attr( $a[ 'name' ] ),
             esc_attr( $a[ 'id' ] ),
             esc_attr( $a[ 'class' ] ),
@@ -915,6 +971,7 @@ class WPGH_Form
             esc_attr( $a[ 'title' ] ),
             $a[ 'attributes' ],
             $required,
+            $checked,
             $a[ 'label' ]
         );
 

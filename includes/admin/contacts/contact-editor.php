@@ -515,7 +515,7 @@ function wpgh_contact_record_section_actions( $contact )
                     echo WPGH()->html->modal_link(array(
                         'title'     => 'Manual Submission',
                         'text'      => __( 'Fill Out', 'groundhogg' ),
-                        'id'        => 'manual-submission',
+                        'id'        => 'manual-submission-button',
                         'class'     => 'manual-submission button button-secondary',
                         'source'    => 'manual-submission-container',
                         'height'    => 600,
