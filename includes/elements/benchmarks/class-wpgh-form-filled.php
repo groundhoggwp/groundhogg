@@ -443,14 +443,14 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                         <th><?php _e( 'Value', 'groundhogg' ) ?></th>
                         <td><?php
                             echo WPGH()->html->input( array( 'id' => 'field-value', 'name' => 'value' ) );
-                            ?><p class="description"><?php _e( 'The default value of the field.', 'groundhogg' ); ?></p></td>
+                            ?><p class="description"><?php _e( 'The default value of the field. Add a tag when the value is as given. For example [Value|18]', 'groundhogg' ); ?></p></td>
                     </tr>
 
                     <tr id="gh-field-options">
                         <th><?php _e( 'Options', 'groundhogg' ) ?></th>
                         <td><?php
                             echo WPGH()->html->textarea( array( 'id' => 'field-options', 'name' => 'options', 'cols' => 50, 'rows' => '5' ) );
-                            ?><p class="description"><?php _e( 'Enter 1 option per line.', 'groundhogg' ) ?></p></td>
+                            ?><p class="description"><?php _e( 'Enter 1 option per line. Add tags by separating the value and tag ID with a |. For example [Option|18]', 'groundhogg' ) ?></p></td>
                     </tr>
                     <tr id="gh-field-multiple">
                         <th><?php _e( 'Allow Multiple Selections', 'groundhogg' ) ?></th>
@@ -471,7 +471,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                         <td><?php
                             echo WPGH()->html->dropdown( array(
                                 'id' => 'field-width',
-                                'name' => 'size',
+                                'name' => 'width',
                                 'options' => array(
                                     '1/2' => '1/2',
                                     '1/3' => '1/3',
@@ -488,7 +488,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                     <tr id="gh-field-captcha-theme">
                         <th><?php _e( 'Theme', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->dropdown( array( 'id' => 'field-captcha-theme', 'name' => 'theme', 'options' => array(
+                            echo WPGH()->html->dropdown( array( 'id' => 'field-theme', 'name' => 'captcha-theme', 'options' => array(
                                     'light' => 'Light',
                                     'dark' => 'Dark',
                                 ) ) );
@@ -497,7 +497,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                     <tr id="gh-field-captcha-size">
                         <th><?php _e( 'Theme', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->dropdown( array( 'id' => 'field-captcha-size', 'name' => 'size', 'options' => array(
+                            echo WPGH()->html->dropdown( array( 'id' => 'field-captcha-size', 'name' => 'captcha-size', 'options' => array(
                                     'normal' => 'Normal',
                                     'compact' => 'Compact',
                                 ) ) );
@@ -506,46 +506,46 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                     <!-- END CAPTCHA OPTIONS -->
 
                     <!-- BEGIN DATE OPTIONS -->
-                    <tr id="gh-field-min-date">
+                    <tr id="gh-field-min_date">
                         <th><?php _e( 'Min Date', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'type' => 'date', 'id' => 'field-date-min', 'name' => 'min_date', 'placeholder' => 'YYY-MM-DD or +3 days or -1 days' ) );
+                            echo WPGH()->html->input( array( 'type' => 'date', 'id' => 'field-min_date', 'name' => 'min_date', 'placeholder' => 'YYY-MM-DD or +3 days or -1 days' ) );
                             ?><p class="description"><?php _e( 'The minimum date a user can enter. You can enter a dynamic date or static date.', 'groundhogg' ) ?></p></td>
                     </tr>
-                    <tr id="gh-field-max-date">
+                    <tr id="gh-field-max_date">
                         <th><?php _e( 'Max Date', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'type' => 'date', 'id' => 'field-date-max', 'name' => 'max_date', 'placeholder' => 'YYY-MM-DD or +3 days or -1 days' ) );
+                            echo WPGH()->html->input( array( 'type' => 'date', 'id' => 'field-max_date', 'name' => 'max_date', 'placeholder' => 'YYY-MM-DD or +3 days or -1 days' ) );
                             ?><p class="description"><?php _e( 'The maximum date a user can enter. You can enter a dynamic date or static date.', 'groundhogg' ) ?></p></td>
                     </tr>
                     <!-- END DATE OPTIONS -->
 
                     <!-- BEGIN TIME OPTIONS -->
-                    <tr id="gh-field-min-time">
+                    <tr id="gh-field-min_time">
                         <th><?php _e( 'Min Time', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'type' => 'time', 'id' => 'field-time-min', 'name' => 'min_time' ) );
+                            echo WPGH()->html->input( array( 'type' => 'time', 'id' => 'field-min_time', 'name' => 'min_time' ) );
                             ?><p class="description"><?php _e( 'The minimum time a user can enter. You can enter a dynamic time or static time.', 'groundhogg' ) ?></p></td>
                     </tr>
-                    <tr id="gh-field-max-time">
+                    <tr id="gh-field-max_time">
                         <th><?php _e( 'Max Time', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'type' => 'time', 'id' => 'field-time-max', 'name' => 'max_time' ) );
+                            echo WPGH()->html->input( array( 'type' => 'time', 'id' => 'field-max_time', 'name' => 'max_time' ) );
                             ?><p class="description"><?php _e( 'The maximum time a user can enter. You can enter a dynamic time or static time.', 'groundhogg' ) ?></p></td>
                     </tr>
                     <!-- END TIME OPTIONS -->
 
                     <!-- BEGIN FILE OPTIONS -->
-                    <tr id="gh-field-max-upload-size">
+                    <tr id="gh-field-max_file_size">
                         <th><?php _e( 'Max File Size', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->number( array( 'id' => 'max-upload-size', 'name' => 'max_file_size', 'placeholder' => '1000000', 'min' => 0, 'max' => wp_max_upload_size() * 1000000 ) );
+                            echo WPGH()->html->number( array( 'id' => 'field-max_file_size', 'name' => 'max_file_size', 'placeholder' => '1000000', 'min' => 0, 'max' => wp_max_upload_size() * 1000000 ) );
                             ?><p class="description"><?php printf( __( 'Maximum size a file can be <b>in Bytes</b>. Your max upload size is %d Bytes.', 'groundhogg' ), wp_max_upload_size() );?></p></td>
                     </tr>
-                    <tr id="gh-field-file-types">
+                    <tr id="gh-field-file_types">
                         <th><?php _e( 'Accepted File Types', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-file-types', 'name' => 'file_types', 'placeholder' => '.pdf,.txt,.doc,.docx' ) );
+                            echo WPGH()->html->input( array( 'id' => 'field-file_types', 'name' => 'file_types', 'placeholder' => '.pdf,.txt,.doc,.docx' ) );
                             ?><p class="description"><?php _e( 'The types of files a user may upload (comma separated).', 'groundhogg' ) ?></p></td>
                     </tr>
                     <!-- END FILE OPTIONS -->

@@ -3,7 +3,7 @@ Contributors: trainingbusinesspros, groundhogg, dhrumit
 Tags: marketing, email, contacts, contact, CRM, marketing automation, email automation, funnels, marketing funnels, marketing campaigns, campaigns, broadcast, contacts, contact management
 Donate link: https://groundhogg.io
 Requires at least: 4.9
-Tested up to: 5.0
+Tested up to: 5.1
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv3
@@ -111,6 +111,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED Prompt to allow anonymous usage tracking.
 * ADDED Logged in benchmark
 * ADDED Ability to deactivate a license from the licenses tab in the settings.
+* ADDED Ability to add tags based on radio button, dropdown selection, or checkbox enabling in the form builder.
 * TWEAKED Improved localization all around.
 * TWEAKED Quick UI improvement for creating emails from the broadcast view.
 * TWEAKED added URL params for pages with dynamic content to help excluding in various caching plugins.
@@ -119,6 +120,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED Various CSS fixes
 * TWEAKED SMTP check now checks for MOST WP SMTP plugins as well as Groundhogg service before publishing notice.
 * TWEAKED Referral prompt is now removed if the installation has active extensions.
+* TWEAKED Form builder is a little bit more specific when including fields to be added
 * FIXED z-index issue causing admin bar in editors to display above the admin bar.
 
 = 1.0.24 =

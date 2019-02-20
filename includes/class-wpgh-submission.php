@@ -253,6 +253,16 @@ class WPGH_Submission
                 if( $config = $this->get_field_config( $key ) ){
                     $value = apply_filters( 'wpgh_sanitize_submit_value', $value, $config );
                     $c->update_meta( $key, $value );
+
+//                    var_dump( $config );
+
+                    $tag_key = base64_encode( $value );
+//                    var_dump( $tag_key );
+                    if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
+                        $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
+//                        var_dump( $config[ 'tag_map' ][ $tag_key ] );
+                    }
+//                    die();
                 }
 
             }

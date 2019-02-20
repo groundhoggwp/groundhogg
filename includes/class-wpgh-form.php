@@ -187,16 +187,22 @@ class WPGH_Form
     public function column( $atts, $content ){
 
     	$a = shortcode_atts( array(
-    	    'size'  => '1/2',
+    	    'size'  => false,
+    	    'width' => '1/2',
             'id'    => '',
             'class' => ''
         ), $atts );
 
-    	switch ( $a[ 'size' ] ){
+    	//backwards compat for columns with the size attr
+    	if ( $a[ 'size' ] ){
+    	    $a[ 'width' ] = $a[ 'size' ];
+        }
 
+    	switch ( $a[ 'width' ] ){
 		    case '1/1':
 		    	$width = 'col-1-of-1';
 		    	break;
+            default:
 		    case '1/2':
 			    $width = 'col-1-of-2';
 			    break;
@@ -211,9 +217,6 @@ class WPGH_Form
 			    break;
 		    case '3/4':
 			    $width = 'col-3-of-4';
-			    break;
-		    default:
-			    $width = 'col-1-of-2';
 			    break;
 	    }
 
@@ -719,8 +722,7 @@ class WPGH_Form
             $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'default' ] );
         }
 
-        $this->fields[] = $a[ 'name' ];
-        $this->config[ $a[ 'name' ] ] = $a ;
+
 
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
         $multiple = $a[ 'multiple' ] ? 'multiple' : '';
@@ -732,13 +734,29 @@ class WPGH_Form
             $options = is_array( $a[ 'options' ] )? $a[ 'options' ] : explode( ',', $a[ 'options' ] );
             $options = array_map( 'trim', $options );
 
-            foreach ( $options as $option ){
+            foreach ( $options as $i => $option ){
 
-                $optionHTML .= sprintf( "<option value='%s'>%s</option>", esc_attr( $option ), $option );
+                $value = is_string( $i ) ? $i : $option;
 
+                /**
+                 * Check if tag should be applied
+                 *
+                 * @since 1.1
+                 */
+                if ( strpos( $value, '|' ) ){
+                    $parts = explode( '|', $value );
+                    $value = $parts[0];
+                    $tag = intval( $parts[1] );
+                    $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
+                }
+
+                $optionHTML .= sprintf( "<option value='%s'>%s</option>", esc_attr( $value ), $value );
             }
 
         }
+
+        $this->fields[] = $a[ 'name' ];
+        $this->config[ $a[ 'name' ] ] = $a ;
 
         $field = sprintf(
             "<label class='gh-input-label'>%s <select name='%s' id='%s' class='gh-input %s' title='%s' %s %s %s>%s</select></label>",
@@ -787,9 +805,6 @@ class WPGH_Form
             $a[ 'id' ] = sanitize_key( $a[ 'label' ] );
         }
 
-        $this->fields[] = $a[ 'name' ];
-        $this->config[ $a[ 'name' ] ] = $a ;
-
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $optionHTML = '';
@@ -809,8 +824,15 @@ class WPGH_Form
 	             * @since 1.1
 	             */
                 if ( strpos( $value, '|' ) ){
-                	$parts = explode( '|', $value );
-                	$value = $parts[0];
+                    $parts = explode( '|', $value );
+                    $value = $parts[0];
+                    $tag = intval( $parts[1] );
+                    $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
+                }
+
+                if ( strpos( $option, '|' ) ){
+                    $parts = explode( '|', $value );
+                    $option = $parts[0];
                 }
 
                 $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label class='gh-radio-label'><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s> %s</label></div>",
@@ -825,6 +847,9 @@ class WPGH_Form
             }
 
         }
+
+        $this->fields[] = $a[ 'name' ];
+        $this->config[ $a[ 'name' ] ] = $a ;
 
         $field = sprintf(
             "<label class='gh-input-label'>%s</label>%s",
@@ -868,17 +893,25 @@ class WPGH_Form
             $a[ 'id' ] = sanitize_key( $a[ 'label' ] );
         }
 
+        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
+
+        $value = esc_attr( $a[ 'value' ] );
+        if ( strpos( $value, '|' ) ){
+            $parts = explode( '|', $value );
+            $value = $parts[0];
+            $tag = intval( $parts[1] );
+            $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
+        }
+
         $this->fields[] = $a[ 'name' ];
         $this->config[ $a[ 'name' ] ] = $a ;
-
-        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $field = sprintf(
             "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='gh-checkbox %s' value='%s' title='%s' %s %s> %s</label>",
             esc_attr( $a[ 'name' ] ),
             esc_attr( $a[ 'id' ] ),
             esc_attr( $a[ 'class' ] ),
-            esc_attr( $a[ 'value' ] ),
+            esc_attr( $value ),
             esc_attr( $a[ 'title' ] ),
             $a[ 'attributes' ],
             $required,
@@ -944,15 +977,24 @@ class WPGH_Form
         }
 
         $a = shortcode_atts( array(
-            'theme'         => 'light',
-            'size'          => 'normal',
+            'theme'         => false,
+            'captcha-theme' => 'light',
+            'size'          => false,
+            'captcha-size'  => 'normal',
         ), $atts );
 
+        if ( $a[ 'theme' ] ){
+            $a[ 'captcha-theme' ] = $a[ 'theme' ];
+        }
+
+        if ( $a[ 'size' ] ){
+            $a[ 'captcha-theme' ] = $a[ 'size' ];
+        }
 
         if ( ! is_admin() )
             wp_enqueue_script( 'google-recaptcha-v2', 'https://www.google.com/recaptcha/api.js', array(), true );
 
-        $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ), $a[ 'theme'], $a['size'] );
+        $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ), $a['captcha-theme'], $a['captcha-size'] );
 
         $this->fields[] = 'g-recaptcha';
         $this->config[ 'g-recaptcha' ] = $a ;

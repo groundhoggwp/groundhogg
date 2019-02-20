@@ -54,20 +54,17 @@ var wpghFormBuilder;
             this.types.address      = ['required','label','id','class'];
             this.types.row          = ['id','class'];
             this.types.col          = ['width','id','class'];
-            this.types.date         = ['required','label','name','min-date','max-date','id','class'];
-            this.types.time         = ['required','label','name','min-time','max-time','id','class'];
-            this.types.file         = ['required','label','name','max-upload-size','file-types','id','class'];
+            this.types.date         = ['required','label','name','min_date','max_date','id','class'];
+            this.types.time         = ['required','label','name','min_time','max_time','id','class'];
+            this.types.file         = ['required','label','name','max_file_size','file-types','id','class'];
         },
 
-        sanitizeKey: function( key )
-        {
+        sanitizeKey: function( key ) {
             return key.toLowerCase().replace( /[^a-z0-9\-_]/g, '' );
         },
 
         setup: function (dom) {
-
             this.activeEditor = $(dom).closest('.form-editor').find('.code')[0];
-
         },
 
         getForm: function (button) {
@@ -111,10 +108,15 @@ var wpghFormBuilder;
 
             for( var i=0;i<attrs.length;i++){
 
-                if ( attrs[i].value !== "" ){
-                    code += ' ' + attrs[i].name + '="' + attrs[i].value.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n/g, ',') + '"'
-                } else if ( attrs[i].name === "label" && ignore.indexOf( this.currentType ) === -1 ){
-                    code += ' label=""';
+                //check if this field actually has the included name of the field allowed.
+                if ( this.types[ this.currentType ].includes( attrs[i].name ) ){
+
+                    if ( attrs[i].value !== "" ){
+                        code += ' ' + attrs[i].name + '="' + attrs[i].value.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n/g, ',') + '"'
+                    } else if ( attrs[i].name === "label" && ignore.indexOf( this.currentType ) === -1 ){
+                        code += ' label=""';
+                    }
+
                 }
 
             }
