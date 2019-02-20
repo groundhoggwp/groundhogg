@@ -21,9 +21,14 @@ class WPGH_Popup
 	private function __construct() {
 
 		add_action( 'admin_footer', array( $this, 'popup' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
 
-	}
+		if ( ! did_action( 'admin_enqueue_scripts' ) ){
+            add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
+        } else {
+		    $this->scripts();
+        }
+
+    }
 
 	public function scripts()
 	{

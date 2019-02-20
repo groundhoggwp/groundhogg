@@ -45,6 +45,12 @@ var wpghContactEditor;
                 $( '#active-tab' ).val( $tab.attr( 'id' ).replace( 'tab_', '' ) );
 
             });
+
+            $( '#manual-submission' ).click( function (e) {
+
+
+
+            });
         }
     };
 

@@ -486,6 +486,46 @@ function wpgh_contact_record_section_actions( $contact )
                 </div>
             </td>
         </tr>
+        <tr>
+            <th><?php _ex( 'Add To Funnel', 'contact_record', 'groundhogg' ); ?></th>
+            <td>
+                <div style="max-width: 400px;">
+                    <?php $forms = WPGH()->steps->get_steps( array(
+                        'step_type' => 'form_fill'
+                    ) );
+
+                    $form_options = array();
+                    $default = 0;
+                    foreach ( $forms as $form ){
+                        if ( ! $default ){$default = $form->ID;}
+                        $step = new WPGH_Step( $form->ID );
+                        if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
+                    }
+
+                    echo WPGH()->html->select2( array(
+                        'name'              => 'manual_form_submission',
+                        'id'                => 'manual_form_submission',
+                        'class'             => 'manual-submission gh-select2',
+                        'data'              => $form_options,
+                        'multiple'          => false,
+                        'placeholder'       => 'Please Select a Form',
+                    ) );
+
+                    ?><div class="row-actions"><?php
+                    echo WPGH()->html->modal_link(array(
+                        'title'     => 'Manual Submission',
+                        'text'      => __( 'Fill Out', 'groundhogg' ),
+                        'id'        => 'manual-submission',
+                        'class'     => 'manual-submission button button-secondary',
+                        'source'    => 'manual-submission-container',
+                        'height'    => 600,
+                        'width'     => 500,
+                        'preventSave'    => 'true',
+                    ));
+                        ?></div>
+                </div>
+            </td>
+        </tr>
     </table>
     <?php
 }
@@ -759,4 +799,11 @@ endforeach;
     <input type="hidden" name="email" value="<?php esc_attr_e( $contact->email ); ?>">
     <input type="hidden" name="user_login" value="<?php esc_attr_e( $contact->email ); ?>">
 </form>
-<?php endif; ?>
+<div id="manual-submission-container" class="hidden">
+    <!-- Form Content -->
+    hi
+</div>
+<?php endif;
+
+do_action( 'groundhogg/contact/record/after/', $contact );
+?>
