@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.1.1 =
+* FIXED Email report wrongly included queued email statistics
+* FIXED Reporting month time ranges are now more specific
+
 = 1.1 =
 * ADDED Prompt to allow anonymous usage tracking.
 * ADDED Logged in benchmark
