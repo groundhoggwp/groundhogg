@@ -738,7 +738,7 @@ class WPGH_Funnels_Page
             }
 
             do_action( "groundhogg/elements/{$step->type}/save", $step );
-            do_action( "groundhogg/elements/{$step->type}/save", $step );
+//            do_action( "groundhogg/elements/{$step->type}/save", $step );
 
         }
 
