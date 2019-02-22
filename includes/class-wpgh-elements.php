@@ -113,7 +113,7 @@ class WPGH_Elements
      */
     public function get_actions()
     {
-        return apply_filters( 'groundhogg/elements/benchmarks', array() );
+        return apply_filters( 'groundhogg/elements/actions', array() );
     }
 
     /**
