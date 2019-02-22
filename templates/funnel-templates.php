@@ -69,3 +69,4 @@ $funnel_templates[ 'email_preferences' ][ 'src' ] = 'https://via.placeholder.com
 $funnel_templates[ 'email_preferences' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/email-preferences.funnel';
 
 $funnel_templates = apply_filters( 'wpgh_funnel_templates', $funnel_templates );
+$funnel_templates = apply_filters( 'groundhogg/templates/funnels', $funnel_templates );

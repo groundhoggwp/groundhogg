@@ -111,3 +111,4 @@ $email_templates['value']['content'] = ob_get_contents();
 ob_end_clean();
 
 $email_templates = apply_filters( 'wpgh_email_templates', $email_templates );
+$email_templates = apply_filters( 'groundhogg/templates/emails', $email_templates );
