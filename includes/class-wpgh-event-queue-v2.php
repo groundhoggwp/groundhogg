@@ -106,7 +106,6 @@ class WPGH_Event_Queue_v2
      */
     public function setup_cron_jobs()
     {
-
         $settings_queue_interval = wpgh_get_option( 'gh_queue_interval', 'every_5_minutes' );
         $real_queue_interval = wpgh_get_option( 'gh_real_queue_interval' );
 
@@ -117,27 +116,6 @@ class WPGH_Event_Queue_v2
         }
 
         $this->time_till_process = wp_next_scheduled( 'wpgh_process_queue' ) - time();
-
-//        $expected_max_time = $this->schedules[ $settings_queue_interval ][ 'interval' ];
-//        $expected_max_time_display = $this->schedules[ $settings_queue_interval ][ 'display' ];
-
-//        if ( ( $this->time_till_process > $expected_max_time + 1 ) && ( ! defined( 'DISABLE_WP_CRON' ) ||  DISABLE_WP_CRON === false ) ){
-//
-//            $actual_time = human_time_diff( time(), $this->time_till_process );
-//
-//            WPGH()->notices->add(
-//                'CRON_OVERRIDE',
-//                sprintf(
-//                    __(
-//                        'Event Queue Error: It appears that something is overriding the default timing of the event queue. The queue is expected to run %s but will not run for at least %s.',
-//                        'groundhogg'
-//                    ),
-//                    $expected_max_time_display,
-//                    $actual_time ),
-//                'warning'
-//            );
-//        }
-
     }
 
     /**
@@ -217,6 +195,7 @@ class WPGH_Event_Queue_v2
 
 
         do_action( 'wpgh_process_event_queue_before', $this );
+        do_action( 'groundhogg/queue/run/before', $this );
 
         $i = 0;
 
@@ -251,6 +230,7 @@ class WPGH_Event_Queue_v2
 
 
         do_action( 'wpgh_process_event_queue_after', $this );
+        do_action( 'groundhogg/queue/run/after', $this );
 
         return $i + $this->process();
     }

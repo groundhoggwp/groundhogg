@@ -535,6 +535,7 @@ class WPGH_Contact
         }
         $this->update_meta( 'preferences_changed', time() );
         do_action( 'wpgh_contact_marketing_preference_updated', $this->ID, $preference );
+        do_action( 'groundhogg/contact/preferences/updated', $this->ID, $preference );
 
     }
 
@@ -545,6 +546,7 @@ class WPGH_Contact
     {
         $this->update( array( 'optin_status' => WPGH_UNSUBSCRIBED ) );
         do_action( 'wpgh_contact_unsubscribed', $this->ID );
+        do_action( 'groundhogg/contact/preferences/unsubscribed', $this->ID );
     }
 
     /**

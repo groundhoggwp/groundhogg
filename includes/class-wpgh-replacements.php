@@ -185,6 +185,7 @@ class WPGH_Replacements
         );
 
         $replacements = apply_filters( 'wpgh_replacement_defaults', $replacements );
+        $replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
 
         foreach ( $replacements as $replacement )
         {
@@ -337,7 +338,8 @@ class WPGH_Replacements
 
         }
 
-        return apply_filters( 'wpgh_filter_replacement_' . $code, $text );
+        $text = apply_filters( 'wpgh_filter_replacement_' . $code, $text );
+        return apply_filters( "groundhogg/replacements/{$code}", $text );
 
     }
 

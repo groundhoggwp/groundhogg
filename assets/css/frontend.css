@@ -27,8 +27,9 @@ ul.gh-form-errors{
     white-space: normal;
 }
 
-label{
+.gh-form-wrapper label{
     cursor: pointer;
+    vertical-align: baseline;
 }
 
 .gh-form-wrapper .gh-input{

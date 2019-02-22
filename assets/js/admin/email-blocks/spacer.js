@@ -10,7 +10,7 @@ var wpghSpacerBlock;
 
             this.height  = $( '#spacer-size' );
             this.height.on( 'change', function ( e ) {
-                editor.getActive().find('.spacer').css('height', $(this).val() + 'px' );
+                editor.getActive().find('.spacer').attr('height', $(this).val() );
             });
 
             $(document).on( 'madeActive', function (e, block, blockType ) {

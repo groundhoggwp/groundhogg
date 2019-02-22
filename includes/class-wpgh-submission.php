@@ -67,6 +67,13 @@ class WPGH_Submission
     public $errors = array();
 
     /**
+     * Handle the admin submissions differently
+     *
+     * @var bool
+     */
+    public $is_admin_submission = false;
+
+    /**
      * WPGH_Submission constructor.
      *
      * If the GH_SUBMIT nonce is active than a from submission is
@@ -190,6 +197,10 @@ class WPGH_Submission
      */
     public function process()
     {
+        if ( is_admin() && current_user_can( 'edit_contacts' ) ){
+            $this->is_admin_submission = true;
+        }
+
         if ( ! $this->setup() ){
             return;
         }
@@ -202,36 +213,35 @@ class WPGH_Submission
             return;
         }
 
-        $c->update_meta( 'ip_address', wpgh_get_visitor_ip() );
-
-        if ( ! $c->get_meta( 'lead_source' ) ){
-            $c->update_meta( 'lead_source', WPGH()->tracking->lead_source );
+        /* Exclude these if submitting from the ADMIN Screen */
+        if ( ! $this->is_admin_submission ){
+            $c->update_meta( 'ip_address', wpgh_get_visitor_ip() );
+            if ( ! $c->get_meta( 'lead_source' ) ){
+                $c->update_meta( 'lead_source', WPGH()->tracking->lead_source );
+            }
+            if ( ! $c->get_meta( 'source_page' ) ){
+                $c->update_meta( 'source_page', $this->source );
+            }
+            if ( isset( $this->agree_terms ) ){
+                $c->update_meta( 'terms_agreement', 'yes' );
+                $c->update_meta( 'terms_agreement_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
+                do_action( 'wpgh_agreed_to_terms', $c, $this );
+                do_action( 'groundhogg/submission/agreed_to_terms', $c, $this );
+                unset( $this->agree_terms );
+            }
+            if ( isset( $this->gdpr_consent ) ){
+                $c->update_meta( 'gdpr_consent', 'yes' );
+                $c->update_meta( 'gdpr_consent_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
+                do_action( 'wpgh_gdpr_consented', $c, $this );
+                do_action( 'groundhogg/submission/gdpr_gave_consent', $c, $this );
+                unset( $this->gdpr_consent );
+            }
+            /* If the contact previously unsubed then reopt them back in.  */
+            if ( $this->contact->optin_status === WPGH_UNSUBSCRIBED ) {
+                $this->contact->change_marketing_preference(WPGH_UNCONFIRMED );
+            }
+            $c->update_meta( 'last_optin', time() );
         }
-
-        if ( ! $c->get_meta( 'source_page' ) ){
-            $c->update_meta( 'source_page', $this->source );
-        }
-
-        if ( isset( $this->agree_terms ) ){
-            $c->update_meta( 'terms_agreement', 'yes' );
-            $c->update_meta( 'terms_agreement_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
-            do_action( 'wpgh_agreed_to_terms', $c, $this );
-            unset( $this->agree_terms );
-        }
-
-        if ( isset( $this->gdpr_consent ) ){
-            $c->update_meta( 'gdpr_consent', 'yes' );
-            $c->update_meta( 'gdpr_consent_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
-            do_action( 'wpgh_gdpr_consented', $c, $this );
-            unset( $this->gdpr_consent );
-        }
-
-        /* If the contact previously unsubed then reopt them back in.  */
-        if ( $this->contact->optin_status === WPGH_UNSUBSCRIBED ) {
-            $this->contact->change_marketing_preference(WPGH_UNCONFIRMED );
-        }
-
-        $c->update_meta( 'last_optin', time() );
 
         foreach ( $this->data as $key => $value ) {
 
@@ -252,17 +262,13 @@ class WPGH_Submission
                 /* NEW: Pass the field's config object to a filter to sanitize it */
                 if( $config = $this->get_field_config( $key ) ){
                     $value = apply_filters( 'wpgh_sanitize_submit_value', $value, $config );
+                    $value = apply_filters( 'groundhogg/submission/meta/sanitize', $value, $config );
+                    $value = apply_filters( "groundhogg/submission/meta/sanitize/{$key}", $value, $config );
                     $c->update_meta( $key, $value );
-
-//                    var_dump( $config );
-
                     $tag_key = base64_encode( $value );
-//                    var_dump( $tag_key );
                     if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
                         $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
-//                        var_dump( $config[ 'tag_map' ][ $tag_key ] );
                     }
-//                    die();
                 }
 
             }
@@ -280,17 +286,33 @@ class WPGH_Submission
         }
 
         $feed_response = apply_filters( 'wpgh_form_submit_feed', true, $this->id, $c, $this );
+        $feed_response = apply_filters( 'groundhogg/submission/feed', $feed_response, $this->id, $c, $this );
 
         if ( ! $this->has_errors() ){
 
             if ( $this->id ){
+
+                /* Remove the Tracking hook */
+                if ( $this->is_admin_submission ){
+                    remove_action( 'wpgh_form_submit', array( WPGH()->tracking, 'form_filled' ) );
+                }
+
                 do_action( 'wpgh_form_submit', $this->id, $c, $this );
+                do_action( 'groundhogg/submission/after', $this->id, $c, $this );
             }
 
-            /* redirect to ensure cookie is set and can be used on the following page*/
-            $success_page = $this->step->get_meta('success_page' );
-            wp_redirect( $success_page );
-            die();
+            if ( ! $this->is_admin_submission ){
+                /* redirect to ensure cookie is set and can be used on the following page */
+                $success_page = $this->step->get_meta('success_page' );
+                wp_redirect( $success_page );
+                die();
+            } else {
+                /* Go to contact edit page and add notice of success */
+                WPGH()->notices->add( 'form_filled', _x( 'Form submitted', 'notice', 'groundhogg' ) );
+                $admin_url = admin_url( sprintf( 'admin.php?page=gh_contacts&action=edit&contact=%d', $this->contact->ID ) );
+                wp_redirect( $admin_url );
+                die();
+            }
 
         } else if ( is_wp_error( $feed_response ) ){
             $this->add_error( $feed_response );
@@ -368,7 +390,6 @@ class WPGH_Submission
             return false;
         }
 
-        //todo consider GDPR checking in the future
         if ( wpgh_is_gdpr()
             && $this->has_field( 'gdpr_consent' )
             && ! isset( $this->gdpr_consent )
@@ -377,7 +398,6 @@ class WPGH_Submission
             return false;
         }
 
-        //todo check recaptcha elsewhere?
         if ( wpgh_is_recaptcha_enabled()
             && $this->has_field( 'g-recaptcha' )
         ) {
@@ -402,7 +422,6 @@ class WPGH_Submission
             }
         }
 
-        //todo check terms elswehere?
         if ( $this->has_field( 'agree_terms' )
             && ! isset( $this->agree_terms )
         ){
@@ -435,7 +454,10 @@ class WPGH_Submission
             }
         }
 
-        return apply_filters( 'wpgh_submission_verify_check', true, $this );
+        $verified = apply_filters( 'wpgh_submission_verify_check', true, $this );
+        $verified = apply_filters( 'groundhogg/submission/verify', $verified, $this );
+
+        return $verified;
     }
 
     /**
@@ -479,7 +501,7 @@ class WPGH_Submission
             foreach ($keys as $key) {
                 if ( strpos( $value, $key ) !== false ){
 
-                    if( apply_filters( 'wpgh_spam_filter', true, $this, $value ) ){
+                    if( apply_filters( 'groundhogg/submission/spam', true, $this, $value ) ){
 
                         return false;
 
@@ -515,14 +537,20 @@ class WPGH_Submission
                 'last_name' => sanitize_text_field( stripslashes( $this->last_name ) )
             );
 
-            if ( is_user_logged_in() ){
-                $args[ 'user_id' ] = get_current_user_id();
-            } else {
-                $user = get_user_by( 'email', $email );
-                if ( $user ){
-                    $args[ 'user_id' ] = $user->ID;
+            /**
+             * Do not update if is admin submission
+             */
+            if ( ! $this->is_admin_submission ){
+                if ( is_user_logged_in() ){
+                    $args[ 'user_id' ] = get_current_user_id();
+                } else {
+                    $user = get_user_by( 'email', $email );
+                    if ( $user ){
+                        $args[ 'user_id' ] = $user->ID;
+                    }
                 }
             }
+
 
             if ( WPGH()->contacts->exists( $email ) ){
                 $this->contact = new WPGH_Contact( $email );
@@ -652,9 +680,7 @@ class WPGH_Submission
 
         $param['path'] = $param['basedir'] . $mydir;
         $param['url'] = $param['baseurl'] . $mydir;
-        $param['subdir'] = $mydir;
-        /* Compat for windows file systems */
-//        $param = array_map( 'wp_normalize_path', $param );
+        $param['subdir'] = $mydir;;
 
         return $param;
     }
@@ -720,31 +746,22 @@ class WPGH_Submission
         if ( ! empty( $file_extensions ) ){
 
             foreach ( $file_extensions as $ext ){
-
                 $ext = str_replace(  '.', '', $ext );
-
                 foreach ( $wp_mimes as $exts => $mime ){
 
                     if ( preg_match( '/' . $ext . '/', $exts ) ){
-
                         $mimes[ $exts ] = $mime;
-
                     }
 
                     break;
 
                 }
-
                 $mimes[ $ext ] = 'application/text';
-
             }
 
             return $mimes;
-
         } else {
-
             return $wp_mimes;
-
         }
 
     }
@@ -767,15 +784,13 @@ class WPGH_Submission
         if ( isset( $_POST[ 'delete_everything' ] ) && $_POST[ 'delete_everything' ] === 'yes' ) {
 
             do_action( 'wpgh_delete_everything', $contact->ID );
+            do_action( 'groundhogg/submission/gdpr/delete_everything', $contact->ID );
 
+            $contact->unsubscribe();
             WPGH()->contacts->delete( $contact->ID );
 
             $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
-
-            do_action( 'wpgh_preference_unsubscribe', $contact->ID );
-
             wp_redirect( $unsub_page );
-
             die();
         }
 

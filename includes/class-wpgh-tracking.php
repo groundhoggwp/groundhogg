@@ -152,7 +152,7 @@ class WPGH_Tracking
 
         }
 
-        add_action( 'wpgh_form_submit', array( $this, 'form_filled' ), 10, 3 );
+        add_action( 'groundhogg/submission/after', array( $this, 'form_filled' ), 10, 3 );
 
     }
 
@@ -166,12 +166,9 @@ class WPGH_Tracking
         $site = get_option( 'siteurl' );
 
         if ( strpos( $site, 'https://' ) !== false && ! is_ssl() ){
-
             $actual_link = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-
             wp_redirect( $actual_link );
             die();
-
         }
 
     }
@@ -623,6 +620,7 @@ class WPGH_Tracking
             );
 
             do_action( 'wpgh_email_opened', $this );
+            do_action( 'groundhogg/tracking/email/opened', $this );
         }
 
         /* only fire if actually doing an open as this may be called by the email_link_clicked method */
@@ -649,6 +647,7 @@ class WPGH_Tracking
 
         if ( $this->get_contact() ){
             do_action( 'wpgh_link_clicked', $step, $this->get_contact() );
+            do_action( 'groundhogg/tracking/becnhmark_link/click', $step, $this->get_contact() );
             $redirect_to = WPGH()->replacements->process( $step->get_meta( 'redirect_to' ), $this->get_contact()->ID );
 
             /* Check unsub page */
@@ -707,6 +706,7 @@ class WPGH_Tracking
         );
 
         do_action( 'wpgh_email_link_click', $this );
+        do_action( 'groundhogg/tracking/email/click', $this );
 
         $this->build_cookie();
 
@@ -763,6 +763,7 @@ class WPGH_Tracking
 
         if ( $this->funnel ){
             do_action( 'wpgh_email_confirmed', $this->contact, $this->funnel->ID );
+            do_action( 'groundhogg/tracking/email/confirmed', $this->contact, $this->funnel->ID );
         }
 
         wp_redirect( $conf_page );

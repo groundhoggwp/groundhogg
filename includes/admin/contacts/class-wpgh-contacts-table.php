@@ -548,8 +548,8 @@ class WPGH_Contacts_Table extends WP_List_Table {
     protected function extra_tablenav($which)
     {
         ?>
-        <div class="alignleft">
-            <a class="button button-secondary action query-export" href="javascript:void(0)"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), $this->get_pagination_arg( 'total_items' ) ); ?></a>
+        <div class="alignleft gh-actions">
+            <a class="button action query-export" href="javascript:void(0)"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), $this->get_pagination_arg( 'total_items' ) ); ?></a>
         </div>
         <?php
     }

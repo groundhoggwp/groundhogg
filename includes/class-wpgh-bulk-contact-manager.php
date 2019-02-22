@@ -328,11 +328,26 @@ class WPGH_Bulk_Contact_Manager
         }
 
         /*let's just quickly process the meta and get out for now */
-
         foreach ( $args as $key => $value ){
             if ( ! empty( $value ) ){
                 $contact->update_meta( $key, sanitize_text_field( $value ) );
             }
+        }
+
+        /* Special case for country code */
+        if ( key_exists( 'country', $args ) ){
+
+            /* Not a country code */
+            if ( strlen( $args[ 'country' ] ) !== 2 ){
+
+                $countries = wpgh_get_countries_list();
+                $code = array_search( $args[ 'country' ], $countries );
+                if ( $code ){
+                    $contact->update_meta( 'country', $code );
+                }
+
+            }
+
         }
 
         //todo, not sure about this

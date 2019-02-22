@@ -29,6 +29,7 @@ var wpghImageBlock;
             this.width = $( '#image-width' );
             this.width.on( 'change', function ( e ) {
                 editor.getActive().find('img').css('width',$(this).val() + '%' );
+                editor.getActive().find('img').attr('width', editor.getActive().find('img').width() );
             });
 
             this.title = $( '#image-title' );

@@ -148,8 +148,8 @@ class WPGH_Events_Table extends WP_List_Table {
         $next_run_in = human_time_diff( time(), $next_run_in );
 
         ?>
-        <div class="alignleft">
-            <a class="button button-secondary action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php printf( _x( 'Process Events (Auto Runs In %s)', 'action', 'groundhogg' ), $next_run_in ); ?></a>
+        <div class="alignleft gh-actions">
+            <a class="button action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php printf( _x( 'Process Events (Auto Runs In %s)', 'action', 'groundhogg' ), $next_run_in ); ?></a>
         </div>
         <?php
     }

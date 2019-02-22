@@ -108,6 +108,15 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.1.1 =
+* ADDED New admin form submit action accessible from the contact record
+* TWEAKED Added spacing around button block & fixed centering issue for improved usability in outlook.
+* TWEAKED converted spacer to table format for outlook compat
+* TWEAKED Default email template for improved outlook compat
+* TWEAKED Image block now also uses width attribute for compatibility across platforms.
+* TWEAKED New filter and action hook guide
+* TWEAKED Form builder content area now sizes to the content automatically
+* TWEAKED Form builder content is auto formatted
+* TWEAKED Long form country is now converted to country code when importing
 * FIXED Email report wrongly included queued email statistics
 * FIXED Reporting month time ranges are now more specific
 

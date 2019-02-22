@@ -487,7 +487,7 @@ function wpgh_contact_record_section_actions( $contact )
             </td>
         </tr>
         <tr>
-            <th><?php _ex( 'Add To Funnel', 'contact_record', 'groundhogg' ); ?></th>
+            <th><?php _ex( 'Internal Form', 'contact_record', 'groundhogg' ); ?></th>
             <td>
                 <div style="max-width: 400px;">
                     <?php $forms = WPGH()->steps->get_steps( array(
@@ -508,21 +508,14 @@ function wpgh_contact_record_section_actions( $contact )
                         'class'             => 'manual-submission gh-select2',
                         'data'              => $form_options,
                         'multiple'          => false,
+                        'selected'          => [ $default ],
                         'placeholder'       => 'Please Select a Form',
                     ) );
 
-                    ?><div class="row-actions"><?php
-                    echo WPGH()->html->modal_link(array(
-                        'title'     => 'Manual Submission',
-                        'text'      => __( 'Fill Out', 'groundhogg' ),
-                        'id'        => 'manual-submission-button',
-                        'class'     => 'manual-submission button button-secondary',
-                        'source'    => 'manual-submission-container',
-                        'height'    => 600,
-                        'width'     => 500,
-                        'preventSave'    => 'true',
-                    ));
-                        ?></div>
+                    ?><div class="row-actions">
+                        <script>var WPGHFormSubmitBaseUrl = '<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&action=form&contact=%d&form=', $contact->ID ) ); ?>';</script>
+                        <a id="form-submit-link" class="button button-secondary" href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&action=form&contact=%d&form=%d', $contact->ID, $default ) ); ?>"><?php _ex( 'Submit Form', 'action', 'groundhogg' ) ?></a>
+                    </div>
                 </div>
             </td>
         </tr>

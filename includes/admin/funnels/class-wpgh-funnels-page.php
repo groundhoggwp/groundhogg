@@ -737,7 +737,7 @@ class WPGH_Funnels_Page
                 $step->delete_meta( 'is_closed' );
             }
 
-            do_action( 'wpgh_save_step_' . $step->type, $step );
+            do_action( "groundhogg/elements/{$step->type}/save", $step );
 
         }
 

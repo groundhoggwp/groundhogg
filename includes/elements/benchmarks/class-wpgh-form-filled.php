@@ -368,13 +368,17 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
 
                         <?php
 
+                        $code = $this->prettify( $form );
+                        $rows = min( substr_count( $code, "\n" ) + 1, 15 );
+
                         $args = array(
                             'id'    => $step->prefix( 'form' ),
                             'name'  => $step->prefix( 'form' ),
-                            'value' => $form,
+                            'value' => $code,
                             'class' => 'code form-html',
                             'cols'  => 64,
-                            'rows'  => 4
+                            'rows'  => $rows,
+                            'attributes' => " style='white-space: nowrap;'"
                         ); ?>
 
                         <?php echo WPGH()->html->textarea( $args ) ?>
@@ -384,6 +388,58 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
         </table>
 
         <?php
+    }
+
+
+    /**
+     * Prettifies the shortcode text to make it easier to identify and read
+     *
+     * @param $code string of shortcode
+     * @return string
+     */
+    private function prettify( $code )
+    {
+
+        $pretty = $code;
+
+        /* Remove all newlines & whitespace */
+        $code = trim( $code, " \t\n\r" );
+        $code = preg_replace( '/(\])\s*(\[)/', "$1$2", $code );
+        $code = preg_replace( '/(\])/', "$1" . PHP_EOL, $code );
+        $codes = explode( PHP_EOL, $code );
+
+//        var_dump( $codes );
+
+        $depth = 0;
+        $pretty = '';
+
+        foreach ( $codes as $i => $shortcode ){
+
+            $shortcode = trim( $shortcode, " \t\n\r" );
+            if ( empty( $shortcode ) ){
+                continue;
+            }
+
+            /* Opening tag */
+            if ( preg_match( '/\[(col|row)\b[^\]]*\]/', $shortcode ) ) {
+                $pretty .= str_repeat( str_repeat( " ", 4 ), $depth ) . $shortcode;
+                $depth++;
+                /* Closing tag */
+            } else if ( preg_match( '/\[\/(col|row)\]/', $shortcode ) ){
+//                var_dump( $shortcode) ;
+                $depth--;
+                $pretty .= str_repeat( str_repeat( " ", 4 ), $depth ) . $shortcode;
+                /* Other stuff */
+            } else {
+                $pretty .= str_repeat( str_repeat( " ", 4 ), $depth ) . $shortcode;
+            }
+
+            $pretty .= PHP_EOL;
+
+        }
+
+        return $pretty;
+
     }
 
     public function modal_form()

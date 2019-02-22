@@ -198,7 +198,8 @@ class WPGH_Email
      */
     public function get_template()
     {
-        return apply_filters( 'wpgh_email_template', $this->template );
+        $template = apply_filters( 'wpgh_email_template', $this->template );
+        return apply_filters( 'groundhogg/email/template', $template );
     }
 
 
@@ -287,6 +288,19 @@ class WPGH_Email
     }
 
     /**
+     * Add alignment CSS to the email content for outlook
+     *
+     * @param $css string the email's current css
+     *
+     * @return string
+     */
+    public function get_alignment_outlook($css)
+    {
+        $alignment = $this->get_meta('alignment', true);
+        return ($alignment === 'left')? '' : 'center';
+    }
+
+    /**
      * Add alignment CSS to the email content
      *
      * @param $css string the email's current css
@@ -296,9 +310,7 @@ class WPGH_Email
     public function get_alignment($css)
     {
         $alignment = $this->get_meta('alignment', true);
-
         $margins = ($alignment === 'left') ? "margin-left:0;margin-right:auto;" : "margin-left:auto;margin-right:auto;";
-
         return $css . $margins;
     }
 
@@ -309,7 +321,8 @@ class WPGH_Email
      */
     public function get_to()
     {
-       return apply_filters( 'wpgh_email_to', $this->contact->email );
+       $to = apply_filters( 'wpgh_email_to', $this->contact->email );
+       return apply_filters( 'groundhogg/email/to', $to );
     }
 
     /**
@@ -324,7 +337,8 @@ class WPGH_Email
             $this->contact->ID
         );
 
-        return apply_filters( 'wpgh_email_subject_line', $subject );
+        $subject = apply_filters( 'wpgh_email_subject_line', $subject );
+        return apply_filters( 'groundhogg/email/subject', $subject );
     }
 
     /**
@@ -342,7 +356,8 @@ class WPGH_Email
             $this->contact->ID
         );
 
-        return apply_filters( 'wpgh_email_pre_header', $pre_header );
+        $pre_header = apply_filters( 'wpgh_email_pre_header', $pre_header );
+        return apply_filters( 'groundhogg/email/pre_header', $pre_header );
     }
 
     /**
@@ -451,7 +466,8 @@ class WPGH_Email
             restore_current_blog();
         }
 
-        return apply_filters( 'wpgh_email_footer', $footer );
+        $footer = apply_filters( 'wpgh_email_footer', $footer );
+        return apply_filters( 'groundhogg/email/footer', $footer );
     }
 
     /**
@@ -481,6 +497,7 @@ class WPGH_Email
      */
     private function add_filters()
     {
+        add_filter( 'wpgh_email_alignment',          array( $this, 'get_alignment_outlook' ) );
         add_filter( 'wpgh_email_container_css',      array( $this, 'get_alignment' ) );
         add_filter( 'wpgh_email_browser_view',       array( $this, 'browser_view_enabled' ) );
         add_filter( 'wpgh_email_browser_link',       array( $this, 'browser_link' ) );
@@ -514,40 +531,39 @@ class WPGH_Email
      */
     public function build()
     {
-        //WPGH()->templates->get_template_part( 'emails/body' );
         $templates = new WPGH_Template_Loader();
 
         $this->add_filters();
 
         ob_start();
 
-//        wp_die( 'HI!' );
+        $template = $this->get_template();
 
-        if ( has_action( 'wpgh_email_template_header_' . $this->get_template() ) ){
+        if ( has_action( "groundhogg/email/header/{$template}" ) ){
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
              */
-            do_action( 'wpgh_email_template_header_' . $this->get_template() , $this );
+            do_action( "groundhogg/email/header/{$template}" , $this );
 
         } else {
             $templates->get_template_part( 'emails/header', $this->get_template() );
         }
 
 //        wp_die( 'HI!' );
-        if ( has_action( 'wpgh_email_template_body_' . $this->get_template() ) ){
+        if ( has_action( "groundhogg/email/body/{$template}" ) ){
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
              */
-            do_action( 'wpgh_email_template_body_' . $this->get_template() , $this );
+            do_action( "groundhogg/email/body/{$template}" , $this );
         } else {
             $templates->get_template_part( 'emails/body', $this->get_template() );
         }
 
-        if ( has_action( 'wpgh_email_template_footer_' . $this->get_template() ) ){
+        if ( has_action( "groundhogg/email/footer/{$template}" ) ){
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
              */
-            do_action( 'wpgh_email_template_footer_' . $this->get_template() , $this );
+            do_action( "groundhogg/email/footer/{$template}" , $this );
 
         } else {
             $templates->get_template_part( 'emails/footer', $this->get_template() );
@@ -645,7 +661,8 @@ class WPGH_Email
         $headers['content_type']    = 'Content-Type: text/html; charset=UTF-8';
         $headers['unsub']  = sprintf( 'List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo( 'admin_email' ), $this->contact->email, $this->get_click_tracking_link(), urlencode( $this->get_unsubscribe_link( '' ) ) );
 
-        return apply_filters( 'wpgh_email_headers', $headers );
+        $headers = apply_filters( 'wpgh_email_headers', $headers );
+        return apply_filters( "groundhogg/email/headers", $headers );
     }
 
 
@@ -721,8 +738,6 @@ class WPGH_Email
         $to = $this->get_to();
         $subject = $this->get_subject_line();
         $content = $this->build();
-
-//                wp_die( 'HI!' );
 
         $headers = $this->get_headers();
 

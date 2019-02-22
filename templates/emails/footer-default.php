@@ -36,30 +36,32 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
     font-size: 13px; 
     text-align: center;" );
 ?>
-
-                        <!-- START FOOTER -->
-                        <div class="footer" style="<?php echo $footer; ?>">
-                            <table border="0" cellpadding="0" cellspacing="0" style="<?php echo $footer_container; ?>">
-                                <tr>
-                                    <td class="content-block" style="<?php echo $footer_content; ?>">
-                                        <span class="apple-link" style="<?php echo $apple_link; ?>">
-                                            <?php echo apply_filters( 'wpgh_email_footer_text', '' ); ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="content-block" style="<?php echo $footer_content; ?>">
-                                        <span style="<?php echo $apple_link; ?>">
-                                            <?php _e( apply_filters( 'gh_unsubscribe_footer_text', __( "Don't want these emails?", 'groundhogg' ) ), 'groundhogg'); ?> <a href="<?php echo esc_url_raw( apply_filters( 'wpgh_email_unsubscribe_link', site_url() ) ); ?>">
-                                                <?php _e( apply_filters( 'gh_unsubscribe_text', __( "Unsubscribe.", 'groundhogg' ) ), 'groundhogg'); ?>
-                                            </a>
-                                        </span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                        <!-- END FOOTER -->
-                    </div>
+                                <!-- START FOOTER -->
+                                <div class="footer" style="<?php echo $footer; ?>">
+                                    <table border="0" cellpadding="0" cellspacing="0" style="<?php echo $footer_container; ?>">
+                                        <tr>
+                                            <td class="content-block" style="<?php echo $footer_content; ?>">
+                                                <span class="apple-link" style="<?php echo $apple_link; ?>">
+                                                    <?php echo apply_filters( 'wpgh_email_footer_text', '' ); ?>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="content-block" style="<?php echo $footer_content; ?>">
+                                                <span style="<?php echo $apple_link; ?>">
+                                                    <?php _e( apply_filters( 'gh_unsubscribe_footer_text', __( "Don't want these emails?", 'groundhogg' ) ), 'groundhogg'); ?> <a href="<?php echo esc_url_raw( apply_filters( 'wpgh_email_unsubscribe_link', site_url() ) ); ?>">
+                                                        <?php _e( apply_filters( 'gh_unsubscribe_text', __( "Unsubscribe.", 'groundhogg' ) ), 'groundhogg'); ?>
+                                                    </a>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <!-- END FOOTER -->
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </table>

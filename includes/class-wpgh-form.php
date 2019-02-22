@@ -769,14 +769,6 @@ class WPGH_Form
 
                 $value = is_string( $i ) ? $i : $option;
 
-                $selected = '';
-                if ( $this->auto_populate ){
-                    $name = $a[ 'name' ];
-                    if ( $this->source_contact->$name === $value ){
-                        $selected = 'selected';
-                    }
-                }
-
                 /**
                  * Check if tag should be applied
                  *
@@ -787,6 +779,14 @@ class WPGH_Form
                     $value = $parts[0];
                     $tag = intval( $parts[1] );
                     $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
+                }
+
+                $selected = '';
+                if ( $this->auto_populate ){
+                    $name = $a[ 'name' ];
+                    if ( $this->source_contact->$name === $value ){
+                        $selected = 'selected';
+                    }
                 }
 
                 $optionHTML .= sprintf( "<option value='%s' %s>%s</option>", esc_attr( $value ), $selected, $value );
@@ -857,14 +857,6 @@ class WPGH_Form
 
                 $value = is_string( $i ) ? $i : $option;
 
-                $checked = '';
-                if ( $this->auto_populate ){
-                    $name = $a[ 'name' ];
-                    if ( $this->source_contact->$name === $value ){
-                        $checked = 'checked';
-                    }
-                }
-
 	            /**
 	             * Check if tag should be applied
 	             *
@@ -880,6 +872,14 @@ class WPGH_Form
                 if ( strpos( $option, '|' ) ){
                     $parts = explode( '|', $value );
                     $option = $parts[0];
+                }
+
+                $checked = '';
+                if ( $this->auto_populate ){
+                    $name = $a[ 'name' ];
+                    if ( $this->source_contact->$name === $value ){
+                        $checked = 'checked';
+                    }
                 }
 
                 $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label class='gh-radio-label'><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s %s> %s</label></div>",
@@ -943,20 +943,20 @@ class WPGH_Form
 
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
-        $checked = '';
-        if ( $this->auto_populate ){
-            $name = $a[ 'name' ];
-            if ( $this->source_contact->$name === $a[ 'value' ] ){
-                $checked = 'checked';
-            }
-        }
-
         $value = esc_attr( $a[ 'value' ] );
         if ( strpos( $value, '|' ) ){
             $parts = explode( '|', $value );
             $value = $parts[0];
             $tag = intval( $parts[1] );
             $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
+        }
+
+        $checked = '';
+        if ( $this->auto_populate ){
+            $name = $a[ 'name' ];
+            if ( $this->source_contact->$name === $value ){
+                $checked = 'checked';
+            }
         }
 
         $this->fields[] = $a[ 'name' ];
@@ -996,6 +996,8 @@ class WPGH_Form
             'required'      => true,
         ), $atts );
 
+        $a = apply_filters( 'groundhogg/form/terms', $a );
+
         return $this->checkbox( $a );
     }
 
@@ -1016,6 +1018,8 @@ class WPGH_Form
             'title'         => _x( 'I Consent', 'form_default', 'groundhogg' ),
             'required'      => true,
         ), $atts );
+
+        $a = apply_filters( 'groundhogg/form/gdpr', $a );
 
         return $this->checkbox( $a );
     }
@@ -1070,9 +1074,7 @@ class WPGH_Form
         $contact = WPGH()->tracking->get_contact();
 
         if ( ! $contact || ! $contact->exists() ){
-
             return _x( 'There is no email to manage.', 'form_default', 'groundhogg' );
-
         }
 
         $html = "<div class='gh-email-preferences-form'>";
@@ -1096,6 +1098,7 @@ class WPGH_Form
         );
 
         $options = apply_filters( 'wpgh_email_preferences', $options );
+        $options = apply_filters( 'groundhogg/form/email_preferences/options', $options );
 
         /* Email Preference Option */
         $args = array(
@@ -1108,6 +1111,7 @@ class WPGH_Form
             'required'  => 'true'
         );
 
+        $args = apply_filters( 'groundhogg/form/email_preferences', $args );
         $html .= $this->radio( $args );
 
         /* Delete Everything Option */
@@ -1119,8 +1123,9 @@ class WPGH_Form
                 'name'      => 'delete_everything',
                 'value'     => 'yes',
             );
-            $html .= $this->checkbox( $args );
 
+            $args = apply_filters( 'groundhogg/form/email_preferences/gdpr', $args );
+            $html .= $this->checkbox( $args );
             /* only show checkbox if unsubscribing */
             $html .= "<script>
 jQuery( function($){ 
@@ -1134,7 +1139,6 @@ jQuery( function($){
     } ) 
 })</script>";
         }
-
 
         $html .= "</div>";
 
@@ -1159,6 +1163,10 @@ jQuery( function($){
         if ( ! empty( $content ) )
         {
             $a['text'] = $content;
+        }
+
+        if ( is_admin() ){
+            $a[ 'class' ] .= 'button button-primary';
         }
 
         $html = sprintf(
@@ -1238,6 +1246,7 @@ jQuery( function($){
         }
 
         $form = apply_filters( 'wpgh_form_shortcode', $form, $this );
+        $form = apply_filters( 'groundhogg/form/after', $form, $this );
 
         return $form;
     }
@@ -1269,7 +1278,9 @@ jQuery( function($){
 
         $form = str_replace( 'required', '', $form );
         $form = apply_filters( 'wpgh_form_shortcode', $form, $this );
+        $form = apply_filters( 'groundhogg/form/after', $form, $this );
         $form = apply_filters( 'wpgh_form_shortcode_preview', $form, $this );
+        $form = apply_filters( 'groundhogg/form/preview/after', $form, $this );
 
         return $form;
     }

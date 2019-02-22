@@ -124,7 +124,7 @@ We appreciate your help, best of luck!
         $num_clicks = WPGH()->activity->count( array( 'end' => $time, 'activity_type' => 'email_link_click' ) );
 
         $stats = [
-            'site_key'  => md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) ),
+            'site_key'  => wpgh_get_option( 'gh_site_key', md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) ) ),
             'contacts'  => WPGH()->funnels->count(),
             'funnels'   => WPGH()->contacts->count(),
             'emails'    => WPGH()->emails->count(),
@@ -137,10 +137,8 @@ We appreciate your help, best of luck!
 
         /* Success */
         if ( ! is_wp_error( $response ) ){
-
             $body = wp_remote_retrieve_body( $response );
             $json = json_decode( $body );
-
         }
 
     }

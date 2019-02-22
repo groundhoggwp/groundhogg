@@ -47,7 +47,11 @@ class WPGH_Spacer_Block extends WPGH_Email_Block
         ob_start();
 
         ?>
-        <div class="spacer" style="margin: 5px 0 5px 0; height: 15px;"></div>
+        <table width="100%">
+            <tr>
+                <td class="spacer" height="10"></td>
+            </tr>
+        </table>
         <?php
 
         return ob_get_clean();

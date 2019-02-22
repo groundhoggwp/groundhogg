@@ -34,14 +34,18 @@ $template_container = apply_filters( 'wpgh_email_container_css', "
 	font-size: 14px; 
 	vertical-align: top; 
 	display: block; 
+	width: 580px;
 	max-width: 580px; 
-	padding: 0px; 
-	width: 580px;" );
+	padding: 0px; " );
+
+$email_width = apply_filters( 'wpgh_email_width', 580 );
+$alignment = apply_filters( 'wpgh_email_alignment', 'center' );
 
 $template_content = apply_filters( 'wpgh_email_content_css', "
     box-sizing: border-box; 
     display: block; 
-    Margin: 0 auto; 
+    Margin: 0 auto;
+    width:580px;
     max-width: 580px; 
     padding: 5px;" );
 
@@ -78,21 +82,24 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
 <body class="email" style="<?php echo $body; ?>">
 <table border="0" cellpadding="0" cellspacing="0" class="body" style="<?php echo $wrapper; ?>">
     <tr>
-        <td class="container" style="<?php echo $template_container; ?>">
-            <div class="content" style="<?php echo $template_content; ?>">
+        <td class="container" style="<?php echo $template_container; ?>" width="<?php echo $email_width; ?>" align="<?php echo $alignment; ?>">
+            <table border="0" cellpadding="0" cellspacing="0" class="body" width="<?php echo $email_width; ?>">
+                <tr>
+                    <td width="<?php echo $email_width; ?>" align="center">
+                        <div class="content" style="<?php echo $template_content; ?>">
 
-                <!-- PREHEADER -->
-                <span class="preheader" style="<?php echo $preheader; ?>"><?php echo apply_filters( 'wpgh_email_pre_header_text', '' ); ?></span>
-                <!-- /PREHEADER -->
+                            <!-- PREHEADER -->
+                            <span class="preheader" style="<?php echo $preheader; ?>"><?php echo apply_filters( 'wpgh_email_pre_header_text', '' ); ?></span>
+                            <!-- /PREHEADER -->
 
-                <!-- BROWSER VIEW -->
-                <?php if ( apply_filters( 'wpgh_email_browser_view', false ) ): ?>
-                    <div class="header" style="text-align: center;margin-bottom: 25px;">
-                        <span class="apple-link" style="<?php echo $apple_link; ?>">
-                            <a href="<?php echo esc_url_raw( apply_filters( 'wpgh_email_browser_link', site_url() ) ); ?>">
-                                <?php _e( apply_filters( 'gh_view_in_browser_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
-                            </a>
-                        </span>
-                    </div>
-                <!-- /BROWSER VIEW -->
-                <?php endif; ?>
+                            <!-- BROWSER VIEW -->
+                            <?php if ( apply_filters( 'wpgh_email_browser_view', false ) ): ?>
+                                <div class="header" style="text-align: center;margin-bottom: 25px;">
+                                    <span class="apple-link" style="<?php echo $apple_link; ?>">
+                                        <a href="<?php echo esc_url_raw( apply_filters( 'wpgh_email_browser_link', site_url() ) ); ?>">
+                                            <?php _e( apply_filters( 'gh_view_in_browser_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
+                                        </a>
+                                    </span>
+                                </div>
+                            <!-- /BROWSER VIEW -->
+                            <?php endif; ?>

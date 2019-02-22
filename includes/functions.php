@@ -48,7 +48,7 @@ function wpgh_get_optin_status_text( $id_or_email )
     $contact = new WPGH_Contact( $id_or_email );
 
     if ( ! $contact->email )
-        return __( 'No Contact' );
+        return _x( 'No Contact', 'notice', 'groundhogg' );
 
     wpgh_get_option( 'gh_strict_gdpr', array( 'no' ) );
 
@@ -57,7 +57,7 @@ function wpgh_get_optin_status_text( $id_or_email )
         $consent = WPGH()->contact_meta->get_meta( $contact->ID, 'gdpr_consent', true );
 
         if ( $consent !== 'yes' )
-            return __( 'This contact has not agreed to receive email marketing from you.', 'groundhogg' );
+            return _x( 'This contact has not agreed to receive email marketing from you.', 'optin_status', 'groundhogg' );
     }
 
     switch ( $contact->optin_status ){
@@ -67,34 +67,34 @@ function wpgh_get_optin_status_text( $id_or_email )
             if ( wpgh_is_confirmation_strict() )
             {
                 if ( ! wpgh_is_in_grace_period( $contact->ID ) )
-                    return __( 'Unconfirmed. This contact will not receive emails, they are passed the email confirmation grace period.', 'groundhogg' );
+                    return _x( 'Unconfirmed. This contact will not receive emails, they are passed the email confirmation grace period.', 'optin_status', 'groundhogg' );
             }
 
-            return __( 'Unconfirmed. They will receive marketing.', 'groundhogg' );
+            return _x( 'Unconfirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
             break;
         case WPGH_CONFIRMED:
-            return __( 'Confirmed. They will receive marketing.', 'groundhogg' );
+            return _x( 'Confirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
             break;
         case WPGH_UNSUBSCRIBED:
-            return __( 'Unsubscribed. They will not receive marketing.', 'groundhogg' );
+            return _x( 'Unsubscribed. They will not receive marketing.','optin_status', 'groundhogg' );
             break;
         case WPGH_WEEKLY:
-            return __( 'This contact will only receive marketing weekly.', 'groundhogg' );
+            return _x( 'This contact will only receive marketing weekly.', 'optin_status','groundhogg' );
             break;
         case WPGH_MONTHLY:
-            return __( 'This contact will only receive marketing monthly.', 'groundhogg' );
+            return _x( 'This contact will only receive marketing monthly.', 'optin_status','groundhogg' );
             break;
         case WPGH_HARD_BOUNCE:
-            return __( 'This email address bounced, they will not receive marketing.', 'groundhogg' );
+            return _x( 'This email address bounced, they will not receive marketing.', 'optin_status', 'groundhogg' );
             break;
         case WPGH_SPAM:
-            return __( 'This contact was marked as spam. They will not receive marketing.', 'groundhogg' );
+            return _x( 'This contact was marked as spam. They will not receive marketing.','optin_status','groundhogg' );
             break;
         case WPGH_COMPLAINED:
-            return __( 'This contact complained about your emails. They will not receive marketing.', 'groundhogg' );
+            return _x( 'This contact complained about your emails. They will not receive marketing.', 'optin_status','groundhogg' );
             break;
         default:
-            return __( 'Unconfirmed. They will receive marketing.', 'groundhogg' );
+            return _x( 'Unconfirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
             break;
     }
 }
@@ -149,8 +149,10 @@ function wpgh_convert_funnel_to_json( $funnel_id )
 
         $export['steps'][$i]['meta']  = $meta;
         $export['steps'][$i]['args']  = apply_filters( 'wpgh_export_step_' . $step->type, array(), $step );
+        $export['steps'][$i]['args']  = apply_filters( "groundhogg/elements/{$step->type}/export" , array(), $step );
         /* allow other plugins to modify */
         $export['steps'][$i] = apply_filters( 'wpgh_step_export_args', $export['steps'][$i], $step );
+        $export['steps'][$i] = apply_filters( 'groundhogg/elements/step/export', $export['steps'][$i], $step );
     }
 
     return json_encode( $export );
@@ -217,6 +219,7 @@ function wpgh_import_funnel( $import )
         $step = new WPGH_Step( $step_id );
 
         do_action( 'wpgh_import_step_' . $step_type, $import_args, $step );
+        do_action( "groundhogg/elements/{$step->type}/import", $import_args, $step );
 
     }
 
@@ -508,6 +511,8 @@ function wpgh_register_scripts()
 {
     wp_register_style( 'jquery-ui', WPGH_ASSETS_FOLDER . 'lib/jquery-ui/jquery-ui.min.css' );
     wp_register_style( 'select2',   WPGH_ASSETS_FOLDER . 'lib/select2/css/select2.min.css' );
+    wp_register_style( 'gh-admin',   WPGH_ASSETS_FOLDER . 'css/admin/admin.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/admin.css' ));
+    wp_enqueue_style( 'gh-admin' );
     wp_register_script( 'select2',  WPGH_ASSETS_FOLDER . 'lib/select2/js/select2.full.js'   , array( 'jquery' ) );
     wp_register_script( 'wpgh-admin-js',   WPGH_ASSETS_FOLDER . 'js/admin/admin.min.js', array( 'jquery' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/admin.min.js' ) );
 }

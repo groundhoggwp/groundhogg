@@ -48,6 +48,7 @@ var wpghContactEditor;
 
             $( '#manual_form_submission' ).on( 'change', function (e) {
                 var formId = $( '#manual_form_submission' ).val();
+                $( '#form-submit-link' ).attr( 'href', WPGHFormSubmitBaseUrl + formId );
             });
         }
     };

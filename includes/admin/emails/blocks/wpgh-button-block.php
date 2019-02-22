@@ -48,15 +48,17 @@ class WPGH_Button_Block extends WPGH_Email_Block
 
         ?>
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr><td height="10"></td></tr>
             <tr>
-                <td>
+                <td align="center">
                     <table border="0" cellspacing="0" cellpadding="0" style="margin-right: auto;margin-left: auto;">
                         <tr>
-                            <td class="email-button" bgcolor="#EB7035" style="padding: 12px 18px 12px 18px; border-radius:3px" align="center"><b><a href="<?php echo site_url(); ?>" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; font-weight: bold; color: #ffffff; text-decoration: none; display: inline-block;"><?php _e('I am a button &rarr;'); ?></a></b></td>
+                            <td class="email-button" bgcolor="#EB7035" style="padding: 12px 18px 12px 18px; border-radius:3px" align="center"><b><a href="<?php echo site_url(); ?>" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; font-weight: bold; color: #ffffff; text-decoration: none !important; display: inline-block;"><?php _e('I am a button &rarr;'); ?></a></b></td>
                         </tr>
                     </table>
                 </td>
             </tr>
+            <tr><td height="10"></td></tr>
         </table>
         <?php
 

@@ -42,16 +42,16 @@ class WPGH_Contacts_Page
 
     public function __construct()
     {
-        add_action( 'admin_menu', array( $this, 'register' ), $this->order );
-        add_action('wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
+        add_action('admin_menu', array($this, 'register'), $this->order);
+        add_action('wp_ajax_wpgh_inline_save_contacts', array($this, 'save_inline'));
 
-        if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_contacts' ){
-            add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
-            add_action( 'init' , array( $this, 'process_action' )  );
+        if (isset($_GET['page']) && $_GET['page'] === 'gh_contacts') {
+            add_action('admin_enqueue_scripts', array($this, 'scripts'));
+            add_action('init', array($this, 'process_action'));
             $this->notices = WPGH()->notices;
         }
 
-        if ( ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_contacts' ) || wp_doing_ajax() ){
+        if ((isset($_GET['page']) && $_GET['page'] === 'gh_contacts') || wp_doing_ajax()) {
             $this->exporter = new WPGH_Bulk_Contact_Manager();
         }
     }
@@ -61,14 +61,14 @@ class WPGH_Contacts_Page
      */
     public function scripts()
     {
-        if ( $this->get_action() === 'edit' || $this->get_action() === 'add'  ){
-            wp_enqueue_style( 'contact-editor', WPGH_ASSETS_FOLDER . 'css/admin/contact-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/contact-editor.css' ) );
-            wp_enqueue_script( 'contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-editor.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/contact-editor.min.js' )  );
+        if ($this->get_action() === 'edit' || $this->get_action() === 'add') {
+            wp_enqueue_style('contact-editor', WPGH_ASSETS_FOLDER . 'css/admin/contact-editor.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/contact-editor.css'));
+            wp_enqueue_script('contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-editor.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/contact-editor.min.js'));
         } else {
-            wp_enqueue_style( 'select2' );
-            wp_enqueue_script( 'select2' );
-            wp_enqueue_style( 'wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . 'css/admin/contacts.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/contacts.css' ) );
-            wp_enqueue_script( 'wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . 'js/admin/inline-edit-contacts.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/inline-edit-contacts.min.js' ) );
+            wp_enqueue_style('select2');
+            wp_enqueue_script('select2');
+            wp_enqueue_style('wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . 'css/admin/contacts.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/contacts.css'));
+            wp_enqueue_script('wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . 'js/admin/inline-edit-contacts.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/inline-edit-contacts.min.js'));
         }
     }
 
@@ -77,8 +77,8 @@ class WPGH_Contacts_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            _x( 'Contacts', 'page_title', 'groundhogg' ),
-            _x( 'Contacts', 'page_title', 'groundhogg' ),
+            _x('Contacts', 'page_title', 'groundhogg'),
+            _x('Contacts', 'page_title', 'groundhogg'),
             'view_contacts',
             'gh_contacts',
             array($this, 'page')
@@ -96,7 +96,7 @@ class WPGH_Contacts_Page
             array(
                 'id' => 'gh_overview',
                 'title' => __('Overview'),
-                'content' => '<p>' . __( "This is where you can manage and view your contacts. Click the quick edit to quickly change contact details.", 'groundhogg' ) . '</p>'
+                'content' => '<p>' . __("This is where you can manage and view your contacts. Click the quick edit to quickly change contact details.", 'groundhogg') . '</p>'
             )
         );
 
@@ -104,14 +104,14 @@ class WPGH_Contacts_Page
             array(
                 'id' => 'gh_edit',
                 'title' => __('Editing'),
-                'content' => '<p>' . __( "While editing a contact you can modify any of their personal information. There are several points of interest...", 'groundhogg' ) . '</p>'
+                'content' => '<p>' . __("While editing a contact you can modify any of their personal information. There are several points of interest...", 'groundhogg') . '</p>'
                     . '<ul> '
-                    . '<li>' . __( 'Manually unsubscribe a contact by checking the "mark as unsubscribed" button.', 'groundhogg' ) . '</li>'
-                    . '<li>' . __( 'Make sure your in compliance by ensuring the terms of agreement and GDPR consent are both checked under the compliance section.', 'groundhogg' ) . '</li>'
-                    . '<li>' . __( 'View the origin of the contact by looking at the lead source field.', 'groundhogg' ) . '</li>'
-                    . '<li>' . __( 'Add or remove custom information about the contact by enabling the "Edit Meta" section. Each meta also includes a replacement code to include it in an email.', 'groundhogg' ) . '</li>'
-                    . '<li>' . __( 'Re-run or cancel events for this contact by viewing the "Upcoming Events" or "Recent History" Section', 'groundhogg' ) . '</li>'
-                    . '<li>' . __( 'Monitor their engagement by looking in the "Recent Email History" section.', 'groundhogg' ) . '</li>'
+                    . '<li>' . __('Manually unsubscribe a contact by checking the "mark as unsubscribed" button.', 'groundhogg') . '</li>'
+                    . '<li>' . __('Make sure your in compliance by ensuring the terms of agreement and GDPR consent are both checked under the compliance section.', 'groundhogg') . '</li>'
+                    . '<li>' . __('View the origin of the contact by looking at the lead source field.', 'groundhogg') . '</li>'
+                    . '<li>' . __('Add or remove custom information about the contact by enabling the "Edit Meta" section. Each meta also includes a replacement code to include it in an email.', 'groundhogg') . '</li>'
+                    . '<li>' . __('Re-run or cancel events for this contact by viewing the "Upcoming Events" or "Recent History" Section', 'groundhogg') . '</li>'
+                    . '<li>' . __('Monitor their engagement by looking in the "Recent Email History" section.', 'groundhogg') . '</li>'
                     . '</ul>'
             )
         );
@@ -125,12 +125,12 @@ class WPGH_Contacts_Page
      */
     private function get_contacts()
     {
-        $contacts = isset( $_REQUEST['contact'] ) ? $_REQUEST['contact'] : null;
+        $contacts = isset($_REQUEST['contact']) ? $_REQUEST['contact'] : null;
 
-        if ( ! $contacts )
+        if (!$contacts)
             return false;
 
-        return is_array( $contacts )? array_map( 'intval', $contacts ) : array( intval( $contacts ) );
+        return is_array($contacts) ? array_map('intval', $contacts) : array(intval($contacts));
     }
 
     /**
@@ -140,13 +140,13 @@ class WPGH_Contacts_Page
      */
     private function get_action()
     {
-        if ( isset( $_REQUEST['filter_action'] ) && ! empty( $_REQUEST['filter_action'] ) )
+        if (isset($_REQUEST['filter_action']) && !empty($_REQUEST['filter_action']))
             return false;
 
-        if ( isset( $_REQUEST['action'] ) && -1 != $_REQUEST['action'] )
+        if (isset($_REQUEST['action']) && -1 != $_REQUEST['action'])
             return $_REQUEST['action'];
 
-        if ( isset( $_REQUEST['action2'] ) && -1 != $_REQUEST['action2'] )
+        if (isset($_REQUEST['action2']) && -1 != $_REQUEST['action2'])
             return $_REQUEST['action2'];
 
         return false;
@@ -159,9 +159,9 @@ class WPGH_Contacts_Page
      */
     private function get_previous_action()
     {
-        $action = get_transient( 'gh_last_action' );
+        $action = get_transient('gh_last_action');
 
-        delete_transient( 'gh_last_action' );
+        delete_transient('gh_last_action');
 
         return $action;
     }
@@ -171,25 +171,36 @@ class WPGH_Contacts_Page
      */
     private function get_title()
     {
-        switch ( $this->get_action() ){
+        switch ($this->get_action()) {
             case 'add':
-                _ex( 'Add Contact', 'page_title', 'groundhogg' );
+                _ex('Add Contact', 'page_title', 'groundhogg');
                 break;
             case 'edit':
                 $contacts = $this->get_contacts();
-                $contact = wpgh_get_contact( array_shift( $contacts  ) );
-                if ( $contact ){
-	                printf( _x( 'Edit Contact: %s', 'page_title', 'groundhogg'), $contact->full_name );
+                $contact = wpgh_get_contact(array_shift($contacts));
+                if ($contact) {
+                    printf(_x('Edit Contact: %s', 'page_title', 'groundhogg'), $contact->full_name);
                 } else {
-	                _ex( 'Oops!', 'page_title', 'groundhogg' );
+                    _ex('Oops!', 'page_title', 'groundhogg');
+                }
+
+                break;
+            case 'form':
+
+                if ( key_exists( 'contact', $_GET ) ){
+                    $contacts = $this->get_contacts();
+                    $contact = wpgh_get_contact(array_shift($contacts));
+                    printf( _x('Submit Form For %s', 'page_title', 'groundhogg'), $contact->full_name );
+                } else{
+                    _ex( 'Submit Form', 'page_title', 'groundhogg' );
                 }
 
                 break;
             case 'search':
-                _ex( 'Search Contacts', 'page_title', 'groundhogg' );
+                _ex('Search Contacts', 'page_title', 'groundhogg');
                 break;
             default:
-                _ex( 'Contacts', 'page_title', 'groundhogg' );
+                _ex('Contacts', 'page_title', 'groundhogg');
         }
     }
 
@@ -199,21 +210,19 @@ class WPGH_Contacts_Page
     public function process_action()
     {
 
-        if ( ! $this->get_action() || ! $this->verify_action() )
+        if (!$this->get_action() || !$this->verify_action())
             return;
 
-        $base_url = remove_query_arg( array( '_wpnonce', 'action' ), wp_get_referer() );
+        $base_url = remove_query_arg(array('_wpnonce', 'action'), wp_get_referer());
 
-        switch ( $this->get_action() )
-        {
+        switch ($this->get_action()) {
             case 'add':
 
-                if ( ! current_user_can( 'add_contacts' ) ){
-                    wp_die( WPGH()->roles->error( 'add_contacts' ) );
+                if (!current_user_can('add_contacts')) {
+                    wp_die(WPGH()->roles->error('add_contacts'));
                 }
 
-                if ( ! empty( $_POST ) )
-                {
+                if (!empty($_POST)) {
                     $this->add_contact();
                 }
 
@@ -221,11 +230,11 @@ class WPGH_Contacts_Page
 
             case 'edit':
 
-                if ( ! current_user_can( 'edit_contacts' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                if (!current_user_can('edit_contacts')) {
+                    wp_die(WPGH()->roles->error('edit_contacts'));
                 }
 
-                if ( ! empty( $_POST ) ){
+                if (!empty($_POST)) {
 
                     $this->update_contact();
 
@@ -235,117 +244,117 @@ class WPGH_Contacts_Page
 
             case 'spam':
 
-                if ( ! current_user_can( 'edit_contacts' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                if (!current_user_can('edit_contacts')) {
+                    wp_die(WPGH()->roles->error('edit_contacts'));
                 }
 
-                foreach ( $this->get_contacts() as $id ) {
+                foreach ($this->get_contacts() as $id) {
 
-                    $contact = new WPGH_Contact( $id );
-                    $args = array( 'optin_status' => WPGH_SPAM );
-                    $contact->update( $args );
+                    $contact = new WPGH_Contact($id);
+                    $args = array('optin_status' => WPGH_SPAM);
+                    $contact->update($args);
 
-                    $ip_address = $contact->get_meta('ip_address' );
+                    $ip_address = $contact->get_meta('ip_address');
 
-                    if ( $ip_address ) {
-                        $blacklist = wpgh_get_option( 'blacklist_keys' );
+                    if ($ip_address) {
+                        $blacklist = wpgh_get_option('blacklist_keys');
                         $blacklist .= "\n" . $ip_address;
-                        $blacklist = sanitize_textarea_field( $blacklist );
-                        update_option( 'blacklist_keys', $blacklist );
+                        $blacklist = sanitize_textarea_field($blacklist);
+                        update_option('blacklist_keys', $blacklist);
                     }
 
-                    do_action( 'wpgh_contact_marked_as_spam', $id );
+                    do_action('wpgh_contact_marked_as_spam', $id);
                 }
 
-	            $this->notices->add(
-		            esc_attr( 'spammed' ),
-		            sprintf( _nx( 'Marked %d contact as spam.','Marked %d contact as spam.', count( $this->get_contacts() ), 'notice', 'groundhogg' ), count( $this->get_contacts() ) ),
-		            'success'
-	            );
+                $this->notices->add(
+                    esc_attr('spammed'),
+                    sprintf(_nx('Marked %d contact as spam.', 'Marked %d contact as spam.', count($this->get_contacts()), 'notice', 'groundhogg'), count($this->get_contacts())),
+                    'success'
+                );
 
-                do_action( 'wpgh_spam_contacts' );
+                do_action('wpgh_spam_contacts');
 
                 break;
 
             case 'delete':
 
-                if ( ! current_user_can( 'delete_contacts' ) ){
-                    wp_die( WPGH()->roles->error( 'delete_contacts' ) );
+                if (!current_user_can('delete_contacts')) {
+                    wp_die(WPGH()->roles->error('delete_contacts'));
                 }
 
-                foreach ( $this->get_contacts() as $id ){
+                foreach ($this->get_contacts() as $id) {
 
-                    do_action( 'wpgh_pre_admin_delete_contact', $id );
+                    do_action('wpgh_pre_admin_delete_contact', $id);
 
-                    $result = WPGH()->contacts->delete( $id );
+                    $result = WPGH()->contacts->delete($id);
 
-                    if ( $result ){
-                        do_action( 'wpgh_post_admin_delete_contact', $id );
+                    if ($result) {
+                        do_action('wpgh_post_admin_delete_contact', $id);
                     }
 
                 }
 
-	            $this->notices->add(
-		            esc_attr( 'deleted' ),
-                    sprintf( _nx( 'Deleted %d contact','Deleted %d contacts', count( $this->get_contacts() ), 'notice', 'groundhogg' ), count( $this->get_contacts() ) ),
-		            'success'
-	            );
+                $this->notices->add(
+                    esc_attr('deleted'),
+                    sprintf(_nx('Deleted %d contact', 'Deleted %d contacts', count($this->get_contacts()), 'notice', 'groundhogg'), count($this->get_contacts())),
+                    'success'
+                );
 
-                do_action( 'wpgh_delete_contacts' );
+                do_action('wpgh_delete_contacts');
 
                 break;
 
             case 'unspam':
 
-                if ( ! current_user_can( 'edit_contacts' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                if (!current_user_can('edit_contacts')) {
+                    wp_die(WPGH()->roles->error('edit_contacts'));
                 }
 
-                foreach ( $this->get_contacts() as $id ) {
-                    $contact = new WPGH_Contact( $id );
-                    $args = array( 'optin_status' => WPGH_UNCONFIRMED );
-                    $contact->update( $args );
+                foreach ($this->get_contacts() as $id) {
+                    $contact = new WPGH_Contact($id);
+                    $args = array('optin_status' => WPGH_UNCONFIRMED);
+                    $contact->update($args);
                 }
 
-	            $this->notices->add(
-		            esc_attr( 'unspam' ),
-                    sprintf( _nx( 'Approved %d contact','Approved %d contacts', count( $this->get_contacts() ), 'notice', 'groundhogg' ), count( $this->get_contacts() ) ),
+                $this->notices->add(
+                    esc_attr('unspam'),
+                    sprintf(_nx('Approved %d contact', 'Approved %d contacts', count($this->get_contacts()), 'notice', 'groundhogg'), count($this->get_contacts())),
                     'success'
-	            );
+                );
 
-                do_action( 'wpgh_unspam_contacts' );
+                do_action('wpgh_unspam_contacts');
 
                 break;
 
             case 'unbounce':
 
-                if ( ! current_user_can( 'edit_contacts' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                if (!current_user_can('edit_contacts')) {
+                    wp_die(WPGH()->roles->error('edit_contacts'));
                 }
 
-                foreach ( $this->get_contacts() as $id ) {
-                    $contact = new WPGH_Contact( $id );
-                    $args = array( 'optin_status' => WPGH_UNCONFIRMED );
-                    $contact->update( $args );
+                foreach ($this->get_contacts() as $id) {
+                    $contact = new WPGH_Contact($id);
+                    $args = array('optin_status' => WPGH_UNCONFIRMED);
+                    $contact->update($args);
                 }
 
-	            $this->notices->add(
-		            esc_attr( 'unbounce' ),
-                    sprintf( _nx( 'Approved %d contact','Approved %d contacts', count( $this->get_contacts() ), 'notice', 'groundhogg' ), count( $this->get_contacts() ) ),
+                $this->notices->add(
+                    esc_attr('unbounce'),
+                    sprintf(_nx('Approved %d contact', 'Approved %d contacts', count($this->get_contacts()), 'notice', 'groundhogg'), count($this->get_contacts())),
                     'success'
-	            );
+                );
 
-                do_action( 'wpgh_unbounce_contacts' );
+                do_action('wpgh_unbounce_contacts');
 
                 break;
 
             case 'search':
 
-                if ( ! current_user_can( 'edit_contacts' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+                if (!current_user_can('edit_contacts')) {
+                    wp_die(WPGH()->roles->error('edit_contacts'));
                 }
 
-                if ( ! empty( $_POST ) ){
+                if (!empty($_POST)) {
                     $search = $this->do_search();
                 }
 
@@ -353,15 +362,15 @@ class WPGH_Contacts_Page
 
         }
 
-        set_transient( 'gh_last_action', $this->get_action(), 30 );
+        set_transient('gh_last_action', $this->get_action(), 30);
 
-        if ( $this->get_action() === 'edit' || $this->get_action() === 'add' ){
+        if ($this->get_action() === 'edit' || $this->get_action() === 'add') {
             return true;
         }
 
-        $base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_contacts() ) ), $base_url );
+        $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_contacts())), $base_url);
 
-        wp_redirect( $base_url );
+        wp_redirect($base_url);
         die();
     }
 
@@ -370,70 +379,70 @@ class WPGH_Contacts_Page
      */
     private function add_contact()
     {
-        if ( ! current_user_can( 'add_contacts' ) ){
-            wp_die( WPGH()->roles->error( 'add_contacts' ) );
+        if (!current_user_can('add_contacts')) {
+            wp_die(WPGH()->roles->error('add_contacts'));
         }
 
-        do_action( 'wpgh_admin_add_contact_before' );
+        do_action('wpgh_admin_add_contact_before');
 
-        if ( ! isset( $_POST['email'] ) ){
-            $this->notices->add( 'NO_EMAIL', _x( "Please enter a valid email address.", 'notice', 'groundhogg' ), 'error' );
+        if (!isset($_POST['email'])) {
+            $this->notices->add('NO_EMAIL', _x("Please enter a valid email address.", 'notice', 'groundhogg'), 'error');
             return;
         }
 
-        if ( isset( $_POST[ 'first_name' ] ) )
-            $args['first_name'] = sanitize_text_field( $_POST[ 'first_name' ] );
+        if (isset($_POST['first_name']))
+            $args['first_name'] = sanitize_text_field($_POST['first_name']);
 
-        if ( isset( $_POST[ 'last_name' ] ) )
-            $args['last_name'] = sanitize_text_field( $_POST[ 'last_name' ] );
+        if (isset($_POST['last_name']))
+            $args['last_name'] = sanitize_text_field($_POST['last_name']);
 
-        if ( isset( $_POST[ 'email' ] ) ){
+        if (isset($_POST['email'])) {
 
-            $email = sanitize_email( $_POST[ 'email' ] );
+            $email = sanitize_email($_POST['email']);
 
-            if ( ! WPGH()->contacts->exists( $email ) ){
-                $args[ 'email' ] = $email;
+            if (!WPGH()->contacts->exists($email)) {
+                $args['email'] = $email;
             } else {
-                $this->notices->add( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg' ), $email ), 'error' );
+                $this->notices->add('email_exists', sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email), 'error');
                 return;
             }
 
         }
 
-        if ( ! is_email( $args['email'] ) ){
-            $this->notices->add( 'NO_EMAIL', _x( "Please enter a valid email address.", 'notice', 'groundhogg' ), 'error' );
+        if (!is_email($args['email'])) {
+            $this->notices->add('NO_EMAIL', _x("Please enter a valid email address.", 'notice', 'groundhogg'), 'error');
             return;
         }
 
-        if ( isset( $_POST['owner_id'] ) ){
-            $args[ 'owner_id' ] = intval( $_POST['owner_id'] );
+        if (isset($_POST['owner_id'])) {
+            $args['owner_id'] = intval($_POST['owner_id']);
         }
 
-        $id = WPGH()->contacts->add( $args );
+        $id = WPGH()->contacts->add($args);
 
-        $contact = new WPGH_Contact( $id );
+        $contact = new WPGH_Contact($id);
 
-        if ( isset( $_POST[ 'primary_phone' ] ) ){
-            $contact->update_meta( 'primary_phone', sanitize_text_field( $_POST[ 'primary_phone' ] ) );
+        if (isset($_POST['primary_phone'])) {
+            $contact->update_meta('primary_phone', sanitize_text_field($_POST['primary_phone']));
         }
 
-        if ( isset( $_POST[ 'primary_phone_extension' ] ) ){
-            $contact->update_meta( 'primary_phone_extension', sanitize_text_field( $_POST[ 'primary_phone_extension' ] ) );
+        if (isset($_POST['primary_phone_extension'])) {
+            $contact->update_meta('primary_phone_extension', sanitize_text_field($_POST['primary_phone_extension']));
         }
 
-        if ( isset( $_POST[ 'notes' ] ) ){
-            $contact->add_note( $_POST[ 'notes' ] );
+        if (isset($_POST['notes'])) {
+            $contact->add_note($_POST['notes']);
         }
 
-        if ( isset( $_POST[ 'tags' ] ) ) {
-            $contact->add_tag( $_POST[ 'tags' ] );
+        if (isset($_POST['tags'])) {
+            $contact->add_tag($_POST['tags']);
         }
 
-        $this->notices->add( 'created', _x( "Contact created!", 'notice','groundhogg' ), 'success' );
+        $this->notices->add('created', _x("Contact created!", 'notice', 'groundhogg'), 'success');
 
-        do_action( 'wpgh_admin_add_contact_after', $id );
+        do_action('wpgh_admin_add_contact_after', $id);
 
-        wp_redirect( admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $id ) );
+        wp_redirect(admin_url('admin.php?page=gh_contacts&action=edit&contact=' . $id));
         die();
     }
 
@@ -443,53 +452,53 @@ class WPGH_Contacts_Page
     private function update_contact()
     {
 
-        if ( ! current_user_can( 'edit_contacts' ) ){
-            wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+        if (!current_user_can('edit_contacts')) {
+            wp_die(WPGH()->roles->error('edit_contacts'));
         }
 
-        $id = intval( $_GET[ 'contact' ] );
+        $id = intval($_GET['contact']);
 
-        if ( ! $id ){
+        if (!$id) {
             return;
         }
 
-        $contact = new WPGH_Contact( $id );
+        $contact = new WPGH_Contact($id);
 
-        do_action( 'wpgh_admin_update_contact_before', $id );
+        do_action('wpgh_admin_update_contact_before', $id);
 
         //todo security check
 
         /* Save the meta first... as actual fields might overwrite it later... */
-        $cur_meta = WPGH()->contact_meta->get_meta( $id );
+        $cur_meta = WPGH()->contact_meta->get_meta($id);
 
         $exclude_meta_list = array(
             'files'
         );
 
-        if ( isset( $_POST[ 'meta' ] ) ){
-            $posted_meta = $_POST[ 'meta' ];
-            foreach ( $cur_meta as $key => $value ){
-                if ( isset( $posted_meta[ $key ] ) ){
-                    $contact->update_meta( $key, sanitize_text_field( $posted_meta[ $key ] ) );
+        if (isset($_POST['meta'])) {
+            $posted_meta = $_POST['meta'];
+            foreach ($cur_meta as $key => $value) {
+                if (isset($posted_meta[$key])) {
+                    $contact->update_meta($key, sanitize_text_field($posted_meta[$key]));
                 } else {
-                    if ( ! in_array( $key, $exclude_meta_list ) ) {
-                        $contact->delete_meta( $key );
+                    if (!in_array($key, $exclude_meta_list)) {
+                        $contact->delete_meta($key);
                     }
                 }
             }
         }
 
         /* add new meta */
-        if ( isset( $_POST[ 'newmetakey' ] ) && isset( $_POST[ 'newmetavalue' ] ) ){
+        if (isset($_POST['newmetakey']) && isset($_POST['newmetavalue'])) {
 
-            $new_meta_keys = $_POST[ 'newmetakey' ];
-            $new_meta_vals = $_POST[ 'newmetavalue' ];
+            $new_meta_keys = $_POST['newmetakey'];
+            $new_meta_vals = $_POST['newmetavalue'];
 
-            foreach ( $new_meta_keys as $i => $new_meta_key ){
-                if ( strpos( $new_meta_vals[ $i ], PHP_EOL  ) !== false ){
-                    $contact->update_meta( sanitize_key( $new_meta_key ), sanitize_textarea_field( stripslashes( $new_meta_vals[ $i ] ) ) );
+            foreach ($new_meta_keys as $i => $new_meta_key) {
+                if (strpos($new_meta_vals[$i], PHP_EOL) !== false) {
+                    $contact->update_meta(sanitize_key($new_meta_key), sanitize_textarea_field(stripslashes($new_meta_vals[$i])));
                 } else {
-                    $contact->update_meta( sanitize_key( $new_meta_key ), sanitize_text_field( stripslashes( $new_meta_vals[ $i ] ) ) );
+                    $contact->update_meta(sanitize_key($new_meta_key), sanitize_text_field(stripslashes($new_meta_vals[$i])));
                 }
             }
 
@@ -498,23 +507,23 @@ class WPGH_Contacts_Page
         /* Update Main Contact Information */
         $args = array();
 
-        if ( isset( $_POST[ 'unsubscribe' ] ) ) {
+        if (isset($_POST['unsubscribe'])) {
 
             $contact->unsubscribe();
 
             $this->notices->add(
-                esc_attr( 'unsubscribed' ),
-                _x( 'This contact will no longer receive marketing.', 'notice', 'groundhogg' ),
+                esc_attr('unsubscribed'),
+                _x('This contact will no longer receive marketing.', 'notice', 'groundhogg'),
                 'info'
             );
         }
 
-        if ( isset( $_POST[ 'email' ] ) ) {
+        if (isset($_POST['email'])) {
 
-            $email = sanitize_email( $_POST[ 'email' ] );
+            $email = sanitize_email($_POST['email']);
 
             //check if it's the current email address.
-            if ( $contact->email !== $email ) {
+            if ($contact->email !== $email) {
                 //check if another email address like it exists...
                 if (!WPGH()->contacts->exists($email)) {
                     $args['email'] = $email;
@@ -527,141 +536,141 @@ class WPGH_Contacts_Page
             }
         }
 
-        if ( isset( $_POST['first_name'] ) ){
-            $args[ 'first_name' ] = sanitize_text_field( $_POST['first_name'] );
+        if (isset($_POST['first_name'])) {
+            $args['first_name'] = sanitize_text_field($_POST['first_name']);
         }
 
-        if ( isset( $_POST['last_name'] ) ){
-            $args[ 'last_name' ] = sanitize_text_field( $_POST['last_name'] );
+        if (isset($_POST['last_name'])) {
+            $args['last_name'] = sanitize_text_field($_POST['last_name']);
         }
 
-        if ( isset( $_POST['owner_id'] ) ){
-            $args[ 'owner_id' ] = intval( $_POST['owner_id'] );
+        if (isset($_POST['owner_id'])) {
+            $args['owner_id'] = intval($_POST['owner_id']);
         }
 
-        if ( isset( $_POST['user'] ) ){
-            $args[ 'user_id' ] = intval( $_POST['user'] );
+        if (isset($_POST['user'])) {
+            $args['user_id'] = intval($_POST['user']);
         }
 
-        $args = array_map( 'stripslashes', $args );
-        $contact->update( $args );
+        $args = array_map('stripslashes', $args);
+        $contact->update($args);
 
-        if ( isset( $_POST['primary_phone'] ) ){
-            $contact->update_meta( 'primary_phone', sanitize_text_field( $_POST['primary_phone'] ) );
+        if (isset($_POST['primary_phone'])) {
+            $contact->update_meta('primary_phone', sanitize_text_field($_POST['primary_phone']));
         }
 
-        if ( isset( $_POST['company_name'] ) ){
-            $contact->update_meta( 'company_name', sanitize_text_field( $_POST['company_name'] ) );
+        if (isset($_POST['company_name'])) {
+            $contact->update_meta('company_name', sanitize_text_field($_POST['company_name']));
         }
 
-        if ( isset( $_POST['job_title'] ) ){
-            $contact->update_meta( 'job_title', sanitize_text_field( $_POST['job_title'] ) );
+        if (isset($_POST['job_title'])) {
+            $contact->update_meta('job_title', sanitize_text_field($_POST['job_title']));
         }
 
-        if ( isset( $_POST['company_address'] ) ){
-            $contact->update_meta( 'company_address', sanitize_text_field( $_POST['company_address'] ) );
+        if (isset($_POST['company_address'])) {
+            $contact->update_meta('company_address', sanitize_text_field($_POST['company_address']));
         }
 
-        if ( isset( $_POST['primary_phone_extension'] ) ){
-            $contact->update_meta( 'primary_phone_extension', sanitize_text_field( $_POST['primary_phone_extension'] ) );
+        if (isset($_POST['primary_phone_extension'])) {
+            $contact->update_meta('primary_phone_extension', sanitize_text_field($_POST['primary_phone_extension']));
         }
 
-        if ( isset( $_POST['street_address_1'] ) ){
-            $contact->update_meta( 'street_address_1', sanitize_text_field( stripslashes( $_POST['street_address_1'] ) ) );
+        if (isset($_POST['street_address_1'])) {
+            $contact->update_meta('street_address_1', sanitize_text_field(stripslashes($_POST['street_address_1'])));
         }
 
-        if ( isset( $_POST['street_address_2'] ) ){
-            $contact->update_meta( 'street_address_2', sanitize_text_field( stripslashes( $_POST['street_address_2'] ) ) );
+        if (isset($_POST['street_address_2'])) {
+            $contact->update_meta('street_address_2', sanitize_text_field(stripslashes($_POST['street_address_2'])));
         }
-        if ( isset( $_POST['city'] ) ){
-            $contact->update_meta( 'city', sanitize_text_field( stripslashes( $_POST['city'] ) ) );
-        }
-
-        if ( isset( $_POST['postal_zip'] ) ){
-            $contact->update_meta( 'postal_zip', sanitize_text_field( stripslashes( $_POST['postal_zip'] ) ) );
+        if (isset($_POST['city'])) {
+            $contact->update_meta('city', sanitize_text_field(stripslashes($_POST['city'])));
         }
 
-        if ( isset( $_POST['region'] ) ){
-            $contact->update_meta( 'region', sanitize_text_field( stripslashes( $_POST['region'] ) ) );
+        if (isset($_POST['postal_zip'])) {
+            $contact->update_meta('postal_zip', sanitize_text_field(stripslashes($_POST['postal_zip'])));
         }
 
-        if ( isset( $_POST['country'] ) ){
-            $contact->update_meta( 'country', sanitize_text_field( stripslashes( $_POST['country'] ) ) );
+        if (isset($_POST['region'])) {
+            $contact->update_meta('region', sanitize_text_field(stripslashes($_POST['region'])));
         }
 
-        if ( isset( $_POST[ 'notes' ] ) ){
-            $contact->update_meta( 'notes', sanitize_textarea_field( stripslashes( $_POST['notes'] ) ) );
+        if (isset($_POST['country'])) {
+            $contact->update_meta('country', sanitize_text_field(stripslashes($_POST['country'])));
         }
 
-        if ( isset( $_POST[ 'lead_source' ] ) ){
-            $contact->update_meta( 'lead_source', esc_url_raw( $_POST['lead_source'] ) );
+        if (isset($_POST['notes'])) {
+            $contact->update_meta('notes', sanitize_textarea_field(stripslashes($_POST['notes'])));
         }
 
-        if ( isset( $_POST[ 'source_page' ] ) ){
-            $contact->update_meta( 'source_page', esc_url_raw( $_POST['source_page'] ) );
+        if (isset($_POST['lead_source'])) {
+            $contact->update_meta('lead_source', esc_url_raw($_POST['lead_source']));
         }
 
-        if ( isset( $_POST[ 'tags' ] ) ){
+        if (isset($_POST['source_page'])) {
+            $contact->update_meta('source_page', esc_url_raw($_POST['source_page']));
+        }
 
-            $tags = WPGH()->tags->validate( $_POST['tags' ] );
+        if (isset($_POST['tags'])) {
+
+            $tags = WPGH()->tags->validate($_POST['tags']);
 
             $cur_tags = $contact->tags;
             $new_tags = $tags;
 
-            $delete_tags = array_diff( $cur_tags, $new_tags );
-            if ( ! empty( $delete_tags ) ) {
-                $contact->remove_tag( $delete_tags );
+            $delete_tags = array_diff($cur_tags, $new_tags);
+            if (!empty($delete_tags)) {
+                $contact->remove_tag($delete_tags);
             }
 
-            $add_tags = array_diff( $new_tags, $cur_tags );
-            if ( ! empty( $add_tags ) ){
+            $add_tags = array_diff($new_tags, $cur_tags);
+            if (!empty($add_tags)) {
 
 //                print_r( $add_tags );
 
-                $result = $contact->add_tag( $add_tags );
+                $result = $contact->add_tag($add_tags);
 
-                if ( ! $result ){
-                    $this->notices->add( 'bad-tag', _x( 'Hmm, looks like we could not add the new tags...', 'notice', 'groundhogg' ) );
+                if (!$result) {
+                    $this->notices->add('bad-tag', _x('Hmm, looks like we could not add the new tags...', 'notice', 'groundhogg'));
                 }
             }
         } else {
-            $contact->remove_tag( $contact->tags );
+            $contact->remove_tag($contact->tags);
         }
 
-        if ( isset( $_POST[ 'send_email' ] ) && isset( $_POST[ 'email_id' ] ) && current_user_can( 'send_emails' ) ){
+        if (isset($_POST['send_email']) && isset($_POST['email_id']) && current_user_can('send_emails')) {
 
-            $mail = new WPGH_Email( intval( $_POST[ 'email_id' ] ) );
+            $mail = new WPGH_Email(intval($_POST['email_id']));
 
-            if ( $mail->exists() ){
+            if ($mail->exists()) {
 
-                WPGH()->events->add( $args );
+                WPGH()->events->add($args);
 
-                if ( $mail->send( $contact ) ){
-                    $this->notices->add( 'sent', _x( "Email sent!", 'notice', 'groundhogg' ), 'info' );
+                if ($mail->send($contact)) {
+                    $this->notices->add('sent', _x("Email sent!", 'notice', 'groundhogg'), 'info');
                 } else {
-                    $this->notices->add( 'not_sent', _x( "Email could not be sent.", 'notice', 'groundhogg' ), 'error' );
+                    $this->notices->add('not_sent', _x("Email could not be sent.", 'notice', 'groundhogg'), 'error');
                 }
             }
         }
 
-        if ( isset( $_POST[ 'start_funnel' ] ) && isset( $_POST[ 'add_contacts_to_funnel_step_picker' ] ) && current_user_can( 'edit_contacts' ) ){
+        if (isset($_POST['start_funnel']) && isset($_POST['add_contacts_to_funnel_step_picker']) && current_user_can('edit_contacts')) {
 
-            $step = new WPGH_Step( intval( $_POST[ 'add_contacts_to_funnel_step_picker' ] ) );
-            if ( $step->enqueue( $contact ) ){
-                $this->notices->add( 'started', _x( "Contact added to funnel.", 'notice', 'groundhogg' ), 'info' );
+            $step = new WPGH_Step(intval($_POST['add_contacts_to_funnel_step_picker']));
+            if ($step->enqueue($contact)) {
+                $this->notices->add('started', _x("Contact added to funnel.", 'notice', 'groundhogg'), 'info');
             }
         }
 
-        $this->notices->add( 'update', _x( "Contact updated!", 'notice', 'groundhogg' ), 'success' );
+        $this->notices->add('update', _x("Contact updated!", 'notice', 'groundhogg'), 'success');
 
-        if ( ! empty( $_FILES[ 'files' ][ 'tmp_name' ][ 0 ] ) ){
+        if (!empty($_FILES['files']['tmp_name'][0])) {
 
 //            var_dump( $_FILES );
 
             $this->upload_files();
         }
 
-        do_action( 'wpgh_admin_update_contact_after', $id );
+        do_action('wpgh_admin_update_contact_after', $id);
     }
 
     /**
@@ -669,52 +678,52 @@ class WPGH_Contacts_Page
      */
     private function upload_files()
     {
-        $id = intval( $_GET[ 'contact' ] );
-        $contact = wpgh_get_contact( $id );
+        $id = intval($_GET['contact']);
+        $contact = wpgh_get_contact($id);
 
-        if ( ! isset( $_FILES[ 'files' ][ 'tmp_name' ][ 0 ] ) || empty( $_FILES[ 'files' ][ 'tmp_name' ][ 0 ] ) ){
+        if (!isset($_FILES['files']['tmp_name'][0]) || empty($_FILES['files']['tmp_name'][0])) {
             return false;
         }
 
-        $files = $_FILES[ 'files' ];
+        $files = $_FILES['files'];
 
-        $num_files = count( $files[ 'name' ] );
+        $num_files = count($files['name']);
 
-        $upload_overrides = array( 'test_form' => false );
+        $upload_overrides = array('test_form' => false);
 
-        for( $i=0; $i < $num_files; $i++ ){
+        for ($i = 0; $i < $num_files; $i++) {
 
             $ifile = array(
-                'name'      => $files[ 'name' ][$i],
-                'type'      => $files[ 'type' ][$i],
-                'tmp_name'  => $files[ 'tmp_name' ][$i],
-                'error'     => $files[ 'error' ][$i],
-                'size'      => $files[ 'size' ][$i],
+                'name' => $files['name'][$i],
+                'type' => $files['type'][$i],
+                'tmp_name' => $files['tmp_name'][$i],
+                'error' => $files['error'][$i],
+                'size' => $files['size'][$i],
             );
 
-            if ( !function_exists('wp_handle_upload') ) {
-                require_once( ABSPATH . '/wp-admin/includes/file.php' );
+            if (!function_exists('wp_handle_upload')) {
+                require_once(ABSPATH . '/wp-admin/includes/file.php');
             }
 
-            add_filter( 'upload_dir', array( WPGH()->submission, 'files_upload_dir' ) );
-            $mfile = wp_handle_upload( $ifile, $upload_overrides );
-            remove_filter( 'upload_dir', array( WPGH()->submission, 'files_upload_dir' ) );
+            add_filter('upload_dir', array(WPGH()->submission, 'files_upload_dir'));
+            $mfile = wp_handle_upload($ifile, $upload_overrides);
+            remove_filter('upload_dir', array(WPGH()->submission, 'files_upload_dir'));
 
-            if( isset( $mfile['error'] ) ) {
-                if ( empty( $mfile[ 'error' ] ) ) {
-                    $mfile['error'] = __('Could not upload file.', 'notice', 'groundhogg' );
+            if (isset($mfile['error'])) {
+                if (empty($mfile['error'])) {
+                    $mfile['error'] = __('Could not upload file.', 'notice', 'groundhogg');
                 }
-                $this->notices->add( 'BAD_UPLOAD', $mfile['error'], 'error' );
+                $this->notices->add('BAD_UPLOAD', $mfile['error'], 'error');
             } else {
-                $files = $contact->get_meta('files' );
+                $files = $contact->get_meta('files');
                 if (!$files) {
                     $files = array();
                 }
-                $j = count( $files ) + 1 ;
-                $mfile[ 'key' ] = $j;
-                $mfile = array_map( 'wp_normalize_path', $mfile );
-                $files[ $j ] = $mfile;
-                $contact->update_meta( 'files', $files );
+                $j = count($files) + 1;
+                $mfile['key'] = $j;
+                $mfile = array_map('wp_normalize_path', $mfile);
+                $files[$j] = $mfile;
+                $contact->update_meta('files', $files);
                 /* Compat for local host WP filesystems */
             }
 
@@ -731,39 +740,39 @@ class WPGH_Contacts_Page
     public function save_inline()
     {
 
-        if ( ! wp_doing_ajax() ){
+        if (!wp_doing_ajax()) {
             return;
         }
 
-        if ( ! current_user_can( 'edit_contacts' ) ){
-            wp_die( WPGH()->roles->error( 'edit_contacts' ) );
+        if (!current_user_can('edit_contacts')) {
+            wp_die(WPGH()->roles->error('edit_contacts'));
         }
 
-        $id = (int) $_POST['ID'];
+        $id = (int)$_POST['ID'];
 
-        $contact = new WPGH_Contact( $id );
+        $contact = new WPGH_Contact($id);
 
-        do_action( 'wpgh_inline_update_contact_before', $id );
+        do_action('wpgh_inline_update_contact_before', $id);
 
-        $email = sanitize_email( $_POST['email'] );
+        $email = sanitize_email($_POST['email']);
 
-        $args[ 'first_name' ] = sanitize_text_field( $_POST['first_name'] );
-        $args[ 'last_name' ] = sanitize_text_field( $_POST['last_name'] );
-        $args[ 'owner_id' ] = intval( $_POST['owner' ] );
+        $args['first_name'] = sanitize_text_field($_POST['first_name']);
+        $args['last_name'] = sanitize_text_field($_POST['last_name']);
+        $args['owner_id'] = intval($_POST['owner']);
 
         $err = array();
 
-        if( !$email ) {
-            $err[] = _x( 'Email cannot be blank.', 'notice', 'groundhogg' );
-        } else if ( ! is_email( $email ) ) {
-            $err[] = _x( 'Invalid email address.', 'notice', 'groundhogg' );
+        if (!$email) {
+            $err[] = _x('Email cannot be blank.', 'notice', 'groundhogg');
+        } else if (!is_email($email)) {
+            $err[] = _x('Invalid email address.', 'notice', 'groundhogg');
         }
 
         //check if it's the current email address.
-        if ( $contact->email !== $email ) {
+        if ($contact->email !== $email) {
 
             //check if another email address like it exists...
-            if ( ! WPGH()->contacts->exists( $email ) ) {
+            if (!WPGH()->contacts->exists($email)) {
                 $args['email'] = $email;
 
                 //update new optin status to unconfirmed
@@ -772,49 +781,49 @@ class WPGH_Contacts_Page
 
             } else {
 
-                $err[] =  sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email);
+                $err[] = sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email);
 
             }
 
         }
 
-        if( !$args[ 'first_name' ] ) {
-            $err[] = _x( 'First name cannot be blank.', 'notice', 'groundhogg' );
+        if (!$args['first_name']) {
+            $err[] = _x('First name cannot be blank.', 'notice', 'groundhogg');
         }
 
-        if( $err ) {
+        if ($err) {
             echo implode(', ', $err);
             exit;
         }
 
-        $args = array_map( 'stripslashes', $args );
+        $args = array_map('stripslashes', $args);
 
-        $contact->update( $args );
+        $contact->update($args);
 
-        $tags = WPGH()->tags->validate( $_POST['tags' ] );
+        $tags = WPGH()->tags->validate($_POST['tags']);
 
         $cur_tags = $contact->tags;
         $new_tags = $tags;
 
-        $delete_tags = array_diff( $cur_tags, $new_tags );
-        if ( ! empty( $delete_tags ) ) {
-            $contact->remove_tag( $delete_tags );
+        $delete_tags = array_diff($cur_tags, $new_tags);
+        if (!empty($delete_tags)) {
+            $contact->remove_tag($delete_tags);
         }
 
-        $add_tags = array_diff( $new_tags, $cur_tags );
-        if ( ! empty( $add_tags ) ){
-            $contact->add_tag( $add_tags );
+        $add_tags = array_diff($new_tags, $cur_tags);
+        if (!empty($add_tags)) {
+            $contact->add_tag($add_tags);
 
         }
 
-        do_action( 'wpgh_inline_update_contact_after', $id );
+        do_action('wpgh_inline_update_contact_after', $id);
 
-        if ( ! class_exists( 'WPGH_Contacts_Table' ) ) {
+        if (!class_exists('WPGH_Contacts_Table')) {
             include_once 'class-wpgh-contacts-table.php';
         }
 
         $contactTable = new WPGH_Contacts_Table;
-        $contactTable->single_row( WPGH()->contacts->get( $id ) );
+        $contactTable->single_row(WPGH()->contacts->get($id));
 
         wp_die();
     }
@@ -826,10 +835,10 @@ class WPGH_Contacts_Page
      */
     function verify_action()
     {
-        if ( ! isset( $_REQUEST['_wpnonce'] ) && ! isset( $_REQUEST[ '_edit_contact_nonce' ] ) )
+        if (!isset($_REQUEST['_wpnonce']) && !isset($_REQUEST['_edit_contact_nonce']))
             return false;
 
-        return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-contacts' ) || wp_verify_nonce( $_REQUEST[ '_edit_contact_nonce' ], $this->get_action() ) ;
+        return wp_verify_nonce($_REQUEST['_wpnonce']) || wp_verify_nonce($_REQUEST['_wpnonce'], $this->get_action()) || wp_verify_nonce($_REQUEST['_wpnonce'], 'bulk-contacts') || wp_verify_nonce($_REQUEST['_edit_contact_nonce'], $this->get_action());
     }
 
     /**
@@ -838,28 +847,30 @@ class WPGH_Contacts_Page
     function table()
     {
 
-        if ( ! current_user_can( 'view_contacts' ) ){
-            wp_die( WPGH()->roles->error( 'view_contacts' ) );
+        if (!current_user_can('view_contacts')) {
+            wp_die(WPGH()->roles->error('view_contacts'));
         }
 
-        if ( ! class_exists( 'WPGH_Contacts_Table' ) ){
+        if (!class_exists('WPGH_Contacts_Table')) {
             include dirname(__FILE__) . '/class-wpgh-contacts-table.php';
         }
 
         $contacts_table = new WPGH_Contacts_Table();
 
         $contacts_table->views(); ?>
-        <form method="post" class="search-form wp-clearfix" >
+        <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Contacts', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e('Search Contacts', 'groundhogg'); ?>
+                    :</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Contacts', 'groundhogg'); ?>">
+                <input type="submit" id="search-submit" class="button"
+                       value="<?php _e('Search Contacts', 'groundhogg'); ?>">
             </p>
             <?php $contacts_table->prepare_items(); ?>
             <?php $contacts_table->display(); ?>
             <?php
-            if ( $contacts_table->has_items())
+            if ($contacts_table->has_items())
                 $contacts_table->inline_edit();
             ?>
         </form>
@@ -873,11 +884,11 @@ class WPGH_Contacts_Page
     function edit()
     {
 
-        if ( ! current_user_can( 'view_contacts' ) ){
-            wp_die( WPGH()->roles->error( 'view_contacts' ) );
+        if (!current_user_can('view_contacts')) {
+            wp_die(WPGH()->roles->error('view_contacts'));
         }
 
-        include dirname( __FILE__ ) . '/contact-editor.php';
+        include dirname(__FILE__) . '/contact-editor.php';
 
     }
 
@@ -886,20 +897,29 @@ class WPGH_Contacts_Page
      */
     function add()
     {
-        if ( ! current_user_can( 'add_contacts' ) ){
-            wp_die( WPGH()->roles->error( 'add_contacts' ) );
+        if (!current_user_can('add_contacts')) {
+            wp_die(WPGH()->roles->error('add_contacts'));
         }
 
-        include dirname( __FILE__ ) . '/add-contact.php';
+        include dirname(__FILE__) . '/add-contact.php';
     }
 
     function search()
     {
-        if ( ! current_user_can( 'view_contacts' ) ){
-            wp_die( WPGH()->roles->error( 'view_contacts' ) );
+        if (!current_user_can('view_contacts')) {
+            wp_die(WPGH()->roles->error('view_contacts'));
         }
 
-        include dirname( __FILE__ ) . '/search.php';
+        include dirname(__FILE__) . '/search.php';
+    }
+
+    public function form()
+    {
+        if (!current_user_can('edit_contacts')) {
+            wp_die(WPGH()->roles->error('edit_contacts'));
+        }
+
+        include dirname(__FILE__) . '/form-admin-submit.php';
     }
 
     /**
@@ -1044,6 +1064,9 @@ class WPGH_Contacts_Page
                     break;
                 case 'search':
                     $this->search();
+                    break;
+                case 'form':
+                    $this->form();
                     break;
                 default:
                     $this->table();

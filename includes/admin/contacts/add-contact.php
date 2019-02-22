@@ -29,7 +29,13 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 ?>
+<?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'default'; ?>
+<h2 class="nav-tab-wrapper">
+    <a href="?page=gh_contacts&action=add&tab=default" class="nav-tab <?php echo $active_tab == 'default' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Quick Add', 'tab', 'groundhogg'); ?></a>
+    <a href="?page=gh_contacts&action=add&tab=form" class="nav-tab <?php echo $active_tab == 'form' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'From Form', 'tab', 'groundhogg'); ?></a>
+</h2>
 
+<?php if ( $active_tab === 'default' ): ?>
 <form method="post" class="">
     <?php wp_nonce_field( 'add' ); ?>
     <h2><?php _e( 'Name' ) ?></h2>
@@ -124,5 +130,44 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
     <?php submit_button( _x( 'Add Contact', 'action', 'groundhogg' ), 'primary', 'add_contact'); ?>
 </form>
+<?php endif;
+
+if ( $active_tab === 'form' ): ?>
+<table class="form-table">
+    <tr>
+        <th><?php _ex( 'Internal Form', 'contact_record', 'groundhogg' ); ?></th>
+        <td>
+            <div style="max-width: 400px;">
+                <?php $forms = WPGH()->steps->get_steps( array(
+                    'step_type' => 'form_fill'
+                ) );
+
+                $form_options = array();
+                $default = 0;
+                foreach ( $forms as $form ){
+                    if ( ! $default ){$default = $form->ID;}
+                    $step = new WPGH_Step( $form->ID );
+                    if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
+                }
+
+                echo WPGH()->html->select2( array(
+                    'name'              => 'manual_form_submission',
+                    'id'                => 'manual_form_submission',
+                    'class'             => 'manual-submission gh-select2',
+                    'data'              => $form_options,
+                    'multiple'          => false,
+                    'selected'          => [ $default ],
+                    'placeholder'       => 'Please Select a Form',
+                ) );
+
+                ?><div class="row-actions">
+                    <script>var WPGHFormSubmitBaseUrl = '<?php printf( 'admin.php?page=gh_contacts&action=form&form=' ); ?>';</script>
+                    <a id="form-submit-link" class="button button-secondary" href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&action=form&form=%d', $default ) ); ?>"><?php _ex( 'Submit Form', 'action', 'groundhogg' ) ?></a>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+<?php endif;
 
 

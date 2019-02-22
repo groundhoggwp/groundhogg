@@ -132,6 +132,7 @@ class WPGH_Step
         //$data = $this->sanitize_columns( $data );
 
         do_action( 'wpgh_step_pre_update', $this->ID, $data );
+        do_action( "groundhogg/step/update/before", $this->ID, $data );
 
         $updated = false;
 
@@ -145,6 +146,8 @@ class WPGH_Step
         }
 
         do_action( 'wpgh_step_post_update', $updated, $this->ID, $data );
+        do_action( "groundhogg/step/update/after", $updated, $this->ID, $data );
+
 
         return $updated;
     }
@@ -278,6 +281,7 @@ class WPGH_Step
     public function get_delay_time()
     {
         $time = apply_filters( 'wpgh_step_enqueue_time_' . $this->type, $this );
+        $time = apply_filters( "groundhogg/elements/{$this->type}/enqueue", $this );
 
         if ( ! is_numeric( $time ) ) {
             $time = time();
@@ -302,10 +306,13 @@ class WPGH_Step
 
         }
 
+        do_action( "groundhogg/elements/{$this->type}/run/before", $this  );
         do_action( 'wpgh_doing_funnel_step_' . $this->type . '_before', $this  );
 
-        $result = apply_filters( 'wpgh_doing_funnel_step_' . $this->type , $contact, $event, $this );
+        $result = apply_filters( "groundhogg/elements/{$this->type}/run", $contact, $event, $this );
+//        $result = apply_filters( 'wpgh_doing_funnel_step_' . $this->type, $contact, $event, $this );
 
+        do_action( "groundhogg/elements/{$this->type}/run/after", $this  );
         do_action( 'wpgh_doing_funnel_step_' . $this->type . '_after', $this  );
 
         return $result;
@@ -537,7 +544,8 @@ class WPGH_Step
      */
     public function icon()
     {
-        return apply_filters( 'wpgh_step_icon_' . $this->type, WPGH_ASSETS_FOLDER . 'images/funnel-icons/no-icon.png' );
+        $icon = apply_filters( 'wpgh_step_icon_' . $this->type, WPGH_ASSETS_FOLDER . 'images/funnel-icons/no-icon.png' );
+        return apply_filters( "groundhogg/elements/{$this->type}/icon", $icon );
     }
 
     /**
@@ -548,6 +556,7 @@ class WPGH_Step
     public function reporting()
     {
 
+        do_action( "groundhogg/elements/{$this->type}/reporting", $this );
         do_action( 'wpgh_get_step_reporting_' . $this->type, $this );
 
     }
@@ -560,6 +569,7 @@ class WPGH_Step
     public function settings()
     {
 
+        do_action( "groundhogg/elements/{$this->type}/settings", $this );
         do_action( 'wpgh_get_step_settings_' . $this->type, $this );
 
     }
@@ -639,8 +649,11 @@ class WPGH_Step
 
                     <div class="custom-settings">
                         <?php do_action( 'wpgh_step_settings_before', $this ); ?>
+                        <?php do_action( 'groundhogg/step/settings/before', $this ); ?>
                         <?php $this->settings(); ?>
                         <?php do_action( 'wpgh_step_settings_after', $this ); ?>
+                        <?php do_action( 'groundhogg/step/settings/after', $this ); ?>
+
                     </div>
 
                 </div>
@@ -648,8 +661,10 @@ class WPGH_Step
                 <!-- REPORTING  -->
                 <div class="step-reporting <?php echo WPGH()->menu->funnels_page->reporting_enabled ? '' : 'hidden' ; ?>">
                     <?php do_action( 'wpgh_step_reporting_before' ); ?>
+                    <?php do_action( 'groundhogg/step/reporting/before' ); ?>
                     <?php $this->reporting(); ?>
                     <?php do_action( 'wpgh_step_reporting_after' ); ?>
+                    <?php do_action( 'groundhogg/step/reporting/after' ); ?>
                 </div>
 
             </div>
