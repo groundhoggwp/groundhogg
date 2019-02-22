@@ -781,6 +781,11 @@ class WPGH_Form
                     $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
                 }
 
+                if ( strpos( $option, '|' ) ){
+                    $parts = explode( '|', $value );
+                    $option = $parts[0];
+                }
+
                 $selected = '';
                 if ( $this->auto_populate ){
                     $name = $a[ 'name' ];
@@ -789,7 +794,7 @@ class WPGH_Form
                     }
                 }
 
-                $optionHTML .= sprintf( "<option value='%s' %s>%s</option>", esc_attr( $value ), $selected, $value );
+                $optionHTML .= sprintf( "<option value='%s' %s>%s</option>", esc_attr( $value ), $selected, $option );
             }
 
         }

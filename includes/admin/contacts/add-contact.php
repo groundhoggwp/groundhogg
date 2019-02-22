@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 <?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'default'; ?>
 <h2 class="nav-tab-wrapper">
     <a href="?page=gh_contacts&action=add&tab=default" class="nav-tab <?php echo $active_tab == 'default' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Quick Add', 'tab', 'groundhogg'); ?></a>
-    <a href="?page=gh_contacts&action=add&tab=form" class="nav-tab <?php echo $active_tab == 'form' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'From Form', 'tab', 'groundhogg'); ?></a>
+    <a href="?page=gh_contacts&action=add&tab=form" class="nav-tab <?php echo $active_tab == 'form' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Internal Form', 'tab', 'groundhogg'); ?></a>
 </h2>
 
 <?php if ( $active_tab === 'default' ): ?>
@@ -150,6 +150,10 @@ if ( $active_tab === 'form' ): ?>
                     if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
                 }
 
+                if ( $_GET[ 'form' ] ){
+                    $default = intval( $_GET[ 'form' ] );
+                }
+
                 echo WPGH()->html->select2( array(
                     'name'              => 'manual_form_submission',
                     'id'                => 'manual_form_submission',
@@ -160,14 +164,20 @@ if ( $active_tab === 'form' ): ?>
                     'placeholder'       => 'Please Select a Form',
                 ) );
 
-                ?><div class="row-actions">
-                    <script>var WPGHFormSubmitBaseUrl = '<?php printf( 'admin.php?page=gh_contacts&action=form&form=' ); ?>';</script>
-                    <a id="form-submit-link" class="button button-secondary" href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&action=form&form=%d', $default ) ); ?>"><?php _ex( 'Submit Form', 'action', 'groundhogg' ) ?></a>
+                ?><div class="actions" style="padding: 2px 0 0;">
+                    <script>var WPGHFormSubmitBaseUrl = '<?php printf( 'admin.php?page=gh_contacts&action=add&tab=form&form=' ); ?>';</script>
+                    <a id="form-submit-link" class="button button-secondary" href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&action=add&tab=form&form=%d', $default ) ); ?>"><?php _ex( 'Change Form', 'action', 'groundhogg' ) ?></a>
                 </div>
             </div>
         </td>
     </tr>
 </table>
+<hr>
+<div>
+    <div style="max-width: 800px; margin: 100px auto">
+        <?php echo do_shortcode( sprintf( '[gh_form id="%d"]', $default ) ); ?>
+    </div>
+</div>
 <?php endif;
 
 

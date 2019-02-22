@@ -61,7 +61,7 @@ class WPGH_Contacts_Page
      */
     public function scripts()
     {
-        if ($this->get_action() === 'edit' || $this->get_action() === 'add') {
+        if ($this->get_action() === 'edit' || $this->get_action() === 'add' || $this->get_action() === 'form' ) {
             wp_enqueue_style('contact-editor', WPGH_ASSETS_FOLDER . 'css/admin/contact-editor.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/contact-editor.css'));
             wp_enqueue_script('contact-editor', WPGH_ASSETS_FOLDER . 'js/admin/contact-editor.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/contact-editor.min.js'));
         } else {
