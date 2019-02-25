@@ -533,9 +533,15 @@ class WPGH_Submission
 
             $args = array(
                 'email' => $email,
-                'first_name' => sanitize_text_field( stripslashes( $this->first_name ) ),
-                'last_name' => sanitize_text_field( stripslashes( $this->last_name ) )
             );
+
+            if ( $this->first_name ){
+                $args[ 'first_name' ] =  sanitize_text_field( stripslashes( $this->first_name ) );
+            }
+
+            if ( $this->last_name ){
+                $args[ 'last_name' ] =  sanitize_text_field( stripslashes( $this->last_name ) );
+            }
 
             /**
              * Do not update if is admin submission

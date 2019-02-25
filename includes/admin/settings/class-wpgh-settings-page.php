@@ -774,6 +774,8 @@ class WPGH_Settings_Page
         switch ( $field['type'] ) {
 
             case 'select2':
+            case 'dropdown_emails':
+            case 'tag_picker':
                 $field[ 'atts' ][ 'selected' ] = array( $value );
                 break;
             case 'dropdown':
