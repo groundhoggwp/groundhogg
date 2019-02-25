@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.1.3 =
+* FIXED First & Last being set to null if not present in form.
+* TWEAKED Form spam verification is now more strict.
+* TWEAKED Is submission fails information is saved so you do not need to re-enter it all.
+
 = 1.1.2 =
 * FIXED File upload file type specification not working
 * FIXED File upload not working if files not specified

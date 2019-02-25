@@ -82,6 +82,13 @@ class WPGH_Form
      */
     var $doing_preview = false;
 
+    /**
+     * Whether a previous submission failed.
+     *
+     * @var bool
+     */
+    var $submission_failed = false;
+
     public function __construct( $atts )
     {
         $this->a = shortcode_atts(array(
@@ -96,6 +103,22 @@ class WPGH_Form
 
         $this->id = intval( $this->a[ 'id' ] );
         $this->add_scripts();
+    }
+
+    /**
+     * Get data from a failed submission
+     *
+     * @param $key string
+     * @return bool|string
+     */
+    private function get_submission_data( $key ){
+
+        if ( key_exists( $key, WPGH()->submission->data ) ){
+            return esc_html( WPGH()->submission->$key );
+        }
+
+        return false;
+
     }
 
 	/**
@@ -276,6 +299,8 @@ class WPGH_Form
             'required'      => false,
         ), $atts );
 
+        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
+
         if ( empty( $a[ 'name' ] ) ){
 
             $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
@@ -301,6 +326,10 @@ class WPGH_Form
             }
         }
 
+        if ( $this->submission_failed ){
+            $a[ 'value' ] = $this->get_submission_data( $a[ 'name' ] );
+        }
+
         $field = sprintf(
             "<label class='gh-input-label'>%s <input type='%s' name='%s' id='%s' class='gh-input %s' value='%s' placeholder='%s' title='%s' %s %s></label>",
             $a[ 'label' ],
@@ -316,6 +345,17 @@ class WPGH_Form
         );
 
         return $this->field_wrap( $field );
+    }
+
+    /**
+     * HTML for plain text field
+     *
+     * @param $atts
+     * @return string
+     */
+    public function text( $atts )
+    {
+        return $this->input_base( $atts );
     }
 
     /**
@@ -519,182 +559,6 @@ class WPGH_Form
     }
 
     /**
-     * Return a simple address block
-     *
-     * @param $atts
-     * @return string
-     */
-    public function address( $atts )
-    {
-        $a = shortcode_atts( array(
-            'label'         => _x( 'Address *', 'form_default', 'groundhogg' ),
-            'class'         => 'gh-address',
-            'enabled'       => 'all',
-            'name_prefix'   => '',
-            'required'      => true,
-        ), $atts );
-
-        $name_prefix = sanitize_key( $a[ 'name_prefix' ] );
-
-        if ( $name_prefix ){
-        	$name_prefix .= '_';
-        }
-
-        $section = sprintf( "<div class='%s'><label class='gh-input-label'>%s</label>", $a[ 'class' ], $a[ 'label' ] );
-
-        $section .= $this->row( array(), $this->column( array( 'size' => '2/3' ), $this->input_base(
-            array(
-                'type'          => 'text',
-                'label'         => _x( 'Street Address 1', 'form_default', 'groundhogg' ),
-                'name'          => $name_prefix . 'street_address_1',
-                'id'            => $name_prefix . 'street_address_1',
-                'placeholder'   => '123 Any St.',
-                'title'         => _x( 'Street Address 1', 'form_default', 'groundhogg' ),
-                'required'      => $a[ 'required' ],
-            )
-        ) ) .
-
-        $this->column( array( 'size' => '1/3' ), $this->input_base(
-            array(
-                'type'          => 'text',
-                'label'         => _x( 'Street Address 2', 'form_default', 'groundhogg' ),
-                'name'          => $name_prefix . 'street_address_2',
-                'id'            => $name_prefix . 'street_address_2',
-                'placeholder'   => 'Unit A',
-                'title'         => _x( 'Street Address 2', 'form_default', 'groundhogg' ),
-                'required'      => $a[ 'required' ],
-            )
-        ) ) );
-
-        $section .= $this->row( array(),  $this->input_base(
-            array(
-                'type'          => 'text',
-                'label'         => _x( 'City', 'form_default', 'groundhogg' ),
-                'name'          => $name_prefix . 'city',
-                'id'            => $name_prefix . 'city',
-                'placeholder'   => 'New York',
-                'title'         => _x( 'City', 'form_default', 'groundhogg' ),
-                'required'      => $a[ 'required' ],
-            )
-        ) );
-
-        $section .= $this->row( array(), $this->column( array( 'size' => '1/2' ),$this->input_base(
-            array(
-                'type'          => 'text',
-                'label'         => _x( 'State/Province', 'form_default', 'groundhogg' ),
-                'name'          => $name_prefix . 'region',
-                'id'            => $name_prefix . 'region',
-                'placeholder'   => 'New York',
-                'title'         => _x( 'State/Province', 'form_default', 'groundhogg' ),
-                'required'      => $a[ 'required' ],
-            )
-        ) ) . $this->column( array( 'size' => '1/2' ), $this->select(
-            array(
-                'label'         => _x( 'Country *', 'form_default', 'groundhogg' ),
-                'name'          => $name_prefix . 'country',
-                'id'            => $name_prefix . 'country',
-                'class'         => '',
-                'options'       => wpgh_get_countries_list(),
-                'attributes'    => '',
-                'title'         => __( 'Country' ),
-                'default'       => _x( 'Please select a country', 'form_default', 'groundhogg' ),
-                'multiple'      => false,
-                'required'      => $a[ 'required' ],
-            ) )
-        ) );
-
-        $section.= $this->input_base(
-            array(
-                'type'          => 'text',
-                'label'         => _x( 'Postal/Zip Code', 'form_default', 'groundhogg' ),
-                'name'          => $name_prefix . 'postal_zip',
-                'id'            => $name_prefix . 'postal_zip',
-                'placeholder'   => '10001',
-                'title'         => _x( 'Postal/Zip Code', 'form_default', 'groundhogg' ),
-                'required'      => $a[ 'required' ],
-            )
-        );
-
-        $section.= "</div>";
-
-        return $section;
-
-    }
-
-    /**
-     * HTML for plain text field
-     *
-     * @param $atts
-     * @return string
-     */
-    public function text( $atts )
-    {
-        return $this->input_base( $atts );
-    }
-
-    /**
-     * Return HTML for a textarea field
-     *
-     * @param $atts
-     * @return string
-     */
-    public function textarea( $atts )
-    {
-        /* return nothing if the form doesn't exist */
-        if ( ! $this->is_form() )
-        {
-            return '';
-        }
-
-        $a = shortcode_atts( array(
-            'label'         => '',
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'value'         => '',
-            'placeholder'   => '',
-            'title'         => '',
-            'attributes'    => '',
-            'required'      => true,
-        ), $atts );
-
-        if ( empty( $a[ 'name' ] ) ){
-            $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
-        }
-
-        if ( empty( $a[ 'id' ] ) ){
-            $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
-        }
-
-        $this->fields[] = $a[ 'name' ];
-        $this->config[ $a[ 'name' ] ] = $a;
-
-        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false"  && $a[ 'required' ] !== "0" ) ? 'required' : '';
-
-        if ( $this->auto_populate ){
-            $name = $a[ 'name' ];
-            if ( $this->source_contact->$name ){
-                $a[ 'value' ] = $this->source_contact->$name;
-            }
-        }
-
-        $field = sprintf(
-            "<label class='gh-input-label'>%s <textarea name='%s' id='%s' class='gh-input %s' placeholder='%s' title='%s' %s %s>%s</textarea></label>",
-            $a[ 'label' ],
-            esc_attr( $a[ 'name' ] ),
-            esc_attr( $a[ 'id' ] ),
-            esc_attr( $a[ 'class' ] ),
-            esc_attr( $a[ 'placeholder' ] ),
-            esc_attr( $a[ 'title' ] ),
-            $a[ 'attributes' ],
-            $required,
-            esc_attr( $a[ 'value' ] )
-        );
-
-        return $this->field_wrap( $field );
-    }
-
-    /**
      * Output html for the number field
      *
      * @param $atts
@@ -728,6 +592,177 @@ class WPGH_Form
     }
 
     /**
+     * Return a simple address block
+     *
+     * @param $atts
+     * @return string
+     */
+    public function address( $atts )
+    {
+        $a = shortcode_atts( array(
+            'label'         => _x( 'Address *', 'form_default', 'groundhogg' ),
+            'class'         => 'gh-address',
+            'enabled'       => 'all',
+            'name_prefix'   => '',
+            'required'      => true,
+        ), $atts );
+
+        $name_prefix = sanitize_key( $a[ 'name_prefix' ] );
+
+        if ( $name_prefix ){
+            $name_prefix .= '_';
+        }
+
+        $section = sprintf( "<div class='%s'><label class='gh-input-label'>%s</label>", $a[ 'class' ], $a[ 'label' ] );
+
+        $section .= $this->row( array(), $this->column( array( 'size' => '2/3' ), $this->input_base(
+                array(
+                    'type'          => 'text',
+                    'label'         => _x( 'Street Address 1', 'form_default', 'groundhogg' ),
+                    'name'          => $name_prefix . 'street_address_1',
+                    'id'            => $name_prefix . 'street_address_1',
+                    'placeholder'   => '123 Any St.',
+                    'title'         => _x( 'Street Address 1', 'form_default', 'groundhogg' ),
+                    'required'      => $a[ 'required' ],
+                )
+            ) ) .
+
+            $this->column( array( 'size' => '1/3' ), $this->input_base(
+                array(
+                    'type'          => 'text',
+                    'label'         => _x( 'Street Address 2', 'form_default', 'groundhogg' ),
+                    'name'          => $name_prefix . 'street_address_2',
+                    'id'            => $name_prefix . 'street_address_2',
+                    'placeholder'   => 'Unit A',
+                    'title'         => _x( 'Street Address 2', 'form_default', 'groundhogg' ),
+                    'required'      => $a[ 'required' ],
+                )
+            ) ) );
+
+        $section .= $this->row( array(),  $this->input_base(
+            array(
+                'type'          => 'text',
+                'label'         => _x( 'City', 'form_default', 'groundhogg' ),
+                'name'          => $name_prefix . 'city',
+                'id'            => $name_prefix . 'city',
+                'placeholder'   => 'New York',
+                'title'         => _x( 'City', 'form_default', 'groundhogg' ),
+                'required'      => $a[ 'required' ],
+            )
+        ) );
+
+        $section .= $this->row( array(), $this->column( array( 'size' => '1/2' ),$this->input_base(
+                array(
+                    'type'          => 'text',
+                    'label'         => _x( 'State/Province', 'form_default', 'groundhogg' ),
+                    'name'          => $name_prefix . 'region',
+                    'id'            => $name_prefix . 'region',
+                    'placeholder'   => 'New York',
+                    'title'         => _x( 'State/Province', 'form_default', 'groundhogg' ),
+                    'required'      => $a[ 'required' ],
+                )
+            ) ) . $this->column( array( 'size' => '1/2' ), $this->select(
+                array(
+                    'label'         => _x( 'Country *', 'form_default', 'groundhogg' ),
+                    'name'          => $name_prefix . 'country',
+                    'id'            => $name_prefix . 'country',
+                    'class'         => '',
+                    'options'       => wpgh_get_countries_list(),
+                    'attributes'    => '',
+                    'title'         => __( 'Country' ),
+                    'default'       => _x( 'Please select a country', 'form_default', 'groundhogg' ),
+                    'multiple'      => false,
+                    'required'      => $a[ 'required' ],
+                ) )
+            ) );
+
+        $section.= $this->input_base(
+            array(
+                'type'          => 'text',
+                'label'         => _x( 'Postal/Zip Code', 'form_default', 'groundhogg' ),
+                'name'          => $name_prefix . 'postal_zip',
+                'id'            => $name_prefix . 'postal_zip',
+                'placeholder'   => '10001',
+                'title'         => _x( 'Postal/Zip Code', 'form_default', 'groundhogg' ),
+                'required'      => $a[ 'required' ],
+            )
+        );
+
+        $section.= "</div>";
+
+        return $section;
+
+    }
+
+    /**
+     * Return HTML for a textarea field
+     *
+     * @param $atts
+     * @return string
+     */
+    public function textarea( $atts )
+    {
+        /* return nothing if the form doesn't exist */
+        if ( ! $this->is_form() )
+        {
+            return '';
+        }
+
+        $a = shortcode_atts( array(
+            'label'         => '',
+            'name'          => '',
+            'id'            => '',
+            'class'         => '',
+            'value'         => '',
+            'placeholder'   => '',
+            'title'         => '',
+            'attributes'    => '',
+            'required'      => true,
+        ), $atts );
+
+        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
+
+        if ( empty( $a[ 'name' ] ) ){
+            $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
+        }
+
+        if ( empty( $a[ 'id' ] ) ){
+            $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
+        }
+
+        $this->fields[] = $a[ 'name' ];
+        $this->config[ $a[ 'name' ] ] = $a;
+
+        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false"  && $a[ 'required' ] !== "0" ) ? 'required' : '';
+
+        if ( $this->auto_populate ){
+            $name = $a[ 'name' ];
+            if ( $this->source_contact->$name ){
+                $a[ 'value' ] = $this->source_contact->$name;
+            }
+        }
+
+        if ( $this->submission_failed ){
+            $a[ 'value' ] = $this->get_submission_data( $a[ 'name' ] );
+        }
+
+        $field = sprintf(
+            "<label class='gh-input-label'>%s <textarea name='%s' id='%s' class='gh-input %s' placeholder='%s' title='%s' %s %s>%s</textarea></label>",
+            $a[ 'label' ],
+            esc_attr( $a[ 'name' ] ),
+            esc_attr( $a[ 'id' ] ),
+            esc_attr( $a[ 'class' ] ),
+            esc_attr( $a[ 'placeholder' ] ),
+            esc_attr( $a[ 'title' ] ),
+            $a[ 'attributes' ],
+            $required,
+            esc_attr( $a[ 'value' ] )
+        );
+
+        return $this->field_wrap( $field );
+    }
+
+    /**
      * Return html for the select
      *
      * @param $atts
@@ -753,6 +788,8 @@ class WPGH_Form
             'multiple'      => false,
             'required'      => true,
         ), $atts );
+
+        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
 
         if ( empty( $a[ 'name' ] ) ){
             $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'default' ] );
@@ -797,6 +834,12 @@ class WPGH_Form
                 if ( $this->auto_populate ){
                     $name = $a[ 'name' ];
                     if ( $this->source_contact->$name === $value ){
+                        $selected = 'selected';
+                    }
+                }
+
+                if ( $this->submission_failed ){
+                    if ( $value === $this->get_submission_data( $a[ 'name' ] ) ){
                         $selected = 'selected';
                     }
                 }
@@ -848,6 +891,8 @@ class WPGH_Form
             'required'      => true,
         ), $atts );
 
+        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
+
         if ( empty( $a[ 'name' ] ) ){
             $a[ 'name' ] = sanitize_key( $a[ 'label' ] );
         }
@@ -890,6 +935,12 @@ class WPGH_Form
                 if ( $this->auto_populate ){
                     $name = $a[ 'name' ];
                     if ( $this->source_contact->$name === $value ){
+                        $checked = 'checked';
+                    }
+                }
+
+                if ( $this->submission_failed ){
+                    if ( $value === $this->get_submission_data( $a[ 'name' ] ) ){
                         $checked = 'checked';
                     }
                 }
@@ -945,6 +996,8 @@ class WPGH_Form
             'required'      => false,
         ), $atts );
 
+        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
+
         if ( empty( $a[ 'name' ] ) ){
             $a[ 'name' ] = sanitize_key( $a[ 'label' ] );
         }
@@ -967,6 +1020,12 @@ class WPGH_Form
         if ( $this->auto_populate ){
             $name = $a[ 'name' ];
             if ( $this->source_contact->$name === $value ){
+                $checked = 'checked';
+            }
+        }
+
+        if ( $this->submission_failed ){
+            if ( $value === $this->get_submission_data( $a[ 'name' ] ) ){
                 $checked = 'checked';
             }
         }
@@ -1207,6 +1266,7 @@ jQuery( function($){
         /* Errors from a previous submission */
         if ( WPGH()->submission->has_errors() ){
 
+            $this->submission_failed = true;
             $errors = WPGH()->submission->get_errors();
             $err_html = "";
 

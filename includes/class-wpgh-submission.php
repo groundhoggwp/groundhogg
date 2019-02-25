@@ -319,7 +319,7 @@ class WPGH_Submission
             return;
         } else {
             /* Default failure handling. */
-            $this->add_error( 'UNKNOWN_ERROR', esc_html__( 'Something went wrong.', 'groundhogg' ) );
+            $this->add_error( 'UNKNOWN_ERROR', _x( 'Something went wrong.', 'submission_error', 'groundhogg' ) );
             return;
         }
 
@@ -348,7 +348,7 @@ class WPGH_Submission
             unset( $this->step_id );
 
             if ( ! $this->step->is_active() ){
-                $this->add_error( 'INACTIVE_FORM', esc_html__( 'This form is not accepting submissions.', 'groundhogg' ) );
+                $this->add_error( 'INACTIVE_FORM', _x( 'This form is not accepting submissions.', 'submission_error', 'groundhogg' ) );
                 return false;
             }
 
@@ -360,7 +360,7 @@ class WPGH_Submission
         }
 
         if ( empty( $this->fields ) ){
-            $this->add_error( 'INVALID_FORM', esc_html__( 'This form is setup incorrectly.', 'groundhogg' ) );
+            $this->add_error( 'INVALID_FORM', _x( 'This form is setup incorrectly.', 'submission_error', 'groundhogg' ) );
             return false;
         }
 
@@ -379,14 +379,14 @@ class WPGH_Submission
     public function verify()
     {
         if( ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) ) {
-            $this->add_error( 'SECURITY_CHECK_FAILED', esc_html__( 'Failed security check.', 'groundhogg' ) );
+            $this->add_error( 'SECURITY_CHECK_FAILED', _x( 'Failed security check.', 'submission_error', 'groundhogg' ) );
             return false;
         }
 
         unset( $_POST[ 'gh_submit_nonce' ] );
 
         if ( empty( $this->fields ) ) {
-            $this->add_error( 'INVALID_FORM', esc_html__( 'This form is setup incorrectly.', 'groundhogg' ) );
+            $this->add_error( 'INVALID_FORM', _x( 'This form is setup incorrectly.', 'submission_error', 'groundhogg' ) );
             return false;
         }
 
@@ -394,7 +394,7 @@ class WPGH_Submission
             && $this->has_field( 'gdpr_consent' )
             && ! isset( $this->gdpr_consent )
         ) {
-            $this->add_error( 'GDPR_CONSENT_REQUIRED', esc_html__( 'You must consent to sign up.', 'groundhogg' ) );
+            $this->add_error( 'GDPR_CONSENT_REQUIRED', _x( 'You must consent to sign up.', 'submission_error', 'groundhogg' ) );
             return false;
         }
 
@@ -403,7 +403,7 @@ class WPGH_Submission
         ) {
 
             if ( ! isset( $this->data[ 'g-recaptcha-response' ] ) ) {
-                $this->add_error( 'SECURITY_CHECK_FAILED', esc_html__( 'Failed security check.', 'groundhogg' ) );
+                $this->add_error( 'SECURITY_CHECK_FAILED', _x( 'Failed security check.', 'submission_error', 'groundhogg' ) );
                 return false;
             }
 
@@ -417,7 +417,7 @@ class WPGH_Submission
             $responseData = json_decode( $verifyResponse );
 
             if( $responseData->success == false ){
-                $this->add_error( 'SECURITY_CHECK_FAILED', esc_html__( 'Failed security check.', 'groundhogg' ) );
+                $this->add_error( 'SECURITY_CHECK_FAILED', _x( 'Failed security check.', 'submission_error', 'groundhogg' ) );
                 return false;
             }
         }
@@ -425,7 +425,7 @@ class WPGH_Submission
         if ( $this->has_field( 'agree_terms' )
             && ! isset( $this->agree_terms )
         ){
-            $this->add_error( 'TERMS_AGREEMENT_REQUIRED', esc_html__( 'You must agree to the terms to sign up.', 'groundhogg' ) );
+            $this->add_error( 'TERMS_AGREEMENT_REQUIRED', _x( 'You must agree to the terms to sign up.', 'submission_error', 'groundhogg' ) );
             return false;
         }
 
@@ -436,23 +436,34 @@ class WPGH_Submission
         $browser = new Browser();
 
         if ( $browser->isRobot() || $browser->isAol() ){
-            $this->add_error( 'SPAM_CHECK_FAILED', esc_html__( 'Failed spam check.', 'groundhogg' ) );
+            $this->add_error( 'SPAM_CHECK_FAILED', _x( 'Failed spam check.',  'submission_error','groundhogg' ) );
             return false;
         }
 
         // Check the IP against the spam list
         if ( $this->is_spam( wpgh_get_visitor_ip() ) ) {
-            $this->add_error( 'SPAM_CHECK_FAILED', esc_html__( 'Failed spam check.', 'groundhogg' ) );
+            $this->add_error( 'SPAM_CHECK_FAILED', _x( 'Failed spam check.',  'submission_error', 'groundhogg' ) );
             return false;
         }
 
         // Check all the POST data against the blacklist
-        foreach ( $this->data as $key => $value ) {
-            if ( $this->is_spam( $value ) ){
-                $this->add_error( 'SPAM_CHECK_FAILED', esc_html__( 'Failed spam check.', 'groundhogg' ) );
-                return false;
+        if ( $this->is_spam( $this->data ) ) {
+            $this->add_error('SPAM_CHECK_FAILED', _x('Failed spam check.', 'submission_error', 'groundhogg'));
+            return false;
+        }
+
+        //check for missing required fields
+//        var_dump( $this->data );
+        foreach ( $this->fields as $field_name ){
+            $config = $this->get_field_config( $field_name );
+            if ( isset( $config[ 'required' ] ) && $config[ 'required' ] ){
+                if ( ! key_exists( $field_name, $this->data ) || $this->data[ $field_name ] === '' || $this->data[ $field_name ] === null ){
+                    $this->add_error('REQUIRED_FIELD_MISSING', _x( 'Missing a required field.', 'submission_error', 'groundhogg' ) );
+                    return false;
+                }
             }
         }
+//        die();
 
         $verified = apply_filters( 'wpgh_submission_verify_check', true, $this );
         $verified = apply_filters( 'groundhogg/submission/verify', $verified, $this );
@@ -487,24 +498,30 @@ class WPGH_Submission
      * Check a given value for spam.
      * If it's in the blacklist, mark the contact as spam and die
      *
-     * @param $value mixed
+     * @param $args mixed
      * @return bool true if spam | false if pass
      */
-    public function is_spam( $value )
+    public function is_spam( $args )
     {
+        /* Turn into array */
+        if ( ! is_array( $args ) ){ $args = [ $args ]; }
+
         $blacklist = wpgh_get_option( 'blacklist_keys', false );
 
         if ( ! empty( $blacklist ) ) {
 
-            $keys = explode(PHP_EOL, $blacklist );
+            $words = explode(PHP_EOL, $blacklist );
 
-            foreach ($keys as $key) {
-                if ( strpos( $value, $key ) !== false ){
+            foreach ($words as $word) {
 
-                    if( apply_filters( 'groundhogg/submission/spam', true, $this, $value ) ){
+                foreach ( $args as $key => $value ){
 
-                        return false;
-
+                    /* if found */
+                    if ( strpos( $value, $word ) !== false ){
+                        return true;
+                    /* Further checking */
+                    } else if ( apply_filters( 'groundhogg/submission/spam', false, $value, $word, $this ) ){
+                        return true;
                     }
                 }
             }
@@ -526,8 +543,8 @@ class WPGH_Submission
 
             $email = sanitize_email( $this->email );
 
-            if ( empty( $email ) ){
-                $this->add_error( 'INVALID_EMAIL', esc_html__( 'Please provide a valid email address.', 'groundhogg' ) );
+            if ( empty( $email ) || ! is_email( $email ) ){
+                $this->add_error( 'INVALID_EMAIL', _x( 'Please provide a valid email address.', 'submission_error', 'groundhogg' ) );
                 return false;
             }
 
@@ -536,11 +553,26 @@ class WPGH_Submission
             );
 
             if ( $this->first_name ){
-                $args[ 'first_name' ] =  sanitize_text_field( stripslashes( $this->first_name ) );
+                $this->first_name =  sanitize_text_field( stripslashes( $this->first_name ) );
+                $args[ 'first_name' ] = $this->first_name;
+                if ( preg_match( '/[0-9]/', $this->first_name ) ){
+                    $this->add_error( 'INVALID_NAME', _x( 'Name should not contain numbers.', 'submission_error', 'groundhogg' ) );
+                    return false;
+                }
             }
 
             if ( $this->last_name ){
-                $args[ 'last_name' ] =  sanitize_text_field( stripslashes( $this->last_name ) );
+                $this->last_name =  sanitize_text_field( stripslashes( $this->last_name ) );
+                $args[ 'last_name' ] = $this->last_name;
+                if ( preg_match( '/[0-9]/', $this->last_name ) ){
+                    $this->add_error( 'INVALID_NAME', _x( 'Name should not contain numbers.', 'submission_error', 'groundhogg' ) );
+                    return false;
+                }
+            }
+
+            if ( $this->first_name && $this->last_name && $this->first_name === $this->last_name ){
+                $this->add_error( 'INVALID_NAME', _x( 'First and last name cannot be the same.', 'submission_error', 'groundhogg' ) );
+                return false;
             }
 
             /**
@@ -557,6 +589,11 @@ class WPGH_Submission
                 }
             }
 
+            if ( $this->is_spam( $args ) ){
+                $this->add_error( 'FOUND_SPAM', _x( 'Your submission looks like spam, please change your information.', 'submission_error', 'groundhogg' ) );
+                return false;
+            }
+
 
             if ( WPGH()->contacts->exists( $email ) ){
                 $this->contact = new WPGH_Contact( $email );
@@ -564,7 +601,7 @@ class WPGH_Submission
             } else{
                 $cid = WPGH()->contacts->add( $args );
                 if ( ! $cid ){
-                    $this->add_error( 'UNKNOWN_ERROR', esc_html__( 'Something went wrong.', 'groundhogg' ) );
+                    $this->add_error( 'UNKNOWN_ERROR', _x( 'Something went wrong.', 'submission_error', 'groundhogg' ) );
                     return false;
                 }
                 $this->contact = new WPGH_Contact( $cid );
@@ -580,7 +617,7 @@ class WPGH_Submission
             $this->contact = WPGH()->tracking->get_contact();
             return $this->contact;
         } else {
-            $this->add_error( 'UNKNOWN_ERROR', esc_html__( 'Something went wrong.', 'groundhogg' ) );
+            $this->add_error( 'UNKNOWN_ERROR', _x( 'Something went wrong.', 'submission_error', 'groundhogg' ) );
             return false;
         }
 
@@ -634,7 +671,7 @@ class WPGH_Submission
 
                         } else {
 
-                            $this->add_error( 'FILE_UPLOAD_ERROR',  __( 'Could not upload file.', 'groundhogg' ) );
+                            $this->add_error( 'FILE_UPLOAD_ERROR',  _x( 'Could not upload file.',  'submission_error', 'groundhogg' ) );
                             return false;
 
                         }
@@ -704,7 +741,7 @@ class WPGH_Submission
         $size = $file[ 'size' ];
 
         if ( intval( $size ) > intval( $config[ 'max_file_size' ] ) ){
-            return new WP_Error( 'FILE_TOO_BIG', __( 'The file you have uploaded is too big.' ) );
+            return new WP_Error( 'FILE_TOO_BIG', _x( 'The file you have uploaded is too big.',  'submission_error', 'greoundhogg' ) );
         }
 
         $extension = wp_check_filetype( $file[ 'name' ] );
@@ -713,7 +750,7 @@ class WPGH_Submission
         if ( ! empty( $config[ 'file_types' ] ) ){
             $mimes = explode( ',', $config[ 'file_types' ] );
             if ( ! in_array( '.' . $extension[ 'ext' ], $mimes ) ){
-                return new WP_Error( 'INCORRECT_MIME', __( 'You are not permitted to upload this type of file.' ) );
+                return new WP_Error( 'INCORRECT_MIME', _x( 'You are not permitted to upload this type of file.', 'submission_error', 'groundhogg' ) );
             }
         }
 
@@ -730,7 +767,7 @@ class WPGH_Submission
         if( isset( $mfile['error'] ) ) {
 
             if ( empty( $mfile[ 'error' ] ) ){
-                $mfile[ 'error' ] = __( 'Could not upload file.' );
+                $mfile[ 'error' ] = _x( 'Could not upload file.',  'submission_error', 'groundhogg' );
             }
 
             return new WP_Error( 'BAD_UPLOAD', $mfile['error'] );
