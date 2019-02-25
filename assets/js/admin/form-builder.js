@@ -56,7 +56,7 @@ var wpghFormBuilder;
             this.types.col          = ['width','id','class'];
             this.types.date         = ['required','label','name','min_date','max_date','id','class'];
             this.types.time         = ['required','label','name','min_time','max_time','id','class'];
-            this.types.file         = ['required','label','name','max_file_size','file-types','id','class'];
+            this.types.file         = ['required','label','name','max_file_size','file_types','id','class'];
         },
 
         sanitizeKey: function( key ) {

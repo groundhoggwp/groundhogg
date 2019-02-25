@@ -602,7 +602,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                         <th><?php _e( 'Accepted File Types', 'groundhogg' ) ?></th>
                         <td><?php
                             echo WPGH()->html->input( array( 'id' => 'field-file_types', 'name' => 'file_types', 'placeholder' => '.pdf,.txt,.doc,.docx' ) );
-                            ?><p class="description"><?php _e( 'The types of files a user may upload (comma separated).', 'groundhogg' ) ?></p></td>
+                            ?><p class="description"><?php _e( 'The types of files a user may upload (comma separated). Leave empty to not specify.', 'groundhogg' ) ?></p></td>
                     </tr>
                     <!-- END FILE OPTIONS -->
 

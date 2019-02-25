@@ -75,6 +75,13 @@ class WPGH_Form
      */
     var $source_contact = null;
 
+    /**
+     * Whether the form is in preview mode
+     *
+     * @var bool
+     */
+    var $doing_preview = false;
+
     public function __construct( $atts )
     {
         $this->a = shortcode_atts(array(
@@ -1170,7 +1177,8 @@ jQuery( function($){
             $a['text'] = $content;
         }
 
-        if ( is_admin() ){
+        /* Don't apply when doing a preview */
+        if ( is_admin() && ! $this->doing_preview ){
             $a[ 'class' ] .= 'button button-primary';
         }
 
@@ -1261,6 +1269,8 @@ jQuery( function($){
      */
     public function preview()
     {
+        $this->doing_preview = true;
+
         $form = '<div class="gh-form-wrapper">';
 
         $this->setup_shortcodes();
@@ -1282,8 +1292,8 @@ jQuery( function($){
         $form .= '</div>';
 
         $form = str_replace( 'required', '', $form );
-        $form = apply_filters( 'wpgh_form_shortcode', $form, $this );
-        $form = apply_filters( 'groundhogg/form/after', $form, $this );
+//        $form = apply_filters( 'wpgh_form_shortcode', $form, $this );
+//        $form = apply_filters( 'groundhogg/form/after', $form, $this );
         $form = apply_filters( 'wpgh_form_shortcode_preview', $form, $this );
         $form = apply_filters( 'groundhogg/form/preview/after', $form, $this );
 

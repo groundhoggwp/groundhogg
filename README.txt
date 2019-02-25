@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.1.2 =
+* FIXED File upload file type specification not working
+* FIXED File upload not working if files not specified
+
 = 1.1.1 =
 * ADDED New admin form submit action accessible from the contact record
 * TWEAKED Added spacing around button block & fixed centering issue for improved usability in outlook.

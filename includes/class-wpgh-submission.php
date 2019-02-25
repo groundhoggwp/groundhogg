@@ -702,10 +702,13 @@ class WPGH_Submission
         }
 
         $extension = wp_check_filetype( $file[ 'name' ] );
-        $mimes = explode( ',', $config[ 'file_types' ] );
 
-        if ( ! in_array( '.' . $extension[ 'ext' ], $mimes ) ){
-            return new WP_Error( 'INCORRECT_MIME', __( 'You are not permitted to upload this type of file.' ) );
+        /* Check if mime is specified */
+        if ( ! empty( $config[ 'file_types' ] ) ){
+            $mimes = explode( ',', $config[ 'file_types' ] );
+            if ( ! in_array( '.' . $extension[ 'ext' ], $mimes ) ){
+                return new WP_Error( 'INCORRECT_MIME', __( 'You are not permitted to upload this type of file.' ) );
+            }
         }
 
         $upload_overrides = array( 'test_form' => false );
