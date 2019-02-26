@@ -117,6 +117,26 @@ class WPGH_Step
 
     }
 
+    public function get_ID()
+    {
+        return $this->ID;
+    }
+
+    public function get_title()
+    {
+        return $this->title;
+    }
+
+    public function get_order()
+    {
+        return $this->order;
+    }
+
+    public function get_type()
+    {
+        return $this->type;
+    }
+
     /**
      * Update the step with new info
      *
@@ -585,17 +605,14 @@ class WPGH_Step
         <div title="<?php echo $this->title ?>" id="<?php echo $this->ID; ?>" class="postbox step <?php echo $this->group; ?> <?php echo $this->type; ?> <?php echo $closed; ?>">
             <button type="button" class="handlediv collapse"><span class="toggle-indicator" aria-hidden="true"></span></button>
             <input type="hidden" class="collapse-input" name="<?php echo $this->prefix( 'closed' ); ?>" value="<?php echo $this->get_meta( 'is_closed' ); ?>">
-
             <!-- DELETE -->
             <button title="Delete" type="button" class="handlediv delete-step">
                 <span class="dashicons dashicons-trash"></span>
             </button>
-
             <!-- DUPLICATE -->
             <button title="Duplicate" type="button" class="handlediv duplicate-step">
                 <span class="dashicons dashicons-admin-page"></span>
             </button>
-
             <!-- HNDLE -->
             <h2 class="hndle ui-sortable-handle">
                 <img class="hndle-icon" width="50" src="<?php echo $this->icon(); ?>">
@@ -607,7 +624,6 @@ class WPGH_Step
                 );
 
                 echo WPGH()->html->input( $args ); ?>
-
                 <?php if( wpgh_is_global_multisite() ): ?>
                     <!-- MULTISITE BLOG OPTION -->
                     <div class="wpmu-options">
@@ -632,32 +648,22 @@ class WPGH_Step
 
                             ?>
                         </label>
-
                     </div>
-
                 <?php endif; ?>
-
             </h2>
-
             <!-- INSIDE -->
             <div class="inside">
-
                 <input type="hidden" name="steps[]" value="<?php echo $this->ID; ?>">
-
                 <!-- SETTINGS -->
                 <div class="step-edit <?php echo WPGH()->menu->funnels_page->reporting_enabled ? 'hidden' : '' ; ?>">
-
                     <div class="custom-settings">
                         <?php do_action( 'wpgh_step_settings_before', $this ); ?>
                         <?php do_action( 'groundhogg/step/settings/before', $this ); ?>
                         <?php $this->settings(); ?>
                         <?php do_action( 'wpgh_step_settings_after', $this ); ?>
                         <?php do_action( 'groundhogg/step/settings/after', $this ); ?>
-
                     </div>
-
                 </div>
-
                 <!-- REPORTING  -->
                 <div class="step-reporting <?php echo WPGH()->menu->funnels_page->reporting_enabled ? '' : 'hidden' ; ?>">
                     <?php do_action( 'wpgh_step_reporting_before' ); ?>
@@ -666,9 +672,7 @@ class WPGH_Step
                     <?php do_action( 'wpgh_step_reporting_after' ); ?>
                     <?php do_action( 'groundhogg/step/reporting/after' ); ?>
                 </div>
-
             </div>
-
         </div>
         <?php
 

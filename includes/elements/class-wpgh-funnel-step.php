@@ -24,22 +24,22 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Funnel_Step
+abstract class WPGH_Funnel_Step
 {
 
-	/**
-	 * @var $type string the type of action
-	 */
+    /**
+     * @var $type string the type of action
+     */
     public $type = '';
 
-	/**
-	 * @var $name string the Display name of the action
-	 */
+    /**
+     * @var $name string the Display name of the action
+     */
     public $name = '';
 
-	/**
-	 * @var $icon string url to icon.
-	 */
+    /**
+     * @var $icon string url to icon.
+     */
     public $icon = '';
 
     /**
@@ -76,7 +76,7 @@ class WPGH_Funnel_Step
     public function __construct()
     {
 
-        if( is_admin() ){
+        if (is_admin()) {
 //            add_filter( 'wpgh_funnel_' . $this->group . 's', array( $this, 'register' ) );
 //            add_action( 'wpgh_get_step_settings_' . $this->type, array( $this, 'settings' ) );
 //            add_action( 'wpgh_get_step_reporting_' . $this->type, array( $this, 'reporting' ) );
@@ -88,11 +88,11 @@ class WPGH_Funnel_Step
              *
              * @since 1.1
              */
-            add_filter( "groundhogg/elements/{$this->group}s", array( $this, 'register' ) );
-            add_action( "groundhogg/elements/{$this->type}/settings", array( $this, 'settings' ) );
-            add_action( "groundhogg/elements/{$this->type}/reporting", array( $this, 'reporting' ) );
-            add_action( "groundhogg/elements/{$this->type}/save", array( $this, 'save' ) );
-            add_filter( "groundhogg/elements/{$this->type}/icon", array( $this, 'icon' ) );
+            add_filter("groundhogg/elements/{$this->get_group()}s", array($this, 'register'));
+            add_action("groundhogg/elements/{$this->get_type()}/settings", array($this, 'settings'));
+            add_action("groundhogg/elements/{$this->get_type()}/reporting", array($this, 'reporting'));
+            add_action("groundhogg/elements/{$this->get_type()}/save", array($this, 'save'));
+            add_filter("groundhogg/elements/{$this->get_type()}/icon", array($this, 'icon'));
         }
 
 //        add_action( 'wpgh_import_step_' . $this->type, array( $this, 'import' ), 10, 2 );
@@ -105,10 +105,61 @@ class WPGH_Funnel_Step
          *
          * @since 1.1
          */
-        add_action( "groundhogg/elements/{$this->type}/import", array( $this, 'import' ), 10, 2 );
-        add_filter( "groundhogg/elements/{$this->type}/export", array( $this, 'export' ), 10, 2 );
-        add_filter( "groundhogg/elements/{$this->type}/enqueue", array( $this, 'enqueue' ) );
-        add_filter( "groundhogg/elements/{$this->type}/run", array( $this, 'run' ), 10, 2 );
+        add_action("groundhogg/elements/{$this->get_type()}/import", array($this, 'import'), 10, 2);
+        add_filter("groundhogg/elements/{$this->get_type()}/export", array($this, 'export'), 10, 2);
+        add_filter("groundhogg/elements/{$this->get_type()}/enqueue", array($this, 'enqueue'));
+        add_filter("groundhogg/elements/{$this->get_type()}/run", array($this, 'run'), 10, 2);
+    }
+
+    /**
+     * Get the element name
+     *
+     * @return string
+     */
+    public function get_name()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the element type
+     *
+     * @return string
+     */
+    public function get_type()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Get the element group
+     *
+     * @return string
+     */
+    public function get_group()
+    {
+        return $this->group;
+    }
+
+    /**
+     * Get the description
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Get the icon
+     *
+     * @param string $default
+     * @return string
+     */
+    public function get_icon( $default='' )
+    {
+        return $this->icon( $default='' );
     }
 
     /**
@@ -120,9 +171,7 @@ class WPGH_Funnel_Step
      */
     public function enqueue( $step )
     {
-
         return time() + $this->delay_time;
-
     }
 
     /**
@@ -149,11 +198,11 @@ class WPGH_Funnel_Step
      */
     public function register( $array )
     {
-		$array[ $this->type ] = array(
-			'title' =>__( $this->name, 'groundhogg' ),
-			'icon'  => $this->icon(),
-            'group' => $this->group,
-            'desc'  => $this->description
+		$array[ $this->get_type() ] = array(
+			'title' =>__( $this->get_name(), 'groundhogg' ),
+			'icon'  => $this->get_icon(),
+            'group' => $this->get_group(),
+            'desc'  => $this->get_description(),
 		);
 
 		return $array;
@@ -180,11 +229,8 @@ class WPGH_Funnel_Step
      *
      * @param $step WPGH_Step
      */
-    public function settings( $step )
-    {
-//        _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the SETTINGS method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
-        _e( 'This step has no registered settings.' );
-    }
+    abstract public function settings( $step );
+
 
     /**
      * Get the reporting view for the STEP
@@ -248,10 +294,7 @@ class WPGH_Funnel_Step
      *
      * @param $step WPGH_Step
      */
-    public function save( $step )
-    {
-//        _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the SAVE method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
-    }
+    abstract public function save( $step );
 
     /**
      * Run the action/benchmark
@@ -263,8 +306,6 @@ class WPGH_Funnel_Step
      */
     public function run( $contact, $event )
     {
-//        _doing_it_wrong( __FUNCTION__, __( 'You should not be calling the RUN method of the parent class. You should be overriding it with a child method.', 'groundhogg' ), '1.0' );
-
         return true;
     }
 
@@ -286,7 +327,4 @@ class WPGH_Funnel_Step
         //silence is golden
         return $args;
     }
-
-
-
 }

@@ -48,7 +48,15 @@ class WPGH_Stats_Collection
         $response = WPGH()->stats->optin();
 
         if ( is_wp_error( $response ) ){
-            WPGH()->notices->add( $response->get_error_code(), $response->get_error_message(), 'error' );
+
+            if ( $response->get_error_code() === 'already_registered' ){
+                WPGH()->notices->add( $response->get_error_code(), _x( 'This site was already registered and has been opted back in.', 'notice', 'groundhogg' ), 'success' );
+                wpgh_update_option( 'gh_opted_in_stats_collection', 1 );
+            } else {
+                WPGH()->notices->add( $response->get_error_code(), $response->get_error_message(), 'error' );
+            }
+
+
             return;
         }
 
@@ -77,7 +85,8 @@ We appreciate your help, best of luck!
 
         $stats = [
             'site_key'  => md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) ),
-            'site_email'=> base64_encode( wp_get_current_user()->user_email ),
+            'site_email' => base64_encode( wp_get_current_user()->user_email ),
+            'display_name' => base64_encode( wp_get_current_user()->display_name ),
         ];
 
         $response = wp_remote_post( 'https://www.groundhogg.io/wp-json/gh/stats/optin/', array( 'body' => $stats ) );

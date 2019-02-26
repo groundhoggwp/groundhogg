@@ -208,11 +208,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $network_options;
 
         /**
-         * @var WPGH_User_Token_Section
-         */
-        public $tokens_section;
-
-        /**
          * @var WPGH_Upgrade
          */
         public $upgrader;

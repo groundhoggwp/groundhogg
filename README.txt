@@ -107,6 +107,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.1.4 =
+* ADDED Search form to welcome page for docs help
+* ADDED Distinct helper methods to Funnel Parent Class
+* TWEAKED Welcome page now queries docs direct from documentation site
+* TWEAKED Welcome page now queries extensions direct from store
+* TWEAKED Stats collection will retrieve display_name
+
 = 1.1.3 =
 * FIXED First & Last being set to null if not present in form.
 * TWEAKED Form spam verification is now more strict.

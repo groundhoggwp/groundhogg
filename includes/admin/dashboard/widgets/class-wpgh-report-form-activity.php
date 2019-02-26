@@ -32,7 +32,7 @@ class WPGH_Report_Form_Activity extends WPGH_Line_Graph_Report_V2
             $events = WPGH()->events->table_name;
             $steps  = WPGH()->steps->table_name;
 
-            $num_form_fills = $wpdb->get_var( "SELECT COUNT(e.ID) FROM $events AS e LEFT JOIN $steps AS s ON e.step_id = s.ID WHERE $this->start_range < e.time AND e.time <= $this->end_range AND s.step_type = 'form_fill'" );
+            $num_form_fills = $wpdb->get_var( "SELECT COUNT(e.ID) FROM $events AS e LEFT JOIN $steps AS s ON e.step_id = s.ID WHERE $this->start_range < e.time AND e.time <= $this->end_range AND s.step_type = 'form_fill' AND e.status = 'complete'" );
 
             $nump_impressions = WPGH()->activity->count( array( 'start' => $this->start_range, 'end' => $this->end_range, 'activity_type' => 'form_impression' ) );
 //            $num_clicks = WPGH()->activity->count( array( 'start' => $this->start_range, 'end' => $this->end_range, 'activity_type' => 'email_link_click' ) );

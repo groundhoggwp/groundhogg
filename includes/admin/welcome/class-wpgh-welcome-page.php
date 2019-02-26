@@ -205,34 +205,56 @@ class WPGH_Welcome_Page
      */
     public function get_articles()
     {
-        $articles = array(
-            array(
-                'title' => __( 'Full Walkthrough', 'groundhogg' ),
-                'desc'  => __( 'Watch this full walkthrough of setting up Groundhogg and building your first funnel.', 'groundhogg' ),
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/12/Full-Demo.png',
-                'link'  => 'https://groundhogg.io/demo/'
-            ),
-            array(
-                'title' => __( "Managing Users", 'groundhogg' ),
-                'desc'  => __( "If you have sales people you need to read how you can give them only specific access to your CRM.", 'groundhogg' ),
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/user-roles-722x361.png',
-                'link'  => 'https://www.groundhogg.io/support/how-to-manage-user-roles/'
-            ),
-            array(
-                'title' => __( "How To Remain Compliant ", 'groundhogg' ),
-                'desc'  => __( "Learn about the tools Groundhogg provides so you can remain complaint in countries around the world.", 'groundhogg' ),
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/compliance-722x361.png',
-                'link'  => 'https://www.groundhogg.io/support/compliance/'
-            ),
-            array(
-                'title' => __( "Send Marketing With Groundhogg", 'groundhogg' ),
-                'desc'  => __( "Get your first 1000 credits free when you sign up! Send SMS and Email with Groundhogg.", 'groundhogg' ),
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/11/email-credits-722x361.png',
-                'link'  => 'https://www.groundhogg.io/downloads/email-credits/'
-            ),
-        );
+//        $articles = array(
+//            array(
+//                'title' => __( 'Full Walkthrough', 'groundhogg' ),
+//                'desc'  => __( 'Watch this full walkthrough of setting up Groundhogg and building your first funnel.', 'groundhogg' ),
+//                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/12/Full-Demo.png',
+//                'link'  => 'https://groundhogg.io/demo/'
+//            ),
+//            array(
+//                'title' => __( "Managing Users", 'groundhogg' ),
+//                'desc'  => __( "If you have sales people you need to read how you can give them only specific access to your CRM.", 'groundhogg' ),
+//                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/user-roles-722x361.png',
+//                'link'  => 'https://www.groundhogg.io/support/how-to-manage-user-roles/'
+//            ),
+//            array(
+//                'title' => __( "How To Remain Compliant ", 'groundhogg' ),
+//                'desc'  => __( "Learn about the tools Groundhogg provides so you can remain complaint in countries around the world.", 'groundhogg' ),
+//                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/compliance-722x361.png',
+//                'link'  => 'https://www.groundhogg.io/support/compliance/'
+//            ),
+//            array(
+//                'title' => __( "Send Marketing With Groundhogg", 'groundhogg' ),
+//                'desc'  => __( "Get your first 1000 credits free when you sign up! Send SMS and Email with Groundhogg.", 'groundhogg' ),
+//                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/11/email-credits-722x361.png',
+//                'link'  => 'https://www.groundhogg.io/downloads/email-credits/'
+//            ),
+//        );
 
-        $articles = apply_filters( 'wpgh_support_articles', $articles );
+        $args = wp_parse_args( array(
+            'include' => [
+                208,
+                184,
+                182,
+                196,
+                197,
+                155,
+                157,
+                153,
+                154
+            ]
+        ) );
+
+        $url = 'https://docs.groundhogg.io/wp-json/wp/v2/docs/';
+        $response = wp_remote_get( add_query_arg( $args, $url ) );
+
+        if ( is_wp_error( $response ) ){
+            return $response->get_error_message();
+        }
+
+        $docs = json_decode( wp_remote_retrieve_body( $response ) );
+        $articles = apply_filters( 'wpgh_support_articles', $docs );
 
         return $articles;
     }
@@ -248,21 +270,14 @@ class WPGH_Welcome_Page
         $article = (object) $args;
 
         ?>
-
         <div class="postbox">
             <?php if ( $article->title ): ?>
-                <h2 class="hndle"><?php echo $article->title; ?></h2>
+                <h2 class="hndle"><?php echo $article->title->rendered; ?></h2>
             <?php endif; ?>
             <div class="inside">
-                <?php if ( $article->img ): ?>
-                    <div class="img-container">
-                        <img src="<?php echo $article->img; ?>" style="width: 100%;max-width: 100%;">
-                    </div>
-                    <hr/>
-                <?php endif; ?>
-                <?php if ( $article->desc ): ?>
+                <?php if ( $article->content->rendered ): ?>
                     <div class="article-description">
-                        <?php echo $article->desc; ?>
+                        <?php echo wp_trim_words( wp_strip_all_tags( $article->content->rendered ), 30 ); ?>
                     </div>
                     <hr/>
                 <?php endif; ?>
@@ -285,41 +300,20 @@ class WPGH_Welcome_Page
      */
     public function get_extensions()
     {
-        $extensions = array(
-            array(
-                'title' => 'All Access Pass',
-                'desc'  => 'Get every Groundhogg extension at one low price!',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/all-access.png',
-                'link'  => 'https://www.groundhogg.io/downloads/all-access-pass/'
-            ),
-            array(
-                'title' => 'Form Styling',
-                'desc'  => 'Quickly style forms without having to code with CSS!',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/11/form-styling.png',
-                'link'  => 'https://www.groundhogg.io/downloads/form-styling/'
-            ),
-            array(
-                'title' => 'Email Countdown Timer',
-                'desc'  => 'Create more engagement from emails by adding countdown timers to your emails.',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/11/countdown-timers-new.png',
-                'link'  => 'https://www.groundhogg.io/downloads/countdown/'
-            ),
-            array(
-                'title' => 'Contracts',
-                'desc'  => 'Have your contacts sign legally binding contracts through Groundhogg. No third party apps required.',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/contracts.png',
-                'link'  => 'https://www.groundhogg.io/downloads/contracts/'
-            ),
-            array(
-                'title' => 'Contact Form 7',
-                'desc'  => 'Start collecting lead information through Contact Form 7, no setup required. Works instantly!',
-                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/10/contact-form-7.png',
-                'link'  => 'https://www.groundhogg.io/downloads/contact-form-7/'
-            ),
-        );
+        $products = WPGH()->get_store_products( array(
+            'category' => [ 16, 9 ],
+        ) );
+
+        $products = $products->products;
+        shuffle( $products );
+        $rands = array_rand( $products, 4 );
+        $extensions = [];
+
+        foreach ( $rands as $rand ){
+            $extensions[] = $products[ $rand ];
+        }
 
         $extensions = apply_filters( 'wpgh_extension_ads', $extensions );
-
         return $extensions;
     }
 
@@ -334,27 +328,55 @@ class WPGH_Welcome_Page
         $extension = (object) $args;
 
         ?>
-
         <div class="postbox">
-            <?php if ( $extension->title ): ?>
-                <h2 class="hndle"><?php echo $extension->title; ?></h2>
+            <?php if ( $extension->info->title ): ?>
+                <h2 class="hndle"><?php echo $extension->info->title; ?></h2>
             <?php endif; ?>
             <div class="inside">
-                <?php if ( $extension->img ): ?>
+                <?php if ( $extension->info->thumbnail ): ?>
                     <div class="img-container">
-                        <img src="<?php echo $extension->img; ?>" style="width: 100%;max-width: 100%;">
+                        <a href="<?php echo $extension->info->link; ?>" target="_blank">
+                            <img src="<?php echo $extension->info->thumbnail; ?>" style="width: 100%;max-width: 100%;">
+                        </a>
                     </div>
                 <hr/>
                 <?php endif; ?>
-                <?php if ( $extension->desc ): ?>
+                <?php if ( $extension->info->excerpt ): ?>
                     <div class="article-description">
-                        <?php echo $extension->desc; ?>
+                        <?php echo $extension->info->excerpt; ?>
                     </div>
                 <hr/>
                 <?php endif; ?>
-                <?php if ( $extension->link ): ?>
+                <?php if ( $extension->info->link ): ?>
                     <p>
-                        <a class="button button-primary" href="<?php echo esc_url_raw( $extension->link ); ?>" target="_blank"><?php _e( 'Buy Now!' ); ?></a>
+                        <?php $pricing = (array) $extension->pricing;
+                        if (count($pricing) > 1) {
+
+                            $price1 = min($pricing);
+                            $price2 = max($pricing);
+
+                            ?>
+                            <a class="button-primary" target="_blank"
+                               href="<?php echo $extension->info->link; ?>"> <?php printf( _x('Buy Now ($%s - $%s)', 'action', 'groundhogg'), $price1, $price2 ); ?></a>
+                            <?php
+                        } else {
+
+                            $price = array_pop($pricing);
+
+                            if ($price > 0.00) {
+                                ?>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action','groundhogg' ), $price ); ?></a>
+                                <?php
+                            } else {
+                                ?>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $extension->info->link; ?>"> <?php _ex('Download', 'action', 'groundhogg'); ?></a>
+                                <?php
+                            }
+                        }
+
+                        ?>
                     </p>
                 <?php endif; ?>
             </div>
@@ -383,17 +405,14 @@ class WPGH_Welcome_Page
                     <h1><?php echo sprintf( __( 'Welcome %s!', 'groundhogg' ), $user->display_name ); ?></h1>
                 </div>
                 <?php $this->notices->notices(); ?>
-
                 <?php do_action( 'wpgh_welcome_page_custom_content' ); ?>
-
                 <?php if ( apply_filters( 'wpgh_show_main_welcome_page_content', true ) ): ?>
-
                 <?php if ( ! wpgh_get_option( 'gh_opted_in_stats_collection' ) && current_user_can( 'manage_options' ) ): ?>
                 <div class="col">
                     <div class="postbox stats-collection">
                         <div class="inside">
                             <h3><?php _e( 'GET 30% OFF WHEN YOU HELP US MAKE GROUNDHOGG BETTER', 'Groundhogg' ); ?></h3>
-                            <p><?php _e( "Want sweet discounts and to help us make Groundhogg even better? When you optin to our stats collection you will get a <b>30% discount off</b> any premium extension or service in out store by sharing <b>anonymous</b> data about your site. You can opt out any time from the settings page.", 'groundhogg' ); ?></p>
+                            <p><?php _e( "Want sweet discounts and to help us make Groundhogg even better? When you optin to our stats collection you will get a <b>30% discount off</b> any premium extension or subscription in our store by sharing <b>anonymous</b> data about your site. You can opt out any time from the settings page. Your email address & display name will be collected so we can send you the discount code.", 'groundhogg' ); ?></p>
                             <p style="text-align: center">
                                 <a class="button button-primary" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=groundhogg&action=opt_in_to_stats' ), 'opt_in_to_stats' ); ?>" ><?php _e( 'Yes, I want to help make Groundhogg better!' ); ?></a>
                             </p>
@@ -404,37 +423,27 @@ class WPGH_Welcome_Page
                     </div>
                 </div>
                 <?php endif; ?>
-
                 <div class="left-col col">
-
                     <div id="support-articles">
-
                         <div class="postbox support">
                             <div class="inside">
                                 <h3><?php _e( 'Support Articles', 'Groundhogg' ); ?></h3>
                                 <p><?php _e( "Don't know where to start? Checkout these articles and learn how to make Groundhogg work for you.", 'groundhogg' ); ?></p>
-                                <p style="text-align: center">
-                                    <a class="button button-primary" href="https://docs.groundhogg.io/" target="_blank"><?php _e( 'View All!' ); ?></a>
-                                </p>
+                                    <form action="https://docs.groundhogg.io/" method="get" target="_blank">
+                                    <input style="width: 250px" type="text" name="s" id="search" class="text" placeholder="Search Docs"><?php submit_button( 'Search', 'primary', 'search', false ); ?>
+                                    <a style="float: right" class="button button-secondary" href="https://docs.groundhogg.io/" target="_blank"><?php _e( 'View All!' ); ?></a>
+                                </form>
                             </div>
                         </div>
-
                         <?php
-
                         foreach ( $this->get_articles() as $article ):
-
                             $this->article_to_html( $article );
-
                         endforeach;
-
                         ?>
-
                     </div>
                 </div>
                 <div class="right-col col">
-
                     <div id="extensions">
-
                         <div class="postbox support">
                             <div class="inside">
                                 <h3><?php _e( 'Awesome Extensions', 'Groundhogg' ); ?></h3>
@@ -444,17 +453,11 @@ class WPGH_Welcome_Page
                                 </p>
                             </div>
                         </div>
-
                         <?php
-
                         foreach ( $this->get_extensions() as $extension ):
-
                             $this->extension_to_html( $extension );
-
                         endforeach;
-
                         ?>
-
                     </div>
                 </div>
 

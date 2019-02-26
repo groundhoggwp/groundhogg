@@ -311,6 +311,19 @@ class WPGH_DB_Tags extends WPGH_DB
 
     }
 
+    public function get_tags_select() {
+        global $wpdb;
+        $results = $wpdb->get_results("SELECT * FROM $this->table_name ORDER BY $this->primary_key DESC" );
+
+        $tags = [];
+
+        foreach ( $results as $tag ){
+            $tags[ $tag->tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
+        }
+
+        return $tags;
+    }
+
     /**
      * Increase the contact tag count
      *
