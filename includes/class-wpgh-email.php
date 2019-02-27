@@ -717,15 +717,12 @@ class WPGH_Email
 
         }
 
-        if ( $contact->get_meta( 'last_sent' ) ){
-
-            $last_sent = intval( $contact->get_meta( 'last_sent' ) );
-
-            if ( ( time() - $last_sent ) <= 5 ){
-                return new WP_Error( 'TOO_MANY_EMAILS', __( 'There must be a minimum 5 seconds before a contact can receive another email.' ) );
-            }
-
-        }
+//        if ( $contact->get_meta( 'last_sent' ) ){
+//            $last_sent = intval( $contact->get_meta( 'last_sent' ) );
+//            if ( ( time() - $last_sent ) <= 5 ){
+//                return new WP_Error( 'TOO_MANY_EMAILS', __( 'There must be a minimum 5 seconds before a contact can receive another email.' ) );
+//            }
+//        }
 
         do_action( 'wpgh_before_email_send', $this );
 
