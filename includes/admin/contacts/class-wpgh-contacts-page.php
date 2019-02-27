@@ -251,8 +251,7 @@ class WPGH_Contacts_Page
                 foreach ($this->get_contacts() as $id) {
 
                     $contact = new WPGH_Contact($id);
-                    $args = array('optin_status' => WPGH_SPAM);
-                    $contact->update($args);
+                    $contact->change_marketing_preference( WPGH_SPAM );
 
                     $ip_address = $contact->get_meta('ip_address');
 
@@ -312,8 +311,7 @@ class WPGH_Contacts_Page
 
                 foreach ($this->get_contacts() as $id) {
                     $contact = new WPGH_Contact($id);
-                    $args = array('optin_status' => WPGH_UNCONFIRMED);
-                    $contact->update($args);
+                    $contact->change_marketing_preference( WPGH_UNCONFIRMED );
                 }
 
                 $this->notices->add(
@@ -334,8 +332,7 @@ class WPGH_Contacts_Page
 
                 foreach ($this->get_contacts() as $id) {
                     $contact = new WPGH_Contact($id);
-                    $args = array('optin_status' => WPGH_UNCONFIRMED);
-                    $contact->update($args);
+                    $contact->change_marketing_preference( WPGH_UNCONFIRMED );
                 }
 
                 $this->notices->add(
@@ -528,7 +525,7 @@ class WPGH_Contacts_Page
                 if (!WPGH()->contacts->exists($email)) {
                     $args['email'] = $email;
                     //update new optin status to unconfirmed
-                    $args['optin_status'] = WPGH_UNCONFIRMED;
+                    $contact->change_marketing_preference( WPGH_UNCONFIRMED );
                     $this->notices->add('optin_status_updated', sprintf(_x('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', 'notice', $email), 'groundhogg'), 'error');
                 } else {
                     $this->notices->add('email_exists', sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email), 'error');
@@ -550,6 +547,10 @@ class WPGH_Contacts_Page
 
         if (isset($_POST['user'])) {
             $args['user_id'] = intval($_POST['user']);
+        }
+
+        if ( isset( $_POST[ 'unlink_user' ]) ){
+            $args['user_id'] = null;
         }
 
         $args = array_map('stripslashes', $args);

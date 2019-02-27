@@ -141,18 +141,24 @@ class WPGH_HTML
             'class' => 'regular-text',
             'value' => '',
             'attributes' => '',
-            'placeholder' => ''
+            'placeholder' => '',
+            'required' => false
         ) );
 
+        if ( $a[ 'required' ] ){
+            $a[ 'required' ] = 'required';
+        }
+
         $html = sprintf(
-            "<input type='%s' id='%s' class='%s' name='%s' value='%s' placeholder='%s' %s>",
+            "<input type='%s' id='%s' class='%s' name='%s' value='%s' placeholder='%s' %s %s>",
             esc_attr( $a[ 'type'    ] ),
             esc_attr( $a[ 'id'      ] ),
             esc_attr( $a[ 'class'   ] ),
             esc_attr( $a[ 'name'    ] ),
             esc_attr( $a[ 'value'   ] ),
             esc_attr( $a[ 'placeholder' ] ),
-            $a[ 'attributes'  ]
+            $a[ 'attributes'  ],
+            $a[ 'required'  ]
         );
 
         return apply_filters( 'wpgh_html_input', $html, $args );

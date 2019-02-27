@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 
 ?>
-<!-- START CONTENT -->
-<?php echo apply_filters( 'wpgh_email_get_content', '' ); ?>
-<!-- END CONTENT -->
+<div class="body-content" style="text-align: left;">
+    <!-- START CONTENT -->
+    <?php echo apply_filters( 'wpgh_email_get_content', '' ); ?>
+    <!-- END CONTENT -->
+</div>

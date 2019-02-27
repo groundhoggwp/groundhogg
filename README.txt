@@ -107,6 +107,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.1.5 =
+* ADDED Gravatar image to contact profile.
+* ADDED Ability to unlink contact records from user accounts.
+* TWEAKED removed 5 second check preventing emails sent in succession, no longer needed.
+* FIXED Email content centered if not explicitly given left align
+
 = 1.1.4 =
 * ADDED Search form to welcome page for docs help
 * ADDED Distinct helper methods to Funnel Parent Class

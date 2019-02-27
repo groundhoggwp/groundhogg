@@ -68,6 +68,11 @@ class WPGH_Admin_Menu
     var $dashboard;
 
     /**
+     * @var WPGH_Guided_Setup
+     */
+    var $guided_setup;
+
+    /**
      * Register the pages...
      *
      * WPGH_Admin_Menu constructor.
@@ -85,6 +90,7 @@ class WPGH_Admin_Menu
         $this->emails_page      = new WPGH_Emails_Page();
         $this->funnels_page     = new WPGH_Funnels_Page();
         $this->events_page      = new WPGH_Events_Page();
+        $this->guided_setup     = new WPGH_Guided_Setup();
 
         /**
          * Add multisite compat
@@ -108,6 +114,7 @@ class WPGH_Admin_Menu
         require_once dirname( __FILE__ ). '/admin/superlinks/class-wpgh-superlinks-page.php';
         require_once dirname( __FILE__ ). '/admin/tags/class-wpgh-tags-page.php';
         require_once dirname( __FILE__ ). '/admin/welcome/class-wpgh-welcome-page.php';
+        require_once dirname( __FILE__ ). '/admin/guided-setup/class-wpgh-guided-setup.php';
     }
 
     public function current_page()

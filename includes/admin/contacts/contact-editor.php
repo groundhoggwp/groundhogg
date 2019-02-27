@@ -104,11 +104,14 @@ add_action( 'wpgh_contact_record_tab_general', 'wpgh_contact_record_general_info
 function wpgh_contact_record_general_info( $contact )
 {
     ?>
-
     <!-- GENERAL NAME INFO -->
-    <h2><?php _e('Name' ) ?></h2>
     <table class="form-table">
         <tbody>
+        <tr>
+            <th><h2><?php _e('Name' ) ?></h2></th>
+            <td><?php echo get_avatar( $contact->email ); ?>
+            </td>
+        </tr>
         <tr>
             <th><label for="first_name"><?php echo _x( 'First Name', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
@@ -131,8 +134,12 @@ function wpgh_contact_record_general_info( $contact )
         <?php if (isset($contact->user->user_login)): ?>
 
             <tr>
-                <th><label for="username"><?php echo __('Username') ?></label></th>
-                <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->user->ID), $contact->user->user_login); ?></td>
+                <th><label for="username"><?php _e('Username') ?></label></th>
+                <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->user->ID), $contact->user->user_login); ?>
+                <span class="row-actions">
+                    <?php submit_button( _x( 'Unlink', 'action', 'groundhogg'), 'secondary', 'unlink_user', false ); ?>
+                </span>
+                </td>
             </tr>
 
         <?php endif; ?>
