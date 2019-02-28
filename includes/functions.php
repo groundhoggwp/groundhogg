@@ -627,6 +627,19 @@ function wpgh_update_option( $key, $value ){
 }
 
 /**
+ * delete option wrapper
+ *
+ * @return mixed
+ */
+function wpgh_delete_option( $key ){
+	if ( wpgh_is_global_multisite() ){
+		return delete_blog_option( get_network()->site_id, $key );
+	} else {
+		return delete_option( $key );
+	}
+}
+
+/**
  * get_transient wrapper
  *
  * @param $key
