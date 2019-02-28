@@ -14,6 +14,11 @@ class Groundhogg_Service_Manager
      */
     const ENDPOINT = 'https://www.groundhogg.io/wp-json/gh/aws/v1/domain';
 
+    /**
+     * Maximum length for
+     */
+    const MAX_LENGTH = 280;
+
     public function __construct()
     {
         $should_listen = get_transient( 'gh_listen_for_connect' );
@@ -71,14 +76,14 @@ class Groundhogg_Service_Manager
         $response = wp_remote_post( self::ENDPOINT, array( 'body' => $post ) );
 
         if ( is_wp_error( $response ) ){
-            WPGH()->notices->add( $response->get_error_code(), $response->get_error_message(), 'error' );
+            WPGH()->notices->add( $response );
             return;
         }
 
         $json = json_decode( wp_remote_retrieve_body( $response ) );
 
         if ( $this->is_json_error( $json ) ){
-            WPGH()->notices->add( $this->is_json_error( $json ) );
+            WPGH()->notices->add( $this->get_json_error( $json ) );
             return;
         }
 
@@ -113,8 +118,24 @@ class Groundhogg_Service_Manager
 
     }
 
+    /**
+     * If the JSON is your typical error response
+     *
+     * @param $json
+     * @return bool
+     */
     public function is_json_error( $json ){
-        if ( isset( $json->code ) && isset( $json->message ) & isset( $json->data ) ){
+        return isset( $json->code ) && isset( $json->message ) && isset( $json->data );
+    }
+
+    /**
+     * Convert JSON to a WP_Error
+     *
+     * @param $json
+     * @return bool|WP_Error
+     */
+    public function get_json_error( $json ){
+        if ( $this->is_json_error( $json ) ){
             return new WP_Error( $json->code, $json->message, $json->data );
         }
 
@@ -235,5 +256,73 @@ class Groundhogg_Service_Manager
 
     }
 
+    /**
+     * Send SMS message via Groundhogg service
+     *
+     * @param $contact WPGH_Contact
+     * @param $message string the message to send
+     *
+     * @return bool|WP_Error
+     */
+    public function send_sms( $contact, $message )
+    {
+
+        if ( ! wpgh_get_option( 'gh_email_token', false ) ){
+            return new WP_Error( 'NO_TOKEN', __( 'You require a Groundhogg Sending Service account before you can send SMS.', 'groundhogg' ) );
+        }
+
+        if ( $contact->is_marketable() ){
+            return new WP_Error( 'UNMARKETABLE', __( 'This contact is currently unmarketable.', 'groundhogg' ) );
+        }
+
+        //send to groundhogg
+        $phone = $contact->get_meta( 'primary_phone' );
+        if ( ! $phone ){
+            return new WP_Error( 'NO_PHONE', __( 'This contact has no phone.', 'groundhogg' ) );
+        }
+
+        $ip = $contact->get_meta( 'ip_address' );
+        if ( ! $ip ){
+            return new WP_Error( 'NO_IP', __( 'An IP address is required to determine the country code.', 'groundhogg' ) );
+        }
+
+        if ( strlen( $message > self::MAX_LENGTH ) ){
+            $message = substr( $message, 0, self::MAX_LENGTH );
+        }
+
+        $message = sanitize_textarea_field( $message );
+        $domain = parse_url( site_url(), PHP_URL_HOST );
+        $data = array(
+            'token' => md5( wpgh_get_option( 'gh_email_token' ) ),
+            'message' => WPGH()->replacements->process( $message, $contact->ID ),
+            'sender' => wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ),
+            'domain' => $domain,
+            'number' => $phone,
+            'ip' => $ip
+        );
+
+        $url = 'https://www.groundhogg.io/wp-json/gh/aws/v1/send-sms/';
+
+        $request    = wp_remote_post( $url, array( 'body' => $data ) );
+        $result     = wp_remote_retrieve_body( $request );
+        $result     = json_decode( $result );
+
+        if ( $this->is_json_error( $result ) ){
+            $error = $this->get_json_error( $result );
+            do_action( 'wpgh_sms_failed', $error );
+            return $error;
+        }
+
+        if ( ! isset( $result->status ) || $result->status !== 'success' ){
+            /* mail failed */
+            $error = new WP_Error( $result->code, $result->message );
+            $contact->add_note( $result->message );
+            do_action( 'wpgh_sms_failed', $error );
+            return $error;
+        }
+
+        return true;
+
+    }
 
 }

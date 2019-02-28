@@ -177,7 +177,7 @@ class WPGH_Settings_Page
             ),
             'service' => array(
                 'id'    => 'service',
-                'title' => _x( 'Groundhogg Email Service', 'settings_sections', 'groundhogg' ),
+                'title' => _x( 'Groundhogg Sending Service (Email & SMS)', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email'
             ),
             'api_settings' => array(
@@ -573,7 +573,7 @@ class WPGH_Settings_Page
             'gh_email_token' => array(
                 'id'        => 'gh_email_token',
                 'section'   => 'service',
-                'label'     => _x( 'Email Service Token', 'settings', 'groundhogg' ),
+                'label'     => _x( 'Email & SMS Service Token', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'Get this key from your <a target="_blank" href="https://www.groundhogg.io/account/manage/">Groundhogg Account Page.</a>', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts' => array(
@@ -586,7 +586,7 @@ class WPGH_Settings_Page
                 'id'        => 'gh_send_with_gh_api',
                 'section'   => 'service',
                 'label'     => _x( 'Send Email With Groundhogg', 'settings', 'groundhogg' ),
-                'desc'      => _x( 'Choose to send email with API.', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Send email using the Groundhogg Sending Service! This will only be used by emails sent with Groundhogg and not other WP emails. You will still be able to send SMS if this is disabled.', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),

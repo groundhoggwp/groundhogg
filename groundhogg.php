@@ -67,6 +67,11 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $broadcasts;
 
         /**
+         * @var WPGH_DB_SMS
+         */
+        public $sms;
+
+        /**
          * GH Emails DB
          *
          * @var object|WPGH_DB_Emails
@@ -268,6 +273,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->email_meta   = new WPGH_DB_Email_Meta();
 
                 self::$instance->broadcasts   = new WPGH_DB_Broadcasts();
+                self::$instance->sms          = new WPGH_DB_SMS();
 
                 self::$instance->activity     = new WPGH_DB_Activity();
                 self::$instance->events       = new WPGH_DB_Events();
@@ -430,6 +436,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-contacts.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-emailmeta.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-emails.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-sms.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-events.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-funnels.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-stepmeta.php';

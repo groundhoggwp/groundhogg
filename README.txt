@@ -111,6 +111,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED Gravatar image to contact profile.
 * ADDED Ability to unlink contact records from user accounts.
 * ADDED Guided Setup UI for new installations.
+* TWEAKED Max default text length increased to 280 characters.
 * TWEAKED removed 5 second check preventing emails sent in succession, no longer needed.
 * FIXED Email content centered if not explicitly given left align
 
