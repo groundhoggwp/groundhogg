@@ -106,8 +106,11 @@ abstract class WPGH_Guided_Setup_Step
     )); ?>
         <div class="wrap">
             <div style="max-width: 800px;margin: auto;">
-                <div class="big-header" style="text-align: center;margin: 2.5em;">
-                    <h1 style="font-size: 40px;"><b><?php echo $this->get_title(); ?></b></h1>
+                <div class="big-header" style="text-align: center;margin: 1.5em;">
+                    <span style="font-size: 40px;line-height: 1.2em;"><b><?php echo $this->get_title(); ?></b></span>
+                </div>
+                <div id="notices">
+                    <?php WPGH()->notices->notices(); ?>
                 </div>
                 <div class="">
                     <div class="postbox">

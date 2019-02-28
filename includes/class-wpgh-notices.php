@@ -21,17 +21,24 @@ class WPGH_Notices
     /**
      * Add a notice
      *
-     * @param $code string ID of the notice
+     * @param $code string|WP_Error ID of the notice
      * @param $message string message
      * @param string $type
      */
-    public function add( $code, $message, $type='success' )
+    public function add( $code='', $message='', $type='success' )
     {
         $notices = get_transient( self::TRANSIENT );
 
         if ( ! $notices || ! is_array( $notices ) )
         {
             $notices = array();
+        }
+
+        if ( is_wp_error( $code ) ){
+            $error = $code;
+            $code = $error->get_error_code();
+            $message = $error->get_error_message();
+            $type = 'error';
         }
 
         $notices[$code][ 'code' ]    = $code;

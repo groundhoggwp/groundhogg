@@ -98,7 +98,7 @@ class WPGH_Guided_Setup_Step_3 extends WPGH_Guided_Setup_Step
     {
         if ( isset( $_POST[ 'gh_active_email' ] ) ){
 	        $redirect_to = sprintf( 'https://www.groundhogg.io/wp-login.php?doing_oauth=true&redirect_to=%s', urlencode( admin_url( 'admin.php?page=gh_guided_setup&action=connect_to_gh&step=' . $this->get_current_step_id() ) ) );
-	        set_transient( 'gh_listen_for_connect', true, HOUR_IN_SECONDS );
+	        set_transient( 'gh_listen_for_connect', 1, HOUR_IN_SECONDS );
 	        wp_redirect( $redirect_to );
 	        die();
         }

@@ -230,6 +230,13 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $stats;
 
         /**
+         * Manager to handle API requests to Groundhogg email & SMS Service.
+         *
+         * @var Groundhogg_Service_Manager
+         */
+        public $service_manager;
+
+        /**
          * Returns the instance on Groundhogg.
          *
          * @return Groundhogg
@@ -287,6 +294,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
                 self::$instance->elements     = new WPGH_Elements();
                 self::$instance->iframe_listener = new WPGH_Form_Iframe();
+                self::$instance->service_manager = new Groundhogg_Service_Manager();
 
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
@@ -470,6 +478,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-popup.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-form-iframe.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-stats-collection.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-groundhogg-service-manager.php';
             require_once WPGH_PLUGIN_DIR . 'includes/functions.php';
             require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';

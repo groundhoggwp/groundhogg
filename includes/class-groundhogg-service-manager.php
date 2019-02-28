@@ -9,11 +9,16 @@
 class Groundhogg_Service_Manager
 {
 
+    /**
+     * API endpoint for Email & SMS service domain verification
+     */
+    const ENDPOINT = 'https://www.groundhogg.io/wp-json/gh/aws/v1/domain';
+
     public function __construct()
     {
         $should_listen = get_transient( 'gh_listen_for_connect' );
         if ( $should_listen && is_admin() ){
-        	add_action( 'admin_init', array( $this, 'connect_email_api' ) );
+        	add_action( 'init', array( $this, 'connect_email_api' ) );
         }
 
         $should_verify = wpgh_is_option_enabled( 'gh_email_api_check_verify_status' );
@@ -54,21 +59,28 @@ class Groundhogg_Service_Manager
         $gh_uid = intval( $_GET[ 'user_id' ] );
 
         $post = [
-            'domain'    => str_replace( 'www.', '', parse_url( site_url(), PHP_URL_HOST ) ),
+            'domain'    => site_url(),
             'user_id'   => $gh_uid,
             'token'     => $token
         ];
 
-        $response = wp_remote_post( 'https://www.groundhogg.io/wp-json/', array( 'body' => $post ) );
+        $response = wp_remote_post( self::ENDPOINT, array( 'body' => $post ) );
 
         if ( is_wp_error( $response ) ){
+            WPGH()->notices->add( $response->get_error_code(), $response->get_error_message(), 'error' );
             return;
         }
 
         $json = json_decode( wp_remote_retrieve_body( $response ) );
 
+        if ( $this->is_json_error( $json ) ){
+            WPGH()->notices->add( $this->is_json_error( $json ) );
+            return;
+        }
+
         //todo check if is correct params
         if ( ! isset( $json->dns_records ) ){
+            WPGH()->notices->add( 'NO_DNS', 'Could not retrieve DNS records.', 'error' );
             return;
         }
 
@@ -96,6 +108,14 @@ class Groundhogg_Service_Manager
 
     }
 
+    public function is_json_error( $json ){
+        if ( isset( $json->code ) && isset( $json->message ) & isset( $json->data ) ){
+            return new WP_Error( $json->code, $json->message, $json->data );
+        }
+
+        return false;
+    }
+
     /**
      * Send a request to Groundhogg.io to verify this domains status
      * Request provides domain status, and if verified an email token to use for sending
@@ -106,12 +126,12 @@ class Groundhogg_Service_Manager
         $gh_uid = wpgh_get_option( 'gh_email_api_user_id' );
 
         $post = [
-            'domain'    => str_replace( 'www.', '', parse_url( site_url(), PHP_URL_HOST ) ),
+            'domain'    => site_url(),
             'user_id'   => $gh_uid,
             'token'     => $token
         ];
 
-        $response = wp_remote_post( 'https://www.groundhogg.io/wp-json/', array( 'body' => $post ) );
+        $response = wp_remote_post( self::ENDPOINT, array( 'body' => $post ) );
 
         if ( is_wp_error( $response ) ){
             return;
@@ -120,8 +140,8 @@ class Groundhogg_Service_Manager
         $json = json_decode( wp_remote_retrieve_body( $response ) );
 
         /* If we got the token, set it and auto enable */
-        if ( isset( $json->TOKEN ) ){
-        	wpgh_update_option( 'gh_email_token', sanitize_text_field( $json->TOKEN ) );
+        if ( isset( $json->token ) ){
+        	wpgh_update_option( 'gh_email_token', sanitize_text_field( $json->token ) );
         	wpgh_update_option( 'gh_send_with_gh_api', [ 'on' ] );
 
         	/* Domain is verified, no longer need to check verification */
