@@ -17,6 +17,11 @@ abstract class WPGH_Guided_Setup_Step
     }
 
     /**
+     * Allow overwriting of dependencies.
+     */
+    public function load_dependencies(){}
+
+    /**
      * @return string
      */
     abstract public function get_title();

@@ -42,6 +42,7 @@ class WPGH_Guided_Setup
             $this->notices = WPGH()->notices;
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
             add_action( 'init', array( $this, 'register_steps' ) );
+            add_action( 'admin_init', array( $this, 'load_dependencies' ) );
         }
     }
 
@@ -64,22 +65,34 @@ class WPGH_Guided_Setup
 
     }
 
+    /**
+     * Load dependencies for current step
+     */
+    public function load_dependencies()
+    {
+        if ( $this->get_current_step_id() ){
+            $this->get_current_step()->load_dependencies();
+        }
+    }
+
     public function register_steps()
     {
 
         include_once dirname( __FILE__ ) . '/class-wpgh-guided-setup-step.php' ;
-        include_once dirname( __FILE__ ) . '/steps/class-wpgh-guided-setup-step-1.php' ;
-        include_once dirname( __FILE__ ) . '/steps/class-wpgh-guided-setup-step-2.php' ;
-        include_once dirname( __FILE__ ) . '/steps/class-wpgh-guided-setup-step-3.php' ;
-        include_once dirname( __FILE__ ) . '/steps/class-wpgh-guided-setup-step-4.php' ;
-        include_once dirname( __FILE__ ) . '/steps/class-wpgh-guided-setup-step-5.php' ;
+        include_once dirname(__FILE__) . '/steps/class-wpgh-guided-setup-step-business.php';
+        include_once dirname(__FILE__) . '/steps/class-wpgh-guided-setup-step-compliance.php';
+        include_once dirname(__FILE__) . '/steps/class-wpgh-guided-setup-step-email.php';
+        include_once dirname(__FILE__) . '/steps/class-wpgh-guided-setup-step-import.php';
+        include_once dirname( __FILE__ ) . '/steps/class-wpgh-guided-setup-step-other.php' ;
+        include_once dirname(__FILE__) . '/steps/class-wpgh-guided-setup-step-finished.php';
 
         $this->steps = [
-            new WPGH_Guided_Setup_Step_1(),
-            new WPGH_Guided_Setup_Step_2(),
-            new WPGH_Guided_Setup_Step_3(),
-            new WPGH_Guided_Setup_Step_4(),
-            new WPGH_Guided_Setup_Step_5(),
+            new WPGH_Guided_Setup_Step_Business(),
+            new WPGH_Guided_Setup_Step_Compliance(),
+            new WPGH_Guided_Setup_Step_Email(),
+            new WPGH_Guided_Setup_Step_Import(),
+            new WPGH_Guided_Setup_Step_Other(),
+            new WPGH_Guided_Setup_Step_Finished(),
         ];
 
     }

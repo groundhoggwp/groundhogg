@@ -6,7 +6,7 @@
  * Time: 11:03 AM
  */
 
-class WPGH_Guided_Setup_Step_1 extends WPGH_Guided_Setup_Step
+class WPGH_Guided_Setup_Step_Business extends WPGH_Guided_Setup_Step
 {
 
     public function get_title()

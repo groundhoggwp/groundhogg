@@ -299,9 +299,9 @@ class WPGH_Bulk_Contact_Manager
             return false;
         }
 
-        if ( isset( $args['owner'] ) ){
-            $data[ 'owner_id' ] = intval( $args['owner'] );
-            unset( $args[ 'owner' ] );
+        if ( isset( $args['owner_id'] ) ){
+            $data[ 'owner_id' ] = intval( $args['owner_id'] );
+            unset( $args[ 'owner_id' ] );
         }
 
         if ( $this->db->exists( $data[ 'email' ] ) ){
