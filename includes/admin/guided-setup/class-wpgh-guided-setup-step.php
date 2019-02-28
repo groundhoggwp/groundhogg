@@ -138,6 +138,11 @@ abstract class WPGH_Guided_Setup_Step
                             </p>
                         </div>
                     </div>
+                    <?php if ( ! $this->is_last_step() ) :?>
+                    <div class="big-header" style="text-align: center;margin: 1.5em;">
+                        <span style="font-size: 20px;line-height: 1.2em;"><b><?php printf( '%d/%d', $this->get_current_step_id(), WPGH()->menu->guided_setup->get_step_count() ); ?></b></span>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
