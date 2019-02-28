@@ -35,7 +35,7 @@ class WPGH_Welcome_Page
 
             add_action( 'admin_init', array( $this, 'status_check' ) );
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
-//            add_action( 'admin_footer', array( $this, 'bg_image' ) );
+            add_action( 'admin_footer', array( $this, 'bg_image' ) );
 
         }
     }

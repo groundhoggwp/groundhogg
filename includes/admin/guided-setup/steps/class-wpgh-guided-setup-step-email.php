@@ -21,7 +21,7 @@ class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
 
     public function get_description()
     {
-        return _x( 'There are lots of ways to send email with Groundhogg! Choose one below.', 'guided_setup', 'groundhogg' );
+        return _x( 'There are different ways to send email with Groundhogg! Choose one below.', 'guided_setup', 'groundhogg' );
     }
 
     public function get_settings()
@@ -33,13 +33,14 @@ class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
         ?>
         <h3><?php _e( 'Recommended' ); ?></h3>
         <div class="postbox" style="padding-right: 10px">
-            <img src="https://www.groundhogg.io/wp-content/uploads/edd/2018/11/email-credits-1024x576.png" width="150" style="float: left; margin: 10px 20px 0 10px;">
+            <img src="https://www.groundhogg.io/wp-content/uploads/edd/2018/11/email-credits-1024x576.png" width="200" style="float: left; margin: 10px 20px 10px 10px;">
             <p><?php _ex( 'You can send your emails & text messages using our Groundhogg Delivery System to get faster delivery times and improved deliverability. Get your <b>first 1000 credits free!</b>', 'guided_setup', 'groundhogg' ); ?></p>
             <p>
                 <?php submit_button( _x( 'Activate', 'guided_setup', 'groundhogg' ), 'primary', 'gh_active_email', false ); ?>
                 <a target="_blank" class="button button-secondary" href="https://www.groundhogg.io/register/"><?php _ex( 'Create Your Account', 'guided_setup', 'groundhogg' ); ?></a>
                 <a target="_blank" class="button button-secondary" href="https://www.groundhogg.io/downloads/email-credits/"><?php _ex( 'Learn more...', 'guided_setup', 'groundhogg' ); ?></a>
             </p>
+            <p class="description"><?php _ex( 'Clicking <b>Activate</b> will take you to the Groundhogg login page.', 'guided_setup', 'groundhogg' ); ?></p>
             <div class="wp-clearfix"></div>
         </div>
         <hr>

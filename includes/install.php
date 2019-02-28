@@ -200,7 +200,13 @@ function wpgh_run_install() {
 function wpgh_redirect_to_welcome( $plugin )
 {
     if( $plugin == plugin_basename( WPGH_PLUGIN_FILE ) ) {
-        exit( wp_redirect( admin_url( 'admin.php?page=groundhogg' ) ) );
+
+        if ( wpgh_is_option_enabled( 'gh_guided_setup_finished' ) ){
+            exit( wp_redirect( admin_url( 'admin.php?page=groundhogg' ) ) );
+        } else {
+            exit( wp_redirect( admin_url( 'admin.php?page=gh_guided_setup' ) ) );
+        }
+
     }
 }
 

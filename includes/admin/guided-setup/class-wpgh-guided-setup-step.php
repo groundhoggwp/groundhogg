@@ -56,6 +56,7 @@ abstract class WPGH_Guided_Setup_Step
         }
 
         if ( $this->save() ){
+            WPGH()->notices->add( 'SAVED', _x( 'Configuration saved!', 'guided_setup', 'groundhogg' ) );
             wp_redirect( sprintf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), $this->get_current_step_id() + 1 ) );
             die();
         }
@@ -115,6 +116,7 @@ abstract class WPGH_Guided_Setup_Step
                     <span style="font-size: 40px;line-height: 1.2em;"><b><?php echo $this->get_title(); ?></b></span>
                 </div>
                 <div id="notices">
+                    <h1 class="hidden">&nbsp;</h1>
                     <?php WPGH()->notices->notices(); ?>
                 </div>
                 <div class="">
@@ -129,6 +131,9 @@ abstract class WPGH_Guided_Setup_Step
                                 <?php endif; ?>
                                 <?php if ( ! $this->is_last_step() ): ?>
                                     <input type="submit" style="float: right" class="button button-primary" value="<?php _ex( 'Save & Continue &rarr;', 'guided_setup', 'groundhogg' ); ?>"/>
+                                <?php endif; ?>
+                                <?php if (  $this->is_last_step() ): ?>
+                                    <a style="float: right" class="button button-primary" href="<?php echo admin_url( 'admin.php?page=groundhogg' ); ?>"><?php _ex( 'Complete Setup!', 'guided_setup', 'groundhogg' ); ?></a>
                                 <?php endif; ?>
                             </p>
                         </div>

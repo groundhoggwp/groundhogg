@@ -50,7 +50,6 @@ class WPGH_Guided_Setup_Step_Compliance extends WPGH_Guided_Setup_Step
 
         ob_start();
         ?>
-        <h2></h2>
         <table class="form-table">
             <tr>
                 <th><?php _ex( 'Privacy Policy', 'setting_label', 'groundhogg' ); ?></th>

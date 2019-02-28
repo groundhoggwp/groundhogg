@@ -151,7 +151,11 @@ class WPGH_Guided_Setup
      */
     public function page()
     {
-        ?><div class="wrap">
+        ?>
+        <div class="wrap">
+        <?php if ( apply_filters( 'wpgh_show_phil_on_welcome_page', true ) ): ?>
+            <img style="position: fixed;bottom: -80px;right: -80px;transform: rotate(-20deg);" class="phil" src="<?php echo WPGH_ASSETS_FOLDER . 'images/phil-340x340.png'; ?>" width="340" height="340">
+        <?php endif; ?>
         <form action="" method="post">
             <?php wp_nonce_field(); ?>
         <?php
@@ -165,15 +169,19 @@ class WPGH_Guided_Setup
             ?>
             <div style="max-width: 800px;margin: auto;">
                 <div class="big-header" style="text-align: center;margin: 2.5em;">
-                    <h1 style="font-size: 40px;"><b><?php _ex( 'Guided Setup', 'guided_setup', 'groundhogg' ); ?></b></h1>
+                    <?php if ( apply_filters( 'wpgh_show_phil_on_welcome_page', true ) ): ?>
+                        <img src="https://www.groundhogg.io/wp-content/uploads/2018/08/Groundhogg_logox300.png" width="300">
+                    <?php else: ?>
+                        <h1 style="font-size: 40px;"><b><?php _ex( 'Guided Setup', 'guided_setup', 'groundhogg' ); ?></b></h1>
+                    <?php endif; ?>
                 </div>
                 <div class="">
                     <div class="postbox">
                         <div class="inside" style="padding: 0 10px 20px 30px;">
-                            <h2><?php _ex( 'Welcome to the Groundhogg Guided Setup', 'guided_setup', 'groundhogg' );?></h2>
+                            <h2><b><?php _ex( 'Welcome to the Groundhogg Guided Setup', 'guided_setup', 'groundhogg' );?></b></h2>
                             <p><?php _ex( 'Follow these steps to quickly setup groundhogg for your business. Setup usually takes around a few minutes. You can always change this information later in the settings page.', 'guided_setup', 'groundhogg' ); ?></p>
                             <p class="submit">
-                                <a class="button button-primary" href="<?php printf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), 1 ) ?>"><?php _ex( 'Get Started!', 'guided_setup', 'groundhogg' ); ?></a>
+                                <a style="float: left" class="button button-primary" href="<?php printf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), 1 ) ?>"><?php _ex( 'Get Started!', 'guided_setup', 'groundhogg' ); ?></a>
                             </p>
                         </div>
                     </div>
