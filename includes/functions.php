@@ -519,10 +519,21 @@ function wpgh_register_scripts()
 
 add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
 
+/**
+ * Add a link to the FB group in the admin footer.
+ *
+ * @param $text
+ * @return string|string[]|null
+ */
 function wpgh_add_bug_report_prompt( $text )
 {
-    return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
+    if ( apply_filters( 'groundhogg/footer/show_text', true ) ){
+        return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
+    }
+
+    return $text;
 }
+
 add_filter('admin_footer_text', 'wpgh_add_bug_report_prompt');
 
 /**
