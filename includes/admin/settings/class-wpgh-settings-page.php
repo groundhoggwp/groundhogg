@@ -756,11 +756,13 @@ class WPGH_Settings_Page
 
                     settings_fields( 'gh_' . $this->active_tab() );
                     do_settings_sections( 'gh_' . $this->active_tab() );
+                    do_action( "groundhogg/settings/{$this->active_tab()}/after_settings" );
                     submit_button();
 
                 }
 
                 do_action( 'gh_tab_' . $this->active_tab() );
+                do_action( "groundhogg/settings/{$this->active_tab()}/after_submit" );
                 ?>
                 <!-- END SETTINGS -->
             </form>

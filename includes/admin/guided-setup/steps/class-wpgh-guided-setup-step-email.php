@@ -29,7 +29,7 @@ class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
         ob_start();
 
         /* Will check to see if they've gone through the process */
-        if ( ! wpgh_is_option_enabled( 'gh_email_api_dns_records' ) ):
+        if ( ! wpgh_get_option( 'gh_email_api_dns_records', false ) ):
         ?>
         <h3><?php _e( 'Recommended' ); ?></h3>
         <div class="postbox" style="padding-right: 10px">
@@ -65,36 +65,9 @@ class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
 
         /* They have */
         else:
-        ?>
-        <p><?php _ex( 'Your Groundhogg account has been enabled to send emails & text messages! To finish this configuration, please add the following DNS records to your DNS zone.', 'guided_setup', 'groundhogg' ); ?></p>
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
-            <tr>
-                <th><?php _ex( 'Name', 'column_label' , 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Type', 'column_label' , 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Value', 'column_label', 'groundhogg'  ); ?></th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php
-            $records = wpgh_get_option( 'gh_email_api_dns_records' );
-            foreach ( $records as $record ): ?>
-            <tr>
-                <td><?php esc_html_e( $record[ 'name' ] ); ?></td>
-                <td><?php esc_html_e( $record[ 'type' ] ); ?></td>
-                <td><?php esc_html_e( $record[ 'value' ] ); ?></td>
-            </tr>
-            <?php endforeach;?>
-            </tbody>
-            <tfoot>
-            <tr>
-                <th><?php _ex( 'Name', 'column_label' , 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Type', 'column_label' , 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Value', 'column_label', 'groundhogg'  ); ?></th>
-            </tr>
-            </tfoot>
-        </table>
-        <?php
+
+            WPGH()->service_manager->get_dns_table();
+
         endif;
 
         return ob_get_clean();
