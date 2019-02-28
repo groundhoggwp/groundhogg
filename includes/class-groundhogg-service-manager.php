@@ -144,6 +144,10 @@ class Groundhogg_Service_Manager
 
         $json = json_decode( wp_remote_retrieve_body( $response ) );
 
+        if ( $this->is_json_error($json)){
+            return;
+        }
+
         /* If we got the token, set it and auto enable */
         if ( isset( $json->token ) ){
         	wpgh_update_option( 'gh_email_token', sanitize_text_field( $json->token ) );
