@@ -813,13 +813,11 @@ class WPGH_Email
         //send to groundhogg
 
         $sender = $this->get_from_email();
-        $domain = explode( '@', $sender );
-        $domain = $domain[1];
 
         $data = array(
 
             'token'     => md5( wpgh_get_option( 'gh_email_token' ) ),
-            'domain'    => $domain,
+            'domain'    => site_url(),
             'sender'    => $sender,
             'from'      => $this->get_from_name(),
             'recipient' => $to,

@@ -299,7 +299,7 @@ class WPGH_Contact
 
         $note = sanitize_textarea_field( $note );
 
-        $current_notes = $this->notes;
+        $current_notes = $this->get_meta( 'notes' );
 
         $new_notes = sprintf( "===== %s =====\n\n", date_i18n( wpgh_get_option( 'date_format' ) ) );
         $new_notes .= sprintf( "%s\n\n", $note );
