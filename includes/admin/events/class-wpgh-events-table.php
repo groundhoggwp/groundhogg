@@ -36,21 +36,23 @@ class WPGH_Events_Table extends WP_List_Table {
             'ajax'     => false,       // Does this table support ajax?
         ) );
     }
+
     /**
      * @see WP_List_Table::::single_row_columns()
      * @return array An associative array containing column information.
      */
     public function get_columns() {
         $columns = array(
-            'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
-            'contact'    => _x( 'Contact', 'Column label', 'wp-funnels' ),
-            'funnel'   => _x( 'Funnel', 'Column label', 'wp-funnels' ),
-            'step' => _x( 'Step', 'Column label', 'wp-funnels' ),
-            'time' => _x( 'Time', 'Column label', 'wp-funnels' ),
+            'cb'        => '<input type="checkbox" />', // Render a checkbox instead of text.
+            'contact'   => _x( 'Contact', 'Column label', 'wp-funnels' ),
+            'funnel'    => _x( 'Funnel', 'Column label', 'wp-funnels' ),
+            'step'      => _x( 'Step', 'Column label', 'wp-funnels' ),
+            'time'      => _x( 'Time', 'Column label', 'wp-funnels' ),
         );
 
         return apply_filters( 'wpgh_event_columns', $columns );
     }
+
     /**
      * Get a list of sortable columns. The format is:
      * 'internal-name' => 'orderby'
@@ -62,10 +64,10 @@ class WPGH_Events_Table extends WP_List_Table {
      */
     protected function get_sortable_columns() {
         $sortable_columns = array(
-            'contact' => array( 'contact_id', false ),
-            'funnel' => array( 'funnel_id', false ),
-            'step' => array( 'step_id', false ),
-            'time' => array( 'time', false ),
+            'contact'   => array( 'contact_id', false ),
+            'funnel'    => array( 'funnel_id', false ),
+            'step'      => array( 'step_id', false ),
+            'time'      => array( 'time', false ),
         );
         return apply_filters( 'wpgh_event_sortable_columns', $sortable_columns );
     }
@@ -102,19 +104,42 @@ class WPGH_Events_Table extends WP_List_Table {
      */
     protected function column_funnel( $event )
     {
-        $funnel_id = intval( $event->funnel_id );
+        if ($event->type) {
+            switch ($event->type) {
+                default:
+                case WPGH_FUNNEL_EVENT:
+                    $funnel = WPGH()->funnels->get( $event->funnel_id );
+                    $title = ( $funnel )? $funnel->title : sprintf( '(%s)', _x( 'funnel deleted', 'status', 'groundhogg' ) ) ;
+                    $view = sprintf( "view=funnel&funnel=%d", $event->funnel_id );
+                    break;
+                case WPGH_BROADCAST_EVENT:
+                    $title =  __( 'Broadcast Email', 'groundhogg' );
+                    $view = sprintf( "view=type&type=%d", WPGH_BROADCAST_EVENT );
+                    break;
+                case WPGH_EMAIL_NOTIFICATION_EVENT:
+                    $title =  __( 'Email Notification', 'groundhogg' );
+                    $view = sprintf( "view=type&type=%d", WPGH_EMAIL_NOTIFICATION_EVENT );
+                    break;
+                case WPGH_SMS_NOTIFICATION_EVENT:
+                    $title =  __( 'SMS Notification', 'groundhogg' );
+                    $view = sprintf( "view=type&type=%d", WPGH_SMS_NOTIFICATION_EVENT );
+                    break;
 
-        if ( $event->is_broadcast_event() ) {
-            $funnel_title = __( 'Broadcast Email', 'groundhogg' );
+            }
         } else {
-            $funnel = WPGH()->funnels->get( $funnel_id );
-            $funnel_title = ( $funnel )? $funnel->title : sprintf( '(%s)', _x( 'funnel deleted', 'status', 'groundhogg' ) ) ;
+            if ($event->is_broadcast_event()) {
+                $title =  __( 'Broadcast Email', 'groundhogg' );
+                $view = sprintf( "view=type&type=%d", WPGH_BROADCAST_EVENT );
+            } else {
+                $funnel = WPGH()->funnels->get( $event->funnel_id );
+                $title = ( $funnel )? $funnel->title : sprintf( '(%s)', _x( 'funnel deleted', 'status', 'groundhogg' ) ) ;
+                $view = sprintf( "view=funnel&funnel=%d", $event->funnel_id );
+            }
         }
 
         return sprintf( "<a href='%s'>%s</a>",
-            admin_url( 'admin.php?page=gh_events&view=funnel&funnel=' . $event->funnel_id ),
-            $funnel_title);
-    }
+            sprintf( admin_url( 'admin.php?page=gh_events&%s' ) , $view ),
+            $title );    }
 
     /**
      * @param $event WPGH_Event
@@ -140,18 +165,6 @@ class WPGH_Events_Table extends WP_List_Table {
             admin_url( 'admin.php?page=gh_events&view=step&step=' . $event->step->ID ),
             $step_title );
 
-    }
-
-    protected function extra_tablenav($which)
-    {
-        $next_run_in = wp_next_scheduled( 'wpgh_process_queue' );
-        $next_run_in = human_time_diff( time(), $next_run_in );
-
-        ?>
-        <div class="alignleft gh-actions">
-            <a class="button action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php printf( _x( 'Process Events (Auto Runs In %s)', 'action', 'groundhogg' ), $next_run_in ); ?></a>
-        </div>
-        <?php
     }
 
     /**
@@ -187,7 +200,7 @@ class WPGH_Events_Table extends WP_List_Table {
                 break;
         }
 
-        if ( $time_diff < 0 ){
+        if ( $time_diff < 0 && $status !== 'waiting' ){
             /* The event has passed */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
                 $time = date_i18n( 'Y/m/d \@ h:i A', intval( $p_time ) );
@@ -204,6 +217,18 @@ class WPGH_Events_Table extends WP_List_Table {
         }
 
         return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+    }
+
+    protected function extra_tablenav($which)
+    {
+        $next_run_in = wp_next_scheduled( 'wpgh_process_queue' );
+        $next_run_in = human_time_diff( time(), $next_run_in );
+
+        ?>
+        <div class="alignleft gh-actions">
+            <a class="button action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php printf( _x( 'Process Events (Auto Runs In %s)', 'action', 'groundhogg' ), $next_run_in ); ?></a>
+        </div>
+        <?php
     }
 
     /**
@@ -325,6 +350,13 @@ class WPGH_Events_Table extends WP_List_Table {
                     ));
 		        }
 		        break;
+            case 'type':
+                if ( isset( $_REQUEST['type'] ) ){
+                    $data = WPGH()->events->get_events( array(
+                        'type' => $_REQUEST[ 'type' ]
+                    ));
+                }
+                break;
             default:
                 $data = WPGH()->events->get_events();
                 break;

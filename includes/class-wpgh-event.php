@@ -26,7 +26,7 @@ class WPGH_Event
     /**
      * The associated step
      *
-     * @var object|WPGH_Step|WPGH_Broadcast
+     * @var object|WPGH_Step|WPGH_Broadcast|WPGH_Email_Notification
      */
     public $step;
 
@@ -59,20 +59,27 @@ class WPGH_Event
     public $status;
 
     /**
+     * The type of event
+     *
+     * @var int|bool
+     */
+    public $type = false;
+
+    /**
      * @param $id int ID of the event
      */
-    public function __construct( $id )
+    public function __construct($id)
     {
 
-        $this->ID = intval( $id );
+        $this->ID = intval($id);
 
-        $event = WPGH()->events->get( $this->ID );
+        $event = WPGH()->events->get($this->ID);
 
-        if ( ! is_object( $event ) ) {
+        if (!is_object($event)) {
             return false;
         }
 
-        $this->setup_event( $event );
+        $this->setup_event($event);
 
     }
 
@@ -81,41 +88,87 @@ class WPGH_Event
      *
      * @param $event
      */
-    private function setup_event( $event )
+    private function setup_event($event)
     {
 
-        $this->time = intval( $event->time );
+        $this->time = intval($event->time);
         $this->status = $event->status;
+
+        if ($event->type) {
+            $this->type = intval($event->type);
+        }
 
         //do I NEED the funnel accessible as an object?
         /* No, no I don't */
-        $this->funnel_id = intval( $event->funnel_id );
+        $this->funnel_id = intval($event->funnel_id);
 
         //definitely need this...
-        $this->contact = new WPGH_Contact( $event->contact_id );
+        $this->contact = new WPGH_Contact($event->contact_id);
 
-        if ( $this->is_broadcast_event() ){
+        /**
+         * Check for an event type if POST 1.2
+         *
+         * @since 1.2
+         */
+        if ($this->type) {
+            switch ($this->type) {
+                default:
+                case WPGH_FUNNEL_EVENT:
+                    $this->step = new WPGH_Step($event->step_id);
+                    break;
+                case WPGH_BROADCAST_EVENT:
+                    $this->step = new WPGH_Broadcast($event->step_id);
+                    break;
+                case WPGH_EMAIL_NOTIFICATION_EVENT:
+                    $this->step = new WPGH_Email_Notification($event->step_id);
+                    break;
+                case WPGH_SMS_NOTIFICATION_EVENT:
+                    $this->step = null;
+                    break;
 
-            /* Special handling for the broadcast event type */
-            $this->step = new WPGH_Broadcast( $event->step_id );
-
+            }
         } else {
+            if ($this->is_broadcast_event()) {
 
-            /*regular step event handling */
-            $this->step = new WPGH_Step( $event->step_id );
+                /* Special handling for the broadcast event type */
+                $this->step = new WPGH_Broadcast($event->step_id);
 
+            } else {
+
+                /*regular step event handling */
+                $this->step = new WPGH_Step($event->step_id);
+
+            }
         }
 
     }
 
     /**
+     * Get the type of event
+     *
+     * @since 1.2
+     * @return int the type opf event.
+     */
+    public function get_event_type()
+    {
+        if ($this->type) {
+            return $this->type;
+        }
+
+        if ($this->is_broadcast_event()) {
+            return WPGH_BROADCAST_EVENT;
+        }
+
+        return WPGH_FUNNEL_EVENT;
+    }
+
+    /**
      * Return whether the event is a broadcast event
+     * @return bool
      */
     public function is_broadcast_event()
     {
-
         return $this->funnel_id === WPGH_BROADCAST;
-
     }
 
     /**
@@ -126,17 +179,17 @@ class WPGH_Event
     public function run()
     {
 
-        if ( ! $this->is_waiting() || $this->has_run() || $this->has_similar() || ! $this->is_time() || ! $this->step->can_run()  )
+        if (!$this->is_waiting() || $this->has_run() || $this->has_similar() || !$this->is_time() || !$this->step->can_run())
             return false;
 
-        do_action( 'wpgh_event_run_before', $this );
+        do_action('wpgh_event_run_before', $this);
 
-        $result = $this->step->run( $this->contact, $this );
+        $result = $this->step->run($this->contact, $this);
 
-        if ( ! $result ){
+        if (!$result) {
 
             /* handle event failure */
-            do_action( 'wpgh_event_run_failed', $this );
+            do_action('wpgh_event_run_failed', $this);
 
             $this->fail();
 
@@ -148,12 +201,12 @@ class WPGH_Event
 
         }
 
-        /* special handling for the broadcast event. Make sure it's status is update to sent... */
-        if ( $this->is_broadcast_event() && $this->step->status !== 'sent' ){
-           $this->step->update( array( 'status' => 'sent' ) );
+        /* special handling for the broadcast event. Make sure it's status is updated to sent... */
+        if ($this->is_broadcast_event() && $this->step->status !== 'sent') {
+            $this->step->update(array('status' => 'sent'));
         }
 
-        do_action( 'wpgh_event_run_after', $this );
+        do_action('wpgh_event_run_after', $this);
 
         return true;
     }
@@ -165,9 +218,9 @@ class WPGH_Event
      */
     public function has_run()
     {
-        $event = WPGH()->events->get( $this->ID );
+        $event = WPGH()->events->get($this->ID);
 
-        if ( $event->status === 'complete' ){
+        if ($event->status === 'complete') {
             return true;
         }
 
@@ -181,25 +234,26 @@ class WPGH_Event
      *
      * @return bool
      */
-    public function has_similar(){
+    public function has_similar()
+    {
 
         $similar_events = WPGH()->events->get_events(
             array(
-                'start'         => $this->time - ( 5 * 60 ),
-                'end'           => $this->time + ( 5 * 60 ),
-                'funnel_id'     => $this->funnel_id,
-                'step_id'       => $this->step->ID,
-                'contact_id'    => $this->contact->ID,
-                'status'        => 'complete'
+                'start' => $this->time - (5 * 60),
+                'end' => $this->time + (5 * 60),
+                'funnel_id' => $this->funnel_id,
+                'step_id' => $this->step->ID,
+                'contact_id' => $this->contact->ID,
+                'status' => 'complete'
             )
         );
 
-        if ( $similar_events && count( $similar_events ) > 0 ){
+        if ($similar_events && count($similar_events) > 0) {
 
             //double check this event...
-            $event = WPGH()->events->get( $this->ID );
+            $event = WPGH()->events->get($this->ID);
 
-            if ( $event->status !== 'complete' ){
+            if ($event->status !== 'complete') {
                 $this->skip();
             }
 
@@ -237,9 +291,9 @@ class WPGH_Event
      */
     public function queue()
     {
-        return $this->update( array(
+        return $this->update(array(
             'status' => 'waiting'
-        ) );
+        ));
     }
 
     /**
@@ -247,16 +301,16 @@ class WPGH_Event
      */
     public function cancel()
     {
-        return $this->update( array(
+        return $this->update(array(
             'status' => 'cancelled'
-        ) );
+        ));
     }
 
     public function fail()
     {
-        return $this->update( array(
+        return $this->update(array(
             'status' => 'failed'
-        ) );
+        ));
     }
 
     /**
@@ -264,9 +318,9 @@ class WPGH_Event
      */
     public function skip()
     {
-        return $this->update( array(
+        return $this->update(array(
             'status' => 'skipped'
-        ) );
+        ));
     }
 
     /**
@@ -274,9 +328,9 @@ class WPGH_Event
      */
     public function complete()
     {
-        return $this->update( array(
+        return $this->update(array(
             'status' => 'complete',
-        ) );
+        ));
     }
 
     /**
@@ -286,11 +340,9 @@ class WPGH_Event
      *
      * @return bool
      */
-    public function update( $args )
+    public function update($args)
     {
-
-        return WPGH()->events->update( $this->ID, $args );
-
+        return WPGH()->events->update($this->ID, $args);
     }
 
 }

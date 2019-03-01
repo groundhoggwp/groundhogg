@@ -70,7 +70,8 @@ $tabs = array(
 $tabs = apply_filters( 'wpgh_contact_record_tabs', $tabs );
 $tabs = apply_filters( 'groundhogg/contact/record/tabs', $tabs );
 
-$active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ] ) ? sanitize_key( $_POST[ 'active_tab' ] ) : 'general';
+$cookie_tab = isset( $_COOKIE[ 'gh_contact_tab' ] ) ? str_replace( 'tab_', '', sanitize_key( $_COOKIE[ 'gh_contact_tab' ] ) ): 'general';
+$active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ] ) ? sanitize_key( $_POST[ 'active_tab' ] ) : $cookie_tab;
 ?>
 
 <!-- Title -->
@@ -729,33 +730,22 @@ function wpgh_contact_record_section_activity( $contact )
     ?>
     <?php do_action('wpgh_contact_edit_before_history', $contact->ID ); ?>
     <!-- UPCOMING EVENTS -->
-    <h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px">
-
+        <h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
+        <p class="description"><?php _ex( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'contact_record', 'groundhogg' ); ?></p>
         <?php $events = WPGH()->events->get_events(array('contact_id' => $contact->ID, 'status' => 'waiting'));
-
         $table = new WPGH_Contact_Events_Table();
         $table->data = $events;
-
         $table->prepare_items();
         $table->display(); ?>
-        <a href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . $contact->ID ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
-
-        <p class="description"><?php _ex( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'contact_record', 'groundhogg' ); ?></p>
-
         <!-- FUNNNEL HISTORY -->
         <h2><?php _ex( 'Recent Funnel History', 'contact_record', 'groundhogg' ); ?></h2>
-        <div style="max-width: 800px">
-        </div>
+        <p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
         <?php $events = WPGH()->events->get_events(array('contact_id' => $contact->ID, 'status' => 'complete'));
-
         $table = new WPGH_Contact_Events_Table();
         $table->data = $events;
-
         $table->prepare_items();
         $table->display(); ?>
-        <a href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . $contact->ID ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
-        <p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
     </div>
     <!-- EMAIL HISTORY -->
     <h2><?php _ex( 'Recent Email History', 'contact_record', 'groundhogg' ); ?></h2>

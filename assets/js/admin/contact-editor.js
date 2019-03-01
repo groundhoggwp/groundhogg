@@ -43,6 +43,7 @@ var wpghContactEditor;
                 $( '#' + $tab.attr( 'id' ) + '_content' ).removeClass( 'hidden' );
 
                 $( '#active-tab' ).val( $tab.attr( 'id' ).replace( 'tab_', '' ) );
+                document.cookie = "gh_contact_tab=" + $tab.attr( 'id' ) + ";path=/;";
 
             });
 

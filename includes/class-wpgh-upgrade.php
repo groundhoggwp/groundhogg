@@ -167,12 +167,14 @@ class WPGH_Upgrade{
 
 	/**
 	 * Create the new SMS table
+     * Update the existing Events table for new event type
 	 * Add appropriate caps to the users
 	 * migrate live SMS steps to the new DB
 	 */
     public function version_1_2()
     {
     	WPGH()->sms->create_table();
+    	WPGH()->events->create_table();
     	WPGH()->roles->add_caps();
 
     	$sms_steps = WPGH()->steps->get_steps( array(

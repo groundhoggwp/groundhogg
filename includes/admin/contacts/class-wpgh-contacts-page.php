@@ -42,6 +42,7 @@ class WPGH_Contacts_Page
 
     public function __construct()
     {
+
         add_action('admin_menu', array($this, 'register'), $this->order);
         add_action('wp_ajax_wpgh_inline_save_contacts', array($this, 'save_inline'));
 
