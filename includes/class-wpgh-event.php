@@ -95,7 +95,7 @@ class WPGH_Event
         $this->status = $event->status;
 
         if ($event->type) {
-            $this->type = intval($event->type);
+            $this->type = intval($event->event_type);
         }
 
         //do I NEED the funnel accessible as an object?
@@ -164,11 +164,27 @@ class WPGH_Event
 
     /**
      * Return whether the event is a broadcast event
+     *
      * @return bool
      */
     public function is_broadcast_event()
     {
         return $this->funnel_id === WPGH_BROADCAST;
+    }
+
+    /**
+     * Return whether the event is a funnel (automated) event.
+     *
+     * @since 1.2
+     * @return bool
+     */
+    public function is_funnel_event()
+    {
+        if ($this->type) {
+            return $this->type === WPGH_FUNNEL_EVENT;
+        }
+
+        return $this->funnel_id !== WPGH_BROADCAST;
     }
 
     /**

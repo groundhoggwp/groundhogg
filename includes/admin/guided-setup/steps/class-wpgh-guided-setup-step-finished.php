@@ -30,7 +30,7 @@ class WPGH_Guided_Setup_Step_Finished extends WPGH_Guided_Setup_Step
 
         wpgh_update_option( 'gh_guided_setup_finished', 1 );
 
-        if ( wpgh_is_option_enabled( 'gh_opted_in_stats_collection' ) ):
+        if ( ! wpgh_is_option_enabled( 'gh_opted_in_stats_collection' ) ):
 
         ?>
         <h3><?php _e( 'Next Steps...', 'Groundhogg' ); ?></h3>

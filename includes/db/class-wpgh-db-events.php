@@ -72,7 +72,7 @@ class WPGH_DB_Events extends WPGH_DB  {
             'funnel_id'     => '%d',
             'step_id'       => '%d',
             'contact_id'    => '%d',
-            'type'          => '%d',
+            'event_type'    => '%d',
             'status'        => '%s',
         );
     }
@@ -90,7 +90,7 @@ class WPGH_DB_Events extends WPGH_DB  {
             'funnel_id'     => 0,
             'step_id'       => 0,
             'contact_id'    => 0,
-            'type'          => WPGH_FUNNEL_EVENT,
+            'event_type'    => WPGH_FUNNEL_EVENT,
             'status'        => 'waiting',
         );
     }
@@ -358,7 +358,7 @@ class WPGH_DB_Events extends WPGH_DB  {
         contact_id bigint(20) unsigned NOT NULL,
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
-        type int unsigned NOT NULL,
+        event_type int unsigned NOT NULL,
         status varchar(20) NOT NULL,
         PRIMARY KEY (ID),
         KEY time (time),

@@ -360,7 +360,8 @@ class WPGH_Step
                 'end'           => $this->get_delay_time() + ( 5 * 60 ),
                 'funnel_id'     => $this->funnel_id,
                 'step_id'       => $this->ID,
-                'contact_id'    => $contact->ID
+                'contact_id'    => $contact->ID,
+                'event_type'     => WPGH_FUNNEL_EVENT
             )
         );
 
@@ -373,9 +374,11 @@ class WPGH_Step
                 'status' => 'skipped'
             ),
             array(
-                'funnel_id' => $this->funnel_id,
-                'contact_id' => $contact->ID,
-                'status' => 'waiting'
+                'funnel_id'     => $this->funnel_id,
+                'contact_id'    => $contact->ID,
+                'event_type'    => WPGH_FUNNEL_EVENT,
+                'status'        => 'waiting'
+
             )
         );
 
@@ -383,6 +386,7 @@ class WPGH_Step
             'time'          => $this->get_delay_time(),
             'funnel_id'     => $this->funnel_id,
             'step_id'       => $this->ID,
+            'event_type'    => WPGH_FUNNEL_EVENT,
             'contact_id'    => $contact->ID
         );
 

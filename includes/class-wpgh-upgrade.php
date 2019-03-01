@@ -168,16 +168,27 @@ class WPGH_Upgrade{
 	/**
 	 * Create the new SMS table
      * Update the existing Events table for new event type
+     * Update All Events to have funnel type
 	 * Add appropriate caps to the users
 	 * migrate live SMS steps to the new DB
 	 */
     public function version_1_2()
     {
-    	WPGH()->sms->create_table();
-    	WPGH()->events->create_table();
-    	WPGH()->roles->add_caps();
+        global $wpdb;
 
-    	$sms_steps = WPGH()->steps->get_steps( array(
+        /* ADD SMS TABLE */
+    	WPGH()->sms->create_table();
+    	/* ADD SMS ROLES*/
+        WPGH()->roles->add_caps();
+        /* UPDATE EVENTS TABLE */
+        WPGH()->events->create_table();
+        $events_table = WPGH()->events->table_name;
+        /* UPDATE EXISTING EVENT TYPES */
+        $wpdb->query( $wpdb->prepare("UPDATE $events_table SET event_type = %d WHERE funnel_id = %d",WPGH_BROADCAST_EVENT, WPGH_BROADCAST ) );
+        $wpdb->query( $wpdb->prepare("UPDATE $events_table SET event_type = %d WHERE funnel_id > %d",WPGH_FUNNEL_EVENT, WPGH_BROADCAST ) );
+
+        /* MIGRATE EXISTING SMS TO DB TABLE */
+        $sms_steps = WPGH()->steps->get_steps( array(
     		'step_type' => 'send_sms'
 	    ) );
 

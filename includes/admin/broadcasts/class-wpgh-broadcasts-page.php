@@ -240,7 +240,7 @@ class WPGH_Broadcasts_Page
             'tags'      => $tags,
             'send_time' => $send_time,
             'scheduled_by' => get_current_user_id(),
-            'status'    => 'scheduled'
+            'status'    => 'scheduled',
         );
 
         $broadcast_id = WPGH()->broadcasts->add( $args );
@@ -265,7 +265,8 @@ class WPGH_Broadcasts_Page
                 'contact_id'    => $contact->ID,
                 'funnel_id'     => WPGH_BROADCAST,
                 'step_id'       => $broadcast_id,
-                'status'        => 'waiting'
+                'status'        => 'waiting',
+                'type'          => WPGH_BROADCAST_EVENT
             );
 
             WPGH()->events->add( $args );

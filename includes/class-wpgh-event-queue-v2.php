@@ -181,18 +181,11 @@ class WPGH_Event_Queue_v2
     private function process()
     {
 
-        /* Get 'er done */
-//        set_time_limit(0 );
-
         $this->prepare_events();
 
-
         if ( empty( $this->events ) ){
-
             return 0;
-
         }
-
 
         do_action( 'wpgh_process_event_queue_before', $this );
         do_action( 'groundhogg/queue/run/before', $this );
@@ -206,28 +199,17 @@ class WPGH_Event_Queue_v2
             $max_events = 9999;
         }
 
-
         /* Check to see if the current queue is still the most recent queue. If it's not Then finish up. */
         while ( $this->has_events() && $i < $max_events ) {
-
             $this->cur_event = $this->get_next();
-
-            if ( $this->cur_event->run() && ! $this->cur_event->is_broadcast_event() ){
-
+            if ( $this->cur_event->run() && $this->cur_event->is_funnel_event() ){
                 $next_step = $this->cur_event->step->get_next_step();
-
                 if ( $next_step instanceof WPGH_Step && $next_step->is_active() ){
-
                     $next_step->enqueue( $this->cur_event->contact );
-
                 }
-
             }
-
             $i++;
-
         }
-
 
         do_action( 'wpgh_process_event_queue_after', $this );
         do_action( 'groundhogg/queue/run/after', $this );
@@ -240,9 +222,7 @@ class WPGH_Event_Queue_v2
      */
     public function get_next()
     {
-
         return array_pop( $this->events );
-
     }
 
     /**
@@ -252,9 +232,7 @@ class WPGH_Event_Queue_v2
      */
     public function has_events()
     {
-
         return ! empty( $this->events );
-
     }
 
     /**
@@ -266,14 +244,7 @@ class WPGH_Event_Queue_v2
      */
     public function add( $event )
     {
-        $e = wp_parse_args( $event, array(
-            'time'          => 0,
-            'contact_id'    => 0,
-            'step_id'       => 0,
-            'funnel_id'     => 0,
-        ) );
-
-        return WPGH()->events->add( $e );
+        return WPGH()->events->add( $event );
     }
 
     /**
@@ -285,11 +256,7 @@ class WPGH_Event_Queue_v2
      */
     public function exists( $event )
     {
-
-        // does this make sense?
-        /* Yes it does... */
         return WPGH()->events->event_exists( $event );
-
     }
 
 }

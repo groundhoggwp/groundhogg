@@ -168,7 +168,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         /**
          * The event queue
          *
-         * @var object|WPGH_Event_Queue
+         * @var object|WPGH_Event_Queue_v2
          */
         public $event_queue;
 

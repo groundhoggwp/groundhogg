@@ -740,7 +740,7 @@ function wpgh_contact_record_section_activity( $contact )
         $table->display(); ?>
         <!-- FUNNNEL HISTORY -->
         <h2><?php _ex( 'Recent Funnel History', 'contact_record', 'groundhogg' ); ?></h2>
-        <p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 20 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
+        <p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 10 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
         <?php $events = WPGH()->events->get_events(array('contact_id' => $contact->ID, 'status' => 'complete'));
         $table = new WPGH_Contact_Events_Table();
         $table->data = $events;
