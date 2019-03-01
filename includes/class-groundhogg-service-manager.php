@@ -271,7 +271,7 @@ class Groundhogg_Service_Manager
             return new WP_Error( 'NO_TOKEN', __( 'You require a Groundhogg Sending Service account before you can send SMS.', 'groundhogg' ) );
         }
 
-        if ( $contact->is_marketable() ){
+        if ( ! $contact->is_marketable() ){
             return new WP_Error( 'UNMARKETABLE', __( 'This contact is currently unmarketable.', 'groundhogg' ) );
         }
 
