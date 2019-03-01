@@ -213,7 +213,7 @@ class WPGH_Emails_Table extends WP_List_Table {
     protected function column_author( $email )
     {
         $user = get_userdata( intval( ( $email->author ) ) );
-        $from_user = esc_html( $user->user_login );
+        $from_user = esc_html( $user->display_name );
         $queryUrl = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $email->author );
         return "<a href='$queryUrl'>$from_user</a>";
     }

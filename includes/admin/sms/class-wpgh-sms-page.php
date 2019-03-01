@@ -1,8 +1,8 @@
 <?php
 /**
- * Superlinks Page
+ * SMS Page
  *
- * This is the superlinks page, it also contains the add form since it's the same layout as the terms.php
+ * This is the sms page, it also contains the add form since it's the same layout as the terms.php
  *
  * @package     Admin
  * @subpackage  Admin/Supperlinks
@@ -23,17 +23,16 @@ class WPGH_SMS_Page
      * @var WPGH_Notices
      */
     public $notices;
-    public $order = 15;
+    public $order = 26;
+
+    const MAX_LENGTH = 280;
 
 	function __construct()
 	{
 
 	    add_action( 'admin_menu', array( $this, 'register' ), $this->order );
-
-		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_superlinks' ){
-
+		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_sms' ){
 			add_action( 'init' , array( $this, 'process_action' )  );
-
 			$this->notices = WPGH()->notices;
 		}
 	}
@@ -43,10 +42,10 @@ class WPGH_SMS_Page
     {
         $page = add_submenu_page(
             'groundhogg',
-            _x( 'Superlinks', 'page_title', 'groundhogg' ),
-            _x( 'Superlinks', 'page_title', 'groundhogg' ),
-            'edit_superlinks',
-            'gh_superlinks',
+            _x( 'Sms', 'page_title', 'groundhogg' ),
+            _x( 'Sms', 'page_title', 'groundhogg' ),
+            'edit_sms',
+            'gh_sms',
             array($this, 'page')
         );
 
@@ -56,25 +55,17 @@ class WPGH_SMS_Page
     /* Register the help bar */
     public function help()
     {
-        $screen = get_current_screen();
-
-        $screen->add_help_tab(
-            array(
-                'id' => 'gh_overview',
-                'title' => __('Overview'),
-                'content' => '<p>' . __( "Superlinks are special superlinks that allow you to apply/remove tags whenever clicked and then take the contact to a page of your choice. To use them, just copy the replacement code and paste in in email, button, or link.", 'groundhogg' ) . '</p>'
-            )
-        );
+        
     }
 
-	function get_superlinks()
+	function get_sms()
 	{
-		$superlinks = isset( $_REQUEST['superlink'] ) ? $_REQUEST['superlink'] : null;
+		$sms = isset( $_REQUEST['sms'] ) ? $_REQUEST['sms'] : null;
 
-		if ( ! $superlinks )
+		if ( ! $sms )
 			return false;
 
-		return is_array( $superlinks )? array_map( 'intval', $superlinks ) : array( intval( $superlinks ) );
+		return is_array( $sms )? array_map( 'intval', $sms ) : array( intval( $sms ) );
 	}
 
 	function get_action()
@@ -104,10 +95,10 @@ class WPGH_SMS_Page
 	{
 		switch ( $this->get_action() ){
 			case 'edit':
-				_ex( 'Edit Superlink', 'page_title', 'groundhogg' );
+				_ex( 'Edit SMS', 'page_title', 'groundhogg' );
 				break;
 			default:
-				_ex( 'Superlinks', 'page_title','groundhogg' );
+				_ex( 'SMS', 'page_title','groundhogg' );
 		}
 	}
 
@@ -122,41 +113,41 @@ class WPGH_SMS_Page
 		{
 			case 'add':
 
-                if ( ! current_user_can( 'add_superlinks' ) ){
-                    wp_die( WPGH()->roles->error( 'add_superlinks' ) );
+                if ( ! current_user_can( 'add_sms' ) ){
+                    wp_die( WPGH()->roles->error( 'add_sms' ) );
                 }
 
 				if ( isset( $_POST ) ) {
-					$this->add_superlink();
+					$this->add_sms();
 				}
 				
 				break;
 
             case 'edit':
 
-                if ( ! current_user_can( 'edit_superlinks' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_superlinks' ) );
+                if ( ! current_user_can( 'edit_sms' ) ){
+                    wp_die( WPGH()->roles->error( 'edit_sms' ) );
                 }
 
                 if ( isset( $_POST ) ){
-                    $this->edit_superlink();
+                    $this->edit_sms();
                 }
 
                 break;
 
             case 'delete':
 
-                if ( ! current_user_can( 'delete_superlinks' ) ){
-                    wp_die( WPGH()->roles->error( 'delete_superlinks' ) );
+                if ( ! current_user_can( 'delete_sms' ) ){
+                    wp_die( WPGH()->roles->error( 'delete_sms' ) );
                 }
 
-				foreach ( $this->get_superlinks() as $id ){
+				foreach ( $this->get_sms() as $id ){
 
-					WPGH()->superlinks->delete( $id );
+					WPGH()->sms->delete( $id );
 
 				}
 
-                $this->notices->add( 'deleted', sprintf( _nx( '%d superlink deleted', '%d superlinks deleted', count( $this->get_superlinks() ), 'notice', 'groundhogg' ), count( $this->get_superlinks() ) ) );
+                $this->notices->add( 'deleted', sprintf( _nx( '%d sms deleted', '%d sms deleted', count( $this->get_sms() ), 'notice', 'groundhogg' ), count( $this->get_sms() ) ) );
 
                 break;
 
@@ -167,64 +158,54 @@ class WPGH_SMS_Page
 		if ( $this->get_action() === 'edit' || $this->get_action() === 'add' )
 			return;
 
-		$base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_superlinks() ) ), $base_url );
+		$base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_sms() ) ), $base_url );
 
 		wp_redirect( $base_url );
 		die();
 	}
 
-	private function add_superlink()
+	private function add_sms()
     {
-        if ( ! current_user_can( 'add_superlinks' ) ){
-            wp_die( WPGH()->roles->error( 'add_superlinks' ) );
+        if ( ! current_user_can( 'add_sms' ) ){
+            wp_die( WPGH()->roles->error( 'add_sms' ) );
         }
 
-        $superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
-        $superlink_target = sanitize_text_field( wp_unslash( $_POST['superlink_target'] ) );
-
-        $superlink_tags = isset( $_POST['superlink_tags'] ) ? WPGH()->tags->validate( $_POST['superlink_tags'] ): array() ;
-
+        $title   = sanitize_text_field( stripslashes( $_POST['title'] ) );
+        $message = substr( sanitize_textarea_field( wp_strip_all_tags( stripslashes( $_POST[ 'message' ] ) ) ), 0, self::MAX_LENGTH );
+        
         $args = array(
-            'name'      => $superlink_name,
-            'target'    => $superlink_target,
-            'tags'      => $superlink_tags
+            'title'      => $title,
+            'message'    => $message,
         );
 
+        $sms_id = WPGH()->sms->add( $args );
 
-        $superlink_id = WPGH()->superlinks->add( $args );
-
-        if ( $superlink_id ){
-            do_action( 'wpgh_superlink_created', $superlink_id );
-
-            $this->notices->add( 'created', _x( 'Superlink created', 'notice', 'groundhogg' ) );
+        if ( $sms_id ){
+            do_action( 'wpgh_sms_created', $sms_id );
+            $this->notices->add( 'created', _x( 'SMS created', 'notice', 'groundhogg' ) );
         }
     }
 
-    private function edit_superlink()
+    private function edit_sms()
     {
-        if ( ! current_user_can( 'edit_superlinks' ) ){
-            wp_die( WPGH()->roles->error( 'edit_superlinks' ) );
+        if ( ! current_user_can( 'edit_sms' ) ){
+            wp_die( WPGH()->roles->error( 'edit_sms' ) );
         }
 
-        $id = intval( $_GET[ 'superlink' ] );
+        $id = intval( $_GET[ 'sms' ] );
+	    $title   = sanitize_text_field( stripslashes( $_POST['title'] ) );
+	    $message = substr( sanitize_textarea_field( wp_strip_all_tags( stripslashes( $_POST[ 'message' ] ) ) ), 0, self::MAX_LENGTH );
 
-        $superlink_name = sanitize_text_field( wp_unslash( $_POST['superlink_name'] ) );
+	    $args = array(
+		    'title'      => $title,
+		    'message'    => $message,
+	    );
 
-        $superlink_target = sanitize_text_field( wp_unslash( $_POST['superlink_target'] ) );
-
-        $superlink_tags = WPGH()->tags->validate( $_POST['superlink_tags'] );
-
-        $args = array(
-            'name'      => $superlink_name,
-            'target'    => $superlink_target,
-            'tags'      => $superlink_tags
-        );
-
-        $result = WPGH()->superlinks->update( $id, $args );
+        $result = WPGH()->sms->update( $id, $args );
 
         if ( $result ) {
-            $this->notices->add( 'updated', _x( 'Updated superlink.', 'notice', 'groundhogg' ) );
-            do_action( 'wpgh_superlink_updated', $id );
+            $this->notices->add( 'updated', _x( 'Updated SMS.', 'notice', 'groundhogg' ) );
+            do_action( 'wpgh_sms_updated', $id );
         }
 
     }
@@ -234,57 +215,46 @@ class WPGH_SMS_Page
 		if ( ! isset( $_REQUEST['_wpnonce'] ) )
 			return false;
 
-		return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-superlinks' );
+		return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-sms' );
 	}
 
 	function table()
 	{
-		if ( ! class_exists( 'WPGH_Superlinks_Table' ) ){
+		if ( ! class_exists( 'WPGH_SMS_Table' ) ){
 			include dirname(__FILE__) . '/class-wpgh-sms-table.php';
 		}
 
-		$superlinks_table = new WPGH_Superlinks_Table(); ?>
+		$sms_table = new WPGH_SMS_Table(); ?>
         <form method="post" class="search-form wp-clearfix">
         <!-- search form -->
             <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Superlinks', 'groundhogg'); ?>:</label>
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search SMS', 'groundhogg'); ?>:</label>
                 <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Superlinks', 'groundhogg' )?>">
+                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search SMS', 'groundhogg' )?>">
             </p>
         </form>
         <div id="col-container" class="wp-clearfix">
             <div id="col-left">
                 <div class="col-wrap">
                     <div class="form-wrap">
-                        <h2><?php _e( 'Add New Superlink', 'groundhogg' ) ?></h2>
-                        <form id="addsuperlink" method="post" action="">
+                        <h2><?php _e( 'Add New SMS', 'groundhogg' ) ?></h2>
+                        <form id="addsms" method="post" action="">
                             <input type="hidden" name="action" value="add">
                             <?php wp_nonce_field(); ?>
                             <div class="form-field term-name-wrap">
-                                <label for="superlink-name"><?php _e( 'Superlink Name', 'groundhogg' ) ?></label>
-                                <input name="superlink_name" id="superlink-name" type="text" value="" maxlength="100" autocomplete="off" required>
-                                <p><?php _e( 'Name a Superlink something simple so you do not forget it.', 'groundhogg' ); ?></p>
+                                <label for="sms-title"><?php _e( 'Title', 'groundhogg' ) ?></label>
+                                <input name="title" id="sms-title" type="text" value="" maxlength="100" autocomplete="off" required>
+                                <p><?php _e( 'Name it something simple so you do not forget it.', 'groundhogg' ); ?></p>
                             </div>
                             <div class="form-field term-target-wrap">
-                                <label for="superlink-target"><?php _e( 'Target URL', 'groundhogg' ) ?></label>
-                                <input name="superlink_target" id="superlink-target" type="url" value="" autocomplete="off" required>
-                                <p><a href="#" id="insert-link" data-target="superlink-target"><?php _e( 'Insert Link' ); ?></a> | <?php _e( 'Insert a url that this link will direct to. This link can contain simple replacement codes.', 'groundhogg' ); ?></p>
-                                <script>
-                                    jQuery( function($){
-                                        $( '#insert-link' ).linkPicker();
-                                    });
-                                </script>
+                                <label for="sms-message"><?php _e( 'Message', 'groundhogg' ) ?></label>
+                                <textarea rows="5" name="message" id="sms-message" autocomplete="off" required></textarea>
+                                <p class="description">
+	                                <?php WPGH()->replacements->show_replacements_button(); ?>
+	                                <?php _e( 'Use any valid replacement codes in your text message. Do not use html! Limit 280 characters.', 'groundhogg' ); ?>
+                                </p>
                             </div>
-                            <div class="form-field term-tag-wrap">
-                                <label for="superlink-description"><?php _e( 'Apply Tags When Clicked', 'groundhogg' ) ?></label>
-                                <?php $tag_args = array();
-                                $tag_args[ 'id' ] = 'superlink_tags';
-                                $tag_args[ 'name' ] = 'superlink_tags[]';
-//                                $tag_args[ 'width' ] = '100%'; ?>
-                                <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
-                                <p><?php _e( 'These tags will be applied to a contact whenever this link is clicked. To create a new tag hit [Enter] or [,]', 'groundhogg' ); ?></p>
-                            </div>
-                            <?php submit_button( _x( 'Add New Superlink', 'action', 'groundhogg' ), 'primary', 'add_superlink' ); ?>
+                            <?php submit_button( _x( 'Add New SMS', 'action', 'groundhogg' ), 'primary', 'add_sms' ); ?>
                         </form>
                     </div>
                 </div>
@@ -292,8 +262,8 @@ class WPGH_SMS_Page
             <div id="col-right">
                 <div class="col-wrap">
                     <form id="posts-filter" method="post">
-                        <?php $superlinks_table->prepare_items(); ?>
-                        <?php $superlinks_table->display(); ?>
+                        <?php $sms_table->prepare_items(); ?>
+                        <?php $sms_table->display(); ?>
                     </form>
                 </div>
             </div>
@@ -303,8 +273,8 @@ class WPGH_SMS_Page
 
 	function edit()
 	{
-        if ( ! current_user_can( 'edit_superlinks' ) ){
-            wp_die( WPGH()->roles->error( 'edit_superlinks' ) );
+        if ( ! current_user_can( 'edit_sms' ) ){
+            wp_die( WPGH()->roles->error( 'edit_sms' ) );
         }
 
 		include dirname(__FILE__) . '/edit-sms.php';
@@ -312,15 +282,9 @@ class WPGH_SMS_Page
 
 	function page()
 	{
-
-		wp_enqueue_editor();
-		wp_enqueue_script('wplink');
-		wp_enqueue_style('editor-buttons');
-		wp_enqueue_script( 'link-picker', WPGH_ASSETS_FOLDER . '/js/admin/link-picker.js' );
-		
 		?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_superlinks' ); ?>"><?php _ex( 'Add New', 'page_tile_action','groundhogg' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_sms' ); ?>"><?php _ex( 'Add New', 'page_tile_action','groundhogg' ); ?></a>
 			<?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){

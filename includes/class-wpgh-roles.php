@@ -167,6 +167,27 @@ class WPGH_Roles {
     }
 
 
+	/**
+	 * SMS:
+	 * - Add sms
+	 * - Delete sms
+	 * - Edit sms
+	 *
+	 * Get caps related to managing sms
+	 *
+	 * @return array
+	 */
+	public function get_sms_caps()
+	{
+		$caps = array(
+			'add_sms',
+			'delete_sms',
+			'edit_sms',
+		);
+
+		return apply_filters( 'wpgh_sms_caps', $caps );
+	}
+
     /**
      * Broadcasts:
      * - Schedule Broadcasts
@@ -293,7 +314,8 @@ class WPGH_Roles {
             $this->get_funnel_caps(),
             $this->get_superlink_caps(),
             $this->get_tag_caps(),
-            $this->get_report_caps()
+            $this->get_report_caps(),
+            $this->get_sms_caps()
         );
 
         return $caps;

@@ -107,10 +107,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
-= 1.1.5 =
+= 1.2 =
 * ADDED Gravatar image to contact profile.
 * ADDED Ability to unlink contact records from user accounts.
 * ADDED Guided Setup UI for new installations.
+* ADDED Central database for SMS so it can be used throughout plugin.
+* ADDED UI for managing SMS globally
 * TWEAKED Max default text length increased to 280 characters.
 * TWEAKED removed 5 second check preventing emails sent in succession, no longer needed.
 * FIXED Email content centered if not explicitly given left align

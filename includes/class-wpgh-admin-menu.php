@@ -52,6 +52,11 @@ class WPGH_Admin_Menu
      */
     var $broadcasts_page;
 
+	/**
+	 * @var WPGH_SMS_Page
+	 */
+    var $sms_page;
+
     /**
      * @var WPGH_Events_Page
      */
@@ -88,6 +93,7 @@ class WPGH_Admin_Menu
         $this->superlink_page   = new WPGH_Superlinks_Page();
         $this->broadcasts_page  = new WPGH_Broadcasts_Page();
         $this->emails_page      = new WPGH_Emails_Page();
+        $this->sms_page         = new WPGH_SMS_Page();
         $this->funnels_page     = new WPGH_Funnels_Page();
         $this->events_page      = new WPGH_Events_Page();
         $this->guided_setup     = new WPGH_Guided_Setup();
@@ -108,6 +114,7 @@ class WPGH_Admin_Menu
         require_once dirname( __FILE__ ). '/admin/dashboard/class-wpgh-dashboard-widgets.php';
         require_once dirname( __FILE__ ). '/admin/contacts/class-wpgh-contacts-page.php';
         require_once dirname( __FILE__ ). '/admin/emails/class-wpgh-emails-page.php';
+        require_once dirname( __FILE__ ). '/admin/sms/class-wpgh-sms-page.php';
         require_once dirname( __FILE__ ). '/admin/events/class-wpgh-events-page.php';
         require_once dirname( __FILE__ ). '/admin/funnels/class-wpgh-funnels-page.php';
         require_once dirname( __FILE__ ). '/admin/settings/class-wpgh-settings-page.php';

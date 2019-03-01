@@ -30,8 +30,8 @@ class WPGH_SMS_Table extends WP_List_Table {
     public function __construct() {
         // Set parent defaults.
         parent::__construct( array(
-            'singular' => 'superlink',     // Singular name of the listed records.
-            'plural'   => 'superlinks',    // Plural name of the listed records.
+            'singular' => 'sms',     // Singular name of the listed records.
+            'plural'   => 'sms',    // Plural name of the listed records.
             'ajax'     => false,       // Does this table support ajax?
         ) );
     }
@@ -43,12 +43,9 @@ class WPGH_SMS_Table extends WP_List_Table {
     public function get_columns() {
         $columns = array(
             'cb'            => '<input type="checkbox" />', // Render a checkbox instead of text.
-            'name'          => _x( 'Name', 'Column label', 'groundhogg' ),
-            'source'        => _x( 'Source Url', 'Column label', 'groundhogg' ),
-            'replacement'   => _x( 'Replacement Code', 'Column label', 'groundhogg' ),
-            'tags'          => _x( 'Tags', 'Column label', 'groundhogg' ),
-            //'clicks' => _x( 'Clicks', 'Column label', 'groundhogg' ),
-            'target'        => _x( 'Target Url', 'Column label', 'groundhogg' ),
+            'title'         => _x( 'Title', 'Column label', 'groundhogg' ),
+            'message'       => _x( 'message', 'Column label', 'groundhogg' ),
+            'author'        => _x( 'Author', 'Column label', 'groundhogg' ),
         );
         return $columns;
     }
@@ -57,72 +54,56 @@ class WPGH_SMS_Table extends WP_List_Table {
      */
     protected function get_sortable_columns() {
         $sortable_columns = array(
-            'name'          => array( 'name', false ),
-//            'target'    => array( 'target', false ),
-            'replacement'   => array( 'replacement', false ),
-            'tags'          => array( 'tags', false ),
-            'clicks'        => array( 'clicks', false ),
+            'title'   => array( 'title', false ),
+            'author'  => array( 'author', false ),
         );
         return $sortable_columns;
     }
 
-    protected function column_name( $superlink )
+    protected function column_title( $sms )
     {
-        $editUrl = admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->ID );
-        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $superlink->name ) . "</a>";
+        $editUrl = admin_url( 'admin.php?page=gh_sms&action=edit&sms=' . $sms->ID );
+        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $sms->title ) . "</a>";
         return $html;
     }
 
-    protected function column_target( $superlink )
+    protected function column_message( $sms )
     {
-        return '<a target="_blank" href="' . esc_url_raw( $superlink->target ) . '">' . esc_url( $superlink->target ) . '</a>';
+    	return apply_filters( 'the_content', wp_trim_words( $sms->message, 20 ) );
     }
 
-    protected function column_replacement( $superlink )
-    {
-        return sprintf( '<input type="text" value="%s" onfocus="this.select()" readonly>', '{superlink.' . $superlink->ID . '}');
-    }
-
-    protected function column_source( $superlink )
-    {
-        return sprintf( '<input style="max-width: 100%%;" class="regular-text" type="text" value="%s" onfocus="this.select()" readonly><p><a target="_blank" href="%s">%s</a></p>', site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ) );
-    }
-
-    protected function column_tags( $superlink )
-    {
-        $tags = array();
-
-        foreach ( $superlink->tags as $i => $tag_id ){
-
-            if ( WPGH()->tags->exists( $tag_id ) ){
-                $tag = WPGH()->tags->get( $tag_id );
-                $tags[ $i ] = '<a href="'. admin_url( 'admin.php?page=gh_contacts&view=tag&tag=' . $tag_id ) . '">' . $tag->tag_name . '</a>';
-            }
-        }
-
-        return implode( ', ', $tags );
-    }
+	/**
+	 * @param $email WPGH_Email
+	 * @return string
+	 */
+	protected function column_author( $sms )
+	{
+		$user = get_userdata( intval( ( $sms->author ) ) );
+		$from_user = esc_html( $user->display_name );
+		$queryUrl = admin_url( 'admin.php?page=gh_sms&view=author&author=' . $user->ID );
+		return "<a href='$queryUrl'>$from_user</a>";
+	}
 
     /**
      * Get default column value.
-     * @param object $superlink        A singular item (one full row's worth of data).
+     * @param object $sms        A singular item (one full row's worth of data).
      * @param string $column_name The name/slug of the column to be processed.
      * @return string Text or HTML to be placed inside the column <td>.
      */
-    protected function column_default( $superlink, $column_name ) {
+    protected function column_default( $sms, $column_name ) {
 
-        return print_r( $superlink->$column_name, true );
+        return print_r( $sms->$column_name, true );
 
     }
     /**
-     * @param object $superlink A singular item (one full row's worth of data).
+     * @param object $sms A singular item (one full row's worth of data).
      * @return string Text to be placed inside the column <td>.
      */
-    protected function column_cb( $superlink ) {
+    protected function column_cb( $sms ) {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $superlink->ID               // The value of the checkbox should be the record's ID.
+            $sms->ID               // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -134,7 +115,7 @@ class WPGH_SMS_Table extends WP_List_Table {
             'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
         );
 
-        return apply_filters( 'wpgh_superlink_bulk_actions', $actions );
+        return apply_filters( 'wpgh_sms_bulk_actions', $actions );
     }
 
     /**
@@ -158,12 +139,17 @@ class WPGH_SMS_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
+        $args = array();
 
-        if ( isset( $_REQUEST['s'] ) ){
-            $data = WPGH()->superlinks->search( $_REQUEST[ 's' ] );
-        } else {
-            $data = WPGH()->superlinks->get_superlinks();
+        if ( isset($_REQUEST[ 's' ]) ){
+        	$args[ 'search' ] = $_REQUEST[ 's' ];
         }
+
+        if ( isset( $_REQUEST[ 'view' ] ) ){
+        	$args[ $_REQUEST[ 'view' ] ] = $_REQUEST[ $_REQUEST[ 'view' ] ];
+        }
+
+        $data = WPGH()->sms->get_smses( $args );
 
         /*
          * Sort the data
@@ -206,32 +192,32 @@ class WPGH_SMS_Table extends WP_List_Table {
     }
 
     /**
-     * Generates and displays row action superlinks.
+     * Generates and displays row action smss.
      *
      * @param object $item        Contact being acted upon.
      * @param string $column_name Current column name.
      * @param string $primary     Primary column name.
      * @return string Row elements output for posts.
      */
-    protected function handle_row_actions( $superlink, $column_name, $primary ) {
+    protected function handle_row_actions( $sms, $column_name, $primary ) {
         if ( $primary !== $column_name ) {
             return '';
         }
 
         $actions = array();
-        $title = $superlink->name;
+        $title = $sms->name;
 
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',
             /* translators: %s: title */
-            admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->ID ),
+            admin_url( 'admin.php?page=gh_sms&action=edit&sms=' . $sms->ID ),
             esc_attr( sprintf( __( 'Edit' ), $title ) ),
             __( 'Edit' )
         );
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_superlinks&superlink='. $superlink->ID . '&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_sms&sms='. $sms->ID . '&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )

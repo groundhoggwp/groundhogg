@@ -82,7 +82,9 @@ function wpgh_run_install() {
     WPGH()->contacts->create_table();
     WPGH()->contact_meta->create_table();
 
-    WPGH()->emails->create_table();
+	WPGH()->sms->create_table();
+
+	WPGH()->emails->create_table();
     WPGH()->email_meta->create_table();
 
     WPGH()->events->create_table();
@@ -255,6 +257,7 @@ function wpgh_wpmu_drop_tables( $tables, $blog_id ) {
     if ( WPGH()->contacts->installed() ) {
         $tables[] = WPGH()->contacts->table_name;
         $tables[] = WPGH()->contact_meta->table_name;
+        $tables[] = WPGH()->sms->table_name;
         $tables[] = WPGH()->emails->table_name;
         $tables[] = WPGH()->email_meta->table_name;
         $tables[] = WPGH()->broadcasts->table_name;
@@ -307,7 +310,9 @@ function wpgh_after_install() {
             @WPGH()->contacts->create_table();
             @WPGH()->contact_meta->create_table();
 
-            @WPGH()->emails->create_table();
+	        @WPGH()->sms->create_table();
+
+	        @WPGH()->emails->create_table();
             @WPGH()->email_meta->create_table();
 
             @WPGH()->events->create_table();
@@ -347,9 +352,7 @@ add_action( 'admin_init', 'wpgh_after_install' );
 function wpgh_api_table_check(){
 
     if ( ! @WPGH()->tokens->installed() ){
-
         @WPGH()->tokens->create_table();
-
     }
 
 }

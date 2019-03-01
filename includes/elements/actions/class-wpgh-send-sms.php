@@ -34,10 +34,8 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
     public function settings( $step )
     {
 
-        $mesg = $step->get_meta( 'text_message' );
-        if ( ! $mesg ) {
-            $mesg = '';
-        }
+        $mesg = $step->get_meta( 'sms_id' );
+
         ?>
         <?php if ( ! wpgh_get_option( 'gh_email_token', false ) ): ?>
         <p style="margin-left: 10px;" class="description">
@@ -48,23 +46,24 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
             <tbody>
             <tr>
                 <th>
-                    <?php echo esc_html__( 'Text Message:', 'groundhogg' ); ?>
+                    <?php echo esc_html__( 'Select Message:', 'groundhogg' ); ?>
                     <p>
                         <?php WPGH()->replacements->show_replacements_button(); ?>
                     </p>
                 </th>
                 <?php $args = array(
-                    'id'    => $step->prefix( 'text_message' ),
-                    'name'  => $step->prefix( 'text_message' ),
-                    'value' => $mesg,
-                    'cols'  => 64,
-                    'rows'  => 4,
-                    'attributes' => sprintf(' maxlength="%d"', self::MAX_LENGTH )
+                    'id'    => $step->prefix( 'sms_id' ),
+                    'name'  => $step->prefix( 'sms_id' ),
+                    'data'  => WPGH()->sms->get_sms_select(),
+                    'selected' => $mesg,
                 ); ?>
                 <td>
-                    <?php echo WPGH()->html->textarea( $args ) ?>
+                    <?php echo WPGH()->html->select2( $args ) ?>
                     <p class="description">
-                        <?php _e( 'Use any valid replacement codes in your text message. Do not use html! Limit 280 characters.', 'groundhogg' ); ?>
+                        <?php _e( 'Select an SMS message.', 'groundhogg' ); ?>
+                        <span class="row-actions">
+                        <a href="<?php echo admin_url( 'admin.php?page=gh_sms' ) ?>" target="_blank"><?php _e( 'Manage SMS', 'groundhogg' ); ?></a>
+                        </span>
                     </p>
                 </td>
             </tr>
@@ -82,9 +81,12 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
     public function save( $step )
     {
 
-        if ( isset( $_POST[ $step->prefix( 'text_message' ) ] ) ){
-            $note_text = substr( sanitize_textarea_field( wp_strip_all_tags( stripslashes( $_POST[ $step->prefix( 'text_message' ) ] ) ) ), 0, self::MAX_LENGTH );
-            $step->update_meta( 'text_message', $note_text );
+        if ( isset( $_POST[ $step->prefix( 'sms_id' ) ] ) ){
+            $step->update_meta( 'sms_id', intval( $_POST[ $step->prefix( 'sms_id' ) ] ) );
+        }
+
+        if ( ! wpgh_get_option( 'gh_email_token', false ) ){
+            WPGH()->notices->add( new WP_Error( 'NO_TOKEN', __( 'Your SMS steps will not work until you active the Groundhogg Sending Service.', 'groundhogg' ) ) );
         }
 
     }
@@ -99,7 +101,14 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
      */
     public function run( $contact, $event )
     {
-        $message = $event->step->get_meta( 'text_message' );
+        $sms_id = $event->step->get_meta( 'sms_id' );
+        $sms = WPGH()->sms->get_sms( $sms_id );
+
+        if ( ! $sms ){
+            return false;
+        }
+
+        $message = $sms->message;
         $result = WPGH()->service_manager->send_sms( $contact, $message );
 
         if ( is_wp_error( $result ) || ! $result ){

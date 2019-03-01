@@ -62,6 +62,7 @@ class WPGH_Upgrade{
         $this->update_to_version( '1.0.16' );
         $this->update_to_version( '1.0.18.1' );
         $this->update_to_version( '1.0.20' );
+        $this->update_to_version( '1.2' );
     }
 
     /**
@@ -161,9 +162,42 @@ class WPGH_Upgrade{
      */
     public function version_1_0_20()
     {
-
         WPGH()->activity->create_table();
+    }
 
+	/**
+	 * Create the new SMS table
+	 * Add appropriate caps to the users
+	 * migrate live SMS steps to the new DB
+	 */
+    public function version_1_2()
+    {
+    	WPGH()->sms->create_table();
+    	WPGH()->roles->add_caps();
+
+    	$sms_steps = WPGH()->steps->get_steps( array(
+    		'step_type' => 'send_sms'
+	    ) );
+
+    	if ( ! empty( $sms_steps ) ){
+
+    		foreach ($sms_steps as $step ){
+    			$step = new WPGH_Step( $step->ID );
+    			$message = $step->get_meta( 'text_message' );
+    			$title = wp_trim_words( $message, 10 );
+
+    			$sms_id = WPGH()->sms->add( array(
+    				'title' => $title,
+				    'message' => $message
+			    ) );
+
+    			if ( $sms_id ){
+    				$step->update_meta( 'sms_id', $sms_id );
+			    }
+
+		    }
+
+	    }
     }
 
 
