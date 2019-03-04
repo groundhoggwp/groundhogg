@@ -31,6 +31,9 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
         parent::__construct();
     }
 
+    /**
+     * @param WPGH_Step $step
+     */
     public function settings( $step )
     {
 
@@ -102,14 +105,13 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
     public function run( $contact, $event )
     {
         $sms_id = $event->step->get_meta( 'sms_id' );
-        $sms = WPGH()->sms->get_sms( $sms_id );
+        $sms = new WPGH_SMS( $sms_id );
 
-        if ( ! $sms ){
+        if ( ! $sms->exists() || ! $contact->is_marketable() ){
             return false;
         }
 
-        $message = $sms->message;
-        $result = WPGH()->service_manager->send_sms( $contact, $message );
+        $result = $sms->send( $contact, $event );
 
         if ( is_wp_error( $result ) || ! $result ){
             return false;

@@ -55,6 +55,13 @@ $funnel_templates[ 'lead_magnet' ][ 'description' ] = _x('Giving away a lead mag
 $funnel_templates[ 'lead_magnet' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'lead_magnet' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/lead-magnet-download.funnel';
 
+/* Login Abandonment */
+
+$funnel_templates[ 'login_abandonment' ][ 'title' ] = _x( 'Login Abandonment', 'funnel_template_name', 'groundhogg' );
+$funnel_templates[ 'login_abandonment' ][ 'description' ] = _x('Remind your subscribers to login every once in a while.', 'funnel_template_description', 'groundhogg' );
+$funnel_templates[ 'login_abandonment' ][ 'src' ] = 'https://via.placeholder.com/350x250';
+$funnel_templates[ 'login_abandonment' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/login-abandonment.funnel';
+
 /* Start from scratch */
 
 $funnel_templates[ 'scratch' ][ 'title' ] = _x( 'Start From Scratch', 'funnel_template_name', 'groundhogg' );
@@ -63,6 +70,7 @@ $funnel_templates[ 'scratch' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'scratch' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/start-from-scratch.funnel';
 
 /* Email Preferences */
+
 $funnel_templates[ 'email_preferences' ][ 'title' ] = _x( 'Email Preferences', 'funnel_template_name', 'groundhogg' );
 $funnel_templates[ 'email_preferences' ][ 'description' ] = _x( 'Setup an email preferences center!', 'funnel_template_description', 'groundhogg' );
 $funnel_templates[ 'email_preferences' ][ 'src' ] = 'https://via.placeholder.com/350x250';

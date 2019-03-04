@@ -183,12 +183,27 @@ function wpgh_contact_record_general_info( $contact )
                     'value' => $contact->email,
                 );
                 echo WPGH()->html->input($args); ?>
-                <label><span class="row-actions"><a style="text-decoration: none" target="_blank"
+                <span class="row-actions"><a style="text-decoration: none" target="_blank"
                                                     href="<?php echo esc_url(substr($contact->email, strpos($contact->email, '@'))); ?>"><span class="dashicons dashicons-external"></span></a></span>
                     <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' . wpgh_get_optin_status_text($contact->ID); ?></p>
-                    <?php if ($contact->optin_status !== WPGH_UNSUBSCRIBED): ?>
-                    <input type="checkbox" name="unsubscribe" value="1"><?php _ex( 'Mark as unsubscribed.', 'contact_record', 'groundhogg' ); ?></label>
-            <?php endif; ?>
+                <?php if ($contact->optin_status !== WPGH_UNSUBSCRIBED): ?>
+                    <div id="manual-unsubscribe" style="margin-bottom: 10px;">
+                        <label><input type="checkbox" name="unsubscribe" value="1"><?php _ex( 'Mark as unsubscribed.', 'contact_record', 'groundhogg' ); ?></label>
+                </div>
+                <?php endif; ?>
+                <?php if ($contact->optin_status !== WPGH_CONFIRMED): ?>
+                <div id="manual-confirmation">
+                    <label><input type="checkbox" name="manual_confirm" id="manual-confirm" value="1"><?php _ex( 'Manually confirm this email address.', 'contact_record', 'groundhogg' ); ?></label>
+                    <div id="confirmation-reason" class="hidden">
+                        <?php echo WPGH()->html->textarea( [ 'name' => 'confirmation_reason', 'cols' => 50, 'rows' => 2,  'placeholder' => __( 'Confirmation reason...', 'groundhogg' ) ] ); ?>
+                    </div>
+                </div>
+                <script>jQuery(function ($) {
+                        $( '#manual-confirm' ).on( 'change', function () {
+                            $( '#confirmation-reason' ).toggleClass( 'hidden' );
+                        } );
+                    });</script>
+                <?php endif; ?>
             </td>
         </tr>
         <tr>
@@ -459,7 +474,24 @@ function wpgh_contact_record_section_actions( $contact )
                 <div style="max-width: 400px">
                     <?php echo WPGH()->html->dropdown_emails(array()); ?>
                     <div class="row-actions">
-                        <button type="submit" name="send_email" value="send" class="button"><?php _e('Send'); ?></button>
+                        <button type="submit" name="send_email" value="send" class="button"><?php _e('Send' ); ?></button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><?php _ex( 'Send SMS', 'contact_record', 'groundhogg' ); ?></th>
+            <td>
+                <div style="max-width: 400px">
+                    <?php
+                    $args = array(
+                        'id'    => 'sms_id',
+                        'name'  => 'sms_id',
+                        'data'  => WPGH()->sms->get_sms_select()
+                    );
+                    echo WPGH()->html->select2( $args ); ?>
+                    <div class="row-actions">
+                        <button type="submit" name="send_sms" value="send" class="button"><?php _e('Send'); ?></button>
                     </div>
                 </div>
             </td>
@@ -733,24 +765,22 @@ function wpgh_contact_record_section_activity( $contact )
     <div style="max-width: 800px">
         <h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
         <p class="description"><?php _ex( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'contact_record', 'groundhogg' ); ?></p>
-        <?php $events = WPGH()->events->get_events(array('contact_id' => $contact->ID, 'status' => 'waiting'));
-        $table = new WPGH_Contact_Events_Table();
-        $table->data = $events;
+        <?php
+        $table = new WPGH_Contact_Events_Table( 'waiting' );
         $table->prepare_items();
         $table->display(); ?>
         <!-- FUNNNEL HISTORY -->
         <h2><?php _ex( 'Recent Funnel History', 'contact_record', 'groundhogg' ); ?></h2>
         <p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 10 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
-        <?php $events = WPGH()->events->get_events(array('contact_id' => $contact->ID, 'status' => 'complete'));
-        $table = new WPGH_Contact_Events_Table();
-        $table->data = $events;
+        <?php
+        $table = new WPGH_Contact_Events_Table( 'complete' );
         $table->prepare_items();
         $table->display(); ?>
     </div>
     <!-- EMAIL HISTORY -->
     <h2><?php _ex( 'Recent Email History', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px">
-        <?php $table = new WPGH_Contact_Activity_Table();
+        <?php $table = new WPGH_Contact_Activity_Table( );
         $table->prepare_items();
         $table->display(); ?>
         <p class="description"><?php _ex( 'This is where you can check if this contact is interacting with your emails.', 'contact_record', 'groundhogg' ); ?></p>

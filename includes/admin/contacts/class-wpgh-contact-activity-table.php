@@ -183,9 +183,9 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
         $data = $wpdb->get_results( $wpdb->prepare(
             "SELECT e.*,s.step_type FROM $events_table e 
                         LEFT JOIN $steps_table s ON e.step_id = s.ID 
-                        WHERE e.contact_id = %d AND e.status = %s AND ( s.step_type = %s OR e.funnel_id = %d )
+                        WHERE e.contact_id = %d AND e.status = %s AND ( s.step_type = %s OR e.funnel_id = %d OR e.event_type = %d )
                         ORDER BY time DESC"
-            , $id, 'complete', 'send_email', WPGH_BROADCAST )
+            , $id, 'complete', 'send_email', WPGH_BROADCAST, WPGH_EMAIL_NOTIFICATION_EVENT )
         );
 
         /*

@@ -32,8 +32,11 @@ $sms = WPGH()->sms->get_sms( $id );
             <td><textarea name="message" id="sms-message" rows="5"><?php echo $sms->message; ?></textarea>
                 <p class="description">
 		            <?php WPGH()->replacements->show_replacements_button(); ?>
-		            <?php _e( 'Use any valid replacement codes in your text message. Do not use html! Limit 280 characters.', 'groundhogg' ); ?>
+                    <?php _e( 'Use any valid replacement codes in your text message. You will be charged 1 credit per every 140 characters.', 'groundhogg' ); ?>&nbsp;<b>(<span id="characters"><?php echo strlen( $sms->message ); ?></span>)</b>
                 </p>
+                <script>jQuery( '#sms-message' ).on( 'keydown', function () {
+                        jQuery( '#characters' ).text( jQuery( '#sms-message' ).val().length )
+                    } );</script>
             </td>
         </tr>
         </tbody>

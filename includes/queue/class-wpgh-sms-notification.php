@@ -1,8 +1,8 @@
 <?php
 /**
- * Email Notification
+ * SMS Notification
  *
- * This is a simple class that allows for manually sent emails to be added to the event queque rather than running right away.
+ * This is a simple class that allows for manually sent sms to be added to the event queue rather than running right away.
  * The reason for this is so that an event can be created that will allow for tracking.
  *
  * @package     Includes
@@ -14,39 +14,41 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Email_Notification
+class WPGH_SMS_Notification implements WPGH_Event_Process
 {
 
+    public $ID;
     /**
-     * The email for the notification
+     * The sms for the notification
      *
-     * @var WPGH_Email|object
+     * @var WPGH_SMS|object
      */
-    public $email;
+    public $sms;
 
     /**
      * WPGH_Broadcast constructor.
      *
-     * @param $id int the ID of the email to send
+     * @param $id int the ID of the sms to send
      */
     public function __construct( $id )
     {
-        $this->email = new WPGH_Email( intval( $id ) );
+        $this->ID = intval( $id );
+        $this->sms = new WPGH_SMS( intval( $id ) );
     }
 
     /**
-     * Send the associated email to the given contact
+     * Send the associated sms to the given contact
      *
      * @param $contact WPGH_Contact
      * @param $event WPGH_Event
      *
-     * @return bool, whether the email sent or not.
+     * @return bool, whether the sms sent or not.
      */
     public function run( $contact, $event = null )
     {
-        do_action( 'groundhogg/email_notification/run/before', $this, $contact, $event );
-        $result = $this->email->send( $contact, $event );
-        do_action( 'groundhogg/email_notification/run/before', $this, $contact, $event );
+        do_action( 'groundhogg/sms_notification/run/before', $this, $contact, $event );
+        $result = $this->sms->send( $contact, $event );
+        do_action( 'groundhogg/sms_notification/run/after', $this, $contact, $event );
         return $result;
     }
 

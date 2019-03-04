@@ -43,7 +43,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $roles;
 
         /**
-         * GH api object //todo in progress
+         * GH api object
          *
          * @var object|WPGH_API_V2
          */
@@ -428,7 +428,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          */
         private function includes()
         {
-            /* DB */
+            /* Databases */
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-activity.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-broadcasts.php';
@@ -453,31 +453,34 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 require_once WPGH_PLUGIN_DIR . 'includes/dashboard.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/tools.php';
                 require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-upgrade.php';
-//                require_once WPGH_PLUGIN_DIR . 'includes/admin/user/class-wpgh-user-tokens-section.php';
 
                 if ( is_multisite() ){
                     require_once WPGH_PLUGIN_DIR . 'includes/admin/multisite/class-wpgh-network-settings-page.php';
                 }
             }
 
+            /* Automation files */
+            require_once WPGH_PLUGIN_DIR . 'includes/queue/interface-wpgh-event-process.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/queue/class-wpgh-broadcast.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/queue/class-wpgh-email-notification.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/queue/class-wpgh-sms-notification.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/queue/class-wpgh-event.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/queue/class-wpgh-event-queue-v2.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/queue/class-wpgh-step.php';
+
             /* Core Files */
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-bounce-checker.php';
-            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-broadcast.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-contact.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-contact-query.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-elements.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-email.php';
-            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-event.php';
-//            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-event-queue.php';
-            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-event-queue-v2.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-sms.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-extension.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-form.php';
-//            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-funnel.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-html.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-notices.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-replacements.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-roles.php';
-            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-step.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-submission.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-superlink.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-template-loader.php';
@@ -486,13 +489,18 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-form-iframe.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-stats-collection.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-groundhogg-service-manager.php';
+
+            /* Functions */
             require_once WPGH_PLUGIN_DIR . 'includes/functions.php';
             require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
-            require_once WPGH_PLUGIN_DIR . 'includes/install.php';
             require_once WPGH_PLUGIN_DIR . 'includes/locations.php';
-
             require_once WPGH_PLUGIN_DIR . 'includes/gutenberg.php';
+
+            /* API */
             require_once WPGH_PLUGIN_DIR . 'api/v2/class-wpgh-api-v2.php';
+
+            /* Install */
+            require_once WPGH_PLUGIN_DIR . 'includes/install.php';
 
         }
 

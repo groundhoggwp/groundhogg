@@ -27,23 +27,23 @@ class WPGH_SMS_Page
 
     const MAX_LENGTH = 280;
 
-	function __construct()
-	{
+    function __construct()
+    {
 
-	    add_action( 'admin_menu', array( $this, 'register' ), $this->order );
-		if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_sms' ){
-			add_action( 'init' , array( $this, 'process_action' )  );
-			$this->notices = WPGH()->notices;
-		}
-	}
+        add_action('admin_menu', array($this, 'register'), $this->order);
+        if (isset($_GET['page']) && $_GET['page'] === 'gh_sms') {
+            add_action('init', array($this, 'process_action'));
+            $this->notices = WPGH()->notices;
+        }
+    }
 
-	/* Register the page */
-	public function register()
+    /* Register the page */
+    public function register()
     {
         $page = add_submenu_page(
             'groundhogg',
-            _x( 'Sms', 'page_title', 'groundhogg' ),
-            _x( 'Sms', 'page_title', 'groundhogg' ),
+            _x('Sms', 'page_title', 'groundhogg'),
+            _x('Sms', 'page_title', 'groundhogg'),
             'edit_sms',
             'gh_sms',
             array($this, 'page')
@@ -55,159 +55,247 @@ class WPGH_SMS_Page
     /* Register the help bar */
     public function help()
     {
-        
+
     }
 
-	function get_sms()
-	{
-		$sms = isset( $_REQUEST['sms'] ) ? $_REQUEST['sms'] : null;
+    function get_sms()
+    {
+        $sms = isset($_REQUEST['sms']) ? $_REQUEST['sms'] : null;
 
-		if ( ! $sms )
-			return false;
+        if (!$sms)
+            return false;
 
-		return is_array( $sms )? array_map( 'intval', $sms ) : array( intval( $sms ) );
-	}
+        return is_array($sms) ? array_map('intval', $sms) : array(intval($sms));
+    }
 
-	function get_action()
-	{
-		if ( isset( $_REQUEST['filter_action'] ) && ! empty( $_REQUEST['filter_action'] ) )
-			return false;
+    function get_action()
+    {
+        if (isset($_REQUEST['filter_action']) && !empty($_REQUEST['filter_action']))
+            return false;
 
-		if ( isset( $_REQUEST['action'] ) && -1 != $_REQUEST['action'] )
-			return $_REQUEST['action'];
+        if (isset($_REQUEST['action']) && -1 != $_REQUEST['action'])
+            return $_REQUEST['action'];
 
-		if ( isset( $_REQUEST['action2'] ) && -1 != $_REQUEST['action2'] )
-			return $_REQUEST['action2'];
+        if (isset($_REQUEST['action2']) && -1 != $_REQUEST['action2'])
+            return $_REQUEST['action2'];
 
-		return false;
-	}
+        return false;
+    }
 
-	function get_previous_action()
-	{
-		$action = get_transient( 'gh_last_action' );
+    function get_previous_action()
+    {
+        $action = get_transient('gh_last_action');
 
-		delete_transient( 'gh_last_action' );
+        delete_transient('gh_last_action');
 
-		return $action;
-	}
+        return $action;
+    }
 
-	function get_title()
-	{
-		switch ( $this->get_action() ){
-			case 'edit':
-				_ex( 'Edit SMS', 'page_title', 'groundhogg' );
-				break;
-			default:
-				_ex( 'SMS', 'page_title','groundhogg' );
-		}
-	}
+    function get_title()
+    {
+        switch ($this->get_action()) {
+            case 'broadcast':
+                _ex('SMS Broadcast', 'page_title', 'groundhogg');
+                break;
+            case 'edit':
+                _ex('Edit SMS', 'page_title', 'groundhogg');
+                break;
+            default:
+                _ex('SMS', 'page_title', 'groundhogg');
+        }
+    }
 
-	function process_action()
-	{
-		if ( ! $this->get_action() || ! $this->verify_action() )
-			return;
+    function process_action()
+    {
+        if (!$this->get_action() || !$this->verify_action())
+            return;
 
-		$base_url = remove_query_arg( array( '_wpnonce', 'action' ), wp_get_referer() );
+        $base_url = remove_query_arg(array('_wpnonce', 'action'), wp_get_referer());
 
-		switch ( $this->get_action() )
-		{
-			case 'add':
+        switch ($this->get_action()) {
+            case 'add':
 
-                if ( ! current_user_can( 'add_sms' ) ){
-                    wp_die( WPGH()->roles->error( 'add_sms' ) );
+                if (!current_user_can('add_sms')) {
+                    wp_die(WPGH()->roles->error('add_sms'));
                 }
 
-				if ( isset( $_POST ) ) {
-					$this->add_sms();
-				}
-				
-				break;
+                if (isset($_POST)) {
+                    $this->add_sms();
+                }
+
+                break;
 
             case 'edit':
 
-                if ( ! current_user_can( 'edit_sms' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_sms' ) );
+                if (!current_user_can('edit_sms')) {
+                    wp_die(WPGH()->roles->error('edit_sms'));
                 }
 
-                if ( isset( $_POST ) ){
+                if (isset($_POST)) {
                     $this->edit_sms();
                 }
 
                 break;
 
-            case 'delete':
-
-                if ( ! current_user_can( 'delete_sms' ) ){
-                    wp_die( WPGH()->roles->error( 'delete_sms' ) );
+            case 'broadcast':
+                if (!current_user_can('edit_sms')) {
+                    wp_die(WPGH()->roles->error('edit_sms'));
                 }
 
-				foreach ( $this->get_sms() as $id ){
+                $this->schedule_broadcast();
 
-					WPGH()->sms->delete( $id );
+                break;
 
-				}
+            case 'delete':
 
-                $this->notices->add( 'deleted', sprintf( _nx( '%d sms deleted', '%d sms deleted', count( $this->get_sms() ), 'notice', 'groundhogg' ), count( $this->get_sms() ) ) );
+                if (!current_user_can('delete_sms')) {
+                    wp_die(WPGH()->roles->error('delete_sms'));
+                }
+
+                foreach ($this->get_sms() as $id) {
+
+                    WPGH()->sms->delete($id);
+
+                }
+
+                $this->notices->add('deleted', sprintf(_nx('%d sms deleted', '%d sms deleted', count($this->get_sms()), 'notice', 'groundhogg'), count($this->get_sms())));
 
                 break;
 
         }
 
-		set_transient( 'gh_last_action', $this->get_action(), 30 );
+        set_transient('gh_last_action', $this->get_action(), 30);
 
-		if ( $this->get_action() === 'edit' || $this->get_action() === 'add' )
-			return;
+        if ($this->get_action() === 'edit' || $this->get_action() === 'add')
+            return;
 
-		$base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_sms() ) ), $base_url );
+        $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_sms())), $base_url);
 
-		wp_redirect( $base_url );
-		die();
-	}
+        wp_redirect($base_url);
+        die();
+    }
 
-	private function add_sms()
+    private function add_sms()
     {
-        if ( ! current_user_can( 'add_sms' ) ){
-            wp_die( WPGH()->roles->error( 'add_sms' ) );
+        if (!current_user_can('add_sms')) {
+            wp_die(WPGH()->roles->error('add_sms'));
         }
 
-        $title   = sanitize_text_field( stripslashes( $_POST['title'] ) );
-        $message = substr( sanitize_textarea_field( wp_strip_all_tags( stripslashes( $_POST[ 'message' ] ) ) ), 0, self::MAX_LENGTH );
-        
+        $title = sanitize_text_field(stripslashes($_POST['title']));
+        $message = sanitize_textarea_field(wp_strip_all_tags(stripslashes($_POST['message'])));
+
         $args = array(
-            'title'      => $title,
-            'message'    => $message,
+            'title' => $title,
+            'message' => $message,
         );
 
-        $sms_id = WPGH()->sms->add( $args );
+        $sms_id = WPGH()->sms->add($args);
 
-        if ( $sms_id ){
-            do_action( 'wpgh_sms_created', $sms_id );
-            $this->notices->add( 'created', _x( 'SMS created', 'notice', 'groundhogg' ) );
+        if ($sms_id) {
+            do_action('wpgh_sms_created', $sms_id);
+            $this->notices->add('created', _x('SMS created', 'notice', 'groundhogg'));
         }
     }
 
     private function edit_sms()
     {
-        if ( ! current_user_can( 'edit_sms' ) ){
-            wp_die( WPGH()->roles->error( 'edit_sms' ) );
+        if (!current_user_can('edit_sms')) {
+            wp_die(WPGH()->roles->error('edit_sms'));
         }
 
-        $id = intval( $_GET[ 'sms' ] );
-	    $title   = sanitize_text_field( stripslashes( $_POST['title'] ) );
-	    $message = substr( sanitize_textarea_field( wp_strip_all_tags( stripslashes( $_POST[ 'message' ] ) ) ), 0, self::MAX_LENGTH );
+        $id = intval($_GET['sms']);
+        $title = sanitize_text_field(stripslashes($_POST['title']));
+        $message = sanitize_textarea_field(wp_strip_all_tags(stripslashes($_POST['message'])));
 
-	    $args = array(
-		    'title'      => $title,
-		    'message'    => $message,
-	    );
+        $args = array(
+            'title' => $title,
+            'message' => $message,
+        );
 
-        $result = WPGH()->sms->update( $id, $args );
+        $result = WPGH()->sms->update($id, $args);
 
-        if ( $result ) {
-            $this->notices->add( 'updated', _x( 'Updated SMS.', 'notice', 'groundhogg' ) );
-            do_action( 'wpgh_sms_updated', $id );
+        if ($result) {
+            $this->notices->add('updated', _x('Updated SMS.', 'notice', 'groundhogg'));
+            do_action('wpgh_sms_updated', $id);
         }
 
+    }
+
+    /**
+     * Schedule an SMS Broadcast.
+     */
+    function schedule_broadcast()
+    {
+        if ( ! current_user_can( 'schedule_broadcasts' ) ){
+            wp_die( WPGH()->roles->error( 'schedule_broadcasts' ) );
+        }
+
+        $sms = isset( $_POST['sms_id'] )? intval( $_POST[ 'sms_id' ] ) : null;
+
+        $tags = isset( $_POST[ 'tags' ] )? WPGH()->tags->validate( $_POST['tags'] ): array();
+
+        if ( empty( $tags ) || ! is_array( $tags ) ) {
+            $this->notices->add( 'no_tags', _x( 'Please select 1 or more tags to send this sms broadcast to', 'notice', 'groundhogg' ), 'error' );
+            return;
+        }
+
+        $exclude_tags = isset( $_POST[ 'exclude_tags' ] )? WPGH()->tags->validate( $_POST['exclude_tags'] ): array();
+
+        $contact_sum = 0;
+
+        foreach ( $tags as $tag ){
+            $tag = WPGH()->tags->get_tag( intval( $tag ) );
+            if ( $tag ){
+                $contact_sum += $tag->contact_count;
+            }
+        }
+
+        if ( $contact_sum === 0 ){
+            $this->notices->add( 'no_contacts', _x( 'Please select a tag with at least 1 contact', 'notice', 'groundhogg' ), 'error' );
+            return;
+        }
+
+        $send_date = isset( $_POST['date'] )? $_POST['date'] : date( 'Y/m/d', strtotime( 'tomorrow' ) );
+        $send_time = isset( $_POST['time'] )? $_POST['time'] : '09:30';
+
+        $time_string = $send_date . ' ' . $send_time;
+
+        /* convert to UTC */
+        $send_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+
+        if ( isset( $_POST[ 'send_now' ] ) ){
+            $send_time = time() + 10;
+        }
+
+        if ( $send_time < time() ){
+            $this->notices->add( 'invalid_date', _x( 'Please select a time in the future', 'notice', 'groundhogg' ), 'error' );
+            return;
+        }
+
+        $query = new WPGH_Contact_Query();
+
+        $args = array(
+            'tags_include' => $tags,
+            'tag_exclude' => $exclude_tags
+        );
+
+        $contacts = $query->query( $args );
+
+        foreach ( $contacts as $i => $contact ) {
+
+            $args = array(
+                'time'          => $send_time,
+                'contact_id'    => $contact->ID,
+                'funnel_id'     => 0,
+                'step_id'       => $sms,
+                'status'        => 'waiting',
+                'event_type'    => WPGH_SMS_NOTIFICATION_EVENT
+            );
+
+            WPGH()->events->add( $args );
+        }
+
+        $this->notices->add( 'success', _x( 'SMS broadcast scheduled!', 'notice','groundhogg' ), 'success' );
     }
 
 	function verify_action()
@@ -251,8 +339,11 @@ class WPGH_SMS_Page
                                 <textarea rows="5" name="message" id="sms-message" autocomplete="off" required></textarea>
                                 <p class="description">
 	                                <?php WPGH()->replacements->show_replacements_button(); ?>
-	                                <?php _e( 'Use any valid replacement codes in your text message. Do not use html! Limit 280 characters.', 'groundhogg' ); ?>
+                                    <?php _e( 'Use any valid replacement codes in your text message. You will be charged 1 credit per every 140 characters.', 'groundhogg' ); ?>&nbsp;<b>(<span id="characters">0</span>)</b>
                                 </p>
+                                <script>jQuery( '#sms-message' ).on( 'keydown', function () {
+                                        jQuery( '#characters' ).text( jQuery( '#sms-message' ).val().length )
+                                    } );</script>
                             </div>
                             <?php submit_button( _x( 'Add New SMS', 'action', 'groundhogg' ), 'primary', 'add_sms' ); ?>
                         </form>
@@ -280,16 +371,30 @@ class WPGH_SMS_Page
 		include dirname(__FILE__) . '/edit-sms.php';
 	}
 
+	function broadcast()
+    {
+        if ( ! current_user_can( 'edit_sms' ) ){
+            wp_die( WPGH()->roles->error( 'edit_sms' ) );
+        }
+
+        include dirname(__FILE__) . '/sms-broadcast.php';
+    }
+
 	function page()
 	{
 		?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_sms' ); ?>"><?php _ex( 'Add New', 'page_tile_action','groundhogg' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
+            <a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_sms' ); ?>"><?php _ex( 'Add New', 'page_tile_action','groundhogg' ); ?></a>
+            <a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_sms&action=broadcast' ); ?>"><?php _ex( 'SMS Broadcast', 'page_tile_action','groundhogg' ); ?></a>
 			<?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){
 				case 'edit':
 					$this->edit();
+					break;
+                case 'broadcast':
+					$this->broadcast();
 					break;
 				default:
 					$this->table();

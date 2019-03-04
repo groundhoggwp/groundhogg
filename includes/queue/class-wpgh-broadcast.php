@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Broadcast
+class WPGH_Broadcast implements WPGH_Event_Process
 {
 
     /**

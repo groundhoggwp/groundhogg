@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Step
+class WPGH_Step implements WPGH_Event_Process
 {
 
     /**

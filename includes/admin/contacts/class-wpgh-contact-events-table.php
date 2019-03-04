@@ -39,6 +39,20 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
      */
     public $data;
 
+    /**
+     * @var string
+     */
+    public $status;
+
+    public function __construct( $status='waiting' )
+    {
+        $this->status = $status;
+        parent::__construct( array(
+            'singular' => 'event',     // Singular name of the listed records.
+            'plural'   => 'events',    // Plural name of the listed records.
+            'ajax'     => false,       // Does this table support ajax?
+        ) );
+    }
 
     /**
      * @see WP_List_Table::::single_row_columns()
@@ -120,15 +134,9 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $data = $this->data;
+        $data =  WPGH()->events->get_events( array( 'contact_id' => intval( $_GET[ 'contact' ] ), 'status' => $this->status ) );
 
-        if ( ! $data ){
-            $data = array();
-        }
-
-        /*
-         * Sort the data
-         */
+         /* Sort the data */
         usort( $data, array( $this, 'usort_reorder' ) );
         $current_page = $this->get_pagenum();
         $total_items = count( $data );

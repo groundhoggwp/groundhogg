@@ -147,15 +147,28 @@ class WPGH_Events_Table extends WP_List_Table {
      */
     protected function column_step( $event )
     {
-
-        if ( $event->is_broadcast_event() ) {
-
-            $step_title = $event->step->email->subject;
-
+        if ($event->type) {
+            switch ($event->type) {
+                default:
+                case WPGH_FUNNEL_EVENT:
+                    $step_title = $event->step->title;
+                    break;
+                case WPGH_BROADCAST_EVENT:
+                    $step_title = $event->step->email->subject;
+                    break;
+                case WPGH_EMAIL_NOTIFICATION_EVENT:
+                    $step_title = $event->step->email->subject;
+                    break;
+                case WPGH_SMS_NOTIFICATION_EVENT:
+                    $step_title = $event->step->sms->title;
+                    break;
+            }
         } else {
-
-            $step_title = $event->step->title;
-
+            if ($event->is_broadcast_event()) {
+                $step_title = $event->step->email->subject;
+            } else {
+                $step_title = $event->step->title;
+            }
         }
 
         if ( ! $step_title )

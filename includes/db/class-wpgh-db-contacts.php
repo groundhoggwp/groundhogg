@@ -127,6 +127,9 @@ class WPGH_DB_Contacts extends WPGH_DB  {
             return false;
         }
 
+        /* Make sure lowercase. */
+        $args[ 'email' ] = strtolower( $args[ 'email' ] );
+
         if( $this->exists( $args['email'], 'email' ) ) {
             // update an existing contact
 
@@ -172,6 +175,10 @@ class WPGH_DB_Contacts extends WPGH_DB  {
      * @return  bool
      */
     public function update( $row_id, $data = array(), $where = '' ) {
+
+        if ( isset( $data[ 'email' ] ) ){
+            $data[ 'email' ] = strtolower( $data[ 'email' ] );
+        }
 
         $result = parent::update( $row_id, $data, $where );
 

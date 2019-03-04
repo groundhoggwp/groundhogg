@@ -26,7 +26,8 @@ class WPGH_Event
     /**
      * The associated step
      *
-     * @var object|WPGH_Step|WPGH_Broadcast|WPGH_Email_Notification
+     * @var object|WPGH_Step|WPGH_Broadcast|WPGH_Email_Notification|WPGH_SMS_Notification
+     *
      */
     public $step;
 
@@ -94,14 +95,11 @@ class WPGH_Event
         $this->time = intval($event->time);
         $this->status = $event->status;
 
-        if ($event->type) {
+        if ($event->event_type) {
             $this->type = intval($event->event_type);
         }
 
-        //do I NEED the funnel accessible as an object?
-        /* No, no I don't */
         $this->funnel_id = intval($event->funnel_id);
-
         //definitely need this...
         $this->contact = new WPGH_Contact($event->contact_id);
 
@@ -123,7 +121,7 @@ class WPGH_Event
                     $this->step = new WPGH_Email_Notification($event->step_id);
                     break;
                 case WPGH_SMS_NOTIFICATION_EVENT:
-                    $this->step = null;
+                    $this->step = new WPGH_SMS_Notification( $event->step_id );
                     break;
 
             }
@@ -202,19 +200,13 @@ class WPGH_Event
 
         $result = $this->step->run($this->contact, $this);
 
-        if (!$result) {
-
+        if ( ! $result || is_wp_error( $result ) ) {
             /* handle event failure */
-            do_action('wpgh_event_run_failed', $this);
-
+            do_action('wpgh_event_run_failed', $this, $result );
             $this->fail();
-
             return false;
-
         } else {
-
             $this->complete();
-
         }
 
         /* special handling for the broadcast event. Make sure it's status is updated to sent... */

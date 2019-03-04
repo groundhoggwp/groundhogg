@@ -266,7 +266,7 @@ class WPGH_Broadcasts_Page
                 'funnel_id'     => WPGH_BROADCAST,
                 'step_id'       => $broadcast_id,
                 'status'        => 'waiting',
-                'type'          => WPGH_BROADCAST_EVENT
+                'event_type'    => WPGH_BROADCAST_EVENT
             );
 
             WPGH()->events->add( $args );

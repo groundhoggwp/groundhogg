@@ -516,6 +516,24 @@ class WPGH_Contacts_Page
             );
         }
 
+        if ( isset( $_POST['manual_confirm'] ) ) {
+            if ( isset( $_POST[ 'confirmation_reason' ] ) && ! empty( $_POST[ 'confirmation_reason' ] ) ){
+                $contact->change_marketing_preference( WPGH_CONFIRMED );
+                $contact->update_meta( 'manual_confirmation_reason', sanitize_textarea_field( stripslashes( $_POST[ 'confirmation_reason' ] ) ) );
+                $this->notices->add(
+                    esc_attr('confirmed'),
+                    _x('This contact\'s email address has been confirmed.', 'notice', 'groundhogg'),
+                    'info'
+                );
+            } else {
+                $this->notices->add(
+                    esc_attr('manual_confirmation_error'),
+                    _x('A reason is required to change the email confirmation status.', 'notice', 'groundhogg'),
+                    'error'
+                );
+            }
+        }
+
         if (isset($_POST['email'])) {
 
             $email = sanitize_email($_POST['email']);
@@ -641,17 +659,38 @@ class WPGH_Contacts_Page
 
         if (isset($_POST['send_email']) && isset($_POST['email_id']) && current_user_can('send_emails')) {
 
-            $mail = new WPGH_Email(intval($_POST['email_id']));
+            $mail_id = intval( $_POST['email_id'] );
 
-            if ($mail->exists()) {
+            $event = [
+                'time'          => time(),
+                'funnel_id'     => 0,
+                'step_id'       => $mail_id,
+                'contact_id'    => $contact->ID,
+                'event_type'    => WPGH_EMAIL_NOTIFICATION_EVENT,
+                'status'        => 'waiting',
+            ];
 
-                WPGH()->events->add($args);
+            if( WPGH()->events->add( $event ) ){
+                $this->notices->add( 'email_queued', _x( 'The email has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
+            }
+        }
 
-                if ($mail->send($contact)) {
-                    $this->notices->add('sent', _x("Email sent!", 'notice', 'groundhogg'), 'info');
-                } else {
-                    $this->notices->add('not_sent', _x("Email could not be sent.", 'notice', 'groundhogg'), 'error');
-                }
+        /* USE the same email priviledges */
+        if (isset($_POST['send_sms']) && isset($_POST['sms_id']) && current_user_can('send_emails')) {
+
+            $sms_id = intval( $_POST['sms_id'] );
+
+            $event = [
+                'time'          => time(),
+                'funnel_id'     => 0,
+                'step_id'       => $sms_id,
+                'contact_id'    => $contact->ID,
+                'event_type'    => WPGH_SMS_NOTIFICATION_EVENT,
+                'status'        => 'waiting',
+            ];
+
+            if( WPGH()->events->add( $event ) ){
+                $this->notices->add( 'sms_queued', _x( 'The sms has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
             }
         }
 

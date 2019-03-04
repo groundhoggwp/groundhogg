@@ -422,7 +422,7 @@ function wpgh_replacement_meta( $arg, $contact_id )
  */
 function wpgh_replacement_first_name( $contact_id )
 {
-    return WPGH()->contacts->get_column_by( 'first_name', 'ID', $contact_id );
+    return ucfirst( strtolower( WPGH()->contacts->get_column_by( 'first_name', 'ID', $contact_id ) ) );
 }
 
 /**
@@ -433,7 +433,7 @@ function wpgh_replacement_first_name( $contact_id )
  */
 function wpgh_replacement_last_name( $contact_id )
 {
-    return WPGH()->contacts->get_column_by( 'last_name', 'ID', $contact_id );
+    return ucfirst( strtolower( WPGH()->contacts->get_column_by( 'last_name', 'ID', $contact_id ) ) );
 }
 
 /**
