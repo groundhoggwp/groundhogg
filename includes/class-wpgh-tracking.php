@@ -743,7 +743,7 @@ class WPGH_Tracking
         if ( ! $this->contact )
             wp_die( 'Hmmm, something went wrong. Please make sure you have cookies enabled.' );
 
-        $this->contact->update( array( 'optin_status' => WPGH_CONFIRMED ) );
+        $this->contact->change_marketing_preference( WPGH_CONFIRMED );
 
         if ( wpgh_is_global_multisite() ){
             switch_to_blog( get_site()->site_id );

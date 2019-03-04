@@ -76,14 +76,25 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
     protected function column_email( $event )
     {
 
-        if ( $event->is_broadcast_event() ) {
-
-            $email = $event->step->email;
-
+        if ($event->type) {
+            switch ($event->type) {
+                default:
+                case WPGH_FUNNEL_EVENT:
+                    $email = new WPGH_Email( $event->step->get_meta( 'email_id' ) );
+                    break;
+                case WPGH_BROADCAST_EVENT:
+                    $email = $event->step->email;
+                    break;
+                case WPGH_EMAIL_NOTIFICATION_EVENT:
+                    $email = $event->step->email;
+                    break;
+            }
         } else {
-
-            $email = new WPGH_Email( $event->step->get_meta( 'email_id' ) );
-
+            if ( $event->is_broadcast_event() ) {
+                $email = $event->step->email;
+            } else {
+                $email = new WPGH_Email( $event->step->get_meta( 'email_id' ) );
+            }
         }
 
         return sprintf(  "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email->ID ), $email->subject );

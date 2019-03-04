@@ -69,8 +69,10 @@ class WPGH_Bounce_Checker
     {
         $domain = explode( '@', $this->inbox );
         $domain = $domain[1];
+        $domain = wpgh_get_option( 'gh_bounce_inbox_host', $domain );
+        $port = wpgh_get_option( 'gh_bounce_inbox_port', 993 );
 
-        $hostname = sprintf( '{%s:993/imap/ssl/novalidate-cert}INBOX', $domain );
+        $hostname = sprintf( '{%s:%d/imap/ssl/novalidate-cert}INBOX', $domain, $port );
 
         /* try to connect */
         $inbox = imap_open( $hostname, $this->inbox, $this->password, OP_READONLY );

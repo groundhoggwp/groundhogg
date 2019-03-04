@@ -52,7 +52,7 @@ var wpghHTMLBlock;
                     }
                 });
 
-                this.htmlCode.on( 'change', function ( cm ) {
+                this.htmlCode.on( 'change keydown', function ( cm ) {
                     editor.getActive().find('.content-inside').html( cm.getValue() );
                 } );
 

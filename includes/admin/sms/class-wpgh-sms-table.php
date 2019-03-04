@@ -205,7 +205,7 @@ class WPGH_SMS_Table extends WP_List_Table {
         }
 
         $actions = array();
-        $title = $sms->name;
+        $title = $sms->title;
 
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',

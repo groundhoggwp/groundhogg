@@ -570,6 +570,32 @@ class WPGH_Settings_Page
                     'id'    => 'gh_bounce_inbox_password',
                 ),
             ),
+            'gh_bounce_inbox_host' => array(
+                'id'        => 'gh_bounce_inbox_host',
+                'section'   => 'bounces',
+                'label'     => _x( 'Bounce Inbox Host', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'This is the domain your email inbox is hosted. Most likely mail.yourdomain.com', 'settings', 'groundhogg' ),
+                'type'      => 'input',
+                'atts' => array(
+                    'type'  => 'text',
+                    'name'  => 'gh_bounce_inbox_host',
+                    'id'    => 'gh_bounce_inbox_host',
+                    'placeholder' => 'mail.' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ?  substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
+                ),
+            ),
+            'gh_bounce_inbox_port' => array(
+                'id'        => 'gh_bounce_inbox_port',
+                'section'   => 'bounces',
+                'label'     => _x( 'Bounce Inbox IMAP Port', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'The bounce checker requires an IMAP connection. Most IMAP ports are 993.', 'settings', 'groundhogg' ),
+                'type'      => 'input',
+                'atts' => array(
+                    'type'  => 'number',
+                    'name'  => 'gh_bounce_inbox_port',
+                    'id'    => 'gh_bounce_inbox_port',
+                    'placeholder' => 993,
+                ),
+            ),
             'gh_email_token' => array(
                 'id'        => 'gh_email_token',
                 'section'   => 'service',

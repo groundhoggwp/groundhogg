@@ -85,7 +85,12 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
     public function extra_tablenav($which)
     {
         ?>
+        <div class="alignleft gh-actions">
         <a class="button button-secondary" href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . $_GET[ 'contact' ] ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
+        <?php if ( $this->status === 'waiting' ): ?>
+        <a class="button action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
+        <?php endif; ?>
+        </div>
         <?php
     }
 

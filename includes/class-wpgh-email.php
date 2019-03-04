@@ -869,11 +869,11 @@ class WPGH_Email
 
                 case 'EMAIL_COMPLAINT':
                     do_action( 'wp_mail_failed', new WP_Error( 'EMAIL_COMPLAINT', $result->message ) );
-                    $this->contact->update( array( 'optin_status' => WPGH_COMPLAINED ) );
+                    $this->contact->change_marketing_preference( WPGH_COMPLAINED );
                     break;
                 case 'EMAIL_BOUNCED':
                     do_action( 'wp_mail_failed', new WP_Error( 'EMAIL_BOUNCED', $result->message ) );
-                    $this->contact->update( array( 'optin_status' => WPGH_HARD_BOUNCE ) );
+                    $this->contact->change_marketing_preference( WPGH_HARD_BOUNCE );
                     break;
                 DEFAULT:
                     do_action( 'wp_mail_failed' ,new WP_Error( $result->code, $result->message ) );
@@ -891,6 +891,9 @@ class WPGH_Email
             return false;
 
         }
+
+        $credits = $result->credits_remaining;
+        wpgh_update_option( 'gh_remaining_api_credits', $credits );
 
         return true;
 

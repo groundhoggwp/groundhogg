@@ -127,10 +127,13 @@ abstract class WPGH_Guided_Setup_Step
                             <?php echo $this->get_settings(); ?>
                             <p class="submit">
                                 <?php if ( ! $this->is_first_step() ): ?>
-                                    <a style="float: left" class="button button-primary" href="<?php printf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), $this->get_current_step_id() - 1 ) ?>"><?php _ex( '&larr; Back', 'guided_setup', 'groundhogg' ); ?></a>
+                                    <a style="float: left" class="button button-secondary" href="<?php printf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), $this->get_current_step_id() - 1 ) ?>"><?php _ex( '&larr; Back', 'guided_setup', 'groundhogg' ); ?></a>
                                 <?php endif; ?>
                                 <?php if ( ! $this->is_last_step() ): ?>
-                                    <input type="submit" style="float: right" class="button button-primary" value="<?php _ex( 'Save & Continue &rarr;', 'guided_setup', 'groundhogg' ); ?>"/>
+                                <span style="float: right" >
+                                    <a class="button button-secondary" href="<?php printf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), $this->get_current_step_id() + 1 ) ?>"><?php _ex( 'Skip', 'guided_setup', 'groundhogg' ); ?></a>
+                                    <input type="submit" class="button button-primary" value="<?php _ex( 'Save & Continue &rarr;', 'guided_setup', 'groundhogg' ); ?>"/>
+                                </span>
                                 <?php endif; ?>
                                 <?php if (  $this->is_last_step() ): ?>
                                     <a style="float: right" class="button button-primary" href="<?php echo admin_url( 'admin.php?page=groundhogg' ); ?>"><?php _ex( 'Complete Setup!', 'guided_setup', 'groundhogg' ); ?></a>

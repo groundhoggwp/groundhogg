@@ -50,6 +50,7 @@ if( wpgh_is_option_enabled( 'gh_uninstall_on_delete' ) ) {
     // Delete the databases
     WPGH()->activity->drop();
     WPGH()->broadcasts->drop();
+    WPGH()->sms->drop();
 
     WPGH()->contacts->drop();
     WPGH()->contact_meta->drop();

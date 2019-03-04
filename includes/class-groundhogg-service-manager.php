@@ -114,7 +114,7 @@ class Groundhogg_Service_Manager
 	     * ]
 	     * */
 	    wpgh_update_option( 'gh_email_api_dns_records', $json->dns_records );
-        WPGH()->notices->add( 'RETRIEVED_DNS', 'Successfully registered your domain.', 'error' );
+        WPGH()->notices->add( 'RETRIEVED_DNS', 'Successfully registered your domain.' );
 
     }
 
@@ -190,6 +190,9 @@ class Groundhogg_Service_Manager
         return wpgh_is_option_enabled( 'gh_send_with_gh_api' );
     }
 
+    /**
+     * Show the DNS Records table
+     */
     public function get_dns_table()
     {
         ?>
@@ -320,6 +323,9 @@ class Groundhogg_Service_Manager
             do_action( 'wpgh_sms_failed', $error );
             return $error;
         }
+
+        $credits = $result->credits_remaining;
+        wpgh_update_option( 'gh_remaining_api_credits', $credits );
 
         return true;
 

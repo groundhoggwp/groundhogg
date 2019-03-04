@@ -17,12 +17,12 @@ var wpghButtonBlock;
         init : function () {
 
             this.text  = $( '#button-text' );
-            this.text.on( 'change', function ( e ) {
+            this.text.on( 'keydown change', function ( e ) {
                 editor.getActive().find('a').text($(this).val());
             });
 
             this.link  = $( '#button-link' );
-            this.link.on( 'change', function ( e ) {
+            this.link.on( 'keydown change', function ( e ) {
                 editor.getActive().find('a').attr('href', $(this).val() );
             });
 
