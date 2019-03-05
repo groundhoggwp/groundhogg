@@ -211,32 +211,6 @@ class WPGH_Welcome_Page
      */
     public function get_articles()
     {
-//        $articles = array(
-//            array(
-//                'title' => __( 'Full Walkthrough', 'groundhogg' ),
-//                'desc'  => __( 'Watch this full walkthrough of setting up Groundhogg and building your first funnel.', 'groundhogg' ),
-//                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/12/Full-Demo.png',
-//                'link'  => 'https://groundhogg.io/demo/'
-//            ),
-//            array(
-//                'title' => __( "Managing Users", 'groundhogg' ),
-//                'desc'  => __( "If you have sales people you need to read how you can give them only specific access to your CRM.", 'groundhogg' ),
-//                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/user-roles-722x361.png',
-//                'link'  => 'https://www.groundhogg.io/support/how-to-manage-user-roles/'
-//            ),
-//            array(
-//                'title' => __( "How To Remain Compliant ", 'groundhogg' ),
-//                'desc'  => __( "Learn about the tools Groundhogg provides so you can remain complaint in countries around the world.", 'groundhogg' ),
-//                'img'   => 'https://www.groundhogg.io/wp-content/uploads/2018/10/compliance-722x361.png',
-//                'link'  => 'https://www.groundhogg.io/support/compliance/'
-//            ),
-//            array(
-//                'title' => __( "Send Marketing With Groundhogg", 'groundhogg' ),
-//                'desc'  => __( "Get your first 1000 credits free when you sign up! Send SMS and Email with Groundhogg.", 'groundhogg' ),
-//                'img'   => 'https://www.groundhogg.io/wp-content/uploads/edd/2018/11/email-credits-722x361.png',
-//                'link'  => 'https://www.groundhogg.io/downloads/email-credits/'
-//            ),
-//        );
 
         $args = wp_parse_args( array(
             'include' => [
