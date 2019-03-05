@@ -113,9 +113,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED Guided Setup UI for new installations.
 * ADDED Central database for SMS so it can be used throughout plugin.
 * ADDED UI for managing SMS globally
+* ADDED Error reporting for failed events in the events screen.
+* ADDED Process events direct from contact activity tab.
+* ADDED Support for manually confirming a contact's email address.
 * TWEAKED Max default text length increased to 280 characters.
 * TWEAKED removed 5 second check preventing emails sent in succession, no longer needed.
 * FIXED Email content centered if not explicitly given left align
+* FIXED Emails sent if in draft mode.
 
 = 1.1.4 =
 * ADDED Search form to welcome page for docs help

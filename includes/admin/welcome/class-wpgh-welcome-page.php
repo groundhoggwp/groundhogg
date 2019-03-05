@@ -57,6 +57,12 @@ class WPGH_Welcome_Page
     public function other_notices()
     {
 
+        if ( ! wpgh_get_option( 'gh_guided_setup_finished', false ) ){
+            $this->notices->add(
+                'guided_setup', sprintf( "<a href='%s'>%s</a>", admin_url( 'admin.php?page=gh_guided_setup' ), _x( 'You have yet to complete the guided setup process.', 'notice', 'groundhogg' ) ), 'info'
+            );
+        }
+
         /* Hide affiliate notice when extensions are active */
         if ( ! class_exists( 'WPGH_Extensions_Manager' ) )
             include_once dirname( __FILE__ ) . '/../extensions/module-manager.php';
