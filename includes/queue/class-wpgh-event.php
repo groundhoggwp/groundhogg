@@ -67,6 +67,16 @@ class WPGH_Event
     public $type = false;
 
     /**
+     * @var WP_Error
+     */
+    public $error;
+
+    /**
+     * @var string
+     */
+    public $failure_reason;
+
+    /**
      * @param $id int ID of the event
      */
     public function __construct($id)
@@ -94,6 +104,7 @@ class WPGH_Event
 
         $this->time = intval($event->time);
         $this->status = $event->status;
+        $this->failure_reason = $event->failure_reason;
 
         if ($event->event_type) {
             $this->type = intval($event->event_type);
@@ -186,6 +197,44 @@ class WPGH_Event
     }
 
     /**
+     * @since 1.2
+     * @return bool
+     */
+    public function is_sms_notification_event()
+    {
+        return $this->type === WPGH_EMAIL_NOTIFICATION_EVENT;
+    }
+
+    /**
+     * @since 1.2
+     * @return bool
+     */
+    public function is_email_notification_event()
+    {
+        return $this->type === WPGH_SMS_NOTIFICATION_EVENT;
+    }
+
+    /**
+     * @param $error WP_Error
+     * @return WP_Error|false;
+     */
+    public function set_error( $error ){
+        if ( is_wp_error( $error ) ){
+            return $this->error = $error;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function has_error()
+    {
+        return is_wp_error( $this->error );
+    }
+
+    /**
      * Run the event
      *
      * Wrapper function for the step call in WPGH_Step
@@ -202,8 +251,13 @@ class WPGH_Event
 
         if ( ! $result || is_wp_error( $result ) ) {
             /* handle event failure */
+
+            $this->set_error( $result );
+
             do_action('wpgh_event_run_failed', $this, $result );
+
             $this->fail();
+
             return false;
         } else {
             $this->complete();
@@ -279,9 +333,7 @@ class WPGH_Event
      */
     public function is_time()
     {
-
         return $this->time <= time();
-
     }
 
     /**
@@ -316,9 +368,21 @@ class WPGH_Event
 
     public function fail()
     {
-        return $this->update(array(
+        $args = array(
             'status' => 'failed'
-        ));
+        );
+
+        /**
+         * Report a failure reason for better debugging.
+         *
+         * @since 1.2
+         */
+        if ( $this->has_error() ){
+            $error = sprintf( "%s: %s", $this->error->get_error_code(), $this->error->get_error_message() );
+            $args[ 'failure_reason' ] = $error;
+        }
+
+        return $this->update( $args );
     }
 
     /**
@@ -338,6 +402,7 @@ class WPGH_Event
     {
         return $this->update(array(
             'status' => 'complete',
+            'failure_reason' => '',
         ));
     }
 

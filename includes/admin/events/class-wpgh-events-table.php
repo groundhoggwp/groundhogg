@@ -48,6 +48,7 @@ class WPGH_Events_Table extends WP_List_Table {
             'funnel'    => _x( 'Funnel', 'Column label', 'wp-funnels' ),
             'step'      => _x( 'Step', 'Column label', 'wp-funnels' ),
             'time'      => _x( 'Time', 'Column label', 'wp-funnels' ),
+            'errors'    => _x( 'Errors', 'Column label', 'wp-funnels' ),
         );
 
         return apply_filters( 'wpgh_event_columns', $columns );
@@ -230,6 +231,15 @@ class WPGH_Events_Table extends WP_List_Table {
         }
 
         return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+    }
+
+    /**
+     * @param $event WPGH_Event
+     * @return string
+     */
+    protected function column_errors($event)
+    {
+        return $event->failure_reason ? $event->failure_reason : '&#x2014;' ;
     }
 
     protected function extra_tablenav($which)
@@ -418,53 +428,78 @@ class WPGH_Events_Table extends WP_List_Table {
     /**
      * Generates and displays row action superlinks.
      *
-     * @param object $event        Event being acted upon.
+     * @param WPGH_Event $event        Event being acted upon.
      * @param string $column_name Current column name.
      * @param string $primary     Primary column name.
      * @return string Row elements output for posts.
      */
     protected function handle_row_actions( $event, $column_name, $primary ) {
-        if ( $primary !== $column_name ) {
-            return '';
-        }
 
-        $actions = array();
+        $actions = [];
 
-        switch ( $event->status ){
-            case 'waiting':
-                $actions['execute'] = sprintf(
-                    '<a href="%s" class="edit" aria-label="%s">%s</a>',
-                    /* translators: %s: title */
-                    esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ) ) ),
-                    esc_attr( _x( 'Execute', 'action', 'groundhogg' ) ),
-                    _x( 'Run Now', 'action', 'groundhogg' )
+        if ( $primary === $column_name ) {
+
+            $actions = array();
+
+            switch ($event->status) {
+                case 'waiting':
+                    $actions['execute'] = sprintf(
+                        '<a href="%s" class="edit" aria-label="%s">%s</a>',
+                        /* translators: %s: title */
+                        esc_url(wp_nonce_url(admin_url('admin.php?page=gh_events&event=' . $event->ID . '&action=execute'))),
+                        esc_attr(_x('Execute', 'action', 'groundhogg')),
+                        _x('Run Now', 'action', 'groundhogg')
+                    );
+                    $actions['delete'] = sprintf(
+                        '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+                        esc_url(wp_nonce_url(admin_url('admin.php?page=gh_events&event=' . $event->ID . '&action=cancel'))),
+                        /* translators: %s: title */
+                        esc_attr(_x('Cancel', 'action', 'groundhogg')),
+                        _x('Cancel', 'action', 'groundhogg')
+                    );
+                    break;
+                default:
+                    $actions['re_execute'] = sprintf(
+                        '<a href="%s" class="edit" aria-label="%s">%s</a>',
+                        /* translators: %s: title */
+                        esc_url(wp_nonce_url(admin_url('admin.php?page=gh_events&event=' . $event->ID . '&action=execute'))),
+                        esc_attr(_x('Run Again', 'action', 'groundhogg')),
+                        _x('Run Again', 'action', 'groundhogg')
+                    );
+                    break;
+
+            }
+
+            if ($event->contact->exists()) {
+                $actions['view'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
+                    admin_url('admin.php?page=gh_contacts&action=edit&contact=' . $event->contact->ID),
+                    esc_attr(_x('View Contact', 'action', 'groundhogg')),
+                    _x('View Contact', 'action', 'groundhogg')
                 );
-                $actions['delete'] = sprintf(
-                    '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-                    esc_url( wp_nonce_url(admin_url('admin.php?page=gh_events&event='. $event->ID .'&action=cancel') ) ),
-                    /* translators: %s: title */
-                    esc_attr( _x( 'Cancel', 'action', 'groundhogg' ) ),
-                    _x( 'Cancel', 'action', 'groundhogg' )
-                );
-                break;
-            default:
-                $actions['re_execute'] = sprintf(
-                    '<a href="%s" class="edit" aria-label="%s">%s</a>',
-                    /* translators: %s: title */
-                    esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ) ) ),
-                    esc_attr( _x( 'Run Again', 'action', 'groundhogg' ) ),
-                    _x( 'Run Again', 'action', 'groundhogg' )
-                );
-                break;
+            }
+        } else if ( $column_name === 'funnel' ){
 
-        }
+            if ( $event->is_funnel_event() ){
+                $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
+                    admin_url('admin.php?page=gh_funnels&action=edit&funnel=' . $event->funnel_id),
+                    esc_attr(_x('Edit Funnel', 'action', 'groundhogg')),
+                    _x('Edit Funnel', 'action', 'groundhogg')
+                );
 
-        if ( $event->contact->exists() ){
-            $actions[ 'view' ] = sprintf( "<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $event->contact->ID ),
-                esc_attr( _x( 'View Contact', 'action', 'groundhogg' ) ),
-                _x( 'View Contact', 'action', 'groundhogg' )
-            );
+            }
+
+        } else if ( $column_name === 'step' ){
+
+            if ( $event->is_funnel_event() ){
+                $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
+                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->funnel_id, $event->step->ID ) ),
+                    esc_attr(_x('Edit Step', 'action', 'groundhogg')),
+                    _x('Edit Step', 'action', 'groundhogg')
+                );
+            }
+
+
+
         }
 
 

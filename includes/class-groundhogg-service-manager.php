@@ -316,6 +316,8 @@ class Groundhogg_Service_Manager
             return $error;
         }
 
+//        var_dump( $result );
+
         if ( ! isset( $result->status ) || $result->status !== 'success' ){
             /* mail failed */
             $error = new WP_Error( $result->code, $result->message );

@@ -131,6 +131,11 @@ class WPGH_Email
     protected $previous_altbody;
 
     /**
+     * @var WP_Error
+     */
+    public $error;
+
+    /**
      * @var string
      */
     public $error_message;
@@ -144,10 +149,10 @@ class WPGH_Email
 
         $this->ID = intval($id);
 
-        if ( ! WPGH()->emails->exists( $id ) )
+        if (!WPGH()->emails->exists($id))
             return false;
 
-        $email = (object) WPGH()->emails->get_email( $id );
+        $email = (object)WPGH()->emails->get_email($id);
 
         $this->setup_email($email);
 
@@ -198,8 +203,8 @@ class WPGH_Email
      */
     public function get_template()
     {
-        $template = apply_filters( 'wpgh_email_template', $this->template );
-        return apply_filters( 'groundhogg/email/template', $template );
+        $template = apply_filters('wpgh_email_template', $this->template);
+        return apply_filters('groundhogg/email/template', $template);
     }
 
 
@@ -230,7 +235,7 @@ class WPGH_Email
      */
     public function is_confirmation_email()
     {
-        return strpos( $this->content, '{confirmation_link}' ) !== false;
+        return strpos($this->content, '{confirmation_link}') !== false;
     }
 
     /**
@@ -240,16 +245,16 @@ class WPGH_Email
      *
      * @return string
      */
-    public function browser_link( $link )
+    public function browser_link($link)
     {
 
-        if ( wpgh_is_global_multisite() ){
-            switch_to_blog( get_site()->site_id );
+        if (wpgh_is_global_multisite()) {
+            switch_to_blog(get_site()->site_id);
         }
 
-        $url = get_permalink( wpgh_get_option( 'gh_view_in_browser_page' ) ) . '?email=' . $this->ID ;
+        $url = get_permalink(wpgh_get_option('gh_view_in_browser_page')) . '?email=' . $this->ID;
 
-        if ( is_multisite() && ms_is_switched() ){
+        if (is_multisite() && ms_is_switched()) {
             restore_current_blog();
         }
 
@@ -279,7 +284,7 @@ class WPGH_Email
     public function get_click_tracking_link()
     {
         return site_url(
-            sprintf( 'gh-tracking/email/click/?u=%s&e=%s&i=%s&ref=',
+            sprintf('gh-tracking/email/click/?u=%s&e=%s&i=%s&ref=',
                 dechex($this->contact->ID),
                 dechex($this->event->ID),
                 dechex($this->ID)
@@ -297,7 +302,7 @@ class WPGH_Email
     public function get_alignment_outlook($css)
     {
         $alignment = $this->get_meta('alignment', true);
-        return ($alignment === 'left')? '' : 'center';
+        return ($alignment === 'left') ? '' : 'center';
     }
 
     /**
@@ -321,8 +326,8 @@ class WPGH_Email
      */
     public function get_to()
     {
-       $to = apply_filters( 'wpgh_email_to', $this->contact->email );
-       return apply_filters( 'groundhogg/email/to', $to );
+        $to = apply_filters('wpgh_email_to', $this->contact->email);
+        return apply_filters('groundhogg/email/to', $to);
     }
 
     /**
@@ -333,12 +338,12 @@ class WPGH_Email
     public function get_subject_line()
     {
         $subject = WPGH()->replacements->process(
-            sanitize_text_field( $this->subject ),
+            sanitize_text_field($this->subject),
             $this->contact->ID
         );
 
-        $subject = apply_filters( 'wpgh_email_subject_line', $subject );
-        return apply_filters( 'groundhogg/email/subject', $subject );
+        $subject = apply_filters('wpgh_email_subject_line', $subject);
+        return apply_filters('groundhogg/email/subject', $subject);
     }
 
     /**
@@ -349,15 +354,15 @@ class WPGH_Email
      *
      * @return string
      */
-    public function get_pre_header( $content )
+    public function get_pre_header($content)
     {
         $pre_header = WPGH()->replacements->process(
             $this->pre_header,
             $this->contact->ID
         );
 
-        $pre_header = apply_filters( 'wpgh_email_pre_header', $pre_header );
-        return apply_filters( 'groundhogg/email/pre_header', $pre_header );
+        $pre_header = apply_filters('wpgh_email_pre_header', $pre_header);
+        return apply_filters('groundhogg/email/pre_header', $pre_header);
     }
 
     /**
@@ -368,7 +373,7 @@ class WPGH_Email
      *
      * @return string
      */
-    public function get_content( $content='' )
+    public function get_content($content = '')
     {
         $content = WPGH()->replacements->process(
             $this->content,
@@ -376,13 +381,13 @@ class WPGH_Email
         );
 
         /* filter out double http based on bug where superlinks have http:// prepended */
-        $schema = is_ssl()? 'https://' : 'http://';
-        $content = str_replace( 'http://https://', $schema, $content );
-        $content = str_replace( 'http://http://', $schema, $content );
+        $schema = is_ssl() ? 'https://' : 'http://';
+        $content = str_replace('http://https://', $schema, $content);
+        $content = str_replace('http://http://', $schema, $content);
 
         /* Other filters */
-        $content = apply_filters( 'wpgh_email_template_make_clickable', true ) ? make_clickable( $content ) : $content;
-        $content = str_replace( '&#038;', '&amp;', $content );
+        $content = apply_filters('wpgh_email_template_make_clickable', true) ? make_clickable($content) : $content;
+        $content = str_replace('&#038;', '&amp;', $content);
 
         return $content;
     }
@@ -394,10 +399,10 @@ class WPGH_Email
      *
      * @return string
      */
-    public function convert_to_tracking_links( $content )
+    public function convert_to_tracking_links($content)
     {
         /* Filter the superlinks to include data about the email, campaign, and funnel steps... */
-        return preg_replace_callback( '/(href=")(?!mailto)([^"]*)(")/i', array( $this, 'tracking_link_callback' ) , $content );
+        return preg_replace_callback('/(href=")(?!mailto)([^"]*)(")/i', array($this, 'tracking_link_callback'), $content);
     }
 
     /**
@@ -406,9 +411,9 @@ class WPGH_Email
      * @param $matches
      * @return string
      */
-    public function tracking_link_callback( $matches )
+    public function tracking_link_callback($matches)
     {
-        return $matches[1] . $this->get_click_tracking_link() . urlencode( $matches[2] ) . $matches[3];
+        return $matches[1] . $this->get_click_tracking_link() . urlencode($matches[2]) . $matches[3];
     }
 
     /**
@@ -418,56 +423,56 @@ class WPGH_Email
      *
      * @return string
      */
-    public function get_footer_text( $content )
+    public function get_footer_text($content)
     {
         $footer = "";
 
-        if ( wpgh_is_global_multisite() ){
-            switch_to_blog( get_site()->site_id );
+        if (wpgh_is_global_multisite()) {
+            switch_to_blog(get_site()->site_id);
         }
 
-        if ( wpgh_get_option( 'gh_business_name' ) )
+        if (wpgh_get_option('gh_business_name'))
             $footer .= "&copy; {business_name}<br/>";
 
-        if ( wpgh_get_option( 'gh_street_address_1' ) )
+        if (wpgh_get_option('gh_street_address_1'))
             $footer .= "{business_address}<br/>";
 
         $sub = array();
 
-        if ( wpgh_get_option( 'gh_phone', 0 ) ) {
+        if (wpgh_get_option('gh_phone', 0)) {
             $sub[] = sprintf(
                 "<a href='tel:%s'>%s</a>",
-                esc_attr( wpgh_get_option('gh_phone') ),
-                esc_attr( wpgh_get_option('gh_phone') )
+                esc_attr(wpgh_get_option('gh_phone')),
+                esc_attr(wpgh_get_option('gh_phone'))
             );
         }
 
-        if ( wpgh_get_option( 'gh_privacy_policy' ) ) {
+        if (wpgh_get_option('gh_privacy_policy')) {
             $sub[] = sprintf(
                 "<a href='%s'>%s</a>",
-                esc_attr( get_permalink( wpgh_get_option( 'gh_privacy_policy' ) ) ),
-                apply_filters( 'gh_privacy_policy_footer_text', __( 'Privacy Policy', 'groundhogg' ) )
+                esc_attr(get_permalink(wpgh_get_option('gh_privacy_policy'))),
+                apply_filters('gh_privacy_policy_footer_text', __('Privacy Policy', 'groundhogg'))
             );
         }
 
-        if ( wpgh_get_option( 'gh_terms' ) ) {
+        if (wpgh_get_option('gh_terms')) {
             $sub[] = sprintf(
                 "<a href='%s'>%s</a>",
-                esc_attr( get_permalink( wpgh_get_option( 'gh_terms' ) ) ),
-                apply_filters( 'gh_terms_footer_text', __( 'Terms', 'groundhogg' ) )
+                esc_attr(get_permalink(wpgh_get_option('gh_terms'))),
+                apply_filters('gh_terms_footer_text', __('Terms', 'groundhogg'))
             );
         }
 
-        $footer .= implode(' | ', $sub );
+        $footer .= implode(' | ', $sub);
 
-        $footer = WPGH()->replacements->process( $footer, $this->contact->ID );
+        $footer = WPGH()->replacements->process($footer, $this->contact->ID);
 
-        if ( is_multisite() && ms_is_switched() ){
+        if (is_multisite() && ms_is_switched()) {
             restore_current_blog();
         }
 
-        $footer = apply_filters( 'wpgh_email_footer', $footer );
-        return apply_filters( 'groundhogg/email/footer', $footer );
+        $footer = apply_filters('wpgh_email_footer', $footer);
+        return apply_filters('groundhogg/email/footer', $footer);
     }
 
     /**
@@ -476,15 +481,15 @@ class WPGH_Email
      * @param $url
      * @return false|string
      */
-    public function get_unsubscribe_link( $url )
+    public function get_unsubscribe_link($url)
     {
-        if ( wpgh_is_global_multisite() ){
-            switch_to_blog( get_site()->site_id );
+        if (wpgh_is_global_multisite()) {
+            switch_to_blog(get_site()->site_id);
         }
 
-        $url = get_permalink( wpgh_get_option( 'gh_email_preferences_page' ) );
+        $url = get_permalink(wpgh_get_option('gh_email_preferences_page'));
 
-        if ( is_multisite() && ms_is_switched() ){
+        if (is_multisite() && ms_is_switched()) {
             restore_current_blog();
         }
 
@@ -497,15 +502,15 @@ class WPGH_Email
      */
     private function add_filters()
     {
-        add_filter( 'wpgh_email_alignment',          array( $this, 'get_alignment_outlook' ) );
-        add_filter( 'wpgh_email_container_css',      array( $this, 'get_alignment' ) );
-        add_filter( 'wpgh_email_browser_view',       array( $this, 'browser_view_enabled' ) );
-        add_filter( 'wpgh_email_browser_link',       array( $this, 'browser_link' ) );
-        add_filter( 'wpgh_email_pre_header_text',    array( $this, 'get_pre_header' ) );
-        add_filter( 'wpgh_email_get_content',        array( $this, 'get_content' ) );
-        add_filter( 'wpgh_email_footer_text',        array( $this, 'get_footer_text' ) );
-        add_filter( 'wpgh_email_unsubscribe_link',   array( $this, 'get_unsubscribe_link' ) );
-        add_filter( 'wpgh_email_open_tracking_link', array( $this, 'get_open_tracking_link' ) );
+        add_filter('wpgh_email_alignment', array($this, 'get_alignment_outlook'));
+        add_filter('wpgh_email_container_css', array($this, 'get_alignment'));
+        add_filter('wpgh_email_browser_view', array($this, 'browser_view_enabled'));
+        add_filter('wpgh_email_browser_link', array($this, 'browser_link'));
+        add_filter('wpgh_email_pre_header_text', array($this, 'get_pre_header'));
+        add_filter('wpgh_email_get_content', array($this, 'get_content'));
+        add_filter('wpgh_email_footer_text', array($this, 'get_footer_text'));
+        add_filter('wpgh_email_unsubscribe_link', array($this, 'get_unsubscribe_link'));
+        add_filter('wpgh_email_open_tracking_link', array($this, 'get_open_tracking_link'));
     }
 
     /**
@@ -513,14 +518,14 @@ class WPGH_Email
      */
     private function remove_filters()
     {
-        remove_filter( 'wpgh_email_container_css',      array( $this, 'get_alignment' ) );
-        remove_filter( 'wpgh_email_browser_view',       array( $this, 'browser_view_enabled' ) );
-        remove_filter( 'wpgh_email_browser_link',       array( $this, 'browser_link' ) );
-        remove_filter( 'wpgh_email_pre_header_text',    array( $this, 'get_pre_header' ) );
-        remove_filter( 'wpgh_email_get_content',        array( $this, 'get_content' ) );
-        remove_filter( 'wpgh_email_footer_text',        array( $this, 'get_footer_text' ) );
-        remove_filter( 'wpgh_email_unsubscribe_link',   array( $this, 'get_unsubscribe_link' ) );
-        remove_filter( 'wpgh_email_open_tracking_link', array( $this, 'get_open_tracking_link' ) );
+        remove_filter('wpgh_email_container_css', array($this, 'get_alignment'));
+        remove_filter('wpgh_email_browser_view', array($this, 'browser_view_enabled'));
+        remove_filter('wpgh_email_browser_link', array($this, 'browser_link'));
+        remove_filter('wpgh_email_pre_header_text', array($this, 'get_pre_header'));
+        remove_filter('wpgh_email_get_content', array($this, 'get_content'));
+        remove_filter('wpgh_email_footer_text', array($this, 'get_footer_text'));
+        remove_filter('wpgh_email_unsubscribe_link', array($this, 'get_unsubscribe_link'));
+        remove_filter('wpgh_email_open_tracking_link', array($this, 'get_open_tracking_link'));
     }
 
 
@@ -539,34 +544,34 @@ class WPGH_Email
 
         $template = $this->get_template();
 
-        if ( has_action( "groundhogg/email/header/{$template}" ) ){
+        if (has_action("groundhogg/email/header/{$template}")) {
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
              */
-            do_action( "groundhogg/email/header/{$template}" , $this );
+            do_action("groundhogg/email/header/{$template}", $this);
 
         } else {
-            $templates->get_template_part( 'emails/header', $this->get_template() );
+            $templates->get_template_part('emails/header', $this->get_template());
         }
 
 //        wp_die( 'HI!' );
-        if ( has_action( "groundhogg/email/body/{$template}" ) ){
+        if (has_action("groundhogg/email/body/{$template}")) {
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
              */
-            do_action( "groundhogg/email/body/{$template}" , $this );
+            do_action("groundhogg/email/body/{$template}", $this);
         } else {
-            $templates->get_template_part( 'emails/body', $this->get_template() );
+            $templates->get_template_part('emails/body', $this->get_template());
         }
 
-        if ( has_action( "groundhogg/email/footer/{$template}" ) ){
+        if (has_action("groundhogg/email/footer/{$template}")) {
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.
              */
-            do_action( "groundhogg/email/footer/{$template}" , $this );
+            do_action("groundhogg/email/footer/{$template}", $this);
 
         } else {
-            $templates->get_template_part( 'emails/footer', $this->get_template() );
+            $templates->get_template_part('emails/footer', $this->get_template());
 
         }
 
@@ -574,16 +579,16 @@ class WPGH_Email
         $content = ob_get_clean();
 //        return ob_get_clean();
 
-        if ( empty( $content ) )
-        $content = 'No content...';
+        if (empty($content))
+            $content = 'No content...';
 
 
-        $content = $this->minify( $content );
-        $content = $this->convert_to_tracking_links( $content );
+        $content = $this->minify($content);
+        $content = $this->convert_to_tracking_links($content);
 
         $this->remove_filters();
 
-        return apply_filters( 'wpgh_the_email_content', $content );
+        return apply_filters('wpgh_the_email_content', $content);
 //        return $content;
     }
 
@@ -594,22 +599,22 @@ class WPGH_Email
      */
     public function get_from_name()
     {
-        if ( intval( $this->from_user ) ) {
+        if (intval($this->from_user)) {
 
-            $from_user  = get_userdata( $this->from_user );
+            $from_user = get_userdata($this->from_user);
             return $from_user->display_name;
 
         } else {
 
             $owner = $this->contact->owner;
 
-            if ( $owner && is_email( $owner->user_email ) ) {
+            if ($owner && is_email($owner->user_email)) {
 
                 return $owner->display_name;
 
             } else {
 
-                return wpgh_get_option( 'gh_business_name' );
+                return wpgh_get_option('gh_business_name');
 
             }
 
@@ -623,22 +628,22 @@ class WPGH_Email
      */
     public function get_from_email()
     {
-        if ( intval( $this->from_user ) ) {
+        if (intval($this->from_user)) {
 
-            $from_user  = get_userdata( $this->from_user );
+            $from_user = get_userdata($this->from_user);
             return $from_user->user_email;
 
         } else {
 
             $owner = $this->contact->owner;
 
-            if ( $owner && is_email( $owner->user_email ) ) {
+            if ($owner && is_email($owner->user_email)) {
 
                 return $owner->user_email;
 
             } else {
 
-                return wpgh_get_option( 'admin_email' );
+                return wpgh_get_option('admin_email');
 
             }
 
@@ -655,14 +660,14 @@ class WPGH_Email
         /* Use default mail-server */
         $headers = array();
 
-        $headers['from']            = 'From: ' . $this->get_from_name() . ' <' . $this->get_from_email() . '>';
-        $headers['reply_to']        = 'Reply-To: ' . $this->get_from_email();
-        $headers['return_path']     = 'Return-Path: ' . wpgh_get_option( 'gh_bounce_inbox', $this->get_from_email() );
-        $headers['content_type']    = 'Content-Type: text/html; charset=UTF-8';
-        $headers['unsub']  = sprintf( 'List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo( 'admin_email' ), $this->contact->email, $this->get_click_tracking_link(), urlencode( $this->get_unsubscribe_link( '' ) ) );
+        $headers['from'] = 'From: ' . $this->get_from_name() . ' <' . $this->get_from_email() . '>';
+        $headers['reply_to'] = 'Reply-To: ' . $this->get_from_email();
+        $headers['return_path'] = 'Return-Path: ' . wpgh_get_option('gh_bounce_inbox', $this->get_from_email());
+        $headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
+        $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo('admin_email'), $this->contact->email, $this->get_click_tracking_link(), urlencode($this->get_unsubscribe_link('')));
 
-        $headers = apply_filters( 'wpgh_email_headers', $headers );
-        return apply_filters( "groundhogg/email/headers", $headers );
+        $headers = apply_filters('wpgh_email_headers', $headers);
+        return apply_filters("groundhogg/email/headers", $headers);
     }
 
 
@@ -673,26 +678,30 @@ class WPGH_Email
      * @param $event object the of the associated event
      * @return bool|WP_Error
      */
-    public function send( $contact, $event = null )
+    public function send($contact, $event = null)
     {
 
-        if ( is_numeric( $contact ) ) {
+        if ( $this->status !== 'ready' ){
+            return new WP_Error('NOT_READY', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->status ) );
+        }
+
+        if (is_numeric($contact)) {
 
             /* catch if contact ID given rather than WPGH_Contact */
-            $contact = new WPGH_Contact( $contact );
+            $contact = new WPGH_Contact($contact);
 
         }
 
-        if ( ! is_object( $contact )  )
-            return new WP_Error( 'BAD_CONTACT', __( 'No contact provided...' ) );
+        if (!is_object($contact))
+            return new WP_Error('BAD_CONTACT', __('No contact provided...'));
 
         $this->contact = $contact;
 
         /* we got an event so all is well */
-        if ( is_object( $event ) ){
-            $this->event  = $event;
+        if (is_object($event)) {
+            $this->event = $event;
 
-        } else if ( is_object( WPGH()->event_queue->cur_event ) ) {
+        } else if (is_object(WPGH()->event_queue->cur_event)) {
 
             /* We didn't get an event, but it looks like one is happening so we'll get it from global scope */
             $this->event = WPGH()->event_queue->cur_event;
@@ -705,32 +714,25 @@ class WPGH_Email
 
         }
 
-        if ( ! $this->testing ){
+        if (!$this->testing) {
             /* Skip if testing */
 
-            if ( ! $contact->is_marketable() ){
+            if (!$contact->is_marketable()) {
 
                 /* The contact is unmarketable so exit out. */
-                return new WP_Error( 'NON_MARKETABLE', __( 'Contact is not marketable.' ) );
+                return new WP_Error('NON_MARKETABLE', __('Contact is not marketable.'));
 
             }
 
         }
 
-//        if ( $contact->get_meta( 'last_sent' ) ){
-//            $last_sent = intval( $contact->get_meta( 'last_sent' ) );
-//            if ( ( time() - $last_sent ) <= 5 ){
-//                return new WP_Error( 'TOO_MANY_EMAILS', __( 'There must be a minimum 5 seconds before a contact can receive another email.' ) );
-//            }
-//        }
-
-        do_action( 'wpgh_before_email_send', $this );
+        do_action('wpgh_before_email_send', $this);
 
         /* Additional settings */
-        add_action( 'phpmailer_init', array( $this, 'set_bounce_return_path' ) );
-        add_action( 'phpmailer_init', array( $this, 'set_plaintext_body' ) );
-        add_action( 'wp_mail_failed', array( $this, 'mail_failed' ) );
-        add_filter( 'wp_mail_content_type', array( $this, 'send_in_html' ) );
+        add_action('phpmailer_init', array($this, 'set_bounce_return_path'));
+        add_action('phpmailer_init', array($this, 'set_plaintext_body'));
+        add_action('wp_mail_failed', array($this, 'mail_failed'));
+        add_filter('wp_mail_content_type', array($this, 'send_in_html'));
 
         $to = $this->get_to();
         $subject = $this->get_subject_line();
@@ -739,7 +741,7 @@ class WPGH_Email
         $headers = $this->get_headers();
 
         /* Send with API. Do not send with API while in TEST MODE */
-        if ( wpgh_is_email_api_enabled() && ! $this->testing ){
+        if (wpgh_is_email_api_enabled() && !$this->testing) {
             $sent = $this->send_with_gh(
                 $to,
                 $subject,
@@ -747,7 +749,7 @@ class WPGH_Email
                 $headers
             );
         } else {
-        /* Send with default WP */
+            /* Send with default WP */
             $sent = $this->send_with_wp(
                 $to,
                 $subject,
@@ -757,22 +759,26 @@ class WPGH_Email
         }
 
 
-        remove_action( 'phpmailer_init', array( $this, 'set_bounce_return_path' ) );
-        remove_action( 'phpmailer_init', array( $this, 'set_plaintext_body' ) );
-        remove_action( 'wp_mail_failed', array( $this, 'mail_failed' ) );
-        remove_filter( 'wp_mail_content_type', array( $this, 'send_in_html' ) );
+        remove_action('phpmailer_init', array($this, 'set_bounce_return_path'));
+        remove_action('phpmailer_init', array($this, 'set_plaintext_body'));
+        remove_action('wp_mail_failed', array($this, 'mail_failed'));
+        remove_filter('wp_mail_content_type', array($this, 'send_in_html'));
 
-        if ( ! $sent ){
+        if (!$sent) {
 
-            do_action( 'wpgh_email_send_failed', $this );
+            do_action('wpgh_email_send_failed', $this);
 
         } else {
 
-            $contact->update_meta( 'last_sent', time() );
+            $contact->update_meta('last_sent', time());
 
         }
 
-        do_action( 'wpgh_after_email_send', $this );
+        do_action('wpgh_after_email_send', $this);
+
+        if ( $this->has_errors() ){
+            return $this->error;
+        }
 
         return $sent;
 
@@ -787,7 +793,7 @@ class WPGH_Email
      * @param $headers
      * @return bool
      */
-    private function send_with_wp( $to,$subject,$content,$headers )
+    private function send_with_wp($to, $subject, $content, $headers)
     {
         return wp_mail(
             $to,
@@ -807,7 +813,7 @@ class WPGH_Email
      *
      * @return bool|wp_error
      */
-    private function send_with_gh( $to, $subject, $content, $headers )
+    private function send_with_gh($to, $subject, $content, $headers)
     {
 
         //send to groundhogg
@@ -816,84 +822,80 @@ class WPGH_Email
 
         $data = array(
 
-            'token'     => md5( wpgh_get_option( 'gh_email_token' ) ),
-            'domain'    => site_url(),
-            'sender'    => $sender,
-            'from'      => $this->get_from_name(),
+            'token' => md5(wpgh_get_option('gh_email_token')),
+            'domain' => site_url(),
+            'sender' => $sender,
+            'from' => $this->get_from_name(),
             'recipient' => $to,
-            'subject'   => $subject,
-            'content'   => $content,
+            'subject' => $subject,
+            'content' => $content,
         );
 
 // validate domain and senders email address before making sending request
 
         $url = 'https://www.groundhogg.io/wp-json/gh/aws/v1/send-email/';
 
-        $request = wp_remote_post( $url, array( 'body' => $data ) );
+        $request = wp_remote_post($url, array('body' => $data));
 
-        if ( ! $request || is_wp_error( $request ) ){
-            do_action( 'wp_mail_failed' ,new WP_Error( 'API_MAIL_FAILED', $request->get_error_message() ) );
+        if (!$request || is_wp_error($request)) {
+            do_action('wp_mail_failed', new WP_Error('API_MAIL_FAILED', $request->get_error_message()));
 
             /* Fall back to default WP */
-            $this->send_with_wp(
+            return $this->send_with_wp(
                 $to,
                 $subject,
                 $content,
                 $headers
             );
-
-            return false;
         }
 
-        $result = wp_remote_retrieve_body( $request );
-        $result = json_decode( $result );
+        $result = wp_remote_retrieve_body($request);
+        $result = json_decode($result);
 
-        if ( ! is_object( $result ) ){
+        if (!is_object($result)) {
 
-            do_action( 'wp_mail_failed' ,new WP_Error( 'API_MAIL_FAILED', __( 'An unknown error occurred.', 'groudhogg' ) ) );
+            do_action('wp_mail_failed', new WP_Error('API_MAIL_FAILED', __('An unknown error occurred.', 'groudhogg')));
 
             /* Fall back to default WP */
-            $this->send_with_wp(
+            return $this->send_with_wp(
                 $to,
                 $subject,
                 $content,
                 $headers
             );
 
-            return false;
-
             /* Error Code */
-        } else if ( ! isset( $result->status ) || $result->status !== 'success' ){
+        } else if (WPGH()->service_manager->is_json_error($result)) {
 
-            switch ( $result->code ){
+            $error = WPGH()->service_manager->get_json_error( $result );
+
+            switch ( $error->get_error_code() ) {
 
                 case 'EMAIL_COMPLAINT':
-                    do_action( 'wp_mail_failed', new WP_Error( 'EMAIL_COMPLAINT', $result->message ) );
-                    $this->contact->change_marketing_preference( WPGH_COMPLAINED );
+                    do_action('wp_mail_failed', $error );
+                    $this->contact->change_marketing_preference(WPGH_COMPLAINED);
                     break;
                 case 'EMAIL_BOUNCED':
-                    do_action( 'wp_mail_failed', new WP_Error( 'EMAIL_BOUNCED', $result->message ) );
-                    $this->contact->change_marketing_preference( WPGH_HARD_BOUNCE );
+                    do_action('wp_mail_failed', $error );
+                    $this->contact->change_marketing_preference(WPGH_HARD_BOUNCE);
                     break;
                 DEFAULT:
-                    do_action( 'wp_mail_failed' ,new WP_Error( $result->code, $result->message ) );
+                    do_action('wp_mail_failed', $error );
                     break;
             }
 
             /* Fall back to default WP */
-            $this->send_with_wp(
+            return $this->send_with_wp(
                 $to,
                 $subject,
                 $content,
                 $headers
             );
 
-            return false;
-
         }
 
         $credits = $result->credits_remaining;
-        wpgh_update_option( 'gh_remaining_api_credits', $credits );
+        wpgh_update_option('gh_remaining_api_credits', $credits);
 
         return true;
 
@@ -904,11 +906,11 @@ class WPGH_Email
      *
      * @param $error WP_Error
      */
-    public function mail_failed( $error )
+    public function mail_failed($error)
     {
         $message = sprintf(
-            __( "Email failed to send.\nSend time: %s\nTo: %s\nSubject: %s\n\nError: %s", 'groundhogg' ),
-            date_i18n( 'F j Y H:i:s', current_time( 'timestamp' ) ),
+            __("Email failed to send.\nSend time: %s\nTo: %s\nSubject: %s\n\nError: %s", 'groundhogg'),
+            date_i18n('F j Y H:i:s', current_time('timestamp')),
             $this->contact->email,
             $this->subject,
             $error->get_error_message()
@@ -918,9 +920,18 @@ class WPGH_Email
             $message
         );
 
-        error_log( $message );
+        error_log($message);
 
+        $this->error = $error;
         $this->error_message = $error->get_error_message();
+    }
+
+    /**
+     * @return bool
+     */
+    public function has_errors()
+    {
+        return is_wp_error( $this->error );
     }
 
     /**

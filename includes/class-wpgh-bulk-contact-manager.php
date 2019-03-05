@@ -310,7 +310,16 @@ class WPGH_Bulk_Contact_Manager
         } else {
             $id = $this->db->add( $data );
             $contact = new WPGH_Contact( $id );
-            $contact->update( array( 'optin_status' => WPGH_UNCONFIRMED ) );
+        }
+
+        if ( isset( $data[ 'optin_status' ] ) ){
+
+            if ( intval( $data[ 'optin_status' ] )  === WPGH_UNSUBSCRIBED ){
+                $contact->unsubscribe();
+            } else {
+                $contact->change_marketing_preference( intval( $data[ 'optin_status' ] ) );
+            }
+
         }
 
         if ( isset( $args[ 'tags' ] ) ){

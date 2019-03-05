@@ -169,7 +169,9 @@ class WPGH_SMS_Page
         if ($this->get_action() === 'edit' || $this->get_action() === 'add')
             return;
 
-        $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_sms())), $base_url);
+        if( $this->get_action() !== 'broadcast' ){
+            $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_sms())), $base_url);
+        }
 
         wp_redirect($base_url);
         die();
@@ -382,6 +384,11 @@ class WPGH_SMS_Page
 
 	function page()
 	{
+
+	    if ( $this->get_action() === 'broadcast' ){
+	        $this->notices->add( 'no_cancel', _x( 'Warning: There is currently no ability to cancel SMS broadcasts at this time.', 'notice', 'groundhogg' ), 'warning' );
+        }
+
 		?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>

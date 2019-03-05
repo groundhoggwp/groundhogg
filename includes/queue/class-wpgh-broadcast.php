@@ -141,7 +141,7 @@ class WPGH_Broadcast implements WPGH_Event_Process
      * @param $contact WPGH_Contact
      * @param $event WPGH_Event
      *
-     * @return bool, whether the email sent or not.
+     * @return bool|WP_Error whether the email sent or not.
      */
     public function run( $contact, $event = null )
     {
