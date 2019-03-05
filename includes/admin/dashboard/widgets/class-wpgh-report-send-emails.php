@@ -129,8 +129,8 @@ class WPGH_Report_Send_Emails extends WPGH_Line_Graph_Report_V2
             $num_opens = WPGH()->activity->count( array( 'start' => $this->start_range, 'end' => $this->end_range, 'activity_type' => 'email_opened' ) );
             $num_clicks = WPGH()->activity->count( array( 'start' => $this->start_range, 'end' => $this->end_range, 'activity_type' => 'email_link_click' ) );
 
-            $from = convert_to_local_time( $this->start_range );
-            $to = convert_to_local_time( $this->end_range );
+            $from = wpgh_convert_to_local_time( $this->start_range );
+            $to = wpgh_convert_to_local_time( $this->end_range );
 
             $export_info[] = array(
                 __( 'From' ) => date( 'F jS', $from ),

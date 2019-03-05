@@ -387,7 +387,7 @@ class WPGH_Welcome_Page
                 <?php $this->notices->notices(); ?>
                 <?php do_action( 'wpgh_welcome_page_custom_content' ); ?>
                 <?php if ( apply_filters( 'wpgh_show_main_welcome_page_content', true ) ): ?>
-                <?php if ( ! wpgh_get_option( 'gh_opted_in_stats_collection' ) && current_user_can( 'manage_options' ) ): ?>
+                <?php if ( wpgh_should_show_stats_collection() ): ?>
                 <div class="col">
                     <div class="postbox stats-collection">
                         <div class="inside">

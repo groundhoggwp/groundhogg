@@ -120,6 +120,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED removed 5 second check preventing emails sent in succession, no longer needed.
 * FIXED Email content centered if not explicitly given left align
 * FIXED Emails sent if in draft mode.
+* FIXED Non required fields are being required by the submission handler.
 
 = 1.1.4 =
 * ADDED Search form to welcome page for docs help

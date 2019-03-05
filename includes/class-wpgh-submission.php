@@ -456,14 +456,13 @@ class WPGH_Submission
 //        var_dump( $this->data );
         foreach ( $this->fields as $field_name ){
             $config = $this->get_field_config( $field_name );
-            if ( isset( $config[ 'required' ] ) && $config[ 'required' ] ){
+            if ( isset( $config[ 'required' ] ) && $config[ 'required' ] && $config[ 'required' ] !== "false"   ){
                 if ( ! key_exists( $field_name, $this->data ) || $this->data[ $field_name ] === '' || $this->data[ $field_name ] === null ){
-                    $this->add_error('REQUIRED_FIELD_MISSING', _x( 'Missing a required field.', 'submission_error', 'groundhogg' ) );
+                    $this->add_error(new WP_Error( 'REQUIRED_FIELD_MISSING', sprintf( _x( 'Missing a required field: %s', 'submission_error', 'groundhogg' ), $config[ 'label' ] ), $config ) );
                     return false;
                 }
             }
         }
-//        die();
 
         $verified = apply_filters( 'wpgh_submission_verify_check', true, $this );
         $verified = apply_filters( 'groundhogg/submission/verify', $verified, $this );

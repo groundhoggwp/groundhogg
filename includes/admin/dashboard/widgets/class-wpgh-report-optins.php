@@ -106,8 +106,8 @@ class WPGH_Report_Optins extends WPGH_Line_Graph_Report_V2
 
             $num_contacts = $wpdb->get_var( "SELECT COUNT(email) FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'" );
 
-            $from = convert_to_local_time( $this->start_range );
-            $to = convert_to_local_time( $this->end_range );
+            $from = wpgh_convert_to_local_time( $this->start_range );
+            $to = wpgh_convert_to_local_time( $this->end_range );
 
             $dataset1[] = array(
                 _x( 'From', 'stats', 'groundhogg' )     => date( 'F jS', $from ),

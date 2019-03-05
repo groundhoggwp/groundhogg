@@ -296,7 +296,7 @@ class WPGH_Field_Timer extends WPGH_Funnel_Step
         /* Calculate as if there is no delay... */
 
         if ( $run_when == 'now' ){
-            $time_string = $date . ' ' . date( 'H:i:s', convert_to_local_time( time() ) ) ;
+            $time_string = $date . ' ' . date( 'H:i:s', wpgh_convert_to_local_time( time() ) ) ;
             $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
         } else {
             $time_string = $date . ' ' . $run_time;

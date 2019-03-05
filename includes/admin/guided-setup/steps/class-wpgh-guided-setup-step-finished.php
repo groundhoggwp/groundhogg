@@ -30,7 +30,7 @@ class WPGH_Guided_Setup_Step_Finished extends WPGH_Guided_Setup_Step
 
         wpgh_update_option( 'gh_guided_setup_finished', 1 );
 
-        if ( ! wpgh_is_option_enabled( 'gh_opted_in_stats_collection' ) ):
+        if ( wpgh_should_show_stats_collection() ):
 
         ?>
         <h3><?php _e( 'Next Steps...', 'Groundhogg' ); ?></h3>
@@ -43,7 +43,9 @@ class WPGH_Guided_Setup_Step_Finished extends WPGH_Guided_Setup_Step
             <p><?php _e( "Want sweet discounts and to help us make Groundhogg even better? When you optin to our stats collection you will get a <b>30% discount off</b> any premium extension or subscription in our store by sharing <b>anonymous</b> data about your site. You can opt out any time from the settings page. Your email address & display name will be collected so we can send you the discount code.", 'groundhogg' ); ?></p>
         </div>
         <?php
+
         endif;
+
         ?>
         <div class="postbox" style="padding: 0 10px 0 20px">
             <h3><?php _e( 'Write your first Email!', 'Groundhogg' ); ?></h3>

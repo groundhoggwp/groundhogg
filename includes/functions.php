@@ -797,7 +797,9 @@ function wpgh_recount_tag_contacts_count()
     }
 }
 
-
+/**
+ * Listen for the funnel share link and then perform the download.
+ */
 function wpgh_funnel_share_listen()
 {
     if ( isset( $_GET[ 'funnel_share' ] ) ) {
@@ -858,7 +860,7 @@ function wpgh_convert_to_utc_0( $time )
  * @param $time
  * @return int
  */
-function convert_to_local_time( $time )
+function wpgh_convert_to_local_time($time )
 {
     if ( is_string( $time ) ){
         $time = strtotime( $time );
@@ -1169,4 +1171,117 @@ function wpgh_get_form_list() {
         if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
     }
     return $form_options;
+}
+
+/**
+ * Whether or not we should show the stats collection prompt
+ *
+ * @return bool
+ */
+function wpgh_should_show_stats_collection()
+{
+    $show = false;
+
+    if ( ! wpgh_is_option_enabled( 'gh_opted_in_stats_collection' ) && current_user_can( 'manage_options' ) ){
+        $show = true;
+    }
+
+    return apply_filters( 'groundhogg/stats_collection/show', $show );
+}
+
+/**
+ * If the JSON is your typical error response
+ *
+ * @param $json
+ * @return bool
+ */
+function wpgh_is_json_error( $json ){
+    return isset( $json->code ) && isset( $json->message ) && isset( $json->data );
+}
+
+/**
+ * Convert JSON to a WP_Error
+ *
+ * @param $json
+ * @return bool|WP_Error
+ */
+function wpgh_get_json_error( $json ){
+    if ( wpgh_is_json_error( $json ) ){
+        return new WP_Error( $json->code, $json->message, $json->data );
+    }
+    return false;
+}
+
+/**
+ * Schedule a 1 off email notification
+ *
+ * @param $email_id int the ID of the email to send
+ * @param $contact_id_or_email int|string the ID of the contact to send to
+ * @param int $time time time to send at, defaults to time()
+ *
+ * @return bool whether the scheduling was successful.
+ */
+function wpgh_send_email_notification( $email_id, $contact_id_or_email, $time=0 )
+{
+    $contact = wpgh_get_contact( $contact_id_or_email );
+
+    if ( ! WPGH()->emails->exists( $email_id ) || ! $contact ){
+        return false;
+    }
+
+    if ( ! $time ){
+        $time = time();
+    }
+
+    $event = [
+        'time'          => $time,
+        'funnel_id'     => 0,
+        'step_id'       => $email_id,
+        'contact_id'    => $contact->ID,
+        'event_type'    => WPGH_EMAIL_NOTIFICATION_EVENT,
+        'status'        => 'waiting',
+    ];
+
+    if ( WPGH()->events->add( $event ) ){
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Schedule a 1 off sms notification
+ *
+ * @param $sms_id int the ID of the sms to send
+ * @param $contact_id_or_email int|string the ID of the contact to send to
+ * @param int $time time time to send at, defaults to time()
+ *
+ * @return bool whether the scheduling was successful.
+ */
+function wpgh_send_sms_notification( $sms_id, $contact_id_or_email, $time=0 )
+{
+    $contact = wpgh_get_contact( $contact_id_or_email );
+
+    if ( ! WPGH()->sms->exists( $sms_id ) || ! $contact ){
+        return false;
+    }
+
+    if ( ! $time ){
+        $time = time();
+    }
+
+    $event = [
+        'time'          => $time,
+        'funnel_id'     => 0,
+        'step_id'       => $sms_id,
+        'contact_id'    => $contact->ID,
+        'event_type'    => WPGH_SMS_NOTIFICATION_EVENT,
+        'status'        => 'waiting',
+    ];
+
+    if ( WPGH()->events->add( $event ) ){
+        return true;
+    }
+
+    return false;
 }

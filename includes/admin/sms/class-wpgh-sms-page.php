@@ -284,20 +284,10 @@ class WPGH_SMS_Page
         $contacts = $query->query( $args );
 
         foreach ( $contacts as $i => $contact ) {
-
-            $args = array(
-                'time'          => $send_time,
-                'contact_id'    => $contact->ID,
-                'funnel_id'     => 0,
-                'step_id'       => $sms,
-                'status'        => 'waiting',
-                'event_type'    => WPGH_SMS_NOTIFICATION_EVENT
-            );
-
-            WPGH()->events->add( $args );
+            wpgh_send_sms_notification( $sms, $contact->ID, $send_time );
         }
 
-        $this->notices->add( 'success', _x( 'SMS broadcast scheduled!', 'notice','groundhogg' ), 'success' );
+        $this->notices->add( 'success', _x( 'SMS broadcast scheduled!', 'notice', 'groundhogg' ), 'success' );
     }
 
 	function verify_action()

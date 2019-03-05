@@ -115,8 +115,8 @@ class WPGH_Report_Form_Activity extends WPGH_Line_Graph_Report_V2
             $num_form_fills = $wpdb->get_var( "SELECT COUNT(e.ID) FROM $events AS e LEFT JOIN $steps AS s ON e.step_id = s.ID WHERE $this->start_range < e.time AND e.time <= $this->end_range AND s.step_type = 'form_fill'" );
             $nump_impressions = WPGH()->activity->count( array( 'start' => $this->start_range, 'end' => $this->end_range, 'activity_type' => 'form_impression' ) );
 
-            $from = convert_to_local_time( $this->start_range );
-            $to = convert_to_local_time( $this->end_range );
+            $from = wpgh_convert_to_local_time( $this->start_range );
+            $to = wpgh_convert_to_local_time( $this->end_range );
 
             $export_info[] = array(
                 _x( 'From', 'stats', 'groundhogg' ) => date( 'F jS', $from ),

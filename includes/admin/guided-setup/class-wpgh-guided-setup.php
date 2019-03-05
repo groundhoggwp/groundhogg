@@ -86,14 +86,14 @@ class WPGH_Guided_Setup
         include_once dirname( __FILE__ ) . '/steps/class-wpgh-guided-setup-step-other.php' ;
         include_once dirname(__FILE__) . '/steps/class-wpgh-guided-setup-step-finished.php';
 
-        $this->steps = [
+        $this->steps = apply_filters( 'groundhogg/guided_setup/steps', [
             new WPGH_Guided_Setup_Step_Business(),
             new WPGH_Guided_Setup_Step_Compliance(),
             new WPGH_Guided_Setup_Step_Email(),
             new WPGH_Guided_Setup_Step_Import(),
             new WPGH_Guided_Setup_Step_Other(),
             new WPGH_Guided_Setup_Step_Finished(),
-        ];
+        ] );
 
     }
 

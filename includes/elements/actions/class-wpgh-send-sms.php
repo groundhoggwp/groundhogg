@@ -40,9 +40,9 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
         $mesg = $step->get_meta( 'sms_id' );
 
         ?>
-        <?php if ( ! wpgh_get_option( 'gh_email_token', false ) ): ?>
+        <?php if ( ! wpgh_get_option( 'gh_sms_token', false ) ): ?>
         <p style="margin-left: 10px;" class="description">
-            <?php _e( 'SMS uses the <a target="_blank" href="https://www.groundhogg.io/downloads/email-credits/">Groundhogg Sending Service</a> & requires that you have setup your <a target="_blank" href="https://www.groundhogg.io/downloads/email-credits/">Groundhogg account</a>.', 'groundhogg' ); ?>
+            <?php _e( 'SMS uses the <a target="_blank" href="https://www.groundhogg.io/downloads/sms-credits/">Groundhogg Sending Service</a> & requires that you have setup your <a target="_blank" href="https://www.groundhogg.io/downloads/sms-credits/">Groundhogg account</a>.', 'groundhogg' ); ?>
         </p>
         <?php endif; ?>
         <table class="form-table">
@@ -85,7 +85,7 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
             $step->update_meta( 'sms_id', intval( $_POST[ $step->prefix( 'sms_id' ) ] ) );
         }
 
-        if ( ! wpgh_get_option( 'gh_email_token', false ) ){
+        if ( ! wpgh_get_option( 'gh_sms_token', false ) ){
             WPGH()->notices->add( new WP_Error( 'NO_TOKEN', __( 'Your SMS steps will not work until you active the Groundhogg Sending Service.', 'groundhogg' ) ) );
         }
 
@@ -115,6 +115,47 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
         }
 
         return true;
+    }
+
+    /**
+     * Export the sms content
+     * 
+     * @param array $args
+     * @param WPGH_Step $step
+     * @return array
+     */
+    public function export($args, $step)
+    {
+        $sms_id = intval( $step->get_meta( 'sms_id' ) );
+
+        $sms = new WPGH_SMS( $sms_id );
+
+        if ( ! $sms->exists() )
+            return $args;
+
+        $args[ 'title'] = $sms->title;
+        $args[ 'message' ] = $sms->message;
+
+        return $args;    
+    }
+
+    /**
+     * Import SMS content
+     *
+     * @param array $args
+     * @param WPGH_Step $step
+     */
+    public function import($args, $step)
+    {
+        $sms_id = WPGH()->sms->add( array(
+            'title'   => $args['title'],
+            'message' => $args['message'],
+            'author'  => get_current_user_id()
+        ) );
+
+        if ( $sms_id ){
+            $step->update_meta( 'sms_id', $sms_id );
+        }
     }
 
 }

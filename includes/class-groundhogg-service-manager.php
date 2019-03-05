@@ -48,6 +48,22 @@ class Groundhogg_Service_Manager
 	}
 
     /**
+     * @return int
+     */
+	public function get_gh_uid()
+    {
+        return apply_filters( 'groundhogg/service_manager/register_domain/user_id', wpgh_get_option( 'gh_email_api_user_id' ) );
+    }
+
+    /**
+     * @return string
+     */
+	public function get_oauth_token()
+    {
+        return apply_filters( 'groundhogg/service_manager/register_domain/oauth_token', wpgh_get_option( 'gh_email_api_oauth_token' ) );
+    }
+
+    /**
      * Sends a request to Groundhogg.io to add this domain
      * Request returns a text record and a list of DKIM records
      */
@@ -67,8 +83,43 @@ class Groundhogg_Service_Manager
         $token  = sanitize_text_field( urldecode( $_GET[ 'token' ] ) );
         $gh_uid = intval( $_GET[ 'user_id' ] );
 
+        /* Update relevant options for further requests */
+        wpgh_update_option( 'gh_email_api_user_id', $gh_uid );
+        wpgh_update_option( 'gh_email_api_oauth_token', $token );
+
+        $result = $this->register_domain( site_url() );
+
+        if ( is_wp_error( $result ) ){
+            WPGH()->notices->add( $result );
+            return;
+        }
+
+        WPGH()->notices->add( 'RETRIEVED_DNS', 'Successfully registered your domain.' );
+
+    }
+
+    /**
+     * Register this domain
+     * @param $domain string url of the site to register
+     * @return bool|WP_Error
+     */
+    public function register_domain( $domain = '' )
+    {
+
+        if ( ! $domain ){
+            $domain = site_url();
+        }
+
+        /* Use filters to retrieve the UID and TOKEN if whitelabel solution */
+        $gh_uid = $this->get_gh_uid();
+        $token = $this->get_oauth_token();
+
+        if ( ! $gh_uid || ! $token ){
+            return new WP_Error( 'INVALID_CREDENTIALS', 'Missing token or User ID.' );
+        }
+
         $post = [
-            'domain'    => site_url(),
+            'domain'    => $domain,
             'user_id'   => $gh_uid,
             'token'     => $token
         ];
@@ -76,46 +127,45 @@ class Groundhogg_Service_Manager
         $response = wp_remote_post( self::ENDPOINT, array( 'body' => $post ) );
 
         if ( is_wp_error( $response ) ){
-            WPGH()->notices->add( $response );
-            return;
+            return $response;
         }
 
         $json = json_decode( wp_remote_retrieve_body( $response ) );
 
         if ( $this->is_json_error( $json ) ){
-            WPGH()->notices->add( $this->get_json_error( $json ) );
-            return;
+            return $this->get_json_error( $json );
         }
 
-        //todo check if is correct params
         if ( ! isset( $json->dns_records ) ){
-            WPGH()->notices->add( 'NO_DNS', 'Could not retrieve DNS records.', 'error' );
-            return;
+            return new WP_Error( 'NO_DNS', 'Could not retrieve DNS records.' );
         }
 
-	    /* Don't listen for connect anymore */
+        /* Don't listen for connect anymore */
         delete_transient( 'gh_listen_for_connect' );
 
         /* Let WP know we should check for verification stats */
-	    wpgh_update_option( 'gh_email_api_check_verify_status', 1 );
+        wpgh_update_option( 'gh_email_api_check_verify_status', 1 );
 
-	    /* Update relevant options for further requests */
-	    wpgh_update_option( 'gh_email_api_user_id', $gh_uid );
-	    wpgh_update_option( 'gh_email_api_oauth_token', $token );
+        /* @type $json->dns_records array */
+        /*
+         * [
+         *   [
+         *    'name' => 'abc.'
+         *    'type' => 'CNAME'
+         *    'value' => 'aws.com'
+         *   ],
+         * ]
+         * */
+        wpgh_update_option( 'gh_email_api_dns_records', $json->dns_records );
 
-	    /* @type $json->dns_records array */
-	    /*
-	     * [
-	     *   [
-	     *    'name' => 'abc.'
-	     *    'type' => 'CNAME'
-	     *    'value' => 'aws.com'
-	     *   ],
-	     * ]
-	     * */
-	    wpgh_update_option( 'gh_email_api_dns_records', $json->dns_records );
-        WPGH()->notices->add( 'RETRIEVED_DNS', 'Successfully registered your domain.' );
+        /**
+         * @var $json object the JSON response from Groundhogg.io
+         * @var $gh_uid int the User ID used to login
+         * @var $token string the token used to connect.
+         */
+        do_action( 'groundhogg/service_manager/domain/registered', $json, $gh_uid, $token );
 
+        return true;
     }
 
     /**
@@ -148,8 +198,13 @@ class Groundhogg_Service_Manager
      */
     public function check_verification_status()
     {
-        $token  = wpgh_get_option( 'gh_email_api_oauth_token' );
-        $gh_uid = wpgh_get_option( 'gh_email_api_user_id' );
+        /* Use filters to retrieve the UID and TOKEN if whitelabel solution */
+        $gh_uid = $this->get_gh_uid();
+        $token = $this->get_oauth_token();
+
+        if ( ! $gh_uid || ! $token ){
+            return;
+        }
 
         $post = [
             'domain'    => site_url(),
@@ -177,6 +232,8 @@ class Groundhogg_Service_Manager
         	/* Domain is verified, no longer need to check verification */
         	wpgh_delete_option( 'gh_email_api_check_verify_status' );
 	        wp_clear_scheduled_hook( 'groundhogg/service/verify_domain' );
+
+            do_action( 'groundhogg/service_manager/domain/verified', $json, $gh_uid, $token );
         }
     }
 
@@ -196,9 +253,9 @@ class Groundhogg_Service_Manager
     public function get_dns_table()
     {
         ?>
-        <p><?php _ex( 'Your Groundhogg account has been enabled to send emails & text messages! To finish this configuration, please add the following DNS records to your DNS zone.', 'guided_setup', 'groundhogg' ); ?>&nbsp;
+        <p><?php _ex( 'Your account has been enabled to send emails & text messages! To finish this configuration, please add the following DNS records to your DNS zone.', 'guided_setup', 'groundhogg' ); ?>&nbsp;
             <a target="_blank" href="https://www.google.com/search?q=how+to+add+dns+record"><?php _ex( 'Learn about adding DNS records.', 'guided_setup', 'groundhogg' ); ?></a></p>
-        <p><?php _ex( 'After you have added the DNS records your domain will be automatically verified and Groundhogg will start using the Groundhogg sending service.', 'guided_setup', 'groundhogg' ); ?></p>
+        <p><?php _ex( 'After you have added the DNS records your domain will be automatically verified and Groundhogg will start using the Groundhogg Sending Service.', 'guided_setup', 'groundhogg' ); ?></p>
         <style>
             .full-width{ width: 100%}
             .widefat tr td:nth-child(2), .widefat tr th:nth-child(2){width: 50px;}
@@ -245,6 +302,9 @@ class Groundhogg_Service_Manager
         <?php
     }
 
+    /**
+     * Show the DNS table in the settings where the email is located
+     */
     public function show_dns_in_settings()
     {
 

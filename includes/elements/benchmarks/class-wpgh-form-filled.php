@@ -452,7 +452,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                     <tr id="gh-field-required">
                         <th><?php _e( 'Required Field', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->checkbox( array( 'id' => 'field-required', 'name' => 'required', 'label' => __( 'Yes' ) ) );
+                            echo WPGH()->html->checkbox( array( 'id' => 'field-required', 'name' => 'required', 'label' => __( 'Yes' ), 'value' => 'true' ) );
                             ?></td>
                     </tr>
                     <tr id="gh-field-label">

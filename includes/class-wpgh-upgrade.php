@@ -35,7 +35,7 @@ class WPGH_Upgrade{
         }
 
         $this->current_version = WPGH()->version;
-        add_action( 'admin_init', array( $this, 'do_upgrades' ) );
+        add_action( 'init', array( $this, 'do_upgrades' ) );
 
     }
 
@@ -197,18 +197,23 @@ class WPGH_Upgrade{
     		foreach ($sms_steps as $step ){
     			$step = new WPGH_Step( $step->ID );
     			$message = $step->get_meta( 'text_message' );
-    			$title = wp_trim_words( $message, 10 );
 
-    			$sms_id = WPGH()->sms->add( array(
-    				'title' => $title,
-				    'message' => $message
-			    ) );
+    			if ( $message ){
 
-    			if ( $sms_id ){
-    				$step->update_meta( 'sms_id', $sms_id );
-			    }
+                    $title = wp_trim_words( $message, 10 );
 
-		    }
+                    $sms_id = WPGH()->sms->add( array(
+                        'title' => $title,
+                        'message' => $message
+                    ) );
+
+                    if ( $sms_id ){
+                        $step->update_meta( 'sms_id', $sms_id );
+                    }
+
+    			}
+
+            }
 
 	    }
     }

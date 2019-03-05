@@ -30,18 +30,16 @@ global $wpdb, $wp_roles;
 if( wpgh_is_option_enabled( 'gh_uninstall_on_delete' ) ) {
 
     /** Delete the Plugin Pages */
-    $wpgh_created_pages = array( 'gh_confirmation_page', 'gh_unsubscribe_page', 'gh_email_preferences_page' );
+    $wpgh_created_pages = array( 'gh_confirmation_page', 'gh_unsubscribe_page', 'gh_email_preferences_page', 'gh_view_in_browser_page' );
     foreach ( $wpgh_created_pages as $p ) {
         $page = wpgh_get_option( $p, false );
+
         if ( $page ) {
             wp_delete_post( $page, true );
         }
+
         delete_option( $p );
     }
-
-    /** Delete all the Plugin Options */
-    delete_option( 'wpgh_settings' );
-    delete_option( 'wpgh_version' );
 
     /* delete permissions */
     WPGH()->roles->remove_caps();
@@ -75,17 +73,26 @@ if( wpgh_is_option_enabled( 'gh_uninstall_on_delete' ) ) {
     wp_clear_scheduled_hook( 'wpgh_process_queue' );
     wp_clear_scheduled_hook( 'wpgh_check_bounces' );
     wp_clear_scheduled_hook( 'wpgh_do_stats_collection' );
+    wp_clear_scheduled_hook( 'groundhogg/service/verify_domain' );
 
     //delete api keys from user_meta
     delete_metadata('user',0,'wpgh_user_public_key','',true);
     delete_metadata('user',0,'wpgh_user_secret_key','',true);
 
-    // Remove any transients we've left behind
+    // Remove any transients and options we've left behind
+    $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'gh\_%'" );
+    $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'wpgh\_%'" );
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_wpgh\_%'" );
+    $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_gh\_%'" );
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_wpgh\_%'" );
+    $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_gh\_%'" );
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_timeout\_wpgh\_%'" );
+    $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_timeout\_gh\_%'" );
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_timeout\_wpgh\_%'" );
+    $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_timeout\_gh\_%'" );
 
-    file_put_contents( __DIR__ . '/../uninstall-errors.txt', ob_get_contents() );
+    if ( ob_get_contents() ){
+        file_put_contents( __DIR__ . '/../groundhogg-uninstall-errors.txt', ob_get_contents() );
+    }
 
 }

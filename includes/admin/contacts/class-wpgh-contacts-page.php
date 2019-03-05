@@ -661,16 +661,7 @@ class WPGH_Contacts_Page
 
             $mail_id = intval( $_POST['email_id'] );
 
-            $event = [
-                'time'          => time(),
-                'funnel_id'     => 0,
-                'step_id'       => $mail_id,
-                'contact_id'    => $contact->ID,
-                'event_type'    => WPGH_EMAIL_NOTIFICATION_EVENT,
-                'status'        => 'waiting',
-            ];
-
-            if( WPGH()->events->add( $event ) ){
+            if( wpgh_send_email_notification( $mail_id, $contact->ID ) ){
                 $this->notices->add( 'email_queued', _x( 'The email has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
             }
         }
@@ -680,16 +671,7 @@ class WPGH_Contacts_Page
 
             $sms_id = intval( $_POST['sms_id'] );
 
-            $event = [
-                'time'          => time(),
-                'funnel_id'     => 0,
-                'step_id'       => $sms_id,
-                'contact_id'    => $contact->ID,
-                'event_type'    => WPGH_SMS_NOTIFICATION_EVENT,
-                'status'        => 'waiting',
-            ];
-
-            if( WPGH()->events->add( $event ) ){
+            if( wpgh_send_sms_notification( $sms_id, $contact->ID ) ){
                 $this->notices->add( 'sms_queued', _x( 'The sms has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
             }
         }
