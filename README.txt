@@ -118,6 +118,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED Support for manually confirming a contact's email address.
 * ADDED Login abandonment funnel template
 * ADDED SMS API endpoint.
+* ADDED IMAP Test connection UI and more Bounce checker settings.
 * TWEAKED improved email and instruction copy in the funnel templates.
 * TWEAKED Add note UI rather than edit notes directly
 * TWEAKED form fields now default to required false, so no need to add required false into the form shortcode. Explicit required="true" now required.
