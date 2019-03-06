@@ -173,7 +173,8 @@ class WPGH_Settings_Page
             'bounces' => array(
                 'id'    => 'bounces',
                 'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
-                'tab'   => 'email'
+                'tab'   => 'email',
+                'callback' => array( WPGH()->bounce_checker, 'test_connection_ui' ),
             ),
             'service' => array(
                 'id'    => 'service',
@@ -196,10 +197,15 @@ class WPGH_Settings_Page
 
         do_action( 'wpgh_settings_pre_register_sections', $this );
 
-//        var_dump( $this->sections );
-
         foreach ( $this->sections as $id => $section ){
-            add_settings_section( 'gh_' . $section[ 'id' ], $section[ 'title' ], array(), 'gh_' . $section[ 'tab' ] );
+
+            $callback = array();
+
+            if ( key_exists( 'callback', $section ) ){
+                $callback = $section[ 'callback' ];
+            }
+
+            add_settings_section( 'gh_' . $section[ 'id' ], $section[ 'title' ], $callback, 'gh_' . $section[ 'tab' ] );
         }
 
     }
@@ -573,7 +579,7 @@ class WPGH_Settings_Page
             'gh_bounce_inbox_host' => array(
                 'id'        => 'gh_bounce_inbox_host',
                 'section'   => 'bounces',
-                'label'     => _x( 'Bounce Inbox Host', 'settings', 'groundhogg' ),
+                'label'     => _x( 'Mail Server', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'This is the domain your email inbox is hosted. Most likely mail.yourdomain.com', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts' => array(
@@ -586,7 +592,7 @@ class WPGH_Settings_Page
             'gh_bounce_inbox_port' => array(
                 'id'        => 'gh_bounce_inbox_port',
                 'section'   => 'bounces',
-                'label'     => _x( 'Bounce Inbox IMAP Port', 'settings', 'groundhogg' ),
+                'label'     => _x( 'IMAP Port', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'The bounce checker requires an IMAP connection. Most IMAP ports are 993.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
                 'atts' => array(

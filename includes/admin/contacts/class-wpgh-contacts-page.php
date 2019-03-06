@@ -470,7 +470,8 @@ class WPGH_Contacts_Page
         $cur_meta = WPGH()->contact_meta->get_meta($id);
 
         $exclude_meta_list = array(
-            'files'
+            'files',
+            'notes'
         );
 
         if (isset($_POST['meta'])) {
@@ -618,8 +619,8 @@ class WPGH_Contacts_Page
             $contact->update_meta('country', sanitize_text_field(stripslashes($_POST['country'])));
         }
 
-        if (isset($_POST['notes'])) {
-            $contact->update_meta('notes', sanitize_textarea_field(stripslashes($_POST['notes'])));
+        if (isset( $_POST['add_note'] ) && ! empty( $_POST[ 'add_note' ] ) ) {
+            $contact->add_note( $_POST['add_note'] );
         }
 
         if (isset($_POST['lead_source'])) {

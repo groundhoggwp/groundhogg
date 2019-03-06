@@ -310,7 +310,7 @@ class WPGH_Contact
         $this->update_meta( 'notes', $new_notes );
         $this->notes = $new_notes;
 
-        do_action( 'wpgh_contact_note_added', $this->ID );
+        do_action( 'wpgh_contact_note_added', $this->ID, $note );
 
         return true;
     }

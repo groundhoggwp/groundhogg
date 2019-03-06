@@ -119,6 +119,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED Login abandonment funnel template
 * ADDED SMS API endpoint.
 * TWEAKED improved email and instruction copy in the funnel templates.
+* TWEAKED Add note UI rather than edit notes directly
 * TWEAKED form fields now default to required false, so no need to add required false into the form shortcode. Explicit required="true" now required.
 * TWEAKED removed SMS character limit.
 * TWEAKED removed 5 second check preventing emails sent in succession, no longer needed.

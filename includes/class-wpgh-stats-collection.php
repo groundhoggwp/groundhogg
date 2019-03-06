@@ -146,8 +146,23 @@ We appreciate your help, best of luck!
 
         /* Success */
         if ( ! is_wp_error( $response ) ){
+
             $body = wp_remote_retrieve_body( $response );
             $json = json_decode( $body );
+
+            if ( wpgh_is_json_error( $json ) ){
+
+                $error = wpgh_get_json_error( $json );
+
+                /* Optin if not already and optin enabled via settings... */
+                if ( $error->get_error_code() === 'site_unregistered' ){
+
+                    $this->optin();
+
+                }
+
+            }
+
         }
 
     }

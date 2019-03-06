@@ -438,6 +438,22 @@ function wpgh_contact_record_section_notes( $contact )
     ?>
     <!-- NOTES -->
     <h2><?php _e( 'Notes' ); ?></h2>
+    <table class="form-table">
+        <tr>
+            <th><?php _ex( 'Add Note', 'contact_record', 'groundhogg' ); ?></th>
+            <td><?php $args = array(
+                    'id'    => 'add_note',
+                    'name'  => 'add_note',
+                    'value' => '',
+                    'rows'  => 3,
+                    'cols'  => 64,
+                    'attributes' => ''
+                );
+                echo WPGH()->html->textarea( $args ); ?>
+                <?php submit_button( _x( 'Add Note', 'action', 'groundhogg' ), 'secondary', 'add_new_note' ); ?>
+            </td>
+        </tr>
+    </table>
     <table>
         <tbody>
         <tr>
@@ -447,6 +463,7 @@ function wpgh_contact_record_section_notes( $contact )
                     'name'  => 'notes',
                     'value' => $contact->get_meta( 'notes' ),
                     'rows'  => 30,
+                    'attributes' => 'readonly'
                 );
                 echo WPGH()->html->textarea( $args ); ?>
             </td>
