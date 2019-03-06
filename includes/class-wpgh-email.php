@@ -681,7 +681,7 @@ class WPGH_Email
     public function send($contact, $event = null)
     {
 
-        if ( $this->status !== 'ready' ){
+        if ( $this->status !== 'ready' && ! $this->testing ){
             return new WP_Error('NOT_READY', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->status ) );
         }
 

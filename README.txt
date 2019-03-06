@@ -107,6 +107,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.1 =
+* ADDED Automatic GEO location via geoplugin.net when a form is submitted and IP is collected.
+* ADDED Extrapolate location from IP via contact record.
+* ADDED Timezone and IP field to location section of contact record
+* TWEAKED changed "Address" to "Location" in contact record
+* TWEAKED excluded protected meta data from custom info tab
+
 = 1.2 =
 * ADDED Gravatar image to contact profile.
 * ADDED Ability to unlink contact records from user accounts.

@@ -83,6 +83,11 @@ class WPGH_Contact
      */
     public $notes;
 
+    /**
+     * @var string
+     */
+    public $ip_address;
+
 	/**
 	 * WPGH_Contact constructor.
 	 *
@@ -194,6 +199,7 @@ class WPGH_Contact
         }
 
         $this->notes = $this->get_meta('notes' );
+        $this->ip_address = $this->get_meta('ip_address' );
 
     }
 
@@ -204,7 +210,6 @@ class WPGH_Contact
     {
         return WPGH()->contacts->exists( $this->ID, 'ID' );
     }
-
 
     /**
      * Update the contact with the given information
@@ -367,7 +372,6 @@ class WPGH_Contact
 //        return wpgh_delete_contact_meta( $this->ID, $key );
     }
 
-
     /**
      * Magic get method
      *
@@ -394,6 +398,28 @@ class WPGH_Contact
         }
 
         return false;
+    }
+
+
+    /**
+     * Set the data to the given value
+     *
+     * @param $key
+     * @param $value
+     */
+    public function __set( $key, $value )
+    {
+
+        if ( property_exists( $this, $key ) ) {
+
+            $this->$key = $value;
+
+        } else {
+
+            $this->update_meta( $key, $value );
+
+        }
+
     }
 
     /**
@@ -496,7 +522,7 @@ class WPGH_Contact
         return true;
     }
 
-	/**
+    /**
 	 * return whether the contact has a specific tag
 	 *
 	 * @param int|string $tag_id_or_name the ID or name or the tag
@@ -569,6 +595,52 @@ class WPGH_Contact
         }
 
         return false;
+    }
+
+    /**
+     * Extrapolate the contact's location from an IP.
+     *
+     * @param bool $override
+     * @return array|bool
+     */
+    function extrapolate_location( $override=false )
+    {
+
+        $ip_address = $this->ip_address;
+
+        if ( ! $ip_address ){
+            $ip_address = $this->get_meta( 'ip_address' );
+        }
+
+        /* Do not run for localhost IPv6 blank IP */
+        if ( ! $ip_address || $ip_address === "::1" ){
+            return false;
+        }
+
+        $info = ip_info( $ip_address );
+
+        if ( ! $info || empty( $info ) ){
+            return false;
+        }
+
+        $location_meta = [
+            'city' => 'city',
+            'region' => 'region',
+            'country' => 'country_code',
+            'time_zone' => 'time_zone',
+        ];
+
+        foreach ( $location_meta as $meta_key => $ip_info_key ){
+
+            $has_meta = $this->get_meta( $meta_key );
+
+            if ( ! $has_meta || $override ){
+                $this->update_meta( $meta_key, $info[ $ip_info_key ] );
+            }
+
+        }
+
+        return $info;
     }
 
     /**

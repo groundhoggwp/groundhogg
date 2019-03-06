@@ -293,6 +293,7 @@ function wpgh_get_visitor_ip() {
     } else {
         $ip = $_SERVER['REMOTE_ADDR'];
     }
+
     return apply_filters( 'wpgh_get_ip', $ip );
 
 }

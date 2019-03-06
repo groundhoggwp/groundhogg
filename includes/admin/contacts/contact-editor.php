@@ -265,7 +265,7 @@ function wpgh_contact_record_general_info( $contact )
     </table>
 
     <!-- ADDRESS -->
-    <h2><?php _ex( 'Address', 'contact_record', 'groundhogg' ); ?></h2>
+    <h2><?php _ex( 'Location', 'contact_record', 'groundhogg' ); ?></h2>
     <table class="form-table">
         <tbody>
         <tr>
@@ -331,6 +331,34 @@ function wpgh_contact_record_general_info( $contact )
                     );
                     echo WPGH()->html->select2($args); ?>
                 </div>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="ip_address"><?php echo _x( 'IP Address', 'contact_record', 'groundhogg' ) ?></label></th>
+            <td><?php $args = array(
+                    'id' => 'ip_address',
+                    'name' => 'ip_address',
+                    'value' => $contact->get_meta('ip_address' ),
+                );
+                echo WPGH()->html->input($args); ?>
+                <?php if ( $contact->ip_address && $contact->ip_address !== '::1' ): ?>
+                    <span class="row-actions">
+                    <?php submit_button( _x( 'Extrapolate Location', 'action', 'groundhogg'), 'secondary', 'extrapolate_location', false ); ?>
+                </span>
+                <?php ?>
+<?php endif; ?>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="time_zone"><?php echo _x( 'Time Zone', 'contact_record', 'groundhogg' ) ?></label></th>
+            <td><div style="max-width: 338px">
+                    <?php $args = array(
+                    'id' => 'time_zone',
+                    'name' => 'time_zone',
+                    'options' => wpgh_get_time_zones(),
+                    'selected' => $contact->get_meta('time_zone'),
+                );
+                    echo WPGH()->html->dropdown($args); ?></div>
             </td>
         </tr>
         <?php do_action('wpgh_contact_edit_address', $contact->ID ); ?>
@@ -661,27 +689,6 @@ function wpgh_contact_record_section_custom_meta( $contact ){
     <?php do_action( 'wpgh_contact_edit_before_meta', $contact->ID ); ?>
     <!-- META -->
     <h2><?php _ex( 'Custom Meta', 'contact_record', 'groundhogg' ); ?></h2>
-<!--    <table class="form-table" >-->
-<!--        <tr>-->
-<!--            <th><label for="edit_meta">--><?php //_e( 'Edit Meta' ); ?><!--</label></th>-->
-<!--            <td>-->
-<!--                <div id="meta-toggle-switch" class="onoffswitch" style="text-align: left">-->
-<!--                    <input type="checkbox" name="view_meta" class="onoffswitch-checkbox" value="ready" id="edit_meta" --><?php //?><!-- >-->
-<!--                    <label class="onoffswitch-label" for="edit_meta">-->
-<!--                        <span class="onoffswitch-inner"></span>-->
-<!--                        <span class="onoffswitch-switch"></span>-->
-<!--                    </label>-->
-<!--                </div>-->
-<!--            </td>-->
-<!--        </tr>-->
-<!--    </table>-->
-<!--    <script>-->
-<!--        jQuery(function($){-->
-<!--            $('#edit_meta').change(function(){-->
-<!--                $('#meta-table').toggleClass( 'hidden' );-->
-<!--            })-->
-<!--        });-->
-<!--    </script>-->
     <table id='meta-table' class="form-table" >
         <tbody>
         <tr>
@@ -708,6 +715,7 @@ function wpgh_contact_record_section_custom_meta( $contact ){
             'primary_phone_extension',
             'street_address_1',
             'street_address_2',
+            'time_zone',
             'city',
             'postal_zip',
             'region',
@@ -716,7 +724,10 @@ function wpgh_contact_record_section_custom_meta( $contact ){
             'files',
             'company_name',
             'company_address',
-            'job_title'
+            'job_title',
+            'ip_address',
+            'last_optin',
+            'last_sent',
         ) );
 
         $meta = WPGH()->contact_meta->get_meta( $contact->ID );

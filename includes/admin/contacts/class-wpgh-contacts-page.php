@@ -576,59 +576,36 @@ class WPGH_Contacts_Page
         $args = array_map('stripslashes', $args);
         $contact->update($args);
 
-        if (isset($_POST['primary_phone'])) {
-            $contact->update_meta('primary_phone', sanitize_text_field($_POST['primary_phone']));
+        $basic_text_fields = [
+           'primary_phone',
+           'primary_phone_extension',
+           'company_name',
+           'job_title',
+           'company_address',
+           'street_address_1',
+           'street_address_2',
+           'city',
+           'postal_zip',
+           'region',
+           'country',
+           'lead_source',
+           'source_page',
+           'ip_address',
+           'time_zone',
+        ];
+
+        $basic_text_fields = apply_filters( 'groundhogg/contact/update/basic_fields', $basic_text_fields, $contact );
+
+        foreach ( $basic_text_fields as $field ){
+            if (isset($_POST[$field]) ) {
+                $contact->update_meta($field, sanitize_text_field(stripslashes($_POST[$field])));
+            }
         }
 
-        if (isset($_POST['company_name'])) {
-            $contact->update_meta('company_name', sanitize_text_field($_POST['company_name']));
-        }
-
-        if (isset($_POST['job_title'])) {
-            $contact->update_meta('job_title', sanitize_text_field($_POST['job_title']));
-        }
-
-        if (isset($_POST['company_address'])) {
-            $contact->update_meta('company_address', sanitize_text_field($_POST['company_address']));
-        }
-
-        if (isset($_POST['primary_phone_extension'])) {
-            $contact->update_meta('primary_phone_extension', sanitize_text_field($_POST['primary_phone_extension']));
-        }
-
-        if (isset($_POST['street_address_1'])) {
-            $contact->update_meta('street_address_1', sanitize_text_field(stripslashes($_POST['street_address_1'])));
-        }
-
-        if (isset($_POST['street_address_2'])) {
-            $contact->update_meta('street_address_2', sanitize_text_field(stripslashes($_POST['street_address_2'])));
-        }
-        if (isset($_POST['city'])) {
-            $contact->update_meta('city', sanitize_text_field(stripslashes($_POST['city'])));
-        }
-
-        if (isset($_POST['postal_zip'])) {
-            $contact->update_meta('postal_zip', sanitize_text_field(stripslashes($_POST['postal_zip'])));
-        }
-
-        if (isset($_POST['region'])) {
-            $contact->update_meta('region', sanitize_text_field(stripslashes($_POST['region'])));
-        }
-
-        if (isset($_POST['country'])) {
-            $contact->update_meta('country', sanitize_text_field(stripslashes($_POST['country'])));
-        }
-
-        if (isset( $_POST['add_note'] ) && ! empty( $_POST[ 'add_note' ] ) ) {
-            $contact->add_note( $_POST['add_note'] );
-        }
-
-        if (isset($_POST['lead_source'])) {
-            $contact->update_meta('lead_source', esc_url_raw($_POST['lead_source']));
-        }
-
-        if (isset($_POST['source_page'])) {
-            $contact->update_meta('source_page', esc_url_raw($_POST['source_page']));
+        if ( isset( $_POST[ 'extrapolate_location' ] ) ){
+            if ( $contact->extrapolate_location() ){
+                $this->notices->add('location_updated', sprintf(_x('Location updated.', 'notice', $email), 'groundhogg'), 'info');
+            }
         }
 
         if (isset($_POST['tags'])) {

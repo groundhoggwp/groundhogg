@@ -215,7 +215,9 @@ class WPGH_Submission
 
         /* Exclude these if submitting from the ADMIN Screen */
         if ( ! $this->is_admin_submission ){
-            $c->update_meta( 'ip_address', wpgh_get_visitor_ip() );
+            if ( $c->update_meta( 'ip_address', wpgh_get_visitor_ip() ) ){
+                $c->extrapolate_location();
+            }
             if ( ! $c->get_meta( 'lead_source' ) ){
                 $c->update_meta( 'lead_source', WPGH()->tracking->lead_source );
             }
