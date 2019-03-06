@@ -626,6 +626,8 @@ class WPGH_Contact
         $location_meta = [
             'city' => 'city',
             'region' => 'region',
+            'region_code' => 'region_code',
+            'country_name' => 'country',
             'country' => 'country_code',
             'time_zone' => 'time_zone',
         ];

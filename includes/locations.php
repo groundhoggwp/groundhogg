@@ -824,6 +824,7 @@ if ( ! function_exists('ip_info') )
                         $output = array(
                             "city"           => @$ipdat->geoplugin_city,
                             "region"         => @$ipdat->geoplugin_regionName,
+                            "region_code"    => @$ipdat->geoplugin_regionCode,
                             "country"        => @$ipdat->geoplugin_countryName,
                             "country_code"   => @$ipdat->geoplugin_countryCode,
                             "continent"      => @$continents[strtoupper($ipdat->geoplugin_continentCode)],

@@ -728,6 +728,8 @@ function wpgh_contact_record_section_custom_meta( $contact ){
             'ip_address',
             'last_optin',
             'last_sent',
+            'country_name',
+            'region_code',
         ) );
 
         $meta = WPGH()->contact_meta->get_meta( $contact->ID );
