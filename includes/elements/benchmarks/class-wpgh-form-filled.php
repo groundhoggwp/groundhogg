@@ -160,7 +160,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
         $form = $step->get_meta( 'form' );
 
         if ( empty( $form ) ){
-            $form = "[row]\n[col size=\"1/2\"]\n[first required=\"1\" label=\"First Name *\" placeholder=\"John\"]\n[/col]\n[col size=\"1/2\"]\n[last required=\"1\" label=\"Last Name *\" placeholder=\"Doe\"]\n[/col]\n[/row]\n[row]\n[email required=\"1\" label=\"Email *\" placeholder=\"email@example.com\"]\n[/row]\n[submit text=\"Submit\"]";
+            $form = "[row]\n[col size=\"1/2\"]\n[first required=\"true\" label=\"First Name *\" placeholder=\"John\"]\n[/col]\n[col size=\"1/2\"]\n[last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"]\n[/col]\n[/row]\n[row]\n[email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"]\n[/row]\n[submit text=\"Submit\"]";
         }
 
         $ty_page = $step->get_meta( 'success_page' );
@@ -499,14 +499,14 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                         <th><?php _e( 'Value', 'groundhogg' ) ?></th>
                         <td><?php
                             echo WPGH()->html->input( array( 'id' => 'field-value', 'name' => 'value' ) );
-                            ?><p class="description"><?php _e( 'The default value of the field. Add a tag when the value is as given. For example [Value|18]', 'groundhogg' ); ?></p></td>
+                            ?><p class="description"><?php _e( 'The default value of the field. Add a tag when the value is as given. For example Value|18', 'groundhogg' ); ?></p></td>
                     </tr>
 
                     <tr id="gh-field-options">
                         <th><?php _e( 'Options', 'groundhogg' ) ?></th>
                         <td><?php
                             echo WPGH()->html->textarea( array( 'id' => 'field-options', 'name' => 'options', 'cols' => 50, 'rows' => '5' ) );
-                            ?><p class="description"><?php _e( 'Enter 1 option per line. Add tags by separating the value and tag ID with a |. For example [Option|18]', 'groundhogg' ) ?></p></td>
+                            ?><p class="description"><?php _e( 'Enter 1 option per line. Add tags by separating the value and tag ID with a |. For example Option|18', 'groundhogg' ) ?></p></td>
                     </tr>
                     <tr id="gh-field-multiple">
                         <th><?php _e( 'Allow Multiple Selections', 'groundhogg' ) ?></th>

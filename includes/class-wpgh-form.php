@@ -376,7 +376,7 @@ class WPGH_Form
             'placeholder'   => '',
             'attributes'    => 'pattern="[A-Za-z \-\']+"',
             'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
-            'required'      => true,
+            'required'      => false,
         ), $atts );
 
         $this->config[ $a[ 'name' ] ] = $a ;
@@ -402,7 +402,7 @@ class WPGH_Form
             'placeholder'   => '',
             'attributes'    => 'pattern="[A-Za-z \-\']+"',
             'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
-            'required'      => true,
+            'required'      => false,
         ), $atts );
 
         $this->config[ $a[ 'name' ] ] = $a ;
@@ -452,7 +452,7 @@ class WPGH_Form
             'value'         => '',
             'placeholder'   => '',
             'attributes'    => '',
-            'required'      => true,
+            'required'      => false,
         ), $atts );
 
         $this->config[ $a[ 'name' ] ] = $a;
@@ -476,7 +476,7 @@ class WPGH_Form
             'class'         => '',
             'max_file_size' => 0,
             'file_types'    => '',
-            'required'      => true,
+            'required'      => false,
             'attributes'    => '',
 
         ), $atts );
@@ -506,7 +506,7 @@ class WPGH_Form
             'class'         => '',
             'max_date'      => '',
             'min_date'      => '',
-            'required'      => true,
+            'required'      => false,
             'attributes'    => '',
 
         ), $atts );
@@ -540,7 +540,7 @@ class WPGH_Form
             'class'         => '',
             'max_time'      => '',
             'min_time'      => '',
-            'required'      => true,
+            'required'      => false,
             'attributes'    => '',
 
         ), $atts );
@@ -577,7 +577,7 @@ class WPGH_Form
             'max'           => '',
             'min'           => '',
             'attributes'    => '',
-            'required'      => true,
+            'required'      => false,
         ), $atts );
 
         if ( ! empty( $a[ 'max' ] ) ){
@@ -604,7 +604,7 @@ class WPGH_Form
             'class'         => 'gh-address',
             'enabled'       => 'all',
             'name_prefix'   => '',
-            'required'      => true,
+            'required'      => false,
         ), $atts );
 
         $name_prefix = sanitize_key( $a[ 'name_prefix' ] );
@@ -717,7 +717,7 @@ class WPGH_Form
             'placeholder'   => '',
             'title'         => '',
             'attributes'    => '',
-            'required'      => true,
+            'required'      => false,
         ), $atts );
 
         $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
@@ -786,7 +786,7 @@ class WPGH_Form
             'title'         => '',
             'default'       => _x( 'Please select one', 'form_default', 'groundhogg' ),
             'multiple'      => false,
-            'required'      => true,
+            'required'      => false,
         ), $atts );
 
         $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
@@ -888,7 +888,7 @@ class WPGH_Form
             'id'            => '',
             'class'         => '',
             'options'       => '',
-            'required'      => true,
+            'required'      => false,
         ), $atts );
 
         $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );

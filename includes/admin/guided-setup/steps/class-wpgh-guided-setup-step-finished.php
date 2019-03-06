@@ -33,7 +33,7 @@ class WPGH_Guided_Setup_Step_Finished extends WPGH_Guided_Setup_Step
         if ( wpgh_should_show_stats_collection() ):
 
         ?>
-        <h3><?php _e( 'Next Steps...', 'Groundhogg' ); ?></h3>
+        <h3><?php _e( 'Next Steps...', 'groundhogg' ); ?></h3>
         <div class="postbox" style="padding: 0 10px 0 20px">
             <h3><?php _e( 'Get 30% Off When You Help Us Make Groundhogg Better', 'Groundhogg' ); ?></h3>
             <p>

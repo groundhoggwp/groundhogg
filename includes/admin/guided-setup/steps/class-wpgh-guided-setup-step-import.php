@@ -41,7 +41,7 @@ class WPGH_Guided_Setup_Step_Import extends WPGH_Guided_Setup_Step
         <p>
             <input type="file" id="contacts" name="contacts" accept=".csv" >
         </p>
-        <p class="description"><a target="_blank" href="https://docs.groundhogg.io/docs/settings/getting-started/import-your-list/"><?php _e( "Learn how to import contacts into Groundhogg.", 'groundhogg' ); ?></a></p>
+        <p class="description"><a target="_blank" href="https://docs.groundhogg.io/docs/settings/getting-started/import-your-list/"><?php _e( "Learn how to import contacts.", 'groundhogg' ); ?></a></p>
         <hr>
         <?php $tag_args = array();
         $tag_args[ 'id' ] = 'import_tags';

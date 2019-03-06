@@ -39,7 +39,7 @@ var wpghFormBuilder;
         {
             this.types.first        = ['required','label','placeholder','id','class'];
             this.types.last         = ['required','label','placeholder','id','class'];
-            this.types.email        = ['required','label','placeholder','id','class'];
+            this.types.email        = ['label','placeholder','id','class'];
             this.types.phone        = ['required','label','placeholder','id','class'];
             this.types.gdpr         = ['label','id','class'];
             this.types.terms        = ['label','id','class'];
@@ -121,9 +121,9 @@ var wpghFormBuilder;
 
             }
 
-            if ( code.search( 'required' ) === -1 && ignore.indexOf( this.currentType ) === -1 ){
-                code += ' required="false"';
-            }
+            // if ( code.search( 'required' ) === -1 && ignore.indexOf( this.currentType ) === -1 ){
+            //     code += ' required="false"';
+            // }
 
             code += ']';
 

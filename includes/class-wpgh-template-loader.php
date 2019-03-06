@@ -35,7 +35,7 @@ class WPGH_Template_Loader extends Gamajo_Template_Loader {
      * @since 1.0.0
      * @type string
      */
-    protected $theme_template_directory = 'wpgh-templates';
+    protected $theme_template_directory = 'groundhogg-templates';
 
     /**
      * Reference to the root directory path of this plugin.

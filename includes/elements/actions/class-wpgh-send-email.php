@@ -147,7 +147,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                         'name'  => $step->prefix( 'skip_if_confirmed' ),
                         'id'    => $step->prefix( 'skip_if_confirmed' ),
                         'value' => 1,
-                        'label' => __( 'Skip this email if the contact\'s email is already confirmed.', 'Groundhogg' ),
+                        'label' => __( 'Skip this email if the contact\'s email is already confirmed.', 'groundhogg' ),
                         'checked' => $step->get_meta( 'skip_if_confirmed' ),
                     ) ); ?></td>
             </tr>

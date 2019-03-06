@@ -39,7 +39,7 @@ function wpgh_import_contacts_display()
             <p>
                 <input type="file" id="contacts" name="contacts" accept=".csv" >
             </p>
-            <p class="description"><a target="_blank" href="https://docs.groundhogg.io/docs/settings/getting-started/import-your-list/"><?php _e( "Learn how to import contacts into Groundhogg.", 'groundhogg' ); ?></a></p>
+            <p class="description"><a target="_blank" href="https://docs.groundhogg.io/docs/settings/getting-started/import-your-list/"><?php _e( "Learn how to import contacts.", 'groundhogg' ); ?></a></p>
             <hr>
             <?php $tag_args = array();
             $tag_args[ 'id' ] = 'import_tags';
@@ -259,7 +259,7 @@ function wpgh_tools_sysinfo_get() {
     $return  = apply_filters( 'wpgh_sysinfo_after_wordpress_config', $return );
 
     // Groundhogg configuration
-    $return .= "\n" . '-- Groundhogg Configuration' . "\n\n";
+    $return .= "\n" . '-- Plugin Configuration' . "\n\n";
     $return .= 'Version:                  ' . WPGH()->version . "\n";
     $return .= 'Global Multisite:         ' . ( wpgh_is_global_multisite() ? "Enabled\n" : "Disabled\n" );
     $return .= 'ReCaptcha:                ' . ( wpgh_is_recaptcha_enabled() ? "Enabled\n" : "Disabled\n" );
@@ -277,7 +277,7 @@ function wpgh_tools_sysinfo_get() {
     $unsubscribe_page           = wpgh_get_option( 'gh_unsubscribe_page', '' );
     $email_preferences_page     = wpgh_get_option( 'gh_email_preferences_page', '' );
 
-    $return .= "\n" . '-- Groundhogg Page Configuration' . "\n\n";
+    $return .= "\n" . '-- Page Configuration' . "\n\n";
     $return .= 'Confirmation Page:            ' . ( !empty( $confirmation_page ) ? get_permalink( $confirmation_page ) . "\n" : "Unset\n" );
     $return .= 'unsubscribed Page:            ' . ( !empty( $unsubscribe_page ) ? get_permalink( $unsubscribe_page ) . "\n" : "Unset\n" );
     $return .= 'Email Preferences Page:       ' . ( !empty( $email_preferences_page ) ? get_permalink( $email_preferences_page ) . "\n" : "Unset\n" );

@@ -180,7 +180,7 @@ class WPGH_Replacements
             array(
                 'code'        => 'groundhogg_day_quote',
                 'callback'    => 'wpgh_get_random_groundhogday_quote',
-                'description' => _x( 'Inserts a random quote from the movie Groundhogg Day featuring Bill Murray', 'replacement', 'groundhogg' ),
+                'description' => _x( 'Inserts a random quote from the movie Groundhog Day featuring Bill Murray', 'replacement', 'groundhogg' ),
             )
         );
 

@@ -24,6 +24,11 @@ class WPGH_API_V2
     public $emails;
 
     /**
+     * @var WPGH_API_V2_SMS
+     */
+    public $sms;
+
+    /**
      * @var WPGH_API_V2_BASE[]
      */
     public $extension_apis = array();
@@ -37,6 +42,7 @@ class WPGH_API_V2
         $this->contacts = new WPGH_API_V2_CONTACTS();
         $this->tags     = new WPGH_API_V2_TAGS();
         $this->emails   = new WPGH_API_V2_EMAILS();
+        $this->sms      = new WPGH_API_V2_SMS();
 
 //        $this->load_extension_apis();
 
@@ -81,6 +87,7 @@ class WPGH_API_V2
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-contacts.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-tags.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-emails.php';
+        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-sms.php';
 
         do_action( 'wpgh_api_include_extensions', $this );
 

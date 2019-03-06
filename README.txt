@@ -31,7 +31,7 @@ The funnel builder allows you to use benchmarks and actions in any combination t
 
 * When an account is created.
 * When a contact's email is confirmed.
-* Whenever a from is filled out.
+* Whenever a form is filled out.
 * A page is visited.
 * A User's role is changed.
 * A tag is applied
@@ -116,7 +116,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED Error reporting for failed events in the events screen.
 * ADDED Process events direct from contact activity tab.
 * ADDED Support for manually confirming a contact's email address.
-* TWEAKED Max default text length increased to 280 characters.
+* ADDED Login abandonment funnel template
+* ADDED SMS API endpoint.
+* TWEAKED improved email and instruction copy in the funnel templates.
+* TWEAKED form fields now default to required false, so no need to add required false into the form shortcode. Explicit required="true" now required.
+* TWEAKED removed SMS character limit.
 * TWEAKED removed 5 second check preventing emails sent in succession, no longer needed.
 * FIXED Email content centered if not explicitly given left align
 * FIXED Emails sent if in draft mode.

@@ -178,7 +178,7 @@ class WPGH_Guided_Setup
                 <div class="">
                     <div class="postbox">
                         <div class="inside" style="padding: 0 10px 20px 30px;">
-                            <h2><b><?php _ex( 'Welcome to the Groundhogg Guided Setup', 'guided_setup', 'groundhogg' );?></b></h2>
+                            <h2><b><?php _ex( 'Welcome to the Guided Setup', 'guided_setup', 'groundhogg' );?></b></h2>
                             <p><?php _ex( 'Follow these steps to quickly setup Groundhogg for your business. Setup usually takes around a few minutes. You can always change this information later in the settings page.', 'guided_setup', 'groundhogg' ); ?></p>
                             <p class="submit">
                                 <a style="float: left" class="button button-primary" href="<?php printf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), 1 ) ?>"><?php _ex( 'Get Started!', 'guided_setup', 'groundhogg' ); ?></a>

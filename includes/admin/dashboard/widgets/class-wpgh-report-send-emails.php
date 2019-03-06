@@ -79,7 +79,7 @@ class WPGH_Report_Send_Emails extends WPGH_Line_Graph_Report_V2
         $steps  = WPGH()->steps->table_name;
 
         /* ALL SENDS */
-        $num_emails_sent = $wpdb->get_var( "SELECT COUNT(e.ID) FROM $events AS e LEFT JOIN $steps AS s ON e.step_id = s.ID WHERE $this->start_time < e.time AND e.time <= $this->end_time AND ( s.step_type = 'send_email' OR e.funnel_id = 1 ) " );
+        $num_emails_sent = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(e.ID) FROM $events AS e LEFT JOIN $steps AS s ON e.step_id = s.ID WHERE $this->start_time < e.time AND e.time <= $this->end_time AND ( s.step_type = 'send_email' OR e.funnel_id = %d OR e.event_type = %d ) ", WPGH_BROADCAST, WPGH_EMAIL_NOTIFICATION_EVENT ) );
         /* ALL OPENS */
         $num_opens = WPGH()->activity->count( array( 'start' => $this->start_time, 'end' => $this->end_time, 'activity_type' => 'email_opened' ) );
         /* ALL CLICKS */
@@ -135,11 +135,11 @@ class WPGH_Report_Send_Emails extends WPGH_Line_Graph_Report_V2
             $export_info[] = array(
                 __( 'From' ) => date( 'F jS', $from ),
                 __( 'To' ) => date( 'F jS', $to ),
-                __( 'Emails Sent', 'Groundhogg' ) => $num_emails_sent,
-                __( 'Emails Opened', 'Groundhogg' ) => $num_opens,
-                __( 'Emails Clicked', 'Groundhogg' ) => $num_clicks,
-                __( 'Average Open Rate', 'Groundhogg' ) => ceil( ( $num_opens / max( $num_emails_sent, 1 ) ) * 100 ) . '%',
-                __( 'Average Click Through Rate', 'Groundhogg' ) => ceil( ( $num_clicks / max( $num_opens, 1 ) ) * 100 ) . '%',
+                __( 'Emails Sent', 'groundhogg' ) => $num_emails_sent,
+                __( 'Emails Opened', 'groundhogg' ) => $num_opens,
+                __( 'Emails Clicked', 'groundhogg' ) => $num_clicks,
+                __( 'Average Open Rate', 'groundhogg' ) => ceil( ( $num_opens / max( $num_emails_sent, 1 ) ) * 100 ) . '%',
+                __( 'Average Click Through Rate', 'groundhogg' ) => ceil( ( $num_clicks / max( $num_opens, 1 ) ) * 100 ) . '%',
             );
 
             $this->start_range = $this->end_range;

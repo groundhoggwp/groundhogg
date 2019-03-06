@@ -273,7 +273,9 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             </div>
             <!-- End elements area-->
             <!-- main funnel editing area -->
-            <div id="notices"></div>
+            <div id="notices">
+                <?php WPGH()->notices->notices(); ?>
+            </div>
 
             <div style="width: 100%">
                 <?php include_once dirname( __FILE__ ) . '/reporting.php'; ?>

@@ -85,7 +85,7 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
             $step->update_meta( 'sms_id', intval( $_POST[ $step->prefix( 'sms_id' ) ] ) );
         }
 
-        if ( ! wpgh_get_option( 'gh_sms_token', false ) ){
+        if ( ! wpgh_get_option( 'gh_email_token', false ) ){
             WPGH()->notices->add( new WP_Error( 'NO_TOKEN', __( 'Your SMS steps will not work until you active the Groundhogg Sending Service.', 'groundhogg' ) ) );
         }
 

@@ -78,21 +78,21 @@ class WPGH_Guided_Setup_Step_Compliance extends WPGH_Guided_Setup_Step
 
                     echo WPGH()->html->checkbox( array(
                         'name' => 'in_europe',
-                        'label' => __( 'Europe', 'guided_setup', 'Groundhogg' ),
+                        'label' => _x( 'Europe', 'guided_setup', 'groundhogg' ),
                         'value' => 1,
                         'checked' => wpgh_is_option_enabled( 'gh_enable_gdpr' )
                     ) );
                     ?>&nbsp;&nbsp;<?php
                     echo WPGH()->html->checkbox( array(
                         'name' => 'in_canada',
-                        'label' => __( 'Canada', 'guided_setup', 'Groundhogg' ),
+                        'label' => _x( 'Canada', 'guided_setup', 'groundhogg' ),
                         'value' => 1,
                         'checked' => wpgh_is_option_enabled( 'gh_strict_confirmation' )
                     ) );
                     ?>&nbsp;&nbsp;<?php
                     echo WPGH()->html->checkbox( array(
                         'name' => 'other',
-                        'label' => __( 'Other', 'guided_setup', 'Groundhogg' ),
+                        'label' => _x( 'Other', 'guided_setup', 'groundhogg' ),
                         'value' => 1,
                         'checked' => true,
                     ) );
