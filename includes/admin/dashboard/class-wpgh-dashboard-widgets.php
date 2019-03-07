@@ -43,6 +43,9 @@ class WPGH_Dashboard_Widgets
         $this->widgets[] = new WPGH_Search_Engines_Widget();
         $this->widgets[] = new WPGH_Source_Page_Widget();
         $this->widgets[] = new WPGH_UTM_Campaign_Widget();
+        $this->widgets[] = new WPGH_Geographic_Country_Report();
+        $this->widgets[] = new WPGH_Geographic_Region_Report();
+        $this->widgets[] = new WPGH_Optin_Status_Report();
     }
 
     public function scripts(){
@@ -51,6 +54,7 @@ class WPGH_Dashboard_Widgets
             return;
         }
 
+        /* Dequeue EDD Script */
         wp_enqueue_style( 'wpgh-dashboard-widgets', WPGH_ASSETS_FOLDER . 'css/admin/dashboard.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/dashboard.css') );
     }
 
@@ -78,6 +82,7 @@ class WPGH_Dashboard_Widgets
         include_once dirname( __FILE__ ) . '/class-wpgh-dashboard-widget.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-reporting-widget.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-line-graph-report-v2.php';
+        include_once dirname( __FILE__ ) . '/class-wpgh-circle-graph-report.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-time-range-widget.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-most-active-funnels.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-funnel-breakdown-widget.php';
@@ -89,6 +94,9 @@ class WPGH_Dashboard_Widgets
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-search-engines-widget.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-source-page-widget.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-utm-campaign-widget.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-geographic-country-report.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-geographic-region-report.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-optin-status-report.php';
     }
 
 }

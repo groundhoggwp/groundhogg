@@ -626,6 +626,8 @@ class WPGH_Contact
         $location_meta = [
             'city' => 'city',
             'region' => 'region',
+            'region_code' => 'region_code',
+            'country_name' => 'country',
             'country' => 'country_code',
             'time_zone' => 'time_zone',
         ];
@@ -641,6 +643,29 @@ class WPGH_Contact
         }
 
         return $info;
+    }
+
+    /**
+     * Returns the local time of the contact
+     * If time specified, converts the timestamp dependant on the timezone of the user.
+     *
+     * @param int $time UNIX timestamp
+     * @return int UNIX timestamp
+     */
+    function get_local_time( $time=0 ){
+
+        if ( ! $time ){
+            $time = time();
+        }
+
+        if ( ! $this->time_zone && $this->ip_address ){
+           $this->extrapolate_location();
+        }
+
+        $local_time = wpgh_convert_to_foreign_time( $time, $this->time_zone );
+
+        return $local_time;
+
     }
 
     /**

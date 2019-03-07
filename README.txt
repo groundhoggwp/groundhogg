@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.2 =
+* ADDED Schedule broadcasts at time in subscribers' timezone.
+* ADDED Schedule timers to run in subscribers' timezones.
+* ADDED Schedule SMS Broadcasts to run in subscribers' timezones.
+
 = 1.2.1 =
 * ADDED Automatic GEO location via geoplugin.net when a form is submitted and IP is collected.
 * ADDED Extrapolate location from IP via contact record.

@@ -24,9 +24,9 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
      */
     public function scripts()
     {
-        wp_enqueue_script( 'wpgh-flot-chart', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
-        wp_enqueue_script( 'wpgh-flot-chart-categories', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.categories.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.categories.js') );
-        wp_enqueue_script( 'wpgh-flot-chart-time', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.time.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.time.js') );
+        wp_enqueue_script( 'jquery-flot', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
+        wp_enqueue_script( 'jquery-flot-categories', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.categories.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.categories.js') );
+        wp_enqueue_script( 'jquery-flot-time', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.time.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.time.js') );
 //        wp_enqueue_script( 'wpgh-flot-date', WPGH_ASSETS_FOLDER . 'lib/flot/date.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/date.min.js') );
     }
 
@@ -38,13 +38,20 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
         /*
          * Get Data from the Override method.
          */
+
+        $data =  $this->get_data();
+
+        if ( is_array( $data ) ){
+            $data = json_encode( $data );
+        }
+
         ?>
         <div class="report">
             <script type="text/javascript">
                 jQuery(function($) {
 
                     /* DATA OPERATION */
-                    var dataset = <?php echo $this->get_data(); ?>;
+                    var dataset = <?php echo $data; ?>;
                     var options = {
                         series: {
                             lines: {show: true},

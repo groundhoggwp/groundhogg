@@ -80,13 +80,18 @@ $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ]
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
 <!--/ Title -->
-
+<div class="local-time" style="float: right; padding: 10px;font-size: 18px;">
+    <?php _ex( 'Local Time:', 'groundhogg' );?>
+    <span style="font-family: Georgia, Times New Roman, Bitstream Charter, Times, serif;font-weight: 400;"><?php echo date_i18n( "D, F d h:i A", $contact->get_local_time() ); ?>
+        </span>
+</div>
 <!-- BEGIN TABS -->
 <h2 class="nav-tab-wrapper">
     <?php foreach ( $tabs as $id => $tab ): ?>
         <a href="javascript:void(0)" class="nav-tab <?php echo  $active_tab == $id ? 'nav-tab-active' : ''; ?>" id="<?php echo 'tab_' . esc_attr( $id ); ?>"><?php _e( $tab, 'groundhogg'); ?></a>
     <?php endforeach; ?>
 </h2>
+
 <!-- END TABS -->
 
 <form method="post" class="" enctype="multipart/form-data">
@@ -728,6 +733,8 @@ function wpgh_contact_record_section_custom_meta( $contact ){
             'ip_address',
             'last_optin',
             'last_sent',
+            'country_name',
+            'region_code',
         ) );
 
         $meta = WPGH()->contact_meta->get_meta( $contact->ID );

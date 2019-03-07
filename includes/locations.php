@@ -13,9 +13,9 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-function wpgh_get_countries_list()
+function wpgh_get_countries_list( $country_code = '' )
 {
-	return array(
+	$countries = array(
         'AF' => 'Afghanistan',
         'AX' => 'Aland Islands',
         'AL' => 'Albania',
@@ -262,6 +262,14 @@ function wpgh_get_countries_list()
         'ZM' => 'Zambia',
         'ZW' => 'Zimbabwe',
     );
+
+	if ( $country_code && key_exists( $country_code, $countries )  ){
+	    return $countries[ $country_code ];
+    } else if ( $country_code ){
+	    return $country_code;
+    }
+
+	return $countries;
 }
 
 function wpgh_get_american_states_list()
@@ -824,6 +832,7 @@ if ( ! function_exists('ip_info') )
                         $output = array(
                             "city"           => @$ipdat->geoplugin_city,
                             "region"         => @$ipdat->geoplugin_regionName,
+                            "region_code"    => @$ipdat->geoplugin_regionCode,
                             "country"        => @$ipdat->geoplugin_countryName,
                             "country_code"   => @$ipdat->geoplugin_countryCode,
                             "continent"      => @$continents[strtoupper($ipdat->geoplugin_continentCode)],

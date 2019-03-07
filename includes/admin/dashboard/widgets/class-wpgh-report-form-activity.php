@@ -59,7 +59,7 @@ class WPGH_Report_Form_Activity extends WPGH_Line_Graph_Report_V2
         ) ;
 
 
-        return json_encode($ds);
+        return $ds;
     }
 
     /**

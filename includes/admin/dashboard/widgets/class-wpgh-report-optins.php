@@ -46,7 +46,7 @@ class WPGH_Report_Optins extends WPGH_Line_Graph_Report_V2
             'data'  => $dataset1
         ) ;
 
-        return json_encode( $ds );
+        return $ds ;
     }
 
     /**

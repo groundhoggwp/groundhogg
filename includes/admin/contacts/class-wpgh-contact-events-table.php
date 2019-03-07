@@ -114,7 +114,7 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
         $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=cancel' ), 'cancel' ) );
         $actions = array();
 
-        if ( $event->time > time() && $event->status !== 'waiting' ){
+        if ( $event->time > time() && $event->status === 'waiting' ){
             $actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Now', 'action', 'groundhogg' ) );
             $actions[] = sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, _x( 'Cancel', 'action', 'groundhogg' ) );
         } else {

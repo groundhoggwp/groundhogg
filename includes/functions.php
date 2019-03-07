@@ -871,6 +871,34 @@ function wpgh_convert_to_local_time($time )
 }
 
 /**
+ * Converts the given time into the timeZone
+ *
+ * @param $time int UTC-0 Timestamp
+ * @param string $timeZone the timezone to change to
+ * @return int UTC-0 TImestamp that reflects the given timezone
+ */
+function wpgh_convert_to_foreign_time( $time, $timeZone = '' )
+{
+
+    if ( ! $timeZone ){
+        return $time;
+    }
+
+    $timeZone = new DateTimeZone( $timeZone );
+
+    try{
+        $dateTime = new DateTime( 'now', $timeZone );
+    } catch ( Exception $e ){
+        return $time;
+    }
+
+    $offset = $timeZone->getOffset( $dateTime );
+
+    $time += $offset;
+    return $time;
+}
+
+/**
  * Round time to the nearest hour.
  *
  * @param $time int

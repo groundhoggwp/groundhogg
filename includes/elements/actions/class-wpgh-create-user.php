@@ -146,6 +146,10 @@ class WPGH_Create_User extends WPGH_Funnel_Step
 
 	    $role = $event->step->get_meta( 'role' );
 
+	    if ( ! $role ){
+	        $role = 'subscriber';
+        }
+
 	    if ( ! username_exists( $username ) && ! email_exists( $email_address ) ) {
 
 	        $user_id = wp_create_user( $username, $password, $email_address );
@@ -163,6 +167,10 @@ class WPGH_Create_User extends WPGH_Funnel_Step
 	    } else {
 
 	        $user = get_user_by( 'email', $username );
+
+	        if ( ! $user ){
+	            return false;
+            }
 
 	        /**
 	         * @since 1.0.19.4 update the user role if a user account already exists...

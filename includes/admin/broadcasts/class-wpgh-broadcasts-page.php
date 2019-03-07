@@ -226,7 +226,9 @@ class WPGH_Broadcasts_Page
         /* convert to UTC */
         $send_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 
+        $send_now = false;
         if ( isset( $_POST[ 'send_now' ] ) ){
+            $send_now = true;
             $send_time = time() + 10;
         }
 
@@ -258,7 +260,21 @@ class WPGH_Broadcasts_Page
 
         $contacts = $query->query( $args );
 
+        $send_in_timezone = false;
+        if ( isset( $_POST[ 'send_in_timezone' ] ) ){
+            $send_in_timezone = true;
+        }
+
         foreach ( $contacts as $i => $contact ) {
+
+            $contact = wpgh_get_contact( $contact->ID );
+
+            if (  $send_in_timezone && ! $send_now ){
+                $local_time = $contact->get_local_time( $send_time );
+                if ( $local_time > time() ){
+                    $send_time = $local_time;
+                }
+            }
 
             $args = array(
                 'time'          => $send_time,

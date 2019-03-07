@@ -64,7 +64,7 @@ class WPGH_Report_Send_Emails extends WPGH_Line_Graph_Report_V2
         ) ;
 
 
-        return json_encode($ds);
+        return $ds;
     }
 
     /**
