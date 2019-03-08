@@ -156,6 +156,8 @@ class WPGH_Geographic_Region_Report extends WPGH_Circle_Graph_Report
         ?></tbody>
         </table><?php
 
+        $this->export_button();
+
         return '';
 
     }
@@ -168,33 +170,19 @@ class WPGH_Geographic_Region_Report extends WPGH_Circle_Graph_Report
     protected function get_export_data()
     {
 
-        global $wpdb;
+	    $export = [];
 
-        $dataset1 = array();
+	    $data = $this->get_data();
 
-        for ( $i = 0; $i < $this->points; $i++ ){
+	    foreach ( $data as $data_set ){
 
-            $start_date = date( 'Y-m-d H:i:s', $this->start_range );
-            $end_date = date( 'Y-m-d H:i:s', $this->end_range );
+		    $export[] = [
+			    _x( 'Region', 'column_title', 'groundhogg' ) => $data_set[ 'label' ],
+			    _x( 'Contacts', 'column_title', 'groundhogg' ) => $data_set[ 'data' ]
+		    ];
 
-            $table = WPGH()->contacts->table_name;
+	    }
 
-            $num_contacts = $wpdb->get_var( "SELECT COUNT(email) FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'" );
-
-            $from = wpgh_convert_to_local_time( $this->start_range );
-            $to = wpgh_convert_to_local_time( $this->end_range );
-
-            $dataset1[] = array(
-                _x( 'From', 'stats', 'groundhogg' )     => date( 'F jS', $from ),
-                _x( 'To', 'stats', 'groundhogg' )       => date( 'F jS', $to ),
-                _x( 'Contacts', 'stats', 'groundhogg' ) => $num_contacts
-            );
-
-            $this->start_range = $this->end_range;
-            $this->end_range = $this->end_range + $this->difference;
-        }
-
-        return $dataset1;
-
+	    return $export;
     }
 }

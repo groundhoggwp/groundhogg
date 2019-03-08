@@ -224,7 +224,7 @@ class WPGH_Broadcasts_Page
         $time_string = $send_date . ' ' . $send_time;
 
         /* convert to UTC */
-        $send_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $send_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
 
         $send_now = false;
         if ( isset( $_POST[ 'send_now' ] ) ){

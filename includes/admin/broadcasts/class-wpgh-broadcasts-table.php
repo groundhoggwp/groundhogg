@@ -201,7 +201,8 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 
         $contact_sum = WPGH()->events->count( array(
             'funnel_id'     => WPGH_BROADCAST,
-            'step_id'       => $broadcast->ID
+            'step_id'       => $broadcast->ID,
+	        'status'        => 'complete'
         ) );
 
         $html = sprintf( "%s: <strong>%d</strong><br/>",

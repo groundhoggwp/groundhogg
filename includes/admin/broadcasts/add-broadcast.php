@@ -80,6 +80,19 @@ wp_enqueue_style( 'jquery-ui' );
                     'attributes'    => '',
                     'required'      => false,) ); ?>
                 <p class="description"><?php _e( 'The day the broadcast will be sent.', 'groundhogg' ); ?></p>
+                <div>
+	                <?php echo WPGH()->html->checkbox( array(
+		                'label'         => _x( 'Send in the contact\'s local time.', 'action', 'groundhogg' ),
+		                'name'          => 'send_in_timezone',
+		                'id'            => 'send_in_timezone',
+		                'class'         => '',
+		                'value'         => '1',
+		                'checked'       => false,
+		                'title'         => __( 'Send in the contact\'s local time.', 'groundhogg' ),
+		                'attributes'    => '',
+		                'required'      => false,) ); ?>
+                </div>
+                <p class="description"><?php _e( 'If checked, this email will be sent at the specified time in their local timezone. If the time has already passed the email will be scheduled for the following day.', 'groundhogg' ); ?></p>
             </td>
         </tr>
         </tbody>

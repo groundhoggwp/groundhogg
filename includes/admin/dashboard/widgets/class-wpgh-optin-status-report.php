@@ -92,6 +92,8 @@ class WPGH_Optin_Status_Report extends WPGH_Circle_Graph_Report
         ?></tbody>
         </table><?php
 
+        $this->export_button();
+
         return '';
 
     }
@@ -104,11 +106,20 @@ class WPGH_Optin_Status_Report extends WPGH_Circle_Graph_Report
     protected function get_export_data()
     {
 
-        global $wpdb;
+	    $export = [];
 
-        $data = $this->get_data();
+	    $data = $this->get_data();
 
-//        return $dataset1;
+	    foreach ( $data as $data_set ){
+
+		    $export[] = [
+			    _x( 'Optin Status', 'column_title', 'groundhogg' ) => $data_set[ 'label' ],
+			    _x( 'Contacts', 'column_title', 'groundhogg' ) => $data_set[ 'data' ]
+		    ];
+
+	    }
+
+	    return $export;
 
     }
 }

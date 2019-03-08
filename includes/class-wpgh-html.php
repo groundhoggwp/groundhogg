@@ -565,8 +565,8 @@ class WPGH_HTML
             'value' => '',
             'attributes' => '',
             'placeholder' => '',
-            'min-date' => date( 'Y-m-d', strtotime( 'today' ) ),
-            'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
+            'min-date' => date( 'Y-m-d', wpgh_convert_to_local_time( strtotime( 'today' ) ) ),
+            'max-date' => date( 'Y-m-d', wpgh_convert_to_local_time( strtotime( '+100 years' ) ) ),
             'format' => 'yy-mm-dd'
         ) );
 
