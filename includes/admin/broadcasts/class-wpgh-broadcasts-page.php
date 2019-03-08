@@ -269,15 +269,17 @@ class WPGH_Broadcasts_Page
 
             $contact = wpgh_get_contact( $contact->ID );
 
+            $local_time = $send_time;
+
             if (  $send_in_timezone && ! $send_now ){
                 $local_time = $contact->get_local_time( $send_time );
-                if ( $local_time > time() ){
-                    $send_time = $local_time;
+                if ( $local_time < time() ){
+                    $local_time+=DAY_IN_SECONDS;
                 }
             }
 
             $args = array(
-                'time'          => $send_time,
+                'time'          => $local_time,
                 'contact_id'    => $contact->ID,
                 'funnel_id'     => WPGH_BROADCAST,
                 'step_id'       => $broadcast_id,

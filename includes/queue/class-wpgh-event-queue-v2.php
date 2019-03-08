@@ -47,6 +47,11 @@ class WPGH_Event_Queue_v2
     public $schedules = array();
 
     /**
+     * @var bool
+     */
+    private $processing_queue;
+
+    /**
      * Setup the cron jobs
      * Add new short term schedule
      * setup the action for the cron job
@@ -172,6 +177,16 @@ class WPGH_Event_Queue_v2
     }
 
     /**
+     * Whether the queue is processing.
+     *
+     * @return bool
+     */
+    public function is_processing()
+    {
+       return $this->processing_queue;
+    }
+
+    /**
      * Recursive, Iterate through the list of events and process them via the EVENTS api
      * completes successive events quite since WP-Cron only happens once every 5 or 10 minutes depending on
      * the amount of traffic.
@@ -199,6 +214,8 @@ class WPGH_Event_Queue_v2
             $max_events = 9999;
         }
 
+        $this->processing_queue = true;
+
         /* Check to see if the current queue is still the most recent queue. If it's not Then finish up. */
         while ( $this->has_events() && $i < $max_events ) {
             $this->cur_event = $this->get_next();
@@ -210,6 +227,8 @@ class WPGH_Event_Queue_v2
             }
             $i++;
         }
+
+        $this->processing_queue = false;
 
         do_action( 'wpgh_process_event_queue_after', $this );
         do_action( 'groundhogg/queue/run/after', $this );
