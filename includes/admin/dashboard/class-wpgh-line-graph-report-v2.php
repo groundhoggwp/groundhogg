@@ -30,6 +30,13 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
 //        wp_enqueue_script( 'wpgh-flot-date', WPGH_ASSETS_FOLDER . 'lib/flot/date.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/date.min.js') );
     }
 
+	/**
+	 * @return string
+	 */
+    public function get_mode(){
+        return 'time';
+    }
+
     /**
      * Output the widget HTML
      */
@@ -64,7 +71,7 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
                             hoverable: true
                         },
                         xaxis: {
-                            mode: "time",
+                            mode: "<?php echo $this->get_mode(); ?>",
                             localTimezone: true
                             // timezone: "browser"
                             // timezone: "America/Chicago"

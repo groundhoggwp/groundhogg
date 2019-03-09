@@ -5,7 +5,7 @@
  * Date: 11/27/2018
  * Time: 9:13 AM
  */
-class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
+class WPGH_Funnel_Breakdown_Widget extends WPGH_Line_Graph_Report_V2
 {
 
     /**
@@ -19,7 +19,87 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
         parent::__construct();
     }
 
-    public function widget()
+	/**
+	 * @return string
+	 */
+    public function get_mode()
+    {
+        return "categories";
+    }
+
+    public function get_data() {
+
+	    $break_down_funnel_id = intval( $this->get_url_var( 'breakdown_funnel_id', $this->get_option( 'breakdown_funnel_id' ) ) );
+
+	    if ( ! $break_down_funnel_id ){
+		    $funnels = WPGH()->funnels->get_funnels( array( 'status' => 'active' ) );
+		    $break_down_funnel_id = $funnels[0]->ID;
+	    }
+
+	    $this->update_options(
+		    array( 'breakdown_funnel_id' => $break_down_funnel_id )
+	    );
+
+
+	    $steps = WPGH()->steps->get_steps( array(
+		    'funnel_id'  => $break_down_funnel_id,
+//		    'step_group'  => 'benchmark',
+	    ) );
+
+	    if ( empty( $steps ) ){
+		    return [];
+	    }
+
+	    $ds = array();
+	    $dataset1 = array();
+	    $dataset2 = array();
+
+	    foreach ( $steps as $i => $step ) {
+
+		    $query = new WPGH_Contact_Query();
+
+		    $args = array(
+			    'report' => array(
+				    'funnel' => $break_down_funnel_id,
+				    'step' => $step->ID,
+				    'status' => 'complete',
+				    'start' => $this->start_time,
+				    'end' => $this->end_time,
+			    )
+		    );
+
+		    $count = count($query->query($args));
+
+		    $dataset1[] = array( ( $i + 1 ) .'. '. $step->step_title , $count );
+
+		    $args = array(
+			    'report' => array(
+				    'funnel' => intval(  $_REQUEST[ 'funnel' ] ),
+				    'step' => $step->ID,
+				    'status' => 'waiting'
+			    )
+		    );
+
+		    $count = count($query->query($args));
+
+		    $dataset2[] = array( ( $i + 1 ) .'. '. $step->step_title , $count );
+
+	    }
+
+	    $ds[] = array(
+		    'label' => _x( 'Completed Events', 'stats', 'groundhogg' ),
+		    'data'  => $dataset1
+	    ) ;
+	    $ds[] = array(
+		    'label' => __( 'Waiting Contacts', 'stats', 'groundhogg' ),
+		    'data'  => $dataset2
+	    ) ;
+
+	    return $ds;
+
+    }
+
+	public function extra_widget_info()
     {
 
         /*Get all the funnels */
@@ -36,17 +116,9 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Reporting_Widget
             $options[ $funnel->ID ] = $funnel->title;
         }
 
-        $break_down_funnel_id = intval( $this->get_url_var( 'breakdown_funnel_id', $this->get_option( 'breakdown_funnel_id' ) ) );
+	    $break_down_funnel_id = intval( $this->get_url_var( 'breakdown_funnel_id', $this->get_option( 'breakdown_funnel_id' ) ) );
 
-        if ( ! $break_down_funnel_id ){
-            $break_down_funnel_id = $funnels[0]->ID;
-        }
-
-        $this->update_options(
-            array( 'breakdown_funnel_id' => $break_down_funnel_id )
-        );
-
-        ?>
+	    ?>
         <div class="actions">
             <form method="get" action="">
                 <?php
