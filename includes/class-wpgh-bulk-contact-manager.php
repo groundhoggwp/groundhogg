@@ -312,12 +312,12 @@ class WPGH_Bulk_Contact_Manager
             $contact = new WPGH_Contact( $id );
         }
 
-        if ( isset( $data[ 'optin_status' ] ) ){
+        if ( isset( $args[ 'optin_status' ] ) ){
 
-            if ( intval( $data[ 'optin_status' ] )  === WPGH_UNSUBSCRIBED ){
+            if ( intval( $args[ 'optin_status' ] )  === WPGH_UNSUBSCRIBED ){
                 $contact->unsubscribe();
             } else {
-                $contact->change_marketing_preference( intval( $data[ 'optin_status' ] ) );
+                $contact->change_marketing_preference( intval( $args[ 'optin_status' ] ) );
             }
 
         }

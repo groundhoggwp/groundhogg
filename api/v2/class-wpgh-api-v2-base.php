@@ -27,8 +27,13 @@ class WPGH_API_V2_BASE {
     {
         // validate user and set user id for contact operations..
 
-        $token = $request->get_param( 'token' );
-        $key = $request->get_param( 'key' );
+        $token = $request->get_header( 'GH_TOKEN' );
+        $key = $request->get_header( 'GH_PUBLIC_KEY' );
+
+        if ( ! $token || ! $key ){
+            $token = $request->get_param( 'token' );
+            $key = $request->get_param( 'key' );
+        }
 
         if( $token && $key ) {
 

@@ -52,6 +52,16 @@ class WPGH_Event_Queue_v2
     private $processing_queue;
 
     /**
+     * @var float
+     */
+    private $max_process_time;
+
+    /**
+     * @var int
+     */
+    private $events_completed = 0;
+
+    /**
      * Setup the cron jobs
      * Add new short term schedule
      * setup the action for the cron job
@@ -65,7 +75,7 @@ class WPGH_Event_Queue_v2
 
         if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
 
-            add_action( 'admin_init' , array( $this, 'run_queue_manually' ) );
+            add_action( 'init' , array( $this, 'run_queue_manually' ) );
 
         }
 
@@ -142,7 +152,7 @@ class WPGH_Event_Queue_v2
      * Run the queue Manually and provide a notice.
      */
     public function run_queue_manually(){
-        WPGH()->notices->add( 'queue-complete', sprintf( "%d events have been completed.", $this->run_queue() ) );
+        WPGH()->notices->add( 'queue-complete', sprintf( "%d events have been completed in %s seconds.", $this->run_queue(), wpgh_get_option( 'gh_queue_last_execution_time' ) ) );
     }
 
     /**
@@ -150,7 +160,27 @@ class WPGH_Event_Queue_v2
      */
     public function run_queue()
     {
-        return $this->process();
+        $start = microtime(true);
+
+        $this->set_php_timeout_limit();
+        $this->max_process_time = $start + $this->get_max_execution_time();
+        $result =  $this->process();
+        $end = microtime(true);
+        $process_time = $end - $start;
+
+        $times_executed = intval( wpgh_get_option( 'gh_queue_times_executed', 0 ) );
+        $average_execution_time = floatval( wpgh_get_option( 'gh_average_execution_time', 0.0 ) );
+
+        $average = $times_executed * $average_execution_time;
+        $average += $process_time;
+        $times_executed++;
+        $average_execution_time = $average / $times_executed;
+
+        wpgh_update_option( 'gh_queue_last_execution_time', $process_time );
+        wpgh_update_option( 'gh_queue_times_executed', $times_executed );
+        wpgh_update_option( 'gh_average_execution_time', $average_execution_time );
+
+        return $result;
     }
 
     /**
@@ -187,6 +217,39 @@ class WPGH_Event_Queue_v2
     }
 
     /**
+     * The time we have in seconds to process the queue.
+     *
+     * @return float|int
+     */
+    public function get_max_execution_time()
+    {
+        $real_queue_interval = wpgh_get_option( 'gh_real_queue_interval', 'every_5_minutes' );
+
+        switch ( $real_queue_interval ){
+            case 'every_10_minutes':
+                return 10 * MINUTE_IN_SECONDS;
+                break;
+            default;
+            case 'every_5_minutes':
+                return 5 * MINUTE_IN_SECONDS;
+                break;
+            case 'every_1_minutes':
+                return MINUTE_IN_SECONDS;
+                break;
+        }
+
+    }
+
+    /**
+     * Set a PHP time limit so as to not overun the queue as a fail safe.
+     * Add 1 second to give the process time to clean up after itself.
+     */
+    public function set_php_timeout_limit()
+    {
+        set_time_limit( $this->get_max_execution_time() + 1 );
+    }
+
+    /**
      * Recursive, Iterate through the list of events and process them via the EVENTS api
      * completes successive events quite since WP-Cron only happens once every 5 or 10 minutes depending on
      * the amount of traffic.
@@ -216,8 +279,8 @@ class WPGH_Event_Queue_v2
 
         $this->processing_queue = true;
 
-        /* Check to see if the current queue is still the most recent queue. If it's not Then finish up. */
-        while ( $this->has_events() && $i < $max_events ) {
+        /* Only run within given time allotment. DO NOT run past the time interval provided */
+        while ( $this->has_events() && $i < $max_events && microtime( true ) < $this->max_process_time ) {
             $this->cur_event = $this->get_next();
             if ( $this->cur_event->run() && $this->cur_event->is_funnel_event() ){
                 $next_step = $this->cur_event->step->get_next_step();
@@ -232,6 +295,10 @@ class WPGH_Event_Queue_v2
 
         do_action( 'wpgh_process_event_queue_after', $this );
         do_action( 'groundhogg/queue/run/after', $this );
+
+        if ( microtime( true ) >= $this->max_process_time ){
+            return $i;
+        }
 
         return $i + $this->process();
     }
