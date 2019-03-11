@@ -102,10 +102,17 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
     public function run( $contact, $event )
     {
         $sms_id = $event->step->get_meta( 'sms_id' );
+        $skip_if_no_phone = $event->step->get_meta( 'skip_if_no_phone' );
+
         $sms = new WPGH_SMS( $sms_id );
 
         if ( ! $sms->exists() || ! $contact->is_marketable() ){
             return false;
+        }
+
+        /* Skip if the contact does not have a phone number. */
+        if ( ! $contact->primary_phone && $skip_if_no_phone ){
+            return true;
         }
 
         $result = $sms->send( $contact, $event );
