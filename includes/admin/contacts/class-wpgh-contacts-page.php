@@ -358,6 +358,54 @@ class WPGH_Contacts_Page
 
                 break;
 
+            case 'apply_tag':
+                if (!current_user_can('edit_contacts')) {
+                    wp_die(WPGH()->roles->error('edit_contacts'));
+                }
+
+                if ( ! empty( $_POST[ 'bulk_tags' ] ) ){
+
+                    $tags = $_POST[ 'bulk_tags' ];
+
+                    foreach ($this->get_contacts() as $id) {
+                        $contact = wpgh_get_contact( $id );
+                        $contact->apply_tag( $tags );
+                    }
+
+                    $this->notices->add(
+                        esc_attr('applied_tags'),
+                        sprintf(_nx('Applied %d tags to %d contact', 'Applied %d tags to %d contacts', count($this->get_contacts()), 'notice', 'groundhogg'), count( $tags ), count($this->get_contacts())),
+                        'success'
+                    );
+
+                }
+
+                break;
+
+            case 'remove_tag':
+                if (!current_user_can('edit_contacts')) {
+                    wp_die(WPGH()->roles->error('edit_contacts'));
+                }
+
+                if ( ! empty( $_POST[ 'bulk_tags' ] ) ){
+
+                    $tags = $_POST[ 'bulk_tags' ];
+
+                    foreach ($this->get_contacts() as $id) {
+                        $contact = wpgh_get_contact( $id );
+                        $contact->remove_tag( $tags );
+                    }
+
+                    $this->notices->add(
+                        esc_attr('removed_tags'),
+                        sprintf(_nx('Removed %d tags from %d contact', 'Removed %d tags from %d contacts', count($this->get_contacts()), 'notice', 'groundhogg'), count( $tags ), count($this->get_contacts())),
+                        'success'
+                    );
+
+                }
+
+                break;
+
         }
 
         set_transient('gh_last_action', $this->get_action(), 30);

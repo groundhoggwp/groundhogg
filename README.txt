@@ -116,6 +116,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED Funnel Breakdown will now also feature a line chart of contact progress
 * TWEAKED Emails sent using the Groundhogg Sending Service will not longer use wp_mail as backup for error reporting purposes
 * TWEAKED The Groundhogg Sending Service url is now aws.groundhogg.io to improve the speed of requests.
+* ADDED Tools menu item.
+* ADDED Admin menu base class for use in extensions.
+* FIXED Confirmation emails not skipping if email is already confirmed.
 
 = 1.2.1 =
 * ADDED Automatic GEO location via geoplugin.net when a form is submitted and IP is collected.
