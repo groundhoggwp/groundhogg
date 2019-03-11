@@ -111,6 +111,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED Schedule broadcasts at time in subscribers' timezone.
 * ADDED Schedule timers to run in subscribers' timezones.
 * ADDED Schedule SMS Broadcasts to run in subscribers' timezones.
+* FIXED Confirmation emails not skipping if email is already confirmed.
 
 = 1.2.1 =
 * ADDED Automatic GEO location via geoplugin.net when a form is submitted and IP is collected.

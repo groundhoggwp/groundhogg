@@ -301,7 +301,8 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                 /* This will simply get the upcoming email confirmed step and complete it. No muss not fuss */
                 do_action( 'wpgh_email_confirmed', $contact, $event->funnel_id );
 
-                return true;
+                /* Return false to avoid enqueue the next step. */
+                return false;
 
             }
 
