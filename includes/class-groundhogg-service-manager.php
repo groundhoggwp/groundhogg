@@ -258,7 +258,7 @@ class Groundhogg_Service_Manager
             'user_id'   => $gh_uid,
         ];
 
-        $response = $this->request( 'domains/add', $post, 'POST', $headers );
+        $response = $this->request( 'domains/verify', $post, 'POST', $headers );
 
         if ( is_wp_error( $response ) ){
             return;
