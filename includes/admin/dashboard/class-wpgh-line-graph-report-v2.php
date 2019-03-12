@@ -6,18 +6,8 @@
  * Time: 9:13 AM
  */
 
-class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
+abstract class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
 {
-
-    /**
-     * WPGH_Report_V2 constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        add_action( 'wp_dashboard_setup', array( $this, 'scripts' ) );
-    }
 
     /**
      * Enqueue chart scripts

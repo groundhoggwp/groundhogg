@@ -6,7 +6,7 @@
  * Time: 3:24 PM
  */
 
-class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
+abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
 {
 
     protected static $js_flag = false;
@@ -52,8 +52,9 @@ class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
     {
         $this->setup_range();
         $this->setup_reporting_time();
-        add_action( 'wp_dashboard_setup', array( $this, 'scripts' ) );
+
         add_action( 'wp_ajax_wpgh_export_' . $this->wid, array( $this, 'export' ) );
+
         parent::__construct();
     }
 

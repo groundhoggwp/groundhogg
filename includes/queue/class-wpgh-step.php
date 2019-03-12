@@ -326,14 +326,18 @@ class WPGH_Step implements WPGH_Event_Process
 
         }
 
+        $this->switch_to_blog();
+
         do_action( "groundhogg/elements/{$this->type}/run/before", $this  );
-        do_action( 'wpgh_doing_funnel_step_' . $this->type . '_before', $this  );
+//        do_action( 'wpgh_doing_funnel_step_' . $this->type . '_before', $this  );
 
         $result = apply_filters( "groundhogg/elements/{$this->type}/run", $contact, $event, $this );
 //        $result = apply_filters( 'wpgh_doing_funnel_step_' . $this->type, $contact, $event, $this );
 
         do_action( "groundhogg/elements/{$this->type}/run/after", $this  );
-        do_action( 'wpgh_doing_funnel_step_' . $this->type . '_after', $this  );
+//        do_action( 'wpgh_doing_funnel_step_' . $this->type . '_after', $this  );
+
+        $this->restore_current_blog();
 
         return $result;
     }
@@ -393,6 +397,29 @@ class WPGH_Step implements WPGH_Event_Process
         $success = (bool) WPGH()->event_queue->add( $event );
 
         return $success;
+    }
+
+    /**
+     * Switches to the blog which the step can run on.
+     */
+    public function switch_to_blog()
+    {
+        if ( wpgh_is_global_multisite() ) {
+            $blog_id = $this->get_meta( 'blog_id' );
+            if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
+                switch_to_blog( $blog_id );
+            }
+        }
+    }
+
+    /**
+     * Restore the process to the current blog.
+     */
+    public function restore_current_blog()
+    {
+        if ( wpgh_is_global_multisite() ) {
+            restore_current_blog();
+        }
     }
 
     /**

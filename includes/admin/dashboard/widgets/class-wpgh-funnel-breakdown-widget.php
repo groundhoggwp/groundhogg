@@ -74,7 +74,7 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Line_Graph_Report_V2
 
 		    $args = array(
 			    'report' => array(
-				    'funnel' => intval(  $_REQUEST[ 'funnel' ] ),
+				    'funnel' => $break_down_funnel_id,
 				    'step' => $step->ID,
 				    'status' => 'waiting'
 			    )

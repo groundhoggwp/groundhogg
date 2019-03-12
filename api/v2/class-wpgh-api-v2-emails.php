@@ -43,7 +43,7 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
 
         register_rest_route('gh/v2', '/emails/send' ,array(
             // By using this constant we ensure that when the WP_REST_Server changes, our create endpoints will work as intended.
-            'methods' => WP_REST_Server::READABLE,
+            'methods' => WP_REST_Server::CREATABLE,
             // Here we register our callback. The callback is fired when this endpoint is matched by the WP_REST_Server class.
             'callback' => array($this, 'send_email'),
             'permission_callback' => array($this, 'rest_authentication'),
@@ -102,7 +102,7 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
         if( isset( $request['email_id'] ) && isset( $request['id_or_email'] ) ) {
             $email_id   = intval( $request['email_id'] );
             $id_or_email = $request['id_or_email'];
-            $by_user_id = $request->get_param( 'where' );
+            $by_user_id = filter_var( $request->get_param( 'by_user_id' ), FILTER_VALIDATE_BOOLEAN );
 
             $contact = wpgh_get_contact( $id_or_email, $by_user_id );
 

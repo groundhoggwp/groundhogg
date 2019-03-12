@@ -43,14 +43,18 @@ class WPGH_API_V2_SMS extends WPGH_API_V2_BASE
 
         register_rest_route('gh/v2', '/sms/send' ,array(
             // By using this constant we ensure that when the WP_REST_Server changes, our create endpoints will work as intended.
-            'methods' => WP_REST_Server::READABLE,
+            'methods' => WP_REST_Server::CREATABLE,
             // Here we register our callback. The callback is fired when this endpoint is matched by the WP_REST_Server class.
             'callback' => array($this, 'send_sms'),
             'permission_callback' => array($this, 'rest_authentication'),
             'args'=> array(
-                'contact_id' => array(
+                'id_or_email' => array(
                     'required'    => true,
-                    'description' => _x( 'Contact ID which you want to send to.', 'api', 'groundhogg' ),
+                    'description' => _x( 'Contact ID, User ID, or Email Address which you want to send to.', 'api', 'groundhogg' ),
+                ),
+                'by_user_id' => array(
+                    'required'    => false,
+                    'description' => _x( 'Search using the User ID.', 'api', 'groundhogg' ),
                 ),
                 'sms_id' => array(
                     'required'    => true,
@@ -97,15 +101,22 @@ class WPGH_API_V2_SMS extends WPGH_API_V2_BASE
         //check for contact_id and sms_id
         if( isset( $request['sms_id'] ) && isset( $request['contact_id'] ) ) {
             $sms_id   = intval( $request['sms_id'] );
-            $contact_id = intval( $request['contact_id'] );
+            $id_or_email = $request['id_or_email'];
+            $by_user_id = filter_var( $request->get_param( 'by_user_id' ), FILTER_VALIDATE_BOOLEAN );
+
+            $contact = wpgh_get_contact( $id_or_email, $by_user_id );
+
 
             if( !WPGH()->sms->exists( $sms_id ) ) {
                 return new WP_Error('error', sprintf( _x( 'SMS with ID %d not found.', 'api', 'groundhogg' ), $sms_id ) );
             }
-            if( !WPGH()->contacts->exists( $contact_id , 'ID' ) ) {
-                return new WP_Error('error', sprintf( _x( 'Contact with ID %d not found.', 'api', 'groundhogg' ), $contact_id ) );
+
+            if( ! $contact ) {
+                return new WP_Error('error', sprintf( _x( 'Contact with ID %d not found.', 'api', 'groundhogg' ), $id_or_email ) );
             }
-            $status = wpgh_send_sms_notification( $sms_id, $contact_id );
+
+            $status = wpgh_send_sms_notification( $sms_id, $contact->ID );
+
             if( $status ) {
                 return rest_ensure_response(array(
                     'code' => 'success',
