@@ -92,7 +92,7 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
 
             return rest_ensure_response( $response ) ;
         } else {
-            return new WP_Error('error', _x( 'No emails found.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'No emails found.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
     }
 
@@ -108,11 +108,11 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
 
 
             if( ! $contact ) {
-                return new WP_Error('no_contact', sprintf( _x( 'Contact was not found given: %s', 'api', 'groundhogg' ), $id_or_email ) );
+                return new WP_Error('no_contact', sprintf( _x( 'Contact was not found given: %s', 'api', 'groundhogg' ), $id_or_email ), [ 'status' => 400 ] );
             }
 
             if( !WPGH()->emails->exists( $email_id ) ) {
-                return new WP_Error('no_email', sprintf( _x( 'Email with ID %d not found.', 'api', 'groundhogg' ), $email_id ) );
+                return new WP_Error('no_email', sprintf( _x( 'Email with ID %d not found.', 'api', 'groundhogg' ), $email_id ), [ 'status' => 400 ] );
             }
 
             $status = wpgh_send_email_notification( $email_id, $contact->ID );
@@ -123,11 +123,11 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
                     'message' => _x( 'Email sent successfully to contact.', 'api', 'groundhogg' )
                 ));
             } else {
-                return new WP_Error('send_error', _x( 'Email not sent.', 'api', 'groundhogg' ));
+                return new WP_Error('send_error', _x( 'Email not sent.', 'api', 'groundhogg' ) , [ 'status' => 500 ] );
             }
 
         } else {
-            return new WP_Error('invalid_request', _x( 'email_id and contact_id are required to perform this operation.', 'api', 'groundhogg' ) );
+            return new WP_Error('invalid_request', _x( 'email_id and contact_id are required to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
 
     }

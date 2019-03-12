@@ -50,8 +50,7 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
         parent::__construct();
 
         add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
-        add_action( 'wp_ajax_wpgh_page_view', array( $this, 'complete' ) );
-        add_action( 'wp_ajax_nopriv_wpgh_page_view', array( $this, 'complete' ) );
+        add_action( 'groundhogg/api/v2/elements/page-view', array( $this, 'complete' ) );
     }
 
     /**
@@ -61,7 +60,10 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
     public function scripts()
     {
         wp_enqueue_script( 'wpgh-page-view', WPGH_PLUGIN_URL . 'assets/js/frontend.min.js' , array('jquery'), filemtime( WPGH_PLUGIN_DIR . 'assets/js/frontend.min.js' ), true );
-        wp_localize_script( 'wpgh-page-view', 'wpgh_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+        wp_localize_script( 'wpgh-page-view', 'gh_frontent_object', array(
+            'page_view_endpoint' => site_url( 'wp-json/gh/v2/elements/page-view/' ),
+            'form_impression_endpoint' => site_url( 'wp-json/gh/v2/elements/form-impression/' )
+        ));
     }
 
     /**
@@ -138,23 +140,17 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
     }
 
     /**
-     * Whenever a page is visited the benchmark.
+     * Perform the complete action
+     *
+     * @param $ref string
+     * @param $contact WPGH_Contact
      */
-    public function complete()
+    public function complete( $ref, $contact )
     {
-
-        if ( ! wp_doing_ajax() )
-            return;
-
-        $contact = WPGH()->tracking->get_contact();
-
-        if ( ! $contact )
-            die;
-
         $steps = WPGH()->steps->get_steps( array( 'step_type' => $this->type, 'step_group' => $this->group ) );
 
         if ( empty( $steps ) )
-            die;
+            return;
 
         $s = false;
 
@@ -168,9 +164,9 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
                 $match_url  = $step->get_meta( 'url_match' );
 
                 if ( $match_type === 'exact' ){
-                    $is_page = wp_get_referer() === $match_url;
+                    $is_page = $ref === $match_url;
                 } else {
-                    $is_page = strpos( wp_get_referer(), $match_url ) !== false;
+                    $is_page = strpos( $ref, $match_url ) !== false;
                 }
 
                 if ( $is_page ){
@@ -180,13 +176,6 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
                 }
             }
         }
-
-//        if ( $s ){
-//            /* Process the queue immediately */
-//            do_action( 'wpgh_process_queue' );
-//        }
-
-        wp_die();
     }
 
     /**

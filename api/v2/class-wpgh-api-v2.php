@@ -34,6 +34,11 @@ class WPGH_API_V2
     public $debug;
 
     /**
+     * @var WPGH_API_V2_ELEMENTS
+     */
+    public $elements;
+
+    /**
      * @var WPGH_API_V2_BASE[]
      */
     public $extension_apis = array();
@@ -48,6 +53,7 @@ class WPGH_API_V2
         $this->tags     = new WPGH_API_V2_TAGS();
         $this->emails   = new WPGH_API_V2_EMAILS();
         $this->sms      = new WPGH_API_V2_SMS();
+        $this->elements = new WPGH_API_V2_ELEMENTS();
 //        $this->debug    = new WPGH_API_V2_DEBUG();
 
 //        $this->load_extension_apis();
@@ -94,6 +100,7 @@ class WPGH_API_V2
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-tags.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-emails.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-sms.php';
+        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-elements.php';
 //        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-debug.php';
 
         do_action( 'wpgh_api_include_extensions', $this );

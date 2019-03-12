@@ -92,7 +92,7 @@ class WPGH_API_V2_SMS extends WPGH_API_V2_BASE
 
             return rest_ensure_response( $response ) ;
         } else {
-            return new WP_Error('error', _x( 'No sms found.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'No sms found.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
     }
 
@@ -108,11 +108,11 @@ class WPGH_API_V2_SMS extends WPGH_API_V2_BASE
 
 
             if( !WPGH()->sms->exists( $sms_id ) ) {
-                return new WP_Error('error', sprintf( _x( 'SMS with ID %d not found.', 'api', 'groundhogg' ), $sms_id ) );
+                return new WP_Error('error', sprintf( _x( 'SMS with ID %d not found.', 'api', 'groundhogg' ), $sms_id ), [ 'status' => 400 ] );
             }
 
             if( ! $contact ) {
-                return new WP_Error('error', sprintf( _x( 'Contact with ID %d not found.', 'api', 'groundhogg' ), $id_or_email ) );
+                return new WP_Error('error', sprintf( _x( 'Contact with ID %d not found.', 'api', 'groundhogg' ), $id_or_email ), [ 'status' => 400 ] );
             }
 
             $status = wpgh_send_sms_notification( $sms_id, $contact->ID );
@@ -123,11 +123,11 @@ class WPGH_API_V2_SMS extends WPGH_API_V2_BASE
                     'message' => _x( 'SMS sent successfully to contact.', 'api', 'groundhogg' )
                 ));
             } else {
-                return new WP_Error('error', _x( 'SMS not sent.', 'api', 'groundhogg' ));
+                return new WP_Error('error', _x( 'SMS not sent.', 'api', 'groundhogg' ), [ 'status' => 500 ]);
             }
 
         } else {
-            return new WP_Error('error', _x( 'sms_id and contact_id are required to perform this operation.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'sms_id and contact_id are required to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
 
     }

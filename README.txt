@@ -107,6 +107,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.4 =
+* TWEAKED API Errors now have more revealing HTTP response codes.
+* TWEAKED Frontend tracking script now uses the REST API instead of admin-ajax.php for better performance.
+
 = 1.2.3 =
 * TWEAKED Reporting widgets can also register a shortcode for custom admin pages
 * TWEAKED Improved class hierarchy for custom reports in the dashboard
