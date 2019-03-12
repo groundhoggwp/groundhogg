@@ -119,7 +119,7 @@ class WPGH_API_V2_SMS extends WPGH_API_V2_BASE
 
             if( $status ) {
                 return rest_ensure_response(array(
-                    'code' => 'success',
+                    'status' => 'success',
                     'message' => _x( 'SMS sent successfully to contact.', 'api', 'groundhogg' )
                 ));
             } else {
