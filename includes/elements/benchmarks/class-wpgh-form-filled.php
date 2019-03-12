@@ -58,6 +58,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
 
         add_action( 'wp_ajax_wpgh_form_impression', array( $this, 'track_impression' ) );
         add_action( 'wp_ajax_nopriv_wpgh_form_impression', array( $this, 'track_impression' ) );
+        add_action( 'wp_ajax_wpgh_tags_list', array( $this, 'wpgh_tags_list' ) );
     }
 
     /**
@@ -66,6 +67,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
     public function scripts()
     {
         wp_enqueue_script( 'wpgh-form-builder', WPGH_ASSETS_FOLDER . 'js/admin/form-builder.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/form-builder.min.js' ) );
+        wp_localize_script('wpgh-form-builder', 'ajax_object',array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1233 ) );
     }
 
     /**
@@ -146,6 +148,21 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
 
         wp_die( json_encode( $response ) );
 
+    }
+
+    /**
+     * AJAX call to bound list of tags in select2
+     */
+    public function wpgh_tags_list()
+    {
+        $tags =  WPGH()->tags->get_tags();
+        foreach ($tags as $tag ){
+            $select[] = array(
+                'id' => $tag->tag_id,
+                'text' => $tag->tag_name . '('.$tag->contact_count .')'
+            );
+        }
+        wp_die( json_encode( array('results' =>  $select ) ) ) ;
     }
 
 
@@ -505,8 +522,24 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                     <tr id="gh-field-options">
                         <th><?php _e( 'Options', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->textarea( array( 'id' => 'field-options', 'name' => 'options', 'cols' => 50, 'rows' => '5' ) );
-                            ?><p class="description"><?php _e( 'Enter 1 option per line. Add tags by separating the value and tag ID with a |. For example Option|18', 'groundhogg' ) ?></p></td>
+                            echo WPGH()->html->textarea( array( 'id' => 'field-options', 'name' => 'options', 'cols' => 50, 'rows' => '5', 'class' => 'hidden' ) );
+                            ?>
+                            <table id='gh-option-table'   >
+                                <tbody>
+                                <tr>
+                                    <th>
+<!--                                        <div class="hidden">-->
+<!--                                            <span class="metakeyplaceholder">--><?php //esc_attr_e( 'Key' ); ?><!--</span>-->
+<!--                                            <span class="metavalueplaceholder">--><?php //esc_attr_e( 'tag' ); ?><!--</span>-->
+<!--                                        </div>-->
+                                    </th>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" id="btn-saveoption" class="button-primary"><?php _ex( 'Save Options', '', 'groundhogg' ); ?></button>
+                            <button type="button" class="button-secondary addoption"><?php _ex( 'Add Option', '', 'groundhogg' ); ?></button>
+                            <p class="description"><?php _e( 'Enter option name to add option. Tags are optional.You need to save options when you make changes.', 'groundhogg' ) ?></p>
+                        </td>
                     </tr>
                     <tr id="gh-field-multiple">
                         <th><?php _e( 'Allow Multiple Selections', 'groundhogg' ) ?></th>

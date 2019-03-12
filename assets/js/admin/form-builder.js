@@ -31,12 +31,74 @@ var wpghFormBuilder;
                 $(this).val( wpghFormBuilder.sanitizeKey( $(this).val() ) );
             });
 
+            /* Handled  Radio button options */
+            $( '#gh-option-table' ).click(function( e ){
+                if ( $( e.target ).closest( '.deletemeta' ).length ){
+                    $( e.target ).closest( 'tr' ).remove();
+                }
+            });
+
+            $('#btn-saveoption').click(function () {
+                wpghFormBuilder.saveOptions();
+            });
+
+            $( '.addoption' ).click(function() {
+                wpghFormBuilder.addOptionsHTML();
+            });
+
             this.initTypes();
 
         },
 
-        initTypes: function()
-        {
+        saveOptions: function(){
+
+            var ghoptions = new Array();
+            $('input[name="option[]"]').each(function(){
+                ghoptions.push($(this).val());
+            });
+
+            var ghtags = new Array();
+            $('select[name="tags[]"]').each(function(){
+                ghtags.push($(this).val());
+            });
+            var str = '' ;
+            for (i=0 ;i<ghoptions.length ; i++)
+            {
+                if ( ghoptions[i] && ghtags[i] ) {
+                    str += ghoptions[i].trim() + '|'+ghtags[i] +'\n';
+                } else if ( ghoptions[i] ) {
+                    str += ghoptions[i].trim() +'\n';
+                } else {
+                    //do nothing
+                }
+            }
+            $('#field-options').val(str.trim());
+        },
+        addOptionsHTML: function() {
+            var $newMeta = "<tr>" +
+                "<th>" +
+                "<input type='text' class='input'  name='option[]' placeholder='Option Name'>" +
+                "</th>" +
+                "<td>" +
+                "<select class='js-data-example-ajax' name='tags[]' style='min-width: 140px; '></select>"+
+                " <span  class=\"row-actions\"><span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a></span></span>\n" +
+                "</td>" +
+                "</tr>";
+            $('#gh-option-table').find( 'tbody' ).append( $newMeta );
+
+            $('.js-data-example-ajax').select2({
+                ajax: {
+                    url: ajax_object.ajax_url,
+                    dataType: 'json',
+                    data: {
+                        action: 'wpgh_tags_list'
+                    }
+                }
+            });
+
+        },
+
+        initTypes: function() {
             this.types.first        = ['required','label','placeholder','id','class'];
             this.types.last         = ['required','label','placeholder','id','class'];
             this.types.email        = ['label','placeholder','id','class'];
@@ -90,8 +152,7 @@ var wpghFormBuilder;
             }
         },
 
-        buildCode: function()
-        {
+        buildCode: function(){
 
             var $form = $( '#form-field-form' );
 
