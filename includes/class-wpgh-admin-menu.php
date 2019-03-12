@@ -97,6 +97,7 @@ class WPGH_Admin_Menu
         $this->funnels_page     = new WPGH_Funnels_Page();
         $this->events_page      = new WPGH_Events_Page();
         $this->guided_setup     = new WPGH_Guided_Setup();
+        add_action( 'admin_menu', array( $this, 'register_tools_page' ), 98 );
 
         /**
          * Add multisite compat
@@ -105,6 +106,13 @@ class WPGH_Admin_Menu
             $this->settings_page = new WPGH_Settings_Page();
         }
 
+    }
+
+    public function register_tools_page()
+    {
+        global $submenu;
+        $url = admin_url( 'admin.php?page=gh_settings&tab=tools' );
+        $submenu['groundhogg'][] = array('Tools', 'manage_options', $url );
     }
 
     public function includes()

@@ -43,14 +43,18 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
 
         register_rest_route('gh/v2', '/emails/send' ,array(
             // By using this constant we ensure that when the WP_REST_Server changes, our create endpoints will work as intended.
-            'methods' => WP_REST_Server::READABLE,
+            'methods' => WP_REST_Server::CREATABLE,
             // Here we register our callback. The callback is fired when this endpoint is matched by the WP_REST_Server class.
             'callback' => array($this, 'send_email'),
             'permission_callback' => array($this, 'rest_authentication'),
             'args'=> array(
-                'contact_id' => array(
+                'id_or_email' => array(
                     'required'    => true,
-                    'description' => _x( 'Contact ID which you want to send to.', 'api', 'groundhogg' ),
+                    'description' => _x( 'Contact ID, User ID, or Email Address which you want to send to.', 'api', 'groundhogg' ),
+                ),
+                'by_user_id' => array(
+                    'required'    => false,
+                    'description' => _x( 'Search using the User ID.', 'api', 'groundhogg' ),
                 ),
                 'email_id' => array(
                     'required'    => true,
@@ -88,35 +92,42 @@ class WPGH_API_V2_EMAILS extends WPGH_API_V2_BASE
 
             return rest_ensure_response( $response ) ;
         } else {
-            return new WP_Error('error', _x( 'No emails found.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'No emails found.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
     }
 
     public function send_email( WP_REST_Request $request )
-    { // GET list of available LIST of EMAILS
-        //check for contact_id and email_id
-        if( isset( $request['email_id'] ) && isset( $request['contact_id'] ) ) {
+    {
+
+        if( isset( $request['email_id'] ) && isset( $request['id_or_email'] ) ) {
             $email_id   = intval( $request['email_id'] );
-            $contact_id = intval( $request['contact_id'] );
+            $id_or_email = $request['id_or_email'];
+            $by_user_id = filter_var( $request->get_param( 'by_user_id' ), FILTER_VALIDATE_BOOLEAN );
+
+            $contact = wpgh_get_contact( $id_or_email, $by_user_id );
+
+
+            if( ! $contact ) {
+                return new WP_Error('no_contact', sprintf( _x( 'Contact was not found given: %s', 'api', 'groundhogg' ), $id_or_email ), [ 'status' => 400 ] );
+            }
 
             if( !WPGH()->emails->exists( $email_id ) ) {
-                return new WP_Error('error', sprintf( _x( 'Email with ID %d not found.', 'api', 'groundhogg' ), $email_id ) );
+                return new WP_Error('no_email', sprintf( _x( 'Email with ID %d not found.', 'api', 'groundhogg' ), $email_id ), [ 'status' => 400 ] );
             }
-            if( !WPGH()->contacts->exists( $contact_id , 'ID' ) ) {
-                return new WP_Error('error', sprintf( _x( 'Contact with ID %d not found.', 'api', 'groundhogg' ), $contact_id ) );
-            }
-            $status = wpgh_send_email_notification( $email_id, $contact_id );
+
+            $status = wpgh_send_email_notification( $email_id, $contact->ID );
+
             if( $status ) {
                 return rest_ensure_response(array(
-                    'code' => 'success',
+                    'status' => 'success',
                     'message' => _x( 'Email sent successfully to contact.', 'api', 'groundhogg' )
                 ));
             } else {
-                return new WP_Error('error', _x( 'Email not sent.', 'api', 'groundhogg' ));
+                return new WP_Error('send_error', _x( 'Email not sent.', 'api', 'groundhogg' ) , [ 'status' => 500 ] );
             }
 
         } else {
-            return new WP_Error('error', _x( 'email_id and contact_id are required to perform this operation.', 'api', 'groundhogg' ) );
+            return new WP_Error('invalid_request', _x( 'email_id and contact_id are required to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
 
     }

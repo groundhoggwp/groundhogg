@@ -405,6 +405,12 @@ function wpgh_tools_sysinfo_get() {
         $return .= 'Use Only Cookies:         ' . ( ini_get( 'session.use_only_cookies' ) ? 'On' : 'Off' ) . "\n";
     }
 
+    $return .= "\n" . '-- Event Queue information' . "\n\n";
+    $return .= 'Average Execution Time:       ' . esc_html( wpgh_get_option( 'gh_average_execution_time' ) ) . " seconds\n";
+    $return .= 'Last Execution Time:          ' . esc_html( wpgh_get_option( 'gh_queue_last_execution_time' ) ) . " seconds\n";
+    $return .= 'Max Execution Time:           ' . esc_html( WPGH()->event_queue->get_max_execution_time() ) . " seconds\n";
+    $return .= 'Total Executions:             ' . esc_html( wpgh_get_option( 'gh_queue_times_executed' ) ) . "\n";
+
     $return  = apply_filters( 'wpgh_sysinfo_after_session_config', $return );
 
     $return .= "\n" . '### End System Info ###';

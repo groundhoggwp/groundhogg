@@ -815,87 +815,39 @@ class WPGH_Email
      */
     private function send_with_gh($to, $subject, $content, $headers)
     {
-
-        //send to groundhogg
-
         $sender = $this->get_from_email();
 
         $data = array(
-
-            'token' => md5(wpgh_get_option('gh_email_token')),
-            'domain' => site_url(),
-            'sender' => $sender,
-            'from' => $this->get_from_name(),
+            'sender'    => $sender,
+            'from'      => $this->get_from_name(),
             'recipient' => $to,
-            'subject' => $subject,
-            'content' => $content,
+            'subject'   => $subject,
+            'content'   => $content,
         );
 
-// validate domain and senders email address before making sending request
+        $request = WPGH()->service_manager->request( 'emails/send', $data );
 
-        $url = 'https://www.groundhogg.io/wp-json/gh/aws/v1/send-email/';
-
-        $request = wp_remote_post($url, array('body' => $data));
-
-        if (!$request || is_wp_error($request)) {
-            do_action('wp_mail_failed', new WP_Error('API_MAIL_FAILED', $request->get_error_message()));
-
-            /* Fall back to default WP */
-            return $this->send_with_wp(
-                $to,
-                $subject,
-                $content,
-                $headers
-            );
-        }
-
-        $result = wp_remote_retrieve_body($request);
-        $result = json_decode($result);
-
-        if (!is_object($result)) {
-
-            do_action('wp_mail_failed', new WP_Error('API_MAIL_FAILED', __('An unknown error occurred.', 'groudhogg')));
-
-            /* Fall back to default WP */
-            return $this->send_with_wp(
-                $to,
-                $subject,
-                $content,
-                $headers
-            );
-
-            /* Error Code */
-        } else if (WPGH()->service_manager->is_json_error($result)) {
-
-            $error = WPGH()->service_manager->get_json_error( $result );
-
-            switch ( $error->get_error_code() ) {
+        if ( is_wp_error( $request ) ) {
+            switch ( $request->get_error_code() ) {
 
                 case 'EMAIL_COMPLAINT':
-                    do_action('wp_mail_failed', $error );
+                    do_action('wp_mail_failed', $request );
                     $this->contact->change_marketing_preference(WPGH_COMPLAINED);
                     break;
                 case 'EMAIL_BOUNCED':
-                    do_action('wp_mail_failed', $error );
+                    do_action('wp_mail_failed', $request );
                     $this->contact->change_marketing_preference(WPGH_HARD_BOUNCE);
                     break;
                 DEFAULT:
-                    do_action('wp_mail_failed', $error );
+                    do_action('wp_mail_failed', $request );
                     break;
             }
-
-            /* Fall back to default WP */
-            return $this->send_with_wp(
-                $to,
-                $subject,
-                $content,
-                $headers
-            );
-
         }
 
-        $credits = $result->credits_remaining;
-        wpgh_update_option('gh_remaining_api_credits', $credits);
+        if ( isset( $request->credits_remaining ) ){
+            $credits = $request->credits_remaining;
+            wpgh_update_option('gh_remaining_api_credits', $credits);
+        }
 
         return true;
 

@@ -19,8 +19,17 @@ class WPGH_Dashboard_Widgets
      */
     public function __construct()
     {
-        add_action('admin_init', array( $this,'setup_widgets') );
-        add_action('wp_dashboard_setup', array( $this,'scripts') );
+        add_action( 'admin_init', array( $this, 'setup_widgets' ) );
+        add_action( 'groundhogg/reports/load', array( $this, 'scripts' ) );
+        add_action( 'wp_dashboard_setup', array( $this, 'setup_dashboard_widgets' ) );
+    }
+
+    /**
+     * Allow for use of dashboard widgets on other pages
+     */
+    public function setup_dashboard_widgets()
+    {
+       do_action( 'groundhogg/reports/load' );
     }
 
     public function setup_widgets()

@@ -197,10 +197,10 @@ class WPGH_Contacts_Table extends WP_List_Table {
      */
     protected function get_bulk_actions() {
         $actions = array(
-            'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
+            'apply_tag' => _x( 'Apply Tag', 'List table bulk action', 'groundhogg' ),
 //            'export' => _x( 'Export', 'List table bulk action', 'groundhogg' ),
-//            'apply_tag' => _x( 'Apply Tag', 'List table bulk action', 'groundhogg'),
-//            'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'groundhogg')
+            'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'groundhogg'),
+            'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
         );
 
         if ( $this->get_view() === 'spam' ){
@@ -549,6 +549,16 @@ class WPGH_Contacts_Table extends WP_List_Table {
     {
         ?>
         <div class="alignleft gh-actions">
+            <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo WPGH()->html->tag_picker( [
+                    'name'              => 'bulk_tags[]',
+                    'id'                => 'bulk_tags',
+                    'class'             => 'gh-tag-picker',
+                    'data'              => array(),
+                    'selected'          => array(),
+                    'multiple'          => true,
+                    'placeholder'       => __( 'Bulk Apply/Remove Tags', 'groundhogg' ),
+                    'tags'              => true,
+                ] ); ?></div>
             <a class="button action query-export" href="javascript:void(0)"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), $this->get_pagination_arg( 'total_items' ) ); ?></a>
         </div>
         <?php

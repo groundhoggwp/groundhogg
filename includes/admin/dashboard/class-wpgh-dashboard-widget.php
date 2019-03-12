@@ -6,7 +6,7 @@
  * Time: 1:18 PM
  */
 
-class WPGH_Dashboard_Widget {
+abstract class WPGH_Dashboard_Widget {
 
     /**
      * The id of this widget.
@@ -28,7 +28,9 @@ class WPGH_Dashboard_Widget {
      */
     public function __construct() {
 
-        add_action('wp_dashboard_setup', array( $this,'register') );
+        add_action( 'groundhogg/reports/load' , array( $this,'register' ) );
+        add_action( 'groundhogg/reports/load', array( $this, 'scripts' ) );
+        add_shortcode( sprintf( 'gh_%s', $this->wid ), array( $this, 'widget' ) );
 
     }
 
@@ -48,25 +50,15 @@ class WPGH_Dashboard_Widget {
             $this->wid,                                  //A unique slug/ID
             __( $this->name ),//Visible name for the widget
             array( $this,'widget')      //Callback for the main widget content
-//            array( $this,'config')       //Optional callback for widget configuration content
         );
     }
+
+    public function scripts(){ /*overwrite*/ }
 
     /**
      * Load the widget code
      */
-    public function widget() {
-        //overwrite
-    }
-
-    /**
-     * Load widget config code.
-     *
-     * This is what will display when an admin clicks
-     */
-    public function config() {
-        //overwrite
-    }
+    abstract public function widget();
 
     /**
      * Gets the options for a widget of the specified name.

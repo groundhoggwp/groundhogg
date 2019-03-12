@@ -107,10 +107,30 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.4 =
+* TWEAKED API Errors now have more revealing HTTP response codes.
+* TWEAKED Frontend tracking script now uses the REST API instead of admin-ajax.php for better performance.
+
+= 1.2.3 =
+* TWEAKED Reporting widgets can also register a shortcode for custom admin pages
+* TWEAKED Improved class hierarchy for custom reports in the dashboard
+* TWEAKED SMS Api & Email API now use id_or_email
+* FIXED Global Multisite DB queue error
+* FIXED Email & SMS API Sending notification should be POST, not GET
+
 = 1.2.2 =
 * ADDED Schedule broadcasts at time in subscribers' timezone.
 * ADDED Schedule timers to run in subscribers' timezones.
 * ADDED Schedule SMS Broadcasts to run in subscribers' timezones.
+* ADDED Geographic reports to dashboard
+* ADDED Pie chart of optin status report
+* ADDED Tools menu item.
+* ADDED Admin menu base class for use in extensions.
+* TWEAKED Funnel Breakdown will now also feature a line chart of contact progress
+* TWEAKED Emails sent using the Groundhogg Sending Service will not longer use wp_mail as backup for error reporting purposes
+* TWEAKED The Groundhogg Sending Service url is now aws.groundhogg.io to improve the speed of requests.
+* FIXED Confirmation emails not skipping if email is already confirmed.
+* FIXED Email HTML not working
 
 = 1.2.1 =
 * ADDED Automatic GEO location via geoplugin.net when a form is submitted and IP is collected.

@@ -6,18 +6,8 @@
  * Time: 9:13 AM
  */
 
-class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
+abstract class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
 {
-
-    /**
-     * WPGH_Report_V2 constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        add_action( 'wp_dashboard_setup', array( $this, 'scripts' ) );
-    }
 
     /**
      * Enqueue chart scripts
@@ -28,6 +18,13 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
         wp_enqueue_script( 'jquery-flot-categories', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.categories.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.categories.js') );
         wp_enqueue_script( 'jquery-flot-time', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.time.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.time.js') );
 //        wp_enqueue_script( 'wpgh-flot-date', WPGH_ASSETS_FOLDER . 'lib/flot/date.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/date.min.js') );
+    }
+
+	/**
+	 * @return string
+	 */
+    public function get_mode(){
+        return 'time';
     }
 
     /**
@@ -64,7 +61,7 @@ class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
                             hoverable: true
                         },
                         xaxis: {
-                            mode: "time",
+                            mode: "<?php echo $this->get_mode(); ?>",
                             localTimezone: true
                             // timezone: "browser"
                             // timezone: "America/Chicago"

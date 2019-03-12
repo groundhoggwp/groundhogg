@@ -26,11 +26,12 @@ var Groundhogg;
         pageView : function(){
             $.ajax({
                 type: "post",
-                url: wpgh_ajax_object.ajax_url,
-                data: {action: 'wpgh_page_view'},
+                url: gh_frontent_object.page_view_endpoint,
+                data: { ref: window.location.href },
                 success: function( response ){
                     // console.log( events_complete )
-                }
+                },
+                error: function(){}
             });
         },
         logFormImpressions : function() {
@@ -43,16 +44,15 @@ var Groundhogg;
         formImpression : function( id ){
             $.ajax({
                 type: "post",
-                url: wpgh_ajax_object.ajax_url,
+                url: gh_frontent_object.form_impression_endpoint,
                 dataType: 'json',
-                data: {action: 'wpgh_form_impression', id: id},
+                data: { form_id: id },
                 success: function( response ){
-                    if ( typeof response.error !== 'undefined' ){
-                        console.log( response.error );
-                    } else if( typeof response.ref_id !== 'undefined' ) {
+                    if( typeof response.ref_id !== 'undefined' ) {
                         Groundhogg.setCookie( Groundhogg.refID, response.ref_id, 30 );
                     }
-                }
+                },
+                error: function(){}
             });
         },
         init: function(){

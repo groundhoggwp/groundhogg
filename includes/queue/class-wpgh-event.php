@@ -242,8 +242,11 @@ class WPGH_Event
     public function run()
     {
 
-        if (!$this->is_waiting() || $this->has_run() || $this->has_similar() || !$this->is_time() || !$this->step->can_run())
+//        if (!$this->is_waiting() || $this->has_run() || $this->has_similar() || !$this->is_time() || !$this->step->can_run())
+        if (!$this->is_waiting() || $this->has_run() || $this->has_similar() || !$this->is_time() )
             return false;
+
+//        $this->
 
         do_action('wpgh_event_run_before', $this);
 

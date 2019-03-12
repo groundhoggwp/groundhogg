@@ -265,8 +265,15 @@ class WPGH_SMS_Page
         /* convert to UTC */
         $send_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 
+        $send_now = false;
         if ( isset( $_POST[ 'send_now' ] ) ){
+            $send_now = true;
             $send_time = time() + 10;
+        }
+
+        $send_in_timezone = false;
+        if ( isset( $_POST[ 'send_in_timezone' ] ) ){
+            $send_in_timezone = true;
         }
 
         if ( $send_time < time() ){
@@ -284,7 +291,19 @@ class WPGH_SMS_Page
         $contacts = $query->query( $args );
 
         foreach ( $contacts as $i => $contact ) {
-            wpgh_send_sms_notification( $sms, $contact->ID, $send_time );
+
+            $contact = wpgh_get_contact( $contact->ID );
+
+            $local_time = $send_time;
+
+            if ( $send_in_timezone && ! $send_now ){
+                $local_time = $contact->get_local_time( $send_time );
+                if ( $local_time < time() ){
+                    $local_time+=DAY_IN_SECONDS;
+                }
+            }
+
+            wpgh_send_sms_notification( $sms, $contact->ID, $local_time );
         }
 
         $this->notices->add( 'success', _x( 'SMS broadcast scheduled!', 'notice', 'groundhogg' ), 'success' );

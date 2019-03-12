@@ -139,11 +139,25 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
                         'value' => $run_time,
                     );
 
-                    echo WPGH()->html->input( $args ); ?>
+                    echo WPGH()->html->input( $args );
+
+                    ?><div id="<?php echo $step->prefix( 'local_time' );?>" class="<?php echo ( 'now' === $run_when ) ? 'hidden' : ''; ?>"><?php
+                    echo WPGH()->html->checkbox( array(
+                        'label'         => _x( 'Run in the contact\'s local time.', 'action', 'groundhogg' ),
+                        'name'          => $step->prefix( 'send_in_timezone' ),
+                        'id'            => $step->prefix( 'send_in_timezone' ),
+                        'class'         => '',
+                        'value'         => '1',
+                        'checked'       => $step->get_meta( 'send_in_timezone' ),
+                        'title'         => __( 'Run in the contact\'s local time.', 'groundhogg' ),
+                        'attributes'    => '',
+                        'required'      => false,) );
+                        ?></div>
 
                     <script>
                         jQuery( "#<?php echo $step->prefix( 'run_when' ); ?>" ).change(function(){
                             jQuery( "#<?php echo $step->prefix( 'run_time' ); ?>" ).toggleClass( 'hidden' );
+                            jQuery( "#<?php echo $step->prefix( 'local_time' ); ?>" ).toggleClass( 'hidden' );
                         });
                     </script>
                 </td>
@@ -198,6 +212,12 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
             $step->delete_meta( 'disable' );
         }
 
+        if ( isset( $_POST[ $step->prefix( 'send_in_timezone' ) ] ) ){
+            $step->update_meta( 'send_in_timezone', 1 );
+        } else {
+            $step->delete_meta( 'send_in_timezone' );
+        }
+
 
     }
 
@@ -218,6 +238,7 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
         $type       = $step->get_meta( 'delay_type' );
         $run_when   = $step->get_meta( 'run_when' );
         $run_time   = $step->get_meta( 'run_time' );
+        $send_in_timezone = $step->get_meta( 'send_in_timezone' );
 
         if ( $run_when == 'now' ){
             $time_string = '+ ' . $amount . ' ' . $type;
@@ -233,7 +254,15 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
             }
 
             /* convert to utc */
-            $final_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+            $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
+
+            /* Modify according to the contacts timezone */
+            if ( $send_in_timezone && WPGH()->event_queue->is_processing()  ){
+                $final_time = WPGH()->event_queue->cur_event->contact->get_local_time( $final_time );
+                if ( $final_time < time() ){
+                    $final_time+=DAY_IN_SECONDS;
+                }
+            }
         }
 
         return $final_time;

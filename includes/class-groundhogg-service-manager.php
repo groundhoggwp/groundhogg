@@ -10,11 +10,6 @@ class Groundhogg_Service_Manager
 {
 
     /**
-     * API endpoint for Email & SMS service domain verification
-     */
-    const ENDPOINT = 'https://www.groundhogg.io/wp-json/gh/aws/v1/domain';
-
-    /**
      * Maximum length for
      */
     const MAX_LENGTH = 280;
@@ -35,6 +30,64 @@ class Groundhogg_Service_Manager
         if ( wpgh_get_option( 'gh_email_api_dns_records', false ) ){
             add_action( 'groundhogg/settings/email/after_settings', array( $this, 'show_dns_in_settings' ) );
         }
+    }
+
+    /**
+     * @param string $endpoint the REST endpoint
+     * @param array $body the body of the request
+     * @param string $method The request method
+     * @param array $headers optional headers to override a request
+     * @return object|WP_Error
+     */
+    public function request( $endpoint, $body=[], $method='POST', $headers=[] )
+    {
+
+        $method = strtoupper( $method );
+        $url = sprintf( 'https://aws.groundhogg.io/wp-json/aws/v1/%s', $endpoint );
+
+        /* Set Default Headers */
+        if ( empty( $headers ) ){
+            $headers = [
+                'SENDER_TOKEN' => md5( wpgh_get_option( 'gh_email_token', '' ) ),
+                'SENDER_DOMAIN' => site_url(),
+            ];
+        }
+
+        $args = [
+            'method'    => $method,
+            'headers'   => $headers,
+            'body'      => $body,
+            //todo remove later
+//            'sslverify' => false
+        ];
+
+        if ( $method === 'GET' ){
+            $response = wp_remote_get( $url, $args );
+        } else {
+            $response = wp_remote_post( $url, $args );
+        }
+
+//        var_dump( $response );
+//        die();
+
+        if ( ! $response ){
+            return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ) );
+        }
+
+        if ( is_wp_error( $response ) ){
+            return $response;
+        }
+
+        $json = json_decode( wp_remote_retrieve_body( $response ) );
+
+        if ( wpgh_is_json_error( $json ) ){
+            return wpgh_get_json_error( $json );
+        }
+
+//        var_dump( $json );
+
+        return $json;
+
     }
 
 	/**
@@ -118,22 +171,21 @@ class Groundhogg_Service_Manager
             return new WP_Error( 'INVALID_CREDENTIALS', 'Missing token or User ID.' );
         }
 
+        $headers = [
+            'OAUTH_TOKEN' => $token
+        ];
+
         $post = [
             'domain'    => $domain,
             'user_id'   => $gh_uid,
-            'token'     => $token
         ];
 
-        $response = wp_remote_post( self::ENDPOINT, array( 'body' => $post ) );
+        $json = $this->request( 'domains/add', $post, 'POST', $headers );
 
-        if ( is_wp_error( $response ) ){
-            return $response;
-        }
+//        var_dump( $response );
 
-        $json = json_decode( wp_remote_retrieve_body( $response ) );
-
-        if ( $this->is_json_error( $json ) ){
-            return $this->get_json_error( $json );
+        if ( is_wp_error( $json ) ){
+            return $json;
         }
 
         if ( ! isset( $json->dns_records ) ){
@@ -147,15 +199,6 @@ class Groundhogg_Service_Manager
         wpgh_update_option( 'gh_email_api_check_verify_status', 1 );
 
         /* @type $json->dns_records array */
-        /*
-         * [
-         *   [
-         *    'name' => 'abc.'
-         *    'type' => 'CNAME'
-         *    'value' => 'aws.com'
-         *   ],
-         * ]
-         * */
         wpgh_update_option( 'gh_email_api_dns_records', $json->dns_records );
 
         /**
@@ -171,6 +214,7 @@ class Groundhogg_Service_Manager
     /**
      * If the JSON is your typical error response
      *
+     * @deprecated since 1.2.2
      * @param $json
      * @return bool
      */
@@ -181,6 +225,7 @@ class Groundhogg_Service_Manager
     /**
      * Convert JSON to a WP_Error
      *
+     * @deprecated since 1.2.2
      * @param $json
      * @return bool|WP_Error
      */
@@ -206,34 +251,31 @@ class Groundhogg_Service_Manager
             return;
         }
 
+        $headers = [
+            'OAUTH_TOKEN' => $token
+        ];
+
         $post = [
             'domain'    => site_url(),
             'user_id'   => $gh_uid,
-            'token'     => $token
         ];
 
-        $response = wp_remote_post( self::ENDPOINT, array( 'body' => $post ) );
+        $response = $this->request( 'domains/verify', $post, 'POST', $headers );
 
         if ( is_wp_error( $response ) ){
             return;
         }
 
-        $json = json_decode( wp_remote_retrieve_body( $response ) );
-
-        if ( $this->is_json_error($json)){
-            return;
-        }
-
         /* If we got the token, set it and auto enable */
         if ( isset( $json->token ) ){
-        	wpgh_update_option( 'gh_email_token', sanitize_text_field( $json->token ) );
+        	wpgh_update_option( 'gh_email_token', sanitize_text_field( $response->token ) );
         	wpgh_update_option( 'gh_send_with_gh_api', [ 'on' ] );
 
         	/* Domain is verified, no longer need to check verification */
         	wpgh_delete_option( 'gh_email_api_check_verify_status' );
 	        wp_clear_scheduled_hook( 'groundhogg/service/verify_domain' );
 
-            do_action( 'groundhogg/service_manager/domain/verified', $json, $gh_uid, $token );
+            do_action( 'groundhogg/service_manager/domain/verified', $response, $gh_uid, $token );
         }
     }
 
@@ -354,43 +396,35 @@ class Groundhogg_Service_Manager
         }
 
         $message = sanitize_textarea_field( $message );
-        $domain = parse_url( site_url(), PHP_URL_HOST );
         $data = array(
-            'token' => md5( wpgh_get_option( 'gh_email_token' ) ),
             'message' => WPGH()->replacements->process( $message, $contact->ID ),
             'sender' => wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ),
-            'domain' => $domain,
             'number' => $phone,
             'ip' => $ip
         );
 
-        $url = 'https://www.groundhogg.io/wp-json/gh/aws/v1/send-sms/';
+        $response = $this->request( 'sms/send', $data );
 
-        $request    = wp_remote_post( $url, array( 'body' => $data ) );
-        $result     = wp_remote_retrieve_body( $request );
-        $result     = json_decode( $result );
-
-        if ( $this->is_json_error( $result ) ){
-            $error = $this->get_json_error( $result );
-            do_action( 'wpgh_sms_failed', $error );
-            return $error;
+        if ( is_wp_error( $response ) ){
+            do_action( 'wpgh_sms_failed', $response );
+            return $response;
         }
 
-//        var_dump( $result );
-
-        if ( ! isset( $result->status ) || $result->status !== 'success' ){
+        if ( ! isset( $response->status ) || $response->status !== 'success' ){
             /* mail failed */
-            $error = new WP_Error( $result->code, $result->message );
-            $contact->add_note( $result->message );
+            $error = new WP_Error( $response->code, $response->message );
+            $contact->add_note( $response->message );
             do_action( 'wpgh_sms_failed', $error );
             return $error;
         }
 
-        $credits = $result->credits_remaining;
+        $credits = $response->credits_remaining;
         wpgh_update_option( 'gh_remaining_api_credits', $credits );
 
         return true;
 
     }
+
+
 
 }

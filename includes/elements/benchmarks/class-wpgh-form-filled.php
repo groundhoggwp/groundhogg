@@ -56,8 +56,8 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
             add_action( 'admin_footer', array( $this, 'modal_form' ) );
         }
 
-        add_action( 'wp_ajax_wpgh_form_impression', array( $this, 'track_impression' ) );
-        add_action( 'wp_ajax_nopriv_wpgh_form_impression', array( $this, 'track_impression' ) );
+//        add_action( 'wp_ajax_wpgh_form_impression', array( $this, 'track_impression' ) );
+//        add_action( 'wp_ajax_nopriv_wpgh_form_impression', array( $this, 'track_impression' ) );
         add_action( 'wp_ajax_wpgh_tags_list', array( $this, 'wpgh_tags_list' ) );
     }
 
@@ -69,102 +69,6 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
         wp_enqueue_script( 'wpgh-form-builder', WPGH_ASSETS_FOLDER . 'js/admin/form-builder.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/form-builder.min.js' ) );
         wp_localize_script('wpgh-form-builder', 'ajax_object',array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1233 ) );
     }
-
-    /**
-     * Track a form impression from the frontend.
-     */
-    public function track_impression()
-    {
-
-        if( !class_exists( 'Browser' ) )
-            require_once WPGH_PLUGIN_DIR . 'includes/lib/browser.php';
-
-        $browser = new Browser();
-        if ( $browser->isRobot() || $browser->isAol() ){
-            wp_die( json_encode( array( 'error' => 'No Track Robots.' ) ) );
-        }
-
-        $ID = intval( $_POST[ 'id' ] );
-
-        if ( ! WPGH()->steps->exists( $ID ) ){
-            wp_die( json_encode( array( 'error' => 'Form DNE.' ) ) );
-        }
-
-        $step = new WPGH_Step( $ID );
-
-        $response = array();
-
-        /*
-         * Is Contact
-         */
-        if ( $contact = WPGH()->tracking->get_contact() ) {
-
-            $db = WPGH()->activity;
-
-            /* Check if impression for contact exists... */
-            $args = array(
-                'funnel_id'     => $step->funnel_id,
-                'step_id'       => $step->ID,
-                'contact_id'    => $contact->ID,
-                'activity_type' => 'form_impression',
-            );
-
-            $response[ 'cid' ] = $contact->ID;
-
-        } else {
-            /*
-            * Not a Contact
-            */
-
-            /* validate against viewers IP? Cookie? TBD */
-            $db = WPGH()->activity;
-
-            /* Check if impression for contact exists... */
-            if ( isset( $_COOKIE[ 'gh_ref_id' ] ) ){
-                $ref_id = sanitize_key( $_COOKIE[ 'gh_ref_id' ] );
-            } else {
-                $ref_id = uniqid( 'g' );
-            }
-
-            $args = array(
-                'funnel_id'     => $step->funnel_id,
-                'step_id'       => $step->ID,
-                'activity_type' => 'form_impression',
-                'ref'           => $ref_id
-            );
-
-            $response[ 'ref_id' ] = $ref_id;
-
-        }
-
-        if ( ! $db->activity_exists( $args ) ){
-
-            $args[ 'timestamp' ] = time();
-            $db->add( $args );
-
-            $response[ 'result' ] = 'success';
-
-        }
-
-        wp_die( json_encode( $response ) );
-
-    }
-
-    /**
-     * AJAX call to bound list of tags in select2
-     */
-    public function wpgh_tags_list()
-    {
-        $tags =  WPGH()->tags->get_tags();
-        foreach ($tags as $tag ){
-            $select[] = array(
-                'id' => $tag->tag_id,
-                'text' => $tag->tag_name . '('.$tag->contact_count .')'
-            );
-        }
-        wp_die( json_encode( array('results' =>  $select ) ) ) ;
-    }
-
 
     /**
      * @param $step WPGH_Step
@@ -776,5 +680,86 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
         //do nothing...
 
         return true;
+    }
+
+    /**
+     * Track a form impression from the frontend.
+     * @deprecated since 1.2.4
+     */
+    public function track_impression()
+    {
+
+        if( !class_exists( 'Browser' ) )
+            require_once WPGH_PLUGIN_DIR . 'includes/lib/browser.php';
+
+        $browser = new Browser();
+        if ( $browser->isRobot() || $browser->isAol() ){
+            wp_die( json_encode( array( 'error' => 'No Track Robots.' ) ) );
+        }
+
+        $ID = intval( $_POST[ 'id' ] );
+
+        if ( ! WPGH()->steps->exists( $ID ) ){
+            wp_die( json_encode( array( 'error' => 'Form DNE.' ) ) );
+        }
+
+        $step = new WPGH_Step( $ID );
+
+        $response = array();
+
+        /*
+         * Is Contact
+         */
+        if ( $contact = WPGH()->tracking->get_contact() ) {
+
+            $db = WPGH()->activity;
+
+            /* Check if impression for contact exists... */
+            $args = array(
+                'funnel_id'     => $step->funnel_id,
+                'step_id'       => $step->ID,
+                'contact_id'    => $contact->ID,
+                'activity_type' => 'form_impression',
+            );
+
+            $response[ 'cid' ] = $contact->ID;
+
+        } else {
+            /*
+            * Not a Contact
+            */
+
+            /* validate against viewers IP? Cookie? TBD */
+            $db = WPGH()->activity;
+
+            /* Check if impression for contact exists... */
+            if ( isset( $_COOKIE[ 'gh_ref_id' ] ) ){
+                $ref_id = sanitize_key( $_COOKIE[ 'gh_ref_id' ] );
+            } else {
+                $ref_id = uniqid( 'g' );
+            }
+
+            $args = array(
+                'funnel_id'     => $step->funnel_id,
+                'step_id'       => $step->ID,
+                'activity_type' => 'form_impression',
+                'ref'           => $ref_id
+            );
+
+            $response[ 'ref_id' ] = $ref_id;
+
+        }
+
+        if ( ! $db->activity_exists( $args ) ){
+
+            $args[ 'timestamp' ] = time();
+            $db->add( $args );
+
+            $response[ 'result' ] = 'success';
+
+        }
+
+        wp_die( json_encode( $response ) );
+
     }
 }

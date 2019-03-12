@@ -80,7 +80,7 @@ wp_enqueue_style( 'jquery-ui' );
                     'attributes'    => '',
                     'required'      => false,) ); ?>
                 <p class="description"><?php _e( 'The day the broadcast will be sent.', 'groundhogg' ); ?></p>
-                <div>
+                <div style="margin-top: 10px;">
 	                <?php echo WPGH()->html->checkbox( array(
 		                'label'         => _x( 'Send in the contact\'s local time.', 'action', 'groundhogg' ),
 		                'name'          => 'send_in_timezone',

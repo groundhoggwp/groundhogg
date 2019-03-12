@@ -86,7 +86,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     public function get_tags(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'edit_tags' ) ){
-            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
         }
         $tag_id = null;
         $tags = null;
@@ -95,7 +95,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
             if ( !( WPGH()->tags->get_tag( $tag_id ) === false) ) {
                 $tags = WPGH()->tags->get_tag( $tag_id );
             } else {
-                return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ) );
+                return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
             }
         } else {
             $tags = WPGH()->tags->get_tags();
@@ -103,7 +103,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
         if ( $tags != null ) {
             return rest_ensure_response( array( 'tags' => $tags ) );
         } else {
-            return new WP_Error('error', _x( 'No tags found.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'No tags found.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
     }
 
@@ -111,7 +111,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     public function create_tags(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'add_tags' ) ){
-            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
         }
         $parameters = $request->get_json_params();
         if ( isset ( $parameters['tags'] ) ) {
@@ -145,7 +145,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                 ));
             }
         } else {
-            return new WP_Error('error', _x( 'Please enter tags.', 'api', 'groundhogg' ));
+            return new WP_Error('error', _x( 'Please enter tags.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
     }
 
@@ -153,7 +153,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     public function update_tags(WP_REST_Request $request)
     {
         if ( ! user_can( $request['wpgh_user_id'], 'edit_tags' ) ){
-            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ));
+            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
         }
         $parameters = $request->get_json_params();
         if ( isset ( $parameters['tags'] ) ) {
@@ -175,16 +175,16 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                             'message' => _x( 'Tag updated successfully.', 'api', 'groundhogg' )
                         ));
                     } else {
-                        return new WP_Error('error', _x( 'Something went wrong', 'api', 'groundhogg' ));
+                        return new WP_Error('error', _x( 'Something went wrong', 'api', 'groundhogg' ), [ 'status' => 500 ]);
                     }
                 } else {
-                    return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ) );
+                    return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
                 }
             } else {
-                return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ) );
+                return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
             }
         } else {
-            return new WP_Error('error', _x( 'Please provide a valid array of tags.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'Please provide a valid array of tags.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
     }
 
@@ -192,7 +192,7 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
     public function delete_tags( WP_REST_Request $request)
     {// function invoked if user wants to delete one contact
         if ( ! user_can( $request['wpgh_user_id'], 'delete_tags' ) ){
-            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
         }
         if( isset( $request['tag_id'] ) ) {
             $tag_id = intval( $request['tag_id'] );
@@ -204,14 +204,14 @@ class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
                         'message' => _x( 'Tag deleted successfully.', 'api', 'groundhogg' )
                     ));
                 } else {
-                    return new WP_Error('error', _x( 'Something went wrong', 'api', 'groundhogg' ) );
+                    return new WP_Error('error', _x( 'Something went wrong', 'api', 'groundhogg' ), [ 'status' => 500 ] );
                 }
             } else {
 
-                return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ) );
+                return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
             }
         } else {
-            return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ) );
+            return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
         }
 
     }

@@ -142,7 +142,7 @@ We appreciate your help, best of luck!
             'clicks'    => $num_clicks,
         ];
 
-        $response = wp_remote_post( 'https://www.groundhogg.io/wp-json/gh/collect/', array( 'body' => $stats ) );
+        $response = wp_remote_post( 'https://www.groundhogg.io/wp-json/gh/stats/collect/', array( 'body' => $stats ) );
 
         /* Success */
         if ( ! is_wp_error( $response ) ){

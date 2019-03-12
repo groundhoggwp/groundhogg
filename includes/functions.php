@@ -1225,7 +1225,7 @@ function wpgh_should_show_stats_collection()
  * @return bool
  */
 function wpgh_is_json_error( $json ){
-    return isset( $json->code ) && isset( $json->message ) && isset( $json->data );
+    return isset( $json->code ) && isset( $json->message );
 }
 
 /**
@@ -1235,9 +1235,11 @@ function wpgh_is_json_error( $json ){
  * @return bool|WP_Error
  */
 function wpgh_get_json_error( $json ){
+
     if ( wpgh_is_json_error( $json ) ){
         return new WP_Error( $json->code, $json->message, $json->data );
     }
+
     return false;
 }
 

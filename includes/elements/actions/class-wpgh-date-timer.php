@@ -100,6 +100,18 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
                         minDate:0,
                         dateFormat:'yy-m-d'
                     })});</script>
+                    <div id="<?php echo $step->prefix( 'local_time' );?>"><?php
+                        echo WPGH()->html->checkbox( array(
+                            'label'         => _x( 'Run in the contact\'s local time.', 'action', 'groundhogg' ),
+                            'name'          => $step->prefix( 'send_in_timezone' ),
+                            'id'            => $step->prefix( 'send_in_timezone' ),
+                            'class'         => '',
+                            'value'         => '1',
+                            'checked'       => $step->get_meta( 'send_in_timezone' ),
+                            'title'         => __( 'Run in the contact\'s local time.', 'groundhogg' ),
+                            'attributes'    => '',
+                            'required'      => false,) );
+                        ?></div>
             </tr>
             <tr>
                 <th>
@@ -164,6 +176,12 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
             $step->delete_meta( 'disable' );
         }
 
+        if ( isset( $_POST[ $step->prefix( 'send_in_timezone' ) ] ) ){
+            $step->update_meta( 'send_in_timezone', 1 );
+        } else {
+            $step->delete_meta( 'send_in_timezone' );
+        }
+
         $date_timers = WPGH()->steps->get_steps( array( 'step_type' => 'date_timer', 'funnel_id' => $step->funnel_id ) );
 
         foreach ( $date_timers as $date_timer ){
@@ -199,6 +217,8 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
         }
 
         $run_date = $step->get_meta( 'run_date' );
+        $send_in_timezone = $step->get_meta( 'send_in_timezone' );
+
         if ( ! $run_date )
             $run_date = date( 'Y-m-d', strtotime( '+1 day' ) );
 
@@ -209,7 +229,15 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
         $time_string = $run_date . ' ' . $run_time;
 
         /* convert to UTC */
-        $final_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
+
+        /* Modify according to the contacts timezone */
+        if ( $send_in_timezone && WPGH()->event_queue->is_processing()  ){
+            $final_time = WPGH()->event_queue->cur_event->contact->get_local_time( $final_time );
+            if ( $final_time < time() ){
+                $final_time+=DAY_IN_SECONDS;
+            }
+        }
 
         return $final_time;
     }

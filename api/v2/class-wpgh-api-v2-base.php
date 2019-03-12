@@ -21,14 +21,27 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @since  1.5
  */
-class WPGH_API_V2_BASE {
+abstract class WPGH_API_V2_BASE {
+
+    public function __construct()
+    {
+        //initialize api if user check the api section
+        add_action('rest_api_init', array( $this, 'register_routes' ) );
+    }
+
+    abstract public function register_routes();
 
     public function rest_authentication( WP_REST_Request $request )
     {
         // validate user and set user id for contact operations..
 
-        $token = $request->get_param( 'token' );
-        $key = $request->get_param( 'key' );
+        $token = $request->get_header( 'GH_TOKEN' );
+        $key = $request->get_header( 'GH_PUBLIC_KEY' );
+
+        if ( ! $token || ! $key ){
+            $token = $request->get_param( 'token' );
+            $key = $request->get_param( 'key' );
+        }
 
         if( $token && $key ) {
 
@@ -45,15 +58,15 @@ class WPGH_API_V2_BASE {
                     $request->set_param( 'wpgh_user_id', $user );
 
                 } else {
-                    return new WP_Error( 'error',_x( 'Invalid Authentication.', 'api', 'groundhogg' ) );
+                    return new WP_Error( 'error',_x( 'Invalid Authentication.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
                 }
             } else {
-                return new WP_Error( 'error',_x( 'API key is not valid.', 'api', 'groundhogg' ) );
+                return new WP_Error( 'error',_x( 'API key is not valid.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
             }
 
         } else {
 
-            return new WP_Error( 'error',_x( 'Please enter a API valid token and public key.', 'api', 'groundhogg' ));
+            return new WP_Error( 'error',_x( 'Please enter a API valid token and public key.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
 
         }
 
