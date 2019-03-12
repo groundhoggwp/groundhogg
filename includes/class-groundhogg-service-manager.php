@@ -180,10 +180,12 @@ class Groundhogg_Service_Manager
             'user_id'   => $gh_uid,
         ];
 
-        $response = $this->request( 'domains/add', $post, 'POST', $headers );
+        $json = $this->request( 'domains/add', $post, 'POST', $headers );
 
-        if ( is_wp_error( $response ) ){
-            return $response;
+//        var_dump( $response );
+
+        if ( is_wp_error( $json ) ){
+            return $json;
         }
 
         if ( ! isset( $json->dns_records ) ){
