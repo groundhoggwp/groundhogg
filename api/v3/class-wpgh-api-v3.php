@@ -95,12 +95,12 @@ class WPGH_API_V2
     private function includes()
     {
 
-        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-base.php';
-        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-contacts.php';
-        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-tags.php';
-        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-emails.php';
-        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-sms.php';
-        include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-elements.php';
+        include_once dirname(__FILE__) . '/class-wpgh-api-v3-base.php';
+        include_once dirname(__FILE__) . '/class-wpgh-api-v3-contacts.php';
+        include_once dirname(__FILE__) . '/class-wpgh-api-v3-tags.php';
+        include_once dirname(__FILE__) . '/class-wpgh-api-v3-emails.php';
+        include_once dirname(__FILE__) . '/class-wpgh-api-v3-sms.php';
+        include_once dirname(__FILE__) . '/class-wpgh-api-v3-elements.php';
 //        include_once dirname( __FILE__ ) . '/class-wpgh-api-v3-debug.php';
 
         do_action( 'wpgh_api_include_extensions', $this );

@@ -497,7 +497,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/gutenberg.php';
 
             /* API */
-            require_once WPGH_PLUGIN_DIR . 'api/v2/class-wpgh-api-v2.php';
+            require_once WPGH_PLUGIN_DIR . 'api/v2/class-wpgh-api-v3.php';
 
             /* Install */
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';
