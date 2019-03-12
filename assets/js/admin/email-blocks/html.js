@@ -47,12 +47,9 @@ var wpghHTMLBlock;
                     matchBrackets: true,
                     indentUnit: 4,
                     specialChars: /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b-\u200f\u2028\u2029\ufeff]/,
-                    onChange: function ( cm ) {
-                        editor.getActive().find('.content-inside').html( cm.getValue() );
-                    }
                 });
 
-                this.htmlCode.on( 'change keydown', function ( cm ) {
+                this.htmlCode.on( 'change', function ( cm ) {
                     editor.getActive().find('.content-inside').html( cm.getValue() );
                 } );
 
