@@ -7,8 +7,6 @@
  *
  * @package     WPGH
  * @subpackage  Classes/API
- *
- *
  */
 
 // Exit if accessed directly
@@ -94,12 +92,13 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
 
         $response = array();
 
+        $db = WPGH()->activity;
+
         /*
          * Is Contact
          */
         if ( $contact = WPGH()->tracking->get_contact() ) {
 
-            $db = WPGH()->activity;
 
             /* Check if impression for contact exists... */
             $args = array(
@@ -107,6 +106,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
                 'step_id'       => $step->ID,
                 'contact_id'    => $contact->ID,
                 'activity_type' => 'form_impression',
+                'start'         => time() - DAY_IN_SECONDS
             );
 
             $response[ 'cid' ] = $contact->ID;
@@ -115,9 +115,6 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
             /*
             * Not a Contact
             */
-
-            /* validate against viewers IP? Cookie? TBD */
-            $db = WPGH()->activity;
 
             /* Check if impression for contact exists... */
             if ( isset( $_COOKIE[ 'gh_ref_id' ] ) ){
@@ -130,7 +127,8 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
                 'funnel_id'     => $step->funnel_id,
                 'step_id'       => $step->ID,
                 'activity_type' => 'form_impression',
-                'ref'           => $ref_id
+                'referer'       => $ref_id,
+                'start'         => time() - DAY_IN_SECONDS
             );
 
             $response[ 'ref_id' ] = $ref_id;
@@ -138,11 +136,12 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
         }
 
         if ( $db->activity_exists( $args ) ){
-            return self::ERROR_200( 'no_double_track', 'Unique views only.' );
+            return self::ERROR_200( 'no_double_track', 'Unique views only.', $response );
         }
 
         do_action( 'groundhogg/api/v3/elements/form-impression' );
 
+        unset( $args[ 'start' ] );
         $args[ 'timestamp' ] = time();
         $db->add( $args );
 

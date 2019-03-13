@@ -113,6 +113,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED API Errors now have more revealing HTTP response codes.
 * TWEAKED Frontend tracking script now uses the REST API instead of admin-ajax.php for better performance.
 * TWEAKED Rather than explicitly enabling the API, a user must now explicitly disable it due to the fact we now use the API for most basic functionality.
+* FIXED Form Impression reporting bug only tracking impressions for existing contacts.
 
 = 1.2.3 =
 * TWEAKED Reporting widgets can also register a shortcode for custom admin pages
