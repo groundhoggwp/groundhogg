@@ -991,6 +991,7 @@ class WPGH_Form
             'id'            => '',
             'class'         => '',
             'value'         => '1',
+            'tag'           => 0,
             'title'         => '',
             'attributes'    => '',
             'required'      => false,
@@ -1009,11 +1010,16 @@ class WPGH_Form
         $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
 
         $value = esc_attr( $a[ 'value' ] );
+
         if ( strpos( $value, '|' ) ){
             $parts = explode( '|', $value );
             $value = $parts[0];
             $tag = intval( $parts[1] );
             $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
+        }
+
+        if ( $a[ 'tag' ] ){
+            $a[ 'tag_map' ][ base64_encode($value) ] = intval( $a[ 'tag' ] );
         }
 
         $checked = '';
@@ -1063,6 +1069,7 @@ class WPGH_Form
             'id'            => 'agree_terms',
             'class'         => 'gh-terms',
             'value'         => 'yes',
+            'tag'           => 0,
             'title'         => _x( 'Please agree to the terms of service.', 'form_default', 'groundhogg' ),
             'required'      => true,
         ), $atts );
@@ -1086,6 +1093,7 @@ class WPGH_Form
             'id'            => 'gdpr_consent',
             'class'         => 'gh-gdpr',
             'value'         => 'yes',
+            'tag'           => 0,
             'title'         => _x( 'I Consent', 'form_default', 'groundhogg' ),
             'required'      => true,
         ), $atts );

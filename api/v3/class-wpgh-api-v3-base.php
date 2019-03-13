@@ -250,7 +250,7 @@ abstract class WPGH_API_V3_BASE {
     {
 
         /* Check if the API is enabled... */
-        if ( ! wpgh_is_option_enabled( 'gh_enable_api' ) ){
+        if ( wpgh_is_option_enabled( 'gh_disable_api' ) ){
             return self::ERROR_403( 'api_unavailable', 'The api has been disabled by the administrator.' );
         }
 
@@ -263,7 +263,7 @@ abstract class WPGH_API_V3_BASE {
         $key = $request->get_header( 'gh_public_key' );
 
         if( ! $token || ! $key ) {
-            return self::ERROR_401( 'no_token_or_key', _x( 'Please enter a API valid token and public key.', 'api', 'groundhogg' ), $request->get_headers() );
+            return self::ERROR_401( 'no_token_or_key', _x( 'Please enter a API valid token and public key.', 'api', 'groundhogg' ) );
         }
 
         //validate user

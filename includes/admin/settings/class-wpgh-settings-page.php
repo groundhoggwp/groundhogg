@@ -628,16 +628,16 @@ class WPGH_Settings_Page
                     'value'         => 'on',
                 ),
             ),
-            'gh_enable_api' => array(
-                'id'        => 'gh_enable_api',
+            'gh_disable_api' => array(
+                'id'        => 'gh_disable_api',
                 'section'   => 'api_settings',
-                'label'     => _x( 'Enable the Groundhogg API', 'settings', 'groundhogg' ),
-                'desc'      => _x( 'Enabling this will allow other platforms to access information on this site.', 'settings', 'groundhogg' ),
+                'label'     => _x( 'Disable the Groundhogg API', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Disabling the API will prevent other platforms from accessing information on this site. Functionality in some extensions may be affected as well.', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(
-                    'label'         => __( 'Enable' ),
-                    'name'          => 'gh_enable_api',
-                    'id'            => 'gh_enable_api',
+                    'label'         => __( 'Disable' ),
+                    'name'          => 'gh_disable_api',
+                    'id'            => 'gh_disable_api',
                     'value'         => 'on',
                 ),
             ),

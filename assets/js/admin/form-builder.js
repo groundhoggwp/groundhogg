@@ -33,13 +33,9 @@ var wpghFormBuilder;
 
             /* Handled  Radio button options */
             $( '#gh-option-table' ).click(function( e ){
-                if ( $( e.target ).closest( '.deletemeta' ).length ){
-                    $( e.target ).closest( 'tr' ).remove();
+                if ( $( e.target ).closest( '.deleteOption' ).length ){
+                    $( e.target ).closest( '.option-wrapper' ).remove();
                 }
-            });
-
-            $('#btn-saveoption').click(function () {
-                wpghFormBuilder.saveOptions();
             });
 
             $( '.addoption' ).click(function() {
@@ -52,12 +48,12 @@ var wpghFormBuilder;
 
         saveOptions: function(){
 
-            var ghoptions = new Array();
+            var ghoptions = [];
             $('input[name="option[]"]').each(function(){
                 ghoptions.push($(this).val());
             });
 
-            var ghtags = new Array();
+            var ghtags = [];
             $('select[name="tags[]"]').each(function(){
                 ghtags.push($(this).val());
             });
@@ -74,28 +70,28 @@ var wpghFormBuilder;
             }
             $('#field-options').val(str.trim());
         },
+
         addOptionsHTML: function() {
-            var $newMeta = "<tr>" +
-                "<th>" +
-                "<input type='text' class='input'  name='option[]' placeholder='Option Name'>" +
-                "</th>" +
-                "<td>" +
-                "<select class='js-data-example-ajax' name='tags[]' style='min-width: 140px; '></select>"+
-                " <span  class=\"row-actions\"><span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a></span></span>\n" +
-                "</td>" +
-                "</tr>";
-            $('#gh-option-table').find( 'tbody' ).append( $newMeta );
+            var $newOption = "<div class='option-wrapper' style='margin-bottom:10px;'>" +
+                "<div style='display: inline-block;width: 170px;vertical-align: top;'>" +
+                "<input type='text' class='input' style='float: left' name='option[]' placeholder='Option Text'>" +
+                "</div>" +
+                "<div style='display: inline-block;width: 220px;vertical-align: top;'>" +
+                "<select class='gh-single-tag-picker' name='tags[]' style='max-width: 140px;'></select>"+
+                "</div>" +
+                "<div style='display: inline-block;width: 20px;vertical-align: top;'>" +
+                " <span  class=\"row-actions\"><span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deleteOption\"><span class=\"dashicons dashicons-trash\"></span></a></span></span>\n" +
+                "</div>" +
+                "</div>";
+            $('#gh-option-table').append( $newOption );
 
-            $('.js-data-example-ajax').select2({
-                ajax: {
-                    url: ajax_object.ajax_url,
-                    dataType: 'json',
-                    data: {
-                        action: 'wpgh_tags_list'
-                    }
-                }
-            });
+            wpgh.init();
 
+        },
+
+        resetOptions: function() {
+            $('#gh-option-table').html( '' );
+            this.addOptionsHTML();
         },
 
         initTypes: function() {
@@ -103,8 +99,8 @@ var wpghFormBuilder;
             this.types.last         = ['required','label','placeholder','id','class'];
             this.types.email        = ['label','placeholder','id','class'];
             this.types.phone        = ['required','label','placeholder','id','class'];
-            this.types.gdpr         = ['label','id','class'];
-            this.types.terms        = ['label','id','class'];
+            this.types.gdpr         = ['label','tag','id','class'];
+            this.types.terms        = ['label','tag','id','class'];
             this.types.recaptcha    = ['captcha-theme','captcha-size','id','class'];
             this.types.submit       = ['text','id','class'];
             this.types.text         = ['required','label','placeholder','name','id','class'];
@@ -112,7 +108,7 @@ var wpghFormBuilder;
             this.types.number       = ['required','label','name','min','max','id','class'];
             this.types.dropdown     = ['required','label','name','default','options','multiple','id','class'];
             this.types.radio        = ['required','label','name','options','id','class'];
-            this.types.checkbox     = ['required','label','name','value','id','class'];
+            this.types.checkbox     = ['required','label','name','value','tag','id','class'];
             this.types.address      = ['required','label','id','class'];
             this.types.row          = ['id','class'];
             this.types.col          = ['width','id','class'];
@@ -156,6 +152,7 @@ var wpghFormBuilder;
 
             var $form = $( '#form-field-form' );
 
+            this.saveOptions();
             var attrs = $form.serializeArray();
 
             var code = '[' + this.currentType;
@@ -195,6 +192,8 @@ var wpghFormBuilder;
             }
 
             $form.trigger( 'reset' );
+
+            this.resetOptions();
 
             return code;
 

@@ -30,17 +30,6 @@ class WPGH_Guided_Setup_Step_Other extends WPGH_Guided_Setup_Step
         ?>
         <table class="form-table">
             <tr>
-                <th><?php _ex( 'Enable the Groundhogg API', 'setting_label', 'groundhogg' ); ?></th>
-                <td><?php echo  WPGH()->html->checkbox( array(
-                        'name' => 'gh_enable_api',
-                        'label' => __( 'Enable', 'guided_setup', 'Groundhogg' ),
-                        'value' => 1,
-                        'checked' => wpgh_is_option_enabled( 'gh_enable_api' )
-                    ) );?>
-                    <p class="description"><?php _ex( 'This will allow other plugins & software to communicate with Groundhogg on this site.', 'guided_setup', 'groundhogg' ); ?></p>
-                </td>
-            </tr>
-            <tr>
                 <th><?php _ex( 'How frequently should the event queue run?', 'setting_label', 'groundhogg' ); ?></th>
                 <td><?php echo WPGH()->html->dropdown( array(
                         'name' => 'gh_queue_interval',
@@ -62,10 +51,6 @@ class WPGH_Guided_Setup_Step_Other extends WPGH_Guided_Setup_Step
 
     public function save()
     {
-        if ( isset( $_POST[ 'gh_enable_api' ] ) && ! empty( $_POST[ 'gh_enable_api' ] ) ){
-            wpgh_update_option( 'gh_enable_api', [ 'on' ] );
-        }
-
         if ( isset( $_POST[ 'gh_queue_interval' ] ) && ! empty( $_POST[ 'gh_queue_interval' ] ) ){
             wpgh_update_option( 'gh_queue_interval', sanitize_key( $_POST[ 'gh_queue_interval' ] ) );
         }

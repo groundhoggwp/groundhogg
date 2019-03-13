@@ -10,8 +10,30 @@ var wpgh;
                 multiple: true,
                 tokenSeparators: ['/',',',';'],
                 ajax: {
-                    url: ajaxurl + '?action=gh_get_tags',
+                    url: gh_admin_object.tags_endpoint,
                     dataType: 'json',
+                    beforeSend: function ( xhr ) {
+                        xhr.setRequestHeader( 'X-WP-Nonce', gh_admin_object.nonce );
+                    },
+                    results: function(data, page) {
+                        return {
+                            results: data.results
+                        };
+                    }
+                }
+            });
+        },
+        buildSingleTagPicker: function() {
+            $('.gh-single-tag-picker' ).css( 'width', '100%' ).select2({
+                tags:false,
+                multiple: false,
+                tokenSeparators: ['/',',',';'],
+                ajax: {
+                    url: gh_admin_object.tags_endpoint,
+                    dataType: 'json',
+                    beforeSend: function ( xhr ) {
+                        xhr.setRequestHeader( 'X-WP-Nonce', gh_admin_object.nonce );
+                    },
                     results: function(data, page) {
                         return {
                             results: data.results
@@ -23,8 +45,11 @@ var wpgh;
         buildEmailPicker: function() {
             $('.gh-email-picker' ).css( 'width', '100%' ).select2({
                 ajax: {
-                    url: ajaxurl + '?action=gh_get_emails',
+                    url: gh_admin_object.emails_endpoint,
                     dataType: 'json',
+                    beforeSend: function ( xhr ) {
+                        xhr.setRequestHeader( 'X-WP-Nonce', gh_admin_object.nonce );
+                    },
                     results: function(data, page) {
                         return {
                             results: data.results
@@ -36,8 +61,11 @@ var wpgh;
         buildContactPicker: function (){
             $('.gh-contact-picker' ).css( 'width', '100%' ).select2({
                 ajax: {
-                    url: ajaxurl + '?action=gh_get_contacts',
+                    url: gh_admin_object.contacts_endpoint,
                     dataType: 'json',
+                    beforeSend: function ( xhr ) {
+                        xhr.setRequestHeader( 'X-WP-Nonce', gh_admin_object.nonce );
+                    },
                     results: function(data, page) {
                         return {
                             results: data.results
@@ -78,6 +106,7 @@ var wpgh;
             this.buildEmailPicker();
             this.buildContactPicker();
             this.buildTagPicker();
+            this.buildSingleTagPicker();
             this.buildBenchmarkPicker();
             this.buildMetaKeyPicker();
         },

@@ -496,7 +496,7 @@ add_action( 'admin_init', 'wpgh_tools_sysinfo_download' );
  */
 function wpgh_api_keys_table()
 {
-    if ( ! wpgh_is_option_enabled( 'gh_enable_api' ) ){
+    if ( wpgh_is_option_enabled( 'gh_disable_api' ) ){
         return;
     }
 

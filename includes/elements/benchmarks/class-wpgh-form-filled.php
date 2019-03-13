@@ -56,9 +56,12 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
             add_action( 'admin_footer', array( $this, 'modal_form' ) );
         }
 
-//        add_action( 'wp_ajax_wpgh_form_impression', array( $this, 'track_impression' ) );
-//        add_action( 'wp_ajax_nopriv_wpgh_form_impression', array( $this, 'track_impression' ) );
-        add_action( 'wp_ajax_wpgh_tags_list', array( $this, 'wpgh_tags_list' ) );
+        /* Backwards compat */
+        if ( wpgh_is_option_enabled( 'gh_disable_api' ) ){
+            add_action( 'wp_ajax_gh_form_impression', array( $this, 'track_impression' ) );
+            add_action( 'wp_ajax_nopriv_gh_form_impression', array( $this, 'track_impression' ) );
+        }
+
     }
 
     /**
@@ -67,7 +70,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
     public function scripts()
     {
         wp_enqueue_script( 'wpgh-form-builder', WPGH_ASSETS_FOLDER . 'js/admin/form-builder.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/form-builder.min.js' ) );
-        wp_localize_script('wpgh-form-builder', 'ajax_object',array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1233 ) );
+        //wp_localize_script('wpgh-form-builder', 'ajax_object',array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1233 ) );
     }
 
     /**
@@ -420,7 +423,13 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                         <th><?php _e( 'Value', 'groundhogg' ) ?></th>
                         <td><?php
                             echo WPGH()->html->input( array( 'id' => 'field-value', 'name' => 'value' ) );
-                            ?><p class="description"><?php _e( 'The default value of the field. Add a tag when the value is as given. For example Value|18', 'groundhogg' ); ?></p></td>
+                            ?><p class="description"><?php _e( 'The default value of the field.', 'groundhogg' ); ?></p></td>
+                    </tr>
+                    <tr id="gh-field-tag">
+                        <th><?php _e( 'Add Tag', 'groundhogg' ) ?></th>
+                        <td><?php
+                            echo WPGH()->html->tag_picker( array( 'id' => 'field-tag', 'name' => 'tag', 'class' => 'gh-single-tag-picker', 'multiple' => false ) );
+                            ?><p class="description"><?php _e( 'Add a tag when this checkbox is selected.', 'groundhogg' ); ?></p></td>
                     </tr>
 
                     <tr id="gh-field-options">
@@ -428,20 +437,21 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                         <td><?php
                             echo WPGH()->html->textarea( array( 'id' => 'field-options', 'name' => 'options', 'cols' => 50, 'rows' => '5', 'class' => 'hidden' ) );
                             ?>
-                            <table id='gh-option-table'   >
-                                <tbody>
-                                <tr>
-                                    <th>
-<!--                                        <div class="hidden">-->
-<!--                                            <span class="metakeyplaceholdevdvdvddvr">--><?php //esc_attr_e( 'Key' ); ?><!--</span>-->
-<!--                                            <span class="metavalueplaceholder">--><?php //esc_attr_e( 'tag' ); ?><!--</span>-->
-<!--                                        </div>-->
-                                    </th>
-                                </tr>
-                                </tbody>
-                            </table>
-                            <button type="button" id="btn-saveoption" class="button-primary"><?php _ex( 'Save Options', '', 'groundhogg' ); ?></button>
-                            <button type="button" class="button-secondary addoption"><?php _ex( 'Add Option', '', 'groundhogg' ); ?></button>
+                            <div id='gh-option-table'>
+                                <div class='option-wrapper' style='margin-bottom:10px;'>
+                                    <div style='display: inline-block;width: 170px;vertical-align: top;'>
+                                        <input type='text' class='input' style='float: left' name='option[]' placeholder='Option Text'>
+                                    </div>
+                                    <div style='display: inline-block;width: 220px;vertical-align: top;'>
+                                        <select class='gh-single-tag-picker' name='tags[]' style='max-width: 140px;'></select>
+                                    </div>
+                                    <div style='display: inline-block;width: 20px;vertical-align: top;'>
+                                        <span  class="row-actions"><span class="delete"><a style="text-decoration: none" href="javascript:void(0)" class="deleteOption"><span class="dashicons dashicons-trash"></span></a></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="button-secondary addoption"><?php _ex( 'Add Option', 'action', 'groundhogg' ); ?></button>
+<!--                            <button type="button" id="btn-saveoption" class="button-primary">--><?php //_ex( 'Save Options', 'action', 'groundhogg' ); ?><!--</button>-->
                             <p class="description"><?php _e( 'Enter option name to add option. Tags are optional.You need to save options when you make changes.', 'groundhogg' ) ?></p>
                         </td>
                     </tr>

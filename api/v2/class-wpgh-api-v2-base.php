@@ -34,7 +34,7 @@ abstract class WPGH_API_V2_BASE {
     public function rest_authentication( WP_REST_Request $request )
     {
         /* Check if the API is enabled... */
-        if ( ! wpgh_is_option_enabled( 'gh_enable_api' ) ){
+        if ( wpgh_is_option_enabled( 'gh_disable_api' ) ){
             return new WP_Error( 'api_unavailable', 'The api has been disabled by the administrator.', [ 'status' => 403 ] );
         }
 

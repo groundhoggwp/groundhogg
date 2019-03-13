@@ -229,6 +229,14 @@ class WPGH_Submission
                 $c->update_meta( 'terms_agreement_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
                 do_action( 'wpgh_agreed_to_terms', $c, $this );
                 do_action( 'groundhogg/submission/agreed_to_terms', $c, $this );
+
+                if( $config = $this->get_field_config( 'agree_terms' ) ){
+                    $tag_key = base64_encode( $this->agree_terms );
+                    if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
+                        $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
+                    }
+                }
+
                 unset( $this->agree_terms );
             }
             if ( isset( $this->gdpr_consent ) ){
@@ -236,6 +244,14 @@ class WPGH_Submission
                 $c->update_meta( 'gdpr_consent_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
                 do_action( 'wpgh_gdpr_consented', $c, $this );
                 do_action( 'groundhogg/submission/gdpr_gave_consent', $c, $this );
+
+                if( $config = $this->get_field_config( 'gdpr_consent' ) ){
+                    $tag_key = base64_encode( $this->gdpr_consent );
+                    if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
+                        $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
+                    }
+                }
+
                 unset( $this->gdpr_consent );
             }
             /* If the contact previously unsubed then reopt them back in.  */

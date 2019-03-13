@@ -141,6 +141,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
             return self::ERROR_200( 'no_double_track', 'Unique views only.' );
         }
 
+        do_action( 'groundhogg/api/v3/elements/form-impression' );
 
         $args[ 'timestamp' ] = time();
         $db->add( $args );

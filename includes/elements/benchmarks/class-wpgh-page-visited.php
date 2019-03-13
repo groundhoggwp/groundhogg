@@ -50,7 +50,15 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
         parent::__construct();
 
         add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
-        add_action( 'groundhogg/api/v2/elements/page-view', array( $this, 'complete' ) );
+        add_action( 'groundhogg/api/v3/elements/page-view', array( $this, 'complete' ) );
+
+        /* Backwards compat */
+        if ( wpgh_is_option_enabled( 'gh_disable_api' ) ){
+            add_action( 'groundhogg/page_visited', array( $this, 'complete' ) );
+            add_action( 'wp_ajax_gh_page_view', array( $this, 'ajax_complete' ) );
+            add_action( 'wp_ajax_nopriv_gh_page_view', array( $this, 'ajax_complete' ) );
+        }
+
     }
 
     /**
@@ -60,10 +68,19 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
     public function scripts()
     {
         wp_enqueue_script( 'wpgh-page-view', WPGH_PLUGIN_URL . 'assets/js/frontend.min.js' , array('jquery'), filemtime( WPGH_PLUGIN_DIR . 'assets/js/frontend.min.js' ), true );
-        wp_localize_script( 'wpgh-page-view', 'gh_frontent_object', array(
-            'page_view_endpoint' => site_url( 'wp-json/gh/v2/elements/page-view/' ),
-            'form_impression_endpoint' => site_url( 'wp-json/gh/v2/elements/form-impression/' )
-        ));
+
+        if ( ! wpgh_is_option_enabled( 'gh_disable_api' ) ){
+            wp_localize_script( 'wpgh-page-view', 'gh_frontent_object', array(
+                'page_view_endpoint' => site_url( 'wp-json/gh/v3/elements/page-view/' ),
+                'form_impression_endpoint' => site_url( 'wp-json/gh/v3/elements/form-impression/' )
+            ));
+        } else {
+            /* backwards compat */
+            wp_localize_script( 'wpgh-page-view', 'gh_frontent_object', array(
+                'page_view_endpoint' => admin_url( 'admin-ajax.php?action=gh_page_view' ),
+                'form_impression_endpoint' => admin_url( 'admin-ajax.php?action=gh_form_impression' ),
+            ));
+        }
     }
 
     /**
@@ -137,6 +154,28 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
 
         if ( isset( $_POST[ $step->prefix( 'url_match' ) ] ) )
             $step->update_meta(  'url_match', esc_url_raw( $_POST[ $step->prefix(  'url_match' ) ] ) );
+    }
+
+    /**
+     * backwards compat ajax function for page visited.
+     */
+    public function ajax_complete()
+    {
+        $contact = WPGH()->tracking->get_contact();
+
+        if ( ! $contact ){
+            wp_die( json_encode( [ 'status' => 'failed' ] ) );
+        }
+
+        $ref = stripslashes( sanitize_text_field( $_POST[ 'ref' ] ) );
+
+        if ( ! $ref ){
+            wp_die( json_encode( [ 'status' => 'failed' ] ) );
+        }
+
+        do_action( 'groundhogg/page_visited', $ref, $contact );
+
+        wp_die( json_encode( [ 'status' => 'success' ] ) );
     }
 
     /**
