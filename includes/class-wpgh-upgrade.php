@@ -63,6 +63,7 @@ class WPGH_Upgrade{
         $this->update_to_version( '1.0.18.1' );
         $this->update_to_version( '1.0.20' );
         $this->update_to_version( '1.2' );
+        $this->update_to_version( '1.2.4' );
     }
 
     /**
@@ -216,6 +217,14 @@ class WPGH_Upgrade{
             }
 
 	    }
+    }
+
+    /**
+     * Allow for emails to be saved as templates in the templates page.
+     */
+    public function version_1_2_4()
+    {
+        WPGH()->emails->create_table();
     }
 
 

@@ -354,7 +354,6 @@ function wpgh_get_australian_states()
 	);
 }
 
-
 function wpgh_get_canadian_provinces_list()
 {
     return array(
@@ -868,4 +867,25 @@ if ( ! function_exists('ip_info') )
         }
         return $output;
     }
+}
+
+/**
+ * Verify that the IP address is real.
+ *
+ * @param $IP string
+ * @return bool
+ */
+function wpgh_verify_ip( $IP = null )
+{
+    if ( ! $IP ){
+        $IP = getRealIpAddr();
+    }
+
+    if ( ! filter_var( $IP, FILTER_VALIDATE_IP ) ){
+        return false;
+    }
+
+    $ip_info = (object) ip_info( $IP );
+
+    return ! empty( $ip_info->time_zone ) && ! empty( $ip_info->country_code );
 }

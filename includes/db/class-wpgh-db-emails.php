@@ -56,7 +56,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
         }
 
         $this->primary_key = 'ID';
-        $this->version     = '1.0';
+        $this->version     = '1.1';
     }
 
     /**
@@ -74,6 +74,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
             'author'        => '%d',
             'from_user'     => '%d',
             'status'        => '%s',
+            'is_template'   => '%d',
             'last_updated'  => '%s',
             'date_created'  => '%s',
         );
@@ -93,6 +94,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
             'content'       => '',
             'author'        => 0,
             'from_user'     => 0,
+            'is_template'   => 0,
             'status'        => 'draft',
             'last_updated'  => current_time( 'mysql' ),
             'date_created'  => current_time( 'mysql' ),
@@ -335,6 +337,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
         pre_header text NOT NULL,
         from_user bigint(20) unsigned NOT NULL,
         author bigint(20) unsigned NOT NULL,   
+        is_template tinyint unsigned NOT NULL,   
         status VARCHAR(20) NOT NULL,
         last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,

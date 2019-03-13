@@ -396,5 +396,20 @@ abstract class WPGH_DB {
 
     }
 
+    /**
+     * Update the DB if required
+     */
+    public function update_db()
+    {
+        if ( ! $this->installed() || get_option( $this->table_name . '_db_version' ) !== $this->version ) {
+            $this->create_table();
+        }
+    }
+
+    /**
+     * Create the DB
+     */
+    abstract public function create_table();
+
 
 }

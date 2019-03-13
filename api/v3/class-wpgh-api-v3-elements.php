@@ -79,7 +79,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
         $browser = new Browser();
 
         if ( $browser->isRobot() || $browser->isAol() ){
-            return self::ERROR_401( 'looks_like_a_bot', 'Form impressions only track bots.' );
+            return self::ERROR_401( 'looks_like_a_bot', 'Form impressions do not track bots.' );
         }
 
         $ID = intval( $request->get_param( 'form_id' ) );
@@ -118,8 +118,15 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
 
             /* Check if impression for contact exists... */
             if ( isset( $_COOKIE[ 'gh_ref_id' ] ) ){
+
                 $ref_id = sanitize_key( $_COOKIE[ 'gh_ref_id' ] );
+
             } else {
+
+                if ( ! wpgh_verify_ip() ){
+                    return self::ERROR_401( 'unverified_ip', 'Could not verify ip address.' );
+                }
+
                 $ref_id = uniqid( 'g' );
             }
 

@@ -652,7 +652,7 @@ class WPGH_Contacts_Page
 
         if ( isset( $_POST[ 'extrapolate_location' ] ) ){
             if ( $contact->extrapolate_location() ){
-                $this->notices->add('location_updated', sprintf(_x('Location updated.', 'notice', $email), 'groundhogg'), 'info');
+                $this->notices->add('location_updated', _x( 'Location updated.', 'notice', 'groundhogg' ), 'info');
             }
         }
 

@@ -210,7 +210,7 @@ var wpghEmailEditor;
         {
             $( "<button type='button' class='notice-dismiss'><span class='screen-reader-text'>Dismiss This Notice</span></button>" ).appendTo( '.is-dismissible' );
             $( '.notice-dismiss' ).on( 'click', function ( e ) {
-                $(this).parent().fadeOut( 500, function () {
+                $(this).parent().fadeOut( 100, function () {
                     $(this).remove();
                 } );
             } )

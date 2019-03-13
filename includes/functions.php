@@ -1342,3 +1342,31 @@ function wpgh_send_sms_notification( $sms_id, $contact_id_or_email, $time=0 )
 
     return false;
 }
+
+//add_filter( 'groundhogg/templates/emails', 'wpgh_add_my_custom_email_templates' );
+
+/**
+ * Include custom email templates
+ *
+ * @param $email_templates
+ * @return mixed
+ */
+function wpgh_add_my_custom_email_templates( $email_templates ){
+
+    $emails = WPGH()->emails->get_emails( [ 'is_template' => 1 ] );
+
+    foreach ( $emails as $email ){
+
+        $template = [
+            'title'          => $email->subject,
+            'description'    => $email->pre_header,
+            'content'        => $email->content,
+        ];
+
+        array_unshift( $email_templates, $template );
+
+    }
+
+    return $email_templates;
+
+}

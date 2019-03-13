@@ -34,7 +34,11 @@ class WPGH_Emails_Page
     {
 
         add_action( 'admin_menu', array( $this, 'register' ), $this->order );
+
+        /* Ajax functions */
         add_action( 'wp_ajax_gh_update_email', array( $this, 'update_email_ajax' ) );
+        add_action( 'wp_ajax_get_my_emails_search_results', array( $this, 'get_my_emails_search_results' ) );
+
         $this->notices = WPGH()->notices;
         if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_emails' ){
 
@@ -370,6 +374,8 @@ class WPGH_Emails_Page
             wp_die( WPGH()->roles->error( 'add_emails' ) );
         }
 
+        $args = [];
+
         if ( isset( $_POST[ 'email_template' ] ) ){
 
             include_once WPGH_PLUGIN_DIR . '/templates/email-templates.php';
@@ -378,12 +384,15 @@ class WPGH_Emails_Page
              * @var $email_templates array
              * @see /templates/email-templates.php
              */
-            $email_content = $email_templates[ $_POST[ 'email_template' ] ][ 'content' ];
+            $args[ 'content' ] = $email_templates[ $_POST[ 'email_template' ] ][ 'content' ];
+            $args[ 'subject' ] = $email_templates[ $_POST[ 'email_template' ] ][ 'title' ];
 
         } else if ( isset( $_POST[ 'email_id' ] ) ) {
 
             $email = WPGH()->emails->get( intval( $_POST['email_id'] ) );
-            $email_content = $email->content;
+            $args[ 'content' ] = $email->content;
+            $args[ 'subject' ] = sprintf( "%s - (copy)", $email->subject );
+            $args[ 'pre_header' ] = $email->pre_header;
 
         } else {
 
@@ -392,14 +401,10 @@ class WPGH_Emails_Page
 
         }
 
-        $email = array(
-            'content'   => $email_content,
-            'status'    => 'draft',
-            'author'    => get_current_user_id(),
-            'from_user' => get_current_user_id(),
-        );
+        $args[ 'author' ] = get_current_user_id();
+        $args[ 'from_user' ] = get_current_user_id();
 
-        $email_id = WPGH()->emails->add( $email );
+        $email_id = WPGH()->emails->add( $args );
 
         if ( ! $email_id ){
 
@@ -486,6 +491,8 @@ class WPGH_Emails_Page
         $args[ 'content' ] = $content;
 
         $args[ 'last_updated' ] = current_time( 'mysql' );
+
+        $args[ 'is_template' ] = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
 
         if ( WPGH()->emails->update( $id, $args ) ){
             $this->notices->add( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
@@ -683,5 +690,38 @@ class WPGH_Emails_Page
             </div>
             <?php
         }
+    }
+
+    /**
+     * Get search results
+     */
+    public function get_my_emails_search_results()
+    {
+
+        ob_start();
+
+        $emails = array_slice( WPGH()->emails->get_emails( [ 'search' => sanitize_text_field( stripslashes( $_POST[ 's' ] ) ) ] ), 0, 20 );
+
+        if ( empty( $emails ) ):
+            ?> <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php
+        else:
+        ?>
+        <?php foreach ( $emails as $email ): ?>
+            <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
+                <h2 class="hndle"><?php echo $email->subject; ?></h2>
+                <div class="inside">
+                    <p><?php echo empty( $email->pre_header )? __( 'Custom Email', 'groundhogg' ) :  $email->pre_header; ?></p>
+                    <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $email->ID; ?> " class="email-container postbox">
+                        <?php echo $email->content; ?>
+                    </div>
+                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email->ID; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+                </div>
+            </div>
+        <?php endforeach;
+
+        endif;
+
+        $response = [ 'html' => ob_get_clean() ];
+        wp_die( json_encode( $response ) );
     }
 }

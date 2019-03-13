@@ -62,7 +62,7 @@ do_action( 'wpgh_before_new_funnel' );
                 <p style="float: left"><?php _e( 'Search for templates from our marketplace.', 'groundhogg' ); ?></p>
                 <p style="float: right" class="description"><?php _e( 'Want to share your funnel with the world? <a target="_blank" href="https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/">Get Started Now!</a>', 'groundhogg' ); ?></p>
                 <form class="search-form" method="get">
-                    <input type="text" id="search_funnel" placeholder="<?php esc_attr_e( 'Type in a search term like <i>Webinar</i>...', 'groundhogg' ) ;?>"  class="wp-filter-search" />
+                    <input type="text" id="search_funnel" placeholder="<?php esc_attr_e( 'Type in a search term like Webinar...', 'groundhogg' ) ;?>"  class="wp-filter-search" />
                 </form>
             </div>
         </div>

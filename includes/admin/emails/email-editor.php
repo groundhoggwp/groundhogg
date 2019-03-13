@@ -49,6 +49,16 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
             </div>
             <div class="status-options">
                 <div id="status">
+                    <div id="template-save" style="margin: 3px 10px 0 0;">
+                        <?php echo WPGH()->html->checkbox( [
+                            'label'         => __( 'Save as template', 'groundhogg' ),
+                            'name'          => 'save_as_template',
+                            'id'            => 'save_as_template',
+                            'class'         => '',
+                            'value'         => '1',
+                            'checked'       => $email->is_template(),
+                        ] ); ?>
+                    </div>
                     <div id="editor-toggle-switch" class="onoffswitch" style="text-align: left">
                         <input type="checkbox" name="editor_view" class="onoffswitch-checkbox" value="ready" id="editor-toggle">
                         <label class="onoffswitch-label" for="editor-toggle">
@@ -92,12 +102,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                         <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo esc_attr( $email->pre_header ); ?>" id="pre_header" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
-                <!-- RETURN PATH NOTICE-->
-                <?php if ( isset( $_REQUEST['return_funnel'] ) ): ?>
-                    <div class="notice notice-info is-dismissible">
-                        <p><a href="<?php echo admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $_REQUEST['return_funnel'] . '#' . $_REQUEST['return_step'] ); ?>"><?php  _e( '&larr; Back to editing funnel' ); ?></a></p>
-                    </div>
-                <?php endif; ?>
+
                 <!-- /RETURN PATH -->
                 <div id="notices">
 

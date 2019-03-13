@@ -119,6 +119,11 @@ class WPGH_Email
     public $event;
 
     /**
+     * @var bool;
+     */
+    public $is_template;
+
+    /**
      * The template to use
      *
      * @var
@@ -182,6 +187,10 @@ class WPGH_Email
 
         }
 
+        if ( intval( $email->is_template ) ){
+            $this->is_template = true;
+        }
+
         // Id and subject must exist.
         if (!empty($this->ID) && !empty($this->subject)) {
             return true;
@@ -191,6 +200,17 @@ class WPGH_Email
 
     }
 
+    /**
+     * @return bool
+     */
+    public function is_template()
+    {
+        return (bool) $this->is_template;
+    }
+
+    /**
+     * @return bool
+     */
     public function exists()
     {
         return $this->ID > 0;
