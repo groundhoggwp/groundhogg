@@ -38,8 +38,8 @@ abstract class WPGH_API_V2_BASE {
             return new WP_Error( 'api_unavailable', 'The api has been disabled by the administrator.', [ 'status' => 403 ] );
         }
 
-        $token = $request->get_header( 'GH_TOKEN' );
-        $key = $request->get_header( 'GH_PUBLIC_KEY' );
+        $token = $request->get_header( 'gh_token' );
+        $key = $request->get_header( 'gh_public_key' );
 
         if ( ! $token || ! $key ){
             $token = $request->get_param( 'token' );

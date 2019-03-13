@@ -37,7 +37,23 @@ class WPGH_API_V3_EMAILS extends WPGH_API_V3_BASE
                 'args' => [
                     'query' => [
                         'description' => _x( 'Any search parameters.', 'api', 'groundhogg' )
-                    ]
+                    ],
+                    'select' => [
+                        'required'    => false,
+                        'description' => _x( 'Whether to retrieve as available for a select input.', 'api', 'groundhogg' ),
+                    ],
+                    'select2' => [
+                        'required'    => false,
+                        'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
+                    ],
+                    'search' => [
+                        'required'    => false,
+                        'description' => _x( 'Search string for tag name.', 'api', 'groundhogg' ),
+                    ],
+                    'q' => [
+                        'required'    => false,
+                        'description' => _x( 'Shorthand for search.', 'api', 'groundhogg' ),
+                    ],
                 ]
             ]
         ] );
@@ -76,16 +92,47 @@ class WPGH_API_V3_EMAILS extends WPGH_API_V3_BASE
             return self::ERROR_INVALID_PERMISSIONS();
         }
 
-        $query = (array) $request->get_param( 'query' );
+        $query =  $request->get_param( 'query' ) ? (array) $request->get_param( 'query' ) : [];
 
-        if ( empty( $query ) ){
-            $query = [];
+        $search = $request->get_param( 'q' ) ? $request->get_param( 'q' ) : $request->get_param( 'search' ) ;
+        $search = sanitize_text_field( stripslashes( $search ) );
+
+        if ( ! key_exists( 'search', $query ) && ! empty( $search ) ){
+            $query[ 'search' ] = $search;
         }
+
+        $is_for_select = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
+        $is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 
         $emails = WPGH()->emails->get_emails( $query );
 
-        if ( empty( $emails ) ){
-            return self::ERROR_404( 'no_emails', 'No emails matched the provided query.' );
+        if ( $is_for_select2 ){
+            $json = array();
+
+            foreach ( $emails as $i => $email ) {
+
+                $json[] = array(
+                    'id' => $email->ID,
+                    'text' => $email->subject . ' (' . $email->status . ')'
+                );
+
+            }
+
+            $results = array( 'results' => $json, 'more' => false );
+
+            return rest_ensure_response( $results );
+        }
+
+        if ( $is_for_select ){
+
+            $response_emails = [];
+
+            foreach ( $emails as $i => $email ) {
+                $response_emails[ $email->ID ] = $email->subject;
+            }
+
+            $emails = $response_emails;
+
         }
 
         return self::SUCCESS_RESPONSE( [ 'emails' => $emails ] );

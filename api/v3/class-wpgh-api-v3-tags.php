@@ -34,6 +34,24 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_tags' ],
                 'permission_callback' => $auth_callback,
+                'args'=> [
+                    'select' => [
+                        'required'    => false,
+                        'description' => _x( 'Whether to retrieve as available for a select input.', 'api', 'groundhogg' ),
+                    ],
+                    'select2' => [
+                        'required'    => false,
+                        'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
+                    ],
+                    'search' => [
+                        'required'    => false,
+                        'description' => _x( 'Search string for tag name.', 'api', 'groundhogg' ),
+                    ],
+                    'q' => [
+                        'required'    => false,
+                        'description' => _x( 'Shorthand for search.', 'api', 'groundhogg' ),
+                    ],
+                ]
             ],
             [
                 'methods' => WP_REST_Server::CREATABLE,
@@ -130,11 +148,44 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
      */
     public function get_tags(WP_REST_Request $request)
     {
-        if ( ! current_user_can( 'edit_tags' ) ){
+        if ( ! current_user_can( 'manage_tags' ) ){
             return self::ERROR_INVALID_PERMISSIONS();
         }
 
-        $tags = WPGH()->tags->get_tags_select();
+        $search = $request->get_param( 'q' ) ? $request->get_param( 'q' ) : $request->get_param( 'search' ) ;
+        $search = sanitize_text_field( stripslashes( $search ) );
+
+        $is_for_select = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
+        $is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
+
+        $tags = WPGH()->tags->search( $search );
+
+        if ( $is_for_select2 ){
+            $json = array();
+
+            foreach ( $tags as $i => $tag ) {
+                $json[] = array(
+                    'id' => $tag->tag_id,
+                    'text' => sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count )
+                );
+            }
+
+            $results = array( 'results' => $json, 'more' => false );
+
+            return rest_ensure_response( $results );
+        }
+
+        if ( $is_for_select ){
+
+            $response_tags = [];
+
+            foreach ( $tags as $i => $tag ) {
+                $response_tags[ $tag->tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
+            }
+
+            $tags = $response_tags;
+
+        }
 
         return self::SUCCESS_RESPONSE( [ 'tags' => $tags ] );
     }

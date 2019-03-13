@@ -109,6 +109,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.2.4 =
 * ADDED Updated API methods v3.
+* TWEAKED API only loads when wp_rest_init is invoked rather than loading all of the classes ahead of time.
 * TWEAKED API Errors now have more revealing HTTP response codes.
 * TWEAKED Frontend tracking script now uses the REST API instead of admin-ajax.php for better performance.
 

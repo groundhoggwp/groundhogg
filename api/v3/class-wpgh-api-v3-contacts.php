@@ -38,7 +38,23 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
                     'query' => [
                         'required' => false,
                         'description' => _x( 'An array of query args. See WPGH_Contact_Query for acceptable arguments.', 'api', 'groundhogg' ),
-                    ]
+                    ],
+                    'select' => [
+                        'required'    => false,
+                        'description' => _x( 'Whether to retrieve as available for a select input.', 'api', 'groundhogg' ),
+                    ],
+                    'select2' => [
+                        'required'    => false,
+                        'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
+                    ],
+                    'search' => [
+                        'required'    => false,
+                        'description' => _x( 'Search string for tag name.', 'api', 'groundhogg' ),
+                    ],
+                    'q' => [
+                        'required'    => false,
+                        'description' => _x( 'Shorthand for search.', 'api', 'groundhogg' ),
+                    ],
                 ]
             ],
             [
@@ -231,17 +247,63 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             return self::SUCCESS_RESPONSE( [ 'contact' => $this->get_contact_for_rest_response( $contact->ID ) ] );
         }
 
-        $query = $request->get_param( 'query' ) ? (array) $request->get_param( 'query' ) : [];
+        $query =  $request->get_param( 'query' ) ? (array) $request->get_param( 'query' ) : [];
+
+        $search = $request->get_param( 'q' ) ? $request->get_param( 'q' ) : $request->get_param( 'search' ) ;
+        $search = sanitize_text_field( stripslashes( $search ) );
+
+        if ( ! key_exists( 'search', $query ) && ! empty( $search ) ){
+            $query[ 'search' ] = $search;
+        }
+
+        $is_for_select = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
+        $is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
+
         $contact_query = new WPGH_Contact_Query();
         $contacts = $contact_query->query( $query );
 
-        $response = [];
+        if ( $is_for_select2 ){
+            $json = array();
 
-        foreach ( $contacts as $contact ) {
-            $response[ $contact->ID ] = $this->get_contact_for_rest_response( $contact->ID );
+            foreach ( $contacts as $i => $contact ) {
+
+                $json[] = array(
+                    'id' => $contact->ID,
+                    'text' => sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email )
+                );
+
+            }
+
+            $results = array( 'results' => $json, 'more' => false );
+
+            return rest_ensure_response( $results );
         }
 
-        return self::SUCCESS_RESPONSE( [ 'contacts' => $response ] );
+        if ( $is_for_select ){
+
+            $response_contacts = [];
+
+            foreach ( $contacts as $i => $contact ) {
+                $response_contacts[ $contact->ID ] = sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email );
+            }
+
+            $contacts = $response_contacts;
+
+        }
+
+        else {
+
+            $response_contacts = [];
+
+            foreach ( $contacts as $contact ) {
+                $response_contacts[ $contact->ID ] = $this->get_contact_for_rest_response( $contact->ID );
+            }
+
+            $contacts = $response_contacts;
+        }
+
+
+        return self::SUCCESS_RESPONSE( [ 'contacts' => $contacts ] );
     }
 
     /**
