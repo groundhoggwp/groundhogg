@@ -26,14 +26,17 @@ abstract class WPGH_API_V2_BASE {
     public function __construct()
     {
         //initialize api if user check the api section
-        add_action('rest_api_init', array( $this, 'register_routes' ) );
+        add_action('groundhogg/api/v2/init', array( $this, 'register_routes' ) );
     }
 
     abstract public function register_routes();
 
     public function rest_authentication( WP_REST_Request $request )
     {
-        // validate user and set user id for contact operations..
+        /* Check if the API is enabled... */
+        if ( ! wpgh_is_option_enabled( 'gh_enable_api' ) ){
+            return new WP_Error( 'api_unavailable', 'The api has been disabled by the administrator.', [ 'status' => 403 ] );
+        }
 
         $token = $request->get_header( 'GH_TOKEN' );
         $key = $request->get_header( 'GH_PUBLIC_KEY' );
@@ -69,9 +72,6 @@ abstract class WPGH_API_V2_BASE {
             return new WP_Error( 'error',_x( 'Please enter a API valid token and public key.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
 
         }
-
-        $request->set_param( 'token', '*****' . substr( $token, strlen( $token ) - 5 ) );
-        $request->set_param( 'key', '*****' . substr( $key, strlen( $key ) - 5 ) );
 
 
         return true;

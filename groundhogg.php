@@ -288,7 +288,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 	             * Replaced Queue with Queue V2 @since 1.0.18
 	             */
                 self::$instance->event_queue  = new WPGH_Event_Queue_V2();
-//                self::$instance->event_queue  = new WPGH_Event_Queue();
 
                 self::$instance->replacements = new WPGH_Replacements();
                 self::$instance->notices      = new WPGH_Notices();
@@ -310,11 +309,8 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                     }
                 }
 
+                self::$instance->api = new WPGH_API_LOADER();
                 self::$instance->stats = new WPGH_Stats_Collection();
-
-                if ( wpgh_is_option_enabled( 'gh_enable_api' ) ){
-                    self::$instance->api = new WPGH_API_V2();
-                }
 
                 self::$instance->register_blocks();
                 self::$instance->register_integrations();
@@ -497,7 +493,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/gutenberg.php';
 
             /* API */
-            require_once WPGH_PLUGIN_DIR . 'api/v2/class-wpgh-api-v3.php';
+            require_once WPGH_PLUGIN_DIR . 'api/class-wpgh-api-loader.php';
 
             /* Install */
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';

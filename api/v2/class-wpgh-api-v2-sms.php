@@ -23,12 +23,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class WPGH_API_V2_SMS extends WPGH_API_V2_BASE
 {
-    public function __construct()
-    {
-        //initialize api if user check the api section
-        add_action('rest_api_init', array( $this, 'register_routes' ) );
-    }
-
     public function register_routes()
     {
         register_rest_route('gh/v2', '/sms', array(

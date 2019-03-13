@@ -108,6 +108,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.2.4 =
+* ADDED Updated API methods v3.
 * TWEAKED API Errors now have more revealing HTTP response codes.
 * TWEAKED Frontend tracking script now uses the REST API instead of admin-ajax.php for better performance.
 

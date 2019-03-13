@@ -26,11 +26,14 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
 
     public function register_routes()
     {
+
+        $auth_callback = $this->get_auth_callback();
+
         register_rest_route('gh/v3', '/contacts', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_contacts' ],
-                'permission_callback' => [ $this, 'auth' ],
+                'permission_callback' => $auth_callback,
                 'args'=> [
                     'query' => [
                         'required' => false,
@@ -41,7 +44,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             [
                 'methods' => WP_REST_Server::CREATABLE,
                 'callback' => [ $this, 'create_contact' ],
-                'permission_callback' => [ $this, 'auth' ],
+                'permission_callback' => $auth_callback,
                 'args'=> [
                     'contact' => [
                         'required'    => true,
@@ -52,7 +55,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'update_contact' ],
-                'permission_callback' => [ $this, 'auth' ],
+                'permission_callback' => $auth_callback,
                 'args'=> [
                     'id_or_email' => [
                         'required'    => true,
@@ -71,7 +74,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             [
                 'methods' => WP_REST_Server::DELETABLE,
                 'callback' => [ $this, 'delete_contact' ],
-                'permission_callback' => [ $this, 'auth' ],
+                'permission_callback' => $auth_callback,
                 'args'=> [
                     'id_or_email' => [
                         'required'    => false,
@@ -84,6 +87,106 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
                 ]
             ],
         ] );
+
+        register_rest_route('gh/v3', '/contacts/tags', [
+            [
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => [ $this, 'get_tags' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'id_or_email' => [
+                        'required'    => true,
+                        'description' => _x('The ID or email of the contact you want to apply tags to.','api','groundhogg'),
+                    ],
+                    'by_user_id' => [
+                        'required'    => false,
+                        'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
+                    ],
+                ]
+            ],
+            [
+                'methods' => WP_REST_Server::EDITABLE,
+                'callback' => [ $this, 'apply_tags' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'id_or_email' => [
+                        'required'    => true,
+                        'description' => _x('The ID or email of the contact you want to apply tags to.','api','groundhogg'),
+                    ],
+                    'by_user_id' => [
+                        'required'    => false,
+                        'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
+                    ],
+                    'tags' => [
+                        'required'    => true,
+                        'description' => _x( 'Array of tag names or tag ids.', 'api', 'groundhogg' ),
+                    ]
+                ]
+            ],
+            [
+                'methods' => WP_REST_Server::DELETABLE,
+                'callback' => [ $this, 'remove_tags' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'id_or_email' => [
+                        'required'    => true,
+                        'description' => _x('The ID or email of the contact you want to remove tags from.','api','groundhogg'),
+                    ],
+                    'by_user_id' => [
+                        'required'    => false,
+                        'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
+                    ],
+                    'tags' => [
+                        'required'    => true,
+                        'description' => _x( 'Array of tag names or tag ids.', 'api', 'groundhogg' ),
+                    ]
+                ]
+            ]
+        ]);
+
+        register_rest_route('gh/v3', '/contacts/apply_tags', [
+            [
+                'methods' => WP_REST_Server::EDITABLE,
+                'callback' => [ $this, 'apply_tags' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'id_or_email' => [
+                        'required'    => true,
+                        'description' => _x('The ID or email of the contact you want to apply tags to.','api','groundhogg'),
+                    ],
+                    'by_user_id' => [
+                        'required'    => false,
+                        'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
+                    ],
+                    'tags' => [
+                        'required'    => true,
+                        'description' => _x( 'Array of tag names or tag ids.', 'api', 'groundhogg' ),
+                    ]
+                ]
+            ]
+        ]);
+
+        register_rest_route('gh/v3', '/contacts/remove_tags', [
+            [
+                'methods' => WP_REST_Server::EDITABLE,
+                'callback' => [ $this, 'remove_tags' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'id_or_email' => [
+                        'required'    => true,
+                        'description' => _x('The ID or email of the contact you want to remove tags from.','api','groundhogg'),
+                    ],
+                    'by_user_id' => [
+                        'required'    => false,
+                        'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
+                    ],
+                    'tags' => [
+                        'required'    => true,
+                        'description' => _x( 'Array of tag names or tag ids.', 'api', 'groundhogg' ),
+                    ]
+                ]
+            ]
+        ]);
 
     }
 
@@ -125,7 +228,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
                 return $contact;
             }
 
-            return rest_ensure_response( $this->get_contact_for_rest_response( $contact->ID ) );
+            return self::SUCCESS_RESPONSE( [ 'contact' => $this->get_contact_for_rest_response( $contact->ID ) ] );
         }
 
         $query = $request->get_param( 'query' ) ? (array) $request->get_param( 'query' ) : [];
@@ -138,7 +241,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             $response[ $contact->ID ] = $this->get_contact_for_rest_response( $contact->ID );
         }
 
-        return rest_ensure_response( $response );
+        return self::SUCCESS_RESPONSE( [ 'contacts' => $response ] );
     }
 
     /**
@@ -178,11 +281,9 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
 
         $contact = $this->get_contact_for_rest_response( $contact_id->ID );
 
-        return rest_ensure_response(array(
-            'status'  => 'success',
-            'message' => _x('Contact added successfully.', 'api', 'groundhogg'),
+        return self::SUCCESS_RESPONSE( [
             'contact' => $contact
-        ));
+        ], _x( 'Contact added successfully.', 'api', 'groundhogg' ) );
 
     }
 
@@ -243,11 +344,9 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
 
         $contact = $this->get_contact_for_rest_response( $contact->ID );
 
-        return rest_ensure_response(array(
-            'status'  => 'success',
-            'message' => _x('Contact updated successfully.', 'api', 'groundhogg'),
+        return self::SUCCESS_RESPONSE( [
             'contact' => $contact
-        ));
+        ], _x('Contact updated successfully.', 'api', 'groundhogg') );
     }
 
     /**
@@ -274,10 +373,90 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             return self::ERROR_UNKNOWN();
         }
 
-        return rest_ensure_response( [
-            'status'  => 'success',
-            'message' => _x('Contact deleted successfully.', 'api', 'groundhogg'),
-        ] );
+        return self::SUCCESS_RESPONSE( [], _x('Contact deleted successfully.', 'api', 'groundhogg') );
+
+    }
+
+    /**
+     * Get list of tag IDs that a contact has.
+     *
+     * @param WP_REST_Request $request
+     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     */
+    public function get_tags( WP_REST_Request $request  )
+    {
+        if ( ! current_user_can( 'view_contacts' ) ) {
+            return self::ERROR_INVALID_PERMISSIONS();
+        }
+
+        $contact = self::get_contact_from_request( $request );
+
+        if ( is_wp_error( $contact ) ){
+            return $contact;
+        }
+
+        return self::SUCCESS_RESPONSE( [ 'tags' => $contact->tags ] );
+    }
+
+    /**
+     * Apply tags to a contact
+     *
+     * @param WP_REST_Request $request
+     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     */
+    public function apply_tags( WP_REST_Request $request )
+    {
+
+        if ( ! current_user_can( 'edit_contacts' ) ) {
+            return self::ERROR_INVALID_PERMISSIONS();
+        }
+
+        $contact = self::get_contact_from_request( $request );
+
+        if( is_wp_error( $contact ) ) {
+            return $contact;
+        }
+
+        $tag_names = $request->get_param( 'tags' );
+
+        if ( empty( $tag_names ) ){
+            return self::ERROR_400( 'invalid_tag_names', 'An array of tags is required.' );
+        }
+
+        $contact->apply_tag( $tag_names );
+
+        return self::SUCCESS_RESPONSE();
+
+    }
+
+    /**
+     * Remove tags from a contact
+     *
+     * @param WP_REST_Request $request
+     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     */
+    public function remove_tags( WP_REST_Request $request )
+    {
+
+        if ( ! current_user_can( 'edit_contacts' ) ) {
+            return self::ERROR_INVALID_PERMISSIONS();
+        }
+
+        $contact = self::get_contact_from_request( $request );
+
+        if( is_wp_error( $contact ) ) {
+            return $contact;
+        }
+
+        $tag_names = $request->get_param( 'tags' );
+
+        if ( empty( $tag_names ) ){
+            return self::ERROR_400( 'invalid_tag_names', 'An array of tags is required.' );
+        }
+
+        $contact->remove_tag( $tag_names );
+
+        return self::SUCCESS_RESPONSE();
 
     }
 

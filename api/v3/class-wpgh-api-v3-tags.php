@@ -15,204 +15,277 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * WPGH_API_V2_CONTACTS Class
+ * WPGH_API_V3_TAGS Class
  *
  * Renders API returns as a JSON
  *
  * @since  1.5
  */
-class WPGH_API_V2_TAGS extends WPGH_API_V2_BASE
+class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
 {
-    public function __construct()
-    {
-        //initialize api if user check the api section
-        add_action('rest_api_init', array( $this, 'register_routes' ) );
-    }
 
     public function register_routes()
     {
-        register_rest_route('gh/v2', '/tags', array(
-            array(
-                // By using this constant we ensure that when the WP_REST_Server changes, our readable endpoints will work as intended.
+
+        $auth_callback = $this->get_auth_callback();
+
+        register_rest_route('gh/v3', '/tags', [
+            [
                 'methods' => WP_REST_Server::READABLE,
-                // Here we register our callback. The callback is fired when this endpoint is matched by the WP_REST_Server class.
-                'callback' => array($this, 'get_tags'),
-                'permission_callback' => array($this, 'rest_authentication'),
-                'args'=> array(
-                    'tags_id' => array(
-                        'required'    => false,
-                        'description' => _x( 'The ID of tag to retrieve.', 'api', 'groundhogg' ),
-                    )
-                )
-            ),
-            array(
+                'callback' => [ $this, 'get_tags' ],
+                'permission_callback' => $auth_callback,
+            ],
+            [
                 'methods' => WP_REST_Server::CREATABLE,
-                'callback' => array($this, 'create_tags'),
-                'permission_callback' => array($this, 'rest_authentication'),
-                'args'=> array(
-                    'tags' => array(
+                'callback' => [ $this, 'create_tags' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'tags' => [
                         'required'    => true,
                         'description' => _x( 'Array of tag names.', 'api', 'groundhogg' ),
-                    )
-                )
-            ),
-            array(
+                    ]
+                ]
+            ],
+            [
                 'methods' => WP_REST_Server::DELETABLE,
-                'callback' => array($this, 'delete_tags'),
-                'permission_callback' => array($this, 'rest_authentication'),
-                'args'=> array(
-                    'tag_id' => array(
+                'callback' => [ $this, 'delete_tag' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'tag_id' => [
                         'required'    => true,
                         'description' => _x( 'The ID of the tag to delete.', 'api', 'groundhogg' ),
-                    )
-                )
-            ),
-            array(
-                'methods' => 'PUT, PATCH',
-                'callback' => array($this, 'update_tags'),
-                'permission_callback' => array($this, 'rest_authentication'),
-                'args'=> array(
-                    'tags' => array(
+                    ]
+                ]
+            ],
+            [
+                'methods' => WP_REST_Server::EDITABLE,
+                'callback' => [ $this, 'update_tag' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'tag_id' => [
                         'required'    => true,
                         'description' => _x( 'Contains array of tags to update.', 'api', 'groundhogg' ),
-                    )
-                )
-            ),
-        ));
+                    ],
+                    'tag_name' => [
+                        'description' => _x( 'The new name of the tag.', 'api', 'groundhogg' ),
+                    ],
+                    'tag_description' => [
+                        'description' => _x( 'the new description of the tag.', 'api', 'groundhogg' ),
+                    ]
+                ]
+            ],
+        ] );
+
+        register_rest_route('gh/v3', '/tags/apply', [
+            [
+                'methods' => WP_REST_Server::EDITABLE,
+                'callback' => [ $this, 'apply_tags' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'id_or_email' => [
+                        'required'    => true,
+                        'description' => _x('The ID or email of the contact you want to apply tags to.','api','groundhogg'),
+                    ],
+                    'by_user_id' => [
+                        'required'    => false,
+                        'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
+                    ],
+                    'tags' => [
+                        'required'    => true,
+                        'description' => _x( 'Array of tag names or tag ids.', 'api', 'groundhogg' ),
+                    ]
+                ]
+            ]
+        ]);
+
+        register_rest_route('gh/v3', '/tags/remove', [
+            [
+                'methods' => WP_REST_Server::EDITABLE,
+                'callback' => [ $this, 'remove_tags' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'id_or_email' => [
+                        'required'    => true,
+                        'description' => _x('The ID or email of the contact you want to remove tags from.','api','groundhogg'),
+                    ],
+                    'by_user_id' => [
+                        'required'    => false,
+                        'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
+                    ],
+                    'tags' => [
+                        'required'    => true,
+                        'description' => _x( 'Array of tag names or tag ids.', 'api', 'groundhogg' ),
+                    ]
+                ]
+            ]
+        ]);
 
     }
 
-    //GET METHOD
+    /**
+     * Get all the tags
+     *
+     * @param WP_REST_Request $request
+     * @return WP_Error|WP_REST_Response
+     */
     public function get_tags(WP_REST_Request $request)
     {
-        if ( ! user_can( $request['wpgh_user_id'], 'edit_tags' ) ){
-            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
+        if ( ! current_user_can( 'edit_tags' ) ){
+            return self::ERROR_INVALID_PERMISSIONS();
         }
-        $tag_id = null;
-        $tags = null;
-        if (isset ($request['tag_id'])) {
-            $tag_id = intval( $request['tag_id'] );
-            if ( !( WPGH()->tags->get_tag( $tag_id ) === false) ) {
-                $tags = WPGH()->tags->get_tag( $tag_id );
-            } else {
-                return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
-            }
-        } else {
-            $tags = WPGH()->tags->get_tags();
-        }
-        if ( $tags != null ) {
-            return rest_ensure_response( array( 'tags' => $tags ) );
-        } else {
-            return new WP_Error('error', _x( 'No tags found.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
-        }
+
+        $tags = WPGH()->tags->get_tags_select();
+
+        return self::SUCCESS_RESPONSE( [ 'tags' => $tags ] );
     }
 
-    //POST METHOD
+    /**
+     * Created tags
+     *
+     * @param WP_REST_Request $request
+     * @return WP_Error|WP_REST_Response
+     */
     public function create_tags(WP_REST_Request $request)
     {
-        if ( ! user_can( $request['wpgh_user_id'], 'add_tags' ) ){
-            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
+        if ( ! current_user_can( 'add_tags' ) ){
+            return self::ERROR_INVALID_PERMISSIONS();
         }
-        $parameters = $request->get_json_params();
-        if ( isset ( $parameters['tags'] ) ) {
-            $tags = array_map('sanitize_text_field', $parameters['tags'] );
-            $insert_count = 0;
-            foreach ($tags as $tag)
-            {
-                $desc =  '';
-                if ( isset( $tag['tag_name'] ) ) {
-                    // check tag_name is set or not
-                    if ( isset( $tag['tag_description'] ) ) {
-                        //chcek for description
-                        $desc  = sanitize_text_field( $tag['tag_description'] ) ;
-                        $id = WPGH()->tags->add( array(
-                            'tag_name' => sanitize_text_field( $tag['tag_name'] ),
-                            'tag_description' => $desc
-                        ) );
-                        $insert_count ++;
-                    } else {
-                        $id = WPGH()->tags->add( array(
-                            'tag_name' => sanitize_text_field( $tag['tag_name'] )
-                        ) );
-                        $insert_count ++;
-                    }
-                }
-            }
-            if ( $insert_count > 0 ) {
-                return rest_ensure_response(array(
-                    'code' => 'success',
-                    'message' => sprintf( __( '%d tags added successfully.','groundhogg' ), $insert_count )
-                ));
-            }
-        } else {
-            return new WP_Error('error', _x( 'Please enter tags.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
+
+        $tag_names = $request->get_param( 'tags' );
+
+        if ( empty( $tag_names ) ){
+            return self::ERROR_400( 'invalid_tag_names', 'An array of tags is required.' );
         }
+
+        $tag_ids = WPGH()->tags->validate( $tag_names );
+
+        $response_tags = [];
+
+        foreach ( $tag_ids as $tag_id ){
+            $response_tags[ $tag_id ] = WPGH()->tags->get_column_by( 'tag_name', 'tag_id', $tag_id );
+        }
+
+        return self::SUCCESS_RESPONSE( [ 'tags' => $response_tags ] );
     }
 
-    //PUT METHOD
-    public function update_tags(WP_REST_Request $request)
+    /**
+     * Update a tag
+     *
+     * @param WP_REST_Request $request
+     * @return WP_Error|WP_REST_Response
+     */
+    public function update_tag(WP_REST_Request $request)
     {
-        if ( ! user_can( $request['wpgh_user_id'], 'edit_tags' ) ){
-            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
+        if ( ! current_user_can( 'edit_tags' ) ){
+            return self::ERROR_INVALID_PERMISSIONS();
         }
-        $parameters = $request->get_json_params();
-        if ( isset ( $parameters['tags'] ) ) {
-            if( isset( $parameters['tags']['tag_id'] ) )  {
-                if ( !( WPGH()->tags->get_tag( $parameters['tags']['tag_id'] ) === false ) ) {
-                    if( isset( $parameters['tags']['tag_name'] ) ){
-                        $result  = WPGH()->tags->update( intval( $parameters['tags']['tag_id'] ) , array(
-                            'tag_name' => sanitize_text_field( $parameters['tags']['tag_name'] ),
-                        ) );
-                    }
-                    if( isset( $parameters['tags']['tag_description'] ) ) {
-                        $result  = WPGH()->tags->update( intval( $parameters['tags']['tag_id'] ) , array(
-                            'tag_description' => sanitize_text_field( $parameters['tags']['tag_description'] ),
-                        ) );
-                    }
-                    if( $result ){
-                        return rest_ensure_response(array(
-                            'code' => 'success',
-                            'message' => _x( 'Tag updated successfully.', 'api', 'groundhogg' )
-                        ));
-                    } else {
-                        return new WP_Error('error', _x( 'Something went wrong', 'api', 'groundhogg' ), [ 'status' => 500 ]);
-                    }
-                } else {
-                    return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
-                }
-            } else {
-                return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
-            }
-        } else {
-            return new WP_Error('error', _x( 'Please provide a valid array of tags.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
+
+        $tag_id = intval( $request->get_param( 'tag_id' ) );
+        $tag_name = sanitize_text_field( $request->get_param( 'tag_name' ) );
+        $tag_description = sanitize_text_field( $request->get_param( 'tag_description' ) );
+
+        if ( ! $tag_id || ! $tag_name ){
+            return self::ERROR_400( 'invalid_tag_params', 'Please provide proper arguments.' );
         }
+
+        $args = array(
+            'tag_name'          => $tag_name,
+            'tag_slug'          => sanitize_title( $tag_name ),
+            'tag_description'   => $tag_description,
+        );
+
+        if ( ! WPGH()->tags->update( $tag_id, $args ) ){
+            return self::ERROR_UNKNOWN();
+        }
+
+        return self::SUCCESS_RESPONSE();
+
     }
 
-    //DELETE METHOD
-    public function delete_tags( WP_REST_Request $request)
-    {// function invoked if user wants to delete one contact
-        if ( ! user_can( $request['wpgh_user_id'], 'delete_tags' ) ){
-            return new WP_Error('error', _x( 'You are not eligible to perform this operation.', 'api', 'groundhogg' ), [ 'status' => 401 ] );
+    /**
+     * Delete a tag
+     *
+     * @param WP_REST_Request $request
+     * @return WP_Error|WP_REST_Response
+     */
+    public function delete_tag( WP_REST_Request $request)
+    {
+        if ( ! current_user_can( 'delete_tags' ) ){
+            return self::ERROR_INVALID_PERMISSIONS();
         }
-        if( isset( $request['tag_id'] ) ) {
-            $tag_id = intval( $request['tag_id'] );
-            // ----------- code to delete contact
-            if ( !( WPGH()->tags->get_tag( $tag_id ) === false) ) {
-                if ( WPGH()->tags->delete( $tag_id ) ) {
-                    return rest_ensure_response( array(
-                        'code' => 'success',
-                        'message' => _x( 'Tag deleted successfully.', 'api', 'groundhogg' )
-                    ));
-                } else {
-                    return new WP_Error('error', _x( 'Something went wrong', 'api', 'groundhogg' ), [ 'status' => 500 ] );
-                }
-            } else {
 
-                return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
-            }
-        } else {
-            return new WP_Error('error', _x( 'Please provide a valid tag ID.', 'api', 'groundhogg' ), [ 'status' => 400 ] );
+        $tag_id = intval( $request->get_param( 'tag_id' ) );
+
+        if ( ! $tag_id ){
+            return self::ERROR_400( 'invalid_tag_params', 'Please provide proper arguments.' );
         }
+
+        if ( ! WPGH()->tags->delete( $tag_id ) ){
+            return self::ERROR_UNKNOWN();
+        }
+
+        return self::SUCCESS_RESPONSE();
+    }
+
+    /**
+     * Apply tags to a contact
+     *
+     * @param WP_REST_Request $request
+     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     */
+    public function apply_tags( WP_REST_Request $request )
+    {
+
+        if ( ! current_user_can( 'edit_contacts' ) ) {
+            return self::ERROR_INVALID_PERMISSIONS();
+        }
+
+        $contact = self::get_contact_from_request( $request );
+
+        if( is_wp_error( $contact ) ) {
+            return $contact;
+        }
+
+        $tag_names = $request->get_param( 'tags' );
+
+        if ( empty( $tag_names ) ){
+            return self::ERROR_400( 'invalid_tag_names', 'An array of tags is required.' );
+        }
+
+        $contact->apply_tag( $tag_names );
+
+        return self::SUCCESS_RESPONSE();
+
+    }
+
+    /**
+     * Remove tags from a contact
+     *
+     * @param WP_REST_Request $request
+     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     */
+    public function remove_tags( WP_REST_Request $request )
+    {
+
+        if ( ! current_user_can( 'edit_contacts' ) ) {
+            return self::ERROR_INVALID_PERMISSIONS();
+        }
+
+        $contact = self::get_contact_from_request( $request );
+
+        if( is_wp_error( $contact ) ) {
+            return $contact;
+        }
+
+        $tag_names = $request->get_param( 'tags' );
+
+        if ( empty( $tag_names ) ){
+            return self::ERROR_400( 'invalid_tag_names', 'An array of tags is required.' );
+        }
+
+        $contact->remove_tag( $tag_names );
+
+        return self::SUCCESS_RESPONSE();
 
     }
 }

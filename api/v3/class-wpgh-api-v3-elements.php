@@ -15,61 +15,64 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * WPGH_API_V2_ELEMENTS Class
+ * WPGH_API_V3_ELEMENTS Class
  *
  * Renders API returns as a JSON
  *
  * @since  1.5
  */
-class WPGH_API_V2_ELEMENTS extends WPGH_API_V2_BASE
+class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
 {
 
     public function register_routes()
     {
-        register_rest_route('gh/v2', '/elements/page-view', array(
-            array(
-                // By using this constant we ensure that when the WP_REST_Server changes, our readable endpoints will work as intended.
+        register_rest_route('gh/v3', '/elements/page-view', [
+            [
                 'methods' => WP_REST_Server::EDITABLE,
-                // Here we register our callback. The callback is fired when this endpoint is matched by the WP_REST_Server class.
                 'callback' => array($this, 'page_view'),
-            )
-        ));
+            ]
+        ] );
 
-        register_rest_route('gh/v2', '/elements/form-impression', array(
-            array(
-                // By using this constant we ensure that when the WP_REST_Server changes, our readable endpoints will work as intended.
+        register_rest_route('gh/v3', '/elements/form-impression', [
+            [
                 'methods' => WP_REST_Server::EDITABLE,
-                // Here we register our callback. The callback is fired when this endpoint is matched by the WP_REST_Server class.
                 'callback' => array($this, 'form_impression'),
-            )
-        ));
-
-
-
+            ]
+        ] );
     }
 
+    /**
+     * Perform a page view action
+     *
+     * @param WP_REST_Request $request
+     * @return mixed|WP_Error|WP_REST_Response
+     */
     public function page_view( WP_REST_Request $request )
     {
         $contact = WPGH()->tracking->get_contact();
 
         if ( ! $contact ){
-            return new WP_Error( 'no_contact', 'No contact to track...', [ 'status' => 200 ] );
+            return self::ERROR_200( 'no_contact', 'No contact to track...' );
         }
 
         $ref = $request->get_param( 'ref' );
 
         if ( ! $ref ){
-            return new WP_Error( 'no_ref', 'Cannot track blank pages...', [ 'status' => 400 ]  );
+            return self::ERROR_400( 'no_ref', 'Cannot track blank pages...' );
         }
 
-        do_action( 'groundhogg/api/v2/elements/page-view', $ref, $contact );
+        do_action( 'groundhogg/api/v3/elements/page-view', $ref, $contact );
 
-        return rest_ensure_response( [
-            'status' => 'success'
-        ] );
+        return self::SUCCESS_RESPONSE();
 
     }
 
+    /**
+     * Log a form impressions for tracking purposes.
+     *
+     * @param WP_REST_Request $request
+     * @return mixed|WP_Error|WP_REST_Response
+     */
     public function form_impression( WP_REST_Request $request )
     {
         if( !class_exists( 'Browser' ) )
@@ -78,13 +81,13 @@ class WPGH_API_V2_ELEMENTS extends WPGH_API_V2_BASE
         $browser = new Browser();
 
         if ( $browser->isRobot() || $browser->isAol() ){
-            return new WP_Error( 'looks_lik_a_bot', 'Form impressions only track bots.', [ 'status' => 401 ]  );
+            return self::ERROR_401( 'looks_like_a_bot', 'Form impressions only track bots.' );
         }
 
         $ID = intval( $request->get_param( 'form_id' ) );
 
         if ( ! WPGH()->steps->exists( $ID ) ){
-            return new WP_Error( 'form_dne', 'The given form does not exist.', [ 'status' => 400 ] );
+            return self::ERROR_400( 'form_dne', 'The given form does not exist.' );
         }
 
         $step = new WPGH_Step( $ID );
@@ -135,17 +138,14 @@ class WPGH_API_V2_ELEMENTS extends WPGH_API_V2_BASE
         }
 
         if ( $db->activity_exists( $args ) ){
-            return new WP_Error( 'no_double_track', 'Unique views only.', [ 'status' => 200 ] );
+            return self::ERROR_200( 'no_double_track', 'Unique views only.' );
         }
 
 
         $args[ 'timestamp' ] = time();
         $db->add( $args );
 
-        $response[ 'status' ] = 'success';
-
-
-        return rest_ensure_response( $response );
+        return self::SUCCESS_RESPONSE( $response );
     }
 
 }

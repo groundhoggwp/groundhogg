@@ -54,9 +54,8 @@ class WPGH_API_V2
         $this->emails   = new WPGH_API_V2_EMAILS();
         $this->sms      = new WPGH_API_V2_SMS();
         $this->elements = new WPGH_API_V2_ELEMENTS();
-//        $this->debug    = new WPGH_API_V2_DEBUG();
 
-//        $this->load_extension_apis();
+        do_action( 'groundhogg/api/v2/init', $this );
 
     }
 
@@ -82,14 +81,6 @@ class WPGH_API_V2
     }
 
     /**
-     * Filter for extensions to add their implementations of the API class
-     */
-    private function load_extension_apis()
-    {
-        $this->extension_apis = apply_filters( 'wpgh_api_add_extension', $this->extension_apis );
-    }
-
-    /**
      * Include base files.
      */
     private function includes()
@@ -101,7 +92,6 @@ class WPGH_API_V2
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-emails.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-sms.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-api-v2-elements.php';
-//        include_once dirname( __FILE__ ) . '/class-wpgh-api-v3-debug.php';
 
         do_action( 'wpgh_api_include_extensions', $this );
 
