@@ -6,42 +6,13 @@
  * Time: 4:18 PM
  */
 
-class WPGH_API_V2
+class WPGH_API_V3
 {
-    /**
-     * @var WPGH_API_V2_CONTACTS
-     */
-    public $contacts;
 
     /**
-     * @var WPGH_API_V2_TAGS
+     * @var WPGH_API_V3_BASE[]
      */
-    public $tags;
-
-    /**
-     * @var WPGH_API_V2_EMAILS
-     */
-    public $emails;
-
-    /**
-     * @var WPGH_API_V2_SMS
-     */
-    public $sms;
-
-    /**
-     * @var WPGH_API_V2_DEBUG
-     */
-    public $debug;
-
-    /**
-     * @var WPGH_API_V2_ELEMENTS
-     */
-    public $elements;
-
-    /**
-     * @var WPGH_API_V2_BASE[]
-     */
-    public $extension_apis = array();
+    public $apis = [];
 
 
     public function __construct()
@@ -49,22 +20,31 @@ class WPGH_API_V2
 
         $this->includes();
 
-        $this->contacts = new WPGH_API_V2_CONTACTS();
-        $this->tags     = new WPGH_API_V2_TAGS();
-        $this->emails   = new WPGH_API_V2_EMAILS();
-        $this->sms      = new WPGH_API_V2_SMS();
-        $this->elements = new WPGH_API_V2_ELEMENTS();
-//        $this->debug    = new WPGH_API_V2_DEBUG();
+        do_action( 'groundhogg/api/v3/pre_init', $this );
 
-//        $this->load_extension_apis();
+        $this->declare_base_endpoints();
 
+        do_action( 'groundhogg/api/v3/init', $this );
+
+    }
+
+    /**
+     * Declare the initial endpoints.
+     */
+    public function declare_base_endpoints()
+    {
+        $this->contacts = new WPGH_API_V3_CONTACTS();
+        $this->tags     = new WPGH_API_V3_TAGS();
+        $this->emails   = new WPGH_API_V3_EMAILS();
+        $this->sms      = new WPGH_API_V3_SMS();
+        $this->elements = new WPGH_API_V3_ELEMENTS();
     }
 
     /**
      * Get API class
      *
      * @param $name
-     * @return mixed | WPGH_API_V2_BASE
+     * @return mixed | WPGH_API_V3_BASE
      */
     public function __get($name)
     {
@@ -72,9 +52,9 @@ class WPGH_API_V2
 
             return $this->$name;
 
-        } else if ( isset( $this->extension_apis[ $name ] ) ){
+        } else if ( isset( $this->apis[ $name ] ) ){
 
-            return $this->extension_apis[ $name ];
+            return $this->apis[ $name ];
 
         } else {
             return false;
@@ -82,11 +62,14 @@ class WPGH_API_V2
     }
 
     /**
-     * Filter for extensions to add their implementations of the API class
+     * Set extension apis
+     *
+     * @param $name
+     * @param $value
      */
-    private function load_extension_apis()
+    public function __set( $name, $value )
     {
-        $this->extension_apis = apply_filters( 'wpgh_api_add_extension', $this->extension_apis );
+        $this->apis[ $name ] = $value;
     }
 
     /**
@@ -101,9 +84,8 @@ class WPGH_API_V2
         include_once dirname(__FILE__) . '/class-wpgh-api-v3-emails.php';
         include_once dirname(__FILE__) . '/class-wpgh-api-v3-sms.php';
         include_once dirname(__FILE__) . '/class-wpgh-api-v3-elements.php';
-//        include_once dirname( __FILE__ ) . '/class-wpgh-api-v3-debug.php';
 
-        do_action( 'wpgh_api_include_extensions', $this );
+        do_action( 'groundhogg/api/v3/includes', $this );
 
     }
 

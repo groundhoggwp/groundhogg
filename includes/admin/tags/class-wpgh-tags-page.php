@@ -185,7 +185,7 @@ class WPGH_Tags_Page
 
         if ( isset( $_POST['bulk_add'] ) ){
 
-            $tag_names = explode( PHP_EOL, trim( sanitize_textarea_field( wp_unslash( $_POST['bulk_tags'] ) ) ) );
+            $tag_names = explode( PHP_EOL, trim( sanitize_textarea_field( stripslashes( $_POST['bulk_tags'] ) ) ) );
 
             foreach ($tag_names as $name) {
 
@@ -198,8 +198,8 @@ class WPGH_Tags_Page
             $this->notices->add( 'new-tags', sprintf( _nx( '%d tag created', '%d tags created', count( $tag_names ), 'notice', 'groundhogg' ), count( $tag_names ) ) );
         } else {
 
-            $tag_name = sanitize_text_field( wp_unslash( $_POST['tag_name'] ) );
-            $tag_desc = sanitize_text_field( wp_unslash( $_POST['tag_description'] ) );
+            $tag_name = sanitize_text_field( stripslashes( $_POST['tag_name'] ) );
+            $tag_desc = sanitize_text_field( stripslashes( $_POST['tag_description'] ) );
             $id =WPGH()->tags->add( array( 'tag_name' => $tag_name, 'tag_description' => $tag_desc ) );
 
             do_action( 'wpgh_tag_created', $id );
@@ -215,8 +215,8 @@ class WPGH_Tags_Page
             wp_die( WPGH()->roles->error( 'edit_tags' ) );
         }
 
-        $tag_name = sanitize_text_field( wp_unslash( $_POST[ 'name' ] ) );
-        $tag_description = sanitize_textarea_field( wp_unslash( $_POST[ 'description' ] ) );
+        $tag_name = sanitize_text_field( stripslashes( $_POST[ 'name' ] ) );
+        $tag_description = sanitize_textarea_field( stripslashes( $_POST[ 'description' ] ) );
 
         $args = array(
             'tag_name'          => $tag_name,

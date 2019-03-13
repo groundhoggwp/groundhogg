@@ -24,14 +24,14 @@ abstract class WPGH_API_V3_BASE {
     /**
      * @var WP_User
      */
-    protected $current_user;
+    protected static $current_user;
 
     /**
      * WPGH_API_V3_BASE constructor.
      */
     public function __construct()
     {
-        add_action('groundhogg/api/v3/loaded', array( $this, 'register_routes' ) );
+        add_action('groundhogg/api/v3/init', array( $this, 'register_routes' ) );
     }
 
     /**
@@ -46,9 +46,9 @@ abstract class WPGH_API_V3_BASE {
      *
      * @param $id int user ID
      */
-    protected function set_current_user( $id )
+    protected static function set_current_user( $id )
     {
-        $this->current_user = get_userdata( $id );
+        self::$current_user = get_userdata( $id );
     }
 
     /**
@@ -119,6 +119,19 @@ abstract class WPGH_API_V3_BASE {
     }
 
     /**
+     * HTTP CODE 403 ERROR RESPONSE Wrapper
+     *
+     * @param string $code
+     * @param string $msg
+     * @param array $data
+     * @return WP_Error
+     */
+    protected static function ERROR_404( $code='', $msg='', $data=[] )
+    {
+        return self::ERROR_CODE( $code, $msg, $data, 404 );
+    }
+
+    /**
      * HTTP CODE 500 ERROR RESPONSE Wrapper
      *
      * @param string $code
@@ -165,6 +178,33 @@ abstract class WPGH_API_V3_BASE {
     }
 
     /**
+     * Returns a default set of args along with a status
+     *
+     * @param array $args
+     * @param string $message
+     * @param string $status
+     * @return WP_REST_Response
+     */
+    protected static function SUCCESS_RESPONSE( $args = [], $message='', $status='success' )
+    {
+
+        if ( ! is_array( $args ) ){
+            $args = [$args];
+        }
+
+        if ( ! key_exists( 'status', $args ) ){
+            $args[ 'status' ] = $status;
+        }
+
+        if ( ! key_exists( 'message', $args ) && $message ){
+            $args[ 'message' ] = $message;
+        }
+
+        return rest_ensure_response( $args );
+    }
+
+
+    /**
      * Given a request get a contact if one exists.
      *
      * @param WP_REST_Request $request
@@ -184,13 +224,22 @@ abstract class WPGH_API_V3_BASE {
 
         if( ! $contact ) {
             if ( is_numeric( $id_or_email ) ){
-                return self::ERROR_400('no_contact', sprintf( _x( 'Contact with ID %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
+                return self::ERROR_400('invalid_id', sprintf( _x( 'Contact with ID %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
             } else {
-                return self::ERROR_400('no_contact', sprintf( _x( 'Contact with email %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
+                return self::ERROR_400('invalid_email', sprintf( _x( 'Contact with email %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
             }
         }
 
         return $contact;
+    }
+
+    /**
+     * Get the standard auth callback array
+     *
+     * @return array
+     */
+    public function get_auth_callback(){
+        return [ $this,  'auth' ];
     }
 
     /**
@@ -199,21 +248,22 @@ abstract class WPGH_API_V3_BASE {
      */
     public function auth( WP_REST_Request $request )
     {
+
+        /* Check if the API is enabled... */
+        if ( ! wpgh_is_option_enabled( 'gh_enable_api' ) ){
+            return self::ERROR_403( 'api_unavailable', 'The api has been disabled by the administrator.' );
+        }
+
         /* If the current user is logged in then we can bypass the key authentication */
         if ( is_user_logged_in() ){
             return true;
         }
 
-        $token = $request->get_header( 'GH_TOKEN' );
-        $key = $request->get_header( 'GH_PUBLIC_KEY' );
-
-        if ( ! $token || ! $key ){
-            $token = $request->get_param( 'token' );
-            $key = $request->get_param( 'key' );
-        }
+        $token = $request->get_header( 'gh_token' );
+        $key = $request->get_header( 'gh_public_key' );
 
         if( ! $token || ! $key ) {
-            return self::ERROR_401( 'no_token_or_key', _x( 'Please enter a API valid token and public key.', 'api', 'groundhogg' ) );
+            return self::ERROR_401( 'no_token_or_key', _x( 'Please enter a API valid token and public key.', 'api', 'groundhogg' ), $request->get_headers() );
         }
 
         //validate user
@@ -227,7 +277,7 @@ abstract class WPGH_API_V3_BASE {
 
         $secret = get_user_meta( $user_id,'wpgh_user_secret_key',true);
 
-        if ( ! $this->check_keys( $secret, $key, $token ) ){
+        if ( ! self::check_keys( $secret, $key, $token ) ){
             return self::ERROR_401( 'invalid_key_or_token', _x( 'Invalid Authentication.', 'api', 'groundhogg' ) );
         }
 
@@ -235,10 +285,7 @@ abstract class WPGH_API_V3_BASE {
          * Set the current user for the request
          */
         set_current_user( $user_id );
-        $this->set_current_user( $user_id );
-
-        $request->set_param( 'token', '*****' . substr( $token, strlen( $token ) - 5 ) );
-        $request->set_param( 'key', '*****' . substr( $key, strlen( $key ) - 5 ) );
+        self::set_current_user( $user_id );
 
         return true;
     }
@@ -251,7 +298,7 @@ abstract class WPGH_API_V3_BASE {
      * @param $token
      * @return bool
      */
-    public function check_keys( $secret, $public, $token ) {
+    public static function check_keys( $secret, $public, $token ) {
         return hash_equals( md5( $secret . $public ), $token );
     }
 
