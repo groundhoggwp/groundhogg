@@ -217,20 +217,23 @@ class WPGH_Events_Table extends WP_List_Table {
         if ( $time_diff < 0 && $status !== 'waiting' ){
             /* The event has passed */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = date_i18n( 'Y/m/d \@ h:i A', intval( $p_time ) );
+                $time = date_i18n( 'Y-m-d \@ h:i A', intval( $p_time ) );
             } else {
                 $time = sprintf( _x( "%s ago", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
             }
         } else {
             /* the event is scheduled */
             if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( 'Y/m/d \@ h:i A', intval( $p_time )  ) );
+                $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( 'Y-m-d \@ h:i A', intval( $p_time )  ) );
             } else {
                 $time = sprintf( _x( "in %s", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
             }
         }
 
-        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+        $html = $time_prefix . '&nbsp;<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+        $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->contact->get_local_time( $event->time ) ), __( 'local time' ) ) . '</i>';
+
+        return $html;
     }
 
     /**

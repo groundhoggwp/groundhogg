@@ -919,10 +919,6 @@ function wpgh_get_timezone_offset( $timeZone = '' )
         return 0;
     }
 
-    if ( ! $timeZone ){
-        return 0;
-    }
-
     try{
         $timeZone = new DateTimeZone( $timeZone );
     } catch (Exception $e) {
