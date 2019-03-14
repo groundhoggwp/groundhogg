@@ -109,6 +109,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.2.5 =
 * TWEAKED wpgh_get_contact now uses a cache to avoid multiple creations of similar objects.
+* TWEAKED Added option to send transactional emails through the Groundhogg Sending Service.
+* FIXED Send in TimeZone not scheduling events at the correct time in some cases.
 
 = 1.2.4 =
 * ADDED Updated API methods v3.
