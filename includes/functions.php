@@ -908,6 +908,37 @@ function wpgh_convert_to_utc_0( $time )
 }
 
 /**
+ * Get a timezone offest.
+ *
+ * @param string $timeZone
+ * @return int
+ */
+function wpgh_get_timezone_offset( $timeZone = '' )
+{
+    if ( ! $timeZone ){
+        return 0;
+    }
+
+    if ( ! $timeZone ){
+        return 0;
+    }
+
+    try{
+        $timeZone = new DateTimeZone( $timeZone );
+    } catch (Exception $e) {
+        return 0;
+    }
+
+    try{
+        $dateTime = new DateTime( 'now', $timeZone );
+    } catch ( Exception $e ){
+        return 0;
+    }
+
+    return $timeZone->getOffset( $dateTime );
+}
+
+/**
  * Convert a unix timestamp to local time
  *
  * @param $time
@@ -921,6 +952,7 @@ function wpgh_convert_to_local_time($time )
 
     return $time + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 }
+
 
 /**
  * Converts the given time into the timeZone
@@ -936,17 +968,8 @@ function wpgh_convert_to_foreign_time( $time, $timeZone = '' )
         return $time;
     }
 
-    $timeZone = new DateTimeZone( $timeZone );
+    $time += wpgh_get_timezone_offset( $timeZone );
 
-    try{
-        $dateTime = new DateTime( 'now', $timeZone );
-    } catch ( Exception $e ){
-        return $time;
-    }
-
-    $offset = $timeZone->getOffset( $dateTime );
-
-    $time += $offset;
     return $time;
 }
 
@@ -1412,8 +1435,6 @@ function wpgh_parse_headers( $headers )
 
     $parsed = imap_rfc822_parse_headers( $headers );
 
-//    var_dump( json_encode( $parsed ) );
-
     if ( ! $parsed ){
         return false;
     }
@@ -1454,7 +1475,7 @@ if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_emai
         $sender = get_option( 'admin_email' );
         $from = get_bloginfo( 'name' );
 
-        if ( $headers ){
+        if ( ! empty( $headers ) ){
             $from = $headers[ 'from' ];
             $sender = $headers[ 'sender' ];
         }

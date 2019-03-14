@@ -169,7 +169,7 @@ class WPGH_Broadcasts_Page
                     $broadcast->cancel();
                 }
 
-                $this->notices->add( 'cancelled', _nx( '%d broadcasts cancelled', '%d broadcast cancelled', count( $this->get_broadcasts() ), 'notice', 'groundhogg' ) );
+                $this->notices->add( 'cancelled', sprintf( _nx( '%d broadcasts cancelled', '%d broadcast cancelled', count( $this->get_broadcasts() ), 'notice', 'groundhogg' ), count( $this->get_broadcasts() ) ) );
 
                 break;
         }
@@ -272,7 +272,7 @@ class WPGH_Broadcasts_Page
             $local_time = $send_time;
 
             if (  $send_in_timezone && ! $send_now ){
-                $local_time = $contact->get_local_time( $send_time );
+                $local_time = $contact->get_local_time_in_utc_0( $send_time );
                 if ( $local_time < time() ){
                     $local_time+=DAY_IN_SECONDS;
                 }

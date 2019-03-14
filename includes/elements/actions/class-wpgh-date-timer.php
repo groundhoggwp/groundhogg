@@ -233,7 +233,7 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
 
         /* Modify according to the contacts timezone */
         if ( $send_in_timezone && WPGH()->event_queue->is_processing()  ){
-            $final_time = WPGH()->event_queue->cur_event->contact->get_local_time( $final_time );
+            $final_time = WPGH()->event_queue->cur_event->contact->get_local_time_in_utc_0( $final_time );
             if ( $final_time < time() ){
                 $final_time+=DAY_IN_SECONDS;
             }

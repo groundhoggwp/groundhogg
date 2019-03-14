@@ -360,10 +360,10 @@ function wpgh_contact_record_general_info( $contact )
                     <?php $args = array(
                     'id' => 'time_zone',
                     'name' => 'time_zone',
-                    'options' => wpgh_get_time_zones(),
+                    'data' => wpgh_get_time_zones(),
                     'selected' => $contact->get_meta('time_zone'),
                 );
-                    echo WPGH()->html->dropdown($args); ?></div>
+                    echo WPGH()->html->select2($args); ?></div>
             </td>
         </tr>
         <?php do_action('wpgh_contact_edit_address', $contact->ID ); ?>

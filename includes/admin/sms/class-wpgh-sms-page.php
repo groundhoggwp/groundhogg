@@ -297,7 +297,7 @@ class WPGH_SMS_Page
             $local_time = $send_time;
 
             if ( $send_in_timezone && ! $send_now ){
-                $local_time = $contact->get_local_time( $send_time );
+                $local_time = $contact->get_local_time_in_utc_0( $send_time );
                 if ( $local_time < time() ){
                     $local_time+=DAY_IN_SECONDS;
                 }

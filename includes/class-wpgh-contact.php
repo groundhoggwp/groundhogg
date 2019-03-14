@@ -669,6 +669,57 @@ class WPGH_Contact
     }
 
     /**
+     * Compensate for hour difference between local site time and the timezone of the contact.
+     *
+     * @param int $time
+     * @return int
+     */
+    function get_local_time_in_utc_0( $time = 0 ){
+
+        if ( ! $time ){
+            $time = time();
+        }
+
+        return $time + $this->get_utc_0_offset();
+    }
+
+    /**
+     * Get the contacts timezone offset.
+     *
+     * @return int
+     */
+    function get_time_zone_offset()
+    {
+        return wpgh_get_timezone_offset( $this->time_zone );
+    }
+
+    /**
+     * Get a proper UTC offset
+     *
+     * @return int
+     */
+    function get_utc_0_offset()
+    {
+        return intval( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) - $this->get_time_zone_offset();
+    }
+
+    /**
+     * Convert a given unix time stamp
+     *
+     * @param int $time
+     */
+    function convert_to_local_time( $time = 0 )
+    {
+        if ( ! $time ){
+            $time = time();
+        }
+
+        if ( ! $this->time_zone && $this->ip_address ){
+            $this->extrapolate_location();
+        }
+    }
+
+    /**
      * Output a contact. Just give the email back
      *
      * @return string
