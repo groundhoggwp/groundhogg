@@ -1412,15 +1412,20 @@ function wpgh_parse_headers( $headers )
 
     $parsed = imap_rfc822_parse_headers( $headers );
 
+//    var_dump( json_encode( $parsed ) );
+
     if ( ! $parsed ){
         return false;
     }
 
     $map = [];
 
-    if ( $parsed->sender ){
+    if ( $parsed->sender && ! is_array( $parsed->sender ) ){
         $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
         $map[ 'from' ] = $parsed->sender->personal;
+    } else if ( is_array( $parsed->sender ) ){
+        $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender[0]->mailbox, $parsed->sender[0]->host );
+        $map[ 'from' ] = $parsed->sender[0]->personal;
     }
 
     return $map;

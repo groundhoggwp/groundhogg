@@ -22,6 +22,7 @@ class Groundhogg_Service_Manager
         }
 
         $should_verify = wpgh_is_option_enabled( 'gh_email_api_check_verify_status' );
+
         if ( $should_verify ){
         	add_action( 'admin_init', array( $this, 'setup_cron' ) );
         	add_action( 'groundhogg/service/verify_domain', array( $this, 'check_verification_status' ) );
