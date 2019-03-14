@@ -1397,39 +1397,39 @@ function wpgh_add_my_custom_email_templates( $email_templates ){
 
 }
 
+/**
+ * Parse the headers and return things like from/to etc...
+ *
+ * @param $headers string|string[]
+ * @return array|false
+ */
+function wpgh_parse_headers( $headers )
+{
+    $headers = is_array( $headers ) ? implode( PHP_EOL, $headers ) : $headers;
+    if ( ! is_string( $headers ) ){
+        return false;
+    }
+
+    $parsed = imap_rfc822_parse_headers( $headers );
+
+    if ( ! $parsed ){
+        return false;
+    }
+
+    $map = [];
+
+    if ( $parsed->sender ){
+        $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
+        $map[ 'from' ] = $parsed->sender->personal;
+    }
+
+    return $map;
+
+}
+
 /* Pluggable functions */
 
 if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_email_through_ghss' ) ):
-
-    /**
-     * Parse the headers and return things like from/to etc...
-     *
-     * @param $headers string|string[]
-     * @return array;
-     */
-    function wpgh_parse_headers( $headers )
-    {
-        $headers = is_array( $headers ) ? implode( PHP_EOL, $headers ) : $headers;
-        if ( ! is_string( $headers ) ){
-            return false;
-        }
-
-        $parsed = imap_rfc822_parse_headers( $headers );
-
-        if ( ! $parsed ){
-            return false;
-        }
-
-        $map = [];
-
-        if ( $parsed->sender ){
-            $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
-            $map[ 'from' ] = $parsed->sender->personal;
-        }
-
-        return $map;
-
-    }
 
     /**
      * Overwrite the default WP Mail Function to use the GH Sending Service instead.

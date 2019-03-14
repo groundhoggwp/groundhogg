@@ -105,8 +105,15 @@ Class WPGH_SMS
 
         }
 
-        return WPGH()->service_manager->send_sms( $contact, $this->get_message() );
+        if ( apply_filters( 'groundhogg/sms/send_with_ghss', true ) ){
+            $sent = WPGH()->service_manager->send_sms( $contact, $this->get_message() );
+        } else {
+            $sent = apply_filters( 'groundhogg/sms/send_custom', true, $contact, $this->get_message() );
+        }
 
+        do_action( 'groundhogg/sms/sent', $sent, $this );
+
+        return $sent;
     }
 
 }
