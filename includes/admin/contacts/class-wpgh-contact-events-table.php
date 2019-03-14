@@ -101,7 +101,30 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
 
     public function handle_row_actions($event, $column_name, $primary)
     {
-        __return_false();
+
+        $actions = [];
+
+        if ( $column_name === 'funnel' ){
+            if ( $event->is_funnel_event() ){
+                $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
+                    admin_url('admin.php?page=gh_funnels&action=edit&funnel=' . $event->funnel_id),
+                    esc_attr(_x('Edit Funnel', 'action', 'groundhogg')),
+                    _x('Edit Funnel', 'action', 'groundhogg')
+                );
+            }
+
+        } else if ( $column_name === 'step' ){
+            if ( $event->is_funnel_event() ){
+                $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
+                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->funnel_id, $event->step->ID ) ),
+                    esc_attr(_x('Edit Step', 'action', 'groundhogg')),
+                    _x('Edit Step', 'action', 'groundhogg')
+                );
+            }
+        }
+
+
+        return $this->row_actions( apply_filters( 'wpgh_event_row_actions', $actions, $event, $column_name ) );
     }
 
     /**

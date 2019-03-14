@@ -133,7 +133,10 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
             $time = sprintf( _x( "%s ago", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
         }
 
-        return '<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+        $html = '<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+        $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->contact->get_local_time( intval( $activity->timestamp ) ) ), __( 'local time' ) ) . '</i>';
+
+        return $html;
 
     }
 
