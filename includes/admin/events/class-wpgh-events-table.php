@@ -311,7 +311,8 @@ class WPGH_Events_Table extends WP_List_Table {
             'waiting'   => WPGH()->events->count( array( 'status' => 'waiting' ) ),
             'skipped'   => WPGH()->events->count( array( 'status' => 'skipped' ) ),
             'cancelled' => WPGH()->events->count( array( 'status' => 'cancelled' ) ),
-            'completed' => WPGH()->events->count( array( 'status' => 'complete' ) )
+            'completed' => WPGH()->events->count( array( 'status' => 'complete' ) ),
+            'failed' => WPGH()->events->count( array( 'status' => 'failed' ) )
         );
 
         return apply_filters( 'gh_event_views', array(
@@ -319,7 +320,8 @@ class WPGH_Events_Table extends WP_List_Table {
             'waiting'   => "<a class='" . ($view === 'waiting' ? 'current' : '') . "' href='" . $base_url . "waiting" . "'>" . _x( 'Waiting', 'view', 'groundhogg' ) . ' <span class="count">('.$count['waiting'].')</span>' . "</a>",
             'skipped'   => "<a class='" . ($view === 'skipped' ? 'current' : '') . "' href='" . $base_url . "skipped" . "'>" . _x( 'Skipped','view','groundhogg') . ' <span class="count">('.$count['skipped'].')</span>' . "</a>",
             'cancelled' => "<a class='" . ($view === 'cancelled' ? 'current' : '') . "' href='" . $base_url . "cancelled" . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) .' <span class="count">('.$count['cancelled'].')</span>' . "</a>",
-            'completed' => "<a class='" . ($view === 'completed' ? 'current' : '') . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ). ' <span class="count">('.$count['completed'].')</span>' . "</a>"
+            'completed' => "<a class='" . ($view === 'completed' ? 'current' : '') . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ). ' <span class="count">('.$count['completed'].')</span>' . "</a>",
+            'failed' => "<a class='" . ($view === 'failed' ? 'current' : '') . "' href='" . $base_url . "failed" . "'>" . _x( 'Failed', 'view', 'groundhogg' ). ' <span class="count">('.$count['failed'].')</span>' . "</a>"
         ) );
     }
 

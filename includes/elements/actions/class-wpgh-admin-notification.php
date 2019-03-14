@@ -43,6 +43,13 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
      */
     public $description = 'Send an email notification to any email or list of emails.';
 
+    /**
+     * An error if something goes wrong while sending the notification.
+     *
+     * @var WP_Error
+     */
+    private $mail_error;
+
     public function __construct()
     {
         $this->name = _x( 'Admin Notification', 'element_name', 'groundhogg' );
@@ -182,7 +189,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
      * @param $contact WPGH_Contact
      * @param $event WPGH_Event
      *
-     * @return bool
+     * @return bool|WP_Error
      */
     public function run( $contact, $event )
     {
@@ -191,7 +198,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
 
         $finished_note = sanitize_textarea_field( WPGH()->replacements->process( $note, $event->contact->ID ) );
 
-        $finished_note .= sprintf( "\n\n%s: %s", __( 'Manage Contact', 'groundhogg' ), admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $event->contact->ID  ) );
+        $finished_note .= apply_filters( 'the_content', sprintf( "\n\n%s: %s", __( 'Manage Contact', 'groundhogg' ), admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $event->contact->ID  ) ) );
 
         $subject = $event->step->get_meta('subject' );
         $subject = sanitize_text_field(  WPGH()->replacements->process( $subject, $event->contact->ID ) );
@@ -199,18 +206,35 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
         $send_to = $event->step->get_meta( 'send_to' );
 
         if ( ! is_email( $send_to ) ){
-
             $send_to = WPGH()->replacements->process( $send_to, $event->contact->ID );
-
         }
 
-        if ( ! $send_to )
-        {
+        if ( ! $send_to ){
             return false;
         }
 
-        return wp_mail( $send_to, $subject, $finished_note );
+        add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
+        $sent =  wp_mail( $send_to, $subject, $finished_note );
+
+        remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
+
+        if ( is_wp_error( $this->mail_error ) ){
+            return $this->mail_error;
+        }
+
+        return $sent;
+
+    }
+
+    /**
+     * Map the error to the wahetevr
+     *
+     * @param $result
+     */
+    public function mail_failed( $result )
+    {
+        $this->mail_error = $result;
     }
 
 

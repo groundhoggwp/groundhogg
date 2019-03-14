@@ -789,6 +789,14 @@ function wpgh_get_current_user_roles()
 }
 
 /**
+ * Array access for existing contact objects...
+ *
+ * @type WPGH_Contact[]
+ */
+global $wpgh_contacts_cache;
+$wpgh_contacts_cache = [];
+
+/**
  * Simple function to get a contact
  *
  * @since 1.0.6 implemented
@@ -796,12 +804,30 @@ function wpgh_get_current_user_roles()
  *
  * @param $id_or_email string|int
  * @param $by_user_id bool
+ * @param $get_from_cache bool
  * @return WPGH_Contact|false
  */
-function wpgh_get_contact( $id_or_email, $by_user_id=false ){
+function wpgh_get_contact( $id_or_email, $by_user_id=false, $get_from_cache=true ){
+
+    global $wpgh_contacts_cache;
+
+    if ( $get_from_cache && is_array( $wpgh_contacts_cache ) ){
+        $cache_key = ! $by_user_id ? md5( $id_or_email ) : md5( sprintf( 'u_%s', $id_or_email ) ) ;
+        if (  key_exists( $cache_key, $wpgh_contacts_cache ) ){
+            return $wpgh_contacts_cache[ $cache_key ];
+        }
+    }
+
+//    var_dump( $wpgh_contacts_cache );
+
     $contact = new WPGH_Contact( $id_or_email, $by_user_id );
 
     if ( $contact->exists() ){
+
+        if ( $get_from_cache && is_array( $wpgh_contacts_cache )  ){
+            $wpgh_contacts_cache[ $cache_key ] = $contact;
+        }
+
         return $contact;
     }
 
@@ -1370,3 +1396,92 @@ function wpgh_add_my_custom_email_templates( $email_templates ){
     return $email_templates;
 
 }
+
+/* Pluggable functions */
+
+if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_email_through_ghss' ) ):
+
+    /**
+     * Parse the headers and return things like from/to etc...
+     *
+     * @param $headers string|string[]
+     * @return array;
+     */
+    function wpgh_parse_headers( $headers )
+    {
+        $headers = is_array( $headers ) ? implode( PHP_EOL, $headers ) : $headers;
+        if ( ! is_string( $headers ) ){
+            return false;
+        }
+
+        $parsed = imap_rfc822_parse_headers( $headers );
+
+        if ( ! $parsed ){
+            return false;
+        }
+
+        $map = [];
+
+        if ( $parsed->sender ){
+            $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
+            $map[ 'from' ] = $parsed->sender->personal;
+        }
+
+        return $map;
+
+    }
+
+    /**
+     * Overwrite the default WP Mail Function to use the GH Sending Service instead.
+     *
+     * @param string $to
+     * @param string $subject
+     * @param string $content
+     * @param array $headers
+     * @return bool
+     */
+    function wp_mail( $to='', $subject='', $content='', $headers =[] ){
+
+        if ( ! empty( $headers ) ){
+            $headers = wpgh_parse_headers( $headers );
+        }
+
+        $sender = get_option( 'admin_email' );
+        $from = get_bloginfo( 'name' );
+
+        if ( $headers ){
+            $from = $headers[ 'from' ];
+            $sender = $headers[ 'sender' ];
+        }
+
+        if ( is_array( $to ) ){
+            $to = implode( ',', $to );
+        }
+
+        $data = array(
+            'sender'    => $sender,
+            'from'      => $from,
+            'recipients' => $to,
+            'subject'   => $subject,
+            'content'   => $content,
+        );
+
+        $request = WPGH()->service_manager->request( 'emails/wp_mail', $data );
+
+        if ( is_wp_error( $request ) ) {
+
+            do_action( 'wp_mail_failed', $request );
+
+            return false;
+        }
+
+        if ( isset( $request->credits_remaining ) ){
+            $credits = $request->credits_remaining;
+            wpgh_update_option('gh_remaining_api_credits', $credits);
+        }
+
+        return true;
+
+    }
+
+endif;

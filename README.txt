@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.5 =
+* TWEAKED wpgh_get_contact now uses a cache to avoid multiple creations of similar objects.
+
 = 1.2.4 =
 * ADDED Updated API methods v3.
 * ADDED My templates to emails section for easy duplicating of emails.
