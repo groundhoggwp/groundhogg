@@ -65,6 +65,7 @@ class WPGH_DB_Step_Meta extends WPGH_DB {
     public function register_table() {
         global $wpdb;
         $wpdb->stepmeta = $this->table_name;
+        $wpdb->tables[] = 'stepmeta';
     }
 
     /**

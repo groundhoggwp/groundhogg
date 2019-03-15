@@ -66,7 +66,7 @@ class WPGH_Events_Page
         $events = isset( $_REQUEST['event'] ) ? $_REQUEST['event'] : null;
 
         if ( ! $events )
-            return false;
+            return [];
 
         return is_array( $events )? array_map( 'intval', $events ): array( intval ( $events ) );
     }

@@ -63,6 +63,8 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
     public function register_table() {
         global $wpdb;
         $wpdb->emailmeta = $this->table_name;
+        $wpdb->tables[] = 'emailmeta';
+
     }
 
     /**

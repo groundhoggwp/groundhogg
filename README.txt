@@ -107,6 +107,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.6 =
+* FIXED Add note not working. Code removed accidentally.
+
 = 1.2.5 =
 * TWEAKED wpgh_get_contact now uses a cache to avoid multiple creations of similar objects.
 * TWEAKED Added option to send transactional emails through the Groundhogg Sending Service.

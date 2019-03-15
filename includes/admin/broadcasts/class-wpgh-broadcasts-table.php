@@ -205,8 +205,9 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 	        'status'        => 'complete'
         ) );
 
-        $html = sprintf( "%s: <strong>%d</strong><br/>",
+        $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
             _x( "Sent", 'stats', 'groundhogg' ),
+            admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s', WPGH_BROADCAST, $broadcast->ID) ),
             $contact_sum
         );
 

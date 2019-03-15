@@ -103,9 +103,8 @@ class WPGH_Broadcast implements WPGH_Event_Process
      */
     public function cancel()
     {
-        $this->update( array( 'status' => 'cancelled' ) );
 
-        WPGH()->events->mass_update(
+        if ( WPGH()->events->mass_update(
             array(
                 'status' => 'cancelled'
             ),
@@ -113,7 +112,10 @@ class WPGH_Broadcast implements WPGH_Event_Process
                 'step_id'   => $this->ID,
                 'funnel_id' => WPGH_BROADCAST
             )
-        );
+        ) ){
+            $this->update( array( 'status' => 'cancelled' ) );
+        }
+
     }
 
     /**

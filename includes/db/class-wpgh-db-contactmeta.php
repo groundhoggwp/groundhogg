@@ -64,6 +64,8 @@ class WPGH_DB_Contact_Meta extends WPGH_DB {
     public function register_table() {
         global $wpdb;
         $wpdb->contactmeta = $this->table_name;
+        $wpdb->tables[] = 'contactmeta';
+
     }
 
     /**

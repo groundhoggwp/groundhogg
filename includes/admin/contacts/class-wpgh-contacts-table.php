@@ -302,6 +302,15 @@ class WPGH_Contacts_Table extends WP_List_Table {
             $query[ 'date_query' ][ 'before' ] = stripslashes( $_REQUEST[ 'date_before' ] );
         }
 
+        if ( isset( $_REQUEST[ 'tags_include'] ) ){
+            $tag_id = $_GET['tags_include'];
+            $query[ 'tags_include' ] = $tag_id;
+        }
+
+        if ( isset( $_REQUEST[ 'tags_exclude'] ) ){
+            $tag_id = $_GET['tags_exclude'];
+            $query[ 'tags_exclude' ] = $tag_id;
+        }
 
         switch ( $this->get_view() )
         {
@@ -342,7 +351,6 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
                 }
                 break;
-
             case 'tag':
                 if ( isset( $_REQUEST[ 'tag'] ) ){
                     $tag_id = $_GET['tag'];
@@ -351,7 +359,6 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
                 }
                 break;
-
             case 'report':
 
                 $report = array();

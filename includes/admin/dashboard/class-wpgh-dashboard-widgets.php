@@ -55,6 +55,7 @@ class WPGH_Dashboard_Widgets
         $this->widgets[] = new WPGH_Geographic_Country_Report();
         $this->widgets[] = new WPGH_Geographic_Region_Report();
         $this->widgets[] = new WPGH_Optin_Status_Report();
+        $this->widgets[] = new WPGH_Last_Broadcast_Report();
     }
 
     public function scripts(){
@@ -106,6 +107,7 @@ class WPGH_Dashboard_Widgets
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-geographic-country-report.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-geographic-region-report.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-optin-status-report.php';
+        include_once dirname( __FILE__ ) . '/widgets/class-wpgh-last-broadcast-report.php';
     }
 
 }

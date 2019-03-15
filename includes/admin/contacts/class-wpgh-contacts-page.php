@@ -683,6 +683,10 @@ class WPGH_Contacts_Page
             $contact->remove_tag($contact->tags);
         }
 
+        if ( isset( $_POST[ 'add_new_note' ] ) ){
+            $contact->add_note( $_POST[ 'add_note' ] );
+        }
+
         if (isset($_POST['send_email']) && isset($_POST['email_id']) && current_user_can('send_emails')) {
 
             $mail_id = intval( $_POST['email_id'] );

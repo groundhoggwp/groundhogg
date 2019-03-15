@@ -497,13 +497,13 @@ class WPGH_Contact_Query {
             $join .= " $join_type $meta_table AS email_mt ON $this->table_name.$this->primary_key = email_mt.{$this->meta_type}_id";
         }
 
-        if ( ( ! empty( $this->query_vars['tags_include'] ) || ! empty( $this->query_vars['tags_exclude'] ) ) ) {
-            $tags_table = WPGH()->tag_relationships->table_name;
-
-            $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
-
-            $join .= " $join_type $tags_table AS c_tags ON $this->table_name.$this->primary_key = c_tags.{$this->meta_type}_id";
-        }
+//        if ( ( ! empty( $this->query_vars['tags_include'] ) || ! empty( $this->query_vars['tags_exclude'] ) ) ) {
+//            $tags_table = WPGH()->tag_relationships->table_name;
+//
+//            $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
+//
+//            $join .= " $join_type $tags_table AS c_tags ON $this->table_name.$this->primary_key = c_tags.{$this->meta_type}_id";
+//        }
 
         if ( ! empty( $this->query_vars[ 'report' ] ) ){
             $events_table = WPGH()->events->table_name;
@@ -580,13 +580,19 @@ class WPGH_Contact_Query {
             }
         }
 
+        $tags_relationships_table = WPGH()->tag_relationships->table_name;
+
         if ( ! empty( $this->query_vars[ 'tags_include' ] ) ){
             if ( is_array( $this->query_vars[ 'tags_include' ] ) ){
                 $tags_include_ids = implode( ',', wp_parse_id_list( $this->query_vars['tags_include'] ) );
             } else {
                 $tags_include_ids = $this->query_vars[ 'tags_include' ];
             }
-            $where['tags_include'] = "c_tags.tag_id IN ( $tags_include_ids )";
+
+            $contactIds = $wpdb->get_results( "SELECT contact_id FROM $tags_relationships_table WHERE tag_id IN ( $tags_include_ids )", OBJECT_K );
+            $ids = array_keys( $contactIds );
+            $ids = implode( ',', $ids );
+            $where['tags_include'] = "ID IN ( $ids )";
         }
 
         if ( ! empty( $this->query_vars[ 'tags_exclude' ] ) ){
@@ -595,7 +601,10 @@ class WPGH_Contact_Query {
             } else {
                 $tags_exclude_ids = $this->query_vars[ 'tags_exclude' ];
             }
-            $where['tags_include'] = "c_tags.tag_id NOT IN ( $tags_exclude_ids )";
+            $contactIds = $wpdb->get_results( "SELECT contact_id FROM $tags_relationships_table WHERE tag_id IN ( $tags_exclude_ids )", OBJECT_K );
+            $ids = array_keys( $contactIds );
+            $ids = implode( ',', $ids );
+            $where['tags_exclude'] = "ID NOT IN ( $ids )";
         }
 
         if ( $this->query_vars['report'] && is_array( $this->query_vars['report'] ) ) {

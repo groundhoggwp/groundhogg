@@ -39,8 +39,8 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
 
         $mesg = $step->get_meta( 'sms_id' );
 
-        ?>
-        <?php if ( ! wpgh_get_option( 'gh_sms_token', false ) ): ?>
+        /* Check to see if we are sending sms with the GH System. If another system is active then do not display the message. */
+        if ( ! wpgh_get_option( 'gh_sms_token', false ) && apply_filters( 'groundhogg/sms/send_with_ghss', true ) ): ?>
         <p style="margin-left: 10px;" class="description">
             <?php _e( 'SMS uses the <a target="_blank" href="https://www.groundhogg.io/downloads/sms-credits/">Groundhogg Sending Service</a> & requires that you have setup your <a target="_blank" href="https://www.groundhogg.io/downloads/sms-credits/">Groundhogg account</a>.', 'groundhogg' ); ?>
         </p>
@@ -85,7 +85,7 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
             $step->update_meta( 'sms_id', intval( $_POST[ $step->prefix( 'sms_id' ) ] ) );
         }
 
-        if ( ! wpgh_get_option( 'gh_email_token', false ) ){
+        if ( ! wpgh_get_option( 'gh_email_token', false ) && apply_filters( 'groundhogg/sms/send_with_ghss', true ) ){
             WPGH()->notices->add( new WP_Error( 'NO_TOKEN', __( 'Your SMS steps will not work until you active the Groundhogg Sending Service.', 'groundhogg' ) ) );
         }
 
