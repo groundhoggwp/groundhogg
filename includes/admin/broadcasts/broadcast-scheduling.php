@@ -76,8 +76,10 @@ echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
 
             updateProgress: function() {
 
-                this.bar.css( 'width', ( ( this.complete / this.all ) * 100 ) + '%' );
-                this.progress.text( Math.round( ( this.complete / this.all ) * 100 ) + '%' );
+                var p = Math.round( ( this.complete / this.all ) * 100 );
+
+                this.bar.animate( { 'width': p + '%' }, 'slow' );
+                this.progress.text( p + '%' );
 
                 if ( this.complete === this.all ){
                     $( '#broadcast-complete' ).removeClass( 'hidden' );
