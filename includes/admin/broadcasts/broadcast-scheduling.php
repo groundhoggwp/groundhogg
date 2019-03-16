@@ -24,28 +24,10 @@ foreach ( $contacts as $contact ){
     $id_list[] = $contact->ID;
 }
 
-?>
-<style>
-    #progress-bar-wrap {
-        width: 100%;
-        background-color: #ddd;
-        margin-top: 20px;
-    }
 
-    #progress-bar {
-        width: 1%;
-        padding: 7px;
-        background-color: #4CAF50;
-        box-sizing: border-box;
-    }
-    #progress{
-        color: #FFFFFF;
-        font-weight: 500;
-    }
-</style>
-<div id="progress-bar-wrap">
-    <div id="progress-bar"><span id="progress">0%</span></div>
-</div>
+echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
+
+?>
 
 <div id="broadcast-complete" class="hidden">
     <p><?php _e( "The scheduling process is now complete.", 'groundhogg' ); ?></p>
@@ -71,8 +53,8 @@ foreach ( $contacts as $contact ){
 
                 this.contacts = contacts;
                 this.all = contacts.length;
-                this.bar = $( '#progress-bar' );
-                this.progress = $( '#progress' );
+                this.bar = $( '#scheduler' );
+                this.progress = $( '#scheduler-percentage' );
 
                 this.send();
 
@@ -122,17 +104,13 @@ foreach ( $contacts as $contact ){
 
                         } else {
                             console.log( response );
-                            alert( response );
-                            var $spinner = $( '.spinner-import' );
-                            $spinner.css( 'visibility', 'hidden' );
+                            bs.bar.css( 'color', '#f70000' );
                         }
 
                     },
                     error: function ( response ) {
                         console.log( response );
-                        alert( response );
-                        var $spinner = $( '.spinner-import' );
-                        $spinner.css( 'visibility', 'hidden' );
+                        bs.bar.css( 'color', '#f70000' );
                     }
                 });
 

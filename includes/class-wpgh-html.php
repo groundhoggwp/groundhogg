@@ -971,4 +971,34 @@ class WPGH_HTML
         return $html;
     }
 
+	/**
+	 * Output a progress bar.
+	 *
+	 * @param $args
+	 *
+	 * @return string
+	 */
+    public function progress_bar( $args )
+    {
+	    $a = wp_parse_args( $args, array(
+		    'id'        => '',
+		    'class'     => '',
+		    'hidden'    => false,
+	    ) );
+
+	    $hidden = ( $a[ 'hidden' ] ) ? 'hidden' : '';
+
+	    $bar = sprintf( "<div id='%s-wrap' class=\"progress-bar-wrap %s %s\">
+	            <div id='%s' class=\"progress-bar\"><span id='%s-percentage' class=\"progress-percentage\">0%%</span></div>
+			</div>",
+		    esc_attr( $a[ 'id' ] ),
+		    esc_attr( $a[ 'class' ] ),
+		    $hidden,
+		    esc_attr( $a[ 'id' ] ),
+		    esc_attr( $a[ 'id' ] )
+	    );
+
+	    return $bar;
+    }
+
 }

@@ -12,6 +12,9 @@ var wpghImportExport;
         import_id: null,
         tags: null,
         size: 100,
+        contactsToDelete: 0,
+        deletedContacts: 0,
+
 
         /**
          * Setup the button click event
@@ -141,6 +144,11 @@ var wpghImportExport;
         updateStatus: function () {
 
             var p = Math.ceil( ( ( this.completedRows + this.skippedRows ) / this.allRows )  * 100 );
+
+            $( '#import-loader-wrap' ).removeClass( 'hidden' );
+            $( '#import-loader' ).animate( { 'width' : p + '%' }, 'slow' );
+            $( '#import-loader-percentage' ).text( p + '%' );
+
             this.status.html( 'Status: ' + p + '% | Completed: ' + this.completedRows + ' | Skipped: ' + this.skippedRows );
             console.log( { status: p, completed: this.completedRows, skipped: this.skippedRows } );
 
@@ -201,17 +209,39 @@ var wpghImportExport;
         },
 
         bulkDelete : function () {
+
             var tags = $( '#delete_tags' ).val();
             var $spinner = $( '.spinner-delete' );
             $spinner.css( 'visibility', 'visible' );
+
             $.ajax({
                 type: "post",
                 url: ajaxurl,
                 data: { action: 'wpgh_bulk_delete_contacts', tags: tags },
-                success: function ( msg ) {
-                    alert( msg );
-                    $("#delete_tags").val('').change();
-                    $spinner.css( 'visibility', 'hidden' );
+                dataType: 'json',
+                success: function ( response ) {
+
+                    console.log( response );
+
+                    if ( response.complete !== undefined ){
+                        $("#delete_tags").val('').change();
+                        $spinner.css( 'visibility', 'hidden' );
+
+                        $( '#delete-loader-percentage' ).text( response.message );
+
+                    } else {
+
+                        wpghImportExport.deletedContacts += response.contactsDeleted;
+
+                        var p = Math.round( ( wpghImportExport.deletedContacts / parseInt( response.totalContacts ) * 100 ) );
+
+                        $( '#delete-loader-wrap' ).removeClass( 'hidden' );
+                        $( '#delete-loader' ).animate( { 'width' : p + '%' }, 'slow' );
+                        $( '#delete-loader-percentage' ).text( p + '%' );
+
+                        wpghImportExport.bulkDelete();
+
+                    }
                 }
             });
         },

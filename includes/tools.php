@@ -44,7 +44,11 @@ function wpgh_import_contacts_display()
             <?php $tag_args = array();
             $tag_args[ 'id' ] = 'import_tags';
             $tag_args[ 'name' ] = 'import_tags[]'; ?>
-            <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
+            <?php echo WPGH()->html->tag_picker( $tag_args );
+
+            echo WPGH()->html->progress_bar( [ 'id' => 'import-loader', 'hidden' => true ] );
+
+            ?>
             <div class="import-status-wrapper"><p><strong><span class="import-status"></span></strong></p></div>
             <p class="description"><?php _e( 'These tags will be applied to the contacts upon importing.', 'groundhogg' ); ?></p>
             <p class="submit">
@@ -108,7 +112,9 @@ function wpgh_bulk_delete_contacts_display()
             <?php $tag_args = array();
             $tag_args[ 'id' ] = 'delete_tags';
             $tag_args[ 'name' ] = 'delete_tags[]';?>
-            <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
+            <?php echo WPGH()->html->tag_picker( $tag_args );
+            echo WPGH()->html->progress_bar( [ 'id' => 'delete-loader', 'hidden' => true ] );
+            ?>
             <p class="description"><?php _e( 'Contacts with these tags will be delete. Leave blank to delete ALL contacts.', 'groundhogg' ); ?></p>
             <p class="submit">
                 <button class="bulk-delete button button-primary" id="delete" type="button"><?php _e( 'Delete Contacts' ); ?></button>

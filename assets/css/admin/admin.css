@@ -5,3 +5,21 @@
 .tablenav .gh-actions .action{
     margin: 1px 8px 0 0;
 }
+
+.progress-bar-wrap {
+    width: 100%;
+    background-color: #ddd;
+    margin-top: 20px;
+}
+
+.progress-bar {
+    width: 1%;
+    padding: 7px;
+    background-color: #4CAF50;
+    box-sizing: border-box;
+}
+
+.progress-percentage{
+    color: #FFFFFF;
+    font-weight: 500;
+}

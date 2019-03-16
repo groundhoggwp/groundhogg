@@ -180,14 +180,12 @@ class WPGH_Bulk_Contact_Manager
     public function delete()
     {
 
-        global $wpdb;
-
         if ( ! current_user_can( 'delete_contacts' ) )
             wp_die( 'You cannot manage contacts.' );
 
         if ( empty( $_POST[ 'tags' ] ) ){
 
-            wp_die( __( 'Please select at least 1 tag.', 'groundhogg' ) );
+            $response = [ 'error' => 'Please select at least 1 tag.' ];
 
         } else {
 
@@ -199,13 +197,43 @@ class WPGH_Bulk_Contact_Manager
                 'tags_include' => $tags
             ));
 
-            foreach ( $contacts as $contact ){
-                WPGH()->contacts->delete( $contact->ID );
+            if ( ! empty( $contacts ) ){
+
+	            $i = 0;
+
+	            if ( ! ( $total_contacts = get_transient( 'gh_bulk_delete_total_contacts' ) ) ){
+		            $total_contacts = count( $contacts );
+		            set_transient( 'gh_bulk_delete_total_contacts', $total_contacts, HOUR_IN_SECONDS );
+	            }
+
+	            while ( ! empty( $contacts ) && $i < 100 ) {
+		            $contact = array_pop( $contacts );
+		            if ( WPGH()->contacts->delete( $contact->ID ) ){
+			            $i++;
+		            }
+	            }
+
+	            $response = [
+		            'contactsDeleted' => $i,
+		            'totalContacts' => intval( $total_contacts )
+	            ];
+
+            } else {
+
+	            $total_contacts = get_transient( 'gh_bulk_delete_total_contacts' );
+
+	            $response = [
+		            'complete' => true,
+		            'message' => __( sprintf( "%d contacts have been deleted.", $total_contacts ), 'groundhogg' )
+	            ];
+
+	            delete_transient( 'gh_bulk_delete_total_contacts' );
+
             }
 
         }
 
-        wp_die( sprintf( __( 'Deleted %d contacts.', 'groundhogg' ), count( $contacts )  ));
+        wp_die( json_encode( $response ) );
 
     }
 
