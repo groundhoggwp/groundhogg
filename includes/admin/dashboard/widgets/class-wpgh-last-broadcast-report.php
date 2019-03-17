@@ -109,7 +109,10 @@ class WPGH_Last_Broadcast_Report extends WPGH_Circle_Graph_Report
             return __( 'No broadcast data available.', 'groundhogg' );
         }
 
+        $broadcast = new WPGH_Broadcast( $this->last_broadcast_id );
+
         ?>
+        <h3 style="font-weight: 500;"><?php printf( __( "Subject: %s", 'groundhogg' ), $broadcast->email->subject ); ?></h3>
         <hr>
         <table class="chart-summary">
         <thead>
@@ -205,8 +208,8 @@ class WPGH_Last_Broadcast_Report extends WPGH_Circle_Graph_Report
         foreach ( $data as $data_set ){
 
             $export[] = [
-                _x( 'Country', 'column_title', 'groundhogg' ) => $data_set[ 'label' ],
-                _x( 'Contacts', 'column_title', 'groundhogg' ) => $data_set[ 'data' ]
+                _x( 'Stat', 'column_title', 'groundhogg' ) => $data_set[ 'label' ],
+                _x( 'Count', 'column_title', 'groundhogg' ) => $data_set[ 'data' ]
             ];
 
         }
