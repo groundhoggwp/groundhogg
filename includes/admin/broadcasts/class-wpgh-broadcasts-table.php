@@ -52,7 +52,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'email_id'    => _x( 'Email', 'Column label', 'groundhogg' ),
+			'object_id'    => _x( 'Email/SMS', 'Column label', 'groundhogg' ),
 			'from_user'   => _x( 'Scheduled By', 'Column label', 'groundhogg' ),
 			'send_time'   => _x( 'Scheduled Run Date', 'Column label', 'groundhogg' ),
             'send_to_tags' => _x( 'Send To Tags', 'Column label', 'groundhogg' ),
@@ -71,7 +71,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
-			'email_id'    => array( 'email_id', false ),
+			'object_id'    => array( 'object_id', false ),
 			'from_user' => array( 'from_user', false ),
 			'send_time' => array( 'send_at', false ),
 			'date_scheduled' => array( 'date_scheduled', false )
@@ -132,7 +132,13 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         $actions = array();
 
         if ( $this->get_view() !== 'cancelled' ) {
-            $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast->email->ID ) . "'>" . _x( 'Edit Email', 'action', 'groundhogg') . "</a></span>";
+
+        	if ( $broadcast->is_email() ){
+		        $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast->email->ID ) . "'>" . _x( 'Edit Email', 'action', 'groundhogg') . "</a></span>";
+	        } else {
+		        $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_sms&action=edit&sms=' . $broadcast->sms->ID ) . "'>" . _x( 'Edit SMS', 'action', 'groundhogg') . "</a></span>";
+	        }
+
             if ( intval( $broadcast->send_time ) > time() ){
                 $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->ID ), 'cancel') . "'>" . _x( 'Cancel', 'action', 'groundhogg') . "</a></span>";
             }
@@ -145,9 +151,9 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
      * @param $broadcast WPGH_Broadcast
      * @return string
      */
-    protected function column_email_id( $broadcast )
+    protected function column_object_id( $broadcast )
     {
-        $subject = ( ! $broadcast->email->subject )? '(' . _x( 'no email', 'status' ,'groundhogg' ) . ')' : $broadcast->email->subject;
+        $subject = $broadcast->get_title();
         $editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . $broadcast->ID );
 
         if ( $this->get_view() === 'cancelled' ){
@@ -184,45 +190,56 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
      */
     protected function column_stats( $broadcast )
     {
-        if ( $broadcast->status !== 'sent' )
-            return '&#x2014;';
 
-        $opens = WPGH()->activity->count( array(
-            'funnel_id'     => WPGH_BROADCAST,
-            'step_id'       => $broadcast->ID,
-            'activity_type' => 'email_opened'
-        ) );
+	    if ( $broadcast->status !== 'sent' )
+		    return '&#x2014;';
 
-        $clicks = WPGH()->activity->count( array(
-            'funnel_id'     => WPGH_BROADCAST,
-            'step_id'       => $broadcast->ID,
-            'activity_type' => 'email_link_click'
-        ) );
+	    $contact_sum = WPGH()->events->count( array(
+		    'funnel_id'     => WPGH_BROADCAST,
+		    'step_id'       => $broadcast->ID,
+		    'status'        => 'complete'
+	    ) );
 
-        $contact_sum = WPGH()->events->count( array(
-            'funnel_id'     => WPGH_BROADCAST,
-            'step_id'       => $broadcast->ID,
-	        'status'        => 'complete'
-        ) );
+    	if ( $broadcast->is_sms() ){
 
-        $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
-            _x( "Sent", 'stats', 'groundhogg' ),
-            admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s', WPGH_BROADCAST, $broadcast->ID) ),
-            $contact_sum
-        );
+		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
+			    _x( "Sent", 'stats', 'groundhogg' ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&status=%s', WPGH_BROADCAST, $broadcast->ID, 'complete' ) ),
+			    $contact_sum
+		    );
 
-        $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
-            _x( "Opens", 'stats', 'groundhogg' ),
-            admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
-            $opens
-        );
+	    } else {
+		    $opens = WPGH()->activity->count( array(
+			    'funnel_id'     => WPGH_BROADCAST,
+			    'step_id'       => $broadcast->ID,
+			    'activity_type' => 'email_opened'
+		    ) );
 
-        $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
-            _x( "Clicks", 'stats', 'groundhogg' ),
-            admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) ),
-            $clicks );
+		    $clicks = WPGH()->activity->count( array(
+			    'funnel_id'     => WPGH_BROADCAST,
+			    'step_id'       => $broadcast->ID,
+			    'activity_type' => 'email_link_click'
+		    ) );
 
-        $html.= sprintf( "%s: <strong>%d%%</strong><br/>", _x( "C.T.R", 'stats', 'groundhogg' ), round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) );
+		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
+			    _x( "Sent", 'stats', 'groundhogg' ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s', WPGH_BROADCAST, $broadcast->ID) ),
+			    $contact_sum
+		    );
+
+		    $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
+			    _x( "Opens", 'stats', 'groundhogg' ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
+			    $opens
+		    );
+
+		    $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
+			    _x( "Clicks", 'stats', 'groundhogg' ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) ),
+			    $clicks );
+
+		    $html.= sprintf( "%s: <strong>%d%%</strong><br/>", _x( "C.T.R", 'stats', 'groundhogg' ), round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) );
+	    }
 
         return $html;
     }

@@ -28,7 +28,9 @@ foreach ( $contacts as $contact ){
 echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
 
 ?>
-
+<div id="spinner" class="">
+    <span class="spinner" style="visibility: visible;"></span>
+</div>
 <div id="broadcast-complete" class="hidden">
     <p><?php _e( "The scheduling process is now complete.", 'groundhogg' ); ?></p>
     <p class="submit">
@@ -46,7 +48,7 @@ echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
             contacts: 0,
             complete: 0,
             all:0,
-            size: 50,
+            size: 100,
             bar: null,
 
             init: function () {
@@ -55,6 +57,10 @@ echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
                 this.all = contacts.length;
                 this.bar = $( '#scheduler' );
                 this.progress = $( '#scheduler-percentage' );
+
+                if ( this.all < 400 ){
+                    this.size = Math.ceil( this.all / 4 );
+                }
 
                 this.send();
 
@@ -78,11 +84,12 @@ echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
 
                 var p = Math.round( ( this.complete / this.all ) * 100 );
 
-                this.bar.animate( { 'width': p + '%' }, 'slow' );
+                this.bar.animate( { 'width': p + '%' } );
                 this.progress.text( p + '%' );
 
                 if ( this.complete === this.all ){
                     $( '#broadcast-complete' ).removeClass( 'hidden' );
+                    $( '#spinner' ).addClass( 'hidden' );
                 }
 
             },
@@ -102,6 +109,13 @@ echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
 
                             if ( bs.contacts.length > 0 ){
                                 bs.send();
+                            }
+
+                            if ( response.return_url !== undefined ){
+
+                                setTimeout( function () {
+                                    window.location.replace(response.return_url);
+                                }, 1000 );
                             }
 
                         } else {

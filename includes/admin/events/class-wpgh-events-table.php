@@ -114,7 +114,7 @@ class WPGH_Events_Table extends WP_List_Table {
                     $view = sprintf( "view=funnel&funnel=%d", $event->funnel_id );
                     break;
                 case WPGH_BROADCAST_EVENT:
-                    $title =  __( 'Broadcast Email', 'groundhogg' );
+                    $title =  sprintf( __( '%s Broadcast', 'groundhogg' ), ucfirst( $event->step->get_type() ) );
                     $view = sprintf( "view=type&type=%d", WPGH_BROADCAST_EVENT );
                     break;
                 case WPGH_EMAIL_NOTIFICATION_EVENT:
@@ -155,7 +155,7 @@ class WPGH_Events_Table extends WP_List_Table {
                     $step_title = $event->step->title;
                     break;
                 case WPGH_BROADCAST_EVENT:
-                    $step_title = $event->step->email->subject;
+                    $step_title = $event->step->get_title();
                     break;
                 case WPGH_EMAIL_NOTIFICATION_EVENT:
                     $step_title = $event->step->email->subject;

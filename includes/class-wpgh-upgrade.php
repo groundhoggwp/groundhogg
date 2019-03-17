@@ -64,6 +64,7 @@ class WPGH_Upgrade{
         $this->update_to_version( '1.0.20' );
         $this->update_to_version( '1.2' );
         $this->update_to_version( '1.2.4' );
+        $this->update_to_version( '1.2.5' );
     }
 
     /**
@@ -227,5 +228,17 @@ class WPGH_Upgrade{
         WPGH()->emails->create_table();
     }
 
+	/**
+	 * Make the broadcasts table SMS compatible.
+	 */
+    public function version_1_2_5()
+    {
+	    global $wpdb;
+	    $table = WPGH()->broadcasts->table_name;
+	    $wpdb->query( "ALTER TABLE $table CHANGE `email_id` `object_id` bigint(20) unsigned;" );
+	    WPGH()->broadcasts->create_table();
+	    $wpdb->query( $wpdb->prepare("UPDATE $table SET object_type = %s WHERE object_type = '';", 'email' ) );
+
+    }
 
 }

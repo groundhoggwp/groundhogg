@@ -58,6 +58,22 @@ var wpgh;
                 }
             });
         },
+        buildSMSPicker: function() {
+            $('.gh-sms-picker' ).css( 'width', '100%' ).select2({
+                ajax: {
+                    url: gh_admin_object.sms_endpoint,
+                    dataType: 'json',
+                    beforeSend: function ( xhr ) {
+                        xhr.setRequestHeader( 'X-WP-Nonce', gh_admin_object.nonce );
+                    },
+                    results: function(data, page) {
+                        return {
+                            results: data.results
+                        };
+                    }
+                }
+            });
+        },
         buildContactPicker: function (){
             $('.gh-contact-picker' ).css( 'width', '100%' ).select2({
                 ajax: {
@@ -104,6 +120,7 @@ var wpgh;
         init:  function () {
             this.buildSelect2();
             this.buildEmailPicker();
+            this.buildSMSPicker();
             this.buildContactPicker();
             this.buildTagPicker();
             this.buildSingleTagPicker();

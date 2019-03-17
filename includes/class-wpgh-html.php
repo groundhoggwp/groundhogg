@@ -26,6 +26,7 @@ class WPGH_HTML
 
         add_action( 'wp_ajax_gh_get_contacts', array( $this, 'gh_get_contacts' ) );
         add_action( 'wp_ajax_gh_get_emails', array( $this, 'gh_get_emails' ) );
+        add_action( 'wp_ajax_gh_get_sms', array( $this, 'gh_get_sms' ) );
         add_action( 'wp_ajax_gh_get_tags', array( $this, 'gh_get_tags' ) );
         add_action( 'wp_ajax_gh_get_benchmarks', array( $this, 'gh_get_benchmarks' ) );
         add_action( 'wp_ajax_gh_get_meta_keys', array( $this, 'get_meta_keys' ) );
@@ -722,6 +723,72 @@ class WPGH_HTML
 
         return $this->select2( $a );
     }
+
+	/**
+	 * Get json email results for email picker
+	 */
+	public function gh_get_sms()
+	{
+
+		$query_args=[];
+
+		if ( ! is_user_logged_in() || ! current_user_can( 'edit_sms' ) )
+			wp_die( 'No access to sms.' );
+
+		if ( isset(  $_REQUEST[ 'q' ] ) ){
+			$query_args[ 'search' ] = $_REQUEST[ 'q' ];
+		}
+
+		$data = WPGH()->sms->get_smses( $query_args );
+
+		$json = array();
+
+		foreach ( $data as $i => $sms ) {
+
+			$json[] = array(
+				'id' => $sms->ID,
+				'text' => $sms->title
+			);
+
+		}
+
+		$results = array( 'results' => $json, 'more' => false );
+
+		wp_die( json_encode( $results ) );
+	}
+
+	/**
+	 * Return the html for an email picker
+	 *
+	 * @param $args
+	 * @return string
+	 */
+	public function dropdown_sms( $args )
+	{
+		$a = wp_parse_args( $args, array(
+			'name'              => 'sms_id',
+			'id'                => 'sms_id',
+			'class'             => 'gh-sms-picker',
+			'data'              => array(),
+			'selected'          => array(),
+			'multiple'          => false,
+			'placeholder'       => __( 'Please select an SMS', 'groundhogg' ),
+			'tags'              => false,
+		) );
+
+		foreach ( $a[ 'selected' ] as $sms_id ){
+
+			if ( WPGH()->sms->exists( $sms_id ) ){
+
+				$email =  WPGH()->sms->get( $sms_id );
+				$a[ 'data' ][ $sms_id ] = $email->title;
+
+			}
+
+		}
+
+		return $this->select2( $a );
+	}
 
 	/**
 	 * Get json email results for email picker

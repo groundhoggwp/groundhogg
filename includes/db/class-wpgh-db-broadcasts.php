@@ -48,7 +48,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
         }
 
         $this->primary_key = 'ID';
-        $this->version     = '1.0';
+        $this->version     = '1.1';
     }
 
     /**
@@ -60,7 +60,8 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
     public function get_columns() {
         return array(
             'ID'                => '%d',
-            'email_id'          => '%d',
+            'object_id'         => '%d',
+            'object_type'       => '%s',
             'scheduled_by'      => '%d',
             'send_time'         => '%d',
             'tags'              => '%s',
@@ -78,7 +79,8 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
     public function get_column_defaults() {
         return array(
             'ID'                => 0,
-            'email_id'          => 0,
+            'object_id'         => 0,
+            'object_type'       => 'email',
             'scheduled_by'      => 0,
             'send_time'         => 0,
             'tags'              => '',
@@ -88,7 +90,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
     }
 
     /**
-     * Given a data set, if tags are present make sure the end up serialized
+     * Given a data set, if tags are present make sure they end up serialized
      *
      * @param array $data
      * @return array
@@ -349,7 +351,8 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
 
         $sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        email_id bigint(20) unsigned NOT NULL,
+        object_id bigint(20) unsigned NOT NULL,
+        object_type VARCHAR(20) NOT NULL,
         scheduled_by bigint(20) unsigned NOT NULL,
         send_time bigint(20) unsigned NOT NULL,
         tags longtext NOT NULL,

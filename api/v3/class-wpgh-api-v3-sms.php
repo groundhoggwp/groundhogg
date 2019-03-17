@@ -31,14 +31,30 @@ class WPGH_API_V3_SMS extends WPGH_API_V3_BASE
 
         register_rest_route('gh/v3', '/sms', [
             [
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => [ $this, 'get_sms' ],
-                'permission_callback' => $auth_callback,
-                'args' => [
-                    'query' => [
-                        'description' => _x( 'Any search parameters.', 'api', 'groundhogg' )
-                    ]
-                ]
+	            'methods' => WP_REST_Server::READABLE,
+	            'callback' => [ $this, 'get_sms' ],
+	            'permission_callback' => $auth_callback,
+	            'args' => [
+		            'query' => [
+			            'description' => _x( 'Any search parameters.', 'api', 'groundhogg' )
+		            ],
+		            'select' => [
+			            'required'    => false,
+			            'description' => _x( 'Whether to retrieve as available for a select input.', 'api', 'groundhogg' ),
+		            ],
+		            'select2' => [
+			            'required'    => false,
+			            'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
+		            ],
+		            'search' => [
+			            'required'    => false,
+			            'description' => _x( 'Search string for tag name.', 'api', 'groundhogg' ),
+		            ],
+		            'q' => [
+			            'required'    => false,
+			            'description' => _x( 'Shorthand for search.', 'api', 'groundhogg' ),
+		            ],
+	            ]
             ]
         ] );
 
@@ -72,23 +88,54 @@ class WPGH_API_V3_SMS extends WPGH_API_V3_BASE
      */
     public function get_sms( WP_REST_Request $request )
     {
-        if ( ! current_user_can( 'edit_sms' ) ){
-            return self::ERROR_INVALID_PERMISSIONS();
-        }
+	    if ( ! current_user_can( 'edit_sms' ) ){
+		    return self::ERROR_INVALID_PERMISSIONS();
+	    }
 
-        $query = (array) $request->get_param( 'query' );
+	    $query =  $request->get_param( 'query' ) ? (array) $request->get_param( 'query' ) : [];
 
-        if ( empty( $query ) ){
-            $query = [];
-        }
+	    $search = $request->get_param( 'q' ) ? $request->get_param( 'q' ) : $request->get_param( 'search' ) ;
+	    $search = sanitize_text_field( stripslashes( $search ) );
 
-        $sms = WPGH()->sms->get_sms( $query );
+	    if ( ! key_exists( 'search', $query ) && ! empty( $search ) ){
+		    $query[ 'search' ] = $search;
+	    }
 
-        if ( empty( $sms ) ){
-            return self::ERROR_404( 'no_sms', 'No sms matched the provided query.' );
-        }
+	    $is_for_select = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
+	    $is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 
-        return self::SUCCESS_RESPONSE( [ 'sms' => $sms ] );
+	    $sms = WPGH()->sms->get_smses( $query );
+
+	    if ( $is_for_select2 ){
+		    $json = array();
+
+		    foreach ( $sms as $i => $sms_single ) {
+
+			    $json[] = array(
+				    'id' => $sms_single->ID,
+				    'text' => $sms_single->title
+			    );
+
+		    }
+
+		    $results = array( 'results' => $json, 'more' => false );
+
+		    return rest_ensure_response( $results );
+	    }
+
+	    if ( $is_for_select ){
+
+		    $response_sms = [];
+
+		    foreach ( $sms as $i => $sms_single ) {
+			    $response_sms[ $sms_single->ID ] = $sms_single->title;
+		    }
+
+		    $sms = $response_sms;
+
+	    }
+
+	    return self::SUCCESS_RESPONSE( [ 'sms' => $sms ] );
     }
 
     /**

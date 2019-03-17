@@ -31,6 +31,26 @@ class WPGH_Broadcast implements WPGH_Event_Process
      */
     public $email;
 
+	/**
+	 * @var WPGH_SMS
+	 */
+    public $sms;
+
+	/**
+	 * @var WPGH_SMS|WPGH_Email
+	 */
+    public $object;
+
+	/**
+	 * @var int
+	 */
+    public $object_id;
+
+	/**
+	 * @var string
+	 */
+    public $object_type;
+
     /**
      * the time when the broadcast is to be sent
      * @var int
@@ -81,6 +101,55 @@ class WPGH_Broadcast implements WPGH_Event_Process
 
     }
 
+	/**
+	 * @return string
+	 */
+    public function get_type()
+    {
+    	return $this->object_type;
+    }
+
+	/**
+	 * Whether the broadcast is sending an sms
+	 *
+	 * @return bool
+	 */
+    public function is_sms()
+    {
+        return $this->object_type === 'sms';
+    }
+
+	/**
+	 * Whether the broadcast is sending an email
+	 *
+	 * @return bool
+	 */
+    public function is_email()
+    {
+    	return $this->object_type === 'email';
+    }
+
+	/**
+	 * Get the column row title for the broadcast.
+	 *
+	 * @return string
+	 */
+    public function get_title()
+    {
+
+    	if ( ! $this->object->exists() ){
+    		return __( '(The associated Email or SMS was deleted.)', 'groundhogg' );
+	    }
+
+    	if ( $this->is_sms() ){
+    		return $this->sms->title;
+	    } else {
+    		return $this->email->subject;
+	    }
+
+    }
+
+
     /**
      * Setup the properties...
      *
@@ -89,8 +158,18 @@ class WPGH_Broadcast implements WPGH_Event_Process
     public function setup_broadcast( $broadcast )
     {
 
-        $this->email        = new WPGH_Email( $broadcast->email_id );
-        $this->scheduled_by = intval( $broadcast->scheduled_by );
+    	$this->object_type = isset( $broadcast->object_type ) && $broadcast->object_type === 'sms' ? 'sms' : 'email';
+    	$this->object_id = intval( $broadcast->object_id );
+
+    	if ( $this->object_type === 'email' ){
+		    $this->email = new WPGH_Email( $this->object_id );
+		    $this->object = $this->email;
+	    } else {
+		    $this->sms = new WPGH_SMS( $this->object_id );
+		    $this->object = $this->sms;
+	    }
+
+	    $this->scheduled_by = intval( $broadcast->scheduled_by );
         $this->send_time    = intval( $broadcast->send_time );
         $this->tags         = maybe_unserialize( $broadcast->tags );
         $this->status       = $broadcast->status;
@@ -138,7 +217,7 @@ class WPGH_Broadcast implements WPGH_Event_Process
     }
 
     /**
-     * Send the associated email to the given contact
+     * Send the associated object to the given contact
      *
      * @param $contact WPGH_Contact
      * @param $event WPGH_Event
@@ -148,11 +227,9 @@ class WPGH_Broadcast implements WPGH_Event_Process
     public function run( $contact, $event = null )
     {
 
-        do_action( 'wpgh_send_broadcast_email_before', $this, $contact, $event );
-
-        $result = $this->email->send( $contact, $event );
-
-        do_action( 'wpgh_send_broadcast_email_after', $this, $contact, $event );
+	    do_action( "groundhogg/broadcast/{$this->object_type}/before", $this, $contact, $event );
+        $result = $this->object->send( $contact, $event );
+        do_action( "groundhogg/broadcast/{$this->object_type}/after", $this, $contact, $event );
 
         return $result;
     }

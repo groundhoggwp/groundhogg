@@ -528,6 +528,7 @@ function wpgh_register_scripts()
         wp_localize_script( 'wpgh-admin-js', 'gh_admin_object', [
             'tags_endpoint' => site_url( 'wp-json/gh/v3/tags?select2=true' ),
             'emails_endpoint' => site_url( 'wp-json/gh/v3/emails?select2=true' ),
+            'sms_endpoint' => site_url( 'wp-json/gh/v3/sms?select2=true' ),
             'contacts_endpoint' => site_url( 'wp-json/gh/v3/contacts?select2=true' ),
             'nonce' => wp_create_nonce( 'wp_rest' )
         ] );
@@ -537,6 +538,7 @@ function wpgh_register_scripts()
         wp_localize_script( 'wpgh-admin-js', 'gh_admin_object', [
             'tags_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_tags' ),
             'emails_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_emails' ),
+            'sms_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_sms' ),
             'contacts_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_contacts' ),
             'nonce' => wp_create_nonce( 'admin_ajax' )
         ] );

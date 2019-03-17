@@ -674,7 +674,9 @@ class WPGH_Emails_Page
         } else {
             ?>
             <div class="wrap">
-                <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
+                <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
+                <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
+                <a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add&type=email' ); ?>"><?php _ex( 'Email Broadcast', 'page_tile_action','groundhogg' ); ?></a>
                 <?php $this->notices->notices(); ?>
                 <hr class="wp-header-end">
                 <?php switch ( $this->get_action() ){

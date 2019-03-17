@@ -33,11 +33,11 @@ class WPGH_Broadcasts_Page
         add_action('admin_menu', array($this, 'register'), $this->order);
 
         add_action( 'wp_ajax_gh_email_broadcast_schedule', [ $this, 'ajax_bulk_schedule' ] );
+	    $this->notices = WPGH()->notices;
 
-        if (isset($_GET['page']) && $_GET['page'] === 'gh_broadcasts') {
-            add_action('init', array($this, 'process_action'));
-            add_action('admin_enqueue_scripts', array($this, 'scripts'));
-            $this->notices = WPGH()->notices;
+	    if (isset($_GET['page']) && $_GET['page'] === 'gh_broadcasts') {
+	        add_action('init', array($this, 'process_action'));
+	        add_action('admin_enqueue_scripts', array($this, 'scripts'));
         }
     }
 
@@ -203,14 +203,15 @@ class WPGH_Broadcasts_Page
 
         $config = [];
 
-        $email = isset($_POST['email_id']) ? intval($_POST['email_id']) : null;
-        if (!$email) {
-            $this->notices->add('no_email', _x('Please select an email to send.', 'notice', 'groundhogg'), 'error');
+        $object_id = isset($_POST['object_id']) ? intval($_POST['object_id']) : null;
+        if (!$object_id) {
+            $this->notices->add('no_object', _x('Please select an email or SMS to send.', 'notice', 'groundhogg'), 'error');
             return;
         }
 
-        /* Set the email */
-        $config['email'] = $email;
+        /* Set the object  */
+        $config['object_id'] = $object_id;
+        $config['object_type'] = isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' : 'email';
 
         $tags = isset($_POST['tags']) ? WPGH()->tags->validate($_POST['tags']) : array();
         if (empty($tags) || !is_array($tags)) {
@@ -256,7 +257,8 @@ class WPGH_Broadcasts_Page
         $config['send_time'] = $send_time;
 
         $args = array(
-            'email_id' => $email,
+            'object_id' => $object_id,
+            'object_type' => $config[ 'object_type' ],
             'tags' => $tags,
             'send_time' => $send_time,
             'scheduled_by' => get_current_user_id(),
@@ -306,53 +308,58 @@ class WPGH_Broadcasts_Page
             return;
         }
 
-        $contact_ids = array_map('absint', $_POST['contacts']);
+        $response = [];
 
-        $config = wp_parse_args($config, [
-            'broadcast_id' => 0,
-            'send_time' => time(),
-            'send_now' => false,
-            'send_in_local_time' => false
-        ]);
+        if ( isset( $_POST[ 'contacts' ] ) && ! empty($_POST['contacts'] ) ){
+	        $contact_ids = array_map('absint', $_POST['contacts']);
 
-        $broadcast_id = intval($config['broadcast_id']);
-        $send_time = intval($config['send_time']);
-        $send_now = filter_var($config['send_now'], FILTER_VALIDATE_BOOLEAN);
-        $send_in_timezone = filter_var($config['send_in_local_time'], FILTER_VALIDATE_BOOLEAN);
+	        $config = wp_parse_args($config, [
+		        'broadcast_id' => 0,
+		        'send_time' => time(),
+		        'send_now' => false,
+		        'send_in_local_time' => false
+	        ]);
 
-        $completed = 0;
+	        $broadcast_id = intval($config['broadcast_id']);
+	        $send_time = intval($config['send_time']);
+	        $send_now = filter_var($config['send_now'], FILTER_VALIDATE_BOOLEAN);
+	        $send_in_timezone = filter_var($config['send_in_local_time'], FILTER_VALIDATE_BOOLEAN);
 
-        foreach ($contact_ids as $id) {
+	        $completed = 0;
 
-            $contact = wpgh_get_contact($id);
+	        foreach ($contact_ids as $id) {
 
-            $local_time = $send_time;
+		        $local_time = $send_time;
 
-            if ($send_in_timezone && !$send_now) {
-                $local_time = $contact->get_local_time_in_utc_0($send_time);
-                if ($local_time < time()) {
-                    $local_time += DAY_IN_SECONDS;
-                }
-            }
+		        if ( $send_in_timezone && ! $send_now ) {
+			        $contact = wpgh_get_contact( $id );
+			        $local_time = $contact->get_local_time_in_utc_0( $send_time );
+			        if ($local_time < time()) {
+				        $local_time += DAY_IN_SECONDS;
+			        }
+		        }
 
-            $args = array(
-                'time' => $local_time,
-                'contact_id' => $contact->ID,
-                'funnel_id' => WPGH_BROADCAST,
-                'step_id' => $broadcast_id,
-                'status' => 'waiting',
-                'event_type' => WPGH_BROADCAST_EVENT
-            );
+		        $args = array(
+			        'time' => $local_time,
+			        'contact_id' => $id,
+			        'funnel_id' => WPGH_BROADCAST,
+			        'step_id' => $broadcast_id,
+			        'status' => 'waiting',
+			        'event_type' => WPGH_BROADCAST_EVENT
+		        );
 
-            if (WPGH()->events->add($args)) {
-                $completed++;
-            }
+		        if (WPGH()->events->add($args)) {
+			        $completed++;
+		        }
+	        }
+
+	        $response = [ 'complete' => $completed ];
         }
 
-        $response = [ 'complete' => $completed ];
-
         if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
+	        $this->notices->add('scheduled', _x('Broadcast Scheduled!', 'notice', 'groundhogg') );
             delete_transient( 'gh_get_broadcast_config' );
+            $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_broadcasts' );
         }
 
         wp_die( json_encode( $response ) );
@@ -440,7 +447,9 @@ class WPGH_Broadcasts_Page
     {
         ?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add' ); ?>"><?php _ex( 'Schedule New', 'page_title_action', 'groundhogg' ); ?></a>
+            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
+            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add&type=email' ); ?>"><?php _ex( 'Schedule Email Broadcast', 'page_title_action', 'groundhogg' ); ?></a>
+            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add&type=sms' ); ?>"><?php _ex( 'Schedule SMS Broadcast', 'page_title_action', 'groundhogg' ); ?></a>
             <?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
             <?php switch ( $this->get_action() ){

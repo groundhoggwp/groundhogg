@@ -19,15 +19,17 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 wp_enqueue_script( 'jquery-ui-datepicker' );
 wp_enqueue_style( 'jquery-ui' );
 
+$type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' : 'email';
 ?>
 <form name="edittag" id="edittag" method="post" action="">
     <?php wp_nonce_field(); ?>
     <table class="form-table">
+        <?php if ( $type === 'email' ): ?>
         <tbody><tr class="form-field term-email-wrap">
             <th scope="row"><label for="email_id"><?php _e( 'Select an email to send.', 'groundhogg' ) ?></label></th>
             <td><?php $args = array();
                 $args[ 'id' ] = 'email_id';
-                $args[ 'name' ] = 'email_id';
+                $args[ 'name' ] = 'object_id';
                 $args[ 'required' ] = true;
 
                 echo WPGH()->html->dropdown_emails( $args ); ?>
@@ -37,6 +39,20 @@ wp_enqueue_style( 'jquery-ui' );
                 <p class="description"><?php _e( 'The Broadcast tool uses your global emails.', 'groundhogg' ) ?></p>
             </td>
         </tr>
+        <?php else : ?>
+            <tr class="form-field term-sms-wrap">
+                <th scope="row"><label for="sms_id"><?php _e( 'Select an SMS to send.', 'groundhogg' ) ?></label></th>
+                <td><?php $args = array();
+			        $args[ 'id' ] = 'sms_id';
+			        $args[ 'name' ] = 'object_id';
+			        $args[ 'required' ] = true;
+			        echo WPGH()->html->dropdown_sms( $args ); ?>
+                    <div class="row-actions">
+                        <a target="_blank" class="button button-secondary" href="<?php echo admin_url( 'admin.php?page=gh_sms&action=add' ); ?>"><?php _e( 'Create New SMS', 'groundhogg' ); ?></a>
+                    </div>
+                </td>
+            </tr>
+        <?php endif; ?>
         <tr class="form-field term-tags-wrap">
             <th scope="row"><label for="description"><?php _e( 'Send To:', 'groundhogg' ); ?></label></th>
             <td><?php $tag_args = array();

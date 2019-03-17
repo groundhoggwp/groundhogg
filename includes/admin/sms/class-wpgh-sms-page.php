@@ -31,9 +31,11 @@ class WPGH_SMS_Page
     {
 
         add_action('admin_menu', array($this, 'register'), $this->order);
-        if (isset($_GET['page']) && $_GET['page'] === 'gh_sms') {
-            add_action('init', array($this, 'process_action'));
-            $this->notices = WPGH()->notices;
+	    add_action( 'wp_ajax_gh_sms_broadcast_schedule', [ $this, 'ajax_bulk_schedule' ] );
+
+	    $this->notices = WPGH()->notices;
+	    if (isset($_GET['page']) && $_GET['page'] === 'gh_sms') {
+	        add_action('init', array($this, 'process_action'));
         }
     }
 
@@ -97,6 +99,9 @@ class WPGH_SMS_Page
             case 'broadcast':
                 _ex('SMS Broadcast', 'page_title', 'groundhogg');
                 break;
+	        case 'schedule':
+		        _ex('Scheduling...', 'page_title', 'groundhogg');
+		        break;
             case 'edit':
                 _ex('Edit SMS', 'page_title', 'groundhogg');
                 break;
@@ -166,7 +171,7 @@ class WPGH_SMS_Page
 
         set_transient('gh_last_action', $this->get_action(), 30);
 
-        if ($this->get_action() === 'edit' || $this->get_action() === 'add')
+        if ($this->get_action() === 'edit' || $this->get_action() === 'add' || $this->get_action() == 'broadcast' )
             return;
 
         if( $this->get_action() !== 'broadcast' ){
@@ -221,92 +226,6 @@ class WPGH_SMS_Page
             do_action('wpgh_sms_updated', $id);
         }
 
-    }
-
-    /**
-     * Schedule an SMS Broadcast.
-     */
-    function schedule_broadcast()
-    {
-        if ( ! current_user_can( 'schedule_broadcasts' ) ){
-            wp_die( WPGH()->roles->error( 'schedule_broadcasts' ) );
-        }
-
-        $sms = isset( $_POST['sms_id'] )? intval( $_POST[ 'sms_id' ] ) : null;
-
-        $tags = isset( $_POST[ 'tags' ] )? WPGH()->tags->validate( $_POST['tags'] ): array();
-
-        if ( empty( $tags ) || ! is_array( $tags ) ) {
-            $this->notices->add( 'no_tags', _x( 'Please select 1 or more tags to send this sms broadcast to', 'notice', 'groundhogg' ), 'error' );
-            return;
-        }
-
-        $exclude_tags = isset( $_POST[ 'exclude_tags' ] )? WPGH()->tags->validate( $_POST['exclude_tags'] ): array();
-
-        $contact_sum = 0;
-
-        foreach ( $tags as $tag ){
-            $tag = WPGH()->tags->get_tag( intval( $tag ) );
-            if ( $tag ){
-                $contact_sum += $tag->contact_count;
-            }
-        }
-
-        if ( $contact_sum === 0 ){
-            $this->notices->add( 'no_contacts', _x( 'Please select a tag with at least 1 contact', 'notice', 'groundhogg' ), 'error' );
-            return;
-        }
-
-        $send_date = isset( $_POST['date'] )? $_POST['date'] : date( 'Y/m/d', strtotime( 'tomorrow' ) );
-        $send_time = isset( $_POST['time'] )? $_POST['time'] : '09:30';
-
-        $time_string = $send_date . ' ' . $send_time;
-
-        /* convert to UTC */
-        $send_time = strtotime( $time_string ) - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
-
-        $send_now = false;
-        if ( isset( $_POST[ 'send_now' ] ) ){
-            $send_now = true;
-            $send_time = time() + 10;
-        }
-
-        $send_in_timezone = false;
-        if ( isset( $_POST[ 'send_in_timezone' ] ) ){
-            $send_in_timezone = true;
-        }
-
-        if ( $send_time < time() ){
-            $this->notices->add( 'invalid_date', _x( 'Please select a time in the future', 'notice', 'groundhogg' ), 'error' );
-            return;
-        }
-
-        $query = new WPGH_Contact_Query();
-
-        $args = array(
-            'tags_include' => $tags,
-            'tag_exclude' => $exclude_tags
-        );
-
-        $contacts = $query->query( $args );
-
-        foreach ( $contacts as $i => $contact ) {
-
-            $contact = wpgh_get_contact( $contact->ID );
-
-            $local_time = $send_time;
-
-            if ( $send_in_timezone && ! $send_now ){
-                $local_time = $contact->get_local_time_in_utc_0( $send_time );
-                if ( $local_time < time() ){
-                    $local_time+=DAY_IN_SECONDS;
-                }
-            }
-
-            wpgh_send_sms_notification( $sms, $contact->ID, $local_time );
-        }
-
-        $this->notices->add( 'success', _x( 'SMS broadcast scheduled!', 'notice', 'groundhogg' ), 'success' );
     }
 
 	function verify_action()
@@ -382,15 +301,6 @@ class WPGH_SMS_Page
 		include dirname(__FILE__) . '/edit-sms.php';
 	}
 
-	function broadcast()
-    {
-        if ( ! current_user_can( 'edit_sms' ) ){
-            wp_die( WPGH()->roles->error( 'edit_sms' ) );
-        }
-
-        include dirname(__FILE__) . '/sms-broadcast.php';
-    }
-
 	function page()
 	{
 
@@ -402,15 +312,12 @@ class WPGH_SMS_Page
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
             <a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_sms' ); ?>"><?php _ex( 'Add New', 'page_tile_action','groundhogg' ); ?></a>
-            <a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_sms&action=broadcast' ); ?>"><?php _ex( 'SMS Broadcast', 'page_tile_action','groundhogg' ); ?></a>
+            <a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add&type=sms' ); ?>"><?php _ex( 'SMS Broadcast', 'page_tile_action','groundhogg' ); ?></a>
 			<?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
 			<?php switch ( $this->get_action() ){
 				case 'edit':
 					$this->edit();
-					break;
-                case 'broadcast':
-					$this->broadcast();
 					break;
 				default:
 					$this->table();
