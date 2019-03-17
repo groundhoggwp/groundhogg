@@ -96,12 +96,14 @@ class WPGH_Upgrade{
 
             $func = $this->convert_version_to_function( $version );
 
-            if ( method_exists( $this, $func ) ){
-                call_user_func( array( $this, $func ) );
-            }
+            if ( $func && method_exists( $this, $func ) ){
 
-            $this->db_version = $version;
-            update_option( 'wpgh_last_upgrade_version', $this->db_version );
+                call_user_func( array( $this, $func ) );
+
+                $this->db_version = $version;
+
+                update_option( 'wpgh_last_upgrade_version', $this->db_version );
+            }
 
         }
 
