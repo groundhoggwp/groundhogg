@@ -109,6 +109,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.2.6 =
 * ADDED progress bars to import/bulk delete tools to provide visual keys for progress.
+* ADDED Last broadcast Report in the dashboard.
 * TWEAKED Broadcasts are now scheduled in batches to avoid timing out for larger lists on bad hosting.
 * FIXED Add note not working. Code removed accidentally.
 

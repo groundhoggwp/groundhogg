@@ -64,7 +64,7 @@ class WPGH_Upgrade{
         $this->update_to_version( '1.0.20' );
         $this->update_to_version( '1.2' );
         $this->update_to_version( '1.2.4' );
-        $this->update_to_version( '1.2.5' );
+        $this->update_to_version( '1.2.6' );
     }
 
     /**
@@ -231,7 +231,7 @@ class WPGH_Upgrade{
 	/**
 	 * Make the broadcasts table SMS compatible.
 	 */
-    public function version_1_2_5()
+    public function version_1_2_6()
     {
 	    global $wpdb;
 	    $table = WPGH()->broadcasts->table_name;
