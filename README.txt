@@ -107,6 +107,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.7 =
+* ADDED DB status to system report.
+* FIXED typo in notice when changing a contacts email address.
+* FIXED Dashboard not loading if circle graph report is in closed position.
+
 = 1.2.6 =
 * ADDED progress bars to import/bulk delete tools to provide visual keys for progress.
 * ADDED Last broadcast Report in the dashboard.

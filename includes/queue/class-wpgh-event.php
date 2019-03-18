@@ -16,6 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class WPGH_Event
 {
 
+    /** @var string Event statuses */
+    const COMPLETE  = 'complete';
+    const CANCELLED = 'canceled';
+    const SKIPPED   = 'skipped';
+    const WAITING   = 'waiting';
+    const FAILED    = 'failed';
+
     /**
      * The event's ID
      *

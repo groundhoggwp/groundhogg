@@ -40,7 +40,8 @@ abstract class WPGH_Circle_Graph_Report extends WPGH_Reporting_Widget
 
                 jQuery(function($) {
                     var dataSet = <?php echo $data; ?>;
-                    $.plot('#graph-<?php echo sanitize_key($this->name); ?>', dataSet, {
+
+                    var options = {
                         grid : {
                             clickable : true,
                             hoverable : true
@@ -62,13 +63,19 @@ abstract class WPGH_Circle_Graph_Report extends WPGH_Reporting_Widget
                                 }
                             }
                         },
-                    });
+                    };
 
-                    $('#graph-<?php echo sanitize_key($this->name); ?>').bind("plotclick", function(event,pos,obj) {
-                        try{
-                            window.location.replace(dataSet[obj.seriesIndex].url);
-                        } catch (e) {}
-                    });
+                    if ( $( "#graph-<?php echo sanitize_key($this->name); ?>" ).width() > 0 ){
+
+                        $.plot($("#graph-<?php echo sanitize_key($this->name); ?>"), dataSet, options);
+
+                        $('#graph-<?php echo sanitize_key($this->name); ?>').bind("plotclick", function(event,pos,obj) {
+                            try{
+                                window.location.replace(dataSet[obj.seriesIndex].url);
+                            } catch (e) {}
+                        });
+
+                    }
                 });
 
             </script>

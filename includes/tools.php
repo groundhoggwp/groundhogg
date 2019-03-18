@@ -417,8 +417,29 @@ function wpgh_tools_sysinfo_get() {
     $return .= 'Max Execution Time:           ' . esc_html( WPGH()->event_queue->get_max_execution_time() ) . " seconds\n";
     $return .= 'Total Executions:             ' . esc_html( wpgh_get_option( 'gh_queue_times_executed' ) ) . "\n";
 
-    $return  = apply_filters( 'wpgh_sysinfo_after_session_config', $return );
+    $return .= "\n" . '-- Tables' . "\n\n";
+    $return .= 'Contacts:       ' . ( WPGH()->contacts->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Contact Meta:   ' . ( WPGH()->contact_meta->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Emails:         ' . ( WPGH()->emails->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Email Meta:     ' . ( WPGH()->email_meta->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Broadcasts:     ' . ( WPGH()->broadcasts->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'SMS:            ' . ( WPGH()->sms->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Funnels:        ' . ( WPGH()->funnels->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Steps:          ' . ( WPGH()->steps->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Step Meta:      ' . ( WPGH()->step_meta->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Events:         ' . ( WPGH()->events->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Activity:       ' . ( WPGH()->activity->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Superlinks:     ' . ( WPGH()->superlinks->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Tags:           ' . ( WPGH()->tags->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+    $return .= 'Tag Relationships: ' . ( WPGH()->tag_relationships->installed() ? 'Installed' : 'Not Installed' ) . "\n";
 
+    $return .= "\n" . '-- WPDB' . "\n\n";
+    $return .= 'Tables:                     ' . implode( ', ', $wpdb->tables() ) . "\n";
+    $return .= 'Step Meta Connection:       ' . ( isset( $wpdb->stepmeta ) ? sprintf( 'Connected (%s)', $wpdb->stepmeta ) : 'Not Connected' ) . "\n";
+    $return .= 'Email Meta Connection:      ' . ( isset( $wpdb->emailmeta ) ? sprintf( 'Connected (%s)', $wpdb->emailmeta ) : 'Not Connected' ) . "\n";
+    $return .= 'Contact Meta Connection:    ' . ( isset( $wpdb->contactmeta ) ? sprintf( 'Connected (%s)', $wpdb->contactmeta ) : 'Not Connected' ) . "\n";
+
+    $return  = apply_filters( 'wpgh_sysinfo_after_session_config', $return );
     $return .= "\n" . '### End System Info ###';
 
     return $return;

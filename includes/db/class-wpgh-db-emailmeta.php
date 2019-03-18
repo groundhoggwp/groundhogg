@@ -34,7 +34,7 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
         $this->primary_key = 'meta_id';
         $this->version     = '1.0';
 
-        add_action( 'plugins_loaded', array( $this, 'register_table' ), 11 );
+        add_action( 'plugins_loaded', array( $this, 'register_table' ) );
         add_action( 'installing_groundhogg', array( $this, 'register_table' ) );
 
     }
@@ -63,7 +63,7 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
     public function register_table() {
         global $wpdb;
         $wpdb->emailmeta = $this->table_name;
-        $wpdb->tables[] = 'emailmeta';
+        $wpdb->tables[] = 'gh_emailmeta';
 
     }
 

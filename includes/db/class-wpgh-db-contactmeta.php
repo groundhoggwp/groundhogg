@@ -34,7 +34,7 @@ class WPGH_DB_Contact_Meta extends WPGH_DB {
         $this->primary_key = 'meta_id';
         $this->version     = '1.0';
 
-        add_action( 'plugins_loaded', array( $this, 'register_table' ), 11 );
+        add_action( 'plugins_loaded', array( $this, 'register_table' ) );
         add_action( 'installing_groundhogg', array( $this, 'register_table' ) );
         add_action( 'wpgh_post_delete_contact', array( $this, 'delete_contact_meta_on_delete' ) );
 
@@ -64,7 +64,7 @@ class WPGH_DB_Contact_Meta extends WPGH_DB {
     public function register_table() {
         global $wpdb;
         $wpdb->contactmeta = $this->table_name;
-        $wpdb->tables[] = 'contactmeta';
+        $wpdb->tables[] = 'gh_contactmeta';
 
     }
 

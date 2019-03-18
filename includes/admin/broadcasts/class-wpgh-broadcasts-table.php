@@ -154,7 +154,12 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
     protected function column_object_id( $broadcast )
     {
         $subject = $broadcast->get_title();
-        $editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . $broadcast->ID );
+
+        if ( $broadcast->is_email() ){
+            $editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . $broadcast->ID );
+        } else {
+            $editUrl = '#';
+        }
 
         if ( $this->get_view() === 'cancelled' ){
             $html = "<strong>{$subject}</strong>";
@@ -204,7 +209,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 
 		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
 			    _x( "Sent", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&status=%s', WPGH_BROADCAST, $broadcast->ID, 'complete' ) ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&status=%s', WPGH_BROADCAST, $broadcast->ID, WPGH_Event::COMPLETE ) ),
 			    $contact_sum
 		    );
 
@@ -223,7 +228,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 
 		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
 			    _x( "Sent", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s', WPGH_BROADCAST, $broadcast->ID) ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&status=%s', WPGH_BROADCAST, $broadcast->ID, WPGH_Event::COMPLETE ) ),
 			    $contact_sum
 		    );
 
