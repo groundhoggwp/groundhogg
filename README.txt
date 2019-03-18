@@ -443,7 +443,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED there is now a check to see if a "robot" is submitting form. All robots will fail.
 * FIXED Form builder was using dropdown shortcode but that shortcode wasn't actually registered...
 
-= 10.0.12 =
+= 1.0.12 =
 * ADDED Interactive Broadcast pie chart.
 * ADDED Dashboard Reports.
 * TWEAKED Form Address Field to include proper placeholder information
@@ -452,19 +452,19 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED Import contact trimming column headers
 * TWEAKED Better error reporting when contact import fails.
 
-= 10.0.11.1 =
+= 1.0.11.1 =
 * FIXED Line which included the report missing
 * TWEAKED added new code for the default form.
 
-= 10.0.11 =
+= 1.0.11 =
 * ADDED New Funnel Reporting Graph at top of funnel when in reporting mode.
 * ADDED compatibility for modal outside of funnel editor.
 * TWEAKED New form build improvements. Popup UI for adding fields in the form builder.
 
-= 10.0.10.4 =
+= 1.0.10.4 =
 * ADDED Introduced funnel warnings for date timers with descending dates and dates that are in the past.
 
-= 10.0.10.3 =
+= 1.0.10.3 =
 * ADDED some mobile compatibility for the funnel view. Mostly just for basic edits and funnel reporting purposes.
 * FIXED bug where cron was called a private function.
 
