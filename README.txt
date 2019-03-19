@@ -108,7 +108,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.2.8 =
-* TWEAKED Better warning for the gloabl multisite db network.
+* TWEAKED Better warning for the global multisite db network.
 * FIXED Does not drop main network DB if subsite is deleted when the global DB option is enabled.
 
 = 1.2.7 =
