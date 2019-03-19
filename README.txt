@@ -9,15 +9,13 @@ Stable tag: trunk
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
-The first WordPress powered open source marketing automation plugin that requires no external, monthly paid, expensive platform that is too complicated to use anyway.
+Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
 
 == Description ==
 
-Groundhogg provides the essential tools for you to be able to communicate with your list effectively.
+Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
 
-Use Benchmarks (interactions with your site) to trigger Actions with your list to provide a more meaningful conversation.
-
-Groundhogg provides tools that allow you to create and implement high converting email marketing funnels in a matter of minutes. If you're new to marketing, Groundhogg also comes with pre-built funnel and email templates to speed up the process.
+Groundhogg provides a suite of digital marketing and sales tools that allow you to create and implement high converting funnels in a matter of minutes. If you're new to marketing, Groundhogg also comes with pre-built funnel and email templates to speed up the process.
 
 Our [extensions library](https://groundhogg.io/downloads/) will allow you to connect WordPress' most powerful plugins, adding more trigger points and useful interaction tools.
 
