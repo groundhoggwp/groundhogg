@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 1.2.7
+Version: 1.2.8
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.2.7';
+        public $version = '1.2.8';
 
         /**
          * @var $instance Groundhogg instance
@@ -48,11 +48,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          * @var object|WPGH_API_V2
          */
         public $api;
-
-        /**
-         * @var WPGH_DB_API_Tokens
-         */
-        public $tokens;
 
         /**
          * GH HTML Helper Class
@@ -278,7 +273,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->activity     = new WPGH_DB_Activity();
                 self::$instance->events       = new WPGH_DB_Events();
                 self::$instance->superlinks   = new WPGH_DB_Superlinks();
-                self::$instance->tokens       = new WPGH_DB_API_Tokens();
 
                 self::$instance->roles        = new WPGH_Roles();
                 self::$instance->tracking     = new WPGH_Tracking();
@@ -440,7 +434,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-superlinks.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-tag-relationships.php';
             require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-tags.php';
-            require_once WPGH_PLUGIN_DIR . 'includes/db/class-wpgh-db-api-tokens.php';
 
             /* Admin Files */
             if ( is_admin() ){

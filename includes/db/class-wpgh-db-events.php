@@ -44,13 +44,9 @@ class WPGH_DB_Events extends WPGH_DB  {
      */
     public function __construct() {
 
-        global $wpdb;
+        $this->db_name = 'gh_events';
+        $this->table_name();
 
-        if ( wpgh_should_if_multisite() ){
-            $this->table_name  = $wpdb->prefix . 'gh_events';
-        } else {
-            $this->table_name  = $wpdb->base_prefix . 'gh_events';
-        }
         $this->primary_key = 'ID';
         $this->version     = '1.0';
 

@@ -39,13 +39,8 @@ class WPGH_DB_Activity extends WPGH_DB  {
      */
     public function __construct() {
 
-        global $wpdb;
-
-        if ( wpgh_should_if_multisite() ){
-            $this->table_name  = $wpdb->prefix . 'gh_activity';
-        } else {
-            $this->table_name  = $wpdb->base_prefix . 'gh_activity';
-        }
+        $this->db_name = 'gh_activity';
+        $this->table_name();
 
         $this->primary_key = 'ID';
         $this->version     = '1.0';

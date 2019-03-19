@@ -254,22 +254,24 @@ function wpgh_wpmu_drop_tables( $tables, $blog_id ) {
 
     switch_to_blog( $blog_id );
 
+    global $wpdb;
+
     if ( WPGH()->contacts->installed() ) {
-        $tables[] = WPGH()->contacts->table_name;
-        $tables[] = WPGH()->contact_meta->table_name;
-        $tables[] = WPGH()->sms->table_name;
-        $tables[] = WPGH()->emails->table_name;
-        $tables[] = WPGH()->email_meta->table_name;
-        $tables[] = WPGH()->broadcasts->table_name;
-        $tables[] = WPGH()->funnels->table_name;
-        $tables[] = WPGH()->superlinks->table_name;
-        $tables[] = WPGH()->tags->table_name;
-        $tables[] = WPGH()->tag_relationships->table_name;
-        $tables[] = WPGH()->events->table_name;
-        $tables[] = WPGH()->activity->table_name;
-        $tables[] = WPGH()->steps->table_name;
-        $tables[] = WPGH()->step_meta->table_name;
-//        $tables[] = WPGH()->tokens->table_name;
+        /* do not use the table name in the event GLOBAL DB is enabled. */
+        $tables[] = $wpdb->prefix . WPGH()->contacts->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->contact_meta->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->sms->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->emails->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->email_meta->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->broadcasts->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->funnels->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->superlinks->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->tags->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->tag_relationships->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->events->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->activity->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->steps->db_name;
+        $tables[] = $wpdb->prefix . WPGH()->step_meta->db_name;
     }
 
     restore_current_blog();
@@ -343,21 +345,6 @@ function wpgh_after_install() {
 }
 
 add_action( 'admin_init', 'wpgh_after_install' );
-
-/**
- * Update to add table, amke sure it exists....
- *
- * @deprecated since 1.0.16
- */
-function wpgh_api_table_check(){
-
-    if ( ! @WPGH()->tokens->installed() ){
-        @WPGH()->tokens->create_table();
-    }
-
-}
-
-//add_action( 'admin_init', 'wpgh_api_table_check' );
 
 /**
  * Install user roles on sub-sites of a network

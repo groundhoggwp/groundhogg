@@ -24,13 +24,9 @@ class WPGH_DB_Step_Meta extends WPGH_DB {
      * @since   2.6
      */
     public function __construct() {
-        global $wpdb;
 
-        if ( wpgh_should_if_multisite() ){
-            $this->table_name  = $wpdb->prefix . 'gh_stepmeta';
-        } else {
-            $this->table_name  = $wpdb->base_prefix . 'gh_stepmeta';
-        }
+        $this->db_name = 'gh_stepmeta';
+        $this->table_name();
 
         $this->primary_key = 'meta_id';
         $this->version     = '1.0';

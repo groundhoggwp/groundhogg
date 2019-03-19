@@ -34,6 +34,14 @@ abstract class WPGH_DB {
      * @access  public
      * @since   2.1
      */
+    public $db_name;
+
+    /**
+     * The name of our database table
+     *
+     * @access  public
+     * @since   2.1
+     */
     public $table_name;
 
     /**
@@ -56,6 +64,27 @@ abstract class WPGH_DB {
      * @var string
      */
     public $charset;
+
+
+    /**
+     * Get table name
+     *
+     * @return string
+     */
+    public function table_name()
+    {
+        global $wpdb;
+
+        if ( ! isset( $this->table_name ) ){
+            if ( ! wpgh_is_global_multisite() ){
+                $this->table_name  = $wpdb->prefix . $this->db_name;
+            } else {
+                $this->table_name = $wpdb->base_prefix . $this->db_name;
+            }
+        }
+
+        return $this->table_name;
+    }
 
     /**
      * Get the charset
@@ -145,7 +174,7 @@ abstract class WPGH_DB {
      * @access  public
      * @since   2.1
      */
-    public function __construct() {}
+    abstract public function __construct();
 
     /**
      * Whitelist of columns

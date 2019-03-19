@@ -49,25 +49,17 @@ if( wpgh_is_option_enabled( 'gh_uninstall_on_delete' ) ) {
     WPGH()->activity->drop();
     WPGH()->broadcasts->drop();
     WPGH()->sms->drop();
-
     WPGH()->contacts->drop();
     WPGH()->contact_meta->drop();
-
     WPGH()->emails->drop();
     WPGH()->email_meta->drop();
-
     WPGH()->events->drop();
-
     WPGH()->steps->drop();
     WPGH()->step_meta->drop();
-
     WPGH()->funnels->drop();
     WPGH()->superlinks->drop();
-
     WPGH()->tags->drop();
     WPGH()->tag_relationships->drop();
-
-    WPGH()->tokens->drop();
 
     /** Cleanup Cron Events */
     wp_clear_scheduled_hook( 'wpgh_process_queue' );

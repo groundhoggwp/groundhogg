@@ -33,13 +33,8 @@ class WPGH_DB_Tags extends WPGH_DB
      */
     public function __construct() {
 
-        global $wpdb;
-
-        if ( wpgh_should_if_multisite() ){
-            $this->table_name  = $wpdb->prefix . 'gh_tags';
-        } else {
-            $this->table_name  = $wpdb->base_prefix . 'gh_tags';
-        }
+        $this->db_name = 'gh_tags';
+        $this->table_name();
 
         $this->primary_key = 'tag_id';
         $this->version     = '1.0';

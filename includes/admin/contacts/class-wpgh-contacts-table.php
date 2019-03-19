@@ -554,8 +554,25 @@ class WPGH_Contacts_Table extends WP_List_Table {
      */
     protected function extra_tablenav($which)
     {
+        if ( $which === 'top' ){
+            ?>
+            <script>
+                jQuery(function ($) {
+                    $( '#bulk-action-selector-top,#bulk-action-selector-bottom' ).on( 'change', function () {
+                        var $bulk = $(this);
+                        if ( $bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag' ){
+                            $( '.bulk-tag-action' ).removeClass( 'hidden' );
+                        } else {
+                            $( '.bulk-tag-action' ).addClass( 'hidden' );
+                        }
+                    } )
+                });
+            </script>
+            <?php
+        }
+
         ?>
-        <div class="alignleft gh-actions">
+        <div class="alignleft gh-actions bulk-tag-action hidden">
             <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo WPGH()->html->tag_picker( [
                     'name'              => 'bulk_tags[]',
                     'id'                => 'bulk_tags',
@@ -566,6 +583,8 @@ class WPGH_Contacts_Table extends WP_List_Table {
                     'placeholder'       => __( 'Bulk Apply/Remove Tags', 'groundhogg' ),
                     'tags'              => true,
                 ] ); ?></div>
+        </div>
+        <div class="alignleft gh-actions">
             <a class="button action query-export" href="javascript:void(0)"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), $this->get_pagination_arg( 'total_items' ) ); ?></a>
         </div>
         <?php

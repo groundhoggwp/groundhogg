@@ -47,13 +47,8 @@ class WPGH_DB_Emails extends WPGH_DB  {
      */
     public function __construct() {
 
-        global $wpdb;
-
-        if ( wpgh_should_if_multisite() ){
-            $this->table_name  = $wpdb->prefix . 'gh_emails';
-        } else {
-            $this->table_name  = $wpdb->base_prefix . 'gh_emails';
-        }
+        $this->db_name = 'gh_emails';
+        $this->table_name();
 
         $this->primary_key = 'ID';
         $this->version     = '1.1';
