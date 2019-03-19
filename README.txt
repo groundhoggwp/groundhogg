@@ -106,6 +106,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.2.9 =
+* TWEAKED Form File input visual ques.
+* TWEAKED Form Date picker now uses jQuery datepicker UI instead of browser date select.
 * FIXED wp_mail() bug.
 * FIXED Site stats collection had num contacts and num funnels reversed.
 

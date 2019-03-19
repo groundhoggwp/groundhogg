@@ -509,6 +509,16 @@ function wpgh_view_email_in_browser()
 add_action( 'template_redirect', 'wpgh_view_email_in_browser' );
 
 /**
+ * Register frontend scripts.
+ */
+function wpgh_register_frontend_scripts()
+{
+    wp_register_style( 'jquery-ui', WPGH_ASSETS_FOLDER . 'lib/jquery-ui/jquery-ui.min.css' );
+}
+
+add_action( 'wp_enqueue_scripts', 'wpgh_register_frontend_scripts' );
+
+/**
  * Register popular admin js and CSS for use throughout gourndhogg.
  */
 function wpgh_register_scripts()

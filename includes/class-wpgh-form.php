@@ -473,7 +473,7 @@ class WPGH_Form
             'label'         => _x( 'File *', 'form_default', 'groundhogg' ),
             'name'          => '',
             'id'            => '',
-            'class'         => '',
+            'class'         => 'gh-file-uploader',
             'max_file_size' => 0,
             'file_types'    => '',
             'required'      => false,
@@ -487,7 +487,8 @@ class WPGH_Form
 
         $this->config[ $a[ 'name' ] ] = $a;
 
-        return $this->input_base( $a );
+        return  $this->input_base( $a );
+
     }
 
     /**
@@ -499,13 +500,14 @@ class WPGH_Form
     public function date( $atts )
     {
         $a = shortcode_atts( array(
-            'type'          => 'date',
+            'type'          => 'text',
             'label'         => _x( 'Date *', 'form_default', 'groundhogg' ),
             'name'          => '',
             'id'            => '',
             'class'         => '',
             'max_date'      => '',
             'min_date'      => '',
+            'date_format'   => 'yy-mm-dd',
             'required'      => false,
             'attributes'    => '',
 
@@ -519,9 +521,18 @@ class WPGH_Form
             $a[ 'attributes' ] .= sprintf( ' min="%s"', esc_attr( $a[ 'min_date' ] ) );
         }
 
+        $a[ 'id' ] = uniqid( 'date_' );
+
         $this->config[ $a[ 'name' ] ] = $a;
 
-        return $this->input_base( $a );
+        $base = $this->input_base( $a );
+
+        $base = sprintf( "%s<script>jQuery(function($){\$('#%s').datepicker({changeMonth: true,changeYear: true,minDate: '%s', maxDate: '%s',dateFormat:'%s'})});</script>", $base, $a[ 'id' ], esc_attr( $a[ 'min_date' ] ), esc_attr( $a[ 'max_date' ] ), esc_attr( $a[ 'date_format' ] ) );
+
+        wp_enqueue_script( 'jquery-ui-datepicker' );
+        wp_enqueue_style( 'jquery-ui' );
+
+        return $base;
     }
 
     /**

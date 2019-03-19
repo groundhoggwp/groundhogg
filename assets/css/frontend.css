@@ -51,6 +51,16 @@ ul.gh-form-errors{
     padding-right: 10px;
 }
 
+.gh-file-uploader{
+    width: 100%;
+    margin: auto;
+    padding: 30px;
+    box-sizing: border-box;
+    background: #f1f1f1;
+    border: 2px dashed #e5e5e5;
+    text-align: center;
+}
+
 /*.gh-form-column:nth-last-child(2){*/
     /*padding-right: 0;*/
 /*}*/
