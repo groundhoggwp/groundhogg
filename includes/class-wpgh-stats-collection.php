@@ -134,8 +134,8 @@ We appreciate your help, best of luck!
 
         $stats = [
             'site_key'  => wpgh_get_option( 'gh_site_key', md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) ) ),
-            'contacts'  => WPGH()->funnels->count(),
-            'funnels'   => WPGH()->contacts->count(),
+            'contacts'  =>  WPGH()->contacts->count(),
+            'funnels'   => WPGH()->funnels->count(),
             'emails'    => WPGH()->emails->count(),
             'sent'      => $num_emails_sent,
             'opens'     => $num_opens,
