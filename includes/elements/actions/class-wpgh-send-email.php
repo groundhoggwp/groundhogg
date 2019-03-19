@@ -285,7 +285,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
      * @param $contact WPGH_Contact
      * @param $event WPGH_Event
      *
-     * @return bool
+     * @return bool|WP_Error
      */
     public function run( $contact, $event )
     {
@@ -302,7 +302,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
                 do_action( 'wpgh_email_confirmed', $contact, $event->funnel_id );
 
                 /* Return false to avoid enqueue the next step. */
-                return false;
+                return new WP_Error( 'email_already_confirmed', 'The contact has already confirmed their email address.' );
 
             }
 

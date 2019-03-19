@@ -49,8 +49,8 @@ class Groundhogg_Service_Manager
         /* Set Default Headers */
         if ( empty( $headers ) ){
             $headers = [
-                'SENDER_TOKEN' => md5( wpgh_get_option( 'gh_email_token', '' ) ),
-                'SENDER_DOMAIN' => site_url(),
+                'sender-token' => md5( wpgh_get_option( 'gh_email_token', '' ) ),
+                'sender-domain' => site_url(),
             ];
         }
 
@@ -68,9 +68,6 @@ class Groundhogg_Service_Manager
             $response = wp_remote_post( $url, $args );
         }
 
-//        var_dump( $response );
-//        die();
-
         if ( ! $response ){
             return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ) );
         }
@@ -84,8 +81,6 @@ class Groundhogg_Service_Manager
         if ( wpgh_is_json_error( $json ) ){
             return wpgh_get_json_error( $json );
         }
-
-//        var_dump( $json );
 
         return $json;
 

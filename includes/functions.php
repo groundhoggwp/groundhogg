@@ -1419,6 +1419,19 @@ function wpgh_add_my_custom_email_templates( $email_templates ){
 }
 
 /**
+ * Return if a value in an array isset and is not empty
+ *
+ * @param $array
+ * @param $key
+ *
+ * @return bool
+ */
+function gisset_not_empty( $array, $key='' )
+{
+    return isset( $array[ $key ] ) && ! empty( $array[ $key] );
+}
+
+/**
  * Parse the headers and return things like from/to etc...
  *
  * @param $headers string|string[]
@@ -1471,9 +1484,9 @@ if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_emai
         }
 
         $sender = get_option( 'admin_email' );
-        $from = get_bloginfo( 'name' );
+        $from = wpgh_get_option( 'business_name' );
 
-        if ( ! empty( $headers ) ){
+        if ( ! empty( $headers ) && gisset_not_empty( $headers[ 'from' ] ) && gisset_not_empty( $headers[ 'sender' ] ) ){
             $from = $headers[ 'from' ];
             $sender = $headers[ 'sender' ];
         }
@@ -1493,9 +1506,7 @@ if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_emai
         $request = WPGH()->service_manager->request( 'emails/wp_mail', $data );
 
         if ( is_wp_error( $request ) ) {
-
             do_action( 'wp_mail_failed', $request );
-
             return false;
         }
 
