@@ -1484,7 +1484,7 @@ if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_emai
         }
 
         $sender = get_option( 'admin_email' );
-        $from = wpgh_get_option( 'business_name' );
+        $from = get_bloginfo( 'name' );
 
         if ( ! empty( $headers ) && gisset_not_empty( $headers[ 'from' ] ) && gisset_not_empty( $headers[ 'sender' ] ) ){
             $from = $headers[ 'from' ];
