@@ -88,6 +88,11 @@ class WPGH_Contact
      */
     public $ip_address;
 
+    /**
+     * @var array[] all contact meta data
+     */
+    public $meta;
+
 	/**
 	 * WPGH_Contact constructor.
 	 *
@@ -110,7 +115,6 @@ class WPGH_Contact
         }
 
         $contact = WPGH()->contacts->get_contact_by( $field, $_id_or_email );
-//        $contact = wpgh_get_contact_by( $field, $_id_or_email );
 
         if ( empty( $contact ) || ! is_object( $contact ) ) {
             return false;
@@ -328,8 +332,16 @@ class WPGH_Contact
      */
     public function get_meta( $key )
     {
-         return WPGH()->contact_meta->get_meta( $this->ID, $key, true );
-//        return wpgh_get_contact_meta( $this->ID, $key );
+
+        if ( key_exists( $key, $this->meta ) ){
+            return $this->meta[ $key ];
+        }
+
+        $val = WPGH()->contact_meta->get_meta( $this->ID, $key, true );
+
+        $this->meta[ $key ] = $val;
+
+        return $val;
     }
 
     /**
@@ -342,8 +354,13 @@ class WPGH_Contact
      */
     public function update_meta( $key, $value )
     {
-         return WPGH()->contact_meta->update_meta( $this->ID, $key, $value );
-//        return wpgh_update_contact_meta( $this->ID, $key, $value );
+         if ( WPGH()->contact_meta->update_meta( $this->ID, $key, $value ) ){
+             $this->meta[ $key ] = $value;
+
+             return true;
+         }
+
+         return false;
     }
 
     /**
@@ -356,8 +373,13 @@ class WPGH_Contact
      */
     public function add_meta( $key, $value )
     {
-         return WPGH()->contact_meta->add_meta( $this->ID, $key, $value );
-//        return wpgh_add_contact_meta( $this->ID, $key, $value );
+        if ( WPGH()->contact_meta->add_meta( $this->ID, $key, $value ) ){
+            $this->meta[ $key ] = $value;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -368,8 +390,8 @@ class WPGH_Contact
      */
     public function delete_meta( $key )
     {
-         return WPGH()->contact_meta->delete_meta( $this->ID, $key );
-//        return wpgh_delete_contact_meta( $this->ID, $key );
+        unset( $this->meta[$key] );
+        return WPGH()->contact_meta->delete_meta( $this->ID, $key );
     }
 
     /**

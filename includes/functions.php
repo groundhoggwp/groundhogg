@@ -1530,3 +1530,34 @@ if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_emai
     }
 
 endif;
+
+/**
+ * This function is for use by any form or eccom extensions which is essentially a copy of the PROCESS method in the submission handler.
+ *
+ * @param $contact WPGH_Contact
+ */
+function wpgh_after_form_submit_handler( &$contact )
+{
+
+    if ( $contact->update_meta( 'ip_address', wpgh_get_visitor_ip() ) ){
+        $contact->extrapolate_location();
+    }
+
+    if ( ! $contact->get_meta( 'lead_source' ) ){
+        $contact->update_meta( 'lead_source', WPGH()->tracking->lead_source );
+    }
+
+    if ( ! $contact->get_meta( 'source_page' ) ){
+        $contact->update_meta( 'source_page', wp_get_referer()  );
+    }
+
+    if ( is_user_logged_in() && ! $contact->user ){
+        $contact->update( array( 'user_id' => get_current_user_id() ) );
+    }
+
+    if ( $contact->optin_status === WPGH_UNSUBSCRIBED ) {
+        $contact->change_marketing_preference( WPGH_UNCONFIRMED );
+    }
+
+    $contact->update_meta( 'last_optin', time() );
+}
