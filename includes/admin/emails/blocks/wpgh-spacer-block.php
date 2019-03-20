@@ -49,7 +49,7 @@ class WPGH_Spacer_Block extends WPGH_Email_Block
         ?>
         <table width="100%">
             <tr>
-                <td class="spacer" height="10"></td>
+                <td class="spacer" height="10">&nbsp;</td>
             </tr>
         </table>
         <?php
@@ -67,12 +67,14 @@ class WPGH_Spacer_Block extends WPGH_Email_Block
 
         $this->settings = array(
             array(
-                'type'  => 'number',
-                'label' => __( 'Spacer Height' ),
+                'type'  => 'range',
+                'label' => __( 'Height' ),
                 'atts'  => array(
-                    'class' => 'input',
                     'id'    => 'spacer-size',
                     'name'  => 'spacer-size',
+                    'min' => 10,
+                    'step' => 10,
+                    'max' => 300,
                 ),
             ),
         );

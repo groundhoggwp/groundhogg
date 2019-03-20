@@ -69,7 +69,7 @@ class WPGH_Emails_Page
             wp_enqueue_script( 'codemirror-mode-js', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/javascript.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/javascript.js') );
             wp_enqueue_script( 'codemirror-mode-html', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/htmlmixed.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/htmlmixed.js') );
 
-            wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.js' ) );
+            wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.min.js' ) );
 
             wp_localize_script( 'email-editor', 'email', array(
                 'id'                    => intval( $_GET[ 'email' ] ),
@@ -481,6 +481,13 @@ class WPGH_Emails_Page
         $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
         $args[ 'from_user' ] = $from_user;
 
+        if ( $from_user > 0 ){
+            $user = get_userdata( $from_user );
+            if ( ! wpgh_email_is_same_domain( $user->user_email ) ){
+                $this->notices->add( 'email-cross-domain-warning', sprintf( __( 'You are sending this email from an email address (%s) which does not belong to this server. This may cause deliverability issues and harm your sender reputation.', 'groundhogg' ), $user->user_email ), 'warning' );
+            }
+        }
+
         $subject =  ( isset( $_POST['subject'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['subject'] ) ) ) ): '';
         $args[ 'subject' ] = $subject;
 
@@ -605,7 +612,7 @@ class WPGH_Emails_Page
         require_once dirname( __FILE__ ) . '/blocks/wpgh-spacer-block.php';
         require_once dirname( __FILE__ ) . '/blocks/wpgh-button-block.php';
         require_once dirname( __FILE__ ) . '/blocks/wpgh-html-block.php';
-        require_once dirname( __FILE__ ) . '/blocks/wpgh-column-block.php';
+//        require_once dirname( __FILE__ ) . '/blocks/wpgh-column-block.php';
     }
 
     /**
@@ -620,11 +627,11 @@ class WPGH_Emails_Page
 
         $blocks[] = new WPGH_Text_Block();
         $blocks[] = new WPGH_Image_Block();
-        $blocks[] = new WPGH_Divider_Block();
-        $blocks[] = new WPGH_Spacer_Block();
         $blocks[] = new WPGH_Button_Block();
         $blocks[] = new WPGH_HTML_Block();
-        $blocks[] = new WPGH_Column_Block();
+        $blocks[] = new WPGH_Divider_Block();
+        $blocks[] = new WPGH_Spacer_Block();
+//        $blocks[] = new WPGH_Column_Block();
 
         return apply_filters( 'wpgh_setup_email_blocks', $blocks );
 

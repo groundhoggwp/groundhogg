@@ -85,7 +85,7 @@ class WPGH_Button_Block extends WPGH_Email_Block
                 ),
             ),
             array(
-                'type'  => 'input',
+                'type'  => 'link_picker',
                 'label' => __( 'Button Link' ),
                 'atts'  => array(
                     'class' => 'input',

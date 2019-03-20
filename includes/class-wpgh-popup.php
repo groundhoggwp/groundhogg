@@ -57,11 +57,10 @@ class WPGH_Popup
 					</button>
 				</div>
 			</div>
-            <div class="iframe-loader-wrapper hidden">
+            <div class="iframe-loader-wrapper hidden" style="text-align: center;">
                 <div class="iframe-loader"></div>
             </div>
-			<div class="popup-content">
-			</div>
+			<div class="popup-content"></div>
 			<div class="popup-footer">
 				<button class="popup-save button button-primary" type="button"><?php _e( 'Save Changes' ); ?></button>
 			</div>

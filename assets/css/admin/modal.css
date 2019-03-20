@@ -93,6 +93,7 @@
 }
 
 .iframe-loader {
+    display: inline-block;
     margin: 200px auto;
     font-size: 25px;
     width: 1em;

@@ -107,9 +107,14 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 = 1.2.9 =
 * ADDED Submission handler function for form extensions.
+* ADDED Shoddy column support for email builder.
+* ADDED Link picker for Button & Image Email blocks
+* ADDED Warning when sending email from an email address which has a different host than the given site.
+* TWEAKED improved link picker for link supported benchmarks.
 * TWEAKED Form File input visual ques.
 * TWEAKED Form Date picker now uses jQuery datepicker UI instead of browser date select.
 * TWEAKED Contact now has a meta cache array for faster querying of metadata
+* FIXED Iframe in modal now has proper scroll bar.
 * FIXED wp_mail() bug.
 * FIXED Site stats collection had num contacts and num funnels reversed.
 

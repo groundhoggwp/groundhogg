@@ -530,7 +530,7 @@ function wpgh_register_scripts()
     wp_enqueue_style( 'gh-admin' );
 
     wp_register_script( 'select2',  WPGH_ASSETS_FOLDER . 'lib/select2/js/select2.full.js'   , array( 'jquery' ) );
-    wp_register_script( 'wpgh-admin-js',   WPGH_ASSETS_FOLDER . 'js/admin/admin.min.js', array( 'jquery' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/admin.min.js' ) );
+    wp_register_script( 'wpgh-admin-js',   WPGH_ASSETS_FOLDER . 'js/admin/admin.min.js', array( 'jquery', 'select2', 'jquery-ui-autocomplete' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/admin.min.js' ) );
 
     if ( ! wpgh_is_option_enabled( 'gh_disable_api' ) ){
 
@@ -540,7 +540,8 @@ function wpgh_register_scripts()
             'emails_endpoint' => site_url( 'wp-json/gh/v3/emails?select2=true' ),
             'sms_endpoint' => site_url( 'wp-json/gh/v3/sms?select2=true' ),
             'contacts_endpoint' => site_url( 'wp-json/gh/v3/contacts?select2=true' ),
-            'nonce' => wp_create_nonce( 'wp_rest' )
+            'nonce' => wp_create_nonce( 'wp_rest' ),
+            '_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' )
         ] );
     } else {
 
@@ -550,7 +551,8 @@ function wpgh_register_scripts()
             'emails_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_emails' ),
             'sms_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_sms' ),
             'contacts_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_contacts' ),
-            'nonce' => wp_create_nonce( 'admin_ajax' )
+            'nonce' => wp_create_nonce( 'admin_ajax' ),
+            '_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' )
         ] );
     }
 
@@ -1563,4 +1565,17 @@ function wpgh_after_form_submit_handler( &$contact )
     }
 
     $contact->update_meta( 'last_optin', time() );
+}
+
+/**
+ * Whether the given email address has the same hostname as the current site.
+ *
+ * @param $email
+ * @return bool
+ */
+function wpgh_email_is_same_domain( $email )
+{
+    $email_domain = substr( $email, 0, strrpos($email, '@'));
+    $site_domain = parse_url( site_url(), PHP_URL_HOST );
+    return strpos( $site_domain, $email_domain ) !== false;
 }

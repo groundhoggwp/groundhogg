@@ -38,7 +38,7 @@ var wpghModal;
             if ( this.args.source.match( urlRegex ) ){
                 this.loader.removeClass( 'hidden' );
     		    this.source = $(
-    		        "<div><iframe class='hidden' src='" + this.args.source + "' width='" + this.args.width + "' height='" + ( this.args.height - 100 ) + "' onload='wpghModal.prepareFrame( this )'></iframe></div>"
+    		        "<div><iframe class='hidden' src='" + this.args.source + "' width='" + this.args.width + "' height='" + ( this.args.height - 100 ) + "' style='margin-bottom: -5px;' onload='wpghModal.prepareFrame( this )'></iframe></div>"
                 );
             } else {
                 this.source  = $( '#' + this.args.source );
@@ -88,6 +88,7 @@ var wpghModal;
     	    this.window.css( 'top', 'calc( 50% - ' + ( this.args.height / 2 ) + 'px )' );
     	    this.window.css( 'left', 'calc( 50% - ' + ( this.args.width / 2 ) + 'px )' );
     	    this.content.css( 'height', ( this.args.height - 100 ) + 'px');
+    	    this.loader.css( 'height', ( this.args.height - 100 ) + 'px');
         },
 
 		open: function(){
@@ -99,11 +100,9 @@ var wpghModal;
         close: function(){
             this.pushContent();
             this.hidePopUp();
-
             if ( this.args.preventSave === undefined || this.args.preventSave === false || this.args.preventSave === 'false' ){
                 $(document).trigger( 'wpghModalClosed' );
             }
-
             this.reset();
         },
 
@@ -111,7 +110,6 @@ var wpghModal;
         {
             var $iframe = $(iframe);
             var $content = $( '#wpbody-content', $iframe.contents() );
-            // console.log( $content );
             this.content.append( $content );
         },
 
@@ -121,13 +119,6 @@ var wpghModal;
             this.content.css( 'padding', 0 );
             $iframe.removeClass( 'hidden' );
             this.loader.addClass( 'hidden' );
-
-            //if a link is clicked reload the frame.
-            // $iframe.contents().find( 'a' ).click( function () {
-            //     wpghModal.frameReload();
-            // });
-
-            //special handling for email builder.
             $iframe.contents().find( '.choose-template' ).click( function () {
                 wpghModal.frameReload();
             });
@@ -142,13 +133,11 @@ var wpghModal;
         /* Switch the content In the source and target between */
         pullContent: function(){
         	this.content.append( this.source.children() );
-        	// console.log( this.content.children() );
             $( document ).trigger( 'wpghModalContentPulled' );
         },
 
         pushContent: function(){
             this.source.append( this.content.children() );
-            // console.log( this.source.children() );
             $( document ).trigger( 'wpghModalContentPushed' );
         },
 

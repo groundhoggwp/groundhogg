@@ -68,6 +68,7 @@ class WPGH_Link_Clicked extends WPGH_Funnel_Step
                 <th><?php _e( 'Copy This Link:' ); ?></th>
                 <td>
                     <input
+                            type="text"
                             onfocus="this.select()"
                             class="regular-text code"
                             value="<?php echo site_url( '/gh-tracking/link/click?id=' . $step->ID ); ?>"
@@ -86,22 +87,12 @@ class WPGH_Link_Clicked extends WPGH_Funnel_Step
                         'id'        => $step->prefix( 'redirect_to' ),
                         'name'      => $step->prefix( 'redirect_to' ),
                         'title'     => __( 'Redirect To' ),
-                        'value'     => $redirect_url
+                        'value'     => $redirect_url,
                     );
 
-                    echo WPGH()->html->input( $args );
+                    echo WPGH()->html->link_picker( $args );
 
                     ?>
-                    <p class="description">
-                        <a href="#" data-target="<?php echo $step->prefix( 'redirect_to' ) ?>" id="<?php echo $step->prefix( 'add_link' ); ?>">
-                            <?php _e( 'Insert Link' , 'groundhogg' ); ?>
-                        </a>
-                    </p>
-                    <script>
-                        jQuery(function($){
-                            $('#<?php echo $step->prefix('add_link' ); ?>').linkPicker();
-                        });
-                    </script>
                 </td>
             </tr>
         </table>

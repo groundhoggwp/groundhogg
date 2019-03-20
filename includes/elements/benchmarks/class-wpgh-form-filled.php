@@ -164,19 +164,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
                         'value'     => $ty_page
                     );
 
-                    echo WPGH()->html->input( $args );
-
-                    ?>
-                    <p class="description">
-                        <a href="#" data-target="<?php echo $step->prefix( 'success_page' ) ?>" id="<?php echo $step->prefix( 'add_link' ); ?>">
-                            <?php _e( 'Insert Link' , 'groundhogg' ); ?>
-                        </a>
-                    </p>
-                    <script>
-                        jQuery(function($){
-                            $('#<?php echo $step->prefix('add_link' ); ?>').linkPicker();
-                        });
-                    </script>
+                    echo WPGH()->html->link_picker( $args ); ?>
                 </td>
             </tr>
             </tbody>
