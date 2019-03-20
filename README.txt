@@ -105,6 +105,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.9.2 =
+* TWEAKED SMS Step now has a skip if no phone available option.
+* FIXED checking for option that does not exist in SMS Step. (Non lethal)
+
 = 1.2.9.1 =
 * HOT FIX for WP mail bug when using GHSS.
 
