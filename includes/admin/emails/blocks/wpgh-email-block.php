@@ -90,6 +90,7 @@ class WPGH_Email_Block
     public function block_html()
     {
 
+//        $html = sprintf( "\n<!-- %s BLOCK START -->", strtoupper( $this->name ) );
         $html = sprintf( "<div  class=\"row\" data-block='%s'>", $this->name );
         $html.= sprintf( "<div  class=\"content-wrapper %s_block\">" , $this->name );
         $html.= "<div class=\"content-inside inner-content text-content\" style=\"padding: 5px;\">";
@@ -99,6 +100,7 @@ class WPGH_Email_Block
         $html .= '</div>';
         $html .= '</div>';
         $html .= '</div>';
+//        $html .= sprintf( "\n<!-- %s BLOCK END -->", strtoupper( $this->name ) );
 
         echo $html;
 

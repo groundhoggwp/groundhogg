@@ -25,16 +25,11 @@ class WPGH_Column_Block extends WPGH_Email_Block
      */
     public function __construct()
     {
-
         $this->icon = WPGH_ASSETS_FOLDER . 'images/email-icons/spacer-block.png' ;
         $this->name = 'column';
         $this->title = __( 'Column', 'groundhogg' );
-
-        wp_enqueue_script( 'wpgh-column-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/column.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/column.js' ) );
-
-
+//        wp_enqueue_script( 'wpgh-column-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/column.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/column.js' ) );
         parent::__construct();
-
     }
 
     /**
@@ -47,28 +42,22 @@ class WPGH_Column_Block extends WPGH_Email_Block
         ob_start();
 
         ?>
-        <table border="0" cellpadding="0" cellspacing="0" width="100%" class="">
+        <table border="0" cellpadding="5" cellspacing="0" width="100%" class="">
             <tbody>
             <tr>
-                <td align="center" valign="top" width="50%">
-                    <!--LEFT BLOCK CODE START-->
-
-
-                    <div>
-                        <p>Enable HTML view to edit this block. You can past your custom code between start and end comment using HTML editor.</p>
+                <td align="left" valign="top" width="50%">
+                    <!--LEFT COLUMN CODE START-->
+                    <div class="inner-content">
+                        <p><?php _e( 'Column content can only be edited in HTML mode at the moment.', 'groundhogg' ); ?></p>
                     </div>
-
-
-                    <!--LEFT BLOCK CODE END-->
+                    <!--LEFT COLUMN CODE END-->
                 </td>
-                <td align="center" valign="top" width="50%">
-                    <!--RIGHT BLOCK CODE START-->
-
-                    <div>
-                        <p>Enable HTML view to edit this block.You can past your custom code between start and end comment using HTML editor.</p>
+                <td align="left" valign="top" width="50%">
+                    <!--RIGHT COLUMN CODE START-->
+                    <div class="inner-content">
+                        <p><?php _e( 'Column content can only be edited in HTML mode at the moment.', 'groundhogg' ); ?></p>
                     </div>
-
-                    <!--RIGHT BLOCK CODE END-->
+                    <!--RIGHT COLUMN CODE END-->
                 </td>
             </tr>
             </tbody>

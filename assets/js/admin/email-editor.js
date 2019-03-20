@@ -247,7 +247,7 @@ var wpghEmailEditor;
                 start: function ( e, ui ) {
                     var el = this;
                     var block_type = el.id.replace( '-block', '' );
-                    var html = $( '.' + block_type + '-template' ).children().first().clone();
+                    var html = $( '.' + block_type + '-template' ).html();
                     $('#temp-html').html( html );
                 },
                 stop: function ( e, ui ) {
