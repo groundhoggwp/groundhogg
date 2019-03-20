@@ -44,7 +44,7 @@ class WPGH_SMS_Table extends WP_List_Table {
         $columns = array(
             'cb'            => '<input type="checkbox" />', // Render a checkbox instead of text.
             'title'         => _x( 'Title', 'Column label', 'groundhogg' ),
-            'message'       => _x( 'message', 'Column label', 'groundhogg' ),
+            'message'       => _x( 'Message', 'Column label', 'groundhogg' ),
             'author'        => _x( 'Author', 'Column label', 'groundhogg' ),
         );
         return $columns;
