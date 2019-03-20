@@ -49,8 +49,8 @@ class Groundhogg_Service_Manager
         /* Set Default Headers */
         if ( empty( $headers ) ){
             $headers = [
-                'sender-token' => md5( wpgh_get_option( 'gh_email_token', '' ) ),
-                'sender-domain' => site_url(),
+                'Sender-Token' => md5( wpgh_get_option( 'gh_email_token', '' ) ),
+                'Sender-Domain' => site_url(),
             ];
         }
 
@@ -168,7 +168,7 @@ class Groundhogg_Service_Manager
         }
 
         $headers = [
-            'OAUTH_TOKEN' => $token
+            'Oauth-Token' => $token
         ];
 
         $post = [
@@ -248,7 +248,7 @@ class Groundhogg_Service_Manager
         }
 
         $headers = [
-            'OAUTH_TOKEN' => $token
+            'Oauth-Token' => $token
         ];
 
         $post = [

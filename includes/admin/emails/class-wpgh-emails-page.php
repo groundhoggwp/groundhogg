@@ -544,7 +544,7 @@ class WPGH_Emails_Page
 
                 if ( ! $sent || is_wp_error( $sent ) ){
                     if ( is_wp_error( $sent ) ){
-                        $this->notices->add( 'oops', __( 'Failed to send test: ' . $sent->get_error_message() ), 'error' );
+                        $this->notices->add( $sent );
                     } else {
                         $this->notices->add( 'oops', __( 'Failed to send test: ' . $email->get_error_message() ), 'error' );
                     }

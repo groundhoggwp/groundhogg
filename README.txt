@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.9.1 =
+* HOT FIX for WP mail bug when using GHSS.
+
 = 1.2.9 =
 * ADDED Submission handler function for form extensions.
 * ADDED Shoddy column support for email builder.

@@ -1506,7 +1506,7 @@ if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_emai
         $sender = get_option( 'admin_email' );
         $from = get_bloginfo( 'name' );
 
-        if ( ! empty( $headers ) && gisset_not_empty( $headers[ 'from' ] ) && gisset_not_empty( $headers[ 'sender' ] ) ){
+        if ( ! empty( $headers ) && gisset_not_empty( $headers, 'from' ) && gisset_not_empty( $headers, 'sender' ) ){
             $from = $headers[ 'from' ];
             $sender = $headers[ 'sender' ];
         }
@@ -1575,7 +1575,7 @@ function wpgh_after_form_submit_handler( &$contact )
  */
 function wpgh_email_is_same_domain( $email )
 {
-    $email_domain = substr( $email, 0, strrpos($email, '@'));
-    $site_domain = parse_url( site_url(), PHP_URL_HOST );
+    $email_domain = substr( $email, strrpos($email, '@') + 1 );
+    $site_domain = site_url();
     return strpos( $site_domain, $email_domain ) !== false;
 }
