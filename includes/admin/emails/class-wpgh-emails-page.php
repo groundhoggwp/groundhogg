@@ -69,7 +69,7 @@ class WPGH_Emails_Page
             wp_enqueue_script( 'codemirror-mode-js', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/javascript.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/javascript.js') );
             wp_enqueue_script( 'codemirror-mode-html', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/htmlmixed.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/htmlmixed.js') );
 
-            wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.min.js' ) );
+            wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.js' ) );
 
             wp_localize_script( 'email-editor', 'email', array(
                 'id'                    => intval( $_GET[ 'email' ] ),
@@ -605,6 +605,7 @@ class WPGH_Emails_Page
         require_once dirname( __FILE__ ) . '/blocks/wpgh-spacer-block.php';
         require_once dirname( __FILE__ ) . '/blocks/wpgh-button-block.php';
         require_once dirname( __FILE__ ) . '/blocks/wpgh-html-block.php';
+        require_once dirname( __FILE__ ) . '/blocks/wpgh-column-block.php';
     }
 
     /**
@@ -623,6 +624,7 @@ class WPGH_Emails_Page
         $blocks[] = new WPGH_Spacer_Block();
         $blocks[] = new WPGH_Button_Block();
         $blocks[] = new WPGH_HTML_Block();
+//        $blocks[] = new WPGH_Column_Block();
 
         return apply_filters( 'wpgh_setup_email_blocks', $blocks );
 

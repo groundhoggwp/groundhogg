@@ -961,6 +961,14 @@ function wpgh_convert_to_local_time($time )
     return $time + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 }
 
+/**
+ * Backwards compat for dependent extensions.
+ */
+if ( ! function_exists( 'convert_to_local_time' ) ){
+    function convert_to_local_time( $time ){
+        return wpgh_convert_to_local_time( $time );
+    }
+}
 
 /**
  * Converts the given time into the timeZone
@@ -1518,11 +1526,6 @@ if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_emai
         if ( is_wp_error( $request ) ) {
             do_action( 'wp_mail_failed', $request );
             return false;
-        }
-
-        if ( isset( $request->credits_remaining ) ){
-            $credits = $request->credits_remaining;
-            wpgh_update_option('gh_remaining_api_credits', $credits);
         }
 
         return true;

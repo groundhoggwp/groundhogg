@@ -163,7 +163,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                             } ?>
 
                             <!-- Editor Content -->
-                            <div id="email-inside" class="email-sortable" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
+                            <div id="email-inside" class="email-sortable email-content-wrapper" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
                                 <?php echo $email->content; ?>
                             </div>
 
