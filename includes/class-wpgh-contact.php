@@ -91,7 +91,7 @@ class WPGH_Contact
     /**
      * @var array[] all contact meta data
      */
-    public $meta;
+    public $meta = [];
 
 	/**
 	 * WPGH_Contact constructor.

@@ -594,7 +594,7 @@ class WPGH_Contacts_Page
                     $args['email'] = $email;
                     //update new optin status to unconfirmed
                     $contact->change_marketing_preference( WPGH_UNCONFIRMED );
-                    $this->notices->add('optin_status_updated', sprintf(_x('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', 'notice', $email), 'groundhogg'), 'error');
+                    $this->notices->add('optin_status_updated', sprintf(_x('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', 'notice', 'groundhogg'), $email), 'error');
                 } else {
                     $this->notices->add('email_exists', sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email), 'error');
                 }
