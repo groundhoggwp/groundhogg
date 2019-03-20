@@ -624,7 +624,7 @@ class WPGH_Emails_Page
         $blocks[] = new WPGH_Spacer_Block();
         $blocks[] = new WPGH_Button_Block();
         $blocks[] = new WPGH_HTML_Block();
-//        $blocks[] = new WPGH_Column_Block();
+        $blocks[] = new WPGH_Column_Block();
 
         return apply_filters( 'wpgh_setup_email_blocks', $blocks );
 

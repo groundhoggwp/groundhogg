@@ -47,39 +47,32 @@ class WPGH_Column_Block extends WPGH_Email_Block
         ob_start();
 
         ?>
-
-
-        <table border="1" cellpadding="0" cellspacing="0" width="100%" class="">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" class="">
             <tbody>
             <tr>
-                <td align="center" valign="top" width="50%" class="email-sortable-row ui-sortable" id="email-inside">
-                    <div class="row" data-block="divider">
-                        <div class="content-wrapper divider_block">
-                            <div class="content-inside inner-content text-content" style="padding: 5px;">
-                                <div style="margin: 5px 0 5px 0">
-                                    <hr style="width:80%;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td align="center" valign="top" width="50%" class="email-sortable-row ui-sortable column-control"  id="email-inside">
-                    <div class="row" data-block="divider">
-                        <div class="content-wrapper divider_block">
-                            <div class="content-inside inner-content text-content" style="padding: 5px;">
-                                <div style="margin: 5px 0 5px 0">
-                                    <hr style="width:80%;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="email-sortable" style="padding: 20px;"></div>
+                <td align="center" valign="top" width="50%">
+                    <!--LEFT BLOCK CODE START-->
 
+
+                    <div>
+                        <p>Enable HTML view to edit this block. You can past your custom code between start and end comment using HTML editor.</p>
+                    </div>
+
+
+                    <!--LEFT BLOCK CODE END-->
+                </td>
+                <td align="center" valign="top" width="50%">
+                    <!--RIGHT BLOCK CODE START-->
+
+                    <div>
+                        <p>Enable HTML view to edit this block.You can past your custom code between start and end comment using HTML editor.</p>
+                    </div>
+
+                    <!--RIGHT BLOCK CODE END-->
                 </td>
             </tr>
             </tbody>
         </table>
-
         <?php
         return ob_get_clean();
     }
@@ -95,7 +88,7 @@ class WPGH_Column_Block extends WPGH_Email_Block
 //        $this->settings = array(
 //            array(
 //                'type'  => 'number',
-//                'label' => __( 'Spacer Height' ),
+//                'label' => __( '' ),
 //                'atts'  => array(
 //                    'class' => 'input',
 //                    'id'    => 'spacer-size',
@@ -103,7 +96,7 @@ class WPGH_Column_Block extends WPGH_Email_Block
 //                ),
 //            ),
 //        );
-//
+
         return parent::register_settings();
 
     }
