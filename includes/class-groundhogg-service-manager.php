@@ -69,7 +69,7 @@ class Groundhogg_Service_Manager
         }
 
         if ( ! $response ){
-            return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ) );
+            return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), $response );
         }
 
         if ( is_wp_error( $response ) ){
@@ -78,8 +78,19 @@ class Groundhogg_Service_Manager
 
         $json = json_decode( wp_remote_retrieve_body( $response ) );
 
+        if ( ! $json ){
+            return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), wp_remote_retrieve_body( $response )  );
+        }
+
         if ( wpgh_is_json_error( $json ) ){
             return wpgh_get_json_error( $json );
+        }
+
+        /**
+         * Handle this at global scope.
+         */
+        if ( isset( $response->credits_remaining ) ){
+            wpgh_update_option( 'gh_remaining_api_credits', $response->credits_remaining );
         }
 
         return $json;
@@ -394,7 +405,7 @@ class Groundhogg_Service_Manager
         $message = sanitize_textarea_field( $message );
         $data = array(
             'message' => WPGH()->replacements->process( $message, $contact->ID ),
-            'sender' => wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ),
+            'sender' => wpgh_sanitize_from_name( wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ) ),
             'number' => $phone,
             'ip' => $ip
         );
@@ -405,17 +416,6 @@ class Groundhogg_Service_Manager
             do_action( 'wpgh_sms_failed', $response );
             return $response;
         }
-
-        if ( ! isset( $response->status ) || $response->status !== 'success' ){
-            /* mail failed */
-            $error = new WP_Error( $response->code, $response->message );
-            $contact->add_note( $response->message );
-            do_action( 'wpgh_sms_failed', $error );
-            return $error;
-        }
-
-        $credits = $response->credits_remaining;
-        wpgh_update_option( 'gh_remaining_api_credits', $credits );
 
         return true;
 

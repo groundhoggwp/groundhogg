@@ -561,7 +561,7 @@ class WPGH_Emails_Page
                 do_action( 'wpgh_after_send_test_email', $id );
             } else {
 
-                $this->notices->add( 'oops', __( 'Failed to send test: ', 'groundhogg' ) . __( 'No user selected. PLease select a user to send the test to.', 'groundhogg' ) , 'error' );
+                $this->notices->add( 'oops', __( 'Failed to send test: No user selected. PLease select a user to send the test to.', 'groundhogg' ), 'error' );
 
             }
 

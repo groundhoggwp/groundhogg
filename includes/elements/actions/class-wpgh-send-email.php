@@ -320,6 +320,11 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
      */
     public function import( $args, $step )
     {
+
+        if ( ! gisset_not_empty( $args, 'content' ) || ! gisset_not_empty( $args, 'subject' ) || ! gisset_not_empty( $args, 'pre_header' ) ){
+            return;
+        }
+
         $email_id = WPGH()->emails->add( array(
             'content'       => $args['content'],
             'subject'       => $args['subject'],
