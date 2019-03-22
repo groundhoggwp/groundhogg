@@ -1835,6 +1835,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
         if ( WPGH()->service_manager->has_errors() ){
             $mail_error_data[ 'orig_error_data' ] = WPGH()->service_manager->get_last_error()->get_error_data();
+            $mail_error_data[ 'orig_error_message' ] = WPGH()->service_manager->get_last_error()->get_error_message();
             $mail_error_data[ 'orig_error_code' ] = WPGH()->service_manager->get_last_error()->get_error_code();
         }
 
@@ -1854,6 +1855,50 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
         return false;
     }
 }
+
+/**
+ * handle a wp_mail_failed event.
+ *
+ * @param $error WP_Error
+ */
+function wpgh_parse_complaint_and_bounce_emails( $error )
+{
+    $data = (array) $error->get_error_data();
+
+    if ( ! gisset_not_empty( $data, 'orig_error_data' ) ){
+        return;
+    }
+
+    $code = $data[ 'orig_error_code' ];
+    $data = $data[ 'orig_error_data' ];
+
+    if ( $code === 'invalid_recipients' ){
+
+        /* handle bounces */
+        $bounces = gisset_not_empty( $data, 'bounces' )? $data[ 'bounces' ] : [];
+
+        if ( ! empty( $bounces ) ){
+            foreach ( $bounces as $email ){
+                if ( $contact = wpgh_get_contact( $email ) ){
+                    $contact->change_marketing_preference( WPGH_HARD_BOUNCE );
+                }
+            }
+
+        }
+
+        $complaints = gisset_not_empty( $data, 'complaints' )? $data[ 'complaints' ] : [];
+
+        if ( ! empty( $complaints ) ){
+            foreach ( $complaints as $email ){
+                if ( $contact = wpgh_get_contact( $email ) ){
+                    $contact->change_marketing_preference( WPGH_COMPLAINED );
+                }
+            }
+        }
+    }
+}
+
+add_action( 'wp_mail_failed', 'wpgh_parse_complaint_and_bounce_emails' );
 
 /**
  * Override the default from email
