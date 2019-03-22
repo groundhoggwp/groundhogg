@@ -501,7 +501,7 @@ class WPGH_Email
      * @param $url
      * @return false|string
      */
-    public function get_unsubscribe_link($url)
+    public function get_unsubscribe_link($url='')
     {
         if (wpgh_is_global_multisite()) {
             switch_to_blog(get_site()->site_id);
@@ -684,7 +684,7 @@ class WPGH_Email
         $headers['reply_to'] = 'Reply-To: ' . $this->get_from_email();
         $headers['return_path'] = 'Return-Path: ' . wpgh_get_option('gh_bounce_inbox', $this->get_from_email());
         $headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
-        $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo('admin_email'), $this->contact->email, $this->get_click_tracking_link(), urlencode($this->get_unsubscribe_link('')));
+        $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo('admin_email'), $this->contact->email, $this->get_click_tracking_link(), urlencode($this->get_unsubscribe_link() ) );
 
         $headers = apply_filters('wpgh_email_headers', $headers);
         return apply_filters("groundhogg/email/headers", $headers);

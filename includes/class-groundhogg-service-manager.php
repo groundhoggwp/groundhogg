@@ -51,16 +51,22 @@ class Groundhogg_Service_Manager
             $headers = [
                 'Sender-Token' => md5( wpgh_get_option( 'gh_email_token', '' ) ),
                 'Sender-Domain' => site_url(),
+                'Content-Type' => sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) )
             ];
         }
 
+        $body = is_array( $body ) ? wp_json_encode( $body ) : $body;
+
         $args = [
-            'method'    => $method,
-            'headers'   => $headers,
-            'body'      => $body,
-            //todo remove later
-//            'sslverify' => false
+            'method'        => $method,
+            'headers'       => $headers,
+            'body'          => $body,
+            'data_format'   => 'body',
+            'sslverify'     => true
         ];
+
+//        var_dump( $args );
+//        die();
 
         if ( $method === 'GET' ){
             $response = wp_remote_get( $url, $args );

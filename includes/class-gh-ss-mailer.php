@@ -30,7 +30,7 @@ class GH_SS_Mailer extends PHPMailer
             $message = $this->getSentMIMEMessage();
 
             $response = WPGH()->service_manager->request( 'emails/wp_mail/v2', [
-                    'SentMIMEMessage' => $message,
+                    'message' => $message,
             ], 'POST' );
 
         } catch (phpmailerException $exc) {

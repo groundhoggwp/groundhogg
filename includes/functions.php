@@ -1825,6 +1825,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
         $mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
         $mail_error_data['phpmailer_exception_code'] = $e->getCode();
+        $mail_error_data['mime_message'] = $phpmailer->getSentMIMEMessage();
+
+//        var_dump( $phpmailer->getSentMIMEMessage() );
+//        die();
 
         /**
          * Fires after a phpmailerException is caught.
