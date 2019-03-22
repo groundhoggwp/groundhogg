@@ -176,6 +176,11 @@ class WPGH_Settings_Page
                 'tab'   => 'email',
                 'callback' => array( WPGH()->bounce_checker, 'test_connection_ui' ),
             ),
+            'overrides' => [
+                'id'    => 'overrides',
+                'title' => _x( 'Overrides', 'settings_sections', 'groundhogg' ),
+                'tab'   => 'email'
+            ],
             'service' => array(
                 'id'    => 'service',
                 'title' => _x( 'Groundhogg Sending Service (Email & SMS)', 'settings_sections', 'groundhogg' ),
@@ -602,6 +607,31 @@ class WPGH_Settings_Page
                     'placeholder' => 993,
                 ),
             ),
+            'gh_override_from_name' => [
+                'id'        => 'gh_override_from_name',
+                'section'   => 'overrides',
+                'label'     => _x( 'Default From Name', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Override the default wp_mail from name.', 'settings', 'groundhogg' ),
+                'type'      => 'input',
+                'atts' => array(
+                    'name'  => 'gh_override_from_name',
+                    'id'    => 'gh_override_from_name',
+                    'placeholder' => wpgh_get_option( 'gh_business_name' ),
+                ),
+            ],
+            'gh_override_from_email' => [
+                'id'        => 'gh_override_from_email',
+                'section'   => 'overrides',
+                'label'     => _x( 'Default From Email', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Override the default wp_mail from email.', 'settings', 'groundhogg' ),
+                'type'      => 'input',
+                'atts' => array(
+                    'type'  => 'email',
+                    'name'  => 'gh_override_from_email',
+                    'id'    => 'gh_override_from_email',
+                    'placeholder' => wpgh_get_option( 'admin_email' ),
+                ),
+            ],
             'gh_email_token' => array(
                 'id'        => 'gh_email_token',
                 'section'   => 'service',

@@ -215,7 +215,7 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
 
         add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
-        $sent =  wp_mail( $send_to, $subject, $finished_note );
+        $sent =  wp_mail( $send_to, $subject, $finished_note, [] );
 
         remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 

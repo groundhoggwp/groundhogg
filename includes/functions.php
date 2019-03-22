@@ -1845,6 +1845,48 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 }
 
 /**
+ * Override the default from email
+ *
+ * @param $original_email_address
+ * @return mixed
+ */
+function wpgh_sender_email( $original_email_address ) {
+
+    // Get the site domain and get rid of www.
+    $sitename = strtolower( $_SERVER['SERVER_NAME'] );
+    if ( substr( $sitename, 0, 4 ) == 'www.' ) {
+        $sitename = substr( $sitename, 4 );
+    }
+
+    $from_email = 'wordpress@' . $sitename;
+
+    if ( $original_email_address === $from_email ){
+        $original_email_address = wpgh_get_option( 'gh_override_from_email', $original_email_address );
+    }
+
+    return $original_email_address;
+}
+
+/**
+ * Override the default from name
+ *
+ * @param $original_email_from
+ * @return mixed
+ */
+function wpgh_sender_name( $original_email_from ) {
+
+    if( $original_email_from === 'WordPress' ){
+        $original_email_from = wpgh_get_option( 'gh_override_from_name', $original_email_from );
+    }
+
+    return $original_email_from;
+}
+
+// Hooking up our functions to WordPress filters
+add_filter( 'wp_mail_from', 'wpgh_sender_email' );
+add_filter( 'wp_mail_from_name', 'wpgh_sender_name' );
+
+/**
  * AWS Doesn't like special chars in the from name so we'll strip them out here.
  *
  * @param $name
