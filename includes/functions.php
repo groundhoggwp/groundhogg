@@ -1839,9 +1839,6 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
             $mail_error_data[ 'orig_error_code' ] = WPGH()->service_manager->get_last_error()->get_error_code();
         }
 
-//        var_dump( $mail_error_data );
-//        die();
-
         /**
          * Fires after a phpmailerException is caught.
          *
