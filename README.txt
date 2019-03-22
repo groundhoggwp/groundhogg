@@ -108,6 +108,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 = 1.2.10 =
 * ADDED Send email notifications when event fails option.
 * ADDED Test method for GHSS.
+* TWEAKED Moved Misc settings to a misc tab
 * TWEAKED SMS Step now has a skip if no phone available option.
 * TWEAKED GH SS now uses an extended version of PHPMailer for better email encoding and support for attachments.
 * FIXED checking for option that does not exist in SMS Step. (Non lethal)
