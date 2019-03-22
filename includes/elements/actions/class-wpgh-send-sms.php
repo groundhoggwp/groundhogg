@@ -129,7 +129,10 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
 
         $result = $sms->send( $contact, $event );
 
-        if ( is_wp_error( $result ) || ! $result ){
+	    /**
+	     * Skip if there is an error in accordance with the $skip param.
+	     */
+        if ( ( is_wp_error( $result ) || ! $result ) && ! $skip_if_no_phone ){
             return $result;
         }
 
