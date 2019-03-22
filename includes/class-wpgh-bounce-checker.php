@@ -46,13 +46,6 @@ class WPGH_Bounce_Checker
         if ( ! wpgh_get_option( 'gh_bounce_inbox', false ) || ! wpgh_get_option( 'gh_bounce_inbox_password', false ) )
             return;
 
-        include_once dirname( __FILE__ ) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
-
-        $this->bounce_handler = new BounceHandler();
-
-        $this->inbox    = wpgh_get_option( 'gh_bounce_inbox' );
-        $this->password = wpgh_get_option( 'gh_bounce_inbox_password' );
-
         /* run whenever these jobs are run */
         add_action( 'init', array( $this, 'setup_cron' ) );
         add_action( 'wpgh_check_bounces', array( $this, 'check' )  );
@@ -80,6 +73,22 @@ class WPGH_Bounce_Checker
     }
 
     /**
+     * Setup the bounce checker
+     */
+    private function setup()
+    {
+
+        if ( ! class_exists( 'BounceHandler' ) ){
+            include_once dirname( __FILE__ ) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
+        }
+
+        $this->bounce_handler = new BounceHandler();
+
+        $this->inbox    = wpgh_get_option( 'gh_bounce_inbox' );
+        $this->password = wpgh_get_option( 'gh_bounce_inbox_password' );
+    }
+
+    /**
      * Test the bounce inbox connection
      */
     public function do_test_connection()
@@ -87,6 +96,8 @@ class WPGH_Bounce_Checker
         if ( ! is_admin() || ! current_user_can( 'manage_options' ) ){
             return;
         }
+
+        $this->setup();
 
         $test = $this->test_connection();
 
@@ -106,6 +117,9 @@ class WPGH_Bounce_Checker
      */
     public function test_connection()
     {
+
+        $this->setup();
+
         $domain = explode( '@', $this->inbox );
         $domain = $domain[1];
         $domain = wpgh_get_option( 'gh_bounce_inbox_host', $domain );

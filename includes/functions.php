@@ -628,6 +628,16 @@ function wpgh_is_email_api_enabled(){
 }
 
 /**
+ * whather we have a token or not.
+ *
+ * @return bool
+ */
+function wpgh_has_email_token()
+{
+    return ( bool ) wpgh_get_option( 'gh_email_token', false );
+}
+
+/**
  * Generic function for checking checkboxes from the Groundhogg settings.
  *
  * @param string $key
@@ -1811,13 +1821,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     // Send!
     try {
 
-
         if ( empty( $phpmailer->AltBody ) ){
             $phpmailer->AltBody = wp_strip_all_tags( $message );
         }
-
-//        $configset = 'ConfigSet';
-//        $phpmailer->addCustomHeader('X-SES-CONFIGURATION-SET', $configset);
 
         return $phpmailer->send();
 
@@ -1827,7 +1833,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
         $mail_error_data['phpmailer_exception_code'] = $e->getCode();
         $mail_error_data['mime_message'] = $phpmailer->getSentMIMEMessage();
 
-//        var_dump( $phpmailer->getSentMIMEMessage() );
+//        var_dump( $mail_error_data );
 //        die();
 
         /**
@@ -1968,4 +1974,27 @@ function wpgh_using_ghss_for_sms()
 function wpgh_ghss_is_active()
 {
     return (bool) wpgh_get_option( 'gh_email_token', false );
+}
+
+if ( wpgh_is_option_enabled( 'gh_send_notifications_on_event_failure' ) ){
+
+    /**
+     * Send event failure notification.
+     *
+     * @param $event WPGH_Event
+     */
+    function wpgh_send_event_failure_notification( $event )
+    {
+
+        $subject = sprintf( "Event (%s) failed for %s", $event->get_step_title(), $event->contact->email );
+        $message = sprintf( "This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->contact->full_name, $event->contact->email );
+        $message.=sprintf( "\nFailure Reason: %s", $event->get_failure_reason() );
+        $message.=sprintf( "\nManage Failed Events: %s", admin_url( 'admin.php?page=gh_events&view=status&status=failed' ) );
+        $to = wpgh_get_option( 'gh_event_failure_notification_email', get_option( 'admin_email' ) );
+        wp_mail( $to, $subject, apply_filters( 'the_content', $message ) );
+
+    }
+
+    add_action( 'groundhogg/event/failed', 'wpgh_send_event_failure_notification' );
+
 }

@@ -31,6 +31,49 @@ class Groundhogg_Service_Manager
         if ( wpgh_get_option( 'gh_email_api_dns_records', false ) ){
             add_action( 'groundhogg/settings/email/after_settings', array( $this, 'show_dns_in_settings' ) );
         }
+
+        if ( is_admin() && isset( $_GET[ 'test_gh_ss_connection' ] ) ){
+            add_action( 'init', array( $this, 'send_test_email' ) );
+        }
+    }
+
+    public function test_connection_ui(){
+
+        if ( wpgh_has_email_token() ){
+            ?>
+            <a href="<?php echo add_query_arg( 'test_gh_ss_connection', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>" class="button-secondary"><?php _ex( 'Send Test Email', 'action', 'groundhogg' ) ?></a>
+            <?php
+        }
+
+    }
+
+    /**
+     * Send a test email via GH_SS
+     */
+    public function send_test_email()
+    {
+        add_action( 'wp_mail_failed', [ $this, 'test_email_failed' ] );
+
+        if ( wpgh_is_option_enabled( 'gh_send_all_email_through_ghss' ) ){
+            $result = wp_mail( wp_get_current_user()->user_email, '[TEST] from the Groundhogg Sending Service', 'This is a test message to ensure the Groundhogg Sending Service is working.' );
+        } else {
+            $result = gh_ss_mail( wp_get_current_user()->user_email, '[TEST] from the Groundhogg Sending Service', 'This is a test message to ensure the Groundhogg Sending Service is working.' );
+        }
+
+        remove_action( 'wp_mail_failed', [ $this, 'test_email_failed' ] );
+
+        if ( $result ){
+            WPGH()->notices->add( 'mail_success', 'Test Message Sent Successfully!' );
+        }
+    }
+
+    /**
+     * If the test email fails.
+     *
+     * @param $error WP_Error
+     */
+    public function test_email_failed( $error ){
+        WPGH()->notices->add( $error );
     }
 
     /**
@@ -410,10 +453,11 @@ class Groundhogg_Service_Manager
 
         $message = sanitize_textarea_field( $message );
         $data = array(
-            'message' => WPGH()->replacements->process( $message, $contact->ID ),
-            'sender' => wpgh_sanitize_from_name( wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ) ),
-            'number' => $phone,
-            'ip' => $ip
+            'message'       => WPGH()->replacements->process( $message, $contact->ID ),
+            'sender'        => wpgh_sanitize_from_name( wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ) ),
+            'number'        => $phone,
+            'ip'            => $ip,
+            'country_code'  => $contact->country
         );
 
         $response = $this->request( 'sms/send', $data );

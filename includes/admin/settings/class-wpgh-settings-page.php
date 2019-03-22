@@ -134,6 +134,10 @@ class WPGH_Settings_Page
                 'id'    => 'api_tab',
                 'title' => _x( 'API', 'settings_tabs', 'groundhogg' )
             ),
+            'misc'   =>  array(
+                'id'    => 'misc',
+                'title' => _x( 'Misc', 'settings_tabs', 'groundhogg' )
+            ),
         ) );
     }
 
@@ -153,7 +157,7 @@ class WPGH_Settings_Page
             'misc_info' => array(
                 'id'    => 'misc_info',
                 'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
-                'tab'   => 'general'
+                'tab'   => 'misc'
             ),
             'pages' => array(
                 'id'    => 'pages',
@@ -184,7 +188,8 @@ class WPGH_Settings_Page
             'service' => array(
                 'id'    => 'service',
                 'title' => _x( 'Groundhogg Sending Service (Email & SMS)', 'settings_sections', 'groundhogg' ),
-                'tab'   => 'email'
+                'tab'   => 'email',
+                'callback' => array( WPGH()->service_manager, 'test_connection_ui' ),
             ),
             'api_settings' => array(
                 'id'    => 'api_settings',
@@ -363,6 +368,33 @@ class WPGH_Settings_Page
                     'name'          => 'gh_opted_in_stats_collection',
                     'id'            => 'gh_opted_in_stats_collection',
                     'value'         => 'on',
+                ),
+            ),
+            'gh_send_notifications_on_event_failure' => array(
+                'id'        => 'gh_send_notifications_on_event_failure',
+                'section'   => 'misc_info',
+                'label'     => _x( 'Event Failure Notifications', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'This will let you know if something goes wrong in a funnel so you can fix it.', 'settings', 'groundhogg' ),
+                'type' => 'checkbox',
+                'atts' => array(
+                    'label'         => __( 'Enable' ),
+                    //keep brackets for backwards compat
+                    'name'          => 'gh_send_notifications_on_event_failure',
+                    'id'            => 'gh_send_notifications_on_event_failure',
+                    'value'         => 'on',
+                ),
+            ),
+            'gh_event_failure_notification_email' => array(
+                'id'        => 'gh_event_failure_notification_email',
+                'section'   => 'misc_info',
+                'label'     => _x( 'Event Failure Notification Email', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'The email which you would like to send failure notifications to.', 'settings', 'groundhogg' ),
+                'type'      => 'input',
+                'atts'      => array(
+                    'type'          => 'email',
+                    'id'            => 'gh_event_failure_notification_email',
+                    'name'          => 'gh_event_failure_notification_email',
+                    'placeholder'   => get_option( 'admin_email' )
                 ),
             ),
             'gh_max_events' => array(
