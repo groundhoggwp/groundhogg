@@ -46,6 +46,8 @@ class WPGH_Bounce_Checker
         if ( ! wpgh_get_option( 'gh_bounce_inbox', false ) || ! wpgh_get_option( 'gh_bounce_inbox_password', false ) )
             return;
 
+        $this->setup();
+
         /* run whenever these jobs are run */
         add_action( 'init', array( $this, 'setup_cron' ) );
         add_action( 'wpgh_check_bounces', array( $this, 'check' )  );
@@ -73,17 +75,30 @@ class WPGH_Bounce_Checker
     }
 
     /**
+     * get the bounce handler
+     *
+     * @return BounceHandler
+     */
+    private function get_bounce_handler()
+    {
+
+        if ( ! $this->bounce_handler ){
+
+            if ( ! class_exists( 'BounceHandler' ) ){
+                include_once dirname( __FILE__ ) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
+            }
+
+            $this->bounce_handler = new BounceHandler();
+        }
+
+        return $this->bounce_handler;
+    }
+
+    /**
      * Setup the bounce checker
      */
     private function setup()
     {
-
-        if ( ! class_exists( 'BounceHandler' ) ){
-            include_once dirname( __FILE__ ) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
-        }
-
-        $this->bounce_handler = new BounceHandler();
-
         $this->inbox    = wpgh_get_option( 'gh_bounce_inbox' );
         $this->password = wpgh_get_option( 'gh_bounce_inbox_password' );
     }
@@ -96,8 +111,6 @@ class WPGH_Bounce_Checker
         if ( ! is_admin() || ! current_user_can( 'manage_options' ) ){
             return;
         }
-
-        $this->setup();
 
         $test = $this->test_connection();
 
@@ -175,7 +188,7 @@ class WPGH_Bounce_Checker
         if ( ! $emails )
             return;
 
-        //print_r( $bounce_handler->bouncelist );
+        $this->get_bounce_handler();
 
         foreach( $emails as $email_number ) {
 
