@@ -204,6 +204,44 @@ class WPGH_HTML
     }
 
     /**
+     * Wrapper function for the INPUT
+     *
+     * @param $args
+     * @return string
+     */
+    public function range( $args )
+    {
+
+        $a = wp_parse_args( $args, array(
+            'type'  => 'range',
+            'name'  => '',
+            'id'    => '',
+            'class' => 'slider',
+            'value' => '',
+            'attributes' => '',
+            'placeholder' => '',
+            'min'       => 0,
+            'max'       => 99999,
+            'step'      => 1
+        ) );
+
+        if ( ! empty( $a[ 'max' ] ) ){
+            $a[ 'attributes' ] .= sprintf( ' max="%d"', $a[ 'max' ] );
+        }
+
+        if ( ! empty( $a[ 'min' ] ) ){
+            $a[ 'attributes' ] .= sprintf( ' min="%d"', $a[ 'min' ] );
+        }
+
+        if ( ! empty( $a[ 'step' ] ) ){
+            $a[ 'attributes' ] .= sprintf( ' step="%s"', $a[ 'step' ] );
+        }
+
+
+        return $this->input( $a );
+    }
+
+    /**
      * Output a simple textarea field
      *
      * @param $args
@@ -961,6 +999,12 @@ class WPGH_HTML
         return apply_filters( 'wpgh_html_color_picker', $html, $args );
     }
 
+    /**
+     * This is for use withing the email editor.
+     *
+     * @param $args
+     * @return string
+     */
     public function font_picker( $args )
     {
         $a = wp_parse_args( $args, array(
@@ -992,6 +1036,12 @@ class WPGH_HTML
 
     }
 
+    /**
+     * Image picker, maimly for use by the email editor
+     *
+     * @param $args
+     * @return string
+     */
     public function image_picker( $args )
     {
         $a = wp_parse_args( $args, array(
@@ -1037,6 +1087,50 @@ class WPGH_HTML
 
         return $html;
     }
+
+    /**
+     * Autocomplete link picker
+     *
+     * @param $args
+     * @return string
+     */
+    public function link_picker( $args )
+    {
+        $a = wp_parse_args( $args, array(
+            'type'  => 'text',
+            'name'  => '',
+            'id'    => '',
+            'class' => 'regular-text',
+            'value' => '',
+            'attributes' => '',
+            'placeholder' => __( 'Start typing...', 'groundhogg' ),
+            'required' => false
+        ) );
+
+        if ( $a[ 'required' ] ){
+            $a[ 'required' ] = 'required';
+        }
+
+        $html = sprintf(
+            "<input type='%s' id='%s' class='%s gh-link-picker' name='%s' value='%s' placeholder='%s' %s %s>",
+            esc_attr( $a[ 'type'    ] ),
+            esc_attr( $a[ 'id'      ] ),
+            esc_attr( $a[ 'class'   ] ),
+            esc_attr( $a[ 'name'    ] ),
+            esc_attr( $a[ 'value'   ] ),
+            esc_attr( $a[ 'placeholder' ] ),
+            $a[ 'attributes'  ],
+            $a[ 'required'  ]
+        );
+
+        wp_enqueue_script( 'jquery' );
+        wp_enqueue_script( 'jquery-ui-autocomplete' );
+        wp_enqueue_script( 'wpgh-admin-js' );
+
+
+        return apply_filters( 'wpgh_html_link_picker', $html, $args );
+    }
+
 
 	/**
 	 * Output a progress bar.

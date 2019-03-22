@@ -25,6 +25,11 @@ class WPGH_Submission
     public $data;
 
     /**
+     * @var array Acts as an alias for $_FILES
+     */
+    public $files;
+
+    /**
      * These are the EXPECTED Fields given by the form shortcode present
      *
      * @var array
@@ -352,6 +357,7 @@ class WPGH_Submission
     public function setup(){
 
         $this->data = $_POST;
+        $this->files = $_FILES;
 
         $this->source = wpgh_get_referer();
 
@@ -471,15 +477,27 @@ class WPGH_Submission
         }
 
         //check for missing required fields
-//        var_dump( $this->data );
         foreach ( $this->fields as $field_name ){
             $config = $this->get_field_config( $field_name );
-            if ( isset( $config[ 'required' ] ) && $config[ 'required' ] && $config[ 'required' ] !== "false"   ){
-                if ( ! key_exists( $field_name, $this->data ) || $this->data[ $field_name ] === '' || $this->data[ $field_name ] === null ){
-                    $this->add_error(new WP_Error( 'REQUIRED_FIELD_MISSING', sprintf( _x( 'Missing a required field: %s', 'submission_error', 'groundhogg' ), $config[ 'label' ] ), $config ) );
-                    return false;
+
+            $missing_required = false;
+
+            if ( isset( $config[ 'required' ] ) && $config[ 'required' ] && $config[ 'required' ] !== "false" ) {
+                switch ( $config[ 'type' ] ){
+                    case 'file':
+                        $missing_required = ! key_exists( $field_name, $this->files ) || $this->files[ $field_name ] === '' || $this->files[ $field_name ] === null;
+                        break;
+                    default:
+                        $missing_required = ! key_exists( $field_name, $this->data ) || $this->data[ $field_name ] === '' || $this->data[ $field_name ] === null;
+                        break;
                 }
             }
+
+            if ( $missing_required ){
+                $this->add_error(new WP_Error( 'REQUIRED_FIELD_MISSING', sprintf( _x( 'Missing a required field: %s', 'submission_error', 'groundhogg' ), $config[ 'label' ] ), $config ) );
+                return false;
+            }
+
         }
 
         $verified = apply_filters( 'wpgh_submission_verify_check', true, $this );

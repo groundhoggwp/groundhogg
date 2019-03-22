@@ -73,12 +73,14 @@ class WPGH_Image_Block extends WPGH_Email_Block
                 ),
             ),
             array(
-                'type'  => 'number',
+                'type'  => 'range',
                 'label' => __( 'Width' ),
                 'atts'  => array(
-                    'class' => 'input',
+                    'class' => 'slider',
                     'id'    => 'image-width',
                     'name'  => 'image-width',
+                    'max'   => 100,
+                    'min'   => 1
                 ),
             ),
             array(
@@ -95,7 +97,7 @@ class WPGH_Image_Block extends WPGH_Email_Block
                 ),
             ),
             array(
-                'type'  => 'input',
+                'type'  => 'link_picker',
                 'label' => __( 'Link' ),
                 'atts'  => array(
                     'class' => 'input',

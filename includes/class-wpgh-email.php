@@ -203,6 +203,14 @@ class WPGH_Email
     /**
      * @return bool
      */
+    public function is_draft()
+    {
+        return $this->status === 'draft';
+    }
+
+    /**
+     * @return bool
+     */
     public function is_template()
     {
         return (bool) $this->is_template;
@@ -501,7 +509,7 @@ class WPGH_Email
      * @param $url
      * @return false|string
      */
-    public function get_unsubscribe_link($url)
+    public function get_unsubscribe_link($url='')
     {
         if (wpgh_is_global_multisite()) {
             switch_to_blog(get_site()->site_id);
@@ -684,7 +692,7 @@ class WPGH_Email
         $headers['reply_to'] = 'Reply-To: ' . $this->get_from_email();
         $headers['return_path'] = 'Return-Path: ' . wpgh_get_option('gh_bounce_inbox', $this->get_from_email());
         $headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
-        $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo('admin_email'), $this->contact->email, $this->get_click_tracking_link(), urlencode($this->get_unsubscribe_link('')));
+        $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo('admin_email'), $this->contact->email, $this->get_click_tracking_link(), urlencode($this->get_unsubscribe_link() ) );
 
         $headers = apply_filters('wpgh_email_headers', $headers);
         return apply_filters("groundhogg/email/headers", $headers);
@@ -815,12 +823,7 @@ class WPGH_Email
      */
     private function send_with_wp($to, $subject, $content, $headers)
     {
-        return wp_mail(
-            $to,
-            $subject,
-            $content,
-            $headers
-        );
+        return wp_mail( $to, $subject, $content, $headers );
     }
 
     /**
@@ -835,42 +838,7 @@ class WPGH_Email
      */
     private function send_with_gh($to, $subject, $content, $headers)
     {
-        $sender = $this->get_from_email();
-
-        $data = array(
-            'sender'    => $sender,
-            'from'      => $this->get_from_name(),
-            'recipient' => $to,
-            'subject'   => $subject,
-            'content'   => $content,
-        );
-
-        $request = WPGH()->service_manager->request( 'emails/send', $data );
-
-        if ( is_wp_error( $request ) ) {
-            switch ( $request->get_error_code() ) {
-
-                case 'EMAIL_COMPLAINT':
-                    do_action('wp_mail_failed', $request );
-                    $this->contact->change_marketing_preference(WPGH_COMPLAINED);
-                    break;
-                case 'EMAIL_BOUNCED':
-                    do_action('wp_mail_failed', $request );
-                    $this->contact->change_marketing_preference(WPGH_HARD_BOUNCE);
-                    break;
-                DEFAULT:
-                    do_action('wp_mail_failed', $request );
-                    break;
-            }
-        }
-
-        if ( isset( $request->credits_remaining ) ){
-            $credits = $request->credits_remaining;
-            wpgh_update_option('gh_remaining_api_credits', $credits);
-        }
-
-        return true;
-
+        return gh_ss_mail( $to, $subject, $content, $headers );
     }
 
     /**

@@ -242,6 +242,74 @@ class WPGH_Event
     }
 
     /**
+     * @return string
+     */
+    public function get_step_title()
+    {
+        if ($this->type) {
+            switch ($this->type) {
+                default:
+                case WPGH_FUNNEL_EVENT:
+                    $step_title = $this->step->title;
+                    break;
+                case WPGH_BROADCAST_EVENT:
+                    $step_title = $this->step->get_title();
+                    break;
+                case WPGH_EMAIL_NOTIFICATION_EVENT:
+                    $step_title = $this->step->email->subject;
+                    break;
+                case WPGH_SMS_NOTIFICATION_EVENT:
+                    $step_title = $this->step->sms->title;
+                    break;
+            }
+        } else {
+            if ($this->is_broadcast_event()) {
+                $step_title = $this->step->email->subject;
+            } else {
+                $step_title = $this->step->title;
+            }
+        }
+
+        return $step_title;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_funnel_title()
+    {
+        if ($this->type) {
+            switch ($this->type) {
+                default:
+                case WPGH_FUNNEL_EVENT:
+                    $funnel = WPGH()->funnels->get( $this->funnel_id );
+                    $title = ( $funnel )? $funnel->title : sprintf( '(%s)', _x( 'funnel deleted', 'status', 'groundhogg' ) ) ;
+                    break;
+                case WPGH_BROADCAST_EVENT:
+                    $title =  sprintf( __( '%s Broadcast', 'groundhogg' ), ucfirst( $this->step->get_type() ) );
+                    break;
+                case WPGH_EMAIL_NOTIFICATION_EVENT:
+                    $title =  __( 'Email Notification', 'groundhogg' );
+                    break;
+                case WPGH_SMS_NOTIFICATION_EVENT:
+                    $title =  __( 'SMS Notification', 'groundhogg' );
+                    break;
+
+            }
+        } else {
+            if ($this->is_broadcast_event()) {
+                $title =  __( 'Broadcast Email', 'groundhogg' );
+            } else {
+                $funnel = WPGH()->funnels->get( $this->funnel_id );
+                $title = ( $funnel )? $funnel->title : sprintf( '(%s)', _x( 'funnel deleted', 'status', 'groundhogg' ) ) ;
+            }
+        }
+
+        return $title;
+    }
+
+
+    /**
      * Run the event
      *
      * Wrapper function for the step call in WPGH_Step
@@ -392,6 +460,8 @@ class WPGH_Event
             $args[ 'failure_reason' ] = $error;
         }
 
+        do_action( 'groundhogg/event/failed', $this );
+
         return $this->update( $args );
     }
 
@@ -426,6 +496,24 @@ class WPGH_Event
     public function update($args)
     {
         return WPGH()->events->update($this->ID, $args);
+    }
+
+    /**
+     * Get the failure reason.
+     *
+     * @return bool|string
+     */
+    public function get_failure_reason()
+    {
+        if ( $this->failure_reason ){
+            return $this->failure_reason;
+        }
+
+        if ( $this->has_error() ){
+            return sprintf( '%s: %s', $this->error->get_error_code(), $this->error->get_error_message() );
+        }
+
+        return false;
     }
 
 }

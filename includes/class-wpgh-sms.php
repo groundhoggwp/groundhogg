@@ -83,8 +83,10 @@ Class WPGH_SMS
 
         }
 
-        if ( ! is_object( $contact )  )
+        if ( ! is_object( $contact )  ){
             return new WP_Error( 'BAD_CONTACT', __( 'No contact provided...' ) );
+        }
+
 
         $this->contact = $contact;
 
@@ -105,10 +107,17 @@ Class WPGH_SMS
 
         }
 
-        if ( apply_filters( 'groundhogg/sms/send_with_ghss', true ) ){
+        /**
+         * Allow other services to hook into this process.
+         */
+        if ( wpgh_using_ghss_for_sms() ){
+
             $sent = WPGH()->service_manager->send_sms( $contact, $this->get_message() );
+
         } else {
-            $sent = apply_filters( 'groundhogg/sms/send_custom', true, $contact, $this->get_message() );
+
+            $sent = apply_filters( 'groundhogg/sms/send_custom', true, $contact, $this->get_message(), $this );
+
         }
 
         do_action( 'groundhogg/sms/sent', $sent, $this );

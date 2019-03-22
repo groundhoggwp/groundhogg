@@ -1,6 +1,9 @@
 var wpgh;
 (function($) {
     wpgh = {
+
+        elements : [],
+
         buildSelect2: function(){
             $('.gh-select2' ).css( 'width', '100%' ).select2();
         },
@@ -116,6 +119,33 @@ var wpgh;
                 }
             });
         },
+        buildLinkPicker : function(){
+            $('.gh-link-picker' ).autocomplete({
+                source: function( request, response ) {
+                    $.ajax( {
+                        url: ajaxurl,
+                        method: 'post',
+                        dataType: "json",
+                        data: {
+                            action: 'wp-link-ajax',
+                            _ajax_linking_nonce: gh_admin_object._ajax_linking_nonce,
+                            term: request.term
+                        },
+                        success: function( data ) {
+                            var $return = [];
+                            for ( var item in data ) {
+                                if (data.hasOwnProperty( item ) ) {
+                                    item = data[ item ];
+                                    $return.push( { label: item.title  + ' (' + item.info + ')', value: item.permalink } );
+                                }
+                            }
+                            response( $return );
+                        }
+                    } );
+                },
+                minLength: 2
+            } );
+        },
 
         init:  function () {
             this.buildSelect2();
@@ -126,6 +156,7 @@ var wpgh;
             this.buildSingleTagPicker();
             this.buildBenchmarkPicker();
             this.buildMetaKeyPicker();
+            this.buildLinkPicker();
         },
     };
 

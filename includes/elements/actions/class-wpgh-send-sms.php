@@ -40,9 +40,9 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
         $mesg = $step->get_meta( 'sms_id' );
 
         /* Check to see if we are sending sms with the GH System. If another system is active then do not display the message. */
-        if ( ! wpgh_get_option( 'gh_sms_token', false ) && apply_filters( 'groundhogg/sms/send_with_ghss', true ) ): ?>
+        if ( ! wpgh_ghss_is_active() && wpgh_using_ghss_for_sms() ): ?>
         <p style="margin-left: 10px;" class="description">
-            <?php _e( 'SMS uses the <a target="_blank" href="https://www.groundhogg.io/downloads/sms-credits/">Groundhogg Sending Service</a> & requires that you have setup your <a target="_blank" href="https://www.groundhogg.io/downloads/sms-credits/">Groundhogg account</a>.', 'groundhogg' ); ?>
+            <?php _e( 'SMS uses the <a target="_blank" href="https://www.groundhogg.io/downloads/email-credits/">Groundhogg Sending Service</a> & requires that you have setup your <a target="_blank" href="https://www.groundhogg.io/downloads/email-credits/">Groundhogg account</a>.', 'groundhogg' ); ?>
         </p>
         <?php endif; ?>
         <table class="form-table">
@@ -54,16 +54,22 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
                 <?php $args = array(
                     'id'    => $step->prefix( 'sms_id' ),
                     'name'  => $step->prefix( 'sms_id' ),
-                    'data'  => WPGH()->sms->get_sms_select(),
-                    'selected' => $mesg,
+                    'selected' => [ intval( $mesg ) ],
                 ); ?>
                 <td>
-                    <?php echo WPGH()->html->select2( $args ) ?>
-                    <p class="description">
-                        <?php _e( 'Select an SMS message.', 'groundhogg' ); ?>
-                        <span class="row-actions">
-                        <a href="<?php echo admin_url( 'admin.php?page=gh_sms' ) ?>" target="_blank"><?php _e( 'Manage SMS', 'groundhogg' ); ?></a>
-                        </span>
+                    <?php echo WPGH()->html->dropdown_sms( $args ) ?>
+                    <p>
+                        <?php
+
+                        echo WPGH()->html->checkbox( array(
+                            'name'  => $step->prefix( 'skip_if_no_phone' ),
+                            'id'    => $step->prefix( 'skip_if_no_phone' ),
+                            'value' => 1,
+                            'label' => __( 'Skip phone number unavailable.', 'groundhogg' ),
+                            'checked' => $step->get_meta( 'skip_if_no_phone' ),
+                        ) );
+
+                        ?>
                     </p>
                 </td>
             </tr>
@@ -85,7 +91,13 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
             $step->update_meta( 'sms_id', intval( $_POST[ $step->prefix( 'sms_id' ) ] ) );
         }
 
-        if ( ! wpgh_get_option( 'gh_email_token', false ) && apply_filters( 'groundhogg/sms/send_with_ghss', true ) ){
+        if ( isset( $_POST[ $step->prefix( 'skip_if_no_phone' ) ] ) ){
+            $step->update_meta( 'skip_if_no_phone', true );
+        } else {
+            $step->delete_meta( 'skip_if_no_phone' );
+        }
+
+        if ( ! wpgh_ghss_is_active() && wpgh_using_ghss_for_sms() ){
             WPGH()->notices->add( new WP_Error( 'NO_TOKEN', __( 'Your SMS steps will not work until you active the Groundhogg Sending Service.', 'groundhogg' ) ) );
         }
 
@@ -104,7 +116,7 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
         $sms_id = $event->step->get_meta( 'sms_id' );
         $skip_if_no_phone = $event->step->get_meta( 'skip_if_no_phone' );
 
-        $sms = new WPGH_SMS( $sms_id );
+        $sms = new WPGH_SMS( intval( $sms_id ) );
 
         if ( ! $sms->exists() || ! $contact->is_marketable() ){
             return false;
@@ -117,8 +129,11 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
 
         $result = $sms->send( $contact, $event );
 
-        if ( is_wp_error( $result ) || ! $result ){
-            return false;
+	    /**
+	     * Skip if there is an error in accordance with the $skip param.
+	     */
+        if ( ( is_wp_error( $result ) || ! $result ) && ! $skip_if_no_phone ){
+            return $result;
         }
 
         return true;
@@ -154,6 +169,11 @@ class WPGH_Send_SMS extends WPGH_Funnel_Step
      */
     public function import($args, $step)
     {
+
+        if ( ! gisset_not_empty( $args, 'title' ) || ! gisset_not_empty( $args, 'message' ) ){
+            return;
+        }
+
         $sms_id = WPGH()->sms->add( array(
             'title'   => $args['title'],
             'message' => $args['message'],

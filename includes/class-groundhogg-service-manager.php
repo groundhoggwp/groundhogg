@@ -14,6 +14,13 @@ class Groundhogg_Service_Manager
      */
     const MAX_LENGTH = 280;
 
+    /**
+     * List of errors.
+     *
+     * @var WP_Error[]
+     */
+    public $errors = [];
+
     public function __construct()
     {
         $should_listen = get_transient( 'gh_listen_for_connect' );
@@ -31,6 +38,49 @@ class Groundhogg_Service_Manager
         if ( wpgh_get_option( 'gh_email_api_dns_records', false ) ){
             add_action( 'groundhogg/settings/email/after_settings', array( $this, 'show_dns_in_settings' ) );
         }
+
+        if ( is_admin() && isset( $_GET[ 'test_gh_ss_connection' ] ) ){
+            add_action( 'init', array( $this, 'send_test_email' ) );
+        }
+    }
+
+    public function test_connection_ui(){
+
+        if ( wpgh_has_email_token() ){
+            ?>
+            <a href="<?php echo add_query_arg( 'test_gh_ss_connection', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>" class="button-secondary"><?php _ex( 'Send Test Email', 'action', 'groundhogg' ) ?></a>
+            <?php
+        }
+
+    }
+
+    /**
+     * Send a test email via GH_SS
+     */
+    public function send_test_email()
+    {
+        add_action( 'wp_mail_failed', [ $this, 'test_email_failed' ] );
+
+        if ( wpgh_is_option_enabled( 'gh_send_all_email_through_ghss' ) ){
+            $result = wp_mail( wp_get_current_user()->user_email, '[TEST] from the Groundhogg Sending Service', 'This is a test message to ensure the Groundhogg Sending Service is working.' );
+        } else {
+            $result = gh_ss_mail( wp_get_current_user()->user_email, '[TEST] from the Groundhogg Sending Service', 'This is a test message to ensure the Groundhogg Sending Service is working.' );
+        }
+
+        remove_action( 'wp_mail_failed', [ $this, 'test_email_failed' ] );
+
+        if ( $result ){
+            WPGH()->notices->add( 'mail_success', 'Test Message Sent Successfully!' );
+        }
+    }
+
+    /**
+     * If the test email fails.
+     *
+     * @param $error WP_Error
+     */
+    public function test_email_failed( $error ){
+        WPGH()->notices->add( $error );
     }
 
     /**
@@ -49,18 +99,24 @@ class Groundhogg_Service_Manager
         /* Set Default Headers */
         if ( empty( $headers ) ){
             $headers = [
-                'sender-token' => md5( wpgh_get_option( 'gh_email_token', '' ) ),
-                'sender-domain' => site_url(),
+                'Sender-Token' => md5( wpgh_get_option( 'gh_email_token', '' ) ),
+                'Sender-Domain' => site_url(),
+                'Content-Type' => sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) )
             ];
         }
 
+        $body = is_array( $body ) ? wp_json_encode( $body ) : $body;
+
         $args = [
-            'method'    => $method,
-            'headers'   => $headers,
-            'body'      => $body,
-            //todo remove later
-//            'sslverify' => false
+            'method'        => $method,
+            'headers'       => $headers,
+            'body'          => $body,
+            'data_format'   => 'body',
+            'sslverify'     => true
         ];
+
+//        var_dump( $args );
+//        die();
 
         if ( $method === 'GET' ){
             $response = wp_remote_get( $url, $args );
@@ -69,17 +125,35 @@ class Groundhogg_Service_Manager
         }
 
         if ( ! $response ){
-            return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ) );
+            $error = new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), $response );
+            $this->add_error( $error );
+            return $error;
         }
 
         if ( is_wp_error( $response ) ){
+            $this->add_error( $response );
             return $response;
         }
 
         $json = json_decode( wp_remote_retrieve_body( $response ) );
 
+        if ( ! $json ){
+            $error = new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), wp_remote_retrieve_body( $response )  );
+            $this->add_error( $error );
+            return $error;
+        }
+
         if ( wpgh_is_json_error( $json ) ){
-            return wpgh_get_json_error( $json );
+            $error = wpgh_get_json_error( $json );
+            $this->add_error( $error );
+            return $error;
+        }
+
+        /**
+         * Handle this at global scope.
+         */
+        if ( isset( $response->credits_remaining ) ){
+            wpgh_update_option( 'gh_remaining_api_credits', $response->credits_remaining );
         }
 
         return $json;
@@ -168,7 +242,7 @@ class Groundhogg_Service_Manager
         }
 
         $headers = [
-            'OAUTH_TOKEN' => $token
+            'Oauth-Token' => $token
         ];
 
         $post = [
@@ -248,7 +322,7 @@ class Groundhogg_Service_Manager
         }
 
         $headers = [
-            'OAUTH_TOKEN' => $token
+            'Oauth-Token' => $token
         ];
 
         $post = [
@@ -393,10 +467,11 @@ class Groundhogg_Service_Manager
 
         $message = sanitize_textarea_field( $message );
         $data = array(
-            'message' => WPGH()->replacements->process( $message, $contact->ID ),
-            'sender' => wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ),
-            'number' => $phone,
-            'ip' => $ip
+            'message'       => WPGH()->replacements->process( $message, $contact->ID ),
+            'sender'        => wpgh_sanitize_from_name( wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ) ),
+            'number'        => $phone,
+            'ip'            => $ip,
+            'country_code'  => $contact->country
         );
 
         $response = $this->request( 'sms/send', $data );
@@ -406,19 +481,41 @@ class Groundhogg_Service_Manager
             return $response;
         }
 
-        if ( ! isset( $response->status ) || $response->status !== 'success' ){
-            /* mail failed */
-            $error = new WP_Error( $response->code, $response->message );
-            $contact->add_note( $response->message );
-            do_action( 'wpgh_sms_failed', $error );
-            return $error;
-        }
-
-        $credits = $response->credits_remaining;
-        wpgh_update_option( 'gh_remaining_api_credits', $credits );
-
         return true;
 
+    }
+
+    /**
+     * @param $wperror WP_Error
+     */
+    public function add_error( $wperror ){
+        if ( $wperror instanceof WP_Error ){
+            $this->errors[] = $wperror;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function has_errors()
+    {
+        return ! empty( $this->errors );
+    }
+
+    /**
+     * @return WP_Error[]
+     */
+    public function get_errors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @return WP_Error
+     */
+    public function get_last_error()
+    {
+        return $this->errors[ count( $this->errors ) - 1 ];
     }
 
 

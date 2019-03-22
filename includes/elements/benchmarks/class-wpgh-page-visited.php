@@ -100,6 +100,14 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
                     <?php esc_attr_e( 'Enter URL', 'groundhogg' ); ?>
                 </th>
                 <td><?php
+                    $args = array(
+                        'id'        => $step->prefix( 'url_match' ),
+                        'name'      => $step->prefix( 'url_match' ),
+                        'title'     => __( 'Match Url' ),
+                        'value'     => $match_url,
+                    );
+
+                    echo WPGH()->html->link_picker( $args );
 
                     $match_types = array(
                         'partial'   => __( 'Partial Match' ),
@@ -113,28 +121,7 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
                         'selected'  => $match_type
                     );
 
-                    echo WPGH()->html->dropdown( $args );
-
-                    $args = array(
-                        'id'        => $step->prefix( 'url_match' ),
-                        'name'      => $step->prefix( 'url_match' ),
-                        'title'     => __( 'Match Url' ),
-                        'value'     => $match_url
-                    );
-
-                    echo WPGH()->html->input( $args );
-
-                    ?>
-                    <p class="description">
-                        <a href="#" data-target="<?php echo $step->prefix( 'url_match' ) ?>" id="<?php echo $step->prefix( 'add_link' ); ?>">
-                            <?php _e( 'Insert Link' , 'groundhogg' ); ?>
-                        </a>
-                    </p>
-                    <script>
-                        jQuery(function($){
-                            $('#<?php echo $step->prefix('add_link' ); ?>').linkPicker();
-                        });
-                    </script>
+                    echo WPGH()->html->dropdown( $args );?>
                 </td>
             </tr>
         </table>

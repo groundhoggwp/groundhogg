@@ -34,7 +34,9 @@ class WPGH_Notices
             $notices = array();
         }
 
+        $data = [];
         if ( is_wp_error( $code ) ){
+            $data = $code->get_error_data();
             $error = $code;
             $code = $error->get_error_code();
             $message = $error->get_error_message();
@@ -44,6 +46,7 @@ class WPGH_Notices
         $notices[$code][ 'code' ]    = $code;
         $notices[$code][ 'message' ] = $message;
         $notices[$code][ 'type' ]    = $type;
+        $notices[$code][ 'data' ]    = $data;
 
         set_transient( self::TRANSIENT, $notices, 60 );
     }
@@ -60,7 +63,11 @@ class WPGH_Notices
 
         foreach ( $notices as $notice ){
             ?>
-            <div id="<?php esc_attr_e( $notice['code'] ); ?>" class="notice notice-<?php esc_attr_e( $notice[ 'type' ] ); ?> is-dismissible"><p><strong><?php echo $notice[ 'message' ]; ?></strong></p></div>
+            <div id="<?php esc_attr_e( $notice['code'] ); ?>" class="notice notice-<?php esc_attr_e( $notice[ 'type' ] ); ?> is-dismissible"><p><strong><?php echo $notice[ 'message' ]; ?></strong></p>
+            <?php if ( $notice[ 'type' ] === 'error' && ! empty( $notice[ 'data' ] ) ): ?>
+                <p><textarea class="code" style="width: 100%;" readonly ><?php echo json_encode( $notice[ 'data' ] ); ?></textarea></p>
+            <?php endif; ?>
+            </div>
             <?php
         }
 

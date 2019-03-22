@@ -46,7 +46,13 @@ class WPGH_Divider_Block extends WPGH_Email_Block
         ob_start();
 
         ?>
-        <div style="margin: 5px 0 5px 0"><hr style="width:80%;"/></div>
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="divider">
+                    <div style="margin: 5px 0 5px 0"><hr style="width:80%;"/></div>
+                </td>
+            </tr>
+        </table>
         <?php
 
         return ob_get_clean();
@@ -62,14 +68,32 @@ class WPGH_Divider_Block extends WPGH_Email_Block
 
         $this->settings = array(
             array(
-                'type'  => 'number',
+                'type'  => 'range',
                 'label' => __( 'Width' ),
                 'atts'  => array(
-                    'class' => 'input',
                     'id'    => 'divider-width',
                     'name'  => 'divider-width',
                     'max'   => 100,
                     'min'   => 10
+                ),
+            ),
+            array(
+                'type'  => 'range',
+                'label' => __( 'Height' ),
+                'atts'  => array(
+                    'id'    => 'divider-height',
+                    'name'  => 'divider-height',
+                    'min'   => 1,
+                    'max'   => 20
+                ),
+            ),
+            array(
+                'type'  => 'input',
+                'label' => __( 'Color' ),
+                'atts'  => array(
+                    'name' => 'divider-color',
+                    'id' => 'divider-color',
+                    'value' => '#E5E5E5'
                 ),
             ),
         );

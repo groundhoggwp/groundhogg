@@ -348,6 +348,10 @@ class WPGH_Funnels_Page
                 foreach ( $this->get_funnels() as $id ){
                     $json = wpgh_convert_funnel_to_json( $id );
                     $newId = $this->import_funnel( $json );
+
+                    $funnel = WPGH()->funnels->get( $newId );
+                    WPGH()->funnels->update( $newId, [ 'title' => sprintf( '%s - (Copy)', $funnel->title ) ] );
+
                 }
 
                 $this->notices->add(

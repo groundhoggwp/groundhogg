@@ -105,11 +105,27 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.10 =
+* ADDED Send email notifications when event fails option.
+* ADDED Test method for GHSS.
+* TWEAKED Moved Misc settings to a misc tab
+* TWEAKED SMS Step now has a skip if no phone available option.
+* TWEAKED GH SS now uses an extended version of PHPMailer for better email encoding and support for attachments.
+* FIXED checking for option that does not exist in SMS Step. (Non lethal)
+
+= 1.2.9.1 =
+* HOT FIX for WP mail bug when using GHSS.
+
 = 1.2.9 =
 * ADDED Submission handler function for form extensions.
+* ADDED Shoddy column support for email builder.
+* ADDED Link picker for Button & Image Email blocks
+* ADDED Warning when sending email from an email address which has a different host than the given site.
+* TWEAKED improved link picker for link supported benchmarks.
 * TWEAKED Form File input visual ques.
 * TWEAKED Form Date picker now uses jQuery datepicker UI instead of browser date select.
 * TWEAKED Contact now has a meta cache array for faster querying of metadata
+* FIXED Iframe in modal now has proper scroll bar.
 * FIXED wp_mail() bug.
 * FIXED Site stats collection had num contacts and num funnels reversed.
 

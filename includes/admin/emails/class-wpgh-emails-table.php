@@ -80,7 +80,7 @@ class WPGH_Emails_Table extends WP_List_Table {
         if ( $this->get_view() !== 'trash' )
             return;
         ?>
-        <div class="alignleft">
+        <div class="alignleft gh-actions">
             <a class="button" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
         </div>
         <?php

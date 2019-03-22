@@ -417,7 +417,7 @@ class WPGH_Step implements WPGH_Event_Process
      */
     public function restore_current_blog()
     {
-        if ( wpgh_is_global_multisite() ) {
+        if ( wpgh_is_global_multisite() && ms_is_switched() ) {
             restore_current_blog();
         }
     }
