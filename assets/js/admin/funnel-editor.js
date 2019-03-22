@@ -98,6 +98,7 @@ var wpghFunnelEditor;
 
             if($reporting.is( ':checked')){
                 $('.step-reporting').removeClass('hidden');
+                $('.step-reporting').removeClass('hidden');
                 $('.step-edit').addClass('hidden');
             }
 
@@ -254,6 +255,8 @@ var wpghFunnelEditor;
          * @param e node
          */
         deleteStep: function (e) {
+
+            $('.spinner').css('visibility','visible');
             var step = $(e).closest('.step');
             var result = confirm( "Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action." );
             if (result) {
@@ -262,10 +265,12 @@ var wpghFunnelEditor;
                     url: ajaxurl,
                     data: {action: "wpgh_delete_funnel_step", step_id: step.attr( 'id' ) },
                     success: function (result) {
-                        // console.log(step.attr( 'id' ));
+                        $('.spinner').css('visibility','hidden');
                         step.remove();
                     }
                 });
+            } else {
+                $('.spinner').css('visibility','hidden');
             }
         },
 

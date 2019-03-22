@@ -213,6 +213,14 @@ class WPGH_Broadcasts_Page
         $config['object_id'] = $object_id;
         $config['object_type'] = isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' : 'email';
 
+        if ( $config[ 'object_type' ] === 'email' ){
+            $email = new WPGH_Email( $object_id );
+            if ( $email->is_draft() ){
+                $this->notices->add('email_in_draft_mode', _x('You cannot schedule an email while it is in draft mode.', 'notice', 'groundhogg'), 'error' );
+                return;
+            }
+        }
+
         $tags = isset($_POST['tags']) ? WPGH()->tags->validate($_POST['tags']) : array();
         if (empty($tags) || !is_array($tags)) {
             $this->notices->add('no_tags', _x('Please select 1 or more tags to send this broadcast to', 'notice', 'groundhogg'), 'error');

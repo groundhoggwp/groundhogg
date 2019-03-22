@@ -203,6 +203,14 @@ class WPGH_Email
     /**
      * @return bool
      */
+    public function is_draft()
+    {
+        return $this->status === 'draft';
+    }
+
+    /**
+     * @return bool
+     */
     public function is_template()
     {
         return (bool) $this->is_template;

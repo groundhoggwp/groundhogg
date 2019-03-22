@@ -50,6 +50,36 @@ class GH_SS_Mailer extends PHPMailer
         }
 
         if ( is_wp_error( $response ) ){
+
+            if ( $response->get_error_code() === 'invalid_recipients' ){
+
+                /* handle bounces */
+                $data = (array) $response->get_error_data();
+
+                $bounces = gisset_not_empty( $data, 'bounces' )? $data[ 'bounces' ] : [];
+
+                if ( ! empty( $bounces ) ){
+                    foreach ( $bounces as $email ){
+                        if ( $contact = wpgh_get_contact( $email ) ){
+                            $contact->change_marketing_preference( WPGH_HARD_BOUNCE );
+                        }
+                    }
+
+                }
+
+                $complaints = gisset_not_empty( $data, 'complaints' )? $data[ 'complaints' ] : [];
+
+                if ( ! empty( $complaints ) ){
+                    foreach ( $complaints as $email ){
+                        if ( $contact = wpgh_get_contact( $email ) ){
+                            $contact->change_marketing_preference( WPGH_COMPLAINED );
+                        }
+                    }
+
+                }
+
+            }
+
             throw new phpmailerException( $response->get_error_message(), self::STOP_CRITICAL );
         }
 

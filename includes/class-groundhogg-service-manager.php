@@ -14,6 +14,13 @@ class Groundhogg_Service_Manager
      */
     const MAX_LENGTH = 280;
 
+    /**
+     * List of errors.
+     *
+     * @var WP_Error[]
+     */
+    public $errors = [];
+
     public function __construct()
     {
         $should_listen = get_transient( 'gh_listen_for_connect' );
@@ -118,21 +125,28 @@ class Groundhogg_Service_Manager
         }
 
         if ( ! $response ){
-            return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), $response );
+            $error = new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), $response );
+            $this->add_error( $error );
+            return $error;
         }
 
         if ( is_wp_error( $response ) ){
+            $this->add_error( $response );
             return $response;
         }
 
         $json = json_decode( wp_remote_retrieve_body( $response ) );
 
         if ( ! $json ){
-            return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), wp_remote_retrieve_body( $response )  );
+            $error = new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), wp_remote_retrieve_body( $response )  );
+            $this->add_error( $error );
+            return $error;
         }
 
         if ( wpgh_is_json_error( $json ) ){
-            return wpgh_get_json_error( $json );
+            $error = wpgh_get_json_error( $json );
+            $this->add_error( $error );
+            return $error;
         }
 
         /**
@@ -469,6 +483,39 @@ class Groundhogg_Service_Manager
 
         return true;
 
+    }
+
+    /**
+     * @param $wperror WP_Error
+     */
+    public function add_error( $wperror ){
+        if ( $wperror instanceof WP_Error ){
+            $this->errors[] = $wperror;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function has_errors()
+    {
+        return ! empty( $this->errors );
+    }
+
+    /**
+     * @return WP_Error[]
+     */
+    public function get_errors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @return WP_Error
+     */
+    public function get_last_error()
+    {
+        return $this->errors[ count( $this->errors ) - 1 ];
     }
 
 

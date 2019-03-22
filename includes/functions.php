@@ -1833,6 +1833,11 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
         $mail_error_data['phpmailer_exception_code'] = $e->getCode();
         $mail_error_data['mime_message'] = $phpmailer->getSentMIMEMessage();
 
+        if ( WPGH()->service_manager->has_errors() ){
+            $mail_error_data[ 'orig_error_data' ] = WPGH()->service_manager->get_last_error()->get_error_data();
+            $mail_error_data[ 'orig_error_code' ] = WPGH()->service_manager->get_last_error()->get_error_code();
+        }
+
 //        var_dump( $mail_error_data );
 //        die();
 
