@@ -75,7 +75,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
                 'args'=> [
                     'id_or_email' => [
                         'required'    => true,
-                        'description' => _x('The ID or email of the contact you want to delete.','api','groundhogg'),
+                        'description' => _x('The ID or email of the contact you want to update.','api','groundhogg'),
                     ],
                     'by_user_id' => [
                         'required'    => false,

@@ -65,6 +65,7 @@ class WPGH_Upgrade{
         $this->update_to_version( '1.2' );
         $this->update_to_version( '1.2.4' );
         $this->update_to_version( '1.2.6' );
+        $this->update_to_version( '1.2.10.3' );
     }
 
     /**
@@ -243,4 +244,15 @@ class WPGH_Upgrade{
 
     }
 
+    /**
+     * Add send SMS caps to admin and marketer.
+     */
+    public function version_1_2_10_3()
+    {
+        global $wp_roles;
+
+        //add new roles for reports
+        $wp_roles->add_cap( 'administrator', 'send_sms' );
+        $wp_roles->add_cap( 'marketer', 'send_sms' );
+    }
 }

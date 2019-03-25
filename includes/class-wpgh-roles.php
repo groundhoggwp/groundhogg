@@ -183,6 +183,7 @@ class WPGH_Roles {
 			'add_sms',
 			'delete_sms',
 			'edit_sms',
+			'send_sms',
 		);
 
 		return apply_filters( 'wpgh_sms_caps', $caps );
