@@ -2045,3 +2045,22 @@ if ( wpgh_is_option_enabled( 'gh_send_notifications_on_event_failure' ) ){
     add_action( 'groundhogg/event/failed', 'wpgh_send_event_failure_notification' );
 
 }
+
+
+if ( ! function_exists( 'wpgh_split_name' ) ):
+
+/**
+ * Split a name into first and last.
+ *
+ * @param $name
+ *
+ * @return array
+ */
+function wpgh_split_name($name) {
+	$name = trim($name);
+	$last_name = (strpos($name, ' ') === false) ? '' : preg_replace('#.*\s([\w-]*)$#', '$1', $name);
+	$first_name = trim( preg_replace('#'.$last_name.'#', '', $name ) );
+	return array($first_name, $last_name);
+}
+
+endif;

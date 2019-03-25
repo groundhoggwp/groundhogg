@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.10.1 =
+* HOT FIX Elementor form integration broken after last update.
+
 = 1.2.10 =
 * ADDED Send email notifications when event fails option.
 * ADDED Test method for GHSS.

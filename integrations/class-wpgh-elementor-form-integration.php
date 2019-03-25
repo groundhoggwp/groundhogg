@@ -47,12 +47,6 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
             return;
         }
 
-        // Make sure that there is a Sendy Email field ID
-        // which is required by Sendy's API to subsribe a user
-        if ( empty( $settings['groundhogg_email_field'] ) ) {
-            return;
-        }
-
         // Get submitted Form data
         $raw_fields = $record->get( 'fields' );
 
@@ -60,6 +54,12 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
         $fields = [];
         foreach ( $raw_fields as $id => $field ) {
             $fields[ $id ] = $field['value'];
+        }
+
+        if ( ! empty( $fields[ 'name' ] ) ){
+        	$parts = wpgh_split_name( $fields[ 'name' ] );
+        	$fields[ 'first_name' ] = $parts[ 0 ];
+        	$fields[ 'last_name' ] = $parts[ 1 ];
         }
 
         $args = wp_parse_args( $fields, array(
@@ -81,36 +81,7 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
 
         $contact = wpgh_get_contact( $id );
 
-        $contact->update_meta( 'ip_address', wpgh_get_visitor_ip() );
-
-        if ( ! $contact->get_meta( 'lead_source' ) ){
-            $contact->update_meta( 'lead_source', WPGH()->tracking->lead_source );
-        }
-
-        if ( ! $contact->get_meta( 'source_page' ) ){
-            $contact->update_meta( 'source_page', wpgh_get_referer() );
-        }
-
-        if ( isset( $fields[ 'agree_terms'] ) ){
-            $contact->update_meta( 'terms_agreement', 'yes' );
-            $contact->update_meta( 'terms_agreement_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
-            do_action( 'wpgh_agreed_to_terms', $contact, $this );
-            unset( $fields[ 'agree_terms'] );
-        }
-
-        if ( isset( $fields['gdpr_consent'] ) ){
-            $contact->update_meta( 'gdpr_consent', 'yes' );
-            $contact->update_meta( 'gdpr_consent_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
-            do_action( 'wpgh_gdpr_consented', $contact, $this );
-            unset( $fields['gdpr_consent'] );
-        }
-
-        /* If the contact previously unsubed then reopt them back in.  */
-        if ( $contact->optin_status === WPGH_UNSUBSCRIBED ) {
-            $contact->change_marketing_preference(WPGH_UNCONFIRMED );
-        }
-
-        $contact->update_meta( 'last_optin', time() );
+        wpgh_after_form_submit_handler( $contact );
 
         $ignore = array(
             'first_name',
