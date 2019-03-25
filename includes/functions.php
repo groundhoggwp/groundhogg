@@ -1494,6 +1494,22 @@ function wpgh_parse_headers( $headers )
 
 }
 
+add_filter("retrieve_password_message", "wpgh_fix_html_pw_reset_link", 10, 4);
+
+/**
+ * GHSS doesn't link the <pwlink> format so we have to fix it by removing the gl & lt
+ *
+ * @param $message
+ * @param $key
+ * @param $user_login
+ * @param $user_data
+ * @return string
+ */
+function wpgh_fix_html_pw_reset_link($message, $key, $user_login, $user_data )    {
+    $message = preg_replace( '/<(https?:\/\/.*)>/', '$1', $message );
+    return $message;
+}
+
 /**
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
@@ -1509,6 +1525,9 @@ function wpgh_parse_headers( $headers )
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
     // Compact the input, apply the filters, and extract them back out
+
+    /* GHSS can only send HTML emails apparently. So convert all emails to HTML */
+    $message = apply_filters( 'the_content', $message );
 
     /**
      * Filters the wp_mail() arguments.
@@ -1752,8 +1771,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
     // Set Content-Type and charset
     // If we don't have a content-type from the input headers
+    //auto set HTML because AWS doesn't like plain text.
     if ( ! isset( $content_type ) ) {
-        $content_type = 'text/plain';
+        $content_type = 'text/html';
     }
 
     /**
