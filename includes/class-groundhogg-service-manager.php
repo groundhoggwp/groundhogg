@@ -42,7 +42,45 @@ class Groundhogg_Service_Manager
         if ( is_admin() && isset( $_GET[ 'test_gh_ss_connection' ] ) ){
             add_action( 'init', array( $this, 'send_test_email' ) );
         }
+
     }
+
+    /**
+     * Listen for option change for cron
+     *
+     * @param $val
+     * @return array|false
+     */
+    public function manage_cron( $val )
+    {
+        if( $val === 'on' ){
+            if( ! wpgh_get_option('gh_enable_cron_ghss') ) {
+                $post = [
+                    'domain'    => site_url(),
+                    'user_id'   => $this->get_gh_uid(),
+                ];
+                $response = $this->request( 'cron/cron_enable', $post, 'POST' );
+                if ( is_wp_error( $response ) ){
+                    WPGH()->notices->add( $response );
+                }
+            }
+            return true;
+        } else {
+            if( wpgh_get_option('gh_enable_cron_ghss') ) {
+                $post = [
+                    'domain'    => site_url(),
+                    'user_id'   => $this->get_gh_uid(),
+                ];
+                $response = $this->request( 'cron/cron_disable', $post, 'POST' );
+
+                if ( is_wp_error( $response ) ){
+                    WPGH()->notices->add( $response );
+                }
+            }
+            return false;
+        }
+    }
+
 
     public function test_connection_ui(){
 

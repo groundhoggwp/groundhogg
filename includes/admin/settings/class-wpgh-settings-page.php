@@ -702,6 +702,22 @@ class WPGH_Settings_Page
                     'value'         => 'on',
                 ),
             ),
+            'gh_enable_cron_ghss' => array(
+                'id'        => 'gh_enable_cron_ghss',
+                'section'   => 'service',
+                'label'     => _x( 'Enable Cron Job', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Enable cron job to make cron request to your site every minute.', 'settings', 'groundhogg' ),
+                'type'      => 'checkbox',
+                'atts' => array(
+                    'label'         => __( 'Enable' ),
+                    'name'          => 'gh_enable_cron_ghss',
+                    'id'            => 'gh_enable_cron_ghss',
+                    'value'         => 'on',
+                ),
+                'args' => [
+                    'sanitize_callback' => [ WPGH()->service_manager, 'manage_cron' ]
+                ]
+            ),
             'gh_disable_api' => array(
                 'id'        => 'gh_disable_api',
                 'section'   => 'api_settings',
@@ -729,7 +745,8 @@ class WPGH_Settings_Page
         foreach( $this->settings as $id => $setting ){
 //            print_r($setting[ 'section' ]);
             add_settings_field( $setting['id'], $setting['label'], array( $this, 'settings_callback' ), 'gh_' . $this->sections[ $setting[ 'section' ] ][ 'tab' ], 'gh_' . $setting[ 'section' ], $setting );
-            register_setting( 'gh_' . $this->sections[ $setting[ 'section' ] ][ 'tab' ], $setting['id'] );
+            $args = gisset_not_empty( $setting, 'args' ) ? $setting[ 'args' ]: [];
+            register_setting( 'gh_' . $this->sections[ $setting[ 'section' ] ][ 'tab' ], $setting['id'], $args );
         }
     }
 
