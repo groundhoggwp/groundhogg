@@ -921,7 +921,7 @@ class WPGH_Funnels_Page
 
         foreach ( $contacts as $contact ){
 
-            $contact = new WPGH_Contact( $contact->ID );
+            $contact = wpgh_get_contact( $contact->ID );
             $step->enqueue( $contact );
 
         }

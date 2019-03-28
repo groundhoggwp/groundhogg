@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 1.2.10.2
+Version: 1.2.11
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.2.10.2';
+        public $version = '1.2.11';
 
         /**
          * @var $instance Groundhogg instance
@@ -237,6 +237,49 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $service_manager;
 
         /**
+         * @var WPGH_Tag_Association_Mapper
+         */
+        public $status_tag_mapper;
+
+        /**
+         * Array of modules, this allows for quick adding of modules without having to define anything.
+         *
+         * @var array
+         */
+        private $modules = [];
+
+        /**
+         * @param $name
+         * @param $value
+         */
+        public function __set( $name, $value )
+        {
+            if ( ! property_exists( $this, $name ) ){
+                $this->modules[ $name ] = $value;
+            } else {
+                $this->$name = $value;
+            }
+
+        }
+
+        /**
+         * @param $name
+         * @return bool|mixed
+         */
+        public function __get($name)
+        {
+            if ( ! property_exists( $this, $name ) ){
+                if ( key_exists( $name ,$this->modules ) ){
+                    return $this->modules[ $name ];
+                }
+            } else {
+                return $this->$name;
+            }
+
+            return false;
+        }
+
+        /**
          * Returns the instance on Groundhogg.
          *
          * @return Groundhogg
@@ -294,6 +337,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->elements     = new WPGH_Elements();
                 self::$instance->iframe_listener = new WPGH_Form_Iframe();
                 self::$instance->service_manager = new Groundhogg_Service_Manager();
+                self::$instance->status_tag_mapper = new WPGH_Tag_Association_Mapper();
 
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
@@ -478,6 +522,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-form-iframe.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-stats-collection.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-groundhogg-service-manager.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-tag-association-mapper.php';
 
             /* Functions */
             require_once WPGH_PLUGIN_DIR . 'includes/functions.php';

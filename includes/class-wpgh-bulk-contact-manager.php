@@ -333,21 +333,15 @@ class WPGH_Bulk_Contact_Manager
         }
 
         if ( $this->db->exists( $data[ 'email' ] ) ){
-            $contact = new WPGH_Contact( $data[ 'email'] );
+            $contact = wpgh_get_contact( $data[ 'email'] );
             $contact->update( $data );
         } else {
             $id = $this->db->add( $data );
-            $contact = new WPGH_Contact( $id );
+            $contact = wpgh_get_contact( $id );
         }
 
         if ( isset( $args[ 'optin_status' ] ) ){
-
-            if ( intval( $args[ 'optin_status' ] )  === WPGH_UNSUBSCRIBED ){
-                $contact->unsubscribe();
-            } else {
-                $contact->change_marketing_preference( intval( $args[ 'optin_status' ] ) );
-            }
-
+            $contact->change_marketing_preference( intval( $args[ 'optin_status' ] ) );
         }
 
         if ( isset( $args[ 'tags' ] ) ){

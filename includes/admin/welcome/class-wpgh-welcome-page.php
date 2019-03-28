@@ -63,16 +63,15 @@ class WPGH_Welcome_Page
             );
         }
 
-        /* Hide affiliate notice when extensions are active */
-        if ( ! class_exists( 'WPGH_Extensions_Manager' ) )
-            include_once dirname( __FILE__ ) . '/../extensions/module-manager.php';
-
-        if ( ! WPGH_Extension_Manager::has_extensions() ){
-            $this->notices->add(
-                'affiliate', _x( 'You can get our entire extension library for $1 if <a href="https://www.groundhogg.io/partner/" target="_blank">you refer a friend.</a>', 'notice', 'groundhogg' ), 'info'
-            );
-        }
-
+//        /* Hide affiliate notice when extensions are active */
+//        if ( ! class_exists( 'WPGH_Extensions_Manager' ) )
+//            include_once dirname( __FILE__ ) . '/../extensions/module-manager.php';
+//
+//        if ( ! WPGH_Extension_Manager::has_extensions() ){
+//            $this->notices->add(
+//                'affiliate', _x( 'You can get our entire extension library for $1 if <a href="https://www.groundhogg.io/partner/" target="_blank">you refer a friend.</a>', 'notice', 'groundhogg' ), 'info'
+//            );
+//        }
 
     }
 

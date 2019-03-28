@@ -119,7 +119,7 @@ class WPGH_Event
 
         $this->funnel_id = intval($event->funnel_id);
         //definitely need this...
-        $this->contact = new WPGH_Contact($event->contact_id);
+        $this->contact = wpgh_get_contact($event->contact_id);
 
         /**
          * Check for an event type if POST 1.2

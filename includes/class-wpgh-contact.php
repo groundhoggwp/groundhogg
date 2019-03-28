@@ -576,14 +576,18 @@ class WPGH_Contact
      */
 	function change_marketing_preference( $preference )
     {
+        $old_preference = $this->optin_status;
+
         if ( $preference === WPGH_UNSUBSCRIBED ){
             $this->unsubscribe();
         } else {
             $this->update( array( 'optin_status' => $preference ) );
         }
+
         $this->update_meta( 'preferences_changed', time() );
-        do_action( 'wpgh_contact_marketing_preference_updated', $this->ID, $preference );
-        do_action( 'groundhogg/contact/preferences/updated', $this->ID, $preference );
+
+        do_action( 'wpgh_contact_marketing_preference_updated', $this->ID, $preference, $old_preference );
+        do_action( 'groundhogg/contact/preferences/updated', $this->ID, $preference, $old_preference );
 
     }
 
@@ -658,7 +662,7 @@ class WPGH_Contact
 
             $has_meta = $this->get_meta( $meta_key );
 
-            if ( ! $has_meta || $override ){
+            if ( key_exists( $ip_info_key, $info ) && ( ! $has_meta || $override ) ){
                 $this->update_meta( $meta_key, $info[ $ip_info_key ] );
             }
 

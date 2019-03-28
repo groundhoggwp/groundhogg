@@ -716,7 +716,7 @@ class WPGH_Email
         if (is_numeric($contact)) {
 
             /* catch if contact ID given rather than WPGH_Contact */
-            $contact = new WPGH_Contact($contact);
+            $contact = wpgh_get_contact($contact);
 
         }
 

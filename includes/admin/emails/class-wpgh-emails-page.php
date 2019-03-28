@@ -538,7 +538,7 @@ class WPGH_Emails_Page
                     wpgh_create_contact_from_user( $user );
                 }
 
-                $contact = new WPGH_Contact( $user->user_email );
+                $contact = wpgh_get_contact( $user->user_email );
 
                 $sent = $contact->exists() ? $email->send( $contact ) : false;
 

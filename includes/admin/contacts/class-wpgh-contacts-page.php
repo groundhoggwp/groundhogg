@@ -251,7 +251,7 @@ class WPGH_Contacts_Page
 
                 foreach ($this->get_contacts() as $id) {
 
-                    $contact = new WPGH_Contact($id);
+                    $contact = wpgh_get_contact($id);
                     $contact->change_marketing_preference( WPGH_SPAM );
 
                     $ip_address = $contact->get_meta('ip_address');
@@ -311,7 +311,7 @@ class WPGH_Contacts_Page
                 }
 
                 foreach ($this->get_contacts() as $id) {
-                    $contact = new WPGH_Contact($id);
+                    $contact = wpgh_get_contact($id);
                     $contact->change_marketing_preference( WPGH_UNCONFIRMED );
                 }
 
@@ -332,7 +332,7 @@ class WPGH_Contacts_Page
                 }
 
                 foreach ($this->get_contacts() as $id) {
-                    $contact = new WPGH_Contact($id);
+                    $contact = wpgh_get_contact($id);
                     $contact->change_marketing_preference( WPGH_UNCONFIRMED );
                 }
 
@@ -466,7 +466,7 @@ class WPGH_Contacts_Page
 
         $id = WPGH()->contacts->add($args);
 
-        $contact = new WPGH_Contact($id);
+        $contact = wpgh_get_contact($id);
 
         if (isset($_POST['primary_phone'])) {
             $contact->update_meta('primary_phone', sanitize_text_field($_POST['primary_phone']));
@@ -508,7 +508,7 @@ class WPGH_Contacts_Page
             return;
         }
 
-        $contact = new WPGH_Contact($id);
+        $contact = wpgh_get_contact($id);
 
         do_action('wpgh_admin_update_contact_before', $id);
 
@@ -803,7 +803,7 @@ class WPGH_Contacts_Page
 
         $id = (int)$_POST['ID'];
 
-        $contact = new WPGH_Contact($id);
+        $contact = wpgh_get_contact($id);
 
         do_action('wpgh_inline_update_contact_before', $id);
 

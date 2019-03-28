@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.2.11 =
+* TWEAKED Changed MOST instances of "new WPGH_Contact()" to "wpgh_get_contact()" so that the contacts cache is checked rather than querying the DB every time.
+
 = 1.2.10.2 =
 * HOT FIX Send all emails in HTML content type as GHSS does not like plain text emails. Use 'the_content' filter on plain text emails.
 

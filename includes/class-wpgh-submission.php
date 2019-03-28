@@ -220,15 +220,7 @@ class WPGH_Submission
 
         /* Exclude these if submitting from the ADMIN Screen */
         if ( ! $this->is_admin_submission ){
-            if ( $c->update_meta( 'ip_address', wpgh_get_visitor_ip() ) ){
-                $c->extrapolate_location();
-            }
-            if ( ! $c->get_meta( 'lead_source' ) ){
-                $c->update_meta( 'lead_source', WPGH()->tracking->lead_source );
-            }
-            if ( ! $c->get_meta( 'source_page' ) ){
-                $c->update_meta( 'source_page', $this->source );
-            }
+
             if ( isset( $this->agree_terms ) ){
                 $c->update_meta( 'terms_agreement', 'yes' );
                 $c->update_meta( 'terms_agreement_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
@@ -244,6 +236,7 @@ class WPGH_Submission
 
                 unset( $this->agree_terms );
             }
+
             if ( isset( $this->gdpr_consent ) ){
                 $c->update_meta( 'gdpr_consent', 'yes' );
                 $c->update_meta( 'gdpr_consent_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
@@ -259,11 +252,9 @@ class WPGH_Submission
 
                 unset( $this->gdpr_consent );
             }
-            /* If the contact previously unsubed then reopt them back in.  */
-            if ( $this->contact->optin_status === WPGH_UNSUBSCRIBED ) {
-                $this->contact->change_marketing_preference(WPGH_UNCONFIRMED );
-            }
-            $c->update_meta( 'last_optin', time() );
+
+            wpgh_after_form_submit_handler( $c );
+
         }
 
         foreach ( $this->data as $key => $value ) {
@@ -631,7 +622,7 @@ class WPGH_Submission
 
 
             if ( WPGH()->contacts->exists( $email ) ){
-                $this->contact = new WPGH_Contact( $email );
+                $this->contact = wpgh_get_contact( $email );
                 $this->contact->update( $args );
             } else{
                 $cid = WPGH()->contacts->add( $args );
@@ -639,7 +630,7 @@ class WPGH_Submission
                     $this->add_error( 'UNKNOWN_ERROR', _x( 'Something went wrong.', 'submission_error', 'groundhogg' ) );
                     return false;
                 }
-                $this->contact = new WPGH_Contact( $cid );
+                $this->contact = wpgh_get_contact( $cid );
             }
 
             //unset used DATA from the data prop

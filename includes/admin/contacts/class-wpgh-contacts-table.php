@@ -543,7 +543,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
     {
         ?>
         <tr id="contact-<?php echo $item->ID; ?>">
-            <?php $this->single_row_columns( new WPGH_Contact( $item->ID ) ); ?>
+            <?php $this->single_row_columns( wpgh_get_contact( $item->ID ) ); ?>
         </tr>
         <?php
     }

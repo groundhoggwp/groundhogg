@@ -566,7 +566,7 @@ class WPGH_HTML
             'data'              => array(),
             'selected'          => array(),
             'multiple'          => true,
-            'placeholder'       => __( 'Please Select One Or More Tags', 'groundhogg' ),
+            'placeholder'       => __( 'Please Select a Tag', 'groundhogg' ),
             'tags'              => true,
         ) );
 
@@ -678,7 +678,7 @@ class WPGH_HTML
 
         foreach ( $a[ 'selected' ] as $contact_id ){
 
-            $contact = new WPGH_Contact( $contact_id );
+            $contact = wpgh_get_contact( $contact_id );
 
             if ( $contact->exists() ) {
 
@@ -1139,7 +1139,7 @@ class WPGH_HTML
 	 *
 	 * @return string
 	 */
-    public function progress_bar( $args )
+    public function progress_bar( $args=[] )
     {
 	    $a = wp_parse_args( $args, array(
 		    'id'        => '',
@@ -1160,6 +1160,43 @@ class WPGH_HTML
 	    );
 
 	    return $bar;
+    }
+
+    public function toggle( $args=[] )
+    {
+        $a = shortcode_atts( array(
+            'label'         => '',
+            'name'          => '',
+            'id'            => '',
+            'class'         => '',
+            'value'         => '1',
+            'checked'       => false,
+            'title'         => '',
+            'attributes'    => '',
+            'on'            => 'On',
+            'off'           => 'Off',
+        ), $args );
+
+        $css = sprintf( "<style>#%s-switch .onoffswitch-inner:before {content: \"%s\";}
+#%s-switch .onoffswitch-inner:after {content: \"%s\";}</style>",esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'on' ] ), esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'off' ] ) );
+
+        return sprintf("%s<div id=\"%s-switch\" class=\"onoffswitch %s\" style=\"text-align: left\">
+                        <input type=\"checkbox\" id=\"%s\" name=\"%s\" class=\"onoffswitch-checkbox %s\" value=\"%s\" %s>
+                        <label class=\"onoffswitch-label\" for=\"%s\">
+                            <span class=\"onoffswitch-inner\"></span>
+                            <span class=\"onoffswitch-switch\"></span>
+                        </label>
+                    </div>",
+            $css,
+            esc_attr( $a[ 'id' ] ),
+            esc_attr( $a[ 'class' ] ),
+            esc_attr( $a[ 'id' ] ),
+            esc_attr( $a[ 'name' ] ),
+            esc_attr( $a[ 'class' ] ),
+            esc_attr( $a[ 'value' ] ),
+            $a[ 'checked' ] ? 'checked' : '',
+            esc_attr( $a[ 'id' ] )
+        );
     }
 
 }

@@ -198,7 +198,7 @@ class WPGH_Bounce_Checker
 
             foreach( $multiArray as $the ){
 
-                $contact  = new WPGH_Contact( $the['recipient'] );
+                $contact  = wpgh_get_contact( $the['recipient'] );
 
                 if ( ! $contact->email ){
                     continue;

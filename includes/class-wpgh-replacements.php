@@ -495,7 +495,7 @@ function wpgh_replacement_phone_ext( $contact_id )
 function wpgh_replacement_address( $contact_id )
 {
 
-    $contact = new WPGH_Contact( $contact_id );
+    $contact = wpgh_get_contact( $contact_id );
 
     $address = array();
 

@@ -130,6 +130,10 @@ class WPGH_Settings_Page
                 'id'    => 'extensions',
                 'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' )
             ),
+            'tags'   => [
+                'id'    => 'tags',
+                'title' => _x( 'Tags', 'settings_tabs', 'groundhogg' )
+            ],
             'api_tab'   =>  array(
                 'id'    => 'api_tab',
                 'title' => _x( 'API', 'settings_tabs', 'groundhogg' )
@@ -196,6 +200,11 @@ class WPGH_Settings_Page
                 'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'api_tab'
             ),
+            'optin_status_tags' => [
+                'id'    => 'optin_status_tags',
+                'title' => _x( 'Optin Status Tags', 'settings_sections', 'groundhogg' ),
+                'tab'   => 'tags'
+            ]
         ) );
     }
 
@@ -731,6 +740,102 @@ class WPGH_Settings_Page
                     'value'         => 'on',
                 ),
             ),
+            'gh_confirmed_tag' => [
+                'id'        => 'gh_confirmed_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Confirmed Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All confirmed contacts will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_confirmed_tag',
+                    'id'            => 'gh_confirmed_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
+            'gh_unconfirmed_tag' => [
+                'id'        => 'gh_unconfirmed_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Unconfirmed Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All unconfirmed contacts will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_unconfirmed_tag',
+                    'id'            => 'gh_unconfirmed_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
+            'gh_unsubscribed_tag' => [
+                'id'        => 'gh_unsubscribed_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Unsubscribed Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All unsubscribed contacts will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_unsubscribed_tag',
+                    'id'            => 'gh_unsubscribed_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
+            'gh_spammed_tag' => [
+                'id'        => 'gh_spammed_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Spam Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All contacts which are marked as spam will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_spammed_tag',
+                    'id'            => 'gh_spammed_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
+            'gh_bounced_tag' => [
+                'id'        => 'gh_bounced_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Bounced Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All contacts which have bounced will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_bounced_tag',
+                    'id'            => 'gh_bounced_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
+            'gh_complained_tag' => [
+                'id'        => 'gh_complained_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Complained Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All contacts which have complained will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_complained_tag',
+                    'id'            => 'gh_complained_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
+            'gh_marketable_tag' => [
+                'id'        => 'gh_marketable_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Marketable Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All contacts which are considered marketable will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_marketable_tag',
+                    'id'            => 'gh_marketable_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
+            'gh_non_marketable_tag' => [
+                'id'        => 'gh_non_marketable_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Non Marketable Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All contacts which are considered unmarketable will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_non_marketable_tag',
+                    'id'            => 'gh_non_marketable_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
         ) );
     }
 
@@ -901,7 +1006,7 @@ class WPGH_Settings_Page
             case 'select2':
             case 'dropdown_emails':
             case 'tag_picker':
-                $field[ 'atts' ][ 'selected' ] = array( $value );
+                $field[ 'atts' ][ 'selected' ] = is_array( $value )? $value : [$value];
                 break;
             case 'dropdown':
                 $field[ 'atts' ][ 'selected' ] = $value;
@@ -915,8 +1020,10 @@ class WPGH_Settings_Page
                 break;
         }
 
-        echo call_user_func( array( WPGH()->html, $field[ 'type' ] ), $field[ 'atts' ] );
+        $field[ 'atts' ][ 'id' ] = esc_attr( sanitize_key( $field['id'] ) );
+//        $field[ 'atts' ][ 'name' ] = esc_attr( $field['id'] );
 
+        echo call_user_func( array( WPGH()->html, $field[ 'type' ] ), $field[ 'atts' ] );
 
         if( isset( $field['desc'] ) && $desc = $field['desc'] ) {
             printf( '<p class="description">%s</p>', $desc );

@@ -255,7 +255,7 @@ class WPGH_DB_Contacts extends WPGH_DB  {
      */
     public function update_contact_email_on_user_update( $user_id = 0, $old_user_data = '' ) {
 
-        $contact = new WPGH_Contact( $user_id, true );
+        $contact = wpgh_get_contact( $user_id, true );
 
         if( ! $contact ) {
             return false;

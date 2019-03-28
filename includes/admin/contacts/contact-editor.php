@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $id = intval( $_GET[ 'contact' ] );
 
-$contact = new WPGH_Contact( $id );
+$contact = wpgh_get_contact( $id );
 
 if ( ! $contact->exists() ) {
     wp_die( _x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );

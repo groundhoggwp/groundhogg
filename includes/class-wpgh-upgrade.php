@@ -35,7 +35,7 @@ class WPGH_Upgrade{
         }
 
         $this->current_version = WPGH()->version;
-        add_action( 'init', array( $this, 'do_upgrades' ) );
+        add_action( 'admin_init', array( $this, 'do_upgrades' ) );
 
     }
 
@@ -66,6 +66,7 @@ class WPGH_Upgrade{
         $this->update_to_version( '1.2.4' );
         $this->update_to_version( '1.2.6' );
         $this->update_to_version( '1.2.10.3' );
+        $this->update_to_version( '1.2.11' );
     }
 
     /**
@@ -254,5 +255,13 @@ class WPGH_Upgrade{
         //add new roles for reports
         $wp_roles->add_cap( 'administrator', 'send_sms' );
         $wp_roles->add_cap( 'marketer', 'send_sms' );
+    }
+
+    /**
+     * Add default tag associations.
+     */
+    public function version_1_2_11()
+    {
+        WPGH()->status_tag_mapper->install_default_tags();
     }
 }

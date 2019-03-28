@@ -95,7 +95,7 @@ class WPGH_Superlink
      */
     public function process()
     {
-        $contact = new WPGH_Contact( $this->contact_id );
+        $contact = wpgh_get_contact( $this->contact_id );
 
         if ( ! empty( $this->tags ) && $contact->exists() ){
 

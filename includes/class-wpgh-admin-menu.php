@@ -78,6 +78,11 @@ class WPGH_Admin_Menu
     var $guided_setup;
 
     /**
+     * @var WPGH_Admin_Bulk_Job
+     */
+    var $bulk_jobs;
+
+    /**
      * Register the pages...
      *
      * WPGH_Admin_Menu constructor.
@@ -97,6 +102,8 @@ class WPGH_Admin_Menu
         $this->funnels_page     = new WPGH_Funnels_Page();
         $this->events_page      = new WPGH_Events_Page();
         $this->guided_setup     = new WPGH_Guided_Setup();
+        $this->bulk_jobs        = new WPGH_Admin_Bulk_Job();
+
         add_action( 'admin_menu', array( $this, 'register_tools_page' ), 98 );
 
         /**
@@ -108,6 +115,9 @@ class WPGH_Admin_Menu
 
     }
 
+    /**
+     * Add tools link in menu
+     */
     public function register_tools_page()
     {
         global $submenu;
@@ -115,10 +125,12 @@ class WPGH_Admin_Menu
         $submenu['groundhogg'][] = array('Tools', 'manage_options', $url );
     }
 
+    /**
+     * Include the admin pages...
+     */
     public function includes()
     {
         require_once dirname( __FILE__ ). '/admin/broadcasts/class-wpgh-broadcasts-page.php';
-//        require_once dirname( __FILE__ ). '/admin/dashboard/class-wpgh-dashboard-page.php';
         require_once dirname( __FILE__ ). '/admin/dashboard/class-wpgh-dashboard-widgets.php';
         require_once dirname( __FILE__ ). '/admin/contacts/class-wpgh-contacts-page.php';
         require_once dirname( __FILE__ ). '/admin/emails/class-wpgh-emails-page.php';
@@ -130,6 +142,7 @@ class WPGH_Admin_Menu
         require_once dirname( __FILE__ ). '/admin/tags/class-wpgh-tags-page.php';
         require_once dirname( __FILE__ ). '/admin/welcome/class-wpgh-welcome-page.php';
         require_once dirname( __FILE__ ). '/admin/guided-setup/class-wpgh-guided-setup.php';
+        require_once dirname( __FILE__ ). '/admin/bulk-jobs/class-wpgh-admin-bulk-job.php';
     }
 
     public function current_page()

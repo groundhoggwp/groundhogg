@@ -32,6 +32,19 @@ class WPGH_Dashboard_Widgets
        do_action( 'groundhogg/reports/load' );
     }
 
+    public function __set( $key, $val ){
+        $this->widgets[ $key ] = $val;
+    }
+
+    public function __get( $key )
+    {
+        if ( key_exists( $key, $this->widgets) ){
+            return $this->widgets[ $key ];
+        }
+
+        return false;
+    }
+
     public function setup_widgets()
     {
 
@@ -56,6 +69,9 @@ class WPGH_Dashboard_Widgets
         $this->widgets[] = new WPGH_Geographic_Region_Report();
         $this->widgets[] = new WPGH_Optin_Status_Report();
         $this->widgets[] = new WPGH_Last_Broadcast_Report();
+
+        do_action( 'groundhogg/dashboard/widgets/init', $this );
+
     }
 
     public function scripts(){

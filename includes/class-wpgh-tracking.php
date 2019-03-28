@@ -184,7 +184,7 @@ class WPGH_Tracking
             $uid = absint( intval( hexdec( $_REQUEST[ 'u' ] ) ) );
 
             if ( WPGH()->contacts->exists( $uid, 'ID' ) ){
-                $contact = new WPGH_Contact( $uid );
+                $contact = wpgh_get_contact( $uid );
                 $this->contact = $contact;
             }
 
@@ -310,7 +310,7 @@ class WPGH_Tracking
 //        wp_die( );
 
         if ( isset( $cookie->contact ) ){
-            $this->contact  = new WPGH_Contact( $cookie->contact );
+            $this->contact  = wpgh_get_contact( $cookie->contact );
         }
 
         if ( isset( $cookie->email ) ){
@@ -362,7 +362,7 @@ class WPGH_Tracking
 
         $user = wp_get_current_user();
 
-        $contact = new WPGH_Contact( $user->user_email );
+        $contact = wpgh_get_contact( $user->user_email );
 
         if ( ! $contact->exists() ){
             return;
@@ -482,7 +482,7 @@ class WPGH_Tracking
      */
     public function set_contact( $contact_id )
     {
-        $contact = new WPGH_Contact( $contact_id );
+        $contact = wpgh_get_contact( $contact_id );
 
         if ( $contact->exists() )
         {

@@ -190,6 +190,8 @@ function wpgh_run_install() {
         update_option( 'gh_view_in_browser_page', $id );
     }
 
+    WPGH()->status_tag_mapper->install_default_tags();
+
     update_option( 'wpgh_version', WPGH_VERSION );
 
     // Add a temporary option to note that WPGH pages have been created

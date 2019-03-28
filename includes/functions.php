@@ -1526,9 +1526,6 @@ function wpgh_fix_html_pw_reset_link($message, $key, $user_login, $user_data )  
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
     // Compact the input, apply the filters, and extract them back out
 
-    /* GHSS can only send HTML emails apparently. So convert all emails to HTML */
-    $message = apply_filters( 'the_content', $message );
-
     /**
      * Filters the wp_mail() arguments.
      *
@@ -1629,6 +1626,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
                             $from_email = trim( $content );
                         }
                         break;
+                    case 'mime-version':
+                        // Ensure mime-version does not survive do avoid duplicate header.
+                        break;
                     case 'content-type':
                         if ( strpos( $content, ';' ) !== false ) {
                             list( $type, $charset_content ) = explode( ';', $content );
@@ -1722,10 +1722,6 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
         return false;
     }
 
-    // Set mail's subject and body
-    $phpmailer->Subject = $subject;
-    $phpmailer->Body    = $message;
-
     // Set destination addresses, using appropriate methods for handling addresses
     $address_headers = compact( 'to', 'cc', 'bcc', 'reply_to' );
 
@@ -1766,12 +1762,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
         }
     }
 
-    // Set to use PHP's mail()
-//    $phpmailer->isMail();
-
     // Set Content-Type and charset
     // If we don't have a content-type from the input headers
-    //auto set HTML because AWS doesn't like plain text.
+    // Auto set HTML because AWS doesn't like plain text.
     if ( ! isset( $content_type ) ) {
         $content_type = 'text/html';
     }
@@ -1787,17 +1780,23 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
     $phpmailer->ContentType = $content_type;
 
+    // Set the content-type and charset
     // Set whether it's plaintext, depending on $content_type
+    // GHSS can only send HTML emails apparently. So convert all emails to HTML
     if ( 'text/html' == $content_type ) {
         $phpmailer->isHTML( true );
+        $message = apply_filters( 'the_content', $message );
     }
+
+    // Set mail's subject and body
+    $phpmailer->Subject = $subject;
+    $phpmailer->Body    = $message;
 
     // If we don't have a charset from the input headers
     if ( ! isset( $charset ) ) {
         $charset = get_bloginfo( 'charset' );
     }
 
-    // Set the content-type and charset
 
     /**
      * Filters the default wp_mail() charset.
@@ -2066,7 +2065,6 @@ if ( wpgh_is_option_enabled( 'gh_send_notifications_on_event_failure' ) ){
 
 }
 
-
 if ( ! function_exists( 'wpgh_split_name' ) ):
 
 /**
@@ -2084,3 +2082,4 @@ function wpgh_split_name($name) {
 }
 
 endif;
+
