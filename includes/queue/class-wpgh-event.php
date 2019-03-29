@@ -480,6 +480,9 @@ class WPGH_Event
      */
     public function complete()
     {
+
+        do_action( 'groundhogg/event/complete', $this );
+
         return $this->update(array(
             'status' => 'complete',
             'failure_reason' => '',
