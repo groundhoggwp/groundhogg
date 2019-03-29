@@ -237,7 +237,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         public $service_manager;
 
         /**
-         * @var WPGH_Tag_Association_Mapper
+         * @var WPGH_Tag_Mapping
          */
         public $status_tag_mapper;
 
@@ -337,7 +337,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->elements     = new WPGH_Elements();
                 self::$instance->iframe_listener = new WPGH_Form_Iframe();
                 self::$instance->service_manager = new Groundhogg_Service_Manager();
-                self::$instance->status_tag_mapper = new WPGH_Tag_Association_Mapper();
+                self::$instance->status_tag_mapper = new WPGH_Tag_Mapping();
 
                 if ( is_admin() ){
                     self::$instance->menu       = new WPGH_Admin_Menu();
@@ -522,7 +522,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-form-iframe.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-stats-collection.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-groundhogg-service-manager.php';
-            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-tag-association-mapper.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-tag-mapping.php';
 
             /* Functions */
             require_once WPGH_PLUGIN_DIR . 'includes/functions.php';

@@ -106,7 +106,14 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.2.11 =
+* ADDED optin status tag mapping so that it is easier to reference a broad scope of contacts without having to manage the tag associations through funnels.
+* ADDED Tags settings tab to add options for tag mapping
+* ADDED option to enable/disable cron job via GHSS from settings page.
+* TWEAKED skipping email confirmation emails will result in a skip rather than a WP_Error
+* TWEAKED X-Mailer header now set as Groundhogg.
+* TWEAKED funnels events which return false with soft fail and skip rather than hard fail with a WP Error.
 * TWEAKED Changed MOST instances of "new WPGH_Contact()" to "wpgh_get_contact()" so that the contacts cache is checked rather than querying the DB every time.
+* TWEAKED the Admin page abstract class to include more beneficial functions.
 
 = 1.2.10.2 =
 * HOT FIX Send all emails in HTML content type as GHSS does not like plain text emails. Use 'the_content' filter on plain text emails.

@@ -85,12 +85,17 @@ $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ]
     <span style="font-family: Georgia, Times New Roman, Bitstream Charter, Times, serif;font-weight: 400;"><?php echo date_i18n( "D, F d h:i A", $contact->get_local_time() ); ?>
         </span>
 </div>
+
+<?php do_action( 'groundhogg/contact/record/nav/before', $contact ); ?>
+
 <!-- BEGIN TABS -->
 <h2 class="nav-tab-wrapper">
     <?php foreach ( $tabs as $id => $tab ): ?>
         <a href="javascript:void(0)" class="nav-tab <?php echo  $active_tab == $id ? 'nav-tab-active' : ''; ?>" id="<?php echo 'tab_' . esc_attr( $id ); ?>"><?php _e( $tab, 'groundhogg'); ?></a>
     <?php endforeach; ?>
 </h2>
+
+<?php do_action( 'groundhogg/contact/record/nav/after', $contact ); ?>
 
 <!-- END TABS -->
 

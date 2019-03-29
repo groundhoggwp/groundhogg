@@ -6,7 +6,7 @@
  * Time: 11:01 AM
  */
 
-class WPGH_Tag_Association_Mapper
+class WPGH_Tag_Mapping
 {
 
     const MARKETABLE = 'marketable';
