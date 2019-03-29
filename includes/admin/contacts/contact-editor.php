@@ -153,6 +153,8 @@ function wpgh_contact_record_general_info( $contact )
         </tbody>
     </table>
 
+    <?php do_action( 'groundhogg/contact/record/name/after', $contact ); ?>
+
     <?php if (!$contact->user): ?>
 
     <h2><?php _e('Create User Account'); ?></h2>
@@ -173,6 +175,9 @@ function wpgh_contact_record_general_info( $contact )
         </tr>
 
     </table>
+
+    <?php do_action( 'groundhogg/contact/record/user/after', $contact ); ?>
+
 <?php endif; ?>
 
     <!-- GENERAL CONTACT INFO -->
@@ -234,6 +239,8 @@ function wpgh_contact_record_general_info( $contact )
         </tbody>
     </table>
 
+    <?php do_action( 'groundhogg/contact/record/contact_info/after', $contact ); ?>
+
     <!-- Company info -->
     <h2><?php _ex( 'Company Info', 'contact_record', 'groundhogg' ); ?></h2>
     <table class="form-table">
@@ -268,6 +275,9 @@ function wpgh_contact_record_general_info( $contact )
             </td>
         </tr>
     </table>
+
+    <?php do_action( 'groundhogg/contact/record/company_info/after', $contact ); ?>
+
 
     <!-- ADDRESS -->
     <h2><?php _ex( 'Location', 'contact_record', 'groundhogg' ); ?></h2>
