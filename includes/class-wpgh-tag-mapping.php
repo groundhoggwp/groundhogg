@@ -98,7 +98,7 @@ class WPGH_Tag_Mapping
     {
         $notice = sprintf(
             __( "New features are now available, but we need to perform an upgrade process first! %s", 'groundhogg' ),
-            sprintf( "<a href='%s'>Start Upgrade</a>", admin_url( 'admin.php?page=gh_bulk_jobs&action=bulk_apply_status_tags' ) )
+            sprintf( "<a href='%s' class='button button-secondary'>Start Upgrade</a>", admin_url( 'admin.php?page=gh_bulk_jobs&action=bulk_apply_status_tags' ) )
         );
 
         WPGH()->notices->add( 'upgrade_notice', $notice, 'info' );
@@ -154,17 +154,15 @@ class WPGH_Tag_Mapping
      */
     public function install_default_tags()
     {
-
         $tags = $this->get_default_tags();
-
         foreach ( $tags as $option_name => $tag_args ){
-            $tags_id = WPGH()->tags->add( $tag_args );
-            if ( $tags_id ){
-                wpgh_update_option( $option_name, $tags_id );
+            if ( ! wpgh_get_option( $option_name, false ) ){
+                $tags_id = WPGH()->tags->add( $tag_args );
+                if ( $tags_id ){
+                    wpgh_update_option( $option_name, $tags_id );
+                }
             }
-
         }
-
     }
 
     /**
