@@ -2045,27 +2045,57 @@ function wpgh_ghss_is_active()
     return (bool) wpgh_get_option( 'gh_email_token', false );
 }
 
-if ( wpgh_is_option_enabled( 'gh_send_notifications_on_event_failure' ) ){
+/**
+ * Notify the admin when credits run low.
+ *
+ * @param $credits
+ */
+function wpgh_ghss_notify_low_credit( $credits ){
+
+    if ( $credits > 1000 ){
+        return;
+    }
+
+    $message = false;
+    $subject = false;
+
+    switch ( $credits ) {
+        case 1000:
+        case 500:
+        case 300:
+        case 100:
+        case 0:
+            $subject = sprintf( "Low on Email/SMS credits!" );
+            $message = sprintf( "You are running low on credits! Only %s credits remaining. Top up on credits &rarr; https://www.groundhogg.io/downloads/email-credits/", $credits );
+            break;
+    }
+
+    if ( $message && $subject ){
+        wp_mail( get_bloginfo( 'admin_email' ), $subject, $message );
+    }
+
+}
+
+add_action( 'groundhogg/ghss/credits_used', 'wpgh_ghss_notify_low_credit' );
+
+if ( wpgh_is_option_enabled( 'gh_send_notifications_on_event_failure' ) ) {
 
     /**
      * Send event failure notification.
      *
      * @param $event WPGH_Event
      */
-    function wpgh_send_event_failure_notification( $event )
+    function wpgh_send_event_failure_notification($event)
     {
-
-        $subject = sprintf( "Event (%s) failed for %s", $event->get_step_title(), $event->contact->email );
-        $message = sprintf( "This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->contact->full_name, $event->contact->email );
-        $message.=sprintf( "\nFailure Reason: %s", $event->get_failure_reason() );
-        $message.=sprintf( "\nManage Failed Events: %s", admin_url( 'admin.php?page=gh_events&view=status&status=failed' ) );
-        $to = wpgh_get_option( 'gh_event_failure_notification_email', get_option( 'admin_email' ) );
-        wp_mail( $to, $subject, apply_filters( 'the_content', $message ) );
-
+        $subject = sprintf("Event (%s) failed for %s", $event->get_step_title(), $event->contact->email);
+        $message = sprintf("This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->contact->full_name, $event->contact->email);
+        $message .= sprintf("\nFailure Reason: %s", $event->get_failure_reason());
+        $message .= sprintf("\nManage Failed Events: %s", admin_url('admin.php?page=gh_events&view=status&status=failed'));
+        $to = wpgh_get_option('gh_event_failure_notification_email', get_option('admin_email'));
+        wp_mail($to, $subject, apply_filters('the_content', $message));
     }
 
-    add_action( 'groundhogg/event/failed', 'wpgh_send_event_failure_notification' );
-
+    add_action('groundhogg/event/failed', 'wpgh_send_event_failure_notification');
 }
 
 if ( ! function_exists( 'wpgh_split_name' ) ):

@@ -191,11 +191,24 @@ class Groundhogg_Service_Manager
          * Handle this at global scope.
          */
         if ( isset( $response->credits_remaining ) ){
-            wpgh_update_option( 'gh_remaining_api_credits', $response->credits_remaining );
+
+            $credits = intval( $response->credits_remaining );
+            wpgh_update_option( 'gh_remaining_api_credits', $credits );
+            do_action( "groundhogg/ghss/credits_used", $credits );
         }
 
         return $json;
 
+    }
+
+    /**
+     * Get the number of remaining credits.
+     *
+     * @return int
+     */
+    public function get_remaining_credit()
+    {
+        return intval( wpgh_get_option( 'gh_remaining_api_credits', 0 ) );
     }
 
 	/**

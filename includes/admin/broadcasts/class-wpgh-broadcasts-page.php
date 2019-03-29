@@ -243,6 +243,11 @@ class WPGH_Broadcasts_Page
             return;
         }
 
+        if ( wpgh_ghss_is_active() && $contact_sum > WPGH()->service_manager->get_remaining_credit() ){
+            $this->notices->add('no_enough_credits', sprintf( _x( 'You do not have enough email credits to send this broadcast! %s' , 'notice', 'groundhogg'), 'error' ), "<a target='_blank' href='https://www.groundhogg.io/downloads/email-credits/'>Get Credits!</a>" );
+            return;
+        }
+
         $send_date = isset($_POST['date']) ? $_POST['date'] : date('Y/m/d', strtotime('tomorrow'));
         $send_time = isset($_POST['time']) ? $_POST['time'] : '09:30';
 
