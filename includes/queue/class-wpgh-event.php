@@ -316,20 +316,22 @@ class WPGH_Event
      */
     public function run()
     {
-
-//        if (!$this->is_waiting() || $this->has_run() || $this->has_similar() || !$this->is_time() || !$this->step->can_run())
         if (!$this->is_waiting() || $this->has_run() || $this->has_similar() || !$this->is_time() )
             return false;
-
-//        $this->
 
         do_action('wpgh_event_run_before', $this);
 
         $result = $this->step->run($this->contact, $this);
 
-        if ( ! $result || is_wp_error( $result ) ) {
-            /* handle event failure */
+        // Soft fail when return false
+        if ( ! $result ){
+            $this->skip();
+            return false;
+        }
 
+        // Hard fail when WP Error
+        if ( is_wp_error( $result ) ) {
+            /* handle event failure */
             $this->set_error( $result );
 
             do_action('wpgh_event_run_failed', $this, $result );
@@ -337,9 +339,10 @@ class WPGH_Event
             $this->fail();
 
             return false;
-        } else {
-            $this->complete();
+
         }
+
+        $this->complete();
 
         /* special handling for the broadcast event. Make sure it's status is updated to sent... */
         if ($this->is_broadcast_event() && $this->step->status !== 'sent') {
@@ -429,6 +432,8 @@ class WPGH_Event
      */
     public function queue()
     {
+        do_action( 'groundhogg/event/queued', $this );
+
         return $this->update(array(
             'status' => 'waiting'
         ));
@@ -439,6 +444,8 @@ class WPGH_Event
      */
     public function cancel()
     {
+        do_action( 'groundhogg/event/cancelled', $this );
+
         return $this->update(array(
             'status' => 'cancelled'
         ));
@@ -470,6 +477,9 @@ class WPGH_Event
      */
     public function skip()
     {
+
+        do_action( 'groundhogg/event/skipped', $this );
+
         return $this->update(array(
             'status' => 'skipped'
         ));

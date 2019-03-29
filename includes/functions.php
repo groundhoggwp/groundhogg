@@ -1837,6 +1837,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
      */
     do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
 
+    // Hard set X-Mailer cuz we taking credit for this.
+    $phpmailer->XMailer = sprintf( 'Groundhogg %s (https://www.groundhogg.io)', WPGH()->version );
+
     // Send!
     try {
 

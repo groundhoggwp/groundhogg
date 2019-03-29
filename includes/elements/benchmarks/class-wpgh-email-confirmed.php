@@ -110,11 +110,6 @@ class WPGH_Email_Confirmed extends WPGH_Funnel_Step
 
         }
 
-//        if ( $s ){
-//            /* Process the queue immediately */
-//            do_action( 'wpgh_process_queue' );
-//        }
-
     }
 
     /**
