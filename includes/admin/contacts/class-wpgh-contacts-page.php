@@ -551,37 +551,7 @@ class WPGH_Contacts_Page
 
         }
 
-        /* Update Main Contact Information */
         $args = array();
-
-        if (isset($_POST['unsubscribe'])) {
-
-            $contact->unsubscribe();
-
-            $this->notices->add(
-                esc_attr('unsubscribed'),
-                _x('This contact will no longer receive marketing.', 'notice', 'groundhogg'),
-                'info'
-            );
-        }
-
-        if ( isset( $_POST['manual_confirm'] ) ) {
-            if ( isset( $_POST[ 'confirmation_reason' ] ) && ! empty( $_POST[ 'confirmation_reason' ] ) ){
-                $contact->change_marketing_preference( WPGH_CONFIRMED );
-                $contact->update_meta( 'manual_confirmation_reason', sanitize_textarea_field( stripslashes( $_POST[ 'confirmation_reason' ] ) ) );
-                $this->notices->add(
-                    esc_attr('confirmed'),
-                    _x('This contact\'s email address has been confirmed.', 'notice', 'groundhogg'),
-                    'info'
-                );
-            } else {
-                $this->notices->add(
-                    esc_attr('manual_confirmation_error'),
-                    _x('A reason is required to change the email confirmation status.', 'notice', 'groundhogg'),
-                    'error'
-                );
-            }
-        }
 
         if (isset($_POST['email'])) {
 
@@ -683,6 +653,39 @@ class WPGH_Contacts_Page
             $contact->remove_tag($contact->tags);
         }
 
+        /* Update Main Contact Information */
+
+        //Do after tags get updated for compatibility with new optin status change.
+
+        if (isset($_POST['unsubscribe'])) {
+
+            $contact->unsubscribe();
+
+            $this->notices->add(
+                esc_attr('unsubscribed'),
+                _x('This contact will no longer receive marketing.', 'notice', 'groundhogg'),
+                'info'
+            );
+        }
+
+        if ( isset( $_POST['manual_confirm'] ) ) {
+            if ( isset( $_POST[ 'confirmation_reason' ] ) && ! empty( $_POST[ 'confirmation_reason' ] ) ){
+                $contact->change_marketing_preference( WPGH_CONFIRMED );
+                $contact->update_meta( 'manual_confirmation_reason', sanitize_textarea_field( stripslashes( $_POST[ 'confirmation_reason' ] ) ) );
+                $this->notices->add(
+                    esc_attr('confirmed'),
+                    _x('This contact\'s email address has been confirmed.', 'notice', 'groundhogg'),
+                    'info'
+                );
+            } else {
+                $this->notices->add(
+                    esc_attr('manual_confirmation_error'),
+                    _x('A reason is required to change the email confirmation status.', 'notice', 'groundhogg'),
+                    'error'
+                );
+            }
+        }
+
         if ( isset( $_POST[ 'add_new_note' ] ) ){
             $contact->add_note( $_POST[ 'add_note' ] );
         }
@@ -717,9 +720,6 @@ class WPGH_Contacts_Page
         $this->notices->add('update', _x("Contact updated!", 'notice', 'groundhogg'), 'success');
 
         if (!empty($_FILES['files']['tmp_name'][0])) {
-
-//            var_dump( $_FILES );
-
             $this->upload_files();
         }
 

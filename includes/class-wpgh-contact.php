@@ -578,27 +578,23 @@ class WPGH_Contact
     {
         $old_preference = $this->optin_status;
 
-        if ( $preference === WPGH_UNSUBSCRIBED ){
-            $this->unsubscribe();
-        } else {
-            $this->update( array( 'optin_status' => $preference ) );
-        }
+        $this->update( [ 'optin_status' => $preference ] );
 
         $this->update_meta( 'preferences_changed', time() );
 
-        do_action( 'wpgh_contact_marketing_preference_updated', $this->ID, $preference, $old_preference );
         do_action( 'groundhogg/contact/preferences/updated', $this->ID, $preference, $old_preference );
+
+        if ( $preference === WPGH_UNSUBSCRIBED ){
+            do_action( 'groundhogg/contact/preferences/unsubscribed', $this->ID, $preference, $old_preference );
+        }
 
     }
 
     /**
      * Unsubscribe a contact
      */
-	function unsubscribe()
-    {
-        $this->update( array( 'optin_status' => WPGH_UNSUBSCRIBED ) );
-        do_action( 'wpgh_contact_unsubscribed', $this->ID );
-        do_action( 'groundhogg/contact/preferences/unsubscribed', $this->ID );
+	function unsubscribe() {
+        $this->change_marketing_preference( WPGH_UNSUBSCRIBED );
     }
 
     /**
