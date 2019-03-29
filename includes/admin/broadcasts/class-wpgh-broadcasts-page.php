@@ -244,7 +244,7 @@ class WPGH_Broadcasts_Page
         }
 
         if ( wpgh_ghss_is_active() && $contact_sum > WPGH()->service_manager->get_remaining_credit() ){
-            $this->notices->add('not_enough_credits', sprintf( _x( 'You do not have enough email credits to send this broadcast! %s' , 'notice', 'groundhogg'), 'error' ), "<a target='_blank' href='https://www.groundhogg.io/downloads/email-credits/'>Get Credits!</a>" );
+            $this->notices->add('not_enough_credits', sprintf( _x( 'You do not have enough credits to send this broadcast! %s' , 'notice', 'groundhogg'), 'error' ), "<a target='_blank' href='https://www.groundhogg.io/downloads/email-credits/'>Get Credits!</a>" );
             return;
         }
 
