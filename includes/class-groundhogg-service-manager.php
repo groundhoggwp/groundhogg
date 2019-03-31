@@ -82,6 +82,9 @@ class Groundhogg_Service_Manager
     }
 
 
+	/**
+	 * Add a test connection button for the GHSS
+	 */
     public function test_connection_ui(){
 
         if ( wpgh_has_email_token() ){
@@ -126,13 +129,14 @@ class Groundhogg_Service_Manager
      * @param array $body the body of the request
      * @param string $method The request method
      * @param array $headers optional headers to override a request
+     * @param int $version which version of the API to request
      * @return object|WP_Error
      */
-    public function request( $endpoint, $body=[], $method='POST', $headers=[] )
+    public function request( $endpoint, $body=[], $method='POST', $headers=[], $version=2 )
     {
 
         $method = strtoupper( $method );
-        $url = sprintf( 'https://aws.groundhogg.io/wp-json/aws/v2/%s', $endpoint );
+        $url = sprintf( 'https://aws.groundhogg.io/wp-json/aws/v%d/%s', $version, $endpoint );
 
         /* Set Default Headers */
         if ( empty( $headers ) ){
@@ -152,9 +156,6 @@ class Groundhogg_Service_Manager
             'data_format'   => 'body',
             'sslverify'     => true
         ];
-
-//        var_dump( $args );
-//        die();
 
         if ( $method === 'GET' ){
             $response = wp_remote_get( $url, $args );
@@ -333,32 +334,6 @@ class Groundhogg_Service_Manager
     }
 
     /**
-     * If the JSON is your typical error response
-     *
-     * @deprecated since 1.2.2
-     * @param $json
-     * @return bool
-     */
-    public function is_json_error( $json ){
-        return isset( $json->code ) && isset( $json->message ) && isset( $json->data );
-    }
-
-    /**
-     * Convert JSON to a WP_Error
-     *
-     * @deprecated since 1.2.2
-     * @param $json
-     * @return bool|WP_Error
-     */
-    public function get_json_error( $json ){
-        if ( $this->is_json_error( $json ) ){
-            return new WP_Error( $json->code, $json->message, $json->data );
-        }
-
-        return false;
-    }
-
-    /**
      * Send a request to Groundhogg.io to verify this domains status
      * Request provides domain status, and if verified an email token to use for sending
      */
@@ -410,12 +385,113 @@ class Groundhogg_Service_Manager
         return wpgh_is_option_enabled( 'gh_send_with_gh_api' );
     }
 
-    /**
-     * Show the DNS Records table
+	/**
+     * Send SMS message via Groundhogg service
+     *
+     * @param $contact WPGH_Contact
+     * @param $message string the message to send
+     *
+     * @return bool|WP_Error
      */
-    public function get_dns_table()
+    public function send_sms( $contact, $message )
     {
-        ?>
+
+        if ( ! wpgh_get_option( 'gh_email_token', false ) ){
+            return new WP_Error( 'NO_TOKEN', __( 'You require a Groundhogg Sending Service account before you can send SMS.', 'groundhogg' ) );
+        }
+
+        if ( ! $contact->is_marketable() ){
+            return new WP_Error( 'NON_MARKETABLE', __( 'This contact is currently unmarketable.', 'groundhogg' ) );
+        }
+
+        //send to groundhogg
+        $phone = $contact->get_meta( 'primary_phone' );
+
+        if ( ! $phone ){
+            return new WP_Error( 'NO_PHONE', __( 'This contact has no phone.', 'groundhogg' ) );
+        }
+
+        $country_code = $contact->get_meta( 'country' );
+
+        if ( ! $country_code ){
+            return new WP_Error( 'INVALID_COUNTRY_CODE', __( 'A country code is required to send SMS.', 'groundhogg' ) );
+        }
+
+        $message = sanitize_textarea_field( $message );
+        $data = array(
+            'message'       => WPGH()->replacements->process( $message, $contact->ID ),
+            'sender'        => wpgh_sanitize_from_name( wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ) ),
+            'phone_number'  => $phone,
+            'country_code'  => $country_code
+        );
+
+        $response = $this->request( 'sms/send', $data );
+
+        if ( is_wp_error( $response ) ){
+            do_action( 'wpgh_sms_failed', $response );
+            return $response;
+        }
+
+        return true;
+
+    }
+
+	/**
+     * @param $wperror WP_Error
+     */
+    public function add_error( $wperror ){
+        if ( $wperror instanceof WP_Error ){
+            $this->errors[] = $wperror;
+        }
+    }
+
+	/**
+     * @return bool
+     */
+    public function has_errors()
+    {
+        return ! empty( $this->errors );
+    }
+
+	/**
+     * @return WP_Error[]
+     */
+    public function get_errors()
+    {
+        return $this->errors;
+    }
+
+	/**
+     * @return WP_Error
+     */
+    public function get_last_error()
+    {
+        return $this->errors[ count( $this->errors ) - 1 ];
+    }
+
+	/**
+	 * Show the DNS table in the settings where the email is located
+	 */
+	public function show_dns_in_settings()
+	{
+
+		if ( ! wpgh_is_option_enabled( 'gh_send_with_gh_api' ) ){
+			?>
+            <h2><?php _ex( 'DNS Records', 'settings_page', 'groundhogg' ); ?></h2>
+            <div style="max-width: 800px">
+				<?php $this->get_dns_table(); ?>
+            </div>
+			<?php
+		}
+
+	}
+
+	/**
+	 * Show the DNS Records table
+	 */
+	public function get_dns_table()
+	{
+		?>
         <p><?php _ex( 'Your account has been enabled to send emails & text messages! To finish this configuration, please add the following DNS records to your DNS zone.', 'guided_setup', 'groundhogg' ); ?>&nbsp;
             <a target="_blank" href="https://www.google.com/search?q=how+to+add+dns+record"><?php _ex( 'Learn about adding DNS records.', 'guided_setup', 'groundhogg' ); ?></a></p>
         <p><?php _ex( 'After you have added the DNS records your domain will be automatically verified and Groundhogg will start using the Groundhogg Sending Service.', 'guided_setup', 'groundhogg' ); ?></p>
@@ -432,27 +508,27 @@ class Groundhogg_Service_Manager
             </tr>
             </thead>
             <tbody>
-            <?php
-            $records = wpgh_get_option( 'gh_email_api_dns_records' );
-            foreach ( $records as $record ): ?>
+			<?php
+			$records = wpgh_get_option( 'gh_email_api_dns_records' );
+			foreach ( $records as $record ): ?>
                 <tr>
                     <td>
                         <input
-                            type="text"
-                            onfocus="this.select()"
-                            class="full-width"
-                            value="<?php echo esc_attr( $record->name ); ?>"
-                            readonly>
+                                type="text"
+                                onfocus="this.select()"
+                                class="full-width"
+                                value="<?php echo esc_attr( $record->name ); ?>"
+                                readonly>
                     </td>
                     <td><?php esc_html_e( $record->type ); ?></td>
                     <td> <input
-                            type="text"
-                            onfocus="this.select()"
-                            class="full-width"
-                            value="<?php echo esc_attr( $record->value ); ?>"
-                            readonly></td>
+                                type="text"
+                                onfocus="this.select()"
+                                class="full-width"
+                                value="<?php echo esc_attr( $record->value ); ?>"
+                                readonly></td>
                 </tr>
-            <?php endforeach;?>
+			<?php endforeach;?>
             </tbody>
             <tfoot>
             <tr>
@@ -462,112 +538,8 @@ class Groundhogg_Service_Manager
             </tr>
             </tfoot>
         </table>
-        <?php
-    }
-
-    /**
-     * Show the DNS table in the settings where the email is located
-     */
-    public function show_dns_in_settings()
-    {
-
-        if ( ! wpgh_is_option_enabled( 'gh_send_with_gh_api' ) ){
-            ?>
-            <h2><?php _ex( 'DNS Records', 'settings_page', 'groundhogg' ); ?></h2>
-            <div style="max-width: 800px">
-                <?php $this->get_dns_table(); ?>
-            </div>
-            <?php
-        }
-
-    }
-
-    /**
-     * Send SMS message via Groundhogg service
-     *
-     * @param $contact WPGH_Contact
-     * @param $message string the message to send
-     *
-     * @return bool|WP_Error
-     */
-    public function send_sms( $contact, $message )
-    {
-
-        if ( ! wpgh_get_option( 'gh_email_token', false ) ){
-            return new WP_Error( 'NO_TOKEN', __( 'You require a Groundhogg Sending Service account before you can send SMS.', 'groundhogg' ) );
-        }
-
-        if ( ! $contact->is_marketable() ){
-            return new WP_Error( 'UNMARKETABLE', __( 'This contact is currently unmarketable.', 'groundhogg' ) );
-        }
-
-        //send to groundhogg
-        $phone = $contact->get_meta( 'primary_phone' );
-        if ( ! $phone ){
-            return new WP_Error( 'NO_PHONE', __( 'This contact has no phone.', 'groundhogg' ) );
-        }
-
-        $ip = $contact->get_meta( 'ip_address' );
-        if ( ! $ip ){
-            return new WP_Error( 'NO_IP', __( 'An IP address is required to determine the country code.', 'groundhogg' ) );
-        }
-
-        if ( strlen( $message > self::MAX_LENGTH ) ){
-            $message = substr( $message, 0, self::MAX_LENGTH );
-        }
-
-        $message = sanitize_textarea_field( $message );
-        $data = array(
-            'message'       => WPGH()->replacements->process( $message, $contact->ID ),
-            'sender'        => wpgh_sanitize_from_name( wpgh_get_option( 'gh_business_name', get_bloginfo( 'name' ) ) ),
-            'number'        => $phone,
-            'ip'            => $ip,
-            'country_code'  => $contact->country
-        );
-
-        $response = $this->request( 'sms/send', $data );
-
-        if ( is_wp_error( $response ) ){
-            do_action( 'wpgh_sms_failed', $response );
-            return $response;
-        }
-
-        return true;
-
-    }
-
-    /**
-     * @param $wperror WP_Error
-     */
-    public function add_error( $wperror ){
-        if ( $wperror instanceof WP_Error ){
-            $this->errors[] = $wperror;
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    public function has_errors()
-    {
-        return ! empty( $this->errors );
-    }
-
-    /**
-     * @return WP_Error[]
-     */
-    public function get_errors()
-    {
-        return $this->errors;
-    }
-
-    /**
-     * @return WP_Error
-     */
-    public function get_last_error()
-    {
-        return $this->errors[ count( $this->errors ) - 1 ];
-    }
+		<?php
+	}
 
 
 
