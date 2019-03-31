@@ -30,7 +30,7 @@ class GH_SS_Mailer extends PHPMailer
             $message = $this->getSentMIMEMessage();
 
             if ( apply_filters( 'groundhogg/mailer/use_gh_ss', true ) ){
-                $response = WPGH()->service_manager->request( 'emails/wp_mail/v2', [
+                $response = WPGH()->service_manager->request( 'emails/send', [
                     'message' => $message,
                 ], 'POST' );
             } else {

@@ -132,7 +132,7 @@ class Groundhogg_Service_Manager
     {
 
         $method = strtoupper( $method );
-        $url = sprintf( 'https://aws.groundhogg.io/wp-json/aws/v1/%s', $endpoint );
+        $url = sprintf( 'https://aws.groundhogg.io/wp-json/aws/v2/%s', $endpoint );
 
         /* Set Default Headers */
         if ( empty( $headers ) ){
