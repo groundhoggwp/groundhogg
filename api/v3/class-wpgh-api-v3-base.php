@@ -284,7 +284,7 @@ abstract class WPGH_API_V3_BASE {
         /**
          * Set the current user for the request
          */
-        set_current_user( $user_id );
+	    wp_set_current_user( $user_id );
         self::set_current_user( $user_id );
 
         return true;
