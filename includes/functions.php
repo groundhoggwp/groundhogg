@@ -2066,7 +2066,7 @@ function wpgh_ghss_notify_low_credit( $credits ){
         case 100:
         case 0:
             $subject = sprintf( "Low on Email/SMS credits!" );
-            $message = sprintf( "You are running low on credits! Only %s credits remaining. Top up on credits &rarr; https://www.groundhogg.io/downloads/email-credits/", $credits );
+            $message = sprintf( "You are running low on credits! Only %s credits remaining. Top up on credits &rarr; https://www.groundhogg.io/downloads/credits/", $credits );
             break;
     }
 
@@ -2077,6 +2077,7 @@ function wpgh_ghss_notify_low_credit( $credits ){
 }
 
 add_action( 'groundhogg/ghss/credits_used', 'wpgh_ghss_notify_low_credit' );
+add_action( 'groundhogg/ghss/sms_credits_used', 'wpgh_ghss_notify_low_credit' );
 
 if ( wpgh_is_option_enabled( 'gh_send_notifications_on_event_failure' ) ) {
 

@@ -125,6 +125,8 @@ class Groundhogg_Service_Manager
     }
 
     /**
+     * Send a request to the gh SS.
+     *
      * @param string $endpoint the REST endpoint
      * @param array $body the body of the request
      * @param string $method The request method
@@ -187,14 +189,18 @@ class Groundhogg_Service_Manager
             return $error;
         }
 
-        /**
-         * Handle this at global scope.
-         */
+        // Update num of credits remaining.
         if ( isset( $response->credits_remaining ) ){
-
             $credits = intval( $response->credits_remaining );
             wpgh_update_option( 'gh_remaining_api_credits', $credits );
             do_action( "groundhogg/ghss/credits_used", $credits );
+        }
+
+        // Update num of SMS credits remaining.
+        if ( isset( $response->sms_credits_remaining ) ){
+            $credits = intval( $response->sms_credits_remaining );
+            wpgh_update_option( 'gh_remaining_api_sms_credits', $credits );
+            do_action( "groundhogg/ghss/sms_credits_used", $credits );
         }
 
         return $json;
