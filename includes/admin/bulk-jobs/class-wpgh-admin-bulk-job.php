@@ -36,17 +36,9 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
         do_action( $bulk_action );
     }
 
-    /* Register the page */
-    public function register()
+    protected function get_parent_slug()
     {
-        $page = add_submenu_page(
-            null,
-            $this->get_name(),
-            $this->get_name(),
-            $this->get_cap(),
-            $this->get_slug(),
-            [ $this, 'page' ]
-        );
+        return 'options.php';
     }
 
     /**

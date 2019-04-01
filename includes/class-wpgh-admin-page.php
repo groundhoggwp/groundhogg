@@ -48,6 +48,16 @@ abstract class WPGH_Admin_Page
     }
 
     /**
+     * Get the parent slug
+     *
+     * @return string
+     */
+    protected function get_parent_slug()
+    {
+        return 'groundhogg';
+    }
+
+    /**
      * Add Ajax actions...
      *
      * @return mixed
@@ -108,7 +118,7 @@ abstract class WPGH_Admin_Page
     public function register()
     {
         $page = add_submenu_page(
-            'groundhogg',
+            $this->get_parent_slug(),
             $this->get_name(),
             $this->get_name(),
             $this->get_cap(),
@@ -206,7 +216,7 @@ abstract class WPGH_Admin_Page
 
         $base_url = remove_query_arg(array('_wpnonce', 'action'), wp_get_referer());
 
-        $func = sprintf( "%s_rule", $this->get_action() );
+        $func = sprintf( "%s_%s", $this->get_action(), $this->get_item_type() );
 
         if ( method_exists( $this, $func ) ){
             $exitCode = call_user_func( [ $this, $func ] );
@@ -283,6 +293,27 @@ abstract class WPGH_Admin_Page
             ?>
         </div>
         <?php
+    }
+
+    /**
+     * Get the admin url with the given query string.
+     *
+     * @param string $query_string
+     * @return string
+     */
+    public function admin_url( $query_string = '' )
+    {
+        $base = admin_url( sprintf( 'admin.php?page=%s', $this->get_slug() ) );
+
+        if ( empty( $query_string ) ){
+            return $base;
+        }
+
+        if ( is_array( $query_string ) ){
+            $query_string = http_build_query( $query_string );
+        }
+
+        return sprintf( "%s&%s", $base, $query_string );
     }
 
 

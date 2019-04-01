@@ -2125,3 +2125,34 @@ function wpgh_split_name($name) {
 
 endif;
 
+/**
+ * Get a list of items from a file path, if file does not exist of there are no items return an empty array.
+ *
+ * @param string $file_path
+ * @return array
+ */
+function wpgh_get_items_from_csv( $file_path='' )
+{
+
+    if ( ! file_exists( $file_path ) ){
+        return [];
+    }
+
+    $rows = array_map('str_getcsv', file( $file_path, FILE_SKIP_EMPTY_LINES ) );
+    $header = array_shift($rows );
+    $csv = [];
+    foreach ($rows as $row) {
+        $csv[] = array_combine($header, $row);
+    }
+
+    return $csv;
+
+}
+
+/**
+ * @return string Get the CSV import URL.
+ */
+function wpgh_get_csv_imports_dir( $file_path='' ){
+    $upload_dir = wp_get_upload_dir();
+    return sprintf( "%s/groundhogg-imports/%s", $upload_dir[ 'basedir' ], $file_path );
+}
