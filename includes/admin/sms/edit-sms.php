@@ -32,17 +32,15 @@ $sms = WPGH()->sms->get_sms( $id );
             <td><textarea name="message" id="sms-message" rows="5"><?php echo $sms->message; ?></textarea>
                 <p class="description">
 		            <?php WPGH()->replacements->show_replacements_button(); ?>
-                    <?php _e( 'Use any valid replacement codes in your text message. You will be charged 1 credit per every 140 characters.', 'groundhogg' ); ?>&nbsp;<b>(<span id="characters"><?php echo strlen( $sms->message ); ?></span>)</b>
+                    <?php _e( 'Use any valid replacement codes in your text message.', 'groundhogg' ); ?>
                 </p>
-                <script>jQuery( '#sms-message' ).on( 'keydown', function () {
-                        jQuery( '#characters' ).text( jQuery( '#sms-message' ).val().length )
-                    } );</script>
             </td>
         </tr>
         </tbody>
     </table>
     <div class="edit-sms-actions">
         <?php submit_button( __( 'Update' ), 'primary', 'update', false ); ?>
+        <?php submit_button( __( 'Update & Test' ), 'secondary', 'save_and_test', false ); ?>
         <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_sms&action=delete&sms='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
     </div>
 </form>

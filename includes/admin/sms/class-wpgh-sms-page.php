@@ -25,8 +25,6 @@ class WPGH_SMS_Page
     public $notices;
     public $order = 26;
 
-    const MAX_LENGTH = 280;
-
     function __construct()
     {
 
@@ -142,15 +140,6 @@ class WPGH_SMS_Page
 
                 break;
 
-            case 'broadcast':
-                if (!current_user_can('edit_sms')) {
-                    wp_die(WPGH()->roles->error('edit_sms'));
-                }
-
-                $this->schedule_broadcast();
-
-                break;
-
             case 'delete':
 
                 if (!current_user_can('delete_sms')) {
@@ -182,6 +171,9 @@ class WPGH_SMS_Page
         die();
     }
 
+    /**
+     * Add a new SMS message
+     */
     private function add_sms()
     {
         if (!current_user_can('add_sms')) {
@@ -204,6 +196,9 @@ class WPGH_SMS_Page
         }
     }
 
+    /**
+     * Edit the SMS message.
+     */
     private function edit_sms()
     {
         if (!current_user_can('edit_sms')) {
@@ -220,6 +215,20 @@ class WPGH_SMS_Page
         );
 
         $result = WPGH()->sms->update($id, $args);
+
+        if ( gisset_not_empty( $_POST, 'save_and_test' ) ){
+            $sms = new WPGH_SMS( $id );
+
+            $contact = wpgh_get_contact( get_current_user_id(), true );
+
+            $result = $sms->send( $contact );
+
+            if ( is_wp_error( $result ) ){
+                WPGH()->notices->add( $result );
+            } else {
+                WPGH()->notices->add( 'test_sent', sprintf( 'Test sent to %s!', $contact->primary_phone ), 'info' );
+            }
+        }
 
         if ($result) {
             $this->notices->add('updated', _x('Updated SMS.', 'notice', 'groundhogg'));
@@ -269,11 +278,7 @@ class WPGH_SMS_Page
                                 <textarea rows="5" name="message" id="sms-message" autocomplete="off" required></textarea>
                                 <p class="description">
 	                                <?php WPGH()->replacements->show_replacements_button(); ?>
-                                    <?php _e( 'Use any valid replacement codes in your text message. You will be charged 1 credit per every 140 characters.', 'groundhogg' ); ?>&nbsp;<b>(<span id="characters">0</span>)</b>
-                                </p>
-                                <script>jQuery( '#sms-message' ).on( 'keydown', function () {
-                                        jQuery( '#characters' ).text( jQuery( '#sms-message' ).val().length )
-                                    } );</script>
+                                    <?php _e( 'Use any valid replacement codes in your text message.', 'groundhogg' ); ?>
                             </div>
                             <?php submit_button( _x( 'Add New SMS', 'action', 'groundhogg' ), 'primary', 'add_sms' ); ?>
                         </form>

@@ -129,14 +129,13 @@ class Groundhogg_Service_Manager
      * @param array $body the body of the request
      * @param string $method The request method
      * @param array $headers optional headers to override a request
-     * @param int $version which version of the API to request
      * @return object|WP_Error
      */
-    public function request( $endpoint, $body=[], $method='POST', $headers=[], $version=2 )
+    public function request( $endpoint, $body=[], $method='POST', $headers=[] )
     {
 
         $method = strtoupper( $method );
-        $url = sprintf( 'https://aws.groundhogg.io/wp-json/aws/v%d/%s', $version, $endpoint );
+        $url = sprintf( 'https://aws.groundhogg.io/wp-json/api/v2/%s', $endpoint );
 
         /* Set Default Headers */
         if ( empty( $headers ) ){
@@ -408,7 +407,7 @@ class Groundhogg_Service_Manager
         $phone = $contact->get_meta( 'primary_phone' );
 
         if ( ! $phone ){
-            return new WP_Error( 'NO_PHONE', __( 'This contact has no phone.', 'groundhogg' ) );
+            return new WP_Error( 'NO_PHONE', sprintf( __( 'Contact %s has no phone number.', 'groundhogg' ), $contact->email ) );
         }
 
         $country_code = $contact->get_meta( 'country' );
@@ -425,7 +424,7 @@ class Groundhogg_Service_Manager
             'country_code'  => $country_code
         );
 
-        $response = $this->request( 'sms/send', $data );
+        $response = $this->request( 'sms/send', $data, 'POST' );
 
         if ( is_wp_error( $response ) ){
             do_action( 'wpgh_sms_failed', $response );
