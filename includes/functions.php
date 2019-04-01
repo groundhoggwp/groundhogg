@@ -1936,7 +1936,11 @@ function wpgh_sender_email( $original_email_address ) {
     $from_email = 'wordpress@' . $sitename;
 
     if ( $original_email_address === $from_email ){
-        $original_email_address = wpgh_get_option( 'gh_override_from_email', $original_email_address );
+        $new_email_address = wpgh_get_option( 'gh_override_from_email', $original_email_address );
+
+        if ( ! empty( $new_email_address ) ){
+            $original_email_address = $new_email_address;
+        }
     }
 
     return $original_email_address;
@@ -1951,7 +1955,11 @@ function wpgh_sender_email( $original_email_address ) {
 function wpgh_sender_name( $original_email_from ) {
 
     if( $original_email_from === 'WordPress' ){
-        $original_email_from = wpgh_get_option( 'gh_override_from_name', $original_email_from );
+        $new_email_from = wpgh_get_option( 'gh_override_from_name', $original_email_from );
+
+        if ( ! empty( $new_email_from ) ){
+            $original_email_from = $new_email_from;
+        }
     }
 
     return $original_email_from;
