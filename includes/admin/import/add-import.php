@@ -27,6 +27,7 @@ do_action( 'groundhogg/import/form/before' );
                 <input type="file" name="import_file" id="import_file" accept=".csv">
                 <button class="button-primary" name="import_file_button" value="import"><?php _ex('Import Contacts', 'action', 'groundhogg'); ?></button>
             </form>
+            <p class="description" style="text-align: center"><a href="<?php echo admin_url( 'admin.php?page=gh_imports' ); ?>">&larr;&nbsp;<?php _e( 'Import from existing file.' ); ?></a></p>
         </div>
     </div>
 </div>

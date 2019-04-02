@@ -1105,7 +1105,7 @@ class WPGH_Contacts_Page
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
             <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_contacts&action=add' ); ?>"><?php _ex( 'Add New', 'page_title_action', 'groundhogg' ); ?></a>
-            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_settings&tab=tools' ); ?>"><?php _ex( 'Import', 'page_title_action', 'groundhogg' ); ?></a>
+            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_imports&action=add' ); ?>"><?php _ex( 'Import', 'page_title_action', 'groundhogg' ); ?></a>
             <?php $this->notices->notices(); ?>
             <hr class="wp-header-end">
             <?php switch ( $this->get_action() ){

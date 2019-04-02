@@ -2138,14 +2138,21 @@ function wpgh_get_items_from_csv( $file_path='' )
         return [];
     }
 
-    $rows = array_map('str_getcsv', file( $file_path, FILE_SKIP_EMPTY_LINES ) );
-    $header = array_shift($rows );
-    $csv = [];
-    foreach ($rows as $row) {
-        $csv[] = array_combine($header, $row);
+    $header = NULL;
+    $data = array();
+    if (($handle = fopen($file_path, 'r')) !== FALSE)
+    {
+        while (($row = fgetcsv($handle, 1000, ',')) !== FALSE)
+        {
+            if(!$header)
+                $header = $row;
+            else
+                $data[] = array_combine($header, $row);
+        }
+        fclose($handle);
     }
 
-    return $csv;
+    return $data;
 
 }
 
@@ -2156,3 +2163,202 @@ function wpgh_get_csv_imports_dir( $file_path='' ){
     $upload_dir = wp_get_upload_dir();
     return sprintf( "%s/groundhogg-imports/%s", $upload_dir[ 'basedir' ], $file_path );
 }
+
+/**
+ * @return string Get the CSV import URL.
+ */
+function wpgh_get_csv_imports_url( $file_path='' ){
+    $upload_dir = wp_get_upload_dir();
+    return sprintf( "%s/groundhogg-imports/%s", $upload_dir[ 'baseurl' ], $file_path );
+}
+
+/**
+ * Get a list of mappable fields as well as extra fields
+ *
+ * @param array $extra
+ * @return array
+ */
+function wpgh_get_mappable_fields( $extra=[] )
+{
+
+    $defaults = [
+        'full_name'                 => __( 'Full Name' ),
+        'first_name'                => __( 'First Name' ),
+        'last_name'                 => __( 'Last Name' ),
+        'email'                     => __( 'Email Address' ),
+        'optin_status'              => __( 'Optin Status' ),
+        'user_id'                   => __( 'User Id' ),
+        'owner_id'                  => __( 'Owner Id' ),
+        'primary_phone'             => __( 'Phone Number' ),
+        'primary_phone_extension'   => __( 'Phone Number Extension' ),
+        'street_address_1'          => __( 'Street Address 1' ),
+        'street_address_2'          => __( 'Street Address 2' ),
+        'city'                      => __( 'City' ),
+        'postal_zip'                => __( 'Postal/Zip' ),
+        'region'                    => __( 'Province/State/Region' ),
+        'country'                   => __( 'Country' ),
+        'company_name'              => __( 'Company Name' ),
+        'company_address'           => __( 'Full Company Address' ),
+        'job_title'                 => __( 'Job Title' ),
+        'time_zone'                 => __( 'Time Zone' ),
+        'ip_address'                => __( 'IP Address' ),
+        'lead_source'               => __( 'Lead Source' ),
+        'source_page'               => __( 'Source Page' ),
+        'notes'                     => __( 'Add To Notes' ),
+        'tags'                      => __( 'Apply Value as Tag' ),
+        'meta'                      => __( 'Add as Custom Meta' ),
+    ];
+
+    $fields = array_merge( $defaults, $extra );
+
+    return apply_filters( 'groundhogg/mappable_fields', $fields );
+
+}
+
+/**
+ * Generate a contact from given associative array and a field map.
+ *
+ * @param $fields
+ * @param $map
+ *
+ * @return WPGH_Contact|false
+ */
+function wpgh_generate_contact_with_map( $fields, $map )
+{
+    $meta = [];
+    $tags = [];
+    $notes = [];
+
+    $args = [];
+
+    foreach ( $fields as $column => $value ){
+
+        // ignore if we are not mapping it.
+        if ( ! key_exists( $column, $map ) ){
+            continue;
+        }
+
+        $field = $map[ $column ];
+
+        switch ( $field ){
+            case 'full_name':
+                $parts = wpgh_split_name( $value );
+                $args[ 'first_name' ] = sanitize_text_field( $parts[0] );
+                $args[ 'last_name' ] = sanitize_text_field( $parts[1] );
+                break;
+            case 'first_name':
+            case 'last_name':
+                $args[ $field ] = sanitize_text_field( $value );
+                break;
+            case 'email':
+                $args[ $field ] = sanitize_email( $value );
+                break;
+            case 'optin_status':
+            case 'user_id':
+            case 'owner_id':
+                $args[ $field ] = absint( $value );
+                break;
+            case 'primary_phone':
+            case 'primary_phone_extension':
+            case 'street_address_1' :
+            case 'street_address_2':
+            case 'city':
+            case 'postal_zip':
+            case 'region':
+            case 'company_name':
+            case 'company_address':
+            case 'job_title':
+            case 'lead_source':
+            case 'source_page':
+                $meta[ $field ] = sanitize_text_field( $value );
+                break;
+            case 'country':
+                if ( strlen( $value ) !== 2 ){
+                    $countries = wpgh_get_countries_list();
+                    $code = array_search( $value, $countries );
+                    if ( $code ){
+                        $value = $code;
+                    }
+                }
+                $meta[ $field ] = $value;
+                break;
+            case 'tags':
+                $maybe_tags = explode( ',', $value );
+                $tags = array_merge( $tags, $maybe_tags );
+                break;
+            case 'meta':
+                $meta[ get_key_from_column_label( $column ) ] = sanitize_text_field( $value );
+                break;
+            case 'notes':
+                $notes[] = sanitize_textarea_field( $value );
+                break;
+            case 'time_zone':
+                $zones = wpgh_get_time_zones();
+                $code = array_search( $value, $zones );
+                if ( $code ){
+                    $meta[ $field ] = $code;
+                }
+                break;
+            case 'ip_address':
+                $ip = filter_var( $value, FILTER_VALIDATE_IP );
+                if ( $ip ){
+                    $meta[ $field ] = $ip;
+                }
+
+                break;
+        }
+
+    }
+
+    $id = WPGH()->contacts->add( $args );
+
+    if ( ! $id ){
+        return false;
+    }
+
+    $contact = wpgh_get_contact( $id );
+
+    if ( ! $contact ){
+        return false;
+    }
+
+    // Add Tags
+    if ( ! empty( $tags ) ){
+        $contact->apply_tag( $tags );
+    }
+
+    // Add notes
+    if ( ! empty( $notes ) ){
+        foreach ( $notes as $note ){
+            $contact->add_note( $note );
+        }
+    }
+
+    // update meta data
+    if ( ! empty( $meta ) ){
+        foreach ( $meta as $key => $value ){
+            $contact->update_meta( $key, $value );
+        }
+    }
+
+    // Run the actions for optin status.
+    $contact->change_marketing_preference( $contact->optin_status );
+    $contact->update_meta( 'last_optin', time() );
+
+    return $contact;
+}
+
+if ( ! function_exists( 'get_key_from_column_label' ) ):
+
+/**
+ * Key a key from a column label
+ *
+ * @param $column
+ * @return string
+ */
+function get_key_from_column_label( $column )
+{
+    return sanitize_key( str_replace( ' ', '_', $column ) );
+}
+
+endif;

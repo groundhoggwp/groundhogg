@@ -16,6 +16,8 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
     /* Unused Functions */
     public function get_order(){return 0;}
     public function scripts(){}
+    protected function add_additional_actions(){}
+
     public function help(){}
 
     /**
@@ -89,7 +91,7 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
      */
     public function page(){
 
-        WPGH()->notices->add( 'do_not_leave', __( 'Do not leave this page till the job is complete!', 'groundhogg' ), 'warning' )
+        WPGH()->notices->add( 'do_not_leave', __( 'Do not leave this page till the current process is complete!', 'groundhogg' ), 'warning' )
 
         ?>
         <div class="wrap">
@@ -107,13 +109,11 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
     {
 
         $items = apply_filters( "groundhogg/bulk_job/{$this->get_action()}/query", [] );
+        $max_items = apply_filters( "groundhogg/bulk_job/{$this->get_action()}/max_items", 25, $items );
 
         echo WPGH()->html->progress_bar( [ 'id' => 'bulk-job', 'hidden' => false ] );
 
         ?>
-        <div id="spinner" class="">
-            <span class="spinner" style="visibility: visible;"></span>
-        </div>
         <div id="job-complete" class="hidden">
             <p><?php _e( "The process is now complete.", 'groundhogg' ); ?></p>
             <p class="submit">
@@ -131,8 +131,9 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
                     items: 0,
                     complete: 0,
                     all:0,
-                    size: 100,
+                    size: <?php echo $max_items; ?>,
                     bar: null,
+                    title: "",
 
                     init: function () {
 
@@ -140,6 +141,7 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
                         this.all = items.length;
                         this.bar = $( '#bulk-job' );
                         this.progress = $( '#bulk-job-percentage' );
+                        this.title = document.title;
 
                         if ( this.all < 400 ){
                             this.size = Math.ceil( this.all / 4 );
@@ -157,6 +159,12 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
                         }
 
                         return this.items.splice( 0, end );
+
+                        // for ( var i = 0; i < items.length; i++ ){
+                        //     this.clean( items[ i ] )
+                        // }
+                        //
+                        // return items;
                     },
 
                     isLastOfThem: function (){
@@ -169,12 +177,35 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
 
                         this.bar.animate( { 'width': p + '%' } );
                         this.progress.text( p + '%' );
+                        document.title = '(' + p + '%) ' + this.title;
 
                         if ( this.complete === this.all ){
                             $( '#job-complete' ).removeClass( 'hidden' );
-                            $( '#spinner' ).addClass( 'hidden' );
+                            this.progress.removeClass( 'spinner' );
                         }
 
+                    },
+
+                    error: function( response ){
+                        // console.log( response );
+                        bp.bar.css( 'background-color', '#f70000' );
+                        this.progress.removeClass( 'spinner' );
+                        alert( 'Something went wrong...' );
+                    },
+
+                    clean: function( obj ){
+
+                        if ( typeof obj !== 'object' || obj === null ){
+                            return;
+                        }
+
+                        var propNames = Object.getOwnPropertyNames(obj);
+                        for (var i = 0; i < propNames.length; i++) {
+                            var propName = propNames[i];
+                            if (obj[propName] === null || obj[propName] === undefined || obj[propName] === '' ) {
+                                delete obj[propName];
+                            }
+                        }
                     },
 
                     send: function () {
@@ -204,14 +235,12 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
                                     }
 
                                 } else {
-                                    console.log( response );
-                                    bp.bar.css( 'color', '#f70000' );
+                                    bp.error( response );
                                 }
 
                             },
                             error: function ( response ) {
-                                console.log( response );
-                                bp.bar.css( 'color', '#f70000' );
+                                bp.error();
                             }
                         });
 

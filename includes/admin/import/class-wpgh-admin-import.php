@@ -12,11 +12,30 @@ if ( ! class_exists( 'WPGH_Admin_Page' ) ){
 
 class WPGH_Admin_Import extends WPGH_Admin_Page
 {
+    // Unused functions.
+    public function scripts(){}
+    public function help(){}
 
-    public function add_ajax_actions()
-    {
-        add_filter( "groundhogg/bulk_job/gh_import_contacts/query", [ $this, 'bulk_job_query' ] );
+    public function add_ajax_actions(){
         add_action( "groundhogg/bulk_job/gh_import_contacts/ajax", [ $this, 'process_bulk_job' ] );
+    }
+
+    protected function add_additional_actions(){
+        add_filter( "groundhogg/bulk_job/gh_import_contacts/query", [ $this, 'bulk_job_query' ] );
+        add_filter( "groundhogg/bulk_job/gh_import_contacts/max_items", [ $this, 'calc_max_items' ], 10, 2 );
+    }
+
+    /**
+     * @param $items
+     * @return int
+     */
+    public function calc_max_items( $max, $items ){
+        $item = array_shift( $items );
+        $fields = count( $item );
+        $max = intval( ini_get( 'max_input_vars' ) );
+        $max_items = floor( $max / $fields ) - 1;
+
+        return $max_items;
     }
 
     /**
@@ -29,9 +48,11 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
         }
 
         $file_name = urldecode( $_GET[ 'file_name' ] );
-        $file_name = wp_normalize_path( wpgh_get_csv_imports_dir( $file_name ) );
+        $file_path = wp_normalize_path( wpgh_get_csv_imports_dir( $file_name ) );
 
-        return wpgh_get_items_from_csv( $file_name );
+//        wp_die( $file_path );
+
+        return wpgh_get_items_from_csv( $file_path );
     }
 
     /**
@@ -42,6 +63,45 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
         if ( ! current_user_can( 'import_contacts' ) ){
             return;
         }
+
+        // get the map
+        $field_map = wpgh_get_transient( 'gh_import_map' );
+        $import_tags = wpgh_get_transient( 'gh_import_tags' );
+
+        if ( ! $field_map ){
+            return;
+        }
+
+        // get the posted items
+        $items = $_POST[ 'items' ];
+
+        $complete = 0;
+        $skipped  = 0;
+
+        // iterate over the contacts
+        foreach ( $items as $item ){
+
+            $contact = wpgh_generate_contact_with_map( $item, $field_map );
+
+            if ( ! $contact ){
+                $skipped++;
+            } else {
+                // Apply import specific tags.
+                $contact->apply_tag( $import_tags );
+                $complete++;
+            }
+
+        }
+
+        $response = [ 'complete' => $complete + $skipped ];
+
+        if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
+            wpgh_delete_transient( 'gh_import_map' );
+            WPGH()->notices->add('finished', _x('Import finished!', 'notice', 'groundhogg') );
+            $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_contacts' );
+        }
+
+        wp_die( json_encode( $response ) );
     }
 
     public function get_order()
@@ -68,20 +128,9 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
     {
         return 'import_contacts';
     }
-
     public function get_item_type()
     {
         return 'import';
-    }
-
-    public function scripts()
-    {
-        // TODO: Implement scripts() method.
-    }
-
-    public function help()
-    {
-        // TODO: Implement help() method.
     }
 
     protected function get_title_actions()
@@ -96,7 +145,17 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
 
     public function view()
     {
-        echo 'hi';
+
+        if ( ! class_exists( 'WPGH_Imports_Table' ) ){
+            require_once dirname( __FILE__ ) . '/class-wpgh-imports-table.php';
+        }
+
+        $table = new WPGH_Imports_Table(); ?>
+        <form method="post" class="search-form wp-clearfix">
+            <?php $table->prepare_items(); ?>
+            <?php $table->display(); ?>
+        </form>
+       <?php
     }
 
     public function add()
@@ -145,6 +204,40 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
         if ( ! current_user_can( 'import_contacts' ) ){
             wp_die( 'Oops...' );
         }
+
+        $map = $_POST[ 'map' ];
+
+        if ( ! is_array( $map ) ){
+            wp_die( 'Oops...' );
+        }
+
+        $file_name = $_POST[ 'file_name' ];
+
+        $tags = [ sprintf( '%s - %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s' ) ) ];
+
+        if ( gisset_not_empty( $_POST, 'tags' ) ){
+            $tags = array_merge( $tags, $_POST[ 'tags' ] );
+        }
+
+        $tags = WPGH()->tags->validate( $tags );
+
+        wpgh_set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS );
+        wpgh_set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );
+
+        wp_redirect( admin_url( 'admin.php?page=gh_bulk_jobs&action=gh_import_contacts&file_name=' . $file_name ) );
+        die();
+
+    }
+
+    public function delete_import()
+    {
+        $file_name = $_REQUEST[ 'file_name' ];
+        $filepath = wpgh_get_csv_imports_dir( $file_name );
+
+        unlink( $filepath );
+
+        $this->notices->add( 'file_removed', __( 'Import deleted', 'groundhogg' ) );
+        return self::PAGE;
     }
 
     /**

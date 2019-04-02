@@ -37,23 +37,9 @@ function wpgh_import_contacts_display()
         <h2 class="hndle"><?php _e( 'Import Contacts', 'groundhogg' ); ?></h2>
         <div class="inside">
             <p>
-                <input type="file" id="contacts" name="contacts" accept=".csv" >
-            </p>
-            <p class="description"><a target="_blank" href="https://docs.groundhogg.io/docs/settings/getting-started/import-your-list/"><?php _e( "Learn how to import contacts.", 'groundhogg' ); ?></a></p>
-            <hr>
-            <?php $tag_args = array();
-            $tag_args[ 'id' ] = 'import_tags';
-            $tag_args[ 'name' ] = 'import_tags[]'; ?>
-            <?php echo WPGH()->html->tag_picker( $tag_args );
-
-            echo WPGH()->html->progress_bar( [ 'id' => 'import-loader', 'hidden' => true ] );
-
-            ?>
-            <div class="import-status-wrapper"><p><strong><span class="import-status"></span></strong></p></div>
-            <p class="description"><?php _e( 'These tags will be applied to the contacts upon importing.', 'groundhogg' ); ?></p>
-            <p class="submit">
-                <button class="import button button-primary" id="import" type="button"><?php _e( 'Import Contacts' ); ?></button>
-                <span class="spinner spinner-import" style="float: none"></span>
+                <?php _e( 'Importing contacts has become much easier! Use our new import tool for an effortless importing experience.', 'groundhogg' ); ?>
+            </p><p>
+                <a class="button-primary" href="<?php echo admin_url( 'admin.php?page=gh_imports' ); ?>"><?php _e( 'Got to imports!', 'groundhogg' ); ?></a>
             </p>
         </div>
     </div>
@@ -112,21 +98,103 @@ function wpgh_bulk_delete_contacts_display()
             <?php $tag_args = array();
             $tag_args[ 'id' ] = 'delete_tags';
             $tag_args[ 'name' ] = 'delete_tags[]';?>
-            <?php echo WPGH()->html->tag_picker( $tag_args );
-            echo WPGH()->html->progress_bar( [ 'id' => 'delete-loader', 'hidden' => true ] );
-            ?>
+            <?php echo WPGH()->html->tag_picker($tag_args);?>
             <p class="description"><?php _e( 'Contacts with these tags will be delete. Leave blank to delete ALL contacts.', 'groundhogg' ); ?></p>
             <p class="submit">
-                <button class="bulk-delete button button-primary" id="delete" type="button"><?php _e( 'Delete Contacts' ); ?></button>
-                <span class="spinner spinner-delete" style="float:none;"></span>
+                <a class="bulk-delete-link button button-primary" id="delete" href="<?php echo admin_url( 'admin.php?page=gh_bulk_jobs&action=gh_delete_contacts' ); ?>"><?php _e( 'Delete Contacts' ); ?></a>
             </p>
         </div>
     </div>
+    <script>
+        (function ($) {
+            var $link = $( '.bulk-delete-link' );
+            var $tags = $( '#delete_tags' );
+
+            var baseUrl = '<?php echo admin_url( 'admin.php?page=gh_bulk_jobs&action=gh_delete_contacts' ); ?>';
+
+            $tags.on( 'change', function () {
+                $link.attr( 'href', baseUrl + '&tags=' + encodeURIComponent( $tags.val().join() ) );
+            } );
+        })(jQuery)
+    </script>
     <!-- End Delete Tool -->
     <?php
 }
 
 add_action( 'gh_settings_tools', 'wpgh_bulk_delete_contacts_display' );
+
+/**
+ * Get Ids of contacts to be deleted.
+ *
+ * @param $items
+ * @return array
+ */
+function wpgh_bulk_delete_contacts_query( $items )
+{
+    if ( ! current_user_can( 'delete_contacts' ) ){
+        return $items;
+    }
+
+    $query = new WPGH_Contact_Query();
+    $args = [];
+
+    if ( gisset_not_empty( $_REQUEST, 'tags' ) ){
+        $tags = wp_parse_id_list( explode( ',', urldecode( $_REQUEST[ 'tags' ] ) ) );
+        $args[ 'tags_include' ] = $tags;
+    }
+
+    $contacts = $query->query( $args );
+    $ids = wp_list_pluck( $contacts, 'ID' );
+
+    return $ids;
+}
+add_filter( 'groundhogg/bulk_job/gh_delete_contacts/query', 'wpgh_bulk_delete_contacts_query' );
+
+
+/**
+ * Do 100 at a time.
+ *
+ * @param $max
+ * @param $items
+ * @return int
+ */
+function wpgh_bulk_delete_contacts_max_items( $max, $items )
+{
+    if ( ! current_user_can( 'delete_contacts' ) ){
+        return $max;
+    }
+
+    return 100;
+}
+
+add_filter( 'groundhogg/bulk_job/gh_delete_contacts/max_items', 'wpgh_bulk_delete_contacts_max_items', 10, 2 );
+
+function wpgh_bulk_delete_contacts_ajax()
+{
+    if ( ! current_user_can( 'delete_contacts' ) ){
+        return;
+    }
+
+    $ids = wp_parse_id_list( $_POST[ 'items' ] );
+
+    $complete = 0;
+
+    foreach ( $ids as $id ){
+        WPGH()->contacts->delete( $id );
+        $complete++;
+    }
+
+    $response = [ 'complete' => $complete ];
+
+    if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
+        WPGH()->notices->add('finished', _x('Contacts deleted!', 'notice', 'groundhogg') );
+        $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_contacts' );
+    }
+
+    wp_die( json_encode( $response ) );
+}
+
+add_action( 'groundhogg/bulk_job/gh_delete_contacts/ajax', 'wpgh_bulk_delete_contacts_ajax' );
 
 /**
  * Display the system info tab

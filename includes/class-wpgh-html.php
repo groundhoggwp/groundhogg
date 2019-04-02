@@ -1150,7 +1150,9 @@ class WPGH_HTML
 	    $hidden = ( $a[ 'hidden' ] ) ? 'hidden' : '';
 
 	    $bar = sprintf( "<div id='%s-wrap' class=\"progress-bar-wrap %s %s\">
-	            <div id='%s' class=\"progress-bar\"><span id='%s-percentage' class=\"progress-percentage\">0%%</span></div>
+	            <div id='%s' class=\"progress-bar\">
+	            <span id='%s-percentage' style='visibility: visible;float: none;padding-left: 30px;opacity: 1;' class=\"progress-percentage spinner\">0%%</span>
+	            </div>
 			</div>",
 		    esc_attr( $a[ 'id' ] ),
 		    esc_attr( $a[ 'class' ] ),

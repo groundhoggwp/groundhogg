@@ -40,6 +40,8 @@ abstract class WPGH_Admin_Page
             $this->add_ajax_actions();
         }
 
+        $this->add_additional_actions();
+
         if ( $this->is_current_page() ) {
             add_action('admin_enqueue_scripts', array($this, 'scripts'));
             add_action('init', array($this, 'process_action'));
@@ -62,7 +64,14 @@ abstract class WPGH_Admin_Page
      *
      * @return mixed
      */
-    abstract public function add_ajax_actions();
+    abstract protected function add_ajax_actions();
+
+    /**
+     * Adds additional actions.
+     *
+     * @return mixed
+     */
+    abstract protected function add_additional_actions();
 
     /**
      * Get the menu order between 1 - 99
@@ -148,7 +157,7 @@ abstract class WPGH_Admin_Page
         if (!$items)
             return false;
 
-        return is_array($items) ? array_map('intval', $items) : array(intval($items));
+        return is_array($items) ? $items : array( $items );
     }
 
     /**
