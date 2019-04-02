@@ -10,19 +10,19 @@ if ( ! class_exists( 'WPGH_Admin_Page' ) ){
     require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-page.php';
 }
 
-class WPGH_Admin_Import extends WPGH_Admin_Page
+class WPGH_Admin_Export extends WPGH_Admin_Page
 {
     // Unused functions.
     public function scripts(){}
     public function help(){}
 
     public function add_ajax_actions(){
-        add_action( "groundhogg/bulk_job/gh_import_contacts/ajax", [ $this, 'process_bulk_job' ] );
+        add_action( "groundhogg/bulk_job/gh_export_contacts/ajax", [ $this, 'process_bulk_job' ] );
     }
 
     protected function add_additional_actions(){
-        add_filter( "groundhogg/bulk_job/gh_import_contacts/query", [ $this, 'bulk_job_query' ] );
-        add_filter( "groundhogg/bulk_job/gh_import_contacts/max_items", [ $this, 'calc_max_items' ], 10, 2 );
+        add_filter( "groundhogg/bulk_job/gh_export_contacts/query", [ $this, 'bulk_job_query' ] );
+        add_filter( "groundhogg/bulk_job/gh_export_contacts/max_items", [ $this, 'calc_max_items' ], 10, 2 );
     }
 
     /**
@@ -30,12 +30,7 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
      * @return int
      */
     public function calc_max_items( $max, $items ){
-        $item = array_shift( $items );
-        $fields = count( $item );
-        $max = intval( ini_get( 'max_input_vars' ) );
-        $max_items = floor( $max / $fields ) - 1;
-
-        return $max_items;
+        return min( 500, intval( ini_get( 'max_input_vars' ) ) ) ;
     }
 
     /**
@@ -43,16 +38,17 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
      */
     public function bulk_job_query( $items )
     {
-        if ( ! current_user_can( 'import_contacts' ) ){
+        if ( ! current_user_can( 'export_contacts' ) ){
             return $items;
         }
 
-        $file_name = urldecode( $_GET[ 'import' ] );
-        $file_path = wp_normalize_path( wpgh_get_csv_imports_dir( $file_name ) );
+        $query = new WPGH_Contact_Query();
+        $args = $_GET;
 
-//        wp_die( $file_path );
+        $contacts = $query->query( $args );
+        $ids = wp_list_pluck( $contacts, 'ID' );
 
-        return wpgh_get_items_from_csv( $file_path );
+        return $ids;
     }
 
     /**
@@ -60,44 +56,77 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
      */
     public function process_bulk_job()
     {
-        if ( ! current_user_can( 'import_contacts' ) ){
+        if ( ! current_user_can( 'export_contacts' ) ){
             return;
         }
 
-        // get the map
-        $field_map = wpgh_get_transient( 'gh_import_map' );
-        $import_tags = wpgh_get_transient( 'gh_import_tags' );
-
-        if ( ! $field_map ){
-            return;
-        }
-
-        // get the posted items
-        $items = $_POST[ 'items' ];
+        $ids = wp_parse_id_list( $_POST[ 'items' ] );
 
         $complete = 0;
-        $skipped  = 0;
 
-        // iterate over the contacts
-        foreach ( $items as $item ){
+        $meta_keys = WPGH()->contact_meta->get_keys();
+        $default_keys = [
+            'ID',
+            'email',
+            'first_name',
+            'last_name',
+            'user_id',
+            'owner_id',
+            'optin_status',
+            'date_created',
+        ];
 
-            $contact = wpgh_generate_contact_with_map( $item, $field_map );
+        $headers = array_merge( $default_keys, $meta_keys );
 
-            if ( ! $contact ){
-                $skipped++;
-            } else {
-                // Apply import specific tags.
-                $contact->apply_tag( $import_tags );
-                $complete++;
-            }
+        $file_name = wpgh_get_transient( 'gh_export_file_name' );
 
+        $fp = false;
+
+        // If the file path is not set, let's set it.
+        if ( ! $file_name ){
+
+            // randomize the file path to prevent direct access.
+            $file_name = md5( wpgh_encrypt_decrypt( time() ) ) . '.csv';
+
+            // get the full path.
+            $file_path = wpgh_get_csv_exports_dir( $file_name, true );
+            wpgh_set_transient( 'gh_export_file_name', $file_name, HOUR_IN_SECONDS );
+
+            //write the headers to the export.
+            $fp = fopen( $file_path,"w" );
+            fputcsv( $fp, $headers );
         }
 
-        $response = [ 'complete' => $complete + $skipped ];
+        // If we have the file name then open the file before we move on.
+        if ( ! $fp ){
+            $file_path = wpgh_get_csv_exports_dir( $file_name, true );
+            $fp = fopen( $file_path,"w" );
+        }
+
+        foreach ( $ids as $id ){
+
+            $line = [];
+
+            $contact = wpgh_get_contact( $id );
+
+            foreach ( $headers as $header ){
+                $line[] = $contact->$header;
+            }
+
+            fputcsv( $fp, $line );
+
+            $complete++;
+        }
+
+        fclose( $fp );
+
+        $response = [ 'complete' => $complete ];
 
         if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
-            wpgh_delete_transient( 'gh_import_map' );
-            WPGH()->notices->add('finished', _x('Import finished!', 'notice', 'groundhogg') );
+
+            $file_url = wpgh_get_csv_exports_url( $file_name );
+
+            WPGH()->notices->add('finished', sprintf( _x( 'Export file created. %s', 'notice', 'groundhogg'), "<a class='button button-primary' href='$file_url'>Download Now</a>" ) );
             $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_contacts' );
         }
 
@@ -116,21 +145,21 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
 
     public function get_slug()
     {
-        return 'gh_imports';
+        return 'gh_exports';
     }
 
     public function get_name()
     {
-        return __( 'Imports' );
+        return __( 'Exports' );
     }
 
     public function get_cap()
     {
-        return 'import_contacts';
+        return 'export_contacts';
     }
     public function get_item_type()
     {
-        return 'import';
+        return 'export';
     }
 
     protected function get_title_actions()
@@ -138,7 +167,7 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
         return [
             [
                 'link'      => $this->admin_url( [ 'action' => 'add' ] ),
-                'action'    => __( 'Import New List' ),
+                'action'    => __( 'Export Contacts' ),
             ]
         ];
     }
@@ -166,7 +195,7 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
     public function add_import()
     {
 
-        if ( ! current_user_can( 'import_contacts' ) ){
+        if ( ! current_user_can( 'export_contacts' ) ){
             wp_die( 'Oops...' );
         }
 
@@ -201,7 +230,7 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
 
     public function map_import()
     {
-        if ( ! current_user_can( 'import_contacts' ) ){
+        if ( ! current_user_can( 'export_contacts' ) ){
             wp_die( 'Oops...' );
         }
 
@@ -224,7 +253,7 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
         wpgh_set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS );
         wpgh_set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );
 
-        wp_redirect( admin_url( 'admin.php?page=gh_bulk_jobs&action=gh_import_contacts&import=' . $file_name ) );
+        wp_redirect( admin_url( 'admin.php?page=gh_bulk_jobs&action=gh_export_contacts&import=' . $file_name ) );
         die();
 
     }

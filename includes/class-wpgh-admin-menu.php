@@ -88,6 +88,11 @@ class WPGH_Admin_Menu
     var $import;
 
     /**
+     * @var WPGH_Admin_Export
+     */
+    var $export;
+
+    /**
      * Register the pages...
      *
      * WPGH_Admin_Menu constructor.
@@ -109,6 +114,7 @@ class WPGH_Admin_Menu
         $this->guided_setup     = new WPGH_Guided_Setup();
         $this->bulk_jobs        = new WPGH_Admin_Bulk_Job();
         $this->import        = new WPGH_Admin_Import();
+        $this->export        = new WPGH_Admin_Export();
 
         add_action( 'admin_menu', array( $this, 'register_tools_page' ), 98 );
 
@@ -150,6 +156,7 @@ class WPGH_Admin_Menu
         require_once dirname( __FILE__ ). '/admin/guided-setup/class-wpgh-guided-setup.php';
         require_once dirname( __FILE__ ). '/admin/bulk-jobs/class-wpgh-admin-bulk-job.php';
         require_once dirname( __FILE__ ). '/admin/import/class-wpgh-admin-import.php';
+        require_once dirname( __FILE__ ). '/admin/export/class-wpgh-admin-export.php';
     }
 
     public function current_page()

@@ -233,12 +233,12 @@ class WPGH_Contacts_Table extends WP_List_Table {
         );
 
         return apply_filters( 'contact_views', array(
-            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . $base_url . "all" . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('.  ( $count[ 'unconfirmed' ] + $count[ 'confirmed' ] ) .')</span>' . "</a>",
-            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . _x( 'Unconfirmed', 'view', 'groundhogg' ) . ' <span class="count">('.$count['unconfirmed'].')</span>' . "</a>",
-            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . _x( 'Confirmed', 'view', 'groundhogg' ) . ' <span class="count">('.$count['confirmed'].')</span>'. "</a>",
-            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . _x( 'Unsubscribed', 'view', 'groundhogg' ) . ' <span class="count">('.$count['opted_out'].')</span>' . "</a>",
-            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . "spam" . "'>" . _x( 'Spam', 'view', 'groundhogg' ) . ' <span class="count">('.$count['spam'].')</span>' . "</a>",
-            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . "bounce" . "'>" . _x( 'Bounced', 'view', 'groundhogg') .' <span class="count">('.$count['bounce'].')</span>' . "</a>"
+            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . $base_url . "all" . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('.  number_format_i18n( $count[ 'unconfirmed' ] + $count[ 'confirmed' ] ) .')</span>' . "</a>",
+            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . _x( 'Unconfirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['unconfirmed'] ) . ')</span>' . "</a>",
+            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . _x( 'Confirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['confirmed'] ) .')</span>'. "</a>",
+            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . _x( 'Unsubscribed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['opted_out'] ) .')</span>' . "</a>",
+            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . "spam" . "'>" . _x( 'Spam', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['spam'] ) .')</span>' . "</a>",
+            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . "bounce" . "'>" . _x( 'Bounced', 'view', 'groundhogg') .' <span class="count">('. number_format_i18n( $count['bounce'] ) . ')</span>' . "</a>"
         ) );
     }
 
@@ -585,7 +585,8 @@ class WPGH_Contacts_Table extends WP_List_Table {
                 ] ); ?></div>
         </div>
         <div class="alignleft gh-actions">
-            <a class="button action query-export" href="javascript:void(0)"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), $this->get_pagination_arg( 'total_items' ) ); ?></a>
+            <a class="button action query-export" href="javascript:void(0)"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
+            <span class="spinner-export spinner"></span>
         </div>
         <?php
     }

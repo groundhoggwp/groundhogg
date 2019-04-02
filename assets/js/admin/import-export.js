@@ -174,6 +174,9 @@ var wpghImportExport;
                 dataType: 'json',
                 data: { action: hook, tags: tags },
                 success: function ( json ) {
+
+                    $spinner.css( 'visibility', 'hidden' );
+
                     var CSV = Papa.unparse( json, {
                         quotes: false,
                         quoteChar: '"',
@@ -184,7 +187,6 @@ var wpghImportExport;
                     } );
 
                     wpghImportExport.makeFile( CSV );
-                    $spinner.css( 'visibility', 'hidden' );
                 }
             });
         },

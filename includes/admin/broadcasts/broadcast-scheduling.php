@@ -28,9 +28,6 @@ foreach ( $contacts as $contact ){
 echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
 
 ?>
-<div id="spinner" class="">
-    <span class="spinner" style="visibility: visible;"></span>
-</div>
 <div id="broadcast-complete" class="hidden">
     <p><?php _e( "The scheduling process is now complete.", 'groundhogg' ); ?></p>
     <p class="submit">
@@ -89,9 +86,16 @@ echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
 
                 if ( this.complete === this.all ){
                     $( '#broadcast-complete' ).removeClass( 'hidden' );
-                    $( '#spinner' ).addClass( 'hidden' );
+                    this.progress.removeClass( 'spinner' );
                 }
 
+            },
+
+            error: function( response ){
+                // console.log( response );
+                bs.bar.css( 'background-color', '#f70000' );
+                this.progress.removeClass( 'spinner' );
+                alert( 'Something went wrong...' );
             },
 
             send: function () {
@@ -119,14 +123,12 @@ echo WPGH()->html->progress_bar( [ 'id' => 'scheduler', 'hidden' => false ] );
                             }
 
                         } else {
-                            console.log( response );
-                            bs.bar.css( 'color', '#f70000' );
+                            bs.error( response );
                         }
 
                     },
                     error: function ( response ) {
-                        console.log( response );
-                        bs.bar.css( 'color', '#f70000' );
+                        bs.error( response );
                     }
                 });
 

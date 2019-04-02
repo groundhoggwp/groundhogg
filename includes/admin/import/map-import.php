@@ -15,7 +15,7 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$file_name = urldecode( $_GET[ 'file_name' ] );
+$file_name = urldecode( $_GET[ 'import' ] );
 $file_path = wp_normalize_path( wpgh_get_csv_imports_dir( $file_name ) );
 
 if ( ! file_exists( $file_path ) ){
@@ -31,7 +31,7 @@ $sample_item = array_shift( $items );
     <?php wp_nonce_field(); ?>
     <?php echo  WPGH()->html->input( [
         'type' => 'hidden',
-        'name' => 'file_name',
+        'name' => 'import',
         'value' => $file_name
     ] ); ?>
 <h2><?php _e( 'Map Contact Fields', 'groundhogg' ); ?></h2>

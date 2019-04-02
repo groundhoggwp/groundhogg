@@ -72,7 +72,7 @@ class WPGH_Imports_Table extends WP_List_Table {
 		$download_url = $import[ 'file_url' ];
 
 		$html = "<strong>";
-		$html .= "<a class='row-title' href='$download_url'>{$import['file_name']}</a>";
+		$html .= "<a class='row-title' href='$download_url'>{$import['file']}</a>";
 		$html .= "</strong>";
 
 		return $html;
@@ -120,7 +120,7 @@ class WPGH_Imports_Table extends WP_List_Table {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			$this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-			$import[ 'file_name' ]               // The value of the checkbox should be the record's ID.
+			$import[ 'file' ]               // The value of the checkbox should be the record's ID.
 		);
 	}
 
@@ -169,7 +169,7 @@ class WPGH_Imports_Table extends WP_List_Table {
                 $filepath = wpgh_get_csv_imports_dir($filename);
 
                 $file = [
-                    'file_name' => $filename,
+                    'file' => $filename,
                     'file_path' => $filepath,
                     'file_url' => wpgh_get_csv_imports_url($filename),
                     'date' => filemtime($filepath),
@@ -213,7 +213,7 @@ class WPGH_Imports_Table extends WP_List_Table {
 		$a = (array) $a;
 		$b = (array) $b;
 		// If no sort, default to title.
-		$orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'file_name'; // WPCS: Input var ok.
+		$orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'file'; // WPCS: Input var ok.
 		// If no order, default to asc.
 		$order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
 		// Determine sort order.
@@ -239,14 +239,14 @@ class WPGH_Imports_Table extends WP_List_Table {
 		$actions['import'] = sprintf(
 			'<a href="%s" class="edit" aria-label="%s">%s</a>',
 			/* translators: %s: title */
-			admin_url( 'admin.php?page=gh_imports&action=map&file_name=' . $import[ 'file_name' ] ),
+			admin_url( 'admin.php?page=gh_imports&action=map&import=' . $import[ 'file' ] ),
 			esc_attr( 'Import' ),
 			__( 'Import' )
 		);
 
 		$actions['delete'] = sprintf(
 			'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-			wp_nonce_url(admin_url( 'admin.php?page=gh_imports&action=delete&file_name=' . $import[ 'file_name' ] )),
+			wp_nonce_url(admin_url( 'admin.php?page=gh_imports&action=delete&import=' . $import[ 'file' ] )),
 			/* translators: %s: title */
 			esc_attr( 'Delete Permanently' ),
 			__( 'Delete Import' )

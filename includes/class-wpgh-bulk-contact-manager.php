@@ -170,7 +170,12 @@ class WPGH_Bulk_Contact_Manager
 
         }
 
-        wp_die( json_encode( $contacts ) );
+        $response = wp_json_encode( array_slice( $contacts, 0, 10000 ) );
+
+//        var_dump( substr( $response, 0, 700 ) );
+//        die();
+
+        wp_die( $response );
 
     }
 

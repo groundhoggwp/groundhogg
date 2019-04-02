@@ -2157,11 +2157,30 @@ function wpgh_get_items_from_csv( $file_path='' )
 }
 
 /**
+ * Create the import/export folders
+ */
+function wpgh_mk_folders()
+{
+    if ( ! file_exists( wpgh_get_csv_exports_dir() ) ){
+        wp_mkdir_p( wpgh_get_csv_exports_dir() );
+    }
+
+    if ( ! file_exists( wpgh_get_csv_imports_dir() ) ){
+        wp_mkdir_p( wpgh_get_csv_imports_dir() );
+    }
+}
+
+/**
  * @return string Get the CSV import URL.
  */
-function wpgh_get_csv_imports_dir( $file_path='' ){
+function wpgh_get_csv_imports_dir( $file_path='', $create_folders=false ){
+
+    if ( $create_folders ){
+        wpgh_mk_folders();
+    }
+
     $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/groundhogg-imports/%s", $upload_dir[ 'basedir' ], $file_path );
+    return sprintf( "%s/groundhogg/imports/%s", $upload_dir[ 'basedir' ], $file_path );
 }
 
 /**
@@ -2169,8 +2188,30 @@ function wpgh_get_csv_imports_dir( $file_path='' ){
  */
 function wpgh_get_csv_imports_url( $file_path='' ){
     $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/groundhogg-imports/%s", $upload_dir[ 'baseurl' ], $file_path );
+    return sprintf( "%s/groundhogg/imports/%s", $upload_dir[ 'baseurl' ], $file_path );
 }
+
+/**
+ * @return string Get the CSV export URL.
+ */
+function wpgh_get_csv_exports_dir( $file_path='', $create_folders=false ){
+
+    if ( $create_folders ){
+        wpgh_mk_folders();
+    }
+
+    $upload_dir = wp_get_upload_dir();
+    return sprintf( "%s/groundhogg/exports/%s", $upload_dir[ 'basedir' ], $file_path );
+}
+
+/**
+ * @return string Get the CSV export URL.
+ */
+function wpgh_get_csv_exports_url( $file_path='' ){
+    $upload_dir = wp_get_upload_dir();
+    return sprintf( "%s/groundhogg/exports/%s", $upload_dir[ 'baseurl' ], $file_path );
+}
+
 
 /**
  * Get a list of mappable fields as well as extra fields
@@ -2237,6 +2278,8 @@ function wpgh_generate_contact_with_map( $fields, $map )
         if ( ! key_exists( $column, $map ) ){
             continue;
         }
+
+        $value = wp_unslash( $value );
 
         $field = $map[ $column ];
 
