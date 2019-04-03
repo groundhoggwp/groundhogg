@@ -758,6 +758,9 @@ class WPGH_Contacts_Page
                 require_once(ABSPATH . '/wp-admin/includes/file.php');
             }
 
+            WPGH()->submission->contact = $contact;
+            WPGH()->submission->set_upload_dirs();
+
             add_filter('upload_dir', array(WPGH()->submission, 'files_upload_dir'));
             $mfile = wp_handle_upload($ifile, $upload_overrides);
             remove_filter('upload_dir', array(WPGH()->submission, 'files_upload_dir'));

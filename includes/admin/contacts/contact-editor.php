@@ -639,6 +639,18 @@ function wpgh_contact_record_section_files( $contact )
     <!-- BEGIN FILES -->
     <h2><?php _ex( 'Files', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px;">
+        <style>
+            .wp-admin .gh-file-uploader{
+                width: 100%;
+                margin: auto;
+                padding: 30px !important;
+                box-sizing: border-box;
+                background: #F9F9F9;
+                border: 2px dashed #e5e5e5;
+                text-align: center;
+                margin-top: 10px;
+            }
+        </style>
         <table class="wp-list-table widefat fixed striped files">
             <thead>
             <tr>
@@ -651,7 +663,7 @@ function wpgh_contact_record_section_files( $contact )
             <tbody>
             <?php
 
-            $files = $contact->get_meta('files');
+            $files = $contact->get_associated_files();
 
             if (empty($files)):
                 ?>
@@ -663,15 +675,15 @@ function wpgh_contact_record_section_files( $contact )
 
                 foreach ($files as $key => $item):
 
-                    if (!isset($item['file'])) {
+                    if (!isset($item['file_name'])) {
                         continue;
                     }
 
-                    $info = pathinfo($item['file']);
+                    $info = pathinfo($item['file_path']);
                     ?>
                     <tr>
-                        <td><?php printf("<a href='%s' target='_blank'>%s</a>", $item['url'], esc_html($info['basename'])); ?></td>
-                        <td><?php esc_html_e(size_format(filesize($item['file']))); ?></td>
+                        <td><?php printf("<a href='%s' target='_blank'>%s</a>", $item['file_url'], esc_html($info['basename'])); ?></td>
+                        <td><?php esc_html_e(size_format(filesize($item['file_path']))); ?></td>
                         <td><?php esc_html_e($info['extension']); ?></td>
                         <td><?php echo '{files.' . intval( $key ) . '}'; ?></td>
                     </tr>
@@ -690,7 +702,7 @@ function wpgh_contact_record_section_files( $contact )
             </tfoot>
         </table>
         <div>
-            <p class="description"><?php _ex( 'Upload files: ', 'contact_record', 'groundhogg' ); ?><input type="file" name="files[]" multiple></p>
+            <input class="gh-file-uploader" type="file" name="files[]" multiple>
             <p class="description"><?php _ex( 'Click <b>Update Contact</b> when ready to upload.', 'contact_record', 'groundhogg' ); ?></p>
         </div>
     </div>

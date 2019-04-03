@@ -722,36 +722,18 @@ class WPGH_Submission
      */
     public function files_upload_dir( $param )
     {
-        $mydir = '/groundhogg';
-
-        if ( is_multisite() ){
-            $mydir .= '/' . get_current_blog_id();
-        }
-
-        if ( $this->contact ){
-
-            $mydir .= '/' . wpgh_encrypt_decrypt( $this->contact->email );
-
-        } else if ( isset( $_GET[ 'id' ] ) ) {
-
-            $id = intval( $_GET[ 'id' ] );
-
-            $contact = wpgh_get_contact( $id );
-
-            $mydir .= '/' . wpgh_encrypt_decrypt( $contact->email );
-
-        } else {
-
-            $user = wp_get_current_user();
-            $mydir .= '/' . wpgh_encrypt_decrypt( $user->user_email );
-
-        }
-
-        $param['path'] = $param['basedir'] . $mydir;
-        $param['url'] = $param['baseurl'] . $mydir;
-        $param['subdir'] = $mydir;;
-
+        $param['path'] =   $this->files_upload_path[ 'path' ];
+        $param['url'] =    $this->files_upload_path[ 'url' ];
+        $param['subdir'] = $this->files_upload_path[ 'basedir' ];
         return $param;
+    }
+
+    /**
+     * Save the files_upload_path temporarily.
+     */
+    public function set_upload_dirs()
+    {
+        $this->files_upload_path = $this->contact->get_uploads_folder();
     }
 
     /**
@@ -785,6 +767,8 @@ class WPGH_Submission
         if ( !function_exists('wp_handle_upload') ) {
             require_once( ABSPATH . '/wp-admin/includes/file.php' );
         }
+
+        $this->set_upload_dirs();
 
         add_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
         $mfile = wp_handle_upload( $file, $upload_overrides );

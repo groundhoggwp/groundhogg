@@ -742,6 +742,48 @@ class WPGH_Contact
     }
 
     /**
+     * get the upload folder for this contact
+     */
+    public function get_uploads_folder()
+    {
+        return [
+            'basedir' => wpgh_get_contact_uploads_dir(),
+            'path'    => wpgh_get_contact_uploads_dir( md5( wpgh_encrypt_decrypt( $this->email ) ) ),
+            'url'     => wpgh_get_contact_uploads_url( md5( wpgh_encrypt_decrypt( $this->email ) ) )
+        ];
+    }
+
+    /**
+     * Get a list of associated files.
+     */
+    public function get_associated_files()
+    {
+        $data = [];
+
+        $uploads_dir = $this->get_uploads_folder();
+
+        if ( file_exists( $uploads_dir[ 'path' ] ) ) {
+
+            $scanned_directory = array_diff(scandir($uploads_dir[ 'path' ]), ['..', '.']);
+
+            foreach ($scanned_directory as $filename) {
+                $filepath = $uploads_dir[ 'path' ] . '/' . $filename;
+                $file = [
+                    'file_name' => $filename,
+                    'file_path' => $filepath,
+                    'file_url' => $uploads_dir[ 'url' ] . '/' . $filename,
+                    'date_uploaded' => filectime($filepath),
+                ];
+
+                $data[] = $file;
+
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Output a contact. Just give the email back
      *
      * @return string

@@ -2211,6 +2211,26 @@ function wpgh_mk_folders()
     if ( ! file_exists( wpgh_get_csv_imports_dir() ) ){
         wp_mkdir_p( wpgh_get_csv_imports_dir() );
     }
+
+    if ( ! file_exists( wpgh_get_contact_uploads_dir() ) ){
+        wp_mkdir_p( wpgh_get_contact_uploads_dir() );
+    }
+}
+
+/**
+ * Get the base uploads path.
+ *
+ * @return string
+ */
+function wpgh_get_base_uploads_path()
+{
+    $base = 'groundhogg';
+
+    if ( is_multisite() && ! wpgh_is_global_multisite() ){
+        $base .= '/' . get_current_blog_id();
+    }
+
+    return apply_filters( 'groundhogg/uploads_path', $base );
 }
 
 /**
@@ -2223,7 +2243,7 @@ function wpgh_get_csv_imports_dir( $file_path='', $create_folders=false ){
     }
 
     $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/groundhogg/imports/%s", $upload_dir[ 'basedir' ], $file_path );
+    return sprintf( "%s/%s/imports/%s", $upload_dir[ 'basedir' ], wpgh_get_base_uploads_path(), $file_path );
 }
 
 /**
@@ -2231,7 +2251,28 @@ function wpgh_get_csv_imports_dir( $file_path='', $create_folders=false ){
  */
 function wpgh_get_csv_imports_url( $file_path='' ){
     $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/groundhogg/imports/%s", $upload_dir[ 'baseurl' ], $file_path );
+    return sprintf( "%s/%s/imports/%s", $upload_dir[ 'baseurl' ], wpgh_get_base_uploads_path(), $file_path );
+}
+
+/**
+ * @return string Get the CSV import URL.
+ */
+function wpgh_get_contact_uploads_dir( $file_path='', $create_folders=false ){
+
+    if ( $create_folders ){
+        wpgh_mk_folders();
+    }
+
+    $upload_dir = wp_get_upload_dir();
+    return sprintf( "%s/%s/uploads/%s", $upload_dir[ 'basedir' ], wpgh_get_base_uploads_path(), $file_path );
+}
+
+/**
+ * @return string Get the CSV import URL.
+ */
+function wpgh_get_contact_uploads_url( $file_path='' ){
+    $upload_dir = wp_get_upload_dir();
+    return sprintf( "%s/%s/uploads/%s", $upload_dir[ 'baseurl' ], wpgh_get_base_uploads_path(), $file_path );
 }
 
 /**
@@ -2244,7 +2285,7 @@ function wpgh_get_csv_exports_dir( $file_path='', $create_folders=false ){
     }
 
     $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/groundhogg/exports/%s", $upload_dir[ 'basedir' ], $file_path );
+    return sprintf( "%s/%s/exports/%s", $upload_dir[ 'basedir' ], wpgh_get_base_uploads_path(), $file_path );
 }
 
 /**
@@ -2252,7 +2293,7 @@ function wpgh_get_csv_exports_dir( $file_path='', $create_folders=false ){
  */
 function wpgh_get_csv_exports_url( $file_path='' ){
     $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/groundhogg/exports/%s", $upload_dir[ 'baseurl' ], $file_path );
+    return sprintf( "%s/%s/exports/%s", $upload_dir[ 'baseurl' ], wpgh_get_base_uploads_path(), $file_path );
 }
 
 
