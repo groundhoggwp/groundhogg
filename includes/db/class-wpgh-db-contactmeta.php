@@ -192,9 +192,7 @@ class WPGH_DB_Contact_Meta extends WPGH_DB {
         $key_array = array();
 
         foreach ( $keys as $key ){
-
             $key_array[ $key ] = $key;
-
         }
 
         return $key_array;

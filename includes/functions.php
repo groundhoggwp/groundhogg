@@ -2185,7 +2185,7 @@ function wpgh_get_items_from_csv( $file_path='' )
     $data = array();
     if (($handle = fopen($file_path, 'r')) !== FALSE)
     {
-        while (($row = fgetcsv($handle, 1000, ',')) !== FALSE)
+        while (($row = fgetcsv($handle, 0, ',')) !== FALSE)
         {
             if(!$header)
                 $header = $row;
@@ -2200,21 +2200,22 @@ function wpgh_get_items_from_csv( $file_path='' )
 }
 
 /**
- * Create the import/export folders
+ * Get the base uploads path.
+ *
+ * @return string
  */
-function wpgh_mk_folders()
+function wpgh_get_base_uploads_dir()
 {
-    if ( ! file_exists( wpgh_get_csv_exports_dir() ) ){
-        wp_mkdir_p( wpgh_get_csv_exports_dir() );
+    $base = 'groundhogg';
+
+    $upload_dir = wp_get_upload_dir();
+    $base = $upload_dir[ 'basedir' ] . DIRECTORY_SEPARATOR . $base;
+
+    if ( is_multisite() && ! wpgh_is_global_multisite() ){
+        $base .= '/' . get_current_blog_id();
     }
 
-    if ( ! file_exists( wpgh_get_csv_imports_dir() ) ){
-        wp_mkdir_p( wpgh_get_csv_imports_dir() );
-    }
-
-    if ( ! file_exists( wpgh_get_contact_uploads_dir() ) ){
-        wp_mkdir_p( wpgh_get_contact_uploads_dir() );
-    }
+    return wp_normalize_path( apply_filters( 'groundhogg/uploads_path', $base ) );
 }
 
 /**
@@ -2222,9 +2223,12 @@ function wpgh_mk_folders()
  *
  * @return string
  */
-function wpgh_get_base_uploads_path()
+function wpgh_get_base_uploads_url()
 {
     $base = 'groundhogg';
+
+    $upload_dir = wp_get_upload_dir();
+    $base = $upload_dir[ 'baseurl' ] . '/' . $base;
 
     if ( is_multisite() && ! wpgh_is_global_multisite() ){
         $base .= '/' . get_current_blog_id();
@@ -2234,66 +2238,77 @@ function wpgh_get_base_uploads_path()
 }
 
 /**
+ * Generic function for mapping to uploads folder.
+ *
+ * @param string $subdir
+ * @param string $file_path
+ * @param bool $create_folders
+ * @return string
+ */
+function wpgh_get_uploads_dir( $subdir='uploads', $file_path='', $create_folders=false )
+{
+    $path = untrailingslashit( wp_normalize_path( sprintf( "%s/%s/%s", wpgh_get_base_uploads_dir(), $subdir, $file_path ) ) );
+
+    if ( $create_folders ){
+        wp_mkdir_p( $path );
+    }
+
+    return $path;
+}
+
+/**
+ * Generic function for mapping to uploads folder.
+ *
+ * @param string $subdir
+ * @param string $file_path
+ * @return string
+ */
+function wpgh_get_uploads_url( $subdir='uploads', $file_path='' )
+{
+    $path = untrailingslashit( sprintf( "%s/%s/%s", wpgh_get_base_uploads_url(), $subdir, $file_path ) );
+    return $path;
+}
+
+/**
  * @return string Get the CSV import URL.
  */
 function wpgh_get_csv_imports_dir( $file_path='', $create_folders=false ){
-
-    if ( $create_folders ){
-        wpgh_mk_folders();
-    }
-
-    $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/%s/imports/%s", $upload_dir[ 'basedir' ], wpgh_get_base_uploads_path(), $file_path );
+    return wpgh_get_uploads_dir( 'imports', $file_path, $create_folders );
 }
 
 /**
  * @return string Get the CSV import URL.
  */
 function wpgh_get_csv_imports_url( $file_path='' ){
-    $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/%s/imports/%s", $upload_dir[ 'baseurl' ], wpgh_get_base_uploads_path(), $file_path );
+    return wpgh_get_uploads_url( 'imports', $file_path );
 }
 
 /**
  * @return string Get the CSV import URL.
  */
 function wpgh_get_contact_uploads_dir( $file_path='', $create_folders=false ){
-
-    if ( $create_folders ){
-        wpgh_mk_folders();
-    }
-
-    $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/%s/uploads/%s", $upload_dir[ 'basedir' ], wpgh_get_base_uploads_path(), $file_path );
+    return wpgh_get_uploads_dir( 'uploads', $file_path, $create_folders );
 }
 
 /**
  * @return string Get the CSV import URL.
  */
 function wpgh_get_contact_uploads_url( $file_path='' ){
-    $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/%s/uploads/%s", $upload_dir[ 'baseurl' ], wpgh_get_base_uploads_path(), $file_path );
+    return wpgh_get_uploads_url( 'uploads', $file_path );
 }
 
 /**
  * @return string Get the CSV export URL.
  */
 function wpgh_get_csv_exports_dir( $file_path='', $create_folders=false ){
-
-    if ( $create_folders ){
-        wpgh_mk_folders();
-    }
-
-    $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/%s/exports/%s", $upload_dir[ 'basedir' ], wpgh_get_base_uploads_path(), $file_path );
+    return wpgh_get_uploads_dir( 'exports', $file_path, $create_folders );
 }
 
 /**
  * @return string Get the CSV export URL.
  */
 function wpgh_get_csv_exports_url( $file_path='' ){
-    $upload_dir = wp_get_upload_dir();
-    return sprintf( "%s/%s/exports/%s", $upload_dir[ 'baseurl' ], wpgh_get_base_uploads_path(), $file_path );
+    return wpgh_get_uploads_url( 'exports', $file_path );
 }
 
 
@@ -2498,4 +2513,22 @@ function get_key_from_column_label( $column )
     return sanitize_key( str_replace( ' ', '_', $column ) );
 }
 
+endif;
+
+if ( ! function_exists( 'multi_implode' ) ):
+    function multi_implode( $glue, $array ) {
+        $ret = '';
+
+        foreach ($array as $item) {
+            if (is_array($item)) {
+                $ret .= multi_implode( $glue, $item ) . $glue;
+            } else {
+                $ret .= $item . $glue;
+            }
+        }
+
+        $ret = substr($ret, 0, 0-strlen($glue));
+
+        return $ret;
+    }
 endif;

@@ -16,7 +16,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 $file_name = urldecode( $_GET[ 'import' ] );
-$file_path = wp_normalize_path( wpgh_get_csv_imports_dir( $file_name ) );
+$file_path = wpgh_get_csv_imports_dir( $file_name );
 
 if ( ! file_exists( $file_path ) ){
     wp_die( 'The given file does not exist.' );

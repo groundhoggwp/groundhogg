@@ -23,6 +23,8 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 
 class WPGH_Contacts_Table extends WP_List_Table {
 
+    private $query;
+
     /**
      * TT_Example_List_Table constructor.
      *
@@ -420,6 +422,8 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
         $c_query = new WPGH_Contact_Query();
 
+        $this->query = $query;
+
         $data = $c_query->query( $query );
 
         set_transient( 'wpgh_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
@@ -570,7 +574,6 @@ class WPGH_Contacts_Table extends WP_List_Table {
             </script>
             <?php
         }
-
         ?>
         <div class="alignleft gh-actions bulk-tag-action hidden">
             <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo WPGH()->html->tag_picker( [
@@ -584,9 +587,15 @@ class WPGH_Contacts_Table extends WP_List_Table {
                     'tags'              => true,
                 ] ); ?></div>
         </div>
+
+        <?php
+
+        $query_string = _http_build_query( $this->query );
+        $base = sprintf( admin_url( 'admin.php?page=gh_bulk_jobs&action=gh_export_contacts&%s' ), $query_string );
+
+        ?>
         <div class="alignleft gh-actions">
-            <a class="button action query-export" href="javascript:void(0)"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
-            <span class="spinner-export spinner"></span>
+            <a class="button action " href="<?php echo $base; ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
         </div>
         <?php
     }

@@ -193,6 +193,7 @@ function wpgh_run_install() {
     WPGH()->status_tag_mapper->install_default_tags();
 
     update_option( 'wpgh_version', WPGH_VERSION );
+    update_option( 'wpgh_last_upgrade_version', WPGH_VERSION );
 
     // Add a temporary option to note that WPGH pages have been created
     set_transient( '_wpgh_installed', true, 30 );
@@ -417,5 +418,5 @@ function wpgh_install_email_preferences_center() {
 
 }
 
-add_action( 'admin_init', 'wpgh_install_email_preferences_center' );
+//add_action( 'admin_init', 'wpgh_install_email_preferences_center' );
 

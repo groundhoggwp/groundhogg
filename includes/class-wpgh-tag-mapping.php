@@ -29,7 +29,7 @@ class WPGH_Tag_Mapping
         // So instead we'll listen for an event failed. #goodenough
         add_action( 'groundhogg/event/failed', [ $this, 'listen_for_non_marketable' ] );
 
-        if ( ! wpgh_get_option( 'gh_optin_status_job', false ) ){
+        if ( wpgh_get_option( 'gh_optin_status_job', false ) ){
             add_action( 'admin_init', [ $this, 'add_upgrade_notice' ] );
         }
 
@@ -85,7 +85,7 @@ class WPGH_Tag_Mapping
         if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
             WPGH()->notices->add('finished', _x('Job finished!', 'notice', 'groundhogg') );
             $response[ 'return_url' ] = admin_url( 'admin.php?page=groundhogg' );
-            wpgh_update_option( 'gh_optin_status_job', true );
+            wpgh_delete_option( 'gh_optin_status_job' );
         }
 
         wp_die( json_encode( $response ) );

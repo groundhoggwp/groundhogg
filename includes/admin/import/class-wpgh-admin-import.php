@@ -12,6 +12,9 @@ if ( ! class_exists( 'WPGH_Admin_Page' ) ){
 
 class WPGH_Admin_Import extends WPGH_Admin_Page
 {
+
+    private $uploads_path = [];
+
     // Unused functions.
     public function scripts(){}
     public function help(){}
@@ -184,6 +187,9 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
             return self::SELF;
         }
 
+//        var_dump( $result );
+//        wp_die();
+
         wp_redirect( $this->admin_url( [
             'action' => 'map',
             'import' => urlencode( basename( $result['file'] ) ),
@@ -253,17 +259,21 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
      */
     public function files_upload_dir( $param )
     {
-        $mydir = '/groundhogg/imports';
-
-        if ( is_multisite() ){
-            $mydir .= '/' . get_current_blog_id();
-        }
-
-        $param['path'] = $param['basedir'] . $mydir;
-        $param['url'] = $param['baseurl'] . $mydir;
-        $param['subdir'] = $mydir;
+        $param['path']      = $this->uploads_path[ 'path'];
+        $param['url']       = $this->uploads_path[ 'url' ];
+        $param['subdir']    = $this->uploads_path[ 'subdir' ];
 
         return $param;
+    }
+
+    /**
+     * Initialize the base upload path
+     */
+    private function set_uploads_path()
+    {
+        $this->uploads_path[ 'subdir' ] = wpgh_get_base_uploads_dir();
+        $this->uploads_path[ 'path' ] = wpgh_get_csv_imports_dir();
+        $this->uploads_path[ 'url' ] = wpgh_get_csv_imports_url();
     }
 
     /**
@@ -282,6 +292,11 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
         if ( !function_exists('wp_handle_upload') ) {
             require_once( ABSPATH . '/wp-admin/includes/file.php' );
         }
+
+        $this->set_uploads_path();
+
+//        var_dump( $this->uploads_path );
+//        wp_die();
 
         add_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
         $mfile = wp_handle_upload( $file, $upload_overrides );

@@ -165,6 +165,7 @@ class WPGH_Welcome_Page
             array( $this, 'page' ),
             'dashicons-email-alt',
             2
+
         );
 
         $sub_page = add_submenu_page(
