@@ -117,6 +117,11 @@ class WPGH_Step implements WPGH_Event_Process
 
     }
 
+    public function exists()
+    {
+        return $this->funnel_id > 0 && $this->order > 0;
+    }
+
     public function get_ID()
     {
         return $this->ID;
@@ -268,7 +273,7 @@ class WPGH_Step implements WPGH_Event_Process
 
             /* regardless of whether the current step is an action
             or a benchmark we can run the next step if it's an action */
-            return new WPGH_Step( $items[ $i ]->ID );
+            return wpgh_get_funnel_step( $items[ $i ]->ID );
 
         }
 
@@ -279,7 +284,7 @@ class WPGH_Step implements WPGH_Event_Process
 
                 if ( $items[ $i ]->step_group === 'action' ) {
 
-                    return new WPGH_Step( $items[ $i ]->ID );
+                    return wpgh_get_funnel_step( $items[ $i ]->ID );
 
                 }
 

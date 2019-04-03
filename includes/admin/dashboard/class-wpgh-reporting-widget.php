@@ -46,6 +46,18 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
     public $difference;
 
     /**
+     * @var array
+     */
+    protected $data = [];
+
+    /**
+     * A list of contacts that reporting widgets use.
+     *
+     * @var
+     */
+    protected static $contacts = [];
+
+    /**
      * WPGH_Reporting_Widget constructor.
      */
     public function __construct()
@@ -254,5 +266,36 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
             <span class="spinner"></span>
         </div>
         <?php
+    }
+
+    /**
+     * Get contacts from within the time range of the reporting widget.
+     *
+     * @return array|object|null
+     */
+    public function get_contacts_created_within_time_range()
+    {
+
+        if ( ! empty( self::$contacts ) ){
+            return self::$contacts;
+        }
+
+        global $wpdb;
+
+        $table = WPGH()->contacts->table_name;
+        $start_date = date('Y-m-d H:i:s', $this->start_time);
+        $end_date = date('Y-m-d H:i:s', $this->end_time);
+
+        self::$contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+
+        return self::$contacts;
+    }
+
+    /**
+     * @return array Get just the IDs of the contacts
+     */
+    public function get_contact_ids_created_within_time_range()
+    {
+        return wp_parse_id_list( wp_list_pluck( $this->get_contacts_created_within_time_range() , 'ID' ) );
     }
 }

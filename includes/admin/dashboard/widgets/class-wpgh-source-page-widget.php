@@ -19,46 +19,50 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
         parent::__construct();
     }
 
+    public static $source_pages = [];
+
+    public function get_source_pages()
+    {
+        if ( ! empty( self::$source_pages ) ){
+            return self::$source_pages;
+        }
+
+        $contact_ids = $this->get_contact_ids_created_within_time_range();
+        $ids = implode( ',', $contact_ids );
+
+        $sources = array();
+
+        global $wpdb;
+        $table_name = WPGH()->contact_meta->table_name;
+        self::$source_pages = wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", 'source_page' ) ), 'meta_value' );
+
+        return self::$source_pages;
+    }
+
     /**
      * Get table of lead sources
      */
     public function widget()
     {
-        global $wpdb;
-
-        $table = WPGH()->contacts->table_name;
-        $start_date = date('Y-m-d H:i:s', $this->start_time);
-        $end_date = date('Y-m-d H:i:s', $this->end_time);
-
-        $contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+        $contact_ids = $this->get_contact_ids_created_within_time_range();
+        $ids = implode( ',', $contact_ids );
 
         $sources = array();
 
-        foreach ( $contacts as $contact ){
+        global $wpdb;
+        $table_name = WPGH()->contact_meta->table_name;
 
-            $lead_source = WPGH()->contact_meta->get_meta( $contact->ID, 'source_page', true );
+        $source_pages = $this->get_source_pages();
 
-            if ( $lead_source ){
-
-                if ( filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
-                    /* TO avoid long lists of specifics, limit to just the root domin. */
-                    $lead_source = parse_url( $lead_source, PHP_URL_PATH );
-                }
-
-                $lead_source = preg_replace('/\?.*/', '', $lead_source);
-
-                if ( isset($sources[$lead_source]) ){
-                    $sources[$lead_source]++;
-                } else {
-                    $sources[$lead_source] = 1;
-                }
-
+        foreach ( $source_pages as $source_page ){
+            if ( ! empty( $source_page ) ){
+                $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'source_page', $source_page ) );
+                $sources[ $source_page ] = $num_contacts;
             }
-
         }
 
         if ( empty( $sources ) ){
-            printf( '<p class="description">%s</p>', _x( 'No new pages to report.', 'notice', 'groundhogg' ) );
+            printf( '<p class="description">%s</p>', _x( 'No new lead sources to report.', 'notice', 'groundhogg' ) );
             return;
         }
 
@@ -67,28 +71,32 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
 
         ?>
         <table class="chart-summary">
-        <thead>
-        <tr>
-            <th><?php _ex( 'Source Page', 'column_title','groundhogg' ); ?></th>
-            <th><?php _ex( 'Contacts', 'column_title','groundhogg' ); ?></th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php
+            <thead>
+            <tr>
+                <th><?php _ex( 'Source Page', 'column_title', 'groundhogg' ); ?></th>
+                <th><?php _ex( 'Contacts', 'column_title','groundhogg' ); ?></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php
 
-        foreach ( $sources as $source => $num_contacts ):
+            foreach ( $sources as $source => $num_contacts ):
+
+                ?>
+                <tr>
+                    <?php if ( filter_var( $source, FILTER_VALIDATE_URL ) ): ?>
+                        <td class=""><?php printf( '<a href="%s">%s</a>', $source, wp_parse_url( $source, PHP_URL_PATH ) ); ?></td>
+                    <?php else: ?>
+                        <td class=""><?php printf( '<a href="%s">%s</a>', $source, $source ); ?></td>
+                    <?php endif; ?>
+                    <td class="summary-total"><?php printf( '<a href="%s">%s</a>', admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=%s&meta_value=%s&meta_compare=RLIKE&date_after=%s&date_before=%s', 'source_page', urlencode( $source ), date( 'Y-m-d', $this->start_time), date( 'Y-m-d', $this->end_time ) ) ), $num_contacts ); ?></td>
+                </tr>
+            <?php
+
+            endforeach;
 
             ?>
-            <tr>
-                <td class=""><?php printf( '<a href="%s">%s</a>', admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=%s&meta_value=%s&meta_compare=RLIKE&date_after=%s&date_before=%s', 'source_page', urlencode( $source ), date( 'Y-m-d', $this->start_time), date( 'Y-m-d', $this->end_time ) ) ), $source ); ?></td>
-                <td class="summary-total"><?php printf( '%d', $num_contacts ); ?></td>
-            </tr>
-        <?php
-
-        endforeach;
-
-        ?>
-        </tbody>
+            </tbody>
         </table>
         <?php
 
@@ -97,38 +105,23 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
 
     protected function get_export_data()
     {
-        global $wpdb;
-
-        $table = WPGH()->contacts->table_name;
-        $start_date = date('Y-m-d H:i:s', $this->start_time);
-        $end_date = date('Y-m-d H:i:s', $this->end_time);
-
-        $contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+        $contact_ids = $this->get_contact_ids_created_within_time_range();
+        $ids = implode( ',', $contact_ids );
 
         $sources = array();
 
-        foreach ( $contacts as $contact ){
+        global $wpdb;
+        $table_name = WPGH()->contact_meta->table_name;
 
-            $lead_source = WPGH()->contact_meta->get_meta( $contact->ID, 'source_page', true );
+        $source_pages = $this->get_source_pages();
 
-            if ( $lead_source ){
-
-                if ( filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
-
-                    /* TO avoid long lists of specifics, limit to just the root domin. */
-                    $lead_source = parse_url( $lead_source, PHP_URL_PATH );
-
-                }
-
-                if ( isset($sources[$lead_source]) ){
-                    $sources[$lead_source]++;
-                } else {
-                    $sources[$lead_source] = 1;
-                }
-
+        foreach ( $source_pages as $source_page ){
+            if ( ! empty( $source_page ) ){
+                $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'source_page', $source_page ) );
+                $sources[ $source_page ] = $num_contacts;
             }
-
         }
+
 
         if ( empty( $sources ) ){
             return _x( 'No new sources to report.', 'notice', 'groundhogg' );

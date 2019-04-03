@@ -12,6 +12,7 @@ class WPGH_Last_Broadcast_Report extends WPGH_Circle_Graph_Report
      * @var int
      */
     private $last_broadcast_id;
+    private $broadcasts_cache = null;
 
     public function __construct()
     {
@@ -28,9 +29,11 @@ class WPGH_Last_Broadcast_Report extends WPGH_Circle_Graph_Report
      */
     public function get_last_broadcast()
     {
-        $broadcasts = WPGH()->broadcasts->get_broadcasts( [ 'status' => 'sent' ] );
+        if ( $this->broadcasts_cache === null ){
+            $this->broadcasts_cache = WPGH()->broadcasts->get_broadcasts( [ 'status' => 'sent' ] );
+        }
 
-        if ( ! $broadcasts ){
+        if ( ! $this->broadcasts_cache ){
             return false;
         }
 

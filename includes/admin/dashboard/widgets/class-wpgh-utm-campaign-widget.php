@@ -24,38 +24,19 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
      */
     public function widget()
     {
-        global $wpdb;
-
-        $table = WPGH()->contacts->table_name;
-        $start_date = date('Y-m-d H:i:s', $this->start_time);
-        $end_date = date('Y-m-d H:i:s', $this->end_time);
-
-        $contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+        $contact_ids = $this->get_contact_ids_created_within_time_range();
+        $ids = implode( ',', $contact_ids );
 
         $sources = array();
 
-        foreach ( $contacts as $contact ){
+        global $wpdb;
+        $table_name = WPGH()->contact_meta->table_name;
 
-            $utm = array();
+        $campaigns = wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", 'utm_campaign' ) ), 'meta_value' );
 
-            $utm[ 'campaign' ] = WPGH()->contact_meta->get_meta( $contact->ID, 'utm_campaign', true );
-            $utm[ 'source' ]   = WPGH()->contact_meta->get_meta( $contact->ID, 'utm_source', true );
-            $utm[ 'medium' ]   = WPGH()->contact_meta->get_meta( $contact->ID, 'utm_medium', true );
-            $utm[ 'content' ]  = WPGH()->contact_meta->get_meta( $contact->ID, 'utm_content', true );
-            $utm[ 'term' ]     = WPGH()->contact_meta->get_meta( $contact->ID, 'utm_term', true );
-
-            $utm_string = implode( '|', $utm );
-
-            if ( empty( $utm_string ) ){
-
-                if ( isset($sources[$utm_string]) ){
-                    $sources[$utm_string]++;
-                } else {
-                    $sources[$utm_string] = 1;
-                }
-
-            }
-
+        foreach ( $campaigns as $campaign ){
+            $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'utm_campaign', $campaign ) );
+            $sources[ $campaign ] = $num_contacts;
         }
 
         if ( empty( $sources ) ){
@@ -71,10 +52,6 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
         <thead>
         <tr>
             <th><?php _ex( 'Campaign','column_title', 'groundhogg' ); ?></th>
-            <th><?php _ex( 'Source', 'column_title','groundhogg' ); ?></th>
-            <th><?php _ex( 'Medium', 'column_title','groundhogg' ); ?></th>
-            <th><?php _ex( 'Content','column_title', 'groundhogg' ); ?></th>
-            <th><?php _ex( 'Term', 'column_title','groundhogg' ); ?></th>
             <th><?php _ex( 'Contacts','column_title', 'groundhogg' ); ?></th>
         </tr>
         </thead>
@@ -82,17 +59,10 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
         <?php
 
         foreach ( $sources as $source => $num_contacts ):
-
-            $utm = explode( '|', $source );
-
             ?>
             <tr>
-                <td><?php printf( '%s', $utm[0] ); ?></td>
-                <td><?php printf( '%s', $utm[1] ); ?></td>
-                <td><?php printf( '%s', $utm[2] ); ?></td>
-                <td><?php printf( '%s', $utm[3] ); ?></td>
-                <td><?php printf( '%s', $utm[4] ); ?></td>
-                <td class="summary-total"><?php printf( '%d', $num_contacts ); ?></td>
+                <td><?php printf( '%s', $source ); ?></td>
+                <td class="summary-total"><a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=utm_campaign&meta_value=%s', $source ) ); ?>"><?php printf( '%d', $num_contacts ); ?></a></td>
             </tr>
         <?php
 
@@ -108,13 +78,8 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
 
     protected function get_export_data()
     {
-        global $wpdb;
 
-        $table = WPGH()->contacts->table_name;
-        $start_date = date('Y-m-d H:i:s', $this->start_time);
-        $end_date = date('Y-m-d H:i:s', $this->end_time);
-
-        $contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+        $contacts = $this->get_contacts_created_within_time_range();
 
         $sources = array();
 
@@ -130,7 +95,7 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
 
             $utm_string = implode( '|', $utm );
 
-            if ( empty( $utm_string ) ){
+            if ( ! empty( $utm_string ) ){
 
                 if ( isset($sources[$utm_string]) ){
                     $sources[$utm_string]++;

@@ -19,6 +19,10 @@ class WPGH_Geographic_Country_Report extends WPGH_Circle_Graph_Report
     public function get_data()
     {
 
+        if ( ! empty( $this->data ) ){
+            return $this->data;
+        }
+
         global $wpdb;
 
         $dataset  =  array();
@@ -28,29 +32,21 @@ class WPGH_Geographic_Country_Report extends WPGH_Circle_Graph_Report
         }
 
         $table_name = WPGH()->contact_meta->table_name;
-        $results = $wpdb->get_results( $wpdb->prepare( "SELECT meta_value FROM $table_name WHERE meta_key = %s", 'country' ) );
+        $results = $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s", 'country' ) );
 
         foreach ( $results as $result ){
 
             $result->meta_value = substr( strtoupper( $result->meta_value ), 0, 2 );
+            $count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_value) FROM $table_name WHERE meta_key = %s AND meta_value = %s", 'country', $result->meta_value ) );
 
-            if ( key_exists( $result->meta_value, $dataset ) ){
-                $dataset[ $result->meta_value ][ 'data' ]++;
-            } else {
-
-                $label = 'unknown';
-                if ( $result->meta_value ){
-                    $label = wpgh_get_countries_list( $result->meta_value );
-                }
-
+            if ( $count ){
+                $label = $result->meta_value ? wpgh_get_countries_list( $result->meta_value ) : 'unknown';
                 $dataset[ $result->meta_value ] = [
                     'label' => $label,
-                    'data' => 1,
+                    'data' => $count,
                     'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=country&meta_value=%s', $result->meta_value ) )
                 ];
-
             }
-
         }
 
         if ( empty( $dataset ) ){
@@ -86,7 +82,9 @@ class WPGH_Geographic_Country_Report extends WPGH_Circle_Graph_Report
 
         usort( $dataset , array( $this, 'sort' ) );
 
-        return array_values( $dataset );
+        $this->data = array_values( $dataset );
+
+        return $this->data;
     }
 
     public function sort( $a, $b )
@@ -115,19 +113,6 @@ class WPGH_Geographic_Country_Report extends WPGH_Circle_Graph_Report
      */
     protected function extra_widget_info()
     {
-
-//        ?>
-<!--        <form method="get" action="" style="margin-top: 10px;">-->
-<!--            --><?php
-//
-//            $this->form_reporting_inputs();
-//
-//            submit_button( __( 'Bulk Geo-locate Contacts' ), 'secondary', 'bulk_geo_locate', false );
-//
-//            ?>
-<!--        </form>-->
-<!--        --><?php
-
         $data = $this->get_data();
 
         ?>

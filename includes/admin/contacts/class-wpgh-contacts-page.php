@@ -711,7 +711,7 @@ class WPGH_Contacts_Page
 
         if (isset($_POST['start_funnel']) && isset($_POST['add_contacts_to_funnel_step_picker']) && current_user_can('edit_contacts')) {
 
-            $step = new WPGH_Step(intval($_POST['add_contacts_to_funnel_step_picker']));
+            $step = wpgh_get_funnel_step(intval($_POST['add_contacts_to_funnel_step_picker']));
             if ($step->enqueue($contact)) {
                 $this->notices->add('started', _x("Contact added to funnel.", 'notice', 'groundhogg'), 'info');
             }

@@ -848,7 +848,7 @@ class WPGH_HTML
 
 		foreach ( $data as $i => $step ) {
 
-            $step = new WPGH_Step( $step->ID );
+            $step = wpgh_get_funnel_step( $step->ID );
 
             if ( $step->is_active() ){
 
@@ -906,7 +906,7 @@ class WPGH_HTML
 
 		foreach ( $a[ 'selected' ] as $benchmark_id ){
 
-		    $step = new WPGH_Step( $benchmark_id );
+		    $step = wpgh_get_funnel_step( $benchmark_id );
 
 			if ( WPGH()->steps->exists( $benchmark_id ) && $step->is_active() ){
                 $funnel_name = WPGH()->funnels->get_column_by( 'title', 'ID', $step->funnel_id );

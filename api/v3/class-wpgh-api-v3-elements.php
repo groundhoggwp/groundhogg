@@ -88,7 +88,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
             return self::ERROR_400( 'form_dne', 'The given form does not exist.' );
         }
 
-        $step = new WPGH_Step( $ID );
+        $step = wpgh_get_funnel_step( $ID );
 
         $response = array();
 

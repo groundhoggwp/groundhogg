@@ -358,7 +358,7 @@ class WPGH_Submission
 
             $this->id = $this->step_id;
 
-            $this->step = new WPGH_Step( $this->id );
+            $this->step = wpgh_get_funnel_step( $this->id );
 
             unset( $this->step_id );
 
@@ -766,7 +766,7 @@ class WPGH_Submission
         $file = $_FILES[ $key ];
         $size = $file[ 'size' ];
 
-        if ( intval( $size ) > intval( $config[ 'max_file_size' ] ) ){
+        if ( gisset_not_empty( $config, 'max_file_size' ) && intval( $size ) > intval( $config[ 'max_file_size' ] ) ){
             return new WP_Error( 'FILE_TOO_BIG', _x( 'The file you have uploaded is too big.',  'submission_error', 'greoundhogg' ) );
         }
 

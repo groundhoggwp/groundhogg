@@ -130,7 +130,7 @@ class WPGH_Event
             switch ($this->type) {
                 default:
                 case WPGH_FUNNEL_EVENT:
-                    $this->step = new WPGH_Step($event->step_id);
+                    $this->step = wpgh_get_funnel_step($event->step_id);
                     break;
                 case WPGH_BROADCAST_EVENT:
                     $this->step = new WPGH_Broadcast($event->step_id);
@@ -152,7 +152,7 @@ class WPGH_Event
             } else {
 
                 /*regular step event handling */
-                $this->step = new WPGH_Step($event->step_id);
+                $this->step = wpgh_get_funnel_step($event->step_id);
 
             }
         }

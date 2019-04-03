@@ -203,7 +203,7 @@ class WPGH_Tracking
                     $this->funnel = WPGH()->funnels->get( $event->funnel_id );
                 }
 
-                $this->step   = new WPGH_Step( $event->step_id );
+                $this->step   = wpgh_get_funnel_step( $event->step_id );
             }
         }
 
@@ -322,7 +322,7 @@ class WPGH_Tracking
         }
 
         if ( isset( $cookie->step ) ){
-            $this->step     = WPGH()->steps->get( $cookie->step );
+            $this->step     = wpgh_get_funnel_step( $cookie->step );
         }
 
         if ( isset( $cookie->funnel ) ){
@@ -643,7 +643,7 @@ class WPGH_Tracking
 
         $step_id = intval( $_REQUEST[ 'id' ] );
 
-        $step = new WPGH_Step( $step_id );
+        $step = wpgh_get_funnel_step( $step_id );
 
         if ( $this->get_contact() ){
             do_action( 'wpgh_link_clicked', $step, $this->get_contact() );
@@ -725,7 +725,7 @@ class WPGH_Tracking
 	 */
     public function form_filled( $step_id, $contact, $submission )
     {
-    	$step = new WPGH_Step( $step_id );
+    	$step = wpgh_get_funnel_step( $step_id );
 
     	$this->funnel = WPGH()->funnels->get( $step->funnel_id );
     	$this->step = $step;

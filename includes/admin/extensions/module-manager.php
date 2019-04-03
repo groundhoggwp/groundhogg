@@ -14,8 +14,8 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) ){
-    require_once dirname(__FILE__) . '/updater/EDD_SL_Plugin_Updater.php';
+if ( ! class_exists('GH_EDD_SL_Plugin_Updater') ){
+    require_once dirname(__FILE__) . '/updater/GH_EDD_SL_Plugin_Updater.php';
 }
 
 class WPGH_Extension_Manager
@@ -73,7 +73,7 @@ class WPGH_Extension_Manager
 
         foreach ( $extensions as $extension_args ){
             if ( self::has_license( $extension_args['item_id'] ) && self::get_license_status( $extension_args['item_id']  ) !== 'invalid' ){
-                $updater = new EDD_SL_Plugin_Updater( WPGH_Extension_Manager::$storeUrl, $extension_args['file'], array(
+                $updater = new GH_EDD_SL_Plugin_Updater( WPGH_Extension_Manager::$storeUrl, $extension_args['file'], array(
                         'version' 	=> $extension_args['version'], 		// current version number
                         'license' 	=> trim( self::get_license( $extension_args['item_id'] ) ), 	// license key (used wpgh_get_option above to retrieve from DB)
                         'item_id'   => $extension_args['item_id'], 	// id of this product in EDD

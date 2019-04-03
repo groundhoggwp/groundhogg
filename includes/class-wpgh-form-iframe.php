@@ -54,7 +54,7 @@ class WPGH_Form_Iframe
 
         $this->form->set_iframe_compat( true );
 
-        $this->step = new WPGH_Step( $form_id );
+        $this->step = wpgh_get_funnel_step( $form_id );
 
         $this->add_actions();
 

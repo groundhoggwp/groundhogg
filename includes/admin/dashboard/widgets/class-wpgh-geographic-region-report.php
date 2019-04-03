@@ -19,6 +19,10 @@ class WPGH_Geographic_Region_Report extends WPGH_Circle_Graph_Report
     public function get_data()
     {
 
+        if ( ! empty( $this->data ) ){
+            return $this->data;
+        }
+
         $country_code = strtoupper( $this->get_url_var( 'country_code', $this->get_option( 'country_code' ) ) );
 
         if ( ! $country_code ){
@@ -34,31 +38,31 @@ class WPGH_Geographic_Region_Report extends WPGH_Circle_Graph_Report
         $dataset  =  array();
 
         $table_name = WPGH()->contact_meta->table_name;
-        $results = $wpdb->get_results( $wpdb->prepare( "SELECT contact_id,meta_value FROM $table_name WHERE meta_key = %s", 'region' ) );
 
-        foreach ( $results as $result ){
+        $contact_ids = wp_parse_id_list( wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT contact_id FROM $table_name WHERE meta_key = %s AND meta_value = %s", 'country', $country_code ) ), 'contact_id' ) );
+        $ids = implode( ',', $contact_ids );
+        $regions = $wpdb->get_results( $wpdb->prepare( "SELECT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", 'region' ) );
+
+        foreach ( $regions as $result ){
 
             $result->meta_value = ucwords( strtolower( $result->meta_value ) );
+            if ( key_exists( $result->meta_value, $dataset ) ){
+                $dataset[ $result->meta_value ][ 'data' ]++;
+            } else {
 
-            if ( WPGH()->contact_meta->get_meta( $result->contact_id, 'country', true ) === $country_code ){
-
-                if ( key_exists( $result->meta_value, $dataset ) ){
-                    $dataset[ $result->meta_value ][ 'data' ]++;
-                } else {
-
-                    $label = 'unknown';
-                    if ( $result->meta_value ){
-                        $label = $result->meta_value;
-                    }
-
-                    $dataset[ $result->meta_value ] = [
-                        'label' => $label,
-                        'data' => 1,
-                        'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=region&meta_value=%s', $result->meta_value ) )
-                    ];
-
+                $label = 'unknown';
+                if ( $result->meta_value ){
+                    $label = $result->meta_value;
                 }
+
+                $dataset[ $result->meta_value ] = [
+                    'label' => $label,
+                    'data' => 1,
+                    'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=region&meta_value=%s', $result->meta_value ) )
+                ];
+
             }
+
 
         }
 
@@ -94,8 +98,8 @@ class WPGH_Geographic_Region_Report extends WPGH_Circle_Graph_Report
         }
 
         usort( $dataset , array( $this, 'sort' ) );
-
-        return array_values( $dataset );
+        $this->data = array_values( $dataset );
+        return $this->data;
     }
 
     public function sort( $a, $b )

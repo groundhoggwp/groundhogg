@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @author Easy Digital Downloads
  * @version 1.6.17
  */
-class EDD_SL_Plugin_Updater {
+class GH_EDD_SL_Plugin_Updater {
 
     private $api_url     = '';
     private $api_data    = array();

@@ -107,6 +107,7 @@ class WPGH_Dashboard_Widgets
     {
         include_once dirname( __FILE__ ) . '/class-wpgh-dashboard-widget.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-reporting-widget.php';
+        include_once dirname( __FILE__ ) . '/class-wpgh-lead-source-report-widget.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-line-graph-report-v2.php';
         include_once dirname( __FILE__ ) . '/class-wpgh-circle-graph-report.php';
         include_once dirname( __FILE__ ) . '/widgets/class-wpgh-time-range-widget.php';

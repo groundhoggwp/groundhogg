@@ -5,7 +5,7 @@
  * Date: 11/27/2018
  * Time: 9:13 AM
  */
-class WPGH_Search_Engines_Widget extends WPGH_Reporting_Widget
+class WPGH_Search_Engines_Widget extends WPGH_Lead_Source_Report_Widget
 {
 
     private $search_engines = array();
@@ -66,44 +66,33 @@ class WPGH_Search_Engines_Widget extends WPGH_Reporting_Widget
      */
     public function widget()
     {
-        global $wpdb;
-
-//        var_dump( $this->social_networks );
-
-        $table = WPGH()->contacts->table_name;
-        $start_date = date('Y-m-d H:i:s', $this->start_time);
-        $end_date = date('Y-m-d H:i:s', $this->end_time);
-
-        $contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+        $contact_ids = $this->get_contact_ids_created_within_time_range();
+        $ids = implode( ',', $contact_ids );
 
         $sources = array();
 
-        foreach ( $contacts as $contact ){
+        global $wpdb;
+        $table_name = WPGH()->contact_meta->table_name;
 
-            $lead_source = WPGH()->contact_meta->get_meta( $contact->ID, 'lead_source', true );
+        $lead_sources = $this->get_lead_sources();
 
-            if ( $lead_source ){
+        foreach ( $lead_sources as $lead_source ){
+            if ( ! empty( $lead_source ) && filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
 
-                if ( filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
+                /* TO avoid long lists of specifics, limit to just the root domin. */
+                $test_lead_source = parse_url( $lead_source, PHP_URL_HOST );
+                $test_lead_source = str_replace( 'www.', '', $test_lead_source );
 
-                    /* TO avoid long lists of specifics, limit to just the root domin. */
-                    $lead_source = parse_url( $lead_source, PHP_URL_HOST );
-                    $lead_source = str_replace( 'www.', '', $lead_source );
+                foreach ( $this->search_engines as $engine_name => $atts ){
 
-                    foreach ( $this->search_engines as $engine_name => $atts ){
-                        $urls = $atts[0]['urls'];
-                        if ( $this->in_urls( $lead_source, $urls ) ) {
-//                            var_dump( $urls );
-                            if ( isset($sources[$engine_name]) ){
-                                $sources[$engine_name]++;
-                            } else {
-                                $sources[$engine_name] = 1;
-                            }
-                        }
+                    $urls = $atts[0]['urls'];
+                    if ( $this->in_urls( $test_lead_source, $urls ) ) {
+                        $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
+                        $sources[ $lead_source ] = [ 'count' => $num_contacts, 'name' => $engine_name ];
+
                     }
                 }
             }
-
         }
 
         if ( empty( $sources ) ){
@@ -125,12 +114,12 @@ class WPGH_Search_Engines_Widget extends WPGH_Reporting_Widget
         <tbody>
         <?php
 
-        foreach ( $sources as $source => $num_contacts ):
+        foreach ( $sources as $source => $data ):
 
             ?>
             <tr>
-                <td class=""><?php printf( '<a href="%s">%s</a>', admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=%s&meta_value=%s&meta_compare=RLIKE&date_after=%s&date_before=%s', 'lead_source', urlencode( strtolower( $source ) ), date( 'Y-m-d', $this->start_time), date( 'Y-m-d', $this->end_time ) ) ), $source ); ?></td>
-                <td class="summary-total"><?php printf( '%d', $num_contacts ); ?></td>
+                <td class=""><?php printf( '<a href="%s">%s</a>', admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=%s&meta_value=%s&meta_compare=RLIKE&date_after=%s&date_before=%s', 'lead_source', urlencode( strtolower( $source ) ), date( 'Y-m-d', $this->start_time), date( 'Y-m-d', $this->end_time ) ) ), $data[ 'name' ] ); ?></td>
+                <td class="summary-total"><?php printf( '%d', $data[ 'count' ] ); ?></td>
             </tr>
         <?php
 
@@ -146,44 +135,33 @@ class WPGH_Search_Engines_Widget extends WPGH_Reporting_Widget
 
     protected function get_export_data()
     {
-        global $wpdb;
-
-//        var_dump( $this->social_networks );
-
-        $table = WPGH()->contacts->table_name;
-        $start_date = date('Y-m-d H:i:s', $this->start_time);
-        $end_date = date('Y-m-d H:i:s', $this->end_time);
-
-        $contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+        $contact_ids = $this->get_contact_ids_created_within_time_range();
+        $ids = implode( ',', $contact_ids );
 
         $sources = array();
 
-        foreach ( $contacts as $contact ){
+        global $wpdb;
+        $table_name = WPGH()->contact_meta->table_name;
 
-            $lead_source = WPGH()->contact_meta->get_meta( $contact->ID, 'lead_source', true );
+        $lead_sources = $this->get_lead_sources();
 
-            if ( $lead_source ){
+        foreach ( $lead_sources as $lead_source ){
+            if ( ! empty( $lead_source ) && filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
 
-                if ( filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
+                /* TO avoid long lists of specifics, limit to just the root domin. */
+                $test_lead_source = parse_url( $lead_source, PHP_URL_HOST );
+                $test_lead_source = str_replace( 'www.', '', $test_lead_source );
 
-                    /* TO avoid long lists of specifics, limit to just the root domin. */
-                    $lead_source = parse_url( $lead_source, PHP_URL_HOST );
-                    $lead_source = str_replace( 'www.', '', $lead_source );
+                foreach ( $this->search_engines as $engine_name => $atts ){
 
-                    foreach ( $this->search_engines as $engine_name => $atts ){
-                        $urls = $atts[0]['urls'];
-                        if ( $this->in_urls( $lead_source, $urls ) ) {
-//                            var_dump( $urls );
-                            if ( isset($sources[$engine_name]) ){
-                                $sources[$engine_name]++;
-                            } else {
-                                $sources[$engine_name] = 1;
-                            }
-                        }
+                    $urls = $atts[0]['urls'];
+                    if ( $this->in_urls( $test_lead_source, $urls ) ) {
+                        $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
+                        $sources[ $lead_source ] = [ 'count' => $num_contacts, 'name' => $engine_name ];
+
                     }
                 }
             }
-
         }
 
         if ( empty( $sources ) ){
@@ -195,11 +173,12 @@ class WPGH_Search_Engines_Widget extends WPGH_Reporting_Widget
 
         $export_info = array();
 
-        foreach ( $sources as $source => $num_contacts ):
+        foreach ( $sources as $source => $data ):
 
             $export_info[] = array(
-                _x( 'Search Engine', 'column_title', 'groundhogg' ) => $source,
-                _x( 'Number of Contacts', 'column_title', 'groundhogg' ) => $num_contacts,
+                _x( 'Search Engine', 'column_title', 'groundhogg' ) => $data[ 'name' ],
+                _x( 'Search Engine Url', 'column_title', 'groundhogg' ) => $source,
+                _x( 'Number of Contacts', 'column_title', 'groundhogg' ) => $data[ 'count' ],
             );
 
         endforeach;

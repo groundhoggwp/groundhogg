@@ -35,7 +35,7 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
         $max = intval( ini_get( 'max_input_vars' ) );
         $max_items = floor( $max / $fields ) - 1;
 
-        return $max_items;
+        return min( $max_items, 100 );
     }
 
     /**
@@ -253,7 +253,7 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
      */
     public function files_upload_dir( $param )
     {
-        $mydir = '/groundhogg-imports';
+        $mydir = '/groundhogg/imports';
 
         if ( is_multisite() ){
             $mydir .= '/' . get_current_blog_id();
@@ -261,7 +261,7 @@ class WPGH_Admin_Import extends WPGH_Admin_Page
 
         $param['path'] = $param['basedir'] . $mydir;
         $param['url'] = $param['baseurl'] . $mydir;
-        $param['subdir'] = $mydir;;
+        $param['subdir'] = $mydir;
 
         return $param;
     }

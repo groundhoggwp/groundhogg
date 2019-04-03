@@ -26,7 +26,7 @@ class WPGH_WPBakery_Widget extends WPBakeryShortCode {
         $default = 0;
         foreach ( $forms as $form ){
             if ( ! $default ){$default = $form->ID;}
-            $step = new WPGH_Step( $form->ID );
+            $step = wpgh_get_funnel_step( $form->ID );
             if ( $step->is_active() ){
                 $form_options[] =  array(
                     'id'    => $form->ID,

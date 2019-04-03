@@ -182,7 +182,7 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
 
         foreach ( $steps as $step ) {
 
-            $step = new WPGH_Step( $step->ID );
+            $step = wpgh_get_funnel_step( $step->ID );
 
             if ( $step->can_complete( $contact ) ){
 

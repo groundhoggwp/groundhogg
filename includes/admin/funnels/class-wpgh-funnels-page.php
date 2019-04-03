@@ -583,7 +583,7 @@ class WPGH_Funnels_Page
 
             foreach ( $steps as $i => $step ):
 
-                $step = new WPGH_Step( $step->ID );
+                $step = wpgh_get_funnel_step( $step->ID );
 
                 $step->html();
                 // echo $step;
@@ -714,7 +714,7 @@ class WPGH_Funnels_Page
         foreach ( $steps as $i => $stepId ) {
 
             $stepId = intval( $stepId );
-            $step = new WPGH_Step( $stepId );
+            $step = wpgh_get_funnel_step( $stepId );
 
             //quick Order Hack to get the proper order of a step...
 
@@ -746,7 +746,7 @@ class WPGH_Funnels_Page
 
         }
 
-        $first_step = new WPGH_Step( $steps[0] );
+        $first_step = wpgh_get_funnel_step( $steps[0] );
 
         /* if it's not a bench mark then the funnel cant actually ever run */
         if ( ! $first_step->is_benchmark() ){
@@ -803,7 +803,7 @@ class WPGH_Funnels_Page
 
         if ( $step_id ){
 
-            $step = new WPGH_Step( $step_id );
+            $step = wpgh_get_funnel_step( $step_id );
 
             ob_start();
 
@@ -832,7 +832,7 @@ class WPGH_Funnels_Page
 
         $step_id = absint( intval( $_POST['step_id'] ) );
 
-        $step = new WPGH_Step( $step_id );
+        $step = wpgh_get_funnel_step( $step_id );
 
         if ( ! $step || empty( $step->funnel_id ) )
             wp_die( 'Could not find step...' );
@@ -859,7 +859,7 @@ class WPGH_Funnels_Page
 
         if ( $newID ){
 
-            $step = new WPGH_Step( $newID );
+            $step = wpgh_get_funnel_step( $newID );
 
             ob_start();
 
@@ -889,7 +889,7 @@ class WPGH_Funnels_Page
             wp_die( 'No Step.' );
 
         $stepid = absint( intval( $_POST['step_id'] ) );
-        $step = new WPGH_Step( $stepid );
+        $step = wpgh_get_funnel_step( $stepid );
         if ( $contacts = $step->get_waiting_contacts() ){
             $next_step = $step->get_next_step();
             if ( $next_step instanceof WPGH_Step && $next_step->is_active() ){
@@ -917,7 +917,7 @@ class WPGH_Funnels_Page
         $query = new WPGH_Contact_Query();
         $contacts = $query->query( array( 'tags_include'  => $tags ) );
 
-        $step = new WPGH_Step( intval( $_POST[ 'step' ] ) );
+        $step = wpgh_get_funnel_step( intval( $_POST[ 'step' ] ) );
 
         foreach ( $contacts as $contact ){
 

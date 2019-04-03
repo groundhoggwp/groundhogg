@@ -5,7 +5,7 @@
  * Date: 11/27/2018
  * Time: 9:13 AM
  */
-class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
+class WPGH_Social_Media_Widget extends WPGH_Lead_Source_Report_Widget
 {
 
     private $social_networks = array();
@@ -39,43 +39,30 @@ class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
      */
     public function widget()
     {
-        global $wpdb;
-
-//        var_dump( $this->social_networks );
-
-        $table = WPGH()->contacts->table_name;
-        $start_date = date('Y-m-d H:i:s', $this->start_time);
-        $end_date = date('Y-m-d H:i:s', $this->end_time);
-
-        $contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+        $contact_ids = $this->get_contact_ids_created_within_time_range();
+        $ids = implode( ',', $contact_ids );
 
         $sources = array();
 
-        foreach ( $contacts as $contact ){
+        global $wpdb;
+        $table_name = WPGH()->contact_meta->table_name;
 
-            $lead_source = WPGH()->contact_meta->get_meta( $contact->ID, 'lead_source', true );
+        $lead_sources = $this->get_lead_sources();
 
-            if ( $lead_source ){
+        foreach ( $lead_sources as $lead_source ){
+            if ( ! empty( $lead_source ) && filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
 
-                if ( filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
+                /* TO avoid long lists of specifics, limit to just the root domin. */
+                $test_lead_source = parse_url( $lead_source, PHP_URL_HOST );
+                $test_lead_source = str_replace( 'www.', '', $test_lead_source );
 
-                    /* TO avoid long lists of specifics, limit to just the root domin. */
-                    $lead_source = parse_url( $lead_source, PHP_URL_HOST );
-                    $lead_source = str_replace( 'www.', '', $lead_source );
-
-                    foreach ( $this->social_networks as $network_name => $network_urls ){
-
-                        if ( in_array( $lead_source, $network_urls ) )
-
-                        if ( isset($sources[$network_name]) ){
-                            $sources[$network_name]++;
-                        } else {
-                            $sources[$network_name] = 1;
-                        }
+                foreach ( $this->social_networks as $network_name => $network_urls ){
+                    if ( in_array( $test_lead_source, $network_urls ) ){
+                        $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
+                        $sources[ $lead_source ] = [ 'count' => $num_contacts, 'name' => $network_name ];
                     }
                 }
             }
-
         }
 
         if ( empty( $sources ) ){
@@ -97,12 +84,16 @@ class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
         <tbody>
         <?php
 
-        foreach ( $sources as $source => $num_contacts ):
+        foreach ( $sources as $source => $data ):
 
             ?>
             <tr>
-                <td class=""><?php printf( '<a href="%s">%s</a>', admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=%s&meta_value=%s&meta_compare=RLIKE&date_after=%s&date_before=%s', 'lead_source', urlencode( strtolower( $source ) ), date( 'Y-m-d', $this->start_time), date( 'Y-m-d', $this->end_time ) ) ), $source ); ?></td>
-                <td class="summary-total"><?php printf( '%d', $num_contacts ); ?></td>
+                <?php if ( filter_var( $source, FILTER_VALIDATE_URL ) ): ?>
+                    <td class=""><?php printf( '<a href="%s">%s</a>', $source, $data[ 'name' ] ); ?></td>
+                <?php else: ?>
+                    <td class=""><?php printf( '%s', $source ); ?></td>
+                <?php endif; ?>
+                <td class="summary-total"><?php printf( '<a href="%s">%s</a>', admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=%s&meta_value=%s&meta_compare=RLIKE&date_after=%s&date_before=%s', 'lead_source', urlencode( $source ), date( 'Y-m-d', $this->start_time), date( 'Y-m-d', $this->end_time ) ) ), $data[ 'count' ]  ); ?></td>
             </tr>
         <?php
 
@@ -124,43 +115,30 @@ class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
      */
     protected function get_export_data()
     {
-        global $wpdb;
-
-//        var_dump( $this->social_networks );
-
-        $table = WPGH()->contacts->table_name;
-        $start_date = date('Y-m-d H:i:s', $this->start_time);
-        $end_date = date('Y-m-d H:i:s', $this->end_time);
-
-        $contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+        $contact_ids = $this->get_contact_ids_created_within_time_range();
+        $ids = implode( ',', $contact_ids );
 
         $sources = array();
 
-        foreach ( $contacts as $contact ){
+        global $wpdb;
+        $table_name = WPGH()->contact_meta->table_name;
 
-            $lead_source = WPGH()->contact_meta->get_meta( $contact->ID, 'lead_source', true );
+        $lead_sources = $this->get_lead_sources();
 
-            if ( $lead_source ){
+        foreach ( $lead_sources as $lead_source ){
+            if ( ! empty( $lead_source ) && filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
 
-                if ( filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
+                /* TO avoid long lists of specifics, limit to just the root domin. */
+                $test_lead_source = parse_url( $lead_source, PHP_URL_HOST );
+                $test_lead_source = str_replace( 'www.', '', $test_lead_source );
 
-                    /* TO avoid long lists of specifics, limit to just the root domin. */
-                    $lead_source = parse_url( $lead_source, PHP_URL_HOST );
-                    $lead_source = str_replace( 'www.', '', $lead_source );
-
-                    foreach ( $this->social_networks as $network_name => $network_urls ){
-
-                        if ( in_array( $lead_source, $network_urls ) )
-
-                            if ( isset($sources[$network_name]) ){
-                                $sources[$network_name]++;
-                            } else {
-                                $sources[$network_name] = 1;
-                            }
+                foreach ( $this->social_networks as $network_name => $network_urls ){
+                    if ( in_array( $test_lead_source, $network_urls ) ){
+                        $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
+                        $sources[ $lead_source ] = [ 'count' => $num_contacts, 'name' => $network_name ];
                     }
                 }
             }
-
         }
 
         if ( empty( $sources ) ){
@@ -172,11 +150,12 @@ class WPGH_Social_Media_Widget extends WPGH_Reporting_Widget
 
         $export_info = array();
 
-        foreach ( $sources as $source => $num_contacts ):
+        foreach ( $sources as $source => $data ):
 
             $export_info[] = array(
-                _x( 'Social Media Source', 'column_title','groundhogg' ) => $source,
-                _x( 'Number of Contacts', 'column_title','groundhogg' ) => $num_contacts,
+                _x( 'Social Media Source', 'column_title','groundhogg' ) => $data[ 'name' ],
+                _x( 'Social Media Url', 'column_title','groundhogg' ) => $source,
+                _x( 'Number of Contacts', 'column_title','groundhogg' ) => $data[ 'count' ],
             );
 
         endforeach;

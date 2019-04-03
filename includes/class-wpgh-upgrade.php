@@ -201,7 +201,7 @@ class WPGH_Upgrade{
     	if ( ! empty( $sms_steps ) ){
 
     		foreach ($sms_steps as $step ){
-    			$step = new WPGH_Step( $step->ID );
+    			$step = wpgh_get_funnel_step( $step->ID );
     			$message = $step->get_meta( 'text_message' );
 
     			if ( $message ){

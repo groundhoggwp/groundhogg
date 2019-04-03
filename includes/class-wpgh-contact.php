@@ -212,7 +212,7 @@ class WPGH_Contact
      */
     public function exists()
     {
-        return WPGH()->contacts->exists( $this->ID, 'ID' );
+        return ! empty( $this->email ) && $this->ID > 0;
     }
 
     /**

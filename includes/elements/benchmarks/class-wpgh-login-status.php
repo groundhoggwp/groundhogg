@@ -75,8 +75,8 @@ class WPGH_Login_Status_Changed extends WPGH_Funnel_Step
                 <th><?php echo esc_html__( 'Run when a user logs in:', 'groundhogg' ); ?></th>
                 <td>
                     <?php echo WPGH()->html->dropdown(array(
-	                    'name'  => $step->prefix( 'status' ),
-	                    'id'    => $step->prefix( 'status' ),
+	                    'name'  => $step->prefix( 'type' ),
+	                    'id'    => $step->prefix( 'type' ),
 	                    'class'   => '',
 	                    'options' => array(
                             'any'   => __( 'Any Time', 'groundhogg' ),
@@ -97,10 +97,10 @@ class WPGH_Login_Status_Changed extends WPGH_Funnel_Step
         </table>
         <script>
             jQuery( function($){
-               $( '#<?php echo $step->prefix('status' ); ?>' ).on( 'change', function ( e ) {
-                   if ( $(this).val() === 'any' ){$( '#<?php echo $step->prefix('amount' ); ?>' ).fadeOut();}
-                   else {$( '#<?php echo $step->prefix('amount' ); ?>' ).fadeIn();}
-               } );$( '#<?php echo $step->prefix('status' ); ?>' ).trigger( 'change' );
+               $( '#<?php echo $step->prefix('type' ); ?>' ).on( 'change', function ( e ) {
+                   if ( $(this).val() === 'any' ){$( '#<?php echo $step->prefix('amount' ); ?>' ).hide();}
+                   else {$( '#<?php echo $step->prefix('amount' ); ?>' ).show();}
+               } );$( '#<?php echo $step->prefix('type' ); ?>' ).trigger( 'change' );
             });
         </script>
         <?php
@@ -113,11 +113,14 @@ class WPGH_Login_Status_Changed extends WPGH_Funnel_Step
      */
     public function save( $step )
     {
-        if ( isset(  $_POST[ $step->prefix( 'status' ) ] ) ){
+        if ( isset(  $_POST[ $step->prefix( 'type' ) ] ) ){
+	        $status = sanitize_text_field( $_POST[ $step->prefix( 'type' ) ] );
+            $step->update_meta( 'type', $status );
+        }
 
-	        $status = sanitize_text_field( $_POST[ $step->prefix( 'status' ) ] );
-            $step->update_meta( 'status', $status );
-
+        if ( isset(  $_POST[ $step->prefix( 'amount' ) ] ) ){
+            $status = absint( $_POST[ $step->prefix( 'amount' ) ] );
+            $step->update_meta( 'amount', $status );
         }
 
     }
@@ -144,8 +147,8 @@ class WPGH_Login_Status_Changed extends WPGH_Funnel_Step
         $contact->update_meta( 'times_logged_in', $times );
 
         foreach ( $steps as $step ) {
-            $step = new WPGH_Step( $step->ID );
-            $status = $step->get_meta( 'status' );
+            $step = wpgh_get_funnel_step( $step->ID );
+            $status = $step->get_meta( 'type' );
 	        $can_complete = ( $status === 'any' ) ? $can_complete = true : $times === $step->get_meta( 'amount' );
 
             if ( $step->can_complete( $contact ) && $can_complete ){

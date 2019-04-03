@@ -186,7 +186,7 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
 
         foreach ( $date_timers as $date_timer ){
 
-            $date_timer = new WPGH_Step( $date_timer->ID );
+            $date_timer = wpgh_get_funnel_step( $date_timer->ID );
 
             if ( $date_timer->order < $step->order && $this->compare_timer( $date_timer, $step ) < 0 ){
 

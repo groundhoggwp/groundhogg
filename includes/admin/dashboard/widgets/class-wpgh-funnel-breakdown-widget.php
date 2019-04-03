@@ -8,6 +8,8 @@
 class WPGH_Funnel_Breakdown_Widget extends WPGH_Line_Graph_Report_V2
 {
 
+    protected $funnels = [];
+
     /**
      * WPGH_Report_V2 constructor.
      */
@@ -15,6 +17,8 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Line_Graph_Report_V2
     {
         $this->wid = 'funnel_breakdown_widget';
         $this->name = _x( 'Funnel Breakdown', 'widget_name', 'groundhogg' );
+
+        $this->funnels = WPGH()->funnels->get_funnels( array( 'status' => 'active' ) );
 
         parent::__construct();
     }
@@ -29,11 +33,14 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Line_Graph_Report_V2
 
     public function get_data() {
 
+        if ( ! empty( $this->data ) ){
+            return $this->data;
+        }
+
 	    $break_down_funnel_id = intval( $this->get_url_var( 'breakdown_funnel_id', $this->get_option( 'breakdown_funnel_id' ) ) );
 
 	    if ( ! $break_down_funnel_id ){
-		    $funnels = WPGH()->funnels->get_funnels( array( 'status' => 'active' ) );
-		    $break_down_funnel_id = $funnels[0]->ID;
+		    $break_down_funnel_id = $this->funnels[0]->ID;
 	    }
 
 	    $this->update_options(
@@ -90,10 +97,13 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Line_Graph_Report_V2
 		    'label' => _x( 'Completed Events', 'stats', 'groundhogg' ),
 		    'data'  => $dataset1
 	    ) ;
+
 	    $ds[] = array(
 		    'label' => __( 'Waiting Contacts', 'stats', 'groundhogg' ),
 		    'data'  => $dataset2
-	    ) ;
+	    );
+
+	    $this->data = $ds;
 
 	    return $ds;
 
@@ -103,16 +113,15 @@ class WPGH_Funnel_Breakdown_Widget extends WPGH_Line_Graph_Report_V2
     {
 
         /*Get all the funnels */
-        $funnels = WPGH()->funnels->get_funnels( array( 'status' => 'active' ) );
 
-        if ( empty( $funnels ) ){
+        if ( empty( $this->funnels ) ){
             printf( '<p>%s</p>', _x( 'You have no active funnels.', 'notice', 'groundhogg' ) );
             return;
         }
 
         $options = array();
 
-        foreach ( $funnels as $funnel ){
+        foreach ( $this->funnels as $funnel ){
             $options[ $funnel->ID ] = $funnel->title;
         }
 

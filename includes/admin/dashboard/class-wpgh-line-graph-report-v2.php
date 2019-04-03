@@ -10,6 +10,11 @@ abstract class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
 {
 
     /**
+     * @var array
+     */
+    protected $data = [];
+
+    /**
      * Enqueue chart scripts
      */
     public function scripts()

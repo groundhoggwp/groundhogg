@@ -474,7 +474,7 @@ class WPGH_Form
             'name'          => '',
             'id'            => '',
             'class'         => 'gh-file-uploader',
-            'max_file_size' => 0,
+            'max_file_size' => wp_max_upload_size(),
             'file_types'    => '',
             'required'      => false,
             'attributes'    => '',
@@ -1314,7 +1314,13 @@ jQuery( function($){
             $content = '';
         }
 
-        $form .= do_shortcode( $content );
+        $content = do_shortcode( $content );
+
+        if ( empty( $content ) ){
+            $content = sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
+        }
+
+        $form .= $content;
 
         $this->destroy_shortcodes();
 

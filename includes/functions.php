@@ -45,7 +45,7 @@ function wpgh_get_referer()
  */
 function wpgh_get_optin_status_text( $id_or_email )
 {
-    $contact = new WPGH_Contact( $id_or_email );
+    $contact = wpgh_get_contact( $id_or_email );
 
     if ( ! $contact->email )
         return _x( 'No Contact', 'notice', 'groundhogg' );
@@ -54,7 +54,7 @@ function wpgh_get_optin_status_text( $id_or_email )
 
     if ( wpgh_is_gdpr() && wpgh_is_gdpr_strict() )
     {
-        $consent = WPGH()->contact_meta->get_meta( $contact->ID, 'gdpr_consent', true );
+        $consent = $contact->gdpr_consent;
 
         if ( $consent !== 'yes' )
             return _x( 'This contact has not agreed to receive email marketing from you.', 'optin_status', 'groundhogg' );
@@ -99,6 +99,7 @@ function wpgh_get_optin_status_text( $id_or_email )
     }
 }
 
+
 /**
  * Convert the funnel into a json object so it can be duplicated fairly easily.
  *
@@ -128,7 +129,7 @@ function wpgh_convert_funnel_to_json( $funnel_id )
 
     foreach ( $steps as $i => $step )
     {
-        $step = new WPGH_Step( $step->ID );
+        $step = wpgh_get_funnel_step( $step->ID );
 
         $export['steps'][$i] = array();
         $export['steps'][$i]['title'] = $step->title;
@@ -216,7 +217,7 @@ function wpgh_import_funnel( $import )
 
         $import_args = $step_args[ 'args' ];
 
-        $step = new WPGH_Step( $step_id );
+        $step = wpgh_get_funnel_step( $step_id );
 
         do_action( 'wpgh_import_step_' . $step_type, $import_args, $step );
         do_action( "groundhogg/elements/{$step->type}/import", $import_args, $step );
@@ -349,11 +350,11 @@ function wpgh_is_confirmation_strict()
 function wpgh_is_in_grace_period( $contact_id )
 {
 
-    $contact = new WPGH_Contact( $contact_id );
+    $contact = wpgh_get_contact( $contact_id );
 
     $grace = intval( wpgh_get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
 
-    $base = WPGH()->contact_meta->get_meta( $contact_id, 'last_optin', true );
+    $base = $contact->last_optin;
 
     if ( ! $base )
     {
@@ -859,6 +860,48 @@ function wpgh_get_contact( $id_or_email, $by_user_id=false, $get_from_cache=true
 }
 
 /**
+ * Array access for existing contact objects...
+ *
+ * @type WPGH_Contact[]
+ */
+global $wpgh_funnel_steps_cache;
+$wpgh_funnel_steps_cache = [];
+
+/**
+ * Simple function to get a contact
+ *
+ * @since 1.3 return false if contact does not exist
+ *
+ * @param $id int
+ * @return WPGH_Step|false
+ */
+function wpgh_get_funnel_step( $id, $get_from_cache=true ){
+
+    global $wpgh_funnel_steps_cache;
+
+    $cache_key = md5( $id );
+
+    if ( $get_from_cache && is_array( $wpgh_funnel_steps_cache ) ){
+        if (  key_exists( $cache_key, $wpgh_funnel_steps_cache ) ){
+            return $wpgh_funnel_steps_cache[ $cache_key ];
+        }
+    }
+
+    $step = new WPGH_Step( $id );
+
+    if ( $step->exists() ){
+
+        if ( $get_from_cache && is_array( $wpgh_funnel_steps_cache )  ){
+            $wpgh_contacts_cache[ $cache_key ] = $step;
+        }
+
+        return $step;
+    }
+
+    return false;
+}
+
+/**
  * Recount the contacts per tag...
  */
 function wpgh_recount_tag_contacts_count()
@@ -1299,7 +1342,7 @@ function wpgh_get_form_list() {
     $default = 0;
     foreach ( $forms as $form ){
         if ( ! $default ){$default = $form->ID;}
-        $step = new WPGH_Step( $form->ID );
+        $step = wpgh_get_funnel_step( $form->ID );
         if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
     }
     return $form_options;
@@ -2006,7 +2049,7 @@ function wpgh_after_form_submit_handler( &$contact )
     }
 
     if ( ! $contact->get_meta( 'source_page' ) ){
-        $contact->update_meta( 'source_page', wp_get_referer()  );
+        $contact->update_meta( 'source_page', wpgh_get_referer()  );
     }
 
     if ( is_user_logged_in() && ! $contact->user ){
@@ -2245,6 +2288,11 @@ function wpgh_get_mappable_fields( $extra=[] )
         'ip_address'                => __( 'IP Address' ),
         'lead_source'               => __( 'Lead Source' ),
         'source_page'               => __( 'Source Page' ),
+        'utm_campaign'              => __( 'UTM Campaign' ),
+        'utm_content'               => __( 'UTM Content' ),
+        'utm_medium'                => __( 'UTM Medium' ),
+        'utm_term'                  => __( 'UTM Term' ),
+        'utm_source'                => __( 'UTM Source' ),
         'notes'                     => __( 'Add To Notes' ),
         'tags'                      => __( 'Apply Value as Tag' ),
         'meta'                      => __( 'Add as Custom Meta' ),
@@ -2313,6 +2361,11 @@ function wpgh_generate_contact_with_map( $fields, $map )
             case 'job_title':
             case 'lead_source':
             case 'source_page':
+            case 'utm_campaign':
+            case 'utm_medium':
+            case 'utm_content':
+            case 'utm_term':
+            case 'utm_source':
                 $meta[ $field ] = sanitize_text_field( $value );
                 break;
             case 'country':

@@ -90,7 +90,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
         $ty_page = $step->get_meta( 'success_page' );
 
         if ( empty( $ty_page ) ){
-            $ty_page = site_url( 'thank-you/' );
+            $ty_page = site_url( '/thank-you/' );
         }
 
         ?>
@@ -643,7 +643,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
     public function complete( $step_id, $contact, $submission )
     {
 
-	    $step = new WPGH_Step( $step_id );
+	    $step = wpgh_get_funnel_step( $step_id );
 
 	    /* Double check that the wpgh_form_submit action isn't being fired by another benchmark */
 	    if ( $step->type !== $this->type )
@@ -701,7 +701,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
             wp_die( json_encode( array( 'error' => 'Form DNE.' ) ) );
         }
 
-        $step = new WPGH_Step( $ID );
+        $step = wpgh_get_funnel_step( $ID );
 
         $response = array();
 

@@ -124,7 +124,7 @@ class WPGH_Tag_Applied extends WPGH_Funnel_Step
 
         foreach ( $steps as $step ){
 
-            $step = new WPGH_Step( $step->ID );
+            $step = wpgh_get_funnel_step( $step->ID );
 
             $tags = $step->get_meta( 'tags' );
 

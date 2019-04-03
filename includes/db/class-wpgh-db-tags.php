@@ -26,6 +26,13 @@ class WPGH_DB_Tags extends WPGH_DB
     public $cache_group = 'contact_tags';
 
     /**
+     * Runtime associative array of ID => tag_object
+     *
+     * @var array
+     */
+    public $tag_cache = [];
+
+    /**
      * Get things started
      *
      * @access  public
@@ -241,7 +248,15 @@ class WPGH_DB_Tags extends WPGH_DB
      */
     public function get_tag( $id )
     {
-        return $this->get_tag_by( 'tag_id', $id );
+        $id = absint( $id );
+
+        if ( key_exists( $id, $this->tag_cache ) ){
+            return $this->tag_cache[ $id ];
+        }
+
+        $tag = $this->get_tag_by( 'tag_id', $id );
+        $this->tag_cache[ $id ] = $tag;
+        return $tag;
     }
 
     /**
