@@ -246,7 +246,7 @@ class WPGH_Exports_Table extends WP_List_Table {
 
 		$actions['delete'] = sprintf(
 			'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-			wp_nonce_url(admin_url( 'admin.php?page=gh_exports&action=delete&export=' . $export[ 'file' ] )),
+			wp_nonce_url(admin_url( 'admin.php?page=gh_tools&tab=export&action=delete&export=' . $export[ 'file' ] )),
 			/* translators: %s: title */
 			esc_attr( 'Delete Permanently' ),
 			__( 'Delete export' )

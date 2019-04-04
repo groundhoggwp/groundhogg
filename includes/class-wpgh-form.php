@@ -1192,7 +1192,7 @@ class WPGH_Form
 
         /* Email Preference Option */
         $args = array(
-            'label'     => _x( 'Manage Email Preferences For <b>' . $contact->email . '</b>:', 'form_default', 'groundhogg' ),
+            'label'     => _x( 'Manage Email Preferences For <b>' . obfuscate_email( $contact->email ) . '</b>:', 'form_default', 'groundhogg' ),
             'id'        => 'email_preferences',
             'name'      => 'email_preferences',
             'options'   => $options,

@@ -32,7 +32,13 @@ class WPGH_Broadcasts_Page
     {
         add_action('admin_menu', array($this, 'register'), $this->order);
 
-        add_action( 'wp_ajax_gh_email_broadcast_schedule', [ $this, 'ajax_bulk_schedule' ] );
+        add_filter( "groundhogg/bulk_job/gh_schedule_broadcast/query", [ $this, 'schedule_broadcast_query' ] );
+        add_filter( "groundhogg/bulk_job/gh_schedule_broadcast/max_items", [ $this, 'schedule_broadcast_max_items' ], 10, 2 );
+
+        if ( wp_doing_ajax() ){
+            add_action( "groundhogg/bulk_job/gh_schedule_broadcast/ajax", [ $this, 'ajax_bulk_schedule' ] );
+        }
+
 	    $this->notices = WPGH()->notices;
 
 	    if (isset($_GET['page']) && $_GET['page'] === 'gh_broadcasts') {
@@ -299,10 +305,37 @@ class WPGH_Broadcasts_Page
 
         set_transient('gh_get_broadcast_config', $config, HOUR_IN_SECONDS);
 
-        $this->notices->add('scheduling...', _x('Do not leave this page until the broadcast has finished scheduling!', 'notice', 'groundhogg'), 'warning');
-
-        wp_redirect(admin_url(sprintf('admin.php?page=gh_broadcasts&action=schedule&broadcast=%d', $broadcast_id)));
+        wp_redirect(admin_url(sprintf('admin.php?page=gh_bulk_jobs&action=gh_schedule_broadcast&broadcast=%d', $broadcast_id)));
         die();
+    }
+
+    public function schedule_broadcast_query( $items )
+    {
+        if ( ! current_user_can( 'schedule_broadcasts' ) ){
+            return $items;
+        }
+
+        $config = get_transient('gh_get_broadcast_config');
+
+        if (!is_array($config)) {
+            return $items;
+        }
+
+        $query = new WPGH_Contact_Query();
+
+        $contacts = $query->query( $config['contact_query'] );
+        $ids = wp_list_pluck( $contacts, 'ID' );
+
+        return $ids;
+    }
+
+    public function schedule_broadcast_max_items( $max, $items )
+    {
+        if ( ! current_user_can( 'schedule_broadcasts' ) ){
+            return $max;
+        }
+
+        return 100;
     }
 
     /**
@@ -323,8 +356,8 @@ class WPGH_Broadcasts_Page
 
         $response = [];
 
-        if ( isset( $_POST[ 'contacts' ] ) && ! empty($_POST['contacts'] ) ){
-	        $contact_ids = array_map('absint', $_POST['contacts']);
+        if ( isset( $_POST[ 'items' ] ) && ! empty($_POST['items'] ) ){
+	        $contact_ids = wp_parse_id_list( $_POST['items'] );
 
 	        $config = wp_parse_args($config, [
 		        'broadcast_id' => 0,
@@ -370,7 +403,7 @@ class WPGH_Broadcasts_Page
         }
 
         if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
-	        $this->notices->add('scheduled', _x('Broadcast Scheduled!', 'notice', 'groundhogg') );
+	        $this->notices->add('scheduled', _x('Broadcast scheduled!', 'notice', 'groundhogg') );
             delete_transient( 'gh_get_broadcast_config' );
             $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_broadcasts' );
         }
@@ -444,15 +477,6 @@ class WPGH_Broadcasts_Page
         include dirname(__FILE__) . '/broadcast-report.php';
     }
 
-    function schedule()
-    {
-        if (!current_user_can('schedule_broadcasts')) {
-            wp_die(WPGH()->roles->error('schedule_broadcasts'));
-        }
-
-        include dirname(__FILE__) . '/broadcast-scheduling.php';
-    }
-
     /**
      * Display the screen content
      */
@@ -471,9 +495,6 @@ class WPGH_Broadcasts_Page
                     break;
                 case 'edit':
                     $this->report();
-                    break;
-                case 'schedule':
-                    $this->schedule();
                     break;
                 default:
                     $this->table();

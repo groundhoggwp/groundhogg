@@ -2532,3 +2532,17 @@ if ( ! function_exists( 'multi_implode' ) ):
         return $ret;
     }
 endif;
+
+if ( ! function_exists( 'obfuscate_email' ) ):
+/**
+ * Obfuscate an email address
+ *
+ * @param $email
+ * @return string|string[]|null
+ */
+function obfuscate_email( $email )
+{
+    return preg_replace("/(?!^).(?=[^@]+@)/", "*", $email );
+}
+
+endif;

@@ -122,10 +122,6 @@ class WPGH_Settings_Page
                 'id'    => 'email',
                 'title' => _x( 'Email', 'settings_tabs', 'groundhogg' )
             ),
-            'tools'        =>  array(
-                'id'    => 'tools',
-                'title' => _x( 'Tools', 'settings_tabs', 'groundhogg' )
-            ),
             'extensions'   =>  array(
                 'id'    => 'extensions',
                 'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' )

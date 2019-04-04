@@ -239,14 +239,14 @@ class WPGH_Imports_Table extends WP_List_Table {
 		$actions['import'] = sprintf(
 			'<a href="%s" class="edit" aria-label="%s">%s</a>',
 			/* translators: %s: title */
-			admin_url( 'admin.php?page=gh_imports&action=map&import=' . $import[ 'file' ] ),
+			admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import[ 'file' ] ),
 			esc_attr( 'Import' ),
 			__( 'Import' )
 		);
 
 		$actions['delete'] = sprintf(
 			'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-			wp_nonce_url(admin_url( 'admin.php?page=gh_imports&action=delete&import=' . $import[ 'file' ] )),
+			wp_nonce_url(admin_url( 'admin.php?page=gh_tools&tab=import&action=delete&import=' . $import[ 'file' ] )),
 			/* translators: %s: title */
 			esc_attr( 'Delete Permanently' ),
 			__( 'Delete Import' )
