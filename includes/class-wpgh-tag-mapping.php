@@ -83,9 +83,11 @@ class WPGH_Tag_Mapping
         $response = [ 'complete' => $completed ];
 
         if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
-            WPGH()->notices->add('finished', _x('Job finished!', 'notice', 'groundhogg') );
+
+            WPGH()->notices->add('finished', _x('Job finished! Optin status tag mapping has now been enabled.', 'notice', 'groundhogg') );
             $response[ 'return_url' ] = admin_url( 'admin.php?page=groundhogg' );
             wpgh_delete_option( 'gh_optin_status_job' );
+
         }
 
         wp_die( json_encode( $response ) );
@@ -97,8 +99,8 @@ class WPGH_Tag_Mapping
     public function add_upgrade_notice()
     {
         $notice = sprintf(
-            __( "New features are now available, but we need to perform an upgrade process first! %s", 'groundhogg' ),
-            sprintf( "<a href='%s' class='button button-secondary'>Start Upgrade</a>", admin_url( 'admin.php?page=gh_bulk_jobs&action=bulk_apply_status_tags' ) )
+            __( "New features are now available, but we need to perform an upgrade process first!", 'groundhogg' ),
+            sprintf( "&nbsp;&nbsp;<a href='%s' class='button button-secondary'>Start Upgrade</a>", admin_url( 'admin.php?page=gh_bulk_jobs&action=bulk_apply_status_tags' ) )
         );
 
         WPGH()->notices->add( 'upgrade_notice', $notice, 'info' );

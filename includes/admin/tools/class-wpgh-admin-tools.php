@@ -472,6 +472,12 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
             wpgh_delete_transient( 'gh_import_map' );
             WPGH()->notices->add('finished', _x('Import finished!', 'notice', 'groundhogg') );
             $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_contacts' );
+
+            // Return to guided setup if it's not yet complete.
+            if ( ! wpgh_get_option( 'gh_guided_setup_finished', false ) ){
+                $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_guided_setup&step=5' );
+            }
+
         }
 
         wp_die( json_encode( $response ) );

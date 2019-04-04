@@ -167,7 +167,7 @@ class WPGH_Guided_Setup
         } else {
             /* Do Starting Content*/
             ?>
-            <div style="max-width: 800px;margin: auto;">
+            <div style="max-width: 600px;margin: auto;">
                 <div class="big-header" style="text-align: center;margin: 2.5em;">
                     <?php if ( apply_filters( 'wpgh_show_phil_on_welcome_page', true ) ): ?>
                         <img src="https://www.groundhogg.io/wp-content/uploads/2018/08/Groundhogg_logox300.png" width="300">
@@ -177,9 +177,12 @@ class WPGH_Guided_Setup
                 </div>
                 <div class="">
                     <div class="postbox">
-                        <div class="inside" style="padding: 0 10px 20px 30px;">
+                        <div class="inside" style="padding: 30px;">
                             <h2><b><?php _ex( 'Welcome to the Guided Setup', 'guided_setup', 'groundhogg' );?></b></h2>
                             <p><?php _ex( 'Follow these steps to quickly setup Groundhogg for your business. Setup usually takes around a few minutes. You can always change this information later in the settings page.', 'guided_setup', 'groundhogg' ); ?></p>
+                            <?php if ( apply_filters( 'wpgh_show_phil_on_welcome_page', true ) ): ?>
+                                <img width="100%" src="https://www.groundhogg.io/wp-content/uploads/2019/04/phil-pulling-lever.png">
+                            <?php endif; ?>
                             <p class="submit">
                                 <a style="float: left" class="button button-primary" href="<?php printf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), 1 ) ?>"><?php _ex( 'Get Started!', 'guided_setup', 'groundhogg' ); ?></a>
                             </p>
