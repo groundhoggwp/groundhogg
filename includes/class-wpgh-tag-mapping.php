@@ -33,8 +33,22 @@ class WPGH_Tag_Mapping
             add_action( 'admin_init', [ $this, 'add_upgrade_notice' ] );
         }
 
+        add_filter( "groundhogg/bulk_job/bulk_apply_status_tags/max_items", [ $this, 'max_items' ], 10, 2 );
         add_filter( "groundhogg/bulk_job/bulk_apply_status_tags/query", [ $this, 'bulk_job_query' ] );
         add_action( "groundhogg/bulk_job/bulk_apply_status_tags/ajax", [ $this, 'process_bulk_job' ] );
+    }
+
+    /**
+     * @param $items
+     * @return int
+     */
+    public function max_items( $max, $items ){
+        $item = array_shift( $items );
+        $fields = count( $item );
+        $max = intval( ini_get( 'max_input_vars' ) );
+        $max_items = floor( $max / $fields ) - 1;
+
+        return min( $max_items, 100 );
     }
 
     /**
@@ -99,7 +113,7 @@ class WPGH_Tag_Mapping
     public function add_upgrade_notice()
     {
         $notice = sprintf(
-            __( "New features are now available, but we need to perform an upgrade process first!", 'groundhogg' ),
+            __( "New features are now available, but we need to perform an upgrade process first! %s", 'groundhogg' ),
             sprintf( "&nbsp;&nbsp;<a href='%s' class='button button-secondary'>Start Upgrade</a>", admin_url( 'admin.php?page=gh_bulk_jobs&action=bulk_apply_status_tags' ) )
         );
 

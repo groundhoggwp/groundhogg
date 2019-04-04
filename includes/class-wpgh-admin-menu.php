@@ -83,14 +83,8 @@ class WPGH_Admin_Menu
     var $bulk_jobs;
 
     /**
-     * @var WPGH_Admin_Import
+     * @var WPGH_Admin_Tools
      */
-    var $import;
-
-    /**
-     * @var WPGH_Admin_Export
-     */
-    var $export;
     var $tools;
 
     /**
@@ -114,11 +108,8 @@ class WPGH_Admin_Menu
         $this->events_page      = new WPGH_Events_Page();
         $this->guided_setup     = new WPGH_Guided_Setup();
         $this->bulk_jobs        = new WPGH_Admin_Bulk_Job();
-//        $this->import           = new WPGH_Admin_Import();
-//        $this->export           = new WPGH_Admin_Export();
         $this->tools            = new WPGH_Admin_Tools();
 
-//        add_action( 'admin_menu', array( $this, 'register_tools_page' ), 98 );
 
         /**
          * Add multisite compat
@@ -127,16 +118,6 @@ class WPGH_Admin_Menu
             $this->settings_page = new WPGH_Settings_Page();
         }
 
-    }
-
-    /**
-     * Add tools link in menu
-     */
-    public function register_tools_page()
-    {
-        global $submenu;
-        $url = admin_url( 'admin.php?page=gh_settings&tab=tools' );
-        $submenu['groundhogg'][] = array('Tools', 'manage_options', $url );
     }
 
     /**

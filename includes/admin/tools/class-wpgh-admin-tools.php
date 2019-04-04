@@ -15,31 +15,40 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
 
     protected $uploads_path = [];
 
+    public $importer;
+    public $exporter;
+    public $deleter;
+
+    public function __construct()
+    {
+
+        if ( ! class_exists( 'WPGH_Import_Bulk_Job' ) ){
+            include dirname( __FILE__ ) . '/class-wpgh-import-bulk-job.php';
+        }
+
+        if ( ! class_exists( 'WPGH_Export_Bulk_job' ) ){
+            include dirname( __FILE__ ) . '/class-wpgh-export-bulk-job.php';
+        }
+
+        if ( ! class_exists( 'WPGH_Delete_Bulk_Job' ) ){
+            include dirname( __FILE__ ) . '/class-wpgh-delete-bulk-job.php';
+        }
+
+        $this->importer = new WPGH_Import_Bulk_Job();
+        $this->exporter = new WPGH_Export_Bulk_job();
+        $this->deleter  = new WPGH_Delete_Bulk_Job();
+
+        parent::__construct();
+    }
+
     // Unused functions.
     public function view(){}
     public function scripts(){}
     public function help(){}
-
-    public function add_ajax_actions(){
-        add_action( "groundhogg/bulk_job/gh_import_contacts/ajax", [ $this, 'import_process_bulk_job' ] );
-        add_action( "groundhogg/bulk_job/gh_export_contacts/ajax", [ $this, 'export_process_bulk_job' ] );
-        add_action( 'groundhogg/bulk_job/gh_delete_contacts/ajax', [ $this, 'bulk_delete_contacts_ajax' ] );
-
-    }
+    public function add_ajax_actions(){}
 
     protected function add_additional_actions(){
-
         add_action( "groundhogg/admin/{$this->get_slug()}", [ $this, 'delete_warning' ] );
-
-        add_filter( "groundhogg/bulk_job/gh_import_contacts/query", [ $this, 'import_bulk_job_query' ] );
-        add_filter( "groundhogg/bulk_job/gh_import_contacts/max_items", [ $this, 'import_calc_max_items' ], 10, 2 );
-
-        add_filter( "groundhogg/bulk_job/gh_export_contacts/query", [ $this, 'export_bulk_job_query' ] );
-        add_filter( "groundhogg/bulk_job/gh_export_contacts/max_items", [ $this, 'export_calc_max_items' ], 10, 2 );
-
-        add_filter( 'groundhogg/bulk_job/gh_delete_contacts/query', [ $this, 'bulk_delete_contacts_query' ] );
-        add_filter( 'groundhogg/bulk_job/gh_delete_contacts/max_items', [ $this, 'bulk_delete_contacts_max_items' ], 10, 2 );
-
     }
 
     public function get_order(){return 98;}
@@ -89,6 +98,13 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
             $actions[] = [
                 'link'      => $this->admin_url( [ 'action' => 'add', 'tab' => 'import' ] ),
                 'action'    => __( 'Import New List' ),
+            ];
+        }
+
+        if ( $this->current_tab() === 'export' ){
+            $actions[] = [
+                'link'      => $this->exporter->get_start_url(),
+                'action'    => __( 'Export All Contacts' ),
             ];
         }
 
@@ -377,9 +393,7 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
         wpgh_set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS );
         wpgh_set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );
 
-        wp_redirect( admin_url( 'admin.php?page=gh_bulk_jobs&action=gh_import_contacts&import=' . $file_name ) );
-        die();
-
+        $this->importer->start( [ 'import' => $file_name ] );
     }
 
     /**
@@ -396,91 +410,6 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
 
         $this->notices->add( 'file_removed', __( 'Imports deleted.', 'groundhogg' ) );
         return self::PAGE;
-    }
-
-    /**
-     * @param $items
-     * @return int
-     */
-    public function import_calc_max_items( $max, $items ){
-        $item = array_shift( $items );
-        $fields = count( $item );
-        $max = intval( ini_get( 'max_input_vars' ) );
-        $max_items = floor( $max / $fields ) - 1;
-
-        return min( $max_items, 100 );
-    }
-
-    /**
-     * Get the items to process.
-     */
-    public function import_bulk_job_query( $items )
-    {
-        if ( ! current_user_can( 'import_contacts' ) ){
-            return $items;
-        }
-
-        $file_name = urldecode( $_GET[ 'import' ] );
-        $file_path = wp_normalize_path( wpgh_get_csv_imports_dir( $file_name ) );
-
-//        wp_die( $file_path );
-
-        return wpgh_get_items_from_csv( $file_path );
-    }
-
-    /**
-     * Process the items
-     */
-    public function import_process_bulk_job()
-    {
-        if ( ! current_user_can( 'import_contacts' ) ){
-            return;
-        }
-
-        // get the map
-        $field_map = wpgh_get_transient( 'gh_import_map' );
-        $import_tags = wpgh_get_transient( 'gh_import_tags' );
-
-        if ( ! $field_map ){
-            return;
-        }
-
-        // get the posted items
-        $items = $_POST[ 'items' ];
-
-        $complete = 0;
-        $skipped  = 0;
-
-        // iterate over the contacts
-        foreach ( $items as $item ){
-
-            $contact = wpgh_generate_contact_with_map( $item, $field_map );
-
-            if ( ! $contact ){
-                $skipped++;
-            } else {
-                // Apply import specific tags.
-                $contact->apply_tag( $import_tags );
-                $complete++;
-            }
-
-        }
-
-        $response = [ 'complete' => $complete + $skipped ];
-
-        if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
-            wpgh_delete_transient( 'gh_import_map' );
-            WPGH()->notices->add('finished', _x('Import finished!', 'notice', 'groundhogg') );
-            $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_contacts' );
-
-            // Return to guided setup if it's not yet complete.
-            if ( ! wpgh_get_option( 'gh_guided_setup_finished', false ) ){
-                $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_guided_setup&step=5' );
-            }
-
-        }
-
-        wp_die( json_encode( $response ) );
     }
 
     ####### EXPORT TAB FUNCTIONS #########
@@ -516,119 +445,6 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
 
         $this->notices->add( 'file_removed', __( 'Exports deleted.', 'groundhogg' ) );
         return self::PAGE;
-    }
-
-    /**
-     * @param $items
-     * @return int
-     */
-    public function export_calc_max_items( $max, $items ){
-        return min( 500, intval( ini_get( 'max_input_vars' ) ) ) ;
-    }
-
-    /**
-     * Get the items to process.
-     */
-    public function export_bulk_job_query( $items )
-    {
-        if ( ! current_user_can( 'export_contacts' ) ){
-            return $items;
-        }
-
-        $query = new WPGH_Contact_Query();
-        $args = $_GET;
-
-        $contacts = $query->query( $args );
-        $ids = wp_list_pluck( $contacts, 'ID' );
-
-        return $ids;
-    }
-
-    /**
-     * Process the items
-     */
-    public function export_process_bulk_job()
-    {
-        if ( ! current_user_can( 'export_contacts' ) ){
-            return;
-        }
-
-        $ids = wp_parse_id_list( $_POST[ 'items' ] );
-
-        $complete = 0;
-
-        $meta_keys = array_values( WPGH()->contact_meta->get_keys() );
-        $default_keys = [
-            'ID',
-            'email',
-            'first_name',
-            'last_name',
-            'user_id',
-            'owner_id',
-            'optin_status',
-            'date_created',
-        ];
-
-        $headers = array_merge( $default_keys, $meta_keys );
-
-//        var_dump( $headers );
-//        die();
-
-        $file_name = wpgh_get_transient( 'gh_export_file' );
-
-        $fp = false;
-
-        // If the file path is not set, let's set it.
-        if ( ! $file_name ){
-
-            // randomize the file path to prevent direct access.
-            $file_name = md5( wpgh_encrypt_decrypt( time() ) ) . '.csv';
-
-            // get the full path.
-            $file_path = wpgh_get_csv_exports_dir( $file_name, true );
-            wpgh_set_transient( 'gh_export_file', $file_name, HOUR_IN_SECONDS );
-
-            //write the headers to the export.
-            $fp = fopen( $file_path,"w" );
-            fputcsv( $fp, $headers );
-        }
-
-        // If we have the file name then open the file before we move on.
-        if ( ! $fp ){
-            $file_path = wpgh_get_csv_exports_dir( $file_name, true );
-            $fp = fopen( $file_path,"a" );
-        }
-
-        foreach ( $ids as $id ){
-
-            $line = [];
-
-            $contact = wpgh_get_contact( $id );
-
-            foreach ( $headers as $header ){
-                // Check for array type
-                $line[] = is_array( $contact->$header ) ? multi_implode( ',', $contact->$header ) : $contact->$header;
-            }
-
-            fputcsv( $fp, $line );
-
-            $complete++;
-        }
-
-        fclose( $fp );
-
-        $response = [ 'complete' => $complete ];
-
-        if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
-
-            wpgh_delete_transient( 'gh_export_file' );
-
-            $file_url = wpgh_get_csv_exports_url( $file_name );
-            WPGH()->notices->add('finished', sprintf( _x( 'Export file created. %s', 'notice', 'groundhogg'), "&nbsp;&nbsp;&nbsp;<a class='button button-primary' href='$file_url'>Download Now</a>" ) );
-            $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_contacts' );
-        }
-
-        wp_die( json_encode( $response ) );
     }
 
     ####### DELETE TAB FUNCTIONS #########
@@ -673,75 +489,7 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
     public function delete_bulk_delete_tool()
     {
         $tags = WPGH()->tags->validate( $_POST[ 'tags' ] );
-        $url = add_query_arg( [ 'action' => 'gh_delete_contacts', 'tags_include' => implode( ',', $tags ) ], admin_url( 'admin.php?page=gh_bulk_jobs' ) );
-
-        wp_redirect( $url );
-        die();
-    }
-
-    /**
-     * Get Ids of contacts to be deleted.
-     *
-     * @param $items
-     * @return array
-     */
-    public function bulk_delete_contacts_query( $items )
-    {
-        if ( ! current_user_can( 'delete_contacts' ) ){
-            return $items;
-        }
-
-        $query = new WPGH_Contact_Query();
-        $args = $_GET;
-
-        $contacts = $query->query( $args );
-        $ids = wp_list_pluck( $contacts, 'ID' );
-
-        return $ids;
-    }
-
-    /**
-     * Do 100 at a time.
-     *
-     * @param $max
-     * @param $items
-     * @return int
-     */
-    function bulk_delete_contacts_max_items( $max, $items )
-    {
-        if ( ! current_user_can( 'delete_contacts' ) ){
-            return $max;
-        }
-
-        return 100;
-    }
-
-    /**
-     * Process the bulk delete ajax action
-     */
-    function bulk_delete_contacts_ajax()
-    {
-        if ( ! current_user_can( 'delete_contacts' ) ){
-            return;
-        }
-
-        $ids = wp_parse_id_list( $_POST[ 'items' ] );
-
-        $complete = 0;
-
-        foreach ( $ids as $id ){
-            WPGH()->contacts->delete( $id );
-            $complete++;
-        }
-
-        $response = [ 'complete' => $complete ];
-
-        if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
-            WPGH()->notices->add('finished', _x('Contacts deleted!', 'notice', 'groundhogg') );
-            $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_contacts' );
-        }
-
-        wp_die( json_encode( $response ) );
+        $this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] );
     }
 
 }
