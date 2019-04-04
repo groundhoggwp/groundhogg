@@ -17,6 +17,7 @@ class WPGH_Export_Bulk_job extends WPGH_Bulk_Job
 
     protected $fp;
     protected $file_name;
+    protected $file_path;
     protected $headers;
 
     /**
@@ -113,7 +114,6 @@ class WPGH_Export_Bulk_job extends WPGH_Bulk_Job
         $headers = array_merge( $default_keys, $meta_keys );
 
         $file_name = wpgh_get_transient( 'gh_export_file' );
-        $this->file_name = $file_name;
 
         $fp = false;
 
@@ -138,6 +138,8 @@ class WPGH_Export_Bulk_job extends WPGH_Bulk_Job
         }
 
         $this->fp = $fp;
+        $this->file_name = $file_name;
+        $this->file_path = $file_path;
         $this->headers = $headers;
     }
 
