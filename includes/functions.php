@@ -2250,7 +2250,7 @@ function wpgh_get_uploads_dir( $subdir='uploads', $file_path='', $create_folders
     $path = untrailingslashit( wp_normalize_path( sprintf( "%s/%s/%s", wpgh_get_base_uploads_dir(), $subdir, $file_path ) ) );
 
     if ( $create_folders ){
-        wp_mkdir_p( $path );
+        wp_mkdir_p( dirname( $path ) );
     }
 
     return $path;

@@ -239,9 +239,9 @@ class WPGH_Exports_Table extends WP_List_Table {
 		$actions['export'] = sprintf(
 			'<a href="%s" class="edit" aria-label="%s">%s</a>',
 			/* translators: %s: title */
-			admin_url( 'admin.php?page=gh_exports&action=map&export=' . $export[ 'file' ] ),
-			esc_attr( 'export' ),
-			__( 'export' )
+			$export[ 'file_url' ],
+			esc_attr( 'Export' ),
+			__( 'Export' )
 		);
 
 		$actions['delete'] = sprintf(

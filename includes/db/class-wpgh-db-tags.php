@@ -197,7 +197,7 @@ class WPGH_DB_Tags extends WPGH_DB
             return false;
         }
 
-        $tag = $this->get_tag_by( 'tag_id', $id );
+        $tag = $this->get_tag( $id );
 
         if ( $tag->tag_id > 0 ) {
 
@@ -208,7 +208,7 @@ class WPGH_DB_Tags extends WPGH_DB
 
             if ( $result ) {
                 $this->set_last_changed();
-
+                unset( $this->tag_cache[ md5( $id ) ] );
                 do_action( 'wpgh_delete_tag', $tag->tag_id );
             }
 
@@ -233,7 +233,11 @@ class WPGH_DB_Tags extends WPGH_DB
             return false;
         }
 
-        $tag = $this->get_tag_by( $field, $value );
+        if ( $field === 'tag_id' ){
+            $tag = $this->get( $value );
+        } else {
+            $tag = $this->get_tag_by( $field, $value );
+        }
 
         return ! empty( $tag ) ;
 
@@ -249,13 +253,14 @@ class WPGH_DB_Tags extends WPGH_DB
     public function get_tag( $id )
     {
         $id = absint( $id );
+        $cache_key = md5( $id );
 
-        if ( key_exists( $id, $this->tag_cache ) ){
-            return $this->tag_cache[ $id ];
+        if ( key_exists( $cache_key, $this->tag_cache ) ){
+            return $this->tag_cache[ $cache_key ];
         }
 
         $tag = $this->get_tag_by( 'tag_id', $id );
-        $this->tag_cache[ $id ] = $tag;
+        $this->tag_cache[ $cache_key ] = $tag;
         return $tag;
     }
 
@@ -347,11 +352,8 @@ class WPGH_DB_Tags extends WPGH_DB
         }
 
         $tag = $this->get_tag( $tag_id );
-
-        $count = intval( $tag->contact_count );
-        $count++;
-
-        $this->update( $tag_id, array( 'contact_count' => $count ), $this->primary_key );
+        $tag->contact_count = intval( $tag->contact_count ) + 1;
+        $this->update( $tag_id, array( 'contact_count' => $tag->contact_count ), $this->primary_key );
     }
 
     /**
@@ -367,11 +369,8 @@ class WPGH_DB_Tags extends WPGH_DB
         }
 
         $tag = $this->get_tag( $tag_id );
-
-        $count = intval( $tag->contact_count );
-        $count--;
-
-        $this->update( $tag_id, array( 'contact_count' => $count ), $this->primary_key );
+        $tag->contact_count = intval( $tag->contact_count ) - 1;
+        $this->update( $tag_id, array( 'contact_count' => $tag->contact_count ), $this->primary_key );
     }
 
     /**

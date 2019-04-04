@@ -113,8 +113,8 @@ class WPGH_Admin_Menu
         $this->events_page      = new WPGH_Events_Page();
         $this->guided_setup     = new WPGH_Guided_Setup();
         $this->bulk_jobs        = new WPGH_Admin_Bulk_Job();
-        $this->import        = new WPGH_Admin_Import();
-        $this->export        = new WPGH_Admin_Export();
+        $this->import           = new WPGH_Admin_Import();
+        $this->export           = new WPGH_Admin_Export();
 
         add_action( 'admin_menu', array( $this, 'register_tools_page' ), 98 );
 

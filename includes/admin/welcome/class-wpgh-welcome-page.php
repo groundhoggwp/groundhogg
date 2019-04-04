@@ -41,6 +41,41 @@ class WPGH_Welcome_Page
     }
 
     /**
+     * Add the page
+     */
+    public function register()
+    {
+
+        $page = add_menu_page(
+            WPGH()->brand(),
+            WPGH()->brand(),
+            'view_contacts',
+            'groundhogg',
+            array( $this, 'page' ),
+            'dashicons-email-alt',
+            2
+
+        );
+
+        $sub_page = add_submenu_page(
+            'groundhogg',
+            _x( 'Welcome', 'page_title', 'groundhogg' ),
+            _x( 'Welcome', 'page_title', 'groundhogg' ),
+            'view_contacts',
+            'groundhogg',
+            array($this, 'page')
+        );
+
+        /* White label compat */
+        if ( apply_filters( 'wpgh_remove_welcome_page', false ) ){
+            remove_submenu_page( 'groundhogg', 'groundhogg' );
+        }
+
+        add_action("load-" . $page, array($this, 'help'));
+
+    }
+
+    /**
      * Check a bunch of stuff.
      */
     public function status_check()
@@ -74,6 +109,7 @@ class WPGH_Welcome_Page
 //        }
 
     }
+
 
     /**
      * Check to see if some plugins are active.
@@ -111,7 +147,6 @@ class WPGH_Welcome_Page
         }
     }
 
-
     /**
      * Check to see if the settings are complete
      */
@@ -148,41 +183,6 @@ class WPGH_Welcome_Page
                 'no_contacts', _x( 'Seems like you need some more contacts. Go to the <a href="?page=gh_settings&tab=tools">tools area</a> and import your mailing list!', 'notice', 'groundhogg' ), 'warning'
             );
         }
-
-    }
-
-    /**
-     * Add the page
-     */
-    public function register()
-    {
-
-        $page = add_menu_page(
-            WPGH()->brand(),
-            WPGH()->brand(),
-            'view_contacts',
-            'groundhogg',
-            array( $this, 'page' ),
-            'dashicons-email-alt',
-            2
-
-        );
-
-        $sub_page = add_submenu_page(
-            'groundhogg',
-            _x( 'Welcome', 'page_title', 'groundhogg' ),
-            _x( 'Welcome', 'page_title', 'groundhogg' ),
-            'view_contacts',
-            'groundhogg',
-            array($this, 'page')
-        );
-
-        /* White label compat */
-        if ( apply_filters( 'wpgh_remove_welcome_page', false ) ){
-            remove_submenu_page( 'groundhogg', 'groundhogg' );
-        }
-
-        add_action("load-" . $page, array($this, 'help'));
 
     }
 

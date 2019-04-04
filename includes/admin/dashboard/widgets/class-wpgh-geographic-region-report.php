@@ -41,7 +41,12 @@ class WPGH_Geographic_Region_Report extends WPGH_Circle_Graph_Report
 
         $contact_ids = wp_parse_id_list( wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT contact_id FROM $table_name WHERE meta_key = %s AND meta_value = %s", 'country', $country_code ) ), 'contact_id' ) );
         $ids = implode( ',', $contact_ids );
-        $regions = $wpdb->get_results( $wpdb->prepare( "SELECT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", 'region' ) );
+
+        $regions = [];
+
+        if ( ! empty( $ids ) ){
+            $regions = $wpdb->get_results( $wpdb->prepare( "SELECT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", 'region' ) );
+        }
 
         foreach ( $regions as $result ){
 

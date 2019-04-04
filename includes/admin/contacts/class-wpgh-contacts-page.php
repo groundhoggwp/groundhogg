@@ -57,6 +57,20 @@ class WPGH_Contacts_Page
         }
     }
 
+    public function register()
+    {
+        $page = add_submenu_page(
+            'groundhogg',
+            _x('Contacts', 'page_title', 'groundhogg'),
+            _x('Contacts', 'page_title', 'groundhogg'),
+            'view_contacts',
+            'gh_contacts',
+            array($this, 'page')
+        );
+
+        add_action("load-" . $page, array($this, 'help'));
+    }
+
     /**
      * Get the scripts in there
      */
@@ -72,21 +86,7 @@ class WPGH_Contacts_Page
             wp_enqueue_script('wpgh-inline-edit-contacts', WPGH_ASSETS_FOLDER . 'js/admin/inline-edit-contacts.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/inline-edit-contacts.min.js'));
         }
     }
-
     /* Register the page */
-    public function register()
-    {
-        $page = add_submenu_page(
-            'groundhogg',
-            _x('Contacts', 'page_title', 'groundhogg'),
-            _x('Contacts', 'page_title', 'groundhogg'),
-            'view_contacts',
-            'gh_contacts',
-            array($this, 'page')
-        );
-
-        add_action("load-" . $page, array($this, 'help'));
-    }
 
     /* help bar */
     public function help()
