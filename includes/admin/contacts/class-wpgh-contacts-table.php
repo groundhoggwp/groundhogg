@@ -283,11 +283,6 @@ class WPGH_Contacts_Table extends WP_List_Table {
             $query[ 'owner' ] = get_current_user_id();
         }
 
-        $query[ 'optin_status' ] = array(
-            WPGH_CONFIRMED,
-            WPGH_UNCONFIRMED
-        );
-
         if ( isset( $_REQUEST[ 'meta_key' ] ) && isset( $_REQUEST[ 'meta_value' ] ) ){
             $query[ 'meta_key' ] = sanitize_key( $_REQUEST[ 'meta_key' ] );
             $query[ 'meta_value' ] = urldecode( $_REQUEST[ 'meta_value' ] );
@@ -422,6 +417,13 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
         $c_query = new WPGH_Contact_Query();
 
+        if ( empty( $query ) ){
+            $query[ 'optin_status' ] = array(
+                WPGH_CONFIRMED,
+                WPGH_UNCONFIRMED
+            );
+        }
+
         $this->query = $query;
         $data = $c_query->query( $query );
 
@@ -532,7 +534,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
             wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
-            __( 'Delete Permanently' )
+            __( 'Delete' )
         );
 
         return $this->row_actions( apply_filters( 'wpgh_contact_row_actions', $actions, $contact, $column_name ) );

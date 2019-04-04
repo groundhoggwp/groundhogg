@@ -52,6 +52,16 @@ class WPGH_Notices
     }
 
     /**
+     * @param string $code
+     */
+    public function remove( $code='' )
+    {
+        $notices = get_transient( self::TRANSIENT );
+        unset( $notices[ $code ] );
+        set_transient( self::TRANSIENT, $notices, 60 );
+    }
+
+    /**
      * Get the notices
      */
     public function notices()

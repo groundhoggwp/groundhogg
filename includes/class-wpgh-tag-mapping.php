@@ -6,7 +6,7 @@
  * Time: 11:01 AM
  */
 
-class WPGH_Tag_Mapping
+class WPGH_Tag_Mapping extends WPGH_Bulk_Job
 {
 
     const MARKETABLE = 'marketable';
@@ -33,78 +33,7 @@ class WPGH_Tag_Mapping
             add_action( 'admin_init', [ $this, 'add_upgrade_notice' ] );
         }
 
-        add_filter( "groundhogg/bulk_job/bulk_apply_status_tags/max_items", [ $this, 'max_items' ], 10, 2 );
-        add_filter( "groundhogg/bulk_job/bulk_apply_status_tags/query", [ $this, 'bulk_job_query' ] );
-        add_action( "groundhogg/bulk_job/bulk_apply_status_tags/ajax", [ $this, 'process_bulk_job' ] );
-    }
-
-    /**
-     * @param $items
-     * @return int
-     */
-    public function max_items( $max, $items ){
-        $item = array_shift( $items );
-        $fields = count( $item );
-        $max = intval( ini_get( 'max_input_vars' ) );
-        $max_items = floor( $max / $fields ) - 1;
-
-        return min( $max_items, 100 );
-    }
-
-    /**
-     * Get the IDS of all contacts.
-     *
-     * @param $items
-     * @return array
-     */
-    public function bulk_job_query( $items )
-    {
-        $query = new WPGH_Contact_Query();
-        $items = $query->query([]);
-
-        $ids = wp_list_pluck( $items, 'ID' );
-
-        return $ids;
-    }
-
-    /**
-     * Process the bulk job and apply all the tags retroactively.
-     */
-    public function process_bulk_job()
-    {
-        $IDs = wp_parse_id_list( $_POST[ 'items' ] );
-
-        $completed = 0;
-
-        foreach ( $IDs as $id ){
-
-            $contact = wpgh_get_contact( $id );
-
-            if ( $contact ){
-
-                $tags = [];
-
-                $tags[] = $this->get_status_tag( $contact->optin_status );
-                $tags[] = $contact->is_marketable() ? $this->get_status_tag( self::MARKETABLE ) : $this->get_status_tag( self::NON_MARKETABLE );
-
-                $contact->apply_tag( $tags );
-
-            }
-
-            $completed++;
-        }
-
-        $response = [ 'complete' => $completed ];
-
-        if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
-
-            WPGH()->notices->add('finished', _x('Job finished! Optin status tag mapping has now been enabled.', 'notice', 'groundhogg') );
-            $response[ 'return_url' ] = admin_url( 'admin.php?page=groundhogg' );
-            wpgh_delete_option( 'gh_optin_status_job' );
-
-        }
-
-        wp_die( json_encode( $response ) );
+        parent::__construct();
     }
 
     /**
@@ -117,7 +46,7 @@ class WPGH_Tag_Mapping
             sprintf( "&nbsp;&nbsp;<a href='%s' class='button button-secondary'>Start Upgrade</a>", admin_url( 'admin.php?page=gh_bulk_jobs&action=bulk_apply_status_tags' ) )
         );
 
-        WPGH()->notices->add( 'upgrade_notice', $notice, 'info' );
+        WPGH()->notices->add( 'status_tag_upgrade_notice', $notice, 'info' );
     }
 
     /**
@@ -296,4 +225,98 @@ class WPGH_Tag_Mapping
 
     }
 
+    /**
+     * @param $items
+     * @return int
+     */
+    public function max_items( $max, $items ){
+        $item = array_shift( $items );
+        $fields = count( $item );
+        $max = intval( ini_get( 'max_input_vars' ) );
+        $max_items = floor( $max / $fields ) - 1;
+
+        return min( $max_items, 100 );
+    }
+
+    /**
+     * Get the IDS of all contacts.
+     *
+     * @param $items
+     * @return array
+     */
+    public function query( $items )
+    {
+        $query = new WPGH_Contact_Query();
+        $items = $query->query([]);
+
+        $ids = wp_list_pluck( $items, 'ID' );
+
+        return $ids;
+    }
+
+    /**
+     * Get the action reference.
+     *
+     * @return string
+     */
+    public function get_action()
+    {
+        return 'bulk_apply_status_tags';
+    }
+
+    /**
+     * Do stuff before the loop
+     *
+     * @return void
+     */
+    protected function pre_loop(){}
+
+    /**
+     * do stuff after the loop
+     *
+     * @return void
+     */
+    protected function post_loop(){}
+
+    /**
+     * Process an item
+     *
+     * @param $item mixed
+     * @param $args array
+     * @return void
+     */
+    protected function process_item( $item )
+    {
+        $contact = wpgh_get_contact( absint( $item ) );
+
+        if ( $contact ){
+
+            $tags = [];
+
+            $tags[] = $this->get_status_tag( $contact->optin_status );
+            $tags[] = $contact->is_marketable() ? $this->get_status_tag( self::MARKETABLE ) : $this->get_status_tag( self::NON_MARKETABLE );
+
+            $contact->apply_tag( $tags );
+
+        }
+    }
+
+    /**
+     * Cleanup any options/transients/notices after the bulk job has been processed.
+     *
+     * @return void
+     */
+    protected function clean_up()
+    {
+        WPGH()->notices->remove( 'status_tag_upgrade_notice' );
+        wpgh_delete_option( 'gh_optin_status_job' );
+    }
+
+    /**
+     * @return string
+     */
+    protected function get_finished_notice()
+    {
+        return _x('Job finished! Optin status tag mapping has now been enabled.', 'notice', 'groundhogg');
+    }
 }

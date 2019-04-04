@@ -78,7 +78,7 @@ class WPGH_Tags_Table extends WP_List_Table {
     protected function column_contact_count( $tag )
     {
         $count = $tag->contact_count;
-        return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag=' . $tag->tag_id ).'">'. $count .'</a>' : '0';
+        return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&tags_include=' . $tag->tag_id ).'">'. $count .'</a>' : '0';
     }
 
     protected function column_tag_description( $tag )
