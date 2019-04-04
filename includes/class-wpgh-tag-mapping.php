@@ -43,7 +43,7 @@ class WPGH_Tag_Mapping extends WPGH_Bulk_Job
     {
         $notice = sprintf(
             __( "New features are now available, but we need to perform an upgrade process first! %s", 'groundhogg' ),
-            sprintf( "&nbsp;&nbsp;<a href='%s' class='button button-secondary'>Start Upgrade</a>", admin_url( 'admin.php?page=gh_bulk_jobs&action=bulk_apply_status_tags' ) )
+            sprintf( "&nbsp;&nbsp;<a href='%s' class='button button-secondary'>Start Upgrade</a>", $this->get_start_url() )
         );
 
         WPGH()->notices->add( 'status_tag_upgrade_notice', $notice, 'info' );
