@@ -101,17 +101,8 @@ function wpgh_run_install() {
     /* Setup the cron event */
     WPGH()->event_queue->setup_cron_jobs();
 
-    /* convert users to contacts */
-    $args = array(
-        'fields' => 'all_with_meta'
-    );
-
-    $users = get_users( $args );
-
-    /* @var $wp_user WP_User */
-    foreach ( $users as $wp_user ) {
-        wpgh_create_contact_from_user( $wp_user );
-    }
+    // Create a contact for the current user.
+    wpgh_create_contact_from_user( get_current_user_id() );
 
     /* Recount tag relationships */
     wpgh_recount_tag_contacts_count();
@@ -191,6 +182,8 @@ function wpgh_run_install() {
     WPGH()->status_tag_mapper->install_default_tags();
 
     update_option( 'wpgh_version', WPGH_VERSION );
+
+    // Avoid trying to update from previous versions.
     update_option( 'wpgh_last_upgrade_version', WPGH_VERSION );
 
     // Add a temporary option to note that WPGH pages have been created

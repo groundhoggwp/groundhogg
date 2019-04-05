@@ -103,7 +103,9 @@ class WPGH_Sync_Bulk_Job extends WPGH_Bulk_Job
      *
      * @return void
      */
-    protected function clean_up(){}
+    protected function clean_up(){
+        wpgh_recount_tag_contacts_count();
+    }
 
     /**
      * Get the return URL
