@@ -112,6 +112,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * ADDED Field mapping when importing contact lists, as well as a page to re-import lists and delete imported lists.
 * ADDED Tools Specific page for managing imported lists, exported lists, system info and other tools to be added in the future.
 * ADDED New method for exporting lists, lists are now generated server side and are stored in an exports folder, exports can be re-downloaded multiple times.
+* ADDED Field mapping to the elementor integration.
 * TWEAKED skipping email confirmation emails will result in a skip rather than a WP_Error
 * TWEAKED X-Mailer header now set as Groundhogg.
 * TWEAKED funnels events which return false with soft fail and skip rather than hard fail with a WP Error.
@@ -122,7 +123,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED the Admin page abstract class to include more beneficial functions.
 * TWEAKED Overhauled the file system for contact specific uploads, as well as for imports/exports.
 * TWEAKED Obfuscated the email address on the email preferences page.
-* TWEAKED Broadcast scheduling gets sent through new bulk jobs system..
+* TWEAKED Broadcast scheduling gets sent through new bulk jobs system.
 
 = 1.2.10.2 =
 * HOT FIX Send all emails in HTML content type as GHSS does not like plain text emails. Use 'the_content' filter on plain text emails.

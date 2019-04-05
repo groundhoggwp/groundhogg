@@ -51,7 +51,7 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
         // Get submitted Form data
         $raw_fields = $record->get( 'fields' );
 
-        //Create a map
+        // Create a map
         $map = [];
 
         // Normalize the Form Data
@@ -67,11 +67,64 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
             $fields[ $id ] = $field['value'];
         }
 
-        $contact = wpgh_generate_contact_with_map( $fields, $map );
+        // Ensure that mapped fields exist.
+        if ( ! empty( $map ) ){
+            $contact = wpgh_generate_contact_with_map( $fields, $map );
+            if ( $contact ){
+                $contact->apply_tag( wp_parse_id_list( $settings['groundhogg_tags'] ) );
+            }
+            wpgh_after_form_submit_handler( $contact );
 
-        if ( $contact ){
-            $contact->apply_tag( wp_parse_id_list( $settings['groundhogg_tags'] ) );
+            //Stop here.
+            return;
         }
+
+        ######### BACKWARDS COMPAT BEYOND THIS POINT ###########
+
+        // If the map don't exist, use the old integration.
+        if ( ! empty( $fields[ 'name' ] ) ){
+            $parts = wpgh_split_name( $fields[ 'name' ] );
+            $fields[ 'first_name' ] = $parts[ 0 ];
+            $fields[ 'last_name' ] = $parts[ 1 ];
+        }
+
+        $args = wp_parse_args( $fields, array(
+            'first_name' => '',
+            'last_name' => '',
+            'email' => ''
+        ) );
+
+        if ( empty( $args[ 'email' ] ) ){
+            return;
+        }
+        //magic time
+        $id = WPGH()->contacts->add( $args );
+        if ( ! $id ){
+            return;
+        }
+        $contact = wpgh_get_contact( $id );
+        $ignore = array(
+            'first_name',
+            'last_name',
+            'email'
+        );
+        foreach ( $fields as $key => $value ) {
+            $key = sanitize_key( $key );
+            if ( is_array( $value ) ){
+                $value = implode( ', ', $value );
+            }
+            if ( strpos( $value, PHP_EOL  ) !== false ){
+                $value = sanitize_textarea_field( stripslashes( $value ) );
+            } else {
+                $value = sanitize_text_field( stripslashes( $value ) );
+            }
+            if ( ! in_array( $key, $ignore ) ){
+                $value = apply_filters( 'wpgh_sanitize_submit_value', $value, null );
+                $contact->update_meta( $key, $value );
+            }
+        }
+        wpgh_after_form_submit_handler( $contact );
+        $contact->apply_tag( wp_parse_id_list( $settings['groundhogg_tags'] ) );
 
     }
 
