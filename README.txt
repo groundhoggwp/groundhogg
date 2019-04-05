@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.1 =
+* HOT FIX Rollback Elementor integration to previous version as doesn't work when multiplte forms on same page.
+
 = 1.3 =
 * ADDED Tags settings tab to add options for tag mapping
 * ADDED optin status tag mapping so that it is easier to reference a broad scope of contacts without having to manage the tag associations through funnels.

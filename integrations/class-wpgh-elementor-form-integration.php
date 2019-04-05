@@ -68,7 +68,8 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
         }
 
         // Ensure that mapped fields exist.
-        if ( ! empty( $map ) ){
+        // TODO Revisit this at a later date.
+        if ( ! empty( $map ) || false ){
             $contact = wpgh_generate_contact_with_map( $fields, $map );
             if ( $contact ){
                 $contact->apply_tag( wp_parse_id_list( $settings['groundhogg_tags'] ) );
@@ -108,6 +109,7 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
             'last_name',
             'email'
         );
+
         foreach ( $fields as $key => $value ) {
             $key = sanitize_key( $key );
             if ( is_array( $value ) ){
@@ -123,6 +125,7 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
                 $contact->update_meta( $key, $value );
             }
         }
+
         wpgh_after_form_submit_handler( $contact );
         $contact->apply_tag( wp_parse_id_list( $settings['groundhogg_tags'] ) );
 
@@ -170,27 +173,32 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
             ]
         );
 
-        $fields = $widget->get_settings( 'form_fields' );
 
-        foreach ( $fields as $field ){
+        // Disable new field mapping for now.
+        if ( false ) {
 
-            $field_label = $field[ 'field_label' ];
-            $field_id = $field[ '_id' ];
+            $fields = $widget->get_settings('form_fields' );
 
-            $map_id = sprintf( 'map_%s', $field_id );
-            $setting_label = sprintf( __( "Map %s", 'groundhogg' ), $field_label );
+            foreach ($fields as $field) {
 
-            $widget->add_control(
-                $map_id,
-                [
-                    'label' => $setting_label,
-                    'label_block' => true,
-                    'type' => \Elementor\Controls_Manager::SELECT,
-                    'multiple' => true,
-                    'options' => wpgh_get_mappable_fields(),
-                    'default' => get_key_from_column_label( $field_id ),
-                ]
-            );
+                $field_label = $field['field_label'];
+                $field_id = $field['_id'];
+
+                $map_id = sprintf('map_%s', $field_id);
+                $setting_label = sprintf(__("Map %s", 'groundhogg'), $field_label);
+
+                $widget->add_control(
+                    $map_id,
+                    [
+                        'label' => $setting_label,
+                        'label_block' => true,
+                        'type' => \Elementor\Controls_Manager::SELECT,
+                        'multiple' => true,
+                        'options' => wpgh_get_mappable_fields(),
+                        'default' => get_key_from_column_label( $field_id ),
+                    ]
+                );
+            }
         }
 
         $widget->end_controls_section();
