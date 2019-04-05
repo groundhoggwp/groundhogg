@@ -312,4 +312,5 @@ function wpgh_view_in_browser_shortcode()
 }
 
 add_shortcode( 'browser_email', 'wpgh_view_in_browser_shortcode' );
+add_shortcode( 'browser_view', 'wpgh_view_in_browser_shortcode' );
 
