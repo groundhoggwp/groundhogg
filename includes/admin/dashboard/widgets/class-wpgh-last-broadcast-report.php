@@ -37,7 +37,7 @@ class WPGH_Last_Broadcast_Report extends WPGH_Circle_Graph_Report
             return false;
         }
 
-        $broadcast = array_shift( $broadcasts );
+        $broadcast = array_shift( $this->broadcasts_cache );
 
         $this->last_broadcast_id = $broadcast->ID;
 

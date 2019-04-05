@@ -170,7 +170,7 @@ function wpgh_run_install() {
     if ( ! wpgh_get_option( 'gh_view_in_browser_page', false ) ){
         $email_preferences_args = array(
             'post_title' => _x( 'Emails', 'default_pages', 'groundhogg' ),
-            'post_content' => '[browser_view]',
+            'post_content' => '[browser_email]',
             'post_type' => 'page',
             'post_status' => 'publish',
             'post_author' => get_current_user_id(),
