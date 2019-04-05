@@ -126,6 +126,8 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 * TWEAKED the Admin page abstract class to include more beneficial functions.
 * TWEAKED Obfuscated the email address on the email preferences page.
 * TWEAKED Broadcast scheduling gets sent through new bulk jobs system.
+* FIXED EDD Plugin Updater slowing down admin dashboard with extraneous call to api endpoint.
+* FIXED Renamed EDD Plugin Updater to prevent conflicts from another plugin.
 
 = 1.2.10.2 =
 * HOT FIX Send all emails in HTML content type as GHSS does not like plain text emails. Use 'the_content' filter on plain text emails.

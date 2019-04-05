@@ -21,7 +21,7 @@ if ( ! class_exists('GH_EDD_SL_Plugin_Updater') ){
 class WPGH_Extension_Manager
 {
     static $extensions = array(); // array( item_id => array( license, status ) )
-    static $storeUrl = "https://groundhogg.io";
+    static $storeUrl = "https://www.groundhogg.io";
 
 	/**
      * Add an extension to the extensions options.
@@ -67,10 +67,19 @@ class WPGH_Extension_Manager
 	    return update_option( "gh_extensions", static::$extensions );
     }
 
+    public static function maybe_check_for_updates()
+    {
+        $current = get_site_transient( 'update_plugins' );
+        if ( isset( $current->last_checked ) && 12 * HOUR_IN_SECONDS > ( time() - $current->last_checked ) ) {
+            return;
+        }
+
+        self::check_for_updates();
+    }
+
     public static function check_for_updates()
     {
         $extensions = apply_filters( 'get_gh_extensions', array() );
-
         foreach ( $extensions as $extension_args ){
             if ( self::has_license( $extension_args['item_id'] ) && self::get_license_status( $extension_args['item_id']  ) !== 'invalid' ){
                 $updater = new GH_EDD_SL_Plugin_Updater( WPGH_Extension_Manager::$storeUrl, $extension_args['file'], array(
@@ -347,7 +356,13 @@ class WPGH_Extension_Manager
 	}
 }
 
-add_action( 'gh_tab_extensions', array( 'WPGH_Extension_Manager', 'extension_page' ) );
+add_action( 'gh_tab_extensions',    [ 'WPGH_Extension_Manager', 'extension_page' ] );
+//add_action( 'load-plugins.php',     [ 'WPGH_Extension_Manager', 'check_for_updates' ] );
+//add_action( 'load-update.php',      [ 'WPGH_Extension_Manager', 'check_for_updates' ] );
+//add_action( 'load-update-core.php', [ 'WPGH_Extension_Manager', 'check_for_updates' ] );
+//add_action( 'wp_update_plugins',    [ 'WPGH_Extension_Manager', 'check_for_updates' ] );
+//add_action( 'admin_init',           [ 'WPGH_Extension_Manager', 'maybe_check_for_updates' ] );
+add_action( 'admin_init',           [ 'WPGH_Extension_Manager', 'check_for_updates' ] );
 
 class WPGH_Extension_Box
 {

@@ -52,11 +52,6 @@ class WPGH_Settings_Page
         add_action( 'admin_init', array( $this, 'register_sections' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
 
-        if ( ! class_exists( 'WPGH_Extensions_Manager' ) )
-            include_once dirname( __FILE__ ) . '/../extensions/module-manager.php';
-
-        add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'check_for_updates' ) );
-
 	    if ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) {
 		    add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );
 		    add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_deactivation' ) );
@@ -1017,7 +1012,6 @@ class WPGH_Settings_Page
         }
 
         $field[ 'atts' ][ 'id' ] = esc_attr( sanitize_key( $field['id'] ) );
-//        $field[ 'atts' ][ 'name' ] = esc_attr( $field['id'] );
 
         echo call_user_func( array( WPGH()->html, $field[ 'type' ] ), $field[ 'atts' ] );
 

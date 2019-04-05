@@ -354,7 +354,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 self::$instance->register_integrations();
 
                 add_action( 'plugins_loaded', array( self::$instance, 'load_text_domain' ) );
-
             }
 
 
@@ -532,6 +531,8 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
             /* API */
             require_once WPGH_PLUGIN_DIR . 'api/class-wpgh-api-loader.php';
+
+            include_once WPGH_PLUGIN_DIR . 'includes/admin/extensions/module-manager.php';
 
             /* Install */
             require_once WPGH_PLUGIN_DIR . 'includes/install.php';

@@ -571,7 +571,7 @@ function wpgh_contact_record_section_actions( $contact )
                     $options = array();
                     foreach ($steps as $step) {
                         $step = wpgh_get_funnel_step($step->ID);
-                        if ($step->is_active()) {
+                        if ( $step && $step->is_active()) {
                             $funnel_name = WPGH()->funnels->get_column_by('title', 'ID', $step->funnel_id);
                             $options[$funnel_name][$step->ID] = sprintf("%d. %s (%s)", $step->order, $step->title, str_replace('_', ' ', $step->type));
                         }
