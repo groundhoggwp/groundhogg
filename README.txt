@@ -106,22 +106,24 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.3 =
-* ADDED optin status tag mapping so that it is easier to reference a broad scope of contacts without having to manage the tag associations through funnels.
 * ADDED Tags settings tab to add options for tag mapping
+* ADDED optin status tag mapping so that it is easier to reference a broad scope of contacts without having to manage the tag associations through funnels.
 * ADDED option to enable/disable cron job via GHSS from settings page.
-* ADDED Field mapping when importing contact lists, as well as a page to re-import lists and delete imported lists.
 * ADDED Tools Specific page for managing imported lists, exported lists, system info and other tools to be added in the future.
+* ADDED Field mapping when importing contact lists, as well as a page to re-import lists and delete imported lists.
 * ADDED New method for exporting lists, lists are now generated server side and are stored in an exports folder, exports can be re-downloaded multiple times.
-* ADDED Field mapping to the elementor integration.
-* TWEAKED skipping email confirmation emails will result in a skip rather than a WP_Error
+* ADDED Api for mapping fields for form integrations and Zapier integration for more flexibility.
+* ADDED Field mapping to the Elementor integration.
+* TWEAKED Major performance overhaul of report generation for the dashboard. reports arte now generated much quicker when the number of contacts is > 20,000
+* TWEAKED Users are no longer auto converted to contacts upon installation. you must now sync contacts via the tools page.
+* TWEAKED Overhauled the file system for contact specific uploads, as well as for imports/exports.
 * TWEAKED X-Mailer header now set as Groundhogg.
-* TWEAKED funnels events which return false with soft fail and skip rather than hard fail with a WP Error.
+* TWEAKED skipping email confirmation emails will result in a skip rather than a WP_Error
+* TWEAKED funnels events which return false will soft fail and skip rather than hard fail with a WP Error.
 * TWEAKED Changed MOST instances of "new WPGH_Contact()" to "wpgh_get_contact()" so that the contacts cache is checked rather than querying the DB every time.
 * TWEAKED Changed MOST instances of "new WPGH_Step()" to "wpgh_get_funnel_step()" so that the steps cache is checked rather than querying the DB every time.
 * TWEAKED implemented a tag cache array to avoid duplicate db queries.
-* TWEAKED Major performance overhaul of report generation for the dashboard. reports arte now generated much quicker when the number of contacts is > 20,000
 * TWEAKED the Admin page abstract class to include more beneficial functions.
-* TWEAKED Overhauled the file system for contact specific uploads, as well as for imports/exports.
 * TWEAKED Obfuscated the email address on the email preferences page.
 * TWEAKED Broadcast scheduling gets sent through new bulk jobs system.
 

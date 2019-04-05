@@ -1136,8 +1136,8 @@ function wpgh_create_contact_from_user( $user, $sync_meta = false )
 
     // Additional stuff.
     $contact->update_meta( 'user_login', $user->user_login );
-    $roles = wpgh_get_roles_pretty_names( $user->roles );
-    $contact->add_tag( $roles );
+    $contact->change_marketing_preference( $contact->optin_status );
+    $contact->add_tag( wpgh_get_roles_pretty_names( $user->roles ) );
 
     return $contact;
 }

@@ -591,7 +591,13 @@ class WPGH_Contacts_Table extends WP_List_Table {
         <div class="alignleft gh-actions">
             <a class="button action " href="<?php echo WPGH()->menu->tools->exporter->get_start_url( $this->query ); ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
         </div>
-        <?php
+<!--        -->
+<!--        <div class="alignleft gh-actions">-->
+<!--            <a class="button action " href="--><?php //echo add_query_arg( array_merge( $this->query, [ 'use_query' => true ] ), admin_url( 'admin.php?page=gh_broadcasts&action=add&type=email' ) ) ?><!--">--><?php //printf( _nx( 'Export %s contact','Send Broadcast to %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?><!--</a>-->
+<!--        </div>-->
+<!--        --><?php
+
+        do_action( 'groundhogg/contacts/table/extra_tablenav', $this );
     }
 
     /**

@@ -55,13 +55,22 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
         <?php endif; ?>
         <tr class="form-field term-tags-wrap">
             <th scope="row"><label for="description"><?php _e( 'Send To:', 'groundhogg' ); ?></label></th>
-            <td><?php $tag_args = array();
+            <td><?php
+
+                if ( ! gisset_not_empty( $_GET, 'use_query' ) ):
+
+                $tag_args = array();
                 $tag_args[ 'id' ] = 'tags';
                 $tag_args[ 'name' ] = 'tags[]';
                 $tag_args[ 'required' ] = true;
 
                 echo WPGH()->html->tag_picker( $tag_args ); ?>
                 <p class="description"><?php _e( 'This broadcast will be sent to contacts with these tags.', 'groundhogg' ); ?></p>
+                <?php else:
+                $query = new WPGH_Contact_Query();
+                $num = count( $query->query( $_GET ) );
+                    printf( __( "%d Contacts", 'groundhogg' ), $num );
+                endif; ?>
             </td>
         </tr>
         <tr class="form-field term-exclude-tags-wrap">
