@@ -364,7 +364,7 @@ class WPGH_Tracking
 
         $contact = wpgh_get_contact( $user->user_email );
 
-        if ( ! $contact->exists() ){
+        if ( ! $contact || ! $contact->exists() ){
             return;
         }
 

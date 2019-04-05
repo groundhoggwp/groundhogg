@@ -98,8 +98,6 @@ function wpgh_run_install() {
     WPGH()->tags->create_table();
     WPGH()->tag_relationships->create_table();
 
-//    WPGH()->tokens->create_table();
-
     /* Setup the cron event */
     WPGH()->event_queue->setup_cron_jobs();
 

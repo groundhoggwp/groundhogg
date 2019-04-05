@@ -55,7 +55,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 			'object_id'    => _x( 'Email/SMS', 'Column label', 'groundhogg' ),
 			'from_user'   => _x( 'Scheduled By', 'Column label', 'groundhogg' ),
 			'send_time'   => _x( 'Scheduled Run Date', 'Column label', 'groundhogg' ),
-            'send_to_tags' => _x( 'Send To Tags', 'Column label', 'groundhogg' ),
+            'sending_to' => _x( 'Sending To', 'Column label', 'groundhogg' ),
             'stats' => _x( 'Stats', 'Column label', 'groundhogg' ),
             'date_scheduled' => _x( 'Date Scheduled', 'Column label', 'groundhogg' ),
 		);
@@ -193,6 +193,33 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
      * @param $broadcast WPGH_Broadcast
      * @return string
      */
+    protected function column_sending_to( $broadcast )
+    {
+
+        $num = WPGH()->events->count( [
+            'funnel_id'     => WPGH_BROADCAST,
+            'step_id'       => $broadcast->ID,
+            'status'        => 'waiting',
+            'event_type'    => WPGH_BROADCAST_EVENT
+        ] );
+
+        if ( ! $num ){
+            return '&#x2014;';
+        }
+
+        $link = sprintf( "<a href='%s'>%s %s</a>",
+            admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s', WPGH_BROADCAST, $broadcast->ID ) ),
+            $num,
+            __( 'Contacts', 'groundhogg' )
+        );
+
+        return $link;
+    }
+
+    /**
+     * @param $broadcast WPGH_Broadcast
+     * @return string
+     */
     protected function column_stats( $broadcast )
     {
 
@@ -299,30 +326,6 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
             $time = sprintf( _x( "%s ago", 'status', 'groundhogg'  ), human_time_diff( $dc_time, $cur_time ) );
         }
         return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
-    }
-
-    /**
-     * @param $broadcast WPGH_Broadcast
-     * @return string
-     */
-    protected function column_send_to_tags( $broadcast )
-    {
-        $tags = array();
-
-        foreach ( $broadcast->tags as $i => $tag_id ){
-
-            if ( WPGH()->tags->exists( $tag_id ) ){
-                $tag = WPGH()->tags->get( $tag_id );
-                $tags[$i] = '<a href="'.admin_url('admin.php?page=gh_contacts&view=tag&tag='.$tag_id).'">' . $tag->tag_name . ' ('  . $tag->contact_count . ')</a>';
-            }
-
-        }
-
-        if ( empty( $tags ) ){
-            return '&#x2014;';
-        }
-
-        return implode( ', ', $tags );
     }
 
 	/**

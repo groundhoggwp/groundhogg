@@ -1082,9 +1082,10 @@ function wpgh_round_to_day( $time ){
  * Create a contact quickly from a user account.
  *
  * @param $user WP_User|int
+ * @param $sync_meta bool whether to copy the meta data over.
  * @return WPGH_Contact|false|WP_Error the new contact, false on failure, or WP_Error on error
  */
-function wpgh_create_contact_from_user( $user )
+function wpgh_create_contact_from_user( $user, $sync_meta = false )
 {
 
     if ( is_int( $user ) ) {
@@ -1120,7 +1121,12 @@ function wpgh_create_contact_from_user( $user )
         'optin_status'  => WPGH_UNCONFIRMED
     );
 
+    if ( empty( $args[ 'first_name' ] ) ){
+        $args[ 'first_name' ] = $user->display_name;
+    }
+
     $id = WPGH()->contacts->add( $args );
+
 
     if ( ! $id ){
         return new WP_Error( 'BAD_ARGS', __( 'Could not create contact.', 'groundhogg' ) );
@@ -1128,9 +1134,8 @@ function wpgh_create_contact_from_user( $user )
 
     $contact = wpgh_get_contact( $id );
 
-    /**
-     * Apply roles as tags
-     */
+    // Additional stuff.
+    $contact->update_meta( 'user_login', $user->user_login );
     $roles = wpgh_get_roles_pretty_names( $user->roles );
     $contact->add_tag( $roles );
 

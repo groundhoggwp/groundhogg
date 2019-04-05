@@ -18,6 +18,7 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
     public $importer;
     public $exporter;
     public $deleter;
+    public $syncer;
 
     public function __construct()
     {
@@ -34,9 +35,14 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
             include dirname( __FILE__ ) . '/class-wpgh-delete-bulk-job.php';
         }
 
+        if ( ! class_exists( 'WPGH_Sync_Bulk_Job' ) ){
+            include dirname( __FILE__ ) . '/class-wpgh-sync-bulk-job.php';
+        }
+
         $this->importer = new WPGH_Import_Bulk_Job();
         $this->exporter = new WPGH_Export_Bulk_job();
         $this->deleter  = new WPGH_Delete_Bulk_Job();
+        $this->syncer   = new WPGH_Sync_Bulk_Job();
 
         parent::__construct();
     }
@@ -126,6 +132,10 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
             [
                 'name' => __( 'Export' ),
                 'slug'  => 'export',
+            ],
+            [
+                'name' => __( 'Sync Users & Contacts' ),
+                'slug'  => 'sync',
             ],
             [
                 'name' => __( 'Bulk Delete Contacts' ),
@@ -232,6 +242,48 @@ class WPGH_Admin_Tools extends WPGH_Admin_Page
             </div>
         </div>
         <?php
+    }
+
+    ####### SYNC TAB FUNCTIONS #########
+
+    public function sync_view()
+    {
+        ?>
+        <div class="show-upload-view">
+            <div class="upload-plugin-wrap">
+                <div class="upload-plugin">
+                    <p class="install-help"><?php _e( 'Sync Users & Contacts', 'groundhogg' ); ?></p>
+                    <form method="post" class="wp-upload-form">
+                        <?php wp_nonce_field(); ?>
+                        <?php echo WPGH()->html->input( [
+                            'type' => 'hidden',
+                            'name' => 'action',
+                            'value' => 'bulk_sync',
+                        ] ); ?>
+                        <p><?php _e( 'The sync process will create new contact records for all users in the database. If a contact records already exists then the association will be updated.' ); ?></p>
+<!--                        --><?php //echo WPGH()->html->checkbox( [
+//                            'label'         => 'Sync meta data?',
+//                            'name'          => 'sync_meta',
+//                            'value'         => '1',
+//                            'checked'       => false,
+//                            'required'      => false,
+//                        ] ); ?>
+                        <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
+                            <button style="width: 100%" class="button-primary" name="sync_users" value="sync"><?php _ex('Start Sync Process', 'action', 'groundhogg'); ?></button>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Delete all them contacts.
+     */
+    public function sync_bulk_sync_tool()
+    {
+        $this->syncer->start();
     }
 
     ####### IMPORT TAB FUNCTIONS #########

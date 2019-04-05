@@ -27,19 +27,18 @@ class WPGH_Broadcasts_Page
      */
     public $notices;
     public $order = 20;
+    public $scheduler;
 
     function __construct()
     {
         add_action('admin_menu', array($this, 'register'), $this->order);
+	    $this->notices = WPGH()->notices;
 
-        add_filter( "groundhogg/bulk_job/gh_schedule_broadcast/query", [ $this, 'schedule_broadcast_query' ] );
-        add_filter( "groundhogg/bulk_job/gh_schedule_broadcast/max_items", [ $this, 'schedule_broadcast_max_items' ], 10, 2 );
-
-        if ( wp_doing_ajax() ){
-            add_action( "groundhogg/bulk_job/gh_schedule_broadcast/ajax", [ $this, 'ajax_bulk_schedule' ] );
+        if ( ! class_exists( 'WPGH_Broadcast_Bulk_Job' ) ){
+            include dirname( __FILE__ ) . '/class-wpgh-broadcast-bulk-job.php';
         }
 
-	    $this->notices = WPGH()->notices;
+        $this->scheduler = new WPGH_Broadcast_Bulk_Job();
 
 	    if (isset($_GET['page']) && $_GET['page'] === 'gh_broadcasts') {
 	        add_action('init', array($this, 'process_action'));
@@ -249,10 +248,10 @@ class WPGH_Broadcasts_Page
             return;
         }
 
-        if ( wpgh_ghss_is_active() && $contact_sum > WPGH()->service_manager->get_remaining_credit() ){
-            $this->notices->add('not_enough_credits', sprintf( _x( 'You do not have enough credits to send this broadcast! %s' , 'notice', 'groundhogg'), 'error' ), "<a target='_blank' href='https://www.groundhogg.io/downloads/email-credits/'>Get Credits!</a>" );
-            return;
-        }
+//        if ( wpgh_ghss_is_active() && $contact_sum > WPGH()->service_manager->get_remaining_credit() ){
+//            $this->notices->add('not_enough_credits', sprintf( _x( 'You do not have enough credits to send this broadcast! %s' , 'notice', 'groundhogg'), 'error' ), "<a target='_blank' href='https://www.groundhogg.io/downloads/email-credits/'>Get Credits!</a>" );
+//            return;
+//        }
 
         $send_date = isset($_POST['date']) ? $_POST['date'] : date('Y/m/d', strtotime('tomorrow'));
         $send_time = isset($_POST['time']) ? $_POST['time'] : '09:30';
@@ -305,111 +304,7 @@ class WPGH_Broadcasts_Page
 
         set_transient('gh_get_broadcast_config', $config, HOUR_IN_SECONDS);
 
-        wp_redirect(admin_url(sprintf('admin.php?page=gh_bulk_jobs&action=gh_schedule_broadcast&broadcast=%d', $broadcast_id)));
-        die();
-    }
-
-    public function schedule_broadcast_query( $items )
-    {
-        if ( ! current_user_can( 'schedule_broadcasts' ) ){
-            return $items;
-        }
-
-        $config = get_transient('gh_get_broadcast_config');
-
-        if (!is_array($config)) {
-            return $items;
-        }
-
-        $query = new WPGH_Contact_Query();
-
-        $contacts = $query->query( $config['contact_query'] );
-        $ids = wp_list_pluck( $contacts, 'ID' );
-
-        return $ids;
-    }
-
-    public function schedule_broadcast_max_items( $max, $items )
-    {
-        if ( ! current_user_can( 'schedule_broadcasts' ) ){
-            return $max;
-        }
-
-        return 100;
-    }
-
-    /**
-     * Perform the actual scheduling via ajax to avoid a timeout.
-     */
-    public function ajax_bulk_schedule()
-    {
-
-        if (!current_user_can('schedule_broadcasts')) {
-            return;
-        }
-
-        $config = get_transient('gh_get_broadcast_config');
-
-        if (!is_array($config)) {
-            return;
-        }
-
-        $response = [];
-
-        if ( isset( $_POST[ 'items' ] ) && ! empty($_POST['items'] ) ){
-	        $contact_ids = wp_parse_id_list( $_POST['items'] );
-
-	        $config = wp_parse_args($config, [
-		        'broadcast_id' => 0,
-		        'send_time' => time(),
-		        'send_now' => false,
-		        'send_in_local_time' => false
-	        ]);
-
-	        $broadcast_id = intval($config['broadcast_id']);
-	        $send_time = intval($config['send_time']);
-	        $send_now = filter_var($config['send_now'], FILTER_VALIDATE_BOOLEAN);
-	        $send_in_timezone = filter_var($config['send_in_local_time'], FILTER_VALIDATE_BOOLEAN);
-
-	        $completed = 0;
-
-	        foreach ($contact_ids as $id) {
-
-		        $local_time = $send_time;
-
-		        if ( $send_in_timezone && ! $send_now ) {
-			        $contact = wpgh_get_contact( $id );
-			        $local_time = $contact->get_local_time_in_utc_0( $send_time );
-			        if ($local_time < time()) {
-				        $local_time += DAY_IN_SECONDS;
-			        }
-		        }
-
-		        $args = array(
-			        'time' => $local_time,
-			        'contact_id' => $id,
-			        'funnel_id' => WPGH_BROADCAST,
-			        'step_id' => $broadcast_id,
-			        'status' => 'waiting',
-			        'event_type' => WPGH_BROADCAST_EVENT
-		        );
-
-		        if (WPGH()->events->add($args)) {
-			        $completed++;
-		        }
-	        }
-
-	        $response = [ 'complete' => $completed ];
-        }
-
-        if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
-	        $this->notices->add('scheduled', _x('Broadcast scheduled!', 'notice', 'groundhogg') );
-            delete_transient( 'gh_get_broadcast_config' );
-            $response[ 'return_url' ] = admin_url( 'admin.php?page=gh_broadcasts' );
-        }
-
-        wp_die( json_encode( $response ) );
-
+        $this->scheduler->start( $query );
     }
 
     /**
