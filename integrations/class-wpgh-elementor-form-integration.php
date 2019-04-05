@@ -40,6 +40,7 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
      * @param \ElementorPro\Modules\Forms\Classes\Ajax_Handler $ajax_handler
      */
     public function run( $record, $ajax_handler ) {
+
         $settings = $record->get( 'form_settings' );
 
         //  Make sure that there is a tag to apply
@@ -50,67 +51,27 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
         // Get submitted Form data
         $raw_fields = $record->get( 'fields' );
 
+        //Create a map
+        $map = [];
+
         // Normalize the Form Data
         $fields = [];
         foreach ( $raw_fields as $id => $field ) {
+
+            // Generate the field map
+            $map_id = sprintf( 'map_%s', $id );
+            if ( key_exists( $map_id, $settings ) ){
+                $map[ $id ] = $settings[ $map_id ];
+            }
+
             $fields[ $id ] = $field['value'];
         }
 
-        if ( ! empty( $fields[ 'name' ] ) ){
-        	$parts = wpgh_split_name( $fields[ 'name' ] );
-        	$fields[ 'first_name' ] = $parts[ 0 ];
-        	$fields[ 'last_name' ] = $parts[ 1 ];
+        $contact = wpgh_generate_contact_with_map( $fields, $map );
+
+        if ( $contact ){
+            $contact->apply_tag( wp_parse_id_list( $settings['groundhogg_tags'] ) );
         }
-
-        $args = wp_parse_args( $fields, array(
-            'first_name' => '',
-            'last_name' => '',
-            'email' => ''
-        ) );
-
-        if ( empty( $args[ 'email' ] ) ){
-            return;
-        }
-
-        //magic time
-        $id = WPGH()->contacts->add( $args );
-
-        if ( ! $id ){
-            return;
-        }
-
-        $contact = wpgh_get_contact( $id );
-
-        wpgh_after_form_submit_handler( $contact );
-
-        $ignore = array(
-            'first_name',
-            'last_name',
-            'email'
-        );
-
-        foreach ( $fields as $key => $value ) {
-
-            $key = sanitize_key( $key );
-
-            if ( is_array( $value ) ){
-                $value = implode( ', ', $value );
-            }
-
-            if ( strpos( $value, PHP_EOL  ) !== false ){
-                $value = sanitize_textarea_field( stripslashes( $value ) );
-            } else {
-                $value = sanitize_text_field( stripslashes( $value ) );
-            }
-
-            if ( ! in_array( $key, $ignore ) ){
-                $value = apply_filters( 'wpgh_sanitize_submit_value', $value, null );
-                $contact->update_meta( $key, $value );
-            }
-
-        }
-
-        $contact->apply_tag( wp_parse_id_list( $settings['groundhogg_tags'] ) );
 
     }
 
@@ -155,6 +116,29 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
                 'description' => __( 'Once a contact is created this tag will be applied.', 'groundhogg' ),
             ]
         );
+
+        $fields = $widget->get_settings( 'form_fields' );
+
+        foreach ( $fields as $field ){
+
+            $field_label = $field[ 'field_label' ];
+            $field_id = $field[ '_id' ];
+
+            $map_id = sprintf( 'map_%s', $field_id );
+            $setting_label = sprintf( __( "Map %s", 'groundhogg' ), $field_label );
+
+            $widget->add_control(
+                $map_id,
+                [
+                    'label' => $setting_label,
+                    'label_block' => true,
+                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'multiple' => true,
+                    'options' => wpgh_get_mappable_fields(),
+                    'default' => get_key_from_column_label( $field_id ),
+                ]
+            );
+        }
 
         $widget->end_controls_section();
 

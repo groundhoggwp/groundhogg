@@ -563,7 +563,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
                 'number'   => '-1'
             ) );
 
-            $url = 'https://groundhogg.io/edd-api/v2/products/';
+            $url = 'https://www.groundhogg.io/edd-api/v2/products/';
 
             $response = wp_remote_get( add_query_arg( $args, $url ) );
 

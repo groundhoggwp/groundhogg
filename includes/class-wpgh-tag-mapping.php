@@ -5,6 +5,9 @@
  * Date: 2019-03-28
  * Time: 11:01 AM
  */
+if ( ! class_exists( 'WPGH_Bulk_Job' ) ){
+    include WPGH_PLUGIN_DIR. 'includes/class-wpgh-bulk-job.php';
+}
 
 class WPGH_Tag_Mapping extends WPGH_Bulk_Job
 {
@@ -230,12 +233,8 @@ class WPGH_Tag_Mapping extends WPGH_Bulk_Job
      * @return int
      */
     public function max_items( $max, $items ){
-        $item = array_shift( $items );
-        $fields = count( $item );
         $max = intval( ini_get( 'max_input_vars' ) );
-        $max_items = floor( $max / $fields ) - 1;
-
-        return min( $max_items, 100 );
+        return min( $max, 100 );
     }
 
     /**

@@ -2373,7 +2373,6 @@ function wpgh_generate_contact_with_map( $fields, $map )
     $meta = [];
     $tags = [];
     $notes = [];
-
     $args = [];
 
     foreach ( $fields as $column => $value ){
