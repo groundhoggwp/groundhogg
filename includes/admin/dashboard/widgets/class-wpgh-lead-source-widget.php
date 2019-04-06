@@ -32,17 +32,19 @@ class WPGH_Lead_Source_Widget extends WPGH_Lead_Source_Report_Widget
 
         global $wpdb;
         $table_name = WPGH()->contact_meta->table_name;
-
         $lead_sources = $this->get_lead_sources();
 
-        foreach ( $lead_sources as $lead_source ){
-            if ( ! empty( $lead_source ) ){
-                $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
-                $sources[ $lead_source ] = $num_contacts;
-            }
+        if ( ! empty( $ids ) ){
+	        foreach ( $lead_sources as $lead_source ){
+		        if ( ! empty( $lead_source ) ){
+			        $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
+			        $sources[ $lead_source ] = $num_contacts;
+		        }
+	        }
         }
 
-        if ( empty( $sources ) ){
+
+	    if ( empty( $sources ) ){
             printf( '<p class="description">%s</p>', _x( 'No new lead sources to report.', 'notice', 'groundhogg' ) );
             return;
         }

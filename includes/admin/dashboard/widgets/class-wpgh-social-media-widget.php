@@ -49,20 +49,22 @@ class WPGH_Social_Media_Widget extends WPGH_Lead_Source_Report_Widget
 
         $lead_sources = $this->get_lead_sources();
 
-        foreach ( $lead_sources as $lead_source ){
-            if ( ! empty( $lead_source ) && filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
+        if ( ! empty( $ids ) ){
+	        foreach ( $lead_sources as $lead_source ){
+		        if ( ! empty( $lead_source ) && filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
 
-                /* TO avoid long lists of specifics, limit to just the root domin. */
-                $test_lead_source = parse_url( $lead_source, PHP_URL_HOST );
-                $test_lead_source = str_replace( 'www.', '', $test_lead_source );
+			        /* TO avoid long lists of specifics, limit to just the root domin. */
+			        $test_lead_source = parse_url( $lead_source, PHP_URL_HOST );
+			        $test_lead_source = str_replace( 'www.', '', $test_lead_source );
 
-                foreach ( $this->social_networks as $network_name => $network_urls ){
-                    if ( in_array( $test_lead_source, $network_urls ) ){
-                        $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
-                        $sources[ $lead_source ] = [ 'count' => $num_contacts, 'name' => $network_name ];
-                    }
-                }
-            }
+			        foreach ( $this->social_networks as $network_name => $network_urls ){
+				        if ( in_array( $test_lead_source, $network_urls ) ){
+					        $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
+					        $sources[ $lead_source ] = [ 'count' => $num_contacts, 'name' => $network_name ];
+				        }
+			        }
+		        }
+	        }
         }
 
         if ( empty( $sources ) ){

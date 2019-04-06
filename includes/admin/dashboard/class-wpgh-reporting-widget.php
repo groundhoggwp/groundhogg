@@ -55,7 +55,7 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
      *
      * @var
      */
-    protected static $contacts = [];
+    protected static $contacts = null;
 
     /**
      * WPGH_Reporting_Widget constructor.
@@ -276,7 +276,7 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
     public function get_contacts_created_within_time_range()
     {
 
-        if ( ! empty( self::$contacts ) ){
+        if ( self::$contacts !== null ){
             return self::$contacts;
         }
 
