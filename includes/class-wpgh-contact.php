@@ -466,7 +466,7 @@ class WPGH_Contact
 
         if ( ! is_array( $tag_id_or_array ) ){
 
-            $tags = array( $tag_id_or_array );
+            $tags = explode( ',', $tag_id_or_array );
 
         } else if( is_array( $tag_id_or_array ) ){
 
@@ -510,17 +510,11 @@ class WPGH_Contact
     public function remove_tag( $tag_id_or_array )
     {
         if ( ! is_array( $tag_id_or_array ) ){
-
-            $tags = array( $tag_id_or_array );
-
+	        $tags = explode( ',', $tag_id_or_array );
         } else if( is_array( $tag_id_or_array ) ){
-
             $tags = $tag_id_or_array;
-
         } else {
-
             return false;
-
         }
 
         $tags = WPGH()->tags->validate( $tags );

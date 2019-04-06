@@ -108,15 +108,11 @@ class WPGH_DB_Tags extends WPGH_DB
                 $slug = sanitize_title( $tag_id_or_string );
 
                 if ( $this->exists( $slug, 'tag_slug' ) ) {
-
                     $tag = $this->get_tag_by( 'tag_slug', $slug );
-
                     $tags[] = $tag->tag_id;
 
                 } else {
-
-                    $tags[] = $this->add( array( 'tag_name' => $tag_id_or_string ) );
-
+                    $tags[] = $this->add( array( 'tag_name' => sanitize_text_field( $tag_id_or_string ) ) );
                 }
             }
         }

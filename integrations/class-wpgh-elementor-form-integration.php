@@ -49,14 +49,14 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
         }
 
         // Get submitted Form data
-        $raw_fields = $record->get( 'fields' );
 
-        // Create a map
-        $map = [];
+	    // Create a map
+	    $map = [];
 
-        // Normalize the Form Data
-        $fields = [];
-        foreach ( $raw_fields as $id => $field ) {
+	    // Normalize the Form Data
+	    $fields = [];
+	    $raw_fields = $record->get( 'fields' );
+	    foreach ( $raw_fields as $id => $field ) {
 
 //            // Generate the field map
 //            $map_id = sprintf( 'map_%s', $id );
