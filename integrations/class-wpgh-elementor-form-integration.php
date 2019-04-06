@@ -58,11 +58,11 @@ class WPGH_Elementor_Form_Integration extends \ElementorPro\Modules\Forms\Classe
         $fields = [];
         foreach ( $raw_fields as $id => $field ) {
 
-            // Generate the field map
-            $map_id = sprintf( 'map_%s', $id );
-            if ( key_exists( $map_id, $settings ) ){
-                $map[ $id ] = $settings[ $map_id ];
-            }
+//            // Generate the field map
+//            $map_id = sprintf( 'map_%s', $id );
+//            if ( key_exists( $map_id, $settings ) ){
+//                $map[ $id ] = $settings[ $map_id ];
+//            }
 
             $fields[ $id ] = $field['value'];
         }

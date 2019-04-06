@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.2 =
+* HOT FIX for dashboard db error when no new contacts have been created.
+
 = 1.3.1 =
 * HOT FIX Rollback Elementor integration to previous version as doesn't work when multiplte forms on same page.
 
