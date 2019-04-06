@@ -34,40 +34,37 @@ class WPGH_Social_Media_Widget extends WPGH_Lead_Source_Report_Widget
         $this->social_networks = Spyc::YAMLLoad( WPGH_PLUGIN_DIR . 'includes/lib/potential-known-leadsources/Socials.yml' );
     }
 
+	protected function get_data() {
+
+		$sources = [];
+
+		foreach ( $this->meta_query( 'lead_source' ) as $lead_source ){
+			if ( ! empty( $lead_source ) && filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
+
+				/* TO avoid long lists of specifics, limit to just the root domin. */
+				$test_lead_source = parse_url( $lead_source, PHP_URL_HOST );
+				$test_lead_source = str_replace( 'www.', '', $test_lead_source );
+
+				foreach ( $this->social_networks as $network_name => $network_urls ){
+					if ( in_array( $test_lead_source, $network_urls ) ){
+						$num_contacts = $this->meta_query_count( 'lead_source', $lead_source );
+						$sources[ $lead_source ] = [ 'count' => $num_contacts, 'name' => $network_name ];
+					}
+				}
+			}
+		}
+
+		return $sources;
+	}
+
     /**
      * Get table of lead sources
      */
     public function widget()
     {
-        $contact_ids = $this->get_contact_ids_created_within_time_range();
-        $ids = implode( ',', $contact_ids );
+	    $sources = $this->get_data();
 
-        $sources = array();
-
-        global $wpdb;
-        $table_name = WPGH()->contact_meta->table_name;
-
-        $lead_sources = $this->get_lead_sources();
-
-        if ( ! empty( $ids ) ){
-	        foreach ( $lead_sources as $lead_source ){
-		        if ( ! empty( $lead_source ) && filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
-
-			        /* TO avoid long lists of specifics, limit to just the root domin. */
-			        $test_lead_source = parse_url( $lead_source, PHP_URL_HOST );
-			        $test_lead_source = str_replace( 'www.', '', $test_lead_source );
-
-			        foreach ( $this->social_networks as $network_name => $network_urls ){
-				        if ( in_array( $test_lead_source, $network_urls ) ){
-					        $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
-					        $sources[ $lead_source ] = [ 'count' => $num_contacts, 'name' => $network_name ];
-				        }
-			        }
-		        }
-	        }
-        }
-
-        if ( empty( $sources ) ){
+	    if ( empty( $sources ) ){
             printf( '<p class="description">%s</p>', _x( 'No new social media sources to report.', 'notice', 'groundhogg' ) );
             return;
         }
@@ -117,33 +114,9 @@ class WPGH_Social_Media_Widget extends WPGH_Lead_Source_Report_Widget
      */
     protected function get_export_data()
     {
-        $contact_ids = $this->get_contact_ids_created_within_time_range();
-        $ids = implode( ',', $contact_ids );
+	    $sources = $this->get_data();
 
-        $sources = array();
-
-        global $wpdb;
-        $table_name = WPGH()->contact_meta->table_name;
-
-        $lead_sources = $this->get_lead_sources();
-
-        foreach ( $lead_sources as $lead_source ){
-            if ( ! empty( $lead_source ) && filter_var( $lead_source, FILTER_VALIDATE_URL ) ){
-
-                /* TO avoid long lists of specifics, limit to just the root domin. */
-                $test_lead_source = parse_url( $lead_source, PHP_URL_HOST );
-                $test_lead_source = str_replace( 'www.', '', $test_lead_source );
-
-                foreach ( $this->social_networks as $network_name => $network_urls ){
-                    if ( in_array( $test_lead_source, $network_urls ) ){
-                        $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'lead_source', $lead_source ) );
-                        $sources[ $lead_source ] = [ 'count' => $num_contacts, 'name' => $network_name ];
-                    }
-                }
-            }
-        }
-
-        if ( empty( $sources ) ){
+	    if ( empty( $sources ) ){
             return _x( 'No new social media sources to report.', 'notice', 'groundhogg' );
         }
 

@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.3 =
+* ADDED New meta_query & meta_query_count helpers to the DB widgets to cut down on duplicate code.
+
 = 1.3.2 =
 * HOT FIX for dashboard db error when no new contacts have been created.
 

@@ -19,25 +19,25 @@ class WPGH_UTM_Campaign_Widget extends WPGH_Reporting_Widget
         parent::__construct();
     }
 
-    /**
+    protected function get_data() {
+
+        $sources = [];
+
+	    foreach ( $this->meta_query( 'utm_campaign' ) as $campaign ){
+		    $num_contacts = $this->meta_query_count( 'utm_campaign', $campaign );
+		    $sources[ $campaign ] = $num_contacts;
+	    }
+
+	    return $sources;
+    }
+
+	/**
      * Get table of lead sources
      */
     public function widget()
     {
-        $contact_ids = $this->get_contact_ids_created_within_time_range();
-        $ids = implode( ',', $contact_ids );
 
-        $sources = array();
-
-        global $wpdb;
-        $table_name = WPGH()->contact_meta->table_name;
-
-        $campaigns = wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", 'utm_campaign' ) ), 'meta_value' );
-
-        foreach ( $campaigns as $campaign ){
-            $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'utm_campaign', $campaign ) );
-            $sources[ $campaign ] = $num_contacts;
-        }
+	    $sources = $this->get_data();
 
         if ( empty( $sources ) ){
             printf( '<p class="description">%s</p>', _x( 'Nothing new to report.', 'notice', 'groundhogg' ) );

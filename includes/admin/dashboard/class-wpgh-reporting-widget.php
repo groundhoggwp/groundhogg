@@ -195,11 +195,6 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
 
         $this->start_range = $this->start_time;
         $this->end_range = $this->start_range + $this->difference;
-
-//        $this->start_time = convert_to_local_time( $this->start_time );
-//        $this->end_time = convert_to_local_time( $this->end_time );
-//        $this->start_range = convert_to_local_time( $this->start_range );
-//        $this->end_range = convert_to_local_time( $this->end_range );
     }
 
     /**
@@ -298,4 +293,84 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
     {
         return wp_parse_id_list( wp_list_pluck( $this->get_contacts_created_within_time_range() , 'ID' ) );
     }
+
+	public static $meta_query_results = [];
+
+	/**
+	 * @param $meta_key
+	 *
+	 * @return array
+	 */
+	public function meta_query( $meta_key='' )
+	{
+		global $wpdb;
+		$cache_key = md5( $meta_key );
+
+		if ( key_exists( $cache_key, self::$meta_query_results ) ){
+			return self::$meta_query_results[ $cache_key ];
+		}
+
+		$contact_ids = $this->get_contact_ids_created_within_time_range();
+		$ids = implode( ',', $contact_ids );
+
+		$results = [];
+
+		if ( empty( $ids ) ){
+			return $results;
+		}
+
+		$table_name = WPGH()->contact_meta->table_name;
+		$results = wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", 'source_page' ) ), 'meta_value' );
+
+		self::$meta_query_results[ $cache_key ] = $results;
+
+		return $results;
+	}
+
+	/**
+	 * @param string $meta_key
+	 * @param string $meta_value
+	 *
+	 * @return mixed|null|string
+	 */
+	public function meta_query_count( $meta_key='', $meta_value='' ){
+
+		global $wpdb;
+
+		$cache_key = md5( implode( '|', [ $meta_key, $meta_value ] ) );
+
+		if ( key_exists( $cache_key, self::$meta_query_results ) ){
+			return self::$meta_query_results[ $cache_key ];
+		}
+
+		$table_name = WPGH()->contact_meta->table_name;
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM {$table_name} WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( {$this->get_id_list_string()} )", $meta_key, $meta_value ) );
+
+		self::$meta_query_results[ $cache_key ] = $count;
+
+		return $count;
+
+	}
+
+	/**
+     * The list of IDs used in query
+     *
+	 * @return string
+	 */
+	public function get_id_list_string()
+    {
+	    $contact_ids = $this->get_contact_ids_created_within_time_range();
+
+	    $list = implode( ',', $contact_ids );
+
+	    if ( empty( $list ) )
+	        return '0';
+
+	    return $list;
+    }
+
+	/**
+	 * @return array
+	 */
+    protected function get_data(){ return []; }
 }

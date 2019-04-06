@@ -19,49 +19,27 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
         parent::__construct();
     }
 
-    public static $source_pages = [];
+	protected function get_data() {
 
-    public function get_source_pages()
-    {
-        if ( ! empty( self::$source_pages ) ){
-            return self::$source_pages;
-        }
+		$sources = [];
 
-        $contact_ids = $this->get_contact_ids_created_within_time_range();
-        $ids = implode( ',', $contact_ids );
+		foreach ( $this->meta_query( 'source_page' ) as $source_page ){
+			$num_contacts = $this->meta_query_count( 'source_page', $source_page );
+			$sources[ $source_page ] = $num_contacts;
+		}
 
-        $sources = array();
-
-        global $wpdb;
-        $table_name = WPGH()->contact_meta->table_name;
-        self::$source_pages = wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", 'source_page' ) ), 'meta_value' );
-
-        return self::$source_pages;
-    }
+		return $sources;
+	}
 
     /**
      * Get table of lead sources
      */
     public function widget()
     {
-        $contact_ids = $this->get_contact_ids_created_within_time_range();
-        $ids = implode( ',', $contact_ids );
 
-        $sources = array();
+	    $sources = $this->get_data();
 
-        global $wpdb;
-        $table_name = WPGH()->contact_meta->table_name;
-
-        $source_pages = $this->get_source_pages();
-
-        foreach ( $source_pages as $source_page ){
-            if ( ! empty( $source_page ) ){
-                $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'source_page', $source_page ) );
-                $sources[ $source_page ] = $num_contacts;
-            }
-        }
-
-        if ( empty( $sources ) ){
+	    if ( empty( $sources ) ){
             printf( '<p class="description">%s</p>', _x( 'No new lead sources to report.', 'notice', 'groundhogg' ) );
             return;
         }
@@ -105,25 +83,9 @@ class WPGH_Source_Page_Widget extends WPGH_Reporting_Widget
 
     protected function get_export_data()
     {
-        $contact_ids = $this->get_contact_ids_created_within_time_range();
-        $ids = implode( ',', $contact_ids );
+	    $sources = $this->get_data();
 
-        $sources = array();
-
-        global $wpdb;
-        $table_name = WPGH()->contact_meta->table_name;
-
-        $source_pages = $this->get_source_pages();
-
-        foreach ( $source_pages as $source_page ){
-            if ( ! empty( $source_page ) ){
-                $num_contacts = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM $table_name WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( $ids )", 'source_page', $source_page ) );
-                $sources[ $source_page ] = $num_contacts;
-            }
-        }
-
-
-        if ( empty( $sources ) ){
+	    if ( empty( $sources ) ){
             return _x( 'No new sources to report.', 'notice', 'groundhogg' );
         }
 
