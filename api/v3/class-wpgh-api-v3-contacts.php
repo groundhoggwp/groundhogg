@@ -400,7 +400,11 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
         // insert data in contact meta table if users send meta data
         if ( $meta ) {
             foreach( $meta as $key => $value ) {
-                $contact->update_meta( sanitize_key( $key ), sanitize_text_field( $value ) );
+                if($key === 'notes') {
+                    $contact->update_meta( sanitize_key( $key ), sanitize_textarea_field( $value ) );
+                } else {
+                    $contact->update_meta( sanitize_key( $key ), sanitize_text_field( $value ) );
+                }
             }
         }
 
