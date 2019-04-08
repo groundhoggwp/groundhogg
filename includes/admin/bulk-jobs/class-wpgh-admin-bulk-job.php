@@ -223,7 +223,7 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
                             type: "post",
                             url: ajaxurl,
                             dataType: 'json',
-                            data: { action: 'bulk_action_listener', bulk_action: '<?php echo "groundhogg/bulk_job/{$this->get_action()}/ajax" ?>', items: bp.getItems(), _wpnonce: <?php echo wp_create_nonce( $this->get_action() ); ?>, the_end: bp.isLastOfThem() },
+                            data: { action: 'bulk_action_listener', bulk_action: '<?php echo "groundhogg/bulk_job/{$this->get_action()}/ajax" ?>', items: bp.getItems(), _wpnonce: '<?php echo wp_create_nonce( $this->get_action() ); ?>', the_end: bp.isLastOfThem() },
                             success: function( response ){
 
                                 console.log(response);
