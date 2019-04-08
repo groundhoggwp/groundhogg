@@ -1,10 +1,13 @@
 <?php
 namespace ElementorPro\Modules\Forms\Actions;
 
+use Elementor\Control_Repeater;
 use Elementor\Controls_Manager;
+use Elementor\Repeater;
 use ElementorPro\Modules\Forms\Classes\Form_Record;
 use ElementorPro\Modules\Forms\Classes\Integration_Base;
 use ElementorPro\Modules\Forms\Controls\Fields_Map;
+use ElementorPro\Modules\Forms\Controls\Gh_Fields_Map;
 use ElementorPro\Classes\Utils;
 use Elementor\Settings;
 
@@ -14,56 +17,73 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Groundhogg extends Integration_Base {
 
-	public function get_name() {
-		return 'groundhogg';
+    public function __construct()
+    {
+        add_action( 'elementor/editor/footer', [ $this, 'enqueue' ] );
+    }
+
+    public function enqueue()
+    {
+        wp_enqueue_script( 'gh-elementor', plugin_dir_url( __FILE__ ) . 'elementor.js', [ 'elementor-pro' ], WPGH()->version );
+
+        $mappable_fields = wpgh_get_mappable_fields();
+        $fields = [];
+
+        foreach ( $mappable_fields as $field_id => $field_label ){
+            $fields[] = [
+                'remote_id'         => $field_id,
+                'remote_label'      => $field_label,
+                'remote_type'       => 'text',
+                'remote_required'   => in_array( $field_id, [ 'email' ] ),
+            ];
+        }
+
+        wp_localize_script( 'gh-elementor', 'ghMappableFields', [
+            'fields' => $fields
+        ] );
+    }
+
+    public function get_name() {
+		return 'groundhogg_v2';
 	}
 
 	public function get_label() {
-		return __( 'Groundhogg', 'elementor-pro' );
+		return __( 'Groundhogg (v2)', 'elementor-pro' );
 	}
 
 	public function register_settings_section( $widget ) {
 		$widget->start_controls_section(
 			'section_groundhogg',
 			[
-				'label' => __( 'Groundhogg', 'elementor-pro' ),
+				'label' => __( 'Groundhogg (v2)', 'elementor-pro' ),
 				'condition' => [
 					'submit_actions' => $this->get_name(),
 				],
 			]
 		);
 
-		$widget->add_control(
+        $widget->add_control(
+            'groundhogg_tags',
+            [
+                'label' => __( 'Apply Tags', 'elementor-pro' ),
+                'type' => Controls_Manager::SELECT2,
+                'options' => WPGH()->tags->get_tags_select(),
+                'multiple' => true,
+                'label_block' => false,
+            ]
+        );
+
+        $widget->add_control(
 			'groundhogg_fields_map',
 			[
 				'label' => __( 'Field Mapping', 'elementor-pro' ),
-				'type' => Fields_Map::CONTROL_TYPE,
+				'type' => Gh_Fields_Map::CONTROL_TYPE,
 				'separator' => 'before',
-				'fields' => [
-					[
-						'name' => 'remote_id',
-						'type' => Controls_Manager::HIDDEN,
-					],
-					[
-						'name' => 'local_id',
-						'type' => Controls_Manager::SELECT,
-					],
-				],
+                'render_type' => 'none',
 			]
 		);
 
-		$widget->add_control(
-			'groundhogg_tags',
-			[
-				'label' => __( 'Tags', 'elementor-pro' ),
-				'type' => Controls_Manager::SELECT2,
-				'options' => [],
-				'multiple' => true,
-				'label_block' => true,
-			]
-		);
-
-		$widget->end_controls_section();
+        $widget->end_controls_section();
 	}
 
 	public function on_export( $element ) {
@@ -85,7 +105,7 @@ class Groundhogg extends Integration_Base {
 		$subscriber = $this->create_subscriber_object( $record );
 
 		if ( ! $subscriber ) {
-			$ajax_handler->add_admin_error_message( __( 'Groundhogg Integration requires an email field', 'elementor-pro' ) );
+			$ajax_handler->add_admin_error_message( __( 'Groundhogg integration requires an email field.', 'elementor-pro' ) );
 			return;
 		}
 
@@ -105,13 +125,17 @@ class Groundhogg extends Integration_Base {
 	private function create_subscriber_object( Form_Record $record ) {
 
 		$map = $this->get_fields_map( $record );
-		$fields = $this->get_normalized_fields( $record );
 
-		if ( ! isset( $fields['email'] ) ) {
-			return false;
-		}
+        if ( ! in_array( 'email', $map ) ) {
+            return false;
+        }
 
-		$contact = wpgh_generate_contact_with_map( $fields, $map );
+        $fields = $this->get_normalized_fields( $record );
+        $contact = wpgh_generate_contact_with_map( $fields, $map );
+
+        if ( $contact ){
+            wpgh_after_form_submit_handler( $contact );
+        }
 
 		return $contact;
 	}
@@ -124,14 +148,15 @@ class Groundhogg extends Integration_Base {
 	private function get_fields_map( Form_Record $record ) {
 		$map = [];
 
-		// Other form has a field mapping
-		foreach ( $record->get_form_settings( 'groundhogg_fields_map' ) as $map_item ) {
-			if ( empty( $fields[ $map_item['local_id'] ]['value'] ) ) {
-				continue;
-			}
+		$fields_map = $record->get_form_settings( 'groundhogg_fields_map' );
 
-			$map[ $map_item[ 'local_id' ] ] = $map[ $map_item[ 'remote_id' ] ];
-		}
+		foreach ( $fields_map as $map_item ) {
+
+		    if ( ! empty( $map_item[ 'remote_id' ] ) ){
+                $map[ $map_item[ 'local_id' ] ] = $map_item[ 'remote_id' ];
+            }
+
+        }
 
 		return $map;
 	}

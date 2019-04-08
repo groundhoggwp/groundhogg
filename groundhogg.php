@@ -443,9 +443,25 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          */
         private function register_integrations()
         {
+            add_action( 'elementor/controls/controls_registered', function (){
+                include_once dirname(__FILE__) . '/integrations/elementor/fields-map.php';
+                \Elementor\Plugin::instance()->controls_manager->register_control( 'gh_fields_map', new \ElementorPro\Modules\Forms\Controls\Gh_Fields_Map() );
+            } );
+
+            /* New Elementor Integration */
             add_action( 'elementor_pro/init', function() {
                 // Here its safe to include our action class file
-                include_once dirname( __FILE__ ) . '/integrations/class-wpgh-elementor-form-integration.php';
+                include_once dirname(__FILE__) . '/integrations/elementor/groundhogg.php';
+                // Instantiate the action class
+                $groundhogg_action = new \ElementorPro\Modules\Forms\Actions\Groundhogg();
+                // Register the action with form widget
+                \ElementorPro\Plugin::instance()->modules_manager->get_modules('forms')->add_form_action($groundhogg_action->get_name(), $groundhogg_action);
+            });
+
+            /* Old Elementor Integration. */
+            add_action( 'elementor_pro/init', function() {
+                // Here its safe to include our action class file
+                include_once dirname(__FILE__) . '/integrations/elementor/class-wpgh-elementor-form-integration.php';
                 // Instantiate the action class
                 $groundhogg_action = new WPGH_Elementor_Form_Integration();
                 // Register the action with form widget
