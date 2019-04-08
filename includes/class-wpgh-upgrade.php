@@ -267,8 +267,11 @@ class WPGH_Upgrade{
         WPGH()->status_tag_mapper->install_default_tags();
     }
 
+	/**
+	 * install other caps.
+	 */
     public function version_1_3_5()
     {
-
+		WPGH()->roles->add_caps();
     }
 }
