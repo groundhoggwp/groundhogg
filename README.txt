@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.5 =
+* FIXED remote code execution (RCE) vulnerability (https://www.pluginvulnerabilities.com/2019/04/05/our-proactive-monitoring-caught-an-authenticated-remote-code-execution-rce-vulnerability-being-introduced-in-to-groundhogg/)
+
 = 1.3.4 =
 * FIXED Fixed the new Elementor integration which was disabled in 1.3.1. Elementor Integration now supports complex field mapping.
 

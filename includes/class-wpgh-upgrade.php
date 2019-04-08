@@ -67,6 +67,7 @@ class WPGH_Upgrade{
         $this->update_to_version( '1.2.6' );
         $this->update_to_version( '1.2.10.3' );
         $this->update_to_version( '1.3' );
+        $this->update_to_version( '1.3.5' );
     }
 
     /**
@@ -264,5 +265,10 @@ class WPGH_Upgrade{
     {
         wpgh_update_option( 'gh_optin_status_job', true );
         WPGH()->status_tag_mapper->install_default_tags();
+    }
+
+    public function version_1_3_5()
+    {
+
     }
 }
