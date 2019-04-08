@@ -44,7 +44,9 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
 	        return;
         }
 
-	    do_action( $bulk_action );
+	    $action = "groundhogg/bulk_job/{$bulk_action}/ajax";
+
+	    do_action( $action );
     }
 
     protected function get_parent_slug()
@@ -223,7 +225,7 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
                             type: "post",
                             url: ajaxurl,
                             dataType: 'json',
-                            data: { action: 'bulk_action_listener', bulk_action: '<?php echo "groundhogg/bulk_job/{$this->get_action()}/ajax" ?>', items: bp.getItems(), _wpnonce: '<?php echo wp_create_nonce( $this->get_action() ); ?>', the_end: bp.isLastOfThem() },
+                            data: { action: 'bulk_action_listener', bulk_action: '<?php echo $this->get_action(); ?>', items: bp.getItems(), _wpnonce: '<?php echo wp_create_nonce(  $this->get_action() ); ?>', the_end: bp.isLastOfThem() },
                             success: function( response ){
 
                                 console.log(response);
