@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.4 =
+* FIXED Fixed the new Elementor integration which was disabled in 1.3.1. Elementor Integration now supports complex field mapping.
+
 = 1.3.3 =
 * ADDED New meta_query & meta_query_count helpers to the DB widgets to cut down on duplicate code.
 
