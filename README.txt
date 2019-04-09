@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.6 =
+* Just a notification to prompt users to update to plugin with resolved vulnerabilities.
+
 = 1.3.5 =
 * FIXED remote code execution (RCE) vulnerability (https://www.pluginvulnerabilities.com/2019/04/05/our-proactive-monitoring-caught-an-authenticated-remote-code-execution-rce-vulnerability-being-introduced-in-to-groundhogg/)
 
