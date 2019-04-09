@@ -94,18 +94,12 @@ class WPGH_Email_Confirmed extends WPGH_Funnel_Step
             return;
         }
 
-        $steps = WPGH()->steps->get_steps( array( 'step_type' => $this->type, 'step_group' => $this->group, 'funnel_id' => $funnel_id ) );
-
+        $steps = $this->get_like_steps();
         $s = false;
-
         foreach ( $steps as $step ){
-
             $step = wpgh_get_funnel_step( $step->ID );
-
             if ( $step->can_complete( $contact ) ){
-
                 $s = $step->enqueue( $contact );
-
             }
 
         }

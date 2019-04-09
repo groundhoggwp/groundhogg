@@ -173,7 +173,7 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
      */
     public function complete( $ref, $contact )
     {
-        $steps = WPGH()->steps->get_steps( array( 'step_type' => $this->type, 'step_group' => $this->group ) );
+        $steps = $this->get_like_steps();
 
         if ( empty( $steps ) )
             return;
@@ -181,8 +181,6 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
         $s = false;
 
         foreach ( $steps as $step ) {
-
-            $step = wpgh_get_funnel_step( $step->ID );
 
             if ( $step->can_complete( $contact ) ){
 

@@ -116,14 +116,12 @@ class WPGH_Tag_Removed extends WPGH_Funnel_Step
         if ( ! $contact->has_tag( $tag_id ) )
             return;
 
-        $steps = WPGH()->steps->get_steps( array( 'step_type' => $this->type, 'step_group' => $this->group ) );
+        $steps = $this->get_like_steps();
 
         if ( empty( $steps ) )
             return;
 
         foreach ( $steps as $step ){
-
-            $step = wpgh_get_funnel_step( $step->ID );
 
             $tags = $step->get_meta( 'tags' );
 
