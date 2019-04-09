@@ -119,7 +119,7 @@ class WPGH_Step implements WPGH_Event_Process
 
     public function exists()
     {
-        return $this->funnel_id > 0 && $this->order > 0;
+        return $this->funnel_id > 0 && $this->type && $this->group;
     }
 
     public function get_ID()
