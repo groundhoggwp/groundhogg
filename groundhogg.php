@@ -517,6 +517,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/queue/class-wpgh-step.php';
 
             /* Core Files */
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-object.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-bounce-checker.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-contact.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-contact-query.php';
