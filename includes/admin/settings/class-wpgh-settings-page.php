@@ -378,7 +378,6 @@ class WPGH_Settings_Page
                 'type' => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),
-                    //keep brackets for backwards compat
                     'name'          => 'gh_send_notifications_on_event_failure',
                     'id'            => 'gh_send_notifications_on_event_failure',
                     'value'         => 'on',
@@ -423,6 +422,19 @@ class WPGH_Settings_Page
                         'every_5_minutes' => 'Every 5 Minutes',
                         'every_10_minutes' => 'Every 10 Minutes',
                     ),
+                ),
+            ),
+            'gh_script_debug' => array(
+                'id'        => 'gh_script_debug',
+                'section'   => 'misc_info',
+                'label'     => _x( 'Enable Script Debug Mode', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'This will attempt to load full JS files instead of minified JS files for debugging.', 'settings', 'groundhogg' ),
+                'type'      => 'checkbox',
+                'atts'      => array(
+                    'label'         => __( 'Enable' ),
+                    'name'          => 'gh_script_debug',
+                    'id'            => 'gh_script_debug',
+                    'value'         => 'on',
                 ),
             ),
             'gh_confirmation_page' => array(

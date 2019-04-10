@@ -267,13 +267,16 @@ class WPGH_Superlinks_Page
                             </div>
                             <div class="form-field term-target-wrap">
                                 <label for="superlink-target"><?php _e( 'Target URL', 'groundhogg' ) ?></label>
-                                <input name="superlink_target" id="superlink-target" type="url" value="" autocomplete="off" required>
-                                <p><a href="#" id="insert-link" data-target="superlink-target"><?php _e( 'Insert Link' ); ?></a> | <?php _e( 'Insert a url that this link will direct to. This link can contain simple replacement codes.', 'groundhogg' ); ?></p>
-                                <script>
-                                    jQuery( function($){
-                                        $( '#insert-link' ).linkPicker();
-                                    });
-                                </script>
+                                <?php
+                                $args = array(
+                                    'type'      => 'url',
+                                    'id'        => 'superlink_target',
+                                    'name'      => 'superlink_target',
+                                    'title'     => __( 'Superlink target' ),
+                                );
+
+                                echo WPGH()->html->link_picker( $args ); ?>
+                                <p><?php _e( 'Insert a url that this link will direct to. This link can contain simple replacement codes.', 'groundhogg' ); ?></p>
                             </div>
                             <div class="form-field term-tag-wrap">
                                 <label for="superlink-description"><?php _e( 'Apply Tags When Clicked', 'groundhogg' ) ?></label>
@@ -312,12 +315,6 @@ class WPGH_Superlinks_Page
 
 	function page()
 	{
-
-		wp_enqueue_editor();
-		wp_enqueue_script('wplink');
-		wp_enqueue_style('editor-buttons');
-		wp_enqueue_script( 'link-picker', WPGH_ASSETS_FOLDER . '/js/admin/link-picker.js' );
-		
 		?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1><a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_superlinks' ); ?>"><?php _ex( 'Add New', 'page_tile_action','groundhogg' ); ?></a>

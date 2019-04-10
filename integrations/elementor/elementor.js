@@ -1,10 +1,5 @@
 (function ( e, ep, fields, $ ) {
 
-    /**
-     * Groundhogg Integration.
-     *
-     * @type {{updateFieldsMapping: updateFieldsMapping, getName: (function(): string), onTagsUpdate: onTagsUpdate, getGroundhoggCache: getGroundhoggCache, onElementChange: onElementChange}}
-     */
     var GroundhoggIntegration = {
         fields: fields,
 
@@ -14,32 +9,17 @@
 
         onElementChange: function onElementChange( setting ) {
             var self = this;
-            if ( setting.indexOf( "groundhogg" ) !== -1 ){
+            if ( setting.indexOf( "groundhogg_v2" ) !== -1 ){
                 self.updateFieldsMapping();
             }
         },
 
         updateFieldsMapping: function updateFieldsMapping() {
-            this.getEditorControlView( 'groundhogg_fields_map' ).updateMap();
+            this.getEditorControlView( 'groundhogg_v2_fields_map' ).updateMap();
         },
-
-        getGroundhoggCache: function getGroundhoggCache(type, action, cacheKey, requestArgs) {
-            if (_.has(this.cache[type], cacheKey)) {
-                var data = {};
-                data[type] = this.cache[type][cacheKey];
-                return jQuery.Deferred().resolve(data);
-            }
-
-            requestArgs = _.extend({}, requestArgs, {
-                service: 'groundhogg_v2',
-                groundhogg_action: action,
-            });
-
-            return this.fetchCache(type, cacheKey, requestArgs);
-        }
     };
 
-    GroundhoggIntegration = Object.assign( GroundhoggIntegration, ep.modules.forms.activecampaign );
+    GroundhoggIntegration = Object.assign( ep.modules.forms.activecampaign, GroundhoggIntegration );
     ep.modules.forms.groundhogg = GroundhoggIntegration;
 
     /**

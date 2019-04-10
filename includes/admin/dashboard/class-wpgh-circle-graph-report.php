@@ -10,15 +10,6 @@ abstract class WPGH_Circle_Graph_Report extends WPGH_Reporting_Widget
 {
 
     /**
-     * Enqueue chart scripts
-     */
-    public function scripts()
-    {
-        wp_enqueue_script( 'jquery-flot', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
-        wp_enqueue_script( 'jquery-flot-pie', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.pie.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.pie.js') );
-    }
-
-    /**
      * Output the widget HTML
      */
     public function widget()

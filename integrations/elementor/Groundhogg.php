@@ -17,32 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Groundhogg extends Integration_Base {
 
-    public function __construct()
-    {
-        add_action( 'elementor/editor/footer', [ $this, 'enqueue' ] );
-    }
-
-    public function enqueue()
-    {
-        wp_enqueue_script( 'gh-elementor', plugin_dir_url( __FILE__ ) . 'elementor.js', [ 'elementor-pro' ], WPGH()->version );
-
-        $mappable_fields = wpgh_get_mappable_fields();
-        $fields = [];
-
-        foreach ( $mappable_fields as $field_id => $field_label ){
-            $fields[] = [
-                'remote_id'         => $field_id,
-                'remote_label'      => $field_label,
-                'remote_type'       => 'text',
-                'remote_required'   => in_array( $field_id, [ 'email' ] ),
-            ];
-        }
-
-        wp_localize_script( 'gh-elementor', 'ghMappableFields', [
-            'fields' => $fields
-        ] );
-    }
-
     public function get_name() {
 		return 'groundhogg_v2';
 	}
@@ -53,7 +27,7 @@ class Groundhogg extends Integration_Base {
 
 	public function register_settings_section( $widget ) {
 		$widget->start_controls_section(
-			'section_groundhogg',
+			'section_groundhogg_v2',
 			[
 				'label' => __( 'Groundhogg (v2)', 'elementor-pro' ),
 				'condition' => [
@@ -63,7 +37,7 @@ class Groundhogg extends Integration_Base {
 		);
 
         $widget->add_control(
-            'groundhogg_tags',
+            'groundhogg_v2_tags',
             [
                 'label' => __( 'Apply Tags', 'elementor-pro' ),
                 'type' => Controls_Manager::SELECT2,
@@ -74,12 +48,25 @@ class Groundhogg extends Integration_Base {
         );
 
         $widget->add_control(
-			'groundhogg_fields_map',
+			'groundhogg_v2_fields_map',
 			[
 				'label' => __( 'Field Mapping', 'elementor-pro' ),
 				'type' => Gh_Fields_Map::CONTROL_TYPE,
 				'separator' => 'before',
-                'render_type' => 'none',
+//                'render_type' => 'none',
+//                'fields' => [
+//                    [
+//                        'name' => 'local_id',
+//                        'type' => Controls_Manager::HIDDEN,
+//                    ],
+//                    [
+//                        'name' => 'remote_id',
+//                        'type' => Controls_Manager::SELECT,
+//                    ],
+//                ],
+                'condition' => [
+                    'groundhogg_v2_tags!' => '',
+                ],
 			]
 		);
 
@@ -88,8 +75,8 @@ class Groundhogg extends Integration_Base {
 
 	public function on_export( $element ) {
 		unset(
-			$element['settings']['groundhogg_fields_map'],
-			$element['settings']['groundhogg_tags']
+			$element['settings']['groundhogg_v2_fields_map'],
+			$element['settings']['groundhogg_v2_tags']
 		);
 
 		return $element;
@@ -109,8 +96,8 @@ class Groundhogg extends Integration_Base {
 			return;
 		}
 
-		if ( '' !== $form_settings['groundhogg_tags'] ) {
-			$subscriber->apply_tag( wp_parse_id_list( $form_settings['groundhogg_tags'] ) );
+		if ( '' !== $form_settings['groundhogg_v2_tags'] ) {
+			$subscriber->apply_tag( wp_parse_id_list( $form_settings['groundhogg_v2_tags'] ) );
 		}
 	}
 
@@ -148,7 +135,7 @@ class Groundhogg extends Integration_Base {
 	private function get_fields_map( Form_Record $record ) {
 		$map = [];
 
-		$fields_map = $record->get_form_settings( 'groundhogg_fields_map' );
+		$fields_map = $record->get_form_settings( 'groundhogg_v2_fields_map' );
 
 		foreach ( $fields_map as $map_item ) {
 

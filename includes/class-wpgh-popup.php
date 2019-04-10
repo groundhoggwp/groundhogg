@@ -19,29 +19,26 @@ class WPGH_Popup
     public static $instance;
 
 	private function __construct() {
-
 		add_action( 'admin_footer', array( $this, 'popup' ) );
-
 		if ( ! did_action( 'admin_enqueue_scripts' ) ){
             add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
         } else {
 		    $this->scripts();
         }
-
     }
 
 	public function scripts()
 	{
-		wp_enqueue_script( 'wpgh-modal', WPGH_ASSETS_FOLDER . 'js/admin/modal.min.js', array( 'wp-color-picker' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/modal.min.js' ) );
-        wp_localize_script('wpgh-modal', 'wpghModalDefaults', array(
+        wp_enqueue_style( 'groundhogg-admin-modal' );
+        wp_enqueue_script( 'groundhogg-admin-modal' );
+        wp_localize_script('groundhogg-admin-modal', 'wpghModalDefaults', array(
             'title'     => 'Modal',
             'footertext' => __( 'Save Changes' ),
             'height'    => 500,
             'width'     => 500,
             'footer'    => 'true',
         ) );
-        wp_enqueue_style( 'wpgh-modal', WPGH_ASSETS_FOLDER . 'css/admin/modal.css', array( 'wp-color-picker' ), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/modal.css' ) );
-	}
+    }
 
 	public function popup()
 	{

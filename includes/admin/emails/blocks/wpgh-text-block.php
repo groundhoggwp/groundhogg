@@ -31,11 +31,12 @@ class WPGH_Text_Block extends WPGH_Email_Block
         $this->title = __( 'Text Block', 'groundhogg' );
 
         wp_enqueue_editor();
-        wp_enqueue_script('wplink');
         wp_enqueue_style('editor-buttons');
-        wp_enqueue_style('simple-editor', WPGH_ASSETS_FOLDER . 'css/admin/simple-editor.css' );
-        wp_enqueue_script('simple-editor', WPGH_ASSETS_FOLDER . 'js/admin/simple-editor.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/simple-editor.min.js' ) );
-        wp_enqueue_script( 'wpgh-text-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/text.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/text.min.js' ) );
+        wp_enqueue_style('groundhogg-admin-simple-editor' );
+
+        wp_enqueue_script('wplink');
+        wp_enqueue_script( 'groundhogg-admin-simple-editor' );
+        wp_enqueue_script( 'groundhogg-email-text' );
 
         parent::__construct();
 

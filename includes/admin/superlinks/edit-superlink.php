@@ -29,13 +29,18 @@ $superlink = WPGH()->superlinks->get_superlink( $id );
         </tr>
         <tr class="form-field term-target-wrap">
             <th scope="row"><label for="superlink-target"><?php _e( 'Target URL', 'groundhogg' ) ?></label></th>
-            <td><input name="superlink_target" id="superlink-target" type="url" value="<?php echo $superlink->target; ?>" autocomplete="off">
-                <p class="description"><a href="#" id="insert-link" data-target="superlink-target"><?php _e( 'Insert Link' ); ?></a> | <?php _e( 'This is the url the contact will be re-directed to after clicking this Superlink.', 'groundhogg' ); ?></p>
-                <script>
-                    jQuery( function($){
-                        $( '#insert-link' ).linkPicker();
-                    });
-                </script>
+            <td>
+                <?php
+                $args = array(
+                    'type'      => 'url',
+                    'id'        => 'superlink_target',
+                    'name'      => 'superlink_target',
+                    'title'     => __( 'Superlink target' ),
+                    'value'     => $superlink->target,
+                );
+
+                echo WPGH()->html->link_picker( $args ); ?>
+                <p class="description"><?php _e( 'This is the url the contact will be re-directed to after clicking this Superlink.', 'groundhogg' ); ?></p>
             </td>
         </tr>
         <tr class="form-field term-tags-wrap">

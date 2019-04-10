@@ -14,17 +14,6 @@ abstract class WPGH_Line_Graph_Report_V2 extends WPGH_Reporting_Widget
      */
     protected $data = [];
 
-    /**
-     * Enqueue chart scripts
-     */
-    public function scripts()
-    {
-        wp_enqueue_script( 'jquery-flot', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
-        wp_enqueue_script( 'jquery-flot-categories', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.categories.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.categories.js') );
-        wp_enqueue_script( 'jquery-flot-time', WPGH_ASSETS_FOLDER . 'lib/flot/jquery.flot.time.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.time.js') );
-//        wp_enqueue_script( 'wpgh-flot-date', WPGH_ASSETS_FOLDER . 'lib/flot/date.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/date.min.js') );
-    }
-
 	/**
 	 * @return string
 	 */

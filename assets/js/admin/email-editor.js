@@ -26,7 +26,6 @@
 
 }( jQuery ));
 
-
 var wpghEmailEditor;
 
 ( function( $, editor ) {
@@ -70,8 +69,13 @@ var wpghEmailEditor;
                 wpghEmailEditor.save( e );
             });
 
-            this.sidebar = new StickySidebar('.editor-actions-inner', {
-                topSpacing: 32,
+            // this.sidebar = new StickySidebar('.editor-actions-inner', {
+            //     topSpacing: 32,
+            //     bottomSpacing: 0
+            // });
+
+            this.sidebar = $('.editor-actions-inner').stickySidebar({
+                topSpacing: 78,
                 bottomSpacing: 0
             });
 
@@ -318,7 +322,7 @@ var wpghEmailEditor;
             $(document).trigger( 'madeActive', [ block, blockType ] );
             // console.log( { block_type: blockType, block: block });
 
-            this.sidebar.updateSticky();
+            // this.sidebar.updateSticky();
 
         },
 

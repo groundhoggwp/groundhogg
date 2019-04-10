@@ -20,7 +20,7 @@ class WPGH_Dashboard_Widgets
     public function __construct()
     {
         add_action( 'admin_init', array( $this, 'setup_widgets' ) );
-        add_action( 'groundhogg/reports/load', array( $this, 'scripts' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
         add_action( 'wp_dashboard_setup', array( $this, 'setup_dashboard_widgets' ) );
     }
 
@@ -74,14 +74,43 @@ class WPGH_Dashboard_Widgets
 
     }
 
-    public function scripts(){
+    public function scripts( $hook_suffix ){
 
-        if ( ! current_user_can( 'view_reports' ) ){
+        if ( $hook_suffix !== 'index.php' ){
             return;
         }
 
-        /* Dequeue EDD Script */
-        wp_enqueue_style( 'wpgh-dashboard-widgets', WPGH_ASSETS_FOLDER . 'css/admin/dashboard.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/dashboard.css') );
+        if ( ! current_user_can( 'view_reports' ) ){ return; }
+
+        wp_enqueue_style( 'groundhogg-admin-dashboard' );
+        wp_enqueue_script( 'groundhogg-admin-dashboard' );
+
+        wp_localize_script( 'groundhogg-admin-dashboard', 'wpghDashboard', array(
+            'date_range' => $this->range,
+            'custom_date_range_start' => esc_attr( $this->get_url_var( 'custom_date_range_start' ) ),
+            'custom_date_range_end' => esc_attr( $this->get_url_var( 'custom_date_range_end' ) )
+        ) );
+
+        wp_enqueue_script( 'jquery-flot' );
+        wp_enqueue_script( 'jquery-flot-pie' );
+        wp_enqueue_script( 'jquery-flot-categories' );
+        wp_enqueue_script( 'jquery-flot-time' );
+    }
+
+    /**
+     * Get a query var
+     *
+     * @param $var
+     * @param $default
+     * @return string
+     */
+    public function get_url_var( $var, $default = false )
+    {
+        if ( isset( $_REQUEST[ $var ] ) && ! empty( $_REQUEST[ $var ] ) ){
+            return sanitize_text_field( urldecode( $_REQUEST[ $var ] ) );
+        }
+
+        return $default;
     }
 
     /**

@@ -39,10 +39,11 @@ class WPGH_Dashboard_Page
      */
     public function scripts()
     {
-        wp_enqueue_style( 'dashboard', WPGH_ASSETS_FOLDER . '/css/admin/dashboard.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/dashboard.css') );
-        wp_enqueue_script( 'wpgh-flot-chart', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
-        wp_enqueue_script( 'wpgh-flot-chart-categories', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.categories.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.categories.js') );
-        wp_enqueue_script( 'wpgh-flot-chart-time', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.time.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.time.js') );
+        wp_enqueue_style( 'groundhogg-admin-dashboard' );
+
+        wp_enqueue_style( 'jquery-flot' );
+        wp_enqueue_style( 'jquery-flot-time' );
+        wp_enqueue_style( 'jquery-flot-categories' );
     }
 
     public function register()

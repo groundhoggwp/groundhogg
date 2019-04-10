@@ -1,6 +1,6 @@
-var Groundhogg;
-(function ($) {
-    Groundhogg = {
+var Groundhogg = Groundhogg || {};
+(function (gh, ob, $) {
+    $.extend( gh, {
         leadSource: 'gh_referer',
         refID: 'gh_ref_id',
         setCookie: function(cname, cvalue, exdays){
@@ -26,30 +26,36 @@ var Groundhogg;
         pageView : function(){
             $.ajax({
                 type: "post",
-                url: gh_frontent_object.page_view_endpoint,
-                data: { ref: window.location.href },
-                success: function( response ){
-                    // console.log( events_complete )
+                url: ob.page_view_endpoint,
+                data: { ref: window.location.href, _ghnonce: ob._ghnonce },
+                beforeSend: function ( xhr ) {
+                    xhr.setRequestHeader( 'X-WP-Nonce', ob._wpnonce );
                 },
+                success: function( response ){},
                 error: function(){}
             });
         },
         logFormImpressions : function() {
+            var self = this;
             var forms = $( '.gh-form' );
             $.each( forms, function ( i, e ) {
                 var fId = $(e).find( 'input[name="step_id"]' ).val();
-                Groundhogg.formImpression( fId );
+                self.formImpression( fId );
             });
         },
         formImpression : function( id ){
+            var self = this;
             $.ajax({
                 type: "post",
-                url: gh_frontent_object.form_impression_endpoint,
+                url: ob.form_impression_endpoint,
                 dataType: 'json',
-                data: { form_id: id },
+                data: { ref: window.location.href, form_id: id, _ghnonce: ob._ghnonce },
+                beforeSend: function ( xhr ) {
+                    xhr.setRequestHeader( 'X-WP-Nonce', ob._wpnonce );
+                },
                 success: function( response ){
                     if( typeof response.ref_id !== 'undefined' ) {
-                        Groundhogg.setCookie( Groundhogg.refID, response.ref_id, 30 );
+                        self.setCookie( self.refID, response.ref_id, 30 );
                     }
                 },
                 error: function(){}
@@ -63,9 +69,10 @@ var Groundhogg;
             this.pageView();
             this.logFormImpressions();
         }
-    };
+    } );
+
     $(function(){
-        Groundhogg.init();
+        gh.init();
     });
-})(jQuery);
+})(Groundhogg, gh_frontent_object, jQuery);
 
