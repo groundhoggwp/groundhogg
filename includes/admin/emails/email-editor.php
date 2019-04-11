@@ -59,20 +59,22 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                             'checked'       => $email->is_template(),
                         ] ); ?>
                     </div>
-                    <div id="editor-toggle-switch" class="onoffswitch" style="text-align: left">
-                        <input type="checkbox" name="editor_view" class="onoffswitch-checkbox" value="ready" id="editor-toggle">
-                        <label class="onoffswitch-label" for="editor-toggle">
-                            <span class="onoffswitch-inner"></span>
-                            <span class="onoffswitch-switch"></span>
-                        </label>
-                    </div>
-                    <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
-                        <input type="checkbox" name="email_status" class="onoffswitch-checkbox" value="ready" id="status-toggle" <?php if ( $email->status == 'ready' ) echo 'checked'; ?>>
-                        <label class="onoffswitch-label" for="status-toggle">
-                            <span class="onoffswitch-inner"></span>
-                            <span class="onoffswitch-switch"></span>
-                        </label>
-                    </div>
+                    <?php echo WPGH()->html->toggle( [
+                        'name'          => 'editor_view',
+                        'id'            => 'editor-toggle',
+                        'value'         => 'ready',
+                        'checked'       => false,
+                        'on'            => 'HTML',
+                        'off'           => 'Visual',
+                    ]); ?>
+                    <?php echo WPGH()->html->toggle( [
+                        'name'          => 'email_status',
+                        'id'            => 'status-toggle',
+                        'value'         => 'ready',
+                        'checked'       => $email->status === 'ready',
+                        'on'            => 'Ready',
+                        'off'           => 'Draft',
+                    ]); ?>
                 </div>
                 <div id="save">
                     <span class="spinner" style="float: left"></span>

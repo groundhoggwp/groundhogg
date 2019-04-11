@@ -67,6 +67,14 @@ abstract class WPGH_DB {
 
 
     /**
+     * Get things started
+     *
+     * @access  public
+     * @since   2.1
+     */
+    abstract public function __construct();
+
+    /**
      * Get table name
      *
      * @return string
@@ -86,6 +94,7 @@ abstract class WPGH_DB {
         return $this->table_name;
     }
 
+
     /**
      * Get the charset
      *
@@ -96,7 +105,6 @@ abstract class WPGH_DB {
         global $wpdb;
         return $wpdb->get_charset_collate();
     }
-
 
     /**
      * Create a where clause given an array
@@ -167,14 +175,6 @@ abstract class WPGH_DB {
 
         return $where;
     }
-
-    /**
-     * Get things started
-     *
-     * @access  public
-     * @since   2.1
-     */
-    abstract public function __construct();
 
     /**
      * Whitelist of columns

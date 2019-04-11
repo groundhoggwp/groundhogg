@@ -97,13 +97,15 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         }})});
                 </script>
                 <?php submit_button( _x( 'Refresh', 'action', 'groundhogg' ), 'secondary', 'change_reporting', false ); ?>
-                <div class="onoffswitch">
-                    <input type="checkbox" name="reporting_on" class="onoffswitch-checkbox" id="reporting-toggle" value="1" <?php if( isset( $_REQUEST[ 'change_reporting' ] ) ) echo 'checked'; ?> >
-                    <label class="onoffswitch-label" for="reporting-toggle">
-                        <span class="onoffswitch-inner"></span>
-                        <span class="onoffswitch-switch"></span>
-                    </label>
-                </div>
+
+                <?php echo WPGH()->html->toggle( [
+                    'name'          => 'reporting_on',
+                    'id'            => 'reporting-toggle',
+                    'value'         => 'ready',
+                    'checked'       => isset( $_REQUEST[ 'change_reporting' ] ),
+                    'on'            => 'Reporting',
+                    'off'           => 'Editing',
+                ]); ?>
             </div>
             <div class="status-options">
                 <div id="add-contacts">
@@ -175,13 +177,14 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                     <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _ex( 'Export Funnel', 'action','groundhogg'); ?></a>
                 </div>
                 <div id="status">
-                    <div id="status-toggle-switch" class="onoffswitch" style="text-align: left">
-                        <input type="checkbox" name="funnel_status" class="onoffswitch-checkbox" value="active" id="status-toggle" <?php if ( $funnel->status == 'active' ) echo 'checked'; ?>>
-                        <label class="onoffswitch-label" for="status-toggle">
-                            <span class="onoffswitch-inner"></span>
-                            <span class="onoffswitch-switch"></span>
-                        </label>
-                    </div>
+                    <?php echo WPGH()->html->toggle( [
+                        'name'          => 'funnel_status',
+                        'id'            => 'status-toggle',
+                        'value'         => 'active',
+                        'checked'       => $funnel->status === 'active',
+                        'on'            => 'Active',
+                        'off'           => 'Inactive',
+                    ]); ?>
                 </div>
                 <div id="save">
                     <span class="spinner" style="float: left"></span>

@@ -1175,7 +1175,6 @@ class WPGH_HTML
     public function toggle( $args=[] )
     {
         $a = shortcode_atts( array(
-            'label'         => '',
             'name'          => '',
             'id'            => '',
             'class'         => '',
