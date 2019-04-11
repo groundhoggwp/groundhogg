@@ -101,9 +101,11 @@ input[type=range].slider::-ms-thumb {
     cursor: pointer;
     height: 13.4px;
 }
+
 input[type=range].slider:focus::-ms-fill-lower {
     background: #ffffff;
 }
+
 input[type=range].slider:focus::-ms-fill-upper {
     background: #ffffff;
 }
@@ -112,17 +114,21 @@ input[type=range].slider:focus::-ms-fill-upper {
     position: relative; width: 106px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
+
 .onoffswitch-checkbox {
     display: none !important;
 }
+
 .onoffswitch-label {
     display: block; overflow: hidden; cursor: pointer;
     border: 1px solid #E3E3E3; border-radius: 3px;
 }
+
 .onoffswitch-inner {
     display: block; width: 200%; margin-left: -100%;
     transition: margin 0.3s ease-in 0s;
 }
+
 .onoffswitch-inner:before, .onoffswitch-inner:after {
     display: block; float: left; width: 50%; height: 27px; padding: 0; line-height: 23px;
     font-size: 14px; color: white;
@@ -130,6 +136,7 @@ input[type=range].slider:focus::-ms-fill-upper {
     border: 2px solid transparent;
     background-clip: padding-box;
 }
+
 .onoffswitch-inner:before {
     content: "On";
     padding-left: 10px;

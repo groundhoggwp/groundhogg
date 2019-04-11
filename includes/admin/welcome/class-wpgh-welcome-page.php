@@ -198,7 +198,7 @@ class WPGH_Welcome_Page
     /* Enque JS or CSS */
     public function scripts()
     {
-        wp_enqueue_style( 'wpgh-welcome-page', WPGH_ASSETS_FOLDER . 'css/admin/welcome.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/welcome.css' ) );
+        wp_enqueue_style( 'groundhogg-admin-welcome' );
     }
 
     /**

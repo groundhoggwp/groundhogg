@@ -31,7 +31,7 @@ class WPGH_Button_Block extends WPGH_Email_Block
         $this->title = __( 'Button', 'groundhogg' );
 
         wp_enqueue_style( 'wp-color-picker' );
-        wp_enqueue_script( 'wpgh-button-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/button.min.js', array( 'wp-color-picker' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/button.min.js' ) );
+        wp_enqueue_script( 'groundhogg-email-button' );
 
         parent::__construct();
 

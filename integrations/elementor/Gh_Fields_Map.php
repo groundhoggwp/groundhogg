@@ -42,4 +42,27 @@ class Gh_Fields_Map extends Fields_Map {
 			],
 		] );
 	}
+
+	public function enqueue()
+    {
+        $IS_MINIFIED = wpgh_is_option_enabled( 'gh_script_debug' ) ? '' : '.min' ;
+
+        wp_enqueue_script( 'groundhogg-elementor', plugin_dir_url( __FILE__ ) . 'elementor' . $IS_MINIFIED .'.js', [], WPGH()->version, true );
+
+        $mappable_fields = wpgh_get_mappable_fields();
+        $fields = [];
+
+        foreach ( $mappable_fields as $field_id => $field_label ){
+            $fields[] = [
+                'remote_id'         => $field_id,
+                'remote_label'      => $field_label,
+                'remote_type'       => 'text',
+                'remote_required'   => in_array( $field_id, [ 'email' ] ),
+            ];
+        }
+
+        wp_localize_script( 'groundhogg-elementor', 'ghMappableFields', [
+            'fields' => $fields
+        ] );
+    }
 }

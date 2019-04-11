@@ -30,9 +30,7 @@ class WPGH_Spacer_Block extends WPGH_Email_Block
         $this->name = 'spacer';
         $this->title = __( 'Spacer', 'groundhogg' );
 
-        wp_enqueue_script( 'wpgh-spacer-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/spacer.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/spacer.min.js' ) );
-
-
+        wp_enqueue_script( 'groundhogg-email-spacer' );
         parent::__construct();
 
     }

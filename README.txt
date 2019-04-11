@@ -105,11 +105,20 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.7 =
+* ADDED extra nonce to frontend form impression checks to ensure request is intentional.
+* ADDED extra nonce to frontend page view checks to ensure request is intentional.
+* ADDED option to include full or minified files.
+* FIXED v2 Elementor integration conflict
+* FIXED v2 Elementor integration script inclusion.
+
 = 1.3.6 =
 * Just a notification to prompt users to update to plugin with resolved vulnerabilities.
 
 = 1.3.5 =
+* ADDED local images to assets/images
 * FIXED remote code execution (RCE) vulnerability (https://www.pluginvulnerabilities.com/2019/04/05/our-proactive-monitoring-caught-an-authenticated-remote-code-execution-rce-vulnerability-being-introduced-in-to-groundhogg/)
+* REMOVED Extraneous jQuery library.
 
 = 1.3.4 =
 * FIXED Fixed the new Elementor integration which was disabled in 1.3.1. Elementor Integration now supports complex field mapping.

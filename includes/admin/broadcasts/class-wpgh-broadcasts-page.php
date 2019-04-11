@@ -51,10 +51,8 @@ class WPGH_Broadcasts_Page
      */
     public function scripts()
     {
-
-        wp_enqueue_script('wpgh-flot-chart', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js'));
-        wp_enqueue_script('wpgh-flot-chart-pie', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.pie.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.pie.js'));
-
+        wp_enqueue_script('jquery-flot' );
+        wp_enqueue_script('jquery-flot-pie' );
     }
 
     public function register()

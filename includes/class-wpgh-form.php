@@ -135,7 +135,7 @@ class WPGH_Form
 	 */
     private function add_scripts()
     {
-    	wp_enqueue_style( 'wpgh-frontend', WPGH_ASSETS_FOLDER . 'css/frontend.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/frontend.css' ) );
+    	wp_enqueue_style( 'groundhogg-frontend' );
     }
 
     /**
@@ -1142,8 +1142,9 @@ class WPGH_Form
             $a[ 'captcha-theme' ] = $a[ 'size' ];
         }
 
-        if ( ! is_admin() )
+        if ( ! is_admin() ){
             wp_enqueue_script( 'google-recaptcha-v2', 'https://www.google.com/recaptcha/api.js', array(), true );
+        }
 
         $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ), $a['captcha-theme'], $a['captcha-size'] );
 

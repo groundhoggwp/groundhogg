@@ -17,7 +17,6 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
     public function get_order(){return 0;}
     public function scripts(){}
     protected function add_additional_actions(){}
-
     public function help(){}
 
     /**
@@ -38,13 +37,16 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
             return;
         }
 
-	    $bulk_action = $_POST[ 'bulk_action' ];
+        // Sanitize the bulk action
+        // Permitted Characters 0-9, A-z, _, -, / to keep inline with the Groundhogg Action Structure. No spaces.
+	    $bulk_action = preg_replace( '/[^0-9A-z_\-\/]/', '', $_POST[ 'bulk_action' ] );
 
 	    if ( ! wp_verify_nonce( $_POST[ '_wpnonce' ], $bulk_action ) ){
 	        return;
         }
 
-	    $action = "groundhogg/bulk_job/{$bulk_action}/ajax";
+	    //Double check and that everything is okay.
+	    $action = sanitize_text_field( "groundhogg/bulk_job/{$bulk_action}/ajax" );
 
 	    do_action( $action );
     }

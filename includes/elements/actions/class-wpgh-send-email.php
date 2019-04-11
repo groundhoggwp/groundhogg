@@ -57,23 +57,17 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
         parent::__construct();
 
-        if ( is_admin() && isset( $_GET['page'] ) && ( $_GET[ 'page' ] === 'gh_funnels' ||  $_GET[ 'page' ] === 'gh_emails' ) && isset($_REQUEST[ 'action' ]) && $_REQUEST[ 'action' ] === 'edit' ) {
-            add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
-        }
+        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
     }
 
     public function scripts(){
-        wp_enqueue_script(
-            'wpgh-email-element',
-            WPGH_ASSETS_FOLDER . 'js/admin/funnel-elements/email.min.js',
-            array(),
-            filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/funnel-elements/email.min.js' )
-        );
-
-        wp_localize_script('wpgh-email-element', 'wpghEmailsBase', array(
-            'path' =>  admin_url( 'admin.php?page=gh_emails' ),
-            'dontSaveChangesMsg'    => _x( "You have changes which have not been saved. Are you sure you want to exit?", 'notice', 'groundhogg' ),
-        ) );
+        if ( WPGH()->menu->current_page() === 'gh_funnels' && WPGH()->menu->current_action() === 'edit' ) {
+            wp_enqueue_script('groundhogg-funnel-email');
+            wp_localize_script('groundhogg-funnel-email', 'wpghEmailsBase', array(
+                'path' => admin_url('admin.php?page=gh_emails'),
+                'dontSaveChangesMsg' => _x("You have changes which have not been saved. Are you sure you want to exit?", 'notice', 'groundhogg'),
+            ));
+        }
     }
 
     /**

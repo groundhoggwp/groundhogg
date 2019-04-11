@@ -83,9 +83,9 @@ class WPGH_Funnels_Page
 	public function scripts()
     {
        if ( $this->get_action() === 'edit' ){
+
            wp_enqueue_style('editor-buttons');
            wp_enqueue_style( 'jquery-ui' );
-
 
            wp_enqueue_editor();
            wp_enqueue_script('wplink');
@@ -94,15 +94,15 @@ class WPGH_Funnels_Page
            wp_enqueue_script( 'jquery-ui-draggable' );
            wp_enqueue_script( 'jquery-ui-datepicker' );
 
-           wp_enqueue_script( 'link-picker', WPGH_ASSETS_FOLDER . '/js/admin/link-picker.min.js' );
-           wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/sticky-sidebar.js' );
-           wp_enqueue_script( 'jquery-sticky-sidebar', WPGH_ASSETS_FOLDER . '/lib/sticky-sidebar/jquery.sticky-sidebar.js' );
+           wp_enqueue_script( 'groundhogg-admin-link-picker' );
+           wp_enqueue_script( 'sticky-sidebar' );
+           wp_enqueue_script( 'jquery-sticky-sidebar' );
 
-           wp_enqueue_style( 'funnel-editor', WPGH_ASSETS_FOLDER . '/css/admin/funnel-editor.css', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/css/admin/funnel-editor.css') );
-           wp_enqueue_script( 'funnel-editor', WPGH_ASSETS_FOLDER . '/js/admin/funnel-editor.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/funnel-editor.js') );
-           wp_enqueue_script( 'wpgh-flot-chart', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.min.js') );
-           wp_enqueue_script( 'wpgh-flot-chart-categories', WPGH_ASSETS_FOLDER . '/lib/flot/jquery.flot.categories.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/flot/jquery.flot.categories.js') );
+           wp_enqueue_style(  'groundhogg-admin-funnel-editor' );
+           wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
 
+           wp_enqueue_script( 'jquery-flot' );
+           wp_enqueue_script( 'jquery-flot-categories' );
        }
     }
 

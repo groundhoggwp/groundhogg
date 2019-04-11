@@ -290,6 +290,28 @@ abstract class WPGH_Funnel_Step
     }
 
     /**
+     * Get similar steps which can be used by benchmarks.
+     * @return WPGH_Step[]
+     */
+    public function get_like_steps()
+    {
+        $raw_steps = WPGH()->steps->get_steps( array( 'step_type' => $this->get_type(), 'step_group' => $this->get_group() ) );
+
+        $steps = [];
+
+        foreach ( $raw_steps as $raw_step ){
+            $step = wpgh_get_funnel_step( absint( $raw_step->ID ) );
+
+            if ( $step ){
+                $steps[] = $step;
+            }
+        }
+
+        return $steps;
+
+    }
+
+    /**
      * Save the step based on the given ID
      *
      * @param $step WPGH_Step

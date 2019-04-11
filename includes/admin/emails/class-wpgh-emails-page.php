@@ -59,33 +59,35 @@ class WPGH_Emails_Page
             wp_enqueue_script( 'jquery-ui-sortable' );
             wp_enqueue_script( 'jquery-ui-draggable' );
 
-            wp_enqueue_script( 'sticky-sidebar', WPGH_ASSETS_FOLDER . 'lib/sticky-sidebar/sticky-sidebar.js' );
-
             // adding code mirror
-            wp_enqueue_style( 'codemirror-css', WPGH_ASSETS_FOLDER . 'lib/codemirror/codemirror.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/lib/codemirror/codemirror.css' ) );
-            wp_enqueue_script( 'codemirror-js', WPGH_ASSETS_FOLDER . 'lib/codemirror/codemirror.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/codemirror.js') );
-            wp_enqueue_script( 'codemirror-mode-css', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/css.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/css.js') );
-            wp_enqueue_script( 'codemirror-mode-xml', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/xml.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/xml.js') );
-            wp_enqueue_script( 'codemirror-mode-js', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/javascript.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/javascript.js') );
-            wp_enqueue_script( 'codemirror-mode-html', WPGH_ASSETS_FOLDER . 'lib/codemirror/modes/htmlmixed.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/codemirror/modes/htmlmixed.js') );
+            wp_enqueue_style( 'codemirror' );
+            wp_enqueue_script( 'codemirror' );
+            wp_enqueue_script( 'codemirror-mode-css' );
+            wp_enqueue_script( 'codemirror-mode-xml' );
+            wp_enqueue_script( 'codemirror-mode-js'  );
+            wp_enqueue_script( 'codemirror-mode-html' );
 
-            wp_enqueue_script( 'email-editor', WPGH_ASSETS_FOLDER . 'js/admin/email-editor.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-editor.min.js' ) );
+            wp_enqueue_script( 'sticky-sidebar' );
+            wp_enqueue_script( 'jquery-sticky-sidebar' );
 
-            wp_localize_script( 'email-editor', 'email', array(
-                'id'                    => intval( $_GET[ 'email' ] ),
-            ) );
-
-            wp_enqueue_style('email-editor', WPGH_ASSETS_FOLDER . 'css/admin/email-editor.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/email-editor.css' ) );
 
             // adding beautify js
-            wp_enqueue_script( 'beautify-js', WPGH_ASSETS_FOLDER . 'lib/js-beautify/beautify.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/js-beautify/beautify.min.js') );
-            wp_enqueue_script( 'beautify-css', WPGH_ASSETS_FOLDER . 'lib/js-beautify/beautify-css.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/js-beautify/beautify-css.min.js') );
-            wp_enqueue_script( 'beautify-html', WPGH_ASSETS_FOLDER . 'lib/js-beautify/beautify-html.min.js', array(), filemtime(WPGH_PLUGIN_DIR . 'assets/lib/js-beautify/beautify-html.min.js') );
+            wp_enqueue_script( 'beautify-js'  );
+            wp_enqueue_script( 'beautify-css' );
+            wp_enqueue_script( 'beautify-html' );
 
+            wp_enqueue_style( 'groundhogg-admin-email-editor' );
+            wp_enqueue_script( 'groundhogg-admin-email-editor' );
 
-        } else if ( $this->get_action() === 'add' || $this->get_action() === 'edit' ){
-	        wp_enqueue_script( 'iframe-checker', WPGH_ASSETS_FOLDER . 'js/admin/iframe-checker.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/iframe-checker.min.js' ) );
-	        wp_enqueue_style( 'iframe-checker', WPGH_ASSETS_FOLDER . 'css/admin/iframe.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/iframe.css' ) );
+            wp_localize_script( 'groundhogg-admin-email-editor', 'email', array(
+                'id' => intval( $_GET[ 'email' ] ),
+            ) );
+
+        }
+
+        if ( $this->get_action() === 'add' || $this->get_action() === 'edit' ){
+	        wp_enqueue_script( 'groundhogg-admin-iframe' );
+	        wp_enqueue_style( 'groundhogg-admin-iframe' );
         }
     }
 

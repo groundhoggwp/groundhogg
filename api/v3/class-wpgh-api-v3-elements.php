@@ -27,14 +27,32 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
         register_rest_route('gh/v3', '/elements/page-view', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
-                'callback' => array($this, 'page_view'),
+                'permission_callback' => function ( WP_REST_Request $request ){
+                    return wp_verify_nonce( $request->get_param( '_ghnonce' ), 'groundhogg_frontend' );
+                },
+                'callback' => [ $this, 'page_view' ],
+                'args' => [
+                    '_ghnonce' => [
+                        'description' => 'Need this!',
+                        'required' => true
+                    ]
+                ]
             ]
         ] );
 
         register_rest_route('gh/v3', '/elements/form-impression', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
-                'callback' => array($this, 'form_impression'),
+                'callback' => [ $this, 'form_impression' ],
+                'permission_callback' => function ( WP_REST_Request $request ){
+                    return wp_verify_nonce( $request->get_param( '_ghnonce' ), 'groundhogg_frontend' );
+                },
+                'args' => [
+                    '_ghnonce' => [
+                        'description' => 'Need this!',
+                        'required' => true
+                    ]
+                ]
             ]
         ] );
     }

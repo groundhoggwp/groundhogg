@@ -71,24 +71,6 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
     }
 
     /**
-     * Reporting Widget Specific Scripts
-     */
-    public function scripts()
-    {
-        wp_enqueue_script( 'wpgh-dashboard', WPGH_ASSETS_FOLDER . 'js/admin/dashboard.min.js', array( 'jquery' ), filemtime(WPGH_PLUGIN_DIR . 'assets/js/admin/dashboard.min.js') );
-        wp_enqueue_script( 'papaparse', WPGH_ASSETS_FOLDER . 'lib/papa-parse/papaparse.js' );
-
-        if ( ! self::$js_flag ){
-            wp_localize_script( 'wpgh-dashboard', 'wpghDashboard', array(
-                'date_range' => $this->range,
-                'custom_date_range_start' => esc_attr( $this->get_url_var( 'custom_date_range_start' ) ),
-                'custom_date_range_end' => esc_attr( $this->get_url_var( 'custom_date_range_end' ) )
-            ) );
-            self::$js_flag = true;
-        }
-    }
-
-    /**
      * Output reporting args for a form if a refresh is necessary
      */
     protected function form_reporting_inputs()
@@ -108,9 +90,6 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
      */
     protected function setup_reporting_time()
     {
-
-//        echo date_default_timezone_get();
-//        date_default_timezone_set( 'UTC' );
 
         switch ( $this->range ){
             case 'today';

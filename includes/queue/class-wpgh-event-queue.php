@@ -62,12 +62,6 @@ class WPGH_Event_Queue
         add_action( 'init', array( $this, 'setup_cron_jobs' ) );
         add_action( self::ACTION , array( $this, 'run_queue' ) );
 
-//        add_action( 'admin_init', array( $this, 'ajax_process' ) );
-//        add_action( 'wp_ajax_nopriv_gh_process_queue', array( $this, 'ajax_process' ) );
-//        add_action( 'wp_ajax_gh_process_queue', array( $this, 'ajax_process' ) );
-//        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
-//        add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
-
         if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
 
             add_action( 'admin_init' , array( $this, 'run_queue' ) );
@@ -102,24 +96,6 @@ class WPGH_Event_Queue
 
         }
 
-    }
-
-    public function scripts()
-    {
-        $last_request_time = intval( get_transient( 'gh_queue_last_request_time' ) );
-
-        if ( ! $last_request_time ){
-            /* in milliseconds */
-             $last_request_time = time();
-        }
-
-        wp_register_script( 'wpgh-queue',   WPGH_ASSETS_FOLDER . 'js/admin/queue.min.js', array( 'jquery' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/queue.min.js' ) );
-        wp_enqueue_script( 'wpgh-queue' );
-        wp_localize_script( 'wpgh-queue', 'wpghQueue', array(
-            'ajax_url'      => admin_url( 'admin-ajax.php' ),
-            'timeInterval'  => $this->get_interval(),
-            'lastRun'       => date( 'Y-m-d H:i:s', $last_request_time )
-        ) );
     }
 
     /**

@@ -512,7 +512,8 @@ class WPGH_HTML
 
         wp_enqueue_script( 'select2' );
         wp_enqueue_style( 'select2' );
-        wp_enqueue_script( 'wpgh-admin-js' );
+        wp_enqueue_style( 'groundhogg-admin' );
+        wp_enqueue_script( 'groundhogg-admin' );
 
         return apply_filters( 'wpgh_html_select2', $html, $args );
 
@@ -1083,7 +1084,8 @@ class WPGH_HTML
         ) );
 
         wp_enqueue_media();
-        wp_enqueue_script('gh-media-picker', WPGH_ASSETS_FOLDER . 'js/admin/media-picker.min.js', filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/media-picker.min.js' ) );
+        wp_enqueue_style('groundhogg-admin' );
+        wp_enqueue_script('groundhogg-admin-media-picker' );
 
         return $html;
     }
@@ -1104,6 +1106,7 @@ class WPGH_HTML
             'value' => '',
             'attributes' => '',
             'placeholder' => __( 'Start typing...', 'groundhogg' ),
+            'autocomplete' => false,
             'required' => false
         ) );
 
@@ -1111,22 +1114,25 @@ class WPGH_HTML
             $a[ 'required' ] = 'required';
         }
 
+        $a[ 'autocomplete' ] = $a[ 'autocomplete' ] ? 'on' : 'off';
+
         $html = sprintf(
-            "<input type='%s' id='%s' class='%s gh-link-picker' name='%s' value='%s' placeholder='%s' %s %s>",
+            "<input type='%s' id='%s' class='%s gh-link-picker' name='%s' value='%s' placeholder='%s' autocomplete='%s' %s %s>",
             esc_attr( $a[ 'type'    ] ),
             esc_attr( $a[ 'id'      ] ),
             esc_attr( $a[ 'class'   ] ),
             esc_attr( $a[ 'name'    ] ),
             esc_attr( $a[ 'value'   ] ),
             esc_attr( $a[ 'placeholder' ] ),
+            esc_attr( $a[ 'autocomplete' ] ),
             $a[ 'attributes'  ],
             $a[ 'required'  ]
         );
 
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( 'jquery-ui-autocomplete' );
-        wp_enqueue_script( 'wpgh-admin-js' );
-
+        wp_enqueue_style( 'groundhogg-admin' );
+        wp_enqueue_script( 'groundhogg-admin' );
 
         return apply_filters( 'wpgh_html_link_picker', $html, $args );
     }
@@ -1161,13 +1167,14 @@ class WPGH_HTML
 		    esc_attr( $a[ 'id' ] )
 	    );
 
-	    return $bar;
+        wp_enqueue_style( 'groundhogg-admin' );
+
+        return $bar;
     }
 
     public function toggle( $args=[] )
     {
         $a = shortcode_atts( array(
-            'label'         => '',
             'name'          => '',
             'id'            => '',
             'class'         => '',
@@ -1181,6 +1188,8 @@ class WPGH_HTML
 
         $css = sprintf( "<style>#%s-switch .onoffswitch-inner:before {content: \"%s\";}
 #%s-switch .onoffswitch-inner:after {content: \"%s\";}</style>",esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'on' ] ), esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'off' ] ) );
+
+        wp_enqueue_style( 'groundhogg-admin' );
 
         return sprintf("%s<div id=\"%s-switch\" class=\"onoffswitch %s\" style=\"text-align: left\">
                         <input type=\"checkbox\" id=\"%s\" name=\"%s\" class=\"onoffswitch-checkbox %s\" value=\"%s\" %s>

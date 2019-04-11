@@ -332,7 +332,7 @@ class WPGH_Extension_Manager
 
 	public static function extension_page()
 	{
-        wp_enqueue_style( 'gh-extensions-style', WPGH_ASSETS_FOLDER . '/css/admin/extensions.css' );
+        wp_enqueue_style( 'groundhogg-admin-extension' );
 
         //use a filter instead of the member variable so that it goes away when plugin is deactivated.
 		$extensions = apply_filters( 'get_gh_extensions', array() );

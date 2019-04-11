@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 1.3.6
+Version: 1.3.7
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.3.6';
+        public $version = '1.3.7';
 
         /**
          * @var $instance Groundhogg instance
@@ -444,14 +444,14 @@ if ( ! class_exists( 'Groundhogg' ) ) :
         private function register_integrations()
         {
             add_action( 'elementor/controls/controls_registered', function (){
-                include_once dirname(__FILE__) . '/integrations/elementor/fields-map.php';
+                include_once dirname(__FILE__) . '/integrations/elementor/Gh_Fields_Map.php';
                 \Elementor\Plugin::instance()->controls_manager->register_control( 'gh_fields_map', new \ElementorPro\Modules\Forms\Controls\Gh_Fields_Map() );
             } );
 
             /* New Elementor Integration */
             add_action( 'elementor_pro/init', function() {
                 // Here its safe to include our action class file
-                include_once dirname(__FILE__) . '/integrations/elementor/groundhogg.php';
+                include_once dirname(__FILE__) . '/integrations/elementor/Groundhogg.php';
                 // Instantiate the action class
                 $groundhogg_action = new \ElementorPro\Modules\Forms\Actions\Groundhogg();
                 // Register the action with form widget
@@ -517,6 +517,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
             require_once WPGH_PLUGIN_DIR . 'includes/queue/class-wpgh-step.php';
 
             /* Core Files */
+            require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-object.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-bounce-checker.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-contact.php';
             require_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-contact-query.php';
@@ -541,6 +542,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
             /* Functions */
             require_once WPGH_PLUGIN_DIR . 'includes/functions.php';
+            require_once WPGH_PLUGIN_DIR . 'includes/scripts.php';
             require_once WPGH_PLUGIN_DIR . 'includes/shortcodes.php';
             require_once WPGH_PLUGIN_DIR . 'includes/locations.php';
             require_once WPGH_PLUGIN_DIR . 'includes/gutenberg.php';

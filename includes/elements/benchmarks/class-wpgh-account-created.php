@@ -106,11 +106,9 @@ class WPGH_Account_Created extends WPGH_Funnel_Step
     public function complete( $user, $contact )
     {
 
-        $steps = WPGH()->steps->get_steps( array( 'step_type' => $this->type, 'step_group' => $this->group ) );
+        $steps = $this->get_like_steps();
 
         foreach ( $steps as $step ) {
-
-            $step = wpgh_get_funnel_step( $step->ID );
 
             $role = $step->get_meta( 'role' );
 

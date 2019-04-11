@@ -1,7 +1,7 @@
-var wpghEmailElement;
+var wpghEmailElement = {};
 
-(function ($,base) {
-    wpghEmailElement = {
+(function (e,$,base) {
+    e = $.extend( e, {
 
         ID: 0,
         target: null,
@@ -12,47 +12,48 @@ var wpghEmailElement;
         init: function () {
             $( document ).on( 'change', '.gh-email-picker', function ( e ) {
                 var link = '#source=' + encodeURIComponent( base.path + '&action=edit&email=' + $(this).val() ) + '&height=900&width=1500' ;
-                wpghEmailElement.ID = $(this).val();
-                wpghEmailElement.target = $(this).closest('.postbox' );
+                e.ID = $(this).val();
+                e.target = $(this).closest('.postbox' );
                 $(this).closest( '.form-table' ).find( '.edit-email' ).attr( 'href', link );
             } );
 
             $( document ).on( 'click', '.add-email', function ( e ) {
-                wpghEmailElement.target = $(this).closest('.postbox' );
-                wpghEmailElement.addingEmail = true;
-                wpghEmailElement.editingEmail = false;
+                e.target = $(this).closest('.postbox' );
+                e.addingEmail = true;
+                e.editingEmail = false;
             } );
 
             $( document ).on( 'click', '.edit-email', function ( e ) {
-                wpghEmailElement.target = $(this).closest('.postbox' );
-                wpghEmailElement.addingEmail = false;
-                wpghEmailElement.editingEmail = true;
+                e.target = $(this).closest('.postbox' );
+                e.addingEmail = false;
+                e.editingEmail = true;
             } );
 
             $( document ).on( 'click', '.popup-save', function ( e ) {
 
-                if ( ! wpghEmailElement.addingEmail && ! wpghEmailElement.editingEmail  ){
+                if ( ! e.addingEmail && ! e.editingEmail  ){
                     return;
                 }
 
-                if ( ! wpghEmailElement.changesSaved ){
+                if ( ! e.changesSaved ){
                     if ( ! confirm( base.dontSaveChangesMsg ) ){
                         throw new Error("Unsaved changes!");
                     }
                 }
 
-                if ( wpghEmailElement.addingEmail ){
-                    wpghEmailElement.target.find( '.add-email-override' ).val( wpghEmailElement.ID )
+                if ( e.addingEmail ){
+                    e.target.find( '.add-email-override' ).val( e.ID )
                 }
 
-                wpghEmailElement.addingEmail = false;
-                wpghEmailElement.editingEmail = false;
+                e.addingEmail = false;
+                e.editingEmail = false;
 
             } );
         }
-    };
+    } );
 
     $( function () {
-        wpghEmailElement.init()
+        e.init()
     } );
-})(jQuery,wpghEmailsBase);
+
+})(wpghEmailElement,jQuery,wpghEmailsBase);

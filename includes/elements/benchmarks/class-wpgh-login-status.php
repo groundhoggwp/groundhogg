@@ -133,7 +133,7 @@ class WPGH_Login_Status_Changed extends WPGH_Funnel_Step
 	 */
     public function login( $user_login, $user  )
     {
-        $steps = WPGH()->steps->get_steps( array( 'step_type' => $this->type, 'step_group' => $this->group ) );
+        $steps = $this->get_like_steps();
         $contact = wpgh_get_contact( $user->user_email );
 
         if ( ! $contact ){
@@ -147,7 +147,6 @@ class WPGH_Login_Status_Changed extends WPGH_Funnel_Step
         $contact->update_meta( 'times_logged_in', $times );
 
         foreach ( $steps as $step ) {
-            $step = wpgh_get_funnel_step( $step->ID );
             $status = $step->get_meta( 'type' );
 	        $can_complete = ( $status === 'any' ) ? $can_complete = true : $times === $step->get_meta( 'amount' );
 
