@@ -172,9 +172,9 @@ class Plugin {
      */
     public function on_rest_api_init() {
         // On admin/frontend sometimes the rest API is initialized after the common is initialized.
-        if ( ! $this->common ) {
-            $this->init_common();
-        }
+//        if ( ! $this->common ) {
+//            $this->init_common();
+//        }
     }
 
     /**

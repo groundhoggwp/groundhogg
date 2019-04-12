@@ -1,5 +1,4 @@
 <?php
-
 namespace Groundhogg\DB;
 
 // Exit if accessed directly

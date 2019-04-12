@@ -151,7 +151,7 @@ class Tag_Relationships extends DB
             return false;
         }
 
-        do_action( '' );
+        do_action( 'groundhogg/db/pre_bulk_delete/tag_relationships', wp_parse_id_list( $tags ) );
 
         return $this->delete( [ 'contact_id' => $contact_id ] );
 

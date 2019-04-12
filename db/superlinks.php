@@ -1,4 +1,9 @@
 <?php
+
+namespace Groundhogg\DB;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Superlinks DB
  *
@@ -11,38 +16,46 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-/**
- * WPGH_DB_Contacts Class
- *
- * @since 2.1
- */
-class _DB_Superlinks extends DB  {
-
-        /**
-     * The name of the cache group.
-     *
-     * @access public
-     * @since  2.8
-     * @var string
-     */
-    public $cache_group = 'superlinks';
+class Superlinks extends DB  {
 
     /**
-     * Get things started
+     * Get the DB suffix
      *
-     * @access  public
-     * @since   2.1
+     * @return string
      */
-    public function __construct() {
+    public function get_db_suffix()
+    {
+        return 'gh_superlinks';
+    }
 
-        $this->db_name = 'gh_superlinks';
-        $this->table_name();
+    /**
+     * Get the DB primary key
+     *
+     * @return string
+     */
+    public function get_primary_key()
+    {
+        return 'ID';
+    }
 
-        $this->primary_key = 'ID';
-        $this->version     = '1.0';
+    /**
+     * Get the DB version
+     *
+     * @return mixed
+     */
+    public function get_db_version()
+    {
+        return '2.0';
+    }
+
+    /**
+     * Get the object type we're inserting/updateing/deleting.
+     *
+     * @return string
+     */
+    public function get_object_type()
+    {
+        return 'superlink';
     }
 
     /**
@@ -83,16 +96,13 @@ class _DB_Superlinks extends DB  {
      * @param array $data
      * @return array
      */
-    private function serialize_tags( $data = array() ){
-
+    private function serialize_tags( $data = array() )
+    {
         if ( isset( $data[ 'tags' ] ) ){
-
             $data[ 'tags' ] = maybe_serialize( $data[ 'tags' ] );
-
         }
 
         return $data;
-
     }
 
     /**
@@ -104,9 +114,7 @@ class _DB_Superlinks extends DB  {
     private function unserialize_tags( $obj = null )
     {
         if ( is_object( $obj ) && isset( $obj->tags ) ){
-
             $obj->tags = maybe_unserialize( $obj->tags );
-
         }
 
         return $obj;
@@ -118,8 +126,8 @@ class _DB_Superlinks extends DB  {
      * @access  public
      * @since   2.1
      */
-    public function add( $data = array() ) {
-
+    public function add( $data = array() )
+    {
         $args = wp_parse_args(
             $data,
             $this->get_column_defaults()
@@ -131,24 +139,7 @@ class _DB_Superlinks extends DB  {
 
         $args = $this->serialize_tags( $args );
 
-        return $this->insert( $args, 'superlink' );
-    }
-
-    /**
-     * Insert a new superlink
-     *
-     * @access  public
-     * @since   2.1
-     * @return  int
-     */
-    public function insert( $data, $type = '' ) {
-        $result = parent::insert( $data, $type );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
+        return $this->insert( $args );
     }
 
     /**
@@ -158,66 +149,11 @@ class _DB_Superlinks extends DB  {
      * @since   2.1
      * @return  bool
      */
-    public function update( $row_id, $data = array(), $where = '' ) {
-
+    public function update( $row_id, $data = array(), $where = '' )
+    {
         $data = $this->serialize_tags( $data );
-
         $result = parent::update( $row_id, $data, $where );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
         return $result;
-    }
-
-    /**
-     * Delete a superlink
-     *
-     * @access  public
-     * @since   2.3.1
-     */
-    public function delete( $id = false ) {
-
-        if ( empty( $id ) ) {
-            return false;
-        }
-
-        $superlink = $this->get_superlink_by( 'ID', $id );
-
-        if ( $superlink->ID > 0 ) {
-
-            global $wpdb;
-
-            $result = $wpdb->delete( $this->table_name, array( 'ID' => $superlink->ID ), array( '%d' ) );
-
-            if ( $result ) {
-                $this->set_last_changed();
-            }
-
-            return $result;
-
-        } else {
-            return false;
-        }
-
-    }
-
-    /**
-     * Checks if a superlink exists
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function exists( $value = 0, $field = 'ID' ) {
-
-        $columns = $this->get_columns();
-        if ( ! array_key_exists( $field, $columns ) ) {
-            return false;
-        }
-
-        return (bool) $this->get_column_by( 'ID', $field, $value );
-
     }
 
     /**
@@ -250,23 +186,24 @@ class _DB_Superlinks extends DB  {
         return $this->unserialize_tags( parent::get_by( $field, $value ) );
     }
 
+    /**
+     * Search for superlinks
+     *
+     * @param string $s
+     * @return array
+     */
     public function search($s = '')
     {
         $results = parent::search($s); // TODO: Change the autogenerated stub
-
-
         if ( is_array( $results ) ){
-
             $results = array_map( array( $this, 'unserialize_tags' ), $results );
-
         }
-
         return $results;
-
     }
 
+
     /**
-     * Retrieve superlinks from the database
+     * Retrieve Superlinks from the database
      *
      * @access  public
      * @since   2.1
@@ -292,22 +229,17 @@ class _DB_Superlinks extends DB  {
         $where = $this->generate_where( $data );
 
         if ( empty( $where ) ){
-
             $where = "1=1";
-
         }
 
         $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where" );
 
         if ( is_array( $results ) ){
-
             $results = array_map( array( $this, 'unserialize_tags' ), $results );
-
         }
 
         return $results;
     }
-
 
     /**
      * Count the total number of superlinks in the database
@@ -315,40 +247,9 @@ class _DB_Superlinks extends DB  {
      * @access  public
      * @since   2.1
      */
-    public function count( $args = array() ) {
-
+    public function count( $args = array() )
+    {
         return count( $this->get_superlinks( $args ) );
-
-    }
-
-    /**
-     * Sets the last_changed cache key for superlinks.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function set_last_changed() {
-        wp_cache_set( 'last_changed', microtime(), $this->cache_group );
-    }
-
-    /**
-     * Retrieves the value of the last_changed cache key for superlinks.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function get_last_changed() {
-        if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-            return wp_cache_get_last_changed( $this->cache_group );
-        }
-
-        $last_changed = wp_cache_get( 'last_changed', $this->cache_group );
-        if ( ! $last_changed ) {
-            $last_changed = microtime();
-            wp_cache_set( 'last_changed', $last_changed, $this->cache_group );
-        }
-
-        return $last_changed;
     }
 
     /**
@@ -376,5 +277,4 @@ class _DB_Superlinks extends DB  {
 
         update_option( $this->table_name . '_db_version', $this->version );
     }
-
 }

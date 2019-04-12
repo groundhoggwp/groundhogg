@@ -1,4 +1,10 @@
 <?php
+
+namespace Groundhogg\DB;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Steps DB
  *
@@ -11,16 +17,7 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-/**
- * WPGH_DB_Contacts Class
- *
- * @since 2.1
- */
-class _DB_Steps extends DB  {
+class Steps extends DB  {
 
     /**
      * The metadata type.
@@ -32,29 +29,49 @@ class _DB_Steps extends DB  {
     public $meta_type = 'step';
 
     /**
-     * The name of the cache group.
+     * Get the DB suffix
      *
-     * @access public
-     * @since  2.8
-     * @var string
+     * @return string
      */
-    public $cache_group = 'steps';
+    public function get_db_suffix()
+    {
+        return 'gh_events';
+    }
 
     /**
-     * Get things started
+     * Get the DB primary key
      *
-     * @access  public
-     * @since   2.1
+     * @return string
      */
-    public function __construct() {
+    public function get_primary_key()
+    {
+        return 'ID';
+    }
 
-        $this->db_name = 'gh_steps';
-        $this->table_name();
+    /**
+     * Get the DB version
+     *
+     * @return mixed
+     */
+    public function get_db_version()
+    {
+        return '2.0';
+    }
 
-        $this->primary_key = 'ID';
-        $this->version     = '1.0';
+    /**
+     * Get the object type we're inserting/updateing/deleting.
+     *
+     * @return string
+     */
+    public function get_object_type()
+    {
+        return 'step';
+    }
 
-        add_action( 'wpgh_delete_funnel', array( $this, 'delete_steps' ) );
+    protected function add_additional_actions()
+    {
+        add_action( 'groundhogg/db/post_delete/funnel', [ $this, 'delete_steps' ] );
+        parent::add_additional_actions();
     }
 
     /**
@@ -110,75 +127,7 @@ class _DB_Steps extends DB  {
             return false;
         }
 
-        return $this->insert( $args, 'step' );
-    }
-
-    /**
-     * Insert a new step
-     *
-     * @access  public
-     * @since   2.1
-     * @return  int
-     */
-    public function insert( $data, $type = '' ) {
-        $result = parent::insert( $data, $type );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Update a step
-     *
-     * @access  public
-     * @since   2.1
-     * @return  bool
-     */
-    public function update( $row_id, $data = array(), $where = '' ) {
-        $result = parent::update( $row_id, $data, $where );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Delete a step
-     *
-     * @access  public
-     * @since   2.3.1
-     */
-    public function delete( $id = false ) {
-
-        if ( empty( $id ) ) {
-            return false;
-        }
-
-        $step = $this->get_step_by( 'ID', $id );
-
-        if ( $step->ID > 0 ) {
-
-            global $wpdb;
-
-            $result = $wpdb->delete( $this->table_name, array( 'ID' => $step->ID ), array( '%d' ) );
-
-            if ( $result ) {
-                $this->set_last_changed();
-            }
-
-            do_action( 'wpgh_delete_step', $id );
-
-            return $result;
-
-        } else {
-            return false;
-        }
-
+        return $this->insert( $args );
     }
 
     /**
@@ -187,8 +136,8 @@ class _DB_Steps extends DB  {
      * @param bool|int $id Funnel ID
      * @return bool|false|int
      */
-    public function delete_steps( $id = false ){
-
+    public function delete_steps( $id = false )
+    {
         if ( empty( $id ) ) {
             return false;
         }
@@ -204,25 +153,6 @@ class _DB_Steps extends DB  {
         }
 
         return $result;
-
-
-    }
-
-    /**
-     * Checks if a step exists
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function exists( $value = 0, $field = 'ID' ) {
-
-        $columns = $this->get_columns();
-        if ( ! array_key_exists( $field, $columns ) ) {
-            return false;
-        }
-
-        return (bool) $this->get_column_by( 'ID', $field, $value );
-
     }
 
     /**
@@ -254,6 +184,7 @@ class _DB_Steps extends DB  {
 
         return parent::get_by( $field, $value );
     }
+
 
     /**
      * Retrieve steps from the database
@@ -300,7 +231,6 @@ class _DB_Steps extends DB  {
         return $results;
     }
 
-
     /**
      * Count the total number of steps in the database
      *
@@ -311,36 +241,6 @@ class _DB_Steps extends DB  {
 
         return count( $this->get_steps( $args ) );
 
-    }
-
-    /**
-     * Sets the last_changed cache key for steps.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function set_last_changed() {
-        wp_cache_set( 'last_changed', microtime(), $this->cache_group );
-    }
-
-    /**
-     * Retrieves the value of the last_changed cache key for steps.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function get_last_changed() {
-        if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-            return wp_cache_get_last_changed( $this->cache_group );
-        }
-
-        $last_changed = wp_cache_get( 'last_changed', $this->cache_group );
-        if ( ! $last_changed ) {
-            $last_changed = microtime();
-            wp_cache_set( 'last_changed', $last_changed, $this->cache_group );
-        }
-
-        return $last_changed;
     }
 
     /**
@@ -370,5 +270,4 @@ class _DB_Steps extends DB  {
 
         update_option( $this->table_name . '_db_version', $this->version );
     }
-
 }

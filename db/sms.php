@@ -1,4 +1,9 @@
 <?php
+
+namespace Groundhogg\DB;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * SMS DB
  *
@@ -11,33 +16,48 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 1.2
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class _DB_SMS extends DB
+class SMS extends DB
 {
-    /**
-     * The name of the cache group.
-     *
-     * @access public
-     * @since  2.8
-     * @var string
-     */
-    public $cache_group = 'sms_messages';
+
 
     /**
-     * Get things started
+     * Get the DB suffix
      *
-     * @access  public
-     * @since   2.1
+     * @return string
      */
-    public function __construct() {
+    public function get_db_suffix()
+    {
+        return 'gh_sms';
+    }
 
-        $this->db_name = 'gh_sms';
-        $this->table_name();
+    /**
+     * Get the DB primary key
+     *
+     * @return string
+     */
+    public function get_primary_key()
+    {
+        return 'ID';
+    }
 
-        $this->primary_key = 'ID';
-        $this->version     = '1.0';
+    /**
+     * Get the DB version
+     *
+     * @return mixed
+     */
+    public function get_db_version()
+    {
+        return '2.0';
+    }
+
+    /**
+     * Get the object type we're inserting/updateing/deleting.
+     *
+     * @return string
+     */
+    public function get_object_type()
+    {
+        return 'sms';
     }
 
     /**
@@ -55,6 +75,7 @@ class _DB_SMS extends DB
         );
     }
 
+
     /**
      * Get default column values
      *
@@ -70,7 +91,6 @@ class _DB_SMS extends DB
         );
     }
 
-    
     /**
      * Add a sms
      *
@@ -88,96 +108,7 @@ class _DB_SMS extends DB
             return false;
         }
 
-        return $this->insert( $args, 'sms' );
-    }
-
-    /**
-     * Insert a new sms
-     *
-     * @access  public
-     * @since   2.1
-     * @return  int
-     */
-    public function insert( $data, $type = '' ) {
-        $result = parent::insert( $data, $type );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Update a sms
-     *
-     * @access  public
-     * @since   2.1
-     * @return  bool
-     */
-    public function update( $row_id, $data = array(), $where = '' ) {
-
-        $result = parent::update( $row_id, $data, $where );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Delete a sms
-     *
-     * @access  public
-     * @since   2.3.1
-     */
-    public function delete( $id = false ) {
-
-        if ( empty( $id ) ) {
-            return false;
-        }
-
-        $sms = $this->get_sms_by( 'ID', $id );
-
-        if ( $sms->ID > 0 ) {
-
-            global $wpdb;
-
-            /* delete the actual sms */
-            $result = $wpdb->delete( $this->table_name, array( 'ID' => $sms->ID ), array( '%d' ) );
-
-            if ( $result ) {
-                $this->set_last_changed();
-
-                do_action( 'wpgh_delete_sms', $sms->ID );
-            }
-
-            return $result;
-
-        } else {
-            return false;
-        }
-
-    }
-
-    /**
-     * Checks if a sms exists
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function exists( $value = 0, $field = 'ID' ) {
-
-        $columns = $this->get_columns();
-        if ( ! array_key_exists( $field, $columns ) ) {
-            return false;
-        }
-
-        $sms = $this->get_sms_by( $field, $value );
-
-        return ! empty( $sms ) ;
-
+        return $this->insert( $args );
     }
 
     /**
@@ -284,9 +215,7 @@ class _DB_SMS extends DB
         $extra = '';
 
         if ( isset( $data[ 'search' ] ) ){
-
             $extra .= sprintf( " AND (%s)", $this->generate_search( $data[ 'search' ] ) );
-
         }
 
         // Initialise column format array
@@ -322,36 +251,6 @@ class _DB_SMS extends DB
     }
 
     /**
-     * Sets the last_changed cache key for smss.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function set_last_changed() {
-        wp_cache_set( 'last_changed', microtime(), $this->cache_group );
-    }
-
-    /**
-     * Retrieves the value of the last_changed cache key for smss.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function get_last_changed() {
-        if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-            return wp_cache_get_last_changed( $this->cache_group );
-        }
-
-        $last_changed = wp_cache_get( 'last_changed', $this->cache_group );
-        if ( ! $last_changed ) {
-            $last_changed = microtime();
-            wp_cache_set( 'last_changed', $last_changed, $this->cache_group );
-        }
-
-        return $last_changed;
-    }
-
-    /**
      * Create the table
      *
      * @access  public
@@ -375,5 +274,4 @@ class _DB_SMS extends DB
 
         update_option( $this->table_name . '_db_version', $this->version );
     }
-
 }

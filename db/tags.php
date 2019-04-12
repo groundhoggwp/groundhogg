@@ -69,6 +69,7 @@ class Tags extends DB
     {
         add_action( 'groundhogg/db/post_insert/tag_relationship', [ $this, 'increase_contact_count' ], 10, 2 );
         add_action( 'groundhogg/db/post_delete/tag_relationship', [ $this, 'decrease_contact_count' ], 10 );
+        add_action( 'groundhogg/db/pre_bulk_delete/tag_relationships', [ $this, 'bulk_decrease_tag_count' ], 10 );
     }
 
     /**
@@ -349,6 +350,10 @@ class Tags extends DB
      */
     public function decrease_contact_count( $args = [] )
     {
+        if ( ! gisset_not_empty( $args, 'tag_id' ) ){
+            return;
+        }
+
         $tag_id = absint( $args[ 'tag_id' ] );
 
         if ( ! $this->exists( $tag_id ) ) {
@@ -358,6 +363,22 @@ class Tags extends DB
         $tag = $this->get_tag( $tag_id );
         $tag->contact_count = intval( $tag->contact_count ) - 1;
         $this->update( $tag_id, array( 'contact_count' => $tag->contact_count ), $this->primary_key );
+    }
+
+    /**
+     * Bulk decrease the contact count.
+     *
+     * @param $tag_ids
+     */
+    public function bulk_decrease_tag_count( $tag_ids ){
+
+        if ( empty( $tag_ids ) ){
+            return;
+        }
+
+        foreach ( $tag_ids as $id ){
+            $this->decrease_contact_count( [ 'tag_id' => $id ] );
+        }
     }
 
     /**
