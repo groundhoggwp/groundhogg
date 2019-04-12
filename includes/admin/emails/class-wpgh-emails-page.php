@@ -59,6 +59,7 @@ class WPGH_Emails_Page
             wp_enqueue_script( 'jquery-ui-sortable' );
             wp_enqueue_script( 'jquery-ui-draggable' );
 
+
             // adding code mirror
             wp_enqueue_style( 'codemirror' );
             wp_enqueue_script( 'codemirror' );

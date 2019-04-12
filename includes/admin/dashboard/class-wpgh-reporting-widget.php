@@ -125,9 +125,7 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
                 break;
             case 'this_month';
                 $this->start_time   = strtotime( 'first day of ' . date( 'F Y' ) );
-//                var_dump( date( 'Y-m-d H:i:s', $this->start_time ) );
                 $this->end_time     = strtotime( 'first day of ' . date( 'F Y', time() + MONTH_IN_SECONDS ) );
-//                var_dump( date( 'Y-m-d H:i:s', $this->end_time ) );
                 $this->points       = ceil( MONTH_IN_SECONDS / DAY_IN_SECONDS );
                 $this->difference   = DAY_IN_SECONDS;
                 break;
@@ -299,7 +297,7 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
 		}
 
 		$table_name = WPGH()->contact_meta->table_name;
-		$results = wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", 'source_page' ) ), 'meta_value' );
+		$results = wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", $meta_key ) ), 'meta_value' );
 
 		self::$meta_query_results[ $cache_key ] = $results;
 

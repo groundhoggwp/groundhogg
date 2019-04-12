@@ -105,6 +105,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.8 =
+* FIXED Status toggles inheriting incorrect CSS labels.
+* FIXED not adding new emails from Custom Email templates
+* FIXED Report meta query only using source_page as meta key...
+
 = 1.3.7 =
 * ADDED extra nonce to frontend form impression checks to ensure request is intentional.
 * ADDED extra nonce to frontend page view checks to ensure request is intentional.
