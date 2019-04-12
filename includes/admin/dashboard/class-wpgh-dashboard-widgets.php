@@ -22,6 +22,7 @@ class WPGH_Dashboard_Widgets
         add_action( 'admin_init', array( $this, 'setup_widgets' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
         add_action( 'wp_dashboard_setup', array( $this, 'setup_dashboard_widgets' ) );
+        add_action( 'groundhogg/api/v3/init_reports', array( $this, 'setup_dashboard_widgets' ) );
     }
 
     /**
