@@ -191,8 +191,8 @@ class WPGH_Upgrade{
         WPGH()->events->create_table();
         $events_table = WPGH()->events->table_name;
         /* UPDATE EXISTING EVENT TYPES */
-        $wpdb->query( $wpdb->prepare("UPDATE $events_table SET event_type = %d WHERE funnel_id = %d",WPGH_BROADCAST_EVENT, WPGH_BROADCAST ) );
-        $wpdb->query( $wpdb->prepare("UPDATE $events_table SET event_type = %d WHERE funnel_id > %d",WPGH_FUNNEL_EVENT, WPGH_BROADCAST ) );
+        $wpdb->query( $wpdb->prepare("UPDATE $events_table SET event_type = %d WHERE funnel_id = %d",GROUNDHOGG_BROADCAST_EVENT, WPGH_BROADCAST ) );
+        $wpdb->query( $wpdb->prepare("UPDATE $events_table SET event_type = %d WHERE funnel_id > %d",GROUNDHOGG_FUNNEL_EVENT, WPGH_BROADCAST ) );
 
         /* MIGRATE EXISTING SMS TO DB TABLE */
         $sms_steps = WPGH()->steps->get_steps( array(

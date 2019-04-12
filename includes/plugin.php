@@ -1,6 +1,9 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\DB\Manager as DB_Manager;
+use Groundhogg\Admin\Admin_Menu;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -36,9 +39,28 @@ class Plugin {
      * @since 2.0.0
      * @access public
      *
-     * @var DB[]
+     * @var DB_Manager[]
      */
-    public $dbs = [];
+    public $dbs;
+
+    /**
+     * Holds plugin specific notices.
+     *
+     * @var Notices
+     */
+    public $notices;
+
+    /**
+     * Inits the admin screens.
+     *
+     * @var Admin_Menu
+     */
+    public $admin;
+
+    /**
+     * @var HTML
+     */
+    public $HTML;
     
     /**
      * Settings.
@@ -64,17 +86,6 @@ class Plugin {
      */
     public $role_manager;
 
-    /**
-     * Admin.
-     *
-     * Holds the plugin admin.
-     *
-     * @since 1.0.0
-     * @access public
-     *
-     * @var Admin
-     */
-    public $admin;
     
     /**
      * @var Log_Manager
@@ -189,8 +200,13 @@ class Plugin {
      */
     private function init_components() {
 
+        $this->dbs = new DB_Manager();
+        $this->HTML = new HTML();
 
         if ( is_admin() ) {
+
+            $this->notices = new Notices();
+            $this->admin   = new Admin_Menu();
 
         }
 
@@ -205,7 +221,7 @@ class Plugin {
      * @access private
      */
     private function register_autoloader() {
-        require ELEMENTOR_PATH . '/includes/autoloader.php';
+        require GROUNDHOGG_PATH . '/includes/autoloader.php';
 
         Autoloader::run();
     }
@@ -221,13 +237,26 @@ class Plugin {
     private function __construct() {
         $this->register_autoloader();
 
-        $this->logger = Log_Manager::instance();
+//        $this->logger = Log_Manager::instance();
+//
+//        Maintenance::init();
+//        Compatibility::register_actions();
 
-        Maintenance::init();
-        Compatibility::register_actions();
+        $this->includes();
 
-        add_action( 'init', [ $this, 'init' ], 0 );
+        add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
         add_action( 'rest_api_init', [ $this, 'on_rest_api_init' ] );
+    }
+
+    /**
+     * Include other files
+     */
+    private function includes()
+    {
+        require  GROUNDHOGG_PATH . '/includes/functions.php';
+        require  GROUNDHOGG_PATH . '/includes/scripts.php';
+//        require  GROUNDHOGG_PATH . '/includes/install.php';
+//        require  GROUNDHOGG_PATH . '/includes/install.php';
     }
 }
 

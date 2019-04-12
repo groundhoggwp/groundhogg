@@ -1,5 +1,4 @@
 <?php
-
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -19,6 +18,11 @@ define( 'WPGH_MONTHLY'      , 4 );
 define( 'WPGH_HARD_BOUNCE'  , 5 );
 define( 'WPGH_SPAM'         , 6 );
 define( 'WPGH_COMPLAINED'   , 7 );
+
+function WPGH()
+{
+    return \Groundhogg\Plugin::instance();
+}
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons
@@ -1368,7 +1372,7 @@ function wpgh_send_email_notification( $email_id, $contact_id_or_email, $time=0 
         'funnel_id'     => 0,
         'step_id'       => $email_id,
         'contact_id'    => $contact->ID,
-        'event_type'    => WPGH_EMAIL_NOTIFICATION_EVENT,
+        'event_type'    => GROUNDHOGG_EMAIL_NOTIFICATION_EVENT,
         'status'        => 'waiting',
     ];
 
@@ -1405,7 +1409,7 @@ function wpgh_send_sms_notification( $sms_id, $contact_id_or_email, $time=0 )
         'funnel_id'     => 0,
         'step_id'       => $sms_id,
         'contact_id'    => $contact->ID,
-        'event_type'    => WPGH_SMS_NOTIFICATION_EVENT,
+        'event_type'    => GROUNDHOGG_SMS_NOTIFICATION_EVENT,
         'status'        => 'waiting',
     ];
 

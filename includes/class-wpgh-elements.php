@@ -62,7 +62,7 @@ class WPGH_Elements
     private function includes()
     {
         /* Parent Class */
-        include_once dirname( __FILE__ ) . '/elements/class-wpgh-funnel-step.php';
+        include_once dirname(__FILE__) . '/elements/class-wpgh-funnel-step.php';
 
         /* actions */
         $action_path = dirname( __FILE__ ) . '/elements/actions/';

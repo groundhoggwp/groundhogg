@@ -129,16 +129,16 @@ class WPGH_Event
         if ($this->type) {
             switch ($this->type) {
                 default:
-                case WPGH_FUNNEL_EVENT:
+                case GROUNDHOGG_FUNNEL_EVENT:
                     $this->step = wpgh_get_funnel_step($event->step_id);
                     break;
-                case WPGH_BROADCAST_EVENT:
+                case GROUNDHOGG_BROADCAST_EVENT:
                     $this->step = new WPGH_Broadcast($event->step_id);
                     break;
-                case WPGH_EMAIL_NOTIFICATION_EVENT:
+                case GROUNDHOGG_EMAIL_NOTIFICATION_EVENT:
                     $this->step = new WPGH_Email_Notification($event->step_id);
                     break;
-                case WPGH_SMS_NOTIFICATION_EVENT:
+                case GROUNDHOGG_SMS_NOTIFICATION_EVENT:
                     $this->step = new WPGH_SMS_Notification( $event->step_id );
                     break;
 
@@ -172,10 +172,10 @@ class WPGH_Event
         }
 
         if ($this->is_broadcast_event()) {
-            return WPGH_BROADCAST_EVENT;
+            return GROUNDHOGG_BROADCAST_EVENT;
         }
 
-        return WPGH_FUNNEL_EVENT;
+        return GROUNDHOGG_FUNNEL_EVENT;
     }
 
     /**
@@ -197,7 +197,7 @@ class WPGH_Event
     public function is_funnel_event()
     {
         if ($this->type) {
-            return $this->type === WPGH_FUNNEL_EVENT;
+            return $this->type === GROUNDHOGG_FUNNEL_EVENT;
         }
 
         return $this->funnel_id !== WPGH_BROADCAST;
@@ -209,7 +209,7 @@ class WPGH_Event
      */
     public function is_sms_notification_event()
     {
-        return $this->type === WPGH_EMAIL_NOTIFICATION_EVENT;
+        return $this->type === GROUNDHOGG_EMAIL_NOTIFICATION_EVENT;
     }
 
     /**
@@ -218,7 +218,7 @@ class WPGH_Event
      */
     public function is_email_notification_event()
     {
-        return $this->type === WPGH_SMS_NOTIFICATION_EVENT;
+        return $this->type === GROUNDHOGG_SMS_NOTIFICATION_EVENT;
     }
 
     /**
@@ -249,16 +249,16 @@ class WPGH_Event
         if ($this->type) {
             switch ($this->type) {
                 default:
-                case WPGH_FUNNEL_EVENT:
+                case GROUNDHOGG_FUNNEL_EVENT:
                     $step_title = $this->step->title;
                     break;
-                case WPGH_BROADCAST_EVENT:
+                case GROUNDHOGG_BROADCAST_EVENT:
                     $step_title = $this->step->get_title();
                     break;
-                case WPGH_EMAIL_NOTIFICATION_EVENT:
+                case GROUNDHOGG_EMAIL_NOTIFICATION_EVENT:
                     $step_title = $this->step->email->subject;
                     break;
-                case WPGH_SMS_NOTIFICATION_EVENT:
+                case GROUNDHOGG_SMS_NOTIFICATION_EVENT:
                     $step_title = $this->step->sms->title;
                     break;
             }
@@ -281,17 +281,17 @@ class WPGH_Event
         if ($this->type) {
             switch ($this->type) {
                 default:
-                case WPGH_FUNNEL_EVENT:
+                case GROUNDHOGG_FUNNEL_EVENT:
                     $funnel = WPGH()->funnels->get( $this->funnel_id );
                     $title = ( $funnel )? $funnel->title : sprintf( '(%s)', _x( 'funnel deleted', 'status', 'groundhogg' ) ) ;
                     break;
-                case WPGH_BROADCAST_EVENT:
+                case GROUNDHOGG_BROADCAST_EVENT:
                     $title =  sprintf( __( '%s Broadcast', 'groundhogg' ), ucfirst( $this->step->get_type() ) );
                     break;
-                case WPGH_EMAIL_NOTIFICATION_EVENT:
+                case GROUNDHOGG_EMAIL_NOTIFICATION_EVENT:
                     $title =  __( 'Email Notification', 'groundhogg' );
                     break;
-                case WPGH_SMS_NOTIFICATION_EVENT:
+                case GROUNDHOGG_SMS_NOTIFICATION_EVENT:
                     $title =  __( 'SMS Notification', 'groundhogg' );
                     break;
 

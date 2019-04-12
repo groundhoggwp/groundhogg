@@ -370,7 +370,7 @@ class WPGH_Step implements WPGH_Event_Process
                 'funnel_id'     => $this->funnel_id,
                 'step_id'       => $this->ID,
                 'contact_id'    => $contact->ID,
-                'event_type'     => WPGH_FUNNEL_EVENT
+                'event_type'     => GROUNDHOGG_FUNNEL_EVENT
             )
         );
 
@@ -385,7 +385,7 @@ class WPGH_Step implements WPGH_Event_Process
             array(
                 'funnel_id'     => $this->funnel_id,
                 'contact_id'    => $contact->ID,
-                'event_type'    => WPGH_FUNNEL_EVENT,
+                'event_type'    => GROUNDHOGG_FUNNEL_EVENT,
                 'status'        => 'waiting'
 
             )
@@ -395,7 +395,7 @@ class WPGH_Step implements WPGH_Event_Process
             'time'          => $this->get_delay_time(),
             'funnel_id'     => $this->funnel_id,
             'step_id'       => $this->ID,
-            'event_type'    => WPGH_FUNNEL_EVENT,
+            'event_type'    => GROUNDHOGG_FUNNEL_EVENT,
             'contact_id'    => $contact->ID
         );
 

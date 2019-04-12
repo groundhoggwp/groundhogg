@@ -1,5 +1,4 @@
 <?php
-
 namespace Groundhogg\DB;
 
 if ( ! defined( 'ABSPATH' ) ) exit;

@@ -63,7 +63,7 @@ class WPGH_Admin_Menu
     var $events_page;
 
     /**
-     * @var WPGH_Welcome_Page
+     * @var Welcome
      */
     var $welcome_page;
 
@@ -96,7 +96,7 @@ class WPGH_Admin_Menu
     {
         $this->includes();
 
-        $this->welcome_page     = new WPGH_Welcome_Page();
+        $this->welcome_page     = new Welcome();
         $this->dashboard        = new WPGH_Dashboard_Widgets();
         $this->contacts_page    = new WPGH_Contacts_Page();
         $this->tags_page        = new WPGH_Tags_Page();
@@ -125,20 +125,20 @@ class WPGH_Admin_Menu
      */
     public function includes()
     {
-        require_once dirname( __FILE__ ). '/admin/broadcasts/class-wpgh-broadcasts-page.php';
-        require_once dirname( __FILE__ ). '/admin/dashboard/class-wpgh-dashboard-widgets.php';
-        require_once dirname( __FILE__ ). '/admin/contacts/class-wpgh-contacts-page.php';
-        require_once dirname( __FILE__ ). '/admin/emails/class-wpgh-emails-page.php';
-        require_once dirname( __FILE__ ). '/admin/sms/class-wpgh-sms-page.php';
-        require_once dirname( __FILE__ ). '/admin/events/class-wpgh-events-page.php';
-        require_once dirname( __FILE__ ). '/admin/funnels/class-wpgh-funnels-page.php';
-        require_once dirname( __FILE__ ). '/admin/settings/class-wpgh-settings-page.php';
-        require_once dirname( __FILE__ ). '/admin/superlinks/class-wpgh-superlinks-page.php';
-        require_once dirname( __FILE__ ). '/admin/tags/class-wpgh-tags-page.php';
-        require_once dirname( __FILE__ ). '/admin/welcome/class-wpgh-welcome-page.php';
-        require_once dirname( __FILE__ ). '/admin/guided-setup/class-wpgh-guided-setup.php';
-        require_once dirname( __FILE__ ). '/admin/bulk-jobs/class-wpgh-admin-bulk-job.php';
-        require_once dirname( __FILE__ ). '/admin/tools/class-wpgh-admin-tools.php';
+        require_once dirname(__FILE__) . '/admin/broadcasts/class-wpgh-broadcasts-page.php';
+        require_once dirname(__FILE__) . '/admin/dashboard/class-wpgh-dashboard-widgets.php';
+        require_once dirname(__FILE__) . '/admin/contacts/class-wpgh-contacts-page.php';
+        require_once dirname(__FILE__) . '/admin/emails/class-wpgh-emails-page.php';
+        require_once dirname(__FILE__) . '/admin/sms/class-wpgh-sms-page.php';
+        require_once dirname(__FILE__) . '/admin/events/class-wpgh-events-page.php';
+        require_once dirname(__FILE__) . '/admin/funnels/class-wpgh-funnels-page.php';
+        require_once dirname(__FILE__) . '/admin/settings/settings-page.php';
+        require_once dirname(__FILE__) . '/admin/superlinks/class-wpgh-superlinks-page.php';
+        require_once dirname(__FILE__) . '/admin/tags/class-wpgh-tags-page.php';
+        require_once dirname(__FILE__) . '/admin/welcome/welcome-page.php';
+        require_once dirname(__FILE__) . '/admin/guided-setup/class-wpgh-guided-setup.php';
+        require_once dirname(__FILE__) . '/admin/bulk-jobs/class-wpgh-admin-bulk-job.php';
+        require_once dirname(__FILE__) . '/admin/tools/class-wpgh-admin-tools.php';
     }
 
     public function current_page()

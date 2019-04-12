@@ -6,7 +6,7 @@
  * Time: 11:01 AM
  */
 if ( ! class_exists( 'WPGH_Bulk_Job' ) ){
-    include WPGH_PLUGIN_DIR. 'includes/class-wpgh-bulk-job.php';
+    include WPGH_PLUGIN_DIR. 'includes/bulk-job.php';
 }
 
 class WPGH_Tag_Mapping extends WPGH_Bulk_Job

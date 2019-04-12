@@ -1,14 +1,13 @@
 <?php
-
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'WPGH_FUNNEL_EVENT', 1 );
-define( 'WPGH_BROADCAST_EVENT', 2 );
-define( 'WPGH_EMAIL_NOTIFICATION_EVENT', 3 );
-define( 'WPGH_SMS_NOTIFICATION_EVENT', 4 );
+define( 'GROUNDHOGG_FUNNEL_EVENT', 1 );
+define( 'GROUNDHOGG_BROADCAST_EVENT', 2 );
+define( 'GROUNDHOGG_EMAIL_NOTIFICATION_EVENT', 3 );
+define( 'GROUNDHOGG_SMS_NOTIFICATION_EVENT', 4 );
 
 /**
  * Events DB
@@ -107,7 +106,7 @@ class Events extends DB  {
             'funnel_id'     => 0,
             'step_id'       => 0,
             'contact_id'    => 0,
-            'event_type'    => WPGH_FUNNEL_EVENT,
+            'event_type'    => GROUNDHOGG_FUNNEL_EVENT,
             'failure_reason'=> '',
             'status'        => 'waiting',
         );
