@@ -1,29 +1,34 @@
 <?php
 /**
- * SMS DB
+ * Superlinks DB
  *
- * Store sms messages
+ * Store and manipulate superlinks
  *
  * @package     Includes
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 1.2
+ * @since       File available since Release 0.1
  */
-
+// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_DB_SMS extends WPGH_DB
-{
-    /**
+/**
+ * WPGH_DB_Contacts Class
+ *
+ * @since 2.1
+ */
+class _DB_Superlinks extends DB  {
+
+        /**
      * The name of the cache group.
      *
      * @access public
      * @since  2.8
      * @var string
      */
-    public $cache_group = 'sms_messages';
+    public $cache_group = 'superlinks';
 
     /**
      * Get things started
@@ -33,7 +38,7 @@ class WPGH_DB_SMS extends WPGH_DB
      */
     public function __construct() {
 
-        $this->db_name = 'gh_sms';
+        $this->db_name = 'gh_superlinks';
         $this->table_name();
 
         $this->primary_key = 'ID';
@@ -48,10 +53,11 @@ class WPGH_DB_SMS extends WPGH_DB
      */
     public function get_columns() {
         return array(
-            'ID'      => '%d',
-            'title'   => '%s',
-            'message' => '%s',
-            'author'  => '%d',
+            'ID'            => '%d',
+            'name'          => '%s',
+            'target'        => '%s',
+            'tags'          => '%s',
+            'clicks'        => '%d',
         );
     }
 
@@ -63,16 +69,51 @@ class WPGH_DB_SMS extends WPGH_DB
      */
     public function get_column_defaults() {
         return array(
-            'ID'      => 0,
-            'title'   => '',
-            'message' => '',
-            'author'  => get_current_user_id(),
+            'ID'            => 0,
+            'name'          => '',
+            'target'        => '',
+            'tags'          => '',
+            'clicks'        => 0,
         );
     }
 
-    
     /**
-     * Add a sms
+     * Given a data set, if tags are present make sure the end up serialized
+     *
+     * @param array $data
+     * @return array
+     */
+    private function serialize_tags( $data = array() ){
+
+        if ( isset( $data[ 'tags' ] ) ){
+
+            $data[ 'tags' ] = maybe_serialize( $data[ 'tags' ] );
+
+        }
+
+        return $data;
+
+    }
+
+    /**
+     * Given a data set, if tags are present make sure they end up unserialized
+     *
+     * @param null $obj
+     * @return null
+     */
+    private function unserialize_tags( $obj = null )
+    {
+        if ( is_object( $obj ) && isset( $obj->tags ) ){
+
+            $obj->tags = maybe_unserialize( $obj->tags );
+
+        }
+
+        return $obj;
+    }
+
+    /**
+     * Add a superlink
      *
      * @access  public
      * @since   2.1
@@ -84,15 +125,17 @@ class WPGH_DB_SMS extends WPGH_DB
             $this->get_column_defaults()
         );
 
-        if( empty( $args['title'] ) ) {
+        if ( empty( $args[ 'target' ] ) ){
             return false;
         }
 
-        return $this->insert( $args, 'sms' );
+        $args = $this->serialize_tags( $args );
+
+        return $this->insert( $args, 'superlink' );
     }
 
     /**
-     * Insert a new sms
+     * Insert a new superlink
      *
      * @access  public
      * @since   2.1
@@ -109,13 +152,15 @@ class WPGH_DB_SMS extends WPGH_DB
     }
 
     /**
-     * Update a sms
+     * Update a superlink
      *
      * @access  public
      * @since   2.1
      * @return  bool
      */
     public function update( $row_id, $data = array(), $where = '' ) {
+
+        $data = $this->serialize_tags( $data );
 
         $result = parent::update( $row_id, $data, $where );
 
@@ -127,7 +172,7 @@ class WPGH_DB_SMS extends WPGH_DB
     }
 
     /**
-     * Delete a sms
+     * Delete a superlink
      *
      * @access  public
      * @since   2.3.1
@@ -138,19 +183,16 @@ class WPGH_DB_SMS extends WPGH_DB
             return false;
         }
 
-        $sms = $this->get_sms_by( 'ID', $id );
+        $superlink = $this->get_superlink_by( 'ID', $id );
 
-        if ( $sms->ID > 0 ) {
+        if ( $superlink->ID > 0 ) {
 
             global $wpdb;
 
-            /* delete the actual sms */
-            $result = $wpdb->delete( $this->table_name, array( 'ID' => $sms->ID ), array( '%d' ) );
+            $result = $wpdb->delete( $this->table_name, array( 'ID' => $superlink->ID ), array( '%d' ) );
 
             if ( $result ) {
                 $this->set_last_changed();
-
-                do_action( 'wpgh_delete_sms', $sms->ID );
             }
 
             return $result;
@@ -162,7 +204,7 @@ class WPGH_DB_SMS extends WPGH_DB
     }
 
     /**
-     * Checks if a sms exists
+     * Checks if a superlink exists
      *
      * @access  public
      * @since   2.1
@@ -174,105 +216,62 @@ class WPGH_DB_SMS extends WPGH_DB
             return false;
         }
 
-        $sms = $this->get_sms_by( $field, $value );
-
-        return ! empty( $sms ) ;
+        return (bool) $this->get_column_by( 'ID', $field, $value );
 
     }
 
     /**
-     * Retrieves the sms by the ID.
+     * Retrieves the superlink by the ID.
      *
      * @param $id
      *
      * @return mixed
      */
-    public function get_sms( $id )
+    public function get_superlink( $id )
     {
-        return $this->get_sms_by( 'ID', $id );
+        return $this->get_superlink_by( 'ID', $id );
     }
 
     /**
-     * Retrieves a single sms from the database
+     * Retrieves a single superlink from the database
      *
      * @access public
      * @since  2.3
-     * @param  string $field id or email
-     * @param  mixed  $value  The Customer ID or email to search
-     * @return mixed          Upon success, an object of the sms. Upon failure, NULL
+     * @param  string $field id or superlink
+     * @param  mixed  $value  The Customer ID or superlink to search
+     * @return mixed          Upon success, an object of the superlink. Upon failure, NULL
      */
-    public function get_sms_by( $field = 'ID', $value = 0 ) {
+    public function get_superlink_by( $field = 'ID', $value = 0 ) {
+
         if ( empty( $field ) || empty( $value ) ) {
             return NULL;
         }
 
-        if ( 'ID' == $field ) {
-            // Make sure the value is numeric to avoid casting objects, for example,
-            // to int 1.
-            if ( ! is_numeric( $value ) ) {
-                return false;
-            }
+        return $this->unserialize_tags( parent::get_by( $field, $value ) );
+    }
 
-            $value = intval( $value );
+    public function search($s = '')
+    {
+        $results = parent::search($s); // TODO: Change the autogenerated stub
 
-            if ( $value < 1 ) {
-                return false;
-            }
 
-        }
+        if ( is_array( $results ) ){
 
-        if ( ! $value ) {
-            return false;
-        }
+            $results = array_map( array( $this, 'unserialize_tags' ), $results );
 
-        $results = $this->get_by( $field, $value );
-
-        if ( empty( $results ) ) {
-            return false;
         }
 
         return $results;
+
     }
 
     /**
-     * Retrieve smss from the database
+     * Retrieve superlinks from the database
      *
      * @access  public
      * @since   2.1
      */
-    public function get_all_sms() {
-
-        global $wpdb;
-
-        $results = $wpdb->get_results("SELECT * FROM $this->table_name ORDER BY $this->primary_key DESC" );
-
-        return $results;
-
-    }
-
-    /**
-     * GET SMS messages ready for select/dropdown
-     *
-     * @return array
-     */
-    public function get_sms_select() {
-        global $wpdb;
-        $results = $this->get_all_sms();
-        $smses = [];
-        foreach ( $results as $sms ){
-            $smses[ $sms->ID ] = sprintf( "%s", $sms->title );
-        }
-
-        return $smses;
-    }
-
-    /**
-    * Retrieve messages from the database
-    *
-    * @access  public
-    * @since   2.1
-    */
-    public function get_smses( $data = array() ) {
+    public function get_superlinks( $data = array() ) {
 
         global  $wpdb;
 
@@ -280,14 +279,6 @@ class WPGH_DB_SMS extends WPGH_DB
             return false;
 
         $data = (array) $data;
-
-        $extra = '';
-
-        if ( isset( $data[ 'search' ] ) ){
-
-            $extra .= sprintf( " AND (%s)", $this->generate_search( $data[ 'search' ] ) );
-
-        }
 
         // Initialise column format array
         $column_formats = $this->get_columns();
@@ -306,23 +297,32 @@ class WPGH_DB_SMS extends WPGH_DB
 
         }
 
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY $this->primary_key DESC" );
+        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where" );
+
+        if ( is_array( $results ) ){
+
+            $results = array_map( array( $this, 'unserialize_tags' ), $results );
+
+        }
 
         return $results;
     }
 
+
     /**
-     * Count the total number of smss in the database
+     * Count the total number of superlinks in the database
      *
      * @access  public
      * @since   2.1
      */
     public function count( $args = array() ) {
-        return count( $this->get_smses( $args ) );
+
+        return count( $this->get_superlinks( $args ) );
+
     }
 
     /**
-     * Sets the last_changed cache key for smss.
+     * Sets the last_changed cache key for superlinks.
      *
      * @access public
      * @since  2.8
@@ -332,7 +332,7 @@ class WPGH_DB_SMS extends WPGH_DB
     }
 
     /**
-     * Retrieves the value of the last_changed cache key for smss.
+     * Retrieves the value of the last_changed cache key for superlinks.
      *
      * @access public
      * @since  2.8
@@ -361,14 +361,15 @@ class WPGH_DB_SMS extends WPGH_DB
 
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-        ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        title text NOT NULL,
-        message text NOT NULL,
-        author bigint(20) unsigned NOT NULL,
-        PRIMARY KEY (ID)
+		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        name mediumtext NOT NULL,
+        target mediumtext NOT NULL,
+        tags longtext NOT NULL,
+        clicks bigint(20) NOT NULL,
+        PRIMARY KEY  (ID)
 		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );

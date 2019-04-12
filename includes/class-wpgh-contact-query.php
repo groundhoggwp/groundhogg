@@ -117,7 +117,7 @@ class WPGH_Contact_Query {
      *
      * @access protected
      * @since  2.8
-     * @var WPGH_DB_Contacts
+     * @var _DB_Contacts
      */
     protected $wpgh_db_contacts;
 

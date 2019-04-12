@@ -23,7 +23,7 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit;
 
 // Load WPGH file.
-include_once dirname( __FILE__ ) . '/groundhogg.php' ;
+include_once dirname(__FILE__) . '/plugin.php';
 
 global $wpdb, $wp_roles;
 

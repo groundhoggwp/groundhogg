@@ -1,4 +1,10 @@
 <?php
+
+namespace Groundhogg\DB;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Activity DB
  *
@@ -11,43 +17,57 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-/**
- * WPGH_DB_Contacts Class
- *
- * @since 2.1
- */
-class WPGH_DB_Activity extends WPGH_DB  {
+class Activity extends DB  {
 
     /**
-     * The name of the cache group.
+     * Get the DB suffix
      *
-     * @access public
-     * @since  2.8
-     * @var string
+     * @return string
      */
-    public $cache_group = 'activity';
+    public function get_db_suffix()
+    {
+        return 'gh_activity';
+    }
 
     /**
-     * Get things started
+     * Get the DB primary key
      *
-     * @access  public
-     * @since   2.1
+     * @return string
      */
-    public function __construct() {
+    public function get_primary_key()
+    {
+        return 'ID';
+    }
 
-        $this->db_name = 'gh_activity';
-        $this->table_name();
+    /**
+     * Get the DB version
+     *
+     * @return mixed
+     */
+    public function get_db_version()
+    {
+        return '2.0';
+    }
 
-        $this->primary_key = 'ID';
-        $this->version     = '1.0';
+    /**
+     * Listen for deletions for other objects since we don't want to hold clutter for previous things
+     * to keep the DB small.
+     */
+    protected function add_additional_actions()
+    {
+        add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
+        add_action( 'groundhogg/db/post_delete/funnel',  [ $this, 'funnel_deleted' ] );
+        add_action( 'groundhogg/db/post_delete/step',    [ $this, 'step_deleted' ] );
+    }
 
-        add_action( 'wpgh_post_delete_contact',  array( $this, 'contact_deleted' ) );
-        add_action( 'wpgh_delete_funnel',   array( $this, 'funnel_deleted' ) );
-        add_action( 'wpgh_delete_step',     array( $this, 'step_deleted' ) );
+    /**
+     * Get the object type we're inserting/updateing/deleting.
+     *
+     * @return string
+     */
+    public function get_object_type()
+    {
+        return 'activity';
     }
 
     /**
@@ -57,7 +77,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
      * @since   2.1
      */
     public function get_columns() {
-        return array(
+        return [
             'ID'            => '%d',
             'timestamp'     => '%d',
             'funnel_id'     => '%d',
@@ -67,7 +87,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
             'email_id'      => '%d',
             'activity_type' => '%s',
             'referer'       => '%s',
-        );
+        ];
     }
 
     /**
@@ -107,55 +127,23 @@ class WPGH_DB_Activity extends WPGH_DB  {
             return false;
         }
 
-        return $this->insert( $args, 'activity' );
+        return $this->insert( $args );
     }
 
     /**
-     * Insert a new activity
+     * Helper function to bulk delete events in the event associated things happen.
      *
-     * @access  public
-     * @since   2.1
-     * @return  int
+     * @param array $data
+     * @return false|int
      */
-    public function insert( $data, $type = '' ) {
-        $result = parent::insert( $data, $type );
+    public function bulk_delete( $data = [] )
+    {
+        global $wpdb;
 
-        if ( $result ) {
-            $this->set_last_changed();
-        }
+        $column_formats = $this->get_columns();
+        $data = array_intersect_key( $data, $column_formats );
 
-        return $result;
-    }
-
-    /**
-     * Update activity
-     *
-     * @access  public
-     * @since   2.1
-     * @return  bool
-     */
-    public function update( $row_id, $data = array(), $where = '' ) {
-        $result = parent::update( $row_id, $data, $where );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Delete activity
-     *
-     * @access  public
-     * @since   2.3.1
-     */
-    public function delete( $id = false ) {
-        $result = parent::delete( $id );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
+        $result = $wpdb->delete( $this->table_name, $data );
 
         return $result;
     }
@@ -220,9 +208,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
      */
     public function count( $args = array() )
     {
-
         return count( $this->get_activity( $args ) );
-
     }
 
     /**
@@ -232,29 +218,8 @@ class WPGH_DB_Activity extends WPGH_DB  {
      * @since   2.1
      */
     public function activity_exists( $data = array() ) {
-
         $results = $this->get_activity( $data );
-
         return ! empty( $results );
-
-    }
-
-    /**
-     * Helper function to bulk delete events in the event associated things happen.
-     *
-     * @param array $args
-     * @return false|int
-     */
-    public function bulk_delete( $data = array(), $where= array( '%d' ) )
-    {
-        global $wpdb;
-
-        $column_formats = $this->get_columns();
-        $data = array_intersect_key( $data, $column_formats );
-
-        $result = $wpdb->delete( $this->table_name, $data );
-
-        return $result;
     }
 
     /**
@@ -264,7 +229,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
      * @return false|int
      */
     public function contact_deleted( $id ){
-        return $this->bulk_delete(  array( 'contact_id' => $id ) );
+        return $this->bulk_delete( [ 'contact_id' => $id ] );
     }
 
     /**
@@ -274,7 +239,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
      * @return false|int
      */
     public function funnel_deleted( $id ){
-        return $this->bulk_delete(  array( 'funnel_id' => $id ) );
+        return $this->bulk_delete( [ 'funnel_id' => $id ] );
     }
 
     /**
@@ -284,37 +249,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
      * @return false|int
      */
     public function step_deleted( $id ){
-        return $this->bulk_delete(  array( 'step_id' => $id ) );
-    }
-
-    /**
-     * Sets the last_changed cache key for activitys.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function set_last_changed() {
-        wp_cache_set( 'last_changed', microtime(), $this->cache_group );
-    }
-
-    /**
-     * Retrieves the value of the last_changed cache key for activitys.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function get_last_changed() {
-        if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-            return wp_cache_get_last_changed( $this->cache_group );
-        }
-
-        $last_changed = wp_cache_get( 'last_changed', $this->cache_group );
-        if ( ! $last_changed ) {
-            $last_changed = microtime();
-            wp_cache_set( 'last_changed', $last_changed, $this->cache_group );
-        }
-
-        return $last_changed;
+        return $this->bulk_delete( [ 'step_id' => $id ] );
     }
 
     /**
@@ -327,7 +262,7 @@ class WPGH_DB_Activity extends WPGH_DB  {
 
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $charset_collate = $wpdb->get_charset_collate();
 
@@ -352,5 +287,4 @@ class WPGH_DB_Activity extends WPGH_DB  {
 
         update_option( $this->table_name . '_db_version', $this->version );
     }
-
 }

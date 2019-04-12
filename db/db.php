@@ -1,5 +1,10 @@
 <?php
 
+namespace Groundhogg\DB;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * DB Parent Class
  *
@@ -13,20 +18,7 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-/**
- * GH base class
- *
- * @package     GH
- * @subpackage  Classes/GH DB
- * @copyright   Copyright (c) 2018, Adrian Tobey (modified from EDD_DB)
- * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License
- * @since       0.1
- */
-abstract class WPGH_DB {
+abstract class DB {
 
     /**
      * The name of our database table
@@ -34,7 +26,7 @@ abstract class WPGH_DB {
      * @access  public
      * @since   2.1
      */
-    public $db_name;
+    public $db_suffix;
 
     /**
      * The name of our database table
@@ -65,29 +57,79 @@ abstract class WPGH_DB {
      */
     public $charset;
 
-
     /**
      * Get things started
      *
      * @access  public
      * @since   2.1
      */
-    abstract public function __construct();
+    public function __construct(){
+        $this->db_suffix   = $this->get_db_suffix();
+        $this->table_name  = $this->get_table_name();
+
+        $this->primary_key = $this->get_primary_key();
+        $this->version     = $this->get_db_version();
+        $this->charset     = $this->get_charset_collate();
+
+        $this->add_additional_actions();
+    }
+
+    /**
+     * Option to add additional actions following construct.
+     */
+    protected function add_additional_actions(){}
+
+    /**
+     * Get the DB suffix
+     *
+     * @return string
+     */
+    abstract public function get_db_suffix();
+
+    /**
+     * Get the DB primary key
+     *
+     * @return string
+     */
+    abstract public function get_primary_key();
+
+    /**
+     * Get the DB version
+     *
+     * @return mixed
+     */
+    abstract public function get_db_version();
+
+    /**
+     * Get the object type we're inserting/updateing/deleting.
+     *
+     * @return string
+     */
+    abstract public function get_object_type();
+
+    /**
+     * Get the cache group
+     *
+     * @return string
+     */
+    public function get_cache_group(){
+        return 'gh_' . $this->get_object_type() . 's';
+    }
 
     /**
      * Get table name
      *
      * @return string
      */
-    public function table_name()
+    public function get_table_name()
     {
         global $wpdb;
 
         if ( ! isset( $this->table_name ) ){
             if ( ! wpgh_is_global_multisite() ){
-                $this->table_name  = $wpdb->prefix . $this->db_name;
+                $this->table_name  = $wpdb->prefix . $this->db_suffix;
             } else {
-                $this->table_name = $wpdb->base_prefix . $this->db_name;
+                $this->table_name = $wpdb->base_prefix . $this->db_suffix;
             }
         }
 
@@ -184,7 +226,7 @@ abstract class WPGH_DB {
      * @return  array
      */
     public function get_columns() {
-        return array();
+        return [];
     }
 
     /**
@@ -195,7 +237,7 @@ abstract class WPGH_DB {
      * @return  array
      */
     public function get_column_defaults() {
-        return array();
+        return [];
     }
 
     /**
@@ -251,19 +293,35 @@ abstract class WPGH_DB {
     }
 
     /**
+     * Add a email
+     *
+     * @access  public
+     * @since   2.1
+     */
+    public function add( $data = array() ) {
+
+        $args = wp_parse_args(
+            $data,
+            $this->get_column_defaults()
+        );
+
+        return $this->insert( $args );
+    }
+
+    /**
      * Insert a new row
      *
      * @access  public
      * @since   2.1
      * @return  int
      */
-    public function insert( $data, $type = '' ) {
+    public function insert( $data ) {
         global $wpdb;
 
         // Set default values
         $data = wp_parse_args( $data, $this->get_column_defaults() );
 
-        do_action( 'wpgh_pre_insert_' . $type, $data );
+        do_action( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data );
 
         // Initialise column format array
         $column_formats = $this->get_columns();
@@ -281,7 +339,11 @@ abstract class WPGH_DB {
         $wpdb->insert( $this->table_name, $data, $column_formats );
         $wpdb_insert_id = $wpdb->insert_id;
 
-        do_action( 'wpgh_post_insert_' . $type, $wpdb_insert_id, $data );
+        if ( $wpdb_insert_id ) {
+            $this->set_last_changed();
+        }
+
+        do_action( 'groundhogg/db/post_insert/' . $this->get_object_type(), $wpdb_insert_id, $data );
 
         return $wpdb_insert_id;
     }
@@ -293,7 +355,7 @@ abstract class WPGH_DB {
      * @since   2.1
      * @return  bool
      */
-    public function update( $row_id, $data = array(), $where = '' ) {
+    public function update( $row_id, $data = [], $where = '' ) {
 
         global $wpdb;
 
@@ -320,10 +382,15 @@ abstract class WPGH_DB {
         $data_keys = array_keys( $data );
         $column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
+        do_action( 'groundhogg/db/pre_update/' . $this->get_object_type(), $row_id, $data );
 
         if ( false === $wpdb->update( $this->table_name, $data, array( $where => $row_id ), $column_formats ) ) {
             return false;
         }
+
+        $this->set_last_changed();
+
+        do_action( 'groundhogg/db/post_update/' . $this->get_object_type(), $row_id );
 
         return true;
     }
@@ -350,13 +417,13 @@ abstract class WPGH_DB {
         $data = array_intersect_key( $data, $column_formats );
         $where = array_intersect_key( $where, $column_formats );
 
-        // Reorder $column_formats to match the order of columns given in $data
-//        $data_keys = array_keys( $data );
-//        $column_formats = array_merge( array_flip( $data_keys ), );
+        do_action( 'groundhogg/db/pre_mass_update/' . $this->get_object_type(), $data );
 
         if ( false === $wpdb->update( $this->table_name, $data, $where ) ) {
             return false;
         }
+
+        do_action( 'groundhogg/db/post_mass_update/' . $this->get_object_type(), $data );
 
         return true;
     }
@@ -379,11 +446,34 @@ abstract class WPGH_DB {
             return false;
         }
 
+        do_action( 'groundhogg/db/pre_delete/' . $this->get_object_type(), $row_id );
+
         if ( false === $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE $this->primary_key = %d", $row_id ) ) ) {
             return false;
         }
 
+        $this->set_last_changed();
+
+        do_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), $row_id );
+
         return true;
+    }
+
+    /**
+     * Checks if a broadcast exists
+     *
+     * @access  public
+     * @since   2.1
+     */
+    public function exists( $value = 0, $field = 'ID' ) {
+
+        $columns = $this->get_columns();
+        if ( ! array_key_exists( $field, $columns ) ) {
+            return false;
+        }
+
+        return (bool) $this->get_column_by( 'ID', $field, $value );
+
     }
 
     /**
@@ -433,6 +523,36 @@ abstract class WPGH_DB {
         if ( ! $this->installed() || get_option( $this->table_name . '_db_version' ) !== $this->version ) {
             $this->create_table();
         }
+    }
+
+    /**
+     * Sets the last_changed cache key for contacts.
+     *
+     * @access public
+     * @since  2.8
+     */
+    public function set_last_changed() {
+        wp_cache_set( 'last_changed', microtime(), $this->get_cache_group() );
+    }
+
+    /**
+     * Retrieves the value of the last_changed cache key for contacts.
+     *
+     * @access public
+     * @since  2.8
+     */
+    public function get_last_changed() {
+        if ( function_exists( 'wp_cache_get_last_changed' ) ) {
+            return wp_cache_get_last_changed( $this->get_cache_group() );
+        }
+
+        $last_changed = wp_cache_get( 'last_changed', $this->get_cache_group() );
+        if ( ! $last_changed ) {
+            $last_changed = microtime();
+            wp_cache_set( 'last_changed', $last_changed, $this->get_cache_group() );
+        }
+
+        return $last_changed;
     }
 
     /**

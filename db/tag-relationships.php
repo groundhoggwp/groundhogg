@@ -1,4 +1,9 @@
 <?php
+
+namespace Groundhogg\DB;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * tag relationships DB
  *
@@ -11,10 +16,7 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_DB_Tag_Relationships extends WPGH_DB
+class Tag_Relationships extends DB
 {
     /**
      * The name of the cache group.
@@ -26,21 +28,53 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
     public $cache_group = 'contact_tag_relationships';
 
     /**
-     * Get things started
+     * Get the DB suffix
      *
-     * @access  public
-     * @since   2.1
+     * @return string
      */
-    public function __construct() {
+    public function get_db_suffix()
+    {
+        return 'gh_tag_relationships';
+    }
 
-        $this->db_name = 'gh_tag_relationships';
-        $this->table_name();
+    /**
+     * Get the DB primary key
+     *
+     * @return string
+     */
+    public function get_primary_key()
+    {
+        return 'tag_id,contact_id';
+    }
 
-        $this->primary_key = 'tag_id,contact_id';
-        $this->version     = '1.0';
+    /**
+     * Get the DB version
+     *
+     * @return mixed
+     */
+    public function get_db_version()
+    {
+        return '2.0';
+    }
 
-        add_action( 'wpgh_post_delete_contact', array( $this, 'contact_deleted' ) );
-        add_action( 'wpgh_delete_tag', array( $this, 'tag_deleted' ) );
+    /**
+     * Get the object type we're inserting/updateing/deleting.
+     *
+     * @return string
+     */
+    public function get_object_type()
+    {
+        return 'tag_relationship';
+    }
+
+    /**
+     * Clean up after tag/contact is deleted.
+     */
+    protected function add_additional_actions()
+    {
+        add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
+        add_action( 'groundhogg/db/post_delete/tag', [ $this, 'tag_deleted' ] );
+        parent::add_additional_actions();
     }
 
     /**
@@ -77,64 +111,16 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
      */
     public function add( $tag_id = 0, $contact_id = 0 ) {
 
-        if ( ! WPGH()->tags->exists( $tag_id ) || ! WPGH()->contacts->exists( $contact_id, 'ID' ) ) {
+        if ( ! $tag_id || ! $contact_id ){
             return false;
         }
 
-        global $wpdb;
-
-        $wpdb->show_errors();
-
         $data = array(
-            'tag_id' => $tag_id,
-            'contact_id' => $contact_id
+            'tag_id' => absint( $tag_id ),
+            'contact_id' => absint( $contact_id )
         );
 
-        $result = $this->insert( $data, 'contact_tag_relationship' );
-
-        if ( $result ){
-            WPGH()->tags->increase_contact_count( $tag_id );
-        }
-
-        return $result;
-    }
-
-    /**
-     * Insert a new tag relationship
-     *
-     * @access  public
-     * @since   2.1
-     * @return  int
-     */
-    public function insert( $data, $type = '' ) {
-
-        global $wpdb;
-
-        // Set default values
-        $data = wp_parse_args( $data, $this->get_column_defaults() );
-
-        do_action( 'wpgh_pre_insert_' . $type, $data );
-
-        // Initialise column format array
-        $column_formats = $this->get_columns();
-
-        // Force fields to lower case
-        $data = array_change_key_case( $data );
-
-        // White list columns
-        $data = array_intersect_key( $data, $column_formats );
-
-        // Reorder $column_formats to match the order of columns given in $data
-        $data_keys = array_keys( $data );
-        $column_formats = array_merge( array_flip( $data_keys ), $column_formats );
-
-        $result = $wpdb->insert( $this->table_name, $data, $column_formats );
-
-        do_action( 'wpgh_post_insert_' . $type, $data );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
+        $result = $this->insert( $data );
 
         return $result;
     }
@@ -147,9 +133,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
      * @return bool
      */
     public function tag_deleted( $tag_id ){
-
-        return $this->delete( array( 'tag_id' => $tag_id ) );
-
+        return $this->delete( [ 'tag_id' => $tag_id ] );
     }
 
     /**
@@ -167,11 +151,9 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
             return false;
         }
 
-        foreach ( $tags as $tag ) {
-            WPGH()->tags->decrease_contact_count( $tag );
-        }
+        do_action( '' );
 
-        return $this->delete( array( 'contact_id' => $contact_id ) );
+        return $this->delete( [ 'contact_id' => $contact_id ] );
 
     }
 
@@ -202,9 +184,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
             return false;
         }
 
-        if ( isset( $args[ 'tag_id' ] ) ){
-            WPGH()->tags->decrease_contact_count( $args[ 'tag_id' ] );
-        }
+        do_action( 'groundhogg/db/post_delete/tag_relationship', $args );
 
         return true;
 
@@ -236,6 +216,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 
     }
 
+
     /**
      * Retrieve tags from the database
      *
@@ -259,7 +240,6 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 
         return $results;
     }
-
 
     /**
      * Count the total number of tags in the database
@@ -291,6 +271,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 
     }
 
+
     /**
      * Get a list of contacts associated with a particular tag
      *
@@ -301,7 +282,6 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
         return $this->get_relationships( $tag_id, 'tag_id', 'contact_id' );
 
     }
-
 
     /**
      * Sets the last_changed cache key for tags.
@@ -343,7 +323,7 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $sql = "CREATE TABLE " . $this->table_name . " (
 		tag_id bigint(20) unsigned NOT NULL,
@@ -357,5 +337,4 @@ class WPGH_DB_Tag_Relationships extends WPGH_DB
 
         update_option( $this->table_name . '_db_version', $this->version );
     }
-
 }

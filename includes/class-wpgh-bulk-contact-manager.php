@@ -18,7 +18,7 @@ class WPGH_Bulk_Contact_Manager
 {
 
     /**
-     * @var WPGH_DB_Contacts
+     * @var _DB_Contacts
      */
     public $db;
 

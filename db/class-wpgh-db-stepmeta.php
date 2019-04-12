@@ -1,6 +1,6 @@
 <?php
 /**
- * Email Meta DB
+ * Step Meta DB
  *
  * Allows for the use of metadata api usage
  *
@@ -15,7 +15,7 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_DB_Email_Meta extends WPGH_DB {
+class _DB_Step_Meta extends DB {
 
     /**
      * Get things started
@@ -25,7 +25,7 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
      */
     public function __construct() {
 
-        $this->db_name = 'gh_emailmeta';
+        $this->db_name = 'gh_stepmeta';
         $this->table_name();
 
         $this->primary_key = 'meta_id';
@@ -33,6 +33,7 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
 
         add_action( 'plugins_loaded', array( $this, 'register_table' ) );
         add_action( 'installing_groundhogg', array( $this, 'register_table' ) );
+        add_action( 'wpgh_delete_step', array( $this, 'delete_step_meta_on_delete' ) );
 
     }
 
@@ -45,7 +46,7 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
     public function get_columns() {
         return array(
             'meta_id'     => '%d',
-            'email_id'  => '%d',
+            'step_id'     => '%d',
             'meta_key'    => '%s',
             'meta_value'  => '%s',
         );
@@ -59,17 +60,32 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
      */
     public function register_table() {
         global $wpdb;
-        $wpdb->emailmeta = $this->table_name;
-        $wpdb->tables[] = 'gh_emailmeta';
+        $wpdb->stepmeta = $this->table_name;
+        $wpdb->tables[] = 'gh_stepmeta';
+    }
+
+    /**
+     * Clean up contact Meta if steps gets delete
+     *
+     * @param $id int the ID of the step
+     * @return false|int
+     */
+    public function delete_step_meta_on_delete( $id ){
+
+        global $wpdb;
+
+        $result = $wpdb->delete( $this->table_name, array( 'step_id' => $id ), array( '%d' ) );
+
+        return $result;
 
     }
 
     /**
-     * Retrieve email meta field for a email.
+     * Retrieve step meta field for a step.
      *
      * For internal use only. Use EDD_Contact->get_meta() for public usage.
      *
-     * @param   int    $email_id   Contact ID.
+     * @param   int    $step_id   Contact ID.
      * @param   string $meta_key      The meta key to retrieve.
      * @param   bool   $single        Whether to return a single value.
      * @return  mixed                 Will be an array if $single is false. Will be value of meta data field if $single is true.
@@ -77,21 +93,21 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
      * @access  private
      * @since   2.6
      */
-    public function get_meta( $email_id = 0, $meta_key = '', $single = false ) {
-        $email_id = $this->sanitize_email_id( $email_id );
-        if ( false === $email_id ) {
+    public function get_meta( $step_id = 0, $meta_key = '', $single = false ) {
+        $step_id = $this->sanitize_step_id( $step_id );
+        if ( false === $step_id ) {
             return false;
         }
 
-        return get_metadata( 'email', $email_id, $meta_key, $single );
+        return get_metadata( 'step', $step_id, $meta_key, $single );
     }
 
     /**
-     * Add meta data field to a email.
+     * Add meta data field to a step.
      *
      * For internal use only. Use EDD_Contact->add_meta() for public usage.
      *
-     * @param   int    $email_id   Contact ID.
+     * @param   int    $step_id   Contact ID.
      * @param   string $meta_key      Metadata name.
      * @param   mixed  $meta_value    Metadata value.
      * @param   bool   $unique        Optional, default is false. Whether the same key should not be added.
@@ -100,26 +116,26 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
      * @access  private
      * @since   2.6
      */
-    public function add_meta( $email_id = 0, $meta_key = '', $meta_value, $unique = false ) {
-        $email_id = $this->sanitize_email_id( $email_id );
-        if ( false === $email_id ) {
+    public function add_meta( $step_id = 0, $meta_key = '', $meta_value, $unique = false ) {
+        $step_id = $this->sanitize_step_id( $step_id );
+        if ( false === $step_id ) {
             return false;
         }
 
-        return add_metadata( 'email', $email_id, $meta_key, $meta_value, $unique );
+        return add_metadata( 'step', $step_id, $meta_key, $meta_value, $unique );
     }
 
     /**
-     * Update email meta field based on Contact ID.
+     * Update step meta field based on Contact ID.
      *
      * For internal use only. Use EDD_Contact->update_meta() for public usage.
      *
      * Use the $prev_value parameter to differentiate between meta fields with the
      * same key and Contact ID.
      *
-     * If the meta field for the email does not exist, it will be added.
+     * If the meta field for the step does not exist, it will be added.
      *
-     * @param   int    $email_id   Contact ID.
+     * @param   int    $step_id   Contact ID.
      * @param   string $meta_key      Metadata key.
      * @param   mixed  $meta_value    Metadata value.
      * @param   mixed  $prev_value    Optional. Previous value to check before removing.
@@ -128,17 +144,17 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
      * @access  private
      * @since   2.6
      */
-    public function update_meta( $email_id = 0, $meta_key = '', $meta_value, $prev_value = '' ) {
-        $email_id = $this->sanitize_email_id( $email_id );
-        if ( false === $email_id ) {
+    public function update_meta( $step_id = 0, $meta_key = '', $meta_value, $prev_value = '' ) {
+        $step_id = $this->sanitize_step_id( $step_id );
+        if ( false === $step_id ) {
             return false;
         }
 
-        return update_metadata( 'email', $email_id, $meta_key, $meta_value, $prev_value );
+        return update_metadata( 'step', $step_id, $meta_key, $meta_value, $prev_value );
     }
 
     /**
-     * Remove metadata matching criteria from a email.
+     * Remove metadata matching criteria from a step.
      *
      * For internal use only. Use EDD_Contact->delete_meta() for public usage.
      *
@@ -146,7 +162,7 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
      * value, will keep from removing duplicate metadata with the same key. It also
      * allows removing all metadata matching key, if needed.
      *
-     * @param   int    $email_id   Contact ID.
+     * @param   int    $step_id   Contact ID.
      * @param   string $meta_key      Metadata name.
      * @param   mixed  $meta_value    Optional. Metadata value.
      * @return  bool                  False for failure. True for success.
@@ -154,8 +170,8 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
      * @access  private
      * @since   2.6
      */
-    public function delete_meta( $email_id = 0, $meta_key = '', $meta_value = '' ) {
-        return delete_metadata( 'email', $email_id, $meta_key, $meta_value );
+    public function delete_meta( $step_id = 0, $meta_key = '', $meta_value = '' ) {
+        return delete_metadata( 'step', $step_id, $meta_key, $meta_value );
     }
 
     /**
@@ -166,15 +182,15 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
      */
     public function create_table() {
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $sql = "CREATE TABLE {$this->table_name} (
 		meta_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-		email_id bigint(20) unsigned NOT NULL,
+		step_id bigint(20) unsigned NOT NULL,
 		meta_key varchar(255) DEFAULT NULL,
 		meta_value longtext,
 		PRIMARY KEY  (meta_id),
-		KEY email_id (email_id),
+		KEY step_id (step_id),
 		KEY meta_key (meta_key)
 		) {$this->get_charset_collate()};";
 
@@ -184,29 +200,29 @@ class WPGH_DB_Email_Meta extends WPGH_DB {
     }
 
     /**
-     * Given a email ID, make sure it's a positive number, greater than zero before inserting or adding.
+     * Given a step ID, make sure it's a positive number, greater than zero before inserting or adding.
      *
      * @since  2.6
-     * @param  int|string $email_id A passed email ID.
-     * @return int|bool                The normalized email ID or false if it's found to not be valid.
+     * @param  int|string $step_id A passed step ID.
+     * @return int|bool                The normalized step ID or false if it's found to not be valid.
      */
-    private function sanitize_email_id( $email_id ) {
-        if ( ! is_numeric( $email_id ) ) {
+    private function sanitize_step_id( $step_id ) {
+        if ( ! is_numeric( $step_id ) ) {
             return false;
         }
 
-        $email_id = (int) $email_id;
+        $step_id = (int) $step_id;
 
         // We were given a non positive number
-        if ( absint( $email_id ) !== $email_id ) {
+        if ( absint( $step_id ) !== $step_id ) {
             return false;
         }
 
-        if ( empty( $email_id ) ) {
+        if ( empty( $step_id ) ) {
             return false;
         }
 
-        return absint( $email_id );
+        return absint( $step_id );
 
     }
 

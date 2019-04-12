@@ -1,4 +1,10 @@
 <?php
+
+namespace Groundhogg\DB;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Contact DB
  *
@@ -11,16 +17,7 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-/**
- * WPGH_DB_Contacts Class
- *
- * @since 2.1
- */
-class WPGH_DB_Contacts extends WPGH_DB  {
+class Contacts extends DB {
 
     /**
      * The metadata type.
@@ -41,30 +38,52 @@ class WPGH_DB_Contacts extends WPGH_DB  {
     public $date_key = 'date_created';
 
     /**
-     * The name of the cache group.
+     * Get the DB suffix
      *
-     * @access public
-     * @since  2.8
-     * @var string
+     * @return string
      */
-    public $cache_group = 'contacts';
+    public function get_db_suffix()
+    {
+        return 'gh_contacts';
+    }
 
     /**
-     * Get things started
+     * Get the DB primary key
      *
-     * @access  public
-     * @since   2.1
+     * @return string
      */
-    public function __construct() {
+    public function get_primary_key()
+    {
+        return 'ID';
+    }
 
-        $this->db_name = 'gh_contacts';
-        $this->table_name();
+    /**
+     * Get the DB version
+     *
+     * @return mixed
+     */
+    public function get_db_version()
+    {
+        return '2.0';
+    }
 
-        $this->primary_key = 'ID';
-        $this->version     = '1.0';
+    /**
+     * Get the object type we're inserting/updateing/deleting.
+     *
+     * @return string
+     */
+    public function get_object_type()
+    {
+        return 'contact';
+    }
 
-        add_action( 'profile_update', array( $this, 'update_contact_email_on_user_update' ), 10, 2 );
-
+    /**
+     * Update contact record when user profile updated.
+     */
+    protected function add_additional_actions()
+    {
+        add_action( 'profile_update', array( $this, 'update_contact_on_user_update'), 10, 2 );
+        parent::add_additional_actions();
     }
 
     /**
@@ -122,23 +141,17 @@ class WPGH_DB_Contacts extends WPGH_DB  {
             return false;
         }
 
-        /* Make sure lowercase. */
-        $args[ 'email' ] = strtolower( $args[ 'email' ] );
+        $args = $this->sanitize_columns( $args );
 
         if( $this->exists( $args['email'], 'email' ) ) {
-            // update an existing contact
 
+            // update an existing contact
             $contact = $this->get_contact_by( 'email', $args[ 'email' ] );
             $this->update( $contact->ID, $data );
-
             $result = $contact->ID;
 
         } else {
-
-            $result = $this->insert( $args, 'contact' );
-
-            do_action( 'wpgh_contact_created', $result );
-
+            $result = $this->insert( $args );
         }
 
         return $result;
@@ -152,8 +165,8 @@ class WPGH_DB_Contacts extends WPGH_DB  {
      * @since   2.1
      * @return  int
      */
-    public function insert( $data, $type = '' ) {
-        $result = parent::insert( $data, $type );
+    public function insert( $data ) {
+        $result = parent::insert( $data );
 
         if ( $result ) {
             $this->set_last_changed();
@@ -171,9 +184,7 @@ class WPGH_DB_Contacts extends WPGH_DB  {
      */
     public function update( $row_id, $data = array(), $where = '' ) {
 
-        if ( isset( $data[ 'email' ] ) ){
-            $data[ 'email' ] = strtolower( $data[ 'email' ] );
-        }
+        $data = $this->sanitize_columns( $data );
 
         $result = parent::update( $row_id, $data, $where );
 
@@ -253,34 +264,40 @@ class WPGH_DB_Contacts extends WPGH_DB  {
      * @access  public
      * @since   2.4
      */
-    public function update_contact_email_on_user_update( $user_id = 0, $old_user_data = '' ) {
-
-        $contact = wpgh_get_contact( $user_id, true );
-
-        if( ! $contact ) {
-            return false;
-        }
+    public function update_contact_on_user_update( $user_id = 0, $old_user_data = '' ) {
 
         $user = get_userdata( $user_id );
 
-        if( ! empty( $user ) && $user->user_email !== $contact->email ) {
+        if ( ! $user ){
+            return false;
+        }
 
-            if( ! $this->get_contact_by( 'email', $user->user_email ) ) {
+        $contact = $this->get_contact_by( 'user_id', $user_id );
 
-                $success = $this->update( $contact->ID, array( 'user_id' => $user_id ) );
-                $success = $this->update( $contact->ID, array( 'email' => $user->user_email ) );
+        if( ! $contact ) {
 
-                if( $success ) {
-                    // Update some payment meta if we need to
-
-                    do_action( 'wpgh_update_contact_email_on_user_update', $user, $contact );
-
-                }
-
+            // get by email if UID fails.
+            $contact = $this->get_contact_by( 'email', $user->user_email );
+            if ( ! $contact ){
+                return false;
             }
 
         }
 
+        $args = [
+            'first_name' => $user->first_name,
+            'last_name'  => $user->last_name,
+            'email'      => $user->user_email,
+            'user_id'    => $user_id
+        ];
+
+        $args = $this->sanitize_columns( $args );
+
+        if ( $this->update( $contact->ID, $args ) ){
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -300,6 +317,7 @@ class WPGH_DB_Contacts extends WPGH_DB  {
         return parent::get_by( $field, $value );
     }
 
+
     /**
      * Retrieve contacts from the database
      *
@@ -314,7 +332,6 @@ class WPGH_DB_Contacts extends WPGH_DB  {
 
         return $query->query( $args );
     }
-
 
     /**
      * Count the total number of contacts in the database
@@ -392,36 +409,6 @@ class WPGH_DB_Contacts extends WPGH_DB  {
     }
 
     /**
-     * Sets the last_changed cache key for contacts.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function set_last_changed() {
-        wp_cache_set( 'last_changed', microtime(), $this->cache_group );
-    }
-
-    /**
-     * Retrieves the value of the last_changed cache key for contacts.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function get_last_changed() {
-        if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-            return wp_cache_get_last_changed( $this->cache_group );
-        }
-
-        $last_changed = wp_cache_get( 'last_changed', $this->cache_group );
-        if ( ! $last_changed ) {
-            $last_changed = microtime();
-            wp_cache_set( 'last_changed', $last_changed, $this->cache_group );
-        }
-
-        return $last_changed;
-    }
-
-    /**
      * Create the table
      *
      * @access  public
@@ -431,7 +418,7 @@ class WPGH_DB_Contacts extends WPGH_DB  {
 
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -452,4 +439,36 @@ class WPGH_DB_Contacts extends WPGH_DB  {
         update_option( $this->table_name . '_db_version', $this->version );
     }
 
+    /**
+     * Sanitize the given columns
+     *
+     * @param $cols
+     * @return array
+     */
+    public function sanitize_columns( $cols )
+    {
+
+        foreach ( $cols as $key => $val ){
+
+            switch ( $key ){
+
+                case 'first_name':
+                case 'last_name' :
+                    $cols[ $key ] = ucwords( strtolower( sanitize_text_field( $val ) ) );
+                    break;
+                case 'email':
+                    $cols[ $key ] = strtolower( sanitize_email( $val ) );
+                    break;
+                case 'optin_status':
+                case 'owner_id':
+                case 'user_id':
+                    $cols[ $key ] = absint( $val );
+                    break;
+            }
+
+        }
+
+        return $cols;
+
+    }
 }

@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @since 2.1
  */
-class WPGH_DB_Steps extends WPGH_DB  {
+class _DB_Steps extends DB  {
 
     /**
      * The metadata type.
@@ -353,7 +353,7 @@ class WPGH_DB_Steps extends WPGH_DB  {
 
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,

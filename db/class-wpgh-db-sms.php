@@ -1,27 +1,21 @@
 <?php
 /**
- * Broadcasts DB
+ * SMS DB
  *
- * Stores information about broadcasts
+ * Store sms messages
  *
  * @package     Includes
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @since       File available since Release 1.2
  */
 
-// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-/**
- * WPGH_DB_Contacts Class
- *
- * @since 2.1
- */
-class WPGH_DB_Broadcasts extends WPGH_DB  {
-
+class _DB_SMS extends DB
+{
     /**
      * The name of the cache group.
      *
@@ -29,7 +23,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
      * @since  2.8
      * @var string
      */
-    public $cache_group = 'broadcasts';
+    public $cache_group = 'sms_messages';
 
     /**
      * Get things started
@@ -39,11 +33,11 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
      */
     public function __construct() {
 
-        $this->db_name = 'gh_broadcasts';
+        $this->db_name = 'gh_sms';
         $this->table_name();
 
         $this->primary_key = 'ID';
-        $this->version     = '1.1';
+        $this->version     = '1.0';
     }
 
     /**
@@ -54,14 +48,10 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
      */
     public function get_columns() {
         return array(
-            'ID'                => '%d',
-            'object_id'         => '%d',
-            'object_type'       => '%s',
-            'scheduled_by'      => '%d',
-            'send_time'         => '%d',
-            'tags'              => '%s',
-            'status'            => '%s',
-            'date_scheduled'    => '%s',
+            'ID'      => '%d',
+            'title'   => '%s',
+            'message' => '%s',
+            'author'  => '%d',
         );
     }
 
@@ -73,52 +63,16 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
      */
     public function get_column_defaults() {
         return array(
-            'ID'                => 0,
-            'object_id'         => 0,
-            'object_type'       => 'email',
-            'scheduled_by'      => 0,
-            'send_time'         => 0,
-            'tags'              => '',
-            'status'            => 'scheduled',
-            'date_scheduled'    => current_time( 'mysql' ),
+            'ID'      => 0,
+            'title'   => '',
+            'message' => '',
+            'author'  => get_current_user_id(),
         );
     }
 
+    
     /**
-     * Given a data set, if tags are present make sure they end up serialized
-     *
-     * @param array $data
-     * @return array
-     */
-    private function serialize_tags( $data = array() ){
-
-        if ( isset( $data[ 'tags' ] ) ){
-
-            $data[ 'tags' ] = maybe_serialize( $data[ 'tags' ] );
-
-        }
-
-        return $data;
-
-    }
-
-    /**
-     * Given a data set, if tags are present make sure they end up unserialized
-     *
-     * @param null $obj
-     * @return null
-     */
-    private function unserialize_tags( $obj = null )
-    {
-        if ( is_object( $obj ) && isset( $obj->tags ) ){
-            $obj->tags = maybe_unserialize( $obj->tags );
-        }
-
-        return $obj;
-    }
-
-    /**
-     * Add a broadcast
+     * Add a sms
      *
      * @access  public
      * @since   2.1
@@ -129,14 +83,16 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
             $data,
             $this->get_column_defaults()
         );
-        
-        $args = $this->serialize_tags( $args );
 
-        return $this->insert( $args, 'broadcast' );
+        if( empty( $args['title'] ) ) {
+            return false;
+        }
+
+        return $this->insert( $args, 'sms' );
     }
 
     /**
-     * Insert a new broadcast
+     * Insert a new sms
      *
      * @access  public
      * @since   2.1
@@ -153,15 +109,14 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
     }
 
     /**
-     * Update a broadcast
+     * Update a sms
      *
      * @access  public
      * @since   2.1
      * @return  bool
      */
     public function update( $row_id, $data = array(), $where = '' ) {
-        $data = $this->serialize_tags( $data );
-        
+
         $result = parent::update( $row_id, $data, $where );
 
         if ( $result ) {
@@ -172,7 +127,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
     }
 
     /**
-     * Delete a broadcast
+     * Delete a sms
      *
      * @access  public
      * @since   2.3.1
@@ -183,16 +138,19 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
             return false;
         }
 
-        $broadcast = $this->get_broadcast_by( 'ID', $id );
+        $sms = $this->get_sms_by( 'ID', $id );
 
-        if ( $broadcast->ID > 0 ) {
+        if ( $sms->ID > 0 ) {
 
             global $wpdb;
 
-            $result = $wpdb->delete( $this->table_name, array( 'ID' => $broadcast->ID ), array( '%d' ) );
+            /* delete the actual sms */
+            $result = $wpdb->delete( $this->table_name, array( 'ID' => $sms->ID ), array( '%d' ) );
 
             if ( $result ) {
                 $this->set_last_changed();
+
+                do_action( 'wpgh_delete_sms', $sms->ID );
             }
 
             return $result;
@@ -204,7 +162,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
     }
 
     /**
-     * Checks if a broadcast exists
+     * Checks if a sms exists
      *
      * @access  public
      * @since   2.1
@@ -216,47 +174,105 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
             return false;
         }
 
-        return (bool) $this->get_column_by( 'ID', $field, $value );
+        $sms = $this->get_sms_by( $field, $value );
+
+        return ! empty( $sms ) ;
 
     }
 
     /**
-     * Retrieves the broadcast by the ID.
+     * Retrieves the sms by the ID.
      *
      * @param $id
      *
      * @return mixed
      */
-    public function get_broadcast( $id )
+    public function get_sms( $id )
     {
-        return  $this->get_broadcast_by( 'ID', $id );
+        return $this->get_sms_by( 'ID', $id );
     }
 
     /**
-     * Retrieves a single broadcast from the database
+     * Retrieves a single sms from the database
      *
      * @access public
      * @since  2.3
-     * @param  string $field id or broadcast
-     * @param  mixed  $value  The Customer ID or broadcast to search
-     * @return mixed          Upon success, an object of the broadcast. Upon failure, NULL
+     * @param  string $field id or email
+     * @param  mixed  $value  The Customer ID or email to search
+     * @return mixed          Upon success, an object of the sms. Upon failure, NULL
      */
-    public function get_broadcast_by( $field = 'ID', $value = 0 ) {
-
+    public function get_sms_by( $field = 'ID', $value = 0 ) {
         if ( empty( $field ) || empty( $value ) ) {
             return NULL;
         }
 
-        return $this->unserialize_tags( parent::get_by( $field, $value ) );
+        if ( 'ID' == $field ) {
+            // Make sure the value is numeric to avoid casting objects, for example,
+            // to int 1.
+            if ( ! is_numeric( $value ) ) {
+                return false;
+            }
+
+            $value = intval( $value );
+
+            if ( $value < 1 ) {
+                return false;
+            }
+
+        }
+
+        if ( ! $value ) {
+            return false;
+        }
+
+        $results = $this->get_by( $field, $value );
+
+        if ( empty( $results ) ) {
+            return false;
+        }
+
+        return $results;
     }
 
     /**
-     * Retrieve broadcasts from the database
+     * Retrieve smss from the database
      *
      * @access  public
      * @since   2.1
      */
-    public function get_broadcasts( $data = array() ) {
+    public function get_all_sms() {
+
+        global $wpdb;
+
+        $results = $wpdb->get_results("SELECT * FROM $this->table_name ORDER BY $this->primary_key DESC" );
+
+        return $results;
+
+    }
+
+    /**
+     * GET SMS messages ready for select/dropdown
+     *
+     * @return array
+     */
+    public function get_sms_select() {
+        global $wpdb;
+        $results = $this->get_all_sms();
+        $smses = [];
+        foreach ( $results as $sms ){
+            $smses[ $sms->ID ] = sprintf( "%s", $sms->title );
+        }
+
+        return $smses;
+    }
+
+    /**
+    * Retrieve messages from the database
+    *
+    * @access  public
+    * @since   2.1
+    */
+    public function get_smses( $data = array() ) {
 
         global  $wpdb;
 
@@ -264,6 +280,14 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
             return false;
 
         $data = (array) $data;
+
+        $extra = '';
+
+        if ( isset( $data[ 'search' ] ) ){
+
+            $extra .= sprintf( " AND (%s)", $this->generate_search( $data[ 'search' ] ) );
+
+        }
 
         // Initialise column format array
         $column_formats = $this->get_columns();
@@ -277,33 +301,28 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
         $where = $this->generate_where( $data );
 
         if ( empty( $where ) ){
+
             $where = "1=1";
+
         }
 
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where ORDER BY send_time DESC" );
-
-        if ( is_array( $results ) ){
-            $results = array_map( array( $this, 'unserialize_tags' ), $results );
-        }
+        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY $this->primary_key DESC" );
 
         return $results;
     }
 
-
     /**
-     * Count the total number of broadcasts in the database
+     * Count the total number of smss in the database
      *
      * @access  public
      * @since   2.1
      */
     public function count( $args = array() ) {
-
-        return count( $this->get_broadcasts( $args ) );
-
+        return count( $this->get_smses( $args ) );
     }
 
     /**
-     * Sets the last_changed cache key for broadcasts.
+     * Sets the last_changed cache key for smss.
      *
      * @access public
      * @since  2.8
@@ -313,7 +332,7 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
     }
 
     /**
-     * Retrieves the value of the last_changed cache key for broadcasts.
+     * Retrieves the value of the last_changed cache key for smss.
      *
      * @access public
      * @since  2.8
@@ -342,17 +361,13 @@ class WPGH_DB_Broadcasts extends WPGH_DB  {
 
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $sql = "CREATE TABLE " . $this->table_name . " (
-		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        object_id bigint(20) unsigned NOT NULL,
-        object_type VARCHAR(20) NOT NULL,
-        scheduled_by bigint(20) unsigned NOT NULL,
-        send_time bigint(20) unsigned NOT NULL,
-        tags longtext NOT NULL,
-        status VARCHAR(20) NOT NULL,
-        date_scheduled datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        title text NOT NULL,
+        message text NOT NULL,
+        author bigint(20) unsigned NOT NULL,
         PRIMARY KEY (ID)
 		) {$this->get_charset_collate()};";
 

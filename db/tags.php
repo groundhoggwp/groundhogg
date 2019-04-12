@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg\DB;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Tags DB
  *
@@ -11,19 +15,8 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_DB_Tags extends WPGH_DB
+class Tags extends DB
 {
-    /**
-     * The name of the cache group.
-     *
-     * @access public
-     * @since  2.8
-     * @var string
-     */
-    public $cache_group = 'contact_tags';
 
     /**
      * Runtime associative array of ID => tag_object
@@ -33,18 +26,49 @@ class WPGH_DB_Tags extends WPGH_DB
     public $tag_cache = [];
 
     /**
-     * Get things started
+     * Get the DB suffix
      *
-     * @access  public
-     * @since   2.1
+     * @return string
      */
-    public function __construct() {
+    public function get_db_suffix()
+    {
+        return 'gh_tags';
+    }
 
-        $this->db_name = 'gh_tags';
-        $this->table_name();
+    /**
+     * Get the DB primary key
+     *
+     * @return string
+     */
+    public function get_primary_key()
+    {
+        return 'tag_id';
+    }
 
-        $this->primary_key = 'tag_id';
-        $this->version     = '1.0';
+    /**
+     * Get the DB version
+     *
+     * @return mixed
+     */
+    public function get_db_version()
+    {
+        return '2.0';
+    }
+
+    /**
+     * Get the object type we're inserting/updateing/deleting.
+     *
+     * @return string
+     */
+    public function get_object_type()
+    {
+        return 'tag';
+    }
+
+    protected function add_additional_actions()
+    {
+        add_action( 'groundhogg/db/post_insert/tag_relationship', [ $this, 'increase_contact_count' ], 10, 2 );
+        add_action( 'groundhogg/db/post_delete/tag_relationship', [ $this, 'decrease_contact_count' ], 10 );
     }
 
     /**
@@ -143,42 +167,7 @@ class WPGH_DB_Tags extends WPGH_DB
             return $tag->tag_id;
         }
 
-        return $this->insert( $args, 'tag' );
-    }
-
-    /**
-     * Insert a new tag
-     *
-     * @access  public
-     * @since   2.1
-     * @return  int
-     */
-    public function insert( $data, $type = '' ) {
-        $result = parent::insert( $data, $type );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Update a tag
-     *
-     * @access  public
-     * @since   2.1
-     * @return  bool
-     */
-    public function update( $row_id, $data = array(), $where = '' ) {
-
-        $result = parent::update( $row_id, $data, $where );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
+        return $this->insert( $args );
     }
 
     /**
@@ -197,15 +186,10 @@ class WPGH_DB_Tags extends WPGH_DB
 
         if ( $tag->tag_id > 0 ) {
 
-            global $wpdb;
-
-            /* delete the actual tag */
-            $result = $wpdb->delete( $this->table_name, array( 'tag_id' => $tag->tag_id ), array( '%d' ) );
+            $result = parent::delete( $id );
 
             if ( $result ) {
-                $this->set_last_changed();
                 unset( $this->tag_cache[ md5( $id ) ] );
-                do_action( 'wpgh_delete_tag', $tag->tag_id );
             }
 
             return $result;
@@ -315,13 +299,16 @@ class WPGH_DB_Tags extends WPGH_DB
     public function get_tags() {
 
         global $wpdb;
-
         $results = $wpdb->get_results("SELECT * FROM $this->table_name ORDER BY $this->primary_key DESC" );
-
         return $results;
 
     }
 
+    /**
+     * Get tags in an array format that is select friendly.
+     *
+     * @return array
+     */
     public function get_tags_select() {
         global $wpdb;
         $results = $wpdb->get_results("SELECT * FROM $this->table_name ORDER BY $this->primary_key DESC" );
@@ -338,10 +325,12 @@ class WPGH_DB_Tags extends WPGH_DB
     /**
      * Increase the contact tag count
      *
-     * @param $tag_id
+     * @param $insert_id
+     * @param $args
      */
-    public function increase_contact_count( $tag_id )
+    public function increase_contact_count( $insert_id = 0, $args = [] )
     {
+        $tag_id = absint( $args[ 'tag_id' ] );
 
         if ( ! $this->exists( $tag_id ) ) {
             return;
@@ -355,10 +344,12 @@ class WPGH_DB_Tags extends WPGH_DB
     /**
      * Decrease the contact tag count
      *
-     * @param $tag_id
+     * @param $insert_id
+     * @param $args
      */
-    public function decrease_contact_count( $tag_id )
+    public function decrease_contact_count( $args = [] )
     {
+        $tag_id = absint( $args[ 'tag_id' ] );
 
         if ( ! $this->exists( $tag_id ) ) {
             return;
@@ -376,39 +367,7 @@ class WPGH_DB_Tags extends WPGH_DB
      * @since   2.1
      */
     public function count( $args = array() ) {
-
         return count( $this->get_tags() );
-
-    }
-
-    /**
-     * Sets the last_changed cache key for tags.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function set_last_changed() {
-        wp_cache_set( 'last_changed', microtime(), $this->cache_group );
-    }
-
-    /**
-     * Retrieves the value of the last_changed cache key for tags.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function get_last_changed() {
-        if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-            return wp_cache_get_last_changed( $this->cache_group );
-        }
-
-        $last_changed = wp_cache_get( 'last_changed', $this->cache_group );
-        if ( ! $last_changed ) {
-            $last_changed = microtime();
-            wp_cache_set( 'last_changed', $last_changed, $this->cache_group );
-        }
-
-        return $last_changed;
     }
 
     /**
@@ -421,7 +380,7 @@ class WPGH_DB_Tags extends WPGH_DB
 
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $sql = "CREATE TABLE " . $this->table_name . " (
         tag_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -437,5 +396,4 @@ class WPGH_DB_Tags extends WPGH_DB
 
         update_option( $this->table_name . '_db_version', $this->version );
     }
-
 }

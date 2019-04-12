@@ -1,8 +1,8 @@
 <?php
 /**
- * Superlinks DB
+ * Funnels DB
  *
- * Store and manipulate superlinks
+ * Store information about funnels
  *
  * @package     Includes
  * @subpackage  includes/DB
@@ -11,6 +11,7 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -19,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @since 2.1
  */
-class WPGH_DB_Superlinks extends WPGH_DB  {
+class _DB_Funnels extends DB  {
 
         /**
      * The name of the cache group.
@@ -28,7 +29,7 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
      * @since  2.8
      * @var string
      */
-    public $cache_group = 'superlinks';
+    public $cache_group = 'funnels';
 
     /**
      * Get things started
@@ -38,11 +39,13 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
      */
     public function __construct() {
 
-        $this->db_name = 'gh_superlinks';
+        $this->db_name = 'gh_funnels';
         $this->table_name();
 
         $this->primary_key = 'ID';
         $this->version     = '1.0';
+        
+        add_action( 'wpgh_post_insert_event', array( $this, 'calculate_active_contacts' ) );
     }
 
     /**
@@ -54,10 +57,12 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
     public function get_columns() {
         return array(
             'ID'            => '%d',
-            'name'          => '%s',
-            'target'        => '%s',
-            'tags'          => '%s',
-            'clicks'        => '%d',
+            'author'        => '%d',
+            'title'         => '%s',
+            'status'        => '%s',
+            'active_contacts' => '%d',
+            'date_created'  => '%s',
+            'last_updated'  => '%s',
         );
     }
 
@@ -70,50 +75,17 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
     public function get_column_defaults() {
         return array(
             'ID'            => 0,
-            'name'          => '',
-            'target'        => '',
-            'tags'          => '',
-            'clicks'        => 0,
+            'author'        => 0,
+            'title'         => '',
+            'status'        => 'inactive',
+            'active_contacts' => 0,
+            'date_created'  => current_time( 'mysql' ),
+            'last_updated'  => current_time( 'mysql' ),
         );
     }
 
     /**
-     * Given a data set, if tags are present make sure the end up serialized
-     *
-     * @param array $data
-     * @return array
-     */
-    private function serialize_tags( $data = array() ){
-
-        if ( isset( $data[ 'tags' ] ) ){
-
-            $data[ 'tags' ] = maybe_serialize( $data[ 'tags' ] );
-
-        }
-
-        return $data;
-
-    }
-
-    /**
-     * Given a data set, if tags are present make sure they end up unserialized
-     *
-     * @param null $obj
-     * @return null
-     */
-    private function unserialize_tags( $obj = null )
-    {
-        if ( is_object( $obj ) && isset( $obj->tags ) ){
-
-            $obj->tags = maybe_unserialize( $obj->tags );
-
-        }
-
-        return $obj;
-    }
-
-    /**
-     * Add a superlink
+     * Add a funnel
      *
      * @access  public
      * @since   2.1
@@ -125,17 +97,15 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
             $this->get_column_defaults()
         );
 
-        if ( empty( $args[ 'target' ] ) ){
+        if ( empty( $args[ 'title' ] ) ){
             return false;
         }
 
-        $args = $this->serialize_tags( $args );
-
-        return $this->insert( $args, 'superlink' );
+        return $this->insert( $args, 'funnel' );
     }
 
     /**
-     * Insert a new superlink
+     * Insert a new funnel
      *
      * @access  public
      * @since   2.1
@@ -152,15 +122,25 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
     }
 
     /**
-     * Update a superlink
+     * Calculate the number of contacts for a specific funnel
+     * 
+     * @param $wpdb_insert_id int ID
+     */
+    public function calculate_active_contacts( $wpdb_insert_id )
+    {
+        $event = WPGH()->events->get( $wpdb_insert_id );
+        $count = WPGH()->events->count( array( 'funnel_id' => $event->funnel_id, 'start' => strtotime( '30 days ago' ) ) );
+        $this->update( $event->funnel_id, array( 'active_contacts' => $count ) );
+    }
+
+    /**
+     * Update a funnel
      *
      * @access  public
      * @since   2.1
      * @return  bool
      */
     public function update( $row_id, $data = array(), $where = '' ) {
-
-        $data = $this->serialize_tags( $data );
 
         $result = parent::update( $row_id, $data, $where );
 
@@ -172,7 +152,7 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
     }
 
     /**
-     * Delete a superlink
+     * Delete a funnel
      *
      * @access  public
      * @since   2.3.1
@@ -183,17 +163,19 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
             return false;
         }
 
-        $superlink = $this->get_superlink_by( 'ID', $id );
+        $funnel = $this->get_funnel_by( 'ID', $id );
 
-        if ( $superlink->ID > 0 ) {
+        if ( $funnel->ID > 0 ) {
 
             global $wpdb;
 
-            $result = $wpdb->delete( $this->table_name, array( 'ID' => $superlink->ID ), array( '%d' ) );
+            $result = $wpdb->delete( $this->table_name, array( 'ID' => $funnel->ID ), array( '%d' ) );
 
             if ( $result ) {
                 $this->set_last_changed();
             }
+
+            do_action( 'wpgh_delete_funnel', $id );
 
             return $result;
 
@@ -204,7 +186,7 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
     }
 
     /**
-     * Checks if a superlink exists
+     * Checks if a funnel exists
      *
      * @access  public
      * @since   2.1
@@ -221,57 +203,42 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
     }
 
     /**
-     * Retrieves the superlink by the ID.
+     * Retrieves the funnel by the ID.
      *
      * @param $id
      *
      * @return mixed
      */
-    public function get_superlink( $id )
+    public function get_funnel( $id )
     {
-        return $this->get_superlink_by( 'ID', $id );
+        return $this->get_funnel_by( 'ID', $id );
     }
 
     /**
-     * Retrieves a single superlink from the database
+     * Retrieves a single funnel from the database
      *
      * @access public
      * @since  2.3
-     * @param  string $field id or superlink
-     * @param  mixed  $value  The Customer ID or superlink to search
-     * @return mixed          Upon success, an object of the superlink. Upon failure, NULL
+     * @param  string $field id or funnel
+     * @param  mixed  $value  The Customer ID or funnel to search
+     * @return mixed          Upon success, an object of the funnel. Upon failure, NULL
      */
-    public function get_superlink_by( $field = 'ID', $value = 0 ) {
+    public function get_funnel_by( $field = 'ID', $value = 0 ) {
 
         if ( empty( $field ) || empty( $value ) ) {
             return NULL;
         }
 
-        return $this->unserialize_tags( parent::get_by( $field, $value ) );
-    }
-
-    public function search($s = '')
-    {
-        $results = parent::search($s); // TODO: Change the autogenerated stub
-
-
-        if ( is_array( $results ) ){
-
-            $results = array_map( array( $this, 'unserialize_tags' ), $results );
-
-        }
-
-        return $results;
-
+        return parent::get_by( $field, $value );
     }
 
     /**
-     * Retrieve superlinks from the database
+     * Retrieve funnels from the database
      *
      * @access  public
      * @since   2.1
      */
-    public function get_superlinks( $data = array() ) {
+    public function get_funnels( $data = array() ) {
 
         global  $wpdb;
 
@@ -279,6 +246,14 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
             return false;
 
         $data = (array) $data;
+
+        $extra = '';
+
+        if ( isset( $data[ 'search' ] ) ){
+
+            $extra .= sprintf( " AND (%s)", $this->generate_search( $data[ 'search' ] ) );
+
+        }
 
         // Initialise column format array
         $column_formats = $this->get_columns();
@@ -297,32 +272,26 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
 
         }
 
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where" );
-
-        if ( is_array( $results ) ){
-
-            $results = array_map( array( $this, 'unserialize_tags' ), $results );
-
-        }
+        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY $this->primary_key DESC" );
 
         return $results;
     }
 
 
     /**
-     * Count the total number of superlinks in the database
+     * Count the total number of funnels in the database
      *
      * @access  public
      * @since   2.1
      */
     public function count( $args = array() ) {
 
-        return count( $this->get_superlinks( $args ) );
+        return count( $this->get_funnels( $args ) );
 
     }
 
     /**
-     * Sets the last_changed cache key for superlinks.
+     * Sets the last_changed cache key for funnels.
      *
      * @access public
      * @since  2.8
@@ -332,7 +301,7 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
     }
 
     /**
-     * Retrieves the value of the last_changed cache key for superlinks.
+     * Retrieves the value of the last_changed cache key for funnels.
      *
      * @access public
      * @since  2.8
@@ -361,18 +330,22 @@ class WPGH_DB_Superlinks extends WPGH_DB  {
 
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        name mediumtext NOT NULL,
-        target mediumtext NOT NULL,
-        tags longtext NOT NULL,
-        clicks bigint(20) NOT NULL,
-        PRIMARY KEY  (ID)
+        title text NOT NULL,
+        status varchar(20) NOT NULL,
+        author bigint(20) unsigned NOT NULL,
+        active_contacts bigint(20) unsigned NOT NULL,
+        last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        PRIMARY KEY (ID)
 		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );
+
+        $wpdb->query( "ALTER TABLE $this->table_name AUTO_INCREMENT = 2" );
 
         update_option( $this->table_name . '_db_version', $this->version );
     }

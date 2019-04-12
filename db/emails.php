@@ -1,4 +1,10 @@
 <?php
+
+namespace Groundhogg\DB;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Email DB
  *
@@ -11,15 +17,7 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-/**
- * WPGH_DB_Contacts Class
- *
- * @since 2.1
- */
-class WPGH_DB_Emails extends WPGH_DB  {
+class Emails extends DB  {
 
     /**
      * The metadata type.
@@ -40,18 +38,43 @@ class WPGH_DB_Emails extends WPGH_DB  {
     public $cache_group = 'emails';
 
     /**
-     * Get things started
+     * Get the DB suffix
      *
-     * @access  public
-     * @since   2.1
+     * @return string
      */
-    public function __construct() {
+    public function get_db_suffix()
+    {
+        return 'gh_emails';
+    }
 
-        $this->db_name = 'gh_emails';
-        $this->table_name();
+    /**
+     * Get the DB primary key
+     *
+     * @return string
+     */
+    public function get_primary_key()
+    {
+        return 'ID';
+    }
 
-        $this->primary_key = 'ID';
-        $this->version     = '1.1';
+    /**
+     * Get the DB version
+     *
+     * @return mixed
+     */
+    public function get_db_version()
+    {
+        return '2.0';
+    }
+
+    /**
+     * Get the object type we're inserting/updateing/deleting.
+     *
+     * @return string
+     */
+    public function get_object_type()
+    {
+        return 'email';
     }
 
     /**
@@ -61,7 +84,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
      * @since   2.1
      */
     public function get_columns() {
-        return array(
+        return [
             'ID'            => '%d',
             'subject'       => '%s',
             'pre_header'    => '%s',
@@ -72,7 +95,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
             'is_template'   => '%d',
             'last_updated'  => '%s',
             'date_created'  => '%s',
-        );
+        ];
     }
 
     /**
@@ -82,7 +105,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
      * @since   2.1
      */
     public function get_column_defaults() {
-        return array(
+        return [
             'ID'            => 0,
             'subject'       => '',
             'pre_header'    => '',
@@ -93,106 +116,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
             'status'        => 'draft',
             'last_updated'  => current_time( 'mysql' ),
             'date_created'  => current_time( 'mysql' ),
-        );
-    }
-
-    /**
-     * Add a email
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function add( $data = array() ) {
-
-        $args = wp_parse_args(
-            $data,
-            $this->get_column_defaults()
-        );
-
-        return $this->insert( $args, 'email' );
-    }
-
-    /**
-     * Insert a new email
-     *
-     * @access  public
-     * @since   2.1
-     * @return  int
-     */
-    public function insert( $data, $type = '' ) {
-        $result = parent::insert( $data, $type );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Update a email
-     *
-     * @access  public
-     * @since   2.1
-     * @return  bool
-     */
-    public function update( $row_id, $data = array(), $where = 'ID' ) {
-        $result = parent::update( $row_id, $data, $where );
-
-        if ( $result ) {
-            $this->set_last_changed();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Delete a email
-     *
-     * @access  public
-     * @since   2.3.1
-     */
-    public function delete( $id = false ) {
-
-        if ( empty( $id ) ) {
-            return false;
-        }
-
-        $email = $this->get_email_by( 'ID', $id );
-
-        if ( $email->ID > 0 ) {
-
-            global $wpdb;
-
-            $result = $wpdb->delete( $this->table_name, array( 'ID' => $email->ID ), array( '%d' ) );
-
-            if ( $result ) {
-                $this->set_last_changed();
-            }
-
-            return $result;
-
-        } else {
-            return false;
-        }
-
-    }
-
-    /**
-     * Checks if a email exists
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function exists( $value = 0, $field = 'ID' ) {
-
-        $columns = $this->get_columns();
-        if ( ! array_key_exists( $field, $columns ) ) {
-            return false;
-        }
-
-        return (bool) $this->get_column_by( 'ID', $field, $value );
-
+        ];
     }
 
     /**
@@ -224,6 +148,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
 
         return parent::get_by( $field, $value );
     }
+
 
     /**
      * Retrieve emails from the database
@@ -270,7 +195,6 @@ class WPGH_DB_Emails extends WPGH_DB  {
         return $results;
     }
 
-
     /**
      * Count the total number of emails in the database
      *
@@ -278,39 +202,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
      * @since   2.1
      */
     public function count( $args = array() ) {
-
         return count( $this->get_emails( $args ) );
-
-    }
-
-    /**
-     * Sets the last_changed cache key for emails.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function set_last_changed() {
-        wp_cache_set( 'last_changed', microtime(), $this->cache_group );
-    }
-
-    /**
-     * Retrieves the value of the last_changed cache key for emails.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function get_last_changed() {
-        if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-            return wp_cache_get_last_changed( $this->cache_group );
-        }
-
-        $last_changed = wp_cache_get( 'last_changed', $this->cache_group );
-        if ( ! $last_changed ) {
-            $last_changed = microtime();
-            wp_cache_set( 'last_changed', $last_changed, $this->cache_group );
-        }
-
-        return $last_changed;
     }
 
     /**
@@ -323,7 +215,7 @@ class WPGH_DB_Emails extends WPGH_DB  {
 
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         $sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -343,5 +235,4 @@ class WPGH_DB_Emails extends WPGH_DB  {
 
         update_option( $this->table_name . '_db_version', $this->version );
     }
-
 }

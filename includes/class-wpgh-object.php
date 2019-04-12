@@ -31,12 +31,12 @@ abstract class WPGH_Object
     protected $meta = [];
 
     /**
-     * @var WPGH_DB
+     * @var DB
      */
     protected $db;
 
     /**
-     * @var WPGH_DB
+     * @var DB
      */
     protected $meta_db;
 
@@ -152,7 +152,7 @@ abstract class WPGH_Object
     /**
      * Return the DB instance that is associated with items of this type.
      *
-     * @return WPGH_DB
+     * @return DB
      */
     abstract protected function get_db();
 
@@ -160,7 +160,7 @@ abstract class WPGH_Object
     /**
      * Return a META DB instance associated with items of this type.
      *
-     * @return WPGH_DB
+     * @return DB
      */
     abstract protected function get_meta_db();
 
