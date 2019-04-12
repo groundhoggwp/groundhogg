@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 2.0 =
+* USE Namespace, autoloader, and more goodies to improve code organization.
+
 = 1.3.7 =
 * ADDED extra nonce to frontend form impression checks to ensure request is intentional.
 * ADDED extra nonce to frontend page view checks to ensure request is intentional.
