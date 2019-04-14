@@ -36,6 +36,8 @@ define( 'GROUNDHOGG_ASSETS_URL', GROUNDHOGG_URL . 'assets/' );
 
 add_action( 'plugins_loaded', 'groundhogg_load_plugin_textdomain' );
 
+define( 'GROUNDHOGG_TEXT_DOMAIN', 'groundhogg' );
+
 if ( ! version_compare( PHP_VERSION, '5.4', '>=' ) ) {
     add_action( 'admin_notices', 'groundhogg_fail_php_version' );
 } elseif ( ! version_compare( get_bloginfo( 'version' ), '4.7', '>=' ) ) {
