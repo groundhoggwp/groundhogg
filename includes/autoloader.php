@@ -32,6 +32,11 @@ class Autoloader {
 		'Notices' => 'includes/notices.php',
 		'Bulk_Job' => 'includes/bulk-jobs/bulk-job.php',
 		'HTML' => 'includes/html.php',
+		'Utils' => 'includes/utils.php',
+		'Locations' => 'includes/locations.php',
+		'Compliance' => 'includes/compliance.php',
+		'Base_Object' => 'includes/base-object.php',
+		'Base_Object_With_Meta' => 'includes/base-object-with-meta.php',
 	];
 
 	/**

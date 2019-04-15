@@ -1,8 +1,18 @@
 <?php
+namespace Groundhogg;
+
+
+// Exit if accessed directly
+use Groundhogg\DB\DB;
+use Groundhogg\DB\Meta_DB;
+use WP_User;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Contact
  *
- * Lost going on here, to much to cover. Essentially, you have a contact, lost of help methods, cool stuff.
+ * Lots going on here, to much to cover. Essentially, you have a contact, lost of helper methods, cool stuff.
  * This was originally modified from the EDD_Customer class by easy digital downloads, but quickly came into it's own.
  *
  * @package     Includes
@@ -11,99 +21,32 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Contact
+class Contact extends Base_Object_With_Meta
 {
 
-	/**
-	 * @var int $ID The Contact's Id
-	 */
-	public $ID;
-
-	/**
-	 * @var string Contact's Primary Email
-	 */
-	public $email;
-
-	/**
-	 * @var string $first_name Contact's First Name
-	 */
-	public $first_name;
-
-	/**
-	 * @var string $last_name Contact's Last Name
-	 */
-	public $last_name;
-
     /**
-     * @var string the full name of the contact
+     * Tag IDs
+     *
+     * @var int[]
      */
-	public $full_name;
-
-	/**
-	 * @var string $date_created Date & time the contact was created
-	 */
-	public $date_created;
-
-	/**
-	 * @var array $tags list of tag ids the contact has
-	 */
-	public $tags = array();
-
-	/**
-	 * @var string $activity an account of all activity associated with the contact.
-	 */
-	public $activity;
-
-	/**
-	 * @var int $optin_status the optin status of the contact
-	 */
-	public $optin_status;
+    protected $tags;
 
     /**
-     * The contact owner
+     * An instance of the WP User
      *
      * @var WP_User
      */
-	public $owner;
+    protected $user;
 
     /**
-     * The associated user account
-     *
-     * @var WP_USER
+     * Contact constructor.
+     * @param bool $_id_or_email
+     * @param bool $by_user_id
      */
-	public $user;
-
-    /**
-     * The contact notes
-     *
-     * @var string
-     */
-    public $notes;
-
-    /**
-     * @var string
-     */
-    public $ip_address;
-
-    /**
-     * @var array[] all contact meta data
-     */
-    public $meta = [];
-
-	/**
-	 * WPGH_Contact constructor.
-	 *
-	 * @param string|int|bool $_id_or_email either the email or the id of the contact to retrieve
-     * @param $by_user_id bool
-     * @param bool get contact via the User ID
-	 */
     public function __construct( $_id_or_email = false, $by_user_id = false ){
 
         if ( false === $_id_or_email || ( is_numeric( $_id_or_email ) && (int) $_id_or_email !== absint( $_id_or_email ) ) ) {
-            return false;
+            return;
         }
 
         $by_user_id = is_bool( $by_user_id ) ? $by_user_id : false;
@@ -114,97 +57,118 @@ class WPGH_Contact
             $field = 'email';
         }
 
-        $contact = WPGH()->contacts->get_contact_by( $field, $_id_or_email );
-
-        if ( empty( $contact ) || ! is_object( $contact ) ) {
-            return false;
-        }
-
-        $this->setup_contact( $contact );
+        parent::__construct( $_id_or_email, $field );
     }
 
     /**
-     * Whether the contact is active in a certain funnel
+     * Return the DB instance that is associated with items of this type.
      *
-     * @param $funnel_id
-     * @return bool
+     * @return DB
      */
-    public function in_funnel( $funnel_id )
+    protected function get_db()
     {
-        return WPGH()->events->count( array( 'funnel_id' => $funnel_id, 'contact_id' => $this->ID ) ) > 0;
+        return Plugin::instance()->dbs->get_db( 'contacts' );
     }
 
     /**
-     * Setup the default contact args
+     * Return a META DB instance associated with items of this type.
      *
-     * @param $contact object|array
+     * @return Meta_DB
      */
-	private function setup_contact( $contact )
+    protected function get_meta_db()
     {
+        return Plugin::instance()->dbs->get_db( 'contactmeta' );
+    }
 
-        foreach ( (object) $contact as $key => $value)
-        {
-            switch ( $key ){
-                case 'ID':
+    /**
+     * A string to represent the object type
+     *
+     * @return string
+     */
+    protected function get_object_type()
+    {
+        return 'contact';
+    }
 
-                    $this->ID = intval( $contact->ID );
+    /**
+     * Do any post setup actions.
+     *
+     * @return void
+     */
+    protected function post_setup()
+    {
+        $this->tags = wp_parse_id_list( Plugin::instance()->dbs->get_db( 'tag_relationships' )->get_relationships( $this->ID ) );
+        $this->user = get_userdata( $this->get_user_id() );
+    }
 
-                    break;
-                case 'first_name':
+    /**
+     * Get the contact's email address
+     *
+     * @return string
+     */
+    public function get_email()
+    {
+        return strtolower( $this->email );
+    }
 
-                    $this->first_name = ucfirst( $contact->first_name );
+    /**
+     * Gets the contact's optin status
+     *
+     * @return int
+     */
+    public function get_optin_status()
+    {
+        return absint( $this->optin_status );
+    }
 
-                    break;
-                case 'last_name':
+    /**
+     * Get the contact's first name
+     *
+     * @return string
+     */
+    public function get_first_name()
+    {
+        return ucwords( strtolower( $this->first_name ) );
+    }
 
-                    $this->last_name = ucfirst( $contact->last_name );
+    /**
+     * Gtet the contact's last name
+     *
+     * @return string
+     */
+    public function get_last_name()
+    {
+        return ucwords( strtolower( $this->last_name ) );
+    }
 
-                    break;
-                case 'email':
+    /**
+     * Get the contact's full name
+     *
+     * @return string
+     */
+    public function get_full_name()
+    {
+        return trim( ucwords( strtolower( sprintf( '%s %s', $this->get_first_name(), $this->get_last_name() ) ) ), ' ' );
+    }
 
-                    $this->email = strtolower( $contact->email );
+    /**
+     * Get the user ID
+     *
+     * @return int
+     */
+    public function get_user_id()
+    {
+       return absint( $this->user_id );
+    }
 
-                    break;
-                case 'optin_status':
-
-                    $this->optin_status = intval( $contact->optin_status );
-
-                    break;
-                case 'owner_id':
-
-                    $this->owner = get_userdata( $contact->owner_id );
-
-                    break;
-                case 'user_id':
-
-                    $this->user = get_userdata( $contact->user_id );
-
-                    break;
-                case 'date_created':
-
-                    $this->date_created = $contact->date_created;
-
-                    break;
-                default:
-                    $this->$key = $value;
-
-            }
-
-        }
-
-        $this->full_name = sprintf( "%s %s", $this->first_name, $this->last_name );
-
-        $tags = WPGH()->tag_relationships->get_tags_by_contact( $this->ID );
-
-        if ( is_array( $tags ) ){
-            $this->tags = array_map( 'intval', $tags );
-        } else {
-            $this->tags = array();
-        }
-
-        $this->notes = $this->get_meta('notes' );
-        $this->ip_address = $this->get_meta('ip_address' );
-
+    /**
+     * Get the user data
+     *
+     * @return WP_User
+     */
+    public function get_userdata()
+    {
+        return $this->user;
     }
 
     /**
@@ -212,37 +176,7 @@ class WPGH_Contact
      */
     public function exists()
     {
-        return ! empty( $this->email ) && $this->ID > 0;
-    }
-
-    /**
-     * Update the contact with the given information
-     *
-     * @param $data
-     * @return bool
-     */
-    public function update( $data = array() ) {
-
-        if ( empty( $data ) ) {
-            return false;
-        }
-
-//        $data = $this->sanitize_columns( $data );
-
-        do_action( 'wpgh_contact_pre_update', $this->ID, $data );
-
-
-        if ( $updated = WPGH()->contacts->update( $this->ID, $data, 'ID' ) ) {
-
-            $contact = WPGH()->contacts->get_contact_by( 'ID', $this->ID );
-
-            $this->setup_contact( $contact );
-
-        }
-
-        do_action( 'wpgh_contact_post_update', $updated, $this->ID, $data );
-
-        return $updated;
+        return is_email( $this->email );
     }
 
     /**
@@ -252,47 +186,7 @@ class WPGH_Contact
      */
     public function is_marketable()
     {
-        /* check for strict GDPR settings */
-        if ( wpgh_is_gdpr() && wpgh_is_gdpr_strict() )
-        {
-            $consent = $this->get_meta('gdpr_consent' );
-
-            if ( $consent !== 'yes' )
-                return false;
-        }
-
-        switch ( $this->optin_status )
-        {
-            case WPGH_UNCONFIRMED:
-                /* check for grace period if necessary */
-                if ( wpgh_is_confirmation_strict() ) {
-                    if ( ! wpgh_is_in_grace_period( $this->ID ) )
-                        return false;
-                }
-
-                return true;
-                break;
-            case WPGH_CONFIRMED:
-                return true;
-                break;
-            case WPGH_SPAM;
-            case WPGH_COMPLAINED;
-            case WPGH_HARD_BOUNCE;
-            case WPGH_UNSUBSCRIBED:
-                return false;
-                break;
-            case WPGH_WEEKLY:
-                $last_sent = $this->get_meta( 'last_sent' );
-                return ( time() - intval( $last_sent ) ) > 7 * 24 * HOUR_IN_SECONDS;
-                break;
-            case WPGH_MONTHLY:
-                $last_sent = $this->get_meta( 'last_sent' );
-                return ( time() - intval( $last_sent ) ) > 30 * 24 * HOUR_IN_SECONDS;
-                break;
-            default:
-                return true;
-                break;
-        }
+        return Plugin::instance()->compliance->is_marketable( $this->ID );
     }
 
     /**
@@ -310,18 +204,26 @@ class WPGH_Contact
 
         $current_notes = $this->get_meta( 'notes' );
 
-        $new_notes = sprintf( "===== %s =====\n\n", date_i18n( wpgh_get_option( 'date_format' ) ) );
+        $new_notes = sprintf( "===== %s =====\n\n", date_i18n( get_option( 'date_format' ) ) );
         $new_notes .= sprintf( "%s\n\n", $note );
         $new_notes .= $current_notes;
 
         $new_notes = sanitize_textarea_field( $new_notes );
 
         $this->update_meta( 'notes', $new_notes );
-        $this->notes = $new_notes;
 
-        do_action( 'wpgh_contact_note_added', $this->ID, $note );
+        do_action( 'groundhogg/contact/note/added', $this->ID, $note, $this );
 
         return true;
+    }
+
+    /**
+     * get the contact's notes
+     *
+     * @return string
+     */
+    public function get_notes(){
+        return $this->get_meta( 'notes' );
     }
 
     /**
@@ -787,4 +689,14 @@ class WPGH_Contact
         return $this->email;
     }
 
+    /**
+     * Whether the contact is active in a certain funnel
+     *
+     * @param $funnel_id
+     * @return bool
+     */
+    public function in_funnel( $funnel_id )
+    {
+        return WPGH()->events->count( array( 'funnel_id' => $funnel_id, 'contact_id' => $this->ID ) ) > 0;
+    }
 }

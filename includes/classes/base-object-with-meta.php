@@ -1,27 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: adria
- * Date: 2019-04-09
- * Time: 9:18 AM
- */
+namespace Groundhogg;
 
-abstract class WPGH_Object
+use Groundhogg\DB\DB;
+use Groundhogg\DB\Meta_DB;
+
+abstract class Base_Object_With_Meta extends Base_Object
 {
-
-    /**
-     * The ID of the object
-     *
-     * @var int
-     */
-    public $ID = 0;
-
-    /**
-     * The regular data
-     *
-     * @var array
-     */
-    protected $data = [];
 
     /**
      * The meta data
@@ -33,24 +17,7 @@ abstract class WPGH_Object
     /**
      * @var DB
      */
-    protected $db;
-
-    /**
-     * @var DB
-     */
     protected $meta_db;
-
-
-    public function __construct($ID)
-    {
-        $this->ID = intval($ID);
-        $object = $this->get_from_db();
-
-        if (!$object)
-            return false;
-
-        $this->setup_object($object);
-    }
 
     /**
      * Setup the class
@@ -60,9 +27,14 @@ abstract class WPGH_Object
      */
     protected function setup_object($object)
     {
+
+        $object = (object) $object;
+
         if (!is_object($object)) {
             return false;
         }
+
+        $this->ID = absint( $object->ID );
 
         //Lets just make sure we all good here.
         $object = apply_filters( "groundhogg/{$this->get_object_type()}/setup", $object );
@@ -79,28 +51,6 @@ abstract class WPGH_Object
 
         return true;
 
-    }
-
-    /**
-     * Do any post setup actions.
-     *
-     * @return void
-     */
-    abstract protected function post_setup();
-
-    /**
-     * Set an object property.
-     *
-     * @param $name
-     * @param $value
-     */
-    public function __set($name, $value)
-    {
-        if (property_exists($this, $name)) {
-            $this->$name = $value;
-        }
-
-        $this->data[$name] = $value;
     }
 
     /**
@@ -130,72 +80,11 @@ abstract class WPGH_Object
     }
 
     /**
-     * Checks if the data from the DB checks out.
-     *
-     * @return bool
-     */
-    public function exists()
-    {
-        $data = implode( '', $this->data );
-        return ! empty( $data );
-    }
-
-    /**
-     * Get the object from the associated db.
-     *
-     * @return object
-     */
-    protected function get_from_db(){
-        return $this->get_db()->get( $this->ID );
-    }
-
-    /**
-     * Return the DB instance that is associated with items of this type.
-     *
-     * @return DB
-     */
-    abstract protected function get_db();
-
-
-    /**
      * Return a META DB instance associated with items of this type.
      *
-     * @return DB
+     * @return Meta_DB
      */
     abstract protected function get_meta_db();
-
-    /**
-     * A string to represent the object type
-     *
-     * @return string
-     */
-    abstract protected function get_object_type();
-
-    /**
-     * Update the object
-     *
-     * @param array $data
-     * @return bool
-     */
-    public function update( $data = [] )
-    {
-        if ( empty( $data ) ) {
-            return false;
-        }
-
-        $data = $this->sanitize_columns( $data );
-
-        do_action( "groundhogg/{$this->get_object_type()}/pre_update", $this->ID, $data, $this );
-
-        if ( $updated = $this->get_db()->update( $this->ID, $data, 'ID' ) ) {
-            $contact = $this->get_from_db();
-            $this->setup_object( $contact );
-        }
-
-        do_action( "groundhogg/{$this->get_object_type()}/post_update", $this->ID, $data, $this );
-
-        return $updated;
-    }
 
     /**
      * Sanitize columns when updating the object

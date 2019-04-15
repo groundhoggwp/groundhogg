@@ -11,14 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 
 define( 'WPGH_BROADCAST'    , 1 );
-define( 'WPGH_UNCONFIRMED'  , 0 );
-define( 'WPGH_CONFIRMED'    , 1 );
-define( 'WPGH_UNSUBSCRIBED' , 2 );
-define( 'WPGH_WEEKLY'       , 3 );
-define( 'WPGH_MONTHLY'      , 4 );
-define( 'WPGH_HARD_BOUNCE'  , 5 );
-define( 'WPGH_SPAM'         , 6 );
-define( 'WPGH_COMPLAINED'   , 7 );
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons
@@ -33,75 +25,11 @@ function wpgh_get_referer()
 	return ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
 }
 
-/**
- * Get the text explanation for the optin status of a contact
- * 0 = unconfirmed, can send email
- * 1 = confirmed, can send email
- * 2 = opted out, can't send email
- *
- * @param $id_or_email int|string the contact in question
- *
- * @return bool|string
- */
-function wpgh_get_optin_status_text( $id_or_email )
-{
-    $contact = wpgh_get_contact( $id_or_email );
-
-    if ( ! $contact->email )
-        return _x( 'No Contact', 'notice', 'groundhogg' );
-
-    wpgh_get_option( 'gh_strict_gdpr', array( 'no' ) );
-
-    if ( wpgh_is_gdpr() && wpgh_is_gdpr_strict() )
-    {
-        $consent = $contact->gdpr_consent;
-
-        if ( $consent !== 'yes' )
-            return _x( 'This contact has not agreed to receive email marketing from you.', 'optin_status', 'groundhogg' );
-    }
-
-    switch ( $contact->optin_status ){
-
-        case WPGH_UNCONFIRMED:
-
-            if ( wpgh_is_confirmation_strict() )
-            {
-                if ( ! wpgh_is_in_grace_period( $contact->ID ) )
-                    return _x( 'Unconfirmed. This contact will not receive emails, they are passed the email confirmation grace period.', 'optin_status', 'groundhogg' );
-            }
-
-            return _x( 'Unconfirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
-            break;
-        case WPGH_CONFIRMED:
-            return _x( 'Confirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
-            break;
-        case WPGH_UNSUBSCRIBED:
-            return _x( 'Unsubscribed. They will not receive marketing.','optin_status', 'groundhogg' );
-            break;
-        case WPGH_WEEKLY:
-            return _x( 'This contact will only receive marketing weekly.', 'optin_status','groundhogg' );
-            break;
-        case WPGH_MONTHLY:
-            return _x( 'This contact will only receive marketing monthly.', 'optin_status','groundhogg' );
-            break;
-        case WPGH_HARD_BOUNCE:
-            return _x( 'This email address bounced, they will not receive marketing.', 'optin_status', 'groundhogg' );
-            break;
-        case WPGH_SPAM:
-            return _x( 'This contact was marked as spam. They will not receive marketing.','optin_status','groundhogg' );
-            break;
-        case WPGH_COMPLAINED:
-            return _x( 'This contact complained about your emails. They will not receive marketing.', 'optin_status','groundhogg' );
-            break;
-        default:
-            return _x( 'Unconfirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
-            break;
-    }
-}
-
 
 /**
  * Convert the funnel into a json object so it can be duplicated fairly easily.
+ *
+ * @todo add to funnel class
  *
  * @param $funnel_id int the ID of the funnel to convert.
  * @return false|string the json string of a converted funnel or false on failure.
@@ -161,6 +89,8 @@ function wpgh_convert_funnel_to_json( $funnel_id )
 
 /**
  * Import a funnel
+ *
+ * @todo add to funnel class
  *
  * @return bool|int
  */
@@ -297,73 +227,6 @@ function wpgh_get_visitor_ip() {
 
     return apply_filters( 'wpgh_get_ip', $ip );
 
-}
-
-/**
- * Check if GDPR is enabled throughout the plugin.
- *
- * @return bool, whether it's enable or not.
- */
-function wpgh_is_gdpr()
-{
-    $is_gdpr =  wpgh_get_option( 'gh_enable_gdpr', array() );
-
-    if ( ! is_array( $is_gdpr ) )
-        return false;
-
-    return in_array( 'on', $is_gdpr );
-}
-
-/**
- * check if the GDPR strict option is enabled
- *
- * @return bool
- */
-function wpgh_is_gdpr_strict()
-{
-
-    $is_gdpr_strict =  wpgh_get_option( 'gh_strict_gdpr', array() );
-
-    if ( ! is_array( $is_gdpr_strict ) )
-        return false;
-
-    return in_array( 'on', $is_gdpr_strict );
-}
-
-function wpgh_is_confirmation_strict()
-{
-
-    $is_confirmation_strict =  wpgh_get_option( 'gh_strict_confirmation', array() );
-
-    if ( ! is_array( $is_confirmation_strict ) )
-        return false;
-
-    return in_array( 'on', $is_confirmation_strict );
-}
-
-/**
- * Return whether the given contact is within the strict confirmation grace period
- *
- * @param $contact_id
- * @return bool
- */
-function wpgh_is_in_grace_period( $contact_id )
-{
-
-    $contact = wpgh_get_contact( $contact_id );
-
-    $grace = intval( wpgh_get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
-
-    $base = $contact->last_optin;
-
-    if ( ! $base )
-    {
-        $base = strtotime( $contact->date_created );
-    }
-
-    $time_passed = time() - $base;
-
-    return $time_passed < $grace;
 }
 
 
@@ -759,52 +622,6 @@ function wpgh_get_current_user_roles()
 
     return $roles;
 
-}
-
-/**
- * Array access for existing contact objects...
- *
- * @type WPGH_Contact[]
- */
-global $wpgh_contacts_cache;
-$wpgh_contacts_cache = [];
-
-/**
- * Simple function to get a contact
- *
- * @since 1.0.6 implemented
- * @since 1.0.20.2 return false if contact does not exist
- *
- * @param $id_or_email string|int
- * @param $by_user_id bool
- * @param $get_from_cache bool
- * @return WPGH_Contact|false
- */
-function wpgh_get_contact( $id_or_email, $by_user_id=false, $get_from_cache=true ){
-
-    global $wpgh_contacts_cache;
-
-    if ( $get_from_cache && is_array( $wpgh_contacts_cache ) ){
-        $cache_key = ! $by_user_id ? md5( $id_or_email ) : md5( sprintf( 'u_%s', $id_or_email ) ) ;
-        if (  key_exists( $cache_key, $wpgh_contacts_cache ) ){
-            return $wpgh_contacts_cache[ $cache_key ];
-        }
-    }
-
-//    var_dump( $wpgh_contacts_cache );
-
-    $contact = new WPGH_Contact( $id_or_email, $by_user_id );
-
-    if ( $contact->exists() ){
-
-        if ( $get_from_cache && is_array( $wpgh_contacts_cache )  ){
-            $wpgh_contacts_cache[ $cache_key ] = $contact;
-        }
-
-        return $contact;
-    }
-
-    return false;
 }
 
 /**

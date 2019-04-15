@@ -11,7 +11,9 @@ class Manager
 {
 
     /**
-     * @var DB[]
+     * List of DBs
+     *
+     * @var DB[]|Meta_DB[]
      */
     protected $dbs = [];
 
@@ -42,6 +44,9 @@ class Manager
         $this->tags         = new Tags();
         $this->tag_relationships = new Tag_Relationships();
 
+        /**
+         * Runs when the DB Manager is setup and all the standard DBs have been initialized.
+         */
         do_action( 'groundhogg/db/manager/init', $this );
     }
 

@@ -4,9 +4,7 @@ namespace Groundhogg;
 use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
+if ( ! defined( 'ABSPATH' ) ) {exit;}
 
 /**
  * Groundhogg plugin.
@@ -39,7 +37,7 @@ class Plugin {
      * @since 2.0.0
      * @access public
      *
-     * @var DB_Manager[]
+     * @var DB_Manager
      */
     public $dbs;
 
@@ -58,9 +56,21 @@ class Plugin {
     public $admin;
 
     /**
-     * @var HTML
+     * @var Utils
      */
-    public $HTML;
+    public $utils;
+
+    /**
+     * @var Scripts
+     */
+    public $scripts;
+
+    /**
+     * Utils for compliance management
+     *
+     * @var Compliance
+     */
+    public $compliance;
     
     /**
      * Settings.
@@ -200,8 +210,10 @@ class Plugin {
      */
     private function init_components() {
 
-        $this->dbs = new DB_Manager();
-        $this->HTML = new HTML();
+        $this->dbs          = new DB_Manager();
+        $this->compliance   = new Compliance();
+        $this->utils        = new Utils();
+        $this->scripts      = new Scripts();
 
         if ( is_admin() ) {
 
