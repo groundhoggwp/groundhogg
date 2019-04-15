@@ -118,10 +118,7 @@ class WPGH_Tracking
 	    add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
 	    add_action( 'template_redirect', [ $this, 'do_tracking_redirect' ] );
 	    add_action( 'template_redirect', [ $this, 'do_confirmation_redirect' ] );
-
-	    if ( isset( $_COOKIE[ 'gh_referer' ] ) ) {
-		    $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referer' ] );
-	    }
+	    add_action( 'template_redirect', [ $this, 'do_superlink_redirect' ] );
 
         add_action( 'groundhogg/submission/after', array( $this, 'form_filled' ), 10, 3 );
 
@@ -134,6 +131,7 @@ class WPGH_Tracking
     {
     	add_rewrite_rule( 'gh-tracking/([^/]*)/([^/]*)', 'index.php?tracking=true&tracking_via=$matches[1]&tracking_action=$matches[2]', 'top' );
     	add_rewrite_rule( 'gh-confirmation/[^/]*/([^/]*)', 'index.php?confirmation=true&confirmation_via=$matches[1]', 'top' );
+    	add_rewrite_rule( 'superlinks/link/([^/]*)', 'index.php?superlink=true&superlink_id=$matches[1]', 'top' );
     }
 
 	/**
@@ -152,6 +150,10 @@ class WPGH_Tracking
 		// Confirmation vars
 		$vars[] = 'confirmation';
 		$vars[] = 'confirmation_via';
+
+		// Superlinks
+		$vars[] = 'superlink';
+		$vars[] = 'superlink_id';
 
 		return $vars;
 	}
@@ -203,6 +205,32 @@ class WPGH_Tracking
 	    	return;
 
 	    $this->email_confirmed();
+    }
+
+    /**
+     * do a superlink and then redirect to the target
+     */
+    public function do_superlink_redirect()
+    {
+        $superlink = get_query_var( 'superlink' );
+
+        if ( ! $superlink || ! $this->contact ){
+            return;
+        }
+
+        $superlink_id = absint( get_query_var( 'superlink_id' ) );
+        $link = WPGH()->superlinks->get_superlink( $superlink_id );
+
+        if ( ! $link ){
+            return;
+        }
+
+        $target = esc_url_raw( urldecode( WPGH()->replacements->process( $link->target, $this->contact->ID ) ) );
+        $tags = maybe_unserialize( $link->tags );
+        $this->contact->apply_tag( wp_parse_id_list( $tags ) );
+
+        wp_redirect( $target );
+        die();
     }
 
 
@@ -340,6 +368,11 @@ class WPGH_Tracking
      */
     public function deconstruct_cookie()
     {
+
+        if ( isset( $_COOKIE[ 'gh_referer' ] ) ) {
+            $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referer' ] );
+        }
+
         if ( ! isset( $_COOKIE[ self::COOKIE ] ) )
             return false;
 

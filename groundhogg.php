@@ -3,7 +3,7 @@
 Plugin Name: Groundhogg
 Plugin URI: https://wordpress.org/plugins/groundhogg/
 Description: CRM and marketing automation for WordPress
-Version: 1.3.8
+Version: 1.3.9
 Author: Groundhogg Inc.
 Author URI: http://www.groundhogg.io
 Text Domain: groundhogg
@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.3.8';
+        public $version = '1.3.9';
 
         /**
          * @var $instance Groundhogg instance
@@ -139,12 +139,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          * @var object|WPGH_DB_Superlinks
          */
         public $superlinks;
-
-        /**
-         *
-         * @var WPGH_Superlink
-         */
-        public $superlink;
 
         /**
          * The tracking class
@@ -319,7 +313,6 @@ if ( ! class_exists( 'Groundhogg' ) ) :
 
                 self::$instance->roles        = new WPGH_Roles();
                 self::$instance->tracking     = new WPGH_Tracking();
-                self::$instance->superlink    = new WPGH_Superlink();
 
 	            /**
 	             * Replaced Queue with Queue V2 @since 1.0.18
