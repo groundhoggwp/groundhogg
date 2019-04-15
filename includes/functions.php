@@ -1,5 +1,4 @@
 <?php
-namespace Groundhogg;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -20,11 +19,6 @@ define( 'WPGH_MONTHLY'      , 4 );
 define( 'WPGH_HARD_BOUNCE'  , 5 );
 define( 'WPGH_SPAM'         , 6 );
 define( 'WPGH_COMPLAINED'   , 7 );
-
-function WPGH()
-{
-    return \Groundhogg\Plugin::instance();
-}
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons

@@ -71,7 +71,7 @@ abstract class Admin_Page
      *
      * @return int
      */
-    abstract public function get_priority();
+    public function get_priority(){ return 10; }
 
     /**
      * Get the page slug
