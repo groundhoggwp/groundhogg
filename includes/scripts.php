@@ -1,24 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: adria
- * Date: 2019-04-10
- * Time: 11:28 AM
- */
+namespace Groundhogg;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
  * Register frontend scripts.
  */
-function wpgh_register_frontend_scripts()
+function register_frontend_scripts()
 {
-    $IS_MINIFIED = wpgh_is_option_enabled( 'gh_script_debug' ) ? '' : '.min' ;
+    $IS_MINIFIED = is_option_enabled( 'gh_script_debug' ) ? '' : '.min' ;
 
     wp_register_script( 'groundhogg-frontend',GROUNDHOGG_ASSETS_URL . 'js/frontend' . $IS_MINIFIED .'.js', [ 'jquery' ], GROUNDHOGG_VERSION );
     wp_register_script( 'groundhogg-email-iframe',GROUNDHOGG_ASSETS_URL . 'js/email' . $IS_MINIFIED .'.js', [ 'jquery' ], GROUNDHOGG_VERSION );
 
-    if ( ! wpgh_is_option_enabled( 'gh_disable_api' ) ){
+    if ( ! is_option_enabled( 'gh_disable_api' ) ){
         wp_localize_script( 'groundhogg-frontend', 'gh_frontent_object', array(
             'page_view_endpoint'        => site_url( 'wp-json/gh/v3/elements/page-view/' ),
             'form_impression_endpoint'  => site_url( 'wp-json/gh/v3/elements/form-impression/' ),
@@ -38,12 +33,12 @@ function wpgh_register_frontend_scripts()
     do_action( 'groundhogg/frontend/after_register_scripts' );
 }
 
-add_action( 'wp_enqueue_scripts', 'wpgh_register_frontend_scripts' );
+add_action( 'wp_enqueue_scripts', 'register_frontend_scripts' );
 
 /**
  * Register frontend Styles
  */
-function wpgh_register_frontend_styles()
+function register_frontend_styles()
 {
     wp_register_style( 'jquery-ui', GROUNDHOGG_ASSETS_URL . 'lib/jquery-ui/jquery-ui.min.css', [], GROUNDHOGG_VERSION );
     wp_register_style( 'groundhogg-frontend',GROUNDHOGG_ASSETS_URL . 'css/frontend.css', [], GROUNDHOGG_VERSION );
@@ -51,15 +46,15 @@ function wpgh_register_frontend_styles()
     do_action( 'groundhogg/frontend/after_register_styles' );
 }
 
-add_action( 'wp_enqueue_scripts', 'wpgh_register_frontend_styles' );
+add_action( 'wp_enqueue_scripts', 'register_frontend_styles' );
 
 /**
  * Register all the required admin scripts.
  */
-function wpgh_register_admin_scripts()
+function register_admin_scripts()
 {
     // Whether to include minified files or not.
-    $IS_MINIFIED = wpgh_is_option_enabled( 'gh_script_debug' ) ? '' : '.min' ;
+    $IS_MINIFIED = is_option_enabled( 'gh_script_debug' ) ? '' : '.min' ;
 
     // Select 2
     wp_register_script( 'select2', GROUNDHOGG_ASSETS_URL . 'lib/select2/js/select2.full' . $IS_MINIFIED .'.js' , [ 'jquery' ] );
@@ -117,7 +112,7 @@ function wpgh_register_admin_scripts()
     wp_register_script( 'groundhogg-funnel-email', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-elements/email' . $IS_MINIFIED .'.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
     // LOCALIZE ANY REQUIRED SCRIPTS
-    if ( ! wpgh_is_option_enabled( 'gh_disable_api' ) ){
+    if ( ! is_option_enabled( 'gh_disable_api' ) ){
         /* Load improved picker request urls */
         wp_localize_script( 'groundhogg-admin', 'gh_admin_object', [
             'tags_endpoint'         => site_url( 'wp-json/gh/v3/tags?select2=true' ),
@@ -143,12 +138,12 @@ function wpgh_register_admin_scripts()
     do_action( 'groundhogg/admin/after_register_scripts' );
 }
 
-add_action( 'admin_enqueue_scripts', 'wpgh_register_admin_scripts' );
+add_action( 'admin_enqueue_scripts', 'register_admin_scripts' );
 
 /**
  * Register all the required admin styles.
  */
-function wpgh_register_admin_styles()
+function register_admin_styles()
 {
     wp_register_style( 'jquery-ui', GROUNDHOGG_ASSETS_URL . 'lib/jquery-ui/jquery-ui.min.css' );
     wp_register_style( 'select2',   GROUNDHOGG_ASSETS_URL . 'lib/select2/css/select2.min.css' );
@@ -169,4 +164,4 @@ function wpgh_register_admin_styles()
     do_action( 'groundhogg/admin/after_register_styles' );
 }
 
-add_action( 'admin_enqueue_scripts', 'wpgh_register_admin_styles' );
+add_action( 'admin_enqueue_scripts', 'register_admin_styles' );

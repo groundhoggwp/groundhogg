@@ -138,7 +138,7 @@ class WPGH_Admin_Menu
         require_once dirname(__FILE__) . '/admin/welcome/welcome-page.php';
         require_once dirname(__FILE__) . '/admin/guided-setup/class-wpgh-guided-setup.php';
         require_once dirname(__FILE__) . '/admin/bulk-jobs/class-wpgh-admin-bulk-job.php';
-        require_once dirname(__FILE__) . '/admin/tools/class-wpgh-admin-tools.php';
+        require_once dirname(__FILE__) . '/admin/tools/tools-page.php';
     }
 
     public function current_page()

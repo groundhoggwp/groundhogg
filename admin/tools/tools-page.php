@@ -1,5 +1,7 @@
 <?php
-namespace Groundhogg\Admin;
+namespace Groundhogg\Admin\Tools;
+
+use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Bulk_Delete_Contacts;
 use Groundhogg\Export_Contacts;
 use Groundhogg\Import_Contacts;

@@ -1,4 +1,6 @@
 <?php
+namespace Groundhogg;
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 

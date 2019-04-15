@@ -17,53 +17,105 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class HTML
 {
 
-    /**
+	/**
      * WPGH_HTML constructor.
      *
      * Set up the ajax calls.
      */
     public function __construct()
     {
-        add_action( 'wp_ajax_gh_get_contacts',   [ $this, 'gh_get_contacts' ] );
-        add_action( 'wp_ajax_gh_get_emails',     [ $this, 'gh_get_emails' ] );
-        add_action( 'wp_ajax_gh_get_sms',        [ $this, 'gh_get_sms' ] );
-        add_action( 'wp_ajax_gh_get_tags',       [ $this, 'gh_get_tags' ] );
-        add_action( 'wp_ajax_gh_get_benchmarks', [ $this, 'gh_get_benchmarks' ] );
-        add_action( 'wp_ajax_gh_get_meta_keys',  [ $this, 'get_meta_keys' ] );
+        add_action( 'wp_ajax_gh_get_contacts',   [ $this, 'ajax_get_contacts' ] );
+        add_action( 'wp_ajax_gh_get_emails',     [ $this, 'ajax_get_emails' ] );
+        add_action( 'wp_ajax_gh_get_sms',        [ $this, 'ajax_get_sms' ] );
+        add_action( 'wp_ajax_gh_get_tags',       [ $this, 'ajax_get_tags' ] );
+        add_action( 'wp_ajax_gh_get_benchmarks', [ $this, 'ajax_get_benchmarks' ] );
+        add_action( 'wp_ajax_gh_get_meta_keys',  [ $this, 'ajax_get_meta_keys' ] );
     }
 
-    public function checkbox( $args )
-    {
-        $a = shortcode_atts( array(
-            'label'         => '',
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'value'         => '1',
-            'checked'       => false,
-            'title'         => '',
-            'attributes'    => '',
-            'required'      => false,
-        ), $args );
+	/**
+	 * Output a simple input field
+	 *
+	 * @param $args
+	 * @return string
+	 */
+	public function input( $args )
+	{
+		$a = wp_parse_args( $args, array(
+			'type'  => 'text',
+			'name'  => '',
+			'id'    => '',
+			'class' => 'regular-text',
+			'value' => '',
+			'attributes' => '',
+			'placeholder' => '',
+			'required' => false
+		) );
 
-        $required = $a[ 'required' ] ? 'required' : '';
-        $checked = $a[ 'checked' ] ? 'checked' : '';
+		if ( $a[ 'required' ] ){
+			$a[ 'required' ] = 'required';
+		}
 
-        return sprintf(
-            "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='%s' value='%s' title='%s' %s %s %s> %s</label>",
-            esc_attr( $a[ 'name' ] ),
-            esc_attr( $a[ 'id' ] ),
-            esc_attr( $a[ 'class' ] ),
-            esc_attr( $a[ 'value' ] ),
-            esc_attr( $a[ 'title' ] ),
-            $a[ 'attributes' ],
-            $checked,
-            $required,
-            $a[ 'label' ]
-        );
-    }
+		$html = sprintf(
+			"<input type='%s' id='%s' class='%s' name='%s' value='%s' placeholder='%s' %s %s>",
+			esc_attr( $a[ 'type'    ] ),
+			esc_attr( $a[ 'id'      ] ),
+			esc_attr( $a[ 'class'   ] ),
+			esc_attr( $a[ 'name'    ] ),
+			esc_attr( $a[ 'value'   ] ),
+			esc_attr( $a[ 'placeholder' ] ),
+			$a[ 'attributes'  ],
+			$a[ 'required'  ]
+		);
 
-    public function button($args )
+		return apply_filters( 'groundhogg/html/input', $html, $a );
+	}
+
+	/**
+	 * Wrapper function for the INPUT
+	 *
+	 * @param $args
+	 * @return string
+	 */
+	public function number( $args )
+	{
+
+		$a = wp_parse_args( $args, array(
+			'type'  => 'number',
+			'name'  => '',
+			'id'    => '',
+			'class' => 'regular-text',
+			'value' => '',
+			'attributes' => '',
+			'placeholder' => '',
+			'min'       => 0,
+			'max'       => 99999,
+			'step'      => 1
+		) );
+
+		if ( ! empty( $a[ 'max' ] ) ){
+			$a[ 'attributes' ] .= sprintf( ' max="%d"', $a[ 'max' ] );
+		}
+
+		if ( ! empty( $a[ 'min' ] ) ){
+			$a[ 'attributes' ] .= sprintf( ' min="%d"', $a[ 'min' ] );
+		}
+
+		if ( ! empty( $a[ 'step' ] ) ){
+			$a[ 'attributes' ] .= sprintf( ' step="%s"', $a[ 'step' ] );
+		}
+
+
+		return apply_filters( 'groundhogg/html/number', $this->input( $a ), $a );
+	}
+
+	/**
+	 * Output a button
+	 *
+	 * @param $args
+	 *
+	 * @return string
+	 */
+	public function button($args )
     {
         $a = wp_parse_args( $args, array(
             'type'      => 'button',
@@ -86,12 +138,54 @@ class HTML
             esc_attr( $a[ 'text'  ] )
         );
 
-        return apply_filters( 'wpgh_html_button', $html, $args );
+        return apply_filters( 'groundhogg/html/button', $html, $a );
     }
 
-    /**
-     * Generate a modal link quickly
-     */
+	/**
+	 * Output a checkbox
+	 *
+	 * @param $args
+	 *
+	 * @return string
+	 */
+	public function checkbox( $args )
+	{
+		$a = shortcode_atts( array(
+			'label'         => '',
+			'name'          => '',
+			'id'            => '',
+			'class'         => '',
+			'value'         => '1',
+			'checked'       => false,
+			'title'         => '',
+			'attributes'    => '',
+			'required'      => false,
+		), $args );
+
+		$required = $a[ 'required' ] ? 'required' : '';
+		$checked = $a[ 'checked' ] ? 'checked' : '';
+
+		return apply_filters( 'groundhogg/html/checkbox', sprintf(
+			"<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='%s' value='%s' title='%s' %s %s %s> %s</label>",
+			esc_attr( $a[ 'name' ] ),
+			esc_attr( $a[ 'id' ] ),
+			esc_attr( $a[ 'class' ] ),
+			esc_attr( $a[ 'value' ] ),
+			esc_attr( $a[ 'title' ] ),
+			$a[ 'attributes' ],
+			$checked,
+			$required,
+			$a[ 'label' ]
+		), $a );
+	}
+
+	/**
+	 * Generate a link that activates the Groundhogg modal
+	 *
+	 * @param array $args
+	 *
+	 * @return mixed|void
+	 */
     public function modal_link( $args = array() )
     {
         $a = wp_parse_args( $args, array(
@@ -123,83 +217,7 @@ class HTML
             $a[ 'text' ]
         );
 
-        return apply_filters( 'wpgh_html_modal_link', $html, $args );
-    }
-
-    /**
-     * Output a simple input field
-     *
-     * @param $args
-     * @return string
-     */
-    public function input( $args )
-    {
-        $a = wp_parse_args( $args, array(
-            'type'  => 'text',
-            'name'  => '',
-            'id'    => '',
-            'class' => 'regular-text',
-            'value' => '',
-            'attributes' => '',
-            'placeholder' => '',
-            'required' => false
-        ) );
-
-        if ( $a[ 'required' ] ){
-            $a[ 'required' ] = 'required';
-        }
-
-        $html = sprintf(
-            "<input type='%s' id='%s' class='%s' name='%s' value='%s' placeholder='%s' %s %s>",
-            esc_attr( $a[ 'type'    ] ),
-            esc_attr( $a[ 'id'      ] ),
-            esc_attr( $a[ 'class'   ] ),
-            esc_attr( $a[ 'name'    ] ),
-            esc_attr( $a[ 'value'   ] ),
-            esc_attr( $a[ 'placeholder' ] ),
-            $a[ 'attributes'  ],
-            $a[ 'required'  ]
-        );
-
-        return apply_filters( 'wpgh_html_input', $html, $args );
-    }
-
-    /**
-     * Wrapper function for the INPUT
-     *
-     * @param $args
-     * @return string
-     */
-    public function number( $args )
-    {
-
-        $a = wp_parse_args( $args, array(
-            'type'  => 'number',
-            'name'  => '',
-            'id'    => '',
-            'class' => 'regular-text',
-            'value' => '',
-            'attributes' => '',
-            'placeholder' => '',
-            'min'       => 0,
-            'max'       => 99999,
-            'step'      => 1
-        ) );
-
-        if ( ! empty( $a[ 'max' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' max="%d"', $a[ 'max' ] );
-        }
-
-        if ( ! empty( $a[ 'min' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' min="%d"', $a[ 'min' ] );
-        }
-
-        if ( ! empty( $a[ 'step' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' step="%s"', $a[ 'step' ] );
-        }
-
-
-        return $this->input( $a );
+        return apply_filters( 'groundhogg/html/modal_link', $html, $a );
     }
 
     /**
@@ -237,7 +255,7 @@ class HTML
         }
 
 
-        return $this->input( $a );
+	    return apply_filters( 'groundhogg/html/range', $this->input( $a ), $a );
     }
 
     /**
@@ -271,7 +289,7 @@ class HTML
             $a[ 'value'         ]
         );
 
-        return apply_filters( 'wpgh_html_textarea', $html, $args );
+        return apply_filters( 'groundhogg/html/textarea', $html, $a );
 
     }
 
@@ -336,7 +354,7 @@ class HTML
             $optionHTML
         );
 
-        return apply_filters( 'wpgh_html_dropdown', $html, $args );
+	    return apply_filters( 'groundhogg/html/textarea', $html, $a );
 
     }
 
@@ -363,21 +381,17 @@ class HTML
         ) );
 
         if ( empty( $a[ 'options' ] ) ){
-
             $owners = get_users( array( 'role__in' => array( 'administrator', 'marketer', 'sales_manager' ) ) );
 
             /**
-             * @var $owner WP_User
+             * @var $owner \WP_User
              */
             foreach ( $owners as $owner ){
-
                 $a[ 'options' ][ $owner->ID ] = sprintf( '%s (%s)', $owner->display_name, $owner->user_email );
-
             }
-
         }
 
-        return $this->dropdown( $a );
+	    return apply_filters( 'groundhogg/html/dropdown_owners', $this->dropdown( $a ), $a );
     }
 
     /**
@@ -404,7 +418,7 @@ class HTML
             $owners = get_users( array( 'role__in' => array( 'administrator', 'marketer', 'sales_manager' ) ) );
 
             /**
-             * @var $owner WP_User
+             * @var $owner \WP_User
              */
             foreach ( $owners as $owner ){
 
@@ -414,7 +428,7 @@ class HTML
 
         }
 
-        return $this->select2( $a );
+	    return apply_filters( 'groundhogg/html/round_robin', $this->select2( $a ), $a );
     }
 
     /**
@@ -509,49 +523,16 @@ class HTML
             $optionHTML
         );
 
-        wp_enqueue_script( 'select2' );
-        wp_enqueue_style( 'select2' );
-        wp_enqueue_style( 'groundhogg-admin' );
-        wp_enqueue_script( 'groundhogg-admin' );
+	    wp_enqueue_style( 'select2' );
+	    wp_enqueue_script( 'select2' );
+	    wp_enqueue_style( 'groundhogg-admin' );
+	    wp_enqueue_script( 'groundhogg-admin' );
 
-        return apply_filters( 'wpgh_html_select2', $html, $args );
+        return apply_filters( 'groundhogg/html/select2', $html, $a );
 
     }
 
-    /**
-     * Get json tag results for tag picker
-     */
-    public function gh_get_tags()
-    {
-        if ( ! is_user_logged_in() || ! current_user_can( 'manage_tags' ) )
-            wp_die( 'No access to tags.' );
-
-        $value = isset( $_REQUEST[ 'q' ] ) ? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
-
-        if ( empty( $value ) ){
-            $tags = WPGH()->tags->get_tags();
-        } else {
-            $tags = WPGH()->tags->search( $value );
-        }
-
-        $json = array();
-
-        foreach ( $tags as $i => $tag ) {
-
-            $json[] = array(
-                'id' => $tag->tag_id,
-                'text' => sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count )
-            );
-
-        }
-
-        $results = array( 'results' => $json, 'more' => false );
-
-        wp_die( json_encode( $results ) );
-    }
-
-
-    /**
+	/**
      * Return the HTML for a tag picker
      *
      * @param $args
@@ -586,10 +567,11 @@ class HTML
         }
 
 
-        return $this->select2( $a );
+        return apply_filters( 'groundhogg/html/tag_picker', $this->select2( $a ), $a );
     }
 
-    /**
+
+	/**
      * Output a simple Jquery UI date picker
      *
      * @param $args
@@ -626,38 +608,10 @@ class HTML
         wp_enqueue_script( 'jquery-ui-datepicker' );
         wp_enqueue_style( 'jquery-ui' );
 
-        return apply_filters( 'wpgh_html_date_picker', $html, $args );
+        return apply_filters( 'groundhogg/html/date_picker', $html, $a );
     }
 
-    /**
-     * Get json contact results for contact picker
-     */
-    public function gh_get_contacts()
-    {
-        if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
-            wp_die( 'No access to contacts.' );
-
-        $value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
-
-        $contacts = WPGH()->contacts->search( $value );
-
-        $json = array();
-
-        foreach ( $contacts as $i => $contact ) {
-
-            $json[] = array(
-                'id' => $contact->ID,
-                'text' => sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email )
-            );
-
-        }
-
-        $results = array( 'results' => $json, 'more' => false );
-
-        wp_die( json_encode( $results ) );    }
-
-
-    /**
+	/**
      * Return the HTML of a dropdown for contacts
      *
      * @param $args
@@ -689,47 +643,10 @@ class HTML
         }
 
 
-        return $this->select2( $a );
+        return apply_filters( 'groundhogg/html/dropdown_contacts', $this->select2( $a ), $a );
     }
 
-    /**
-     * Get json email results for email picker
-     */
-    public function gh_get_emails()
-    {
-
-        if ( ! is_user_logged_in() || ! current_user_can( 'edit_emails' ) )
-            wp_die( 'No access to emails.' );
-
-        if ( isset(  $_REQUEST[ 'q' ] ) ){
-            $query_args[ 'search' ] = $_REQUEST[ 'q' ];
-        }
-
-        $query_args[ 'status' ] = 'ready';
-        $data = WPGH()->emails->get_emails( $query_args );
-
-        $query_args[ 'status' ] = 'draft';
-        $data2 = WPGH()->emails->get_emails( $query_args );
-
-        $data = array_merge( $data, $data2 );
-
-        $json = array();
-
-        foreach ( $data as $i => $email ) {
-
-            $json[] = array(
-                'id' => $email->ID,
-                'text' => $email->subject . ' (' . $email->status . ')'
-            );
-
-        }
-
-        $results = array( 'results' => $json, 'more' => false );
-
-        wp_die( json_encode( $results ) );
-    }
-
-    /**
+	/**
      * Return the html for an email picker
      *
      * @param $args
@@ -759,13 +676,14 @@ class HTML
 
         }
 
-        return $this->select2( $a );
+	    return apply_filters( 'groundhogg/html/dropdown_emails', $this->select2( $a ), $a );
     }
+
 
 	/**
 	 * Get json email results for email picker
 	 */
-	public function gh_get_sms()
+	public function ajax_get_sms()
 	{
 
 		$query_args=[];
@@ -831,7 +749,7 @@ class HTML
 	/**
 	 * Get json email results for email picker
 	 */
-	public function gh_get_benchmarks()
+	public function ajax_get_benchmarks()
 	{
 
 		if ( ! is_user_logged_in() || ! current_user_can( 'edit_funnels' ) )
@@ -918,10 +836,10 @@ class HTML
 		return $this->select2( $a );
 	}
 
-    /**
+	/**
      * Returns a select 2 compatible json object with contact data meta keys
      */
-	public function get_meta_keys(){
+	public function ajax_get_meta_keys(){
         if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
             wp_die( 'No access to contacts.' );
 
@@ -943,7 +861,7 @@ class HTML
         wp_die( json_encode( $results ) );
     }
 
-    /**
+	/**
      * Get a meta key picker. useful for searching.
      *
      * @param array $args
@@ -970,7 +888,7 @@ class HTML
         return $this->select2( $a );
     }
 
-    /**
+	/**
      * Return HTML for a color picker
      *
      * @param $args
@@ -993,13 +911,12 @@ class HTML
             esc_attr( $a[ 'default' ] )
         );
 
-        wp_enqueue_style( 'wp-color-picker' );
-        wp_enqueue_script( 'wpgh-color-picker', WPGH_ASSETS_FOLDER . 'js/admin/color-picker.js', array( 'jquery', 'wp-color-picker' ), filemtime( WPGH_PLUGIN_DIR  . 'assets/js/admin/color-picker.js' ) );
 
-        return apply_filters( 'wpgh_html_color_picker', $html, $args );
+
+        return apply_filters( 'groundhogg/html/color_picker', $html, $args );
     }
 
-    /**
+	/**
      * This is for use withing the email editor.
      *
      * @param $args
@@ -1032,11 +949,11 @@ class HTML
         $a[ 'options' ] = $a[ 'fonts' ];
 
 
-        return $this->dropdown( $a );
+        return apply_filters( 'groundhogg/html/font_picker', $this->dropdown( $a ), $a );
 
     }
 
-    /**
+	/**
      * Image picker, maimly for use by the email editor
      *
      * @param $args
@@ -1086,10 +1003,10 @@ class HTML
         wp_enqueue_style('groundhogg-admin' );
         wp_enqueue_script('groundhogg-admin-media-picker' );
 
-        return $html;
+        return apply_filters( 'groundhogg/html/image_picker', $html, $a );
     }
 
-    /**
+	/**
      * Autocomplete link picker
      *
      * @param $args
@@ -1133,9 +1050,8 @@ class HTML
         wp_enqueue_style( 'groundhogg-admin' );
         wp_enqueue_script( 'groundhogg-admin' );
 
-        return apply_filters( 'wpgh_html_link_picker', $html, $args );
+        return apply_filters( 'groundhogg/html/link_picker', $html, $args );
     }
-
 
 	/**
 	 * Output a progress bar.
@@ -1168,10 +1084,17 @@ class HTML
 
         wp_enqueue_style( 'groundhogg-admin' );
 
-        return $bar;
+        return apply_filters( 'groundhogg/html/progress_bar', $bar, $a );
     }
 
-    public function toggle( $args=[] )
+	/**
+	 * Output a styled toggle switch.
+	 *
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	public function toggle( $args=[] )
     {
         $a = shortcode_atts( array(
             'name'          => '',
@@ -1190,7 +1113,7 @@ class HTML
 
         wp_enqueue_style( 'groundhogg-admin' );
 
-        return sprintf("%s<div id=\"%s-switch\" class=\"onoffswitch %s\" style=\"text-align: left\">
+        $html = sprintf("%s<div id=\"%s-switch\" class=\"onoffswitch %s\" style=\"text-align: left\">
                         <input type=\"checkbox\" id=\"%s\" name=\"%s\" class=\"onoffswitch-checkbox %s\" value=\"%s\" %s>
                         <label class=\"onoffswitch-label\" for=\"%s\">
                             <span class=\"onoffswitch-inner\"></span>
@@ -1207,6 +1130,105 @@ class HTML
             $a[ 'checked' ] ? 'checked' : '',
             esc_attr( $a[ 'id' ] )
         );
+
+	    return apply_filters( 'groundhogg/html/toggle', $html, $a );
     }
+
+	/**
+	 * Get json tag results for tag picker
+	 */
+	public function ajax_get_tags()
+	{
+		if ( ! is_user_logged_in() || ! current_user_can( 'manage_tags' ) )
+			wp_die( 'No access to tags.' );
+
+		$value = isset( $_REQUEST[ 'q' ] ) ? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
+
+		if ( empty( $value ) ){
+			$tags = WPGH()->tags->get_tags();
+		} else {
+			$tags = WPGH()->tags->search( $value );
+		}
+
+		$json = array();
+
+		foreach ( $tags as $i => $tag ) {
+
+			$json[] = array(
+				'id' => $tag->tag_id,
+				'text' => sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count )
+			);
+
+		}
+
+		$results = array( 'results' => $json, 'more' => false );
+
+		wp_send_json( $results );
+	}
+
+	/**
+	 * Get json contact results for contact picker
+	 */
+	public function ajax_get_contacts()
+	{
+		if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
+			wp_die( 'No access to contacts.' );
+
+		$value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
+
+		$contacts = WPGH()->contacts->search( $value );
+
+		$json = array();
+
+		foreach ( $contacts as $i => $contact ) {
+
+			$json[] = array(
+				'id' => $contact->ID,
+				'text' => sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email )
+			);
+
+		}
+
+		$results = array( 'results' => $json, 'more' => false );
+
+		wp_send_json( $results );
+	}
+
+	/**
+	 * Get json email results for email picker
+	 */
+	public function ajax_get_emails()
+	{
+
+		if ( ! is_user_logged_in() || ! current_user_can( 'edit_emails' ) )
+			wp_die( 'No access to emails.' );
+
+		if ( isset(  $_REQUEST[ 'q' ] ) ){
+			$query_args[ 'search' ] = $_REQUEST[ 'q' ];
+		}
+
+		$query_args[ 'status' ] = 'ready';
+		$data = WPGH()->emails->get_emails( $query_args );
+
+		$query_args[ 'status' ] = 'draft';
+		$data2 = WPGH()->emails->get_emails( $query_args );
+
+		$data = array_merge( $data, $data2 );
+
+		$json = array();
+
+		foreach ( $data as $i => $email ) {
+
+			$json[] = array(
+				'id' => $email->ID,
+				'text' => $email->subject . ' (' . $email->status . ')'
+			);
+
+		}
+
+		$results = array( 'results' => $json, 'more' => false );
+
+		wp_send_json( $results );
+	}
 
 }
