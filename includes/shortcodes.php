@@ -69,13 +69,14 @@ add_shortcode( 'gh_replacements', 'wpgh_merge_replacements_shortcode' );
 function wpgh_contact_replacement_shortcode( $atts )
 {
 	$a = shortcode_atts( array(
-		'field' => 'first'
+		'field' => 'first',
+        'default' => 'Friend'
 	), $atts );
 
     $contact = WPGH()->tracking->get_contact();
 
 	if ( ! $contact )
-		return __( 'Friend', 'groundhogg' );
+		return __( $a[ 'default' ], 'groundhogg' );
 
 	$content = sprintf( '{%s}', $a[ 'field' ] );
 
