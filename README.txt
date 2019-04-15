@@ -106,7 +106,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 == Changelog ==
 
 = 1.3.9 =
+* TWEAKED Page pickers on settings page are now ajax powered to avoid extraneous get_posts() call.
 * TWEAKED tracking links, link click benchmarks, and Superlinks now use re-write rules to perform redirects rather than checking the REQUEST_URI.
+* FIXED Loading form integration when Elementor PRO is not installed.
 
 = 1.3.8 =
 * FIXED Status toggles inheriting incorrect CSS labels.

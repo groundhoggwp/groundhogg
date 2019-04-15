@@ -222,28 +222,6 @@ class WPGH_Settings_Page
 
     private function get_default_settings()
     {
-
-        $pages = get_posts( array(
-            'numberposts'   => -1,
-            'category'      => 0,
-            'orderby'       => 'post_title',
-            'order'         => 'ASC',
-            'include'       => array(),
-            'exclude'       => array(),
-            'meta_key'      => '',
-            'meta_value'    => '',
-            'post_type'     => 'page',
-            'suppress_filters' => true
-        ) );
-
-        $pops = array();
-
-        if ( $pages ){
-            foreach ( $pages as $page ){
-                $pops[ $page->ID ] = $page->post_title;
-            }
-        }
-
         return apply_filters( 'wpgh_settings_settings', array(
             'gh_business_name' => array(
                 'id'        => 'gh_business_name',
@@ -442,11 +420,10 @@ class WPGH_Settings_Page
                 'section'   => 'pages',
                 'label'     => _x( 'Email Confirmation Page', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'Page contacts see when they confirm their email.', 'settings', 'groundhogg' ),
-                'type'      => 'select2',
+                'type'      => 'page_picker',
                 'atts'      => array(
                     'name'  => 'gh_confirmation_page',
                     'id'    => 'gh_confirmation_page',
-                    'data'  => $pops,
                 ),
             ),
             'gh_unsubscribe_page' => array(
@@ -454,11 +431,10 @@ class WPGH_Settings_Page
                 'section'   => 'pages',
                 'label'     => _x( 'Unsubscribe Page', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'Page contacts see when they unsubscribe.', 'settings', 'groundhogg' ),
-                'type'      => 'select2',
+                'type'      => 'page_picker',
                 'atts'      => array(
                     'name'  => 'gh_unsubscribe_page',
                     'id'    => 'gh_unsubscribe_page',
-                    'data'  => $pops,
                 ),
             ),
             'gh_email_preferences_page' => array(
@@ -466,11 +442,10 @@ class WPGH_Settings_Page
                 'section'   => 'pages',
                 'label'     => _x( 'Email Preferences Page', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'Page where contacts can manage their email preferences.', 'settings', 'groundhogg' ),
-                'type'      => 'select2',
+                'type'      => 'page_picker',
                 'atts'      => array(
                     'name'  => 'gh_email_preferences_page',
                     'id'    => 'gh_email_preferences_page',
-                    'data'  => $pops,
                 ),
             ),
             'gh_view_in_browser_page' => array(
@@ -478,11 +453,10 @@ class WPGH_Settings_Page
                 'section'   => 'pages',
                 'label'     => _x( 'View Email In Browser Page', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'Page containing the shortcode [browser_view] so contacts can view an email in the browser in the event their email client looks funky.', 'settings', 'groundhogg' ),
-                'type'      => 'select2',
+                'type'      => 'page_picker',
                 'atts'      => array(
                     'name'  => 'gh_view_in_browser_page',
                     'id'    => 'gh_view_in_browser_page',
-                    'data'  => $pops,
                 ),
             ),
             'gh_privacy_policy' => array(
@@ -490,11 +464,10 @@ class WPGH_Settings_Page
                 'section'   => 'compliance',
                 'label'     => __( 'Privacy Policy' ),
                 'desc'      => _x( 'Link to your privacy policy.', 'settings', 'groundhogg' ),
-                'type'      => 'select2',
+                'type'      => 'page_picker',
                 'atts'      => array(
                     'name'  => 'gh_privacy_policy',
                     'id'    => 'gh_privacy_policy',
-                    'data'  => $pops,
                 ),
             ),
             'gh_terms' => array(
@@ -502,11 +475,10 @@ class WPGH_Settings_Page
                 'section'   => 'compliance',
                 'label'     => _x( 'Terms & Conditions (Terms of Service)', 'settings', 'groundogg' ),
                 'desc'      => _x( 'Link to your terms & conditions.', 'settings', 'groundhogg' ),
-                'type'      => 'select2',
+                'type'      => 'page_picker',
                 'atts'      => array(
                     'name'  => 'gh_terms',
                     'id'    => 'gh_terms',
-                    'data'  => $pops,
                 ),
             ),
             'gh_strict_confirmation' => array(
@@ -1008,6 +980,7 @@ class WPGH_Settings_Page
 
             case 'select2':
             case 'dropdown_emails':
+            case 'page_picker':
             case 'tag_picker':
                 $field[ 'atts' ][ 'selected' ] = is_array( $value )? $value : [$value];
                 break;

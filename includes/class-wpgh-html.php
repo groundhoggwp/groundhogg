@@ -30,6 +30,7 @@ class WPGH_HTML
         add_action( 'wp_ajax_gh_get_tags', array( $this, 'gh_get_tags' ) );
         add_action( 'wp_ajax_gh_get_benchmarks', array( $this, 'gh_get_benchmarks' ) );
         add_action( 'wp_ajax_gh_get_meta_keys', array( $this, 'get_meta_keys' ) );
+        add_action( 'wp_ajax_gh_get_pages', array( $this, 'get_pages' ) );
 
     }
 
@@ -926,10 +927,10 @@ class WPGH_HTML
         if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
             wp_die( 'No access to contacts.' );
 
-        $json = array();
 
         $data = WPGH()->contact_meta->get_keys();
 
+        $json = array();
         foreach ( $data as $i => $key ) {
 
             $json[] = array(
@@ -969,6 +970,67 @@ class WPGH_HTML
         }
 
         return $this->select2( $a );
+    }
+
+    /**
+     * Get a meta key picker. useful for searching.
+     *
+     * @param array $args
+     * @return string
+     */
+	public function page_picker( $args=array() ){
+        $a = wp_parse_args( $args, array(
+            'name'              => 'page',
+            'id'                => 'page',
+            'class'             => 'gh-page-picker',
+            'data'              => array(),
+            'selected'          => array(),
+            'multiple'          => false,
+            'placeholder'       => __( 'Please select a page', 'groundhogg' ),
+            'tags'              => false,
+        ) );
+
+        foreach ( $a[ 'selected' ] as $key ){
+
+            $a[ 'data' ][ $key ] = get_the_title( absint( $key ) );
+
+        }
+
+        return $this->select2( $a );
+    }
+
+    /**
+     * Return a list of pages.
+     */
+    public function get_pages()
+    {
+        if ( ! current_user_can( 'manage_options' ) ){
+            wp_send_json_error();
+        }
+
+        $pages = get_posts( array(
+            'numberposts'   => -1,
+            'category'      => 0,
+            'orderby'       => 'post_title',
+            'order'         => 'ASC',
+            'include'       => array(),
+            'exclude'       => array(),
+            'meta_key'      => '',
+            'meta_value'    => '',
+            'post_type'     => 'page',
+            'suppress_filters' => true
+        ) );
+
+        $json = array();
+        foreach ( $pages as $i => $page ) {
+            $json[] = array(
+                'id' => $page->ID,
+                'text' => $page->post_title
+            );
+        }
+
+        $results = array( 'results' => $json, 'more' => false );
+        wp_send_json( $results );
     }
 
     /**

@@ -225,10 +225,10 @@ class WPGH_Tracking
             return;
         }
 
-        $target = esc_url_raw( urldecode( WPGH()->replacements->process( $link->target, $this->contact->ID ) ) );
         $tags = maybe_unserialize( $link->tags );
         $this->contact->apply_tag( wp_parse_id_list( $tags ) );
 
+        $target = esc_url_raw( WPGH()->replacements->process( $link->target, $this->contact->ID ) );
         wp_redirect( $target );
         die();
     }

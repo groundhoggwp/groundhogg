@@ -127,7 +127,7 @@ function wpgh_tools_sysinfo_get() {
     $return  = apply_filters( 'wpgh_sysinfo_after_wpgh_config', $return );
 
     // Groundhogg pages
-    $confirmation_page          = wpgh_get_option( 'gh_email_confirmation_page', '' );
+    $confirmation_page          = wpgh_get_option( 'gh_confirmation_page', '' );
     $unsubscribe_page           = wpgh_get_option( 'gh_unsubscribe_page', '' );
     $email_preferences_page     = wpgh_get_option( 'gh_email_preferences_page', '' );
 
@@ -141,7 +141,7 @@ function wpgh_tools_sysinfo_get() {
     // WPGH Templates
     $dir = get_stylesheet_directory() . '/wpgh_templates/*';
     if( is_dir( $dir ) && ( count( glob( "$dir/*" ) ) !== 0 ) ) {
-        $return .= "\n" . '-- WPGH Template Overrides' . "\n\n";
+        $return .= "\n" . '-- Groundhogg Template Overrides' . "\n\n";
 
         foreach( glob( $dir ) as $file ) {
             $return .= 'Filename:                 ' . basename( $file ) . "\n";

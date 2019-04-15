@@ -119,6 +119,19 @@ var wpgh;
                 }
             });
         },
+        buildPagePicker: function(){
+            $('.gh-page-picker' ).css( 'width', '100%' ).select2({
+                ajax: {
+                    url: ajaxurl + '?action=gh_get_pages',
+                    dataType: 'json',
+                    results: function(data, page) {
+                        return {
+                            results: data.results
+                        };
+                    }
+                }
+            });
+        },
         buildLinkPicker : function(){
             $('.gh-link-picker' ).autocomplete({
                 source: function( request, response ) {
@@ -157,6 +170,7 @@ var wpgh;
             this.buildBenchmarkPicker();
             this.buildMetaKeyPicker();
             this.buildLinkPicker();
+            this.buildPagePicker();
         },
     };
 

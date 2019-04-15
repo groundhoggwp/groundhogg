@@ -436,13 +436,15 @@ if ( ! class_exists( 'Groundhogg' ) ) :
          */
         private function register_integrations()
         {
-            add_action( 'elementor/controls/controls_registered', function (){
-                include_once dirname(__FILE__) . '/integrations/elementor/Gh_Fields_Map.php';
-                \Elementor\Plugin::instance()->controls_manager->register_control( 'gh_fields_map', new \ElementorPro\Modules\Forms\Controls\Gh_Fields_Map() );
-            } );
 
             /* New Elementor Integration */
             add_action( 'elementor_pro/init', function() {
+
+                add_action( 'elementor/controls/controls_registered', function (){
+                    include_once dirname(__FILE__) . '/integrations/elementor/Gh_Fields_Map.php';
+                    \Elementor\Plugin::instance()->controls_manager->register_control( 'gh_fields_map', new \ElementorPro\Modules\Forms\Controls\Gh_Fields_Map() );
+                } );
+
                 // Here its safe to include our action class file
                 include_once dirname(__FILE__) . '/integrations/elementor/Groundhogg.php';
                 // Instantiate the action class
