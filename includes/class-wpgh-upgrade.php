@@ -68,6 +68,7 @@ class WPGH_Upgrade{
         $this->update_to_version( '1.2.10.3' );
         $this->update_to_version( '1.3' );
         $this->update_to_version( '1.3.5' );
+        $this->update_to_version( '1.3.9' );
     }
 
     /**
@@ -273,5 +274,14 @@ class WPGH_Upgrade{
     public function version_1_3_5()
     {
 		WPGH()->roles->add_caps();
+    }
+
+	/**
+	 * Add new tracking rewrite rules.
+	 */
+    public function version_1_3_9()
+    {
+    	WPGH()->tracking->add_rewrite_rules();
+    	flush_rewrite_rules();
     }
 }
