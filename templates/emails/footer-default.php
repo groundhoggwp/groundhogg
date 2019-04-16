@@ -42,14 +42,14 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
                                         <tr>
                                             <td class="content-block" style="<?php echo $footer_content; ?>">
                                                 <span class="apple-link" style="<?php echo $apple_link; ?>">
-                                                    <?php echo apply_filters( 'wpgh_email_footer_text', '' ); ?>
+                                                    <?php echo apply_filters( 'groundhogg/email/footer_text', '' ); ?>
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="content-block" style="<?php echo $footer_content; ?>">
                                                 <span style="<?php echo $apple_link; ?>">
-                                                    <?php _e( apply_filters( 'gh_unsubscribe_footer_text', __( "Don't want these emails?", 'groundhogg' ) ), 'groundhogg'); ?> <a href="<?php echo esc_url_raw( apply_filters( 'wpgh_email_unsubscribe_link', site_url() ) ); ?>">
+                                                    <?php _e( apply_filters( 'gh_unsubscribe_footer_text', __( "Don't want these emails?", 'groundhogg' ) ), 'groundhogg'); ?> <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email/unsubscribe_link', site_url() ) ); ?>">
                                                         <?php _e( apply_filters( 'gh_unsubscribe_text', __( "Unsubscribe.", 'groundhogg' ) ), 'groundhogg'); ?>
                                                     </a>
                                                 </span>
@@ -65,6 +65,6 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
                 </td>
             </tr>
         </table>
-        <img alt="" style="visibility: hidden" width="0" height="0" src="<?php echo esc_url_raw( apply_filters( 'wpgh_email_open_tracking_link', '' ) ); ?>">
+        <img alt="" style="visibility: hidden" width="0" height="0" src="<?php echo esc_url_raw( apply_filters( 'groundhogg/email/open_tracking_link', '' ) ); ?>">
     </body>
 </html>

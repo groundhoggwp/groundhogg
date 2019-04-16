@@ -2,12 +2,9 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+use Groundhogg\Event;
 
-define( 'GROUNDHOGG_FUNNEL_EVENT', 1 );
-define( 'GROUNDHOGG_BROADCAST_EVENT', 2 );
-define( 'GROUNDHOGG_EMAIL_NOTIFICATION_EVENT', 3 );
-define( 'GROUNDHOGG_SMS_NOTIFICATION_EVENT', 4 );
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
  * Events DB
@@ -88,7 +85,8 @@ class Events extends DB  {
             'step_id'       => '%d',
             'contact_id'    => '%d',
             'event_type'    => '%d',
-            'failure_reason'=> '%s',
+            'error_code'    => '%s',
+            'error_message' => '%s',
             'status'        => '%s',
         );
     }
@@ -106,8 +104,9 @@ class Events extends DB  {
             'funnel_id'     => 0,
             'step_id'       => 0,
             'contact_id'    => 0,
-            'event_type'    => GROUNDHOGG_FUNNEL_EVENT,
-            'failure_reason'=> '',
+            'event_type'    => Event::FUNNEL,
+            'error_code'    => '',
+            'error_message' => '',
             'status'        => 'waiting',
         );
     }
@@ -296,7 +295,8 @@ class Events extends DB  {
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
         event_type int unsigned NOT NULL,
-        failure_reason tinytext NOT NULL, 
+        error_code tinytext NOT NULL, 
+        error_message tinytext NOT NULL, 
         status varchar(20) NOT NULL,
         PRIMARY KEY (ID),
         KEY time (time),

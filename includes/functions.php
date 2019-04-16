@@ -1,5 +1,7 @@
 <?php
 
+namespace Groundhogg;
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -9,8 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * Date: 2018-10-04
  * Time: 5:10 PM
  */
-
-define( 'WPGH_BROADCAST'    , 1 );
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons
@@ -23,68 +23,6 @@ function wpgh_get_referer()
         return wp_get_referer();
 
 	return ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
-}
-
-
-/**
- * Convert the funnel into a json object so it can be duplicated fairly easily.
- *
- * @todo add to funnel class
- *
- * @param $funnel_id int the ID of the funnel to convert.
- * @return false|string the json string of a converted funnel or false on failure.
- */
-function wpgh_convert_funnel_to_json( $funnel_id )
-{
-    if ( ! $funnel_id || ! is_int( $funnel_id) )
-        return false;
-
-    $funnel = WPGH()->funnels->get_funnel( $funnel_id );
-
-    if ( ! $funnel )
-        return false;
-
-    $export = array();
-
-    $export['title'] = $funnel->title;
-
-    $export[ 'steps' ] = array();
-
-    $steps = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel->ID ) );
-
-    if ( ! $steps )
-        return false;
-
-    foreach ( $steps as $i => $step )
-    {
-        $step = wpgh_get_funnel_step( $step->ID );
-
-        $export['steps'][$i] = array();
-        $export['steps'][$i]['title'] = $step->title;
-        $export['steps'][$i]['group'] = $step->group;
-        $export['steps'][$i]['type']  = $step->type;
-
-        $meta = WPGH()->step_meta->get_meta( $step->ID );
-
-        foreach ( $meta as $j => $item ){
-
-            if ( is_array( $item ) ){
-                $meta[ $j ] = array( maybe_unserialize( array_shift( $item ) ) );
-            } else {
-                $meta[ $j ] = maybe_unserialize( $item ) ;
-            }
-
-        }
-
-        $export['steps'][$i]['meta']  = $meta;
-        $export['steps'][$i]['args']  = apply_filters( 'wpgh_export_step_' . $step->type, array(), $step );
-        $export['steps'][$i]['args']  = apply_filters( "groundhogg/elements/{$step->type}/export" , array(), $step );
-        /* allow other plugins to modify */
-        $export['steps'][$i] = apply_filters( 'wpgh_step_export_args', $export['steps'][$i], $step );
-        $export['steps'][$i] = apply_filters( 'groundhogg/elements/step/export', $export['steps'][$i], $step );
-    }
-
-    return json_encode( $export );
 }
 
 /**
@@ -209,28 +147,6 @@ function wpgh_encrypt_decrypt( $string, $action = 'e' ) {
 }
 
 /**
- * Get the IP address of the current visitor
- *
- * @return string the IP of a vsitor.
- */
-function wpgh_get_visitor_ip() {
-
-    if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-        //check ip from share internet
-        $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-        //to check ip is pass from proxy
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else {
-        $ip = $_SERVER['REMOTE_ADDR'];
-    }
-
-    return apply_filters( 'wpgh_get_ip', $ip );
-
-}
-
-
-/**
  * Extract the funnel ID from a link, only for use in ADMIN funnel editor.
  *
  * @param $link string link from the funnel editor page
@@ -268,7 +184,7 @@ function wpgh_remove_builder_toolbar( $content )
     return preg_replace( '/<wpgh-toolbar\b[^>]*>(.*?)<\/wpgh-toolbar>/', '', $content );
 }
 
-add_filter( 'wpgh_the_email_content', 'wpgh_remove_builder_toolbar' );
+add_filter( 'groundhogg/email/the_content', 'wpgh_remove_builder_toolbar' );
 add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_builder_toolbar' );
 
 
@@ -283,7 +199,7 @@ function wpgh_remove_content_editable( $content )
     return preg_replace( "/contenteditable=\"true\"/", '', $content );
 }
 
-add_filter( 'wpgh_the_email_content', 'wpgh_remove_content_editable' );
+add_filter( 'groundhogg/email/the_content', 'wpgh_remove_content_editable' );
 add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_content_editable' );
 
 /**
@@ -313,7 +229,7 @@ function wpgh_minify_html( $content )
     return $buffer;
 }
 
-add_filter( 'wpgh_the_email_content', 'wpgh_minify_html' );
+add_filter( 'groundhogg/email/the_content', 'wpgh_minify_html' );
 
 /**
  * Remove script tags from the email content
@@ -449,155 +365,6 @@ function wpgh_has_email_token()
     return ( bool ) wpgh_get_option( 'gh_email_token', false );
 }
 
-/**
- * Generic function for checking checkboxes from the Groundhogg settings.
- *
- * @param string $key
- * @return bool
- */
-function wpgh_is_option_enabled( $key = '' )
-{
-    $option = wpgh_get_option( $key, array() );
-
-    if ( ! is_array( $option ) && $option ){
-        return true;
-    }
-
-    //backwards compat
-
-    return is_array( $option ) && in_array( 'on', $option );
-}
-
-/**
- * Swicth between the main site options if on a multisite network.
- *
- * @param $key
- * @param bool $default
- *
- * @return mixed
- */
-function wpgh_get_option( $key, $default=false )
-{
-
-    if ( wpgh_is_global_multisite() ){
-        return get_blog_option( get_network()->site_id, $key, $default );
-    } else {
-        return get_option( $key, $default );
-    }
-
-}
-
-/**
- * update option wrapper
- *
- * @return mixed
- */
-function wpgh_update_option( $key, $value ){
-    if ( wpgh_is_global_multisite() ){
-        return update_blog_option( get_network()->site_id, $key, $value );
-    } else {
-        return update_option( $key, $value );
-    }
-}
-
-/**
- * delete option wrapper
- *
- * @return mixed
- */
-function wpgh_delete_option( $key ){
-	if ( wpgh_is_global_multisite() ){
-		return delete_blog_option( get_network()->site_id, $key );
-	} else {
-		return delete_option( $key );
-	}
-}
-
-/**
- * get_transient wrapper
- *
- * @param $key
- * @return mixed
- */
-function wpgh_get_transient( $key ){
-    if ( wpgh_is_global_multisite() ){
-        return get_site_transient( $key );
-    } else {
-        return get_transient( $key );
-    }
-}
-
-/**
- * delete_transient wrapper
- *
- * @param $key
- * @return mixed
- */
-function wpgh_delete_transient( $key ){
-    if ( wpgh_is_global_multisite() ){
-        return delete_site_transient( $key );
-    } else {
-        return delete_transient( $key );
-    }
-}
-
-/**
- * Set transient wrapper
- *
- * @param $key
- * @param $value
- * @param $exp
- * @return bool
- */
-function wpgh_set_transient( $key, $value, $exp ){
-    if ( wpgh_is_global_multisite() ){
-        return set_site_transient( $key, $value, $exp );
-    } else {
-        return set_transient( $key, $value, $exp );
-    }
-}
-
-/**
- * Protect MAIN functionality by this multisite check.
- *
- * @return bool
- */
-function wpgh_should_if_multisite()
-{
-
-    if ( ! is_multisite() ){
-        return true;
-    }
-
-    if ( is_multisite() && ! get_site_option( 'gh_global_db_enabled' ) ){
-        return true;
-    }
-
-    if ( is_multisite() && get_site_option( 'gh_global_db_enabled' ) && is_main_site() ){
-        return true;
-    }
-
-    return false;
-
-}
-
-/**
- * Check if the site is gloabl multisite enabled
- *
- * @return bool
- */
-function wpgh_is_global_multisite()
-{
-    if ( ! is_multisite() ){
-        return false;
-    }
-
-    if ( is_multisite() && ! get_site_option( 'gh_global_db_enabled' ) ){
-        return false;
-    }
-
-    return true;
-}
 
 /**
  * Return the current user role.
@@ -624,47 +391,6 @@ function wpgh_get_current_user_roles()
 
 }
 
-/**
- * Array access for existing contact objects...
- *
- * @type WPGH_Contact[]
- */
-global $wpgh_funnel_steps_cache;
-$wpgh_funnel_steps_cache = [];
-
-/**
- * Simple function to get a contact
- *
- * @since 1.3 return false if contact does not exist
- *
- * @param $id int
- * @return WPGH_Step|false
- */
-function wpgh_get_funnel_step( $id, $get_from_cache=true ){
-
-    global $wpgh_funnel_steps_cache;
-
-    $cache_key = md5( $id );
-
-    if ( $get_from_cache && is_array( $wpgh_funnel_steps_cache ) ){
-        if (  key_exists( $cache_key, $wpgh_funnel_steps_cache ) ){
-            return $wpgh_funnel_steps_cache[ $cache_key ];
-        }
-    }
-
-    $step = new WPGH_Step( $id );
-
-    if ( $step->exists() ){
-
-        if ( $get_from_cache && is_array( $wpgh_funnel_steps_cache )  ){
-            $wpgh_contacts_cache[ $cache_key ] = $step;
-        }
-
-        return $step;
-    }
-
-    return false;
-}
 
 /**
  * Recount the contacts per tag...
@@ -722,92 +448,6 @@ function wpgh_funnel_share_listen()
 }
 
 add_action( 'init', 'wpgh_funnel_share_listen' );
-
-/**
- * Convert a unix timestamp to UTC-0 time
- *
- * @param $time
- * @return int
- */
-function wpgh_convert_to_utc_0( $time )
-{
-    if ( is_string( $time ) ){
-        $time = strtotime( $time );
-    }
-
-    return $time - ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
-
-}
-
-/**
- * Get a timezone offest.
- *
- * @param string $timeZone
- * @return int
- */
-function wpgh_get_timezone_offset( $timeZone = '' )
-{
-    if ( ! $timeZone ){
-        return 0;
-    }
-
-    try{
-        $timeZone = new DateTimeZone( $timeZone );
-    } catch (Exception $e) {
-        return 0;
-    }
-
-    try{
-        $dateTime = new DateTime( 'now', $timeZone );
-    } catch ( Exception $e ){
-        return 0;
-    }
-
-    return $timeZone->getOffset( $dateTime );
-}
-
-/**
- * Convert a unix timestamp to local time
- *
- * @param $time
- * @return int
- */
-function wpgh_convert_to_local_time($time )
-{
-    if ( is_string( $time ) ){
-        $time = strtotime( $time );
-    }
-
-    return $time + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
-}
-
-/**
- * Backwards compat for dependent extensions.
- */
-if ( ! function_exists( 'convert_to_local_time' ) ){
-    function convert_to_local_time( $time ){
-        return wpgh_convert_to_local_time( $time );
-    }
-}
-
-/**
- * Converts the given time into the timeZone
- *
- * @param $time int UTC-0 Timestamp
- * @param string $timeZone the timezone to change to
- * @return int UTC-0 TImestamp that reflects the given timezone
- */
-function wpgh_convert_to_foreign_time( $time, $timeZone = '' )
-{
-
-    if ( ! $timeZone ){
-        return $time;
-    }
-
-    $time += wpgh_get_timezone_offset( $timeZone );
-
-    return $time;
-}
 
 /**
  * Round time to the nearest hour.
@@ -1947,17 +1587,15 @@ endif;
 function wpgh_get_items_from_csv( $file_path='' )
 {
 
-    if ( ! file_exists( $file_path ) ){
+    if (!file_exists($file_path)) {
         return [];
     }
 
     $header = NULL;
     $data = array();
-    if (($handle = fopen($file_path, 'r')) !== FALSE)
-    {
-        while (($row = fgetcsv($handle, 0, ',')) !== FALSE)
-        {
-            if(!$header)
+    if (($handle = fopen($file_path, 'r')) !== FALSE) {
+        while (($row = fgetcsv($handle, 0, ',')) !== FALSE) {
+            if (!$header)
                 $header = $row;
             else
                 $data[] = array_combine($header, $row);
@@ -1967,118 +1605,6 @@ function wpgh_get_items_from_csv( $file_path='' )
 
     return $data;
 
-}
-
-/**
- * Get the base uploads path.
- *
- * @return string
- */
-function wpgh_get_base_uploads_dir()
-{
-    $base = 'groundhogg';
-
-    $upload_dir = wp_get_upload_dir();
-    $base = $upload_dir[ 'basedir' ] . DIRECTORY_SEPARATOR . $base;
-
-    if ( is_multisite() && ! wpgh_is_global_multisite() ){
-        $base .= '/' . get_current_blog_id();
-    }
-
-    return wp_normalize_path( apply_filters( 'groundhogg/uploads_path', $base ) );
-}
-
-/**
- * Get the base uploads path.
- *
- * @return string
- */
-function wpgh_get_base_uploads_url()
-{
-    $base = 'groundhogg';
-
-    $upload_dir = wp_get_upload_dir();
-    $base = $upload_dir[ 'baseurl' ] . '/' . $base;
-
-    if ( is_multisite() && ! wpgh_is_global_multisite() ){
-        $base .= '/' . get_current_blog_id();
-    }
-
-    return apply_filters( 'groundhogg/uploads_path', $base );
-}
-
-/**
- * Generic function for mapping to uploads folder.
- *
- * @param string $subdir
- * @param string $file_path
- * @param bool $create_folders
- * @return string
- */
-function wpgh_get_uploads_dir( $subdir='uploads', $file_path='', $create_folders=false )
-{
-    $path = untrailingslashit( wp_normalize_path( sprintf( "%s/%s/%s", wpgh_get_base_uploads_dir(), $subdir, $file_path ) ) );
-
-    if ( $create_folders ){
-        wp_mkdir_p( dirname( $path ) );
-    }
-
-    return $path;
-}
-
-/**
- * Generic function for mapping to uploads folder.
- *
- * @param string $subdir
- * @param string $file_path
- * @return string
- */
-function wpgh_get_uploads_url( $subdir='uploads', $file_path='' )
-{
-    $path = untrailingslashit( sprintf( "%s/%s/%s", wpgh_get_base_uploads_url(), $subdir, $file_path ) );
-    return $path;
-}
-
-/**
- * @return string Get the CSV import URL.
- */
-function wpgh_get_csv_imports_dir( $file_path='', $create_folders=false ){
-    return wpgh_get_uploads_dir( 'imports', $file_path, $create_folders );
-}
-
-/**
- * @return string Get the CSV import URL.
- */
-function wpgh_get_csv_imports_url( $file_path='' ){
-    return wpgh_get_uploads_url( 'imports', $file_path );
-}
-
-/**
- * @return string Get the CSV import URL.
- */
-function wpgh_get_contact_uploads_dir( $file_path='', $create_folders=false ){
-    return wpgh_get_uploads_dir( 'uploads', $file_path, $create_folders );
-}
-
-/**
- * @return string Get the CSV import URL.
- */
-function wpgh_get_contact_uploads_url( $file_path='' ){
-    return wpgh_get_uploads_url( 'uploads', $file_path );
-}
-
-/**
- * @return string Get the CSV export URL.
- */
-function wpgh_get_csv_exports_dir( $file_path='', $create_folders=false ){
-    return wpgh_get_uploads_dir( 'exports', $file_path, $create_folders );
-}
-
-/**
- * @return string Get the CSV export URL.
- */
-function wpgh_get_csv_exports_url( $file_path='' ){
-    return wpgh_get_uploads_url( 'exports', $file_path );
 }
 
 

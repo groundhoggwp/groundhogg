@@ -119,18 +119,23 @@ abstract class Base_Object_With_Meta extends Base_Object
 
     /**
      * Get some meta
+     * If key is not specified return the meta data array.
      *
      * @param $key
+     * @param $single
      * @return mixed
      */
-    public function get_meta( $key )
+    public function get_meta( $key = false, $single = true )
     {
+        if ( ! $key ) {
+            return $this->meta;
+        }
 
         if ( key_exists( $key, $this->meta ) ){
             return $this->meta[ $key ];
         }
 
-        $val = $this->get_meta_db()->get_meta( $this->ID, $key, true );
+        $val = $this->get_meta_db()->get_meta( $this->ID, $key, $single );
 
         $this->meta[ $key ] = $val;
 
@@ -186,5 +191,13 @@ abstract class Base_Object_With_Meta extends Base_Object
     {
         unset( $this->meta[$key] );
         return $this->get_meta_db()->delete_meta( $this->ID, $key );
+    }
+
+    /**
+     * @return array
+     */
+    public function get_as_array()
+    {
+        return [ 'data' => $this->data, 'meta' => $this->meta ];
     }
 }

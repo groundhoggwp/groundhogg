@@ -1,4 +1,6 @@
 <?php
+namespace Groundhogg;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -6,17 +8,14 @@
  * Time: 9:00 AM
  */
 
-interface WPGH_Event_Process
+interface Event_Process
 {
-    /**
-     * WPGH_Event_Process constructor.
-     * @param $id int
-     */
-    public function __construct( $id );
+    public function get_funnel_title();
+    public function get_step_title();
 
     /**
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event
      * @return mixed
      */
     public function run( $contact, $event );

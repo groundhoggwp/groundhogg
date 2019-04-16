@@ -1,0 +1,785 @@
+<?php
+namespace Groundhogg;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+/**
+ * Replacements
+ *
+ * The inspiration for this class came from EDD_Email_Tags by easy digital downloads.
+ * But ours is better because it allows for dynamic arguments passed with the replacements code.
+ *
+ * @package     Includes
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
+ */
+class Replacements
+{
+
+    /**
+     * Array of replacement codes and their callback functions
+     *
+     * @var array
+     */
+    var $replacements = array();
+
+    /**
+     * The contact ID
+     *
+     * @var int
+     */
+    var $contact_id;
+
+    /**
+     * @var Contact
+     */
+    protected $current_contact;
+
+
+    public function __construct()
+    {
+
+        $this->setup_defaults();
+
+        if ( gisset_not_empty( $_GET, 'page' ) && strpos( $_GET[ 'page' ],'gh_' ) !== false ){
+            add_action( 'admin_footer' , [ $this, 'replacements_in_footer' ] );
+        }
+
+    }
+
+    /**
+     * Setup the default replacement codes
+     */
+    private function setup_defaults()
+    {
+
+        $replacements = array(
+            array(
+                'code'        => 'first',
+                'callback'    => [ $this, 'replacement_first_name' ],
+                'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'first_name',
+                'callback'    => [ $this, 'replacement_first_name' ],
+                'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'last',
+                'callback'    => [ $this, 'replacement_last_name' ],
+                'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'last_name',
+                'callback'    => [ $this, 'replacement_last_name' ],
+                'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'full_name',
+                'callback'    => [ $this, 'replacement_full_name' ],
+                'description' => _x( 'The contact\'s full name.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'   => 'username',
+                'callback'    => [ $this, 'replacement_username' ],
+                'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'email',
+                'callback'    => [ $this, 'replacement_email' ],
+                'description' => _x( 'The contact\'s email address.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'phone',
+                'callback'    => [ $this, 'replacement_phone' ],
+                'description' => _x( 'The contact\'s phone number.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'phone_ext',
+                'callback'    => [ $this, 'replacement_phone_ext' ],
+                'description' => _x( 'The contact\'s phone number extension.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'address',
+                'callback'    => [ $this, 'replacement_address' ],
+                'description' => _x( 'The contact\'s full address.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'company_name',
+                'callback'    => [ $this, 'replacement_company_name' ],
+                'description' => _x( 'The contact\'s company name.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'job_title',
+                'callback'    => [ $this, 'replacement_job_title' ],
+                'description' => _x( 'The contact\'s job title.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'company_address',
+                'callback'    => [ $this, 'replacement_company_address' ],
+                'description' => _x( 'The contact\'s company address.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'meta',
+                'callback'    => [ $this, 'replacement_meta' ],
+                'description' => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'business_name',
+                'callback'    => [ $this, 'replacement_business_name' ],
+                'description' => _x( 'The business name as defined in the settings.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'business_phone',
+                'callback'    => [ $this, 'replacement_business_phone' ],
+                'description' => _x( 'The business phone number as defined in the settings.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'business_address',
+                'callback'    => [ $this, 'replacement_business_address' ],
+                'description' => _x( 'The business address as defined in the settings.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'owner_first_name',
+                'callback'    => [ $this, 'replacement_owner_first_name' ],
+                'description' => _x( 'The contact owner\'s name.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'owner_last_name',
+                'callback'    => [ $this, 'replacement_owner_last_name' ],
+                'description' => _x( 'The contact owner\'s name.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'owner_email',
+                'callback'    => [ $this, 'replacement_owner_email' ],
+                'description' => _x( 'The contact owner\'s email address.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'owner_phone',
+                'callback'    => [ $this, 'replacement_owner_phone' ],
+                'description' => _x( 'The contact owner\'s phone number.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'confirmation_link',
+                'callback'    => [ $this, 'replacement_confirmation_link' ],
+                'description' => _x( 'A link to confirm the email address of a contact.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'confirmation_link_raw',
+                'callback'    => [ $this, 'replacement_confirmation_link_raw' ],
+                'description' => _x( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'superlink',
+                'callback'    => [ $this, 'replacement_superlink' ],
+                'description' => _x( 'A superlink code. Usage: {superlink.id}', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'date',
+                'callback'    => [ $this, 'replacement_date' ],
+                'description' => _x( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'files',
+                'callback'    => [ $this, 'replacement_files' ],
+                'description' => _x( 'Insert a download link for a file. Usage {files.key}. Example: {files.custom_files}. Do find the key for a file see the contact record and copy the relevant replacement code.', 'replacement', 'groundhogg' ),
+            ),
+            array(
+                'code'        => 'groundhogg_day_quote',
+                'callback'    => [ $this, 'get_random_groundhogday_quote' ],
+                'description' => _x( 'Inserts a random quote from the movie Groundhog Day featuring Bill Murray', 'replacement', 'groundhogg' ),
+            )
+        );
+
+        $replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
+
+        foreach ( $replacements as $replacement )
+        {
+            $this->add( $replacement['code'], $replacement[ 'callback' ], $replacement[ 'description' ] );
+        }
+
+    }
+
+    /**
+     * Add a replacement code
+     *
+     * @param $code string the code
+     * @param $callback string|array the callback function
+     * @param string $description string description of the code
+     *
+     * @return bool
+     */
+    function add( $code, $callback, $description='' )
+    {
+        if ( ! $code || ! $callback )
+            return false;
+
+        if ( is_callable( $callback ) )
+        {
+            $this->replacements[ $code ] = array(
+                'code' => $code,
+                'callback' => $callback,
+                'description' => $description
+            );
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Remove a replacement code
+     *
+     * @since 1.9
+     *
+     * @param string $code to remove
+     */
+    public function remove( $code )
+    {
+        unset( $this->replacements[$code] );
+    }
+
+    /**
+     * See if the replacement code exists already
+     *
+     * @param $code
+     *
+     * @return bool
+     */
+    function has_replacement( $code )
+    {
+        return array_key_exists( $code, $this->replacements );
+    }
+
+    /**
+     * Returns a list of all replacement codes
+     *
+     * @since 1.9
+     *
+     * @return array
+     */
+    public function get_replacements()
+    {
+        return $this->replacements;
+    }
+
+    /**
+     * Process the codes based on the given contact ID
+     *
+     * @param $contact_id int ID of the contact
+     * @param $content
+     *
+     * @return string
+     */
+    public function process( $content, $contact_id=null )
+    {
+
+        if ( ! $contact_id ){
+            // TODO implement tracking...
+            $contact_id = Plugin::$instance->tracking->get_current_contact_id();
+        }
+
+        if ( ! $contact_id || ! is_int( $contact_id ) )
+            return $content;
+
+        // Check if there is at least one tag added
+        if ( empty( $this->replacements ) || ! is_array( $this->replacements ) ) {
+            return $content;
+        }
+
+        $this->contact_id = $contact_id;
+        $this->current_contact = Plugin::$instance->utils->get_contact( $contact_id );
+
+        if ( ! $this->current_contact ){
+            return $content;
+        }
+
+        $new_content = preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
+        $this->contact_id = null;
+        $this->current_contact = null;
+
+        return $new_content;
+
+    }
+
+    /**
+     * @return Contact
+     */
+    protected function get_current_contact()
+    {
+        return $this->current_contact;
+    }
+
+    /**
+     * Process the given replacement code
+     *
+     * @param $m
+     *
+     * @return mixed
+     */
+    private function do_replacement( $m )
+    {
+        // Get tag
+        $code = $m[1];
+
+        /* make sure that if it's a dynamic code to remove anything after the period */
+        if ( strpos( $code, '.' ) > 0 ) {
+            $parts = explode( '.', $code );
+            $code = $parts[0];
+        }
+
+        // Return tag if tag not set
+        if ( ! $this->has_replacement( $code ) && substr( $code, 0, 1 ) !== '_' ) {
+            return $m[0];
+        }
+
+        /* reset code */
+        $code = $m[1];
+
+        if ( substr( $code, 0, 1) === '_' ) {
+
+            $text = $this->get_current_contact()->get_meta( substr( $code, 1 ) );
+
+        } else if ( strpos( $code, '.' ) > 0 ) {
+
+            $parts = explode( '.', $code );
+            $code = $parts[0];
+
+            if ( ! isset( $parts[1] ) ) {
+                $arg = false;
+            } else {
+                $arg = $parts[1];
+            }
+
+            $text = call_user_func( $this->replacements[ $code ]['callback'], $arg, $this->contact_id, $code );
+
+        } else {
+
+            $text = call_user_func( $this->replacements[ $code ]['callback'], $this->contact_id, $code );
+
+        }
+
+        return apply_filters( "groundhogg/replacements/{$code}", $text );
+
+    }
+
+    public function get_table()
+    {
+        ?>
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+            <tr>
+                <th><?php _e( 'Replacement Code' ); ?></th>
+                <th><?php _e( 'Description' ); ?></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <?php foreach ( $this->get_replacements() as $replacement ): ?>
+                <tr>
+                    <td>
+                        <input style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}" readonly>
+                    </td>
+                    <td>
+                        <span><?php esc_html_e( $replacement[ 'description' ] ); ?></span>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php
+    }
+
+    public function replacements_in_footer()
+    {
+        ?>
+        <div id="footer-replacement-codes" class="hidden">
+            <?php $this->get_table(); ?>
+        </div>
+        <?php
+    }
+
+    public function show_replacements_button()
+    {
+        echo Plugin::$instance->utils->html->modal_link( array(
+            'title'     => 'Replacements',
+            'text'      => _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
+            'footer_button_text' => __( 'Close' ),
+            'id'        => '',
+            'class'     => 'button button-secondary no-padding',
+            'source'    => 'footer-replacement-codes',
+            'height'    => 900,
+            'width'     => 700,
+        ) );
+
+    }
+
+
+    /**
+     * Return the contact meta
+     *
+     * @param $contact_id int
+     * @param $arg string the meta key
+     * @return mixed|string
+     */
+    function replacement_meta( $arg, $contact_id )
+    {
+        if ( empty( $arg ) )
+            return '';
+
+        return print_r( $this->get_current_contact()->get_meta( $arg ) , true );
+    }
+
+    /**
+     * Return back the first name ot the contact.
+     *
+     * @param $contact_id int the contact_id
+     * @return string the first name
+     */
+    function replacement_first_name( $contact_id )
+    {
+        return $this->get_current_contact()->get_first_name();
+    }
+
+    /**
+     * Return back the last name ot the contact.
+     *
+     * @param $contact_id int the contact_id
+     * @return string the last name
+     */
+    function replacement_last_name( $contact_id )
+    {
+        return $this->get_current_contact()->get_last_name();
+    }
+
+    /**
+     * Return back the full name ot the contact.
+     *
+     * @param $contact_id int the contact_id
+     * @return string the last name
+     */
+    function replacement_full_name( $contact_id )
+    {
+        return $this->get_current_contact()->get_full_name();
+    }
+
+    /**
+     * Return the username of the contact if one exists.
+     *
+     * @param $contact_id int the contact's id
+     * @return string
+     */
+    function replacement_username( $contact_id )
+    {
+        return $this->get_current_contact()->get_userdata() ? $this->get_current_contact()->get_userdata()->user_login : $this->get_current_contact()->get_email();
+    }
+
+    /**
+     * Return back the email of the contact.
+     *
+     * @param $contact_id int the contact ID
+     * @return string the email
+     */
+    function replacement_email( $contact_id )
+    {
+        return $this->get_current_contact()->get_email();
+    }
+
+    /**
+     * Return back the phone # ot the contact.
+     *
+     * @param $contact_id int the contact_id
+     * @return string the first name
+     */
+    function replacement_phone( $contact_id )
+    {
+        return $this->get_current_contact()->get_phone_number();
+    }
+
+    /**
+     * Return back the phone # ext the contact.
+     *
+     * @param $contact_id int the contact_id
+     * @return string the first name
+     */
+    function replacement_phone_ext( $contact_id )
+    {
+        return $this->get_current_contact()->get_phone_extension();
+    }
+
+    /**
+     * Return back the address of the contact.
+     *
+     * @param $contact_id int the contact_id
+     * @return string the first name
+     */
+    function replacement_address( $contact_id )
+    {
+        $address = implode( ', ', $this->get_current_contact()->get_address() );
+
+        return $address;
+
+    }
+
+    /**
+     * Get the company name of a contact
+     *
+     * @param $contact_id
+     * @return mixed
+     */
+    function replacement_company_name( $contact_id )
+    {
+        return $this->get_current_contact()->get_meta( 'company_name' );
+    }
+
+    /**
+     * Get the company address of a contact
+     *
+     * @param $contact_id
+     * @return mixed
+     */
+    function replacement_company_address( $contact_id )
+    {
+        return $this->get_current_contact()->get_meta( 'company_address' );
+    }
+
+    /**
+     * Get the job title of a contact
+     *
+     * @param $contact_id
+     * @return mixed
+     */
+    function replacement_job_title( $contact_id )
+    {
+        return $this->get_current_contact()->get_meta( 'job_title' );
+    }
+
+    /**
+     * Return back the email address of the contact owner.
+     *
+     * @param $contact_id int the contact ID
+     * @return string the owner's email
+     */
+    function replacement_owner_email( $contact_id )
+    {
+        $user = $this->get_current_contact()->get_ownerdata();
+
+        if ( ! $user )
+            return get_bloginfo( 'admin_email' );
+
+        return $user->user_email;
+    }
+
+    /**
+     * Return back the first name of the contact owner.
+     *
+     * @param $contact_id int the contact
+     * @return string the owner's name
+     */
+    function replacement_owner_first_name( $contact_id )
+    {
+        $user = $this->get_current_contact()->get_ownerdata();
+
+        if ( ! $user )
+            return get_bloginfo( 'admin_email' );
+
+        return $user->first_name;
+    }
+
+    /**
+     * Return back the first name of the contact owner.
+     *
+     * @param $contact_id int the contact
+     * @return string the owner's name
+     */
+    function replacement_owner_last_name( $contact_id )
+    {
+        $user = $this->get_current_contact()->get_ownerdata();
+
+        if ( ! $user )
+            return get_bloginfo( 'admin_email' );
+
+        return $user->last_name;
+    }
+
+    /**
+     * Return a confirmation link for the contact
+     * This just gets the Optin Page link for now.
+     *
+     * @return string the optin link
+     */
+    function replacement_confirmation_link()
+    {
+        $link_text = apply_filters( 'groundhogg/replacements/confirmation_text', Plugin::$instance->settings->get_option( 'confirmation_text', __( 'Confirm your email.', 'groundhogg' ) ) );
+        $link_url = site_url( 'gh-confirmation/via/email/' );
+
+        return sprintf( "<a href=\"%s\" target=\"_blank\">%s</a>", $link_url, $link_text );
+    }
+
+    /**
+     * Return a raw confirmation link for the contact that can be placed in a button.
+     * This just gets the Optin Page link for now.
+     *
+     * @return string the optin link
+     */
+    function replacement_confirmation_link_raw()
+    {
+        $link_url = site_url( 'gh-confirmation/via/email/' );
+        return $link_url;
+    }
+
+    /**
+     * Do the link replacement...
+     *
+     * @param $linkId int the ID of the link
+     *
+     * @return string the superlink url
+     */
+    function replacement_superlink( $linkId )
+    {
+        $linkId = absint( intval( $linkId ) );
+        return site_url( 'superlinks/link/' . $linkId );
+    }
+
+    /**
+     * Return a formatted date in local time.
+     *
+     * @param $time_string
+     *
+     * @return string
+     */
+    function replacement_date( $time_string )
+    {
+
+        $parts =preg_split( "/(\||;)/", $time_string );
+
+        if ( count( $parts ) === 1 ){
+            $format = 'l jS \of F Y';
+            $when = $parts[0];
+        } else {
+            $format = $parts[0];
+            $when = $parts[1];
+        }
+
+        /* convert to local time */
+        $time = strtotime( $when ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+
+        return date_i18n( $format, $time );
+
+    }
+
+    /**
+     * Return the business name
+     *
+     * @return string
+     */
+    function replacement_business_name()
+    {
+        return Plugin::$instance->settings->get_option( 'business_name' );
+    }
+
+    /**
+     * Return eh business phone #
+     *
+     * @return string
+     */
+    function replacement_business_phone()
+    {
+        return Plugin::$instance->settings->get_option( 'phone' );
+    }
+
+    /**
+     * Return the business address
+     *
+     * @return array|string
+     */
+    function replacement_business_address()
+    {
+        $address_keys = [
+            'street_address_1',
+            'street_address_2',
+            'zip_or_postal',
+            'city',
+            'region',
+            'country',
+        ];
+
+        $address = [];
+
+        foreach ( $address_keys as $key ){
+
+            $val = Plugin::$instance->settings->get_option( $key );
+            if ( ! empty( $val ) ){
+                $address[$key] = $val;
+            }
+        }
+
+        $address = implode( ', ', $address );
+
+        return $address;
+    }
+
+    /**
+     * Get a file download link from a contact record.
+     *
+     * @param $key string|int the key for the file
+     * @param $contact_id int
+     *
+     * @return string
+     */
+    function replacement_files( $key = '', $contact_id = null )
+    {
+
+        $files = $this->get_current_contact()->get_associated_files();
+
+        if ( ! empty( $files ) ){
+            return __( 'No files found.', 'groundhogg' );
+        }
+
+        $html = '';
+
+        foreach ( $files as $i => $file ){
+            $html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( $file[ 'file_url' ] ), esc_html( $file[ 'file_name' ] ) );
+        }
+
+        return sprintf( '<ul>%s</ul>', $html );
+    }
+
+    /**
+     * Return a random quote from the movie groundhog day staring bill murray.
+     * Also the movie of which branding is based upon.
+     *
+     * @return mixed
+     */
+    function get_random_groundhogday_quote()
+    {
+        $quotes = array();
+
+        $quotes[] = "I'm not going to live by their rules anymore.";
+        $quotes[] = "When Chekhov saw the long winter, he saw a winter bleak and dark and bereft of hope. Yet we know that winter is just another step in the cycle of life. But standing here among the people of Punxsutawney and basking in the warmth of their hearths and hearts, I couldn't imagine a better fate than a long and lustrous winter.";
+        $quotes[] = "Hi, three cheeseburgers, two large fries, two milkshakes, and one large coke.";;
+        $quotes[] = "It's the same thing every day, Clean up your room, stand up straight, pick up your feet, take it like a man, be nice to your sister, don't mix beer and wine ever, Oh yeah, don't drive on the railroad tracks.";
+        $quotes[] = "I'm a god, I'm not the God. I don't think.";
+        $quotes[] = "Don't drive angry! Don't drive angry!";
+        $quotes[] = "I'm betting he's going to swerve first.";
+        $quotes[] = "You want a prediction about the weather? You're asking the wrong Phil. I'm going to give you a prediction about this winter? It's going to be cold, it's going to be dark and it's going to last you for the rest of your lives!";
+        $quotes[] = "We mustn't keep our audience waiting.";
+        $quotes[] = "Okay campers, rise and shine, and don't forget your booties cause its cold out there...its cold out there every day.";
+        $quotes[] = "I peg you as a glass half empty kinda guy.";
+        $quotes[] = "Why would anybody steal a groundhog? I can probably think of a couple of reasons... pervert.";
+        $quotes[] = "Well, what if there is no tomorrow? There wasn't one today.";
+        $quotes[] = "Did he actually refer to himself as \"the talent\"?";
+        $quotes[] = "Did you sleep well Mr. Connors?";
+
+        $quotes = apply_filters( 'add_movie_quotes', $quotes );
+
+        $quote = rand( 0, count( $quotes ) - 1 );
+
+        return $quotes[ $quote ];
+    }
+
+}

@@ -1,4 +1,14 @@
 <?php
+namespace Groundhogg;
+
+
+use Groundhogg\DB\DB;
+use Groundhogg\DB\Events;
+use Groundhogg\DB\Meta_DB;
+use Groundhogg\DB\Step_Meta;
+use Groundhogg\DB\Steps;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Step
  *
@@ -10,180 +20,115 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Step implements WPGH_Event_Process
+class Step extends Base_Object_With_Meta implements Event_Process
 {
-
-    /**
-     * The ID of the step
-     *
-     * @var int
-     */
-    public $ID;
-
-    /**
-     * The funnel this step is a child of
-     *
-     * @var int
-     */
-    public $funnel_id;
-
-    /**
-     * The step type
-     *
-     * @var string
-     */
-    public $type;
-
-    /**
-     * The step group
-     *
-     * @var string
-     */
-    public $group;
-
-    /**
-     * The step's order
-     *
-     * @var int
-     */
-    public $order;
-
-    /**
-     * The step title
-     *
-     * @var string
-     */
-    public $title;
-
-    /**
-     * The number of seconds to delay if this step is being enqueued
-     *
-     * @var int
-     */
-    public $queue_delay = 0;
+    const BENCHMARK = 'benchmark';
+    const ACTION = 'action';
 
     /**
      * This is only used when the step is enqueuing itself...
      *
      * @since 1.0.16
      *
-     * @var WPGH_Contact
+     * @var Contact
      */
     public $enqueued_contact;
 
     /**
-     * WPGH_Step constructor.
+     * Return the DB instance that is associated with items of this type.
      *
-     * @param $id int ID of the step
+     * @return Steps
      */
-    public function __construct( $id )
+    protected function get_db()
     {
-        $this->ID = intval( $id );
-
-        $step = WPGH()->steps->get( $this->ID );
-
-        if ( ! $step )
-            return false;
-
-        $this->setup_step( $step );
+        return Plugin::$instance->dbs->get_db( 'steps' );
     }
 
     /**
-     * Sets up the class given the DB step object
+     * Return a META DB instance associated with items of this type.
      *
-     * @param $step
-     * @return bool
+     * @return Step_Meta
      */
-    public function setup_step( $step )
+    protected function get_meta_db()
     {
-
-        if ( ! is_object( $step ) ){
-
-            return false;
-
-        }
-
-        $this->title        = $step->step_title;
-        $this->funnel_id    = intval( $step->funnel_id );
-        $this->order        = intval( $step->step_order );
-        $this->type         = $step->step_type;
-        $this->group        = $step->step_group;
-
-        return ! empty( $this->type   ) && ! empty( $this->group  );
-
+        return Plugin::$instance->dbs->get_db( 'stepmeta' );
     }
 
-    public function exists()
+    /**
+     * Get the events DB
+     *
+     * @return Events
+     */
+    protected function get_events_db()
     {
-        return $this->funnel_id > 0 && $this->type && $this->group;
+        return Plugin::$instance->dbs->get_db( 'events' );
     }
 
-    public function get_ID()
+    /**
+     * Do any post setup actions.
+     *
+     * @return void
+     */
+    protected function post_setup()
     {
-        return $this->ID;
+        // TODO: Implement post_setup() method.
+    }
+
+    /**
+     * A string to represent the object type
+     *
+     * @return string
+     */
+    protected function get_object_type()
+    {
+        return 'step';
+    }
+
+    public function get_id()
+    {
+        return absint( $this->ID );
     }
 
     public function get_title()
     {
-        return $this->title;
+        return $this->step_title;
     }
 
     public function get_order()
     {
-        return $this->order;
+        return absint( $this->step_order );
     }
 
     public function get_type()
     {
-        return $this->type;
+        return $this->step_type;
+    }
+
+    public function get_group()
+    {
+        return $this->step_group;
+    }
+
+    public function get_funnel_id()
+    {
+        return absint( $this->funnel_id );
     }
 
     /**
-     * Update the step with new info
-     *
-     * @param array $data
-     * @return bool
+     * @return Funnel
      */
-    public function update( $data = array() )
+    public function get_funnel()
     {
-        if ( empty( $data ) ) {
-            return false;
-        }
-
-        //$data = $this->sanitize_columns( $data );
-
-        do_action( 'wpgh_step_pre_update', $this->ID, $data );
-        do_action( "groundhogg/step/update/before", $this->ID, $data );
-
-        $updated = false;
-
-        if ( WPGH()->steps->update( $this->ID, $data ) ) {
-
-            $step = WPGH()->steps->get_step( $this->ID );
-            $this->setup_step( $step );
-
-            $updated = true;
-
-        }
-
-        do_action( 'wpgh_step_post_update', $updated, $this->ID, $data );
-        do_action( "groundhogg/step/update/after", $updated, $this->ID, $data );
-
-
-        return $updated;
+        return Plugin::$instance->utils->get_funnel( $this->get_funnel_id() );
     }
 
     /**
      * Get an array of contacts which are "waiting'
-     * @return WPGH_Contact[] | false
+     * @return Contact[] | false
      */
     public function get_waiting_contacts()
     {
-        $contacts = array();
+        $contacts = [];
         $events = $this->get_waiting_events();
 
         if ( ! $events ){
@@ -191,44 +136,44 @@ class WPGH_Step implements WPGH_Event_Process
         }
 
         foreach ( $events as $event ){
-            $contacts[] = $event->contact;
+            $contacts[] = $event->get_contact();
         }
 
         return $contacts;
     }
 
+
     /**
      * Get an array of waiting events
-     * @return WPGH_Event[]|false
+     * @return Event[]|false
      */
     public function get_waiting_events()
     {
-        $events = WPGH()->events->get_events( array(
-            'status' => 'waiting',
-            'step_id' => $this->ID,
-            'funnel_id' => $this->funnel_id,
-        ) );
+        $events = $this->get_events_db()->get_events( [
+            'status'    => Event::WAITING,
+            'step_id'   => $this->get_id(),
+            'funnel_id' => $this->get_funnel_id(),
+        ] );
 
-        $prepped = array();
+        $prepped = [];
 
         if ( ! $events ){
             return false;
         }
 
         foreach ( $events as $event ) {
-            $prepped[] = new WPGH_Event( $event->ID );
+            $prepped[] = Plugin::$instance->utils->get_event( $event->ID );
         }
 
         return $prepped;
     }
-
 
     /**
      * @return bool whether the step is a benchmark
      */
     public function is_benchmark()
     {
-       return $this->group === 'benchmark';
+       return $this->get_group() === self::BENCHMARK;
     }
 
     /**
@@ -236,31 +181,26 @@ class WPGH_Step implements WPGH_Event_Process
      */
     public function is_action()
     {
-        return $this->group === 'action';
+        return $this->get_group() === self::ACTION;
     }
 
     /**
      * Get the next step in the order
      *
-     * @return WPGH_Step|false
+     * @return Step|false
      */
-    public function get_next_step()
+    public function get_next_action()
     {
 
         /* this will give an array of objects ordered by appearance in the funnel builder */
-
-        $items = WPGH()->steps->get_steps( array(
-            'funnel_id' => $this->funnel_id,
-        ) );
+        $items = $this->get_funnel()->get_steps();
 
         if (  empty( $items ) ){
-
             /* something went wrong or there are no more steps*/
             return false;
-
         }
 
-        $i = $this->order;
+        $i = $this->get_order();
 
         if ( $i >= count( $items ) ) {
 
@@ -269,11 +209,11 @@ class WPGH_Step implements WPGH_Event_Process
 
         }
 
-        if ( $items[ $i ]->step_group === 'action' ){
+        if ( $items[ $i ]->step_group === self::ACTION ){
 
             /* regardless of whether the current step is an action
             or a benchmark we can run the next step if it's an action */
-            return wpgh_get_funnel_step( $items[ $i ]->ID );
+            return $items[ $i ];
 
         }
 
@@ -282,9 +222,9 @@ class WPGH_Step implements WPGH_Event_Process
             //todo verify comparison
             while ( $i < count( $items ) ) {
 
-                if ( $items[ $i ]->step_group === 'action' ) {
+                if ( $items[ $i ]->step_group === self::ACTION ) {
 
-                    return wpgh_get_funnel_step( $items[ $i ]->ID );
+                    return $items[ $i ];
 
                 }
 
@@ -305,8 +245,7 @@ class WPGH_Step implements WPGH_Event_Process
      */
     public function get_delay_time()
     {
-        $time = apply_filters( 'wpgh_step_enqueue_time_' . $this->type, $this );
-        $time = apply_filters( "groundhogg/elements/{$this->type}/enqueue", $this );
+        $time = apply_filters( "groundhogg/elements/{$this->get_type()}/enqueue", $this );
 
         if ( ! is_numeric( $time ) ) {
             $time = time();
@@ -318,29 +257,24 @@ class WPGH_Step implements WPGH_Event_Process
     /**
      * Do the event when being processed from the event queue...
      *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event Event
      *
-     * @return bool whether it was successful or not
+     * @return bool|\WP_Error whether it was successful or not
      */
     public function run( $contact, $event = null )
     {
         if ( ! $this->is_active() ) {
-            /* Exit out, this step is inactive */
             return false;
-
         }
 
         $this->switch_to_blog();
 
-        do_action( "groundhogg/elements/{$this->type}/run/before", $this  );
-//        do_action( 'wpgh_doing_funnel_step_' . $this->type . '_before', $this  );
+        do_action( "groundhogg/elements/{$this->get_type()}/run/before", $this  );
 
-        $result = apply_filters( "groundhogg/elements/{$this->type}/run", $contact, $event, $this );
-//        $result = apply_filters( 'wpgh_doing_funnel_step_' . $this->type, $contact, $event, $this );
+        $result = apply_filters( "groundhogg/elements/{$this->get_type()}/run", $contact, $event, $this );
 
-        do_action( "groundhogg/elements/{$this->type}/run/after", $this  );
-//        do_action( 'wpgh_doing_funnel_step_' . $this->type . '_after', $this  );
+        do_action( "groundhogg/elements/{$this->get_type()}/run/after", $this  );
 
         $this->restore_current_blog();
 
@@ -350,56 +284,36 @@ class WPGH_Step implements WPGH_Event_Process
     /**
      * Create an event and add it to the queue
      *
-     * @param $contact WPGH_Contact
+     * @param $contact Contact
      *
      * @return bool
      */
     public function enqueue( $contact )
     {
-
-        //contact should NOT be present in the same funnel twice...
-
-        /* Check if a similar event such as this already exists FIRST */
-
         $this->enqueued_contact = $contact;
 
-        $similar_events = WPGH()->events->get_events(
-            array(
-                'start'         => $this->get_delay_time() - ( 5 * 60 ),
-                'end'           => $this->get_delay_time() + ( 5 * 60 ),
-                'funnel_id'     => $this->funnel_id,
-                'step_id'       => $this->ID,
-                'contact_id'    => $contact->ID,
-                'event_type'     => GROUNDHOGG_FUNNEL_EVENT
-            )
+        $this->get_events_db()->mass_update(
+            [
+                'status' => Event::SKIPPED
+            ],
+            [
+                'funnel_id'     => $this->get_funnel_id(),
+                'contact_id'    => $contact->get_id(),
+                'event_type'    => Event::FUNNEL,
+                'status'        => Event::WAITING
+
+            ]
         );
 
-        if ( $similar_events && count( $similar_events ) > 0 ){
-            return false;
-        }
-
-        WPGH()->events->mass_update(
-            array(
-                'status' => 'skipped'
-            ),
-            array(
-                'funnel_id'     => $this->funnel_id,
-                'contact_id'    => $contact->ID,
-                'event_type'    => GROUNDHOGG_FUNNEL_EVENT,
-                'status'        => 'waiting'
-
-            )
-        );
-
-        $event = array(
+        $event = [
             'time'          => $this->get_delay_time(),
-            'funnel_id'     => $this->funnel_id,
-            'step_id'       => $this->ID,
-            'event_type'    => GROUNDHOGG_FUNNEL_EVENT,
-            'contact_id'    => $contact->ID
-        );
+            'funnel_id'     => $this->get_funnel_id(),
+            'step_id'       => $this->get_id(),
+            'event_type'    => Event::FUNNEL,
+            'contact_id'    => $contact->get_id()
+        ];
 
-        $success = (bool) WPGH()->event_queue->add( $event );
+        $success = (bool) $this->get_events_db()->add( $event );
 
         return $success;
     }
@@ -409,7 +323,7 @@ class WPGH_Step implements WPGH_Event_Process
      */
     public function switch_to_blog()
     {
-        if ( wpgh_is_global_multisite() ) {
+        if ( is_global_multisite() ) {
             $blog_id = $this->get_meta( 'blog_id' );
             if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
                 switch_to_blog( $blog_id );
@@ -422,7 +336,7 @@ class WPGH_Step implements WPGH_Event_Process
      */
     public function restore_current_blog()
     {
-        if ( wpgh_is_global_multisite() && ms_is_switched() ) {
+        if ( is_global_multisite() && ms_is_switched() ) {
             restore_current_blog();
         }
     }
@@ -437,7 +351,7 @@ class WPGH_Step implements WPGH_Event_Process
     public function can_run()
     {
 
-        if ( wpgh_is_global_multisite() ){
+        if ( is_global_multisite() ){
 
             $blog_id = $this->get_meta( 'blog_id' );
 
@@ -466,29 +380,29 @@ class WPGH_Step implements WPGH_Event_Process
 
     /**
      * Whether this step can actually be completed
-     * @param $contact WPGH_Contact
+     * @param $contact Contact
      * @return bool
      */
     public function can_complete( $contact=null )
     {
-        if ( $this->type === 'action' )
+        if ( $this->is_action() )
             return false;
 
         return $this->is_active() && ( $this->is_starting() || $this->contact_in_funnel( $contact ) );
     }
 
+
     /**
      * Returns whether the contact is currently in the funnel
      *
-     * @param $contact WPGH_Contact
+     * @param $contact Contact
      *
      * @return bool
      */
     public function contact_in_funnel( $contact )
     {
-        return WPGH()->events->count( array( 'funnel_id' => $this->funnel_id, 'contact_id' => $contact->ID ) ) > 0;
+        return $this->get_events_db()->count( [ 'funnel_id' => $this->get_funnel_id(), 'contact_id' => $contact->get_id() ] ) > 0;
     }
-
 
     /**
      * Return whether the step/funnel is active?
@@ -497,9 +411,7 @@ class WPGH_Step implements WPGH_Event_Process
      */
     public function is_active()
     {
-
-        return WPGH()->funnels->get_column_by( 'status', 'ID', $this->funnel_id ) === 'active' ;
-
+        return $this->get_funnel()->is_active();
     }
 
     /**
@@ -509,21 +421,21 @@ class WPGH_Step implements WPGH_Event_Process
      */
     public function is_starting()
     {
-        if ( $this->type === 'action' )
+        if ( $this->is_action() )
             return false;
 
-        if ( $this->order === 1 )
+        if ( $this->get_order() === 1 )
             return true;
 
-        $step_order = $this->order - 1;
+        $step_order = $this->get_order() - 1;
 
         while ( $step_order > 0 ){
 
-            $steps =  WPGH()->steps->get_steps( array( 'funnel_id' => $this->funnel_id, 'step_order' => $step_order ) );
+            $steps = $this->get_funnel()->get_steps();
 
             $step = array_shift( $steps );
 
-            if ( $step->step_group === 'action' ){
+            if ( $step->is_action() ){
                 return false;
             }
 
@@ -534,53 +446,6 @@ class WPGH_Step implements WPGH_Event_Process
     }
 
     /**
-     * Get Step meta
-     *
-     * @param $key
-     * @return mixed
-     */
-    public function get_meta( $key )
-    {
-        return WPGH()->step_meta->get_meta( $this->ID, $key, true );
-    }
-
-    /**
-     * Add step meta
-     *
-     * @param $key
-     * @param $value
-     * @return bool
-     */
-    public function add_meta( $key, $value )
-    {
-        return WPGH()->step_meta->add_meta( $this->ID, $key, $value );
-    }
-
-    /**
-     * Update step meta
-     *
-     * @param $key
-     * @param $value
-     * @return bool
-     */
-    public function update_meta( $key, $value )
-    {
-        return WPGH()->step_meta->update_meta( $this->ID, $key, $value );
-
-    }
-
-    /**
-     * Delete step meta
-     *
-     * @param $key
-     * @return bool
-     */
-    public function delete_meta( $key )
-    {
-        return WPGH()->step_meta->delete_meta( $this->ID, $key );
-    }
-
-    /**
      * Return the name given with the ID prefixed for easy access in the $_POST variable
      *
      * @param $name
@@ -588,7 +453,7 @@ class WPGH_Step implements WPGH_Event_Process
      */
     public function prefix( $name )
     {
-        return $this->ID . '_' . esc_attr( $name );
+        return $this->get_id() . '_' . esc_attr( $name );
     }
 
     /**
@@ -600,8 +465,8 @@ class WPGH_Step implements WPGH_Event_Process
      */
     public function icon()
     {
-        $icon = apply_filters( 'wpgh_step_icon_' . $this->type, WPGH_ASSETS_FOLDER . 'images/funnel-icons/no-icon.png' );
-        return apply_filters( "groundhogg/elements/{$this->type}/icon", $icon );
+        $icon = apply_filters( 'wpgh_step_icon_' . $this->get_type(), GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png' );
+        return apply_filters( "groundhogg/elements/{$this->get_type()}/icon", $icon );
     }
 
     /**
@@ -612,8 +477,8 @@ class WPGH_Step implements WPGH_Event_Process
     public function reporting()
     {
 
-        do_action( "groundhogg/elements/{$this->type}/reporting", $this );
-        do_action( 'wpgh_get_step_reporting_' . $this->type, $this );
+        do_action( "groundhogg/elements/{$this->get_type()}/reporting", $this );
+        do_action( 'wpgh_get_step_reporting_' . $this->get_type(), $this );
 
     }
 
@@ -625,8 +490,8 @@ class WPGH_Step implements WPGH_Event_Process
     public function settings()
     {
 
-        do_action( "groundhogg/elements/{$this->type}/settings", $this );
-        do_action( 'wpgh_get_step_settings_' . $this->type, $this );
+        do_action( "groundhogg/elements/{$this->get_type()}/settings", $this );
+        do_action( 'wpgh_get_step_settings_' . $this->get_type(), $this );
 
     }
 
@@ -714,6 +579,17 @@ class WPGH_Step implements WPGH_Event_Process
 
     }
 
+
+    public function get_step_title()
+    {
+        return $this->get_title();
+    }
+
+    public function get_funnel_title()
+    {
+        return $this->get_funnel()->get_title();
+    }
+
     /**
      * Get the HTML of the step and return it.
      *
@@ -730,6 +606,4 @@ class WPGH_Step implements WPGH_Event_Process
 
         return $html;
     }
-
-
 }

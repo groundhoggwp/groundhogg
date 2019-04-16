@@ -31,12 +31,14 @@ class Autoloader {
 	private static $classes_map = [
 		'Notices' => 'includes/notices.php',
 		'Bulk_Job' => 'includes/bulk-jobs/bulk-job.php',
-		'HTML' => 'includes/html.php',
-		'Utils' => 'includes/utils.php',
-		'Locations' => 'includes/locations.php',
+		'HTML' => 'includes/utils/html.php',
+		'Utils' => 'includes/utils/utils.php',
+		'Files' => 'includes/utils/files.php',
+		'Location_Utils' => 'includes/utils/location-utils.php',
 		'Compliance' => 'includes/compliance.php',
-		'Base_Object' => 'includes/base-object.php',
-		'Base_Object_With_Meta' => 'includes/base-object-with-meta.php',
+		'Base_Object' => 'includes/classes/base-object.php',
+		'Base_Object_With_Meta' => 'includes/classes/base-object-with-meta.php',
+		'Contact' => 'includes/classes/contact.php',
 	];
 
 	/**

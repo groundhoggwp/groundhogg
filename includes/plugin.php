@@ -85,6 +85,11 @@ class Plugin {
     public $settings;
 
     /**
+     * @var Replacements
+     */
+    public $replacements;
+
+    /**
      * Role Manager.
      *
      * Holds the plugin Role Manager
@@ -214,6 +219,8 @@ class Plugin {
         $this->compliance   = new Compliance();
         $this->utils        = new Utils();
         $this->scripts      = new Scripts();
+        $this->settings     = new Settings();
+        $this->replacements = new Replacements();
 
         if ( is_admin() ) {
 

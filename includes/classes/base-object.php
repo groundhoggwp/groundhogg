@@ -128,6 +128,16 @@ abstract class Base_Object implements Serializable, ArrayAccess
     }
 
     /**
+     * Get the original data
+     *
+     * @return array
+     */
+    public function get_data()
+    {
+        return $this->data;
+    }
+
+    /**
      * Checks if the data from the DB checks out.
      *
      * @return bool
@@ -300,5 +310,13 @@ abstract class Base_Object implements Serializable, ArrayAccess
         }
 
         unset($this->data[$offset]);
+    }
+
+    /**
+     * @return array
+     */
+    public function get_as_array()
+    {
+        return [ 'data' => $this->data ];
     }
 }

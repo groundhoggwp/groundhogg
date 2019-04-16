@@ -16,6 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 ?>
 <div class="body-content" style="text-align: left;">
     <!-- START CONTENT -->
-    <?php echo apply_filters( 'wpgh_email_get_content', '' ); ?>
+    <?php echo apply_filters( 'groundhogg/email/content', '' ); ?>
     <!-- END CONTENT -->
 </div>

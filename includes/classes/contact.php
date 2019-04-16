@@ -1,7 +1,6 @@
 <?php
 namespace Groundhogg;
 
-
 // Exit if accessed directly
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
@@ -41,25 +40,31 @@ class Contact extends Base_Object_With_Meta
     protected $user;
 
     /**
+     * @var WP_User
+     */
+    protected $owner;
+
+    /**
      * Contact constructor.
      * @param bool $_id_or_email
      * @param bool $by_user_id
      */
-    public function __construct( $_id_or_email = false, $by_user_id = false ){
+    public function __construct($_id_or_email = false, $by_user_id = false)
+    {
 
-        if ( false === $_id_or_email || ( is_numeric( $_id_or_email ) && (int) $_id_or_email !== absint( $_id_or_email ) ) ) {
+        if (false === $_id_or_email || (is_numeric($_id_or_email) && (int)$_id_or_email !== absint($_id_or_email))) {
             return;
         }
 
-        $by_user_id = is_bool( $by_user_id ) ? $by_user_id : false;
+        $by_user_id = is_bool($by_user_id) ? $by_user_id : false;
 
-        if ( is_numeric( $_id_or_email ) ) {
+        if (is_numeric($_id_or_email)) {
             $field = $by_user_id ? 'user_id' : 'ID';
         } else {
             $field = 'email';
         }
 
-        parent::__construct( $_id_or_email, $field );
+        parent::__construct($_id_or_email, $field);
     }
 
     /**
@@ -69,7 +74,7 @@ class Contact extends Base_Object_With_Meta
      */
     protected function get_db()
     {
-        return Plugin::instance()->dbs->get_db( 'contacts' );
+        return Plugin::instance()->dbs->get_db('contacts');
     }
 
     /**
@@ -79,27 +84,27 @@ class Contact extends Base_Object_With_Meta
      */
     protected function get_meta_db()
     {
-        return Plugin::instance()->dbs->get_db( 'contactmeta' );
+        return Plugin::instance()->dbs->get_db('contactmeta');
     }
 
-	/**
-	 * Get the tags DB
-	 *
-	 * @return Tags
-	 */
+    /**
+     * Get the tags DB
+     *
+     * @return Tags
+     */
     protected function get_tags_db()
     {
-    	return Plugin::instance()->dbs->get_db( 'tags' );
+        return Plugin::instance()->dbs->get_db('tags');
     }
 
-	/**
-	 * Get the tag rel DB
-	 *
-	 * @return Tag_Relationships
-	 */
+    /**
+     * Get the tag rel DB
+     *
+     * @return Tag_Relationships
+     */
     protected function get_tag_rel_db()
     {
-    	return Plugin::instance()->dbs->get_db( 'tag_relationships' );
+        return Plugin::instance()->dbs->get_db('tag_relationships');
     }
 
     /**
@@ -119,18 +124,29 @@ class Contact extends Base_Object_With_Meta
      */
     protected function post_setup()
     {
-        $this->tags = wp_parse_id_list( $this->get_tag_rel_db()->get_relationships( $this->ID ) );
-        $this->user = get_userdata( $this->get_user_id() );
+        $this->tags = wp_parse_id_list($this->get_tag_rel_db()->get_relationships($this->ID));
+        $this->user = get_userdata($this->get_user_id());
+        $this->owner = get_userdata($this->get_owner_id());
     }
 
-	/**
-	 * The contact ID
-	 *
-	 * @return int
-	 */
+    /**
+     * The contact ID
+     *
+     * @return int
+     */
     public function get_id()
     {
-    	return absint( $this->ID );
+        return absint($this->ID);
+    }
+
+    /**
+     * Get the tags
+     *
+     * @return array
+     */
+    public function get_tags()
+    {
+        return wp_parse_id_list( $this->tags );
     }
 
     /**
@@ -194,13 +210,93 @@ class Contact extends Base_Object_With_Meta
     }
 
     /**
+     * Get the user ID
+     *
+     * @return int
+     */
+    public function get_owner_id()
+    {
+       return absint( $this->owner_id );
+    }
+
+    /**
      * Get the user data
      *
-     * @return WP_User
+     * @return WP_User|false
      */
     public function get_userdata()
     {
         return $this->user;
+    }
+
+    public function get_ownerdata()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_phone_number()
+    {
+        return $this->get_meta( 'primary_phone' );
+    }
+
+    /**
+     * @return string
+     */
+    public function get_phone_extension()
+    {
+        return $this->get_meta( 'primary_phone_extension' );
+    }
+
+    /**
+     * Get the contacts's IP
+     *
+     * @return mixed
+     */
+    public function get_ip_address()
+    {
+        return $this->get_meta( 'ip_address' );
+    }
+
+    /**
+     * Get the contact's time_zone
+     *
+     * @return mixed
+     */
+    public function get_time_zone()
+    {
+        return $this->get_meta( 'time_zone' );
+    }
+
+    /**
+     * Get the address
+     *
+     * @return array
+     */
+    public function get_address()
+    {
+        $address_keys = [
+            'street_address_1',
+            'street_address_2',
+            'postal_zip',
+            'city',
+            'region',
+            'country',
+        ];
+
+        $address = [];
+
+        foreach ( $address_keys as $key ){
+
+            $val =  $this->get_meta( $key );
+            if ( ! empty( $val ) ){
+                $address[$key] = $val;
+            }
+        }
+
+        return $address;
     }
 
     /**
@@ -353,19 +449,13 @@ class Contact extends Base_Object_With_Meta
 	 *
 	 * @return bool
 	 */
-	function has_tag( $tag_id_or_name )
+    public function has_tag( $tag_id_or_name )
 	{
-
 	    if ( ! is_numeric( $tag_id_or_name ) ) {
-
-            $tag = (object) WPGH()->tags->get_tag_by( 'tag_slug', $tag_id_or_name );
-
-            $tag_id = intval( $tag->tag_id );
-
+            $tag = (object) $this->get_tags_db()->get_tag_by( 'tag_slug', sanitize_title( $tag_id_or_name ) );
+            $tag_id = absint( $tag->tag_id );
         } else {
-
 	        $tag_id = absint( $tag_id_or_name );
-
         }
 
 	    return in_array( $tag_id, $this->tags );
@@ -376,9 +466,9 @@ class Contact extends Base_Object_With_Meta
      *
      * @param $preference
      */
-	function change_marketing_preference( $preference )
+    public function change_marketing_preference( $preference )
     {
-        $old_preference = $this->optin_status;
+        $old_preference = $this->get_optin_status();
 
         $this->update( [ 'optin_status' => $preference ] );
 
@@ -386,7 +476,7 @@ class Contact extends Base_Object_With_Meta
 
         do_action( 'groundhogg/contact/preferences/updated', $this->ID, $preference, $old_preference );
 
-        if ( $preference === WPGH_UNSUBSCRIBED ){
+        if ( $preference === Compliance::UNSUBSCRIBED){
             do_action( 'groundhogg/contact/preferences/unsubscribed', $this->ID, $preference, $old_preference );
         }
 
@@ -395,8 +485,8 @@ class Contact extends Base_Object_With_Meta
     /**
      * Unsubscribe a contact
      */
-	function unsubscribe() {
-        $this->change_marketing_preference( WPGH_UNSUBSCRIBED );
+    public function unsubscribe() {
+        $this->change_marketing_preference( Compliance::UNSUBSCRIBED );
     }
 
     /**
@@ -404,17 +494,16 @@ class Contact extends Base_Object_With_Meta
      *
      * @return bool true if we found a relevant user account, false otherwise.
      */
-    function auto_link_account()
+    public function auto_link_account()
     {
-
-        if ( $this->user ){
+        if ( $this->get_user_id() ){
             return true;
         }
 
-        $user = get_user_by( 'email', $this->email );
+        $user = get_user_by( 'email', $this->get_email() );
 
         if ( $user ){
-            $this->update( array( 'user_id' => $user->ID ) );
+            $this->update( [ 'user_id' => $user->ID ] );
             return true;
         }
 
@@ -427,43 +516,35 @@ class Contact extends Base_Object_With_Meta
      * @param bool $override
      * @return array|bool
      */
-    function extrapolate_location( $override=false )
+    public function extrapolate_location( $override=false )
     {
-
-        $ip_address = $this->ip_address;
-
-        if ( ! $ip_address ){
-            $ip_address = $this->get_meta( 'ip_address' );
-        }
+        $ip_address = $this->get_ip_address();
 
         /* Do not run for localhost IPv6 blank IP */
         if ( ! $ip_address || $ip_address === "::1" ){
             return false;
         }
 
-        $info = ip_info( $ip_address );
+        $info = Plugin::instance()->utils->location->ip_info( $ip_address );
 
         if ( ! $info || empty( $info ) ){
             return false;
         }
 
         $location_meta = [
-            'city' => 'city',
-            'region' => 'region',
-            'region_code' => 'region_code',
-            'country_name' => 'country',
-            'country' => 'country_code',
-            'time_zone' => 'time_zone',
+            'city'          => 'city',
+            'region'        => 'region',
+            'region_code'   => 'region_code',
+            'country_name'  => 'country',
+            'country'       => 'country_code',
+            'time_zone'     => 'time_zone',
         ];
 
         foreach ( $location_meta as $meta_key => $ip_info_key ){
-
             $has_meta = $this->get_meta( $meta_key );
-
             if ( key_exists( $ip_info_key, $info ) && ( ! $has_meta || $override ) ){
                 $this->update_meta( $meta_key, $info[ $ip_info_key ] );
             }
-
         }
 
         return $info;
@@ -482,11 +563,18 @@ class Contact extends Base_Object_With_Meta
             $time = time();
         }
 
-        if ( ! $this->time_zone && $this->ip_address ){
+        $time_zone  = $this->get_time_zone();
+        $ip_address = $this->get_ip_address();
+
+        if ( ! $time_zone && $ip_address ){
            $this->extrapolate_location();
         }
 
-        $local_time = wpgh_convert_to_foreign_time( $time, $this->time_zone );
+        try {
+            $local_time = Plugin::$instance->utils->location->convert_to_foreign_time( $time, $time_zone );
+        } catch ( \Exception $e ){
+            $local_time = $time;
+        }
 
         return $local_time;
 
@@ -514,7 +602,11 @@ class Contact extends Base_Object_With_Meta
      */
     function get_time_zone_offset()
     {
-        return wpgh_get_timezone_offset( $this->time_zone );
+        try {
+            return Plugin::$instance->utils->location->get_timezone_offset( $this->time_zone );
+        } catch (\Exception $e ){
+            return 0;
+        }
     }
 
     /**
@@ -524,23 +616,17 @@ class Contact extends Base_Object_With_Meta
      */
     function get_utc_0_offset()
     {
-        return intval( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) - $this->get_time_zone_offset();
+        return intval( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) - $this->get_time_zone_offset();
     }
 
     /**
-     * Convert a given unix time stamp
+     * Get the basename of the path
      *
-     * @param int $time
+     * @return string
      */
-    function convert_to_local_time( $time = 0 )
+    public function get_upload_folder_basename()
     {
-        if ( ! $time ){
-            $time = time();
-        }
-
-        if ( ! $this->time_zone && $this->ip_address ){
-            $this->extrapolate_location();
-        }
+        return  md5( wpgh_encrypt_decrypt( $this->get_email() ) );
     }
 
     /**
@@ -549,9 +635,9 @@ class Contact extends Base_Object_With_Meta
     public function get_uploads_folder()
     {
         return [
-            'basedir' => wpgh_get_contact_uploads_dir(),
-            'path'    => wpgh_get_contact_uploads_dir( md5( wpgh_encrypt_decrypt( $this->email ) ) ),
-            'url'     => wpgh_get_contact_uploads_url( md5( wpgh_encrypt_decrypt( $this->email ) ) )
+            'basedir' => Plugin::$instance->utils->files->get_contact_uploads_dir(),
+            'path'    => Plugin::$instance->utils->files->get_contact_uploads_dir( $this->get_upload_folder_basename() ),
+            'url'     => Plugin::$instance->utils->files->get_contact_uploads_url( $this->get_upload_folder_basename() )
         ];
     }
 
@@ -566,9 +652,9 @@ class Contact extends Base_Object_With_Meta
 
         if ( file_exists( $uploads_dir[ 'path' ] ) ) {
 
-            $scanned_directory = array_diff(scandir($uploads_dir[ 'path' ]), ['..', '.']);
+            $scanned_directory = array_diff( scandir( $uploads_dir[ 'path' ] ), ['..', '.'] );
 
-            foreach ($scanned_directory as $filename) {
+            foreach ( $scanned_directory as $filename ) {
                 $filepath = $uploads_dir[ 'path' ] . '/' . $filename;
                 $file = [
                     'file_name' => $filename,
@@ -586,23 +672,22 @@ class Contact extends Base_Object_With_Meta
     }
 
     /**
-     * Output a contact. Just give the email back
+     * Get the contact data as an array.
      *
-     * @return string
+     * @return array
      */
-	function __toString()
+    public function get_as_array()
     {
-        return $this->email;
+        return [ 'data' => $this->get_data(), 'meta' => $this->get_meta(), 'tags' => $this->get_tags(), 'files' => $this->get_associated_files() ];
     }
 
     /**
-     * Whether the contact is active in a certain funnel
+     * Output a contact. Just give the full name & email
      *
-     * @param $funnel_id
-     * @return bool
+     * @return string
      */
-    public function in_funnel( $funnel_id )
+	public function __toString()
     {
-        return WPGH()->events->count( array( 'funnel_id' => $funnel_id, 'contact_id' => $this->ID ) ) > 0;
+        return sprintf( "%s (%s)", $this->get_full_name(), $this->get_email() );
     }
 }

@@ -29,7 +29,7 @@ $wrapper = apply_filters( 'wpgh_email_wrapper_css', "
 	width: 100%; 
 	background-color: #FFFFFF;" );
 
-$template_container = apply_filters( 'wpgh_email_container_css', "
+$template_container = apply_filters( 'groundhogg/email/container_css', "
 	font-family: sans-serif; 
 	font-size: 14px; 
 	vertical-align: top; 
@@ -39,7 +39,7 @@ $template_container = apply_filters( 'wpgh_email_container_css', "
 	padding: 0px; " );
 
 $email_width = apply_filters( 'wpgh_email_width', 580 );
-$alignment = apply_filters( 'wpgh_email_alignment', 'center' );
+$alignment = apply_filters( 'groundhogg/email/alignment', 'center' );
 
 $template_content = apply_filters( 'wpgh_email_content_css', "
     box-sizing: border-box; 
@@ -89,14 +89,14 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
                         <div class="content" style="<?php echo $template_content; ?>">
 
                             <!-- PREHEADER -->
-                            <span class="preheader" style="<?php echo $preheader; ?>"><?php echo apply_filters( 'wpgh_email_pre_header_text', '' ); ?></span>
+                            <span class="preheader" style="<?php echo $preheader; ?>"><?php echo apply_filters( 'groundhogg/email/pre_header_text', '' ); ?></span>
                             <!-- /PREHEADER -->
 
                             <!-- BROWSER VIEW -->
-                            <?php if ( apply_filters( 'wpgh_email_browser_view', false ) ): ?>
+                            <?php if ( apply_filters( 'groundhogg/email/browser_view', false ) ): ?>
                                 <div class="header" style="text-align: center;margin-bottom: 25px;">
                                     <span class="apple-link" style="<?php echo $apple_link; ?>">
-                                        <a href="<?php echo esc_url_raw( apply_filters( 'wpgh_email_browser_link', site_url() ) ); ?>">
+                                        <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email/browser_link', site_url() ) ); ?>">
                                             <?php _e( apply_filters( 'gh_view_in_browser_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
                                         </a>
                                     </span>

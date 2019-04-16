@@ -1,4 +1,11 @@
 <?php
+namespace Groundhogg;
+
+use Groundhogg\DB\Broadcasts;
+use Groundhogg\DB\DB;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Broadcast
  *
@@ -11,125 +18,83 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Broadcast implements WPGH_Event_Process
+class Broadcast extends Base_Object implements Event_Process
 {
 
+    const TYPE_SMS = 'sms';
+    const TYPE_EMAIL = 'email';
+
+
     /**
-     * The ID of the broadcast
+     * Do any post setup actions.
      *
-     * @var int
+     * @return void
      */
-    public $ID;
-
-    /**
-     * The email the broadcast is supposed to send
-     *
-     * @var WPGH_Email|object
-     */
-    public $email;
-
-	/**
-	 * @var WPGH_SMS
-	 */
-    public $sms;
-
-	/**
-	 * @var WPGH_SMS|WPGH_Email
-	 */
-    public $object;
-
-	/**
-	 * @var int
-	 */
-    public $object_id;
-
-	/**
-	 * @var string
-	 */
-    public $object_type;
-
-    /**
-     * the time when the broadcast is to be sent
-     * @var int
-     */
-    public $send_time;
-
-    /**
-     * the ID of the person who scheduled the broadcast
-     *
-     * @var int
-     */
-    public $scheduled_by;
-
-    /**
-     * A list of tag IDs that the broadcast is being sent to
-     *
-     * @var array
-     */
-    public $tags;
-
-    /**
-     * The date created
-     *
-     * @var string
-     */
-    public $date_scheduled;
-
-    /**
-     * The current status of the broadcast...
-     *
-     * @var string
-     */
-    public $status;
-
-    /**
-     * WPGH_Broadcast constructor.
-     *
-     * @param $id int the ID of the broadcast record
-     */
-    public function __construct( $id )
+    protected function post_setup()
     {
-
-        $this->ID = intval( $id );
-
-        $broadcast = WPGH()->broadcasts->get_broadcast( $id );
-
-        $this->setup_broadcast( $broadcast );
-
+        // TODO: Implement post_setup() method.
     }
 
-	/**
+    /**
+     * Return the DB instance that is associated with items of this type.
+     *
+     * @return Broadcasts
+     */
+    protected function get_db()
+    {
+        return Plugin::$instance->dbs->get_db( 'broadcasts' );
+    }
+
+    /**
+     * A string to represent the object type
+     *
+     * @return string
+     */
+    protected function get_object_type()
+    {
+        return 'broadcast';
+    }
+
+    public function get_funnel_title()
+    {
+        return __( 'Broadcast Email', 'groundhogg' );
+    }
+
+    public function get_step_title()
+    {
+        return $this->get_title();
+    }
+
+    /**
 	 * @return string
 	 */
-    public function get_type()
+    public function get_broadcast_type()
     {
     	return $this->object_type;
     }
 
-	/**
+    /**
 	 * Whether the broadcast is sending an sms
 	 *
 	 * @return bool
 	 */
     public function is_sms()
     {
-        return $this->object_type === 'sms';
+        return $this->get_broadcast_type() === self::TYPE_SMS;
     }
 
-	/**
+    /**
 	 * Whether the broadcast is sending an email
 	 *
 	 * @return bool
 	 */
     public function is_email()
     {
-    	return $this->object_type === 'email';
+    	return $this->get_broadcast_type() === self::TYPE_EMAIL;
     }
 
-	/**
+
+    /**
 	 * Get the column row title for the broadcast.
 	 *
 	 * @return string
@@ -148,7 +113,6 @@ class WPGH_Broadcast implements WPGH_Event_Process
 	    }
 
     }
-
 
     /**
      * Setup the properties...
@@ -245,5 +209,4 @@ class WPGH_Broadcast implements WPGH_Event_Process
         return true;
 
     }
-
 }

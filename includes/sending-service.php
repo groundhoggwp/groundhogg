@@ -1,18 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: adria
- * Date: 2019-02-27
- * Time: 3:28 PM
- */
+namespace Groundhogg;
 
-class Groundhogg_Service_Manager
+use WP_Error;
+
+class Sending_Service
 {
-
-    /**
-     * Maximum length for
-     */
-    const MAX_LENGTH = 280;
 
     /**
      * List of errors.
@@ -21,9 +13,13 @@ class Groundhogg_Service_Manager
      */
     public $errors = [];
 
+    /**
+     * Sending_Service constructor.
+     */
     public function __construct()
     {
         $should_listen = get_transient( 'gh_listen_for_connect' );
+
         if ( $should_listen && is_admin() ){
         	add_action( 'init', array( $this, 'connect_email_api' ) );
         }
@@ -44,6 +40,27 @@ class Groundhogg_Service_Manager
         }
 
     }
+
+    public function has_api_token()
+    {
+        return;
+    }
+
+    public function is_active_for_email()
+    {
+
+    }
+
+    public function is_active_for_transactional_email()
+    {
+
+    }
+
+    public function is_active_for_sms()
+    {
+
+    }
+
 
     /**
      * Listen for option change for cron

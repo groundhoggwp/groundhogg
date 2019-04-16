@@ -1,17 +1,5 @@
 <?php
-
-/**
- * Template Loader
- *
- * Load templates
- *
- * @package     Includes
- * @author      Adrian Tobey <info@groundhogg.io>
- * @copyright   Copyright (c) 2018, Groundhogg Inc.
- * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
- */
-
+namespace Groundhogg;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -19,7 +7,9 @@ if ( ! class_exists( 'Gamajo_Template_Loader' ) ){
     require_once dirname( __FILE__ ) . '/lib/class-template-loader.php';
 }
 
-class WPGH_Template_Loader extends Gamajo_Template_Loader {
+use Gamajo_Template_Loader;
+
+class Template_Loader extends Gamajo_Template_Loader {
 
     /**
      * Prefix for filter names.
@@ -27,7 +17,7 @@ class WPGH_Template_Loader extends Gamajo_Template_Loader {
      * @since 1.0.0
      * @type string
      */
-    protected $filter_prefix = 'wpgh';
+    protected $filter_prefix = 'groundhogg';
 
     /**
      * Directory name where custom templates for this plugin should be found in the theme.
@@ -43,7 +33,6 @@ class WPGH_Template_Loader extends Gamajo_Template_Loader {
      * @since 1.0.0
      * @type string
      */
-    protected $plugin_directory = WPGH_PLUGIN_DIR;
-
+    protected $plugin_directory = GROUNDHOGG_PATH;
 
 }

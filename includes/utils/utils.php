@@ -4,14 +4,19 @@ namespace Groundhogg;
 class Utils
 {
     /**
-     * @var Locations
+     * @var Location_Utils
      */
-    public $locations;
+    public $location;
 
     /**
      * @var HTML
      */
     public $html;
+
+    /**
+     * @var Files
+     */
+    public $files;
 
     /**
      * @var Base_Object[]
@@ -41,24 +46,25 @@ class Utils
     public function __construct()
     {
 
-        $this->locations    = new Locations();
+        $this->location     = new Location_Utils();
         $this->html         = new HTML();
+        $this->files        = new Files();
 
     }
 
     /**
-     * Get an object from the cache or rtuent a new instance of the object.
+     * Get an object from the cache or return a new instance of the object.
      *
      * @param int $id
      * @param string|bool $by
-     * @param string $type
+     * @param string $object
      * @param bool $get_from_cache
      *
      * @return mixed|Base_Object
      */
-    public function get_object( $id = 0 , $by = 'ID' , $type = 'contact', $get_from_cache = true ){
+    public function get_object( $id = 0 , $by = 'ID' , $object = 'contact', $get_from_cache = true ){
 
-        $cache_key = md5(  $id . '|' . $by . '|' . $type );
+        $cache_key = md5(  $id . '|' . $by . '|' . $object );
 
         if ( $get_from_cache ){
             if (  key_exists( $cache_key, self::$object_cache ) ){
@@ -66,8 +72,8 @@ class Utils
             }
         }
 
-        $class = gisset_not_empty( self::$class_object_map[ $type ] ) ? self::$class_object_map[ $type ] : ucfirst( $type );
-        $class = apply_filters( 'groundhogg/utils/get_object', $class, $type );
+        $class = gisset_not_empty( self::$class_object_map[ $object ] ) ? self::$class_object_map[ $object ] : ucfirst( $object );
+        $class = apply_filters( 'groundhogg/utils/get_object', $class, $object );
 
         if ( ! $class ){
             return false;
@@ -98,6 +104,35 @@ class Utils
         return $this->get_object( $id_or_email, $by_user_id, 'contact', $get_from_cache );
     }
 
+    /**
+     * @param $id
+     * @param bool $get_from_cache
+     * @return Step
+     */
+    public function get_step( $id, $get_from_cache=true )
+    {
+        return $this->get_object( $id, 'ID', 'step', $get_from_cache );
+    }
+
+    /**
+     * @param $id
+     * @param bool $get_from_cache
+     * @return Event
+     */
+    public function get_event( $id, $get_from_cache=true )
+    {
+        return $this->get_object( $id, 'ID', 'event', $get_from_cache );
+    }
+
+    /**
+     * @param $id
+     * @param bool $get_from_cache
+     * @return Funnel
+     */
+    public function get_funnel( $id, $get_from_cache=true )
+    {
+        return $this->get_object( $id, 'ID', 'funnel', $get_from_cache );
+    }
 
 
 }
