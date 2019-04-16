@@ -90,6 +90,11 @@ class Plugin {
     public $replacements;
 
     /**
+     * @var Sending_Service
+     */
+    public $sending_service;
+
+    /**
      * Role Manager.
      *
      * Holds the plugin Role Manager
@@ -221,6 +226,7 @@ class Plugin {
         $this->scripts      = new Scripts();
         $this->settings     = new Settings();
         $this->replacements = new Replacements();
+        $this->sending_service = new Sending_Service();
 
         if ( is_admin() ) {
 

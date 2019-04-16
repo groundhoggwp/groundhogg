@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use WP_Error;
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -780,7 +782,7 @@ function wpgh_should_show_stats_collection()
  * @param $json
  * @return bool
  */
-function wpgh_is_json_error( $json ){
+function is_json_error( $json ){
     return isset( $json->code ) && isset( $json->message );
 }
 
@@ -790,7 +792,7 @@ function wpgh_is_json_error( $json ){
  * @param $json
  * @return bool|WP_Error
  */
-function wpgh_get_json_error( $json ){
+function get_json_error( $json ){
 
     if ( wpgh_is_json_error( $json ) ){
         return new WP_Error( $json->code, $json->message, $json->data );
@@ -1428,9 +1430,9 @@ add_filter( 'wp_mail_from_name', 'wpgh_sender_name' );
  * @param $name
  * @return string
  */
-function wpgh_sanitize_from_name( $name )
+function sanitize_from_name( $name )
 {
-    return sanitize_text_field( preg_replace( '/&#?[a-z0-9]+;/', '', $name ) );
+    return sanitize_text_field( preg_replace( '/[^A-z0-9 ]/', '', $name ) );
 }
 
 /* Pluggable functions */
