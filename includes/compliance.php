@@ -95,7 +95,8 @@ class Compliance
 
         switch ( $contact->get_optin_status() )
         {
-            case self::UNCONFIRMED:
+	        default:
+	        case self::UNCONFIRMED:
                 /* check for grace period if necessary */
                 if ( $this->is_confirmation_strict() ) {
                     if ( ! $this->is_in_grace_period( $contact->ID ) )
@@ -104,25 +105,22 @@ class Compliance
 
                 return true;
                 break;
-            case self::CONFIRMED:
+	        case self::CONFIRMED:
                 return true;
                 break;
-            case self::SPAM;
-            case self::COMPLAINED;
-            case self::HARD_BOUNCE;
-            case self::UNSUBSCRIBED:
+	        case self::SPAM;
+	        case self::COMPLAINED;
+	        case self::HARD_BOUNCE;
+	        case self::UNSUBSCRIBED:
                 return false;
                 break;
-            case self::WEEKLY:
+	        case self::WEEKLY:
                 $last_sent = $contact->get_meta( 'last_sent' );
                 return ( time() - intval( $last_sent ) ) > 7 * 24 * HOUR_IN_SECONDS;
                 break;
-            case self::MONTHLY:
+	        case self::MONTHLY:
                 $last_sent = $contact->get_meta( 'last_sent' );
                 return ( time() - intval( $last_sent ) ) > 30 * 24 * HOUR_IN_SECONDS;
-                break;
-            default:
-                return true;
                 break;
         }
     }
@@ -172,13 +170,13 @@ class Compliance
     /**
      * Return whether the given contact is within the strict confirmation grace period
      *
-     * @param $contact_id
+     * @param $id_or_email
      * @return bool
      */
-    public function is_in_grace_period( $contact_id )
+    public function is_in_grace_period( $id_or_email )
     {
 
-        $contact = wpgh_get_contact( $contact_id );
+        $contact = Plugin::instance()->utils->get_contact( $id_or_email );
 
         $grace = intval( wpgh_get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
 

@@ -5,6 +5,8 @@ namespace Groundhogg;
 // Exit if accessed directly
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
+use Groundhogg\DB\Tag_Relationships;
+use Groundhogg\DB\Tags;
 use WP_User;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -80,6 +82,26 @@ class Contact extends Base_Object_With_Meta
         return Plugin::instance()->dbs->get_db( 'contactmeta' );
     }
 
+	/**
+	 * Get the tags DB
+	 *
+	 * @return Tags
+	 */
+    protected function get_tags_db()
+    {
+    	return Plugin::instance()->dbs->get_db( 'tags' );
+    }
+
+	/**
+	 * Get the tag rel DB
+	 *
+	 * @return Tag_Relationships
+	 */
+    protected function get_tag_rel_db()
+    {
+    	return Plugin::instance()->dbs->get_db( 'tag_relationships' );
+    }
+
     /**
      * A string to represent the object type
      *
@@ -97,8 +119,18 @@ class Contact extends Base_Object_With_Meta
      */
     protected function post_setup()
     {
-        $this->tags = wp_parse_id_list( Plugin::instance()->dbs->get_db( 'tag_relationships' )->get_relationships( $this->ID ) );
+        $this->tags = wp_parse_id_list( $this->get_tag_rel_db()->get_relationships( $this->ID ) );
         $this->user = get_userdata( $this->get_user_id() );
+    }
+
+	/**
+	 * The contact ID
+	 *
+	 * @return int
+	 */
+    public function get_id()
+    {
+    	return absint( $this->ID );
     }
 
     /**
@@ -227,126 +259,6 @@ class Contact extends Base_Object_With_Meta
     }
 
     /**
-     * Get some contact meta
-     *
-     * @param $key
-     * @return mixed
-     */
-    public function get_meta( $key )
-    {
-
-        if ( key_exists( $key, $this->meta ) ){
-            return $this->meta[ $key ];
-        }
-
-        $val = WPGH()->contact_meta->get_meta( $this->ID, $key, true );
-
-        $this->meta[ $key ] = $val;
-
-        return $val;
-    }
-
-    /**
-     * Update some information about the contact
-     *
-     * @param $key
-     * @param $value
-     *
-     * @return mixed
-     */
-    public function update_meta( $key, $value )
-    {
-         if ( WPGH()->contact_meta->update_meta( $this->ID, $key, $value ) ){
-             $this->meta[ $key ] = $value;
-
-             return true;
-         }
-
-         return false;
-    }
-
-    /**
-     * Add some meta
-     *
-     * @param $key
-     * @param $value
-     *
-     * @return mixed
-     */
-    public function add_meta( $key, $value )
-    {
-        if ( WPGH()->contact_meta->add_meta( $this->ID, $key, $value ) ){
-            $this->meta[ $key ] = $value;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Delete some meta
-     *
-     * @param $key
-     * @return mixed
-     */
-    public function delete_meta( $key )
-    {
-        unset( $this->meta[$key] );
-        return WPGH()->contact_meta->delete_meta( $this->ID, $key );
-    }
-
-    /**
-     * Magic get method
-     *
-     * @param $key
-     * @return bool|mixed
-     */
-    public function __get( $key )
-    {
-        if ( property_exists( $this, $key ) ){
-
-            return $this->$key;
-
-        } elseif ( method_exists( $this, $key ) ) {
-
-            return call_user_func( array( $this, $key ) );
-
-        } else {
-
-            $exists = $this->get_meta( $key );
-
-            if ( $exists )
-                return $exists;
-
-        }
-
-        return false;
-    }
-
-
-    /**
-     * Set the data to the given value
-     *
-     * @param $key
-     * @param $value
-     */
-    public function __set( $key, $value )
-    {
-
-        if ( property_exists( $this, $key ) ) {
-
-            $this->$key = $value;
-
-        } else {
-
-            $this->update_meta( $key, $value );
-
-        }
-
-    }
-
-    /**
      * Wrapper function for add_tag to make it easier
      *
      * @param $tag_id_or_array
@@ -367,20 +279,14 @@ class Contact extends Base_Object_With_Meta
     {
 
         if ( ! is_array( $tag_id_or_array ) ){
-
             $tags = explode( ',', $tag_id_or_array );
-
         } else if( is_array( $tag_id_or_array ) ){
-
             $tags = $tag_id_or_array;
-
         } else {
-
             return false;
-
         }
 
-        $tags = WPGH()->tags->validate( $tags );
+        $tags = $this->get_tags_db()->validate( $tags );
 
         foreach ( $tags as $tag_id ) {
 
@@ -388,10 +294,10 @@ class Contact extends Base_Object_With_Meta
 
                 $this->tags[] = $tag_id;
 
-                $result = WPGH()->tag_relationships->add( $tag_id, $this->ID );
+                $result = $this->get_tag_rel_db()->add( $tag_id, $this->ID );
 
                 if ( $result ){
-                    do_action( 'wpgh_tag_applied', $this, $tag_id );
+                    do_action( 'groundhogg/contact/tag_applied', $this, $tag_id );
                 }
 
             }
@@ -419,7 +325,7 @@ class Contact extends Base_Object_With_Meta
             return false;
         }
 
-        $tags = WPGH()->tags->validate( $tags );
+        $tags = $this->get_tags_db()->validate( $tags );
 
         foreach ( $tags as $tag_id ) {
 
@@ -427,10 +333,10 @@ class Contact extends Base_Object_With_Meta
 
                 unset( $this->tags[ array_search( $tag_id, $this->tags ) ] );
 
-                $result = WPGH()->tag_relationships->delete( array( 'tag_id' => $tag_id, 'contact_id' => $this->ID ) );
+                $result = $this->get_tag_rel_db()->delete( [ 'tag_id' => $tag_id, 'contact_id' => $this->ID ] );
 
                 if ( $result ){
-                    do_action( 'wpgh_tag_removed', $this, $tag_id );
+                    do_action( 'groundhogg/contact/tag_removed', $this, $tag_id );
                 }
 
             }
