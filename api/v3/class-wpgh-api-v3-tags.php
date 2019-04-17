@@ -216,7 +216,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
             $response_tags[ $tag_id ] = WPGH()->tags->get_column_by( 'tag_name', 'tag_id', $tag_id );
         }
 
-        return self::SUCCESS_RESPONSE( [ 'tags' => $response_tags ] );
+        return self::SUCCESS_RESPONSE( [ 'tags' => $response_tags , "message" => "Tag added successfully!"] );
     }
 
     /**
@@ -249,7 +249,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
             return self::ERROR_UNKNOWN();
         }
 
-        return self::SUCCESS_RESPONSE();
+        return self::SUCCESS_RESPONSE( ["message"=> "Tag Updated Successfully!"]);
 
     }
 
