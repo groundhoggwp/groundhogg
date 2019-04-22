@@ -28,7 +28,6 @@ class WPGH_Column_Block extends WPGH_Email_Block
         $this->icon = WPGH_ASSETS_FOLDER . 'images/email-icons/spacer-block.png' ;
         $this->name = 'column';
         $this->title = __( 'Column', 'groundhogg' );
-//        wp_enqueue_script( 'wpgh-column-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/column.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/column.js' ) );
         parent::__construct();
     }
 

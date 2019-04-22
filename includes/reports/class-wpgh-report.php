@@ -6,10 +6,8 @@
  * Time: 3:24 PM
  */
 
-abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
+abstract class WPGH_Report
 {
-
-    protected static $js_flag = false;
     /**
      * @var int
      */
@@ -50,6 +48,9 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
      */
     protected $data = [];
 
+    protected $custom_start_time;
+    protected $custom_end_time;
+
     /**
      * A list of contacts that reporting widgets use.
      *
@@ -57,32 +58,69 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
      */
     protected static $contacts = null;
 
-    /**
-     * WPGH_Reporting_Widget constructor.
-     */
-    public function __construct()
+	/**
+	 * WPGH_Report constructor.
+	 *
+	 * @param string $range The time range to execute the report
+	 * @param int $start only works if range is custom.
+	 * @param int $end only works if range is custom
+	 */
+    public function __construct( $range = '', $start = 0, $end = 0 )
     {
-        $this->setup_range();
-        $this->setup_reporting_time();
+	    $this->setup_range( $range );
 
-        add_action( 'wp_ajax_wpgh_export_' . $this->wid, array( $this, 'export' ) );
+	    if ( $this->range === 'custom' ){
+		    $this->custom_start_time = $start;
+		    $this->custom_end_time = $end;
+	    }
 
-        parent::__construct();
+	    $this->setup_reporting_time();
     }
 
-    /**
-     * Output reporting args for a form if a refresh is necessary
-     */
-    protected function form_reporting_inputs()
+	/**
+     * Gets the report ID fro reference.
+     *
+	 * @return mixed string
+	 */
+    abstract public function get_report_id();
+
+	/**
+     * Setup the range from the supported ranges...
+     *
+	 * @param string $range
+	 */
+    protected function setup_range( $range = '' )
     {
-        printf( '<input type="hidden" value="%s" name="%s">', esc_attr( $this->range ), 'date_range' );
-        printf( '<input type="hidden" value="%s" name="%s" >', esc_attr( $this->get_url_var( 'custom_date_range_start' ) ), 'custom_date_range_start' );
-        printf( '<input type="hidden" value="%s" name="%s">', esc_attr( $this->get_url_var( 'custom_date_range_end' ) ), 'custom_date_range_end' );
+        if ( ! in_array( $range, self::get_ranges() ) ){
+            $range = 'this_week';
+        }
+
+        $this->range = $range;
     }
 
-    protected function setup_range()
+	/**
+	 * @param bool $keys_only
+	 *
+	 * @return array
+	 */
+    protected static function get_ranges( $keys_only = true )
     {
-        $this->range = $this->get_url_var( 'date_range', 'this_week' );
+        $ranges = [
+	        'today'         => _x( 'Today', 'reporting_range', 'groundhogg' ),
+	        'yesterday'     => _x( 'Yesterday', 'reporting_range', 'groundhogg' ),
+	        'this_week'     => _x( 'This Week', 'reporting_range', 'groundhogg' ),
+	        'last_week'     => _x( 'Last Week', 'reporting_range', 'groundhogg' ),
+	        'last_30'       => _x( 'Last 30 Days', 'reporting_range', 'groundhogg' ),
+	        'this_month'    => _x( 'This Month', 'reporting_range', 'groundhogg' ),
+	        'last_month'    => _x( 'Last Month', 'reporting_range', 'groundhogg' ),
+	        'this_quarter'  => _x( 'This Quarter', 'reporting_range', 'groundhogg' ),
+	        'last_quarter'  => _x( 'Last Quarter', 'reporting_range', 'groundhogg' ),
+	        'this_year'     => _x( 'This Year', 'reporting_range', 'groundhogg' ),
+	        'last_year'     => _x( 'Last Year', 'reporting_range', 'groundhogg' ),
+	        'custom'        => _x( 'Custom Range', 'reporting_range', 'groundhogg' ),
+        ];
+
+        return $keys_only ? array_keys( $ranges ) : $ranges;
     }
 
     /**
@@ -162,8 +200,8 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
                 $this->difference   = MONTH_IN_SECONDS;
                 break;
             case 'custom';
-                $this->start_time   = wpgh_round_to_day( strtotime( $this->get_url_var( 'custom_date_range_start' ) ) );
-                $this->end_time     = wpgh_round_to_day( strtotime( $this->get_url_var( 'custom_date_range_end' ) ) );
+                $this->start_time   = wpgh_round_to_day( $this->get_custom_start_date() );
+                $this->end_time     = wpgh_round_to_day( $this->get_custom_end_date() );
                 $range = $this->end_time - $this->start_time;
                 $this->points       = ceil( $range  / $this->get_time_diff( $range ) );
                 $this->difference   = $this->get_time_diff( $range );
@@ -172,6 +210,39 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
 
         $this->start_range = $this->start_time;
         $this->end_range = $this->start_range + $this->difference;
+    }
+
+	/**
+	 * @return false|int
+	 */
+    protected function get_custom_start_date()
+    {
+
+        if ( is_string( $this->custom_start_time ) ){
+            return strtotime( $this->custom_start_time );
+        }
+
+        if ( is_numeric( $this->custom_start_time ) ){
+            return absint( $this->custom_start_time );
+        }
+
+	    return strtotime( 'today' );
+    }
+
+	/**
+	 * @return false|int
+	 */
+    protected function get_custom_end_date()
+    {
+	    if ( is_string( $this->custom_end_time ) ){
+		    return strtotime( $this->custom_end_time );
+	    }
+
+	    if ( is_numeric( $this->custom_end_time ) ){
+		    return absint( $this->custom_end_time );
+	    }
+
+	    return strtotime( 'today' ) + DAY_IN_SECONDS;
     }
 
     /**
@@ -198,56 +269,12 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
     }
 
     /**
-     * @return array
-     */
-    protected function get_export_data()
-    {
-        return array();
-    }
-
-    /**
-     * Ajax function to get export data CSV format.
-     */
-    public function export()
-    {
-        if ( ! current_user_can( 'export_reports' ) ){
-            $response = _x( 'You cannot export reports!', 'notice', 'groundhogg' );
-            wp_die(  $response  );
-        }
-
-        $this->range = stripslashes( $_POST[ 'date_range' ] );
-        $this->setup_reporting_time();
-
-        $data = $this->get_export_data();
-        $response = is_array( $data ) ? json_encode( $data ) : $data;
-        wp_die( $response );
-    }
-
-    /**
-     * Output an export button that will export the report
-     */
-    protected function export_button()
-    {
-        if ( ! current_user_can( 'export_reports' ) ){
-            return;
-        }
-        ?>
-        <div class="export-button">
-            <hr>
-            <button id="<?php printf( 'export-%s', $this->wid ); ?>" type="button" class="export button button-secondary"><?php _ex( 'Export Report', 'action', 'groundhogg' ) ?></button>
-            <span class="spinner"></span>
-        </div>
-        <?php
-    }
-
-    /**
      * Get contacts from within the time range of the reporting widget.
      *
      * @return array|object|null
      */
     public function get_contacts_created_within_time_range()
     {
-
         if ( self::$contacts !== null ){
             return self::$contacts;
         }
@@ -258,7 +285,11 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
         $start_date = date('Y-m-d H:i:s', $this->start_time);
         $end_date = date('Y-m-d H:i:s', $this->end_time);
 
-        self::$contacts = $wpdb->get_results("SELECT ID FROM $table WHERE '$start_date' <= date_created AND date_created <= '$end_date'");
+        self::$contacts = $wpdb->get_results(
+                $wpdb->prepare(
+	                "SELECT ID FROM $table WHERE %s <= date_created AND date_created <= %s"
+                , $start_date, $end_date )
+        );
 
         return self::$contacts;
     }
@@ -271,9 +302,16 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
         return wp_parse_id_list( wp_list_pluck( $this->get_contacts_created_within_time_range() , 'ID' ) );
     }
 
+	/**
+     * Acts as a cache for reports that might perform similar meta queries
+     *
+	 * @var array
+	 */
 	public static $meta_query_results = [];
 
 	/**
+     * Queries the meta DB for distinct values of a mata key, in essence returning the various instances of meta_value
+     *
 	 * @param $meta_key
 	 *
 	 * @return array
@@ -297,7 +335,14 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
 		}
 
 		$table_name = WPGH()->contact_meta->table_name;
-		$results = wp_list_pluck( $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )", $meta_key ) ), 'meta_value' );
+		$results = wp_list_pluck(
+		        $wpdb->get_results(
+		                $wpdb->prepare(
+		                        "SELECT DISTINCT meta_value FROM $table_name WHERE meta_key = %s AND contact_id IN ( $ids )",
+                                $meta_key
+                        )
+                ), 'meta_value'
+        );
 
 		self::$meta_query_results[ $cache_key ] = $results;
 
@@ -305,6 +350,8 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
 	}
 
 	/**
+     * Retrieves the number of times a meta value for a particular meta key exists
+     *
 	 * @param string $meta_key
 	 * @param string $meta_value
 	 *
@@ -321,7 +368,12 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
 		}
 
 		$table_name = WPGH()->contact_meta->table_name;
-		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(meta_id) FROM {$table_name} WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( {$this->get_id_list_string()} )", $meta_key, $meta_value ) );
+		$count = $wpdb->get_var(
+		        $wpdb->prepare(
+		                "SELECT COUNT(meta_id) FROM {$table_name} WHERE meta_key = %s AND meta_value = %s AND contact_id IN ( {$this->get_id_list_string()} )",
+                        $meta_key, $meta_value
+                )
+        );
 
 		self::$meta_query_results[ $cache_key ] = $count;
 
@@ -347,7 +399,10 @@ abstract class WPGH_Reporting_Widget extends WPGH_Dashboard_Widget
     }
 
 	/**
+     * Get the actual data for the report. Some sort of formatted array....
+     * Implementation is left up to the user.
+     *
 	 * @return array
 	 */
-    protected function get_data(){ return []; }
+    abstract protected function get_data();
 }

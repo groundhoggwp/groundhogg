@@ -67,6 +67,8 @@ class WPGH_Upgrade{
         $this->update_to_version( '1.2.6' );
         $this->update_to_version( '1.2.10.3' );
         $this->update_to_version( '1.3' );
+        $this->update_to_version( '1.3.5' );
+        $this->update_to_version( '1.3.9' );
     }
 
     /**
@@ -264,5 +266,22 @@ class WPGH_Upgrade{
     {
         wpgh_update_option( 'gh_optin_status_job', true );
         WPGH()->status_tag_mapper->install_default_tags();
+    }
+
+	/**
+	 * install other caps.
+	 */
+    public function version_1_3_5()
+    {
+		WPGH()->roles->add_caps();
+    }
+
+	/**
+	 * Add new tracking rewrite rules.
+	 */
+    public function version_1_3_9()
+    {
+    	WPGH()->tracking->add_rewrite_rules();
+    	flush_rewrite_rules();
     }
 }

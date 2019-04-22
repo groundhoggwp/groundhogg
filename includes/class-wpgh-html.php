@@ -30,6 +30,7 @@ class WPGH_HTML
         add_action( 'wp_ajax_gh_get_tags', array( $this, 'gh_get_tags' ) );
         add_action( 'wp_ajax_gh_get_benchmarks', array( $this, 'gh_get_benchmarks' ) );
         add_action( 'wp_ajax_gh_get_meta_keys', array( $this, 'get_meta_keys' ) );
+        add_action( 'wp_ajax_gh_get_pages', array( $this, 'get_pages' ) );
 
     }
 
@@ -512,7 +513,8 @@ class WPGH_HTML
 
         wp_enqueue_script( 'select2' );
         wp_enqueue_style( 'select2' );
-        wp_enqueue_script( 'wpgh-admin-js' );
+        wp_enqueue_style( 'groundhogg-admin' );
+        wp_enqueue_script( 'groundhogg-admin' );
 
         return apply_filters( 'wpgh_html_select2', $html, $args );
 
@@ -925,10 +927,10 @@ class WPGH_HTML
         if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
             wp_die( 'No access to contacts.' );
 
-        $json = array();
 
         $data = WPGH()->contact_meta->get_keys();
 
+        $json = array();
         foreach ( $data as $i => $key ) {
 
             $json[] = array(
@@ -968,6 +970,67 @@ class WPGH_HTML
         }
 
         return $this->select2( $a );
+    }
+
+    /**
+     * Get a meta key picker. useful for searching.
+     *
+     * @param array $args
+     * @return string
+     */
+	public function page_picker( $args=array() ){
+        $a = wp_parse_args( $args, array(
+            'name'              => 'page',
+            'id'                => 'page',
+            'class'             => 'gh-page-picker',
+            'data'              => array(),
+            'selected'          => array(),
+            'multiple'          => false,
+            'placeholder'       => __( 'Please select a page', 'groundhogg' ),
+            'tags'              => false,
+        ) );
+
+        foreach ( $a[ 'selected' ] as $key ){
+
+            $a[ 'data' ][ $key ] = get_the_title( absint( $key ) );
+
+        }
+
+        return $this->select2( $a );
+    }
+
+    /**
+     * Return a list of pages.
+     */
+    public function get_pages()
+    {
+        if ( ! current_user_can( 'manage_options' ) ){
+            wp_send_json_error();
+        }
+
+        $pages = get_posts( array(
+            'numberposts'   => -1,
+            'category'      => 0,
+            'orderby'       => 'post_title',
+            'order'         => 'ASC',
+            'include'       => array(),
+            'exclude'       => array(),
+            'meta_key'      => '',
+            'meta_value'    => '',
+            'post_type'     => 'page',
+            'suppress_filters' => true
+        ) );
+
+        $json = array();
+        foreach ( $pages as $i => $page ) {
+            $json[] = array(
+                'id' => $page->ID,
+                'text' => $page->post_title
+            );
+        }
+
+        $results = array( 'results' => $json, 'more' => false );
+        wp_send_json( $results );
     }
 
     /**
@@ -1083,7 +1146,8 @@ class WPGH_HTML
         ) );
 
         wp_enqueue_media();
-        wp_enqueue_script('gh-media-picker', WPGH_ASSETS_FOLDER . 'js/admin/media-picker.min.js', filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/media-picker.min.js' ) );
+        wp_enqueue_style('groundhogg-admin' );
+        wp_enqueue_script('groundhogg-admin-media-picker' );
 
         return $html;
     }
@@ -1104,6 +1168,7 @@ class WPGH_HTML
             'value' => '',
             'attributes' => '',
             'placeholder' => __( 'Start typing...', 'groundhogg' ),
+            'autocomplete' => false,
             'required' => false
         ) );
 
@@ -1111,22 +1176,25 @@ class WPGH_HTML
             $a[ 'required' ] = 'required';
         }
 
+        $a[ 'autocomplete' ] = $a[ 'autocomplete' ] ? 'on' : 'off';
+
         $html = sprintf(
-            "<input type='%s' id='%s' class='%s gh-link-picker' name='%s' value='%s' placeholder='%s' %s %s>",
+            "<input type='%s' id='%s' class='%s gh-link-picker' name='%s' value='%s' placeholder='%s' autocomplete='%s' %s %s>",
             esc_attr( $a[ 'type'    ] ),
             esc_attr( $a[ 'id'      ] ),
             esc_attr( $a[ 'class'   ] ),
             esc_attr( $a[ 'name'    ] ),
             esc_attr( $a[ 'value'   ] ),
             esc_attr( $a[ 'placeholder' ] ),
+            esc_attr( $a[ 'autocomplete' ] ),
             $a[ 'attributes'  ],
             $a[ 'required'  ]
         );
 
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( 'jquery-ui-autocomplete' );
-        wp_enqueue_script( 'wpgh-admin-js' );
-
+        wp_enqueue_style( 'groundhogg-admin' );
+        wp_enqueue_script( 'groundhogg-admin' );
 
         return apply_filters( 'wpgh_html_link_picker', $html, $args );
     }
@@ -1161,13 +1229,14 @@ class WPGH_HTML
 		    esc_attr( $a[ 'id' ] )
 	    );
 
-	    return $bar;
+        wp_enqueue_style( 'groundhogg-admin' );
+
+        return $bar;
     }
 
     public function toggle( $args=[] )
     {
         $a = shortcode_atts( array(
-            'label'         => '',
             'name'          => '',
             'id'            => '',
             'class'         => '',
@@ -1181,6 +1250,8 @@ class WPGH_HTML
 
         $css = sprintf( "<style>#%s-switch .onoffswitch-inner:before {content: \"%s\";}
 #%s-switch .onoffswitch-inner:after {content: \"%s\";}</style>",esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'on' ] ), esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'off' ] ) );
+
+        wp_enqueue_style( 'groundhogg-admin' );
 
         return sprintf("%s<div id=\"%s-switch\" class=\"onoffswitch %s\" style=\"text-align: left\">
                         <input type=\"checkbox\" id=\"%s\" name=\"%s\" class=\"onoffswitch-checkbox %s\" value=\"%s\" %s>

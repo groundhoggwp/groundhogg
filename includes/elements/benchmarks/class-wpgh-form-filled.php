@@ -69,8 +69,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
      */
     public function scripts()
     {
-        wp_enqueue_script( 'wpgh-form-builder', WPGH_ASSETS_FOLDER . 'js/admin/form-builder.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/form-builder.min.js' ) );
-        //wp_localize_script('wpgh-form-builder', 'ajax_object',array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1233 ) );
+        wp_enqueue_script( 'groundhogg-admin-form-builder' );
     }
 
     /**

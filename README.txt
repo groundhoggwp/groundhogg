@@ -105,6 +105,31 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.9 =
+* TWEAKED Page pickers on settings page are now ajax powered to avoid extraneous get_posts() call.
+* TWEAKED tracking links, link click benchmarks, and Superlinks now use re-write rules to perform redirects rather than checking the REQUEST_URI.
+* FIXED Loading form integration when Elementor PRO is not installed.
+
+= 1.3.8 =
+* FIXED Status toggles inheriting incorrect CSS labels.
+* FIXED not adding new emails from Custom Email templates.
+* FIXED Report meta query only using source_page as meta key.
+
+= 1.3.7 =
+* ADDED extra nonce to frontend form impression checks to ensure request is intentional.
+* ADDED extra nonce to frontend page view checks to ensure request is intentional.
+* ADDED option to include full or minified files.
+* FIXED v2 Elementor integration conflict
+* FIXED v2 Elementor integration script inclusion.
+
+= 1.3.6 =
+* Just a notification to prompt users to update to plugin with resolved vulnerabilities.
+
+= 1.3.5 =
+* ADDED local images to assets/images
+* FIXED remote code execution (RCE) vulnerability (https://www.pluginvulnerabilities.com/2019/04/05/our-proactive-monitoring-caught-an-authenticated-remote-code-execution-rce-vulnerability-being-introduced-in-to-groundhogg/)
+* REMOVED Extraneous jQuery library.
+
 = 1.3.4 =
 * FIXED Fixed the new Elementor integration which was disabled in 1.3.1. Elementor Integration now supports complex field mapping.
 

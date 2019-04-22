@@ -138,13 +138,15 @@ class WPGH_Admin_Menu
         require_once dirname( __FILE__ ). '/admin/welcome/class-wpgh-welcome-page.php';
         require_once dirname( __FILE__ ). '/admin/guided-setup/class-wpgh-guided-setup.php';
         require_once dirname( __FILE__ ). '/admin/bulk-jobs/class-wpgh-admin-bulk-job.php';
-//        require_once dirname( __FILE__ ). '/admin/import/class-wpgh-admin-import.php';
-//        require_once dirname( __FILE__ ). '/admin/export/class-wpgh-admin-export.php';
         require_once dirname( __FILE__ ). '/admin/tools/class-wpgh-admin-tools.php';
     }
 
     public function current_page()
     {
+        if ( ! is_admin() ){
+            return false;
+        }
+
         if ( isset( $_GET['page'] ) ){
             return $_GET['page'];
         }

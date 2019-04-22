@@ -30,7 +30,7 @@ class WPGH_HTML_Block extends WPGH_Email_Block
         $this->name = 'html';
         $this->title = __( 'HTML', 'groundhogg' );
 
-        wp_enqueue_script( 'wpgh-html-block', WPGH_ASSETS_FOLDER . 'js/admin/email-blocks/html.min.js', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/email-blocks/html.min.js' ) );
+        wp_enqueue_script( 'groundhogg-email-html' );
 
         parent::__construct();
 

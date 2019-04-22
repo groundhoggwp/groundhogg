@@ -204,6 +204,43 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             ]
         ]);
 
+        register_rest_route('gh/v3', '/contacts/notes', [
+            [
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => [ $this, 'get_notes' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'id_or_email' => [
+                        'required'    => true,
+                        'description' => _x('The ID or email of the contact you want to apply tags to.','api','groundhogg'),
+                    ],
+                    'by_user_id' => [
+                        'required'    => false,
+                        'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
+                    ]
+                ]
+            ],
+            [
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => [ $this, 'add_note' ],
+                'permission_callback' => $auth_callback,
+                'args'=> [
+                    'id_or_email' => [
+                        'required'    => true,
+                        'description' => _x('The ID or email of the contact you want to apply tags to.','api','groundhogg'),
+                    ],
+                    'by_user_id' => [
+                        'required'    => false,
+                        'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
+                    ],
+                    'note' => [
+                        'required'    => true,
+                        'description' => _x( 'the note text you wish to add.', 'api', 'groundhogg' ),
+                    ]
+                ]
+            ]
+        ]);
+
     }
 
     /**
@@ -499,7 +536,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
      * Remove tags from a contact
      *
      * @param WP_REST_Request $request
-     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     * @return WP_Error|WP_REST_Response
      */
     public function remove_tags( WP_REST_Request $request )
     {
@@ -524,6 +561,58 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
 
         return self::SUCCESS_RESPONSE();
 
+    }
+
+    /**
+     * Get the note
+     *
+     * @param WP_REST_Request $request
+     * @return WP_Error|WP_REST_Response
+     */
+    public function get_notes( WP_REST_Request $request )
+    {
+        if ( ! current_user_can( 'view_contacts' ) ) {
+            return self::ERROR_INVALID_PERMISSIONS();
+        }
+
+        $contact = self::get_contact_from_request( $request );
+
+        if( is_wp_error( $contact ) ) {
+            return $contact;
+        }
+
+        $notes = $contact->get_meta( 'notes' );
+
+        return self::SUCCESS_RESPONSE( [ 'notes' => $notes ] );
+    }
+
+    /**
+     * Add a note to the contact.
+     *
+     * @param WP_REST_Request $request
+     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     */
+    public function add_note( WP_REST_Request $request )
+    {
+        if ( ! current_user_can( 'edit_contacts' ) ) {
+            return self::ERROR_INVALID_PERMISSIONS();
+        }
+
+        $contact = self::get_contact_from_request( $request );
+
+        if( is_wp_error( $contact ) ) {
+            return $contact;
+        }
+
+        $note = $request->get_param( 'note' );
+
+        if ( ! $contact->add_note( $note ) ){
+            return self::ERROR_403( 'bad_note', 'Could not add the given note.' );
+        }
+
+        $notes = $contact->get_meta( 'notes' );
+
+        return self::SUCCESS_RESPONSE( [ 'notes' => $notes ] );
     }
 
 }

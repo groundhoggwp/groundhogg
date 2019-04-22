@@ -510,58 +510,6 @@ function wpgh_view_email_in_browser()
 add_action( 'template_redirect', 'wpgh_view_email_in_browser' );
 
 /**
- * Register frontend scripts.
- */
-function wpgh_register_frontend_scripts()
-{
-    wp_register_style( 'jquery-ui', WPGH_ASSETS_FOLDER . 'lib/jquery-ui/jquery-ui.min.css' );
-}
-
-add_action( 'wp_enqueue_scripts', 'wpgh_register_frontend_scripts' );
-
-/**
- * Register popular admin js and CSS for use throughout gourndhogg.
- */
-function wpgh_register_scripts()
-{
-    wp_register_style( 'jquery-ui', WPGH_ASSETS_FOLDER . 'lib/jquery-ui/jquery-ui.min.css' );
-    wp_register_style( 'select2',   WPGH_ASSETS_FOLDER . 'lib/select2/css/select2.min.css' );
-    wp_register_style( 'gh-admin',   WPGH_ASSETS_FOLDER . 'css/admin/admin.css', array(), filemtime( WPGH_PLUGIN_DIR . 'assets/css/admin/admin.css' ));
-
-    wp_enqueue_style( 'gh-admin' );
-
-    wp_register_script( 'select2',  WPGH_ASSETS_FOLDER . 'lib/select2/js/select2.full.js'   , array( 'jquery' ) );
-    wp_register_script( 'wpgh-admin-js',   WPGH_ASSETS_FOLDER . 'js/admin/admin.min.js', array( 'jquery', 'select2', 'jquery-ui-autocomplete' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/admin/admin.min.js' ) );
-
-    if ( ! wpgh_is_option_enabled( 'gh_disable_api' ) ){
-
-        /* Load improved picker request urls */
-        wp_localize_script( 'wpgh-admin-js', 'gh_admin_object', [
-            'tags_endpoint' => site_url( 'wp-json/gh/v3/tags?select2=true' ),
-            'emails_endpoint' => site_url( 'wp-json/gh/v3/emails?select2=true' ),
-            'sms_endpoint' => site_url( 'wp-json/gh/v3/sms?select2=true' ),
-            'contacts_endpoint' => site_url( 'wp-json/gh/v3/contacts?select2=true' ),
-            'nonce' => wp_create_nonce( 'wp_rest' ),
-            '_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' )
-        ] );
-    } else {
-
-        /* Backwards compat */
-        wp_localize_script( 'wpgh-admin-js', 'gh_admin_object', [
-            'tags_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_tags' ),
-            'emails_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_emails' ),
-            'sms_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_sms' ),
-            'contacts_endpoint' => admin_url( 'admin-ajax.php?action=gh_get_contacts' ),
-            'nonce' => wp_create_nonce( 'admin_ajax' ),
-            '_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' )
-        ] );
-    }
-
-}
-
-add_action( 'admin_enqueue_scripts', 'wpgh_register_scripts' );
-
-/**
  * Add a link to the FB group in the admin footer.
  *
  * @param $text

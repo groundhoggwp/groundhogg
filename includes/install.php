@@ -181,6 +181,9 @@ function wpgh_run_install() {
 
     WPGH()->status_tag_mapper->install_default_tags();
 
+    WPGH()->tracking->add_rewrite_rules();
+    flush_rewrite_rules();
+
     update_option( 'wpgh_version', WPGH_VERSION );
 
     // Avoid trying to update from previous versions.

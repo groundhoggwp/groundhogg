@@ -154,7 +154,7 @@ if ( count( $custom_templates ) > 0 ){
                     <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $id; ?> " class="email-container postbox">
                         <?php echo $email_args->content; ?>
                     </div>
-                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email->ID; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email_args->ID; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
                     <a class="button-secondary" href="<?php printf( admin_url( 'admin.php?page=gh_emails&action=edit&email=%d' ), $email_args->ID ); ?>"><?php _e( 'Edit Template', 'groundhogg' ); ?></a>
                 </div>
             </div>

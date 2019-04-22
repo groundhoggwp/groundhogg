@@ -108,53 +108,131 @@ class WPGH_Tracking
     public function __construct()
     {
 
-        if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/click' ) !== false ){
+    	add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 
-            add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
-            add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
-            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
-            add_action( 'template_redirect', array( $this, 'email_link_clicked' ) );
-            $this->doing_click = true;
+	    add_action( 'init', [ $this, 'deconstruct_cookie' ] );
+	    add_action( 'init', [ $this, 'extract_from_login' ] );
+	    add_action( 'init', [ $this, 'parse_utm' ] );
+	    add_action( 'init', [ $this, 'setup_url_vars' ] );
 
-        } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/link/click' ) !== false ){
-
-            add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
-            add_action( 'plugins_loaded', array( $this, 'extract_from_login' ) );
-            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
-            add_action( 'template_redirect', array( $this, 'link_clicked' ) );
-            $this->doing_click = true;
-
-        } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-tracking/email/open' ) !== false  ) {
-
-            add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
-            add_action( 'plugins_loaded', array( $this, 'setup_url_vars' ) );
-            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
-            add_action( 'init', array( $this, 'email_opened' ) );
-            $this->doing_open = true;
-
-        } else if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-confirmation/via/email' ) !== false ) {
-
-            add_action( 'plugins_loaded', array( $this, 'fix_tracking_ssl' ) );
-            add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
-            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
-            add_action( 'init', array( $this, 'email_confirmed' ) );
-            $this->doing_confirmation = true;
-
-        } else {
-
-            add_action( 'plugins_loaded', array( $this, 'deconstruct_cookie' ) );
-            add_action( 'plugins_loaded', array( $this, 'extract_from_login' ) );
-            add_action( 'plugins_loaded', array( $this, 'parse_utm' ) );
-
-            if ( isset( $_COOKIE[ 'gh_referer' ] ) ) {
-                $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referer' ] );
-            }
-
-        }
+	    add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
+	    add_action( 'template_redirect', [ $this, 'do_tracking_redirect' ] );
+	    add_action( 'template_redirect', [ $this, 'do_confirmation_redirect' ] );
+	    add_action( 'template_redirect', [ $this, 'do_superlink_redirect' ] );
 
         add_action( 'groundhogg/submission/after', array( $this, 'form_filled' ), 10, 3 );
 
     }
+
+	/**
+	 * Adds the rewrite rules for tracking.
+	 */
+    public function add_rewrite_rules()
+    {
+    	add_rewrite_rule( 'gh-tracking/([^/]*)/([^/]*)', 'index.php?tracking=true&tracking_via=$matches[1]&tracking_action=$matches[2]', 'top' );
+    	add_rewrite_rule( 'gh-confirmation/[^/]*/([^/]*)', 'index.php?confirmation=true&confirmation_via=$matches[1]', 'top' );
+    	add_rewrite_rule( 'superlinks/link/([^/]*)', 'index.php?superlink=true&superlink_id=$matches[1]', 'top' );
+    }
+
+	/**
+	 * Add the query vars.
+	 *
+	 * @param $vars
+	 * @return array
+	 */
+	public function add_query_vars( $vars )
+	{
+		// Tracking vars
+		$vars[] = 'tracking';
+		$vars[] = 'tracking_via';
+		$vars[] = 'tracking_action';
+
+		// Confirmation vars
+		$vars[] = 'confirmation';
+		$vars[] = 'confirmation_via';
+
+		// Superlinks
+		$vars[] = 'superlink';
+		$vars[] = 'superlink_id';
+
+		return $vars;
+	}
+
+	/**
+	 * Do a tracking redirect during the template_redirect hook
+	 */
+    public function do_tracking_redirect()
+    {
+	    $tracking = get_query_var( 'tracking' );
+
+	    if ( ! $tracking )
+	    	return;
+
+	    $tracking_via = get_query_var( 'tracking_via' );
+	    $tracking_action = get_query_var( 'tracking_action' );
+
+	    switch ( $tracking_via ){
+		    case 'link':
+
+				$this->link_clicked();
+
+	            break;
+		    case 'email':
+		    	switch ( $tracking_action ){
+				    case 'open':
+				    	$this->doing_open = true;
+				    	$this->email_opened();
+				    	break;
+				    case 'click':
+				    	$this->doing_click = true;
+				    	$this->email_link_clicked();
+				    	break;
+			    }
+
+		    	break;
+	    }
+
+    }
+
+	/**
+	 * Do a confirmation redirect during the template redirect function
+	 */
+    public function do_confirmation_redirect()
+    {
+	    $confirmation = get_query_var( 'confirmation' );
+
+	    if ( ! $confirmation )
+	    	return;
+
+	    $this->email_confirmed();
+    }
+
+    /**
+     * do a superlink and then redirect to the target
+     */
+    public function do_superlink_redirect()
+    {
+        $superlink = get_query_var( 'superlink' );
+
+        if ( ! $superlink || ! $this->contact ){
+            return;
+        }
+
+        $superlink_id = absint( get_query_var( 'superlink_id' ) );
+        $link = WPGH()->superlinks->get_superlink( $superlink_id );
+
+        if ( ! $link ){
+            return;
+        }
+
+        $tags = maybe_unserialize( $link->tags );
+        $this->contact->apply_tag( wp_parse_id_list( $tags ) );
+
+        $target = esc_url_raw( WPGH()->replacements->process( $link->target, $this->contact->ID ) );
+        wp_redirect( $target );
+        die();
+    }
+
 
     /**
      * For some reason emails are being sent out with http instead of https...
@@ -178,6 +256,10 @@ class WPGH_Tracking
      */
     public function setup_url_vars()
     {
+	    $ref = gisset_not_empty( $_REQUEST, 'ref' ) ? esc_url_raw( urldecode( $_REQUEST[ 'ref' ] ) ) : site_url() ;
+	    $uid = gisset_not_empty( $_REQUEST, 'u' ) ? hexdec( $_REQUEST[ 'u' ] ) : 0;
+	    $eid = gisset_not_empty( $_REQUEST, 'e' ) ? hexdec( $_REQUEST[ 'e' ] ) : 0;
+	    $iid = gisset_not_empty( $_REQUEST, 'i' ) ? hexdec( $_REQUEST[ 'i' ] ) : 0;
 
         if ( isset( $_REQUEST[ 'u' ] ) )
         {
@@ -190,42 +272,31 @@ class WPGH_Tracking
 
         }
 
-        if ( isset( $_REQUEST[ 'e' ] ) )
-        {
-            $eid = hexdec( $_REQUEST[ 'e' ] );
-
-            $event = WPGH()->events->get( $eid );
-
-            if ( is_object( $event ) ){
-                $this->event = new WPGH_Event( $event->ID );
-
-                if ( ! $this->event->funnel_id !== WPGH_BROADCAST ){
-                    $this->funnel = WPGH()->funnels->get( $event->funnel_id );
-                }
-
-                $this->step   = wpgh_get_funnel_step( $event->step_id );
-            }
+        if ( $uid ){
+        	$this->contact = wpgh_get_contact( $uid );
         }
 
-        if ( isset( $_REQUEST[ 'i' ] ) )
-        {
-            $eid = hexdec( $_REQUEST[ 'i' ] );
+        if ( $eid ){
+	        $event = WPGH()->events->get( $eid );
+	        if ( is_object( $event ) ){
+		        $this->event = new WPGH_Event( $event->ID );
+		        if ( ! $this->event->funnel_id !== WPGH_BROADCAST ){
+			        $this->funnel = WPGH()->funnels->get( $event->funnel_id );
+		        }
+		        $this->step = wpgh_get_funnel_step( $event->step_id );
+	        }
+        }
 
-            $email = WPGH()->emails->get( $eid );
+        if ( $iid ) {
+            $email = WPGH()->emails->get( $iid );
 
             if ( is_object( $email ) && ! empty( $email ) ){
                 $this->email = new WPGH_Email( $email->ID );
             }
         }
 
-
-        if ( isset( $_REQUEST[ 'ref' ] ) ) {
-            $this->ref = esc_url_raw( urldecode( $_REQUEST[ 'ref' ] ) );
-            $this->ref = str_replace( 'amp;', '', $this->ref );
-
-            if ( empty( $this->ref ) ){
-                $this->ref = site_url();
-            }
+        if ( $ref ) {
+            $this->ref = str_replace( 'amp;', '', $ref );
         }
 
     }
@@ -274,9 +345,6 @@ class WPGH_Tracking
 
         }
 
-//        var_dump( $cookie );
-//        wp_die();
-//
         $cookie = json_encode( $cookie );
         $cookie = wpgh_encrypt_decrypt( $cookie, 'e' );
 
@@ -300,14 +368,16 @@ class WPGH_Tracking
      */
     public function deconstruct_cookie()
     {
+
+        if ( isset( $_COOKIE[ 'gh_referer' ] ) ) {
+            $this->lead_source = esc_url_raw( $_COOKIE[ 'gh_referer' ] );
+        }
+
         if ( ! isset( $_COOKIE[ self::COOKIE ] ) )
             return false;
 
         $cookie = wpgh_encrypt_decrypt( $_COOKIE[ self::COOKIE ], 'd' );
         $cookie = json_decode( $cookie );
-
-//        var_dump( $cookie );
-//        wp_die( );
 
         if ( isset( $cookie->contact ) ){
             $this->contact  = wpgh_get_contact( $cookie->contact );
@@ -394,8 +464,8 @@ class WPGH_Tracking
 
         } else {
 
-            if ( isset( $_GET[ 'key' ] ) ){
-                return sanitize_text_field( stripslashes( urldecode( $_GET[ $key ] ) ) );
+            if ( gisset_not_empty( $_REQUEST, $key ) ){
+                return sanitize_text_field( wp_unslash( urldecode( $_GET[ $key ] ) ) );
             }
 
         }
@@ -414,7 +484,7 @@ class WPGH_Tracking
         if ( wp_doing_ajax() ){
             return strpos( wp_get_referer(),'utm_' ) !== false;
         } else {
-            $query = implode( '|', array_keys( $_GET ) );
+            $query = implode( '|', array_keys( $_REQUEST ) );
             return strpos( $query,'utm_' ) !== false;
         }
     }
@@ -645,17 +715,20 @@ class WPGH_Tracking
 
         $step = wpgh_get_funnel_step( $step_id );
 
+        if ( ! $step )
+        	return;
+
         if ( $this->get_contact() ){
             do_action( 'wpgh_link_clicked', $step, $this->get_contact() );
-            do_action( 'groundhogg/tracking/becnhmark_link/click', $step, $this->get_contact() );
+            do_action( 'groundhogg/tracking/benchmark_link/click', $step, $this->get_contact() );
             $redirect_to = WPGH()->replacements->process( $step->get_meta( 'redirect_to' ), $this->get_contact()->ID );
 
-            /* Check unsub page */
-            if ( wpgh_is_global_multisite() ){
-                switch_to_blog( get_site()->site_id );
-            }
+	        if ( wpgh_is_global_multisite() ){
+		        switch_to_blog( get_site()->site_id );
+	        }
 
-            $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
+	        /* Check unsub page */
+	        $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
             if ( $redirect_to === $unsub_page ){
                 $redirect_to = sprintf( '%s?u=%s', $unsub_page, dechex( $this->contact->ID ) );
             }

@@ -69,13 +69,14 @@ add_shortcode( 'gh_replacements', 'wpgh_merge_replacements_shortcode' );
 function wpgh_contact_replacement_shortcode( $atts )
 {
 	$a = shortcode_atts( array(
-		'field' => 'first'
+		'field' => 'first',
+        'default' => 'Friend'
 	), $atts );
 
     $contact = WPGH()->tracking->get_contact();
 
 	if ( ! $contact )
-		return __( 'Friend', 'groundhogg' );
+		return __( $a[ 'default' ], 'groundhogg' );
 
 	$content = sprintf( '{%s}', $a[ 'field' ] );
 
@@ -298,8 +299,7 @@ function wpgh_get_browser_html_content()
  */
 function wpgh_view_in_browser_shortcode()
 {
-
-    wp_enqueue_script( 'wpgh-email', WPGH_PLUGIN_URL . 'assets/js/email.min.js', array( 'jquery' ), filemtime( WPGH_PLUGIN_DIR . 'assets/js/email.min.js' ), true );
+    wp_enqueue_script( 'groundhogg-email-iframe' );
 
     ob_start();
     ?>

@@ -302,6 +302,16 @@ class WPGH_Roles {
         return apply_filters( 'wpgh_report_caps', $caps );
     }
 
+    public function get_other_caps()
+    {
+	    $caps = array(
+		    'perform_bulk_actions',
+	    );
+
+	    return apply_filters( 'wpgh_other_caps', $caps );
+    }
+
+
     /**
      * Returns a list of all the caps added by GH
      */
@@ -316,7 +326,8 @@ class WPGH_Roles {
             $this->get_superlink_caps(),
             $this->get_tag_caps(),
             $this->get_report_caps(),
-            $this->get_sms_caps()
+            $this->get_sms_caps(),
+            $this->get_other_caps()
         );
 
         return $caps;
