@@ -374,7 +374,7 @@ class WPGH_Form
             'class'         => 'gh-first-name',
             'value'         => '',
             'placeholder'   => '',
-            'attributes'    => 'pattern="[A-Za-z \-\']+"',
+            'attributes'    => 'pattern="^[\w\pL\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$"',
             'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
             'required'      => false,
         ), $atts );
@@ -393,21 +393,13 @@ class WPGH_Form
     public function last_name( $atts )
     {
         $a = shortcode_atts( array(
-            'type'          => 'text',
             'label'         => _x( 'Last Name *', 'form_default', 'groundhogg' ),
             'name'          => 'last_name',
             'id'            => 'last_name',
             'class'         => 'gh-last-name',
-            'value'         => '',
-            'placeholder'   => '',
-            'attributes'    => 'pattern="[A-Za-z \-\']+"',
-            'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
-            'required'      => false,
         ), $atts );
 
-        $this->config[ $a[ 'name' ] ] = $a ;
-
-        return $this->input_base( $a );
+        return $this->first_name( $a );
     }
 
     /**

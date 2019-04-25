@@ -151,7 +151,6 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
 
             if ( strpos( $send_to, ',' ) !== false ){
                 $emails = array_map( 'trim', explode( ',', $send_to ) );
-
                 $sanitized_emails = array();
 
                 foreach ( $emails as $email ){
@@ -159,26 +158,19 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
                 }
 
                 $send_to = implode( ',', $sanitized_emails );
-
             } else {
-
                 $send_to = ( $send_to === '{owner_email}' )? '{owner_email}' : sanitize_email( $send_to );
-
             }
 
             $step->update_meta( 'send_to', $send_to );
         }
 
         if ( isset( $_POST[ $step->prefix( 'subject' ) ] ) ){
-
             $step->update_meta( 'subject', sanitize_text_field( $_POST[  $step->prefix( 'subject' ) ] ) );
-
         }
 
         if ( isset( $_POST[ $step->prefix( 'note_text' ) ] ) ){
-
             $step->update_meta( 'note_text', sanitize_textarea_field( $_POST[  $step->prefix( 'note_text' ) ] ) );
-
         }
 
     }
@@ -198,7 +190,10 @@ class WPGH_Admin_Notification extends WPGH_Funnel_Step
 
         $finished_note = sanitize_textarea_field( WPGH()->replacements->process( $note, $event->contact->ID ) );
 
-        $finished_note .= apply_filters( 'the_content', sprintf( "\n\n%s: %s", __( 'Manage Contact', 'groundhogg' ), admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $event->contact->ID  ) ) );
+        $finished_note .= sprintf( "\n\n======== %s ========\nEdit: %s\nReply: %s", __( 'Manage Contact', 'groundhogg' ),
+            admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->ID  ),
+            $contact->email
+        );
 
         $subject = $event->step->get_meta('subject' );
         $subject = sanitize_text_field(  WPGH()->replacements->process( $subject, $event->contact->ID ) );
