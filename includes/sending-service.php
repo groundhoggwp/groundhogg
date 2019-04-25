@@ -29,7 +29,7 @@ class Sending_Service
         	add_action( 'groundhogg/sending_service/verify_domain', [ $this, 'check_verification_status' ] );
         }
 
-        if ( $this->get_dns_records() ){
+        if ( $this->has_dns_records() ){
             add_action( 'groundhogg/settings/email/after_settings', [ $this, 'show_dns_in_settings' ] );
         }
 
@@ -73,6 +73,16 @@ class Sending_Service
     public function get_dns_records()
     {
         return Plugin::$instance->settings->get_option( 'email_api_dns_records' );
+    }
+
+    /**
+     * Has Aws Records
+     *
+     * @return bool
+     */
+    public function has_dns_records()
+    {
+        return (bool) $this->get_dns_records();
     }
 
     /**

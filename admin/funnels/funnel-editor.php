@@ -229,7 +229,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         </table>
                         <?php do_action( 'wpgh_benchmark_icons_after' ); ?>
                         <p>
-                            <?php echo esc_html__( 'Benchmarks start and stop automation elements for a contact.','groundhogg' ); ?>
+                            <?php echo esc_html__( 'Benchmarks start and stop automation steps for a contact.','groundhogg' ); ?>
                         </p>
                     </div>
                 </div>

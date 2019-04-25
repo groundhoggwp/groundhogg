@@ -1,10 +1,10 @@
-/* Flot plugin for drawing all elements of a plot on the canvas.
+/* Flot plugin for drawing all steps of a plot on the canvas.
 
 Copyright (c) 2007-2014 IOLA and Ole Laursen.
 Licensed under the MIT license.
 
-Flot normally produces certain elements, like axis labels and the legend, using
-HTML elements. This permits greater interactivity and customization, and often
+Flot normally produces certain steps, like axis labels and the legend, using
+HTML steps. This permits greater interactivity and customization, and often
 looks better, due to cross-browser canvas text inconsistencies and limitations.
 
 It can also be desirable to render the plot entirely in canvas, particularly
@@ -64,7 +64,7 @@ browser, but needs to redraw with canvas text when exporting as an image.
 			var context = this.context,
 				cache = this._textCache;
 
-			// For each text layer, render elements marked as active
+			// For each text layer, render steps marked as active
 
 			context.save();
 			context.textBaseline = "middle";

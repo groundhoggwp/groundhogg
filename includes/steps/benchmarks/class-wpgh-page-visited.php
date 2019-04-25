@@ -50,7 +50,7 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
         parent::__construct();
 
         add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
-        add_action( 'groundhogg/api/v3/elements/page-view', array( $this, 'complete' ), 10, 2 );
+        add_action( 'groundhogg/api/v3/steps/page-view', array( $this, 'complete' ), 10, 2 );
 
         /* Backwards compat */
         if ( wpgh_is_option_enabled( 'gh_disable_api' ) ){

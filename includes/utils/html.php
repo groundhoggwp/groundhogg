@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * HTML
  *
- * Helper class for reusable html markup. Mostly input elements and form elements.
+ * Helper class for reusable html markup. Mostly input steps and form steps.
  *
  * @package     Includes
  * @author      Adrian Tobey <info@groundhogg.io>
@@ -16,6 +16,30 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class HTML
 {
+
+    const INPUT             = 'input';
+    const NUMBER            = 'number';
+    const BUTTON            = 'button';
+    const TOGGLE            = 'toggle';
+    const CHECKBOX          = 'checkbox';
+    const MODAL_LINK        = 'modal_link';
+    const RANGE             = 'range';
+    const TEXTAREA          = 'textarea';
+    const ROUND_ROBIN       = 'round_robin';
+    const SELECT2           = 'select2';
+    const TAG_PICKER        = 'tag_picker';
+    const FONT_PICKER       = 'font_picker';
+    const DATE_PICKER       = 'date_picker';
+    const LINK_PICKER       = 'link_picker';
+    const COLOR_PICKER      = 'color_picker';
+    const IMAGE_PICKER      = 'image_picker';
+    const BENCHMARK_PICKER  = 'benchmark_picker';
+    const META_KEY_PICKER   = 'meta_key_picker';
+    const DROPDOWN          = 'dropdown';
+    const DROPDOWN_CONTACTS = 'dropdown_contacts';
+    const DROPDOWN_EMAILS   = 'dropdown_emails';
+    const DROPDOWN_OWNERS   = 'dropdown_owners';
+    const DROPDOWN_SMS      = 'dropdown_sms';
 
 	/**
      * WPGH_HTML constructor.
@@ -32,13 +56,67 @@ class HTML
         add_action( 'wp_ajax_gh_get_meta_keys',  [ $this, 'ajax_get_meta_keys' ] );
     }
 
+    /**
+     * Start a form table cuz we use LOTS of those!!!
+     *
+     * @param array $args
+     */
+    public function start_form_table( $args=[] )
+    {
+        $args = wp_parse_args( $args, [
+            'title' => '',
+            'class' => ''
+        ] );
+
+        if ( ! empty( $args[ 'title' ] ) ){
+            ?><h3><?php echo $args[ 'title' ]; ?></h3><?php
+        }
+        ?>
+<table class="form-table <?php esc_attr_e( $args[ 'class' ] ) ?>">
+    <tbody>
+<?php
+    }
+
+    /**
+     * Add a form table row
+     *
+     * @param array $args
+     */
+    public function add_form_control( $args=[] )
+    {
+        $args = wp_parse_args( $args, [
+            'label' => '',
+            'type' => self::INPUT,
+            'attrs' => [],
+            'description' => ''
+        ] );
+
+        if ( ! method_exists( $this, $args[ 'type' ] ) ){
+            return;
+        }
+
+        ?>
+        <tr class="form-row">
+            <th><?php echo $args[ 'label' ]; ?></th><td><?php echo call_user_func( [ $this, $args[ 'type' ] ], $args[ 'attrs' ] );
+        if ( ! empty( $args[ 'description' ] ) ){
+            ?><p class="description"><?php echo $args[ 'description' ]; ?></p><?php
+        } ?></td>
+        </tr>
+        <?php
+    }
+
+    public function end_form_table()
+    {
+        ?></tbody></table><?php
+    }
+
 	/**
 	 * Output a simple input field
 	 *
 	 * @param $args
 	 * @return string
 	 */
-	public function input( $args )
+	public function input( $args=[] )
 	{
 		$a = wp_parse_args( $args, array(
 			'type'  => 'text',
@@ -76,7 +154,7 @@ class HTML
 	 * @param $args
 	 * @return string
 	 */
-	public function number( $args )
+	public function number( $args=[] )
 	{
 
 		$a = wp_parse_args( $args, array(
@@ -115,7 +193,7 @@ class HTML
 	 *
 	 * @return string
 	 */
-	public function button($args )
+	public function button( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'type'      => 'button',
@@ -148,7 +226,7 @@ class HTML
 	 *
 	 * @return string
 	 */
-	public function checkbox( $args )
+	public function checkbox( $args=[] )
 	{
 		$a = shortcode_atts( array(
 			'label'         => '',
@@ -186,7 +264,7 @@ class HTML
 	 *
 	 * @return mixed|void
 	 */
-    public function modal_link( $args = array() )
+    public function modal_link( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'title'     => 'Modal',
@@ -226,7 +304,7 @@ class HTML
      * @param $args
      * @return string
      */
-    public function range( $args )
+    public function range( $args=[] )
     {
 
         $a = wp_parse_args( $args, array(
@@ -264,7 +342,7 @@ class HTML
      * @param $args
      * @return string
      */
-    public function textarea( $args )
+    public function textarea( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'  => '',
@@ -299,7 +377,7 @@ class HTML
      * @param $args
      * @return string
      */
-    public function dropdown( $args )
+    public function dropdown( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'              => '',
@@ -365,7 +443,7 @@ class HTML
      * @param $args
      * @return string
      */
-    public function dropdown_owners( $args=array() )
+    public function dropdown_owners( $args=[] )
     {
 
         $a = wp_parse_args( $args, array(
@@ -399,7 +477,7 @@ class HTML
      *
      * @return string
      */
-    public function round_robin( $args=array() )
+    public function round_robin( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'              => 'round_robin',
@@ -441,7 +519,7 @@ class HTML
      *
      * @return string
      */
-    public function select2( $args )
+    public function select2( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'              => '',
@@ -538,7 +616,7 @@ class HTML
      * @param $args
      * @return string
      */
-    public function tag_picker( $args )
+    public function tag_picker( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'              => 'tags[]',
@@ -577,7 +655,7 @@ class HTML
      * @param $args
      * @return string HTML
      */
-    public function date_picker( $args )
+    public function date_picker( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'  => '',
@@ -586,8 +664,8 @@ class HTML
             'value' => '',
             'attributes' => '',
             'placeholder' => '',
-            'min-date' => date( 'Y-m-d', wpgh_convert_to_local_time( strtotime( 'today' ) ) ),
-            'max-date' => date( 'Y-m-d', wpgh_convert_to_local_time( strtotime( '+100 years' ) ) ),
+            'min-date' => date( 'Y-m-d', strtotime( 'today' ) ),
+            'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
             'format' => 'yy-mm-dd'
         ) );
 
@@ -617,7 +695,7 @@ class HTML
      * @param $args
      * @return string
      */
-    public function dropdown_contacts( $args )
+    public function dropdown_contacts( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'              => 'contact_id',
@@ -652,7 +730,7 @@ class HTML
      * @param $args
      * @return string
      */
-    public function dropdown_emails( $args )
+    public function dropdown_emails( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'              => 'email_id',
@@ -680,125 +758,36 @@ class HTML
     }
 
 
-	/**
-	 * Get json email results for email picker
-	 */
-	public function ajax_get_sms()
-	{
-
-		$query_args=[];
-
-		if ( ! is_user_logged_in() || ! current_user_can( 'edit_sms' ) )
-			wp_die( 'No access to sms.' );
-
-		if ( isset(  $_REQUEST[ 'q' ] ) ){
-			$query_args[ 'search' ] = $_REQUEST[ 'q' ];
-		}
-
-		$data = WPGH()->sms->get_smses( $query_args );
-
-		$json = array();
-
-		foreach ( $data as $i => $sms ) {
-
-			$json[] = array(
-				'id' => $sms->ID,
-				'text' => $sms->title
-			);
-
-		}
-
-		$results = array( 'results' => $json, 'more' => false );
-
-		wp_die( json_encode( $results ) );
-	}
-
-	/**
+    /**
 	 * Return the html for an email picker
 	 *
 	 * @param $args
 	 * @return string
 	 */
-	public function dropdown_sms( $args )
+	public function dropdown_sms( $args=[] )
 	{
 		$a = wp_parse_args( $args, array(
 			'name'              => 'sms_id',
 			'id'                => 'sms_id',
 			'class'             => 'gh-sms-picker',
-			'data'              => array(),
-			'selected'          => array(),
+			'data'              => [],
+			'selected'          => [],
 			'multiple'          => false,
 			'placeholder'       => __( 'Please select an SMS', 'groundhogg' ),
 			'tags'              => false,
 		) );
 
 		foreach ( $a[ 'selected' ] as $sms_id ){
-
-			if ( WPGH()->sms->exists( $sms_id ) ){
-
-				$email =  WPGH()->sms->get( $sms_id );
-				$a[ 'data' ][ $sms_id ] = $email->title;
-
+			if ( Plugin::$instance->dbs->get_db( 'sms' )->exists( $sms_id ) ){
+				$sms = Plugin::$instance->dbs->get_db( 'sms' )->get( $sms_id );
+				$a[ 'data' ][ $sms_id ] = $sms->title;
 			}
-
 		}
 
 		return $this->select2( $a );
 	}
 
-	/**
-	 * Get json email results for email picker
-	 */
-	public function ajax_get_benchmarks()
-	{
-
-		if ( ! is_user_logged_in() || ! current_user_can( 'edit_funnels' ) )
-			wp_die( 'No access to benchmarks.' );
-
-		if ( isset(  $_REQUEST[ 'q' ] ) ){
-			$query_args[ 'search' ] = $_REQUEST[ 'q' ];
-		}
-
-		$query_args[ 'step_group' ] = 'benchmark';
-		$data = WPGH()->steps->get_steps( $query_args );
-
-		$json = array();
-
-		foreach ( $data as $i => $step ) {
-
-            $step = wpgh_get_funnel_step( $step->ID );
-
-            if ( $step->is_active() ){
-
-                $funnel_name = WPGH()->funnels->get_column_by( 'title', 'ID', $step->funnel_id );
-
-                if ( isset( $json[ $funnel_name ] ) ){
-                    $json[ $funnel_name ][ 'children' ][] = array(
-                        'text' => sprintf( '%d. %s (%s)', $step->order, $step->title, str_replace( '_', ' ', $step->type ) ),
-                        'id'   => $step->ID
-                    );
-                } else {
-                    $json[ $funnel_name ] = array(
-                        'text' => $funnel_name,
-                        'children' => array(
-                            array(
-                                'text' => sprintf( '%d. %s (%s)', $step->order, $step->title, str_replace( '_', ' ', $step->type ) ),
-                                'id'   => $step->ID
-                            )
-                        )
-                    );
-                }
-
-            }
-
-		}
-
-		$results = array( 'results' => array_values( $json ), 'more' => false );
-
-		wp_die( json_encode( $results ) );
-	}
-
-	/**
+    /**
 	 * Returns a picker for benchmarks.
 	 * Included in core so that we don't need to include it in every extension we write.
 	 *
@@ -806,29 +795,27 @@ class HTML
 	 *
 	 * @return string
 	 */
-	public function benchmark_picker( $args=array() )
+	public function benchmark_picker( $args=[] )
 	{
 
 		$a = wp_parse_args( $args, array(
 			'name'              => 'benchmarks[]',
 			'id'                => 'benchmarks',
 			'class'             => 'gh-benchmark-picker',
-			'data'              => array(),
-			'selected'          => array(),
+			'data'              => [],
+			'selected'          => [],
 			'multiple'          => true,
-			'placeholder'       => __( 'Please select 1 or more benchmarks', 'groundhogg' ),
+			'placeholder'       => __( 'Please select one or more benchmarks', 'groundhogg' ),
 			'tags'              => false,
 		) );
 
-//		$data = array();
-
 		foreach ( $a[ 'selected' ] as $benchmark_id ){
 
-		    $step = wpgh_get_funnel_step( $benchmark_id );
+		    $step = Plugin::$instance->utils->get_step( $benchmark_id );
 
-			if ( WPGH()->steps->exists( $benchmark_id ) && $step->is_active() ){
-                $funnel_name = WPGH()->funnels->get_column_by( 'title', 'ID', $step->funnel_id );
-                $a[ 'data' ][ $funnel_name ][ $step->ID ] = sprintf( "%d. %s (%s)", $step->order, $step->title, str_replace( '_', ' ', $step->type ) );
+			if ( $step ){
+                $funnel_name = $step->get_funnel_title();
+                $a[ 'data' ][ $funnel_name ][ $step->ID ] = sprintf( "%d. %s (%s)", $step->get_order(), $step->get_title(), str_replace( '_', ' ', $step->get_type() ) );
 			}
 
 		}
@@ -836,38 +823,13 @@ class HTML
 		return $this->select2( $a );
 	}
 
-	/**
-     * Returns a select 2 compatible json object with contact data meta keys
-     */
-	public function ajax_get_meta_keys(){
-        if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
-            wp_die( 'No access to contacts.' );
-
-        $json = array();
-
-        $data = WPGH()->contact_meta->get_keys();
-
-        foreach ( $data as $i => $key ) {
-
-            $json[] = array(
-                'id' => $key,
-                'text' => $key
-            );
-
-        }
-
-        $results = array( 'results' => $json, 'more' => false );
-
-        wp_die( json_encode( $results ) );
-    }
-
-	/**
+    /**
      * Get a meta key picker. useful for searching.
      *
      * @param array $args
      * @return string
      */
-	public function meta_key_picker( $args=array() ){
+	public function meta_key_picker( $args=[] ){
         $a = wp_parse_args( $args, array(
             'name'              => 'key',
             'id'                => 'key',
@@ -888,13 +850,13 @@ class HTML
         return $this->select2( $a );
     }
 
-	/**
+    /**
      * Return HTML for a color picker
      *
      * @param $args
      * @return string
      */
-    public function color_picker( $args )
+    public function color_picker( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'      => '',
@@ -916,13 +878,13 @@ class HTML
         return apply_filters( 'groundhogg/html/color_picker', $html, $args );
     }
 
-	/**
+    /**
      * This is for use withing the email editor.
      *
      * @param $args
      * @return string
      */
-    public function font_picker( $args )
+    public function font_picker( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'name'      => '',
@@ -953,13 +915,13 @@ class HTML
 
     }
 
-	/**
+    /**
      * Image picker, maimly for use by the email editor
      *
      * @param $args
      * @return string
      */
-    public function image_picker( $args )
+    public function image_picker( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'id'        => '',
@@ -1006,13 +968,13 @@ class HTML
         return apply_filters( 'groundhogg/html/image_picker', $html, $a );
     }
 
-	/**
+    /**
      * Autocomplete link picker
      *
      * @param $args
      * @return string
      */
-    public function link_picker( $args )
+    public function link_picker( $args=[] )
     {
         $a = wp_parse_args( $args, array(
             'type'  => 'text',
@@ -1053,7 +1015,7 @@ class HTML
         return apply_filters( 'groundhogg/html/link_picker', $html, $args );
     }
 
-	/**
+    /**
 	 * Output a progress bar.
 	 *
 	 * @param $args
@@ -1087,7 +1049,7 @@ class HTML
         return apply_filters( 'groundhogg/html/progress_bar', $bar, $a );
     }
 
-	/**
+    /**
 	 * Output a styled toggle switch.
 	 *
 	 * @param array $args
@@ -1134,23 +1096,30 @@ class HTML
 	    return apply_filters( 'groundhogg/html/toggle', $html, $a );
     }
 
-	/**
+    /**
+     * Send a json response in the format for a select2 picker
+     *
+     * @param array $data
+     */
+    public function send_picker_response( $data = [] )
+    {
+        $results = [ 'results' => $data, 'more' => false ];
+        wp_send_json( $results );
+    }
+
+    /**
 	 * Get json tag results for tag picker
 	 */
 	public function ajax_get_tags()
 	{
 		if ( ! is_user_logged_in() || ! current_user_can( 'manage_tags' ) )
-			wp_die( 'No access to tags.' );
+            wp_send_json_error();
 
 		$value = isset( $_REQUEST[ 'q' ] ) ? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
 
-		if ( empty( $value ) ){
-			$tags = WPGH()->tags->get_tags();
-		} else {
-			$tags = WPGH()->tags->search( $value );
-		}
+        $tags = Plugin::$instance->dbs->get_db( 'tags' )->search( $value );
 
-		$json = array();
+		$json = [];
 
 		foreach ( $tags as $i => $tag ) {
 
@@ -1161,22 +1130,20 @@ class HTML
 
 		}
 
-		$results = array( 'results' => $json, 'more' => false );
-
-		wp_send_json( $results );
+		$this->send_picker_response( $json );
 	}
 
-	/**
+    /**
 	 * Get json contact results for contact picker
 	 */
 	public function ajax_get_contacts()
 	{
 		if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
-			wp_die( 'No access to contacts.' );
+            wp_send_json_error();
 
 		$value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
 
-		$contacts = WPGH()->contacts->search( $value );
+		$contacts = Plugin::$instance->dbs->get_db( 'contacts' )->search( $value );
 
 		$json = array();
 
@@ -1189,33 +1156,21 @@ class HTML
 
 		}
 
-		$results = array( 'results' => $json, 'more' => false );
+        $this->send_picker_response( $json );
+    }
 
-		wp_send_json( $results );
-	}
-
-	/**
+    /**
 	 * Get json email results for email picker
 	 */
 	public function ajax_get_emails()
 	{
-
 		if ( ! is_user_logged_in() || ! current_user_can( 'edit_emails' ) )
-			wp_die( 'No access to emails.' );
+            wp_send_json_error();
 
-		if ( isset(  $_REQUEST[ 'q' ] ) ){
-			$query_args[ 'search' ] = $_REQUEST[ 'q' ];
-		}
+        $value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
+        $data = Plugin::$instance->dbs->get_db( 'emails' )->search( $value );
 
-		$query_args[ 'status' ] = 'ready';
-		$data = WPGH()->emails->get_emails( $query_args );
-
-		$query_args[ 'status' ] = 'draft';
-		$data2 = WPGH()->emails->get_emails( $query_args );
-
-		$data = array_merge( $data, $data2 );
-
-		$json = array();
+		$json = [];
 
 		foreach ( $data as $i => $email ) {
 
@@ -1226,9 +1181,102 @@ class HTML
 
 		}
 
-		$results = array( 'results' => $json, 'more' => false );
-
-		wp_send_json( $results );
+        $this->send_picker_response( $json );
 	}
+
+    /**
+     * Get json email results for email picker
+     */
+    public function ajax_get_sms()
+    {
+        if ( ! is_user_logged_in() || ! current_user_can( 'edit_sms' ) )
+            wp_send_json_error();
+
+        $value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
+        $data = Plugin::$instance->dbs->get_db( 'sms' )->search( $value );
+
+        $json = array();
+
+        foreach ( $data as $i => $sms ) {
+
+            $json[] = array(
+                'id' => $sms->ID,
+                'text' => $sms->title
+            );
+
+        }
+
+        $this->send_picker_response( $json );
+    }
+
+    /**
+     * Returns a select 2 compatible json object with contact data meta keys
+     */
+    public function ajax_get_meta_keys()
+    {
+        if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) )
+            wp_send_json_error();
+
+        $json = [];
+
+        $data = Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys();
+
+        foreach ( $data as $i => $key ) {
+
+            $json[] = array(
+                'id' => $key,
+                'text' => $key
+            );
+
+        }
+
+        $this->send_picker_response( $json );
+    }
+
+    /**
+     * Get json email results for email picker
+     */
+    public function ajax_get_benchmarks()
+    {
+
+        if ( ! is_user_logged_in() || ! current_user_can( 'edit_funnels' ) )
+            wp_send_json_error();
+
+        $value = isset( $_REQUEST[ 'q' ] )? sanitize_text_field( $_REQUEST[ 'q' ] ) : '';
+        $data = Plugin::$instance->dbs->get_db( 'steps' )->search( $value );
+
+        $json = array();
+
+        foreach ( $data as $i => $step ) {
+
+            $step = Plugin::$instance->utils->get_step( absint( $step->ID ) );
+
+            if ( $step->is_active() ){
+
+                $funnel_name = $step->get_funnel_title();
+
+                if ( isset( $json[ $funnel_name ] ) ){
+                    $json[ $funnel_name ][ 'children' ][] = [
+                        'text' => sprintf( '%d. %s (%s)', $step->get_order(), $step->get_title(), str_replace( '_', ' ', $step->get_type() ) ),
+                        'id'   => $step->ID
+                    ];
+                } else {
+                    $json[ $funnel_name ] = array(
+                        'text' => $funnel_name,
+                        'children' => [
+                            [
+                                'text' => sprintf( '%d. %s (%s)', $step->get_order(), $step->get_title(), str_replace( '_', ' ', $step->get_type() ) ),
+                                'id'   => $step->ID
+                            ]
+                        ]
+                    );
+                }
+
+            }
+
+        }
+
+        $this->send_picker_response( $json );
+    }
 
 }

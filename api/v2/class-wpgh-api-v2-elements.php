@@ -26,7 +26,7 @@ class WPGH_API_V2_ELEMENTS extends WPGH_API_V2_BASE
 
     public function register_routes()
     {
-        register_rest_route('gh/v2', '/elements/page-view', array(
+        register_rest_route('gh/v2', '/steps/page-view', array(
             array(
                 // By using this constant we ensure that when the WP_REST_Server changes, our readable endpoints will work as intended.
                 'methods' => WP_REST_Server::EDITABLE,
@@ -35,7 +35,7 @@ class WPGH_API_V2_ELEMENTS extends WPGH_API_V2_BASE
             )
         ));
 
-        register_rest_route('gh/v2', '/elements/form-impression', array(
+        register_rest_route('gh/v2', '/steps/form-impression', array(
             array(
                 // By using this constant we ensure that when the WP_REST_Server changes, our readable endpoints will work as intended.
                 'methods' => WP_REST_Server::EDITABLE,
@@ -62,7 +62,7 @@ class WPGH_API_V2_ELEMENTS extends WPGH_API_V2_BASE
             return new WP_Error( 'no_ref', 'Cannot track blank pages...', [ 'status' => 400 ]  );
         }
 
-        do_action( 'groundhogg/api/v2/elements/page-view', $ref, $contact );
+        do_action( 'groundhogg/api/v2/steps/page-view', $ref, $contact );
 
         return rest_ensure_response( [
             'status' => 'success'

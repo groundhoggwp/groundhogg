@@ -194,8 +194,8 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
     /**
      * Get an associative array ( option_name => option_title ) with the list
-     * of bulk elements available on this table.
-     * @return array An associative array containing all the bulk elements.
+     * of bulk steps available on this table.
+     * @return array An associative array containing all the bulk steps.
      */
     protected function get_bulk_actions() {
         $actions = array(
@@ -476,7 +476,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
      * @param object $contact        Contact being acted upon.
      * @param string $column_name Current column name.
      * @param string $primary     Primary column name.
-     * @return string Row elements output for posts.
+     * @return string Row steps output for posts.
      */
     protected function handle_row_actions( $contact, $column_name, $primary ) {
         if ( $primary !== $column_name ) {

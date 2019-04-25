@@ -52,7 +52,7 @@ if (!document.createElement('canvas').getContext) {
   var IE_VERSION = +navigator.userAgent.match(/MSIE ([\d.]+)?/)[1];
 
   /**
-   * This funtion is assigned to the <canvas> elements as element.getContext().
+   * This funtion is assigned to the <canvas> steps as element.getContext().
    * @this {HTMLElement}
    * @return {CanvasRenderingContext2D_}
    */
@@ -116,14 +116,14 @@ if (!document.createElement('canvas').getContext) {
   var G_vmlCanvasManager_ = {
     init: function(opt_doc) {
       var doc = opt_doc || document;
-      // Create a dummy element so that IE will allow canvas elements to be
+      // Create a dummy element so that IE will allow canvas steps to be
       // recognized.
       doc.createElement('canvas');
       doc.attachEvent('onreadystatechange', bind(this.init_, this, doc));
     },
 
     init_: function(doc) {
-      // find all canvas elements
+      // find all canvas steps
       var els = doc.getElementsByTagName('canvas');
       for (var i = 0; i < els.length; i++) {
         this.initElement(els[i]);
@@ -133,7 +133,7 @@ if (!document.createElement('canvas').getContext) {
     /**
      * Public initializes a canvas element so that it can be used as canvas
      * element from now on. This is called automatically before the page is
-     * loaded but if you are creating elements using createElement you need to
+     * loaded but if you are creating steps using createElement you need to
      * make sure this is called on the element.
      * @param {HTMLElement} el The canvas element to initialize.
      * @return {HTMLElement} the element that was created.
@@ -146,7 +146,7 @@ if (!document.createElement('canvas').getContext) {
         addNamespacesAndStylesheet(el.ownerDocument);
 
         // Remove fallback content. There is no way to hide text nodes so we
-        // just remove all childNodes. We could hide all elements and remove
+        // just remove all childNodes. We could hide all steps and remove
         // text nodes but who really cares about the fallback content.
         el.innerHTML = '';
 

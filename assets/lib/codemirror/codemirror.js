@@ -2188,8 +2188,8 @@
     lineView.changes = null;
   }
 
-  // Lines with gutter elements, widgets or a background class need to
-  // be wrapped, and have the extra elements added to the wrapper div
+  // Lines with gutter steps, widgets or a background class need to
+  // be wrapped, and have the extra steps added to the wrapper div
   function ensureLineWrapped(lineView) {
     if (lineView.node == lineView.text) {
       lineView.node = elt("div", null, null, "position: relative");
@@ -3541,7 +3541,7 @@
     if (cm.display.scroller.scrollTop != val) { cm.display.scroller.scrollTop = val; }
   }
 
-  // Sync scroller and scrollbar, ensure the gutter elements are
+  // Sync scroller and scrollbar, ensure the gutter steps are
   // aligned.
   function setScrollLeft(cm, val, isScroller, forceScroll) {
     val = Math.min(val, cm.display.scroller.scrollWidth - cm.display.scroller.clientWidth);
@@ -4330,7 +4330,7 @@
     }
 
     var view = display.view, lineN = display.viewFrom;
-    // Loop over the elements in the view, syncing cur (the DOM nodes
+    // Loop over the steps in the view, syncing cur (the DOM nodes
     // in display.lineDiv) with the view as we go.
     for (var i = 0; i < view.length; i++) {
       var lineView = view[i];
@@ -4367,7 +4367,7 @@
     cm.display.gutters.style.height = (measure.docHeight + cm.display.barHeight + scrollGap(cm)) + "px";
   }
 
-  // Rebuild the gutter elements, ensure the margin to the left of the
+  // Rebuild the gutter steps, ensure the margin to the left of the
   // code matches their width.
   function updateGutters(cm) {
     var gutters = cm.display.gutters, specs = cm.options.gutters;
@@ -4672,7 +4672,7 @@
 
   // By default, updates that start and end at the beginning of a line
   // are treated specially, in order to make the association of line
-  // widgets and marker elements with the text behave more intuitive.
+  // widgets and marker steps with the text behave more intuitive.
   function isWholeLineUpdate(doc, change) {
     return change.from.ch == 0 && change.to.ch == 0 && lst(change.text) == "" &&
       (!doc.cm || doc.cm.options.wholeLineUpdateBefore)
@@ -5694,7 +5694,7 @@
     }
   };
 
-  // Line widgets are block elements displayed above or below a line.
+  // Line widgets are block steps displayed above or below a line.
 
   var LineWidget = function(doc, node, options) {
     var this$1 = this;

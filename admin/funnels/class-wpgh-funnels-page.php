@@ -152,7 +152,7 @@ class WPGH_Funnels_Page
                 'content' => '<p>' . __('When editing a funnel you can add Funnel Steps. Funnel Steps are either Benchmarks or Actions. Benchmarks are whenever a Contact "does" something, while Actions are doing thing to a contact such as sending an email. Simply drag in the desired funnel steps in any order.', 'groundhogg') . '</p>'
                     . '<p>' . __('Actions are run sequentially, so when an action takes place, it simply loads the next action. That means if you need to change it you can!', 'groundhogg') . '</p>'
                     . '<p>' . __('Benchmarks are a bit different. If you have several benchmarks in a row, what happens is once one of them is completed by a contact the first action found proceeding that benchmark is launched, skipping all other benchmarks. That way you can have multiple automation triggers. ', 'groundhogg') . '</p>'
-                    . '<p>' . __('Once a benchmark is complete all elements that are scheduled before that benchmark will stop immediately.', 'groundhogg') . '</p>'
+                    . '<p>' . __('Once a benchmark is complete all steps that are scheduled before that benchmark will stop immediately.', 'groundhogg') . '</p>'
             )
         );
 
@@ -741,8 +741,8 @@ class WPGH_Funnels_Page
                 $step->delete_meta( 'is_closed' );
             }
 
-            do_action( "groundhogg/elements/{$step->type}/save", $step );
-//            do_action( "groundhogg/elements/{$step->type}/save", $step );
+            do_action( "groundhogg/steps/{$step->type}/save", $step );
+//            do_action( "groundhogg/steps/{$step->type}/save", $step );
 
         }
 

@@ -2,7 +2,7 @@
 /**
  * Elements
  *
- * This exists solely to init the basic elements. Do not look here for adding you own elements. Extending the WPGH_Funnel_Step class is enough.
+ * This exists solely to init the basic steps. Do not look here for adding you own steps. Extending the WPGH_Funnel_Step class is enough.
  *
  * @package     Includes
  * @author      Adrian Tobey <info@groundhogg.io>
@@ -17,7 +17,7 @@ class WPGH_Elements
 {
 
     /**
-     * Storage for the instances of the elements
+     * Storage for the instances of the steps
      *
      * @var array
      */
@@ -57,15 +57,15 @@ class WPGH_Elements
     }
 
     /**
-     * Include all the elements for the Funnel Steps
+     * Include all the steps for the Funnel Steps
      */
     private function includes()
     {
         /* Parent Class */
-        include_once dirname(__FILE__) . '/elements/class-wpgh-funnel-step.php';
+        include_once dirname(__FILE__) . '/steps/funnel-step.php';
 
         /* actions */
-        $action_path = dirname( __FILE__ ) . '/elements/actions/';
+        $action_path = dirname( __FILE__ ) . '/steps/actions/';
 
         include_once $action_path . 'class-wpgh-admin-notification.php';
         include_once $action_path . 'class-wpgh-apply-note.php';
@@ -82,7 +82,7 @@ class WPGH_Elements
         include_once $action_path . 'class-wpgh-send-sms.php';
 
         /* Benchmarks */
-        $benchmark_path = dirname( __FILE__ ) . '/elements/benchmarks/';
+        $benchmark_path = dirname( __FILE__ ) . '/steps/benchmarks/';
 
         include_once $benchmark_path . 'class-wpgh-account-created.php';
         include_once $benchmark_path . 'class-wpgh-email-confirmed.php';
@@ -103,7 +103,7 @@ class WPGH_Elements
      */
     public function get_benchmarks()
     {
-        return apply_filters( "groundhogg/elements/benchmarks", array() );
+        return apply_filters( "groundhogg/steps/benchmarks", array() );
     }
 
     /**
@@ -113,7 +113,7 @@ class WPGH_Elements
      */
     public function get_actions()
     {
-        return apply_filters( 'groundhogg/elements/actions', array() );
+        return apply_filters( 'groundhogg/steps/actions', array() );
     }
 
     /**

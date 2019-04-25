@@ -91,7 +91,7 @@ var stickySidebar = createCommonjsModule(function (module, exports) {
       innerWrapperSelector: '.inner-wrapper-sticky',
 
       /**
-       * The name of CSS class to apply to elements when they have become stuck.
+       * The name of CSS class to apply to steps when they have become stuck.
        * @type {String|False}
        */
       stickyClass: 'is-affixed',

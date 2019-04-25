@@ -24,7 +24,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
 
     public function register_routes()
     {
-        register_rest_route('gh/v3', '/elements/page-view', [
+        register_rest_route('gh/v3', '/steps/page-view', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'permission_callback' => function ( WP_REST_Request $request ){
@@ -40,7 +40,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
             ]
         ] );
 
-        register_rest_route('gh/v3', '/elements/form-impression', [
+        register_rest_route('gh/v3', '/steps/form-impression', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'form_impression' ],
@@ -77,7 +77,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
             return self::ERROR_400( 'no_ref', 'Cannot track blank pages...' );
         }
 
-        do_action( 'groundhogg/api/v3/elements/page-view', $ref, $contact );
+        do_action( 'groundhogg/api/v3/steps/page-view', $ref, $contact );
 
         return self::SUCCESS_RESPONSE();
 
@@ -164,7 +164,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
             return self::ERROR_200( 'no_double_track', 'Unique views only.', $response );
         }
 
-        do_action( 'groundhogg/api/v3/elements/form-impression' );
+        do_action( 'groundhogg/api/v3/steps/form-impression' );
 
         unset( $args[ 'start' ] );
         $args[ 'timestamp' ] = time();

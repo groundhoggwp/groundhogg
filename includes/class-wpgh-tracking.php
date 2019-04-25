@@ -103,7 +103,7 @@ class WPGH_Tracking
      * WPGH_Tracking constructor.
      *
      *
-     * Look at the current URL and depending on that setup the vars and enqueue the appropriate elements if any
+     * Look at the current URL and depending on that setup the vars and enqueue the appropriate steps if any
      */
     public function __construct()
     {

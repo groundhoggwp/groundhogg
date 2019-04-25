@@ -3155,7 +3155,7 @@ S2.define('select2/data/select',[
   };
 
   SelectAdapter.prototype.destroy = function () {
-    // Remove anything added to child elements
+    // Remove anything added to child steps
     this.$element.find('*').each(function () {
       // Remove any custom data set by Select2
       $.removeData(this, 'data');
@@ -4293,7 +4293,7 @@ S2.define('select2/dropdown/attachBody',[
     // Determine what the parent element is to use for calciulating the offset
     var $offsetParent = this.$dropdownParent;
 
-    // For statically positoned elements, we need to get the element
+    // For statically positoned steps, we need to get the element
     // that is determining the offset
     if ($offsetParent.css('position') === 'static') {
       $offsetParent = $offsetParent.offsetParent();
@@ -5420,7 +5420,7 @@ S2.define('select2/core',[
     var changed = false;
     var self = this;
 
-    // Ignore any mutation events raised for elements that aren't options or
+    // Ignore any mutation events raised for steps that aren't options or
     // optgroups. This handles the case when the select element is destroyed
     if (
       evt && evt.target && (

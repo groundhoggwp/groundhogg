@@ -184,7 +184,7 @@ Licensed under the MIT license.
 
 		var cache = this._textCache;
 
-		// For each text layer, add elements marked as active that haven't
+		// For each text layer, add steps marked as active that haven't
 		// already been rendered, and remove those that are no longer active.
 
 		for (var layerKey in cache) {

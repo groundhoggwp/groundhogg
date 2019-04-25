@@ -281,7 +281,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
   outline: none;
 }
 
-/* Force content-box sizing for the elements where we expect it */
+/* Force content-box sizing for the steps where we expect it */
 .CodeMirror-scroll,
 .CodeMirror-sizer,
 .CodeMirror-gutter,

@@ -853,7 +853,7 @@ class Email extends Base_Object_With_Meta
             '',
             $text );
 
-        // replace certain elements with a line-break
+        // replace certain steps with a line-break
         $text = preg_replace(
             array(
                 '@</?((div)|(h[1-9])|(/tr)|(p)|(pre))@iu'
@@ -861,7 +861,7 @@ class Email extends Base_Object_With_Meta
             "\n\$0",
             $text );
 
-        // replace other elements with a space
+        // replace other steps with a space
         $text = preg_replace(
             array(
                 '@</((td)|(th))@iu'

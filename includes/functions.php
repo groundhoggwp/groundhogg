@@ -90,7 +90,7 @@ function wpgh_import_funnel( $import )
         $step = wpgh_get_funnel_step( $step_id );
 
         do_action( 'wpgh_import_step_' . $step_type, $import_args, $step );
-        do_action( "groundhogg/elements/{$step->type}/import", $import_args, $step );
+        do_action( "groundhogg/steps/{$step->type}/import", $import_args, $step );
 
     }
 

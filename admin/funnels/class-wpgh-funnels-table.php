@@ -39,7 +39,7 @@ class WPGH_Funnels_Table extends WP_List_Table {
      * Get a list of columns. The format is:
      * 'internal-name' => 'Title'
      *
-     * bulk elements or checkboxes, simply leave the 'cb' entry out of your array.
+     * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
      *
      * @see WP_List_Table::::single_row_columns()
      * @return array An associative array containing column information.
@@ -176,10 +176,10 @@ class WPGH_Funnels_Table extends WP_List_Table {
     }
 
 	/**
-     * Get default row elements...
+     * Get default row steps...
      *
      * @param $funnel object
-     * @return string a list of elements
+     * @return string a list of steps
      */
     protected function handle_row_actions( $funnel, $column_name, $primary )
     {
@@ -301,9 +301,9 @@ class WPGH_Funnels_Table extends WP_List_Table {
 
     /**
      * Get an associative array ( option_name => option_title ) with the list
-     * of bulk elements available on this table.
+     * of bulk steps available on this table.
      *
-     * @return array An associative array containing all the bulk elements.
+     * @return array An associative array containing all the bulk steps.
      */
     protected function get_bulk_actions() {
 

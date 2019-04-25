@@ -245,7 +245,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function get_delay_time()
     {
-        $time = apply_filters( "groundhogg/elements/{$this->get_type()}/enqueue", $this );
+        $time = apply_filters( "groundhogg/steps/{$this->get_type()}/enqueue", $this );
 
         if ( ! is_numeric( $time ) ) {
             $time = time();
@@ -270,11 +270,11 @@ class Step extends Base_Object_With_Meta implements Event_Process
 
         $this->switch_to_blog();
 
-        do_action( "groundhogg/elements/{$this->get_type()}/run/before", $this  );
+        do_action( "groundhogg/steps/{$this->get_type()}/run/before", $this  );
 
-        $result = apply_filters( "groundhogg/elements/{$this->get_type()}/run", $contact, $event, $this );
+        $result = apply_filters( "groundhogg/steps/{$this->get_type()}/run", $contact, $event, $this );
 
-        do_action( "groundhogg/elements/{$this->get_type()}/run/after", $this  );
+        do_action( "groundhogg/steps/{$this->get_type()}/run/after", $this  );
 
         $this->restore_current_blog();
 
@@ -457,134 +457,24 @@ class Step extends Base_Object_With_Meta implements Event_Process
     }
 
     /**
-     * Get the ICON for the step.
-     *
-     * @see WPGH_Funnel_Step
-     *
-     * @return string
-     */
-    public function icon()
-    {
-        $icon = apply_filters( 'wpgh_step_icon_' . $this->get_type(), GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png' );
-        return apply_filters( "groundhogg/elements/{$this->get_type()}/icon", $icon );
-    }
-
-    /**
-     * Output the reporting section for the step...
-     *
-     * @see WPGH_Funnel_Step
-     */
-    public function reporting()
-    {
-
-        do_action( "groundhogg/elements/{$this->get_type()}/reporting", $this );
-        do_action( 'wpgh_get_step_reporting_' . $this->get_type(), $this );
-
-    }
-
-    /**
-     * Output the settigns section for the step...
-     *
-     * @see WPGH_Funnel_Step
-     */
-    public function settings()
-    {
-
-        do_action( "groundhogg/elements/{$this->get_type()}/settings", $this );
-        do_action( 'wpgh_get_step_settings_' . $this->get_type(), $this );
-
-    }
-
-    /**
      * Output the HTML of a step.
      */
     public function html()
     {
-        $closed = $this->get_meta( 'is_closed' ) ? 'closed' : '' ;
-
-        ?>
-        <div title="<?php echo $this->title ?>" id="<?php echo $this->ID; ?>" class="postbox step <?php echo $this->group; ?> <?php echo $this->type; ?> <?php echo $closed; ?>">
-            <button type="button" class="handlediv collapse"><span class="toggle-indicator" aria-hidden="true"></span></button>
-            <input type="hidden" class="collapse-input" name="<?php echo $this->prefix( 'closed' ); ?>" value="<?php echo $this->get_meta( 'is_closed' ); ?>">
-            <!-- DELETE -->
-            <button title="Delete" type="button" class="handlediv delete-step">
-                <span class="dashicons dashicons-trash"></span>
-            </button>
-            <!-- DUPLICATE -->
-            <button title="Duplicate" type="button" class="handlediv duplicate-step">
-                <span class="dashicons dashicons-admin-page"></span>
-            </button>
-            <!-- HNDLE -->
-            <h2 class="hndle ui-sortable-handle">
-                <img class="hndle-icon" width="50" src="<?php echo $this->icon(); ?>">
-                <?php $args = array(
-                    'name'  => $this->prefix( 'title' ),
-                    'id'    => $this->prefix( 'title' ),
-                    'value' => __( $this->title, 'groundhogg' ),
-                    'title' => __( 'Step Title', 'groundhogg' ),
-                );
-
-                echo WPGH()->html->input( $args ); ?>
-                <?php if( wpgh_is_global_multisite() ): ?>
-                    <!-- MULTISITE BLOG OPTION -->
-                    <div class="wpmu-options">
-                        <label style="padding-left: 30px">
-                            <?php _e( 'Run on which blog?' ); ?>
-                            <?php
-
-                            $sites = get_sites();
-
-                            $options = array();
-                            foreach ( $sites as $site ){
-                                $options[ $site->blog_id ] = get_blog_details($site->blog_id)->blogname;
-                            }
-
-                            echo WPGH()->html->dropdown( array(
-                                'name'   => $this->prefix( 'blog_id' ),
-                                'id'     => $this->prefix( 'blog_id' ),
-                                'options' => $options,
-                                'selected' => $this->get_meta( 'blog_id' ),
-                                'option_none' => __( 'Any blog', 'groundhogg' )
-                            ) );
-
-                            ?>
-                        </label>
-                    </div>
-                <?php endif; ?>
-            </h2>
-            <!-- INSIDE -->
-            <div class="inside">
-                <input type="hidden" name="steps[]" value="<?php echo $this->ID; ?>">
-                <!-- SETTINGS -->
-                <div class="step-edit <?php echo WPGH()->menu->funnels_page->reporting_enabled ? 'hidden' : '' ; ?>">
-                    <div class="custom-settings">
-                        <?php do_action( 'wpgh_step_settings_before', $this ); ?>
-                        <?php do_action( 'groundhogg/step/settings/before', $this ); ?>
-                        <?php $this->settings(); ?>
-                        <?php do_action( 'wpgh_step_settings_after', $this ); ?>
-                        <?php do_action( 'groundhogg/step/settings/after', $this ); ?>
-                    </div>
-                </div>
-                <!-- REPORTING  -->
-                <div class="step-reporting <?php echo WPGH()->menu->funnels_page->reporting_enabled ? '' : 'hidden' ; ?>">
-                    <?php do_action( 'wpgh_step_reporting_before' ); ?>
-                    <?php do_action( 'groundhogg/step/reporting/before' ); ?>
-                    <?php $this->reporting(); ?>
-                    <?php do_action( 'wpgh_step_reporting_after' ); ?>
-                    <?php do_action( 'groundhogg/step/reporting/after' ); ?>
-                </div>
-            </div>
-        </div>
-        <?php
-
+        do_action( "groundhogg/steps/{$this->get_type()}/html", $this );
     }
 
-
+    /**
+     * @return string
+     */
     public function get_step_title()
     {
         return $this->get_title();
     }
 
+    /**
+     * @return string
+     */
     public function get_funnel_title()
     {
         return $this->get_funnel()->get_title();
@@ -597,7 +487,6 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function __toString()
     {
-
         ob_start();
 
         $this->html();
