@@ -100,10 +100,14 @@ Yes, you can find our Official [Woocommerce](https://groundhogg.io/downloads/woo
 = Is it secure? =
 We follow all best WordPress security practices. Plus it's open source, so we have a large community looking out for potential weaknesses when it comes to your data.
 
-= Is it GDPR, CANSPAM, or CASL compliant? =
+= Is it GDPR, CANSPAM, and CASL compliant? =
 Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & privacy legislation.
 
 == Changelog ==
+
+= 1.3.10 =
+* ADDED support for unicode letters in first/last name regex.
+* FIXED Admin notification not showing line breaks when sending with plain text emails.
 
 = 1.3.9 =
 * TWEAKED Page pickers on settings page are now ajax powered to avoid extraneous get_posts() call.

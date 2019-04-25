@@ -16,7 +16,7 @@ if ( ! class_exists( 'Groundhogg' ) ) :
     final class Groundhogg
     {
 
-        public $version = '1.3.9';
+        public $version = '1.3.10';
 
         /**
          * @var $instance Groundhogg instance
