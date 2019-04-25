@@ -133,7 +133,7 @@ abstract class WPGH_Bulk_Job
 
         }
 
-        wp_die( json_encode( $response ) );
+        wp_send_json( $response );
 
     }
 
