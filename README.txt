@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.11.1 =
+* FIXED Last name placeholder missing.
+
 = 1.3.11 =
 * ADDED All/Any condition to Tag Added & Tag Removed Benchmarks
 

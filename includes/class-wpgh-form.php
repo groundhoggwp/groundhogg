@@ -397,9 +397,16 @@ class WPGH_Form
             'name'          => 'last_name',
             'id'            => 'last_name',
             'class'         => 'gh-last-name',
+            'value'         => '',
+            'placeholder'   => '',
+            'attributes'    => 'pattern="^[\w\pL\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$"',
+            'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
+            'required'      => false,
         ), $atts );
 
-        return $this->first_name( $a );
+        $this->config[ $a[ 'name' ] ] = $a ;
+
+        return $this->input_base( $a );
     }
 
     /**
