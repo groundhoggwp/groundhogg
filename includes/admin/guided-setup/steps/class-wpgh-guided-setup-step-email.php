@@ -46,7 +46,7 @@ class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
         <hr>
         <h3><?php _e( 'Alternatives' ); ?></h3>
         <div class="postbox" style="padding-right: 10px">
-            <img src="https://ps.w.org/wp-mail-smtp/assets/banner-772x250.png?rev=1982773" width="300" style="float: left; margin: 10px 20px 0 10px;border: 1px solid #ededed">
+            <img src="https://ps.w.org/wp-mail-smtp/assets/banner-772x250.png" width="300" style="float: left; margin: 10px 20px 0 10px;border: 1px solid #ededed">
             <p><?php _ex( 'You can send your emails using an <b>SMTP Service</b> using an SMTP plugin like WP Mail SMTP. This is recommended if you do not use our service.', 'guided_setup', 'groundhogg' ); ?></p>
             <p>
                 <a target="_blank" class="button button-primary" href="<?php echo admin_url( 'plugin-install.php?s=WP+Mail+SMTP&tab=search&type=term' ); ?>"><?php _ex( 'Get WP Mail SMTP', 'guided_setup', 'groundhogg' ); ?></a>
@@ -54,7 +54,7 @@ class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
             </p>
             <div class="wp-clearfix"></div>
         </div><div class="postbox" style="padding-right: 10px">
-            <img src="https://ps.w.org/wp-ses/assets/banner-772x250.png?rev=2012130" width="300" style="float: left; margin: 10px 20px 0 10px;">
+            <img src="https://ps.w.org/wp-ses/assets/banner-772x250.jpg" width="300" style="float: left; margin: 10px 20px 0 10px;">
             <p><?php _ex( 'You can send your emails using <b>Amazon SES</b> which is very cost effective and provides a high deliverability rating, although is more difficult to setup.', 'guided_setup', 'groundhogg' ); ?></p>
             <p>
                 <a target="_blank" class="button button-primary" href="<?php echo admin_url( 'plugin-install.php?s=wp+ses&tab=search&type=term' ); ?>"><?php _ex( 'Get WP SES', 'guided_setup', 'groundhogg' ); ?></a>

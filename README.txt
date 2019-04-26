@@ -105,6 +105,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.11.2 =
+* ADDED New more self explanatory hook to register API endpoints for extensions.
+* ADDED NAMESPACE constant for v3 API.
+* FIXED Bug when importing contacts under 400 may exceed max_input_vars setting
+* FIXED Missing images in Email Setup Step
+* FIXED Oauth domain registration in guided setup giving a missing parameters error.
+
 = 1.3.11.1 =
 * FIXED Last name placeholder missing.
 

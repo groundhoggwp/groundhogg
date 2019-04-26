@@ -24,6 +24,8 @@ class WPGH_API_V3
 
         $this->declare_base_endpoints();
 
+        do_action( 'groundhogg/api/v3/register_endpoints', $this );
+
         do_action( 'groundhogg/api/v3/init', $this );
 
     }

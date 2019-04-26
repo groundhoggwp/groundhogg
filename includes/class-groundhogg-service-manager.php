@@ -144,10 +144,13 @@ class Groundhogg_Service_Manager
             $headers = [
                 'Sender-Token' => md5( wpgh_get_option( 'gh_email_token', '' ) ),
                 'Sender-Domain' => site_url(),
-                'Content-Type' => sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) )
+//                'Content-Type' => sprintf( 'application/json; charset=%s', get_option( 'blog_charset', 'utf-8' ) )
             ];
+
         }
 
+        // Set content type to JSON.
+        $headers[ 'Content-Type' ] = sprintf( 'application/json; charset=%s', get_option( 'blog_charset', 'utf-8' ) );
         $body = is_array( $body ) ? wp_json_encode( $body ) : $body;
 
         $args = [
@@ -308,8 +311,6 @@ class Groundhogg_Service_Manager
         ];
 
         $json = $this->request( 'domains/add', $post, 'POST', $headers );
-
-//        var_dump( $response );
 
         if ( is_wp_error( $json ) ){
             return $json;

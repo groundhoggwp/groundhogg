@@ -57,9 +57,13 @@ class WPGH_Import_Bulk_Job extends WPGH_Bulk_Job
         $item = array_shift( $items );
         $fields = count( $item );
         $max = intval( ini_get( 'max_input_vars' ) );
+//        var_dump( $max );
+        $max = $max ? $max : 1000;
         $max_items = floor( $max / $fields ) - 1;
+        $max_items = min( $max_items, 100 );
 
-        return min( $max_items, 100 );
+//        var_dump( $max_items );
+        return $max_items;
     }
 
     /**

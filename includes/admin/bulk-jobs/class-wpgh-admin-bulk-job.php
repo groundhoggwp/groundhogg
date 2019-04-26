@@ -41,6 +41,8 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
         // Permitted Characters 0-9, A-z, _, -, / to keep inline with the Groundhogg Action Structure. No spaces.
 	    $bulk_action = preg_replace( '/[^0-9A-z_\-\/]/', '', $_POST[ 'bulk_action' ] );
 
+//        var_dump( $_POST );
+
 	    if ( ! wp_verify_nonce( $_POST[ '_wpnonce' ], $bulk_action ) ){
 	        return;
         }
@@ -156,28 +158,21 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
                         this.progress = $( '#bulk-job-percentage' );
                         this.title = document.title;
 
-                        if ( this.all < 400 ){
-                            this.size = Math.ceil( this.all / 4 );
-                        }
-
                         this.send();
-
                     },
 
                     getItems: function (){
                         var end = this.size;
 
-                        if ( this.items.length < this.size ){
+                        if ( this.items.length < end ){
                             end  = this.items.length;
                         }
 
-                        return this.items.splice( 0, end );
+                        var items = this.items.splice( 0, end );
 
-                        // for ( var i = 0; i < items.length; i++ ){
-                        //     this.clean( items[ i ] )
-                        // }
-                        //
-                        // return items;
+                        console.log( { max_items: end, item_count: items.length } );
+
+                        return items;
                     },
 
                     isLastOfThem: function (){
@@ -227,7 +222,7 @@ class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
                             type: "post",
                             url: ajaxurl,
                             dataType: 'json',
-                            data: { action: 'bulk_action_listener', bulk_action: '<?php echo $this->get_action(); ?>', items: bp.getItems(), _wpnonce: '<?php echo wp_create_nonce(  $this->get_action() ); ?>', the_end: bp.isLastOfThem() },
+                            data: { action: 'bulk_action_listener', bulk_action: '<?php echo $this->get_action(); ?>', _wpnonce: '<?php echo wp_create_nonce(  $this->get_action() ); ?>', items: bp.getItems() , the_end: bp.isLastOfThem() },
                             success: function( response ){
 
                                 console.log(response);

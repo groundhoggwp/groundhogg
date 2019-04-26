@@ -29,7 +29,7 @@ class WPGH_API_V3_REPORTS extends WPGH_API_V3_BASE
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route('gh/v3', '/reports', [
+        register_rest_route(self::NAMESPACE, '/reports', [
             [
 	            'methods' => WP_REST_Server::READABLE,
 	            'callback' => [ $this, 'get_reports' ],

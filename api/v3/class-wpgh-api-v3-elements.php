@@ -24,7 +24,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
 
     public function register_routes()
     {
-        register_rest_route('gh/v3', '/elements/page-view', [
+        register_rest_route(self::NAMESPACE, '/elements/page-view', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'permission_callback' => function ( WP_REST_Request $request ){
@@ -40,7 +40,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
             ]
         ] );
 
-        register_rest_route('gh/v3', '/elements/form-impression', [
+        register_rest_route(self::NAMESPACE, '/elements/form-impression', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'form_impression' ],
