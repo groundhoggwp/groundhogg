@@ -1,4 +1,9 @@
 <?php
+namespace Groundhogg;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Contact query class
  *
@@ -9,11 +14,7 @@
  * @license     http://opensource.org/licenses/gpl-3.0 GNU Public License
  * @since       0.9
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Contact_Query {
+class Contact_Query {
 
     /**
      * SQL for database query.

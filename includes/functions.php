@@ -913,7 +913,7 @@ function wpgh_add_my_custom_email_templates( $email_templates ){
  */
 function gisset_not_empty( $array, $key='' )
 {
-    return isset( $array[ $key ] ) && ! empty( $array[ $key] );
+    return isset( $array[ $key ] ) && ! empty( $array[ $key ] );
 }
 
 /**

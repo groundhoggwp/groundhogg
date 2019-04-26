@@ -449,6 +449,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
      * Return the name given with the ID prefixed for easy access in the $_POST variable
      *
      * @param $name
+     * @deprecated since 2.0
      * @return string
      */
     public function prefix( $name )
@@ -462,6 +463,14 @@ class Step extends Base_Object_With_Meta implements Event_Process
     public function html()
     {
         do_action( "groundhogg/steps/{$this->get_type()}/html", $this );
+    }
+
+    /**
+     * Save the step
+     */
+    public function save()
+    {
+        do_action( "groundhogg/steps/{$this->get_type()}/save", $this );
     }
 
     /**

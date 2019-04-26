@@ -67,7 +67,7 @@ class WPGH_Elements
         /* actions */
         $action_path = dirname( __FILE__ ) . '/steps/actions/';
 
-        include_once $action_path . 'class-wpgh-admin-notification.php';
+        include_once $action_path . 'admin-notification.php';
         include_once $action_path . 'class-wpgh-apply-note.php';
         include_once $action_path . 'class-wpgh-apply-owner.php';
         include_once $action_path . 'class-wpgh-apply-tag.php';

@@ -81,8 +81,9 @@ class HTML
      * Add a form table row
      *
      * @param array $args
+     * @param bool $tr_wrap whether the control should be wrapped in a TR tag
      */
-    public function add_form_control( $args=[] )
+    public function add_form_control( $args=[], $tr_wrap = true )
     {
         $args = wp_parse_args( $args, [
             'label' => '',
@@ -95,6 +96,8 @@ class HTML
             return;
         }
 
+        if ( $tr_wrap ):
+
         ?>
         <tr class="form-row">
             <th><?php echo $args[ 'label' ]; ?></th><td><?php echo call_user_func( [ $this, $args[ 'type' ] ], $args[ 'attrs' ] );
@@ -102,7 +105,17 @@ class HTML
             ?><p class="description"><?php echo $args[ 'description' ]; ?></p><?php
         } ?></td>
         </tr>
-        <?php
+            <?php
+        else:
+            ?>
+            <div class="form-row">
+                <label><?php echo $args[ 'label' ]; ?><?php echo call_user_func( [ $this, $args[ 'type' ] ], $args[ 'attrs' ] );?></label>
+                <? if ( ! empty( $args[ 'description' ] ) ){
+                    ?><p class="description"><?php echo $args[ 'description' ]; ?></p><?php
+                } ?>
+            </div>
+            <?php
+        endif;
     }
 
     public function end_form_table()
