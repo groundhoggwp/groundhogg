@@ -68,7 +68,20 @@ class WPGH_Tag_Removed extends WPGH_Funnel_Step
             <tbody>
             <tr>
                 <th>
-                    <?php echo esc_html__( 'Run when any of these tags are removed:', 'groundhogg' ); ?>
+                    <?php
+                    $args = [
+                        'name' => $step->prefix( 'condition' ),
+                        'selected' => $step->get_meta( 'condition' ),
+                        'option_none' => false,
+                        'attributes' => 'style="vertical-align:middle;"',
+                        'options' =>
+                            [
+                                'any' => __( 'any' ),
+                                'all' => __( 'all' ),
+                            ]
+                    ] ;
+
+                    printf( __( 'Run when %s of these tags are removed:', 'groundhogg' ), WPGH()->html->dropdown( $args ) ); ?>
                 </th>
                 <?php $args = array(
                     'id' => $step->prefix( 'tags' ),
@@ -95,11 +108,12 @@ class WPGH_Tag_Removed extends WPGH_Funnel_Step
     {
 
         if ( isset( $_POST[ $step->prefix( 'tags' ) ] ) ){
-
             $tags = WPGH()->tags->validate( $_POST[ $step->prefix( 'tags' ) ] );
-
             $step->update_meta( 'tags', $tags );
+        }
 
+        if ( isset( $_POST[ $step->prefix( 'condition' ) ] ) ){
+            $step->update_meta( 'condition', $_POST[ $step->prefix( 'condition' ) ] === 'any' ? 'any' : 'all'  );
         }
 
     }
@@ -113,7 +127,7 @@ class WPGH_Tag_Removed extends WPGH_Funnel_Step
     public function complete( $contact, $tag_id )
     {
         /* just make sure */
-        if ( ! $contact->has_tag( $tag_id ) )
+        if ( $contact->has_tag( $tag_id ) )
             return;
 
         $steps = $this->get_like_steps();
@@ -124,14 +138,21 @@ class WPGH_Tag_Removed extends WPGH_Funnel_Step
         foreach ( $steps as $step ){
 
             $tags = $step->get_meta( 'tags' );
+            $condition = $step->get_meta( 'condition' );
 
-            if ( ! is_array( $tags ) )
-                $tags = array();
+            switch ( $condition ){
+                default:
+                case 'any':
+                    $not_has_tags = in_array( $tag_id, $tags );
+                    break;
+                case 'all':
+                    $diff = array_diff( $tags, $contact->tags );
+                    $not_has_tags = in_array( $tag_id, $tags ) && count( $diff ) === count( $tags );
+                    break;
+            }
 
-            if ( $step->can_complete( $contact ) && in_array( $tag_id, $tags ) ){
-
+            if ( $step->can_complete( $contact ) && $not_has_tags ){
                 $step->enqueue( $contact );
-
             }
 
         }

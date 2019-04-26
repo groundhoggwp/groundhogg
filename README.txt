@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.11 =
+* ADDED All/Any condition to Tag Added & Tag Removed Benchmarks
+
 = 1.3.10 =
 * ADDED support for unicode letters in first/last name regex.
 * FIXED Admin notification not showing line breaks when sending with plain text emails.

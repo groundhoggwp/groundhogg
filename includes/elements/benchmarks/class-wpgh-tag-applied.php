@@ -68,14 +68,27 @@ class WPGH_Tag_Applied extends WPGH_Funnel_Step
             <tbody>
             <tr>
                 <th>
-                    <?php echo esc_html__( 'Run when any of these tags are applied:', 'groundhogg' ); ?>
+                    <?php
+                    $args = [
+                        'name' => $step->prefix( 'condition' ),
+                        'selected' => $step->get_meta( 'condition' ),
+                        'option_none' => false,
+                        'attributes' => 'style="vertical-align:middle;"',
+                        'options' =>
+                            [
+                                'any' => __( 'any' ),
+                                'all' => __( 'all' ),
+                            ]
+                    ] ;
+
+                    printf( __( 'Run when %s of these tags are applied:', 'groundhogg' ), WPGH()->html->dropdown( $args ) ); ?>
                 </th>
-                <?php $args = array(
-                    'id' => $step->prefix( 'tags' ),
-                    'name' => $step->prefix( 'tags' ) . '[]',
-                    'selected' => $tags
-                ); ?>
-                <td>
+                <td><?php ?>
+                    <?php $args = array(
+                        'id' => $step->prefix( 'tags' ),
+                        'name' => $step->prefix( 'tags' ) . '[]',
+                        'selected' => $tags
+                    ); ?>
                     <?php echo WPGH()->html->tag_picker( $args ); ?>
                     <p class="description"><?php _e( 'Add new tags by hitting [Enter] or by typing a [,].', 'groundhogg' ); ?></p>
                 </td>
@@ -95,11 +108,12 @@ class WPGH_Tag_Applied extends WPGH_Funnel_Step
     {
 
         if ( isset( $_POST[ $step->prefix( 'tags' ) ] ) ){
-
             $tags = WPGH()->tags->validate( $_POST[ $step->prefix( 'tags' ) ] );
-
             $step->update_meta( 'tags', $tags );
+        }
 
+        if ( isset( $_POST[ $step->prefix( 'condition' ) ] ) ){
+            $step->update_meta( 'condition', $_POST[ $step->prefix( 'condition' ) ] === 'any' ? 'any' : 'all'  );
         }
 
     }
@@ -116,7 +130,6 @@ class WPGH_Tag_Applied extends WPGH_Funnel_Step
         if ( ! $contact->has_tag( $tag_id ) )
             return;
 
-
         $steps = $this->get_like_steps();
 
         if ( empty( $steps ) )
@@ -124,15 +137,22 @@ class WPGH_Tag_Applied extends WPGH_Funnel_Step
 
         foreach ( $steps as $step ){
 
-            $tags = $step->get_meta( 'tags' );
+            $tags = wp_parse_id_list( $step->get_meta( 'tags' ) );
+            $condition = $step->get_meta( 'condition' );
 
-            if ( ! is_array( $tags ) )
-                $tags = array();
+            switch ( $condition ){
+                default:
+                case 'any':
+                    $has_tags = in_array( $tag_id, $tags );
+                    break;
+                case 'all':
+                    $intersect = array_intersect( $tags, $contact->tags );
+                    $has_tags = in_array( $tag_id, $tags ) && count( $intersect ) === count( $tags );
+                    break;
+            }
 
-            if ( $step->can_complete( $contact ) && in_array( $tag_id, $tags ) ){
-
+            if ( $step->can_complete( $contact ) && $has_tags ){
                 $step->enqueue( $contact );
-
             }
 
         }
