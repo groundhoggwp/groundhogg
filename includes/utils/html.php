@@ -78,6 +78,15 @@ class HTML
     }
 
     /**
+     * @param $th string
+     * @param $td string
+     */
+    public function add_form_row( $th, $td )
+    {
+
+    }
+
+    /**
      * Add a form table row
      *
      * @param array $args
@@ -88,7 +97,7 @@ class HTML
         $args = wp_parse_args( $args, [
             'label' => '',
             'type' => self::INPUT,
-            'attrs' => [],
+            'field' => [],
             'description' => ''
         ] );
 
@@ -100,7 +109,7 @@ class HTML
 
         ?>
         <tr class="form-row">
-            <th><?php echo $args[ 'label' ]; ?></th><td><?php echo call_user_func( [ $this, $args[ 'type' ] ], $args[ 'attrs' ] );
+            <th><?php echo $args[ 'label' ]; ?></th><td><?php echo call_user_func( [ $this, $args[ 'type' ] ], $args[ 'field' ] );
         if ( ! empty( $args[ 'description' ] ) ){
             ?><p class="description"><?php echo $args[ 'description' ]; ?></p><?php
         } ?></td>
@@ -109,7 +118,7 @@ class HTML
         else:
             ?>
             <div class="form-row">
-                <label><?php echo $args[ 'label' ]; ?><?php echo call_user_func( [ $this, $args[ 'type' ] ], $args[ 'attrs' ] );?></label>
+                <label><?php echo $args[ 'label' ]; ?><?php echo call_user_func( [ $this, $args[ 'type' ] ], $args[ 'field' ] );?></label>
                 <? if ( ! empty( $args[ 'description' ] ) ){
                     ?><p class="description"><?php echo $args[ 'description' ]; ?></p><?php
                 } ?>
@@ -676,7 +685,7 @@ class HTML
             'class' => 'regular-text',
             'value' => '',
             'attributes' => '',
-            'placeholder' => '',
+            'placeholder' => 'yyy-mm-dd',
             'min-date' => date( 'Y-m-d', strtotime( 'today' ) ),
             'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
             'format' => 'yy-mm-dd'

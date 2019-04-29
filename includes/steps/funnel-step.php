@@ -8,6 +8,7 @@ use function Groundhogg\gisset_not_empty;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Supports_Errors;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -33,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-abstract class Funnel_Step
+abstract class Funnel_Step extends Supports_Errors
 {
 
     /**
@@ -78,7 +79,9 @@ abstract class Funnel_Step
          *
          * @since 1.1
          */
+        add_action("groundhogg/steps/{$this->get_type()}/import", [$this, 'pre_import'], 1, 2);
         add_action("groundhogg/steps/{$this->get_type()}/import", [$this, 'import'], 10, 2);
+        add_filter("groundhogg/steps/{$this->get_type()}/export", [$this, 'pre_export'], 1, 2);
         add_filter("groundhogg/steps/{$this->get_type()}/export", [$this, 'export'], 10, 2);
         add_filter("groundhogg/steps/{$this->get_type()}/enqueue", [$this, 'enqueue']);
         add_filter("groundhogg/steps/{$this->get_type()}/run", [$this, 'pre_run'], 1, 2);
@@ -86,7 +89,7 @@ abstract class Funnel_Step
     }
 
     /**
-     * ] et the element name
+     * Get the element name
      *
      * @return string
      */
@@ -198,17 +201,21 @@ abstract class Funnel_Step
     protected function add_control( $setting = '', $args=[] )
     {
         $args = wp_parse_args( $args, [
-            'label' => '',
-            'type' => HTML::INPUT,
-            'attrs' => [],
-            'value' => '',
-            'default' => '',
-            'description' => ''
+            'label'         => '',
+            'type'          => HTML::INPUT,
+            'default'       => '',
+            'field'         => [],
+            'description'   => '',
         ] );
 
-        $args[ 'attrs' ][ 'id' ] = $this->setting_id_prefix( $setting );
-        $args[ 'attrs' ][ 'name' ] = $this->setting_name_prefix( $setting );
-        $args[ 'attrs' ][ 'value' ] = empty( $args[ 'value' ] ) ? $this->get_setting( $setting, $args[ 'default' ] ) : $args[ 'value' ] ;
+        $args[ 'field' ][ 'id' ] = $this->setting_id_prefix( $setting );
+        $args[ 'field' ][ 'name' ] = $this->setting_name_prefix( $setting );
+
+        // Multiple compatibility
+        if ( gisset_not_empty( $args[ 'field' ], 'multiple' ) && $args[ 'multiple' ] === true ){
+            $args[ 'field' ][ 'name' ] .= '[]';
+            $args[ 'field' ][ 'multiple' ] = true;
+        }
 
         Plugin::$instance->utils->html->add_form_control( $args );
     }
@@ -575,12 +582,30 @@ abstract class Funnel_Step
         return true;
     }
 
+
+    /**
+     * @param $step
+     */
+    public function pre_import( $step )
+    {
+        $this->set_current_step( $step );
+    }
+
     /**
      * @param $args array of args
      * @param $step Step
      */
     public function import( $args, $step ){
         //silence is golden
+    }
+
+    /**
+     * @param $args
+     * @param $step
+     */
+    public function pre_export( $args, $step )
+    {
+        $this->set_current_step( $step );
     }
 
     /**

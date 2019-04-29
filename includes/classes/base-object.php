@@ -5,7 +5,7 @@ use Groundhogg\DB\DB;
 use Serializable;
 use ArrayAccess;
 
-abstract class Base_Object implements Serializable, ArrayAccess
+abstract class Base_Object extends Supports_Errors implements Serializable, ArrayAccess
 {
 
     /**

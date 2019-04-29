@@ -6,7 +6,6 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
-use Groundhogg\Steps\Funnel_Step;
 
 /**
  * Admin Notification
@@ -24,7 +23,7 @@ use Groundhogg\Steps\Funnel_Step;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Admin_Notification extends Funnel_Step
+class Admin_Notification extends Action
 {
 
     /**
@@ -52,16 +51,6 @@ class Admin_Notification extends Funnel_Step
     public function get_type()
     {
         return 'admin_notification';
-    }
-
-    /**
-     * Get the element group
-     *
-     * @return string
-     */
-    public function get_group()
-    {
-        return self::ACTION;
     }
 
     /**
@@ -111,7 +100,7 @@ class Admin_Notification extends Funnel_Step
             'type'          => HTML::TEXTAREA,
             'default'       => "Please follow up with {full_name} soon.\nEmail: {email}]\nPhone: {phone}",
             'description'   => __( 'Use any valid replacement codes.', 'groundhogg' ),
-            'attrs'         => [
+            'field'         => [
                 'cols'  => 64,
                 'rows'  => 4
             ],
@@ -162,15 +151,15 @@ class Admin_Notification extends Funnel_Step
 
         $finished_note = sanitize_textarea_field( Plugin::$instance->replacements->process( $note, $contact->get_id() ) );
 
-        $finished_note.= sprintf( "\n\n%s: %s", __( 'Manage Contact', 'groundhogg' ), admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $event->contact->ID  ) );
+        $finished_note.= sprintf( "\n\n%s: %s", __( 'Manage Contact', 'groundhogg' ), admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id()  ) );
 
         $subject = $this->get_setting( 'subject' );
-        $subject = sanitize_text_field( WPGH()->replacements->process( $subject, $contact->get_id() ) );
+        $subject = sanitize_text_field( Plugin::$instance->replacements->process( $subject, $contact->get_id() ) );
 
-        $send_to = $event->step->get_meta( 'send_to' );
+        $send_to = $this->get_setting( 'send_to' );
 
         if ( ! is_email( $send_to ) ){
-            $send_to = WPGH()->replacements->process( $send_to, $event->contact->ID );
+            $send_to = Plugin::$instance->replacements->process( $send_to, $contact->get_id() );
         }
 
         if ( ! $send_to ){
@@ -183,20 +172,20 @@ class Admin_Notification extends Funnel_Step
 
         remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
-        if ( is_wp_error( $this->mail_error ) ){
-            return $this->mail_error;
+        if ( $this->has_errors() ){
+            return $this->get_last_error();
         }
 
         return $sent;
 
     }
     /**
-     * Map the error to the wahetevr
+     * Map the error to the whatever
      *
      * @param $result
      */
     public function mail_failed( $result )
     {
-        $this->mail_error = $result;
+        $this->add_error( $result );
     }
 }

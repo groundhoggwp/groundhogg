@@ -56,11 +56,6 @@ class Email extends Base_Object_With_Meta
     protected $from_userdata;
 
     /**
-     * @var WP_Error[]
-     */
-    protected $errors = [];
-
-    /**
      * Return the DB instance that is associated with items of this type.
      *
      * @return Emails
@@ -768,30 +763,6 @@ class Email extends Base_Object_With_Meta
         );
 
         $this->add_error( $error );
-    }
-
-    /**
-     * @param $error WP_Error
-     */
-    public function add_error( $error )
-    {
-        $this->errors[] = $error;
-    }
-
-    /**
-     * @return bool
-     */
-    public function has_errors()
-    {
-        return ! empty( $this->errors );
-    }
-
-    /**
-     * @return WP_Error
-     */
-    public function get_last_error()
-    {
-        return $this->errors[ count( $this->errors ) - 1 ];
     }
 
     /**

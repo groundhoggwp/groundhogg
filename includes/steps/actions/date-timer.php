@@ -1,4 +1,11 @@
 <?php
+namespace Groundhogg\Steps\Actions;
+
+use Groundhogg\HTML;
+use Groundhogg\Step;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Date Timer
  *
@@ -12,50 +19,72 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Date_Timer extends WPGH_Funnel_Step
+class Date_Timer extends Action
 {
 
     /**
-     * @var string
+     * Get the element name
+     *
+     * @return string
      */
-    public $type    = 'date_timer';
-
-    /**
-     * @var string
-     */
-    public $group   = 'action';
-
-    /**
-     * @var string
-     */
-    public $icon    = 'date-timer.png';
-
-    /**
-     * @var string
-     */
-    public $name    = 'Date Timer';
-
-    /**
-     * @var string
-     */
-    public $description = 'Pause until a specific date & time.';
-
-    public function __construct()
+    public function get_name()
     {
-        $this->name = _x( 'Date Timer', 'element_name', 'groundhogg' );
-        $this->description = _x( 'Pause until a specific date & time.', 'element_description', 'groundhogg' );
-
-        parent::__construct();
+        return _x( 'Date Timer', 'element_name', 'groundhogg' );
     }
 
     /**
-     * @param $step WPGH_Step
+     * Get the element type
+     *
+     * @return string
+     */
+    public function get_type()
+    {
+        return 'date_timer';
+    }
+
+    /**
+     * Get the description
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        return _x( 'Pause until a specific date & time.', 'element_description', 'groundhogg' );
+    }
+
+    /**
+     * Get the icon URL
+     *
+     * @return string
+     */
+    public function get_icon()
+    {
+        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/date-timer.png';
+    }
+
+    /**
+     * @param $step Step
      */
     public function settings( $step )
     {
+        $this->start_controls_section();
+
+        $this->add_control( 'run_date', [
+            'label'         => __( 'Wait till:', 'groundhogg' ),
+            'type'          => HTML::DATE_PICKER,
+            'default'       => date( 'Y-m-d', strtotime( '+1 day' ) ),
+            'description'   => __( 'The time will wait till this date to run...', 'groundhogg' )
+        ] );
+
+        $this->add_control( 'run_time', [
+            'label'         => __( 'Wait till:', 'groundhogg' ),
+            'type'          => HTML::DATE_PICKER,
+            'default'       => date( 'Y-m-d', strtotime( '+1 day' ) ),
+            'description'   => __( 'The time will wait till this date to run...', 'groundhogg' )
+        ]);
+
+        $this->end_controls_section();
+
 
         $run_date = $step->get_meta( 'run_date' );
         if ( ! $run_date )
@@ -255,5 +284,4 @@ class WPGH_Date_Timer extends WPGH_Funnel_Step
         //do nothing
         return true;
     }
-
 }

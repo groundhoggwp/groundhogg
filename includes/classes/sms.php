@@ -107,7 +107,7 @@ Class SMS extends Base_Object
         if ( Plugin::$instance->sending_service->is_active_for_sms() ){
             $sent = $this->send_with_gh();
         } else {
-            $sent = apply_filters( 'groundhogg/sms/send_custom', true, $contact, $this->get_message(), $this );
+            $sent = apply_filters( 'groundhogg/sms/send_custom', false, $this->get_merged_message(), $this );
         }
 
         do_action( 'groundhogg/sms/sent', $sent, $this );

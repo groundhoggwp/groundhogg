@@ -452,40 +452,6 @@ function wpgh_funnel_share_listen()
 add_action( 'init', 'wpgh_funnel_share_listen' );
 
 /**
- * Round time to the nearest hour.
- *
- * @param $time int
- * @return int
- */
-function wpgh_round_to_hour( $time ){
-
-    $minutes = $time % HOUR_IN_SECONDS; # pulls the remainder of the hour.
-
-    $time -= $minutes; # just start off rounded down.
-
-    if ($minutes >= ( HOUR_IN_SECONDS / 2 ) ) $time += HOUR_IN_SECONDS; # add one hour if 30 mins or higher.
-
-    return $time;
-}
-
-/**
- * Round time to the nearest day.
- *
- * @param $time int
- * @return int
- */
-function wpgh_round_to_day( $time ){
-
-    $hours = $time % DAY_IN_SECONDS; # pulls the remainder of the hour.
-
-    $time -= $hours; # just start off rounded down.
-
-    if ($hours >= ( DAY_IN_SECONDS / 2 ) ) $time += DAY_IN_SECONDS; # add one day if 12 hours or higher.
-
-    return $time;
-}
-
-/**
  * Create a contact quickly from a user account.
  *
  * @param $user WP_User|int

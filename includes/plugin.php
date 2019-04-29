@@ -66,6 +66,11 @@ class Plugin {
     public $scripts;
 
     /**
+     * @var Roles
+     */
+    public $roles;
+
+    /**
      * Utils for compliance management
      *
      * @var Compliance
@@ -227,6 +232,7 @@ class Plugin {
         $this->settings     = new Settings();
         $this->replacements = new Replacements();
         $this->sending_service = new Sending_Service();
+        $this->roles        = new Roles();
 
         if ( is_admin() ) {
 

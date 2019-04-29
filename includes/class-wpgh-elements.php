@@ -68,11 +68,11 @@ class WPGH_Elements
         $action_path = dirname( __FILE__ ) . '/steps/actions/';
 
         include_once $action_path . 'admin-notification.php';
-        include_once $action_path . 'class-wpgh-apply-note.php';
-        include_once $action_path . 'class-wpgh-apply-owner.php';
-        include_once $action_path . 'class-wpgh-apply-tag.php';
-        include_once $action_path . 'class-wpgh-create-user.php';
-        include_once $action_path . 'class-wpgh-date-timer.php';
+        include_once $action_path . 'apply-note.php';
+        include_once $action_path . 'apply-owner.php';
+        include_once $action_path . 'apply-tag.php';
+        include_once $action_path . 'create-user.php';
+        include_once $action_path . 'date-timer.php';
         include_once $action_path . 'class-wpgh-field-timer.php';
         include_once $action_path . 'class-wpgh-delay-timer.php';
         include_once $action_path . 'class-wpgh-edit-meta.php';

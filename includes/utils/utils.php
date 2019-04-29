@@ -4,7 +4,7 @@ namespace Groundhogg;
 class Utils
 {
     /**
-     * @var Location_Utils
+     * @var Location
      */
     public $location;
 
@@ -17,6 +17,11 @@ class Utils
      * @var Files
      */
     public $files;
+
+    /**
+     * @var Date_Time
+     */
+    public $date_time;
 
     /**
      * @var Base_Object[]
@@ -46,9 +51,10 @@ class Utils
     public function __construct()
     {
 
-        $this->location     = new Location_Utils();
+        $this->location     = new Location();
         $this->html         = new HTML();
         $this->files        = new Files();
+        $this->date_time    = new Date_Time();
 
     }
 

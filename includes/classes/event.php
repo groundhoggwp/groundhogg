@@ -37,11 +37,6 @@ class Event extends Base_Object
     const SMS_NOTIFICATION = 4;
 
     /**
-     * @var WP_Error[]
-     */
-    protected $errors = [];
-
-    /**
      * @var Contact
      */
     protected $contact;
@@ -236,36 +231,6 @@ class Event extends Base_Object
     public function is_email_notification_event()
     {
         return $this->get_event_type() === self::SMS_NOTIFICATION;
-    }
-
-    /**
-     * @param $error WP_Error
-     * @return WP_Error|false;
-     */
-    public function add_error($error ){
-        if ( is_wp_error( $error ) ){
-            return $this->errors[] = $error;
-        }
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function has_errors()
-    {
-        return ! empty( $this->errors );
-    }
-
-    /**
-     * @return WP_Error|false
-     */
-    public function get_last_error()
-    {
-        if (! $this->has_errors())
-            return false;
-
-        return  $this->errors[ count( $this->errors ) - 1 ];
     }
 
     /**

@@ -1,19 +1,12 @@
 <?php
-/**
- * Roles and Capabilities
- *
- * @package     Includes
- * @author      Adrian Tobey <info@groundhogg.io>
- * @copyright   Copyright (c) 2018, Groundhogg Inc.
- * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
-*/
+namespace Groundhogg;
+
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * WPGH_Roles Class
+ * Roles Class
  *
  * This class handles the role creation and assignment of capabilities for those roles.
  *
@@ -22,16 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @since 1.4.4
  */
-class WPGH_Roles {
-
-	/**
-	 * Get things going
-	 *
-	 * @since 1.4.4
-	 */
-	public function __construct() {
-		add_filter( 'map_meta_cap', array( $this, 'meta_caps' ), 10, 4 );
-	}
+class Roles {
 
 	/**
 	 * Add new shop roles with default WP caps
@@ -333,22 +317,35 @@ class WPGH_Roles {
         return $caps;
     }
 
+
+    /**
+     * Return the WP_Roles instance.
+     *
+     * @return \WP_Roles
+     */
+    public function get_wp_roles()
+    {
+        global $wp_roles;
+
+        if ( class_exists('WP_Roles') ) {
+            if ( ! isset( $wp_roles ) ) {
+                $wp_roles = new \WP_Roles();
+            }
+        }
+
+        return $wp_roles;
+    }
+
 	/**
 	 * Add new shop-specific capabilities
 	 *
 	 * @since  1.4.4
-	 * @global WP_Roles $wp_roles
+	 * @global \WP_Roles $wp_roles
 	 * @return void
 	 */
 	public function add_caps()
     {
-		global $wp_roles;
-
-		if ( class_exists('WP_Roles') ) {
-			if ( ! isset( $wp_roles ) ) {
-				$wp_roles = new WP_Roles();
-			}
-		}
+		$wp_roles = $this->get_wp_roles();
 
 		if ( is_object( $wp_roles ) ) {
 
@@ -382,19 +379,7 @@ class WPGH_Roles {
 		}
 	}
 
-	/**
-	 * Map meta caps to primitive caps
-	 *
-	 * @since  2.0
-	 * @return array $caps
-	 */
-	public function meta_caps( $caps, $cap, $user_id, $args ) {
-
-		return $caps;
-
-	}
-
-	/**
+    /**
 	 * Remove core post type capabilities (called on uninstall)
 	 *
 	 * @since 1.5.2
@@ -402,15 +387,10 @@ class WPGH_Roles {
 	 */
 	public function remove_caps() {
 
-		global $wp_roles;
+        $wp_roles = $this->get_wp_roles();
 
-		if ( class_exists( 'WP_Roles' ) ) {
-			if ( ! isset( $wp_roles ) ) {
-				$wp_roles = new WP_Roles();
-			}
-		}
 
-		if ( is_object( $wp_roles ) ) {
+        if ( is_object( $wp_roles ) ) {
 
 			/* Shop Manager Capabilities */
             $caps = $this->get_gh_caps();
@@ -455,6 +435,25 @@ class WPGH_Roles {
 
         return $error;
 
+    }
+
+    /**
+     * Returns an array of roles used for select elements.
+     *
+     * @return string[]
+     */
+    public function get_roles_for_select()
+    {
+        $editable_roles = array_reverse( get_editable_roles() );
+
+        $roles = [];
+
+        foreach ( $editable_roles as $role => $details ) {
+            $name = translate_user_role( $details['name'] );
+            $roles[ $role ] = $name;
+        }
+
+        return $roles;
     }
 
 }
