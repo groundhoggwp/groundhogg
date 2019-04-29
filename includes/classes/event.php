@@ -144,7 +144,7 @@ class Event extends Base_Object
     }
 
     /**
-     * @return Step
+     * @return $step Step
      */
     public function get_step()
     {

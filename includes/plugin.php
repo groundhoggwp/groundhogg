@@ -100,16 +100,9 @@ class Plugin {
     public $sending_service;
 
     /**
-     * Role Manager.
-     *
-     * Holds the plugin Role Manager
-     *
-     * @since 2.0.0
-     * @access public
-     *
-     * @var \Groundhogg\Core\RoleManager\Role_Manager
+     * @var Event_Queue
      */
-    public $role_manager;
+    public $event_queue;
 
     
     /**
@@ -233,6 +226,7 @@ class Plugin {
         $this->replacements = new Replacements();
         $this->sending_service = new Sending_Service();
         $this->roles        = new Roles();
+        $this->event_queue  = new Event_Queue();
 
         if ( is_admin() ) {
 

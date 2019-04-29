@@ -1,7 +1,10 @@
 <?php
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Contact;
+use Groundhogg\Event;
 use Groundhogg\HTML;
+use Groundhogg\Plugin;
 use Groundhogg\Step;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -67,110 +70,61 @@ class Date_Timer extends Action
      */
     public function settings( $step )
     {
-        $this->start_controls_section();
 
-        $this->add_control( 'run_date', [
-            'label'         => __( 'Wait till:', 'groundhogg' ),
-            'type'          => HTML::DATE_PICKER,
-            'default'       => date( 'Y-m-d', strtotime( '+1 day' ) ),
-            'description'   => __( 'The time will wait till this date to run...', 'groundhogg' )
-        ] );
+        $html = Plugin::$instance->utils->html;
 
-        $this->add_control( 'run_time', [
-            'label'         => __( 'Wait till:', 'groundhogg' ),
-            'type'          => HTML::DATE_PICKER,
-            'default'       => date( 'Y-m-d', strtotime( '+1 day' ) ),
-            'description'   => __( 'The time will wait till this date to run...', 'groundhogg' )
-        ]);
+        $html->start_form_table();
 
-        $this->end_controls_section();
+        $html->start_row();
 
+        $html->th( __( 'Wait till:', 'groundhogg' ) );
 
-        $run_date = $step->get_meta( 'run_date' );
-        if ( ! $run_date )
-            $run_date = date( 'Y-m-d', strtotime( '+1 day' ) );
+        $run_date_args = [
+            'class'         => 'input',
+            'name'          => $this->setting_name_prefix( 'run_date' ),
+            'id'            => $this->setting_id_prefix( 'run_date' ),
+            'value'         => $this->get_setting( 'run_date', date( 'Y-m-d', strtotime( '+3 days' ) ) ),
+            'placeholder'   => 'yyy-mm-dd',
+        ];
 
-        $run_time = $step->get_meta( 'run_time' );
-        if ( ! $run_time )
-            $run_time = '09:30';
+        $run_date = $html->date_picker( $run_date_args );
 
-        $checked = $step->get_meta( 'disable' );
+        $run_time_args = [
+            'type'  => 'time',
+            'class' => 'input',
+            'name'  => $this->setting_name_prefix( 'run_time' ),
+            'id'    => $this->setting_id_prefix(   'run_time' ),
+            'value' => $this->get_setting( 'run_time', "09:00:00" ),
+        ];
 
-        ?>
+        $run_time = $html->input( $run_time_args );
 
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th><?php echo esc_html__( 'Wait till:', 'groundhogg' ); ?></th>
-                <td>
-                    <?php $args = array(
-                        'class'         => 'input',
-                        'name'          => $step->prefix( 'run_date' ),
-                        'id'            => $step->prefix( 'run_date' ),
-                        'value'         => $run_date,
-                        'placeholder'   => 'yyy-mm-dd',
-                    );
+        $local_time_args = [
+            'label'         => _x( "Run in the contact's local time.", 'action', 'groundhogg' ),
+            'name'          => $this->setting_name_prefix( 'send_in_timezone' ),
+            'id'            => $this->setting_id_prefix(   'send_in_timezone' ),
+            'value'         => '1',
+            'checked'       => $step->get_meta( 'send_in_timezone' ),
+            'title'         => __( 'Run in the contact\'s local time.', 'groundhogg' ),
+            'required'      => false,
+        ];
 
-                    echo WPGH()->html->input( $args ); ?>
-                    <?php
+        $local_time = $html->wrap( $html->checkbox( $local_time_args ), 'div', [ 'id' => $this->setting_id_prefix( 'local_time_div' ) ] );
 
-                    $args = array(
-                        'type'  => 'time',
-                        'class' => 'input',
-                        'name'  => $step->prefix( 'run_time' ),
-                        'id'    => $step->prefix( 'run_time' ),
-                        'value' => $run_time,
-                    );
+        $td_content = $run_date . $run_time . $local_time;
 
-                    echo WPGH()->html->input( $args ); ?>
-                    <script>jQuery(function($){$('#<?php echo $step->prefix( 'run_date' ); ?>').datepicker({
-                        changeMonth: true,
-                        changeYear: true,
-                        minDate:0,
-                        dateFormat:'yy-m-d'
-                    })});</script>
-                    <div id="<?php echo $step->prefix( 'local_time' );?>"><?php
-                        echo WPGH()->html->checkbox( array(
-                            'label'         => _x( 'Run in the contact\'s local time.', 'action', 'groundhogg' ),
-                            'name'          => $step->prefix( 'send_in_timezone' ),
-                            'id'            => $step->prefix( 'send_in_timezone' ),
-                            'class'         => '',
-                            'value'         => '1',
-                            'checked'       => $step->get_meta( 'send_in_timezone' ),
-                            'title'         => __( 'Run in the contact\'s local time.', 'groundhogg' ),
-                            'attributes'    => '',
-                            'required'      => false,) );
-                        ?></div>
-            </tr>
-            <tr>
-                <th>
-                    <?php echo esc_html__( 'Disable Temporarily:', 'groundhogg' ); ?>
-                </th>
-                <td><?php
-                    $args = array(
-//                    'type'  => 'time',
-//                    'class' => 'input',
-                        'name'  => $step->prefix( 'disable' ),
-                        'id'    => $step->prefix( 'disable' ),
-                        'value' => 1,
-                        'checked' => $checked,
-                        'label' => __( 'Disable', 'groundhogg' )
-                    );
+        $html->td( $td_content );
 
-                    echo WPGH()->html->checkbox( $args ); ?>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        $html->end_row();
 
-        <?php
+        $html->end_form_table();
     }
 
     /**
      * Compare timers to see if one which date comes first compared to the order of appearance
      *
-     * @param $step1 WPGH_Step
-     * @param $step2 WPGH_Step
+     * @param $step1 Step
+     * @param $step2 Step
      *
      * @return int;
      */
@@ -187,48 +141,26 @@ class Date_Timer extends Action
     /**
      * Save the step settings
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function save( $step )
     {
+        $this->save_setting( 'run_date', strtotime( 'Y-m-d', $this->get_posted_data( 'run_date' ) ) );
+        $this->save_setting( 'run_time', sanitize_text_field( $this->get_posted_data( 'run_date' ) ) );
 
-        $amount = sanitize_text_field(  $_POST[ $step->prefix( 'run_date' )] );
-        $date = date( 'Y-m-d', strtotime( $amount ) );
-        $step->update_meta( 'run_date', $date );
+        $send_in_timezone = $this->get_posted_data( 'send_in_timezone', false );
+        $this->save_setting( 'send_in_timezone', (bool) $send_in_timezone );
 
-        $type = sanitize_text_field( $_POST[ $step->prefix( 'run_time' ) ] );
-        $step->update_meta( 'run_time', $type );
+        $other_timers = $this->get_like_steps( [ 'funnel_id' => $step->get_funnel_id() ] );
 
-        if ( isset( $_POST[ $step->prefix( 'disable' ) ] ) ){
-            $step->update_meta( 'disable', 1 );
-        } else {
-            $step->delete_meta( 'disable' );
-        }
-
-        if ( isset( $_POST[ $step->prefix( 'send_in_timezone' ) ] ) ){
-            $step->update_meta( 'send_in_timezone', 1 );
-        } else {
-            $step->delete_meta( 'send_in_timezone' );
-        }
-
-        $date_timers = WPGH()->steps->get_steps( array( 'step_type' => 'date_timer', 'funnel_id' => $step->funnel_id ) );
-
-        foreach ( $date_timers as $date_timer ){
-
-            $date_timer = wpgh_get_funnel_step( $date_timer->ID );
-
-            if ( $date_timer->order < $step->order && $this->compare_timer( $date_timer, $step ) < 0 ){
-
-                WPGH()->notices->add( 'timer-error', sprintf( __( 'You have date timers with descending dates! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->ID, $step->title ), 'warning' );
-
+        foreach ( $other_timers as $date_timer ){
+            if ( $date_timer->get_order() < $step->get_order() && $this->compare_timer( $date_timer, $step ) < 0 ){
+                Plugin::$instance->notices->add( 'timer-error', sprintf( __( 'You have date timers with descending dates! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->get_id(), $step->get_title() ), 'warning' );
             }
-
         }
 
         if ( $this->enqueue( $step ) < time() ){
-
-            WPGH()->notices->add( 'timer-error', sprintf( __( 'You have date timers with dates in the past! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->ID, $step->title ), 'warning' );
-
+            Plugin::$instance->notices->add( 'timer-error', sprintf( __( 'You have date timers with dates in the past! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->get_id(), $step->get_title() ), 'warning' );
         }
 
     }
@@ -236,33 +168,23 @@ class Date_Timer extends Action
     /**
      * Override the parent and set the run time of this function to the settings
      *
-     * @param WPGH_Step $step
+     * @param Step $step
      * @return int
      */
     public function enqueue( $step )
     {
-        if ( $step->get_meta( 'disable' ) ){
-            return parent::enqueue( $step );
-        }
-
-        $run_date = $step->get_meta( 'run_date' );
-        $send_in_timezone = $step->get_meta( 'send_in_timezone' );
-
-        if ( ! $run_date )
-            $run_date = date( 'Y-m-d', strtotime( '+1 day' ) );
-
-        $run_time = $step->get_meta( 'run_time' );
-        if ( ! $run_time )
-            $run_time = '09:30';
+        $run_date = $this->get_setting( 'run_date', date( 'Y-m-d', strtotime( '+1 day' ) ) );
+        $run_time = $this->get_setting( 'run_time', '09:00:00' );
+        $send_in_timezone = $this->get_setting( 'send_in_timezone', false );
 
         $time_string = $run_date . ' ' . $run_time;
 
         /* convert to UTC */
-        $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
+        $final_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
 
         /* Modify according to the contacts timezone */
-        if ( $send_in_timezone && WPGH()->event_queue->is_processing()  ){
-            $final_time = WPGH()->event_queue->cur_event->contact->get_local_time_in_utc_0( $final_time );
+        if ( $send_in_timezone && Plugin::$instance->event_queue::is_processing()  ){
+            $final_time = Plugin::$instance->event_queue->get_current_contact()->get_local_time_in_utc_0( $final_time );
             if ( $final_time < time() ){
                 $final_time+=DAY_IN_SECONDS;
             }
@@ -274,8 +196,8 @@ class Date_Timer extends Action
     /**
      * Process the apply tag step...
      *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event Event
      *
      * @return true
      */

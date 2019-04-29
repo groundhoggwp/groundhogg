@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Event Queue
  *
@@ -12,29 +16,27 @@
  * @since       File available since Release 1.0.18
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Event_Queue_v2
+class Event_Queue extends Supports_Errors
 {
 
-    const ACTION = 'wpgh_process_queue';
+    const ACTION = 'groundhogg_process_queue';
 
     /**
-     * @var WPGH_Contact the current contact in the event
+     * @var Contact the current contact in the event
      */
-    public $contact;
+    protected $current_contact;
 
     /**
-     * @var object|WPGH_Event the current event
+     * @var object|Event the current event
      */
-    public $cur_event;
+    protected $current_event;
 
     /**
      * All the events queued for processing
      *
-     * @var array of events
+     * @var Event[] of events
      */
-    public $events;
+    protected $events;
 
     /**
      * @var int
@@ -44,22 +46,22 @@ class WPGH_Event_Queue_v2
     /**
      * @var array()
      */
-    public $schedules = array();
+    protected $schedules = array();
 
     /**
      * @var bool
      */
-    private $processing_queue;
+    private static $is_processing;
 
     /**
      * @var float
      */
-    private $max_process_time;
+    protected $max_process_time;
 
     /**
      * @var int
      */
-    private $events_completed = 0;
+    protected $events_completed = 0;
 
     /**
      * Setup the cron jobs
@@ -68,17 +70,38 @@ class WPGH_Event_Queue_v2
      */
     public function __construct()
     {
-        add_action( 'plugins_loaded', array( $this, 'setup_cron_schedules' ) );
+        $this->setup_cron_schedules();
+
         add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
         add_action( 'init', array( $this, 'setup_cron_jobs' ) );
         add_action( self::ACTION , array( $this, 'run_queue' ) );
 
         if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
-
             add_action( 'init' , array( $this, 'run_queue_manually' ) );
-
         }
+    }
 
+    public function get_queue_execution_time()
+    {
+
+    }
+
+    public function get_last_execution_time()
+    {
+        return Plugin::$instance->settings->get_option( 'queue_last_execution_time' );
+    }
+
+    public function get_total_executions()
+    {
+
+    }
+
+
+    /**
+     * Run the queue Manually and provide a notice.
+     */
+    public function run_queue_manually(){
+        Plugin::$instance->notices->add( 'queue-complete', sprintf( "%d events have been completed in %s seconds.", $this->run_queue(), $this->get_last_execution_time() ) );
     }
 
     /**
@@ -103,13 +126,17 @@ class WPGH_Event_Queue_v2
     }
 
     /**
-     * Add the scheules
+     * Add the schedules
      *
      * @param $schedules
-     * @return array
+     * @return array|false
      */
-    public function add_cron_schedules( $schedules )
+    public function add_cron_schedules( $schedules = [] )
     {
+        if ( ! is_array( $schedules ) ){
+            return $schedules;
+        }
+
         $schedules = array_merge( $schedules, $this->schedules );
         return $schedules;
     }
@@ -121,16 +148,16 @@ class WPGH_Event_Queue_v2
      */
     public function setup_cron_jobs()
     {
-        $settings_queue_interval = wpgh_get_option( 'gh_queue_interval', 'every_5_minutes' );
-        $real_queue_interval = wpgh_get_option( 'gh_real_queue_interval' );
+        $settings_queue_interval    = Plugin::$instance->settings->get_option( 'queue_interval', 'every_5_minutes' );
+        $real_queue_interval        = Plugin::$instance->settings->get_option( 'real_queue_interval' );
 
         if ( ! wp_next_scheduled( self::ACTION ) || $settings_queue_interval !== $real_queue_interval ){
-            wp_clear_scheduled_hook( 'wpgh_cron_event' );
-            update_option( 'gh_real_queue_interval', $settings_queue_interval );
-            wp_schedule_event( time(), apply_filters( 'wpgh_queue_interval', $settings_queue_interval ), self::ACTION );
+            wp_clear_scheduled_hook( self::ACTION );
+            Plugin::$instance->settings->update_option( 'real_queue_interval', $settings_queue_interval );
+            wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', $settings_queue_interval ), self::ACTION );
         }
 
-        $this->time_till_process = wp_next_scheduled( 'wpgh_process_queue' ) - time();
+        $this->time_till_process = wp_next_scheduled( self::ACTION ) - time();
     }
 
     /**
@@ -138,21 +165,13 @@ class WPGH_Event_Queue_v2
      */
     public function prepare_events()
     {
+        $events = Plugin::$instance->dbs->get_db( 'events' )->get_queued_event_ids();
 
-        $events = WPGH()->events->get_queued_events();
-
-        foreach ( $events as $event ) {
-            $this->events[] = new WPGH_Event( $event->ID );
+        foreach ( $events as $event_id ) {
+            $this->events[] = Plugin::$instance->utils->get_event( $event_id );
         }
 
         return $this->events;
-    }
-
-    /**
-     * Run the queue Manually and provide a notice.
-     */
-    public function run_queue_manually(){
-        WPGH()->notices->add( 'queue-complete', sprintf( "%d events have been completed in %s seconds.", $this->run_queue(), wpgh_get_option( 'gh_queue_last_execution_time' ) ) );
     }
 
     /**
@@ -160,50 +179,40 @@ class WPGH_Event_Queue_v2
      */
     public function run_queue()
     {
-        $start = microtime(true);
+        $start = microtime(true );
 
-        $this->set_php_timeout_limit();
-        $this->max_process_time = $start + $this->get_max_execution_time();
+        $settings = Plugin::$instance->settings;
+
+        // Give ourselves an extra 3 seconds to clean up if we need to.
+        $this->max_process_time = $start + $this->get_max_execution_time() - 3;
+
         $result =  $this->process();
-        $end = microtime(true);
+        $end = microtime(true );
         $process_time = $end - $start;
 
-        $times_executed = intval( wpgh_get_option( 'gh_queue_times_executed', 0 ) );
-        $average_execution_time = floatval( wpgh_get_option( 'gh_average_execution_time', 0.0 ) );
+        $times_executed = intval( $settings->get_option( 'queue_times_executed', 0 ) );
+        $average_execution_time = floatval( $settings->get_option( 'average_execution_time', 0.0 ) );
 
         $average = $times_executed * $average_execution_time;
         $average += $process_time;
         $times_executed++;
         $average_execution_time = $average / $times_executed;
 
-        wpgh_update_option( 'gh_queue_last_execution_time', $process_time );
-        wpgh_update_option( 'gh_queue_times_executed', $times_executed );
-        wpgh_update_option( 'gh_average_execution_time', $average_execution_time );
+        $settings->update_option( 'queue_last_execution_time', $process_time );
+        $settings->update_option( 'queue_times_executed', $times_executed );
+        $settings->update_option( 'average_execution_time', $average_execution_time );
 
         return $result;
     }
 
     /**
-     * Process the queue within a semaphore lock...
+     * Set the processing state
+     *
+     * @param bool $bool
      */
-    private function semaphore_process()
+    protected static function set_is_processing( $bool = true )
     {
-        $key = ftok(__FILE__, 'G' );
-
-        $semaphore = sem_get($key, 1);
-
-        $result = 0;
-
-        if ( $semaphore && sem_acquire( $semaphore, 1) !== false ) {
-
-            $result = $this->process();
-
-            sem_release($semaphore) ;
-
-        }
-
-        return $result;
-
+       self::$is_processing = (bool) $bool;
     }
 
     /**
@@ -211,9 +220,9 @@ class WPGH_Event_Queue_v2
      *
      * @return bool
      */
-    public function is_processing()
+    public static function is_processing()
     {
-       return $this->processing_queue;
+        return (bool) static::$is_processing;
     }
 
     /**
@@ -223,30 +232,64 @@ class WPGH_Event_Queue_v2
      */
     public function get_max_execution_time()
     {
-        $real_queue_interval = wpgh_get_option( 'gh_real_queue_interval', 'every_5_minutes' );
+        $real_queue_interval = Plugin::$instance->settings->get_option( 'real_queue_interval', 'every_5_minutes' );
 
         switch ( $real_queue_interval ){
             case 'every_10_minutes':
-                return 10 * MINUTE_IN_SECONDS;
+                $max = 10 * MINUTE_IN_SECONDS;
                 break;
             default;
             case 'every_5_minutes':
-                return 5 * MINUTE_IN_SECONDS;
+                $max = 5 * MINUTE_IN_SECONDS;
                 break;
             case 'every_1_minutes':
-                return MINUTE_IN_SECONDS;
+                $max = MINUTE_IN_SECONDS;
                 break;
         }
 
+        $real_max = $this->get_real_max_execution_time();
+
+        return min( $max, $real_max );
     }
 
     /**
-     * Set a PHP time limit so as to not overun the queue as a fail safe.
-     * Add 1 second to give the process time to clean up after itself.
+     * @return int
      */
-    public function set_php_timeout_limit()
+    public function get_real_max_execution_time()
     {
-        set_time_limit( $this->get_max_execution_time() + 1 );
+        return absint( ini_get('max_execution_time') );
+    }
+
+    /**
+     * @param $event Event
+     */
+    protected function set_current_event( &$event )
+    {
+        $this->current_event = $event;
+    }
+
+    /**
+     * @return Event
+     */
+    public function get_current_event()
+    {
+        return $this->current_event;
+    }
+
+    /**
+     * @param $contact Contact
+     */
+    protected function set_current_contact( &$contact )
+    {
+        $this->current_contact = $contact;
+    }
+
+    /**
+     * @return Contact
+     */
+    public function get_current_contact()
+    {
+        return $this->current_contact;
     }
 
     /**
@@ -265,36 +308,38 @@ class WPGH_Event_Queue_v2
             return 0;
         }
 
-        do_action( 'wpgh_process_event_queue_before', $this );
-        do_action( 'groundhogg/queue/run/before', $this );
+        do_action( 'groundhogg/event_queue/process/before', $this );
 
         $i = 0;
 
-        $max_events = intval( wpgh_get_option( 'gh_max_events', 9999 ) );
+        $max_events = intval( Plugin::$instance->settings->get_option( 'max_events', 9999 ) );
 
         /* double check event setting */
         if ( $max_events === 0 ){
             $max_events = 9999;
         }
 
-        $this->processing_queue = true;
+        self::set_is_processing( true );
 
         /* Only run within given time allotment. DO NOT run past the time interval provided */
         while ( $this->has_events() && $i < $max_events && microtime( true ) < $this->max_process_time ) {
-            $this->cur_event = $this->get_next();
-            if ( $this->cur_event->run() && $this->cur_event->is_funnel_event() ){
-                $next_step = $this->cur_event->step->get_next_step();
-                if ( $next_step instanceof WPGH_Step && $next_step->is_active() ){
-                    $next_step->enqueue( $this->cur_event->contact );
+
+            $event = $this->get_next_event();
+            $this->set_current_event( $event );
+            $this->set_current_contact( $event->get_contact() );
+
+            if ( $event->run() && $event->is_funnel_event() ){
+                $next_step = $event->get_step()->get_next_action();
+                if ( $next_step instanceof Step && $next_step->is_active() ){
+                    $next_step->enqueue( $event->get_contact() );
                 }
             }
             $i++;
         }
 
-        $this->processing_queue = false;
+        self::set_is_processing( false );
 
-        do_action( 'wpgh_process_event_queue_after', $this );
-        do_action( 'groundhogg/queue/run/after', $this );
+        do_action( 'groundhogg/event_queue/process/after', $this );
 
         if ( microtime( true ) >= $this->max_process_time ){
             return $i;
@@ -306,7 +351,7 @@ class WPGH_Event_Queue_v2
     /**
      * Get the next event in the queue to run.
      */
-    public function get_next()
+    public function get_next_event()
     {
         return array_pop( $this->events );
     }
@@ -319,30 +364,6 @@ class WPGH_Event_Queue_v2
     public function has_events()
     {
         return ! empty( $this->events );
-    }
-
-    /**
-     * Add an event to the event queue
-     *
-     * @param $event array of event attributes
-     *
-     * @return int the ID of the new event
-     */
-    public function add( $event )
-    {
-        return WPGH()->events->add( $event );
-    }
-
-    /**
-     * Return whether a similar event exists
-     *
-     * @param $event array of event attributes
-     *
-     * @return bool whether the event exists
-     */
-    public function exists( $event )
-    {
-        return WPGH()->events->event_exists( $event );
     }
 
 }

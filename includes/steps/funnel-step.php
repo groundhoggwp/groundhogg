@@ -83,6 +83,7 @@ abstract class Funnel_Step extends Supports_Errors
         add_action("groundhogg/steps/{$this->get_type()}/import", [$this, 'import'], 10, 2);
         add_filter("groundhogg/steps/{$this->get_type()}/export", [$this, 'pre_export'], 1, 2);
         add_filter("groundhogg/steps/{$this->get_type()}/export", [$this, 'export'], 10, 2);
+        add_filter("groundhogg/steps/{$this->get_type()}/enqueue", [$this, 'pre_enqueue'], 1 );
         add_filter("groundhogg/steps/{$this->get_type()}/enqueue", [$this, 'enqueue']);
         add_filter("groundhogg/steps/{$this->get_type()}/run", [$this, 'pre_run'], 1, 2);
         add_filter("groundhogg/steps/{$this->get_type()}/run", [$this, 'run'], 10, 2);
@@ -212,9 +213,28 @@ abstract class Funnel_Step extends Supports_Errors
         $args[ 'field' ][ 'name' ] = $this->setting_name_prefix( $setting );
 
         // Multiple compatibility
-        if ( gisset_not_empty( $args[ 'field' ], 'multiple' ) && $args[ 'multiple' ] === true ){
+        if ( gisset_not_empty( $args[ 'field' ], 'multiple' ) && $args['field'][ 'multiple' ] === true ){
             $args[ 'field' ][ 'name' ] .= '[]';
             $args[ 'field' ][ 'multiple' ] = true;
+        }
+
+        switch ( $args[ 'type' ] ){
+            default:
+                $args[ 'field' ][ 'value' ] = $this->get_setting( $setting, $args[ 'default' ] );
+                break;
+            case HTML::TAG_PICKER:
+            case HTML::SELECT2:
+            case HTML::ROUND_ROBIN:
+            case HTML::DROPDOWN:
+            case HTML::DROPDOWN_OWNERS:
+            case HTML::DROPDOWN_EMAILS:
+            case HTML::DROPDOWN_SMS:
+            case HTML::DROPDOWN_CONTACTS:
+                $args[ 'field' ][ 'selected' ] = $this->get_setting( $setting, $args[ 'default' ] );
+                break;
+            case HTML::CHECKBOX:
+                $args[ 'field' ][ 'checked' ] = (bool) $this->get_setting( $setting, $args[ 'default' ] );
+                break;
         }
 
         Plugin::$instance->utils->html->add_form_control( $args );
@@ -266,7 +286,11 @@ abstract class Funnel_Step extends Supports_Errors
      */
     protected function save_setting( $setting='', $val='' )
     {
-        $this->get_current_step()->update_meta( $setting, $val );
+        if ( ! $val ){
+            $this->get_current_step()->delete_meta( $setting );
+        } else {
+            $this->get_current_step()->update_meta( $setting, $val );
+        }
     }
 
     /**
@@ -409,9 +433,13 @@ abstract class Funnel_Step extends Supports_Errors
      * Get similar steps which can be used by benchmarks.
      * @return Step[]
      */
-    public function get_like_steps()
+    public function get_like_steps( $query = [] )
     {
-        $raw_steps = Plugin::$instance->dbs->get_db( 'steps' )->get_steps( [ 'step_type' => $this->get_type(), 'step_group' => $this->get_group() ] );
+
+        $args = [ 'step_type' => $this->get_type(), 'step_group' => $this->get_group() ];
+        $query = array_merge( $query, $args );
+
+        $raw_steps = Plugin::$instance->dbs->get_db( 'steps' )->get_steps( $query );
 
         $steps = [];
 
@@ -582,6 +610,13 @@ abstract class Funnel_Step extends Supports_Errors
         return true;
     }
 
+    /**
+     * @param $step
+     */
+    public function pre_enqueue( $step )
+    {
+        $this->set_current_step( $step );
+    }
 
     /**
      * @param $step

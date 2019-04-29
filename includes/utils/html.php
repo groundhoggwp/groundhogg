@@ -77,13 +77,40 @@ class HTML
 <?php
     }
 
-    /**
-     * @param $th string
-     * @param $td string
-     */
-    public function add_form_row( $th, $td )
+    public function start_row( $args = [] )
     {
+        $args = wp_parse_args( $args, [
+            'title' => '',
+            'class' => '',
+            'id' => ''
+        ] );
 
+        printf( "<tr title='%s' class='%s' id='%s'>", esc_attr( $args[ 'title' ] ), esc_attr( $args[ 'class' ] ), esc_attr( [ 'id' ] ) );
+    }
+
+    public function end_row( $args = [] )
+    {
+        printf( "</tr>" );
+    }
+
+    public function th( $content, $args = [] )
+    {
+        $args = wp_parse_args( $args, [
+            'title' => '',
+            'class' => '',
+        ] );
+
+        printf( "<th title='%s' class='%s'>%s</th>", esc_attr( $args[ 'title' ] ), esc_attr( $args[ 'class' ] ), $content );
+    }
+
+    public function td( $content, $args = [] )
+    {
+        $args = wp_parse_args( $args, [
+            'title' => '',
+            'class' => '',
+        ] );
+
+        printf( "<td title='%s' class='%s'>%s</td>", esc_attr( $args[ 'title' ] ), esc_attr( $args[ 'class' ] ), $content );
     }
 
     /**
@@ -126,6 +153,35 @@ class HTML
             <?php
         endif;
     }
+
+    /**
+     * Wrap arbitraty HTML in another element
+     *
+     * @param string $content
+     * @param string $e
+     * @param array $atts
+     * @return string
+     */
+    public function wrap( $content = '', $e = 'div', $atts = [] )
+    {
+        return sprintf( '<%1$s %2$s>%3$s</%1$s>', esc_html( $e ), $this->array_to_atts( $atts ), $content );
+    }
+
+    /**
+     * Turn an arbitrary array of elements into html tags
+     *
+     * @param $atts
+     * @return string
+     */
+    public function array_to_atts( $atts )
+    {
+        $tag = '';
+        foreach ($atts as $key => $value) {
+            $tag .= sanitize_key( $key ) . '="' . esc_attr( $value ) . '" ';
+        }
+        return $tag;
+    }
+
 
     public function end_form_table()
     {

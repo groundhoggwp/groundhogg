@@ -134,7 +134,7 @@ class Events extends DB  {
     /**
      * Get all the queued events
      */
-    public function get_queued_events()
+    public function get_queued_event_ids()
     {
         global  $wpdb;
 
@@ -144,7 +144,7 @@ class Events extends DB  {
             , time(), 'waiting' )
         );
 
-        return $results;
+        return wp_parse_id_list( wp_list_pluck( $results, 'ID' ) );
     }
 
     /**
