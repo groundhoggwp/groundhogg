@@ -29,7 +29,7 @@ class WPGH_API_V3_EMAILS extends WPGH_API_V3_BASE
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route(self::NAMESPACE, '/emails', [
+        register_rest_route(self::NAME_SPACE, '/emails', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_emails' ],
@@ -58,7 +58,7 @@ class WPGH_API_V3_EMAILS extends WPGH_API_V3_BASE
             ]
         ] );
 
-        register_rest_route(self::NAMESPACE, '/emails/send' ,array(
+        register_rest_route(self::NAME_SPACE, '/emails/send' ,array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => [ $this, 'send_email' ],
             'permission_callback' => $auth_callback,

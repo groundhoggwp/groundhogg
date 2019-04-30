@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 abstract class WPGH_API_V3_BASE {
 
 
-    const NAMESPACE = 'gh/v3';
+    const NAME_SPACE = 'gh/v3';
 
     /**
      * @var WP_User

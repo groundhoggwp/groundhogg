@@ -29,7 +29,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route(self::NAMESPACE, '/tags', [
+        register_rest_route(self::NAME_SPACE, '/tags', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_tags' ],
@@ -94,7 +94,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
             ],
         ] );
 
-        register_rest_route(self::NAMESPACE, '/tags/apply', [
+        register_rest_route(self::NAME_SPACE, '/tags/apply', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'apply_tags' ],
@@ -116,7 +116,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
             ]
         ]);
 
-        register_rest_route(self::NAMESPACE, '/tags/remove', [
+        register_rest_route(self::NAME_SPACE, '/tags/remove', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'remove_tags' ],

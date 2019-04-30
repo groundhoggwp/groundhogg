@@ -29,7 +29,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route(self::NAMESPACE, '/contacts', [
+        register_rest_route(self::NAME_SPACE, '/contacts', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_contacts' ],
@@ -104,7 +104,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             ],
         ] );
 
-        register_rest_route(self::NAMESPACE, '/contacts/tags', [
+        register_rest_route(self::NAME_SPACE, '/contacts/tags', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_tags' ],
@@ -160,7 +160,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             ]
         ]);
 
-        register_rest_route(self::NAMESPACE, '/contacts/apply_tags', [
+        register_rest_route(self::NAME_SPACE, '/contacts/apply_tags', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'apply_tags' ],
@@ -182,7 +182,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             ]
         ]);
 
-        register_rest_route(self::NAMESPACE, '/contacts/remove_tags', [
+        register_rest_route(self::NAME_SPACE, '/contacts/remove_tags', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'remove_tags' ],
@@ -204,7 +204,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             ]
         ]);
 
-        register_rest_route(self::NAMESPACE, '/contacts/notes', [
+        register_rest_route(self::NAME_SPACE, '/contacts/notes', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_notes' ],

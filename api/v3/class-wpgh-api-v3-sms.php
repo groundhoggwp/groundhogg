@@ -29,7 +29,7 @@ class WPGH_API_V3_SMS extends WPGH_API_V3_BASE
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route(self::NAMESPACE, '/sms', [
+        register_rest_route(self::NAME_SPACE, '/sms', [
             [
 	            'methods' => WP_REST_Server::READABLE,
 	            'callback' => [ $this, 'get_sms' ],
@@ -58,7 +58,7 @@ class WPGH_API_V3_SMS extends WPGH_API_V3_BASE
             ]
         ] );
 
-        register_rest_route(self::NAMESPACE, '/sms/send' ,array(
+        register_rest_route(self::NAME_SPACE, '/sms/send' ,array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => [ $this, 'send_sms' ],
             'permission_callback' => $auth_callback,

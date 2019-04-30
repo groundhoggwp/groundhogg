@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.11.3 =
+* FIXED NAMSPACE constant not allowed in php 5.6, changed to NAME_SPACE for backwards compatibility.
+
 = 1.3.11.2 =
 * ADDED New more self explanatory hook to register API endpoints for extensions.
 * ADDED NAMESPACE constant for v3 API.
