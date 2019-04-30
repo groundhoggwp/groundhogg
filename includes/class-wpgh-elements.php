@@ -74,7 +74,7 @@ class WPGH_Elements
         include_once $action_path . 'create-user.php';
         include_once $action_path . 'date-timer.php';
         include_once $action_path . 'class-wpgh-field-timer.php';
-        include_once $action_path . 'class-wpgh-delay-timer.php';
+        include_once $action_path . 'delay-timer.php';
         include_once $action_path . 'class-wpgh-edit-meta.php';
         include_once $action_path . 'class-wpgh-http-post.php';
         include_once $action_path . 'class-wpgh-remove-tag.php';

@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg\Steps\Actions;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Delay Timer
  *
@@ -12,11 +16,48 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Delay_Timer extends WPGH_Funnel_Step
+class Delay_Timer extends Action
 {
+
+    /**
+     * Get the element name
+     *
+     * @return string
+     */
+    public function get_name()
+    {
+        return _x( 'Delay Timer', 'action_name', 'groundhogg' );
+    }
+
+    /**
+     * Get the element type
+     *
+     * @return string
+     */
+    public function get_type()
+    {
+        return 'delay_timer';
+    }
+
+    /**
+     * Get the description
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        // TODO: Implement get_description() method.
+    }
+
+    /**
+     * Get the icon URL
+     *
+     * @return string
+     */
+    public function get_icon()
+    {
+        // TODO: Implement get_icon() method.
+    }
 
     /**
      * @var string
@@ -267,7 +308,6 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
 
         return $final_time;
     }
-
     /**
      * Process the apply tag step...
      *
@@ -281,5 +321,4 @@ class WPGH_Delay_Timer extends WPGH_Funnel_Step
         //do nothing
         return true;
     }
-
 }
