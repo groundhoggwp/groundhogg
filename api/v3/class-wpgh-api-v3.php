@@ -38,6 +38,8 @@ class WPGH_API_V3
         $this->emails   = new WPGH_API_V3_EMAILS();
         $this->sms      = new WPGH_API_V3_SMS();
         $this->elements = new WPGH_API_V3_ELEMENTS();
+        $this->broadcasts = new WPGH_API_V3_BROADCASTS();
+        $this->bulk_job_listener = new WPGH_API_V3_BULK_JOB_LISTENER();
     }
 
     /**
@@ -84,6 +86,8 @@ class WPGH_API_V3
         include_once dirname(__FILE__) . '/class-wpgh-api-v3-emails.php';
         include_once dirname(__FILE__) . '/class-wpgh-api-v3-sms.php';
         include_once dirname(__FILE__) . '/class-wpgh-api-v3-elements.php';
+        include_once dirname(__FILE__) . '/class-wpgh-api-v3-broadcasts.php';
+        include_once dirname(__FILE__) . '/class-wpgh-api-v3-bulk-job-listener.php';
 
         do_action( 'groundhogg/api/v3/includes', $this );
 

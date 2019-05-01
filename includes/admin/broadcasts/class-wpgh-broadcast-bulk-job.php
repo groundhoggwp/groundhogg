@@ -43,7 +43,13 @@ class WPGH_Broadcast_Bulk_Job extends WPGH_Bulk_Job
         }
 
         $query = new WPGH_Contact_Query();
-        $args = $_GET;
+
+        $config = get_transient( 'gh_get_broadcast_config' );
+        if ( ! $config ){
+            return $items;
+        }
+
+        $args = $config[ 'contact_query' ];
 
         $contacts = $query->query( $args );
         $ids = wp_list_pluck( $contacts, 'ID' );
