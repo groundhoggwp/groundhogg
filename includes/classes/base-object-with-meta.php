@@ -34,7 +34,9 @@ abstract class Base_Object_With_Meta extends Base_Object
             return false;
         }
 
-        $this->ID = absint( $object->ID );
+        $identifier = $this->get_identifier_key();
+
+        $this->set_id( $object->$identifier );
 
         //Lets just make sure we all good here.
         $object = apply_filters( "groundhogg/{$this->get_object_type()}/setup", $object );
@@ -108,7 +110,7 @@ abstract class Base_Object_With_Meta extends Base_Object
             return $this->meta;
         }
 
-        $meta = $this->get_meta_db()->get_meta( $this->ID );
+        $meta = $this->get_meta_db()->get_meta( $this->get_id() );
 
         foreach ( $meta as $meta_key => $array_values ){
             $this->meta[ $meta_key ] = maybe_unserialize( array_shift( $array_values ) );
@@ -135,7 +137,7 @@ abstract class Base_Object_With_Meta extends Base_Object
             return $this->meta[ $key ];
         }
 
-        $val = $this->get_meta_db()->get_meta( $this->ID, $key, $single );
+        $val = $this->get_meta_db()->get_meta( $this->get_id(), $key, $single );
 
         $this->meta[ $key ] = $val;
 
@@ -152,7 +154,7 @@ abstract class Base_Object_With_Meta extends Base_Object
      */
     public function update_meta( $key, $value )
     {
-        if ( $this->get_meta_db()->update_meta( $this->ID, $key, $value ) ){
+        if ( $this->get_meta_db()->update_meta( $this->get_id(), $key, $value ) ){
             $this->meta[ $key ] = $value;
 
             return true;
@@ -171,7 +173,7 @@ abstract class Base_Object_With_Meta extends Base_Object
      */
     public function add_meta( $key, $value )
     {
-        if ( $this->get_meta_db()->add_meta( $this->ID, $key, $value ) ){
+        if ( $this->get_meta_db()->add_meta( $this->get_id(), $key, $value ) ){
             $this->meta[ $key ] = $value;
 
             return true;
@@ -190,7 +192,7 @@ abstract class Base_Object_With_Meta extends Base_Object
     public function delete_meta( $key )
     {
         unset( $this->meta[$key] );
-        return $this->get_meta_db()->delete_meta( $this->ID, $key );
+        return $this->get_meta_db()->delete_meta( $this->get_id(), $key );
     }
 
     /**

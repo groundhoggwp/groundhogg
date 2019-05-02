@@ -32,8 +32,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
      * @param $identifier int|string the identifier to look for
      * @param $field string the file to query
      */
-    public function __construct( $identifier = 0, $field = 'ID' )
+    public function __construct( $identifier = 0, $field = null )
     {
+        if ( ! $field ){
+            $field = $this->get_identifier_key();
+        }
+
         $object = $this->get_from_db( $field, $identifier );
 
         if ( ! $object || empty( $object ) )
@@ -41,6 +45,31 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
         $this->setup_object( $object );
     }
+
+    /**
+     * @return int
+     */
+    protected function get_id()
+    {
+        return absint( $this->ID );
+    }
+
+    /**
+     * @param $id
+     */
+    protected function set_id( $id )
+    {
+        $this->ID = absint( $id );
+    }
+
+    /**
+     * @return string
+     */
+    protected function get_identifier_key()
+    {
+        return $this->get_db()->get_primary_key();
+    }
+
 
     /**
      * Setup the class
@@ -56,7 +85,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
             return false;
         }
 
-        $this->ID = absint( $object->ID );
+        $identifier = $this->get_identifier_key();
+
+        $this->set_id( $object->$identifier );
 
         //Lets just make sure we all good here.
         $object = apply_filters( "groundhogg/{$this->get_object_type()}/setup", $object );
@@ -187,14 +218,14 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
         $data = $this->sanitize_columns( $data );
 
-        do_action( "groundhogg/{$this->get_object_type()}/pre_update", $this->ID, $data, $this );
+        do_action( "groundhogg/{$this->get_object_type()}/pre_update", $this->get_id(), $data, $this );
 
-        if ( $updated = $this->get_db()->update( $this->ID, $data, 'ID' ) ) {
-            $object = $this->get_from_db( 'ID', $this->ID );
+        if ( $updated = $this->get_db()->update( $this->get_id(), $data, $this->get_identifier_key() ) ) {
+            $object = $this->get_from_db( $this->get_identifier_key(), $this->get_id() );
             $this->setup_object( $object );
         }
 
-        do_action( "groundhogg/{$this->get_object_type()}/post_update", $this->ID, $data, $this );
+        do_action( "groundhogg/{$this->get_object_type()}/post_update", $this->get_id(), $data, $this );
 
         return $updated;
     }
