@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg\Steps\Actions;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Delay Timer
  *
@@ -12,43 +16,47 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Field_Timer extends WPGH_Funnel_Step
+class Field_Timer extends Action
 {
 
     /**
-     * @var string
+     * Get the element name
+     *
+     * @return string
      */
-    public $type    = 'field_timer';
-
-    /**
-     * @var string
-     */
-    public $group   = 'action';
-
-    /**
-     * @var string
-     */
-    public $icon    = 'field-timer.png';
-
-    /**
-     * @var string
-     */
-    public $name    = 'Field Timer';
-
-    /**
-     * @var string
-     */
-    public $description = 'Pause for the specified amount of time before a date in the meta.';
-
-    public function __construct()
+    public function get_name()
     {
-        $this->name = _x( 'Field Timer', 'element_name', 'groundhogg' );
-        $this->description = _x( 'Pause for the specified amount of time before a date in the meta.', 'element_description', 'groundhogg' );
+        return _x( 'Field Timer', 'action_name', 'groundhogg' );
+    }
 
-        parent::__construct();
+    /**
+     * Get the element type
+     *
+     * @return string
+     */
+    public function get_type()
+    {
+        return 'field_timer';
+    }
+
+    /**
+     * Get the description
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        return _x( 'Pause for the specified amount of time before a date in the meta.', 'element_description', 'groundhogg' );
+    }
+
+    /**
+     * Get the icon URL
+     *
+     * @return string
+     */
+    public function get_icon()
+    {
+        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/field-timer.png';
     }
 
     /**

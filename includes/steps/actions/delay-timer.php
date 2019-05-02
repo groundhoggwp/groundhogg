@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Contact;
+use Groundhogg\Event;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 
@@ -76,211 +78,108 @@ class Delay_Timer extends Action
 
         $html->th( __( 'Wait at least:', 'groundhogg' ) );
 
-        $run_date_args = [
-            'class'         => 'input',
-            'name'          => $this->setting_name_prefix( 'run_date' ),
-            'id'            => $this->setting_id_prefix( 'run_date' ),
-            'value'         => $this->get_setting( 'run_date', date( 'Y-m-d', strtotime( '+3 days' ) ) ),
-            'placeholder'   => 'yyy-mm-dd',
-        ];
-
-        $run_date = $html->date_picker( $run_date_args );
-
-        $run_time_args = [
-            'type'  => 'time',
-            'class' => 'input',
-            'name'  => $this->setting_name_prefix( 'run_time' ),
-            'id'    => $this->setting_id_prefix(   'run_time' ),
-            'value' => $this->get_setting( 'run_time', "09:00:00" ),
-        ];
-
-        $run_time = $html->input( $run_time_args );
-
-        $local_time_args = [
-            'label'         => _x( "Run in the contact's local time.", 'action', 'groundhogg' ),
-            'name'          => $this->setting_name_prefix( 'send_in_timezone' ),
-            'id'            => $this->setting_id_prefix(   'send_in_timezone' ),
-            'value'         => '1',
-            'checked'       => $step->get_meta( 'send_in_timezone' ),
-            'title'         => __( "Run in the contact's local time.", 'groundhogg' ),
-            'required'      => false,
-        ];
-
-        $local_time = $html->wrap( $html->checkbox( $local_time_args ), 'div', [ 'id' => $this->setting_id_prefix( 'local_time_div' ) ] );
-
-        $td_content = $run_date . $run_time . $local_time;
-
-        $html->td( $td_content );
+        $html->td( [
+            // DELAY AMOUNT
+            $html->number( [
+                'class'         => 'input',
+                'name'          => $this->setting_name_prefix( 'delay_amount' ),
+                'id'            => $this->setting_id_prefix( 'delay_amount' ),
+                'value'         => $this->get_setting( 'delay_amount', 3 ),
+                'placeholder'   => 3,
+            ] ),
+            // DELAY TYPE
+            $html->dropdown( [
+                'name'          => $this->setting_name_prefix( 'delay_type' ),
+                'id'            => $this->setting_id_prefix( 'delay_type' ),
+                'options'       => [
+                    'minutes'   => __( 'Minutes' ),
+                    'hours'     => __( 'Hours' ),
+                    'days'      => __( 'Days' ),
+                    'weeks'     => __( 'Weeks' ),
+                    'months'    => __( 'Months' ),
+                ],
+                'selected'      => $this->get_setting( 'delay_type', 'minutes' ),
+                'option_none'   => false,
+            ] ),
+        ] );
 
         $html->end_row();
+        $html->start_row();
+
+        $html->th( __( 'And run:', 'groundhogg' ) );
+
+        $html->td( [
+            // RUN WHEN
+            $html->dropdown( [
+                'name'          => $this->setting_name_prefix( 'run_when' ),
+                'id'            => $this->setting_id_prefix( 'run_when' ),
+                'class'         => 'run_when',
+                'options'       => [
+                    'now'   => __( 'Immediately', 'groundhogg' ),
+                    'later' => __( 'At time of day', 'groundhogg' ),
+                ],
+                'selected'      => $this->get_setting( 'run_when', 'now' ),
+                'option_none'   => false,
+            ] ),
+            // RUN TIME
+            $html->input( [
+                'type'  => 'time',
+                'class' => ( 'now' === $this->get_setting( 'run_when', 'now' ) ) ? 'input run_time hidden' : 'run_time input',
+                'name'  => $this->setting_name_prefix( 'run_time' ),
+                'id'    => $this->setting_id_prefix(   'run_time' ),
+                'value' => $this->get_setting( 'run_time', "09:00:00" ),
+            ] ),
+            // LOCAL TIME
+            $html->wrap(
+                $html->checkbox( [
+                    'label'         => _x( "Run in the contact's local time.", 'action', 'groundhogg' ),
+                    'name'          => $this->setting_name_prefix( 'send_in_timezone' ),
+                    'id'            => $this->setting_id_prefix(   'send_in_timezone' ),
+                    'value'         => '1',
+                    'checked'       => (bool) $this->get_setting( 'send_in_timezone' ),
+                    'title'         => __( "Run in the contact's local time.", 'groundhogg' ),
+                    'required'      => false,
+                ] ),
+                'div',
+                [
+                    'id' => $this->setting_id_prefix( 'local_time_div' )
+                ]
+            )
+        ] );
 
         $html->end_form_table();
-
-        ?>
-
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th><?php echo esc_html__( 'Wait at least:', 'groundhogg' ); ?></th>
-                <td>
-                    <?php $args = array(
-                        'name'  => $step->prefix( 'delay_amount' ),
-                        'id'    => $step->prefix( 'delay_amount' ),
-                        'class' => 'input',
-                        'value' => $amount,
-                        'min'   => 0,
-                        'max'   => 9999,
-                    );
-
-                    echo WPGH()->html->number( $args );
-
-                    $delay_types = array(
-                        'minutes'   => __( 'Minutes' ),
-                        'hours'     => __( 'Hours' ),
-                        'days'      => __( 'Days' ),
-                        'weeks'     => __( 'Weeks' ),
-                        'months'    => __( 'Months' ),
-                    );
-
-                    $args = array(
-                        'name'          => $step->prefix( 'delay_type' ),
-                        'id'            => $step->prefix( 'delay_type' ),
-                        'options'       => $delay_types,
-                        'selected'      => $type,
-                        'option_none'   => false,
-                    );
-
-                    echo WPGH()->html->dropdown( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th><?php echo esc_html__( 'And run:', 'groundhogg' ); ?></th>
-                <td>
-                    <?php
-
-                    $when_types = array(
-                        'now'   => __( 'Immediately', 'groundhogg' ),
-                        'later' => __( 'At time of day...', 'groundhogg' ),
-                    );
-
-                    $args = array(
-                        'name'          => $step->prefix( 'run_when' ),
-                        'id'            => $step->prefix( 'run_when' ),
-                        'options'       => $when_types,
-                        'selected'      => $run_when,
-                        'option_none'   => false,
-                    );
-
-                    echo WPGH()->html->dropdown( $args );
-
-                    $args = array(
-                        'type'  => 'time',
-                        'class' => ( 'now' === $run_when ) ? 'input hidden' : 'input',
-                        'name'  => $step->prefix( 'run_time' ),
-                        'id'    => $step->prefix( 'run_time' ),
-                        'value' => $run_time,
-                    );
-
-                    echo WPGH()->html->input( $args );
-
-                    ?><div id="<?php echo $step->prefix( 'local_time' );?>" class="<?php echo ( 'now' === $run_when ) ? 'hidden' : ''; ?>"><?php
-                    echo WPGH()->html->checkbox( array(
-                        'label'         => _x( 'Run in the contact\'s local time.', 'action', 'groundhogg' ),
-                        'name'          => $step->prefix( 'send_in_timezone' ),
-                        'id'            => $step->prefix( 'send_in_timezone' ),
-                        'class'         => '',
-                        'value'         => '1',
-                        'checked'       => $step->get_meta( 'send_in_timezone' ),
-                        'title'         => __( 'Run in the contact\'s local time.', 'groundhogg' ),
-                        'attributes'    => '',
-                        'required'      => false,) );
-                        ?></div>
-
-                    <script>
-                        jQuery( "#<?php echo $step->prefix( 'run_when' ); ?>" ).change(function(){
-                            jQuery( "#<?php echo $step->prefix( 'run_time' ); ?>" ).toggleClass( 'hidden' );
-                            jQuery( "#<?php echo $step->prefix( 'local_time' ); ?>" ).toggleClass( 'hidden' );
-                        });
-                    </script>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <?php echo esc_html__( 'Disable Temporarily:', 'groundhogg' ); ?>
-                </th>
-                <td><?php
-                    $args = array(
-//                    'type'  => 'time',
-//                    'class' => 'input',
-                        'name'  => $step->prefix( 'disable' ),
-                        'id'    => $step->prefix( 'disable' ),
-                        'value' => 1,
-                        'checked' => $checked,
-                        'label' => __( 'Disable', 'groundhogg' )
-                    );
-
-                    echo WPGH()->html->checkbox( $args ); ?>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
-        <?php
     }
 
     /**
      * Save the step settings
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function save( $step )
     {
+        $this->save_setting( 'delay_amount', absint( $this->get_posted_data( 'delay_amount' ) ) );
+        $this->save_setting( 'delay_type', sanitize_text_field( $this->get_posted_data( 'delay_type' ) ) );
+        $this->save_setting( 'run_when', sanitize_text_field( $this->get_posted_data( 'run_when' ) ) );
+        $this->save_setting( 'run_time', sanitize_text_field( $this->get_posted_data( 'run_time' ) ) );
 
-        $amount = intval( $_POST[ $step->prefix('delay_amount' ) ] );
-        $step->update_meta( 'delay_amount', $amount );
-
-        $type = sanitize_text_field( $_POST[ $step->prefix( 'delay_type' ) ] );
-        $step->update_meta( 'delay_type', $type );
-
-        $run_time = sanitize_text_field( $_POST[ $step->prefix( 'run_when' ) ] );
-        $step->update_meta( 'run_when', $run_time );
-
-        $run_time = sanitize_text_field( $_POST[ $step->prefix( 'run_time' ) ] );
-        $step->update_meta( 'run_time', $run_time );
-
-        if ( isset( $_POST[ $step->prefix( 'disable' ) ] ) ){
-            $step->update_meta( 'disable', 1 );
-        } else {
-            $step->delete_meta( 'disable' );
-        }
-
-        if ( isset( $_POST[ $step->prefix( 'send_in_timezone' ) ] ) ){
-            $step->update_meta( 'send_in_timezone', 1 );
-        } else {
-            $step->delete_meta( 'send_in_timezone' );
-        }
-
-
+        $send_in_timezone = $this->get_posted_data( 'send_in_timezone', false );
+        $this->save_setting( 'send_in_timezone', (bool) $send_in_timezone );
     }
 
     /**
      * Override the parent and set the run time of this function to the settings
      *
-     * @param WPGH_Step $step
+     * @param Step $step
      * @return int
      */
     public function enqueue( $step )
     {
 
-        if ( $step->get_meta( 'disable' ) ){
-            return parent::enqueue( $step );
-        }
-
-        $amount     = $step->get_meta( 'delay_amount' );
-        $type       = $step->get_meta( 'delay_type' );
-        $run_when   = $step->get_meta( 'run_when' );
-        $run_time   = $step->get_meta( 'run_time' );
-        $send_in_timezone = $step->get_meta( 'send_in_timezone' );
+        $amount     = absint( $this->get_setting( 'delay_amount' ) );
+        $type       = $this->get_setting( 'delay_type' );
+        $run_time   = $this->get_setting( 'run_time', '09:00:00' );
+        $run_when   = $this->get_setting( 'run_when', 'now' );
+        $send_in_timezone = $this->get_setting( 'send_in_timezone', false );
 
         if ( $run_when == 'now' ){
             $time_string = '+ ' . $amount . ' ' . $type;
@@ -296,11 +195,11 @@ class Delay_Timer extends Action
             }
 
             /* convert to utc */
-            $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
+            $final_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
 
             /* Modify according to the contacts timezone */
-            if ( $send_in_timezone && WPGH()->event_queue->is_processing()  ){
-                $final_time = WPGH()->event_queue->cur_event->contact->get_local_time_in_utc_0( $final_time );
+            if ( $send_in_timezone && Plugin::$instance->event_queue::is_processing()  ){
+                $final_time = Plugin::$instance->event_queue->get_current_contact()->get_local_time_in_utc_0( $final_time );
                 if ( $final_time < time() ){
                     $final_time+=DAY_IN_SECONDS;
                 }
@@ -312,8 +211,8 @@ class Delay_Timer extends Action
     /**
      * Process the apply tag step...
      *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event Event
      *
      * @return true
      */

@@ -1,4 +1,13 @@
 <?php
+namespace Groundhogg\Steps\Actions;
+
+use Groundhogg\Contact;
+use Groundhogg\Event;
+use Groundhogg\Plugin;
+use Groundhogg\Step;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * HTTP Post
  *
@@ -12,49 +21,52 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_HTTP_Post extends WPGH_Funnel_Step
+class HTTP_Post extends Action
 {
-
     /**
-     * @var string
+     * Get the element name
+     *
+     * @return string
      */
-    public $type    = 'http_post';
-
-    /**
-     * @var string
-     */
-    public $group   = 'action';
-
-    /**
-     * @var string
-     */
-    public $icon    = 'http-post.png' ;
-
-    /**
-     * @var string
-     */
-    public $name    = 'HTTP Post';
-
-    /**
-     * @var string
-     */
-    public $description = 'Send an HTTP Post to your favorite external software.';
-
-    public function __construct()
+    public function get_name()
     {
-        $this->name = _x( 'HTTP Post', 'element_name', 'groundhogg' );
-        $this->description = _x( 'Send an HTTP Post to your favorite external software.', 'element_description', 'groundhogg' );
-
-        parent::__construct();
+        return _x( 'HTTP Post', 'action_name', 'groundhogg' );
     }
 
     /**
+     * Get the element type
+     *
+     * @return string
+     */
+    public function get_type()
+    {
+        return 'http_post';
+    }
+
+    /**
+     * Get the description
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        return _x( 'Send an HTTP Post to your favorite external software.', 'element_description', 'groundhogg' );
+    }
+
+    /**
+     * Get the icon URL
+     *
+     * @return string
+     */
+    public function get_icon()
+    {
+        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/http-post.png';
+    }
+    
+    /**
      * Display the settings
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function settings( $step )
     {
@@ -67,9 +79,11 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
             $post_values = array( '' ); //empty to show first option.
         }
 
+        $html = Plugin::$instance->utils->html;
+        
         ?>
 
-        <table class="form-table" id="meta-table-<?php echo $step->ID ; ?>">
+        <table class="form-table" id="meta-table-<?php echo $step->get_id() ; ?>">
             <tbody>
             <tr>
                 <td>
@@ -78,12 +92,12 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
                 <td colspan="2">
                     <?php $args = array(
                         'type'  => 'url',
-                        'name'  => $step->prefix( 'post_url' ),
-                        'id'    => $step->prefix( 'post_url' ),
+                        'name'  => $this->setting_name_prefix( 'post_url' ),
+                        'id'    => $this->setting_id_prefix( 'post_url' ),
                         'value' => $post_url
                     );
 
-                    echo WPGH()->html->input( $args ); ?>
+                    echo $html->input( $args ); ?>
                 </td>
             </tr>
             <?php foreach ( $post_keys as $i => $post_key): ?>
@@ -92,12 +106,12 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
                         <label><strong><?php _e( 'Key: ' ); ?></strong>
 
                             <?php $args = array(
-                                'name'  => $step->prefix( 'post_keys' ) . '[]',
+                                'name'  => $this->setting_name_prefix( 'post_keys' ) . '[]',
                                 'class' => 'input',
                                 'value' => sanitize_key( $post_key )
                             );
 
-                            echo WPGH()->html->input( $args ); ?>
+                            echo $html->input( $args ); ?>
 
                         </label>
                     </td>
@@ -108,7 +122,7 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
                                 'value' => esc_html( $post_values[$i] )
                             );
 
-                            echo WPGH()->html->input( $args ); ?></label>
+                            echo $html->input( $args ); ?></label>
                     </td>
                     <td>
                     <span class="row-actions">
@@ -121,7 +135,7 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
             </tbody>
         </table>
         <p>
-            <?php WPGH()->replacements->show_replacements_button(); ?>
+            <?php Plugin::$instance->replacements->show_replacements_button(); ?>
         </p>
         <script>
             jQuery(function($){
@@ -143,44 +157,41 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
     /**
      * Save the settings
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function save( $step )
     {
+        $this->save_setting( 'post_url', esc_url_raw( $this->get_posted_data( 'post_url' ) ) );
 
-        if ( isset( $_POST[ $step->prefix( 'post_url' ) ] ) ){
-            $step->update_meta( 'post_url', esc_url_raw( $_POST[ $step->prefix( 'post_url' ) ] ) );
-        }
+        $post_keys = $this->get_posted_data( 'post_keys', [] );
 
-        if ( isset( $_POST[ $step->prefix(  'post_keys' ) ]  ) ){
-            $post_keys = $_POST[ $step->prefix(  'post_keys' ) ];
-            $post_values = $_POST[ $step->prefix( 'post_values' ) ];
+        if ( $post_keys ){
+            $post_values = $this->get_posted_data( 'post_values', [] );
 
             if ( ! is_array( $post_keys ) )
                 return;
 
             $post_keys = array_map( 'sanitize_key', $post_keys );
-            $post_values = array_map( 'sanitize_text_field', $post_values );
+            $post_values = array_map( 'sanitize_text_field', wp_unslash( $post_values ) );
 
-            $step->update_meta( 'post_keys', $post_keys );
-            $step->update_meta( 'post_values', $post_values );
+            $this->save_setting( 'post_keys', $post_keys );
+            $this->save_setting( 'post_values', $post_values );
         }
 
     }
-
     /**
      * Process the http post step...
      *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event Event
      *
      * @return bool|object
      */
     public function run( $contact, $event )
     {
 
-        $post_keys = $event->step->get_meta( 'post_keys' );
-        $post_values = $event->step->get_meta( 'post_values' );
+        $post_keys   = $this->get_setting( 'post_keys' );
+        $post_values = $this->get_setting( 'post_values' );
 
         if ( ! is_array( $post_keys ) || ! is_array( $post_values ) || empty( $post_keys ) || empty( $post_values ) ){
             return false;
@@ -191,24 +202,22 @@ class WPGH_HTTP_Post extends WPGH_Funnel_Step
         foreach ( $post_keys as $i => $key )
         {
             if ( ! empty( $key ) ){
-                $post_array[ sanitize_key( $key ) ] = WPGH()->replacements->process( sanitize_text_field( $post_values[ $i ] ), $contact->ID );
+                $post_array[ sanitize_key( $key ) ] = Plugin::$instance->replacements->process( sanitize_text_field( $post_values[ $i ] ), $contact->get_id() );
             }
         }
 
-        $post_url = $event->step->get_meta( 'post_url' );
-        $post_url = WPGH()->replacements->process( esc_url_raw( $post_url ), $contact->ID );
+        $post_url = $this->get_setting('post_url' );
+        $post_url = Plugin::$instance->replacements->process( esc_url_raw( $post_url ), $contact->get_id() );
 
         $response = wp_remote_post( $post_url, array(
             'body' => $post_array
         ) );
 
         if ( is_wp_error( $response ) ) {
-            $contact->add_note( sanitize_text_field( $response->get_error_message() ) );
+            $contact->add_note( $response->get_error_message() );
         }
 
         return $response;
 
     }
-
-
 }

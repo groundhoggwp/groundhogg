@@ -245,7 +245,7 @@ abstract class Funnel_Step extends Supports_Errors
 
         switch ( $args[ 'type' ] ){
             default:
-                $args[ 'field' ][ 'value' ] = $this->get_setting( $setting, $args[ 'default' ] );
+                $args[ 'field' ][ 'value' ] = esc_html( $this->get_setting( $setting, $args[ 'default' ] ) );
                 break;
             case HTML::TAG_PICKER:
             case HTML::SELECT2:
@@ -255,7 +255,7 @@ abstract class Funnel_Step extends Supports_Errors
             case HTML::DROPDOWN_EMAILS:
             case HTML::DROPDOWN_SMS:
             case HTML::DROPDOWN_CONTACTS:
-                $args[ 'field' ][ 'selected' ] = $this->get_setting( $setting, $args[ 'default' ] );
+                $args[ 'field' ][ 'selected' ] = esc_attr( $this->get_setting( $setting, $args[ 'default' ] ) );
                 break;
             case HTML::CHECKBOX:
                 $args[ 'field' ][ 'checked' ] = (bool) $this->get_setting( $setting, $args[ 'default' ] );
@@ -556,17 +556,21 @@ abstract class Funnel_Step extends Supports_Errors
                 <?php //TODO Reporting enabled? ?>
                 <div class="step-edit <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? 'hidden' : '' ; ?>">
                     <div class="custom-settings">
-                        <?php do_action( 'groundhogg/step/settings/before', $this ); ?>
+                        <?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before" ); ?>
+                        <?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
                         <?php $this->settings( $step ); ?>
-                        <?php do_action( 'groundhogg/step/settings/after', $this ); ?>
+                        <?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after" ); ?>
+                        <?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
                     </div>
                 </div>
                 <!-- REPORTING  -->
                 <?php //TODO Reporting enabled? ?>
                 <div class="step-reporting <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden' ; ?>">
-                    <?php do_action( 'groundhogg/step/reporting/before' ); ?>
+                    <?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before" ); ?>
+                    <?php do_action( 'groundhogg/steps/reporting/before' ); ?>
                     <?php $this->reporting( $step ); ?>
-                    <?php do_action( 'groundhogg/step/reporting/after' ); ?>
+                    <?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/after" ); ?>
+                    <?php do_action( 'groundhogg/steps/reporting/after' ); ?>
                 </div>
             </div>
         </div>

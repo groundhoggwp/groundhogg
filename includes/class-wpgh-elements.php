@@ -73,11 +73,11 @@ class WPGH_Elements
         include_once $action_path . 'apply-tag.php';
         include_once $action_path . 'create-user.php';
         include_once $action_path . 'date-timer.php';
-        include_once $action_path . 'class-wpgh-field-timer.php';
+        include_once $action_path . 'field-timer.php';
         include_once $action_path . 'delay-timer.php';
-        include_once $action_path . 'class-wpgh-edit-meta.php';
-        include_once $action_path . 'class-wpgh-http-post.php';
-        include_once $action_path . 'class-wpgh-remove-tag.php';
+        include_once $action_path . 'edit-meta.php';
+        include_once $action_path . 'http-post.php';
+        include_once $action_path . 'remove-tag.php';
         include_once $action_path . 'send-email.php';
         include_once $action_path . 'send-sms.php';
 

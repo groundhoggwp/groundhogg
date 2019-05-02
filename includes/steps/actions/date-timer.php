@@ -104,7 +104,7 @@ class Date_Timer extends Action
             'name'          => $this->setting_name_prefix( 'send_in_timezone' ),
             'id'            => $this->setting_id_prefix(   'send_in_timezone' ),
             'value'         => '1',
-            'checked'       => $step->get_meta( 'send_in_timezone' ),
+            'checked'       => (bool) $this->get_setting( 'send_in_timezone' ),
             'title'         => __( "Run in the contact's local time.", 'groundhogg' ),
             'required'      => false,
         ];

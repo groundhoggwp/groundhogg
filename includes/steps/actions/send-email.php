@@ -1,6 +1,11 @@
 <?php
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Compliance;
+use Groundhogg\Contact;
+use Groundhogg\Contact_Query;
+use Groundhogg\Event;
+use function Groundhogg\gisset_not_empty;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -93,29 +98,39 @@ class Send_Email extends Action
 
         $html->th( __( 'Select an email to send:', 'groundhogg' ) );
         $html->td( [
+            // EMAIL ID DROPDOWN
             $html->dropdown_emails( [
                 'name'  => $this->setting_name_prefix( 'email_id' ),
                 'id'    => $this->setting_id_prefix(   'email_id' ),
                 'selected' => $this->get_setting( 'email_id' ),
             ] ),
+            // ROW ACTIONS
             "<div class=\"row-actions\">",
+            // EDIT EMAIL
             $html->button( [
                 'title'     => 'Edit Email',
                 'text'      => _x( 'Edit Email', 'action', 'groundhogg' ),
                 'class'     => 'button button-primary edit-email',
             ] ),
+            // ADD NEW EMAIL
             $html->button( [
                 'title'     => 'Create New Email',
                 'text'      => _x( 'Create New Email', 'action', 'groundhogg' ),
                 'class'     => 'button button-secondary add-email',
             ] ),
-            "</div>"
+            "</div>",
+            // ADD EMAIL OVERRIDE
+            $html->input( [
+                'type'  => 'hidden',
+                'name'  => $this->setting_name_prefix( 'add_email_override' ),
+                'id'    => $this->setting_id_prefix(   'add_email_override' ),
+                'class' => 'add-email-override',
+            ] )
         ] );
 
         $html->end_row();
 
         if ( $email && $email->is_confirmation_email() ){
-
             $html->add_form_control( [
                 'label' => __( 'Skip if confirmed?', 'groundhogg' ),
                 'type' => HTML::CHECKBOX,
@@ -127,40 +142,34 @@ class Send_Email extends Action
                 ],
                 'description' =>  __( 'Skip to next <b>Email Confirmed</b> benchmark if email is already confirmed.', 'groundhogg' ),
             ] );
-
         }
 
         $html->end_form_table();
-
-        echo $html->input( [
-            'type'  => 'hidden',
-            'name'  => $this->setting_name_prefix( 'add_email_override' ),
-            'id'    => $this->setting_id_prefix(   'add_email_override' ),
-            'class' => 'add-email-override',
-        ] );
     }
 
     /**
      * Extend the EMAIL reporting VIEW with open rates...
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function reporting($step)
     {
-        parent::reporting($step);
+        parent::reporting( $step );
 
-        $start_time = WPGH()->menu->funnels_page->reporting_start_time;
-        $end_time   = WPGH()->menu->funnels_page->reporting_end_time;
+        $times = $this->get_reporting_interval();
 
-        $cquery = new WPGH_Contact_Query();
+        $start_time = $times[ 'start_time' ];
+        $end_time = $times[ 'end_time' ];
+
+        $cquery = new Contact_Query();
 
         $num_opens = $cquery->query( array(
             'count' => true,
             'activity' => array(
                 'start' => $start_time,
                 'end'   => $end_time,
-                'step'  => $step->ID,
-                'funnel'=> $step->funnel_id,
+                'step'  => $step->get_id(),
+                'funnel'=> $step->get_funnel_id(),
                 'activity_type'  => 'email_opened'
             )
         ) );
@@ -170,8 +179,8 @@ class Send_Email extends Action
             'activity' => array(
                 'start' => $start_time,
                 'end'   => $end_time,
-                'step'  => $step->ID,
-                'funnel'=> $step->funnel_id,
+                'step'  => $step->get_id(),
+                'funnel'=> $step->get_funnel_id(),
                 'activity_type'  => 'email_link_click'
             )
         ) );
@@ -182,8 +191,8 @@ class Send_Email extends Action
         <span class="opens"><?php _ex( 'Opens', 'stats', 'groundhogg' ); ?>:&nbsp;
             <strong>
                 <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s',
-                        $step->funnel_id,
-                        $step->ID,
+                        $step->get_funnel_id(),
+                        $step->get_id(),
                         'email_opened',
                         $start_time,
                         $end_time )
@@ -193,8 +202,8 @@ class Send_Email extends Action
             <span class="clicks"><?php _ex( 'Clicks', 'stats', 'groundhogg' ); ?>:&nbsp;
                 <strong>
                 <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s',
-                        $step->funnel_id,
-                        $step->ID,
+                        $step->get_funnel_id(),
+                        $step->get_id(),
                         'email_link_click',
                         $start_time,
                         $end_time )
@@ -204,74 +213,43 @@ class Send_Email extends Action
             <span class="ctr"><?php _ex( 'C.T.R', 'stats', 'groundhogg' ); ?>:&nbsp;<strong><?php echo round( ( $num_clicks / ( ( $num_opens > 0 )? $num_opens : 1 ) * 100 ), 2 ); ?></strong>%</span>
         </p>
         <?php
-
-        do_action( 'wpgh_email_reporting_after', $step );
     }
 
     /**
      * Save the settings
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function save( $step )
     {
-
-        if ( isset( $_POST[ $step->prefix( 'email_id' ) ] ) ){
-
-            $email_id = intval(  $_POST[ $step->prefix( 'email_id' ) ] );
-
-            /**
-             * Hack for adding new emails and saving.
-             */
-            if ( isset( $_POST[ $step->prefix( 'add_email_override' ) ] ) && ! empty( $_POST[ $step->prefix( 'add_email_override' ) ] ) ){
-                $email_id = intval(  $_POST[ $step->prefix( 'add_email_override' ) ] );
-            }
-
-            $step->update_meta( 'email_id', $email_id );
-
-            $email = WPGH()->emails->get( $email_id );
-
-            if ( $email->status === 'draft' && $step->is_active() ){
-
-                WPGH()->menu->funnels_page->notices->add( 'contains-drafts', _x( 'Your funnel contains email steps which are in draft mode. Please ensure all your emails are marked as ready.', 'notice', 'groundhogg' ), 'info' );
-
-            }
-
-        }
-
-        if ( isset( $_POST[ $step->prefix( 'skip_if_confirmed' ) ] ) ){
-
-            $step->update_meta( 'skip_if_confirmed', 1 );
-
-        } else {
-
-            $step->delete_meta( 'skip_if_confirmed' );
-
-        }
-
+        $this->save_setting( 'email_id', absint( $this->get_posted_data( 'add_email_override', $this->get_posted_data( 'email_id' ) ) ) );
+        $this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
     }
 
     /**
      * Process the apply note step...
      *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event Event
      *
-     * @return bool|WP_Error
+     * @return bool|\WP_Error
      */
     public function run( $contact, $event )
     {
 
-        $email_id = apply_filters( 'wpgh_step_run_send_email_id', $event->step->get_meta( 'email_id' ), $event );
+        $email_id = absint( $this->get_setting( 'email_id' ) );
+        $email = Plugin::$instance->utils->get_email( $email_id );
 
-        $email = new WPGH_Email( $email_id );
+        if ( ! $email ){
+            return new \WP_Error( 'email_dne', 'Invalid email ID provided.' );
+        }
 
         if ( $email->is_confirmation_email() ){
 
-            if ( $event->step->get_meta( 'skip_if_confirmed' ) && $contact->optin_status === WPGH_CONFIRMED ){
+            if ( $this->get_setting( 'skip_if_confirmed' ) && $contact->get_optin_status() === Compliance::CONFIRMED ){
 
                 /* This will simply get the upcoming email confirmed step and complete it. No muss not fuss */
-                do_action( 'wpgh_email_confirmed', $contact, $event->funnel_id );
+                do_action( 'groundhogg/steps/email/confirmed', $contact, $event->get_funnel_id() );
 
                 /* Return false to avoid enqueue the next step. */
                 return false;
@@ -287,7 +265,7 @@ class Send_Email extends Action
     /**
      * Create a new email and set the step email_id to the ID of the new email.
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      * @param $args array list of args to provide criteria for import.
      */
     public function import( $args, $step )
@@ -301,13 +279,13 @@ class Send_Email extends Action
             $args[ 'pre_header' ] = '';
         }
 
-        $email_id = WPGH()->emails->add( array(
+        $email_id = Plugin::$instance->dbs->get_db( 'emails' )->add( [
             'content'       => $args['content'],
             'subject'       => $args['subject'],
             'pre_header'    => $args['pre_header'],
             'from_user'     => get_current_user_id(),
             'author'        => get_current_user_id()
-        ) );
+        ] );
 
         if ( $email_id ){
             $step->update_meta( 'email_id', $email_id );
@@ -319,21 +297,21 @@ class Send_Email extends Action
      * Export all tag related steps
      *
      * @param $args array of args
-     * @param $step WPGH_Step
+     * @param $step Step
      * @return array of tag names
      */
     public function export( $args, $step )
     {
-        $email_id = intval( $step->get_meta( 'email_id' ) );
+        $email_id = absint( $step->get_meta( 'email_id' ) );
 
-        $email = new WPGH_Email( $email_id );
+        $email = Plugin::$instance->utils->get_email( $email_id );
 
-        if ( ! $email->exists() )
+        if ( ! $email || ! $email->exists() )
             return $args;
 
-        $args[ 'subject'] = $email->subject;
-        $args[ 'pre_header' ] = $email->pre_header;
-        $args[ 'content' ] = $email->content;
+        $args[ 'subject'] = $email->get_subject_line();
+        $args[ 'pre_header' ] = $email->get_pre_header();
+        $args[ 'content' ] = $email->get_content();
 
         return $args;
     }

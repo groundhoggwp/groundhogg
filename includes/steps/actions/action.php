@@ -4,6 +4,8 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Steps\Funnel_Step;
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Created by PhpStorm.
  * User: adria
