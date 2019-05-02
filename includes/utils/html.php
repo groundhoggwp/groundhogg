@@ -95,6 +95,10 @@ class HTML
 
     public function th( $content, $args = [] )
     {
+        if ( is_array( $content ) ){
+            $content = implode( '', $content );
+        }
+
         $args = wp_parse_args( $args, [
             'title' => '',
             'class' => '',
@@ -105,6 +109,10 @@ class HTML
 
     public function td( $content, $args = [] )
     {
+        if ( is_array( $content ) ){
+            $content = implode( '', $content );
+        }
+
         $args = wp_parse_args( $args, [
             'title' => '',
             'class' => '',

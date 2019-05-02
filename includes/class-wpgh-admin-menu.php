@@ -127,7 +127,7 @@ class WPGH_Admin_Menu
     {
         require_once dirname(__FILE__) . '/admin/broadcasts/class-wpgh-broadcasts-page.php';
         require_once dirname(__FILE__) . '/admin/dashboard/class-wpgh-dashboard-widgets.php';
-        require_once dirname(__FILE__) . '/admin/contacts/class-wpgh-contacts-page.php';
+        require_once dirname(__FILE__) . '/admin/contacts/contacts-page.php';
         require_once dirname(__FILE__) . '/admin/emails/class-wpgh-emails-page.php';
         require_once dirname(__FILE__) . '/admin/sms/class-wpgh-sms-page.php';
         require_once dirname(__FILE__) . '/admin/events/class-wpgh-events-page.php';

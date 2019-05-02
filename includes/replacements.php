@@ -734,7 +734,7 @@ class Replacements
     function replacement_files( $key = '', $contact_id = null )
     {
 
-        $files = $this->get_current_contact()->get_associated_files();
+        $files = $this->get_current_contact()->get_files();
 
         if ( ! empty( $files ) ){
             return __( 'No files found.', 'groundhogg' );

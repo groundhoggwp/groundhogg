@@ -229,6 +229,9 @@ class Contact extends Base_Object_With_Meta
         return $this->user;
     }
 
+    /**
+     * @return WP_User
+     */
     public function get_ownerdata()
     {
         return $this->owner;
@@ -268,6 +271,14 @@ class Contact extends Base_Object_With_Meta
     public function get_time_zone()
     {
         return $this->get_meta( 'time_zone' );
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    public function get_date_created()
+    {
+        return $this->date_created;
     }
 
     /**
@@ -571,7 +582,7 @@ class Contact extends Base_Object_With_Meta
         }
 
         try {
-            $local_time = Plugin::$instance->utils->location->convert_to_foreign_time( $time, $time_zone );
+            $local_time = Plugin::$instance->utils->date_time->convert_to_foreign_time( $time, $time_zone );
         } catch ( \Exception $e ){
             $local_time = $time;
         }
@@ -603,7 +614,7 @@ class Contact extends Base_Object_With_Meta
     function get_time_zone_offset()
     {
         try {
-            return Plugin::$instance->utils->location->get_timezone_offset( $this->time_zone );
+            return Plugin::$instance->utils->date_time->get_timezone_offset( $this->time_zone );
         } catch (\Exception $e ){
             return 0;
         }
@@ -620,13 +631,63 @@ class Contact extends Base_Object_With_Meta
     }
 
     /**
+     * @no_access Do not access
+     *
+     * @param $dirs
+     * @return mixed
+     */
+    public function map_upload( $dirs )
+    {
+        $dirs['path'] =   $this->upload_paths[ 'path' ];
+        $dirs['url'] =    $this->upload_paths[ 'url' ];
+        $dirs['subdir'] = $this->upload_paths[ 'basedir' ];
+        $dirs['suburl'] = $this->upload_paths[ 'baseurl' ];
+        return $dirs;
+    }
+
+    /**
+     * Upload a file
+     *
+     * Usage: $contact->upload_file( $_FILES[ 'file_name' ] )
+     *
+     * @param $file
+     * @return array|\WP_Error
+     */
+    public function upload_file( $file )
+    {
+
+        $upload_overrides = array( 'test_form' => false );
+
+        if ( !function_exists('wp_handle_upload') ) {
+            require_once( ABSPATH . '/wp-admin/includes/file.php' );
+        }
+
+        $this->get_uploads_folder();
+
+        add_filter( 'upload_dir', [ $this, 'map_upload' ] );
+        $mfile = wp_handle_upload( $file, $upload_overrides );
+        remove_filter( 'upload_dir', [ $this, 'map_upload' ] );
+
+        if( isset( $mfile['error'] ) ) {
+
+            if ( empty( $mfile[ 'error' ] ) ){
+                $mfile[ 'error' ] = _x( 'Could not upload file.',  'submission_error', 'groundhogg' );
+            }
+
+            return new \WP_Error( 'bad_upload', $mfile['error'] );
+        }
+
+        return $mfile;
+    }
+
+    /**
      * Get the basename of the path
      *
      * @return string
      */
     public function get_upload_folder_basename()
     {
-        return  md5( wpgh_encrypt_decrypt( $this->get_email() ) );
+        return md5( wpgh_encrypt_decrypt( $this->get_email() ) );
     }
 
     /**
@@ -634,17 +695,22 @@ class Contact extends Base_Object_With_Meta
      */
     public function get_uploads_folder()
     {
-        return [
+        $paths = [
             'basedir' => Plugin::$instance->utils->files->get_contact_uploads_dir(),
+            'baseurl' => Plugin::$instance->utils->files->get_contact_uploads_url(),
             'path'    => Plugin::$instance->utils->files->get_contact_uploads_dir( $this->get_upload_folder_basename() ),
             'url'     => Plugin::$instance->utils->files->get_contact_uploads_url( $this->get_upload_folder_basename() )
         ];
+
+        $this->upload_paths = $paths;
+
+        return $paths;
     }
 
     /**
      * Get a list of associated files.
      */
-    public function get_associated_files()
+    public function get_files()
     {
         $data = [];
 
@@ -678,7 +744,10 @@ class Contact extends Base_Object_With_Meta
      */
     public function get_as_array()
     {
-        return [ 'data' => $this->get_data(), 'meta' => $this->get_meta(), 'tags' => $this->get_tags(), 'files' => $this->get_associated_files() ];
+        return apply_filters(
+            "groundhogg/{$this->get_object_type()}/get_as_array",
+            [ 'data' => $this->get_data(), 'meta' => $this->get_meta(), 'tags' => $this->get_tags(), 'files' => $this->get_files() ]
+        );
     }
 
     /**

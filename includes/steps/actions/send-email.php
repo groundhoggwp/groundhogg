@@ -1,4 +1,12 @@
 <?php
+namespace Groundhogg\Steps\Actions;
+
+use Groundhogg\HTML;
+use Groundhogg\Plugin;
+use Groundhogg\Step;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Send Email
  *
@@ -13,153 +21,123 @@
  * @since       File available since Release 0.9
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Send_Email extends WPGH_Funnel_Step
+class Send_Email extends Action
 {
 
     /**
-     * @var string
-     */
-    public $type    = 'send_email';
-
-    /**
-     * @var string
-     */
-    public $group   = 'action';
-
-    /**
-     * @var string
-     */
-    public $icon    = 'send-email.png' ;
-
-    /**
-     * @var string
-     */
-    public $name    = 'Send Email';
-
-    /**
-     * The time delay before this step can be run.
+     * Get the element name
      *
-     * @var int
+     * @return string
      */
-    public $delay_time = 5;
+    public function get_name()
+    {
+        return  _x( 'Send Email', 'action_name', 'groundhogg' );
+    }
 
     /**
-     * @var string
+     * Get the element type
+     *
+     * @return string
      */
-    public $description = 'Send an email to a contact.';
-
-    public function __construct()
+    public function get_type()
     {
-        $this->name = _x( 'Send Email', 'element_name', 'groundhogg' );
-        $this->description = _x( 'Send an email to a contact.', 'element_description', 'groundhogg' );
+        return 'send_email';
+    }
 
-        parent::__construct();
+    /**
+     * Get the description
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        return _x( 'Send an email to a contact.', 'element_description', 'groundhogg' );
+    }
 
-        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
+    /**
+     * Get the icon URL
+     *
+     * @return string
+     */
+    public function get_icon()
+    {
+        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/send-email.png';
     }
 
     public function scripts(){
-        if ( WPGH()->menu->current_page() === 'gh_funnels' && WPGH()->menu->current_action() === 'edit' ) {
-            wp_enqueue_script('groundhogg-funnel-email');
-            wp_localize_script('groundhogg-funnel-email', 'wpghEmailsBase', array(
-                'path' => admin_url('admin.php?page=gh_emails'),
-                'dontSaveChangesMsg' => _x("You have changes which have not been saved. Are you sure you want to exit?", 'notice', 'groundhogg'),
-            ));
-        }
+        wp_enqueue_script('groundhogg-funnel-email' );
+
+        wp_localize_script('groundhogg-funnel-email', 'groundhoggEmailStep', array(
+            'edit_email_path' => admin_url( 'admin.php?page=gh_emails&action=edit' ),
+            'add_email_path' => admin_url( 'admin.php?page=gh_emails&action=add' ),
+            'save_changes_prompt' => _x( "You have changes which have not been saved. Are you sure you want to exit?", 'notice', 'groundhogg' ),
+        ));
     }
 
     /**
      * Display the settings
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function settings( $step )
     {
-        $email_id = $step->get_meta( 'email_id' );
 
-        if ( ! $email_id ){
-            /* If this is for example a NEW step, the lets just set a default email */
-            $emails = WPGH()->emails->get_emails();
-            $email_id = array_pop( $emails )->ID;
+        $html = Plugin::$instance->utils->html;
+
+        $email_id = $this->get_setting( 'email_id' );
+        $email = Plugin::$instance->utils->get_email( $email_id );
+
+        $html->start_form_table();
+
+        $html->start_row();
+
+        $html->th( __( 'Select an email to send:', 'groundhogg' ) );
+        $html->td( [
+            $html->dropdown_emails( [
+                'name'  => $this->setting_name_prefix( 'email_id' ),
+                'id'    => $this->setting_id_prefix(   'email_id' ),
+                'selected' => $this->get_setting( 'email_id' ),
+            ] ),
+            "<div class=\"row-actions\">",
+            $html->button( [
+                'title'     => 'Edit Email',
+                'text'      => _x( 'Edit Email', 'action', 'groundhogg' ),
+                'class'     => 'button button-primary edit-email',
+            ] ),
+            $html->button( [
+                'title'     => 'Create New Email',
+                'text'      => _x( 'Create New Email', 'action', 'groundhogg' ),
+                'class'     => 'button button-secondary add-email',
+            ] ),
+            "</div>"
+        ] );
+
+        $html->end_row();
+
+        if ( $email && $email->is_confirmation_email() ){
+
+            $html->add_form_control( [
+                'label' => __( 'Skip if confirmed?', 'groundhogg' ),
+                'type' => HTML::CHECKBOX,
+                'field' => [
+                    'name'  => $this->setting_name_prefix( 'skip_if_confirmed' ),
+                    'id'    => $this->setting_id_prefix(   'skip_if_confirmed' ),
+                    'label' => __( 'Enable', 'groundhogg' ),
+                    'checked' => (bool) $this->get_setting( 'skip_if_confirmed' )
+                ],
+                'description' =>  __( 'Skip to next <b>Email Confirmed</b> benchmark if email is already confirmed.', 'groundhogg' ),
+            ] );
+
         }
 
-        $email = new WPGH_Email( $email_id );
+        $html->end_form_table();
 
-        $return_path = admin_url( 'admin.php?page=gh_emails&return_funnel=' . $step->funnel_id . '&return_step=' . $step->ID );
-        $basic_path = admin_url( 'admin.php?page=gh_emails' );
-
-        ?>
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th>
-                    <?php esc_html_e( 'Select an email to send:', 'groundhogg' ); ?>
-                </th>
-                <td>
-                    <?php $args = array(
-                        'id'        => $step->prefix( 'email_id' ),
-                        'name'      => $step->prefix( 'email_id' ),
-                        'selected'  => array( $email_id ),
-                    );
-
-                    echo WPGH()->html->dropdown_emails( $args ); ?>
-                    <div class="row-actions">
-
-                        <?php echo WPGH()->html->modal_link( array(
-                            'title'     => 'Edit Email',
-                            'text'      => _x( 'Edit Email', 'action', 'groundhogg' ),
-                            'footer_button_text' => __( 'Close' ),
-                            'id'        => '',
-                            'class'     => 'button button-primary edit-email',
-                            'source'    => $basic_path . '&email=' . $email_id . '&action=edit',
-                            'height'    => 900,
-                            'width'     => 1500,
-                            'footer'    => 'true',
-                            'preventSave'    => 'false',
-                        )); ?>
-                        <?php echo WPGH()->html->modal_link( array(
-                            'title'     => 'Create New Email',
-                            'text'      => _x( 'Create New Email', 'action', 'groundhogg' ),
-                            'footer_button_text' => __( 'Close' ),
-                            'id'        => '',
-                            'class'     => 'button button-secondary add-email',
-                            'source'    => $return_path . '&action=add',
-                            'height'    => 900,
-                            'width'     => 1500,
-                            'footer'    => 'true',
-                            'preventSave'    => 'false',
-                        )); ?>
-                    </div>
-                </td>
-            </tr>
-            <?php if ( $email->is_confirmation_email() ): ?>
-            <tr>
-                <th><?php _e( 'Skip if confirmed?' ) ?></th>
-                <td><?php echo WPGH()->html->checkbox( array(
-                        'name'  => $step->prefix( 'skip_if_confirmed' ),
-                        'id'    => $step->prefix( 'skip_if_confirmed' ),
-                        'value' => 1,
-                        'label' => __( 'Skip this email if the contact\'s email is already confirmed.', 'groundhogg' ),
-                        'checked' => $step->get_meta( 'skip_if_confirmed' ),
-                    ) ); ?></td>
-            </tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
-
-        <?php echo WPGH()->html->input( array(
+        echo $html->input( [
             'type'  => 'hidden',
-            'name'  => $step->prefix( 'add_email_override' ),
-            'id'    => $step->prefix( 'add_email_override' ),
+            'name'  => $this->setting_name_prefix( 'add_email_override' ),
+            'id'    => $this->setting_id_prefix(   'add_email_override' ),
             'class' => 'add-email-override',
-            'value' => '',
-            'attributes' => '',
-            'placeholder' => ''
-        ) ); ?>
-
-        <?php
+        ] );
     }
 
     /**
@@ -336,6 +314,7 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
         }
     }
 
+
     /**
      * Export all tag related steps
      *
@@ -358,8 +337,4 @@ class WPGH_Send_Email extends WPGH_Funnel_Step
 
         return $args;
     }
-
-
-
-
 }

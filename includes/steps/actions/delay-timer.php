@@ -1,6 +1,9 @@
 <?php
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Plugin;
+use Groundhogg\Step;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -46,7 +49,7 @@ class Delay_Timer extends Action
      */
     public function get_description()
     {
-        // TODO: Implement get_description() method.
+        return _x( 'Pause for the specified amount of time.', 'element_description', 'groundhogg' );
     }
 
     /**
@@ -56,64 +59,62 @@ class Delay_Timer extends Action
      */
     public function get_icon()
     {
-        // TODO: Implement get_icon() method.
+        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/delay-timer.png';
     }
 
     /**
-     * @var string
-     */
-    public $type    = 'delay_timer';
-
-    /**
-     * @var string
-     */
-    public $group   = 'action';
-
-    /**
-     * @var string
-     */
-    public $icon    = 'delay-timer.png';
-
-    /**
-     * @var string
-     */
-    public $name    = 'Delay Timer';
-
-    /**
-     * @var string
-     */
-    public $description = 'Pause for the specified amount of time.';
-
-    public function __construct()
-    {
-        $this->name = _x( 'Delay Timer', 'element_name', 'groundhogg' );
-        $this->description = _x( 'Pause for the specified amount of time.', 'element_description', 'groundhogg' );
-
-        parent::__construct();
-    }
-
-    /**
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function settings( $step )
     {
-        $checked = $step->get_meta( 'disable' );
 
-        $amount = $step->get_meta( 'delay_amount');
-        if ( ! $amount )
-            $amount = 3;
+        $html = Plugin::$instance->utils->html;
 
-        $type = $step->get_meta( 'delay_type' );
-        if ( ! $type )
-            $type = 'days';
+        $html->start_form_table();
 
-        $run_when = $step->get_meta( 'run_when' );
-        if ( ! $run_when )
-            $run_when = 'now';
+        $html->start_row();
 
-        $run_time = $step->get_meta( 'run_time' );
-        if ( ! $run_time )
-            $run_time = '09:30';
+        $html->th( __( 'Wait at least:', 'groundhogg' ) );
+
+        $run_date_args = [
+            'class'         => 'input',
+            'name'          => $this->setting_name_prefix( 'run_date' ),
+            'id'            => $this->setting_id_prefix( 'run_date' ),
+            'value'         => $this->get_setting( 'run_date', date( 'Y-m-d', strtotime( '+3 days' ) ) ),
+            'placeholder'   => 'yyy-mm-dd',
+        ];
+
+        $run_date = $html->date_picker( $run_date_args );
+
+        $run_time_args = [
+            'type'  => 'time',
+            'class' => 'input',
+            'name'  => $this->setting_name_prefix( 'run_time' ),
+            'id'    => $this->setting_id_prefix(   'run_time' ),
+            'value' => $this->get_setting( 'run_time', "09:00:00" ),
+        ];
+
+        $run_time = $html->input( $run_time_args );
+
+        $local_time_args = [
+            'label'         => _x( "Run in the contact's local time.", 'action', 'groundhogg' ),
+            'name'          => $this->setting_name_prefix( 'send_in_timezone' ),
+            'id'            => $this->setting_id_prefix(   'send_in_timezone' ),
+            'value'         => '1',
+            'checked'       => $step->get_meta( 'send_in_timezone' ),
+            'title'         => __( "Run in the contact's local time.", 'groundhogg' ),
+            'required'      => false,
+        ];
+
+        $local_time = $html->wrap( $html->checkbox( $local_time_args ), 'div', [ 'id' => $this->setting_id_prefix( 'local_time_div' ) ] );
+
+        $td_content = $run_date . $run_time . $local_time;
+
+        $html->td( $td_content );
+
+        $html->end_row();
+
+        $html->end_form_table();
 
         ?>
 

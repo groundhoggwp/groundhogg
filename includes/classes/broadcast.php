@@ -24,6 +24,10 @@ class Broadcast extends Base_Object implements Event_Process
     const TYPE_SMS = 'sms';
     const TYPE_EMAIL = 'email';
 
+    /**
+     * @var SMS|Email
+     */
+    protected $object;
 
     /**
      * Do any post setup actions.
@@ -32,7 +36,14 @@ class Broadcast extends Base_Object implements Event_Process
      */
     protected function post_setup()
     {
-        // TODO: Implement post_setup() method.
+        switch ( $this->get_broadcast_type() ) {
+            case self::TYPE_EMAIL:
+                $this->object = Plugin::$instance->utils->get_email( $this->get_object_id() );
+                break;
+            case self::TYPE_SMS:
+                $this->object = Plugin::$instance->utils->get_sms( $this->get_object_id() );
+                break;
+        }
     }
 
     /**
@@ -46,6 +57,14 @@ class Broadcast extends Base_Object implements Event_Process
     }
 
     /**
+     * @return int
+     */
+    protected function get_id()
+    {
+        return absint( $this->ID );
+    }
+
+    /**
      * A string to represent the object type
      *
      * @return string
@@ -55,11 +74,17 @@ class Broadcast extends Base_Object implements Event_Process
         return 'broadcast';
     }
 
+    /**
+     * @return string|void
+     */
     public function get_funnel_title()
     {
         return __( 'Broadcast Email', 'groundhogg' );
     }
 
+    /**
+     * @return string
+     */
     public function get_step_title()
     {
         return $this->get_title();
@@ -71,6 +96,14 @@ class Broadcast extends Base_Object implements Event_Process
     public function get_broadcast_type()
     {
     	return $this->object_type;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_object_id()
+    {
+        return absint( $this->object_id );
     }
 
     /**
@@ -93,6 +126,14 @@ class Broadcast extends Base_Object implements Event_Process
     	return $this->get_broadcast_type() === self::TYPE_EMAIL;
     }
 
+    /**
+     * @return Email|SMS|null
+     */
+    public function get_object()
+    {
+        return $this->object;
+    }
+
 
     /**
 	 * Get the column row title for the broadcast.
@@ -102,98 +143,48 @@ class Broadcast extends Base_Object implements Event_Process
     public function get_title()
     {
 
-    	if ( ! $this->object->exists() ){
+    	if ( ! $this->get_object() || ! $this->get_object()->exists() ){
     		return __( '(The associated Email or SMS was deleted.)', 'groundhogg' );
 	    }
 
-    	if ( $this->is_sms() ){
-    		return $this->sms->title;
-	    } else {
-    		return $this->email->subject;
-	    }
+    	return $this->get_object()->get_title();
 
     }
 
     /**
-     * Setup the properties...
-     *
-     * @param $broadcast object
-     */
-    public function setup_broadcast( $broadcast )
-    {
-
-    	$this->object_type = isset( $broadcast->object_type ) && $broadcast->object_type === 'sms' ? 'sms' : 'email';
-    	$this->object_id = intval( $broadcast->object_id );
-
-    	if ( $this->object_type === 'email' ){
-		    $this->email = new WPGH_Email( $this->object_id );
-		    $this->object = $this->email;
-	    } else {
-		    $this->sms = new WPGH_SMS( $this->object_id );
-		    $this->object = $this->sms;
-	    }
-
-	    $this->scheduled_by = intval( $broadcast->scheduled_by );
-        $this->send_time    = intval( $broadcast->send_time );
-        $this->tags         = maybe_unserialize( $broadcast->tags );
-        $this->status       = $broadcast->status;
-        $this->date_scheduled = $broadcast->date_scheduled;
-
-    }
-
-    /**
-     * cancel the broadcast
+     * Cancel the broadcast
      */
     public function cancel()
     {
 
-        if ( WPGH()->events->mass_update(
-            array(
-                'status' => 'cancelled'
-            ),
-            array(
-                'step_id'   => $this->ID,
-                'funnel_id' => WPGH_BROADCAST
-            )
+        if ( Plugin::$instance->dbs->get_db( 'events' )->mass_update(
+            [
+                'status' => Event::CANCELLED
+            ],
+            [
+                'step_id'   => $this->get_id(),
+                'event_type' => Event::BROADCAST
+            ]
         ) ){
-            $this->update( array( 'status' => 'cancelled' ) );
+            $this->update( [ 'status' => 'cancelled' ] );
         }
 
-    }
-
-    /**
-     * Update info about the broadcast
-     *
-     * @param $args array of info
-     * @return bool
-     */
-    public function update( $args )
-    {
-        $result = WPGH()->broadcasts->update( $this->ID, $args );
-
-        if ( $result ){
-            $broadcast = WPGH()->broadcasts->get( $this->ID );
-
-            $this->setup_broadcast( $broadcast );
-        }
-
-        return $result;
     }
 
     /**
      * Send the associated object to the given contact
      *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event Event
      *
-     * @return bool|WP_Error whether the email sent or not.
+     * @return bool|\WP_Error whether the email sent or not.
      */
     public function run( $contact, $event = null )
     {
 
-	    do_action( "groundhogg/broadcast/{$this->object_type}/before", $this, $contact, $event );
-        $result = $this->object->send( $contact, $event );
-        do_action( "groundhogg/broadcast/{$this->object_type}/after", $this, $contact, $event );
+	    do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
+        $result = $this->get_object()->send( $contact, $event );
+        do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );
 
         return $result;
     }
@@ -205,8 +196,6 @@ class Broadcast extends Base_Object implements Event_Process
      */
     public function can_run()
     {
-
         return true;
-
     }
 }

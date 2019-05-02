@@ -140,5 +140,25 @@ class Utils
         return $this->get_object( $id, 'ID', 'funnel', $get_from_cache );
     }
 
+    /**
+     * @param $id
+     * @param bool $get_from_cache
+     * @return Email
+     */
+    public function get_email( $id, $get_from_cache=true )
+    {
+        return $this->get_object( $id, 'ID', 'email', $get_from_cache );
+    }
+
+    /**
+     * @param $id
+     * @param bool $get_from_cache
+     * @return Sms
+     */
+    public function get_sms( $id, $get_from_cache=true )
+    {
+        return $this->get_object( $id, 'ID', 'sms', $get_from_cache );
+    }
+
 
 }

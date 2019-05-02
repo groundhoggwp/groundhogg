@@ -60,7 +60,7 @@ abstract class Funnel_Step extends Supports_Errors
     public function __construct()
     {
 
-        if (is_admin()) {
+        if ( is_admin() && $this->is_editing_screen() ) {
 
             /**
              * New filters/actions for better usability and extendability
@@ -72,6 +72,7 @@ abstract class Funnel_Step extends Supports_Errors
             add_action("groundhogg/steps/{$this->get_type()}/html", [$this, 'html']);
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'pre_save'], 1 );
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'save']);
+            add_action("admin_enqueue_scripts", [$this, 'admin_scripts'] );
         }
 
         /**
@@ -87,7 +88,21 @@ abstract class Funnel_Step extends Supports_Errors
         add_filter("groundhogg/steps/{$this->get_type()}/enqueue", [$this, 'enqueue']);
         add_filter("groundhogg/steps/{$this->get_type()}/run", [$this, 'pre_run'], 1, 2);
         add_filter("groundhogg/steps/{$this->get_type()}/run", [$this, 'run'], 10, 2);
+        add_action("wp_enqueue_scripts", [$this, 'frontend_scripts'] );
+
     }
+
+    /**
+     * Whether we are looking at the editing screen.
+     *
+     * @return bool
+     */
+    protected function is_editing_screen()
+    {
+        //TODO implement
+        return true;
+    }
+
 
     /**
      * Get the element name
@@ -123,6 +138,16 @@ abstract class Funnel_Step extends Supports_Errors
      * @return string
      */
     abstract public function get_icon();
+
+    /**
+     * Enqueue any admin scripts/styles
+     */
+    public function admin_scripts(){}
+
+    /**
+     * Enqueue any frontend scripts/styles
+     */
+    public function frontend_scripts(){}
 
     /**
      * Get the delay time in seconds.

@@ -16,11 +16,17 @@ abstract class Supports_Errors
     protected $errors = [];
 
     /**
-     * @param $error \WP_Error
+     * @param string|\WP_Error $code
+     * @param string $message
+     * @param array $data
      */
-    public function add_error( $error )
+    public function add_error( $code = '', $message = '', $data = [] )
     {
-        $this->errors[] = $error;
+        $error = is_wp_error( $code ) ? $code : new \WP_Error( $code, $message, $data );
+
+        if ( is_wp_error( $error ) ){
+            $this->errors[] = $error;
+        }
     }
 
     /**

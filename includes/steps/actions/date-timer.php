@@ -155,12 +155,12 @@ class Date_Timer extends Action
 
         foreach ( $other_timers as $date_timer ){
             if ( $date_timer->get_order() < $step->get_order() && $this->compare_timer( $date_timer, $step ) < 0 ){
-                Plugin::$instance->notices->add( 'timer-error', sprintf( __( 'You have date timers with descending dates! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->get_id(), $step->get_title() ), 'warning' );
+                $this->add_error( 'timer-error', sprintf( __( 'You have date timers with descending dates! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->get_id(), $step->get_title() ), [ 'notice' => 'warning' ] );
             }
         }
 
         if ( $this->enqueue( $step ) < time() ){
-            Plugin::$instance->notices->add( 'timer-error', sprintf( __( 'You have date timers with dates in the past! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->get_id(), $step->get_title() ), 'warning' );
+            $this->add_error( 'timer-error', sprintf( __( 'You have date timers with dates in the past! Your funnel may not work as expected. See <a href="#%d">%s</a>! Timers with dates in the past will run immediately.' ), $step->get_id(), $step->get_title() ), [ 'notice' => 'warning' ] );
         }
 
     }

@@ -78,8 +78,8 @@ class WPGH_Elements
         include_once $action_path . 'class-wpgh-edit-meta.php';
         include_once $action_path . 'class-wpgh-http-post.php';
         include_once $action_path . 'class-wpgh-remove-tag.php';
-        include_once $action_path . 'class-wpgh-send-email.php';
-        include_once $action_path . 'class-wpgh-send-sms.php';
+        include_once $action_path . 'send-email.php';
+        include_once $action_path . 'send-sms.php';
 
         /* Benchmarks */
         $benchmark_path = dirname( __FILE__ ) . '/steps/benchmarks/';

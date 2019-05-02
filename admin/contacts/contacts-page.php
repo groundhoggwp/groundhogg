@@ -1,4 +1,11 @@
 <?php
+namespace Groundhogg\Admin\Contacts;
+
+use Groundhogg\Admin\Admin_Page;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Page gh_contacts
  *
@@ -19,13 +26,7 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-
-class WPGH_Contacts_Page
+class Contacts_Page extends Admin_Page
 {
 
     /**
@@ -1129,5 +1130,75 @@ class WPGH_Contacts_Page
             } ?>
         </div>
         <?php
+    }
+
+    /**
+     * Add Ajax actions...
+     *
+     * @return mixed
+     */
+    protected function add_ajax_actions()
+    {
+        // TODO: Implement add_ajax_actions() method.
+    }
+
+    /**
+     * Adds additional actions.
+     *
+     * @return mixed
+     */
+    protected function add_additional_actions()
+    {
+        // TODO: Implement add_additional_actions() method.
+    }
+
+    /**
+     * Get the page slug
+     *
+     * @return string
+     */
+    public function get_slug()
+    {
+        // TODO: Implement get_slug() method.
+    }
+
+    /**
+     * Get the menu name
+     *
+     * @return string
+     */
+    public function get_name()
+    {
+        // TODO: Implement get_name() method.
+    }
+
+    /**
+     * The required minimum capability required to load the page
+     *
+     * @return string
+     */
+    public function get_cap()
+    {
+        // TODO: Implement get_cap() method.
+    }
+
+    /**
+     * Get the item type for this page
+     *
+     * @return mixed
+     */
+    public function get_item_type()
+    {
+        // TODO: Implement get_item_type() method.
+    }
+
+    /**
+     * Output the basic view.
+     *
+     * @return mixed
+     */
+    public function view()
+    {
+        // TODO: Implement view() method.
     }
 }

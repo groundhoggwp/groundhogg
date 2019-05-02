@@ -249,11 +249,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
      */
     public function serialize()
     {
-        $data = [
-            'data' => $this->data,
-        ];
-
-        return serialize( $data );
+        return serialize( $this->get_as_array() );
     }
 
     /**
@@ -261,7 +257,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
      */
     public function unserialize( $serialized )
     {
+        /**
+         * @var $data array
+         */
         $data = unserialize( $serialized );
+        $data = $data[ 'data' ];
+
         $this->setup_object( $data );
     }
 
@@ -348,6 +349,6 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
      */
     public function get_as_array()
     {
-        return [ 'data' => $this->data ];
+        return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [ 'data' => $this->data ] );
     }
 }

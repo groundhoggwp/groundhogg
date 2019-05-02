@@ -105,6 +105,11 @@ class Email extends Base_Object_With_Meta
         return $this->subject;
     }
 
+    public function get_title()
+    {
+        return $this->get_subject_line();
+    }
+
     public function get_pre_header()
     {
         return $this->pre_header;
