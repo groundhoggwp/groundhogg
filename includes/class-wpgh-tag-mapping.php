@@ -1,15 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: adria
- * Date: 2019-03-28
- * Time: 11:01 AM
- */
-if ( ! class_exists( 'WPGH_Bulk_Job' ) ){
-    include WPGH_PLUGIN_DIR. 'includes/bulk-job.php';
-}
+namespace Groundhogg;
 
-class WPGH_Tag_Mapping extends WPGH_Bulk_Job
+class WPGH_Tag_Mapping extends Bulk_Job
 {
 
     const MARKETABLE = 'marketable';
@@ -32,7 +24,7 @@ class WPGH_Tag_Mapping extends WPGH_Bulk_Job
         // So instead we'll listen for an event failed. #goodenough
         add_action( 'groundhogg/event/failed', [ $this, 'listen_for_non_marketable' ] );
 
-        if ( wpgh_get_option( 'gh_optin_status_job', false ) ){
+        if ( get_option( 'gh_optin_status_job', false ) ){
             add_action( 'admin_init', [ $this, 'add_upgrade_notice' ] );
         }
 

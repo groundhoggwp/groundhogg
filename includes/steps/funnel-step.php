@@ -250,11 +250,13 @@ abstract class Funnel_Step extends Supports_Errors
             case HTML::TAG_PICKER:
             case HTML::SELECT2:
             case HTML::ROUND_ROBIN:
+            case HTML::DROPDOWN_SMS:
+            case HTML::DROPDOWN_EMAILS:
+            case HTML::DROPDOWN_CONTACTS:
+                $args[ 'field' ][ 'data' ] = wp_parse_args( $this->get_setting( $setting, $args[ 'default' ] ) );
+                break;
             case HTML::DROPDOWN:
             case HTML::DROPDOWN_OWNERS:
-            case HTML::DROPDOWN_EMAILS:
-            case HTML::DROPDOWN_SMS:
-            case HTML::DROPDOWN_CONTACTS:
                 $args[ 'field' ][ 'selected' ] = esc_attr( $this->get_setting( $setting, $args[ 'default' ] ) );
                 break;
             case HTML::CHECKBOX:

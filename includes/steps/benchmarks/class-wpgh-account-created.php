@@ -1,4 +1,14 @@
 <?php
+namespace Groundhogg\Steps\Benchmarks;
+
+use Groundhogg\Contact;
+use Groundhogg\DB\Steps;
+use Groundhogg\HTML;
+use Groundhogg\Plugin;
+use Groundhogg\Step;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Account Created
  *
@@ -11,99 +21,105 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Account_Created extends WPGH_Funnel_Step
+class Account_Created extends Benchmark
 {
 
     /**
-     * @var string
-     */
-    public $type    = 'account_created';
-
-    /**
-     * @var string
-     */
-    public $group   = 'benchmark';
-
-    /**
-     * @var string
-     */
-    public $icon    = 'account-created.png';
-
-    /**
-     * @var string
-     */
-    public $name    = 'Account Created';
-
-    /**
-     * Add the completion action
+     * Get the element name
      *
-     * WPGH_Form_Filled constructor.
+     * @return string
      */
-    public function __construct()
+    public function get_name()
     {
+        return _x( 'New User', 'element_name', 'groundhogg' );
 
-        $this->name         = _x( 'New User', 'element_name', 'groundhogg' );
-        $this->description  = _x( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'element_description', 'groundhogg' );
-
-        parent::__construct();
-
-        add_action( 'wpgh_user_created', array( $this, 'complete' ), 10, 2 );
     }
 
     /**
-     * @param $step WPGH_Step
+     * Get the element type
+     *
+     * @return string
+     */
+    public function get_type()
+    {
+        return 'account_created';
+    }
+
+    /**
+     * Get the description
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        return _x( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'element_description', 'groundhogg' );
+    }
+
+    /**
+     * Get the icon URL
+     *
+     * @return string
+     */
+    public function get_icon()
+    {
+        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/account-created.png';
+    }
+
+    /**
+     * @param $step Step
      */
     public function settings( $step )
     {
-        $account_role = $step->get_meta( 'role' );
+        $this->start_controls_section();
 
-        if ( ! $account_role )
-            $account_role = 'subscriber'
+        $this->add_control( 'role', [
+            'label'         => __( 'User Role(s):', 'groundhogg' ),
+            'type'          => HTML::SELECT2,
+            'default'       => 'subscriber',
+            'description'   => __( 'New users with these roles will trigger this benchmark.', 'groundhogg' ),
+            'field'         => [
+                'multiple' => true,
+                'options'  => Plugin::$instance->roles->get_roles_for_select(),
+            ],
+        ] );
 
-        ?>
-
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th><?php echo esc_html__( 'Run when the following type of account is created:', 'groundhogg' ); ?></th>
-                <td>
-                    <select name="<?php echo $step->prefix( 'role' ); ?>" id="<?php echo $step->prefix( 'role' ); ?>">
-                        <?php wp_dropdown_roles( $account_role ); ?>
-                    </select>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
-        <?php
+        $this->end_controls_section();
     }
 
     /**
      * Save the step settings
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function save( $step )
     {
-        if ( isset(  $_POST[ $step->prefix( 'role' ) ] ) ){
+        $this->save_setting( 'role', sanitize_text_field( $this->get_posted_data( 'role', 'subscriber' ) ) );
+    }
 
-            $role = sanitize_text_field( $_POST[ $step->prefix( 'role' ) ] );
-            $step->update_meta( 'role', $role );
+    /**
+     * Here you must define the action to listen for.
+     *
+     * For example, add_action( 'action_to_listen_for', [ $this, 'complete' ], 10, 2 );
+     *
+     * @return void
+     */
+    protected function add_complete_action()
+    {
+        add_action( 'user_register', array( $this, 'complete' ), 10, 1 );
+    }
 
-        }
-
+    protected function condition($step, $contact, $args)
+    {
+        // TODO: Implement condition() method.
     }
 
     /**
      * Whenever a form is filled complete the benchmark.
      *
-     * @param $user WP_User
-     * @param $contact WPGH_Contact
+     * @param $user \WP_User
+     * @param $contact t
      */
-    public function complete( $user, $contact )
+    public function complete( $user_id )
     {
 
         $steps = $this->get_like_steps();
@@ -134,5 +150,4 @@ class WPGH_Account_Created extends WPGH_Funnel_Step
 
         return true;
     }
-
 }
