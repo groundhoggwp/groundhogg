@@ -176,11 +176,25 @@ switch ( $action ):
 
         manage_preferences_head( __( 'Manage Preferences', 'groudhogg' ), 'manage' );
 
+        $preferences = [
+            'none'          => _x( 'I love this company, you can communicate with me whenever you feel like.', 'preferences', 'groundhogg' ),
+            'weekly'        => _x( "It's getting a bit much. Communicate with me weekly.", 'preferences', 'groundhogg' ),
+            'monthly'       => _x( 'Distance makes the heart grow fonder. Communicate with me monthly.', 'preferences', 'groundhogg' ),
+            'unsubscribe'   => _x( 'I no longer wish to receive any form of communication. Unsubscribe me!', 'preferences', 'groundhogg' )
+        ];
+
+        $preferences = apply_filters( 'manage_email_preferences_options', $preferences );
+
         ?>
 <p><?php printf( __( 'Managing preferences for %s.', 'groundhogg' ), obfuscate_email( $contact->get_email() ) )?></p>
 <form action="" id="preferences">
     <?php wp_nonce_field( 'manage_email_preferences' ); ?>
-
+    <?php foreach ( $preferences as $preference => $text ): ?>
+        <p><label><input type="radio" name="preference" value="<?php esc_attr_e( $preference ); ?>" class="preference-<?php esc_attr_e( $preference ); ?>">&nbsp;<?php echo $text; ?></label></p>
+    <?php endforeach; ?>
+    <?php if ( \Groundhogg\Plugin::$instance->compliance->is_gdpr_enabled() ): ?>
+        <p style="display: none"><label><input type="checkbox" name="delete_everything" value="yes" class="preference-gdpr-delete">&nbsp;<?php _e( 'Request all information on record be removed.', 'groundhogg' ); ?></label></p>
+    <?php endif; ?>
 </form>
     <?php
 
