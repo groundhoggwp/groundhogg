@@ -1,6 +1,5 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
-
 use Groundhogg\Admin\Admin_Page;
 
 // Exit if accessed directly

@@ -1,4 +1,13 @@
 <?php
+
+namespace Groundhogg\Admin\SMS;
+
+use Groundhogg\Plugin;
+use WP_List_Table;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * SMS Table
  *
@@ -12,15 +21,13 @@
  * @since       File available since Release 1.2
  */
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
 
 // WP_List_Table is not loaded automatically so we need to load it in our application
 if( ! class_exists( 'WP_List_Table' ) ) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_SMS_Table extends WP_List_Table {
+class SMS_Table extends WP_List_Table {
     /**
      * TT_Example_List_Table constructor.
      *
@@ -139,17 +146,12 @@ class WPGH_SMS_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $args = array();
-
-        if ( isset($_REQUEST[ 's' ]) ){
-        	$args[ 'search' ] = $_REQUEST[ 's' ];
+        $args = [];
+        if ( isset( $_REQUEST[ 's' ] ) ){
+            $args[ 'search' ] = $_REQUEST[ 's' ];
         }
-
-        if ( isset( $_REQUEST[ 'view' ] ) ){
-        	$args[ $_REQUEST[ 'view' ] ] = $_REQUEST[ $_REQUEST[ 'view' ] ];
-        }
-
-        $data = WPGH()->sms->get_smses( $args );
+        $args = wp_unslash( $args );
+        $data = Plugin::$instance->dbs->get_db( 'sms' )->query( $args );
 
         /*
          * Sort the data

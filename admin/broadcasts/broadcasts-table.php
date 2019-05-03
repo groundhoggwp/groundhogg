@@ -1,4 +1,11 @@
 <?php
+namespace Groundhogg\Admin\Broadcasts;
+
+use Groundhogg\Broadcast;
+use Groundhogg\Event;
+use Groundhogg\Plugin;
+use \WP_List_Table;
+
 /**
  * The table for Broadcasts
  *
@@ -24,7 +31,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 	require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_Broadcasts_Table extends WP_List_Table {
+class Broadcasts_Table extends WP_List_Table {
 
 	/**
 	 * TT_Example_List_Table constructor.
@@ -86,16 +93,17 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
      */
 	protected function get_views()
     {
+        //todo
         $count = array(
-            'sent'      => WPGH()->broadcasts->count( array( 'status' => 'sent'         ) ),
-            'scheduled' => WPGH()->broadcasts->count( array( 'status' => 'scheduled'    ) ),
-            'cancelled' => WPGH()->broadcasts->count( array( 'status' => 'cancelled'    ) ),
+            'sent'      => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'sent'      ] ),
+            'scheduled' => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'scheduled' ] ),
+            'cancelled' => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'cancelled' ] ),
         );
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=all' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'sent' ] + $count[ 'scheduled' ] ) . ")</span>" . "</a>";
-        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=sent' ) . "'>" . _x( 'Sent', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'sent' ] . ")</span>" . "</a>";
-        $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=scheduled' ) . "'>" . _x( 'Scheduled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'scheduled' ] . ")</span>" . "</a>";
-        $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&view=cancelled' ) . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'cancelled' ] . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=all' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'sent' ] + $count[ 'scheduled' ] ) . ")</span>" . "</a>";
+        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=sent' ) . "'>" . _x( 'Sent', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'sent' ] . ")</span>" . "</a>";
+        $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=scheduled' ) . "'>" . _x( 'Scheduled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'scheduled' ] . ")</span>" . "</a>";
+        $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=cancelled' ) . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'cancelled' ] . ")</span>" . "</a>";
 
         return apply_filters(  'wpgh_broadcast_views', $views );
     }
@@ -111,14 +119,14 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
     public function single_row($item)
     {
         echo '<tr>';
-        $this->single_row_columns( new WPGH_Broadcast( $item->ID ) );
+        $this->single_row_columns( new Broadcast( $item->ID ) );
         echo '</tr>';
     }
 
     /**
      * Get default row steps...
      *
-     * @param $broadcast WPGH_Broadcast
+     * @param $broadcast Broadcast
      * @param $column_name
      * @param $primary
      * @return string a list of steps
@@ -134,13 +142,13 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         if ( $this->get_view() !== 'cancelled' ) {
 
         	if ( $broadcast->is_email() ){
-		        $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast->email->ID ) . "'>" . _x( 'Edit Email', 'action', 'groundhogg') . "</a></span>";
+		        $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_emails&action=edit&email=' . $broadcast->get_object_id() ) . "'>" . _x( 'Edit Email', 'action', 'groundhogg') . "</a></span>";
 	        } else {
-		        $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_sms&action=edit&sms=' . $broadcast->sms->ID ) . "'>" . _x( 'Edit SMS', 'action', 'groundhogg') . "</a></span>";
+		        $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_sms&action=edit&sms=' . $broadcast->get_object_id() ) . "'>" . _x( 'Edit SMS', 'action', 'groundhogg') . "</a></span>";
 	        }
 
-            if ( intval( $broadcast->send_time ) > time() ){
-                $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->ID ), 'cancel') . "'>" . _x( 'Cancel', 'action', 'groundhogg') . "</a></span>";
+            if ( intval( $broadcast->get_send_time() ) > time() ){
+                $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->get_id() ), 'cancel') . "'>" . _x( 'Cancel', 'action', 'groundhogg') . "</a></span>";
             }
         }
 
@@ -148,7 +156,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
     }
 
     /**
-     * @param $broadcast WPGH_Broadcast
+     * @param $broadcast Broadcast
      * @return string
      */
     protected function column_object_id( $broadcast )
@@ -178,29 +186,28 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
     }
 
     /**
-     * @param $broadcast WPGH_Broadcast
+     * @param $broadcast Broadcast
      * @return string
      */
     protected function column_from_user( $broadcast )
     {
-        $user = get_userdata( intval( ( $broadcast->scheduled_by ) ) );
+        $user = get_userdata( $broadcast->get_scheduled_by_id() );
         $from_user = esc_html( $user->display_name );
-        $queryUrl = admin_url( 'admin.php?page=gh_broadcasts&view=scheduled_by&scheduled_by=' . $broadcast->scheduled_by );
+        $queryUrl = admin_url( 'admin.php?page=gh_broadcasts&scheduled_by=' . $broadcast->get_scheduled_by_id() );
         return "<a href='$queryUrl'>$from_user</a>";
     }
 
     /**
-     * @param $broadcast WPGH_Broadcast
+     * @param $broadcast Broadcast
      * @return string
      */
     protected function column_sending_to( $broadcast )
     {
 
-        $num = WPGH()->events->count( [
-            'funnel_id'     => WPGH_BROADCAST,
-            'step_id'       => $broadcast->ID,
+        $num =  Plugin::$instance->dbs->get_db('events')->count( [
+            'step_id'       => $broadcast->get_id(),
             'status'        => 'waiting',
-            'event_type'    => GROUNDHOGG_BROADCAST_EVENT
+            'event_type'    => Event::BROADCAST
         ] );
 
         if ( ! $num ){
@@ -208,7 +215,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
         }
 
         $link = sprintf( "<a href='%s'>%s %s</a>",
-            admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s', WPGH_BROADCAST, $broadcast->ID ) ),
+            admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&event_type=%s&step=%s', Event::BROADCAST, $broadcast->get_id() ) ),
             $num,
             __( 'Contacts', 'groundhogg' )
         );
@@ -217,57 +224,59 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
     }
 
     /**
-     * @param $broadcast WPGH_Broadcast
+     * @param $broadcast Broadcast
      * @return string
      */
     protected function column_stats( $broadcast )
     {
 
-	    if ( $broadcast->status !== 'sent' )
+	    if ( $broadcast->get_status() !== 'sent' )
 		    return '&#x2014;';
 
-	    $contact_sum = WPGH()->events->count( array(
-		    'funnel_id'     => WPGH_BROADCAST,
-		    'step_id'       => $broadcast->ID,
-		    'status'        => 'complete'
-	    ) );
+	    $contact_sum = Plugin::$instance->dbs->get_db('events')->count( [
+		    'step_id'       => $broadcast->get_id(),
+		    'status'        => 'complete',
+		    'event_type'    => Event::BROADCAST
+	    ] );
 
     	if ( $broadcast->is_sms() ){
 
 		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
 			    _x( "Sent", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&status=%s', WPGH_BROADCAST, $broadcast->ID, WPGH_Event::COMPLETE ) ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&event_type=%s&step=%s&status=%s', Event::BROADCAST, $broadcast->get_id(), Event::COMPLETE ) ),
 			    $contact_sum
 		    );
 
 	    } else {
-		    $opens = WPGH()->activity->count( array(
-			    'funnel_id'     => WPGH_BROADCAST,
-			    'step_id'       => $broadcast->ID,
-			    'activity_type' => 'email_opened'
-		    ) );
 
-		    $clicks = WPGH()->activity->count( array(
-			    'funnel_id'     => WPGH_BROADCAST,
-			    'step_id'       => $broadcast->ID,
+
+		    $opens = Plugin::$instance->dbs->get_db('activity')->count( [
+			    'funnel_id'     => $broadcast->get_funnel_id(),
+			    'step_id'       => $broadcast->get_id(),
+			    'activity_type' => 'email_opened'
+		    ] );
+
+		    $clicks = Plugin::$instance->dbs->get_db('activity')->count( [
+                'funnel_id'     => $broadcast->get_funnel_id(),
+                'step_id'       => $broadcast->get_id(),
 			    'activity_type' => 'email_link_click'
-		    ) );
+		    ] );
 
 		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
 			    _x( "Sent", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&status=%s', WPGH_BROADCAST, $broadcast->ID, WPGH_Event::COMPLETE ) ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&status=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), Event::COMPLETE ) ),
 			    $contact_sum
 		    );
 
 		    $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
 			    _x( "Opens", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_opened', 0, time() ) ),
 			    $opens
 		    );
 
 		    $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
 			    _x( "Clicks", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) ),
+			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_link_click', 0, time() ) ),
 			    $clicks );
 
 		    $html.= sprintf( "%s: <strong>%d%%</strong><br/>", _x( "C.T.R", 'stats', 'groundhogg' ), round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) );
@@ -277,13 +286,13 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
     }
 
     /**
-     * @param $broadcast WPGH_Broadcast
+     * @param $broadcast Broadcast
      * @return string
      */
     protected function column_send_time( $broadcast )
     {
         /* convert to local time. */
-        $p_time = intval( $broadcast->send_time ) + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $p_time = Plugin::$instance->utils->date_time->convert_to_local_time( $broadcast->get_send_time() );
 
         $cur_time = (int) current_time( 'timestamp' );
 
@@ -311,12 +320,12 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
     }
 
     /**
-     * @param $broadcast WPGH_Broadcast
+     * @param $broadcast Broadcast
      * @return string
      */
     protected function column_date_scheduled( $broadcast )
     {
-        $dc_time = mysql2date( 'U', $broadcast->date_scheduled );
+        $dc_time = mysql2date( 'U', $broadcast->get_date_scheduled() );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $dc_time - $cur_time;
         $time_prefix = _x( 'Created', 'status', 'groundhogg' );
@@ -338,7 +347,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_default( $broadcast, $column_name ) {
 
-	    do_action( 'wpgh_broadcasts_custom_columns', $broadcast, $column_name );
+	    do_action( 'groundhogg/admin/broadcasts/table/columns', $broadcast, $column_name );
 
 	    return '';
 	}
@@ -401,50 +410,8 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $query_args = array();
+        $data = Plugin::$instance->dbs->get_db('broadcasts')->query( $_GET );
 
-        switch ( $this->get_view() )
-        {
-            case 'sent':
-                $query_args[ 'status' ] = 'sent';
-                $data = WPGH()->broadcasts->get_broadcasts( $query_args );
-                break;
-
-            case 'scheduled':
-                $query_args[ 'status' ] = 'scheduled';
-                $data = WPGH()->broadcasts->get_broadcasts( $query_args );
-                break;
-
-            case 'cancelled':
-                $query_args[ 'status' ] = 'cancelled';
-                $data = WPGH()->broadcasts->get_broadcasts( $query_args );
-                break;
-
-            case 'scheduled_by':
-                $query_args[ 'scheduled_by' ] = intval( $_REQUEST[ 'scheduled_by' ] );
-                $data = WPGH()->broadcasts->get_broadcasts( $query_args );
-                break;
-
-            default:
-
-                $data = WPGH()->broadcasts->get_broadcasts( array( 'status' => 'sent' ) );
-                $data = $data ? $data: array();
-
-                $data2 = WPGH()->broadcasts->get_broadcasts( array( 'status' => 'scheduled' ) );
-                $data2 = $data2 ? $data2: array();
-
-                $data = array_merge( $data, $data2 );
-
-                break;
-        }
-
-//        if ( empty( $data ) ){
-//            $data = array();
-//        }
-
-		/*
-		 * Sort the data
-		 */
 		usort( $data, array( $this, 'usort_reorder' ) );
 
 		$current_page = $this->get_pagenum();
@@ -454,6 +421,7 @@ class WPGH_Broadcasts_Table extends WP_List_Table {
 		$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
 
 		$this->items = $data;
+
 		/**
 		 * REQUIRED. We also have to register our pagination options & calculations.
 		 */

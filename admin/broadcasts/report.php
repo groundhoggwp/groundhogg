@@ -1,4 +1,10 @@
 <?php
+
+namespace Groundhogg\Admin\Broadcasts;
+
+use Groundhogg\Broadcast;
+use Groundhogg\Plugin;
+
 /**
  * This is the page which allows users to view reports related to sent broadcasts.
  *
@@ -17,11 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $id = intval( $_GET[ 'broadcast' ] );
 
-$broadcast = new WPGH_Broadcast( $id );
+$broadcast = new Broadcast( $id );
 
-if ( $broadcast->status !== 'sent' ):
-    WPGH()->notices->add( 'unsent', _x( 'Stats will show once the broadcast has been sent.', 'notice', 'groundhogg' ), 'warning' );
-    WPGH()->notices->notices();
+if ( ! $broadcast->is_sent() ):
+    Plugin::$instance->notices->add( 'unsent', _x( 'Stats will show once the broadcast has been sent.', 'notice', 'groundhogg' ), 'warning' );
+    Plugin::$instance->notices->notices();
 ?>
 <p class="submit">
     <a href="javascript:history.go(-1)" class="button button-primary">Go Back</a>
@@ -38,13 +44,14 @@ else:
         <th><?php  _ex( 'Total Delivered', 'stats','groundhogg' ); ?></th>
         <td><?php
 
-            $contact_sum = WPGH()->events->count( array(
-                'funnel_id'     => WPGH_BROADCAST,
-                'step_id'       => $broadcast->ID
-            ) );
+
+            $contact_sum = Plugin::$instance->dbs->get_db('events')->count([
+                'funnel_id'     => $broadcast->get_funnel_id(),
+                'step_id'       => $broadcast->get_id()
+            ] );
 
             echo sprintf( "<strong><a href='%s' target='_blank' >%d</a></strong></strong>",
-                admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 0, time() ) ),
+                admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 0, time() ) ),
                 $contact_sum
             );
 
@@ -55,14 +62,14 @@ else:
         <th><?php _ex( 'Opens', 'stats','groundhogg' ); ?></th>
         <td><?php
 
-            $opens = WPGH()->activity->count( array(
-                'funnel_id'     => WPGH_BROADCAST,
-                'step_id'       => $broadcast->ID,
+            $opens = Plugin::$instance->dbs->get_db('events')->count([
+                'funnel_id'     => $broadcast->get_funnel_id(),
+                'step_id'       => $broadcast->get_id(),
                 'activity_type' => 'email_opened'
-            ) );
+            ] );
 
                 echo sprintf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
-                admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
+                admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_opened', 0, time() ) ),
                 $opens,
                 ( $opens / $contact_sum ) * 100
             );
@@ -72,14 +79,14 @@ else:
     <tr>
         <th><?php _ex( 'Clicks', 'stats', 'groundhogg' ); ?></th>
         <td><?php
-            $clicks = WPGH()->activity->count( array(
-                'funnel_id'     => WPGH_BROADCAST,
-                'step_id'       => $broadcast->ID,
+            $clicks = Plugin::$instance->dbs->get_db('events')->count([
+                'funnel_id'     => $broadcast->get_funnel_id(),
+                'step_id'       => $broadcast->get_id(),
                 'activity_type' => 'email_link_click'
-            ) );
+            ] );
 
             echo sprintf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
-                admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) ),
+                admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_link_click', 0, time() ) ),
                 $clicks,
                 ( $clicks / $contact_sum ) * 100
             );
@@ -100,18 +107,17 @@ else:
         /*
         * create array  of data ..
         */
-
         $dataset  =  array();
 
         $dataset[] = array(
             'label' => _x('Opens, did not click', 'stats', 'groundhogg'),
             'data' => $opens - $clicks,
-            'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_opened', 0, time() ) ),
+            'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_opened', 0, time() ) ),
         ) ;
         $dataset[] = array(
             'label' => _x('Opens and clicked', 'stats', 'groundhogg'),
             'data' => $clicks,
-            'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', 0, time() ) )
+            'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_link_click', 0, time() ) )
         ) ;
         $dataset[] = array(
             'label' => _x('Unopened', 'stats', 'groundhogg'),
@@ -167,11 +173,19 @@ else:
 <h2><?php _ex( 'Links Clicked', 'stats', 'groundhogg'  ); ?></h2>
 <?php
 
-    $activity = WPGH()->activity->get_activity( array(
-        'funnel_id'     => WPGH_BROADCAST,
-        'step_id'       => $broadcast->ID,
-        'activity_type' => 'email_link_click'
-    ) );
+
+//    $activity = WPGH()->activity->get_activity( array(
+//        'funnel_id'     => $broadcast->get_funnel_id(),
+//        'step_id'       => $broadcast->get_id(),
+//        'activity_type' => 'email_link_click'
+//    ) ); todo check query for fetch
+
+     $activity = Plugin::$instance->dbs->get_db('events')->query([
+         'funnel_id'     => $broadcast->get_funnel_id(),
+         'step_id'       => $broadcast->get_id(),
+         'activity_type' => 'email_link_click'
+     ] );
+
 
 
     $links = array();
@@ -209,7 +223,7 @@ else:
     ?>
     <tr>
         <td><?php echo sprintf( "<a href='%s' target='_blank' >%s</a>", $link, $link ) ?></td>
-        <td><?php echo sprintf( "<a href='%s' target='_blank' >%d</a>", admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&referer=%s&start=%s&end=%s', WPGH_BROADCAST, $broadcast->ID, 'email_link_click', $link, 0, time() ) ), $clicks ); ?></td>
+        <td><?php echo sprintf( "<a href='%s' target='_blank' >%d</a>", admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&referer=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_link_click', $link, 0, time() ) ), $clicks ); ?></td>
     </tr>
     <?php
     endforeach;

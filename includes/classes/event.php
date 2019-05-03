@@ -128,6 +128,14 @@ class Event extends Base_Object
     }
 
     /**
+     * @return String
+     */
+    public function get_failure_reason()
+    {
+        return $this->failure_reason;
+    }
+
+    /**
      * @return Contact
      */
     public function get_contact()

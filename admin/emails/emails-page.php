@@ -1,4 +1,11 @@
 <?php
+namespace Groundhogg\Admin\Emails;
+use Groundhogg\Admin\Admin_Page;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+
 /**
  * View Emails
  *
@@ -14,11 +21,7 @@
  */
 
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-
-class WPGH_Emails_Page
+class Emails_Page extends Admin_Page
 {
     /**
      * @var WPGH_Notices
@@ -737,4 +740,41 @@ class WPGH_Emails_Page
         $response = [ 'html' => ob_get_clean() ];
         wp_die( json_encode( $response ) );
     }
+
+    protected function add_ajax_actions()
+    {
+        // TODO: Implement add_ajax_actions() method.
+    }
+
+    protected function add_additional_actions()
+    {
+        // TODO: Implement add_additional_actions() method.
+    }
+
+    public function get_slug()
+    {
+        // TODO: Implement get_slug() method.
+    }
+
+    public function get_name()
+    {
+        // TODO: Implement get_name() method.
+    }
+
+    public function get_cap()
+    {
+        // TODO: Implement get_cap() method.
+    }
+
+    public function get_item_type()
+    {
+        // TODO: Implement get_item_type() method.
+    }
+
+    public function view()
+    {
+        // TODO: Implement view() method.
+    }
+
+
 }

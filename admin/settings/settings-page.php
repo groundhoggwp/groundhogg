@@ -1,6 +1,5 @@
 <?php
 namespace Groundhogg\Admin\Settings;
-
 use Groundhogg\Admin\Admin_Page;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -1029,4 +1028,46 @@ class Settings_Page extends Admin_Page
             printf( '<p class="description">%s</p>', $desc );
         }
     }
+
+    protected function add_ajax_actions()
+    {
+        // TODO: Implement add_ajax_actions() method.
+    }
+
+    protected function add_additional_actions()
+    {
+        // TODO: Implement add_additional_actions() method.
+    }
+
+    public function get_slug()
+    {
+        // TODO: Implement get_slug() method.
+    }
+
+    public function get_name()
+    {
+        // TODO: Implement get_name() method.
+    }
+
+    public function get_cap()
+    {
+        // TODO: Implement get_cap() method.
+    }
+
+    public function get_item_type()
+    {
+        // TODO: Implement get_item_type() method.
+    }
+
+    public function scripts()
+    {
+        // TODO: Implement scripts() method.
+    }
+
+    public function view()
+    {
+        // TODO: Implement view() method.
+    }
+
+
 }

@@ -23,6 +23,7 @@ class Broadcast extends Base_Object implements Event_Process
 
     const TYPE_SMS = 'sms';
     const TYPE_EMAIL = 'email';
+    const FUNNEL_ID = 1;
 
     /**
      * @var SMS|Email
@@ -59,7 +60,7 @@ class Broadcast extends Base_Object implements Event_Process
     /**
      * @return int
      */
-    protected function get_id()
+    public function get_id()
     {
         return absint( $this->ID );
     }
@@ -134,6 +135,35 @@ class Broadcast extends Base_Object implements Event_Process
         return $this->object;
     }
 
+    public function get_send_time()
+    {
+        return absint( $this->send_time );
+    }
+
+    public function get_scheduled_by_id()
+    {
+        return absint( $this->scheduled_by );
+    }
+
+    public function get_funnel_id()
+    {
+        return self::FUNNEL_ID;
+    }
+
+    public function get_status()
+    {
+        return $this->status;
+    }
+
+    public function is_sent()
+    {
+        return $this->get_status() === 'sent';
+    }
+
+    public function get_date_scheduled()
+    {
+        return $this->date_scheduled;
+    }
 
     /**
 	 * Get the column row title for the broadcast.

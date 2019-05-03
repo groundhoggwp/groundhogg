@@ -1,4 +1,11 @@
 <?php
+
+namespace Groundhogg\Admin\Events;
+
+use Groundhogg\Event;
+use Groundhogg\Plugin;
+use \WP_List_Table;
+
 /**
  * Events Table Class
  *
@@ -20,7 +27,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_Events_Table extends WP_List_Table {
+class Events_Table extends WP_List_Table {
 
     /**
      * TT_Example_List_Table constructor.
@@ -76,118 +83,66 @@ class WPGH_Events_Table extends WP_List_Table {
     public function single_row($item)
     {
         echo '<tr>';
-        $this->single_row_columns( new WPGH_Event( $item->ID ) );
+        $this->single_row_columns( new Event( $item->ID ) );
         echo '</tr>';
     }
 
     /**
-     * @param $event WPGH_Event
+     * @param $event Event
      * @return string
      */
     protected function column_contact( $event )
     {
-
-
-        if ( ! $event->contact->exists() )
+        if ( ! $event->get_contact()->exists() )
             return sprintf( "<strong>(%s)</strong>",  _x( 'contact deleted', 'status', 'groundhogg' ) );
 
         $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
-            admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $event->contact->ID ),
-            $event->contact->email
+            admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $event->get_contact_id() ),
+            $event->get_contact()->get_email()
         );
 
         return $html;
     }
 
     /**
-     * @param $event WPGH_Event
+     * @param $event Event
      * @return string
      */
     protected function column_funnel( $event )
     {
-        if ($event->type) {
-            switch ($event->type) {
-                default:
-                case GROUNDHOGG_FUNNEL_EVENT:
-                    $funnel = WPGH()->funnels->get( $event->funnel_id );
-                    $title = ( $funnel )? $funnel->title : sprintf( '(%s)', _x( 'funnel deleted', 'status', 'groundhogg' ) ) ;
-                    $view = sprintf( "view=funnel&funnel=%d", $event->funnel_id );
-                    break;
-                case GROUNDHOGG_BROADCAST_EVENT:
-                    $title =  sprintf( __( '%s Broadcast', 'groundhogg' ), ucfirst( $event->step->get_type() ) );
-                    $view = sprintf( "view=type&type=%d", GROUNDHOGG_BROADCAST_EVENT );
-                    break;
-                case GROUNDHOGG_EMAIL_NOTIFICATION_EVENT:
-                    $title =  __( 'Email Notification', 'groundhogg' );
-                    $view = sprintf( "view=type&type=%d", GROUNDHOGG_EMAIL_NOTIFICATION_EVENT );
-                    break;
-                case GROUNDHOGG_SMS_NOTIFICATION_EVENT:
-                    $title =  __( 'SMS Notification', 'groundhogg' );
-                    $view = sprintf( "view=type&type=%d", GROUNDHOGG_SMS_NOTIFICATION_EVENT );
-                    break;
+        $funnel_title = $event->get_funnel_title();
 
-            }
-        } else {
-            if ($event->is_broadcast_event()) {
-                $title =  __( 'Broadcast Email', 'groundhogg' );
-                $view = sprintf( "view=type&type=%d", GROUNDHOGG_BROADCAST_EVENT );
-            } else {
-                $funnel = WPGH()->funnels->get( $event->funnel_id );
-                $title = ( $funnel )? $funnel->title : sprintf( '(%s)', _x( 'funnel deleted', 'status', 'groundhogg' ) ) ;
-                $view = sprintf( "view=funnel&funnel=%d", $event->funnel_id );
-            }
-        }
+        if ( ! $funnel_title )
+            return sprintf( "<strong>(%s)</strong>", _x( 'funnel deleted', 'status', 'groundhogg' ) );
 
         return sprintf( "<a href='%s'>%s</a>",
-            sprintf( admin_url( 'admin.php?page=gh_events&%s' ) , $view ),
-            $title );    }
+            sprintf( admin_url( 'admin.php?page=gh_events&funnel=%s' ), $event->get_funnel_id() ),
+            $funnel_title );    }
 
     /**
-     * @param $event WPGH_Event
+     * @param $event Event
      * @return string
      */
     protected function column_step( $event )
     {
-        if ($event->type) {
-            switch ($event->type) {
-                default:
-                case GROUNDHOGG_FUNNEL_EVENT:
-                    $step_title = $event->step->title;
-                    break;
-                case GROUNDHOGG_BROADCAST_EVENT:
-                    $step_title = $event->step->get_title();
-                    break;
-                case GROUNDHOGG_EMAIL_NOTIFICATION_EVENT:
-                    $step_title = $event->step->email->subject;
-                    break;
-                case GROUNDHOGG_SMS_NOTIFICATION_EVENT:
-                    $step_title = $event->step->sms->title;
-                    break;
-            }
-        } else {
-            if ($event->is_broadcast_event()) {
-                $step_title = $event->step->email->subject;
-            } else {
-                $step_title = $event->step->title;
-            }
-        }
+        $step_title = $event->get_step_title();
 
         if ( ! $step_title )
             return sprintf( "<strong>(%s)</strong>", _x( 'step deleted', 'status', 'groundhogg' ) );
 
         return sprintf( "<a href='%s'>%s</a>",
-            admin_url( 'admin.php?page=gh_events&view=step&step=' . $event->step->ID ),
+            admin_url( 'admin.php?page=gh_events&view=step&step=' . $event->get_step_id() ),
             $step_title );
 
     }
 
     /**
-     * @param $event WPGH_Event
+     * @param $event Event
      * @return string
      */
     protected function column_time( $event )
     {
-        $p_time = intval( $event->time ) + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $p_time = Plugin::$instance->utils->date_time->convert_to_local_time( $event->get_time() );
 
         $cur_time = (int) current_time( 'timestamp' );
 
@@ -231,18 +186,18 @@ class WPGH_Events_Table extends WP_List_Table {
         }
 
         $html = $time_prefix . '&nbsp;<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
-        $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->contact->get_local_time( $event->time ) ), __( 'local time' ) ) . '</i>';
+        $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->get_contact()->get_local_time( $event->get_time() ) ), __( 'local time' ) ) . '</i>';
 
         return $html;
     }
 
     /**
-     * @param $event WPGH_Event
+     * @param $event Event
      * @return string
      */
     protected function column_errors($event)
     {
-        return $event->failure_reason ? $event->failure_reason : '&#x2014;' ;
+        return $event->get_failure_reason() ? $event->get_failure_reason() : '&#x2014;' ;
     }
 
     protected function extra_tablenav($which)
@@ -259,7 +214,7 @@ class WPGH_Events_Table extends WP_List_Table {
 
     /**
      * Get default column value.
-     * @param WPGH_Event $event        A singular item (one full row's worth of data).
+     * @param Event $event        A singular item (one full row's worth of data).
      * @param string $column_name The name/slug of the column to be processed.
      * @return string Text or HTML to be placed inside the column <td>.
      */
@@ -311,11 +266,11 @@ class WPGH_Events_Table extends WP_List_Table {
         $view = $this->get_view();
 
         $count = array(
-            'waiting'   => WPGH()->events->count( array( 'status' => 'waiting' ) ),
-            'skipped'   => WPGH()->events->count( array( 'status' => 'skipped' ) ),
-            'cancelled' => WPGH()->events->count( array( 'status' => 'cancelled' ) ),
-            'completed' => WPGH()->events->count( array( 'status' => 'complete' ) ),
-            'failed' => WPGH()->events->count( array( 'status' => 'failed' ) )
+            'waiting'   => Plugin::$instance->dbs->get_db('events')->count( array( 'status' => 'waiting' ) ),
+            'skipped'   => Plugin::$instance->dbs->get_db('events')->count( array( 'status' => 'skipped' ) ),
+            'cancelled' => Plugin::$instance->dbs->get_db('events')->count( array( 'status' => 'cancelled' ) ),
+            'completed' => Plugin::$instance->dbs->get_db('events')->count( array( 'status' => 'complete' ) ),
+            'failed' =>    Plugin::$instance->dbs->get_db('events')->count( array( 'status' => 'failed' ) )
         );
 
         return apply_filters( 'gh_event_views', array(
@@ -352,41 +307,36 @@ class WPGH_Events_Table extends WP_List_Table {
         {
             case 'status':
                 if ( isset( $_REQUEST['status'] ) ){
-                    $data = WPGH()->events->get_events( array(
-                        'status' => $_REQUEST[ 'status' ]
-                    ));
+//                    $data = WPGH()->events->get_events( array(
+//                        'status' => $_REQUEST[ 'status' ]
+//                    )); todo check
+
+                    $data = Plugin::$instance->dbs->get_db('events')->query( ['status' => $_REQUEST[ 'status' ] ]);
                 }
                 break;
             case 'contact':
 	            if ( isset( $_REQUEST['contact'] ) ){
-                    $data = WPGH()->events->get_events( array(
-                        'contact_id' => $_REQUEST[ 'contact' ]
-                    ));
+                    $data = Plugin::$instance->dbs->get_db('events')->query( [ 'contact_id' => $_REQUEST[ 'contact' ]]);
 	            }
 	            break;
             case 'funnel':
 	            if ( isset( $_REQUEST['funnel'] ) ){
-                    $data = WPGH()->events->get_events( array(
-                        'funnel_id' => $_REQUEST[ 'funnel' ]
-                    ));
+
+                    $data = Plugin::$instance->dbs->get_db('events')->query( [ 'funnel_id' => $_REQUEST[ 'funnel' ] ]);
 	            }
 	            break;
 	        case 'step':
 		        if ( isset( $_REQUEST['step'] ) ){
-                    $data = WPGH()->events->get_events( array(
-                        'step_id' => $_REQUEST[ 'step' ]
-                    ));
+                    $data = Plugin::$instance->dbs->get_db('events')->query( [ 'step_id' => $_REQUEST[ 'step' ] ]);
 		        }
 		        break;
             case 'type':
                 if ( isset( $_REQUEST['type'] ) ){
-                    $data = WPGH()->events->get_events( array(
-                        'type' => $_REQUEST[ 'type' ]
-                    ));
+                    $data = Plugin::$instance->dbs->get_db('events')->query( [ 'type' => $_REQUEST[ 'type' ] ]);
                 }
                 break;
             default:
-                $data = WPGH()->events->get_events();
+                $data = Plugin::$instance->dbs->get_db('events')->query( [ ]);
                 break;
         }
 
@@ -433,7 +383,7 @@ class WPGH_Events_Table extends WP_List_Table {
     /**
      * Generates and displays row action superlinks.
      *
-     * @param WPGH_Event $event        Event being acted upon.
+     * @param Event $event        Event being acted upon.
      * @param string $column_name Current column name.
      * @param string $primary     Primary column name.
      * @return string Row steps output for posts.
@@ -451,13 +401,13 @@ class WPGH_Events_Table extends WP_List_Table {
                     $actions['execute'] = sprintf(
                         '<a href="%s" class="edit" aria-label="%s">%s</a>',
                         /* translators: %s: title */
-                        esc_url(wp_nonce_url(admin_url('admin.php?page=gh_events&event=' . $event->ID . '&action=execute'))),
+                        esc_url(wp_nonce_url(admin_url('admin.php?page=gh_events&event=' . $event->get_id() . '&action=execute'))),
                         esc_attr(_x('Execute', 'action', 'groundhogg')),
                         _x('Run Now', 'action', 'groundhogg')
                     );
                     $actions['delete'] = sprintf(
                         '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-                        esc_url(wp_nonce_url(admin_url('admin.php?page=gh_events&event=' . $event->ID . '&action=cancel'))),
+                        esc_url(wp_nonce_url(admin_url('admin.php?page=gh_events&event=' . $event->get_id() . '&action=cancel'))),
                         /* translators: %s: title */
                         esc_attr(_x('Cancel', 'action', 'groundhogg')),
                         _x('Cancel', 'action', 'groundhogg')
@@ -467,7 +417,7 @@ class WPGH_Events_Table extends WP_List_Table {
                     $actions['re_execute'] = sprintf(
                         '<a href="%s" class="edit" aria-label="%s">%s</a>',
                         /* translators: %s: title */
-                        esc_url(wp_nonce_url(admin_url('admin.php?page=gh_events&event=' . $event->ID . '&action=execute'))),
+                        esc_url(wp_nonce_url(admin_url('admin.php?page=gh_events&event=' . $event->get_id() . '&action=execute'))),
                         esc_attr(_x('Run Again', 'action', 'groundhogg')),
                         _x('Run Again', 'action', 'groundhogg')
                     );
@@ -475,9 +425,9 @@ class WPGH_Events_Table extends WP_List_Table {
 
             }
 
-            if ($event->contact->exists()) {
+            if ($event->get_contact()->exists()) {
                 $actions['view'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                    admin_url('admin.php?page=gh_contacts&action=edit&contact=' . $event->contact->ID),
+                    admin_url('admin.php?page=gh_contacts&action=edit&contact=' . $event->get_contact()->get_id()),
                     esc_attr(_x('View Contact', 'action', 'groundhogg')),
                     _x('View Contact', 'action', 'groundhogg')
                 );
@@ -486,7 +436,7 @@ class WPGH_Events_Table extends WP_List_Table {
 
             if ( $event->is_funnel_event() ){
                 $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                    admin_url('admin.php?page=gh_funnels&action=edit&funnel=' . $event->funnel_id),
+                    admin_url('admin.php?page=gh_funnels&action=edit&funnel=' . $event->get_funnel_id()),
                     esc_attr(_x('Edit Funnel', 'action', 'groundhogg')),
                     _x('Edit Funnel', 'action', 'groundhogg')
                 );
@@ -497,7 +447,7 @@ class WPGH_Events_Table extends WP_List_Table {
 
             if ( $event->is_funnel_event() ){
                 $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->funnel_id, $event->step->ID ) ),
+                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->get_funnel_id(), $event->get_step()->get_id() ) ),
                     esc_attr(_x('Edit Step', 'action', 'groundhogg')),
                     _x('Edit Step', 'action', 'groundhogg')
                 );

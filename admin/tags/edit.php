@@ -1,4 +1,10 @@
 <?php
+namespace Groundhogg\Admin\Tags;
+
+use Groundhogg\Plugin;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Edit Tag
  *
@@ -10,14 +16,15 @@
  * @since       File available since Release 0.1
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+$id = absint( $_GET[ 'tag' ] );
 
-$id = intval( $_GET[ 'tag' ] );
+if ( ! $id ){
+    return;
+}
 
-$tag = WPGH()->tags->get_tag( $id );
+$tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $id );
 
 ?>
-
 <form name="edittag" id="edittag" method="post" action="" class="validate">
     <?php wp_nonce_field(); ?>
     <table class="form-table">

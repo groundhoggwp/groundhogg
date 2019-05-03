@@ -1,4 +1,9 @@
 <?php
+namespace Groundhogg\Admin\SMS;
+
+use Groundhogg\Plugin;
+
+
 /**
  * Edit An SMS message
  *
@@ -15,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $id = intval( $_GET[ 'sms' ] );
 
-$sms = WPGH()->sms->get_sms( $id );
+$sms = Plugin::$instance->dbs->get_db('sms')->get($id);
 
 ?>
 <form name="edittag" id="edittag" method="post" action="">
@@ -31,7 +36,7 @@ $sms = WPGH()->sms->get_sms( $id );
             <th scope="row"><label for="sms-message"><?php _e( 'Target URL', 'groundhogg' ) ?></label></th>
             <td><textarea name="message" id="sms-message" rows="5"><?php echo $sms->message; ?></textarea>
                 <p class="description">
-		            <?php WPGH()->replacements->show_replacements_button(); ?>
+		            <?php Plugin::$instance->replacements->show_replacements_button(); ?>
                     <?php _e( 'Use any valid replacement codes in your text message.', 'groundhogg' ); ?>
                 </p>
             </td>

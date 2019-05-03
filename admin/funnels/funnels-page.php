@@ -1,4 +1,11 @@
 <?php
+namespace Groundhogg\Admin\Funnels;
+use Groundhogg\Admin\Admin_Page;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+
 /**
  * View Funnels
  *
@@ -10,12 +17,7 @@
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.1
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-
-class WPGH_Funnels_Page
+class Funnels_Page extends Admin_Page
 {
 
     /**
@@ -1117,4 +1119,41 @@ class WPGH_Funnels_Page
             ?> <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
         }
     }
+
+    protected function add_ajax_actions()
+    {
+        // TODO: Implement add_ajax_actions() method.
+    }
+
+    protected function add_additional_actions()
+    {
+        // TODO: Implement add_additional_actions() method.
+    }
+
+    public function get_slug()
+    {
+        // TODO: Implement get_slug() method.
+    }
+
+    public function get_name()
+    {
+        // TODO: Implement get_name() method.
+    }
+
+    public function get_cap()
+    {
+        // TODO: Implement get_cap() method.
+    }
+
+    public function get_item_type()
+    {
+        // TODO: Implement get_item_type() method.
+    }
+
+    public function view()
+    {
+        // TODO: Implement view() method.
+    }
+
+
 }

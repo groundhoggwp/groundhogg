@@ -1,4 +1,7 @@
 <?php
+namespace Groundhogg\Admin\Superlinks;
+
+use Groundhogg\Plugin;
 /**
  * Edit A Superlink
  *
@@ -10,12 +13,10 @@
  * @since       File available since Release 0.1
  */
 
-
 if ( ! defined( 'ABSPATH' ) ) exit;
-
 $id = intval( $_GET[ 'superlink' ] );
 
-$superlink = WPGH()->superlinks->get_superlink( $id );
+$superlink =Plugin::instance()->dbs->get_db('superlinks')->get($id);
 
 ?>
 <form name="edittag" id="edittag" method="post" action="">
@@ -39,7 +40,7 @@ $superlink = WPGH()->superlinks->get_superlink( $id );
                     'value'     => $superlink->target,
                 );
 
-                echo WPGH()->html->link_picker( $args ); ?>
+              echo Plugin::$instance->utils->html->link_picker( $args); ?>
                 <p class="description"><?php _e( 'This is the url the contact will be re-directed to after clicking this Superlink.', 'groundhogg' ); ?></p>
             </td>
         </tr>
@@ -55,8 +56,8 @@ $superlink = WPGH()->superlinks->get_superlink( $id );
                 if ( !empty ( $superlink->tags ) ){
                     $tag_args['selected'] = $superlink->tags;
                 }
+                echo Plugin::$instance->utils->html->tag_picker( $tag_args);
                 ?>
-                <?php echo WPGH()->html->tag_picker( $tag_args ); ?>
                 <p class="description"><?php _e( 'These tags will be applied to a contact whenever this link is clicked. To create a new tag hit [enter] or [comma]', 'groundhogg' ); ?></p>
             </td>
         </tr>

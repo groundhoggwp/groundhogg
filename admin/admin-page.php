@@ -226,6 +226,11 @@ abstract class Admin_Page
         return wp_verify_nonce($_REQUEST['_wpnonce']) || wp_verify_nonce($_REQUEST['_wpnonce'], $this->get_current_action()) || wp_verify_nonce($_REQUEST['_wpnonce'], sprintf( 'bulk-%ss', $this->get_item_type() ) );
     }
 
+    protected function wp_die_no_access()
+    {
+        return wp_die( __( "Invalid permissions." , 'groundhogg' ), 'No Access!' );
+    }
+
     /**
      * Process the given action
      */
@@ -321,8 +326,10 @@ abstract class Admin_Page
 
             if ( method_exists( $this, $this->get_current_action() ) ){
                 call_user_func( [ $this, $this->get_current_action() ] );
-            } else {
+            } else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}" ) ) {
                 do_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}", $this );
+            } else {
+                call_user_func( [ $this, 'view' ] );
             }
 
             ?>

@@ -1,4 +1,9 @@
 <?php
+namespace Groundhogg\Admin\Broadcasts;
+
+use Groundhogg\Contact_Query;
+use Groundhogg\Plugin;
+
 /**
  * This is the page which allows the user to schedule a broadcast.
  *
@@ -32,7 +37,8 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
                 $args[ 'name' ] = 'object_id';
                 $args[ 'required' ] = true;
 
-                echo WPGH()->html->dropdown_emails( $args ); ?>
+                echo Plugin::$instance->utils->html->dropdown_emails($args) ;
+                 ?>
                 <div class="row-actions">
                     <a target="_blank" class="button button-secondary" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Create New Email', 'groundhogg' ); ?></a>
                 </div>
@@ -46,7 +52,7 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
 			        $args[ 'id' ] = 'sms_id';
 			        $args[ 'name' ] = 'object_id';
 			        $args[ 'required' ] = true;
-			        echo WPGH()->html->dropdown_sms( $args ); ?>
+                    echo Plugin::$instance->utils->html->dropdown_sms($args) ; ?>
                     <div class="row-actions">
                         <a target="_blank" class="button button-secondary" href="<?php echo admin_url( 'admin.php?page=gh_sms&action=add' ); ?>"><?php _e( 'Create New SMS', 'groundhogg' ); ?></a>
                     </div>
@@ -64,10 +70,10 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
                 $tag_args[ 'name' ] = 'tags[]';
                 $tag_args[ 'required' ] = true;
 
-                echo WPGH()->html->tag_picker( $tag_args ); ?>
+                echo Plugin::$instance->utils->html->tag_picker( $tag_args ); ?>
                 <p class="description"><?php _e( 'This broadcast will be sent to contacts with these tags.', 'groundhogg' ); ?></p>
                 <?php else:
-                $query = new WPGH_Contact_Query();
+                $query = new Contact_Query();
                 $num = count( $query->query( $_GET ) );
                     printf( __( "%d Contacts", 'groundhogg' ), $num );
                 endif; ?>
@@ -80,7 +86,7 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
                 $tag_args[ 'name' ] = 'exclude_tags[]';
                 $tag_args[ 'required' ] = false;
 
-                echo WPGH()->html->tag_picker( $tag_args ); ?>
+                echo Plugin::$instance->utils->html->tag_picker( $tag_args ); ?>
                 <p class="description"><?php _e( 'These contacts will be excluded.', 'groundhogg' ); ?></p>
             </td>
         </tr>
@@ -89,12 +95,11 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
                 <label for="date"><?php _e( 'Send On:', 'groundhogg' ); ?></label>
             </th>
             <td>
-<!--                <input style="height:29px;width: 100px" class="input" placeholder="Y/m/d" type="text" id="date" name="date" value="" autocomplete="off" required>-->
                 <div style="display: inline-block; width: 100px;">
-                    <?php echo WPGH()->html->date_picker( array( 'name' => 'date', 'id' => 'date', 'class' => 'input' ) ); ?>
+                    <?php echo Plugin::$instance->utils->html->date_picker( array( 'name' => 'date', 'id' => 'date', 'class' => 'input' ) ); ?>
                 </div>
                 <input type="time" id="time" name="time" value="09:00" autocomplete="off" required><?php _e( '&nbsp;or&nbsp;', 'groundhogg' ); ?>
-                <?php echo WPGH()->html->checkbox( array(
+                <?php echo Plugin::$instance->utils->html->checkbox( array(
                     'label'         => _x( 'Send Now', 'action', 'groundhogg' ),
                     'name'          => 'send_now',
                     'id'            => 'send_now',
@@ -106,7 +111,7 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
                     'required'      => false,) ); ?>
                 <p class="description"><?php _e( 'The day the broadcast will be sent.', 'groundhogg' ); ?></p>
                 <div style="margin-top: 10px;">
-	                <?php echo WPGH()->html->checkbox( array(
+	                <?php echo Plugin::$instance->utils->html->checkbox( array(
 		                'label'         => _x( 'Send in the contact\'s local time.', 'action', 'groundhogg' ),
 		                'name'          => 'send_in_timezone',
 		                'id'            => 'send_in_timezone',

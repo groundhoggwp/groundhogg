@@ -476,6 +476,56 @@ abstract class DB {
     }
 
     /**
+     * @param array $data
+     * @return array|bool|null|object
+     */
+    public function query( $data = [], $order='' )
+    {
+        global  $wpdb;
+
+        if ( empty( $order ) ){
+            $order = $this->get_primary_key();
+        }
+
+        if ( ! is_array( $data ) )
+            return false;
+
+        $data = (array) $data;
+        $data = esc_sql( $data );
+
+        $extra = '';
+
+        if ( isset( $data[ 'search' ] ) ){
+            $extra .= sprintf( " AND (%s)", $this->generate_search( $data[ 'search' ] ) );
+        }
+
+        // Initialise column format array
+        $column_formats = $this->get_columns();
+
+        // Force fields to lower case
+        $data = array_change_key_case( $data );
+
+        // White list columns
+        $data = array_intersect_key( $data, $column_formats );
+
+        $where = $this->generate_where( $data );
+
+        if ( ! empty( $where ) ){
+            $where = "WHERE " . $where;
+        }
+
+        $results = $wpdb->get_results( "SELECT * FROM $this->table_name $where $extra ORDER BY `$order` ASC" );
+
+        return $results;
+    }
+
+    public function count( $args=[] )
+    {
+        return $this->count( $this->query( $args ) );
+    }
+
+
+    /**
      * Check if the given table exists
      *
      * @since  2.4

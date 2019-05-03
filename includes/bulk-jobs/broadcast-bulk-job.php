@@ -1,4 +1,10 @@
 <?php
+namespace Groundhogg\Bulk_Jobs;
+
+use Groundhogg\Contact_Query;
+use Groundhogg\Event;
+use Groundhogg\Plugin;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -8,11 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( ! class_exists( 'WPGH_Bulk_Job' ) ){
-    include WPGH_PLUGIN_DIR. 'includes/bulk-job.php';
-}
-
-class WPGH_Broadcast_Bulk_Job extends WPGH_Bulk_Job
+class Broadcast_Bulk_Job extends Bulk_Job
 {
 
     protected $config = [];
@@ -42,7 +44,7 @@ class WPGH_Broadcast_Bulk_Job extends WPGH_Bulk_Job
             return $items;
         }
 
-        $query = new WPGH_Contact_Query();
+        $query = new Contact_Query();
         $args = $_GET;
 
         $contacts = $query->query( $args );
@@ -84,7 +86,8 @@ class WPGH_Broadcast_Bulk_Job extends WPGH_Bulk_Job
         $local_time = $this->send_time;
 
         if ( $this->send_in_timezone && ! $this->send_now ) {
-            $contact = wpgh_get_contact( $id );
+
+            $contact = Plugin::$instance->utils->get_contact($id);
             $local_time = $contact->get_local_time_in_utc_0( $this->send_time );
             if ($local_time < time()) {
                 $local_time += DAY_IN_SECONDS;
@@ -94,13 +97,13 @@ class WPGH_Broadcast_Bulk_Job extends WPGH_Bulk_Job
         $args = [
             'time'          => $local_time,
             'contact_id'    => $id,
-            'funnel_id'     => WPGH_BROADCAST,
+            'funnel_id'     => 1,
             'step_id'       => $this->broadcast_id,
             'status'        => 'waiting',
-            'event_type'    => GROUNDHOGG_BROADCAST_EVENT
+            'event_type'    => Event::BROADCAST
         ];
 
-        WPGH()->events->add($args);
+        Plugin::$instance->dbs->get_db('events')->add($args);
     }
 
     /**
@@ -141,7 +144,7 @@ class WPGH_Broadcast_Bulk_Job extends WPGH_Bulk_Job
      */
     protected function clean_up()
     {
-        wpgh_delete_transient( 'gh_get_broadcast_config' );
+        delete_transient( 'gh_get_broadcast_config' );
     }
 
     /**

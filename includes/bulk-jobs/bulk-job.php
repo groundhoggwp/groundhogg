@@ -1,8 +1,10 @@
 <?php
 
-namespace Groundhogg;
+namespace Groundhogg\Bulk_Jobs;
 
 // Exit if accessed directly
+use Groundhogg\Plugin;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**

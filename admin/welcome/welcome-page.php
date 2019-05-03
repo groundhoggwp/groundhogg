@@ -1,6 +1,5 @@
 <?php
 namespace Groundhogg\Admin\Welcome;
-
 use Groundhogg\Admin\Admin_Page as Admin_Page;
 
 if ( ! defined( 'ABSPATH' ) ) exit;

@@ -1,16 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: adria
- * Date: 2019-03-28
- * Time: 2:45 PM
- */
 
-if ( ! class_exists( 'WPGH_Admin_Page' ) ){
+namespace  Groundhogg\Admin\Bulk_Job;
+
+use Groundhogg\Plugin;
+use Groundhogg\Admin\Admin_Page;
+
+
+if ( ! class_exists( 'Admin_Page' ) ){
     include_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-page.php';
 }
 
-class WPGH_Admin_Bulk_Job extends WPGH_Admin_Page
+//todo whole page
+
+
+class Admin_Bulk_Job extends Admin_Page
 {
 
     /* Unused Functions */

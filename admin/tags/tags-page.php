@@ -1,0 +1,264 @@
+<?php
+namespace Groundhogg\Admin\Tags;
+use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Plugin;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+/**
+ * View Tags
+ *
+ * @package     Admin
+ * @subpackage  Admin/Tags
+ * @author      Adrian Tobey <info@groundhogg.io>
+ * @copyright   Copyright (c) 2018, Groundhogg Inc.
+ * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
+ * @since       File available since Release 0.1
+ */
+class Tags_Page extends Admin_Page
+{
+    // UNUSED FUNCTIONS
+    protected function add_ajax_actions(){}
+    public function help(){}
+    public function scripts(){}
+
+    protected function add_additional_actions()
+    {
+        if ( isset( $_GET[ 'recount_contacts' ] ) ){
+            add_action( 'init' , array( $this, 'recount' )  );
+        }
+    }
+
+    public function get_slug()
+    {
+        return 'gh_tags';
+    }
+
+    public function get_name()
+    {
+        return _x( 'Tags', 'page_title', 'groundhogg' );
+    }
+
+    public function get_cap()
+    {
+        return 'edit_tags';
+    }
+
+    public function get_item_type()
+    {
+        return 'tag';
+    }
+
+    public function get_priority(){
+        return 20;
+    }
+
+    public function recount()
+    {
+        wpgh_recount_tag_contacts_count();
+    }
+
+    /**
+     * @return string
+     */
+    protected function get_title()
+    {
+        switch ( $this->get_current_action() )
+        {
+            default:
+            case 'add':
+            case 'view':
+                return $this->get_name();
+                break;
+            case 'edit':
+                return _x( 'Edit Tag', 'page_title', 'groundhogg' );
+                break;
+        }
+    }
+
+    /**
+     * Add Tag Process
+     *
+     * @return \WP_Error|true|false
+     */
+    public function process_add(){
+
+        if ( ! current_user_can( 'add_tags' ) ){
+            $this->wp_die_no_access();
+        }
+
+        if ( isset( $_POST[ 'bulk_add' ] ) ){
+
+            $tag_names = explode( PHP_EOL, trim( sanitize_textarea_field( wp_unslash( $_POST['bulk_tags'] ) ) ) );
+
+            $ids = [];
+
+            foreach ($tag_names as $name) {
+                $id = Plugin::$instance->dbs->get_db( 'tags' )->add( [ 'tag_name' => $name ] );
+
+                if ( $id ){
+                    $ids[] = $id;
+                }
+            }
+
+            if ( ! empty( $ids ) ){
+                return new \WP_Error( 'unable_to_add_tags', "Something went wrong adding the tags." );
+            }
+
+            $this->add_notice( 'new-tags', sprintf( _nx( '%d tag created', '%d tags created', count( $tag_names ), 'notice', 'groundhogg' ), count( $tag_names ) ) );
+            return true;
+
+        } else {
+
+            $tag_name = sanitize_text_field( wp_unslash( $_POST['tag_name'] ) );
+            $tag_desc = sanitize_text_field( wp_unslash( $_POST['tag_description'] ) );
+            $id = Plugin::$instance->dbs->get_db( 'tags' )->add( [ 'tag_name' => $tag_name, 'tag_description' => $tag_desc ] );
+
+            if ( ! $id ){
+                return new \WP_Error( 'unable_to_add_tag', "Something went wrong adding the tag." );
+            }
+
+            $this->add_notice( 'new-tag', _x( 'Tag created!', 'notice', 'groundhogg' ) );
+
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool|\WP_Error
+     */
+    public function process_edit(){
+
+        if ( ! current_user_can( 'edit_tags' ) ){
+            $this->wp_die_no_access();
+        }
+
+        $tag_name = sanitize_text_field( wp_unslash( $_POST[ 'name' ] ) );
+        $tag_description = sanitize_textarea_field( wp_unslash( $_POST[ 'description' ] ) );
+
+        $args = array(
+            'tag_name'          => $tag_name,
+            'tag_slug'          => sanitize_title( $tag_name ),
+            'tag_description'   => $tag_description,
+        );
+
+        Plugin::$instance->dbs->get_db( 'tags' )->update( absint( $_GET[ 'tag' ] ), $args );
+
+        $this->add_notice( 'updated', _x( 'Tag updated.', 'notice', 'groundhogg' ) );
+
+        // Return false to return to main page.
+        return false;
+
+    }
+
+    /**
+     * Delete tags from the admin
+     *
+     * @return bool|\WP_Error
+     */
+    public function process_delete()
+    {
+        if ( ! current_user_can( 'delete_tags' ) ){
+            $this->wp_die_no_access();
+        }
+
+        foreach ( $this->get_items() as $id ){
+            if ( ! Plugin::$instance->dbs->get_db( 'tags' )->delete( $id ) ){
+                return new \WP_Error( 'unable_to_delete_tag', "Something went wrong deleting the tag." );
+            }
+        }
+
+        $this->add_notice(
+            'deleted',
+            sprintf( _nx( '%d tag deleted', '%d tags deleted', count( $this->get_items() ), 'notice', 'groundhogg' ),
+                count( $this->get_items() )
+            )
+        );
+
+        return true;
+    }
+
+    public function view()
+	{
+		if ( ! class_exists( 'Tags_Table' ) ){
+			include dirname(__FILE__) . '/tags-table.php';
+		}
+
+		$tags_table = new Tags_Table(); ?>
+        <form method="post" class="search-form wp-clearfix">
+            <!-- search form -->
+            <p class="search-box">
+                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Tags', 'groundhogg'); ?>:</label>
+                <input type="search" id="post-search-input" name="s" value="">
+                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( __( 'Search Tags', 'groundhogg' ) )?>">
+            </p>
+        </form>
+        <div id="col-container" class="wp-clearfix">
+            <div id="col-left">
+                <div class="col-wrap">
+                    <div class="form-wrap">
+                        <h2><?php _e( 'Add New Tag', 'groundhogg' ) ?></h2>
+                        <form id="addtag" method="post" action="">
+                            <input type="hidden" name="action" value="add">
+							<?php wp_nonce_field(); ?>
+                            <div class="form-field term-name-wrap">
+                                <label for="tag-name"><?php _e( 'Tag Name', 'groundhogg' ) ?></label>
+                                <input name="tag_name" id="tag-name" type="text" value="" size="40">
+                                <p><?php _e( 'Name a tag something simple so you do not forget it.', 'groundhogg' ); ?></p>
+                            </div>
+                            <div class="form-field term-description-wrap">
+                                <label for="tag-description"><?php _e( 'Description', 'groundhogg' ) ?></label>
+                                <textarea name="tag_description" id="tag-description" rows="5" cols="40"></textarea>
+                                <p><?php _e( 'Tag descriptions are only visible to admins and will never be seen by contacts.', 'groundhogg' ); ?></p>
+                            </div>
+                            <div class="form-field term-bulk-wrap hidden">
+                                <label for="tag-bulk"><?php _e( 'Bulk Add Tags', 'groundhogg' ) ?></label>
+                                <textarea name="bulk_tags" id="tag-bulk" rows="5" cols="40" maxlength="1000"></textarea>
+                                <p><?php _e( 'Enter 1 tag per line.', 'groundhogg' ); ?></p>
+                            </div>
+                            <div class="form-field term-toggle-bulk-wrap">
+                                <label for="tag-bulk-toggle"><input name="bulk_add" id="tag-bulk-toggle" type="checkbox"><?php _e( 'Add tags in bulk?', 'groundhogg' ) ?></label>
+                            </div>
+                            <script>
+                                jQuery(function($){
+                                    $( '#tag-bulk-toggle' ).change(function(){
+                                        if ( $(this).is( ':checked' ) ){
+                                            $( '.term-name-wrap' ).addClass( 'hidden' );
+                                            $( '.term-description-wrap' ).addClass( 'hidden' );
+                                            $( '.term-bulk-wrap' ).removeClass( 'hidden' );
+                                        } else {
+                                            $( '.term-name-wrap' ).removeClass( 'hidden' );
+                                            $( '.term-description-wrap' ).removeClass( 'hidden' );
+                                            $( '.term-bulk-wrap' ).addClass( 'hidden' );
+                                        }
+                                    });
+                                });
+                            </script>
+							<?php submit_button( _x( 'Add New Tag', 'action', 'groundhogg' ), 'primary', 'add_tag' ); ?>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div id="col-right">
+                <div class="col-wrap">
+                    <form id="posts-filter" method="post">
+						<?php $tags_table->prepare_items(); ?>
+						<?php $tags_table->display(); ?>
+                    </form>
+                </div>
+            </div>
+        </div>
+		<?php
+	}
+
+    public function edit()
+	{
+        if ( ! current_user_can( 'edit_tags' ) ){
+            $this->wp_die_no_access();
+        }
+
+        include dirname( __FILE__ ) . '/edit.php';
+	}
+}

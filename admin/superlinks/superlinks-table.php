@@ -1,24 +1,34 @@
 <?php
+
+namespace Groundhogg\Admin\Superlinks;
+
+use Groundhogg\Plugin;
+use WP_List_Table;
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
- * Tags Table
+ * Superlinks Table
+ *
+ * This is the Superlinks table, has basic actions and shows basic info about a superlink.
  *
  * @package     Admin
- * @subpackage  Admin/Tags
+ * @subpackage  Admin/Supperlinks
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+
 
 // WP_List_Table is not loaded automatically so we need to load it in our application
 if( ! class_exists( 'WP_List_Table' ) ) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_Tags_Table extends WP_List_Table {
+class Superlinks_Table extends WP_List_Table {
     /**
      * TT_Example_List_Table constructor.
      *
@@ -28,8 +38,8 @@ class WPGH_Tags_Table extends WP_List_Table {
     public function __construct() {
         // Set parent defaults.
         parent::__construct( array(
-            'singular' => 'tag',     // Singular name of the listed records.
-            'plural'   => 'tags',    // Plural name of the listed records.
+            'singular' => 'superlink',     // Singular name of the listed records.
+            'plural'   => 'superlinks',    // Plural name of the listed records.
             'ajax'     => false,       // Does this table support ajax?
         ) );
     }
@@ -40,10 +50,13 @@ class WPGH_Tags_Table extends WP_List_Table {
      */
     public function get_columns() {
         $columns = array(
-            'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
-            'tag_name'    => _x( 'Name', 'Column label', 'groundhogg' ),
-            'tag_description'   => _x( 'Description', 'Column label', 'groundhogg' ),
-            'contact_count' => _x( 'Count', 'Column label', 'groundhogg' ),
+            'cb'            => '<input type="checkbox" />', // Render a checkbox instead of text.
+            'name'          => _x( 'Name', 'Column label', 'groundhogg' ),
+            'source'        => _x( 'Source Url', 'Column label', 'groundhogg' ),
+            'replacement'   => _x( 'Replacement Code', 'Column label', 'groundhogg' ),
+            'tags'          => _x( 'Tags', 'Column label', 'groundhogg' ),
+            //'clicks' => _x( 'Clicks', 'Column label', 'groundhogg' ),
+            'target'        => _x( 'Target Url', 'Column label', 'groundhogg' ),
         );
         return $columns;
     }
@@ -52,60 +65,73 @@ class WPGH_Tags_Table extends WP_List_Table {
      */
     protected function get_sortable_columns() {
         $sortable_columns = array(
-            'tag_name'    => array( 'tag_name', false ),
-            'tag_description' => array( 'tag_description', false ),
-            'contact_count' => array( 'contact_count', false ),
+            'name'          => array( 'name', false ),
+//            'target'    => array( 'target', false ),
+            'replacement'   => array( 'replacement', false ),
+            'tags'          => array( 'tags', false ),
+            'clicks'        => array( 'clicks', false ),
         );
         return $sortable_columns;
     }
 
-    protected function extra_tablenav($which)
+    protected function column_name( $superlink )
     {
-        ?>
-        <div class="alignleft gh-actions">
-            <a class="button action" href="<?php echo add_query_arg( 'recount_contacts', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php _ex( 'Recount Contacts', 'action','groundhogg' ); ?></a>
-        </div>
-        <?php
-    }
-
-    protected function column_tag_name( $tag )
-    {
-        $editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->tag_id );
-        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $tag->tag_name ) . "</a>";
+        $editUrl = admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->ID );
+        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $superlink->name ) . "</a>";
         return $html;
     }
 
-    protected function column_contact_count( $tag )
+    protected function column_target( $superlink )
     {
-        $count = $tag->contact_count;
-        return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&tags_include=' . $tag->tag_id ).'">'. $count .'</a>' : '0';
+        return '<a target="_blank" href="' . esc_url_raw( $superlink->target ) . '">' . esc_url( $superlink->target ) . '</a>';
     }
 
-    protected function column_tag_description( $tag )
+    protected function column_replacement( $superlink )
     {
-        return ! empty( $tag->tag_description ) ? $tag->tag_description : '&#x2014;';
+        return sprintf( '<input type="text" value="%s" onfocus="this.select()" readonly>', '{superlink.' . $superlink->ID . '}');
+    }
+
+    protected function column_source( $superlink )
+    {
+        return sprintf( '<input style="max-width: 100%%;" class="regular-text" type="text" value="%s" onfocus="this.select()" readonly><p><a target="_blank" href="%s">%s</a></p>', site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ) );
+    }
+
+    protected function column_tags( $superlink )
+    {
+        $tags = array();
+
+        foreach ( $superlink->tags as $i => $tag_id ){
+
+
+            if ( Plugin::$instance->dbs->get_db('tags')->exists( $tag_id ) ){
+                $tag = Plugin::$instance->dbs->get_db('tags')->get( $tag_id );
+                $tags[ $i ] = '<a href="'. admin_url( 'admin.php?page=gh_contacts&view=tag&tag=' . $tag_id ) . '">' . $tag->tag_name . '</a>';
+            }
+        }
+
+        return implode( ', ', $tags );
     }
 
     /**
      * Get default column value.
-     * @param object $tag        A singular item (one full row's worth of data).
+     * @param object $superlink        A singular item (one full row's worth of data).
      * @param string $column_name The name/slug of the column to be processed.
      * @return string Text or HTML to be placed inside the column <td>.
      */
-    protected function column_default( $tag, $column_name ) {
+    protected function column_default( $superlink, $column_name ) {
 
-        return print_r( $tag->$column_name, true );
+        return print_r( $superlink->$column_name, true );
 
     }
     /**
-     * @param object $tag A singular item (one full row's worth of data).
+     * @param object $superlink A singular item (one full row's worth of data).
      * @return string Text to be placed inside the column <td>.
      */
-    protected function column_cb( $tag ) {
+    protected function column_cb( $superlink ) {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $tag->tag_id               // The value of the checkbox should be the record's ID.
+            $superlink->ID               // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -117,7 +143,7 @@ class WPGH_Tags_Table extends WP_List_Table {
             'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
         );
 
-        return apply_filters( 'wpgh_contact_tag_bulk_actions', $actions );
+        return apply_filters( 'wpgh_superlink_bulk_actions', $actions );
     }
 
     /**
@@ -132,34 +158,23 @@ class WPGH_Tags_Table extends WP_List_Table {
      * @uses $this->set_pagination_args()
      */
     function prepare_items() {
-        global $wpdb; //This is used only if making any database queries
-        /*
-         * First, lets decide how many records per page to show
-         */
+
         $per_page = 30;
-        /*
-         * REQUIRED. Now we need to define our column headers. This includes a complete
-         * array of columns to be displayed (slugs & titles), a list of columns
-         * to keep hidden, and a list of columns that are sortable. Each of these
-         * can be defined in another method (as we've done here) before being
-         * used to build the value for our _column_headers property.
-         */
+
         $columns  = $this->get_columns();
         $hidden   = array();
         $sortable = $this->get_sortable_columns();
-        /*
-         * REQUIRED. Finally, we build an array to be used by the class for column
-         * headers. The $this->_column_headers property takes an array which contains
-         * three other arrays. One for all columns, one for hidden columns, and one
-         * for sortable columns.
-         */
+
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        if ( isset( $_REQUEST['s'] ) ){
-            $data = WPGH()->tags->search( $_REQUEST[ 's' ] );
-        } else {
-            $data = WPGH()->tags->get_tags();
+        $args = [];
+
+        if ( isset( $_REQUEST[ 's' ] ) ){
+            $args[ 'search' ] = $_REQUEST[ 's' ];
         }
+
+        $args = wp_unslash( $args );
+        $data = Plugin::instance()->dbs->get_db('superlinks')->query($args);
 
 
         /*
@@ -167,34 +182,14 @@ class WPGH_Tags_Table extends WP_List_Table {
          */
         usort( $data, array( $this, 'usort_reorder' ) );
 
-
-        /*
-         * REQUIRED for pagination. Let's figure out what page the user is currently
-         * looking at. We'll need this later, so you should always include it in
-         * your own package classes.
-         */
         $current_page = $this->get_pagenum();
-        /*
-         * REQUIRED for pagination. Let's check how many items are in our data array.
-         * In real-world use, this would be the total number of items in your database,
-         * without filtering. We'll need this later, so you should always include it
-         * in your own package classes.
-         */
+
         $total_items = count( $data );
-        /*
-         * The WP_List_Table class does not handle pagination for us, so we need
-         * to ensure that the data is trimmed to only the current page. We can use
-         * array_slice() to do that.
-         */
+
         $data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
-        /*
-         * REQUIRED. Now we can add our *sorted* data to the items property, where
-         * it can be used by the rest of the class.
-         */
+
         $this->items = $data;
-        /**
-         * REQUIRED. We also have to register our pagination options & calculations.
-         */
+
         $this->set_pagination_args( array(
             'total_items' => $total_items,                     // WE have to calculate the total number of items.
             'per_page'    => $per_page,                        // WE have to determine how many items to show on a page.
@@ -213,9 +208,8 @@ class WPGH_Tags_Table extends WP_List_Table {
     protected function usort_reorder( $a, $b ) {
         $a = (array) $a;
         $b = (array) $b;
-
         // If no sort, default to title.
-        $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'tag_id'; // WPCS: Input var ok.
+        $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'ID'; // WPCS: Input var ok.
         // If no order, default to asc.
         $order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
         // Determine sort order.
@@ -226,32 +220,30 @@ class WPGH_Tags_Table extends WP_List_Table {
     /**
      * Generates and displays row action superlinks.
      *
-     * @param object $tag        Contact being acted upon.
+     * @param object $item        Contact being acted upon.
      * @param string $column_name Current column name.
      * @param string $primary     Primary column name.
      * @return string Row steps output for posts.
      */
-    protected function handle_row_actions( $tag, $column_name, $primary ) {
+    protected function handle_row_actions( $superlink, $column_name, $primary ) {
         if ( $primary !== $column_name ) {
             return '';
         }
 
         $actions = array();
-        $title = $tag->tag_name;
-
-        $actions[ 'id' ] = 'ID: ' . $tag->tag_id;
+        $title = $superlink->name;
 
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',
             /* translators: %s: title */
-            admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->tag_id ),
+            admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->ID ),
             esc_attr( sprintf( __( 'Edit' ), $title ) ),
             __( 'Edit' )
         );
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_tags&tag='. $tag->tag_id . '&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_superlinks&superlink='. $superlink->ID . '&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )
