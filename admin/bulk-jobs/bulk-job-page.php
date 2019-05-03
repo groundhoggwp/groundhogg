@@ -1,19 +1,11 @@
 <?php
 
-namespace  Groundhogg\Admin\Bulk_Job;
+namespace  Groundhogg\Admin\Bulk_Jobs;
 
 use Groundhogg\Plugin;
 use Groundhogg\Admin\Admin_Page;
 
-
-if ( ! class_exists( 'Admin_Page' ) ){
-    include_once WPGH_PLUGIN_DIR . 'includes/class-wpgh-admin-page.php';
-}
-
-//todo whole page
-
-
-class Admin_Bulk_Job extends Admin_Page
+class Bulk_Job_Page extends Admin_Page
 {
 
     /* Unused Functions */
@@ -86,7 +78,7 @@ class Admin_Bulk_Job extends Admin_Page
      */
     public function get_cap()
     {
-        return 'manage_options';
+        return 'perform_bulk_jobs';
     }
 
     /**
@@ -94,7 +86,7 @@ class Admin_Bulk_Job extends Admin_Page
      */
     public function get_item_type()
     {
-        return 'job';
+        return 'bulk_job';
     }
 
     protected function get_title_actions()
@@ -107,16 +99,21 @@ class Admin_Bulk_Job extends Admin_Page
      */
     public function page(){
 
-        WPGH()->notices->add( 'do_not_leave', __( 'Do not leave this page till the current process is complete!', 'groundhogg' ), 'warning' )
+        $this->add_notice( 'do_not_leave', __( 'Do not leave the page till the process is complete!', 'groudnhogg' ), 'warning' );
 
         ?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
+            <?php $this->do_title_actions(); ?>
             <div id="notices">
-                <?php $this->notices->notices(); ?>
+                <?php Plugin::instance()->notices->notices(); ?>
             </div>
             <hr class="wp-header-end">
-            <?php $this->view(); ?>
+            <?php
+
+            $this->view();
+
+            ?>
         </div>
         <?php
     }
@@ -124,10 +121,10 @@ class Admin_Bulk_Job extends Admin_Page
     public function view()
     {
 
-        $items = apply_filters( "groundhogg/bulk_job/{$this->get_action()}/query", [] );
-        $max_items = apply_filters( "groundhogg/bulk_job/{$this->get_action()}/max_items", 25, $items );
+        $items = apply_filters( "groundhogg/bulk_job/{$this->get_current_action()}/query", [] );
+        $max_items = apply_filters( "groundhogg/bulk_job/{$this->get_current_action()}/max_items", 25, $items );
 
-        echo WPGH()->html->progress_bar( [ 'id' => 'bulk-job', 'hidden' => false ] );
+        echo Plugin::$instance->utils->html->progress_bar( [ 'id' => 'bulk-job', 'hidden' => false ] );
 
         ?>
         <div id="job-complete" class="hidden">
@@ -226,21 +223,23 @@ class Admin_Bulk_Job extends Admin_Page
 
                     send: function () {
 
+                        var self = this;
+
                         $.ajax({
                             type: "post",
                             url: ajaxurl,
                             dataType: 'json',
-                            data: { action: 'bulk_action_listener', bulk_action: '<?php echo $this->get_action(); ?>', items: bp.getItems(), _wpnonce: '<?php echo wp_create_nonce(  $this->get_action() ); ?>', the_end: bp.isLastOfThem() },
+                            data: { action: 'bulk_action_listener', bulk_action: '<?php echo $this->get_current_action(); ?>', items: self.getItems(), _wpnonce: '<?php echo wp_create_nonce(  $this->get_current_action() ); ?>', the_end: self.isLastOfThem() },
                             success: function( response ){
 
                                 console.log(response);
 
                                 if ( typeof response.complete !== "undefined" ){
-                                    bp.complete += response.complete;
-                                    bp.updateProgress();
+                                    self.complete += response.complete;
+                                    self.updateProgress();
 
                                     if ( bp.items.length > 0 ){
-                                        bp.send();
+                                        self.send();
                                     }
 
                                     if ( response.return_url !== undefined ){
@@ -251,12 +250,12 @@ class Admin_Bulk_Job extends Admin_Page
                                     }
 
                                 } else {
-                                    bp.error( response );
+                                    self.error( response );
                                 }
 
                             },
                             error: function ( response ) {
-                                bp.error();
+                                self.error();
                             }
                         });
 
@@ -268,7 +267,7 @@ class Admin_Bulk_Job extends Admin_Page
                     bp.init();
                 });
 
-            })( jQuery, BulkProcessor, <?php echo json_encode( $items ); ?> );
+            })( jQuery, BulkProcessor, <?php echo wp_json_encode( $items ); ?> );
         </script>
         <?php
     }

@@ -137,7 +137,7 @@ class WPGH_Admin_Menu
         require_once dirname(__FILE__) . '/admin/tags/class-wpgh-tags-page.php';
         require_once dirname(__FILE__) . '/admin/welcome/welcome-page.php';
         require_once dirname(__FILE__) . '/admin/guided-setup/class-wpgh-guided-setup.php';
-        require_once dirname(__FILE__) . '/admin/bulk-jobs/class-wpgh-admin-bulk-job.php';
+        require_once dirname(__FILE__) . '/admin/bulk-jobs/bulk-job-page.php';
         require_once dirname(__FILE__) . '/admin/tools/tools-page.php';
     }
 
