@@ -2,6 +2,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\Plugin;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -125,7 +127,7 @@ abstract class DB {
         global $wpdb;
 
         if ( ! isset( $this->table_name ) ){
-            if ( ! wpgh_is_global_multisite() ){
+            if ( ! Plugin::$instance->settings->is_global_multisite() ){
                 $this->table_name  = $wpdb->prefix . $this->db_suffix;
             } else {
                 $this->table_name = $wpdb->base_prefix . $this->db_suffix;

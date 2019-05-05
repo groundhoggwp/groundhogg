@@ -73,9 +73,9 @@ class Plugin {
     /**
      * Utils for compliance management
      *
-     * @var Compliance
+     * @var Preferences
      */
-    public $compliance;
+    public $preferences;
     
     /**
      * Settings.
@@ -218,22 +218,22 @@ class Plugin {
      */
     private function init_components() {
 
-        $this->dbs          = new DB_Manager();
-        $this->compliance   = new Compliance();
-        $this->utils        = new Utils();
-        $this->scripts      = new Scripts();
         $this->settings     = new Settings();
-        $this->replacements = new Replacements();
-        $this->sending_service = new Sending_Service();
-        $this->roles        = new Roles();
-        $this->event_queue  = new Event_Queue();
+        $this->dbs          = new DB_Manager();
+        $this->preferences  = new Preferences();
+//        $this->utils        = new Utils();
+        $this->scripts      = new Scripts();
+//        $this->replacements = new Replacements();
+//        $this->sending_service = new Sending_Service();
+//        $this->roles        = new Roles();
+//        $this->event_queue  = new Event_Queue();
 
-        if ( is_admin() ) {
-
-            $this->notices = new Notices();
-            $this->admin   = new Admin_Menu();
-
-        }
+//        if ( is_admin() ) {
+//
+//            $this->notices = new Notices();
+//            $this->admin   = new Admin_Menu();
+//
+//        }
 
     }
 
@@ -279,7 +279,7 @@ class Plugin {
     private function includes()
     {
         require  GROUNDHOGG_PATH . '/includes/functions.php';
-        require  GROUNDHOGG_PATH . '/includes/scripts.php';
+//        require  GROUNDHOGG_PATH . '/includes/scripts.php';
 //        require  GROUNDHOGG_PATH . '/includes/install.php';
 //        require  GROUNDHOGG_PATH . '/includes/install.php';
     }

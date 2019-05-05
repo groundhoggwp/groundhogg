@@ -1,7 +1,7 @@
 <?php
 namespace Groundhogg;
 
-class Compliance
+class Preferences
 {
     // Optin Statuses
     const UNCONFIRMED   = 0;
@@ -12,6 +12,108 @@ class Compliance
     const HARD_BOUNCE   = 5;
     const SPAM          = 6;
     const COMPLAINED    = 7;
+
+    public function __construct()
+    {
+        add_action( 'init', [ $this, 'add_rewrite_rules' ] );
+
+        add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
+
+        add_filter( 'template_include', [ $this, 'template_include' ] );
+        add_action( 'template_redirect', [ $this, 'save_preference_changes' ] );
+        add_action( 'template_redirect', [ $this, 'auto_change_preference' ] );
+
+    }
+
+    /**
+     * If the action has certain parameters then allow for changing
+     * the email preference through certain links.
+     */
+    public function auto_change_preference()
+    {
+        $managing_preferences = (bool) get_query_var( 'manage_preferences' );
+        $action = get_query_var( 'action', false );
+
+        if ( $managing_preferences && $action ){
+
+            switch ( $action ){
+                case 'unsubscribe':
+                    break;
+                case 'confirm':
+            }
+
+        }
+
+    }
+
+    /**
+     * Save any changes to a contact's email preferences.
+     */
+    public function save_preference_changes()
+    {
+        // Security check.
+        if ( ! gisset_not_empty( $_POST, '_wpnonce' ) || ! wp_verify_nonce( $_POST[ '_wpnonce' ], 'manage_email_preferences' ) ){
+            return;
+        }
+
+        $action = get_query_var( 'action' );
+
+        switch ( $action )
+        {
+            default:
+            case 'manage':
+
+                if ( ! gisset_not_empty( $_POST, 'preference' ) ){
+                    return;
+                }
+
+                $preference = absint( $_POST[ 'preference' ] );
+
+                //TODO get Contact
+
+                break;
+        }
+
+    }
+
+    /**
+     * Add the rewrite rules required for the Preferences center.
+     */
+    public function add_rewrite_rules()
+    {
+        add_rewrite_rule( '^gh/preferences/([^/?]*)', 'index.php?manage_preferences=true&action=$matches[1]', 'top' );
+    }
+
+    /**
+     * Add the query vars needed to manage the request.
+     *
+     * @param $vars
+     * @return array
+     */
+    public function add_query_vars( $vars )
+    {
+        $vars[] = 'manage_preferences';
+        $vars[] = 'action';
+        return $vars;
+    }
+
+    /**
+     * Overwrite the existing template with the manage preferences template.
+     *
+     * @param $template
+     * @return string
+     */
+    public function template_include( $template )
+    {
+        $managing_preferences = (bool) get_query_var( 'manage_preferences' );
+        $new_template = GROUNDHOGG_PATH . 'templates/preferences.php';
+
+        if ( $managing_preferences && file_exists( $new_template ) ){
+            return $new_template;
+        }
+
+        return $template;
+    }
 
     /**
      * Get the text explanation for the optin status of a contact
@@ -116,11 +218,11 @@ class Compliance
                 break;
 	        case self::WEEKLY:
                 $last_sent = $contact->get_meta( 'last_sent' );
-                return ( time() - intval( $last_sent ) ) > 7 * 24 * HOUR_IN_SECONDS;
+                return ( time() - absint( $last_sent ) ) > 7 * 24 * HOUR_IN_SECONDS;
                 break;
 	        case self::MONTHLY:
                 $last_sent = $contact->get_meta( 'last_sent' );
-                return ( time() - intval( $last_sent ) ) > 30 * 24 * HOUR_IN_SECONDS;
+                return ( time() - absint( $last_sent ) ) > 30 * 24 * HOUR_IN_SECONDS;
                 break;
         }
     }
@@ -132,12 +234,7 @@ class Compliance
      */
     public function is_gdpr_enabled()
     {
-        $is_gdpr =  wpgh_get_option( 'gh_enable_gdpr', array() );
-
-        if ( ! is_array( $is_gdpr ) )
-            return false;
-
-        return in_array( 'on', $is_gdpr );
+        return Plugin::$instance->settings->is_option_enabled( 'enable_gdpr' );
     }
 
     /**
@@ -147,24 +244,17 @@ class Compliance
      */
     public function is_gdpr_strict()
     {
-
-        $is_gdpr_strict =  wpgh_get_option( 'gh_strict_gdpr', array() );
-
-        if ( ! is_array( $is_gdpr_strict ) )
-            return false;
-
-        return in_array( 'on', $is_gdpr_strict );
+        return Plugin::$instance->settings->is_option_enabled( 'strict_gdpr' );
     }
 
+    /**
+     * Whether strict confirmation is enabled for CASL.
+     *
+     * @return bool
+     */
     public function is_confirmation_strict()
     {
-
-        $is_confirmation_strict =  wpgh_get_option( 'gh_strict_confirmation', array() );
-
-        if ( ! is_array( $is_confirmation_strict ) )
-            return false;
-
-        return in_array( 'on', $is_confirmation_strict );
+        return Plugin::$instance->settings->is_option_enabled( 'strict_confirmation' );
     }
 
     /**
@@ -178,13 +268,13 @@ class Compliance
 
         $contact = Plugin::instance()->utils->get_contact( $id_or_email );
 
-        $grace = intval( wpgh_get_option( 'gh_confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
+        $grace = absint( Plugin::$instance->settings->get_option( 'confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
 
-        $base = $contact->last_optin;
+        $base = absint( $contact->last_optin );
 
         if ( ! $base )
         {
-            $base = strtotime( $contact->date_created );
+            $base = strtotime( $contact->get_date_created() );
         }
 
         $time_passed = time() - $base;

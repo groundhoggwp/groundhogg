@@ -21,7 +21,8 @@ if ( ! function_exists( 'obfuscate_email' ) ):
      */
     function obfuscate_email( $email )
     {
-        return preg_replace("/(?!^).(?=[^@]+@)/", "*", $email );
+        $email = preg_replace("/(?!@).(?=.{2}[^@]+\.)/", "*", $email );
+        return $email;
     }
 
 endif;
@@ -31,8 +32,9 @@ endif;
  */
 function enqueue_manage_preferences_styles()
 {
-    global $wp_styles;
-    $wp_styles->queue = array();
+
+    // Dequeue Theme Support.
+    wp_dequeue_style( basename( get_stylesheet_directory() ) . '-style' );
 
     wp_enqueue_style( 'manage-preferences' );
 
@@ -60,13 +62,13 @@ function enqueue_manage_preferences_scripts()
  */
 function ensure_logo_is_there()
 {
-
     if ( has_custom_logo() ) :
 
         $image = wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' );
+
         ?>
         <style type="text/css">
-            .manage-preferences h1 a {
+            #main h1 a {
                 background-image: url(<?php echo esc_url( $image[0] ); ?>);
                 -webkit-background-size: <?php echo absint( $image[1] )?>px;
                 background-size: <?php echo absint( $image[1] ) ?>px;
@@ -91,7 +93,6 @@ function manage_preferences_head( $title='', $action='' )
 
     add_action( 'wp_head', 'noindex' );
     add_action( 'wp_head', 'wp_sensitive_page_meta' );
-    add_action( 'wp_head', 'wp_login_viewport_meta' );
     add_action( 'wp_head', 'ensure_logo_is_there' );
 
     $mp_title = get_bloginfo( 'name', 'display' );
@@ -108,7 +109,7 @@ function manage_preferences_head( $title='', $action='' )
         $header_url   = network_home_url();
         $header_title = get_network()->site_name;
     } else {
-        $header_url   = __( 'https://www.groundhogg.io/' );
+        $header_url   = site_url();
         $header_title = __( 'Powered by Groundhogg', 'groundhogg' );
     }
 
@@ -133,7 +134,9 @@ function manage_preferences_head( $title='', $action='' )
 </head>
 <body class="manage-preferences <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
 <div id="main">
+    <?php if ( has_custom_logo() ): ?>
     <h1><a href="<?php echo esc_url( $header_url ); ?>" title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
+    <?php endif; ?>
     <div id="content box">
     <?php
 }
@@ -144,13 +147,12 @@ function manage_preferences_head( $title='', $action='' )
 function manage_preferences_footer() {
     ?>
     </div>
-    <p id="backtoblog"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">
+    <p id="extralinks"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">
             <?php
             /* translators: %s: site title */
             printf( _x( '&larr; Back to %s', 'site' ), get_bloginfo( 'title', 'display' ) );
-            ?>
-        </a></p>
-    <?php the_privacy_policy_link( '<div class="privacy-policy-page-link">', '</div>' ); ?>
+            ?></a> |
+        <?php the_privacy_policy_link( '<span class="privacy-policy-page-link">', '</span>' ); ?></p>
 </div>
 <?php
 wp_footer();
@@ -163,39 +165,80 @@ wp_footer();
 
 $action = get_query_var( 'action', 'manage' );
 $contact_id = absint( get_query_var( 'contact_id', 0 ) );
-$contact = \Groundhogg\Plugin::$instance->utils->get_contact( $contact_id );
+//$contact = \Groundhogg\Plugin::$instance->utils->get_contact( $contact_id );
+$contact = new \Groundhogg\Contact( 1 );
+//$contact = false;
 
+// Force email collection.
 if ( ! $contact ){
-    wp_die( __( 'No contact to manage. This might be because you do not have cookies enabled, or you have clicked an expired link.', 'groundhogg' ) );
+    $action = 'no_email';
 }
 
 switch ( $action ):
 
     default:
+    // Support for reaching this page if there is no email to manage...
+    case 'no_email':
+
+    manage_preferences_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
+
+    ?>
+    <form action="" id="emailaddress" method="post">
+        <?php wp_nonce_field( 'manage_email_preferences' ); ?>
+        <p><?php _e( 'Please enter your email address to manage your preferences.', 'groundhogg' ); ?></p>
+        <p><input type="email" name="email" id="email" placeholder="<?php esc_attr_e( "your.name@domain.com", 'groundhogg' ); ?>" required></p>
+        <p>
+            <input id="submit" type="submit" value="<?php esc_attr_e( 'Submit', 'groundhogg' ); ?>">
+        </p>
+    </form>
+    <?php
+
+    manage_preferences_footer();
+
+    break;
     case 'manage':
 
-        manage_preferences_head( __( 'Manage Preferences', 'groudhogg' ), 'manage' );
+        manage_preferences_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
 
         $preferences = [
-            'none'          => _x( 'I love this company, you can communicate with me whenever you feel like.', 'preferences', 'groundhogg' ),
+            'confirm'       => _x( 'I love this company, you can communicate with me whenever you feel like.', 'preferences', 'groundhogg' ),
             'weekly'        => _x( "It's getting a bit much. Communicate with me weekly.", 'preferences', 'groundhogg' ),
             'monthly'       => _x( 'Distance makes the heart grow fonder. Communicate with me monthly.', 'preferences', 'groundhogg' ),
             'unsubscribe'   => _x( 'I no longer wish to receive any form of communication. Unsubscribe me!', 'preferences', 'groundhogg' )
         ];
 
+        if ( \Groundhogg\Plugin::$instance->preferences->is_gdpr_enabled() ){
+            $preferences[ 'gdpr_delete' ] = _x( 'Unsubscribe me and delete any personal information about me.', 'preferences', 'groundhogg' );
+        }
+
         $preferences = apply_filters( 'manage_email_preferences_options', $preferences );
 
         ?>
-<p><?php printf( __( 'Managing preferences for %s.', 'groundhogg' ), obfuscate_email( $contact->get_email() ) )?></p>
-<form action="" id="preferences">
+<form action="" id="preferences" method="post">
+    <p><b><?php printf( __( 'Managing preferences for %s (%s).', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) )?></b></p>
     <?php wp_nonce_field( 'manage_email_preferences' ); ?>
-    <?php foreach ( $preferences as $preference => $text ): ?>
-        <p><label><input type="radio" name="preference" value="<?php esc_attr_e( $preference ); ?>" class="preference-<?php esc_attr_e( $preference ); ?>">&nbsp;<?php echo $text; ?></label></p>
+    <ul class="preferences">
+        <?php foreach ( $preferences as $preference => $text ): ?>
+        <li><label><input type="radio" name="preference" value="<?php esc_attr_e( $preference ); ?>" class="preference-<?php esc_attr_e( $preference ); ?>" required><?php echo $text; ?></label></li>
     <?php endforeach; ?>
-    <?php if ( \Groundhogg\Plugin::$instance->compliance->is_gdpr_enabled() ): ?>
+    </ul>
+    <?php if ( \Groundhogg\Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
         <p style="display: none"><label><input type="checkbox" name="delete_everything" value="yes" class="preference-gdpr-delete">&nbsp;<?php _e( 'Request all information on record be removed.', 'groundhogg' ); ?></label></p>
     <?php endif; ?>
+    <p>
+        <input id="submit" type="submit" value="<?php esc_attr_e( 'Save Changes', 'groundhogg' ); ?>">
+    </p>
 </form>
+    <script>
+        jQuery(function ($) {
+           var $preferences = $( 'input[name="preference"]' ).change( function () {
+               $preferences.closest( 'li' ).removeClass( 'checked' );
+               if ( $( this ).is( ':checked' ) ){
+                   $( this ).closest( 'li' ).addClass( 'checked' );
+               }
+           });
+        });
+    </script>
     <?php
 
 
@@ -203,8 +246,31 @@ switch ( $action ):
 
         break;
     case 'unsubscribe':
+
+        manage_preferences_head( __( 'Unsubscribed', 'groundhogg' ), 'unsubscribe' );
+
+        ?>
+    <div class="box">
+        <p><b><?php printf( __( 'Your email address %s has just been unsubscribed.', 'groundhogg' ), obfuscate_email( $contact->get_email() ) )?></b></p>
+        <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.' ); ?></p>
+    </div>
+<?php
+        manage_preferences_footer();
+
         break;
     case 'confirm':
+
+        manage_preferences_head( __( 'Confirmed', 'groundhogg' ), 'confirm' );
+
+        ?>
+    <div class="box">
+        <p><b><?php printf( __( 'Your email address %s has just been confirmed!', 'groundhogg' ), obfuscate_email( $contact->get_email() ) )?></b></p>
+        <p><?php printf( __( 'You will now receive electronic communication from %1$s. Should you wish to change your communication preferences you may do so at any time by clicking the <b>Manage Preferences</b> button in the footer of any email sent by %1$s.' ), get_bloginfo( 'title', 'display' ) ); ?></p>
+    </div>
+<?php
+
+        manage_preferences_footer();
+
         break;
 
 endswitch;

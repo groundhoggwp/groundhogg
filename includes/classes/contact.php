@@ -325,7 +325,7 @@ class Contact extends Base_Object_With_Meta
      */
     public function is_marketable()
     {
-        return Plugin::instance()->compliance->is_marketable( $this->ID );
+        return Plugin::instance()->preferences->is_marketable( $this->ID );
     }
 
     /**
@@ -487,7 +487,7 @@ class Contact extends Base_Object_With_Meta
 
         do_action( 'groundhogg/contact/preferences/updated', $this->ID, $preference, $old_preference );
 
-        if ( $preference === Compliance::UNSUBSCRIBED){
+        if ( $preference === Preferences::UNSUBSCRIBED){
             do_action( 'groundhogg/contact/preferences/unsubscribed', $this->ID, $preference, $old_preference );
         }
 
@@ -497,7 +497,7 @@ class Contact extends Base_Object_With_Meta
      * Unsubscribe a contact
      */
     public function unsubscribe() {
-        $this->change_marketing_preference( Compliance::UNSUBSCRIBED );
+        $this->change_marketing_preference( Preferences::UNSUBSCRIBED );
     }
 
     /**

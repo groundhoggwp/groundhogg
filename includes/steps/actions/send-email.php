@@ -1,7 +1,7 @@
 <?php
 namespace Groundhogg\Steps\Actions;
 
-use Groundhogg\Compliance;
+use Groundhogg\Preferences;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
@@ -246,7 +246,7 @@ class Send_Email extends Action
 
         if ( $email->is_confirmation_email() ){
 
-            if ( $this->get_setting( 'skip_if_confirmed' ) && $contact->get_optin_status() === Compliance::CONFIRMED ){
+            if ( $this->get_setting( 'skip_if_confirmed' ) && $contact->get_optin_status() === Preferences::CONFIRMED ){
 
                 /* This will simply get the upcoming email confirmed step and complete it. No muss not fuss */
                 do_action( 'groundhogg/steps/email/confirmed', $contact, $event->get_funnel_id() );

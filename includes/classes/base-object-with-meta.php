@@ -112,6 +112,10 @@ abstract class Base_Object_With_Meta extends Base_Object
 
         $meta = $this->get_meta_db()->get_meta( $this->get_id() );
 
+        if ( ! $meta ){
+            return [];
+        }
+
         foreach ( $meta as $meta_key => $array_values ){
             $this->meta[ $meta_key ] = maybe_unserialize( array_shift( $array_values ) );
         }

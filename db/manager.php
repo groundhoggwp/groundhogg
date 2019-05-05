@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\DB;
 
+use function Groundhogg\gisset_not_empty;
+
 /**
  * DB Manager to manage databases in Groundhogg
  *

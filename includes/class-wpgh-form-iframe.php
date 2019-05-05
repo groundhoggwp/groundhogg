@@ -37,7 +37,7 @@ class WPGH_Form_Iframe
      */
     public function get_iframe_js()
     {
-        include WPGH_PLUGIN_DIR . 'templates/form-iframe.js.php';
+        include WPGH_PLUGIN_DIR . 'templates/iframe.js.php';
         die();
     }
 
@@ -60,7 +60,7 @@ class WPGH_Form_Iframe
 
         ob_start();
 
-        include WPGH_PLUGIN_DIR . 'templates/form-iframe.php';
+        include WPGH_PLUGIN_DIR . 'templates/iframe.php';
 
         $HTML = ob_get_clean();
 

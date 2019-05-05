@@ -241,33 +241,13 @@ class Tag_Relationships extends DB
     }
 
     /**
-     * Count the total number of tags in the database
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function count( $value, $column='contact_id' ) {
-
-        $results = $this->get_relationships( $value, $column );
-
-        if ( $results ){
-            return count( $results );
-        }
-
-        return 0;
-
-    }
-
-    /**
      * Get a list of tags associated with a particular contact
      *
      * @param int $contact_id
      * @return array|bool|null|object
      */
     public function get_tags_by_contact( $contact_id=0 ){
-
         return $this->get_relationships( $contact_id, 'contact_id', 'tag_id' );
-
     }
 
 
