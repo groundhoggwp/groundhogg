@@ -52,7 +52,7 @@ class Preferences
     public function save_preference_changes()
     {
         // Security check.
-        if ( ! gisset_not_empty( $_POST, '_wpnonce' ) || ! wp_verify_nonce( $_POST[ '_wpnonce' ], 'manage_email_preferences' ) ){
+        if ( ! isset_not_empty( $_POST, '_wpnonce' ) || ! wp_verify_nonce( $_POST[ '_wpnonce' ], 'manage_email_preferences' ) ){
             return;
         }
 
@@ -63,13 +63,13 @@ class Preferences
             default:
             case 'manage':
 
-                if ( ! gisset_not_empty( $_POST, 'preference' ) ){
+                if ( ! isset_not_empty( $_POST, 'preference' ) ){
                     return;
                 }
 
                 $preference = absint( $_POST[ 'preference' ] );
 
-                //TODO get Contact
+            //TODO get Contact
 
                 break;
         }

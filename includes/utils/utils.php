@@ -34,15 +34,15 @@ class Utils
      * @var string[]
      */
     protected static $class_object_map = [
-        'contact'   => 'Contact',
-        'funnel'    => 'Funnel',
-        'step'      => 'Step',
-        'event'     => 'Event',
-        'email'     => 'Email',
-        'sms'       => 'Sms',
-        'broadcast' => 'Broadcast',
-        'superlink' => 'Superlink',
-        'tag'       => 'Tag',
+        'contact'   => '\Groundhogg\Contact',
+        'funnel'    => '\Groundhogg\Funnel',
+        'step'      => '\Groundhogg\Step',
+        'event'     => '\Groundhogg\Event',
+        'email'     => '\Groundhogg\Email',
+        'sms'       => '\Groundhogg\Sms',
+        'broadcast' => '\Groundhogg\Broadcast',
+        'superlink' => '\Groundhogg\Superlink',
+        'tag'       => '\Groundhogg\Tag',
     ];
 
     /**
@@ -66,7 +66,7 @@ class Utils
      * @param string $object
      * @param bool $get_from_cache
      *
-     * @return mixed|Base_Object
+     * @return false|Base_Object|Base_Object_With_Meta
      */
     public function get_object( $id = 0 , $by = 'ID' , $object = 'contact', $get_from_cache = true ){
 
@@ -78,7 +78,7 @@ class Utils
             }
         }
 
-        $class = gisset_not_empty( self::$class_object_map[ $object ] ) ? self::$class_object_map[ $object ] : ucfirst( $object );
+        $class = isset_not_empty( self::$class_object_map, $object ) ? self::$class_object_map[ $object ] : ucfirst( $object );
         $class = apply_filters( 'groundhogg/utils/get_object', $class, $object );
 
         if ( ! $class ){
@@ -92,6 +92,8 @@ class Utils
 
         if ( $object && $object->exists() ){
             self::$object_cache[ $cache_key ] = $object;
+
+            return $object;
         }
 
         return false;
@@ -103,7 +105,7 @@ class Utils
      * @param $id_or_email
      * @param bool $by_user_id
      * @param bool $get_from_cache
-     * @return Contact
+     * @return Contact|false
      */
     public function get_contact( $id_or_email, $by_user_id=false, $get_from_cache=true )
     {
@@ -158,6 +160,56 @@ class Utils
     public function get_sms( $id, $get_from_cache=true )
     {
         return $this->get_object( $id, 'ID', 'sms', $get_from_cache );
+    }
+
+    /**
+     * Provides a quick way to instill a contact session and tie events to a particluar contact.
+     *
+     * @param $string|int the thing to encrypt/decrypt
+     * @param string $action whether to encrypt or decrypt
+     * @return bool|string false if failur, the result and success.
+     */
+    public function encrypt_decrypt( $string, $action = 'e' ) {
+        // you may change these values to your own
+        $encrypt_method = "AES-256-CBC";
+
+        if ( ! Plugin::$instance->settings->get_option( 'gh_secret_key', false ) )
+            update_option( 'gh_secret_key', bin2hex( openssl_random_pseudo_bytes( 32 ) ) );
+
+        if ( ! Plugin::$instance->settings->get_option( 'gh_secret_iv', false ) )
+            update_option( 'gh_secret_iv', bin2hex( openssl_random_pseudo_bytes( 16 ) ) );
+
+        if ( in_array( $encrypt_method, openssl_get_cipher_methods()) ){
+
+            $secret_key = Plugin::$instance->settings->get_option( 'gh_secret_key' );
+            $secret_iv = Plugin::$instance->settings->get_option( 'gh_secret_iv' );
+
+            //backwards compat
+            if ( ctype_xdigit( $secret_key ) ){
+                $secret_key = hex2bin( $secret_key );
+                $secret_iv = hex2bin( $secret_iv );
+            }
+
+            $output = false;
+            $key = substr( hash( 'sha256', $secret_key ), 0, 32 );
+            $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
+
+            if( $action == 'e' ) {
+                $output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+            }
+            else if( $action == 'd' ){
+                $output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv );
+            }
+        } else {
+            if( $action == 'e' ) {
+                $output = base64_encode( $string );
+            }
+            else if( $action == 'd' ){
+                $output = base64_decode( $string );
+            }
+        }
+
+        return $output;
     }
 
 

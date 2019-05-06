@@ -27,8 +27,8 @@ class Scripts
     {
         $IS_MINIFIED = $this->is_script_debug_enabled() ? '' : '.min';
 
-        wp_register_script('groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
-        wp_register_script('groundhogg-email-iframe', GROUNDHOGG_ASSETS_URL . 'js/email' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
+        wp_register_script('groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend/frontend' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
+        wp_register_script('manage-preferences', GROUNDHOGG_ASSETS_URL . 'js/frontend/preferences' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
 
         if (!Plugin::$instance->settings->is_option_enabled('disable_api')) {
             wp_localize_script('groundhogg-frontend', 'gh_frontent_object', array(

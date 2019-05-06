@@ -3,7 +3,7 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
-use function Groundhogg\gisset_not_empty;
+use function Groundhogg\isset_not_empty;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -143,7 +143,7 @@ class Send_SMS extends Action
      */
     public function import($args, $step)
     {
-        if ( ! gisset_not_empty( $args, 'title' ) || ! gisset_not_empty( $args, 'message' ) ){
+        if ( ! isset_not_empty( $args, 'title' ) || ! isset_not_empty( $args, 'message' ) ){
             return;
         }
 

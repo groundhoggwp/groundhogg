@@ -687,7 +687,7 @@ class Contact extends Base_Object_With_Meta
      */
     public function get_upload_folder_basename()
     {
-        return md5( wpgh_encrypt_decrypt( $this->get_email() ) );
+        return md5( Plugin::$instance->utils->encrypt_decrypt( $this->get_email() ) );
     }
 
     /**

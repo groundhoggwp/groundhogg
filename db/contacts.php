@@ -2,6 +2,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use function Groundhogg\isset_not_empty;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -184,6 +186,15 @@ class Contacts extends DB {
     public function update( $row_id, $data = array(), $where = '' ) {
 
         $data = $this->sanitize_columns( $data );
+
+        // Check for duplicate email.
+        if ( isset_not_empty( $data, 'email' ) && $this->exists( $data['email'], 'email' ) ){
+            $a_row_id = absint( $this->get_contact_by( 'email', $data[ 'email' ] )->ID );
+            if ( $a_row_id !== $row_id ){
+                // unset instead of return false;
+                unset( $data[ 'email' ] );
+            }
+        }
 
         $result = parent::update( $row_id, $data, $where );
 

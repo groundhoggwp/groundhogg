@@ -1,4 +1,6 @@
 <?php
+namespace Groundhogg;
+
 /**
  * The header for our theme
  *
@@ -21,22 +23,133 @@ if ( ! function_exists( 'obfuscate_email' ) ):
      */
     function obfuscate_email( $email )
     {
-        $email = preg_replace("/(?!@).(?=.{2}[^@]+\.)/", "*", $email );
+        if ( ! is_email( $email ) ){
+            return false;
+        }
+
+        $parts = explode( '@', $email );
+
+        $parts[ 0 ] = preg_replace( '/(?!^).(?=.+$)/', '*', $parts[ 0 ] );
+        $parts[ 1 ] = preg_replace( '/(?!^).(?=.+\.)/', '*', $parts[ 1 ] );
+        $email = implode( '@', $parts );
+
         return $email;
     }
 
 endif;
 
+if ( ! function_exists( 'mail_gdpr_data' ) ){
+
+    /**
+     * Mail the contact profile to the contact which requested it.
+     * Uses the regular wp_mail function.
+     *
+     * @param $contact_id
+     * @return bool
+     */
+    function mail_gdpr_data( $contact_id )
+    {
+
+        $contact = Plugin::$instance->utils->get_contact( $contact_id );
+
+//        if ( ! $contact ){
+//            return false;
+//        }
+
+        // 2D array
+
+        $message = __( "You are receiving this message because you have requested an audit of your personal information. This message contains all current information about your contact profile.\n" );
+
+        $contact_data = apply_filters( 'groundhogg/preferences/contact_data', $contact->get_as_array() );
+
+        // Basic Information
+        $message .= sprintf( "\n======== %s =========\n", __( 'Basic Information', 'groundhogg' ) );
+
+        foreach ( $contact_data[ 'data' ] as $key => $contact_datum ){
+            $message .= sprintf( "%s: %s\n", key_to_words( $key ),$contact_datum );
+        }
+
+        // Custom Information
+        if ( isset_not_empty( $contact_data, 'meta' ) ){
+            $message .= sprintf( "\n======== %s =========\n", __( 'Other Information', 'groundhogg' ) );
+            foreach ( $contact_data[ 'meta' ] as $key => $contact_datum ){
+                $message .= sprintf( "%s: %s\n", key_to_words( $key ),$contact_datum );
+            }
+        }
+
+        // Custom Information
+        if ( isset_not_empty( $contact_data, 'tags' ) ){
+            $message .= sprintf( "\n======== %s =========\n", __( 'Profile Tags', 'groundhogg' ) );
+
+            $tag_names = [];
+
+            foreach ( $contact_data[ 'tags' ] as $tag_id ){
+                $tag_names[] = Plugin::$instance->dbs->get_db( 'tags' )->get_column_by( 'tag_name', 'tag_id', $tag_id );
+            }
+
+            $message .= sprintf( "%s\n", implode( ', ', $tag_names ) );
+        }
+
+        // Files
+        if ( isset_not_empty( $contact_data, 'files' ) ){
+            $message .= sprintf( "\n======== %s =========\n", __( 'Files', 'groundhogg' ) );
+
+            foreach ( $contact_data[ 'files' ] as $file_data ){
+                $message .= sprintf( "%s: %s\n", $file_data[ 'file_name' ] , $file_data[ 'file_url' ] );
+            }
+        }
+
+        return wp_mail( $contact->get_email(), sprintf( __( 'Your personal profile audit with %s', 'groundhogg' ), get_bloginfo( 'title' ) ), esc_html( $message ) );
+    }
+
+}
+
 /**
- * Remove all other styles form this page so there are no conflicts.
+ * Dequeue WooCommerce style for compatibility
+ */
+function dequeue_wc_css_compat()
+{
+    global $wp_styles;
+    $maybe_dequeue = $wp_styles->queue;
+    foreach ( $maybe_dequeue as $style ){
+        if ( strpos( $style, 'woocommerce' ) !== false ){
+            wp_dequeue_style( $style );
+        }
+    }
+}
+
+/**
+ * Dequeue Theme styles for compatibility
+ */
+function dequeue_theme_css_compat()
+{
+    $theme_name = basename( get_stylesheet_directory() );
+
+    // Dequeue Theme Support.
+    wp_dequeue_style( $theme_name. '-style' );
+    wp_dequeue_style( $theme_name );
+    wp_dequeue_style( 'style' );
+
+    // Extra compat.
+    global $wp_styles;
+    $maybe_dequeue = $wp_styles->queue;
+    foreach ( $maybe_dequeue as $style ){
+        if ( strpos( $style, $theme_name ) !== false ){
+            wp_dequeue_style( $style );
+        }
+    }
+}
+
+/**
+ * Enqueue and dequeue relevant scripts.
  */
 function enqueue_manage_preferences_styles()
 {
-
-    // Dequeue Theme Support.
-    wp_dequeue_style( basename( get_stylesheet_directory() ) . '-style' );
+    dequeue_theme_css_compat();
+    dequeue_wc_css_compat();
 
     wp_enqueue_style( 'manage-preferences' );
+    wp_enqueue_style( 'common' );
 
     /**
      * Allow plugins to add styles to this page.
@@ -88,12 +201,12 @@ function ensure_logo_is_there()
  */
 function manage_preferences_head( $title='', $action='' )
 {
-    add_action( 'wp_print_styles', 'enqueue_manage_preferences_styles' );
-    add_action( 'wp_enqueue_scripts', 'enqueue_manage_preferences_scripts' );
+    add_action( 'wp_print_styles', 'Groundhogg\enqueue_manage_preferences_styles' );
+    add_action( 'wp_enqueue_scripts', 'Groundhogg\enqueue_manage_preferences_scripts' );
 
     add_action( 'wp_head', 'noindex' );
     add_action( 'wp_head', 'wp_sensitive_page_meta' );
-    add_action( 'wp_head', 'ensure_logo_is_there' );
+    add_action( 'wp_head', 'Groundhogg\ensure_logo_is_there' );
 
     $mp_title = get_bloginfo( 'name', 'display' );
 
@@ -127,6 +240,7 @@ function manage_preferences_head( $title='', $action='' )
 <html <?php language_attributes(); ?>>
 <head>
     <meta charset="<?php bloginfo( 'charset' ); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="profile" href="http://gmpg.org/xfn/11">
     <title><?php echo $mp_title; ?></title>
 
@@ -136,7 +250,10 @@ function manage_preferences_head( $title='', $action='' )
 <div id="main">
     <?php if ( has_custom_logo() ): ?>
     <h1><a href="<?php echo esc_url( $header_url ); ?>" title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
-    <?php endif; ?>
+    <?php endif;
+
+    Plugin::$instance->notices->notices();
+    ?>
     <div id="content box">
     <?php
 }
@@ -151,6 +268,10 @@ function manage_preferences_footer() {
             <?php
             /* translators: %s: site title */
             printf( _x( '&larr; Back to %s', 'site' ), get_bloginfo( 'title', 'display' ) );
+            ?></a> | <a href="<?php echo esc_url( site_url( 'gh/preferences/profile' ) ); ?>">
+            <?php
+            /* translators: %s: site title */
+            _e( 'Edit Profile', 'groundhogg' );
             ?></a> |
         <?php the_privacy_policy_link( '<span class="privacy-policy-page-link">', '</span>' ); ?></p>
 </div>
@@ -163,21 +284,17 @@ wp_footer();
 <?php
 }
 
-$action = get_query_var( 'action', 'manage' );
-$contact_id = absint( get_query_var( 'contact_id', 0 ) );
-//$contact = \Groundhogg\Plugin::$instance->utils->get_contact( $contact_id );
-$contact = new \Groundhogg\Contact( 1 );
-//$contact = false;
+$contact = Plugin::$instance->tracking->get_current_contact();
+$action = get_query_var( 'action', 'profile' );
 
-// Force email collection.
-if ( ! $contact ){
+// Compat for erase action which will be true because there will be no contact.
+if ( ! $contact && $action !== 'erase' ){
     $action = 'no_email';
 }
 
 switch ( $action ):
 
     default:
-    // Support for reaching this page if there is no email to manage...
     case 'no_email':
 
     manage_preferences_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
@@ -196,7 +313,155 @@ switch ( $action ):
     manage_preferences_footer();
 
     break;
+    case 'download':
+
+        if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'download_profile' ) ){
+            if ( mail_gdpr_data( $contact->get_id() ) ){
+                Plugin::$instance->notices->add( 'sent', __( 'Profile information sent to your inbox!', 'groundhogg' ) );
+
+                /**
+                 * After the request is made to download the profile
+                 *
+                 * @param $contact Contact
+                 */
+                do_action( 'groundhogg/preferences/download_profile', $contact );
+
+            } else {
+                Plugin::$instance->notices->add( new WP_Error( 'failed', __( 'Something went wrong sending your email.', 'groundhogg' ) ) );
+            }
+
+        }
+
+        wp_redirect( site_url( 'gh/preferences/profile/' ) );
+        die();
+    case 'erase':
+
+        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'erase_profile' ) ){
+            wp_redirect( site_url( 'gh/preferences/profile/' ) );
+            die();
+        }
+
+        /**
+         * Before the request is made to erase the profile
+         *
+         * @param $contact Contact
+         */
+        do_action( 'groundhogg/preferences/erase_profile', $contact );
+
+        // Todo Erase profile data...
+
+        manage_preferences_head( __( 'Erased', 'groundhogg' ), 'erase' );
+
+        ?>
+        <div class="box">
+            <p><b><?php _e( 'Your data has been erased!', 'groundhogg' ); ?></b></p>
+            <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.' ); ?></p>
+            <p>
+                <a id="gotosite" class="button" href="<?php echo esc_url( site_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
+            </p>
+        </div>
+        <?php
+        manage_preferences_footer();
+        break;
+
+    case 'profile':
+
+        if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'update_contact_profile' ) ){
+
+            $email = sanitize_email( get_request_var( 'email' ) );
+            if ( ! $email ){
+                Plugin::$instance->notices->add( new WP_Error( 'bad_email', __( 'You must verify your email address.', 'groundhogg' ) ) );
+            }
+
+            $args = [
+                'first_name' => sanitize_text_field( get_request_var( 'first_name' ) ),
+                'last_name' =>  sanitize_text_field( get_request_var( 'last_name' ) ),
+                'email' => sanitize_email( get_request_var( 'email' ) ) ,
+            ];
+
+            $args = apply_filters( 'groundhogg/preferences/update_profile', $args, $contact );
+
+            if ( $contact->update( $args ) ){
+                Plugin::$instance->notices->add( 'updated', __( 'Profile updated!', 'groundhogg' ) );
+            }
+
+            apply_filters( 'groundhogg/preferences/update_profile', $args, $contact );
+        }
+
+        manage_preferences_head( __( 'Update Profile', 'groundhogg' ), 'profile' );
+
+        ?>
+        <form action="" id="preferences" method="post">
+            <p><b><?php printf( __( 'Update information for %s (%s).', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) )?></b></p>
+            <p><?php _e( 'Use the form below to update your information to the most current.', 'groundhogg' ) ?></p>
+            <?php wp_nonce_field( 'update_contact_profile' ); ?>
+            <p>
+                <label><?php _e( 'First Name', 'groundhogg' ); ?>
+                    <input type="text" name="first_name" required>
+                </label>
+            </p>
+            <p>
+                <label><?php _e( 'Last Name', 'groundhogg' ); ?>
+                    <input type="text" name="last_name" required>
+                </label>
+            </p>
+            <p>
+                <label><?php _e( 'Confirm Email Address', 'groundhogg' ); ?>
+                    <input type="email" name="email" required>
+                </label>
+            </p>
+            <?php do_action( 'groundhogg/preferences/profile_form' ); ?>
+            <p>
+                <input id="submit" type="submit" class="button" value="<?php esc_attr_e( 'Save Changes', 'groundhogg' ); ?>">
+            </p>
+        </form>
+        <div class="box">
+            <p><?php _e( 'Click below to manage your communication preferences and determine when and how you would like to receive communication from us.', 'groundhogg' ) ?></p>
+            <p>
+                <a id="gotopreferences" class="button" href="<?php echo esc_url( site_url( 'gh/preferences/manage' ) ); ?>"><?php _e( 'Change Email Preferences', 'groundhogg' ) ?></a>
+            </p>
+        </div>
+    <?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
+        <div class="box">
+            <p><?php _e( 'Click below to email yourself an audit of all personal information currently on file. Or if you wish for us to no longer have access to this information you can request a data erasure in accordance with your privacy rights.', 'groundhogg' ) ?></p>
+            <p>
+                <a id="downloadprofile" class="button" href="<?php echo esc_url( wp_nonce_url( site_url( 'gh/preferences/download' ), 'download_profile' ) ); ?>"><?php _e( 'Download Profile', 'groundhogg' ) ?></a>
+                <a id="eraseprofile" class="button right" href="<?php echo esc_url( wp_nonce_url( site_url( 'gh/preferences/erase' ), 'erase_profile' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
+            </p>
+        </div>
+    <?php endif; ?>
+    <?php do_action( 'groundhogg/preferences/profile_form/after' ); ?>
+        <?php
+
+        manage_preferences_footer();
+        break;
+
     case 'manage':
+
+        if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'manage_email_preferences' ) ){
+
+            $preference = get_request_var( 'preference' );
+
+            switch ( $preference ){
+                case 'unsubscribe':
+                    wp_redirect( wp_nonce_url( site_url( 'gh/preferences/unsubscribe' ), 'unsubscribe' ) );
+                    die();
+                    break;
+                case 'confirm':
+                    wp_redirect( site_url( 'gh/preferences/confirm' ) );
+                    die();
+                    break;
+                case 'weekly':
+                    $contact->change_marketing_preference( Preferences::WEEKLY );
+                    break;
+                case 'monthly':
+                    $contact->change_marketing_preference( Preferences::MONTHLY );
+                    break;
+            }
+
+            Plugin::$instance->notices->add( 'updated', __( 'Preferences saved!' ) );
+
+        }
 
         manage_preferences_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
 
@@ -207,7 +472,7 @@ switch ( $action ):
             'unsubscribe'   => _x( 'I no longer wish to receive any form of communication. Unsubscribe me!', 'preferences', 'groundhogg' )
         ];
 
-        if ( \Groundhogg\Plugin::$instance->preferences->is_gdpr_enabled() ){
+        if ( Plugin::$instance->preferences->is_gdpr_enabled() ){
             $preferences[ 'gdpr_delete' ] = _x( 'Unsubscribe me and delete any personal information about me.', 'preferences', 'groundhogg' );
         }
 
@@ -222,23 +487,14 @@ switch ( $action ):
         <li><label><input type="radio" name="preference" value="<?php esc_attr_e( $preference ); ?>" class="preference-<?php esc_attr_e( $preference ); ?>" required><?php echo $text; ?></label></li>
     <?php endforeach; ?>
     </ul>
-    <?php if ( \Groundhogg\Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
+    <?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
         <p style="display: none"><label><input type="checkbox" name="delete_everything" value="yes" class="preference-gdpr-delete">&nbsp;<?php _e( 'Request all information on record be removed.', 'groundhogg' ); ?></label></p>
     <?php endif; ?>
     <p>
-        <input id="submit" type="submit" value="<?php esc_attr_e( 'Save Changes', 'groundhogg' ); ?>">
+        <input class="button" id="submit" type="submit" value="<?php esc_attr_e( 'Save Changes', 'groundhogg' ); ?>">
+        <a id="gotoprofile" class="button right" href="<?php echo esc_url( site_url( 'gh/preferences/profile' ) ); ?>"><?php _e( 'Cancel' ) ?></a>
     </p>
 </form>
-    <script>
-        jQuery(function ($) {
-           var $preferences = $( 'input[name="preference"]' ).change( function () {
-               $preferences.closest( 'li' ).removeClass( 'checked' );
-               if ( $( this ).is( ':checked' ) ){
-                   $( this ).closest( 'li' ).addClass( 'checked' );
-               }
-           });
-        });
-    </script>
     <?php
 
 
@@ -247,12 +503,21 @@ switch ( $action ):
         break;
     case 'unsubscribe':
 
+        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'unsubscribe' ) ) {
+            wp_redirect( site_url( 'gh/preferences/manage' ) );
+        }
+
+        $contact->unsubscribe();
+
         manage_preferences_head( __( 'Unsubscribed', 'groundhogg' ), 'unsubscribe' );
 
         ?>
     <div class="box">
         <p><b><?php printf( __( 'Your email address %s has just been unsubscribed.', 'groundhogg' ), obfuscate_email( $contact->get_email() ) )?></b></p>
         <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.' ); ?></p>
+        <p>
+            <a id="gotosite" class="button" href="<?php echo esc_url( site_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
+        </p>
     </div>
 <?php
         manage_preferences_footer();
@@ -260,12 +525,17 @@ switch ( $action ):
         break;
     case 'confirm':
 
+        $contact->change_marketing_preference( Preferences::CONFIRMED );
+
         manage_preferences_head( __( 'Confirmed', 'groundhogg' ), 'confirm' );
 
         ?>
     <div class="box">
         <p><b><?php printf( __( 'Your email address %s has just been confirmed!', 'groundhogg' ), obfuscate_email( $contact->get_email() ) )?></b></p>
-        <p><?php printf( __( 'You will now receive electronic communication from %1$s. Should you wish to change your communication preferences you may do so at any time by clicking the <b>Manage Preferences</b> button in the footer of any email sent by %1$s.' ), get_bloginfo( 'title', 'display' ) ); ?></p>
+        <p><?php printf( __( 'You will now receive electronic communication from %1$s. Should you wish to change your communication preferences you may do so at any time by clicking the <b>Manage Preferences</b> link or <b>Unsubscribe</b> link in the footer of any email sent by %1$s.' ), get_bloginfo( 'title', 'display' ) ); ?></p>
+        <p>
+            <a id="gotosite" class="button" href="<?php echo esc_url( site_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
+        </p>
     </div>
 <?php
 

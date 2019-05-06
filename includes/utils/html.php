@@ -154,7 +154,7 @@ class HTML
             ?>
             <div class="form-row">
                 <label><?php echo $args[ 'label' ]; ?><?php echo call_user_func( [ $this, $args[ 'type' ] ], $args[ 'field' ] );?></label>
-                <? if ( ! empty( $args[ 'description' ] ) ){
+                <?php if ( ! empty( $args[ 'description' ] ) ){
                     ?><p class="description"><?php echo $args[ 'description' ]; ?></p><?php
                 } ?>
             </div>

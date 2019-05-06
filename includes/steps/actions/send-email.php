@@ -5,7 +5,7 @@ use Groundhogg\Preferences;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
-use function Groundhogg\gisset_not_empty;
+use function Groundhogg\isset_not_empty;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -271,11 +271,11 @@ class Send_Email extends Action
     public function import( $args, $step )
     {
 
-        if ( ! gisset_not_empty( $args, 'content' ) || ! gisset_not_empty( $args, 'subject' ) ){
+        if ( ! isset_not_empty( $args, 'content' ) || ! isset_not_empty( $args, 'subject' ) ){
             return;
         }
 
-        if ( ! gisset_not_empty( $args, 'content' ) ){
+        if ( ! isset_not_empty( $args, 'content' ) ){
             $args[ 'pre_header' ] = '';
         }
 

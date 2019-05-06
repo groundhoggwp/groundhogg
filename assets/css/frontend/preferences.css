@@ -1,5 +1,6 @@
 html,body,#main{
     background-color: #f1f1f1;
+    position: initial !important;
 }
 
 * {
@@ -13,16 +14,15 @@ html,body,#main{
 }
 
 #main {
-    margin: 50px auto;
-    padding: 10px;
     max-width: 500px;
-    width: 100%;
+    padding: 6% 0 0;
+    margin: auto;
 }
 
 #main form, #main .box {
     margin-top: 20px;
     margin-left: 0;
-    padding: 26px 24px 46px;
+    padding: 26px 24px;
     font-weight: 400;
     overflow: hidden;
     background: #fff;
@@ -48,12 +48,26 @@ html,body,#main{
     display: block;
 }
 
-#main * {
+* {
     margin: 0;
     padding: 0;
 }
 
-#main p {
+#main .notice {
+    margin: 0;
+}
+
+.right {
+    float: right;
+}
+
+@media screen and (max-width: 360px ) {
+    .right {
+        float: none;
+    }
+}
+
+body p {
     margin: 1.1em 0;
 }
 
@@ -85,6 +99,7 @@ label {
 ul.preferences
 {
     list-style: none;
+    margin: 1.1em 0;
 }
 
 #main ul.preferences li{
@@ -103,10 +118,17 @@ ul.preferences
 }
 
 ul.preferences li input[type="radio"]{
-    display: none;
+    margin-right: 5px;
 }
 
-#emailaddress input[type="email"]{
+#main p label{
+    color: #72777c;
+    font-size: 14px;
+}
+
+#main input[type="email"],
+#main input[type="tel"],
+#main input[type="text"]{
     background: #fbfbfb;
     border-radius: 0;
     font-size: 24px;
@@ -120,15 +142,18 @@ ul.preferences li input[type="radio"]{
     transition: 50ms border-color ease-in-out;
 }
 
-#main #submit{
+#main .button{
+    display: inline-block;
     padding: 12px 16px;
     background-color: #3875d7;
     color: #FFFFFF;
     border: none;
     border-radius: 3px;
     cursor: pointer;
+    margin-bottom: 10px;
+    text-decoration: none;
 }
 
-#main #submit:hover{
+#main .button:hover{
     background-color: #20427a;
 }

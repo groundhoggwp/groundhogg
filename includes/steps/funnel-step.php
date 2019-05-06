@@ -4,7 +4,7 @@ namespace Groundhogg\Steps;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
-use function Groundhogg\gisset_not_empty;
+use function Groundhogg\isset_not_empty;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -238,7 +238,7 @@ abstract class Funnel_Step extends Supports_Errors
         $args[ 'field' ][ 'name' ] = $this->setting_name_prefix( $setting );
 
         // Multiple compatibility
-        if ( gisset_not_empty( $args[ 'field' ], 'multiple' ) && $args['field'][ 'multiple' ] === true ){
+        if ( isset_not_empty( $args[ 'field' ], 'multiple' ) && $args['field'][ 'multiple' ] === true ){
             $args[ 'field' ][ 'name' ] .= '[]';
             $args[ 'field' ][ 'multiple' ] = true;
         }
@@ -340,7 +340,7 @@ abstract class Funnel_Step extends Supports_Errors
      */
     protected function get_posted_data($key = '', $default=false )
     {
-        if ( gisset_not_empty( $this->posted_settings, $key ) ){
+        if ( isset_not_empty( $this->posted_settings, $key ) ){
             return $this->posted_settings[ $key ];
         }
 

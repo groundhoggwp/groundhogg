@@ -70,20 +70,17 @@ class Notices
      */
     public function notices()
     {
-        /**
-         * Prevent notices from appearing in non admin contexts.
-         */
-        if ( ! is_admin() ){
-            return;
-        }
 
         $notices = get_transient( self::TRANSIENT );
+
+        if ( ! $notices )
+            return;
 
         ?><div id="groundhogg-notices"><?php
 
         foreach ( $notices as $notice ){
 
-            if ( gisset_not_empty( $notice, 'cap' ) && ! current_user_can( $notice[ 'cap' ] ) ){
+            if ( isset_not_empty( $notice, 'cap' ) && ! current_user_can( $notice[ 'cap' ] ) ){
                 continue;
             }
 
@@ -99,6 +96,14 @@ class Notices
         ?></div><?php
 
         delete_transient( 'groundhogg_notices' );
+    }
+
+    /**
+     * Alias for notices()
+     */
+    public function print_notices()
+    {
+        $this->notices();
     }
 
 }

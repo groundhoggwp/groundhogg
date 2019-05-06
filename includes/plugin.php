@@ -104,6 +104,11 @@ class Plugin {
      */
     public $event_queue;
 
+    /**
+     * @var Tracking
+     */
+    public $tracking;
+
     
     /**
      * @var Log_Manager
@@ -221,8 +226,10 @@ class Plugin {
         $this->settings     = new Settings();
         $this->dbs          = new DB_Manager();
         $this->preferences  = new Preferences();
-//        $this->utils        = new Utils();
+        $this->tracking     = new Tracking();
+        $this->utils        = new Utils();
         $this->scripts      = new Scripts();
+        $this->notices      = new Notices();
 //        $this->replacements = new Replacements();
 //        $this->sending_service = new Sending_Service();
 //        $this->roles        = new Roles();
@@ -230,7 +237,6 @@ class Plugin {
 
 //        if ( is_admin() ) {
 //
-//            $this->notices = new Notices();
 //            $this->admin   = new Admin_Menu();
 //
 //        }

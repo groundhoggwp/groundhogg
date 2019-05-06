@@ -43,7 +43,7 @@ class Replacements
 
         $this->setup_defaults();
 
-        if ( gisset_not_empty( $_GET, 'page' ) && strpos( $_GET[ 'page' ],'gh_' ) !== false ){
+        if ( isset_not_empty( $_GET, 'page' ) && strpos( $_GET[ 'page' ],'gh_' ) !== false ){
             add_action( 'admin_footer' , [ $this, 'replacements_in_footer' ] );
         }
 

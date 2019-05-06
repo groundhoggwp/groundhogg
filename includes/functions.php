@@ -8,11 +8,72 @@ use WP_Error;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Created by PhpStorm.
- * User: adria
- * Date: 2018-10-04
- * Time: 5:10 PM
+ * Return if a value in an array isset and is not empty
+ *
+ * @param $array
+ * @param $key
+ *
+ * @return bool
  */
+function isset_not_empty($array, $key='' )
+{
+    return isset( $array[ $key ] ) && ! empty( $array[ $key ] );
+}
+
+/**
+ * Get a variable from the $_REQUEST global
+ *
+ * @param string $key
+ * @param bool $default
+ * @param bool $post_only
+ * @return mixed
+ */
+function get_request_var( $key='', $default=false, $post_only=false )
+{
+    $global = $post_only ? $_POST : $_REQUEST;
+    return get_array_var( $global, $key, $default );
+}
+
+/**
+ * Get a variable from an array or default if it doesn't exist.
+ *
+ * @param $array
+ * @param string $key
+ * @param bool $default
+ * @return bool
+ */
+function get_array_var( $array, $key='', $default=false )
+{
+    if ( isset_not_empty( $array, $key ) ){
+        return $array[ $key ];
+    }
+
+    return $default;
+}
+
+/**
+ * convert a key to words.
+ *
+ * @param $key
+ * @return string
+ */
+function key_to_words( $key )
+{
+    return ucwords( preg_replace( '/[-_]/', ' ', $key ) );
+}
+
+/**
+ * Convert words to a key
+ *
+ * @param $words
+ * @return string
+ */
+function words_to_key( $words )
+{
+    return sanitize_key( str_replace( ' ', '_', $words ) );
+}
+
+
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons
@@ -95,57 +156,6 @@ function wpgh_import_funnel( $import )
     }
 
     return $funnel_id;
-}
-
-
-/**
- * Provides a quick way to instill a contact session and tie events to a particluar contact.
- *
- * @param $string|int the thing to encrypt/decrypt
- * @param string $action whether to encrypt or decrypt
- * @return bool|string false if failur, the result and success.
- */
-function wpgh_encrypt_decrypt( $string, $action = 'e' ) {
-    // you may change these values to your own
-    $encrypt_method = "AES-256-CBC";
-
-    if ( ! wpgh_get_option( 'gh_secret_key', false ) )
-        update_option( 'gh_secret_key', bin2hex( openssl_random_pseudo_bytes( 32 ) ) );
-
-    if ( ! wpgh_get_option( 'gh_secret_iv', false ) )
-        update_option( 'gh_secret_iv', bin2hex( openssl_random_pseudo_bytes( 16 ) ) );
-
-    if ( in_array( $encrypt_method, openssl_get_cipher_methods()) ){
-
-        $secret_key = wpgh_get_option( 'gh_secret_key' );
-        $secret_iv = wpgh_get_option( 'gh_secret_iv' );
-
-        //backwards compat
-        if ( ctype_xdigit( $secret_key ) ){
-            $secret_key = hex2bin( $secret_key );
-            $secret_iv = hex2bin( $secret_iv );
-        }
-
-        $output = false;
-        $key = substr( hash( 'sha256', $secret_key ), 0, 32 );
-        $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
-
-        if( $action == 'e' ) {
-            $output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
-        }
-        else if( $action == 'd' ){
-            $output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv );
-        }
-    } else {
-        if( $action == 'e' ) {
-            $output = base64_encode( $string );
-        }
-        else if( $action == 'd' ){
-            $output = base64_decode( $string );
-        }
-    }
-
-    return $output;
 }
 
 /**
@@ -869,18 +879,6 @@ function wpgh_add_my_custom_email_templates( $email_templates ){
 
 }
 
-/**
- * Return if a value in an array isset and is not empty
- *
- * @param $array
- * @param $key
- *
- * @return bool
- */
-function gisset_not_empty( $array, $key='' )
-{
-    return isset( $array[ $key ] ) && ! empty( $array[ $key ] );
-}
 
 /**
  * Parse the headers and return things like from/to etc...
@@ -1305,7 +1303,7 @@ function wpgh_parse_complaint_and_bounce_emails( $error )
 {
     $data = (array) $error->get_error_data();
 
-    if ( ! gisset_not_empty( $data, 'orig_error_data' ) ){
+    if ( ! isset_not_empty( $data, 'orig_error_data' ) ){
         return;
     }
 
@@ -1315,7 +1313,7 @@ function wpgh_parse_complaint_and_bounce_emails( $error )
     if ( $code === 'invalid_recipients' ){
 
         /* handle bounces */
-        $bounces = gisset_not_empty( $data, 'bounces' )? $data[ 'bounces' ] : [];
+        $bounces = isset_not_empty( $data, 'bounces' )? $data[ 'bounces' ] : [];
 
         if ( ! empty( $bounces ) ){
             foreach ( $bounces as $email ){
@@ -1326,7 +1324,7 @@ function wpgh_parse_complaint_and_bounce_emails( $error )
 
         }
 
-        $complaints = gisset_not_empty( $data, 'complaints' )? $data[ 'complaints' ] : [];
+        $complaints = isset_not_empty( $data, 'complaints' )? $data[ 'complaints' ] : [];
 
         if ( ! empty( $complaints ) ){
             foreach ( $complaints as $email ){
@@ -1387,8 +1385,8 @@ function wpgh_sender_name( $original_email_from ) {
 }
 
 // Hooking up our functions to WordPress filters
-add_filter( 'wp_mail_from', 'wpgh_sender_email' );
-add_filter( 'wp_mail_from_name', 'wpgh_sender_name' );
+//add_filter( 'wp_mail_from', 'wpgh_sender_email' );
+//add_filter( 'wp_mail_from_name', 'wpgh_sender_name' );
 
 /**
  * AWS Doesn't like special chars in the from name so we'll strip them out here.
@@ -1794,18 +1792,4 @@ if ( ! function_exists( 'multi_implode' ) ):
 
         return $ret;
     }
-endif;
-
-if ( ! function_exists( 'obfuscate_email' ) ):
-/**
- * Obfuscate an email address
- *
- * @param $email
- * @return string|string[]|null
- */
-function obfuscate_email( $email )
-{
-    return preg_replace("/(?!^).(?=[^@]+@)/", "*", $email );
-}
-
 endif;

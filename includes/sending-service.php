@@ -33,7 +33,7 @@ class Sending_Service
             add_action( 'groundhogg/settings/email/after_settings', [ $this, 'show_dns_in_settings' ] );
         }
 
-        if ( is_admin() && gisset_not_empty( $_REQUEST, 'test_gh_ss_connection' ) ){
+        if ( is_admin() && isset_not_empty( $_REQUEST, 'test_gh_ss_connection' ) ){
             add_action( 'init', [ $this, 'send_test_email' ] );
         }
 
@@ -251,9 +251,9 @@ class Sending_Service
     {
         if ( ! is_admin()
              || $this->is_active_for_email()
-             || ! gisset_not_empty( $_GET, 'action' )
+             || ! isset_not_empty( $_GET, 'action' )
              || 'connect_to_gh' !== $_GET['action']
-             || ! gisset_not_empty( $_GET, 'token' )
+             || ! isset_not_empty( $_GET, 'token' )
              || ! current_user_can( 'manage_options' )
         ){
             return;

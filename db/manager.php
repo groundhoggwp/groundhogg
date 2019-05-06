@@ -1,7 +1,7 @@
 <?php
 namespace Groundhogg\DB;
 
-use function Groundhogg\gisset_not_empty;
+use function Groundhogg\isset_not_empty;
 
 /**
  * DB Manager to manage databases in Groundhogg
@@ -70,7 +70,7 @@ class Manager
      */
     public function __get( $key )
     {
-        if ( gisset_not_empty( $this->dbs, $key ) ){
+        if ( isset_not_empty( $this->dbs, $key ) ){
             return $this->dbs[ $key ];
         }
 
