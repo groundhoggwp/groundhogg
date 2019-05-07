@@ -11,7 +11,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-$body = apply_filters( 'wpgh_email_body_css', "
+$body = apply_filters( 'groundhogg/email_template/body_css', "
 	background-color: #FFFFFF; 
 	font-family: sans-serif; 
 	-webkit-font-smoothing: antialiased; 
@@ -22,34 +22,35 @@ $body = apply_filters( 'wpgh_email_body_css', "
 	-ms-text-size-adjust: 100%; 
 	-webkit-text-size-adjust: 100%;" );
 
-$wrapper = apply_filters( 'wpgh_email_wrapper_css', "
+$wrapper = apply_filters( 'groundhogg/email_template/wrapper_css', "
 	border-collapse: separate; 
 	mso-table-lspace: 0pt; 
 	mso-table-rspace: 0pt; 
 	width: 100%; 
 	background-color: #FFFFFF;" );
 
-$template_container = apply_filters( 'groundhogg/email/container_css', "
+$template_container = apply_filters( 'groundhogg/email_template/container_css', "
 	font-family: sans-serif; 
 	font-size: 14px; 
 	vertical-align: top; 
 	display: block; 
-	width: 580px;
+	width: 100%;
 	max-width: 580px; 
 	padding: 0px; " );
 
-$email_width = apply_filters( 'wpgh_email_width', 580 );
-$alignment = apply_filters( 'groundhogg/email/alignment', 'center' );
+$email_width = apply_filters( 'groundhogg/email_template/width', 580 );
 
-$template_content = apply_filters( 'wpgh_email_content_css', "
+$alignment = apply_filters( 'groundhogg/email_template/alignment', 'center' );
+
+$template_content = apply_filters( 'groundhogg/email_template/content_css', "
     box-sizing: border-box; 
     display: block; 
     Margin: 0 auto;
-    width:580px;
+    width:100%;
     max-width: 580px; 
     padding: 5px;" );
 
-$preheader = apply_filters( 'wpgh_email_preheader_css', "
+$preheader = apply_filters( 'groundhogg/email_template/preheader_css', "
     color: transparent; 
     display: none; 
     height: 0; 
@@ -61,10 +62,19 @@ $preheader = apply_filters( 'wpgh_email_preheader_css', "
     visibility: hidden; 
     width: 0;" );
 
-$apple_link = apply_filters( 'wpgh_email_apple_link_css', "
+$apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', "
     color: #999999; 
     font-size: 13px; 
     text-align: center;");
+
+$email_title = get_bloginfo( 'name', 'display' );
+
+/* translators: Login screen title. 1: Login screen name, 2: Network or site name */
+$email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), apply_filters( 'groundhogg/email_template/title', 'Email' ), $email_title );
+$email_title = apply_filters( 'groundhogg/email_template/title', $email_title, $title );
+
+$is_showing_in_iframe = get_query_var( 'pagenow' ) === 'emails';
+$email_width = $is_showing_in_iframe ? '100%' : $email_width;
 
 ?>
 <!doctype html>
@@ -74,7 +84,8 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
 <head>
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title><?php echo get_bloginfo( 'name' );?></title>
+    <title><?php echo $email_title; ?></title>
+    <base target="_parent">
 </head>
 <!-- /HEAD -->
 
@@ -89,15 +100,15 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
                         <div class="content" style="<?php echo $template_content; ?>">
 
                             <!-- PREHEADER -->
-                            <span class="preheader" style="<?php echo $preheader; ?>"><?php echo apply_filters( 'groundhogg/email/pre_header_text', '' ); ?></span>
+                            <span class="preheader" style="<?php echo $preheader; ?>"><?php echo apply_filters( 'groundhogg/email_template/pre_header_text', '' ); ?></span>
                             <!-- /PREHEADER -->
 
                             <!-- BROWSER VIEW -->
-                            <?php if ( apply_filters( 'groundhogg/email/browser_view', false ) ): ?>
+                            <?php if ( apply_filters( 'groundhogg/email_template/show_browser_view', false ) ): ?>
                                 <div class="header" style="text-align: center;margin-bottom: 25px;">
                                     <span class="apple-link" style="<?php echo $apple_link; ?>">
-                                        <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email/browser_link', site_url() ) ); ?>">
-                                            <?php _e( apply_filters( 'gh_view_in_browser_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
+                                        <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email_template/browser_view_link', site_url() ) ); ?>">
+                                            <?php _e( apply_filters( 'groundhogg/email_template/browser_view_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
                                         </a>
                                     </span>
                                 </div>

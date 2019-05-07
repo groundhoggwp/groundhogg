@@ -9,13 +9,11 @@
  * @since       File available since Release 0.1
  */
 
-
 if ( ! defined( 'ABSPATH' ) ) exit;
-
 
 ?>
 <div class="body-content" style="text-align: left;">
     <!-- START CONTENT -->
-    <?php echo apply_filters( 'groundhogg/email/content', '' ); ?>
+    <?php echo apply_filters( 'groundhogg/email_template/content', '' ); ?>
     <!-- END CONTENT -->
 </div>

@@ -29,6 +29,7 @@ class Scripts
 
         wp_register_script('groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend/frontend' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
         wp_register_script('manage-preferences', GROUNDHOGG_ASSETS_URL . 'js/frontend/preferences' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
+        wp_register_script('fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
 
         if (!Plugin::$instance->settings->is_option_enabled('disable_api')) {
             wp_localize_script('groundhogg-frontend', 'gh_frontent_object', array(
@@ -58,6 +59,7 @@ class Scripts
         wp_register_style('jquery-ui', GROUNDHOGG_ASSETS_URL . 'lib/jquery-ui/jquery-ui.min.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'css/frontend.css', [], GROUNDHOGG_VERSION);
         wp_register_style('manage-preferences', GROUNDHOGG_ASSETS_URL . 'css/frontend/preferences.css', [], GROUNDHOGG_VERSION );
+        wp_register_style('groundhogg-browser-view', GROUNDHOGG_ASSETS_URL . 'css/frontend/broswer-view.css', [], GROUNDHOGG_VERSION );
 
         do_action('groundhogg/scripts/after_register_frontend_styles');
     }

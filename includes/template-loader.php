@@ -1,13 +1,12 @@
 <?php
 namespace Groundhogg;
+use Gamajo_Template_Loader;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( ! class_exists( 'Gamajo_Template_Loader' ) ){
-    require_once dirname( __FILE__ ) . '/lib/class-template-loader.php';
+    include_once dirname( __FILE__ ) . '/lib/gamajo-template-loader.php';
 }
-
-use Gamajo_Template_Loader;
 
 class Template_Loader extends Gamajo_Template_Loader {
 

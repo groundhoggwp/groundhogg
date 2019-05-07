@@ -19,11 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Superlink extends Base_Object
 {
 
-    protected function post_setup()
-    {
-        // TODO: Implement post_setup() method.
-    }
-
     protected function get_db()
     {
         return Plugin::$instance->dbs->get_db( 'superlinks' );
@@ -41,12 +36,31 @@ class Superlink extends Base_Object
 
     public function get_source_url()
     {
-        //todo
+        return sprintf( site_url( 'gh/superlinks/link/%d' ), $this->get_id() );
     }
 
     public function get_replacement_code()
     {
-        //todo
+        return sprintf( '{superlink.%d}', $this->get_id() );
+    }
+
+    protected function post_setup()
+    {
+        // TODO: Implement post_setup() method.
+    }
+
+    /**
+     * @param $contact Contact
+     */
+    public function process( $contact )
+    {
+        if ( ! $contact ){
+            return;
+        }
+
+        $contact->apply_tag( $this->get_tags() );
+        $target = Plugin::$instance->replacements->process( $this->get_target_url(), $contact->get_id() );
+        die( wp_redirect( $target ) );
     }
 
     /**
@@ -54,7 +68,7 @@ class Superlink extends Base_Object
      */
     public function get_tags()
     {
-        return $this->tags;
+        return wp_parse_id_list( $this->tags );
     }
 
     /**
@@ -65,7 +79,6 @@ class Superlink extends Base_Object
         return $this->target;
 
     }
-
 
     /**
      * @return int

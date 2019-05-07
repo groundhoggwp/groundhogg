@@ -109,6 +109,11 @@ class Plugin {
      */
     public $tracking;
 
+    /**
+     * @var Rewrites
+     */
+    public $rewrites;
+
     
     /**
      * @var Log_Manager
@@ -230,7 +235,8 @@ class Plugin {
         $this->utils        = new Utils();
         $this->scripts      = new Scripts();
         $this->notices      = new Notices();
-//        $this->replacements = new Replacements();
+        $this->rewrites     = new Rewrites();
+        $this->replacements = new Replacements();
 //        $this->sending_service = new Sending_Service();
 //        $this->roles        = new Roles();
 //        $this->event_queue  = new Event_Queue();

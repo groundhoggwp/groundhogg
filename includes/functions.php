@@ -73,7 +73,41 @@ function words_to_key( $words )
     return sanitize_key( str_replace( ' ', '_', $words ) );
 }
 
+/**
+ * Dequeue WooCommerce style for compatibility
+ */
+function dequeue_wc_css_compat()
+{
+    global $wp_styles;
+    $maybe_dequeue = $wp_styles->queue;
+    foreach ( $maybe_dequeue as $style ){
+        if ( strpos( $style, 'woocommerce' ) !== false ){
+            wp_dequeue_style( $style );
+        }
+    }
+}
 
+/**
+ * Dequeue Theme styles for compatibility
+ */
+function dequeue_theme_css_compat()
+{
+    $theme_name = basename( get_stylesheet_directory() );
+
+    // Dequeue Theme Support.
+    wp_dequeue_style( $theme_name. '-style' );
+    wp_dequeue_style( $theme_name );
+    wp_dequeue_style( 'style' );
+
+    // Extra compat.
+    global $wp_styles;
+    $maybe_dequeue = $wp_styles->queue;
+    foreach ( $maybe_dequeue as $style ){
+        if ( strpos( $style, $theme_name ) !== false ){
+            wp_dequeue_style( $style );
+        }
+    }
+}
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons
@@ -191,13 +225,13 @@ function wpgh_extract_query_arg( $link, $arg = '' )
  *
  * @return string the new email content.
  */
-function wpgh_remove_builder_toolbar( $content )
+function remove_builder_toolbar( $content )
 {
     return preg_replace( '/<wpgh-toolbar\b[^>]*>(.*?)<\/wpgh-toolbar>/', '', $content );
 }
 
-add_filter( 'groundhogg/email/the_content', 'wpgh_remove_builder_toolbar' );
-add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_builder_toolbar' );
+add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
+//add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_builder_toolbar' );
 
 
 /**
@@ -206,42 +240,13 @@ add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_builder_toolbar' );
  * @param $content string email HTML
  * @return string the filtered email content.
  */
-function wpgh_remove_content_editable( $content )
+function remove_content_editable( $content )
 {
     return preg_replace( "/contenteditable=\"true\"/", '', $content );
 }
 
-add_filter( 'groundhogg/email/the_content', 'wpgh_remove_content_editable' );
-add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_content_editable' );
-
-/**
- * Strip out irrelevant whitespace form the html.
- *
- * @param $content string
- * @return string
- */
-function wpgh_minify_html( $content )
-{
-    $search = array(
-        '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
-        '/[^\S ]+\</s',     // strip whitespaces before tags, except space
-        '/(\s)+/s',         // shorten multiple whitespace sequences
-        '/<!--(.|\s)*?-->/' // Remove HTML comments
-    );
-
-    $replace = array(
-        '>',
-        '<',
-        '\\1',
-        ''
-    );
-
-    $buffer = preg_replace($search, $replace, $content);
-
-    return $buffer;
-}
-
-add_filter( 'groundhogg/email/the_content', 'wpgh_minify_html' );
+add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
+//add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_content_editable' );
 
 /**
  * Remove script tags from the email content
@@ -249,12 +254,12 @@ add_filter( 'groundhogg/email/the_content', 'wpgh_minify_html' );
  * @param $content string the email content
  * @return string, sanitized email content
  */
-function wpgh_strip_script_tags( $content )
+function strip_script_tags( $content )
 {
     return preg_replace( '/<script\b[^>]*>(.*?)<\/script>/', '', $content );
 }
 
-add_filter( 'wpgh_sanitize_email_content', 'wpgh_strip_script_tags' );
+//add_filter( 'wpgh_sanitize_email_content', 'strip_script_tags' );
 
 /**
  * Remove form tags from emails.
@@ -267,38 +272,7 @@ function wpgh_strip_form_tags( $content )
     return preg_replace( '/<form\b[^>]*>(.*?)<\/form>/', '', $content );
 }
 
-add_filter( 'wpgh_sanitize_email_content', 'wpgh_strip_form_tags' );
-
-/**
- * Output the contents of an email if clicking the view in browser link.
- */
-function wpgh_view_email_in_browser()
-{
-    if ( strpos( $_SERVER[ 'REQUEST_URI' ], '/gh-email/' ) === false )
-        return;
-
-    $email = new WPGH_Email( intval( $_REQUEST[ 'email' ] ) );
-
-    $contact = WPGH()->tracking->get_contact();
-
-    if ( ! $contact || ! $contact->email )
-    {
-        wp_die( 'no contact' );
-        return;
-    }
-
-    if ( ! $email->exists() )
-    {
-        wp_die( 'no email' );
-        return;
-    }
-
-    $email->contact = $contact;
-
-    wp_die( $email->get_content(), $email->get_subject_line() );
-}
-
-//add_action( 'template_redirect', 'wpgh_view_email_in_browser' );
+//add_filter( 'wpgh_sanitize_email_content', 'wpgh_strip_form_tags' );
 
 /**
  * Add a link to the FB group in the admin footer.
@@ -306,7 +280,7 @@ function wpgh_view_email_in_browser()
  * @param $text
  * @return string|string[]|null
  */
-function wpgh_add_bug_report_prompt( $text )
+function add_bug_report_prompt( $text )
 {
     if ( apply_filters( 'groundhogg/footer/show_text', true ) ){
         return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
@@ -315,7 +289,7 @@ function wpgh_add_bug_report_prompt( $text )
     return $text;
 }
 
-add_filter('admin_footer_text', 'wpgh_add_bug_report_prompt');
+add_filter('admin_footer_text', '\Groundhogg\add_bug_report_prompt');
 
 /**
  * Converts an array of tag IDs to a Select 2 friendly format.

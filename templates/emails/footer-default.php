@@ -10,19 +10,19 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$footer = apply_filters( 'wpgh_email_footer_css', "
+$footer = apply_filters( 'groundhogg/email_template/footer_css', "
     clear: both; 
     Margin-top: 10px; 
     text-align: center; 
     width: 100%;" );
 
-$footer_container = apply_filters( 'wpgh_email_footer_container_css', "
+$footer_container = apply_filters( 'groundhogg/email_template/footer_container_css', "
     border-collapse: separate;
     mso-table-lspace: 0pt; 
     mso-table-rspace: 0pt; 
     width: 100%;" );
 
-$footer_content = apply_filters( 'wpgh_email_footer_content_css', "
+$footer_css = apply_filters( 'groundhogg/email_template/footer_content_css', "
     font-family: sans-serif; 
     vertical-align: top; 
     padding-bottom: 10px; 
@@ -31,7 +31,7 @@ $footer_content = apply_filters( 'wpgh_email_footer_content_css', "
     color: #999999; 
     text-align: center;" );
 
-$apple_link = apply_filters( 'wpgh_email_apple_link_css', "
+$apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', "
     color: #999999; 
     font-size: 13px; 
     text-align: center;" );
@@ -40,17 +40,17 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
                                 <div class="footer" style="<?php echo $footer; ?>">
                                     <table border="0" cellpadding="0" cellspacing="0" style="<?php echo $footer_container; ?>">
                                         <tr>
-                                            <td class="content-block" style="<?php echo $footer_content; ?>">
+                                            <td class="content-block" style="<?php echo $footer_css; ?>">
                                                 <span class="apple-link" style="<?php echo $apple_link; ?>">
-                                                    <?php echo apply_filters( 'groundhogg/email/footer_text', '' ); ?>
+                                                    <?php echo apply_filters( 'groundhogg/email_template/footer_text', '' ); ?>
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="content-block" style="<?php echo $footer_content; ?>">
+                                            <td class="content-block" style="<?php echo $footer_css; ?>">
                                                 <span style="<?php echo $apple_link; ?>">
-                                                    <?php _e( apply_filters( 'gh_unsubscribe_footer_text', __( "Don't want these emails?", 'groundhogg' ) ), 'groundhogg'); ?> <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email/unsubscribe_link', site_url() ) ); ?>">
-                                                        <?php _e( apply_filters( 'gh_unsubscribe_text', __( "Unsubscribe.", 'groundhogg' ) ), 'groundhogg'); ?>
+                                                    <?php _e( apply_filters( 'groundhogg/email_template/pre_unsubscribe_text', __( "Don't want these emails?", 'groundhogg' ) ), 'groundhogg'); ?> <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email_template/unsubscribe_link', site_url() ) ); ?>">
+                                                        <?php _e( apply_filters( 'groundhogg/email_template/unsubscribe_text', __( "Unsubscribe.", 'groundhogg' ) ), 'groundhogg'); ?>
                                                     </a>
                                                 </span>
                                             </td>
@@ -65,6 +65,6 @@ $apple_link = apply_filters( 'wpgh_email_apple_link_css', "
                 </td>
             </tr>
         </table>
-        <img alt="" style="visibility: hidden" width="0" height="0" src="<?php echo esc_url_raw( apply_filters( 'groundhogg/email/open_tracking_link', '' ) ); ?>">
+        <img alt="" style="visibility: hidden" width="0" height="0" src="<?php echo esc_url( apply_filters( 'groundhogg/email_template/open_tracking_link', '' ) ); ?>">
     </body>
 </html>

@@ -105,42 +105,6 @@ if ( ! function_exists( 'mail_gdpr_data' ) ){
 }
 
 /**
- * Dequeue WooCommerce style for compatibility
- */
-function dequeue_wc_css_compat()
-{
-    global $wp_styles;
-    $maybe_dequeue = $wp_styles->queue;
-    foreach ( $maybe_dequeue as $style ){
-        if ( strpos( $style, 'woocommerce' ) !== false ){
-            wp_dequeue_style( $style );
-        }
-    }
-}
-
-/**
- * Dequeue Theme styles for compatibility
- */
-function dequeue_theme_css_compat()
-{
-    $theme_name = basename( get_stylesheet_directory() );
-
-    // Dequeue Theme Support.
-    wp_dequeue_style( $theme_name. '-style' );
-    wp_dequeue_style( $theme_name );
-    wp_dequeue_style( 'style' );
-
-    // Extra compat.
-    global $wp_styles;
-    $maybe_dequeue = $wp_styles->queue;
-    foreach ( $maybe_dequeue as $style ){
-        if ( strpos( $style, $theme_name ) !== false ){
-            wp_dequeue_style( $style );
-        }
-    }
-}
-
-/**
  * Enqueue and dequeue relevant scripts.
  */
 function enqueue_manage_preferences_styles()
@@ -254,7 +218,7 @@ function manage_preferences_head( $title='', $action='' )
 
     Plugin::$instance->notices->notices();
     ?>
-    <div id="content box">
+    <div id="content">
     <?php
 }
 
@@ -297,20 +261,35 @@ switch ( $action ):
     default:
     case 'no_email':
 
-    manage_preferences_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
+        if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'identify_yourself' ) ) {
 
-    ?>
-    <form action="" id="emailaddress" method="post">
-        <?php wp_nonce_field( 'manage_email_preferences' ); ?>
-        <p><?php _e( 'Please enter your email address to manage your preferences.', 'groundhogg' ); ?></p>
-        <p><input type="email" name="email" id="email" placeholder="<?php esc_attr_e( "your.name@domain.com", 'groundhogg' ); ?>" required></p>
-        <p>
-            <input id="submit" type="submit" value="<?php esc_attr_e( 'Submit', 'groundhogg' ); ?>">
-        </p>
-    </form>
-    <?php
+            $email = sanitize_email(get_request_var('email'));
 
-    manage_preferences_footer();
+            if ( is_email( $email ) ){
+                $contact = Plugin::$instance->utils->get_contact( $email );
+
+                if ( $contact ){
+                    // Start tracking this contact
+                    Plugin::$instance->tracking->start_tracking( $contact );
+                    die( wp_redirect( site_url( 'gh/preferences/profile' ) ) );
+                }
+            }
+        }
+
+        manage_preferences_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
+
+        ?>
+        <form action="" id="emailaddress" method="post">
+            <?php wp_nonce_field( 'identify_yourself' ); ?>
+            <p><?php _e( 'Please enter your email address to manage your preferences.', 'groundhogg' ); ?></p>
+            <p><input type="email" name="email" id="email" placeholder="<?php esc_attr_e( "your.name@domain.com", 'groundhogg' ); ?>" required></p>
+            <p>
+                <input id="submit" type="submit" class="button" value="<?php esc_attr_e( 'Submit', 'groundhogg' ); ?>">
+            </p>
+        </form>
+        <?php
+
+        manage_preferences_footer();
 
     break;
     case 'download':
@@ -327,42 +306,13 @@ switch ( $action ):
                 do_action( 'groundhogg/preferences/download_profile', $contact );
 
             } else {
-                Plugin::$instance->notices->add( new WP_Error( 'failed', __( 'Something went wrong sending your email.', 'groundhogg' ) ) );
+                Plugin::$instance->notices->add( new \WP_Error( 'failed', __( 'Something went wrong sending your email.', 'groundhogg' ) ) );
             }
 
         }
 
         wp_redirect( site_url( 'gh/preferences/profile/' ) );
         die();
-    case 'erase':
-
-        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'erase_profile' ) ){
-            wp_redirect( site_url( 'gh/preferences/profile/' ) );
-            die();
-        }
-
-        /**
-         * Before the request is made to erase the profile
-         *
-         * @param $contact Contact
-         */
-        do_action( 'groundhogg/preferences/erase_profile', $contact );
-
-        // Todo Erase profile data...
-
-        manage_preferences_head( __( 'Erased', 'groundhogg' ), 'erase' );
-
-        ?>
-        <div class="box">
-            <p><b><?php _e( 'Your data has been erased!', 'groundhogg' ); ?></b></p>
-            <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.' ); ?></p>
-            <p>
-                <a id="gotosite" class="button" href="<?php echo esc_url( site_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
-            </p>
-        </div>
-        <?php
-        manage_preferences_footer();
-        break;
 
     case 'profile':
 
@@ -370,7 +320,7 @@ switch ( $action ):
 
             $email = sanitize_email( get_request_var( 'email' ) );
             if ( ! $email ){
-                Plugin::$instance->notices->add( new WP_Error( 'bad_email', __( 'You must verify your email address.', 'groundhogg' ) ) );
+                Plugin::$instance->notices->add( new \WP_Error( 'bad_email', __( 'You must verify your email address.', 'groundhogg' ) ) );
             }
 
             $args = [
@@ -448,7 +398,7 @@ switch ( $action ):
                     die();
                     break;
                 case 'confirm':
-                    wp_redirect( site_url( 'gh/preferences/confirm' ) );
+                    wp_redirect( wp_nonce_url( site_url( 'gh/preferences/confirm' ) ) );
                     die();
                     break;
                 case 'weekly':
@@ -460,6 +410,9 @@ switch ( $action ):
             }
 
             Plugin::$instance->notices->add( 'updated', __( 'Preferences saved!' ) );
+
+            wp_redirect( site_url( 'gh/preferences/profile' ) );
+            die();
 
         }
 
@@ -525,6 +478,10 @@ switch ( $action ):
         break;
     case 'confirm':
 
+        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ) ) ) {
+            wp_redirect( site_url( 'gh/preferences/manage' ) );
+        }
+
         $contact->change_marketing_preference( Preferences::CONFIRMED );
 
         manage_preferences_head( __( 'Confirmed', 'groundhogg' ), 'confirm' );
@@ -543,4 +500,34 @@ switch ( $action ):
 
         break;
 
+    case 'erase':
+
+        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'erase_profile' ) ){
+            wp_redirect( site_url( 'gh/preferences/profile/' ) );
+            die();
+        }
+
+        /**
+         * Before the request is made to erase the profile
+         *
+         * @param $contact Contact
+         */
+        do_action( 'groundhogg/preferences/erase_profile', $contact );
+
+
+        // Todo Erase profile data...
+
+        manage_preferences_head( __( 'Erased', 'groundhogg' ), 'erase' );
+
+        ?>
+        <div class="box">
+            <p><b><?php _e( 'Your data has been erased!', 'groundhogg' ); ?></b></p>
+            <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.' ); ?></p>
+            <p>
+                <a id="gotosite" class="button" href="<?php echo esc_url( site_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
+            </p>
+        </div>
+        <?php
+        manage_preferences_footer();
+        break;
 endswitch;

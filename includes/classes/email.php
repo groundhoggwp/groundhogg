@@ -1,7 +1,6 @@
 <?php
 namespace Groundhogg;
 
-
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Email_Meta;
 use Groundhogg\DB\Emails;
@@ -209,6 +208,16 @@ class Email extends Base_Object_With_Meta
     }
 
     /**
+     * Whether the current email contains a confirmation link.
+     *
+     * @return bool
+     */
+    public function is_confirmation_email()
+    {
+        return strpos( $this->get_content(), '{confirmation_link}') !== false;
+    }
+
+    /**
      * Whether browser view is enabled
      *
      * @param $bool
@@ -221,26 +230,16 @@ class Email extends Base_Object_With_Meta
     }
 
     /**
-     * Whether the current email contains a confirmation link.
-     *
-     * @return bool
-     */
-    public function is_confirmation_email()
-    {
-        return strpos( $this->get_content(), '{confirmation_link}') !== false;
-    }
-
-    /**
      * Return the browser view option for this email.
      *
      * @param $link
      *
      * @return string
      */
-    public function browser_link($link)
+    public function browser_view_link($link)
     {
 
-        if ( is_global_multisite() ) {
+        if ( Plugin::$instance->settings->is_global_multisite() ) {
             switch_to_blog( get_site()->site_id );
         }
 
@@ -261,7 +260,7 @@ class Email extends Base_Object_With_Meta
     public function get_open_tracking_link()
     {
         return site_url(sprintf(
-            "gh-tracking/email/open/?u=%d&e=%d&i=%d",
+            "gh/tracking/email/open/u/%s/e/%s/i/%s/",
             dechex( $this->get_contact()->get_id() ),
             ! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
             dechex( $this->get_id() )
@@ -276,7 +275,7 @@ class Email extends Base_Object_With_Meta
     public function get_click_tracking_link()
     {
         return site_url(
-            sprintf('gh-tracking/email/click/?u=%d&e=%d&i=%d&ref=',
+            sprintf('gh/tracking/email/click/u/%s/e/%s/i/%s/ref/',
                 dechex( $this->get_contact()->get_id() ),
                 ! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
                 dechex( $this->get_id() )
@@ -403,7 +402,7 @@ class Email extends Base_Object_With_Meta
      */
     public function tracking_link_callback( $matches )
     {
-        return $matches[1] . $this->get_click_tracking_link() . urlencode($matches[2]) . $matches[3];
+        return $matches[1] . $this->get_click_tracking_link() . urlencode( base64_encode( $matches[2]) ) . $matches[3];
     }
 
     /**
@@ -433,7 +432,7 @@ class Email extends Base_Object_With_Meta
         if ( Plugin::$instance->settings->get_option('privacy_policy' ) ) {
             $sub[] = sprintf(
                 "<a href='%s'>%s</a>",
-                esc_attr( get_permalink( Plugin::$instance->settings->get_option('privacy_policy' ) ) ),
+                esc_url( get_permalink( Plugin::$instance->settings->get_option('privacy_policy' ) ) ),
                 apply_filters('groundhogg/email/privacy_policy_link_text', __('Privacy Policy', 'groundhogg'))
             );
         }
@@ -441,12 +440,12 @@ class Email extends Base_Object_With_Meta
         if (Plugin::$instance->settings->get_option('terms' ) ) {
             $sub[] = sprintf(
                 "<a href='%s'>%s</a>",
-                esc_attr(get_permalink(Plugin::$instance->settings->get_option('gh_terms'))),
-                apply_filters('groundhogg/email/terms_link_text', __('Terms', 'groundhogg'))
+                esc_url( get_permalink(Plugin::$instance->settings->get_option('terms') ) ),
+                apply_filters('groundhogg/email/terms_link_text', __( 'Terms', 'groundhogg' ) )
             );
         }
 
-        $footer .= implode(' | ', $sub);
+        $footer .= implode(' | ', $sub );
 
         $footer = Plugin::$instance->replacements->process( $footer, $this->get_contact()->get_id() );
 
@@ -465,16 +464,7 @@ class Email extends Base_Object_With_Meta
      */
     public function get_unsubscribe_link( $url='' )
     {
-        if ( Plugin::$instance->settings->is_global_multisite() ) {
-            switch_to_blog(get_site()->site_id);
-        }
-
-        $url = get_permalink(Plugin::$instance->settings->get_option('email_preferences_page' ) );
-
-        if ( is_multisite() && ms_is_switched()) {
-            restore_current_blog();
-        }
-
+        $url = site_url( 'gh/preferences/profile/' );
         return $url;
 
     }
@@ -484,18 +474,17 @@ class Email extends Base_Object_With_Meta
      */
     private function add_filters()
     {
-        add_filter( 'groundhogg/email/alignment',          [ $this, 'get_alignment_outlook' ] );
-        add_filter( 'groundhogg/email/alignment',          [ $this, 'get_alignment_outlook' ] );
-        add_filter( 'groundhogg/email/container_css',      [ $this, 'get_alignment'] );
-        add_filter( 'groundhogg/email/browser_view',       [ $this, 'browser_view_enabled'] );
-        add_filter( 'groundhogg/email/browser_link',       [ $this, 'browser_link'] );
-        add_filter( 'groundhogg/email/pre_header_text',    [ $this, 'get_merged_pre_header'] );
-        add_filter( 'groundhogg/email/content',            [ $this, 'get_merged_content'] );
-        add_filter( 'groundhogg/email/footer_text',        [ $this, 'get_footer_text'] );
-        add_filter( 'groundhogg/email/unsubscribe_link',   [ $this, 'get_unsubscribe_link'] );
-        add_filter( 'groundhogg/email/open_tracking_link', [ $this, 'get_open_tracking_link'] );
-        add_filter( 'groundhogg/email/the_content',        [ $this, 'convert_to_tracking_links'] );
-        add_filter( 'groundhogg/email/the_content',        [ $this, 'minify'] );
+        add_filter( 'groundhogg/email_template/alignment',          [ $this, 'get_alignment_outlook' ] );
+        add_filter( 'groundhogg/email_template/container_css',      [ $this, 'get_alignment'] );
+        add_filter( 'groundhogg/email_template/show_browser_view',  [ $this, 'browser_view_enabled'] );
+        add_filter( 'groundhogg/email_template/browser_view_link',  [ $this, 'browser_view_link'] );
+        add_filter( 'groundhogg/email_template/pre_header_text',    [ $this, 'get_merged_pre_header'] );
+        add_filter( 'groundhogg/email_template/content',            [ $this, 'get_merged_content'] );
+        add_filter( 'groundhogg/email_template/footer_text',        [ $this, 'get_footer_text'] );
+        add_filter( 'groundhogg/email_template/unsubscribe_link',   [ $this, 'get_unsubscribe_link'] );
+        add_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link'] );
+        add_filter( 'groundhogg/email/the_content',                 [ $this, 'convert_to_tracking_links'] );
+        add_filter( 'groundhogg/email/the_content',                 [ $this, 'minify'] );
     }
 
 
@@ -504,17 +493,17 @@ class Email extends Base_Object_With_Meta
      */
     private function remove_filters()
     {
-        remove_filter( 'groundhogg/email/alignment',          [ $this, 'get_alignment_outlook' ] );
-        remove_filter( 'groundhogg/email/container_css',      [ $this, 'get_alignment'] );
-        remove_filter( 'groundhogg/email/browser_view',       [ $this, 'browser_view_enabled'] );
-        remove_filter( 'groundhogg/email/browser_link',       [ $this, 'browser_link'] );
-        remove_filter( 'groundhogg/email/pre_header_text',    [ $this, 'get_pre_header'] );
-        remove_filter( 'groundhogg/email/content',            [ $this, 'get_content'] );
-        remove_filter( 'groundhogg/email/footer_text',        [ $this, 'get_footer_text'] );
-        remove_filter( 'groundhogg/email/unsubscribe_link',   [ $this, 'get_unsubscribe_link'] );
-        remove_filter( 'groundhogg/email/open_tracking_link', [ $this, 'get_open_tracking_link'] );
-        remove_filter( 'groundhogg/email/the_content',        [ $this, 'convert_to_tracking_links'] );
-        remove_filter( 'groundhogg/email/the_content',        [ $this, 'minify'] );
+        remove_filter( 'groundhogg/email_template/alignment',          [ $this, 'get_alignment_outlook' ] );
+        remove_filter( 'groundhogg/email_template/container_css',      [ $this, 'get_alignment'] );
+        remove_filter( 'groundhogg/email_template/show_browser_view',  [ $this, 'browser_view_enabled'] );
+        remove_filter( 'groundhogg/email_template/browser_view_link',  [ $this, 'browser_view_link'] );
+        remove_filter( 'groundhogg/email_template/pre_header_text',    [ $this, 'get_merged_pre_header'] );
+        remove_filter( 'groundhogg/email_template/content',            [ $this, 'get_merged_content'] );
+        remove_filter( 'groundhogg/email_template/footer_text',        [ $this, 'get_footer_text'] );
+        remove_filter( 'groundhogg/email_template/unsubscribe_link',   [ $this, 'get_unsubscribe_link'] );
+        remove_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link'] );
+        remove_filter( 'groundhogg/email/the_content',                 [ $this, 'convert_to_tracking_links'] );
+        remove_filter( 'groundhogg/email/the_content',                 [ $this, 'minify'] );
     }
 
     /**
@@ -565,8 +554,8 @@ class Email extends Base_Object_With_Meta
 
         $content = ob_get_clean();
 
-        if ( empty( $content ) )
-            $content = 'No content...';
+//        if ( empty( $content ) )
+//            $content = 'No content...';
 
         $content = apply_filters( 'groundhogg/email/the_content', $content );
 
@@ -624,13 +613,46 @@ class Email extends Base_Object_With_Meta
     }
 
     /**
+     * Set the contact
+     *
+     * @param $contact Contact|int
+     */
+    public function set_contact( $contact )
+    {
+        if ( is_numeric( $contact ) ){
+            $contact = Plugin::$instance->utils->get_contact( $contact );
+        }
+
+        $this->contact = $contact;
+    }
+
+    /**
+     * Set Event
+     *
+     * @param $event Event|int
+     */
+    public function set_event( $event )
+    {
+        if ( ! is_object( $event ) ){
+            $event = absint( $event );
+            $event = Plugin::$instance->utils->get_event( $event );
+
+            if ( ! $event ){
+                $event = new Event( 0 );
+            }
+        }
+
+        $this->event = $event;
+    }
+
+    /**
      * Send the email
      *
      * @param $contact_id_or_email Contact|int|string
-     * @param $event Event|null the of the associated event
+     * @param $event Event|int the of the associated event
      * @return bool|WP_Error
      */
-    public function send( $contact_id_or_email, $event = null )
+    public function send( $contact_id_or_email, $event = 0 )
     {
 
         if ( $this->is_draft() && ! $this->is_testing() ){
@@ -643,11 +665,11 @@ class Email extends Base_Object_With_Meta
             return new WP_Error('no_recipient', __( 'No valid recipient was provided.' ) );
         }
 
-        $this->contact = $contact;
+        $this->set_contact( $contact );
 
         /* we got an event so all is well */
         if ( is_object( $event ) ) {
-            $this->event = $event;
+            $this->set_event( $event );
         }
 
         /* Skip if testing */
@@ -706,7 +728,7 @@ class Email extends Base_Object_With_Meta
         do_action('groundhogg/email/after_send', $this);
 
         if ( $this->has_errors() ){
-            return $this->error;
+            return $this->get_last_error();
         }
 
         return $sent;

@@ -16,64 +16,8 @@ class Preferences
     public function __construct()
     {
         add_action( 'init', [ $this, 'add_rewrite_rules' ] );
-
         add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
-
         add_filter( 'template_include', [ $this, 'template_include' ] );
-        add_action( 'template_redirect', [ $this, 'save_preference_changes' ] );
-        add_action( 'template_redirect', [ $this, 'auto_change_preference' ] );
-
-    }
-
-    /**
-     * If the action has certain parameters then allow for changing
-     * the email preference through certain links.
-     */
-    public function auto_change_preference()
-    {
-        $managing_preferences = (bool) get_query_var( 'manage_preferences' );
-        $action = get_query_var( 'action', false );
-
-        if ( $managing_preferences && $action ){
-
-            switch ( $action ){
-                case 'unsubscribe':
-                    break;
-                case 'confirm':
-            }
-
-        }
-
-    }
-
-    /**
-     * Save any changes to a contact's email preferences.
-     */
-    public function save_preference_changes()
-    {
-        // Security check.
-        if ( ! isset_not_empty( $_POST, '_wpnonce' ) || ! wp_verify_nonce( $_POST[ '_wpnonce' ], 'manage_email_preferences' ) ){
-            return;
-        }
-
-        $action = get_query_var( 'action' );
-
-        switch ( $action )
-        {
-            default:
-            case 'manage':
-
-                if ( ! isset_not_empty( $_POST, 'preference' ) ){
-                    return;
-                }
-
-                $preference = absint( $_POST[ 'preference' ] );
-
-            //TODO get Contact
-
-                break;
-        }
-
     }
 
     /**

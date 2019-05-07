@@ -15,40 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Autoloader {
 
-	const ALIASES_DEPRECATION_RANGE = 0.2;
+    const ALIASES_DEPRECATION_RANGE = 0.2;
 
-	/**
-	 * Classes map.
-	 *
-	 * Maps Groundhogg classes to file names.
-	 *
-	 * @since 1.6.0
-	 * @access private
-	 * @static
-	 *
-	 * @var array Classes used by groundhogg.
-	 */
-	private static $classes_map = [
-		'Notices'       => 'includes/notices.php',
-		'Scripts'       => 'includes/scripts.php',
-		'Preferences'   => 'includes/preferences.php',
-		'Tracking'      => 'includes/tracking.php',
-		'Settings'      => 'includes/settings.php',
-		'Bulk_Job'      => 'includes/bulk-jobs/bulk-job.php',
-		'HTML'          => 'includes/utils/html.php',
-		'Utils'         => 'includes/utils/utils.php',
-		'Files'         => 'includes/utils/files.php',
-		'Location'      => 'includes/utils/location.php',
-		'Updater'       => 'includes/utils/updater.php',
-		'Date_Time'     => 'includes/utils/date-time.php',
-		'Compliance'    => 'includes/compliance.php',
-		'Supports_Errors' => 'includes/supports-errors.php',
-		'Base_Object'   => 'includes/classes/base-object.php',
-		'Base_Object_With_Meta' => 'includes/classes/base-object-with-meta.php',
-		'Contact'       => 'includes/classes/contact.php',
-	];
-
-	/**
+    /**
 	 * Classes aliases.
 	 *
 	 * Maps Groundhogg classes to aliases.
@@ -60,10 +29,49 @@ class Autoloader {
 	 * @var array Classes aliases.
 	 */
 	private static $classes_aliases = [
-		
+
 	];
 
-	/**
+    /**
+     * Classes map.
+     *
+     * Maps Groundhogg classes to file names.
+     *
+     * @since 1.6.0
+     * @access private
+     * @static
+     *
+     * @var array Classes used by groundhogg.
+     */
+    private static $classes_map = [
+        'Notices'       => 'includes/notices.php',
+        'Scripts'       => 'includes/scripts.php',
+        'Preferences'   => 'includes/preferences.php',
+        'Tracking'      => 'includes/tracking.php',
+        'Rewrites'      => 'includes/rewrites.php',
+        'Replacements'  => 'includes/replacements.php',
+        'Settings'      => 'includes/settings.php',
+        'Bulk_Job'      => 'includes/bulk-jobs/bulk-job.php',
+        'HTML'          => 'includes/utils/html.php',
+        'Utils'         => 'includes/utils/utils.php',
+        'Files'         => 'includes/utils/files.php',
+        'Location'      => 'includes/utils/location.php',
+        'Updater'       => 'includes/utils/updater.php',
+        'Date_Time'     => 'includes/utils/date-time.php',
+        'Compliance'    => 'includes/compliance.php',
+        'Supports_Errors' => 'includes/supports-errors.php',
+        'Base_Object'   => 'includes/classes/base-object.php',
+        'Base_Object_With_Meta' => 'includes/classes/base-object-with-meta.php',
+        'Contact'       => 'includes/classes/contact.php',
+        'Email'         => 'includes/classes/email.php',
+        'Event'         => 'includes/classes/event.php',
+        'Superlink'     => 'includes/classes/superlink.php',
+        'Tag'           => 'includes/classes/tag.php',
+        'Template_Loader' => 'includes/template-loader.php',
+        'Gamajo_Template_Loader' => 'includes/lib/gamajo-template-loader.php',
+    ];
+
+    /**
 	 * Run autoloader.
 	 *
 	 * Register a function as `__autoload()` implementation.
