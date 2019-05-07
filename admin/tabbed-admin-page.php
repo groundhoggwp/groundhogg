@@ -35,7 +35,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page
      */
     protected function get_current_tab()
     {
-        return gisset_not_empty( $_GET, 'tab' ) ? $_GET[ 'tab' ] : $this->get_tabs()[ 0 ][ 'slug' ];
+        return isset_not_emtpy( $_GET, 'tab' ) ? $_GET[ 'tab' ] : $this->get_tabs()[ 0 ][ 'slug' ];
     }
 
     /**

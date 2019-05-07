@@ -241,11 +241,9 @@ class Plugin {
 //        $this->roles        = new Roles();
 //        $this->event_queue  = new Event_Queue();
 
-//        if ( is_admin() ) {
-//
-//            $this->admin   = new Admin_Menu();
-//
-//        }
+        if ( is_admin() ) {
+            $this->admin   = new Admin_Menu();
+        }
 
     }
 

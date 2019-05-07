@@ -884,7 +884,7 @@ class Settings_Page extends Admin_Page
         foreach( $this->settings as $id => $setting ){
 //            print_r($setting[ 'section' ]);
             add_settings_field( $setting['id'], $setting['label'], array( $this, 'settings_callback' ), 'gh_' . $this->sections[ $setting[ 'section' ] ][ 'tab' ], 'gh_' . $setting[ 'section' ], $setting );
-            $args = gisset_not_empty( $setting, 'args' ) ? $setting[ 'args' ]: []; //todo
+            $args = isset_not_emtpy( $setting, 'args' ) ? $setting[ 'args' ]: []; //todo
             register_setting( 'gh_' . $this->sections[ $setting[ 'section' ] ][ 'tab' ], $setting['id'], $args );
         }
     }

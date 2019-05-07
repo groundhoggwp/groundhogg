@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\DB;
 
+use function Groundhogg\isset_not_empty;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -350,7 +352,7 @@ class Tags extends DB
      */
     public function decrease_contact_count( $args = [] )
     {
-        if ( ! gisset_not_empty( $args, 'tag_id' ) ){
+        if ( ! isset_not_empty( $args, 'tag_id' ) ){
             return;
         }
 

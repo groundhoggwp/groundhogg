@@ -1,4 +1,7 @@
 <?php
+
+namespace Groundhogg;
+
 /**
  * Modal
  *
@@ -10,11 +13,11 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 1.0.5
  */
-class WPGH_Popup
+class Modal
 {
 
     /**
-     * @var WPGH_Popup
+     * @var Modal
      */
     public static $instance;
 
@@ -69,24 +72,12 @@ class WPGH_Popup
 	public static function instance()
     {
 
-        if ( ! self::$instance instanceof WPGH_Popup ){
-            self::$instance = new WPGH_Popup();
+        if ( ! self::$instance instanceof Modal ){
+            self::$instance = new Modal();
         }
 
         return self::$instance;
 
     }
 
-}
-
-/**
- * Enqueues the modal scripts
- *
- * @return WPGH_Popup
- *
- * @since 1.0.5
- */
-function wpgh_enqueue_modal()
-{
-    return WPGH_Popup::instance();
 }

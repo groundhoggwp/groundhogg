@@ -73,7 +73,7 @@ class SMS_Page extends Admin_Page
                 'target' => '_self',
             ],
             [
-                'link' => Plugin::$instance->admin->get_page( 'broadcasts' )->admin_url( [ 'action' => 'add', 'type' => 'sms' ] ),
+//                'link' => Plugin::$instance->admin->get_page( 'broadcasts' )->admin_url( [ 'action' => 'add', 'type' => 'sms' ] ),
                 'action' => __( 'Broadcast', 'groundhogg' ),
                 'target' => '_self',
             ]
@@ -130,7 +130,7 @@ class SMS_Page extends Admin_Page
 
         $result = Plugin::$instance->dbs->get_db('sms')->update($id, $args);
 
-        if ( gisset_not_empty( $_POST, 'save_and_test' ) ){
+        if ( isset_not_emtpy( $_POST, 'save_and_test' ) ){
             $sms = Plugin::$instance->utils->get_sms( $id );
             $contact = Plugin::$instance->utils->get_contact( get_current_user_id(), true );
             $result = $sms->send( $contact );
@@ -210,7 +210,7 @@ class SMS_Page extends Admin_Page
                                 <label for="sms-message"><?php _e( 'Message', 'groundhogg' ) ?></label>
                                 <textarea rows="5" name="message" id="sms-message" autocomplete="off" required></textarea>
                                 <p class="description">
-	                                <?php WPGH()->replacements->show_replacements_button(); ?>
+	                                <?php Plugin::$instance->replacements->show_replacements_button(); ?>
                                     <?php _e( 'Use any valid replacement codes in your text message.', 'groundhogg' ); ?>
                             </div>
                             <?php submit_button( _x( 'Add New SMS', 'action', 'groundhogg' ), 'primary', 'add_sms' ); ?>

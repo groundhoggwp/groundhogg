@@ -87,7 +87,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
         $identifier = $this->get_identifier_key();
 
-        $this->set_id( $object->$identifier );
+        $this->set_id( absint( $object->$identifier ) );
 
         //Lets just make sure we all good here.
         $object = apply_filters( "groundhogg/{$this->get_object_type()}/setup", $object );

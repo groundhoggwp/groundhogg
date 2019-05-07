@@ -155,7 +155,7 @@ if ( $active_tab === 'form' ): ?>
                     if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
                 }
 
-                if ( gisset_not_empty( $_GET, 'form' ) ){ //todo
+                if ( isset_not_emtpy( $_GET, 'form' ) ){ //todo
                     $default = intval( $_GET[ 'form' ] );
                 }
 

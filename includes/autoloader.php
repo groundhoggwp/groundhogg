@@ -56,6 +56,7 @@ class Autoloader {
         'Utils'         => 'includes/utils/utils.php',
         'Files'         => 'includes/utils/files.php',
         'Location'      => 'includes/utils/location.php',
+        'Modal'         => 'includes/modal.php',
         'Updater'       => 'includes/utils/updater.php',
         'Date_Time'     => 'includes/utils/date-time.php',
         'Compliance'    => 'includes/compliance.php',

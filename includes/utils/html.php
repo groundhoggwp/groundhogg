@@ -365,7 +365,7 @@ class HTML
             'preventSave'    => 'true',
         ) );
 
-        wpgh_enqueue_modal();
+        enqueue_groundhogg_modal();
 
         $html = sprintf(
             "<a title='%s' id='%s' class='%s trigger-popup' href='#source=%s&footer=%s&width=%d&height=%d&footertext=%s&preventSave=%s' >%s</a>",

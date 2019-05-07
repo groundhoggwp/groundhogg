@@ -748,7 +748,7 @@ class WPGH_Submission
         $file = $_FILES[ $key ];
         $size = $file[ 'size' ];
 
-        if ( gisset_not_empty( $config, 'max_file_size' ) && intval( $size ) > intval( $config[ 'max_file_size' ] ) ){
+        if ( isset_not_emtpy( $config, 'max_file_size' ) && intval( $size ) > intval( $config[ 'max_file_size' ] ) ){
             return new WP_Error( 'FILE_TOO_BIG', _x( 'The file you have uploaded is too big.',  'submission_error', 'greoundhogg' ) );
         }
 

@@ -104,7 +104,7 @@ abstract class Bulk_Job
      */
     public function get_items()
     {
-        return gisset_not_empty( $_POST, 'items' ) ? $_POST[ 'items' ] : [];
+        return isset_not_emtpy( $_POST, 'items' ) ? $_POST[ 'items' ] : [];
     }
 
     /**

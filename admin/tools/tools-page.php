@@ -363,7 +363,7 @@ class Tools_Page extends Tabbed_Admin_Page
 
         $tags = [ sprintf( '%s - %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s' ) ) ];
 
-        if ( gisset_not_empty( $_POST, 'tags' ) ){ //todo
+        if ( isset_not_emtpy( $_POST, 'tags' ) ){ //todo
             $tags = array_merge( $tags, $_POST[ 'tags' ] );
         }
 

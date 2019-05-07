@@ -110,6 +110,19 @@ function dequeue_theme_css_compat()
 }
 
 /**
+ * Enqueues the modal scripts
+ *
+ * @return Modal
+ *
+ * @since 1.0.5
+ */
+function enqueue_groundhogg_modal()
+{
+    return Modal::instance();
+}
+
+
+/**
  * Return the FULL URI from wp_get_referer for string comparisons
  *
  * @return string

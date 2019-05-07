@@ -56,7 +56,7 @@ class Tags_Page extends Admin_Page
 
     public function recount()
     {
-        wpgh_recount_tag_contacts_count();
+//        wpgh_recount_tag_contacts_count(); todo
     }
 
     /**
@@ -102,7 +102,7 @@ class Tags_Page extends Admin_Page
                 }
             }
 
-            if ( ! empty( $ids ) ){
+            if ( empty( $ids ) ){
                 return new \WP_Error( 'unable_to_add_tags', "Something went wrong adding the tags." );
             }
 

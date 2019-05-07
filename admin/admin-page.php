@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin;
 
 use Groundhogg\Plugin;
+use function Groundhogg\isset_not_empty;
 
 /**
  * Abstract Admin Page

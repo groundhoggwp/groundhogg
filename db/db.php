@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 // Exit if accessed directly
 use Groundhogg\Plugin;
 
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -498,7 +499,8 @@ abstract class DB {
         $extra = '';
 
         if ( isset( $data[ 'search' ] ) ){
-            $extra .= sprintf( " AND (%s)", $this->generate_search( $data[ 'search' ] ) );
+            $extra .= sprintf( "(%s)", $this->generate_search( $data[ 'search' ] ) );
+            unset( $data[ 'search' ] );
         }
 
         // Initialise column format array
@@ -512,11 +514,25 @@ abstract class DB {
 
         $where = $this->generate_where( $data );
 
+        $query = [];
+
         if ( ! empty( $where ) ){
-            $where = "WHERE " . $where;
+            $query[] = $where;
         }
 
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name $where $extra ORDER BY `$order` ASC" );
+        if ( ! empty( $extra ) ){
+            $query[] = $extra;
+        }
+
+        $query = trim( implode( ' AND ', $query ), ' ' );
+
+        if ( ! empty( $query ) ){
+            $query = "WHERE " . $query;
+        }
+
+        $sql = "SELECT * FROM $this->table_name $query ORDER BY `$order` ASC";
+
+        $results = $wpdb->get_results( $sql );
 
         return $results;
     }

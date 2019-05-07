@@ -1,7 +1,11 @@
 <?php
 namespace Groundhogg\Admin;
 
+use Groundhogg\Admin\Emails\Emails_Page;
+use Groundhogg\Admin\SMS\SMS_Page;
+use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Welcome\Welcome_Page;
+use function Groundhogg\isset_not_empty;
 
 /**
  * Admin Manager to manage databases in Groundhogg
@@ -30,7 +34,9 @@ class Admin_Menu
      */
     protected function init_admin(){
 
-        $this->welcome = new Welcome_Page();
+        $this->welcome  = new Welcome_Page();
+        $this->tags     = new Tags_Page();
+        $this->sms      = new SMS_Page();
 
         do_action( 'groundhogg/admin/init', $this );
     }
@@ -53,13 +59,12 @@ class Admin_Menu
      */
     public function __get( $key )
     {
-        if ( gisset_not_empty( $this->pages, $key ) ){
+        if ( isset_not_empty( $this->pages, $key ) ){
             return $this->pages[ $key ];
         }
 
         return false;
     }
-
 
     /**
      * Set the data to the given value

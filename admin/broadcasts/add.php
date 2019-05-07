@@ -63,7 +63,7 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
             <th scope="row"><label for="description"><?php _e( 'Send To:', 'groundhogg' ); ?></label></th>
             <td><?php
 
-                if ( ! gisset_not_empty( $_GET, 'use_query' ) ):
+                if ( ! isset_not_emtpy( $_GET, 'use_query' ) ):
 
                 $tag_args = array();
                 $tag_args[ 'id' ] = 'tags';

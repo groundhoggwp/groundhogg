@@ -76,6 +76,19 @@ class Tags_Table extends WP_List_Table {
     }
 
     /**
+     * Generates content for a single row of the table
+     *
+     * @since 3.1.0
+     *
+     * @param object $item The current item
+     */
+    public function single_row( $item ) {
+        echo '<tr>';
+        $this->single_row_columns( new Tag( absint( $item->tag_id ) ) );
+        echo '</tr>';
+    }
+
+    /**
      * @param $tag Tag
      * @return string
      */
