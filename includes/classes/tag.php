@@ -42,6 +42,14 @@ class Tag extends Base_Object {
     }
 
     /**
+     * @return int
+     */
+    public function get_id()
+    {
+        return absint( $this->tag_id );
+    }
+
+    /**
      * @return string
      */
     public function get_description()
@@ -55,6 +63,14 @@ class Tag extends Base_Object {
     public function get_contact_count()
     {
         return absint( $this->contact_count );
+    }
+
+    /**
+     * @return string
+     */
+    public function get_slug()
+    {
+        return $this->tag_slug;
     }
 
     /**

@@ -1,4 +1,6 @@
 <?php
+namespace Groundhogg\Admin\Tools;
+
 /**
  * New Import
  *

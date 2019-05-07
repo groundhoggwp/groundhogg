@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Tags;
 
+use Groundhogg\Tag;
 use Groundhogg\Plugin;
 use WP_List_Table;
 
@@ -74,22 +75,34 @@ class Tags_Table extends WP_List_Table {
         <?php
     }
 
+    /**
+     * @param $tag Tag
+     * @return string
+     */
     protected function column_tag_name( $tag )
     {
-        $editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->tag_id );
-        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $tag->tag_name ) . "</a>";
+        $editUrl = admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->get_id() );
+        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $tag->get_name() ) . "</a>";
         return $html;
     }
 
+    /**
+     * @param $tag Tag
+     * @return string
+     */
     protected function column_contact_count( $tag )
     {
         $count = $tag->contact_count;
-        return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&tags_include=' . $tag->tag_id ).'">'. $count .'</a>' : '0';
+        return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&tags_include=' . $tag->get_id() ).'">'. $count .'</a>' : '0';
     }
 
+    /**
+     * @param $tag Tag
+     * @return string
+     */
     protected function column_tag_description( $tag )
     {
-        return ! empty( $tag->tag_description ) ? $tag->tag_description : '&#x2014;';
+        return ! empty( $tag->get_description() ) ? $tag->get_description() : '&#x2014;';
     }
 
     /**
@@ -103,15 +116,17 @@ class Tags_Table extends WP_List_Table {
         return print_r( $tag->$column_name, true );
 
     }
+
+
     /**
-     * @param object $tag A singular item (one full row's worth of data).
+     * @param  $tag Tag A singular item (one full row's worth of data).
      * @return string Text to be placed inside the column <td>.
      */
     protected function column_cb( $tag ) {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $tag->tag_id               // The value of the checkbox should be the record's ID.
+            $tag->get_id()               // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -197,7 +212,7 @@ class Tags_Table extends WP_List_Table {
     /**
      * Generates and displays row action superlinks.
      *
-     * @param object $tag        Contact being acted upon.
+     * @param $tag Tag      Contact being acted upon.
      * @param string $column_name Current column name.
      * @param string $primary     Primary column name.
      * @return string Row steps output for posts.
@@ -208,21 +223,21 @@ class Tags_Table extends WP_List_Table {
         }
 
         $actions = array();
-        $title = $tag->tag_name;
+        $title = $tag->get_name();
 
-        $actions[ 'id' ] = 'ID: ' . $tag->tag_id;
+        $actions[ 'id' ] = 'ID: ' . $tag->get_id();
 
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',
             /* translators: %s: title */
-            admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->tag_id ),
+            admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->get_id() ),
             esc_attr( sprintf( __( 'Edit' ), $title ) ),
             __( 'Edit' )
         );
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_tags&tag='. $tag->tag_id . '&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_tags&tag='. $tag->get_id() . '&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )

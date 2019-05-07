@@ -6,6 +6,7 @@ use Groundhogg\Bulk_Delete_Contacts;
 use Groundhogg\Export_Contacts;
 use Groundhogg\Import_Contacts;
 use Groundhogg\Sync_Contacts;
+use Groundhogg\Plugin;
 use \WP_Error;
 
 /**
@@ -113,7 +114,7 @@ class Tools_Page extends Tabbed_Admin_Page
 
         if ( $this->get_current_tab() === 'export' ){
             $actions[] = [
-                'link'      => $this->exporter->get_start_url(),
+                'link'      => $this->exporter->get_start_url(), //todo
                 'action'    => __( 'Export All Contacts' ),
             ];
         }
@@ -188,7 +189,7 @@ class Tools_Page extends Tabbed_Admin_Page
                     <p class="install-help"><?php _e( 'Sync Users & Contacts', 'groundhogg' ); ?></p>
                     <form method="post" class="wp-upload-form">
                         <?php wp_nonce_field(); ?>
-                        <?php echo WPGH()->html->input( [
+                        <?php echo Plugin::$instance->utils->html->input( [
                             'type' => 'hidden',
                             'name' => 'action',
                             'value' => 'bulk_sync',
@@ -209,7 +210,7 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function sync_bulk_sync_tool()
     {
-        $this->syncer->start();
+        $this->syncer->start(); //todo
     }
 
     ####### IMPORT TAB FUNCTIONS #########
@@ -223,7 +224,7 @@ class Tools_Page extends Tabbed_Admin_Page
             require_once dirname(__FILE__) . '/class-wpgh-imports-table.php';
         }
 
-        $table = new WPGH_Imports_Table(); ?>
+        $table = new WPGH_Imports_Table();  //todo ?>
         <form method="post" class="search-form wp-clearfix">
             <?php $table->prepare_items(); ?>
             <?php $table->display(); ?>
@@ -260,8 +261,8 @@ class Tools_Page extends Tabbed_Admin_Page
         }
 
         if ( empty( $_FILES[ 'import_file' ][ 'name' ] ) ){
-            $this->notices->add( new WP_Error( 'no_files', 'Please upload a file!' ) );
-            return self::SELF;
+            $this->add_notice( new WP_Error( 'no_files', 'Please upload a file!' ) );
+            return self::SELF; //todo
         }
 
         $_FILES[ 'import_file' ][ 'name' ] = md5( $_FILES[ 'import_file' ][ 'name' ] ) . '.csv';
@@ -269,8 +270,8 @@ class Tools_Page extends Tabbed_Admin_Page
         $result = $this->handle_file_upload( 'import_file' );
 
         if ( is_wp_error( $result ) ){
-            $this->notices->add( $result );
-            return self::SELF;
+            $this->add_notice( $result );
+            return self::SELF; //todo
         }
 
         wp_redirect( $this->admin_url( [
@@ -338,9 +339,9 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     private function set_uploads_path()
     {
-        $this->uploads_path[ 'subdir' ] = wpgh_get_base_uploads_dir();
-        $this->uploads_path[ 'path' ] = wpgh_get_csv_imports_dir();
-        $this->uploads_path[ 'url' ] = wpgh_get_csv_imports_url();
+        $this->uploads_path[ 'subdir' ] = Plugin::$instance->utils->files->get_base_uploads_dir();
+        $this->uploads_path[ 'path' ]   = Plugin::$instance->utils->files->get_csv_imports_dir();
+        $this->uploads_path[ 'url' ]    = Plugin::$instance->utils->files->get_csv_imports_url();
     }
 
     /**
@@ -362,16 +363,16 @@ class Tools_Page extends Tabbed_Admin_Page
 
         $tags = [ sprintf( '%s - %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s' ) ) ];
 
-        if ( gisset_not_empty( $_POST, 'tags' ) ){
+        if ( gisset_not_empty( $_POST, 'tags' ) ){ //todo
             $tags = array_merge( $tags, $_POST[ 'tags' ] );
         }
 
-        $tags = WPGH()->tags->validate( $tags );
+        $tags = Plugin::$instance->dbs->get_db('tags')->validate( $tags );
 
-        wpgh_set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS );
-        wpgh_set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );
+        wpgh_set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS ); //todo
+        wpgh_set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );   //todo
 
-        $this->importer->start( [ 'import' => $file_name ] );
+        $this->importer->start( [ 'import' => $file_name ] ); //todo
     }
 
     /**
@@ -382,11 +383,11 @@ class Tools_Page extends Tabbed_Admin_Page
         $files = $this->get_items();
 
         foreach ( $files as $file_name ){
-            $filepath = wpgh_get_csv_imports_dir( $file_name );
+            $filepath = Plugin::$instance->utils->files->get_csv_imports_dir( $file_name );
             unlink( $filepath );
         }
 
-        $this->notices->add( 'file_removed', __( 'Imports deleted.', 'groundhogg' ) );
+        $this->add_notice( 'file_removed', __( 'Imports deleted.', 'groundhogg' ) );
         return self::PAGE;
     }
 
@@ -397,11 +398,11 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function export_view()
     {
-        if ( ! class_exists( 'WPGH_Exports_Table' ) ){
-            require_once dirname(__FILE__) . '/class-wpgh-exports-table.php';
+        if ( ! class_exists( 'Exports_Table' ) ){
+            require_once dirname(__FILE__) . '/exports-table.php';
         }
 
-        $table = new WPGH_Exports_Table(); ?>
+        $table = new Exports_Table(); ?>
         <form method="post" class="wp-clearfix">
             <?php $table->prepare_items(); ?>
             <?php $table->display(); ?>
@@ -417,11 +418,11 @@ class Tools_Page extends Tabbed_Admin_Page
         $files = $this->get_items();
 
         foreach ( $files as $file_name ){
-            $filepath = wpgh_get_csv_exports_dir( $file_name );
+            $filepath = Plugin::$instance->utils->files->get_csv_exports_dir( $file_name );
             unlink( $filepath );
         }
 
-        $this->notices->add( 'file_removed', __( 'Exports deleted.', 'groundhogg' ) );
+        $this->add_notice( 'file_removed', __( 'Exports deleted.', 'groundhogg' ) );
         return self::PAGE;
     }
 
@@ -429,8 +430,8 @@ class Tools_Page extends Tabbed_Admin_Page
 
     public function delete_warning()
     {
-        if ( $this->current_tab() === 'delete' ){
-            $this->notices->add( 'no_going_back', __( '&#9888; There is no going back once the deletion process has started.', 'groudnhogg' ), 'warning' );
+        if ( $this->get_current_tab() === 'delete' ){
+            $this->add_notice( 'no_going_back', __( '&#9888; There is no going back once the deletion process has started.', 'groudnhogg' ), 'warning' );
         }
 
     }
@@ -444,12 +445,12 @@ class Tools_Page extends Tabbed_Admin_Page
                     <p class="install-help"><?php _e( 'Delete Contacts in Bulk by Tag', 'groundhogg' ); ?></p>
                     <form method="post" class="wp-upload-form">
                         <?php wp_nonce_field(); ?>
-                        <?php echo WPGH()->html->input( [
+                        <?php echo Plugin::$instance->utils->html->input( [
                             'type' => 'hidden',
                             'name' => 'action',
                             'value' => 'bulk_delete',
                         ] ); ?>
-                        <?php echo WPGH()->html->tag_picker( [] ); ?>
+                        <?php echo Plugin::$instance->utils->html->tag_picker( [] ); ?>
                         <p>&#9888;&nbsp;<b><?php _e( 'Once you click the delete button there is no going back!' ); ?></b></p>
                         <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
                             <button style="width: 100%" class="button-primary" name="delete_contacts" value="delete"><?php _ex('Delete Contacts', 'action', 'groundhogg'); ?></button>
@@ -466,8 +467,8 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function delete_bulk_delete_tool()
     {
-        $tags = WPGH()->tags->validate( $_POST[ 'tags' ] );
-        $this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] );
+        $tags = Plugin::$instance->dbs->get_db('tags')->validate( $_POST[ 'tags' ] );
+        $this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] ); //todo
     }
 
     /**

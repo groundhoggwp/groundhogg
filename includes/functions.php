@@ -737,22 +737,6 @@ function wpgh_get_form_list() {
 }
 
 /**
- * Whether or not we should show the stats collection prompt
- *
- * @return bool
- */
-function wpgh_should_show_stats_collection()
-{
-    $show = false;
-
-    if ( ! wpgh_is_option_enabled( 'gh_opted_in_stats_collection' ) && current_user_can( 'manage_options' ) ){
-        $show = true;
-    }
-
-    return apply_filters( 'groundhogg/stats_collection/show', $show );
-}
-
-/**
  * If the JSON is your typical error response
  *
  * @param $json

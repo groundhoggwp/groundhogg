@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Settings;
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -19,6 +20,57 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Settings_Page extends Admin_Page
 {
+
+    // UNUSED FUNCTIONS
+    protected function add_ajax_actions() {}
+    public function help() {}
+    public function scripts() {}
+
+    protected function add_additional_actions()
+    {
+        add_action( 'admin_init', array( $this, 'init_defaults' ) );
+        add_action( 'admin_init', array( $this, 'register_sections' ) );
+        add_action( 'admin_init', array( $this, 'register_settings' ) );
+
+        if ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) {
+            add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );
+            add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_deactivation' ) );
+        }
+
+        if ( ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) || wp_doing_ajax() ){
+            $this->importer = new WPGH_Bulk_Contact_Manager(); // todo
+        }
+    }
+
+    public function get_slug()
+    {
+        return 'gh_settings';
+    }
+
+    public function get_name()
+    {
+        return _x( 'Groundhogg Settings', 'page_title', 'groundhogg' );
+    }
+
+    public function get_cap()
+    {
+        return 'manage_options';
+    }
+
+    public function get_item_type()
+    {
+        return null; //todo
+    }
+    public function get_priority()
+    {
+        return 99;
+    }
+
+    public function view()
+    {
+        // TODO: Implement view() method.
+    }
+
 
     /**
      * A list of the settings tabs
@@ -43,8 +95,7 @@ class Settings_Page extends Admin_Page
 
     public function __construct()
     {
-        /* Settings always come last. */
-        add_action( 'admin_menu', array( $this, 'register' ), 99 );
+
         add_action( 'admin_init', array( $this, 'init_defaults' ) );
         add_action( 'admin_init', array( $this, 'register_sections' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
@@ -72,27 +123,8 @@ class Settings_Page extends Admin_Page
         do_action( 'wpgh_settings_post_defaults_init', $this );
     }
 
-    /* Register the page */
-    public function register()
-    {
-        $page = add_submenu_page(
-            'groundhogg',
-            __( 'Settings' ),
-            __( 'Settings' ),
-            'manage_options',
-            'gh_settings',
-            array( $this, 'settings_content' )
-        );
 
-        add_action( "load-" . $page, array( $this, 'help' ) );
 
-    }
-
-    /* Display the help bar */
-    public function help()
-    {
-        //todo
-    }
 
     /**
      * Returns a list of tabs
@@ -140,6 +172,8 @@ class Settings_Page extends Admin_Page
      */
     private function get_default_sections()
     {
+
+
         return apply_filters( 'wpgh_settings_sections', array(
             'business_info' => array(
                 'id'    => 'business_info',
@@ -170,7 +204,7 @@ class Settings_Page extends Admin_Page
                 'id'    => 'bounces',
                 'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email',
-                'callback' => array( WPGH()->bounce_checker, 'test_connection_ui' ),
+                'callback' => array( WPGH()->bounce_checker, 'test_connection_ui' ), //todo
             ),
             'overrides' => [
                 'id'    => 'overrides',
@@ -181,7 +215,7 @@ class Settings_Page extends Admin_Page
                 'id'    => 'service',
                 'title' => _x( 'Groundhogg Sending Service (Email & SMS)', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email',
-                'callback' => array( WPGH()->service_manager, 'test_connection_ui' ),
+                'callback' => array( WPGH()->service_manager, 'test_connection_ui' ), //todo
             ),
             'api_settings' => array(
                 'id'    => 'api_settings',
@@ -657,7 +691,7 @@ class Settings_Page extends Admin_Page
                 'atts' => array(
                     'name'  => 'gh_override_from_name',
                     'id'    => 'gh_override_from_name',
-                    'placeholder' => wpgh_get_option( 'gh_business_name' ),
+                    'placeholder' => Plugin::$instance->settings->get_option( 'gh_business_name' ),
                 ),
             ],
             'gh_override_from_email' => [
@@ -670,7 +704,7 @@ class Settings_Page extends Admin_Page
                     'type'  => 'email',
                     'name'  => 'gh_override_from_email',
                     'id'    => 'gh_override_from_email',
-                    'placeholder' => wpgh_get_option( 'admin_email' ),
+                    'placeholder' => Plugin::$instance->settings->get_option( 'admin_email' ),
                 ),
             ],
             'gh_email_token' => array(
@@ -724,7 +758,7 @@ class Settings_Page extends Admin_Page
                     'value'         => 'on',
                 ),
                 'args' => [
-                    'sanitize_callback' => [ WPGH()->service_manager, 'manage_cron' ]
+                    'sanitize_callback' => [ WPGH()->service_manager, 'manage_cron' ] //todo
                 ]
             ),
             'gh_disable_api' => array(
@@ -850,7 +884,7 @@ class Settings_Page extends Admin_Page
         foreach( $this->settings as $id => $setting ){
 //            print_r($setting[ 'section' ]);
             add_settings_field( $setting['id'], $setting['label'], array( $this, 'settings_callback' ), 'gh_' . $this->sections[ $setting[ 'section' ] ][ 'tab' ], 'gh_' . $setting[ 'section' ], $setting );
-            $args = gisset_not_empty( $setting, 'args' ) ? $setting[ 'args' ]: [];
+            $args = gisset_not_empty( $setting, 'args' ) ? $setting[ 'args' ]: []; //todo
             register_setting( 'gh_' . $this->sections[ $setting[ 'section' ] ][ 'tab' ], $setting['id'], $args );
         }
     }
@@ -963,10 +997,10 @@ class Settings_Page extends Admin_Page
             }
         </style>
         <div class="wrap">
-            <h1><?php printf( '%s %s' , WPGH()->brand(), __( 'Settings' ) ); ?></h1>
+            <h1><?php printf( '%s %s' , WPGH()->brand(), __( 'Settings' ) ); //todo ?></h1>
             <?php
             settings_errors();
-            WPGH()->notices->notices();
+            //WPGH()->notices->notices();  todo don't need it
             $action = $this->tab_has_settings( $this->active_tab() ) ? 'options.php' : ''; ?>
             <form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
 
@@ -999,7 +1033,7 @@ class Settings_Page extends Admin_Page
 
     public function settings_callback( $field )
     {
-        $value = wpgh_get_option( $field['id'] );
+        $value = Plugin::$instance->settings->get_option( $field['id'] );
 
         switch ( $field['type'] ) {
 
@@ -1022,52 +1056,17 @@ class Settings_Page extends Admin_Page
 
         $field[ 'atts' ][ 'id' ] = esc_attr( sanitize_key( $field['id'] ) );
 
-        echo call_user_func( array( WPGH()->html, $field[ 'type' ] ), $field[ 'atts' ] );
+//        echo call_user_func( array( WPGH()->html, $field[ 'type' ] ), $field[ 'atts' ] ); todo
+
+        echo call_user_func( array( Plugin::$instance->utils->html, $field[ 'type' ] ), $field[ 'atts' ] );
+
+
 
         if( isset( $field['desc'] ) && $desc = $field['desc'] ) {
             printf( '<p class="description">%s</p>', $desc );
         }
     }
 
-    protected function add_ajax_actions()
-    {
-        // TODO: Implement add_ajax_actions() method.
-    }
-
-    protected function add_additional_actions()
-    {
-        // TODO: Implement add_additional_actions() method.
-    }
-
-    public function get_slug()
-    {
-        // TODO: Implement get_slug() method.
-    }
-
-    public function get_name()
-    {
-        // TODO: Implement get_name() method.
-    }
-
-    public function get_cap()
-    {
-        // TODO: Implement get_cap() method.
-    }
-
-    public function get_item_type()
-    {
-        // TODO: Implement get_item_type() method.
-    }
-
-    public function scripts()
-    {
-        // TODO: Implement scripts() method.
-    }
-
-    public function view()
-    {
-        // TODO: Implement view() method.
-    }
 
 
 }

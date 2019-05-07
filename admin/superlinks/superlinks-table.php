@@ -2,7 +2,9 @@
 
 namespace Groundhogg\Admin\Superlinks;
 
+use Groundhogg\Superlink;
 use Groundhogg\Plugin;
+use VisualComposer\Modules\Settings\Traits\SubMenu;
 use WP_List_Table;
 
 // Exit if accessed directly
@@ -74,33 +76,55 @@ class Superlinks_Table extends WP_List_Table {
         return $sortable_columns;
     }
 
+
+    /**
+     * @param $superlink Superlink
+     * @return string
+     */
     protected function column_name( $superlink )
     {
-        $editUrl = admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->ID );
-        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $superlink->name ) . "</a>";
+        $editUrl = admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->get_id() );
+        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $superlink->get_name() ) . "</a>";
         return $html;
     }
 
+    /**
+     * @param $superlink Superlink
+     * @return string
+     */
     protected function column_target( $superlink )
     {
-        return '<a target="_blank" href="' . esc_url_raw( $superlink->target ) . '">' . esc_url( $superlink->target ) . '</a>';
+        return '<a target="_blank" href="' . esc_url_raw( $superlink->get_target_url() ) . '">' . esc_url( $superlink->get_target_url() ) . '</a>';
     }
 
+    /**
+     * @param $superlink Superlink
+     * @return string
+     */
     protected function column_replacement( $superlink )
     {
-        return sprintf( '<input type="text" value="%s" onfocus="this.select()" readonly>', '{superlink.' . $superlink->ID . '}');
+        return sprintf( '<input type="text" value="%s" onfocus="this.select()" readonly>', '{superlink.' . $superlink->get_id() . '}');
     }
 
+    /**
+     * @param $superlink Superlink
+     * @return string
+     */
     protected function column_source( $superlink )
     {
-        return sprintf( '<input style="max-width: 100%%;" class="regular-text" type="text" value="%s" onfocus="this.select()" readonly><p><a target="_blank" href="%s">%s</a></p>', site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ), site_url( 'superlinks/link/' . $superlink->ID ) );
+        return sprintf( '<input style="max-width: 100%%;" class="regular-text" type="text" value="%s" onfocus="this.select()" readonly><p><a target="_blank" href="%s">%s</a></p>', site_url( 'superlinks/link/' . $superlink->get_id() ), site_url( 'superlinks/link/' . $superlink->get_id() ), site_url( 'superlinks/link/' . $superlink->get_id() ) );
     }
+
+    /**
+     * @param $superlink Superlink
+     * @return string
+     */
 
     protected function column_tags( $superlink )
     {
         $tags = array();
-
-        foreach ( $superlink->tags as $i => $tag_id ){
+        //todo
+        foreach ( $superlink->get_tags() as $i => $tag_id ){
 
 
             if ( Plugin::$instance->dbs->get_db('tags')->exists( $tag_id ) ){
@@ -124,14 +148,14 @@ class Superlinks_Table extends WP_List_Table {
 
     }
     /**
-     * @param object $superlink A singular item (one full row's worth of data).
+     * @param  $superlink Superlink A singular item (one full row's worth of data).
      * @return string Text to be placed inside the column <td>.
      */
     protected function column_cb( $superlink ) {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $superlink->ID               // The value of the checkbox should be the record's ID.
+            $superlink->get_id()       // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -220,7 +244,7 @@ class Superlinks_Table extends WP_List_Table {
     /**
      * Generates and displays row action superlinks.
      *
-     * @param object $item        Contact being acted upon.
+     * @param $superlink Superlink Contact being acted upon.
      * @param string $column_name Current column name.
      * @param string $primary     Primary column name.
      * @return string Row steps output for posts.
@@ -231,19 +255,19 @@ class Superlinks_Table extends WP_List_Table {
         }
 
         $actions = array();
-        $title = $superlink->name;
+        $title = $superlink->get_name();
 
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',
             /* translators: %s: title */
-            admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->ID ),
+            admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->get_name() ),
             esc_attr( sprintf( __( 'Edit' ), $title ) ),
             __( 'Edit' )
         );
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_superlinks&superlink='. $superlink->ID . '&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_superlinks&superlink='. $superlink->get_id() . '&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )

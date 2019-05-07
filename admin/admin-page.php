@@ -255,6 +255,11 @@ abstract class Admin_Page
             return;
         }
 
+        if ( is_string( $exitCode ) && esc_url_raw( $exitCode ) ){
+            wp_redirect( esc_url( $exitCode ) );
+            die();
+        }
+
         // Return to self if true response.
         if ( $exitCode === true ){
             return;

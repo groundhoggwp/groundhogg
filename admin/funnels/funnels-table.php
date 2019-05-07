@@ -1,4 +1,10 @@
 <?php
+namespace Groundhogg\Admin\Funnels;
+
+use Groundhogg\Plugin;
+use \WP_List_Table;
+use Groundhogg\Contact_Query;
+
 /**
  * Emails Table Class
  *
@@ -19,7 +25,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_Funnels_Table extends WP_List_Table {
+class Funnels_Table extends WP_List_Table {
 
     /**
      * TT_Example_List_Table constructor.
@@ -86,9 +92,9 @@ class WPGH_Funnels_Table extends WP_List_Table {
         $views =  array();
 
         $count = array(
-            'active'    => WPGH()->funnels->count( array( 'status' => 'active' ) ),
-            'inactive'  => WPGH()->funnels->count( array( 'status' => 'inactive' ) ),
-            'archived'  => WPGH()->funnels->count( array( 'status' => 'archived' ) )
+            'active'    => Plugin::$instance->dbs->get_db('funnels')->count( array( 'status' => 'active' ) ),
+            'inactive'  => Plugin::$instance->dbs->get_db('funnels')->count( array( 'status' => 'inactive' ) ),
+            'archived'  => Plugin::$instance->dbs->get_db('funnels')->count( array( 'status' => 'archived' ) )
         );
 
         $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=all' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'active' ] + $count[ 'inactive' ] ) . ")</span>" . "</a>";
@@ -132,31 +138,31 @@ class WPGH_Funnels_Table extends WP_List_Table {
                     'last_year'     => _x( 'Last Year', 'reporting_range', 'groundhogg' ),
                     'custom'        => _x( 'Custom Range', 'reporting_range', 'groundhogg' ),
                 ),
-                'selected' => WPGH()->menu->funnels_page->get_url_var( 'date_range', 'this_week' ),
-            ); echo WPGH()->html->dropdown( $args );
+                'selected' => WPGH()->menu->funnels_page->get_url_var( 'date_range', 'this_week' ), //todo
+            ); echo Plugin::$instance->utils->html->dropdown( $args );
 
             submit_button( _x( 'Refresh', 'action', 'groundhogg' ), 'secondary', 'change_reporting', false );
 
-            $class = WPGH()->menu->funnels_page->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden';
+            $class = WPGH()->menu->funnels_page->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden'; //todo
 
             ?><div class="custom-range <?php echo $class ?> alignleft actions"><?php
 
-                echo WPGH()->html->date_picker(array(
+                echo Plugin::$instance->utils->html->date_picker(array(
                     'name'  => 'custom_date_range_start',
                     'id'    => 'custom_date_range_start',
                     'class' => 'input',
-                    'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_start' ),
+                    'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_start' ), //todo
                     'attributes' => '',
                     'placeholder' => 'YYY-MM-DD',
                     'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
                     'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
                     'format' => 'yy-mm-dd'
                 ));
-                echo WPGH()->html->date_picker(array(
+                echo Plugin::$instance->utils->html->date_picker(array(
                     'name'  => 'custom_date_range_end',
                     'id'    => 'custom_date_range_end',
                     'class' => 'input',
-                    'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_end' ),
+                    'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_end' ), //todo
                     'attributes' => '',
                     'placeholder' => 'YYY-MM-DD',
                     'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
@@ -226,13 +232,13 @@ class WPGH_Funnels_Table extends WP_List_Table {
     protected function column_active_contacts( $funnel )
     {
 
-        $query  = new WPGH_Contact_Query();
+        $query  = new Contact_Query();
 
         $count = $query->query( array(
             'count'  => true,
             'report' => array(
-                'start'     => WPGH()->menu->funnels_page->reporting_start_time,
-                'end'       => WPGH()->menu->funnels_page->reporting_end_time,
+                'start'     => WPGH()->menu->funnels_page->reporting_start_time, //todo
+                'end'       => WPGH()->menu->funnels_page->reporting_end_time, //todo
                 'funnel'    => $funnel->ID
             )
         ) );
@@ -356,24 +362,24 @@ class WPGH_Funnels_Table extends WP_List_Table {
 
             case 'active':
 
-                $data = WPGH()->funnels->get_funnels( array( 'status' => 'active' ) );
+                $data = Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'active' ) );
 
                 break;
             case 'inactive':
 
-                $data = WPGH()->funnels->get_funnels( array( 'status' => 'inactive' ) );
+                $data = Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'inactive' ) );
 
                 break;
             case 'archived':
 
-                $data = WPGH()->funnels->get_funnels( array( 'status' => 'archived' ) );
+                $data = Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'archived' ) );
 
                 break;
             default:
 
                 $data = array_merge(
-                    WPGH()->funnels->get_funnels( array( 'status' => 'inactive' ) ),
-                    WPGH()->funnels->get_funnels( array( 'status' => 'active' ) )
+                    Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'inactive' ) ),
+                    Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'active' ) )
                 );
 
                 break;

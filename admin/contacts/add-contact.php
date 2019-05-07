@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg\Admin\Contacts;
+
+use Groundhogg\Plugin;
+
 /**
  * Add a contact via the Admin "ADD NEW" button
  *
@@ -47,7 +51,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                     'id'    => 'first_name',
                     'name'  => 'first_name',
                 );
-                echo WPGH()->html->input( $args ); ?></td>
+
+                echo Plugin::$instance->utils->html->input( $args ); ?></td>
         </tr>
         <tr>
             <th><label for="last_name"><?php echo __( 'Last Name', 'groundhogg' )?></label></th>
@@ -55,7 +60,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                     'id'    => 'last_name',
                     'name'  => 'last_name',
                 );
-                echo WPGH()->html->input( $args ); ?></td>
+                echo Plugin::$instance->utils->html->input( $args ); ?></td>
         </tr>
         <?php do_action( 'wpgh_contact_add_new_name' ); ?>
         </tbody>
@@ -70,7 +75,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                     'id'    => 'email',
                     'name'  => 'email',
                 );
-                echo WPGH()->html->input( $args ); ?></td>
+                echo Plugin::$instance->utils->html->input( $args ); ?></td>
         </tr>
         <tr>
             <th><label for="primary_phone"><?php echo __( 'Primary Phone', 'groundhogg' )?></label></th>
@@ -79,7 +84,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                     'id'    => 'primary_phone',
                     'name'  => 'primary_phone',
                 );
-                echo WPGH()->html->input( $args ); ?></td>
+                echo Plugin::$instance->utils->html->input( $args ); ?></td>
         </tr>
         <tr>
             <th><label for="phone_extension"><?php echo __( 'Phone Extension', 'groundhogg' )?></label></th>
@@ -87,7 +92,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                     'id'    => 'primary_phone_extension',
                     'name'  => 'primary_phone_extension',
                 );
-                echo WPGH()->html->input( $args ); ?></td>
+                echo Plugin::$instance->utils->html->input( $args ); ?></td>
         </tr>
         <?php do_action( 'wpgh_contact_add_new_contact_info' ); ?>
         </tbody>
@@ -97,14 +102,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         <tbody>
         <tr>
             <th><?php _e( 'Owner', 'groundhogg' ); ?></th>
-            <td><?php echo WPGH()->html->dropdown_owners(); ?>
+            <td><?php echo Plugin::$instance->utils->html->dropdown_owners(); ?>
             </td>
         </tr>
         <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
             <td>
                 <div style="max-width: 400px;">
-                    <?php $args = array(); echo WPGH()->html->tag_picker( $args ); ?>
+                    <?php $args = array(); echo Plugin::$instance->utils->html->tag_picker( $args ); ?>
                 </div>
 
             </td>
@@ -121,7 +126,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                     'name'  => 'notes',
                     'value' => '',
                 );
-                echo WPGH()->html->textarea( $args ); ?></td>
+                echo Plugin::$instance->utils->html->textarea( $args ); ?></td>
         </tr>
         <?php do_action( 'wpgh_contact_add_new_notes' ); ?>
         </tbody>
@@ -138,23 +143,23 @@ if ( $active_tab === 'form' ): ?>
         <th><?php _ex( 'Internal Form', 'contact_record', 'groundhogg' ); ?></th>
         <td>
             <div style="max-width: 400px;">
-                <?php $forms = WPGH()->steps->get_steps( array(
+                <?php $forms = Plugin::$instance->dbs->get_db('steps')->query( [
                     'step_type' => 'form_fill'
-                ) );
+                ] );
 
                 $form_options = array();
                 $default = 0;
                 foreach ( $forms as $form ){
                     if ( ! $default ){$default = $form->ID;}
-                    $step = wpgh_get_funnel_step( $form->ID );
+                    $step = wpgh_get_funnel_step( $form->ID ); //todo
                     if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
                 }
 
-                if ( gisset_not_empty( $_GET, 'form' ) ){
+                if ( gisset_not_empty( $_GET, 'form' ) ){ //todo
                     $default = intval( $_GET[ 'form' ] );
                 }
 
-                echo WPGH()->html->select2( array(
+                echo Plugin::$instance->utils->html->select2( array(
                     'name'              => 'manual_form_submission',
                     'id'                => 'manual_form_submission',
                     'class'             => 'manual-submission gh-select2',

@@ -1,4 +1,12 @@
 <?php
+namespace Groundhogg\Admin\Contacts;
+
+use \WP_List_Table;
+use Groundhogg\Plugin;
+use Groundhogg\Contact;
+use Groundhogg\Contact_Query;
+
+
 /**
  * Contacts Table Class
  *
@@ -21,7 +29,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_Contacts_Table extends WP_List_Table {
+class Contacts_Table extends WP_List_Table {
 
     private $query;
 
@@ -77,31 +85,31 @@ class WPGH_Contacts_Table extends WP_List_Table {
     }
 
     /**
-     * @param $contact WPGH_Contact
+     * @param $contact Contact
      * @return string
      */
     protected function column_email( $contact )
     {
 
-        $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->ID );
-        $html  = '<div id="inline_' . intval( $contact->ID ). '" class="hidden">';
-        $html .= '  <div class="email">' . esc_html( $contact->email ). '</div>';
-        $html .= '  <div class="first_name">' . esc_html( $contact->first_name ). '</div>';
-        $html .= '  <div class="last_name">' . esc_html( $contact->last_name ). '</div>';
-        $html .= '  <div class="optin_status">' . esc_html( $contact->optin_status ). '</div>';
-        if ( $contact->owner ){
-            $html .= '  <div class="owner">' . esc_html( $contact->owner->ID ). '</div>';
+        $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() );
+        $html  = '<div id="inline_' . intval( $contact->get_id() ). '" class="hidden">';
+        $html .= '  <div class="email">' . esc_html( $contact->get_email() ). '</div>';
+        $html .= '  <div class="first_name">' . esc_html( $contact->get_first_name() ). '</div>';
+        $html .= '  <div class="last_name">' . esc_html( $contact->get_last_name() ). '</div>';
+        $html .= '  <div class="optin_status">' . esc_html( $contact->get_optin_status() ). '</div>';
+        if ( $contact->get_owner_id() ){
+            $html .= '  <div class="owner">' . esc_html( $contact->get_owner_id() ). '</div>';
         }
-        $html .= '  <div class="tags">' . esc_html( json_encode( $contact->tags ) ). '</div>';
-        $html .= '  <div class="tags-data">' . esc_html( json_encode( wpgh_format_tags_for_select2( $contact->tags ) ) ) . '</div>';
+        $html .= '  <div class="tags">' . esc_html( json_encode( $contact->get_tags() ) ). '</div>';
+        $html .= '  <div class="tags-data">' . esc_html( json_encode( wpgh_format_tags_for_select2( $contact->get_tags() ) ) ) . '</div>';
         $html .= '</div>';
 
 
         $html .= "<strong>";
 
-        $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->email ) . "</a>";
+        $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->get_email() ) . "</a>";
 
-        if ( $contact->optin_status === WPGH_UNCONFIRMED && ( ! isset( $_REQUEST[ 'optin_status' ] ) || $_REQUEST[ 'optin_status' ] !== 'unconfirmed' ) ){
+        if ( $contact->get_optin_status() === WPGH_UNCONFIRMED && ( ! isset( $_REQUEST[ 'optin_status' ] ) || $_REQUEST[ 'optin_status' ] !== 'unconfirmed' ) ){
             $html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Unconfirmed', 'status', 'groundhogg' ) . ")</span>";
         }
 
@@ -112,49 +120,49 @@ class WPGH_Contacts_Table extends WP_List_Table {
     }
 
     /**
-     * @param $contact WPGH_Contact
+     * @param $contact Contact
      * @return string
      */
     protected function column_first_name( $contact )
     {
-        return $contact->first_name ? $contact->first_name : '&#x2014;' ;
+        return $contact->get_first_name() ? $contact->get_first_name() : '&#x2014;' ;
     }
 
     /**
-     * @param $contact WPGH_Contact
+     * @param $contact Contact
      * @return string
      */
     protected function column_last_name( $contact )
     {
-        return $contact->last_name ? $contact->last_name : '&#x2014;' ;
+        return $contact->get_last_name() ? $contact->get_last_name() : '&#x2014;' ;
     }
 
     /**
-     * @param $contact WPGH_Contact
+     * @param $contact Contact
      * @return string
      */
     protected function column_user_id( $contact )
     {
-        $user = get_user_by( 'email', $contact->email );
+        $user = get_user_by( 'email', $contact->get_email() );
         return $user ? '<a href="'.admin_url('user-edit.php?user_id='.$user->ID ).'">'.$user->display_name.'</a>' :  '&#x2014;';
     }
 
     /**
-     * @param $contact WPGH_Contact
+     * @param $contact Contact
      * @return string
      */
     protected function column_owner_id( $contact )
     {
-        return ! empty( $contact->owner->ID ) ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=owner&owner=' . $contact->owner->ID ).'">'. $contact->owner->user_login .'</a>' :  '&#x2014;';
+        return ! empty( $contact->get_owner_id() ) ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=owner&owner=' . $contact->get_owner_id() ).'">'. $contact->owner->user_login .'</a>' :  '&#x2014;';
     }
 
     /**
-     * @param $contact WPGH_Contact
+     * @param $contact Contact
      * @return string
      */
     protected function column_date_created( $contact )
     {
-        $dc_time = mysql2date( 'U', $contact->date_created );
+        $dc_time = mysql2date( 'U', $contact->get_date_created() );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $dc_time - $cur_time;
         $time_prefix = __( 'Created', 'groundhogg' );
@@ -181,14 +189,14 @@ class WPGH_Contacts_Table extends WP_List_Table {
     /**
      * Get value for checkbox column.
      *
-     * @param object $contact A singular item (one full row's worth of data).
+     * @param  $contact Contact A singular item (one full row's worth of data).
      * @return string Text to be placed inside the column <td>.
      */
     protected function column_cb( $contact ) {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $contact->ID                // The value of the checkbox should be the record's ID.
+            $contact->get_id()                // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -227,11 +235,11 @@ class WPGH_Contacts_Table extends WP_List_Table {
         $view = isset($_REQUEST['optin_status']) ? $_REQUEST['optin_status'] : 'all';
 
         $count = array(
-            'unconfirmed'   => WPGH()->contacts->count( array( 'optin_status' => WPGH_UNCONFIRMED   ) ),
-            'confirmed'     => WPGH()->contacts->count( array( 'optin_status' => WPGH_CONFIRMED     ) ),
-            'opted_out'     => WPGH()->contacts->count( array( 'optin_status' => WPGH_UNSUBSCRIBED  ) ),
-            'spam'          => WPGH()->contacts->count( array( 'optin_status' => WPGH_SPAM          ) ),
-            'bounce'        => WPGH()->contacts->count( array( 'optin_status' => WPGH_HARD_BOUNCE   ) ),
+            'unconfirmed'   => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_UNCONFIRMED   ] ),
+            'confirmed'     => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_CONFIRMED     ] ),
+            'opted_out'     => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_UNSUBSCRIBED  ] ),
+            'spam'          => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_SPAM          ] ),
+            'bounce'        => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_HARD_BOUNCE   ] ),
         );
 
         return apply_filters( 'contact_views', array(
@@ -279,7 +287,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
         }
 
-        if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
+        if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){ //todo
             $query[ 'owner' ] = get_current_user_id();
         }
 
@@ -415,8 +423,8 @@ class WPGH_Contacts_Table extends WP_List_Table {
                 break;
         }
 
-        $c_query = new WPGH_Contact_Query();
-
+        $c_query = new Contact_Query();
+        // todo change constant
         if ( empty( $query ) ){
             $query[ 'optin_status' ] = array(
                 WPGH_CONFIRMED,
@@ -473,7 +481,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
     /**
      * Generates and displays row action superlinks.
      *
-     * @param object $contact        Contact being acted upon.
+     * @param $contact Contact Contact being acted upon.
      * @param string $column_name Current column name.
      * @param string $primary     Primary column name.
      * @return string Row steps output for posts.
@@ -484,7 +492,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
         }
 
         $actions = array();
-        $title = $contact->email;
+        $title = $contact->get_email();
 
         $actions['inline hide-if-no-js'] = sprintf(
             '<a href="#" class="editinline" aria-label="%s">%s</a>',
@@ -506,7 +514,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
         if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] === 'spam' ){
             $actions['unspam'] = sprintf(
 		        '<a href="%s" class="unspam" aria-label="%s">%s</a>',
-		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=unspam')),
+		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->get_id() .'&action=unspam')),
 		        /* translators: %s: title */
 		        esc_attr( sprintf( _x( 'Mark %s as approved.', 'action', 'groundhogg' ), $title ) ),
 		        __( 'Approve' )
@@ -514,7 +522,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
         } else if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] === 'bounce' ){
 	        $actions['unbounce'] = sprintf(
 		        '<a href="%s" class="unbounce" aria-label="%s">%s</a>',
-		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=unbounce')),
+		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->get_id() .'&action=unbounce')),
 		        /* translators: %s: title */
 		        esc_attr( sprintf( _x( 'Mark %s as a valid email.', 'action', 'groundhogg' ), $title ) ),
 		        _x( 'Valid Email', 'action', 'groundhogg' )
@@ -522,7 +530,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
         } else {
 	        $actions['spam'] = sprintf(
 		        '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=spam')),
+		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->get_id() .'&action=spam')),
 		        /* translators: %s: title */
 		        esc_attr( sprintf( _x( 'Mark %s as spam', 'action', 'groundhogg' ), $title ) ),
 		        __( 'Spam' )
@@ -531,7 +539,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->ID .'&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->get_id() .'&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )
@@ -548,7 +556,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
     {
         ?>
         <tr id="contact-<?php echo $item->ID; ?>">
-            <?php $this->single_row_columns( wpgh_get_contact( $item->ID ) ); ?>
+            <?php $this->single_row_columns(  Plugin::$instance->utils->get_contact( $item->ID ) ); ?>
         </tr>
         <?php
     }
@@ -577,7 +585,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
         }
         ?>
         <div class="alignleft gh-actions bulk-tag-action hidden">
-            <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo WPGH()->html->tag_picker( [
+            <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo Plugin::$instance->utils->html->tag_picker( [
                     'name'              => 'bulk_tags[]',
                     'id'                => 'bulk_tags',
                     'class'             => 'gh-tag-picker',
@@ -589,7 +597,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
                 ] ); ?></div>
         </div>
         <div class="alignleft gh-actions">
-            <a class="button action " href="<?php echo WPGH()->menu->tools->exporter->get_start_url( $this->query ); ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
+            <a class="button action " href="<?php echo  WPGH()->menu->tools->exporter->get_start_url( $this->query ); //todo  ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
         </div>
 <!--        -->
 <!--        <div class="alignleft gh-actions">-->
@@ -644,7 +652,7 @@ class WPGH_Contacts_Table extends WP_List_Table {
                             <label class="inline-edit-tags">
                                 <span class="title"><?php _e('Tags'); ?></span>
                             </label>
-                            <?php echo WPGH()->html->dropdown( array( 'id' => 'tags', 'name' => 'tags[]' ) ); ?>
+                            <?php echo Plugin::$instance->utils->html->dropdown( array( 'id' => 'tags', 'name' => 'tags[]' ) ); ?>
                         </div>
                     </fieldset>
                     <div class="submit inline-edit-save">

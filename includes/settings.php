@@ -147,5 +147,5 @@ class Settings
             return set_transient( $key, $value, $exp );
         }
     }
-    
+
 }

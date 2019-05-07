@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg\Admin\Contacts;
+
+use Groundhogg\Plugin;
+
 /**
  * Submit a form manually via the admin
  *
@@ -19,12 +23,14 @@ if ( ! isset( $_GET[ 'form' ] ) ){
 }
 
 $form_id = intval( $_GET[ 'form' ] );
-$step = wpgh_get_funnel_step( $form_id );
+
+//$step = wpgh_get_funnel_step( $form_id );
+$step = Plugin::$instance->utils->get_step( $form_id ); //todo check
 $contact_id = intval( $_GET[ 'contact' ] );
 
 ?>
 <!-- Title -->
-<span class="hidden" id="new-title"><?php echo $step->title ?> &lsaquo; </span>
+<span class="hidden" id="new-title"><?php echo $step->get_title() ?> &lsaquo; </span>
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
@@ -33,15 +39,14 @@ $contact_id = intval( $_GET[ 'contact' ] );
         <th><?php _ex( 'Internal Form', 'contact_record', 'groundhogg' ); ?></th>
         <td>
             <div style="max-width: 400px;">
-                <?php $forms = WPGH()->steps->get_steps( array(
-                    'step_type' => 'form_fill'
-                ) );
-
+                <?php
+                $forms = Plugin::$instance->dbs->get_db('steps')->query( [  'step_type' => 'form_fill' ] );
                 $form_options = array();
                 $default = 0;
                 foreach ( $forms as $form ){
                     if ( ! $default ){$default = $form->ID;}
-                    $step = wpgh_get_funnel_step( $form->ID );
+//                    $step = wpgh_get_funnel_step( $form->ID ); todo check
+                    $step = Plugin::$instance->utils->get_step( $form->ID );
                     if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
                 }
 
@@ -49,7 +54,8 @@ $contact_id = intval( $_GET[ 'contact' ] );
                     $default = intval( $_GET[ 'form' ] );
                 }
 
-                echo WPGH()->html->select2( array(
+
+                echo Plugin::$instance->utils->html->select2( [
                     'name'              => 'manual_form_submission',
                     'id'                => 'manual_form_submission',
                     'class'             => 'manual-submission gh-select2',
@@ -57,7 +63,7 @@ $contact_id = intval( $_GET[ 'contact' ] );
                     'multiple'          => false,
                     'selected'          => [ $default ],
                     'placeholder'       => 'Please Select a Form',
-                ) );
+                ] );
 
                 ?><div class="actions" style="padding: 2px 0 0;">
                     <script>var WPGHFormSubmitBaseUrl = '<?php printf( 'admin.php?page=gh_contacts&action=form&contact=%d&form=', $contact_id ); ?>';</script>

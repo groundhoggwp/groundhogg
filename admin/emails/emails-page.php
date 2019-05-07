@@ -1,7 +1,10 @@
 <?php
 namespace Groundhogg\Admin\Emails;
-use Groundhogg\Admin\Admin_Page;
 
+use Groundhogg;
+use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Plugin;
+use Groundhogg\Email;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -23,41 +26,46 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Emails_Page extends Admin_Page
 {
-    /**
-     * @var WPGH_Notices
-     */
-    public $notices;
 
-    public $order = 25;
-
-    /**
-     * WPGH_Emails_Page constructor.
-     */
-    function __construct()
+    protected function add_ajax_actions()
     {
-
-        add_action( 'admin_menu', array( $this, 'register' ), $this->order );
-
-        /* Ajax functions */
         add_action( 'wp_ajax_gh_update_email', array( $this, 'update_email_ajax' ) );
         add_action( 'wp_ajax_get_my_emails_search_results', array( $this, 'get_my_emails_search_results' ) );
+    }
 
-        $this->notices = WPGH()->notices;
-        if ( isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_emails' ){
+    protected function add_additional_actions()
+    {
+        // todo
 
-            add_action( 'init' , array( $this, 'process_action' )  );
-            add_action( 'admin_enqueue_scripts' , array( $this, 'scripts' )  );
-
-            if ( $this->get_action() === 'edit' ){
-                add_action( 'in_admin_header' , array( $this, 'prevent_notices' )  );
-            }
-
+        if ( $this->get_current_action() === 'edit' ){
+            add_action( 'in_admin_header' , array( $this, 'prevent_notices' )  );
         }
     }
 
+    public function get_slug()
+    {
+        return 'gh_emails';
+    }
+
+    public function get_name()
+    {
+        return _x( 'Emails', 'page_title', 'groundhogg' );
+    }
+
+    public function get_cap()
+    {
+        return 'edit_emails';
+    }
+
+    public function get_item_type()
+    {
+        return 'email';
+    }
+
+
     public function scripts()
     {
-        if ( $this->get_action() === 'edit' ){
+        if ( $this->get_current_action() === 'edit' ){
 
             wp_enqueue_script( 'jquery-ui-sortable' );
             wp_enqueue_script( 'jquery-ui-draggable' );
@@ -88,26 +96,12 @@ class Emails_Page extends Admin_Page
 
         }
 
-        if ( $this->get_action() === 'add' || $this->get_action() === 'edit' ){
-	        wp_enqueue_script( 'groundhogg-admin-iframe' );
-	        wp_enqueue_style( 'groundhogg-admin-iframe' );
+        if ( $this->get_current_action() === 'add' || $this->get_current_action() === 'edit' ){
+            wp_enqueue_script( 'groundhogg-admin-iframe' );
+            wp_enqueue_style( 'groundhogg-admin-iframe' );
         }
     }
 
-
-    public function register()
-    {
-        $page = add_submenu_page(
-            'groundhogg',
-            _x( 'Emails', 'page_title', 'groundhogg' ),
-            _x( 'Emails', 'page_title', 'groundhogg' ),
-            'edit_emails',
-            'gh_emails',
-            array($this, 'page')
-        );
-
-        add_action("load-" . $page, array($this, 'help'));
-    }
 
     public function help()
     {
@@ -151,232 +145,258 @@ class Emails_Page extends Admin_Page
 
 
     /**
-     * Get affected emails
-     *
-     * @return array|bool
-     */
-    function get_emails()
-    {
-        $emails = isset( $_REQUEST['email'] ) ? $_REQUEST['email'] : null;
-
-        if ( ! $emails )
-            return false;
-
-        return is_array( $emails )? array_map( 'intval', $emails ) : array( intval( $emails ) );
-    }
-
-    /**
-     * Get the action
-     *
-     * @return bool|string
-     */
-    function get_action()
-    {
-        if ( isset( $_REQUEST['filter_action'] ) && ! empty( $_REQUEST['filter_action'] ) )
-            return false;
-
-        if ( isset( $_REQUEST['action'] ) && -1 != $_REQUEST['action'] )
-            return $_REQUEST['action'];
-
-        if ( isset( $_REQUEST['action2'] ) && -1 != $_REQUEST['action2'] )
-            return $_REQUEST['action2'];
-
-        return false;
-    }
-
-    /**
-     * Get the last completed action
-     *
-     * @return mixed
-     */
-    function get_previous_action()
-    {
-        $action = get_transient( 'gh_last_action' );
-
-        delete_transient( 'gh_last_action' );
-
-        return $action;
-    }
-
-    /**
      * Get the title of the current page
      */
     function get_title()
     {
-        switch ( $this->get_action() ){
+        switch ( $this->get_current_action() ){
             case 'add':
-                _e( 'Add Email' , 'groundhogg' );
+                return _x( 'Add Email' , 'page_title', 'groundhogg' );
                 break;
             case 'edit':
-                _e( 'Edit Email' , 'groundhogg' );
+                return _x( 'Edit Email' ,'page_title', 'groundhogg' );
                 break;
+            case 'view':
             default:
-                _e( 'Emails', 'groundhogg' );
+                return _x( 'Emails', 'page_title', 'groundhogg' );
+                break;
         }
     }
 
     /**
-     * Process the current action based on the admin view and any post variables
+     * @return array|array[]
      */
-    function process_action()
+    protected function get_title_actions()
     {
-        if ( ! $this->get_action() || ! $this->verify_action() )
-            return;
+        return [
+            [
+                'link' => $this->admin_url( [ 'action' => 'add' ] ),
+                'action' => __( 'Add New', 'groundhogg' ),
+                'target' => '_self',
+            ],
+            [
+                'link' => Plugin::$instance->admin->get_page( 'broadcasts' )->admin_url( [ 'action' => 'add', 'type' => 'email' ] ),
+                'action' => __( 'Broadcast', 'groundhogg' ),
+                'target' => '_self',
+            ]
+        ];
+    }
 
-        $base_url = remove_query_arg( array( '_wpnonce', 'action' ), wp_get_referer() );
+    public function process_restore()
+    {
+        if ( ! current_user_can( 'edit_emails' ) ){
+            $this->wp_die_no_access();
+        }
 
-        switch ( $this->get_action() )
+        foreach ( $this->get_items() as $id ) //todo
         {
-            case 'add':
-
-                if ( ! current_user_can( 'add_emails' ) ){
-                    wp_die( WPGH()->roles->error( 'add_emails' ) );
-                }
-
-                if ( ! empty( $_POST ) ) {
-
-                    $this->add_email();
-
-                }
-
-                break;
-
-            case 'edit':
-
-                if ( ! current_user_can( 'edit_emails' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_emails' ) );
-                }
-
-                if ( ! empty( $_POST ) ){
-
-                    $this->update_email();
-
-                }
-
-                break;
-
-            case 'trash':
-
-                if ( ! current_user_can( 'edit_emails' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_emails' ) );
-                }
-
-                foreach ( $this->get_emails() as $id ) {
-
-                    $args = array( 'status' => 'trash' );
-
-                    WPGH()->emails->update( $id, $args );
-
-                }
-
-	            $this->notices->add(
-		            esc_attr( 'trashed' ),
-		            sprintf( "%s %d %s",
-			            __( 'Trashed' ),
-			            count( $this->get_emails() ),
-			            __( 'Emails', 'groundhogg' ) ),
-		            'success'
-	            );
-
-                do_action( 'wpgh_trash_emails' );
-
-                break;
-
-            case 'delete':
-
-                if ( ! current_user_can( 'delete_emails' ) ){
-                    wp_die( WPGH()->roles->error( 'delete_emails' ) );
-                }
-
-                foreach ( $this->get_emails() as $id ){
-                    WPGH()->emails->delete( $id );
-                }
-
-                $this->notices->add(
-		            esc_attr( 'deleted' ),
-		            sprintf( "%s %d %s",
-			            __( 'Deleted' ),
-			            count( $this->get_emails() ),
-			            __( 'Emails', 'groundhogg' ) ),
-		            'success'
-	            );
-
-                do_action( 'wpgh_delete_emails' );
-
-                break;
-
-            case 'empty_trash':
-
-                if ( ! current_user_can( 'delete_emails' ) ){
-                    wp_die( WPGH()->roles->error( 'delete_emails' ) );
-                }
-
-                $emails = WPGH()->emails->get_emails( array( 'status' => 'trash' ) );
-
-                foreach ( $emails as $email ){
-                    WPGH()->emails->delete( $email->ID );
-                }
-
-                $this->notices->add(
-                    esc_attr( 'deleted' ),
-                    sprintf( "%s %d %s",
-                        __( 'Deleted' ),
-                        count( $emails ),
-                        __( 'Emails', 'groundhogg' ) ),
-                    'success'
-                );
-
-                break;
-
-            case 'restore':
-
-                if ( ! current_user_can( 'edit_emails' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_emails' ) );
-                }
-
-                foreach ( $this->get_emails() as $id )
-                {
-                    $args = array( 'status' => 'draft' );
-
-                    WPGH()->emails->update( $id, $args );                }
-
-                $this->notices->add(
-		            esc_attr( 'restored' ),
-		            sprintf( "%s %d %s",
-			            __( 'Restored' ),
-			            count( $this->get_emails() ),
-			            __( 'Emails', 'groundhogg' ) ),
-		            'success'
-	            );
-
-                do_action( 'wpgh_restore_emails' );
-
-                break;
-
+            Plugin::$instance->dbs->get_db('emails')->update( $id , [ 'status' => 'draft' ] );
         }
 
-        set_transient( 'gh_last_action', $this->get_action(), 30 );
+        $this->add_notice(
+            esc_attr( 'restored' ),
+            sprintf( "%s %d %s",
+                __( 'Restored' ),
+                count( $this->get_items() ),
+                __( 'Emails', 'groundhogg' ) ),
+            'success'
+        );
 
-        if ( $this->get_action() === 'edit' || $this->get_action() === 'add' )
-            return;
+        return true;
+    }
 
-        $this->get_emails();
+    public function process_empty_trash()
+    {
 
-        if ( $this->get_emails() ){
-            $base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_emails() ) ), $base_url );
+        if ( ! current_user_can( 'delete_emails' ) ){
+            $this->wp_die_no_access();
         }
 
-        wp_redirect( $base_url );
-        die();
+        $emails = Plugin::$instance->dbs->get_db('emails')->query( [ 'status' => 'trash' ] );
+
+        foreach ( $emails as $email ){
+            Plugin::$instance->dbs->get_db('emails')->delete( $email->ID );
+        }
+
+        $this->add_notice(
+            esc_attr( 'deleted' ),
+            sprintf( "%s %d %s",
+                __( 'Deleted' ),
+                count( $emails ),
+                __( 'Emails', 'groundhogg' ) ),
+            'success'
+        );
+
+        return true;
+    }
+
+    public function process_delete()
+    {
+        if ( ! current_user_can( 'delete_emails' ) ){
+            $this->wp_die_no_access();
+        }
+
+        foreach ( $this->get_items() as $id ){
+            if ( ! Plugin::$instance->dbs->get_db( 'emails' )->delete( $id ) ){
+                return new \WP_Error( 'unable_to_delete_email', "Something went wrong deleting the email." );
+            }
+        }
+
+        $this->add_notice(
+            esc_attr( 'deleted' ),
+            sprintf( "%s %d %s",
+                __( 'Deleted' ),
+                count( $this->get_items() ),
+                __( 'Emails', 'groundhogg' ) ),
+            'success'
+        );
+
+        return true;
+    }
+
+    public function process_trash()
+    {
+        if ( ! current_user_can( 'edit_emails' ) ){
+           $this->wp_die_no_access();
+        }
+
+        foreach ( $this->get_items() as $id ) {
+            Plugin::$instance->dbs->get_db('emails')->update( $id , [ 'status' => 'trash' ] );
+        }
+
+        $this->add_notice(
+            esc_attr( 'trashed' ),
+            sprintf( "%s %d %s",
+                __( 'Trashed' ),
+                count( $this->get_items() ),
+                __( 'Emails', 'groundhogg' ) ),
+            'success'
+        );
+
+        return true;
+    }
+
+    private function process_edit()
+    {
+        if ( ! current_user_can( 'edit_emails' ) ){
+            $this->wp_die_no_access();
+        }
+
+        $id = intval( $_REQUEST[ 'email' ] );
+
+        //do_action( 'wpgh_email_update_before', $id ); todo
+
+        $args = array();
+
+        $status = ( isset( $_POST['email_status'] ) )? sanitize_text_field( trim( wp_unslash( $_POST['email_status'] ) ) ): 'draft';
+        $args[ 'status' ] = $status;
+
+        if ( $status === 'draft' ) {
+            $this->add_notice( 'email-in-draft-mode', __( 'This email will not be sent while in DRAFT mode.', 'groundhogg' ), 'info' );
+        }
+
+        $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
+        $args[ 'from_user' ] = $from_user;
+
+        if ( $from_user > 0 ){
+            $user = get_userdata( $from_user );
+            if ( !  wpgh_email_is_same_domain( $user->user_email ) ){ //todo
+                $this->add_notice( 'email-cross-domain-warning', sprintf( __( 'You are sending this email from an email address (%s) which does not belong to this server. This may cause deliverability issues and harm your sender reputation.', 'groundhogg' ), $user->user_email ), 'warning' );
+            }
+        }
+
+        $subject =  ( isset( $_POST['subject'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['subject'] ) ) ) ): '';
+        $args[ 'subject' ] = $subject;
+
+        $pre_header =  ( isset( $_POST['pre_header'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['pre_header'] ) ) ) ): '';
+        $args[ 'pre_header' ] = $pre_header;
+
+        //todo
+        $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpgh_sanitize_email_content', Plugin::$instance->utils-> wpgh_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
+        $args[ 'content' ] = $content;
+
+        $args[ 'last_updated' ] = current_time( 'mysql' );
+
+        $args[ 'is_template' ] = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
+
+
+        if ( Plugin::$instance->dbs->get_db('emails')->update( $id, $args ) ){
+            $this->add_notice( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
+        } else {
+            $this->add_notice( 'email-update-error', __( 'Something went wrong.', 'groundhogg' ), 'error' );
+        }
+
+        $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
+        Plugin::$instance->dbs->get_db('emailmeta' )->update_meta( $id, 'alignment', $alignment );
+
+
+        $browser_view =  ( isset( $_POST['browser_view'] ) )? 1 : false;
+        Plugin::$instance->dbs->get_db('emailmeta' )->update_meta( $id, 'browser_view', $browser_view ); //todo
+
+//        do_action( 'wpgh_email_update_after', $id ); todo
+
+        if ( isset( $_POST['send_test'] ) ){
+
+            if ( ! current_user_can( 'send_emails' ) ){
+                $this->wp_die_no_access();
+            }
+
+//            do_action( 'wpgh_before_send_test_email', $id ); todo
+
+            $test_email_uid =  ( isset( $_POST['test_email'] ) )? intval( $_POST['test_email'] ): '';
+
+            if ( $test_email_uid ){
+
+                Plugin::$instance->dbs->get_db('emailmeta' )->update_meta( $id, 'test_email', $test_email_uid  ); //todo
+
+                $email = new Email( $id ); // todo Email not found
+
+                $email->enable_test_mode(); //todo
+
+                $user = get_userdata( $test_email_uid );
+
+                if ( ! Plugin::$instance->dbs->get_db('contacts')->exists( $user->user_email ) ){
+                    wpgh_create_contact_from_user( $user ); //todo
+                }
+
+                $contact = Plugin::$instance->utils->get_contact( $user->user_email );
+
+                $sent = $contact->exists() ? $email->send( $contact ) : false; //todo
+
+                if ( ! $sent || is_wp_error( $sent ) ){
+                    if ( is_wp_error( $sent ) ){
+//                        $this->notices->add( $sent );
+                        $this->add_notice($sent);
+                    } else {
+                        return new \WP_Error( 'oops', "Failed to send test:" . $email->get_error_message() ); //todo
+                    }
+                } else {
+
+
+                    $this->add_notice(
+                        esc_attr( 'sent-test' ),
+                        sprintf( "%s %s",
+                            __( 'Sent test email to', 'groundhogg' ),
+                            get_userdata( $test_email_uid )->user_email ),
+                        'success'
+                    );
+                }
+
+                do_action( 'wpgh_after_send_test_email', $id ); //todo
+            } else {
+                return new \WP_Error( 'oops', __( 'Failed to send test: No user selected. PLease select a user to send the test to.', 'groundhogg' ) );
+            }
+        }
+        return true;
     }
 
     /**
      * Create an email and then redirect to the edit page
      */
-    private function add_email()
+    public function process_add()
     {
         if ( ! current_user_can( 'add_emails' ) ){
-            wp_die( WPGH()->roles->error( 'add_emails' ) );
+            $this->wp_die_no_access();
         }
 
         $args = [];
@@ -394,28 +414,26 @@ class Emails_Page extends Admin_Page
 
         } else if ( isset( $_POST[ 'email_id' ] ) ) {
 
-            $email = WPGH()->emails->get( intval( $_POST['email_id'] ) );
+
+            $email = Plugin::$instance->dbs->get_db('emails' )->get( intval( $_POST['email_id'] ) );
             $args[ 'content' ] = $email->content;
             $args[ 'subject' ] = sprintf( "%s - (copy)", $email->subject );
             $args[ 'pre_header' ] = $email->pre_header;
 
         } else {
 
-            $this->notices->add( 'ooops', __( 'Could not create email.', 'groundhogg' ), 'error' );
-            return;
-
+            return new \WP_Error( 'ooops',  __( 'Could not create email.', 'groundhogg' ) );
         }
 
         $args[ 'author' ] = get_current_user_id();
         $args[ 'from_user' ] = get_current_user_id();
 
-        $email_id = WPGH()->emails->add( $args );
+
+        $email_id = Plugin::$instance->dbs->get_db('emails')->add($args);
 
         if ( ! $email_id ){
 
-            $this->notices->add( 'ooops', __( 'Could not create email.', 'groundhogg' ), 'error' );
-            return;
-
+            return new \WP_Error( 'ooops',  __( 'Could not create email.', 'groundhogg' ) );
         }
 
         $return_path = admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id );
@@ -426,16 +444,13 @@ class Emails_Page extends Admin_Page
             $step_id = intval( $_GET['return_step'] );
             $funnel_id = intval( $_GET['return_funnel'] );
             $return_path .= sprintf( "&return_funnel=%s&return_step=%s", $funnel_id, $step_id );
-
-            WPGH()->step_meta->update_meta( $step_id, 'email_id', $email_id );
-
+            Plugin::$instance->dbs->get_db('emailmeta')->update_meta( $step_id , 'email_id' ,$email_id ); //todo Update meta
         }
 
-        do_action( 'wpgh_add_email', $email_id );
+//        do_action( 'wpgh_add_email', $email_id ); todo remove
 
-        wp_redirect( $return_path );
+        return $return_path ;
 
-        die();
     }
 
     public function update_email_ajax()
@@ -445,13 +460,14 @@ class Emails_Page extends Admin_Page
             return;
         }
 
-        $this->update_email();
+//        $this->update_email();
+        $this->process_edit();
 
         ob_start();
 
         $this->notices->notices();
 
-        $notices = ob_get_clean();
+        $notices = ob_get_clean();  // todo
 
         $response = array(
             'notices'   => $notices
@@ -461,134 +477,13 @@ class Emails_Page extends Admin_Page
 
     }
 
-    /**
-     * Update the current email
-     */
-    private function update_email()
+    public function table()
     {
-        if ( ! current_user_can( 'edit_emails' ) ){
-            wp_die( WPGH()->roles->error( 'edit_emails' ) );
+        if ( ! class_exists( 'Emails_Table' ) ){
+            include dirname(__FILE__) . '/emails-table.php';
         }
 
-        $id = intval( $_REQUEST[ 'email' ] );
-
-        do_action( 'wpgh_email_update_before', $id );
-
-        $args = array();
-
-        $status = ( isset( $_POST['email_status'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_status'] ) ) ): 'draft';
-        $args[ 'status' ] = $status;
-
-        if ( $status === 'draft' ) {
-            $this->notices->add( 'email-in-draft-mode', __( 'This email will not be sent while in DRAFT mode.', 'groundhogg' ), 'info' );
-        }
-
-        $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
-        $args[ 'from_user' ] = $from_user;
-
-        if ( $from_user > 0 ){
-            $user = get_userdata( $from_user );
-            if ( ! wpgh_email_is_same_domain( $user->user_email ) ){
-                $this->notices->add( 'email-cross-domain-warning', sprintf( __( 'You are sending this email from an email address (%s) which does not belong to this server. This may cause deliverability issues and harm your sender reputation.', 'groundhogg' ), $user->user_email ), 'warning' );
-            }
-        }
-
-        $subject =  ( isset( $_POST['subject'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['subject'] ) ) ) ): '';
-        $args[ 'subject' ] = $subject;
-
-        $pre_header =  ( isset( $_POST['pre_header'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['pre_header'] ) ) ) ): '';
-        $args[ 'pre_header' ] = $pre_header;
-
-        $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpgh_sanitize_email_content', wpgh_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
-        $args[ 'content' ] = $content;
-
-        $args[ 'last_updated' ] = current_time( 'mysql' );
-
-        $args[ 'is_template' ] = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
-
-        if ( WPGH()->emails->update( $id, $args ) ){
-            $this->notices->add( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
-        } else {
-            $this->notices->add( 'email-update-error', __( 'Something went wrong.', 'groundhogg' ), 'error' );
-        }
-
-        $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
-        WPGH()->email_meta->update_meta( $id, 'alignment', $alignment );
-
-        $browser_view =  ( isset( $_POST['browser_view'] ) )? 1 : false;
-        WPGH()->email_meta->update_meta( $id, 'browser_view', $browser_view );
-
-        do_action( 'wpgh_email_update_after', $id );
-
-        if ( isset( $_POST['send_test'] ) ){
-
-            if ( ! current_user_can( 'send_emails' ) ){
-                wp_die( WPGH()->roles->error( 'send_emails' ) );
-            }
-
-            do_action( 'wpgh_before_send_test_email', $id );
-
-            $test_email_uid =  ( isset( $_POST['test_email'] ) )? intval( $_POST['test_email'] ): '';
-
-            if ( $test_email_uid ){
-                WPGH()->email_meta->update_meta( $id, 'test_email', $test_email_uid );
-
-                $email = new WPGH_Email( $id );
-
-                $email->enable_test_mode();
-
-                $user = get_userdata( $test_email_uid );
-
-                if ( ! WPGH()->contacts->exists( $user->user_email ) ){
-                    wpgh_create_contact_from_user( $user );
-                }
-
-                $contact = wpgh_get_contact( $user->user_email );
-
-                $sent = $contact->exists() ? $email->send( $contact ) : false;
-
-                if ( ! $sent || is_wp_error( $sent ) ){
-                    if ( is_wp_error( $sent ) ){
-                        $this->notices->add( $sent );
-                    } else {
-                        $this->notices->add( 'oops', __( 'Failed to send test: ' . $email->get_error_message() ), 'error' );
-                    }
-                } else {
-                    $this->notices->add(
-                        esc_attr( 'sent-test' ),
-                        sprintf( "%s %s",
-                            __( 'Sent test email to', 'groundhogg' ),
-                            get_userdata( $test_email_uid )->user_email ),
-                        'success'
-                    );
-                }
-
-                do_action( 'wpgh_after_send_test_email', $id );
-            } else {
-
-                $this->notices->add( 'oops', __( 'Failed to send test: No user selected. PLease select a user to send the test to.', 'groundhogg' ), 'error' );
-
-            }
-
-        }
-
-    }
-
-    function verify_action()
-    {
-        if ( ! isset( $_REQUEST['_wpnonce'] ) )
-            return false;
-
-        return wp_verify_nonce( $_REQUEST[ '_wpnonce' ] ) || wp_verify_nonce( $_REQUEST[ '_wpnonce' ], $this->get_action() )|| wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'bulk-emails' );
-    }
-
-    function table()
-    {
-        if ( ! class_exists( 'WPGH_Emails_Table' ) ){
-            include dirname(__FILE__) . '/class-wpgh-emails-table.php';
-        }
-
-        $emails_table = new WPGH_Emails_Table();
+        $emails_table = new Emails_Table();
 
         $emails_table->views(); ?>
         <form method="post" class="search-form wp-clearfix" >
@@ -642,24 +537,21 @@ class Emails_Page extends Admin_Page
 
     }
 
-    function edit()
+    public function edit()
     {
 
         if ( ! current_user_can( 'edit_emails' ) ){
-            wp_die( WPGH()->roles->error( 'edit_emails' ) );
+            $this->wp_die_no_access();
         }
-
         $this->include_blocks();
         $this->get_blocks();
-
         include dirname(__FILE__) . '/email-editor.php';
-
     }
 
-    function add()
+    public function add()
     {
         if ( ! current_user_can( 'add_emails' ) ){
-            wp_die( WPGH()->roles->error( 'add_emails' ) );
+            $this->wp_die_no_access();
         }
 
         include dirname(__FILE__) . '/add-email.php';
@@ -675,10 +567,10 @@ class Emails_Page extends Admin_Page
         remove_all_actions( 'admin_notices' );
     }
 
-    function page()
+    public function view()
     {
         if ( ! current_user_can( 'edit_emails' ) ){
-            wp_die( WPGH()->roles->error( 'edit_emails' ) );
+            $this->wp_die_no_access();
         }
 
         if ( $this->get_action() === 'edit' ){
@@ -691,9 +583,9 @@ class Emails_Page extends Admin_Page
                 <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
                 <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
                 <a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add&type=email' ); ?>"><?php _ex( 'Email Broadcast', 'page_tile_action','groundhogg' ); ?></a>
-                <?php $this->notices->notices(); ?>
+                <?php $this->notices->notices(); //todo remove ?>
                 <hr class="wp-header-end">
-                <?php switch ( $this->get_action() ){
+                <?php switch ( $this->get_current_action() ){
                     case 'add':
                         $this->add();
                         break;
@@ -713,10 +605,9 @@ class Emails_Page extends Admin_Page
      */
     public function get_my_emails_search_results()
     {
-
         ob_start();
 
-        $emails = array_slice( WPGH()->emails->get_emails( [ 'search' => sanitize_text_field( stripslashes( $_POST[ 's' ] ) ) ] ), 0, 20 );
+        $emails = array_slice( Plugin::$instance->dbs->get_db('emails')->query( [ 'search' => sanitize_text_field( stripslashes( $_POST[ 's' ] ) ) ] ), 0, 20 );
 
         if ( empty( $emails ) ):
             ?> <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php
@@ -740,41 +631,4 @@ class Emails_Page extends Admin_Page
         $response = [ 'html' => ob_get_clean() ];
         wp_die( json_encode( $response ) );
     }
-
-    protected function add_ajax_actions()
-    {
-        // TODO: Implement add_ajax_actions() method.
-    }
-
-    protected function add_additional_actions()
-    {
-        // TODO: Implement add_additional_actions() method.
-    }
-
-    public function get_slug()
-    {
-        // TODO: Implement get_slug() method.
-    }
-
-    public function get_name()
-    {
-        // TODO: Implement get_name() method.
-    }
-
-    public function get_cap()
-    {
-        // TODO: Implement get_cap() method.
-    }
-
-    public function get_item_type()
-    {
-        // TODO: Implement get_item_type() method.
-    }
-
-    public function view()
-    {
-        // TODO: Implement view() method.
-    }
-
-
 }

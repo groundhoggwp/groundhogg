@@ -1,4 +1,9 @@
 <?php
+namespace Groundhogg\Admin\Contacts;
+
+use Groundhogg\Plugin;
+use Groundhogg\Contact;
+
 /**
  * Edit a contact record via the Admin
  *
@@ -35,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $id = intval( $_GET[ 'contact' ] );
 
-$contact = wpgh_get_contact( $id );
+$contact = Plugin::$instance->utils->get_contact( $id );
 
 if ( ! $contact->exists() ) {
     wp_die( _x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );
@@ -46,7 +51,7 @@ include_once "class-wpgh-contact-events-table.php";
 
 /* Quit if */
 if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
-    if ( $contact->owner->ID !== get_current_user_id() ){
+    if ( $contact->get_owner_id() !== get_current_user_id() ){
 
         wp_die( _x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
 
@@ -56,7 +61,7 @@ if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
 /* Auto link the account before we see the create account form. */
 $contact->auto_link_account();
 
-$title = ! empty( $contact->first_name  ) ? $contact->full_name : $contact->email;
+$title = ! empty( $contact->get_first_name()  ) ? $contact->get_full_name() : $contact->get_email();
 
 $tabs = array(
 	'general'       => _x( 'General Info', 'contact_record_tab', 'groundhogg' ),
@@ -110,7 +115,7 @@ add_action( 'wpgh_contact_record_tab_general', 'wpgh_contact_record_general_info
 /**
  * Contact Info
  *
- * @param $contact WPGH_Contact
+ * @param $contact Contact
  */
 function wpgh_contact_record_general_info( $contact )
 {
@@ -120,7 +125,7 @@ function wpgh_contact_record_general_info( $contact )
         <tbody>
         <tr>
             <th><h2><?php _e('Name' ) ?></h2></th>
-            <td><?php echo get_avatar( $contact->email ); ?>
+            <td><?php echo get_avatar( $contact->get_email() ); ?>
             </td>
         </tr>
         <tr>
@@ -128,9 +133,9 @@ function wpgh_contact_record_general_info( $contact )
             <td><?php $args = array(
                     'id' => 'first_name',
                     'name' => 'first_name',
-                    'value' => $contact->first_name,
+                    'value' => $contact->get_first_name(),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
             </td>
         </tr>
         <tr>
@@ -140,13 +145,13 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'last_name',
                     'value' => $contact->last_name,
                 );
-                echo WPGH()->html->input($args); ?></td>
+                echo Plugin::$instance->utils->html->input($args); ?></td>
         </tr>
-        <?php if (isset($contact->user->user_login)): ?>
+        <?php if (isset($contact->user->user_login)):  //todo check ?>
 
             <tr>
                 <th><label for="username"><?php _e('Username') ?></label></th>
-                <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->user->ID), $contact->user->user_login); ?>
+                <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->user->ID), $contact->user->user_login);  //todo check?>
                 <span class="row-actions">
                     <?php submit_button( _x( 'Unlink', 'action', 'groundhogg'), 'secondary', 'unlink_user', false ); ?>
                 </span>
@@ -154,7 +159,7 @@ function wpgh_contact_record_general_info( $contact )
             </tr>
 
         <?php endif; ?>
-        <?php do_action('wpgh_contact_edit_name', $contact->ID ); ?>
+        <?php do_action('wpgh_contact_edit_name', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -195,22 +200,22 @@ function wpgh_contact_record_general_info( $contact )
                     'type' => 'email',
                     'id' => 'email',
                     'name' => 'email',
-                    'value' => $contact->email,
+                    'value' => $contact->get_email(),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
                 <span class="row-actions"><a style="text-decoration: none" target="_blank"
-                                                    href="<?php echo esc_url(substr($contact->email, strpos($contact->email, '@'))); ?>"><span class="dashicons dashicons-external"></span></a></span>
-                    <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' . wpgh_get_optin_status_text($contact->ID); ?></p>
-                <?php if ($contact->optin_status !== WPGH_UNSUBSCRIBED): ?>
+                                                    href="<?php echo esc_url(substr($contact->get_email(), strpos($contact->get_email(), '@'))); ?>"><span class="dashicons dashicons-external"></span></a></span>
+                    <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' . wpgh_get_optin_status_text($contact->get_id());  //todo ?></p>
+                <?php if ($contact->get_optin_status() !== WPGH_UNSUBSCRIBED): ?>
                     <div id="manual-unsubscribe" style="margin-bottom: 10px;">
                         <label><input type="checkbox" name="unsubscribe" value="1"><?php _ex( 'Mark as unsubscribed.', 'contact_record', 'groundhogg' ); ?></label>
                 </div>
                 <?php endif; ?>
-                <?php if ($contact->optin_status !== WPGH_CONFIRMED): ?>
+                <?php if ($contact->get_optin_status() !== WPGH_CONFIRMED): ?>
                 <div id="manual-confirmation">
                     <label><input type="checkbox" name="manual_confirm" id="manual-confirm" value="1"><?php _ex( 'Manually confirm this email address.', 'contact_record', 'groundhogg' ); ?></label>
                     <div id="confirmation-reason" class="hidden">
-                        <?php echo WPGH()->html->textarea( [ 'name' => 'confirmation_reason', 'cols' => 50, 'rows' => 2,  'placeholder' => __( 'Confirmation reason...', 'groundhogg' ) ] ); ?>
+                        <?php echo Plugin::$instance->utils->html->textarea( [ 'name' => 'confirmation_reason', 'cols' => 50, 'rows' => 2,  'placeholder' => __( 'Confirmation reason...', 'groundhogg' ) ] ); ?>
                     </div>
                 </div>
                 <script>jQuery(function ($) {
@@ -229,7 +234,7 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'primary_phone',
                     'value' => $contact->get_meta('primary_phone'),
                 );
-                echo WPGH()->html->input($args); ?></td>
+                echo Plugin::$instance->utils->html->input($args); ?></td>
         </tr>
         <tr>
             <th><label for="primary_phone_extension"><?php echo _x( 'Phone Extension', 'contact_record', 'groundhogg' ) ?></label></th>
@@ -238,9 +243,9 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'primary_phone_extension',
                     'value' => $contact->get_meta('primary_phone_extension'),
                 );
-                echo WPGH()->html->input($args); ?></td>
+                echo Plugin::$instance->utils->html->input($args); ?></td>
         </tr>
-        <?php do_action('wpgh_contact_edit_contact_info', $contact->ID ); ?>
+        <?php do_action('wpgh_contact_edit_contact_info', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -256,7 +261,7 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'company_name',
                     'value' => $contact->get_meta('company_name'),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
             </td>
         </tr>
         <tr>
@@ -266,7 +271,7 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'job_title',
                     'value' => $contact->get_meta('job_title'),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
             </td>
         </tr>
         <tr>
@@ -276,7 +281,7 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'company_address',
                     'value' => $contact->get_meta('company_address'),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
             </td>
         </tr>
     </table>
@@ -295,7 +300,7 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'street_address_1',
                     'value' => $contact->get_meta('street_address_1'),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
             </td>
         </tr>
         <tr>
@@ -305,7 +310,7 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'street_address_2',
                     'value' => $contact->get_meta('street_address_2'),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
             </td>
         </tr>
         <tr>
@@ -315,7 +320,7 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'city',
                     'value' => $contact->get_meta('city'),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
             </td>
         </tr>
         <tr>
@@ -325,7 +330,7 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'postal_zip',
                     'value' => $contact->get_meta('postal_zip'),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
             </td>
         </tr>
         <tr>
@@ -335,7 +340,7 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'region',
                     'value' => $contact->get_meta('region'),
                 );
-                echo WPGH()->html->input($args); ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
             </td>
         </tr>
         <tr>
@@ -346,10 +351,10 @@ function wpgh_contact_record_general_info( $contact )
                         'id' => 'country',
                         'name' => 'country',
                         'selected' => $contact->get_meta('country'),
-                        'data' => wpgh_get_countries_list(),
+                        'data' => wpgh_get_countries_list(),  // todo
                         'placeholder' => _x( 'Select a Country', 'contact_record', 'groundhogg' ),
                     );
-                    echo WPGH()->html->select2($args); ?>
+                    echo Plugin::$instance->utils->html->select2($args); ?>
                 </div>
             </td>
         </tr>
@@ -360,8 +365,8 @@ function wpgh_contact_record_general_info( $contact )
                     'name' => 'ip_address',
                     'value' => $contact->get_meta('ip_address' ),
                 );
-                echo WPGH()->html->input($args); ?>
-                <?php if ( $contact->ip_address && $contact->ip_address !== '::1' ): ?>
+                echo Plugin::$instance->utils->html->input($args); ?>
+                <?php if ( $contact->get_ip_address() && $contact->get_ip_address() !== '::1' ): ?>
                     <span class="row-actions">
                     <?php submit_button( _x( 'Extrapolate Location', 'action', 'groundhogg'), 'secondary', 'extrapolate_location', false ); ?>
                 </span>
@@ -375,13 +380,13 @@ function wpgh_contact_record_general_info( $contact )
                     <?php $args = array(
                     'id' => 'time_zone',
                     'name' => 'time_zone',
-                    'data' => wpgh_get_time_zones(),
+                    'data' => wpgh_get_time_zones(), //todo
                     'selected' => $contact->get_meta('time_zone'),
                 );
-                    echo WPGH()->html->select2($args); ?></div>
+                    echo Plugin::$instance->utils->html->select2($args); ?></div>
             </td>
         </tr>
-        <?php do_action('wpgh_contact_edit_address', $contact->ID ); ?>
+        <?php do_action('wpgh_contact_edit_address', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -408,7 +413,7 @@ function wpgh_contact_record_general_info( $contact )
 add_action( 'wpgh_contact_record_tab_segmentation', 'wpgh_contact_record_section_segmentation' );
 
 /**
- * @param $contact WPGH_Contact
+ * @param $contact Contact
  */
 function wpgh_contact_record_section_segmentation( $contact )
 {
@@ -420,7 +425,7 @@ function wpgh_contact_record_section_segmentation( $contact )
         <tbody>
         <tr>
             <th><?php _ex( 'Owner', 'contact_record', 'groundhogg' ); ?></th>
-            <td><?php echo WPGH()->html->dropdown_owners( array( 'selected' => ( $contact->owner )? $contact->owner->ID : 0 ) ); ?>
+            <td><?php echo Plugin::$instance->utils->html->dropdown_owners( array( 'selected' => ( $contact->owner )? $contact->owner->ID : 0 ) ); ?>
             </td>
         </tr>
         <tr>
@@ -430,7 +435,7 @@ function wpgh_contact_record_section_segmentation( $contact )
                     'name'  => 'source_page',
                     'value' => $contact->get_meta( 'source_page' ),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo Plugin::$instance->utils->html->input( $args ); ?>
                 <span class="row-actions">
                     <a style="text-decoration: none" target="_blank" href="<?php echo esc_url( $contact->get_meta( 'source_page' ) ); ?>"><span class="dashicons dashicons-external"></span></a>
                 </span>
@@ -446,7 +451,7 @@ function wpgh_contact_record_section_segmentation( $contact )
                     'name' => 'lead_source',
                     'value' => $contact->get_meta( 'lead_source' ),
                 );
-                echo WPGH()->html->input( $args ); ?>
+                echo Plugin::$instance->utils->html->input( $args ); ?>
                 <span class="row-actions">
                     <a style="text-decoration: none" target="_blank" href="<?php echo esc_url( $contact->get_meta( 'lead_source' ) ); ?>"><span class="dashicons dashicons-external"></span></a>
                 </span>
@@ -465,12 +470,12 @@ function wpgh_contact_record_section_segmentation( $contact )
                     'id'        => 'tags',
                     'name'      => 'tags[]',
                     'selected'  => $contact->tags,
-                ); echo WPGH()->html->tag_picker( $args ); ?>
+                ); echo Plugin::$instance->utils->html->tag_picker( $args ); ?>
                 <p class="description"><?php _ex( 'Add new tags by hitting [Enter] or by typing a [,].', 'contact_record', 'groundhogg' ); ?></p>
                 </div>
             </td>
         </tr>
-        <?php do_action( 'wpgh_contact_edit_tags', $contact->ID ); ?>
+        <?php do_action( 'wpgh_contact_edit_tags', $contact->get_id() ); ?>
         </tbody>
     </table>
 <?php
@@ -479,7 +484,7 @@ function wpgh_contact_record_section_segmentation( $contact )
 add_action( 'wpgh_contact_record_tab_notes', 'wpgh_contact_record_section_notes' );
 
 /**
- * @param $contact WPGH_Contact
+ * @param $contact Contact
  */
 function wpgh_contact_record_section_notes( $contact )
 {
@@ -497,7 +502,7 @@ function wpgh_contact_record_section_notes( $contact )
                     'cols'  => 64,
                     'attributes' => ''
                 );
-                echo WPGH()->html->textarea( $args ); ?>
+                echo Plugin::$instance->utils->html->textarea( $args ); ?>
                 <?php submit_button( _x( 'Add Note', 'action', 'groundhogg' ), 'secondary', 'add_new_note' ); ?>
             </td>
         </tr>
@@ -513,10 +518,10 @@ function wpgh_contact_record_section_notes( $contact )
                     'rows'  => 30,
                     'attributes' => 'readonly'
                 );
-                echo WPGH()->html->textarea( $args ); ?>
+                echo Plugin::$instance->utils->html->textarea( $args ); ?>
             </td>
         </tr>
-        <?php do_action( 'wpgh_contact_edit_notes', $contact->ID ); ?>
+        <?php do_action( 'wpgh_contact_edit_notes', $contact->get_id() ); ?>
         </tbody>
     </table>
     <?php
@@ -525,7 +530,7 @@ function wpgh_contact_record_section_notes( $contact )
 add_action( 'wpgh_contact_record_tab_actions', 'wpgh_contact_record_section_actions' );
 
 /**
- * @param $contact WPGH_contact
+ * @param $contact contact
  */
 function wpgh_contact_record_section_actions( $contact )
 {
@@ -537,7 +542,7 @@ function wpgh_contact_record_section_actions( $contact )
             <th><?php _ex( 'Send Email', 'contact_record', 'groundhogg' ); ?></th>
             <td>
                 <div style="max-width: 400px">
-                    <?php echo WPGH()->html->dropdown_emails(array()); ?>
+                    <?php echo Plugin::$instance->utils->html->dropdown_emails(array()); ?>
                     <div class="row-actions">
                         <button type="submit" name="send_email" value="send" class="button"><?php _e('Send' ); ?></button>
                     </div>
@@ -552,9 +557,9 @@ function wpgh_contact_record_section_actions( $contact )
                     $args = array(
                         'id'    => 'sms_id',
                         'name'  => 'sms_id',
-                        'data'  => WPGH()->sms->get_sms_select()
+                        'data'  => WPGH()->sms->get_sms_select() //todo
                     );
-                    echo WPGH()->html->select2( $args ); ?>
+                    echo Plugin::$instance->utils->html->select2( $args ); ?>
                     <div class="row-actions">
                         <button type="submit" name="send_sms" value="send" class="button"><?php _e('Send'); ?></button>
                     </div>
@@ -567,22 +572,23 @@ function wpgh_contact_record_section_actions( $contact )
                 <div style="max-width: 400px">
                     <?php
 
-                    $steps = WPGH()->steps->get_steps();
+                    $steps = Plugin::$instance->dbs->get_db('steps')->query();
                     $options = array();
                     foreach ($steps as $step) {
-                        $step = wpgh_get_funnel_step($step->ID);
+                        $step =Plugin::$instance->utils->get_step( $step->ID);
                         if ( $step && $step->is_active()) {
-                            $funnel_name = WPGH()->funnels->get_column_by('title', 'ID', $step->funnel_id);
+
+                            $funnel_name = Plugin::$instance->dbs->get_db('funnels')->get_column_by('title', 'ID', $step->funnel_id);
                             $options[$funnel_name][$step->ID] = sprintf("%d. %s (%s)", $step->order, $step->title, str_replace('_', ' ', $step->type));
                         }
                     }
 
-                    echo WPGH()->html->select2(array(
+                    echo Plugin::$instance->utils->html->select2( [
                         'name' => 'add_contacts_to_funnel_step_picker',
                         'id' => 'add_contacts_to_funnel_step_picker',
                         'data' => $options,
                         'multiple' => false,
-                    ));
+                    ]);
 
                     ?>
                     <div class="row-actions">
@@ -595,19 +601,21 @@ function wpgh_contact_record_section_actions( $contact )
             <th><?php _ex( 'Internal Form', 'contact_record', 'groundhogg' ); ?></th>
             <td>
                 <div style="max-width: 400px;">
+
                     <?php $forms = WPGH()->steps->get_steps( array(
                         'step_type' => 'form_fill'
                     ) );
 
+                    //todo
                     $form_options = array();
                     $default = 0;
                     foreach ( $forms as $form ){
                         if ( ! $default ){$default = $form->ID;}
-                        $step = wpgh_get_funnel_step( $form->ID );
+                        $step = wpgh_get_funnel_step( $form->ID ); //todo
                         if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
                     }
 
-                    echo WPGH()->html->select2( array(
+                    echo Plugin::$instance->utils->html->select2( [
                         'name'              => 'manual_form_submission',
                         'id'                => 'manual_form_submission',
                         'class'             => 'manual-submission gh-select2',
@@ -615,7 +623,7 @@ function wpgh_contact_record_section_actions( $contact )
                         'multiple'          => false,
                         'selected'          => [ $default ],
                         'placeholder'       => 'Please Select a Form',
-                    ) );
+                    ] );
 
                     ?><div class="row-actions">
                         <script>var WPGHFormSubmitBaseUrl = '<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&action=form&contact=%d&form=', $contact->ID ) ); ?>';</script>
@@ -631,7 +639,7 @@ function wpgh_contact_record_section_actions( $contact )
 add_action( 'wpgh_contact_record_tab_files', 'wpgh_contact_record_section_files' );
 
 /**
- * @param $contact WPGH_Contact
+ * @param $contact Contact
  */
 function wpgh_contact_record_section_files( $contact )
 {
@@ -663,7 +671,7 @@ function wpgh_contact_record_section_files( $contact )
             <tbody>
             <?php
 
-            $files = $contact->get_associated_files();
+            $files = $contact->get_files();
 
             if (empty($files)):
                 ?>
@@ -714,11 +722,11 @@ function wpgh_contact_record_section_files( $contact )
 add_action( 'wpgh_contact_record_tab_meta_data', 'wpgh_contact_record_section_custom_meta' );
 
 /**
- * @param $contact WPGH_Contact
+ * @param $contact Contact
  */
 function wpgh_contact_record_section_custom_meta( $contact ){
     ?>
-    <?php do_action( 'wpgh_contact_edit_before_meta', $contact->ID ); ?>
+    <?php do_action( 'wpgh_contact_edit_before_meta', $contact->get_id() ); ?>
     <!-- META -->
     <h2><?php _ex( 'Custom Meta', 'contact_record', 'groundhogg' ); ?></h2>
     <table id='meta-table' class="form-table" >
@@ -764,7 +772,8 @@ function wpgh_contact_record_section_custom_meta( $contact ){
             'region_code',
         ) );
 
-        $meta = WPGH()->contact_meta->get_meta( $contact->ID );
+        $meta = Plugin::$instance->dbs->get_db('contactmeta')->get_meta($contact->get_id());
+
 
         foreach ( $meta as $meta_key => $value ):
 
@@ -786,7 +795,7 @@ function wpgh_contact_record_section_custom_meta( $contact ){
                                 'value' => $value
                             );
 
-                            echo WPGH()->html->textarea( $args );
+                            echo Plugin::$instance->utils->html->textarea( $args );
 
                         } else {
 
@@ -796,7 +805,7 @@ function wpgh_contact_record_section_custom_meta( $contact ){
                                 'value' => $value
                             );
 
-                            echo WPGH()->html->input( $args );
+                            echo Plugin::$instance->utils->html->input( $args );
 
                         }
                         ?>
@@ -806,7 +815,7 @@ function wpgh_contact_record_section_custom_meta( $contact ){
                 </tr>
             <?php endif;
         endforeach; ?>
-        <?php do_action( 'wpgh_contact_edit_meta', $contact->ID ); ?>
+        <?php do_action( 'wpgh_contact_edit_meta', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -817,17 +826,18 @@ add_action( 'wpgh_contact_record_tab_activity', 'wpgh_contact_record_section_act
 
 
 /**
- * @param $contact WPGH_Contact
+ * @param $contact Contact
  */
 function wpgh_contact_record_section_activity( $contact )
 {
     ?>
-    <?php do_action('wpgh_contact_edit_before_history', $contact->ID ); ?>
+    <?php do_action('wpgh_contact_edit_before_history', $contact->get_id() ); ?>
     <!-- UPCOMING EVENTS -->
     <div style="max-width: 800px">
         <h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
         <p class="description"><?php _ex( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'contact_record', 'groundhogg' ); ?></p>
         <?php
+        //todo
         $table = new WPGH_Contact_Events_Table( 'waiting' );
         $table->prepare_items();
         $table->display(); ?>
@@ -870,16 +880,16 @@ endforeach;
         </p>
     </div>
 
-    <?php echo WPGH()->html->input( array( 'type' => 'hidden', 'name' => 'active_tab', 'id' => 'active-tab' ) ); ?>
+    <?php echo Plugin::$instance->utils->html->input( array( 'type' => 'hidden', 'name' => 'active_tab', 'id' => 'active-tab' ) ); ?>
 
 </form>
 <?php if ( ! $contact->user ): ?>
 <form id="create-user-form" action="<?php echo admin_url( 'user-new.php' ); ?>" method="post">
     <input type="hidden" name="createuser" value="1">
-    <input type="hidden" name="first_name" value="<?php esc_attr_e( $contact->first_name ); ?>">
-    <input type="hidden" name="last_name" value="<?php esc_attr_e( $contact->last_name ); ?>">
-    <input type="hidden" name="email" value="<?php esc_attr_e( $contact->email ); ?>">
-    <input type="hidden" name="user_login" value="<?php esc_attr_e( $contact->email ); ?>">
+    <input type="hidden" name="first_name" value="<?php esc_attr_e( $contact->get_first_name() ); ?>">
+    <input type="hidden" name="last_name" value="<?php esc_attr_e( $contact->get_last_name() ); ?>">
+    <input type="hidden" name="email" value="<?php esc_attr_e( $contact->get_email() ); ?>">
+    <input type="hidden" name="user_login" value="<?php esc_attr_e( $contact->get_email() ); ?>">
 </form>
 <div id="manual-submission-container" class="hidden">
     <!-- Form Content -->

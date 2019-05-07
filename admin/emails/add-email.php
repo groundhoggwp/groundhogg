@@ -1,4 +1,10 @@
 <?php
+namespace Groundhogg\Admin\Emails;
+
+use Groundhogg\Plugin;
+use Groundhogg\Email;
+
+
 /**
  * Add Email
  *
@@ -34,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $from_funnel = ( isset( $_GET['return_funnel'] ) )? '&return_funnel=' . $_GET['return_funnel']: '';
 $from_funnel .= ( isset( $_GET['return_step'] ) )? '&return_step=' . $_GET['return_step']: '';
-$custom_templates = WPGH()->emails->get_emails( [ 'is_template' => 1 ] );
+$custom_templates = Plugin::$instance->dbs->get_db('emails')->query( [ 'is_template' => 1 ] );
 
 if ( count( $custom_templates ) > 0 ){
     $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'my-templates';
@@ -58,6 +64,7 @@ if ( count( $custom_templates ) > 0 ){
 
     <?php if ( $active_tab === 'templates' ):
         include WPGH_PLUGIN_DIR . 'templates/email-templates.php';
+        //todo check for variable error
         foreach ( $email_templates as $id => $email_args ): ?>
 
         <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
@@ -91,7 +98,10 @@ if ( count( $custom_templates ) > 0 ){
         </div>
         <div id="emails">
             <!-- Only retrieve previous 20 emails.. -->
-            <?php $emails = array_slice( WPGH()->emails->get_emails(), 0, 20 ); ?>
+            <?php
+//            $emails = array_slice( WPGH()->emails->get_emails(), 0, 20 );
+            $emails = array_slice(  Plugin::$instance->dbs->get_db('emails')->query() , 0, 20 );
+            ?>
             <?php foreach ( $emails as $email ): ?>
                 <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
                     <h2 class="hndle"><?php echo $email->subject; ?></h2>
@@ -154,7 +164,7 @@ if ( count( $custom_templates ) > 0 ){
                     <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $id; ?> " class="email-container postbox">
                         <?php echo $email_args->content; ?>
                     </div>
-                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email->ID; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email->ID;  //todo find var ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
                     <a class="button-secondary" href="<?php printf( admin_url( 'admin.php?page=gh_emails&action=edit&email=%d' ), $email_args->ID ); ?>"><?php _e( 'Edit Template', 'groundhogg' ); ?></a>
                 </div>
             </div>

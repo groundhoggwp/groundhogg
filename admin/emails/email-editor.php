@@ -1,4 +1,10 @@
 <?php
+
+namespace Groundhogg\Admin\Emails;
+
+use Groundhogg\Plugin;
+use Groundhogg\Email;
+
 /**
  * Email Editor
  *
@@ -18,15 +24,15 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 
 $email_id = intval( $_GET['email'] );
-$email = new WPGH_Email( $email_id );
+$email = new Email( $email_id );
 
 $blocks = apply_filters( 'wpgh_email_blocks', array() );
 
 ?>
 
 <!-- NEW EMAIL TAB TITLE -->
-<?php if ( ! empty( $email->subject ) ): ?>
-<span class="hidden" id="new-title"><?php echo $email->subject; ?> &lsaquo; </span>
+<?php if ( ! empty( $email->get_subject_line() ) ): ?>
+<span class="hidden" id="new-title"><?php echo $email->get_subject_line(); ?> &lsaquo; </span>
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
@@ -39,8 +45,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
     <!-- Before-->
     <?php wp_nonce_field(); ?>
     <?php do_action('wpgh_edit_email_form_before'); ?>
-
-    <?php echo WPGH()->html->input( array( 'type' => 'hidden', 'name' => 'email', 'value' => $email_id ) ); ?>
+    <?php echo Plugin::$instance->utils->html->input( [ 'type' => 'hidden', 'name' => 'email', 'value' => $email_id ] ); ?>
 
     <div class="header-wrap">
         <div class="funnel-editor-header">
@@ -50,7 +55,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
             <div class="status-options">
                 <div id="status">
                     <div id="template-save" style="margin: 3px 10px 0 0;">
-                        <?php echo WPGH()->html->checkbox( [
+                        <?php echo Plugin::$instance->utils->html->checkbox( [
                             'label'         => __( 'Save as template', 'groundhogg' ),
                             'name'          => 'save_as_template',
                             'id'            => 'save_as_template',
@@ -59,7 +64,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                             'checked'       => $email->is_template(),
                         ] ); ?>
                     </div>
-                    <?php echo WPGH()->html->toggle( [
+                    <?php echo Plugin::$instance->utils->html->toggle( [
                         'name'          => 'editor_view',
                         'id'            => 'editor-toggle',
                         'value'         => 'ready',
@@ -67,11 +72,11 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                         'on'            => 'HTML',
                         'off'           => 'Visual',
                     ]); ?>
-                    <?php echo WPGH()->html->toggle( [
+                    <?php echo Plugin::$instance->utils->html->toggle( [
                         'name'          => 'email_status',
                         'id'            => 'status-toggle',
                         'value'         => 'ready',
-                        'checked'       => $email->status === 'ready',
+                        'checked'       => $email->get_status() === 'ready',
                         'on'            => 'Ready',
                         'off'           => 'Draft',
                     ]); ?>
@@ -97,11 +102,11 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
 
                         <!-- Subject Line -->
                         <label class="screen-reader-text" id="title-prompt-text" for="subject"><?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?></label>
-                        <input placeholder="<?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?>" type="text" name="subject" size="30" value="<?php echo esc_attr( $email->subject ); ?>" id="subject" spellcheck="true" autocomplete="off" required>
+                        <input placeholder="<?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?>" type="text" name="subject" size="30" value="<?php echo esc_attr( $email->get_subject_line() ); ?>" id="subject" spellcheck="true" autocomplete="off" required>
 
                         <!-- Pre Header-->
                         <label class="screen-reader-text" id="title-prompt-text" for="pre_header"><?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?></label>
-                        <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo esc_attr( $email->pre_header ); ?>" id="pre_header" spellcheck="true" autocomplete="off">
+                        <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo esc_attr( $email->get_pre_header() ); ?>" id="pre_header" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
 
@@ -158,6 +163,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                         <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto;">
 
                             <?php $alignment = $email->get_meta( 'alignment' );
+                            //todo check
                             if ( $alignment === 'center' ){
                                 $margins = "margin-left:auto;margin-right:auto;";
                             } else {
@@ -166,7 +172,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
 
                             <!-- Editor Content -->
                             <div id="email-inside" class="email-sortable email-content-wrapper" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
-                                <?php echo $email->content; ?>
+                                <?php echo $email->get_content(); ?>
                             </div>
 
                         </div>
@@ -178,7 +184,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                 </div>
                 <!-- Saved Content -->
                 <div class="hidden">
-                    <textarea id="content" name="content"><?php echo $email->content; ?></textarea>
+                    <textarea id="content" name="content"><?php echo $email->get_content(); ?></textarea>
                 </div>
 
             </div>
@@ -196,7 +202,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                                     <tr>
                                         <th><?php _e( 'From User:', 'groundhogg'  ); ?></th>
                                         <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user ); ?>
-                                        <td><?php echo WPGH()->html->dropdown_owners( $args ); ?></td>
+                                        <td><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></td>
                                     </tr>
                                     <tr>
                                         <th><label for="send_test"><?php _e( 'Send Test:', 'groundhogg'  ); ?></label></th>
@@ -206,7 +212,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                                         <th><?php _e( 'To:', 'groundhogg' ); ?></th>
                                         <?php $to = $email->get_meta( 'test_email' ) ? $email->get_meta( 'test_email' ) : get_current_user_id(); ?>
                                         <?php $args = array( 'option_none' => __( 'Please Select One.' ) , 'id' => 'test_email', 'name' => 'test_email', 'selected' => $to ); ?>
-                                        <td><?php echo WPGH()->html->dropdown_owners( $args ); ?></td>
+                                        <td><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></td>
                                     </tr>
                                     <script>
                                         jQuery(function($){$("#send_test").on( 'input', function(){
@@ -281,6 +287,6 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
             <!-- End elements area-->
             <div style="clear: both;"></div>
         </div>
-        <?php WPGH()->replacements->get_table(); ?>
+        <?php Plugin::$instance->replacements->get_table();  ?>
     </div>
 </form>

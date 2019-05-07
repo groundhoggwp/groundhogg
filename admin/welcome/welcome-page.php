@@ -1,6 +1,9 @@
 <?php
 namespace Groundhogg\Admin\Welcome;
-use Groundhogg\Admin\Admin_Page as Admin_Page;
+
+use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Plugin;
+
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -12,6 +15,58 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Welcome_Page extends Admin_Page
 {
+    // UNUSED FUNCTIONS
+    public function help() {}
+    protected function add_ajax_actions() {}
+    /**
+     * Get the menu order between 1 - 99
+     *
+     * @return int
+     */
+    public function get_priority()
+    {
+        return 1;
+    }
+
+    /**
+     * Get the page slug
+     *
+     * @return string
+     */
+    public function get_slug()
+    {
+        return 'groundhogg';
+    }
+
+    /**
+     * Get the menu name
+     *
+     * @return string
+     */
+    public function get_name()
+    {
+        return apply_filters( 'groundhogg/admin/welcome/name', 'Groundhogg' );
+    }
+
+    /**
+     * The required minimum capability required to load the page
+     *
+     * @return string
+     */
+    public function get_cap()
+    {
+        return 'view_contacts';
+    }
+
+    /**
+     * Get the item type for this page
+     *
+     * @return mixed
+     */
+    public function get_item_type()
+    {
+        return null;
+    }
 
     /**
      * Adds additional actions.
@@ -25,7 +80,7 @@ class Welcome_Page extends Admin_Page
     }
 
     /**
-     * Add the page
+     * Add the page todo
      */
     public function register()
     {
@@ -73,7 +128,7 @@ class Welcome_Page extends Admin_Page
      */
     public function other_notices()
     {
-        if ( ! wpgh_get_option( 'gh_guided_setup_finished', false ) ){
+        if ( ! get_option( 'gh_guided_setup_finished', false ) ){
             $this->add_notice(
                 'guided_setup', sprintf( "<a href='%s'>%s</a>", admin_url( 'admin.php?page=gh_guided_setup' ), _x( 'You have yet to complete the guided setup process.', 'notice', 'groundhogg' ) ), 'info'
             );
@@ -105,7 +160,7 @@ class Welcome_Page extends Admin_Page
             }
         }
 
-        if ( wpgh_is_option_enabled( 'gh_send_with_gh_api' ) ){
+        if ( Plugin::$instance->settings->is_option_enabled( 'send_with_gh_api' ) ){
 	        $has_smtp = true;
         }
 
@@ -121,20 +176,14 @@ class Welcome_Page extends Admin_Page
      */
     public function check_settings()
     {
-        if ( ! wpgh_get_option( 'gh_business_name' ) ){
+        if ( ! Plugin::$instance->settings->get_option( 'business_name', false ) ){
             $this->add_notice(
                 'incomplete_settings', _x( 'It appears you have incomplete settings! Go to <a href="?page=gh_settings">the settings page</a> and fill out all your business information.', 'notice', 'groundhogg' ), 'warning'
             );
         }
     }
 
-    /**
-     * Add the help bar
-     */
-    public function help()
-    {
-        //todo
-    }
+
     /* Enque JS or CSS */
 
     public function scripts()
@@ -331,9 +380,23 @@ class Welcome_Page extends Admin_Page
     }
 
     /**
+     * Whether or not we should show the stats collection prompt
+     *
+     * @return bool
+     */
+    public function should_show_stats_collection()
+    {
+        $show = false;
+        if ( ! Plugin::$instance->settings->is_option_enabled( 'gh_opted_in_stats_collection' ) && current_user_can( 'manage_options' ) ){
+            $show = true;
+        }
+        return apply_filters( 'groundhogg/stats_collection/show', $show );
+    }
+
+    /**
      * The main output
      */
-    public function page()
+    public function view()
     {
 
         $user = wp_get_current_user();
@@ -350,7 +413,7 @@ class Welcome_Page extends Admin_Page
                 <?php $this->notices(); ?>
                 <?php do_action( 'wpgh_welcome_page_custom_content' ); ?>
                 <?php if ( apply_filters( 'wpgh_show_main_welcome_page_content', true ) ): ?>
-                    <?php if ( wpgh_should_show_stats_collection() ): ?>
+                    <?php if ( $this->should_show_stats_collection() ): ?>
                         <div class="col">
                             <div class="postbox stats-collection">
                                 <div class="inside">
@@ -412,6 +475,9 @@ class Welcome_Page extends Admin_Page
 
     }
 
+    /**
+     * Display background Image on Welcome Page
+     */
     public function bg_image()
     {
         ?>
@@ -427,73 +493,4 @@ class Welcome_Page extends Admin_Page
 <?php
     }
 
-    /**
-     * Get the menu order between 1 - 99
-     *
-     * @return int
-     */
-    public function get_priority()
-    {
-        return 1;
-    }
-
-    /**
-     * Get the page slug
-     *
-     * @return string
-     */
-    public function get_slug()
-    {
-        return 'groundhogg';
-    }
-
-    /**
-     * Get the menu name
-     *
-     * @return string
-     */
-    public function get_name()
-    {
-        return apply_filters( 'groundhogg/admin/welcome/name', 'Groundhogg' );
-    }
-
-    /**
-     * The required minimum capability required to load the page
-     *
-     * @return string
-     */
-    public function get_cap()
-    {
-        return 'view_contacts';
-    }
-
-    /**
-     * Get the item type for this page
-     *
-     * @return mixed
-     */
-    public function get_item_type()
-    {
-        return null;
-    }
-
-    /**
-     * Output the basic view.
-     *
-     * @return mixed
-     */
-    public function view()
-    {
-        // TODO: Implement view() method.
-    }
-
-    /**
-     * Add Ajax actions...
-     *
-     * @return mixed
-     */
-    protected function add_ajax_actions()
-    {
-        // TODO: Implement add_ajax_actions() method.
-    }
 }

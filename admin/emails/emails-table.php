@@ -1,4 +1,10 @@
 <?php
+namespace Groundhogg\Admin\Emails;
+
+use Groundhogg\Email;
+use Groundhogg\Plugin;
+use WP_List_Table;
+
 /**
  * Emails Table Class
  *
@@ -20,7 +26,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 	require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_Emails_Table extends WP_List_Table {
+class Emails_Table extends WP_List_Table {
 
 	/**
 	 * TT_Example_List_Table constructor.
@@ -95,9 +101,9 @@ class WPGH_Emails_Table extends WP_List_Table {
     {
         $views =  array();
 
-        $count_ready  = WPGH()->emails->count( array( 'status' => 'ready' ) );
-        $count_draft  = WPGH()->emails->count( array( 'status' => 'draft' ) );
-        $count_trash  = WPGH()->emails->count( array( 'status' => 'trash' ) );
+        $count_ready  = Plugin::$instance->dbs->get_db('emails')->count( array( 'status' => 'ready' ) );
+        $count_draft  = Plugin::$instance->dbs->get_db('emails')->count( array( 'status' => 'draft' ) );
+        $count_trash  = Plugin::$instance->dbs->get_db('emails')->count( array( 'status' => 'trash' ) );
         $count_all = $count_ready + $count_draft;
 
 
@@ -126,7 +132,7 @@ class WPGH_Emails_Table extends WP_List_Table {
      */
     public function single_row( $item ) {
 
-        $email = new WPGH_Email( $item->ID );
+        $email = new Email( $item->ID );
 
         echo '<tr>';
         $this->single_row_columns( $email );
@@ -134,7 +140,7 @@ class WPGH_Emails_Table extends WP_List_Table {
     }
 
     /**
-     * @param object $email WPGH_Email
+     * @param  $email Email
      * @param string $column_name
      * @param string $primary
      * @return string
@@ -146,7 +152,7 @@ class WPGH_Emails_Table extends WP_List_Table {
         }
 
         $actions = array();
-        $id = $email->ID;
+        $id = $email->get_id();
 
         if ( $this->get_view() === 'trash' )
         {
@@ -161,13 +167,13 @@ class WPGH_Emails_Table extends WP_List_Table {
     }
 
     /**
-     * @param $email WPGH_Email
+     * @param $email Email
      * @return string
      */
     protected function column_subject( $email )
     {
-        $subject = ( ! $email->subject )? '(' . __( 'no subject' ) . ')' : $email->subject ;
-        $editUrl = admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email->ID );
+        $subject = ( ! $email->get_subject_line() )? '(' . __( 'no subject' ) . ')' : $email->get_subject_line() ;
+        $editUrl = admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email->get_id() );
 
         if ( $this->get_view() === 'trash' ){
             $html = "<strong>{$subject}</strong>";
@@ -176,7 +182,7 @@ class WPGH_Emails_Table extends WP_List_Table {
 
             $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
 
-            if ( $email->status === 'draft' ){
+            if ( $email->get_status() === 'draft' ){
                 $html .= " &#x2014; " . "<span class='post-state'>(" . __( 'Draft' ) . ")</span>";
             }
 	        $html .= "</strong>";
@@ -186,12 +192,12 @@ class WPGH_Emails_Table extends WP_List_Table {
     }
 
     /**
-     * @param $email WPGH_Email
+     * @param $email Email
      * @return string
      */
     protected function column_from_user( $email )
     {
-        $from = intval( ( $email->from_user ) );
+        $from = intval( ( $email->get_from_user() ) );
 
         if ( $from ){
             $user = get_userdata( $from );
@@ -207,24 +213,24 @@ class WPGH_Emails_Table extends WP_List_Table {
     }
 
     /**
-     * @param $email WPGH_Email
+     * @param $email Email
      * @return string
      */
     protected function column_author( $email )
     {
-        $user = get_userdata( intval( ( $email->author ) ) );
+        $user = get_userdata( intval( ( $email->get_author_id() ) ) );
         $from_user = esc_html( $user->display_name );
-        $queryUrl = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $email->author );
+        $queryUrl = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $email->get_author_id() );
         return "<a href='$queryUrl'>$from_user</a>";
     }
 
     /**
-     * @param $email WPGH_Email
+     * @param $email Email
      * @return string
      */
     protected function column_date_created( $email )
     {
-        $dc_time = mysql2date( 'U', $email->date_created );
+        $dc_time = mysql2date( 'U', $email->get_date_created() );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $dc_time - $cur_time;
         $time_prefix = __( 'Created' );
@@ -239,12 +245,12 @@ class WPGH_Emails_Table extends WP_List_Table {
     }
 
     /**
-     * @param $email WPGH_Email
+     * @param $email Email
      * @return string
      */
     protected function column_last_updated( $email )
     {
-        $lu_time = mysql2date( 'U', $email->last_updated );
+        $lu_time = mysql2date( 'U', $email->get_last_updated() );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $lu_time - $cur_time;
         $time_prefix = __( 'Updated', 'groundhogg' );
@@ -338,48 +344,50 @@ class WPGH_Emails_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $query_args = array();
+//        $query_args = array();
+//
+//        if ( isset( $_REQUEST[ 's' ] ) ){
+//
+//            $query_args[ 'search' ] = $_REQUEST[ 's' ];
+//
+//        }
+//
+//        switch ( $this->get_view() )
+//        {
+//            case 'trash':
+//                $query_args[ 'status' ] = 'trash';
+//                $data = WPGH()->emails->get_emails( $query_args );
+//                break;
+//
+//            case 'ready':
+//                $query_args[ 'status' ] = 'ready';
+//                $data = WPGH()->emails->get_emails( $query_args );
+//                break;
+//
+//            case 'draft':
+//                $query_args[ 'status' ] = 'draft';
+//                $data = WPGH()->emails->get_emails( $query_args );
+//                break;
+//
+//            case 'from_user':
+//                $query_args[ 'from_user' ] = intval( $_REQUEST[ 'from_user' ] );
+//                $data = WPGH()->emails->get_emails( $query_args );
+//                break;
+//
+//            default:
+//
+//                $query_args[ 'status' ] = 'ready';
+//                $data = WPGH()->emails->get_emails( $query_args );
+//
+//                $query_args[ 'status' ] = 'draft';
+//                $data2 = WPGH()->emails->get_emails( $query_args );
+//
+//                $data = array_merge( $data, $data2 );
+//
+//                break;
+//        }
 
-        if ( isset( $_REQUEST[ 's' ] ) ){
-
-            $query_args[ 'search' ] = $_REQUEST[ 's' ];
-
-        }
-
-        switch ( $this->get_view() )
-        {
-            case 'trash':
-                $query_args[ 'status' ] = 'trash';
-                $data = WPGH()->emails->get_emails( $query_args );
-                break;
-
-            case 'ready':
-                $query_args[ 'status' ] = 'ready';
-                $data = WPGH()->emails->get_emails( $query_args );
-                break;
-
-            case 'draft':
-                $query_args[ 'status' ] = 'draft';
-                $data = WPGH()->emails->get_emails( $query_args );
-                break;
-
-            case 'from_user':
-                $query_args[ 'from_user' ] = intval( $_REQUEST[ 'from_user' ] );
-                $data = WPGH()->emails->get_emails( $query_args );
-                break;
-
-            default:
-
-                $query_args[ 'status' ] = 'ready';
-                $data = WPGH()->emails->get_emails( $query_args );
-
-                $query_args[ 'status' ] = 'draft';
-                $data2 = WPGH()->emails->get_emails( $query_args );
-
-                $data = array_merge( $data, $data2 );
-
-                break;
-        }
+        $data = Plugin::$instance->dbs->get_db('broadcasts')->query( $_GET ); //todo check
 
 		/*
 		 * Sort the data

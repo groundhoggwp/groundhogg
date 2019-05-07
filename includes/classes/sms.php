@@ -51,6 +51,11 @@ Class SMS extends Base_Object
         return $this->title;
     }
 
+    public function get_author()
+    {
+        return absint( $this->author );
+    }
+
     /**
      * A string to represent the object type
      *

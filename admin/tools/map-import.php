@@ -1,4 +1,9 @@
 <?php
+
+namespace Groundhogg\Admin\Tools;
+
+use Groundhogg\Plugin;
+
 /**
  * Map Import
  *
@@ -16,20 +21,20 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 $file_name = urldecode( $_GET[ 'import' ] );
-$file_path = wpgh_get_csv_imports_dir( $file_name );
+$file_path = Plugin::$instance->utils->files->get_csv_imports_dir( $file_name );
 
 if ( ! file_exists( $file_path ) ){
     wp_die( 'The given file does not exist.' );
 }
 
-$items = wpgh_get_items_from_csv( $file_path );
+$items = wpgh_get_items_from_csv( $file_path ); //todo
 
 $sample_item = array_shift( $items );
 
 ?>
 <form method="post">
     <?php wp_nonce_field(); ?>
-    <?php echo  WPGH()->html->input( [
+    <?php echo  Plugin::$instance->utils->html->input( [
         'type' => 'hidden',
         'name' => 'import',
         'value' => $file_name
@@ -54,18 +59,18 @@ $sample_item = array_shift( $items );
     <tr>
         <th><?php echo $key; ?></th>
         <td>
-            <?php echo WPGH()->html->input( [
+            <?php echo Plugin::$instance->utils->html->input( [
                 'name' => 'no_submit',
                 'id'   => 'no_submit',
                 'value' => $value,
                 'attributes' => 'readonly'
             ] );
 
-            echo WPGH()->html->dropdown( [
+            echo Plugin::$instance->utils->html->dropdown( [
                 'name' => sprintf( 'map[%s]', $key ),
                 'id'   => sprintf( 'map_%s', $key ),
-                'selected' => get_key_from_column_label( $key ),
-                'options' => wpgh_get_mappable_fields(),
+                'selected' => get_key_from_column_label( $key ), //todo
+                'options' => wpgh_get_mappable_fields(), //todo
                 'option_none' => '* Do Not Map *'
             ] );
             ?>
@@ -78,7 +83,7 @@ $sample_item = array_shift( $items );
     ?>
     <tr>
         <th><?php _e( 'Add additional tags to this import' ) ?></th>
-        <td><div style="max-width: 500px"><?php echo WPGH()->html->tag_picker( [] ); ?></div></td>
+        <td><div style="max-width: 500px"><?php echo Plugin::$instance->utils->html->tag_picker( [] ); ?></div></td>
     </tr>
     </tbody>
 </table>

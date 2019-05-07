@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg\Admin\Contacts;
+
+use Groundhogg\Plugin;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -13,7 +17,7 @@
  * @param $table
  */
 function gscmp( $section, $table = 'meta' ){
-    echo WPGH()->html->dropdown( array(
+    echo Plugin::$instance->utils->html->dropdown( array(
         'name'              => sprintf( '%s[%s][comp]', $table, $section ),
         'id'                => sprintf( '%s__%s__comp', $table, $section ),
         'class'             => '',
@@ -42,7 +46,7 @@ function gscmp( $section, $table = 'meta' ){
  * @param $table
  */
 function gsfld( $section, $table = 'meta' ){
-    echo WPGH()->html->input(array(
+    echo Plugin::$instance->utils->html->input(array(
         'type'  => 'text',
         'name'  => sprintf( '%s[%s][search]', $table, $section ),
         'id'    => sprintf( '%s__%s__search', $table, $section ),
@@ -135,7 +139,7 @@ function gsfld( $section, $table = 'meta' ){
                     <tr>
                         <th><?php _e( 'Owner', 'groundhogg' ); ?></th>
                         <td><?php gscmp( 'owner', 'c' ); ?></td>
-                        <td><?php echo WPGH()->html->dropdown_owners( array(
+                        <td><?php echo Plugin::$instance->utils->html->dropdown_owners( array(
                                 'name'              => sprintf( 'c[%s][comp]', 'owner' ),
                                 'id'                => sprintf( 'c__%s__comp', 'owner' ),
                             ) ) ?></td>
@@ -154,7 +158,7 @@ function gsfld( $section, $table = 'meta' ){
                         <th colspan="1">
                             <?php _e( 'Tags' ); ?>
                         </th>
-                        <td colspan="2" ><?php echo WPGH()->html->dropdown( array(
+                        <td colspan="2" ><?php echo Plugin::$instance->utils->html->dropdown( array(
                                 'name'              => sprintf( 'tags[%s][comp]', 'tags_1' ),
                                 'id'                => sprintf( 'tags__%s__comp', 'tags_1' ),
                                 'class'             => '',
@@ -169,7 +173,7 @@ function gsfld( $section, $table = 'meta' ){
 
                     </tr>
                     <tr>
-                        <td colspan="3"><?php echo WPGH()->html->tag_picker(array(
+                        <td colspan="3"><?php echo Plugin::$instance->utils->html->tag_picker(array(
                                 'name'              => sprintf( 'tags[%s][tags][]', 'tags_1' ),
                                 'id'                => sprintf( 'tags__%s__tags', 'tags_1' ),
                             )); ?></td>
@@ -178,7 +182,7 @@ function gsfld( $section, $table = 'meta' ){
                         <th colspan="1">
                             <?php _e( 'And' ); ?>
                         </th>
-                        <td colspan="2" ><?php echo WPGH()->html->dropdown( array(
+                        <td colspan="2" ><?php echo Plugin::$instance->utils->html->dropdown( array(
                                 'name'              => sprintf( 'tags[%s][comp]', 'tags_2' ),
                                 'id'                => sprintf( 'tags__%s__comp', 'tags_2' ),
                                 'class'             => '',
@@ -193,7 +197,7 @@ function gsfld( $section, $table = 'meta' ){
 
                     </tr>
                     <tr>
-                        <td colspan="3"><?php echo WPGH()->html->tag_picker(array(
+                        <td colspan="3"><?php echo Plugin::$instance->utils->html->tag_picker(array(
                                 'name'              => sprintf( 'tags[%s][tags][]', 'tags_2' ),
                                 'id'                => sprintf( 'tags__%s__tags', 'tags_2' ),
                             )); ?></td>
@@ -209,7 +213,7 @@ function gsfld( $section, $table = 'meta' ){
                     <?php for( $i=1; $i<6; $i++ ): ?>
 
                     <tr>
-                        <td><?php echo WPGH()->html->meta_key_picker( array(
+                        <td><?php echo Plugin::$instance->utils->html->meta_key_picker( array(
                                 'name' => sprintf( 'c_meta[%s][key]', 'meta_' . $i ),
                                 'id'   => sprintf( 'c_meta__%s__key', 'meta_' . $i ),
                             ) ); ?></td>

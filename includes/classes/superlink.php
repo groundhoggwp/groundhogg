@@ -41,24 +41,38 @@ class Superlink extends Base_Object
 
     public function get_source_url()
     {
-
+        //todo
     }
 
     public function get_replacement_code()
     {
-
+        //todo
     }
 
+    /**
+     * @return array
+     */
     public function get_tags()
     {
-
+        return $this->tags;
     }
 
+    /**
+     * @return string
+     */
     public function get_target_url()
     {
+        return $this->target;
 
     }
 
 
+    /**
+     * @return int
+     */
+    public function get_id()
+    {
+        return absint( $this->ID );
+    }
 
 }

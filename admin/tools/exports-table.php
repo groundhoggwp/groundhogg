@@ -1,4 +1,8 @@
 <?php
+namespace  Groundhogg\Admin\Tools;
+
+use Groundhogg\Plugin;
+use \WP_List_Table;
 /**
  * Contacts Table Class
  *
@@ -19,7 +23,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 	require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_Imports_Table extends WP_List_Table {
+class Exports_Table extends WP_List_Table {
 
 	/**
 	 * TT_Example_List_Table constructor.
@@ -30,8 +34,8 @@ class WPGH_Imports_Table extends WP_List_Table {
 	public function __construct() {
 		// Set parent defaults.
 		parent::__construct( array(
-			'singular' => 'import',     // Singular name of the listed records.
-			'plural'   => 'imports',    // Plural name of the listed records.
+			'singular' => 'export',     // Singular name of the listed records.
+			'plural'   => 'exports',    // Plural name of the listed records.
 			'ajax'     => false,       // Does this table support ajax?
 		) );
 	}
@@ -45,7 +49,7 @@ class WPGH_Imports_Table extends WP_List_Table {
 			'cb'   => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'file' => _x( 'File', 'Column label', 'groundhogg' ),
             'rows' => _x( 'Rows', 'Column label', 'groundhogg' ),
-            'date' => _x( 'Date Uploaded', 'Column label', 'groundhogg' ),
+            'date' => _x( 'Date Exported', 'Column label', 'groundhogg' ),
 		);
 		return $columns;
 	}
@@ -64,15 +68,15 @@ class WPGH_Imports_Table extends WP_List_Table {
     /**
      * Get the rule title
      *
-     * @param $import array
+     * @param $export array
      * @return string
      */
-	protected function column_file( $import )
+	protected function column_file( $export )
 	{
-		$download_url = $import[ 'file_url' ];
+		$download_url = $export[ 'file_url' ];
 
 		$html = "<strong>";
-		$html .= "<a class='row-title' href='$download_url'>{$import['file']}</a>";
+		$html .= "<a class='row-title' href='$download_url'>{$export['file']}</a>";
 		$html .= "</strong>";
 
 		return $html;
@@ -81,46 +85,46 @@ class WPGH_Imports_Table extends WP_List_Table {
     /**
      * Get the rule type
      *
-     * @param $import array
+     * @param $export array
      * @return mixed
      */
-	protected function column_rows( $import )
+	protected function column_rows( $export )
 	{
-		return $import['rows'];
+		return $export['rows'];
 	}
 
     /**
      * Show the points to add.
      *
-     * @param $import array
+     * @param $export array
      * @return string
      */
-	protected function column_date( $import )
+	protected function column_date( $export )
 	{
-	    $strdate = date_i18n( 'Y-m-d H:i:s', intval( $import[ 'date' ] ) );
+	    $strdate = date_i18n( 'Y-m-d H:i:s', intval( $export[ 'date' ] ) );
 		return '<abbr title="' . $strdate . '">' . $strdate . '</abbr>';
 	}
 
 	/**
 	 * Get default column value.
-	 * @param object $import        A singular item (one full row's worth of data).
+	 * @param object $export        A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
-	protected function column_default( $import, $column_name ) {
+	protected function column_default( $export, $column_name ) {
 
-		return print_r( $import[$column_name], true );
+		return print_r( $export[$column_name], true );
 
 	}
 	/**
-	 * @param object $import A singular item (one full row's worth of data).
+	 * @param object $export A singular item (one full row's worth of data).
 	 * @return string Text to be placed inside the column <td>.
 	 */
-	protected function column_cb( $import ) {
+	protected function column_cb( $export ) {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			$this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-			$import[ 'file' ]               // The value of the checkbox should be the record's ID.
+			$export[ 'file' ]               // The value of the checkbox should be the record's ID.
 		);
 	}
 
@@ -132,13 +136,13 @@ class WPGH_Imports_Table extends WP_List_Table {
 			'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
 		);
 
-		return apply_filters( 'wpgh_imports_bulk_actions', $actions );
+		return apply_filters( 'wpgh_exports_bulk_actions', $actions );
 	}
 
 	/**
 	 * Prepares the list of items for displaying.
 
-	 * @global wpdb $wpdb
+	 * @global $wpdb \wpdb
 	 * @uses $this->_column_headers
 	 * @uses $this->items
 	 * @uses $this->get_columns()
@@ -159,19 +163,19 @@ class WPGH_Imports_Table extends WP_List_Table {
 
         $data = [];
 
-        if ( file_exists( wpgh_get_csv_imports_dir() ) ) {
+        if ( file_exists( Plugin::$instance->utils->files->get_csv_exports_dir() ) ) {
 
-            $scanned_directory = array_diff(scandir(wpgh_get_csv_imports_dir()), ['..', '.']);
+            $scanned_directory = array_diff(scandir( Plugin::$instance->utils->files->get_csv_exports_dir() ), ['..', '.']);
 
 
             foreach ($scanned_directory as $filename) {
 
-                $filepath = wpgh_get_csv_imports_dir($filename);
+                $filepath = Plugin::$instance->utils->files->get_csv_exports_dir($filename);
 
                 $file = [
                     'file' => $filename,
                     'file_path' => $filepath,
-                    'file_url' => wpgh_get_csv_imports_url($filename),
+                    'file_url' => Plugin::$instance->utils->files->get_csv_exports_url($filename),
                     'date' => filemtime($filepath),
                     'rows' => count(file($filepath, FILE_SKIP_EMPTY_LINES)) - 1,
                 ];
@@ -224,32 +228,32 @@ class WPGH_Imports_Table extends WP_List_Table {
 	/**
 	 * Generates and displays row action rule.
 	 *
-	 * @param array $import       Contact being acted upon.
+	 * @param array $export       Contact being acted upon.
 	 * @param string $column_name Current column name.
 	 * @param string $primary     Primary column name.
 	 * @return string Row steps output for posts.
 	 */
-	protected function handle_row_actions( $import, $column_name, $primary ) {
+	protected function handle_row_actions( $export, $column_name, $primary ) {
 		if ( $primary !== $column_name ) {
 			return '';
 		}
 
 		$actions = array();
 
-		$actions['import'] = sprintf(
+		$actions['export'] = sprintf(
 			'<a href="%s" class="edit" aria-label="%s">%s</a>',
 			/* translators: %s: title */
-			admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import[ 'file' ] ),
-			esc_attr( 'Import' ),
-			__( 'Import' )
+			$export[ 'file_url' ],
+			esc_attr( 'Export' ),
+			__( 'Export' )
 		);
 
 		$actions['delete'] = sprintf(
 			'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-			wp_nonce_url(admin_url( 'admin.php?page=gh_tools&tab=import&action=delete&import=' . $import[ 'file' ] )),
+			wp_nonce_url(admin_url( 'admin.php?page=gh_tools&tab=export&action=delete&export=' . $export[ 'file' ] )),
 			/* translators: %s: title */
 			esc_attr( 'Delete Permanently' ),
-			__( 'Delete Import' )
+			__( 'Delete export' )
 		);
 
 		return $this->row_actions( $actions );

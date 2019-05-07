@@ -1,4 +1,6 @@
 <?php
+
+
 /**
  * Module Manager
  *
@@ -36,6 +38,7 @@ class WPGH_Extension_Manager
     public static function add_extension( $item_id, $license, $status, $expiry )
     {
         if ( empty( static::$extensions ) )
+
             static::$extensions = wpgh_get_option( "gh_extensions", array() );
 
         static::$extensions[ $item_id ] = array(

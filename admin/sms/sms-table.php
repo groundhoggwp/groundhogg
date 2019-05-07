@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\SMS;
 
+use Groundhogg\SMS;
 use Groundhogg\Plugin;
 use WP_List_Table;
 
@@ -67,25 +68,33 @@ class SMS_Table extends WP_List_Table {
         return $sortable_columns;
     }
 
+    /**
+     * @param $sms SMS
+     * @return string
+     */
     protected function column_title( $sms )
     {
-        $editUrl = admin_url( 'admin.php?page=gh_sms&action=edit&sms=' . $sms->ID );
-        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $sms->title ) . "</a>";
+        $editUrl = admin_url( 'admin.php?page=gh_sms&action=edit&sms=' . $sms->get_id() );
+        $html = "<a class='row-title' href='$editUrl'>" . esc_html( $sms->get_title() ) . "</a>";
         return $html;
     }
 
+    /**
+     * @param $sms SMS
+     * @return mixed|void
+     */
     protected function column_message( $sms )
     {
-    	return apply_filters( 'the_content', wp_trim_words( $sms->message, 20 ) );
+    	return apply_filters( 'the_content', wp_trim_words( $sms->get_message(), 20 ) );
     }
 
-	/**
-	 * @param $email WPGH_Email
-	 * @return string
-	 */
+    /**
+     * @param $sms SMS
+     * @return string
+     */
 	protected function column_author( $sms )
 	{
-		$user = get_userdata( intval( ( $sms->author ) ) );
+		$user = get_userdata( intval( ( $sms->get_author() ) ) );
 		$from_user = esc_html( $user->display_name );
 		$queryUrl = admin_url( 'admin.php?page=gh_sms&view=author&author=' . $user->ID );
 		return "<a href='$queryUrl'>$from_user</a>";
@@ -93,24 +102,23 @@ class SMS_Table extends WP_List_Table {
 
     /**
      * Get default column value.
-     * @param object $sms        A singular item (one full row's worth of data).
+     * @param  $sms SMS        A singular item (one full row's worth of data).
      * @param string $column_name The name/slug of the column to be processed.
      * @return string Text or HTML to be placed inside the column <td>.
      */
     protected function column_default( $sms, $column_name ) {
-
         return print_r( $sms->$column_name, true );
 
     }
     /**
-     * @param object $sms A singular item (one full row's worth of data).
+     * @param  $sms SMS A singular item (one full row's worth of data).
      * @return string Text to be placed inside the column <td>.
      */
     protected function column_cb( $sms ) {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $sms->ID               // The value of the checkbox should be the record's ID.
+            $sms->get_id()               // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -196,7 +204,7 @@ class SMS_Table extends WP_List_Table {
     /**
      * Generates and displays row action smss.
      *
-     * @param object $item        Contact being acted upon.
+     * @param $sms  SMS  Contact being acted upon.
      * @param string $column_name Current column name.
      * @param string $primary     Primary column name.
      * @return string Row steps output for posts.
@@ -207,19 +215,19 @@ class SMS_Table extends WP_List_Table {
         }
 
         $actions = array();
-        $title = $sms->title;
+        $title = $sms->get_title();
 
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',
             /* translators: %s: title */
-            admin_url( 'admin.php?page=gh_sms&action=edit&sms=' . $sms->ID ),
+            admin_url( 'admin.php?page=gh_sms&action=edit&sms=' . $sms->get_id() ),
             esc_attr( sprintf( __( 'Edit' ), $title ) ),
             __( 'Edit' )
         );
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_sms&sms='. $sms->ID . '&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_sms&sms='. $sms->get_id() . '&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )

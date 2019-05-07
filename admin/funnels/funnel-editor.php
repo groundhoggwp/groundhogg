@@ -1,4 +1,8 @@
 <?php
+
+namespace Groundhogg\Admin\Funnels;
+
+use Groundhogg\Plugin;
 /**
  * Edit Funnel
  *
@@ -20,7 +24,7 @@ $funnel_id = intval( $_GET['funnel'] );
 
 do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
 
-$funnel = WPGH()->funnels->get( $funnel_id );
+$funnel = Plugin::$instance->dbs->get_db('funnels')->get( $funnel_id );
 
 ?>
 <span class="hidden" id="new-title"><?php echo $funnel->title; ?> &lsaquo; </span>
@@ -34,7 +38,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
         'name' => 'funnel',
         'id'    => 'funnel',
         'value' => $funnel_id
-    ); echo WPGH()->html->input( $args ); ?>
+    ); echo Plugin::$instance->utils->html->input( $args ); ?>
     <div class="header-wrap">
         <div class="funnel-editor-header">
             <div class="title alignleft">
@@ -59,14 +63,14 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         'last_year'     => _x( 'Last Year', 'reporting_range', 'groundhogg' ),
                         'custom'        => _x( 'Custom Range', 'reporting_range', 'groundhogg' ),
                     ),
-                    'selected' => WPGH()->menu->funnels_page->get_url_var( 'date_range', 'this_week' ),
-                ); echo WPGH()->html->dropdown( $args );
+                    'selected' => WPGH()->menu->funnels_page->get_url_var( 'date_range', 'this_week' ), //todo
+                ); echo Plugin::$instance->utils->html->dropdown( $args );
 
-                $class = WPGH()->menu->funnels_page->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden';
+                $class = WPGH()->menu->funnels_page->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden'; //todo
 
                 ?><div class="custom-range <?php echo $class ?> alignleft"><?php
 
-                    echo WPGH()->html->date_picker(array(
+                    echo Plugin::$instance->utils->html->date_picker(array(
                         'name'  => 'custom_date_range_start',
                         'id'    => 'custom_date_range_start',
                         'class' => 'input',
@@ -77,11 +81,11 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
                         'format' => 'yy-mm-dd'
                     ));
-                    echo WPGH()->html->date_picker(array(
+                    echo Plugin::$instance->utils->html->date_picker(array(
                         'name'  => 'custom_date_range_end',
                         'id'    => 'custom_date_range_end',
                         'class' => 'input',
-                        'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_end' ),
+                        'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_end' ), //todo
                         'attributes' => '',
                         'placeholder' => 'YYY-MM-DD',
                         'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
@@ -98,7 +102,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                 </script>
                 <?php submit_button( _x( 'Refresh', 'action', 'groundhogg' ), 'secondary', 'change_reporting', false ); ?>
 
-                <?php echo WPGH()->html->toggle( [
+                <?php echo Plugin::$instance->utils->html->toggle( [
                     'name'          => 'reporting_on',
                     'id'            => 'reporting-toggle',
                     'value'         => 'ready',
@@ -126,7 +130,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                                     <td>
                                         <?php
 
-                                        echo WPGH()->html->tag_picker( array(
+                                        echo Plugin::$instance->utils->html->tag_picker( array(
                                             'name'  => 'add_contacts_to_funnel_tag_picker[]',
                                             'id'    => 'add_contacts_to_funnel_tag_picker',
                                         ) );
@@ -143,16 +147,16 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                                     <td>
                                         <?php
 
-                                        $steps = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id ) );
+                                        $steps = Plugin::$instance->dbs->get_db('steps')->query( array( 'funnel_id' => $funnel_id ) );
                                         $options = array();
                                         foreach ( $steps as $step ){
-                                            $step = wpgh_get_funnel_step( $step->ID );
+                                            $step = Plugin::$instance->utils->get_step( $step->ID );
                                             if ($step->is_active() ){
                                                 $options[ $step->ID ] = $step->title . ' (' . str_replace( '_', ' ', $step->type ) . ')';
                                             }
                                         }
 
-                                        echo WPGH()->html->select2( array(
+                                        echo Plugin::$instance->utils->html->select2( array(
                                             'name'              => 'add_contacts_to_funnel_step_picker',
                                             'id'                => 'add_contacts_to_funnel_step_picker',
                                             'data'              => $options,
@@ -177,7 +181,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                     <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _ex( 'Export Funnel', 'action','groundhogg'); ?></a>
                 </div>
                 <div id="status">
-                    <?php echo WPGH()->html->toggle( [
+                    <?php echo Plugin::$instance->utils->html->toggle( [
                         'name'          => 'funnel_status',
                         'id'            => 'status-toggle',
                         'value'         => 'active',
@@ -204,7 +208,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         <?php do_action( 'wpgh_benchmark_icons_before' ); ?>
                         <table>
                             <tbody>
-                            <?php $elements = WPGH()->elements->get_benchmarks();
+                            <?php $elements = WPGH()->elements->get_benchmarks(); //todo
 
                             $i = 0;
 
@@ -241,7 +245,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                         <?php do_action( 'wpgh_action_icons_before' ); ?>
                         <table>
                             <tbody>
-                            <?php $elements = WPGH()->elements->get_actions();
+                            <?php $elements = WPGH()->elements->get_actions(); //todo
 
                             $i = 0;
 
@@ -277,7 +281,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
             <!-- End elements area-->
             <!-- main funnel editing area -->
             <div id="notices">
-                <?php WPGH()->notices->notices(); ?>
+                <?php WPGH()->notices->notices(); //todo remove ?>
             </div>
 
             <div style="width: 100%">
@@ -288,23 +292,18 @@ $funnel = WPGH()->funnels->get( $funnel_id );
                 <div style="visibility: hidden" id="normal-sortables" class="meta-box-sortables ui-sortable">
                     <?php do_action('wpgh_funnel_steps_before' ); ?>
 
-                    <?php $steps = WPGH()->steps->get_steps( array( 'funnel_id' => $funnel_id ) );
+                    <?php $steps = Plugin::$instance->dbs->get_db('steps')->query( array( 'funnel_id' => $funnel_id ) );
 
                     if ( empty( $steps ) ): ?>
                         <div class="">
                             <?php esc_html_e( 'Drag in new steps to build the ultimate sales machine!' , 'groundhogg'); ?>
                         </div>
                     <?php else:
-
                         foreach ( $steps as $i => $step ):
-
-                            $step = wpgh_get_funnel_step( $step->ID );
-
+                            $step = Plugin::$instance->utils->get_step( $step->ID );
                             $step->html();
                             // echo $step;
-
                         endforeach;
-
                     endif; ?>
                     <?php do_action('wpgh_funnel_steps_after' ); ?>
                 </div>

@@ -1,4 +1,12 @@
 <?php
+
+namespace Groundhogg\Admin\Contacts;
+
+use \WP_List_Table;
+use Groundhogg\Event;
+use Groundhogg\Plugin;
+use Groundhogg\Email;
+
 /**
  * Activity table view
  *
@@ -22,7 +30,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_Contact_Activity_Table extends WP_List_Table {
+class Contact_Activity_Table extends WP_List_Table {
 
     /**
      * @var array
@@ -65,35 +73,36 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
      */
     public function single_row( $item ) {
         echo '<tr>';
-        $this->single_row_columns( new WPGH_Event( $item->ID ) );
+        $this->single_row_columns( new Event( $item->ID ) );
         echo '</tr>';
     }
 
     /**
-     * @param $event WPGH_Event
+     * @param $event Event
      * @return string
      */
     protected function column_email( $event )
     {
 
-        if ($event->type) {
-            switch ($event->type) {
+        if ($event->get_event_type()) {
+            switch ($event->get_event_type()) {
                 default:
                 case GROUNDHOGG_FUNNEL_EVENT:
-                    $email = new WPGH_Email( $event->step->get_meta( 'email_id' ) );
+//                    $email = new WPGH_Email( $event->step->get_meta( 'email_id' ) ); todo check
+                    $email = new Email($event->get_step()->get_meta( 'email_id' ));
                     break;
                 case GROUNDHOGG_BROADCAST_EVENT:
-                    $email = $event->step->email;
+                    $email = $event->step->email; //todo
                     break;
                 case GROUNDHOGG_EMAIL_NOTIFICATION_EVENT:
-                    $email = $event->step->email;
+                    $email = $event->step->email; //todo
                     break;
             }
         } else {
             if ( $event->is_broadcast_event() ) {
-                $email = $event->step->email;
+                $email = $event->step->email; //todo
             } else {
-                $email = new WPGH_Email( $event->step->get_meta( 'email_id' ) );
+                $email = new WPGH_Email( $event->step->get_meta( 'email_id' ) ); //todo
             }
         }
 
@@ -101,20 +110,22 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
     }
 
     /**
-     * @param $event WPGH_Event
+     * @param $event Event
      *
      * @return string
      */
     protected function column_open( $event )
     {
 
-        $activity = WPGH()->activity->get_activity( array(
+//        $activity = WPGH()->activity->get_activity( array( todo check
+
+        $activity = Plugin::$instance->dbs->get_db('activity')->query( [
             'funnel_id'     => $event->funnel_id,
-            'step_id'       => $event->step->ID,
+            'step_id'       => $event->get_step_id() ,
             'activity_type' => 'email_opened',
-            'contact_id'    => $event->contact->ID,
+            'contact_id'    => $event->get_contact_id(),
 //            'event_id'      => $event->ID
-        ) );
+        ] );
 
 //        print_r( $activity );
 
@@ -124,7 +135,7 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
 
         $activity = array_shift( $activity );
 
-        $p_time = intval( $activity->timestamp ) + ( wpgh_get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $p_time = intval( $activity->timestamp ) + ( Plugin::$instance->settings->get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
         $cur_time = (int) current_time( 'timestamp' );
         $time_diff = $p_time - $cur_time;
         if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
@@ -134,26 +145,27 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
         }
 
         $html = '<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
-        $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->contact->get_local_time( intval( $activity->timestamp ) ) ), __( 'local time' ) ) . '</i>';
+        $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->contact->get_local_time( intval( $activity->timestamp ) ) ), __( 'local time' ) ) . '</i>'; //todo
 
         return $html;
 
     }
 
     /**
-     * @param $event WPGH_Event
+     * @param $event Event
      * @return string
      */
     protected function column_click( $event )
     {
 
-        $activity = WPGH()->activity->get_activity( array(
+
+        $activity = Plugin::$instance->dbs->get_db('activity')->query( [
             'funnel_id'     => $event->funnel_id,
-            'step_id'       => $event->step->ID,
+            'step_id'       => $event->get_step_id(),
             'activity_type' => 'email_link_click',
-            'contact_id'    => $event->contact->ID,
+            'contact_id'    => $event->get_contact_id(),
 //            'event_id'      => $event->ID
-        ) );
+        ] );
 
         if( empty( $activity ) ){
             return '&#x2014;';
@@ -167,7 +179,7 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
 
     /**
      * Prepares the list of items for displaying.
-     * @global wpdb $wpdb
+     * @global $wpdb \wpdb
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
@@ -189,8 +201,8 @@ class WPGH_Contact_Activity_Table extends WP_List_Table {
 
         global $wpdb;
 
-        $events_table = WPGH()->events->table_name;
-        $steps_table = WPGH()->steps->table_name;
+        $events_table = Plugin::$instance->dbs->get_db('events')->get_table_name();
+        $steps_table  = Plugin::$instance->dbs->get_db('steps')->get_table_name();
 
         $id = intval( $_REQUEST[ 'contact' ] );
 
