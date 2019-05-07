@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Bounce Checker
  *
@@ -14,10 +18,7 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Bounce_Checker
+class Bounce_Checker
 {
     /**
      * The inbox in which bounces are located
@@ -36,7 +37,7 @@ class WPGH_Bounce_Checker
     /**
      * The bounce handler class
      *
-     * @var BounceHandler
+     * @var \BounceHandler
      */
     var $bounce_handler;
 

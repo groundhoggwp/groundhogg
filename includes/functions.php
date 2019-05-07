@@ -17,7 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 function isset_not_empty($array, $key='' )
 {
-    return isset( $array[ $key ] ) && ! empty( $array[ $key ] );
+    if ( is_object( $array ) ){
+        return isset( $array->$key ) && ! empty( $array->$key );
+    } elseif ( is_array( $array  ) ){
+        return isset( $array[ $key ] ) && ! empty( $array[ $key ] );
+    }
+
+    return false;
 }
 
 /**
@@ -958,7 +964,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
     /* Use the GH SS Mailer class instead */
     if ( ! ( $phpmailer instanceof GH_SS_Mailer ) ) {
-        require_once dirname( __FILE__ ) . '/class-gh-ss-mailer.php';
+        require_once dirname(__FILE__) . '/gh-ss-mailer.php';
         $phpmailer = new GH_SS_Mailer( true );
     }
 

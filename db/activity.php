@@ -130,24 +130,6 @@ class Activity extends DB  {
     }
 
     /**
-     * Helper function to bulk delete events in the event associated things happen.
-     *
-     * @param array $data
-     * @return false|int
-     */
-    public function bulk_delete( $data = [] )
-    {
-        global $wpdb;
-
-        $column_formats = $this->get_columns();
-        $data = array_intersect_key( $data, $column_formats );
-
-        $result = $wpdb->delete( $this->table_name, $data );
-
-        return $result;
-    }
-
-    /**
      * Retrieve activity like the given args
      *
      * @access  public

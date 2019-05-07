@@ -45,6 +45,8 @@ class Manager
         $this->superlinks   = new Superlinks();
         $this->tags         = new Tags();
         $this->tag_relationships = new Tag_Relationships();
+        $this->submissions = new Submissions();
+        $this->submissionmeta = new Submission_Meta();
 
         /**
          * Runs when the DB Manager is setup and all the standard DBs have been initialized.
@@ -60,6 +62,16 @@ class Manager
      */
     public function get_db( $key ){
         return $this->$key;
+    }
+
+    /**
+     * Install all DBS.
+     */
+    public function install_dbs()
+    {
+        foreach ( $this->dbs as $db ){
+            $db->create_table();
+        }
     }
 
     /**

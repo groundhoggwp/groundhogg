@@ -114,6 +114,11 @@ class Plugin {
      */
     public $rewrites;
 
+    /**
+     * @var Tag_Mapping
+     */
+    public $tag_mapping;
+
     
     /**
      * @var Log_Manager
@@ -192,6 +197,8 @@ class Plugin {
      * @access public
      */
     public function init() {
+
+        $this->includes();
         $this->init_components();
 
         /**
@@ -228,6 +235,11 @@ class Plugin {
      */
     private function init_components() {
 
+        //Maintenance stuff.
+        $this->installer    = new Main_Installer();
+        $this->updater      = new Main_Updater();
+
+        // Modules
         $this->settings     = new Settings();
         $this->dbs          = new DB_Manager();
         $this->preferences  = new Preferences();
@@ -237,8 +249,9 @@ class Plugin {
         $this->notices      = new Notices();
         $this->rewrites     = new Rewrites();
         $this->replacements = new Replacements();
+        $this->tag_mapping  = new Tag_Mapping();
+
 //        $this->sending_service = new Sending_Service();
-//        $this->roles        = new Roles();
 //        $this->event_queue  = new Event_Queue();
 
         if ( is_admin() ) {
@@ -270,14 +283,14 @@ class Plugin {
      * @access private
      */
     private function __construct() {
-        $this->register_autoloader();
 
+        $this->register_autoloader();
 //        $this->logger = Log_Manager::instance();
 //
 //        Maintenance::init();
 //        Compatibility::register_actions();
 
-        $this->includes();
+//        $this->init();
 
         add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
         add_action( 'rest_api_init', [ $this, 'on_rest_api_init' ] );
@@ -289,7 +302,6 @@ class Plugin {
     private function includes()
     {
         require  GROUNDHOGG_PATH . '/includes/functions.php';
-//        require  GROUNDHOGG_PATH . '/includes/scripts.php';
 //        require  GROUNDHOGG_PATH . '/includes/install.php';
 //        require  GROUNDHOGG_PATH . '/includes/install.php';
     }

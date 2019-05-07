@@ -96,6 +96,14 @@ abstract class DB {
     abstract public function get_primary_key();
 
     /**
+     * @return string
+     */
+    public function get_date_key()
+    {
+        return 'date_created';
+    }
+
+    /**
      * Get the DB version
      *
      * @return mixed
@@ -428,6 +436,25 @@ abstract class DB {
         do_action( 'groundhogg/db/post_mass_update/' . $this->get_object_type(), $data );
 
         return true;
+    }
+
+
+    /**
+     * Helper function to bulk delete events in the event associated things happen.
+     *
+     * @param array $args
+     * @return false|int
+     */
+    public function bulk_delete( $data = array(), $where= array( '%d' ) )
+    {
+        global $wpdb;
+
+        $column_formats = $this->get_columns();
+        $data = array_intersect_key( $data, $column_formats );
+
+        $result = $wpdb->delete( $this->table_name, $data );
+
+        return $result;
     }
 
     /**

@@ -51,16 +51,21 @@ class Autoloader {
         'Rewrites'      => 'includes/rewrites.php',
         'Replacements'  => 'includes/replacements.php',
         'Settings'      => 'includes/settings.php',
-        'Bulk_Job'      => 'includes/bulk-jobs/bulk-job.php',
+        'Tag_Mapping'   => 'includes/tag-mapping.php',
+        'Modal'         => 'includes/modal.php',
+        'Main_Updater'  => 'includes/main-updater.php',
+        'Main_Installer' => 'includes/main-installer.php',
+        'Compliance'    => 'includes/compliance.php',
+        'Contact_Query' => 'includes/contact-query.php',
+        'Supports_Errors' => 'includes/supports-errors.php',
+        'Template_Loader' => 'includes/template-loader.php',
         'HTML'          => 'includes/utils/html.php',
         'Utils'         => 'includes/utils/utils.php',
         'Files'         => 'includes/utils/files.php',
         'Location'      => 'includes/utils/location.php',
-        'Modal'         => 'includes/modal.php',
         'Updater'       => 'includes/utils/updater.php',
+        'Installer'     => 'includes/utils/installer.php',
         'Date_Time'     => 'includes/utils/date-time.php',
-        'Compliance'    => 'includes/compliance.php',
-        'Supports_Errors' => 'includes/supports-errors.php',
         'Base_Object'   => 'includes/classes/base-object.php',
         'Base_Object_With_Meta' => 'includes/classes/base-object-with-meta.php',
         'Contact'       => 'includes/classes/contact.php',
@@ -68,8 +73,7 @@ class Autoloader {
         'Event'         => 'includes/classes/event.php',
         'Superlink'     => 'includes/classes/superlink.php',
         'Tag'           => 'includes/classes/tag.php',
-        'Template_Loader' => 'includes/template-loader.php',
-        'Gamajo_Template_Loader' => 'includes/lib/gamajo-template-loader.php',
+        'Bulk_Jobs\Bulk_Job' => 'includes/bulk-jobs/bulk-job.php',
     ];
 
     /**
@@ -122,8 +126,6 @@ class Autoloader {
 					$relative_class_name
 				)
 			);
-
-//			var_dump( $filename );
 
 			$filename = GROUNDHOGG_PATH . $filename . '.php';
 		}

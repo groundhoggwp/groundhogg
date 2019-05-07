@@ -1,7 +1,9 @@
 <?php
 namespace Groundhogg;
 
-class WPGH_Tag_Mapping extends Bulk_Job
+use Groundhogg\Bulk_Jobs\Bulk_Job;
+
+class Tag_Mapping extends Bulk_Job
 {
 
     const MARKETABLE = 'marketable';
@@ -14,6 +16,9 @@ class WPGH_Tag_Mapping extends Bulk_Job
      */
     private $tag_map = [];
 
+    /**
+     * Tag_Mapping constructor.
+     */
     public function __construct()
     {
 
@@ -41,7 +46,7 @@ class WPGH_Tag_Mapping extends Bulk_Job
             sprintf( "&nbsp;&nbsp;<a href='%s' class='button button-secondary'>Start Upgrade</a>", $this->get_start_url() )
         );
 
-        WPGH()->notices->add( 'status_tag_upgrade_notice', $notice, 'info' );
+        Plugin::$instance->notices->add( 'status_tag_upgrade_notice', $notice, 'info' );
     }
 
     /**
@@ -96,10 +101,10 @@ class WPGH_Tag_Mapping extends Bulk_Job
     {
         $tags = $this->get_default_tags();
         foreach ( $tags as $option_name => $tag_args ){
-            if ( ! wpgh_get_option( $option_name, false ) ){
-                $tags_id = WPGH()->tags->add( $tag_args );
+            if ( ! Plugin::$instance->settings->get_option( $option_name, false ) ){
+                $tags_id = Plugin::$instance->dbs->get_db( 'tags' )->add( $tag_args );
                 if ( $tags_id ){
-                    wpgh_update_option( $option_name, $tags_id );
+                    Plugin::$instance->settings->update_option( $option_name, $tags_id );
                 }
             }
         }
@@ -115,14 +120,14 @@ class WPGH_Tag_Mapping extends Bulk_Job
 
         if ( empty( $this->tag_map ) ){
             $this->tag_map = [
-                WPGH_CONFIRMED       => wpgh_get_option( 'gh_confirmed_tag', false ),
-                WPGH_UNCONFIRMED     => wpgh_get_option( 'gh_unconfirmed_tag', false ),
-                WPGH_UNSUBSCRIBED    => wpgh_get_option( 'gh_unsubscribed_tag', false ),
-                WPGH_SPAM            => wpgh_get_option( 'gh_spammed_tag', false ),
-                WPGH_HARD_BOUNCE     => wpgh_get_option( 'gh_bounced_tag', false ),
-                WPGH_COMPLAINED      => wpgh_get_option( 'gh_complained_tag', false ),
-                self::MARKETABLE     => wpgh_get_option( 'gh_marketable_tag', false ),
-                self::NON_MARKETABLE => wpgh_get_option( 'gh_non_marketable_tag', false ),
+                Preferences::CONFIRMED    => Plugin::$instance->settings->get_option( 'gh_confirmed_tag', false ),
+                Preferences::UNCONFIRMED  => Plugin::$instance->settings->get_option( 'gh_unconfirmed_tag', false ),
+                Preferences::UNSUBSCRIBED => Plugin::$instance->settings->get_option( 'gh_unsubscribed_tag', false ),
+                Preferences::SPAM         => Plugin::$instance->settings->get_option( 'gh_spammed_tag', false ),
+                Preferences::HARD_BOUNCE  => Plugin::$instance->settings->get_option( 'gh_bounced_tag', false ),
+                Preferences::COMPLAINED   => Plugin::$instance->settings->get_option( 'gh_complained_tag', false ),
+                self::MARKETABLE          => Plugin::$instance->settings->get_option( 'gh_marketable_tag', false ),
+                self::NON_MARKETABLE      => Plugin::$instance->settings->get_option( 'gh_non_marketable_tag', false ),
             ];
         }
 
@@ -161,7 +166,7 @@ class WPGH_Tag_Mapping extends Bulk_Job
     public function optin_status_changed( $contact_id=0, $status=0, $old_status=0 )
     {
 
-        $contact = wpgh_get_contact( $contact_id );
+        $contact = Plugin::$instance->utils->get_contact( $contact_id );
 
         if ( ! $contact )
             return;
@@ -205,7 +210,7 @@ class WPGH_Tag_Mapping extends Bulk_Job
      *
      * What this will allow is to listen for a NON_MARKETABLE error code which will allow the adding of the non marketable tag.
      *
-     * @param $event WPGH_Event
+     * @param $event Event
      */
     public function listen_for_non_marketable( $event )
     {
@@ -213,9 +218,9 @@ class WPGH_Tag_Mapping extends Bulk_Job
         $non_marketable_tag = $this->get_status_tag( self::NON_MARKETABLE );
         $marketable_tag = $this->get_status_tag( self::MARKETABLE );
 
-        if ( $event->error->get_error_code() === 'NON_MARKETABLE' && $event->contact->has_tag( $marketable_tag ) ){
-            $event->contact->remove_tag( $marketable_tag );
-            $event->contact->apply_tag( $non_marketable_tag );
+        if ( $event->get_last_error()->get_error_code() === 'NON_MARKETABLE' && $event->get_contact()->has_tag( $marketable_tag ) ){
+            $event->get_contact()->remove_tag( $marketable_tag );
+            $event->get_contact()->apply_tag( $non_marketable_tag );
         }
 
     }
@@ -237,7 +242,7 @@ class WPGH_Tag_Mapping extends Bulk_Job
      */
     public function query( $items )
     {
-        $query = new WPGH_Contact_Query();
+        $query = new Contact_Query();
         $items = $query->query([]);
 
         $ids = wp_list_pluck( $items, 'ID' );
@@ -278,7 +283,7 @@ class WPGH_Tag_Mapping extends Bulk_Job
      */
     protected function process_item( $item )
     {
-        $contact = wpgh_get_contact( absint( $item ) );
+        $contact = Plugin::$instance->utils->get_contact( absint( $item ) );
 
         if ( $contact ){
 
@@ -299,8 +304,8 @@ class WPGH_Tag_Mapping extends Bulk_Job
      */
     protected function clean_up()
     {
-        WPGH()->notices->remove( 'status_tag_upgrade_notice' );
-        wpgh_delete_option( 'gh_optin_status_job' );
+        Plugin::$instance->notices->remove( 'status_tag_upgrade_notice' );
+        Plugin::$instance->settings->delete_option( 'gh_optin_status_job' );
     }
 
     /**

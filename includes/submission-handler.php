@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Submission
  *
@@ -10,11 +14,7 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Submission
+class Submission_Handler extends Supports_Errors
 {
 
     /**
@@ -22,61 +22,47 @@ class WPGH_Submission
      *
      * @var array
      */
-    public $data;
+    protected $data;
 
     /**
      * @var array Acts as an alias for $_FILES
      */
-    public $files;
+    protected $files;
 
     /**
      * These are the EXPECTED Fields given by the form shortcode present
      *
      * @var array
      */
-    public $fields;
+    protected $fields;
 
     /**
      * The form config array object
      *
      * @var array
      */
-    public $config;
+    protected $config;
 
     /**
      * @var string this is set to the referer which is also the source page
      */
-    public $source;
+    protected $source;
 
     /**
      * @var int this ends up being the ID of the form
      */
-    public $id;
+    protected $form_id;
 
 	/**
-	 * @var WPGH_Step the funnel's step, mostly here to use the is_active()
+	 * @var Step the funnel's step, mostly here to use the is_active()
 	 *
 	 */
-    public $step;
+    protected $step;
 
     /**
-     * @var WPGH_Contact
+     * @var Contact
      */
-    public $contact;
-
-    /**
-     * Arrray of errors
-     *
-     * @var WP_Error[]
-     */
-    public $errors = array();
-
-    /**
-     * Handle the admin submissions differently
-     *
-     * @var bool
-     */
-    public $is_admin_submission = false;
+    protected $contact;
 
     /**
      * WPGH_Submission constructor.
@@ -86,50 +72,9 @@ class WPGH_Submission
      */
     public function __construct()
     {
-        if ( isset( $_POST[ 'gh_submit_nonce' ] ) ) {
-            add_action( 'init', array( $this, 'process' ) );
+        if ( $this->is_submitting() ) {
+            add_action( 'init', [ $this, 'process' ] );
         }
-    }
-
-    /**
-     * Add a new error
-     *
-     * @param $code string|WP_Error
-     * @param $message string
-     *
-     * @return WP_Error
-     */
-    public function add_error( $code = '', $message = '' )
-    {
-        if ( is_wp_error( $code ) ){
-            $error = $code;
-        } else {
-            $error = new WP_Error( $code, $message );
-        }
-
-        $this->errors[ $error->get_error_code() ] = $error;
-
-        return $error;
-    }
-
-    /**
-     * Whether the submission has errors which need to be displayed.
-     *
-     * @return bool
-     */
-    public function has_errors()
-    {
-       return ! empty( $this->errors );
-    }
-
-    /**
-     * Return the list of errors...
-     *
-     * @return WP_Error[]
-     */
-    public function get_errors()
-    {
-        return $this->errors;
     }
 
     /**
@@ -161,9 +106,7 @@ class WPGH_Submission
      */
     public function __set( $key, $value )
     {
-
         $this->data[ $key ] = $value;
-
     }
 
     /**
@@ -188,6 +131,22 @@ class WPGH_Submission
     }
 
     /**
+     * @return bool
+     */
+    public function is_admin_submission()
+    {
+        return is_admin() && current_user_can( 'edit_contacts' );
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_submitting()
+    {
+        return get_request_var( 'action' ) === 'gh_submit_form';
+    }
+
+    /**
      * Process the submission.
      *
      * Verify the submission should be processed, if not exit out and die.
@@ -202,10 +161,6 @@ class WPGH_Submission
      */
     public function process()
     {
-        if ( is_admin() && current_user_can( 'edit_contacts' ) ){
-            $this->is_admin_submission = true;
-        }
-
         if ( ! $this->setup() ){
             return;
         }
@@ -347,7 +302,7 @@ class WPGH_Submission
      */
     public function setup(){
 
-        $this->data = $_POST;
+        $this->data = wp_unslash( $_POST );
         $this->files = $_FILES;
 
         $this->source = wpgh_get_referer();
@@ -356,14 +311,13 @@ class WPGH_Submission
 
         if ( isset( $this->step_id ) ) {
 
-            $this->id = $this->step_id;
-
-            $this->step = wpgh_get_funnel_step( $this->id );
+            $this->form_id = absint( $this->step_id );
+            $this->step = Plugin::$instance->utils->get_step( $this->form_id  );
 
             unset( $this->step_id );
 
             if ( ! $this->step->is_active() ){
-                $this->add_error( 'INACTIVE_FORM', _x( 'This form is not accepting submissions.', 'submission_error', 'groundhogg' ) );
+                $this->add_error( 'inactive_form', _x( 'This form is not accepting submissions.', 'submission_error', 'groundhogg' ) );
                 return false;
             }
 
@@ -371,11 +325,11 @@ class WPGH_Submission
             $this->config = $this->step->get_meta( 'config' );
 
         } else {
-            $this->id = 0;
+            $this->form_id = 0;
         }
 
         if ( empty( $this->fields ) ){
-            $this->add_error( 'INVALID_FORM', _x( 'This form is setup incorrectly.', 'submission_error', 'groundhogg' ) );
+            $this->add_error( 'invalid_form', _x( 'This form is setup incorrectly.', 'submission_error', 'groundhogg' ) );
             return false;
         }
 
@@ -393,38 +347,42 @@ class WPGH_Submission
      */
     public function verify()
     {
-        if( ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) ) {
-            $this->add_error( 'SECURITY_CHECK_FAILED', _x( 'Failed security check.', 'submission_error', 'groundhogg' ) );
-            return false;
-        }
+//        if( ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) ) {
+//            $this->add_error( 'SECURITY_CHECK_FAILED', _x( 'Failed security check.', 'submission_error', 'groundhogg' ) );
+//            return false;
+//        }
 
-        unset( $_POST[ 'gh_submit_nonce' ] );
+//        unset( $_POST[ 'gh_submit_nonce' ] );
 
+        // Ensure valid form.
         if ( empty( $this->fields ) ) {
-            $this->add_error( 'INVALID_FORM', _x( 'This form is setup incorrectly.', 'submission_error', 'groundhogg' ) );
+            $this->add_error( 'invalid_form', _x( 'This form is setup incorrectly.', 'submission_error', 'groundhogg' ) );
             return false;
         }
 
-        if ( wpgh_is_gdpr()
-            && $this->has_field( 'gdpr_consent' )
-            && ! isset( $this->gdpr_consent )
-        ) {
-            $this->add_error( 'GDPR_CONSENT_REQUIRED', _x( 'You must consent to sign up.', 'submission_error', 'groundhogg' ) );
+        // GDPR Check
+        if ( Plugin::$instance->preferences->is_gdpr_enabled() && $this->has_field( 'gdpr_consent' ) && ! isset_not_empty( $this, 'gdpr_consent' ) ) {
+            $this->add_error( 'gdpr_consent_missing', _x( 'You must verify that you consent to receive marketing before you can sign up.', 'submission_error', 'groundhogg' ) );
             return false;
         }
 
-        if ( wpgh_is_recaptcha_enabled()
-            && $this->has_field( 'g-recaptcha' )
-        ) {
+        // Terms is required
+        if ( $this->has_field( 'agree_terms' ) && ! isset_not_empty( $this, 'agree_terms' ) ){
+            $this->add_error( 'TERMS_AGREEMENT_REQUIRED', _x( 'You must agree to the terms to sign up.', 'submission_error', 'groundhogg' ) );
+            return false;
+        }
+
+        // Recaptcha check
+        if ( $this->has_field( 'g-recaptcha' ) ) {
 
             if ( ! isset( $this->data[ 'g-recaptcha-response' ] ) ) {
-                $this->add_error( 'SECURITY_CHECK_FAILED', _x( 'Failed security check.', 'submission_error', 'groundhogg' ) );
+                $this->add_error( 'captcha_verification_failed', _x( 'Failed reCaptcha verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
                 return false;
             }
 
             $file_name = sprintf(
                 "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
-                wpgh_get_option( 'gh_recaptcha_secret_key' ),
+                Plugin::$instance->settings->get_option( 'gh_recaptcha_secret_key' ),
                 $this->data[ 'g-recaptcha-response' ]
             );
 
@@ -432,38 +390,31 @@ class WPGH_Submission
             $responseData = json_decode( $verifyResponse );
 
             if( $responseData->success == false ){
-                $this->add_error( 'SECURITY_CHECK_FAILED', _x( 'Failed security check.', 'submission_error', 'groundhogg' ) );
+                $this->add_error( 'captcha_verification_failed', _x( 'Failed reCaptcha verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
                 return false;
             }
         }
 
-        if ( $this->has_field( 'agree_terms' )
-            && ! isset( $this->agree_terms )
-        ){
-            $this->add_error( 'TERMS_AGREEMENT_REQUIRED', _x( 'You must agree to the terms to sign up.', 'submission_error', 'groundhogg' ) );
-            return false;
+        if( ! class_exists( '\Browser' ) ){
+            require_once GROUNDHOGG_PATH . 'includes/lib/browser.php';
         }
 
-        if( ! class_exists( 'Browser' ) ){
-            require_once WPGH_PLUGIN_DIR . 'includes/lib/browser.php';
-        }
-
-        $browser = new Browser();
+        $browser = new \Browser();
 
         if ( $browser->isRobot() || $browser->isAol() ){
-            $this->add_error( 'SPAM_CHECK_FAILED', _x( 'Failed spam check.',  'submission_error','groundhogg' ) );
+            $this->add_error( 'spam_check_failed', _x( 'Failed spam check.',  'submission_error','groundhogg' ) );
             return false;
         }
 
         // Check the IP against the spam list
-        if ( $this->is_spam( wpgh_get_visitor_ip() ) ) {
-            $this->add_error( 'SPAM_CHECK_FAILED', _x( 'Failed spam check.',  'submission_error', 'groundhogg' ) );
+        if ( $this->is_spam( Plugin::$instance->utils->location->get_real_ip() ) ) {
+            $this->add_error( 'spam_check_failed', _x( 'Failed spam check.',  'submission_error', 'groundhogg' ) );
             return false;
         }
 
         // Check all the POST data against the blacklist
         if ( $this->is_spam( $this->data ) ) {
-            $this->add_error('SPAM_CHECK_FAILED', _x('Failed spam check.', 'submission_error', 'groundhogg'));
+            $this->add_error('spam_check_failed', _x( 'Failed spam check.', 'submission_error', 'groundhogg') );
             return false;
         }
 
@@ -485,16 +436,13 @@ class WPGH_Submission
             }
 
             if ( $missing_required ){
-                $this->add_error(new WP_Error( 'REQUIRED_FIELD_MISSING', sprintf( _x( 'Missing a required field: %s', 'submission_error', 'groundhogg' ), $config[ 'label' ] ), $config ) );
+                $this->add_error( new \WP_Error( 'required_field_missing', sprintf( _x( 'Missing a required field: %s', 'submission_error', 'groundhogg' ), esc_html( $config[ 'label' ] ) ), $config ) );
                 return false;
             }
 
         }
 
-        $verified = apply_filters( 'wpgh_submission_verify_check', true, $this );
-        $verified = apply_filters( 'groundhogg/submission/verify', $verified, $this );
-
-        return $verified;
+        return apply_filters( 'groundhogg/submission_handler/verify', true, $this );
     }
 
     /**
@@ -532,7 +480,7 @@ class WPGH_Submission
         /* Turn into array */
         if ( ! is_array( $args ) ){ $args = [ $args ]; }
 
-        $blacklist = wpgh_get_option( 'blacklist_keys', false );
+        $blacklist = get_option( 'blacklist_keys', false );
 
         if ( ! empty( $blacklist ) ) {
 
@@ -546,7 +494,7 @@ class WPGH_Submission
                     if ( strpos( $value, $word ) !== false ){
                         return true;
                     /* Further checking */
-                    } else if ( apply_filters( 'groundhogg/submission/spam', false, $value, $word, $this ) ){
+                    } else if ( apply_filters( 'groundhogg/submission_handler/spam', false, $value, $word, $this ) ){
                         return true;
                     }
                 }
@@ -560,7 +508,7 @@ class WPGH_Submission
     /**
      * Create the contact record and return back the contact ID
      *
-     * @return WPGH_Contact|false the $contact or false if failure.
+     * @return Contact|false the $contact or false if failure.
      *
      */
     public function create_contact()
@@ -715,28 +663,6 @@ class WPGH_Submission
     }
 
     /**
-     * Change the default upload directory
-     *
-     * @param $param
-     * @return mixed
-     */
-    public function files_upload_dir( $param )
-    {
-        $param['path'] =   $this->files_upload_path[ 'path' ];
-        $param['url'] =    $this->files_upload_path[ 'url' ];
-        $param['subdir'] = $this->files_upload_path[ 'basedir' ];
-        return $param;
-    }
-
-    /**
-     * Save the files_upload_path temporarily.
-     */
-    public function set_upload_dirs()
-    {
-        $this->files_upload_path = $this->contact->get_uploads_folder();
-    }
-
-    /**
      * Upload a file to the Groundhogg file directory
      *
      * @param $key
@@ -785,97 +711,4 @@ class WPGH_Submission
 
         return $mfile;
     }
-
-    /**
-     * Get an array of allowed mime types for WP
-     *
-     * @param array $file_extensions
-     * @return array
-     */
-    private function get_allow_mime_types( $file_extensions=array() )
-    {
-
-        $mimes = array();
-
-        $wp_mimes = get_allowed_mime_types();
-
-        if ( ! empty( $file_extensions ) ){
-
-            foreach ( $file_extensions as $ext ){
-                $ext = str_replace(  '.', '', $ext );
-                foreach ( $wp_mimes as $exts => $mime ){
-
-                    if ( preg_match( '/' . $ext . '/', $exts ) ){
-                        $mimes[ $exts ] = $mime;
-                    }
-
-                    break;
-
-                }
-                $mimes[ $ext ] = 'application/text';
-            }
-
-            return $mimes;
-        } else {
-            return $wp_mimes;
-        }
-
-    }
-
-    /**
-     * If the contact is changing their preferences, process that change as well.
-     */
-    private function process_email_preference_changes()
-    {
-        if ( ! isset( $_POST[ 'email_preferences_nonce' ] ) || ! wp_verify_nonce( $_POST[ 'email_preferences_nonce' ], 'change_email_preferences' ) )
-            return;
-
-        $contact = $this->contact;
-
-        if ( ! $contact )
-            return;
-
-        //$contact->update_meta( 'preferences_changed', time() );
-
-        if ( isset( $_POST[ 'delete_everything' ] ) && $_POST[ 'delete_everything' ] === 'yes' ) {
-
-            do_action( 'wpgh_delete_everything', $contact->ID );
-            do_action( 'groundhogg/submission/gdpr/delete_everything', $contact->ID );
-
-            $contact->unsubscribe();
-            WPGH()->contacts->delete( $contact->ID );
-
-            $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
-            wp_redirect( $unsub_page );
-            die();
-        }
-
-        $preference = isset( $_POST[ 'email_preferences' ] ) ? sanitize_text_field( $_POST[ 'email_preferences' ] ): '';
-
-        switch ( $preference ){
-            case 'none':
-                if ( $contact->optin_status !== WPGH_CONFIRMED ){
-                    /* If they already confirmed DON'T CHANGE IT! */
-                    $contact->change_marketing_preference( WPGH_UNCONFIRMED );
-                }
-
-                break;
-            case 'weekly':
-                $contact->change_marketing_preference( WPGH_WEEKLY );
-                break;
-            case 'monthly':
-                $contact->change_marketing_preference( WPGH_MONTHLY );
-                break;
-            case 'unsubscribe':
-                $contact->unsubscribe();
-                $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
-                wp_redirect( $unsub_page );
-                die();
-
-                break;
-        }
-
-    }
-
-
 }

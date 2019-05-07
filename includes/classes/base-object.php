@@ -231,6 +231,32 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
     }
 
     /**
+     * Update the object
+     *
+     * @param array $data
+     * @return bool
+     */
+    public function create( $data = [] )
+    {
+        if ( empty( $data ) ) {
+            return false;
+        }
+
+        $data = $this->sanitize_columns( $data );
+
+        do_action( "groundhogg/{$this->get_object_type()}/pre_update", $this->get_id(), $data, $this );
+
+        if ( $updated = $this->get_db()->add( $data ) ) {
+            $object = $this->get_from_db( $this->get_identifier_key(), $this->get_id() );
+            $this->setup_object( $object );
+        }
+
+        do_action( "groundhogg/{$this->get_object_type()}/post_update", $this->get_id(), $data, $this );
+
+        return $updated;
+    }
+
+    /**
      * Sanitize columns when updating the object
      *
      * @param array $data

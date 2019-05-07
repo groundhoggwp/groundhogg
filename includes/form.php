@@ -13,7 +13,7 @@ namespace Groundhogg;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Form
+class Form
 {
     /**
      * Form attributes
@@ -99,7 +99,7 @@ class WPGH_Form
 
         if ( is_admin() && current_user_can( 'edit_contacts' ) && key_exists( 'contact', $_GET ) ){
             $this->auto_populate = true;
-            $this->source_contact = wpgh_get_contact( intval( $_GET[ 'contact' ] ) );
+            $this->source_contact = Plugin::$instance->utils->get_contact( absint( get_request_var( 'contact' ) ) );
         }
 
         $this->id = intval( $this->a[ 'id' ] );
@@ -1156,88 +1156,6 @@ class WPGH_Form
     }
 
     /**
-     * Offer up the email preferences form
-     *
-     * @return string
-     */
-    public function email_preferences( $atts )
-    {
-
-        $contact = WPGH()->tracking->get_contact();
-
-        if ( ! $contact || ! $contact->exists() ){
-            return _x( 'There is no email to manage.', 'form_default', 'groundhogg' );
-        }
-
-        $html = "<div class='gh-email-preferences-form'>";
-        $html .= wp_nonce_field( 'change_email_preferences', 'email_preferences_nonce', false, false );
-
-        $last_change = $contact->get_meta( 'preferences_changed' );
-
-        if ( $last_change && ( time() - $last_change ) < 30 ){
-
-            $html.= sprintf( "<div class='notice' style='color: white; background: #3ed920;padding: 6px;margin-bottom: 10px;'>%s</div>",
-                _x( 'Your preferences have been changed!', 'form_default', 'groundhogg' )
-            );
-
-        }
-
-        $options = array(
-            'none'          => _x( 'I love this company, you can communicate with me whenever you feel like.', 'form_default', 'groundhogg' ),
-            'weekly'        => _x( 'It\'s getting a bit much. Communicate with me weekly.', 'form_default', 'groundhogg' ),
-            'monthly'       => _x( 'Distance makes the heart grow fonder. Communicate with me monthly.', 'form_default', 'groundhogg' ),
-            'unsubscribe'   => _x( 'I no longer wish to receive any form of communication. Unsubscribe me!', 'form_default', 'groundhogg' )
-        );
-
-        $options = apply_filters( 'wpgh_email_preferences', $options );
-        $options = apply_filters( 'groundhogg/form/email_preferences/options', $options );
-
-        /* Email Preference Option */
-        $args = array(
-            'label'     => _x( 'Manage Email Preferences For <b>' . obfuscate_email( $contact->email ) . '</b>:', 'form_default', 'groundhogg' ),
-            'id'        => 'email_preferences',
-            'name'      => 'email_preferences',
-            'options'   => $options,
-            'selected'  => 'none',
-            'class'     => 'email-preference',
-            'required'  => 'true'
-        );
-
-        $args = apply_filters( 'groundhogg/form/email_preferences', $args );
-        $html .= $this->radio( $args );
-
-        /* Delete Everything Option */
-
-        if ( wpgh_is_gdpr() ){
-            $args = array(
-                'label'     => _x( ' Please also delete all personal information on record.', 'form_default', 'groundhogg' ),
-                'id'        => 'delete_everything',
-                'name'      => 'delete_everything',
-                'value'     => 'yes',
-            );
-
-            $args = apply_filters( 'groundhogg/form/email_preferences/gdpr', $args );
-            $html .= $this->checkbox( $args );
-            /* only show checkbox if unsubscribing */
-            $html .= "<script>
-jQuery( function($){ 
-    $( '#delete_everything' ).parent().css( 'display', 'none' );
-    $('input[name=email_preferences]').on( 'change', function(){ 
-        if ( $(this).is( ':checked' ) && $(this).val() === 'unsubscribe' ){ 
-            $( '#delete_everything' ).parent().fadeIn() 
-        } else { 
-            $( '#delete_everything' ).parent().fadeOut() 
-        } 
-    } ) 
-})</script>";
-        }
-
-        $html .= "</div>";
-
-        return $html;
-    }
-
-    /**
      * Submit button html
      *
      * @param $atts
@@ -1379,9 +1297,6 @@ jQuery( function($){
         $form .= '</div>';
 
         $form = str_replace( 'required', '', $form );
-//        $form = apply_filters( 'wpgh_form_shortcode', $form, $this );
-//        $form = apply_filters( 'groundhogg/form/after', $form, $this );
-        $form = apply_filters( 'wpgh_form_shortcode_preview', $form, $this );
         $form = apply_filters( 'groundhogg/form/preview/after', $form, $this );
 
         return $form;

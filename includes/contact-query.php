@@ -2,6 +2,8 @@
 namespace Groundhogg;
 
 // Exit if accessed directly
+use Groundhogg\DB\Contacts;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -118,7 +120,7 @@ class Contact_Query {
      *
      * @access protected
      * @since  2.8
-     * @var _DB_Contacts
+     * @var Contacts
      */
     protected $wpgh_db_contacts;
 
@@ -223,14 +225,14 @@ class Contact_Query {
         if ( $wpgh_db_contacts ) {
             $this->wpgh_db_contacts = $wpgh_db_contacts;
         } else {
-            $this->wpgh_db_contacts = WPGH()->contacts;
+            $this->wpgh_db_contacts = Plugin::$instance->dbs->get_db( 'contacts' );
         }
 
-        $this->table_name       = $this->wpgh_db_contacts->table_name;
-        $this->meta_type        = $this->wpgh_db_contacts->meta_type;
-        $this->primary_key      = $this->wpgh_db_contacts->primary_key;
-        $this->date_key         = $this->wpgh_db_contacts->date_key;
-        $this->cache_group      = $this->wpgh_db_contacts->cache_group;
+        $this->table_name       = $this->wpgh_db_contacts->get_table_name();
+        $this->meta_type        = $this->wpgh_db_contacts->get_object_type();
+        $this->primary_key      = $this->wpgh_db_contacts->get_primary_key();
+        $this->date_key         = $this->wpgh_db_contacts->get_date_key();
+        $this->cache_group      = $this->wpgh_db_contacts->get_cache_group();
 
         $this->query_var_defaults = array(
             'number'        => -1,
@@ -300,10 +302,10 @@ class Contact_Query {
         $this->query_vars['offset'] = absint( $this->query_vars['offset'] );
 
         if ( ! empty( $this->query_vars['date_query'] ) && is_array( $this->query_vars['date_query'] ) ) {
-            $this->date_query = new WP_Date_Query( $this->query_vars['date_query'], $this->table_name . '.' . $this->date_key );
+            $this->date_query = new \WP_Date_Query( $this->query_vars['date_query'], $this->table_name . '.' . $this->date_key );
         }
 
-        $this->meta_query = new WP_Meta_Query();
+        $this->meta_query = new \WP_Meta_Query();
         $this->meta_query->parse_query_vars( $this->query_vars );
 
         if ( ! empty( $this->meta_query->queries ) ) {
@@ -315,7 +317,7 @@ class Contact_Query {
          *
          * @since 2.8
          *
-         * @param WPGH_Contact_Query &$this The WPGH_Contact_Query instance (passed by reference).
+         * @param Contact_Query &$this The WPGH_Contact_Query instance (passed by reference).
          */
         do_action_ref_array( 'wpgh_parse_contact_query', array( &$this ) );
     }
@@ -338,7 +340,7 @@ class Contact_Query {
          *
          * @since 2.8
          *
-         * @param WPGH_Contact_Query &$this Current instance of WPGH_Contact_Query, passed by reference.
+         * @param Contact_Query &$this Current instance of WPGH_Contact_Query, passed by reference.
          */
         do_action_ref_array( 'wpgh_pre_get_contacts', array( &$this ) );
 
@@ -388,7 +390,7 @@ class Contact_Query {
      * @access protected
      * @since  2.8
      *
-     * @global wpdb $wpdb WordPress database abstraction object.
+     * @global \wpdb $wpdb WordPress database abstraction object.
      *
      * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
      */
@@ -439,7 +441,7 @@ class Contact_Query {
      * @access protected
      * @since  2.8
      *
-     * @global wpdb $wpdb WordPress database abstraction object.
+     * @global \wpdb $wpdb WordPress database abstraction object.
      */
     protected function set_found_items() {
         global $wpdb;
@@ -451,7 +453,7 @@ class Contact_Query {
              * @since 2.8
              *
              * @param string             $found_contacts_query SQL query. Default 'SELECT FOUND_ROWS()'.
-             * @param WPGH_Contact_Query $contact_query        The `WPGH_Contact_Query` instance.
+             * @param Contact_Query $contact_query        The `WPGH_Contact_Query` instance.
              */
             $found_items_query = apply_filters( 'wpgh_found_contacts_query', 'SELECT FOUND_ROWS()', $this );
 
@@ -507,7 +509,7 @@ class Contact_Query {
 //        }
 
         if ( ! empty( $this->query_vars[ 'report' ] ) ){
-            $events_table = WPGH()->events->table_name;
+            $events_table = Plugin::$instance->dbs->get_db( 'events' )->get_table_name();
 
             $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
 
@@ -515,7 +517,7 @@ class Contact_Query {
         }
 
         if ( ! empty( $this->query_vars[ 'activity' ] ) ){
-            $activity_table = WPGH()->activity->table_name;
+            $activity_table = Plugin::$instance->dbs->get_db( 'activity' )->get_table_name();
 
             $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
 
@@ -581,7 +583,7 @@ class Contact_Query {
             }
         }
 
-        $tags_relationships_table = WPGH()->tag_relationships->table_name;
+        $tags_relationships_table = Plugin::$instance->dbs->get_db( 'tag_relationships' )->get_table_name();
 
         if ( ! empty( $this->query_vars[ 'tags_include' ] ) ){
             if ( is_array( $this->query_vars[ 'tags_include' ] ) ){
@@ -782,7 +784,7 @@ class Contact_Query {
      * @access protected
      * @since  2.8
      *
-     * @global wpdb  $wpdb WordPress database abstraction object.
+     * @global \wpdb  $wpdb WordPress database abstraction object.
      *
      * @param string $string  Search string.
      * @param array  $columns Columns to search.

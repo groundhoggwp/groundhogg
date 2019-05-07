@@ -15,9 +15,25 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @since 1.4.4
  */
-class Roles {
+class Main_Roles extends Roles {
 
-	/**
+    /**
+     * Returns an array  of role => [
+     *  'role' => '',
+     *  'name' => '',
+     *  'caps' => []
+     * ]
+     *
+     * In this case caps should just be the meta cap map for other WP related stuff.
+     *
+     * @return array[]
+     */
+    public function get_roles()
+    {
+        // TODO: Implement get_roles() method.
+    }
+
+    /**
 	 * Add new shop roles with default WP caps
 	 *
 	 * @since 1.4.4
@@ -63,6 +79,7 @@ class Roles {
 		) );
 	}
 
+
     /**
      * Remove the roles from WPGH
      */
@@ -73,10 +90,9 @@ class Roles {
             remove_role( $role );
         }
     }
-
-
     ###################
     ### DEFINE CAPS ###
+
     ###################
 
     /**
@@ -129,6 +145,7 @@ class Roles {
         return apply_filters( 'wpgh_tag_caps', $caps );
     }
 
+
     /**
      * Superlinks:
      * - Add Superlinks
@@ -150,8 +167,7 @@ class Roles {
         return apply_filters( 'wpgh_superlink_caps', $caps );
     }
 
-
-	/**
+    /**
 	 * SMS:
 	 * - Add sms
 	 * - Delete sms
@@ -286,6 +302,7 @@ class Roles {
         return apply_filters( 'wpgh_report_caps', $caps );
     }
 
+
     public function get_other_caps()
     {
 	    $caps = array(
@@ -317,7 +334,6 @@ class Roles {
         return $caps;
     }
 
-
     /**
      * Return the WP_Roles instance.
      *
@@ -336,7 +352,7 @@ class Roles {
         return $wp_roles;
     }
 
-	/**
+    /**
 	 * Add new shop-specific capabilities
 	 *
 	 * @since  1.4.4
@@ -455,5 +471,4 @@ class Roles {
 
         return $roles;
     }
-
 }
