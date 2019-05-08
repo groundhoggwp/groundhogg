@@ -447,7 +447,7 @@ class Events_Table extends WP_List_Table {
 
             if ( $event->is_funnel_event() ){
                 $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->get_funnel_id(), $event->get_step()->get_id() ) ),
+                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->get_funnel_id(), $event->get_step_id() ) ),
                     esc_attr(_x('Edit Step', 'action', 'groundhogg')),
                     _x('Edit Step', 'action', 'groundhogg')
                 );
@@ -460,4 +460,6 @@ class Events_Table extends WP_List_Table {
 
         return $this->row_actions( apply_filters( 'wpgh_event_row_actions', $actions, $event, $column_name ) );
     }
+
+
 }

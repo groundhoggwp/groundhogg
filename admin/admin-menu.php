@@ -1,8 +1,12 @@
 <?php
 namespace Groundhogg\Admin;
 
+use Groundhogg\Admin\Broadcasts\Broadcasts_Page;
 use Groundhogg\Admin\Emails\Emails_Page;
+use Groundhogg\Admin\Events\Events_Page;
+use Groundhogg\Admin\Funnels\Funnels_Page;
 use Groundhogg\Admin\SMS\SMS_Page;
+use Groundhogg\Admin\Superlinks\Superlinks_Page;
 use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Welcome\Welcome_Page;
 use function Groundhogg\isset_not_empty;
@@ -37,6 +41,11 @@ class Admin_Menu
         $this->welcome  = new Welcome_Page();
         $this->tags     = new Tags_Page();
         $this->sms      = new SMS_Page();
+        $this->superlinks = new Superlinks_Page();
+        $this->broadcasts = new Broadcasts_Page();
+        $this->events   = new Events_Page();
+        $this->emails   = new Emails_Page();
+
 
         do_action( 'groundhogg/admin/init', $this );
     }

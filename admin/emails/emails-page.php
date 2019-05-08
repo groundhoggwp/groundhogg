@@ -5,6 +5,10 @@ use Groundhogg;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
+use function Groundhogg\wpgh_email_is_same_domain;
+use function Groundhogg\wpgh_create_contact_from_user;
+use Groundhogg\Admin\Emails\Blocks;
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -349,9 +353,9 @@ class Emails_Page extends Admin_Page
 
                 Plugin::$instance->dbs->get_db('emailmeta' )->update_meta( $id, 'test_email', $test_email_uid  ); //todo
 
-                $email = new Email( $id ); // todo Email not found
+                $email = new Email( $id );
 
-                $email->enable_test_mode(); //todo
+                $email->enable_test_mode();
 
                 $user = get_userdata( $test_email_uid );
 
@@ -361,14 +365,14 @@ class Emails_Page extends Admin_Page
 
                 $contact = Plugin::$instance->utils->get_contact( $user->user_email );
 
-                $sent = $contact->exists() ? $email->send( $contact ) : false; //todo
+                $sent = $contact->exists() ? $email->send( $contact ) : false;
 
                 if ( ! $sent || is_wp_error( $sent ) ){
                     if ( is_wp_error( $sent ) ){
 //                        $this->notices->add( $sent );
                         $this->add_notice($sent);
                     } else {
-                        return new \WP_Error( 'oops', "Failed to send test:" . $email->get_error_message() ); //todo
+                        return new \WP_Error( 'oops', "Failed to send test:" ); //todo add error message
                     }
                 } else {
 
@@ -403,7 +407,7 @@ class Emails_Page extends Admin_Page
 
         if ( isset( $_POST[ 'email_template' ] ) ){
 
-            include_once WPGH_PLUGIN_DIR . '/templates/email-templates.php';
+//            include_once WPGH_PLUGIN_DIR . '/templates/email-templates.php';  todo  may be not required
 
             /**
              * @var $email_templates array
@@ -465,7 +469,7 @@ class Emails_Page extends Admin_Page
 
         ob_start();
 
-        $this->notices->notices();
+        //$this->add_notice();
 
         $notices = ob_get_clean();  // todo
 
@@ -485,34 +489,16 @@ class Emails_Page extends Admin_Page
 
         $emails_table = new Emails_Table();
 
-        $emails_table->views(); ?>
-        <form method="post" class="search-form wp-clearfix" >
-            <!-- search form -->
-            <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Emails', 'groundhogg'); ?>:</label>
-                <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Emails', 'groundhogg'); ?>">
-            </p>
+        $emails_table->views();
+
+        $this->search_form( __( 'Search Emails', 'groundhogg' ) );
+
+        ?>
+        <form method="post">
             <?php $emails_table->prepare_items(); ?>
             <?php $emails_table->display(); ?>
         </form>
-
         <?php
-    }
-
-    /**
-     * Include the blocks...
-     */
-    private function include_blocks()
-    {
-        require_once dirname(__FILE__) . '/blocks/wpgh-email-block.php';
-        require_once dirname(__FILE__) . '/blocks/wpgh-text-block.php';
-        require_once dirname(__FILE__) . '/blocks/wpgh-image-block.php';
-        require_once dirname(__FILE__) . '/blocks/wpgh-divider-block.php';
-        require_once dirname(__FILE__) . '/blocks/wpgh-spacer-block.php';
-        require_once dirname(__FILE__) . '/blocks/wpgh-button-block.php';
-        require_once dirname(__FILE__) . '/blocks/wpgh-html-block.php';
-//        require_once dirname( __FILE__ ) . '/blocks/wpgh-column-block.php';
     }
 
     /**
@@ -525,13 +511,13 @@ class Emails_Page extends Admin_Page
 
         $blocks = array();
 
-        $blocks[] = new WPGH_Text_Block();
-        $blocks[] = new WPGH_Image_Block();
-        $blocks[] = new WPGH_Button_Block();
-        $blocks[] = new WPGH_HTML_Block();
-        $blocks[] = new WPGH_Divider_Block();
-        $blocks[] = new WPGH_Spacer_Block();
-//        $blocks[] = new WPGH_Column_Block();
+//        $blocks[] = new WPGH_Text_Block(); //todo
+//        $blocks[] = new WPGH_Image_Block(); //todo
+        $blocks[] = new Blocks\Button();
+//        $blocks[] = new WPGH_HTML_Block(); //todo
+//        $blocks[] = new WPGH_Divider_Block(); //todo
+//        $blocks[] = new WPGH_Spacer_Block(); //todo
+//        $blocks[] = new WPGH_Column_Block(); //todo
 
         return apply_filters( 'wpgh_setup_email_blocks', $blocks );
 
@@ -539,12 +525,12 @@ class Emails_Page extends Admin_Page
 
     public function edit()
     {
-
         if ( ! current_user_can( 'edit_emails' ) ){
             $this->wp_die_no_access();
         }
-        $this->include_blocks();
+
         $this->get_blocks();
+
         include dirname(__FILE__) . '/email-editor.php';
     }
 
@@ -573,7 +559,7 @@ class Emails_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        if ( $this->get_action() === 'edit' ){
+        if ( $this->get_current_action() === 'edit' ){
 
             $this->edit();
 
@@ -581,9 +567,6 @@ class Emails_Page extends Admin_Page
             ?>
             <div class="wrap">
                 <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
-                <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg' ); ?></a>
-                <a class="page-title-action" href="<?php echo admin_url( 'admin.php?page=gh_broadcasts&action=add&type=email' ); ?>"><?php _ex( 'Email Broadcast', 'page_tile_action','groundhogg' ); ?></a>
-                <?php $this->notices->notices(); //todo remove ?>
                 <hr class="wp-header-end">
                 <?php switch ( $this->get_current_action() ){
                     case 'add':

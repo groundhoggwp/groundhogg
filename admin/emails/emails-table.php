@@ -344,50 +344,9 @@ class Emails_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-//        $query_args = array();
-//
-//        if ( isset( $_REQUEST[ 's' ] ) ){
-//
-//            $query_args[ 'search' ] = $_REQUEST[ 's' ];
-//
-//        }
-//
-//        switch ( $this->get_view() )
-//        {
-//            case 'trash':
-//                $query_args[ 'status' ] = 'trash';
-//                $data = WPGH()->emails->get_emails( $query_args );
-//                break;
-//
-//            case 'ready':
-//                $query_args[ 'status' ] = 'ready';
-//                $data = WPGH()->emails->get_emails( $query_args );
-//                break;
-//
-//            case 'draft':
-//                $query_args[ 'status' ] = 'draft';
-//                $data = WPGH()->emails->get_emails( $query_args );
-//                break;
-//
-//            case 'from_user':
-//                $query_args[ 'from_user' ] = intval( $_REQUEST[ 'from_user' ] );
-//                $data = WPGH()->emails->get_emails( $query_args );
-//                break;
-//
-//            default:
-//
-//                $query_args[ 'status' ] = 'ready';
-//                $data = WPGH()->emails->get_emails( $query_args );
-//
-//                $query_args[ 'status' ] = 'draft';
-//                $data2 = WPGH()->emails->get_emails( $query_args );
-//
-//                $data = array_merge( $data, $data2 );
-//
-//                break;
-//        }
 
-        $data = Plugin::$instance->dbs->get_db('broadcasts')->query( $_GET ); //todo check
+
+        $data = Plugin::$instance->dbs->get_db('emails' )->query( $_GET ); //todo check
 
 		/*
 		 * Sort the data

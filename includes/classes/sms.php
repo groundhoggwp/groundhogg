@@ -1,7 +1,8 @@
 <?php
 namespace Groundhogg;
 
-use Groundhogg\DB\SMS as SMS_DB;
+
+use Groundhogg\DB\DB;
 use WP_Error;
 
 Class SMS extends Base_Object
@@ -16,11 +17,7 @@ Class SMS extends Base_Object
      */
     private $event;
 
-    /**
-     * Return the DB instance that is associated with items of this type.
-     *
-     * @return SMS_DB
-     */
+
     protected function get_db()
     {
         return Plugin::$instance->dbs->get_db( 'sms' );

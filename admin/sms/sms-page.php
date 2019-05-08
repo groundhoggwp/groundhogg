@@ -3,6 +3,8 @@ namespace Groundhogg\Admin\SMS;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Plugin;
 use Groundhogg\SMS;
+use function  Groundhogg\isset_not_empty;
+
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -49,6 +51,12 @@ class SMS_Page extends Admin_Page
         return 'sms';
     }
 
+    // No S.
+    public function get_item_type_plural()
+    {
+        return $this->get_item_type();
+    }
+
     public function get_title()
     {
         switch ($this->get_current_action()) {
@@ -73,7 +81,7 @@ class SMS_Page extends Admin_Page
                 'target' => '_self',
             ],
             [
-//                'link' => Plugin::$instance->admin->get_page( 'broadcasts' )->admin_url( [ 'action' => 'add', 'type' => 'sms' ] ),
+                'link' => Plugin::$instance->admin->get_page( 'broadcasts' )->admin_url( [ 'action' => 'add', 'type' => 'sms' ] ),
                 'action' => __( 'Broadcast', 'groundhogg' ),
                 'target' => '_self',
             ]
@@ -130,7 +138,7 @@ class SMS_Page extends Admin_Page
 
         $result = Plugin::$instance->dbs->get_db('sms')->update($id, $args);
 
-        if ( isset_not_emtpy( $_POST, 'save_and_test' ) ){
+        if ( isset_not_empty( $_POST, 'save_and_test' ) ){
             $sms = Plugin::$instance->utils->get_sms( $id );
             $contact = Plugin::$instance->utils->get_contact( get_current_user_id(), true );
             $result = $sms->send( $contact );
@@ -164,9 +172,9 @@ class SMS_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        foreach ( $this->get_items() as $id ){
-            if ( ! Plugin::$instance->dbs->get_db( 'sms' )->delete( $id ) ){
-                return new \WP_Error( 'unable_to_delete_sms', "Something went wrong while deleting the SMS." );
+        foreach( $this->get_items() as $id ) {
+            if (!Plugin::$instance->dbs->get_db('sms')->delete( $id ) ) {
+                return new \WP_Error('unable_to_delete_sms', "Something went wrong while deleting the sms.");
             }
         }
 
@@ -184,15 +192,11 @@ class SMS_Page extends Admin_Page
 			include dirname(__FILE__) . '/sms-table.php';
 		}
 
-		$sms_table = new SMS_Table(); ?>
-        <form method="post" class="search-form wp-clearfix">
-        <!-- search form -->
-            <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search SMS', 'groundhogg'); ?>:</label>
-                <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search SMS', 'groundhogg' )?>">
-            </p>
-        </form>
+		$sms_table = new SMS_Table();
+
+		$this->search_form( __( 'Search SMS', 'groundhogg' ) );
+
+		?>
         <div id="col-container" class="wp-clearfix">
             <div id="col-left">
                 <div class="col-wrap">

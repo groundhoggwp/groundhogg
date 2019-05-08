@@ -6,6 +6,7 @@ use Groundhogg\SMS;
 use Groundhogg\Plugin;
 use WP_List_Table;
 
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -133,10 +134,12 @@ class SMS_Table extends WP_List_Table {
         return apply_filters( 'wpgh_sms_bulk_actions', $actions );
     }
 
+
+
     /**
      * Prepares the list of items for displaying.
 
-     * @global wpdb $wpdb
+     * @global $wpdb \wpdb
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
@@ -235,4 +238,11 @@ class SMS_Table extends WP_List_Table {
 
         return $this->row_actions( $actions );
     }
+
+    public function single_row( $item ) {
+        echo '<tr>';
+        $this->single_row_columns( new SMS( $item->ID ) );
+        echo '</tr>';
+    }
+
 }

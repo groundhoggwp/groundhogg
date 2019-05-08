@@ -2,6 +2,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 
 
@@ -189,14 +190,27 @@ abstract class DB {
         if (!empty($args) && is_array($args)) {
             foreach ($args as $key => $value) {
 
-                if ( is_string( $value ) ){
-                    $value = "'" . $value . "'";
-                }
+                if ( is_array( $value ) ){
 
-                if ( strpos( $value, '%' ) !== false ){
-                    $where[] = $key . " LIKE " . $value;
+                    $ORS = [];
+
+                    foreach ( $value as $item ){
+                        $ORS[] = "'" . $item . "'";
+
+                    }
+
+                    $where[] = "$key IN (" . implode( ',', $ORS ) . ")";
+
                 } else {
-                    $where[] = $key . " = " . $value;
+                    if ( is_string( $value ) ){
+                        $value = "'" . $value . "'";
+                    }
+
+                    if ( strpos( $value, '%' ) !== false ){
+                        $where[] = $key . " LIKE " . $value;
+                    } else {
+                        $where[] = $key . " = " . $value;
+                    }
                 }
             }
         }
@@ -543,7 +557,12 @@ abstract class DB {
 
         $extra = '';
 
-        if ( isset( $data[ 'search' ] ) ){
+        // Compat for search shorthand.
+        if ( isset_not_empty( $data, 's' ) ){
+            $data[ 'search' ] = $data[ 's' ];
+        }
+
+        if ( isset_not_empty( $data, 'search' ) ){
             $extra .= sprintf( "(%s)", $this->generate_search( $data[ 'search' ] ) );
             unset( $data[ 'search' ] );
         }
@@ -576,6 +595,8 @@ abstract class DB {
         }
 
         $sql = "SELECT * FROM $this->table_name $query ORDER BY `$order` ASC";
+
+//        var_dump( $sql );
 
         $results = $wpdb->get_results( $sql );
 

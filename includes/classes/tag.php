@@ -1,7 +1,5 @@
 <?php
 namespace Groundhogg;
-
-
 use Groundhogg\DB\DB;
 
 /**

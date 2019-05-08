@@ -1,4 +1,6 @@
 <?php
+
+namespace Groundhogg\Admin\Emails\Blocks;
 /**
  * Button block
  *
@@ -15,65 +17,27 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Button_Block extends WPGH_Email_Block
+class Button extends Email_Block
 {
 
-    /**
-     * Declare the block properties
-     *
-     * WPGH_Text_Block constructor.
-     */
-    public function __construct()
+    public function get_icon()
     {
-
-        $this->icon = WPGH_ASSETS_FOLDER . 'images/email-icons/button.png' ;
-        $this->name = 'button';
-        $this->title = __( 'Button', 'groundhogg' );
-
-        wp_enqueue_style( 'wp-color-picker' );
-        wp_enqueue_script( 'groundhogg-email-button' );
-
-        parent::__construct();
-
+        return GROUNDHOGG_ASSETS_PATH . 'images/email-icons/button.png' ;
     }
 
-    /**
-     * Return the inner html of the block
-     *
-     * @return string
-     */
-    protected function inner_html()
+    public function get_name()
     {
-        ob_start();
-
-        ?>
-        <table width="100%" border="0" cellspacing="0" cellpadding="0">
-            <tr><td height="10"></td></tr>
-            <tr>
-                <td align="center">
-                    <table border="0" cellspacing="0" cellpadding="0" style="margin-right: auto;margin-left: auto;">
-                        <tr>
-                            <td class="email-button" bgcolor="#EB7035" style="padding: 12px 18px 12px 18px; border-radius:3px" align="center"><b><a href="<?php echo site_url(); ?>" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; font-weight: bold; color: #ffffff; text-decoration: none !important; display: inline-block;"><?php _e('I am a button &rarr;'); ?></a></b></td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr><td height="10"></td></tr>
-        </table>
-        <?php
-
-        return ob_get_clean();
+        return 'button';
     }
 
-    /**
-     * Register the block settings panel
-     *
-     * @return array
-     */
-    protected function register_settings()
+    public function get_title()
     {
+        return _x( 'Button', 'email_block', 'groundhogg' );
+    }
 
-        $this->settings = array(
+    public function get_settings()
+    {
+        return array(
 
             array(
                 'type'  => 'input',
@@ -132,10 +96,39 @@ class WPGH_Button_Block extends WPGH_Email_Block
                 ),
             ),
         );
-
-        return parent::register_settings();
-
     }
 
+    public function scripts()
+    {
+        wp_enqueue_style( 'wp-color-picker' );
+        wp_enqueue_script( 'groundhogg-email-button' );
+    }
 
+    /**
+     * Return the inner html of the block
+     *
+     * @return string
+     */
+    protected function inner_html()
+    {
+        ob_start();
+
+        ?>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr><td height="10"></td></tr>
+            <tr>
+                <td align="center">
+                    <table border="0" cellspacing="0" cellpadding="0" style="margin-right: auto;margin-left: auto;">
+                        <tr>
+                            <td class="email-button" bgcolor="#EB7035" style="padding: 12px 18px 12px 18px; border-radius:3px" align="center"><b><a href="<?php echo site_url(); ?>" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; font-weight: bold; color: #ffffff; text-decoration: none !important; display: inline-block;"><?php _e('I am a button &rarr;'); ?></a></b></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr><td height="10"></td></tr>
+        </table>
+        <?php
+
+        return ob_get_clean();
+    }
 }

@@ -186,15 +186,11 @@ class Tags_Page extends Admin_Page
 			include dirname(__FILE__) . '/tags-table.php';
 		}
 
-		$tags_table = new Tags_Table(); ?>
-        <form method="post" class="search-form wp-clearfix">
-            <!-- search form -->
-            <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Tags', 'groundhogg'); ?>:</label>
-                <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( __( 'Search Tags', 'groundhogg' ) )?>">
-            </p>
-        </form>
+		$tags_table = new Tags_Table();
+
+		$this->search_form( __( 'Search Tags', 'groundhogg' ) );
+
+		?>
         <div id="col-container" class="wp-clearfix">
             <div id="col-left">
                 <div class="col-wrap">

@@ -250,7 +250,7 @@ class Plugin {
         $this->replacements = new Replacements();
         $this->tag_mapping  = new Tag_Mapping();
 
-//        $this->sending_service = new Sending_Service();
+        $this->sending_service = new Sending_Service();
 //        $this->event_queue  = new Event_Queue();
 
         if ( is_admin() ) {

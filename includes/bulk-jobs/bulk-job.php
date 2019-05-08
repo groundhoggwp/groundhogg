@@ -4,6 +4,7 @@ namespace Groundhogg\Bulk_Jobs;
 
 // Exit if accessed directly
 use Groundhogg\Plugin;
+use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -104,7 +105,7 @@ abstract class Bulk_Job
      */
     public function get_items()
     {
-        return isset_not_emtpy( $_POST, 'items' ) ? $_POST[ 'items' ] : [];
+        return isset_not_empty( $_POST, 'items' ) ? $_POST[ 'items' ] : [];
     }
 
     /**

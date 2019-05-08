@@ -100,7 +100,7 @@ class Broadcasts_Table extends WP_List_Table {
             'cancelled' => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'cancelled' ] ),
         );
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=all' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'sent' ] + $count[ 'scheduled' ] ) . ")</span>" . "</a>";
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'sent' ] + $count[ 'scheduled' ] ) . ")</span>" . "</a>";
         $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=sent' ) . "'>" . _x( 'Sent', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'sent' ] . ")</span>" . "</a>";
         $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=scheduled' ) . "'>" . _x( 'Scheduled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'scheduled' ] . ")</span>" . "</a>";
         $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=cancelled' ) . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'cancelled' ] . ")</span>" . "</a>";
@@ -410,9 +410,20 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $data = Plugin::$instance->dbs->get_db('broadcasts')->query( $_GET );
+		if ( $this->get_view() === 'all' ){
+		    $query = [
+		       'status' => [
+		           'sent',
+                   'scheduled'
+               ]
+            ];
+        } else {
+		    $query = $_GET;
+        }
 
-		usort( $data, array( $this, 'usort_reorder' ) );
+        $data = Plugin::$instance->dbs->get_db('broadcasts')->query( $query );
+
+        usort( $data, array( $this, 'usort_reorder' ) );
 
 		$current_page = $this->get_pagenum();
 

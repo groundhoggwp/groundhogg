@@ -171,6 +171,21 @@ class Superlinks_Table extends WP_List_Table {
     }
 
     /**
+     * Generates content for a single row of the table
+     *
+     * @since 3.1.0
+     *
+     * @param object $item The current item
+     */
+    public function single_row( $item ) {
+        echo '<tr>';
+        $this->single_row_columns( new Superlink( absint( $item->ID ) ) );
+        echo '</tr>';
+    }
+
+
+
+    /**
      * Prepares the list of items for displaying.
 
      * @global wpdb $wpdb

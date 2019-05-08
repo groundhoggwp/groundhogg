@@ -165,7 +165,7 @@ class Superlinks_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        foreach ($this->get_items() as $id) {
+        foreach( $this->get_items() as $id) {
 
             if (!Plugin::$instance->dbs->get_db('superlinks')->delete( $id ) ) {
                 return new \WP_Error('unable_to_delete_superlink', "Something went wrong while deleting the superlink.");

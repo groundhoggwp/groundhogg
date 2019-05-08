@@ -246,8 +246,10 @@ class Event extends Base_Object
      */
     public function get_step_title()
     {
-        return $this->get_step()->get_step_title();
+        return $this->get_step()->get_step_title(); //todo
+//        return '';
     }
+
 
 
     /**
@@ -255,7 +257,9 @@ class Event extends Base_Object
      */
     public function get_funnel_title()
     {
-        return $this->get_step()->get_funnel_title();
+        return $this->get_step()->get_funnel_title(); //todo
+//        return '' ;
+
     }
 
     /**

@@ -61,6 +61,7 @@ class Autoloader {
         'Compliance'    => 'includes/compliance.php',
         'Contact_Query' => 'includes/contact-query.php',
         'Supports_Errors' => 'includes/supports-errors.php',
+        'Sending_Service' => 'includes/sending-service.php',
         'Template_Loader' => 'includes/template-loader.php',
         'GH_SS_Mailer'  => 'includes/gh-ss-mailer.php',
         'HTML'          => 'includes/utils/html.php',
@@ -78,7 +79,13 @@ class Autoloader {
         'Event'         => 'includes/classes/event.php',
         'Superlink'     => 'includes/classes/superlink.php',
         'Tag'           => 'includes/classes/tag.php',
+        'SMS'           => 'includes/classes/sms.php',
+        'Broadcast'     => 'includes/classes/broadcast.php',
+        'Funnel'        => 'includes/classes/funnel.php',
+        'Step'          => 'includes/classes/step.php',
         'Bulk_Jobs\Bulk_Job' => 'includes/bulk-jobs/bulk-job.php',
+        'Bulk_Jobs\Broadcast_Bulk_Job' => 'includes/bulk-jobs/broadcast-bulk-job.php',
+        'Event_Process' => 'includes/interfaces/event-process.php',
     ];
 
     /**

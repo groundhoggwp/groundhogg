@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin;
 
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
 
@@ -37,7 +38,7 @@ abstract class Admin_Page
         if ( $this->is_current_page() ) {
 
             add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
-            add_action( 'init', [ $this, 'process_action' ] );
+            add_action( 'admin_init', [ $this, 'process_action' ] );
 
             $this->add_additional_actions();
         }
@@ -101,6 +102,15 @@ abstract class Admin_Page
      * @return mixed
      */
     abstract public function get_item_type();
+
+    /**
+     * Adds an S
+     *
+     * @return string
+     */
+    public function get_item_type_plural(){
+        return $this->get_item_type() . 's';
+    }
 
     /**
      * Whether this page is the current page
@@ -224,12 +234,35 @@ abstract class Admin_Page
         if ( !isset( $_REQUEST['_wpnonce'] ) || ! current_user_can( $this->get_cap() ) )
             return false;
 
-        return wp_verify_nonce($_REQUEST['_wpnonce']) || wp_verify_nonce($_REQUEST['_wpnonce'], $this->get_current_action()) || wp_verify_nonce($_REQUEST['_wpnonce'], sprintf( 'bulk-%ss', $this->get_item_type() ) );
+        return wp_verify_nonce($_REQUEST['_wpnonce']) || wp_verify_nonce($_REQUEST['_wpnonce'], $this->get_current_action()) || wp_verify_nonce($_REQUEST['_wpnonce'], sprintf( 'bulk-%s', $this->get_item_type_plural() ) );
     }
 
+    /**
+     * Die if no access
+     */
     protected function wp_die_no_access()
     {
         return wp_die( __( "Invalid permissions." , 'groundhogg' ), 'No Access!' );
+    }
+
+    /**
+     * Output a search form
+     *
+     * @param $title
+     * @param string $name
+     */
+    protected function search_form( $title, $name='s' )
+    {
+        ?>
+        <form method="get" class="search-form wp-clearfix">
+            <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
+            <p class="search-box">
+                <label class="screen-reader-text" for="post-search-input"><?php echo $title; ?>:</label>
+                <input type="search" id="post-search-input" name="<?php echo $name?>" value="<?php esc_attr_e( get_request_var( $name ) ); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( $title ); ?>">
+            </p>
+        </form>
+        <?php
     }
 
     /**
@@ -238,8 +271,13 @@ abstract class Admin_Page
     public function process_action()
     {
 
-        if ( !$this->get_current_action() || !$this->verify_action() )
+//        var_dump( $this->get_current_action() );
+//        var_dump( $this->verify_action() );
+
+        if ( ! $this->get_current_action() || !$this->verify_action() )
             return;
+
+//        wp_die();
 
         $base_url = remove_query_arg( [ '_wpnonce', 'action' ], wp_get_referer() );
 

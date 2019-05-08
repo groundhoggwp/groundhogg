@@ -55,6 +55,10 @@ class Events_Page extends Admin_Page
         return 40;
     }
 
+    protected function get_title_actions()
+    {
+        return [];
+    }
 
     /**
      *  Sets the title of the page

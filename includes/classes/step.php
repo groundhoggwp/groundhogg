@@ -1,7 +1,5 @@
 <?php
 namespace Groundhogg;
-
-
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Events;
 use Groundhogg\DB\Meta_DB;

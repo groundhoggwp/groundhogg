@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Contact_Query;
 use Groundhogg\Plugin;
+use function Groundhogg\isset_not_empty;
 
 /**
  * This is the page which allows the user to schedule a broadcast.
@@ -63,7 +64,7 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
             <th scope="row"><label for="description"><?php _e( 'Send To:', 'groundhogg' ); ?></label></th>
             <td><?php
 
-                if ( ! isset_not_emtpy( $_GET, 'use_query' ) ):
+                if ( ! isset_not_empty( $_GET, 'use_query' ) ):
 
                 $tag_args = array();
                 $tag_args[ 'id' ] = 'tags';

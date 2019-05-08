@@ -59,7 +59,7 @@ class Funnels_Page extends Admin_Page
     {
         $this->setup_reporting();
 
-        if ( $this->get_action() === 'edit' ){
+        if ( $this->get_current_action() === 'edit' ){
             add_action( 'in_admin_header' , array( $this, 'prevent_notices' )  );
             /* just need to enqueue it... */
             $this->popup = wpgh_enqueue_modal();
@@ -393,6 +393,9 @@ class Funnels_Page extends Admin_Page
 		wp_redirect( $base_url );
 		die();
 	}
+
+
+
 
     /**
      * Export a funnel
