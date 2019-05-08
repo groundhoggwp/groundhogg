@@ -43,6 +43,7 @@ abstract class Funnel_Step extends Supports_Errors
      * @var Step
      */
     protected $current_step = null;
+    protected $current_contact = null;
 
     /**
      * @var array
@@ -190,12 +191,7 @@ abstract class Funnel_Step extends Supports_Errors
      */
     public function register( $array )
     {
-		$array[ $this->get_type() ] = array(
-			'title' =>__( $this->get_name(), 'groundhogg' ),
-			'icon'  => $this->get_icon(),
-            'group' => $this->get_group(),
-            'desc'  => $this->get_description(),
-		);
+        $array[] = $this;
 
 		return $array;
     }
@@ -364,6 +360,22 @@ abstract class Funnel_Step extends Supports_Errors
     }
 
     /**
+     * @param Contact $contact
+     */
+    protected function set_current_contact( Contact $contact )
+    {
+        $this->current_contact = $contact;
+    }
+
+    /**
+     * @return Contact
+     */
+    protected function get_current_contact()
+    {
+        return $this->current_contact;
+    }
+
+    /**
      * Gets the step order
      *
      * @return false|int|string
@@ -466,7 +478,7 @@ abstract class Funnel_Step extends Supports_Errors
         $args = [ 'step_type' => $this->get_type(), 'step_group' => $this->get_group() ];
         $query = array_merge( $query, $args );
 
-        $raw_steps = Plugin::$instance->dbs->get_db( 'steps' )->get_steps( $query );
+        $raw_steps = Plugin::$instance->dbs->get_db( 'steps' )->query( $query );
 
         $steps = [];
 
@@ -626,6 +638,7 @@ abstract class Funnel_Step extends Supports_Errors
     public function pre_run( $contact, $event )
     {
         $this->set_current_step( $event->get_step() );
+        $this->set_current_contact( $contact );
     }
 
     /**

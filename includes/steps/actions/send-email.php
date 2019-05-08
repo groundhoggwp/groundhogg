@@ -36,7 +36,7 @@ class Send_Email extends Action
      */
     public function get_name()
     {
-        return  _x( 'Send Email', 'action_name', 'groundhogg' );
+        return  _x( 'Send Email', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -56,7 +56,7 @@ class Send_Email extends Action
      */
     public function get_description()
     {
-        return _x( 'Send an email to a contact.', 'element_description', 'groundhogg' );
+        return _x( 'Send an email to a contact.', 'step_description', 'groundhogg' );
     }
 
     /**

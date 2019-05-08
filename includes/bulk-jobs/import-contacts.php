@@ -33,7 +33,7 @@ class Import_Contacts extends Bulk_Job
         $file_name = urldecode( $_GET[ 'import' ] );
         $file_path = wp_normalize_path( wpgh_get_csv_imports_dir( $file_name ) );
 
-        return wpgh_get_items_from_csv( $file_path );
+        return get_items_from_csv( $file_path );
     }
 
     /**

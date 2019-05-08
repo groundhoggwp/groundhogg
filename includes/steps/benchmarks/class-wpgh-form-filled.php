@@ -44,8 +44,8 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-        $this->name         = _x( 'Web Form', 'element_name', 'groundhogg' );
-        $this->description  = _x( 'Use this form builder to create forms and display them on your site with shortcodes.', 'element_description', 'groundhogg' );
+        $this->name         = _x( 'Web Form', 'step_name', 'groundhogg' );
+        $this->description  = _x( 'Use this form builder to create forms and display them on your site with shortcodes.', 'step_description', 'groundhogg' );
 
         parent::__construct();
 

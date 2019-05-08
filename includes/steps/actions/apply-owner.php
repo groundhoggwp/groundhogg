@@ -6,6 +6,8 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Step;
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Apply Owner
  *
@@ -18,10 +20,7 @@ use Groundhogg\Step;
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-class WPGH_Apply_Owner extends Action
+class Apply_Owner extends Action
 {
 
     /**
@@ -31,7 +30,7 @@ class WPGH_Apply_Owner extends Action
      */
     public function get_name()
     {
-        return _x( 'Apply Owner', 'action_name', 'groundhogg' );
+        return _x( 'Apply Owner', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -51,7 +50,7 @@ class WPGH_Apply_Owner extends Action
      */
     public function get_description()
     {
-        return _x( 'Set the contact owner to the specified user account.', 'action_description', 'groundhogg' );
+        return _x( 'Set the contact owner to the specified user account.', 'step_description', 'groundhogg' );
     }
 
     /**

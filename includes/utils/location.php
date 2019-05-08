@@ -397,7 +397,7 @@ class Location
      * Get a list of all the time zones
      *
      * @return array
-     * @throws \Exception
+//     * @throws \Exception
      */
     public function get_time_zones()
     {
@@ -422,7 +422,11 @@ class Location
         $timezone_offsets = array();
         foreach ($timezones as $timezone) {
             $tz = new DateTimeZone($timezone);
-            $timezone_offsets[$timezone] = $tz->getOffset(new DateTime);
+            try{
+                $timezone_offsets[$timezone] = $tz->getOffset(new DateTime);
+            } catch ( \Exception $e ){
+                return [];
+            }
         }
 
         // sort timezone by offset

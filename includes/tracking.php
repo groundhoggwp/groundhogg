@@ -266,6 +266,14 @@ class Tracking
     }
 
     /**
+     * @return string
+     */
+    public function get_leadsource()
+    {
+        return '';
+    }
+
+    /**
      * Get the contact which is currently being tracked.
      *
      * @return Contact|false

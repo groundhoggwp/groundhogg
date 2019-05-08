@@ -31,7 +31,7 @@ class Apply_Note extends Action
      */
     public function get_name()
     {
-        return _x( 'Apply Note', 'action_name', 'groundhogg' );
+        return _x( 'Apply Note', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -51,7 +51,7 @@ class Apply_Note extends Action
      */
     public function get_description()
     {
-        return _x( 'Add a note to the notes section of a contact.', 'element_description', 'groundhogg' );
+        return _x( 'Add a note to the notes section of a contact.', 'step_description', 'groundhogg' );
     }
 
     /**

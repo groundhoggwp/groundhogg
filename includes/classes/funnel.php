@@ -131,6 +131,91 @@ class Funnel extends Base_Object
     }
 
     /**
+     * Return wrapper function.
+     *
+     * @return array|bool
+     */
+    public function export()
+    {
+        return $this->get_as_array();
+    }
+
+    /**
+     * Import a funnel
+     **
+     * @return bool|int
+     */
+    public function import( $import )
+    {
+        if ( is_string( $import ) ){
+            $import = json_decode( $import, true );
+        }
+
+        if ( ! is_array( $import ) )
+            return false;
+
+        $title = $import[ 'title' ];
+
+        $args = [
+            'title' => $title,
+            'status' => 'inactive',
+            'author' => get_current_user_id()
+        ];
+
+        $funnel_id = $this->create( $args );
+
+        $steps = $import[ 'steps' ];
+
+//        $valid_actions = WPGH()->elements->get_actions();
+//        $valid_benchmarks = WPGH()->elements->get_benchmarks();
+
+        foreach ( $steps as $i => $step_args )
+        {
+
+            $step_title = $step_args['title'];
+            $step_group = $step_args['group'];
+            $step_type  = $step_args['type'];
+
+            if ( ! isset( $valid_actions[$step_type] ) && ! isset( $valid_benchmarks[$step_type] ) )
+                continue;
+
+            $args = array(
+                'funnel_id' => $funnel_id,
+                'step_title'     => $step_title,
+                'step_status'    => 'ready',
+                'step_group'     => $step_group,
+                'step_type'      => $step_type,
+                'step_order'     => $i+1,
+            );
+
+            $step = new Step();
+
+            $step_id = $step->create( $args );
+
+            if ( ! $step_id ){
+                continue;
+            }
+
+            $step_meta = $step_args[ 'meta' ];
+
+            foreach ( $step_meta as $key => $value ) {
+                if ( is_array( $value ) ){
+                    $step->update_meta( $key, array_shift( $value ) );
+                } else {
+                    $step->update_meta( $key, $value );
+                }
+            }
+
+            $import_args = $step_args[ 'args' ];
+
+            $step->import( $import_args );
+
+        }
+
+        return $funnel_id;
+    }
+
+    /**
      * @return false|string
      */
     public function get_as_json()

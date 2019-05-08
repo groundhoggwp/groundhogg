@@ -66,7 +66,7 @@ class Plugin {
     public $scripts;
 
     /**
-     * @var Roles
+     * @var Main_Roles
      */
     public $roles;
 

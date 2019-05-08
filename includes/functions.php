@@ -106,6 +106,31 @@ function dequeue_wc_css_compat()
 }
 
 /**
+ * If the JSON is your typical error response
+ *
+ * @param $json
+ * @return bool
+ */
+function is_json_error( $json ){
+    return isset( $json->code ) && isset( $json->message );
+}
+
+/**
+ * Convert JSON to a WP_Error
+ *
+ * @param $json
+ * @return bool|WP_Error
+ */
+function get_json_error( $json ){
+
+    if ( is_json_error( $json ) ){
+        return new WP_Error( $json->code, $json->message, $json->data );
+    }
+
+    return false;
+}
+
+/**
  * Dequeue Theme styles for compatibility
  */
 function dequeue_theme_css_compat()
@@ -344,7 +369,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
     try {
         $phpmailer->setFrom( $from_email, $from_name, false );
-    } catch ( phpmailerException $e ) {
+    } catch ( \phpmailerException $e ) {
         $mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
         $mail_error_data['phpmailer_exception_code'] = $e->getCode();
 
@@ -388,7 +413,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
                         $phpmailer->addReplyTo( $address, $recipient_name );
                         break;
                 }
-            } catch ( phpmailerException $e ) {
+            } catch ( \phpmailerException $e ) {
                 continue;
             }
         }
@@ -454,7 +479,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
         foreach ( $attachments as $attachment ) {
             try {
                 $phpmailer->addAttachment( $attachment );
-            } catch ( phpmailerException $e ) {
+            } catch ( \phpmailerException $e ) {
                 continue;
             }
         }
@@ -465,12 +490,12 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
      *
      * @since 2.2.0
      *
-     * @param PHPMailer $phpmailer The PHPMailer instance (passed by reference).
+     * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
      */
     do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
 
     // Hard set X-Mailer cuz we taking credit for this.
-    $phpmailer->XMailer = sprintf( 'Groundhogg %s (https://www.groundhogg.io)', WPGH()->version );
+    $phpmailer->XMailer = sprintf( 'Groundhogg %s (https://www.groundhogg.io)', GROUNDHOGG_VERSION );
 
     // Send!
     try {
@@ -481,16 +506,16 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
         return $phpmailer->send();
 
-    } catch ( phpmailerException $e ) {
+    } catch ( \phpmailerException $e ) {
 
         $mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
         $mail_error_data['phpmailer_exception_code'] = $e->getCode();
         $mail_error_data['mime_message'] = $phpmailer->getSentMIMEMessage();
 
-        if ( WPGH()->service_manager->has_errors() ){
-            $mail_error_data[ 'orig_error_data' ] = WPGH()->service_manager->get_last_error()->get_error_data();
-            $mail_error_data[ 'orig_error_message' ] = WPGH()->service_manager->get_last_error()->get_error_message();
-            $mail_error_data[ 'orig_error_code' ] = WPGH()->service_manager->get_last_error()->get_error_code();
+        if ( Plugin::$instance->sending_service->has_errors() ){
+            $mail_error_data[ 'orig_error_data' ] = Plugin::$instance->sending_service->get_last_error()->get_error_data();
+            $mail_error_data[ 'orig_error_message' ] = Plugin::$instance->sending_service->get_last_error()->get_error_message();
+            $mail_error_data[ 'orig_error_code' ] = Plugin::$instance->sending_service->get_last_error()->get_error_code();
         }
 
         /**
@@ -519,76 +544,6 @@ function wpgh_get_referer()
         return wp_get_referer();
 
 	return ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
-}
-
-/**
- * Import a funnel
- *
- * @todo add to funnel class
- *
- * @return bool|int
- */
-function wpgh_import_funnel( $import )
-{
-    if ( is_string( $import ) ){
-        $import = json_decode( $import, true );
-    }
-
-    if ( ! is_array( $import ) )
-        return false;
-
-    $title = $import[ 'title' ];
-
-    $funnel_id = WPGH()->funnels->add( array( 'title' => $title, 'status' => 'inactive', 'author' => get_current_user_id() ) );
-
-    $steps = $import[ 'steps' ];
-
-    $valid_actions = WPGH()->elements->get_actions();
-    $valid_benchmarks = WPGH()->elements->get_benchmarks();
-
-    foreach ( $steps as $i => $step_args )
-    {
-
-        $step_title = $step_args['title'];
-        $step_group = $step_args['group'];
-        $step_type  = $step_args['type'];
-
-        if ( ! isset( $valid_actions[$step_type] ) && ! isset( $valid_benchmarks[$step_type] ) )
-            continue;
-
-        $args = array(
-            'funnel_id' => $funnel_id,
-            'step_title'     => $step_title,
-            'step_status'    => 'ready',
-            'step_group'     => $step_group,
-            'step_type'      => $step_type,
-            'step_order'     => $i+1,
-        );
-
-        $step_id = WPGH()->steps->add( $args );
-
-        $step_meta = $step_args[ 'meta' ];
-
-//        var_dump( $step_meta );
-
-        foreach ( $step_meta as $key => $value ) {
-            if ( is_array( $value ) ){
-                WPGH()->step_meta->update_meta( $step_id, $key, array_shift( $value ) );
-            } else {
-                WPGH()->step_meta->update_meta( $step_id, $key, $value );
-            }
-        }
-
-        $import_args = $step_args[ 'args' ];
-
-        $step = wpgh_get_funnel_step( $step_id );
-
-        do_action( 'wpgh_import_step_' . $step_type, $import_args, $step );
-        do_action( "groundhogg/steps/{$step->type}/import", $import_args, $step );
-
-    }
-
-    return $funnel_id;
 }
 
 /**
@@ -680,7 +635,6 @@ function recount_tag_contacts_count()
     }
 }
 
-
 /**
  * Create a contact quickly from a user account.
  *
@@ -688,7 +642,7 @@ function recount_tag_contacts_count()
  * @param $sync_meta bool whether to copy the meta data over.
  * @return Contact|false|WP_Error the new contact, false on failure, or WP_Error on error
  */
-function wpgh_create_contact_from_user( $user, $sync_meta = false )
+function create_contact_from_user($user, $sync_meta = false )
 {
 
     if ( is_int( $user ) ) {
@@ -737,9 +691,9 @@ function wpgh_create_contact_from_user( $user, $sync_meta = false )
     }
 
     // Additional stuff.
+
+    // Save the login
     $contact->update_meta( 'user_login', $user->user_login );
-    $contact->change_marketing_preference( $contact->get_optin_status() );
-    $contact->add_tag( wpgh_get_roles_pretty_names( $user->roles ) );
 
     return $contact;
 }
@@ -749,10 +703,14 @@ function wpgh_create_contact_from_user( $user, $sync_meta = false )
  *
  * @param $userId int the Id of the user
  */
-function wpgh_convert_user_to_contact_when_user_registered( $userId )
+function convert_user_to_contact_when_user_registered( $userId )
 {
     $user = get_userdata( $userId );
-    $contact = wpgh_create_contact_from_user( $user );
+    $contact = create_contact_from_user( $user );
+
+    if ( ! $contact ){
+        return;
+    }
 
     if ( ! is_admin() ){
 
@@ -764,114 +722,35 @@ function wpgh_convert_user_to_contact_when_user_registered( $userId )
     /**
      * Provide hook for the Account Created benchmark and other functionality
      *
-     * @param $user WP_User
-     * @param $contact WPGH_Contact
+     * @param $user \WP_User
+     * @param $contact Contact
      */
-    do_action( 'wpgh_user_created', $user, $contact );
+    do_action( 'groundhogg/contact_created_from_user', $user, $contact );
 }
 
-add_action( 'user_register', 'wpgh_convert_user_to_contact_when_user_registered' );
-
-/**
- * Get quarter $start & end dates...
- *
- * @see https://stackoverflow.com/questions/21185924/get-startdate-and-enddate-for-current-quarter-php
- *
- * @param string $quarter
- * @param null $year
- * @param null $format
- * @return int[]
- * @throws Exception
- */
-function wpgh_get_dates_of_quarter($quarter = 'current', $year = null, $format = null)
-{
-    if ( !is_int($year) ) {
-        $year = (new DateTime)->format('Y');
-    }
-    $current_quarter = ceil((new DateTime)->format('n') / 3);
-    switch (  strtolower($quarter) ) {
-        case 'this':
-        case 'current':
-            $quarter = ceil((new DateTime)->format('n') / 3);
-            break;
-
-        case 'previous':
-            $year = (new DateTime)->format('Y');
-            if ($current_quarter == 1) {
-                $quarter = 4;
-                $year--;
-            } else {
-                $quarter =  $current_quarter - 1;
-            }
-            break;
-
-        case 'first':
-            $quarter = 1;
-            break;
-
-        case 'last':
-            $quarter = 4;
-            break;
-
-        default:
-            $quarter = (!is_int($quarter) || $quarter < 1 || $quarter > 4) ? $current_quarter : $quarter;
-            break;
-    }
-    if ( $quarter === 'this' ) {
-        $quarter = ceil((new DateTime)->format('n') / 3);
-    }
-    $start = new DateTime($year.'-'.(3*$quarter-2).'-1 00:00:00');
-    $end = new DateTime($year.'-'.(3*$quarter).'-'.($quarter == 1 || $quarter == 4 ? 31 : 30) .' 23:59:59');
-
-    return array(
-        'start' => $start->getTimestamp(),
-        'end'   => $end->getTimestamp(),
-    );
-}
+// Ensure runs before tag mapping stuff...
+add_action( 'user_register', '\Groundhogg\convert_user_to_contact_when_user_registered' );
 
 /**
  * Used for blocks...
  *
  * @return array
  */
-function wpgh_get_form_list() {
+function get_form_list() {
 
-    $forms = WPGH()->steps->get_steps( array(
+    $forms = Plugin::$instance->dbs->get_db( 'steps' )->query( [
         'step_type' => 'form_fill'
-    ) );
+    ] );
+
     $form_options = array();
     $default = 0;
     foreach ( $forms as $form ){
         if ( ! $default ){$default = $form->ID;}
-        $step = wpgh_get_funnel_step( $form->ID );
+        $step = Plugin::$instance->utils->get_step( $form->ID );
         if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
     }
+
     return $form_options;
-}
-
-/**
- * If the JSON is your typical error response
- *
- * @param $json
- * @return bool
- */
-function is_json_error( $json ){
-    return isset( $json->code ) && isset( $json->message );
-}
-
-/**
- * Convert JSON to a WP_Error
- *
- * @param $json
- * @return bool|WP_Error
- */
-function get_json_error( $json ){
-
-    if ( wpgh_is_json_error( $json ) ){
-        return new WP_Error( $json->code, $json->message, $json->data );
-    }
-
-    return false;
 }
 
 /**
@@ -1023,7 +902,7 @@ function listen_for_complaint_and_bounce_emails( $error )
         if ( ! empty( $bounces ) ){
             foreach ( $bounces as $email ){
                 if ( $contact = ( $email ) ){
-                    $contact->change_marketing_preference( WPGH_HARD_BOUNCE );
+                    $contact->change_marketing_preference( Preferences::HARD_BOUNCE );
                 }
             }
 
@@ -1033,8 +912,8 @@ function listen_for_complaint_and_bounce_emails( $error )
 
         if ( ! empty( $complaints ) ){
             foreach ( $complaints as $email ){
-                if ( $contact = wpgh_get_contact( $email ) ){
-                    $contact->change_marketing_preference( WPGH_COMPLAINED );
+                if ( $contact = get_contactdata( $email ) ){
+                    $contact->change_marketing_preference( Preferences::COMPLAINED );
                 }
             }
         }
@@ -1049,7 +928,7 @@ add_action( 'wp_mail_failed', '\Groundhogg\listen_for_complaint_and_bounce_email
  * @param $original_email_address
  * @return mixed
  */
-function wpgh_sender_email( $original_email_address ) {
+function sender_email( $original_email_address ) {
 
     // Get the site domain and get rid of www.
     $sitename = strtolower( $_SERVER['SERVER_NAME'] );
@@ -1060,7 +939,7 @@ function wpgh_sender_email( $original_email_address ) {
     $from_email = 'wordpress@' . $sitename;
 
     if ( $original_email_address === $from_email ){
-        $new_email_address = wpgh_get_option( 'gh_override_from_email', $original_email_address );
+        $new_email_address = Plugin::$instance->settings->get_option( 'override_from_email', $original_email_address );
 
         if ( ! empty( $new_email_address ) ){
             $original_email_address = $new_email_address;
@@ -1076,10 +955,10 @@ function wpgh_sender_email( $original_email_address ) {
  * @param $original_email_from
  * @return mixed
  */
-function wpgh_sender_name( $original_email_from ) {
+function sender_name( $original_email_from ) {
 
     if( $original_email_from === 'WordPress' ){
-        $new_email_from = wpgh_get_option( 'gh_override_from_name', $original_email_from );
+        $new_email_from = Plugin::$instance->settings->get_option( 'override_from_name', $original_email_from );
 
         if ( ! empty( $new_email_from ) ){
             $original_email_from = $new_email_from;
@@ -1090,8 +969,8 @@ function wpgh_sender_name( $original_email_from ) {
 }
 
 // Hooking up our functions to WordPress filters
-//add_filter( 'wp_mail_from', 'wpgh_sender_email' );
-//add_filter( 'wp_mail_from_name', 'wpgh_sender_name' );
+add_filter( 'wp_mail_from', '\Groundhogg\sender_email' );
+add_filter( 'wp_mail_from_name', '\Groundhogg\sender_name' );
 
 /**
  * AWS Doesn't like special chars in the from name so we'll strip them out here.
@@ -1104,41 +983,32 @@ function sanitize_from_name( $name )
     return sanitize_text_field( preg_replace( '/[^A-z0-9 ]/', '', $name ) );
 }
 
-///* Pluggable functions */
-//if ( ! function_exists( 'wp_mail' ) && wpgh_is_option_enabled( 'gh_send_all_email_through_ghss' ) ):
-//
-//    function wp_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
-//        return gh_ss_mail( $to, $subject, $message, $headers, $attachments);
-//    }
-//
-//endif;
-
 /**
  * This function is for use by any form or eccom extensions which is essentially a copy of the PROCESS method in the submission handler.
  *
- * @param $contact WPGH_Contact
+ * @param $contact Contact
  */
-function wpgh_after_form_submit_handler( &$contact )
+function after_form_submit_handler( &$contact )
 {
 
-    if ( $contact->update_meta( 'ip_address', wpgh_get_visitor_ip() ) ){
+    if ( $contact->update_meta( 'ip_address', Plugin::$instance->utils->location->get_real_ip() ) ){
         $contact->extrapolate_location();
     }
 
     if ( ! $contact->get_meta( 'lead_source' ) ){
-        $contact->update_meta( 'lead_source', WPGH()->tracking->lead_source );
+        $contact->update_meta( 'lead_source', Plugin::$instance->tracking->get_leadsource() );
     }
 
     if ( ! $contact->get_meta( 'source_page' ) ){
-        $contact->update_meta( 'source_page', wpgh_get_referer()  );
+        $contact->update_meta( 'source_page', wpgh_get_referer() );
     }
 
-    if ( is_user_logged_in() && ! $contact->user ){
-        $contact->update( array( 'user_id' => get_current_user_id() ) );
+    if ( is_user_logged_in() && ! $contact->get_userdata() ){
+        $contact->update( [ 'user_id' => get_current_user_id() ] );
     }
 
-    if ( $contact->optin_status === WPGH_UNSUBSCRIBED ) {
-        $contact->change_marketing_preference( WPGH_UNCONFIRMED );
+    if ( ! $contact->is_marketable() ) {
+        $contact->change_marketing_preference( Preferences::UNCONFIRMED );
     }
 
     $contact->update_meta( 'last_optin', time() );
@@ -1150,7 +1020,7 @@ function wpgh_after_form_submit_handler( &$contact )
  * @param $email
  * @return bool
  */
-function wpgh_email_is_same_domain( $email )
+function email_is_same_domain($email )
 {
     $email_domain = substr( $email, strrpos($email, '@') + 1 );
     $site_domain = site_url();
@@ -1158,31 +1028,11 @@ function wpgh_email_is_same_domain( $email )
 }
 
 /**
- * Whether SMS is using the GHSS.
- *
- * @return bool
- */
-function wpgh_using_ghss_for_sms()
-{
-    return (bool) apply_filters( 'groundhogg/sms/send_with_ghss', true );
-}
-
-/**
- * Whether the ghss is active.
- *
- * @return bool
- */
-function wpgh_ghss_is_active()
-{
-    return (bool) wpgh_get_option( 'gh_email_token', false );
-}
-
-/**
  * Notify the admin when credits run low.
  *
  * @param $credits
  */
-function wpgh_ghss_notify_low_credit( $credits ){
+function gh_ss_notify_low_credit($credits ){
 
     if ( $credits > 1000 ){
         return;
@@ -1208,30 +1058,28 @@ function wpgh_ghss_notify_low_credit( $credits ){
 
 }
 
-add_action( 'groundhogg/ghss/credits_used', 'wpgh_ghss_notify_low_credit' );
-add_action( 'groundhogg/ghss/sms_credits_used', 'wpgh_ghss_notify_low_credit' );
+add_action( 'groundhogg/ghss/credits_used', '\Groundhogg\gh_ss_notify_low_credit');
+add_action( 'groundhogg/ghss/sms_credits_used', '\Groundhogg\gh_ss_notify_low_credit');
 
-//if ( wpgh_is_option_enabled( 'gh_send_notifications_on_event_failure' ) ) {
-//
-//    /**
-//     * Send event failure notification.
-//     *
-//     * @param $event WPGH_Event
-//     */
-//    function wpgh_send_event_failure_notification($event)
-//    {
-//        $subject = sprintf("Event (%s) failed for %s", $event->get_step_title(), $event->contact->email);
-//        $message = sprintf("This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->contact->full_name, $event->contact->email);
-//        $message .= sprintf("\nFailure Reason: %s", $event->get_failure_reason());
-//        $message .= sprintf("\nManage Failed Events: %s", admin_url('admin.php?page=gh_events&view=status&status=failed'));
-//        $to = wpgh_get_option('gh_event_failure_notification_email', get_option('admin_email'));
-//        wp_mail($to, $subject, apply_filters('the_content', $message));
-//    }
-//
-//    add_action('groundhogg/event/failed', 'wpgh_send_event_failure_notification');
-//}
+if ( get_option( 'gh_send_notifications_on_event_failure' ) ) {
 
-if ( ! function_exists( 'wpgh_split_name' ) ):
+    /**
+     * Send event failure notification.
+     *
+     * @param $event Event
+     */
+    function send_event_failure_notification($event)
+    {
+        $subject = sprintf("Event (%s) failed for %s on %s", $event->get_step_title(), $event->get_contact()->get_email(), esc_html( get_bloginfo( 'title' ) ) );
+        $message = sprintf("This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->contact->full_name, $event->contact->email);
+        $message .= sprintf("\nFailure Reason: %s", $event->get_failure_reason());
+        $message .= sprintf("\nManage Failed Events: %s", admin_url('admin.php?page=gh_events&view=status&status=failed'));
+        $to = Plugin::$instance->settings->get_option('event_failure_notification_email', get_option('admin_email') );
+        wp_mail( $to, $subject, $message );
+    }
+
+    add_action('groundhogg/event/failed', '\Groundhogg\send_event_failure_notification');
+}
 
 /**
  * Split a name into first and last.
@@ -1240,14 +1088,12 @@ if ( ! function_exists( 'wpgh_split_name' ) ):
  *
  * @return array
  */
-function wpgh_split_name($name) {
+function split_name($name) {
 	$name = trim($name);
 	$last_name = (strpos($name, ' ') === false) ? '' : preg_replace('#.*\s([\w-]*)$#', '$1', $name);
 	$first_name = trim( preg_replace('#'.$last_name.'#', '', $name ) );
 	return array($first_name, $last_name);
 }
-
-endif;
 
 /**
  * Get a list of items from a file path, if file does not exist of there are no items return an empty array.
@@ -1255,7 +1101,7 @@ endif;
  * @param string $file_path
  * @return array
  */
-function wpgh_get_items_from_csv( $file_path='' )
+function get_items_from_csv($file_path='' )
 {
 
     if (!file_exists($file_path)) {
@@ -1285,7 +1131,7 @@ function wpgh_get_items_from_csv( $file_path='' )
  * @param array $extra
  * @return array
  */
-function wpgh_get_mappable_fields( $extra=[] )
+function get_mappable_fields( $extra=[] )
 {
 
     $defaults = [
@@ -1311,14 +1157,15 @@ function wpgh_get_mappable_fields( $extra=[] )
         'ip_address'                => __( 'IP Address' ),
         'lead_source'               => __( 'Lead Source' ),
         'source_page'               => __( 'Source Page' ),
+        'notes'                     => __( 'Add To Notes' ),
+        'tags'                      => __( 'Apply Value as Tag' ),
+        'meta'                      => __( 'Add as Custom Meta' ),
+        'file'                      => __( 'Upload File' ),
         'utm_campaign'              => __( 'UTM Campaign' ),
         'utm_content'               => __( 'UTM Content' ),
         'utm_medium'                => __( 'UTM Medium' ),
         'utm_term'                  => __( 'UTM Term' ),
         'utm_source'                => __( 'UTM Source' ),
-        'notes'                     => __( 'Add To Notes' ),
-        'tags'                      => __( 'Apply Value as Tag' ),
-        'meta'                      => __( 'Add as Custom Meta' ),
     ];
 
     $fields = array_merge( $defaults, $extra );
@@ -1333,14 +1180,15 @@ function wpgh_get_mappable_fields( $extra=[] )
  * @param $fields
  * @param $map
  *
- * @return WPGH_Contact|false
+ * @return Contact|false
  */
-function wpgh_generate_contact_with_map( $fields, $map )
+function generate_contact_with_map( $fields, $map )
 {
     $meta = [];
     $tags = [];
     $notes = [];
     $args = [];
+    $files = [];
 
     foreach ( $fields as $column => $value ){
 
@@ -1355,7 +1203,7 @@ function wpgh_generate_contact_with_map( $fields, $map )
 
         switch ( $field ){
             case 'full_name':
-                $parts = wpgh_split_name( $value );
+                $parts = split_name( $value );
                 $args[ 'first_name' ] = sanitize_text_field( $parts[0] );
                 $args[ 'last_name' ] = sanitize_text_field( $parts[1] );
                 break;
@@ -1392,7 +1240,7 @@ function wpgh_generate_contact_with_map( $fields, $map )
                 break;
             case 'country':
                 if ( strlen( $value ) !== 2 ){
-                    $countries = wpgh_get_countries_list();
+                    $countries = Plugin::$instance->utils->location->get_countries_list();
                     $code = array_search( $value, $countries );
                     if ( $code ){
                         $value = $code;
@@ -1407,11 +1255,16 @@ function wpgh_generate_contact_with_map( $fields, $map )
             case 'meta':
                 $meta[ get_key_from_column_label( $column ) ] = sanitize_text_field( $value );
                 break;
+            case 'files':
+                if ( isset_not_empty( $_FILES, $column ) ){
+                    $files[ $column ] = $_FILES[ $column ];
+                }
+                break;
             case 'notes':
                 $notes[] = sanitize_textarea_field( $value );
                 break;
             case 'time_zone':
-                $zones = wpgh_get_time_zones();
+                $zones = Plugin::$instance->utils->location->get_time_zones();
                 $code = array_search( $value, $zones );
                 if ( $code ){
                     $meta[ $field ] = $code;
@@ -1428,15 +1281,10 @@ function wpgh_generate_contact_with_map( $fields, $map )
 
     }
 
-    $id = WPGH()->contacts->add( $args );
+    $contact = new Contact();
+    $id = $contact->create( $args );
 
     if ( ! $id ){
-        return false;
-    }
-
-    $contact = wpgh_get_contact( $id );
-
-    if ( ! $contact ){
         return false;
     }
 
@@ -1459,8 +1307,12 @@ function wpgh_generate_contact_with_map( $fields, $map )
         }
     }
 
-    // Run the actions for optin status.
-    $contact->change_marketing_preference( $contact->optin_status );
+    if ( ! empty( $files ) ){
+        foreach ( $files as $file ){
+            $contact->upload_file( $file );
+        }
+    }
+
     $contact->update_meta( 'last_optin', time() );
 
     return $contact;
@@ -1469,7 +1321,7 @@ function wpgh_generate_contact_with_map( $fields, $map )
 if ( ! function_exists( 'get_key_from_column_label' ) ):
 
 /**
- * Key a key from a column label
+ * Get a key from a column label
  *
  * @param $column
  * @return string

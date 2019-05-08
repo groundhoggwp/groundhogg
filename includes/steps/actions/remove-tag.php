@@ -31,7 +31,7 @@ class Remove_Tag extends Action
      */
     public function get_name()
     {
-        return _x( 'Remove Tag', 'action_name', 'groundhogg' );
+        return _x( 'Remove Tag', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -51,7 +51,7 @@ class Remove_Tag extends Action
      */
     public function get_description()
     {
-        return _x( 'Remove a tag from a contact.', 'element_description', 'groundhogg' );
+        return _x( 'Remove a tag from a contact.', 'step_description', 'groundhogg' );
     }
 
     /**
@@ -91,7 +91,7 @@ class Remove_Tag extends Action
      */
     public function save( $step )
     {
-        $this->save_setting( 'tags', wp_parse_id_list( $this->get_posted_data( 'tags', [] ) ) );
+        $this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
     }
 
     /**

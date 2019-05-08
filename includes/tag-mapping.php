@@ -33,12 +33,43 @@ class Tag_Mapping extends Bulk_Job
             add_action( 'admin_init', [ $this, 'add_upgrade_notice' ] );
         }
 
+        // Quick hook to update the marketing preference automatically when a contact is created for the first time.
+        add_action( 'groundhogg/contact/post_create', [ $this, 'change_marketing_preference' ], 10, 3 );
+        add_action( 'groundhogg/contact/post_create', [ $this, 'auto_map_roles' ], 10, 3 );
+
         // Map User Roles...
         add_action( 'add_user_role', [ $this, 'apply_tags_to_contact_from_new_roles' ], 10, 2 );
         add_action( 'set_user_role', [ $this, 'apply_tags_to_contact_from_changed_roles' ], 10, 3 );
         add_action( 'remove_user_role', [ $this, 'remove_tags_from_contact_from_remove_roles' ], 10, 2 );
 
         parent::__construct();
+    }
+
+    /**
+     * Whenever a contact is created if user roles are available automap them
+     *
+     * @param $id int
+     * @param $data array
+     * @param $contact Contact
+     */
+    public function auto_map_roles( $id, $data, $contact )
+    {
+        if ( $contact->get_userdata() ){
+            $contact->add_tag( $this->get_roles_pretty_names( $contact->get_userdata()->roles ) );
+        }
+    }
+
+    /**
+     * This auto runs the contact function "change_marketing_preference whenever a contact is created for the first time."
+     * This will then perform our tag associative mapping functions...
+     *
+     * @param $id int
+     * @param $data array
+     * @param $contact Contact
+     */
+    public function change_marketing_preference( $id, $data, $contact )
+    {
+        $contact->change_marketing_preference( $contact->get_optin_status() );
     }
 
     /**

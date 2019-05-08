@@ -18,7 +18,7 @@ class Send_SMS extends Action
      */
     public function get_name()
     {
-        return _x( 'Send SMS', 'action_name', 'groundhogg' );
+        return _x( 'Send SMS', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -38,7 +38,7 @@ class Send_SMS extends Action
      */
     public function get_description()
     {
-        return _x( 'Send a one way text message to the contact.', 'element_description', 'groundhogg' );
+        return _x( 'Send a one way text message to the contact.', 'step_description', 'groundhogg' );
     }
 
     /**

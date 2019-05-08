@@ -40,7 +40,7 @@ class Admin_Notification extends Action
      */
     public function get_name()
     {
-        return _x( 'Admin Notification', 'action_name', 'groundhogg' );
+        return _x( 'Admin Notification', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -60,7 +60,7 @@ class Admin_Notification extends Action
      */
     public function get_description()
     {
-        return _x( 'Send an email notification to any email or list of emails.', 'action_description', 'groundhogg' );
+        return _x( 'Send an email notification to any email or list of emails.', 'step_description', 'groundhogg' );
     }
 
     /**

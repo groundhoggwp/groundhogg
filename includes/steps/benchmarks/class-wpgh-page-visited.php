@@ -44,8 +44,8 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-        $this->name         = _x( 'Page Visited', 'element_name', 'groundhogg' );
-        $this->description  = _x( 'Runs whenever the specified page is visited.', 'element_description', 'groundhogg' );
+        $this->name         = _x( 'Page Visited', 'step_name', 'groundhogg' );
+        $this->description  = _x( 'Runs whenever the specified page is visited.', 'step_description', 'groundhogg' );
 
         parent::__construct();
 

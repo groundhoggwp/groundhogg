@@ -45,8 +45,8 @@ class WPGH_Login_Status_Changed extends WPGH_Funnel_Step
     public function __construct()
     {
 
-        $this->name         = _x( 'Logged In', 'element_name', 'groundhogg' );
-        $this->description  = _x( 'Whenever a user logs in for a certain amount of times.', 'element_description', 'groundhogg' );
+        $this->name         = _x( 'Logged In', 'step_name', 'groundhogg' );
+        $this->description  = _x( 'Whenever a user logs in for a certain amount of times.', 'step_description', 'groundhogg' );
 
         parent::__construct();
 

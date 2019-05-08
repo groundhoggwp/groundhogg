@@ -30,7 +30,7 @@ class Apply_Tag extends Action
      */
     public function get_name()
     {
-        return _x( 'Apply Tag', 'action_name', 'groundhogg' );
+        return _x( 'Apply Tag', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -50,7 +50,7 @@ class Apply_Tag extends Action
      */
     public function get_description()
     {
-        return _x( 'Add a tag to a contact.', 'element_description', 'groundhogg' );
+        return _x( 'Add a tag to a contact.', 'step_description', 'groundhogg' );
     }
 
     /**
@@ -90,7 +90,7 @@ class Apply_Tag extends Action
      */
     public function save( $step )
     {
-        $this->save_setting( 'tags', wp_parse_id_list( $this->get_posted_data( 'tags', [] ) ) );
+        $this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
     }
 
     /**

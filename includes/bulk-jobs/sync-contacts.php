@@ -72,7 +72,7 @@ class Sync_Contacts extends Bulk_Job
             return;
         }
 
-        wpgh_create_contact_from_user( absint( $item ) );
+        create_contact_from_user( absint( $item ) );
     }
 
     /**

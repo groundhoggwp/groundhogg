@@ -31,7 +31,7 @@ class Delay_Timer extends Action
      */
     public function get_name()
     {
-        return _x( 'Delay Timer', 'action_name', 'groundhogg' );
+        return _x( 'Delay Timer', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -51,7 +51,7 @@ class Delay_Timer extends Action
      */
     public function get_description()
     {
-        return _x( 'Pause for the specified amount of time.', 'element_description', 'groundhogg' );
+        return _x( 'Pause for the specified amount of time.', 'step_description', 'groundhogg' );
     }
 
     /**

@@ -32,7 +32,7 @@ class Create_User extends Action
      */
     public function get_name()
     {
-        return _x( 'Create User', 'action_name', 'groundhogg' );
+        return _x( 'Create User', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -52,7 +52,7 @@ class Create_User extends Action
      */
     public function get_description()
     {
-        return _x( 'Create a WP User account at the specified level. Username is the contact\'s email.', 'action_description', 'groundhogg' );
+        return _x( 'Create a WP User account at the specified level. Username is the contact\'s email.', 'step_description', 'groundhogg' );
     }
 
     /**

@@ -3,6 +3,7 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
 use Groundhogg\DB\Steps;
+use function Groundhogg\get_contactdata;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -31,7 +32,7 @@ class Account_Created extends Benchmark
      */
     public function get_name()
     {
-        return _x( 'New User', 'element_name', 'groundhogg' );
+        return _x( 'New User', 'step_name', 'groundhogg' );
 
     }
 
@@ -52,7 +53,7 @@ class Account_Created extends Benchmark
      */
     public function get_description()
     {
-        return _x( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'element_description', 'groundhogg' );
+        return _x( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'step_description', 'groundhogg' );
     }
 
     /**
@@ -97,57 +98,53 @@ class Account_Created extends Benchmark
     }
 
     /**
-     * Here you must define the action to listen for.
+     * get the hook for which the benchmark will run
      *
-     * For example, add_action( 'action_to_listen_for', [ $this, 'complete' ], 10, 2 );
-     *
-     * @return void
+     * @return string
      */
-    protected function add_complete_action()
+    protected function get_complete_hook()
     {
-        add_action( 'user_register', array( $this, 'complete' ), 10, 1 );
-    }
-
-    protected function condition($step, $contact, $args)
-    {
-        // TODO: Implement condition() method.
+        return 'user_register';
     }
 
     /**
-     * Whenever a form is filled complete the benchmark.
-     *
-     * @param $user \WP_User
-     * @param $contact t
+     * @return int
      */
-    public function complete( $user_id )
+    protected function get_num_hook_args()
+    {
+        return 1;
+    }
+
+    /**
+     * @param $user_id
+     */
+    public function setup( $user_id )
+    {
+        $this->add_data( 'user_id', $user_id );
+    }
+
+    /**
+     * Get the contact from the data set.
+     *
+     * @return Contact
+     */
+    protected function get_the_contact()
+    {
+        return get_contactdata( $this->get_data( 'user_id' ), true );
+    }
+
+    /**
+     * @return bool
+     */
+    protected function can_complete_step()
     {
 
-        $steps = $this->get_like_steps();
+        $role = $this->get_setting( 'role' );
 
-        foreach ( $steps as $step ) {
-
-            $role = $step->get_meta( 'role' );
-
-            if ( $step->can_complete( $contact ) && in_array( $role, $user->roles ) ){
-
-                $step->enqueue( $contact );
-
-            }
+        if ( in_array( $role, $this->get_current_contact()->get_userdata()->roles ) ){
+            return true;
         }
-    }
 
-    /**
-     * Process the tag applied step...
-     *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
-     *
-     * @return true
-     */
-    public function run( $contact, $event )
-    {
-        //do nothing...
-
-        return true;
+        return false;
     }
 }

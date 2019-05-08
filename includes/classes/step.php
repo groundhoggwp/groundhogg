@@ -481,9 +481,9 @@ class Step extends Base_Object_With_Meta implements Event_Process
         return apply_filters( "groundhogg/steps/{$this->get_type()}/export" , [], $this );
     }
 
-    public function import()
+    public function import( $import_args = [] )
     {
-
+        do_action( "groundhogg/steps/{$this->get_type()}/import", $import_args, $this );
     }
 
     /**

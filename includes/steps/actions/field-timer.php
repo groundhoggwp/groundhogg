@@ -26,7 +26,7 @@ class Field_Timer extends Action
      */
     public function get_name()
     {
-        return _x( 'Field Timer', 'action_name', 'groundhogg' );
+        return _x( 'Field Timer', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -46,7 +46,7 @@ class Field_Timer extends Action
      */
     public function get_description()
     {
-        return _x( 'Pause for the specified amount of time before a date in the meta.', 'element_description', 'groundhogg' );
+        return _x( 'Pause for the specified amount of time before a date in the meta.', 'step_description', 'groundhogg' );
     }
 
     /**

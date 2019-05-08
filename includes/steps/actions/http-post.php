@@ -30,7 +30,7 @@ class HTTP_Post extends Action
      */
     public function get_name()
     {
-        return _x( 'HTTP Post', 'action_name', 'groundhogg' );
+        return _x( 'HTTP Post', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -50,7 +50,7 @@ class HTTP_Post extends Action
      */
     public function get_description()
     {
-        return _x( 'Send an HTTP Post to your favorite external software.', 'element_description', 'groundhogg' );
+        return _x( 'Send an HTTP Post to your favorite external software.', 'step_description', 'groundhogg' );
     }
 
     /**
@@ -117,7 +117,7 @@ class HTTP_Post extends Action
                     </td>
                     <td>
                         <label><strong><?php _e( 'Value: ' ); ?></strong> <?php $args = array(
-                                'name'  => $step->prefix( 'post_values' ) . '[]',
+                                'name'  => $this->setting_name_prefix( 'post_values' ) . '[]',
                                 'class' => 'input',
                                 'value' => esc_html( $post_values[$i] )
                             );

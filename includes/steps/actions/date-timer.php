@@ -32,7 +32,7 @@ class Date_Timer extends Action
      */
     public function get_name()
     {
-        return _x( 'Date Timer', 'element_name', 'groundhogg' );
+        return _x( 'Date Timer', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -52,7 +52,7 @@ class Date_Timer extends Action
      */
     public function get_description()
     {
-        return _x( 'Pause until a specific date & time.', 'element_description', 'groundhogg' );
+        return _x( 'Pause until a specific date & time.', 'step_description', 'groundhogg' );
     }
 
     /**

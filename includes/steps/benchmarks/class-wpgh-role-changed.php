@@ -44,8 +44,8 @@ class WPGH_Role_Changed extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-        $this->name         = _x( 'Role Changed', 'element_name', 'groundhogg' );
-        $this->description  = _x( 'Runs whenever a user\'s role is changed .', 'element_description', 'groundhogg' );
+        $this->name         = _x( 'Role Changed', 'step_name', 'groundhogg' );
+        $this->description  = _x( 'Runs whenever a user\'s role is changed .', 'step_description', 'groundhogg' );
 
         parent::__construct();
 

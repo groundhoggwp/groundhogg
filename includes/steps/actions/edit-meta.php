@@ -30,7 +30,7 @@ class Edit_Meta extends Action
      */
     public function get_name()
     {
-        return _x( 'Edit Meta', 'action_name', 'groundhogg' );
+        return _x( 'Edit Meta', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -50,7 +50,7 @@ class Edit_Meta extends Action
      */
     public function get_description()
     {
-        return _x( 'Directly edit the meta data of the contact.', 'element_description', 'groundhogg' );
+        return _x( 'Directly edit the meta data of the contact.', 'step_description', 'groundhogg' );
     }
 
     /**
