@@ -75,7 +75,7 @@ class Welcome_Page extends Admin_Page
      */
     protected function add_additional_actions()
     {
-        add_action( 'admin_init', array( $this, 'status_check' ) );
+        add_action( 'admin_head', array( $this, 'status_check' ) );
         add_action( 'admin_footer', array( $this, 'bg_image' ) );
     }
 

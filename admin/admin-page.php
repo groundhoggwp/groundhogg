@@ -31,7 +31,7 @@ abstract class Admin_Page
     {
         add_action( 'admin_menu', [ $this, 'register' ], $this->get_priority() );
 
-        if ( wp_doing_ajax() && $this->is_ajax_request() ){
+        if ( wp_doing_ajax() ){
             $this->add_ajax_actions();
         }
 
@@ -125,20 +125,6 @@ abstract class Admin_Page
         }
 
         return false;
-    }
-
-    /**
-     * Whether the current ajax request is coming from the given page.
-     *
-     * @return bool
-     */
-    public function is_ajax_request()
-    {
-        if ( ! wp_doing_ajax() ){
-            return false;
-        }
-
-        return check_ajax_referer( $this->get_current_action(), '_wpnonce' );
     }
 
     /**
@@ -358,6 +344,9 @@ abstract class Admin_Page
      * Display the title and dependent action include the appropriate page content
      */
     public function page(){
+
+        do_action( "groundhogg/admin/{$this->get_slug()}/before" );
+
         ?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
@@ -379,6 +368,8 @@ abstract class Admin_Page
             ?>
         </div>
         <?php
+
+        do_action( "groundhogg/admin/{$this->get_slug()}/after" );
     }
 
     /**

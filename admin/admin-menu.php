@@ -39,12 +39,12 @@ class Admin_Menu
     protected function init_admin(){
 
         $this->welcome  = new Welcome_Page();
-        $this->tags     = new Tags_Page();
-        $this->sms      = new SMS_Page();
-        $this->superlinks = new Superlinks_Page();
-        $this->broadcasts = new Broadcasts_Page();
-        $this->events   = new Events_Page();
-        $this->emails   = new Emails_Page();
+//        $this->tags     = new Tags_Page();
+//        $this->sms      = new SMS_Page();
+//        $this->superlinks = new Superlinks_Page();
+//        $this->broadcasts = new Broadcasts_Page();
+//        $this->events   = new Events_Page();
+//        $this->emails   = new Emails_Page();
 
 
         do_action( 'groundhogg/admin/init', $this );

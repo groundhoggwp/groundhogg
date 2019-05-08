@@ -1,4 +1,7 @@
 <?php
+
+namespace Groundhogg\Admin\Emails\Blocks;
+
 /**
  * Spacer block
  *
@@ -15,58 +18,26 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Divider_Block extends WPGH_Email_Block
+class Divider extends Email_Block
 {
-
-    /**
-     * Declare the block properties
-     *
-     * WPGH_Text_Block constructor.
-     */
-    public function __construct()
+    public function get_icon()
     {
-
-        $this->icon = WPGH_ASSETS_FOLDER . 'images/email-icons/divider.png' ;
-        $this->name = 'divider';
-        $this->title = __( 'Divider', 'groundhogg' );
-
-        wp_enqueue_script( 'groundhogg-email-divider' );
-
-        parent::__construct();
-
+        return GROUNDHOGG_ASSETS_PATH . 'images/email-icons/divider.png' ;
     }
 
-    /**
-     * Return the inner html of the block
-     *
-     * @return string
-     */
-    protected function inner_html()
+    public function get_name()
     {
-        ob_start();
-
-        ?>
-        <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-                <td class="divider">
-                    <div style="margin: 5px 0 5px 0"><hr style="width:80%;"/></div>
-                </td>
-            </tr>
-        </table>
-        <?php
-
-        return ob_get_clean();
+        return 'divider';
     }
 
-    /**
-     * Register the block settings panel
-     *
-     * @return array
-     */
-    protected function register_settings()
+    public function get_title()
     {
+        return _x( 'Divider', 'email_block', 'groundhogg' );
+    }
 
-        $this->settings = array(
+    public function get_settings()
+    {
+        return array(
             array(
                 'type'  => 'range',
                 'label' => __( 'Width' ),
@@ -97,10 +68,33 @@ class WPGH_Divider_Block extends WPGH_Email_Block
                 ),
             ),
         );
-
-        return parent::register_settings();
-
     }
 
+    public function scripts()
+    {
+        wp_enqueue_script( 'groundhogg-email-divider' );
+    }
+
+    /**
+     * Return the inner html of the block
+     *
+     * @return string
+     */
+    protected function inner_html()
+    {
+        ob_start();
+
+        ?>
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="divider">
+                    <div style="margin: 5px 0 5px 0"><hr style="width:80%;"/></div>
+                </td>
+            </tr>
+        </table>
+        <?php
+
+        return ob_get_clean();
+    }
 
 }

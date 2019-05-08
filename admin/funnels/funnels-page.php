@@ -5,6 +5,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Contact_Query;
 use Groundhogg\Step;
 
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -98,7 +99,7 @@ class Funnels_Page extends Admin_Page
      */
 	public function scripts()
     {
-       if ( $this->get_action() === 'edit' ){
+       if ( $this->get_current_action() === 'edit' ){
 
            wp_enqueue_style('editor-buttons');
            wp_enqueue_style( 'jquery-ui' );
@@ -261,52 +262,9 @@ class Funnels_Page extends Admin_Page
 
 		switch ( $this->get_action() )
 		{
-			case 'add':
 
-                if ( ! current_user_can( 'add_funnels' ) ){
-                    wp_die( WPGH()->roles->error( 'add_funnels' ) );
-                }
 
-				if ( isset( $_POST ) ) {
-                    $this->process_add();
-                }
 
-				break;
-
-            case 'edit':
-
-                if ( ! current_user_can( 'edit_funnels' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_funnels' ) );
-                }
-
-                if ( isset( $_POST ) ){
-                    $this->process_edit();
-                }
-
-                break;
-
-            case 'duplicate':
-
-                if ( ! current_user_can( 'add_funnels' ) ){
-                    wp_die( WPGH()->roles->error( 'add_funnels' ) );
-                }
-
-                foreach ( $this->get_funnels() as $id ){
-                    $json = wpgh_convert_funnel_to_json( $id );
-                    $newId = $this->import_funnel( $json );
-
-                    $funnel = WPGH()->funnels->get( $newId );
-                    WPGH()->funnels->update( $newId, [ 'title' => sprintf( '%s - (Copy)', $funnel->title ) ] );
-
-                }
-
-                $this->notices->add(
-                    esc_attr( 'duplicated' ),
-                    _x( 'Funnel duplicated', 'notice', 'groundhogg' ),
-                    'success'
-                );
-
-                break;
 
             case 'archive':
 
@@ -394,8 +352,29 @@ class Funnels_Page extends Admin_Page
 		die();
 	}
 
+	public function process_duplicate ()
+    {
+        if ( ! current_user_can( 'add_funnels' ) ){
+            $this->wp_die_no_access();
+        }
 
+        foreach ( $this->get_items() as $id ){
+            $json = wpgh_convert_funnel_to_json( $id );
+            $newId = $this->import_funnel( $json );
 
+            $funnel = WPGH()->funnels->get( $newId );
+            WPGH()->funnels->update( $newId, [ 'title' => sprintf( '%s - (Copy)', $funnel->title ) ] );
+
+        }
+
+        $this->notices->add(
+            esc_attr( 'duplicated' ),
+            _x( 'Funnel duplicated', 'notice', 'groundhogg' ),
+            'success'
+        );
+
+        return true;
+    }
 
     /**
      * Export a funnel
@@ -434,7 +413,7 @@ class Funnels_Page extends Admin_Page
         return true;
     }
 
-	private function process_add()
+	public function process_add()
     {
 
         if ( ! current_user_can( 'add_funnels' ) ){
@@ -840,7 +819,7 @@ class Funnels_Page extends Admin_Page
         $stepid = absint( intval( $_POST['step_id'] ) );
         $step = Plugin::$instance->utils->get_step( $stepid );
         if ( $contacts = $step->get_waiting_contacts() ){
-            $next_step = $step->get_next_step();    //todo change
+            $next_step = $step->get_next_step();    //todo change  ---- $step->get_next_action()
             if ( $next_step instanceof Step && $next_step->is_active() ){
                  foreach ( $contacts as $contact ){
                      $next_step->enqueue( $contact );
