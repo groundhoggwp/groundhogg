@@ -58,7 +58,7 @@ class Manager
      * Set the data to the given value
      *
      * @param $key string
-     * @return DB|Meta_DB
+     * @return DB|Meta_DB|Tags
      */
     public function get_db( $key ){
         return $this->$key;
@@ -72,6 +72,34 @@ class Manager
         foreach ( $this->dbs as $db ){
             $db->create_table();
         }
+    }
+
+    /**
+     * Drop all the DBs
+     */
+    public function drop_dbs()
+    {
+        foreach ( $this->dbs as $db ){
+            $db->drop();
+        }
+    }
+
+    /**
+     * Get all the table names.
+     *
+     * @return string[]
+     */
+    public function get_table_names()
+    {
+        $table_names = [];
+
+        foreach ( $this->dbs as $db ){
+
+            $table_names[] = $db->get_table_name();
+
+        }
+
+        return $table_names;
     }
 
     /**

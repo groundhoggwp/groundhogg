@@ -235,13 +235,12 @@ class Plugin {
      */
     private function init_components() {
 
-        //Maintenance stuff.
-        $this->installer    = new Main_Installer();
-        $this->updater      = new Main_Updater();
+        // Settings & DBS needs to go first...
+        $this->settings     = new Settings();
+        $this->roles        = new Main_Roles();
+        $this->dbs          = new DB_Manager();
 
         // Modules
-        $this->settings     = new Settings();
-        $this->dbs          = new DB_Manager();
         $this->preferences  = new Preferences();
         $this->tracking     = new Tracking();
         $this->utils        = new Utils();
@@ -257,6 +256,10 @@ class Plugin {
         if ( is_admin() ) {
             $this->admin   = new Admin_Menu();
         }
+
+        // Goes last to ensure everything is installed before running...
+        $this->installer    = new Main_Installer();
+        $this->updater      = new Main_Updater();
 
     }
 
@@ -285,14 +288,13 @@ class Plugin {
     private function __construct() {
 
         $this->register_autoloader();
-//        $this->logger = Log_Manager::instance();
-//
-//        Maintenance::init();
-//        Compatibility::register_actions();
 
-//        $this->init();
+        if ( did_action( 'plugins_loaded' ) ){
+            $this->init();
+        } else {
+            add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
+        }
 
-        add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
         add_action( 'rest_api_init', [ $this, 'on_rest_api_init' ] );
     }
 

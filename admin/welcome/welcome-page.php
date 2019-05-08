@@ -398,11 +398,11 @@ class Welcome_Page extends Admin_Page
      */
     public function view()
     {
+        // TODO revisit actions...
 
         $user = wp_get_current_user();
-        ?>
 
-        <?php if ( apply_filters( 'wpgh_show_phil_on_welcome_page', true ) ): ?>
+        if ( apply_filters( 'wpgh_show_phil_on_welcome_page', true ) ): ?>
         <img class="phil" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340">
     <?php endif; ?>
         <div id="welcome-page" class="welcome-page">
@@ -411,6 +411,7 @@ class Welcome_Page extends Admin_Page
                     <h1><?php echo sprintf( __( 'Welcome %s!', 'groundhogg' ), $user->display_name ); ?></h1>
                 </div>
                 <?php $this->notices(); ?>
+                <hr class="wp-header-end">
                 <?php do_action( 'wpgh_welcome_page_custom_content' ); ?>
                 <?php if ( apply_filters( 'wpgh_show_main_welcome_page_content', true ) ): ?>
                     <?php if ( $this->should_show_stats_collection() ): ?>
@@ -472,6 +473,19 @@ class Welcome_Page extends Admin_Page
             </div>
         </div>
         <?php
+
+    }
+
+    public function page()
+    {
+
+        if ( method_exists( $this, $this->get_current_action() ) ){
+            call_user_func( [ $this, $this->get_current_action() ] );
+        } else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}" ) ) {
+            do_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}", $this );
+        } else {
+            call_user_func( [ $this, 'view' ] );
+        }
 
     }
 

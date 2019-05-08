@@ -121,11 +121,11 @@ class Funnel extends Base_Object
             $export['steps'][$i]['order'] = $step->get_order();
             $export['steps'][$i]['type']  = $step->get_type();
             $export['steps'][$i]['meta']  = $step->get_meta();
-            $export['steps'][$i]['args']  = apply_filters( "groundhogg/steps/{$step->get_type()}/export" , array(), $step );
+            $export['steps'][$i]['args']  = $step->export();
 
-            /* allow other plugins to modify */
-            $export['steps'][$i] = apply_filters( 'groundhogg/steps/step/export', $export['steps'][$i], $step );
         }
+
+        $export = apply_filters( 'groundhogg/funnel/export', $export, $this );
 
         return $export;
     }

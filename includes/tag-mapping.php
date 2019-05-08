@@ -33,7 +33,107 @@ class Tag_Mapping extends Bulk_Job
             add_action( 'admin_init', [ $this, 'add_upgrade_notice' ] );
         }
 
+        // Map User Roles...
+        add_action( 'add_user_role', [ $this, 'apply_tags_to_contact_from_new_roles' ], 10, 2 );
+        add_action( 'set_user_role', [ $this, 'apply_tags_to_contact_from_changed_roles' ], 10, 3 );
+        add_action( 'remove_user_role', [ $this, 'remove_tags_from_contact_from_remove_roles' ], 10, 2 );
+
         parent::__construct();
+    }
+
+    /**
+     * When a role is set also set the tag
+     *
+     * @param $user_id int
+     * @param $role string
+     * @param $old_roles string[]
+     */
+    public function apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_roles )
+    {
+        $contact = Plugin::$instance->utils->get_contact( $user_id, true );
+
+        if ( ! $contact || ! $contact->exists() ){
+            return;
+        }
+
+        // Convert list of roles to a list of tags and remove them...
+        $roles = $this->get_roles_pretty_names( $old_roles );
+        $contact->remove_tag( $roles );
+
+        // Add the new role as a tag
+        $role = $this->get_role_pretty_name( $role );
+        $contact->add_tag( $role );
+    }
+
+    /**
+     * When a role is remove also remove the tag
+     *
+     * @param $user_id int
+     * @param $role string
+     */
+    public function remove_tags_from_contact_from_remove_roles( $user_id, $role )
+    {
+        $contact = Plugin::$instance->utils->get_contact( $user_id, true );
+        $role = $this->get_role_pretty_name( $role );
+        $contact->remove_tag( $role );
+    }
+
+    /**
+     * When a role is added also add the tag
+     *
+     * @param $user_id int
+     * @param $role string
+     */
+    public function apply_tags_to_contact_from_new_roles( $user_id, $role )
+    {
+        $contact = Plugin::$instance->utils->get_contact( $user_id, true );
+
+        if ( ! $contact || ! $contact->exists() ){
+            return;
+        }
+
+        $role = $this->get_role_pretty_name( $role );
+        $contact->add_tag( $role );
+    }
+
+    /**
+     * Convert an array of roles to n array of display roles
+     *
+     * @param $roles array an array of user roles...
+     * @return array an array of pretty role names.
+     */
+    public function get_roles_pretty_names( $roles )
+    {
+        $pretty_roles = array();
+
+        foreach ( $roles as $role ){
+            $pretty_roles[] = $this->get_role_pretty_name( $role );
+        }
+
+        return $pretty_roles;
+    }
+
+    /**
+     * Convert a role to a tag name
+     *
+     * @param $role string the user role
+     * @return int the ID of the tag
+     */
+    public function convert_role_to_tag( $role )
+    {
+        $tags = Plugin::$instance->dbs->get_db('tags' )->validate( $this->get_role_pretty_name( $role ) );
+        return array_shift( $tags );
+    }
+
+    /**
+     * Get the pretty name of a role
+     *
+     * @param $role string
+     * @return string
+     */
+    public function get_role_pretty_name( $role )
+    {
+        return translate_user_role( wp_roles()->roles[ $role ]['name'] );
     }
 
     /**
@@ -257,7 +357,7 @@ class Tag_Mapping extends Bulk_Job
      */
     public function get_action()
     {
-        return 'bulk_apply_status_tags';
+        return 'bulk_map_segmentation_tags';
     }
 
     /**
@@ -289,8 +389,11 @@ class Tag_Mapping extends Bulk_Job
 
             $tags = [];
 
-            $tags[] = $this->get_status_tag( $contact->optin_status );
+            $tags[] = $this->get_status_tag( $contact->get_optin_status() );
             $tags[] = $contact->is_marketable() ? $this->get_status_tag( self::MARKETABLE ) : $this->get_status_tag( self::NON_MARKETABLE );
+
+            $role_tags = $this->get_roles_pretty_names( $contact->get_userdata()->roles );
+            $tags = array_merge( $tags, $role_tags );
 
             $contact->apply_tag( $tags );
 
@@ -313,6 +416,6 @@ class Tag_Mapping extends Bulk_Job
      */
     protected function get_finished_notice()
     {
-        return _x('Job finished! Optin status tag mapping has now been enabled.', 'notice', 'groundhogg');
+        return _x('Job finished! Optin status & User Role tag mapping has now been enabled.', 'notice', 'groundhogg');
     }
 }

@@ -8,6 +8,18 @@ use WP_Error;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
+ * Wrapper function for Utils function.
+ *
+ * @param $contact_id_or_email
+ * @param $by_user_id
+ * @return false|Contact
+ */
+function get_contactdata( $contact_id_or_email, $by_user_id=false )
+{
+    return Plugin::$instance->utils->get_contact( $contact_id_or_email, $by_user_id );
+}
+
+/**
  * Return if a value in an array isset and is not empty
  *
  * @param $array
@@ -127,785 +139,6 @@ function enqueue_groundhogg_modal()
     return Modal::instance();
 }
 
-
-/**
- * Return the FULL URI from wp_get_referer for string comparisons
- *
- * @return string
- */
-function wpgh_get_referer()
-{
-    if ( ! isset( $_POST[ '_wp_http_referer' ]  ) )
-        return wp_get_referer();
-
-	return ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
-}
-
-/**
- * Import a funnel
- *
- * @todo add to funnel class
- *
- * @return bool|int
- */
-function wpgh_import_funnel( $import )
-{
-    if ( is_string( $import ) ){
-        $import = json_decode( $import, true );
-    }
-
-    if ( ! is_array( $import ) )
-        return false;
-
-    $title = $import[ 'title' ];
-
-    $funnel_id = WPGH()->funnels->add( array( 'title' => $title, 'status' => 'inactive', 'author' => get_current_user_id() ) );
-
-    $steps = $import[ 'steps' ];
-
-    $valid_actions = WPGH()->elements->get_actions();
-    $valid_benchmarks = WPGH()->elements->get_benchmarks();
-
-    foreach ( $steps as $i => $step_args )
-    {
-
-        $step_title = $step_args['title'];
-        $step_group = $step_args['group'];
-        $step_type  = $step_args['type'];
-
-        if ( ! isset( $valid_actions[$step_type] ) && ! isset( $valid_benchmarks[$step_type] ) )
-            continue;
-
-        $args = array(
-            'funnel_id' => $funnel_id,
-            'step_title'     => $step_title,
-            'step_status'    => 'ready',
-            'step_group'     => $step_group,
-            'step_type'      => $step_type,
-            'step_order'     => $i+1,
-        );
-
-        $step_id = WPGH()->steps->add( $args );
-
-        $step_meta = $step_args[ 'meta' ];
-
-//        var_dump( $step_meta );
-
-        foreach ( $step_meta as $key => $value ) {
-            if ( is_array( $value ) ){
-                WPGH()->step_meta->update_meta( $step_id, $key, array_shift( $value ) );
-            } else {
-                WPGH()->step_meta->update_meta( $step_id, $key, $value );
-            }
-        }
-
-        $import_args = $step_args[ 'args' ];
-
-        $step = wpgh_get_funnel_step( $step_id );
-
-        do_action( 'wpgh_import_step_' . $step_type, $import_args, $step );
-        do_action( "groundhogg/steps/{$step->type}/import", $import_args, $step );
-
-    }
-
-    return $funnel_id;
-}
-
-/**
- * Extract the funnel ID from a link, only for use in ADMIN funnel editor.
- *
- * @param $link string link from the funnel editor page
- *
- * @return int|false the funnel ID, false otherwise
- */
-function wpgh_extract_query_arg( $link, $arg = '' )
-{
-
-    $queryString = parse_url( $link, PHP_URL_QUERY );
-
-    $queryArgs = explode( '&', $queryString );
-
-    foreach ( $queryArgs as $args ){
-
-        $subArgs = explode( '=' , $args );
-        if ( $subArgs[0] == $arg ){
-            return intval( $subArgs[1] );
-        }
-
-    }
-
-    return false;
-}
-
-/**
- * Remove the editing toolbar from the email content so it doesn't show up in the client's email.
- *
- * @param $content string the email content
- *
- * @return string the new email content.
- */
-function remove_builder_toolbar( $content )
-{
-    return preg_replace( '/<wpgh-toolbar\b[^>]*>(.*?)<\/wpgh-toolbar>/', '', $content );
-}
-
-add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
-//add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_builder_toolbar' );
-
-
-/**
- * Remove the content editable attribute from the email's html
- *
- * @param $content string email HTML
- * @return string the filtered email content.
- */
-function remove_content_editable( $content )
-{
-    return preg_replace( "/contenteditable=\"true\"/", '', $content );
-}
-
-add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
-//add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_content_editable' );
-
-/**
- * Remove script tags from the email content
- *
- * @param $content string the email content
- * @return string, sanitized email content
- */
-function strip_script_tags( $content )
-{
-    return preg_replace( '/<script\b[^>]*>(.*?)<\/script>/', '', $content );
-}
-
-//add_filter( 'wpgh_sanitize_email_content', 'strip_script_tags' );
-
-/**
- * Remove form tags from emails.
- *
- * @param $content string the email content
- * @return string, sanitized email content
- */
-function wpgh_strip_form_tags( $content )
-{
-    return preg_replace( '/<form\b[^>]*>(.*?)<\/form>/', '', $content );
-}
-
-//add_filter( 'wpgh_sanitize_email_content', 'wpgh_strip_form_tags' );
-
-/**
- * Add a link to the FB group in the admin footer.
- *
- * @param $text
- * @return string|string[]|null
- */
-function add_bug_report_prompt( $text )
-{
-    if ( apply_filters( 'groundhogg/footer/show_text', true ) ){
-        return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
-    }
-
-    return $text;
-}
-
-add_filter('admin_footer_text', '\Groundhogg\add_bug_report_prompt');
-
-/**
- * Converts an array of tag IDs to a Select 2 friendly format.
- *
- * @param array $tags
- * @return array|false
- */
-function wpgh_format_tags_for_select2( $tags=array() )
-{
-
-    if ( ! is_array( $tags ) )
-        return false;
-
-    $json = array();
-
-    foreach ( $tags as $i => $tag ) {
-        $tag = WPGH()->tags->get_tag( $tag );
-        $json[] = array(
-            'id' => $tag->tag_id,
-            'text' => sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count )
-        );
-    }
-
-    return $json;
-
-}
-
-/**
- * Check if Recaptcha is enabled throughout the plugin.
- *
- * @return bool, whether it's enable or not.
- */
-function wpgh_is_recaptcha_enabled(){
-
-    $recaptcha = wpgh_get_option( 'gh_enable_recaptcha', array() );
-
-    return is_array( $recaptcha ) && in_array( 'on', $recaptcha );
-}
-
-/**
- * Check if the email API is enabled throughout the plugin.
- *
- * @return bool, whether it's enable or not.
- */
-function wpgh_is_email_api_enabled(){
-
-    $recaptcha = wpgh_get_option( 'gh_send_with_gh_api', array() );
-
-    return is_array( $recaptcha ) && in_array( 'on', $recaptcha );
-}
-
-/**
- * whather we have a token or not.
- *
- * @return bool
- */
-function wpgh_has_email_token()
-{
-    return ( bool ) wpgh_get_option( 'gh_email_token', false );
-}
-
-
-/**
- * Return the current user role.
- *
- * @return array|bool
- */
-function wpgh_get_current_user_roles()
-{
-
-    if ( ! is_user_logged_in() )
-        return false;
-
-    $user = wp_get_current_user();
-
-    $roles = (array) $user->roles;
-
-//    if ( count( $roles ) === 1 ){
-//
-//        return $roles[0];
-//
-//    }
-
-    return $roles;
-
-}
-
-
-/**
- * Recount the contacts per tag...
- */
-function wpgh_recount_tag_contacts_count()
-{
-    /* Recount tag relationships */
-    $tags = WPGH()->tags->get_tags();
-
-    if ( ! empty( $tags ) ){
-        foreach ( $tags as $tag ){
-            $count = WPGH()->tag_relationships->count( $tag->tag_id, 'tag_id' );
-            WPGH()->tags->update( $tag->tag_id, array( 'contact_count' => $count ) );
-        }
-    }
-}
-
-/**
- * Listen for the funnel share link and then perform the download.
- */
-function wpgh_funnel_share_listen()
-{
-    if ( isset( $_GET[ 'funnel_share' ] ) ) {
-
-        $key = urldecode( $_GET[ 'funnel_share' ] );
-        $id = intval( wpgh_encrypt_decrypt( $key, 'd' ) );
-        if ( WPGH()->funnels->exists( $id ) ){
-
-            $funnel = WPGH()->funnels->get_funnel( $id );
-
-            if ( ! $funnel )
-                return;
-
-            $export_string = wpgh_convert_funnel_to_json( $id );
-
-            if ( ! $export_string )
-                return;
-
-            $filename = $funnel->title . ' - '. date("Y-m-d_H-i", time() );
-
-            header("Content-type: text/plain");
-
-            header( "Content-disposition: attachment; filename=".$filename.".funnel");
-
-            $file = fopen('php://output', 'w');
-
-            fputs( $file, $export_string );
-
-            fclose($file);
-
-            exit();
-        }
-
-    }
-}
-
-//add_action( 'init', 'wpgh_funnel_share_listen' );
-
-/**
- * Create a contact quickly from a user account.
- *
- * @param $user WP_User|int
- * @param $sync_meta bool whether to copy the meta data over.
- * @return WPGH_Contact|false|WP_Error the new contact, false on failure, or WP_Error on error
- */
-function wpgh_create_contact_from_user( $user, $sync_meta = false )
-{
-
-    if ( is_int( $user ) ) {
-        $user = get_userdata( $user );
-        if ( ! $user ){
-            return false;
-        }
-    }
-
-    if ( ! $user instanceof WP_User ){
-        return false;
-    }
-
-    /* Get by email instead of by ID because */
-    $contact = wpgh_get_contact( $user->user_email );
-
-    /**
-     * Do not continue if the contact already exists. Just return it...
-     */
-    if ( $contact && $contact->exists() ){
-        $contact->update( array( 'user_id' => $user->ID ) );
-        return $contact;
-    }
-
-    /**
-     * Setup the initial args..
-     */
-    $args = array(
-        'first_name'    => $user->first_name,
-        'last_name'     => $user->last_name,
-        'email'         => $user->user_email,
-        'user_id'       => $user->ID,
-        'optin_status'  => WPGH_UNCONFIRMED
-    );
-
-    if ( empty( $args[ 'first_name' ] ) ){
-        $args[ 'first_name' ] = $user->display_name;
-    }
-
-    $id = WPGH()->contacts->add( $args );
-
-
-    if ( ! $id ){
-        return new WP_Error( 'BAD_ARGS', __( 'Could not create contact.', 'groundhogg' ) );
-    }
-
-    $contact = wpgh_get_contact( $id );
-
-    // Additional stuff.
-    $contact->update_meta( 'user_login', $user->user_login );
-    $contact->change_marketing_preference( $contact->optin_status );
-    $contact->add_tag( wpgh_get_roles_pretty_names( $user->roles ) );
-
-    return $contact;
-}
-
-/**
- * Convert an array of roles to n array of display roles
- *
- * @param $roles array an array of user roles...
- * @return array an array of pretty role names.
- */
-function wpgh_get_roles_pretty_names( $roles )
-{
-    $pretty_roles = array();
-
-    foreach ( $roles as $role ){
-        $pretty_roles[] = wpgh_get_role_pretty_name( $role );
-    }
-
-    return $pretty_roles;
-}
-
-/**
- * Get the pretty name of a role
- *
- * @param $role string
- * @return string
- */
-function wpgh_get_role_pretty_name( $role )
-{
-    global $wp_roles;
-    return translate_user_role( $wp_roles->roles[ $role ]['name'] );
-}
-
-/**
- * Convert a role to a tag name
- *
- * @param $role string the user role
- * @return int the ID of the tag
- */
-function wpgh_convert_role_to_tag( $role )
-{
-    $tags = WPGH()->tags->validate( wpgh_get_role_pretty_name( $role ) );
-    return array_shift( $tags );
-}
-
-/**
- * When a role is added also add the tag
- *
- * @param $user_id int
- * @param $role string
- */
-function wpgh_apply_tags_to_contact_from_new_roles( $user_id, $role )
-{
-    $contact = wpgh_get_contact( $user_id, true );
-
-    if ( ! $contact || ! $contact->exists() ){
-        return;
-    }
-
-    $role = wpgh_get_role_pretty_name( $role );
-    $contact->add_tag( $role );
-}
-
-add_action( 'add_user_role', 'wpgh_apply_tags_to_contact_from_new_roles', 10, 2 );
-
-/**
- * When a role is remove also remove the tag
- *
- * @param $user_id int
- * @param $role string
- */
-function wpgh_remove_tags_to_contact_from_remove_roles( $user_id, $role )
-{
-    $contact = wpgh_get_contact( $user_id, true );
-    $role = wpgh_get_role_pretty_name( $role );
-    $contact->remove_tag( $role );
-}
-
-add_action( 'remove_user_role', 'wpgh_remove_tags_to_contact_from_remove_roles', 10, 2 );
-
-/**
- * When a role is set also set the tag
- *
- * @param $user_id int
- * @param $role string
- * @param $old_roles string[]
- */
-function wpgh_apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_roles )
-{
-    $contact = wpgh_get_contact( $user_id, true );
-
-    if ( ! $contact || ! $contact->exists() ){
-        return;
-    }
-
-    /**
-     * Convert list of roles to a list of tags and remove them...
-     */
-    $roles = wpgh_get_roles_pretty_names( $old_roles );
-    $contact->remove_tag( $roles );
-
-    /**
-     * Add the new role as a tag
-     */
-    $role = wpgh_get_role_pretty_name( $role );
-    $contact->add_tag( $role );
-}
-
-add_action( 'set_user_role', 'wpgh_apply_tags_to_contact_from_changed_roles', 10, 3 );
-
-/**
- * Provides a global hook not requireing the benchmark anymore.
- *
- * @param $userId int the Id of the user
- */
-function wpgh_convert_user_to_contact_when_user_registered( $userId )
-{
-    $user = get_userdata( $userId );
-    $contact = wpgh_create_contact_from_user( $user );
-
-    if ( ! is_admin() ){
-
-        /* register front end which is technically an optin */
-        $contact->update_meta( 'last_optin', time() );
-
-    }
-
-    /**
-     * Provide hook for the Account Created benchmark and other functionality
-     *
-     * @param $user WP_User
-     * @param $contact WPGH_Contact
-     */
-    do_action( 'wpgh_user_created', $user, $contact );
-}
-
-add_action( 'user_register', 'wpgh_convert_user_to_contact_when_user_registered' );
-
-/**
- * Get quarter $start & end dates...
- *
- * @see https://stackoverflow.com/questions/21185924/get-startdate-and-enddate-for-current-quarter-php
- *
- * @param string $quarter
- * @param null $year
- * @param null $format
- * @return int[]
- * @throws Exception
- */
-function wpgh_get_dates_of_quarter($quarter = 'current', $year = null, $format = null)
-{
-    if ( !is_int($year) ) {
-        $year = (new DateTime)->format('Y');
-    }
-    $current_quarter = ceil((new DateTime)->format('n') / 3);
-    switch (  strtolower($quarter) ) {
-        case 'this':
-        case 'current':
-            $quarter = ceil((new DateTime)->format('n') / 3);
-            break;
-
-        case 'previous':
-            $year = (new DateTime)->format('Y');
-            if ($current_quarter == 1) {
-                $quarter = 4;
-                $year--;
-            } else {
-                $quarter =  $current_quarter - 1;
-            }
-            break;
-
-        case 'first':
-            $quarter = 1;
-            break;
-
-        case 'last':
-            $quarter = 4;
-            break;
-
-        default:
-            $quarter = (!is_int($quarter) || $quarter < 1 || $quarter > 4) ? $current_quarter : $quarter;
-            break;
-    }
-    if ( $quarter === 'this' ) {
-        $quarter = ceil((new DateTime)->format('n') / 3);
-    }
-    $start = new DateTime($year.'-'.(3*$quarter-2).'-1 00:00:00');
-    $end = new DateTime($year.'-'.(3*$quarter).'-'.($quarter == 1 || $quarter == 4 ? 31 : 30) .' 23:59:59');
-
-    return array(
-        'start' => $start->getTimestamp(),
-        'end'   => $end->getTimestamp(),
-    );
-}
-
-/**
- * Used for blocks...
- *
- * @return array
- */
-function wpgh_get_form_list() {
-
-    $forms = WPGH()->steps->get_steps( array(
-        'step_type' => 'form_fill'
-    ) );
-    $form_options = array();
-    $default = 0;
-    foreach ( $forms as $form ){
-        if ( ! $default ){$default = $form->ID;}
-        $step = wpgh_get_funnel_step( $form->ID );
-        if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
-    }
-    return $form_options;
-}
-
-/**
- * If the JSON is your typical error response
- *
- * @param $json
- * @return bool
- */
-function is_json_error( $json ){
-    return isset( $json->code ) && isset( $json->message );
-}
-
-/**
- * Convert JSON to a WP_Error
- *
- * @param $json
- * @return bool|WP_Error
- */
-function get_json_error( $json ){
-
-    if ( wpgh_is_json_error( $json ) ){
-        return new WP_Error( $json->code, $json->message, $json->data );
-    }
-
-    return false;
-}
-
-/**
- * Schedule a 1 off email notification
- *
- * @param $email_id int the ID of the email to send
- * @param $contact_id_or_email int|string the ID of the contact to send to
- * @param int $time time time to send at, defaults to time()
- *
- * @return bool whether the scheduling was successful.
- */
-function wpgh_send_email_notification( $email_id, $contact_id_or_email, $time=0 )
-{
-    $contact = wpgh_get_contact( $contact_id_or_email );
-
-    if ( ! WPGH()->emails->exists( $email_id ) || ! $contact ){
-        return false;
-    }
-
-    if ( ! $time ){
-        $time = time();
-    }
-
-    $event = [
-        'time'          => $time,
-        'funnel_id'     => 0,
-        'step_id'       => $email_id,
-        'contact_id'    => $contact->ID,
-        'event_type'    => GROUNDHOGG_EMAIL_NOTIFICATION_EVENT,
-        'status'        => 'waiting',
-    ];
-
-    if ( WPGH()->events->add( $event ) ){
-        return true;
-    }
-
-    return false;
-}
-
-/**
- * Schedule a 1 off sms notification
- *
- * @param $sms_id int the ID of the sms to send
- * @param $contact_id_or_email int|string the ID of the contact to send to
- * @param int $time time time to send at, defaults to time()
- *
- * @return bool whether the scheduling was successful.
- */
-function wpgh_send_sms_notification( $sms_id, $contact_id_or_email, $time=0 )
-{
-    $contact = wpgh_get_contact( $contact_id_or_email );
-
-    if ( ! WPGH()->sms->exists( $sms_id ) || ! $contact ){
-        return false;
-    }
-
-    if ( ! $time ){
-        $time = time();
-    }
-
-    $event = [
-        'time'          => $time,
-        'funnel_id'     => 0,
-        'step_id'       => $sms_id,
-        'contact_id'    => $contact->ID,
-        'event_type'    => GROUNDHOGG_SMS_NOTIFICATION_EVENT,
-        'status'        => 'waiting',
-    ];
-
-    if ( WPGH()->events->add( $event ) ){
-        return true;
-    }
-
-    return false;
-}
-
-//add_filter( 'groundhogg/templates/emails', 'wpgh_add_my_custom_email_templates' );
-
-/**
- * Include custom email templates
- *
- * @param $email_templates
- * @return mixed
- */
-function wpgh_add_my_custom_email_templates( $email_templates ){
-
-    $emails = WPGH()->emails->get_emails( [ 'is_template' => 1 ] );
-
-    foreach ( $emails as $email ){
-
-        $template = [
-            'title'          => $email->subject,
-            'description'    => $email->pre_header,
-            'content'        => $email->content,
-        ];
-
-        array_unshift( $email_templates, $template );
-
-    }
-
-    return $email_templates;
-
-}
-
-
-/**
- * Parse the headers and return things like from/to etc...
- *
- * @param $headers string|string[]
- * @return array|false
- */
-function wpgh_parse_headers( $headers )
-{
-    $headers = is_array( $headers ) ? implode( PHP_EOL, $headers ) : $headers;
-    if ( ! is_string( $headers ) ){
-        return false;
-    }
-
-    $parsed = imap_rfc822_parse_headers( $headers );
-
-    if ( ! $parsed ){
-        return false;
-    }
-
-    $map = [];
-
-    if ( $parsed->sender && ! is_array( $parsed->sender ) ){
-        $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
-        $map[ 'from' ] = $parsed->sender->personal;
-    } else if ( is_array( $parsed->sender ) ){
-        $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender[0]->mailbox, $parsed->sender[0]->host );
-        $map[ 'from' ] = $parsed->sender[0]->personal;
-    }
-
-    return $map;
-
-}
-
-add_filter("retrieve_password_message", "wpgh_fix_html_pw_reset_link", 10, 4);
-
-/**
- * GHSS doesn't link the <pwlink> format so we have to fix it by removing the gl & lt
- *
- * @param $message
- * @param $key
- * @param $user_login
- * @param $user_data
- * @return string
- */
-function wpgh_fix_html_pw_reset_link($message, $key, $user_login, $user_data )    {
-    $message = preg_replace( '/<(https?:\/\/.*)>/', '$1', $message );
-    return $message;
-}
-
 /**
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
@@ -917,6 +150,9 @@ function wpgh_fix_html_pw_reset_link($message, $key, $user_login, $user_data )  
  * @param string       $message     Message contents
  * @param string|array $headers     Optional. Additional headers.
  * @param string|array $attachments Optional. Files to attach.
+ *
+ * @throws \Exception
+ *
  * @return bool Whether the email contents were sent successfully.
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
@@ -964,7 +200,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
     /* Use the GH SS Mailer class instead */
     if ( ! ( $phpmailer instanceof GH_SS_Mailer ) ) {
-        require_once dirname(__FILE__) . '/gh-ss-mailer.php';
+//        require_once dirname(__FILE__) . '/gh-ss-mailer.php';
         $phpmailer = new GH_SS_Mailer( true );
     }
 
@@ -1271,12 +507,504 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     }
 }
 
+
+/**
+ * Return the FULL URI from wp_get_referer for string comparisons
+ *
+ * @return string
+ */
+function wpgh_get_referer()
+{
+    if ( ! isset( $_POST[ '_wp_http_referer' ]  ) )
+        return wp_get_referer();
+
+	return ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
+}
+
+/**
+ * Import a funnel
+ *
+ * @todo add to funnel class
+ *
+ * @return bool|int
+ */
+function wpgh_import_funnel( $import )
+{
+    if ( is_string( $import ) ){
+        $import = json_decode( $import, true );
+    }
+
+    if ( ! is_array( $import ) )
+        return false;
+
+    $title = $import[ 'title' ];
+
+    $funnel_id = WPGH()->funnels->add( array( 'title' => $title, 'status' => 'inactive', 'author' => get_current_user_id() ) );
+
+    $steps = $import[ 'steps' ];
+
+    $valid_actions = WPGH()->elements->get_actions();
+    $valid_benchmarks = WPGH()->elements->get_benchmarks();
+
+    foreach ( $steps as $i => $step_args )
+    {
+
+        $step_title = $step_args['title'];
+        $step_group = $step_args['group'];
+        $step_type  = $step_args['type'];
+
+        if ( ! isset( $valid_actions[$step_type] ) && ! isset( $valid_benchmarks[$step_type] ) )
+            continue;
+
+        $args = array(
+            'funnel_id' => $funnel_id,
+            'step_title'     => $step_title,
+            'step_status'    => 'ready',
+            'step_group'     => $step_group,
+            'step_type'      => $step_type,
+            'step_order'     => $i+1,
+        );
+
+        $step_id = WPGH()->steps->add( $args );
+
+        $step_meta = $step_args[ 'meta' ];
+
+//        var_dump( $step_meta );
+
+        foreach ( $step_meta as $key => $value ) {
+            if ( is_array( $value ) ){
+                WPGH()->step_meta->update_meta( $step_id, $key, array_shift( $value ) );
+            } else {
+                WPGH()->step_meta->update_meta( $step_id, $key, $value );
+            }
+        }
+
+        $import_args = $step_args[ 'args' ];
+
+        $step = wpgh_get_funnel_step( $step_id );
+
+        do_action( 'wpgh_import_step_' . $step_type, $import_args, $step );
+        do_action( "groundhogg/steps/{$step->type}/import", $import_args, $step );
+
+    }
+
+    return $funnel_id;
+}
+
+/**
+ * Remove the editing toolbar from the email content so it doesn't show up in the client's email.
+ *
+ * @param $content string the email content
+ *
+ * @return string the new email content.
+ */
+function remove_builder_toolbar( $content )
+{
+    return preg_replace( '/<wpgh-toolbar\b[^>]*>(.*?)<\/wpgh-toolbar>/', '', $content );
+}
+
+add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
+//add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_builder_toolbar' );
+
+
+/**
+ * Remove the content editable attribute from the email's html
+ *
+ * @param $content string email HTML
+ * @return string the filtered email content.
+ */
+function remove_content_editable( $content )
+{
+    return preg_replace( "/contenteditable=\"true\"/", '', $content );
+}
+
+add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
+//add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_content_editable' );
+
+/**
+ * Remove script tags from the email content
+ *
+ * @param $content string the email content
+ * @return string, sanitized email content
+ */
+function strip_script_tags( $content )
+{
+    return preg_replace( '/<script\b[^>]*>(.*?)<\/script>/', '', $content );
+}
+
+//add_filter( 'wpgh_sanitize_email_content', 'strip_script_tags' );
+
+/**
+ * Remove form tags from emails.
+ *
+ * @param $content string the email content
+ * @return string, sanitized email content
+ */
+function wpgh_strip_form_tags( $content )
+{
+    return preg_replace( '/<form\b[^>]*>(.*?)<\/form>/', '', $content );
+}
+
+//add_filter( 'wpgh_sanitize_email_content', 'wpgh_strip_form_tags' );
+
+/**
+ * Add a link to the FB group in the admin footer.
+ *
+ * @param $text
+ * @return string|string[]|null
+ */
+function add_bug_report_prompt( $text )
+{
+    if ( apply_filters( 'groundhogg/footer/show_text', true ) ){
+        return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
+    }
+
+    return $text;
+}
+
+add_filter('admin_footer_text', '\Groundhogg\add_bug_report_prompt');
+
+/**
+ * Recount the contacts per tag...
+ */
+function recount_tag_contacts_count()
+{
+    /* Recount tag relationships */
+    $tags = Plugin::$instance->dbs->get_db( 'tags' )->query();
+
+    if ( ! empty( $tags ) ){
+        foreach ( $tags as $tag ){
+            $count =Plugin::$instance->dbs->get_db( 'tag_relationships' )->count( [ 'tag_id' => $tag->tag_id ] );
+            Plugin::$instance->dbs->get_db( 'tags' )->update( $tag->tag_id, [ 'contact_count' => $count ] );
+        }
+    }
+}
+
+
+/**
+ * Create a contact quickly from a user account.
+ *
+ * @param $user \WP_User|int
+ * @param $sync_meta bool whether to copy the meta data over.
+ * @return Contact|false|WP_Error the new contact, false on failure, or WP_Error on error
+ */
+function wpgh_create_contact_from_user( $user, $sync_meta = false )
+{
+
+    if ( is_int( $user ) ) {
+        $user = get_userdata( $user );
+        if ( ! $user ){
+            return false;
+        }
+    }
+
+    if ( ! $user instanceof \WP_User ){
+        return false;
+    }
+
+    /* Get by email instead of by ID because */
+    $contact = get_contactdata( $user->user_email );
+
+    /**
+     * Do not continue if the contact already exists. Just return it...
+     */
+    if ( $contact && $contact->exists() ){
+        $contact->update( [ 'user_id' => $user->ID ] );
+        return $contact;
+    }
+
+    /**
+     * Setup the initial args..
+     */
+    $args = array(
+        'first_name'    => $user->first_name,
+        'last_name'     => $user->last_name,
+        'email'         => $user->user_email,
+        'user_id'       => $user->ID,
+        'optin_status'  => Preferences::UNCONFIRMED
+    );
+
+    if ( empty( $args[ 'first_name' ] ) ){
+        $args[ 'first_name' ] = $user->display_name;
+    }
+
+    $contact = new Contact();
+
+    $id = $contact->create( $args );
+
+    if ( ! $id ){
+        return new \WP_Error( 'db_error', __( 'Could not create contact.', 'groundhogg' ) );
+    }
+
+    // Additional stuff.
+    $contact->update_meta( 'user_login', $user->user_login );
+    $contact->change_marketing_preference( $contact->get_optin_status() );
+    $contact->add_tag( wpgh_get_roles_pretty_names( $user->roles ) );
+
+    return $contact;
+}
+
+/**
+ * Provides a global hook not requireing the benchmark anymore.
+ *
+ * @param $userId int the Id of the user
+ */
+function wpgh_convert_user_to_contact_when_user_registered( $userId )
+{
+    $user = get_userdata( $userId );
+    $contact = wpgh_create_contact_from_user( $user );
+
+    if ( ! is_admin() ){
+
+        /* register front end which is technically an optin */
+        $contact->update_meta( 'last_optin', time() );
+
+    }
+
+    /**
+     * Provide hook for the Account Created benchmark and other functionality
+     *
+     * @param $user WP_User
+     * @param $contact WPGH_Contact
+     */
+    do_action( 'wpgh_user_created', $user, $contact );
+}
+
+add_action( 'user_register', 'wpgh_convert_user_to_contact_when_user_registered' );
+
+/**
+ * Get quarter $start & end dates...
+ *
+ * @see https://stackoverflow.com/questions/21185924/get-startdate-and-enddate-for-current-quarter-php
+ *
+ * @param string $quarter
+ * @param null $year
+ * @param null $format
+ * @return int[]
+ * @throws Exception
+ */
+function wpgh_get_dates_of_quarter($quarter = 'current', $year = null, $format = null)
+{
+    if ( !is_int($year) ) {
+        $year = (new DateTime)->format('Y');
+    }
+    $current_quarter = ceil((new DateTime)->format('n') / 3);
+    switch (  strtolower($quarter) ) {
+        case 'this':
+        case 'current':
+            $quarter = ceil((new DateTime)->format('n') / 3);
+            break;
+
+        case 'previous':
+            $year = (new DateTime)->format('Y');
+            if ($current_quarter == 1) {
+                $quarter = 4;
+                $year--;
+            } else {
+                $quarter =  $current_quarter - 1;
+            }
+            break;
+
+        case 'first':
+            $quarter = 1;
+            break;
+
+        case 'last':
+            $quarter = 4;
+            break;
+
+        default:
+            $quarter = (!is_int($quarter) || $quarter < 1 || $quarter > 4) ? $current_quarter : $quarter;
+            break;
+    }
+    if ( $quarter === 'this' ) {
+        $quarter = ceil((new DateTime)->format('n') / 3);
+    }
+    $start = new DateTime($year.'-'.(3*$quarter-2).'-1 00:00:00');
+    $end = new DateTime($year.'-'.(3*$quarter).'-'.($quarter == 1 || $quarter == 4 ? 31 : 30) .' 23:59:59');
+
+    return array(
+        'start' => $start->getTimestamp(),
+        'end'   => $end->getTimestamp(),
+    );
+}
+
+/**
+ * Used for blocks...
+ *
+ * @return array
+ */
+function wpgh_get_form_list() {
+
+    $forms = WPGH()->steps->get_steps( array(
+        'step_type' => 'form_fill'
+    ) );
+    $form_options = array();
+    $default = 0;
+    foreach ( $forms as $form ){
+        if ( ! $default ){$default = $form->ID;}
+        $step = wpgh_get_funnel_step( $form->ID );
+        if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
+    }
+    return $form_options;
+}
+
+/**
+ * If the JSON is your typical error response
+ *
+ * @param $json
+ * @return bool
+ */
+function is_json_error( $json ){
+    return isset( $json->code ) && isset( $json->message );
+}
+
+/**
+ * Convert JSON to a WP_Error
+ *
+ * @param $json
+ * @return bool|WP_Error
+ */
+function get_json_error( $json ){
+
+    if ( wpgh_is_json_error( $json ) ){
+        return new WP_Error( $json->code, $json->message, $json->data );
+    }
+
+    return false;
+}
+
+/**
+ * Schedule a 1 off email notification
+ *
+ * @param $email_id int the ID of the email to send
+ * @param $contact_id_or_email int|string the ID of the contact to send to
+ * @param int $time time time to send at, defaults to time()
+ *
+ * @return bool whether the scheduling was successful.
+ */
+function send_email_notification( $email_id, $contact_id_or_email, $time=0 )
+{
+    $contact = Plugin::$instance->utils->get_contact( $contact_id_or_email );
+    $email = Plugin::$instance->utils->get_email( $email_id );
+
+    if ( ! $contact || ! $email ){
+        return false;
+    }
+
+    if ( ! $time ){
+        $time = time();
+    }
+
+    $event = [
+        'time'          => $time,
+        'funnel_id'     => 0,
+        'step_id'       => $email->get_id(),
+        'contact_id'    => $contact->get_id(),
+        'event_type'    => Event::EMAIL_NOTIFICATION,
+        'status'        => 'waiting',
+    ];
+
+    if ( Plugin::$instance->dbs->get_db('events' )->add( $event ) ){
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Schedule a 1 off sms notification
+ *
+ * @param $sms_id int the ID of the sms to send
+ * @param $contact_id_or_email int|string the ID of the contact to send to
+ * @param int $time time time to send at, defaults to time()
+ *
+ * @return bool whether the scheduling was successful.
+ */
+function send_sms_notification( $sms_id, $contact_id_or_email, $time=0 )
+{
+    $contact = Plugin::$instance->utils->get_contact( $contact_id_or_email );
+    $sms = Plugin::$instance->utils->get_sms( $sms_id );
+
+    if ( ! $contact || ! $sms ){
+        return false;
+    }
+
+    if ( ! $time ){
+        $time = time();
+    }
+
+    $event = [
+        'time'          => $time,
+        'funnel_id'     => 0,
+        'step_id'       => $sms->get_id(),
+        'contact_id'    => $contact->get_id(),
+        'event_type'    => Event::SMS_NOTIFICATION,
+        'status'        => 'waiting',
+    ];
+
+    if ( Plugin::$instance->dbs->get_db('events' )->add( $event ) ){
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Parse the headers and return things like from/to etc...
+ *
+ * @param $headers string|string[]
+ * @return array|false
+ */
+function parse_email_headers( $headers )
+{
+    $headers = is_array( $headers ) ? implode( PHP_EOL, $headers ) : $headers;
+    if ( ! is_string( $headers ) ){
+        return false;
+    }
+
+    $parsed = imap_rfc822_parse_headers( $headers );
+
+    if ( ! $parsed ){
+        return false;
+    }
+
+    $map = [];
+
+    if ( $parsed->sender && ! is_array( $parsed->sender ) ){
+        $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
+        $map[ 'from' ] = $parsed->sender->personal;
+    } else if ( is_array( $parsed->sender ) ){
+        $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender[0]->mailbox, $parsed->sender[0]->host );
+        $map[ 'from' ] = $parsed->sender[0]->personal;
+    }
+
+    return $map;
+}
+
+
+/**
+ * GHSS doesn't link the <pwlink> format so we have to fix it by removing the gl & lt
+ *
+ * @param $message
+ * @param $key
+ * @param $user_login
+ * @param $user_data
+ * @return string
+ */
+function fix_html_pw_reset_link($message, $key, $user_login, $user_data )    {
+    $message = preg_replace( '/<(https?:\/\/.*)>/', '$1', $message );
+    return $message;
+}
+
+add_filter( 'retrieve_password_message', '\Groundhogg\fix_html_pw_reset_link', 10, 4 );
+
 /**
  * handle a wp_mail_failed event.
  *
  * @param $error WP_Error
  */
-function wpgh_parse_complaint_and_bounce_emails( $error )
+function listen_for_complaint_and_bounce_emails( $error )
 {
     $data = (array) $error->get_error_data();
 
@@ -1294,7 +1022,7 @@ function wpgh_parse_complaint_and_bounce_emails( $error )
 
         if ( ! empty( $bounces ) ){
             foreach ( $bounces as $email ){
-                if ( $contact = wpgh_get_contact( $email ) ){
+                if ( $contact = ( $email ) ){
                     $contact->change_marketing_preference( WPGH_HARD_BOUNCE );
                 }
             }
@@ -1313,7 +1041,7 @@ function wpgh_parse_complaint_and_bounce_emails( $error )
     }
 }
 
-add_action( 'wp_mail_failed', 'wpgh_parse_complaint_and_bounce_emails' );
+add_action( 'wp_mail_failed', '\Groundhogg\listen_for_complaint_and_bounce_emails' );
 
 /**
  * Override the default from email

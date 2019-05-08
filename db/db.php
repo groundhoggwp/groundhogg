@@ -136,7 +136,7 @@ abstract class DB {
         global $wpdb;
 
         if ( ! isset( $this->table_name ) ){
-            if ( ! Plugin::$instance->settings->is_global_multisite() ){
+            if ( ! $this->is_global_multisite() ){
                 $this->table_name  = $wpdb->prefix . $this->db_suffix;
             } else {
                 $this->table_name = $wpdb->base_prefix . $this->db_suffix;
@@ -144,6 +144,24 @@ abstract class DB {
         }
 
         return $this->table_name;
+    }
+
+    /**
+     * Check if the site is global multisite enabled
+     *
+     * @return bool
+     */
+    private function is_global_multisite()
+    {
+        if ( ! is_multisite() ){
+            return false;
+        }
+
+        if ( is_multisite() && ! get_site_option( 'gh_global_db_enabled' ) ){
+            return false;
+        }
+
+        return true;
     }
 
 

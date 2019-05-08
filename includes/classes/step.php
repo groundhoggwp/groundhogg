@@ -474,6 +474,21 @@ class Step extends Base_Object_With_Meta implements Event_Process
     }
 
     /**
+     * Oh Boy....
+     *
+     * @return array
+     */
+    public function export()
+    {
+        return apply_filters( "groundhogg/steps/{$this->get_type()}/export" , [], $this );
+    }
+
+    public function import()
+    {
+
+    }
+
+    /**
      * @return string
      */
     public function get_step_title()

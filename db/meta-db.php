@@ -223,7 +223,7 @@ abstract class Meta_DB extends DB {
 		meta_key varchar(255) DEFAULT NULL,
 		meta_value longtext,
 		PRIMARY KEY  (meta_id),
-		KEY object_id (object_id),
+		KEY {$this->get_object_id_col()} ({$this->get_object_id_col()}),
 		KEY meta_key (meta_key)
 		) {$this->get_charset_collate()};";
 

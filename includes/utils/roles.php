@@ -66,7 +66,7 @@ abstract class Roles {
             return;
         }
 
-        foreach ( $roles as $role => $role_args ){
+        foreach ( $roles as $role_args ){
 
             $role_args = wp_parse_args( $role_args, [
                 'role' => '',
@@ -74,9 +74,7 @@ abstract class Roles {
                 'caps' => [],
             ] );
 
-            list( $role, $name, $caps ) = $role_args;
-
-            add_role( $role, $name, $caps );
+            add_role( $role_args[ 'role' ], $role_args[ 'name' ], $role_args[ 'caps' ] );
         }
 
     }
@@ -182,10 +180,11 @@ abstract class Roles {
     public function roles_are_installed()
     {
         $installed_roles = array_keys( wp_roles()->roles );
-        $our_roles = array_keys( $this->get_roles() );
+        $our_roles = array_column( $this->get_roles(), 'role' );
 
         // If our roles were installed this should be empty
         $missing_roles = array_diff( $our_roles, $installed_roles );
+
         return empty( $missing_roles );
     }
 

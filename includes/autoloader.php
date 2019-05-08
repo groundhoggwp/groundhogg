@@ -11,7 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Groundhogg autoloader handler class is responsible for loading the different
  * classes needed to run the plugin.
  *
- * @since 1.6.0
+ * Borrowed from Elementor, thanks guys...
+ *
+ * @since 2.0
  */
 class Autoloader {
 
@@ -54,16 +56,19 @@ class Autoloader {
         'Tag_Mapping'   => 'includes/tag-mapping.php',
         'Modal'         => 'includes/modal.php',
         'Main_Updater'  => 'includes/main-updater.php',
+        'Main_Roles'    => 'includes/main-roles.php',
         'Main_Installer' => 'includes/main-installer.php',
         'Compliance'    => 'includes/compliance.php',
         'Contact_Query' => 'includes/contact-query.php',
         'Supports_Errors' => 'includes/supports-errors.php',
         'Template_Loader' => 'includes/template-loader.php',
+        'GH_SS_Mailer'  => 'includes/gh-ss-mailer.php',
         'HTML'          => 'includes/utils/html.php',
         'Utils'         => 'includes/utils/utils.php',
         'Files'         => 'includes/utils/files.php',
         'Location'      => 'includes/utils/location.php',
         'Updater'       => 'includes/utils/updater.php',
+        'Roles'         => 'includes/utils/roles.php',
         'Installer'     => 'includes/utils/installer.php',
         'Date_Time'     => 'includes/utils/date-time.php',
         'Base_Object'   => 'includes/classes/base-object.php',

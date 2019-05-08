@@ -21,8 +21,8 @@ abstract class Installer {
         register_deactivation_hook( $this->get_plugin_file(), [ $this, 'deactivation_hook' ] );
 
         add_action( 'wpmu_new_blog', [ $this, 'new_blog_created' ], 10, 6 );
-        add_filter( 'wpmu_drop_tables', 'wpmu_drop_tables', 10, 2 );
-        add_action( 'activated_plugin', 'plugin_activated' );
+        add_filter( 'wpmu_drop_tables', [ $this, 'wpmu_drop_tables' ], 10, 2 );
+        add_action( 'activated_plugin', [ $this, 'plugin_activated' ] );
     }
 
     abstract protected function activate();
@@ -92,9 +92,8 @@ abstract class Installer {
      * Fires after the 'activated_plugin' hook.
      *
      * @param $plugin
-     * @return mixed
      */
-    abstract public function plugin_activated( $plugin );
+    public function plugin_activated( $plugin ){}
 
     /**
      * The path to the main plugin file
@@ -126,6 +125,8 @@ abstract class Installer {
     {
         global $wpdb;
 
+//        ob_start();
+
         if ( is_multisite() && $network_wide ) {
 
             foreach ( $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs LIMIT 100" ) as $blog_id ) {
@@ -138,7 +139,7 @@ abstract class Installer {
             $this->activation_wrapper();
         }
 
-//        file_put_contents( dirname( $this->get_plugin_file() ) . '/activation-errors', ob_get_contents() );
+        file_put_contents( dirname( $this->get_plugin_file() ) . '/activation-errors.txt', ob_get_contents() );
     }
 
     /**

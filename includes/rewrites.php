@@ -48,6 +48,13 @@ class Rewrites
             'index.php?pagenow=superlink&superlink_id=$matches[1]',
             'top'
         );
+
+        // Funnel Download/Export
+        add_rewrite_rule(
+            '^gh/funnels/export/([^/]*)/?$',
+            'index.php?pagenow=funnels&action=export&enc_funnel_id=$matches[1]',
+            'top'
+        );
     }
 
     /**
@@ -59,7 +66,9 @@ class Rewrites
     public function add_query_vars( $vars )
     {
         $vars[] = 'pagenow';
+        $vars[] = 'action';
         $vars[] = 'superlink_id';
+        $vars[] = 'funnel_id';
         $vars[] = 'email_id';
         return $vars;
     }
@@ -74,6 +83,7 @@ class Rewrites
     {
         $this->map_query_var( $query, 'email_id', 'absint' );
         $this->map_query_var( $query, 'superlink_id', 'absint' );
+        $this->map_query_var( $query, 'enc_funnel_id', 'urldecode' );
         return $query;
     }
 
@@ -132,6 +142,25 @@ class Rewrites
 
                 break;
             case 'benchmark_link':
+                break;
+            case 'funnels':
+                // Export the funnel from special rewrite link...
+                $funnel_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_funnel_id' ), 'd' ) );
+                $funnel = new Funnel( $funnel_id );
+
+                if ( ! $funnel->exists() ){
+                    return;
+                }
+
+                $export_string = wp_json_encode( $funnel->get_as_array() );
+                $filename = 'funnel-' . $funnel->get_title() . '-'. date("Y-m-d_H-i", time() );
+
+                header("Content-type: text/plain");
+                header( "Content-disposition: attachment; filename=".$filename.".funnel");
+                $file = fopen('php://output', 'w');
+                fputs( $file, $export_string );
+                fclose($file);
+                exit();
                 break;
 
         }
