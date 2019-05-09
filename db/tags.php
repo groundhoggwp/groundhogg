@@ -204,29 +204,6 @@ class Tags extends DB
     }
 
     /**
-     * Checks if a tag exists
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function exists( $value = 0, $field = 'tag_id' ) {
-
-        $columns = $this->get_columns();
-        if ( ! array_key_exists( $field, $columns ) ) {
-            return false;
-        }
-
-        if ( $field === 'tag_id' ){
-            $tag = $this->get( $value );
-        } else {
-            $tag = $this->get_tag_by( $field, $value );
-        }
-
-        return ! empty( $tag ) ;
-
-    }
-
-    /**
      * Retrieves the tag by the ID.
      *
      * @param $id

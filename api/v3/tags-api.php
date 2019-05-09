@@ -1,27 +1,19 @@
 <?php
-/**
- * Groundhogg API tags
- *
- * This class provides a front-facing JSON API that makes it possible to
- * query data from the other application application.
- *
- * @package     WPGH
- * @subpackage  Classes/API
- *
- *
- */
+namespace Groundhogg\Api\V3;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-/**
- * WPGH_API_V3_TAGS Class
- *
- * Renders API returns as a JSON
- *
- * @since  1.5
- */
-class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
+use Groundhogg\Contact;
+use Groundhogg\Contact_Query;
+use function Groundhogg\get_contactdata;
+use Groundhogg\Plugin;
+use WP_REST_Server;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_Error;
+
+class Tags_Api extends Base
 {
 
     public function register_routes()
@@ -158,7 +150,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
         $is_for_select = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
         $is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 
-        $tags = WPGH()->tags->search( $search );
+        $tags = Plugin::$instance->dbs->get_db( 'tags' )->search( $search );
 
         if ( $is_for_select2 ){
             $json = array();
@@ -208,12 +200,12 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
             return self::ERROR_400( 'invalid_tag_names', 'An array of tags is required.' );
         }
 
-        $tag_ids = WPGH()->tags->validate( $tag_names );
+        $tag_ids = Plugin::$instance->dbs->get_db( 'tags' )->validate( $tag_names );
 
         $response_tags = [];
 
         foreach ( $tag_ids as $tag_id ){
-            $response_tags[ $tag_id ] = WPGH()->tags->get_column_by( 'tag_name', 'tag_id', $tag_id );
+            $response_tags[ $tag_id ] = Plugin::$instance->dbs->get_db( 'tags' )->get_column_by( 'tag_name', 'tag_id', $tag_id );
         }
 
         return self::SUCCESS_RESPONSE( [ 'tags' => $response_tags ] );
@@ -245,7 +237,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
             'tag_description'   => $tag_description,
         );
 
-        if ( ! WPGH()->tags->update( $tag_id, $args ) ){
+        if ( ! Plugin::$instance->dbs->get_db( 'tags' )->update( $tag_id, $args ) ){
             return self::ERROR_UNKNOWN();
         }
 
@@ -271,7 +263,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
             return self::ERROR_400( 'invalid_tag_params', 'Please provide proper arguments.' );
         }
 
-        if ( ! WPGH()->tags->delete( $tag_id ) ){
+        if ( ! Plugin::$instance->dbs->get_db( 'tags' )->delete( $tag_id ) ){
             return self::ERROR_UNKNOWN();
         }
 
@@ -282,7 +274,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
      * Apply tags to a contact
      *
      * @param WP_REST_Request $request
-     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     * @return false|WP_Error|WP_REST_Response
      */
     public function apply_tags( WP_REST_Request $request )
     {
@@ -313,7 +305,7 @@ class WPGH_API_V3_TAGS extends WPGH_API_V3_BASE
      * Remove tags from a contact
      *
      * @param WP_REST_Request $request
-     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     * @return false|WP_Error|WP_REST_Response|Contact
      */
     public function remove_tags( WP_REST_Request $request )
     {

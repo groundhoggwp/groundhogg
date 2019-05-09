@@ -1,4 +1,6 @@
 <?php
+namespace Groundhogg\Api\V3;
+
 /**
  * Created by PhpStorm.
  * User: atty
@@ -6,20 +8,20 @@
  * Time: 4:18 PM
  */
 
-class WPGH_API_V3
+class API_V3
 {
 
     /**
-     * @var WPGH_API_V3_BASE[]
+     * @var BASE[]
      */
     public $apis = [];
 
 
     public function __construct()
     {
-
-        $this->includes();
-
+        /**
+         * Use this action to declare extension endpoints...
+         */
         do_action( 'groundhogg/api/v3/pre_init', $this );
 
         $this->declare_base_endpoints();
@@ -33,18 +35,18 @@ class WPGH_API_V3
      */
     public function declare_base_endpoints()
     {
-        $this->contacts = new WPGH_API_V3_CONTACTS();
-        $this->tags     = new WPGH_API_V3_TAGS();
-        $this->emails   = new WPGH_API_V3_EMAILS();
-        $this->sms      = new WPGH_API_V3_SMS();
-        $this->elements = new WPGH_API_V3_ELEMENTS();
+        $this->contacts = new Contacts_Api();
+        $this->tags     = new Tags_Api();
+        $this->emails   = new Email_Api();
+        $this->sms      = new Sms_Api();
+        $this->tracking = new Tracking_Api();
     }
 
     /**
      * Get API class
      *
      * @param $name
-     * @return mixed | WPGH_API_V3_BASE
+     * @return mixed | BASE
      */
     public function __get($name)
     {
@@ -70,23 +72,6 @@ class WPGH_API_V3
     public function __set( $name, $value )
     {
         $this->apis[ $name ] = $value;
-    }
-
-    /**
-     * Include base files.
-     */
-    private function includes()
-    {
-
-        include_once dirname(__FILE__) . '/class-wpgh-api-v3-base.php';
-        include_once dirname(__FILE__) . '/class-wpgh-api-v3-contacts.php';
-        include_once dirname(__FILE__) . '/class-wpgh-api-v3-tags.php';
-        include_once dirname(__FILE__) . '/class-wpgh-api-v3-emails.php';
-        include_once dirname(__FILE__) . '/class-wpgh-api-v3-sms.php';
-        include_once dirname(__FILE__) . '/class-wpgh-api-v3-elements.php';
-
-        do_action( 'groundhogg/api/v3/includes', $this );
-
     }
 
 }

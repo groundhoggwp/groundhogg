@@ -122,6 +122,16 @@ class HTML
     }
 
     /**
+     * Return P description.
+     *
+     * @param $text
+     * @return string
+     */
+    public function description( $text ){
+        return sprintf( '<p class="description">%s</p>', $text );
+    }
+
+    /**
      * Add a form table row
      *
      * @param array $args

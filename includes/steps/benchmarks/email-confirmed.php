@@ -96,19 +96,11 @@ class Email_Confirmed extends Benchmark
     /**
      * get the hook for which the benchmark will run
      *
-     * @return string
+     * @return string[]
      */
-    protected function get_complete_hook()
+    protected function get_complete_hooks()
     {
-        return 'groundhogg/contact/preferences/updated';
-    }
-
-    /**
-     * @return int
-     */
-    protected function get_num_hook_args()
-    {
-        return 3;
+        return [ 'groundhogg/contact/preferences/updated' => 3 ];
     }
 
     /**
@@ -138,6 +130,6 @@ class Email_Confirmed extends Benchmark
      */
     protected function can_complete_step()
     {
-        return $this->get_data( 'preference' ) === Preferences::CONFIRMED;
+        return $this->get_data( 'preference' ) === Preferences::CONFIRMED && $this->get_current_contact()->get_optin_status() === Preferences::CONFIRMED;
     }
 }

@@ -49,6 +49,13 @@ class Rewrites
             'top'
         );
 
+        // Benchmark links OLD
+        add_rewrite_rule(
+            '^gh/link/click/([^/]*)/?$',
+            'index.php?pagenow=benchmark_link&link_id=$matches[1]',
+            'top'
+        );
+
         // Funnel Download/Export
         add_rewrite_rule(
             '^gh/funnels/export/([^/]*)/?$',
@@ -70,6 +77,7 @@ class Rewrites
         $vars[] = 'superlink_id';
         $vars[] = 'funnel_id';
         $vars[] = 'email_id';
+        $vars[] = 'link_id';
         return $vars;
     }
 
@@ -81,6 +89,7 @@ class Rewrites
      */
     public function parse_query( $query )
     {
+        $this->map_query_var( $query, 'link_id', 'absint' );
         $this->map_query_var( $query, 'email_id', 'absint' );
         $this->map_query_var( $query, 'superlink_id', 'absint' );
         $this->map_query_var( $query, 'enc_funnel_id', 'urldecode' );
@@ -142,6 +151,25 @@ class Rewrites
 
                 break;
             case 'benchmark_link':
+
+                $link_id = absint( get_query_var( 'link_id' ) );
+                $contact = Plugin::$instance->tracking->get_current_contact();
+
+                $step = Plugin::$instance->utils->get_step( $link_id );
+
+                if ( ! $contact || ! $step ) {
+                    return;
+                }
+
+                $target_url = $step->get_meta( 'redirect_to' );
+
+                do_action( 'groundhogg/rewrites/benchmark_link/clicked', $contact, $step );
+
+                $target_url = Plugin::$instance->replacements->process( $target_url, $contact->get_id() );
+
+                wp_redirect( wp_nonce_url( $target_url,  -1, 'key' ) );
+                die();
+
                 break;
             case 'funnels':
                 // Export the funnel from special rewrite link...
@@ -180,44 +208,5 @@ class Rewrites
         if ( isset_not_empty( $array, $key ) ){
             $array[ $key ] = call_user_func( $func, $array[ $key ] );
         }
-    }
-
-
-    /**
-     * Tracking for the link click benchmark.
-     */
-    public function link_clicked()
-    {
-
-
-        if ( ! $step )
-            return;
-
-        if ( $this->get_contact() ){
-            do_action( 'wpgh_link_clicked', $step, $this->get_contact() );
-            do_action( 'groundhogg/tracking/benchmark_link/click', $step, $this->get_contact() );
-            $redirect_to = WPGH()->replacements->process( $step->get_meta( 'redirect_to' ), $this->get_contact()->ID );
-
-            if ( wpgh_is_global_multisite() ){
-                switch_to_blog( get_site()->site_id );
-            }
-
-            /* Check unsub page */
-            $unsub_page = get_permalink( wpgh_get_option( 'gh_unsubscribe_page' ) );
-            if ( $redirect_to === $unsub_page ){
-                $redirect_to = sprintf( '%s?u=%s', $unsub_page, dechex( $this->contact->ID ) );
-            }
-
-            if ( is_multisite() && ms_is_switched() ){
-                restore_current_blog();
-            }
-
-
-        } else {
-            $redirect_to = $step->get_meta( 'redirect_to' );
-        }
-
-        wp_redirect( $redirect_to );
-        die();
     }
 }

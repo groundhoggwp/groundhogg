@@ -398,7 +398,7 @@ switch ( $action ):
                     die();
                     break;
                 case 'confirm':
-                    wp_redirect( wp_nonce_url( site_url( 'gh/preferences/confirm' ) ) );
+                    wp_redirect( wp_nonce_url( site_url( 'gh/preferences/confirm' ), -1, 'key' ) );
                     die();
                     break;
                 case 'weekly':
@@ -478,7 +478,7 @@ switch ( $action ):
         break;
     case 'confirm':
 
-        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ) ) ) {
+        if ( ! wp_verify_nonce( get_request_var( 'key' ) ) ) {
             wp_redirect( site_url( 'gh/preferences/manage' ) );
         }
 

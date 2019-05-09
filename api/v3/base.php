@@ -1,28 +1,27 @@
 <?php
-/**
- * Groundhogg API base
- *
- * This class provides an absic architecture for child API classes.
- *
- * @package     WPGH
- * @subpackage  Classes/API
- *
- */
+namespace Groundhogg\Api\V3;
+
+use Groundhogg\Contact;
+use function Groundhogg\get_contactdata;
+use WP_Error;
+use WP_REST_Response;
+use WP_REST_Request;
+use Groundhogg\Plugin;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * WPGH_API_V3_BASE Class
+ * API_V3_BASE Class
  *
  * Renders API returns as a JSON
  *
  * @since  1.5
  */
-abstract class WPGH_API_V3_BASE {
+abstract class Base {
 
     /**
-     * @var WP_User
+     * @var \WP_User
      */
     protected static $current_user;
 
@@ -208,7 +207,7 @@ abstract class WPGH_API_V3_BASE {
      * Given a request get a contact if one exists.
      *
      * @param WP_REST_Request $request
-     * @return false|WP_Error|WPGH_Contact
+     * @return false|WP_Error|Contact
      */
     protected static function get_contact_from_request( WP_REST_Request $request )
     {
@@ -220,7 +219,7 @@ abstract class WPGH_API_V3_BASE {
         }
 
         $by_user_id = filter_var( $request->get_param( 'by_user_id' ), FILTER_VALIDATE_BOOLEAN );
-        $contact = wpgh_get_contact( $id_or_email, $by_user_id );
+        $contact = get_contactdata( $id_or_email, $by_user_id );
 
         if( ! $contact ) {
             if ( is_numeric( $id_or_email ) ){
@@ -250,7 +249,7 @@ abstract class WPGH_API_V3_BASE {
     {
 
         /* Check if the API is enabled... */
-        if ( wpgh_is_option_enabled( 'gh_disable_api' ) ){
+        if ( Plugin::$instance->settings->is_option_enabled( 'disable_api' ) ){
             return self::ERROR_403( 'api_unavailable', 'The api has been disabled by the administrator.' );
         }
 

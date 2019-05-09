@@ -20,6 +20,16 @@ function get_contactdata( $contact_id_or_email, $by_user_id=false )
 }
 
 /**
+ * Get DB
+ *
+ * @param $name
+ * @return DB\DB|DB\Meta_DB|DB\Tags
+ */
+function get_db( $name ){
+    return Plugin::$instance->dbs->get_db( $name );
+}
+
+/**
  * Return if a value in an array isset and is not empty
  *
  * @param $array
@@ -656,8 +666,7 @@ function create_contact_from_user($user, $sync_meta = false )
         return false;
     }
 
-    /* Get by email instead of by ID because */
-    $contact = get_contactdata( $user->user_email );
+    $contact = get_contactdata( $user->ID, true );
 
     /**
      * Do not continue if the contact already exists. Just return it...
@@ -1157,6 +1166,8 @@ function get_mappable_fields( $extra=[] )
         'ip_address'                => __( 'IP Address' ),
         'lead_source'               => __( 'Lead Source' ),
         'source_page'               => __( 'Source Page' ),
+        'terms_agreement'           => __( 'Terms Agreement' ),
+        'gdpr_consent'              => __( 'GDPR Consent' ),
         'notes'                     => __( 'Add To Notes' ),
         'tags'                      => __( 'Apply Value as Tag' ),
         'meta'                      => __( 'Add as Custom Meta' ),
@@ -1237,6 +1248,20 @@ function generate_contact_with_map( $fields, $map )
             case 'utm_term':
             case 'utm_source':
                 $meta[ $field ] = sanitize_text_field( $value );
+                break;
+            // Only checks whether value is not empty.
+            case 'terms_agreement':
+                if ( ! empty( $value ) ){
+                    $meta[ 'terms_agreement' ] = 'yes';
+                    $meta[ 'terms_agreement_date' ] = date_i18n( get_option( 'date_format' ) );
+                }
+                break;
+            // Only checks whether value is not empty.
+            case 'gdpr_consent':
+                if ( ! empty( $value ) ){
+                    $meta[ 'gdpr_consent' ] = 'yes';
+                    $meta[ 'gdpr_consent_date' ] = date_i18n( get_option( 'date_format' ) );
+                }
                 break;
             case 'country':
                 if ( strlen( $value ) !== 2 ){

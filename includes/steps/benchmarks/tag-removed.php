@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 
 /**
- * Tag Applied
+ * Tag Removed
  *
- * This will run whenever a tag is applied
+ * This will run whenever a tag is removed
  *
  * @package     Elements
  * @subpackage  Elements/Benchmarks
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-class Tag_Applied extends Benchmark
+class Tag_Removed extends Benchmark
 {
 
     /**
@@ -34,7 +34,7 @@ class Tag_Applied extends Benchmark
      */
     public function get_name()
     {
-        return _x( 'Tag Applied', 'step_name', 'groundhogg' );
+        return _x( 'Tag Removed', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -44,7 +44,7 @@ class Tag_Applied extends Benchmark
      */
     public function get_type()
     {
-        return 'tag_applied';
+        return 'tag_removed';
     }
 
     /**
@@ -54,7 +54,7 @@ class Tag_Applied extends Benchmark
      */
     public function get_description()
     {
-        return _x( 'Runs whenever any of the specified tags are added to a contact.', 'step_description', 'groundhogg' );
+        return _x( 'Runs whenever any of the specified tags are removed from a contact.', 'step_description', 'groundhogg' );
     }
 
     /**
@@ -64,7 +64,7 @@ class Tag_Applied extends Benchmark
      */
     public function get_icon()
     {
-        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-applied.png';
+        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-removed.png';
     }
 
     /**
@@ -89,7 +89,7 @@ class Tag_Applied extends Benchmark
         ] );
 
         $this->add_control( 'tags', [
-            'label'         => sprintf( __( 'Run when %s of these tags are applied:', 'groundhogg' ), $condition_picker ),
+            'label'         => sprintf( __( 'Run when %s of these tags are removed:', 'groundhogg' ), $condition_picker ),
             'type'          => HTML::TAG_PICKER,
             'description'   => __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ),
             'field'         => [
@@ -122,7 +122,7 @@ class Tag_Applied extends Benchmark
 
         $tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( get_array_var( $args, 'tags' ) );
 
-        $this->save_setting( 'tags', $tags );;
+        $this->save_setting( 'tags', $tags );
     }
 
     /**
@@ -159,7 +159,7 @@ class Tag_Applied extends Benchmark
      */
     protected function get_complete_hooks()
     {
-        return [ 'groundhogg/contact/tag_applied' => 2 ];
+        return [ 'groundhogg/contact/tag_removed' => 2 ];
     }
 
     /**
@@ -192,7 +192,7 @@ class Tag_Applied extends Benchmark
     protected function can_complete_step()
     {
 
-        $applied_tag = $this->get_data( 'tag_id' );
+        $removed_tag = $this->get_data( 'tag_id' );
 
         $tags = wp_parse_id_list( $this->get_setting( 'tags' ) );
         $condition = $this->get_setting( 'condition', 'any' );
@@ -200,14 +200,14 @@ class Tag_Applied extends Benchmark
         switch ( $condition ){
             default:
             case 'any':
-                $has_tags = in_array( $applied_tag, $tags );
+                $not_has_tags = in_array( $removed_tag, $tags );
                 break;
             case 'all':
                 $intersect = array_intersect( $tags, $this->get_current_contact()->get_tags() );
-                $has_tags = in_array( $applied_tag, $tags ) && count( $intersect ) === count( $tags );
+                $not_has_tags = in_array( $removed_tag, $tags ) && count( $intersect ) === count( $tags );
                 break;
         }
 
-        return $has_tags;
+        return $not_has_tags;
     }
 }

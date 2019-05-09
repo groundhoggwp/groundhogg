@@ -1,30 +1,23 @@
 <?php
-/**
- * Groundhogg Elements API
- *
- * This class provides a front-facing JSON API that makes it possible to
- * query data from the other application application.
- *
- * @package     WPGH
- * @subpackage  Classes/API
- */
+namespace Groundhogg\Api\V3;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-/**
- * WPGH_API_V3_ELEMENTS Class
- *
- * Renders API returns as a JSON
- *
- * @since  1.5
- */
-class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
+use function Groundhogg\get_db;
+use Groundhogg\Plugin;
+use WP_REST_Server;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_Error;
+
+class Tracking_Api extends Base
 {
+
 
     public function register_routes()
     {
-        register_rest_route('gh/v3', '/steps/page-view', [
+        register_rest_route('gh/v3', '/tracking/page-view', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'permission_callback' => function ( WP_REST_Request $request ){
@@ -40,7 +33,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
             ]
         ] );
 
-        register_rest_route('gh/v3', '/steps/form-impression', [
+        register_rest_route('gh/v3', '/tracking/form-impression', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'form_impression' ],
@@ -65,7 +58,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
      */
     public function page_view( WP_REST_Request $request )
     {
-        $contact = WPGH()->tracking->get_contact();
+        $contact = Plugin::$instance->tracking->get_current_contact();
 
         if ( ! $contact ){
             return self::ERROR_200( 'no_contact', 'No contact to track...' );
@@ -92,9 +85,9 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
     public function form_impression( WP_REST_Request $request )
     {
         if( !class_exists( 'Browser' ) )
-            require_once WPGH_PLUGIN_DIR . 'includes/lib/browser.php';
+            require_once GROUNDHOGG_PATH . 'includes/lib/browser.php';
 
-        $browser = new Browser();
+        $browser = new \Browser();
 
         if ( $browser->isRobot() || $browser->isAol() ){
             return self::ERROR_401( 'looks_like_a_bot', 'Form impressions do not track bots.' );
@@ -102,32 +95,30 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
 
         $ID = intval( $request->get_param( 'form_id' ) );
 
-        if ( ! WPGH()->steps->exists( $ID ) ){
+        if ( ! get_db( 'steps' )->exists( $ID ) ){
             return self::ERROR_400( 'form_dne', 'The given form does not exist.' );
         }
 
-        $step = wpgh_get_funnel_step( $ID );
+        $step = Plugin::$instance->utils->get_step( $ID );
 
         $response = array();
-
-        $db = WPGH()->activity;
 
         /*
          * Is Contact
          */
-        if ( $contact = WPGH()->tracking->get_contact() ) {
+        if ( $contact = Plugin::$instance->tracking->get_current_contact() ) {
 
 
             /* Check if impression for contact exists... */
             $args = array(
-                'funnel_id'     => $step->funnel_id,
-                'step_id'       => $step->ID,
-                'contact_id'    => $contact->ID,
+                'funnel_id'     => $step->get_funnel_id(),
+                'step_id'       => $step->get_id(),
+                'contact_id'    => $contact->get_id(),
                 'activity_type' => 'form_impression',
                 'start'         => time() - DAY_IN_SECONDS
             );
 
-            $response[ 'cid' ] = $contact->ID;
+            $response[ 'cid' ] = $contact->get_id();
 
         } else {
             /*
@@ -141,7 +132,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
 
             } else {
 
-                if ( ! wpgh_verify_ip() ){
+                if ( ! Plugin::$instance->utils->location->verify_ip() ){
                     return self::ERROR_401( 'unverified_ip', 'Could not verify ip address.' );
                 }
 
@@ -149,18 +140,18 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
             }
 
             $args = array(
-                'funnel_id'     => $step->funnel_id,
-                'step_id'       => $step->ID,
+                'funnel_id'     => $step->get_funnel_id(),
+                'step_id'       => $step->get_id(),
                 'activity_type' => 'form_impression',
                 'referer'       => $ref_id,
-                'start'         => time() - DAY_IN_SECONDS
+                'from'         => time() - DAY_IN_SECONDS
             );
 
             $response[ 'ref_id' ] = $ref_id;
 
         }
 
-        if ( $db->activity_exists( $args ) ){
+        if ( get_db( 'activity' )->exists( $args ) ){
             return self::ERROR_200( 'no_double_track', 'Unique views only.', $response );
         }
 
@@ -168,7 +159,7 @@ class WPGH_API_V3_ELEMENTS extends WPGH_API_V3_BASE
 
         unset( $args[ 'start' ] );
         $args[ 'timestamp' ] = time();
-        $db->add( $args );
+        get_db( 'activity' )->add( $args );
 
         return self::SUCCESS_RESPONSE( $response );
     }

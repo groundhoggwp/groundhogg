@@ -3,8 +3,6 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
 use function Groundhogg\create_contact_from_user;
-use Groundhogg\DB\Steps;
-use function Groundhogg\get_contactdata;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -12,9 +10,9 @@ use Groundhogg\Step;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Account Created
+ * Role Changed
  *
- * This will run proceeding actions whenever a WordPRess acount is created
+ * This will run whenever a user's role is changed to the specified role
  *
  * @package     Elements
  * @subpackage  Elements/Benchmarks
@@ -23,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-class Account_Created extends Benchmark
+class Role_Changed extends Benchmark
 {
 
     /**
@@ -33,8 +31,7 @@ class Account_Created extends Benchmark
      */
     public function get_name()
     {
-        return _x( 'New User', 'step_name', 'groundhogg' );
-
+        return _x( 'Role Changed', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -44,7 +41,7 @@ class Account_Created extends Benchmark
      */
     public function get_type()
     {
-        return 'account_created';
+        return 'role_changed';
     }
 
     /**
@@ -54,7 +51,7 @@ class Account_Created extends Benchmark
      */
     public function get_description()
     {
-        return _x( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'step_description', 'groundhogg' );
+        return _x( "Runs whenever a user's role is changed.", 'step_description', 'groundhogg' );
     }
 
     /**
@@ -64,7 +61,22 @@ class Account_Created extends Benchmark
      */
     public function get_icon()
     {
-        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/account-created.png';
+        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/role-changed.png';
+    }
+
+
+    /**
+     * Add the completion action
+     *
+     * WPGH_Form_Filled constructor.
+     */
+    public function __construct()
+    {
+
+        parent::__construct();
+
+        add_action( 'set_user_role', array( $this, 'complete' ), 10, 3 );
+        add_action( 'add_user_role', array( $this, 'complete' ), 10, 2 );
     }
 
     /**
@@ -75,10 +87,10 @@ class Account_Created extends Benchmark
         $this->start_controls_section();
 
         $this->add_control( 'role', [
-            'label'         => __( 'User Role(s):', 'groundhogg' ),
+            'label'         => __( 'Run whn this access is given:', 'groundhogg' ),
             'type'          => HTML::SELECT2,
             'default'       => 'subscriber',
-            'description'   => __( 'New users with these roles will trigger this benchmark.', 'groundhogg' ),
+            'description'   => __( 'Users with these roles will trigger this benchmark.', 'groundhogg' ),
             'field'         => [
                 'multiple' => true,
                 'options'  => Plugin::$instance->roles->get_roles_for_select(),
@@ -101,20 +113,24 @@ class Account_Created extends Benchmark
     /**
      * get the hook for which the benchmark will run
      *
-     * @return int[]
+     * @return string[]
      */
     protected function get_complete_hooks()
     {
-        return [ 'user_register' => 1 ];
+        return [ 'set_user_role' => 3, 'add_user_role' => 2 ];
     }
 
     /**
-     * @param $user_id
+     * @param $userId int the ID of a user.
+     * @param $cur_role string the new role of the user
+     * @param $old_roles array list of previous user roles.
      */
-    public function setup( $user_id )
+    public function setup( $userId, $cur_role, $old_roles=array() )
     {
-        $this->add_data( 'user_id', $user_id );
+        $this->add_data( 'user_id', $userId );
+        $this->add_data( 'role', $cur_role );
     }
+
 
     /**
      * Get the contact from the data set.
@@ -127,13 +143,15 @@ class Account_Created extends Benchmark
     }
 
     /**
+     * Based on the current step and contact,
+     *
      * @return bool
      */
     protected function can_complete_step()
     {
         $role = $this->get_setting( 'role' );
         $step_roles = is_array( $role )? $role : [ $role ];
-        $like_roles = array_intersect( $step_roles, $this->get_current_contact()->get_userdata()->roles );
-        return !empty( $like_roles );
+        $added_role = $this->get_data( 'role' );
+        return in_array( $added_role, $step_roles );
     }
 }

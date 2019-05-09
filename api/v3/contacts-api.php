@@ -1,27 +1,19 @@
 <?php
-/**
- * Groundhogg API Contacts
- *
- * This class provides a front-facing JSON API that makes it possible to
- * query data from the other application application.
- *
- * @package     WPGH
- * @subpackage  Classes/API
- *
- *
- */
+namespace Groundhogg\Api\V3;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-/**
- * WPGH_API_V2_CONTACTS Class
- *
- * Renders API returns as a JSON
- *
- * @since  1.5
- */
-class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
+use Groundhogg\Contact;
+use Groundhogg\Contact_Query;
+use function Groundhogg\get_contactdata;
+use Groundhogg\Plugin;
+use WP_REST_Server;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_Error;
+
+class Contacts_Api extends Base
 {
 
     public function register_routes()
@@ -247,17 +239,13 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
      * Get a contact which will look good in a JSON response.
      *
      * @param $id
-     * @return object
+     * @return array|false
      */
     public function get_contact_for_rest_response( $id )
     {
-        $raw_contact = WPGH()->contacts->get( $id );
-        $contact_meta = WPGH()->contact_meta->get_meta($id);
-        foreach ( $contact_meta as $key => $value ){
-            $contact_meta[ $key ] = array_pop( $value );
-        }
-        $raw_contact->meta = $contact_meta;
-        return $raw_contact;
+        $contact = get_contactdata( $id );
+
+        return $contact? $contact->get_as_array() : false;
     }
 
     /**
@@ -296,7 +284,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
         $is_for_select = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
         $is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 
-        $contact_query = new WPGH_Contact_Query();
+        $contact_query = new Contact_Query();
         $contacts = $contact_query->query( $query );
 
         if ( $is_for_select2 ){
@@ -370,15 +358,15 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
 
         $args = array_map('sanitize_text_field', $args );
 
-        $contact_id = WPGH()->contacts->add( $args );
+        $contact_id = Plugin::$instance->dbs->get_db( 'contacts' )->add( $args );
 
         if ( $meta ) {
             foreach( $meta as $key => $value ) {
-                WPGH()->contact_meta->update_meta( $contact_id, sanitize_key( $key ), sanitize_text_field( $value ) );
+                Plugin::$instance->dbs->get_db( 'contactmeta' )->update_meta( $contact_id, sanitize_key( $key ), sanitize_text_field( $value ) );
             }
         }
 
-        $contact = $this->get_contact_for_rest_response( $contact_id->ID );
+        $contact = $this->get_contact_for_rest_response( $contact_id );
 
         return self::SUCCESS_RESPONSE( [
             'contact' => $contact
@@ -420,11 +408,11 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             return self::ERROR_400('invalid_email', _x( 'Please provide a valid email address.', 'api', 'groundhogg' ) );
         }
 
-        if ( isset( $args[ 'email' ] ) && $args[ 'email' ] !== $contact->email && WPGH()->contacts->exists( $args[ 'email' ] ) ){
+        if ( isset( $args[ 'email' ] ) && $args[ 'email' ] !== $contact->get_email() && Plugin::$instance->dbs->get_db( 'contacts' )->exists( $args[ 'email' ] ) ){
             return self::ERROR_400('email_in_use', _x( 'This email address already belongs to another contact.', 'api', 'groundhogg' ) );
         }
 
-        if ( isset( $args[ 'optin_status' ] ) && intval( $args[ 'optin_status' ] ) !== $contact->optin_status ){
+        if ( isset( $args[ 'optin_status' ] ) && intval( $args[ 'optin_status' ] ) !== $contact->get_optin_status() ){
             $contact->change_marketing_preference( intval( $args[ 'optin_status' ] ) );
         }
 
@@ -470,7 +458,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             return $contact;
         }
 
-        $yes = WPGH()->contacts->delete( $contact->ID );
+        $yes = Plugin::$instance->dbs->get_db( 'contacts' )->delete( $contact->get_id() );
 
         if ( ! $yes ){
             return self::ERROR_UNKNOWN();
@@ -484,7 +472,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
      * Get list of tag IDs that a contact has.
      *
      * @param WP_REST_Request $request
-     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     * @return false|WP_Error|WP_REST_Response|Contact
      */
     public function get_tags( WP_REST_Request $request  )
     {
@@ -498,14 +486,14 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
             return $contact;
         }
 
-        return self::SUCCESS_RESPONSE( [ 'tags' => $contact->tags ] );
+        return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
     }
 
     /**
      * Apply tags to a contact
      *
      * @param WP_REST_Request $request
-     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     * @return false|WP_Error|WP_REST_Response|Contact
      */
     public function apply_tags( WP_REST_Request $request )
     {
@@ -590,7 +578,7 @@ class WPGH_API_V3_CONTACTS extends WPGH_API_V3_BASE
      * Add a note to the contact.
      *
      * @param WP_REST_Request $request
-     * @return false|WP_Error|WP_REST_Response|WPGH_Contact
+     * @return false|WP_Error|WP_REST_Response|Contact
      */
     public function add_note( WP_REST_Request $request )
     {

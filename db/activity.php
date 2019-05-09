@@ -129,78 +129,9 @@ class Activity extends DB  {
         return $this->insert( $args );
     }
 
-    /**
-     * Retrieve activity like the given args
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function get_activity( $data = array(), $order = 'timestamp' ) {
-
-        global  $wpdb;
-
-        if ( ! is_array( $data ) )
-            return false;
-
-        $other = '';
-
-        /* allow for special handling of time based search */
-        if ( isset( $data[ 'start' ] ) ){
-
-            $other .= sprintf( " AND timestamp >= %d", $data[ 'start' ] );
-
-        }
-
-        /* allow for special handling of time based search */
-        if ( isset( $data[ 'end' ] ) ){
-
-            $other .= sprintf( " AND timestamp <= %d", $data[ 'end' ] );
-
-        }
-
-        // Initialise column format array
-        $column_formats = $this->get_columns();
-
-        // Force fields to lower case
-        $data = array_change_key_case( $data );
-
-        // White list columns
-        $data = array_intersect_key( $data, $column_formats );
-
-        $where = $this->generate_where( $data );
-
-        if ( empty( $where ) ){
-
-            $where = "1=1";
-
-        }
-
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $other ORDER BY $order DESC" );
-
-        return $results;
-
-    }
-
-    /**
-     * Count the number of rows
-     *
-     * @param array $args
-     * @return int
-     */
-    public function count( $args = array() )
+    public function get_date_key()
     {
-        return count( $this->get_activity( $args ) );
-    }
-
-    /**
-     * Check to see if activity like the objet supplied exists
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function activity_exists( $data = array() ) {
-        $results = $this->get_activity( $data );
-        return ! empty( $results );
+        return 'timestamp';
     }
 
     /**

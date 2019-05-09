@@ -50,8 +50,10 @@ abstract class Benchmark extends Funnel_Step
     {
         // Setup the main complete function
         // Accepts no arguments, but requires that child implementations setup the data ahead of time.
-        add_action( $this->get_complete_hook(), [ $this, 'setup' ], 98, $this->get_num_hook_args() );
-        add_action( $this->get_complete_hook(), [ $this, 'complete' ], 99, 0 );
+        foreach ( $this->get_complete_hooks() as $hook => $args ){
+            add_action( $hook, [ $this, 'setup' ], 98, $args );
+            add_action( $hook, [ $this, 'complete' ], 99, 0 );
+        }
 
         parent::__construct();
     }
@@ -59,14 +61,9 @@ abstract class Benchmark extends Funnel_Step
     /**
      * get the hook for which the benchmark will run
      *
-     * @return string
+     * @return int[string]
      */
-    abstract protected function get_complete_hook();
-
-    /**
-     * @return int
-     */
-    abstract protected function get_num_hook_args();
+    abstract protected function get_complete_hooks();
 
     /**
      * Get the contact from the data set.

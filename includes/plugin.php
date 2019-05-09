@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\Api\Api_Loader;
 use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
 
@@ -40,6 +41,11 @@ class Plugin {
      * @var DB_Manager
      */
     public $dbs;
+
+    /**
+     * @var Api\Api_Loader
+     */
+    public $api;
 
     /**
      * Holds plugin specific notices.
@@ -261,6 +267,7 @@ class Plugin {
         $this->installer    = new Main_Installer();
         $this->updater      = new Main_Updater();
 
+        $this->api = new Api_Loader();
     }
 
     /**
@@ -294,8 +301,6 @@ class Plugin {
         } else {
             add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
         }
-
-        add_action( 'rest_api_init', [ $this, 'on_rest_api_init' ] );
     }
 
     /**
@@ -304,8 +309,7 @@ class Plugin {
     private function includes()
     {
         require  GROUNDHOGG_PATH . '/includes/functions.php';
-//        require  GROUNDHOGG_PATH . '/includes/install.php';
-//        require  GROUNDHOGG_PATH . '/includes/install.php';
+        require  GROUNDHOGG_PATH . '/includes/pluggable.php';
     }
 }
 

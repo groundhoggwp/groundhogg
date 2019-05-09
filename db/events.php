@@ -61,6 +61,14 @@ class Events extends DB  {
     }
 
     /**
+     * @return string
+     */
+    public function get_date_key()
+    {
+        return 'time';
+    }
+
+    /**
      * Clean up DB events when this happens.
      */
     protected function add_additional_actions()
@@ -148,76 +156,6 @@ class Events extends DB  {
     }
 
     /**
-     * Retrieve activity like the given args
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function get_events( $data = array(), $order = 'time' ) {
-
-        global  $wpdb;
-
-        if ( ! is_array( $data ) )
-            return false;
-
-        $other = '';
-
-        /* allow for special handling of time based search */
-        if ( isset( $data[ 'start' ] ) ){
-
-            $other .= sprintf( " AND time >= %d", $data[ 'start' ] );
-            unset( $data[ 'start' ] );
-        }
-
-        /* allow for special handling of time based search */
-        if ( isset( $data[ 'end' ] ) ){
-
-            $other .= sprintf( " AND time <= %d", $data[ 'end' ] );
-            unset( $data[ 'end' ] );
-        }
-
-        // Initialise column format array
-        $column_formats = $this->get_columns();
-
-        // Force fields to lower case
-        $data = array_change_key_case( $data );
-
-        // White list columns
-        $data = array_intersect_key( $data, $column_formats );
-
-        $where = $this->generate_where( $data );
-
-        if ( empty( $where ) ){
-
-            $where = "1=1";
-
-        }
-
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $other ORDER BY $order DESC" );
-
-        return $results;
-
-    }
-
-    /**
-     * Helper function to bulk delete events in the event associated things happen.
-     *
-     * @param array $args
-     * @return false|int
-     */
-    public function bulk_delete( $data = array(), $where= array( '%d' ) )
-    {
-        global $wpdb;
-
-        $column_formats = $this->get_columns();
-        $data = array_intersect_key( $data, $column_formats );
-
-        $result = $wpdb->delete( $this->table_name, $data );
-
-        return $result;
-    }
-
-    /**
      * Delete events for a contact that was just deleted...
      *
      * @param $id
@@ -246,34 +184,6 @@ class Events extends DB  {
      */
     public function step_deleted( $id ){
         return $this->bulk_delete(  array( 'step_id' => $id ) );
-    }
-
-
-    /**
-     * Count the number of rows
-     *
-     * @param array $args
-     * @return int
-     */
-    public function count( $args = array() )
-    {
-
-        return count( $this->get_events( $args ) );
-
-    }
-
-    /**
-     * Check to see if activity like the object supplied exists
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function event_exists( $data = array() ) {
-
-        $results = $this->get_events( $data );
-
-        return ! empty( $results );
-
     }
 
     /**

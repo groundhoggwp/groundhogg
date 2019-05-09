@@ -526,14 +526,19 @@ abstract class DB {
      * @access  public
      * @since   2.1
      */
-    public function exists( $value = 0, $field = 'ID' ) {
+    public function exists( $value = 0, $field = false ) {
 
         $columns = $this->get_columns();
+
+        if ( ! $field ){
+            $field = $this->get_primary_key();
+        }
+
         if ( ! array_key_exists( $field, $columns ) ) {
             return false;
         }
 
-        return (bool) $this->get_column_by( 'ID', $field, $value );
+        return (bool) $this->get_column_by( $this->get_primary_key(), $field, $value );
 
     }
 
@@ -555,6 +560,8 @@ abstract class DB {
         $data = (array) $data;
         $data = esc_sql( $data );
 
+        $query = [];
+
         $extra = '';
 
         // Compat for search shorthand.
@@ -563,8 +570,29 @@ abstract class DB {
         }
 
         if ( isset_not_empty( $data, 'search' ) ){
-            $extra .= sprintf( "(%s)", $this->generate_search( $data[ 'search' ] ) );
-            unset( $data[ 'search' ] );
+            $query[] = sprintf( "(%s)", $this->generate_search( $data[ 'search' ] ) );
+        }
+
+        // Normalize
+        if ( isset_not_empty( $data, 'start' ) ){
+            $data[ 'from' ] = $data[ 'start' ];
+        }
+
+        // Normalize
+        if ( isset_not_empty( $data, 'end' ) ){
+            $data[ 'to' ] = $data[ 'end' ];
+        }
+
+        /* allow for special handling of time based search */
+        if ( isset_not_empty( $data, 'from' ) ){
+            $format = is_numeric( $data[ 'from' ] ) ? '%d' : "'%s'";
+            $query[] = sprintf( "`%s` >= $format", $this->get_date_key(), $data[ 'from' ] );
+        }
+
+        /* allow for special handling of time based search */
+        if (  isset_not_empty( $data, 'to' ) ){
+            $format = is_numeric( $data[ 'from' ] ) ? '%d' : "'%s'";
+            $query[] = sprintf( "`%s` <= $format", $this->get_date_key(), $data[ 'to' ] );
         }
 
         // Initialise column format array
@@ -578,14 +606,8 @@ abstract class DB {
 
         $where = $this->generate_where( $data );
 
-        $query = [];
-
         if ( ! empty( $where ) ){
             $query[] = $where;
-        }
-
-        if ( ! empty( $extra ) ){
-            $query[] = $extra;
         }
 
         $query = trim( implode( ' AND ', $query ), ' ' );
@@ -595,8 +617,6 @@ abstract class DB {
         }
 
         $sql = "SELECT * FROM $this->table_name $query ORDER BY `$order` ASC";
-
-//        var_dump( $sql );
 
         $results = $wpdb->get_results( $sql );
 

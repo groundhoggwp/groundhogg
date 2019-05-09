@@ -1,29 +1,18 @@
 <?php
-/**
- * Groundhogg API Emails
- *
- * This class provides a front-facing JSON API that makes it possible to
- * query data from the other application application.
- *
- * @package     WPGH
- * @subpackage  Classes/API
- *
- *
- */
+namespace Groundhogg\Api\V3;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-/**
- * WPGH_API_V3_EMAILS Class
- *
- * Renders API returns as a JSON
- *
- * @since  1.5
- */
-class WPGH_API_V3_EMAILS extends WPGH_API_V3_BASE
-{
+use Groundhogg\Plugin;
+use function Groundhogg\send_email_notification;
+use WP_REST_Server;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_Error;
 
+class Email_Api extends Base
+{
     public function register_routes()
     {
 
@@ -104,7 +93,7 @@ class WPGH_API_V3_EMAILS extends WPGH_API_V3_BASE
         $is_for_select = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
         $is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 
-        $emails = WPGH()->emails->get_emails( $query );
+        $emails =Plugin::$instance->dbs->get_db( 'emails' )->query( $query );
 
         if ( $is_for_select2 ){
             $json = array();
@@ -158,11 +147,11 @@ class WPGH_API_V3_EMAILS extends WPGH_API_V3_BASE
 
         $email_id = intval( $request->get_param( 'email_id' ) );
 
-        if( ! WPGH()->emails->exists( $email_id ) ) {
+        if( ! Plugin::$instance->dbs->get_db( 'emails' )->exists( $email_id ) ) {
             return self::ERROR_400('no_email', sprintf( _x( 'Email with ID %d not found.', 'api', 'groundhogg' ), $email_id ) );
         }
 
-        $status = wpgh_send_email_notification( $email_id, $contact->ID );
+        $status = send_email_notification( $email_id, $contact->ID );
 
         if( ! $status ) {
             return self::ERROR_UNKNOWN();

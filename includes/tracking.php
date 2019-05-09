@@ -96,29 +96,25 @@ class Tracking
      */
     public function add_rewrite_rules()
     {
-        // Has Ref attribute
+        // No Ref attribute
+        // OLD STRUCTURE
+        // TODO implement backwards compatibility.
         add_rewrite_rule(
-            '^gh-tracking/([^/]*)/([^/]*)/\?u=([^&]*)&e=([^&]*)&i=([^&]*)&ref=([^&]*)$',
-            'index.php?pagenow=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]&target_url=$matches[6]',
+            '^gh-tracking/([^/]*)/([^/]*)/?$',
+            'index.php?pagenow=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]$backwards_compat=true',
             'bottom'
         );
 
         // New tracking structure.
+        // With Ref attribute
         add_rewrite_rule(
             '^gh/tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/ref/([^/]*)/?$',
             'index.php?pagenow=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]&target_url=$matches[6]',
             'top'
         );
 
-        // No Ref attribute
-        add_rewrite_rule(
-            '^gh-tracking/([^/]*)/([^/]*)/\?u=([^&]*)&e=([^&]*)&i=([^&]*)$',
-            'index.php?pagenow=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]',
-            'bottom'
-        );
-
         // New tracking structure.
-        // Test Link http://localhost/wp1/gh/tracking/email/open/u/1234/e/5678/i/9112/
+        // No Ref attribute
         add_rewrite_rule(
             '^gh/tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/?$',
             'index.php?pagenow=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]',
@@ -523,7 +519,7 @@ class Tracking
     /**
      * When tracking a link click redirect the user to the destination after performing the necessary tracking
      *
-     * @param $target string where to send the subscrtiber
+     * @param $target string where to send the subscriber
      */
     protected function email_link_clicked( $target = '' )
     {
@@ -555,7 +551,7 @@ class Tracking
         }
 
         /* thanks for coming! */
-        wp_redirect( wp_nonce_url( $target ) );
+        wp_redirect( wp_nonce_url( $target,  -1, 'key' ) );
     }
 
     /**
