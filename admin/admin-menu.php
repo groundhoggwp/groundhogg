@@ -41,6 +41,7 @@ class Admin_Menu
     protected function init_admin(){
 
         $this->welcome  = new Welcome_Page();
+        $this->contacts = new Contacts_Page();
         $this->tags     = new Tags_Page();
         $this->sms      = new SMS_Page();
         $this->superlinks = new Superlinks_Page();
@@ -48,7 +49,6 @@ class Admin_Menu
         $this->events   = new Events_Page();
         $this->emails   = new Emails_Page();
         $this->settings = new Settings_Page();
-        $this->contacts = new Contacts_Page();
 
         do_action( 'groundhogg/admin/init', $this );
     }

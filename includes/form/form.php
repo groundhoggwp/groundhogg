@@ -20,35 +20,35 @@ class Form
      *
      * @var array
      */
-    var $a;
+    protected $attributes;
 
     /**
      * Form content
      *
      * @var string
      */
-    var $content;
+    protected $content;
 
     /**
      * Form ID, also ID of the step
      *
      * @var int
      */
-    var $id;
+    protected $id;
 
     /**
-     * Array of field IDs given all the filds in the form
+     * Array of field IDs given all the fields in the form
      *
      * @var array
      */
-    var $fields = array();
+    protected $fields = [];
 
     /**
      * This will contain a config object and all the settings of the form to compare against for security checks later on...
      *
      * @var array
      */
-    var $config = array();
+    protected $config = [];
 
     /**
      * Full rendering of the form
@@ -92,7 +92,7 @@ class Form
 
     public function __construct( $atts )
     {
-        $this->a = shortcode_atts(array(
+        $this->attributes = shortcode_atts(array(
             'class'     => '',
             'id'        => 0
         ), $atts);
@@ -102,7 +102,7 @@ class Form
             $this->source_contact = Plugin::$instance->utils->get_contact( absint( get_request_var( 'contact' ) ) );
         }
 
-        $this->id = intval( $this->a[ 'id' ] );
+        $this->id = intval( $this->attributes[ 'id' ] );
         $this->add_scripts();
     }
 
@@ -168,9 +168,8 @@ class Form
         add_shortcode( 'gdpr',       array( $this, 'gdpr'        ) );
         add_shortcode( 'recaptcha',  array( $this, 'recaptcha'   ) );
         add_shortcode( 'submit',     array( $this, 'submit'      ) );
-        add_shortcode( 'email_preferences',  array( $this, 'email_preferences' ) );
 
-        do_action( 'wpgh_setup_form_shortcodes', $this );
+        do_action( 'groundhogg/form/setup_shortcodes', $this );
     }
 
     /**
@@ -202,7 +201,7 @@ class Form
         remove_shortcode( 'email_preferences' );
         remove_shortcode( 'submit'       );
 
-	    do_action( 'wpgh_destroy_form_shortcodes' );
+        do_action( 'groundhogg/form/destroy_shortcodes', $this );
     }
 
     /**
@@ -222,17 +221,16 @@ class Form
         return sprintf( "<div class='gh-form-field'>%s</div>", $content );
     }
 
-    public function row( $atts, $content ){
-
+    public function row( $atts, $content )
+    {
         $a = shortcode_atts( array(
             'id'    => '',
             'class' => ''
         ), $atts );
 
-//    	return sprintf( "<div id='%s' class='gh-form-row %s'>%s<div style=\"clear:both;\"></div></div>", $a['id'], $a['class'], do_shortcode( $content ) );
     	return sprintf( "<div id='%s' class='gh-form-row clearfix %s'>%s</div>", $a['id'], $a['class'], do_shortcode( $content ) );
-
     }
+
     public function column( $atts, $content ){
 
     	$a = shortcode_atts( array(
@@ -270,7 +268,6 @@ class Form
 	    }
 
 	    return sprintf( "<div id='%s' class='gh-form-column %s %s'>%s</div>", $a['id'], $a['class'], $width, do_shortcode( $content ) );
-
     }
 
     /**
@@ -348,149 +345,6 @@ class Form
         return $this->field_wrap( $field );
     }
 
-    /**
-     * HTML for plain text field
-     *
-     * @param $atts
-     * @return string
-     */
-    public function text( $atts )
-    {
-        return $this->input_base( $atts );
-    }
-
-    /**
-     * Return the first name field html
-     *
-     * @param $atts
-     * @return string
-     */
-    public function first_name( $atts )
-    {
-        $a = shortcode_atts( array(
-            'type'          => 'text',
-            'label'         => _x( 'First Name *', 'form_default', 'groundhogg' ),
-            'name'          => 'first_name',
-            'id'            => 'first_name',
-            'class'         => 'gh-first-name',
-            'value'         => '',
-            'placeholder'   => '',
-            'attributes'    => 'pattern="[A-Za-z \-\']+"',
-            'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
-            'required'      => false,
-        ), $atts );
-
-        $this->config[ $a[ 'name' ] ] = $a ;
-
-        return $this->input_base( $a );
-    }
-
-    /**
-     * Return the last name field HTML
-     *
-     * @param $atts
-     * @return string
-     */
-    public function last_name( $atts )
-    {
-        $a = shortcode_atts( array(
-            'type'          => 'text',
-            'label'         => _x( 'Last Name *', 'form_default', 'groundhogg' ),
-            'name'          => 'last_name',
-            'id'            => 'last_name',
-            'class'         => 'gh-last-name',
-            'value'         => '',
-            'placeholder'   => '',
-            'attributes'    => 'pattern="[A-Za-z \-\']+"',
-            'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
-            'required'      => false,
-        ), $atts );
-
-        $this->config[ $a[ 'name' ] ] = $a ;
-
-        return $this->input_base( $a );
-    }
-
-    /**
-     * Return the email field HTML
-     *
-     * @param $atts
-     * @return string
-     */
-    public function email( $atts )
-    {
-        $a = shortcode_atts( array(
-            'type'          => 'email',
-            'label'         => _x( 'Email *', 'form_default', 'groundhogg' ),
-            'name'          => 'email',
-            'id'            => 'email',
-            'class'         => 'gh-email',
-            'value'         => '',
-            'placeholder'   => '',
-            'attributes'    => '',
-            'required'      => true,
-        ), $atts );
-
-        $this->config[ $a[ 'name' ] ] = $a ;
-
-        return $this->input_base( $a );
-    }
-
-    /**
-     * Return HTML for the phone field
-     *
-     * @param $atts
-     * @return string
-     */
-    public function phone( $atts )
-    {
-        $a = shortcode_atts( array(
-            'type'          => 'tel',
-            'label'         => _x( 'Phone *', 'form_default', 'groundhogg' ),
-            'name'          => 'primary_phone',
-            'id'            => 'primary_phone',
-            'class'         => 'gh-tel',
-            'value'         => '',
-            'placeholder'   => '',
-            'attributes'    => '',
-            'required'      => false,
-        ), $atts );
-
-        $this->config[ $a[ 'name' ] ] = $a;
-
-        return $this->input_base( $a );
-    }
-
-    /**
-     * Return HTML for a file input
-     *
-     * @param $atts
-     * @return string
-     */
-    public function file( $atts )
-    {
-        $a = shortcode_atts( array(
-            'type'          => 'file',
-            'label'         => _x( 'File *', 'form_default', 'groundhogg' ),
-            'name'          => '',
-            'id'            => '',
-            'class'         => 'gh-file-uploader',
-            'max_file_size' => wp_max_upload_size(),
-            'file_types'    => '',
-            'required'      => false,
-            'attributes'    => '',
-
-        ), $atts );
-
-        if ( ! empty( $a[ 'file_types' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' accept="%s"', esc_attr( $a[ 'file_types' ] ) );
-        }
-
-        $this->config[ $a[ 'name' ] ] = $a;
-
-        return  $this->input_base( $a );
-
-    }
 
     /**
      * Return HTML for a date input
@@ -513,14 +367,6 @@ class Form
             'attributes'    => '',
 
         ), $atts );
-
-        if ( ! empty( $a[ 'max_date' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' max="%s"', esc_attr( $a[ 'max_date' ] ) );
-        }
-
-        if ( ! empty( $a[ 'min_date' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' min="%s"', esc_attr( $a[ 'min_date' ] ) );
-        }
 
         $a[ 'id' ] = uniqid( 'date_' );
 
@@ -679,7 +525,7 @@ class Form
                     'name'          => $name_prefix . 'country',
                     'id'            => $name_prefix . 'country',
                     'class'         => '',
-                    'options'       => wpgh_get_countries_list(),
+                    'options'       => Plugin::$instance->utils->location->get_countries_list(),
                     'attributes'    => '',
                     'title'         => __( 'Country' ),
                     'default'       => _x( 'Please select a country', 'form_default', 'groundhogg' ),
@@ -1147,7 +993,7 @@ class Form
             wp_enqueue_script( 'google-recaptcha-v2', 'https://www.google.com/recaptcha/api.js', array(), true );
         }
 
-        $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', wpgh_get_option( 'gh_recaptcha_site_key', '' ), $a['captcha-theme'], $a['captcha-size'] );
+        $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', get_option( 'gh_recaptcha_site_key', '' ), $a['captcha-theme'], $a['captcha-size'] );
 
         $this->fields[] = 'g-recaptcha';
         $this->config[ 'g-recaptcha' ] = $a ;
@@ -1219,11 +1065,11 @@ class Form
         }
 
 	    $target = $this->iframe_compat ? "target=\"_parent\"" : "";
-        $form .= "<form method='post' class='gh-form " . $this->a[ 'class' ] . "' " . $target . " enctype=\"multipart/form-data\" >";
+        $form .= "<form method='post' class='gh-form " . $this->attributes[ 'class' ] . "' " . $target . " enctype=\"multipart/form-data\" >";
         $form .= wp_nonce_field( 'gh_submit', 'gh_submit_nonce', true, false );
 
-        if ( ! empty( $this->a[ 'id' ] ) ){
-            $form .= "<input type='hidden' name='step_id' value='" . $this->a['id'] . "'>";
+        if ( ! empty( $this->attributes[ 'id' ] ) ){
+            $form .= "<input type='hidden' name='step_id' value='" . $this->attributes['id'] . "'>";
         }
 
         $this->setup_shortcodes();

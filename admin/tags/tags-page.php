@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Tags;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Plugin;
+use function Groundhogg\recount_tag_contacts_count;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -21,7 +22,9 @@ class Tags_Page extends Admin_Page
     // UNUSED FUNCTIONS
     protected function add_ajax_actions(){}
     public function help(){}
-    public function scripts(){}
+    public function scripts(){
+        wp_enqueue_style( 'groundhogg-admin' );
+    }
 
     protected function add_additional_actions()
     {
@@ -51,12 +54,12 @@ class Tags_Page extends Admin_Page
     }
 
     public function get_priority(){
-        return 20;
+        return 10;
     }
 
     public function recount()
     {
-//        wpgh_recount_tag_contacts_count(); todo
+        recount_tag_contacts_count();
     }
 
     /**

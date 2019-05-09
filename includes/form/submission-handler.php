@@ -22,7 +22,7 @@ class Submission_Handler extends Supports_Errors
      *
      * @var array
      */
-    protected $data;
+    protected $posted_data;
 
     /**
      * @var array Acts as an alias for $_FILES
@@ -89,9 +89,9 @@ class Submission_Handler extends Supports_Errors
 
             return $this->$key;
 
-        } else if ( isset( $this->data[ $key ] ) ) {
+        } else if ( isset( $this->posted_data[ $key ] ) ) {
 
-            return $this->data[ $key ];
+            return $this->posted_data[ $key ];
 
         }
 
@@ -106,7 +106,7 @@ class Submission_Handler extends Supports_Errors
      */
     public function __set( $key, $value )
     {
-        $this->data[ $key ] = $value;
+        $this->posted_data[ $key ] = $value;
     }
 
     /**
@@ -117,7 +117,7 @@ class Submission_Handler extends Supports_Errors
      */
     public function __isset( $name )
     {
-        return isset( $this->data[ $name ] );
+        return isset( $this->posted_data[ $name ] );
     }
 
     /**
@@ -127,7 +127,7 @@ class Submission_Handler extends Supports_Errors
      */
     public function __unset( $name )
     {
-        unset( $this->data[ $name ] );
+        unset( $this->posted_data[ $name ] );
     }
 
     /**
@@ -169,128 +169,224 @@ class Submission_Handler extends Supports_Errors
             return;
         }
 
-        if ( ! ( $c = $this->create_contact() ) ){
-            return;
-        }
+        // Arrays for stuff
+        $meta = [];
+        $tags = [];
+        $notes = [];
+        $args = [];
+        $files = [];
 
-        /* Exclude these if submitting from the ADMIN Screen */
-        if ( ! $this->is_admin_submission ){
+        // Iterate over expected fields...
+        foreach ( $this->fields as $field => $config ){
 
-            if ( isset( $this->agree_terms ) ){
-                $c->update_meta( 'terms_agreement', 'yes' );
-                $c->update_meta( 'terms_agreement_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
-                do_action( 'wpgh_agreed_to_terms', $c, $this );
-                do_action( 'groundhogg/submission/agreed_to_terms', $c, $this );
+            if ( ! get_array_var( $this->posted_data, $field )  )
 
-                if( $config = $this->get_field_config( 'agree_terms' ) ){
-                    $tag_key = base64_encode( $this->agree_terms );
-                    if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
-                        $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
+            $value = wp_unslash( $value );
+
+            switch ( $field ){
+                case 'full_name':
+                    $parts = split_name( $value );
+                    $args[ 'first_name' ] = sanitize_text_field( $parts[0] );
+                    $args[ 'last_name' ] = sanitize_text_field( $parts[1] );
+                    break;
+                case 'first_name':
+                case 'last_name':
+                    $args[ $field ] = sanitize_text_field( $value );
+                    break;
+                case 'email':
+                    $args[ $field ] = sanitize_email( $value );
+                    break;
+                default:
+                    if ( strpos( $value, PHP_EOL ) !== false ){
+                        $meta[ $field ] = sanitize_textarea_field( $value );
+                    } else {
+                        $meta[ $field ] = sanitize_text_field( $value );
                     }
-                }
-
-                unset( $this->agree_terms );
-            }
-
-            if ( isset( $this->gdpr_consent ) ){
-                $c->update_meta( 'gdpr_consent', 'yes' );
-                $c->update_meta( 'gdpr_consent_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
-                do_action( 'wpgh_gdpr_consented', $c, $this );
-                do_action( 'groundhogg/submission/gdpr_gave_consent', $c, $this );
-
-                if( $config = $this->get_field_config( 'gdpr_consent' ) ){
-                    $tag_key = base64_encode( $this->gdpr_consent );
-                    if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
-                        $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
+                    break;
+                // Only checks whether value is not empty.
+                case 'terms_agreement':
+                    if ( ! empty( $value ) ){
+                        $meta[ 'terms_agreement' ] = 'yes';
+                        $meta[ 'terms_agreement_date' ] = date_i18n( get_option( 'date_format' ) );
                     }
-                }
-
-                unset( $this->gdpr_consent );
-            }
-
-            wpgh_after_form_submit_handler( $c );
-
-        }
-
-        foreach ( $this->data as $key => $value ) {
-
-            $key = sanitize_key( $key );
-
-            if ( is_array( $value ) ){
-                $value = implode( ', ', $value );
-            }
-
-            if ( strpos( $value, PHP_EOL  ) !== false ){
-                $value = sanitize_textarea_field( stripslashes( $value ) );
-            } else {
-                $value = sanitize_text_field( stripslashes( $value ) );
-            }
-
-            if ( $this->has_field( $key ) ) {
-
-                /* NEW: Pass the field's config object to a filter to sanitize it */
-                if( $config = $this->get_field_config( $key ) ){
-                    $value = apply_filters( 'wpgh_sanitize_submit_value', $value, $config );
-                    $value = apply_filters( 'groundhogg/submission/meta/sanitize', $value, $config );
-                    $value = apply_filters( "groundhogg/submission/meta/sanitize/{$key}", $value, $config );
-                    $c->update_meta( $key, $value );
-                    $tag_key = base64_encode( $value );
-                    if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
-                        $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
+                    break;
+                // Only checks whether value is not empty.
+                case 'gdpr_consent':
+                    if ( ! empty( $value ) ){
+                        $meta[ 'gdpr_consent' ] = 'yes';
+                        $meta[ 'gdpr_consent_date' ] = date_i18n( get_option( 'date_format' ) );
                     }
-                }
-
+                    break;
+                case 'country':
+                    if ( strlen( $value ) !== 2 ){
+                        $countries = Plugin::$instance->utils->location->get_countries_list();
+                        $code = array_search( $value, $countries );
+                        if ( $code ){
+                            $value = $code;
+                        }
+                    }
+                    $meta[ $field ] = $value;
+                    break;
             }
 
         }
 
-        if ( ! empty( $_FILES ) ){
-            if ( ! $this->upload_files() ){
-                return;
+        $contact = new Contact();
+        $id = $contact->create( $args );
+
+        if ( ! $id ){
+            return false;
+        }
+
+        // Add Tags
+        if ( ! empty( $tags ) ){
+            $contact->apply_tag( $tags );
+        }
+
+        // Add notes
+        if ( ! empty( $notes ) ){
+            foreach ( $notes as $note ){
+                $contact->add_note( $note );
             }
         }
 
-        if ( isset( $_POST[ 'email_preferences_nonce' ] ) ){
-            $this->process_email_preference_changes();
+        // update meta data
+        if ( ! empty( $meta ) ){
+            foreach ( $meta as $key => $value ){
+                $contact->update_meta( $key, $value );
+            }
         }
 
-        $feed_response = apply_filters( 'wpgh_form_submit_feed', true, $this->id, $c, $this );
-        $feed_response = apply_filters( 'groundhogg/submission/feed', $feed_response, $this->id, $c, $this );
-
-        if ( ! $this->has_errors() ){
-
-            if ( $this->id ){
-
-                /* Remove the Tracking hook */
-                if ( $this->is_admin_submission ){
-                    remove_action( 'wpgh_form_submit', array( WPGH()->tracking, 'form_filled' ) );
-                }
-
-                do_action( 'wpgh_form_submit', $this->id, $c, $this );
-                do_action( 'groundhogg/submission/after', $this->id, $c, $this );
+        if ( ! empty( $files ) ){
+            foreach ( $files as $file ){
+                $contact->upload_file( $file );
             }
-
-            if ( ! $this->is_admin_submission ){
-                /* redirect to ensure cookie is set and can be used on the following page */
-                $success_page = $this->step->get_meta('success_page' );
-                wp_redirect( $success_page );
-                die();
-            } else {
-                /* Go to contact edit page and add notice of success */
-                WPGH()->notices->add( 'form_filled', _x( 'Form submitted', 'notice', 'groundhogg' ) );
-                $admin_url = admin_url( sprintf( 'admin.php?page=gh_contacts&action=edit&contact=%d', $this->contact->ID ) );
-                wp_redirect( $admin_url );
-                die();
-            }
-
-        } else if ( is_wp_error( $feed_response ) ){
-            $this->add_error( $feed_response );
-            return;
-        } else {
-            /* Default failure handling. */
-            $this->add_error( 'UNKNOWN_ERROR', _x( 'Something went wrong.', 'submission_error', 'groundhogg' ) );
-            return;
         }
+
+        $contact->update_meta( 'last_optin', time() );
+
+        return $contact;
+
+
+
+//        /* Exclude these if submitting from the ADMIN Screen */
+//        if ( ! $this->is_admin_submission ){
+//
+//            if ( isset( $this->agree_terms ) ){
+//                $c->update_meta( 'terms_agreement', 'yes' );
+//                $c->update_meta( 'terms_agreement_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
+//                do_action( 'wpgh_agreed_to_terms', $c, $this );
+//                do_action( 'groundhogg/submission/agreed_to_terms', $c, $this );
+//
+//                if( $config = $this->get_field_config( 'agree_terms' ) ){
+//                    $tag_key = base64_encode( $this->agree_terms );
+//                    if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
+//                        $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
+//                    }
+//                }
+//
+//                unset( $this->agree_terms );
+//            }
+//
+//            if ( isset( $this->gdpr_consent ) ){
+//                $c->update_meta( 'gdpr_consent', 'yes' );
+//                $c->update_meta( 'gdpr_consent_date', date_i18n( wpgh_get_option( 'date_format' ) ) );
+//                do_action( 'wpgh_gdpr_consented', $c, $this );
+//                do_action( 'groundhogg/submission/gdpr_gave_consent', $c, $this );
+//
+//                if( $config = $this->get_field_config( 'gdpr_consent' ) ){
+//                    $tag_key = base64_encode( $this->gdpr_consent );
+//                    if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
+//                        $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
+//                    }
+//                }
+//
+//                unset( $this->gdpr_consent );
+//            }
+//
+//            wpgh_after_form_submit_handler( $c );
+//
+//        }
+//
+//        foreach ( $this->data as $key => $value ) {
+//
+//            $key = sanitize_key( $key );
+//
+//            if ( is_array( $value ) ){
+//                $value = implode( ', ', $value );
+//            }
+//
+//            if ( strpos( $value, PHP_EOL  ) !== false ){
+//                $value = sanitize_textarea_field( stripslashes( $value ) );
+//            } else {
+//                $value = sanitize_text_field( stripslashes( $value ) );
+//            }
+//
+//            if ( $this->has_field( $key ) ) {
+//
+//                /* NEW: Pass the field's config object to a filter to sanitize it */
+//                if( $config = $this->get_field_config( $key ) ){
+//                    $value = apply_filters( 'wpgh_sanitize_submit_value', $value, $config );
+//                    $value = apply_filters( 'groundhogg/submission/meta/sanitize', $value, $config );
+//                    $value = apply_filters( "groundhogg/submission/meta/sanitize/{$key}", $value, $config );
+//                    $c->update_meta( $key, $value );
+//                    $tag_key = base64_encode( $value );
+//                    if ( key_exists( 'tag_map', $config ) && key_exists( $tag_key, $config[ 'tag_map' ] ) ){
+//                        $c->apply_tag( [ $config[ 'tag_map' ][ $tag_key ] ] );
+//                    }
+//                }
+//
+//            }
+//
+//        }
+//
+//        if ( ! empty( $_FILES ) ){
+//            if ( ! $this->upload_files() ){
+//                return;
+//            }
+//        }
+//
+//        if ( isset( $_POST[ 'email_preferences_nonce' ] ) ){
+//            $this->process_email_preference_changes();
+//        }
+//
+//        $feed_response = apply_filters( 'wpgh_form_submit_feed', true, $this->id, $c, $this );
+//        $feed_response = apply_filters( 'groundhogg/submission/feed', $feed_response, $this->id, $c, $this );
+//
+//        if ( ! $this->has_errors() ){
+//
+//            if ( $this->id ){
+//
+//                /* Remove the Tracking hook */
+//                if ( $this->is_admin_submission ){
+//                    remove_action( 'wpgh_form_submit', array( WPGH()->tracking, 'form_filled' ) );
+//                }
+//
+//                do_action( 'wpgh_form_submit', $this->id, $c, $this );
+//                do_action( 'groundhogg/submission/after', $this->id, $c, $this );
+//            }
+//
+//            if ( ! $this->is_admin_submission ){
+//                /* redirect to ensure cookie is set and can be used on the following page */
+//                $success_page = $this->step->get_meta('success_page' );
+//                wp_redirect( $success_page );
+//                die();
+//            } else {
+//                /* Go to contact edit page and add notice of success */
+//                WPGH()->notices->add( 'form_filled', _x( 'Form submitted', 'notice', 'groundhogg' ) );
+//                $admin_url = admin_url( sprintf( 'admin.php?page=gh_contacts&action=edit&contact=%d', $this->contact->ID ) );
+//                wp_redirect( $admin_url );
+//                die();
+//            }
+//
+//        } else if ( is_wp_error( $feed_response ) ){
+//            $this->add_error( $feed_response );
+//            return;
+//        } else {
+//            /* Default failure handling. */
+//            $this->add_error( 'UNKNOWN_ERROR', _x( 'Something went wrong.', 'submission_error', 'groundhogg' ) );
+//            return;
+//        }
 
 
     }
@@ -302,7 +398,7 @@ class Submission_Handler extends Supports_Errors
      */
     public function setup(){
 
-        $this->data = wp_unslash( $_POST );
+        $this->posted_data = wp_unslash( $_POST );
         $this->files = $_FILES;
 
         $this->source = wpgh_get_referer();
@@ -375,7 +471,7 @@ class Submission_Handler extends Supports_Errors
         // Recaptcha check
         if ( $this->has_field( 'g-recaptcha' ) ) {
 
-            if ( ! isset( $this->data[ 'g-recaptcha-response' ] ) ) {
+            if ( ! isset( $this->posted_data[ 'g-recaptcha-response' ] ) ) {
                 $this->add_error( 'captcha_verification_failed', _x( 'Failed reCaptcha verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
                 return false;
             }
@@ -383,7 +479,7 @@ class Submission_Handler extends Supports_Errors
             $file_name = sprintf(
                 "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
                 Plugin::$instance->settings->get_option( 'gh_recaptcha_secret_key' ),
-                $this->data[ 'g-recaptcha-response' ]
+                $this->posted_data[ 'g-recaptcha-response' ]
             );
 
             $verifyResponse = file_get_contents( $file_name );
@@ -413,7 +509,7 @@ class Submission_Handler extends Supports_Errors
         }
 
         // Check all the POST data against the blacklist
-        if ( $this->is_spam( $this->data ) ) {
+        if ( $this->is_spam( $this->posted_data ) ) {
             $this->add_error('spam_check_failed', _x( 'Failed spam check.', 'submission_error', 'groundhogg') );
             return false;
         }
@@ -430,7 +526,7 @@ class Submission_Handler extends Supports_Errors
                         $missing_required = ! key_exists( $field_name, $this->files ) || $this->files[ $field_name ] === '' || $this->files[ $field_name ] === null;
                         break;
                     default:
-                        $missing_required = ! key_exists( $field_name, $this->data ) || $this->data[ $field_name ] === '' || $this->data[ $field_name ] === null;
+                        $missing_required = ! key_exists( $field_name, $this->posted_data ) || $this->posted_data[ $field_name ] === '' || $this->posted_data[ $field_name ] === null;
                         break;
                 }
             }
@@ -597,118 +693,5 @@ class Submission_Handler extends Supports_Errors
 
         return false;
 
-    }
-
-    /**
-     * Process any file uploads tht may be present.
-     *
-     * @return bool true if no files or files uploaded, false otherwise.
-     */
-    public function upload_files()
-    {
-
-        if ( empty( $_FILES ) ){
-            /* No files present, don't worry about it */
-            return true;
-        }
-
-        foreach ( $_FILES as $key => $file ) {
-
-            $key = sanitize_key( $key );
-
-            if ($this->has_field( $key ) ) {
-
-                if ($config = $this->get_field_config($key)) {
-
-                    if ($config['type'] === 'file') {
-
-                        if ( $file = $this->handle_file_upload( $key, $config ) ) {
-
-                            if ( is_wp_error($file) || ! is_array( $file ) ) {
-                                $this->add_error( $file->get_error_code(), $file->get_error_message() );
-                                return false;
-                            }
-
-                            $files = $this->contact->get_meta('files');
-
-                            if (!$files) {
-                                $files = array();
-                            }
-
-                            $file[ 'key' ] = $key;
-                            /* Compat for local host WP filesystems */
-                            $file = array_map( 'wp_normalize_path', $file );
-
-                            $files[ $key ] = $file;
-                            $this->contact->update_meta('files', $files);
-                            $this->contact->update_meta($key, $file['url']);
-
-                        } else {
-
-                            $this->add_error( 'FILE_UPLOAD_ERROR',  _x( 'Could not upload file.',  'submission_error', 'groundhogg' ) );
-                            return false;
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-        }
-
-        return true;
-
-    }
-
-    /**
-     * Upload a file to the Groundhogg file directory
-     *
-     * @param $key
-     * @param $config
-     * @return array|bool|WP_Error
-     */
-    private function handle_file_upload( $key, $config )
-    {
-        $file = $_FILES[ $key ];
-        $size = $file[ 'size' ];
-
-        if ( isset_not_emtpy( $config, 'max_file_size' ) && intval( $size ) > intval( $config[ 'max_file_size' ] ) ){
-            return new WP_Error( 'FILE_TOO_BIG', _x( 'The file you have uploaded is too big.',  'submission_error', 'greoundhogg' ) );
-        }
-
-        $extension = wp_check_filetype( $file[ 'name' ] );
-
-        /* Check if mime is specified */
-        if ( ! empty( $config[ 'file_types' ] ) ){
-            $mimes = explode( ',', $config[ 'file_types' ] );
-            if ( ! in_array( '.' . $extension[ 'ext' ], $mimes ) ){
-                return new WP_Error( 'INCORRECT_MIME', _x( 'You are not permitted to upload this type of file.', 'submission_error', 'groundhogg' ) );
-            }
-        }
-
-        $upload_overrides = array( 'test_form' => false );
-
-        if ( !function_exists('wp_handle_upload') ) {
-            require_once( ABSPATH . '/wp-admin/includes/file.php' );
-        }
-
-        $this->set_upload_dirs();
-
-        add_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
-        $mfile = wp_handle_upload( $file, $upload_overrides );
-        remove_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
-
-        if( isset( $mfile['error'] ) ) {
-
-            if ( empty( $mfile[ 'error' ] ) ){
-                $mfile[ 'error' ] = _x( 'Could not upload file.',  'submission_error', 'groundhogg' );
-            }
-
-            return new WP_Error( 'BAD_UPLOAD', $mfile['error'] );
-        }
-
-        return $mfile;
     }
 }

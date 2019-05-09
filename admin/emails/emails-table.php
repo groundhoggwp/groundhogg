@@ -197,12 +197,9 @@ class Emails_Table extends WP_List_Table {
      */
     protected function column_from_user( $email )
     {
-        $from = intval( ( $email->get_from_user() ) );
-
-        if ( $from ){
-            $user = get_userdata( $from );
-            $from_user = esc_html( $user->display_name . ' <' . $user->user_email . '>' );
-            $queryUrl = admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=' . $from );
+        if ( $email->get_from_user() ){
+            $from_user = esc_html(  $email->get_from_user()->display_name . ' <' .  $email->get_from_user()->user_email . '>' );
+            $queryUrl = admin_url( 'admin.php?page=gh_emails&view=from_user&from_user=' .  $email->get_from_user_id() );
             return "<a href='$queryUrl'>$from_user</a>";
         } else {
             return sprintf("<a href='%s'>%s</a>",

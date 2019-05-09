@@ -240,7 +240,7 @@ abstract class Admin_Page
     protected function search_form( $title, $name='s' )
     {
         ?>
-        <form method="get" class="search-form wp-clearfix">
+        <form method="get" class="search-form">
             <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
             <p class="search-box">
                 <label class="screen-reader-text" for="post-search-input"><?php echo $title; ?>:</label>

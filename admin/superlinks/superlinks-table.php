@@ -126,10 +126,12 @@ class Superlinks_Table extends WP_List_Table {
         //todo
         foreach ( $superlink->get_tags() as $i => $tag_id ){
 
+//            var_dump( $tags );
+
 
             if ( Plugin::$instance->dbs->get_db('tags')->exists( $tag_id ) ){
                 $tag = Plugin::$instance->dbs->get_db('tags')->get( $tag_id );
-                $tags[ $i ] = '<a href="'. admin_url( 'admin.php?page=gh_contacts&view=tag&tag=' . $tag_id ) . '">' . $tag->tag_name . '</a>';
+                $tags[ $i ] = '<a href="'. admin_url( 'admin.php?page=gh_contacts&tags_include=' . $tag_id ) . '">' . $tag->tag_name . '</a>';
             }
         }
 
@@ -275,7 +277,7 @@ class Superlinks_Table extends WP_List_Table {
         $actions['edit'] = sprintf(
             '<a href="%s" class="editinline" aria-label="%s">%s</a>',
             /* translators: %s: title */
-            admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->get_name() ),
+            admin_url( 'admin.php?page=gh_superlinks&action=edit&superlink=' . $superlink->get_id() ),
             esc_attr( sprintf( __( 'Edit' ), $title ) ),
             __( 'Edit' )
         );

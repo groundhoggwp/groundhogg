@@ -84,13 +84,6 @@ class Contacts_Page extends Admin_Page
         return 'contact';
     }
 
-
-    /**
-     * @var Bulk_Contact_Manager todo
-     */
-    private $exporter;
-
-
     /**
      * Get the scripts in there
      */
@@ -809,7 +802,7 @@ class Contacts_Page extends Admin_Page
     /**
      * Display the contact table
      */
-    function table()
+    public function view()
     {
 
         if (!current_user_can('view_contacts')) {
@@ -877,34 +870,6 @@ class Contacts_Page extends Admin_Page
             $this->wp_die_no_access();
         }
         include dirname(__FILE__) . '/form-admin-submit.php';
-    }
-
-    /**
-     * Display the title and dependent action include the appropriate page content
-     */
-    public function view()
-    {
-        ?>
-        <div class="wrap">
-            <hr class="wp-header-end">
-            <?php switch ( $this->get_current_action() ){
-                case 'add':
-                    $this->add();
-                    break;
-                case 'edit':
-                    $this->edit();
-                    break;
-                case 'search':
-                    $this->search();
-                    break;
-                case 'form':
-                    $this->form();
-                    break;
-                default:
-                    $this->table();
-            } ?>
-        </div>
-        <?php
     }
 
     protected function add_additional_actions()

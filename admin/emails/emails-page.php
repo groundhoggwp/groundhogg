@@ -481,7 +481,7 @@ class Emails_Page extends Admin_Page
 
     }
 
-    public function table()
+    public function view()
     {
         if ( ! class_exists( 'Emails_Table' ) ){
             include dirname(__FILE__) . '/emails-table.php';
@@ -553,36 +553,6 @@ class Emails_Page extends Admin_Page
         remove_all_actions( 'admin_notices' );
     }
 
-    public function view()
-    {
-        if ( ! current_user_can( 'edit_emails' ) ){
-            $this->wp_die_no_access();
-        }
-
-        if ( $this->get_current_action() === 'edit' ){
-
-            $this->edit();
-
-        } else {
-            ?>
-            <div class="wrap">
-                <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
-                <hr class="wp-header-end">
-                <?php switch ( $this->get_current_action() ){
-                    case 'add':
-                        $this->add();
-                        break;
-                    case 'edit':
-                        $this->edit();
-                        break;
-                    default:
-                        $this->table();
-                } ?>
-            </div>
-            <?php
-        }
-    }
-
     /**
      * Get search results
      */
@@ -612,6 +582,6 @@ class Emails_Page extends Admin_Page
         endif;
 
         $response = [ 'html' => ob_get_clean() ];
-        wp_die( json_encode( $response ) );
+        wp_send_json( $response );
     }
 }

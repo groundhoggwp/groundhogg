@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 
+use function Groundhogg\get_request_var;
+use function Groundhogg\isset_not_empty;
 use Groundhogg\Preferences;
 use \WP_List_Table;
 use Groundhogg\Plugin;
@@ -231,7 +233,7 @@ class Contacts_Table extends WP_List_Table {
 
     protected function get_views() {
         global $wpdb;
-        $base_url = admin_url( 'admin.php?page=gh_contacts&view=optin_status&optin_status=' );
+        $base_url = admin_url( 'admin.php?page=gh_contacts&optin_status=' );
 
         $view = isset($_REQUEST['optin_status']) ? $_REQUEST['optin_status'] : 'all';
 
@@ -244,12 +246,12 @@ class Contacts_Table extends WP_List_Table {
         );
 
         return apply_filters( 'contact_views', array(
-            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . $base_url . "all" . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('.  number_format_i18n( $count[ 'unconfirmed' ] + $count[ 'confirmed' ] ) .')</span>' . "</a>",
-            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . "unconfirmed" . "'>" . _x( 'Unconfirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['unconfirmed'] ) . ')</span>' . "</a>",
-            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . "confirmed" . "'>" . _x( 'Confirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['confirmed'] ) .')</span>'. "</a>",
-            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . "opted_out" . "'>" . _x( 'Unsubscribed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['opted_out'] ) .')</span>' . "</a>",
-            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . "spam" . "'>" . _x( 'Spam', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['spam'] ) .')</span>' . "</a>",
-            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . "bounce" . "'>" . _x( 'Bounced', 'view', 'groundhogg') .' <span class="count">('. number_format_i18n( $count['bounce'] ) . ')</span>' . "</a>"
+            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('.  number_format_i18n( $count[ 'unconfirmed' ] + $count[ 'confirmed' ] ) .')</span>' . "</a>",
+            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . Preferences::CONFIRMED . "'>" . _x( 'Confirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['confirmed'] ) .')</span>'. "</a>",
+            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . Preferences::UNCONFIRMED . "'>" . _x( 'Unconfirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['unconfirmed'] ) . ')</span>' . "</a>",
+            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . Preferences::UNSUBSCRIBED . "'>" . _x( 'Unsubscribed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['opted_out'] ) .')</span>' . "</a>",
+            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . Preferences::SPAM . "'>" . _x( 'Spam', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['spam'] ) .')</span>' . "</a>",
+            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . Preferences::HARD_BOUNCE . "'>" . _x( 'Bounced', 'view', 'groundhogg') .' <span class="count">('. number_format_i18n( $count['bounce'] ) . ')</span>' . "</a>"
         ) );
     }
 
@@ -277,155 +279,14 @@ class Contacts_Table extends WP_List_Table {
 
         $query = array();
 
-        if ( isset( $_REQUEST[ 's' ] ) ){
-
-            $query[ 'search' ] = $_REQUEST['s'];
-            $query[ 'search_columns' ] = array(
-                'first_name',
-                'last_name',
-                'email'
-            );
-
-        }
-
-//        if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){ //todo
-//            $query[ 'owner' ] = get_current_user_id();
-//        }
-
-        if ( isset( $_REQUEST[ 'meta_key' ] ) && isset( $_REQUEST[ 'meta_value' ] ) ){
-            $query[ 'meta_key' ] = sanitize_key( $_REQUEST[ 'meta_key' ] );
-            $query[ 'meta_value' ] = urldecode( $_REQUEST[ 'meta_value' ] );
-            if ( isset( $_REQUEST[ 'meta_compare' ] ) ){
-                $query['meta_compare'] = strtoupper( sanitize_key(  $_REQUEST[ 'meta_compare' ]  ) );
-            }
-        }
-
-        if ( isset( $_REQUEST[ 'date_after' ] ) ){
-            $query[ 'date_query' ][ 'after' ] = stripslashes( $_REQUEST[ 'date_after' ] );
-        }
-
-        if ( isset( $_REQUEST[ 'date_before' ] ) ){
-            $query[ 'date_query' ][ 'before' ] = stripslashes( $_REQUEST[ 'date_before' ] );
-        }
-
-        if ( isset( $_REQUEST[ 'tags_include'] ) ){
-            $tag_id = $_GET['tags_include'];
-            $query[ 'tags_include' ] = $tag_id;
-        }
-
-        if ( isset( $_REQUEST[ 'tags_exclude'] ) ){
-            $tag_id = $_GET['tags_exclude'];
-            $query[ 'tags_exclude' ] = $tag_id;
-        }
-
-        switch ( $this->get_view() )
-        {
-            case 'optin_status':
-                if ( isset( $_REQUEST['optin_status'] ) ){
-
-                    switch ( $_REQUEST['optin_status'] ){
-
-                        case 'unconfirmed':
-                            $view = Preferences::UNCONFIRMED;
-                            break;
-                        case 'confirmed':
-                            $view = Preferences::CONFIRMED;
-                            break;
-                        case 'opted_out':
-                            $view = Preferences::UNSUBSCRIBED;
-                            break;
-                        case 'spam':
-                            $view = Preferences::SPAM;
-                            break;
-                        case 'bounce':
-                            $view = Preferences::HARD_BOUNCE;
-                            break;
-                        default:
-                            $view = Preferences::UNCONFIRMED;
-                            break;
-                    }
-
-                    $query[ 'optin_status' ] = $view;
-
-                }
-                break;
-
-            case 'owner':
-                if ( isset( $_REQUEST['owner'] ) ){
-
-                    $query[ 'owner' ]  = intval( $_REQUEST['owner'] );
-
-                }
-                break;
-            case 'tag':
-                if ( isset( $_REQUEST[ 'tag'] ) ){
-                    $tag_id = $_GET['tag'];
-
-                    $query[ 'tags_include' ] = $tag_id;
-
-                }
-                break;
-            case 'report':
-
-                $report = array();
-
-                if ( isset( $_REQUEST['status'] ) ) {
-                    $report['status'] = $_REQUEST['status'];
-                }
-
-                if ( isset( $_REQUEST['funnel'] ) ){
-                    $report['funnel'] = intval ( $_REQUEST['funnel'] );
-                }
-
-                if ( isset(  $_REQUEST['step'] ) ){
-                    $report['step'] = intval ( $_REQUEST['step'] );
-                }
-
-                if ( isset( $_REQUEST['start'] ) ){
-                    $report['start'] = intval ( $_REQUEST['start'] );
-                }
-
-                if ( isset( $_REQUEST['end'] ) ){
-                    $report['end'] = intval ( $_REQUEST['end'] );
-                }
-
-                $query[ 'report' ] = $report;
-
-                break;
-
-            case 'activity':
-
-                $report = array();
-
-                if ( isset( $_REQUEST['activity_type'] ) ) {
-                    $report[ 'activity_type' ] = sanitize_key( $_REQUEST['activity_type'] );
-                }
-                if ( isset( $_REQUEST['funnel'] ) ){
-                    $report[ 'funnel' ] = intval ( $_REQUEST['funnel'] );
-                }
-                if ( isset( $_REQUEST['referer'] ) ){
-                    $report[ 'referer' ] = urldecode( $_REQUEST['referer'] );
-                }
-                if ( isset(  $_REQUEST['step'] ) ){
-                    $report[ 'step' ] = intval ( $_REQUEST['step'] );
-                }
-                if ( isset( $_REQUEST['start'] ) ){
-                    $report[ 'start' ] = intval ( $_REQUEST['start'] );
-                }
-                if ( isset( $_REQUEST['end'] ) ){
-                    $report[ 'end' ] = intval ( $_REQUEST['end'] );
-                }
-
-                $query[ 'activity' ] = $report;
-
-                break;
-            default:
-
-                break;
-        }
-
         $c_query = new Contact_Query();
-        // todo change constant
+
+        $query = $_GET;
+
+        if ( isset_not_empty( $_GET, 's' ) ){
+            $query[ 'search' ] = get_request_var( 's' );
+        }
+
         if ( empty( $query ) ){
             $query[ 'optin_status' ] = array(
                 Preferences::CONFIRMED,

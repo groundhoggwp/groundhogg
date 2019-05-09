@@ -195,7 +195,12 @@ abstract class DB {
                     $ORS = [];
 
                     foreach ( $value as $item ){
-                        $ORS[] = "'" . $item . "'";
+
+                        if ( ! is_numeric( $item ) ){
+                            $ORS[] = "'" . $item . "'";
+                        } else {
+                            $ORS[] = $item;
+                        }
 
                     }
 
@@ -291,7 +296,7 @@ abstract class DB {
      */
     public function get( $row_id ) {
         global $wpdb;
-        return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) );
+        return apply_filters( 'groundhogg/db/get/' . $this->get_object_type() , $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) ) );
     }
 
     /**
@@ -304,7 +309,7 @@ abstract class DB {
     public function get_by( $column, $row_id ) {
         global $wpdb;
         $column = esc_sql( $column );
-        return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $column = %s LIMIT 1;", $row_id ) );
+        return apply_filters( 'groundhogg/db/get/' . $this->get_object_type(), $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $column = %s LIMIT 1;", $row_id ) ) );
     }
 
     /**
@@ -317,7 +322,7 @@ abstract class DB {
     public function get_column( $column, $row_id ) {
         global $wpdb;
         $column = esc_sql( $column );
-        return $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) );
+        return apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) ) );
     }
 
     /**
@@ -331,7 +336,7 @@ abstract class DB {
         global $wpdb;
         $column_where = esc_sql( $column_where );
         $column       = esc_sql( $column );
-        return $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) );
+        return apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) ) );
     }
 
     /**
@@ -377,6 +382,8 @@ abstract class DB {
         // Reorder $column_formats to match the order of columns given in $data
         $data_keys = array_keys( $data );
         $column_formats = array_merge( array_flip( $data_keys ), $column_formats );
+
+        $data = apply_filters( 'groundhogg/db/pre_insert/' . $this->get_object_type(), $data, $column_formats );
 
         $wpdb->insert( $this->table_name, $data, $column_formats );
         $wpdb_insert_id = $wpdb->insert_id;
@@ -426,6 +433,8 @@ abstract class DB {
 
         do_action( 'groundhogg/db/pre_update/' . $this->get_object_type(), $row_id, $data );
 
+        $data = apply_filters( 'groundhogg/db/pre_update/' . $this->get_object_type(), $data, $row_id );
+
         if ( false === $wpdb->update( $this->table_name, $data, array( $where => $row_id ), $column_formats ) ) {
             return false;
         }
@@ -461,6 +470,8 @@ abstract class DB {
 
         do_action( 'groundhogg/db/pre_mass_update/' . $this->get_object_type(), $data );
 
+        $data = apply_filters( 'groundhogg/db/pre_mass_update/' . $this->get_object_type(), $data, $column_formats );
+
         if ( false === $wpdb->update( $this->table_name, $data, $where ) ) {
             return false;
         }
@@ -483,6 +494,8 @@ abstract class DB {
 
         $column_formats = $this->get_columns();
         $data = array_intersect_key( $data, $column_formats );
+
+        do_action( 'groundhogg/db/pre_bulk_delete/' . $this->get_object_type(), $data );
 
         $result = $wpdb->delete( $this->table_name, $data );
 
@@ -620,7 +633,7 @@ abstract class DB {
 
         $results = $wpdb->get_results( $sql );
 
-        return $results;
+        return apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results );
     }
 
     public function count( $args=[] )

@@ -563,7 +563,9 @@ class Contact_Query {
         if ( $this->query_vars[ 'optin_status' ]  !== 'any' ) {
 
             if ( is_array( $this->query_vars[ 'optin_status' ] ) ){
-                $this->query_vars[ 'optin_status' ] = implode( ',', $this->query_vars[ 'optin_status' ] );
+                $this->query_vars[ 'optin_status' ] = implode( ',', wp_parse_id_list( $this->query_vars[ 'optin_status' ] ) );
+            } else {
+                $this->query_vars[ 'optin_status' ] = abs( $this->query_vars[ 'optin_status' ] );
             }
 
             $where['optin_status'] = "optin_status in ( {$this->query_vars['optin_status']} )";
@@ -583,30 +585,20 @@ class Contact_Query {
             }
         }
 
-        $tags_relationships_table = Plugin::$instance->dbs->get_db( 'tag_relationships' )->get_table_name();
-
         if ( ! empty( $this->query_vars[ 'tags_include' ] ) ){
-            if ( is_array( $this->query_vars[ 'tags_include' ] ) ){
-                $tags_include_ids = implode( ',', wp_parse_id_list( $this->query_vars['tags_include'] ) );
-            } else {
-                $tags_include_ids = $this->query_vars[ 'tags_include' ];
-            }
 
-            $contactIds = $wpdb->get_results( "SELECT contact_id FROM $tags_relationships_table WHERE tag_id IN ( $tags_include_ids )", OBJECT_K );
-            $ids = array_keys( $contactIds );
-            $ids = implode( ',', $ids );
+            $relationships = Plugin::$instance->dbs->get_db( 'tag_relationships' )->query( [ 'tag_id' => wp_parse_id_list( $this->query_vars['tags_include'] ) ], 'contact_id' );
+            $ids = wp_parse_id_list( wp_list_pluck( $relationships, 'contact_id' ) );
+            // Use 1=2 to signify no contacts have this tag...
+            $ids = ! empty( $ids ) ? implode( ',', $ids ) : '1=2';
             $where['tags_include'] = "ID IN ( $ids )";
         }
 
         if ( ! empty( $this->query_vars[ 'tags_exclude' ] ) ){
-            if ( is_array( $this->query_vars[ 'tags_exclude' ] ) ){
-                $tags_exclude_ids = implode( ',', wp_parse_id_list( $this->query_vars['tags_exclude'] ) );
-            } else {
-                $tags_exclude_ids = $this->query_vars[ 'tags_exclude' ];
-            }
-            $contactIds = $wpdb->get_results( "SELECT contact_id FROM $tags_relationships_table WHERE tag_id IN ( $tags_exclude_ids )", OBJECT_K );
-            $ids = array_keys( $contactIds );
-            $ids = implode( ',', $ids );
+            $relationships = Plugin::$instance->dbs->get_db( 'tag_relationships' )->query( [ 'tag_id' => wp_parse_id_list( $this->query_vars['tags_include'] ) ], 'contact_id' );
+            $ids = wp_parse_id_list( wp_list_pluck( $relationships, 'contact_id' ) );
+            // Use 1=2 to signify no contacts have this tag...
+            $ids = ! empty( $ids ) ? implode( ',', $ids ) : '1=2';
             $where['tags_exclude'] = "ID NOT IN ( $ids )";
         }
 

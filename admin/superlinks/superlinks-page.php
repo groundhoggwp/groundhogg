@@ -132,7 +132,10 @@ class Superlinks_Page extends Admin_Page
         $id = absint($_GET['superlink']);
         $superlink_name = sanitize_text_field(wp_unslash($_POST['superlink_name']));
         $superlink_target = sanitize_text_field(wp_unslash($_POST['superlink_target']));
-        $superlink_tags =Plugin::$instance->dbs->get_db('tags' )->validate( wp_unslash( $_POST['superlink_tags'] ) );
+
+
+        $superlink_tags = Plugin::$instance->dbs->get_db('tags' )->validate( wp_unslash( $_POST[ 'superlink_tags' ] ) );
+        var_dump( $superlink_tags );
 
         $args = array(
             'name' => $superlink_name,
@@ -140,7 +143,7 @@ class Superlinks_Page extends Admin_Page
             'tags' => $superlink_tags
         );
 
-        $result = Plugin::$instance->dbs->get_db('superlinks')->update($id, $args);
+        $result = Plugin::$instance->dbs->get_db('superlinks')->update( $id, $args );
 
         if (!$result) {
             return new \WP_Error('unable_to_update_superlink', "Something went wrong while updating the Superlink..." );
