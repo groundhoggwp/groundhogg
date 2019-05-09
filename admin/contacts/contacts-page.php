@@ -203,8 +203,7 @@ class Contacts_Page extends Admin_Page
             if (!Plugin::$instance->dbs->get_db('contacts')->exists($email)) {
                 $args['email'] = $email;
             } else {
-                return new \WP_Error( 'email_exists', __('Sorry, the email %s already belongs to another contact.', 'groundhogg') );
-
+                return new \WP_Error( 'email_exists',  sprintf( _x('Sorry, the email %s already belongs to another contact.', 'page_title', 'groundhogg'), $email ) );
             }
         }
 

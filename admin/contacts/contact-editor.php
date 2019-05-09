@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
+use Groundhogg\Step;
 
 /**
  * Edit a contact record via the Admin
@@ -148,11 +149,11 @@ function contact_record_general_info( $contact )
                 );
                 echo Plugin::$instance->utils->html->input($args); ?></td>
         </tr>
-        <?php if ( $contact->get_userdata() ):  //todo check ?>
+        <?php if ( $contact->get_userdata() ):   ?>
 
             <tr>
                 <th><label for="username"><?php _e('Username') ?></label></th>
-                <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->get_userdata()->ID), $contact->get_userdata()->user_login);  //todo check?>
+                <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->get_user_id()), $contact->get_userdata()->user_login); ?>
                 <span class="row-actions">
                     <?php submit_button( _x( 'Unlink', 'action', 'groundhogg'), 'secondary', 'unlink_user', false ); ?>
                 </span>
@@ -206,7 +207,7 @@ function contact_record_general_info( $contact )
                 echo Plugin::$instance->utils->html->input($args); ?>
                 <span class="row-actions"><a style="text-decoration: none" target="_blank"
                                                     href="<?php echo esc_url(substr($contact->get_email(), strpos($contact->get_email(), '@'))); ?>"><span class="dashicons dashicons-external"></span></a></span>
-                    <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' .  Plugin::$instance->preferences->get_optin_status_text($contact->get_id());  //todo ?></p>
+                    <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' .  Plugin::$instance->preferences->get_optin_status_text($contact->get_id()); ?></p>
                 <?php if ($contact->get_optin_status() !== Preferences::UNSUBSCRIBED): ?>
                     <div id="manual-unsubscribe" style="margin-bottom: 10px;">
                         <label><input type="checkbox" name="unsubscribe" value="1"><?php _ex( 'Mark as unsubscribed.', 'contact_record', 'groundhogg' ); ?></label>
@@ -352,7 +353,7 @@ function contact_record_general_info( $contact )
                         'id' => 'country',
                         'name' => 'country',
                         'selected' => $contact->get_meta('country'),
-                        'data' => Plugin::$instance->utils->location->get_countries_list(),  // todo
+                        'data' => Plugin::$instance->utils->location->get_countries_list(),
                         'placeholder' => _x( 'Select a Country', 'contact_record', 'groundhogg' ),
                     );
                     echo Plugin::$instance->utils->html->select2($args); ?>
@@ -381,7 +382,7 @@ function contact_record_general_info( $contact )
                     <?php $args = array(
                     'id' => 'time_zone',
                     'name' => 'time_zone',
-                    'data' => Plugin::$instance->utils->location->get_time_zones(), //todo
+                    'data' => Plugin::$instance->utils->location->get_time_zones(),
                     'selected' => $contact->get_meta('time_zone'),
                 );
                     echo Plugin::$instance->utils->html->select2($args); ?></div>
@@ -426,7 +427,7 @@ function contact_record_section_segmentation( $contact )
         <tbody>
         <tr>
             <th><?php _ex( 'Owner', 'contact_record', 'groundhogg' ); ?></th>
-            <td><?php echo Plugin::$instance->utils->html->dropdown_owners( array( 'selected' => ( $contact->owner )? $contact->owner->ID : 0 ) ); ?>
+            <td><?php echo Plugin::$instance->utils->html->dropdown_owners( array( 'selected' => ( $contact->get_ownerdata() )? $contact->get_owner_id() : 0 ) ); ?>
             </td>
         </tr>
         <tr>
@@ -470,7 +471,7 @@ function contact_record_section_segmentation( $contact )
                 $args = array(
                     'id'        => 'tags',
                     'name'      => 'tags[]',
-                    'selected'  => $contact->tags,
+                    'selected'  => $contact->get_tags(),
                 ); echo Plugin::$instance->utils->html->tag_picker( $args ); ?>
                 <p class="description"><?php _ex( 'Add new tags by hitting [Enter] or by typing a [,].', 'contact_record', 'groundhogg' ); ?></p>
                 </div>
@@ -482,7 +483,7 @@ function contact_record_section_segmentation( $contact )
 <?php
 }
 
-add_action( 'contact_record_tab_notes', 'contact_record_section_notes' );
+add_action( 'groundhogg/admin/contact/record/tab/notes', '\Groundhogg\Admin\Contacts\contact_record_section_notes' );
 
 /**
  * @param $contact Contact
@@ -528,7 +529,7 @@ function contact_record_section_notes( $contact )
     <?php
 }
 
-add_action( 'contact_record_tab_actions', 'contact_record_section_actions' );
+add_action( 'groundhogg/admin/contact/record/tab/actions', '\Groundhogg\Admin\Contacts\contact_record_section_actions' );
 
 /**
  * @param $contact contact
@@ -558,7 +559,8 @@ function contact_record_section_actions( $contact )
                     $args = array(
                         'id'    => 'sms_id',
                         'name'  => 'sms_id',
-                        'data'  => WPGH()->sms->get_sms_select() //todo
+                        'data'  =>  WPGH()->sms->get_sms_select() //todo
+
                     );
                     echo Plugin::$instance->utils->html->select2( $args ); ?>
                     <div class="row-actions">
@@ -612,7 +614,7 @@ function contact_record_section_actions( $contact )
                     $default = 0;
                     foreach ( $forms as $form ){
                         if ( ! $default ){$default = $form->ID;}
-                        $step = get_funnel_step( $form->ID ); //todo
+                        $step = Plugin::$instance->utils->get_step( $form->ID );  // todo get_funnel_step( $form->ID );
                         if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
                     }
 
@@ -637,7 +639,7 @@ function contact_record_section_actions( $contact )
     <?php
 }
 
-add_action( 'contact_record_tab_files', 'contact_record_section_files' );
+add_action( 'groundhogg/admin/contact/record/tab/files', '\Groundhogg\Admin\Contacts\contact_record_section_files' );
 
 /**
  * @param $contact Contact
@@ -720,7 +722,7 @@ function contact_record_section_files( $contact )
     <?php
 }
 
-add_action( 'contact_record_tab_meta_data', 'contact_record_section_custom_meta' );
+add_action( 'groundhogg/admin/contact/record/tab/meta_data', '\Groundhogg\Admin\Contacts\contact_record_section_custom_meta' );
 
 /**
  * @param $contact Contact
@@ -773,8 +775,7 @@ function contact_record_section_custom_meta( $contact ){
             'region_code',
         ) );
 
-        $meta = Plugin::$instance->dbs->get_db('contactmeta')->get_meta($contact->get_id());
-
+        $meta = $contact->get_meta();
 
         foreach ( $meta as $meta_key => $value ):
 
@@ -787,30 +788,22 @@ function contact_record_section_custom_meta( $contact ){
                     </th>
                     <td>
                         <?php
-
                         if ( strpos( $value, PHP_EOL  ) !== false ){
-
                             $args = array(
                                 'name' => 'meta[' . $meta_key . ']',
                                 'id'   => $meta_key,
                                 'value' => $value
                             );
-
                             echo Plugin::$instance->utils->html->textarea( $args );
-
                         } else {
-
                             $args = array(
                                 'name' => 'meta[' . $meta_key . ']',
                                 'id'   => $meta_key,
                                 'value' => $value
                             );
-
                             echo Plugin::$instance->utils->html->input( $args );
-
                         }
                         ?>
-
                         <span class="row-actions"><span class="delete"><a style="text-decoration: none" href="javascript:void(0)" class="deletemeta"><span class="dashicons dashicons-trash"></span></a></span></span>
                     </td>
                 </tr>
@@ -823,7 +816,7 @@ function contact_record_section_custom_meta( $contact ){
     <?php
 }
 
-add_action( 'contact_record_tab_activity', 'contact_record_section_activity' );
+add_action( 'groundhogg/admin/contact/record/tab/activity', '\Groundhogg\Admin\Contacts\contact_record_section_activity' );
 
 
 /**
@@ -838,22 +831,22 @@ function contact_record_section_activity( $contact )
         <h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
         <p class="description"><?php _ex( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'contact_record', 'groundhogg' ); ?></p>
         <?php
-        //todo
-        $table = new WPGH_Contact_Events_Table( 'waiting' );
+
+        $table = new Contact_Events_Table( 'waiting' );
         $table->prepare_items();
         $table->display(); ?>
         <!-- FUNNNEL HISTORY -->
         <h2><?php _ex( 'Recent Funnel History', 'contact_record', 'groundhogg' ); ?></h2>
         <p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 10 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
         <?php
-        $table = new WPGH_Contact_Events_Table( 'complete' );
+        $table = new Contact_Events_Table( 'complete' );
         $table->prepare_items();
         $table->display(); ?>
     </div>
     <!-- EMAIL HISTORY -->
     <h2><?php _ex( 'Recent Email History', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px">
-        <?php $table = new WPGH_Contact_Activity_Table( );
+        <?php $table = new Contact_Activity_Table( );
         $table->prepare_items();
         $table->display(); ?>
         <p class="description"><?php _ex( 'This is where you can check if this contact is interacting with your emails.', 'contact_record', 'groundhogg' ); ?></p>
@@ -882,7 +875,7 @@ endforeach;
     <?php echo Plugin::$instance->utils->html->input( array( 'type' => 'hidden', 'name' => 'active_tab', 'id' => 'active-tab' ) ); ?>
 
 </form>
-<?php if ( ! $contact->user ): ?>
+<?php if ( ! $contact->get_userdata() ): ?>
 <form id="create-user-form" action="<?php echo admin_url( 'user-new.php' ); ?>" method="post">
     <input type="hidden" name="createuser" value="1">
     <input type="hidden" name="first_name" value="<?php esc_attr_e( $contact->get_first_name() ); ?>">
