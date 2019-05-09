@@ -625,7 +625,7 @@ abstract class DB {
 
     public function count( $args=[] )
     {
-        return $this->count( $this->query( $args ) );
+        return count( $this->query( $args ) );
     }
 
 
@@ -701,7 +701,6 @@ abstract class DB {
 
         $last_changed = wp_cache_get( 'last_changed', $this->get_cache_group() );
         if ( ! $last_changed ) {
-            $last_changed = microtime();
             wp_cache_set( 'last_changed', $last_changed, $this->get_cache_group() );
         }
 

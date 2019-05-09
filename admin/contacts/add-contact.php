@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Plugin;
+use function Groundhogg\isset_not_empty;
 
 /**
  * Add a contact via the Admin "ADD NEW" button
@@ -151,11 +152,11 @@ if ( $active_tab === 'form' ): ?>
                 $default = 0;
                 foreach ( $forms as $form ){
                     if ( ! $default ){$default = $form->ID;}
-                    $step = wpgh_get_funnel_step( $form->ID ); //todo
+                    $step = Plugin::$instance->utils->get_step($form->ID);   //wpgh_get_funnel_step( $form->ID ); //todo not working
                     if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
                 }
 
-                if ( isset_not_emtpy( $_GET, 'form' ) ){ //todo
+                if ( isset_not_empty( $_GET, 'form' ) ){
                     $default = intval( $_GET[ 'form' ] );
                 }
 

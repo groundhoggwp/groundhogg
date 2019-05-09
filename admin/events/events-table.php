@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Event;
+use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use \WP_List_Table;
 
@@ -303,42 +304,7 @@ class Events_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        switch ( $this->get_view() )
-        {
-            case 'status':
-                if ( isset( $_REQUEST['status'] ) ){
-//                    $data = WPGH()->events->get_events( array(
-//                        'status' => $_REQUEST[ 'status' ]
-//                    )); todo check
-
-                    $data = Plugin::$instance->dbs->get_db('events')->query( ['status' => $_REQUEST[ 'status' ] ]);
-                }
-                break;
-            case 'contact':
-	            if ( isset( $_REQUEST['contact'] ) ){
-                    $data = Plugin::$instance->dbs->get_db('events')->query( [ 'contact_id' => $_REQUEST[ 'contact' ]]);
-	            }
-	            break;
-            case 'funnel':
-	            if ( isset( $_REQUEST['funnel'] ) ){
-
-                    $data = Plugin::$instance->dbs->get_db('events')->query( [ 'funnel_id' => $_REQUEST[ 'funnel' ] ]);
-	            }
-	            break;
-	        case 'step':
-		        if ( isset( $_REQUEST['step'] ) ){
-                    $data = Plugin::$instance->dbs->get_db('events')->query( [ 'step_id' => $_REQUEST[ 'step' ] ]);
-		        }
-		        break;
-            case 'type':
-                if ( isset( $_REQUEST['type'] ) ){
-                    $data = Plugin::$instance->dbs->get_db('events')->query( [ 'type' => $_REQUEST[ 'type' ] ]);
-                }
-                break;
-            default:
-                $data = Plugin::$instance->dbs->get_db('events')->query( [ ]);
-                break;
-        }
+        $data = get_db( 'events' )->query( $_GET );
 
         /*
          * Sort the data
