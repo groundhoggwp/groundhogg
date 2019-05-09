@@ -3,7 +3,9 @@ namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
-
+use Groundhogg\Preferences;
+use function Groundhogg\send_email_notification;
+use function Groundhogg\send_sms_notification;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -35,11 +37,6 @@ class Contacts_Page extends Admin_Page
     protected function add_ajax_actions()
     {
         add_action('wp_ajax_wpgh_inline_save_contacts', array($this, 'save_inline'));
-    }
-
-    protected function add_additional_actions()
-    {
-        // TODO: Implement add_additional_actions() method.
     }
 
     /**
@@ -89,53 +86,17 @@ class Contacts_Page extends Admin_Page
 
 
     /**
-     * @var WPGH_Notices
-     */
-    public $notices;
-
-    /**
-     * @var WPGH_Bulk_Contact_Manager
+     * @var Bulk_Contact_Manager todo
      */
     private $exporter;
 
-    public $order = 5;
-
-    public function __construct()
-    {
-
-
-
-        if (isset($_GET['page']) && $_GET['page'] === 'gh_contacts') {
-            add_action('admin_enqueue_scripts', array($this, 'scripts'));
-            add_action('init', array($this, 'process_action'));
-            $this->notices = WPGH()->notices;
-        }
-
-        if ((isset($_GET['page']) && $_GET['page'] === 'gh_contacts') || wp_doing_ajax()) {
-            $this->exporter = new WPGH_Bulk_Contact_Manager();
-        }
-    }
-
-    public function register()
-    {
-        $page = add_submenu_page(
-            'groundhogg',
-            _x('Contacts', 'page_title', 'groundhogg'),
-            _x('Contacts', 'page_title', 'groundhogg'),
-            'view_contacts',
-            'gh_contacts',
-            array($this, 'page')
-        );
-
-        add_action("load-" . $page, array($this, 'help'));
-    }
 
     /**
      * Get the scripts in there
      */
     public function scripts()
     {
-        if ($this->get_action() === 'edit' || $this->get_action() === 'add' || $this->get_action() === 'form' ) {
+        if ($this->get_current_action() === 'edit' || $this->get_current_action() === 'add' || $this->get_current_action() === 'form' ) {
             wp_enqueue_style('groundhogg-admin-contact-editor' );
             wp_enqueue_script('groundhogg-admin-contact-editor' );
         } else {
@@ -192,7 +153,7 @@ class Contacts_Page extends Admin_Page
                 $contacts = $this->get_items();
                 $contact = Plugin::$instance->utils->get_contact( array_shift($contacts) ); //todo check
                 if ($contact) {
-                    printf(_x('Edit Contact: %s', 'page_title', 'groundhogg'), $contact->full_name);
+                    return sprintf( _x('Edit Contact: %s', 'page_title', 'groundhogg'), $contact->get_full_name() );
                 } else {
                     return _ex('Oops!', 'page_title', 'groundhogg');
                 }
@@ -203,7 +164,7 @@ class Contacts_Page extends Admin_Page
                 if ( key_exists( 'contact', $_GET ) ){
                     $contacts = $this->get_items();
                     $contact = Plugin::$instance->utils->get_contact( array_shift($contacts) ); // todo check
-                    printf( _x('Submit Form For %s', 'page_title', 'groundhogg'), $contact->full_name );
+                    return sprintf( _x('Submit Form For %s', 'page_title', 'groundhogg'), $contact->full_name );
                 } else{
                     return _ex( 'Submit Form', 'page_title', 'groundhogg' );
                 }
@@ -313,7 +274,7 @@ class Contacts_Page extends Admin_Page
     /**
      * Update the contact via the admin screen
      */
-    private function process_edit()
+    public function process_edit()
     {
 
         if (!current_user_can('edit_contacts')) {
@@ -384,7 +345,7 @@ class Contacts_Page extends Admin_Page
                 if (!Plugin::$instance->dbs->get_db('contacts')->exists($email)) {
                     $args['email'] = $email;
                     //update new optin status to unconfirmed
-                    $contact->change_marketing_preference( WPGH_UNCONFIRMED ); //todo
+                    $contact->change_marketing_preference( Preferences::UNCONFIRMED ); //todo
                     return new \WP_Error( 'optin_status_updated',sprintf(_x('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', 'notice', 'groundhogg'), $email) );
 
                 } else {
@@ -452,7 +413,7 @@ class Contacts_Page extends Admin_Page
 
             $tags = Plugin::$instance->dbs->get_db('tags')->validate( wp_unslash($_POST['tags']));
 
-            $cur_tags = $contact->tags;
+            $cur_tags = $contact->get_tags();
             $new_tags = $tags;
 
             $delete_tags = array_diff($cur_tags, $new_tags);
@@ -471,7 +432,7 @@ class Contacts_Page extends Admin_Page
                 }
             }
         } else {
-            $contact->remove_tag($contact->tags);
+            $contact->remove_tag($contact->get_tags());
         }
 
         /* Update Main Contact Information */
@@ -491,7 +452,7 @@ class Contacts_Page extends Admin_Page
 
         if ( isset( $_POST['manual_confirm'] ) ) {
             if ( isset( $_POST[ 'confirmation_reason' ] ) && ! empty( $_POST[ 'confirmation_reason' ] ) ){
-                $contact->change_marketing_preference( WPGH_CONFIRMED ); //todo
+                $contact->change_marketing_preference( Preferences::CONFIRMED );
                 $contact->update_meta( 'manual_confirmation_reason', sanitize_textarea_field( stripslashes( $_POST[ 'confirmation_reason' ] ) ) );
                 $this->add_notice(
                     esc_attr('confirmed'),
@@ -512,7 +473,7 @@ class Contacts_Page extends Admin_Page
 
             $mail_id = intval( $_POST['email_id'] );
 
-            if( wpgh_send_email_notification( $mail_id, $contact->ID ) ){  //todo
+            if( send_email_notification( $mail_id, $contact->ID ) ){
                 $this->add_notice( 'email_queued', _x( 'The email has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
             }
         }
@@ -522,7 +483,7 @@ class Contacts_Page extends Admin_Page
 
             $sms_id = intval( $_POST['sms_id'] );
 
-            if( wpgh_send_sms_notification( $sms_id, $contact->ID ) ){ //todo
+            if( send_sms_notification( $sms_id, $contact->ID ) ){
                 $this->add_notice( 'sms_queued', _x( 'The sms has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
             }
         }
@@ -539,9 +500,9 @@ class Contacts_Page extends Admin_Page
 
         $this->add_notice('update', _x("Contact updated!", 'notice', 'groundhogg'), 'success');
 
-        if (!empty($_FILES['files']['tmp_name'][0])) {
-            $this->upload_files();
-        }
+//        if (!empty($_FILES['files']['tmp_name'][0])) {
+//            $this->upload_files();
+//        } todo ENABLE UPLOAD FILE FOR CONTACTS
 
         //do_action('wpgh_admin_update_contact_after', $id); todo remove
 
@@ -579,6 +540,7 @@ class Contacts_Page extends Admin_Page
                 require_once(ABSPATH . '/wp-admin/includes/file.php');
             }
 
+//            Plugin::$instance->dbs->get_db('submissions')->
             WPGH()->submission->contact = $contact;  // todo
             WPGH()->submission->set_upload_dirs();   // todo
 
@@ -620,7 +582,7 @@ class Contacts_Page extends Admin_Page
 
 
             $contact = Plugin::$instance->utils->get_contact( $id );
-            $contact->change_marketing_preference( WPGH_SPAM ); //todo
+            $contact->change_marketing_preference( Preferences::SPAM );
 
             $ip_address = $contact->get_meta('ip_address');
 
@@ -653,7 +615,7 @@ class Contacts_Page extends Admin_Page
 
         foreach ($this->get_items() as $id) {
             $contact = Plugin::$instance->utils->get_contact($id);
-            $contact->change_marketing_preference( WPGH_UNCONFIRMED ); //todo
+            $contact->change_marketing_preference( Preferences::UNCONFIRMED );
         }
 
         $this->add_notice(
@@ -673,7 +635,7 @@ class Contacts_Page extends Admin_Page
 
         foreach ($this->get_items() as $id) {
             $contact = Plugin::$instance->utils->get_contact($id);
-            $contact->change_marketing_preference( WPGH_UNCONFIRMED );
+            $contact->change_marketing_preference( Preferences::UNCONFIRMED );
         }
 
         $this->add_notice(
@@ -784,12 +746,14 @@ class Contacts_Page extends Admin_Page
         if ($contact->email !== $email) {
 
 
+
+
             //check if another email address like it exists...
             if (!Plugin::$instance->dbs->get_db('contacts')->exists($email)) {
                 $args['email'] = $email;
 
                 //update new optin status to unconfirmed
-                $contact->change_marketing_preference( WPGH_UNCONFIRMED );
+                $contact->change_marketing_preference( Preferences::UNCONFIRMED );
                 $err[] = sprintf(_x('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', 'notice', 'groundhogg'), $email );
 
             } else {
@@ -815,7 +779,7 @@ class Contacts_Page extends Admin_Page
 
         $tags = Plugin::$instance->dbs->get_db('tags')->validate( $_POST['tags'] ); //todo
 
-        $cur_tags = $contact->tags;
+        $cur_tags = $contact->get_tags();
         $new_tags = $tags;
 
         $delete_tags = array_diff($cur_tags, $new_tags);
@@ -858,16 +822,13 @@ class Contacts_Page extends Admin_Page
 
         $contacts_table = new Contacts_Table();
 
+        $this->search_form( __( 'Search Contacts', 'groundhogg' ) );
+
+
         $contacts_table->views(); ?>
         <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
-            <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e('Search Contacts', 'groundhogg'); ?>
-                    :</label>
-                <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button"
-                       value="<?php _e('Search Contacts', 'groundhogg'); ?>">
-            </p>
+
             <?php $contacts_table->prepare_items(); ?>
             <?php $contacts_table->display(); ?>
             <?php
@@ -919,55 +880,36 @@ class Contacts_Page extends Admin_Page
     }
 
     /**
-     * @param $key
-     * @param $comp
-     * @param $value
-     *
-     * @return string
+     * Display the title and dependent action include the appropriate page content
      */
-    private function generate_comparison_statement( $key, $comp, $value )
+    public function view()
     {
-        global $wpdb;
+        ?>
+        <div class="wrap">
+            <hr class="wp-header-end">
+            <?php switch ( $this->get_current_action() ){
+                case 'add':
+                    $this->add();
+                    break;
+                case 'edit':
+                    $this->edit();
+                    break;
+                case 'search':
+                    $this->search();
+                    break;
+                case 'form':
+                    $this->form();
+                    break;
+                default:
+                    $this->table();
+            } ?>
+        </div>
+        <?php
+    }
 
-        if ( is_array( $value ) ){
-            $value = sprintf( '(%s)', implode( ',', $value ) );
-        } else if ( is_numeric( $value ) ){
-            $value = intval( $value );
-        }
-
-        $insert = is_int( $value ) ? '%d' : '%s';
-
-        switch ( $comp ){
-            default:
-            case '=':
-                $statement = $wpdb->prepare( "$key = $insert", $value );
-                break;
-            case '!=':
-                $statement = $wpdb->prepare( "$key = $insert", $value );
-                break;
-            case 'LIKE sw':
-                $statement = $wpdb->prepare( "$key LIKE '%s'", $value . '%' );
-                break;
-            case 'LIKE ew':
-                $statement = $wpdb->prepare( "$key LIKE '%s'", '%' . $value );
-                break;
-            case 'LIKE c':
-                $statement = $wpdb->prepare( "$key LIKE '%s'", '%' . $value . '%' );
-                break;
-            case 'NOT LIKE c':
-                $statement = $wpdb->prepare( "$key NOT LIKE '%s'", '%' . $value . '%' );
-                break;
-            case 'EMPTY':
-                $statement = "$key IS EMPTY";
-                break;
-            case 'NOT EMPTY':
-                $statement =  "$key IS NOT EMPTY";
-                break;
-        }
-
-        return $statement;
-
-
+    protected function add_additional_actions()
+    {
+        // TODO: Implement add_additional_actions() method.
     }
 
     /**
@@ -979,7 +921,8 @@ class Contacts_Page extends Admin_Page
 
         $contacts       = Plugin::$instance->dbs->get_db('contacts')->table_name;
         $contact_meta   = Plugin::$instance->dbs->get_db('contactmeta')->table_name;
-        $tags           = WPGH()->tag_relationships->table_name;  //todo
+        $tags           = Plugin::$instance->dbs->get_db('tag_relationships')->table_name;
+
 
         $SELECT = "SELECT DISTINCT c.* FROM $contacts AS c LEFT JOIN $contact_meta AS meta ON c.ID = meta.contact_id LEFT JOIN $tags AS tags ON c.ID = tags.contact_id";
         $WHERE = "WHERE ";
@@ -1039,35 +982,54 @@ class Contacts_Page extends Admin_Page
     }
 
     /**
-     * Display the title and dependent action include the appropriate page content
+     * @param $key
+     * @param $comp
+     * @param $value
+     *
+     * @return string
      */
-    public function view()
+    private function generate_comparison_statement( $key, $comp, $value )
     {
-        ?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline"><?php $this->get_title(); ?></h1>
-            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_contacts&action=add' ); ?>"><?php _ex( 'Add New', 'page_title_action', 'groundhogg' ); ?></a>
-            <a class="page-title-action aria-button-if-js" href="<?php echo admin_url( 'admin.php?page=gh_tools&tab=import&action=add' ); ?>"><?php _ex( 'Import', 'page_title_action', 'groundhogg' ); ?></a>
-            <?php $this->notices->notices(); ?>
-            <hr class="wp-header-end">
-            <?php switch ( $this->get_action() ){
-                case 'add':
-                    $this->add();
-                    break;
-                case 'edit':
-                    $this->edit();
-                    break;
-                case 'search':
-                    $this->search();
-                    break;
-                case 'form':
-                    $this->form();
-                    break;
-                default:
-                    $this->table();
-            } ?>
-        </div>
-        <?php
-    }
+        global $wpdb;
 
+        if ( is_array( $value ) ){
+            $value = sprintf( '(%s)', implode( ',', $value ) );
+        } else if ( is_numeric( $value ) ){
+            $value = intval( $value );
+        }
+
+        $insert = is_int( $value ) ? '%d' : '%s';
+
+        switch ( $comp ){
+            default:
+            case '=':
+                $statement = $wpdb->prepare( "$key = $insert", $value );
+                break;
+            case '!=':
+                $statement = $wpdb->prepare( "$key = $insert", $value );
+                break;
+            case 'LIKE sw':
+                $statement = $wpdb->prepare( "$key LIKE '%s'", $value . '%' );
+                break;
+            case 'LIKE ew':
+                $statement = $wpdb->prepare( "$key LIKE '%s'", '%' . $value );
+                break;
+            case 'LIKE c':
+                $statement = $wpdb->prepare( "$key LIKE '%s'", '%' . $value . '%' );
+                break;
+            case 'NOT LIKE c':
+                $statement = $wpdb->prepare( "$key NOT LIKE '%s'", '%' . $value . '%' );
+                break;
+            case 'EMPTY':
+                $statement = "$key IS EMPTY";
+                break;
+            case 'NOT EMPTY':
+                $statement =  "$key IS NOT EMPTY";
+                break;
+        }
+
+        return $statement;
+
+
+    }
 }

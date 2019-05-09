@@ -1,4 +1,6 @@
 <?php
+namespace Groundhogg\Admin\Emails\Blocks;
+
 /**
  * Spacer block
  *
@@ -15,20 +17,31 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Column_Block extends WPGH_Email_Block
+class Column extends Email_Block
 {
-
-    /**
-     * Declare the block properties
-     *
-     * WPGH_Text_Block constructor.
-     */
-    public function __construct()
+    public function get_icon()
     {
-        $this->icon = WPGH_ASSETS_FOLDER . 'images/email-icons/spacer-block.png' ;
-        $this->name = 'column';
-        $this->title = __( 'Column', 'groundhogg' );
-        parent::__construct();
+        return GROUNDHOGG_ASSETS_PATH . 'images/email-icons/spacer-block.png' ;
+    }
+
+    public function get_name()
+    {
+        return 'Column';
+    }
+
+    public function get_title()
+    {
+        return _x('Column', 'email_block', 'groundhogg');
+    }
+
+    public function get_settings()
+    {
+        // No settings
+    }
+
+    public function scripts()
+    {
+        // No scripts
     }
 
     /**
@@ -39,7 +52,6 @@ class WPGH_Column_Block extends WPGH_Email_Block
     protected function inner_html()
     {
         ob_start();
-
         ?>
         <table border="0" cellpadding="5" cellspacing="0" width="100%" class="">
             <tbody>
@@ -64,30 +76,5 @@ class WPGH_Column_Block extends WPGH_Email_Block
         <?php
         return ob_get_clean();
     }
-
-    /**
-     * Register the block settings panel
-     *
-     * @return array
-     */
-    protected function register_settings()
-    {
-
-//        $this->settings = array(
-//            array(
-//                'type'  => 'number',
-//                'label' => __( '' ),
-//                'atts'  => array(
-//                    'class' => 'input',
-//                    'id'    => 'spacer-size',
-//                    'name'  => 'spacer-size',
-//                ),
-//            ),
-//        );
-
-        return parent::register_settings();
-
-    }
-
 
 }

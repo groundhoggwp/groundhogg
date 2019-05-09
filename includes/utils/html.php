@@ -729,9 +729,9 @@ class HTML
 
             foreach ( $a[ 'selected' ] as $tag_id ){
 
-                if ( WPGH()->tags->exists( $tag_id ) ){
+                if ( Plugin::$instance->dbs->get_db('tags')->exists( $tag_id ) ){
 
-                    $tag = WPGH()->tags->get( $tag_id );
+                    $tag = Plugin::$instance->dbs->get_db('tags')->get( $tag_id );
 
                     $a[ 'data' ][ $tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
 

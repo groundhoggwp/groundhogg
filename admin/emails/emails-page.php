@@ -511,13 +511,13 @@ class Emails_Page extends Admin_Page
 
         $blocks = array();
 
-//        $blocks[] = new WPGH_Text_Block(); //todo
-//        $blocks[] = new WPGH_Image_Block(); //todo
+        $blocks[] = new Blocks\Text();
+        $blocks[] = new Blocks\Image();
         $blocks[] = new Blocks\Button();
-//        $blocks[] = new WPGH_HTML_Block(); //todo
-//        $blocks[] = new WPGH_Divider_Block(); //todo
-//        $blocks[] = new WPGH_Spacer_Block(); //todo
-//        $blocks[] = new WPGH_Column_Block(); //todo
+        $blocks[] = new Blocks\HTML();
+        $blocks[] = new Blocks\Divider();
+        $blocks[] = new Blocks\Spacer();
+//        $blocks[] = new Blocks\Column();
 
         return apply_filters( 'wpgh_setup_email_blocks', $blocks );
 

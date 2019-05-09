@@ -250,107 +250,47 @@ class Funnels_Page extends Admin_Page
 		}
 	}
 
-    /**
-     * Process the current action whatever it may be
-     */
-	public function process_action()
-	{
-		if ( ! $this->get_action() || ! $this->verify_action() )
-			return;
 
-		$base_url = remove_query_arg( array( '_wpnonce', 'action' ), wp_get_referer() );
-
-		switch ( $this->get_action() )
-		{
-
-
-
-
-            case 'archive':
-
-                if ( ! current_user_can( 'edit_funnels' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_funnels' ) );
-                }
-
-				foreach ( $this->get_funnels() as $id ) {
-				    $args = array( 'status' => 'archived' );
-				    WPGH()->funnels->update( $id, $args );
-				}
-
-				$this->notices->add(
-                    esc_attr( 'archived' ),
-                    sprintf( _nx( 'Archived %d funnel', 'Archived %d funnels', count( $this->get_funnels() ), 'notice', 'groundhogg' ), count( $this->get_funnels() ) ),
-                    'success'
-                );
-
-				do_action( 'wpgh_archive_funnels' );
-
-				break;
-
-            case 'delete':
-
-                if ( ! current_user_can( 'delete_funnels' ) ){
-                    wp_die( WPGH()->roles->error( 'delete_funnels' ) );
-                }
-
-				foreach ( $this->get_funnels() as $id ){
-					WPGH()->funnels->delete( $id );
-				}
-
-                $this->notices->add(
-					esc_attr( 'deleted' ),
-                    sprintf( _nx( 'Deleted %d funnel', 'Deleted %d funnels', count( $this->get_funnels() ), 'notice', 'groundhogg' ), count( $this->get_funnels() ) ),
-                    'success'
-				);
-
-				do_action( 'wpgh_delete_funnels' );
-
-				break;
-
-            case 'restore':
-
-                if ( ! current_user_can( 'edit_funnels' ) ){
-                    wp_die( WPGH()->roles->error( 'edit_funnels' ) );
-                }
-
-				foreach ( $this->get_funnels() as $id )
-				{
-                    $args = array( 'status' => 'inactive' );
-                    WPGH()->funnels->update( $id, $args );
-				}
-
-                $this->notices->add(
-					esc_attr( 'restored' ),
-                    sprintf( _nx( 'Restored %d funnel', 'Deleted %d funnels', count( $this->get_funnels() ), 'notice', 'groundhogg' ), count( $this->get_funnels() ) ),
-                    'success'
-				);
-
-				do_action( 'wpgh_restore_funnels' );
-
-				break;
-
-            case 'export':
-
-                if ( ! current_user_can( 'export_funnels' ) ){
-                    wp_die( WPGH()->roles->error( 'export_funnels' ) );
-                }
-
-                $this->process_export();
-
-                break;
-
+	public function process_delete ()
+    {
+        if ( ! current_user_can( 'delete_funnels' ) ){
+            $this->wp_die_no_access();
         }
 
-		set_transient( 'gh_last_action', $this->get_action(), 30 );
+        foreach ( $this->get_items() as $id ){
+            Plugin::$instance->dbs->get_db('funnels')->delete( $id );
+        }
 
-		if ( $this->get_action() === 'edit' || $this->get_action() === 'add' )
-			return;
+        $this->add_notice(
+            esc_attr( 'deleted' ),
+            sprintf( _nx( 'Deleted %d funnel', 'Deleted %d funnels', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+            'success'
+        );
 
-		$base_url = add_query_arg( 'ids', urlencode( implode( ',', $this->get_funnels() ) ), $base_url );
+        return true;
+    }
 
-		wp_redirect( $base_url );
-		die();
-	}
+    public function process_restore()
+    {
+        if ( ! current_user_can( 'edit_funnels' ) ){
+            $this->wp_die_no_access();
+        }
+
+        foreach ( $this->get_items() as $id )
+        {
+            $args = array( 'status' => 'inactive' );
+            Plugin::$instance->dbs->get_db('funnels')->update( $id, $args );
+        }
+
+        $this->add_notice(
+            esc_attr( 'restored' ),
+            sprintf( _nx( 'Restored %d funnel', 'Deleted %d funnels', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+            'success'
+        );
+
+        return true;
+    }
+
 
 	public function process_duplicate ()
     {
@@ -359,15 +299,15 @@ class Funnels_Page extends Admin_Page
         }
 
         foreach ( $this->get_items() as $id ){
-            $json = wpgh_convert_funnel_to_json( $id );
+            $json = wpgh_convert_funnel_to_json( $id ); //todo
             $newId = $this->import_funnel( $json );
 
-            $funnel = WPGH()->funnels->get( $newId );
-            WPGH()->funnels->update( $newId, [ 'title' => sprintf( '%s - (Copy)', $funnel->title ) ] );
+            $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $newId );
+            Plugin::$instance->dbs->get_db('funnels')->update( $newId, [ 'title' => sprintf( '%s - (Copy)', $funnel->title ) ] );
 
         }
 
-        $this->notices->add(
+        $this->add_notice(
             esc_attr( 'duplicated' ),
             _x( 'Funnel duplicated', 'notice', 'groundhogg' ),
             'success'
@@ -375,6 +315,28 @@ class Funnels_Page extends Admin_Page
 
         return true;
     }
+
+    public function process_archive()
+    {
+        if ( ! current_user_can( 'edit_funnels' ) ){
+            $this->wp_die_no_access();
+        }
+
+        foreach ( $this->get_items() as $id ) {
+            $args = array( 'status' => 'archived' );
+            Plugin::$instance->dbs->get_db('funnels')->update( $id, $args );
+        }
+
+        $this->add_notice(
+            esc_attr( 'archived' ),
+            sprintf( _nx( 'Archived %d funnel', 'Archived %d funnels', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+            'success'
+        );
+
+//        do_action( 'wpgh_archive_funnels' );  todo remove
+        return true ;
+    }
+
 
     /**
      * Export a funnel
@@ -422,7 +384,7 @@ class Funnels_Page extends Admin_Page
 
         if ( isset( $_POST[ 'funnel_template' ] ) ){
 
-            include WPGH_PLUGIN_DIR . 'templates/funnel-templates.php';
+            include GROUNDHOGG_PATH . 'templates/funnel-templates.php';
 
             /* @var $funnel_templates array included from funnel-templates.php */
 

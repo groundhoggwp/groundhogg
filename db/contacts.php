@@ -3,6 +3,8 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use function Groundhogg\isset_not_empty;
+use Groundhogg\Contact_Query;
+
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -338,7 +340,7 @@ class Contacts extends DB {
         $args = $this->prepare_contact_query_args( $args );
         $args['count'] = false;
 
-        $query = new WPGH_Contact_Query( '', $this );
+        $query = new Contact_Query( '', $this );
 
         return $query->query( $args );
     }
@@ -354,7 +356,7 @@ class Contacts extends DB {
         $args['count'] = true;
         $args['offset'] = 0;
 
-        $query   = new WPGH_Contact_Query( '', $this );
+        $query   = new Contact_Query( '', $this );
         $results = $query->query( $args );
 
         return $results;

@@ -1,4 +1,11 @@
 <?php
+namespace Groundhogg\Admin\Contacts;
+
+use Groundhogg\Admin\Events;
+use Groundhogg\Plugin;
+use \WP_List_Table;
+use Groundhogg\Event;
+
 /**
  * Contact Events table view
  *
@@ -26,11 +33,11 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-if ( ! class_exists( 'WPGH_Events_Table' ) ){
-    require_once ( WPGH_PLUGIN_DIR . 'includes/admin/events/class-wpgh-events-table.php' );
+if ( ! class_exists( 'Events_Table' ) ){
+    require_once ( GROUNDHOGG_PATH . 'includes/admin/events/events-table.php' );
 }
 
-class WPGH_Contact_Events_Table extends WPGH_Events_Table {
+class Contact_Events_Table extends Events\Events_Table {
 
     /**
      * The data concerning the contact
@@ -99,6 +106,12 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
         __return_false();
     }
 
+    /**
+     * @param $event Event
+     * @param string $column_name
+     * @param string $primary
+     * @return string
+     */
     public function handle_row_actions($event, $column_name, $primary)
     {
 
@@ -107,7 +120,7 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
         if ( $column_name === 'funnel' ){
             if ( $event->is_funnel_event() ){
                 $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                    admin_url('admin.php?page=gh_funnels&action=edit&funnel=' . $event->funnel_id),
+                    admin_url('admin.php?page=gh_funnels&action=edit&funnel=' . $event->get_funnel_id()),
                     esc_attr(_x('Edit Funnel', 'action', 'groundhogg')),
                     _x('Edit Funnel', 'action', 'groundhogg')
                 );
@@ -116,7 +129,7 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
         } else if ( $column_name === 'step' ){
             if ( $event->is_funnel_event() ){
                 $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->funnel_id, $event->step->ID ) ),
+                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->funnel_id, $event->get_step_id() ) ),
                     esc_attr(_x('Edit Step', 'action', 'groundhogg')),
                     _x('Edit Step', 'action', 'groundhogg')
                 );
@@ -128,13 +141,13 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
     }
 
     /**
-     * @param $event WPGH_Event
+     * @param $event Event
      * @return string
      */
     protected function column_actions( $event )
     {
-        $run = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=execute' ), 'execute' ) );
-        $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->ID . '&action=cancel' ), 'cancel' ) );
+        $run = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->get_id() . '&action=execute' ), 'execute' ) );
+        $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->get_id() . '&action=cancel' ), 'cancel' ) );
         $actions = array();
 
         if ( $event->time > time() && $event->status === 'waiting' ){
@@ -162,7 +175,7 @@ class WPGH_Contact_Events_Table extends WPGH_Events_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $data =  WPGH()->events->get_events( array( 'contact_id' => intval( $_GET[ 'contact' ] ), 'status' => $this->status ) );
+        $data =  Plugin::$instance->dbs->get_db('events')->query( [ 'contact_id' => intval( $_GET[ 'contact' ] ), 'status' => $this->status ] );
 
          /* Sort the data */
         usort( $data, array( $this, 'usort_reorder' ) );

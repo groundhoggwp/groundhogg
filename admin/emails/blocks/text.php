@@ -1,4 +1,6 @@
 <?php
+namespace Groundhogg\Admin\Emails\Blocks;
+
 /**
  * Text block
  *
@@ -15,58 +17,26 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Text_Block extends WPGH_Email_Block
+class Text extends Email_Block
 {
-
-    /**
-     * Declare the block properties
-     *
-     * WPGH_Text_Block constructor.
-     */
-    public function __construct()
+    public function get_icon()
     {
-
-        $this->icon = WPGH_ASSETS_FOLDER . 'images/email-icons/text-block.png' ;
-        $this->name = 'text';
-        $this->title = __( 'Text Block', 'groundhogg' );
-
-        wp_enqueue_editor();
-        wp_enqueue_style('editor-buttons');
-        wp_enqueue_style('groundhogg-admin-simple-editor' );
-
-        wp_enqueue_script('wplink');
-        wp_enqueue_script( 'groundhogg-admin-simple-editor' );
-        wp_enqueue_script( 'groundhogg-email-text' );
-
-        parent::__construct();
-
+        return GROUNDHOGG_ASSETS_PATH . 'images/email-icons/text-block.png' ;
     }
 
-    /**
-     * Return the inner html of the block
-     *
-     * @return string
-     */
-    protected function inner_html()
+    public function get_name()
     {
-        return sprintf(
-            '<p>%s</p>',
-            __( 'Customize this section by editing the text, adding your own copy, 
-            using the options above to bold, italicize, or create links and bullets, 
-            or use the options in the "Design" panel on the left to change 
-            the font styles of your email.', 'groundhogg' )
-        );
+        return 'text';
     }
 
-    /**
-     * Register the block settings panel
-     *
-     * @return array
-     */
-    protected function register_settings()
+    public function get_title()
     {
+        return _x('Text Block', 'email_block', 'groundhogg');
+    }
 
-        $this->settings = array(
+    public function get_settings()
+    {
+        return  array(
             array(
                 'type'  => 'number',
                 'label' => __( 'H1 Size' ),
@@ -128,10 +98,35 @@ class WPGH_Text_Block extends WPGH_Email_Block
                 ),
             ),
         );
-
-        return parent::register_settings();
-
     }
 
+    public function scripts()
+    {
+        wp_enqueue_editor();
+        wp_enqueue_style('editor-buttons');
+        wp_enqueue_style('groundhogg-admin-simple-editor' );
+
+        wp_enqueue_script('wplink');
+        wp_enqueue_script( 'groundhogg-admin-simple-editor' );
+        wp_enqueue_script( 'groundhogg-email-text' );
+    }
+
+
+
+    /**
+     * Return the inner html of the block
+     *
+     * @return string
+     */
+    protected function inner_html()
+    {
+        return sprintf(
+            '<p>%s</p>',
+            __( 'Customize this section by editing the text, adding your own copy, 
+            using the options above to bold, italicize, or create links and bullets, 
+            or use the options in the "Design" panel on the left to change 
+            the font styles of your email.', 'groundhogg' )
+        );
+    }
 
 }

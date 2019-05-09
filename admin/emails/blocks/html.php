@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Admin\Emails\Blocks;
 
+use Groundhogg\Plugin;
+
 /**
  * HTML block
  *
@@ -84,13 +86,13 @@ class HTML extends Email_Block
 
         $block_settings = $this->register_settings();
 
-        $html = sprintf("<div id=\"%s-block-editor\" data-block-settings=\"%s\" class=\"postbox hidden\">", $this->name, $this->name);
-        $html .= sprintf("<h3 class=\"hndle\">%s</h3>", $this->title);
+        $html = sprintf("<div id=\"%s-block-editor\" data-block-settings=\"%s\" class=\"postbox hidden\">", $this->get_name(), $this->get_name());
+        $html .= sprintf("<h3 class=\"hndle\">%s</h3>", $this->get_title());
         $html .= "<div class=\"inside\" style='margin:0;padding:0;'><div class=\"options\">";
         foreach ($block_settings as $i => $settings) {
 
-            if (isset($settings['type']) && method_exists(WPGH()->html, $settings['type'])) {
-                $html .= sprintf("<td>%s</td>", call_user_func(array(WPGH()->html, $settings['type']), $settings['atts']));
+            if (isset($settings['type']) && method_exists(Plugin::$instance->utils->html, $settings['type'])) {
+                $html .= sprintf("<td>%s</td>", call_user_func(array(Plugin::$instance->utils->html, $settings['type']), $settings['atts']));
             }
         }
 

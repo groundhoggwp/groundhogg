@@ -2,9 +2,11 @@
 namespace Groundhogg\Admin;
 
 use Groundhogg\Admin\Broadcasts\Broadcasts_Page;
+use Groundhogg\Admin\Contacts\Contacts_Page;
 use Groundhogg\Admin\Emails\Emails_Page;
 use Groundhogg\Admin\Events\Events_Page;
 use Groundhogg\Admin\Funnels\Funnels_Page;
+use Groundhogg\Admin\Settings\Settings_Page;
 use Groundhogg\Admin\SMS\SMS_Page;
 use Groundhogg\Admin\Superlinks\Superlinks_Page;
 use Groundhogg\Admin\Tags\Tags_Page;
@@ -39,13 +41,14 @@ class Admin_Menu
     protected function init_admin(){
 
         $this->welcome  = new Welcome_Page();
-//        $this->tags     = new Tags_Page();
-//        $this->sms      = new SMS_Page();
-//        $this->superlinks = new Superlinks_Page();
-//        $this->broadcasts = new Broadcasts_Page();
-//        $this->events   = new Events_Page();
-//        $this->emails   = new Emails_Page();
-
+        $this->tags     = new Tags_Page();
+        $this->sms      = new SMS_Page();
+        $this->superlinks = new Superlinks_Page();
+        $this->broadcasts = new Broadcasts_Page();
+        $this->events   = new Events_Page();
+        $this->emails   = new Emails_Page();
+        $this->settings = new Settings_Page();
+        $this->contacts = new Contacts_Page();
 
         do_action( 'groundhogg/admin/init', $this );
     }

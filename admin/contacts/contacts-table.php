@@ -1,10 +1,12 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 
+use Groundhogg\Preferences;
 use \WP_List_Table;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+
 
 
 /**
@@ -101,15 +103,14 @@ class Contacts_Table extends WP_List_Table {
             $html .= '  <div class="owner">' . esc_html( $contact->get_owner_id() ). '</div>';
         }
         $html .= '  <div class="tags">' . esc_html( json_encode( $contact->get_tags() ) ). '</div>';
-        $html .= '  <div class="tags-data">' . esc_html( json_encode( wpgh_format_tags_for_select2( $contact->get_tags() ) ) ) . '</div>';
+//        $html .= '  <div class="tags-data">' . esc_html( json_encode( wpgh_format_tags_for_select2( $contact->get_tags() ) ) ) . '</div>'; todo remove comment
         $html .= '</div>';
-
 
         $html .= "<strong>";
 
         $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->get_email() ) . "</a>";
 
-        if ( $contact->get_optin_status() === WPGH_UNCONFIRMED && ( ! isset( $_REQUEST[ 'optin_status' ] ) || $_REQUEST[ 'optin_status' ] !== 'unconfirmed' ) ){
+        if ( $contact->get_optin_status() === Preferences::UNCONFIRMED && ( ! isset( $_REQUEST[ 'optin_status' ] ) || $_REQUEST[ 'optin_status' ] !== 'unconfirmed' ) ){
             $html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Unconfirmed', 'status', 'groundhogg' ) . ")</span>";
         }
 
@@ -235,11 +236,11 @@ class Contacts_Table extends WP_List_Table {
         $view = isset($_REQUEST['optin_status']) ? $_REQUEST['optin_status'] : 'all';
 
         $count = array(
-            'unconfirmed'   => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_UNCONFIRMED   ] ),
-            'confirmed'     => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_CONFIRMED     ] ),
-            'opted_out'     => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_UNSUBSCRIBED  ] ),
-            'spam'          => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_SPAM          ] ),
-            'bounce'        => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => WPGH_HARD_BOUNCE   ] ),
+            'unconfirmed'   => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::UNCONFIRMED   ] ),
+            'confirmed'     => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::CONFIRMED     ] ),
+            'opted_out'     => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::UNSUBSCRIBED  ] ),
+            'spam'          => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::SPAM          ] ),
+            'bounce'        => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::HARD_BOUNCE   ] ),
         );
 
         return apply_filters( 'contact_views', array(
@@ -254,7 +255,7 @@ class Contacts_Table extends WP_List_Table {
 
     /**
      * Prepares the list of items for displaying.
-     * @global wpdb $wpdb
+     * @global $wpdb \wpdb
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
@@ -287,9 +288,9 @@ class Contacts_Table extends WP_List_Table {
 
         }
 
-        if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){ //todo
-            $query[ 'owner' ] = get_current_user_id();
-        }
+//        if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){ //todo
+//            $query[ 'owner' ] = get_current_user_id();
+//        }
 
         if ( isset( $_REQUEST[ 'meta_key' ] ) && isset( $_REQUEST[ 'meta_value' ] ) ){
             $query[ 'meta_key' ] = sanitize_key( $_REQUEST[ 'meta_key' ] );
@@ -325,22 +326,22 @@ class Contacts_Table extends WP_List_Table {
                     switch ( $_REQUEST['optin_status'] ){
 
                         case 'unconfirmed':
-                            $view = WPGH_UNCONFIRMED;
+                            $view = Preferences::UNCONFIRMED;
                             break;
                         case 'confirmed':
-                            $view = WPGH_CONFIRMED;
+                            $view = Preferences::CONFIRMED;
                             break;
                         case 'opted_out':
-                            $view = WPGH_UNSUBSCRIBED;
+                            $view = Preferences::UNSUBSCRIBED;
                             break;
                         case 'spam':
-                            $view = WPGH_SPAM;
+                            $view = Preferences::SPAM;
                             break;
                         case 'bounce':
-                            $view = WPGH_HARD_BOUNCE;
+                            $view = Preferences::HARD_BOUNCE;
                             break;
                         default:
-                            $view = WPGH_UNCONFIRMED;
+                            $view = Preferences::UNCONFIRMED;
                             break;
                     }
 
@@ -427,8 +428,8 @@ class Contacts_Table extends WP_List_Table {
         // todo change constant
         if ( empty( $query ) ){
             $query[ 'optin_status' ] = array(
-                WPGH_CONFIRMED,
-                WPGH_UNCONFIRMED
+                Preferences::CONFIRMED,
+                Preferences::UNCONFIRMED
             );
         }
 
@@ -501,7 +502,7 @@ class Contacts_Table extends WP_List_Table {
             __( 'Quick&nbsp;Edit' )
         );
 
-        $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->ID );
+        $editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() );
 
         $actions['edit'] = sprintf(
             '<a href="%s" class="edit" aria-label="%s">%s</a>',
@@ -597,7 +598,7 @@ class Contacts_Table extends WP_List_Table {
                 ] ); ?></div>
         </div>
         <div class="alignleft gh-actions">
-            <a class="button action " href="<?php echo  WPGH()->menu->tools->exporter->get_start_url( $this->query ); //todo  ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
+            <a class="button action " href="<?php //echo  WPGH()->menu->tools->exporter->get_start_url( $this->query ); //todo uncomment  ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
         </div>
 <!--        -->
 <!--        <div class="alignleft gh-actions">-->

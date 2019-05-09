@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
+use Groundhogg\Preferences;
 
 /**
  * Edit a contact record via the Admin
@@ -16,13 +17,13 @@ use Groundhogg\Contact;
  * The api to add settings sections is not complicated, but as a result you will be responsible for your own CSS & HTML
  * Your best option would be to do something like this...
  *
- * add_action( 'wpgh_contact_edit_before_history', 'my_settings_section' ); ( $id )
+ * add_action( 'contact_edit_before_history', 'my_settings_section' ); ( $id )
  *
  * This will add your section right above the funnel events history section.
  *
  * To save your custom information you will need to hook into the save method which you do by...
  *
- * add_action( 'wpgh_admin_update_contact_after', 'my_save_function' ); ($id)
+ * add_action( 'admin_update_contact_after', 'my_save_function' ); ($id)
  *
  * And accessing the $_POST directly.
  *
@@ -46,11 +47,11 @@ if ( ! $contact->exists() ) {
     wp_die( _x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );
 }
 
-include_once "class-wpgh-contact-activity-table.php";
-include_once "class-wpgh-contact-events-table.php";
+//include_once "class-wpgh-contact-activity-table.php";
+//include_once "class-wpgh-contact-events-table.php";
 
 /* Quit if */
-if ( in_array( 'sales_manager', wpgh_get_current_user_roles() ) ){
+if ( current_user_can( 'sales_manager' ) ){
     if ( $contact->get_owner_id() !== get_current_user_id() ){
 
         wp_die( _x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
@@ -72,8 +73,8 @@ $tabs = array(
 	'actions'       => _x( 'Actions', 'contact_record_tab', 'groundhogg' ),
 	'activity'      => _x( 'Activity', 'contact_record_tab', 'groundhogg' ),
 );
-$tabs = apply_filters( 'wpgh_contact_record_tabs', $tabs );
-$tabs = apply_filters( 'groundhogg/contact/record/tabs', $tabs );
+
+$tabs = apply_filters( 'groundhogg/admin/contact/record/tabs', $tabs );
 
 $cookie_tab = isset( $_COOKIE[ 'gh_contact_tab' ] ) ? str_replace( 'tab_', '', sanitize_key( $_COOKIE[ 'gh_contact_tab' ] ) ): 'general';
 $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ] ) ? sanitize_key( $_POST[ 'active_tab' ] ) : $cookie_tab;
@@ -110,14 +111,14 @@ $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ]
 
 <?php
 
-add_action( 'wpgh_contact_record_tab_general', 'wpgh_contact_record_general_info' );
+add_action( 'groundhogg/admin/contact/record/tab/general', '\Groundhogg\Admin\Contacts\contact_record_general_info' );
 
 /**
  * Contact Info
  *
  * @param $contact Contact
  */
-function wpgh_contact_record_general_info( $contact )
+function contact_record_general_info( $contact )
 {
     ?>
     <!-- GENERAL NAME INFO -->
@@ -143,15 +144,15 @@ function wpgh_contact_record_general_info( $contact )
             <td><?php $args = array(
                     'id' => 'last_name',
                     'name' => 'last_name',
-                    'value' => $contact->last_name,
+                    'value' => $contact->get_last_name(),
                 );
                 echo Plugin::$instance->utils->html->input($args); ?></td>
         </tr>
-        <?php if (isset($contact->user->user_login)):  //todo check ?>
+        <?php if ( $contact->get_userdata() ):  //todo check ?>
 
             <tr>
                 <th><label for="username"><?php _e('Username') ?></label></th>
-                <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->user->ID), $contact->user->user_login);  //todo check?>
+                <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->get_userdata()->ID), $contact->get_userdata()->user_login);  //todo check?>
                 <span class="row-actions">
                     <?php submit_button( _x( 'Unlink', 'action', 'groundhogg'), 'secondary', 'unlink_user', false ); ?>
                 </span>
@@ -159,13 +160,13 @@ function wpgh_contact_record_general_info( $contact )
             </tr>
 
         <?php endif; ?>
-        <?php do_action('wpgh_contact_edit_name', $contact->get_id() ); ?>
+        <?php do_action('contact_edit_name', $contact->get_id() ); ?>
         </tbody>
     </table>
 
-    <?php do_action( 'groundhogg/contact/record/name/after', $contact ); ?>
+    <?php do_action( 'groundhogg/admin/contact/record/name/after', $contact ); ?>
 
-    <?php if (!$contact->user): ?>
+    <?php if (!$contact->get_userdata()): ?>
 
     <h2><?php _e('Create User Account'); ?></h2>
     <table class="form-table">
@@ -186,7 +187,7 @@ function wpgh_contact_record_general_info( $contact )
 
     </table>
 
-    <?php do_action( 'groundhogg/contact/record/user/after', $contact ); ?>
+    <?php do_action( 'groundhogg/admin/contact/record/user/after', $contact ); ?>
 
 <?php endif; ?>
 
@@ -205,13 +206,13 @@ function wpgh_contact_record_general_info( $contact )
                 echo Plugin::$instance->utils->html->input($args); ?>
                 <span class="row-actions"><a style="text-decoration: none" target="_blank"
                                                     href="<?php echo esc_url(substr($contact->get_email(), strpos($contact->get_email(), '@'))); ?>"><span class="dashicons dashicons-external"></span></a></span>
-                    <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' . wpgh_get_optin_status_text($contact->get_id());  //todo ?></p>
-                <?php if ($contact->get_optin_status() !== WPGH_UNSUBSCRIBED): ?>
+                    <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' .  Plugin::$instance->preferences->get_optin_status_text($contact->get_id());  //todo ?></p>
+                <?php if ($contact->get_optin_status() !== Preferences::UNSUBSCRIBED): ?>
                     <div id="manual-unsubscribe" style="margin-bottom: 10px;">
                         <label><input type="checkbox" name="unsubscribe" value="1"><?php _ex( 'Mark as unsubscribed.', 'contact_record', 'groundhogg' ); ?></label>
                 </div>
                 <?php endif; ?>
-                <?php if ($contact->get_optin_status() !== WPGH_CONFIRMED): ?>
+                <?php if ($contact->get_optin_status() !== Preferences::CONFIRMED): ?>
                 <div id="manual-confirmation">
                     <label><input type="checkbox" name="manual_confirm" id="manual-confirm" value="1"><?php _ex( 'Manually confirm this email address.', 'contact_record', 'groundhogg' ); ?></label>
                     <div id="confirmation-reason" class="hidden">
@@ -245,7 +246,7 @@ function wpgh_contact_record_general_info( $contact )
                 );
                 echo Plugin::$instance->utils->html->input($args); ?></td>
         </tr>
-        <?php do_action('wpgh_contact_edit_contact_info', $contact->get_id() ); ?>
+        <?php do_action('contact_edit_contact_info', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -351,7 +352,7 @@ function wpgh_contact_record_general_info( $contact )
                         'id' => 'country',
                         'name' => 'country',
                         'selected' => $contact->get_meta('country'),
-                        'data' => wpgh_get_countries_list(),  // todo
+                        'data' => Plugin::$instance->utils->location->get_countries_list(),  // todo
                         'placeholder' => _x( 'Select a Country', 'contact_record', 'groundhogg' ),
                     );
                     echo Plugin::$instance->utils->html->select2($args); ?>
@@ -380,13 +381,13 @@ function wpgh_contact_record_general_info( $contact )
                     <?php $args = array(
                     'id' => 'time_zone',
                     'name' => 'time_zone',
-                    'data' => wpgh_get_time_zones(), //todo
+                    'data' => Plugin::$instance->utils->location->get_time_zones(), //todo
                     'selected' => $contact->get_meta('time_zone'),
                 );
                     echo Plugin::$instance->utils->html->select2($args); ?></div>
             </td>
         </tr>
-        <?php do_action('wpgh_contact_edit_address', $contact->get_id() ); ?>
+        <?php do_action('contact_edit_address', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -398,7 +399,7 @@ function wpgh_contact_record_general_info( $contact )
             <th><?php _ex( 'Agreed To Terms', 'contact_record', 'groundhogg' ); ?></th>
             <td><?php echo (  $contact->get_meta( 'terms_agreement') === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ),  $contact->get_meta( 'terms_agreement_date' ) ): '&#x2014;'; ?></td>
         </tr>
-        <?php if ( wpgh_is_gdpr() ): ?>
+        <?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
             <tr>
                 <th><?php _e( 'GDPR Consent' ); ?></th>
                 <td><?php echo (  $contact->get_meta( 'gdpr_consent' ) === 'yes' ) ? sprintf( "%s: %s",  __( 'Agreed' ),  $contact->get_meta( 'gdpr_consent_date' ) ) : '&#x2014;'; ?></td>
@@ -410,12 +411,12 @@ function wpgh_contact_record_general_info( $contact )
     <?php
 }
 
-add_action( 'wpgh_contact_record_tab_segmentation', 'wpgh_contact_record_section_segmentation' );
+add_action( 'groundhogg/admin/contact/record/tab/segmentation', '\Groundhogg\Admin\Contacts\contact_record_section_segmentation' );
 
 /**
  * @param $contact Contact
  */
-function wpgh_contact_record_section_segmentation( $contact )
+function contact_record_section_segmentation( $contact )
 {
     ?>
 
@@ -475,18 +476,18 @@ function wpgh_contact_record_section_segmentation( $contact )
                 </div>
             </td>
         </tr>
-        <?php do_action( 'wpgh_contact_edit_tags', $contact->get_id() ); ?>
+        <?php do_action( 'contact_edit_tags', $contact->get_id() ); ?>
         </tbody>
     </table>
 <?php
 }
 
-add_action( 'wpgh_contact_record_tab_notes', 'wpgh_contact_record_section_notes' );
+add_action( 'contact_record_tab_notes', 'contact_record_section_notes' );
 
 /**
  * @param $contact Contact
  */
-function wpgh_contact_record_section_notes( $contact )
+function contact_record_section_notes( $contact )
 {
     ?>
     <!-- NOTES -->
@@ -521,18 +522,18 @@ function wpgh_contact_record_section_notes( $contact )
                 echo Plugin::$instance->utils->html->textarea( $args ); ?>
             </td>
         </tr>
-        <?php do_action( 'wpgh_contact_edit_notes', $contact->get_id() ); ?>
+        <?php do_action( 'contact_edit_notes', $contact->get_id() ); ?>
         </tbody>
     </table>
     <?php
 }
 
-add_action( 'wpgh_contact_record_tab_actions', 'wpgh_contact_record_section_actions' );
+add_action( 'contact_record_tab_actions', 'contact_record_section_actions' );
 
 /**
  * @param $contact contact
  */
-function wpgh_contact_record_section_actions( $contact )
+function contact_record_section_actions( $contact )
 {
     ?>
     <!-- ACTIONS -->
@@ -611,7 +612,7 @@ function wpgh_contact_record_section_actions( $contact )
                     $default = 0;
                     foreach ( $forms as $form ){
                         if ( ! $default ){$default = $form->ID;}
-                        $step = wpgh_get_funnel_step( $form->ID ); //todo
+                        $step = get_funnel_step( $form->ID ); //todo
                         if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
                     }
 
@@ -636,12 +637,12 @@ function wpgh_contact_record_section_actions( $contact )
     <?php
 }
 
-add_action( 'wpgh_contact_record_tab_files', 'wpgh_contact_record_section_files' );
+add_action( 'contact_record_tab_files', 'contact_record_section_files' );
 
 /**
  * @param $contact Contact
  */
-function wpgh_contact_record_section_files( $contact )
+function contact_record_section_files( $contact )
 {
     ?>
     <!-- BEGIN FILES -->
@@ -719,14 +720,14 @@ function wpgh_contact_record_section_files( $contact )
     <?php
 }
 
-add_action( 'wpgh_contact_record_tab_meta_data', 'wpgh_contact_record_section_custom_meta' );
+add_action( 'contact_record_tab_meta_data', 'contact_record_section_custom_meta' );
 
 /**
  * @param $contact Contact
  */
-function wpgh_contact_record_section_custom_meta( $contact ){
+function contact_record_section_custom_meta( $contact ){
     ?>
-    <?php do_action( 'wpgh_contact_edit_before_meta', $contact->get_id() ); ?>
+    <?php do_action( 'contact_edit_before_meta', $contact->get_id() ); ?>
     <!-- META -->
     <h2><?php _ex( 'Custom Meta', 'contact_record', 'groundhogg' ); ?></h2>
     <table id='meta-table' class="form-table" >
@@ -743,7 +744,7 @@ function wpgh_contact_record_section_custom_meta( $contact ){
         <?php
 
         //this meta data will not be shown in the meta data section.
-        $meta_exclude_list = apply_filters( 'wpgh_exclude_meta_list', array(
+        $meta_exclude_list = apply_filters( 'exclude_meta_list', array(
             'lead_source',
             'source_page',
             'page_source',
@@ -815,23 +816,23 @@ function wpgh_contact_record_section_custom_meta( $contact ){
                 </tr>
             <?php endif;
         endforeach; ?>
-        <?php do_action( 'wpgh_contact_edit_meta', $contact->get_id() ); ?>
+        <?php do_action( 'contact_edit_meta', $contact->get_id() ); ?>
         </tbody>
     </table>
 
     <?php
 }
 
-add_action( 'wpgh_contact_record_tab_activity', 'wpgh_contact_record_section_activity' );
+add_action( 'contact_record_tab_activity', 'contact_record_section_activity' );
 
 
 /**
  * @param $contact Contact
  */
-function wpgh_contact_record_section_activity( $contact )
+function contact_record_section_activity( $contact )
 {
     ?>
-    <?php do_action('wpgh_contact_edit_before_history', $contact->get_id() ); ?>
+    <?php do_action('contact_edit_before_history', $contact->get_id() ); ?>
     <!-- UPCOMING EVENTS -->
     <div style="max-width: 800px">
         <h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
@@ -864,15 +865,13 @@ function wpgh_contact_record_section_activity( $contact )
 foreach ( $tabs as $tab => $tab_name ):
 
     ?><div class="tab-content-wrapper <?php if ( $tab !== $active_tab ){ echo 'hidden'; }; ?>" id="<?php echo 'tab_' . esc_attr( $tab ) . '_content'; ?>">
-    <?php do_action('wpgh_contact_record_tab_' . $tab, $contact); ?>
-    <?php do_action("groundhogg/contact/record/tab/{$tab}", $contact); ?>
+    <?php do_action("groundhogg/admin/contact/record/tab/{$tab}", $contact); ?>
     </div><?php
 
 endforeach;
 
     ?>
     <!-- THE END -->
-    <?php do_action( 'wpgh_contact_edit_after', $id ); ?>
     <div class="edit-contact-actions">
         <p class="submit">
             <?php submit_button(_x( 'Update Contact', 'action', 'groundhogg' ), 'primary', 'update', false ); ?>
