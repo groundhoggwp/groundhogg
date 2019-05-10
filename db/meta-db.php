@@ -73,7 +73,7 @@ abstract class Meta_DB extends DB {
      */
     public function register_table() {
         global $wpdb;
-        $wpdb->objectmeta = $this->get_table_name();
+        $wpdb->__set( $this->get_object_type() . 'meta', $this->get_table_name() );
         $wpdb->tables[] = $this->get_db_suffix();
     }
 
@@ -104,9 +104,14 @@ abstract class Meta_DB extends DB {
      */
     public function get_meta( $object_id = 0, $meta_key = '', $single = false ) {
         $object_id = $this->sanitize_id( $object_id );
+
+//        var_dump( $object_id );
+
         if ( false === $object_id ) {
             return false;
         }
+
+//        var_dump( $this->get_object_type() );
 
         return get_metadata( $this->get_object_type(), $object_id, $meta_key, $single );
     }

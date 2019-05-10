@@ -20,11 +20,11 @@ abstract class Supports_Errors
      * @param string $message
      * @param array $data
      */
-    public function add_error( $code = '', $message = '', $data = [] )
+    public function add_error($code = '', $message = '', $data = [])
     {
-        $error = is_wp_error( $code ) ? $code : new \WP_Error( $code, $message, $data );
+        $error = is_wp_error($code) ? $code : new \WP_Error($code, $message, $data);
 
-        if ( is_wp_error( $error ) ){
+        if (is_wp_error($error)) {
             $this->errors[] = $error;
         }
     }
@@ -34,7 +34,7 @@ abstract class Supports_Errors
      */
     public function has_errors()
     {
-        return ! empty( $this->errors );
+        return !empty($this->errors);
     }
 
     /**
@@ -42,6 +42,14 @@ abstract class Supports_Errors
      */
     public function get_last_error()
     {
-        return $this->errors[ count( $this->errors ) - 1 ];
+        return $this->errors[count($this->errors) - 1];
+    }
+
+    /**
+     * @return \WP_Error[]
+     */
+    public function get_errors()
+    {
+        return $this->errors;
     }
 }

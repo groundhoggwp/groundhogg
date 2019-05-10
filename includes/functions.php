@@ -175,6 +175,36 @@ function enqueue_groundhogg_modal()
 }
 
 /**
+ * Convert array to HTML tag attributes
+ *
+ * @param $atts
+ * @return string
+ */
+function array_to_atts( $atts )
+{
+    $tag = '';
+    foreach ($atts as $key => $value) {
+        $tag .= sanitize_key( $key ) . '="' . esc_attr( $value ) . '" ';
+    }
+    return $tag;
+}
+
+/**
+ * Convert array to CSS style attributes
+ *
+ * @param $atts
+ * @return string
+ */
+function array_to_css( $atts )
+{
+    $css = '';
+    foreach ($atts as $key => $value) {
+        $css .= sanitize_key( $key ) . ':' . esc_attr( $value ) . ';';
+    }
+    return $css;
+}
+
+/**
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *

@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\Form\FormV2;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -22,7 +24,7 @@ class Shortcodes
 
     public function register_shortcodes()
     {
-        add_filter( 'no_texturize_shortcodes', 'no_texturize_form' );
+        add_filter( 'no_texturize_shortcodes', [ $this, 'no_texturize_form' ] );
 
         add_shortcode( 'gh_form', [ $this, 'custom_form_shortcode' ] );
         add_shortcode( 'gh_replacements', [ $this, 'merge_replacements_shortcode' ] );
@@ -48,7 +50,7 @@ class Shortcodes
      */
     public function custom_form_shortcode( $atts )
     {
-        $form = new WPGH_Form( $atts );
+        $form = new FormV2( $atts );
 
         return sprintf( "%s", $form );
     }

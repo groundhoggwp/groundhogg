@@ -34,7 +34,7 @@ class Steps extends DB  {
      */
     public function get_db_suffix()
     {
-        return 'gh_events';
+        return 'gh_steps';
     }
 
     /**

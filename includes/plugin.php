@@ -4,6 +4,7 @@ namespace Groundhogg;
 use Groundhogg\Api\Api_Loader;
 use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
+use Groundhogg\Form\Submission_Handler_V2;
 
 if ( ! defined( 'ABSPATH' ) ) {exit;}
 
@@ -125,16 +126,25 @@ class Plugin {
      */
     public $tag_mapping;
 
-    
     /**
-     * @var Log_Manager
+     * @var Submission_Handler_V2
      */
-    public $logger;
+    public $submission_handler;
 
     /**
-     * @var Core\Upgrade\Manager
+     * @var Shortcodes
      */
-    public $upgrade;
+    public $shortcodes;
+    
+//    /**
+//     * @var Log_Manager
+//     */
+//    public $logger;
+//
+//    /**
+//     * @var Core\Upgrade\Manager
+//     */
+//    public $upgrade;
 
     /**
      * Clone.
@@ -241,6 +251,8 @@ class Plugin {
      */
     private function init_components() {
 
+//        var_dump( 'init' );
+
         // Settings & DBS needs to go first...
         $this->settings     = new Settings();
         $this->roles        = new Main_Roles();
@@ -268,6 +280,10 @@ class Plugin {
         $this->updater      = new Main_Updater();
 
         $this->api = new Api_Loader();
+
+        // TODO
+        $this->shortcodes = new Shortcodes();
+        $this->submission_handler = new Submission_Handler_V2();
     }
 
     /**

@@ -11,61 +11,80 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-$body = apply_filters( 'groundhogg/email_template/body_css', "
-	background-color: #FFFFFF; 
-	font-family: sans-serif; 
-	-webkit-font-smoothing: antialiased; 
-	font-size: 14px; 
-	line-height: 1.4; 
-	margin: 0; 
-	padding: 0; 
-	-ms-text-size-adjust: 100%; 
-	-webkit-text-size-adjust: 100%;" );
+$body = [
+    "background-color"          => "#FFFFFF",
+	'font-family'               => 'sans-serif',
+	'-webkit-font-smoothing'    => 'antialiased',
+	'font-size'                 => '14px',
+	'line-height'               => '1.4',
+	'margin'                    => '0',
+	'padding'                   => '0',
+	'-ms-text-size-adjust'      => '100%',
+	'-webkit-text-size-adjust'  => '100%'
+];
 
-$wrapper = apply_filters( 'groundhogg/email_template/wrapper_css', "
-	border-collapse: separate; 
-	mso-table-lspace: 0pt; 
-	mso-table-rspace: 0pt; 
-	width: 100%; 
-	background-color: #FFFFFF;" );
+$body = apply_filters( 'groundhogg/email_template/body_css', $body );
+$body = \Groundhogg\array_to_css( $body );
 
-$template_container = apply_filters( 'groundhogg/email_template/container_css', "
-	font-family: sans-serif; 
-	font-size: 14px; 
-	vertical-align: top; 
-	display: block; 
-	width: 100%;
-	max-width: 580px; 
-	padding: 0px; " );
+$wrapper = apply_filters( 'groundhogg/email_template/wrapper_css', [
+	'border-collapse' => 'separate',
+	'mso-table-lspace' => '0pt',
+	'mso-table-rspace' => '0pt',
+	'width' => '100%',
+	'background-color' => '#FFFFFF'
+] );
+
+$wrapper = \Groundhogg\array_to_css( $wrapper );
+
+$template_container = apply_filters( 'groundhogg/email_template/container_css', [
+	'font-family' => 'sans-serif',
+	'font-size' => '14px',
+	'vertical-align' => 'top',
+	'display' => 'block',
+	'width' => '100%',
+	'max-width' => '580px',
+	'padding' => '0px',
+] );
+
+$template_container = \Groundhogg\array_to_css( $template_container );
 
 $email_width = apply_filters( 'groundhogg/email_template/width', 580 );
 
 $alignment = apply_filters( 'groundhogg/email_template/alignment', 'center' );
 
-$template_content = apply_filters( 'groundhogg/email_template/content_css', "
-    box-sizing: border-box; 
-    display: block; 
-    Margin: 0 auto;
-    width:100%;
-    max-width: 580px; 
-    padding: 5px;" );
+$template_content = apply_filters( 'groundhogg/email_template/content_css', [
+    'box-sizing' => 'border-box',
+    'display' => 'block',
+    'Margin' => '0 auto',
+    'width' => '100%',
+    'max-width' => '580px',
+   ' padding' => '5px',
+] );
 
-$preheader = apply_filters( 'groundhogg/email_template/preheader_css', "
-    color: transparent; 
-    display: none; 
-    height: 0; 
-    max-height: 0; 
-    max-width: 0; 
-    opacity: 0; 
-    overflow: hidden; 
-    mso-hide: all; 
-    visibility: hidden; 
-    width: 0;" );
+$template_content = \Groundhogg\array_to_css( $template_content );
 
-$apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', "
-    color: #999999; 
-    font-size: 13px; 
-    text-align: center;");
+$preheader = apply_filters( 'groundhogg/email_template/preheader_css', [
+    'color' => 'transparent',
+    'display' => 'none',
+    'height' => '0',
+    'max-height' => '0',
+    'max-width' => '0',
+    'opacity' => '0',
+    'overflow' => 'hidden',
+    'mso-hide' => 'all',
+    'visibility' => 'hidden',
+    'width' => '0',
+] );
+
+$preheader = \Groundhogg\array_to_css( $preheader );
+
+$apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', [
+    'color' => '#999999',
+    'font-size' => '13px',
+    'text-align' => 'center',
+]);
+
+$apple_link = \Groundhogg\array_to_css( $apple_link );
 
 $email_title = get_bloginfo( 'name', 'display' );
 

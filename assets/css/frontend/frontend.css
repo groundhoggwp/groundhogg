@@ -65,6 +65,21 @@ ul.gh-form-errors{
     /*padding-right: 0;*/
 /*}*/
 
+.gh-form-edit-link {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    transition: 0.4s;
+}
+
+.gh-form-wrapper:hover .gh-form-edit-link {
+    visibility: visible;
+    background: #FFFFFF;
+    opacity: 1;
+    padding: 5px;
+    transition: 0.4s;
+}
+
 .gh-form-column:last-child{
     padding-right: 0;
 }

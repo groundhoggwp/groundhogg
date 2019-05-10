@@ -55,16 +55,6 @@ class Manager
     }
 
     /**
-     * Set the data to the given value
-     *
-     * @param $key string
-     * @return DB|Meta_DB|Tags
-     */
-    public function get_db( $key ){
-        return $this->$key;
-    }
-
-    /**
      * Install all DBS.
      */
     public function install_dbs()
@@ -100,6 +90,16 @@ class Manager
         }
 
         return $table_names;
+    }
+
+    /**
+     * Set the data to the given value
+     *
+     * @param $key string
+     * @return DB|Meta_DB|Tags
+     */
+    public function get_db( $key ){
+        return $this->$key;
     }
 
     /**

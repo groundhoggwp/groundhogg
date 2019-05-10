@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_request_var;
+use Groundhogg\Plugin;
 
 /**
  * Created by PhpStorm.
@@ -23,20 +24,45 @@ abstract class Field
     protected $atts;
 
     /**
+     * @var string
+     */
+    protected $content;
+
+    /**
      * @var Contact
      */
     protected $contact;
 
     /**
+     * @var int the ID of the form
+     */
+    protected $form_id;
+
+    /**
      * Field constructor.
      */
-    public function __construct()
+    public function __construct( $id = 0 )
     {
+        if ( ! $id ){
+            return;
+        }
+
+        // Set the ID of the associated form
+        $this->form_id = $id;
+
         add_shortcode( $this->get_shortcode_name(), [ $this, 'shortcode' ] );
 
         if ( $this->should_auto_populate() ){
             $this->contact = get_contactdata( absint( get_request_var( 'contact' ) ) );
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function get_form_id()
+    {
+        return absint( $this->form_id );
     }
 
     /**
@@ -58,7 +84,7 @@ abstract class Field
      */
     public function should_auto_populate()
     {
-        return is_admin() && current_user_can( 'edit_contacts' ) && key_exists( 'contact', $_GET );
+        return  ( is_admin() && current_user_can( 'edit_contacts' ) && key_exists( 'contact', $_GET ) );
     }
 
     /**
@@ -92,10 +118,14 @@ abstract class Field
      *
      * @return string
      */
-    final public function shortcode( $atts, $content = '' )
+    public function shortcode( $atts, $content = '' )
     {
+        $this->content = $content;
         $this->atts = shortcode_atts( $this->get_default_args(), $atts, $this->get_shortcode_name() );
-        return do_shortcode( $this->field_wrap( $this->render() ) );
+
+        $content = do_shortcode( $this->render() );
+
+        return apply_filters( 'groundhogg/form/fields/' . $this->get_shortcode_name(), $content );
     }
 
     /**

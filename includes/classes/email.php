@@ -299,15 +299,23 @@ class Email extends Base_Object_With_Meta
     /**
      * Add alignment CSS to the email content
      *
-     * @param $css string the email's current css
+     * @param $css array the email's current css
      *
-     * @return string
+     * @return array
      */
     public function get_alignment($css)
     {
         $alignment = $this->get_meta('alignment', true);
-        $margins = ($alignment === 'left') ? "margin-left:0;margin-right:auto;" : "margin-left:auto;margin-right:auto;";
-        return $css . $margins;
+
+        if ( $alignment === 'left' ){
+            $css[ 'margin-left' ] = '0';
+            $css[ 'margin-right' ] = 'auto';
+        } else {
+            $css[ 'margin-left' ] = 'auto';
+            $css[ 'margin-right' ] = 'auto';
+        }
+
+        return $css;
     }
 
     /**

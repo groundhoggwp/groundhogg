@@ -47,7 +47,7 @@ abstract class Base_Object_With_Meta extends Base_Object
         }
 
         // Get all the meta data.
-        $this->meta = $this->get_all_meta();
+        $this->get_all_meta();
 
         $this->post_setup();
 
@@ -111,6 +111,8 @@ abstract class Base_Object_With_Meta extends Base_Object
         }
 
         $meta = $this->get_meta_db()->get_meta( $this->get_id() );
+
+//        var_dump( $meta );
 
         if ( ! $meta ){
             return [];

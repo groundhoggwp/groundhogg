@@ -60,6 +60,7 @@ class Autoloader {
         'Main_Installer' => 'includes/main-installer.php',
         'Compliance'    => 'includes/compliance.php',
         'Contact_Query' => 'includes/contact-query.php',
+        'Shortcodes'    => 'includes/shortcodes.php',
         'Supports_Errors' => 'includes/supports-errors.php',
         'Sending_Service' => 'includes/sending-service.php',
         'Template_Loader' => 'includes/template-loader.php',
@@ -86,6 +87,16 @@ class Autoloader {
         'Bulk_Jobs\Bulk_Job' => 'includes/bulk-jobs/bulk-job.php',
         'Bulk_Jobs\Broadcast_Bulk_Job' => 'includes/bulk-jobs/broadcast-bulk-job.php',
         'Event_Process' => 'includes/interfaces/event-process.php',
+        // Form
+        'Form\FormV2'  => 'includes/form/formv2.php',
+        'Form\Fields\Field'     => 'includes/form/fields/field.php',
+        'Form\Fields\Column'    => 'includes/form/fields/column.php',
+        'Form\Fields\Row'       => 'includes/form/fields/row.php',
+        'Form\Fields\Input'     => 'includes/form/fields/input.php',
+        'Form\Fields\Text'      => 'includes/form/fields/text.php',
+        'Form\Fields\Textarea'  => 'includes/form/fields/textarea.php',
+        'Form\Fields\First'  => 'includes/form/fields/first.php',
+        'Form\Fields\Last'  => 'includes/form/fields/last.php',
     ];
 
     /**
@@ -139,7 +150,13 @@ class Autoloader {
 				)
 			);
 
-			$filename = GROUNDHOGG_PATH . $filename . '.php';
+			$is_filename = GROUNDHOGG_PATH . $filename . '.php';
+
+			if ( ! file_exists( $is_filename ) ){
+			    $filename = wp_normalize_path( GROUNDHOGG_PATH . 'includes/' . $filename . '.php' );
+            } else {
+			    $filename = $is_filename;
+            }
 		}
 
 		if ( is_readable( $filename ) ) {

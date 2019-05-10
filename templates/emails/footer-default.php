@@ -10,31 +10,35 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$footer = apply_filters( 'groundhogg/email_template/footer_css', "
-    clear: both; 
-    Margin-top: 10px; 
-    text-align: center; 
-    width: 100%;" );
+$footer = apply_filters( 'groundhogg/email_template/footer_css', [
+    'clear' => 'both', 
+    'margin-top' => '10px', 
+    'text-align' => 'center', 
+    'width' => '100%',
+] );
 
-$footer_container = apply_filters( 'groundhogg/email_template/footer_container_css', "
-    border-collapse: separate;
-    mso-table-lspace: 0pt; 
-    mso-table-rspace: 0pt; 
-    width: 100%;" );
+$footer = \Groundhogg\array_to_css( $footer );
 
-$footer_css = apply_filters( 'groundhogg/email_template/footer_content_css', "
-    font-family: sans-serif; 
-    vertical-align: top; 
-    padding-bottom: 10px; 
-    padding-top: 10px; 
-    font-size: 13px; 
-    color: #999999; 
-    text-align: center;" );
+$footer_container = apply_filters( 'groundhogg/email_template/footer_container_css', [
+    'border-collapse' => 'separate',
+    'mso-table-lspace' => '0pt', 
+    'mso-table-rspace' => '0pt', 
+    'width' => '100%',
+] );
 
-$apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', "
-    color: #999999; 
-    font-size: 13px; 
-    text-align: center;" );
+$footer_container = \Groundhogg\array_to_css( $footer_container );
+
+$footer_css = apply_filters( 'groundhogg/email_template/footer_content_css', [
+    'font-family' => 'sans-serif', 
+    'vertical-align' => 'top',
+    'padding-bottom' => '10px',
+    'padding-top' => '10px',
+    'font-size' => '13px',
+    'color' => '#999999',
+    'text-align' => 'center'
+] );
+
+$footer_css = \Groundhogg\array_to_css( $footer_css );
 ?>
                                 <!-- START FOOTER -->
                                 <div class="footer" style="<?php echo $footer; ?>">

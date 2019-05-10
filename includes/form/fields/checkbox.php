@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
+use Groundhogg\Plugin;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -22,6 +24,7 @@ class Checkbox extends Input
             'title'         => '',
             'attributes'    => '',
             'required'      => false,
+            'callback'      => 'sanitize_textarea_field',
         ];
     }
 
@@ -35,22 +38,37 @@ class Checkbox extends Input
         return 'checkbox';
     }
 
+    public function is_checked()
+    {
+        $a = $this->should_auto_populate() && $this->get_value() === $this->get_data_from_contact( $this->get_name() );
+        $b = Plugin::$instance->submission_handler->has_errors() && Plugin::$instance->submission_handler->get_posted_data( $this->get_name() );
+
+        return $a || $b;
+    }
+
+    public function get_config()
+    {
+        return array_merge( [ 'tag_mapping' => [
+            md5( $this->get_value() ) => $this->get_att( 'tag' )
+        ] ], parent::get_config() );
+    }
+
     /**
      * @return string
      */
     public function render()
     {
         return sprintf(
-            '<label class="gh-input-label"><input type="checkbox" name="%2$s" id="%3$s" class="gh-input %4$s" value="%5$s" placeholder="%6$s" title="%7$s" %8$s %9$s> %1$s</label>',
-            $this->get_label(),
+            "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='gh-checkbox %s' value='%s' title='%s' %s %s %s> %s</label>",
             $this->get_name(),
             $this->get_id(),
             $this->get_classes(),
             $this->get_value(),
-            $this->get_placeholder(),
             $this->get_title(),
             $this->get_attributes(),
-            $this->is_required() ? 'required' : ''
+            $this->is_required() ? 'required' : '' ,
+            $this->is_checked() ? 'checked' : '' ,
+            $this->get_label()
         );
     }
 }
