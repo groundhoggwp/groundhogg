@@ -19,6 +19,11 @@ abstract class Field
 {
 
     /**
+     * @var Field
+     */
+    protected static $instance;
+
+    /**
      * @var array
      */
     protected $atts;

@@ -11,7 +11,6 @@ abstract class Input extends Field
 
     public function __construct(int $id = 0)
     {
-
         add_action( 'groundhogg/form/shortcode/after', [ self::class, 'save_config' ] );
 
         parent::__construct($id);
@@ -26,7 +25,7 @@ abstract class Input extends Field
     {
         $config = self::$configurations[ $form->get_id() ];
 
-        var_dump( $config );
+//        var_dump( $config );
 
         get_db( 'stepmeta' )->update_meta( $form->get_id(), 'config', $config );
     }
@@ -49,11 +48,6 @@ abstract class Input extends Field
             "required"      => false,
             'callback'      => 'sanitize_text_field',
         ];
-    }
-
-    public function get_callback()
-    {
-        return $this->get_att( 'callback', 'sanitize_text_field' );
     }
 
     /**
@@ -115,6 +109,18 @@ abstract class Input extends Field
     }
 
     /**
+     * Return the value that will be the final value.
+     *
+     * @param $input string|array
+     * @param $config array
+     * @return string
+     */
+    public static function validate( $input, $config )
+    {
+        return apply_filters( 'groundhogg/form/fields/input/validate' , sanitize_text_field( $input ) );
+    }
+
+    /**
      * @return string
      */
     public function get_classes()
@@ -171,8 +177,6 @@ abstract class Input extends Field
 
         $this->add_field_config();
 
-//        var_dump( self::$configurations );
-
         return apply_filters( 'groundhogg/form/fields/' . $this->get_shortcode_name(), $content );
     }
 
@@ -187,8 +191,9 @@ abstract class Input extends Field
             'name' => $this->get_name(),
             'required' => $this->is_required(),
             'label' => $this->get_label(),
-            'callback' => $this->get_callback(),
+            'callback' => wp_slash( [ get_class( $this ) , 'validate' ] ),
             'type' => $this->get_shortcode_name(),
+            'atts' => $this->atts,
         ];
     }
 

@@ -2,11 +2,12 @@
 
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use function Groundhogg\words_to_key;
 
-class Radio extends Select
+class Radio extends Dropdown
 {
 
     public function get_default_args()
@@ -60,7 +61,7 @@ class Radio extends Select
                 $value = $parts[0];
                 $tag = intval( $parts[1] );
 
-                $this->add_tag_mapping( $option, $tag );
+                $this->add_tag_mapping( $value, $tag );
             }
 
             if ( strpos( $option, '|' ) ){
@@ -74,6 +75,29 @@ class Radio extends Select
         return $return;
     }
 
+
+    /**
+     * Return the value that will be the final value.
+     *
+     * @param $input
+     * @param $config
+     * @return string
+     */
+    public static function validate( $input, $config )
+    {
+        $options = get_array_var( $config[ 'atts' ], 'options', '' );
+
+        // Match the input to the options string.
+        if ( strpos( $options, $input ) === false ){
+            return new \WP_Error( 'invalid_input', __( 'Please select a valid option.', 'groundhogg' ) );
+        }
+
+        return $input;
+    }
+
+    /**
+     * @return string
+     */
     public function render()
     {
         $options = $this->get_options();

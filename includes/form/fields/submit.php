@@ -31,6 +31,10 @@ class Submit extends Field
      */
     public function get_classes()
     {
+        if ( is_admin() ){
+            return 'button button-primary';
+        }
+
         return esc_attr( $this->get_att( "class" ) );
     }
 

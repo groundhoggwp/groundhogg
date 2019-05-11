@@ -6,7 +6,7 @@ use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use function Groundhogg\words_to_key;
 
-class Select extends Input
+class Dropdown extends Input
 {
 
     protected $tag_map = [];
@@ -62,6 +62,10 @@ class Select extends Input
             $this->get_options();
         }
 
+        if ( ! $option ){
+            return $this->tag_map;
+        }
+
         if ( isset_not_empty( $this->tag_map, md5( $option ) ) ){
             return $this->tag_map[ md5( $option ) ];
         }
@@ -98,7 +102,7 @@ class Select extends Input
                 $value = $parts[0];
                 $tag = intval( $parts[1] );
 
-                $this->add_tag_mapping( $option, $tag );
+                $this->add_tag_mapping( $value, $tag );
             }
 
             if ( strpos( $option, '|' ) ){
@@ -122,6 +126,30 @@ class Select extends Input
         return $this->get_att( 'default' );
     }
 
+    /**
+     * Return the value that will be the final value.
+     *
+     * @param $input
+     * @param $config
+     * @return string
+     */
+    public static function validate( $input, $config )
+    {
+        $options = $config[ 'atts' ][ 'options' ];
+
+        $input = is_array( $input ) ? $input : [ $input ];
+
+        foreach ( $input as $item ){
+
+            // Match the input to the options string.
+            if ( strpos( $options, $item ) === false ){
+                return new \WP_Error( 'invalid_input', __( 'Please select a valid dropdown option.', 'groundhogg' ) );
+            }
+        }
+
+        return implode( ', ', $input );
+    }
+
     public function render()
     {
 
@@ -131,8 +159,14 @@ class Select extends Input
 
         foreach ( $options as $i => $value ){
 
-            $selected = $this->get_default() === $value ? 'selected' : '';
-            $selected = $this->get_value() === $value ? 'selected' : $selected;
+            $selected = '';
+
+            if ( ! $this->is_multiple() && $this->get_value() ){
+                $selected = $this->get_default() === $value ? 'selected' : '';
+                $selected = $this->get_value() === $value ? 'selected' : $selected;
+            } else if ( is_array( $this->get_value() ) ) {
+                $selected = in_array( $value, $this->get_value() ) ? 'selected' : '';
+            }
 
             $optionHTML .= sprintf( '<option value="%1$s" %2$s>%3$s</option>', esc_attr( $value ), $selected, $value );
         }

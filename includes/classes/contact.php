@@ -46,25 +46,26 @@ class Contact extends Base_Object_With_Meta
 
     /**
      * Contact constructor.
-     * @param bool $_id_or_email
+     * @param bool|int|string|array $_id_or_email_or_args
      * @param bool $by_user_id
      */
-    public function __construct($_id_or_email = false, $by_user_id = false)
+    public function __construct($_id_or_email_or_args = false, $by_user_id = false)
     {
+        if ( ! is_array( $_id_or_email_or_args ) ){
+            if ( false === $_id_or_email_or_args || (is_numeric($_id_or_email_or_args) && (int)$_id_or_email_or_args !== absint($_id_or_email_or_args) ) ) {
+                return;
+            }
 
-        if (false === $_id_or_email || (is_numeric($_id_or_email) && (int)$_id_or_email !== absint($_id_or_email))) {
-            return;
+            $by_user_id = is_bool($by_user_id) ? $by_user_id : false;
+
+            if (is_numeric($_id_or_email_or_args)) {
+                $field = $by_user_id ? 'user_id' : 'ID';
+            } else {
+                $field = 'email';
+            }
         }
 
-        $by_user_id = is_bool($by_user_id) ? $by_user_id : false;
-
-        if (is_numeric($_id_or_email)) {
-            $field = $by_user_id ? 'user_id' : 'ID';
-        } else {
-            $field = 'email';
-        }
-
-        parent::__construct($_id_or_email, $field);
+        parent::__construct($_id_or_email_or_args, $field);
     }
 
     /**

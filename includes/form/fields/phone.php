@@ -18,7 +18,7 @@ class Phone extends Input
             'label'         => _x( 'Phone *', 'form_default', 'groundhogg' ),
             'name'          => 'primary_phone',
             'id'            => 'primary_phone',
-            'class'         => 'gh-tel',
+            'class'         => 'gh-tel gh-input',
             'value'         => '',
             'placeholder'   => '',
             'attributes'    => '',
@@ -34,5 +34,21 @@ class Phone extends Input
     public function get_shortcode_name()
     {
         return 'phone';
+    }
+
+    /**
+     * Return the value that will be the final value.
+     *
+     * @param $input
+     * @param $config
+     * @return string
+     */
+    public static function validate( $input, $config )
+    {
+        if ( ! preg_match( '/^[+]?[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/', $input ) ){
+            return new \WP_Error( 'invalid_phone_number', __( 'Please provide a valid number.', 'groundhogg' ) );
+        }
+
+        return apply_filters( 'groundhogg/form/fields/number/validate' , $input );
     }
 }

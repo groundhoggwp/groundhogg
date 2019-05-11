@@ -19,6 +19,7 @@ abstract class Supports_Errors
      * @param string|\WP_Error $code
      * @param string $message
      * @param array $data
+     * @return false always
      */
     public function add_error($code = '', $message = '', $data = [])
     {
@@ -27,6 +28,8 @@ abstract class Supports_Errors
         if (is_wp_error($error)) {
             $this->errors[] = $error;
         }
+
+        return false;
     }
 
     /**

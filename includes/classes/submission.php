@@ -54,11 +54,17 @@ class Submission extends Base_Object_With_Meta
         return 'submission';
     }
 
+    /**
+     * @return int
+     */
     public function get_step_id()
     {
         return absint( $this->step_id );
     }
 
+    /**
+     * @return int
+     */
     public function get_form_id()
     {
         return $this->get_step_id();
@@ -72,5 +78,22 @@ class Submission extends Base_Object_With_Meta
     public function get_contact()
     {
         return Plugin::$instance->utils->get_contact( $this->get_contact_id() );
+    }
+
+    /**
+     * Adds a bulk array of posted data from a submission.
+     *
+     * @param $array array
+     */
+    public function add_posted_data( $array )
+    {
+
+        $array = is_array( $array ) ? $array : [ $array ];
+
+        foreach ( $array as $item => $value ){
+
+            $this->add_meta( $item, $value );
+
+        }
     }
 }

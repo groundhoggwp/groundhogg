@@ -29,21 +29,29 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
     /**
      * Base_Object constructor.
-     * @param $identifier int|string the identifier to look for
+     * @param $identifier_or_args int|string the identifier to look for
      * @param $field string the file to query
      */
-    public function __construct( $identifier = 0, $field = null )
+    public function __construct( $identifier_or_args = 0, $field = null )
     {
         if ( ! $field ){
             $field = $this->get_identifier_key();
         }
 
-        $object = $this->get_from_db( $field, $identifier );
+        // Assume we are creating an object...
+        if ( is_array( $identifier_or_args ) ){
 
-        if ( ! $object || empty( $object ) )
-            return false;
+            $this->create( $identifier_or_args );
 
-        $this->setup_object( $object );
+        } else {
+
+            $object = $this->get_from_db( $field, $identifier_or_args );
+
+            if ( ! $object || empty( $object ) )
+                return false;
+
+            $this->setup_object( $object );
+        }
     }
 
     /**
@@ -245,11 +253,16 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
         $data = $this->sanitize_columns( $data );
 
-        do_action( "groundhogg/{$this->get_object_type()}/pre_create", $this->get_id(), $data, $this );
+        do_action( "groundhogg/{$this->get_object_type()}/pre_create", $data, $this );
 
         if ( $id = $this->get_db()->add( $data ) ) {
 
-            $object = $this->get_from_db( $this->get_identifier_key(), $this->get_id() );
+            $object = $this->get_from_db( $this->get_identifier_key(), $id );
+
+            if ( ! $object ){
+                return false;
+            }
+
             $this->setup_object( $object );
 
             do_action( "groundhogg/{$this->get_object_type()}/post_create", $this->get_id(), $data, $this );

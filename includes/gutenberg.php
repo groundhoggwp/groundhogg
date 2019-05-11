@@ -15,7 +15,7 @@ if ( function_exists( 'register_block_type' ) ){
     {
         wp_register_style(
             'groundhogg-form-styling-frontend',
-            plugins_url( '../assets/css/frontend.css', __FILE__ ),
+            plugins_url( '../assets/css/form.css', __FILE__ ),
             array( 'wp-edit-blocks' )
         );
 

@@ -51,7 +51,7 @@ ul.gh-form-errors{
     padding-right: 10px;
 }
 
-.gh-file-uploader{
+.gh-form-wrapper input[type=file].gh-file-uploader{
     width: 100%;
     margin: auto;
     padding: 30px;

@@ -1051,6 +1051,13 @@ function after_form_submit_handler( &$contact )
     }
 
     $contact->update_meta( 'last_optin', time() );
+
+    /**
+     * Helper function.
+     *
+     * @param $contact Contact
+     */
+    do_action( 'groundhogg/after_form_submit', $contact );
 }
 
 /**

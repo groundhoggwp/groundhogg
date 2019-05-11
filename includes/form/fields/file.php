@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
+use Groundhogg\Plugin;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -59,6 +61,15 @@ class File extends Input
     public function get_file_types()
     {
         return $this->get_att( 'file_types', $this->get_default_file_types() );
+    }
+
+    public function get_value()
+    {
+//        if ( Plugin::$instance->submission_handler->has_errors() ){
+//            return Plugin::$instance->submission_handler->get_posted_file( $this->get_name() );
+//        }
+
+        return esc_attr( $this->get_att( "value" ) );
     }
 
     public function render()

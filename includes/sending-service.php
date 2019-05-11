@@ -219,7 +219,7 @@ class Sending_Service
      */
     public function send_test_email()
     {
-        if ( ! wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'send_test_email' ) || ! current_user_can( 'send_email' ) ){
+        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'send_test_email' ) ){
             return;
         }
 

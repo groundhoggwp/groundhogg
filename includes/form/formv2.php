@@ -17,7 +17,7 @@ use Groundhogg\Form\Fields\Phone;
 use Groundhogg\Form\Fields\Radio;
 use Groundhogg\Form\Fields\Recaptcha;
 use Groundhogg\Form\Fields\Row;
-use Groundhogg\Form\Fields\Select;
+use Groundhogg\Form\Fields\Dropdown;
 use Groundhogg\Form\Fields\Submit;
 use Groundhogg\Form\Fields\Terms;
 use Groundhogg\Form\Fields\Text;
@@ -77,7 +77,7 @@ class FormV2 {
         $this->date = new Date($this->get_id());
         $this->time = new Time($this->get_id());
         $this->file = new File($this->get_id());
-        $this->select = new Select($this->get_id());
+        $this->select = new Dropdown($this->get_id());
         $this->radio = new Radio($this->get_id());
         $this->checkbox = new Checkbox($this->get_id());
         $this->terms = new Terms($this->get_id());
@@ -142,6 +142,9 @@ class FormV2 {
      */
     public function shortcode()
     {
+
+        wp_enqueue_style( 'groundhogg-form' );
+
         $form = '<div class="gh-form-wrapper">';
 
         /* Errors from a previous submission */

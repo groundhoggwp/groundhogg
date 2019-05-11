@@ -36,6 +36,19 @@ class Textarea extends Input
         return 'textarea';
     }
 
+
+    /**
+     * Return the value that will be the final value.
+     *
+     * @param $input
+     * @param $config
+     * @return string
+     */
+    public static function validate( $input, $config )
+    {
+        return apply_filters( 'groundhogg/form/fields/textarea/validate' , sanitize_textarea_field( $input ) );
+    }
+
     /**
      * Render the HTML
      *

@@ -125,7 +125,7 @@ class Settings_Page extends Admin_Page
      */
     private function get_default_tabs()
     {
-        return apply_filters( 'wpgh_settings_tabs', array(
+        return apply_filters( 'groundhogg/admin/settings/tabs', array(
             'general'      => array(
                 'id'    => 'general',
                 'title' => _x( 'General', 'settings_tabs', 'groundhogg' )
@@ -166,7 +166,7 @@ class Settings_Page extends Admin_Page
     {
 
 
-        return apply_filters( 'wpgh_settings_sections', array(
+        return apply_filters( 'groundhogg/admin/settings/sections', array(
             'business_info' => array(
                 'id'    => 'business_info',
                 'title' => _x( 'Business Settings', 'settings_sections', 'groundhogg' ),
@@ -187,16 +187,20 @@ class Settings_Page extends Admin_Page
                 'title' => _x( 'Captcha', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'misc'
             ),
+            'event_notices' => [
+                'id'    => 'event_notices',
+                'title' => _x( 'Event Notices', 'settings_sections', 'groundhogg' ),
+                'tab'   => 'misc'
+            ],
+            'event_queue' => [
+                'id'    => 'event_queue',
+                'title' => _x( 'Event Queue', 'settings_sections', 'groundhogg' ),
+                'tab'   => 'misc'
+            ],
             'compliance' => array(
                 'id'    => 'compliance',
                 'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'marketing'
-            ),
-            'bounces' => array(
-                'id'    => 'bounces',
-                'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
-                'tab'   => 'email',
-//                'callback' => array( WPGH()->bounce_checker, 'test_connection_ui' ), //todo
             ),
             'overrides' => [
                 'id'    => 'overrides',
@@ -207,7 +211,13 @@ class Settings_Page extends Admin_Page
                 'id'    => 'service',
                 'title' => _x( 'Groundhogg Sending Service (Email & SMS)', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email',
-//                'callback' => array( WPGH()->service_manager, 'test_connection_ui' ), //todo
+                'callback' => [ Plugin::$instance->sending_service, 'test_connection_ui' ], //todo
+            ),
+            'bounces' => array(
+                'id'    => 'bounces',
+                'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
+                'tab'   => 'email',
+                'callback' => [Plugin::$instance->bounce_checker, 'test_connection_ui' ], //todo
             ),
             'api_settings' => array(
                 'id'    => 'api_settings',
@@ -246,28 +256,7 @@ class Settings_Page extends Admin_Page
     private function get_default_settings()
     {
 
-        $pages = get_posts( array(
-            'numberposts'   => -1,
-            'category'      => 0,
-            'orderby'       => 'post_title',
-            'order'         => 'ASC',
-            'include'       => array(),
-            'exclude'       => array(),
-            'meta_key'      => '',
-            'meta_value'    => '',
-            'post_type'     => 'page',
-            'suppress_filters' => true
-        ) );
-
-        $pops = array();
-
-        if ( $pages ){
-            foreach ( $pages as $page ){
-                $pops[ $page->ID ] = $page->post_title;
-            }
-        }
-
-        return apply_filters( 'wpgh_settings_settings', array(
+        return apply_filters( 'groundhogg/admin/settings/settings', array(
             'gh_business_name' => array(
                 'id'        => 'gh_business_name',
                 'section'   => 'business_info',
@@ -395,7 +384,7 @@ class Settings_Page extends Admin_Page
             ),
             'gh_send_notifications_on_event_failure' => array(
                 'id'        => 'gh_send_notifications_on_event_failure',
-                'section'   => 'misc_info',
+                'section'   => 'event_notices',
                 'label'     => _x( 'Event Failure Notifications', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'This will let you know if something goes wrong in a funnel so you can fix it.', 'settings', 'groundhogg' ),
                 'type' => 'checkbox',
@@ -408,7 +397,7 @@ class Settings_Page extends Admin_Page
             ),
             'gh_event_failure_notification_email' => array(
                 'id'        => 'gh_event_failure_notification_email',
-                'section'   => 'misc_info',
+                'section'   => 'event_notices',
                 'label'     => _x( 'Event Failure Notification Email', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'The email which you would like to send failure notifications to.', 'settings', 'groundhogg' ),
                 'type'      => 'input',
@@ -421,7 +410,7 @@ class Settings_Page extends Admin_Page
             ),
             'gh_max_events' => array(
                 'id'        => 'gh_max_events',
-                'section'   => 'misc_info',
+                'section'   => 'event_queue',
                 'label'     => _x( 'Max Queued Events', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'The maximum number of events that can be run during a single process of the event queue. For larger lists you may want to set this at a lower number for performance reasons.', 'settings', 'groundhogg' ),
                 'type'      => 'number',
@@ -433,7 +422,7 @@ class Settings_Page extends Admin_Page
             ),
             'gh_queue_interval' => array(
                 'id'        => 'gh_queue_interval',
-                'section'   => 'misc_info',
+                'section'   => 'event_queue',
                 'label'     => _x( 'Queue Interval', 'settings', 'groundhogg' ),
                 'desc'      => _x( 'The time interval in between iterations of when the event queue is processed.', 'settings', 'groundhogg' ),
                 'type'      => 'dropdown',
@@ -465,11 +454,10 @@ class Settings_Page extends Admin_Page
                 'section'   => 'compliance',
                 'label'     => __( 'Privacy Policy' ),
                 'desc'      => _x( 'Link to your privacy policy.', 'settings', 'groundhogg' ),
-                'type'      => 'select2',
+                'type'      => 'link_picker',
                 'atts'      => array(
                     'name'  => 'gh_privacy_policy',
                     'id'    => 'gh_privacy_policy',
-                    'data'  => $pops,
                 ),
             ),
             'gh_terms' => array(
@@ -477,11 +465,10 @@ class Settings_Page extends Admin_Page
                 'section'   => 'compliance',
                 'label'     => _x( 'Terms & Conditions (Terms of Service)', 'settings', 'groundogg' ),
                 'desc'      => _x( 'Link to your terms & conditions.', 'settings', 'groundhogg' ),
-                'type'      => 'select2',
+                'type'      => 'link_picker',
                 'atts'      => array(
                     'name'  => 'gh_terms',
                     'id'    => 'gh_terms',
-                    'data'  => $pops,
                 ),
             ),
             'gh_strict_confirmation' => array(
@@ -536,20 +523,6 @@ class Settings_Page extends Admin_Page
                     //keep brackets for backwards compat
                     'name'          => 'gh_strict_gdpr[]',
                     'id'            => 'gh_strict_gdpr',
-                    'value'         => 'on',
-                ),
-            ),
-            'gh_enable_recaptcha' => array(
-                'id'        => 'gh_enable_recaptcha',
-                'section'   => 'captcha',
-                'label'     => _x( 'Enable Recaptcha on forms', 'settings', 'groundhogg' ),
-                'desc'      => _x( 'Add a google recaptcha to all your forms made with the [gh_form] shortcode', 'settings', 'groundhogg' ),
-                'type'      => 'checkbox',
-                'atts' => array(
-                    'label'         => __( 'Enable' ),
-                    //keep brackets for backwards compat
-                    'name'          => 'gh_enable_recaptcha[]',
-                    'id'            => 'gh_enable_recaptcha',
                     'value'         => 'on',
                 ),
             ),
@@ -823,7 +796,7 @@ class Settings_Page extends Admin_Page
     public function register_settings()
     {
 
-        do_action( 'wpgh_settings_pre_register_settings', $this );
+        do_action( 'groundhogg/admin/register_settings/before', $this );
 
         foreach( $this->settings as $id => $setting ){
 //            print_r($setting[ 'section' ]);
@@ -831,6 +804,8 @@ class Settings_Page extends Admin_Page
             $args = isset_not_empty( $setting, 'args' ) ? $setting[ 'args' ]: [];
             register_setting( 'gh_' . $this->sections[ $setting[ 'section' ] ][ 'tab' ], $setting['id'], $args );
         }
+
+        do_action( 'groundhogg/admin/register_settings/after', $this );
     }
 
     /**
@@ -942,10 +917,8 @@ class Settings_Page extends Admin_Page
             }
         </style>
         <div class="wrap">
-<!--            <h1>--><?php // printf( '%s %s' , WPGH()->brand(), __( 'Settings' ) ); //todo ?><!--</h1>-->
             <?php
             settings_errors();
-            //WPGH()->notices->notices();  todo don't need it !
             $action = $this->tab_has_settings( $this->active_tab() ) ? 'options.php' : ''; ?>
             <form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
 
@@ -963,13 +936,12 @@ class Settings_Page extends Admin_Page
 
                     settings_fields( 'gh_' . $this->active_tab() );
                     do_settings_sections( 'gh_' . $this->active_tab() );
-                    do_action( "groundhogg/settings/{$this->active_tab()}/after_settings" );
+                    do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_settings" );
                     submit_button();
 
                 }
 
-                do_action( 'gh_tab_' . $this->active_tab() );
-                do_action( "groundhogg/settings/{$this->active_tab()}/after_submit" );
+                do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_submit" );
                 ?>
                 <!-- END SETTINGS -->
             </form>
@@ -1004,8 +976,6 @@ class Settings_Page extends Admin_Page
 //        echo call_user_func( array( WPGH()->html, $field[ 'type' ] ), $field[ 'atts' ] ); todo
 
         echo call_user_func( array( Plugin::$instance->utils->html, $field[ 'type' ] ), $field[ 'atts' ] );
-
-
 
         if( isset( $field['desc'] ) && $desc = $field['desc'] ) {
             printf( '<p class="description">%s</p>', $desc );

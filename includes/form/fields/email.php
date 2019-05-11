@@ -35,4 +35,22 @@ class Email extends Input
     {
         return 'email';
     }
+
+    /**
+     * Return the value that will be the final value.
+     *
+     * @param $input
+     * @param $config
+     * @return string
+     */
+    public static function validate( $input, $config )
+    {
+        $input = sanitize_email( $input ) ;
+
+        if ( ! is_email( $input ) ){
+            return new \WP_Error( 'invalid_email', __( 'Please provide a valid email address.', 'groundhogg' ) );
+        }
+
+        return apply_filters( 'groundhogg/form/fields/email/validate', $input );
+    }
 }

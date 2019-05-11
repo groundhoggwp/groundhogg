@@ -21,10 +21,26 @@ class First extends Input
             'class'         => 'gh-first-name',
             'value'         => '',
             'placeholder'   => '',
-            'attributes'    => 'pattern="[A-Za-z \-\']+"',
+            'attributes'    => 'pattern="^[\w\pL\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$"',
             'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
             'required'      => false,
         ];
+    }
+
+    /**
+     * Return the value that will be the final value.
+     *
+     * @param $input
+     * @param $config
+     * @return string
+     */
+    public static function validate( $input, $config )
+    {
+        if ( ! preg_match( '/^[\w\pL\-,.][^0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$/', $input ) ){
+            return new \WP_Error( 'invalid_first_name', __( 'Please provide a valid first name.', 'groundhogg' ) );
+        }
+
+        return apply_filters( 'groundhogg/form/fields/first/validate' , sanitize_textarea_field( $input ) );
     }
 
     /**

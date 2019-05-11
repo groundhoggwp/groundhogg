@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Admin\Events;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use \WP_List_Table;
 use Groundhogg\Event;
@@ -33,10 +34,6 @@ if( ! class_exists( 'WP_List_Table' ) ) {
     require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-if ( ! class_exists( 'Events_Table' ) ){
-    require_once ( GROUNDHOGG_PATH . 'includes/admin/events/events-table.php' );
-}
-
 class Contact_Events_Table extends Events\Events_Table {
 
     /**
@@ -54,6 +51,7 @@ class Contact_Events_Table extends Events\Events_Table {
     public function __construct( $status='waiting' )
     {
         $this->status = $status;
+
         parent::__construct( array(
             'singular' => 'event',     // Singular name of the listed records.
             'plural'   => 'events',    // Plural name of the listed records.
@@ -129,7 +127,7 @@ class Contact_Events_Table extends Events\Events_Table {
         } else if ( $column_name === 'step' ){
             if ( $event->is_funnel_event() ){
                 $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->funnel_id, $event->get_step_id() ) ),
+                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->get_funnel_id(), $event->get_step_id() ) ),
                     esc_attr(_x('Edit Step', 'action', 'groundhogg')),
                     _x('Edit Step', 'action', 'groundhogg')
                 );
@@ -175,7 +173,7 @@ class Contact_Events_Table extends Events\Events_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $data =  Plugin::$instance->dbs->get_db('events')->query( [ 'contact_id' => intval( $_GET[ 'contact' ] ), 'status' => $this->status ] );
+        $data =  Plugin::$instance->dbs->get_db('events')->query( [ 'contact_id' => get_request_var( 'contact' ), 'status' => $this->status ] );
 
          /* Sort the data */
         usort( $data, array( $this, 'usort_reorder' ) );

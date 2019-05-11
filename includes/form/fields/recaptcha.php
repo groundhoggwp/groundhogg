@@ -1,7 +1,9 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
-class Recaptcha extends Field
+use Groundhogg\Plugin;
+
+class Recaptcha extends Input
 {
 
     /**
@@ -33,6 +35,15 @@ class Recaptcha extends Field
         return $this->get_att( 'size', $this->get_att( 'captcha-size' ) );
     }
 
+    public function get_name()
+    {
+        return 'g-recaptcha-response';
+    }
+
+    public function get_id()
+    {
+        return 'g-recaptcha-response';
+    }
 
     /**
      * Render the field in HTML
@@ -56,6 +67,29 @@ class Recaptcha extends Field
      */
     public function get_shortcode_name()
     {
-        return 'submit';
+        return 'recaptcha';
+    }
+
+    /**
+     * @param $input
+     * @param $config
+     * @return \WP_Error|true
+     */
+    public static function validate( $input, $config )
+    {
+        $file_name = sprintf(
+            "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
+            Plugin::$instance->settings->get_option( 'gh_recaptcha_secret_key' ),
+            $input
+        );
+
+        $verifyResponse = file_get_contents( $file_name );
+        $responseData = json_decode( $verifyResponse );
+
+        if( $responseData->success == false ){
+            return new \WP_Error( 'captcha_verification_failed', _x( 'Failed reCaptcha verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
+        }
+
+        return true;
     }
 }

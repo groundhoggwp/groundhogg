@@ -135,7 +135,8 @@ class Plugin {
      * @var Shortcodes
      */
     public $shortcodes;
-    
+    public $bounce_checker;
+
 //    /**
 //     * @var Log_Manager
 //     */
@@ -229,17 +230,6 @@ class Plugin {
     }
 
     /**
-     * @since 2.3.0
-     * @access public
-     */
-    public function on_rest_api_init() {
-        // On admin/frontend sometimes the rest API is initialized after the common is initialized.
-//        if ( ! $this->common ) {
-//            $this->init_common();
-//        }
-    }
-
-    /**
      * Init components.
      *
      * Initialize Groundhogg components. Register actions, run setting manager,
@@ -267,8 +257,9 @@ class Plugin {
         $this->rewrites     = new Rewrites();
         $this->replacements = new Replacements();
         $this->tag_mapping  = new Tag_Mapping();
+        $this->bounce_checker = new Bounce_Checker();
 
-//        $this->sending_service = new Sending_Service();
+        $this->sending_service = new Sending_Service();
 //        $this->event_queue  = new Event_Queue();
 
         if ( is_admin() ) {
@@ -295,7 +286,7 @@ class Plugin {
      * @access private
      */
     private function register_autoloader() {
-        require GROUNDHOGG_PATH . '/includes/autoloader.php';
+        require GROUNDHOGG_PATH . 'includes/autoloader.php';
 
         Autoloader::run();
     }

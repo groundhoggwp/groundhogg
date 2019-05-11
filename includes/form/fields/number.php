@@ -61,4 +61,20 @@ class Number extends Input
             $this->get_max(),
             $this->get_att( 'attributes' ) );
     }
+
+    /**
+     * Return the value that will be the final value.
+     * 
+     * @param $input
+     * @param $config
+     * @return string
+     */
+    public static function validate( $input, $config )
+    {
+        if ( ! preg_match( '/[0-9]+/', $input ) ){
+            return new \WP_Error( 'invalid_number', __( 'Please provide a valid number.', 'groundhogg' ) );
+        }
+
+        return apply_filters( 'groundhogg/form/fields/number/validate' , intval( $input ) );
+    }
 }

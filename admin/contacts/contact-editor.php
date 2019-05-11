@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 
+use function Groundhogg\get_array_var;
+use function Groundhogg\get_form_list;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
@@ -559,10 +561,8 @@ function contact_record_section_actions( $contact )
                     $args = array(
                         'id'    => 'sms_id',
                         'name'  => 'sms_id',
-                        'data'  =>  WPGH()->sms->get_sms_select() //todo
-
                     );
-                    echo Plugin::$instance->utils->html->select2( $args ); ?>
+                    echo Plugin::$instance->utils->html->dropdown_sms( $args ); ?>
                     <div class="row-actions">
                         <button type="submit" name="send_sms" value="send" class="button"><?php _e('Send'); ?></button>
                     </div>
@@ -581,8 +581,8 @@ function contact_record_section_actions( $contact )
                         $step =Plugin::$instance->utils->get_step( $step->ID);
                         if ( $step && $step->is_active()) {
 
-                            $funnel_name = Plugin::$instance->dbs->get_db('funnels')->get_column_by('title', 'ID', $step->funnel_id);
-                            $options[$funnel_name][$step->ID] = sprintf("%d. %s (%s)", $step->order, $step->title, str_replace('_', ' ', $step->type));
+                            $funnel_name = $step->get_funnel()->get_title();
+                            $options[$funnel_name][$step->ID] = sprintf("%d. %s (%s)", $step->get_order(), $step->get_title(), str_replace('_', ' ', $step->get_type()));
                         }
                     }
 
@@ -605,18 +605,11 @@ function contact_record_section_actions( $contact )
             <td>
                 <div style="max-width: 400px;">
 
-                    <?php $forms = WPGH()->steps->get_steps( array(
-                        'step_type' => 'form_fill'
-                    ) );
+                    <?php
 
-                    //todo
-                    $form_options = array();
-                    $default = 0;
-                    foreach ( $forms as $form ){
-                        if ( ! $default ){$default = $form->ID;}
-                        $step = Plugin::$instance->utils->get_step( $form->ID );  // todo get_funnel_step( $form->ID );
-                        if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
-                    }
+                    $form_options = get_form_list();
+
+                    $default = get_array_var( $form_options, 0 );
 
                     echo Plugin::$instance->utils->html->select2( [
                         'name'              => 'manual_form_submission',
@@ -867,7 +860,7 @@ endforeach;
     <!-- THE END -->
     <div class="edit-contact-actions">
         <p class="submit">
-            <?php submit_button(_x( 'Update Contact', 'action', 'groundhogg' ), 'primary', 'update', false ); ?>
+            <?php \submit_button(_x( 'Update Contact', 'action', 'groundhogg' ), 'primary', 'update', false ); ?>
             <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
         </p>
     </div>
