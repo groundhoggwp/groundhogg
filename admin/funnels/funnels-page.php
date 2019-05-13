@@ -1,9 +1,12 @@
 <?php
 namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
+use function Groundhogg\enqueue_groundhogg_modal;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Contact_Query;
 use Groundhogg\Step;
+
 
 
 // Exit if accessed directly
@@ -39,12 +42,6 @@ class Funnels_Page extends Admin_Page
      */
     public $reporting_enabled = false;
 
-    /**
-     * @var WPGH_Popup
-     */
-    public $popup;
-
-
     protected function add_ajax_actions()
     {
         add_action( 'wp_ajax_gh_get_templates', array( $this, 'get_funnel_templates_ajax' ) );
@@ -63,7 +60,7 @@ class Funnels_Page extends Admin_Page
         if ( $this->get_current_action() === 'edit' ){
             add_action( 'in_admin_header' , array( $this, 'prevent_notices' )  );
             /* just need to enqueue it... */
-            $this->popup = wpgh_enqueue_modal();
+            enqueue_groundhogg_modal();
         }
     }
 
@@ -91,8 +88,6 @@ class Funnels_Page extends Admin_Page
     public function get_priority(){
         return 30;
     }
-
-
 
     /**
      * enqueue editor scripts
@@ -170,6 +165,16 @@ class Funnels_Page extends Admin_Page
         return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'this_week' ;
     }
 
+    public function get_reporting_start_time()
+    {
+        return $this->reporting_start_time;
+    }
+
+    public function get_reporting_end_time()
+    {
+        return $this->reporting_start_time;
+    }
+
     private function setup_reporting(){
 
         if ( isset( $_POST[ 'reporting_on' ] ) ){
@@ -207,12 +212,12 @@ class Funnels_Page extends Admin_Page
                 $this->reporting_end_time     = $this->reporting_start_time + MONTH_IN_SECONDS;
                 break;
             case 'this_quarter';
-                $quarter            = wpgh_get_dates_of_quarter(); //todo
+                $quarter            = Plugin::$instance->utils->date_time->get_dates_of_quarter();
                 $this->reporting_start_time   = $quarter[ 'start' ];
                 $this->reporting_end_time     = $quarter[ 'end' ];
                 break;
             case 'last_quarter';
-                $quarter            = wpgh_get_dates_of_quarter( 'previous' ); //todo
+                $quarter            = Plugin::$instance->utils->date_time->get_dates_of_quarter( 'previous' );
                 $this->reporting_start_time   = $quarter[ 'start' ];
                 $this->reporting_end_time     = $quarter[ 'end' ];
                 break;
@@ -225,12 +230,11 @@ class Funnels_Page extends Admin_Page
                 $this->reporting_end_time     = $this->reporting_start_time + YEAR_IN_SECONDS;
                 break;
             case 'custom';
-                $this->reporting_start_time   = Plugin::$instance->utils->date_time->round_to_day( strtotime( $this->get_url_var( 'custom_date_range_start' ) ) );
-                $this->reporting_end_time     = Plugin::$instance->utils->date_time->round_to_day( strtotime( $this->get_url_var( 'custom_date_range_end' ) ) );
+                $this->reporting_start_time   = Plugin::$instance->utils->date_time->round_to_day( strtotime( get_request_var( 'custom_date_range_start' ) ) );
+                $this->reporting_end_time     = Plugin::$instance->utils->date_time->round_to_day( strtotime( get_request_var( 'custom_date_range_end' ) ) );
                 break;
             endswitch;
     }
-
 
     /**
      * Get the current screen title based on the action
@@ -249,7 +253,6 @@ class Funnels_Page extends Admin_Page
 				return _ex( 'Funnels', 'page_title', 'groundhogg' );
 		}
 	}
-
 
 	public function process_delete ()
     {
@@ -299,7 +302,8 @@ class Funnels_Page extends Admin_Page
         }
 
         foreach ( $this->get_items() as $id ){
-            $json = wpgh_convert_funnel_to_json( $id ); //todo
+            $json =  wpgh_convert_funnel_to_json( $id ); //todo
+
             $newId = $this->import_funnel( $json );
 
             $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $newId );
@@ -839,12 +843,7 @@ class Funnels_Page extends Admin_Page
 
 		$funnels_table->views(); ?>
         <form method="post" class="search-form wp-clearfix" >
-            <!-- search form -->
-            <p class="search-box">
-                <label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Funnels', 'groundhogg'); ?>:</label>
-                <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button" value="<?php _e( 'Search Funnels', 'groundhogg'); ?>">
-            </p>
+
 			<?php $funnels_table->prepare_items(); ?>
 			<?php $funnels_table->display(); ?>
         </form>

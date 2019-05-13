@@ -1,5 +1,8 @@
 <?php
-// TODO WHLOE PAGE
+namespace Groundhogg\Admin\Funnels;
+
+use Groundhogg\Admin\Funnels;
+
 
 /**
  * Add Funnel
@@ -33,7 +36,7 @@ do_action( 'wpgh_before_new_funnel' );
 <?php if ( 'templates' === $active_tab ): ?>
     <form method="post" id="poststuff" >
         <?php wp_nonce_field(); ?>
-        <?php include WPGH_PLUGIN_DIR . 'templates/funnel-templates.php'; ?>
+        <?php include GROUNDHOGG_PATH . 'templates/assets/funnel-templates.php'; ?>
         <?php foreach ( $funnel_templates as $id => $funnel_args ): ?>
             <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
                 <h2 class="hndle"><?php echo $funnel_args['title']; ?></h2>
@@ -72,7 +75,7 @@ do_action( 'wpgh_before_new_funnel' );
             <span class="spinner" style="float: none; visibility: visible"></span>
         </div>
         <div id="downloads">
-            <?php WPGH()->menu->funnels_page->display_funnel_templates(); ?>
+            <?php  display_funnel_templates();  ?>
         </div>
     </div>
 

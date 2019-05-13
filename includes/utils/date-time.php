@@ -1,5 +1,4 @@
 <?php
-
 namespace Groundhogg;
 
 /**
@@ -138,6 +137,7 @@ class Date_Time
         return $time;
     }
 
+
     /**
      * Get quarter $start & end dates...
      *
@@ -146,8 +146,7 @@ class Date_Time
      * @param string $quarter
      * @param null $year
      * @param null $format
-     * @return int[]
-     * @throws \Exception
+     * @return array
      */
     function get_dates_of_quarter($quarter = 'current', $year = null, $format = null)
     {

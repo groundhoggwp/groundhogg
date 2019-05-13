@@ -8,6 +8,8 @@ use Groundhogg\Import_Contacts;
 use Groundhogg\Sync_Contacts;
 use Groundhogg\Plugin;
 use \WP_Error;
+use function Groundhogg\isset_not_empty;
+use function set_transient;
 
 /**
  * Created by PhpStorm.
@@ -114,7 +116,7 @@ class Tools_Page extends Tabbed_Admin_Page
 
         if ( $this->get_current_tab() === 'export' ){
             $actions[] = [
-                'link'      => $this->exporter->get_start_url(), //todo
+//                'link'      => $this->exporter->get_start_url(), //todo enable
                 'action'    => __( 'Export All Contacts' ),
             ];
         }
@@ -166,12 +168,10 @@ class Tools_Page extends Tabbed_Admin_Page
                 <h2 class="hndle"><?php _e( 'Download System Info', 'groundhogg' ); ?></h2>
                 <div class="inside">
                     <p class="description"><?php _e( 'Download System Info when requesting support.', 'groundhogg' ); ?></p>
-
                     <textarea class="code" style="width: 100%;height:600px;" readonly="readonly" onclick="this.focus(); this.select()" id="system-info-textarea" name="wpgh-sysinfo"><?php echo wpgh_tools_sysinfo_get(); ?></textarea>
                     <p class="submit">
                         <a class="button button-primary" href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php _e( 'Download System Info', 'groundhogg' ); ?></a>
                     </p>
-
                 </div>
             </div>
         </div>
@@ -221,10 +221,10 @@ class Tools_Page extends Tabbed_Admin_Page
     public function import_view()
     {
         if ( ! class_exists( 'WPGH_Imports_Table' ) ){
-            require_once dirname(__FILE__) . '/class-wpgh-imports-table.php';
+            require_once dirname(__FILE__) . '/imports-table.php';
         }
 
-        $table = new WPGH_Imports_Table();  //todo ?>
+        $table = new Imports_Table(); ?>
         <form method="post" class="search-form wp-clearfix">
             <?php $table->prepare_items(); ?>
             <?php $table->display(); ?>
@@ -251,7 +251,7 @@ class Tools_Page extends Tabbed_Admin_Page
     /**
      * Process the import addition
      *
-     * @return int
+     * @return int|WP_Error
      */
     public function process_import_add()
     {
@@ -261,8 +261,7 @@ class Tools_Page extends Tabbed_Admin_Page
         }
 
         if ( empty( $_FILES[ 'import_file' ][ 'name' ] ) ){
-            $this->add_notice( new WP_Error( 'no_files', 'Please upload a file!' ) );
-            return self::SELF; //todo
+            return new WP_Error( 'no_files', 'Please upload a file!' ) ;
         }
 
         $_FILES[ 'import_file' ][ 'name' ] = md5( $_FILES[ 'import_file' ][ 'name' ] ) . '.csv';
@@ -270,8 +269,7 @@ class Tools_Page extends Tabbed_Admin_Page
         $result = $this->handle_file_upload( 'import_file' );
 
         if ( is_wp_error( $result ) ){
-            $this->add_notice( $result );
-            return self::SELF; //todo
+            return $result;
         }
 
         wp_redirect( $this->admin_url( [
@@ -363,16 +361,16 @@ class Tools_Page extends Tabbed_Admin_Page
 
         $tags = [ sprintf( '%s - %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s' ) ) ];
 
-        if ( isset_not_emtpy( $_POST, 'tags' ) ){ //todo
+        if ( isset_not_empty( $_POST, 'tags' ) ){
             $tags = array_merge( $tags, $_POST[ 'tags' ] );
         }
 
         $tags = Plugin::$instance->dbs->get_db('tags')->validate( $tags );
 
-        wpgh_set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS ); //todo
-        wpgh_set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );   //todo
+        set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS );
+        set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );
 
-        $this->importer->start( [ 'import' => $file_name ] ); //todo
+        $this->importer->start( [ 'import' => $file_name ] );
     }
 
     /**
@@ -388,7 +386,7 @@ class Tools_Page extends Tabbed_Admin_Page
         }
 
         $this->add_notice( 'file_removed', __( 'Imports deleted.', 'groundhogg' ) );
-        return self::PAGE;
+        return true;
     }
 
     ####### EXPORT TAB FUNCTIONS #########
@@ -423,7 +421,7 @@ class Tools_Page extends Tabbed_Admin_Page
         }
 
         $this->add_notice( 'file_removed', __( 'Exports deleted.', 'groundhogg' ) );
-        return self::PAGE;
+        return true;
     }
 
     ####### DELETE TAB FUNCTIONS #########
@@ -468,7 +466,7 @@ class Tools_Page extends Tabbed_Admin_Page
     public function delete_bulk_delete_tool()
     {
         $tags = Plugin::$instance->dbs->get_db('tags')->validate( $_POST[ 'tags' ] );
-        $this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] ); //todo
+        $this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] );
     }
 
     /**

@@ -162,7 +162,7 @@ if ( $active_tab === 'form' ): ?>
                 $default = 0;
                 foreach ( $forms as $form ){
                     if ( ! $default ){$default = $form->ID;}
-                    $step = Plugin::$instance->utils->get_step($form->ID);   //wpgh_get_funnel_step( $form->ID ); //todo not working
+                    $step = Plugin::$instance->utils->get_step($form->ID);
                     if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
                 }
 

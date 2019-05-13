@@ -1,6 +1,9 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\Bulk_Jobs\Bulk_Job;
+use \WP_User;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Sync_Contacts extends Bulk_Job

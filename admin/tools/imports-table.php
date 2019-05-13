@@ -25,7 +25,7 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 	require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class WPGH_Imports_Table extends WP_List_Table {
+class Imports_Table extends WP_List_Table {
 
 	/**
 	 * TT_Example_List_Table constructor.
@@ -144,7 +144,7 @@ class WPGH_Imports_Table extends WP_List_Table {
 	/**
 	 * Prepares the list of items for displaying.
 
-	 * @global wpdb $wpdb
+	 * @global $wpdb \wpdb
 	 * @uses $this->_column_headers
 	 * @uses $this->items
 	 * @uses $this->get_columns()

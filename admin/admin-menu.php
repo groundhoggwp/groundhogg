@@ -10,6 +10,7 @@ use Groundhogg\Admin\Settings\Settings_Page;
 use Groundhogg\Admin\SMS\SMS_Page;
 use Groundhogg\Admin\Superlinks\Superlinks_Page;
 use Groundhogg\Admin\Tags\Tags_Page;
+use Groundhogg\Admin\Tools\Tools_Page;
 use Groundhogg\Admin\Welcome\Welcome_Page;
 use function Groundhogg\isset_not_empty;
 
@@ -49,6 +50,8 @@ class Admin_Menu
         $this->events   = new Events_Page();
         $this->emails   = new Emails_Page();
         $this->settings = new Settings_Page();
+        $this->tools    = new Tools_Page();
+        $this->funnels  = new Funnels_Page();
 
         do_action( 'groundhogg/admin/init', $this );
     }

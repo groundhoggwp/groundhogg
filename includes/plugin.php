@@ -257,7 +257,7 @@ class Plugin {
         $this->rewrites     = new Rewrites();
         $this->replacements = new Replacements();
         $this->tag_mapping  = new Tag_Mapping();
-        $this->bounce_checker = new Bounce_Checker();
+//        $this->bounce_checker = new Bounce_Checker();
 
         $this->sending_service = new Sending_Service();
 //        $this->event_queue  = new Event_Queue();
@@ -273,8 +273,8 @@ class Plugin {
         $this->api = new Api_Loader();
 
         // TODO
-        $this->shortcodes = new Shortcodes();
-        $this->submission_handler = new Submission_Handler_V2();
+//        $this->shortcodes = new Shortcodes();
+//        $this->submission_handler = new Submission_Handler_V2();
     }
 
     /**

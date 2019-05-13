@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\Bulk_Jobs\Bulk_Job;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Bulk_Delete_Contacts extends Bulk_Job
@@ -27,7 +29,7 @@ class Bulk_Delete_Contacts extends Bulk_Job
             return $items;
         }
 
-        $query = new WPGH_Contact_Query();
+        $query = new Contact_Query();
         $args = $_GET;
 
         $contacts = $query->query( $args );
@@ -60,7 +62,7 @@ class Bulk_Delete_Contacts extends Bulk_Job
      */
     protected function process_item( $item )
     {
-        Plugin::instance()->dbs->contacts->delete( absint( $item ) );
+        Plugin::instance()->dbs->get_db('contacts')->delete( absint( $item ) );
     }
 
     /**

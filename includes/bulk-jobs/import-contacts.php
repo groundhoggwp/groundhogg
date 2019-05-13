@@ -1,6 +1,9 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\Bulk_Jobs\Bulk_Job;
+
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Import_Contacts extends Bulk_Job
@@ -31,7 +34,7 @@ class Import_Contacts extends Bulk_Job
         }
 
         $file_name = urldecode( $_GET[ 'import' ] );
-        $file_path = wp_normalize_path( wpgh_get_csv_imports_dir( $file_name ) );
+        $file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
 
         return get_items_from_csv( $file_path );
     }
@@ -61,7 +64,7 @@ class Import_Contacts extends Bulk_Job
      */
     protected function process_item( $item )
     {
-        $contact = wpgh_generate_contact_with_map( $item, $this->field_map );
+        $contact = \Groundhogg\generate_contact_with_map( $item, $this->field_map );
         if ( $contact ) {
             $contact->apply_tag( $this->import_tags );
         }
@@ -74,8 +77,8 @@ class Import_Contacts extends Bulk_Job
      */
     protected function pre_loop()
     {
-        $this->field_map    = wpgh_get_transient( 'gh_import_map' );
-        $this->import_tags  = wp_parse_id_list( wpgh_get_transient( 'gh_import_tags' ) );
+        $this->field_map    = Plugin::$instance->settings->get_transient( 'gh_import_map' );
+        $this->import_tags  = wp_parse_id_list( Plugin::$instance->settings->get_transient( 'gh_import_tags' ) );
     }
 
     /**
@@ -92,8 +95,8 @@ class Import_Contacts extends Bulk_Job
      */
     protected function clean_up()
     {
-        wpgh_delete_transient( 'gh_import_map' );
-        wpgh_delete_transient( 'gh_import_tags' );
+        Plugin::$instance->settings->delete_transient('gh_import_map' );
+        Plugin::$instance->settings->delete_transient( 'gh_import_tags' );
     }
 
     /**
@@ -106,7 +109,7 @@ class Import_Contacts extends Bulk_Job
         $url = admin_url( 'admin.php?page=gh_contacts' );
 
         // Return to guided setup if it's not yet complete.
-        if ( ! wpgh_get_option( 'gh_guided_setup_finished', false ) ){
+        if ( ! Plugin::$instance->settings->get_option('gh_guided_setup_finished', false ) ){
             $url = admin_url( 'admin.php?page=gh_guided_setup&step=5' );
         }
 

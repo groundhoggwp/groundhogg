@@ -1,9 +1,14 @@
 <?php
 namespace Groundhogg\Admin\Funnels;
 
+use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use \WP_List_Table;
 use Groundhogg\Contact_Query;
+use Groundhogg\Admin\Funnels\Funnels_Page;
+
+use function Groundhogg\get_request_var;
+
 
 /**
  * Emails Table Class
@@ -138,12 +143,12 @@ class Funnels_Table extends WP_List_Table {
                     'last_year'     => _x( 'Last Year', 'reporting_range', 'groundhogg' ),
                     'custom'        => _x( 'Custom Range', 'reporting_range', 'groundhogg' ),
                 ),
-                'selected' => WPGH()->menu->funnels_page->get_url_var( 'date_range', 'this_week' ), //todo
+                'selected' => get_request_var( 'date_range', 'this_week' ),
             ); echo Plugin::$instance->utils->html->dropdown( $args );
 
             submit_button( _x( 'Refresh', 'action', 'groundhogg' ), 'secondary', 'change_reporting', false );
 
-            $class = WPGH()->menu->funnels_page->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden'; //todo
+            $class = get_request_var( 'date_range' ) === 'custom' ? '' : 'hidden';
 
             ?><div class="custom-range <?php echo $class ?> alignleft actions"><?php
 
@@ -151,7 +156,7 @@ class Funnels_Table extends WP_List_Table {
                     'name'  => 'custom_date_range_start',
                     'id'    => 'custom_date_range_start',
                     'class' => 'input',
-                    'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_start' ), //todo
+                    'value' => get_request_var( 'custom_date_range_start' ),
                     'attributes' => '',
                     'placeholder' => 'YYY-MM-DD',
                     'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
@@ -162,7 +167,9 @@ class Funnels_Table extends WP_List_Table {
                     'name'  => 'custom_date_range_end',
                     'id'    => 'custom_date_range_end',
                     'class' => 'input',
-                    'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_end' ), //todo
+                    'value' => get_request_var( 'custom_date_range_end' ),
+
+
                     'attributes' => '',
                     'placeholder' => 'YYY-MM-DD',
                     'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
@@ -229,21 +236,30 @@ class Funnels_Table extends WP_List_Table {
         return $html;
     }
 
+    /**
+     * @param $funnel Funnel
+     * @return string
+     */
     protected function column_active_contacts( $funnel )
     {
 
         $query  = new Contact_Query();
 
-        $count = $query->query( array(
-            'count'  => true,
-            'report' => array(
-                'start'     => WPGH()->menu->funnels_page->reporting_start_time, //todo
-                'end'       => WPGH()->menu->funnels_page->reporting_end_time, //todo
-                'funnel'    => $funnel->ID
-            )
-        ) );
+        $start = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_start_time();
+        $end   = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_end_time();
 
-        $queryUrl = admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%d&start=%d', $funnel->ID, WPGH()->menu->funnels_page->reporting_start_time ) );
+        $query_args = [
+            'report' => array(
+                'start'     => $start,
+                'end'       => $end,
+                'funnel'    => $funnel->get_id()
+            )
+        ];
+
+
+        $count = $query->query( array_merge( [ 'count' => true ], $query_args ) );
+        $queryUrl = admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( $query_args ) ) );
+
         return "<a href='$queryUrl'>$count</a>";
     }
 
@@ -334,7 +350,7 @@ class Funnels_Table extends WP_List_Table {
      *
      * REQUIRED! This is where you prepare your data for display. This method will
      *
-     * @global wpdb $wpdb
+     * @global $wpdb \wpdb
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()

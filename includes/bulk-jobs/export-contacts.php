@@ -1,6 +1,10 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\Bulk_Jobs\Bulk_Job;
+
+
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Export_Contacts extends Bulk_Job
@@ -32,7 +36,7 @@ class Export_Contacts extends Bulk_Job
             return $items;
         }
 
-        $query = new WPGH_Contact_Query();
+        $query = new Contact_Query();
         $args = $_GET;
 
         $contacts = $query->query( $args );
@@ -68,7 +72,7 @@ class Export_Contacts extends Bulk_Job
 
         $line = [];
 
-        $contact = wpgh_get_contact( absint( $item ) );
+        $contact = Plugin::$instance->utils->get_contact( absint( $item ) );
 
         if ( $contact ){
 
@@ -90,7 +94,8 @@ class Export_Contacts extends Bulk_Job
      */
     protected function pre_loop()
     {
-        $meta_keys = array_values( WPGH()->contact_meta->get_keys() );
+
+        $meta_keys = array_values( Plugin::$instance->dbs->get_db('contactmeta')->get_keys() );
         $default_keys = [
             'ID',
             'email',
@@ -104,18 +109,20 @@ class Export_Contacts extends Bulk_Job
 
         $headers = array_merge( $default_keys, $meta_keys );
 
-        $file_name = wpgh_get_transient( 'gh_export_file' );
+        $file_name = Plugin::$instance->settings->get_transient('gh_export_file') ;
+
+
 
         $fp = false;
 
         if ( ! $file_name ){
 
             // randomize the file path to prevent direct access.
-            $file_name = md5( wpgh_encrypt_decrypt( time() ) ) . '.csv';
+            $file_name = md5( wpgh_encrypt_decrypt( time() ) ) . '.csv'; //todo
 
             // get the full path.
-            $file_path = wpgh_get_csv_exports_dir( $file_name, true );
-            wpgh_set_transient( 'gh_export_file', $file_name, HOUR_IN_SECONDS );
+            $file_path = Plugin::$instance->utils->files->get_csv_exports_dir( $file_name, true );
+            Plugin::$instance->settings->set_transient( 'gh_export_file', $file_name, HOUR_IN_SECONDS );
 
             //write the headers to the export.
             $fp = fopen( $file_path,"w" );
@@ -124,7 +131,7 @@ class Export_Contacts extends Bulk_Job
 
         // If we have the file name then open the file before we move on.
         if ( ! $fp ){
-            $file_path = wpgh_get_csv_exports_dir( $file_name, true );
+            $file_path = Plugin::$instance->utils->files->get_csv_exports_dir( $file_name, true );
             $fp = fopen( $file_path,"a" );
         }
 
@@ -151,7 +158,7 @@ class Export_Contacts extends Bulk_Job
      */
     protected function clean_up()
     {
-        wpgh_delete_transient( 'gh_export_file' );
+        Plugin::$instance->settings->delete_transient( 'gh_export_file' );
     }
 
     /**
@@ -171,7 +178,7 @@ class Export_Contacts extends Bulk_Job
      */
     protected function get_finished_notice()
     {
-        $file_url = wpgh_get_csv_exports_url( $this->file_name );
+        $file_url =Plugin::$instance->utils->files->get_csv_exports_url( $this->file_name );
         return sprintf( _x( 'Export file created. %s', 'notice', 'groundhogg'), "&nbsp;&nbsp;&nbsp;<a class='button button-primary' href='$file_url'>Download Now</a>" );
     }
 }

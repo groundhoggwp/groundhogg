@@ -3,6 +3,9 @@
 namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Plugin;
+use function Groundhogg\get_items_from_csv;
+use function Groundhogg\get_key_from_column_label;
+use function Groundhogg\get_mappable_fields;
 
 /**
  * Map Import
@@ -27,7 +30,7 @@ if ( ! file_exists( $file_path ) ){
     wp_die( 'The given file does not exist.' );
 }
 
-$items = wpgh_get_items_from_csv( $file_path ); //todo
+ get_items_from_csv( $file_path );
 
 $sample_item = array_shift( $items );
 
@@ -69,8 +72,8 @@ $sample_item = array_shift( $items );
             echo Plugin::$instance->utils->html->dropdown( [
                 'name' => sprintf( 'map[%s]', $key ),
                 'id'   => sprintf( 'map_%s', $key ),
-                'selected' => get_key_from_column_label( $key ), //todo
-                'options' => wpgh_get_mappable_fields(), //todo
+                'selected' => get_key_from_column_label( $key ),
+                'options' => get_mappable_fields(),
                 'option_none' => '* Do Not Map *'
             ] );
             ?>

@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin;
 
 use Groundhogg\Plugin;
+use function Groundhogg\isset_not_empty;
 
 /**
  * Abstract Admin Page
@@ -35,7 +36,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page
      */
     protected function get_current_tab()
     {
-        return isset_not_emtpy( $_GET, 'tab' ) ? $_GET[ 'tab' ] : $this->get_tabs()[ 0 ][ 'slug' ];
+        return isset_not_empty( $_GET, 'tab' ) ? $_GET[ 'tab' ] : $this->get_tabs()[ 0 ][ 'slug' ];
     }
 
     /**
@@ -106,7 +107,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page
             <?php $this->do_page_tabs(); ?>
             <?php
 
-            $method = sprintf( '%s_%s', $this->get_current_action(), $this->get_current_action() );
+            $method = sprintf( '%s_%s', $this->get_current_tab(), $this->get_current_action() );
 
             if ( method_exists( $this, $method ) ){
                 call_user_func( [ $this, $method ] );
