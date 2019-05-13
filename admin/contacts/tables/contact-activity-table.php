@@ -1,6 +1,6 @@
 <?php
 
-namespace Groundhogg\Admin\Contacts;
+namespace Groundhogg\Admin\Contacts\Tables;
 
 use \WP_List_Table;
 use Groundhogg\Event;
@@ -175,6 +175,18 @@ class Contact_Activity_Table extends WP_List_Table {
 
         return '<a target="_blank" href="' . esc_url( $activity->referer ) . '">' . esc_url( $activity->referer ) . '</a>';
 
+    }
+
+    public function display_tablenav($which)
+    {
+        if ( $which === 'top' ):
+            ?>
+            <div class="tablenav <?php echo esc_attr( $which ); ?>">
+                <?php $this->extra_tablenav( $which ); ?>
+                <br class="clear" />
+            </div>
+        <?php
+        endif;
     }
 
     /**

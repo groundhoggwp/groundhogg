@@ -217,10 +217,21 @@ abstract class Admin_Page
      */
     protected function verify_action()
     {
-        if ( !isset( $_REQUEST['_wpnonce'] ) || ! current_user_can( $this->get_cap() ) )
+        if ( ! get_request_var( '_wpnonce' ) || ! current_user_can( $this->get_cap() ) )
             return false;
 
-        return wp_verify_nonce($_REQUEST['_wpnonce']) || wp_verify_nonce($_REQUEST['_wpnonce'], $this->get_current_action()) || wp_verify_nonce($_REQUEST['_wpnonce'], sprintf( 'bulk-%s', $this->get_item_type_plural() ) );
+        $nonce = get_request_var( '_wpnonce' );
+
+//        var_dump( $nonce );
+//        wp_die();
+
+        $checks = [
+            wp_verify_nonce( $nonce ),
+            wp_verify_nonce( $nonce, $this->get_current_action() ),
+            wp_verify_nonce( $nonce, sprintf( 'bulk-%s', $this->get_item_type_plural() ) )
+        ];
+
+        return in_array( true, $checks );
     }
 
     /**
@@ -259,15 +270,16 @@ abstract class Admin_Page
 
 //        var_dump( $this->get_current_action() );
 //        var_dump( $this->verify_action() );
+//        var_dump( $_POST );
 
-        if ( ! $this->get_current_action() || !$this->verify_action() )
+        if ( ! $this->get_current_action() || ! $this->verify_action() )
             return;
-
-//        wp_die();
 
         $base_url = remove_query_arg( [ '_wpnonce', 'action' ], wp_get_referer() );
 
         $func = sprintf( "process_%s", $this->get_current_action() );
+
+        $exitCode = null;
 
         if ( method_exists( $this, $func ) ){
             $exitCode = call_user_func( [ $this, $func ] );
@@ -281,7 +293,7 @@ abstract class Admin_Page
         }
 
         if ( is_string( $exitCode ) && esc_url_raw( $exitCode ) ){
-            wp_redirect( esc_url( $exitCode ) );
+            wp_redirect( $exitCode );
             die();
         }
 
@@ -390,7 +402,7 @@ abstract class Admin_Page
             $query_string = http_build_query( $query_string );
         }
 
-        return sprintf( "%s&%s", $base, $query_string );
+        return $base . '&' . $query_string;
     }
 
     /**

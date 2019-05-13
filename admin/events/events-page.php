@@ -29,7 +29,9 @@ class Events_Page extends Admin_Page
     protected function add_ajax_actions() {}
     public function help() {}
     protected function add_additional_actions() {}
-    public function scripts() {}
+    public function scripts() {
+        wp_enqueue_style( 'groundhogg-admin' );
+    }
 
     public function get_slug()
     {

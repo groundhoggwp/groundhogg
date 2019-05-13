@@ -51,6 +51,8 @@ class Contact extends Base_Object_With_Meta
      */
     public function __construct($_id_or_email_or_args = false, $by_user_id = false)
     {
+        $field = false;
+
         if ( ! is_array( $_id_or_email_or_args ) ){
             if ( false === $_id_or_email_or_args || (is_numeric($_id_or_email_or_args) && (int)$_id_or_email_or_args !== absint($_id_or_email_or_args) ) ) {
                 return;
@@ -65,7 +67,7 @@ class Contact extends Base_Object_With_Meta
             }
         }
 
-        parent::__construct($_id_or_email_or_args, $field);
+        parent::__construct($_id_or_email_or_args, $field );
     }
 
     /**
@@ -641,8 +643,8 @@ class Contact extends Base_Object_With_Meta
     {
         $dirs['path'] =   $this->upload_paths[ 'path' ];
         $dirs['url'] =    $this->upload_paths[ 'url' ];
-        $dirs['subdir'] = $this->upload_paths[ 'basedir' ];
-        $dirs['suburl'] = $this->upload_paths[ 'baseurl' ];
+        $dirs['subdir'] = $this->upload_paths[ 'subdir' ];
+        $dirs['suburl'] = $this->upload_paths[ 'suburl' ];
         return $dirs;
     }
 
@@ -666,16 +668,16 @@ class Contact extends Base_Object_With_Meta
         $this->get_uploads_folder();
 
         add_filter( 'upload_dir', [ $this, 'map_upload' ] );
+
+        var_dump( $file );
+
         $mfile = wp_handle_upload( $file, $upload_overrides );
+        var_dump( $mfile );
+
         remove_filter( 'upload_dir', [ $this, 'map_upload' ] );
 
-        if( isset( $mfile['error'] ) ) {
-
-            if ( empty( $mfile[ 'error' ] ) ){
-                $mfile[ 'error' ] = _x( 'Could not upload file.',  'submission_error', 'groundhogg' );
-            }
-
-            return new \WP_Error( 'bad_upload', $mfile['error'] );
+        if( isset_not_empty( $mfile['error'] ) ) {
+            return new \WP_Error( 'bad_upload', __( 'Unable to upload file.', 'groundhogg' ) );
         }
 
         return $mfile;
@@ -697,8 +699,8 @@ class Contact extends Base_Object_With_Meta
     public function get_uploads_folder()
     {
         $paths = [
-            'basedir' => Plugin::$instance->utils->files->get_contact_uploads_dir(),
-            'baseurl' => Plugin::$instance->utils->files->get_contact_uploads_url(),
+            'subdir' => Plugin::$instance->utils->files->get_contact_uploads_dir(),
+            'suburl' => Plugin::$instance->utils->files->get_contact_uploads_url(),
             'path'    => Plugin::$instance->utils->files->get_contact_uploads_dir( $this->get_upload_folder_basename() ),
             'url'     => Plugin::$instance->utils->files->get_contact_uploads_url( $this->get_upload_folder_basename() )
         ];

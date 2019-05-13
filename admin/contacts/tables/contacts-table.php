@@ -1,5 +1,5 @@
 <?php
-namespace Groundhogg\Admin\Contacts;
+namespace Groundhogg\Admin\Contacts\Tables;
 
 use function Groundhogg\get_request_var;
 use function Groundhogg\isset_not_empty;

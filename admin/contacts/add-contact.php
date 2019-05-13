@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
 
@@ -51,6 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
             <td><?php $args = array(
                     'id'    => 'first_name',
                     'name'  => 'first_name',
+                    'value' => esc_attr( get_request_var( 'first_name' ) ),
                 );
 
                 echo Plugin::$instance->utils->html->input( $args ); ?></td>
@@ -60,10 +62,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
             <td><?php $args = array(
                     'id'    => 'last_name',
                     'name'  => 'last_name',
+                    'value' => esc_attr( get_request_var( 'last_name' ) ),
                 );
                 echo Plugin::$instance->utils->html->input( $args ); ?></td>
         </tr>
-        <?php do_action( 'wpgh_contact_add_new_name' ); ?>
+        <?php do_action( 'groundhogg/admin/contacts/add/form/name' ); ?>
         </tbody>
     </table>
     <h2><?php _e( 'Contact Info' ); ?></h2>
@@ -75,6 +78,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                     'type'  => 'email',
                     'id'    => 'email',
                     'name'  => 'email',
+                    'value' => esc_attr( get_request_var( 'email' ) ),
+
                 );
                 echo Plugin::$instance->utils->html->input( $args ); ?></td>
         </tr>
@@ -84,6 +89,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                     'type'  => 'tel',
                     'id'    => 'primary_phone',
                     'name'  => 'primary_phone',
+                    'value' => esc_attr( get_request_var( 'primary_phone' ) ),
+
                 );
                 echo Plugin::$instance->utils->html->input( $args ); ?></td>
         </tr>
@@ -92,10 +99,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
             <td><?php $args = array(
                     'id'    => 'primary_phone_extension',
                     'name'  => 'primary_phone_extension',
+                    'value' => esc_attr( get_request_var( 'primary_phone_extension' ) ),
                 );
                 echo Plugin::$instance->utils->html->input( $args ); ?></td>
         </tr>
-        <?php do_action( 'wpgh_contact_add_new_contact_info' ); ?>
+        <?php do_action( 'groundhogg/admin/contacts/add/form/contact_info' ); ?>
         </tbody>
     </table>
     <h2><?php _e( 'Segmentation' ); ?></h2>
@@ -103,19 +111,21 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         <tbody>
         <tr>
             <th><?php _e( 'Owner', 'groundhogg' ); ?></th>
-            <td><?php echo Plugin::$instance->utils->html->dropdown_owners(); ?>
+            <td><?php echo Plugin::$instance->utils->html->dropdown_owners( [
+                    'selected' => absint( get_request_var( 'owner_id' ) )
+                ] ); ?>
             </td>
         </tr>
         <tr>
             <th><label for="tags"><?php echo __( 'Tags', 'groundhogg' )?></label></th>
             <td>
                 <div style="max-width: 400px;">
-                    <?php $args = array(); echo Plugin::$instance->utils->html->tag_picker( $args ); ?>
+                    <?php $args = [ 'selected' => wp_parse_id_list( get_request_var( 'tags' ) ) ];
+                    echo Plugin::$instance->utils->html->tag_picker( $args ); ?>
                 </div>
-
             </td>
         </tr>
-        <?php do_action( 'wpgh_contact_add_new_tags' ); ?>
+        <?php do_action( 'groundhogg/admin/contacts/add/form/tags' ); ?>
         </tbody>
     </table>
     <h2><?php _e( 'Notes' ); ?></h2>
@@ -125,14 +135,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
             <td><?php $args = array(
                     'id'    => 'notes',
                     'name'  => 'notes',
-                    'value' => '',
+                    'value' => esc_attr( get_request_var( 'notes' ) ),
                 );
                 echo Plugin::$instance->utils->html->textarea( $args ); ?></td>
         </tr>
-        <?php do_action( 'wpgh_contact_add_new_notes' ); ?>
+        <?php do_action( 'groundhogg/admin/contacts/add/form/notes' ); ?>
         </tbody>
     </table>
-    <?php do_action('wpgh_add_new_contact_form_after'); ?>
+    <?php do_action( 'groundhogg/admin/contacts/add/form/after' ); ?>
 
     <?php submit_button( _x( 'Add Contact', 'action', 'groundhogg' ), 'primary', 'add_contact'); ?>
 </form>

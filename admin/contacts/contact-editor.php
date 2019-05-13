@@ -62,6 +62,8 @@ if ( current_user_can( 'sales_manager' ) ){
     }
 }
 
+//var_dump( $contact );
+
 /* Auto link the account before we see the create account form. */
 $contact->auto_link_account();
 
@@ -109,9 +111,7 @@ $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ]
 <!-- END TABS -->
 
 <form method="post" class="" enctype="multipart/form-data">
-    <?php wp_nonce_field( 'edit', '_edit_contact_nonce' ); ?>
-
-
+    <?php wp_nonce_field( 'edit' ); ?>
 <?php
 
 add_action( 'groundhogg/admin/contact/record/tab/general', '\Groundhogg\Admin\Contacts\contact_record_general_info' );
@@ -163,7 +163,6 @@ function contact_record_general_info( $contact )
             </tr>
 
         <?php endif; ?>
-        <?php do_action('contact_edit_name', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -249,7 +248,6 @@ function contact_record_general_info( $contact )
                 );
                 echo Plugin::$instance->utils->html->input($args); ?></td>
         </tr>
-        <?php do_action('contact_edit_contact_info', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -291,7 +289,6 @@ function contact_record_general_info( $contact )
     </table>
 
     <?php do_action( 'groundhogg/contact/record/company_info/after', $contact ); ?>
-
 
     <!-- ADDRESS -->
     <h2><?php _ex( 'Location', 'contact_record', 'groundhogg' ); ?></h2>
@@ -390,7 +387,6 @@ function contact_record_general_info( $contact )
                     echo Plugin::$instance->utils->html->select2($args); ?></div>
             </td>
         </tr>
-        <?php do_action('contact_edit_address', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -479,7 +475,6 @@ function contact_record_section_segmentation( $contact )
                 </div>
             </td>
         </tr>
-        <?php do_action( 'contact_edit_tags', $contact->get_id() ); ?>
         </tbody>
     </table>
 <?php
@@ -525,7 +520,6 @@ function contact_record_section_notes( $contact )
                 echo Plugin::$instance->utils->html->textarea( $args ); ?>
             </td>
         </tr>
-        <?php do_action( 'contact_edit_notes', $contact->get_id() ); ?>
         </tbody>
     </table>
     <?php
@@ -707,11 +701,9 @@ function contact_record_section_files( $contact )
         </table>
         <div>
             <input class="gh-file-uploader" type="file" name="files[]" multiple>
-            <p class="description"><?php _ex( 'Click <b>Update Contact</b> when ready to upload.', 'contact_record', 'groundhogg' ); ?></p>
         </div>
     </div>
     <!-- END FILES -->
-
     <?php
 }
 
@@ -722,7 +714,6 @@ add_action( 'groundhogg/admin/contact/record/tab/meta_data', '\Groundhogg\Admin\
  */
 function contact_record_section_custom_meta( $contact ){
     ?>
-    <?php do_action( 'contact_edit_before_meta', $contact->get_id() ); ?>
     <!-- META -->
     <h2><?php _ex( 'Custom Meta', 'contact_record', 'groundhogg' ); ?></h2>
     <table id='meta-table' class="form-table" >
@@ -739,7 +730,7 @@ function contact_record_section_custom_meta( $contact ){
         <?php
 
         //this meta data will not be shown in the meta data section.
-        $meta_exclude_list = apply_filters( 'exclude_meta_list', array(
+        $meta_exclude_list = apply_filters( 'groundhogg/admin/contacts/exclude_meta_list', [
             'lead_source',
             'source_page',
             'page_source',
@@ -766,14 +757,13 @@ function contact_record_section_custom_meta( $contact ){
             'last_sent',
             'country_name',
             'region_code',
-        ) );
+        ] );
 
         $meta = $contact->get_meta();
 
         foreach ( $meta as $meta_key => $value ):
 
-            if ( ! in_array( $meta_key, $meta_exclude_list ) ):
-                $value = $value[ 0 ]; ?>
+            if ( ! in_array( $meta_key, $meta_exclude_list ) ): ?>
                 <tr id="meta-<?php esc_attr_e( $meta_key )?>">
                     <th>
                         <?php esc_html_e( $meta_key ); ?>
@@ -802,7 +792,6 @@ function contact_record_section_custom_meta( $contact ){
                 </tr>
             <?php endif;
         endforeach; ?>
-        <?php do_action( 'contact_edit_meta', $contact->get_id() ); ?>
         </tbody>
     </table>
 
@@ -818,28 +807,27 @@ add_action( 'groundhogg/admin/contact/record/tab/activity', '\Groundhogg\Admin\C
 function contact_record_section_activity( $contact )
 {
     ?>
-    <?php do_action('contact_edit_before_history', $contact->get_id() ); ?>
     <!-- UPCOMING EVENTS -->
     <div style="max-width: 800px">
         <h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
         <p class="description"><?php _ex( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'contact_record', 'groundhogg' ); ?></p>
         <?php
 
-        $table = new Contact_Events_Table( 'waiting' );
+        $table = new Tables\Contact_Events_Table( 'waiting' );
         $table->prepare_items();
         $table->display(); ?>
         <!-- FUNNNEL HISTORY -->
         <h2><?php _ex( 'Recent Funnel History', 'contact_record', 'groundhogg' ); ?></h2>
         <p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 10 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
         <?php
-        $table = new Contact_Events_Table( 'complete' );
+        $table = new Tables\Contact_Events_Table( 'complete' );
         $table->prepare_items();
         $table->display(); ?>
     </div>
     <!-- EMAIL HISTORY -->
     <h2><?php _ex( 'Recent Email History', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px">
-        <?php $table = new Contact_Activity_Table( );
+        <?php $table = new Tables\Contact_Activity_Table( );
         $table->prepare_items();
         $table->display(); ?>
         <p class="description"><?php _ex( 'This is where you can check if this contact is interacting with your emails.', 'contact_record', 'groundhogg' ); ?></p>

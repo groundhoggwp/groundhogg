@@ -1,6 +1,10 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Admin\Admin_Page;
+use function Groundhogg\get_array_var;
+use function Groundhogg\get_contactdata;
+use function Groundhogg\get_db;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
@@ -89,6 +93,8 @@ class Contacts_Page extends Admin_Page
      */
     public function scripts()
     {
+        wp_enqueue_style( 'groundhogg-admin' );
+
         if ($this->get_current_action() === 'edit' || $this->get_current_action() === 'add' || $this->get_current_action() === 'form' ) {
             wp_enqueue_style('groundhogg-admin-contact-editor' );
             wp_enqueue_script('groundhogg-admin-contact-editor' );
@@ -157,7 +163,7 @@ class Contacts_Page extends Admin_Page
                 if ( key_exists( 'contact', $_GET ) ){
                     $contacts = $this->get_items();
                     $contact = Plugin::$instance->utils->get_contact( array_shift($contacts) ); // todo check
-                    return sprintf( _x('Submit Form For %s', 'page_title', 'groundhogg'), $contact->full_name );
+                    return sprintf( _x('Submit Form For %s', 'page_title', 'groundhogg'), $contact->get_full_name() );
                 } else{
                     return _ex( 'Submit Form', 'page_title', 'groundhogg' );
                 }
@@ -183,190 +189,158 @@ class Contacts_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        do_action('wpgh_admin_add_contact_before');
+        do_action('groundhogg/admin/contacts/add/before');
+        
+        $_POST = wp_unslash( $_POST );
 
-        if (!isset($_POST['email'])) {
-            return new \WP_Error( 'NO_EMAIL', __("Please enter a valid email address.", 'groundhogg') );
+        if ( ! get_request_var( 'email' ) ) {
+            return new \WP_Error( 'no_email', __( "Please enter a valid email address.", 'groundhogg' ) );
         }
 
-        if (isset($_POST['first_name']))
-            $args['first_name'] = sanitize_text_field($_POST['first_name']);
+        $args['first_name'] = sanitize_text_field( get_request_var( 'first_name' ) );
+        $args['last_name'] = sanitize_text_field( get_request_var( 'last_name' ) );
+        $args['owner_id'] = absint( get_request_var( 'owner_id' ) );
 
-        if (isset($_POST['last_name']))
-            $args['last_name'] = sanitize_text_field($_POST['last_name']);
+        $email = sanitize_email( get_request_var( 'email' ) );
 
-        if (isset($_POST['email'])) {
-
-            $email = sanitize_email($_POST['email']);
-
-
-            if (!Plugin::$instance->dbs->get_db('contacts')->exists($email)) {
-                $args['email'] = $email;
-            } else {
-                return new \WP_Error( 'email_exists',  sprintf( _x('Sorry, the email %s already belongs to another contact.', 'page_title', 'groundhogg'), $email ) );
-            }
+        if (!Plugin::$instance->dbs->get_db('contacts')->exists($email)) {
+            $args['email'] = $email;
+        } else {
+            return new \WP_Error( 'email_exists',  sprintf( _x('Sorry, the email %s already belongs to another contact.', 'page_title', 'groundhogg'), $email ) );
         }
 
-        if (!is_email($args['email'])) {
-            return new \WP_Error( 'NO_EMAIL', __("Please enter a valid email address.", 'groundhogg') );
+        if (!is_email($email)) {
+            return new \WP_Error( 'invalid_email', __("Please enter a valid email address.", 'groundhogg') );
         }
 
-        if (isset($_POST['owner_id'])) {
-            $args['owner_id'] = intval($_POST['owner_id']);
+        $contact = new Contact( $args );
+
+        if ( ! $contact->exists() ){
+            return new \WP_Error( 'db_error', __( 'Could not add contact.', 'groundhogg' ) );
         }
 
-        $id = Plugin::$instance->dbs->get_db('contacts')->add($args);
+        $contact->update_meta('primary_phone', sanitize_text_field(get_request_var('primary_phone')));
+        $contact->update_meta('primary_phone_extension', sanitize_text_field( get_request_var('primary_phone_extension')));
 
-        $contact = Plugin::$instance->utils->get_contact( $id );
-
-        if (isset($_POST['primary_phone'])) {
-            $contact->update_meta('primary_phone', sanitize_text_field($_POST['primary_phone']));
+        if (get_request_var('notes')) {
+            $contact->add_note(get_request_var('notes'));
         }
 
-        if (isset($_POST['primary_phone_extension'])) {
-            $contact->update_meta('primary_phone_extension', sanitize_text_field($_POST['primary_phone_extension']));
-        }
-
-        if (isset($_POST['notes'])) {
-            $contact->add_note($_POST['notes']);
-        }
-
-        if (isset($_POST['tags'])) {
-            $contact->add_tag($_POST['tags']);
+        if (get_request_var('tags')) {
+            $contact->add_tag(get_request_var('tags'));
         }
 
         $this->add_notice('created', _x("Contact created!", 'notice', 'groundhogg'), 'success');
 
-        return (admin_url('admin.php?page=gh_contacts&action=edit&contact=' . $id));
+        return $this->admin_url( [ 'action' => 'edit', 'contact' => $contact->get_id() ] );
     }
 
-
-    public function process_delete ()
+    public function get_meta_key_exclusions()
     {
-        if (!current_user_can('delete_contacts')) {
-          $this->wp_die_no_access();
-        }
-
-        foreach ($this->get_items() as $id) {
-            do_action('wpgh_pre_admin_delete_contact', $id);
-            if ( ! Plugin::$instance->dbs->get_db( 'contacts' )->delete( $id ) ){
-                return new \WP_Error( 'unable_to_delete_contact', "Something went wrong while deleting the contact." );
-            }
-        }
-
-        $this->add_notice(
-            esc_attr('deleted'),
-            sprintf(_nx('Deleted %d contact', 'Deleted %d contacts', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
-            'success'
-        );
-
-        return true;
+        return apply_filters( 'groundhogg/admin/contacts/exclude_meta_list', [
+            'lead_source',
+            'source_page',
+            'page_source',
+            'terms_agreement',
+            'terms_agreement_date',
+            'gdpr_consent',
+            'gdpr_consent_date',
+            'primary_phone',
+            'primary_phone_extension',
+            'street_address_1',
+            'street_address_2',
+            'time_zone',
+            'city',
+            'postal_zip',
+            'region',
+            'country',
+            'notes',
+            'files',
+            'company_name',
+            'company_address',
+            'job_title',
+            'ip_address',
+            'last_optin',
+            'last_sent',
+            'country_name',
+            'region_code',
+        ] );
     }
+
 
     /**
      * Update the contact via the admin screen
      */
     public function process_edit()
     {
-
         if (!current_user_can('edit_contacts')) {
             $this->wp_die_no_access();
         }
 
-        $id = intval($_GET['contact']);
+        $_POST = wp_unslash( $_POST );
+
+        $id = absint( get_request_var( 'contact' ) );
 
         if (!$id) {
-            return new \WP_Error( 'no_contcat', __( 'Contact id not found' ) );
+            return new \WP_Error( 'no_contact_id', __( 'Contact id not found.', 'groundhogg' ) );
         }
 
-        $contact = Plugin::$instance->utils->get_contact( $id );
+        $contact = get_contactdata( $id );
 
-//        do_action('wpgh_admin_update_contact_before', $id); todo
+        //this meta data will not be deleted.
 
-        //todo security check
+        $posted_meta = get_request_var( 'meta' );
 
-        /* Save the meta first... as actual fields might overwrite it later... */
-        $cur_meta = Plugin::$instance->dbs->get_db('contactmeta')->get_meta( $id );
+        // Handle Meta ADD/DELETE
+        if ( $posted_meta ){
 
-//        WPGH()->contact_meta->get_meta($id); todo
+            $posted_meta_keys = array_keys( $posted_meta );
+            $stored_meta_keys = array_keys( $contact->get_meta() );
+            $exclude_keys = $this->get_meta_key_exclusions();
 
-        $exclude_meta_list = array(
-            'files',
-            'notes'
-        );
+            $editable_meta = array_diff( $stored_meta_keys, $exclude_keys );
+            $deletable_meta = array_diff( $editable_meta, $posted_meta_keys );
 
-        if (isset($_POST['meta'])) {
-            $posted_meta = $_POST['meta'];
-            foreach ($cur_meta as $key => $value) {
-                if (isset($posted_meta[$key])) {
-                    $contact->update_meta($key, sanitize_text_field($posted_meta[$key]));
-                } else {
-                    if (!in_array($key, $exclude_meta_list)) {
-                        $contact->delete_meta($key);
-                    }
-                }
+            foreach ( $deletable_meta as $key ){
+                $contact->delete_meta( $key );
             }
-        }
 
-        /* add new meta */
-        if (isset($_POST['newmetakey']) && isset($_POST['newmetavalue'])) {
-
-            $new_meta_keys = $_POST['newmetakey'];
-            $new_meta_vals = $_POST['newmetavalue'];
-
-            foreach ($new_meta_keys as $i => $new_meta_key) {
-                if (strpos($new_meta_vals[$i], PHP_EOL) !== false) {
-                    $contact->update_meta(sanitize_key($new_meta_key), sanitize_textarea_field(stripslashes($new_meta_vals[$i])));
-                } else {
-                    $contact->update_meta(sanitize_key($new_meta_key), sanitize_text_field(stripslashes($new_meta_vals[$i])));
-                }
+            foreach ( $editable_meta as $key ){
+                $contact->update_meta( $key, get_array_var( $posted_meta, $key ) );
             }
 
         }
 
-        $args = array();
+        $new_meta_keys = get_request_var( 'newmetakey', [] );
+        $new_meta_vals = get_request_var( 'newmetavalue', [] );
 
-        if (isset($_POST['email'])) {
-
-            $email = sanitize_email($_POST['email']);
-
-            //check if it's the current email address.
-            if ($contact->email !== $email) {
-                //check if another email address like it exists...
-
-                if (!Plugin::$instance->dbs->get_db('contacts')->exists($email)) {
-                    $args['email'] = $email;
-                    //update new optin status to unconfirmed
-                    $contact->change_marketing_preference( Preferences::UNCONFIRMED ); //todo
-                    return new \WP_Error( 'optin_status_updated',sprintf(_x('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', 'notice', 'groundhogg'), $email) );
-
-                } else {
-                    return new \WP_Error( 'email_exists', sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email) );
-                }
+        foreach ( $new_meta_keys as $i => $new_meta_key) {
+            if (strpos($new_meta_vals[$i], PHP_EOL) !== false) {
+                $contact->update_meta(sanitize_key($new_meta_key), sanitize_textarea_field($new_meta_vals[$i]));
+            } else {
+                $contact->update_meta(sanitize_key($new_meta_key), sanitize_text_field($new_meta_vals[$i]));
             }
         }
 
-        if (isset($_POST['first_name'])) {
-            $args['first_name'] = sanitize_text_field($_POST['first_name']);
+        $args = [];
+
+
+        $email = sanitize_email( get_request_var( 'email' ) );
+
+        //check if it's the current email address.
+        if ( $contact->get_email() !== $email) {
+            if (!Plugin::$instance->dbs->get_db('contacts' )->exists( $email ) ) {
+                $args['email'] = $email;
+            } else {
+                return new \WP_Error( 'email_exists', sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email) );
+            }
         }
 
-        if (isset($_POST['last_name'])) {
-            $args['last_name'] = sanitize_text_field($_POST['last_name']);
-        }
+        $args['first_name'] = sanitize_text_field( get_request_var('first_name' ) );
+        $args['last_name'] = sanitize_text_field( get_request_var( 'last_name' ) );
+        $args['owner_id'] = absint( get_request_var( 'owner_id' ) );
+        $args['user_id'] = absint( get_request_var( 'user' ) );
 
-        if (isset($_POST['owner_id'])) {
-            $args['owner_id'] = intval($_POST['owner_id']);
-        }
-
-        if (isset($_POST['user'])) {
-            $args['user_id'] = intval($_POST['user']);
-        }
-
-        if ( isset( $_POST[ 'unlink_user' ]) ){
-            $args['user_id'] = null;
-        }
-
-        $args = array_map('stripslashes', $args);
         $contact->update($args);
 
         $basic_text_fields = [
@@ -395,15 +369,16 @@ class Contacts_Page extends Admin_Page
             }
         }
 
-        if ( isset( $_POST[ 'extrapolate_location' ] ) ){
+        if ( get_request_var( 'extrapolate_location' ) ){
             if ( $contact->extrapolate_location() ){
                 $this->add_notice('location_updated', _x( 'Location updated.', 'notice', 'groundhogg' ), 'info');
             }
         }
 
-        if (isset($_POST['tags'])) {
+        // Process any tag removals.
+        if ( get_request_var( 'tags' ) ) {
 
-            $tags = Plugin::$instance->dbs->get_db('tags')->validate( wp_unslash($_POST['tags']));
+            $tags = Plugin::$instance->dbs->get_db('tags')->validate( get_request_var( 'tags' ) );
 
             $cur_tags = $contact->get_tags();
             $new_tags = $tags;
@@ -415,9 +390,6 @@ class Contacts_Page extends Admin_Page
 
             $add_tags = array_diff($new_tags, $cur_tags);
             if (!empty($add_tags)) {
-
-//                print_r( $add_tags );
-
                 $result = $contact->add_tag($add_tags);
                 if (!$result) {
                     return new \WP_Error( 'bad-tag', __('Hmm, looks like we could not add the new tags...' , 'groundhogg' ) );
@@ -427,14 +399,9 @@ class Contacts_Page extends Admin_Page
             $contact->remove_tag($contact->get_tags());
         }
 
-        /* Update Main Contact Information */
-
-        //Do after tags get updated for compatibility with new optin status change.
-
-        if (isset($_POST['unsubscribe'])) {
-
+        // Check if needing to unsubscribe.
+        if ( get_request_var( 'unsubscribe' )  ) {
             $contact->unsubscribe();
-
             $this->add_notice(
                 esc_attr('unsubscribed'),
                 _x('This contact will no longer receive marketing.', 'notice', 'groundhogg'),
@@ -442,10 +409,11 @@ class Contacts_Page extends Admin_Page
             );
         }
 
-        if ( isset( $_POST['manual_confirm'] ) ) {
-            if ( isset( $_POST[ 'confirmation_reason' ] ) && ! empty( $_POST[ 'confirmation_reason' ] ) ){
+        // Check if we are manually confirming the email naually
+        if ( get_request_var( 'manual_confirm' ) ) {
+            if ( get_request_var( 'confirmation_reason' ) ){
                 $contact->change_marketing_preference( Preferences::CONFIRMED );
-                $contact->update_meta( 'manual_confirmation_reason', sanitize_textarea_field( stripslashes( $_POST[ 'confirmation_reason' ] ) ) );
+                $contact->update_meta( 'manual_confirmation_reason', sanitize_textarea_field( get_request_var( 'confirmation_reason' ) ) );
                 $this->add_notice(
                     esc_attr('confirmed'),
                     _x('This contact\'s email address has been confirmed.', 'notice', 'groundhogg'),
@@ -457,122 +425,74 @@ class Contacts_Page extends Admin_Page
             }
         }
 
-        if ( isset( $_POST[ 'add_new_note' ] ) ){
-            $contact->add_note( $_POST[ 'add_note' ] );
+        if ( get_request_var( 'add_new_note' ) ){
+            $contact->add_note( get_request_var( 'add_note' ) );
         }
 
         if (isset($_POST['send_email']) && isset($_POST['email_id']) && current_user_can('send_emails')) {
-
             $mail_id = intval( $_POST['email_id'] );
-
-            if( send_email_notification( $mail_id, $contact->ID ) ){
+            if( send_email_notification( $mail_id, $contact->get_id() ) ){
                 $this->add_notice( 'email_queued', _x( 'The email has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
             }
         }
 
         /* USE the same email priviledges */
         if (isset($_POST['send_sms']) && isset($_POST['sms_id']) && current_user_can('send_emails')) {
-
             $sms_id = intval( $_POST['sms_id'] );
-
-            if( send_sms_notification( $sms_id, $contact->ID ) ){
-                $this->add_notice( 'sms_queued', _x( 'The sms has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
+            if( send_sms_notification( $sms_id, $contact->get_id() ) ){
+                $this->add_notice( 'sms_queued', _x( 'The SMS has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
             }
         }
 
         if (isset($_POST['start_funnel']) && isset($_POST['add_contacts_to_funnel_step_picker']) && current_user_can('edit_contacts')) {
-
-//            $step = wpgh_get_funnel_step(intval($_POST['add_contacts_to_funnel_step_picker'])); todo
-
             $step = Plugin::$instance->utils->get_step(intval($_POST['add_contacts_to_funnel_step_picker']));
             if ($step->enqueue($contact)) {
                 $this->add_notice('started', _x("Contact added to funnel.", 'notice', 'groundhogg'), 'info');
             }
         }
 
+        if ( ! empty( $_FILES ) ) {
+            foreach ( $_FILES as $file_key => $file ){
+                $e = $contact->upload_file( $file );
+                if ( is_wp_error( $e ) ){
+                    return $e;
+                }
+            }
+        }
+
         $this->add_notice('update', _x("Contact updated!", 'notice', 'groundhogg'), 'success');
-
-//        if (!empty($_FILES['files']['tmp_name'][0])) {
-//            $this->upload_files();
-//        } todo ENABLE UPLOAD FILE FOR CONTACTS
-
-        //do_action('wpgh_admin_update_contact_after', $id); todo remove
 
         return true;
     }
 
-    /**
-     * Upload files to a contact if uploaded from the admin page
-     */
-    private function upload_files()
+    public function process_delete()
     {
-        $id = intval($_GET['contact']);
-        $contact = Plugin::$instance->utils->get_contact($id);
-        if (!isset($_FILES['files']['tmp_name'][0]) || empty($_FILES['files']['tmp_name'][0])) {
-            return false;
+        if (!current_user_can('delete_contacts')) {
+            $this->wp_die_no_access();
         }
 
-        $files = $_FILES['files'];
-
-        $num_files = count($files['name']);
-
-        $upload_overrides = array('test_form' => false);
-
-        for ($i = 0; $i < $num_files; $i++) {
-
-            $ifile = array(
-                'name' => $files['name'][$i],
-                'type' => $files['type'][$i],
-                'tmp_name' => $files['tmp_name'][$i],
-                'error' => $files['error'][$i],
-                'size' => $files['size'][$i],
-            );
-
-            if (!function_exists('wp_handle_upload')) {
-                require_once(ABSPATH . '/wp-admin/includes/file.php');
-            }
-
-//            Plugin::$instance->dbs->get_db('submissions')->
-            WPGH()->submission->contact = $contact;  // todo
-            WPGH()->submission->set_upload_dirs();   // todo
-
-
-            add_filter('upload_dir', array(WPGH()->submission, 'files_upload_dir')); //todo
-            $mfile = wp_handle_upload($ifile, $upload_overrides);
-            remove_filter('upload_dir', array(WPGH()->submission, 'files_upload_dir')); //todo
-
-            if (isset($mfile['error'])) {
-                if (empty($mfile['error'])) {
-                    $mfile['error'] = __('Could not upload file.', 'notice', 'groundhogg');
-                }
-                return new \WP_Error( 'BAD_UPLOAD', $mfile['error'] );
-            } else {
-                $files = $contact->get_meta('files');
-                if (!$files) {
-                    $files = array();
-                }
-                $j = count($files) + 1;
-                $mfile['key'] = $j;
-                $mfile = array_map('wp_normalize_path', $mfile);
-                $files[$j] = $mfile;
-                $contact->update_meta('files', $files);
-                /* Compat for local host WP filesystems */
+        foreach ($this->get_items() as $id) {
+            if ( ! Plugin::$instance->dbs->get_db( 'contacts' )->delete( $id ) ){
+                return new \WP_Error( 'unable_to_delete_contact', "Something went wrong while deleting the contact." );
             }
         }
+
+        $this->add_notice(
+            esc_attr('deleted'),
+            sprintf(_nx('Deleted %d contact', 'Deleted %d contacts', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
+            'success'
+        );
+
         return true;
     }
 
     public function process_spam()
     {
-
-
         if (!current_user_can('edit_contacts')) {
             $this->wp_die_no_access();
         }
 
         foreach ($this->get_items() as $id) {
-
-
             $contact = Plugin::$instance->utils->get_contact( $id );
             $contact->change_marketing_preference( Preferences::SPAM );
 
@@ -584,17 +504,13 @@ class Contacts_Page extends Admin_Page
                 $blacklist = sanitize_textarea_field($blacklist);
                 update_option('blacklist_keys', $blacklist);
             }
-
-            do_action('wpgh_contact_marked_as_spam', $id); //todo
         }
 
         $this->add_notice(
             esc_attr('spammed'),
-            sprintf(_nx('Marked %d contact as spam.', 'Marked %d contact as spam.', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
+            sprintf(_nx('Marked %d contact as spam.', 'Marked %d contacts as spam.', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
             'success'
         );
-
-//        do_action('wpgh_spam_contacts'); todo remove
 
         return true;
     }
@@ -612,7 +528,7 @@ class Contacts_Page extends Admin_Page
 
         $this->add_notice(
             esc_attr('unspam'),
-            sprintf(_nx('Approved %d contact', 'Approved %d contacts', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
+            sprintf(_nx('Approved %d contact.', 'Approved %d contacts.', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
             'success'
         );
 
@@ -632,21 +548,10 @@ class Contacts_Page extends Admin_Page
 
         $this->add_notice(
             esc_attr('unbounce'),
-            sprintf(_nx('Approved %d contact', 'Approved %d contacts', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
+            sprintf(_nx('Approved %d contact.', 'Approved %d contacts.', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
             'success'
         );
         return true;
-    }
-
-    public function process_search()
-    {
-        if (!current_user_can('edit_contacts')) {
-            $this->wp_die_no_access();
-        }
-
-        if (!empty($_POST)) {
-            $search = $this->do_search();
-        }
     }
 
     public function process_apply_tag()
@@ -655,9 +560,9 @@ class Contacts_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        if ( ! empty( $_POST[ 'bulk_tags' ] ) ){
+        if ( get_request_var( 'bulk_tags', false ) ){
 
-            $tags = $_POST[ 'bulk_tags' ];
+            $tags = wp_parse_id_list( get_request_var( 'bulk_tags' ) );
 
             foreach ($this->get_items() as $id) {
                 $contact = Plugin::$instance->utils->get_contact($id);
@@ -673,15 +578,20 @@ class Contacts_Page extends Admin_Page
         return true;
     }
 
+    /**
+     * Remove tags from the contact.
+     *
+     * @return bool
+     */
     public function process_remove_tag()
     {
         if (!current_user_can('edit_contacts')) {
             $this->wp_die_no_access();
         }
 
-        if ( ! empty( $_POST[ 'bulk_tags' ] ) ){
+        if ( get_request_var( 'bulk_tags', false ) ){
 
-            $tags = $_POST[ 'bulk_tags' ];
+            $tags = wp_parse_id_list( get_request_var( 'bulk_tags' ) );
 
             foreach ($this->get_items() as $id) {
                 $contact = Plugin::$instance->utils->get_contact($id);
@@ -695,10 +605,9 @@ class Contacts_Page extends Admin_Page
             );
 
         }
+
         return true;
     }
-
-
 
     /**
      * Save the contact during inline edit
@@ -714,17 +623,19 @@ class Contacts_Page extends Admin_Page
            $this->wp_die_no_access();
         }
 
-        $id = (int)$_POST['ID'];
+        $id = absint( get_request_var( 'ID' ) );
 
-        $contact = Plugin::$instance->utils->get_contact($id);
+        $contact = get_contactdata( $id );
 
-        do_action('wpgh_inline_update_contact_before', $id); //todo remove
+        do_action('groundhogg/admin/contact/save_inline/before', $id, $contact );
 
-        $email = sanitize_email($_POST['email']);
+        $data = wp_unslash( $_POST );
 
-        $args['first_name'] = sanitize_text_field($_POST['first_name']);
-        $args['last_name'] = sanitize_text_field($_POST['last_name']);
-        $args['owner_id'] = intval($_POST['owner']);
+        $email = sanitize_email( get_array_var( $data, 'email' ) );
+
+        $args['first_name'] = sanitize_text_field( get_array_var( $data, 'first_name' ) );
+        $args['last_name'] = sanitize_text_field( get_array_var( $data, 'last_name' ) );
+        $args['owner_id'] = absint( get_array_var( $data, 'owner' ) );
 
         $err = array();
 
@@ -734,30 +645,10 @@ class Contacts_Page extends Admin_Page
             $err[] = _x('Invalid email address.', 'notice', 'groundhogg');
         }
 
-        //check if it's the current email address.
-        if ($contact->email !== $email) {
-
-
-
-
-            //check if another email address like it exists...
-            if (!Plugin::$instance->dbs->get_db('contacts')->exists($email)) {
-                $args['email'] = $email;
-
-                //update new optin status to unconfirmed
-                $contact->change_marketing_preference( Preferences::UNCONFIRMED );
-                $err[] = sprintf(_x('The email address of this contact has been changed to %s. Their optin status has been changed to [unconfirmed] to reflect the change as well.', 'notice', 'groundhogg'), $email );
-
-            } else {
-
-                $err[] = sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email);
-
-            }
-
-        }
-
-        if (!$args['first_name']) {
-            $err[] = _x('First name cannot be blank.', 'notice', 'groundhogg');
+        if ($contact->get_email() !== $email && ! Plugin::$instance->dbs->get_db('contacts')->exists( $email ) ) {
+            $args['email'] = $email;
+        } else {
+            $err[] = sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email);
         }
 
         if ($err) {
@@ -765,11 +656,9 @@ class Contacts_Page extends Admin_Page
             exit;
         }
 
-        $args = array_map('stripslashes', $args);
+        $contact->update( $args );
 
-        $contact->update($args);
-
-        $tags = Plugin::$instance->dbs->get_db('tags')->validate( $_POST['tags'] ); //todo
+        $tags = get_db('tags' )->validate( get_array_var( $data, 'tags' ) ); //todo
 
         $cur_tags = $contact->get_tags();
         $new_tags = $tags;
@@ -785,16 +674,12 @@ class Contacts_Page extends Admin_Page
 
         }
 
-        do_action('wpgh_inline_update_contact_after', $id); // todo remove
+        do_action('groundhogg/admin/contact/save_inline/after', $id, $contact );
 
-        if (!class_exists('Contacts_Table')) {
-            include_once 'contacts-table.php';
-        }
-
-        $contactTable = new Contacts_Table;
+        $contactTable = new Tables\Contacts_Table;
         $contactTable->single_row( Plugin::$instance->dbs->get_db('contacts')->get( $id ) );
 
-        wp_die(); // todo return or not !
+        wp_die();
     }
 
 
@@ -803,33 +688,20 @@ class Contacts_Page extends Admin_Page
      */
     public function view()
     {
-
         if (!current_user_can('view_contacts')) {
             $this->wp_die_no_access();
         }
 
-        if (!class_exists('Contacts_Table')) {
-            include dirname(__FILE__) . '/contacts-table.php';
-        }
-
-        $contacts_table = new Contacts_Table();
-
+        $contacts_table = new Tables\Contacts_Table();
         $this->search_form( __( 'Search Contacts', 'groundhogg' ) );
 
+        $contacts_table->views();
+        $contacts_table->prepare_items();
+        $contacts_table->display();
 
-        $contacts_table->views(); ?>
-        <form method="post" class="search-form wp-clearfix">
-            <!-- search form -->
-
-            <?php $contacts_table->prepare_items(); ?>
-            <?php $contacts_table->display(); ?>
-            <?php
-            if ($contacts_table->has_items())
-                $contacts_table->inline_edit();
-            ?>
-        </form>
-
-        <?php
+        if ( $contacts_table->has_items() ){
+            $contacts_table->inline_edit();
+        }
     }
 
     /**
@@ -874,126 +746,5 @@ class Contacts_Page extends Admin_Page
     protected function add_additional_actions()
     {
         // TODO: Implement add_additional_actions() method.
-    }
-
-    /**
-     * From the search.php page access the POST and generate a WHERE clause...
-     */
-    private function do_search()
-    {
-        global $wpdb;
-
-        $contacts       = Plugin::$instance->dbs->get_db('contacts')->table_name;
-        $contact_meta   = Plugin::$instance->dbs->get_db('contactmeta')->table_name;
-        $tags           = Plugin::$instance->dbs->get_db('tag_relationships')->table_name;
-
-
-        $SELECT = "SELECT DISTINCT c.* FROM $contacts AS c LEFT JOIN $contact_meta AS meta ON c.ID = meta.contact_id LEFT JOIN $tags AS tags ON c.ID = tags.contact_id";
-        $WHERE = "WHERE ";
-        $CLAUSES = array();
-
-        $general = $_POST[ 'c' ];
-        $meta    = $_POST[ 'meta' ];
-        $custom  = $_POST[ 'c_meta' ];
-        $tags    = $_POST[ 'tags' ];
-//        $tags_2    = $_POST[ 'tags_2' ];
-
-        foreach ( $general as $key => $args ){
-
-            if ( ! empty( $args[ 'search' ] ) && ! empty( $args[ 'comp' ] ) ){
-
-                $search = $wpdb->esc_like( sanitize_text_field( stripslashes( $args[ 'search' ] ) ) );
-                $CLAUSES[] = $this->generate_comparison_statement( 'c.' . $key, $args[ 'comp' ], $search );
-
-            }
-
-        }
-
-        foreach ( $meta as $key => $args ){
-
-            if ( ! empty( $args[ 'search' ] ) && ! empty( $args[ 'comp' ] ) ){
-
-                $search = $wpdb->esc_like( sanitize_text_field( stripslashes( $args[ 'search' ] ) ) );
-                $CLAUSES[] = $this->generate_comparison_statement( 'meta.meta_key', '=', sanitize_key( $key ) );
-                $CLAUSES[] = $this->generate_comparison_statement( 'meta.meta_value', $args[ 'comp' ], $search );
-
-            }
-
-        }
-
-        foreach ( $custom as $key => $args ){
-
-            if ( ! empty( $args[ 'key' ] ) && ! empty( $args[ 'search' ] ) && ! empty( $args[ 'comp' ] ) ){
-
-                $search = $wpdb->esc_like( sanitize_text_field( stripslashes( $args[ 'search' ] ) ) );
-                $CLAUSES[] = $this->generate_comparison_statement( 'meta.meta_key', '=', sanitize_key( $args[ 'key' ] ) );
-                $CLAUSES[] = $this->generate_comparison_statement( 'meta.meta_value', $args[ 'comp' ], $search );
-
-            }
-
-        }
-
-        $tags_1 = wp_parse_id_list( $tags[ 'tags_1' ]['tags'] );
-        $tags_2 = wp_parse_id_list( $tags[ 'tags_2' ]['tags'] );
-
-        $SQL = sprintf( '%s %s %s', $SELECT, $WHERE, implode( ' AND ', $CLAUSES ) );
-
-        var_dump($SQL);
-        $results = $wpdb->get_results( $SQL );
-        var_dump( $results );
-        die();
-
-    }
-
-    /**
-     * @param $key
-     * @param $comp
-     * @param $value
-     *
-     * @return string
-     */
-    private function generate_comparison_statement( $key, $comp, $value )
-    {
-        global $wpdb;
-
-        if ( is_array( $value ) ){
-            $value = sprintf( '(%s)', implode( ',', $value ) );
-        } else if ( is_numeric( $value ) ){
-            $value = intval( $value );
-        }
-
-        $insert = is_int( $value ) ? '%d' : '%s';
-
-        switch ( $comp ){
-            default:
-            case '=':
-                $statement = $wpdb->prepare( "$key = $insert", $value );
-                break;
-            case '!=':
-                $statement = $wpdb->prepare( "$key = $insert", $value );
-                break;
-            case 'LIKE sw':
-                $statement = $wpdb->prepare( "$key LIKE '%s'", $value . '%' );
-                break;
-            case 'LIKE ew':
-                $statement = $wpdb->prepare( "$key LIKE '%s'", '%' . $value );
-                break;
-            case 'LIKE c':
-                $statement = $wpdb->prepare( "$key LIKE '%s'", '%' . $value . '%' );
-                break;
-            case 'NOT LIKE c':
-                $statement = $wpdb->prepare( "$key NOT LIKE '%s'", '%' . $value . '%' );
-                break;
-            case 'EMPTY':
-                $statement = "$key IS EMPTY";
-                break;
-            case 'NOT EMPTY':
-                $statement =  "$key IS NOT EMPTY";
-                break;
-        }
-
-        return $statement;
-
-
     }
 }

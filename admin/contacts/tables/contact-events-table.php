@@ -1,5 +1,5 @@
 <?php
-namespace Groundhogg\Admin\Contacts;
+namespace Groundhogg\Admin\Contacts\Tables;
 
 use Groundhogg\Admin\Events;
 use function Groundhogg\get_request_var;
