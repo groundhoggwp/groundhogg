@@ -1,4 +1,7 @@
 <?php
+namespace Groundhogg\Admin\Funnels;
+
+use Groundhogg\Plugin;
 /**
  * Created by PhpStorm.
  * User: atty
@@ -56,7 +59,7 @@
 
                 funnelChart = {
 
-                    data: <?php echo json_encode( WPGH()->menu->funnels_page->get_chart_data() ); ?>,
+                    data: <?php echo json_encode( Plugin::$instance->admin->get_page( 'funnels' )->get_chart_data() ); ?>,
                     options: {
                         series: {
                             lines: {show: true},

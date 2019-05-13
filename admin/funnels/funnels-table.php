@@ -6,6 +6,7 @@ use Groundhogg\Plugin;
 use \WP_List_Table;
 use Groundhogg\Contact_Query;
 use Groundhogg\Admin\Funnels\Funnels_Page;
+use Groundhogg\Manager;
 
 use function Groundhogg\get_request_var;
 
@@ -191,7 +192,7 @@ class Funnels_Table extends WP_List_Table {
 	/**
      * Get default row steps...
      *
-     * @param $funnel object
+     * @param $funnel Funnel
      * @return string a list of steps
      */
     protected function handle_row_actions( $funnel, $column_name, $primary )
@@ -201,7 +202,7 @@ class Funnels_Table extends WP_List_Table {
         }
 
         $actions = array();
-        $id = $funnel->ID;
+        $id = $funnel->get_id();
 
         if ( $this->get_view() === 'archived' ) {
             $actions[ 'restore' ] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . _x( 'Restore', 'action', 'groundhogg'  ) . "</a></span>";
@@ -310,14 +311,14 @@ class Funnels_Table extends WP_List_Table {
     /**
      * Get value for checkbox column.
      *
-     * @param object $funnel A singular item (one full row's worth of data).
+     * @param  $funnel Funnel A singular item (one full row's worth of data).
      * @return string Text to be placed inside the column <td>.
      */
     protected function column_cb( $funnel ) {
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
             $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $funnel->ID                // The value of the checkbox should be the record's ID.
+            $funnel->get_id()                // The value of the checkbox should be the record's ID.
         );
     }
 
@@ -440,5 +441,14 @@ class Funnels_Table extends WP_List_Table {
         // Determine sort order.
         $result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
         return ( 'desc' === $order ) ? $result : - $result;
+    }
+
+    /**
+     * @param object $item
+     */
+    public function single_row( $item ) {
+        echo '<tr>';
+        $this->single_row_columns( new Funnel( $item->ID ) );
+        echo '</tr>';
     }
 }
