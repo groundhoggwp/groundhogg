@@ -644,7 +644,6 @@ class Contact extends Base_Object_With_Meta
         $dirs['path'] =   $this->upload_paths[ 'path' ];
         $dirs['url'] =    $this->upload_paths[ 'url' ];
         $dirs['subdir'] = $this->upload_paths[ 'subdir' ];
-        $dirs['suburl'] = $this->upload_paths[ 'suburl' ];
         return $dirs;
     }
 
@@ -656,7 +655,7 @@ class Contact extends Base_Object_With_Meta
      * @param $file
      * @return array|\WP_Error
      */
-    public function upload_file( $file )
+    public function upload_file( &$file )
     {
 
         $upload_overrides = array( 'test_form' => false );
@@ -666,17 +665,11 @@ class Contact extends Base_Object_With_Meta
         }
 
         $this->get_uploads_folder();
-
         add_filter( 'upload_dir', [ $this, 'map_upload' ] );
-
-        var_dump( $file );
-
         $mfile = wp_handle_upload( $file, $upload_overrides );
-        var_dump( $mfile );
-
         remove_filter( 'upload_dir', [ $this, 'map_upload' ] );
 
-        if( isset_not_empty( $mfile['error'] ) ) {
+        if( isset_not_empty( $mfile, 'error' ) ) {
             return new \WP_Error( 'bad_upload', __( 'Unable to upload file.', 'groundhogg' ) );
         }
 
@@ -699,8 +692,7 @@ class Contact extends Base_Object_With_Meta
     public function get_uploads_folder()
     {
         $paths = [
-            'subdir' => Plugin::$instance->utils->files->get_contact_uploads_dir(),
-            'suburl' => Plugin::$instance->utils->files->get_contact_uploads_url(),
+            'subdir'  => sprintf( '/groundhogg/uploads/%s', $this->get_upload_folder_basename() ),
             'path'    => Plugin::$instance->utils->files->get_contact_uploads_dir( $this->get_upload_folder_basename() ),
             'url'     => Plugin::$instance->utils->files->get_contact_uploads_url( $this->get_upload_folder_basename() )
         ];

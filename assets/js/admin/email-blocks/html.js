@@ -1,9 +1,9 @@
-wpghEmailEditor = wpghEmailEditor || {};
 
-var wpghHTMLBlock;
-( function( $, editor ) {
+var HtmlBlock = {};
 
-    wpghHTMLBlock = {
+( function( $, editor, block ) {
+
+    $.extend( block, {
 
         blockType: 'html',
         htmlCode: null,
@@ -11,22 +11,13 @@ var wpghHTMLBlock;
         content: null,
 
         init : function () {
-
             this.content  = $( '#html-content' );
-
-            // this.content.on( 'change', function ( e ) {
-            //     editor.getActive().find('.content-inside').html( $(this).val().trim() );
-            // });
-
+            var self = this;
             $(document).on( 'madeActive', function (e, block, blockType ) {
-                if ( wpghHTMLBlock.blockType === blockType ){
-
-                    // wpghHTMLBlock.createEditor();
-                    // console.log( {in:'text', blockType: blockType} );
-                    wpghHTMLBlock.parse( block );
+                if ( self.blockType === blockType ){
+                    self.parse( block );
                 }
             });
-
         },
 
         /**
@@ -54,18 +45,14 @@ var wpghHTMLBlock;
                 } );
 
             }
-
             this.htmlCode.setSize( this.content.parent().width(), this.content.parent().height() );
-            // this.htmlCode.setSize( this.content.parent().width(), null );
-            // this.content.val( block.find('.content-inside').html().trim() );
             this.htmlCode.setValue( block.find('.content-inside').html().trim() );
-
         }
 
-    };
+    } );
 
     $(function(){
-        wpghHTMLBlock.init();
+        block.init();
     })
 
-})( jQuery, wpghEmailEditor );
+})( jQuery, EmailEditor, HtmlBlock );

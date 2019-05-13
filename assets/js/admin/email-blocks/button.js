@@ -1,9 +1,9 @@
-wpghEmailEditor = wpghEmailEditor || {};
 
-var wpghButtonBlock;
-( function( $, editor ) {
+var ButtonBlock = {};
 
-    wpghButtonBlock = {
+( function( $, editor, block ) {
+
+    $.extend( block, {
 
         blockType: 'button',
 
@@ -15,6 +15,8 @@ var wpghButtonBlock;
         size: null,
 
         init : function () {
+
+            var self = this;
 
             this.text  = $( '#button-text' );
             this.text.on( 'keydown change', function ( e ) {
@@ -29,13 +31,13 @@ var wpghButtonBlock;
             this.color = $( '#button-color' );
             this.color.wpColorPicker({
                 change: function (event, ui) {
-                    editor.getActive().find('.email-button').attr('bgcolor', wpghButtonBlock.color.val() );}
+                    editor.getActive().find('.email-button').attr('bgcolor', self.color.val() );}
             });
 
             this.textColor = $( '#button-text-color' );
             this.textColor.wpColorPicker({
                 change: function (event, ui) {
-                    editor.getActive().find('a').css('color', wpghButtonBlock.textColor.val() );}
+                    editor.getActive().find('a').css('color', self.textColor.val() );}
             });
 
             this.font = $( '#button-font' );
@@ -50,11 +52,11 @@ var wpghButtonBlock;
 
             $(document).on( 'madeActive', function (e, block, blockType ) {
 
-                if ( wpghButtonBlock.blockType === blockType ){
+                if ( self.blockType === blockType ){
 
                     // wpghButtonBlock.createEditor();
                     // console.log( {in:'text', blockType: blockType} );
-                    wpghButtonBlock.parse( block );
+                    self.parse( block );
                 }
 
             });
@@ -74,10 +76,10 @@ var wpghButtonBlock;
 
         }
 
-    };
+    } );
 
     $(function(){
-        wpghButtonBlock.init();
+        block.init();
     })
 
-})( jQuery, wpghEmailEditor );
+})( jQuery, EmailEditor, ButtonBlock );

@@ -17,11 +17,11 @@ namespace Groundhogg\Admin\Emails\Blocks;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Column extends Email_Block
+class Column extends Block
 {
     public function get_icon()
     {
-        return GROUNDHOGG_ASSETS_PATH . 'images/email-icons/spacer-block.png' ;
+        return GROUNDHOGG_ASSETS_URL . 'images/email-icons/spacer-block.png' ;
     }
 
     public function get_name()

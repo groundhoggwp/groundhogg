@@ -17,11 +17,11 @@ namespace Groundhogg\Admin\Emails\Blocks;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Text extends Email_Block
+class Text extends Block
 {
     public function get_icon()
     {
-        return GROUNDHOGG_ASSETS_PATH . 'images/email-icons/text-block.png' ;
+        return GROUNDHOGG_ASSETS_URL . 'images/email-icons/text-block.png' ;
     }
 
     public function get_name()
@@ -110,7 +110,6 @@ class Text extends Email_Block
         wp_enqueue_script( 'groundhogg-admin-simple-editor' );
         wp_enqueue_script( 'groundhogg-email-text' );
     }
-
 
 
     /**

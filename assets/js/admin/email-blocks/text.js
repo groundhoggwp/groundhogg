@@ -1,9 +1,9 @@
-wpghEmailEditor = wpghEmailEditor || {};
 
-var wpghTextBlock;
-( function( $, editor ) {
+var TextBlock = {};
 
-    wpghTextBlock = {
+( function( $, editor, block ) {
+
+    $.extend( block, {
 
         blockType: 'text',
         pFont: null,
@@ -15,6 +15,8 @@ var wpghTextBlock;
         richText: null,
 
         init : function () {
+
+            var self = this;
 
             this.pFont  = $( '#p-font' );
             this.pFont.on( 'change', function ( e ) {
@@ -48,21 +50,15 @@ var wpghTextBlock;
 
             $(document).on( 'madeActive', function (e, block, blockType ) {
 
-                wpghTextBlock.destroyEditor();
-
-                // console.log( {in:'text', blockType: blockType} );
-
-                if ( wpghTextBlock.blockType === blockType ){
-
-                    // wpghTextBlock.createEditor();
-                    // console.log( {in:'text', blockType: blockType} );
-                    wpghTextBlock.parse( block );
+                self.destroyEditor();
+                if ( self.blockType === blockType ){
+                    self.parse( block );
                 }
 
             });
 
-            $(document).on( 'madeInactive', function ( e ) {wpghTextBlock.destroyEditor();});
-            $(document).on( 'duplicateBlock', function ( e ) {wpghTextBlock.destroyEditor();});
+            $(document).on( 'madeInactive', function ( e ) {self.destroyEditor();});
+            $(document).on( 'duplicateBlock', function ( e ) {self.destroyEditor();});
 
         },
 
@@ -77,7 +73,7 @@ var wpghTextBlock;
             this.placeActionBar();
 
             $(document).scroll( function (e) {
-                wpghTextBlock.placeActionBar();
+                block.placeActionBar();
             } );
 
         },
@@ -86,39 +82,34 @@ var wpghTextBlock;
             var $actionBAr = $( '.simple-editor-actionbar' );
             $actionBAr.width( $( '#email-body' ).width() );
 
-            var offset;
+            var yoffset;
             var xoffset;
 
-            if ( ! wpghEmailEditor.inFrame() ){
-                offset = 32;
+            if ( ! editor.inFrame() ){
+                yoffset = 32;
                 xoffset = 160;
             } else {
                 xoffset = 0;
-                offset = 0;
+                yoffset = 0;
             }
 
             // $actionBAr.css( 'top', $( '#editor' ).offset().top - offset );
-            if ( window.pageYOffset > $( '#editor' ).offset().top - ( 48 + offset ) ){
+            if ( window.pageYOffset > $( '#editor' ).offset().top - ( 48 + yoffset ) ){
                 $actionBAr.css( 'position', 'fixed' );
-                $actionBAr.css( 'top',  ( 46 + offset ) + 'px');
-                $actionBAr.css( 'left', 291 + xoffset + 'px' );
+                $actionBAr.css( 'top',  ( 46 + yoffset ) + 'px');
+                // $actionBAr.css( 'left', xoffset + 'px' );
             } else {
                 $actionBAr.css( 'position', 'absolute' );
-                $actionBAr.css( 'top', $( '#editor' ).offset().top - offset );
-                $actionBAr.css( 'left', '291px' );
-
+                $actionBAr.css( 'top', $( '#editor' ).offset().top - yoffset );
             }
 
         },
 
         destroyEditor: function(){
-            // console.log({richText:this.richText, message:'Destroying Editor'});
             if ( this.richText ){
                 this.richText.simpleEditor().destroy();
                 this.richText = null;
-                // console.log({richText:this.richText, message:'Editor Destroyed'});
             }
-
         },
 
         /**
@@ -140,10 +131,10 @@ var wpghTextBlock;
         }
 
 
-    };
+    } );
 
     $(function(){
-        wpghTextBlock.init();
+        block.init();
     })
 
-})( jQuery, wpghEmailEditor );
+})( jQuery, EmailEditor, TextBlock );

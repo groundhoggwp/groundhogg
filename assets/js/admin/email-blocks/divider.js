@@ -1,9 +1,9 @@
-wpghEmailEditor = wpghEmailEditor || {};
 
-var wpghDividerBlock;
-( function( $, editor ) {
+var DividerBlock = {};
 
-    wpghDividerBlock = {
+( function( $, editor, block ) {
+
+    $.extend( block, {
 
         blockType: 'divider',
 
@@ -12,6 +12,8 @@ var wpghDividerBlock;
         thickness: null,
 
         init : function () {
+
+            var self = this;
 
             this.height  = $( '#divider-width' );
             this.height.on( 'change input', function ( e ) {
@@ -26,13 +28,13 @@ var wpghDividerBlock;
             this.color = $( '#divider-color' );
             this.color.wpColorPicker({
                 change: function (event, ui) {
-                    editor.getActive().find('hr').css('border-top-color', wpghDividerBlock.color.val() );}
+                    editor.getActive().find('hr').css('border-top-color', self.color.val() );}
             });
 
             $(document).on( 'madeActive', function (e, block, blockType ) {
 
-                if ( wpghDividerBlock.blockType === blockType ){
-                    wpghDividerBlock.parse( block );
+                if ( self.blockType === blockType ){
+                    self.parse( block );
                 }
 
             });
@@ -50,10 +52,10 @@ var wpghDividerBlock;
 
         }
 
-    };
+    } );
 
     $(function(){
-        wpghDividerBlock.init();
+        block.init();
     })
 
-})( jQuery, wpghEmailEditor );
+})( jQuery, EmailEditor, DividerBlock );

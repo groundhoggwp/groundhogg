@@ -1,9 +1,9 @@
-wpghEmailEditor = wpghEmailEditor || {};
 
-var wpghImageBlock;
-( function( $, editor ) {
+var ImageBlock = {};
 
-    wpghImageBlock = {
+( function( $, editor, block ) {
+
+    $.extend( block, {
 
         blockType: 'image',
 
@@ -15,6 +15,8 @@ var wpghImageBlock;
         link: null,
 
         init : function () {
+
+            var self = this;
 
             this.src  = $( '#image-src' );
             this.src.on( 'change', function ( e ) {
@@ -49,11 +51,11 @@ var wpghImageBlock;
 
             $(document).on( 'madeActive', function (e, block, blockType ) {
 
-                if ( wpghImageBlock.blockType === blockType ){
+                if ( self.blockType === blockType ){
 
                     // wpghImageBlock.createEditor();
                     // console.log( {in:'text', blockType: blockType} );
-                    wpghImageBlock.parse( block );
+                    self.parse( block );
                 }
             });
         },
@@ -74,10 +76,10 @@ var wpghImageBlock;
 
         }
 
-    };
+    } );
 
     $(function(){
-        wpghImageBlock.init();
+        block.init();
     })
 
-})( jQuery, wpghEmailEditor );
+})( jQuery, EmailEditor, ImageBlock );

@@ -17,7 +17,7 @@ class Files
 
         $base = $upload_dir[ 'basedir' ] . DIRECTORY_SEPARATOR . $base;
 
-        if ( is_multisite() && ! is_global_multisite() ){
+        if ( is_multisite() && ! Plugin::$instance->settings->is_global_multisite() ){
             $base .= '/' . get_current_blog_id();
         }
 

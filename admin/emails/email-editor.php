@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 $email_id = intval( $_GET['email'] );
 $email = new Email( $email_id );
 
-$blocks = apply_filters( 'wpgh_email_blocks', array() );
+$blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
 
 ?>
 
@@ -48,7 +48,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
     <?php echo Plugin::$instance->utils->html->input( [ 'type' => 'hidden', 'name' => 'email', 'value' => $email_id ] ); ?>
 
     <div class="header-wrap">
-        <div class="funnel-editor-header">
+        <div class="editor-header">
             <div class="title-wrap">
                 <span id="title"><?php _e( 'Edit Email', 'groundhogg'  ); ?></span><a class="button" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg'  ); ?></a>
             </div>
@@ -64,6 +64,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                             'checked'       => $email->is_template(),
                         ] ); ?>
                     </div>
+                    <?php Plugin::$instance->replacements->show_replacements_button(); ?>&nbsp;
                     <?php echo Plugin::$instance->utils->html->toggle( [
                         'name'          => 'editor_view',
                         'id'            => 'editor-toggle',
@@ -119,47 +120,6 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
                 <!-- Editor -->
                 <div id="email-content">
                     <div id="editor" class="editor" style="display: flex;">
-
-                        <!-- Block Options -->
-                        <div id="editor-actions" style="display: inline-block;width: 280px;float: left">
-                            <div style="width: 280px;"></div>
-                            <div class="editor-actions-inner">
-
-                                <?php
-
-                                foreach ( $blocks as $block_type => $block ){
-
-                                    do_action( 'wpgh_' . $block_type . '_block_settings' );
-
-                                }
-
-                                ?>
-
-                                <!-- Main Content Options -->
-                                <div id="email-editor" class="postbox">
-                                    <h3 class="hndle"><?php _e( 'Email Options' , 'groundhogg' ); ?></h3>
-                                    <div class="inside">
-                                        <div class="options">
-                                            <table class="form-table">
-                                                <tr>
-                                                    <th><?php _e( 'Alignment' ); ?></th>
-                                                    <td>
-                                                        <select id="email-align" name="email_alignment">
-                                                            <option value="left" <?php if ( $email->get_meta( 'alignment' ) === 'left' ) echo 'selected' ; ?> ><?php _e('Left'); ?></option>
-                                                            <option value="center" <?php if ( $email->get_meta( 'alignment' ) === 'center' ) echo 'selected' ; ?>><?php _e('Center'); ?></option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><?php _e( 'Enable Browser View' , 'groundhogg' ); ?></th>
-                                                    <td><input type="checkbox" name="browser_view" value="1" <?php if ( $email->get_meta( 'browser_view' ) == 1 ) echo 'checked' ; ?>></td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto;">
 
                             <?php $alignment = $email->get_meta( 'alignment' );
@@ -191,94 +151,108 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
 
             <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sidebar">
-                <div id="submitdiv" class="postbox">
-                    <h3 class="hndle"><?php echo __( 'Sender', 'groundhogg' );?></h3>
-                    <div class="inside">
-                        <div class="submitbox">
-                            <div id="minor-publishing-actions">
-                                <?php do_action( 'wpgh_email_actions_before' ); ?>
-                                <table class="form-table">
-                                    <tbody>
-                                    <tr>
-                                        <th><?php _e( 'From User:', 'groundhogg'  ); ?></th>
-                                        <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user ); ?>
-                                        <td><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th><label for="send_test"><?php _e( 'Send Test:', 'groundhogg'  ); ?></label></th>
-                                        <td><input type="checkbox" id="send_test" name="send_test"></td>
-                                    </tr>
-                                    <tr id="send-to" class="hidden">
-                                        <th><?php _e( 'To:', 'groundhogg' ); ?></th>
-                                        <?php $to = $email->get_meta( 'test_email' ) ? $email->get_meta( 'test_email' ) : get_current_user_id(); ?>
-                                        <?php $args = array( 'option_none' => __( 'Please Select One.' ) , 'id' => 'test_email', 'name' => 'test_email', 'selected' => $to ); ?>
-                                        <td><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></td>
-                                    </tr>
-                                    <script>
-                                        jQuery(function($){$("#send_test").on( 'input', function(){
-                                            $("#send-to").toggleClass( 'hidden' );
-                                        })});
-                                    </script>
-                                    </tbody>
-                                </table>
-                                <?php do_action( 'wpgh_email_actions_after' ); ?>
+                <div id="editor-panel">
+                    <?php
+
+                    foreach ( $blocks as $block_type => $block ){
+                        do_action( "groundhogg/admin/emails/blocks/$block_type/settings_panel" );
+                    }
+
+                    ?>
+                </div>
+                <div id="settings-panel">
+                    <div id="submitdiv" class="postbox">
+                        <h3 class="hndle"><?php _e( 'Email Options' , 'groundhogg' ); ?></h3>
+                        <div class="inside">
+                            <div class="submitbox">
+                                <div id="minor-publishing-actions">
+                                    <table class="form-table">
+                                        <tbody>
+                                        <tr>
+                                            <th><?php _e( 'From:', 'groundhogg'  ); ?></th>
+                                            <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user ); ?>
+                                            <td><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e( 'Alignment' ); ?></th>
+                                            <td>
+                                                <select id="email-align" name="email_alignment">
+                                                    <option value="left" <?php if ( $email->get_meta( 'alignment' ) === 'left' ) echo 'selected' ; ?> ><?php _e('Left'); ?></option>
+                                                    <option value="center" <?php if ( $email->get_meta( 'alignment' ) === 'center' ) echo 'selected' ; ?>><?php _e('Center'); ?></option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <script>
+                                            jQuery(function($){$("#send_test").on( 'input', function(){
+                                                $("#send-to").toggleClass( 'hidden' );
+                                            })});
+                                        </script>
+                                        </tbody>
+                                    </table>
+                                    <table class="form-table">
+                                        <tbody>
+                                        <tr>
+                                            <th><?php _e( 'Enable Browser View' , 'groundhogg' ); ?></th>
+                                            <td><input type="checkbox" name="browser_view" value="1" <?php if ( $email->get_meta( 'browser_view' ) == 1 ) echo 'checked' ; ?>></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <?php do_action( 'wpgh_email_side_actions_after' ); ?>
-                <?php do_action( 'wpgh_email_blocks_before' ); ?>
-                <div id='blocks' class="postbox">
-                    <h2 class="hndle"><?php echo __( 'Blocks', 'groundhogg' );?></h2>
-                    <div class="inside">
-                        <table>
-                            <tbody>
+                    <div id='blocks' class="postbox">
+                        <h2 class="hndle"><?php echo __( 'Blocks', 'groundhogg' );?></h2>
+                        <div class="inside">
+                            <table>
+                                <tbody>
 
-                            <?php
-
-                            $i = 0;
-
-                            ?><tr><?php
-
-                                foreach ( $blocks as $block_type => $block ):
-
-                                if ( ( $i % 2 ) == 0 ):
-                                ?></tr><tr><?php
-                                endif;
-
-                                ?>
-                                <td>
-                                    <div id='<?php echo $block[ 'name' ]; ?>-block' data-block-type="<?php echo $block[ 'name' ]; ?>" class="wpgh-element email-draggable">
-                                        <div class="builder-icon">
-                                            <img src="<?php echo $block[ 'icon' ]; ?>"></div>
-                                        <p><?php echo $block[ 'title' ]; ?></p>
-                                    </div>
-                                </td>
                                 <?php
 
-                                $i++;
+                                $i = 0;
 
-                                endforeach;
+                                ?><tr><?php
 
-                                ?></tr><?php
+                                    foreach ( $blocks as $block_type => $block ):
 
-                            ?>
-                            </tbody>
-                        </table>
-                        <div class="hidden">
+                                    if ( ( $i % 2 ) == 0 ):
+                                    ?></tr><tr><?php
+                                    endif;
 
-                            <?php
+                                    ?>
+                                    <td>
+                                        <div id='<?php echo $block[ 'name' ]; ?>-block' data-block-type="<?php echo $block[ 'name' ]; ?>" class="wpgh-element email-draggable">
+                                            <div class="builder-icon">
+                                                <img src="<?php echo $block[ 'icon' ]; ?>"></div>
+                                            <p><?php echo $block[ 'title' ]; ?></p>
+                                        </div>
+                                    </td>
+                                    <?php
 
-                            foreach ( $blocks as $block_type => $block ){
+                                    $i++;
 
-                                ?><div class="<?php echo $block[ 'name' ]; ?>-template"><?php
-                                do_action( 'wpgh_' . $block_type . '_block_html' );
-                                ?></div> <?php
+                                    endforeach;
 
-                            }
+                                    ?></tr><?php
 
-                            ?>
-                            <div id="temp-html" class="hidden"></div>
+                                ?>
+                                </tbody>
+                            </table>
+                            <div class="hidden">
+
+                                <?php
+
+                                foreach ( $blocks as $block_type => $block ){
+
+                                    ?><div class="<?php echo $block[ 'name' ]; ?>-template"><?php
+                                    do_action( "groundhogg/admin/emails/blocks/$block_type/html" );
+                                    ?></div> <?php
+
+                                }
+
+                                ?>
+                                <div id="temp-html" class="hidden"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -287,6 +261,5 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
             <!-- End elements area-->
             <div style="clear: both;"></div>
         </div>
-        <?php Plugin::$instance->replacements->get_table();  ?>
     </div>
 </form>

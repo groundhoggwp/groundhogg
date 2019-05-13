@@ -141,6 +141,25 @@ function get_json_error( $json ){
 }
 
 /**
+ * Normalize multiple files.
+ *
+ * @param $files
+ * @return array
+ */
+function normalize_files( &$files )
+{
+    $_files       = [ ];
+    $_files_count = count( $files[ 'name' ] );
+    $_files_keys  = array_keys( $files );
+
+    for ( $i = 0; $i < $_files_count; $i++ )
+        foreach ( $_files_keys as $key )
+            $_files[ $i ][ $key ] = $files[ $key ][ $i ];
+
+    return $_files;
+}
+
+/**
  * Dequeue Theme styles for compatibility
  */
 function dequeue_theme_css_compat()

@@ -20,11 +20,11 @@ use Groundhogg\Plugin;
 // Exit if accessed directly
 if (!defined('ABSPATH')) exit;
 
-class HTML extends Email_Block
+class HTML extends Block
 {
     public function get_icon()
     {
-        return GROUNDHOGG_ASSETS_PATH . 'images/email-icons/html-block.png';
+        return GROUNDHOGG_ASSETS_URL . 'images/email-icons/html-block.png';
     }
 
     public function get_name()

@@ -1,9 +1,10 @@
-wpghEmailEditor = wpghEmailEditor || {};
 
-var wpghSpacerBlock;
-( function( $, editor ) {
+var SpacerBlock = {};
 
-    wpghSpacerBlock = {
+( function( $, editor, block ) {
+
+    $.extend( block, {
+
         blockType: 'spacer',
         height: null,
         init : function () {
@@ -13,13 +14,11 @@ var wpghSpacerBlock;
                 editor.getActive().find('.spacer').attr('height', $(this).val() );
             });
 
+            var self = this;
+
             $(document).on( 'madeActive', function (e, block, blockType ) {
-
-                if ( wpghSpacerBlock.blockType === blockType ){
-
-                    // wpghSpacerBlock.createEditor();
-                    // console.log( {in:'text', blockType: blockType} );
-                    wpghSpacerBlock.parse( block );
+                if ( self.blockType === blockType ){
+                    self.parse( block );
                 }
 
             });
@@ -36,10 +35,10 @@ var wpghSpacerBlock;
 
         }
 
-    };
+    } );
 
     $(function(){
-        wpghSpacerBlock.init();
+        block.init();
     })
 
-})( jQuery, wpghEmailEditor );
+})( jQuery, EmailEditor, SpacerBlock );

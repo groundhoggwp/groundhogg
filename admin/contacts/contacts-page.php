@@ -5,6 +5,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
+use function Groundhogg\normalize_files;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
@@ -451,8 +452,9 @@ class Contacts_Page extends Admin_Page
             }
         }
 
-        if ( ! empty( $_FILES ) ) {
-            foreach ( $_FILES as $file_key => $file ){
+        if ( ! empty( $_FILES[ 'files' ] ) ) {
+            $files = normalize_files( $_FILES[ 'files' ] );
+            foreach ( $files as $file_key => $file ){
                 $e = $contact->upload_file( $file );
                 if ( is_wp_error( $e ) ){
                     return $e;

@@ -21,7 +21,7 @@ use Groundhogg\Plugin;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-abstract class Email_Block
+abstract class Block
 {
 
     /**
@@ -115,7 +115,7 @@ abstract class Email_Block
 
         $block_settings = $this->register_settings();
 
-        $html = sprintf( "<div id=\"%1$s-block-editor\" data-block-settings=\"%1$s\" class=\"postbox hidden\">", $this->get_name() );
+        $html = sprintf( '<div id="%1$s-block-editor" data-block-settings="%1$s" class="postbox hidden">', $this->get_name() );
         $html.= sprintf( "<h3 class=\"hndle\">%s</h3>", $this->get_title() );
         $html.= "<div class=\"inside\"><div class=\"options\"><table class=\"form-table\">";
 
