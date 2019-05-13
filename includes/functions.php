@@ -59,7 +59,7 @@ function isset_not_empty($array, $key='' )
 function get_request_var( $key='', $default=false, $post_only=false )
 {
     $global = $post_only ? $_POST : $_REQUEST;
-    return get_array_var( $global, $key, $default );
+    return wp_unslash( get_array_var( $global, $key, $default ) );
 }
 
 /**

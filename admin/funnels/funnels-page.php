@@ -108,7 +108,7 @@ class Funnels_Page extends Admin_Page
 
            wp_enqueue_script( 'groundhogg-admin-link-picker' );
            wp_enqueue_script( 'sticky-sidebar' );
-           wp_enqueue_script( 'jquery-sticky-sidebar' );
+//           wp_enqueue_script( 'jquery-sticky-sidebar' );
 
            wp_enqueue_style(  'groundhogg-admin-funnel-editor' );
            wp_enqueue_script( 'groundhogg-admin-funnel-editor' );

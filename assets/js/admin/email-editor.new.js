@@ -77,7 +77,7 @@
             self.alignment = $( '#email-align' );
             self.alignment.on( 'change', function () {
                 var email =  $( '#email-inside' );
-                if ( $( self ).val() === 'left' ){
+                if ( $( this ).val() === 'left' ){
                     email.css( 'margin-left', '0' );
                     email.css( 'margin-right', 'auto' );
                 } else {
@@ -136,7 +136,7 @@
                 }
             }).change();
 
-            this.sidebar = $('#postbox-container-1').stickySidebar({
+            this.sidebar = new StickySidebar( '#postbox-container-1' , {
                 topSpacing: 78,
                 bottomSpacing: 0
             });
@@ -194,30 +194,19 @@
             var fd = $('form').serialize();
             fd = fd +  '&action=gh_update_email';
 
-            var ajaxCall = $.ajax({
-                type: "post",
-                url: ajaxurl,
-                dataType: 'json',
-                data: fd,
-                success: function ( response ) {
+            adminAjaxRequest( fd, function ( response ) {
 
-                    if ( self.inFrame() ){
-                        parent.wpghEmailElement.changesSaved = true;
-                    }
+                handleNotices( response.data.notices );
+                hideSpinner();
 
-                    $( '#notices' ).html( response.notices );
-                    hideSpinner();
-                    $( '.row' ).wpghToolBar();
-                    self.makeDismissible();
+                $( '.row' ).wpghToolBar();
 
-                }
-            });
-
+                console.log( response );
+            } );
         },
 
         editorSizing: function (){
             $('.editor-header').width( $('#poststuff').width() );
-            // $('#email-body').height( $(window).height() - ( 47 * 3 ) );
         },
 
         /**
@@ -251,8 +240,16 @@
                 },
                 stop: function ( e, ui ) {
                     $('#email-content').find('.email-draggable').replaceWith( $('#temp-html').html() );
-
                 }
+            });
+        },
+
+        /**
+         * Make the blocks draggable
+         */
+        makeClickable: function(){
+            $( ".email-draggable" ).on( 'dblclick', function ( e ) {
+                $('#email-content')
             });
         },
 
@@ -321,7 +318,7 @@
             $(document).trigger( 'madeActive', [ block, blockType ] );
             // console.log( { block_type: blockType, block: block });
 
-            // this.sidebar.updateSticky();
+            this.sidebar.updateSticky();
 
         },
 

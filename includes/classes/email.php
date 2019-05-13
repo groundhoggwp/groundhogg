@@ -243,7 +243,7 @@ class Email extends Base_Object_With_Meta
             switch_to_blog( get_site()->site_id );
         }
 
-        $url = get_permalink( Plugin::$instance->settings->get_option( 'view_in_browser_page' ) ) . '?email=' . $this->get_id();
+        $url = sprintf( "%s/gh/browser-view/emails/%d", site_url(), $this->get_id() );
 
         if ( is_multisite() && ms_is_switched() ) {
             restore_current_blog();

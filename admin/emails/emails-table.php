@@ -106,21 +106,17 @@ class Emails_Table extends WP_List_Table {
         $count_trash  = Plugin::$instance->dbs->get_db('emails')->count( array( 'status' => 'trash' ) );
         $count_all = $count_ready + $count_draft;
 
+        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails' ) . "'>" . __( 'All' ) . " <span class='count'>(" . $count_all . ")</span>" . "</a>";
+        $views['ready'] = "<a class='" .  print_r( ( $this->get_view() === 'ready' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . $count_ready . ")</span>" . "</a>";
+        $views['draft'] = "<a class='" .  print_r( ( $this->get_view() === 'draft' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . $count_draft . ")</span>" . "</a>";
+        $views['trash'] = "<a class='" .  print_r( ( $this->get_view() === 'trash' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . $count_trash . ")</span>" . "</a>";
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=all' ) . "'>" . __( 'All' ) . " <span class='count'>(" . $count_all . ")</span>" . "</a>";
-
-        $views['ready'] = "<a class='" .  print_r( ( $this->get_view() === 'ready' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . $count_ready . ")</span>" . "</a>";
-
-        $views['draft'] = "<a class='" .  print_r( ( $this->get_view() === 'draft' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . $count_draft . ")</span>" . "</a>";
-
-        $views['trash'] = "<a class='" .  print_r( ( $this->get_view() === 'trash' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&view=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . $count_trash . ")</span>" . "</a>";
-
-        return apply_filters(  'wpgh_email_views', $views );
+        return apply_filters(  'groundhogg/admin/emails/table/views', $views );
     }
 
     protected function get_view()
     {
-        return ( isset( $_GET['view'] ) )? $_GET['view'] : 'all';
+        return ( isset( $_GET['status'] ) )? $_GET['status'] : 'all';
     }
 
     /**
@@ -341,9 +337,16 @@ class Emails_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
+		$query = wp_unslash( $_REQUEST );
+		unset( $query[ 'page' ] );
 
+		if ( empty( $query ) ){
+		    $query = [
+                'status' => [ 'draft', 'ready' ]
+            ];
+        }
 
-        $data = Plugin::$instance->dbs->get_db('emails' )->query( $_GET ); //todo check
+        $data = Plugin::$instance->dbs->get_db('emails' )->query( $query ); //todo check
 
 		/*
 		 * Sort the data

@@ -82,8 +82,7 @@ class Emails_Page extends Admin_Page
             wp_enqueue_script( 'codemirror-mode-html' );
 
             wp_enqueue_script( 'sticky-sidebar' );
-            wp_enqueue_script( 'jquery-sticky-sidebar' );
-
+            //            wp_enqueue_script( 'jquery-sticky-sidebar' );
 
             // adding beautify js
             wp_enqueue_script( 'beautify-js'  );
@@ -103,6 +102,8 @@ class Emails_Page extends Admin_Page
             wp_enqueue_script( 'groundhogg-admin-iframe' );
             wp_enqueue_style( 'groundhogg-admin-iframe' );
         }
+
+        wp_enqueue_style( 'groundhogg-admin' );
     }
 
 
@@ -279,118 +280,105 @@ class Emails_Page extends Admin_Page
         return true;
     }
 
-    private function process_edit()
+    public function update_email_ajax()
+    {
+
+        if ( ! wp_doing_ajax() ){
+            return;
+        }
+
+        if ( ! $this->verify_action() ){
+            wp_send_json_error();
+        }
+
+        $result = $this->process_edit();
+
+        if ( is_wp_error( $result ) ){
+            $this->add_notice( $result );
+        }
+
+        $this->send_ajax_response( $result );
+
+    }
+
+    public function process_edit()
     {
         if ( ! current_user_can( 'edit_emails' ) ){
             $this->wp_die_no_access();
         }
 
-        $id = intval( $_REQUEST[ 'email' ] );
-
-        //do_action( 'wpgh_email_update_before', $id ); todo
+        $id = absint( Groundhogg\get_request_var( 'email' ) );
+        $email = Plugin::$instance->utils->get_email( $id );
 
         $args = array();
 
-        $status = ( isset( $_POST['email_status'] ) )? sanitize_text_field( trim( wp_unslash( $_POST['email_status'] ) ) ): 'draft';
-        $args[ 'status' ] = $status;
+        $status = sanitize_text_field( Groundhogg\get_request_var( 'email_status', 'draft' ) );
 
         if ( $status === 'draft' ) {
-            $this->add_notice( 'email-in-draft-mode', __( 'This email will not be sent while in DRAFT mode.', 'groundhogg' ), 'info' );
+            $this->add_notice( 'email-in-draft-mode', __( 'Emails cannot be sent while in DRAFT mode.', 'groundhogg' ), 'warning' );
         }
 
-        $from_user =  ( isset( $_POST['from_user'] ) )? intval( $_POST['from_user'] ): -1;
-        $args[ 'from_user' ] = $from_user;
+        $from_user = absint( Groundhogg\get_request_var( 'from_user' ) );
 
         if ( $from_user > 0 ){
             $user = get_userdata( $from_user );
-            if ( !  wpgh_email_is_same_domain( $user->user_email ) ){ //todo
+            if ( !  Groundhogg\email_is_same_domain( $user->user_email ) ){ //todo
                 $this->add_notice( 'email-cross-domain-warning', sprintf( __( 'You are sending this email from an email address (%s) which does not belong to this server. This may cause deliverability issues and harm your sender reputation.', 'groundhogg' ), $user->user_email ), 'warning' );
             }
         }
 
-        $subject =  ( isset( $_POST['subject'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['subject'] ) ) ) ): '';
+        $subject = sanitize_text_field( Groundhogg\get_request_var( 'subject' ) );
+        $pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );
+        $content =  apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'content' ) );
+
+        $args[ 'status' ] = $status;
         $args[ 'subject' ] = $subject;
-
-        $pre_header =  ( isset( $_POST['pre_header'] ) )? wp_strip_all_tags( sanitize_text_field( trim( stripslashes( $_POST['pre_header'] ) ) ) ): '';
         $args[ 'pre_header' ] = $pre_header;
-
-        //todo
-        $content =  ( isset( $_POST['content'] ) )? apply_filters( 'wpgh_sanitize_email_content', Plugin::$instance->utils-> wpgh_minify_html( trim( stripslashes( $_POST['content'] ) ) ) ): '';
         $args[ 'content' ] = $content;
 
         $args[ 'last_updated' ] = current_time( 'mysql' );
-
         $args[ 'is_template' ] = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
 
 
-        if ( Plugin::$instance->dbs->get_db('emails')->update( $id, $args ) ){
+        if ( $email->update( $args ) ){
             $this->add_notice( 'email-updated', __( 'Email Updated.', 'groundhogg' ), 'success' );
         } else {
-            $this->add_notice( 'email-update-error', __( 'Something went wrong.', 'groundhogg' ), 'error' );
+            return new \WP_Error( 'unable_to_update_email', 'Unable to update email!' );
         }
 
-        $alignment =  ( isset( $_POST['email_alignment'] ) )? sanitize_text_field( trim( stripslashes( $_POST['email_alignment'] ) ) ): '';
-        Plugin::$instance->dbs->get_db('emailmeta' )->update_meta( $id, 'alignment', $alignment );
+        $email->update_meta( 'alignment', sanitize_text_field( Groundhogg\get_request_var( 'email_alignment' ) ) );
+        $email->update_meta( 'browser_view', boolval( Groundhogg\get_request_var( 'browser_view' ) ) );
 
-
-        $browser_view =  ( isset( $_POST['browser_view'] ) )? 1 : false;
-        Plugin::$instance->dbs->get_db('emailmeta' )->update_meta( $id, 'browser_view', $browser_view ); //todo
-
-//        do_action( 'wpgh_email_update_after', $id ); todo
-
-        if ( isset( $_POST['send_test'] ) ){
+        if ( Groundhogg\get_request_var( 'send_test' ) ){
 
             if ( ! current_user_can( 'send_emails' ) ){
                 $this->wp_die_no_access();
             }
 
-//            do_action( 'wpgh_before_send_test_email', $id ); todo
+            $contact = new Groundhogg\Contact( [ 'user_id' => get_current_user_id() ] );
 
-            $test_email_uid =  ( isset( $_POST['test_email'] ) )? intval( $_POST['test_email'] ): '';
+            if ( $contact->exists() ){
 
-            if ( $test_email_uid ){
-
-                Plugin::$instance->dbs->get_db('emailmeta' )->update_meta( $id, 'test_email', $test_email_uid  ); //todo
-
-                $email = new Email( $id );
-
-                $email->enable_test_mode();
-
-                $user = get_userdata( $test_email_uid );
-
-                if ( ! Plugin::$instance->dbs->get_db('contacts')->exists( $user->user_email ) ){
-                    wpgh_create_contact_from_user( $user ); //todo
-                }
-
-                $contact = Plugin::$instance->utils->get_contact( $user->user_email );
-
-                $sent = $contact->exists() ? $email->send( $contact ) : false;
+                $sent = $email->send( $contact );
 
                 if ( ! $sent || is_wp_error( $sent ) ){
-                    if ( is_wp_error( $sent ) ){
-//                        $this->notices->add( $sent );
-                        $this->add_notice($sent);
-                    } else {
-                        return new \WP_Error( 'oops', "Failed to send test:" ); //todo add error message
-                    }
+                    return is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test:" );
                 } else {
-
-
                     $this->add_notice(
                         esc_attr( 'sent-test' ),
                         sprintf( "%s %s",
                             __( 'Sent test email to', 'groundhogg' ),
-                            get_userdata( $test_email_uid )->user_email ),
+                            $contact->get_email() ),
                         'success'
                     );
                 }
 
-                do_action( 'wpgh_after_send_test_email', $id ); //todo
             } else {
                 return new \WP_Error( 'oops', __( 'Failed to send test: No user selected. PLease select a user to send the test to.', 'groundhogg' ) );
             }
         }
-        return true;
+
+        return $email->get_as_array();
     }
 
     /**
@@ -406,8 +394,7 @@ class Emails_Page extends Admin_Page
 
         if ( isset( $_POST[ 'email_template' ] ) ){
 
-//            include_once WPGH_PLUGIN_DIR . '/templates/email-templates.php';  todo  may be not required
-
+            include_once GROUNDHOGG_PATH . '/templates/assets/email-templates.php';
             /**
              * @var $email_templates array
              * @see /templates/email-templates.php
@@ -447,36 +434,10 @@ class Emails_Page extends Admin_Page
             $step_id = intval( $_GET['return_step'] );
             $funnel_id = intval( $_GET['return_funnel'] );
             $return_path .= sprintf( "&return_funnel=%s&return_step=%s", $funnel_id, $step_id );
-            Plugin::$instance->dbs->get_db('emailmeta')->update_meta( $step_id , 'email_id' ,$email_id ); //todo Update meta
+            Groundhogg\get_db('stepmeta' )->update_meta( $step_id, 'email_id', $email_id );
         }
-
-//        do_action( 'wpgh_add_email', $email_id ); todo remove
 
         return $return_path ;
-
-    }
-
-    public function update_email_ajax()
-    {
-
-        if ( ! wp_doing_ajax() ){
-            return;
-        }
-
-//        $this->update_email();
-        $this->process_edit();
-
-        ob_start();
-
-        //$this->add_notice();
-
-        $notices = ob_get_clean();  // todo
-
-        $response = array(
-            'notices'   => $notices
-        );
-
-        wp_die( json_encode( $response ) );
 
     }
 
@@ -567,7 +528,7 @@ class Emails_Page extends Admin_Page
     {
         ob_start();
 
-        $emails = array_slice( Plugin::$instance->dbs->get_db('emails')->query( [ 'search' => sanitize_text_field( stripslashes( $_POST[ 's' ] ) ) ] ), 0, 20 );
+        $emails = array_slice( Plugin::$instance->dbs->get_db('emails')->query( [ 'search' => sanitize_text_field( wp_unslash( $_POST[ 's' ] ) ) ] ), 0, 20 );
 
         if ( empty( $emails ) ):
             ?> <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php

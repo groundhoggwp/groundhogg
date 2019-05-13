@@ -97,10 +97,11 @@ var TextBlock = {};
             if ( window.pageYOffset > $( '#editor' ).offset().top - ( 48 + yoffset ) ){
                 $actionBAr.css( 'position', 'fixed' );
                 $actionBAr.css( 'top',  ( 46 + yoffset ) + 'px');
-                // $actionBAr.css( 'left', xoffset + 'px' );
+                $actionBAr.css( 'left', xoffset + 'px' );
             } else {
                 $actionBAr.css( 'position', 'absolute' );
                 $actionBAr.css( 'top', $( '#editor' ).offset().top - yoffset );
+                $actionBAr.css( 'left', 0 );
             }
 
         },

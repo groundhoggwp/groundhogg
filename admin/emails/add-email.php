@@ -4,7 +4,6 @@ namespace Groundhogg\Admin\Emails;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
 
-
 /**
  * Add Email
  *
@@ -63,8 +62,14 @@ if ( count( $custom_templates ) > 0 ){
     <?php wp_nonce_field(); ?>
 
     <?php if ( $active_tab === 'templates' ):
-        include WPGH_PLUGIN_DIR . 'templates/email-templates.php';
-        //todo check for variable error
+
+        $email_templates = [];
+
+        include GROUNDHOGG_PATH . 'templates/assets/email-templates.php';
+
+        /**
+         * @param $email_templates array
+         */
         foreach ( $email_templates as $id => $email_args ): ?>
 
         <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
@@ -99,8 +104,7 @@ if ( count( $custom_templates ) > 0 ){
         <div id="emails">
             <!-- Only retrieve previous 20 emails.. -->
             <?php
-//            $emails = array_slice( WPGH()->emails->get_emails(), 0, 20 );
-            $emails = array_slice(  Plugin::$instance->dbs->get_db('emails')->query() , 0, 20 );
+            $emails = array_slice(  Plugin::$instance->dbs->get_db('emails' )->query() , 0, 20 );
             ?>
             <?php foreach ( $emails as $email ): ?>
                 <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
@@ -154,18 +158,18 @@ if ( count( $custom_templates ) > 0 ){
             })(jQuery);
         </script>
     <?php else:
-        foreach ( $custom_templates as $id => $email_args ): ?>
+        foreach ( $custom_templates as $id => $email ): ?>
             <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
-                <h2 class="hndle"><?php esc_html_e( $email_args->subject ); ?></h2>
+                <h2 class="hndle"><?php esc_html_e( $email->subject ); ?></h2>
                 <div class="inside">
                     <p><?php
-                        echo ( ! empty( $email_args->pre_header ) ) ? esc_html( $email_args->pre_header ) : '&#x2014;';
+                        echo ( ! empty( $email->pre_header ) ) ? esc_html( $email->pre_header ) : '&#x2014;';
                     ?></p>
                     <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $id; ?> " class="email-container postbox">
-                        <?php echo $email_args->content; ?>
+                        <?php echo $email->content; ?>
                     </div>
                     <button class="choose-template button-primary" name="email_id" value="<?php echo $email->ID;  //todo find var ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
-                    <a class="button-secondary" href="<?php printf( admin_url( 'admin.php?page=gh_emails&action=edit&email=%d' ), $email_args->ID ); ?>"><?php _e( 'Edit Template', 'groundhogg' ); ?></a>
+                    <a class="button-secondary" href="<?php printf( admin_url( 'admin.php?page=gh_emails&action=edit&email=%d' ), $email->ID ); ?>"><?php _e( 'Edit Template', 'groundhogg' ); ?></a>
                 </div>
             </div>
         <?php endforeach;

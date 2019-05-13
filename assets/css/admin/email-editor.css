@@ -9,8 +9,9 @@
 }
 
 #poststuff {
-    padding-top: 0px;
+    padding-top: 0;
     margin-top: 47px;
+    background: #FFFFFF;
 }
 
 .header-wrap{
@@ -21,7 +22,7 @@
     float: right;
     margin-right: -300px;
     width: 299px;
-    border-left: 1px solid #e5e5e5;
+    /*border-left: 1px solid #e5e5e5;*/
 }
 
 #postbox-container-1 .postbox{
@@ -31,6 +32,9 @@
     margin: 0;
 }
 
+#postbox-container-1 .postbox:last-child{
+    border-bottom: none;
+}
 
 .editor-header{
     z-index: 9999;
@@ -78,12 +82,16 @@
 
 .notice {
     margin: 0;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e2e4e7;
 }
 
 #post-body-content, .edit-form-section {
      margin-bottom: 0;
 }
+
+/*.is-affixed .inner-wrapper-sticky {*/
+    /*border-left: 1px solid #e2e4e7;*/
+/*}*/
 
 /* END NEW STUFF */
 
@@ -108,6 +116,10 @@ wpgh-toolbar hr{
 
 select {
     vertical-align: top;
+}
+
+#titlediv{
+    border-right: 1px solid #e2e4e7;
 }
 
 #titlediv #subject, #titlediv #pre_header {
@@ -174,6 +186,7 @@ select {
     margin-right: auto;
     box-sizing: border-box;
     background-color: #FFFFFF;
+    border-right: 1px solid #e2e4e7;
 }
 
 #email-body a:focus{
@@ -207,7 +220,8 @@ select {
 }
 
 #editor{
-    min-height: 500px;
+    min-height: 80vh;
+    max-height: 90vh;
 }
 
 #editor-panel .postbox {
@@ -367,4 +381,8 @@ select {
 
 input, select, textarea{
     max-width: 100% !important;
+}
+
+#html-editor{
+    border-right: 1px solid #e2e4e7;
 }

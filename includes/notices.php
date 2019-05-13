@@ -73,10 +73,13 @@ class Notices
 
         $notices = get_transient( self::TRANSIENT );
 
-        if ( ! $notices )
-            return;
+        if ( ! $notices ){
+            $notices = [];
+        }
 
-        ?><div id="groundhogg-notices"><?php
+        if ( ! wp_doing_ajax() ){
+            ?><div id="groundhogg-notices"><?php
+        }
 
         foreach ( $notices as $notice ){
 
@@ -86,14 +89,16 @@ class Notices
 
             ?>
             <div id="<?php esc_attr_e( $notice['code'] ); ?>" class="notice notice-<?php esc_attr_e( $notice[ 'type' ] ); ?> is-dismissible"><p><strong><?php echo wp_kses_post( $notice[ 'message' ] ); ?></strong></p>
-            <?php if ( $notice[ 'type' ] === 'error' && ! empty( $notice[ 'data' ] ) ): ?>
-                <p><textarea class="code" style="width: 100%;" readonly><?php echo wp_json_encode( $notice[ 'data' ] ); ?></textarea></p>
-            <?php endif; ?>
+                <?php if ( $notice[ 'type' ] === 'error' && ! empty( $notice[ 'data' ] ) ): ?>
+                    <p><textarea class="code" style="width: 100%;" readonly><?php echo wp_json_encode( $notice[ 'data' ] ); ?></textarea></p>
+                <?php endif; ?>
             </div>
             <?php
         }
 
-        ?></div><?php
+        if ( ! wp_doing_ajax() ) {
+            ?></div><?php
+        }
 
         delete_transient( 'groundhogg_notices' );
     }
