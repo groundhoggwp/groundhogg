@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Funnels;
+use Groundhogg\Plugin;
 
 
 /**
@@ -75,7 +76,7 @@ do_action( 'wpgh_before_new_funnel' );
             <span class="spinner" style="float: none; visibility: visible"></span>
         </div>
         <div id="downloads">
-            <?php  display_funnel_templates();  ?>
+            <?php Plugin::$instance->admin->get_page( 'funnels' )->display_funnel_templates();  ?>
         </div>
     </div>
 

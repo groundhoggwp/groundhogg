@@ -30,7 +30,7 @@ if ( ! file_exists( $file_path ) ){
     wp_die( 'The given file does not exist.' );
 }
 
- get_items_from_csv( $file_path );
+$items = get_items_from_csv( $file_path );
 
 $sample_item = array_shift( $items );
 

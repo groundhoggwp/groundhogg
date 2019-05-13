@@ -2,7 +2,11 @@
 
 namespace Groundhogg\Admin\Funnels;
 
+use Groundhogg\Funnel;
 use Groundhogg\Plugin;
+use function Groundhogg\get_request_var;
+use Groundhogg\Manager;
+
 /**
  * Edit Funnel
  *
@@ -24,10 +28,10 @@ $funnel_id = intval( $_GET['funnel'] );
 
 do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
 
-$funnel = Plugin::$instance->dbs->get_db('funnels')->get( $funnel_id );
+$funnel = new Funnel( $funnel_id );
 
 ?>
-<span class="hidden" id="new-title"><?php echo $funnel->title; ?> &lsaquo; </span>
+<span class="hidden" id="new-title"><?php echo $funnel->get_title(); ?> &lsaquo; </span>
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
@@ -42,7 +46,7 @@ $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $funnel_id );
     <div class="header-wrap">
         <div class="funnel-editor-header">
             <div class="title alignleft">
-                <input class="title" placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php echo $funnel->title; ?>" id="title" spellcheck="true" autocomplete="off">
+                <input class="title" placeholder="<?php echo __('Enter Funnel Name Here', 'groundhogg');?>" type="text" name="funnel_title" size="30" value="<?php esc_attr_e( $funnel->get_title() ); ?>" id="title" spellcheck="true" autocomplete="off">
             </div>
             <div id="reporting" class="alignleft">
                 <?php $args = array(
@@ -63,35 +67,35 @@ $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $funnel_id );
                         'last_year'     => _x( 'Last Year', 'reporting_range', 'groundhogg' ),
                         'custom'        => _x( 'Custom Range', 'reporting_range', 'groundhogg' ),
                     ),
-                    'selected' => WPGH()->menu->funnels_page->get_url_var( 'date_range', 'this_week' ), //todo
+                    'selected' => get_request_var( 'date_range', 'this_week' ), //todo
                 ); echo Plugin::$instance->utils->html->dropdown( $args );
 
-                $class = WPGH()->menu->funnels_page->get_url_var( 'date_range' ) === 'custom' ? '' : 'hidden'; //todo
+                $class = get_request_var( 'date_range' ) === 'custom' ? '' : 'hidden'; //todo
 
                 ?><div class="custom-range <?php echo $class ?> alignleft"><?php
 
-                    echo Plugin::$instance->utils->html->date_picker(array(
-                        'name'  => 'custom_date_range_start',
-                        'id'    => 'custom_date_range_start',
-                        'class' => 'input',
-                        'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_start' ),
-                        'attributes' => '',
-                        'placeholder' => 'YYY-MM-DD',
-                        'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
-                        'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
-                        'format' => 'yy-mm-dd'
-                    ));
-                    echo Plugin::$instance->utils->html->date_picker(array(
-                        'name'  => 'custom_date_range_end',
-                        'id'    => 'custom_date_range_end',
-                        'class' => 'input',
-                        'value' => WPGH()->menu->funnels_page->get_url_var( 'custom_date_range_end' ), //todo
-                        'attributes' => '',
-                        'placeholder' => 'YYY-MM-DD',
-                        'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
-                        'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
-                        'format' => 'yy-mm-dd'
-                    )); ?>
+//                    echo Plugin::$instance->utils->html->date_picker(array(
+//                        'name'  => 'custom_date_range_start',
+//                        'id'    => 'custom_date_range_start',
+//                        'class' => 'input',
+//                        'value' => get_request_var( 'custom_date_range_start' ),
+//                        'attributes' => '',
+//                        'placeholder' => 'YYY-MM-DD',
+//                        'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
+//                        'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
+//                        'format' => 'yy-mm-dd'
+//                    ));
+//                    echo Plugin::$instance->utils->html->date_picker(array(
+//                        'name'  => 'custom_date_range_end',
+//                        'id'    => 'custom_date_range_end',
+//                        'class' => 'input',
+//                        'value' => get_request_var( 'custom_date_range_end' ), //todo
+//                        'attributes' => '',
+//                        'placeholder' => 'YYY-MM-DD',
+//                        'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
+//                        'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
+//                        'format' => 'yy-mm-dd'
+//                    )); ?>
                 </div>
                 <script>jQuery(function($){$('#date_range').change(function(){
                         if($(this).val() === 'custom'){
@@ -177,7 +181,7 @@ $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $funnel_id );
                 </div>
                 <div id="export">
                     <a id="copy-share-link" style="text-decoration: none; display: inline-block" href="#"><span style="padding: 5px;" title="Copy Share Link" class="dashicons dashicons-share"></span></a>
-                    <input id="share-link" type="hidden" value="<?php echo add_query_arg( 'funnel_share', wpgh_encrypt_decrypt( $funnel_id, 'e' ), site_url() ); ?>">
+                    <input id="share-link" type="hidden" value="<?php echo add_query_arg( 'funnel_share', Plugin::$instance->utils->encrypt_decrypt( $funnel_id, 'e' ), site_url() ); ?>">
                     <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _ex( 'Export Funnel', 'action','groundhogg'); ?></a>
                 </div>
                 <div id="status">
@@ -208,30 +212,21 @@ $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $funnel_id );
                         <?php do_action( 'wpgh_benchmark_icons_before' ); ?>
                         <table>
                             <tbody>
-                            <?php $elements = WPGH()->elements->get_benchmarks(); //todo
-
+                            <tr><?php 
+                                $benchmarks = Plugin::$instance->step_manager->get_benchmarks();
                             $i = 0;
-
-                            ?><tr><?php
-
-                            foreach ( $elements as  $element => $args  ):
-
+                            foreach ( $benchmarks as $benchmark ):
                                 if ( ( $i % 3 ) == 0 ):
                                     ?></tr><tr><?php
                                 endif;
-
-                                ?><td><div id='<?php echo $element; ?>' title="<?php esc_attr_e( $args['desc'] ); ?>" class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
-
+                                ?><td><div id='<?php echo $benchmark->get_type(); ?>' title="<?php esc_attr_e( $benchmark->get_description() ); ?>" class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $benchmark->get_icon() ); ?>"></div><p><?php echo $benchmark->get_name()  ?></p></div></td><?php
                                 $i++;
 
                             endforeach;
 
-                            ?></tr><?php
-
-                                ?>
+                            ?></tr>
                             </tbody>
                         </table>
-                        <?php do_action( 'wpgh_benchmark_icons_after' ); ?>
                         <p>
                             <?php echo esc_html__( 'Benchmarks start and stop automation steps for a contact.','groundhogg' ); ?>
                         </p>
@@ -245,27 +240,19 @@ $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $funnel_id );
                         <?php do_action( 'wpgh_action_icons_before' ); ?>
                         <table>
                             <tbody>
-                            <?php $elements = WPGH()->elements->get_actions(); //todo
-
-                            $i = 0;
-
-                            ?><tr><?php
-
-                            foreach ( $elements as  $element => $args  ):
-
+                            <tr><?php
+                                $actions = Plugin::$instance->step_manager->get_actions();
+                                $i = 0;
+                                foreach ( $actions as $action ):
                                 if ( ( $i % 3 ) == 0 ):
                                 ?></tr><tr><?php
                                 endif;
-
-                                ?><td><div id='<?php echo $element; ?>' title="<?php esc_attr_e( $args['desc'] ); ?>" class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $args['icon'] ); ?>"></div><p><?php echo $args['title']; ?></p></div></td><?php
-
+                                ?><td><div id='<?php echo $action->get_type(); ?>' title="<?php esc_attr_e( $action->get_description() ); ?>" class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $action->get_icon() ); ?>"></div><p><?php echo $action->get_name()  ?></p></div></td><?php
                                 $i++;
 
-                            endforeach;
+                                endforeach;
 
-                            ?></tr><?php
-
-                                ?>
+                                ?></tr>
                             </tbody>
                         </table>
                         <?php do_action( 'wpgh_action_icons_after' ); ?>
@@ -281,7 +268,7 @@ $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $funnel_id );
             <!-- End elements area-->
             <!-- main funnel editing area -->
             <div id="notices">
-                <?php WPGH()->notices->notices(); //todo remove ?>
+                <?php  // WPGH()->notices->notices(); //todo remove ?>
             </div>
 
             <div style="width: 100%">
