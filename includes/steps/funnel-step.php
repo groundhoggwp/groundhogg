@@ -36,6 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 abstract class Funnel_Step extends Supports_Errors
 {
+    protected static $step_properties = [];
 
     /**
      * The current step
@@ -191,9 +192,25 @@ abstract class Funnel_Step extends Supports_Errors
      */
     public function register( $array )
     {
-        $array[] = $this;
+        $array[ $this->get_type() ] = $this;
+
+        self::$step_properties[ $this->get_type() ] = [
+            'type' => $this->get_type(),
+            'name' => $this->get_name(),
+            'description' => $this->get_description(),
+            'icon' => $this->get_icon(),
+        ];
 
 		return $array;
+    }
+
+    /**
+     * @param $type
+     * @return mixed
+     */
+    public static function get_step_properties( $type )
+    {
+        return self::$step_properties[ $type ];
     }
 
     /**
@@ -665,7 +682,7 @@ abstract class Funnel_Step extends Supports_Errors
     /**
      * @param $step
      */
-    public function pre_import( $step )
+    public function pre_import( $args, $step )
     {
         $this->set_current_step( $step );
     }

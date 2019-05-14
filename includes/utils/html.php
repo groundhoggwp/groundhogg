@@ -85,7 +85,10 @@ class HTML
             'id' => ''
         ] );
 
-        printf( "<tr title='%s' class='%s' id='%s'>", esc_attr( $args[ 'title' ] ), esc_attr( $args[ 'class' ] ), esc_attr( [ 'id' ] ) );
+        printf( "<tr title='%s' class='%s' id='%s'>",
+            esc_attr( $args[ 'title' ] ),
+            esc_attr( $args[ 'class' ] ),
+            esc_attr( $args[ 'id' ] ) );
     }
 
     public function end_row( $args = [] )
@@ -839,15 +842,16 @@ class HTML
             'tags'              => false,
         ) );
 
+        $a[ 'selected' ] = wp_parse_id_list( $a[ 'selected' ] );
+
+//        var_dump( $a[ 'selected' ] );
+
         foreach ( $a[ 'selected' ] as $email_id ){
-
-            if ( WPGH()->emails->exists( $email_id ) ){
-
-                $email =  WPGH()->emails->get( $email_id );
+            if ( get_db( 'emails' )->exists( $email_id ) ){
+                $email = get_db( 'emails' )->get( $email_id );
                 $a[ 'data' ][ $email_id ] = $email->subject . ' (' . $email->status . ')';
 
             }
-
         }
 
 	    return apply_filters( 'groundhogg/html/dropdown_emails', $this->select2( $a ), $a );

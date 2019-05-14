@@ -32,7 +32,7 @@ class Funnel extends Base_Object
      */
     protected function get_steps_db()
     {
-        return Plugin::instance()->dbs->get_db('steps');
+        return Plugin::instance()->dbs->get_db('steps' );
     }
 
     /**
@@ -104,7 +104,7 @@ class Funnel extends Base_Object
     public function get_as_array()
     {
         $export = [];
-        $export[ 'title' ] = $this->get_title();
+        $export[ 'title' ] = sprintf( "%s - Copy", $this->get_title() );
         $export[ 'steps' ] = [];
 
         $steps = $this->get_steps();
@@ -141,6 +141,16 @@ class Funnel extends Base_Object
     }
 
     /**
+     * The export URL
+     *
+     * @return string
+     */
+    public function export_url()
+    {
+        return site_url( sprintf( 'gh/funnels/export/%s/', Plugin::$instance->utils->encrypt_decrypt( $this->get_id() ) ) );
+    }
+
+    /**
      * Import a funnel
      **
      * @return bool|int
@@ -164,10 +174,11 @@ class Funnel extends Base_Object
 
         $funnel_id = $this->create( $args );
 
-        $steps = $import[ 'steps' ];
+        if ( ! $funnel_id ){
+            return false;
+        }
 
-//        $valid_actions = WPGH()->elements->get_actions();
-//        $valid_benchmarks = WPGH()->elements->get_benchmarks();
+        $steps = $import[ 'steps' ];
 
         foreach ( $steps as $i => $step_args )
         {
@@ -175,9 +186,6 @@ class Funnel extends Base_Object
             $step_title = $step_args['title'];
             $step_group = $step_args['group'];
             $step_type  = $step_args['type'];
-
-            if ( ! isset( $valid_actions[$step_type] ) && ! isset( $valid_benchmarks[$step_type] ) )
-                continue;
 
             $args = array(
                 'funnel_id' => $funnel_id,
@@ -188,11 +196,12 @@ class Funnel extends Base_Object
                 'step_order'     => $i+1,
             );
 
-            $step = new Step();
+            $step = new Step( $args );
 
-            $step_id = $step->create( $args );
+            if ( ! $step->exists() ){
 
-            if ( ! $step_id ){
+                wp_die();
+
                 continue;
             }
 

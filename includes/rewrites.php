@@ -76,6 +76,7 @@ class Rewrites
         $vars[] = 'action';
         $vars[] = 'superlink_id';
         $vars[] = 'funnel_id';
+        $vars[] = 'enc_funnel_id';
         $vars[] = 'email_id';
         $vars[] = 'link_id';
         return $vars;
@@ -92,7 +93,7 @@ class Rewrites
         $this->map_query_var( $query, 'link_id', 'absint' );
         $this->map_query_var( $query, 'email_id', 'absint' );
         $this->map_query_var( $query, 'superlink_id', 'absint' );
-        $this->map_query_var( $query, 'enc_funnel_id', 'urldecode' );
+//        $this->map_query_var( $query, 'enc_funnel_id', 'urldecode' );
         return $query;
     }
 
@@ -175,6 +176,8 @@ class Rewrites
                 // Export the funnel from special rewrite link...
                 $funnel_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_funnel_id' ), 'd' ) );
                 $funnel = new Funnel( $funnel_id );
+
+//                wp_die( get_query_var( 'enc_funnel_id' ) );
 
                 if ( ! $funnel->exists() ){
                     return;

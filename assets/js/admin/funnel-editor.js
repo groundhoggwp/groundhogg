@@ -2,7 +2,7 @@ var wpghDoingAutoSave = false;
 
 var wpghFunnelEditor;
 
-( function( $ ) {
+( function( $, funnel ) {
 
     wpghFunnelEditor = {
 
@@ -210,7 +210,7 @@ var wpghFunnelEditor;
             if ( this.insertDummyStep('.ui-draggable') ){
 
                 var order = $('.step').index($('#temp-step')) + 1;
-                var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order};
+                var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order, funnel_id:funnel.id};
                 this.getStepHtml(data);
 
             }
@@ -367,4 +367,4 @@ var wpghFunnelEditor;
         }
     };
     $(function(){wpghFunnelEditor.init();})
-})( jQuery );
+})( jQuery, Funnel );

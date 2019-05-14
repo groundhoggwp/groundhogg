@@ -136,6 +136,10 @@ class Plugin {
      * @var Shortcodes
      */
     public $shortcodes;
+
+    /**
+     * @var Bounce_Checker
+     */
     public $bounce_checker;
 
     /**

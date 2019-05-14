@@ -1,12 +1,15 @@
 <?php
 namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Funnel;
 use Groundhogg\Manager;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Contact_Query;
 use Groundhogg\Step;
+
+
 
 
 
@@ -111,10 +114,14 @@ class Funnels_Page extends Admin_Page
 
            wp_enqueue_script( 'groundhogg-admin-link-picker' );
            wp_enqueue_script( 'sticky-sidebar' );
-//           wp_enqueue_script( 'jquery-sticky-sidebar' );
+           wp_enqueue_script( 'jquery-sticky-sidebar' );
 
            wp_enqueue_style(  'groundhogg-admin-funnel-editor' );
            wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
+
+           wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
+               'id' => absint( get_request_var( 'funnel' ) )
+           ] );
 
            wp_enqueue_script( 'jquery-flot' );
            wp_enqueue_script( 'jquery-flot-categories' );
@@ -305,13 +312,17 @@ class Funnels_Page extends Admin_Page
         }
 
         foreach ( $this->get_items() as $id ){
-            $json =  wpgh_convert_funnel_to_json( $id ); //todo
 
-            $newId = $this->import_funnel( $json );
+            $funnel = new Funnel( $id );
 
-            $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $newId );
-            Plugin::$instance->dbs->get_db('funnels')->update( $newId, [ 'title' => sprintf( '%s - (Copy)', $funnel->title ) ] );
+            if ( ! $funnel->exists() ){
+                continue;
+            }
 
+            $json = $funnel->export();
+
+            $new_funnel = new Funnel();
+            $new_funnel->import( $json );
         }
 
         $this->add_notice(
@@ -323,6 +334,11 @@ class Funnels_Page extends Admin_Page
         return true;
     }
 
+    /**
+     * Archive a funnel
+     *
+     * @return bool
+     */
     public function process_archive()
     {
         if ( ! current_user_can( 'edit_funnels' ) ){
@@ -346,42 +362,10 @@ class Funnels_Page extends Admin_Page
 
 
     /**
-     * Export a funnel
+     * Process add action for the funnel.
+     *
+     * @return string|\WP_Error
      */
-	public function process_export()
-    {
-
-        if ( ! current_user_can( 'export_funnels' ) ){
-            $this->wp_die_no_access();
-        }
-
-        $id = intval( $_GET['funnel'] );
-
-        $funnel = Plugin::$instance->dbs->get_db('funnels')->get( $id );
-
-        if ( ! $funnel )
-            return;
-
-        $export_string = wpgh_convert_funnel_to_json( $id ); //todo
-
-        if ( ! $export_string )
-            return;
-
-        $filename = "groundhogg_funnel-" . $funnel->title . ' - '. date("Y-m-d_H-i", time() );
-
-        header("Content-type: text/plain");
-
-        header( "Content-disposition: attachment; filename=".$filename.".funnel");
-
-        $file = fopen('php://output', 'w');
-
-        fputs( $file, $export_string );
-
-        fclose($file);
-
-        return true;
-    }
-
 	public function process_add()
     {
 
@@ -400,18 +384,17 @@ class Funnels_Page extends Admin_Page
 
         } else if ( isset( $_POST[ 'funnel_id' ] ) ) {
 
-            $from_funnel = intval( $_POST[ 'funnel_id' ] );
-            $json = wpgh_convert_funnel_to_json( $from_funnel ); //todo
-            $funnel_id = $this->import_funnel( json_decode( $json, true ) );
+            $from_funnel = absint( $_POST[ 'funnel_id' ] );
+            $from_funnel = new Funnel( $from_funnel );
+
+            $json = $from_funnel->export();
+            $funnel_id = $this->import_funnel( $json );
 
         } else if ( isset( $_FILES[ 'funnel_template' ] ) ) {
-
             if ($_FILES['funnel_template']['error'] == UPLOAD_ERR_OK && is_uploaded_file( $_FILES['funnel_template']['tmp_name'] ) ) {
-
-                $json = file_get_contents($_FILES['funnel_template']['tmp_name'] );
-                $funnel_id = $this->import_funnel( json_decode( $json, true ) );
+                $json = file_get_contents($_FILES['funnel_template']['tmp_name']);
+                $funnel_id = $this->import_funnel(json_decode($json, true));
             }
-
         } else {
             return new \WP_Error( 'error', __('Please select a template...' , 'groundhogg')  );
         }
@@ -419,8 +402,6 @@ class Funnels_Page extends Admin_Page
         if ( ! isset( $funnel_id ) || empty( $funnel_id ) ){
             wp_die( 'Error creating funnel.' );
         }
-
-        do_action( 'wpgh_funnel_created', $funnel_id ); //todo remove
 
         $this->add_notice( esc_attr( 'created' ), _x( 'Funnel created', 'notice', 'groundhogg' ), 'success' );
 
@@ -441,7 +422,10 @@ class Funnels_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        return wpgh_import_funnel( $import ); //todo
+        $funnel = new Funnel();
+        $funnel->import( $import );
+
+        return $funnel->import( $import );
     }
 
 	/**
@@ -677,16 +661,14 @@ class Funnels_Page extends Admin_Page
         }
 
         $content = '';
+        $step_type      = get_request_var( 'step_type' );
+        $step_order     = absint( get_request_var( 'step_order') );
+        $funnel_id      = absint( get_request_var( 'funnel_id' ) );
 
-        $step_type = $_POST['step_type'];
-        $step_order = intval( $_POST['step_order'] );
+        $elements = Plugin::$instance->step_manager->get_elements();
 
-        $funnel_id = intval( wpgh_extract_query_arg( wp_get_referer(), 'funnel' ) ); //todo
-
-        $elements_obj = new Manager();
-        $elements = $elements_obj->get_elements();
-        $title = $elements[ $step_type ][ 'title' ];
-        $step_group = $elements[ $step_type ][ 'group' ];
+        $title = $elements[ $step_type ]->get_name();
+        $step_group = $elements[ $step_type ]->get_group();
 
         $step_id = Plugin::$instance->dbs->get_db('steps')->add( [
             'funnel_id'     => $funnel_id,
@@ -695,6 +677,8 @@ class Funnels_Page extends Admin_Page
             'step_group'    => $step_group,
             'step_order'    => $step_order,
         ] );
+
+
 
         if ( $step_id ){
 
@@ -707,6 +691,7 @@ class Funnels_Page extends Admin_Page
 
             $content = ob_get_clean();
         }
+
 
         wp_die( $content );
     }
@@ -983,6 +968,11 @@ class Funnels_Page extends Admin_Page
         }
     }
 
+
+    public function is_reporting_enabled()
+    {
+        return false;// todo I returned false for this function call and its working.
+    }
 
 
 

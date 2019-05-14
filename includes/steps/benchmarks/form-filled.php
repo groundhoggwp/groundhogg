@@ -1,4 +1,12 @@
 <?php
+
+namespace Groundhogg\Steps\Benchmarks;
+
+use Groundhogg\Contact;
+use Groundhogg\HTML;
+use Groundhogg\Step;
+
+
 /**
  * Form Filled
  *
@@ -14,28 +22,66 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Form_Filled extends WPGH_Funnel_Step
+class WPGH_Form_Filled extends Benchmark
 {
 
     /**
-     * @var string
+     * Get element name
+     * @return string
      */
-    public $type    = 'form_fill';
+    public function get_name()
+    {
+        return _x( 'Web Form', 'step_name', 'groundhogg' );
+    }
 
     /**
-     * @var string
+     * Get element type
+     *
+     * @return string
      */
-    public $group   = 'benchmark';
+    public function get_type()
+    {
+        return 'form_fill';
+    }
 
     /**
-     * @var string
+     * Get element description
+     *
+     * @return string
      */
-    public $icon    = 'form-filled.png';
+    public function get_description()
+    {
+        return _x( 'Use this form builder to create forms and display them on your site with shortcodes.', 'step_description', 'groundhogg' );
+    }
 
     /**
-     * @var string
+     * Get the icon URL
+     *
+     * @return string
      */
-    public $name    = 'Web Form';
+    public function get_icon()
+    {
+        return 'form-filled.png';
+    }
+
+
+    protected function get_complete_hooks()
+    {
+        // TODO: Implement get_complete_hooks() method.
+    }
+
+    protected function get_the_contact()
+    {
+        // TODO: Implement get_the_contact() method.
+    }
+
+    protected function can_complete_step()
+    {
+        // TODO: Implement can_complete_step() method.
+    }
+
+
+
 
     /**
      * Add the completion action
@@ -44,8 +90,7 @@ class WPGH_Form_Filled extends WPGH_Funnel_Step
      */
     public function __construct()
     {
-        $this->name         = _x( 'Web Form', 'step_name', 'groundhogg' );
-        $this->description  = _x( 'Use this form builder to create forms and display them on your site with shortcodes.', 'step_description', 'groundhogg' );
+
 
         parent::__construct();
 
