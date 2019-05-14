@@ -337,7 +337,7 @@ class Emails_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$query = wp_unslash( $_REQUEST );
+		$query = wp_unslash( $_GET );
 		unset( $query[ 'page' ] );
 
 		if ( empty( $query ) ){

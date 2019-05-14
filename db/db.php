@@ -404,18 +404,18 @@ abstract class DB {
      * @since   2.1
      * @return  bool
      */
-    public function update( $row_id, $data = [], $where = '' ) {
+    public function update( $row_id = 0, $data = [], $where = [] ) {
 
         global $wpdb;
 
         $row_id = absint( $row_id );
 
-        if( empty( $row_id ) ) {
-            return false;
+        if ( ! empty( $row_id ) ){
+            $where = [ $this->get_primary_key() => $row_id ];
         }
 
-        if( empty( $where ) ) {
-            $where = $this->primary_key;
+        if ( empty( $where ) ){
+            return false;
         }
 
         // Initialise column format array
@@ -431,17 +431,17 @@ abstract class DB {
         $data_keys = array_keys( $data );
         $column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
-        do_action( 'groundhogg/db/pre_update/' . $this->get_object_type(), $row_id, $data );
+        do_action( 'groundhogg/db/pre_update/' . $this->get_object_type(), $where, $data );
 
-        $data = apply_filters( 'groundhogg/db/pre_update/' . $this->get_object_type(), $data, $row_id );
+        $data = apply_filters( 'groundhogg/db/pre_update/' . $this->get_object_type(), $data, $where );
 
-        if ( false === $wpdb->update( $this->table_name, $data, array( $where => $row_id ), $column_formats ) ) {
+        if ( false === $wpdb->update( $this->table_name, $data, $where, $column_formats ) ) {
             return false;
         }
 
         $this->set_last_changed();
 
-        do_action( 'groundhogg/db/post_update/' . $this->get_object_type(), $row_id );
+        do_action( 'groundhogg/db/post_update/' . $this->get_object_type(), $where );
 
         return true;
     }
@@ -488,16 +488,22 @@ abstract class DB {
      * @param array $args
      * @return false|int
      */
-    public function bulk_delete( $data = array(), $where= array( '%d' ) )
+    public function bulk_delete( $where = [] )
     {
         global $wpdb;
 
+        if ( empty( $where ) ){
+            return false;
+        }
+
         $column_formats = $this->get_columns();
-        $data = array_intersect_key( $data, $column_formats );
+        $where = array_intersect_key( $where, $column_formats );
 
-        do_action( 'groundhogg/db/pre_bulk_delete/' . $this->get_object_type(), $data );
+        do_action( 'groundhogg/db/pre_bulk_delete/' . $this->get_object_type(), $where );
 
-        $result = $wpdb->delete( $this->table_name, $data );
+        $result = $wpdb->delete( $this->table_name, $where );
+
+        do_action( 'groundhogg/db/post_bulk_delete/' . $this->get_object_type(), $where );
 
         return $result;
     }

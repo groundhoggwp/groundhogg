@@ -69,12 +69,5 @@ $funnel_templates[ 'scratch' ][ 'description' ] = _x( 'Have some inspiration? Us
 $funnel_templates[ 'scratch' ][ 'src' ] = 'https://via.placeholder.com/350x250';
 $funnel_templates[ 'scratch' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/start-from-scratch.funnel';
 
-/* Email Preferences */
-
-$funnel_templates[ 'email_preferences' ][ 'title' ] = _x( 'Email Preferences', 'funnel_template_name', 'groundhogg' );
-$funnel_templates[ 'email_preferences' ][ 'description' ] = _x( 'Setup an email preferences center!', 'funnel_template_description', 'groundhogg' );
-$funnel_templates[ 'email_preferences' ][ 'src' ] = 'https://via.placeholder.com/350x250';
-$funnel_templates[ 'email_preferences' ][ 'file' ] = dirname( __FILE__ ) . '/funnels/email-preferences.funnel';
-
 $funnel_templates = apply_filters( 'wpgh_funnel_templates', $funnel_templates );
 $funnel_templates = apply_filters( 'groundhogg/templates/funnels', $funnel_templates );

@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Emails\Blocks;
 
+use function Groundhogg\array_to_css;
 use Groundhogg\Plugin;
 /**
  * Email block
@@ -36,6 +37,7 @@ abstract class Block
         add_filter( 'groundhogg/admin/emails/blocks', [ $this, 'register' ] );
         add_action( "groundhogg/admin/emails/blocks/{$this->get_name()}/settings_panel", [ $this, 'settings_panel' ] );
         add_action( "groundhogg/admin/emails/blocks/{$this->get_name()}/html" , [ $this, 'block_html' ] );
+        add_action( "groundhogg/admin/emails/blocks/{$this->get_name()}/extra_css", [ $this, 'extra_css' ] );
     }
 
     abstract public function get_icon();
@@ -43,6 +45,8 @@ abstract class Block
     abstract public function get_title();
     abstract public function get_settings();
     abstract public function scripts();
+
+    public function extra_css( $css ){ return $css; }
 
     /**
      * @var array()
@@ -79,7 +83,10 @@ abstract class Block
 
         $html = sprintf( "<div  class=\"row\" data-block='%s'>", $this->get_name() );
         $html.= sprintf( "<div  class=\"content-wrapper %s_block\">" , $this->get_name() );
-        $html.= "<div class=\"content-inside inner-content text-content\" style=\"padding: 5px;\">";
+
+        $extra_css = array_to_css( apply_filters( "groundhogg/admin/emails/blocks/{$this->get_name()}/extra_css", [] ) );
+
+        $html.= "<div class=\"content-inside inner-content text-content\" style=\"padding: 5px;$extra_css\">";
 
         $html .= $this->inner_html();
 

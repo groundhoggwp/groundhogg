@@ -2,6 +2,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use function Groundhogg\isset_not_empty;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -17,6 +19,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since       File available since Release 0.1
  */
 class Broadcasts extends DB  {
+
+    protected function add_additional_actions()
+    {
+        add_filter( 'groundhogg/db/pre_insert/broadcast', [ $this, 'serialize_tags' ] );
+        add_filter( 'groundhogg/db/pre_update/broadcast', [ $this, 'serialize_tags' ] );
+
+        add_filter( 'groundhogg/db/get/broadcast', [ $this, 'unserialize_tags' ] );
+    }
 
     /**
      * Get the DB suffix
@@ -97,19 +107,18 @@ class Broadcasts extends DB  {
     }
 
     /**
-     * Given a data set, if tags are present make sure they end up serialized
+     * Given a data set, if tags are present make sure the end up serialized
      *
      * @param array $data
      * @return array
      */
-    private function serialize_tags( $data = array() ){
-
-        if ( isset( $data[ 'tags' ] ) ){
+    public function serialize_tags( $data = [] )
+    {
+        if ( isset_not_empty( $data, 'tags' ) ){
             $data[ 'tags' ] = maybe_serialize( $data[ 'tags' ] );
         }
 
         return $data;
-
     }
 
     /**
@@ -118,108 +127,13 @@ class Broadcasts extends DB  {
      * @param null $obj
      * @return null
      */
-    private function unserialize_tags( $obj = null )
+    public function unserialize_tags( $obj = null )
     {
         if ( is_object( $obj ) && isset( $obj->tags ) ){
             $obj->tags = maybe_unserialize( $obj->tags );
         }
 
         return $obj;
-    }
-
-    /**
-     * Update a broadcast
-     *
-     * @access  public
-     * @since   2.1
-     * @return  bool
-     */
-    public function update( $row_id, $data = array(), $where = '' ) {
-        $data = $this->serialize_tags( $data );
-
-        $result = parent::update( $row_id, $data, $where );
-
-        return $result;
-    }
-
-    /**
-     * Retrieves the broadcast by the ID.
-     *
-     * @param $id
-     *
-     * @return mixed
-     */
-    public function get_broadcast( $id )
-    {
-        return  $this->get_broadcast_by( 'ID', $id );
-    }
-
-    /**
-     * Retrieves a single broadcast from the database
-     *
-     * @access public
-     * @since  2.3
-     * @param  string $field id or broadcast
-     * @param  mixed  $value  The Customer ID or broadcast to search
-     * @return mixed          Upon success, an object of the broadcast. Upon failure, NULL
-     */
-    public function get_broadcast_by( $field = 'ID', $value = 0 ) {
-
-        if ( empty( $field ) || empty( $value ) ) {
-            return NULL;
-        }
-
-        return $this->unserialize_tags( parent::get_by( $field, $value ) );
-    }
-
-
-    /**
-     * Retrieve broadcasts from the database
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function get_broadcasts( $data = array() ) {
-
-        global  $wpdb;
-
-        if ( ! is_array( $data ) )
-            return false;
-
-        $data = (array) $data;
-
-        // Initialise column format array
-        $column_formats = $this->get_columns();
-
-        // Force fields to lower case
-        $data = array_change_key_case( $data );
-
-        // White list columns
-        $data = array_intersect_key( $data, $column_formats );
-
-        $where = $this->generate_where( $data );
-
-        if ( empty( $where ) ){
-            $where = "1=1";
-        }
-
-        $results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where ORDER BY send_time DESC" );
-
-        if ( is_array( $results ) ){
-            $results = array_map( array( $this, 'unserialize_tags' ), $results );
-        }
-
-        return $results;
-    }
-
-    /**
-     * Count the total number of broadcasts in the database
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function count( $args = array() ) {
-        return count( $this->get_broadcasts( $args ) );
     }
 
     /**
