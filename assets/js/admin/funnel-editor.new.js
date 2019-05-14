@@ -31,11 +31,6 @@
 
             /* Activate Spinner */
             $('form').on('submit', function( e ){
-
-                // e.preventDefault();
-                
-                console.log( 'save' );
-
                 self.save( e );
             });
 
@@ -146,10 +141,12 @@
 
             adminAjaxRequest( fd, function ( response ) {
 
-                // handleNotices( response.data.notices );
+                handleNotices( response.data.notices );
+                // console.log( response.data.notices );
+
                 hideSpinner();
                 //
-                // $( '#normal-sortables' ).html( response.data.steps );
+                $( '#normal-sortables' ).html( response.data.data.steps );
                 //
                 // funnelChart.data = response.data.chartData;
                 //
@@ -157,7 +154,7 @@
                 //     funnelChart.draw();
                 // }
                 //
-                // $( document ).trigger( 'new-step' );
+                $( document ).trigger( 'new-step' );
 
                 console.log( response );
             } );
@@ -189,7 +186,7 @@
          */
         replaceDummyStep: function (html) {
             this.editor.find('.replace-me').replaceWith(html);
-            $(document).trigger('wpghAddedStep');
+            $(document).trigger('new-step');
         },
 
         /**
@@ -205,8 +202,7 @@
 
                 var order = $('.step').index($('#temp-step')) + 1;
                 var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order, funnel_id:funnel.id};
-                this.getStepHtml(data);
-
+                this.getStepHtml( data );
             }
         },
 
@@ -214,6 +210,8 @@
          * Initializes the draggable state of the steps
          */
         makeDraggable: function () {
+            var self=this;
+
             this.draggables = $(".ui-draggable").draggable({
                 connectToSortable: ".ui-sortable",
                 helper: "clone",
@@ -221,7 +219,7 @@
                     /* double check we dropped in a step... */
                     if ( ui.helper.closest( '#normal-sortables' ).length > 0 ){
                         console.log( ui.helper.parent() );
-                        wpghFunnelEditor.convertDraggableToStep( this )
+                        self.convertDraggableToStep( this )
                     }
 
                 }
@@ -260,7 +258,7 @@
 
                 adminAjaxRequest(
                     {action: "wpgh_delete_funnel_step", step_id: step.attr( 'id' ) },
-                    function (result) {
+                    function ( result ) {
                         hideSpinner();
                         step.remove();
                     }
@@ -296,10 +294,17 @@
 
             var self = this;
 
-            adminAjaxRequest( obj, function (html) {
-                self.curHTML = html;
-                self.replaceDummyStep(html);
+            adminAjaxRequest( obj, function ( response ) {
+
+                // console.log( response );
+
+                self.curHTML = response.data.data.html;
+                self.replaceDummyStep(self.curHTML);
+                //
+                // alert(html);
             } );
+
+
         },
 
         addContacts: function () {

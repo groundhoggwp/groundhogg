@@ -87,7 +87,7 @@ class Role_Changed extends Benchmark
         $this->start_controls_section();
 
         $this->add_control( 'role', [
-            'label'         => __( 'Run whn this access is given:', 'groundhogg' ),
+            'label'         => __( 'Run when this access is given:', 'groundhogg' ),
             'type'          => HTML::SELECT2,
             'default'       => 'subscriber',
             'description'   => __( 'Users with these roles will trigger this benchmark.', 'groundhogg' ),
@@ -107,7 +107,7 @@ class Role_Changed extends Benchmark
      */
     public function save( $step )
     {
-        $this->save_setting( 'role', array_map( 'sanitize_text_field', $this->get_posted_data( 'role', 'subscriber' ) ) );
+        $this->save_setting( 'role', array_map( 'sanitize_text_field', $this->get_posted_data( 'role', [ 'subscriber' ] ) ) );
     }
 
     /**

@@ -147,7 +147,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function get_waiting_events()
     {
-        $events = $this->get_events_db()->get_events( [
+        $events = $this->get_events_db()->query( [
             'status'    => Event::WAITING,
             'step_id'   => $this->get_id(),
             'funnel_id' => $this->get_funnel_id(),

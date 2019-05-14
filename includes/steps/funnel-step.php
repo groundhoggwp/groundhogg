@@ -3,7 +3,10 @@ namespace Groundhogg\Steps;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use function Groundhogg\ensure_array;
 use Groundhogg\Event;
+use function Groundhogg\get_array_var;
+use function Groundhogg\get_request_var;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
@@ -73,7 +76,7 @@ abstract class Funnel_Step extends Supports_Errors
             add_action("groundhogg/steps/{$this->get_type()}/html", [$this, 'pre_html'], 1 );
             add_action("groundhogg/steps/{$this->get_type()}/html", [$this, 'html']);
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'pre_save'], 1 );
-            add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'save']);
+            add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'save'], 11 );
             add_action("admin_enqueue_scripts", [$this, 'admin_scripts'] );
         }
 
@@ -92,7 +95,10 @@ abstract class Funnel_Step extends Supports_Errors
         add_filter("groundhogg/steps/{$this->get_type()}/run", [$this, 'run'], 10, 2);
         add_action("wp_enqueue_scripts", [$this, 'frontend_scripts'] );
 
+        $this->add_additional_actions();
     }
+
+    protected function add_additional_actions(){}
 
     /**
      * Whether we are looking at the editing screen.
@@ -101,8 +107,7 @@ abstract class Funnel_Step extends Supports_Errors
      */
     protected function is_editing_screen()
     {
-        //TODO implement
-        return true;
+        return get_request_var( 'page' ) === 'gh_funnels' && get_request_var( 'action' ) === 'edit';
     }
 
 
@@ -266,7 +271,7 @@ abstract class Funnel_Step extends Supports_Errors
             case HTML::DROPDOWN_SMS:
             case HTML::DROPDOWN_EMAILS:
             case HTML::DROPDOWN_CONTACTS:
-                $args[ 'field' ][ 'data' ] = wp_parse_args( $this->get_setting( $setting, $args[ 'default' ] ) );
+                $args[ 'field' ][ 'selected' ] = ensure_array( $this->get_setting( $setting, $args[ 'default' ] ) );
                 break;
             case HTML::DROPDOWN:
             case HTML::DROPDOWN_OWNERS:
@@ -301,7 +306,7 @@ abstract class Funnel_Step extends Supports_Errors
      */
     protected function setting_name_prefix( $setting='' )
     {
-        return sprintf( 'step[%d][%s]', $this->get_current_step()->get_id(), $setting );
+        return sprintf( 'steps[%d][%s]', $this->get_current_step()->get_id(), $setting );
     }
 
     /**
@@ -353,11 +358,7 @@ abstract class Funnel_Step extends Supports_Errors
      */
     protected function get_posted_data($key = '', $default=false )
     {
-        if ( isset_not_empty( $this->posted_settings, $key ) ){
-            return $this->posted_settings[ $key ];
-        }
-
-        return $default;
+        return get_array_var( $this->posted_settings, $key, $default );
     }
 
     /**
@@ -613,7 +614,7 @@ abstract class Funnel_Step extends Supports_Errors
      *
      * @param $step Step
      */
-    protected function pre_save( Step $step )
+    public function pre_save( Step $step )
     {
         $this->set_current_step( $step );
         $this->posted_settings = wp_unslash( $_POST[ 'steps' ][ $step->get_id() ] );

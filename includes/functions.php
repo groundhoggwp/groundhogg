@@ -63,6 +63,21 @@ function get_request_var( $key='', $default=false, $post_only=false )
 }
 
 /**
+ * Ensures an array
+ *
+ * @param $array
+ * @return array
+ */
+function ensure_array( $array )
+{
+    if ( is_array( $array ) ){
+        return $array;
+    }
+
+    return [ $array ];
+}
+
+/**
  * Get a variable from an array or default if it doesn't exist.
  *
  * @param $array

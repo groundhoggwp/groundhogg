@@ -24,7 +24,7 @@ class Funnel extends Base_Object
      */
     protected function get_db()
     {
-        return Plugin::instance()->dbs->get_db('funnels');
+        return Plugin::instance()->dbs->get_db('funnels' );
     }
 
     /**

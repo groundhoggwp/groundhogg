@@ -3,6 +3,7 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
@@ -10,6 +11,7 @@ use Groundhogg\Step;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
 use Groundhogg\Form;
+use Groundhogg\Submission;
 
 
 /**
@@ -29,6 +31,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Form_Filled extends Benchmark
 {
+    protected function add_additional_actions(){
+        add_action( 'admin_footer', [$this, 'modal_form'] );
+    }
 
     /**
      * Get element name
@@ -81,22 +86,44 @@ class Form_Filled extends Benchmark
     }
 
     /**
+     * Setup the completion process
+     *
+     * @param $submission Submission
+     * @param $contact Contact
+     * @param $submission_handler
+     */
+    public function setup( $submission, $contact, $submission_handler)
+    {
+        $this->add_data( 'form_id', $submission->get_form_id() );
+        $this->add_data( 'contact_id', $submission->get_contact_id() );
+    }
+
+    /**
      * Based on the current step and contact,
      *
      * @return bool
      */
     protected function can_complete_step()
     {
+        return $this->get_current_step()->get_id() === $this->get_data( 'form_id' );
+    }
 
+    /**
+     * @return false|Contact
+     */
+    protected function get_the_contact()
+    {
+        return get_contactdata( $this->get_data( 'contact_id' ) );
     }
 
     /**
      * Enqueue the form builder JS in the admin area
      */
-    public function scripts()
+    public function admin_scripts()
     {
         wp_enqueue_script( 'groundhogg-admin-form-builder' );
     }
+
 
     /**
      * @param $step Step
@@ -303,7 +330,6 @@ class Form_Filled extends Benchmark
         <?php
     }
 
-
     /**
      * Prettifies the shortcode text to make it easier to identify and read
      *
@@ -354,6 +380,7 @@ class Form_Filled extends Benchmark
         return $pretty;
 
     }
+
 
     public function modal_form()
     {
@@ -567,7 +594,6 @@ class Form_Filled extends Benchmark
         <?php
     }
 
-
     /**
      * Save the step settings
      *
@@ -620,10 +646,5 @@ class Form_Filled extends Benchmark
             <span class="cvr" title="<?php _e( 'Conversion Rate' ); ?>"><?php _e( 'CVR: '); ?><strong><?php echo round( ( $num_events_completed / ( ( $num_impressions > 0 )? $num_impressions : 1 ) * 100 ), 2 ); ?></strong>%</span>
         </p>
         <?php
-    }
-
-    protected function get_the_contact()
-    {
-
     }
 }

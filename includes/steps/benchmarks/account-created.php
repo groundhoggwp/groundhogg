@@ -81,7 +81,7 @@ class Account_Created extends Benchmark
             'description'   => __( 'New users with these roles will trigger this benchmark.', 'groundhogg' ),
             'field'         => [
                 'multiple' => true,
-                'options'  => Plugin::$instance->roles->get_roles_for_select(),
+                'data'  => Plugin::$instance->roles->get_roles_for_select(),
             ],
         ] );
 
@@ -95,7 +95,7 @@ class Account_Created extends Benchmark
      */
     public function save( $step )
     {
-        $this->save_setting( 'role', array_map( 'sanitize_text_field', $this->get_posted_data( 'role', 'subscriber' ) ) );
+        $this->save_setting( 'role', array_map( 'sanitize_text_field', $this->get_posted_data( 'role', [ 'subscriber' ] ) ) );
     }
 
     /**

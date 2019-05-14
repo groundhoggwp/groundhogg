@@ -635,7 +635,7 @@ class HTML
         $multiple           = $a[ 'multiple' ]              ? 'multiple'             : '';
         $tags               = $a[ 'tags' ]                  ? 'data-tags="true"'     : '';
 
-        $a[ 'selected' ]    = is_array( $a[ 'selected' ] )  ? $a[ 'selected' ]  : array( $a[ 'selected' ] );
+        $a[ 'selected' ]    = ensure_array( $a[ 'selected' ] );
 
         $optionHTML = '';
 
@@ -727,6 +727,8 @@ class HTML
             'placeholder'       => __( 'Please Select a Tag', 'groundhogg' ),
             'tags'              => true,
         ) );
+
+        $a[ 'selected' ] = wp_parse_id_list( $a[ 'selected' ] );
 
         if ( is_array( $a[ 'selected' ] ) ){
 

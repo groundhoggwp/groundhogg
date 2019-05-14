@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\DB\Steps;
 use Groundhogg\Funnel;
 use Groundhogg\Manager;
 use function Groundhogg\enqueue_groundhogg_modal;
@@ -112,7 +113,7 @@ class Funnels_Page extends Admin_Page
            wp_enqueue_script( 'jquery-ui-draggable' );
            wp_enqueue_script( 'jquery-ui-datepicker' );
 
-           wp_enqueue_script( 'groundhogg-admin-link-picker' );
+//           wp_enqueue_script( 'groundhogg-admin-link-picker' );
            wp_enqueue_script( 'sticky-sidebar' );
 
            wp_enqueue_style(  'groundhogg-admin-funnel-editor' );
@@ -446,8 +447,10 @@ class Funnels_Page extends Admin_Page
             $this->add_notice( $result );
         }
 
-//        $result[ 'chartData' ] = $this->get_chart_data();
-//        $result[ 'step_html' ] = $this->get_step_html();
+        $result = [];
+
+        $result[ 'chartData' ] = $this->get_chart_data();
+        $result[ 'steps' ] = $this->get_step_html();
 
         $this->send_ajax_response( $result );
 
@@ -475,6 +478,7 @@ class Funnels_Page extends Admin_Page
         ] );
 
         $dataset1 = array();
+        $dataset2 = array();
 
         foreach ( $steps as $i => $step ) {
 
@@ -529,17 +533,12 @@ class Funnels_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        if ( empty( $_POST ) ) {
-            return new \WP_Error( 'no_post', "POST variable not found." );
-        }
-
         /* check if funnel is to big... */
         if ( count( $_POST, COUNT_RECURSIVE ) >= intval( ini_get( 'max_input_vars' ) ) ){
             return new \WP_Error( 'post_too_big', _x( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.', 'notice', 'groundhogg' ) );
         }
 
-//        $funnel_id = intval( $_REQUEST[ 'funnel' ] );
-        $funnel_id = absint( get_request_var( 'funnel_id' ) );
+        $funnel_id = absint( get_request_var( 'funnel' ) );
 
         $funnel = new Funnel( $funnel_id );
 
@@ -560,7 +559,7 @@ class Funnels_Page extends Admin_Page
         //get all the steps in the funnel.
         $step_ids = wp_parse_id_list( get_request_var( 'step_ids' ) );
 
-        if ( ! $step_ids ){
+        if ( empty( $step_ids ) ){
             return new \WP_Error( 'no_steps', 'Please add automation first.' );
         }
 
@@ -576,7 +575,7 @@ class Funnels_Page extends Admin_Page
 
         }
 
-        $first_step = $completed_steps[0];
+        $first_step = array_shift( $completed_steps );
 
         /* if it's not a bench mark then the funnel cant actually ever run */
         if ( ! $first_step->is_benchmark() ){
@@ -587,17 +586,6 @@ class Funnels_Page extends Admin_Page
 
         return true;
 
-    }
-
-    public function autosave_funnel()
-    {
-        if ( ! wp_doing_ajax() ){
-            return;
-        }
-
-        $this->process_edit();
-
-        wp_die('Auto saved successfully...' );
     }
 
     public function add_step()
@@ -621,7 +609,7 @@ class Funnels_Page extends Admin_Page
         $title = $elements[ $step_type ]->get_name();
         $step_group = $elements[ $step_type ]->get_group();
 
-        $step_id = Plugin::$instance->dbs->get_db('steps')->add( [
+        $step = new Step( [
             'funnel_id'     => $funnel_id,
             'step_title'    => $title,
             'step_type'     => $step_type,
@@ -629,22 +617,14 @@ class Funnels_Page extends Admin_Page
             'step_order'    => $step_order,
         ] );
 
-
-
-        if ( $step_id ){
-
-            $step = Plugin::$instance->utils->get_step($step_id ) ;
-//            wpgh_get_funnel_step( $step_id ); todo check
-
+        if ( $step->exists() ){
             ob_start();
-
             $step->html();
-
             $content = ob_get_clean();
+            $this->send_ajax_response( [ 'html' => $content ] );
         }
 
-
-        wp_die( $content );
+        wp_send_json_error();
     }
 
     public function duplicate_step()
@@ -708,6 +688,7 @@ class Funnels_Page extends Admin_Page
      */
     public function delete_step()
     {
+
         if ( ! current_user_can( 'edit_funnels' ) ){
             $this->wp_die_no_access();
         }
@@ -717,21 +698,26 @@ class Funnels_Page extends Admin_Page
             return;
         }
 
-        if ( ! isset( $_POST['step_id'] ) )
-            wp_die( 'No Step.' );
 
-        $stepid = absint( intval( $_POST['step_id'] ) );
+        $stepid = absint( get_request_var( 'step_id' ) );
         $step = Plugin::$instance->utils->get_step( $stepid );
+
+        // Move contacts forward
+
         if ( $contacts = $step->get_waiting_contacts() ){
             $next_step = $step->get_next_action();
             if ( $next_step instanceof Step && $next_step->is_active() ){
-                 foreach ( $contacts as $contact ){
-                     $next_step->enqueue( $contact );
-                 }
+                foreach ( $contacts as $contact ){
+                    $next_step->enqueue( $contact );
+                }
             }
         }
 
-        wp_die( Plugin::$instance->dbs->get_db('steps')->delete( $stepid ) );
+        if ( Plugin::$instance->dbs->get_db('steps')->delete( $stepid ) ){
+            wp_send_json_success( [ 'id' => $stepid ] );
+        }
+
+        wp_send_json_error();
     }
 
     /**
@@ -919,12 +905,9 @@ class Funnels_Page extends Admin_Page
         }
     }
 
-
     public function is_reporting_enabled()
     {
         return false;// todo I returned false for this function call and its working.
     }
-
-
 
 }

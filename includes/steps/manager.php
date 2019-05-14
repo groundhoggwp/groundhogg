@@ -17,6 +17,7 @@ use Groundhogg\Steps\Actions\Send_SMS;
 use Groundhogg\Steps\Benchmarks\Account_Created;
 use Groundhogg\Steps\Benchmarks\Benchmark;
 use Groundhogg\Steps\Benchmarks\Email_Confirmed;
+use Groundhogg\Steps\Benchmarks\Form_Filled;
 use Groundhogg\Steps\Benchmarks\Link_Clicked;
 use Groundhogg\Steps\Benchmarks\Login_Status;
 use Groundhogg\Steps\Benchmarks\Page_Visited;
@@ -62,7 +63,7 @@ class Manager {
 
         /* Benchmarks */
         $this->elements[] = new Account_Created();
-//        $this->elements[] = new \WPGH_Form_Filled();
+        $this->elements[] = new Form_Filled();
         $this->elements[] = new Email_Confirmed();
         $this->elements[] = new Link_Clicked();
         $this->elements[] = new Login_Status();

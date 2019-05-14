@@ -1,8 +1,8 @@
-var wpghFormBuilder;
+var FormBuilder = {};
 
-(function($){
+(function($,builder){
 
-    wpghFormBuilder = {
+    $.extend( builder, {
 
         activeEditor: null,
         active: false,
@@ -11,24 +11,26 @@ var wpghFormBuilder;
 
         init: function () {
 
+            var self = this;
+
             $(document).on('click', 'div.form-buttons', function (e) {
 
-                wpghFormBuilder.setup(this);
-                wpghFormBuilder.getForm(e.target);
+                self.setup(this);
+                self.getForm(e.target);
 
             });
 
             $( '.popup-save' ).click( function (e) {
-                if ( wpghFormBuilder.active ){
-                    wpghFormBuilder.makeField();
+                if ( self.active ){
+                    self.makeField();
                 }
             });
 
             $( '#field-name' ).change( function () {
-                $(this).val( wpghFormBuilder.sanitizeKey( $(this).val() ) );
+                $(this).val( self.sanitizeKey( $(this).val() ) );
             });
             $( '#field-id' ).change( function () {
-                $(this).val( wpghFormBuilder.sanitizeKey( $(this).val() ) );
+                $(this).val( self.sanitizeKey( $(this).val() ) );
             });
 
             /* Handled  Radio button options */
@@ -39,7 +41,7 @@ var wpghFormBuilder;
             });
 
             $( '.addoption' ).click(function() {
-                wpghFormBuilder.addOptionsHTML();
+                self.addOptionsHTML();
             });
 
             this.initTypes();
@@ -230,10 +232,10 @@ var wpghFormBuilder;
             this.active = false;
         }
 
-    };
+    } );
 
     $(function () {
-        wpghFormBuilder.init();
+        builder.init();
     });
 
-})(jQuery);
+})(jQuery, FormBuilder);

@@ -145,7 +145,7 @@ class Date_Timer extends Action
      */
     public function save( $step )
     {
-        $this->save_setting( 'run_date', strtotime( 'Y-m-d', $this->get_posted_data( 'run_date' ) ) );
+        $this->save_setting( 'run_date', date( 'Y-m-d', strtotime( $this->get_posted_data( 'run_date' ) ) ) );
         $this->save_setting( 'run_time', sanitize_text_field( $this->get_posted_data( 'run_date' ) ) );
 
         $send_in_timezone = $this->get_posted_data( 'send_in_timezone', false );
