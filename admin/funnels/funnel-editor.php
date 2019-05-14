@@ -24,10 +24,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $funnel_id = intval( $_GET['funnel'] );
 
-//print_r($_POST);
-
-do_action( 'wpgh_funnel_editor_before_everything', $funnel_id );
-
 $funnel = new Funnel( $funnel_id );
 
 ?>
@@ -181,15 +177,15 @@ $funnel = new Funnel( $funnel_id );
                 </div>
                 <div id="export">
                     <a id="copy-share-link" style="text-decoration: none; display: inline-block" href="#"><span style="padding: 5px;" title="Copy Share Link" class="dashicons dashicons-share"></span></a>
-                    <input id="share-link" type="hidden" value="<?php echo add_query_arg( 'funnel_share', Plugin::$instance->utils->encrypt_decrypt( $funnel_id, 'e' ), site_url() ); ?>">
-                    <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'action', 'export' , $_SERVER['REQUEST_URI'] ), 'export' ) ); ?>" class="button button-secondary"><?php _ex( 'Export Funnel', 'action','groundhogg'); ?></a>
+                    <input id="share-link" type="hidden" value="<?php echo esc_attr( $funnel->export_url() ); ?>">
+                    <a href="<?php echo esc_url( $funnel->export_url() ); ?>" class="button button-secondary"><?php _ex( 'Export Funnel', 'action','groundhogg'); ?></a>
                 </div>
                 <div id="status">
                     <?php echo Plugin::$instance->utils->html->toggle( [
                         'name'          => 'funnel_status',
                         'id'            => 'status-toggle',
                         'value'         => 'active',
-                        'checked'       => $funnel->status === 'active',
+                        'checked'       => $funnel->is_active(),
                         'on'            => 'Active',
                         'off'           => 'Inactive',
                     ]); ?>
@@ -203,13 +199,10 @@ $funnel = new Funnel( $funnel_id );
     </div>
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
-            <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sidebar">
-                                <!-- Begin Benckmark Icons-->
                 <div id='benchmarks' class="postbox">
                     <h3 class="hndle"><?php echo __( 'Benchmarks', 'groundhogg' );?></h3>
                     <div class="elements-inner inside">
-                        <?php do_action( 'wpgh_benchmark_icons_before' ); ?>
                         <table>
                             <tbody>
                             <tr><?php
@@ -237,7 +230,6 @@ $funnel = new Funnel( $funnel_id );
                 <div id='actions' class="postbox">
                     <h2 class="hndle"><?php echo __( 'Actions', 'groundhogg' );?></h2>
                     <div class="inside">
-                        <?php do_action( 'wpgh_action_icons_before' ); ?>
                         <table>
                             <tbody>
                             <tr><?php
@@ -255,8 +247,6 @@ $funnel = new Funnel( $funnel_id );
                                 ?></tr>
                             </tbody>
                         </table>
-                        <?php do_action( 'wpgh_action_icons_after' ); ?>
-
                         <p>
                             <?php esc_html_e( 'Actions are launched whenever a contact completes a benchmark.','groundhogg' ); ?>
                         </p>
@@ -265,12 +255,7 @@ $funnel = new Funnel( $funnel_id );
                 </div>
                 <!-- End Action Icons-->
             </div>
-            <!-- End elements area-->
-            <!-- main funnel editing area -->
-            <div id="notices">
-                <?php  // WPGH()->notices->notices(); //todo remove ?>
-            </div>
-
+            <?php Plugin::$instance->notices->print_notices(); ?>
             <div style="width: 100%">
                 <?php include_once dirname( __FILE__ ) . '/reporting.php'; ?>
             </div>

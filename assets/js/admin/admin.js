@@ -72,7 +72,7 @@
         buildPickers();
     });
 
-    $( document ).on( 'wpghAddedStep', function () {
+    $( document ).on( 'new-step', function () {
         buildPickers();
     });
 

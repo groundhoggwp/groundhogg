@@ -1,9 +1,9 @@
 
-if ( typeof $ === 'undefined' ){
-    var $ = function () {
-        return jQuery;
-    };
-}
+// if ( typeof jQuery === 'undefined' ){
+//     var jQuery = function ( a=false ) {
+//         return jQuery;
+//     };
+// }
 
 /**
  * Send an ajax request to the WP admin.
@@ -27,14 +27,14 @@ function adminAjaxRequest( args, callback=null, fail_callback=null ) {
  * Show a spinner
  */
 function showSpinner() {
-    $('.spinner').css( 'visibility', 'visible' );
+    jQuery('.spinner').css( 'visibility', 'visible' );
 }
 
 /**
  * Hide a spinner
  */
 function hideSpinner() {
-    $('.spinner').css( 'visibility', 'hidden' );
+    jQuery('.spinner').css( 'visibility', 'hidden' );
 }
 
 /**
@@ -44,7 +44,7 @@ function hideSpinner() {
  */
 function handleNotices( notices ) {
     if ( typeof notices !== 'undefined' ){
-        $( '#groundhogg-notices' ).html( notices );
+        jQuery( '#groundhogg-notices' ).html( notices );
     }
 
     makeDismissible();
@@ -55,10 +55,10 @@ function handleNotices( notices ) {
  */
 function makeDismissible() {
 
-    $( "<button type='button' class='notice-dismiss'><span class='screen-reader-text'>Dismiss This Notice</span></button>" ).appendTo( '.is-dismissible' );
-    $( '.notice-dismiss' ).on( 'click', function ( e ) {
-        $(this).parent().fadeOut( 100, function () {
-            $(this).remove();
+    jQuery( "<button type='button' class='notice-dismiss'><span class='screen-reader-text'>Dismiss This Notice</span></button>" ).appendTo( '.is-dismissible' );
+    jQuery( '.notice-dismiss' ).on( 'click', function ( e ) {
+        jQuery(this).parent().fadeOut( 100, function () {
+            jQuery(this).remove();
         } );
     } )
 }

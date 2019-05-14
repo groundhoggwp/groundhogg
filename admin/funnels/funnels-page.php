@@ -114,7 +114,6 @@ class Funnels_Page extends Admin_Page
 
            wp_enqueue_script( 'groundhogg-admin-link-picker' );
            wp_enqueue_script( 'sticky-sidebar' );
-           wp_enqueue_script( 'jquery-sticky-sidebar' );
 
            wp_enqueue_style(  'groundhogg-admin-funnel-editor' );
            wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
@@ -437,50 +436,35 @@ class Funnels_Page extends Admin_Page
 		    return;
 	    }
 
-	    $this->process_edit();
-//	    wp_die( 'hi' );
+        if ( ! $this->verify_action() ){
+            wp_send_json_error();
+        }
 
-	    ob_start();
+        $result = $this->process_edit();
 
-//        $this->notices->notices(); todo check
-        $this->add_notice();
+        if ( is_wp_error( $result ) ){
+            $this->add_notice( $result );
+        }
 
-        $notices = ob_get_clean();
+//        $result[ 'chartData' ] = $this->get_chart_data();
+//        $result[ 'step_html' ] = $this->get_step_html();
+
+        $this->send_ajax_response( $result );
+
+    }
+
+    public function get_step_html()
+    {
+        $funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
+        $steps = $funnel->get_steps();
 
         ob_start();
 
-        do_action('wpgh_funnel_steps_before' ); ?>
+        foreach ( $steps as $step ){
+            echo $step;
+        }
 
-        <?php $steps = Plugin::$instance->dbs->get_db('steps')->query( [ 'funnel_id' => intval( $_REQUEST[ 'funnel' ] )  ]  );
-
-
-        if ( empty( $steps ) ): ?>
-            <div class="">
-                <?php esc_html_e( 'Drag in new steps to build the ultimate sales machine!' , 'groundhogg'); ?>
-            </div>
-        <?php else:
-
-            foreach ( $steps as $i => $step ):
-//                $step = wpgh_get_funnel_step( $step->ID ); // todo check
-                $step = Plugin::$instance->utils->get_step($step->ID);
-                $step->html();
-                // echo $step;
-            endforeach;
-
-        endif; ?>
-        <?php do_action('wpgh_funnel_steps_after' );
-
-        $steps = ob_get_clean();
-
-        $response = array(
-            'notices'   => $notices,
-            'steps'     => $steps,
-            'chartData' => $this->get_chart_data(),
-
-        );
-
-        wp_die( json_encode( $response ) );
-
+        return ob_get_clean();
     }
 
     public function get_chart_data()
@@ -554,23 +538,15 @@ class Funnels_Page extends Admin_Page
             return new \WP_Error( 'post_too_big', _x( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.', 'notice', 'groundhogg' ) );
         }
 
-        $funnel_id = intval( $_REQUEST[ 'funnel' ] );
+//        $funnel_id = intval( $_REQUEST[ 'funnel' ] );
+        $funnel_id = absint( get_request_var( 'funnel_id' ) );
 
-        do_action( 'wpgh_before_save_funnel', $funnel_id );
+        $funnel = new Funnel( $funnel_id );
 
-        $title = sanitize_text_field( stripslashes( $_POST[ 'funnel_title' ] ) );
-
+        $title = sanitize_text_field( get_request_var( 'funnel_title' ) );
         $args[ 'title' ] = $title;
 
-        if ( isset( $_POST[ 'funnel_status' ] ) ){
-            $status = sanitize_text_field( $_POST[ 'funnel_status' ] );
-            if ( $status !== 'active' ){
-                $status = 'inactive';
-            }
-        } else {
-            $status = 'inactive';
-            $this->add_notice( esc_attr( 'inactive' ), _x( 'Funnel is currently inactive', 'notice','groundhogg' ), 'info' );
-        }
+        $status = sanitize_text_field( get_request_var( 'funnel_status', 'inactive' ) );
 
         //do not update the status to inactive if it's not confirmed
         if ( $status === 'inactive' || $status === 'active' ){
@@ -579,58 +555,33 @@ class Funnels_Page extends Admin_Page
 
         $args[ 'last_updated' ] = current_time( 'mysql' );
 
-        Plugin::$instance->dbs->get_db('funnels')->update( $funnel_id, $args );
+        $funnel->update( $args );
 
         //get all the steps in the funnel.
-        $steps = $_POST['steps'];
+        $step_ids = wp_parse_id_list( get_request_var( 'step_ids' ) );
 
-        if ( ! $steps ){
-            wp_die( 'Please add automation first.' );
+        if ( ! $step_ids ){
+            return new \WP_Error( 'no_steps', 'Please add automation first.' );
         }
 
-        foreach ( $steps as $i => $stepId ) {
-            $stepId = intval( $stepId );
-            $step = Plugin::$instance->utils->get_step($stepId);
+        $completed_steps = [];
 
-            //quick Order Hack to get the proper order of a step...
+        foreach ( $step_ids as $order => $stepId ) {
 
-            $order = $i + 1;
-            $title = sanitize_text_field( wp_unslash( $_POST[ $step->prefix( 'title' ) ] ) );
+            $step = new Step( $stepId );
 
-            $args = array(
-                'step_title'     =>  $title,
-                'step_order'     =>  $order,
-                'step_status'    =>  'ready',
-            );
+            $step->save();
 
-            $step->update( $args );
-
-            if ( isset( $_POST[ $step->prefix( 'blog_id' ) ] ) ){
-                $step->update_meta( 'blog_id', intval( $_POST[ $step->prefix( 'blog_id' ) ] ) );
-            } else {
-                $step->delete_meta( 'blog_id' );
-            }
-
-            if ( isset( $_POST[ $step->prefix( 'closed' ) ] ) && ! empty(  $_POST[ $step->prefix( 'closed' ) ] ) ){
-                $step->update_meta( 'is_closed', 1 );
-            } else {
-                $step->delete_meta( 'is_closed' );
-            }
-
-            do_action( "groundhogg/steps/{$step->type}/save", $step );
-//            do_action( "groundhogg/steps/{$step->type}/save", $step );
+            $completed_steps[] = $step;
 
         }
 
-//        $first_step = wpgh_get_funnel_step( $steps[0] ); todo check
+        $first_step = $completed_steps[0];
 
-        $first_step = Plugin::$instance->utils->get_step( $step[0] ) ;
         /* if it's not a bench mark then the funnel cant actually ever run */
         if ( ! $first_step->is_benchmark() ){
-            return new \WP_Error( 'bad-funnel', _x( 'Funnels must start with 1 or more benchmarks', 'notice', 'groundhogg' ));
+            return new \WP_Error( 'invalid_config', _x( 'Funnels must start with 1 or more benchmarks', 'warning', 'groundhogg' ));
         }
-
-        do_action( 'wpgh_funnel_updated', $funnel_id ); //todo remove
 
         $this->add_notice( esc_attr( 'updated' ), _x( 'Funnel updated', 'notice', 'groundhogg' ), 'success' );
 

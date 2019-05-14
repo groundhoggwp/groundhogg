@@ -120,50 +120,13 @@ class Page_Visited extends Benchmark
     }
 
     /**
-     * Perform the complete action
-     *
-     * @param $ref string
-     * @param $contact WPGH_Contact
-     */
-    public function complete( $ref, $contact )
-    {
-        $steps = $this->get_like_steps();
-
-        if ( empty( $steps ) )
-            return;
-
-        $s = false;
-
-        foreach ( $steps as $step ) {
-
-            if ( $step->can_complete( $contact ) ){
-
-                $match_type = $step->get_meta( 'match_type' );
-                $match_url  = $step->get_meta( 'url_match' );
-
-                if ( $match_type === 'exact' ){
-                    $is_page = $ref === $match_url;
-                } else {
-                    $is_page = strpos( $ref, $match_url ) !== false;
-                }
-
-                if ( $is_page ){
-
-                   $s = $step->enqueue( $contact );
-
-                }
-            }
-        }
-    }
-
-    /**
      * get the hook for which the benchmark will run
      *
      * @return int[]
      */
     protected function get_complete_hooks()
     {
-        return [ 'groundhogg/api/v3/steps/page-view', 2 ];
+        return [ 'groundhogg/api/v3/steps/page-view' => 2 ];
     }
 
 

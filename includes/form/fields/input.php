@@ -1,7 +1,7 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
-use Groundhogg\Form\FormV2;
+use Groundhogg\Form\Form;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use function Groundhogg\words_to_key;
@@ -19,7 +19,7 @@ abstract class Input extends Field
     protected static $configurations = [];
 
     /**
-     * @param $form FormV2
+     * @param $form Form
      */
     public static function save_config( $form )
     {

@@ -1,1041 +1,137 @@
 <?php
-namespace Groundhogg;
+
+namespace Groundhogg\Form;
+
+use function Groundhogg\array_to_atts;
+use Groundhogg\Form\Fields\Checkbox;
+use Groundhogg\Form\Fields\Column;
+use Groundhogg\Form\Fields\Date;
+use Groundhogg\Form\Fields\Email;
+use Groundhogg\Form\Fields\Field;
+use Groundhogg\Form\Fields\File;
+use Groundhogg\Form\Fields\First;
+use Groundhogg\Form\Fields\GDPR;
+use Groundhogg\Form\Fields\Last;
+use Groundhogg\Form\Fields\Number;
+use Groundhogg\Form\Fields\Phone;
+use Groundhogg\Form\Fields\Radio;
+use Groundhogg\Form\Fields\Recaptcha;
+use Groundhogg\Form\Fields\Row;
+use Groundhogg\Form\Fields\Dropdown;
+use Groundhogg\Form\Fields\Submit;
+use Groundhogg\Form\Fields\Terms;
+use Groundhogg\Form\Fields\Text;
+use Groundhogg\Form\Fields\Textarea;
+use Groundhogg\Form\Fields\Time;
+use function Groundhogg\get_array_var;
+use function Groundhogg\get_db;
+use function Groundhogg\isset_not_empty;
+use Groundhogg\Plugin;
 
 /**
- * Form
- *
- * @package     Includes
- * @author      Adrian Tobey <info@groundhogg.io>
- * @copyright   Copyright (c) 2018, Groundhogg Inc.
- * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * Created by PhpStorm.
+ * User: adria
+ * Date: 2019-05-10
+ * Time: 9:51 AM
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+class Form {
 
-class Form
-{
-    /**
-     * Form attributes
-     *
-     * @var array
-     */
-    protected $attributes;
+    protected $attributes = [];
 
     /**
-     * Form content
-     *
-     * @var string
+     * Manager constructor.
      */
-    protected $content;
-
-    /**
-     * Form ID, also ID of the step
-     *
-     * @var int
-     */
-    protected $id;
-
-    /**
-     * Array of field IDs given all the fields in the form
-     *
-     * @var array
-     */
-    protected $fields = [];
-
-    /**
-     * This will contain a config object and all the settings of the form to compare against for security checks later on...
-     *
-     * @var array
-     */
-    protected $config = [];
-
-    /**
-     * Full rendering of the form
-     *
-     * @var string
-     */
-    var $rendered;
-
-	/**
-	 * @var bool
-	 */
-    var $iframe_compat = false;
-
-    /**
-     * Whether to auto populate a form
-     *
-     * @var bool
-     */
-    var $auto_populate = false;
-
-    /**
-     * Where contact details are pulled from
-     *
-     * @var null WPGH_Contact
-     */
-    var $source_contact = null;
-
-    /**
-     * Whether the form is in preview mode
-     *
-     * @var bool
-     */
-    var $doing_preview = false;
-
-    /**
-     * Whether a previous submission failed.
-     *
-     * @var bool
-     */
-    var $submission_failed = false;
-
     public function __construct( $atts )
     {
-        $this->attributes = shortcode_atts(array(
+        $this->attributes = shortcode_atts( [
             'class'     => '',
             'id'        => 0
-        ), $atts);
+        ], $atts);
 
-        if ( is_admin() && current_user_can( 'edit_contacts' ) && key_exists( 'contact', $_GET ) ){
-            $this->auto_populate = true;
-            $this->source_contact = Plugin::$instance->utils->get_contact( absint( get_request_var( 'contact' ) ) );
-        }
-
-        $this->id = intval( $this->attributes[ 'id' ] );
-        $this->add_scripts();
+        $this->init_fields();
     }
 
     /**
-     * Get data from a failed submission
+     * @return int
+     */
+    public function get_id()
+    {
+        return absint( get_array_var( $this->attributes, 'id' ) );
+    }
+    
+    /**
+     * Setup the base Fields for the plugin
+     */
+    protected function init_fields()
+    {
+        $this->column = new Column( $this->get_id() );
+        $this->row = new Row( $this->get_id() );
+        $this->text = new Text( $this->get_id() );
+        $this->textarea = new Textarea( $this->get_id());
+        $this->first = new First($this->get_id());
+        $this->last = new Last($this->get_id());
+        $this->email = new Email($this->get_id());
+        $this->phone = new Phone($this->get_id());
+        $this->number = new Number($this->get_id());
+        $this->date = new Date($this->get_id());
+        $this->time = new Time($this->get_id());
+        $this->file = new File($this->get_id());
+        $this->select = new Dropdown($this->get_id());
+        $this->radio = new Radio($this->get_id());
+        $this->checkbox = new Checkbox($this->get_id());
+        $this->terms = new Terms($this->get_id());
+        $this->gdpr = new GDPR($this->get_id());
+        $this->recaptcha = new Recaptcha($this->get_id());
+        $this->submint = new Submit($this->get_id());
+        do_action( 'groundhogg/form/fields/init', $this );
+    }
+
+
+    /**
+     * List of fields
+     *
+     * @var Field[]
+     */
+    protected $fields = [];
+    
+    /**
+     * Set the data to the given value
      *
      * @param $key string
-     * @return bool|string
+     * @return Field
      */
-    private function get_submission_data( $key ){
+    public function get_field( $key ){
+        return $this->$key;
+    }
 
-        if ( key_exists( $key, WPGH()->submission->data ) ){
-            return esc_html( WPGH()->submission->$key );
+    /**
+     * Magic get method
+     *
+     * @param $key string
+     * @return Field|false
+     */
+    public function __get( $key )
+    {
+        if ( isset_not_empty( $this->fields, $key ) ){
+            return $this->fields[ $key ];
         }
 
         return false;
-
     }
 
-	/**
-	 * Set whether the form should have Iframe compatibility.
-	 *
-	 * @param $bool
-	 */
-    public function set_iframe_compat( $bool ){
-    	$this->iframe_compat = (bool) $bool;
-    }
-
-	/**
-	 * Add relevant form scripts.
-	 */
-    private function add_scripts()
-    {
-    	wp_enqueue_style( 'groundhogg-frontend' );
-    }
 
     /**
-     * Setup the shortcodes for the fields. ensures that
-     * field shortcodes can only be called withing the form shortcode
-     */
-    private function setup_shortcodes()
-    {
-	    add_shortcode( 'col',        array( $this, 'column'     ) );
-	    add_shortcode( 'row',        array( $this, 'row'        ) );
-	    add_shortcode( 'first_name', array( $this, 'first_name'  ) );
-	    add_shortcode( 'first',      array( $this, 'first_name'  ) );
-        add_shortcode( 'last_name',  array( $this, 'last_name'   ) );
-        add_shortcode( 'last',       array( $this, 'last_name'   ) );
-        add_shortcode( 'file',       array( $this, 'file'        ) );
-        add_shortcode( 'date',       array( $this, 'date'        ) );
-        add_shortcode( 'time',       array( $this, 'time'        ) );
-        add_shortcode( 'email',      array( $this, 'email'       ) );
-        add_shortcode( 'phone',      array( $this, 'phone'       ) );
-        add_shortcode( 'address',    array( $this, 'address'     ) );
-        add_shortcode( 'text',       array( $this, 'text'        ) );
-        add_shortcode( 'textarea',   array( $this, 'textarea'    ) );
-        add_shortcode( 'number',     array( $this, 'number'      ) );
-        add_shortcode( 'select',     array( $this, 'select'      ) );
-        add_shortcode( 'dropdown',   array( $this, 'select'      ) );
-        add_shortcode( 'radio',      array( $this, 'radio'       ) );
-        add_shortcode( 'checkbox',   array( $this, 'checkbox'    ) );
-        add_shortcode( 'terms',      array( $this, 'terms'       ) );
-        add_shortcode( 'gdpr',       array( $this, 'gdpr'        ) );
-        add_shortcode( 'recaptcha',  array( $this, 'recaptcha'   ) );
-        add_shortcode( 'submit',     array( $this, 'submit'      ) );
-
-        do_action( 'groundhogg/form/setup_shortcodes', $this );
-    }
-
-    /**
-     * remove the short codes when they are no longer relevant
-     * field shortcodes can only be called withing the form shortcode
-     */
-    private function destroy_shortcodes()
-    {
-	    remove_shortcode( 'row'          );
-	    remove_shortcode( 'col'          );
-	    remove_shortcode( 'last_name'    );
-	    remove_shortcode( 'last'         );
-	    remove_shortcode( 'file'         );
-	    remove_shortcode( 'date'         );
-	    remove_shortcode( 'time'         );
-	    remove_shortcode( 'first'        );
-	    remove_shortcode( 'first_name'   );
-        remove_shortcode( 'email'        );
-        remove_shortcode( 'phone'        );
-        remove_shortcode( 'address'      );
-        remove_shortcode( 'text'         );
-        remove_shortcode( 'number'       );
-        remove_shortcode( 'select'       );
-        remove_shortcode( 'dropdown'     );
-        remove_shortcode( 'radio'        );
-        remove_shortcode( 'checkbox'     );
-        remove_shortcode( 'terms'        );
-        remove_shortcode( 'recaptcha'    );
-        remove_shortcode( 'email_preferences' );
-        remove_shortcode( 'submit'       );
-
-        do_action( 'groundhogg/form/destroy_shortcodes', $this );
-    }
-
-    /**
-     * Check to ensure the form is real
+     * Set the data to the given value
      *
-     * @return bool
+     * @param $key string
+     * @param $value Field
      */
-    private function is_form()
+    public function __set( $key, $value )
     {
-//        return !empty( $this->a[ 'id' ] );
-
-        return true;
+        $this->fields[ $key ] = $value;
     }
 
-    private function field_wrap( $content )
-    {
-        return sprintf( "<div class='gh-form-field'>%s</div>", $content );
-    }
-
-    public function row( $atts, $content )
-    {
-        $a = shortcode_atts( array(
-            'id'    => '',
-            'class' => ''
-        ), $atts );
-
-    	return sprintf( "<div id='%s' class='gh-form-row clearfix %s'>%s</div>", $a['id'], $a['class'], do_shortcode( $content ) );
-    }
-
-    public function column( $atts, $content ){
-
-    	$a = shortcode_atts( array(
-    	    'size'  => false,
-    	    'width' => '1/2',
-            'id'    => '',
-            'class' => ''
-        ), $atts );
-
-    	//backwards compat for columns with the size attr
-    	if ( $a[ 'size' ] ){
-    	    $a[ 'width' ] = $a[ 'size' ];
-        }
-
-    	switch ( $a[ 'width' ] ){
-		    case '1/1':
-		    	$width = 'col-1-of-1';
-		    	break;
-            default:
-		    case '1/2':
-			    $width = 'col-1-of-2';
-			    break;
-		    case '1/3':
-			    $width = 'col-1-of-3';
-			    break;
-		    case '2/3':
-			    $width = 'col-2-of-3';
-			    break;
-		    case '1/4':
-			    $width = 'col-1-of-4';
-			    break;
-		    case '3/4':
-			    $width = 'col-3-of-4';
-			    break;
-	    }
-
-	    return sprintf( "<div id='%s' class='gh-form-column %s %s'>%s</div>", $a['id'], $a['class'], $width, do_shortcode( $content ) );
-    }
-
-    /**
-     * Returns a basic input structure for the majority of the fields
-     *
-     * @param $atts
-     * @return string
-     */
-    private function input_base( $atts )
-    {
-        /* return nothing if the form doesn't exist */
-        if ( ! $this->is_form() )
-        {
-            return '';
-        }
-
-        $a = shortcode_atts( array(
-            'type'          => 'text',
-            'label'         => '',
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'value'         => '',
-            'placeholder'   => '',
-            'title'         => '',
-            'attributes'    => '',
-            'required'      => false,
-        ), $atts );
-
-        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
-
-        if ( empty( $a[ 'name' ] ) ){
-
-            $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
-        }
-
-        if ( empty( $a[ 'id' ] ) ){
-            $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
-        }
-
-        $this->fields[] = $a[ 'name' ];
-
-        if ( ! isset( $this->config[ $a[ 'name' ] ] ) ){
-            $this->config[ $a[ 'name' ] ] = $a;
-        }
-
-        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
-
-        /* Auto populate for admin submissions */
-        if ( $this->auto_populate ){
-            $name = $a[ 'name' ];
-            if ( $this->source_contact->$name ){
-                $a[ 'value' ] = $this->source_contact->$name;
-            }
-        }
-
-        if ( $this->submission_failed ){
-            $a[ 'value' ] = $this->get_submission_data( $a[ 'name' ] );
-        }
-
-        $field = sprintf(
-            "<label class='gh-input-label'>%s <input type='%s' name='%s' id='%s' class='gh-input %s' value='%s' placeholder='%s' title='%s' %s %s></label>",
-            $a[ 'label' ],
-            esc_attr( $a[ 'type' ] ),
-            esc_attr( $a[ 'name' ] ),
-            esc_attr( $a[ 'id' ] ),
-            esc_attr( $a[ 'class' ] ),
-            esc_attr( $a[ 'value' ] ),
-            esc_attr( $a[ 'placeholder' ] ),
-            esc_attr( $a[ 'title' ] ),
-            $a[ 'attributes' ],
-            $required
-        );
-
-        return $this->field_wrap( $field );
-    }
-
-
-    /**
-     * Return HTML for a date input
-     *
-     * @param $atts
-     * @return string
-     */
-    public function date( $atts )
-    {
-        $a = shortcode_atts( array(
-            'type'          => 'text',
-            'label'         => _x( 'Date *', 'form_default', 'groundhogg' ),
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'max_date'      => '',
-            'min_date'      => '',
-            'date_format'   => 'yy-mm-dd',
-            'required'      => false,
-            'attributes'    => '',
-
-        ), $atts );
-
-        $a[ 'id' ] = uniqid( 'date_' );
-
-        $this->config[ $a[ 'name' ] ] = $a;
-
-        $base = $this->input_base( $a );
-
-        $base = sprintf( "%s<script>jQuery(function($){\$('#%s').datepicker({changeMonth: true,changeYear: true,minDate: '%s', maxDate: '%s',dateFormat:'%s'})});</script>", $base, $a[ 'id' ], esc_attr( $a[ 'min_date' ] ), esc_attr( $a[ 'max_date' ] ), esc_attr( $a[ 'date_format' ] ) );
-
-        wp_enqueue_script( 'jquery-ui-datepicker' );
-        wp_enqueue_style( 'jquery-ui' );
-
-        return $base;
-    }
-
-    /**
-     * Return HTML for a time input
-     *
-     * @param $atts
-     * @return string
-     */
-    public function time( $atts )
-    {
-        $a = shortcode_atts( array(
-            'type'          => 'time',
-            'label'         => _x( 'Time *', 'form_default', 'groundhogg' ),
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'max_time'      => '',
-            'min_time'      => '',
-            'required'      => false,
-            'attributes'    => '',
-
-        ), $atts );
-
-        if ( ! empty( $a[ 'max_time' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' max="%s"', esc_attr( $a[ 'max_time' ] ) );
-        }
-
-        if ( ! empty( $a[ 'min_time' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' min="%s"', esc_attr( $a[ 'min_time' ] ) );
-        }
-
-        $this->config[ $a[ 'name' ] ] = $a;
-
-        return $this->input_base( $a );
-    }
-
-    /**
-     * Output html for the number field
-     *
-     * @param $atts
-     * @return string
-     */
-    public function number( $atts )
-    {
-        $a = shortcode_atts( array(
-            'type'          => 'number',
-            'label'         => _x( 'Number *', 'form_default', 'groundhogg' ),
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'value'         => '',
-            'placeholder'   => '',
-            'max'           => '',
-            'min'           => '',
-            'attributes'    => '',
-            'required'      => false,
-        ), $atts );
-
-        if ( ! empty( $a[ 'max' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' max="%d"', $a[ 'max' ] );
-        }
-
-        if ( ! empty( $a[ 'min' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' min="%d"', $a[ 'min' ] );
-        }
-
-        return $this->input_base( $a );
-    }
-
-    /**
-     * Return a simple address block
-     *
-     * @param $atts
-     * @return string
-     */
-    public function address( $atts )
-    {
-        $a = shortcode_atts( array(
-            'label'         => _x( 'Address *', 'form_default', 'groundhogg' ),
-            'class'         => 'gh-address',
-            'enabled'       => 'all',
-            'name_prefix'   => '',
-            'required'      => false,
-        ), $atts );
-
-        $name_prefix = sanitize_key( $a[ 'name_prefix' ] );
-
-        if ( $name_prefix ){
-            $name_prefix .= '_';
-        }
-
-        $section = sprintf( "<div class='%s'><label class='gh-input-label'>%s</label>", $a[ 'class' ], $a[ 'label' ] );
-
-        $section .= $this->row( array(), $this->column( array( 'size' => '2/3' ), $this->input_base(
-                array(
-                    'type'          => 'text',
-                    'label'         => _x( 'Street Address 1', 'form_default', 'groundhogg' ),
-                    'name'          => $name_prefix . 'street_address_1',
-                    'id'            => $name_prefix . 'street_address_1',
-                    'placeholder'   => '123 Any St.',
-                    'title'         => _x( 'Street Address 1', 'form_default', 'groundhogg' ),
-                    'required'      => $a[ 'required' ],
-                )
-            ) ) .
-
-            $this->column( array( 'size' => '1/3' ), $this->input_base(
-                array(
-                    'type'          => 'text',
-                    'label'         => _x( 'Street Address 2', 'form_default', 'groundhogg' ),
-                    'name'          => $name_prefix . 'street_address_2',
-                    'id'            => $name_prefix . 'street_address_2',
-                    'placeholder'   => 'Unit A',
-                    'title'         => _x( 'Street Address 2', 'form_default', 'groundhogg' ),
-                    'required'      => $a[ 'required' ],
-                )
-            ) ) );
-
-        $section .= $this->row( array(),  $this->input_base(
-            array(
-                'type'          => 'text',
-                'label'         => _x( 'City', 'form_default', 'groundhogg' ),
-                'name'          => $name_prefix . 'city',
-                'id'            => $name_prefix . 'city',
-                'placeholder'   => 'New York',
-                'title'         => _x( 'City', 'form_default', 'groundhogg' ),
-                'required'      => $a[ 'required' ],
-            )
-        ) );
-
-        $section .= $this->row( array(), $this->column( array( 'size' => '1/2' ),$this->input_base(
-                array(
-                    'type'          => 'text',
-                    'label'         => _x( 'State/Province', 'form_default', 'groundhogg' ),
-                    'name'          => $name_prefix . 'region',
-                    'id'            => $name_prefix . 'region',
-                    'placeholder'   => 'New York',
-                    'title'         => _x( 'State/Province', 'form_default', 'groundhogg' ),
-                    'required'      => $a[ 'required' ],
-                )
-            ) ) . $this->column( array( 'size' => '1/2' ), $this->select(
-                array(
-                    'label'         => _x( 'Country *', 'form_default', 'groundhogg' ),
-                    'name'          => $name_prefix . 'country',
-                    'id'            => $name_prefix . 'country',
-                    'class'         => '',
-                    'options'       => Plugin::$instance->utils->location->get_countries_list(),
-                    'attributes'    => '',
-                    'title'         => __( 'Country' ),
-                    'default'       => _x( 'Please select a country', 'form_default', 'groundhogg' ),
-                    'multiple'      => false,
-                    'required'      => $a[ 'required' ],
-                ) )
-            ) );
-
-        $section.= $this->input_base(
-            array(
-                'type'          => 'text',
-                'label'         => _x( 'Postal/Zip Code', 'form_default', 'groundhogg' ),
-                'name'          => $name_prefix . 'postal_zip',
-                'id'            => $name_prefix . 'postal_zip',
-                'placeholder'   => '10001',
-                'title'         => _x( 'Postal/Zip Code', 'form_default', 'groundhogg' ),
-                'required'      => $a[ 'required' ],
-            )
-        );
-
-        $section.= "</div>";
-
-        return $section;
-
-    }
-
-    /**
-     * Return HTML for a textarea field
-     *
-     * @param $atts
-     * @return string
-     */
-    public function textarea( $atts )
-    {
-        /* return nothing if the form doesn't exist */
-        if ( ! $this->is_form() )
-        {
-            return '';
-        }
-
-        $a = shortcode_atts( array(
-            'label'         => '',
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'value'         => '',
-            'placeholder'   => '',
-            'title'         => '',
-            'attributes'    => '',
-            'required'      => false,
-        ), $atts );
-
-        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
-
-        if ( empty( $a[ 'name' ] ) ){
-            $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
-        }
-
-        if ( empty( $a[ 'id' ] ) ){
-            $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'placeholder' ] );
-        }
-
-        $this->fields[] = $a[ 'name' ];
-        $this->config[ $a[ 'name' ] ] = $a;
-
-        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false"  && $a[ 'required' ] !== "0" ) ? 'required' : '';
-
-        if ( $this->auto_populate ){
-            $name = $a[ 'name' ];
-            if ( $this->source_contact->$name ){
-                $a[ 'value' ] = $this->source_contact->$name;
-            }
-        }
-
-        if ( $this->submission_failed ){
-            $a[ 'value' ] = $this->get_submission_data( $a[ 'name' ] );
-        }
-
-        $field = sprintf(
-            "<label class='gh-input-label'>%s <textarea name='%s' id='%s' class='gh-input %s' placeholder='%s' title='%s' %s %s>%s</textarea></label>",
-            $a[ 'label' ],
-            esc_attr( $a[ 'name' ] ),
-            esc_attr( $a[ 'id' ] ),
-            esc_attr( $a[ 'class' ] ),
-            esc_attr( $a[ 'placeholder' ] ),
-            esc_attr( $a[ 'title' ] ),
-            $a[ 'attributes' ],
-            $required,
-            esc_attr( $a[ 'value' ] )
-        );
-
-        return $this->field_wrap( $field );
-    }
-
-    /**
-     * Return html for the select
-     *
-     * @param $atts
-     * @return string
-     */
-    function select( $atts )
-    {
-        /* return nothing if the form doesn't exist */
-        if ( ! $this->is_form() )
-        {
-            return '';
-        }
-
-        $a = shortcode_atts( array(
-            'label'         => _x( 'Select *', 'form_default', 'groundhogg' ),
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'options'       => '',
-            'attributes'    => '',
-            'title'         => '',
-            'default'       => _x( 'Please select one', 'form_default', 'groundhogg' ),
-            'multiple'      => false,
-            'required'      => false,
-        ), $atts );
-
-        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
-
-        if ( empty( $a[ 'name' ] ) ){
-            $a[ 'name' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'default' ] );
-        }
-
-        if ( empty( $a[ 'id' ] ) ){
-            $a[ 'id' ] = !empty( $a[ 'label' ] )? sanitize_key( $a[ 'label' ] ) : sanitize_key( $a[ 'default' ] );
-        }
-
-        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
-        $multiple = $a[ 'multiple' ] ? 'multiple' : '';
-
-        $optionHTML = sprintf( "<option value=''>%s</option>", $a[ 'default' ] );
-
-        if ( ! empty( $a[ 'options' ] ) )
-        {
-            $options = is_array( $a[ 'options' ] )? $a[ 'options' ] : explode( ',', $a[ 'options' ] );
-            $options = array_map( 'trim', $options );
-
-            foreach ( $options as $i => $option ){
-
-                $value = is_string( $i ) ? $i : $option;
-
-                /**
-                 * Check if tag should be applied
-                 *
-                 * @since 1.1
-                 */
-                if ( strpos( $value, '|' ) ){
-                    $parts = explode( '|', $value );
-                    $value = $parts[0];
-                    $tag = intval( $parts[1] );
-                    $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
-                }
-
-                if ( strpos( $option, '|' ) ){
-                    $parts = explode( '|', $value );
-                    $option = $parts[0];
-                }
-
-                $selected = '';
-                if ( $this->auto_populate ){
-                    $name = $a[ 'name' ];
-                    if ( $this->source_contact->$name === $value ){
-                        $selected = 'selected';
-                    }
-                }
-
-                if ( $this->submission_failed ){
-                    if ( $value === $this->get_submission_data( $a[ 'name' ] ) ){
-                        $selected = 'selected';
-                    }
-                }
-
-                $optionHTML .= sprintf( "<option value='%s' %s>%s</option>", esc_attr( $value ), $selected, $option );
-            }
-
-        }
-
-        $this->fields[] = $a[ 'name' ];
-        $this->config[ $a[ 'name' ] ] = $a ;
-
-        $field = sprintf(
-            "<label class='gh-input-label'>%s <select name='%s' id='%s' class='gh-input %s' title='%s' %s %s %s>%s</select></label>",
-            $a[ 'label' ],
-            esc_attr( $a[ 'name' ] ),
-            esc_attr( $a[ 'id' ] ),
-            esc_attr( $a[ 'class' ] ),
-            esc_attr( $a[ 'title' ] ),
-            $a[ 'attributes' ],
-            $required,
-            $multiple,
-            $optionHTML
-        );
-
-        return $this->field_wrap( $field );
-    }
-
-    /**
-     * Return html for the radio options
-     *
-     * @param $atts
-     * @return string
-     */
-    function radio( $atts )
-    {
-        /* return nothing if the form doesn't exist */
-        if ( ! $this->is_form() )
-        {
-            return '';
-        }
-
-        $a = shortcode_atts( array(
-            'label'         => _x( 'Radio *', 'form_default', 'groundhogg' ),
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'options'       => '',
-            'required'      => false,
-        ), $atts );
-
-        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
-
-        if ( empty( $a[ 'name' ] ) ){
-            $a[ 'name' ] = sanitize_key( $a[ 'label' ] );
-        }
-
-        if ( empty( $a[ 'id' ] ) ){
-            $a[ 'id' ] = sanitize_key( $a[ 'label' ] );
-        }
-
-        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
-
-        $optionHTML = '';
-
-        if ( ! empty( $a[ 'options' ] ) )
-        {
-
-            $options = is_string(  $a[ 'options' ] )? explode( ',', $a[ 'options' ] ) :  $a[ 'options' ] ;
-
-            foreach ( $options as $i => $option ){
-
-                $value = is_string( $i ) ? $i : $option;
-
-	            /**
-	             * Check if tag should be applied
-	             *
-	             * @since 1.1
-	             */
-                if ( strpos( $value, '|' ) ){
-                    $parts = explode( '|', $value );
-                    $value = $parts[0];
-                    $tag = intval( $parts[1] );
-                    $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
-                }
-
-                if ( strpos( $option, '|' ) ){
-                    $parts = explode( '|', $value );
-                    $option = $parts[0];
-                }
-
-                $checked = '';
-                if ( $this->auto_populate ){
-                    $name = $a[ 'name' ];
-                    if ( $this->source_contact->$name === $value ){
-                        $checked = 'checked';
-                    }
-                }
-
-                if ( $this->submission_failed ){
-                    if ( $value === $this->get_submission_data( $a[ 'name' ] ) ){
-                        $checked = 'checked';
-                    }
-                }
-
-                $optionHTML .= sprintf( "<div class='gh-radio-wrapper'><label class='gh-radio-label'><input class='gh-radio %s' type='radio' name='%s' id='%s' value='%s' %s %s> %s</label></div>",
-                    esc_attr( $a[ 'class' ] ),
-                    esc_attr( $a[ 'name' ] ),
-                    esc_attr( $a[ 'id' ] ) . '-' . $i,
-                    esc_attr( $value ),
-                    $required,
-                    $checked,
-                    $option
-                );
-
-            }
-
-        }
-
-        $this->fields[] = $a[ 'name' ];
-        $this->config[ $a[ 'name' ] ] = $a ;
-
-        $field = sprintf(
-            "<label class='gh-input-label'>%s</label>%s",
-            $a[ 'label' ],
-            $optionHTML
-        );
-
-        return $this->field_wrap( $field );
-    }
-
-    /**
-     * Checkbox html
-     *
-     * @param $atts
-     * @return string
-     */
-    public function checkbox( $atts )
-    {
-        /* return nothing if the form doesn't exist */
-        if ( ! $this->is_form() )
-        {
-            return '';
-        }
-
-        $a = shortcode_atts( array(
-            'label'         => '',
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'value'         => '1',
-            'tag'           => 0,
-            'title'         => '',
-            'attributes'    => '',
-            'required'      => false,
-        ), $atts );
-
-        $a[ 'name' ] = sanitize_key( strtolower( str_replace( ' ', '_', $a[ 'name' ] ) ) );
-
-        if ( empty( $a[ 'name' ] ) ){
-            $a[ 'name' ] = sanitize_key( $a[ 'label' ] );
-        }
-
-        if ( empty( $a[ 'id' ] ) ){
-            $a[ 'id' ] = sanitize_key( $a[ 'label' ] );
-        }
-
-        $required = ( $a[ 'required' ] && $a[ 'required' ] !== "false" ) ? 'required' : '';
-
-        $value = esc_attr( $a[ 'value' ] );
-
-        if ( strpos( $value, '|' ) ){
-            $parts = explode( '|', $value );
-            $value = $parts[0];
-            $tag = intval( $parts[1] );
-            $a[ 'tag_map' ][ base64_encode($value) ] = $tag;
-        }
-
-        if ( $a[ 'tag' ] ){
-            $a[ 'tag_map' ][ base64_encode($value) ] = intval( $a[ 'tag' ] );
-        }
-
-        $checked = '';
-        if ( $this->auto_populate ){
-            $name = $a[ 'name' ];
-            if ( $this->source_contact->$name === $value ){
-                $checked = 'checked';
-            }
-        }
-
-        if ( $this->submission_failed ){
-            if ( $value === $this->get_submission_data( $a[ 'name' ] ) ){
-                $checked = 'checked';
-            }
-        }
-
-        $this->fields[] = $a[ 'name' ];
-        $this->config[ $a[ 'name' ] ] = $a ;
-
-        $field = sprintf(
-            "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='gh-checkbox %s' value='%s' title='%s' %s %s %s> %s</label>",
-            esc_attr( $a[ 'name' ] ),
-            esc_attr( $a[ 'id' ] ),
-            esc_attr( $a[ 'class' ] ),
-            esc_attr( $value ),
-            esc_attr( $a[ 'title' ] ),
-            $a[ 'attributes' ],
-            $required,
-            $checked,
-            $a[ 'label' ]
-        );
-
-        return $this->field_wrap( $field );
-    }
-
-    /**
-     * Terms agreement
-     *
-     * @param $atts
-     * @return string
-     */
-    public function terms( $atts )
-    {
-        $a = shortcode_atts( array(
-            'label'         => _x( 'I agree to the <i>terms of service</i>.', 'form_default', 'groundhogg' ),
-            'name'          => 'agree_terms',
-            'id'            => 'agree_terms',
-            'class'         => 'gh-terms',
-            'value'         => 'yes',
-            'tag'           => 0,
-            'title'         => _x( 'Please agree to the terms of service.', 'form_default', 'groundhogg' ),
-            'required'      => true,
-        ), $atts );
-
-        $a = apply_filters( 'groundhogg/form/terms', $a );
-
-        return $this->checkbox( $a );
-    }
-
-    /**
-     * GDPR agreement
-     *
-     * @param $atts
-     * @return string
-     */
-    public function gdpr( $atts )
-    {
-        $a = shortcode_atts( array(
-            'label'         => _x( 'I consent to having my personal information collected, and to receive marketing and transactional information related to my request.', 'form_default', 'groundhogg' ),
-            'name'          => 'gdpr_consent',
-            'id'            => 'gdpr_consent',
-            'class'         => 'gh-gdpr',
-            'value'         => 'yes',
-            'tag'           => 0,
-            'title'         => _x( 'I Consent', 'form_default', 'groundhogg' ),
-            'required'      => true,
-        ), $atts );
-
-        $a = apply_filters( 'groundhogg/form/gdpr', $a );
-
-        return $this->checkbox( $a );
-    }
-
-    /**
-     * Return recaptcha html
-     *
-     * @return string
-     */
-    public function recaptcha( $atts )
-    {
-        /* return nothing if the form doesn't exist */
-        if ( ! $this->is_form() )
-        {
-            return '';
-        }
-
-        $a = shortcode_atts( array(
-            'theme'         => false,
-            'captcha-theme' => 'light',
-            'size'          => false,
-            'captcha-size'  => 'normal',
-        ), $atts );
-
-        if ( $a[ 'theme' ] ){
-            $a[ 'captcha-theme' ] = $a[ 'theme' ];
-        }
-
-        if ( $a[ 'size' ] ){
-            $a[ 'captcha-theme' ] = $a[ 'size' ];
-        }
-
-        if ( ! is_admin() ){
-            wp_enqueue_script( 'google-recaptcha-v2', 'https://www.google.com/recaptcha/api.js', array(), true );
-        }
-
-        $html = sprintf( '<div class="g-recaptcha" data-sitekey="%s" data-theme="%s" data-size="%s"></div>', get_option( 'gh_recaptcha_site_key', '' ), $a['captcha-theme'], $a['captcha-size'] );
-
-        $this->fields[] = 'g-recaptcha';
-        $this->config[ 'g-recaptcha' ] = $a ;
-
-        return $this->field_wrap( $html );
-    }
-
-    /**
-     * Submit button html
-     *
-     * @param $atts
-     * @param $content
-     * @return string
-     */
-    public function submit( $atts, $content = '' )
-    {
-        $a = shortcode_atts( array(
-            'id'            => 'gh-submit',
-            'class'         => 'gh-submit',
-            'text'          => __( 'Submit' ),
-        ), $atts );
-
-        if ( ! empty( $content ) )
-        {
-            $a['text'] = $content;
-        }
-
-        /* Don't apply when doing a preview */
-        if ( is_admin() && ! $this->doing_preview ){
-            $a[ 'class' ] .= 'button button-primary';
-        }
-
-        $html = sprintf(
-                "<div class='gh-button-wrapper'><button type='submit' id='%s' class='gh-submit-button %s'>%s</button></div>",
-            esc_attr( $a[ 'id' ] ),
-            esc_attr( $a[ 'class' ] ),
-            $a[ 'text' ]
-        );
-
-        return $this->field_wrap( $html );
-
-    }
 
     /**
      * Do the shortcode
@@ -1046,13 +142,15 @@ class Form
      */
     public function shortcode()
     {
+
+        wp_enqueue_style( 'groundhogg-form' );
+
         $form = '<div class="gh-form-wrapper">';
 
         /* Errors from a previous submission */
-        if ( WPGH()->submission->has_errors() ){
+        if ( Plugin::$instance->submission_handler->has_errors() ){
 
-            $this->submission_failed = true;
-            $errors = WPGH()->submission->get_errors();
+            $errors = Plugin::$instance->submission_handler->get_errors();
             $err_html = "";
 
             foreach ( $errors as $error ){
@@ -1064,86 +162,46 @@ class Form
 
         }
 
-	    $target = $this->iframe_compat ? "target=\"_parent\"" : "";
-        $form .= "<form method='post' class='gh-form " . $this->attributes[ 'class' ] . "' " . $target . " enctype=\"multipart/form-data\" >";
-        $form .= wp_nonce_field( 'gh_submit', 'gh_submit_nonce', true, false );
+        $atts = [
+            'method' => 'post',
+            'class'  => 'gh-form ' . $this->attributes[ 'class' ],
+            'target' => '_parent',
+            'enctype' => 'multipart/form-data'
+        ];
+
+        $form .= sprintf( "<form %s>", array_to_atts( $atts ) );
 
         if ( ! empty( $this->attributes[ 'id' ] ) ){
-            $form .= "<input type='hidden' name='step_id' value='" . $this->attributes['id'] . "'>";
+            $form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id() . "'>";
         }
 
-        $this->setup_shortcodes();
+        $step = Plugin::$instance->utils->get_step( $this->get_id() );
 
-        if ( $this->id && WPGH()->steps->exists( $this->id ) ){
-            $content = WPGH()->step_meta->get_meta( $this->id, 'form', true );
-        } else {
-            $content = '';
+        if ( ! $step ){
+            return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
         }
 
-        $content = do_shortcode( $content );
+        do_action( 'groundhogg/form/shortcode/before', $this );
+
+        $content = do_shortcode( $step->get_meta( 'form' ) );
+
+        do_action( 'groundhogg/form/shortcode/after', $this );
 
         if ( empty( $content ) ){
-            $content = sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
+            return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
         }
 
         $form .= $content;
 
-        $this->destroy_shortcodes();
-
         $form .= '</form>';
 
         if ( is_user_logged_in() && current_user_can( 'edit_funnels' ) ){
-
-        	$funnel_id = WPGH()->steps->get_column_by( 'funnel_id', 'ID', $this->id );
-
-        	$form .= sprintf( "<p><a href='%s'>%s</a></p>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel_id ), __( '(Edit Form)' ) );
+            $form .= sprintf( "<div class='gh-form-edit-link'><a href='%s'>%s</a></div>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $step->get_funnel_id() ), __( '(Edit Form)' ) );
         }
 
         $form .= '</div>';
 
-        /* Save the expected field to post meta so we can access them on the POST end */
-        if ( $this->id && WPGH()->steps->exists( $this->id ) ){
-
-            WPGH()->step_meta->update_meta( $this->id, 'expected_fields', $this->fields );
-            WPGH()->step_meta->update_meta( $this->id, 'config', $this->config );
-
-        }
-
-        $form = apply_filters( 'wpgh_form_shortcode', $form, $this );
         $form = apply_filters( 'groundhogg/form/after', $form, $this );
-
-        return $form;
-    }
-
-    /**
-     * Show review version of the form
-     */
-    public function preview()
-    {
-        $this->doing_preview = true;
-
-        $form = '<div class="gh-form-wrapper">';
-
-        $this->setup_shortcodes();
-
-        if ( $this->id && WPGH()->steps->exists( $this->id ) ){
-
-            $content = WPGH()->step_meta->get_meta( $this->id, 'form', true );
-
-        } else {
-
-            $content = '';
-
-        }
-
-        $form .= do_shortcode( $content );
-
-        $this->destroy_shortcodes();
-
-        $form .= '</div>';
-
-        $form = str_replace( 'required', '', $form );
-        $form = apply_filters( 'groundhogg/form/preview/after', $form, $this );
 
         return $form;
     }
@@ -1157,5 +215,5 @@ class Form
     {
         return $this->shortcode();
     }
-
+    
 }

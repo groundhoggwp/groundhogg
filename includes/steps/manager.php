@@ -62,7 +62,7 @@ class Manager {
 
         /* Benchmarks */
         $this->elements[] = new Account_Created();
-        $this->elements[] = new \WPGH_Form_Filled();
+//        $this->elements[] = new \WPGH_Form_Filled();
         $this->elements[] = new Email_Confirmed();
         $this->elements[] = new Link_Clicked();
         $this->elements[] = new Login_Status();

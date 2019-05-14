@@ -1,7 +1,7 @@
 <?php
 namespace Groundhogg;
 
-use Groundhogg\Form\FormV2;
+use Groundhogg\Form\Form;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -50,7 +50,7 @@ class Shortcodes
      */
     public function custom_form_shortcode( $atts )
     {
-        $form = new FormV2( $atts );
+        $form = new Form( $atts );
 
         return sprintf( "%s", $form );
     }

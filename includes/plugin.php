@@ -4,7 +4,7 @@ namespace Groundhogg;
 use Groundhogg\Api\Api_Loader;
 use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
-use Groundhogg\Form\Submission_Handler_V2;
+use Groundhogg\Form\Submission_Handler;
 use Groundhogg\Steps\Manager as Step_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {exit;}
@@ -128,7 +128,7 @@ class Plugin {
     public $tag_mapping;
 
     /**
-     * @var Submission_Handler_V2
+     * @var Submission_Handler
      */
     public $submission_handler;
 

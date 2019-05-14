@@ -72,7 +72,7 @@ class Autoloader {
         'Bulk_Jobs\Broadcast_Bulk_Job' => 'includes/bulk-jobs/broadcast-bulk-job.php',
         'Event_Process' => 'includes/interfaces/event-process.php',
         // Form
-        'Form\FormV2'  => 'includes/form/formv2.php',
+        'Form\FormV2'  => 'includes/form/form.php',
         'Form\Fields\Field'     => 'includes/form/fields/field.php',
         'Form\Fields\Column'    => 'includes/form/fields/column.php',
         'Form\Fields\Row'       => 'includes/form/fields/row.php',
