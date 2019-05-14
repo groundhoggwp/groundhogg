@@ -3,8 +3,13 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
+use function Groundhogg\get_db;
 use Groundhogg\HTML;
+use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Contact_Query;
+use Groundhogg\Event;
+use Groundhogg\Form;
 
 
 /**
@@ -22,7 +27,7 @@ use Groundhogg\Step;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Form_Filled extends Benchmark
+class Form_Filled extends Benchmark
 {
 
     /**
@@ -61,51 +66,27 @@ class WPGH_Form_Filled extends Benchmark
      */
     public function get_icon()
     {
-        return 'form-filled.png';
+        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/form-filled.png';
     }
-
-
-    protected function get_complete_hooks()
-    {
-        // TODO: Implement get_complete_hooks() method.
-    }
-
-    protected function get_the_contact()
-    {
-        // TODO: Implement get_the_contact() method.
-    }
-
-    protected function can_complete_step()
-    {
-        // TODO: Implement can_complete_step() method.
-    }
-
-
 
 
     /**
-     * Add the completion action
-     *
-     * WPGH_Form_Filled constructor.
+     * @return int[]
      */
-    public function __construct()
+    protected function get_complete_hooks()
     {
+        return [
+               'groundhogg/form/submission_handler/after' => 3
+        ];
+    }
 
-
-        parent::__construct();
-
-        add_action( 'wpgh_form_submit', array( $this, 'complete' ), 10, 3 );
-
-        if ( is_admin() && isset( $_GET['page'] ) && $_GET[ 'page' ] === 'gh_funnels' && isset($_REQUEST[ 'action' ]) && $_REQUEST[ 'action' ] === 'edit' ){
-            add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ));
-            add_action( 'admin_footer', array( $this, 'modal_form' ) );
-        }
-
-        /* Backwards compat */
-        if ( wpgh_is_option_enabled( 'gh_disable_api' ) ){
-            add_action( 'wp_ajax_gh_form_impression', array( $this, 'track_impression' ) );
-            add_action( 'wp_ajax_nopriv_gh_form_impression', array( $this, 'track_impression' ) );
-        }
+    /**
+     * Based on the current step and contact,
+     *
+     * @return bool
+     */
+    protected function can_complete_step()
+    {
 
     }
 
@@ -118,24 +99,13 @@ class WPGH_Form_Filled extends Benchmark
     }
 
     /**
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function settings( $step )
     {
-        $shortcode = sprintf('[gh_form id="%d" title="%s"]', $step->ID, $step->title );
+        $shortcode = sprintf('[gh_form id="%d" title="%s"]', $step->get_id(), esc_attr( $step->get_title() ) );
         $script    = sprintf('<script id="%s" type="text/javascript" src="%s?ghFormIframeJS=1&formId=%s"></script>', 'ghFrame' . $step->ID, site_url(), $step->ID );
-
-        $form = $step->get_meta( 'form' );
-
-        if ( empty( $form ) ){
-            $form = "[row]\n[col size=\"1/2\"]\n[first required=\"true\" label=\"First Name *\" placeholder=\"John\"]\n[/col]\n[col size=\"1/2\"]\n[last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"]\n[/col]\n[/row]\n[row]\n[email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"]\n[/row]\n[submit text=\"Submit\"]";
-        }
-
-        $ty_page = $step->get_meta( 'success_page' );
-
-        if ( empty( $ty_page ) ){
-            $ty_page = site_url( '/thank-you/' );
-        }
+        $default_form = "[row]\n[col size=\"1/2\"]\n[first required=\"true\" label=\"First Name *\" placeholder=\"John\"]\n[/col]\n[col size=\"1/2\"]\n[last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"]\n[/col]\n[/row]\n[row]\n[email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"]\n[/row]\n[submit text=\"Submit\"]";
 
         ?>
 
@@ -166,32 +136,20 @@ class WPGH_Form_Filled extends Benchmark
                             readonly>
                     </strong>
                     <p>
-                        <?php echo WPGH()->html->modal_link( array(
+                        <?php echo Plugin::$instance->utils->html->modal_link( array(
                             'title'     => __( 'Preview' ),
                             'text'      => __( 'Preview' ),
                             'footer_button_text' => __( 'Close' ),
                             'id'        => '',
                             'class'     => 'button button-secondary',
-                            'source'    => $step->prefix( 'preview' ),
+                            'source'    => '',
                             'height'    => 700,
                             'width'     => 600,
                             'footer'    => 'true',
                             'preventSave'    => 'true',
                         ) );
                         ?>
-
-                        <!-- COPY IFRAME LINK BUTTON GOES HERE -->
-
                     </p>
-                    <div class="hidden" id="<?php echo $step->prefix( 'preview' ); ?>" >
-                        <div style="padding-top: 30px;">
-                            <div class="notice notice-warning">
-                                <p><?php _e( 'Not all CSS rules are loaded in the admin area. Frontend results may differ.', 'groundhogg' ); ?></p>
-                            </div>
-                            <?php $preview = new WPGH_Form( array( 'id' => $step->ID ) );
-                            echo $preview->preview(); ?>
-                        </div>
-                    </div>
                 </td>
             </tr><tr>
                 <th>
@@ -202,13 +160,13 @@ class WPGH_Form_Filled extends Benchmark
 
                     $args = array(
                         'type'      => 'text',
-                        'id'        => $step->prefix( 'success_page' ),
-                        'name'      => $step->prefix( 'success_page' ),
+                        'id'        => $this->setting_id_prefix( 'success_page' ),
+                        'name'      => $this->setting_name_prefix( 'success_page' ),
                         'title'     => __( 'Thank You Page' ),
-                        'value'     => $ty_page
+                        'value'     => $this->get_setting( 'success_page' )
                     );
 
-                    echo WPGH()->html->link_picker( $args ); ?>
+                    echo Plugin::$instance->utils->html->link_picker( $args ); ?>
                 </td>
             </tr>
             </tbody>
@@ -318,18 +276,18 @@ class WPGH_Form_Filled extends Benchmark
                                     'height' => 600
                                 ) );
 
-                                echo WPGH()->html->modal_link( $args );
+                                echo Plugin::$instance->utils->html->modal_link( $args );
                             } ?>
                         </div>
 
                         <?php
 
-                        $code = $this->prettify( $form );
+                        $code = $this->prettify( $this->get_setting( 'form', $default_form ) );
                         $rows = min( substr_count( $code, "\n" ) + 1, 15 );
 
                         $args = array(
-                            'id'    => $step->prefix( 'form' ),
-                            'name'  => $step->prefix( 'form' ),
+                            'id'    => $this->setting_id_prefix( 'form' ),
+                            'name'  => $this->setting_name_prefix( 'form' ),
                             'value' => $code,
                             'class' => 'code form-html',
                             'cols'  => 64,
@@ -337,12 +295,11 @@ class WPGH_Form_Filled extends Benchmark
                             'attributes' => " style='white-space: nowrap;'"
                         ); ?>
 
-                        <?php echo WPGH()->html->textarea( $args ) ?>
+                        <?php echo Plugin::$instance->utils->html->textarea( $args ) ?>
                     </div>
                 </td>
             </tr>
         </table>
-
         <?php
     }
 
@@ -408,31 +365,31 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-required">
                         <th><?php _e( 'Required Field', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->checkbox( array( 'id' => 'field-required', 'name' => 'required', 'label' => __( 'Yes' ), 'value' => 'true' ) );
+                            echo Plugin::$instance->utils->html->checkbox( array( 'id' => 'field-required', 'name' => 'required', 'label' => __( 'Yes' ), 'value' => 'true' ) );
                             ?></td>
                     </tr>
                     <tr id="gh-field-label">
                         <th><?php _e( 'Label', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-label', 'name' => 'label' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'id' => 'field-label', 'name' => 'label' ) );
                             ?><p class="description"><?php _e( 'The field label.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <tr id="gh-field-text">
                         <th><?php _e( 'Text', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-text', 'name' => 'text' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'id' => 'field-text', 'name' => 'text' ) );
                             ?><p class="description"><?php _e( 'The button text.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <tr id="gh-field-placeholder">
                         <th><?php _e( 'Placeholder', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-placeholder', 'name' => 'placeholder' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'id' => 'field-placeholder', 'name' => 'placeholder' ) );
                             ?><p class="description"><?php _e( 'The ghost text within the field.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <tr id="gh-field-name">
                         <th><?php _e( 'Name', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-name', 'name' => 'name' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'id' => 'field-name', 'name' => 'name' ) );
                             ?><p class="description"><?php _e( 'This will be the custom field name. I.E. {meta.name}', 'groundhogg' ) ?></p></td>
                     </tr>
 
@@ -440,13 +397,13 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-min">
                         <th><?php _e( 'Min', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->number( array( 'id' => 'field-min', 'name' => 'min', 'class' => 'input' ) );
+                            echo Plugin::$instance->utils->html->number( array( 'id' => 'field-min', 'name' => 'min', 'class' => 'input' ) );
                             ?><p class="description"><?php _e( 'The minimum number a user can enter.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <tr id="gh-field-max">
                         <th><?php _e( 'Max', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->number( array( 'id' => 'field-max', 'name' => 'max', 'class' => 'input' ) );
+                            echo Plugin::$instance->utils->html->number( array( 'id' => 'field-max', 'name' => 'max', 'class' => 'input' ) );
                             ?><p class="description"><?php _e( 'The max number a user can enter.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <!-- END NUMBER OPTIONS -->
@@ -454,20 +411,20 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-value">
                         <th><?php _e( 'Value', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-value', 'name' => 'value' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'id' => 'field-value', 'name' => 'value' ) );
                             ?><p class="description"><?php _e( 'The default value of the field.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <tr id="gh-field-tag">
                         <th><?php _e( 'Add Tag', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->tag_picker( array( 'id' => 'field-tag', 'name' => 'tag', 'class' => 'gh-single-tag-picker', 'multiple' => false ) );
+                            echo Plugin::$instance->utils->html->tag_picker( array( 'id' => 'field-tag', 'name' => 'tag', 'class' => 'gh-single-tag-picker', 'multiple' => false ) );
                             ?><p class="description"><?php _e( 'Add a tag when this checkbox is selected.', 'groundhogg' ); ?></p></td>
                     </tr>
 
                     <tr id="gh-field-options">
                         <th><?php _e( 'Options', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->textarea( array( 'id' => 'field-options', 'name' => 'options', 'cols' => 50, 'rows' => '5', 'class' => 'hidden' ) );
+                            echo Plugin::$instance->utils->html->textarea( array( 'id' => 'field-options', 'name' => 'options', 'cols' => 50, 'rows' => '5', 'class' => 'hidden' ) );
                             ?>
                             <div id='gh-option-table'>
                                 <div class='option-wrapper' style='margin-bottom:10px;'>
@@ -490,13 +447,13 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-multiple">
                         <th><?php _e( 'Allow Multiple Selections', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->checkbox( array( 'id' => 'field-multiple', 'name' => 'multiple', 'label' => __( 'Yes' ) ) );
+                            echo Plugin::$instance->utils->html->checkbox( array( 'id' => 'field-multiple', 'name' => 'multiple', 'label' => __( 'Yes' ) ) );
                             ?></td>
                     </tr>
                     <tr id="gh-field-default">
                         <th><?php _e( 'Default', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-default', 'name' => 'default', 'cols' => 50, 'rows' => '5' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'id' => 'field-default', 'name' => 'default', 'cols' => 50, 'rows' => '5' ) );
                             ?><p class="description"><?php _e( 'The blank option which appears at the top of the list.', 'groundhogg' ) ?></p></td>
                     </tr>
 
@@ -504,7 +461,7 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-width">
                         <th><?php _e( 'Width', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->dropdown( array(
+                            echo Plugin::$instance->utils->html->dropdown( array(
                                 'id' => 'field-width',
                                 'name' => 'width',
                                 'options' => array(
@@ -523,7 +480,7 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-captcha-theme">
                         <th><?php _e( 'Theme', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->dropdown( array( 'id' => 'field-theme', 'name' => 'captcha-theme', 'options' => array(
+                            echo Plugin::$instance->utils->html->dropdown( array( 'id' => 'field-theme', 'name' => 'captcha-theme', 'options' => array(
                                     'light' => 'Light',
                                     'dark' => 'Dark',
                                 ) ) );
@@ -532,7 +489,7 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-captcha-size">
                         <th><?php _e( 'Theme', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->dropdown( array( 'id' => 'field-captcha-size', 'name' => 'captcha-size', 'options' => array(
+                            echo Plugin::$instance->utils->html->dropdown( array( 'id' => 'field-captcha-size', 'name' => 'captcha-size', 'options' => array(
                                     'normal' => 'Normal',
                                     'compact' => 'Compact',
                                 ) ) );
@@ -544,13 +501,13 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-min_date">
                         <th><?php _e( 'Min Date', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'type' => 'date', 'id' => 'field-min_date', 'name' => 'min_date', 'placeholder' => 'YYY-MM-DD or +3 days or -1 days' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'type' => 'date', 'id' => 'field-min_date', 'name' => 'min_date', 'placeholder' => 'YYY-MM-DD or +3 days or -1 days' ) );
                             ?><p class="description"><?php _e( 'The minimum date a user can enter. You can enter a dynamic date or static date.', 'groundhogg' ) ?></p></td>
                     </tr>
                     <tr id="gh-field-max_date">
                         <th><?php _e( 'Max Date', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'type' => 'date', 'id' => 'field-max_date', 'name' => 'max_date', 'placeholder' => 'YYY-MM-DD or +3 days or -1 days' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'type' => 'date', 'id' => 'field-max_date', 'name' => 'max_date', 'placeholder' => 'YYY-MM-DD or +3 days or -1 days' ) );
                             ?><p class="description"><?php _e( 'The maximum date a user can enter. You can enter a dynamic date or static date.', 'groundhogg' ) ?></p></td>
                     </tr>
                     <!-- END DATE OPTIONS -->
@@ -559,13 +516,13 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-min_time">
                         <th><?php _e( 'Min Time', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'type' => 'time', 'id' => 'field-min_time', 'name' => 'min_time' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'type' => 'time', 'id' => 'field-min_time', 'name' => 'min_time' ) );
                             ?><p class="description"><?php _e( 'The minimum time a user can enter. You can enter a dynamic time or static time.', 'groundhogg' ) ?></p></td>
                     </tr>
                     <tr id="gh-field-max_time">
                         <th><?php _e( 'Max Time', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'type' => 'time', 'id' => 'field-max_time', 'name' => 'max_time' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'type' => 'time', 'id' => 'field-max_time', 'name' => 'max_time' ) );
                             ?><p class="description"><?php _e( 'The maximum time a user can enter. You can enter a dynamic time or static time.', 'groundhogg' ) ?></p></td>
                     </tr>
                     <!-- END TIME OPTIONS -->
@@ -574,36 +531,35 @@ class WPGH_Form_Filled extends Benchmark
                     <tr id="gh-field-max_file_size">
                         <th><?php _e( 'Max File Size', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->number( array( 'id' => 'field-max_file_size', 'name' => 'max_file_size', 'placeholder' => '1000000', 'min' => 0, 'max' => wp_max_upload_size() * 1000000 ) );
+                            echo Plugin::$instance->utils->html->number( array( 'id' => 'field-max_file_size', 'name' => 'max_file_size', 'placeholder' => '1000000', 'min' => 0, 'max' => wp_max_upload_size() * 1000000 ) );
                             ?><p class="description"><?php printf( __( 'Maximum size a file can be <b>in Bytes</b>. Your max upload size is %d Bytes.', 'groundhogg' ), wp_max_upload_size() );?></p></td>
                     </tr>
                     <tr id="gh-field-file_types">
                         <th><?php _e( 'Accepted File Types', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-file_types', 'name' => 'file_types', 'placeholder' => '.pdf,.txt,.doc,.docx' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'id' => 'field-file_types', 'name' => 'file_types', 'placeholder' => '.pdf,.txt,.doc,.docx' ) );
                             ?><p class="description"><?php _e( 'The types of files a user may upload (comma separated). Leave empty to not specify.', 'groundhogg' ) ?></p></td>
                     </tr>
                     <!-- END FILE OPTIONS -->
 
                     <!-- BEGIN EXTENSION PLUGIN CUSTOM OPTIONS -->
-                    <?php do_action(  'wpgh_extra_form_settings' ); ?>
+                    <?php do_action(  'groundhogg/steps/benchmarks/form/extra_settings' ); ?>
                     <!-- END EXTENSION PLUGIN CUSTOM OPTIONS -->
 
                     <!-- BEGIN CSS OPTIONS -->
                     <tr id="gh-field-id">
                         <th><?php _e( 'CSS ID', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-id', 'name' => 'id' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'id' => 'field-id', 'name' => 'id' ) );
                             ?><p class="description"><?php _e( 'Use to apply CSS.' , 'groundhogg' ) ?></p></td>
                     </tr>
                     <tr id="gh-field-class">
                         <th><?php _e( 'CSS Class', 'groundhogg' ) ?></th>
                         <td><?php
-                            echo WPGH()->html->input( array( 'id' => 'field-class', 'name' => 'class' ) );
+                            echo Plugin::$instance->utils->html->input( array( 'id' => 'field-class', 'name' => 'class' ) );
                             ?><p class="description"><?php _e( 'Use to apply CSS.', 'groundhogg' ) ?></p></td>
                     </tr>
                     <!-- END CSS OPTIONS -->
-
                     </tbody>
                 </table>
             </form>
@@ -613,16 +569,27 @@ class WPGH_Form_Filled extends Benchmark
 
 
     /**
+     * Save the step settings
+     *
+     * @param $step Step
+     */
+    public function save( $step )
+    {
+        $this->save_setting( 'form', wp_kses_post( $this->get_posted_data( 'form' ) ) );
+        $this->save_setting( 'success_page', esc_url_raw( $this->get_posted_data( 'success_page' ) ) );
+    }
+
+    /**
      * Extend the Form reporting VIEW with impressions vs. submissions...
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function reporting($step)
     {
-        $start_time = WPGH()->menu->funnels_page->reporting_start_time;
-        $end_time   = WPGH()->menu->funnels_page->reporting_end_time;
+        $start_time = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_start_time();
+        $end_time   = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_end_time();
 
-        $cquery = new WPGH_Contact_Query();
+        $cquery = new Contact_Query();
 
         $num_events_completed = $cquery->query( array(
             'count' => true,
@@ -635,7 +602,7 @@ class WPGH_Form_Filled extends Benchmark
             )
         ) );
 
-        $num_impressions = WPGH()->activity->count(array(
+        $num_impressions = get_db('activity')->count(array(
             'start'     => $start_time,
             'end'       => $end_time,
             'step_id'   => $step->ID,
@@ -649,159 +616,14 @@ class WPGH_Form_Filled extends Benchmark
                     <?php echo $num_impressions; ?>
                 </strong>
             </span> |
-                <span class="submissions"><?php _e( 'Fills: ' ); ?><strong><a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . $step->funnel_id . '&step=' . $step->ID . '&start=' . $start_time . '&end=' . $end_time ); ?>"><?php echo $num_events_completed; ?></a></strong></span> |
+            <span class="submissions"><?php _e( 'Fills: ' ); ?><strong><a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . $step->funnel_id . '&step=' . $step->ID . '&start=' . $start_time . '&end=' . $end_time ); ?>"><?php echo $num_events_completed; ?></a></strong></span> |
             <span class="cvr" title="<?php _e( 'Conversion Rate' ); ?>"><?php _e( 'CVR: '); ?><strong><?php echo round( ( $num_events_completed / ( ( $num_impressions > 0 )? $num_impressions : 1 ) * 100 ), 2 ); ?></strong>%</span>
         </p>
         <?php
     }
 
-    /**
-     * Save the step settings
-     *
-     * @param $step WPGH_Step
-     */
-    public function save( $step )
+    protected function get_the_contact()
     {
-        if ( isset( $_POST[ $step->prefix( 'success_page' ) ] ) ){
-
-            $step->update_meta( 'success_page', esc_url_raw( $_POST[  $step->prefix( 'success_page' ) ] ) );
-
-        }
-
-        if ( isset( $_POST[ $step->prefix( 'form' ) ] ) ){
-
-            $step->update_meta( 'form', wp_kses_post( $_POST[  $step->prefix( 'form' ) ] ) );
-
-        }
-    }
-
-    /**
-     * Whenever a form is filled complete the benchmark.
-     *
-     * @param $step_id
-     * @param $contact WPGH_Contact
-     * @param $submission int
-     *
-     * @return bool
-     */
-    public function complete( $step_id, $contact, $submission )
-    {
-
-	    $step = wpgh_get_funnel_step( $step_id );
-
-	    /* Double check that the wpgh_form_submit action isn't being fired by another benchmark */
-	    if ( $step->type !== $this->type )
-	        return false;
-
-	    $success = false;
-
-	    if ( $step->can_complete( $contact ) ){
-
-		    $success = $step->enqueue( $contact );
-            /* Process the queue immediately */
-//            do_action( 'wpgh_process_queue' );
-	    }
-
-	    /*var_dump( $success );
-	    wp_die( 'made-it-here' );*/
-
-	    return $success;
-
-    }
-
-    /**
-     * Process the tag applied step...
-     *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
-     *
-     * @return true
-     */
-    public function run( $contact, $event )
-    {
-        //do nothing...
-
-        return true;
-    }
-
-    /**
-     * Track a form impression from the frontend.
-     * @deprecated since 1.2.4
-     */
-    public function track_impression()
-    {
-
-        if( !class_exists( 'Browser' ) )
-            require_once WPGH_PLUGIN_DIR . 'includes/lib/browser.php';
-
-        $browser = new Browser();
-        if ( $browser->isRobot() || $browser->isAol() ){
-            wp_die( json_encode( array( 'error' => 'No Track Robots.' ) ) );
-        }
-
-        $ID = intval( $_POST[ 'id' ] );
-
-        if ( ! WPGH()->steps->exists( $ID ) ){
-            wp_die( json_encode( array( 'error' => 'Form DNE.' ) ) );
-        }
-
-        $step = wpgh_get_funnel_step( $ID );
-
-        $response = array();
-
-        /*
-         * Is Contact
-         */
-        if ( $contact = WPGH()->tracking->get_contact() ) {
-
-            $db = WPGH()->activity;
-
-            /* Check if impression for contact exists... */
-            $args = array(
-                'funnel_id'     => $step->funnel_id,
-                'step_id'       => $step->ID,
-                'contact_id'    => $contact->ID,
-                'activity_type' => 'form_impression',
-            );
-
-            $response[ 'cid' ] = $contact->ID;
-
-        } else {
-            /*
-            * Not a Contact
-            */
-
-            /* validate against viewers IP? Cookie? TBD */
-            $db = WPGH()->activity;
-
-            /* Check if impression for contact exists... */
-            if ( isset( $_COOKIE[ 'gh_ref_id' ] ) ){
-                $ref_id = sanitize_key( $_COOKIE[ 'gh_ref_id' ] );
-            } else {
-                $ref_id = uniqid( 'g' );
-            }
-
-            $args = array(
-                'funnel_id'     => $step->funnel_id,
-                'step_id'       => $step->ID,
-                'activity_type' => 'form_impression',
-                'ref'           => $ref_id
-            );
-
-            $response[ 'ref_id' ] = $ref_id;
-
-        }
-
-        if ( ! $db->activity_exists( $args ) ){
-
-            $args[ 'timestamp' ] = time();
-            $db->add( $args );
-
-            $response[ 'result' ] = 'success';
-
-        }
-
-        wp_die( json_encode( $response ) );
 
     }
 }
