@@ -302,14 +302,13 @@ class Contacts_Page extends Admin_Page
             $editable_meta = array_diff( $stored_meta_keys, $exclude_keys );
             $deletable_meta = array_diff( $editable_meta, $posted_meta_keys );
 
-            foreach ( $deletable_meta as $key ){
-                $contact->delete_meta( $key );
-            }
-
             foreach ( $editable_meta as $key ){
                 $contact->update_meta( $key, get_array_var( $posted_meta, $key ) );
             }
 
+            foreach ( $deletable_meta as $key ){
+                $contact->delete_meta( $key );
+            }
         }
 
         $new_meta_keys = get_request_var( 'newmetakey', [] );
@@ -333,7 +332,7 @@ class Contacts_Page extends Admin_Page
             if (!Plugin::$instance->dbs->get_db('contacts' )->exists( $email ) ) {
                 $args['email'] = $email;
             } else {
-                return new \WP_Error( 'email_exists', sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email) );
+                $this->add_notice( new \WP_Error( 'email_exists', sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email) ) );
             }
         }
 
@@ -455,9 +454,11 @@ class Contacts_Page extends Admin_Page
         if ( ! empty( $_FILES[ 'files' ] ) ) {
             $files = normalize_files( $_FILES[ 'files' ] );
             foreach ( $files as $file_key => $file ){
-                $e = $contact->upload_file( $file );
-                if ( is_wp_error( $e ) ){
-                    return $e;
+                if ( ! get_array_var( $file, 'error' ) ){
+                    $e = $contact->upload_file( $file );
+                    if ( is_wp_error( $e ) ){
+                        return $e;
+                    }
                 }
             }
         }

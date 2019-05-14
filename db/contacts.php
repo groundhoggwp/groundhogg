@@ -185,7 +185,7 @@ class Contacts extends DB {
      * @since   2.1
      * @return  bool
      */
-    public function update( $row_id, $data = array(), $where = '' ) {
+    public function update( $row_id = 0, $data = [], $where = [] ) {
 
         $data = $this->sanitize_columns( $data );
 
@@ -208,66 +208,13 @@ class Contacts extends DB {
     }
 
     /**
-     * Delete a contact
-     *
-     * @access  public
-     * @since   2.3.1
-     */
-    public function delete( $_id_or_email = false ) {
-
-        if ( empty( $_id_or_email ) ) {
-            return false;
-        }
-
-        $column   = is_email( $_id_or_email ) ? 'email' : 'ID';
-//        $contact = $this->get_contact_by( $column, $_id_or_email );
-
-        if ( $this->exists( $_id_or_email, $column ) ) {
-
-            global $wpdb;
-
-            $contact = $this->get_contact_by( $column, $_id_or_email );
-
-            do_action( 'wpgh_pre_delete_contact', $contact->ID );
-
-            /* delete tag relationships */
-            $result = $wpdb->delete( $this->table_name, array( 'ID' => $contact->ID ), array( '%d' ) );
-
-
-            if ( $result ) {
-
-                $this->set_last_changed();
-
-                do_action( 'wpgh_post_delete_contact', $contact->ID );
-
-            }
-
-            return $result;
-
-        } else {
-            return false;
-        }
-
-    }
-
-    /**
      * Checks if a contact exists
      *
      * @access  public
      * @since   2.1
      */
     public function exists( $value = '', $field = 'email' ) {
-
-        $columns = $this->get_columns();
-
-        if ( ! array_key_exists( $field, $columns ) ) {
-            return false;
-        }
-
-        $contact = $this->get_contact_by( $field, $value );
-
-        return ! empty( $contact );
-
+        return parent::exists( $value, $field );
     }
 
     /**
@@ -329,6 +276,19 @@ class Contacts extends DB {
         return parent::get_by( $field, $value );
     }
 
+    /**
+     * Use contact query calss
+     *
+     * @param array $data
+     * @param string $order
+     * @return array|bool|object|null
+     */
+    public function query( $data = [], $order = '' )
+    {
+        $data = $this->prepare_contact_query_args( $data );
+        $query = new Contact_Query( $data, $this );
+        return $query->items;
+    }
 
     /**
      * Retrieve contacts from the database

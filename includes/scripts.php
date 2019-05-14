@@ -130,29 +130,20 @@ class Scripts
 
         wp_enqueue_script( 'groundhogg-admin-functions' );
 
-        // LOCALIZE ANY REQUIRED SCRIPTS
-        if (!Plugin::$instance->settings->is_option_enabled('disable_api')) {
-            /* Load improved picker request urls */
-            wp_localize_script('groundhogg-admin', 'gh_admin_object', [
-                'tags_endpoint' => site_url('wp-json/gh/v3/tags?select2=true'),
-                'emails_endpoint' => site_url('wp-json/gh/v3/emails?select2=true'),
-                'sms_endpoint' => site_url('wp-json/gh/v3/sms?select2=true'),
-                'contacts_endpoint' => site_url('wp-json/gh/v3/contacts?select2=true'),
-                'nonce' => wp_create_nonce('wp_rest'),
-                '_ajax_linking_nonce' => wp_create_nonce('internal-linking')
-            ]);
-        } else {
+        wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [
+            'tags'      => site_url('wp-json/gh/v3/tags?select2=true'),
+            'emails'    => site_url('wp-json/gh/v3/emails?select2=true'),
+            'sms'       => site_url('wp-json/gh/v3/sms?select2=true'),
+            'contacts'  => site_url('wp-json/gh/v3/contacts?select2=true'),
+            'contacts'  => site_url('wp-json/gh/v3/contacts?select2=true'),
+        ]  );
 
-            /* Backwards compat */
-            wp_localize_script('groundhogg-admin', 'gh_admin_object', [
-                'tags_endpoint' => admin_url('admin-ajax.php?action=gh_get_tags'),
-                'emails_endpoint' => admin_url('admin-ajax.php?action=gh_get_emails'),
-                'sms_endpoint' => admin_url('admin-ajax.php?action=gh_get_sms'),
-                'contacts_endpoint' => admin_url('admin-ajax.php?action=gh_get_contacts'),
-                'nonce' => wp_create_nonce('admin_ajax'),
-                '_ajax_linking_nonce' => wp_create_nonce('internal-linking')
-            ]);
-        }
+        wp_localize_script( 'groundhogg-admin', 'groundhogg_nonces', [
+            '_wpnonce'  => wp_create_nonce(),
+            '_wprest'   => wp_create_nonce( 'wp_rest' ),
+            '_adminajax' => wp_create_nonce( 'admin_ajax' ),
+            '_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
+        ]  );
 
         do_action('groundhogg/scripts/after_register_admin_scripts');
     }

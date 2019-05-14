@@ -34,6 +34,16 @@ class Text extends Block
         return _x('Text Block', 'email_block', 'groundhogg');
     }
 
+    public function extra_css( $css ){
+
+        //font-family: Arial, sans-serif; font-size: 16px;
+
+        $css[ 'font-family' ] = 'Arial, sans-serif';
+        $css[ 'font-size' ] = '16px';
+
+        return $css;
+    }
+
     public function get_settings()
     {
         return  array(
