@@ -71,6 +71,16 @@ class Contact extends Base_Object_With_Meta
     }
 
     /**
+     * Gets the avatar image.
+     *
+     * @return false|string
+     */
+    public function get_profile_picture()
+    {
+        return get_avatar_url( $this->get_email() );
+    }
+
+    /**
      * Return the DB instance that is associated with items of this type.
      *
      * @return DB
@@ -741,7 +751,7 @@ class Contact extends Base_Object_With_Meta
     {
         return apply_filters(
             "groundhogg/{$this->get_object_type()}/get_as_array",
-            [ 'data' => $this->get_data(), 'meta' => $this->get_meta(), 'tags' => $this->get_tags(), 'files' => $this->get_files() ]
+            [ 'gravatar' => $this->get_profile_picture(), 'data' => $this->get_data(), 'meta' => $this->get_meta(), 'tags' => $this->get_tags(), 'files' => $this->get_files() ]
         );
     }
 

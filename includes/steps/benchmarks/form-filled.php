@@ -124,6 +124,10 @@ class Form_Filled extends Benchmark
         wp_enqueue_script( 'groundhogg-admin-form-builder' );
     }
 
+    public function get_default_form()
+    {
+        return "[row][col size=\"1/2\"][first required=\"true\" label=\"First Name *\" placeholder=\"John\"][/col][col size=\"1/2\"][last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"][/col][/row][row][col width=\"1/1\"][email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"][/col][/row][row][col width=\"1/1\"][submit text=\"Submit\"][/col][/row]";
+    }
 
     /**
      * @param $step Step
@@ -131,19 +135,17 @@ class Form_Filled extends Benchmark
     public function settings( $step )
     {
         $shortcode = sprintf('[gh_form id="%d" title="%s"]', $step->get_id(), esc_attr( $step->get_title() ) );
-        $script    = sprintf('<script id="%s" type="text/javascript" src="%s?ghFormIframeJS=1&formId=%s"></script>', 'ghFrame' . $step->ID, site_url(), $step->ID );
-        $default_form = "[row]\n[col size=\"1/2\"]\n[first required=\"true\" label=\"First Name *\" placeholder=\"John\"]\n[/col]\n[col size=\"1/2\"]\n[last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"]\n[/col]\n[/row]\n[row]\n[email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"]\n[/row]\n[submit text=\"Submit\"]";
+        $form_url = site_url( sprintf( 'gh/forms/%d/', $step->get_id() ) );
+        $form_iframe_url = site_url( sprintf( 'gh/forms/iframe%d/', $step->get_id() ) );
+        $script    = sprintf('<script id="%s" type="text/javascript" src="%s"></script>', 'ghFrame' . $step->get_id(), $form_iframe_url, $step->get_id() );
+        $default_form = $this->get_default_form();
 
         ?>
-
         <table class="form-table">
             <tbody>
             <tr>
                 <th>
-                    <?php esc_attr_e( 'Shortcode:', 'groundhogg' ); ?>
-                    <br/>
-                    <br/>
-                    <?php esc_attr_e( 'JS Script:', 'groundhogg' ); ?>
+                    <?php esc_attr_e( 'Shortcode & JS Script:', 'groundhogg' ); ?>
                 </th>
                 <td>
 
@@ -169,7 +171,7 @@ class Form_Filled extends Benchmark
                             'footer_button_text' => __( 'Close' ),
                             'id'        => '',
                             'class'     => 'button button-secondary',
-                            'source'    => '',
+                            'source'    => $form_url,
                             'height'    => 700,
                             'width'     => 600,
                             'footer'    => 'true',
@@ -190,7 +192,7 @@ class Form_Filled extends Benchmark
                         'id'        => $this->setting_id_prefix( 'success_page' ),
                         'name'      => $this->setting_name_prefix( 'success_page' ),
                         'title'     => __( 'Thank You Page' ),
-                        'value'     => $this->get_setting( 'success_page' )
+                        'value'     => $this->get_setting( 'success_page', site_url( 'thank-you/' ) )
                     );
 
                     echo Plugin::$instance->utils->html->link_picker( $args ); ?>

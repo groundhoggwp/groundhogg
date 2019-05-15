@@ -117,6 +117,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
             $this->$key = $value;
         }
 
+        $this->data[ 'ID' ] = $this->get_id();
+
         $this->post_setup();
 
         return true;

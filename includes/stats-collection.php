@@ -1,32 +1,37 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: adria
- * Date: 2019-02-17
- * Time: 11:55 AM
- */
+namespace Groundhogg;
 
-class WPGH_Stats_Collection
+// TODO Remove old cron "wpgh_do_stats_collection"
+
+class Stats_Collection
 {
 
     public function __construct()
     {
+        add_action( 'groundhogg/init', [ $this, 'init' ] );
+    }
 
-        if ( wpgh_is_option_enabled( 'gh_opted_in_stats_collection' ) ){
-            add_action( 'admin_init', array( $this, 'init_cron' ) );
-            add_action( 'wpgh_do_stats_collection', array( $this, 'send_stats' ) );
+    public function init()
+    {
+        if ( $this->is_enabled() ){
+            add_action( 'admin_init', [ $this, 'init_cron' ] );
+            add_action( 'gh_do_stats_collection', [ $this, 'send_stats' ] );
         }
 
-        if ( is_admin() && isset( $_REQUEST[ 'action' ] ) && $_REQUEST[ 'action' ] === 'opt_in_to_stats' ){
-            add_action( 'admin_init', array( $this, 'stats_tracking_optin' ) );
+        if ( is_admin() && get_request_var( 'action' ) === 'opt_in_to_stats' ){
+            add_action( 'admin_init', [ $this, 'stats_tracking_optin' ] );
         }
+    }
 
+    public function is_enabled()
+    {
+        return Plugin::$instance->settings->is_option_enabled( 'gh_opted_in_stats_collection' );
     }
 
 	public function init_cron()
 	{
-		if ( ! wp_next_scheduled( 'wpgh_do_stats_collection' )  ){
-			wp_schedule_event( time(), 'daily' , 'wpgh_do_stats_collection' );
+		if ( ! wp_next_scheduled( 'gh_do_stats_collection' )  ){
+			wp_schedule_event( time(), 'daily' , 'gh_do_stats_collection' );
 		}
 	}
 
@@ -36,33 +41,27 @@ class WPGH_Stats_Collection
     public function stats_tracking_optin()
     {
 
-    	if ( ! current_user_can( 'manage_options' ) ){
-    		wp_die( new WP_Error( 'invalid_permissions', _x( 'You have invalid permissions to do this.', 'notice', 'groundhogg' ) ) );
-	    }
-
-        if ( ! wp_verify_nonce( $_REQUEST[ '_wpnonce' ], 'opt_in_to_stats' ) ){
-            WPGH()->notices->add( 'oops', _x( 'An unknown error occurred.', 'notice', 'groundhogg' ), 'error' );
-            return;
+        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'opt_in_to_stats' ) || ! current_user_can( 'manage_options' ) ){
+            wp_die( new \WP_Error( 'invalid_permissions', _x( 'You have insufficient permissions to do this.', 'notice', 'groundhogg' ) ) );
         }
 
-        $response = WPGH()->stats->optin();
+        $response = $this->optin();
 
         if ( is_wp_error( $response ) ){
 
             if ( $response->get_error_code() === 'already_registered' ){
-                WPGH()->notices->add( $response->get_error_code(), _x( 'This site was already registered and has been opted back in.', 'notice', 'groundhogg' ), 'success' );
-                wpgh_update_option( 'gh_opted_in_stats_collection', 1 );
+                Plugin::$instance->notices->add( $response->get_error_code(), _x( 'This site was already registered and has been opted back in.', 'notice', 'groundhogg' ), 'success' );
+                update_option( 'gh_opted_in_stats_collection', 1 );
             } else {
-                WPGH()->notices->add( $response->get_error_code(), $response->get_error_message(), 'error' );
+                Plugin::$instance->notices->add( $response );
             }
-
 
             return;
         }
 
         $discount = sanitize_text_field( $response->discount );
 
-        WPGH()->notices->add( 'opted_in', sprintf( _x( 'You are now signed up! Your discount code is: %s (This code was also sent to %s)', 'notice', 'groundhogg' ), $discount, wp_get_current_user()->user_email ) );
+        Plugin::$instance->notices->add( 'opted_in', sprintf( _x( 'You are now signed up! Your discount code is: %s (This code was also sent to %s)', 'notice', 'groundhogg' ), $discount, wp_get_current_user()->user_email ) );
 
         $message = sprintf( __( "Hi %s,
 

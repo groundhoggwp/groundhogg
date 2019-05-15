@@ -72,7 +72,7 @@
         buildPickers();
     });
 
-    $( document ).on( 'new-step', function () {
+    $( document ).on( 'new-step gh-init-pickers', function () {
         buildPickers();
     });
 

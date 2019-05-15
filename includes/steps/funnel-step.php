@@ -65,7 +65,7 @@ abstract class Funnel_Step extends Supports_Errors
     public function __construct()
     {
 
-        if ( is_admin() && $this->is_editing_screen() ) {
+        if ( is_admin() && ( $this->is_editing_screen() || wp_doing_ajax() ) ) {
 
             /**
              * New filters/actions for better usability and extendability

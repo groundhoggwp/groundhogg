@@ -321,7 +321,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function switch_to_blog()
     {
-        if ( is_global_multisite() ) {
+        if ( Plugin::$instance->settings->is_global_multisite() ) {
             $blog_id = $this->get_meta( 'blog_id' );
             if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
                 switch_to_blog( $blog_id );
@@ -334,7 +334,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function restore_current_blog()
     {
-        if ( is_global_multisite() && ms_is_switched() ) {
+        if ( Plugin::$instance->settings->is_global_multisite() && ms_is_switched() ) {
             restore_current_blog();
         }
     }
@@ -349,7 +349,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
     public function can_run()
     {
 
-        if ( is_global_multisite() ){
+        if ( Plugin::$instance->settings->is_global_multisite() ){
 
             $blog_id = $this->get_meta( 'blog_id' );
 

@@ -8,7 +8,6 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 1.0.20
  */
-
 header("Content-Type: application/javascript");
 header("Cache-Control: max-age=604800, public");
 
@@ -118,7 +117,7 @@ header("Cache-Control: max-age=604800, public");
             forms[id].iframeLoading = true;
 
             div.innerHTML = '<iframe id="' + idPrefix + 'Iframe_' + id + '" name="infFormId=' + id + '&url=' + escape(location.href) +
-                '" allowtransparency="true" src="' + url + '&referrer=' + escape(referrer) + escape( queryStr ) +
+                '" allowtransparency="true" src="' + url + '?referrer=' + escape(referrer) + escape( queryStr ) +
                 '" frameborder="0" scrolling="no" style="overflow:hidden; border:none; width:100%;' +
                 '" height="450px"></iframe>';
         }
@@ -165,4 +164,4 @@ header("Cache-Control: max-age=604800, public");
 
 })();
 
-ghFormClient.addForm('<?php printf('%s?ghFormIframe=1&formId=%s', site_url(), intval( $_GET[ 'formId' ] ) ) ?>');
+ghFormClient.addForm('<?php echo site_url( sprintf( 'gh/forms/%d/', get_query_var( 'form_id' ) ) ); ?>' );

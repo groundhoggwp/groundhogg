@@ -461,13 +461,13 @@ class Funnels_Page extends Admin_Page
         $funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
         $steps = $funnel->get_steps();
 
-        ob_start();
+        $html="";
 
         foreach ( $steps as $step ){
-            echo $step;
+            $html .= $step->__toString();
         }
 
-        return ob_get_clean();
+        return $html;
     }
 
     public function get_chart_data()

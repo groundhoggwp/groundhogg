@@ -62,6 +62,21 @@ class Rewrites
             'index.php?pagenow=funnels&action=export&enc_funnel_id=$matches[1]',
             'top'
         );
+
+
+        // Forms Iframe Script
+        add_rewrite_rule(
+            '^gh/forms/iframe/([^/]*)/?$',
+            'index.php?pagenow=forms_iframe&form_id=$matches[1]',
+            'top'
+        );
+
+        // Forms Iframe Template
+        add_rewrite_rule(
+            '^gh/forms/([^/]*)/?$',
+            'index.php?pagenow=forms&form_id=$matches[1]',
+            'top'
+        );
     }
 
     /**
@@ -77,6 +92,8 @@ class Rewrites
         $vars[] = 'superlink_id';
         $vars[] = 'funnel_id';
         $vars[] = 'enc_funnel_id';
+        $vars[] = 'enc_form_id';
+        $vars[] = 'form_id';
         $vars[] = 'email_id';
         $vars[] = 'link_id';
         return $vars;
@@ -93,7 +110,7 @@ class Rewrites
         $this->map_query_var( $query, 'link_id', 'absint' );
         $this->map_query_var( $query, 'email_id', 'absint' );
         $this->map_query_var( $query, 'superlink_id', 'absint' );
-//        $this->map_query_var( $query, 'enc_funnel_id', 'urldecode' );
+        $this->map_query_var( $query, 'form_id', 'absint' );
         return $query;
     }
 
@@ -125,8 +142,15 @@ class Rewrites
             case 'emails':
                 $template = $template_loader->get_template_part( 'emails/email', '', false );
                 break;
-
+            case 'forms_iframe':
+                $template = $template_loader->get_template_part( 'form/iframe.js', '', false );
+                break;
+            case 'forms':
+                $template = $template_loader->get_template_part( 'form/form', '', false );
+                break;
         }
+
+//        var_dump( $template );
 
         return $template;
     }

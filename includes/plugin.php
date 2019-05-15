@@ -285,8 +285,8 @@ class Plugin {
         $this->api = new Api_Loader();
 
         // TODO
-//        $this->shortcodes = new Shortcodes();
-//        $this->submission_handler = new Submission_Handler_V2();
+        $this->shortcodes = new Shortcodes();
+        $this->submission_handler = new Submission_Handler();
     }
 
     /**

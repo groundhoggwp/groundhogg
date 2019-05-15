@@ -86,9 +86,7 @@ var FormBuilder = {};
                 "</div>" +
                 "</div>";
             $('#gh-option-table').append( $newOption );
-
-            wpgh.init();
-
+            $(document).trigger( 'gh-init-pickers' );
         },
 
         resetOptions: function() {
