@@ -11,7 +11,7 @@ use \WP_List_Table;
  *
  * This just displays all the broadcast information in a WP_List_Table
  * Columns display basic information about the broadcast including send time
- * and basic reports.
+ * and basic reporting.
  *
  * @package     Admin
  * @subpackage  Admin/Broadcasts

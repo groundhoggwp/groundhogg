@@ -83,7 +83,7 @@ class WPGH_Time_Range_Widget extends WPGH_Reporting_Widget
                 </script>
             </div>
         </form>
-        <p class="description"><?php _e( 'Use this form to quickly change the reporting time for any Groundhogg reports that use it.', 'groundhogg' ); ?></p>
+        <p class="description"><?php _e( 'Use this form to quickly change the reporting time for any Groundhogg reporting that use it.', 'groundhogg' ); ?></p>
 <?php
     }
 }

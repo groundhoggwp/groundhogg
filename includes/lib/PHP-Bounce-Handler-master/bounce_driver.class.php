@@ -53,7 +53,7 @@ class BounceHandler{
     public $looks_like_an_autoresponse = false;
     public $is_hotmail_fbl = false;
     
-    // these are for feedback reports, so you can extract uids from the emails
+    // these are for feedback reporting, so you can extract uids from the emails
     // eg X-my-custom-header: userId12345
     // eg <img src="http://mysite.com/track.php?u=userId12345">
     public $web_beacon_preg_1 = "";
@@ -276,7 +276,7 @@ class BounceHandler{
         $this->output = $tmp;
         // accessors
         /*if it is an FBL, you could use the class variables to access the
-        data (Unlike Multipart-reports, FBL's report only one bounce)
+        data (Unlike Multipart-reporting, FBL's report only one bounce)
         */
         $this->type = $this->find_type();
         $this->action = isset($this->output[0]['action']) ? $this->output[0]['action'] : '';

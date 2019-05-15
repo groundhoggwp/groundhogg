@@ -5,6 +5,7 @@ use Groundhogg\Api\Api_Loader;
 use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
 use Groundhogg\Form\Submission_Handler;
+use Groundhogg\Reporting\Reporting;
 use Groundhogg\Steps\Manager as Step_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {exit;}
@@ -147,6 +148,11 @@ class Plugin {
      */
     public $step_manager;
 
+    /**
+     * @var Reporting
+     */
+    public $reporting;
+
 //    /**
 //     * @var Log_Manager
 //     */
@@ -268,6 +274,7 @@ class Plugin {
         $this->replacements = new Replacements();
         $this->tag_mapping  = new Tag_Mapping();
         $this->step_manager = new Step_Manager();
+        $this->reporting    = new Reporting();
 
 //        $this->bounce_checker = new Bounce_Checker();
 

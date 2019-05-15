@@ -40,6 +40,8 @@ class API_V3
         $this->emails   = new Email_Api();
         $this->sms      = new Sms_Api();
         $this->tracking = new Tracking_Api();
+        $this->data     = new Data_Api();
+        $this->reports  = new Reports_Api();
     }
 
     /**

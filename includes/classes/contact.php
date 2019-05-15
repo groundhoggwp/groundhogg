@@ -750,8 +750,10 @@ class Contact extends Base_Object_With_Meta
     public function get_as_array()
     {
         $contact = $this->get_data();
+
         $contact['ID'] = (string) $this->get_id();
         $contact['gravatar'] = $this->get_profile_picture();
+
         return apply_filters(
             "groundhogg/{$this->get_object_type()}/get_as_array",
             [  'data' => $contact, 'meta' => $this->get_meta(), 'tags' => $this->get_tags(), 'files' => $this->get_files() ]

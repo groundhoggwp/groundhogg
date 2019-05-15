@@ -30,7 +30,7 @@ class WPGH_Dashboard_Widgets
      */
     public function setup_dashboard_widgets()
     {
-       do_action( 'groundhogg/reports/load' );
+       do_action( 'groundhogg/reporting/load' );
     }
 
     public function __set( $key, $val ){

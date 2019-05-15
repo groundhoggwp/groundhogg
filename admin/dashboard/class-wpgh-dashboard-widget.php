@@ -27,7 +27,7 @@ abstract class WPGH_Dashboard_Widget {
      * Hook to wp_dashboard_setup to add the widget.
      */
     public function __construct() {
-        add_action( 'groundhogg/reports/load' , array( $this,'register' ) );
+        add_action( 'groundhogg/reporting/load' , array( $this,'register' ) );
         add_shortcode( sprintf( 'gh_%s', $this->wid ), array( $this, 'widget' ) );
     }
 

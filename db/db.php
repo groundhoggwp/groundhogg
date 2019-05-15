@@ -562,11 +562,25 @@ abstract class DB {
     }
 
     /**
+     * @var array Store results about a query temporarily.
+     */
+    protected static $cache = [];
+
+    /**
      * @param array $data
+     * @param string|false $order
+     * @param bool $from_cache
      * @return array|bool|null|object
      */
-    public function query( $data = [], $order='' )
+    public function query( $data = [], $order='', $from_cache = true )
     {
+        // Check Cache
+        $cache_key = md5( sprintf( '%s|%s|%s|%s|%s' , implode( '|', array_keys( $data ) ), implode( '|', array_values( $data ) ), $order, $this->get_object_type(), $this->get_table_name() ) );
+
+        if ( isset_not_empty( self::$cache, $cache_key ) && $from_cache ){
+            return self::$cache[ $cache_key ];
+        }
+
         global  $wpdb;
 
         if ( empty( $order ) ){
@@ -592,26 +606,16 @@ abstract class DB {
             $query[] = sprintf( "(%s)", $this->generate_search( $data[ 'search' ] ) );
         }
 
-        // Normalize
-        if ( isset_not_empty( $data, 'start' ) ){
-            $data[ 'from' ] = $data[ 'start' ];
-        }
-
-        // Normalize
-        if ( isset_not_empty( $data, 'end' ) ){
-            $data[ 'to' ] = $data[ 'end' ];
+        /* allow for special handling of time based search */
+        if ( isset_not_empty( $data, 'after' ) ){
+            $format = is_numeric( $data[ 'after' ] ) ? '%d' : "'%s'";
+            $query[] = sprintf( "`%s` >= $format", $this->get_date_key(), $data[ 'after' ] );
         }
 
         /* allow for special handling of time based search */
-        if ( isset_not_empty( $data, 'from' ) ){
-            $format = is_numeric( $data[ 'from' ] ) ? '%d' : "'%s'";
-            $query[] = sprintf( "`%s` >= $format", $this->get_date_key(), $data[ 'from' ] );
-        }
-
-        /* allow for special handling of time based search */
-        if (  isset_not_empty( $data, 'to' ) ){
-            $format = is_numeric( $data[ 'from' ] ) ? '%d' : "'%s'";
-            $query[] = sprintf( "`%s` <= $format", $this->get_date_key(), $data[ 'to' ] );
+        if (  isset_not_empty( $data, 'before' ) ){
+            $format = is_numeric( $data[ 'before' ] ) ? '%d' : "'%s'";
+            $query[] = sprintf( "`%s` <= $format", $this->get_date_key(), $data[ 'before' ] );
         }
 
         // Initialise column format array
@@ -638,8 +642,11 @@ abstract class DB {
         $sql = "SELECT * FROM $this->table_name $query ORDER BY `$order` ASC";
 
         $results = $wpdb->get_results( $sql );
+        $results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results );
 
-        return apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results );
+        self::$cache[ $cache_key ] = $results;
+
+        return $results;
     }
 
     public function count( $args=[] )

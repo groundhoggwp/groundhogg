@@ -6,7 +6,7 @@ use Groundhogg\Broadcast;
 use Groundhogg\Plugin;
 
 /**
- * This is the page which allows users to view reports related to sent broadcasts.
+ * This is the page which allows users to view reporting related to sent broadcasts.
  *
  * To add reporting to the screen, you can output any HTML with the action 'wpgh_broadcast_reporting_after'
  *

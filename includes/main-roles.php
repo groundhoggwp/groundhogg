@@ -329,7 +329,7 @@ class Main_Roles extends Roles {
      *  - View Reports
      *  - Export Reports
      *
-     * Get caps related to managing reports
+     * Get caps related to managing reporting
      *
      * @return array
      */
@@ -340,7 +340,7 @@ class Main_Roles extends Roles {
             'export_reports',
         );
 
-        return apply_filters( 'groundhogg/roles/caps/reports', $caps );
+        return apply_filters( 'groundhogg/roles/caps/reporting', $caps );
     }
 
     /**

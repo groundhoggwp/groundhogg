@@ -1,5 +1,7 @@
 <?php
-//TODO TABLE
+namespace Groundhogg\Admin\Settings;
+
+use Groundhogg\Plugin;
 
 /**
  * API Key Table Class
@@ -26,7 +28,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  *
  * @since 2.0
  */
-class WPGH_API_Keys_Table extends WP_List_Table {
+class API_Keys_Table extends \WP_List_Table {
 
     /**
      * @var int Number of items per page
@@ -189,7 +191,7 @@ class WPGH_API_Keys_Table extends WP_List_Table {
             <input type="hidden" name="wpgh_action" value="process_api_key" />
             <input type="hidden" name="wpgh_api_process" value="generate" />
             <?php wp_nonce_field( 'wpgh-api-nonce' ); ?>
-            <?php echo WPGH()->html->dropdown_owners( array( 'option_none' => __( 'Please Select a User', 'groundhogg' ) ) ); ?>
+            <?php echo Plugin::$instance->utils->html->dropdown_owners( array( 'option_none' => __( 'Please Select a User', 'groundhogg' ) ) ); ?>
             <?php submit_button( _x( 'Generate New API Keys', 'action', 'groundhogg' ), 'secondary', 'submit', false );?>
         </form>
         <?php

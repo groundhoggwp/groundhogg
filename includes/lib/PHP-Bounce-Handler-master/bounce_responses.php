@@ -235,13 +235,13 @@ $autorespondlist = array(
 
 # trigger subject lines for bounces
 $bouncesubj = array(
-    'deletver reports about your e?mail',
+    'deletver reporting about your e?mail',
     'delivery errors',
     'delivery failure',
     'delivery has failed',
     'delivery notification',
     'delivery problem',
-    'delivery reports about your email',
+    'delivery reporting about your email',
     'delivery status notif',
     'failure delivery',
     'failure notice',

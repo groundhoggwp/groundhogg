@@ -32,8 +32,8 @@ class Settings_Page extends Admin_Page
      */
     public function __construct()
     {
-        add_action( 'admin_menu', [ $this, 'register' ], $this->get_priority() );
         $this->add_additional_actions();
+        parent::__construct();
     }
 
     protected function add_additional_actions()
@@ -41,6 +41,7 @@ class Settings_Page extends Admin_Page
         add_action( 'admin_init', array( $this, 'init_defaults' ) );
         add_action( 'admin_init', array( $this, 'register_sections' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
+        add_action( "groundhogg/admin/settings/api_tab/after_form", [ $this, 'api_keys_table' ] );
 
         if ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) {
 //            add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );   //todo enable Comment
@@ -82,8 +83,6 @@ class Settings_Page extends Admin_Page
         return [];
     }
 
-
-
     /**
      * A list of the settings tabs
      *
@@ -115,7 +114,7 @@ class Settings_Page extends Admin_Page
         $this->sections = $this->get_default_sections();
         $this->settings = $this->get_default_settings();
 
-        do_action( 'wpgh_settings_post_defaults_init', $this );
+        do_action( 'groundhogg/admin/settings/init_defaults', $this );
     }
 
     /**
@@ -177,11 +176,6 @@ class Settings_Page extends Admin_Page
                 'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'misc'
             ),
-//            'pages' => array(
-//                'id'    => 'pages',
-//                'title' => _x( 'Pages', 'settings_sections', 'groundhogg' ),
-//                'tab'   => 'marketing'
-//            ),
             'captcha' => array(
                 'id'    => 'captcha',
                 'title' => _x( 'Captcha', 'settings_sections', 'groundhogg' ),
@@ -230,6 +224,19 @@ class Settings_Page extends Admin_Page
                 'tab'   => 'tags'
             ]
         ) );
+    }
+
+    public function api_keys_table()
+    {
+
+    $api_keys_table = new API_Keys_Table();
+    $api_keys_table->prepare_items();
+    $api_keys_table->display();
+    ?>
+    <p>
+        <?php _e( 'These API keys allow you to use the REST API to retrieve store data in JSON for external applications or devices.', 'groundhogg' ); ?>
+    </p>
+    <?php
     }
 
     /**
@@ -945,6 +952,7 @@ class Settings_Page extends Admin_Page
                 ?>
                 <!-- END SETTINGS -->
             </form>
+            <?php do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_form" ); ?>
         </div> <?php
     }
 

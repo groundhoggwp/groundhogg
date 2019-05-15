@@ -382,7 +382,7 @@ function wpgh_api_keys_table()
 
     do_action( 'wpgh_tools_api_keys_before' );
 
-    require_once WPGH_PLUGIN_DIR . 'includes/admin/settings/class-wpgh-api-keys-table.php';
+    require_once WPGH_PLUGIN_DIR . 'includes/admin/settings/api-keys-table.php';
 
     $api_keys_table = new WPGH_API_Keys_Table();
     $api_keys_table->prepare_items();

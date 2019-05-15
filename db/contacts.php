@@ -283,11 +283,11 @@ class Contacts extends DB {
      * @param string $order
      * @return array|bool|object|null
      */
-    public function query( $data = [], $order = '' )
+    public function query( $data = [], $order = '', $from_cache=false )
     {
         $data = $this->prepare_contact_query_args( $data );
-        $query = new Contact_Query( $data, $this );
-        return $query->items;
+        $query = new Contact_Query();
+        return $query->query( $data );
     }
 
     /**
