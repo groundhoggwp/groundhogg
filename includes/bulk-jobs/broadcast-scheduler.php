@@ -14,7 +14,7 @@ use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Broadcast_Bulk_Job extends Bulk_Job
+class Broadcast_Scheduler extends Bulk_Job
 {
 
     protected $config = [];

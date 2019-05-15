@@ -1,5 +1,4 @@
 <?php
-
 namespace  Groundhogg\Admin\Bulk_Jobs;
 
 use Groundhogg\Plugin;
@@ -9,7 +8,7 @@ class Bulk_Job_Page extends Admin_Page
 {
 
     /* Unused Functions */
-    public function get_order(){return 0;}
+    public function get_priority(){return 99;}
     public function scripts(){}
     protected function add_additional_actions(){}
     public function help(){}
@@ -78,7 +77,7 @@ class Bulk_Job_Page extends Admin_Page
      */
     public function get_cap()
     {
-        return 'perform_bulk_jobs';
+        return 'perform_bulk_actions';
     }
 
     /**

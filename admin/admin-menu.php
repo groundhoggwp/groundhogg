@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin;
 
 use Groundhogg\Admin\Broadcasts\Broadcasts_Page;
+use Groundhogg\Admin\Bulk_Jobs\Bulk_Job_Page;
 use Groundhogg\Admin\Contacts\Contacts_Page;
 use Groundhogg\Admin\Emails\Emails_Page;
 use Groundhogg\Admin\Events\Events_Page;
@@ -52,6 +53,7 @@ class Admin_Menu
         $this->settings = new Settings_Page();
         $this->tools    = new Tools_Page();
         $this->funnels  = new Funnels_Page();
+        $this->bulk_jobs = new Bulk_Job_Page();
 
         do_action( 'groundhogg/admin/init', $this );
     }

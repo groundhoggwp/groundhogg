@@ -1,9 +1,10 @@
 <?php
-namespace Groundhogg;
+namespace Groundhogg\Bulk_Jobs;
 
-use Groundhogg\Bulk_Jobs\Bulk_Job;
-
-
+use Groundhogg\Contact_Query;
+use function Groundhogg\encrypt;
+use function Groundhogg\multi_implode;
+use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -118,7 +119,7 @@ class Export_Contacts extends Bulk_Job
         if ( ! $file_name ){
 
             // randomize the file path to prevent direct access.
-            $file_name = md5( wpgh_encrypt_decrypt( time() ) ) . '.csv'; //todo
+            $file_name = md5( encrypt( current_time( 'mysql' ) ) ) . '.csv'; //todo
 
             // get the full path.
             $file_path = Plugin::$instance->utils->files->get_csv_exports_dir( $file_name, true );

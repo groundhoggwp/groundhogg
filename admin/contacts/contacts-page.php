@@ -486,7 +486,7 @@ class Contacts_Page extends Admin_Page
             'success'
         );
 
-        return true;
+        return false;
     }
 
     public function process_spam()
@@ -515,7 +515,7 @@ class Contacts_Page extends Admin_Page
             'success'
         );
 
-        return true;
+        return false;
     }
 
     public function process_unspam()
@@ -535,7 +535,7 @@ class Contacts_Page extends Admin_Page
             'success'
         );
 
-      return true;
+      return false;
     }
 
     public function process_unbounce()
@@ -554,7 +554,7 @@ class Contacts_Page extends Admin_Page
             sprintf(_nx('Approved %d contact.', 'Approved %d contacts.', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
             'success'
         );
-        return true;
+        return false;
     }
 
     public function process_apply_tag()
@@ -578,7 +578,7 @@ class Contacts_Page extends Admin_Page
                 'success'
             );
         }
-        return true;
+        return false;
     }
 
     /**
@@ -609,7 +609,7 @@ class Contacts_Page extends Admin_Page
 
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -632,13 +632,11 @@ class Contacts_Page extends Admin_Page
 
         do_action('groundhogg/admin/contact/save_inline/before', $id, $contact );
 
-        $data = wp_unslash( $_POST );
+        $email = sanitize_email( get_request_var( 'email' ) );
 
-        $email = sanitize_email( get_array_var( $data, 'email' ) );
-
-        $args['first_name'] = sanitize_text_field( get_array_var( $data, 'first_name' ) );
-        $args['last_name'] = sanitize_text_field( get_array_var( $data, 'last_name' ) );
-        $args['owner_id'] = absint( get_array_var( $data, 'owner' ) );
+        $args['first_name'] = sanitize_text_field( get_request_var( 'first_name' ) );
+        $args['last_name'] = sanitize_text_field( get_request_var( 'last_name' ) );
+        $args['owner_id'] = absint( get_request_var( 'owner' ) );
 
         $err = array();
 
@@ -648,7 +646,7 @@ class Contacts_Page extends Admin_Page
             $err[] = _x('Invalid email address.', 'notice', 'groundhogg');
         }
 
-        if ($contact->get_email() !== $email && ! Plugin::$instance->dbs->get_db('contacts')->exists( $email ) ) {
+        if ( $contact->get_email() === $email || ! Plugin::$instance->dbs->get_db('contacts')->exists( $email ) ) {
             $args['email'] = $email;
         } else {
             $err[] = sprintf(_x('Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg'), $email);
@@ -661,27 +659,34 @@ class Contacts_Page extends Admin_Page
 
         $contact->update( $args );
 
-        $tags = get_db('tags' )->validate( get_array_var( $data, 'tags' ) ); //todo
+        // Process any tag removals.
+        if ( get_request_var( 'tags' ) ) {
 
-        $cur_tags = $contact->get_tags();
-        $new_tags = $tags;
+            $tags = Plugin::$instance->dbs->get_db('tags')->validate( get_request_var( 'tags' ) );
 
-        $delete_tags = array_diff($cur_tags, $new_tags);
-        if (!empty($delete_tags)) {
-            $contact->remove_tag($delete_tags);
-        }
+            $cur_tags = $contact->get_tags();
+            $new_tags = $tags;
 
-        $add_tags = array_diff($new_tags, $cur_tags);
-        if (!empty($add_tags)) {
-            $contact->add_tag($add_tags);
+            $delete_tags = array_diff($cur_tags, $new_tags);
+            if (!empty($delete_tags)) {
+                $contact->remove_tag($delete_tags);
+            }
 
+            $add_tags = array_diff($new_tags, $cur_tags);
+            if (!empty($add_tags)) {
+                $result = $contact->add_tag($add_tags);
+                if (!$result) {
+                    return new \WP_Error( 'bad-tag', __('Hmm, looks like we could not add the new tags...' , 'groundhogg' ) );
+                }
+            }
+        } else {
+            $contact->remove_tag($contact->get_tags());
         }
 
         do_action('groundhogg/admin/contact/save_inline/after', $id, $contact );
 
         $contactTable = new Tables\Contacts_Table;
-        $contactTable->single_row( Plugin::$instance->dbs->get_db('contacts')->get( $id ) );
-
+        $contactTable->single_row( $contact );
         wp_die();
     }
 
@@ -696,15 +701,21 @@ class Contacts_Page extends Admin_Page
         }
 
         $contacts_table = new Tables\Contacts_Table();
+
         $this->search_form( __( 'Search Contacts', 'groundhogg' ) );
 
         $contacts_table->views();
-        $contacts_table->prepare_items();
-        $contacts_table->display();
+        ?>
+        <form method="post">
+            <?php
+            $contacts_table->prepare_items();
+            $contacts_table->display();
 
-        if ( $contacts_table->has_items() ){
-            $contacts_table->inline_edit();
-        }
+            if ( $contacts_table->has_items() ){
+                $contacts_table->inline_edit();
+            }?>
+        </form>
+        <?php
     }
 
     /**

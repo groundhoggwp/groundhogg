@@ -7,6 +7,7 @@ use Groundhogg\Admin\Admin_Menu;
 use Groundhogg\Form\Submission_Handler;
 use Groundhogg\Reporting\Reporting;
 use Groundhogg\Steps\Manager as Step_Manager;
+use Groundhogg\Bulk_Jobs\Manager as Bulk_Job_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {exit;}
 
@@ -149,6 +150,11 @@ class Plugin {
     public $step_manager;
 
     /**
+     * @var Bulk_Job_Manager
+     */
+    public $bulk_jobs;
+
+    /**
      * @var Reporting
      */
     public $reporting;
@@ -274,11 +280,12 @@ class Plugin {
         $this->replacements = new Replacements();
         $this->tag_mapping  = new Tag_Mapping();
         $this->step_manager = new Step_Manager();
+        $this->bulk_jobs    = new Bulk_Job_Manager();
         $this->reporting    = new Reporting();
 
-//        $this->bounce_checker = new Bounce_Checker();
-
+        $this->bounce_checker = new Bounce_Checker();
         $this->sending_service = new Sending_Service();
+
 //        $this->event_queue  = new Event_Queue();
 
         if ( is_admin() ) {
@@ -291,7 +298,6 @@ class Plugin {
 
         $this->api = new Api_Loader();
 
-        // TODO
         $this->shortcodes = new Shortcodes();
         $this->submission_handler = new Submission_Handler();
     }

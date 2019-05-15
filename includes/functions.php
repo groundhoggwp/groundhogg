@@ -78,6 +78,26 @@ function ensure_array( $array )
 }
 
 /**
+ * Encrypt a string.
+ *
+ * @param $data
+ * @return bool|string
+ */
+function encrypt( $data ){
+    return Plugin::$instance->utils->encrypt_decrypt( $data, 'e' );
+}
+
+/**
+ * Decrypt a string
+ *
+ * @param $data
+ * @return bool|string
+ */
+function decrypt( $data){
+    return Plugin::$instance->utils->encrypt_decrypt( $data, 'd' );
+}
+
+/**
  * Get a variable from an array or default if it doesn't exist.
  *
  * @param $array

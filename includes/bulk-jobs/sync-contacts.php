@@ -1,8 +1,8 @@
 <?php
-namespace Groundhogg;
+namespace Groundhogg\Bulk_Jobs;
 
-use Groundhogg\Bulk_Jobs\Bulk_Job;
-use \WP_User;
+use function Groundhogg\create_contact_from_user;
+use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -39,7 +39,7 @@ class Sync_Contacts extends Bulk_Job
 
         $uids = [];
 
-        /* @var $wp_user WP_User */
+        /* @var $wp_user \WP_User */
         foreach ( $users as $wp_user ) {
             $uids[] = $wp_user->ID;
         }
@@ -98,7 +98,7 @@ class Sync_Contacts extends Bulk_Job
      * @return void
      */
     protected function clean_up(){
-        wpgh_recount_tag_contacts_count();
+        recount_tag_contacts_count();
     }
 
     /**

@@ -97,6 +97,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page
     {
 
         do_action( "groundhogg/admin/{$this->get_slug()}", $this );
+        do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );
 
         ?>
         <div class="wrap">

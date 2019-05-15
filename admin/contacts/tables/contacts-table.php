@@ -48,7 +48,8 @@ class Contacts_Table extends WP_List_Table {
         parent::__construct( array(
             'singular' => 'contact',     // Singular name of the listed records.
             'plural'   => 'contacts',    // Plural name of the listed records.
-            'ajax'     => false,       // Does this table support ajax?
+            'ajax'     => true,       // Does this table support ajax?
+            'screen'   => wp_doing_ajax() ? 'admin_ajax' : null
         ) );
     }
     /**
@@ -105,7 +106,7 @@ class Contacts_Table extends WP_List_Table {
             $html .= '  <div class="owner">' . esc_html( $contact->get_owner_id() ). '</div>';
         }
         $html .= '  <div class="tags">' . esc_html( json_encode( $contact->get_tags() ) ). '</div>';
-//        $html .= '  <div class="tags-data">' . esc_html( json_encode( wpgh_format_tags_for_select2( $contact->get_tags() ) ) ) . '</div>'; todo remove comment
+        $html .= '  <div class="tags-data">' . esc_html( wp_json_encode( $contact->get_tags_for_select2() ) ) . '</div>';
         $html .= '</div>';
 
         $html .= "<strong>";
@@ -283,6 +284,8 @@ class Contacts_Table extends WP_List_Table {
 
         $query = $_GET;
 
+        unset( $query[ 'page' ] );
+
         if ( isset_not_empty( $_GET, 's' ) ){
             $query[ 'search' ] = get_request_var( 's' );
         }
@@ -376,7 +379,7 @@ class Contacts_Table extends WP_List_Table {
         if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] === 'spam' ){
             $actions['unspam'] = sprintf(
 		        '<a href="%s" class="unspam" aria-label="%s">%s</a>',
-		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->get_id() .'&action=unspam')),
+		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact='. $contact->get_id() .'&action=unspam')),
 		        /* translators: %s: title */
 		        esc_attr( sprintf( _x( 'Mark %s as approved.', 'action', 'groundhogg' ), $title ) ),
 		        __( 'Approve' )
@@ -384,7 +387,7 @@ class Contacts_Table extends WP_List_Table {
         } else if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] === 'bounce' ){
 	        $actions['unbounce'] = sprintf(
 		        '<a href="%s" class="unbounce" aria-label="%s">%s</a>',
-		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->get_id() .'&action=unbounce')),
+		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact='. $contact->get_id() .'&action=unbounce')),
 		        /* translators: %s: title */
 		        esc_attr( sprintf( _x( 'Mark %s as a valid email.', 'action', 'groundhogg' ), $title ) ),
 		        _x( 'Valid Email', 'action', 'groundhogg' )
@@ -392,7 +395,7 @@ class Contacts_Table extends WP_List_Table {
         } else {
 	        $actions['spam'] = sprintf(
 		        '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->get_id() .'&action=spam')),
+		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact='. $contact->get_id() .'&action=spam')),
 		        /* translators: %s: title */
 		        esc_attr( sprintf( _x( 'Mark %s as spam', 'action', 'groundhogg' ), $title ) ),
 		        __( 'Spam' )
@@ -401,7 +404,7 @@ class Contacts_Table extends WP_List_Table {
 
         $actions['delete'] = sprintf(
             '<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-            wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact[]='. $contact->get_id() .'&action=delete')),
+            wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact='. $contact->get_id() .'&action=delete')),
             /* translators: %s: title */
             esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
             __( 'Delete' )
@@ -411,14 +414,19 @@ class Contacts_Table extends WP_List_Table {
     }
 
     /**
-     * @param object $item
+     * @param object|Contact $contact
      * @param int $level
      */
-    public function single_row($item, $level = 0)
+    public function single_row( $contact, $level = 0)
     {
+
+        if ( ! $contact instanceof Contact ){
+            $contact = Plugin::$instance->utils->get_contact( absint( $contact->ID ) );
+        }
+
         ?>
-        <tr id="contact-<?php echo $item->ID; ?>">
-            <?php $this->single_row_columns(  Plugin::$instance->utils->get_contact( $item->ID ) ); ?>
+        <tr id="contact-<?php echo $contact->get_id(); ?>">
+            <?php $this->single_row_columns( $contact ); ?>
         </tr>
         <?php
     }
@@ -459,7 +467,7 @@ class Contacts_Table extends WP_List_Table {
                 ] ); ?></div>
         </div>
         <div class="alignleft gh-actions">
-            <a class="button action " href="<?php //echo  WPGH()->menu->tools->exporter->get_start_url( $this->query ); //todo uncomment  ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
+            <a class="button action " href="<?php echo  Plugin::$instance->bulk_jobs->export_contacts->get_start_url( $this->query ); //todo uncomment  ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
         </div>
 <!--        -->
 <!--        <div class="alignleft gh-actions">-->

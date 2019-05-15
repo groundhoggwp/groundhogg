@@ -163,6 +163,26 @@ class Contact extends Base_Object_With_Meta
     }
 
     /**
+     * @return array
+     */
+    public function get_tags_for_select2()
+    {
+        $return = [];
+
+        foreach ( $this->get_tags() as $tag_id ){
+            $tag = new Tag( $tag_id );
+
+            $return[] = [
+                'id' => $tag->get_id(),
+                'text' => $tag->get_name()
+            ];
+        }
+
+        return $return;
+    }
+
+
+    /**
      * Get the contact's email address
      *
      * @return string

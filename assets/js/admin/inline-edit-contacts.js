@@ -4,7 +4,7 @@ window.wp = window.wp || {};
  * Manages the quick edit contact.
  */
 var inlineEditContact;
-( function( $, wp ) {
+( function( $, wp, endpoints, nonces ) {
 
     inlineEditContact = {
         /**
@@ -102,14 +102,18 @@ var inlineEditContact;
 
             var tags = $( '#tags' );
             tags.css( 'width', '100%' );
+
             tags.select2({
-                tags:true,
+                tags: true,
                 multiple: true,
                 tokenSeparators: ['/',',',';'],
                 data:  JSON.parse( $('.tags-data', rowData ).html() ),
                 ajax: {
-                    url: ajaxurl + '?action=gh_get_tags',
+                    url: endpoints.tags,
                     dataType: 'json',
+                    beforeSend: function ( xhr ) {
+                        xhr.setRequestHeader( 'X-WP-Nonce', nonces._wprest );
+                    },
                     results: function(data, page) {
                         return {
                             results: data.results
@@ -228,4 +232,4 @@ var inlineEditContact;
     };
 
     $( document ).ready( function(){ inlineEditContact.init(); } );
-})( jQuery, window.wp );
+})( jQuery, window.wp, groundhogg_endpoints, groundhogg_nonces );

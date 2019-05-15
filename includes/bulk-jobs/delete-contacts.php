@@ -1,11 +1,12 @@
 <?php
-namespace Groundhogg;
+namespace Groundhogg\Bulk_Jobs;
 
-use Groundhogg\Bulk_Jobs\Bulk_Job;
+use Groundhogg\Contact_Query;
+use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Bulk_Delete_Contacts extends Bulk_Job
+class Delete_Contacts extends Bulk_Job
 {
 
     /**

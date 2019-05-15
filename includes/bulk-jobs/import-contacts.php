@@ -1,8 +1,8 @@
 <?php
-namespace Groundhogg;
+namespace Groundhogg\Bulk_Jobs;
 
-use Groundhogg\Bulk_Jobs\Bulk_Job;
-
+use function Groundhogg\get_items_from_csv;
+use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 

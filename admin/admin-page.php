@@ -272,10 +272,6 @@ abstract class Admin_Page
     public function process_action()
     {
 
-//        var_dump( $this->get_current_action() );
-//        var_dump( $this->verify_action() );
-//        var_dump( $_POST );
-
         if ( ! $this->get_current_action() || ! $this->verify_action() )
             return;
 

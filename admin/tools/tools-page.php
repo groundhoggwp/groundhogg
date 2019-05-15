@@ -2,10 +2,7 @@
 namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
-use Groundhogg\Bulk_Delete_Contacts;
-use Groundhogg\Export_Contacts;
-use Groundhogg\Import_Contacts;
-use Groundhogg\Sync_Contacts;
+use Groundhogg\Bulk_Jobs\Delete_Contacts;
 use Groundhogg\Plugin;
 use \WP_Error;
 use function Groundhogg\isset_not_empty;
@@ -24,22 +21,22 @@ class Tools_Page extends Tabbed_Admin_Page
     protected $uploads_path = [];
 
     /**
-     * @var Import_Contacts
+     * @var \Groundhogg\Bulk_Jobs\Import_Contacts
      */
     public $importer;
 
     /**
-     * @var Export_Contacts
+     * @var \Groundhogg\Bulk_Jobs\Export_Contacts
      */
     public $exporter;
 
     /**
-     * @var Bulk_Delete_Contacts
+     * @var Delete_Contacts
      */
     public $deleter;
 
     /**
-     * @var Sync_Contacts
+     * @var \Groundhogg\Bulk_Jobs\Sync_Contacts
      */
     public $syncer;
 
@@ -51,17 +48,15 @@ class Tools_Page extends Tabbed_Admin_Page
 
     protected function add_additional_actions(){
         add_action( "groundhogg/admin/{$this->get_slug()}", [ $this, 'delete_warning' ] );
-        add_action( "admin_init", [ $this, 'init_bulk_jobs' ] );
+        add_action( "init", [ $this, 'init_bulk_jobs' ] );
     }
 
     public function init_bulk_jobs()
     {
-        if ( current_user_can( 'perform_bulk_jobs' ) ){
-            $this->importer = new Import_Contacts();
-            $this->exporter = new Export_Contacts();
-            $this->deleter  = new Bulk_Delete_Contacts();
-            $this->syncer   = new Sync_Contacts();
-        }
+        $this->importer = Plugin::$instance->bulk_jobs->import_contacts;
+        $this->exporter = Plugin::$instance->bulk_jobs->export_contacts;
+        $this->deleter  = Plugin::$instance->bulk_jobs->delete_contacts;
+        $this->syncer   = Plugin::$instance->bulk_jobs->sync_contacts;
     }
 
     public function get_order(){return 98;}
@@ -370,6 +365,8 @@ class Tools_Page extends Tabbed_Admin_Page
         set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS );
         set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );
 
+        var_dump( $this->importer );
+
         $this->importer->start( [ 'import' => $file_name ] );
     }
 
@@ -411,7 +408,7 @@ class Tools_Page extends Tabbed_Admin_Page
     /**
      * @return int delete the files
      */
-    public function export_delete_export()
+    public function process_export_delete()
     {
         $files = $this->get_items();
 
@@ -463,7 +460,7 @@ class Tools_Page extends Tabbed_Admin_Page
     /**
      * Delete all them contacts.
      */
-    public function delete_bulk_delete_tool()
+    public function process_delete_bulk_delete()
     {
         $tags = Plugin::$instance->dbs->get_db('tags')->validate( $_POST[ 'tags' ] );
         $this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] );

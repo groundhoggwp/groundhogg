@@ -2,7 +2,7 @@
 namespace  Groundhogg\Admin\Broadcasts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Broadcast;
-use Groundhogg\Bulk_Jobs\Broadcast_Bulk_Job;
+use Groundhogg\Bulk_Jobs\Broadcast_Scheduler;
 use Groundhogg\Plugin;
 
 // Exit if accessed directly
@@ -28,7 +28,7 @@ class Broadcasts_Page extends Admin_Page
 {
 
     /**
-     * @var Broadcast_Bulk_Job
+     * @var Broadcast_Scheduler
      */
     public $scheduler;
 
@@ -37,7 +37,7 @@ class Broadcasts_Page extends Admin_Page
 
     protected function add_additional_actions()
     {
-        $this->scheduler = new Broadcast_Bulk_Job();
+        $this->scheduler = new Broadcast_Scheduler();
     }
 
     /**
