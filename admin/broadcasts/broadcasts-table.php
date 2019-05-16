@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Broadcasts;
 use Groundhogg\Broadcast;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
+use function Groundhogg\scheduled_time;
 use \WP_List_Table;
 
 /**
@@ -110,7 +111,7 @@ class Broadcasts_Table extends WP_List_Table {
 
     protected function get_view()
     {
-        return ( isset( $_GET['view'] ) )? $_GET['view'] : 'all';
+        return ( isset( $_GET['status'] ) )? $_GET['status'] : 'all';
     }
 
     /**
@@ -215,7 +216,12 @@ class Broadcasts_Table extends WP_List_Table {
         }
 
         $link = sprintf( "<a href='%s'>%s %s</a>",
-            admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&event_type=%s&step=%s', Event::BROADCAST, $broadcast->get_id() ) ),
+            admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
+                'report' => [
+                    'type' => Event::BROADCAST,
+                    'step' => $broadcast->get_id(),
+                ]
+            ] ) ) ),
             $num,
             __( 'Contacts', 'groundhogg' )
         );
@@ -243,7 +249,13 @@ class Broadcasts_Table extends WP_List_Table {
 
 		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
 			    _x( "Sent", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&event_type=%s&step=%s&status=%s', Event::BROADCAST, $broadcast->get_id(), Event::COMPLETE ) ),
+                admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
+                    'report' => [
+                        'type' => Event::BROADCAST,
+                        'step' => $broadcast->get_id(),
+                        'status' => Event::COMPLETE
+                    ]
+                ] ) ) ),
 			    $contact_sum
 		    );
 
@@ -264,19 +276,37 @@ class Broadcasts_Table extends WP_List_Table {
 
 		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
 			    _x( "Sent", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&status=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), Event::COMPLETE ) ),
+                admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
+                    'report' => [
+                        'type' => Event::BROADCAST,
+                        'step' => $broadcast->get_id(),
+                        'status' => Event::COMPLETE
+                    ]
+                ] ) ) ),
 			    $contact_sum
 		    );
 
 		    $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
 			    _x( "Opens", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_opened', 0, time() ) ),
+                admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
+                    'activity' => [
+                        'event_type' => Event::BROADCAST,
+                        'step' => $broadcast->get_id(),
+                        'activity_type' => 'email_opened'
+                    ]
+                ] ) ) ),
 			    $opens
 		    );
 
 		    $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
 			    _x( "Clicks", 'stats', 'groundhogg' ),
-			    admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_link_click', 0, time() ) ),
+                admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
+                    'activity' => [
+                        'event_type' => Event::BROADCAST,
+                        'step' => $broadcast->get_id(),
+                        'activity_type' => 'email_link_click'
+                    ]
+                ] ) ) ),
 			    $clicks );
 
 		    $html.= sprintf( "%s: <strong>%d%%</strong><br/>", _x( "C.T.R", 'stats', 'groundhogg' ), round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) );
@@ -291,32 +321,10 @@ class Broadcasts_Table extends WP_List_Table {
      */
     protected function column_send_time( $broadcast )
     {
-        /* convert to local time. */
-        $p_time = Plugin::$instance->utils->date_time->convert_to_local_time( $broadcast->get_send_time() );
+        $time = scheduled_time( $broadcast->get_send_time() );
+        $time_prefix = $broadcast->get_send_time() > time() ? __( 'Sending', 'groundhogg' ) : __( 'Sent', 'groundhogg' );
 
-        $cur_time = (int) current_time( 'timestamp' );
-
-        $time_diff = $p_time - $cur_time;
-
-        if ( $time_diff < 0 ){
-            $time_prefix = _x( 'Sent', 'status', 'groundhogg' );
-            /* The event has passed */
-            if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = date_i18n( 'jS F, Y \@ h:i A', intval( $p_time ) );
-            } else {
-                $time = sprintf( _x( "%s ago", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
-            }
-        } else {
-            $time_prefix = _x( 'Will send', 'status', 'groundhogg' );
-            /* the event is scheduled */
-            if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
-            } else {
-                $time = sprintf( _x( "in %s", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
-            }
-        }
-
-        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $broadcast->get_send_time()  ) ) . '">' . $time . '</abbr>';
     }
 
     /**
@@ -325,16 +333,10 @@ class Broadcasts_Table extends WP_List_Table {
      */
     protected function column_date_scheduled( $broadcast )
     {
-        $dc_time = mysql2date( 'U', $broadcast->get_date_scheduled() );
-        $cur_time = (int) current_time( 'timestamp' );
-        $time_diff = $dc_time - $cur_time;
-        $time_prefix = _x( 'Created', 'status', 'groundhogg' );
-        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-            $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
-        } else {
-            $time = sprintf( _x( "%s ago", 'status', 'groundhogg'  ), human_time_diff( $dc_time, $cur_time ) );
-        }
-        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
+        $ds_time = strtotime( $broadcast->get_date_scheduled() );
+        $time = scheduled_time( $ds_time );
+
+        return __( 'Scheduled', 'groundhogg' ) . '<br><abbr title="' . date_i18n( DATE_ISO8601, $ds_time ) . '">' . $time . '</abbr>';
     }
 
 	/**
@@ -345,10 +347,9 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @param string $column_name The name/slug of the column to be processed.
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
-	protected function column_default( $broadcast, $column_name ) {
-
+	protected function column_default( $broadcast, $column_name )
+    {
 	    do_action( 'groundhogg/admin/broadcasts/table/columns', $broadcast, $column_name );
-
 	    return '';
 	}
 
@@ -376,7 +377,7 @@ class Broadcasts_Table extends WP_List_Table {
         if ( $this->get_view() !== 'cancelled' )
         {
             $actions = array(
-                'cancel' => _x( 'Cancel Broadcast', 'List table bulk action', 'groundhogg' ),
+                'cancel' => _x( 'Cancel', 'List table bulk action', 'groundhogg' ),
             );
         } else {
             $actions = array();
@@ -410,15 +411,17 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		if ( $this->get_view() === 'all' ){
-		    $query = [
-		       'status' => [
-		           'sent',
-                   'scheduled'
-               ]
+		$query = $_GET;
+
+		unset( $query[ 'page' ] );
+
+		if ( empty( $query ) ){
+            $query = [
+                'status' => [
+                    'sent',
+                    'scheduled'
+                ]
             ];
-        } else {
-		    $query = $_GET;
         }
 
         $data = Plugin::$instance->dbs->get_db('broadcasts')->query( $query );

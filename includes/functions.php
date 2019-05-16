@@ -1466,3 +1466,29 @@ if ( ! function_exists( 'multi_implode' ) ):
         return $ret;
     }
 endif;
+
+/**
+ * Get a time string representing when something should be completed.
+ *
+ * @param $time
+ * @return string
+ */
+function scheduled_time( $time )
+{
+    // convert to local time.
+    $p_time = Plugin::$instance->utils->date_time->convert_to_local_time( $time );
+
+    // Get the current time.
+    $cur_time = (int) current_time( 'timestamp' );
+
+    $time_diff = $p_time - $cur_time;
+
+    if (  absint( $time_diff ) > DAY_IN_SECONDS  ){
+        $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+    } else {
+        $format = $time_diff <= 0 ? _x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
+        $time = sprintf( $format, human_time_diff( $p_time, $cur_time ) );
+    }
+
+    return $time;
+}

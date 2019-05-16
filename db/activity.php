@@ -82,8 +82,9 @@ class Activity extends DB  {
             'funnel_id'     => '%d',
             'step_id'       => '%d',
             'contact_id'    => '%d',
-            'event_id'      => '%d',
             'email_id'      => '%d',
+            'event_id'      => '%d',
+            'event_type'    => '%d',
             'activity_type' => '%s',
             'referer'       => '%s',
         ];
@@ -102,10 +103,11 @@ class Activity extends DB  {
             'funnel_id'     => 0,
             'step_id'       => 0,
             'contact_id'    => 0,
-            'event_id'      => 0,
             'email_id'      => 0,
+            'event_id'      => 0,
+            'event_type'    => 0,
             'activity_type' => '',
-            'referer'      => '',
+            'referer'       => '',
         );
     }
 
@@ -185,8 +187,9 @@ class Activity extends DB  {
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
         activity_type VARCHAR(20) NOT NULL,
-        event_id bigint(20) unsigned NOT NULL,
         email_id bigint(20) unsigned NOT NULL,
+        event_id bigint(20) unsigned NOT NULL,
+        event_type int unsigned NOT NULL,
         referer text NOT NULL,
         PRIMARY KEY (ID),
         KEY timestamp (timestamp),

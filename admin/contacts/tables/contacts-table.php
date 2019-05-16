@@ -147,8 +147,7 @@ class Contacts_Table extends WP_List_Table {
      */
     protected function column_user_id( $contact )
     {
-        $user = get_user_by( 'email', $contact->get_email() );
-        return $user ? '<a href="'.admin_url('user-edit.php?user_id='.$user->ID ).'">'.$user->display_name.'</a>' :  '&#x2014;';
+        return $contact->get_userdata() ? '<a href="'.admin_url('user-edit.php?user_id='. $contact->get_userdata()->ID ).'">'.$contact->get_userdata()->display_name.'</a>' :  '&#x2014;';
     }
 
     /**
@@ -157,7 +156,7 @@ class Contacts_Table extends WP_List_Table {
      */
     protected function column_owner_id( $contact )
     {
-        return ! empty( $contact->get_owner_id() ) ? '<a href="'.admin_url('admin.php?page=gh_contacts&view=owner&owner=' . $contact->get_owner_id() ).'">'. $contact->owner->user_login .'</a>' :  '&#x2014;';
+        return ! empty( $contact->get_owner_id() ) ? '<a href="'.admin_url('admin.php?page=gh_contacts&owner_id=' . $contact->get_owner_id() ).'">'. $contact->owner->user_login .'</a>' :  '&#x2014;';
     }
 
     /**
@@ -229,14 +228,14 @@ class Contacts_Table extends WP_List_Table {
 
     protected function get_view()
     {
-        return ( isset( $_GET['view'] ) )? $_GET['view'] : 'all';
+        return ( isset( $_GET['optin_status'] ) )? absint( $_GET['optin_status'] ) : 10;
     }
 
-    protected function get_views() {
-        global $wpdb;
+    protected function get_views()
+    {
         $base_url = admin_url( 'admin.php?page=gh_contacts&optin_status=' );
 
-        $view = isset($_REQUEST['optin_status']) ? $_REQUEST['optin_status'] : 'all';
+        $view = $this->get_view();
 
         $count = array(
             'unconfirmed'   => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::UNCONFIRMED   ] ),
@@ -247,12 +246,12 @@ class Contacts_Table extends WP_List_Table {
         );
 
         return apply_filters( 'contact_views', array(
-            'all'           => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('.  number_format_i18n( $count[ 'unconfirmed' ] + $count[ 'confirmed' ] ) .')</span>' . "</a>",
-            'confirmed'     => "<a class='" . ($view === 'confirmed' ? 'current' : '') . "' href='" . $base_url . Preferences::CONFIRMED . "'>" . _x( 'Confirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['confirmed'] ) .')</span>'. "</a>",
-            'unconfirmed'   => "<a class='" . ($view === 'unconfirmed' ? 'current' : '') . "' href='" . $base_url . Preferences::UNCONFIRMED . "'>" . _x( 'Unconfirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['unconfirmed'] ) . ')</span>' . "</a>",
-            'opted_out'     => "<a class='" . ($view === 'opted_out' ? 'current' : '') . "' href='" . $base_url . Preferences::UNSUBSCRIBED . "'>" . _x( 'Unsubscribed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['opted_out'] ) .')</span>' . "</a>",
-            'spam'          => "<a class='" . ($view === 'spam' ? 'current' : '') . "' href='" . $base_url . Preferences::SPAM . "'>" . _x( 'Spam', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['spam'] ) .')</span>' . "</a>",
-            'bounce'        => "<a class='" . ($view === 'bounce' ? 'current' : '') . "' href='" . $base_url . Preferences::HARD_BOUNCE . "'>" . _x( 'Bounced', 'view', 'groundhogg') .' <span class="count">('. number_format_i18n( $count['bounce'] ) . ')</span>' . "</a>"
+            'all'           => "<a class='" . ($view === 10 ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('.  number_format_i18n( $count[ 'unconfirmed' ] + $count[ 'confirmed' ] ) .')</span>' . "</a>",
+            'confirmed'     => "<a class='" . ($view === Preferences::CONFIRMED ? 'current' : '') . "' href='" . $base_url . Preferences::CONFIRMED . "'>" . _x( 'Confirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['confirmed'] ) .')</span>'. "</a>",
+            'unconfirmed'   => "<a class='" . ($view === Preferences::UNCONFIRMED ? 'current' : '') . "' href='" . $base_url . Preferences::UNCONFIRMED . "'>" . _x( 'Unconfirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['unconfirmed'] ) . ')</span>' . "</a>",
+            'opted_out'     => "<a class='" . ($view === Preferences::UNSUBSCRIBED ? 'current' : '') . "' href='" . $base_url . Preferences::UNSUBSCRIBED . "'>" . _x( 'Unsubscribed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['opted_out'] ) .')</span>' . "</a>",
+            'spam'          => "<a class='" . ($view === Preferences::SPAM ? 'current' : '') . "' href='" . $base_url . Preferences::SPAM . "'>" . _x( 'Spam', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['spam'] ) .')</span>' . "</a>",
+            'bounce'        => "<a class='" . ($view === Preferences::HARD_BOUNCE ? 'current' : '') . "' href='" . $base_url . Preferences::HARD_BOUNCE . "'>" . _x( 'Bounced', 'view', 'groundhogg') .' <span class="count">('. number_format_i18n( $count['bounce'] ) . ')</span>' . "</a>"
         ) );
     }
 
@@ -468,14 +467,8 @@ class Contacts_Table extends WP_List_Table {
         </div>
         <div class="alignleft gh-actions">
             <a class="button action " href="<?php echo  Plugin::$instance->bulk_jobs->export_contacts->get_start_url( $this->query ); //todo uncomment  ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
-        </div>
-<!--        -->
-<!--        <div class="alignleft gh-actions">-->
-<!--            <a class="button action " href="--><?php //echo add_query_arg( array_merge( $this->query, [ 'use_query' => true ] ), admin_url( 'admin.php?page=gh_broadcasts&action=add&type=email' ) ) ?><!--">--><?php //printf( _nx( 'Export %s contact','Send Broadcast to %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?><!--</a>-->
-<!--        </div>-->
-<!--        --><?php
-
-        do_action( 'groundhogg/contacts/table/extra_tablenav', $this );
+        </div><?php
+        do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
     }
 
     /**

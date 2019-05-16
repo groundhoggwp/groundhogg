@@ -129,7 +129,8 @@ function contact_record_general_info( $contact )
         <tbody>
         <tr>
             <th><h2><?php _e('Name' ) ?></h2></th>
-            <td><?php echo get_avatar( $contact->get_email() ); ?>
+            <?php $contact->get_profile_picture(); ?>
+            <td><img alt="Avatar: Found with https://devidentify.com/" title="Avatar: Found with https://devidentify.com" width="96" height="96" src="<?php echo $contact->get_profile_picture(); ?>">
             </td>
         </tr>
         <tr>

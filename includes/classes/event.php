@@ -3,6 +3,8 @@ namespace Groundhogg;
 
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Events;
+use Groundhogg\Queue\Email_Notification;
+use Groundhogg\Queue\SMS_Notification;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -192,14 +194,15 @@ class Event extends Base_Object
                 $this->step = Plugin::$instance->utils->get_step( $this->get_step_id() );
                 break;
             case self::EMAIL_NOTIFICATION:
+                $this->step = new Email_Notification( $this->get_step_id() );
                 break;
             case self::SMS_NOTIFICATION:
+                $this->step = new SMS_Notification( $this->get_step_id() );
                 break;
             case self::BROADCAST:
+                $this->step = new Broadcast( $this->get_step_id() );
                 break;
-
         }
-
     }
 
     /**
@@ -400,7 +403,8 @@ class Event extends Base_Object
 
         return $this->update( [
             'status' => self::COMPLETE,
-            'failure_reason' => '',
+            'error_code' => '',
+            'error_message' => '',
         ] );
     }
 }

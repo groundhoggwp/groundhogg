@@ -1,4 +1,11 @@
 <?php
+namespace Groundhogg\Queue;
+
+use Groundhogg\Contact;
+use Groundhogg\Email;
+use Groundhogg\Event;
+use Groundhogg\Event_Process;
+
 /**
  * Email Notification
  *
@@ -14,7 +21,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_Email_Notification implements WPGH_Event_Process
+class Email_Notification implements Event_Process
 {
 
     public $ID;
@@ -22,7 +29,7 @@ class WPGH_Email_Notification implements WPGH_Event_Process
     /**
      * The email for the notification
      *
-     * @var WPGH_Email|object
+     * @var Email|object
      */
     public $email;
 
@@ -33,15 +40,15 @@ class WPGH_Email_Notification implements WPGH_Event_Process
      */
     public function __construct( $id )
     {
-        $this->ID = intval( $id );
-        $this->email = new WPGH_Email( intval( $id ) );
+        $this->ID = absint( $id );
+        $this->email = new Email( $this->ID );
     }
 
     /**
      * Send the associated email to the given contact
      *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event Event
      *
      * @return bool, whether the email sent or not.
      */
@@ -63,4 +70,13 @@ class WPGH_Email_Notification implements WPGH_Event_Process
         return true;
     }
 
+    public function get_funnel_title()
+    {
+        return __( 'Email Notification', 'groundhogg' );
+    }
+
+    public function get_step_title()
+    {
+        return $this->email->get_subject_line();
+    }
 }

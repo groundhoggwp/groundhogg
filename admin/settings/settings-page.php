@@ -63,6 +63,11 @@ class Settings_Page extends Admin_Page
         return _x( 'Settings', 'page_title', 'groundhogg' );
     }
 
+    public function get_title()
+    {
+        return _x( 'Groundhogg Settings', 'page_title', 'groundhogg' );
+    }
+
     public function get_cap()
     {
         return 'manage_options';
@@ -226,17 +231,14 @@ class Settings_Page extends Admin_Page
         ) );
     }
 
+    /**
+     * display the API keys table
+     */
     public function api_keys_table()
     {
-
-    $api_keys_table = new API_Keys_Table();
-    $api_keys_table->prepare_items();
-    $api_keys_table->display();
-    ?>
-    <p>
-        <?php _e( 'These API keys allow you to use the REST API to retrieve store data in JSON for external applications or devices.', 'groundhogg' ); ?>
-    </p>
-    <?php
+        $api_keys_table = new API_Keys_Table();
+        $api_keys_table->prepare_items();
+        $api_keys_table->display();
     }
 
     /**

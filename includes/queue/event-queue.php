@@ -1,5 +1,11 @@
 <?php
-namespace Groundhogg;
+namespace Groundhogg\Queue;
+
+use Groundhogg\Contact;
+use Groundhogg\Event;
+use Groundhogg\Plugin;
+use Groundhogg\Step;
+use Groundhogg\Supports_Errors;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 

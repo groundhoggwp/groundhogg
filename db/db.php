@@ -3,6 +3,7 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
 
 
@@ -575,7 +576,7 @@ abstract class DB {
     public function query( $data = [], $order='', $from_cache = true )
     {
         // Check Cache
-        $cache_key = md5( sprintf( '%s|%s|%s|%s|%s' , implode( '|', array_keys( $data ) ), implode( '|', array_values( $data ) ), $order, $this->get_object_type(), $this->get_table_name() ) );
+        $cache_key = md5( sprintf( '%s|%s|%s|%s|%s' , multi_implode( '|', array_keys( $data ) ), multi_implode( '|', array_values( $data ) ), $order, $this->get_object_type(), $this->get_table_name() ) );
 
         if ( isset_not_empty( self::$cache, $cache_key ) && $from_cache ){
             return self::$cache[ $cache_key ];

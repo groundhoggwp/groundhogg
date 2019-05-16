@@ -1,4 +1,11 @@
 <?php
+namespace Groundhogg\Queue;
+
+use Groundhogg\Contact;
+use Groundhogg\Event;
+use Groundhogg\Event_Process;
+use Groundhogg\SMS;
+
 /**
  * SMS Notification
  *
@@ -14,14 +21,14 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class WPGH_SMS_Notification implements WPGH_Event_Process
+class SMS_Notification implements Event_Process
 {
 
     public $ID;
     /**
      * The sms for the notification
      *
-     * @var WPGH_SMS|object
+     * @var SMS|object
      */
     public $sms;
 
@@ -33,14 +40,14 @@ class WPGH_SMS_Notification implements WPGH_Event_Process
     public function __construct( $id )
     {
         $this->ID = intval( $id );
-        $this->sms = new WPGH_SMS( intval( $id ) );
+        $this->sms = new SMS( absint( $id ) );
     }
 
     /**
      * Send the associated sms to the given contact
      *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event Event
      *
      * @return bool, whether the sms sent or not.
      */
@@ -62,4 +69,13 @@ class WPGH_SMS_Notification implements WPGH_Event_Process
         return true;
     }
 
+    public function get_funnel_title()
+    {
+        return __( 'SMS Notification', 'groundhogg' );
+    }
+
+    public function get_step_title()
+    {
+        return $this->sms->get_title();
+    }
 }
