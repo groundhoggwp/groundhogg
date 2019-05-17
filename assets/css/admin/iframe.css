@@ -1,30 +1,34 @@
-/*$( 'html' ).css( 'padding-top', 0 );*/
-/*$( '#wpcontent' ).css( 'margin', 0 );*/
-/*$( '#wpadminbar' ).addClass( 'hidden' );*/
-/*$( '#adminmenuwrap' ).addClass( 'hidden' );*/
-/*$( '#adminmenuback' ).addClass( 'hidden' );*/
-/*$( '#wpfooter' ).addClass( 'hidden' );*/
-
-.iframed html {
-    padding-top: 0;
+html.iframed {
+    padding-top: 0 !important;
 }
 
 .iframed  #wpcontent {
     margin: 0;
 }
 
-.iframed #wpadminbar {
+.iframed #wpbody-content{
+    padding-bottom: 0;
+    min-height: 100vh;
+}
+
+.iframed #wpadminbar,
+.iframed #adminmenuwrap,
+.iframed #adminmenuback,
+.iframed #wpfooter,
+.iframed #screen-meta-links,
+.iframed #screen-meta
+{
     display: none;
 }
 
-.iframed #adminmenuwrap {
-    display: none;
+.iframed .editor-header{
+    top: 0 !important;
 }
 
-.iframed #adminmenuback {
-    display: none;
+.iframed #poststuff{
+    min-height: 100vh;
 }
 
-.iframed #wpfooter{
-    display: none;
+.iframed #email-content{
+    min-height: 80vh;
 }

@@ -20,7 +20,7 @@ var FormBuilder = {};
 
             });
 
-            $( '.popup-save' ).click( function (e) {
+            $( '#popup-close-footer' ).click( function (e) {
                 if ( self.active ){
                     self.makeField();
                 }
@@ -127,7 +127,7 @@ var FormBuilder = {};
 
         getForm: function (button) {
 
-            wpghModal.args.preventSave = true;
+            GroundhoggModal.args.preventSave = true;
             this.active = true;
 
             this.currentType = button.className.split(' ')[2];

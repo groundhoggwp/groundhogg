@@ -86,30 +86,20 @@
                 }
             } );
 
-            // /* Size the editor to full screen if being views in an Iframe. */
-            // // TODO
-            // if ( self.inFrame() ){
-            //     // $( 'body' ).html( $( '#wpbody' ) );
-            //     // $( '#screen-meta-links' ).remove();
-            //     $( 'html' ).css( 'padding-top', 0 );
-            //     $( '#wpcontent' ).css( 'margin', 0 );
-            //     $( '#wpadminbar' ).addClass( 'hidden' );
-            //     $( '#adminmenuwrap' ).addClass( 'hidden' );
-            //     $( '#adminmenuback' ).addClass( 'hidden' );
-            //     $( '#wpfooter' ).addClass( 'hidden' );
-            //     $( '.title-wrap' ).css( 'display', 'none' );
-            //     $( '.funnel-editor-header' ).css( 'top', 0 );
-            //
-            //     $( document ).on( 'change keydown keyup', function ( e ) {
-            //         parent.wpghEmailElement.changesSaved = false;
-            //     } );
-            //
-            //     $(  parent.document ).on( 'click','.popup-save', function( e ){
-            //         self.save( e );
-            //     } );
-            //
-            //     parent.wpghEmailElement.ID = email.id;
-            // }
+            /* Size the editor to full screen if being views in an Iframe. */
+            // TODO
+            if ( self.inFrame() ){
+
+                $( document ).on( 'change keydown keyup', function ( e ) {
+                    parent.EmailStep.changesSaved = false;
+                } );
+
+                $(  parent.document ).on( 'click', '#popup-close-footer', function( e ){
+                    self.save( e );
+                } );
+
+                parent.EmailStep.newEmailId = self.id;
+            }
 
             self.editorSizing();
 
@@ -200,6 +190,10 @@
                 hideSpinner();
 
                 $( '.row' ).wpghToolBar();
+
+                if ( self.inFrame() ){
+                    parent.EmailStep.changesSaved = true;
+                }
 
                 console.log( response );
             } );

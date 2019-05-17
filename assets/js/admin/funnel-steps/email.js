@@ -2,6 +2,7 @@
     $.extend( step, {
 
         ID: 0,
+        newEmailId: 0,
         step: null,
         addingEmail: false,
         editingEmail: false,
@@ -16,60 +17,57 @@
                 self.addingEmail  = false;
                 self.editingEmail = true;
 
+                modal.init( 'Add Email', {
+                    source: self.edit_email_path + '&email=' + self.getEmailId(),
+                    width: 1500,
+                    height: 900,
+                } );
 
-
-            } );
-
-        },
-
-        init_old: function () {
-
-            var self = this;
-
-            $( document ).on( 'change', '.gh-email-picker', function ( e ) {
-                var link = '#source=' + encodeURIComponent( base.path + '&action=edit&email=' + $(this).val() ) + '&height=900&width=1500' ;
-                e.ID = $(this).val();
-                e.target = $(this).closest('.postbox' );
-                $(this).closest( '.form-table' ).find( '.edit-email' ).attr( 'href', link );
             } );
 
             $( document ).on( 'click', '.add-email', function ( e ) {
-                e.target = $(this).closest('.postbox' );
-                e.addingEmail = true;
-                e.editingEmail = false;
+                self.step = $(this).closest('.postbox' );
+                self.addingEmail  = false;
+                self.editingEmail = true;
+
+                modal.init( 'Edit Email', {
+                    source: self.add_email_path,
+                    width: 1500,
+                    height: 900,
+                } );
+
             } );
 
-            $( document ).on( 'click', '.edit-email', function ( e ) {
-                e.target = $(this).closest('.postbox' );
-                e.addingEmail = false;
-                e.editingEmail = true;
-            } );
+            $( document ).on( 'modal-closed', function ( e ) {
 
-            $( document ).on( 'click', '.popup-save', function ( e ) {
-
-                if ( ! e.addingEmail && ! e.editingEmail  ){
+                if ( ! self.addingEmail && ! self.editingEmail  ){
                     return;
                 }
 
-                if ( ! e.changesSaved ){
-                    if ( ! confirm( base.dontSaveChangesMsg ) ){
+                if ( ! self.changesSaved ){
+                    if ( ! confirm( self.save_changes_prompt ) ){
                         throw new Error("Unsaved changes!");
                     }
                 }
 
                 if ( e.addingEmail ){
-                    e.target.find( '.add-email-override' ).val( e.ID )
+                    e.target.find( '.add-email-override' ).val( self.newEmailId )
                 }
 
                 e.addingEmail = false;
                 e.editingEmail = false;
 
             } );
-        }
+
+        },
+
+        getEmailId: function(){
+            return this.step.find( '.gh-email-picker' ).val();
+        },
     } );
 
     $( function () {
         step.init()
     } );
 
-})( jQuery, EmailStep );
+})( jQuery, EmailStep, GroundhoggModal );

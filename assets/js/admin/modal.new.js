@@ -20,15 +20,19 @@ var GroundhoggModal = {};
 
 		init: function ( title, href ) {
 
+    	    var self=this;
+
     	    this.args = defaults;
 
-    	    if ( typeof href === 'string' ){
+    	    // console.log( href );
+
+    	    if ( typeof href == "string" ){
     	        this.parseArgs( href );
             } else {
     	        this.args = $.extend( defaults, href );
             }
 
-    	    this.parseArgs( href );
+    	    console.log( this.args );
 
     		this.overlay = $( '.popup-overlay' );
     		this.window  = $( '.popup-window' );
@@ -36,15 +40,12 @@ var GroundhoggModal = {};
     		this.title   = $( '.popup-title' );
     		this.loader  = $( '.iframe-loader-wrapper' );
 
-    		var exp =/(https|http)?:\/\/((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6})|(localhost)\b([-a-zA-Z0-9@:%_\+.~#?&\/=]*)/;
-            var urlRegex = new RegExp( exp );
-
             this.sizeup();
 
-            if ( this.args.source.match( urlRegex ) ){
+            if ( this.matchUrl( this.args.source ) ){
                 this.loader.removeClass( 'hidden' );
     		    this.source = $(
-    		        "<div><iframe class='hidden' src='" + this.args.source + "' width='" + this.args.width + "' height='" + ( this.args.height - 100 ) + "' style='margin-bottom: -5px;' onload='wpghModal.prepareFrame( this )'></iframe></div>"
+    		        "<div><iframe class='hidden' src='" + this.args.source + "' width='" + this.args.width + "' height='" + ( this.args.height - 100 ) + "' style='margin-bottom: -5px;' onload='GroundhoggModal.prepareFrame( this )'></iframe></div>"
                 );
             } else {
                 this.source  = $( '#' + this.args.source );
@@ -59,9 +60,16 @@ var GroundhoggModal = {};
             }
 
             if ( typeof this.args.footertext !== "undefined" ) {
-                $( '.popup-save' ).text( this.args.footertext );
+                $( '#popup-close-footer' ).text( this.args.footertext );
             }
 
+            self.open();
+        },
+
+        matchUrl: function (maybeUrl){
+            var exp =/(https|http)?:\/\/((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6})|(localhost)\b([-a-zA-Z0-9@:%_\+.~#?&\/=]*)/;
+            var urlRegex = new RegExp( exp );
+            return maybeUrl.match( urlRegex );
         },
 
         parseArgs: function(queryArgs){
@@ -100,14 +108,14 @@ var GroundhoggModal = {};
 		open: function(){
     		this.pullContent();
     		this.showPopUp();
-            $(document).trigger( 'wpghModalOpened' );
+            $(document).trigger( 'GroundhoggModalOpened' );
         },
 
         close: function(){
             this.pushContent();
             this.hidePopUp();
             if ( this.args.preventSave === undefined || this.args.preventSave === false || this.args.preventSave === 'false' ){
-                $(document).trigger( 'wpghModalClosed' );
+                $(document).trigger( 'GroundhoggModalClosed' );
             }
             this.reset();
         },
@@ -120,13 +128,16 @@ var GroundhoggModal = {};
         },
 
         prepareFrame: function( iframe ){
+
+    	    var self = this;
+
             var $iframe = $(iframe);
             this.content.removeClass( 'hidden' );
             this.content.css( 'padding', 0 );
             $iframe.removeClass( 'hidden' );
             this.loader.addClass( 'hidden' );
             $iframe.contents().find( '.choose-template' ).click( function () {
-                wpghModal.frameReload();
+                self.frameReload();
             });
         },
 
@@ -139,12 +150,12 @@ var GroundhoggModal = {};
         /* Switch the content In the source and target between */
         pullContent: function(){
         	this.content.append( this.source.children() );
-            $( document ).trigger( 'wpghModalContentPulled' );
+            $( document ).trigger( 'GroundhoggModalContentPulled' );
         },
 
         pushContent: function(){
             this.source.append( this.content.children() );
-            $( document ).trigger( 'wpghModalContentPushed' );
+            $( document ).trigger( 'GroundhoggModalContentPushed' );
         },
 
         /* Load the PopUp onto the screen */
@@ -185,15 +196,13 @@ var GroundhoggModal = {};
                     if ( $(this).hasClass( 'no-padding' ) ){
                         $( '.popup-content' ).css( 'padding', '0' )
                     }
-
-                    self.open();
                 }
             );
 
-            $( document ).on( 'click', '#popup-close',
+            $( document ).on( 'click', '.popup-close',
                 function(){
-                    self.close();
                     $(document).trigger( 'modal-closed' );
+                    self.close();
                 }
             );
         }

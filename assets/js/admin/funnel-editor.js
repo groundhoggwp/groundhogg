@@ -36,7 +36,7 @@ var wpghFunnelEditor;
                 wpghFunnelEditor.save();
             });
 
-            $( document ).on('wpghModalClosed', function( e ){
+            $( document ).on('GroundhoggModalClosed', function( e ){
                 e.preventDefault();
                 wpghFunnelEditor.save();
             });

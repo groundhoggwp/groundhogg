@@ -84,7 +84,8 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                 </div>
                 <div id="save">
                     <span class="spinner" style="float: left"></span>
-                    <?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ) ?>
+                    <?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ); ?>
+                    <?php submit_button( __( 'Update & Test', 'groundhogg' ), 'secondary', 'update_and_test', false ); ?>
                 </div>
             </div>
         </div>

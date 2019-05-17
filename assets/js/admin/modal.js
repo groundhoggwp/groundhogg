@@ -4,11 +4,11 @@ Display the box in the correct position of the screen.
 close the thickbox and put the content back where it came from.
 */
 
-var wpghModal;
+var GroundhoggModal;
 
 ( function ( $,defaults ) {
 
-    wpghModal = {
+    GroundhoggModal = {
 
     	overlay: null,
 		window: null,
@@ -38,7 +38,7 @@ var wpghModal;
             if ( this.args.source.match( urlRegex ) ){
                 this.loader.removeClass( 'hidden' );
     		    this.source = $(
-    		        "<div><iframe class='hidden' src='" + this.args.source + "' width='" + this.args.width + "' height='" + ( this.args.height - 100 ) + "' style='margin-bottom: -5px;' onload='wpghModal.prepareFrame( this )'></iframe></div>"
+    		        "<div><iframe class='hidden' src='" + this.args.source + "' width='" + this.args.width + "' height='" + ( this.args.height - 100 ) + "' style='margin-bottom: -5px;' onload='GroundhoggModal.prepareFrame( this )'></iframe></div>"
                 );
             } else {
                 this.source  = $( '#' + this.args.source );
@@ -94,14 +94,14 @@ var wpghModal;
 		open: function(){
     		this.pullContent();
     		this.showPopUp();
-            $(document).trigger( 'wpghModalOpened' );
+            $(document).trigger( 'GroundhoggModalOpened' );
         },
 
         close: function(){
             this.pushContent();
             this.hidePopUp();
             if ( this.args.preventSave === undefined || this.args.preventSave === false || this.args.preventSave === 'false' ){
-                $(document).trigger( 'wpghModalClosed' );
+                $(document).trigger( 'GroundhoggModalClosed' );
             }
             this.reset();
         },
@@ -120,7 +120,7 @@ var wpghModal;
             $iframe.removeClass( 'hidden' );
             this.loader.addClass( 'hidden' );
             $iframe.contents().find( '.choose-template' ).click( function () {
-                wpghModal.frameReload();
+                GroundhoggModal.frameReload();
             });
         },
 
@@ -133,12 +133,12 @@ var wpghModal;
         /* Switch the content In the source and target between */
         pullContent: function(){
         	this.content.append( this.source.children() );
-            $( document ).trigger( 'wpghModalContentPulled' );
+            $( document ).trigger( 'GroundhoggModalContentPulled' );
         },
 
         pushContent: function(){
             this.source.append( this.content.children() );
-            $( document ).trigger( 'wpghModalContentPushed' );
+            $( document ).trigger( 'GroundhoggModalContentPushed' );
         },
 
         /* Load the PopUp onto the screen */
@@ -172,38 +172,38 @@ var wpghModal;
                 function(e){
                     e.preventDefault();
                     //console.log(this.href);
-                    wpghModal.init( this.title, this.href );
+                    GroundhoggModal.init( this.title, this.href );
 
                     if ( $(this).hasClass( 'no-padding' ) ){
                         $( '.popup-content' ).css( 'padding', '0' )
                     }
 
-                    wpghModal.open();
+                    GroundhoggModal.open();
                 }
             );
 
             $( document ).on( 'click', '#popup-close',
                 function(){
-                    wpghModal.close();
+                    GroundhoggModal.close();
                 }
             );
 
             $( document ).on( 'click', '.popup-save',
                 function(){
-                    wpghModal.close();
-                    $(document).trigger( 'wpghModalSaved' );
+                    GroundhoggModal.close();
+                    $(document).trigger( 'GroundhoggModalSaved' );
                 }
             );
         }
 	};
 
 	$(function () {
-		wpghModal.reload();
+		GroundhoggModal.reload();
 		$( '.wpgh-color' ).wpColorPicker();
     });
     $( document ).on( 'wpghAddedStep', function () {
-        // wpghModal.reload();
+        // GroundhoggModal.reload();
         $( '.wpgh-color' ).wpColorPicker();
     });
 
-} )(jQuery,wpghModalDefaults);
+} )(jQuery,GroundhoggModalDefaults);

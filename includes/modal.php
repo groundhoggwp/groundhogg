@@ -62,7 +62,7 @@ class Modal
             </div>
 			<div class="popup-content"></div>
 			<div class="popup-footer">
-				<button class="popup-save button button-primary" type="button"><?php _e( 'Save Changes' ); ?></button>
+				<button id="popup-close-footer" class="popup-close button button-primary" type="button"><?php _e( 'Close' ); ?></button>
 			</div>
 		</div>
 		<?php

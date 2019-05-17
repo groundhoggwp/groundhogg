@@ -37,7 +37,7 @@
     bottom:0;
 }
 
-.popup-footer .popup-save {
+.popup-footer #popup-close-footer {
     float: right;
     margin: 10px;
 }
@@ -85,7 +85,6 @@
     text-align: left;
     line-height: 1.4em;
     /*height: 400px;*/
-    overflow: auto;
 }
 
 .select2-dropdown{

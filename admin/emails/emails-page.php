@@ -334,7 +334,7 @@ class Emails_Page extends Admin_Page
         $args[ 'status' ] = $status;
         $args[ 'subject' ] = $subject;
         $args[ 'pre_header' ] = $pre_header;
-        $args[ 'content' ] = $content;
+        $args[ 'content' ] = wp_kses_post( $content );
 
         $args[ 'last_updated' ] = current_time( 'mysql' );
         $args[ 'is_template' ] = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
@@ -349,7 +349,7 @@ class Emails_Page extends Admin_Page
         $email->update_meta( 'alignment', sanitize_text_field( Groundhogg\get_request_var( 'email_alignment' ) ) );
         $email->update_meta( 'browser_view', boolval( Groundhogg\get_request_var( 'browser_view' ) ) );
 
-        if ( Groundhogg\get_request_var( 'send_test' ) ){
+        if ( Groundhogg\get_request_var( 'update_and_test' ) ){
 
             if ( ! current_user_can( 'send_emails' ) ){
                 $this->wp_die_no_access();

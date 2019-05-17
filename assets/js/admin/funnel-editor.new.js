@@ -34,7 +34,7 @@
                 self.save( e );
             });
 
-            $( document ).on('wpghModalClosed', function( e ){
+            $( document ).on('GroundhoggModalClosed', function( e ){
                 self.save( e );
             });
 
