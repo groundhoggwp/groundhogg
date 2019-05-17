@@ -550,16 +550,23 @@ abstract class DB {
 
         $columns = $this->get_columns();
 
-        if ( ! $field ){
-            $field = $this->get_primary_key();
+        if ( is_array( $value ) ){
+
+            $exists = $this->query( $value );
+
+            return ! empty( $exists );
+
+        } else {
+            if ( ! $field ){
+                $field = $this->get_primary_key();
+            }
+
+            if ( ! array_key_exists( $field, $columns ) ) {
+                return false;
+            }
+
+            return (bool) $this->get_column_by( $this->get_primary_key(), $field, $value );
         }
-
-        if ( ! array_key_exists( $field, $columns ) ) {
-            return false;
-        }
-
-        return (bool) $this->get_column_by( $this->get_primary_key(), $field, $value );
-
     }
 
     /**

@@ -203,7 +203,7 @@ class Tools_Page extends Tabbed_Admin_Page
     /**
      * Delete all them contacts.
      */
-    public function sync_bulk_sync_tool()
+    public function process_sync_bulk_sync()
     {
         $this->syncer->start(); //todo
     }

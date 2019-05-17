@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Contacts\Tables;
 
+use function Groundhogg\scheduled_time;
 use \WP_List_Table;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
@@ -83,30 +84,13 @@ class Contact_Activity_Table extends WP_List_Table {
      */
     protected function column_email( $event )
     {
+        $email = $event->get_email();
 
-        if ($event->get_event_type()) {
-            switch ($event->get_event_type()) {
-                default:
-                case GROUNDHOGG_FUNNEL_EVENT:
-//                    $email = new WPGH_Email( $event->step->get_meta( 'email_id' ) ); todo check
-                    $email = new Email($event->get_step()->get_meta( 'email_id' ));
-                    break;
-                case GROUNDHOGG_BROADCAST_EVENT:
-                    $email = $event->step->email; //todo
-                    break;
-                case GROUNDHOGG_EMAIL_NOTIFICATION_EVENT:
-                    $email = $event->step->email; //todo
-                    break;
-            }
-        } else {
-            if ( $event->is_broadcast_event() ) {
-                $email = $event->step->email; //todo
-            } else {
-                $email = new WPGH_Email( $event->step->get_meta( 'email_id' ) ); //todo
-            }
+        if ( ! $email || ! $email->exists() ){
+            return false;
         }
 
-        return sprintf(  "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email->ID ), $email->subject );
+        return sprintf(  "<a href='%s' target='_blank'>%s</a>", admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email->get_id() ), $email->get_subject_line() );
     }
 
     /**
@@ -117,35 +101,24 @@ class Contact_Activity_Table extends WP_List_Table {
     protected function column_open( $event )
     {
 
-//        $activity = WPGH()->activity->get_activity( array( todo check
-
         $activity = Plugin::$instance->dbs->get_db('activity')->query( [
-            'funnel_id'     => $event->funnel_id,
+            'event_id'      => $event->get_id(),
             'step_id'       => $event->get_step_id() ,
             'activity_type' => 'email_opened',
             'contact_id'    => $event->get_contact_id(),
-//            'event_id'      => $event->ID
         ] );
-
-//        print_r( $activity );
 
         if( empty( $activity ) ){
             return '&#x2014;';
         }
 
         $activity = array_shift( $activity );
+        $time = absint( $activity->timestamp );
 
-        $p_time = intval( $activity->timestamp ) + ( Plugin::$instance->settings->get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
-        $cur_time = (int) current_time( 'timestamp' );
-        $time_diff = $p_time - $cur_time;
-        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-            $time = sprintf( _x( "On %s", 'status', 'groundhogg' ), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
-        } else {
-            $time = sprintf( _x( "%s ago", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
-        }
+        $s_time = scheduled_time( $time );
 
-        $html = '<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
-        $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->contact->get_local_time( intval( $activity->timestamp ) ) ), __( 'local time' ) ) . '</i>'; //todo
+        $html = '<abbr title="' . date_i18n( DATE_ISO8601, intval( $time ) ) . '">' . $s_time . '</abbr>';
+        $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->get_contact()->get_local_time( $time ) ), __( 'local time' ) ) . '</i>'; //todo
 
         return $html;
 
@@ -158,13 +131,11 @@ class Contact_Activity_Table extends WP_List_Table {
     protected function column_click( $event )
     {
 
-
         $activity = Plugin::$instance->dbs->get_db('activity')->query( [
-            'funnel_id'     => $event->funnel_id,
-            'step_id'       => $event->get_step_id(),
+            'event_id'      => $event->get_id(),
+            'step_id'       => $event->get_step_id() ,
             'activity_type' => 'email_link_click',
             'contact_id'    => $event->get_contact_id(),
-//            'event_id'      => $event->ID
         ] );
 
         if( empty( $activity ) ){

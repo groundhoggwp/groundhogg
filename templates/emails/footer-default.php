@@ -39,6 +39,14 @@ $footer_css = apply_filters( 'groundhogg/email_template/footer_content_css', [
 ] );
 
 $footer_css = \Groundhogg\array_to_css( $footer_css );
+
+$apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', [
+    'color' => '#999999',
+    'font-size' => '13px',
+    'text-align' => 'center',
+]);
+
+$apple_link = \Groundhogg\array_to_css( $apple_link );
 ?>
                                 <!-- START FOOTER -->
                                 <div class="footer" style="<?php echo $footer; ?>">

@@ -275,7 +275,7 @@ abstract class Admin_Page
         if ( ! $this->get_current_action() || ! $this->verify_action() )
             return;
 
-        $base_url = remove_query_arg( [ '_wpnonce', 'action' ], wp_get_referer() );
+        $base_url = remove_query_arg( [ '_wpnonce', 'action', 'process_queue' ], wp_get_referer() );
 
         $func = sprintf( "process_%s", $this->get_current_action() );
 

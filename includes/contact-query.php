@@ -640,13 +640,13 @@ class Contact_Query {
                 $where['report_type'] = "activity.activity_type = '$type'";
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'event_type' ] ) ){
-                $event_types = implode( ',', ensure_array( $this->query_vars[ 'report' ][ 'event_type' ] ) );
-                $where['report_event_type'] = "activity.event_type IN ( $event_types )";
-            }
+//            if ( !empty( $this->query_vars[ 'report' ][ 'event_type' ] ) ){
+//                $event_types = implode( ',', ensure_array( $this->query_vars[ 'activity' ][ 'event_type' ] ) );
+//                $where['report_event_type'] = "activity.event_type IN ( $event_types )";
+//            }
 
             if ( !empty( $this->query_vars[ 'activity' ][ 'funnel' ] ) ){
-                $funnel_ids = implode( ',', ensure_array( $this->query_vars[ 'report' ][ 'funnel' ] ) );
+                $funnel_ids = implode( ',', ensure_array( $this->query_vars[ 'activity' ][ 'funnel' ] ) );
                 $where['report_funnel'] = "activity.funnel_id IN ( $funnel_ids )";
             }
 

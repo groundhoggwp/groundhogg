@@ -42,7 +42,7 @@ class Notices
             $data = $code->get_error_data();
             $error = $code;
             $code = $error->get_error_code();
-            $message = $error->get_error_message();
+            $message = esc_html($error->get_error_message() );
             $type = 'error';
         }
 

@@ -3,6 +3,7 @@ namespace Groundhogg\Queue;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
@@ -82,24 +83,33 @@ class Event_Queue extends Supports_Errors
         add_action( 'init', array( $this, 'setup_cron_jobs' ) );
         add_action( self::ACTION , array( $this, 'run_queue' ) );
 
-        if ( isset( $_REQUEST[ 'process_queue' ] ) && is_admin() ){
+        if ( get_request_var( 'process_queue' ) && is_admin() ){
             add_action( 'init' , array( $this, 'run_queue_manually' ) );
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function get_queue_execution_time()
     {
-
+        return Plugin::$instance->settings->get_option( 'queue_last_execution_time' );
     }
 
+    /**
+     * @return mixed
+     */
     public function get_last_execution_time()
     {
         return Plugin::$instance->settings->get_option( 'queue_last_execution_time' );
     }
 
+    /**
+     * @return mixed
+     */
     public function get_total_executions()
     {
-
+        return Plugin::$instance->settings->get_option( 'queue_times_executed' );
     }
 
 
@@ -107,7 +117,21 @@ class Event_Queue extends Supports_Errors
      * Run the queue Manually and provide a notice.
      */
     public function run_queue_manually(){
+
+        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'process_queue' ) || ! current_user_can( 'schedule_events' ) ){
+            wp_die( 'Insufficient permissions.' );
+        }
+
         Plugin::$instance->notices->add( 'queue-complete', sprintf( "%d events have been completed in %s seconds.", $this->run_queue(), $this->get_last_execution_time() ) );
+
+        if ( $this->has_errors() ){
+
+            Plugin::$instance->notices->add( 'queue-errors', sprintf( "%d events failed to complete. Please see the following errors.", count( $this->get_errors() ) ), 'warning' );
+
+            foreach ( $this->get_errors() as $error ){
+                Plugin::instance()->notices->add( $error );
+            }
+        }
     }
 
     /**
@@ -332,14 +356,23 @@ class Event_Queue extends Supports_Errors
 
             $event = $this->get_next_event();
             $this->set_current_event( $event );
-            $this->set_current_contact( $event->get_contact() );
+            $contact = $event->get_contact();
+            $this->set_current_contact( $contact );
 
             if ( $event->run() && $event->is_funnel_event() ){
+
                 $next_step = $event->get_step()->get_next_action();
+
                 if ( $next_step instanceof Step && $next_step->is_active() ){
                     $next_step->enqueue( $event->get_contact() );
                 }
+
+            } else {
+                if ( $event->has_errors() ){
+                    $this->add_error( $event->get_last_error() );
+                }
             }
+
             $i++;
         }
 

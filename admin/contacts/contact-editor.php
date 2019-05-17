@@ -3,6 +3,8 @@ namespace Groundhogg\Admin\Contacts;
 
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_form_list;
+use function Groundhogg\get_request_var;
+use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
@@ -42,11 +44,11 @@ use Groundhogg\Step;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$id = intval( $_GET[ 'contact' ] );
+$id = absint( get_request_var( 'contact' ) );
 
 $contact = Plugin::$instance->utils->get_contact( $id );
 
-if ( ! $contact->exists() ) {
+if ( ! $contact || ! $contact->exists() ) {
     wp_die( _x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );
 }
 
@@ -760,7 +762,7 @@ function contact_record_section_custom_meta( $contact ){
             'region_code',
         ] );
 
-        $meta = $contact->get_meta();
+        $meta = $contact->get_all_meta();
 
         foreach ( $meta as $meta_key => $value ):
 
@@ -772,6 +774,9 @@ function contact_record_section_custom_meta( $contact ){
                     </th>
                     <td>
                         <?php
+
+                        $value = is_array( $value ) ? multi_implode( ',', $value ) : $value ;
+
                         if ( strpos( $value, PHP_EOL  ) !== false ){
                             $args = array(
                                 'name' => 'meta[' . $meta_key . ']',

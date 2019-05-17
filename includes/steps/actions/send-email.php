@@ -69,10 +69,9 @@ class Send_Email extends Action
         return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/send-email.png';
     }
 
-    public function scripts(){
+    public function admin_scripts(){
         wp_enqueue_script('groundhogg-funnel-email' );
-
-        wp_localize_script('groundhogg-funnel-email', 'groundhoggEmailStep', array(
+        wp_localize_script('groundhogg-funnel-email', 'EmailStep', array(
             'edit_email_path' => admin_url( 'admin.php?page=gh_emails&action=edit' ),
             'add_email_path' => admin_url( 'admin.php?page=gh_emails&action=add' ),
             'save_changes_prompt' => _x( "You have changes which have not been saved. Are you sure you want to exit?", 'notice', 'groundhogg' ),
@@ -166,10 +165,10 @@ class Send_Email extends Action
         $num_opens = $cquery->query( array(
             'count' => true,
             'activity' => array(
-                'start' => $start_time,
-                'end'   => $end_time,
-                'step'  => $step->get_id(),
-                'funnel'=> $step->get_funnel_id(),
+                'start'  => $start_time,
+                'end'    => $end_time,
+                'step'   => $step->get_id(),
+                'funnel' => $step->get_funnel_id(),
                 'activity_type'  => 'email_opened'
             )
         ) );
@@ -177,10 +176,10 @@ class Send_Email extends Action
         $num_clicks = $cquery->query( array(
             'count' => true,
             'activity' => array(
-                'start' => $start_time,
-                'end'   => $end_time,
-                'step'  => $step->get_id(),
-                'funnel'=> $step->get_funnel_id(),
+                'start'  => $start_time,
+                'end'    => $end_time,
+                'step'   => $step->get_id(),
+                'funnel' => $step->get_funnel_id(),
                 'activity_type'  => 'email_link_click'
             )
         ) );

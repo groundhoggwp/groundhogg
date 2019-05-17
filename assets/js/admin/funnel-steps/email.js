@@ -1,15 +1,31 @@
-var wpghEmailElement = {};
-
-(function (e,$,base) {
-    e = $.extend( e, {
+(function ($,step,modal) {
+    $.extend( step, {
 
         ID: 0,
-        target: null,
+        step: null,
         addingEmail: false,
         editingEmail: false,
         changesSaved: false,
 
-        init: function () {
+        init: function(){
+
+            var self = this;
+
+            $( document ).on( 'click', '.edit-email', function ( e ) {
+                self.step = $(this).closest('.postbox' );
+                self.addingEmail  = false;
+                self.editingEmail = true;
+
+
+
+            } );
+
+        },
+
+        init_old: function () {
+
+            var self = this;
+
             $( document ).on( 'change', '.gh-email-picker', function ( e ) {
                 var link = '#source=' + encodeURIComponent( base.path + '&action=edit&email=' + $(this).val() ) + '&height=900&width=1500' ;
                 e.ID = $(this).val();
@@ -53,7 +69,7 @@ var wpghEmailElement = {};
     } );
 
     $( function () {
-        e.init()
+        step.init()
     } );
 
-})(wpghEmailElement,jQuery,wpghEmailsBase);
+})( jQuery, EmailStep );

@@ -5,6 +5,7 @@ use Groundhogg\Api\Api_Loader;
 use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
 use Groundhogg\Form\Submission_Handler;
+use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Reporting\Reporting;
 use Groundhogg\Steps\Manager as Step_Manager;
 use Groundhogg\Bulk_Jobs\Manager as Bulk_Job_Manager;
@@ -286,7 +287,7 @@ class Plugin {
         $this->bounce_checker = new Bounce_Checker();
         $this->sending_service = new Sending_Service();
 
-//        $this->event_queue  = new Event_Queue();
+        $this->event_queue  = new Event_Queue();
 
         if ( is_admin() ) {
             $this->admin   = new Admin_Menu();

@@ -44,6 +44,11 @@ class Email_Notification implements Event_Process
         $this->email = new Email( $this->ID );
     }
 
+    public function get_id()
+    {
+        return absint( $this->ID );
+    }
+
     /**
      * Send the associated email to the given contact
      *

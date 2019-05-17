@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Events;
 use Groundhogg\Event;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
+use function Groundhogg\scheduled_time;
 use \WP_List_Table;
 
 /**
@@ -56,7 +57,8 @@ class Events_Table extends WP_List_Table {
             'funnel'    => _x( 'Funnel', 'Column label', 'wp-funnels' ),
             'step'      => _x( 'Step', 'Column label', 'wp-funnels' ),
             'time'      => _x( 'Time', 'Column label', 'wp-funnels' ),
-            'errors'    => _x( 'Errors', 'Column label', 'wp-funnels' ),
+            'error_code'    => _x( 'Error Code', 'Column label', 'wp-funnels' ),
+            'error_message' => _x( 'Error Message', 'Column label', 'wp-funnels' ),
         );
 
         return apply_filters( 'wpgh_event_columns', $columns );
@@ -98,7 +100,7 @@ class Events_Table extends WP_List_Table {
             return sprintf( "<strong>(%s)</strong>",  _x( 'contact deleted', 'status', 'groundhogg' ) );
 
         $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
-            admin_url( 'admin.php?page=gh_events&view=contact&contact=' . $event->get_contact_id() ),
+            admin_url( 'admin.php?page=gh_events&contact_id=' . $event->get_contact_id() ),
             $event->get_contact()->get_email()
         );
 
@@ -117,7 +119,7 @@ class Events_Table extends WP_List_Table {
             return sprintf( "<strong>(%s)</strong>", _x( 'funnel deleted', 'status', 'groundhogg' ) );
 
         return sprintf( "<a href='%s'>%s</a>",
-            sprintf( admin_url( 'admin.php?page=gh_events&funnel=%s' ), $event->get_funnel_id() ),
+            sprintf( admin_url( 'admin.php?page=gh_events&funnel_id=%s&event_type=%s' ), $event->get_funnel_id(), $event->get_event_type() ),
             $funnel_title );    }
 
     /**
@@ -132,7 +134,7 @@ class Events_Table extends WP_List_Table {
             return sprintf( "<strong>(%s)</strong>", _x( 'step deleted', 'status', 'groundhogg' ) );
 
         return sprintf( "<a href='%s'>%s</a>",
-            admin_url( 'admin.php?page=gh_events&view=step&step=' . $event->get_step_id() ),
+            admin_url( sprintf( 'admin.php?page=gh_events&step_id=%d&event_type=%s', $event->get_step_id(), $event->get_event_type() ) ),
             $step_title );
 
     }
@@ -143,13 +145,7 @@ class Events_Table extends WP_List_Table {
      */
     protected function column_time( $event )
     {
-        $p_time = Plugin::$instance->utils->date_time->convert_to_local_time( $event->get_time() );
-
-        $cur_time = (int) current_time( 'timestamp' );
-
-        $time_diff = $p_time - $cur_time;
-
-        $status = $event->status;
+        $status = $event->get_status();
 
         switch ( $status ){
             default:
@@ -170,23 +166,9 @@ class Events_Table extends WP_List_Table {
                 break;
         }
 
-        if ( $time_diff < 0 && $status !== 'waiting' ){
-            /* The event has passed */
-            if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = date_i18n( 'Y-m-d \@ h:i A', intval( $p_time ) );
-            } else {
-                $time = sprintf( _x( "%s ago", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
-            }
-        } else {
-            /* the event is scheduled */
-            if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-                $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( 'Y-m-d \@ h:i A', intval( $p_time )  ) );
-            } else {
-                $time = sprintf( _x( "in %s", 'status', 'groundhogg' ), human_time_diff( $p_time, $cur_time ) );
-            }
-        }
+        $time = scheduled_time( $event->get_time() );
 
-        $html = $time_prefix . '&nbsp;<abbr title="' . date_i18n( DATE_ISO8601, intval( $p_time ) ) . '">' . $time . '</abbr>';
+        $html = $time_prefix . '&nbsp;<abbr title="' . date_i18n( DATE_ISO8601, intval( $event->get_time() ) ) . '">' . $time . '</abbr>';
         $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->get_contact()->get_local_time( $event->get_time() ) ), __( 'local time' ) ) . '</i>';
 
         return $html;
@@ -196,9 +178,19 @@ class Events_Table extends WP_List_Table {
      * @param $event Event
      * @return string
      */
-    protected function column_errors($event)
+    protected function column_error_code($event)
     {
-        return $event->get_failure_reason() ? $event->get_failure_reason() : '&#x2014;' ;
+        return $event->get_error_code() ? '<b>'. esc_html( strtolower( $event->get_error_code() ) ) . '</b>' : '&#x2014;' ;
+    }
+
+
+    /**
+     * @param $event Event
+     * @return string
+     */
+    protected function column_error_message($event)
+    {
+        return $event->get_error_message() ? '<b>'. esc_html( strtolower( $event->get_error_message() ) ) . '</b>' : '&#x2014;' ;
     }
 
     protected function extra_tablenav($which)
@@ -208,7 +200,7 @@ class Events_Table extends WP_List_Table {
 
         ?>
         <div class="alignleft gh-actions">
-            <a class="button action" href="<?php echo add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php printf( _x( 'Process Events (Auto Runs In %s)', 'action', 'groundhogg' ), $next_run_in ); ?></a>
+            <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ), 'process_queue' ); ?>"><?php printf( _x( 'Process Events (Auto Runs In %s)', 'action', 'groundhogg' ), $next_run_in ); ?></a>
         </div>
         <?php
     }

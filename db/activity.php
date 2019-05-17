@@ -84,7 +84,7 @@ class Activity extends DB  {
             'contact_id'    => '%d',
             'email_id'      => '%d',
             'event_id'      => '%d',
-            'event_type'    => '%d',
+//            'event_type'    => '%d',
             'activity_type' => '%s',
             'referer'       => '%s',
         ];
@@ -105,7 +105,7 @@ class Activity extends DB  {
             'contact_id'    => 0,
             'email_id'      => 0,
             'event_id'      => 0,
-            'event_type'    => 0,
+//            'event_type'    => 0,
             'activity_type' => '',
             'referer'       => '',
         );
@@ -189,7 +189,6 @@ class Activity extends DB  {
         activity_type VARCHAR(20) NOT NULL,
         email_id bigint(20) unsigned NOT NULL,
         event_id bigint(20) unsigned NOT NULL,
-        event_type int unsigned NOT NULL,
         referer text NOT NULL,
         PRIMARY KEY (ID),
         KEY timestamp (timestamp),

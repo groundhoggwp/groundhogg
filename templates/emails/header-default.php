@@ -90,7 +90,7 @@ $email_title = get_bloginfo( 'name', 'display' );
 
 /* translators: Login screen title. 1: Login screen name, 2: Network or site name */
 $email_title = sprintf( __( '%1$s &lsaquo; %2$s' ), apply_filters( 'groundhogg/email_template/title', 'Email' ), $email_title );
-$email_title = apply_filters( 'groundhogg/email_template/title', $email_title, $title );
+$email_title = apply_filters( 'groundhogg/email_template/title', $email_title );
 
 $is_showing_in_iframe = get_query_var( 'pagenow' ) === 'emails';
 $email_width = $is_showing_in_iframe ? '100%' : $email_width;

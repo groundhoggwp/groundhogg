@@ -154,11 +154,33 @@ class Event extends Base_Object
     }
 
     /**
-     * @return $step Step
+     * @return Step|Email_Notification|SMS_Notification|Broadcast
      */
     public function get_step()
     {
         return $this->step;
+    }
+
+    /**
+     * Get the email of an event.
+     *
+     * @return bool|Email
+     */
+    public function get_email()
+    {
+        switch ( $this->get_event_type() ){
+            case Event::FUNNEL;
+                return new Email( absint( $this->get_step()->get_meta( 'email_id' ) ) );
+                break;
+            case Event::EMAIL_NOTIFICATION;
+                return new Email( $this->get_step()->get_id() );
+                break;
+            case Event::BROADCAST;
+                return new Email( $this->get_step()->get_object_id() );
+                break;
+        }
+
+        return false;
     }
 
     /**

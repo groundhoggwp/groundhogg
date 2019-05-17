@@ -417,35 +417,6 @@ class Tracking
     }
 
     /**
-     * @param $key
-     * @param bool $default
-     *
-     * @return string
-     */
-    private function get_url_var( $key, $default=false )
-    {
-        if ( wp_doing_ajax() ){
-            $url = wp_get_referer();
-
-            $val = wpgh_extract_query_arg( $url, $key );
-
-            if ( $val ){
-                return $val;
-            }
-
-        } else {
-
-            if ( isset_not_empty( $_REQUEST, $key ) ){
-                return sanitize_text_field( wp_unslash( urldecode( $_GET[ $key ] ) ) );
-            }
-
-        }
-
-
-        return $default;
-    }
-
-    /**
      * IF the URL contains UTM variables save them to meta.
      *
      * @return void
@@ -464,11 +435,14 @@ class Tracking
             'utm_term'     => '',
         );
 
-        $utm = wp_parse_args( $_GET, $utm_defaults );
+        $utm = array_intersect_key( $_GET, $utm_defaults );
 
         foreach ( $utm as $utm_var => $utm_val ){
-            if ( $utm_val ){
-                $this->get_current_contact()->update_meta( $utm_var, $utm_val );
+            if ( ! empty( $utm_val ) ){
+                $this->get_current_contact()->update_meta(
+                    $utm_var,
+                    sanitize_text_field( $utm_val )
+                );
             }
         }
     }
@@ -481,15 +455,15 @@ class Tracking
         $event_id = $this->get_tracking_cookie_param( 'event_id' );
         $event = Plugin::$instance->utils->get_event( $event_id );
 
-        if ( ! $event ){
-            if ( $this->doing_open ){
-                /* thanks for coming! */
-                wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
-                die();
-            } else {
-                return;
-            }
-        }
+//        if ( ! $event ){
+//            if ( $this->doing_open ){
+//                /* thanks for coming! */
+//                wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
+//                die();
+//            } else {
+//                return;
+//            }
+//        }
 
         $args = array(
             'timestamp'     => time(),
@@ -504,16 +478,19 @@ class Tracking
 
         //wp_die();
 
-        if ( ! Plugin::$instance->dbs->get_db( 'activity' )->exists( $args ) && Plugin::$instance->dbs->get_db( 'activity' )->add( $args ) ){
+        if ( Plugin::$instance->dbs->get_db( 'activity' )->add( $args ) ){
+
             do_action( 'groundhogg/tracking/email/opened', $this );
+
+            /* only fire if actually doing an open as this may be called by the email_link_clicked method */
+            if ( $this->doing_open ){
+                /* thanks for coming! */
+                wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
+                die();
+            }
         }
 
-        /* only fire if actually doing an open as this may be called by the email_link_clicked method */
-        if ( $this->doing_open ){
-            /* thanks for coming! */
-            wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
-            die();
-        }
+        die();
     }
 
     /**
@@ -530,9 +507,7 @@ class Tracking
         $event = Plugin::$instance->utils->get_event( $event_id );
 
         if ( ! $event ){
-            /* thanks for coming! */
-            wp_redirect( $target );
-            die();
+            wp_die( 'Oops... You may have clicked an expired link, or your cookies may not be enabled.' );
         }
 
         $args = array(
@@ -546,12 +521,15 @@ class Tracking
             'referer'       => $target
         );
 
-        if ( Plugin::$instance->dbs->get_db( 'activity' )->add( $args ) ){
+        if ( get_db( 'activity' )->add( $args ) ){
             do_action( 'groundhogg/tracking/email/click', $this );
+
+            wp_redirect( wp_nonce_url( $target,  -1, 'key' ) );
+            return;
         }
 
-        /* thanks for coming! */
-        wp_redirect( wp_nonce_url( $target,  -1, 'key' ) );
+        // Tracking not available.
+        wp_die( 'Oops... You may have clicked an expired link, or your cookies may not be enabled.' );
     }
 
     /**

@@ -364,8 +364,8 @@ class Contacts_Page extends Admin_Page
         $basic_text_fields = apply_filters( 'groundhogg/contact/update/basic_fields', $basic_text_fields, $contact );
 
         foreach ( $basic_text_fields as $field ){
-            if (isset($_POST[$field]) ) {
-                $contact->update_meta($field, sanitize_text_field(stripslashes($_POST[$field])));
+            if ( get_request_var( $field, false, true ) ) {
+                $contact->update_meta($field, sanitize_text_field(  get_request_var( $field, false, true ) ) );
             }
         }
 

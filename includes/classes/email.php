@@ -440,7 +440,7 @@ class Email extends Base_Object_With_Meta
         if ( Plugin::$instance->settings->get_option('privacy_policy' ) ) {
             $sub[] = sprintf(
                 "<a href='%s'>%s</a>",
-                esc_url( get_permalink( Plugin::$instance->settings->get_option('privacy_policy' ) ) ),
+                esc_url( Plugin::$instance->settings->get_option('privacy_policy' ) ),
                 apply_filters('groundhogg/email/privacy_policy_link_text', __('Privacy Policy', 'groundhogg'))
             );
         }
@@ -448,7 +448,7 @@ class Email extends Base_Object_With_Meta
         if (Plugin::$instance->settings->get_option('terms' ) ) {
             $sub[] = sprintf(
                 "<a href='%s'>%s</a>",
-                esc_url( get_permalink(Plugin::$instance->settings->get_option('terms') ) ),
+                esc_url( Plugin::$instance->settings->get_option('terms') ),
                 apply_filters('groundhogg/email/terms_link_text', __( 'Terms', 'groundhogg' ) )
             );
         }
@@ -700,7 +700,7 @@ class Email extends Base_Object_With_Meta
         $headers = $this->get_headers();
 
         /* Send with API. Do not send with API while in TEST MODE */
-        if ( wpgh_is_email_api_enabled() && ! $this->is_testing() ) {
+        if ( Plugin::$instance->sending_service->is_active_for_email() ) {
             $sent = $this->send_with_gh(
                 $to,
                 $subject,
