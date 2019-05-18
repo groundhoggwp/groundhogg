@@ -105,6 +105,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.11.4 =
+* TWEAKED Field timer now normalizes any custom meta given to ensure it works as intended.
+* FIXED failing security check when submitting forms from the admin screen.
+* FIXED form styling in admin screen.
+
 = 1.3.11.3 =
 * FIXED NAMSPACE constant not allowed in php 5.6, changed to NAME_SPACE for backwards compatibility.
 

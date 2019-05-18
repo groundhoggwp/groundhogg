@@ -393,6 +393,11 @@ class WPGH_Submission
      */
     public function verify()
     {
+
+        if ( current_user_can( 'edit_contacts' ) && is_admin() ){
+            return true;
+        }
+
         if( ! wp_verify_nonce( $_POST[ 'gh_submit_nonce' ], 'gh_submit' ) ) {
             $this->add_error( 'SECURITY_CHECK_FAILED', _x( 'Failed security check.', 'submission_error', 'groundhogg' ) );
             return false;
