@@ -11,6 +11,7 @@ var ButtonBlock = {};
         link: null,
         color: null,
         textColor: null,
+        align: null,
         font: null,
         size: null,
 
@@ -52,6 +53,18 @@ var ButtonBlock = {};
                 editor.getActive().find('a').css('font-size', $(this).val() + 'px' );
             });
 
+            this.align = $( '#button-align' );
+            this.align.on( 'change', function ( e ) {
+
+                // Remove margins compat.
+                var $table = editor.getActive().find( 'table' ).css( {
+                    'margin-right' : 0,
+                    'margin-left' : 0,
+                } );
+
+                editor.getActive().find( 'td').attr( 'align', $(this).val() );
+            });
+
             $(document).on( 'madeActive', function (e, block, blockType ) {
 
                 if ( self.blockType === blockType ){
@@ -75,6 +88,7 @@ var ButtonBlock = {};
             this.text.val( block.find('a').text() );
             this.font.val( block.find('a').css( 'font-family' ).replace(/"/g, '') );
             this.size.val( block.find('a').css( 'font-size' ).replace('px', '') );
+            this.align.val( block.find('td').attr( 'align' ) );
 
         }
 

@@ -375,7 +375,7 @@ class Funnels_Page extends Admin_Page
 
         if ( isset( $_POST[ 'funnel_template' ] ) ){
 
-            include GROUNDHOGG_PATH . 'templates/funnel-templates.php';
+            include GROUNDHOGG_PATH . 'templates/assets/funnel-templates.php';
 
             /* @var $funnel_templates array included from funnel-templates.php */
 
@@ -472,10 +472,8 @@ class Funnels_Page extends Admin_Page
 
     public function get_chart_data()
     {
-        /* Pass funnel ID to get Steps */
-        $steps = Plugin::$instance->dbs->get_db('steps')->query( [
-            'funnel_id' => intval(  $_REQUEST[ 'funnel' ] )
-        ] );
+        $funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
+        $steps = $funnel->get_steps();
 
         $dataset1 = array();
         $dataset2 = array();
@@ -486,8 +484,8 @@ class Funnels_Page extends Admin_Page
 
             $args = array(
                 'report' => array(
-                    'funnel' => intval(  $_REQUEST[ 'funnel' ] ),
-                    'step'   => $step->ID,
+                    'funnel' => $funnel->get_id(),
+                    'step'   => $step->get_id(),
                     'status' => 'complete',
                     'start'  => $this->reporting_start_time,
                     'end'    => $this->reporting_end_time,
@@ -496,7 +494,7 @@ class Funnels_Page extends Admin_Page
 
             $count = count($query->query($args));
 
-            $dataset1[] = array( ( $i + 1 ) .'. '. $step->step_title , $count );
+            $dataset1[] = array( ( $i + 1 ) .'. '. $step->get_title(), $count );
 
             $args = array(
                 'report' => array(
@@ -508,7 +506,7 @@ class Funnels_Page extends Admin_Page
 
             $count = count($query->query($args));
 
-            $dataset2[] = array( ( $i + 1 ) .'. '. $step->step_title , $count );
+            $dataset2[] = array( ( $i + 1 ) .'. '. $step->get_title(), $count );
 
         }
 

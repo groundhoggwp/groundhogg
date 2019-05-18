@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Email;
 use Groundhogg\Preferences;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
@@ -223,6 +224,13 @@ class Send_Email extends Action
     public function save( $step )
     {
         $this->save_setting( 'email_id', absint( $this->get_posted_data( 'add_email_override', $this->get_posted_data( 'email_id' ) ) ) );
+
+        $email = new Email( $this->get_setting( 'email_id' ) );
+
+        if ( $email->is_draft() && $step->get_funnel()->is_active() ){
+            Plugin::$instance->notices->add( 'email_in_draft_mode', __( 'You still have emails in draft mode! These emails will not be sent and will cause automation to stop.' ), 'warning' );
+        }
+
         $this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
     }
 

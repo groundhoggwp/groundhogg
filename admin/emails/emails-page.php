@@ -335,10 +335,8 @@ class Emails_Page extends Admin_Page
         $args[ 'subject' ] = $subject;
         $args[ 'pre_header' ] = $pre_header;
 
-        // Allow RGB
-        add_filter( 'safe_style_css', );
-
-
+        // Convert RGB...
+        $content = Groundhogg\safe_css_filter_rgb_to_hex( $content );
         $args[ 'content' ] = wp_kses_post( $content );
 
         $args[ 'last_updated' ] = current_time( 'mysql' );

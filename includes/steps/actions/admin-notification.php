@@ -88,6 +88,13 @@ class Admin_Notification extends Action
             'description' => __( 'Use any email address or the {owner_email} replacement code.', 'groundhogg' )
         ] );
 
+        $this->add_control( 'reply_to', [
+            'label'         => __( 'Reply To:', 'groundhogg' ),
+            'type'          => HTML::INPUT,
+            'default'       => "{email}",
+            'description'   => __( 'The email address which you can reply to. Use any address or the {email} code.', 'groundhogg' )
+        ] );
+
         $this->add_control( 'subject', [
             'label'         => __( 'Subject:', 'groundhogg' ),
             'type'          => HTML::INPUT,
@@ -132,6 +139,16 @@ class Admin_Notification extends Action
             $this->save_setting( 'send_to', $send_to );
         }
 
+        $reply_to = $this->get_posted_data( 'reply_to' );
+
+        if ( $reply_to ){
+            $reply_to = sanitize_text_field( $reply_to );
+            $emails = array_map( 'trim', explode( ',', $reply_to ) );
+            $email = array_shift( $emails );
+            $reply_to = ( $email === '{email}' )? '{email}' : sanitize_email( $email );
+            $this->save_setting( 'reply_to', $reply_to );
+        }
+
         $this->save_setting( 'subject', sanitize_text_field( $this->get_posted_data( 'subject' ) ) );
         $this->save_setting( 'note_text', sanitize_textarea_field( $this->get_posted_data( 'note_text' ) ) );
     }
@@ -157,6 +174,7 @@ class Admin_Notification extends Action
         $subject = sanitize_text_field( Plugin::$instance->replacements->process( $subject, $contact->get_id() ) );
 
         $send_to = $this->get_setting( 'send_to' );
+        $reply_to = $this->get_setting( 'reply_to', $contact->get_email() );
 
         if ( ! is_email( $send_to ) ){
             $send_to = Plugin::$instance->replacements->process( $send_to, $contact->get_id() );
@@ -168,7 +186,9 @@ class Admin_Notification extends Action
 
         add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
-        $sent =  wp_mail( $send_to, $subject, $finished_note, [] );
+        $sent = wp_mail( $send_to, $subject, $finished_note, [
+            sprintf( 'Reply-To: <%s>', $reply_to )
+        ] );
 
         remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 

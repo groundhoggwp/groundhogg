@@ -14,9 +14,9 @@ use Groundhogg\Plugin;
     <div class="inside">
         <script type="text/javascript">
 
-            var funnelChart;
+            var FunnelChart = {};
 
-            (function ($) {
+            (function ($,chart) {
 
                 var previousPoint = null, previousLabel = null;
 
@@ -57,9 +57,9 @@ use Groundhogg\Plugin;
                     }).appendTo("body").fadeIn(200);
                 }
 
-                funnelChart = {
+                $.extend( chart, {
 
-                    data: <?php echo json_encode( Plugin::$instance->admin->get_page( 'funnels' )->get_chart_data() ); ?>,
+                    data: <?php echo wp_json_encode( Plugin::$instance->admin->get_page( 'funnels' )->get_chart_data() ); ?>,
                     options: {
                         series: {
                             lines: {show: true},
@@ -89,19 +89,19 @@ use Groundhogg\Plugin;
 
                     }
 
-                };
+                } );
 
                 $( '#reporting-toggle' ).on( 'change', function (e) {
 
                     if ( $(this).is( ':checked' ) && ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
 
-                        funnelChart.draw();
+                        chart.draw();
 
                     }
 
                 } );
 
-            })(jQuery);
+            })(jQuery, FunnelChart);
         </script>
         <div id="reporting-chart" style="width: auto;height: 250px"></div>
     </div>

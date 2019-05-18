@@ -28,8 +28,8 @@
 
             $( document ).on( 'click', '.add-email', function ( e ) {
                 self.step = $(this).closest('.postbox' );
-                self.addingEmail  = false;
-                self.editingEmail = true;
+                self.addingEmail  = true;
+                self.editingEmail = false;
 
                 modal.init( 'Edit Email', {
                     source: self.add_email_path,
@@ -52,8 +52,9 @@
                     }
                 }
 
-                if ( e.addingEmail ){
-                    e.target.find( '.add-email-override' ).val( self.newEmailId )
+                if ( self.addingEmail ){
+                    console.log( self.newEmailId );
+                    self.step.find( '.add-email-override' ).val( self.newEmailId )
                 }
 
                 e.addingEmail = false;

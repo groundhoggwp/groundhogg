@@ -70,7 +70,7 @@ class Tracking_Api extends Base
             return self::ERROR_400( 'no_ref', 'Cannot track blank pages...' );
         }
 
-        do_action( 'groundhogg/api/v3/steps/page-view', $ref, $contact );
+        do_action( 'groundhogg/api/v3/tracking/page-view', $ref, $contact );
 
         return self::SUCCESS_RESPONSE();
 
@@ -155,7 +155,7 @@ class Tracking_Api extends Base
             return self::ERROR_200( 'no_double_track', 'Unique views only.', $response );
         }
 
-        do_action( 'groundhogg/api/v3/steps/form-impression' );
+        do_action( 'groundhogg/api/v3/tracking/form-impression' );
 
         unset( $args[ 'start' ] );
         $args[ 'timestamp' ] = time();

@@ -145,18 +145,17 @@
                 // console.log( response.data.notices );
 
                 hideSpinner();
-                //
+
                 $( '#normal-sortables' ).html( response.data.data.steps );
-                //
-                // funnelChart.data = response.data.chartData;
-                //
-                // if( ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
-                //     funnelChart.draw();
-                // }
-                //
+
+                FunnelChart.data = response.data.data.chartData;
+                if( ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
+                    FunnelChart.draw();
+                }
+
                 $( document ).trigger( 'new-step' );
 
-                console.log( response );
+                // console.log( response );
             } );
         },
 

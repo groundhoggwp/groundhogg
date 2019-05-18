@@ -193,15 +193,17 @@
                 handleNotices( response.data.notices );
                 hideSpinner();
 
-                $( '.row' ).wpghToolBar();
+                var content = response.data.data.data.content;
+                $('#email-inside').html( content );
 
+                $( '.row' ).wpghToolBar();
                 if ( self.inFrame() ){
                     parent.EmailStep.changesSaved = true;
                 }
 
                 $( '#send-test' ).val( null );
 
-                console.log( response );
+                // console.log( response );
             } );
         },
 

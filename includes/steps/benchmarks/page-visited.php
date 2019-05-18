@@ -126,9 +126,18 @@ class Page_Visited extends Benchmark
      */
     protected function get_complete_hooks()
     {
-        return [ 'groundhogg/api/v3/steps/page-view' => 2 ];
+        return [ 'groundhogg/api/v3/tracking/page-view' => 2 ];
     }
 
+    /**
+     * @param $ref string
+     * @param $contact Contact
+     */
+    public function setup( $ref, $contact )
+    {
+        $this->add_data( 'url', $ref );
+        $this->add_data( 'contact_id', $contact->get_id() );
+    }
 
 
     /**
@@ -149,5 +158,14 @@ class Page_Visited extends Benchmark
     protected function can_complete_step()
     {
 
+        $match_type = $this->get_setting( 'match_type', 'exact' );
+        $url = $this->get_data( 'url' );
+        $match_url = $this->get_setting( 'url_match' );
+
+        if ( ! $match_url ){
+            return false;
+        }
+
+        return $match_type === 'exact' ?  $match_url === $url : strpos( $match_url, $url ) !== false;
     }
 }

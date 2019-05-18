@@ -142,9 +142,6 @@ function browser_view_footer() {
 }
 
 $email_id = absint( get_query_var( 'email_id' ) );
-
-var_dump( $email_id );
-
 $email = Plugin::$instance->utils->get_email( $email_id );
 
 if ( ! $email ){
