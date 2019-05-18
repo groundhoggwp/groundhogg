@@ -21,7 +21,7 @@ var FormBuilder = {};
             });
 
             $( '#popup-close-footer' ).click( function (e) {
-                if ( self.active ){
+                if ( self.active ){ 
                     self.makeField();
                 }
             });

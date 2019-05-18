@@ -167,11 +167,16 @@ class Tracking
     public function parse_request( $vars )
     {
 
-        $this->map_query_var( $vars, 'contact_id', 'hexdec' );
-        $this->map_query_var( $vars, 'event_id', 'hexdec' );
-        $this->map_query_var( $vars, 'email_id', 'hexdec' );
-        $this->map_query_var( $vars, 'target_url', 'urldecode' );
-        $this->map_query_var( $vars, 'target_url', 'base64_decode' );
+//        var_dump( $vars );
+//        wp_die();
+
+        if ( get_array_var( $vars, 'pagenow' ) === 'tracking' ){
+            $this->map_query_var( $vars, 'contact_id', 'hexdec' );
+            $this->map_query_var( $vars, 'event_id', 'hexdec' );
+            $this->map_query_var( $vars, 'email_id', 'hexdec' );
+            $this->map_query_var( $vars, 'target_url', 'urldecode' );
+            $this->map_query_var( $vars, 'target_url', 'base64_decode' );
+        }
 
         return $vars;
     }
@@ -455,15 +460,15 @@ class Tracking
         $event_id = $this->get_tracking_cookie_param( 'event_id' );
         $event = Plugin::$instance->utils->get_event( $event_id );
 
-//        if ( ! $event ){
-//            if ( $this->doing_open ){
-//                /* thanks for coming! */
-//                wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
-//                die();
-//            } else {
-//                return;
-//            }
-//        }
+        if ( ! $event || ! $event->exists() ){
+            if ( $this->doing_open ){
+                /* thanks for coming! */
+                wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
+                die();
+            } else {
+                return;
+            }
+        }
 
         $args = array(
             'timestamp'     => time(),
@@ -507,6 +512,13 @@ class Tracking
         $event = Plugin::$instance->utils->get_event( $event_id );
 
         if ( ! $event ){
+
+            // Assume testing...
+            if ( is_user_logged_in() ){
+                wp_redirect( wp_nonce_url( $target,  -1, 'key' ) );
+                return;
+            }
+
             wp_die( 'Oops... You may have clicked an expired link, or your cookies may not be enabled.' );
         }
 

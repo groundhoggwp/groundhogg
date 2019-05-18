@@ -86,6 +86,11 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                     <span class="spinner" style="float: left"></span>
                     <?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ); ?>
                     <?php submit_button( __( 'Update & Test', 'groundhogg' ), 'secondary', 'update_and_test', false ); ?>
+                    <?php echo Plugin::$instance->utils->html->input( [
+                        'type' => 'hidden',
+                        'id' => 'send-test',
+                        'name' => 'update_and_test'
+                    ] ); ?>
                 </div>
             </div>
         </div>

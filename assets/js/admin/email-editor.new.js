@@ -49,6 +49,10 @@
             self.actions = $( '#editor-panel' );
             self.settings = $( '#settings-panel' );
 
+            $( '#update_and_test' ).click( function (e) {
+                $( '#send-test' ).val( 'yes' );
+            });
+
             self.editor.on( 'click', function (e) {
                 e.preventDefault();
                 self.feed( e.target );
@@ -127,7 +131,7 @@
             }).change();
 
             this.sidebar = new StickySidebar( '#postbox-container-1' , {
-                topSpacing: 78,
+                topSpacing: self.inFrame() ? 47 : 78,
                 bottomSpacing: 0
             });
 
@@ -194,6 +198,8 @@
                 if ( self.inFrame() ){
                     parent.EmailStep.changesSaved = true;
                 }
+
+                $( '#send-test' ).val( null );
 
                 console.log( response );
             } );

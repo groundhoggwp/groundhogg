@@ -17,12 +17,13 @@ var GroundhoggModal = {};
 		source: null,
         frameUrl: '',
         args: {},
+        defaults: {},
 
 		init: function ( title, href ) {
 
     	    var self=this;
 
-    	    this.args = defaults;
+    	    Object.assign( this.args, defaults );
 
     	    // console.log( href );
 
@@ -31,8 +32,6 @@ var GroundhoggModal = {};
             } else {
     	        this.args = $.extend( defaults, href );
             }
-
-    	    console.log( this.args );
 
     		this.overlay = $( '.popup-overlay' );
     		this.window  = $( '.popup-window' );

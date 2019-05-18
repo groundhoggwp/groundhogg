@@ -334,6 +334,11 @@ class Emails_Page extends Admin_Page
         $args[ 'status' ] = $status;
         $args[ 'subject' ] = $subject;
         $args[ 'pre_header' ] = $pre_header;
+
+        // Allow RGB
+        add_filter( 'safe_style_css', );
+
+
         $args[ 'content' ] = wp_kses_post( $content );
 
         $args[ 'last_updated' ] = current_time( 'mysql' );
@@ -359,10 +364,12 @@ class Emails_Page extends Admin_Page
 
             if ( $contact->exists() ){
 
+                $email->enable_test_mode();
+
                 $sent = $email->send( $contact );
 
                 if ( ! $sent || is_wp_error( $sent ) ){
-                    return is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test:" );
+                    return is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test." );
                 } else {
                     $this->add_notice(
                         esc_attr( 'sent-test' ),
@@ -374,7 +381,7 @@ class Emails_Page extends Admin_Page
                 }
 
             } else {
-                return new \WP_Error( 'oops', __( 'Failed to send test: No user selected. PLease select a user to send the test to.', 'groundhogg' ) );
+                return new \WP_Error( 'oops', __( 'Failed to send test: No user selected. Please select a user to send the test to.', 'groundhogg' ) );
             }
         }
 

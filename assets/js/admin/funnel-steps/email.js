@@ -21,6 +21,7 @@
                     source: self.edit_email_path + '&email=' + self.getEmailId(),
                     width: 1500,
                     height: 900,
+                    footertext: modal.defaults.footertext
                 } );
 
             } );
@@ -34,6 +35,7 @@
                     source: self.add_email_path,
                     width: 1500,
                     height: 900,
+                    footertext: modal.defaults.footertext
                 } );
 
             } );

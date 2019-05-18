@@ -111,6 +111,7 @@ class Send_Email extends Action
                 'text'      => _x( 'Edit Email', 'action', 'groundhogg' ),
                 'class'     => 'button button-primary edit-email',
             ] ),
+            '&nbsp;',
             // ADD NEW EMAIL
             $html->button( [
                 'title'     => 'Create New Email',
