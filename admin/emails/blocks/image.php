@@ -74,7 +74,6 @@ class Image extends Block
                 'type'  => 'link_picker',
                 'label' => __( 'Link' ),
                 'atts'  => array(
-                    'class' => 'input',
                     'id'    => 'image-link',
                     'name'  => 'image-link',
                 ),

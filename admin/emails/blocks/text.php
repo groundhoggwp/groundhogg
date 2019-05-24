@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Admin\Emails\Blocks;
 
+use Groundhogg\Plugin;
+
 /**
  * Text block
  *
@@ -121,6 +123,49 @@ class Text extends Block
         wp_enqueue_script( 'groundhogg-email-text' );
     }
 
+    /**
+     * Build the settings panel for the block
+     */
+    public function settings_panel()
+    {
+
+        $block_settings = $this->register_settings();
+
+        $html = sprintf( '<div id="%1$s-block-editor" data-block-settings="%1$s" class="postbox hidden">', $this->get_name() );
+        $html.= sprintf( "<h3 class=\"hndle\">%s</h3>", $this->get_title() );
+        $html.= "<div class=\"inside\"><div class=\"options\">";
+
+        $html.= Plugin::$instance->utils->html->editor( [ 'id' => 'text-content', 'settings' => [ 'media_buttons' => false ] ] );
+
+        $html.= "<table class=\"form-table\">";
+
+        foreach ( $block_settings as $i => $settings ){
+
+            if ( isset( $settings[ 'type' ] ) && method_exists( Plugin::$instance->utils->html, $settings[ 'type' ] ) ){
+
+                $html .= "<tr>";
+
+                if ( isset( $settings[ 'label' ] ) ){
+
+                    $html .= sprintf( "<th>%s</th>", $settings[ 'label' ] );
+
+                }
+
+                $html .= sprintf( "<td>%s</td>", call_user_func( array( Plugin::$instance->utils->html, $settings[ 'type' ] ), $settings[ 'atts' ] ) );
+
+                $html .= "</tr>";
+
+            }
+
+        }
+
+        $html .= '</table>';
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+
+        echo $html;
+    }
 
     /**
      * Return the inner html of the block

@@ -12,6 +12,11 @@ use Groundhogg\Reporting\Reports\Contacts_By_Region;
 use Groundhogg\Reporting\Reports\Contacts_By_Search_Engine;
 use Groundhogg\Reporting\Reports\Contacts_By_Social_Media;
 use Groundhogg\Reporting\Reports\Contacts_By_Source_Page;
+use Groundhogg\Reporting\Reports\Emails_Clicked;
+use Groundhogg\Reporting\Reports\Emails_Opened;
+use Groundhogg\Reporting\Reports\Emails_Sent;
+use Groundhogg\Reporting\Reports\Last_Broadcast;
+use Groundhogg\Reporting\Reports\New_Contacts;
 use Groundhogg\Reporting\Reports\Report;
 
 /**
@@ -229,6 +234,11 @@ class Reporting
             new Contacts_By_Social_Media(),
             new Contacts_By_Lead_Source(),
             new Contacts_By_Source_Page(),
+            new Last_Broadcast(),
+            new New_Contacts(),
+            new Emails_Sent(),
+            new Emails_Opened(),
+            new Emails_Clicked(),
         ];
 
         $reports = apply_filters( 'groundhogg/reporting/reports/', $reports );

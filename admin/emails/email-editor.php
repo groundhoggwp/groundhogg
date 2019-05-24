@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Emails;
 
+use Groundhogg\Email_Parser;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
 
@@ -217,7 +218,7 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
 
                                     foreach ( $blocks as $block_type => $block ):
 
-                                    if ( ( $i % 2 ) == 0 ):
+                                    if ( ( $i % 3 ) == 0 ):
                                     ?></tr><tr><?php
                                     endif;
 

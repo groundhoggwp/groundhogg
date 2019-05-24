@@ -180,6 +180,21 @@ class Contacts_Page extends Admin_Page
         }
     }
 
+    protected function get_title_actions()
+    {
+        return [
+            [
+                'link' => $this->admin_url( [ 'action' => 'add' ] ),
+                'action' => __( 'Add New', 'groundhogg' ),
+                'target' => '_self',
+            ],
+            [
+                'link' => Plugin::$instance->admin->tools->admin_url( [ 'tab' => 'import', 'action' => 'add' ] ),
+                'action' => __( 'Import', 'groundhogg' ),
+                'target' => '_self',
+            ],
+        ];
+    }
 
     /**
      * Create a contact via the admin area

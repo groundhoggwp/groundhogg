@@ -209,6 +209,25 @@ class HTML
         ?></tbody></table><?php
     }
 
+    /**
+     * @param array $args
+     * @return string
+     */
+    public function editor( $args = [] )
+    {
+        $args = wp_parse_args( $args, [
+            'id' => '',
+            'content' => '',
+            'settings' => []
+        ] );
+
+        ob_start();
+
+        wp_editor( $args[ 'content' ], $args[ 'id' ], $args[ 'settings' ] );
+
+       return ob_get_clean();
+    }
+
 	/**
 	 * Output a simple input field
 	 *

@@ -75,7 +75,22 @@ abstract class DB {
         $this->version     = $this->get_db_version();
         $this->charset     = $this->get_charset_collate();
 
+        add_action( 'plugins_loaded',           [ $this, 'register_table' ] );
+        add_action( 'groundhogg/activating',    [ $this, 'register_table' ] );
+
         $this->add_additional_actions();
+    }
+
+    /**
+     * Register the table with $wpdb so the metadata api can find it
+     *
+     * @access  public
+     * @since   2.6
+     */
+    public function register_table() {
+        global $wpdb;
+        $wpdb->__set( $this->get_object_type() . 's', $this->get_table_name() );
+        $wpdb->tables[] = $this->get_db_suffix();
     }
 
     /**
@@ -203,6 +218,10 @@ abstract class DB {
                             $ORS[] = $item;
                         }
 
+                    }
+
+                    if ( empty( $ORS ) ){
+                        $ORS[] = 0;
                     }
 
                     $where[] = "$key IN (" . implode( ',', $ORS ) . ")";

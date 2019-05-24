@@ -103,6 +103,13 @@ class Manager
     }
 
     /**
+     * @return DB[]|Meta_DB[]
+     */
+    public function get_dbs(){
+        return $this->dbs;
+    }
+
+    /**
      * Magic get method
      *
      * @param $key string

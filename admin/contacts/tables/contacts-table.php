@@ -66,7 +66,7 @@ class Contacts_Table extends WP_List_Table {
             'owner_id'      => _x( 'Owner', 'Column label', 'groundhogg' ),
             'date_created'  => _x( 'Date', 'Column label', 'groundhogg' ),
         );
-        return apply_filters( 'wpgh_contact_columns', $columns );
+        return apply_filters( 'groundhogg_contact_columns', $columns );
     }
     /**
      * Get a list of sortable columns. The format is:
@@ -86,7 +86,7 @@ class Contacts_Table extends WP_List_Table {
             'owner_id'      => array( 'owner_id', false ),
             'date_created'  => array( 'date_created', false )
         );
-        return apply_filters( 'wpgh_contact_sortable_columns', $sortable_columns );
+        return apply_filters( 'groundhogg_contact_sortable_columns', $sortable_columns );
     }
 
     /**
@@ -185,7 +185,7 @@ class Contacts_Table extends WP_List_Table {
      */
     protected function column_default( $contact, $column_name ) {
 
-        do_action( 'wpgh_contacts_custom_column', $contact, $column_name );
+        do_action( 'groundhogg_contacts_custom_column', $contact, $column_name );
 
         return '';
     }
@@ -223,7 +223,7 @@ class Contacts_Table extends WP_List_Table {
         }
 
 
-        return apply_filters( 'wpgh_contact_bulk_actions', $actions );
+        return apply_filters( 'groundhogg_contact_bulk_actions', $actions );
     }
 
     protected function get_view()
@@ -299,7 +299,7 @@ class Contacts_Table extends WP_List_Table {
         $this->query = $query;
         $data = $c_query->query( $query );
 
-        set_transient( 'wpgh_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
+        set_transient( 'groundhogg_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
 
         /**
          * Sort the data
@@ -409,7 +409,7 @@ class Contacts_Table extends WP_List_Table {
             __( 'Delete' )
         );
 
-        return $this->row_actions( apply_filters( 'wpgh_contact_row_actions', $actions, $contact, $column_name ) );
+        return $this->row_actions( apply_filters( 'groundhogg_contact_row_actions', $actions, $contact, $column_name ) );
     }
 
     /**

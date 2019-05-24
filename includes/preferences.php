@@ -201,6 +201,12 @@ class Preferences
         return Plugin::$instance->settings->is_option_enabled( 'strict_confirmation' );
     }
 
+    public function get_grace_period()
+    {
+        return Plugin::$instance->settings->get_option( 'confirmation_grace_period', 14 );
+    }
+
+
     /**
      * Return whether the given contact is within the strict confirmation grace period
      *
@@ -212,7 +218,7 @@ class Preferences
 
         $contact = Plugin::instance()->utils->get_contact( $id_or_email );
 
-        $grace = absint( Plugin::$instance->settings->get_option( 'confirmation_grace_period', 14 ) ) * 24 * HOUR_IN_SECONDS;
+        $grace = absint( $this->get_grace_period() ) * 24 * HOUR_IN_SECONDS;
 
         $base = absint( $contact->last_optin );
 

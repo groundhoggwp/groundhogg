@@ -22,6 +22,35 @@ class Date_Time
         return $offset;
     }
 
+    /**
+     * @param $time
+     * @param bool $diff
+     * @return bool|int
+     */
+    function round_to( $time, $diff=false )
+    {
+        $leftover = $time % $diff;
+
+        $time -= $leftover;
+
+        if ($leftover >= ( $diff / 2 ) ) $time += $diff;
+
+        // Handle MONTH conversion.
+        if ( $diff === MONTH_IN_SECONDS ){
+            $time = strtotime( date( 'Y-m-01', $time ) );
+        }
+
+        if ( $diff === HOUR_IN_SECONDS ){
+            $time = strtotime( date( 'Y-m-d H:00:00', $time ) );
+        }
+
+        if ( $diff === DAY_IN_SECONDS ){
+            $time = strtotime( date( 'Y-m-d 00:00:00', $time ) );
+        }
+
+        return $time;
+    }
+
 
     /**
      * Round time to the nearest hour.
@@ -30,14 +59,7 @@ class Date_Time
      * @return int
      */
     function round_to_hour( $time ){
-
-        $minutes = $time % HOUR_IN_SECONDS; # pulls the remainder of the hour.
-
-        $time -= $minutes; # just start off rounded down.
-
-        if ($minutes >= ( HOUR_IN_SECONDS / 2 ) ) $time += HOUR_IN_SECONDS; # add one hour if 30 mins or higher.
-
-        return $time;
+        return $this->round_to( $time, HOUR_IN_SECONDS );
     }
 
     /**
@@ -47,14 +69,7 @@ class Date_Time
      * @return int
      */
     function round_to_day( $time ){
-
-        $hours = $time % DAY_IN_SECONDS; # pulls the remainder of the hour.
-
-        $time -= $hours; # just start off rounded down.
-
-        if ($hours >= ( DAY_IN_SECONDS / 2 ) ) $time += DAY_IN_SECONDS; # add one day if 12 hours or higher.
-
-        return $time;
+        return $this->round_to( $time, DAY_IN_SECONDS );
     }
 
     /**

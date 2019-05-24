@@ -29,8 +29,6 @@ class Shortcodes
         add_shortcode( 'gh_form', [ $this, 'custom_form_shortcode' ] );
         add_shortcode( 'gh_replacements', [ $this, 'merge_replacements_shortcode' ] );
         add_shortcode( 'ghr', [ $this, 'merge_replacements_shortcode' ] );
-
-
         add_shortcode( 'gh_contact', 'contact_replacement_shortcode' );
         add_shortcode( 'gh_is_contact', 'is_contact_shortcode' );
         add_shortcode( 'gh_is_not_contact', 'is_not_contact_shortcode' );
@@ -76,12 +74,12 @@ class Shortcodes
      */
     public function merge_replacements_shortcode( $atts, $content = '' )
     {
-        $contact = WPGH()->tracking->get_contact();
+        $contact = Plugin::$instance->tracking->get_current_contact();
 
         if ( ! $contact )
             return '';
 
-        return WPGH()->replacements->process( do_shortcode( $content ), $contact->ID );
+        return Plugin::$instance->replacements->process( do_shortcode( $content ), $contact->ID );
     }
     
     /**
@@ -93,14 +91,14 @@ class Shortcodes
             'field' => 'first'
         ), $atts );
 
-        $contact = WPGH()->tracking->get_contact();
+        $contact = Plugin::$instance->tracking->get_current_contact();
 
         if ( ! $contact )
             return __( 'Friend', 'groundhogg' );
 
         $content = sprintf( '{%s}', $a[ 'field' ] );
 
-        return WPGH()->replacements->process( $content, $contact->ID );
+        return Plugin::$instance->replacements->process( $content, $contact->ID );
     }
     
     /**
@@ -112,7 +110,7 @@ class Shortcodes
      */
     function is_contact_shortcode( $atts, $content )
     {
-        $contact = WPGH()->tracking->get_contact();
+        $contact = Plugin::$instance->tracking->get_current_contact();
 
         if ( $contact ) {
             return do_shortcode( $content );
@@ -130,7 +128,7 @@ class Shortcodes
      */
     function is_not_contact_shortcode( $atts, $content )
     {
-        $contact = WPGH()->tracking->get_contact();
+        $contact = Plugin::$instance->tracking->get_current_contact();
 
         if ( $contact ) {
             return '';
@@ -157,7 +155,7 @@ class Shortcodes
         $tags = array_map( 'trim', $tags );
         $tags = array_map( 'intval', $tags );
 
-        $contact = WPGH()->tracking->get_contact();
+        $contact = Plugin::$instance->tracking->get_current_contact();
 
         if ( ! $contact ) {
             return '';
@@ -206,7 +204,7 @@ class Shortcodes
         $tags = array_map( 'trim', $tags );
         $tags = array_map( 'intval', $tags );
 
-        $contact = WPGH()->tracking->get_contact();
+        $contact = Plugin::$instance->tracking->get_current_contact();
 
         if ( ! $contact ) {
             return '';

@@ -111,7 +111,7 @@ class Tools_Page extends Tabbed_Admin_Page
 
         if ( $this->get_current_tab() === 'export' ){
             $actions[] = [
-//                'link'      => $this->exporter->get_start_url(), //todo enable
+                'link'      => $this->exporter->get_start_url(), //todo enable
                 'action'    => __( 'Export All Contacts' ),
             ];
         }
@@ -163,7 +163,7 @@ class Tools_Page extends Tabbed_Admin_Page
                 <h2 class="hndle"><?php _e( 'Download System Info', 'groundhogg' ); ?></h2>
                 <div class="inside">
                     <p class="description"><?php _e( 'Download System Info when requesting support.', 'groundhogg' ); ?></p>
-                    <textarea class="code" style="width: 100%;height:600px;" readonly="readonly" onclick="this.focus(); this.select()" id="system-info-textarea" name="wpgh-sysinfo"><?php echo wpgh_tools_sysinfo_get(); ?></textarea>
+                    <textarea class="code" style="width: 100%;height:600px;" readonly="readonly" onclick="this.focus(); this.select()" id="system-info-textarea" name="sysinfo"><?php echo groundhogg_tools_sysinfo_get(); ?></textarea>
                     <p class="submit">
                         <a class="button button-primary" href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php _e( 'Download System Info', 'groundhogg' ); ?></a>
                     </p>

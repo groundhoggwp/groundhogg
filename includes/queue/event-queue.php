@@ -93,7 +93,7 @@ class Event_Queue extends Supports_Errors
      */
     public function get_queue_execution_time()
     {
-        return Plugin::$instance->settings->get_option( 'queue_last_execution_time' );
+        return Plugin::$instance->settings->get_option( 'average_execution_time' );
     }
 
     /**

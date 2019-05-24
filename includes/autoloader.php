@@ -50,6 +50,7 @@ class Autoloader {
         'GH_SS_Mailer'  => 'includes/gh-ss-mailer.php',
         'HTML'          => 'includes/utils/html.php',
         'Utils'         => 'includes/utils/utils.php',
+        'Email_Parser'  => 'includes/utils/email-parser.php',
         'Files'         => 'includes/utils/files.php',
         'Location'      => 'includes/utils/location.php',
         'Updater'       => 'includes/utils/updater.php',

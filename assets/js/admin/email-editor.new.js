@@ -142,7 +142,6 @@
             var $email = $('#email-content');
             $('wpgh-toolbar').remove();
             $email.find('div').removeAttr( 'contenteditable' ).removeClass( 'active' );
-            TextBlock.destroyEditor();
         },
 
         /**

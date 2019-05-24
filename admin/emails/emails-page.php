@@ -206,7 +206,7 @@ class Emails_Page extends Admin_Page
             'success'
         );
 
-        return true;
+        return false;
     }
 
     public function process_empty_trash()
@@ -231,7 +231,7 @@ class Emails_Page extends Admin_Page
             'success'
         );
 
-        return true;
+        return false;
     }
 
     public function process_delete()
@@ -255,7 +255,7 @@ class Emails_Page extends Admin_Page
             'success'
         );
 
-        return true;
+        return false;
     }
 
     public function process_trash()
@@ -277,7 +277,7 @@ class Emails_Page extends Admin_Page
             'success'
         );
 
-        return true;
+        return false;
     }
 
     public function update_email_ajax()
@@ -329,15 +329,12 @@ class Emails_Page extends Admin_Page
 
         $subject = sanitize_text_field( Groundhogg\get_request_var( 'subject' ) );
         $pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );
-        $content =  apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'content' ) );
+        $content = apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'content' ) );
 
         $args[ 'status' ] = $status;
         $args[ 'subject' ] = $subject;
         $args[ 'pre_header' ] = $pre_header;
-
-        // Convert RGB...
-        $content = Groundhogg\safe_css_filter_rgb_to_hex( $content );
-        $args[ 'content' ] = wp_kses_post( $content );
+        $args[ 'content' ] = $content;
 
         $args[ 'last_updated' ] = current_time( 'mysql' );
         $args[ 'is_template' ] = key_exists( 'save_as_template', $_POST ) ? 1 : 0;

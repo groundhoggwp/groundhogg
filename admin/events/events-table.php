@@ -4,6 +4,8 @@ namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Event;
 use function Groundhogg\get_db;
+use function Groundhogg\get_request_var;
+use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use function Groundhogg\scheduled_time;
 use \WP_List_Table;
@@ -61,7 +63,7 @@ class Events_Table extends WP_List_Table {
             'error_message' => _x( 'Error Message', 'Column label', 'wp-funnels' ),
         );
 
-        return apply_filters( 'wpgh_event_columns', $columns );
+        return apply_filters( 'groundhogg_event_columns', $columns );
     }
 
     /**
@@ -80,7 +82,7 @@ class Events_Table extends WP_List_Table {
             'step'      => array( 'step_id', false ),
             'time'      => array( 'time', false ),
         );
-        return apply_filters( 'wpgh_event_sortable_columns', $sortable_columns );
+        return apply_filters( 'groundhogg_event_sortable_columns', $sortable_columns );
     }
 
     public function single_row($item)
@@ -195,7 +197,7 @@ class Events_Table extends WP_List_Table {
 
     protected function extra_tablenav($which)
     {
-        $next_run_in = wp_next_scheduled( 'wpgh_process_queue' );
+        $next_run_in = wp_next_scheduled( 'groundhogg_process_queue' );
         $next_run_in = human_time_diff( time(), $next_run_in );
 
         ?>
@@ -213,7 +215,7 @@ class Events_Table extends WP_List_Table {
      */
     protected function column_default( $event, $column_name ) {
 
-        do_action( 'wpgh_events_custom_column', $event, $column_name );
+        do_action( 'groundhogg_events_custom_column', $event, $column_name );
 
         return '';
 
@@ -244,17 +246,17 @@ class Events_Table extends WP_List_Table {
 	        'cancel' => _x( 'Cancel', 'List table bulk action', 'wp-funnels' ),
         );
 
-        return apply_filters( 'wpgh_event_bulk_actions', $actions );
+        return apply_filters( 'groundhogg_event_bulk_actions', $actions );
     }
 
     protected function get_view()
     {
-        return ( isset( $_GET['view'] ) )? $_GET['view'] : 'all';
+        return ( isset( $_GET['status'] ) )? $_GET['status'] : 'waiting';
     }
 
     protected function get_views()
     {
-        $base_url = admin_url( 'admin.php?page=gh_events&view=status&status=' );
+        $base_url = admin_url( 'admin.php?page=gh_events&status=' );
 
         $view = $this->get_view();
 
@@ -267,11 +269,10 @@ class Events_Table extends WP_List_Table {
         );
 
         return apply_filters( 'gh_event_views', array(
-            'all'       => "<a class='" . ($view === 'all' ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_events' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('. array_sum($count) . ')</span>' . "</a>",
             'waiting'   => "<a class='" . ($view === 'waiting' ? 'current' : '') . "' href='" . $base_url . "waiting" . "'>" . _x( 'Waiting', 'view', 'groundhogg' ) . ' <span class="count">('.$count['waiting'].')</span>' . "</a>",
+            'completed' => "<a class='" . ($view === 'complete' ? 'current' : '') . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ). ' <span class="count">('.$count['completed'].')</span>' . "</a>",
             'skipped'   => "<a class='" . ($view === 'skipped' ? 'current' : '') . "' href='" . $base_url . "skipped" . "'>" . _x( 'Skipped','view','groundhogg') . ' <span class="count">('.$count['skipped'].')</span>' . "</a>",
             'cancelled' => "<a class='" . ($view === 'cancelled' ? 'current' : '') . "' href='" . $base_url . "cancelled" . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) .' <span class="count">('.$count['cancelled'].')</span>' . "</a>",
-            'completed' => "<a class='" . ($view === 'completed' ? 'current' : '') . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ). ' <span class="count">('.$count['completed'].')</span>' . "</a>",
             'failed' => "<a class='" . ($view === 'failed' ? 'current' : '') . "' href='" . $base_url . "failed" . "'>" . _x( 'Failed', 'view', 'groundhogg' ). ' <span class="count">('.$count['failed'].')</span>' . "</a>"
         ) );
     }
@@ -296,7 +297,19 @@ class Events_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $data = get_db( 'events' )->query( $_GET );
+        $query = $_GET;
+
+        unset( $query[ 'page' ] );
+
+        if ( isset_not_empty( $_GET, 's' ) ){
+            $query[ 'search' ] = get_request_var( 's' );
+        }
+
+        if ( empty( $query ) ){
+            $query[ 'status' ] = Event::WAITING;
+        }
+
+        $data = get_db( 'events' )->query( $query );
 
         /*
          * Sort the data
@@ -416,7 +429,7 @@ class Events_Table extends WP_List_Table {
         }
 
 
-        return $this->row_actions( apply_filters( 'wpgh_event_row_actions', $actions, $event, $column_name ) );
+        return $this->row_actions( apply_filters( 'groundhogg_event_row_actions', $actions, $event, $column_name ) );
     }
 
 

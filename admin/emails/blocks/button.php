@@ -43,7 +43,6 @@ class Button extends Block
                 'type'  => 'input',
                 'label' => __( 'Button Text' ),
                 'atts'  => array(
-                    'class' => 'input',
                     'id'    => 'button-text',
                     'name'  => 'button-text',
                 ),
@@ -52,7 +51,6 @@ class Button extends Block
                 'type'  => 'link_picker',
                 'label' => __( 'Button Link' ),
                 'atts'  => array(
-                    'class' => 'input',
                     'id'    => 'button-link',
                     'name'  => 'button-link',
                 ),

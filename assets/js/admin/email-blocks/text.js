@@ -12,7 +12,7 @@ var TextBlock = {};
         h1Size: null,
         h2Font: null,
         h2Size: null,
-        richText: null,
+        editor: null,
 
         init : function () {
 
@@ -20,12 +20,12 @@ var TextBlock = {};
 
             this.pFont  = $( '#p-font' );
             this.pFont.on( 'change', function ( e ) {
-                editor.getActive().find('.simple-editor-content').css('font-family', $(this).val() );
+                editor.getActive().find( 'p' ).parent().css('font-family', $(this).val() );
             });
 
             this.pSize  = $( '#p-size' );
             this.pSize.on( 'change', function ( e ) {
-                editor.getActive().find('.simple-editor-content').css('font-size', $(this).val() + 'px' );
+                editor.getActive().find( 'p' ).parent().css('font-size', $(this).val() + 'px' );
             });
 
             this.h1Font = $( '#h1-font' );
@@ -49,93 +49,55 @@ var TextBlock = {};
             });
 
             $(document).on( 'madeActive', function (e, block, blockType ) {
-
-                self.destroyEditor();
                 if ( self.blockType === blockType ){
                     self.parse( block );
                 }
-
             });
 
-            $(document).on( 'madeInactive', function ( e ) {self.destroyEditor();});
-            $(document).on( 'duplicateBlock', function ( e ) {self.destroyEditor();});
-
         },
 
-        createEditor: function (){
+        setupEditor: function()
+        {
+            var self = this;
 
-            this.richText = editor.getActive().find('.content-wrapper');
-            this.richText.simpleEditor({
-                defaultParagraphSeparator: 'p',
-                actions: ["bold", "italic", "underline", "color", "strikethrough", "responsiveAlign", "alignLeft", "alignCenter", "alignRight", "alignJustify", "responsiveHeadings", "heading1", "heading2", "olist", "ulist", "paragraph", "link", "unlink"]
+            self.editor = tinyMCE.get( 'text-content' );
+            self.editor.on( 'change input', function () {
+                editor.getActive().find( 'p' ).parent().html( self.editor.getContent() );
+                self.parse( editor.getActive(), false );
             });
-
-            this.placeActionBar();
-
-            $(document).scroll( function (e) {
-                block.placeActionBar();
-            } );
-
         },
 
-        placeActionBar: function(){
-            var $actionBAr = $( '.simple-editor-actionbar' );
-            $actionBAr.width( $( '#email-body' ).width() );
-
-            var yoffset;
-            var xoffset;
-
-            if ( ! editor.inFrame() ){
-                yoffset = 32;
-                xoffset = 160;
-            } else {
-                xoffset = 0;
-                yoffset = 0;
-            }
-
-            // $actionBAr.css( 'top', $( '#editor' ).offset().top - offset );
-            if ( window.pageYOffset > $( '#editor' ).offset().top - ( 48 + yoffset ) ){
-                $actionBAr.css( 'position', 'fixed' );
-                $actionBAr.css( 'top',  ( 46 + yoffset ) + 'px');
-                $actionBAr.css( 'left', xoffset + 'px' );
-            } else {
-                $actionBAr.css( 'position', 'absolute' );
-                $actionBAr.css( 'top', $( '#editor' ).offset().top - yoffset );
-                $actionBAr.css( 'left', 0 );
-            }
-
-        },
-
-        destroyEditor: function(){
-            if ( this.richText ){
-                this.richText.simpleEditor().destroy();
-                this.richText = null;
-            }
-        },
 
         /**
          * A jquery implement block.
          *
          * @param block $
+         * @param parseContent
          */
-        parse: function ( block ) {
+        parse: function ( block, parseContent=true ) {
 
-            this.createEditor();
+            var self = this;
 
-            this.pFont.val( block.find('.simple-editor-content').css( 'font-family' ).replace(/"/g, '') );
-            this.pSize.val( block.find('.simple-editor-content').css( 'font-size' ).replace('px', '') );
+            if ( ! self.editor ){
+                this.setupEditor();
+            }
+
+            if ( parseContent ){
+                self.editor.setContent( block.find( 'p' ).parent().html() );
+            }
+
+            this.pFont.val( block.find( 'p' ).parent().css( 'font-family' ).replace(/"/g, '') );
+            this.pSize.val( block.find( 'p' ).parent().css( 'font-size' ).replace('px', '') );
             try{ this.h1Font.val( block.find('h1').css( 'font-family' ).replace(/"/g, '') ); } catch (e){}
             try{ this.h1Size.val( block.find('h1').css( 'font-size' ).replace('px', '') ); } catch (e){}
             try{ this.h2Font.val( block.find('h2').css( 'font-family' ).replace(/"/g, '') ); } catch (e){}
             try{ this.h2Size.val( block.find('h2').css( 'font-size' ).replace('px', '') ); } catch (e){}
-
         }
-
 
     } );
 
     $(function(){
         block.init();
-    })
+    });
 
 })( jQuery, EmailEditor, TextBlock );

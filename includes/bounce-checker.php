@@ -74,6 +74,38 @@ class Bounce_Checker
     }
 
     /**
+     * @return string|false
+     */
+    public function get_bounce_inbox_pw()
+    {
+        return Plugin::$instance->settings->get_option( 'bounce_inbox_password' );
+    }
+
+    /**
+     * @return string|false
+     */
+    public function get_bounce_inbox()
+    {
+        return Plugin::$instance->settings->get_option( 'bounce_inbox' );
+    }
+
+    /**
+     * @return string
+     */
+    public function get_mail_server()
+    {
+        return  Plugin::$instance->settings->get_option( 'bounce_inbox_host', wp_parse_url( site_url(), PHP_URL_HOST ) );
+    }
+
+    /**
+     * @return int
+     */
+    public function get_port()
+    {
+        return  Plugin::$instance->settings->get_option( 'bounce_inbox_port', 993 );
+    }
+
+    /**
      * get the bounce handler
      *
      * @return \BounceHandler

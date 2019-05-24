@@ -339,6 +339,7 @@ class Emails_Table extends WP_List_Table {
 
 		$query = wp_unslash( $_GET );
 		unset( $query[ 'page' ] );
+		unset( $query[ 'ids' ] );
 
 		if ( empty( $query ) ){
 		    $query = [

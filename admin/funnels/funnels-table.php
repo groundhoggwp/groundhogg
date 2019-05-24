@@ -2,6 +2,8 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
+use function Groundhogg\get_db;
+use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use \WP_List_Table;
 use Groundhogg\Contact_Query;
@@ -66,7 +68,7 @@ class Funnels_Table extends WP_List_Table {
             'date_created'      => _x( 'Date Created', 'Column label', 'groundhogg' ),
         );
 
-        return apply_filters( 'wpgh_funnels_get_columns', $columns );
+        return apply_filters( 'groundhogg_funnels_get_columns', $columns );
     }
     /**
      * Get a list of sortable columns. The format is:
@@ -85,7 +87,7 @@ class Funnels_Table extends WP_List_Table {
             'date_created'      => array( 'date_created', false )
         );
 
-        return apply_filters( 'wpgh_funnels_get_sortable_columns', $sortable_columns );
+        return apply_filters( 'groundhogg_funnels_get_sortable_columns', $sortable_columns );
     }
 
     /**
@@ -103,17 +105,16 @@ class Funnels_Table extends WP_List_Table {
             'archived'  => Plugin::$instance->dbs->get_db('funnels')->count( array( 'status' => 'archived' ) )
         );
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=all' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'active' ] + $count[ 'inactive' ] ) . ")</span>" . "</a>";
-        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=active' ) . "'>" . _x( 'Active', 'view', 'groundhogg'  ) . " <span class='count'>(" . $count[ 'active' ] . ")</span>" . "</a>";
-        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=inactive' ) . "'>" . _x( 'Inactive', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'inactive' ] . ")</span>" . "</a>";
-        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&view=archived' ) . "'>" . _x( 'Archived', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'archived' ] . ")</span>" . "</a>";
+        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=active' ) . "'>" . _x( 'Active', 'view', 'groundhogg'  ) . " <span class='count'>(" . $count[ 'active' ] . ")</span>" . "</a>";
+        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=inactive' ) . "'>" . _x( 'Inactive', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'inactive' ] . ")</span>" . "</a>";
+        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=archived' ) . "'>" . _x( 'Archived', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'archived' ] . ")</span>" . "</a>";
 
-        return apply_filters(  'wpgh_funnel_views', $views );
+        return apply_filters(  'groundhogg_funnel_views', $views );
     }
 
     protected function get_view()
     {
-        return ( isset( $_GET['view'] ) )? $_GET['view'] : 'all';
+        return ( isset( $_GET['status'] ) )? $_GET['status'] : 'active';
     }
 
     protected function extra_tablenav( $which ) {
@@ -214,7 +215,7 @@ class Funnels_Table extends WP_List_Table {
             $actions[ 'trash' ] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive', 'action', 'groundhogg' ) . "</a></span>";
         }
 
-        return $this->row_actions( apply_filters( 'wpgh_funnel_row_actions', $actions, $funnel, $column_name ) );
+        return $this->row_actions( apply_filters( 'groundhogg_funnel_row_actions', $actions, $funnel, $column_name ) );
     }
 
     protected function column_title( $funnel )
@@ -303,7 +304,7 @@ class Funnels_Table extends WP_List_Table {
      */
     protected function column_default( $funnel, $column_name ) {
 
-        do_action( 'wpgh_funnels_custom_column', $funnel, $column_name );
+        do_action( 'groundhogg_funnels_custom_column', $funnel, $column_name );
 
         return '';
 
@@ -344,7 +345,7 @@ class Funnels_Table extends WP_List_Table {
             );
         }
 
-        return apply_filters( 'wpgh_email_bulk_actions', $actions );
+        return apply_filters( 'groundhogg_email_bulk_actions', $actions );
     }
 
     /**
@@ -370,39 +371,19 @@ class Funnels_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        if ( isset( $_REQUEST[ 's' ] ) ){
+        $query = $_GET;
 
-            $query_args[ 'search' ] = $_REQUEST[ 's' ];
+        unset( $query[ 'page' ] );
 
+        if ( isset_not_empty( $_GET, 's' ) ){
+            $query[ 'search' ] = get_request_var( 's' );
         }
 
-        switch ( $this->get_view() ){
-
-            case 'active':
-
-                $data = Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'active' ) );
-
-                break;
-            case 'inactive':
-
-                $data = Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'inactive' ) );
-
-                break;
-            case 'archived':
-
-                $data = Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'archived' ) );
-
-                break;
-            default:
-
-                $data = array_merge(
-                    Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'inactive' ) ),
-                    Plugin::$instance->dbs->get_db('funnels')->query( array( 'status' => 'active' ) )
-                );
-
-                break;
-
+        if ( empty( $query ) ){
+            $query[ 'status' ] = 'active';
         }
+
+        $data = get_db( 'funnels' )->query( $query );
 
         /*
          * Sort the data
