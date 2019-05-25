@@ -13,6 +13,8 @@ use Groundhogg\Plugin;
 abstract class Circle_Graph extends Reporting_Widget
 {
 
+    protected $dataset;
+
     /**
      * Output the widget HTML
      */
@@ -146,6 +148,8 @@ abstract class Circle_Graph extends Reporting_Widget
         }
 
         usort( $dataset , array( $this, 'sort' ) );
+
+        $this->dataset = $dataset;
 
         return $dataset;
     }

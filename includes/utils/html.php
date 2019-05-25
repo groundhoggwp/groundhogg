@@ -57,6 +57,48 @@ class HTML
     }
 
     /**
+     * @param array $args
+     * @param array $cols
+     * @param array $rows
+     * @param bool $footer
+     */
+    public function striped_table( $args=[], $cols=[], $rows=[], $footer=true )
+    {
+        $args = wp_parse_args( $args, [
+            'class' => ''
+        ] );
+
+        ?>
+        <table class="wp-list-table widefat fixed striped <?php esc_attr_e( $args[ 'class' ] ) ?>">
+        <thead>
+        <tr>
+            <?php foreach ( $cols as $col => $name ): ?>
+            <th><?php echo $name; ?></th>
+            <?php endforeach; ?>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $rows as $row => $cells ): ?>
+            <tr>
+                <?php foreach ( $cells as $cell => $content ): ?>
+                    <td><?php echo $content; ?></td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+            <?php if ( $footer ): ?>
+        <tfoot>
+        <?php foreach ( $cols as $col => $name ): ?>
+            <th><?php echo $name; ?></th>
+        <?php endforeach; ?>
+        </tfoot>
+        <?php endif; ?>
+        </table>
+        <?php
+    }
+
+
+    /**
      * Start a form table cuz we use LOTS of those!!!
      *
      * @param array $args

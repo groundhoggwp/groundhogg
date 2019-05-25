@@ -213,7 +213,7 @@ class Submission_Handler extends Supports_Errors
 
         // Create the submission
         $submission = new Submission( [
-            'form_id' => $this->get_form_id(),
+            'step_id' => $this->get_form_id(),
             'contact_id' => $contact->get_id()
         ] );
 

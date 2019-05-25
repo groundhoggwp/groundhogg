@@ -151,6 +151,18 @@ function dequeue_wc_css_compat()
 }
 
 /**
+ * Return the percentage to the second degree.
+ *
+ * @param $a
+ * @param $b
+ * @return float
+ */
+function percentage( $a, $b )
+{
+    return round( ( $b / $a ) * 100, 2 );
+}
+
+/**
  * If the JSON is your typical error response
  *
  * @param $json

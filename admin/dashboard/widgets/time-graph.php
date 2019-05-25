@@ -92,6 +92,8 @@ abstract class Time_Graph extends Line_Graph
 
         }
 
+        $this->dataset = $data;
+
         return $data;
     }
 }

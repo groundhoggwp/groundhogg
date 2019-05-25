@@ -15,6 +15,8 @@ use Groundhogg\Reporting\Reports\Contacts_By_Source_Page;
 use Groundhogg\Reporting\Reports\Emails_Clicked;
 use Groundhogg\Reporting\Reports\Emails_Opened;
 use Groundhogg\Reporting\Reports\Emails_Sent;
+use Groundhogg\Reporting\Reports\Form_Impressions;
+use Groundhogg\Reporting\Reports\Form_Submissions;
 use Groundhogg\Reporting\Reports\Last_Broadcast;
 use Groundhogg\Reporting\Reports\New_Contacts;
 use Groundhogg\Reporting\Reports\Report;
@@ -239,6 +241,8 @@ class Reporting
             new Emails_Sent(),
             new Emails_Opened(),
             new Emails_Clicked(),
+            new Form_Impressions(),
+            new Form_Submissions(),
         ];
 
         $reports = apply_filters( 'groundhogg/reporting/reports/', $reports );

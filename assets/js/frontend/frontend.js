@@ -39,7 +39,7 @@ var Groundhogg = Groundhogg || {};
             var self = this;
             var forms = $( '.gh-form' );
             $.each( forms, function ( i, e ) {
-                var fId = $(e).find( 'input[name="step_id"]' ).val();
+                var fId = $(e).find( 'input[name="gh_submit_form"]' ).val();
                 self.formImpression( fId );
             });
         },

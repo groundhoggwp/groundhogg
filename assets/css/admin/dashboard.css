@@ -14,12 +14,19 @@ table.chart-summary th:first-child,table.chart-summary td:first-child{ text-alig
 table.wpgh-most-active-funnels th:last-child{text-align: center;}
 table.chart-summary td,table.wpgh-most-active-funnels td{padding-top: 10px;}
 table.wpgh-most-active-funnels td.funnel-title{width: 70%;}
-table.chart-summary .summary-total, table.wpgh-most-active-funnels td.active-contacts{
+table.wpgh-most-active-funnels td.active-contacts{width: 30%;}
+.export-button{display: none;}
+.postbox:hover .export-button{display: block;}
+
+/* NEW CSS */
+
+.number-total{
     text-align: center;
     font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
     font-size: 14px;
     font-weight: 500;
 }
-table.wpgh-most-active-funnels td.active-contacts{width: 30%;}
-.export-button{display: none;}
-.postbox:hover .export-button{display: block;}
+
+.report {
+    margin-bottom: 15px;
+}

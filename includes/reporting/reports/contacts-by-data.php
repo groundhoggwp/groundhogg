@@ -17,6 +17,20 @@ use Groundhogg\Reporting\Reporting;
 
 abstract class Contacts_By_Data extends Objects_By_Data
 {
+    public function __construct()
+    {
+        add_filter(  "groundhogg/reporting/reports/{$this->get_id()}/query", [ $this, 'parse_query' ] );
+    }
+
+    public function parse_query( $query )
+    {
+        $query[ 'date_query' ] = [
+            'after' => date( 'Y-m-d H:i:s', $this->get_start_time() ),
+            'before' =>date( 'Y-m-d H:i:s', $this->get_end_time() ),
+        ];
+
+        return $query;
+    }
     /**
      * Get the DB
      *

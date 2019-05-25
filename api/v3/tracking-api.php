@@ -132,7 +132,7 @@ class Tracking_Api extends Base
 
             } else {
 
-                if ( ! Plugin::$instance->utils->location->verify_ip() ){
+                if ( ! is_user_logged_in() && ! Plugin::$instance->utils->location->verify_ip() ){
                     return self::ERROR_401( 'unverified_ip', 'Could not verify ip address.' );
                 }
 

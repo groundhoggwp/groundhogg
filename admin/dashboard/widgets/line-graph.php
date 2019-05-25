@@ -14,6 +14,8 @@ use Groundhogg\Plugin;
 abstract class Line_Graph extends Dashboard_Widget
 {
 
+    protected $dataset = [];
+
     /**
      * @return string
      */
@@ -156,6 +158,8 @@ abstract class Line_Graph extends Dashboard_Widget
             }
 
         }
+
+        $this->dataset = $data;
 
         return $data;
     }

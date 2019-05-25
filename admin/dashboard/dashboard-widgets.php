@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Dashboard;
 use Groundhogg\Admin\Dashboard\Widgets\Country_Widget;
 use Groundhogg\Admin\Dashboard\Widgets\Dashboard_Widget;
 use Groundhogg\Admin\Dashboard\Widgets\Email_Activity;
+use Groundhogg\Admin\Dashboard\Widgets\Form_Activity;
 use Groundhogg\Admin\Dashboard\Widgets\Last_Broadcast_Widget;
 use Groundhogg\Admin\Dashboard\Widgets\New_Contacts;
 use Groundhogg\Admin\Dashboard\Widgets\Optin_Status_Widget;
@@ -70,6 +71,7 @@ class Dashboard_Widgets
             new Last_Broadcast_Widget(),
             new Email_Activity(),
             new New_Contacts(),
+            new Form_Activity(),
         ];
 
 //        $this->widgets[] = new WPGH_Time_Range_Widget();
@@ -111,7 +113,7 @@ class Dashboard_Widgets
         wp_enqueue_style( 'groundhogg-admin-dashboard' );
         wp_enqueue_script( 'groundhogg-admin-dashboard' );
 
-        wp_localize_script( 'groundhogg-admin-dashboard', 'wpghDashboard', array(
+        wp_localize_script( 'groundhogg-admin-dashboard', 'GroundhoggDashboard', array(
             'date_range' => $this->range,
             'custom_date_range_start' => esc_attr( get_request_var( 'custom_date_range_start' ) ),
             'custom_date_range_end' => esc_attr( get_request_var( 'custom_date_range_end' ) )

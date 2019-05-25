@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Admin\Dashboard\Widgets;
 
+use function Groundhogg\percentage;
+use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 
 /**
@@ -20,7 +22,34 @@ class Optin_Status_Widget extends Circle_Graph
      */
     protected function extra_widget_info()
     {
-        // TODO: Implement extra_widget_info() method.
+        $html = Plugin::$instance->utils->html;
+
+        $statuses = wp_list_pluck( $this->dataset, 'label' );
+        $totals = wp_list_pluck( $this->dataset, 'data' );
+        $urls = wp_list_pluck( $this->dataset, 'url' );
+        $total = array_sum( $totals );
+
+        $rows = [];
+
+        for ( $i=0; $i<count( $statuses );$i++ ){
+            $rows[] = [
+                $statuses[ $i ],
+                $html->wrap( $html->wrap( $totals[ $i ], 'span', [ 'class' => 'number-total' ] ), 'a', [ 'href' => $urls[ $i ] ] ),
+                $html->wrap( percentage( $total, $totals[$i] ), 'span', [ 'class' => 'number-total' ] ) . '%',
+            ];
+        }
+
+        $html->striped_table(
+            [ 'class' => $this->get_report_id() ],
+            [
+                __( 'Status', 'groundhogg' ),
+                __( 'Total', 'groundhogg' ),
+                __( 'Percentage (%)', 'groundhogg' ),
+            ],
+            $rows
+            ,
+            false
+        );
     }
 
     /**
@@ -54,7 +83,7 @@ class Optin_Status_Widget extends Circle_Graph
         return [
             'label' => $label,
             'data' => $item_data,
-            'url'  => admin_url( 'page=gh_contacts&optin_status=' . $item_key )
+            'url'  => admin_url( 'admin.php?page=gh_contacts&optin_status=' . $item_key )
         ];
     }
 

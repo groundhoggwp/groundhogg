@@ -105,7 +105,7 @@ class Form_Filled extends Benchmark
      */
     protected function can_complete_step()
     {
-        return $this->get_current_step()->get_id() === $this->get_data( 'form_id' );
+        return absint($this->get_current_step()->get_id() ) === absint( $this->get_data( 'form_id' ) );
     }
 
     /**
