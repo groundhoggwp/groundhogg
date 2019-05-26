@@ -5,6 +5,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
+use Groundhogg\Reporting\Reports\Complete_Funnel_Activity;
 use Groundhogg\Reporting\Reports\Contacts_By_Country;
 use Groundhogg\Reporting\Reports\Contacts_By_Lead_Source;
 use Groundhogg\Reporting\Reports\Contacts_By_Optin_Status;
@@ -20,6 +21,7 @@ use Groundhogg\Reporting\Reports\Form_Submissions;
 use Groundhogg\Reporting\Reports\Last_Broadcast;
 use Groundhogg\Reporting\Reports\New_Contacts;
 use Groundhogg\Reporting\Reports\Report;
+use Groundhogg\Reporting\Reports\Waiting_Funnel_Activity;
 
 /**
  * Created by PhpStorm.
@@ -243,6 +245,8 @@ class Reporting
             new Emails_Clicked(),
             new Form_Impressions(),
             new Form_Submissions(),
+            new Waiting_Funnel_Activity(),
+            new Complete_Funnel_Activity(),
         ];
 
         $reports = apply_filters( 'groundhogg/reporting/reports/', $reports );

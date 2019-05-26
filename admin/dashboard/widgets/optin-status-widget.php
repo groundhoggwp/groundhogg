@@ -39,7 +39,7 @@ class Optin_Status_Widget extends Circle_Graph
             ];
         }
 
-        $html->striped_table(
+        $html->list_table(
             [ 'class' => $this->get_report_id() ],
             [
                 __( 'Status', 'groundhogg' ),

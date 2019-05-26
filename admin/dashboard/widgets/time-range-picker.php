@@ -17,6 +17,7 @@ class Time_Range_Picker extends Dashboard_Widget
     public function widget()
     {
         $html = Plugin::$instance->utils->html;
+        $reporting = Plugin::$instance->reporting;
 
         ?>
         <form action="" method="get">
@@ -66,7 +67,9 @@ class Time_Range_Picker extends Dashboard_Widget
                 </script>
             </div>
         </form>
-        <p class="description"><?php _e( 'Use this form to quickly change the reporting time for any Groundhogg reporting that use it.', 'groundhogg' ); ?></p>
+        <hr>
+        <p><?php printf( __( 'Showing results from %s to %s.', 'groundhogg' ), $html->wrap( date_i18n( 'Y-m-d', $reporting->get_start_time() ), 'b' ), $html->wrap( date_i18n( 'Y-m-d', $reporting->get_end_time() ), 'b' ) );?></p>
+        <p class="description"><?php _e( 'Use this form to quickly change the reporting time range.', 'groundhogg' ); ?></p>
 <?php
     }
 

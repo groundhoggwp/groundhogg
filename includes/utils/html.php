@@ -62,7 +62,7 @@ class HTML
      * @param array $rows
      * @param bool $footer
      */
-    public function striped_table( $args=[], $cols=[], $rows=[], $footer=true )
+    public function list_table($args=[], $cols=[], $rows=[], $footer=true )
     {
         $args = wp_parse_args( $args, [
             'class' => ''

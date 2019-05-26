@@ -18,15 +18,23 @@ class Sending_Service
      */
     public function __construct()
     {
+        add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ] );
+    }
+
+    /**
+     * Run when we are sure plugins are loaded!
+     */
+    public function plugins_loaded()
+    {
         $should_listen = get_transient( 'gh_listen_for_connect' );
 
         if ( $should_listen && is_admin() ){
-        	add_action( 'init', [ $this, 'connect_email_api' ] );
+            add_action( 'init', [ $this, 'connect_email_api' ] );
         }
 
         if ( $this->is_waiting_for_verification() ){
-        	add_action( 'init', [ $this, 'setup_cron' ] );
-        	add_action( 'groundhogg/sending_service/verify_domain', [ $this, 'check_verification_status' ] );
+            add_action( 'init', [ $this, 'setup_cron' ] );
+            add_action( 'groundhogg/sending_service/verify_domain', [ $this, 'check_verification_status' ] );
         }
 
         if ( $this->has_dns_records() ){
@@ -36,7 +44,6 @@ class Sending_Service
         if ( is_admin() && isset_not_empty( $_REQUEST, 'test_gh_ss_connection' ) ){
             add_action( 'init', [ $this, 'send_test_email' ] );
         }
-
     }
 
     /**

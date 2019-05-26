@@ -209,8 +209,8 @@ function contact_record_general_info( $contact )
                     'value' => $contact->get_email(),
                 );
                 echo Plugin::$instance->utils->html->input($args); ?>
-                <span class="row-actions"><a style="text-decoration: none" target="_blank"
-                                                    href="<?php echo esc_url(substr($contact->get_email(), strpos($contact->get_email(), '@'))); ?>"><span class="dashicons dashicons-external"></span></a></span>
+                <span class="row-actions"><a title="<?php printf( esc_attr__( 'Visit %s', 'groundhogg' ), substr($contact->get_email(), strpos($contact->get_email(), '@')+1)); ?>" style="text-decoration: none" target="_blank" href="<?php echo esc_url(substr($contact->get_email(), strpos($contact->get_email(), '@')+1)); ?>"><span class="dashicons dashicons-external"></span></a>
+                <a title="<?php esc_attr_e( 'Send email.', 'groundhogg' ); ?>" style="text-decoration: none" target="_blank" href="mailto:<?php echo $contact->get_email(); ?>"><span class="dashicons dashicons-email"></span></a></span>
                     <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' .  Plugin::$instance->preferences->get_optin_status_text($contact->get_id()); ?></p>
                 <?php if ($contact->get_optin_status() !== Preferences::UNSUBSCRIBED): ?>
                     <div id="manual-unsubscribe" style="margin-bottom: 10px;">

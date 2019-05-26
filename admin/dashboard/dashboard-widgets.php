@@ -5,9 +5,11 @@ use Groundhogg\Admin\Dashboard\Widgets\Country_Widget;
 use Groundhogg\Admin\Dashboard\Widgets\Dashboard_Widget;
 use Groundhogg\Admin\Dashboard\Widgets\Email_Activity;
 use Groundhogg\Admin\Dashboard\Widgets\Form_Activity;
+use Groundhogg\Admin\Dashboard\Widgets\Funnel_Breakdown;
 use Groundhogg\Admin\Dashboard\Widgets\Last_Broadcast_Widget;
 use Groundhogg\Admin\Dashboard\Widgets\New_Contacts;
 use Groundhogg\Admin\Dashboard\Widgets\Optin_Status_Widget;
+use Groundhogg\Admin\Dashboard\Widgets\Search_Engines;
 use Groundhogg\Admin\Dashboard\Widgets\Time_Range_Picker;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
@@ -72,6 +74,8 @@ class Dashboard_Widgets
             new Email_Activity(),
             new New_Contacts(),
             new Form_Activity(),
+            new Funnel_Breakdown(),
+            new Search_Engines(),
         ];
 
 //        $this->widgets[] = new WPGH_Time_Range_Widget();

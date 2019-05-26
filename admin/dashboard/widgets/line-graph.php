@@ -22,6 +22,14 @@ abstract class Line_Graph extends Dashboard_Widget
     abstract public function get_mode();
 
     /**
+     * @return bool
+     */
+    protected function hide_if_no_data()
+    {
+        return true;
+    }
+
+    /**
      * Output the widget HTML
      */
     public function widget()
@@ -31,7 +39,26 @@ abstract class Line_Graph extends Dashboard_Widget
          */
         $data = $this->get_data();
 
-        $is_empty = array_sum( wp_list_pluck( $data[0]['data'], 1 ) ) === 0;
+        $is_empty = empty( $data );
+
+        if ( ! $is_empty ){
+
+            $datasum = [];
+
+            // Check all datasets for data.
+            foreach ( $data as $i => $dataset ){
+                $datasum[] = array_sum( wp_list_pluck( $dataset['data'], 1 ) );
+            }
+
+            if ( array_sum( $datasum ) === 0 ){
+                $is_empty = true;
+            }
+        }
+
+        // Show anyway
+        if ( ! $this->hide_if_no_data() && $is_empty ){
+            $is_empty = false;
+        }
 
         if ( ! $is_empty ):
 

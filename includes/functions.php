@@ -159,6 +159,10 @@ function dequeue_wc_css_compat()
  */
 function percentage( $a, $b )
 {
+    if ( $a === 0 ){
+        return 0;
+    }
+
     return round( ( $b / $a ) * 100, 2 );
 }
 

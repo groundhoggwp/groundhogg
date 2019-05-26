@@ -38,7 +38,7 @@ class Form_Activity extends Time_Graph
         $total_impressions = array_sum( wp_list_pluck( $this->dataset[0][ 'data' ], 1 ) );
         $total_submissions = array_sum( wp_list_pluck( $this->dataset[1][ 'data' ], 1 ) );
 
-        $html->striped_table(
+        $html->list_table(
             [ 'class' => 'form_activity' ],
             [
                 __( 'Impressions', 'groundhogg' ),

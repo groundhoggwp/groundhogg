@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Dashboard\Widgets;
 
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\percentage;
 use Groundhogg\Plugin;
 
 /**
@@ -31,7 +32,28 @@ class Email_Activity extends Time_Graph
      */
     protected function extra_widget_info()
     {
-        // TODO: Implement extra_widget_info() method.
+        $html = Plugin::$instance->utils->html;
+
+        $total_sent = array_sum( wp_list_pluck( $this->dataset[0][ 'data' ], 1 ) );
+        $total_opens = array_sum( wp_list_pluck( $this->dataset[1][ 'data' ], 1 ) );
+        $total_clicks = array_sum( wp_list_pluck( $this->dataset[2][ 'data' ], 1 ) );
+
+        $html->list_table(
+            [ 'class' => 'email_activity' ],
+            [
+                __( 'Sent', 'groundhogg' ),
+                __( 'Opens (O.R)', 'groundhogg' ),
+                __( 'Clicks (C.T.R)', 'groundhogg' ),
+            ],
+            [
+                [
+                    $html->wrap( $total_sent, 'span', [ 'class' => 'number-total' ] ),
+                    $html->wrap( $total_opens . ' (' . percentage( $total_sent, $total_opens) . '%)', 'span', [ 'class' => 'number-total' ] ),
+                    $html->wrap( $total_clicks . ' (' . percentage( $total_opens, $total_clicks) . '%)', 'span', [ 'class' => 'number-total' ] ),
+                ]
+            ],
+            false
+        );
     }
 
     /**

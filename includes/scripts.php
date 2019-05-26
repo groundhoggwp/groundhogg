@@ -134,7 +134,7 @@ class Scripts
 
         wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [
             'tags'      => site_url('wp-json/gh/v3/tags?select2=true'),
-            'emails'    => site_url('wp-json/gh/v3/emails?select2=true'),
+            'emails'    => site_url('wp-json/gh/v3/emails?select2=true&status[]=ready&status[]=draft'),
             'sms'       => site_url('wp-json/gh/v3/sms?select2=true'),
             'contacts'  => site_url('wp-json/gh/v3/contacts?select2=true'),
         ]  );

@@ -243,7 +243,7 @@ class Events_Table extends WP_List_Table {
     protected function get_bulk_actions() {
         $actions = array(
 	        'execute' => _x( 'Run', 'List table bulk action', 'wp-funnels'),
-	        'cancel' => _x( 'Cancel', 'List table bulk action', 'wp-funnels' ),
+	        'cancel'  => _x( 'Cancel', 'List table bulk action', 'wp-funnels' ),
         );
 
         return apply_filters( 'groundhogg_event_bulk_actions', $actions );
