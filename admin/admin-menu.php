@@ -8,6 +8,7 @@ use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
 use Groundhogg\Admin\Emails\Emails_Page;
 use Groundhogg\Admin\Events\Events_Page;
 use Groundhogg\Admin\Funnels\Funnels_Page;
+use Groundhogg\Admin\Guided_Setup\Guided_Setup;
 use Groundhogg\Admin\Settings\Settings_Page;
 use Groundhogg\Admin\SMS\SMS_Page;
 use Groundhogg\Admin\Superlinks\Superlinks_Page;
@@ -46,17 +47,19 @@ class Admin_Menu
         $this->welcome  = new Welcome_Page();
         $this->contacts = new Contacts_Page();
         $this->tags     = new Tags_Page();
-        $this->sms      = new SMS_Page();
-        $this->superlinks = new Superlinks_Page();
-        $this->broadcasts = new Broadcasts_Page();
-        $this->events   = new Events_Page();
         $this->emails   = new Emails_Page();
-        $this->settings = new Settings_Page();
-        $this->tools    = new Tools_Page();
+        $this->sms      = new SMS_Page();
+        $this->broadcasts = new Broadcasts_Page();
         $this->funnels  = new Funnels_Page();
+        $this->superlinks = new Superlinks_Page();
+        $this->events   = new Events_Page();
+        $this->tools    = new Tools_Page();
+        $this->settings = new Settings_Page();
         $this->bulk_jobs = new Bulk_Job_Page();
 
         $this->dashboard = new Dashboard_Widgets();
+
+        $this->guided_setup = new Guided_Setup();
 
         do_action( 'groundhogg/admin/init', $this );
     }

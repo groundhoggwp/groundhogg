@@ -1,4 +1,6 @@
 <?php
+namespace Groundhogg\Admin\Guided_Setup\Steps;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -6,9 +8,8 @@
  * Time: 11:03 AM
  */
 
-class WPGH_Guided_Setup_Step_Import extends WPGH_Guided_Setup_Step
+class Import_Contacts extends Step
 {
-
 
     public function get_title()
     {
@@ -25,15 +26,13 @@ class WPGH_Guided_Setup_Step_Import extends WPGH_Guided_Setup_Step
         return _x( 'Import your contacts so you can start sending emails and marketing your business.', 'guided_setup', 'groundhogg' );
     }
 
-    public function get_settings()
+    public function get_content()
     {
-        ob_start();
         ?>
         <p class="submit" style="text-align: center">
             <a class="button button-primary" target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_tools&action=add&tab=import' );?>"><?php _e( 'Click Here To Import Your List!' ) ?></a>
         </p>
         <?php
-        return ob_get_clean();
     }
 
     public function save()

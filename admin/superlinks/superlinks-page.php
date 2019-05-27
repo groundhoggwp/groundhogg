@@ -50,7 +50,7 @@ class Superlinks_Page extends Admin_Page
 
     public function get_priority()
     {
-        return 15;
+        return 35;
     }
 
     /* Register the help bar */

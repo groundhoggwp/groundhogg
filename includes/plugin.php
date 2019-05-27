@@ -60,6 +60,11 @@ class Plugin {
     public $notices;
 
     /**
+     * @var Dialogger
+     */
+    public $dialogger;
+
+    /**
      * Inits the admin screens.
      *
      * @var Admin_Menu
@@ -109,6 +114,11 @@ class Plugin {
      * @var Sending_Service
      */
     public $sending_service;
+
+    /**
+     * @var Stats_Collection
+     */
+    public $stats_collection;
 
     /**
      * @var Event_Queue
@@ -277,6 +287,7 @@ class Plugin {
         $this->utils        = new Utils();
         $this->scripts      = new Scripts();
         $this->notices      = new Notices();
+        $this->dialogger    = new Dialogger();
         $this->rewrites     = new Rewrites();
         $this->replacements = new Replacements();
         $this->tag_mapping  = new Tag_Mapping();
@@ -286,6 +297,7 @@ class Plugin {
 
         $this->bounce_checker = new Bounce_Checker();
         $this->sending_service = new Sending_Service();
+        $this->stats_collection = new Stats_Collection();
 
         $this->event_queue  = new Event_Queue();
 

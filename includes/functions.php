@@ -30,6 +30,16 @@ function get_db( $name ){
 }
 
 /**
+ * Shorthand;
+ *
+ * @return HTML
+ */
+function html()
+{
+    return Plugin::$instance->utils->html;
+}
+
+/**
  * Return if a value in an array isset and is not empty
  *
  * @param $array
@@ -1535,4 +1545,36 @@ function get_store_products( $args = [] )
     $products = json_decode( wp_remote_retrieve_body( $response ) );
 
     return $products;
+}
+
+/**
+ * Whether to show Groundhogg Branding. Compat with white label options.
+ *
+ * @return bool
+ */
+function show_groundhogg_branding()
+{
+    // TODO
+
+    return true;
+}
+
+/**
+ * Show a floating phil on the page!
+ *
+ * @return void;
+ */
+function floating_phil()
+{
+    ?><img style="position: fixed;bottom: -80px;right: -80px;transform: rotate(-20deg);" class="phil" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
+}
+
+/**
+ * Show the Groundhogg Logo!
+ *
+ * @return void
+ */
+function groundhogg_logo()
+{
+    ?><img src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo.png'; ?>" width="300"><?php
 }

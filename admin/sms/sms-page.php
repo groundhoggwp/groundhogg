@@ -36,6 +36,11 @@ class SMS_Page extends Admin_Page
         return 'gh_sms';
     }
 
+    public function get_priority()
+    {
+        return 20;
+    }
+
     public function get_name()
     {
         return _x( 'SMS', 'page_title', 'groundhogg' );

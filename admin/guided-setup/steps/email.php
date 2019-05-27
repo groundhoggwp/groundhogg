@@ -1,4 +1,10 @@
 <?php
+namespace Groundhogg\Admin\Guided_Setup\Steps;
+
+use function Groundhogg\get_request_var;
+use function Groundhogg\html;
+use Groundhogg\Plugin;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -6,7 +12,7 @@
  * Time: 11:03 AM
  */
 
-class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
+class Email extends Step
 {
 
     public function get_title()
@@ -24,37 +30,36 @@ class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
         return _x( 'There are different ways to send email with Groundhogg! Choose one below.', 'guided_setup', 'groundhogg' );
     }
 
-    public function get_settings()
+    public function get_content()
     {
-        ob_start();
 
         /* Will check to see if they've gone through the process */
-        if ( ! wpgh_get_option( 'gh_email_api_dns_records', false ) ):
+        if ( ! Plugin::$instance->sending_service->has_dns_records() ):
         ?>
-        <h3><?php _e( 'Recommended' ); ?></h3>
-        <div class="postbox" style="padding-right: 10px">
-            <img src="<?php echo WPGH_ASSETS_FOLDER . 'images/email-credits.png'; ?>" width="200" style="float: left; margin: 10px 20px 10px 10px;">
-            <p><?php _ex( 'You can send your emails & text messages using our Groundhogg Sending Service to get faster delivery times and improved deliverability. Get your <b>first 1000 credits free!</b>', 'guided_setup', 'groundhogg' ); ?></p>
+        <h3><?php _e( 'Send Email & SMS With The Groundhogg Sending Service!' ); ?></h3>
+        <img src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/email-credits.png'; ?>" width="300" style="float: left; margin: 5px 20px 0 0;border: 1px solid #ededed">
+        <p><?php _ex( 'You can send your emails <b>and text messages</b> using our Groundhogg Sending Service to get faster delivery times and improved deliverability. Get your <b>first 1000 credits free!</b>', 'guided_setup', 'groundhogg' ); ?></p>
+        <p><a target="_blank" class="button button-secondary" href="https://www.groundhogg.io/downloads/email-credits/"><?php _ex( 'Learn more...', 'guided_setup', 'groundhogg' ); ?></a></p>
+        <div style="margin-top: 60px;">
             <p>
-                <?php submit_button( _x( 'Activate', 'guided_setup', 'groundhogg' ), 'primary', 'gh_active_email', false ); ?>
-                <a target="_blank" class="button button-secondary" href="https://www.groundhogg.io/register/"><?php _ex( 'Create Your Account', 'guided_setup', 'groundhogg' ); ?></a>
-                <a target="_blank" class="button button-secondary" href="https://www.groundhogg.io/downloads/email-credits/"><?php _ex( 'Learn more...', 'guided_setup', 'groundhogg' ); ?></a>
+                <?php submit_button( _x( 'Already have an account? Connect & Activate!', 'guided_setup', 'groundhogg' ), 'primary', 'gh_active_email', false ); ?>
+                <?php submit_button( _x( 'Don\'t have an account? Sign Up Now!', 'guided_setup', 'groundhogg' ), 'secondary', 'gh_sign_up', false ); ?>
             </p>
-            <p class="description"><?php _ex( 'Clicking <b>Activate</b> will take you to the Groundhogg login page.', 'guided_setup', 'groundhogg' ); ?></p>
-            <div class="wp-clearfix"></div>
         </div>
+        <p class="description"><?php _ex( '', 'guided_setup', 'groundhogg' ); ?></p>
+        <div class="wp-clearfix"></div>
         <hr>
         <h3><?php _e( 'Alternatives' ); ?></h3>
-        <div class="postbox" style="padding-right: 10px">
-            <img src="https://ps.w.org/wp-mail-smtp/assets/banner-772x250.png?rev=1982773" width="300" style="float: left; margin: 10px 20px 0 10px;border: 1px solid #ededed">
+        <div class="postbox" style="padding: 10px">
+            <img src="https://ps.w.org/wp-mail-smtp/assets/banner-772x250.png" width="300" style="float: left; margin: 10px 20px 0 0;border: 1px solid #ededed">
             <p><?php _ex( 'You can send your emails using an <b>SMTP Service</b> using an SMTP plugin like WP Mail SMTP. This is recommended if you do not use our service.', 'guided_setup', 'groundhogg' ); ?></p>
             <p>
                 <a target="_blank" class="button button-primary" href="<?php echo admin_url( 'plugin-install.php?s=WP+Mail+SMTP&tab=search&type=term' ); ?>"><?php _ex( 'Get WP Mail SMTP', 'guided_setup', 'groundhogg' ); ?></a>
                 <a target="_blank" class="button button-secondary" href="<?php echo admin_url( 'plugin-install.php?s=SMTP&tab=search&type=term' ); ?>"><?php _ex( 'Browse Others...', 'guided_setup', 'groundhogg' ); ?></a>
             </p>
             <div class="wp-clearfix"></div>
-        </div><div class="postbox" style="padding-right: 10px">
-            <img src="https://ps.w.org/wp-ses/assets/banner-772x250.png?rev=2012130" width="300" style="float: left; margin: 10px 20px 0 10px;">
+        </div><div class="postbox" style="padding: 10px">
+            <img src="https://ps.w.org/wp-ses/assets/banner-772x250.jpg" width="300" style="float: left; margin: 10px 20px 0 0;border: 1px solid #ededed">
             <p><?php _ex( 'You can send your emails using <b>Amazon SES</b> which is very cost effective and provides a high deliverability rating, although is more difficult to setup.', 'guided_setup', 'groundhogg' ); ?></p>
             <p>
                 <a target="_blank" class="button button-primary" href="<?php echo admin_url( 'plugin-install.php?s=wp+ses&tab=search&type=term' ); ?>"><?php _ex( 'Get WP SES', 'guided_setup', 'groundhogg' ); ?></a>
@@ -67,11 +72,9 @@ class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
         /* They have */
         else:
 
-            WPGH()->service_manager->get_dns_table();
+            Plugin::$instance->sending_service->get_dns_table();
 
         endif;
-
-        return ob_get_clean();
     }
 
 	/**
@@ -86,6 +89,13 @@ class WPGH_Guided_Setup_Step_Email extends WPGH_Guided_Setup_Step
 	        set_transient( 'gh_listen_for_connect', 1, HOUR_IN_SECONDS );
 	        wp_redirect( $redirect_to );
 	        die();
+        }
+
+        if ( get_request_var( 'gh_sign_up' ) ){
+            $redirect_to = sprintf( 'https://www.groundhogg.io/wp-login.php?doing_oauth=true&redirect_to=%s', urlencode( admin_url( 'admin.php?page=gh_guided_setup&action=connect_to_gh&step=' . $this->get_current_step_id() ) ) );
+            set_transient( 'gh_listen_for_connect', 1, HOUR_IN_SECONDS );
+            wp_redirect( $redirect_to );
+            die();
         }
 
         return true;

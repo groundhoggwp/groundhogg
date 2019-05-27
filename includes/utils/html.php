@@ -240,6 +240,11 @@ class HTML
     {
         $tag = '';
         foreach ($atts as $key => $value) {
+
+            if ( $key === 'style' && is_array( $value ) ){
+                $value = array_to_css( $value );
+            }
+
             $tag .= sanitize_key( $key ) . '="' . esc_attr( $value ) . '" ';
         }
         return $tag;

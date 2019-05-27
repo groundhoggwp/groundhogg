@@ -48,6 +48,11 @@ class Broadcasts_Page extends Admin_Page
         wp_enqueue_script('jquery-flot-pie' );
     }
 
+    public function get_priority()
+    {
+        return 25;
+    }
+
     public function get_slug()
     {
         return 'gh_broadcasts';
