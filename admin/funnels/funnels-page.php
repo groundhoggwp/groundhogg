@@ -349,7 +349,12 @@ class Funnels_Page extends Admin_Page
 
         $this->add_notice(
             esc_attr( 'archived' ),
-            sprintf( _nx( 'Archived %d funnel', 'Archived %d funnels', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+            sprintf( _nx(
+                'Archived %d funnel',
+                'Archived %d funnels',
+                count( $this->get_items() ),
+                'notice', 'groundhogg' ),
+                count( $this->get_items() ) ),
             'success'
         );
 

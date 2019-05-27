@@ -1,6 +1,9 @@
 <?php
 namespace Groundhogg\Admin\Dashboard\Widgets;
 
+use Groundhogg\Contact_Query;
+use function Groundhogg\get_db;
+use function Groundhogg\percentage;
 use Groundhogg\Plugin;
 
 /**
@@ -30,7 +33,34 @@ class New_Contacts extends Time_Graph
      */
     protected function extra_widget_info()
     {
-        // TODO: Implement extra_widget_info() method.
+        $html = Plugin::$instance->utils->html;
+
+        $total_new_contacts = array_sum( wp_list_pluck( $this->dataset[0][ 'data' ], 1 ) );
+        $total_contacts = get_db( 'contacts' )->count( [] );
+
+        $date_query = [
+            'date_query' => [
+                'before' => date( 'Y-m-d H:i:s', Plugin::$instance->reporting->get_end_time() ),
+                'after' => date( 'Y-m-d H:i:s', Plugin::$instance->reporting->get_start_time() )
+            ]
+        ];
+
+        $html->list_table(
+            [ 'class' => 'new_contacts' ],
+            [
+                __( 'Total Contacts', 'groundhogg' ),
+                __( 'New Contacts', 'groundhogg' ),
+                __( 'Growth (%)', 'groundhogg' ),
+            ],
+            [
+                [
+                    $html->wrap( $total_contacts, 'span', [ 'class' => 'number-total' ] ),
+                    $html->wrap( $total_new_contacts, 'a', [ 'class' => 'number-total', 'href' => add_query_arg( $date_query, admin_url( 'admin.php?page=gh_contacts' ) ) ]  ),
+                    $html->wrap( percentage( $total_contacts, $total_new_contacts ), 'span', [ 'class' => 'number-total' ] ),
+                ]
+            ],
+            false
+        );
     }
 
     /**

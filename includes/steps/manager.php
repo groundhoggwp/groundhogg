@@ -44,22 +44,20 @@ class Manager {
 
     function __construct()
     {
-//        $this->includes();
-
         /* actions */
-        $this->elements[] = new Admin_Notification();
-        $this->elements[] = new Apply_Note();
-        $this->elements[] = new Apply_Owner();
-        $this->elements[] = new Apply_Tag();
-        $this->elements[] = new Create_User();
-        $this->elements[] = new Date_Timer();
-        $this->elements[] = new Delay_Timer();
-        $this->elements[] = new Edit_Meta();
-        $this->elements[] = new Field_Timer();
-        $this->elements[] = new HTTP_Post();
-        $this->elements[] = new Remove_Tag();
         $this->elements[] = new Send_Email();
         $this->elements[] = new Send_SMS();
+        $this->elements[] = new Admin_Notification();
+        $this->elements[] = new Apply_Tag();
+        $this->elements[] = new Remove_Tag();
+        $this->elements[] = new Apply_Note();
+        $this->elements[] = new Date_Timer();
+        $this->elements[] = new Delay_Timer();
+        $this->elements[] = new Field_Timer();
+        $this->elements[] = new Apply_Owner();
+        $this->elements[] = new Create_User();
+        $this->elements[] = new Edit_Meta();
+        $this->elements[] = new HTTP_Post();
 
         /* Benchmarks */
         $this->elements[] = new Account_Created();
@@ -71,7 +69,6 @@ class Manager {
         $this->elements[] = new Role_Changed();
         $this->elements[] = new Tag_Applied();
         $this->elements[] = new Tag_Removed();
-
     }
 
     /**
@@ -101,9 +98,6 @@ class Manager {
      */
     public function get_elements()
     {
-
         return array_merge( $this->get_actions(), $this->get_benchmarks() );
-
     }
-
 }

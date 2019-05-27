@@ -294,16 +294,9 @@
             var self = this;
 
             adminAjaxRequest( obj, function ( response ) {
-
-                // console.log( response );
-
                 self.curHTML = response.data.data.html;
                 self.replaceDummyStep(self.curHTML);
-                //
-                // alert(html);
             } );
-
-
         },
 
         addContacts: function () {
