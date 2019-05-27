@@ -562,4 +562,32 @@ class Location
         return $output;
     }
 
+    /**
+     * Site country code.
+     *
+     * @return bool|mixed|string
+     */
+    public function site_country_code()
+    {
+        if ( ! is_admin() ){
+            return false;
+        }
+
+        $has_saved = get_transient( 'site_country_code' );
+
+        if ( ! empty( $has_saved ) ){
+            return $has_saved;
+        }
+
+        $c_code = $this->ip_info( $this->get_real_ip(), 'countrycode' );
+
+        if ( ! $c_code ){
+            return 'US';
+        }
+
+        set_transient( 'site_country_code', $c_code );
+
+        return $c_code;
+    }
+
 }

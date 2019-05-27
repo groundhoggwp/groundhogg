@@ -7,10 +7,15 @@ use Groundhogg\Admin\Dashboard\Widgets\Email_Activity;
 use Groundhogg\Admin\Dashboard\Widgets\Form_Activity;
 use Groundhogg\Admin\Dashboard\Widgets\Funnel_Breakdown;
 use Groundhogg\Admin\Dashboard\Widgets\Last_Broadcast_Widget;
+use Groundhogg\Admin\Dashboard\Widgets\Lead_Sources;
 use Groundhogg\Admin\Dashboard\Widgets\New_Contacts;
 use Groundhogg\Admin\Dashboard\Widgets\Optin_Status_Widget;
+use Groundhogg\Admin\Dashboard\Widgets\Region_Widget;
 use Groundhogg\Admin\Dashboard\Widgets\Search_Engines;
+use Groundhogg\Admin\Dashboard\Widgets\Social_Platforms;
+use Groundhogg\Admin\Dashboard\Widgets\Source_Pages;
 use Groundhogg\Admin\Dashboard\Widgets\Time_Range_Picker;
+use Groundhogg\Admin\Dashboard\Widgets\UTM_Campaigns;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Reporting\Reports\Last_Broadcast;
@@ -36,9 +41,7 @@ class Dashboard_Widgets
     public function __construct()
     {
         add_action( 'admin_init', array( $this, 'setup_widgets' ) );
-
         add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
-
         add_action( 'wp_dashboard_setup', array( $this, 'setup_dashboard_widgets' ) );
     }
 
@@ -69,6 +72,7 @@ class Dashboard_Widgets
         $widgets = [
             new Time_Range_Picker(),
             new Country_Widget(),
+            new Region_Widget(),
             new Optin_Status_Widget(),
             new Last_Broadcast_Widget(),
             new Email_Activity(),
@@ -76,23 +80,12 @@ class Dashboard_Widgets
             new Form_Activity(),
             new Funnel_Breakdown(),
             new Search_Engines(),
+            new Lead_Sources(),
+            new Social_Platforms(),
+            new Source_Pages(),
+            new UTM_Campaigns(),
         ];
 
-//        $this->widgets[] = new WPGH_Time_Range_Widget();
-//        $this->widgets[] = new WPGH_Report_Send_Emails();
-//        $this->widgets[] = new WPGH_Report_Form_Activity();
-//        $this->widgets[] = new WPGH_Report_Optins();
-//        $this->widgets[] = new WPGH_Most_Active_Funnels_Widget();
-//        $this->widgets[] = new WPGH_Funnel_Breakdown_Widget();
-//        $this->widgets[] = new WPGH_Lead_Source_Widget();
-//        $this->widgets[] = new WPGH_Social_Media_Widget();
-//        $this->widgets[] = new WPGH_Search_Engines_Widget();
-//        $this->widgets[] = new WPGH_Source_Page_Widget();
-//        $this->widgets[] = new WPGH_UTM_Campaign_Widget();
-//        $this->widgets[] = new WPGH_Geographic_Country_Report();
-//        $this->widgets[] = new WPGH_Geographic_Region_Report();
-//        $this->widgets[] = new WPGH_Optin_Status_Report();
-//        $this->widgets[] = new WPGH_Last_Broadcast_Report();
         /**
          * @param $widget Dashboard_Widget
          *

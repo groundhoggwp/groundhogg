@@ -1,5 +1,6 @@
 <?php
 namespace Groundhogg\Admin\Dashboard\Widgets;
+use function Groundhogg\percentage;
 use Groundhogg\Plugin;
 
 /**
@@ -14,6 +15,11 @@ abstract class Table_Widget extends Reporting_Widget
     protected $dataset;
 
     /**
+     * @return string
+     */
+    abstract function column_title();
+
+    /**
      * Output the widget HTML
      */
     public function widget()
@@ -23,11 +29,32 @@ abstract class Table_Widget extends Reporting_Widget
          */
         $data = $this->get_data();
 
-        var_dump( $data );
+        $html = Plugin::$instance->utils->html;
 
-        $is_empty = array_sum( wp_list_pluck( $data, 'data' ) ) === 0;
+        $total = array_sum( wp_list_pluck( $data, 'data' ) );
 
-        if ( ! $is_empty ):
+        if ( $total ):
+
+            foreach ( $data as $i => $datum )
+            {
+
+                $sub_tal = $datum[ 'data' ];
+                $percentage = ' (' . percentage( $total, $sub_tal ) . '%)';
+
+                $datum[ 'data' ] = $html->wrap( $datum[ 'data' ] . $percentage, 'a', [ 'href' => $datum[ 'url' ], 'class' => 'number-total' ] );
+                unset( $datum['url'] );
+                $data[ $i ] = $datum;
+            }
+
+            $html->list_table(
+                [],
+                [
+                    $this->column_title(),
+                    __( 'Contacts', 'groundhogg'),
+                ],
+                $data,
+                false
+            );
 
             $this->extra_widget_info();
 
@@ -65,12 +92,12 @@ abstract class Table_Widget extends Reporting_Widget
         $dataset = [];
 
         foreach ( $data as $key => $datum ){
-            $dataset[] = $this->normalize_datum( $key, $datum );
+            if ( $key && $datum ){
+                $dataset[] = $this->normalize_datum( $key, $datum );
+            }
         }
 
         $dataset = array_values( $dataset );
-
-//        var_dump( $dataset );
 
         usort( $dataset , array( $this, 'sort' ) );
 
@@ -101,6 +128,13 @@ abstract class Table_Widget extends Reporting_Widget
         return $dataset;
     }
 
+    /**
+     * Sort stuff
+     *
+     * @param $a
+     * @param $b
+     * @return mixed
+     */
     public function sort( $a, $b )
     {
         return $b[ 'data' ] - $a[ 'data' ];

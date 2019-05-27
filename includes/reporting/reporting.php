@@ -13,6 +13,7 @@ use Groundhogg\Reporting\Reports\Contacts_By_Region;
 use Groundhogg\Reporting\Reports\Contacts_By_Search_Engine;
 use Groundhogg\Reporting\Reports\Contacts_By_Social_Media;
 use Groundhogg\Reporting\Reports\Contacts_By_Source_Page;
+use Groundhogg\Reporting\Reports\Contacts_By_UTM_Campaign;
 use Groundhogg\Reporting\Reports\Emails_Clicked;
 use Groundhogg\Reporting\Reports\Emails_Opened;
 use Groundhogg\Reporting\Reports\Emails_Sent;
@@ -238,6 +239,7 @@ class Reporting
             new Contacts_By_Social_Media(),
             new Contacts_By_Lead_Source(),
             new Contacts_By_Source_Page(),
+            new Contacts_By_UTM_Campaign(),
             new Last_Broadcast(),
             new New_Contacts(),
             new Emails_Sent(),

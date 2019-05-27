@@ -1,15 +1,10 @@
 <?php
+
 namespace Groundhogg\Admin\Dashboard\Widgets;
 
 use Groundhogg\Plugin;
 
-/**
- * Created by PhpStorm.
- * User: atty
- * Date: 11/27/2018
- * Time: 9:13 AM
- */
-class Search_Engines extends Table_Widget
+class Source_Pages extends Table_Widget
 {
 
     /**
@@ -19,7 +14,7 @@ class Search_Engines extends Table_Widget
      */
     protected function get_report_id()
     {
-        return 'contacts_by_search_engine';
+        return 'contacts_by_source_page';
     }
 
     /**
@@ -42,7 +37,7 @@ class Search_Engines extends Table_Widget
     protected function normalize_datum($item_key, $item_data)
     {
         return [
-            'label' => $item_key,
+            'label' => Plugin::$instance->utils->html->wrap( $item_key, 'a', [ 'href' => $item_key, 'target' => '_blank' ] ),
             'data' => $item_data,
             'url'  => admin_url( 'admin.php?page=gh_contacts&meta_value=lead_source&meta_value=' . urlencode( $item_key ) )
         ];
@@ -53,6 +48,6 @@ class Search_Engines extends Table_Widget
      */
     function column_title()
     {
-        return __( 'Search Engines', 'groundhogg' );
+        return __( 'Source Page', 'groundhogg' );
     }
 }

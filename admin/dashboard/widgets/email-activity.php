@@ -34,12 +34,14 @@ class Email_Activity extends Time_Graph
     {
         $html = Plugin::$instance->utils->html;
 
-        $total_sent = array_sum( wp_list_pluck( $this->dataset[0][ 'data' ], 1 ) );
-        $total_opens = array_sum( wp_list_pluck( $this->dataset[1][ 'data' ], 1 ) );
+        $total_sent   = array_sum( wp_list_pluck( $this->dataset[0][ 'data' ], 1 ) );
+        $total_opens  = array_sum( wp_list_pluck( $this->dataset[1][ 'data' ], 1 ) );
         $total_clicks = array_sum( wp_list_pluck( $this->dataset[2][ 'data' ], 1 ) );
 
         $html->list_table(
-            [ 'class' => 'email_activity' ],
+            [
+                'class' => 'email_activity'
+            ],
             [
                 __( 'Sent', 'groundhogg' ),
                 __( 'Opens (O.R)', 'groundhogg' ),

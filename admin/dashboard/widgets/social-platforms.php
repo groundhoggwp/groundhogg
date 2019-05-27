@@ -9,7 +9,7 @@ use Groundhogg\Plugin;
  * Date: 11/27/2018
  * Time: 9:13 AM
  */
-class Search_Engines extends Table_Widget
+class Social_Platforms extends Table_Widget
 {
 
     /**
@@ -19,7 +19,7 @@ class Search_Engines extends Table_Widget
      */
     protected function get_report_id()
     {
-        return 'contacts_by_search_engine';
+        return 'contacts_by_social_media';
     }
 
     /**
@@ -53,6 +53,6 @@ class Search_Engines extends Table_Widget
      */
     function column_title()
     {
-        return __( 'Search Engines', 'groundhogg' );
+        return __( 'Social Platform', 'groundhogg' );
     }
 }

@@ -1,7 +1,6 @@
 <?php
 namespace Groundhogg\Reporting\Reports;
 
-
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use Groundhogg\Reporting\Reporting;
