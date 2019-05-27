@@ -104,13 +104,14 @@ class Welcome_Page extends Admin_Page
             array($this, 'page')
         );
 
+        $this->screen_id = $page;
+
         /* White label compat */
         if ( apply_filters( 'wpgh_remove_welcome_page', false ) ){
             remove_submenu_page( 'groundhogg', 'groundhogg' );
         }
 
         add_action("load-" . $page, array($this, 'help'));
-
     }
 
     /**
@@ -284,6 +285,36 @@ class Welcome_Page extends Admin_Page
         }
         $products = json_decode( wp_remote_retrieve_body( $response ) );
         return $products;
+    }
+
+    protected function get_pointers()
+    {
+        return [
+            [
+                'id' => 'search_support_test',
+                'screen' => $this->get_screen_id(),
+                'target' => '#support-articles',
+                'title' => 'Need Help?',
+                'show_next' => true,
+                'content' => 'Search our library of support articles and guides by using the form or check out our most popular guides below.',
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'top' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'search_extensions_test',
+                'screen' => $this->get_screen_id(),
+                'target' => '#extensions',
+                'title' => 'Need More Functionality?',
+                'show_next' => true,
+                'content' => 'If you need to connect to additional plugins, then you need to have a look through our list of popular extensions!',
+                'position' => [
+                    'edge' => 'right', //top, bottom, left, right
+                    'align' => 'top' //top, bottom, left, right, middle
+                ]
+            ],
+        ];
     }
 
     /**

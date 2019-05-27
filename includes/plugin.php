@@ -60,9 +60,9 @@ class Plugin {
     public $notices;
 
     /**
-     * @var Dialogger
+     * @var Pointers
      */
-    public $dialogger;
+    public $pointers;
 
     /**
      * Inits the admin screens.
@@ -287,7 +287,7 @@ class Plugin {
         $this->utils        = new Utils();
         $this->scripts      = new Scripts();
         $this->notices      = new Notices();
-        $this->dialogger    = new Dialogger();
+//        $this->pointers     = new Pointers();
         $this->rewrites     = new Rewrites();
         $this->replacements = new Replacements();
         $this->tag_mapping  = new Tag_Mapping();

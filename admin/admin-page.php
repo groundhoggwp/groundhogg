@@ -4,6 +4,7 @@ namespace Groundhogg\Admin;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
+use Groundhogg\Pointers;
 
 /**
  * Abstract Admin Page
@@ -24,21 +25,25 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 abstract class Admin_Page
 {
 
+    protected $screen_id;
+
     /**
      * Page constructor.
      */
     public function __construct()
     {
-        add_action( 'admin_menu', [ $this, 'register' ], $this->get_priority() );
+        add_action('admin_menu', [$this, 'register'], $this->get_priority());
 
-        if ( wp_doing_ajax() ){
+        if (wp_doing_ajax()) {
             $this->add_ajax_actions();
         }
 
-        if ( $this->is_current_page() ) {
+        if ($this->is_current_page()) {
 
-            add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
-            add_action( 'admin_init', [ $this, 'process_action' ] );
+            add_action('admin_enqueue_scripts', [$this, 'scripts']);
+            add_action('admin_enqueue_scripts', [$this, 'register_pointers']);
+
+            add_action('admin_init', [$this, 'process_action']);
 
             $this->add_additional_actions();
         }
@@ -73,7 +78,10 @@ abstract class Admin_Page
      *
      * @return int
      */
-    public function get_priority(){ return 10; }
+    public function get_priority()
+    {
+        return 10;
+    }
 
     /**
      * Get the page slug
@@ -108,7 +116,8 @@ abstract class Admin_Page
      *
      * @return string
      */
-    public function get_item_type_plural(){
+    public function get_item_type_plural()
+    {
         return $this->get_item_type() . 's';
     }
 
@@ -120,8 +129,8 @@ abstract class Admin_Page
     public function is_current_page()
     {
         // Return basic check to see if we are on the current page doing a normal request
-        if ( ! wp_doing_ajax() ){
-            return isset( $_GET['page'] ) && $_GET['page'] === $this->get_slug();
+        if (!wp_doing_ajax()) {
+            return isset($_GET['page']) && $_GET['page'] === $this->get_slug();
         }
 
         return false;
@@ -141,10 +150,12 @@ abstract class Admin_Page
             $this->get_name(),
             $this->get_cap(),
             $this->get_slug(),
-            [ $this, 'page' ]
+            [$this, 'page']
         );
 
-        add_action( "load-" . $page, [ $this, 'help' ] );
+        $this->screen_id = $page;
+
+        add_action("load-" . $page, [$this, 'help']);
     }
 
     /**
@@ -153,6 +164,22 @@ abstract class Admin_Page
      * @return mixed
      */
     abstract public function help();
+
+    /**
+     * @return void
+     */
+    public function register_pointers()
+    {
+        new Pointers( $this->get_pointers() );
+    }
+
+    /**
+     * @return array
+     */
+    protected function get_pointers()
+    {
+        return [];
+    }
 
     /**
      * Get the affected items on this page
@@ -208,6 +235,14 @@ abstract class Admin_Page
     protected function get_title()
     {
         return $this->get_name();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_screen_id()
+    {
+        return $this->screen_id;
     }
 
     /**
