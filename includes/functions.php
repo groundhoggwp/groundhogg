@@ -1512,3 +1512,27 @@ function scheduled_time( $time )
 
     return $time;
 }
+
+function get_store_products( $args = [] )
+{
+    $args = wp_parse_args( $args, array(
+        //'category' => 'templates',
+        'category' => '',
+        'tag'      => '',
+        's'        => '',
+        'page'     => '',
+        'number'   => '-1'
+    ) );
+
+    $url = 'https://www.groundhogg.io/edd-api/v2/products/';
+
+    $response = wp_remote_get( add_query_arg( $args, $url ) );
+
+    if ( is_wp_error( $response ) ){
+        return $response->get_error_message();
+    }
+
+    $products = json_decode( wp_remote_retrieve_body( $response ) );
+
+    return $products;
+}

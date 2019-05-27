@@ -3,18 +3,13 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\DB\Steps;
 use Groundhogg\Funnel;
+use function Groundhogg\get_store_products;
 use Groundhogg\Manager;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Contact_Query;
 use Groundhogg\Step;
-
-
-
-
-
-
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -599,9 +594,9 @@ class Funnels_Page extends Admin_Page
         }
 
         $content = '';
-        $step_type      = get_request_var( 'step_type' );
-        $step_order     = absint( get_request_var( 'step_order') );
-        $funnel_id      = absint( get_request_var( 'funnel_id' ) );
+        $step_type  = get_request_var( 'step_type' );
+        $step_order = absint( get_request_var( 'step_order') );
+        $funnel_id  = absint( get_request_var( 'funnel_id' ) );
 
         $elements = Plugin::$instance->step_manager->get_elements();
 
@@ -638,48 +633,44 @@ class Funnels_Page extends Admin_Page
             return;
         }
 
-        if ( ! isset( $_POST['step_id'] ) )
-            wp_die( 'No Step.' );
+        if ( ! isset( $_POST['step_id'] ) ){
+            wp_send_json_error();
+        }
 
         $step_id = absint( intval( $_POST['step_id'] ) );
 
         $step =  Plugin::$instance->utils->get_step($step_id ) ;
 
-        if ( ! $step || empty( $step->funnel_id ) )
-            wp_die( 'Could not find step...' );
+        if ( ! $step ){
+            wp_send_json_error();
+        }
 
-        $content = '';
-
-        $newID = Plugin::$instance->dbs->get_db('steps')->add( [
-            'funnel_id'      => $step->funnel_id,
-            'step_title'     => $step->title,
-            'step_type'      => $step->type,
-            'step_group'     => $step->group,
+        $new_step = new Step( [
+            'funnel_id'      => $step->get_funnel_id(),
+            'step_title'     => $step->get_title(),
+            'step_type'      => $step->get_type(),
+            'step_group'     => $step->get_group(),
             'step_status'    => 'ready',
-            'step_order'     => $step->order + 1,
+            'step_order'     => $step->get_order() + 1,
         ] );
 
-        if ( ! $newID )
-            wp_die( 'Oops' );
+        if ( ! $new_step->exists() ){
+            wp_send_json_error();
+        }
 
-        $meta = Plugin::$instance->dbs->get_db('stepmeta')->get_meta( $step_id );
+        $meta = $step->get_meta();
 
         foreach ( $meta as $key => $value ) {
-            Plugin::$instance->dbs->get_db('stepmeta')->update_meta( $newID, $key, $value[0] );
+            $new_step->update_meta( $key, $value );
         }
 
-        if ( $newID ){
+        ob_start();
 
-            $step = Plugin::$instance->utils->get_step( $newID );
+        $new_step->html();
 
-            ob_start();
+        $content = ob_get_clean();
 
-            $step->html();
-
-            $content = ob_get_clean();
-        }
-
-        wp_die( $content );
+        wp_send_json_success( [ 'data' => [ 'html' => $content ] ] );
     }
 
     /**
@@ -815,20 +806,16 @@ class Funnels_Page extends Admin_Page
      */
 	public function get_funnel_templates_ajax( )
     {
-
-
-        $args = array();
-        $args =  array( 'category' => 'templates' );
-        $args = array( 's' => $_POST[ 's' ]);
         ob_start();
-        $this->display_funnel_templates( $args );
+
+        $this->display_funnel_templates();
         $html = ob_get_clean();
 
         $response = array(
             'html'  => $html
         );
 
-       wp_die( json_encode( $response ) );
+       wp_send_json( $response );
 
     }
 
@@ -848,7 +835,7 @@ class Funnels_Page extends Admin_Page
         $args[ 'category' ] = 'templates';
 
 
-        $products = WPGH()->get_store_products( $args ); //todo
+        $products = get_store_products( $args );
 
         if ( is_object( $products ) && count( $products->products ) > 0 ) {
 
