@@ -138,7 +138,155 @@ class Contacts_Page extends Admin_Page
         );
     }
 
+    public function get_pointers_view()
+    {
+        return [
+            [
+                'id' => 'export_contacts',
+                'screen' => $this->get_screen_id(),
+                'target' => '.export-contacts',
+                'title' => 'Export Your Contacts',
+                'show_next' => true,
+                'content' => 'You can export your whole list, or part of you list by clicking this button. IT will always export the current query.',
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'filter_contacts',
+                'screen' => $this->get_screen_id(),
+                'target' => '.subsubsub',
+                'title' => 'Filter Contacts',
+                'show_next' => false,
+                'content' => 'You can quickly see which of you contacts can be marketed to and which cannot by filtering them here.',
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+        ];
+    }
 
+    public function get_pointers_add()
+    {
+        return [
+            [
+                'id' => 'add_contacts',
+                'screen' => $this->get_screen_id(),
+                'target' => '.nav-tab-wrapper a:last-child',
+                'title' => 'Add New Contacts',
+                'show_next' => true,
+                'content' => 'You can use our standard form to add new contacts or you can use any of your web forms.',
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'select_form',
+                'screen' => $this->get_screen_id(),
+                'target' => '#form-submit-link',
+                'title' => 'Choose A Form',
+                'show_next' => false,
+                'content' => 'You can add a contact based on any form in any funnel. Select your form from the dropdown and click "Change Form"',
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ],
+        ];
+    }
+
+    public function get_pointers_edit()
+    {
+        return [
+            [
+                'id' => 'contact_tab_general',
+                'screen' => $this->get_screen_id(),
+                'target' => '#tab_general',
+                'title' => 'General Information',
+                'show_next' => true,
+                'content' => "This is where you'll find basic information about the contact, including and contact information.",
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'contact_tab_meta_data',
+                'screen' => $this->get_screen_id(),
+                'target' => '#tab_meta_data',
+                'title' => 'Custom Information',
+                'show_next' => true,
+                'content' => "This is where you'll find any custom information about a contact.",
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'contact_tab_segmentation',
+                'screen' => $this->get_screen_id(),
+                'target' => '#tab_segmentation',
+                'title' => 'Segmentation',
+                'show_next' => true,
+                'content' => "This is where you can add or remove tags. Also where you can see where the contact came from.",
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'contact_tab_notes',
+                'screen' => $this->get_screen_id(),
+                'target' => '#tab_notes',
+                'title' => 'Notes',
+                'show_next' => true,
+                'content' => "Keep things you'd like to remember about contacts in their notes section.",
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'contact_tab_files',
+                'screen' => $this->get_screen_id(),
+                'target' => '#tab_files',
+                'title' => 'Files',
+                'show_next' => true,
+                'content' => "Upload any files you'd like to keep associated with the contact.",
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'contact_tab_actions',
+                'screen' => $this->get_screen_id(),
+                'target' => '#tab_actions',
+                'title' => 'Actions',
+                'show_next' => true,
+                'content' => "Send emails, texts, or submit internal forms from this tab.",
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'contact_tab_activity',
+                'screen' => $this->get_screen_id(),
+                'target' => '#tab_activity',
+                'title' => 'Activity',
+                'show_next' => true,
+                'content' => "View any activity the contact was involved with.",
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+        ];
+    }
 
     /**
      * Get the screen title
@@ -206,7 +354,7 @@ class Contacts_Page extends Admin_Page
         }
 
         do_action('groundhogg/admin/contacts/add/before');
-        
+
         $_POST = wp_unslash( $_POST );
 
         if ( ! get_request_var( 'email' ) ) {

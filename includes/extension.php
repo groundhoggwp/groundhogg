@@ -1,9 +1,7 @@
 <?php
 namespace Groundhogg;
 use Groundhogg\Admin\Admin_Menu;
-use Groundhogg\DB\DB;
 use Groundhogg\DB\Manager;
-use Groundhogg\DB\Meta_DB;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -30,12 +28,23 @@ abstract class Extension
      */
     public static $extensions = [];
 
+    /**
+     * Extension constructor.
+     */
     public function __construct()
     {
         add_action( 'groundhogg/init', [ $this, 'init' ] );
 
         // Add to main list
         self::$extensions[] = $this;
+    }
+
+    /**
+     * @return Extension[]
+     */
+    public static function get_extensions()
+    {
+        return self::$extensions;
     }
 
     /**
@@ -53,9 +62,9 @@ abstract class Extension
         add_action( 'groundhogg/api/v3/pre_init', [ $this, 'add_apis' ] );
         add_action( 'groundhogg/admin/init',      [ $this, 'add_admin_pages' ] );
 
-        add_filter( 'groundhogg/admin/settings/tabs', [ $this, 'register_settings_tabs' ] );
-        add_filter( 'groundhogg/admin/settings/sections', [ $this, 'register_settings_sections' ] );
         add_filter( 'groundhogg/admin/settings/settings', [ $this, 'register_settings' ] );
+        add_filter( 'groundhogg/admin/settings/tabs',     [ $this, 'register_settings_tabs' ] );
+        add_filter( 'groundhogg/admin/settings/sections', [ $this, 'register_settings_sections' ] );
     }
 
     abstract public function includes();
@@ -85,7 +94,6 @@ abstract class Extension
      * @return array[]
      */
     public function register_settings_tabs( $tabs ){ return $tabs; }
-
 
     /**
      * Register any proprietary DBS
@@ -140,13 +148,31 @@ abstract class Extension
     abstract public function get_plugin_file();
 
     /**
+     * Get details...
+     *
+     * @return array|false
+     */
+    public function get_extension_details()
+    {
+        return get_array_var( get_option( 'gh_extensions', [] ), $this->get_download_id(), [] );
+    }
+
+    /**
      * Get this extension's license key
      *
-     * @return string
+     * @return string|false
      */
     public function get_license_key()
     {
-        return get_array_var( get_option( 'gh_extensions', [] ), $this->get_download_id(), '' );
+        return get_array_var( $this->get_extension_details(), 'license' );
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function get_expiry()
+    {
+        return get_array_var( $this->get_extension_details(), 'expiry' );
     }
 
     /**
@@ -166,6 +192,50 @@ abstract class Extension
             'item_id'   => $this->get_download_id(),
             'url'       => home_url()
         ] );
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        $content = "<div style='width: 400px;margin:10px 10px 10px 0;display: inline-block;vertical-align: top' class='postbox'>";
+        $content.= "<h2 class='hndle'>{$this->get_display_name()}</h2>";
+        $content.= "<div class=\"inside\">";
+        $content.= "<p>" . $this->get_display_description() . "</p>";
+
+        $content.= html()->input( [
+            'placeholder'   => __( 'License', 'groundhogg' ),
+            'name'          => "license[{$this->get_download_id()}]",
+            'value'         => $this->get_license_key()
+        ] );
+
+        if ( $this->get_license_key() ){
+
+            $content .= "<p>";
+            $content .= sprintf( __( "Your license expires on %s", 'groundhogg' ), $this->get_expiry() );
+            $content .= "</p>";
+
+            $content .= html()->wrap( html()->wrap( __( 'Deactivate License', 'groundhogg' ), 'a', [
+                'class' => 'button button-secondary',
+                'href' => admin_url( wp_nonce_url( add_query_arg( [
+                    'action' => 'deactivate_license',
+                    'extension' => $this->get_download_id()
+                ], 'admin.php?page=gh_settings&tab=extensions' ) ) )
+            ] ), 'p' );
+        } else {
+            $content .= html()->wrap( html()->input([
+                'type'  => 'submit',
+                'name'  => 'activate_license',
+                'class' => 'button button-primary',
+                'value' => __( 'Activate', 'groundhogg' ),
+            ]), 'p' );
+        }
+
+        $content.= "</div>";
+        $content.= "</div>";
+
+        return $content;
     }
 
 }

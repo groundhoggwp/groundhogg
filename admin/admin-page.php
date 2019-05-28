@@ -178,7 +178,13 @@ abstract class Admin_Page
      */
     protected function get_pointers()
     {
-        return [];
+        $pointers = [];
+
+        if ( method_exists( $this, 'get_pointers_' . $this->get_current_action() ) ){
+            $pointers = call_user_func( [ $this, 'get_pointers_' . $this->get_current_action() ] );
+        }
+
+        return apply_filters( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_action()}/pointers", $pointers );
     }
 
     /**

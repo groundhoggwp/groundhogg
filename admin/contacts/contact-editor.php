@@ -132,7 +132,7 @@ function contact_record_general_info( $contact )
         <tr>
             <th><h2><?php _e('Name' ) ?></h2></th>
             <?php $contact->get_profile_picture(); ?>
-            <td><img alt="Avatar: Found with https://devidentify.com/" title="Avatar: Found with https://devidentify.com" width="96" height="96" src="<?php echo $contact->get_profile_picture(); ?>">
+            <td><img id="profile-pic" alt="Avatar: Found with https://devidentify.com/" title="Avatar: Found with https://devidentify.com" width="96" height="96" src="<?php echo $contact->get_profile_picture(); ?>">
             </td>
         </tr>
         <tr>

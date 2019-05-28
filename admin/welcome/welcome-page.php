@@ -291,7 +291,7 @@ class Welcome_Page extends Admin_Page
     {
         return [
             [
-                'id' => 'search_support_test',
+                'id' => 'search_support',
                 'screen' => $this->get_screen_id(),
                 'target' => '#support-articles',
                 'title' => 'Need Help?',
@@ -303,11 +303,11 @@ class Welcome_Page extends Admin_Page
                 ]
             ],
             [
-                'id' => 'search_extensions_test',
+                'id' => 'search_extensions',
                 'screen' => $this->get_screen_id(),
                 'target' => '#extensions',
                 'title' => 'Need More Functionality?',
-                'show_next' => true,
+                'show_next' => false,
                 'content' => 'If you need to connect to additional plugins, then you need to have a look through our list of popular extensions!',
                 'position' => [
                     'edge' => 'right', //top, bottom, left, right

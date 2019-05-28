@@ -151,6 +151,162 @@ class Emails_Page extends Admin_Page
         );
     }
 
+    public function get_pointers_add()
+    {
+        return [
+            [
+                'id' => 'default_email_templates',
+                'screen' => $this->get_screen_id(),
+                'target' => '#default-templates',
+                'title' => 'Default Templates',
+                'show_next' => true,
+                'content' => "These are templates that we've created for you to get you started. The content contains instructions for what we've learned makes a good email.",
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'my_previous_emails',
+                'screen' => $this->get_screen_id(),
+                'target' => '#my-emails',
+                'title' => 'My Emails',
+                'show_next' => true,
+                'content' => 'All your previously written emails will appear here. You can search them to find and copy the email you want.',
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'my_templates',
+                'screen' => $this->get_screen_id(),
+                'target' => '#my-templates',
+                'title' => 'My Templates',
+                'show_next' => false,
+                'content' => 'Your emails which have been saved as templates will appear here.',
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+        ];
+    }
+
+    public function get_pointers_edit()
+    {
+        return [
+            [
+                'id' => 'email_subject_line',
+                'screen' => $this->get_screen_id(),
+                'target' => '#subject',
+                'title' => 'Subject Line',
+                'show_next' => true,
+                'content' => "The subject line should be something which entices the reader to open the email. Try to avoid spammy phrases like \"FREE STUFF!\".",
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'email_pre_header',
+                'screen' => $this->get_screen_id(),
+                'target' => '#pre_header',
+                'title' => 'Pre-Header',
+                'show_next' => true,
+                'content' => "The pre header is text which is first to show in the email preview.",
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'email_content',
+                'screen' => $this->get_screen_id(),
+                'target' => '#email-inside',
+                'title' => 'Email Content',
+                'show_next' => true,
+                'content' => 'Click on any block to view the content settings on the right.',
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'email_blocks',
+                'screen' => $this->get_screen_id(),
+                'target' => '#blocks',
+                'title' => 'Blocks',
+                'show_next' => true,
+                'content' => 'Drag blocks into the email content to create your email.',
+                'position' => [
+                    'edge' => 'right', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'email_html_view',
+                'screen' => $this->get_screen_id(),
+                'target' => '#editor-toggle-switch',
+                'title' => 'HTML Editor',
+                'show_next' => true,
+                'content' => 'You can edit your email in plain HTML by switching to the HTML view.',
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'email_status',
+                'screen' => $this->get_screen_id(),
+                'target' => '#status-toggle-switch',
+                'title' => 'Email Status',
+                'show_next' => true,
+                'content' => 'You can toggle the status of your emails between draft and ready. Emails cannot be sent until their status is set to "Ready"',
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'email_template_save',
+                'screen' => $this->get_screen_id(),
+                'target' => '#template-save',
+                'title' => 'Save As Template',
+                'show_next' => true,
+                'content' => 'Save your email as a template. When adding a new email you can view it in the "My Templates" tab.',
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'email_replacements',
+                'screen' => $this->get_screen_id(),
+                'target' => '#replacements',
+                'title' => 'Replacements',
+                'show_next' => true,
+                'content' => 'Insert merged contact information by copying replacements codes and adding them to your email content.',
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'email_test',
+                'screen' => $this->get_screen_id(),
+                'target' => '#update_and_test',
+                'title' => 'Test Your Email',
+                'show_next' => false,
+                'content' => 'When you are done editing your email you can update and test it.',
+                'position' => [
+                    'edge' => 'right', //top, bottom, left, right
+                    'align' => 'top' //top, bottom, left, right, middle
+                ]
+            ],
+        ];
+    }
+
 
     /**
      * Get the title of the current page

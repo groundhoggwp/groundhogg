@@ -165,6 +165,126 @@ class Funnels_Page extends Admin_Page
 
     }
 
+    public function get_pointers_add()
+    {
+        return [
+            [
+                'id' => 'default_funnel_templates',
+                'screen' => $this->get_screen_id(),
+                'target' => '#funnel-templates',
+                'title' => 'Default Templates',
+                'show_next' => true,
+                'content' => "These are templates that we've created for you to get you started. The content contains instructions for what we've learned converts and turns leads into contacts.",
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'import_funnel_template',
+                'screen' => $this->get_screen_id(),
+                'target' => '#funnel-import',
+                'title' => 'Import Funnels',
+                'show_next' => true,
+                'content' => 'Downloaded a funnel from somewhere? Import it here.',
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'funnel_marketplace',
+                'screen' => $this->get_screen_id(),
+                'target' => '#funnel-marketplace',
+                'title' => 'Funnel Marketplace',
+                'show_next' => true,
+                'content' => 'Browse the Groundhogg Marketplace for templates that fit your business niche.',
+                'position' => [
+                    'edge' => 'left',
+                    'align' => 'middle'
+                ]
+            ],
+            [
+                'id' => 'start_building_funnel',
+                'screen' => $this->get_screen_id(),
+                'target' => '#poststuff .postbox:first-child .button-primary',
+                'title' => 'Start Building',
+                'show_next' => false,
+                'content' => "When you're ready to start building click this button to copy and edit the funnel template.",
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+        ];
+    }
+
+    public function get_pointers_edit()
+    {
+        return [
+            [
+                'id' => 'funnel_benchmarks',
+                'screen' => $this->get_screen_id(),
+                'target' => '#benchmarks',
+                'title' => 'Benchmarks',
+                'show_next' => true,
+                'content' => "Benchmarks are used to trigger automation. Simply drag them into the funnel flow.",
+                'position' => [
+                    'edge' => 'right', //top, bottom, left, right
+                    'align' => 'top' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'funnel_actions',
+                'screen' => $this->get_screen_id(),
+                'target' => '#actions',
+                'title' => 'Actions',
+                'show_next' => true,
+                'content' => "Actions perform automation, like sending emails or text messages. Drag them into the funnel flow anywhere.",
+                'position' => [
+                    'edge' => 'right', //top, bottom, left, right
+                    'align' => 'top' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'funnel_reporting',
+                'screen' => $this->get_screen_id(),
+                'target' => '#reporting',
+                'title' => 'Reporting',
+                'show_next' => true,
+                'content' => "Enable reporting view to see how contacts are responding to your funnel.",
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'funnel_export',
+                'screen' => $this->get_screen_id(),
+                'target' => '#export',
+                'title' => 'Sharing',
+                'show_next' => true,
+                'content' => "Share your funnel with clients and colleagues by sharing the download link.",
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'funnel_status',
+                'screen' => $this->get_screen_id(),
+                'target' => '#status-toggle-switch',
+                'title' => 'Status',
+                'show_next' => true,
+                'content' => "Turn your funnel on and off at the flick of a switch.",
+                'position' => [
+                    'edge' => 'right', //top, bottom, left, right
+                    'align' => 'top' //top, bottom, left, right, middle
+                ]
+            ],
+        ];
+    }
+
     public function get_reporting_range()
     {
         return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'this_week' ;
@@ -779,7 +899,7 @@ class Funnels_Page extends Admin_Page
         $funnels_table->views();
         $this->search_form( __( 'Search Funnels', 'groundhogg' ) );
         ?>
-        <form method="post" class="wp-clearfix" >
+        <form method="post" class="wp-clearfix">
             <?php $funnels_table->prepare_items(); ?>
             <?php $funnels_table->display(); ?>
         </form>

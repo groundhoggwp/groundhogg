@@ -1,40 +1,17 @@
 <?php
 namespace Groundhogg;
 /**
-* How to Use:
-* Pointers are defined in an associative array and passed to the class upon instantiation.
-* First we hook into the 'admin_enqueue_scripts' hook with our function:
-*
-*   add_action('admin_enqueue_scripts', 'myHelpPointers');
-*
-*   function myHelpPointers() {
-*      //First we define our pointers
-*      $pointers = array(
-*                       array(
-*                           'id' => 'xyz123',   // unique id for this pointer
-*                           'screen' => 'page', // this is the page hook we want our pointer to show on
-*                           'target' => '#element-selector', // the css selector for the pointer to be tied to, best to use ID's
-*                           'title' => 'My ToolTip',
-*                           'content' => 'My tooltips Description',
-*                           'position' => array(
-*                                              'edge' => 'top', //top, bottom, left, right
-*                                              'align' => 'middle' //top, bottom, left, right, middle
-*                                              )
-*                           )
-*                        // more as needed
-*                        );
-*      //Now we instantiate the class and pass our pointer array to the constructor
-*      $myPointers = new WP_Help_Pointer($pointers);
-*    }
-*
-*
-* @package WP_Help_Pointer
-* @version 0.1
-* @author Tim Debo <tim@rawcreativestudios.com>
-* @copyright Copyright (c) 2012, Raw Creative Studios
-* @link https://github.com/rawcreative/wp-help-pointers
-* @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-*/
+ * How to Use:
+ * Pointers are defined in an associative array and passed to the class upon instantiation.
+ * First we hook into the 'admin_enqueue_scripts' hook with our function:
+ *
+ * @package WP_Help_Pointer
+ * @version 0.1
+ * @author Tim Debo <tim@rawcreativestudios.com>
+ * @copyright Copyright (c) 2012, Raw Creative Studios
+ * @link https://github.com/rawcreative/wp-help-pointers
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 class Pointers {
 
 	public $screen_id;
@@ -109,51 +86,77 @@ class Pointers {
      */
 	public function add_scripts()
     {
-        $pointers = $this->valid;
+        $pointers = $this->valid[ 'pointers' ];
 
         if (empty($pointers))
             return;
 
         $pointers = wp_json_encode($pointers);
         ?>
-
         <script>
-            jQuery(document).ready(function ($) {
+            GroundhoggPointers = {};
 
-                var pointers = {};
-                var current_pointer_id = 0;
+            (function ( $, pointers, p ) {
 
-                var GroundhoggPointers = <?php echo $pointers; ?>;
-                $.each(GroundhoggPointers.pointers, function (i) {
-                    wp_help_pointer_open(i);
-                });
+                $.extend( p, {
 
-                $(document).on( 'click', '.pointer-next', function () {
-                    pointers[ current_pointer_id ].pointer( 'close' );
-                    pointers[ current_pointer_id + 1 ].pointer( 'open' );
-                });
+                    pointers: {},
+                    pointer_id: 0,
 
-                function wp_help_pointer_open(i) {
-                    pointer = GroundhoggPointers.pointers[i];
-                    options = $.extend(pointer.options, {
-                        close: function () {
-                            $.post(ajaxurl, {
-                                pointer: pointer.pointer_id,
-                                action: 'dismiss-wp-pointer'
-                            });
+                    init: function () {
+
+                        var self = this;
+
+                        $.each( pointers, function (i) {
+                            self.help_pointer_open(i);
+                        });
+
+                        $(document).on( 'click', '.pointer-next', function () {
+                            self.open_next_pointer();
+                        });
+                    },
+
+                    open_next_pointer: function(){
+                        this.pointers[ this.pointer_id ].pointer( 'close' );
+
+                        this.pointer_id++;
+
+                        if ( this.pointer_id >= Object.keys( this.pointers ).length ){
+                            this.pointer_id = 0;
                         }
-                    });
 
-                    var $pointer = $(pointer.target).pointer(options);
+                        this.pointers[ this.pointer_id ].pointer( 'open' );
+                    },
 
-                    pointers[ i ] = $pointer;
+                    help_pointer_open : function ( i ) {
+                        var pointer = pointers[i];
 
-                    if ( i === 0 ){
-                        current_pointer_id = i;
-                        $pointer.pointer( 'open' );
-                    }
-                }
-            });
+                        options = $.extend( pointer.options, {
+                            close: function () {
+                                $.post(ajaxurl, {
+                                    pointer: pointer.pointer_id,
+                                    action: 'dismiss-wp-pointer'
+                                });
+                            }
+                        });
+
+                        var $pointer = $( pointer.target ).pointer( options );
+
+                        this.pointers[ i ] = $pointer;
+
+                        if ( i === 0 ){
+                            this.pointer_id = i;
+                            $pointer.pointer( 'open' );
+                        }
+                    },
+
+                } );
+
+                $(function () {
+                    p.init();
+                })
+
+            })(jQuery, <?php echo $pointers; ?>, GroundhoggPointers );
         </script>
         <?php
     }

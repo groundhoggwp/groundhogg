@@ -1,6 +1,10 @@
 <?php
 namespace Groundhogg\Admin\Settings;
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Dropins\Test_Extension;
+use Groundhogg\Extension;
+use function Groundhogg\get_request_var;
+use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
 
@@ -42,15 +46,7 @@ class Settings_Page extends Admin_Page
         add_action( 'admin_init', array( $this, 'register_sections' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
         add_action( "groundhogg/admin/settings/api_tab/after_form", [ $this, 'api_keys_table' ] );
-
-        if ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) {
-//            add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_activation' ) );   //todo enable Comment
-//            add_action( 'admin_init', array( 'WPGH_Extension_Manager', 'perform_deactivation' ) );     //todo enable Comment
-        }
-
-        if( ( isset( $_GET['page'] ) && $_GET['page'] === 'gh_settings' ) || wp_doing_ajax() ){
-//            $this->importer = new WPGH_Bulk_Contact_Manager(); // todo enabled
-        }
+        add_action( "groundhogg/admin/settings/extensions/after_submit", [ $this, 'show_extensions' ] );
     }
 
     public function get_slug()
@@ -239,6 +235,63 @@ class Settings_Page extends Admin_Page
         $api_keys_table = new API_Keys_Table();
         $api_keys_table->prepare_items();
         $api_keys_table->display();
+    }
+
+
+    public function show_extensions()
+    {
+        new Test_Extension();
+
+        $extensions = Extension::get_extensions();
+
+        ?>
+        <div id="poststuff">
+            <?php wp_nonce_field(); ?>
+            <p><?php _e( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license.</a>', 'groundhogg' ); ?></p>
+            <?php
+
+            if ( ! empty( $extensions ) ){
+                foreach ( $extensions as $extension ):
+                    echo $extension;
+                endforeach;
+            } else {
+                ?>
+                <p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a href="https://groundhogg.io/downloads/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a></p>
+                <?php
+            } ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * When we submit the form but to the page not to options.php
+     */
+    public function process_view()
+    {
+
+        if ( get_request_var( 'activate_license' ) ){
+
+            $licenses = get_request_var( 'license', [] );
+
+            foreach ( $licenses as $item_id => $license ){
+
+                License_Manager::activate_license( $license, absint( $item_id ) );
+
+            }
+
+        }
+
+    }
+
+    public function process_deactivate_license()
+    {
+
+        $item_id = absint( get_request_var( 'extension' ) );
+
+        if ( $item_id ){
+            License_Manager::deactivate_license( $item_id );
+        }
+
     }
 
     /**

@@ -51,10 +51,10 @@ if ( count( $custom_templates ) > 0 ){
 
 <h2 class="nav-tab-wrapper">
     <?php if ( count( $custom_templates ) > 0 ): ?>
-    <a href="?page=gh_emails&action=add&tab=my-templates<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'my-templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Templates', 'groundhogg'); ?></a>
+    <a id="my-templates" href="?page=gh_emails&action=add&tab=my-templates<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'my-templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Templates', 'groundhogg'); ?></a>
     <?php endif; ?>
-    <a href="?page=gh_emails&action=add&tab=templates<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Default Templates', 'groundhogg'); ?></a>
-    <a href="?page=gh_emails&action=add&tab=my-emails<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'my-emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Emails', 'groundhogg'); ?></a>
+    <a id="default-templates" href="?page=gh_emails&action=add&tab=templates<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Default Templates', 'groundhogg'); ?></a>
+    <a id="my-emails" href="?page=gh_emails&action=add&tab=my-emails<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'my-emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Emails', 'groundhogg'); ?></a>
 </h2>
 <form method="post" id="poststuff" >
     <!-- search form -->

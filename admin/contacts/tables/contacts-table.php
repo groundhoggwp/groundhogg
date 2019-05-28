@@ -466,7 +466,7 @@ class Contacts_Table extends WP_List_Table {
                 ] ); ?></div>
         </div>
         <div class="alignleft gh-actions">
-            <a class="button action " href="<?php echo  Plugin::$instance->bulk_jobs->export_contacts->get_start_url( $this->query ); //todo uncomment  ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
+            <a class="button action export-contacts" href="<?php echo  Plugin::$instance->bulk_jobs->export_contacts->get_start_url( $this->query ); //todo uncomment  ?>"><?php printf( _nx( 'Export %s contact','Export %s contacts',  $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
         </div><?php
         do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
     }
