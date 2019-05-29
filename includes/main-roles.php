@@ -397,4 +397,14 @@ class Main_Roles extends Roles {
 
         return $roles;
     }
+
+    /**
+     * Return a cap to check against the admin to ensure caps are also installed.
+     *
+     * @return mixed
+     */
+    protected function get_admin_cap_check()
+    {
+        return 'view_contacts';
+    }
 }

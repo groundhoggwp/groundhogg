@@ -172,6 +172,14 @@ abstract class Roles {
     }
 
     /**
+     * Return a cap to check against the admin to ensure caps are also installed.
+     *
+     * @return mixed
+     */
+    abstract protected function get_admin_cap_check();
+
+
+    /**
      * Whether the custom roles have been installed
      *
      * @return bool
@@ -184,7 +192,7 @@ abstract class Roles {
         // If our roles were installed this should be empty
         $missing_roles = array_diff( $our_roles, $installed_roles );
 
-        return empty( $missing_roles );
+        return empty( $missing_roles ) || ! get_role( 'administrator' )->has_cap( $this->get_admin_cap_check() );
     }
 
 }
