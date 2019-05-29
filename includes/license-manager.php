@@ -262,4 +262,151 @@ class License_Manager
 
         return true;
     }
+
+    /**
+     * @return Extension[]
+     */
+    public static function get_installed()
+    {
+        return Extension::get_extensions();
+    }
+
+    /**
+     * @param array $args
+     * @return array|mixed|object
+     */
+    public static function get_store_products( $args=array() )
+    {
+        $args = wp_parse_args( $args, array(
+            //'category' => 'templates',
+            'category' => '',
+            'tag'      => '',
+            's'        => '',
+            'page'     => '',
+            'number'   => '-1'
+        ) );
+        $url = 'https://www.groundhogg.io/edd-api/v2/products/';
+        $response = wp_remote_get( add_query_arg( $args, $url ) );
+        if ( is_wp_error( $response ) ){
+            return $response->get_error_message();
+        }
+        $products = json_decode( wp_remote_retrieve_body( $response ) );
+        return $products;
+    }
+
+    /**
+     * Get a list of extensions to promote on the welcome page
+     *
+     * @return array
+     */
+    public static function get_extensions( $num = 4 )
+    {
+        $products = self::get_store_products( array(
+            'category' => [ 16, 9 ],
+        ) );
+
+        $products = $products->products;
+
+        $installed = self::get_installed();
+
+        if ( ! empty( $installed ) ){
+            $keep = [];
+
+            foreach ( $products as $i => $product ){
+                foreach ( $installed as $extension ){
+                    if ( absint( $product->info->id ) !== $extension->get_download_id() ){
+                        $keep[] = $product;
+                    }
+                }
+            }
+
+            // Switch out.
+            $products = $keep;
+        }
+
+        shuffle( $products );
+
+        if ( $num > count( $products ) ){
+            $num = count( $products );
+        }
+
+        $rands = array_rand( $products, $num );
+        $extensions = [];
+
+        foreach ( $rands as $rand ){
+            $extensions[] = $products[ $rand ];
+        }
+
+        $extensions = apply_filters( 'wpgh_extension_ads', $extensions );
+        return $extensions;
+    }
+
+    /**
+     * Convert array to html article
+     *
+     * @param $args array
+     */
+    public static function extension_to_html( $args=array() )
+    {
+        /* I'm lazy so just covert it to an object*/
+        $extension = (object) $args;
+
+        ?>
+        <div class="postbox">
+            <?php if ( $extension->info->title ): ?>
+                <h2 class="hndle"><?php echo $extension->info->title; ?></h2>
+            <?php endif; ?>
+            <div class="inside">
+                <?php if ( $extension->info->thumbnail ): ?>
+                    <div class="img-container">
+                        <a href="<?php echo $extension->info->link; ?>" target="_blank">
+                            <img src="<?php echo $extension->info->thumbnail; ?>" style="width: 100%;max-width: 100%;">
+                        </a>
+                    </div>
+                    <hr/>
+                <?php endif; ?>
+                <?php if ( $extension->info->excerpt ): ?>
+                    <div class="article-description">
+                        <?php echo $extension->info->excerpt; ?>
+                    </div>
+                    <hr/>
+                <?php endif; ?>
+                <?php if ( $extension->info->link ): ?>
+                    <p>
+                        <?php $pricing = (array) $extension->pricing;
+                        if (count($pricing) > 1) {
+
+                            $price1 = min($pricing);
+                            $price2 = max($pricing);
+
+                            ?>
+                            <a class="button-primary" target="_blank"
+                               href="<?php echo $extension->info->link; ?>"> <?php printf( _x('Buy Now ($%s - $%s)', 'action', 'groundhogg'), $price1, $price2 ); ?></a>
+                            <?php
+                        } else {
+
+                            $price = array_pop($pricing);
+
+                            if ($price > 0.00) {
+                                ?>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action','groundhogg' ), $price ); ?></a>
+                                <?php
+                            } else {
+                                ?>
+                                <a class="button-primary" target="_blank"
+                                   href="<?php echo $extension->info->link; ?>"> <?php _ex('Download', 'action', 'groundhogg'); ?></a>
+                                <?php
+                            }
+                        }
+
+                        ?>
+                    </p>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <?php
+
+    }
 }

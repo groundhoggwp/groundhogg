@@ -48,6 +48,11 @@ class Waiting_Funnel_Activity extends Report
     {
         $funnels = get_db( 'funnels' );
         $funnels = $funnels->query(['status' => 'active']);
+
+        if ( empty( $funnels ) ){
+            return 0;
+        }
+
         $funnel = array_shift( $funnels );
         $default_funnel_id = absint( $funnel->ID );
         return absint( get_request_var( 'funnel', $default_funnel_id ) );
@@ -61,6 +66,11 @@ class Waiting_Funnel_Activity extends Report
     public function get_data()
     {
         $funnel = new Funnel( $this->get_funnel_id() );
+
+        if ( ! $funnel->exists() ){
+            return [];
+        }
+
         $steps = $funnel->get_steps();
         $dataset = [];
 

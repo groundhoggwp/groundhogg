@@ -39,6 +39,8 @@ var GroundhoggModal = {};
     		this.title   = $( '.popup-title' );
     		this.loader  = $( '.iframe-loader-wrapper' );
 
+    		//Hi
+
             this.sizeup();
 
             if ( this.matchUrl( this.args.source ) ){

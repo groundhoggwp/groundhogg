@@ -1,4 +1,8 @@
 <?php
+namespace Groundhogg;
+
+use Groundhogg\Queue\Event_Queue;
+
 /**
  * Uninstall Groundhogg
  *
@@ -23,53 +27,31 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit;
 
 // Load WPGH file.
-include_once dirname(__FILE__) . '/plugin.php';
+include_once dirname(__FILE__) . '/groundhogg.php';
 
-global $wpdb, $wp_roles;
 
-if( wpgh_is_option_enabled( 'gh_uninstall_on_delete' ) ) {
+if( Plugin::$instance->settings->is_option_enabled( 'gh_uninstall_on_delete' ) ) {
 
-    /** Delete the Plugin Pages */
-    $wpgh_created_pages = array( 'gh_confirmation_page', 'gh_unsubscribe_page', 'gh_email_preferences_page', 'gh_view_in_browser_page' );
-    foreach ( $wpgh_created_pages as $p ) {
-        $page = wpgh_get_option( $p, false );
+    //Delete DBS
+    Plugin::$instance->dbs->drop_dbs();
 
-        if ( $page ) {
-            wp_delete_post( $page, true );
-        }
+    //Remove Roles & Caps
+    Plugin::$instance->roles->remove_roles_and_caps();
 
-        delete_option( $p );
-    }
-
-    /* delete permissions */
-    WPGH()->roles->remove_caps();
-    WPGH()->roles->remove_roles();
-
-    // Delete the databases
-    WPGH()->activity->drop();
-    WPGH()->broadcasts->drop();
-    WPGH()->sms->drop();
-    WPGH()->contacts->drop();
-    WPGH()->contact_meta->drop();
-    WPGH()->emails->drop();
-    WPGH()->email_meta->drop();
-    WPGH()->events->drop();
-    WPGH()->steps->drop();
-    WPGH()->step_meta->drop();
-    WPGH()->funnels->drop();
-    WPGH()->superlinks->drop();
-    WPGH()->tags->drop();
-    WPGH()->tag_relationships->drop();
+    //Remove all files
+    Plugin::$instance->utils->files->delete_all_files();
 
     /** Cleanup Cron Events */
-    wp_clear_scheduled_hook( 'wpgh_process_queue' );
-    wp_clear_scheduled_hook( 'wpgh_check_bounces' );
-    wp_clear_scheduled_hook( 'wpgh_do_stats_collection' );
-    wp_clear_scheduled_hook( 'groundhogg/service/verify_domain' );
+    wp_clear_scheduled_hook( Event_Queue::ACTION );
+    wp_clear_scheduled_hook( Bounce_Checker::ACTION );
+    wp_clear_scheduled_hook( Stats_Collection::ACTION );
+    wp_clear_scheduled_hook( 'groundhogg/sending_service/verify_domain' );
 
     //delete api keys from user_meta
     delete_metadata('user',0,'wpgh_user_public_key','',true);
     delete_metadata('user',0,'wpgh_user_secret_key','',true);
+
+    global $wpdb;
 
     // Remove any transients and options we've left behind
     $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'gh\_%'" );

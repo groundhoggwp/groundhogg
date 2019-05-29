@@ -80,14 +80,14 @@ abstract class Roles {
     }
 
     /**
-     * Remove the roles from WPGH
+     * Remove the roles from Groundhogg
      */
     public function remove_roles()
     {
-        $roles = array_keys( $this->get_roles() );
+        $roles = $this->get_roles();
 
         foreach ( $roles as $role ) {
-            remove_role( $role );
+            $this->get_wp_roles()->remove_role( $role[ 'role' ] );
         }
     }
 
@@ -138,7 +138,6 @@ abstract class Roles {
             }
 
         }
-
     }
 
     /**
@@ -156,13 +155,13 @@ abstract class Roles {
 
         foreach ($roles as $role) {
 
-            if (method_exists($this, "get_{$role}_caps")) {
+            if ( method_exists($this, "get_{$role}_caps" ) ) {
 
-                $caps = call_user_func([$this, "get_{$role}_caps"]);
+                $caps = call_user_func( [$this, "get_{$role}_caps"] );
 
                 foreach ($caps as $cap) {
 
-                    $wp_roles->remove_cap($role, $cap);
+                    $wp_roles->remove_cap( $role, $cap );
 
                 }
 
@@ -180,7 +179,7 @@ abstract class Roles {
     public function roles_are_installed()
     {
         $installed_roles = array_keys( wp_roles()->roles );
-        $our_roles = array_column( $this->get_roles(), 'role' );
+        $our_roles = wp_list_pluck( $this->get_roles(), 'role' );
 
         // If our roles were installed this should be empty
         $missing_roles = array_diff( $our_roles, $installed_roles );

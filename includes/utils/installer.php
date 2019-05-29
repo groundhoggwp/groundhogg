@@ -125,8 +125,6 @@ abstract class Installer {
     {
         global $wpdb;
 
-//        ob_start();
-
         if ( is_multisite() && $network_wide ) {
 
             foreach ( $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs LIMIT 100" ) as $blog_id ) {

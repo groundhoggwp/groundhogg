@@ -46,7 +46,7 @@
 }
 
 .editor-header{
-    z-index: 9999;
+    z-index: 999;
     top: 32px;
     box-sizing: border-box;
     position: fixed;

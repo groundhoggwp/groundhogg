@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\DB\Steps;
 use Groundhogg\Funnel;
+use function Groundhogg\get_db;
 use function Groundhogg\get_store_products;
 use Groundhogg\Manager;
 use function Groundhogg\enqueue_groundhogg_modal;
@@ -28,17 +29,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Funnels_Page extends Admin_Page
 {
-
-    /**
-     * @var int
-     */
-    public $reporting_start_time;
-
-    /**
-     * @var int
-     */
-    public $reporting_end_time;
-
     /**
      * @var
      */
@@ -52,14 +42,27 @@ class Funnels_Page extends Admin_Page
         add_action( 'wp_ajax_wpgh_delete_funnel_step',  array( $this, 'delete_step' ) );
         add_action( 'wp_ajax_wpgh_duplicate_funnel_step',  array( $this, 'duplicate_step' ) );
         add_action( 'wp_ajax_gh_add_contacts_to_funnel',  array( $this, 'add_contacts_to_funnel' ) );
+    }
 
+    /**
+     * Redirect to the add screen if no funnels are present.
+     */
+    public function redirect_to_add()
+    {
+        if ( get_db( 'funnels' )->count() == 0 ){
+            die( wp_redirect( $this->admin_url( [ 'action' => 'add' ] ) ) );
+        }
     }
 
     protected function add_additional_actions()
     {
         $this->setup_reporting();
 
-        if ( $this->get_current_action() === 'edit' ){
+        if ( $this->is_current_page() && $this->get_current_action() === 'view' ){
+            add_action( 'admin_init', [ $this, 'redirect_to_add' ] );
+        }
+
+        if ( $this->is_current_page() && $this->get_current_action() === 'edit' ){
             add_action( 'in_admin_header' , array( $this, 'prevent_notices' )  );
             /* just need to enqueue it... */
             enqueue_groundhogg_modal();
@@ -181,18 +184,6 @@ class Funnels_Page extends Admin_Page
                 ]
             ],
             [
-                'id' => 'import_funnel_template',
-                'screen' => $this->get_screen_id(),
-                'target' => '#funnel-import',
-                'title' => 'Import Funnels',
-                'show_next' => true,
-                'content' => 'Downloaded a funnel from somewhere? Import it here.',
-                'position' => [
-                    'edge' => 'left', //top, bottom, left, right
-                    'align' => 'middle' //top, bottom, left, right, middle
-                ]
-            ],
-            [
                 'id' => 'funnel_marketplace',
                 'screen' => $this->get_screen_id(),
                 'target' => '#funnel-marketplace',
@@ -202,6 +193,18 @@ class Funnels_Page extends Admin_Page
                 'position' => [
                     'edge' => 'left',
                     'align' => 'middle'
+                ]
+            ],
+            [
+                'id' => 'import_funnel_template',
+                'screen' => $this->get_screen_id(),
+                'target' => '#funnel-import',
+                'title' => 'Import Funnels',
+                'show_next' => true,
+                'content' => 'Downloaded a funnel from somewhere? Import it here.',
+                'position' => [
+                    'edge' => 'left', //top, bottom, left, right
+                    'align' => 'middle' //top, bottom, left, right, middle
                 ]
             ],
             [
@@ -285,80 +288,21 @@ class Funnels_Page extends Admin_Page
         ];
     }
 
-    public function get_reporting_range()
-    {
-        return ( isset( $_POST[ 'date_range' ] ) )? $_POST[ 'date_range' ] : 'this_week' ;
-    }
-
     public function get_reporting_start_time()
     {
-        return $this->reporting_start_time;
+        return Plugin::$instance->reporting->get_start_time();
     }
 
     public function get_reporting_end_time()
     {
-        return $this->reporting_start_time;
+        return Plugin::$instance->reporting->get_end_time();
     }
 
     private function setup_reporting(){
 
-        if ( isset( $_POST[ 'reporting_on' ] ) ){
+        if ( get_request_var( 'reporting_on' ) ){
             $this->reporting_enabled = true;
         }
-
-        switch ( $this->get_reporting_range() ):
-            case 'today';
-                $this->reporting_start_time   = strtotime( 'today' );
-                $this->reporting_end_time     = $this->reporting_start_time + DAY_IN_SECONDS;
-                break;
-            case 'yesterday';
-                $this->reporting_start_time   = strtotime( 'yesterday' );
-                $this->reporting_end_time     = $this->reporting_start_time + DAY_IN_SECONDS;
-                break;
-            default:
-            case 'this_week';
-                $this->reporting_start_time   = mktime(0, 0, 0, date("n"), date("j") - date("N") + 1);
-                $this->reporting_end_time     = $this->reporting_start_time + WEEK_IN_SECONDS;
-                break;
-            case 'last_week';
-                $this->reporting_start_time   = mktime(0, 0, 0, date("n"), date("j") - date("N") + 1) - WEEK_IN_SECONDS;
-                $this->reporting_end_time     = $this->reporting_start_time + WEEK_IN_SECONDS;
-                break;
-            case 'last_30';
-                $this->reporting_start_time   = Plugin::$instance->utils->date_time->round_to_day( time() - MONTH_IN_SECONDS );
-                $this->reporting_end_time     = Plugin::$instance->utils->date_time->round_to_day( time() );
-                break;
-            case 'last_month';
-                $this->reporting_start_time   = strtotime( 'first day of ' . date( 'F Y' , TIME() - MONTH_IN_SECONDS ) );
-                $this->reporting_end_time     = $this->reporting_start_time + MONTH_IN_SECONDS;
-                break;
-            case 'this_month';
-                $this->reporting_start_time   = strtotime( 'first day of ' . date( 'F Y') );
-                $this->reporting_end_time     = $this->reporting_start_time + MONTH_IN_SECONDS;
-                break;
-            case 'this_quarter';
-                $quarter            = Plugin::$instance->utils->date_time->get_dates_of_quarter();
-                $this->reporting_start_time   = $quarter[ 'start' ];
-                $this->reporting_end_time     = $quarter[ 'end' ];
-                break;
-            case 'last_quarter';
-                $quarter            = Plugin::$instance->utils->date_time->get_dates_of_quarter( 'previous' );
-                $this->reporting_start_time   = $quarter[ 'start' ];
-                $this->reporting_end_time     = $quarter[ 'end' ];
-                break;
-            case 'this_year';
-                $this->reporting_start_time   = mktime(0, 0, 0, 1, 1, date( 'Y' ) );
-                $this->reporting_end_time     = $this->reporting_start_time + YEAR_IN_SECONDS;
-                break;
-            case 'last_year';
-                $this->reporting_start_time   = mktime(0, 0, 0, 1, 1, date( 'Y' , time() - YEAR_IN_SECONDS ));
-                $this->reporting_end_time     = $this->reporting_start_time + YEAR_IN_SECONDS;
-                break;
-            case 'custom';
-                $this->reporting_start_time   = Plugin::$instance->utils->date_time->round_to_day( strtotime( get_request_var( 'custom_date_range_start' ) ) );
-                $this->reporting_end_time     = Plugin::$instance->utils->date_time->round_to_day( strtotime( get_request_var( 'custom_date_range_end' ) ) );
-                break;
-            endswitch;
     }
 
     /**
@@ -419,8 +363,7 @@ class Funnels_Page extends Admin_Page
         return true;
     }
 
-
-	public function process_duplicate ()
+	public function process_duplicate()
     {
         if ( ! current_user_can( 'add_funnels' ) ){
             $this->wp_die_no_access();
@@ -608,8 +551,8 @@ class Funnels_Page extends Admin_Page
                     'funnel' => $funnel->get_id(),
                     'step'   => $step->get_id(),
                     'status' => 'complete',
-                    'start'  => $this->reporting_start_time,
-                    'end'    => $this->reporting_end_time,
+                    'start'  => $this->get_reporting_start_time(),
+                    'end'    => $this->get_reporting_end_time(),
                 )
             );
 

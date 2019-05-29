@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
+use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
@@ -40,6 +41,7 @@ class Compliance extends Step
             'type' => HTML::LINK_PICKER,
             'field' => [
                 'value' => get_option( 'gh_privacy_policy' ),
+                'name' => 'gh_privacy_policy'
             ],
             'description' => _x( 'This will be linked in the footer of your emails. It is important to let subscribers know how you plan to use their information.', 'guided_setup', 'groundhogg' )
         ] );
@@ -49,6 +51,7 @@ class Compliance extends Step
             'type' => HTML::LINK_PICKER,
             'field' => [
                 'value' => get_option( 'gh_terms' ),
+                'name' => 'gh_terms'
             ],
             'description' => _x( 'Terms & conditions tell users about what they can expect from using your site.', 'guided_setup', 'groundhogg' )
         ] );
@@ -90,14 +93,8 @@ class Compliance extends Step
      */
     public function save()
     {
-
-        if ( isset( $_POST[ 'gh_privacy_policy' ] ) && ! empty( $_POST[ 'gh_privacy_policy' ] ) ){
-            Plugin::$instance->settings->update_option( 'gh_privacy_policy', intval( $_POST[ 'gh_privacy_policy' ] ) );
-        }
-
-        if ( isset( $_POST[ 'gh_terms' ] ) && ! empty( $_POST[ 'gh_terms' ] ) ){
-            Plugin::$instance->settings->update_option( 'gh_terms', intval( $_POST[ 'gh_terms' ] ) );
-        }
+        Plugin::$instance->settings->update_option( 'gh_privacy_policy', sanitize_text_field( get_request_var( 'gh_privacy_policy' ) ) );
+        Plugin::$instance->settings->update_option( 'gh_terms', sanitize_text_field( get_request_var( 'gh_terms' ) ) );
 
         if ( isset( $_POST[ 'in_canada' ]  ) ){
             Plugin::$instance->settings->update_option( 'gh_strict_confirmation', array( 'on' ) );

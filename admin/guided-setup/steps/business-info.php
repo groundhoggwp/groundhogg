@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
+use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\HTML;
 
@@ -67,6 +68,8 @@ class Business_Info extends Step
                 'label' => $field[ 'name' ],
                 'type' => HTML::INPUT,
                 'field' => [
+                    'name'  => $field[ 'option' ],
+                    'id'    => $field[ 'option' ],
                     'value' => get_option( $field[ 'option' ] )
                 ],
             ] );
@@ -95,8 +98,8 @@ class Business_Info extends Step
         ];
 
         foreach ( $settings as $setting ){
-            if ( isset( $_POST[ $setting ] ) && ! empty( $_POST[ $setting ] ) ){
-                update_option( $setting, sanitize_text_field( $_POST[ $setting ] ) );
+            if ( get_request_var( $setting ) ){
+                update_option( $setting, sanitize_text_field( get_request_var( $setting ) ) );
             }
         }
 

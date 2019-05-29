@@ -4,6 +4,8 @@ namespace Groundhogg;
 use Groundhogg\Api\Api_Loader;
 use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
+use Groundhogg\Dropins\Test_Extension;
+use Groundhogg\Dropins\Test_Extension_2;
 use Groundhogg\Form\Submission_Handler;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Reporting\Reporting;
@@ -104,6 +106,16 @@ class Plugin {
      * @var Settings
      */
     public $settings;
+
+    /**
+     * @var Main_Installer
+     */
+    public $installer;
+
+    /**
+     * @var Main_Updater
+     */
+    public $updater;
 
     /**
      * @var Replacements
@@ -260,6 +272,7 @@ class Plugin {
          * @since 1.0.0
          */
         do_action( 'groundhogg/init' );
+
     }
 
     /**
@@ -274,8 +287,6 @@ class Plugin {
      */
     private function init_components() {
 
-//        var_dump( 'init' );
-
         // Settings & DBS needs to go first...
         $this->settings     = new Settings();
         $this->roles        = new Main_Roles();
@@ -287,7 +298,6 @@ class Plugin {
         $this->utils        = new Utils();
         $this->scripts      = new Scripts();
         $this->notices      = new Notices();
-//        $this->pointers     = new Pointers();
         $this->rewrites     = new Rewrites();
         $this->replacements = new Replacements();
         $this->tag_mapping  = new Tag_Mapping();
@@ -340,12 +350,23 @@ class Plugin {
     private function __construct() {
 
         $this->register_autoloader();
+        $this->init_dropins();
+
 
         if ( did_action( 'plugins_loaded' ) ){
             $this->init();
         } else {
             add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
         }
+    }
+
+    /**
+     * initialize any dropins.
+     */
+    protected function init_dropins()
+    {
+//        new Test_Extension();
+//        new Test_Extension_2();
     }
 
     /**

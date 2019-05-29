@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Email_Parser;
+use function Groundhogg\html;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
 
@@ -174,7 +175,16 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                                         <tr>
                                             <th><?php _e( 'From:', 'groundhogg'  ); ?></th>
                                             <?php $args = array( 'option_none' => __( 'The Contact\'s Owner' ) , 'id' => 'from_user', 'name' => 'from_user', 'selected' => $email->from_user ); ?>
-                                            <td><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></td>
+                                            <td><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?>
+                                                <?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th><?php _e( 'Reply To:', 'groundhogg'  ); ?></th>
+                                            <?php $args = [ 'type' => 'email', 'name' => 'reply_to_override', 'value' => $email->get_meta( 'reply_to_override' ) ]; ?>
+                                            <td><?php echo Plugin::$instance->utils->html->input( $args ); ?>
+                                                <?php echo html()->description( __( 'Override the email address replies are sent to. Leave empty to default to the sender address.' ) ); ?>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th><?php _e( 'Alignment' ); ?></th>

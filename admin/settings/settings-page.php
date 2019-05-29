@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Settings;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Dropins\Test_Extension;
+use Groundhogg\Dropins\Test_Extension_2;
 use Groundhogg\Extension;
 use function Groundhogg\get_request_var;
 use Groundhogg\License_Manager;
@@ -240,23 +241,51 @@ class Settings_Page extends Admin_Page
 
     public function show_extensions()
     {
-        new Test_Extension();
 
         $extensions = Extension::get_extensions();
 
         ?>
         <div id="poststuff">
             <?php wp_nonce_field(); ?>
-            <p><?php _e( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license.</a>', 'groundhogg' ); ?></p>
             <?php
 
             if ( ! empty( $extensions ) ){
+
+                ?>
+                <p><?php _e( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license.</a>', 'groundhogg' ); ?></p>
+                <?php
+
                 foreach ( $extensions as $extension ):
                     echo $extension;
                 endforeach;
             } else {
                 ?>
+                <style>
+                    .masonry {
+                        columns: 1;
+                        column-gap: 1.5em;
+                    }
+                    .postbox {
+                        display: inline-block;
+                        vertical-align: top;
+                    }
+                    @media only screen and (max-width: 1023px) and (min-width: 768px) {  .masonry {
+                        columns: 2;
+                    }
+                    }
+                    @media only screen and (min-width: 1024px) {
+                        .masonry {
+                            columns: 5;
+                        }
+                    }
+                </style>
                 <p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a href="https://groundhogg.io/downloads/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a></p>
+                <div class="masonry">
+                    <?php
+                foreach ( License_Manager::get_extensions(99) as $extension ):
+                    License_Manager::extension_to_html( $extension );
+                endforeach;?>
+                </div>
                 <?php
             } ?>
         </div>

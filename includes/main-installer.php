@@ -75,6 +75,7 @@ class Main_Installer extends Installer
     {
         if( $plugin == plugin_basename( GROUNDHOGG__FILE__ ) ) {
             if ( Plugin::$instance->settings->is_option_enabled( 'gh_guided_setup_finished' ) ){
+//            if ( false ){
                 exit( wp_redirect( admin_url( 'admin.php?page=groundhogg' ) ) );
             } else {
                 exit( wp_redirect( admin_url( 'admin.php?page=gh_guided_setup' ) ) );

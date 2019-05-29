@@ -110,7 +110,7 @@ class Import_Contacts extends Bulk_Job
 
         // Return to guided setup if it's not yet complete.
         if ( ! Plugin::$instance->settings->get_option('gh_guided_setup_finished', false ) ){
-            $url = admin_url( 'admin.php?page=gh_guided_setup&step=5' );
+            $url = admin_url( 'admin.php?page=gh_guided_setup&step=4' );
         }
 
         return $url;

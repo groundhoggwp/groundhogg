@@ -24,6 +24,36 @@ class Files
         return wp_normalize_path( apply_filters( "groundhogg/files/uploads/{$type}", $base ) );
     }
 
+    /**
+     * Delete all files in Groundhogg uploads directory.
+     *
+     * @return bool
+     */
+    public function delete_all_files()
+    {
+        $base_dir = $this->get_base_uploads_dir();
+        $this->delete_files( $base_dir );
+
+        return true;
+    }
+
+    /**
+     * php delete function that deals with directories recursively
+     */
+    public function delete_files($target) {
+        if(is_dir($target)){
+            $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
+
+            foreach( $files as $file ){
+                $this->delete_files( $file );
+            }
+
+            rmdir( $target );
+        } elseif(is_file($target)) {
+            unlink( $target );
+        }
+    }
+
 
     /**
      * Get the base uploads path.

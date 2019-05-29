@@ -6,9 +6,11 @@ namespace Groundhogg;
 class Stats_Collection
 {
 
+    const ACTION = 'gh_do_stats_collection';
+
     public function __construct()
     {
-        add_action( 'groundhogg/init', [ $this, 'init' ] );
+        add_action( 'init', [ $this, 'init' ] );
     }
 
     public function init()
@@ -77,7 +79,7 @@ We appreciate your help, best of luck!
     /**
      * Send the initial request to the GH server and get a response.
      *
-     * @return false|WP_Error|Object
+     * @return false|\WP_Error|Object
      */
     public function optin()
     {
@@ -97,15 +99,15 @@ We appreciate your help, best of luck!
             $json = json_decode( $body );
 
             if ( ! isset( $json->code ) ){
-                return new WP_Error( 'optin_error', _x( 'An unknown error occurred', 'notice', 'groundhogg' ) );
+                return new \WP_Error( 'optin_error', _x( 'An unknown error occurred', 'notice', 'groundhogg' ) );
             }
 
             if ( $json->code !== 'success' ){
-                return new WP_Error( $json->code, $json->message );
+                return new \WP_Error( $json->code, $json->message );
             }
 
-            wpgh_update_option( 'gh_site_key', $stats[ 'site_key' ] );
-            wpgh_update_option( 'gh_opted_in_stats_collection', 1 );
+            update_option( 'gh_site_key', $stats[ 'site_key' ] );
+            update_option( 'gh_opted_in_stats_collection', 1 );
             update_user_meta( wp_get_current_user()->ID, 'gh_discount_code', $json->discount );
 
             return $json;
@@ -123,19 +125,19 @@ We appreciate your help, best of luck!
     {
 
         global $wpdb;
-        $events = WPGH()->events->table_name;
-        $steps  = WPGH()->steps->table_name;
+        $events = get_db( 'events' )->get_table_name();
+        $steps  = get_db( 'steps' )->get_table_name();
         $time = time();
 
         $num_emails_sent = $wpdb->get_var( "SELECT COUNT(e.ID) FROM $events AS e LEFT JOIN $steps AS s ON e.step_id = s.ID WHERE e.time <= $time AND ( s.step_type = 'send_email' OR e.funnel_id = 1 ) " );
-        $num_opens = WPGH()->activity->count( array( 'end' => $time, 'activity_type' => 'email_opened' ) );
-        $num_clicks = WPGH()->activity->count( array( 'end' => $time, 'activity_type' => 'email_link_click' ) );
+        $num_opens = get_db( 'activity' )->count( array( 'end' => $time, 'activity_type' => 'email_opened' ) );
+        $num_clicks = get_db( 'activity' )->count( array( 'end' => $time, 'activity_type' => 'email_link_click' ) );
 
         $stats = [
-            'site_key'  => wpgh_get_option( 'gh_site_key', md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) ) ),
-            'contacts'  =>  WPGH()->contacts->count(),
-            'funnels'   => WPGH()->funnels->count(),
-            'emails'    => WPGH()->emails->count(),
+            'site_key'  => get_option( 'gh_site_key', md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) ) ),
+            'contacts'  => get_db( 'contacts' )->count(),
+            'funnels'   => get_db( 'funnels' )->count(),
+            'emails'    => get_db( 'emails' )->count(),
             'sent'      => $num_emails_sent,
             'opens'     => $num_opens,
             'clicks'    => $num_clicks,
@@ -149,9 +151,9 @@ We appreciate your help, best of luck!
             $body = wp_remote_retrieve_body( $response );
             $json = json_decode( $body );
 
-            if ( wpgh_is_json_error( $json ) ){
+            if ( is_json_error( $json ) ){
 
-                $error = wpgh_get_json_error( $json );
+                $error = get_json_error( $json );
 
                 /* Optin if not already and optin enabled via settings... */
                 if ( $error->get_error_code() === 'site_unregistered' ){

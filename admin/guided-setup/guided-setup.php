@@ -182,4 +182,12 @@ class Guided_Setup extends Admin_Page
      */
     public function help(){}
 
+    /**
+     * Optin to tracking...
+     */
+    public function process_opt_in_to_stats()
+    {
+        Plugin::$instance->stats_collection->stats_tracking_optin();
+    }
+
 }

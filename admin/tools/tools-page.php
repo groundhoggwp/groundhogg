@@ -252,7 +252,7 @@ class Tools_Page extends Tabbed_Admin_Page
     {
 
         if ( ! current_user_can( 'import_contacts' ) ){
-            wp_die( 'Oops...' );
+            $this->wp_die_no_access();
         }
 
         if ( empty( $_FILES[ 'import_file' ][ 'name' ] ) ){
