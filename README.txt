@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.11.5
+* FIXED CSS compatibility issue with select2 in the form builder when WPEP is installed.
+
 = 1.3.11.4 =
 * TWEAKED Field timer now normalizes any custom meta given to ensure it works as intended.
 * FIXED failing security check when submitting forms from the admin screen.

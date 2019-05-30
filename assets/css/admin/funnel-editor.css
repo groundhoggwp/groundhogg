@@ -1,3 +1,7 @@
+body .select2-container{
+    z-index: 99999999 !important;
+}
+
 /* NEW STUFF */
 #wpbody-content{
     /*height: 100vh;*/
