@@ -508,6 +508,7 @@ class Emails_Page extends Admin_Page
 
         $email->update_meta( 'alignment', sanitize_text_field( Groundhogg\get_request_var( 'email_alignment' ) ) );
         $email->update_meta( 'browser_view', boolval( Groundhogg\get_request_var( 'browser_view' ) ) );
+        $email->update_meta( 'reply_to_override', sanitize_email( Groundhogg\get_request_var( 'reply_to_override' ) ) );
 
         if ( Groundhogg\get_request_var( 'update_and_test' ) ){
 

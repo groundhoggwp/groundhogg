@@ -610,9 +610,8 @@ class Email extends Base_Object_With_Meta
     {
         /* Use default mail-server */
         $headers = [];
-
         $headers['from'] = 'From: ' . $this->get_from_name() . ' <' . $this->get_from_email() . '>';
-        $headers['reply_to'] = 'Reply-To: ' . $this->get_from_email();
+        $headers['reply_to'] = 'Reply-To: ' . $this->get_meta( 'reply_to_override' ) ? $this->get_meta( 'reply_to_override' ) : $this->get_from_email();
         $headers['return_path'] = 'Return-Path: ' . Plugin::$instance->settings->get_option('bounce_inbox', $this->get_from_email());
         $headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
         $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), $this->get_click_tracking_link(), urlencode($this->get_unsubscribe_link() ) );

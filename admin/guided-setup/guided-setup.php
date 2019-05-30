@@ -10,6 +10,7 @@ use Groundhogg\Admin\Guided_Setup\Steps\Finished;
 use Groundhogg\Admin\Guided_Setup\Steps\Import_Contacts;
 use Groundhogg\Admin\Guided_Setup\Steps\Start;
 use Groundhogg\Admin\Guided_Setup\Steps\Step;
+use Groundhogg\Admin\Guided_Setup\Steps\Sync_Users;
 use function Groundhogg\floating_phil;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
@@ -60,6 +61,7 @@ class Guided_Setup extends Admin_Page
         $steps[] = new Business_Info();
         $steps[] = new Compliance();
         $steps[] = new Import_Contacts();
+        $steps[] = new Sync_Users();
         $steps[] = new Email();
         $steps[] = new Finished();
 

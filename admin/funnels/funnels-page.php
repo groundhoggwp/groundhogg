@@ -5,7 +5,6 @@ use Groundhogg\DB\Steps;
 use Groundhogg\Funnel;
 use function Groundhogg\get_db;
 use function Groundhogg\get_store_products;
-use Groundhogg\Manager;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;

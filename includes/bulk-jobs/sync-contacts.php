@@ -2,6 +2,7 @@
 namespace Groundhogg\Bulk_Jobs;
 
 use function Groundhogg\create_contact_from_user;
+use Groundhogg\Plugin;
 use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -108,6 +109,13 @@ class Sync_Contacts extends Bulk_Job
      */
     protected function get_return_url()
     {
-        return admin_url( 'admin.php?page=gh_contacts' );
+        $url = admin_url( 'admin.php?page=gh_contacts' );
+
+        // Return to guided setup if it's not yet complete.
+        if ( ! Plugin::$instance->settings->get_option('gh_guided_setup_finished', false ) ){
+            $url = admin_url( 'admin.php?page=gh_guided_setup&step=5' );
+        }
+
+        return $url;
     }
 }
