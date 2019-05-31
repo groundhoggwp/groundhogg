@@ -273,6 +273,11 @@ class Plugin {
          */
         do_action( 'groundhogg/init' );
 
+        /**
+         * Extensions should be loaded after the INIT above, but there is some stuff we need to initialize here.
+         */
+        do_action( 'groundhogg/init/after' );
+
     }
 
     /**
@@ -351,7 +356,6 @@ class Plugin {
 
         $this->register_autoloader();
         $this->init_dropins();
-
 
         if ( did_action( 'plugins_loaded' ) ){
             $this->init();

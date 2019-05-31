@@ -23,7 +23,7 @@ class Test_Extension extends Extension {
      *
      * @param $db_manager Manager
      */
-    public function add_dbs($db_manager)
+    public function register_dbs($db_manager)
     {
         // TODO: Implement add_dbs() method.
     }
@@ -34,7 +34,7 @@ class Test_Extension extends Extension {
      * @param $api_manager
      * @return void
      */
-    public function add_apis($api_manager)
+    public function register_apis($api_manager)
     {
         // TODO: Implement add_apis() method.
     }
@@ -45,7 +45,7 @@ class Test_Extension extends Extension {
      * @param $admin_menu Admin_Menu
      * @return void
      */
-    public function add_admin_pages($admin_menu)
+    public function register_admin_pages($admin_menu)
     {
         // TODO: Implement add_admin_pages() method.
     }

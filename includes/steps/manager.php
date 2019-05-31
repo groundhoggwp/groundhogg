@@ -69,6 +69,16 @@ class Manager {
         $this->elements[] = new Role_Changed();
         $this->elements[] = new Tag_Applied();
         $this->elements[] = new Tag_Removed();
+
+        do_action( 'groundhogg/steps/init', $this );
+    }
+
+    /**
+     * @param $step Funnel_Step
+     */
+    public function add_step( $step )
+    {
+        $this->elements[] = $step;
     }
 
     /**

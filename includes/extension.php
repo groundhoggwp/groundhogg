@@ -2,6 +2,7 @@
 namespace Groundhogg;
 use Groundhogg\Admin\Admin_Menu;
 use Groundhogg\DB\Manager;
+use Groundhogg\Reporting\Reports\Report;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -19,7 +20,20 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 abstract class Extension
 {
 
-    const STORE_URL = 'https://www.groundhogg.io';
+    /**
+     * @var Installer
+     */
+    protected $installer;
+
+    /**
+     * @var Updater
+     */
+    protected $updater;
+
+    /**
+     * @var Roles
+     */
+    protected $roles;
 
     /**
      * Keep a going array of all the Extensions.
@@ -33,11 +47,23 @@ abstract class Extension
      */
     public function __construct()
     {
+        $this->register_autoloader();
+
         add_action( 'groundhogg/init', [ $this, 'init' ] );
 
         // Add to main list
         self::$extensions[] = $this;
     }
+
+    /**
+     * Register autoloader.
+     *
+     * Groundhogg autoloader loads all the classes needed to run the plugin.
+     *
+     * @since 1.6.0
+     * @access private
+     */
+    abstract protected function register_autoloader();
 
     /**
      * @return Extension[]
@@ -58,18 +84,53 @@ abstract class Extension
 
         $this->init_components();
 
-        add_action( 'groundhogg/db/manager/init', [ $this, 'add_dbs' ] );
-        add_action( 'groundhogg/api/v3/pre_init', [ $this, 'add_apis' ] );
-        add_action( 'groundhogg/admin/init',      [ $this, 'add_admin_pages' ] );
+        add_action( 'groundhogg/db/manager/init', [ $this, 'register_dbs'] );
+        add_action( 'groundhogg/api/v3/pre_init', [ $this, 'register_apis'] );
+        add_action( 'groundhogg/bulk_jobs/init',  [ $this, 'register_bulk_jobs' ] );
+        add_action( 'groundhogg/admin/init',      [ $this, 'register_admin_pages'] );
+        add_action( 'groundhogg/steps/init',      [ $this, 'register_funnel_steps' ] );
+        add_action( 'groundhogg/replacements/init', [ $this, 'add_replacements' ] );
 
+        add_filter( 'groundhogg/reporting/reports',       [ $this, 'register_reports' ] );
         add_filter( 'groundhogg/admin/settings/settings', [ $this, 'register_settings' ] );
         add_filter( 'groundhogg/admin/settings/tabs',     [ $this, 'register_settings_tabs' ] );
         add_filter( 'groundhogg/admin/settings/sections', [ $this, 'register_settings_sections' ] );
     }
 
+    /**
+     * Include any files.
+     *
+     * @return void
+     */
     abstract public function includes();
 
+    /**
+     * Init any components that need to be added.
+     *
+     * @return void
+     */
     abstract public function init_components();
+
+    /**
+     * @param $replacements Replacements
+     */
+    public function add_replacements( $replacements ){}
+
+    /**
+     * @param $manager \Groundhogg\Steps\Manager
+     */
+    public function register_funnel_steps( $manager ){}
+
+    /**
+     * @param $manager \Groundhogg\Bulk_Jobs\Manager
+     */
+    public function register_bulk_jobs( $manager ){}
+
+    /**
+     * @param $reports Report[]
+     * @return array
+     */
+    public function register_reports( $reports ){ return $reports; }
 
     /**
      * Add settings to the settings page
@@ -100,7 +161,7 @@ abstract class Extension
      *
      * @param $db_manager Manager
      */
-    abstract public function add_dbs( $db_manager );
+    public function register_dbs( $db_manager ){}
 
     /**
      * Register any api endpoints.
@@ -108,7 +169,7 @@ abstract class Extension
      * @param $api_manager
      * @return void
      */
-    abstract public function add_apis( $api_manager );
+    public function register_apis( $api_manager ){}
 
     /**
      * Register any new admin pages.
@@ -116,7 +177,7 @@ abstract class Extension
      * @param $admin_menu Admin_Menu
      * @return void
      */
-    abstract public function add_admin_pages( $admin_menu );
+    public function register_admin_pages($admin_menu ){}
 
     /**
      * Get the version #
@@ -186,7 +247,7 @@ abstract class Extension
             require_once dirname(__FILE__) . '/lib/edd/GH_EDD_SL_Plugin_Updater.php';
         }
 
-        return new \GH_EDD_SL_Plugin_Updater( self::STORE_URL, $this->get_plugin_file(), [
+        return new \GH_EDD_SL_Plugin_Updater( License_Manager::$storeUrl, $this->get_plugin_file(), [
             'version' 	=> $this->get_version(),
             'license' 	=> $this->get_license_key(),
             'item_id'   => $this->get_download_id(),

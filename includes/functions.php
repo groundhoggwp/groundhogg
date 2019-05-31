@@ -136,6 +136,45 @@ function key_to_words( $key )
 }
 
 /**
+ * Term parser helper.
+ *
+ * @param $term
+ * @return array
+ */
+function get_terms_for_select($term )
+{
+    $terms = get_terms( $term );
+    $options = [];
+
+    foreach ( $terms as $term ) {
+        $options[ absint( $term->term_id ) ] = esc_html( $term->name );
+    }
+
+    return $options;
+}
+
+/**
+ * @param $post_type string|array
+ * @return array
+ */
+function get_posts_for_select( $post_type )
+{
+    $posts = get_posts( array(
+        'post_type' => $post_type,
+        'post_status' => 'publish',
+        'numberposts' => -1
+    ));
+
+    $options = [];
+
+    foreach ( $posts as $i => $post ) {
+        $options[ $post->ID ] = $post->post_title;
+    }
+
+    return $options;
+}
+
+/**
  * Convert words to a key
  *
  * @param $words

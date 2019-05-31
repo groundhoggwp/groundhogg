@@ -41,7 +41,7 @@ class Replacements
     public function __construct()
     {
 
-        $this->setup_defaults();
+        add_action( 'init', [ $this, 'setup_defaults' ] );
 
         if ( isset_not_empty( $_GET, 'page' ) && strpos( $_GET[ 'page' ],'gh_' ) !== false ){
             add_action( 'admin_footer' , [ $this, 'replacements_in_footer' ] );
@@ -52,7 +52,7 @@ class Replacements
     /**
      * Setup the default replacement codes
      */
-    private function setup_defaults()
+    public function setup_defaults()
     {
 
         $replacements = array(
@@ -200,6 +200,7 @@ class Replacements
             $this->add( $replacement['code'], $replacement[ 'callback' ], $replacement[ 'description' ] );
         }
 
+        do_action( 'groundhogg/replacements/init', $this );
     }
 
     /**

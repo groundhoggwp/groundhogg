@@ -251,7 +251,7 @@ class Reporting
             new Complete_Funnel_Activity(),
         ];
 
-        $reports = apply_filters( 'groundhogg/reporting/reports/', $reports );
+        $reports = apply_filters( 'groundhogg/reporting/reports', $reports );
 
         foreach ( $reports as $report ){
             $this->add_report( $report );
