@@ -3,8 +3,8 @@ Contributors: trainingbusinesspros, groundhogg, dhrumit
 Tags: marketing, email, contacts, contact, CRM, marketing automation, email automation, funnels, marketing funnels, marketing campaigns, campaigns, broadcast, contacts, contact management
 Donate link: https://groundhogg.io
 Requires at least: 4.9
-Tested up to: 5.1
-Requires PHP: 5.6
+Tested up to: 5.2
+Requires PHP: 7.0
 Stable tag: trunk
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
@@ -105,7 +105,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
-= 1.3.11.5
+= 1.3.11.6
+* FIXED CSS z-index of select2 in funnel editor caused by previous compatibility resolution.
+
+= 1.3.11.5 =
 * FIXED CSS compatibility issue with select2 in the form builder when WPEP is installed.
 
 = 1.3.11.4 =
