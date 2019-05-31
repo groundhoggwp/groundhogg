@@ -43,7 +43,7 @@ class Stats_Collection
     public function stats_tracking_optin()
     {
 
-        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'opt_in_to_stats' ) || ! current_user_can( 'manage_options' ) ){
+        if ( ! current_user_can( 'manage_options' ) ){
             wp_die( new \WP_Error( 'invalid_permissions', _x( 'You have insufficient permissions to do this.', 'notice', 'groundhogg' ) ) );
         }
 

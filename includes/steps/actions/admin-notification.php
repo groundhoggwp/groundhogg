@@ -27,6 +27,14 @@ class Admin_Notification extends Action
 {
 
     /**
+     * @return string
+     */
+    public function get_help_article()
+    {
+        return 'https://docs.groundhogg.io/docs/builder/actions/admin-notification/';
+    }
+
+    /**
      * An error if something goes wrong while sending the notification.
      *
      * @var \WP_Error

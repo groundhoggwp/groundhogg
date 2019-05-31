@@ -23,6 +23,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Apply_Note extends Action
 {
+    /**
+     * @return string
+     */
+    public function get_help_article()
+    {
+        return 'https://docs.groundhogg.io/docs/builder/actions/apply-note/';
+    }
 
     /**
      * ] et the element name

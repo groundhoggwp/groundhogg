@@ -22,6 +22,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Edit_Meta extends Action
 {
+    /**
+     * @return string
+     */
+    public function get_help_article()
+    {
+        return 'https://docs.groundhogg.io/docs/builder/actions/edit-meta/';
+    }
 
     /**
      * Get the element name

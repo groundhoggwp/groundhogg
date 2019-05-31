@@ -26,18 +26,6 @@ class Finished extends Step
     {
 
         update_option( 'gh_guided_setup_finished', 1 );
-
-        if ( ! Plugin::$instance->stats_collection->is_enabled() ): ?>
-        <div class="postbox" style="padding: 0 10px 0 20px">
-            <h3><?php _e( 'Get a free extension when you help us make Groundhogg better!', 'Groundhogg' ); ?></h3>
-            <p>
-                <a class="button button-primary" href="<?php echo wp_nonce_url( $_SERVER[ 'REQUEST_URI' ] . '&action=opt_in_to_stats' , 'opt_in_to_stats' ); ?>" ><?php _e( 'Yes, I want to help make Groundhogg better!' ); ?></a>
-                <a href="https://www.groundhogg.io/privacy-policy/#usage-tracking" target="_blank"><?php _e( 'Learn more', 'groundhogg' ); ?></a>
-            </p>
-            <p><?php _e( "Want a free extension? You can choose to share non sensitive data about how you use Groundhogg with us and in exchange you will receive a premium extension on us!", 'groundhogg' ); ?></p>
-        </div>
-        <?php endif;
-
         if ( show_groundhogg_branding() ): ?>
             <iframe style="border: 3px solid #e5e5e5" src="https://player.vimeo.com/video/339379046" width="538" height="303" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
         <?php endif;

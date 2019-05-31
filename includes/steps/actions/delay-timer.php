@@ -23,6 +23,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Delay_Timer extends Action
 {
+    /**
+     * @return string
+     */
+    public function get_help_article()
+    {
+        return 'https://docs.groundhogg.io/docs/builder/actions/delay-timer/';
+    }
 
     /**
      * Get the element name

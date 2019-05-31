@@ -11,6 +11,7 @@ use Groundhogg\Admin\Guided_Setup\Steps\Import_Contacts;
 use Groundhogg\Admin\Guided_Setup\Steps\Start;
 use Groundhogg\Admin\Guided_Setup\Steps\Step;
 use Groundhogg\Admin\Guided_Setup\Steps\Sync_Users;
+use Groundhogg\Admin\Guided_Setup\Steps\Tracking;
 use function Groundhogg\floating_phil;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
@@ -63,6 +64,7 @@ class Guided_Setup extends Admin_Page
         $steps[] = new Import_Contacts();
         $steps[] = new Sync_Users();
         $steps[] = new Email();
+        $steps[] = new Tracking();
         $steps[] = new Finished();
 
         $steps = apply_filters( 'groundhogg/admin/guided_setup/steps', $steps );
@@ -183,13 +185,5 @@ class Guided_Setup extends Admin_Page
      * @return mixed
      */
     public function help(){}
-
-    /**
-     * Optin to tracking...
-     */
-    public function process_opt_in_to_stats()
-    {
-        Plugin::$instance->stats_collection->stats_tracking_optin();
-    }
 
 }
