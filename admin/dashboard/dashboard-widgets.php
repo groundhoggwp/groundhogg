@@ -31,7 +31,7 @@ class Dashboard_Widgets
 {
 
     /**
-     * @var array an array of all the available widgets
+     * @var Dashboard_Widget[] an array of all the available widgets
      */
     public $widgets = array();
 
@@ -95,6 +95,15 @@ class Dashboard_Widgets
         }
 
         do_action( 'groundhogg/dashboard/widgets/init', $this );
+    }
+
+    /**
+     * @param $key
+     * @return Dashboard_Widget
+     */
+    public function get_widget( $key )
+    {
+        return get_array_var( $this->widgets, $key );
     }
 
     public function scripts( $hook_suffix )

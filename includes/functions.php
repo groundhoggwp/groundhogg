@@ -113,7 +113,7 @@ function decrypt( $data){
  * @param $array
  * @param string $key
  * @param bool $default
- * @return bool
+ * @return mixed
  */
 function get_array_var( $array, $key='', $default=false )
 {

@@ -56,5 +56,13 @@ abstract class Reporting_Widget extends Dashboard_Widget
     {
         return $this->normalize_data( $this->get_report()->get_data() );
     }
+
+    /**
+     * @return array
+     */
+    public function get_chart_data()
+    {
+        return $this->get_data();
+    }
     
 }
