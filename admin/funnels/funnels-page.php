@@ -486,9 +486,9 @@ class Funnels_Page extends Admin_Page
         }
 
         $funnel = new Funnel();
-        $funnel->import( $import );
+        $id = $funnel->import( $import );
 
-        return $funnel->import( $import );
+        return $id;
     }
 
 	/**

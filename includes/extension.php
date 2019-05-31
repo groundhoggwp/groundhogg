@@ -20,6 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 abstract class Extension
 {
 
+    public static $instance = null;
+
     /**
      * @var Installer
      */
@@ -41,6 +43,36 @@ abstract class Extension
      * @var Extension[]
      */
     public static $extensions = [];
+
+
+    /**
+     * Clone.
+     *
+     * Disable class cloning and throw an error on object clone.
+     *
+     * The whole idea of the singleton design pattern is that there is a single
+     * object. Therefore, we don't want the object to be cloned.
+     *
+     * @access public
+     * @since 1.0.0
+     */
+    public function __clone() {
+        // Cloning instances of the class is forbidden.
+        _doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'groundhogg' ), '2.0.0' );
+    }
+
+    /**
+     * Wakeup.
+     *
+     * Disable unserializing of the class.
+     *
+     * @access public
+     * @since 1.0.0
+     */
+    public function __wakeup() {
+        // Unserializing instances of the class is forbidden.
+        _doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'groundhogg' ), '2.0.0' );
+    }
 
     /**
      * Extension constructor.
@@ -84,6 +116,11 @@ abstract class Extension
 
         $this->init_components();
 
+        add_action( 'groundhogg/scripts/after_register_admin_scripts', [ $this, 'register_admin_scripts' ], 10, 2 );
+        add_action( 'groundhogg/scripts/after_register_admin_styles', [ $this, 'register_admin_styles' ] );
+        add_action( 'groundhogg/scripts/after_register_frontend_scripts', [ $this, 'register_frontend_scripts' ], 10, 2 );
+        add_action( 'groundhogg/scripts/after_register_frontend_styles', [ $this, 'register_frontend_styles' ] );
+
         add_action( 'groundhogg/db/manager/init', [ $this, 'register_dbs'] );
         add_action( 'groundhogg/api/v3/pre_init', [ $this, 'register_apis'] );
         add_action( 'groundhogg/bulk_jobs/init',  [ $this, 'register_bulk_jobs' ] );
@@ -95,6 +132,9 @@ abstract class Extension
         add_filter( 'groundhogg/admin/settings/settings', [ $this, 'register_settings' ] );
         add_filter( 'groundhogg/admin/settings/tabs',     [ $this, 'register_settings_tabs' ] );
         add_filter( 'groundhogg/admin/settings/sections', [ $this, 'register_settings_sections' ] );
+
+        add_filter( 'groundhogg/templates/emails', [ $this, 'register_email_templates' ] );
+        add_filter( 'groundhogg/templates/funnels', [ $this, 'register_funnel_templates' ] );
     }
 
     /**
@@ -110,6 +150,42 @@ abstract class Extension
      * @return void
      */
     abstract public function init_components();
+
+    /**
+     * @param $is_minified bool
+     * @param $IS_MINIFIED string
+     */
+    public function register_admin_scripts( $is_minified, $IS_MINIFIED ){}
+
+    /**
+     * @param $is_minified bool
+     * @param $IS_MINIFIED string
+     */
+    public function register_admin_styles(){}
+
+    /**
+     * @param $is_minified bool
+     * @param $IS_MINIFIED string
+     */
+    public function register_frontend_scripts( $is_minified, $IS_MINIFIED ){}
+
+    /**
+     * @param $is_minified bool
+     * @param $IS_MINIFIED string
+     */
+    public function register_frontend_styles(){}
+
+    /**
+     * @param $templates
+     * @return mixed
+     */
+    public function register_funnel_templates( $templates ){ return $templates; }
+
+    /**
+     * @param $templates
+     * @return mixed
+     */
+    public function register_email_templates($templates){return $templates;}
 
     /**
      * @param $replacements Replacements
@@ -253,6 +329,28 @@ abstract class Extension
             'item_id'   => $this->get_download_id(),
             'url'       => home_url()
         ] );
+    }
+
+    /**
+     * Instance.
+     *
+     * Ensures only one instance of the plugin class is loaded or can be loaded.
+     *
+     * @since 1.0.0
+     * @access public
+     * @static
+     *
+     * @return Extension
+     */
+    public static function instance() {
+        if ( is_null( self::$instance ) ) {
+
+            $class = get_called_class();
+
+            self::$instance = new $class();
+        }
+
+        return self::$instance;
     }
 
     /**

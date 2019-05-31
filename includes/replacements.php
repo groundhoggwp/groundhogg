@@ -142,6 +142,11 @@ class Replacements
                 'description' => _x( 'The business address as defined in the settings.', 'replacement', 'groundhogg' ),
             ),
             array(
+                'code'        => 'site_url',
+                'callback'    => [ $this, 'site_url' ],
+                'description' => _x( 'The site url.', 'replacement', 'groundhogg' ),
+            ),
+            array(
                 'code'        => 'owner_first_name',
                 'callback'    => [ $this, 'replacement_owner_first_name' ],
                 'description' => _x( 'The contact owner\'s name.', 'replacement', 'groundhogg' ),
@@ -644,6 +649,14 @@ class Replacements
     {
         $linkId = absint( intval( $linkId ) );
         return site_url( 'superlinks/link/' . $linkId );
+    }
+
+    /**
+     * @return string
+     */
+    function site_url()
+    {
+        return site_url();
     }
 
     /**

@@ -50,7 +50,7 @@ class Scripts
 
         wp_enqueue_script( 'groundhogg-frontend' );
 
-        do_action('groundhogg/scripts/after_register_frontend_scripts');
+        do_action('groundhogg/scripts/after_register_frontend_scripts', $this->is_script_debug_enabled(), $IS_MINIFIED );
     }
 
     /**
@@ -146,7 +146,7 @@ class Scripts
             '_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
         ]  );
 
-        do_action('groundhogg/scripts/after_register_admin_scripts');
+        do_action('groundhogg/scripts/after_register_admin_scripts', $this->is_script_debug_enabled(), $IS_MINIFIED );
     }
 
     /**

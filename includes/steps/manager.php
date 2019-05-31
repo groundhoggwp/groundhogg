@@ -41,8 +41,13 @@ class Manager {
      */
     private $elements = array();
 
+    public function __construct()
+    {
+        add_action( 'init', [ $this, 'init_steps' ] );
+    }
 
-    function __construct()
+
+    public function init_steps()
     {
         /* actions */
         $this->elements[] = new Send_Email();

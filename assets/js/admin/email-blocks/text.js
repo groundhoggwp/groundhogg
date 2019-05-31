@@ -20,12 +20,12 @@ var TextBlock = {};
 
             this.pFont  = $( '#p-font' );
             this.pFont.on( 'change', function ( e ) {
-                editor.getActive().find( 'p' ).parent().css('font-family', $(this).val() );
+                editor.getActive().find( '.text_block' ).children().first().css('font-family', $(this).val() );
             });
 
             this.pSize  = $( '#p-size' );
             this.pSize.on( 'change', function ( e ) {
-                editor.getActive().find( 'p' ).parent().css('font-size', $(this).val() + 'px' );
+                editor.getActive().find( '.text_block' ).children().first().css('font-size', $(this).val() + 'px' );
             });
 
             this.h1Font = $( '#h1-font' );
@@ -62,7 +62,7 @@ var TextBlock = {};
 
             self.editor = tinyMCE.get( 'text-content' );
             self.editor.on( 'change input', function () {
-                editor.getActive().find( 'p' ).parent().html( self.editor.getContent() );
+                editor.getActive().find( '.text_block' ).children().first().html( self.editor.getContent() );
                 self.parse( editor.getActive(), false );
             });
         },
@@ -83,11 +83,11 @@ var TextBlock = {};
             }
 
             if ( parseContent ){
-                self.editor.setContent( block.find( 'p' ).parent().html() );
+                self.editor.setContent( block.find( '.text_block' ).children().first().html() );
             }
 
-            this.pFont.val( block.find( 'p' ).parent().css( 'font-family' ).replace(/"/g, '') );
-            this.pSize.val( block.find( 'p' ).parent().css( 'font-size' ).replace('px', '') );
+            this.pFont.val( block.find( '.text_block' ).children().first().css( 'font-family' ).replace(/"/g, '') );
+            this.pSize.val( block.find( '.text_block' ).children().first().css( 'font-size' ).replace('px', '') );
             try{ this.h1Font.val( block.find('h1').css( 'font-family' ).replace(/"/g, '') ); } catch (e){}
             try{ this.h1Size.val( block.find('h1').css( 'font-size' ).replace('px', '') ); } catch (e){}
             try{ this.h2Font.val( block.find('h2').css( 'font-family' ).replace(/"/g, '') ); } catch (e){}
