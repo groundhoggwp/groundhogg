@@ -31,6 +31,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Form_Filled extends Benchmark
 {
+
+	public function get_help_article() {
+		return 'https://docs.groundhogg.io/docs/builder/benchmarks/web-form/';
+	}
+
     protected function add_additional_actions(){
         add_action( 'admin_footer', [$this, 'modal_form'] );
     }

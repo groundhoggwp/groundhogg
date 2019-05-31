@@ -27,6 +27,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Tag_Applied extends Benchmark
 {
 
+	public function get_help_article()
+	{
+		return 'https://docs.groundhogg.io/docs/builder/benchmarks/tag-applied/';
+	}
+
     /**
      * Get the element name
      *

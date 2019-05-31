@@ -24,7 +24,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Email_Confirmed extends Benchmark
 {
 
-    /**
+    public function get_help_article() {
+        return 'https://docs.groundhogg.io/docs/builder/benchmarks/email-confirmed/';
+    }
+
+	/**
      * Get the element name
      *
      * @return string

@@ -10,6 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Link_Clicked extends Benchmark
 {
 
+	public function get_help_article()
+	{
+		return 'https://docs.groundhogg.io/docs/builder/benchmarks/link-click/';
+	}
+
     /**
      * Get the element name
      *

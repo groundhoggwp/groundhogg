@@ -5,7 +5,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
-use Groundhogg\Manager;
+use function Groundhogg\html;
 
 /**
  * Edit Funnel
@@ -201,7 +201,10 @@ $funnel = new Funnel( $funnel_id );
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
             <div id="postbox-container-1" class="postbox-container sidebar">
                 <div id='benchmarks' class="postbox">
-                    <h3 class="hndle"><?php echo __( 'Benchmarks', 'groundhogg' );?></h3>
+                    <button title="Help" type="button" class="handlediv help">
+		                <?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/builder/benchmarks/' ); ?>
+                    </button>
+                    <h2 class="hndle"><?php echo __( 'Benchmarks', 'groundhogg' );?></h2>
                     <div class="elements-inner inside">
                         <table>
                             <tbody>
@@ -228,6 +231,9 @@ $funnel = new Funnel( $funnel_id );
                 <!-- End Benchmark Icons-->
                 <!-- Begin Action Icons-->
                 <div id='actions' class="postbox">
+                    <button title="Help" type="button" class="handlediv help">
+		                <?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/builder/actions/' ); ?>
+                    </button>
                     <h2 class="hndle"><?php echo __( 'Actions', 'groundhogg' );?></h2>
                     <div class="inside">
                         <table>

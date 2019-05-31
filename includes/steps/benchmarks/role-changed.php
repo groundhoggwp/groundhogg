@@ -24,7 +24,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Role_Changed extends Benchmark
 {
 
-    /**
+	public function get_help_article()
+	{
+		return 'https://docs.groundhogg.io/docs/builder/benchmarks/role-changed/';
+	}
+
+	/**
      * Get the element name
      *
      * @return string

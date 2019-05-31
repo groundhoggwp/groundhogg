@@ -12,6 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 abstract class Benchmark extends Funnel_Step
 {
 
+	/**
+	 * @return string
+	 */
+	public function get_help_article()
+	{
+		return 'https://docs.groundhogg.io/docs/builder/benchmarks/';
+	}
+
     /**
      * List for arbitrary data manipulation
      *

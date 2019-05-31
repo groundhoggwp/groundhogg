@@ -65,7 +65,7 @@ class Start extends Step
                     <h2><b><?php _ex( 'Welcome to the Guided Setup', 'guided_setup', 'groundhogg' );?></b></h2>
                     <p><?php _ex( 'Follow these steps to quickly setup Groundhogg for your business. Setup only takes a few minutes. You can always change this information later in the settings page.', 'guided_setup', 'groundhogg' ); ?></p>
                     <?php if ( show_groundhogg_branding() ): ?>
-                        <img width="100%" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-pulling-lever.png'; ?>">
+                        <iframe style="border: 3px solid #e5e5e5" src="https://player.vimeo.com/video/339378375" width="538" height="303" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
                     <?php endif; ?>
                     <p class="submit" style="text-align: center">
                         <a style="float: right" class="button button-primary" href="<?php printf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), 1 ) ?>"><?php _ex( 'Get Started!', 'guided_setup', 'groundhogg' ); ?></a>

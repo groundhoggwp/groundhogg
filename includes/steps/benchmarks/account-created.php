@@ -26,6 +26,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Account_Created extends Benchmark
 {
 
+	/**
+	 * @return string
+	 */
+	public function get_help_article()
+	{
+		return 'https://docs.groundhogg.io/docs/builder/benchmarks/account-created/';
+	}
+
     /**
      * Get the element name
      *

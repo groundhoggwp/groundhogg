@@ -4,6 +4,7 @@ namespace Groundhogg\Steps;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\ensure_array;
+use function Groundhogg\html;
 use Groundhogg\Event;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
@@ -521,6 +522,14 @@ abstract class Funnel_Step extends Supports_Errors
         $this->set_current_step( $step );
     }
 
+	/**
+	 * @return string
+	 */
+    public function get_help_article()
+    {
+        return 'https://docs.groundhogg.io';
+    }
+
     /**
      * @param $step Step
      */
@@ -541,6 +550,10 @@ abstract class Funnel_Step extends Supports_Errors
             <!-- DUPLICATE -->
             <button title="Duplicate" type="button" class="handlediv duplicate-step">
                 <span class="dashicons dashicons-admin-page"></span>
+            </button>
+            <!-- HELP -->
+            <button title="Help" type="button" class="handlediv help">
+                <?php echo html()->help_icon( $this->get_help_article() ); ?>
             </button>
             <!-- HNDLE -->
             <h2 class="hndle ui-sortable-handle">

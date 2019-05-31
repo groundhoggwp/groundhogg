@@ -2,13 +2,14 @@
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
 use Groundhogg\Plugin;
+use function Groundhogg\show_groundhogg_branding;
 
 class Finished extends Step
 {
 
     public function get_title()
     {
-        return _x( 'Finished', 'guided_setup', 'groundhogg' );
+        return _x( 'All Done!', 'guided_setup', 'groundhogg' );
     }
 
     public function get_slug()
@@ -35,9 +36,11 @@ class Finished extends Step
             </p>
             <p><?php _e( "Want a free extension? You can choose to share non sensitive data about how you use Groundhogg with us and in exchange you will receive a premium extension on us!", 'groundhogg' ); ?></p>
         </div>
-        <?php
+        <?php endif;
 
-        endif;
+        if ( show_groundhogg_branding() ): ?>
+            <iframe style="border: 3px solid #e5e5e5" src="https://player.vimeo.com/video/339379046" width="538" height="303" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        <?php endif;
     }
 
     protected function step_nav()

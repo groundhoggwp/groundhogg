@@ -422,6 +422,22 @@ class HTML
 		), $a );
 	}
 
+	public function help_icon( $link='' )
+    {
+        return $this->modal_link( [
+            'title'     => 'Help',
+            'text'      => '',
+            'footer_button_text' => __( 'Close' ),
+            'id'        => '',
+            'source'    => $link,
+            'height'    => 800,
+            'width'     => 1000,
+            'footer'    => 'true',
+            'preventSave'    => 'true',
+            'class' => 'dashicons dashicons-editor-help'
+        ] );
+    }
+
 	/**
 	 * Generate a link that activates the Groundhogg modal
 	 *
