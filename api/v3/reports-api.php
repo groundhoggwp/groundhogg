@@ -64,16 +64,13 @@ class Reports_Api extends Base
 
         $get_from_widget = $request->get_param( 'chart_format' );
 
-        if ( ! $get_from_widget ){
+        if ( ! filter_var( $get_from_widget, FILTER_VALIDATE_BOOLEAN ) ){
             $data = Plugin::$instance->reporting->get_report( $report )->get_data();
         } else {
-
             // this is most definitely a hack, do better next time.
-
             $widgets = new Dashboard_Widgets();
             $widgets->setup_widgets();
             $widget = $widgets->get_widget( $report );
-
             $data = [];
 
             if ( method_exists( $widget, 'get_chart_data' ) ){
