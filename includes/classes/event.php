@@ -29,6 +29,7 @@ class Event extends Base_Object
     const SKIPPED = 'skipped';
     const WAITING = 'waiting';
     const FAILED = 'failed';
+    const IN_PROGRESS = 'in_progress';
 
     /**
      * Supported Event Types
@@ -294,12 +295,11 @@ class Event extends Base_Object
      */
     public function run()
     {
-        if ( ! $this->is_waiting() || $this->has_run() || ! $this->is_time() )
-            return false;
-
         do_action('groundhogg/event/run/before', $this);
 
-        $result = $this->get_step()->run( $this->contact, $this );
+        $this->in_progress();
+
+        $result = $this->get_step()->run( $this->get_contact(), $this );
 
         // Soft fail when return false
         if ( ! $result ){
@@ -412,6 +412,18 @@ class Event extends Base_Object
 
         return $this->update( [
             'status' => self::SKIPPED
+        ] );
+    }
+
+    /**
+     * Mark the event as skipped
+     */
+    public function in_progress()
+    {
+        do_action( 'groundhogg/event/in_progress', $this );
+
+        return $this->update( [
+            'status' => self::IN_PROGRESS
         ] );
     }
 

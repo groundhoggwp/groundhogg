@@ -130,7 +130,7 @@ function groundhogg_tools_sysinfo_get() {
     $return .= 'Sending Service ALL MAIL:  ' . ( $plugin->sending_service->is_active_for_transactional_email() && $plugin->sending_service->has_api_token() ? "Enabled\n" : "Disabled\n" );
 
     $return .= "\n" . '-- Event Queue Configuration' . "\n\n";
-    $return .= 'Max Execution Time:           ' . esc_html( $plugin->event_queue->get_max_execution_time() ) . " seconds\n";
+    $return .= 'Max Execution Time:           ' . esc_html( $plugin->event_queue->get_time_limit() ) . " seconds\n";
     $return .= 'Average Execution Time:       ' . esc_html( $plugin->event_queue->get_queue_execution_time() ) . " seconds\n";
     $return .= 'Last Execution Time:          ' . esc_html( $plugin->event_queue->get_last_execution_time() ) . " seconds\n";
     $return .= 'Total Executions:             ' . esc_html( $plugin->event_queue->get_total_executions() ) . "\n";

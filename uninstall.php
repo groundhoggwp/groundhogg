@@ -42,7 +42,7 @@ if( Plugin::$instance->settings->is_option_enabled( 'gh_uninstall_on_delete' ) )
     Plugin::$instance->utils->files->delete_all_files();
 
     /** Cleanup Cron Events */
-    wp_clear_scheduled_hook( Event_Queue::ACTION );
+    wp_clear_scheduled_hook( Event_Queue::WP_CRON_HOOK );
     wp_clear_scheduled_hook( Bounce_Checker::ACTION );
     wp_clear_scheduled_hook( Stats_Collection::ACTION );
     wp_clear_scheduled_hook( 'groundhogg/sending_service/verify_domain' );

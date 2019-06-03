@@ -8,6 +8,8 @@ use Groundhogg\Extension;
 
 class Test_Extension extends Extension {
 
+    public static $instance;
+
     public function includes()
     {
         // TODO: Implement includes() method.
@@ -92,5 +94,18 @@ class Test_Extension extends Extension {
     public function get_plugin_file()
     {
         return __FILE__;
+    }
+
+    /**
+     * Register autoloader.
+     *
+     * Groundhogg autoloader loads all the classes needed to run the plugin.
+     *
+     * @since 1.6.0
+     * @access private
+     */
+    protected function register_autoloader()
+    {
+        // TODO: Implement register_autoloader() method.
     }
 }

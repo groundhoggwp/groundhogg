@@ -93,4 +93,19 @@ class Test_Extension_2 extends Extension {
     {
         return __FILE__;
     }
+
+    public static $instance;
+
+    /**
+     * Register autoloader.
+     *
+     * Groundhogg autoloader loads all the classes needed to run the plugin.
+     *
+     * @since 1.6.0
+     * @access private
+     */
+    protected function register_autoloader()
+    {
+        // TODO: Implement register_autoloader() method.
+    }
 }

@@ -205,7 +205,7 @@ class Events extends DB  {
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
         event_type int unsigned NOT NULL,
-        error_code tinytext NOT NULL, 
+        error_code tinytext NOT NULL,
         error_message tinytext NOT NULL, 
         status varchar(20) NOT NULL,
         PRIMARY KEY (ID),

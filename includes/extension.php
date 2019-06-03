@@ -20,6 +20,10 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 abstract class Extension
 {
 
+    /**
+     * TODO Override this static var in child class.
+     * @var Extension
+     */
     public static $instance = null;
 
     /**
@@ -44,36 +48,6 @@ abstract class Extension
      */
     public static $extensions = [];
 
-
-    /**
-     * Clone.
-     *
-     * Disable class cloning and throw an error on object clone.
-     *
-     * The whole idea of the singleton design pattern is that there is a single
-     * object. Therefore, we don't want the object to be cloned.
-     *
-     * @access public
-     * @since 1.0.0
-     */
-    public function __clone() {
-        // Cloning instances of the class is forbidden.
-        _doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'groundhogg' ), '2.0.0' );
-    }
-
-    /**
-     * Wakeup.
-     *
-     * Disable unserializing of the class.
-     *
-     * @access public
-     * @since 1.0.0
-     */
-    public function __wakeup() {
-        // Unserializing instances of the class is forbidden.
-        _doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'groundhogg' ), '2.0.0' );
-    }
-
     /**
      * Extension constructor.
      */
@@ -84,7 +58,7 @@ abstract class Extension
         add_action( 'groundhogg/init', [ $this, 'init' ] );
 
         // Add to main list
-        self::$extensions[] = $this;
+        Extension::$extensions[] = $this;
     }
 
     /**
@@ -343,14 +317,23 @@ abstract class Extension
      * @return Extension
      */
     public static function instance() {
-        if ( is_null( self::$instance ) ) {
 
-            $class = get_called_class();
+        $class = get_called_class();
 
-            self::$instance = new $class();
+        if ( is_null( $class::$instance ) ) {
+
+            $class::$instance = new $class();
         }
 
-        return self::$instance;
+        return $class::$instance;
+    }
+
+    final public function __clone() {
+        trigger_error("Singleton. No cloning allowed!", E_USER_ERROR);
+    }
+
+    final public function __wakeup() {
+        trigger_error("Singleton. No serialization allowed!", E_USER_ERROR);
     }
 
     /**
@@ -370,12 +353,11 @@ abstract class Extension
         ] );
 
         if ( $this->get_license_key() ){
-
             $content .= "<p>";
             $content .= sprintf( __( "Your license expires on %s", 'groundhogg' ), $this->get_expiry() );
             $content .= "</p>";
 
-            $content .= html()->wrap( html()->wrap( __( 'Deactivate License', 'groundhogg' ), 'a', [
+            $content .= html()->wrap( html()->wrap( __( 'Deactivate', 'groundhogg' ), 'a', [
                 'class' => 'button button-secondary',
                 'href' => admin_url( wp_nonce_url( add_query_arg( [
                     'action' => 'deactivate_license',

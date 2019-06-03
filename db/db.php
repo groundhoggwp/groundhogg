@@ -2,6 +2,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
@@ -529,6 +530,14 @@ abstract class DB {
     }
 
     /**
+     * Flush the cache...
+     */
+    public static function flush_cache()
+    {
+        self::$cache = [];
+    }
+
+    /**
      * Delete a row identified by the primary key
      *
      * @access  public
@@ -595,14 +604,14 @@ abstract class DB {
 
     /**
      * @param array $data
-     * @param string|false $order
+     * @param string|false $ORDER
      * @param bool $from_cache
      * @return array|bool|null|object
      */
-    public function query( $data = [], $order='', $from_cache = true )
+    public function query( $data = [], $ORDER='', $from_cache = true )
     {
         // Check Cache
-        $cache_key = md5( sprintf( '%s|%s|%s|%s|%s' , multi_implode( '|', array_keys( $data ) ), multi_implode( '|', array_values( $data ) ), $order, $this->get_object_type(), $this->get_table_name() ) );
+        $cache_key = md5( sprintf( '%s|%s|%s|%s' , multi_implode( '|', array_keys( $data ) ), multi_implode( '|', array_values( $data ) ), $this->get_object_type(), $this->get_table_name() ) );
 
         if ( isset_not_empty( self::$cache, $cache_key ) && $from_cache ){
             return self::$cache[ $cache_key ];
@@ -610,8 +619,8 @@ abstract class DB {
 
         global  $wpdb;
 
-        if ( empty( $order ) ){
-            $order = $this->get_primary_key();
+        if ( empty( $ORDER ) ){
+            $ORDER = $this->get_primary_key();
         }
 
         if ( ! is_array( $data ) )
@@ -620,9 +629,18 @@ abstract class DB {
         $data = (array) $data;
         $data = esc_sql( $data );
 
-        $query = [];
+        // Compat for limits and order_by
+        if ( isset_not_empty( $data, 'LIMIT' ) ){
+            $LIMIT = get_array_var( $data, 'LIMIT', 99999 );
+            unset( $data[ 'LIMIT' ] );
+        }
 
-        $extra = '';
+        if ( isset_not_empty( $data, 'ORDER_BY' ) ){
+            $ORDER = get_array_var( $data, 'ORDER_BY', 99999 );
+            unset( $data[ 'ORDER_BY' ] );
+        }
+
+        $query = [];
 
         // Compat for search shorthand.
         if ( isset_not_empty( $data, 's' ) ){
@@ -662,13 +680,26 @@ abstract class DB {
 
         $query = trim( implode( ' AND ', $query ), ' ' );
 
+        $clauses = [];
+
         if ( ! empty( $query ) ){
-            $query = "WHERE " . $query;
+            $clauses[] = [ 'WHERE', $query ];
         }
 
-        $sql = "SELECT * FROM $this->table_name $query ORDER BY `$order` ASC";
+        if ( isset( $ORDER ) && ! empty( $ORDER ) ){
+            $clauses[] = [ 'ORDER BY', '`' . $ORDER . '` ASC' ];
+        }
+
+        if ( isset( $LIMIT ) && ! empty( $LIMIT ) ){
+            $clauses[] = [ 'LIMIT', $LIMIT ];
+        }
+
+        $sql = multi_implode( ' ', $clauses );
+
+        $sql = "SELECT * FROM $this->table_name $sql";
 
         $results = $wpdb->get_results( $sql );
+
         $results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results );
 
         self::$cache[ $cache_key ] = $results;
@@ -676,6 +707,10 @@ abstract class DB {
         return $results;
     }
 
+    /**
+     * @param array $args
+     * @return int
+     */
     public function count( $args=[] )
     {
         return count( $this->query( $args ) );

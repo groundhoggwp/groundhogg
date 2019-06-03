@@ -3,6 +3,7 @@ namespace Groundhogg\Queue;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -26,7 +27,15 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Event_Queue extends Supports_Errors
 {
 
-    const ACTION = 'groundhogg_process_queue';
+    /**
+     * The Cron Hook
+     */
+    const WP_CRON_HOOK = 'groundhogg_process_queue';
+
+    /**
+     * The Cron Interval
+     */
+    const WP_CRON_INTERVAL = 'every_minute';
 
     /**
      * @var Contact the current contact in the event
@@ -39,36 +48,19 @@ class Event_Queue extends Supports_Errors
     protected $current_event;
 
     /**
-     * All the events queued for processing
-     *
-     * @var Event[] of events
+     * @var int The time the queue was initialized.
      */
-    protected $events;
-
-    /**
-     * @var int
-     */
-    public $time_till_process;
-
-    /**
-     * @var array()
-     */
-    protected $schedules = array();
+    protected $started;
 
     /**
      * @var bool
      */
-    private static $is_processing;
+    protected static $is_processing;
 
     /**
-     * @var float
+     * @var int[]
      */
-    protected $max_process_time;
-
-    /**
-     * @var int
-     */
-    protected $events_completed = 0;
+    protected $event_ids = [];
 
     /**
      * Setup the cron jobs
@@ -77,11 +69,11 @@ class Event_Queue extends Supports_Errors
      */
     public function __construct()
     {
-        $this->setup_cron_schedules();
+        add_filter( 'cron_schedules', [ $this, 'add_cron_schedules' ] );
 
-        add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
-        add_action( 'init', array( $this, 'setup_cron_jobs' ) );
-        add_action( self::ACTION , array( $this, 'run_queue' ) );
+        add_action( 'init', [ $this, 'setup_cron_jobs' ] );
+
+        add_action( self::WP_CRON_HOOK , [ $this, 'run_queue' ] );
 
         if ( get_request_var( 'process_queue' ) && is_admin() ){
             add_action( 'init' , array( $this, 'run_queue_manually' ) );
@@ -89,29 +81,155 @@ class Event_Queue extends Supports_Errors
     }
 
     /**
-     * @return mixed
+     * Add the schedules
+     *
+     * @param $schedules
+     * @return array|false
      */
-    public function get_queue_execution_time()
+    public function add_cron_schedules( $schedules = [] )
     {
-        return Plugin::$instance->settings->get_option( 'average_execution_time' );
+        if ( ! is_array( $schedules ) ){
+            return $schedules;
+        }
+
+        $schedules[ self::WP_CRON_INTERVAL ] = array(
+            'interval'    => MINUTE_IN_SECONDS,
+            'display'     => _x( 'Every Minute', 'cron_schedule', 'groundhogg' )
+        );
+
+        return $schedules;
     }
 
     /**
-     * @return mixed
+     * Add the event cron job
+     *
+     * @since 1.0.20.1 Added notice to check if there is something wrong with the cron system.
      */
-    public function get_last_execution_time()
+    public function setup_cron_jobs()
     {
-        return Plugin::$instance->settings->get_option( 'queue_last_execution_time' );
+        if ( ! wp_next_scheduled( self::WP_CRON_HOOK ) ){
+            wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', self::WP_CRON_INTERVAL ), self::WP_CRON_HOOK );
+        }
     }
 
     /**
-     * @return mixed
+     * @param $time
      */
-    public function get_total_executions()
+    protected function set_start( $time )
     {
-        return Plugin::$instance->settings->get_option( 'queue_times_executed' );
+        $this->started = $time;
     }
 
+    /**
+     * Decide which process to use...
+     *
+     * @deprecated since 2.0
+     */
+    public function run_queue()
+    {
+        $this->set_start( microtime(true ) );
+
+        $settings = Plugin::$instance->settings;
+
+        Compatibility::raise_memory_limit();
+        Compatibility::raise_time_limit( $this->get_time_limit() );
+
+        $result = $this->process();
+
+        $end = microtime(true );
+        $process_time = $end - $this->started;
+
+        $times_executed = intval( $settings->get_option( 'queue_times_executed', 0 ) );
+        $average_execution_time = floatval( $settings->get_option( 'average_execution_time', 0.0 ) );
+
+        $average = $times_executed * $average_execution_time;
+        $average += $process_time;
+        $times_executed++;
+        $average_execution_time = $average / $times_executed;
+
+        $settings->update_option( 'queue_last_execution_time', $process_time );
+        $settings->update_option( 'queue_times_executed', $times_executed );
+        $settings->update_option( 'average_execution_time', $average_execution_time );
+
+        return $result;
+    }
+
+    /**
+     * Get a list of IDs...
+     *
+     * @return int[]
+     */
+    protected function get_queued_event_ids()
+    {
+        $events = get_db( 'events' )->query( [
+            'status' => 'waiting',
+            'before' => time(),
+            'LIMIT' => 50
+        ], 'time', false );
+
+        $ids = wp_parse_id_list( wp_list_pluck( $events, 'ID' ) );
+
+        return $ids;
+    }
+
+    /**
+     * Recursive, Iterate through the list of events and process them via the EVENTS api
+     * completes successive events quite since WP-Cron only happens once every 5 or 10 minutes depending on
+     * the amount of traffic.
+     *
+     * @return int the number of events process, 0 if no events.
+     */
+    protected function process()
+    {
+
+        $event_ids = $this->get_queued_event_ids();
+        $completed_events = 0;
+
+        if ( empty( $event_ids ) ){
+            return 0;
+        }
+
+        do_action( 'groundhogg/event_queue/process/before', $event_ids );
+
+        self::set_is_processing( true );
+
+        do{
+            $event_id = array_pop( $event_ids );
+
+            $event = new Event( $event_id );
+            $this->set_current_event( $event );
+
+            $contact = $event->get_contact();
+            $this->set_current_contact( $contact );
+
+            if ( $event->run() && $event->is_funnel_event() ){
+
+                $next_step = $event->get_step()->get_next_action();
+
+                if ( $next_step instanceof Step && $next_step->is_active() ){
+                    $next_step->enqueue( $event->get_contact() );
+                }
+
+            } else {
+                if ( $event->has_errors() ){
+                    $this->add_error( $event->get_last_error() );
+                }
+            }
+
+            $completed_events++;
+
+        } while ( ! empty( $event_ids ) && ! $this->limits_exceeded( $completed_events ) );
+
+        self::set_is_processing( false );
+
+        do_action( 'groundhogg/event_queue/process/after', $this );
+
+        if ( $this->limits_exceeded( $completed_events ) ){
+            return $completed_events;
+        }
+
+        return $completed_events + $this->process();
+    }
 
     /**
      * Run the queue Manually and provide a notice.
@@ -135,105 +253,94 @@ class Event_Queue extends Supports_Errors
     }
 
     /**
-     * Add the new 10 minute schedule to the list of schedules
-     **/
-    public function setup_cron_schedules()
-    {
-        $this->schedules[ 'every_10_minutes' ] = array(
-            'interval'    => 10 * MINUTE_IN_SECONDS,
-            'display'     => _x( 'Every 10 Minutes', 'cron_schedule', 'groundhogg' )
-        );
-
-        $this->schedules[ 'every_5_minutes' ] = array(
-            'interval'    => 5 * MINUTE_IN_SECONDS,
-            'display'     => _x( 'Every 5 Minutes', 'cron_schedule', 'groundhogg' )
-        );
-
-        $this->schedules[ 'every_1_minutes' ] = array(
-            'interval'    => MINUTE_IN_SECONDS,
-            'display'     => _x( 'Every 1 Minutes', 'cron_schedule', 'groundhogg' )
-        );
-    }
-
-    /**
-     * Add the schedules
+     * Get the number of seconds the process has been running.
      *
-     * @param $schedules
-     * @return array|false
+     * @return int The number of seconds.
      */
-    public function add_cron_schedules( $schedules = [] )
-    {
-        if ( ! is_array( $schedules ) ){
-            return $schedules;
+    protected function get_execution_time() {
+        $execution_time = microtime( true ) - $this->started;
+
+        // Get the CPU time if the hosting environment uses it rather than wall-clock time to calculate a process's execution time.
+        if ( function_exists( 'getrusage' ) && apply_filters( 'action_scheduler_use_cpu_execution_time', defined( 'PANTHEON_ENVIRONMENT' ) ) ) {
+            $resource_usages = getrusage();
+
+            if ( isset( $resource_usages['ru_stime.tv_usec'], $resource_usages['ru_stime.tv_usec'] ) ) {
+                $execution_time = $resource_usages['ru_stime.tv_sec'] + ( $resource_usages['ru_stime.tv_usec'] / 1000000 );
+            }
         }
 
-        $schedules = array_merge( $schedules, $this->schedules );
-        return $schedules;
+        return $execution_time;
     }
 
+
     /**
-     * Add the event cron job
+     * Check if the host's max execution time is (likely) to be exceeded if processing more actions.
      *
-     * @since 1.0.20.1 Added notice to check if there is something wrong with the cron system.
+     * @param int $processed_actions The number of actions processed so far - used to determine the likelihood of exceeding the time limit if processing another action
+     * @return bool
      */
-    public function setup_cron_jobs()
-    {
-        $settings_queue_interval    = Plugin::$instance->settings->get_option( 'queue_interval', 'every_5_minutes' );
-        $real_queue_interval        = Plugin::$instance->settings->get_option( 'real_queue_interval' );
+    protected function time_likely_to_be_exceeded( $processed_actions ) {
 
-        if ( ! wp_next_scheduled( self::ACTION ) || $settings_queue_interval !== $real_queue_interval ){
-            wp_clear_scheduled_hook( self::ACTION );
-            Plugin::$instance->settings->update_option( 'real_queue_interval', $settings_queue_interval );
-            wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', $settings_queue_interval ), self::ACTION );
-        }
+        $execution_time        = $this->get_execution_time();
+        $max_execution_time    = $this->get_time_limit();
+        $time_per_action       = $execution_time / $processed_actions;
+        $estimated_time        = $execution_time + ( $time_per_action * 3 );
+        $likely_to_be_exceeded = $estimated_time > $max_execution_time;
 
-        $this->time_till_process = wp_next_scheduled( self::ACTION ) - time();
+        return apply_filters( 'groundhogg/event_queue/time_likely_to_be_exceeded', $likely_to_be_exceeded, $this, $processed_actions, $execution_time, $max_execution_time );
     }
 
     /**
-     * Get a list of events that are up for completion
+     * Get memory limit
+     *
+     * Based on WP_Background_Process::get_memory_limit()
+     *
+     * @return int
      */
-    public function prepare_events()
-    {
-        $events = Plugin::$instance->dbs->get_db( 'events' )->get_queued_event_ids();
-
-        foreach ( $events as $event_id ) {
-            $this->events[] = Plugin::$instance->utils->get_event( $event_id );
+    protected function get_memory_limit() {
+        if ( function_exists( 'ini_get' ) ) {
+            $memory_limit = ini_get( 'memory_limit' );
+        } else {
+            $memory_limit = '128M'; // Sensible default, and minimum required by WooCommerce
         }
 
-        return $this->events;
+        if ( ! $memory_limit || -1 === $memory_limit || '-1' === $memory_limit ) {
+            // Unlimited, set to 32GB.
+            $memory_limit = '32G';
+        }
+
+        return Compatibility::convert_hr_to_bytes( $memory_limit );
     }
 
     /**
-     * Decide which process to use...
+     * Memory exceeded
+     *
+     * Ensures the batch process never exceeds 90% of the maximum WordPress memory.
+     *
+     * Based on WP_Background_Process::memory_exceeded()
+     *
+     * @return bool
      */
-    public function run_queue()
-    {
-        $start = microtime(true );
+    protected function memory_exceeded() {
 
-        $settings = Plugin::$instance->settings;
+        $memory_limit    = $this->get_memory_limit() * 0.90;
+        $current_memory  = memory_get_usage( true );
+        $memory_exceeded = $current_memory >= $memory_limit;
 
-        // Give ourselves an extra 3 seconds to clean up if we need to.
-        $this->max_process_time = $start + $this->get_max_execution_time() - 3;
+        return apply_filters( 'groundhogg/event_queue/memory_exceeded', $memory_exceeded, $this );
+    }
 
-        $result =  $this->process();
-
-        $end = microtime(true );
-        $process_time = $end - $start;
-
-        $times_executed = intval( $settings->get_option( 'queue_times_executed', 0 ) );
-        $average_execution_time = floatval( $settings->get_option( 'average_execution_time', 0.0 ) );
-
-        $average = $times_executed * $average_execution_time;
-        $average += $process_time;
-        $times_executed++;
-        $average_execution_time = $average / $times_executed;
-
-        $settings->update_option( 'queue_last_execution_time', $process_time );
-        $settings->update_option( 'queue_times_executed', $times_executed );
-        $settings->update_option( 'average_execution_time', $average_execution_time );
-
-        return $result;
+    /**
+     * See if the batch limits have been exceeded, which is when memory usage is almost at
+     * the maximum limit, or the time to process more actions will exceed the max time limit.
+     *
+     * Based on WC_Background_Process::batch_limits_exceeded()
+     *
+     * @param int $processed_actions The number of actions processed so far - used to determine the likelihood of exceeding the time limit if processing another action
+     * @return bool
+     */
+    protected function limits_exceeded( $processed_actions ) {
+        return $this->memory_exceeded() || $this->time_likely_to_be_exceeded( $processed_actions );
     }
 
     /**
@@ -243,7 +350,7 @@ class Event_Queue extends Supports_Errors
      */
     protected static function set_is_processing( $bool = true )
     {
-       self::$is_processing = (bool) $bool;
+        self::$is_processing = (bool) $bool;
     }
 
     /**
@@ -261,26 +368,9 @@ class Event_Queue extends Supports_Errors
      *
      * @return float|int
      */
-    public function get_max_execution_time()
+    public function get_time_limit()
     {
-        $real_queue_interval = Plugin::$instance->settings->get_option( 'real_queue_interval', 'every_5_minutes' );
-
-        switch ( $real_queue_interval ){
-            case 'every_10_minutes':
-                $max = 10 * MINUTE_IN_SECONDS;
-                break;
-            default;
-            case 'every_5_minutes':
-                $max = 5 * MINUTE_IN_SECONDS;
-                break;
-            case 'every_1_minutes':
-                $max = MINUTE_IN_SECONDS;
-                break;
-        }
-
-        $real_max = $this->get_real_max_execution_time();
-
-        return min( $max, $real_max );
+        return min( MINUTE_IN_SECONDS, $this->get_real_max_execution_time() );
     }
 
     /**
@@ -324,89 +414,27 @@ class Event_Queue extends Supports_Errors
     }
 
     /**
-     * Recursive, Iterate through the list of events and process them via the EVENTS api
-     * completes successive events quite since WP-Cron only happens once every 5 or 10 minutes depending on
-     * the amount of traffic.
-     *
-     * @return int the number of events process, 0 if no events.
+     * @return mixed
      */
-    private function process()
+    public function get_queue_execution_time()
     {
-
-        $this->prepare_events();
-
-        if ( ! $this->has_events() ){
-            return 0;
-        }
-
-        do_action( 'groundhogg/event_queue/process/before', $this );
-
-        $i = 0;
-
-        $max_events = intval( Plugin::$instance->settings->get_option( 'max_events', 9999 ) );
-
-        /* double check event setting */
-        if ( $max_events === 0 ){
-            $max_events = 9999;
-        }
-
-        self::set_is_processing( true );
-
-        /* Only run within given time allotment. DO NOT run past the time interval provided */
-        while ( $this->has_events() && $i < $max_events && microtime( true ) < $this->max_process_time ) {
-
-            $event = $this->get_next_event();
-
-            $this->set_current_event( $event );
-
-            $contact = $event->get_contact();
-
-            $this->set_current_contact( $contact );
-
-            if ( $event->run() && $event->is_funnel_event() ){
-
-                $next_step = $event->get_step()->get_next_action();
-
-                if ( $next_step instanceof Step && $next_step->is_active() ){
-                    $next_step->enqueue( $event->get_contact() );
-                }
-
-            } else {
-                if ( $event->has_errors() ){
-                    $this->add_error( $event->get_last_error() );
-                }
-            }
-
-            $i++;
-        }
-
-        self::set_is_processing( false );
-
-        do_action( 'groundhogg/event_queue/process/after', $this );
-
-        if ( microtime( true ) >= $this->max_process_time ){
-            return $i;
-        }
-
-        return $i + $this->process();
+        return Plugin::$instance->settings->get_option( 'average_execution_time' );
     }
 
     /**
-     * Get the next event in the queue to run.
+     * @return mixed
      */
-    public function get_next_event()
+    public function get_last_execution_time()
     {
-        return array_pop( $this->events );
+        return Plugin::$instance->settings->get_option( 'queue_last_execution_time' );
     }
 
     /**
-     * Is the queue empty of nah?
-     *
-     * @return bool whether the event array is empty
+     * @return mixed
      */
-    public function has_events()
+    public function get_total_executions()
     {
-        return ! empty( $this->events );
+        return Plugin::$instance->settings->get_option( 'queue_times_executed' );
     }
 
 }
