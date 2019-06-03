@@ -190,4 +190,9 @@ abstract class Line_Graph extends Dashboard_Widget
 
         return $data;
     }
+
+    public function get_chart_data()
+    {
+        return $this->get_data();
+    }
 }
