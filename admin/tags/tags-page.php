@@ -157,6 +157,18 @@ class Tags_Page extends Admin_Page
     }
 
     /**
+     * @return bool
+     */
+    public function process_recount()
+    {
+        recount_tag_contacts_count();
+
+        $this->add_notice( 'recount', __( 'Tag associations reset.', 'groundhogg' ) );
+
+        return false;
+    }
+
+    /**
      * Delete tags from the admin
      *
      * @return bool|\WP_Error

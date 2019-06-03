@@ -43,7 +43,7 @@ class Tag_Relationships extends DB
      */
     public function get_primary_key()
     {
-        return 'tag_id,contact_id';
+        return 'tag_id';
     }
 
     /**

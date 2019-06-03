@@ -361,16 +361,6 @@ class Tags extends DB
     }
 
     /**
-     * Count the total number of tags in the database
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function count( $args = array() ) {
-        return count( $this->get_tags() );
-    }
-
-    /**
      * Create the table
      *
      * @access  public

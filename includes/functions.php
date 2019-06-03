@@ -788,8 +788,8 @@ function recount_tag_contacts_count()
 
     if ( ! empty( $tags ) ){
         foreach ( $tags as $tag ){
-            $count =Plugin::$instance->dbs->get_db( 'tag_relationships' )->count( [ 'tag_id' => $tag->tag_id ] );
-            Plugin::$instance->dbs->get_db( 'tags' )->update( $tag->tag_id, [ 'contact_count' => $count ] );
+            $count = Plugin::$instance->dbs->get_db( 'tag_relationships' )->count( [ 'tag_id' => absint( $tag->tag_id ) ] );
+            Plugin::$instance->dbs->get_db( 'tags' )->update( absint( $tag->tag_id ), [ 'contact_count' => $count ] );
         }
     }
 }

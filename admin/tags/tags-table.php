@@ -70,7 +70,7 @@ class Tags_Table extends WP_List_Table {
     {
         ?>
         <div class="alignleft gh-actions">
-            <a class="button action" href="<?php echo add_query_arg( 'recount_contacts', '1', $_SERVER[ 'REQUEST_URI' ] ); ?>"><?php _ex( 'Recount Contacts', 'action','groundhogg' ); ?></a>
+            <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [ 'page' => 'gh_tags', 'action' => 'recount' ], admin_url( 'admin.php' ) ) ) ?>"><?php _ex( 'Recount Contacts', 'action','groundhogg' ); ?></a>
         </div>
         <?php
     }
@@ -105,7 +105,7 @@ class Tags_Table extends WP_List_Table {
      */
     protected function column_contact_count( $tag )
     {
-        $count = $tag->contact_count;
+        $count = $tag->get_contact_count();
         return $count ? '<a href="'.admin_url('admin.php?page=gh_contacts&tags_include=' . $tag->get_id() ).'">'. $count .'</a>' : '0';
     }
 
