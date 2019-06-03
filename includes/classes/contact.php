@@ -443,9 +443,10 @@ class Contact extends Base_Object_With_Meta
 
                 $this->tags[] = $tag_id;
 
-                $result = $this->get_tag_rel_db()->add( $tag_id, $this->ID );
+                $result = $this->get_tag_rel_db()->add( $tag_id, $this->get_id() );
 
-                if ( $result ){
+                // No ID so check for int 0
+                if ( $result === 0 ){
                     do_action( 'groundhogg/contact/tag_applied', $this, $tag_id );
                 }
 

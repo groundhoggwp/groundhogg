@@ -122,9 +122,9 @@ class Events_Page extends Admin_Page
                 )
             );
         }
+
         $this->add_notice('scheduled', sprintf(_nx('%d event rescheduled', '%d events rescheduled', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())));
 
-        //false return users to the main page
         return false;
     }
 

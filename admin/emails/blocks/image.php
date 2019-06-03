@@ -97,8 +97,9 @@ class Image extends Block
         ob_start();
 
         $src = 'https://via.placeholder.com/350x150';
+
         ?>
-        <div class="image-wrapper" style="text-align: center"><a href="<?php echo esc_url( site_url() ); ?>"><img width="350px" src="<?php echo $src;?>" style="display:block;max-width: 100%;width: 350px;vertical-align: bottom;" title="" alt=""></a></div>
+        <div class="image-wrapper" style="text-align: center"><a href="<?php echo esc_url( site_url() ); ?>"><img width="350px" src="<?php echo $src;?>" style="display:inline-block;max-width: 100%;width: 350px;vertical-align: bottom;" title="" alt=""></a></div>
         <?php
 
         return ob_get_clean();

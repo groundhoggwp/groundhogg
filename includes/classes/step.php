@@ -200,6 +200,10 @@ class Step extends Base_Object_With_Meta implements Event_Process
 
         $i = $this->get_order();
 
+//        var_dump( $i );
+//        var_dump( $items );
+//        wp_die();
+
         if ( $i >= count( $items ) ) {
 
             /* This is the last step. */
@@ -207,7 +211,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
 
         }
 
-        if ( $items[ $i ]->step_group === self::ACTION ){
+        if ( $items[ $i ]->get_group() === self::ACTION ){
 
             /* regardless of whether the current step is an action
             or a benchmark we can run the next step if it's an action */
@@ -220,7 +224,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
             //todo verify comparison
             while ( $i < count( $items ) ) {
 
-                if ( $items[ $i ]->step_group === self::ACTION ) {
+                if ( $items[ $i ]->get_group() === self::ACTION ) {
 
                     return $items[ $i ];
 

@@ -86,6 +86,7 @@ class Apply_Owner extends Action
             'description'   => __( 'Selecting more than 1 owner will create a round robin.', 'groundhogg' ),
             'multiple'  => true,
             'field'         => [
+                'multiple'  => true,
                 'class'     => 'gh-select2',
             ],
         ] );
@@ -115,7 +116,7 @@ class Apply_Owner extends Action
     {
 
         $owner = $this->get_setting( 'owner_id' );
-        $owner = is_array( $owner ) ? wp_parse_id_list( $owner ) : absint( $owner );
+        $owner = is_array( $owner ) ? wp_parse_id_list( $owner ) : [ absint( $owner ) ];
 
         /* backwards compat */
         if ( is_numeric( $owner ) ){

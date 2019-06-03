@@ -338,7 +338,7 @@ class Funnels_Page extends Admin_Page
             'success'
         );
 
-        return true;
+        return false;
     }
 
     public function process_restore()
@@ -359,7 +359,7 @@ class Funnels_Page extends Admin_Page
             'success'
         );
 
-        return true;
+        return false;
     }
 
 	public function process_duplicate()

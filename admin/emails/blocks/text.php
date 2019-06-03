@@ -42,6 +42,7 @@ class Text extends Block
 
         $css[ 'font-family' ] = 'Arial, sans-serif';
         $css[ 'font-size' ] = '16px';
+        $css[ 'padding' ] = '5px';
 
         return $css;
     }

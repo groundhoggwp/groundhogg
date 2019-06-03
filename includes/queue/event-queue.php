@@ -217,6 +217,7 @@ class Event_Queue extends Supports_Errors
         $this->max_process_time = $start + $this->get_max_execution_time() - 3;
 
         $result =  $this->process();
+
         $end = microtime(true );
         $process_time = $end - $start;
 
@@ -334,7 +335,7 @@ class Event_Queue extends Supports_Errors
 
         $this->prepare_events();
 
-        if ( empty( $this->events ) ){
+        if ( ! $this->has_events() ){
             return 0;
         }
 
@@ -355,8 +356,11 @@ class Event_Queue extends Supports_Errors
         while ( $this->has_events() && $i < $max_events && microtime( true ) < $this->max_process_time ) {
 
             $event = $this->get_next_event();
+
             $this->set_current_event( $event );
+
             $contact = $event->get_contact();
+
             $this->set_current_contact( $contact );
 
             if ( $event->run() && $event->is_funnel_event() ){

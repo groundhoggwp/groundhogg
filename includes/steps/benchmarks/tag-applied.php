@@ -164,7 +164,9 @@ class Tag_Applied extends Benchmark
      */
     protected function get_complete_hooks()
     {
-        return [ 'groundhogg/contact/tag_applied' => 2 ];
+        return [
+            [ 'groundhogg/contact/tag_applied', 2 ]
+        ];
     }
 
     /**

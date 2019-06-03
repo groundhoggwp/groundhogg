@@ -11,8 +11,33 @@ namespace Groundhogg;
 
 
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', 'Groundhogg\safe_css_filter_rgb_to_hex', 10 );
+add_filter( 'groundhogg/admin/emails/sanitize_email_content', 'Groundhogg\add_safe_style_attributes_to_email', 10 );
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', 'wp_kses_post', 11 );
-//add_filter( 'groundhogg/admin/emails/sanitize_email_content', [ 'Groundhogg\Email_Parser', 'parse_html' ] );
+
+/**
+ * Add some filters....
+ *
+ * @param $content
+ * @return mixed
+ */
+function add_safe_style_attributes_to_email( $content )
+{
+    add_filter( 'safe_style_css', 'Groundhogg\_safe_display_css' );
+
+    return $content;
+}
+
+/**
+ * Add display to list of allowed attributes
+ *
+ * @param $attributes
+ * @return array
+ */
+function _safe_display_css( $attributes )
+{
+    $attributes[] = 'display';
+    return $attributes;
+}
 
 /**
  * Convert all RGB to HEX in content.

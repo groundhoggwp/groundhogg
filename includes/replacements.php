@@ -298,13 +298,14 @@ class Replacements
         }
 
         $this->contact_id = $contact_id;
-        $this->current_contact = Plugin::$instance->utils->get_contact( $contact_id );
+        $this->current_contact = get_contactdata( $contact_id );
 
         if ( ! $this->current_contact ){
             return $content;
         }
 
         $new_content = preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
+
         $this->contact_id = null;
         $this->current_contact = null;
 

@@ -59,8 +59,13 @@ abstract class Benchmark extends Funnel_Step
         // Setup the main complete function
         // Accepts no arguments, but requires that child implementations setup the data ahead of time.
         foreach ( $this->get_complete_hooks() as $hook => $args ){
-            add_action( $hook, [ $this, 'setup' ], 98, $args );
-            add_action( $hook, [ $this, 'complete' ], 99, 0 );
+            if ( is_array( $args ) ){
+                add_action( $args[ 0 ], [ $this, 'setup' ], 98, $args[ 1 ] );
+                add_action( $args[ 0 ], [ $this, 'complete' ], 99, 0 );
+            } else {
+                add_action( $hook, [ $this, 'setup' ], 98, $args );
+                add_action( $hook, [ $this, 'complete' ], 99, 0 );
+            }
         }
 
         parent::__construct();
@@ -69,7 +74,7 @@ abstract class Benchmark extends Funnel_Step
     /**
      * get the hook for which the benchmark will run
      *
-     * @return int[string]
+     * @return int[]
      */
     abstract protected function get_complete_hooks();
 
@@ -94,9 +99,18 @@ abstract class Benchmark extends Funnel_Step
     {
         $steps = $this->get_like_steps();
 
+//        var_dump( 'here' );
+//        wp_die();
+
         foreach ( $steps as $step ) {
 
             $this->set_current_step( $step );
+
+            $contact = $this->get_the_contact();
+
+            if ( is_wp_error( $contact ) || ! $contact ){
+                continue;
+            }
 
             $this->set_current_contact( $this->get_the_contact() );
 

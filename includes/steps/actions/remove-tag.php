@@ -114,7 +114,7 @@ class Remove_Tag extends Action
     {
         $tags = wp_parse_id_list( $this->get_setting( 'tags' ) );
 
-        return $contact->add_tag( $tags );
+        return $contact->remove_tag( $tags );
     }
 
     /**

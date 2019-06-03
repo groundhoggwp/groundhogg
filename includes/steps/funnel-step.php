@@ -74,6 +74,7 @@ abstract class Funnel_Step extends Supports_Errors
              * @since 1.1
              */
             add_filter("groundhogg/steps/{$this->get_group()}s", [$this, 'register']);
+
             add_action("groundhogg/steps/{$this->get_type()}/html", [$this, 'pre_html'], 1 );
             add_action("groundhogg/steps/{$this->get_type()}/html", [$this, 'html']);
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'pre_save'], 1 );
@@ -89,6 +90,7 @@ abstract class Funnel_Step extends Supports_Errors
          */
         add_action("groundhogg/steps/{$this->get_type()}/import", [$this, 'pre_import'], 1, 2);
         add_action("groundhogg/steps/{$this->get_type()}/import", [$this, 'import'], 10, 2);
+
         add_filter("groundhogg/steps/{$this->get_type()}/export", [$this, 'pre_export'], 1, 2);
         add_filter("groundhogg/steps/{$this->get_type()}/export", [$this, 'export'], 10, 2);
         add_filter("groundhogg/steps/{$this->get_type()}/enqueue", [$this, 'pre_enqueue'], 1 );
@@ -273,10 +275,10 @@ abstract class Funnel_Step extends Supports_Errors
             case HTML::DROPDOWN_SMS:
             case HTML::DROPDOWN_EMAILS:
             case HTML::DROPDOWN_CONTACTS:
+            case HTML::DROPDOWN_OWNERS:
                 $args[ 'field' ][ 'selected' ] = ensure_array( $this->get_setting( $setting, $args[ 'default' ] ) );
                 break;
             case HTML::DROPDOWN:
-            case HTML::DROPDOWN_OWNERS:
                 $args[ 'field' ][ 'selected' ] = esc_attr( $this->get_setting( $setting, $args[ 'default' ] ) );
                 break;
             case HTML::CHECKBOX:
@@ -402,7 +404,7 @@ abstract class Funnel_Step extends Supports_Errors
      */
     private function get_posted_order()
     {
-        return array_search( $this->get_current_step()->get_id(), wp_parse_id_list( $_POST[ 'step_ids' ] ) );
+        return array_search( $this->get_current_step()->get_id(), wp_parse_id_list( $_POST[ 'step_ids' ] ) ) + 1;
     }
 
     /**
@@ -666,11 +668,14 @@ abstract class Funnel_Step extends Supports_Errors
      *
      * @param $contact Contact
      * @param $event Event
+     * @return Contact
      */
     public function pre_run( $contact, $event )
     {
         $this->set_current_step( $event->get_step() );
         $this->set_current_contact( $contact );
+
+        return $contact;
     }
 
     /**
@@ -688,10 +693,12 @@ abstract class Funnel_Step extends Supports_Errors
 
     /**
      * @param $step
+     * @return Step
      */
     public function pre_enqueue( $step )
     {
         $this->set_current_step( $step );
+        return $step;
     }
 
     /**
@@ -713,10 +720,12 @@ abstract class Funnel_Step extends Supports_Errors
     /**
      * @param $args
      * @param $step
+     * @return array
      */
     public function pre_export( $args, $step )
     {
         $this->set_current_step( $step );
+        return $args;
     }
 
     /**

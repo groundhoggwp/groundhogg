@@ -516,7 +516,7 @@ class Emails_Page extends Admin_Page
                 $this->wp_die_no_access();
             }
 
-            $contact = new Groundhogg\Contact( [ 'user_id' => get_current_user_id() ] );
+            $contact = new Groundhogg\Contact( [ 'email' => wp_get_current_user()->user_email ] );
 
             if ( $contact->exists() ){
 

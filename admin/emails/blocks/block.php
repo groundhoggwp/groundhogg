@@ -86,7 +86,7 @@ abstract class Block
 
         $extra_css = array_to_css( apply_filters( "groundhogg/admin/emails/blocks/{$this->get_name()}/extra_css", [] ) );
 
-        $html.= "<div class=\"content-inside inner-content text-content\" style=\"padding: 5px;$extra_css\">";
+        $html.= "<div class=\"content-inside inner-content text-content\" style=\"$extra_css\">";
 
         $html .= $this->inner_html();
 
