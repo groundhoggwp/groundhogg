@@ -150,6 +150,8 @@ add_action( 'admin_enqueue_scripts', 'wpgh_register_admin_scripts' );
  */
 function wpgh_register_admin_styles()
 {
+    wp_register_style( 'groundhogg-frontend',WPGH_ASSETS_FOLDER . 'css/frontend.css', [], WPGH_VERSION );
+
     wp_register_style( 'jquery-ui', WPGH_ASSETS_FOLDER . 'lib/jquery-ui/jquery-ui.min.css' );
     wp_register_style( 'select2',   WPGH_ASSETS_FOLDER . 'lib/select2/css/select2.min.css' );
     wp_register_style( 'codemirror', WPGH_ASSETS_FOLDER . 'lib/codemirror/codemirror.css'  );

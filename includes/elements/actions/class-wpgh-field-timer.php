@@ -289,12 +289,19 @@ class WPGH_Field_Timer extends WPGH_Funnel_Step
 
         /* Get the date from the field string... */
         $date = $contact->get_meta( $date_field );
+
+        // Normalize the date.
         if ( ! $date ){
             $date = date( 'Y-m-d', time() );
+        } else if ( is_numeric( $date ) ){
+            // UNIX Support
+            $date = date( 'Y-m-d', absint( $date ) );
+        } else {
+            // Normalize
+            $date = date( 'Y-m-d', strtotime( $date ) );
         }
 
         /* Calculate as if there is no delay... */
-
         if ( $run_when == 'now' ){
             $time_string = $date . ' ' . date( 'H:i:s', wpgh_convert_to_local_time( time() ) ) ;
             $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
