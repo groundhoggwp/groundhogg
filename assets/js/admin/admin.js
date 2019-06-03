@@ -1,10 +1,10 @@
 (function ( $, nonces, endpoints ) {
     
-    function picker( selector, args = {} ) {
+    function picker( selector, args ) {
         $( selector ).css( 'width', '100%' ).select2( args );
     }
 
-    function apiPicker( selector, endpoint, multiple = false, tags = false ) {
+    function apiPicker( selector, endpoint, multiple, tags ) {
         $( selector ).css( 'width', '100%' ).select2({
             tags: tags,
             multiple: multiple,
@@ -49,13 +49,13 @@
                     }
                 } );
             },
-            minLength: 2
+            minLength: 0
         } );
     }
 
     function buildPickers()
     {
-        picker( '.gh-select2' );
+        picker( '.gh-select2', {} );
         apiPicker( '.gh-tag-picker', endpoints.tags, true, true );
         apiPicker( '.gh-single-tag-picker', endpoints.tags, false, false );
         apiPicker( '.gh-single-tag-picker', endpoints.tags, false, false );

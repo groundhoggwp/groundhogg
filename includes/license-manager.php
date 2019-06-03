@@ -277,6 +277,10 @@ class License_Manager
      */
     public static function get_store_products( $args=array() )
     {
+        if ( get_transient( 'gh_store_products' ) ){
+            return get_transient( 'gh_store_products' );
+        }
+
         $args = wp_parse_args( $args, array(
             //'category' => 'templates',
             'category' => '',
@@ -285,12 +289,23 @@ class License_Manager
             'page'     => '',
             'number'   => '-1'
         ) );
+
         $url = 'https://www.groundhogg.io/edd-api/v2/products/';
+
         $response = wp_remote_get( add_query_arg( $args, $url ) );
+
         if ( is_wp_error( $response ) ){
-            return $response->get_error_message();
+            return $response;
         }
+
+        if ( wp_remote_retrieve_response_code( $response ) !== '200' ){
+            return new \WP_Error( 'connection_failure', 'Could not connect to Groundhogg.io' );
+        }
+
         $products = json_decode( wp_remote_retrieve_body( $response ) );
+
+        set_transient( 'gh_store_products', $products, WEEK_IN_SECONDS );
+
         return $products;
     }
 
@@ -304,6 +319,11 @@ class License_Manager
         $products = self::get_store_products( array(
             'category' => [ 16, 9 ],
         ) );
+
+        if ( is_wp_error( $products ) ){
+            Plugin::$instance->notices->add( $products );
+            return [];
+        }
 
         $products = $products->products;
 
@@ -337,7 +357,7 @@ class License_Manager
             $extensions[] = $products[ $rand ];
         }
 
-        $extensions = apply_filters( 'wpgh_extension_ads', $extensions );
+        $extensions = apply_filters( 'groundhogg/license_manager/get_extensions', $extensions );
         return $extensions;
     }
 
