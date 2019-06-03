@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.11.7 =
+* FIXED Listener for bounce errors when using GHSS not causing PHP notice on PHP < 7.1
+
 = 1.3.11.6
 * FIXED CSS z-index of select2 in funnel editor caused by previous compatibility resolution.
 
