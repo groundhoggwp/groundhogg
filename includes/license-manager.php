@@ -298,10 +298,6 @@ class License_Manager
             return $response;
         }
 
-        if ( wp_remote_retrieve_response_code( $response ) !== '200' ){
-            return new \WP_Error( 'connection_failure', 'Could not connect to Groundhogg.io' );
-        }
-
         $products = json_decode( wp_remote_retrieve_body( $response ) );
 
         set_transient( 'gh_store_products', $products, WEEK_IN_SECONDS );

@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Welcome;
 
 use Groundhogg\Admin\Admin_Page;
+use function Groundhogg\html;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
 
@@ -255,7 +256,18 @@ class Welcome_Page extends Admin_Page
                 <?php endif; ?>
                 <?php if ( $article->link ): ?>
                     <p>
-                        <a class="button button-primary" href="<?php echo esc_url_raw( $article->link ); ?>" target="_blank"><?php _e( 'Read More...' ); ?></a>
+                        <?php echo html()->modal_link( [
+                            'title'     => $article->title->rendered,
+                            'text'      => __( 'Read More...', 'groundhogg' ),
+                            'footer_button_text' => __( 'Close' ),
+                            'id'        => '',
+                            'source'    => $article->link,
+                            'height'    => 800,
+                            'width'     => 1000,
+                            'footer'    => 'true',
+                            'class'     => 'button button-primary',
+                            'preventSave'    => 'true',
+                        ] ); ?>
                     </p>
                 <?php endif; ?>
             </div>

@@ -129,17 +129,13 @@ var GroundhoggModal = {};
         },
 
         prepareFrame: function( iframe ){
-
     	    var self = this;
-
             var $iframe = $(iframe);
+            $iframe.removeClass( 'hidden' );
+
             this.content.removeClass( 'hidden' );
             this.content.css( 'padding', 0 );
-            $iframe.removeClass( 'hidden' );
             this.loader.addClass( 'hidden' );
-            $iframe.contents().find( '.choose-template' ).click( function () {
-                self.frameReload();
-            });
         },
 
         frameReload: function()
