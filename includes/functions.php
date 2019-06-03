@@ -1454,6 +1454,7 @@ function wpgh_add_my_custom_email_templates( $email_templates ){
  */
 function gisset_not_empty( $array, $key='' )
 {
+    $array = (array) $array;
     return isset( $array[ $key ] ) && ! empty( $array[ $key] );
 }
 
@@ -1890,7 +1891,7 @@ function wpgh_parse_complaint_and_bounce_emails( $error )
     if ( $code === 'invalid_recipients' ){
 
         /* handle bounces */
-        $bounces = gisset_not_empty( $data, 'bounces' )? $data[ 'bounces' ] : [];
+        $bounces = gisset_not_empty( $data, 'bounces' )? $data->bounces : [];
 
         if ( ! empty( $bounces ) ){
             foreach ( $bounces as $email ){
