@@ -106,6 +106,14 @@ class Event extends Base_Object
         return $this->status;
     }
 
+	/**
+	 * @return string
+	 */
+    public function get_claim()
+    {
+    	return $this->claim;
+    }
+
     /**
      * @return int
      */
@@ -283,9 +291,7 @@ class Event extends Base_Object
      */
     public function get_funnel_title()
     {
-        return $this->get_step()->get_funnel_title(); //todo
-//        return '' ;
-
+        return $this->get_step()->get_funnel_title();
     }
 
     /**
@@ -295,6 +301,10 @@ class Event extends Base_Object
      */
     public function run()
     {
+    	if ( ! $this->get_claim() ){
+    		return false;
+	    }
+
         do_action('groundhogg/event/run/before', $this);
 
         $this->in_progress();

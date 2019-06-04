@@ -1,12 +1,10 @@
-
-
-#wpbody-content{
-    /*height: 100vh;*/
-}
-
 #wpcontent {
     padding-left: 0 !important;
     box-sizing: border-box;
+}
+
+#wpfooter{
+    display: none;
 }
 
 #poststuff {
@@ -228,9 +226,13 @@ select {
     margin: 0.83em 0 0.83em 0;
 }
 
+#wpbody-content{
+    padding-bottom: 0;
+}
+
 #editor{
-    min-height: 80vh;
-    max-height: 90vh;
+    /*min-height: 80vh;*/
+    /*max-height: 90vh;*/
 }
 
 #editor-panel .postbox {

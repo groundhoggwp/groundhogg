@@ -213,7 +213,7 @@ abstract class DB {
 
                     foreach ( $value as $item ){
 
-                        if ( ! is_numeric( $item ) ){
+                        if ( is_string( $item ) ){
                             $ORS[] = "'" . $item . "'";
                         } else {
                             $ORS[] = $item;

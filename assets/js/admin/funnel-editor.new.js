@@ -69,6 +69,12 @@
                 }
             } );
 
+            $( '#postbox-container-1 .hndle' ).click( function ( e ) {
+                var $metabox = $( this.parentNode );
+                $metabox.toggleClass( 'closed' );
+                self.sidebar.updateSticky();
+            })
+
         },
 
         editorSizing: function (){
@@ -154,8 +160,6 @@
                 }
 
                 $( document ).trigger( 'new-step' );
-
-                // console.log( response );
             } );
         },
 
@@ -316,15 +320,8 @@
             }
 
             showSpinner();
-
             adminAjaxRequest( { action: 'gh_add_contacts_to_funnel', tags: tags, step: stepId }, function ( response ) {
-
                 hideSpinner();
-
-                // $( '.add-contacts-response' ).html( response );
-                // $( '.add-contacts-response' ).removeClass( 'hidden' );
-                // makeDismissible();
-
             } );
         },
 

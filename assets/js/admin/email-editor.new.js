@@ -132,7 +132,7 @@
 
             this.sidebar = new StickySidebar( '#postbox-container-1' , {
                 topSpacing: self.inFrame() ? 47 : 78,
-                bottomSpacing: 0
+                bottomSpacing: 20
             });
 
         },
@@ -208,6 +208,7 @@
 
         editorSizing: function (){
             $('.editor-header').width( $('#poststuff').width() );
+            $('#email-body').css( 'min-height', $('#postbox-container-1').height() );
         },
 
         /**

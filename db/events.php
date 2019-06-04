@@ -96,6 +96,7 @@ class Events extends DB  {
             'error_code'    => '%s',
             'error_message' => '%s',
             'status'        => '%s',
+            'claim'         => '%s',
         );
     }
 
@@ -116,6 +117,7 @@ class Events extends DB  {
             'error_code'    => '',
             'error_message' => '',
             'status'        => 'waiting',
+            'claim'         => '',
         );
     }
 
@@ -208,6 +210,7 @@ class Events extends DB  {
         error_code tinytext NOT NULL,
         error_message tinytext NOT NULL, 
         status varchar(20) NOT NULL,
+        claim varchar(20) NOT NULL,
         PRIMARY KEY (ID),
         KEY time (time),
         KEY contact_id (contact_id),

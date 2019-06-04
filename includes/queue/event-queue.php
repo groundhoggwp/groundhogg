@@ -57,6 +57,11 @@ class Event_Queue extends Supports_Errors
      */
     protected static $is_processing;
 
+	/**
+	 * @var Event_Store
+	 */
+    protected $store;
+
     /**
      * @var int[]
      */
@@ -122,11 +127,11 @@ class Event_Queue extends Supports_Errors
 
     /**
      * Decide which process to use...
-     *
-     * @deprecated since 2.0
      */
     public function run_queue()
     {
+    	$this->store = new Event_Store();
+
         $this->set_start( microtime(true ) );
 
         $settings = Plugin::$instance->settings;
@@ -155,24 +160,6 @@ class Event_Queue extends Supports_Errors
     }
 
     /**
-     * Get a list of IDs...
-     *
-     * @return int[]
-     */
-    protected function get_queued_event_ids()
-    {
-        $events = get_db( 'events' )->query( [
-            'status' => 'waiting',
-            'before' => time(),
-            'LIMIT' => 50
-        ], 'time', false );
-
-        $ids = wp_parse_id_list( wp_list_pluck( $events, 'ID' ) );
-
-        return $ids;
-    }
-
-    /**
      * Recursive, Iterate through the list of events and process them via the EVENTS api
      * completes successive events quite since WP-Cron only happens once every 5 or 10 minutes depending on
      * the amount of traffic.
@@ -182,7 +169,11 @@ class Event_Queue extends Supports_Errors
     protected function process()
     {
 
-        $event_ids = $this->get_queued_event_ids();
+    	$max_events = apply_filters( 'groundhogg/event_queue/max_events', 50 );
+
+    	$claim = $this->store->stake_claim( $max_events );
+    	$event_ids = $this->store->get_events_by_claim( $claim );
+
         $completed_events = 0;
 
         if ( empty( $event_ids ) ){
@@ -219,6 +210,8 @@ class Event_Queue extends Supports_Errors
             $completed_events++;
 
         } while ( ! empty( $event_ids ) && ! $this->limits_exceeded( $completed_events ) );
+
+        $this->store->release_events( $claim );
 
         self::set_is_processing( false );
 
