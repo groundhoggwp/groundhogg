@@ -132,7 +132,7 @@
 
             this.sidebar = new StickySidebar( '#postbox-container-1' , {
                 topSpacing: self.inFrame() ? 47 : 78,
-                bottomSpacing: 20
+                bottomSpacing: 0
             });
 
         },
@@ -287,6 +287,8 @@
 
                 $(document).trigger( 'madeInactive' );
 
+                this.sidebar.updateSticky();
+
                 return;
 
             }
@@ -318,10 +320,8 @@
             this.settings.hide();
 
             $(document).trigger( 'madeActive', [ block, blockType ] );
-            // console.log( { block_type: blockType, block: block });
 
             this.sidebar.updateSticky();
-
         },
 
         /**

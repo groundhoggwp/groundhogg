@@ -76,7 +76,7 @@ class Login_Status extends Benchmark
                     'any'   => __( 'Any Time', 'groundhogg' ),
                     'times' => __( 'Number of Times', 'groundhogg' ),
                 ),
-                'selected' => $this->get_setting( 'type' ),
+                'selected' => $this->get_setting( 'type', 'any' ),
                 'multiple' => false,
             ] ),
             $html->number( [

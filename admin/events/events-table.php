@@ -300,6 +300,7 @@ class Events_Table extends WP_List_Table {
         $query = $_GET;
 
         unset( $query[ 'page' ] );
+        unset( $query[ 'ids' ] );
 
         if ( isset_not_empty( $_GET, 's' ) ){
             $query[ 'search' ] = get_request_var( 's' );

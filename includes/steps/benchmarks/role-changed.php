@@ -94,11 +94,12 @@ class Role_Changed extends Benchmark
         $this->add_control( 'role', [
             'label'         => __( 'Run when this access is given:', 'groundhogg' ),
             'type'          => HTML::SELECT2,
-            'default'       => 'subscriber',
+            'default'       => [ 'subscriber' ],
             'description'   => __( 'Users with these roles will trigger this benchmark.', 'groundhogg' ),
+            'multiple' => true,
             'field'         => [
                 'multiple' => true,
-                'options'  => Plugin::$instance->roles->get_roles_for_select(),
+                'data'  => Plugin::$instance->roles->get_roles_for_select(),
             ],
         ] );
 

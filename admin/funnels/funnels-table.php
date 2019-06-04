@@ -117,79 +117,6 @@ class Funnels_Table extends WP_List_Table {
         return ( isset( $_GET['status'] ) )? $_GET['status'] : 'active';
     }
 
-    protected function extra_tablenav( $which ) {
-
-		if ( $which !== 'top' ){
-			return;
-		}
-
-	    wp_enqueue_style(  'jquery-ui' );
-	    wp_enqueue_script( 'jquery-ui-datepicker' );
-
-		?>
-        <div class="alignleft actions bulkactions">
-            <?php $args = array(
-                'name'      => 'date_range',
-                'id'        => 'date_range',
-                'options'   => array(
-                    'today'         => _x( 'Today', 'reporting_range', 'groundhogg' ),
-                    'yesterday'     => _x( 'Yesterday', 'reporting_range', 'groundhogg' ),
-                    'this_week'     => _x( 'This Week', 'reporting_range', 'groundhogg' ),
-                    'last_week'     => _x( 'Last Week', 'reporting_range', 'groundhogg' ),
-                    'last_30'       => _x( 'Last 30 Days', 'reporting_range', 'groundhogg' ),
-                    'this_month'    => _x( 'This Month', 'reporting_range', 'groundhogg' ),
-                    'last_month'    => _x( 'Last Month', 'reporting_range', 'groundhogg' ),
-                    'this_quarter'  => _x( 'This Quarter', 'reporting_range', 'groundhogg' ),
-                    'last_quarter'  => _x( 'Last Quarter', 'reporting_range', 'groundhogg' ),
-                    'this_year'     => _x( 'This Year', 'reporting_range', 'groundhogg' ),
-                    'last_year'     => _x( 'Last Year', 'reporting_range', 'groundhogg' ),
-                    'custom'        => _x( 'Custom Range', 'reporting_range', 'groundhogg' ),
-                ),
-                'selected' => get_request_var( 'date_range', 'this_week' ),
-            ); echo Plugin::$instance->utils->html->dropdown( $args );
-
-            submit_button( _x( 'Refresh', 'action', 'groundhogg' ), 'secondary', 'change_reporting', false );
-
-            $class = get_request_var( 'date_range' ) === 'custom' ? '' : 'hidden';
-
-            ?><div class="custom-range <?php echo $class ?> alignleft actions"><?php
-
-                echo Plugin::$instance->utils->html->date_picker(array(
-                    'name'  => 'custom_date_range_start',
-                    'id'    => 'custom_date_range_start',
-                    'class' => 'input',
-                    'value' => get_request_var( 'custom_date_range_start' ),
-                    'attributes' => '',
-                    'placeholder' => 'YYY-MM-DD',
-                    'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
-                    'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
-                    'format' => 'yy-mm-dd'
-                ));
-                echo Plugin::$instance->utils->html->date_picker(array(
-                    'name'  => 'custom_date_range_end',
-                    'id'    => 'custom_date_range_end',
-                    'class' => 'input',
-                    'value' => get_request_var( 'custom_date_range_end' ),
-
-
-                    'attributes' => '',
-                    'placeholder' => 'YYY-MM-DD',
-                    'min-date' => date( 'Y-m-d', strtotime( '-100 years' ) ),
-                    'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
-                    'format' => 'yy-mm-dd'
-                )); ?>
-            </div>
-            <script>jQuery(function($){$('#date_range').change(function(){
-                    if($(this).val() === 'custom'){
-                        $('.custom-range').removeClass('hidden');
-                    } else {
-                        $('.custom-range').addClass('hidden');
-                    }})});
-            </script>
-        </div>
-		<?php
-    }
-
 	/**
      * Get default row steps...
      *
@@ -266,6 +193,11 @@ class Funnels_Table extends WP_List_Table {
         return "<a href='$queryUrl'>$count</a>";
     }
 
+	/**
+	 * @param $funnel Funnel
+	 *
+	 * @return string
+	 */
     protected function column_last_updated( $funnel )
     {
         $lu_time = mysql2date( 'U', $funnel->last_updated );
@@ -280,6 +212,11 @@ class Funnels_Table extends WP_List_Table {
         return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $lu_time ) ) . '">' . $time . '</abbr>';
     }
 
+	/**
+	 * @param $funnel Funnel
+	 *
+	 * @return string
+	 */
     protected function column_date_created( $funnel )
     {
         $dc_time = mysql2date( 'U', $funnel->date_created );
@@ -374,6 +311,7 @@ class Funnels_Table extends WP_List_Table {
         $query = $_GET;
 
         unset( $query[ 'page' ] );
+        unset( $query[ 'ids' ] );
 
         if ( isset_not_empty( $_GET, 's' ) ){
             $query[ 'search' ] = get_request_var( 's' );

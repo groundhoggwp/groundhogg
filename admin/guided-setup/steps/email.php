@@ -43,7 +43,11 @@ class Email extends Step
         <div style="margin-top: 60px;">
             <p>
                 <?php submit_button( _x( 'Already have an account? Connect & Activate!', 'guided_setup', 'groundhogg' ), 'primary', 'gh_active_email', false ); ?>
-                <?php submit_button( _x( 'Don\'t have an account? Sign Up Now!', 'guided_setup', 'groundhogg' ), 'secondary', 'gh_sign_up', false ); ?>
+                <?php echo html()->wrap( _x( 'Don\'t have an account? Sign Up Now!', 'guided_setup', 'groundhogg' ), 'a', [
+                        'href' => 'https://www.groundhogg.io/register/',
+                    'target' => '_blank',
+                    'class' => 'button button-secondary'
+                ] ); ?>
             </p>
         </div>
         <p class="description"><?php _ex( '', 'guided_setup', 'groundhogg' ); ?></p>
@@ -89,13 +93,6 @@ class Email extends Step
 	        set_transient( 'gh_listen_for_connect', 1, HOUR_IN_SECONDS );
 	        wp_redirect( $redirect_to );
 	        die();
-        }
-
-        if ( get_request_var( 'gh_sign_up' ) ){
-            $redirect_to = sprintf( 'https://www.groundhogg.io/wp-login.php?doing_oauth=true&redirect_to=%s', urlencode( admin_url( 'admin.php?page=gh_guided_setup&action=connect_to_gh&step=' . $this->get_current_step_id() ) ) );
-            set_transient( 'gh_listen_for_connect', 1, HOUR_IN_SECONDS );
-            wp_redirect( $redirect_to );
-            die();
         }
 
         return true;
