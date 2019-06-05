@@ -242,7 +242,7 @@ class API_Keys_Table extends \WP_List_Table {
      * Performs the key query
      *
      * @since 2.0
-     * @return void
+     * @return array
      */
     public function query() {
         $users    = get_users( array(
