@@ -227,27 +227,21 @@ class HTML
      */
     public function wrap( $content = '', $e = 'div', $atts = [] )
     {
-        return sprintf( '<%1$s %2$s>%3$s</%1$s>', esc_html( $e ), $this->array_to_atts( $atts ), $content );
+        return sprintf( '<%1$s %2$s>%3$s</%1$s>', esc_html( $e ), array_to_atts( $atts ), $content );
     }
 
-    /**
-     * Turn an arbitrary array of elements into html tags
+	/**
+     * Generate an html element.
      *
-     * @param $atts
-     * @return string
-     */
-    public function array_to_atts( $atts )
+	 * @param string $e
+	 * @param array $atts
+	 * @param bool $self_closing
+	 *
+	 * @return string
+	 */
+    public function e( $e = 'div', $atts = [], $self_closing = true )
     {
-        $tag = '';
-        foreach ($atts as $key => $value) {
-
-            if ( $key === 'style' && is_array( $value ) ){
-                $value = array_to_css( $value );
-            }
-
-            $tag .= sanitize_key( $key ) . '="' . esc_attr( $value ) . '" ';
-        }
-        return $tag;
+	    return sprintf( '<%1$s %2$s %3$s>', esc_html( $e ), array_to_atts( $atts ), $self_closing ? '/' : '' );
     }
 
 
@@ -289,26 +283,15 @@ class HTML
 			'id'    => '',
 			'class' => 'regular-text',
 			'value' => '',
-			'attributes' => '',
 			'placeholder' => '',
 			'required' => false
 		) );
 
-		if ( $a[ 'required' ] ){
-			$a[ 'required' ] = 'required';
-		}
+		if ( ! $a[ 'required' ] ){
+		    unset( $a[ 'required' ] );
+        }
 
-		$html = sprintf(
-			"<input type='%s' id='%s' class='%s' name='%s' value='%s' placeholder='%s' %s %s>",
-			esc_attr( $a[ 'type'    ] ),
-			esc_attr( $a[ 'id'      ] ),
-			esc_attr( $a[ 'class'   ] ),
-			esc_attr( $a[ 'name'    ] ),
-			esc_attr( $a[ 'value'   ] ),
-			esc_attr( $a[ 'placeholder' ] ),
-			$a[ 'attributes'  ],
-			$a[ 'required'  ]
-		);
+		$html = $this->e( 'input', $a );
 
 		return apply_filters( 'groundhogg/html/input', $html, $a );
 	}
@@ -334,19 +317,6 @@ class HTML
 			'max'       => 99999,
 			'step'      => 1
 		) );
-
-		if ( ! empty( $a[ 'max' ] ) ){
-			$a[ 'attributes' ] .= sprintf( ' max="%d"', $a[ 'max' ] );
-		}
-
-		if ( ! empty( $a[ 'min' ] ) ){
-			$a[ 'attributes' ] .= sprintf( ' min="%d"', $a[ 'min' ] );
-		}
-
-		if ( ! empty( $a[ 'step' ] ) ){
-			$a[ 'attributes' ] .= sprintf( ' step="%s"', $a[ 'step' ] );
-		}
-
 
 		return apply_filters( 'groundhogg/html/number', $this->input( $a ), $a );
 	}

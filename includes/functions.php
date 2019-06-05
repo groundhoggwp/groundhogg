@@ -301,11 +301,17 @@ function enqueue_groundhogg_modal()
  */
 function array_to_atts( $atts )
 {
-    $tag = '';
-    foreach ($atts as $key => $value) {
-        $tag .= sanitize_key( $key ) . '="' . esc_attr( $value ) . '" ';
-    }
-    return $tag;
+	$tag = '';
+	foreach ($atts as $key => $value) {
+
+		if ( $key === 'style' && is_array( $value ) ){
+			$value = array_to_css( $value );
+		}
+
+		$tag .= sanitize_key( $key ) . '="' . esc_attr( $value ) . '" ';
+		}
+
+	return $tag;
 }
 
 /**
