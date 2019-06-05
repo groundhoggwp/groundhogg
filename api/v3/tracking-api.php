@@ -17,7 +17,7 @@ class Tracking_Api extends Base
 
     public function register_routes()
     {
-        register_rest_route('gh/v3', '/tracking/page-view', [
+        register_rest_route(self::NAME_SPACE, '/tracking/page-view', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'permission_callback' => function ( WP_REST_Request $request ){
@@ -33,7 +33,7 @@ class Tracking_Api extends Base
             ]
         ] );
 
-        register_rest_route('gh/v3', '/tracking/form-impression', [
+        register_rest_route(self::NAME_SPACE, '/tracking/form-impression', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'form_impression' ],

@@ -21,7 +21,7 @@ class Contacts_Api extends Base
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route('gh/v3', '/contacts', [
+        register_rest_route(self::NAME_SPACE, '/contacts', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_contacts' ],
@@ -96,7 +96,7 @@ class Contacts_Api extends Base
             ],
         ] );
 
-        register_rest_route('gh/v3', '/contacts/tags', [
+        register_rest_route(self::NAME_SPACE, '/contacts/tags', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_tags' ],
@@ -152,7 +152,7 @@ class Contacts_Api extends Base
             ]
         ]);
 
-        register_rest_route('gh/v3', '/contacts/apply_tags', [
+        register_rest_route(self::NAME_SPACE, '/contacts/apply_tags', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'apply_tags' ],
@@ -174,7 +174,7 @@ class Contacts_Api extends Base
             ]
         ]);
 
-        register_rest_route('gh/v3', '/contacts/remove_tags', [
+        register_rest_route(self::NAME_SPACE, '/contacts/remove_tags', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'remove_tags' ],
@@ -196,7 +196,7 @@ class Contacts_Api extends Base
             ]
         ]);
 
-        register_rest_route('gh/v3', '/contacts/notes', [
+        register_rest_route(self::NAME_SPACE, '/contacts/notes', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_notes' ],

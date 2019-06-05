@@ -18,7 +18,7 @@ class Email_Api extends Base
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route('gh/v3', '/emails', [
+        register_rest_route(self::NAME_SPACE, '/emails', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_emails' ],
@@ -47,7 +47,7 @@ class Email_Api extends Base
             ]
         ] );
 
-        register_rest_route('gh/v3', '/emails/send' ,array(
+        register_rest_route(self::NAME_SPACE, '/emails/send' ,array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => [ $this, 'send_email' ],
             'permission_callback' => $auth_callback,

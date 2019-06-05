@@ -19,7 +19,7 @@ class Sms_Api extends Base
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route('gh/v3', '/sms', [
+        register_rest_route(self::NAME_SPACE, '/sms', [
             [
 	            'methods' => WP_REST_Server::READABLE,
 	            'callback' => [ $this, 'get_sms' ],
@@ -48,7 +48,7 @@ class Sms_Api extends Base
             ]
         ] );
 
-        register_rest_route('gh/v3', '/sms/send' ,array(
+        register_rest_route(self::NAME_SPACE, '/sms/send' ,array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => [ $this, 'send_sms' ],
             'permission_callback' => $auth_callback,

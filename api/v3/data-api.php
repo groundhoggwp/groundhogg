@@ -19,7 +19,7 @@ class Data_Api extends Base
         $callback = $this->get_auth_callback();
 
         // BASIC DB QUERY
-        register_rest_route('gh/v3', '/data', [
+        register_rest_route(self::NAME_SPACE, '/data', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'permission_callback' => $callback,

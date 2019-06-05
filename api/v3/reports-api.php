@@ -23,7 +23,7 @@ class Reports_Api extends Base
         $callback = $this->get_auth_callback();
 
         // BASIC DB QUERY
-        register_rest_route('gh/v3', '/reports', [
+        register_rest_route(self::NAME_SPACE, '/reports', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'permission_callback' => $callback,

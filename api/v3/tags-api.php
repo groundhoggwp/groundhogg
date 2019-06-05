@@ -21,7 +21,7 @@ class Tags_Api extends Base
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route('gh/v3', '/tags', [
+        register_rest_route(self::NAME_SPACE, '/tags', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_tags' ],
@@ -86,7 +86,7 @@ class Tags_Api extends Base
             ],
         ] );
 
-        register_rest_route('gh/v3', '/tags/apply', [
+        register_rest_route(self::NAME_SPACE, '/tags/apply', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'apply_tags' ],
@@ -108,7 +108,7 @@ class Tags_Api extends Base
             ]
         ]);
 
-        register_rest_route('gh/v3', '/tags/remove', [
+        register_rest_route(self::NAME_SPACE, '/tags/remove', [
             [
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'remove_tags' ],

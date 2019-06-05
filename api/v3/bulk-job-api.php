@@ -19,7 +19,7 @@ class Bulk_Job_Api extends Base
 
         $auth_callback = $this->get_auth_callback();
 
-        register_rest_route('gh/v3', '/bulk-jobs', [
+        register_rest_route(self::NAME_SPACE, '/bulk-jobs', [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_init_data' ],
