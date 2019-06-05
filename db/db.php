@@ -129,7 +129,7 @@ abstract class DB {
     abstract public function get_db_version();
 
     /**
-     * Get the object type we're inserting/updateing/deleting.
+     * Get the object type we're inserting/updating/deleting.
      *
      * @return string
      */

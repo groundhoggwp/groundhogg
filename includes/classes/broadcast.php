@@ -230,4 +230,30 @@ class Broadcast extends Base_Object implements Event_Process
     {
         return true;
     }
+
+    /**
+     * @return array
+     */
+    public function get_report_data()
+    {
+        $data = [];
+
+        if ( $this->get_status() === 'sent' ){
+            $data[] = 'hi';
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function get_as_array()
+    {
+        return [
+            'data' => $this->data,
+            'title' => $this->get_title(),
+            'report' => $this->get_report_data(),
+        ];
+    }
 }
