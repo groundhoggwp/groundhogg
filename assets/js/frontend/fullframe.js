@@ -6,7 +6,8 @@ jQuery(function($){
 
     function iResize() {
         for (var i = 0, j = iFrames.length; i < j; i++) {
-            iFrames[i].style.height = iFrames[i].contentWindow.document.body.offsetHeight + offset + 'px';}
+            iFrames[i].height($(iFrames[i].contentWindow.document).height());
+        }
     }
 
     if ($.browser.safari || $.browser.opera) {
@@ -23,7 +24,7 @@ jQuery(function($){
 
     } else {
         iFrames.load(function() {
-            this.style.height = this.contentWindow.document.body.offsetHeight + offset + 'px';
+            $(this).height( $(this.contentWindow.document ).height() );
         });
     }
 

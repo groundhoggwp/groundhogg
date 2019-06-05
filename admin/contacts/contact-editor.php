@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Contacts;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_form_list;
 use function Groundhogg\get_request_var;
+use function Groundhogg\html;
 use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
@@ -652,56 +653,31 @@ function contact_record_section_files( $contact )
                 margin-top: 10px;
             }
         </style>
-        <table class="wp-list-table widefat fixed striped files">
-            <thead>
-            <tr>
-                <th><?php _ex( 'Name', 'contact_record', 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Size', 'contact_record', 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Type', 'contact_record', 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Replacement Code', 'contact_record', 'groundhogg' ); ?></th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php
 
-            $files = $contact->get_files();
+        <?php
 
-            if (empty($files)):
-                ?>
-                <tr>
-                    <td colspan="4"><?php _ex( 'This contact has no files...', 'contact_record', 'groundhogg' ); ?></td>
-                </tr>
-            <?php
-            else:
+        $files = $contact->get_files();
 
-                foreach ($files as $key => $item):
+        $rows = [];
 
-                    if (!isset($item['file_name'])) {
-                        continue;
-                    }
+        foreach ( $files as $key => $item ){
 
-                    $info = pathinfo($item['file_path']);
-                    ?>
-                    <tr>
-                        <td><?php printf("<a href='%s' target='_blank'>%s</a>", $item['file_url'], esc_html($info['basename'])); ?></td>
-                        <td><?php esc_html_e(size_format(filesize($item['file_path']))); ?></td>
-                        <td><?php esc_html_e($info['extension']); ?></td>
-                        <td><?php echo '{files.' . intval( $key ) . '}'; ?></td>
-                    </tr>
-                <?php
-                endforeach;
-            endif;
-            ?>
-            </tbody>
-            <tfoot>
-            <tr>
-                <th><?php _ex( 'Name', 'contact_record', 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Size', 'contact_record', 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Type', 'contact_record', 'groundhogg' ); ?></th>
-                <th><?php _ex( 'Replacement Code', 'contact_record', 'groundhogg' ); ?></th>
-            </tr>
-            </tfoot>
-        </table>
+            $info = pathinfo($item['file_path']);
+
+            $rows[] = [
+                sprintf("<a href='%s' target='_blank'>%s</a>", $item['file_url'], esc_html($info['basename'])),
+                esc_html(size_format(filesize($item['file_path']))),
+                esc_html($info['extension'])
+            ];
+
+        }
+
+        html()->list_table( [], [
+            _x( 'Name', 'contact_record', 'groundhogg' ),
+            _x( 'Size', 'contact_record', 'groundhogg' ),
+            _x( 'Type', 'contact_record', 'groundhogg' ),
+        ], $rows );
+        ?>
         <div>
             <input class="gh-file-uploader" type="file" name="files[]" multiple>
         </div>

@@ -407,11 +407,8 @@ class Emails_Page extends Admin_Page
         }
 
         $this->add_notice(
-            esc_attr( 'deleted' ),
-            sprintf( "%s %d %s",
-                __( 'Deleted' ),
-                count( $this->get_items() ),
-                __( 'Emails', 'groundhogg' ) ),
+            esc_attr('deleted'),
+            sprintf(_nx('Deleted %d email', 'Deleted %d emails', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())),
             'success'
         );
 

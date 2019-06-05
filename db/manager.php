@@ -24,13 +24,21 @@ class Manager
      */
     public function __construct()
     {
-        $this->init_dbs();
+        add_action( 'init', [ $this, 'init_dbs' ] );
+
+        // Re-init the DBS if a new plugin is activated, like an extension.
+        add_action( 'activate_plugin', [ $this, 'listen_for_addons' ] );
+    }
+
+    public function listen_for_addons()
+    {
+        do_action( 'groundhogg/db/manager/init', $this );
     }
 
     /**
      * Setup the base DBs for the plugin
      */
-    protected function init_dbs(){
+    public function init_dbs(){
         $this->activity     = new Activity();
         $this->broadcasts   = new Broadcasts();
         $this->contactmeta  = new Contact_Meta();
@@ -45,13 +53,13 @@ class Manager
         $this->superlinks   = new Superlinks();
         $this->tags         = new Tags();
         $this->tag_relationships = new Tag_Relationships();
-        $this->submissions = new Submissions();
+        $this->submissions    = new Submissions();
         $this->submissionmeta = new Submission_Meta();
 
         /**
          * Runs when the DB Manager is setup and all the standard DBs have been initialized.
          */
-        do_action( 'groundhogg/db/manager/init', $this );
+        $this->listen_for_addons();
     }
 
     /**

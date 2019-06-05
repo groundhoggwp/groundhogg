@@ -17,12 +17,30 @@ abstract class Installer {
      */
     public function __construct()
     {
+        add_action( 'admin_init', [ $this, 'fail_safe_install' ] );
+
         register_activation_hook( $this->get_plugin_file(), [ $this, 'activation_hook' ] );
         register_deactivation_hook( $this->get_plugin_file(), [ $this, 'deactivation_hook' ] );
 
         add_action( 'wpmu_new_blog', [ $this, 'new_blog_created' ], 10, 6 );
         add_filter( 'wpmu_drop_tables', [ $this, 'wpmu_drop_tables' ], 10, 2 );
         add_action( 'activated_plugin', [ $this, 'plugin_activated' ] );
+    }
+
+    /**
+     * Fail safe.
+     *
+     * @return mixed
+     */
+    public function fail_safe_install()
+    {
+        $installed = get_option( "groundhogg_{$this->get_installer_name()}_installed", false );
+
+        if ( ! $installed ){
+            $this->activation_hook();
+        }
+
+        return true;
     }
 
     abstract protected function activate();
@@ -66,6 +84,8 @@ abstract class Installer {
         do_action( "groundhogg/{$this->get_installer_name()}/activated" );
 
         set_transient( "groundhogg_{$this->get_installer_name()}_activated", time(), MINUTE_IN_SECONDS );
+
+        update_option( "groundhogg_{$this->get_installer_name()}_installed", time() );
     }
 
     /**
@@ -86,6 +106,7 @@ abstract class Installer {
         do_action( "groundhogg/{$this->get_installer_name()}/deactivated" );
 
         set_transient( "groundhogg_{$this->get_installer_name()}_deactivated", time(), MINUTE_IN_SECONDS );
+        delete_option( "groundhogg_{$this->get_installer_name()}_installed" );
     }
 
     /**
@@ -160,8 +181,6 @@ abstract class Installer {
         } else {
             $this->deactivation_wrapper();
         }
-
-//        file_put_contents( dirname( $this->get_plugin_file() ) . '/deactivation-errors', ob_get_contents() );
     }
 
     /**

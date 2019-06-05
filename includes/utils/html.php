@@ -68,8 +68,10 @@ class HTML
             'class' => ''
         ] );
 
+        $args[ 'class' ] .= 'wp-list-table widefat fixed striped';
+
         ?>
-        <table class="wp-list-table widefat fixed striped <?php esc_attr_e( $args[ 'class' ] ) ?>">
+        <table <?php echo array_to_atts( $args ); ?> >
         <thead>
         <tr>
             <?php foreach ( $cols as $col => $name ): ?>
@@ -78,6 +80,8 @@ class HTML
         </tr>
         </thead>
         <tbody>
+        <?php if ( ! empty( $rows ) ): ?>
+
         <?php foreach ( $rows as $row => $cells ): ?>
             <tr>
                 <?php foreach ( $cells as $cell => $content ): ?>
@@ -85,6 +89,12 @@ class HTML
                 <?php endforeach; ?>
             </tr>
         <?php endforeach; ?>
+        <?php else:
+
+        $col_span = count( $cols );
+        echo $this->wrap( __( 'No items found...', 'groundhogg' ), 'td', [ 'colspan' => $col_span ] );
+
+        endif; ?>
         </tbody>
             <?php if ( $footer ): ?>
         <tfoot>
@@ -284,11 +294,24 @@ class HTML
 			'class' => 'regular-text',
 			'value' => '',
 			'placeholder' => '',
-			'required' => false
 		) );
 
-		if ( ! $a[ 'required' ] ){
-		    unset( $a[ 'required' ] );
+		$specials = [
+		    'required',
+            'checked',
+            'multiple'
+        ];
+
+		// Backwards compat.
+		foreach ( $specials as $special ){
+		    if ( ! isset_not_empty( $a, $special ) ){
+		        unset( $a[ $special ] );
+            }
+        }
+
+		if ( isset_not_empty( $a, 'attributes' ) && is_array( $a[ 'attributes' ] ) ){
+		    $a = array_merge( $a, $a[ 'attributes' ] );
+		    unset( $a[ 'attributes' ] );
         }
 
 		$html = $this->e( 'input', $a );
@@ -337,21 +360,9 @@ class HTML
             'id'        => '',
             'class'     => 'button button-secondary',
             'value'     => '',
-            'attributes' => '',
         ) );
 
-        $html = sprintf(
-            "<button type='%s' id='%s' class='%s' name='%s' value='%s' %s>%s</button>",
-            esc_attr( $a[ 'type'    ] ),
-            esc_attr( $a[ 'id'      ] ),
-            esc_attr( $a[ 'class'   ] ),
-            esc_attr( $a[ 'name'    ] ),
-            esc_attr( $a[ 'value'   ] ),
-             $a[ 'attributes'  ],
-            esc_attr( $a[ 'text'  ] )
-        );
-
-        return apply_filters( 'groundhogg/html/button', $html, $a );
+        return apply_filters( 'groundhogg/html/button', $this->e( 'button', $a ), $a );
     }
 
 	/**
@@ -365,31 +376,18 @@ class HTML
 	{
 		$a = shortcode_atts( array(
 			'label'         => '',
+			'type'          => 'checkbox',
 			'name'          => '',
 			'id'            => '',
 			'class'         => '',
 			'value'         => '1',
 			'checked'       => false,
 			'title'         => '',
-			'attributes'    => '',
-			'required'      => false,
 		), $args );
 
-		$required = $a[ 'required' ] ? 'required' : '';
-		$checked = $a[ 'checked' ] ? 'checked' : '';
+		$html = $this->wrap( $this->input( $a ) . '&nbsp;' . $a[ 'label' ], 'label', [ 'class' => 'gh-checkbox-label' ] );
 
-		return apply_filters( 'groundhogg/html/checkbox', sprintf(
-			"<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='%s' value='%s' title='%s' %s %s %s> %s</label>",
-			esc_attr( $a[ 'name' ] ),
-			esc_attr( $a[ 'id' ] ),
-			esc_attr( $a[ 'class' ] ),
-			esc_attr( $a[ 'value' ] ),
-			esc_attr( $a[ 'title' ] ),
-			$a[ 'attributes' ],
-			$checked,
-			$required,
-			$a[ 'label' ]
-		), $a );
+		return apply_filters( 'groundhogg/html/checkbox', $html, $a );
 	}
 
 	public function help_icon( $link='' )
@@ -413,7 +411,7 @@ class HTML
 	 *
 	 * @param array $args
 	 *
-	 * @return mixed|void
+	 * @return string
 	 */
     public function modal_link( $args=[] )
     {
@@ -471,19 +469,6 @@ class HTML
             'step'      => 1
         ) );
 
-        if ( ! empty( $a[ 'max' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' max="%d"', $a[ 'max' ] );
-        }
-
-        if ( ! empty( $a[ 'min' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' min="%d"', $a[ 'min' ] );
-        }
-
-        if ( ! empty( $a[ 'step' ] ) ){
-            $a[ 'attributes' ] .= sprintf( ' step="%s"', $a[ 'step' ] );
-        }
-
-
 	    return apply_filters( 'groundhogg/html/range', $this->input( $a ), $a );
     }
 
@@ -503,20 +488,12 @@ class HTML
             'cols'  => '100',
             'rows'  => '7',
             'placeholder'   => '',
-            'attributes'    => ''
         ) );
 
-        $html = sprintf(
-            "<textarea id='%s' class='%s' name='%s' cols='%s' rows='%s' placeholder='%s' %s>%s</textarea>",
-            esc_attr( $a[ 'id'      ] ),
-            esc_attr( $a[ 'class'   ] ),
-            esc_attr( $a[ 'name'    ] ),
-            esc_attr( $a[ 'cols'    ] ),
-            esc_attr( $a[ 'rows'    ] ),
-            esc_attr( $a[ 'placeholder' ] ),
-            $a[ 'attributes'    ],
-            $a[ 'value'         ]
-        );
+        $value = $a[ 'value' ];
+        unset( $a[ 'value' ] );
+
+        $html = $this->wrap( esc_html( $value ), 'textarea', $a );
 
         return apply_filters( 'groundhogg/html/textarea', $html, $a );
 
@@ -538,12 +515,10 @@ class HTML
             'selected'          => '',
             'multiple'          => false,
             'option_none'       => 'Please Select One',
-            'attributes'        => '',
             'option_none_value' => '',
         ) );
 
-        $multiple           = $a[ 'multiple' ]             ? 'multiple'        : '';
-        $a[ 'selected' ]    = is_array( $a[ 'selected' ] ) ? $a[ 'selected' ]  : array( $a[ 'selected' ] );
+        $a[ 'selected' ] = is_array( $a[ 'selected' ] ) ? $a[ 'selected' ]  : array( $a[ 'selected' ] );
 
         $optionHTML = '';
 
@@ -554,36 +529,63 @@ class HTML
             );
         }
 
-        if ( ! empty( $a[ 'options' ] ) && is_array( $a[ 'options' ] ) )
-        {
-            $options = array_map( 'trim', $a[ 'options' ] );
+        if ( ! empty( $a[ 'options' ] ) && is_array( $a[ 'options' ] ) ) {
+
+            $options = $a[ 'options' ];
 
             foreach ( $options as $value => $name ){
 
-                $selected = ( in_array( $value, $a[ 'selected' ] ) ) ? 'selected' : '';
+                /* Include optgroup support */
+                if ( is_array( $name ) ){
 
-                $optionHTML .= sprintf(
-                    "<option value='%s' %s>%s</option>",
-                    esc_attr( $value ),
-                    $selected,
-                    sanitize_text_field( $name )
-                );
+                    /* Redefine */
+                    $inner_options = $name;
+                    $label = $value;
+
+                    $optionHTML .= sprintf( "<optgroup label='%s'>", $label );
+
+                    foreach ( $inner_options as $inner_value => $inner_name ){
+
+                        $selected = ( in_array( $inner_value, $a[ 'selected' ] ) ) ? 'selected' : '';
+
+                        $optionHTML .= sprintf(
+                            "<option value='%s' %s>%s</option>",
+                            esc_attr( $inner_value ),
+                            $selected,
+                            esc_html( $inner_name )
+                        );
+                    }
+
+                    $optionHTML .= "</optgroup>";
+
+                } else {
+                    $selected = ( in_array( $value, $a[ 'selected' ] ) ) ? 'selected' : '';
+
+                    $optionHTML .= sprintf(
+                        "<option value='%s' %s>%s</option>",
+                        esc_attr( $value ),
+                        $selected,
+                        sanitize_text_field( $name )
+                    );
+                }
 
             }
 
         }
 
-        $html = sprintf(
-            "<select name='%s' id='%s' class='%s' %s %s>%s</select>",
-            esc_attr( $a[ 'name' ] ),
-            esc_attr( $a[ 'id' ] ),
-            esc_attr( $a[ 'class' ] ),
-            $a[ 'attributes' ],
-            $multiple,
-            $optionHTML
-        );
+        if ( ! $a[ 'multiple' ] ){
+            unset( $a[ 'multiple' ] );
+        }
 
-	    return apply_filters( 'groundhogg/html/textarea', $html, $a );
+        unset( $a[ 'option_none' ] );
+        unset( $a[ 'attributes' ] );
+        unset( $a[ 'option_none_value' ] );
+        unset( $a[ 'selected' ] );
+        unset( $a[ 'options' ] );
+
+        $html = $this->wrap( $optionHTML, 'select', $a );
+
+	    return apply_filters( 'groundhogg/html/select', $html, $a );
 
     }
 
@@ -605,7 +607,6 @@ class HTML
             'selected'          => '',
             'multiple'          => false,
             'option_none'       => 'Please Select an Owner',
-            'attributes'        => '',
             'option_none_value' => 0,
         ) );
 
@@ -650,9 +651,7 @@ class HTML
              * @var $owner \WP_User
              */
             foreach ( $owners as $owner ){
-
                 $a[ 'data' ][ $owner->ID ] = sprintf( '%s (%s)', $owner->display_name, $owner->user_email );
-
             }
 
         }
@@ -672,90 +671,39 @@ class HTML
      */
     public function select2( $args=[] )
     {
+        wp_enqueue_style( 'select2' );
+        wp_enqueue_script( 'select2' );
+        wp_enqueue_style( 'groundhogg-admin' );
+        wp_enqueue_script( 'groundhogg-admin' );
+
         $a = wp_parse_args( $args, array(
             'name'              => '',
             'id'                => '',
             'class'             => 'gh-select2',
             'data'              => array(),
+            'options'           => [],
             'selected'          => array(),
             'multiple'          => false,
             'placeholder'       => 'Please Select One',
-            'attributes'        => '',
             'tags'              => false,
         ) );
 
-        $multiple           = $a[ 'multiple' ]              ? 'multiple'             : '';
-        $tags               = $a[ 'tags' ]                  ? 'data-tags="true"'     : '';
+        $a[ 'options' ] = $a[ 'data' ];
+        unset( $a[ 'data' ] );
 
-        $a[ 'selected' ]    = ensure_array( $a[ 'selected' ] );
-
-        $optionHTML = '';
-
-        if ( ! empty( $a[ 'data' ] ) && is_array( $a[ 'data' ] ) )
-        {
-            $options = $a[ 'data' ];
-
-            $optionHTML .= sprintf(
-                "<option value=''>%s</option>",
-                $a[ 'placeholder' ]
-            );
-
-            foreach ( $options as $value => $name ){
-
-                /* Include optgroup support */
-                if ( is_array( $name ) ){
-
-                    /* Redefine */
-                    $inner_options = $name;
-                    $label = $value;
-
-                    $optionHTML .= sprintf( "<optgroup label='%s'>", $label );
-
-                    foreach ( $inner_options as $inner_value => $inner_name ){
-
-                        $selected = ( in_array( $inner_value, $a[ 'selected' ] ) ) ? 'selected' : '';
-
-                        $optionHTML .= sprintf(
-                            "<option value='%s' %s>%s</option>",
-                            esc_attr( $inner_value ),
-                            $selected,
-                            sanitize_text_field( $inner_name )
-                        );
-                    }
-
-                    $optionHTML .= "</optgroup>";
-
-                } else {
-                    $selected = ( in_array( $value, $a[ 'selected' ] ) ) ? 'selected' : '';
-
-                    $optionHTML .= sprintf(
-                        "<option value='%s' %s>%s</option>",
-                        esc_attr( $value ),
-                        $selected,
-                        sanitize_text_field( $name )
-                    );
-                }
-
-            }
-
+        if ( isset_not_empty( $a, 'placeholder' ) ) {
+            $a['data-placeholder'] = $a['placeholder'];
         }
 
-        $html = sprintf(
-            "<select name='%s' id='%s' class='%s' data-placeholder='%s' %s %s %s>%s</select>",
-            esc_attr( $a[ 'name' ] ),
-            esc_attr( $a[ 'id' ] ),
-            esc_attr( $a[ 'class' ] ),
-            esc_attr( $a[ 'placeholder' ] ),
-            $a[ 'attributes' ],
-            $tags,
-            $multiple,
-            $optionHTML
-        );
+        unset( $a[ 'placeholder' ] );
 
-	    wp_enqueue_style( 'select2' );
-	    wp_enqueue_script( 'select2' );
-	    wp_enqueue_style( 'groundhogg-admin' );
-	    wp_enqueue_script( 'groundhogg-admin' );
+        if ( isset_not_empty( $a, 'tags' ) ){
+            $a[ 'data-tags' ] = $a[ 'tags' ];
+        }
+
+        unset( $a[ 'tags' ] );
+
+        $html = $this->dropdown( $a );
 
         return apply_filters( 'groundhogg/html/select2', $html, $a );
 
@@ -863,7 +811,7 @@ class HTML
 
         foreach ( $a[ 'selected' ] as $contact_id ){
 
-            $contact = wpgh_get_contact( $contact_id );
+            $contact = get_contactdata( $contact_id );
 
             if ( $contact->exists() ) {
 

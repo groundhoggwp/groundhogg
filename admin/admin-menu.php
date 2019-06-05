@@ -36,13 +36,13 @@ class Admin_Menu
      */
     public function __construct()
     {
-        $this->init_admin();
+        add_action( 'init', [ $this, 'init_admin' ] );
     }
 
     /**
      * Setup the base DBs for the plugin
      */
-    protected function init_admin(){
+    public function init_admin(){
 
         $this->welcome  = new Welcome_Page();
         $this->contacts = new Contacts_Page();

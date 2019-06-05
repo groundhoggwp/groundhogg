@@ -69,7 +69,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
     /**
      * @return int
      */
-    protected function get_id()
+    public function get_id()
     {
         return absint( $this->ID );
     }

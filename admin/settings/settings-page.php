@@ -188,11 +188,11 @@ class Settings_Page extends Admin_Page
                 'title' => _x( 'Event Notices', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'misc'
             ],
-            'event_queue' => [
-                'id'    => 'event_queue',
-                'title' => _x( 'Event Queue', 'settings_sections', 'groundhogg' ),
-                'tab'   => 'misc'
-            ],
+//            'event_queue' => [
+//                'id'    => 'event_queue',
+//                'title' => _x( 'Event Queue', 'settings_sections', 'groundhogg' ),
+//                'tab'   => 'misc'
+//            ],
             'compliance' => array(
                 'id'    => 'compliance',
                 'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
@@ -213,7 +213,7 @@ class Settings_Page extends Admin_Page
                 'id'    => 'bounces',
                 'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email',
-                'callback' => [Plugin::$instance->bounce_checker, 'test_connection_ui' ], //todo
+                'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ], //todo
             ),
             'api_settings' => array(
                 'id'    => 'api_settings',

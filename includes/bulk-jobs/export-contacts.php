@@ -1,8 +1,10 @@
 <?php
 namespace Groundhogg\Bulk_Jobs;
 
+use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\encrypt;
+use function Groundhogg\get_db;
 use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
 
@@ -78,8 +80,19 @@ class Export_Contacts extends Bulk_Job
         if ( $contact ){
 
             foreach ( $this->headers as $header ){
-                // Check for array type
-                $line[] = is_array( $contact->$header ) ? multi_implode( ',', $contact->$header ) : $contact->$header;
+
+                if ( $header === 'tags' ){
+
+                    $raw_tags = get_db( 'tags' )->query( [ 'tag_id' => $contact->get_tags() ] );
+
+                    if ( $raw_tags ){
+                        $names = wp_list_pluck( $raw_tags, 'tag_name' );
+                        $line[] = implode( ',', $names );
+                    }
+
+                } else {
+                    $line[] = is_array( $contact->$header ) ? multi_implode( ',', $contact->$header ) : $contact->$header;
+                }
             }
 
             fputcsv( $this->fp, $line );
@@ -106,6 +119,7 @@ class Export_Contacts extends Bulk_Job
             'owner_id',
             'optin_status',
             'date_created',
+            'tags'
         ];
 
         $headers = array_merge( $default_keys, $meta_keys );

@@ -29,17 +29,17 @@ abstract class Extension
     /**
      * @var Installer
      */
-    protected $installer;
+    public $installer;
 
     /**
      * @var Updater
      */
-    protected $updater;
+    public $updater;
 
     /**
      * @var Roles
      */
-    protected $roles;
+    public $roles;
 
     /**
      * Keep a going array of all the Extensions.
@@ -55,7 +55,11 @@ abstract class Extension
     {
         $this->register_autoloader();
 
-        add_action( 'groundhogg/init', [ $this, 'init' ] );
+        if ( ! did_action( 'groundhogg/init' ) ){
+            add_action( 'groundhogg/init', [ $this, 'init' ] );
+        } else {
+            $this->init();
+        }
 
         // Add to main list
         Extension::$extensions[] = $this;

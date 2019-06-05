@@ -20,6 +20,18 @@ function get_contactdata( $contact_id_or_email, $by_user_id=false )
 }
 
 /**
+ * Internal URL builder.
+ *
+ * @param string $page
+ * @param array $args
+ * @return string
+ */
+function groundhogg_url( $page = '', $args = [] )
+{
+    return Plugin::$instance->admin->get_page( $page )->admin_url( $args );
+}
+
+/**
  * Get DB
  *
  * @param $name
@@ -85,6 +97,17 @@ function ensure_array( $array )
     }
 
     return [ $array ];
+}
+
+/**
+ * Replacements Wrapper.
+ *
+ * @param string $content
+ * @param int $contact_id
+ * @return string
+ */
+function do_replacements( $content = '', $contact_id = 0 ){
+    return Plugin::$instance->replacements->process( $content, $contact_id );
 }
 
 /**
