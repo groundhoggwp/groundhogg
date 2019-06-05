@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 abstract class Base {
 
-    const NAME_SPACE = self::NAME_SPACE;
+    const NAME_SPACE = 'gh/v3';
 
     /**
      * @var \WP_User
