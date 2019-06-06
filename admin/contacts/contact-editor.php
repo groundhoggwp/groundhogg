@@ -355,7 +355,7 @@ function contact_record_general_info( $contact )
                     <?php $args = array(
                         'id' => 'country',
                         'name' => 'country',
-                        'selected' => $contact->get_meta('country'),
+                        'selected' => $contact->get_meta('country' ),
                         'data' => Plugin::$instance->utils->location->get_countries_list(),
                         'placeholder' => _x( 'Select a Country', 'contact_record', 'groundhogg' ),
                     );
@@ -519,7 +519,7 @@ function contact_record_section_notes( $contact )
                     'name'  => 'notes',
                     'value' => $contact->get_meta( 'notes' ),
                     'rows'  => 30,
-                    'attributes' => 'readonly'
+                    'readonly' => true,
                 );
                 echo Plugin::$instance->utils->html->textarea( $args ); ?>
             </td>

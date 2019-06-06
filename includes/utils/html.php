@@ -237,6 +237,10 @@ class HTML
      */
     public function wrap( $content = '', $e = 'div', $atts = [] )
     {
+        if ( is_array( $content ) ){
+            $content = implode( '', $content );
+        }
+
         return sprintf( '<%1$s %2$s>%3$s</%1$s>', esc_html( $e ), array_to_atts( $atts ), $content );
     }
 
@@ -362,7 +366,10 @@ class HTML
             'value'     => '',
         ) );
 
-        return apply_filters( 'groundhogg/html/button', $this->e( 'button', $a ), $a );
+        $text = $a[ 'text' ];
+        unset( $a[ 'text' ] );
+
+        return apply_filters( 'groundhogg/html/button', $this->wrap( $text, 'button', $a ), $a );
     }
 
 	/**
@@ -518,7 +525,7 @@ class HTML
             'option_none_value' => '',
         ) );
 
-        $a[ 'selected' ] = is_array( $a[ 'selected' ] ) ? $a[ 'selected' ]  : array( $a[ 'selected' ] );
+        $a[ 'selected' ] = ensure_array( $a[ 'selected' ] );
 
         $optionHTML = '';
 
@@ -529,7 +536,7 @@ class HTML
             );
         }
 
-        if ( ! empty( $a[ 'options' ] ) && is_array( $a[ 'options' ] ) ) {
+        if ( is_array( get_array_var( $a, 'options' ) ) ) {
 
             $options = $a[ 'options' ];
 
@@ -565,7 +572,7 @@ class HTML
                         "<option value='%s' %s>%s</option>",
                         esc_attr( $value ),
                         $selected,
-                        sanitize_text_field( $name )
+                        esc_html( $name )
                     );
                 }
 
@@ -671,24 +678,24 @@ class HTML
      */
     public function select2( $args=[] )
     {
-        wp_enqueue_style( 'select2' );
-        wp_enqueue_script( 'select2' );
-        wp_enqueue_style( 'groundhogg-admin' );
-        wp_enqueue_script( 'groundhogg-admin' );
-
         $a = wp_parse_args( $args, array(
             'name'              => '',
             'id'                => '',
             'class'             => 'gh-select2',
-            'data'              => array(),
+            'data'              => [],
             'options'           => [],
-            'selected'          => array(),
+            'selected'          => [],
             'multiple'          => false,
             'placeholder'       => 'Please Select One',
             'tags'              => false,
         ) );
 
-        $a[ 'options' ] = $a[ 'data' ];
+//        var_dump( $a );
+
+        if ( isset_not_empty( $a, 'data' ) ){
+            $a[ 'options' ] = $a[ 'data' ];
+        }
+
         unset( $a[ 'data' ] );
 
         if ( isset_not_empty( $a, 'placeholder' ) ) {
@@ -697,13 +704,18 @@ class HTML
 
         unset( $a[ 'placeholder' ] );
 
-        if ( isset_not_empty( $a, 'tags' ) ){
+        if ( isset_not_empty( $a,'tags' ) ){
             $a[ 'data-tags' ] = $a[ 'tags' ];
         }
 
         unset( $a[ 'tags' ] );
 
         $html = $this->dropdown( $a );
+
+        wp_enqueue_style( 'select2' );
+        wp_enqueue_script( 'select2' );
+        wp_enqueue_style( 'groundhogg-admin' );
+        wp_enqueue_script( 'groundhogg-admin' );
 
         return apply_filters( 'groundhogg/html/select2', $html, $a );
 
@@ -845,8 +857,6 @@ class HTML
         ) );
 
         $a[ 'selected' ] = wp_parse_id_list( $a[ 'selected' ] );
-
-//        var_dump( $a[ 'selected' ] );
 
         foreach ( $a[ 'selected' ] as $email_id ){
             if ( get_db( 'emails' )->exists( $email_id ) ){

@@ -441,8 +441,6 @@ class Contacts_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        $_POST = wp_unslash( $_POST );
-
         $id = absint( get_request_var( 'contact' ) );
 
         if (!$id) {

@@ -1,11 +1,11 @@
 (function ( $, nonces, endpoints ) {
     
     function picker( selector, args ) {
-        $( selector ).css( 'width', '100%' ).select2( args );
+        $( selector ).select2( args );
     }
 
     function apiPicker( selector, endpoint, multiple, tags ) {
-        $( selector ).css( 'width', '100%' ).select2({
+        $( selector ).select2({
             tags: tags,
             multiple: multiple,
             tokenSeparators: ['/',',',';'],

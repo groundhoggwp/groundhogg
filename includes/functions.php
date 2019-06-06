@@ -32,6 +32,22 @@ function groundhogg_url( $page = '', $args = [] )
 }
 
 /**
+ * Similar to wp_list_pluck in that we take the ID and the title and match them up.
+ *
+ * @param array $data array[]
+ * @param string $id_col string
+ * @param string $title_col string
+ * @return array
+ */
+function parse_select2_results( $data = [], $id_col='ID', $title_col='title' )
+{
+    $ids = wp_parse_id_list( wp_list_pluck( $data, $id_col ) );
+    $names = wp_list_pluck( $data, $title_col );
+    $results = array_combine( $ids, $names );
+    return $results;
+}
+
+/**
  * Get DB
  *
  * @param $name
@@ -97,6 +113,17 @@ function ensure_array( $array )
     }
 
     return [ $array ];
+}
+
+/**
+ * Wrapper for validating tags...
+ *
+ * @param $maybe_tags
+ * @return array
+ */
+function validate_tags( $maybe_tags )
+{
+    return get_db( 'tags' )->validate( $maybe_tags );
 }
 
 /**
