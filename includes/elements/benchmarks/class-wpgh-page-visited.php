@@ -161,10 +161,8 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
     {
         $steps = $this->get_like_steps();
 
-        if ( empty( $steps ) )
+        if ( empty( $steps ) || empty( $ref ) )
             return;
-
-        $s = false;
 
         foreach ( $steps as $step ) {
 
@@ -173,6 +171,10 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
                 $match_type = $step->get_meta( 'match_type' );
                 $match_url  = $step->get_meta( 'url_match' );
 
+                if ( empty( $match_url ) ){
+                    continue;
+                }
+
                 if ( $match_type === 'exact' ){
                     $is_page = $ref === $match_url;
                 } else {
@@ -180,9 +182,7 @@ class WPGH_Page_Visited extends WPGH_Funnel_Step
                 }
 
                 if ( $is_page ){
-
-                   $s = $step->enqueue( $contact );
-
+                   $step->enqueue( $contact );
                 }
             }
         }
