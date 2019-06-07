@@ -222,6 +222,7 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
 
             <!-- Main Content -->
             <div id="post-body-content">
+                <?php Plugin::$instance->notices->print_notices(); ?>
 
                 <!-- Title Content -->
                 <div id="titlediv">
@@ -236,7 +237,6 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                         <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo esc_attr( $email->get_pre_header() ); ?>" id="pre_header" spellcheck="true" autocomplete="off">
                     </div>
                 </div>
-                <?php Plugin::$instance->notices->print_notices(); ?>
                 <!-- Editor -->
                 <div id="email-content">
                     <div id="editor" class="editor" style="display: flex;">
