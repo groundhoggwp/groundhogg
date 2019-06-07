@@ -422,10 +422,9 @@ abstract class Funnel_Step extends Supports_Errors
      */
     protected function get_reporting_interval()
     {
-
         $times = [
-            'start_time' => '',
-            'end_time' => ''
+            'start_time' => Plugin::$instance->reporting->get_start_time(),
+            'end_time' => Plugin::$instance->reporting->get_end_time(),
         ];
 
         return $times;
@@ -461,7 +460,13 @@ abstract class Funnel_Step extends Supports_Errors
             ?>
                 <p class="report">
                     <?php _e('Waiting:', 'groundhogg') ?>
-                    <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=waiting&funnel=' . $step->get_funnel_id() . '&step=' . $step->get_id() ); ?>">
+                    <a target="_blank" href="<?php echo add_query_arg( [
+                            'report' => [
+                                'step'  => $step->get_id(),
+                                'funnel'=> $step->get_funnel_id(),
+                                'status'=> 'waiting'
+                            ]
+                    ], admin_url( 'admin.php?page=gh_contacts' ) ); ?>">
                         <b><?php echo $num_events_waiting; ?></b>
                     </a>
                 </p>
@@ -483,7 +488,15 @@ abstract class Funnel_Step extends Supports_Errors
         ?>
         <p class="report">
             <?php _e('Completed:', 'groundhogg') ?>
-            <a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . $step->get_funnel_id() . '&step=' . $step->get_id() . '&start=' . $start_time . '&end=' . $end_time ); ?>">
+            <a target="_blank" href="<?php echo add_query_arg( [
+                'report' => [
+                    'step'  => $step->get_id(),
+                    'funnel'=> $step->get_funnel_id(),
+                    'status'=> 'complete',
+                    'start' => $start_time,
+                    'end'   => $end_time,
+                ]
+            ], admin_url( 'admin.php?page=gh_contacts' ) ); ?>">
                 <b><?php echo $num_events_completed; ?></b>
             </a>
         </p>

@@ -73,7 +73,6 @@ class Tracking
 
         // Actions which build the tracking cookie.
         add_action( 'wp_login', [ $this, 'wp_login' ], 10, 2 );
-//        add_action( '' );
 
         add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 
@@ -87,7 +86,7 @@ class Tracking
         add_action( 'template_redirect', [ $this, 'fix_tracking_ssl' ] );
         add_action( 'template_redirect', [ $this, 'template_redirect'] );
 
-//        add_action( 'groundhogg/submission/after', array( $this, 'form_filled' ), 10, 3 );
+        add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 1 );
 
     }
 
@@ -547,19 +546,14 @@ class Tracking
     /**
      * Sets the cookie upon a form fill.
      *
-     * @param $step_id int
-     * @param $contact WPGH_Contact
-     * @param $submission WPGH_Submission
+     * @param $contact Contact
      */
-    public function form_filled( $step_id, $contact, $submission )
+    public function form_filled( $contact )
     {
-        $step = wpgh_get_funnel_step( $step_id );
-
-        $this->funnel = WPGH()->funnels->get( $step->funnel_id );
-        $this->step = $step;
-        $this->contact = $contact;
-
-        $this->build_cookie();
+        if ( ! isset_not_empty( $_COOKIE, self::TRACKING_COOKIE ) ){
+            $this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
+            $this->build_tracking_cookie();
+        }
     }
 
 }

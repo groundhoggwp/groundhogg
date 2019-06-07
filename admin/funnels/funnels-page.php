@@ -952,9 +952,12 @@ class Funnels_Page extends Admin_Page
         }
     }
 
+    /**
+     * @return bool
+     */
     public function is_reporting_enabled()
     {
-        return false;// todo I returned false for this function call and its working.
+        return (bool) get_request_var( 'reporting_on' );
     }
 
 }

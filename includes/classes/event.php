@@ -385,7 +385,8 @@ class Event extends Base_Object
         do_action( 'groundhogg/event/cancelled', $this );
 
         return $this->update( [
-            'status' => self::CANCELLED
+            'status' => self::CANCELLED,
+            'time'   => time(),
         ] );
     }
 
@@ -421,7 +422,8 @@ class Event extends Base_Object
         do_action( 'groundhogg/event/skipped', $this );
 
         return $this->update( [
-            'status' => self::SKIPPED
+            'status' => self::SKIPPED,
+            'time'   => time(),
         ] );
     }
 

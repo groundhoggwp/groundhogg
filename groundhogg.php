@@ -47,6 +47,15 @@ if ( ! version_compare( PHP_VERSION, '5.4', '>=' ) ) {
 }
 
 /**
+ * Groundhogg loaded.
+ *
+ * Fires when Groundhogg was fully loaded and instantiated.
+ *
+ * @since 1.0.0
+ */
+do_action( 'groundhogg/loaded' );
+
+/**
  * Load Groundhogg textdomain.
  *
  * Load gettext translate for Groundhogg text domain.

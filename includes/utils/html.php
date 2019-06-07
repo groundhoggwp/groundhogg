@@ -688,9 +688,8 @@ class HTML
             'multiple'          => false,
             'placeholder'       => 'Please Select One',
             'tags'              => false,
+            'style'             => [ 'min-width' => '400px' ]
         ) );
-
-//        var_dump( $a );
 
         if ( isset_not_empty( $a, 'data' ) ){
             $a[ 'options' ] = $a[ 'data' ];
@@ -1022,6 +1021,7 @@ class HTML
         /* set options so that parse args doesn't remove the fonts */
         $a[ 'options' ] = $a[ 'fonts' ];
 
+        unset( $a[ 'fonts' ] );
 
         return apply_filters( 'groundhogg/html/font_picker', $this->dropdown( $a ), $a );
 

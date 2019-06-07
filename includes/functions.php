@@ -358,8 +358,12 @@ function array_to_atts( $atts )
 			$value = array_to_css( $value );
 		}
 
+		if ( is_array( $value ) ){
+		    $value = implode( ' ', $value );
+        }
+
 		$tag .= sanitize_key( $key ) . '="' . esc_attr( $value ) . '" ';
-		}
+    }
 
 	return $tag;
 }

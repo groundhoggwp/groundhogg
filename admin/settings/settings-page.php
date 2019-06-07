@@ -499,34 +499,34 @@ class Settings_Page extends Admin_Page
                     'placeholder'   => get_option( 'admin_email' )
                 ),
             ),
-            'gh_max_events' => array(
-                'id'        => 'gh_max_events',
-                'section'   => 'event_queue',
-                'label'     => _x( 'Max Queued Events', 'settings', 'groundhogg' ),
-                'desc'      => _x( 'The maximum number of events that can be run during a single process of the event queue. For larger lists you may want to set this at a lower number for performance reasons.', 'settings', 'groundhogg' ),
-                'type'      => 'number',
-                'atts'      => array(
-                    'id'            => 'gh_max_events',
-                    'name'          => 'gh_max_events',
-                    'placeholder'   => '999999'
-                ),
-            ),
-            'gh_queue_interval' => array(
-                'id'        => 'gh_queue_interval',
-                'section'   => 'event_queue',
-                'label'     => _x( 'Queue Interval', 'settings', 'groundhogg' ),
-                'desc'      => _x( 'The time interval in between iterations of when the event queue is processed.', 'settings', 'groundhogg' ),
-                'type'      => 'dropdown',
-                'atts'      => array(
-                    'id'            => 'gh_queue_interval',
-                    'name'          => 'gh_queue_interval',
-                    'options'       => array(
-                        'every_1_minutes' => 'Every 1 Minutes',
-                        'every_5_minutes' => 'Every 5 Minutes',
-                        'every_10_minutes' => 'Every 10 Minutes',
-                    ),
-                ),
-            ),
+//            'gh_max_events' => array(
+//                'id'        => 'gh_max_events',
+//                'section'   => 'event_queue',
+//                'label'     => _x( 'Max Queued Events', 'settings', 'groundhogg' ),
+//                'desc'      => _x( 'The maximum number of events that can be run during a single process of the event queue. For larger lists you may want to set this at a lower number for performance reasons.', 'settings', 'groundhogg' ),
+//                'type'      => 'number',
+//                'atts'      => array(
+//                    'id'            => 'gh_max_events',
+//                    'name'          => 'gh_max_events',
+//                    'placeholder'   => '999999'
+//                ),
+//            ),
+//            'gh_queue_interval' => array(
+//                'id'        => 'gh_queue_interval',
+//                'section'   => 'event_queue',
+//                'label'     => _x( 'Queue Interval', 'settings', 'groundhogg' ),
+//                'desc'      => _x( 'The time interval in between iterations of when the event queue is processed.', 'settings', 'groundhogg' ),
+//                'type'      => 'dropdown',
+//                'atts'      => array(
+//                    'id'            => 'gh_queue_interval',
+//                    'name'          => 'gh_queue_interval',
+//                    'options'       => array(
+//                        'every_1_minutes' => 'Every 1 Minutes',
+//                        'every_5_minutes' => 'Every 5 Minutes',
+//                        'every_10_minutes' => 'Every 10 Minutes',
+//                    ),
+//                ),
+//            ),
             'gh_script_debug' => array(
                 'id'        => 'gh_script_debug',
                 'section'   => 'misc_info',

@@ -52,7 +52,7 @@ class Guided_Setup extends Admin_Page
      */
     protected function add_additional_actions()
     {
-        add_action( 'init', [ $this, 'init_steps' ] );
+        $this->init_steps();
     }
 
     public function init_steps()
@@ -66,8 +66,6 @@ class Guided_Setup extends Admin_Page
         $steps[] = new Email();
         $steps[] = new Tracking();
         $steps[] = new Finished();
-
-        $steps = apply_filters( 'groundhogg/admin/guided_setup/steps', $steps );
 
         $this->steps = $steps;
     }

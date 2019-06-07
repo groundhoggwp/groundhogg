@@ -172,3 +172,19 @@ input[type=range].slider:focus::-ms-fill-upper {
     box-shadow: 0 1px 0 #006799;
     border-color: #0073aa #006799 #006799;
 }
+
+.gh-select2,
+.gh-tag-picker,
+.gh-single-tag-picker,
+.gh-single-tag-picker,
+.gh-email-picker,
+.gh-sms-picker,
+.gh-contact-picker,
+.gh-benchmark-picker,
+.gh-metakey-picker,
+.gh-metakey-picker,
+.select2-container
+{
+    width: 100% !important;
+    max-width: 400px !important;
+}

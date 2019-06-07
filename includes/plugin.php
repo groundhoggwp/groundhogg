@@ -235,15 +235,6 @@ class Plugin {
     public static function instance() {
         if ( is_null( self::$instance ) ) {
             self::$instance = new self();
-
-            /**
-             * Groundhogg loaded.
-             *
-             * Fires when Groundhogg was fully loaded and instantiated.
-             *
-             * @since 1.0.0
-             */
-            do_action( 'groundhogg/loaded' );
         }
 
         return self::$instance;

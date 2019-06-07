@@ -46,24 +46,11 @@ $funnel = new Funnel( $funnel_id );
             </div>
             <div id="reporting" class="alignleft">
                 <?php $args = array(
-                    'name'      => 'date_range',
+                    'name'      => 'range',
                     'id'        => 'date_range',
                     'class'     => 'alignleft',
-                    'options'   => array(
-                        'today'         => _x( 'Today', 'reporting_range', 'groundhogg' ),
-                        'yesterday'     => _x( 'Yesterday', 'reporting_range', 'groundhogg' ),
-                        'this_week'     => _x( 'This Week', 'reporting_range', 'groundhogg' ),
-                        'last_week'     => _x( 'Last Week', 'reporting_range', 'groundhogg' ),
-                        'last_30'       => _x( 'Last 30 Days', 'reporting_range', 'groundhogg' ),
-                        'this_month'    => _x( 'This Month', 'reporting_range', 'groundhogg' ),
-                        'last_month'    => _x( 'Last Month', 'reporting_range', 'groundhogg' ),
-                        'this_quarter'  => _x( 'This Quarter', 'reporting_range', 'groundhogg' ),
-                        'last_quarter'  => _x( 'Last Quarter', 'reporting_range', 'groundhogg' ),
-                        'this_year'     => _x( 'This Year', 'reporting_range', 'groundhogg' ),
-                        'last_year'     => _x( 'Last Year', 'reporting_range', 'groundhogg' ),
-                        'custom'        => _x( 'Custom Range', 'reporting_range', 'groundhogg' ),
-                    ),
-                    'selected' => get_request_var( 'date_range', 'this_week' ), //todo
+                    'options'   => Plugin::$instance->reporting->get_reporting_ranges(),
+                    'selected' => get_request_var( 'range', 'this_week' ), //todo
                 ); echo Plugin::$instance->utils->html->dropdown( $args );
 
                 $class = get_request_var( 'date_range' ) === 'custom' ? '' : 'hidden'; //todo
