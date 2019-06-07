@@ -77,21 +77,25 @@ class Emails_Page extends Admin_Page
             wp_enqueue_script( 'jquery-ui-sortable' );
             wp_enqueue_script( 'jquery-ui-draggable' );
 
-            // adding code mirror
-            wp_enqueue_style( 'codemirror' );
-            wp_enqueue_script( 'codemirror' );
-            wp_enqueue_script( 'codemirror-mode-css' );
-            wp_enqueue_script( 'codemirror-mode-xml' );
-            wp_enqueue_script( 'codemirror-mode-js'  );
-            wp_enqueue_script( 'codemirror-mode-html' );
-
-            wp_enqueue_script( 'sticky-sidebar' );
-            //            wp_enqueue_script( 'jquery-sticky-sidebar' );
-
-            // adding beautify js
+//            // adding code mirror
+//            wp_enqueue_style( 'codemirror' );
+//            wp_enqueue_script( 'codemirror' );
+//            wp_enqueue_script( 'codemirror-mode-css' );
+//            wp_enqueue_script( 'codemirror-mode-xml' );
+//            wp_enqueue_script( 'codemirror-mode-js'  );
+//            wp_enqueue_script( 'codemirror-mode-html' );
+//
+//            wp_enqueue_script( 'sticky-sidebar' );
+//            //            wp_enqueue_script( 'jquery-sticky-sidebar' );
+//
+//            // adding beautify js
             wp_enqueue_script( 'beautify-js'  );
             wp_enqueue_script( 'beautify-css' );
             wp_enqueue_script( 'beautify-html' );
+
+            wp_enqueue_code_editor( [
+                'type' => 'text/html'
+            ] );
 
             wp_enqueue_style( 'groundhogg-admin-email-editor' );
             wp_enqueue_script( 'groundhogg-admin-email-editor' );

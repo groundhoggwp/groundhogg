@@ -118,12 +118,16 @@
                         self.initCodeMirror();
                     }
 
+                    $( 'body' ).addClass( 'html-view' );
+
                     $('#email-content').hide();
                     $('#html-editor').show();
 
                     self.prepareEmailHTML();
-                    self.htmlCode.doc.setValue( html_beautify( $('#email-inside').html() ) );
+                    // self.htmlCode.doc.setValue( $( '#email-inside' ).html() );
+                    self.htmlCode.doc.setValue( html_beautify( $('#email-inside').html(), { indent_with_tabs:true } ) );
                 } else {
+                    $( 'body' ).removeClass( 'html-view' );
                     $( '.row' ).wpghToolBar();
                     $('#html-editor').hide();
                     $('#email-content').show();
@@ -151,13 +155,26 @@
         {
             var self = this;
 
-            self.htmlCode = CodeMirror.fromTextArea( document.getElementById("html-code"), {
-                lineNumbers: true,
-                mode: "text/html",
-                matchBrackets: true,
-                indentUnit: 4,
-                specialChars: /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b-\u200f\u2028\u2029\ufeff]/
-            });
+            // self.htmlCode = CodeMirror.fromTextArea( document.getElementById("html-code"), {
+            //     lineNumbers: true,
+            //     mode: "text/html",
+            //     matchBrackets: true,
+            //     indentUnit: 4,
+            //     specialChars: /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b-\u200f\u2028\u2029\ufeff]/
+            // });
+
+            var editorSettings = wp.codeEditor.defaultSettings ? _.clone( wp.codeEditor.defaultSettings ) : {};
+            editorSettings.codemirror = _.extend(
+                {},
+                editorSettings.codemirror,
+                {
+                    indentUnit: 4,
+                    tabSize: 4
+                }
+            );
+
+            self.htmlCode = wp.codeEditor.initialize( $('#html-code'), editorSettings ).codemirror;
+            // self.htmlCode = self.htmlCode.codemirror;
 
             self.htmlCode.on('change', function() {
                 $('#email-inside').html(self.htmlCode.doc.getValue());
