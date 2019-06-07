@@ -97,61 +97,10 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
             </div>
         </div>
     </div>
-
     <!-- Main -->
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
+
         <div id="post-body" class="metabox-holder columns-2" style="clear: both">
-
-
-            <div id="post-body-content">
-
-                <!-- Title Content -->
-                <div id="titlediv">
-                    <div id="titlewrap">
-
-                        <!-- Subject Line -->
-                        <label class="screen-reader-text" id="title-prompt-text" for="subject"><?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?></label>
-                        <input placeholder="<?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?>" type="text" name="subject" size="30" value="<?php echo esc_attr( $email->get_subject_line() ); ?>" id="subject" spellcheck="true" autocomplete="off" required>
-
-                        <!-- Pre Header-->
-                        <label class="screen-reader-text" id="title-prompt-text" for="pre_header"><?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?></label>
-                        <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo esc_attr( $email->get_pre_header() ); ?>" id="pre_header" spellcheck="true" autocomplete="off">
-                    </div>
-                </div>
-                <?php Plugin::$instance->notices->print_notices(); ?>
-                <!-- Editor -->
-                <div id="email-content">
-                    <div id="editor" class="editor" style="display: flex;">
-                        <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto;">
-
-                            <?php $alignment = $email->get_meta( 'alignment' );
-                            //todo check
-                            if ( $alignment === 'center' ){
-                                $margins = "margin-left:auto;margin-right:auto;";
-                            } else {
-                                $margins = "margin-left:0;margin-right:auto;";
-                            } ?>
-
-                            <!-- Editor Content -->
-                            <div id="email-inside" class="email-sortable email-content-wrapper" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
-                                <?php echo $email->get_content(); ?>
-                            </div>
-                            <div id="example-footer">
-                                <?php ?>
-                            </div>
-                        </div>
-                        <div style="clear: both;"></div>
-                    </div>
-                </div>
-                <div id="html-editor">
-                    <textarea style="width: 100%;"  id="html-code" ></textarea>
-                </div>
-                <!-- Saved Content -->
-                <div class="hidden">
-                    <textarea id="content" name="content"><?php echo $email->get_content(); ?></textarea>
-                </div>
-
-            </div>
 
             <!-- begin elements area -->
             <div id="postbox-container-1" class="postbox-container sidebar">
@@ -270,8 +219,59 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                     </div>
                 </div>
             </div>
-            <!-- HI -->
-            <!-- End elements area-->
+
+            <!-- Main Content -->
+            <div id="post-body-content">
+
+                <!-- Title Content -->
+                <div id="titlediv">
+                    <div id="titlewrap">
+
+                        <!-- Subject Line -->
+                        <label class="screen-reader-text" id="title-prompt-text" for="subject"><?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?></label>
+                        <input placeholder="<?php echo __('Subject Line: Used to capture the attention of the reader.', 'groundhogg');?>" type="text" name="subject" size="30" value="<?php echo esc_attr( $email->get_subject_line() ); ?>" id="subject" spellcheck="true" autocomplete="off" required>
+
+                        <!-- Pre Header-->
+                        <label class="screen-reader-text" id="title-prompt-text" for="pre_header"><?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?></label>
+                        <input placeholder="<?php echo __('Pre Header Text: Used to summarize the content of the email.', 'groundhogg');?>" type="text" name="pre_header" size="30" value="<?php echo esc_attr( $email->get_pre_header() ); ?>" id="pre_header" spellcheck="true" autocomplete="off">
+                    </div>
+                </div>
+                <?php Plugin::$instance->notices->print_notices(); ?>
+                <!-- Editor -->
+                <div id="email-content">
+                    <div id="editor" class="editor" style="display: flex;">
+                        <div id="email-body" class="main-email-body" style="flex-grow: 100;width: auto;">
+
+                            <?php $alignment = $email->get_meta( 'alignment' );
+                            //todo check
+                            if ( $alignment === 'center' ){
+                                $margins = "margin-left:auto;margin-right:auto;";
+                            } else {
+                                $margins = "margin-left:0;margin-right:auto;";
+                            } ?>
+
+                            <!-- Editor Content -->
+                            <div id="email-inside" class="email-sortable email-content-wrapper" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
+                                <?php echo $email->get_content(); ?>
+                            </div>
+                            <div id="example-footer">
+                                <?php ?>
+                            </div>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
+                <div id="html-editor">
+                    <textarea style="width: 100%;"  id="html-code" ></textarea>
+                </div>
+                <!-- Saved Content -->
+                <div class="hidden">
+                    <textarea id="content" name="content"><?php echo $email->get_content(); ?></textarea>
+                </div>
+
+            </div>
+
+            <!-- Clearfix-->
             <div style="clear: both;"></div>
         </div>
     </div>

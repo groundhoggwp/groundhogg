@@ -240,7 +240,7 @@ class Emails_Page extends Admin_Page
                 'show_next' => true,
                 'content' => 'Drag blocks into the email content to create your email.',
                 'position' => [
-                    'edge' => 'right', //top, bottom, left, right
+                    'edge' => 'left', //top, bottom, left, right
                     'align' => 'middle' //top, bottom, left, right, middle
                 ]
             ],

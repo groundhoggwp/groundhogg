@@ -22,14 +22,15 @@
 }
 
 #poststuff #post-body.columns-2{
-    margin-right: 400px;
+    margin-left: 400px;
+    margin-right: 0 !important;
+    border-left: 1px solid #e5e5e5;
 }
 
 #post-body.columns-2 #postbox-container-1 {
-    float: right;
-    margin-right: -400px;
+    float: left;
+    margin-left: -400px;
     width: 399px;
-    /*border-left: 1px solid #e5e5e5;*/
 }
 
 #postbox-container-1 .postbox{
@@ -125,10 +126,6 @@ select {
     vertical-align: top;
 }
 
-#titlediv{
-    border-right: 1px solid #e2e4e7;
-}
-
 #titlediv #subject, #titlediv #pre_header {
     padding: 21px 11px;
     font-size: 21px;
@@ -193,7 +190,7 @@ select {
     margin-right: auto;
     box-sizing: border-box;
     background-color: #FFFFFF;
-    border-right: 1px solid #e2e4e7;
+    /*border-right: 1px solid #e2e4e7;*/
 }
 
 #email-body a:focus{
@@ -392,8 +389,4 @@ select {
 
 input, select, textarea{
     max-width: 100% !important;
-}
-
-#html-editor{
-    border-right: 1px solid #e2e4e7;
 }
