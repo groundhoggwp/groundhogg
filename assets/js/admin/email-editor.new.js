@@ -155,14 +155,6 @@
         {
             var self = this;
 
-            // self.htmlCode = CodeMirror.fromTextArea( document.getElementById("html-code"), {
-            //     lineNumbers: true,
-            //     mode: "text/html",
-            //     matchBrackets: true,
-            //     indentUnit: 4,
-            //     specialChars: /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b-\u200f\u2028\u2029\ufeff]/
-            // });
-
             var editorSettings = wp.codeEditor.defaultSettings ? _.clone( wp.codeEditor.defaultSettings ) : {};
             editorSettings.codemirror = _.extend(
                 {},

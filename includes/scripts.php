@@ -78,13 +78,6 @@ class Scripts
         // Select 2
         wp_register_script('select2', GROUNDHOGG_ASSETS_URL . 'lib/select2/js/select2.full' . $IS_MINIFIED . '.js', ['jquery']);
 
-        // Code Mirror
-//        wp_register_script('codemirror', GROUNDHOGG_ASSETS_URL . 'lib/codemirror/codemirror.js' );
-//        wp_register_script('codemirror-mode-css', GROUNDHOGG_ASSETS_URL . 'lib/codemirror/modes/css.js', [ 'codemirror' ] );
-//        wp_register_script('codemirror-mode-xml', GROUNDHOGG_ASSETS_URL . 'lib/codemirror/modes/xml.js', [ 'codemirror' ] );
-//        wp_register_script('codemirror-mode-js', GROUNDHOGG_ASSETS_URL . 'lib/codemirror/modes/javascript.js', [ 'codemirror' ] );
-//        wp_register_script('codemirror-mode-html', GROUNDHOGG_ASSETS_URL . 'lib/codemirror/modes/htmlmixed.js', [ 'codemirror' ] );
-
         // Beautify JS
         wp_register_script('beautify-js', GROUNDHOGG_ASSETS_URL . 'lib/js-beautify/beautify.min.js');
         wp_register_script('beautify-css', GROUNDHOGG_ASSETS_URL . 'lib/js-beautify/beautify-css.min.js');
@@ -157,8 +150,6 @@ class Scripts
     {
         wp_register_style('jquery-ui', GROUNDHOGG_ASSETS_URL . 'lib/jquery-ui/jquery-ui.min.css');
         wp_register_style('select2', GROUNDHOGG_ASSETS_URL . 'lib/select2/css/select2.min.css');
-
-//        wp_register_style('codemirror', GROUNDHOGG_ASSETS_URL . 'lib/codemirror/codemirror.css');
 
         wp_register_style('groundhogg-admin', GROUNDHOGG_ASSETS_URL . 'css/admin/admin.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-welcome', GROUNDHOGG_ASSETS_URL . 'css/admin/welcome.css', [], GROUNDHOGG_VERSION);
