@@ -247,15 +247,34 @@ abstract class Extension
      */
     abstract public function get_download_id();
 
-    /**
-     * @return string
-     */
-    abstract public function get_display_name();
+    protected $plugin_data = [];
+
+	/**
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+    protected function get_plugin_data( $key='Name' ){
+    	if ( empty( $this->plugin_data ) ){
+		    $this->plugin_data = get_plugin_data( $this->get_plugin_file() );
+	    }
+
+	    return $this->plugin_data[ 'Description' ];
+    }
 
     /**
      * @return string
      */
-    abstract public function get_display_description();
+    public function get_display_name(){
+	    return $this->get_plugin_data( 'Name' );
+    }
+
+    /**
+     * @return string
+     */
+    public function get_display_description(){
+	    return $this->get_plugin_data( 'Description' );
+    }
 
     /**
      * @return string
