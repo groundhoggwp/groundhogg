@@ -590,15 +590,15 @@ class Contact_Query {
             $relationships = Plugin::$instance->dbs->get_db( 'tag_relationships' )->query( [ 'tag_id' => wp_parse_id_list( $this->query_vars['tags_include'] ) ], 'contact_id' );
             $ids = wp_parse_id_list( wp_list_pluck( $relationships, 'contact_id' ) );
             // Use 1=2 to signify no contacts have this tag...
-            $ids = ! empty( $ids ) ? implode( ',', $ids ) : '1=2';
+            $ids = ! empty( $ids ) ? implode( ',', $ids ) : '0';
             $where['tags_include'] = "ID IN ( $ids )";
         }
 
         if ( ! empty( $this->query_vars[ 'tags_exclude' ] ) ){
-            $relationships = Plugin::$instance->dbs->get_db( 'tag_relationships' )->query( [ 'tag_id' => wp_parse_id_list( $this->query_vars['tags_include'] ) ], 'contact_id' );
+            $relationships = Plugin::$instance->dbs->get_db( 'tag_relationships' )->query( [ 'tag_id' => wp_parse_id_list( $this->query_vars['tags_exclude'] ) ], 'contact_id' );
             $ids = wp_parse_id_list( wp_list_pluck( $relationships, 'contact_id' ) );
             // Use 1=2 to signify no contacts have this tag...
-            $ids = ! empty( $ids ) ? implode( ',', $ids ) : '1=2';
+            $ids = ! empty( $ids ) ? implode( ',', $ids ) : '0';
             $where['tags_exclude'] = "ID NOT IN ( $ids )";
         }
 

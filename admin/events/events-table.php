@@ -98,7 +98,7 @@ class Events_Table extends WP_List_Table {
      */
     protected function column_contact( $event )
     {
-        if ( ! $event->get_contact()->exists() )
+        if ( ! $event->get_contact() || ! $event->get_contact()->exists() )
             return sprintf( "<strong>(%s)</strong>",  _x( 'contact deleted', 'status', 'groundhogg' ) );
 
         $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
@@ -171,7 +171,10 @@ class Events_Table extends WP_List_Table {
         $time = scheduled_time( $event->get_time() );
 
         $html = $time_prefix . '&nbsp;<abbr title="' . date_i18n( DATE_ISO8601, intval( $event->get_time() ) ) . '">' . $time . '</abbr>';
-        $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->get_contact()->get_local_time( $event->get_time() ) ), __( 'local time' ) ) . '</i>';
+
+        if ( $event->get_contact() && $event->get_contact()->exists() ){
+            $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->get_contact()->get_local_time( $event->get_time() ) ), __( 'local time' ) ) . '</i>';
+        }
 
         return $html;
     }
@@ -397,7 +400,7 @@ class Events_Table extends WP_List_Table {
 
             }
 
-            if ($event->get_contact()->exists()) {
+            if ( $event->get_contact() && $event->get_contact()->exists() ) {
                 $actions['view'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
                     admin_url('admin.php?page=gh_contacts&action=edit&contact=' . $event->get_contact()->get_id()),
                     esc_attr(_x('View Contact', 'action', 'groundhogg')),

@@ -43,6 +43,9 @@ class API_V3
         $this->tracking = new Tracking_Api();
         $this->data     = new Data_Api();
         $this->reports  = new Reports_Api();
+        $this->broadcasts = new Broadcasts_Api();
+        $this->bulk_job = new Bulk_Job_Api();
+
     }
 
     /**

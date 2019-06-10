@@ -47,6 +47,17 @@ class Broadcast_Scheduler extends Bulk_Job
         $query = new Contact_Query();
         $args = $_GET;
 
+        // Unset GET irrelevant vars...
+        unset( $args[ 'page' ] );
+        unset( $args[ 'bulk_action' ] );
+
+        if ( empty( $args ) ){
+            $config = get_transient('gh_get_broadcast_config');
+            if ( $config ){
+                $args = $config[ 'contact_query' ];
+            }
+        }
+
         $contacts = $query->query( $args );
         $ids = wp_list_pluck( $contacts, 'ID' );
 
