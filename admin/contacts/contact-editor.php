@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 
+use function Groundhogg\current_user_is;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_form_list;
 use function Groundhogg\get_request_var;
@@ -57,7 +58,7 @@ if ( ! $contact || ! $contact->exists() ) {
 //include_once "class-wpgh-contact-events-table.php";
 
 /* Quit if */
-if ( current_user_can( 'sales_manager' ) ){
+if ( current_user_is( 'sales_manager' ) ){
     if ( $contact->get_owner_id() !== get_current_user_id() ){
 
         wp_die( _x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );

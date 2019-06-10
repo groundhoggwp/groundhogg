@@ -76,7 +76,9 @@ class Pointers {
         // No valid pointers? Stop here.
         if (empty($valid_pointers))
             return;
+
         $this->valid = $valid_pointers;
+
         wp_enqueue_style('wp-pointer');
         wp_enqueue_script('wp-pointer');
     }

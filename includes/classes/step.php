@@ -413,7 +413,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function is_active()
     {
-        return $this->get_funnel()->is_active();
+        return $this->get_funnel() && $this->get_funnel()->is_active();
     }
 
     /**

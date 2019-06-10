@@ -20,6 +20,22 @@ function get_contactdata( $contact_id_or_email, $by_user_id=false )
 }
 
 /**
+ * Check whether the current use is the given role.
+ *
+ * @param string $role
+ * @return bool
+ */
+function current_user_is( $role='subscriber' ) {
+    if( is_user_logged_in() ) {
+        $user = wp_get_current_user();
+        $roles = ( array ) $user->roles;
+        return in_array( $role, $roles );
+    } else {
+        return false;
+    }
+}
+
+/**
  * Internal URL builder.
  *
  * @param string $page
