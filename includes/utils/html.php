@@ -253,9 +253,13 @@ class HTML
 	 *
 	 * @return string
 	 */
-    public function e( $e = 'div', $atts = [], $self_closing = true )
+    public function e( $e = 'div', $atts = [], $content='', $self_closing = true )
     {
-	    return sprintf( '<%1$s %2$s %3$s>', esc_html( $e ), array_to_atts( $atts ), $self_closing ? '/' : '' );
+        if ( ! empty( $content ) || ! $self_closing ){
+            return $this->wrap( $content, $e, $atts );
+        }
+
+        return sprintf( '<%1$s %2$s/>', esc_html( $e ), array_to_atts( $atts ) );
     }
 
 
