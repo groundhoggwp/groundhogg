@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use function Groundhogg\current_user_is;
 use function Groundhogg\get_contactdata;
 use Groundhogg\Plugin;
 use WP_REST_Server;
@@ -285,6 +286,12 @@ class Contacts_Api extends Base
         $is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 
         $contact_query = new Contact_Query();
+
+        // Sales person can only see their own contacts...
+        if ( current_user_is( 'sales_manager' ) ){
+            $query[ 'owner' ] = get_current_user_id();
+        }
+
         $contacts = $contact_query->query( $query );
 
         if ( $is_for_select2 ){

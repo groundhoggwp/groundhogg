@@ -939,6 +939,37 @@ class HTML
 	}
 
     /**
+     * @param $args
+     * @return string
+     */
+	public function step_picker( $args )
+    {
+        $steps = Plugin::$instance->dbs->get_db('steps' )->query( [], 'step_order' );
+        $options = array();
+        foreach ($steps as $step) {
+            $step =Plugin::$instance->utils->get_step( $step->ID );
+            if ( $step && $step->is_active()) {
+
+                $funnel_name = $step->get_funnel()->get_title();
+                $options[$funnel_name][$step->ID] = sprintf("%d. %s (%s)", $step->get_order(), $step->get_title(), str_replace('_', ' ', $step->get_type()));
+            }
+        }
+
+        $a = wp_parse_args( $args, array(
+            'name'              => 'steps[]',
+            'id'                => 'steps',
+            'class'             => 'gh-step-picker gh-select2',
+            'selected'          => [],
+            'options'           => $options,
+            'multiple'          => true,
+            'placeholder'       => __( 'Please select one or more steps.', 'groundhogg' ),
+            'tags'              => false,
+        ) );
+
+        return $this->select2( $a );
+    }
+
+    /**
      * Get a meta key picker. useful for searching.
      *
      * @param array $args

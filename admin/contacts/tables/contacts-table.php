@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Contacts\Tables;
 
+use function Groundhogg\current_user_is;
 use function Groundhogg\get_request_var;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Preferences;
@@ -294,6 +295,11 @@ class Contacts_Table extends WP_List_Table {
                 Preferences::CONFIRMED,
                 Preferences::UNCONFIRMED
             );
+        }
+
+        // Sales person can only see their own contacts...
+        if ( current_user_is( 'sales_manager' ) ){
+            $query[ 'owner' ] = get_current_user_id();
         }
 
         $this->query = $query;
