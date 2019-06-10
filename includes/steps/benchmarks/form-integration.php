@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_mappable_fields;
+use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\Step;
 
@@ -19,7 +20,38 @@ use Groundhogg\Step;
 abstract class Form_Integration extends Benchmark
 {
 
-	/**
+    public function add_additional_actions()
+    {
+        add_action( "wp_ajax_get_form_integration_map_{$this->get_type()}", [ $this, 'get_map_ajax' ] );
+    }
+
+    public function admin_scripts()
+    {
+        wp_enqueue_script( 'groundhogg-funnel-form-integration' );
+    }
+
+    /**
+     * Get the html for the field map when the form ID is changed.
+     *
+     * @return void
+     */
+    public function get_map_ajax()
+    {
+        if ( ! wp_doing_ajax() ){
+            return;
+        }
+
+        $step_id = absint( get_request_var( 'step_id' ) );
+        $form_id = absint( get_request_var( 'form_id' ) );
+
+        $this->set_current_step( new Step( $step_id ) );
+
+        $table = $this->field_map_table( $form_id );
+
+        wp_send_json_success( [ 'map' => $table  ] );
+    }
+
+    /**
 	 * Output the settings for the step, dropdown of all available contact forms...
 	 *
 	 * @param $step Step
@@ -35,9 +67,10 @@ abstract class Form_Integration extends Benchmark
                 'id' => $this->setting_id_prefix( 'form_id' ),
                 'name' => $this->setting_name_prefix( 'form_id' ),
                 'data' => $this->get_forms_for_select_2(),
-                'selected' => $this->get_setting( 'form_id' )
+                'selected' => $this->get_setting( 'form_id' ),
+                'class' => 'gh-select2 form-integration-picker'
             ] ),
-            html()->wrap(
+            html()->wrap( [
                 html()->modal_link( [
                     'title'     => __( 'Map Fields', 'groundhogg' ),
                     'text'      => __( 'Map Fields', 'groundhogg' ),
@@ -48,13 +81,14 @@ abstract class Form_Integration extends Benchmark
                     'height'    => 600,
                     'width'     => 600,
                     'footer'    => 'true',
-                    'preventSave' => 'false',
+                    'preventSave' => 'true',
                 ] ),
+                html()->e( 'span', [ 'class' => 'spinner' ], '', false )],
                 'div',
                 [ 'class' => 'row-actions' ]
             ),
             html()->wrap( $this->field_map_table( $this->get_setting( 'form_id' ) ), 'div', [
-                'class' => 'hidden',
+                'class' => 'hidden field-map-wrapper',
                 'id' => $this->setting_id_prefix( 'field_map' )
             ] )
         ] );

@@ -553,7 +553,7 @@ abstract class Funnel_Step extends Supports_Errors
         $closed = $step->get_meta( 'is_closed' ) ? 'closed' : '' ;
 
         ?>
-        <div title="<?php echo $step->get_title() ?>" id="<?php echo $step->get_id(); ?>" class="postbox step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php echo $closed; ?>">
+        <div data-type="<?php esc_attr_e( $this->get_type() ); ?>" title="<?php echo $step->get_title() ?>" id="<?php echo $step->get_id(); ?>" class="postbox step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php echo $closed; ?>">
             <button type="button" class="handlediv collapse"><span class="toggle-indicator" aria-hidden="true"></span></button>
             <input type="hidden" class="collapse-input" name="<?php echo $this->setting_name_prefix( 'closed' ); ?>" value="<?php echo $this->get_setting( 'is_closed' ); ?>">
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">

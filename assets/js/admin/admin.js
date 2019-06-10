@@ -1,4 +1,4 @@
-(function ( $, nonces, endpoints ) {
+(function ( $, nonces, endpoints, gh ) {
     
     function picker( selector, args ) {
         $( selector ).select2( args );
@@ -64,7 +64,6 @@
         apiPicker(  '.gh-contact-picker',       endpoints.contacts, false, false );
         apiPicker(  '.gh-benchmark-picker',     endpoints.benchmarks, false, false );
         apiPicker(  '.gh-metakey-picker',       endpoints.metakeys, false, false );
-        apiPicker(  '.gh-metakey-picker',       endpoints.metakeys, false, false );
         linkPicker( '.gh-link-picker' );
     }
 
@@ -76,4 +75,13 @@
         buildPickers();
     });
 
-})(jQuery, groundhogg_nonces, groundhogg_endpoints);
+    gh.pickers = {};
+
+    // Map functions to Groundhogg object.
+    gh.pickers.picker = picker;
+    gh.pickers.apiPicker = apiPicker;
+    gh.pickers.linkPicker = linkPicker;
+    gh.nonces = nonces;
+    gh.endpoints = endpoints;
+
+})(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg);

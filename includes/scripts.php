@@ -123,6 +123,7 @@ class Scripts
 
         // Funnel Elements
         wp_register_script('groundhogg-funnel-email', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/email' . $IS_MINIFIED . '.js', ['jquery','groundhogg-admin-modal'], GROUNDHOGG_VERSION, true);
+        wp_register_script('groundhogg-funnel-form-integration', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/form-integration' . $IS_MINIFIED . '.js', ['jquery','groundhogg-admin', 'groundhogg-admin-modal'], GROUNDHOGG_VERSION, true);
 
         wp_enqueue_script( 'groundhogg-admin-functions' );
 
@@ -138,6 +139,10 @@ class Scripts
             '_wprest'   => wp_create_nonce( 'wp_rest' ),
             '_adminajax' => wp_create_nonce( 'admin_ajax' ),
             '_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
+        ]  );
+
+        wp_localize_script( 'groundhogg-admin', 'Groundhogg', [
+            'test' => 'Hello World!'
         ]  );
 
         do_action('groundhogg/scripts/after_register_admin_scripts', $this->is_script_debug_enabled(), $IS_MINIFIED );
