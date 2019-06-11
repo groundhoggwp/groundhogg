@@ -114,7 +114,7 @@
                 self.editorSizing();
             });
 
-            $('#editor-toggle').change(function(){
+            $('#editor-toggle').change(function(e){
                 if ($(this).is(':checked')) {
 
                     if ( ! self.htmlCode ){

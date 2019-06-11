@@ -47,6 +47,8 @@ $apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', [
 ]);
 
 $apple_link = \Groundhogg\array_to_css( $apple_link );
+
+do_action( 'groundhogg/templates/email/footer/before' );
 ?>
                                 <!-- START FOOTER -->
                                 <div class="footer" style="<?php echo $footer; ?>">

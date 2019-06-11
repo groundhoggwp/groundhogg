@@ -1,5 +1,4 @@
-var Groundhogg = Groundhogg || {};
-(function (gh, ob, $) {
+(function (gh, $) {
     $.extend( gh, {
         leadSource: 'gh_referer',
         refID: 'gh_ref_id',
@@ -24,12 +23,14 @@ var Groundhogg = Groundhogg || {};
             return null;
         },
         pageView : function(){
+            var self = this;
+
             $.ajax({
                 type: "post",
-                url: ob.page_view_endpoint,
-                data: { ref: window.location.href, _ghnonce: ob._ghnonce },
+                url: self.page_view_endpoint,
+                data: { ref: window.location.href, _ghnonce: self._ghnonce },
                 beforeSend: function ( xhr ) {
-                    xhr.setRequestHeader( 'X-WP-Nonce', ob._wpnonce );
+                    xhr.setRequestHeader( 'X-WP-Nonce', self._wpnonce );
                 },
                 success: function( response ){},
                 error: function(){}
@@ -47,11 +48,11 @@ var Groundhogg = Groundhogg || {};
             var self = this;
             $.ajax({
                 type: "post",
-                url: ob.form_impression_endpoint,
+                url: self.form_impression_endpoint,
                 dataType: 'json',
-                data: { ref: window.location.href, form_id: id, _ghnonce: ob._ghnonce },
+                data: { ref: window.location.href, form_id: id, _ghnonce: self._ghnonce },
                 beforeSend: function ( xhr ) {
-                    xhr.setRequestHeader( 'X-WP-Nonce', ob._wpnonce );
+                    xhr.setRequestHeader( 'X-WP-Nonce', self._wpnonce );
                 },
                 success: function( response ){
                     if( typeof response.ref_id !== 'undefined' ) {
@@ -74,5 +75,5 @@ var Groundhogg = Groundhogg || {};
     $(function(){
         gh.init();
     });
-})(Groundhogg, gh_frontent_object, jQuery);
+})(Groundhogg, jQuery);
 

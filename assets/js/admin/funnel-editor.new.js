@@ -36,7 +36,8 @@
             });
 
             $( document ).on('GroundhoggModalClosed', function( e ){
-                self.save( e );
+                e.preventDefault();
+                self.save( $('#funnel-form') );
             });
 
             if ( window.innerWidth > 600 ){

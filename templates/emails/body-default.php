@@ -13,7 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 ?>
 <div class="body-content" style="text-align: left;">
+    <?php do_action( 'groundhogg/templates/email/content/before' ); ?>
+
     <!-- START CONTENT -->
     <?php echo apply_filters( 'groundhogg/email_template/content', '' ); ?>
     <!-- END CONTENT -->
+
+    <?php do_action( 'groundhogg/templates/email/content/after' ); ?>
 </div>

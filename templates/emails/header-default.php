@@ -105,6 +105,7 @@ $email_width = $is_showing_in_iframe ? '100%' : $email_width;
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title><?php echo $email_title; ?></title>
     <base target="_parent">
+    <?php do_action( 'groundhogg/templates/email/head/after' ); ?>
 </head>
 <!-- /HEAD -->
 
@@ -133,3 +134,4 @@ $email_width = $is_showing_in_iframe ? '100%' : $email_width;
                                 </div>
                             <!-- /BROWSER VIEW -->
                             <?php endif; ?>
+
