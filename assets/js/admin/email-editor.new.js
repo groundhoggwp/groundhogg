@@ -72,8 +72,11 @@
             self.makeDraggable();
 
             /* Activate Spinner */
-            $('form').on( 'submit', function( e ){
-                self.save( e );
+            $('#email-form').on( 'submit', function( e ){
+
+                e.preventDefault();
+
+                self.save( $(this) );
             });
 
             $( '.row' ).wpghToolBar();
@@ -183,17 +186,18 @@
             }
         },
 
-        save: function ( e ) {
+        save: function ( $form ) {
 
             var self = this;
 
-            e.preventDefault();
             showSpinner();
 
             self.prepareEmailHTML();
 
             $('#content').val( $('#email-inside').html() );
-            var fd = $('form').serialize();
+
+            var fd = $form.serialize();
+
             fd = fd +  '&action=gh_update_email';
 
             adminAjaxRequest( fd, function ( response ) {
@@ -208,10 +212,6 @@
                 if ( self.inFrame() ){
                     parent.EmailStep.changesSaved = true;
                 }
-
-                $( '#send-test' ).val( null );
-
-                // console.log( response );
             } );
         },
 

@@ -41,12 +41,10 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
 <?php endif; ?>
 <!-- /END TITLE -->
 
-
-<form method="post">
+<form method="post" id="email-form">
 
     <!-- Before-->
     <?php wp_nonce_field(); ?>
-    <?php do_action('wpgh_edit_email_form_before'); ?>
     <?php echo Plugin::$instance->utils->html->input( [ 'type' => 'hidden', 'name' => 'email', 'value' => $email_id ] ); ?>
 
     <div class="header-wrap">

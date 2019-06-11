@@ -30,8 +30,9 @@
             } );
 
             /* Activate Spinner */
-            $('form').on('submit', function( e ){
-                self.save( e );
+            $('#funnel-form').on('submit', function( e ){
+                e.preventDefault();
+                self.save( $(this) );
             });
 
             $( document ).on('GroundhoggModalClosed', function( e ){
@@ -134,15 +135,13 @@
                 }});
         },
 
-        save: function ( e ) {
-
-            e.preventDefault();
+        save: function ( $form ) {
 
             var self = this;
 
             showSpinner();
 
-            var fd = $('form').serialize();
+            var fd = $form.serialize();
             fd = fd +  '&action=gh_save_funnel_via_ajax';
 
             adminAjaxRequest( fd, function ( response ) {
