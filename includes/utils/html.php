@@ -159,7 +159,7 @@ class HTML
             'class' => '',
         ] );
 
-        printf( "<th title='%s' class='%s'>%s</th>", esc_attr( $args[ 'title' ] ), esc_attr( $args[ 'class' ] ), $content );
+        echo $this->wrap( $content, 'th', $args );
     }
 
     public function td( $content, $args = [] )
@@ -173,7 +173,7 @@ class HTML
             'class' => '',
         ] );
 
-        printf( "<td title='%s' class='%s'>%s</td>", esc_attr( $args[ 'title' ] ), esc_attr( $args[ 'class' ] ), $content );
+        echo $this->wrap( $content, 'td', $args );
     }
 
     /**
