@@ -24,10 +24,11 @@ class Manager
      */
     public function __construct()
     {
-        add_action( 'init', [ $this, 'init_dbs' ] );
+        // GET THOSE DBS UP AND RUNNING ASAP
+        add_action( 'init', [ $this, 'init_dbs' ], 1 );
 
         // Re-init the DBS if a new plugin is activated, like an extension.
-        add_action( 'activate_plugin', [ $this, 'listen_for_addons' ] );
+        add_action( 'activate_plugin', [ $this, 'listen_for_addons' ], 1 );
     }
 
     public function listen_for_addons()

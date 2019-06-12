@@ -66,6 +66,7 @@
             self.editor.on( 'click', 'span.dashicons-trash', function ( e ) {
                 e.preventDefault();
                 self.deleteBlock( e.target );
+                self.feed( null );
             });
 
             self.makeSortable();
@@ -73,9 +74,7 @@
 
             /* Activate Spinner */
             $('#email-form').on( 'submit', function( e ){
-
                 e.preventDefault();
-
                 self.save( $(this) );
             });
 
@@ -102,7 +101,7 @@
                 } );
 
                 $(  parent.document ).on( 'click', '#popup-close-footer', function( e ){
-                    self.save( e );
+                    self.save( $('#email-form') );
                 } );
 
                 parent.EmailStep.newEmailId = self.id;
@@ -264,6 +263,16 @@
             });
         },
 
+        hideBlockSettings: function (){
+            this.editor.find( '.row' ).removeClass( 'active' );
+            this.actions.find( '.postbox' ).addClass( 'hidden' );
+
+            // Show regular settings
+            this.settings.show();
+            $(document).trigger( 'madeInactive' );
+            this.sidebar.updateSticky();
+        },
+
         /**
          * Show the block settings
          * Make the block active
@@ -272,7 +281,10 @@
          */
         feed: function( e ) {
 
-            // console.log( {e: e} );
+            if ( ! e ){
+                this.hideBlockSettings();
+                return;
+            }
 
             /* Make Current Block Active*/
             if ( e.parentNode === null ){
@@ -287,19 +299,8 @@
             }
 
             if ( ! block.hasClass( 'row' ) ){
-
-                this.editor.find( '.row' ).removeClass( 'active' );
-                this.actions.find( '.postbox' ).addClass( 'hidden' );
-
-                // Show regular settings
-                this.settings.show();
-
-                $(document).trigger( 'madeInactive' );
-
-                this.sidebar.updateSticky();
-
+                this.hideBlockSettings();
                 return;
-
             }
 
             this.active = block;
@@ -340,7 +341,6 @@
          */
         deleteBlock: function( e ){
             $( e ).closest( '.row' ).remove();
-
         },
 
         /**

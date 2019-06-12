@@ -74,10 +74,8 @@ class Tracking
         // Actions which build the tracking cookie.
         add_action( 'wp_login', [ $this, 'wp_login' ], 10, 2 );
 
+        add_action( 'init', [ $this, 'deconstruct_tracking_cookie' ], 1 );
         add_action( 'init', [ $this, 'add_rewrite_rules' ] );
-
-        add_action( 'init', [ $this, 'deconstruct_tracking_cookie'] );
-
         add_action( 'init', [ $this, 'parse_utm' ] );
 
         add_filter( 'request', [ $this, 'parse_request' ] );

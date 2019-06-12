@@ -209,10 +209,16 @@ class Funnel extends Base_Object
 
             foreach ( $step_meta as $key => $value ) {
                 if ( is_array( $value ) ){
-                    $step->update_meta( $key, array_shift( $value ) );
-                } else {
-                    $step->update_meta( $key, $value );
+                    $value = array_shift( $value );
                 }
+
+                // Replace URL
+                if ( is_string( $value ) ){
+                    $value = search_and_replace_domain( $value );
+                }
+
+                $step->update_meta( $key, $value );
+
             }
 
             $import_args = $step_args[ 'args' ];

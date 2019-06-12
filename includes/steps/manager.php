@@ -41,11 +41,14 @@ class Manager {
      */
     private $elements = array();
 
+    /**
+     * Manager constructor.
+     */
     public function __construct()
     {
-        add_action( 'init', [ $this, 'init_steps' ] );
+        // RIGHT AFTER THE DBS.
+        add_action( 'init', [ $this, 'init_steps' ], 2 );
     }
-
 
     public function init_steps()
     {

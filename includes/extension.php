@@ -53,12 +53,15 @@ abstract class Extension
      */
     public function __construct()
     {
-        $this->register_autoloader();
+        if ( $this->dependent_plugins_are_installed() ){
 
-        if ( ! did_action( 'groundhogg/init' ) ){
-            add_action( 'groundhogg/init', [ $this, 'init' ] );
-        } else {
-            $this->init();
+            $this->register_autoloader();
+
+            if ( ! did_action( 'groundhogg/init' ) ){
+                add_action( 'groundhogg/init', [ $this, 'init' ] );
+            } else {
+                $this->init();
+            }
         }
 
         // Add to main list
@@ -84,6 +87,53 @@ abstract class Extension
     }
 
     /**
+     * Return a list of plugins which this plugin is dependent on before initializing.
+     * Such as plugins required for Integrations...
+     *
+     * @return string[]
+     */
+    protected function get_dependent_plugins()
+    {
+        return [];
+    }
+
+    /**
+     * Check if all the dependent plugins are installed.
+     *
+     * @return bool
+     */
+    protected function dependent_plugins_are_installed()
+    {
+
+        $plugins = $this->get_dependent_plugins();
+
+        // No dependent plugins!
+        if ( empty( $plugins ) ){
+            return true;
+        }
+
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
+
+        foreach ( $plugins as $plugin_file_path ){
+            if ( ! is_plugin_active( $plugin_file_path ) ){
+                add_action( 'admin_notices', [ $this, 'dependencies_missing_notice' ] );
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function dependencies_missing_notice()
+    {
+        $message = sprintf( esc_html__( '%s is missing required plugins to be active: %s', 'groundhogg' ), $this->get_display_name(), implode( ', ', $this->get_dependent_plugins() ) );
+        $html_message = sprintf( '<div class="notice notice-error">%s</div>', wpautop( $message ) );
+        echo wp_kses_post( $html_message );
+    }
+
+    /**
      * Add any other components...
      *
      * @return void
@@ -105,6 +155,7 @@ abstract class Extension
         add_action( 'groundhogg/admin/init',      [ $this, 'register_admin_pages'] );
         add_action( 'groundhogg/steps/init',      [ $this, 'register_funnel_steps' ] );
         add_action( 'groundhogg/replacements/init', [ $this, 'add_replacements' ] );
+        add_filter( 'groundhogg/admin/emails/blocks/init', [ $this, 'register_email_blocks' ] );
 
         add_filter( 'groundhogg/reporting/reports',       [ $this, 'register_reports' ] );
         add_filter( 'groundhogg/admin/settings/settings', [ $this, 'register_settings' ] );
@@ -164,6 +215,12 @@ abstract class Extension
      * @return mixed
      */
     public function register_email_templates($templates){return $templates;}
+
+    /**
+     * @param $blocks
+     * @return mixed
+     */
+    public function register_email_blocks( $blocks ){ return $blocks; }
 
     /**
      * @param $replacements Replacements
@@ -259,7 +316,7 @@ abstract class Extension
 		    $this->plugin_data = get_plugin_data( $this->get_plugin_file() );
 	    }
 
-	    return $this->plugin_data[ 'Description' ];
+	    return $this->plugin_data[ $key ];
     }
 
     /**

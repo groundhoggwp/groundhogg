@@ -25,7 +25,7 @@ var ButtonBlock = {};
             });
 
             this.link  = $( '#button-link' );
-            this.link.on( 'keydown change', function ( e ) {
+            this.link.on( 'change input', function ( e ) {
                 editor.getActive().find('a').attr('href', $(this).val() );
             });
 

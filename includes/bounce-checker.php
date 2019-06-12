@@ -201,8 +201,15 @@ class Bounce_Checker
     public function check()
     {
         $domain = explode( '@', $this->inbox );
+
         $domain = $domain[1];
+
         $domain = \get_option( 'gh_bounce_inbox_host', $domain );
+
+        if ( ! $domain ){
+            return;
+        }
+
         $port = \get_option( 'gh_bounce_inbox_port', 993 );
 
         $hostname = sprintf( '{%s:%d/imap/ssl/novalidate-cert}INBOX', $domain, $port );

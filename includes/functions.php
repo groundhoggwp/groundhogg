@@ -360,6 +360,16 @@ function enqueue_groundhogg_modal()
 }
 
 /**
+ * Replace any other domain name with the one of the website.
+ *
+ * @param $string
+ * @return string|string[]|null
+ */
+function search_and_replace_domain( $string ){
+    return preg_replace( '#https?:\/\/[^\\/\s]+#', site_url(), $string );
+}
+
+/**
  * Convert array to HTML tag attributes
  *
  * @param $atts

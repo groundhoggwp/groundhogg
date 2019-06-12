@@ -9,6 +9,7 @@ use Groundhogg\Event;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
+use function Groundhogg\search_and_replace_domain;
 use Groundhogg\Step;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -296,7 +297,7 @@ class Send_Email extends Action
         }
 
         $email_id = Plugin::$instance->dbs->get_db( 'emails' )->add( [
-            'content'       => $args['content'],
+            'content'       => search_and_replace_domain( $args['content'] ),
             'subject'       => $args['subject'],
             'pre_header'    => $args['pre_header'],
             'from_user'     => get_current_user_id(),

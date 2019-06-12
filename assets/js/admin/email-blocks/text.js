@@ -86,8 +86,8 @@ var TextBlock = {};
                 self.editor.setContent( block.find( '.text_block' ).children().first().html() );
             }
 
-            this.pFont.val( block.find( '.text_block' ).children().first().css( 'font-family' ).replace(/"/g, '') );
-            this.pSize.val( block.find( '.text_block' ).children().first().css( 'font-size' ).replace('px', '') );
+            try{ this.pFont.val( block.find( '.text_block' ).children().first().css( 'font-family' ).replace(/"/g, '') ) } catch (e){}
+            try{ this.pSize.val( block.find( '.text_block' ).children().first().css( 'font-size' ).replace('px', '') ) } catch (e) {}
             try{ this.h1Font.val( block.find('h1').css( 'font-family' ).replace(/"/g, '') ); } catch (e){}
             try{ this.h1Size.val( block.find('h1').css( 'font-size' ).replace('px', '') ); } catch (e){}
             try{ this.h2Font.val( block.find('h2').css( 'font-family' ).replace(/"/g, '') ); } catch (e){}

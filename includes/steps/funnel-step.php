@@ -617,21 +617,21 @@ abstract class Funnel_Step extends Supports_Errors
                 <?php //TODO Reporting enabled? ?>
                 <div class="step-edit <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? 'hidden' : '' ; ?>">
                     <div class="custom-settings">
-                        <?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before" ); ?>
+                        <?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
                         <?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
                         <?php $this->settings( $step ); ?>
-                        <?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after" ); ?>
+                        <?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
                         <?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
                     </div>
                 </div>
                 <!-- REPORTING  -->
                 <?php //TODO Reporting enabled? ?>
                 <div class="step-reporting <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden' ; ?>">
-                    <?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before" ); ?>
-                    <?php do_action( 'groundhogg/steps/reporting/before' ); ?>
+                    <?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
+                    <?php do_action( 'groundhogg/steps/reporting/before', $step ); ?>
                     <?php $this->reporting( $step ); ?>
-                    <?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/after" ); ?>
-                    <?php do_action( 'groundhogg/steps/reporting/after' ); ?>
+                    <?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
+                    <?php do_action( 'groundhogg/steps/reporting/after', $step ); ?>
                 </div>
             </div>
         </div>
