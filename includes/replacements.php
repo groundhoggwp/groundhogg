@@ -23,7 +23,7 @@ class Replacements
      *
      * @var array
      */
-    var $replacements = array();
+    var $replacement_codes = array();
 
     /**
      * The contact ID
@@ -224,7 +224,7 @@ class Replacements
 
         if ( is_callable( $callback ) )
         {
-            $this->replacements[ $code ] = array(
+            $this->replacement_codes[ $code ] = array(
                 'code' => $code,
                 'callback' => $callback,
                 'description' => $description
@@ -246,7 +246,7 @@ class Replacements
      */
     public function remove( $code )
     {
-        unset( $this->replacements[$code] );
+        unset( $this->replacement_codes[$code] );
     }
 
     /**
@@ -258,7 +258,7 @@ class Replacements
      */
     function has_replacement( $code )
     {
-        return array_key_exists( $code, $this->replacements );
+        return array_key_exists( $code, $this->replacement_codes );
     }
 
     /**
@@ -270,7 +270,7 @@ class Replacements
      */
     public function get_replacements()
     {
-        return $this->replacements;
+        return $this->replacement_codes;
     }
 
     /**
@@ -293,7 +293,7 @@ class Replacements
             return $content;
 
         // Check if there is at least one tag added
-        if ( empty( $this->replacements ) || ! is_array( $this->replacements ) ) {
+        if ( empty( $this->replacement_codes ) || ! is_array( $this->replacement_codes ) ) {
             return $content;
         }
 
@@ -321,6 +321,33 @@ class Replacements
         return $this->current_contact;
     }
 
+    protected function parse_code( $code = '' ){
+
+        $default = $code;
+        $arg = false;
+
+        //Support Default Arguments.
+        if ( strpos( $code, '::' ) > 0 ){
+            $parts = explode( '::', $code );
+            $code = $parts[0];
+            $default = $parts[1];
+        }
+
+        /* make sure that if it's a dynamic code to remove anything after the period */
+        if ( strpos( $code, '.' ) > 0 ) {
+            $parts = explode( '.', $code );
+            $code = $parts[ 0 ];
+            $arg = $parts[ 1 ];
+        }
+
+        return [
+            'code' => $code,
+            'arg'  => $arg,
+            'default' => $default
+        ];
+
+    }
+
     /**
      * Process the given replacement code
      *
@@ -333,41 +360,29 @@ class Replacements
         // Get tag
         $code = $m[1];
 
-        /* make sure that if it's a dynamic code to remove anything after the period */
-        if ( strpos( $code, '.' ) > 0 ) {
-            $parts = explode( '.', $code );
-            $code = $parts[0];
-        }
+        $parts = $this->parse_code( $code );
+
+        $arg     = $parts[ 'arg' ];
+        $code    = $parts[ 'code' ];
+        $default = $parts[ 'default' ];
 
         // Return tag if tag not set
         if ( ! $this->has_replacement( $code ) && substr( $code, 0, 1 ) !== '_' ) {
-            return $m[0];
+            return $default;
         }
 
-        /* reset code */
-        $code = $m[1];
-
+        // Access contact fields.
         if ( substr( $code, 0, 1) === '_' ) {
-
-            $text = $this->get_current_contact()->get_meta( substr( $code, 1 ) );
-
-        } else if ( strpos( $code, '.' ) > 0 ) {
-
-            $parts = explode( '.', $code );
-            $code = $parts[0];
-
-            if ( ! isset( $parts[1] ) ) {
-                $arg = false;
-            } else {
-                $arg = $parts[1];
-            }
-
-            $text = call_user_func( $this->replacements[ $code ]['callback'], $arg, $this->contact_id, $code );
-
+            $field = substr( $code, 1 );
+            $text = $this->get_current_contact()->$field;
+        } else if ( $arg ) {
+            $text = call_user_func( $this->replacement_codes[ $code ]['callback'], $arg, $this->contact_id, $code );
         } else {
+            $text = call_user_func( $this->replacement_codes[ $code ]['callback'], $this->contact_id, $code );
+        }
 
-            $text = call_user_func( $this->replacements[ $code ]['callback'], $this->contact_id, $code );
-
+        if ( empty( $text ) ){
+            $text = $default;
         }
 
         return apply_filters( "groundhogg/replacements/{$code}", $text );
@@ -380,7 +395,7 @@ class Replacements
         <table class="wp-list-table widefat fixed striped">
             <thead>
             <tr>
-                <th><?php _e( 'Replacement Code' ); ?></th>
+                <th><?php _e( 'Replacement Code' );?>&nbsp;<?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/features/replacement-codes/' );?></th>
                 <th><?php _e( 'Description' ); ?></th>
             </tr>
             </thead>
@@ -413,7 +428,7 @@ class Replacements
     public function show_replacements_button()
     {
         echo Plugin::$instance->utils->html->modal_link( array(
-            'title'     => 'Replacements',
+            'title'     => __( 'Replacements', 'groundhogg' ),
             'text'      => _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
             'footer_button_text' => __( 'Close' ),
             'id'        => 'replacements',
