@@ -1,8 +1,11 @@
 <?php
+namespace Groundhogg\Blocks\Elementor;
+
+use function Groundhogg\get_form_list;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-class WPGH_Elementor_Form_Widget extends  \Elementor\Widget_Base {
+class Form_Widget extends \Elementor\Widget_Base {
 
     public function get_name() {
         return 'groundhogg-form';
@@ -13,9 +16,7 @@ class WPGH_Elementor_Form_Widget extends  \Elementor\Widget_Base {
     }
 
     public function get_icon() {
-        // Icon name from the Elementor font file, as per http://dtbaker.net/web-development/creating-your-own-custom-elementor-widgets/
         return 'eicon-form-horizontal';
-//        return 'fa fa-wpforms';
     }
 
     public function get_categories() {
@@ -32,24 +33,14 @@ class WPGH_Elementor_Form_Widget extends  \Elementor\Widget_Base {
             ]
         );
 
-        $forms = WPGH()->steps->get_steps( array(
-            'step_type' => 'form_fill'
-        ) );
-
-        $form_options = array();
-        $default = 0;
-        foreach ( $forms as $form ){
-            if ( ! $default ){$default = $form->ID;}
-            $step = wpgh_get_funnel_step( $form->ID );
-            if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
-        }
+        $form_options = get_form_list();
 
         $this->add_control(
             'form_id',
             [
                 'label' => __( 'Select a Form', 'groundhogg' ),
-                'type' => Elementor\Controls_Manager::SELECT,
-                'default' => $default,
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'default' => 0,
                 'options' => $form_options
             ]
         );
