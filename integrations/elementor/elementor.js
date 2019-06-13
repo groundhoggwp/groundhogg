@@ -19,6 +19,8 @@
         },
     };
 
+    console.log( GroundhoggIntegration );
+
     GroundhoggIntegration = Object.assign( ep.modules.forms.activecampaign, GroundhoggIntegration );
     ep.modules.forms.groundhogg = GroundhoggIntegration;
 

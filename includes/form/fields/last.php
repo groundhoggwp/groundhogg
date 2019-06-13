@@ -20,8 +20,8 @@ class Last extends Input
             'id'            => 'last_name',
             'class'         => 'gh-last-name',
             'value'         => '',
-            'placeholder'   => '',
-            'attributes'    => 'pattern="^[\w\pL\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$"',
+            'placeholder'   => 'Doe',
+            'pattern'       => '^[\w\pL\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$',
             'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
             'required'      => false,
         ];

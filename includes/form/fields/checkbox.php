@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\html;
 use Groundhogg\Plugin;
 
 /**
@@ -58,17 +59,17 @@ class Checkbox extends Input
      */
     public function render()
     {
-        return sprintf(
-            "<label class='gh-checkbox-label'><input type='checkbox' name='%s' id='%s' class='gh-checkbox %s' value='%s' title='%s' %s %s %s> %s</label>",
-            $this->get_name(),
-            $this->get_id(),
-            $this->get_classes(),
-            $this->get_value(),
-            $this->get_title(),
-            $this->get_attributes(),
-            $this->is_required() ? 'required' : '' ,
-            $this->is_checked() ? 'checked' : '' ,
-            $this->get_label()
-        );
+        $atts = [
+            'label' => $this->get_label(),
+            'name'  => $this->get_name(),
+            'id'    => $this->get_id(),
+            'class' => $this->get_classes() . ' gh-checkbox',
+            'value' => $this->get_value(),
+            'title' => $this->get_title(),
+            'required' => $this->is_required(),
+            'checked' => $this->is_checked()
+        ];
+
+        return html()->checkbox( $atts );
     }
 }

@@ -1,21 +1,20 @@
 <?php
-namespace ElementorPro\Modules\Forms\Actions;
+namespace Groundhogg\Integrations\Elementor;
 
-use Elementor\Control_Repeater;
 use Elementor\Controls_Manager;
-use Elementor\Repeater;
 use ElementorPro\Modules\Forms\Classes\Form_Record;
 use ElementorPro\Modules\Forms\Classes\Integration_Base;
-use ElementorPro\Modules\Forms\Controls\Fields_Map;
-use ElementorPro\Modules\Forms\Controls\Gh_Fields_Map;
-use ElementorPro\Classes\Utils;
-use Elementor\Settings;
+use function Groundhogg\after_form_submit_handler;
+use Groundhogg\Contact;
+use function Groundhogg\generate_contact_with_map;
+use function Groundhogg\get_db;
+use function Groundhogg\get_mappable_fields;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-class Groundhogg extends Integration_Base {
+class Elementor_Integration_V2 extends Integration_Base {
 
     public function get_name() {
 		return 'groundhogg_v2';
@@ -36,12 +35,22 @@ class Groundhogg extends Integration_Base {
 			]
 		);
 
+        $tags = get_db( 'tags' )->query();
+
+        $tag_options = array();
+
+        $default = 0;
+        foreach ( $tags as $tag ){
+            if ( ! $default ){$default = $tag->tag_id;}
+            $tag_options[ $tag->tag_id ] = $tag->tag_name;
+        }
+
         $widget->add_control(
             'groundhogg_v2_tags',
             [
                 'label' => __( 'Apply Tags', 'elementor-pro' ),
                 'type' => Controls_Manager::SELECT2,
-                'options' => WPGH()->tags->get_tags_select(),
+                'options' => $tag_options,
                 'multiple' => true,
                 'label_block' => false,
             ]
@@ -51,19 +60,8 @@ class Groundhogg extends Integration_Base {
 			'groundhogg_v2_fields_map',
 			[
 				'label' => __( 'Field Mapping', 'elementor-pro' ),
-				'type' => Gh_Fields_Map::CONTROL_TYPE,
+				'type' => Field_Mapping::CONTROL_TYPE,
 				'separator' => 'before',
-//                'render_type' => 'none',
-//                'fields' => [
-//                    [
-//                        'name' => 'local_id',
-//                        'type' => Controls_Manager::HIDDEN,
-//                    ],
-//                    [
-//                        'name' => 'remote_id',
-//                        'type' => Controls_Manager::SELECT,
-//                    ],
-//                ],
                 'condition' => [
                     'groundhogg_v2_tags!' => '',
                 ],
@@ -107,7 +105,7 @@ class Groundhogg extends Integration_Base {
 	 *
 	 * @param Form_Record $record
 	 *
-	 * @return \WPGH_Contact|bool
+	 * @return Contact|bool
 	 */
 	private function create_subscriber_object( Form_Record $record ) {
 
@@ -118,10 +116,10 @@ class Groundhogg extends Integration_Base {
         }
 
         $fields = $this->get_normalized_fields( $record );
-        $contact = wpgh_generate_contact_with_map( $fields, $map );
+        $contact = generate_contact_with_map( $fields, $map );
 
         if ( $contact ){
-            wpgh_after_form_submit_handler( $contact );
+            after_form_submit_handler( $contact );
         }
 
 		return $contact;
@@ -173,9 +171,17 @@ class Groundhogg extends Integration_Base {
 	 */
 	public function handle_panel_request( array $data ) {
 
-		$tags = WPGH()->tags->get_tags_select();
+        $tags = get_db( 'tags' )->query();
 
-		$mappable_fields = wpgh_get_mappable_fields();
+        $tag_options = array();
+
+        $default = 0;
+        foreach ( $tags as $tag ){
+            if ( ! $default ){$default = $tag->tag_id;}
+            $tag_options[ $tag->tag_id ] = $tag->tag_name;
+        }
+
+		$mappable_fields = get_mappable_fields();
 		$fields = [];
 
 		foreach ( $mappable_fields as $field_id => $field_label ){
@@ -188,7 +194,7 @@ class Groundhogg extends Integration_Base {
 		}
 
 		$response = [
-			'tags'      => $tags,
+			'tags'      => $tag_options,
 			'fields'    => $fields
 		];
 

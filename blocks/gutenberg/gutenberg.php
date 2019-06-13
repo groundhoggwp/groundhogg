@@ -1,24 +1,21 @@
 <?php
+namespace Groundhogg\Blocks\Gutenberg;
+
+use function Groundhogg\get_db;
 
 /**
  * Register Groundhogg Gutenberg block on the backend.
  *
  * @since 1.4.8
  */
-
 if ( function_exists( 'register_block_type' ) ){
 
-    add_action( 'init', 'wpgh_register_block' );
-    add_action( 'enqueue_block_editor_assets',  'wpgh_enqueue_block_editor_assets' );
+    add_action( 'init', 'Groundhogg\Blocks\Gutenberg\register_block' );
+    add_action( 'enqueue_block_editor_assets',  'Groundhogg\Blocks\Gutenberg\enqueue_block_editor_assets' );
 
-    function wpgh_register_block()
+    function register_block()
     {
-        wp_register_style(
-            'groundhogg-form-styling-frontend',
-            plugins_url( '../assets/css/form.css', __FILE__ ),
-            array( 'wp-edit-blocks' )
-        );
-
+        // Enqueue the Groundhogg form style.
         register_block_type( 'groundhogg/forms', array(
             'attributes'      => array(
                 'formId'       => array(
@@ -32,18 +29,17 @@ if ( function_exists( 'register_block_type' ) ){
                 ),
             ),
             'editor_style'    => 'groundhogg-gutenberg-form-selector',
-            'render_callback' => 'wpgh_get_gutenberg_form_html' ,
+            'render_callback' => 'Groundhogg\Blocks\Gutenberg\get_gutenberg_form_html' ,
         ) );
     }
 }
-
 
 /**
  * Load Groundhogg Gutenberg block scripts.
  *
  * @since 1.4.8
  */
-function wpgh_enqueue_block_editor_assets() {
+function enqueue_block_editor_assets() {
 
     $i18n = array(
         'title'            => esc_html__( 'Groundhogg', 'groundhogg' ),
@@ -55,24 +51,16 @@ function wpgh_enqueue_block_editor_assets() {
         'show_description' => esc_html__( 'Show Description', 'groundhogg' ),
     );
 
-    $blockPath = '../assets/js/editor.blocks.js';
+    wp_enqueue_script( 'groundhogg-gutenberg-form-selector',plugin_dir_url( __FILE__ ) . 'js/block.min.js', array( 'wp-blocks', 'wp-i18n', 'wp-element' ,'wp-editor', 'wp-components'  ),GROUNDHOGG_VERSION );
+    wp_enqueue_style('groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION);
 
-    wp_enqueue_script(
-        'groundhogg-gutenberg-form-selector',
-        plugins_url( $blockPath, __FILE__ ),
-        array( 'wp-blocks', 'wp-i18n', 'wp-element' ,'wp-editor', 'wp-components'  ),
-        filemtime( plugin_dir_path( __FILE__ ) . $blockPath )
-    );
-
-    $forms = WPGH()->steps->get_steps( array(
-        'step_type' => 'form_fill'
-    ) );
+    $forms = get_db( 'steps' )->query( [ 'step_type' => 'form_fill' ] );
 
     wp_localize_script(
         'groundhogg-gutenberg-form-selector',
         'groundhogg_gutenberg_form_selector',
         array(
-            'logo_url' =>   plugins_url('../assets/images/phil-340x340.png',__FILE__),
+            'logo_url' => GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png',
             'forms'    => ! empty( $forms ) ? $forms : array(),
             'i18n'     => $i18n,
         )
@@ -88,7 +76,7 @@ function wpgh_enqueue_block_editor_assets() {
  *
  * @return string
  */
-function wpgh_get_gutenberg_form_html( $attr ) {
+function get_gutenberg_form_html( $attr ) {
 
     $id = ! empty( $attr['formId'] ) ? absint( $attr['formId'] ) : 0;
 

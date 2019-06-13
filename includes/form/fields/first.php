@@ -20,8 +20,8 @@ class First extends Input
             'id'            => 'first_name',
             'class'         => 'gh-first-name',
             'value'         => '',
-            'placeholder'   => '',
-            'attributes'    => 'pattern="^[\w\pL\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$"',
+            'placeholder'   => 'John',
+            'pattern'       => '^[\w\pL\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$',
             'title'         => _x( 'Do not include numbers or special characters.', 'form_default', 'groundhogg' ),
             'required'      => false,
         ];

@@ -391,6 +391,10 @@ function array_to_atts( $atts )
 	$tag = '';
 	foreach ($atts as $key => $value) {
 
+	    if ( empty( $value ) ){
+	        continue;
+        }
+
 		if ( $key === 'style' && is_array( $value ) ){
 			$value = array_to_css( $value );
 		}
@@ -1610,7 +1614,7 @@ if ( ! function_exists( 'get_key_from_column_label' ) ):
  */
 function get_key_from_column_label( $column )
 {
-    return sanitize_key( str_replace( ' ', '_', $column ) );
+    return words_to_key( $column );
 }
 
 endif;

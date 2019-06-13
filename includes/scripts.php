@@ -31,10 +31,13 @@ class Scripts
         wp_register_script('manage-preferences', GROUNDHOGG_ASSETS_URL . 'js/frontend/preferences' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
         wp_register_script('fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
 
+        // Integrations
+        wp_register_script( 'groundhogg-elementor-integration', GROUNDHOGG_URL . 'integrations/elementor' . $IS_MINIFIED .'.js', [], GROUNDHOGG_VERSION, true );
+
         if (!Plugin::$instance->settings->is_option_enabled('disable_api')) {
             wp_localize_script('groundhogg-frontend', 'Groundhogg', array(
-                'page_view_endpoint' => site_url('wp-json/gh/v3/tracking/page-view/'),
-                'form_impression_endpoint' => site_url('wp-json/gh/v3/tracking/form-impression/'),
+                'page_view_endpoint' => rest_url( 'gh/v3/tracking/page-view/'),
+                'form_impression_endpoint' => rest_url( 'gh/v3/tracking/form-impression/'),
                 '_wpnonce' => wp_create_nonce('wp_rest'),
                 '_ghnonce' => wp_create_nonce('groundhogg_frontend')
             ));
@@ -74,9 +77,12 @@ class Scripts
     {
         // Whether to include minified files or not.
         $IS_MINIFIED = $this->is_script_debug_enabled() ? '' : '.min';
+        wp_register_script( 'groundhogg-elementor-integration', GROUNDHOGG_URL . 'integrations/elementor' . $IS_MINIFIED .'.js', [], GROUNDHOGG_VERSION, true );
 
         // Select 2
-        wp_register_script('select2', GROUNDHOGG_ASSETS_URL . 'lib/select2/js/select2.full' . $IS_MINIFIED . '.js', ['jquery']);
+        wp_register_script('select2', GROUNDHOGG_ASSETS_URL . 'lib/select2/js/select2.full' . $IS_MINIFIED . '.js', ['jquery'] );
+
+        // Integrations
 
         // Beautify JS
         wp_register_script('beautify-js', GROUNDHOGG_ASSETS_URL . 'lib/js-beautify/beautify.min.js');
@@ -128,10 +134,10 @@ class Scripts
         wp_enqueue_script( 'groundhogg-admin-functions' );
 
         wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [
-            'tags'      => site_url('wp-json/gh/v3/tags?select2=true'),
-            'emails'    => site_url('wp-json/gh/v3/emails?select2=true&status[]=ready&status[]=draft'),
-            'sms'       => site_url('wp-json/gh/v3/sms?select2=true'),
-            'contacts'  => site_url('wp-json/gh/v3/contacts?select2=true'),
+            'tags'      => rest_url('gh/v3/tags?select2=true'),
+            'emails'    => rest_url('gh/v3/emails?select2=true&status[]=ready&status[]=draft'),
+            'sms'       => rest_url('gh/v3/sms?select2=true'),
+            'contacts'  => rest_url('gh/v3/contacts?select2=true'),
         ]  );
 
         wp_localize_script( 'groundhogg-admin', 'groundhogg_nonces', [

@@ -3,6 +3,7 @@ namespace Groundhogg\Form\Fields;
 
 use Groundhogg\Form\Form;
 use function Groundhogg\get_db;
+use function Groundhogg\html;
 use Groundhogg\Plugin;
 use function Groundhogg\words_to_key;
 
@@ -24,8 +25,6 @@ abstract class Input extends Field
     public static function save_config( $form )
     {
         $config = self::$configurations[ $form->get_id() ];
-
-//        var_dump( $config );
 
         get_db( 'stepmeta' )->update_meta( $form->get_id(), 'config', $config );
     }
@@ -197,6 +196,18 @@ abstract class Input extends Field
         ];
     }
 
+    protected function parse_atts( $atts = [] )
+    {
+        $parsed = [];
+        foreach ( $atts as $att => $val ){
+            if ( ! empty( $val ) ){
+                $parsed[ $att ] = $val;
+            }
+        }
+
+        return $parsed;
+    }
+
     /**
      * Render the field in HTML
      *
@@ -204,18 +215,28 @@ abstract class Input extends Field
      */
     public function render()
     {
-        return sprintf(
-            '<label class="gh-input-label">%1$s <input type="%2$s" name="%3$s" id="%4$s" class="gh-input %5$s" value="%6$s" placeholder="%7$s" title="%8$s" %9$s %10$s></label>',
+
+        $atts = [
+            'type'  => $this->get_type(),
+            'name'  => $this->get_name(),
+            'id'    => $this->get_id(),
+            'class' => $this->get_classes() . ' gh-input',
+            'value' => $this->get_value(),
+            'placeholder' => $this->get_placeholder(),
+            'title' => $this->get_title(),
+            'required' => $this->is_required(),
+            'pattern' => $this->get_att( 'pattern' )
+        ];
+
+        return html()->wrap([
             $this->get_label(),
-            $this->get_type(),
-            $this->get_name(),
-            $this->get_id(),
-            $this->get_classes(),
-            $this->get_value(),
-            $this->get_placeholder(),
-            $this->get_title(),
-            $this->get_attributes(),
-            $this->is_required() ? 'required' : ''
+            "&nbsp;",
+            html()->input( $atts )
+        ],
+        'label',
+        [
+            'class' => 'gh-input-label'
+        ]
         );
     }
 }

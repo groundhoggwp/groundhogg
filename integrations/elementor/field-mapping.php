@@ -1,8 +1,10 @@
 <?php
-namespace ElementorPro\Modules\Forms\Controls;
+namespace Groundhogg\Integrations\Elementor;
 
-use Elementor\Control_Repeater;
 use Elementor\Controls_Manager;
+use ElementorPro\Modules\Forms\Controls\Fields_Map;
+use function Groundhogg\get_mappable_fields;
+use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -19,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *   remote_required
  *   local_id
  */
-class Gh_Fields_Map extends Fields_Map {
+class Field_Mapping extends Fields_Map {
 
 	const CONTROL_TYPE = 'gh_fields_map';
 
@@ -45,11 +47,11 @@ class Gh_Fields_Map extends Fields_Map {
 
 	public function enqueue()
     {
-        $IS_MINIFIED = wpgh_is_option_enabled( 'gh_script_debug' ) ? '' : '.min' ;
 
-        wp_enqueue_script( 'groundhogg-elementor', plugin_dir_url( __FILE__ ) . 'elementor' . $IS_MINIFIED .'.js', [], WPGH()->version, true );
-
-        $mappable_fields = wpgh_get_mappable_fields();
+// Whether to include minified files or not.
+        $IS_MINIFIED = Plugin::$instance->scripts->is_script_debug_enabled() ? '' : '.min';
+        wp_enqueue_script( 'groundhogg-elementor-integration', plugin_dir_url(__FILE__ ) . '/elementor' . $IS_MINIFIED .'.js', [], GROUNDHOGG_VERSION, true );
+        $mappable_fields = get_mappable_fields();
         $fields = [];
 
         foreach ( $mappable_fields as $field_id => $field_label ){
@@ -61,7 +63,7 @@ class Gh_Fields_Map extends Fields_Map {
             ];
         }
 
-        wp_localize_script( 'groundhogg-elementor', 'ghMappableFields', [
+        wp_localize_script( 'groundhogg-elementor-integration', 'ghMappableFields', [
             'fields' => $fields
         ] );
     }
