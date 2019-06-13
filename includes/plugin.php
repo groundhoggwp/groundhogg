@@ -7,7 +7,7 @@ use Groundhogg\Admin\Admin_Menu;
 use Groundhogg\Dropins\Test_Extension;
 use Groundhogg\Dropins\Test_Extension_2;
 use Groundhogg\Form\Submission_Handler;
-use Groundhogg\Integrations\Integrations;
+use Groundhogg\Integrations\Integrations_Manager;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Reporting\Reporting;
 use Groundhogg\Steps\Manager as Step_Manager;
@@ -321,7 +321,7 @@ class Plugin {
         $this->shortcodes = new Shortcodes();
         $this->submission_handler = new Submission_Handler();
 
-        new Integrations();
+        new Integrations_Manager();
         new Blocks\Blocks();
     }
 

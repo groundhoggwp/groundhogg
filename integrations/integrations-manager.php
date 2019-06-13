@@ -5,7 +5,7 @@ use Groundhogg\Integrations\Elementor\Elementor_Integration;
 use Groundhogg\Integrations\Elementor\Elementor_Integration_V2;
 use Groundhogg\Integrations\Elementor\Field_Mapping;
 
-class Integrations
+class Integrations_Manager
 {
 
     public function __construct()

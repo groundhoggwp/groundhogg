@@ -681,9 +681,8 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
     // Set Content-Type and charset
     // If we don't have a content-type from the input headers
-    // Auto set HTML because AWS doesn't like plain text.
-    if ( ! isset( $content_type ) ) {
-        $content_type = 'text/html';
+    if ( ! isset( $content_type ) || empty( $content_type ) ) {
+        $content_type = 'text/plain';
     }
 
     /**
@@ -702,7 +701,6 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     // GHSS can only send HTML emails apparently. So convert all emails to HTML
     if ( 'text/html' == $content_type ) {
         $phpmailer->isHTML( true );
-        $message = apply_filters( 'the_content', $message );
     }
 
     // Set mail's subject and body
@@ -757,12 +755,12 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     // Hard set X-Mailer cuz we taking credit for this.
     $phpmailer->XMailer = sprintf( 'Groundhogg %s (https://www.groundhogg.io)', GROUNDHOGG_VERSION );
 
+    if ( $content_type === 'text/html' &&  empty( $phpmailer->AltBody ) ){
+        $phpmailer->AltBody = wp_strip_all_tags( $message );
+    }
+
     // Send!
     try {
-
-        if ( empty( $phpmailer->AltBody ) ){
-            $phpmailer->AltBody = wp_strip_all_tags( $message );
-        }
 
         return $phpmailer->send();
 
@@ -792,6 +790,99 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     }
 }
 
+/**
+ * handle a wp_mail_failed event.
+ *
+ * @param $error WP_Error
+ */
+function listen_for_complaint_and_bounce_emails( $error )
+{
+    $data = (array) $error->get_error_data();
+
+    if ( ! isset_not_empty( $data, 'orig_error_data' ) ){
+        return;
+    }
+
+    $code = $data[ 'orig_error_code' ];
+    $data = $data[ 'orig_error_data' ];
+
+    if ( $code === 'invalid_recipients' ){
+
+        /* handle bounces */
+        $bounces = isset_not_empty( $data, 'bounces' )? $data[ 'bounces' ] : [];
+
+        if ( ! empty( $bounces ) ){
+            foreach ( $bounces as $email ){
+                if ( $contact = ( $email ) ){
+                    $contact->change_marketing_preference( Preferences::HARD_BOUNCE );
+                }
+            }
+
+        }
+
+        $complaints = isset_not_empty( $data, 'complaints' )? $data[ 'complaints' ] : [];
+
+        if ( ! empty( $complaints ) ){
+            foreach ( $complaints as $email ){
+                if ( $contact = get_contactdata( $email ) ){
+                    $contact->change_marketing_preference( Preferences::COMPLAINED );
+                }
+            }
+        }
+    }
+}
+
+add_action( 'wp_mail_failed', '\Groundhogg\listen_for_complaint_and_bounce_emails' );
+
+/**
+ * Override the default from email
+ *
+ * @param $original_email_address
+ * @return mixed
+ */
+function sender_email( $original_email_address ) {
+
+    // Get the site domain and get rid of www.
+    $sitename = strtolower( $_SERVER['SERVER_NAME'] );
+    if ( substr( $sitename, 0, 4 ) == 'www.' ) {
+        $sitename = substr( $sitename, 4 );
+    }
+
+    $from_email = 'wordpress@' . $sitename;
+
+    if ( $original_email_address === $from_email ){
+        $new_email_address = Plugin::$instance->settings->get_option( 'override_from_email', $original_email_address );
+
+        if ( ! empty( $new_email_address ) ){
+            $original_email_address = $new_email_address;
+        }
+    }
+
+    return $original_email_address;
+}
+
+/**
+ * Override the default from name
+ *
+ * @param $original_email_from
+ * @return mixed
+ */
+function sender_name( $original_email_from ) {
+
+    if( $original_email_from === 'WordPress' ){
+        $new_email_from = Plugin::$instance->settings->get_option( 'override_from_name', $original_email_from );
+
+        if ( ! empty( $new_email_from ) ){
+            $original_email_from = $new_email_from;
+        }
+    }
+
+    return $original_email_from;
+}
+
+// Hooking up our functions to WordPress filters
+add_filter( 'wp_mail_from', '\Groundhogg\sender_email' );
+add_filter( 'wp_mail_from_name', '\Groundhogg\sender_name' );
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons
@@ -819,8 +910,6 @@ function remove_builder_toolbar( $content )
 }
 
 add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
-//add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_builder_toolbar' );
-
 
 /**
  * Remove the content editable attribute from the email's html
@@ -834,7 +923,6 @@ function remove_content_editable( $content )
 }
 
 add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
-//add_filter( 'wpgh_sanitize_email_content', 'wpgh_remove_content_editable' );
 
 /**
  * Remove script tags from the email content
@@ -847,20 +935,7 @@ function strip_script_tags( $content )
     return preg_replace( '/<script\b[^>]*>(.*?)<\/script>/', '', $content );
 }
 
-//add_filter( 'wpgh_sanitize_email_content', 'strip_script_tags' );
-
-/**
- * Remove form tags from emails.
- *
- * @param $content string the email content
- * @return string, sanitized email content
- */
-function wpgh_strip_form_tags( $content )
-{
-    return preg_replace( '/<form\b[^>]*>(.*?)<\/form>/', '', $content );
-}
-
-//add_filter( 'wpgh_sanitize_email_content', 'wpgh_strip_form_tags' );
+add_filter( 'groundhogg/email/the_content', '\Groundhogg\strip_script_tags' );
 
 /**
  * Add a link to the FB group in the admin footer.
@@ -1138,100 +1213,6 @@ function fix_html_pw_reset_link($message, $key, $user_login, $user_data )    {
 add_filter( 'retrieve_password_message', '\Groundhogg\fix_html_pw_reset_link', 10, 4 );
 
 /**
- * handle a wp_mail_failed event.
- *
- * @param $error WP_Error
- */
-function listen_for_complaint_and_bounce_emails( $error )
-{
-    $data = (array) $error->get_error_data();
-
-    if ( ! isset_not_empty( $data, 'orig_error_data' ) ){
-        return;
-    }
-
-    $code = $data[ 'orig_error_code' ];
-    $data = $data[ 'orig_error_data' ];
-
-    if ( $code === 'invalid_recipients' ){
-
-        /* handle bounces */
-        $bounces = isset_not_empty( $data, 'bounces' )? $data[ 'bounces' ] : [];
-
-        if ( ! empty( $bounces ) ){
-            foreach ( $bounces as $email ){
-                if ( $contact = ( $email ) ){
-                    $contact->change_marketing_preference( Preferences::HARD_BOUNCE );
-                }
-            }
-
-        }
-
-        $complaints = isset_not_empty( $data, 'complaints' )? $data[ 'complaints' ] : [];
-
-        if ( ! empty( $complaints ) ){
-            foreach ( $complaints as $email ){
-                if ( $contact = get_contactdata( $email ) ){
-                    $contact->change_marketing_preference( Preferences::COMPLAINED );
-                }
-            }
-        }
-    }
-}
-
-add_action( 'wp_mail_failed', '\Groundhogg\listen_for_complaint_and_bounce_emails' );
-
-/**
- * Override the default from email
- *
- * @param $original_email_address
- * @return mixed
- */
-function sender_email( $original_email_address ) {
-
-    // Get the site domain and get rid of www.
-    $sitename = strtolower( $_SERVER['SERVER_NAME'] );
-    if ( substr( $sitename, 0, 4 ) == 'www.' ) {
-        $sitename = substr( $sitename, 4 );
-    }
-
-    $from_email = 'wordpress@' . $sitename;
-
-    if ( $original_email_address === $from_email ){
-        $new_email_address = Plugin::$instance->settings->get_option( 'override_from_email', $original_email_address );
-
-        if ( ! empty( $new_email_address ) ){
-            $original_email_address = $new_email_address;
-        }
-    }
-
-    return $original_email_address;
-}
-
-/**
- * Override the default from name
- *
- * @param $original_email_from
- * @return mixed
- */
-function sender_name( $original_email_from ) {
-
-    if( $original_email_from === 'WordPress' ){
-        $new_email_from = Plugin::$instance->settings->get_option( 'override_from_name', $original_email_from );
-
-        if ( ! empty( $new_email_from ) ){
-            $original_email_from = $new_email_from;
-        }
-    }
-
-    return $original_email_from;
-}
-
-// Hooking up our functions to WordPress filters
-add_filter( 'wp_mail_from', '\Groundhogg\sender_email' );
-add_filter( 'wp_mail_from_name', '\Groundhogg\sender_name' );
-
-/**
  * AWS Doesn't like special chars in the from name so we'll strip them out here.
  *
  * @param $name
@@ -1337,7 +1318,7 @@ if ( get_option( 'gh_send_notifications_on_event_failure' ) ) {
     function send_event_failure_notification($event)
     {
         $subject = sprintf("Event (%s) failed for %s on %s", $event->get_step_title(), $event->get_contact()->get_email(), esc_html( get_bloginfo( 'title' ) ) );
-        $message = sprintf("This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->contact->full_name, $event->contact->email);
+        $message = sprintf("This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->get_contact()->get_full_name(), $event->get_contact()->get_email());
         $message .= sprintf("\nFailure Reason: %s", $event->get_failure_reason());
         $message .= sprintf("\nManage Failed Events: %s", admin_url('admin.php?page=gh_events&view=status&status=failed'));
         $to = Plugin::$instance->settings->get_option('event_failure_notification_email', get_option('admin_email') );
@@ -1694,9 +1675,7 @@ function get_store_products( $args = [] )
  */
 function show_groundhogg_branding()
 {
-    // TODO
-
-    return true;
+    return apply_filters( 'groundhogg/show_branding', true );
 }
 
 /**
