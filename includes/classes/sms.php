@@ -78,7 +78,7 @@ Class SMS extends Base_Object
      */
     public function get_merged_message()
     {
-        return Plugin::$instance->replacements->process( wp_strip_all_tags( wp_unslash( $this->get_message() ) ), $this->contact->ID );
+        return do_replacements( sanitize_textarea_field( $this->get_message() ), $this->contact->get_id() );
     }
 
     /**
