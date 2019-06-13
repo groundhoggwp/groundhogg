@@ -132,12 +132,12 @@ class Funnel_Breakdown extends Category_Graph
 
         $rows = [];
 
-        $total_complete = array_sum( wp_list_pluck( $complete, 1 ) );
+        $total_complete = max( wp_list_pluck( $complete, 1 ) );
 
         foreach ( $complete as $i => $set ){
             $rows[] = [
                 $html->wrap( $set[0], 'a', [ 'href' => admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d', $this->get_funnel_id() ) ) ] ),
-                $html->wrap( $set[1] . ' (' . percentage( $set[1], $total_complete ) . '%)' , 'span', [ 'class' => 'number-total' ] ),
+                $html->wrap( $set[1] . ' (' . percentage( $total_complete, $set[1] ) . '%)' , 'span', [ 'class' => 'number-total' ] ),
                 $html->wrap( $waiting[$i][1], 'span', [ 'class' => 'number-total' ] ),
             ];
         }
