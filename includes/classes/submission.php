@@ -70,6 +70,11 @@ class Submission extends Base_Object_With_Meta
         return $this->get_step_id();
     }
 
+    public function get_date_created()
+    {
+        return date_i18n( get_option( 'date_format' ), strtotime( $this->date_created ) );
+    }
+
     public function get_contact_id()
     {
         return absint( $this->contact_id );
