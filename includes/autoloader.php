@@ -82,6 +82,7 @@ class Autoloader {
         'Form\Fields\Textarea'  => 'includes/form/fields/textarea.php',
         'Form\Fields\First'  => 'includes/form/fields/first.php',
         'Form\Fields\Last'  => 'includes/form/fields/last.php',
+        ''
     ];
 
     /**

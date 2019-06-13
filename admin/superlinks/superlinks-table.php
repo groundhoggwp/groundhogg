@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Superlinks;
 
+use function Groundhogg\get_request_query;
 use Groundhogg\Superlink;
 use Groundhogg\Plugin;
 use VisualComposer\Modules\Settings\Traits\SubMenu;
@@ -208,15 +209,9 @@ class Superlinks_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $args = [];
+        $query = get_request_query();
 
-        if ( isset( $_REQUEST[ 's' ] ) ){
-            $args[ 'search' ] = $_REQUEST[ 's' ];
-        }
-
-        $args = wp_unslash( $args );
-        $data = Plugin::instance()->dbs->get_db('superlinks')->query($args);
-
+        $data = Plugin::instance()->dbs->get_db('superlinks' )->query($query);
 
         /*
          * Sort the data

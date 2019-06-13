@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
 use function Groundhogg\get_db;
+use function Groundhogg\get_request_query;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use \WP_List_Table;
@@ -308,18 +309,7 @@ class Funnels_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $query = $_GET;
-
-        unset( $query[ 'page' ] );
-        unset( $query[ 'ids' ] );
-
-        if ( isset_not_empty( $_GET, 's' ) ){
-            $query[ 'search' ] = get_request_var( 's' );
-        }
-
-        if ( empty( $query ) ){
-            $query[ 'status' ] = 'active';
-        }
+        $query = get_request_query( ['status' => 'active'] );
 
         $data = get_db( 'funnels' )->query( $query );
 

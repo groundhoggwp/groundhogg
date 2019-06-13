@@ -48,7 +48,8 @@ class Tools_Page extends Tabbed_Admin_Page
 
     protected function add_additional_actions(){
         add_action( "groundhogg/admin/{$this->get_slug()}", [ $this, 'delete_warning' ] );
-        add_action( "init", [ $this, 'init_bulk_jobs' ] );
+
+        $this->init_bulk_jobs();
     }
 
     public function init_bulk_jobs()
@@ -111,7 +112,7 @@ class Tools_Page extends Tabbed_Admin_Page
 
         if ( $this->get_current_tab() === 'export' ){
             $actions[] = [
-                'link'      => $this->exporter->get_start_url(), //todo enable
+                'link'      => Plugin::$instance->bulk_jobs->export_contacts->get_start_url(), //todo enable
                 'action'    => __( 'Export All Contacts' ),
             ];
         }

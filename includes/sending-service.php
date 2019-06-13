@@ -61,7 +61,7 @@ class Sending_Service
      */
     public function has_api_token()
     {
-        return Plugin::$instance->settings->is_option_enabled( 'email_token' );
+        return (bool) $this->get_api_token();
     }
 
     /**
@@ -73,16 +73,6 @@ class Sending_Service
     }
 
     /**
-     * Get AWS DNS Records to add to a domain
-     *
-     * @return array|false
-     */
-    public function get_dns_records()
-    {
-        return Plugin::$instance->settings->get_option( 'email_api_dns_records' );
-    }
-
-    /**
      * Has Aws Records
      *
      * @return bool
@@ -90,6 +80,16 @@ class Sending_Service
     public function has_dns_records()
     {
         return (bool) $this->get_dns_records();
+    }
+
+    /**
+     * Get AWS DNS Records to add to a domain
+     *
+     * @return array|false
+     */
+    public function get_dns_records()
+    {
+        return Plugin::$instance->settings->get_option( 'email_api_dns_records' );
     }
 
     /**
@@ -232,7 +232,7 @@ class Sending_Service
 
         add_action( 'wp_mail_failed', [ $this, 'test_email_failed' ] );
 
-        $result = gh_ss_mail( wp_get_current_user()->user_email, '[TEST] from the Groundhogg Sending Service', 'This is a test message to ensure the Groundhogg Sending Service is working.' );
+        $result = gh_ss_mail( wp_get_current_user()->user_email, '[TEST] from the Groundhogg Sending Service', "This is a test message to ensure the Groundhogg Sending Service is working.\n\nLooks like you're ready to go!\n\nEnjoy!\n@ The Groundhogg Team" );
 
         remove_action( 'wp_mail_failed', [ $this, 'test_email_failed' ] );
 
@@ -246,7 +246,9 @@ class Sending_Service
      *
      * @param $error WP_Error
      */
-    public function test_email_failed( $error ){
+    public function test_email_failed( $error )
+    {
+        $error->add_data( $this->get_api_token(), 'api_token' );
         Plugin::$instance->notices->add( $error );
     }
 
@@ -504,7 +506,7 @@ class Sending_Service
         /* Set Default Headers */
         if ( empty( $headers ) ){
             $headers = [
-                'Sender-Token'  => $this->get_api_token(),
+                'Sender-Token'  => md5( $this->get_api_token() ),
                 'Sender-Domain' => site_url(),
                 'Content-Type'  => sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) )
             ];

@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Broadcast;
 use Groundhogg\Event;
+use function Groundhogg\get_request_query;
 use Groundhogg\Plugin;
 use function Groundhogg\scheduled_time;
 use \WP_List_Table;
@@ -411,11 +412,9 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$query = $_GET;
+        $query = get_request_query();
 
-		unset( $query[ 'page' ] );
-
-		if ( empty( $query ) ){
+        if ( empty( $query ) ){
             $query = [
                 'status' => [
                     'sent',

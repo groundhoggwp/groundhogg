@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\SMS;
 
+use function Groundhogg\get_request_query;
 use Groundhogg\SMS;
 use Groundhogg\Plugin;
 use WP_List_Table;
@@ -157,12 +158,9 @@ class SMS_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $args = [];
-        if ( isset( $_REQUEST[ 's' ] ) ){
-            $args[ 'search' ] = $_REQUEST[ 's' ];
-        }
-        $args = wp_unslash( $args );
-        $data = Plugin::$instance->dbs->get_db( 'sms' )->query( $args );
+        $query = get_request_query();
+
+        $data = Plugin::$instance->dbs->get_db( 'sms' )->query( $query );
 
         /*
          * Sort the data
