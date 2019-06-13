@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Bulk_Jobs;
 
+use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
 
 /**
@@ -25,11 +26,11 @@ class Manager
 
     public function init_jobs()
     {
-        $this->broadcast_scheduler = new Broadcast_Scheduler();
-        $this->delete_contacts = new Delete_Contacts();
-        $this->export_contacts = new Export_Contacts();
-        $this->import_contacts = new Import_Contacts();
-        $this->sync_contacts = new Sync_Contacts();
+        $this->broadcast_scheduler  = new Broadcast_Scheduler();
+        $this->delete_contacts      = new Delete_Contacts();
+        $this->export_contacts      = new Export_Contacts();
+        $this->import_contacts      = new Import_Contacts();
+        $this->sync_contacts        = new Sync_Contacts();
 
         do_action( 'groundhogg/bulk_jobs/init', $this );
     }
@@ -43,11 +44,7 @@ class Manager
      */
     public function __get( $key )
     {
-        if ( isset_not_empty( $this->jobs, $key ) ){
-            return $this->jobs[ $key ];
-        }
-
-        return false;
+        return get_array_var( $this->jobs, $key, false );
     }
 
     /**

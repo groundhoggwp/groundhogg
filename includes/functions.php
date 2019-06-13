@@ -1356,13 +1356,23 @@ function get_items_from_csv($file_path='' )
     }
 
     $header = NULL;
+    $header_count = 0;
     $data = array();
     if (($handle = fopen($file_path, 'r')) !== FALSE) {
         while (($row = fgetcsv($handle, 0, ',')) !== FALSE) {
-            if (!$header)
+            if (!$header){
                 $header = $row;
-            else
+                $header_count = count( $header );
+            } else {
+
+                if ( count( $row ) > $header_count ){
+                    $row = array_slice( $row, 0, $header_count );
+                } else if ( count( $row ) < $header_count ){
+                    $row = array_pad( $row, $header_count - count( $row ) + 1, null );
+                }
+
                 $data[] = array_combine($header, $row);
+            }
         }
         fclose($handle);
     }
