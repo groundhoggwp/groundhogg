@@ -74,6 +74,17 @@ function get_db( $name ){
 }
 
 /**
+ * Wrapper
+ *
+ * @param string $option
+ * @return bool
+ */
+function is_option_enabled( $option='' )
+{
+    return Plugin::$instance->settings->is_option_enabled( $option );
+}
+
+/**
  * Shorthand;
  *
  * @return HTML
