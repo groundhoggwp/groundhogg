@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Event;
 use function Groundhogg\get_db;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
@@ -282,7 +283,6 @@ class Events_Table extends WP_List_Table {
 
     /**
      * Prepares the list of items for displaying.
-     * @global wpdb $wpdb
      * @uses $this->_column_headers
      * @uses $this->items
      * @uses $this->get_columns()
@@ -300,18 +300,7 @@ class Events_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $query = $_GET;
-
-        unset( $query[ 'page' ] );
-        unset( $query[ 'ids' ] );
-
-        if ( isset_not_empty( $_GET, 's' ) ){
-            $query[ 'search' ] = get_request_var( 's' );
-        }
-
-        if ( empty( $query ) ){
-            $query[ 'status' ] = Event::WAITING;
-        }
+        $query = get_request_query( [ 'status' => Event::WAITING ] );
 
         $data = get_db( 'events' )->query( $query );
 

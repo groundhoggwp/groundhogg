@@ -128,6 +128,45 @@ function get_request_var( $key='', $default=false, $post_only=false )
 }
 
 /**
+ * Get a db query from the URL.
+ *
+ * @param array $default a default query if the given is empty
+ * @param array $force for the query to include the given
+ * @return array|string
+ */
+function get_request_query( $default = [], $force=[] )
+{
+   $query = $_GET;
+
+   $ignore = apply_filters( 'groundhogg/get_request_query/ignore', [
+       'page',
+       'ids',
+       'action',
+       '_wpnonce'
+   ] );
+
+   foreach ( $ignore  as $key ){
+       unset( $query[ $key ] );
+   }
+
+   foreach ( $query as $key => $value ){
+       $query[ $key ] = sanitize_text_field( urldecode( $value ) );
+   }
+
+    if ( isset_not_empty( $_GET, 's' ) ){
+        $query[ 'search' ] = get_request_var( 's' );
+    }
+
+    $query = array_merge( $query, $force );
+
+   if ( empty( $query ) ){
+       return $default;
+   }
+
+   return wp_unslash( $query );
+}
+
+/**
  * Ensures an array
  *
  * @param $array

@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Email;
+use function Groundhogg\get_request_query;
 use Groundhogg\Plugin;
 use WP_List_Table;
 
@@ -337,15 +338,7 @@ class Emails_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$query = wp_unslash( $_GET );
-		unset( $query[ 'page' ] );
-		unset( $query[ 'ids' ] );
-
-		if ( empty( $query ) ){
-		    $query = [
-                'status' => [ 'draft', 'ready' ]
-            ];
-        }
+        $query = get_request_query( [ 'status' => [ 'draft', 'ready' ] ] );
 
         $data = Plugin::$instance->dbs->get_db('emails' )->query( $query ); //todo check
 

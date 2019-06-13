@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Contacts\Tables;
 
 use function Groundhogg\current_user_is;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Preferences;
@@ -278,24 +279,9 @@ class Contacts_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $query = array();
-
         $c_query = new Contact_Query();
 
-        $query = $_GET;
-
-        unset( $query[ 'page' ] );
-
-        if ( isset_not_empty( $_GET, 's' ) ){
-            $query[ 'search' ] = get_request_var( 's' );
-        }
-
-        if ( empty( $query ) ){
-            $query[ 'optin_status' ] = array(
-                Preferences::CONFIRMED,
-                Preferences::UNCONFIRMED
-            );
-        }
+        $query = get_request_query( [ 'optin_status' => [ Preferences::CONFIRMED, Preferences::UNCONFIRMED ] ] );
 
         // Sales person can only see their own contacts...
         if ( current_user_is( 'sales_manager' ) ){
@@ -303,6 +289,7 @@ class Contacts_Table extends WP_List_Table {
         }
 
         $this->query = $query;
+
         $data = $c_query->query( $query );
 
         set_transient( 'groundhogg_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );

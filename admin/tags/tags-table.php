@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Tags;
 
+use function Groundhogg\get_request_query;
 use Groundhogg\Tag;
 use Groundhogg\Plugin;
 use WP_List_Table;
@@ -175,14 +176,8 @@ class Tags_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $args = [];
-
-        if ( isset( $_REQUEST[ 's' ] ) ){
-            $args[ 'search' ] = $_REQUEST[ 's' ];
-        }
-
-        $args = wp_unslash( $args );
-        $data = Plugin::$instance->dbs->get_db( 'tags' )->query( $args );
+        $query = get_request_query();
+        $data = Plugin::$instance->dbs->get_db( 'tags' )->query( $query );
 
         usort( $data, array( $this, 'usort_reorder' ) );
 
