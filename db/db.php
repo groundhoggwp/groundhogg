@@ -68,7 +68,8 @@ abstract class DB {
      * @access  public
      * @since   2.1
      */
-    public function __construct(){
+    public function __construct()
+    {
         $this->db_suffix   = $this->get_db_suffix();
         $this->table_name  = $this->get_table_name();
 
@@ -76,10 +77,12 @@ abstract class DB {
         $this->version     = $this->get_db_version();
         $this->charset     = $this->get_charset_collate();
 
-        add_action( 'plugins_loaded',           [ $this, 'register_table' ] );
-        add_action( 'groundhogg/activating',    [ $this, 'register_table' ] );
-
         $this->add_additional_actions();
+
+        /**
+         * Register the table...
+         */
+        $this->register_table();
     }
 
     /**
