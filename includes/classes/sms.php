@@ -90,7 +90,7 @@ Class SMS extends Base_Object
     public function send( $contact_id_or_email, $event = null )
     {
 
-        $contact = $contact_id_or_email instanceof Contact ? $contact_id_or_email : Plugin::$instance->utils->get_contact( $contact_id_or_email );
+        $contact = $contact_id_or_email instanceof Contact ? $contact_id_or_email : get_contactdata( $contact_id_or_email );
 
         if ( ! $contact ){
             return new WP_Error('no_recipient', __( 'No valid recipient was provided.' ) );
@@ -144,7 +144,7 @@ Class SMS extends Base_Object
             return new WP_Error( 'invalid_country_code', __( 'A country code is required to send SMS.', 'groundhogg' ) );
         }
 
-        $message = sanitize_textarea_field( $this->get_merged_message() );
+        $message = $this->get_merged_message();
         $sender_name = sanitize_from_name( Plugin::$instance->settings->get_option( 'business_name', get_bloginfo( 'name' ) ) );
 
         $data = array(

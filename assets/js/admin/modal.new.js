@@ -10,6 +10,7 @@ var GroundhoggModal = {};
 
     $.extend( modal, {
 
+        is_open: false,
     	overlay: null,
 		window: null,
 		content: null,
@@ -20,6 +21,10 @@ var GroundhoggModal = {};
         defaults: {},
 
 		init: function ( title, href ) {
+
+            if ( this.is_open ){
+                this.close();
+            }
 
     	    var self=this;
 
@@ -109,6 +114,9 @@ var GroundhoggModal = {};
 		open: function(){
     		this.pullContent();
     		this.showPopUp();
+
+    		this.is_open = true;
+
             $(document).trigger( 'GroundhoggModalOpened' );
         },
 
@@ -176,6 +184,7 @@ var GroundhoggModal = {};
 
         reset: function()
         {
+            this.is_open = false;
             this.args = this.getDefaults();
             this.content.css( 'padding', '0 20px' );
         },

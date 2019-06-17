@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\SMS;
 use Groundhogg\Admin\Admin_Page;
+use function Groundhogg\get_contactdata;
 use Groundhogg\Plugin;
 use Groundhogg\SMS;
 use function  Groundhogg\isset_not_empty;
@@ -145,7 +146,9 @@ class SMS_Page extends Admin_Page
 
         if ( isset_not_empty( $_POST, 'save_and_test' ) ){
             $sms = Plugin::$instance->utils->get_sms( $id );
-            $contact = Plugin::$instance->utils->get_contact( get_current_user_id(), true );
+
+            $contact = get_contactdata( wp_get_current_user()->user_email );
+
             $result = $sms->send( $contact );
 
             if ( is_wp_error( $result ) ){

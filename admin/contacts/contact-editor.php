@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Contacts;
 
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_db;
 use function Groundhogg\get_form_list;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -11,6 +12,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
 use Groundhogg\Step;
+use Groundhogg\Submission;
 
 /**
  * Edit a contact record via the Admin
@@ -810,12 +812,52 @@ function contact_record_section_activity( $contact )
     <!-- EMAIL HISTORY -->
     <h2><?php _ex( 'Recent Email History', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px">
+        <p class="description"><?php _ex( 'This is where you can check if this contact is interacting with your emails.', 'contact_record', 'groundhogg' ); ?></p>
         <?php $table = new Tables\Contact_Activity_Table( );
         $table->prepare_items();
         $table->display(); ?>
-        <p class="description"><?php _ex( 'This is where you can check if this contact is interacting with your emails.', 'contact_record', 'groundhogg' ); ?></p>
     </div>
+    <!-- Form Submissions -->
+    <h2><?php _ex( 'Form Submissions', 'contact_record', 'groundhogg' ); ?></h2>
+    <div style="max-width: 800px">
+        <p class="description"><?php _ex( 'Any previous from submissions from this contact will show below as of version 2.0.', 'contact_record', 'groundhogg' ); ?></p>
+        <?php
 
+        $submission_ids = wp_parse_id_list( wp_list_pluck( get_db( 'submissions' )->query( [ 'contact_id' => $contact->get_id() ] ), 'ID' ) );
+
+        $rows = [];
+
+    foreach ( $submission_ids as $id ){
+
+        $submission = new Submission( $id );
+
+        $row = [];
+
+        $row[] = $submission->get_contact_id();
+        $row[] = $submission->get_date_created();
+        $row[] = html()->textarea( [
+            'cols' => 35,
+            'rows' => 5,
+            'onfocus' => "this.select()",
+            'readonly' => true,
+            'value' => wp_json_encode( $submission->get_meta(), JSON_PRETTY_PRINT ),
+        ] );
+
+        $rows[] = $row;
+    }
+
+    html()->list_table(
+        [],
+        [
+            __( 'Form ID' ),
+            __( 'Date Submitted' ),
+            __( 'Submission Data' ),
+        ],
+        $rows
+    );
+
+    ?>
+    </div>
     <?php
 }
 
