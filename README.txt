@@ -105,6 +105,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.11.8 =
+* FIXED comptibility bug with plugins which include forms on all admin pages.
+* FIXED Plaintext emails being sent out with missing line breaks when using the Groundhogg sending service.
+
 = 1.3.11.7 =
 * FIXED Listener for bounce errors when using GHSS not causing PHP notice on PHP < 7.1
 
