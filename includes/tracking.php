@@ -74,14 +74,14 @@ class Tracking
         // Actions which build the tracking cookie.
         add_action( 'wp_login', [ $this, 'wp_login' ], 10, 2 );
 
-        add_action( 'init', [ $this, 'deconstruct_tracking_cookie' ], 1 );
+        add_action( 'after_setup_theme', [ $this, 'deconstruct_tracking_cookie' ], 1 );
         add_action( 'init', [ $this, 'add_rewrite_rules' ] );
         add_action( 'init', [ $this, 'parse_utm' ] );
 
         add_filter( 'request', [ $this, 'parse_request' ] );
         add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
 
-        add_action( 'template_redirect', [ $this, 'fix_tracking_ssl' ] );
+//        add_action( 'template_redirect', [ $this, 'fix_tracking_ssl' ] );
         add_action( 'template_redirect', [ $this, 'template_redirect'] );
 
         add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 1 );
@@ -283,9 +283,11 @@ class Tracking
         $by_uid = false;
 
         // Override if the user is logged in.
-        if ( is_user_logged_in() ){
-            $id = get_current_user_id();
-            $by_uid = true;
+        if ( function_exists( 'is_user_logged_in' ) ){
+            if ( is_user_logged_in() ){
+                $id = get_current_user_id();
+                $by_uid = true;
+            }
         }
 
         return Plugin::$instance->utils->get_contact( $id, $by_uid );

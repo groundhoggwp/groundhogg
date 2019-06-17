@@ -264,12 +264,6 @@ class Plugin {
          * @since 1.0.0
          */
         do_action( 'groundhogg/init' );
-
-        /**
-         * Extensions should be loaded after the INIT above, but there is some stuff we need to initialize here.
-         */
-        do_action( 'groundhogg/init/after' );
-
     }
 
     /**
@@ -321,8 +315,8 @@ class Plugin {
         $this->shortcodes = new Shortcodes();
         $this->submission_handler = new Submission_Handler();
 
-        new Integrations_Manager();
-        new Blocks\Blocks();
+//        new Integrations_Manager();
+//        new Blocks\Blocks();
     }
 
     /**
