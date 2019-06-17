@@ -1763,7 +1763,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     // If we don't have a content-type from the input headers
     // Auto set HTML because AWS doesn't like plain text.
     if ( ! isset( $content_type ) ) {
-        $content_type = 'text/html';
+        $content_type = 'text/plain';
     }
 
     /**
@@ -1782,7 +1782,6 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     // GHSS can only send HTML emails apparently. So convert all emails to HTML
     if ( 'text/html' == $content_type ) {
         $phpmailer->isHTML( true );
-        $message = apply_filters( 'the_content', $message );
     }
 
     // Set mail's subject and body
@@ -1840,7 +1839,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     // Send!
     try {
 
-        if ( empty( $phpmailer->AltBody ) ){
+        if ( empty( $phpmailer->AltBody ) && $content_type === 'text/html' ){
             $phpmailer->AltBody = wp_strip_all_tags( $message );
         }
 

@@ -65,7 +65,7 @@ var wpghEmailEditor;
             this.makeDraggable();
 
             /* Activate Spinner */
-            $('form').on( 'submit', function( e ){
+            $('#email-form').on( 'submit', function( e ){
                 wpghEmailEditor.save( e );
             });
 
@@ -186,7 +186,7 @@ var wpghEmailEditor;
             $('.spinner').css('visibility','visible');
             this.prepareEmailHTML();
             $('#content').val( $('#email-inside').html() );
-            var fd = $('form').serialize();
+            var fd = $('#email-form').serialize();
             fd = fd +  '&action=gh_update_email';
 
             var ajaxCall = $.ajax({

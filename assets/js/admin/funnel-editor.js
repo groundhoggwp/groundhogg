@@ -31,7 +31,7 @@ var wpghFunnelEditor;
             } );
 
             /* Activate Spinner */
-            $('form').on('submit', function( e ){
+            $('#funnel-form').on('submit', function( e ){
                 e.preventDefault();
                 wpghFunnelEditor.save();
             });
@@ -132,7 +132,7 @@ var wpghFunnelEditor;
 
             $('.spinner').css('visibility','visible');
 
-            var fd = $('form').serialize();
+            var fd = $('#funnel-form').serialize();
 
             fd = fd +  '&action=gh_save_funnel_via_ajax';
 

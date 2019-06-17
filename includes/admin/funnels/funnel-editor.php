@@ -27,7 +27,7 @@ $funnel = WPGH()->funnels->get( $funnel_id );
 <script>
     document.title = jQuery( '#new-title' ).text() + document.title;
 </script>
-<form method="post">
+<form method="post" id="funnel-form">
     <?php wp_nonce_field(); ?>
     <?php $args = array(
         'type' => 'hidden',

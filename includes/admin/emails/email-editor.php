@@ -34,7 +34,7 @@ $blocks = apply_filters( 'wpgh_email_blocks', array() );
 <!-- /END TITLE -->
 
 
-<form method="post">
+<form method="post" id="email-form">
 
     <!-- Before-->
     <?php wp_nonce_field(); ?>
