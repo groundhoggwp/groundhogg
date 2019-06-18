@@ -105,6 +105,9 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 
 == Changelog ==
 
+= 1.3.11.9 =
+* ADD Terms & GDPR consent to field mapping API.
+
 = 1.3.11.8 =
 * FIXED comptibility bug with plugins which include forms on all admin pages.
 * FIXED Plaintext emails being sent out with missing line breaks when using the Groundhogg sending service.

@@ -2302,6 +2302,8 @@ function wpgh_get_mappable_fields( $extra=[] )
         'utm_medium'                => __( 'UTM Medium' ),
         'utm_term'                  => __( 'UTM Term' ),
         'utm_source'                => __( 'UTM Source' ),
+	    'gdpr_consent'              => __( 'GDPR Consent' ),
+	    'terms_agreement'           => __( 'Terms & Conditions Agreement' ),
         'notes'                     => __( 'Add To Notes' ),
         'tags'                      => __( 'Apply Value as Tag' ),
         'meta'                      => __( 'Add as Custom Meta' ),
@@ -2376,6 +2378,14 @@ function wpgh_generate_contact_with_map( $fields, $map )
             case 'utm_source':
                 $meta[ $field ] = sanitize_text_field( $value );
                 break;
+	        case 'gdpr_consent':
+	        	$meta[ 'gdpr_consent' ] = 'yes';
+	        	$meta[ 'gdpr_consent_date' ] = date_i18n( get_option( 'date_format' ) );
+	        	break;
+            case 'terms_agreement':
+	        	$meta[ 'terms_agreement' ] = 'yes';
+	        	$meta[ 'terms_agreementdate' ] = date_i18n( get_option( 'date_format' ) );
+	        	break;
             case 'country':
                 if ( strlen( $value ) !== 2 ){
                     $countries = wpgh_get_countries_list();
