@@ -317,6 +317,7 @@ class Plugin {
 
 //        new Integrations_Manager();
 //        new Blocks\Blocks();
+        new Reviews();
     }
 
     /**

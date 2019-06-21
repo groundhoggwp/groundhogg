@@ -224,7 +224,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
      *
      * @return string
      */
-    abstract protected function get_object_type();
+    protected function get_object_type(){
+        return $this->get_db()->get_object_type();
+    }
 
     /**
      * Update the object
