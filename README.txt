@@ -12,52 +12,81 @@ License URI: https://www.gnu.org/licenses/gpl.md
 Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
 
 == Description ==
-
 Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
 
-Groundhogg provides a suite of digital marketing and sales tools that allow you to create and implement high converting funnels in a matter of minutes. If you're new to marketing, Groundhogg also comes with pre-built funnel and email templates to speed up the process.
+**Marketing Automation** is one of the most effective tools that can help you build your list and generate more revenue for your business.
 
-Our [extensions library](https://groundhogg.io/downloads/) will allow you to connect WordPress' most powerful plugins, adding more trigger points and useful interaction tools.
+With Groundhogg you can turn your static blog, e-commerce store or membership site into a personalized customer journey that will help you create more raving fans and maximize profits.
 
-= How Does It Work? =
+Groundhogg is the only Marketing Automation tools for WordPress that can handle CRM, Email Marketing, SMS Marketing, and more without the need for third-party software. This means you can design your ideal customer journey without ever leaving your WordPress site!
 
-Groundhogg combines the basics of your run of the mill CRM with a simple yet highly versatile funnel builder.
+### GROUNDHOGG IS PERFECT FOR:
 
-The funnel builder allows you to use benchmarks and actions in any combination to design the perfect customer journey which brings them from State A to State B. (See the screenshots to see an example of our visual builder)
+* Capturing Leads
+* Sending Personalized Emails and text messages
+* Collecting unlimited customer data
+* Profiling subscribers
+* Automating the customer journey
+* Improving E-commerce sales
+* Increasing membership retention
+* And so much more...
 
-= Benchmark Triggers Include: =
+Groundhogg is the perfect alternative to [Infusionsoft, HubSpot, Actionetics, ActiveCampaign, ConvertKit, MailChimp and many other expensive third-party apps](https://www.groundhogg.io/comparison/).
 
-* When an account is created.
-* When a contact's email is confirmed.
-* Whenever a form is filled out.
-* A page is visited.
-* A User's role is changed.
-* A tag is applied
-* OR if a tag is removed.
+### CUT COSTS, NOT FEATURES
 
-= Any of those triggers can launch these Actions: =
+Groundhogg takes what the big guys charge thousands of dollars for, and gives them to you for free.
 
-* Send an email
-* Create an admin notification
-* Apply a note
-* Apply a tag
-* Remove a tag
-* Apply a contact Owner
-* Wait till a specific date
-* Wait for a certain amount of time
-* Create a user account
-* Edit contact details
-* OR send an HTTP POST
+* **Send Unlimited Emails** — Groundhogg does not impose a limit on the number of emails you send.
+* **Collect Unlimited Contacts** — Groundhogg does not impose a limit on the number of contacts you can have.
+* **Send SMS Right from WordPress** — Using the Groundhogg Sending Service you can send text messages without paying for any other tools.
+* **Deep WordPress Integration** — Being a WordPress plugin, we are deeply integrated with WP so that setup is minimal.
+* **Unlimited Custom Fields** — Collect an unlimited amount of data about your customers to help you make crucial decisions about your business.
+* **Drag & Drop Email Builder** — Our email builder allows you to create beautiful looking emails that can be viewed without issue in every email client including the oldest versions of outlook.
+* **Automated Funnel Builder** — *La piece de resistance,* Our funnel builder is the ultimate tool that will allow you to design high converting customer journeys that integrate with your favorite WordPress tools.
+* **Import & Export EVERYTHING** — Everything in Groundhogg can be exported and imported into any other website in seconds! Emails, Funnels, Contacts, Settings, EVERYTHING! This makes sharing strategies with customers or clients a breeze.
 
-With our simple visual editing experience, you can use any combination of the above to create a funnel that will ensure your potential customers are paying customers.
+And there is so much more that Groundhogg can do for you.
 
-= By Marketers For... None Marketers? =
+### WHY IS GROUNDHOGG A GAME CHANGER?
 
-We understand that not everyone is born with epic writing abilities and that not everyone knows how to put together a killer sales funnel.
+* **Marketing Automation Tools are Expensive!** — Most tools comparable to Groundhogg cost at least $49/month USD. And at that low price point, the number of contacts you can store and emails you can send is nominal at best.
+* **Marketing Automation Tools are Complicated!** — A lot of the other tools inundate you with a huge feature set and hard to understand documentation. We make it easy by providing you with concrete instructions, templates, and videos.
+* **Marketing Automation Tools are Closed Source!** — We believe that every business has the right to the tools they need, that's why Groundhogg is *OPEN SOURCE,* because that way anyone can make Groundhogg work for them.
+* **Marketing Automation Tools Keep You Stuck!** — The business model of our competitors is to lock you in with their features so that it becomes too painful to leave. We think that sucks, and that's why we've worked hard so that our tools but you back in control.
+* **Marketing Automation Tools are hard to integrate!** — Most other tools require third-party add-ons to integrate like Zapier. Groundhogg can be integrated with many popular WordPress plugins in seconds without the need to pay third parties.
+* **Marketing Automation Tools Promote Their Partners!** — Many of our competitors make their tools deliberately hard to use to so that you'll pay more for their implementation services. **That sucks!** With Groundhogg, everything is DIY and easy as 123.
 
-So you don't have to, we did it for you! Groundhogg comes with a suite of default funnels with pre-written emails and preset settings so that you don't have to know the "How," just the "What."
+### WHO CAN USE GROUNDHOGG TO GROW?
 
-If you're struggling with your current CRM or marketing platform, then ditch it. Export your mailing list and import it into Groundhogg and start having more meaningful conversations that creates a bigger impact.
+Groundhogg is designed for...
+
+* Podcasters
+* Mom & Pop Shops
+* Course Creators
+* Bloggers
+* Membership sites
+* Physical product stores
+* Digital product stores
+* Agencies
+* Freelancers
+* Non-Profits
+* Charities
+* Startups
+* Artists
+* Real Estate Agents & Brokers
+
+**Anyone who can benefit from collecting an email address can benefit from using Groundhogg!**
+
+### JOIN OUR COMMUNITY
+
+Join our [Facebook group](https://www.groundhogg.io/fb/) to talk to others who are using Groundhogg to grow their business.
+
+### ABOUT US
+
+We started building Groundhogg because we believe that every business, regardless of location, language, or budget deserves equal access to marketing and sales tools that will allow them to grow.
+
+Every tools we build draws from this belief so that we can be the #1 resource for accessible marketing and sales tools.
 
 == Screenshots ==
 1. The funnel builder in all its glory, Benchmarks show on right.
