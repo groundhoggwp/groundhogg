@@ -1,4 +1,4 @@
-=== Groundhogg ===
+=== Groundhogg — Marketing Automation & CRM for WordPress ===
 Contributors: trainingbusinesspros, groundhogg, dhrumit
 Tags: marketing, email, contacts, contact, CRM, marketing automation, email automation, funnels, marketing funnels, marketing campaigns, campaigns, broadcast, contacts, contact management
 Donate link: https://groundhogg.io
@@ -12,6 +12,9 @@ License URI: https://www.gnu.org/licenses/gpl.md
 Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
 
 == Description ==
+
+## ATTENTION MARKETERS, FREELANCERS, STORE OWNERS, PODCASTERS, AGENCIES & WORDPRESS AFICIONADOS!
+
 Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
 
 **Marketing Automation** is one of the most effective tools that can help you build your list and generate more revenue for your business.
@@ -117,20 +120,33 @@ Every tools we build draws from this belief so that we can be the #1 resource fo
 * Start Marketing
 
 == Frequently Asked Questions ==
-= Do I need any additional marketing software like mailchimp? =
+
+= Does Groundhogg need any additional marketing software like MailChimp? =
 No, Groundhogg is a completely standalone, lightweight marketing system designed to keep you in the black, even when it comes to your monthly software bill.
 
-= Is there any monthly fee or required upgrade? =
+= Does Groundhogg have any monthly fee or required upgrades? =
 No, you can use Groundhogg for free forever. Groundhogg is a Open Source project designed to democratize email marketing and provide simple easy to use tools to new and none tech savvy business owners.
 
-= Will it connect to Woocommerce or other plugins? =
+= Does Groundhogg connect to Woocommerce or other plugins? =
 Yes, you can find our Official [Woocommerce](https://groundhogg.io/downloads/woocommerce) extension on our site among other extensions for other popular plugins.
 
-= Is it secure? =
+= Does Groundhogg work with my theme? =
+Groundhogg is them agnostic, meaning it will work with every and any theme. Groundhogg is mostly administrative and very little is seen by visitors.
+
+= Does Groundhogg track my subscribers? =
+Yes, Groundhogg has a very smart tracking system that will allow you to monitor your clients interactions with your emails and your site.
+
+= Does Groundhogg Integrate with my membership plugin? =
+YEs, Groundhogg has a builtin connection with the WordPress user API, meaning it will automatically use user roles in your site, like from a membership plugin.
+
+= Is Groundhogg secure? =
 We follow all best WordPress security practices. Plus it's open source, so we have a large community looking out for potential weaknesses when it comes to your data.
 
-= Is it GDPR, CANSPAM, or CASL compliant? =
+= Is Groundhogg GDPR, CANSPAM, or CASL compliant? =
 Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & privacy legislation.
+
+= Is Groundhogg better than my current CRM/Marketing Automation tool? =
+Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 == Changelog ==
 
