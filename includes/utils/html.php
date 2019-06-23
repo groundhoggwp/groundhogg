@@ -107,6 +107,36 @@ class HTML
         <?php
     }
 
+    public function tabs( $tabs=[], $active_tab=false )
+    {
+        if ( empty( $tabs ) ){
+            return;
+        }
+
+        if ( ! $active_tab ){
+            $active_tab = get_request_var( 'tab' );
+
+            // Get first Tab
+            if ( ! $active_tab ){
+                $tab_keys = array_keys( $tabs );
+                $active_tab = array_shift( $tab_keys );
+            }
+        }
+
+        ?>
+        <h2 class="nav-tab-wrapper">
+            <?php foreach ( $tabs as $id => $tab ):
+
+                echo html()->e( 'a', [
+                    'href' => esc_url( add_query_arg( [ 'tab' => $id ], $_SERVER[ 'REQUEST_URI' ] ) ),
+                    'class' => 'nav-tab' . ( $active_tab == $id ? ' nav-tab-active' : '' ),
+                    'id' => $id,
+                ], $tab );
+
+            endforeach; ?>
+        </h2>
+        <?php
+    }
 
     /**
      * Start a form table cuz we use LOTS of those!!!

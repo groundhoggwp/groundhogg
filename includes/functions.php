@@ -153,11 +153,11 @@ function get_request_query( $default = [], $force=[] )
        $query[ $key ] = sanitize_text_field( urldecode( $value ) );
    }
 
-    if ( isset_not_empty( $_GET, 's' ) ){
-        $query[ 'search' ] = get_request_var( 's' );
-    }
+   if ( isset_not_empty( $_GET, 's' ) ){
+       $query[ 'search' ] = get_request_var( 's' );
+   }
 
-    $query = array_merge( $query, $force );
+   $query = array_merge( $query, $force );
 
    if ( empty( $query ) ){
        return $default;

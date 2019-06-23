@@ -30,7 +30,7 @@ abstract class Meta_DB extends DB {
 
     protected function add_additional_actions()
     {
-        $this->register_table();
+//        $this->register_table();
 
         add_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), [ $this, 'delete_associated_meta' ] );
         
