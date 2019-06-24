@@ -85,3 +85,22 @@ function rgb2hex($r, $g=-1, $b=-1)
     $color .= (strlen($b) < 2?'0':'').$b;
     return '#'.$color;
 }
+
+
+add_filter( 'tiny_mce_before_init', '\Groundhogg\tiny_mce_before_init' );
+
+// Add listener for on lick event
+function tiny_mce_before_init( $initArray )
+{
+    $initArray['setup'] = <<<JS
+[function(ed) {
+    ed.on( 'click', function(ed, e) {
+        //your function goes here
+        $(document).trigger( 'to_mce' );
+        // console.log( {trigger:'to_mce'} );
+    });
+
+}][0]
+JS;
+    return $initArray;
+}

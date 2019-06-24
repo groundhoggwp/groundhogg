@@ -404,7 +404,7 @@ class Replacements
             <?php foreach ( $this->get_replacements() as $replacement ): ?>
                 <tr>
                     <td>
-                        <input style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}" readonly>
+                        <input class="replacement-selector" style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}" readonly>
                     </td>
                     <td>
                         <span><?php esc_html_e( $replacement[ 'description' ] ); ?></span>
@@ -427,12 +427,14 @@ class Replacements
 
     public function show_replacements_button()
     {
+        wp_enqueue_script( 'groundhogg-admin-replacements' );
+
         echo Plugin::$instance->utils->html->modal_link( array(
             'title'     => __( 'Replacements', 'groundhogg' ),
-            'text'      => _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
-            'footer_button_text' => __( 'Close' ),
+            'text'      => '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
+            'footer_button_text' => __( 'Insert' ),
             'id'        => 'replacements',
-            'class'     => 'button button-secondary no-padding replacements',
+            'class'     => 'button button-secondary no-padding replacements replacements-button',
             'source'    => 'footer-replacement-codes',
             'height'    => 900,
             'width'     => 700,
@@ -772,6 +774,10 @@ class Replacements
 
         $html = '';
 
+        if ( $file = get_array_var( $files, $key ) ){
+            return sprintf( '<a href="%s">%s</a>', esc_url( $file[ 'file_url' ] ), esc_html( $file[ 'file_name' ] ) );
+        }
+
         foreach ( $files as $i => $file ){
             $html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( $file[ 'file_url' ] ), esc_html( $file[ 'file_name' ] ) );
         }
@@ -789,7 +795,7 @@ class Replacements
     {
         $quotes = array();
 
-        $quotes[] = "I'm not going to live by their rules anymore.";
+        $quotes[] = "I'm not going to live by their rules anymore!";
         $quotes[] = "When Chekhov saw the long winter, he saw a winter bleak and dark and bereft of hope. Yet we know that winter is just another step in the cycle of life. But standing here among the people of Punxsutawney and basking in the warmth of their hearths and hearts, I couldn't imagine a better fate than a long and lustrous winter.";
         $quotes[] = "Hi, three cheeseburgers, two large fries, two milkshakes, and one large coke.";;
         $quotes[] = "It's the same thing every day, Clean up your room, stand up straight, pick up your feet, take it like a man, be nice to your sister, don't mix beer and wine ever, Oh yeah, don't drive on the railroad tracks.";
@@ -800,7 +806,7 @@ class Replacements
         $quotes[] = "We mustn't keep our audience waiting.";
         $quotes[] = "Okay campers, rise and shine, and don't forget your booties cause its cold out there...its cold out there every day.";
         $quotes[] = "I peg you as a glass half empty kinda guy.";
-        $quotes[] = "Why would anybody steal a groundhog? I can probably think of a couple of reasons... pervert.";
+//        $quotes[] = "Why would anybody steal a groundhog? I can probably think of a couple of reasons... pervert.";
         $quotes[] = "Well, what if there is no tomorrow? There wasn't one today.";
         $quotes[] = "Did he actually refer to himself as \"the talent\"?";
         $quotes[] = "Did you sleep well Mr. Connors?";

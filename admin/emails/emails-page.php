@@ -77,6 +77,8 @@ class Emails_Page extends Admin_Page
             wp_enqueue_script( 'jquery-ui-sortable' );
             wp_enqueue_script( 'jquery-ui-draggable' );
 
+            wp_enqueue_style( 'jquery-ui' );
+
             wp_enqueue_script( 'beautify-js'  );
             wp_enqueue_script( 'beautify-css' );
             wp_enqueue_script( 'beautify-html' );

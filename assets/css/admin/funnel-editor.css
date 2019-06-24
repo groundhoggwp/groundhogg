@@ -27,6 +27,11 @@
     margin-top: 47px;
 }
 
+.add-contacts-link{
+    display: inline-block;
+    text-decoration: none;
+}
+
 .header-wrap{
     width:100%;
 }

@@ -69,9 +69,6 @@
                 self.feed( null );
             });
 
-            self.makeSortable();
-            self.makeDraggable();
-
             /* Activate Spinner */
             $('#email-form').on( 'submit', function( e ){
                 e.preventDefault();
@@ -136,11 +133,14 @@
                 }
             }).change();
 
+            self.makeSortable();
+            self.makeDraggable();
+            self.makeResizable();
+
             this.sidebar = new StickySidebar( '#postbox-container-1' , {
                 topSpacing: self.inFrame() ? 47 : 78,
                 bottomSpacing: 0
             });
-
         },
 
         prepareEmailHTML : function()
@@ -253,6 +253,38 @@
                 }
             });
         },
+        
+        makeResizable: function()
+        {
+
+            var self = this;
+
+            var listener = this.resizeListener = {};
+
+            var $postbody = $( "#post-body" );
+            var $sidebar = $( "#postbox-container-1" );
+
+            listener.sidebarWidth = $sidebar.width();
+
+            $postbody.resizable({
+                handles: "w",
+                resize: function (e,ui) {
+                    listener.change = ui.position.left - ui.originalPosition.left;
+                    $sidebar.width( listener.sidebarWidth + listener.change );
+                    $postbody.css( 'margin-left', ( listener.sidebarWidth + listener.change + 1 ) + 'px' );
+                    $sidebar.css( 'margin-left',  -( listener.sidebarWidth + listener.change + 1 ) + 'px' );
+                    $postbody.css( 'left', 0 );
+                },
+                stop:function (e,ui) {
+                    listener.sidebarWidth = $sidebar.width();
+                    self.sidebar.updateSticky();
+                },
+                start: function (e,ui) {
+                    listener.sidebarWidth = $sidebar.width();
+                },
+                grid:10
+            });
+        },
 
         /**
          * Make the blocks draggable
@@ -363,6 +395,36 @@
 
     $(function () {
         editor.init();
-    })
+    });
+
+    var isResizing = false,
+        lastDownX = 0;
+
+    $(function () {
+        var container = $('#post-body'),
+            left = $('#postbox-container-1'),
+            right = $('#post-body-content'),
+            handle = $('#drag');
+
+        handle.on('mousedown', function (e) {
+            isResizing = true;
+            lastDownX = e.clientX;
+        });
+
+        $(document).on('mousemove', function (e) {
+            // we don't want to do anything if we aren't resizing.
+            if (!isResizing)
+                return;
+
+            var offsetRight = container.width() - (e.clientX - container.offset().left);
+
+            left.css('right', offsetRight);
+            right.css('width', offsetRight);
+        }).on('mouseup', function (e) {
+            // stop resizing
+            isResizing = false;
+        });
+    });
+
 
 } )( jQuery, EmailEditor );

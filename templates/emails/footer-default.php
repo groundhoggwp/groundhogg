@@ -49,6 +49,25 @@ $apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', [
 $apple_link = \Groundhogg\array_to_css( $apple_link );
 
 do_action( 'groundhogg/templates/email/footer/before' );
+
+$custom_text = get_option( 'gh_custom_email_footer_text' );
+
+if ( $custom_text ):
+
+    ?>
+<div class="pre-footer">
+    <table border="0" cellpadding="0" cellspacing="0" style="<?php echo $footer_container; ?>">
+        <tr>
+            <td class="content-block" style="">
+                <?php echo wpautop( $custom_text ); ?>
+            </td>
+        </tr>
+    </table>
+</div>
+<?php
+
+endif;
+
 ?>
                                 <!-- START FOOTER -->
                                 <div class="footer" style="<?php echo $footer; ?>">

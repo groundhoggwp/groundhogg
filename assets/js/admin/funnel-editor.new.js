@@ -349,6 +349,6 @@
 
     $(function(){
         funnel.init();
-    })
+    });
 
 })( jQuery, Funnel );

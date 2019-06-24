@@ -99,9 +99,31 @@ $funnel = new Funnel( $funnel_id );
                 ]); ?>
             </div>
             <div class="status-options">
+                <div>
+                    <?php echo Plugin::$instance->utils->html->modal_link( array(
+                        'title'     => __( 'Replacements', 'groundhogg' ),
+                        'text'      => '<span style="padding: 5px;" class="dashicons dashicons-admin-users"></span>',
+                        'footer_button_text' => __( 'Insert' ),
+                        'id'        => 'replacements',
+                        'class'     => 'no-padding replacements replacements-button',
+                        'source'    => 'footer-replacement-codes',
+                        'height'    => 900,
+                        'width'     => 700,
+                    ) ); ?>
+                </div>
                 <div id="add-contacts">
-                    <a title="<?php _ex( 'Add Contacts', 'action', 'groundhogg' ); ?>" href="#source=add-contact-modal&footer=false" class="button trigger-popup"><?php _ex( 'Add Contacts', 'action', 'groundhogg' ) ?></a>
-<!--                    <div class="hidden" id="add-contact-modal" style="">-->
+                    <?php echo  html()->modal_link( [
+                        'title'     => __( 'Add Contacts', 'groundhogg' ),
+                        'text'      => '<span style="padding: 5px;" class="dashicons dashicons-plus-alt"></span>',
+                        'footer_button_text' => __( 'Add Contacts' ),
+                        'id'        => '',
+                        'class'     => 'add-contacts-link',
+                        'source'    => 'add-contact-modal',
+                        'height'    => 300,
+                        'width'     => 500,
+                        'footer'    => 'true',
+                        'preventSave' => 'true',
+                    ] ); ?>
                     <div class="hidden" id="add-contact-modal" style="display: none;">
                         <div>
                             <div class="add-contacts-response hidden"></div>
@@ -139,7 +161,7 @@ $funnel = new Funnel( $funnel_id );
                                         foreach ( $steps as $step ){
                                             $step = Plugin::$instance->utils->get_step( $step->ID );
                                             if ($step->is_active() ){
-                                                $options[ $step->ID ] = $step->title . ' (' . str_replace( '_', ' ', $step->type ) . ')';
+                                                $options[ $step->ID ] = $step->get_title() . ' (' . str_replace( '_', ' ', $step->get_type() ) . ')';
                                             }
                                         }
 
@@ -156,16 +178,12 @@ $funnel = new Funnel( $funnel_id );
                                 </tbody>
                             </table>
                         </div>
-                        <p class="submit">
-                            <button type="button" id="add-contacts-button" class="button button-primary" style="float: left"><?php _ex( 'Add Contacts', 'action', 'groundhogg' ); ?></button>
-                            <span class="spinner" style="float: left"></span>
-                        </p>
                     </div>
                 </div>
                 <div id="export">
-                    <a id="copy-share-link" style="text-decoration: none; display: inline-block" href="#"><span style="padding: 5px;" title="Copy Share Link" class="dashicons dashicons-share"></span></a>
+                    <a id="copy-share-link" style="text-decoration: none; display: inline-block" href="#"><span style="padding: 5px;" title="<?php esc_attr_e( 'Copy share link', 'groundhogg' ) ?>" class="dashicons dashicons-share"></span></a>
                     <input id="share-link" type="hidden" value="<?php echo esc_attr( $funnel->export_url() ); ?>">
-                    <a href="<?php echo esc_url( $funnel->export_url() ); ?>" class="button button-secondary"><?php _ex( 'Export Funnel', 'action','groundhogg'); ?></a>
+                    <a style="text-decoration: none; display: inline-block" href="<?php echo esc_url( $funnel->export_url() ); ?>"><span title="<?php esc_attr_e( 'Export', 'groundhogg' ) ?>"  style="padding: 5px;" class="dashicons dashicons-download"></span></a>
                 </div>
                 <div id="status">
                     <?php echo Plugin::$instance->utils->html->toggle( [

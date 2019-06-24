@@ -109,7 +109,7 @@ class Scripts
         wp_register_script('groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'js/admin/inline-edit-contacts' . $IS_MINIFIED . '.js', ['jquery', 'groundhogg-admin'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'js/admin/dashboard' . $IS_MINIFIED . '.js', ['jquery', 'papaparse'], GROUNDHOGG_VERSION, true);
-        wp_register_script('groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/email-editor.new' . $IS_MINIFIED . '.js', ['jquery', 'sticky-sidebar', 'groundhogg-admin-functions' ], GROUNDHOGG_VERSION, true);
+        wp_register_script('groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/email-editor.new' . $IS_MINIFIED . '.js', ['jquery', 'sticky-sidebar', 'jquery-ui-resizable', 'groundhogg-admin-functions' ], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor.new' . $IS_MINIFIED . '.js', ['jquery', 'groundhogg-admin-functions', 'sticky-sidebar' ], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'js/admin/form-builder' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-iframe', GROUNDHOGG_ASSETS_URL . 'js/admin/iframe-checker' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, false);
@@ -117,6 +117,7 @@ class Scripts
         wp_register_script('groundhogg-admin-link-picker', GROUNDHOGG_ASSETS_URL . 'js/admin/link-picker' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-media-picker', GROUNDHOGG_ASSETS_URL . 'js/admin/media-picker' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-modal', GROUNDHOGG_ASSETS_URL . 'js/admin/modal.new' . $IS_MINIFIED . '.js', ['jquery', 'wp-color-picker'], GROUNDHOGG_VERSION, true);
+        wp_register_script('groundhogg-admin-replacements', GROUNDHOGG_ASSETS_URL . 'js/admin/replacements' . $IS_MINIFIED . '.js', ['jquery', 'groundhogg-admin-modal'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-simple-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/simple-editor' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true);
 
         // Email Blocks

@@ -92,7 +92,7 @@ class HTML
         <?php else:
 
         $col_span = count( $cols );
-        echo $this->wrap( __( 'No items found...', 'groundhogg' ), 'td', [ 'colspan' => $col_span ] );
+        echo $this->wrap( __( 'No items found.', 'groundhogg' ), 'td', [ 'colspan' => $col_span ] );
 
         endif; ?>
         </tbody>
@@ -307,14 +307,27 @@ class HTML
         $args = wp_parse_args( $args, [
             'id' => '',
             'content' => '',
-            'settings' => []
+            'settings' => [],
+            'replacements_button' => false,
         ] );
+
+        if ( $args[ 'replacements_button' ] ){
+            add_action( 'media_buttons', [
+                \Groundhogg\Plugin::$instance->replacements, 'show_replacements_button'
+            ] );
+        }
 
         ob_start();
 
         wp_editor( $args[ 'content' ], $args[ 'id' ], $args[ 'settings' ] );
 
-       return ob_get_clean();
+        if ( $args[ 'replacements_button' ] ){
+            remove_action( 'media_buttons', [
+                \Groundhogg\Plugin::$instance->replacements, 'show_replacements_button'
+            ] );
+        }
+
+        return ob_get_clean();
     }
 
 	/**

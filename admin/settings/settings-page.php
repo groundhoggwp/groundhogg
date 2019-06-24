@@ -5,6 +5,7 @@ use Groundhogg\Dropins\Test_Extension;
 use Groundhogg\Dropins\Test_Extension_2;
 use Groundhogg\Extension;
 use function Groundhogg\get_request_var;
+use function Groundhogg\html;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
@@ -235,7 +236,9 @@ class Settings_Page extends Admin_Page
     {
         $api_keys_table = new API_Keys_Table();
         $api_keys_table->prepare_items();
+        ?><div style="max-width: 900px;"><?php
         $api_keys_table->display();
+        ?></div><?php
     }
 
 
@@ -715,6 +718,15 @@ class Settings_Page extends Admin_Page
                     'placeholder' => Plugin::$instance->settings->get_option( 'admin_email' ),
                 ),
             ],
+            'gh_custom_email_footer_text' => [
+                'id'        => 'gh_custom_email_footer_text',
+                'section'   => 'overrides',
+                'label'     => _x( 'Custom Footer Text', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Text that will appear before the footer in every email. Accepts HTML and plain text.', 'settings', 'groundhogg' ),
+                'type'      => 'editor',
+                'args' => [ 'sanitize_callback' => 'wp_kses_post' ],
+                'atts' => [ 'replacements_button' => true ],
+            ],
             'gh_email_token' => array(
                 'id'        => 'gh_email_token',
                 'section'   => 'service',
@@ -1045,7 +1057,11 @@ class Settings_Page extends Admin_Page
         $value = Plugin::$instance->settings->get_option( $field['id'] );
 
         switch ( $field['type'] ) {
-
+            case 'editor':
+                $field[ 'atts' ][ 'id' ] = $field[ 'id' ];
+                $field[ 'atts' ][ 'content' ] = $value;
+                $field[ 'atts' ][ 'settings' ] = [ 'editor_height' => 200 ];
+                break;
             case 'select2':
             case 'dropdown_emails':
             case 'tag_picker':
@@ -1067,7 +1083,7 @@ class Settings_Page extends Admin_Page
 
 //        echo call_user_func( array( WPGH()->html, $field[ 'type' ] ), $field[ 'atts' ] ); todo
 
-        echo call_user_func( array( Plugin::$instance->utils->html, $field[ 'type' ] ), $field[ 'atts' ] );
+        echo html()->wrap( call_user_func( array( Plugin::$instance->utils->html, $field[ 'type' ] ), $field[ 'atts' ] ), 'div', [ 'style' => [ 'max-width' => '700px' ] ] );
 
         if( isset( $field['desc'] ) && $desc = $field['desc'] ) {
             printf( '<p class="description">%s</p>', $desc );

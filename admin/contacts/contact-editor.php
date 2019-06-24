@@ -745,7 +745,9 @@ function contact_record_section_custom_meta( $contact ){
 
         foreach ( $meta as $meta_key => $value ):
 
-            if ( ! in_array( $meta_key, $meta_exclude_list ) ): ?>
+            // Exclude serialized values...
+            if ( ! in_array( $meta_key, $meta_exclude_list ) && ! is_array( $value ) && ! is_object( $value) ): ?>
+
                 <tr id="meta-<?php esc_attr_e( $meta_key )?>">
                     <th>
                         <?php esc_html_e( $meta_key ); ?>

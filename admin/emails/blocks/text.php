@@ -136,7 +136,7 @@ class Text extends Block
         $html.= sprintf( "<h3 class=\"hndle\">%s</h3>", $this->get_title() );
         $html.= "<div class=\"inside\"><div class=\"options\">";
 
-        $html.= Plugin::$instance->utils->html->editor( [ 'id' => 'text-content', 'settings' => [ 'media_buttons' => false, 'editor_height' => 300 ] ] );
+        $html.= Plugin::$instance->utils->html->editor( [ 'id' => 'text-content', 'replacements_button' => true, 'settings' => [ 'media_buttons' => false, 'editor_height' => 300 ] ] );
 
         $html.= "<table class=\"form-table\">";
 
