@@ -64,7 +64,7 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                             'checked'       => $email->is_template(),
                         ] ); ?>
                     </div>
-                    <?php Plugin::$instance->replacements->show_replacements_button(); ?>&nbsp;
+                    <?php Plugin::$instance->replacements->show_replacements_button( true ); ?>&nbsp;
                     <?php echo Plugin::$instance->utils->html->toggle( [
                         'name'          => 'editor_view',
                         'id'            => 'editor-toggle',

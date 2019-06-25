@@ -425,13 +425,13 @@ class Replacements
         <?php
     }
 
-    public function show_replacements_button()
+    public function show_replacements_button( $short = false )
     {
         wp_enqueue_script( 'groundhogg-admin-replacements' );
 
         echo Plugin::$instance->utils->html->modal_link( array(
             'title'     => __( 'Replacements', 'groundhogg' ),
-            'text'      => '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
+            'text'      => $short ? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>' : '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
             'footer_button_text' => __( 'Insert' ),
             'id'        => 'replacements',
             'class'     => 'button button-secondary no-padding replacements replacements-button',

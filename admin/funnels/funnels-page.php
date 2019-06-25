@@ -122,6 +122,8 @@ class Funnels_Page extends Admin_Page
 
            wp_enqueue_script( 'jquery-flot' );
            wp_enqueue_script( 'jquery-flot-categories' );
+
+           wp_enqueue_script( 'groundhogg-admin-replacements' );
        }
     }
 

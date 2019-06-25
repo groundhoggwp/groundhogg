@@ -7,7 +7,7 @@
     font-weight: normal;
 }
 
-.button.button-secondary.submit.trigger-popup{
+.button.button-secondary.submit.trigger-popup {
     background: #f7f7f7 !important;
     border-color: #ccc !important;
     border-width: 1px !important;
@@ -27,6 +27,7 @@
     margin-top: 47px;
 }
 
+.replacements-button,
 .add-contacts-link{
     display: inline-block;
     text-decoration: none;
@@ -41,9 +42,11 @@
     margin-right: -300px;
     width: 300px;
 }
+
 #postbox-container-1{
     /*overflow: auto;*/
 }
+
 #postbox-container-1 .postbox{
     border: none;
     box-shadow: none;
@@ -97,11 +100,12 @@
 .notice {
     margin: 0 0 1px 0;
 }
-/* END NEW STUFF */
 
+/* END NEW STUFF */
 .form-buttons .button{
     margin: 2px;
 }
+
 .form-buttons {
     margin: 0 0 5px 0;
 }

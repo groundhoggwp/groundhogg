@@ -3,6 +3,7 @@ namespace Groundhogg\Form;
 
 use function Groundhogg\after_form_submit_handler;
 use Groundhogg\Contact;
+use function Groundhogg\decrypt;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
@@ -67,6 +68,13 @@ class Submission_Handler extends Supports_Errors
         // Set the form ID
         $this->form_id = absint( get_request_var( 'gh_submit_form' ) );
 
+        $form_key = absint( decrypt( get_request_var( 'gh_submit_form_key' ) ) );
+
+        if ( $this->form_id !== $form_key ){
+            $this->add_error( 'invalid_form', "This form does not exist." );
+            return;
+        }
+
         // Set a step
         $this->step = Plugin::$instance->utils->get_step( $this->get_form_id() );
 
@@ -89,7 +97,8 @@ class Submission_Handler extends Supports_Errors
 
         do_action( 'groundhogg/submission_handler/setup', $this );
 
-        if ( ! $this->spam_check() ){
+        // Check spam and honeypot.
+        if ( $this->spam_check() ){
             $this->add_error( new \WP_Error( 'failed_spam_check', 'Submission flagged as spam.' ) );
             return;
         }
@@ -423,7 +432,7 @@ class Submission_Handler extends Supports_Errors
             $this->is_spam( $this->get_posted_data() )
         ];
 
-        return in_array( false, $checks );
+        return in_array( true, $checks );
     }
 
 

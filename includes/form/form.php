@@ -152,6 +152,25 @@ class Form {
         return site_url( sprintf( 'gh/forms/%s/submit/', urlencode( encrypt( $this->get_id() ) ) ) );
     }
 
+    protected function get_honey_pot_code()
+    {
+        // Honey Pot validation.
+        $honeypot = html()->input( [
+            'type'          => 'password',
+            'name'          => 'your_password',
+            'id'            => 'your_password',
+            'title'         => 'Password',
+            'class'         => '',
+            'value'         => '',
+            'autocomplete'  => 'off',
+            'tabindex'      => '-1'
+        ] );
+
+        $honeypot = html()->wrap( $honeypot, 'div', [ 'class' => 'your-password h0n3yp0t', 'style' => [ 'display' => 'none' ] ] );
+
+        return $honeypot;
+    }
+
     public function get_html_embed_code()
     {
         $form = html()->e( 'link', [ 'rel' => 'stylesheet', 'href' => GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css' ] );
@@ -169,7 +188,8 @@ class Form {
         $form .= sprintf( "<form %s>", array_to_atts( $atts ) );
 
         if ( ! empty( $this->attributes[ 'id' ] ) ){
-            $form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id() . "'>";
+            $form .= "<input type='hidden' name='gh_submit_form_key' value='" . encrypt( $this->get_id() ) . "'>";
+            $form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id(). "'>";
         }
 
         $step = Plugin::$instance->utils->get_step( $this->get_id() );
@@ -177,6 +197,8 @@ class Form {
         if ( ! $step ){
             return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
         }
+
+//        $form .= $this->get_honey_pot_code();
 
         do_action( 'groundhogg/form/shortcode/before', $this );
 
@@ -243,7 +265,8 @@ class Form {
         $form .= sprintf( "<form %s>", array_to_atts( $atts ) );
 
         if ( ! empty( $this->attributes[ 'id' ] ) ){
-            $form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id() . "'>";
+            $form .= "<input type='hidden' name='gh_submit_form_key' value='" . encrypt( $this->get_id() ) . "'>";
+            $form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id(). "'>";
         }
 
         $step = Plugin::$instance->utils->get_step( $this->get_id() );
@@ -251,6 +274,8 @@ class Form {
         if ( ! $step ){
             return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
         }
+
+//        $form .= $this->get_honey_pot_code();
 
         do_action( 'groundhogg/form/shortcode/before', $this );
 
