@@ -192,6 +192,18 @@ class Submission_Handler extends Supports_Errors
 
         }
 
+        do_action( 'groundhogg/form/submission_handler/before_create_contact', $args, $meta, $tags, $files, $this );
+
+        $first = get_array_var( $args, 'first_name' );
+        $last = get_array_var( $args, 'last_name' );
+
+        if ( $first === $last ){
+            $this->add_error( new \WP_Error( 'error', __( 'First & last name should not be the same.' ) ) );
+        }
+
+        if ( $this->has_errors() ){
+            return false;
+        }
 
         $email = get_array_var( $args, 'email' );
 

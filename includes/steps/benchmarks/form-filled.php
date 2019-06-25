@@ -3,6 +3,7 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
+use function Groundhogg\encrypt;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use Groundhogg\HTML;
@@ -139,18 +140,19 @@ class Form_Filled extends Benchmark
      */
     public function settings( $step )
     {
-        $shortcode = sprintf('[gh_form id="%d" title="%s"]', $step->get_id(), esc_attr( $step->get_title() ) );
-        $form_url = site_url( sprintf( 'gh/forms/%d/', $step->get_id() ) );
-        $form_iframe_url = site_url( sprintf( 'gh/forms/iframe%d/', $step->get_id() ) );
-        $script    = sprintf('<script id="%s" type="text/javascript" src="%s"></script>', 'ghFrame' . $step->get_id(), $form_iframe_url, $step->get_id() );
+        $form = new Form\Form( [ 'id' => $step->get_id() ] );
+
+        $form_url = site_url( sprintf( 'gh/forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
+
         $default_form = $this->get_default_form();
+        $form_embed_code = esc_html( $form->get_html_embed_code() );
 
         ?>
         <table class="form-table">
             <tbody>
             <tr>
                 <th>
-                    <?php esc_attr_e( 'Shortcode & JS Script:', 'groundhogg' ); ?>
+                    <?php esc_attr_e( 'Shortcode, JS Script & HTML Embed Code:', 'groundhogg' ); ?>
                 </th>
                 <td>
 
@@ -159,14 +161,20 @@ class Form_Filled extends Benchmark
                             type="text"
                             onfocus="this.select()"
                             class="regular-text code"
-                            value="<?php echo esc_attr( $shortcode ); ?>"
+                            value="<?php echo esc_attr( $form->get_shortcode() ); ?>"
                             readonly>
                     </strong>
                     <input
                             type="text"
                             onfocus="this.select()"
                             class="regular-text code"
-                            value="<?php echo esc_attr( $script ); ?>"
+                            value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
+                            readonly>
+                    <input
+                            type="text"
+                            onfocus="this.select()"
+                            class="regular-text code"
+                            value="<?php echo esc_attr( $form_embed_code ); ?>"
                             readonly>
                     </strong>
                     <p>
@@ -629,8 +637,8 @@ class Form_Filled extends Benchmark
             'report' => array(
                 'start' => $start_time,
                 'end'   => $end_time,
-                'step'  => $step->ID,
-                'funnel'=> $step->funnel_id,
+                'step'  => $step->get_id(),
+                'funnel'=> $step->get_funnel_id(),
                 'status'=> 'complete'
             )
         ) );
@@ -638,7 +646,7 @@ class Form_Filled extends Benchmark
         $num_impressions = get_db('activity')->count(array(
             'start'     => $start_time,
             'end'       => $end_time,
-            'step_id'   => $step->ID,
+            'step_id'   => $step->get_id(),
             'activity_type' => 'form_impression'
         ));
 
@@ -649,7 +657,8 @@ class Form_Filled extends Benchmark
                     <?php echo $num_impressions; ?>
                 </strong>
             </span> |
-            <span class="submissions"><?php _e( 'Fills: ' ); ?><strong><a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . $step->funnel_id . '&step=' . $step->ID . '&start=' . $start_time . '&end=' . $end_time ); ?>"><?php echo $num_events_completed; ?></a></strong></span> |
+            <!-- TODO -->
+            <span class="submissions"><?php _e( 'Fills: ' ); ?><strong><a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . $step->get_funnel_id() . '&step=' . $step->ID . '&start=' . $start_time . '&end=' . $end_time ); ?>"><?php echo $num_events_completed; ?></a></strong></span> |
             <span class="cvr" title="<?php _e( 'Conversion Rate' ); ?>"><?php _e( 'CVR: '); ?><strong><?php echo round( ( $num_events_completed / ( ( $num_impressions > 0 )? $num_impressions : 1 ) * 100 ), 2 ); ?></strong>%</span>
         </p>
         <?php

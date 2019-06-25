@@ -64,7 +64,7 @@ class Scripts
         wp_register_style('jquery-ui', GROUNDHOGG_ASSETS_URL . 'lib/jquery-ui/jquery-ui.min.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION);
         wp_register_style('manage-preferences', GROUNDHOGG_ASSETS_URL . 'css/frontend/preferences.css', [], GROUNDHOGG_VERSION );
-        wp_register_style('groundhogg-browser-view', GROUNDHOGG_ASSETS_URL . 'css/frontend/browser-view.css', [], GROUNDHOGG_VERSION );
+        wp_register_style('groundhogg-managed-page', GROUNDHOGG_ASSETS_URL . 'css/frontend/managed-page.css', [], GROUNDHOGG_VERSION );
         wp_register_style('groundhogg-loader', GROUNDHOGG_ASSETS_URL . 'css/frontend/loader.css', [], GROUNDHOGG_VERSION);
 
         do_action('groundhogg/scripts/after_register_frontend_styles');

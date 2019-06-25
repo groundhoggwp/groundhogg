@@ -22,6 +22,8 @@ $shortcode = sprintf( '[gh_form id="%d"]', $step->get_id() );
 
 add_filter( 'show_admin_bar', '__return_false' );
 
+set_query_var( 'doing_iframe', true );
+
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>

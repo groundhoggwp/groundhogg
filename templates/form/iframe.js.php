@@ -32,7 +32,7 @@ header("Cache-Control: max-age=604800, public");
     ghFormClient.receiveMessage = receiveMessage;
 
     var formId = 0;
-    var idPrefix = 'ghForm';
+    var idPrefix = 'groundhogg_form_';
     var forms = [];
     var isIframeLoading = false;
     var hasIframeToLoad = false;
@@ -164,4 +164,4 @@ header("Cache-Control: max-age=604800, public");
 
 })();
 
-ghFormClient.addForm('<?php echo site_url( sprintf( 'gh/forms/%d/', get_query_var( 'form_id' ) ) ); ?>' );
+ghFormClient.addForm('<?php echo site_url( sprintf( 'gh/forms/%s/', urlencode( \Groundhogg\encrypt( get_query_var( 'form_id' ) ) ) ) ); ?>' );

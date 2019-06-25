@@ -63,6 +63,11 @@ class Rewrites
             'top'
         );
 
+        add_rewrite_rule(
+            '^gh/forms/([^/]*)/submit/?$',
+            'index.php?pagenow=form_submit&form_id=$matches[1]',
+            'top'
+        );
 
         // Forms Iframe Script
         add_rewrite_rule(
@@ -77,6 +82,8 @@ class Rewrites
             'index.php?pagenow=forms&form_id=$matches[1]',
             'top'
         );
+
+
     }
 
     /**
@@ -111,6 +118,10 @@ class Rewrites
         $this->map_query_var( $query, 'email_id', 'absint' );
 
         $this->map_query_var( $query, 'superlink_id', 'absint' );
+
+        // form
+        $this->map_query_var( $query, 'form_id', 'urldecode' );
+        $this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
         $this->map_query_var( $query, 'form_id', 'absint' );
         return $query;
     }
@@ -148,6 +159,9 @@ class Rewrites
                 break;
             case 'forms':
                 $template = $template_loader->get_template_part( 'form/form', '', false );
+                break;
+            case 'form_submit':
+                $template = $template_loader->get_template_part( 'form/submit', '', false );
                 break;
         }
 

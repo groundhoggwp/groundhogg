@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\html;
 use function Groundhogg\words_to_key;
 
 class Column extends Field
@@ -95,14 +96,10 @@ class Column extends Field
                 break;
         }
 
-        return sprintf(
-            "<div id='%s' class='gh-form-column %s %s'>%s</div>",
-            $this->get_id(),
-            $this->get_classes(),
-            $width,
-            do_shortcode( $this->get_content() )
-        );
-
+        return html()->wrap( do_shortcode( $this->get_content() ), 'div', [
+            'id' => $this->get_id(),
+            'class' => sprintf( 'gh-form-column %s %s', $this->get_classes(), $width ),
+        ] );
     }
 
     /**

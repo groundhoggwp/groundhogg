@@ -1,33 +1,36 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\Form\Form;
+
 /**
  * Enqueue and dequeue relevant scripts.
  */
-function enqueue_browser_view_styles()
+function enqueue_form_submit_styles()
 {
     dequeue_theme_css_compat();
     dequeue_wc_css_compat();
 
     wp_enqueue_style( 'groundhogg-managed-page' );
+    wp_enqueue_style( 'groundhogg-form' );
 
     /**
      * Allow plugins to add styles to this page.
      */
-    do_action( 'enqueue_browser_view_styles' );
+    do_action( 'enqueue_form_submit_styles' );
 }
 
 /**
  * Enqueue any required JS.
  */
-function enqueue_browser_view_scripts()
+function enqueue_form_submit_scripts()
 {
     wp_enqueue_script( 'fullframe' );
 
     /**
      * Allow plugins to add scripts to this page.
      */
-    do_action( 'enqueue_browser_view_scripts' );
+    do_action( 'enqueue_form_submit_scripts' );
 }
 
 /**
@@ -59,10 +62,10 @@ function ensure_logo_is_there()
  * @param string $title
  * @param string $action
  */
-function browser_view_head( $title='', $action='' )
+function form_submit_head( $title='', $action='' )
 {
-    add_action( 'wp_print_styles', 'Groundhogg\enqueue_browser_view_styles' );
-    add_action( 'wp_enqueue_scripts', 'Groundhogg\enqueue_browser_view_scripts' );
+    add_action( 'wp_print_styles', 'Groundhogg\enqueue_form_submit_styles' );
+    add_action( 'wp_enqueue_scripts', 'Groundhogg\enqueue_form_submit_scripts' );
 
     add_action( 'wp_head', 'noindex' );
     add_action( 'wp_head', 'wp_sensitive_page_meta' );
@@ -72,10 +75,10 @@ function browser_view_head( $title='', $action='' )
 
     /* translators: Login screen title. 1: Login screen name, 2: Network or site name */
     $mp_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $title, $mp_title );
-    $mp_title = apply_filters( 'browser_view_title', $mp_title, $title );
+    $mp_title = apply_filters( 'form_submit_title', $mp_title, $title );
 
     $classes = [ $action ];
-    $classes = apply_filters( 'browser_view_title', $classes, $action );
+    $classes = apply_filters( 'form_submit_title', $classes, $action );
 
 
     if ( is_multisite() ) {
@@ -103,8 +106,10 @@ function browser_view_head( $title='', $action='' )
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="profile" href="http://gmpg.org/xfn/11">
         <title><?php echo $mp_title; ?></title>
-
         <?php wp_head(); ?>
+        <style>
+            #main {max-width: 650px;}
+        </style>
     </head>
     <body class="manage-preferences <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
     <div id="main">
@@ -118,7 +123,7 @@ function browser_view_head( $title='', $action='' )
 /**
  * Outputs the footer for the login page.
  */
-function browser_view_footer() {
+function form_submit_footer() {
     ?>
     </div>
     <p id="extralinks"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">
@@ -141,24 +146,32 @@ function browser_view_footer() {
     <?php
 }
 
-$email_id = absint( get_query_var( 'email_id' ) );
-$email = Plugin::$instance->utils->get_email( $email_id );
+$form_id = get_query_var( 'form_id' );
+$form = new Form( [ 'id' => $form_id ] );
 
-if ( ! $email ){
-    wp_die( __( 'Could not load email...' ) );
-}
-
-$contact = Plugin::$instance->tracking->get_current_contact();
-$email->set_contact( $contact );
-
-$subject = $email->get_merged_subject_line();
-
-browser_view_head( $subject, 'view' );
+form_submit_head( __( 'Submit form', 'groundhogg' ), 'view' );
 
 ?>
-<div class="box">
-    <iframe width="100%" src="<?php echo esc_url( site_url( 'gh/emails/' . $email_id ) ); ?>"></iframe>
-</div>
-<?php
+    <div class="box">
+        <?php
 
-browser_view_footer();
+        if ( Plugin::$instance->submission_handler->has_errors() ){
+
+            $errors = Plugin::$instance->submission_handler->get_errors();
+            $err_html = "";
+
+            foreach ( $errors as $error ){
+                $err_html .= sprintf( '<li id="%s">%s</li>', $error->get_error_code(), $error->get_error_message() );
+            }
+
+            $err_html = sprintf( "<ul class='gh-form-errors'>%s</ul>", $err_html );
+            echo sprintf( "<div class='gh-form-errors-wrapper'>%s</div>", $err_html );
+
+        }
+
+        ?>
+        <?php echo $form->get_iframe_embed_code(); ?>
+    </div>
+    <?php
+
+form_submit_footer();

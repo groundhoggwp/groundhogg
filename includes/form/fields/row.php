@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\html;
+
 class Row extends Field
 {
 
@@ -45,7 +47,10 @@ class Row extends Field
      */
     public function render()
     {
-        return sprintf( "<div id='%s' class='gh-form-row clearfix %s'>%s</div>", $this->get_id(), $this->get_classes(), do_shortcode( $this->get_content() ) );
+        return html()->wrap( do_shortcode( $this->get_content() ), 'div', [
+            'id' => $this->get_id(),
+            'class' => sprintf( 'gh-form-row clearfix %s', $this->get_classes() )
+        ] );
     }
 
     /**

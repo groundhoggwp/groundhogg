@@ -3,6 +3,7 @@
 namespace Groundhogg\Form;
 
 use function Groundhogg\array_to_atts;
+use function Groundhogg\encrypt;
 use Groundhogg\Form\Fields\Checkbox;
 use Groundhogg\Form\Fields\Column;
 use Groundhogg\Form\Fields\Date;
@@ -25,6 +26,7 @@ use Groundhogg\Form\Fields\Textarea;
 use Groundhogg\Form\Fields\Time;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 
@@ -132,6 +134,71 @@ class Form {
         $this->fields[ $key ] = $value;
     }
 
+    public function get_shortcode()
+    {
+        return sprintf('[gh_form id="%d"]', $this->get_id() );
+    }
+
+    public function get_iframe_embed_code()
+    {
+        $form_iframe_url = site_url( sprintf( 'gh/forms/iframe/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
+        $script = sprintf('<script id="%s" type="text/javascript" src="%s"></script>', 'groundhogg_form_' . $this->get_id(), $form_iframe_url );
+
+        return $script;
+    }
+
+    public function get_submission_url()
+    {
+        return site_url( sprintf( 'gh/forms/%s/submit/', urlencode( encrypt( $this->get_id() ) ) ) );
+    }
+
+    public function get_html_embed_code()
+    {
+        $form = html()->e( 'link', [ 'rel' => 'stylesheet', 'href' => GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css' ] );
+
+        $form .= '<div class="gh-form-wrapper">';
+
+        $atts = [
+            'method' => 'post',
+            'class'  => 'gh-form ' . $this->attributes[ 'class' ],
+            'target' => '_parent',
+            'action' => $this->get_submission_url(),
+            'enctype' => 'multipart/form-data'
+        ];
+
+        $form .= sprintf( "<form %s>", array_to_atts( $atts ) );
+
+        if ( ! empty( $this->attributes[ 'id' ] ) ){
+            $form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id() . "'>";
+        }
+
+        $step = Plugin::$instance->utils->get_step( $this->get_id() );
+
+        if ( ! $step ){
+            return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
+        }
+
+        do_action( 'groundhogg/form/shortcode/before', $this );
+
+        $content = do_shortcode( $step->get_meta( 'form' ) );
+
+        do_action( 'groundhogg/form/shortcode/after', $this );
+
+        if ( empty( $content ) ){
+            return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
+        }
+
+        $form .= $content;
+
+        $form .= '</form>';
+
+        $form .= '</div>';
+
+        $form = apply_filters( 'groundhogg/form/after', $form, $this );
+
+        return $form;
+    }
+
 
     /**
      * Do the shortcode
@@ -168,6 +235,10 @@ class Form {
             'target' => '_parent',
             'enctype' => 'multipart/form-data'
         ];
+
+        if ( get_query_var( 'doing_iframe' ) ){
+            $atts[ 'action' ] = $this->get_submission_url();
+        }
 
         $form .= sprintf( "<form %s>", array_to_atts( $atts ) );
 
