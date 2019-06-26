@@ -1,6 +1,10 @@
 <?php
 namespace Groundhogg;
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+include GROUNDHOGG_PATH . 'templates/managed-page.php';
+
 /**
  * The header for our theme
  *
@@ -104,158 +108,13 @@ if ( ! function_exists( 'mail_gdpr_data' ) ){
 
 }
 
-/**
- * Enqueue and dequeue relevant scripts.
- */
-function enqueue_manage_preferences_styles()
-{
-    dequeue_theme_css_compat();
-    dequeue_wc_css_compat();
-
+add_action( 'enqueue_managed_page_styles', function (){
     wp_enqueue_style( 'manage-preferences' );
-    wp_enqueue_style( 'common' );
+} );
 
-    /**
-     * Allow plugins to add styles to this page.
-     */
-    do_action( 'enqueue_manage_preferences_styles' );
-}
-
-/**
- * Enqueue any required JS.
- */
-function enqueue_manage_preferences_scripts()
-{
-    wp_enqueue_script( 'manage-preferences' );
-
-    /**
-     * Allow plugins to add scripts to this page.
-     */
-    do_action( 'enqueue_manage_preferences_scripts' );
-}
-
-define( 'MANAGED_PAGE_WIDTH', 500 );
-
-/**
- * Use the site logo.
- */
-function ensure_logo_is_there()
-{
-    if ( has_custom_logo() ) :
-
-        $image = wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' );
-
-        // Resize image
-        if ( $image[ 1 ] > MANAGED_PAGE_WIDTH ){
-            $aspect_ratio = MANAGED_PAGE_WIDTH / $image[ 1 ];
-            $image[ 1 ] = MANAGED_PAGE_WIDTH;
-            $image[ 2 ] = $image[2] * $aspect_ratio;
-        }
-
-        ?>
-        <style type="text/css">
-            #main h1 a {
-                background-image: url(<?php echo esc_url( $image[0] ); ?>);
-                -webkit-background-size: <?php echo absint( $image[1] )?>px;
-                background-size: <?php echo absint( $image[1] ) ?>px;
-                height: <?php echo absint( $image[2] ) ?>px;
-                width: <?php echo absint( $image[1] ) ?>px;
-            }
-        </style>
-    <?php
-    endif;
-}
-
-/**
- * Output the page header.
- *
- * @param string $title
- * @param string $action
- */
-function manage_preferences_head( $title='', $action='' )
-{
-    add_action( 'wp_print_styles', 'Groundhogg\enqueue_manage_preferences_styles' );
-    add_action( 'wp_enqueue_scripts', 'Groundhogg\enqueue_manage_preferences_scripts' );
-
-    add_action( 'wp_head', 'noindex' );
-    add_action( 'wp_head', 'wp_sensitive_page_meta' );
-    add_action( 'wp_head', 'Groundhogg\ensure_logo_is_there' );
-
-    $mp_title = get_bloginfo( 'name', 'display' );
-
-	/* translators: Login screen title. 1: Login screen name, 2: Network or site name */
-	$mp_title = sprintf( __( '%1$s &lsaquo; %2$s' ), $title, $mp_title );
-    $mp_title = apply_filters( 'manage_preferences_title', $mp_title, $title );
-
-    $classes = [ $action ];
-    $classes = apply_filters( 'manage_preferences_title', $classes, $action );
-
-
-    if ( is_multisite() ) {
-        $header_url   = network_home_url();
-        $header_title = get_network()->site_name;
-    } else {
-        $header_url   = site_url();
-        $header_title = __( 'Powered by Groundhogg', 'groundhogg' );
-    }
-
-    /*
-     * To match the URL/title set above, Multisite sites have the blog name,
-     * while single sites get the header title.
-     */
-    if ( is_multisite() ) {
-        $header_text = get_bloginfo( 'name', 'display' );
-    } else {
-        $header_text = $header_title;
-    }
-
-?><!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-<head>
-    <meta charset="<?php bloginfo( 'charset' ); ?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="profile" href="http://gmpg.org/xfn/11">
-    <title><?php echo $mp_title; ?></title>
-
-    <?php wp_head(); ?>
-</head>
-<body class="manage-preferences <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
-<div id="main">
-    <?php if ( has_custom_logo() ): ?>
-    <h1><a href="<?php echo esc_url( $header_url ); ?>" title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
-    <?php endif;
-
-    Plugin::$instance->notices->notices();
-    ?>
-    <div id="content">
-    <?php
-}
-
-/**
- * Outputs the footer for the login page.
- */
-function manage_preferences_footer() {
-    ?>
-    </div>
-    <p id="extralinks"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">
-            <?php
-            /* translators: %s: site title */
-            printf( _x( '&larr; Back to %s', 'site' ), get_bloginfo( 'title', 'display' ) );
-            ?></a> | <a href="<?php echo esc_url( site_url( 'gh/preferences/profile' ) ); ?>">
-            <?php
-            /* translators: %s: site title */
-            _e( 'Edit Profile', 'groundhogg' );
-            ?></a> |
-        <?php the_privacy_policy_link( '<span class="privacy-policy-page-link">', '</span>' ); ?></p>
-</div>
-<?php
-wp_footer();
-?>
-<div class="clear"></div>
-</body>
-</html>
-<?php
-}
+add_action( 'enqueue_managed_page_scripts', function (){
+	wp_enqueue_script( 'manage-preferences' );
+} );
 
 $contact = Plugin::$instance->tracking->get_current_contact();
 $action = get_query_var( 'action', 'profile' );
@@ -285,7 +144,7 @@ switch ( $action ):
             }
         }
 
-        manage_preferences_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
+        managed_page_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
 
         ?>
         <form action="" id="emailaddress" method="post">
@@ -298,7 +157,7 @@ switch ( $action ):
         </form>
         <?php
 
-        manage_preferences_footer();
+        managed_page_footer();
 
     break;
     case 'download':
@@ -328,26 +187,27 @@ switch ( $action ):
         if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'update_contact_profile' ) ){
 
             $email = sanitize_email( get_request_var( 'email' ) );
-            if ( ! $email ){
+            if ( ! $email || $email !== $contact->get_email() ){
                 Plugin::$instance->notices->add( new \WP_Error( 'bad_email', __( 'You must verify your email address.', 'groundhogg' ) ) );
+
+            } else {
+	            $args = [
+		            'first_name' => sanitize_text_field( get_request_var( 'first_name' ) ),
+		            'last_name' =>  sanitize_text_field( get_request_var( 'last_name' ) ),
+//                'email' => sanitize_email( get_request_var( 'email' ) ) ,
+	            ];
+
+	            $args = apply_filters( 'groundhogg/preferences/update_profile', $args, $contact );
+
+	            if ( $contact->update( $args ) ){
+		            Plugin::$instance->notices->add( 'updated', __( 'Profile updated!', 'groundhogg' ) );
+	            }
+
+	            apply_filters( 'groundhogg/preferences/update_profile', $args, $contact );
             }
-
-            $args = [
-                'first_name' => sanitize_text_field( get_request_var( 'first_name' ) ),
-                'last_name' =>  sanitize_text_field( get_request_var( 'last_name' ) ),
-                'email' => sanitize_email( get_request_var( 'email' ) ) ,
-            ];
-
-            $args = apply_filters( 'groundhogg/preferences/update_profile', $args, $contact );
-
-            if ( $contact->update( $args ) ){
-                Plugin::$instance->notices->add( 'updated', __( 'Profile updated!', 'groundhogg' ) );
-            }
-
-            apply_filters( 'groundhogg/preferences/update_profile', $args, $contact );
         }
 
-        manage_preferences_head( __( 'Update Profile', 'groundhogg' ), 'profile' );
+	    managed_page_head( __( 'Update Profile', 'groundhogg' ), 'profile' );
 
         ?>
         <form action="" id="preferences" method="post">
@@ -392,7 +252,7 @@ switch ( $action ):
     <?php do_action( 'groundhogg/preferences/profile_form/after' ); ?>
         <?php
 
-        manage_preferences_footer();
+	    managed_page_footer();
         break;
 
     case 'manage':
@@ -425,7 +285,7 @@ switch ( $action ):
 
         }
 
-        manage_preferences_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
+        managed_page_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
 
         $preferences = [
             'confirm'       => _x( 'I love this company, you can communicate with me whenever you feel like.', 'preferences', 'groundhogg' ),
@@ -460,7 +320,7 @@ switch ( $action ):
     <?php
 
 
-        manage_preferences_footer();
+        managed_page_footer();
 
         break;
     case 'unsubscribe':
@@ -471,7 +331,7 @@ switch ( $action ):
 
         $contact->unsubscribe();
 
-        manage_preferences_head( __( 'Unsubscribed', 'groundhogg' ), 'unsubscribe' );
+        managed_page_head( __( 'Unsubscribed', 'groundhogg' ), 'unsubscribe' );
 
         ?>
     <div class="box">
@@ -482,7 +342,7 @@ switch ( $action ):
         </p>
     </div>
 <?php
-        manage_preferences_footer();
+        managed_page_footer();
 
         break;
     case 'confirm':
@@ -493,7 +353,7 @@ switch ( $action ):
 
         $contact->change_marketing_preference( Preferences::CONFIRMED );
 
-        manage_preferences_head( __( 'Confirmed', 'groundhogg' ), 'confirm' );
+        managed_page_head( __( 'Confirmed', 'groundhogg' ), 'confirm' );
 
         ?>
     <div class="box">
@@ -505,7 +365,7 @@ switch ( $action ):
     </div>
 <?php
 
-        manage_preferences_footer();
+        managed_page_footer();
 
         break;
 
@@ -523,10 +383,7 @@ switch ( $action ):
          */
         do_action( 'groundhogg/preferences/erase_profile', $contact );
 
-
-        // Todo Erase profile data...
-
-        manage_preferences_head( __( 'Erased', 'groundhogg' ), 'erase' );
+        managed_page_head( __( 'Erased', 'groundhogg' ), 'erase' );
 
         ?>
         <div class="box">
@@ -537,6 +394,6 @@ switch ( $action ):
             </p>
         </div>
         <?php
-        manage_preferences_footer();
+        managed_page_footer();
         break;
 endswitch;

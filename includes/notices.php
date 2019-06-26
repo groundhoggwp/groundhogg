@@ -20,6 +20,48 @@ class Notices
 {
     const TRANSIENT = 'groundhogg_notices';
 
+	/**
+	 * @return bool|string
+	 */
+    protected function get_transient_name()
+    {
+        if ( is_user_logged_in() ){
+            return self::TRANSIENT . '_user_' . get_current_user_id();
+        }
+
+        if ( Plugin::$instance->tracking->get_current_contact() ){
+	        return self::TRANSIENT . '_contact_' . Plugin::$instance->tracking->get_current_contact_id();
+        }
+
+        return false;
+    }
+
+	/**
+	 * @return bool
+	 */
+    protected function can_add_notices()
+    {
+        return (bool) $this->get_transient_name();
+    }
+
+	/**
+	 * @return mixed
+	 */
+    protected function get_stored_notices()
+    {
+        return get_transient( $this->get_transient_name() );
+    }
+
+	/**
+	 * @param array $notices
+	 *
+	 * @return bool
+	 */
+    protected function store_notices( $notices=[] )
+    {
+	    return set_transient( $this->get_transient_name() , $notices, MINUTE_IN_SECONDS );
+    }
+
     /**
      * Add a notice
      *
@@ -27,17 +69,23 @@ class Notices
      * @param $message string message
      * @param string $type
      * @param string|bool $cap
+     *
+     * @return true|false
      */
     public function add( $code='', $message='', $type='success', $cap=false )
     {
-        $notices = get_transient( self::TRANSIENT );
+        if ( ! $this->can_add_notices() ){
+            return false;
+        }
 
-        if ( ! $notices || ! is_array( $notices ) )
-        {
+        $notices = $this->get_stored_notices();
+
+        if ( ! $notices || ! is_array( $notices ) ) {
             $notices = array();
         }
 
         $data = [];
+
         if ( is_wp_error( $code ) ){
             $data = $code->get_error_data();
             $error = $code;
@@ -52,17 +100,27 @@ class Notices
         $notices[$code][ 'data' ]    = $data;
         $notices[$code][ 'cap' ]     = $cap;
 
-        set_transient( self::TRANSIENT, $notices, 60 );
+        $this->store_notices( $notices );
+
+        return true;
     }
 
     /**
      * @param string $code
+     *
+     * @return bool
      */
     public function remove( $code='' )
     {
-        $notices = get_transient( self::TRANSIENT );
+	    if ( ! $this->can_add_notices() ){
+	        return false;
+        }
+
+        $notices = $this->get_stored_notices();
         unset( $notices[ $code ] );
-        set_transient( self::TRANSIENT, $notices, 60 );
+        $this->store_notices( $notices );
+
+        return true;
     }
 
     /**
@@ -71,7 +129,7 @@ class Notices
     public function notices()
     {
 
-        $notices = get_transient( self::TRANSIENT );
+        $notices = $this->get_stored_notices();
 
         if ( ! $notices ){
             $notices = [];
@@ -100,7 +158,7 @@ class Notices
             ?></div><?php
         }
 
-        delete_transient( 'groundhogg_notices' );
+        delete_transient( $this->get_transient_name() );
     }
 
     /**
