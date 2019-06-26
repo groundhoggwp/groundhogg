@@ -68,6 +68,12 @@ class Manager
      */
     public function install_dbs()
     {
+    	if ( empty( $this->dbs ) ){
+    		$this->init_dbs();
+	    }
+
+//    	wp_send_json_error( $this->dbs );
+
         foreach ( $this->dbs as $db ){
             $db->create_table();
         }
