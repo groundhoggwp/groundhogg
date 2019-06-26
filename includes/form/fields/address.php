@@ -1,6 +1,9 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\html;
+use Groundhogg\Plugin;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -17,12 +20,29 @@ class Address extends Input
             'label'         => _x( 'Address *', 'form_default', 'groundhogg' ),
             'class'         => 'gh-address',
             'enabled'       => 'all',
-            'name_prefix'   => '',
             'required'      => false,
         ];
     }
 
-    /**
+    public function get_name()
+    {
+    	return 'address';
+    }
+
+	/**
+	 * Return the value that will be the final value.
+	 *
+	 * @param $input string|array
+	 * @param $config array
+	 * @return string
+	 */
+	public static function validate( $input, $config )
+	{
+		return apply_filters( 'groundhogg/form/fields/address/validate' , array_map( 'sanitize_text_field', $input ) );
+	}
+
+
+	/**
      * Get the name of the shortcode
      *
      * @return string
@@ -35,7 +55,73 @@ class Address extends Input
     public function render()
     {
 
+    	$street_address_1 = [
+    		'type' => 'text',
+		    'name' => 'address[street_address_1]',
+		    'class' => 'gh-input',
+		    'placeholder' => __( 'Street Address 1', 'groundhogg'  ),
+		    'required' => $this->is_required()
+	    ];
 
+    	$street_address_2 = [
+		    'type' => 'text',
+		    'name' => 'address[street_address_2]',
+		    'class' => 'gh-input gh-form-field',
+		    'placeholder' => __( 'Street Address 2', 'groundhogg' ),
+		    'required' => false
+	    ];
+
+    	$city = [
+		    'type' => 'text',
+		    'name' => 'address[city]',
+		    'class' => 'gh-input gh-form-field',
+		    'placeholder' => __( 'City', 'groundhogg'  ),
+		    'required' => $this->is_required()
+	    ];
+
+	    $region = [
+		    'type' => 'text',
+		    'name' => 'address[region]',
+		    'class' => 'gh-input gh-form-field',
+		    'placeholder' => __( 'Province/State', 'groundhogg'  ),
+		    'required' => $this->is_required()
+	    ];
+
+	    $postal_code = [
+		    'type' => 'text',
+		    'name' => 'address[postal_zip]',
+		    'class' => 'gh-input gh-form-field',
+		    'placeholder' => __( 'Zip/Postal Code', 'groundhogg'  ),
+		    'required' => $this->is_required()
+	    ];
+
+	    $country = [
+		    'name' => 'address[country]',
+		    'class' => 'gh-input gh-form-field',
+		    'options' => Plugin::$instance->utils->location->get_countries_list(),
+		    'placeholder' => __( 'Country', 'groundhogg'  ),
+		    'required' => $this->is_required(),
+	    ];
+
+	    return html()->e( 'div', [ 'class' => 'gh-address clearfix' ], [
+	    	html()->e( 'div', [ 'class' => 'gh-form-row' ], [
+			    html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-1' ],
+				    html()->e( 'div', [ 'class' => 'gh-form-field' ],
+				        html()->e( 'label', [ 'class' => 'gh-input-label' ], $this->get_label() . ' ' . html()->input( $street_address_1 ) ) ) )
+		    ] ),
+		    html()->e( 'div', [ 'class' => 'gh-form-row' ], [
+			    html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-1' ], html()->input( $street_address_2 ) ),
+		    ] ),
+		    html()->e( 'div', [ 'class' => 'gh-form-row' ], [
+			    html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-1' ], html()->input( $city ) ),
+		    ] ),
+		    html()->e( 'div', [ 'class' => 'gh-form-row' ], [
+			    html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-3' ], html()->input( $region ) ),
+			    html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-3' ], html()->input( $postal_code ) ),
+			    html()->e( 'div', [ 'class' => 'gh-form-column col-1-of-3' ], html()->dropdown( $country ) ),
+
+		    ] )
+	    ] );
 
     }
 }

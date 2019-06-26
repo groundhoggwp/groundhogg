@@ -77,15 +77,18 @@ class Contact extends Base_Object_With_Meta
      */
     public function get_profile_picture()
     {
+    	if ( $this->profile_picture ){
+    		return $this->profile_picture;
+	    }
 
         $result = wp_remote_retrieve_body( wp_remote_get( sprintf( 'https://api.devidentify.com/%s', $this->get_email() ) ) );
         $result = json_decode( $result );
 
-        if ( ! filter_var( $result->success, FILTER_VALIDATE_BOOLEAN ) ){
-            return get_avatar_url( $this->get_email() );
-        }
+        $profile_pic = ( isset( $result->success ) && filter_var( $result->success, FILTER_VALIDATE_BOOLEAN ) ) ? $result->profile_picture : get_avatar_url( $this->get_email() );
 
-        return $result->profile_picture;
+        $this->update_meta( 'profile_picture', $profile_pic );
+
+        return $profile_pic;
 
     }
 

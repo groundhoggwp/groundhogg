@@ -164,10 +164,22 @@ class Submission_Handler extends Supports_Errors
                 case 'email':
                     $args[ 'email' ] = $value;
                     break;
-                // Custom Fields.
-                default:
-                    $meta[ $field ] = $value;
-                    break;
+	            case 'address':
+
+	            	$parts = [
+	            		'street_address_1',
+	            		'street_address_2',
+	            		'city',
+	            		'postal_zip',
+	            		'region',
+			            'country'
+		            ];
+
+	            	foreach ( $parts as $key ){
+	            		$meta[ $key ] = get_array_var( $value, $key );
+		            }
+
+	            	break;
                 // Only checks whether value is not empty.
                 case 'terms_agreement':
                     if ( ! empty( $value ) ){
@@ -192,6 +204,10 @@ class Submission_Handler extends Supports_Errors
                     }
                     $meta[ $field ] = $value;
                     break;
+	            // Custom Fields.
+	            default:
+		            $meta[ $field ] = $value;
+		            break;
             }
 
             // Check for tag mappings.

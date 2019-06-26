@@ -4,6 +4,7 @@ namespace Groundhogg\Form;
 
 use function Groundhogg\array_to_atts;
 use function Groundhogg\encrypt;
+use Groundhogg\Form\Fields\Address;
 use Groundhogg\Form\Fields\Checkbox;
 use Groundhogg\Form\Fields\Column;
 use Groundhogg\Form\Fields\Date;
@@ -84,6 +85,7 @@ class Form {
         $this->checkbox = new Checkbox($this->get_id());
         $this->terms = new Terms($this->get_id());
         $this->gdpr = new GDPR($this->get_id());
+        $this->address = new Address( $this->get_id());
         $this->recaptcha = new Recaptcha($this->get_id());
         $this->submint = new Submit($this->get_id());
         do_action( 'groundhogg/form/fields/init', $this );
