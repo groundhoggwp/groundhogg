@@ -13,6 +13,10 @@
     background: #FFFFFF;
 }
 
+.button .dashicons {
+    vertical-align: middle;
+}
+
 .header-wrap{
     width:100%;
 }

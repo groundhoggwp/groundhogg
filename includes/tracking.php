@@ -171,6 +171,8 @@ class Tracking
             $this->map_query_var( $vars, 'contact_id', 'hexdec' );
             $this->map_query_var( $vars, 'event_id', 'hexdec' );
             $this->map_query_var( $vars, 'email_id', 'hexdec' );
+
+            //Decode & Decode
             $this->map_query_var( $vars, 'target_url', 'urldecode' );
             $this->map_query_var( $vars, 'target_url', 'base64_decode' );
         }
@@ -480,21 +482,16 @@ class Tracking
             'referer'       => ''
         );
 
-        //wp_die();
-
         if ( Plugin::$instance->dbs->get_db( 'activity' )->add( $args ) ){
-
             do_action( 'groundhogg/tracking/email/opened', $this );
-
-            /* only fire if actually doing an open as this may be called by the email_link_clicked method */
-            if ( $this->doing_open ){
-                /* thanks for coming! */
-                wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
-                die();
-            }
         }
 
-        die();
+	    /* only fire if actually doing an open as this may be called by the email_link_clicked method */
+	    if ( $this->doing_open ){
+		    /* thanks for coming! */
+		    wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
+		    die();
+	    }
     }
 
     /**

@@ -134,6 +134,8 @@ function enqueue_manage_preferences_scripts()
     do_action( 'enqueue_manage_preferences_scripts' );
 }
 
+define( 'MANAGED_PAGE_WIDTH', 500 );
+
 /**
  * Use the site logo.
  */
@@ -142,6 +144,13 @@ function ensure_logo_is_there()
     if ( has_custom_logo() ) :
 
         $image = wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' );
+
+        // Resize image
+        if ( $image[ 1 ] > MANAGED_PAGE_WIDTH ){
+            $aspect_ratio = MANAGED_PAGE_WIDTH / $image[ 1 ];
+            $image[ 1 ] = MANAGED_PAGE_WIDTH;
+            $image[ 2 ] = $image[2] * $aspect_ratio;
+        }
 
         ?>
         <style type="text/css">

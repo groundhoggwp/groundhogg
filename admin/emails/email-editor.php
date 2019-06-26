@@ -93,16 +93,28 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                     ] ); ?>
                     <?php echo html()->modal_link( [
 	                    'title'     => __( 'Mobile Preview' ),
-	                    'text'      => __( 'Preview', 'groundhogg' ),
+	                    'text'      => '<span class="dashicons dashicons-smartphone"></span>',
 	                    'footer_button_text' => __( 'Close' ),
 	                    'id'        => '',
 	                    'class'     => 'button button-secondary',
 	                    'source'    => site_url( 'gh/emails/' . $email->get_id() ),
 	                    'height'    => 580,
-	                    'width'     => 320,
+	                    'width'     => 340,
 	                    'footer'    => 'true',
 	                    'preventSave'    => 'true',
                     ] ); ?>
+	                <?php echo html()->modal_link( [
+		                'title'     => __( 'Desktop Preview' ),
+		                'text'      => '<span class="dashicons dashicons-desktop"></span>',
+		                'footer_button_text' => __( 'Close' ),
+		                'id'        => '',
+		                'class'     => 'button button-secondary',
+		                'source'    => site_url( 'gh/emails/' . $email->get_id() ),
+		                'height'    => 600,
+		                'width'     => 700,
+		                'footer'    => 'true',
+		                'preventSave'    => 'true',
+	                ] ); ?>
                 </div>
             </div>
         </div>
