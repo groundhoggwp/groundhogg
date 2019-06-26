@@ -129,7 +129,7 @@ class Sending_Service
      */
     public function get_gh_uid()
     {
-        $user_id = Plugin::$instance->settings->get_option( 'email_api_user_id' );
+        $user_id = Plugin::$instance->settings->get_option( 'gh_email_api_user_id' );
         return apply_filters( 'groundhogg/service_manager/register_domain/user_id', $user_id );
     }
 
@@ -140,7 +140,7 @@ class Sending_Service
      */
     public function get_oauth_token()
     {
-        $token = Plugin::$instance->settings->get_option( 'email_api_oauth_token' );
+        $token = Plugin::$instance->settings->get_option( 'gh_email_api_oauth_token' );
         return apply_filters( 'groundhogg/service_manager/register_domain/oauth_token', $token );
     }
 
@@ -268,8 +268,8 @@ class Sending_Service
             return;
         }
 
-        $token  = sanitize_text_field( urldecode( $_GET[ 'token' ] ) );
-        $gh_uid = absint( $_GET[ 'user_id' ] );
+        $token  = sanitize_text_field( urldecode( get_request_var( 'token' ) ) );
+        $gh_uid = absint( get_request_var( 'user_id' ) );
 
         /* Update relevant options for further requests */
         Plugin::$instance->settings->update_option( 'gh_email_api_user_id', $gh_uid );
@@ -302,7 +302,7 @@ class Sending_Service
         $token = $this->get_oauth_token();
 
         if ( ! $gh_uid || ! $token ){
-            return new WP_Error( 'invalid_credentials', 'Missing token or User ID.' );
+            return new WP_Error( 'invalid_credentials', 'Missing token or user ID.' );
         }
 
         $headers = [
@@ -508,8 +508,11 @@ class Sending_Service
             $headers = [
                 'Sender-Token'  => md5( $this->get_api_token() ),
                 'Sender-Domain' => site_url(),
-                'Content-Type'  => sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) )
             ];
+        }
+
+        if ( ! isset_not_empty( $headers, 'Content-Type' ) ){
+            $headers[ 'Content-Type' ] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
         }
 
         $body = is_array( $body ) ? wp_json_encode( $body ) : $body;
@@ -535,8 +538,9 @@ class Sending_Service
         }
 
         if ( is_wp_error( $response ) ){
-            $this->add_error( $response );
-            return $response;
+            $error = $response;
+	        $this->add_error( $error );
+            return $error;
         }
 
         $json = json_decode( wp_remote_retrieve_body( $response ) );
@@ -549,7 +553,18 @@ class Sending_Service
 
         if ( is_json_error( $json ) ){
             $error = get_json_error( $json );
-            $this->add_error( $error );
+
+            $data = (array) $error->get_error_data();
+
+            $data[ 'url' ] = $url;
+            $data[ 'method' ] = $method;
+	        $data[ 'headers' ] = $headers;
+	        $data[ 'body' ] = json_decode( $body );
+
+	        $error->add_data( $data );
+
+	        $this->add_error( $error );
+
             return $error;
         }
 
