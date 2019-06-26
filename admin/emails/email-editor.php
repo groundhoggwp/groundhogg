@@ -91,10 +91,32 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                         'id' => 'send-test',
                         'name' => 'update_and_test'
                     ] ); ?>
+                    <?php echo html()->modal_link( [
+	                    'title'     => __( 'Mobile Preview' ),
+	                    'text'      => __( 'Preview', 'groundhogg' ),
+	                    'footer_button_text' => __( 'Close' ),
+	                    'id'        => '',
+	                    'class'     => 'button button-secondary',
+	                    'source'    => site_url( 'gh/emails/' . $email->get_id() ),
+	                    'height'    => 580,
+	                    'width'     => 320,
+	                    'footer'    => 'true',
+	                    'preventSave'    => 'true',
+                    ] ); ?>
                 </div>
             </div>
         </div>
     </div>
+
+    <div id="preview" class="hidden">
+        <div class="preview-wrapper">
+            <div class='mobile'>
+
+            </div>
+            <div class="facebook"></div>
+        </div>
+    </div>
+
     <!-- Main -->
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
 

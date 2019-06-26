@@ -136,9 +136,17 @@ class Text extends Block
         $html.= sprintf( "<h3 class=\"hndle\">%s</h3>", $this->get_title() );
         $html.= "<div class=\"inside\"><div class=\"options\">";
 
+        // Remove media buttons
         remove_all_actions( 'media_buttons' );
 
-//        add_action( 'media_buttons' )
+        // Remove full screen
+        add_filter( 'mce_buttons', function ($buttons){
+        	if ( in_array( 'fullscreen', $buttons ) ){
+        		unset( $buttons[ array_search( 'fullscreen', $buttons ) ] );
+	        }
+
+        	return $buttons;
+        } );
 
         $html.= Plugin::$instance->utils->html->editor( [ 'id' => 'text-content', 'replacements_button' => true, 'settings' => [ 'editor_height' => 300 ] ] );
 
