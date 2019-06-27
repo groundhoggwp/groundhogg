@@ -193,7 +193,46 @@ class Form_Filled extends Benchmark
                         ?>
                     </p>
                 </td>
-            </tr><tr>
+            </tr>
+            <tr>
+                <th>
+                    <?php esc_attr_e( 'Submit via AJAX:', 'groundhogg' ); ?>
+                </th>
+                <td>
+                    <?php
+
+                    $ajax_is_enabled = (bool) $this->get_setting( 'enable_ajax' );
+
+                    echo Plugin::$instance->utils->html->checkbox( [
+                        'label'         => __( 'Enable' ),
+                        'name'          => $this->setting_name_prefix( 'enable_ajax' ),
+                        'id'            => $this->setting_id_prefix( 'enable_ajax' ),
+                        'class'         => 'enable-ajax',
+                        'value'         => '1',
+                        'checked'       => $ajax_is_enabled,
+                        'title'         => __( 'Enable Ajax' ),
+                    ] ); ?>
+                </td>
+            </tr>
+            <tr class="<?php echo $ajax_is_enabled ? '' : 'hidden'; ?>">
+                <th>
+                    <?php esc_attr_e( 'Thank You Message:', 'groundhogg' ); ?>
+                </th>
+                <td>
+                    <?php
+
+                    $args = array(
+                        'type'      => 'text',
+                        'id'        => $this->setting_id_prefix( 'success_message' ),
+                        'name'      => $this->setting_name_prefix( 'success_message' ),
+                        'title'     => __( 'Thank You Message' ),
+                        'value'     => $this->get_setting( 'success_message', __( 'Your submission has been received.' ) )
+                    );
+
+                    echo Plugin::$instance->utils->html->input( $args ); ?>
+                </td>
+            </tr>
+            <tr class="<?php echo $ajax_is_enabled ? 'hidden' : ''; ?>">
                 <th>
                     <?php esc_attr_e( 'Thank You Page:', 'groundhogg' ); ?>
                 </th>
@@ -618,6 +657,8 @@ class Form_Filled extends Benchmark
     {
         $this->save_setting( 'form', wp_kses_post( $this->get_posted_data( 'form' ) ) );
         $this->save_setting( 'success_page', esc_url_raw( $this->get_posted_data( 'success_page' ) ) );
+        $this->save_setting( 'success_message', sanitize_textarea_field( $this->get_posted_data( 'success_message' ) ) );
+        $this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );
     }
 
     /**

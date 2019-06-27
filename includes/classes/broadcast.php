@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Broadcasts;
 use Groundhogg\DB\DB;
 
@@ -215,8 +216,14 @@ class Broadcast extends Base_Object implements Event_Process
     {
 
 	    do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
+
         $result = $this->get_object()->send( $contact, $event );
+
         do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );
+
+        if ( ! $this->is_sent() ){
+            $this->update( [ 'status' => 'sent' ] );
+        }
 
         return $result;
     }
@@ -238,8 +245,19 @@ class Broadcast extends Base_Object implements Event_Process
     {
         $data = [];
 
-        if ( $this->get_status() === 'sent' ){
-            $data[] = 'hi';
+        if ( $this->is_sent() ){
+
+            $data[ 'sent' ]         = get_db( 'events' )->count( [ 'step_id' => $this->get_id(), 'event_type' => Event::BROADCAST, 'status' => Event::COMPLETE ] );
+
+            if ( ! $this->is_sms() ){
+                $data[ 'waiting' ]      = get_db( 'events' )->count( [ 'step_id' => $this->get_id(), 'event_type' => Event::BROADCAST, 'status' => Event::WAITING ] );
+                $data[ 'opened' ]       = get_db( 'activity' )->count( [ 'funnel_id' => $this->get_funnel_id(), 'step_id' => $this->get_id(), 'activity_type' => Activity::EMAIL_OPENED ] );
+                $data[ 'open_rate' ]    = percentage( $data[ 'sent' ], $data[ 'opened' ] );
+                $data[ 'clicked' ]      = get_db( 'activity' )->count( [ 'funnel_id' => $this->get_funnel_id(), 'step_id' => $this->get_id(), 'activity_type' => Activity::EMAIL_CLICKED ] );
+                $data[ 'click_through_rate' ] = percentage( $data[ 'clicked' ], $data[ 'opened' ] );
+                $data[ 'unopened' ] = $data[ 'sent' ] - $data[ 'opened' ];
+            }
+
         }
 
         return $data;

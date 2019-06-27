@@ -4,6 +4,8 @@ namespace Groundhogg\Form;
 use function Groundhogg\after_form_submit_handler;
 use Groundhogg\Contact;
 use function Groundhogg\decrypt;
+use function Groundhogg\doing_rest;
+use function Groundhogg\form_errors;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
@@ -27,6 +29,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Submission_Handler extends Supports_Errors
 {
+
+    protected $doing_rest = false;
 
     /**
      * @var array
@@ -60,7 +64,21 @@ class Submission_Handler extends Supports_Errors
             return;
         }
 
-        add_action( 'init', [ $this, 'setup' ] );
+        if ( wp_doing_ajax() && wp_verify_nonce( get_request_var( '_ghnonce' ), 'groundhogg_frontend' ) ) {
+            add_action('wp_ajax_groundhogg_ajax_form_submit', [$this, 'setup']);
+            add_action('wp_ajax_groundhogg_ajax_form_submit', [$this, 'ajax_handler']);
+            add_action('wp_ajax_nopriv_groundhogg_ajax_form_submit', [$this, 'setup']);
+            add_action('wp_ajax_nopriv_groundhogg_ajax_form_submit', [$this, 'ajax_handler']);
+        } else {
+            add_action( 'init', [ $this, 'setup' ] );
+        }
+    }
+
+    public function ajax_handler()
+    {
+        if ( $this->has_errors() ){
+            wp_send_json_error( [ 'errors' => $this->get_errors(), 'html' => form_errors() ] );
+        }
     }
 
     public function setup()
@@ -295,7 +313,17 @@ class Submission_Handler extends Supports_Errors
              */
             do_action( 'groundhogg/form/submission_handler/after', $submission, $contact, $this );
 
-            if ( $this->is_admin_submission() ){
+            if ( $this->is_ajax_request() ){
+
+                $success_message = $this->step->get_meta('success_message' );
+
+                if ( ! $success_message ){
+                    $success_message = __( 'Your submission has been received!', 'groundhogg' );
+                }
+
+                wp_send_json_success( [ 'message' => $success_message,  ] );
+
+            } else if ( $this->is_admin_submission() ){
 
                 Plugin::$instance->notices->add( 'form_filled', _x( 'Form submitted', 'notice', 'groundhogg' ) );
                 $admin_url = admin_url( sprintf( 'admin.php?page=gh_contacts&action=edit&contact=%d', $contact->get_id() ) );
@@ -312,6 +340,11 @@ class Submission_Handler extends Supports_Errors
         }
 
         return false;
+    }
+
+    protected function is_ajax_request()
+    {
+        return wp_doing_ajax() || doing_rest();
     }
 
     public function is_admin_submission()

@@ -2,8 +2,10 @@
 namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Broadcast;
+use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
 use function Groundhogg\get_request_query;
+use function Groundhogg\groundhogg_url;
 use Groundhogg\Plugin;
 use function Groundhogg\scheduled_time;
 use \WP_List_Table;
@@ -107,7 +109,7 @@ class Broadcasts_Table extends WP_List_Table {
         $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=scheduled' ) . "'>" . _x( 'Scheduled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'scheduled' ] . ")</span>" . "</a>";
         $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=cancelled' ) . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'cancelled' ] . ")</span>" . "</a>";
 
-        return apply_filters(  'wpgh_broadcast_views', $views );
+        return apply_filters(  'groundhogg/admin/broadcasts/table/get_views', $views );
     }
 
     protected function get_view()
@@ -149,12 +151,12 @@ class Broadcasts_Table extends WP_List_Table {
 		        $actions['edit'] = "<span class='edit'><a href='" . admin_url('admin.php?page=gh_sms&action=edit&sms=' . $broadcast->get_object_id() ) . "'>" . _x( 'Edit SMS', 'action', 'groundhogg') . "</a></span>";
 	        }
 
-            if ( intval( $broadcast->get_send_time() ) > time() ){
+            if ( $broadcast->get_send_time() > time() ){
                 $actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url(admin_url('admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->get_id() ), 'cancel') . "'>" . _x( 'Cancel', 'action', 'groundhogg') . "</a></span>";
             }
         }
 
-        return $this->row_actions( apply_filters( 'wpgh_broadcast_row_actions', $actions, $broadcast, $column_name ) );
+        return $this->row_actions( apply_filters( 'groundhogg/admin/broadcasts/table/handle_row_actions', $actions, $broadcast, $column_name ) );
     }
 
     /**
@@ -166,7 +168,7 @@ class Broadcasts_Table extends WP_List_Table {
         $subject = $broadcast->get_title();
 
         if ( $broadcast->is_email() ){
-            $editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=edit&broadcast=' . $broadcast->ID );
+            $editUrl = admin_url( 'admin.php?page=gh_broadcasts&action=report&broadcast=' . $broadcast->get_id() );
         } else {
             $editUrl = '#';
         }
@@ -240,78 +242,40 @@ class Broadcasts_Table extends WP_List_Table {
 	    if ( $broadcast->get_status() !== 'sent' )
 		    return '&#x2014;';
 
-	    $contact_sum = Plugin::$instance->dbs->get_db('events')->count( [
-		    'step_id'       => $broadcast->get_id(),
-		    'status'        => 'complete',
-		    'event_type'    => Event::BROADCAST
-	    ] );
+	    $stats = $broadcast->get_report_data();
 
-    	if ( $broadcast->is_sms() ){
+        $html = sprintf(
+            "%s: <strong><a href='%s'>%d</a></strong><br/>",
+            _x( "Sent", 'stats', 'groundhogg' ),
+            add_query_arg(
+                [ 'report' => [ 'type' => Event::BROADCAST, 'step' => $broadcast->get_id(), 'status' => Event::COMPLETE ] ],
+                admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+            ),
+            $stats[ 'sent' ]
+        );
 
-		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
-			    _x( "Sent", 'stats', 'groundhogg' ),
-                admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
-                    'report' => [
-                        'type' => Event::BROADCAST,
-                        'step' => $broadcast->get_id(),
-                        'status' => Event::COMPLETE
-                    ]
-                ] ) ) ),
-			    $contact_sum
-		    );
+    	if ( ! $broadcast->is_sms() ){
 
-	    } else {
+            $html.= sprintf(
+                "%s: <strong><a href='%s'>%d</a></strong><br/>",
+                _x( "Opened", 'stats', 'groundhogg' ),
+                add_query_arg(
+                    [ 'activity' => [ 'activity_type' => Activity::EMAIL_OPENED, 'step_id' => $broadcast->get_id(), 'funnel_id' => $broadcast->get_funnel_id() ] ],
+                    admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+                ),
+                $stats[ 'opened' ]
+            );
 
-
-		    $opens = Plugin::$instance->dbs->get_db('activity')->count( [
-			    'funnel_id'     => $broadcast->get_funnel_id(),
-			    'step_id'       => $broadcast->get_id(),
-			    'activity_type' => 'email_opened'
-		    ] );
-
-		    $clicks = Plugin::$instance->dbs->get_db('activity')->count( [
-                'funnel_id'     => $broadcast->get_funnel_id(),
-                'step_id'       => $broadcast->get_id(),
-			    'activity_type' => 'email_link_click'
-		    ] );
-
-		    $html = sprintf( "%s: <strong><a href='%s'>%d</a></strong><br/>",
-			    _x( "Sent", 'stats', 'groundhogg' ),
-                admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
-                    'report' => [
-                        'type' => Event::BROADCAST,
-                        'step' => $broadcast->get_id(),
-                        'status' => Event::COMPLETE
-                    ]
-                ] ) ) ),
-			    $contact_sum
-		    );
-
-		    $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
-			    _x( "Opens", 'stats', 'groundhogg' ),
-                admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
-                    'activity' => [
-                        'event_type' => Event::BROADCAST,
-                        'step' => $broadcast->get_id(),
-                        'activity_type' => 'email_opened'
-                    ]
-                ] ) ) ),
-			    $opens
-		    );
-
-		    $html.= sprintf( "%s: <strong><a href='%s' target='_blank' >%d</a></strong><br/>",
-			    _x( "Clicks", 'stats', 'groundhogg' ),
-                admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
-                    'activity' => [
-                        'event_type' => Event::BROADCAST,
-                        'step' => $broadcast->get_id(),
-                        'activity_type' => 'email_link_click'
-                    ]
-                ] ) ) ),
-			    $clicks );
-
-		    $html.= sprintf( "%s: <strong>%d%%</strong><br/>", _x( "C.T.R", 'stats', 'groundhogg' ), round( ( $clicks / ( ( $opens > 0 )? $opens : 1 ) * 100 ), 2 ) );
-	    }
+            $html.= sprintf(
+                "%s: <strong><a href='%s'>%d</a></strong><br/>",
+                _x( "Clicked", 'stats', 'groundhogg' ),
+                add_query_arg(
+                    [ 'activity' => [ 'activity_type' => Activity::EMAIL_CLICKED, 'step_id' => $broadcast->get_id(), 'funnel_id' => $broadcast->get_funnel_id() ] ],
+                    admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+                ),
+                $stats[ 'clicked' ]
+            );
+    	}
 
         return $html;
     }

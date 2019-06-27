@@ -28,6 +28,7 @@ class Scripts
         $IS_MINIFIED = $this->is_script_debug_enabled() ? '' : '.min';
 
         wp_register_script('groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend/frontend' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true );
+        wp_register_script('groundhogg-ajax-form', GROUNDHOGG_ASSETS_URL . 'js/frontend/ajax-form' . $IS_MINIFIED . '.js', ['jquery', 'groundhogg-frontend' ], GROUNDHOGG_VERSION, true );
         wp_register_script('manage-preferences', GROUNDHOGG_ASSETS_URL . 'js/frontend/preferences' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
         wp_register_script('fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
 
@@ -38,6 +39,8 @@ class Scripts
             wp_localize_script('groundhogg-frontend', 'Groundhogg', array(
                 'page_view_endpoint' => rest_url( 'gh/v3/tracking/page-view/'),
                 'form_impression_endpoint' => rest_url( 'gh/v3/tracking/form-impression/'),
+                'form_submission_endpoint' => rest_url( 'gh/v3/forms/submit/'),
+                'ajaxurl' => admin_url( 'admin-ajax.php' ),
                 '_wpnonce' => wp_create_nonce('wp_rest'),
                 '_ghnonce' => wp_create_nonce('groundhogg_frontend')
             ));

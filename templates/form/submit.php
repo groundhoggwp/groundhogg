@@ -26,19 +26,7 @@ managed_page_head( $step->get_title(), 'view' );
     <div class="box">
         <?php
 
-        if ( Plugin::$instance->submission_handler->has_errors() ){
-
-            $errors = Plugin::$instance->submission_handler->get_errors();
-            $err_html = "";
-
-            foreach ( $errors as $error ){
-                $err_html .= sprintf( '<li id="%s">%s</li>', $error->get_error_code(), $error->get_error_message() );
-            }
-
-            $err_html = sprintf( "<ul class='gh-form-errors'>%s</ul>", $err_html );
-            echo sprintf( "<div class='gh-form-errors-wrapper'>%s</div>", $err_html );
-
-        }
+        form_errors( false );
 
         ?>
         <?php echo $form->get_iframe_embed_code(); ?>

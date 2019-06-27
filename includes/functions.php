@@ -149,9 +149,8 @@ function get_request_query( $default = [], $force=[] )
        unset( $query[ $key ] );
    }
 
-   foreach ( $query as $key => $value ){
-       $query[ $key ] = sanitize_text_field( urldecode( $value ) );
-   }
+   $query = urldecode_deep( $query );
+   $query = map_deep( $query, 'sanitize_text_field' );
 
    if ( isset_not_empty( $_GET, 's' ) ){
        $query[ 'search' ] = get_request_var( 's' );
@@ -211,6 +210,15 @@ function do_replacements( $content = '', $contact_id = 0 ){
  */
 function encrypt( $data ){
     return Plugin::$instance->utils->encrypt_decrypt( $data, 'e' );
+}
+
+/**
+ * If WordPress is executing a REST request
+ *
+ * @return bool
+ */
+function doing_rest(){
+    return ( defined( 'REST_REQUEST' ) && REST_REQUEST );
 }
 
 /**
@@ -333,6 +341,12 @@ function percentage( $a, $b )
     }
 
     return round( ( $b / $a ) * 100, 2 );
+}
+
+function sort_by_string_in_array($key) {
+    return function ($a, $b) use ($key) {
+        return strnatcmp( get_array_var($a, $key), get_array_var($b, $key) );
+    };
 }
 
 /**
@@ -1751,4 +1765,36 @@ function floating_phil()
 function groundhogg_logo()
 {
     ?><img src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo.png'; ?>" width="300"><?php
+}
+
+/**
+ * Return form submission error html or echo it.
+ *
+ * @param bool $return
+ * @return bool|string
+ */
+function form_errors( $return = true )
+{
+    if ( Plugin::$instance->submission_handler->has_errors() ) {
+
+        $errors = Plugin::$instance->submission_handler->get_errors();
+        $err_html = "";
+
+        foreach ($errors as $error) {
+            $err_html .= sprintf('<li id="%s">%s</li>', $error->get_error_code(), $error->get_error_message());
+        }
+
+        $err_html = sprintf("<ul class='gh-form-errors'>%s</ul>", $err_html);
+        $err_html = sprintf("<div class='gh-message-wrapper gh-form-errors-wrapper'>%s</div>", $err_html);
+
+        if ( $return ){
+            return $err_html;
+        }
+
+        echo $return;
+
+        return true;
+    }
+
+    return false;
 }

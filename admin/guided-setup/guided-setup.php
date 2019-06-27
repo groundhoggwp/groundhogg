@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Guided_Setup;
 
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Admin\Guided_Setup\Steps\Business_Info;
+use Groundhogg\Admin\Guided_Setup\Steps\Community;
 use Groundhogg\Admin\Guided_Setup\Steps\Compliance;
 use Groundhogg\Admin\Guided_Setup\Steps\Email;
 use Groundhogg\Admin\Guided_Setup\Steps\Finished;
@@ -65,6 +66,7 @@ class Guided_Setup extends Admin_Page
         $steps[] = new Sync_Users();
         $steps[] = new Email();
         $steps[] = new Tracking();
+        $steps[] = new Community();
         $steps[] = new Finished();
 
         $this->steps = $steps;

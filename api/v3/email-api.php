@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Groundhogg\Plugin;
 use function Groundhogg\send_email_notification;
+use function Groundhogg\sort_by_string_in_array;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -93,10 +94,12 @@ class Email_Api extends Base
         $is_for_select = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
         $is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 
-        $emails =Plugin::$instance->dbs->get_db( 'emails' )->query( $query );
+        $emails = Plugin::$instance->dbs->get_db( 'emails' )->query( $query, 'ID' );
 
         if ( $is_for_select2 ){
             $json = array();
+
+            usort($emails, sort_by_string_in_array('subject' ) );
 
             foreach ( $emails as $i => $email ) {
 

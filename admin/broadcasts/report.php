@@ -3,6 +3,9 @@
 namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Broadcast;
+use Groundhogg\Classes\Activity;
+use Groundhogg\Event;
+use function Groundhogg\percentage;
 use Groundhogg\Plugin;
 
 /**
@@ -21,7 +24,7 @@ use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$id = intval( $_GET[ 'broadcast' ] );
+$id = absint( $_GET[ 'broadcast' ] );
 
 $broadcast = new Broadcast( $id );
 
@@ -36,6 +39,8 @@ if ( ! $broadcast->is_sent() ):
 
 else:
 
+    $stats = $broadcast->get_report_data();
+
     ?>
 <h2><?php _e( 'Stats', 'groundhogg'  ); ?></h2>
 <table class="form-table">
@@ -44,15 +49,11 @@ else:
         <th><?php  _ex( 'Total Delivered', 'stats','groundhogg' ); ?></th>
         <td><?php
 
-
-            $contact_sum = Plugin::$instance->dbs->get_db('events')->count([
-                'funnel_id'     => $broadcast->get_funnel_id(),
-                'step_id'       => $broadcast->get_id()
-            ] );
-
-            echo sprintf( "<strong><a href='%s' target='_blank' >%d</a></strong></strong>",
-                admin_url( sprintf( 'admin.php?page=gh_contacts&view=report&funnel=%s&step=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 0, time() ) ),
-                $contact_sum
+            printf( "<strong><a href='%s' target='_blank' >%d</a></strong></strong>",
+                add_query_arg(
+                    [ 'report' => [ 'type' => Event::BROADCAST, 'step' => $broadcast->get_id(), 'status' => Event::COMPLETE ] ],
+                    admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+                ), $stats[ 'sent' ]
             );
 
             ?>
@@ -62,16 +63,13 @@ else:
         <th><?php _ex( 'Opens', 'stats','groundhogg' ); ?></th>
         <td><?php
 
-            $opens = Plugin::$instance->dbs->get_db('events')->count([
-                'funnel_id'     => $broadcast->get_funnel_id(),
-                'step_id'       => $broadcast->get_id(),
-                'activity_type' => 'email_opened'
-            ] );
-
-                echo sprintf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
-                admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_opened', 0, time() ) ),
-                $opens,
-                ( $opens / $contact_sum ) * 100
+                printf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
+                    add_query_arg(
+                        [ 'activity' => [ 'activity_type' => Activity::EMAIL_OPENED, 'step_id' => $broadcast->get_id(), 'funnel_id' => $broadcast->get_funnel_id() ] ],
+                        admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+                    ),
+                    $stats[ 'opened' ],
+                percentage( $stats[ 'sent' ], $stats[ 'opened' ] )
             );
 
             ?></td>
@@ -79,27 +77,25 @@ else:
     <tr>
         <th><?php _ex( 'Clicks', 'stats', 'groundhogg' ); ?></th>
         <td><?php
-            $clicks = Plugin::$instance->dbs->get_db('events')->count([
-                'funnel_id'     => $broadcast->get_funnel_id(),
-                'step_id'       => $broadcast->get_id(),
-                'activity_type' => 'email_link_click'
-            ] );
 
-            echo sprintf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
-                admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_link_click', 0, time() ) ),
-                $clicks,
-                ( $clicks / $contact_sum ) * 100
+            printf( "<strong><a href='%s' target='_blank' >%d (%d%%)</a></strong>",
+                add_query_arg(
+                    [ 'activity' => [ 'activity_type' => Activity::EMAIL_CLICKED, 'step_id' => $broadcast->get_id(), 'funnel_id' => $broadcast->get_funnel_id() ] ],
+                    admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+                ),
+                $stats[ 'clicked' ],
+                percentage( $stats[ 'sent' ], $stats[ 'clicked' ] )
             );
 
             ?></td>
     </tr>
     <tr>
         <th><?php _ex( 'Click Through Rate', 'stats', 'groundhogg' ); ?></th>
-        <td><?php echo sprintf("<strong>%d%%</strong>", ( $clicks / $opens ) * 100 ); ?></td>
+        <td><?php echo sprintf("<strong>%d%%</strong>",  percentage( $stats[ 'opened' ], $stats[ 'clicked' ] ) ); ?></td>
     </tr>
     <tr>
         <th><?php _ex( 'Unopened', 'stats','groundhogg' ); ?></th>
-        <td><?php echo sprintf("<strong>%d (%d%%)</strong>", $contact_sum - $opens,  ( ( $contact_sum - $opens ) / $contact_sum ) * 100 ); ?></td>
+        <td><?php echo sprintf("<strong>%d (%d%%)</strong>", $stats[ 'unopened' ],  percentage( $stats[ 'sent' ], $stats[ 'unopened' ] ) ); ?></td>
     </tr>
 
     <?php
@@ -110,21 +106,28 @@ else:
         $dataset  =  array();
 
         $dataset[] = array(
-            'label' => _x('Opens, did not click', 'stats', 'groundhogg'),
-            'data' => $opens - $clicks,
-            'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_opened', 0, time() ) ),
-        ) ;
+            'label' => _x('Opened', 'stats', 'groundhogg'),
+            'data' => $stats[ 'opened' ] - $stats[ 'clicked' ],
+            'url'  => add_query_arg(
+                [ 'activity' => [ 'activity_type' => Activity::EMAIL_OPENED, 'step_id' => $broadcast->get_id(), 'funnel_id' => $broadcast->get_funnel_id() ] ],
+                admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+            )
+        );
+
         $dataset[] = array(
-            'label' => _x('Opens and clicked', 'stats', 'groundhogg'),
-            'data' => $clicks,
-            'url'  => admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_link_click', 0, time() ) )
-        ) ;
+            'label' => _x('Clicked', 'stats', 'groundhogg'),
+            'data' => $stats[ 'clicked' ],
+            'url'  => add_query_arg(
+                [ 'activity' => [ 'activity_type' => Activity::EMAIL_CLICKED, 'step_id' => $broadcast->get_id(), 'funnel_id' => $broadcast->get_funnel_id() ] ],
+                admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+            ),
+        );
+
         $dataset[] = array(
             'label' => _x('Unopened', 'stats', 'groundhogg'),
-            'data' => $contact_sum - $opens,
+            'data' => $stats[ 'unopened' ],
             'url'  => '#'
-
-        ) ;
+        );
 
     ?>
 
@@ -173,31 +176,20 @@ else:
 <h2><?php _ex( 'Links Clicked', 'stats', 'groundhogg'  ); ?></h2>
 <?php
 
-
-//    $activity = WPGH()->activity->get_activity( array(
-//        'funnel_id'     => $broadcast->get_funnel_id(),
-//        'step_id'       => $broadcast->get_id(),
-//        'activity_type' => 'email_link_click'
-//    ) ); todo check query for fetch
-
-     $activity = Plugin::$instance->dbs->get_db('events')->query([
+     $activity = Plugin::$instance->dbs->get_db('activity' )->query([
          'funnel_id'     => $broadcast->get_funnel_id(),
          'step_id'       => $broadcast->get_id(),
-         'activity_type' => 'email_link_click'
+         'activity_type' => Activity::EMAIL_CLICKED
      ] );
-
-
 
     $links = array();
 
     foreach ( $activity as $event ){
-
         if ( isset( $links[ $event->referer ] ) ){
             $links[ $event->referer ] += 1;
         } else {
             $links[ $event->referer ] = 1;
         }
-
     }
 
     ?>
@@ -223,7 +215,12 @@ else:
     ?>
     <tr>
         <td><?php echo sprintf( "<a href='%s' target='_blank' >%s</a>", $link, $link ) ?></td>
-        <td><?php echo sprintf( "<a href='%s' target='_blank' >%d</a>", admin_url( sprintf( 'admin.php?page=gh_contacts&view=activity&funnel=%s&step=%s&activity_type=%s&referer=%s&start=%s&end=%s', $broadcast->get_funnel_id(), $broadcast->get_id(), 'email_link_click', $link, 0, time() ) ), $clicks ); ?></td>
+        <td><?php echo sprintf( "<a href='%s' target='_blank' >%d</a>",
+                add_query_arg(
+                    [ 'activity' => [ 'activity_type' => Activity::EMAIL_CLICKED, 'step_id' => $broadcast->get_id(), 'funnel_id' => $broadcast->get_funnel_id(), 'referer' => $link ] ],
+                    admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+                ),
+            $clicks ); ?></td>
     </tr>
     <?php
     endforeach;

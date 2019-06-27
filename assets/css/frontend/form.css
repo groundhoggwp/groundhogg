@@ -2,14 +2,23 @@
     box-sizing: border-box;
 }
 
-.gh-form-errors-wrapper{
+.gh-message-wrapper{
     padding: 15px;
     margin-bottom: 20px;
     border: 1px solid;
     border-radius: 4px;
+}
+
+.gh-form-errors-wrapper{
     color: #a94442;
     background-color: #f2dede;
     border-color: #ebccd1;
+}
+
+.gh-form-success-wrapper{
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
 }
 
 ul.gh-form-errors{

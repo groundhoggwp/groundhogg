@@ -624,6 +624,11 @@ class Contacts_Page extends Admin_Page
             }
         }
 
+        /**
+         *
+         */
+        do_action( 'groundhogg/admin/contact/save', $contact->get_id(), $contact );
+
         $this->add_notice('update', _x("Contact updated!", 'notice', 'groundhogg'), 'success');
 
         return true;

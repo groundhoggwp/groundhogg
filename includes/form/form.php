@@ -25,6 +25,7 @@ use Groundhogg\Form\Fields\Terms;
 use Groundhogg\Form\Fields\Text;
 use Groundhogg\Form\Fields\Textarea;
 use Groundhogg\Form\Fields\Time;
+use function Groundhogg\form_errors;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
@@ -88,6 +89,7 @@ class Form {
         $this->address = new Address( $this->get_id());
         $this->recaptcha = new Recaptcha($this->get_id());
         $this->submint = new Submit($this->get_id());
+
         do_action( 'groundhogg/form/fields/init', $this );
     }
 
@@ -200,8 +202,6 @@ class Form {
             return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
         }
 
-//        $form .= $this->get_honey_pot_code();
-
         do_action( 'groundhogg/form/shortcode/before', $this );
 
         $content = do_shortcode( $step->get_meta( 'form' ) );
@@ -239,23 +239,20 @@ class Form {
         $form = '<div class="gh-form-wrapper">';
 
         /* Errors from a previous submission */
-        if ( Plugin::$instance->submission_handler->has_errors() ){
+        $form .= form_errors( true );
 
-            $errors = Plugin::$instance->submission_handler->get_errors();
-            $err_html = "";
+        $step = Plugin::$instance->utils->get_step( $this->get_id() );
 
-            foreach ( $errors as $error ){
-                $err_html .= sprintf( '<li id="%s">%s</li>', $error->get_error_code(), $error->get_error_message() );
-            }
+        $submit_via_ajax = $step->get_meta( 'enable_ajax' );
 
-            $err_html = sprintf( "<ul class='gh-form-errors'>%s</ul>", $err_html );
-            $form .= sprintf( "<div class='gh-form-errors-wrapper'>%s</div>", $err_html );
-
+        if ( $submit_via_ajax ){
+            wp_enqueue_script( 'groundhogg-ajax-form' );
+            wp_enqueue_style( 'groundhogg-loader' );
         }
 
         $atts = [
             'method' => 'post',
-            'class'  => 'gh-form ' . $this->attributes[ 'class' ],
+            'class'  => 'gh-form ' . $this->attributes[ 'class' ] . ( $submit_via_ajax ? ' ajax-submit' : '' ),
             'target' => '_parent',
             'enctype' => 'multipart/form-data'
         ];
@@ -271,13 +268,9 @@ class Form {
             $form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id(). "'>";
         }
 
-        $step = Plugin::$instance->utils->get_step( $this->get_id() );
-
         if ( ! $step ){
             return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
         }
-
-//        $form .= $this->get_honey_pot_code();
 
         do_action( 'groundhogg/form/shortcode/before', $this );
 

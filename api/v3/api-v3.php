@@ -19,6 +19,8 @@ class API_V3
 
     public function __construct()
     {
+        define( 'DOING_GROUNDHOGG_REST_REQUEST', true );
+
         /**
          * Use this action to declare extension endpoints...
          */
@@ -45,6 +47,7 @@ class API_V3
         $this->reports  = new Reports_Api();
         $this->broadcasts = new Broadcasts_Api();
         $this->bulk_job = new Bulk_Job_Api();
+//        $this->forms    = new Forms_Api();
 
     }
 

@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Groundhogg\Plugin;
 use function Groundhogg\send_sms_notification;
+use function Groundhogg\sort_by_string_in_array;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -99,7 +100,9 @@ class Sms_Api extends Base
 	    if ( $is_for_select2 ){
 		    $json = array();
 
-		    foreach ( $sms as $i => $sms_single ) {
+            usort($sms, sort_by_string_in_array('subject' ) );
+
+            foreach ( $sms as $i => $sms_single ) {
 
 			    $json[] = array(
 				    'id' => $sms_single->ID,

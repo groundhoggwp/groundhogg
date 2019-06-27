@@ -75,5 +75,6 @@
     $(function(){
         gh.init();
     });
+
 })(Groundhogg, jQuery);
 
