@@ -1,6 +1,9 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 
+use function Groundhogg\get_form_list;
+use function Groundhogg\get_request_var;
+use function Groundhogg\html;
 use Groundhogg\Plugin;
 
 /**
@@ -18,16 +21,11 @@ use Groundhogg\Plugin;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( ! isset( $_GET[ 'form' ] ) ){
-    return;
-}
+$form_id = absint( get_request_var( 'form' ) );
 
-$form_id = intval( $_GET[ 'form' ] );
-
-//$step = wpgh_get_funnel_step( $form_id );
 $step = Plugin::$instance->utils->get_step( $form_id ); //todo check
-$contact_id = intval( $_GET[ 'contact' ] );
 
+$forms = get_form_list();
 ?>
 <!-- Title -->
 <span class="hidden" id="new-title"><?php echo $step->get_title() ?> &lsaquo; </span>
@@ -39,36 +37,24 @@ $contact_id = intval( $_GET[ 'contact' ] );
         <th><?php _ex( 'Internal Form', 'contact_record', 'groundhogg' ); ?></th>
         <td>
             <div style="max-width: 400px;">
+                <form method="get">
+                <?php html()->hidden_GET_inputs(); ?>
+                <?php wp_nonce_field( 'switch_form', '_wpnonce', false ); ?>
                 <?php
-                $forms = Plugin::$instance->dbs->get_db('steps')->query( [  'step_type' => 'form_fill' ] );
-                $form_options = array();
-                $default = 0;
-                foreach ( $forms as $form ){
-                    if ( ! $default ){$default = $form->ID;}
-//                    $step = wpgh_get_funnel_step( $form->ID ); todo check
-                    $step = Plugin::$instance->utils->get_step( $form->ID );
-                    if ( $step->is_active() ){$form_options[ $form->ID ] = $form->step_title;}
-                }
-
-                if ( $_GET[ 'form' ] ){
-                    $default = intval( $_GET[ 'form' ] );
-                }
-
 
                 echo Plugin::$instance->utils->html->select2( [
-                    'name'              => 'manual_form_submission',
+                    'name'              => 'form',
                     'id'                => 'manual_form_submission',
                     'class'             => 'manual-submission gh-select2',
-                    'data'              => $form_options,
+                    'data'              => $forms,
                     'multiple'          => false,
-                    'selected'          => [ $default ],
-                    'placeholder'       => 'Please Select a Form',
+                    'selected'          => $form_id,
+                    'placeholder'       => __( 'Please select a form', 'groundhogg' ),
                 ] );
 
-                ?><div class="actions" style="padding: 2px 0 0;">
-                    <script>var WPGHFormSubmitBaseUrl = '<?php printf( 'admin.php?page=gh_contacts&action=form&contact=%d&form=', $contact_id ); ?>';</script>
-                    <a id="form-submit-link" class="button button-secondary" href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&action=form&contact=%d&form=%d', $contact_id, $default ) ); ?>"><?php _ex( 'Change Form', 'action', 'groundhogg' ) ?></a>
-                </div>
+                submit_button( __( 'Switch Form', 'groundhogg' ) );
+                ?>
+                </form>
             </div>
         </td>
     </tr>
@@ -76,6 +62,13 @@ $contact_id = intval( $_GET[ 'contact' ] );
 <hr>
 <div>
     <div style="max-width: 800px; margin: 100px auto">
-        <?php echo do_shortcode( sprintf( '[gh_form id="%d"]', $default ) ); ?>
+        <?php
+
+        if ( ! $form_id ){
+            $ids = array_keys( $forms );
+            $form_id = array_shift( $ids );
+        }
+
+        echo do_shortcode( sprintf( '[gh_form id="%d"]', $form_id ) ); ?>
     </div>
 </div>

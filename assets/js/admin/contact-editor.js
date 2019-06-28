@@ -1,8 +1,8 @@
-var wpghContactEditor;
+var ContactEditor = {};
 
-(function($){
+(function($,editor){
 
-    wpghContactEditor = {
+    $.extend( editor, {
 
         init: function () {
 
@@ -47,15 +47,15 @@ var wpghContactEditor;
 
             });
 
-            $( '#manual_form_submission' ).on( 'change', function (e) {
-                var formId = $( '#manual_form_submission' ).val();
-                $( '#form-submit-link' ).attr( 'href', WPGHFormSubmitBaseUrl + formId );
-            });
+            // $( '#manual_form_submission' ).on( 'change', function (e) {
+            //     var formId = $( '#manual_form_submission' ).val();
+            //     $( '#form-submit-link' ).attr( 'href', WPGHFormSubmitBaseUrl + formId );
+            // });
         }
-    };
+    } );
 
     $(function () {
-        wpghContactEditor.init();
-    })
+        editor.init();
+    });
 
-})(jQuery);
+})(jQuery,ContactEditor);

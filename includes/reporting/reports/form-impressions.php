@@ -2,6 +2,7 @@
 namespace Groundhogg\Reporting\Reports;
 
 
+use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Meta_DB;
 use Groundhogg\Event;
@@ -49,7 +50,7 @@ class Form_Impressions extends Report
         $db = get_db( 'activity' );
 
         $data = $db->query( [
-            'activity_type' => 'form_impression',
+            'activity_type' => Activity::FORM_IMPRESSION,
             'before' => $this->get_end_time(),
             'after' => $this->get_start_time()
         ] );

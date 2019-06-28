@@ -610,7 +610,7 @@ function contact_record_section_actions( $contact )
 
                     $form_options = get_form_list();
 
-                    $default = get_array_var( $form_options, 0 );
+                    $default = get_array_var( array_keys( $form_options ), 0 );
 
                     echo Plugin::$instance->utils->html->select2( [
                         'name'              => 'manual_form_submission',
@@ -619,12 +619,11 @@ function contact_record_section_actions( $contact )
                         'data'              => $form_options,
                         'multiple'          => false,
                         'selected'          => [ $default ],
-                        'placeholder'       => 'Please Select a Form',
+                        'placeholder'       => __( 'Please select a form', 'groundhogg' ),
                     ] );
 
                     ?><div class="row-actions">
-                        <script>var WPGHFormSubmitBaseUrl = '<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&action=form&contact=%d&form=', $contact->ID ) ); ?>';</script>
-                        <a id="form-submit-link" class="button button-secondary" href="<?php echo admin_url( sprintf( 'admin.php?page=gh_contacts&action=form&contact=%d&form=%d', $contact->ID, $default ) ); ?>"><?php _ex( 'Submit Form', 'action', 'groundhogg' ) ?></a>
+                        <button type="submit" name="switch_form" value="switch_form" class="button"><?php _e('Submit Form', 'groundhogg' ); ?></button>
                     </div>
                 </div>
             </td>

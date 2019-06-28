@@ -39,14 +39,19 @@ do_action( 'wpgh_before_new_funnel' );
         <?php wp_nonce_field(); ?>
         <?php include GROUNDHOGG_PATH . 'templates/assets/funnel-templates.php'; ?>
         <div  id="poststuff" >
-            <?php foreach ( $funnel_templates as $id => $funnel_args ): ?>
+
+            <?php
+
+            /**
+             * @var $funnel_templates array
+             * @see templates/assets/funnels
+             */
+
+            foreach ( $funnel_templates as $id => $funnel_args ): ?>
                 <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
                     <h2 class="hndle"><?php echo $funnel_args['title']; ?></h2>
                     <div class="inside">
                         <p><?php echo $funnel_args['description']; ?></p>
-                        <!-- <div class="postbox">
-                        <img src="<?php echo $funnel_args['src']; ?>" width="100%">
-                    </div> -->
                         <button class="button-primary" name="funnel_template" value="<?php echo $id ?>"><?php _ex('Start Building', 'action', 'groundhogg'); ?></button>
                     </div>
                 </div>
@@ -137,7 +142,7 @@ do_action( 'wpgh_before_new_funnel' );
         </div>
     </div>
 <?php endif;?>
-<?php do_action('wpgh_add_new_funnel_form_after'); ?>
+<?php do_action('groundhogg_add_new_funnel_form_after'); ?>
 <?php
 
 

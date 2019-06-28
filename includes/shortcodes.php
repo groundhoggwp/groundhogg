@@ -50,7 +50,7 @@ class Shortcodes
     {
         $form = new Form( $atts );
 
-        return sprintf( "%s", $form );
+        return $form->shortcode();
     }
     
     /**

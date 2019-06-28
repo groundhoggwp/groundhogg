@@ -5,6 +5,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
+use function Groundhogg\groundhogg_url;
 use function Groundhogg\normalize_files;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
@@ -624,10 +625,16 @@ class Contacts_Page extends Admin_Page
             }
         }
 
-        /**
-         *
-         */
         do_action( 'groundhogg/admin/contact/save', $contact->get_id(), $contact );
+
+        if ( get_request_var( 'switch_form' ) ){
+            wp_redirect( $this->admin_url( [
+                'action' => 'form',
+                'contact' => $contact->get_id(),
+                'form' => get_request_var( 'manual_form_submission' ),
+            ]) );
+            die();
+        }
 
         $this->add_notice('update', _x("Contact updated!", 'notice', 'groundhogg'), 'success');
 

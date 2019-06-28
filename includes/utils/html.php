@@ -57,6 +57,28 @@ class HTML
     }
 
     /**
+     * Turn the GET into inputs for a nav form
+     *
+     * @param bool $echo
+     * @return string
+     */
+    public function hidden_GET_inputs( $echo = true )
+    {
+        $html = '';
+
+        foreach ( $_GET as $key => $value ) {
+            $html .= $this->input( [ 'type' => 'hidden', 'name' => $key, 'value' => $value ] );
+        }
+
+        if ( $echo ){
+            echo $html;
+        }
+
+        return $html;
+
+    }
+
+    /**
      * @param array $args
      * @param array $cols
      * @param array $rows
