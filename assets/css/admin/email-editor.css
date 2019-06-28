@@ -21,6 +21,11 @@
     width:100%;
 }
 
+.ui-resizable-handle:hover{
+    background: #e5e5e5;
+    opacity: 0.5;
+}
+
 .regular-text {
     width: 100% !important;
 }

@@ -26,14 +26,13 @@
 
 }( jQuery ));
 
-var wpghEmailEditor;
-
 ( function( $, editor ) {
 
-    wpghEmailEditor = {
+    $.extend( editor, {
 
         editor:     null,
         actions:    null,
+        settings:   null,
         active:     null,
         alignment:  null,
         sidebar:    null,
@@ -44,45 +43,42 @@ var wpghEmailEditor;
          */
         init: function () {
 
-            this.editor  = $( '#email-body' );
-            this.actions = $( '#editor-panel' );
+            var self = this;
 
-            this.editor.on( 'click', function (e) {
+            self.editor  = $( '#email-body' );
+            self.actions = $( '#editor-panel' );
+            self.settings = $( '#settings-panel' );
+
+            $( '#update_and_test' ).click( function (e) {
+                $( '#send-test' ).val( 'yes' );
+            });
+
+            self.editor.on( 'click', function (e) {
                 e.preventDefault();
-                wpghEmailEditor.feed( e.target );
+                self.feed( e.target );
             } );
 
-            this.editor.on( 'click', 'span.dashicons-admin-page', function ( e ) {
+            self.editor.on( 'click', 'span.dashicons-admin-page', function ( e ) {
                 e.preventDefault();
-                wpghEmailEditor.duplicateBlock( e.target );
+                self.duplicateBlock( e.target );
             });
 
-            this.editor.on( 'click', 'span.dashicons-trash', function ( e ) {
+            self.editor.on( 'click', 'span.dashicons-trash', function ( e ) {
                 e.preventDefault();
-                wpghEmailEditor.deleteBlock( e.target );
+                self.deleteBlock( e.target );
+                self.feed( null );
             });
-            this.makeSortable();
-            this.makeDraggable();
 
             /* Activate Spinner */
-            $('form').on( 'submit', function( e ){
-                wpghEmailEditor.save( e );
-            });
-
-            // this.sidebar = new StickySidebar('.editor-panel-inner', {
-            //     topSpacing: 32,
-            //     bottomSpacing: 0
-            // });
-
-            this.sidebar = $('.editor-panel-inner').stickySidebar({
-                topSpacing: 78,
-                bottomSpacing: 0
+            $('#email-form').on( 'submit', function( e ){
+                e.preventDefault();
+                self.save( $(this) );
             });
 
             $( '.row' ).wpghToolBar();
 
-            this.alignment = $( '#email-align' );
-            this.alignment.on( 'change', function () {
+            self.alignment = $( '#email-align' );
+            self.alignment.on( 'change', function () {
                 var email =  $( '#email-inside' );
                 if ( $( this ).val() === 'left' ){
                     email.css( 'margin-left', '0' );
@@ -94,54 +90,57 @@ var wpghEmailEditor;
             } );
 
             /* Size the editor to full screen if being views in an Iframe. */
-            if ( this.inFrame() ){
-                // $( 'body' ).html( $( '#wpbody' ) );
-                // $( '#screen-meta-links' ).remove();
-                $( 'html' ).css( 'padding-top', 0 );
-                $( '#wpcontent' ).css( 'margin', 0 );
-                $( '#wpadminbar' ).addClass( 'hidden' );
-                $( '#adminmenuwrap' ).addClass( 'hidden' );
-                $( '#adminmenuback' ).addClass( 'hidden' );
-                $( '#wpfooter' ).addClass( 'hidden' );
-                $( '.title-wrap' ).css( 'display', 'none' );
-                $( '.funnel-editor-header' ).css( 'top', 0 );
+            // TODO
+            if ( self.inFrame() ){
 
                 $( document ).on( 'change keydown keyup', function ( e ) {
-                    parent.wpghEmailElement.changesSaved = false;
+                    parent.EmailStep.changesSaved = false;
                 } );
 
-                $(  parent.document ).on( 'click','.popup-save', function( e ){
-                    wpghEmailEditor.save( e );
+                $(  parent.document ).on( 'click', '#popup-close-footer', function( e ){
+                    self.save( $('#email-form') );
                 } );
 
-                parent.wpghEmailElement.ID = email.id;
+                parent.EmailStep.newEmailId = self.id;
             }
 
-            this.editorSizing();
+            self.editorSizing();
 
             $( window ).resize(function() {
-                wpghEmailEditor.editorSizing();
+                self.editorSizing();
             });
 
-            $('#editor-toggle').change(function(){
+            $('#editor-toggle').change(function(e){
                 if ($(this).is(':checked')) {
 
-                    if ( ! wpghEmailEditor.htmlCode ){
-                        wpghEmailEditor.initCodeMirror();
+                    if ( ! self.htmlCode ){
+                        self.initCodeMirror();
                     }
+
+                    $( 'body' ).addClass( 'html-view' );
 
                     $('#email-content').hide();
                     $('#html-editor').show();
 
-                    wpghEmailEditor.prepareEmailHTML();
-                    wpghEmailEditor.htmlCode.doc.setValue( html_beautify( $('#email-inside').html() ) );
+                    self.prepareEmailHTML();
+                    // self.htmlCode.doc.setValue( $( '#email-inside' ).html() );
+                    self.htmlCode.doc.setValue( html_beautify( $('#email-inside').html(), { indent_with_tabs:true } ) );
                 } else {
+                    $( 'body' ).removeClass( 'html-view' );
                     $( '.row' ).wpghToolBar();
                     $('#html-editor').hide();
                     $('#email-content').show();
                 }
             }).change();
 
+            self.makeSortable();
+            self.makeDraggable();
+            self.makeResizable();
+
+            this.sidebar = new StickySidebar( '#postbox-container-1' , {
+                topSpacing: self.inFrame() ? 47 : 78,
+                bottomSpacing: 0
+            });
         },
 
         prepareEmailHTML : function()
@@ -149,7 +148,6 @@ var wpghEmailEditor;
             var $email = $('#email-content');
             $('wpgh-toolbar').remove();
             $email.find('div').removeAttr( 'contenteditable' ).removeClass( 'active' );
-            wpghTextBlock.destroyEditor();
         },
 
         /**
@@ -157,19 +155,26 @@ var wpghEmailEditor;
          */
         initCodeMirror: function()
         {
-            this.htmlCode = CodeMirror.fromTextArea( document.getElementById("html-code"), {
-                lineNumbers: true,
-                mode: "text/html",
-                matchBrackets: true,
-                indentUnit: 4,
-                specialChars: /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b-\u200f\u2028\u2029\ufeff]/
+            var self = this;
+
+            var editorSettings = wp.codeEditor.defaultSettings ? _.clone( wp.codeEditor.defaultSettings ) : {};
+            editorSettings.codemirror = _.extend(
+                {},
+                editorSettings.codemirror,
+                {
+                    indentUnit: 4,
+                    tabSize: 4
+                }
+            );
+
+            self.htmlCode = wp.codeEditor.initialize( $('#html-code'), editorSettings ).codemirror;
+            // self.htmlCode = self.htmlCode.codemirror;
+
+            self.htmlCode.on('change', function() {
+                $('#email-inside').html(self.htmlCode.doc.getValue());
             });
 
-            this.htmlCode.on('change', function() {
-                $('#email-inside').html(wpghEmailEditor.htmlCode.doc.getValue());
-            });
-
-            this.htmlCode.setSize( null, this.editor.height() );
+            self.htmlCode.setSize( null, self.editor.height() );
         },
 
         inFrame: function () {
@@ -180,49 +185,38 @@ var wpghEmailEditor;
             }
         },
 
-        save: function ( e ) {
+        save: function ( $form ) {
 
-            e.preventDefault();
-            $('.spinner').css('visibility','visible');
-            this.prepareEmailHTML();
+            var self = this;
+
+            showSpinner();
+
+            self.prepareEmailHTML();
+
             $('#content').val( $('#email-inside').html() );
-            var fd = $('form').serialize();
+
+            var fd = $form.serialize();
+
             fd = fd +  '&action=gh_update_email';
 
-            var ajaxCall = $.ajax({
-                type: "post",
-                url: ajaxurl,
-                dataType: 'json',
-                data: fd,
-                success: function ( response ) {
+            adminAjaxRequest( fd, function ( response ) {
 
-                    if ( wpghEmailEditor.inFrame() ){
-                        parent.wpghEmailElement.changesSaved = true;
-                    }
+                handleNotices( response.data.notices );
+                hideSpinner();
 
-                    $( '#notices' ).html( response.notices );
-                    $( '.spinner' ).css( 'visibility','hidden' );
-                    $( '.row' ).wpghToolBar();
-                    wpghEmailEditor.makeDismissible();
+                var content = response.data.data.data.content;
+                $('#email-inside').html( content );
 
+                $( '.row' ).wpghToolBar();
+                if ( self.inFrame() ){
+                    parent.EmailStep.changesSaved = true;
                 }
-            });
-
-        },
-
-        makeDismissible: function()
-        {
-            $( "<button type='button' class='notice-dismiss'><span class='screen-reader-text'>Dismiss This Notice</span></button>" ).appendTo( '.is-dismissible' );
-            $( '.notice-dismiss' ).on( 'click', function ( e ) {
-                $(this).parent().fadeOut( 100, function () {
-                    $(this).remove();
-                } );
-            } )
+            } );
         },
 
         editorSizing: function (){
-            $('.funnel-editor-header').width( $('#poststuff').width() );
-            $('#email-body').height( $('#postbox-container-1').height() - 87 );
+            $('.editor-header').width( $('#poststuff').width() );
+            $('#email-body').css( 'min-height', $('#postbox-container-1').height() );
         },
 
         /**
@@ -256,9 +250,61 @@ var wpghEmailEditor;
                 },
                 stop: function ( e, ui ) {
                     $('#email-content').find('.email-draggable').replaceWith( $('#temp-html').html() );
-
                 }
             });
+        },
+        
+        makeResizable: function()
+        {
+
+            var self = this;
+
+            var listener = this.resizeListener = {};
+
+            var $postbody = $( "#post-body" );
+            var $sidebar = $( "#postbox-container-1" );
+            var $innerSidebar = $( ".inner-wrapper-sticky" );
+
+            listener.sidebarWidth = $sidebar.width();
+
+            $postbody.resizable({
+                handles: "w",
+                resize: function (e,ui) {
+                    listener.change = ui.position.left - ui.originalPosition.left;
+                    $sidebar.width( listener.sidebarWidth + listener.change );
+                    $innerSidebar.width( listener.sidebarWidth + listener.change );
+                    $postbody.css( 'margin-left', ( listener.sidebarWidth + listener.change + 1 ) + 'px' );
+                    $sidebar.css( 'margin-left',  -( listener.sidebarWidth + listener.change + 1 ) + 'px' );
+                    $postbody.css( 'left', 0 );
+                },
+                stop:function (e,ui) {
+                    listener.sidebarWidth = $sidebar.width();
+                    self.sidebar.updateSticky();
+                },
+                start: function (e,ui) {
+                    listener.sidebarWidth = $sidebar.width();
+                },
+                grid:10
+            });
+        },
+
+        /**
+         * Make the blocks draggable
+         */
+        makeClickable: function(){
+            $( ".email-draggable" ).on( 'dblclick', function ( e ) {
+                $('#email-content')
+            });
+        },
+
+        hideBlockSettings: function (){
+            this.editor.find( '.row' ).removeClass( 'active' );
+            this.actions.find( '.postbox' ).addClass( 'hidden' );
+
+            // Show regular settings
+            this.settings.show();
+            $(document).trigger( 'madeInactive' );
+            this.sidebar.updateSticky();
         },
 
         /**
@@ -269,7 +315,10 @@ var wpghEmailEditor;
          */
         feed: function( e ) {
 
-            // console.log( {e: e} );
+            if ( ! e ){
+                this.hideBlockSettings();
+                return;
+            }
 
             /* Make Current Block Active*/
             if ( e.parentNode === null ){
@@ -283,18 +332,9 @@ var wpghEmailEditor;
                 return;
             }
 
-            // console.log( {e: block} );
-
             if ( ! block.hasClass( 'row' ) ){
-
-                this.editor.find( '.row' ).removeClass( 'active' );
-                this.actions.find( '.postbox' ).addClass( 'hidden' );
-                this.actions.find( '#email-editor' ).removeClass( 'hidden' );
-
-                $(document).trigger( 'madeInactive' );
-
+                this.hideBlockSettings();
                 return;
-
             }
 
             this.active = block;
@@ -314,16 +354,18 @@ var wpghEmailEditor;
 
             }
 
-            /* Hide All Settings */
+            // Hide All Settings
             this.actions.find( '.postbox' ).addClass( 'hidden' );
-            /* Show block Settings */
+
+            // Show block Settings
             this.actions.find( '#' + blockType + '-block-editor' ).removeClass( 'hidden' );
 
+            // Hide Regular Settings Panel
+            this.settings.hide();
+
             $(document).trigger( 'madeActive', [ block, blockType ] );
-            // console.log( { block_type: blockType, block: block });
 
-            // this.sidebar.updateSticky();
-
+            this.sidebar.updateSticky();
         },
 
         /**
@@ -333,7 +375,6 @@ var wpghEmailEditor;
          */
         deleteBlock: function( e ){
             $( e ).closest( '.row' ).remove();
-
         },
 
         /**
@@ -352,10 +393,40 @@ var wpghEmailEditor;
             return this.active;
         }
 
-    };
+    } );
 
     $(function () {
-        wpghEmailEditor.init();
-    })
+        editor.init();
+    });
 
-} )( jQuery, wpghEmailEditor );
+    var isResizing = false,
+        lastDownX = 0;
+
+    $(function () {
+        var container = $('#post-body'),
+            left = $('#postbox-container-1'),
+            right = $('#post-body-content'),
+            handle = $('#drag');
+
+        handle.on('mousedown', function (e) {
+            isResizing = true;
+            lastDownX = e.clientX;
+        });
+
+        $(document).on('mousemove', function (e) {
+            // we don't want to do anything if we aren't resizing.
+            if (!isResizing)
+                return;
+
+            var offsetRight = container.width() - (e.clientX - container.offset().left);
+
+            left.css('right', offsetRight);
+            right.css('width', offsetRight);
+        }).on('mouseup', function (e) {
+            // stop resizing
+            isResizing = false;
+        });
+    });
+
+
+} )( jQuery, EmailEditor );

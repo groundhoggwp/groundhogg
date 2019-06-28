@@ -746,7 +746,7 @@ class Settings_Page extends Admin_Page
                 'desc'      => _x( 'Send email using the Groundhogg Sending Service! This will only be used by emails sent with Groundhogg and not other WP emails. You will still be able to send SMS if this is disabled.', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(
-                    'label'         => __( 'Enable' ),
+                    'label'         => __( 'Enable (Recommended)' ),
                     'name'          => 'gh_send_with_gh_api[]',
                     'id'            => 'gh_send_with_gh_api',
                     'value'         => 'on',
@@ -756,31 +756,31 @@ class Settings_Page extends Admin_Page
                 'id'        => 'gh_send_all_email_through_ghss',
                 'section'   => 'service',
                 'label'     => _x( 'Send Transactional Email With Groundhogg', 'settings', 'groundhogg' ),
-                'desc'      => _x( 'By default, regular WP email such as account created emails are sent through the default WordPress email method regardless of the above settings. However, you can also choose to send all your transactional email through the Groundhogg Sending Service as well. ', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'By default, regular WP email such as password reset emails are sent through the default WordPress email method regardless of the above settings. However, you can also choose to send all your transactional email through the Groundhogg Sending Service as well. ', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(
-                    'label'         => __( 'Enable' ),
+                    'label'         => __( 'Enable (Recommended)' ),
                     'name'          => 'gh_send_all_email_through_ghss[]',
                     'id'            => 'gh_send_all_email_through_ghss',
                     'value'         => 'on',
                 ),
             ),
-            'gh_enable_cron_ghss' => array(
-                'id'        => 'gh_enable_cron_ghss',
-                'section'   => 'service',
-                'label'     => _x( 'Enable Cron Job', 'settings', 'groundhogg' ),
-                'desc'      => _x( 'Enable cron job to make cron request to your site every minute.', 'settings', 'groundhogg' ),
-                'type'      => 'checkbox',
-                'atts' => array(
-                    'label'         => __( 'Enable' ),
-                    'name'          => 'gh_enable_cron_ghss',
-                    'id'            => 'gh_enable_cron_ghss',
-                    'value'         => 'on',
-                ),
-                'args' => [
-//                    'sanitize_callback' => [ WPGH()->service_manager, 'manage_cron' ] //todo
-                ]
-            ),
+//            'gh_enable_cron_ghss' => array(
+//                'id'        => 'gh_enable_cron_ghss',
+//                'section'   => 'service',
+//                'label'     => _x( 'Enable Cron Job', 'settings', 'groundhogg' ),
+//                'desc'      => _x( 'Enable cron job to make cron request to your site every minute.', 'settings', 'groundhogg' ),
+//                'type'      => 'checkbox',
+//                'atts' => array(
+//                    'label'         => __( 'Enable' ),
+//                    'name'          => 'gh_enable_cron_ghss',
+//                    'id'            => 'gh_enable_cron_ghss',
+//                    'value'         => 'on',
+//                ),
+//                'args' => [
+////                    'sanitize_callback' => [ WPGH()->service_manager, 'manage_cron' ] //todo
+//                ]
+//            ),
             'gh_disable_api' => array(
                 'id'        => 'gh_disable_api',
                 'section'   => 'api_settings',

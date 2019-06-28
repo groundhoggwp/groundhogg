@@ -73,12 +73,12 @@ var ReplacementsInsertListener = {};
         insert: function () {
 
             // CHECK TINY MCE
-            if ( tinymce.activeEditor != undefined && this.to_mce ){
+            if ( typeof tinymce != 'undefined' && tinymce.activeEditor != null && this.to_mce ){
                 tinymce.activeEditor.execCommand('mceInsertContent', false, this.text );
             // INSERT REGULAR TEXT INPUT.
             }
 
-            if ( this.active != undefined && ! this.to_mce ) {
+            if ( this.active != null && ! this.to_mce ) {
                 insertAtCursor( this.active, this.text );
             }
 

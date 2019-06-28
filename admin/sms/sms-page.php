@@ -44,7 +44,7 @@ class SMS_Page extends Admin_Page
 
     public function get_name()
     {
-        return _x( 'SMS', 'page_title', 'groundhogg' );
+        return _x( 'Sms', 'page_title', 'groundhogg' );
     }
 
     public function get_cap()
@@ -71,7 +71,8 @@ class SMS_Page extends Admin_Page
                 break;
             case  'view':
             default:
-                return _x('SMS', 'page_title', 'groundhogg');
+                return $this->get_name();
+                break;
         }
     }
 

@@ -1,10 +1,6 @@
-var wpghDoingAutoSave = false;
-
-var wpghFunnelEditor;
-
 ( function( $, funnel ) {
 
-    wpghFunnelEditor = {
+    $.extend( funnel, {
 
         editorID: '#normal-sortables',
         editor: null,
@@ -14,31 +10,34 @@ var wpghFunnelEditor;
         curHTML: null,
         curOrder: 0,
         reportData: null,
+        sidebar: null,
 
         init: function () {
+
+            var self = this;
 
             /* Create Editor */
             this.editor = $( this.editorID );
 
             /* Bind Delete */
             this.editor.on( 'click', 'button.delete-step', function ( e ) {
-                wpghFunnelEditor.deleteStep( this );
+                self.deleteStep( this );
             } );
 
             /* Bind Duplicate */
             this.editor.on( 'click', 'button.duplicate-step', function ( e ) {
-                wpghFunnelEditor.duplicateStep( this );
+                self.duplicateStep( this );
             } );
 
             /* Activate Spinner */
-            $('form').on('submit', function( e ){
+            $('#funnel-form').on('submit', function( e ){
                 e.preventDefault();
-                wpghFunnelEditor.save();
+                self.save( $(this) );
             });
 
             $( document ).on('GroundhoggModalClosed', function( e ){
                 e.preventDefault();
-                wpghFunnelEditor.save();
+                self.save( $('#funnel-form') );
             });
 
             if ( window.innerWidth > 600 ){
@@ -51,26 +50,32 @@ var wpghFunnelEditor;
             this.editorSizing();
 
             $( window ).resize(function() {
-                wpghFunnelEditor.editorSizing();
+                self.editorSizing();
             });
 
             $( '#add-contacts-button' ).click( function(){
-                wpghFunnelEditor.addContacts();
+                self.addContacts();
             });
 
             $( '#copy-share-link' ).click( function ( e ) {
                 e.preventDefault();
-                prompt( "Copy This Link", $('#share-link').val() );
+                prompt( "Copy this link.", $('#share-link').val() );
             });
 
             $( document ).on( 'click', '.postbox .collapse', function ( e ) {
                 var $step = $( this.parentNode );
                 if ( $step.hasClass( 'closed' ) ){
-                    wpghFunnelEditor.expandStep( $step );
+                    self.expandStep( $step );
                 } else {
-                    wpghFunnelEditor.collapseStep( $step );
+                    self.collapseStep( $step );
                 }
             } );
+
+            $( '#postbox-container-1 .hndle' ).click( function ( e ) {
+                var $metabox = $( this.parentNode );
+                $metabox.toggleClass( 'closed' );
+                self.sidebar.updateSticky();
+            })
 
         },
 
@@ -78,7 +83,12 @@ var wpghFunnelEditor;
             $( '.funnel-editor-header').width( $('#poststuff').width() );
             $( '#postbox-container-2').height( $('#wpbody').height() - 80 );
             // $( '#postbox-container-1' ).height( $(window).height() - (32 - 56));
-            $( '#postbox-container-1' ).stickySidebar({topSpacing:78});
+
+            this.sidebar = new StickySidebar( '#postbox-container-1' , {
+                topSpacing: 78,
+                bottomSpacing: 0
+            });
+
             $( '#normal-sortables' ).css( 'visibility', 'visible' );
         },
 
@@ -126,47 +136,31 @@ var wpghFunnelEditor;
                 }});
         },
 
-        save: function () {
-            // e.preventDefault();
-          //  var chart = loadChart();
+        save: function ( $form ) {
 
-            $('.spinner').css('visibility','visible');
+            var self = this;
 
-            var fd = $('form').serialize();
+            showSpinner();
 
+            var fd = $form.serialize();
             fd = fd +  '&action=gh_save_funnel_via_ajax';
 
-            var ajaxCall = $.ajax({
-                type: "post",
-                url: ajaxurl,
-                dataType: 'json',
-                data: fd,
-                success: function ( response ) {
-                    // response = JSON.parse(response);
-                    // console.log( response );
-                    $( '#notices' ).html( response.notices );
-                    $( '#normal-sortables' ).html( response.steps );
-                    $( '#confirm' ).fadeOut( 300 );
-                    $( '.spinner' ).css( 'visibility','hidden' );
-                    wpghFunnelEditor.makeDismissible();
-                    $(document).trigger('wpghAddedStep');
-                    funnelChart.data = response.chartData;
+            adminAjaxRequest( fd, function ( response ) {
 
-                    if( ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
-                        funnelChart.draw();
-                    }
+                handleNotices( response.data.notices );
+                // console.log( response.data.notices );
+
+                hideSpinner();
+
+                $( '#normal-sortables' ).html( response.data.data.steps );
+
+                FunnelChart.data = response.data.data.chartData;
+                if( ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
+                    FunnelChart.draw();
                 }
-            });
-        },
 
-        makeDismissible: function()
-        {
-            $( "<button type='button' class='notice-dismiss'><span class='screen-reader-text'>Dismiss This Notice</span></button>" ).appendTo( '.is-dismissible' );
-            $( '.notice-dismiss' ).on( 'click', function ( e ) {
-                $(this).parent().fadeOut( 100, function () {
-                    $(this).remove();
-                } );
-            } )
+                $( document ).trigger( 'new-step' );
+            } );
         },
 
         /**
@@ -195,7 +189,7 @@ var wpghFunnelEditor;
          */
         replaceDummyStep: function (html) {
             this.editor.find('.replace-me').replaceWith(html);
-            $(document).trigger('wpghAddedStep');
+            $(document).trigger('new-step');
         },
 
         /**
@@ -211,8 +205,7 @@ var wpghFunnelEditor;
 
                 var order = $('.step').index($('#temp-step')) + 1;
                 var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order, funnel_id:funnel.id};
-                this.getStepHtml(data);
-
+                this.getStepHtml( data );
             }
         },
 
@@ -220,6 +213,8 @@ var wpghFunnelEditor;
          * Initializes the draggable state of the steps
          */
         makeDraggable: function () {
+            var self=this;
+
             this.draggables = $(".ui-draggable").draggable({
                 connectToSortable: ".ui-sortable",
                 helper: "clone",
@@ -227,7 +222,7 @@ var wpghFunnelEditor;
                     /* double check we dropped in a step... */
                     if ( ui.helper.closest( '#normal-sortables' ).length > 0 ){
                         console.log( ui.helper.parent() );
-                        wpghFunnelEditor.convertDraggableToStep( this )
+                        self.convertDraggableToStep( this )
                     }
 
                 }
@@ -256,21 +251,23 @@ var wpghFunnelEditor;
          */
         deleteStep: function (e) {
 
-            $('.spinner').css('visibility','visible');
+            showSpinner();
+
             var step = $(e).closest('.step');
+
             var result = confirm( "Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action." );
+
             if (result) {
-                var ajaxCall = $.ajax({
-                    type: "post",
-                    url: ajaxurl,
-                    data: {action: "wpgh_delete_funnel_step", step_id: step.attr( 'id' ) },
-                    success: function (result) {
-                        $('.spinner').css('visibility','hidden');
+
+                adminAjaxRequest(
+                    {action: "wpgh_delete_funnel_step", step_id: step.attr( 'id' ) },
+                    function ( result ) {
+                        hideSpinner();
                         step.remove();
                     }
-                });
+                );
             } else {
-                $('.spinner').css('visibility','hidden');
+                hideSpinner();
             }
         },
 
@@ -297,15 +294,13 @@ var wpghFunnelEditor;
          * @param obj
          */
         getStepHtml: function (obj) {
-            var ajaxCall = $.ajax({
-                type: "post",
-                url: ajaxurl,
-                data: obj,
-                success: function (html) {
-                    wpghFunnelEditor.curHTML = html;
-                    wpghFunnelEditor.replaceDummyStep(html);
-                }
-            });
+
+            var self = this;
+
+            adminAjaxRequest( obj, function ( response ) {
+                self.curHTML = response.data.data.html;
+                self.replaceDummyStep(self.curHTML);
+            } );
         },
 
         addContacts: function () {
@@ -324,19 +319,10 @@ var wpghFunnelEditor;
                 return;
             }
 
-            $('.spinner').css('visibility','visible');
-
-            var ajaxCall = $.ajax({
-                type: "post",
-                url: ajaxurl,
-                data: { action: 'gh_add_contacts_to_funnel', tags: tags, step: stepId },
-                success: function ( response ) {
-                    $( '.spinner' ).css( 'visibility','hidden' );
-                    $( '.add-contacts-response' ).html( response );
-                    $( '.add-contacts-response' ).removeClass( 'hidden' );
-                    wpghFunnelEditor.makeDismissible();
-                }
-            });
+            showSpinner();
+            adminAjaxRequest( { action: 'gh_add_contacts_to_funnel', tags: tags, step: stepId }, function ( response ) {
+                hideSpinner();
+            } );
         },
 
         /**
@@ -345,12 +331,9 @@ var wpghFunnelEditor;
          * @param $step jQuery object
          */
         collapseStep: function( $step ) {
-
             console.log( $step );
-
             $step.addClass( 'closed' );
             $step.find( '.collapse-input' ).val( '1' )
-
         },
 
         /**
@@ -359,12 +342,13 @@ var wpghFunnelEditor;
          * @param $step jQuery object
          */
         expandStep: function( $step ) {
-
             $step.removeClass( 'closed' );
             $step.find( '.collapse-input' ).val( '' )
-
-
         }
-    };
-    $(function(){wpghFunnelEditor.init();})
+    } );
+
+    $(function(){
+        funnel.init();
+    });
+
 })( jQuery, Funnel );

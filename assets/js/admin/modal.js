@@ -4,12 +4,13 @@ Display the box in the correct position of the screen.
 close the thickbox and put the content back where it came from.
 */
 
-var GroundhoggModal;
+var GroundhoggModal = {};
 
-( function ( $,defaults ) {
+( function ( $, modal, defaults ) {
 
-    GroundhoggModal = {
+    $.extend( modal, {
 
+        is_open: false,
     	overlay: null,
 		window: null,
 		content: null,
@@ -17,12 +18,25 @@ var GroundhoggModal;
 		source: null,
         frameUrl: '',
         args: {},
+        defaults: {},
 
 		init: function ( title, href ) {
 
-    	    this.args = this.getDefaults();
+            if ( this.is_open ){
+                this.close();
+            }
 
-    	    this.parseArgs( href );
+    	    var self=this;
+
+    	    Object.assign( this.args, defaults );
+
+    	    // console.log( href );
+
+    	    if ( typeof href == "string" ){
+    	        this.parseArgs( href );
+            } else {
+    	        this.args = $.extend( defaults, href );
+            }
 
     		this.overlay = $( '.popup-overlay' );
     		this.window  = $( '.popup-window' );
@@ -30,12 +44,11 @@ var GroundhoggModal;
     		this.title   = $( '.popup-title' );
     		this.loader  = $( '.iframe-loader-wrapper' );
 
-    		var exp =/(https|http)?:\/\/((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6})|(localhost)\b([-a-zA-Z0-9@:%_\+.~#?&\/=]*)/;
-            var urlRegex = new RegExp( exp );
+    		//Hi
 
             this.sizeup();
 
-            if ( this.args.source.match( urlRegex ) ){
+            if ( this.matchUrl( this.args.source ) ){
                 this.loader.removeClass( 'hidden' );
     		    this.source = $(
     		        "<div><iframe class='hidden' src='" + this.args.source + "' width='" + this.args.width + "' height='" + ( this.args.height - 100 ) + "' style='margin-bottom: -5px;' onload='GroundhoggModal.prepareFrame( this )'></iframe></div>"
@@ -53,9 +66,16 @@ var GroundhoggModal;
             }
 
             if ( typeof this.args.footertext !== "undefined" ) {
-                $( '.popup-save' ).text( this.args.footertext );
+                $( '#popup-close-footer' ).text( this.args.footertext );
             }
 
+            self.open();
+        },
+
+        matchUrl: function (maybeUrl){
+            var exp =/(https|http)?:\/\/((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6})|(localhost)\b([-a-zA-Z0-9@:%_\+.~#?&\/=]*)/;
+            var urlRegex = new RegExp( exp );
+            return maybeUrl.match( urlRegex );
         },
 
         parseArgs: function(queryArgs){
@@ -94,6 +114,9 @@ var GroundhoggModal;
 		open: function(){
     		this.pullContent();
     		this.showPopUp();
+
+    		this.is_open = true;
+
             $(document).trigger( 'GroundhoggModalOpened' );
         },
 
@@ -114,14 +137,13 @@ var GroundhoggModal;
         },
 
         prepareFrame: function( iframe ){
+    	    var self = this;
             var $iframe = $(iframe);
+            $iframe.removeClass( 'hidden' );
+
             this.content.removeClass( 'hidden' );
             this.content.css( 'padding', 0 );
-            $iframe.removeClass( 'hidden' );
             this.loader.addClass( 'hidden' );
-            $iframe.contents().find( '.choose-template' ).click( function () {
-                GroundhoggModal.frameReload();
-            });
         },
 
         frameReload: function()
@@ -162,48 +184,43 @@ var GroundhoggModal;
 
         reset: function()
         {
+            this.is_open = false;
             this.args = this.getDefaults();
             this.content.css( 'padding', '0 20px' );
         },
 
         reload: function()
         {
+            var self = this;
+
             $( document ).on( 'click', '.trigger-popup',
                 function(e){
                     e.preventDefault();
                     //console.log(this.href);
-                    GroundhoggModal.init( this.title, this.href );
+                    self.init( this.title, this.href );
 
                     if ( $(this).hasClass( 'no-padding' ) ){
                         $( '.popup-content' ).css( 'padding', '0' )
                     }
-
-                    GroundhoggModal.open();
                 }
             );
 
-            $( document ).on( 'click', '#popup-close',
+            $( document ).on( 'click', '.popup-close',
                 function(){
-                    GroundhoggModal.close();
-                }
-            );
-
-            $( document ).on( 'click', '.popup-save',
-                function(){
-                    GroundhoggModal.close();
-                    $(document).trigger( 'GroundhoggModalSaved' );
+                    $(document).trigger( 'modal-closed' );
+                    self.close();
                 }
             );
         }
-	};
+	} );
 
 	$(function () {
-		GroundhoggModal.reload();
+		modal.reload();
 		$( '.wpgh-color' ).wpColorPicker();
     });
-    $( document ).on( 'wpghAddedStep', function () {
-        // GroundhoggModal.reload();
+
+    $( document ).on( 'new-step', function () {
         $( '.wpgh-color' ).wpColorPicker();
     });
 
-} )(jQuery,GroundhoggModalDefaults);
+} )(jQuery, GroundhoggModal, GroundhoggModalDefaults);

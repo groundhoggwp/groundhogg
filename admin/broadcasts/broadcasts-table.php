@@ -99,14 +99,13 @@ class Broadcasts_Table extends WP_List_Table {
     {
         //todo
         $count = array(
-            'sent'      => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'sent'      ] ),
             'scheduled' => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'scheduled' ] ),
+            'sent'      => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'sent'      ] ),
             'cancelled' => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'cancelled' ] ),
         );
 
-        $views['all'] = "<a class='" .  print_r( ( $this->get_view() === 'all' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . " <span class='count'>(" . ( $count[ 'sent' ] + $count[ 'scheduled' ] ) . ")</span>" . "</a>";
-        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=sent' ) . "'>" . _x( 'Sent', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'sent' ] . ")</span>" . "</a>";
         $views['scheduled'] = "<a class='" .  print_r( ( $this->get_view() === 'scheduled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=scheduled' ) . "'>" . _x( 'Scheduled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'scheduled' ] . ")</span>" . "</a>";
+        $views['sent'] = "<a class='" .  print_r( ( $this->get_view() === 'sent' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=sent' ) . "'>" . _x( 'Sent', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'sent' ] . ")</span>" . "</a>";
         $views['cancelled'] = "<a class='" .  print_r( ( $this->get_view() === 'cancelled' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=cancelled' ) . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'cancelled' ] . ")</span>" . "</a>";
 
         return apply_filters(  'groundhogg/admin/broadcasts/table/get_views', $views );
@@ -114,7 +113,7 @@ class Broadcasts_Table extends WP_List_Table {
 
     protected function get_view()
     {
-        return ( isset( $_GET['status'] ) )? $_GET['status'] : 'all';
+        return ( isset( $_GET['status'] ) )? $_GET['status'] : 'scheduled';
     }
 
     /**
@@ -173,18 +172,28 @@ class Broadcasts_Table extends WP_List_Table {
             $editUrl = '#';
         }
 
-        if ( $this->get_view() === 'cancelled' ){
-            $html = "<strong>{$subject}</strong>";
-        } else {
-            $html = "<strong>";
+        switch ( $broadcast->get_status() )
+        {
+            case 'scheduled':
 
-            $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+                $html = sprintf("<strong>%s</strong> &#x2014; <span class='post-state'>(%s)</span>", $broadcast->get_title(), __( 'Scheduled' ) );
 
-            if ( $broadcast->status === 'scheduled' ){
-                $html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Scheduled', 'status', 'groundhogg' ) . ")</span>";
-            }
+                break;
+
+            case 'cancelled':
+
+                $html = sprintf("<strong>%s</strong> &#x2014; <span class='post-state'>(%s)</span>", $broadcast->get_title(), __( 'Cancelled' ) );
+
+                break;
+
+            case 'sent':
+
+                $edit_url = groundhogg_url( 'broadcasts', [ 'action' => 'report', 'broadcast' => $broadcast->get_id() ] );
+
+                $html = sprintf( "<strong><a class='row-title' href='%s'>%s</a></strong>", $edit_url, $broadcast->get_title() );
+
+                break;
         }
-        $html .= "</strong>";
 
         return $html;
     }
@@ -380,10 +389,7 @@ class Broadcasts_Table extends WP_List_Table {
 
         if ( empty( $query ) ){
             $query = [
-                'status' => [
-                    'sent',
-                    'scheduled'
-                ]
+                'status' => 'scheduled'
             ];
         }
 

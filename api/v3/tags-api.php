@@ -8,6 +8,7 @@ use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\get_contactdata;
 use Groundhogg\Plugin;
+use function Groundhogg\sort_by_string_in_array;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -154,6 +155,8 @@ class Tags_Api extends Base
 
         if ( $is_for_select2 ){
             $json = array();
+
+            usort($tags, sort_by_string_in_array( 'tag_name' ) );
 
             foreach ( $tags as $i => $tag ) {
                 $json[] = array(
