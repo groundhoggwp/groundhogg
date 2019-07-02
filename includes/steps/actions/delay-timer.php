@@ -154,6 +154,51 @@ class Delay_Timer extends Action
             )
         ] );
 
+        $html->start_row();
+
+        $html->th( __( 'And run:', 'groundhogg' ) );
+
+        $html->td( [
+            // RUN WHEN
+            $html->dropdown( [
+                'name'          => $this->setting_name_prefix( 'run_when' ),
+                'id'            => $this->setting_id_prefix( 'run_when' ),
+                'class'         => 'run_when',
+                'options'       => [
+                    'now'   => __( 'Immediately', 'groundhogg' ),
+                    'later' => __( 'At time of day', 'groundhogg' ),
+                ],
+                'selected'      => $this->get_setting( 'run_when', 'now' ),
+                'option_none'   => false,
+            ] ),
+            // RUN TIME
+            $html->input( [
+                'type'  => 'time',
+                'class' => ( 'now' === $this->get_setting( 'run_when', 'now' ) ) ? 'input run_time hidden' : 'run_time input',
+                'name'  => $this->setting_name_prefix( 'run_time' ),
+                'id'    => $this->setting_id_prefix(   'run_time' ),
+                'value' => $this->get_setting( 'run_time', "09:00:00" ),
+            ] ),
+            // LOCAL TIME
+            $html->wrap(
+                $html->checkbox( [
+                    'label'         => _x( "Run in the contact's local time.", 'action', 'groundhogg' ),
+                    'name'          => $this->setting_name_prefix( 'send_in_timezone' ),
+                    'id'            => $this->setting_id_prefix(   'send_in_timezone' ),
+                    'value'         => '1',
+                    'checked'       => (bool) $this->get_setting( 'send_in_timezone' ),
+                    'title'         => __( "Run in the contact's local time.", 'groundhogg' ),
+                    'required'      => false,
+                ] ),
+                'div',
+                [
+                    'id' => $this->setting_id_prefix( 'local_time_div' )
+                ]
+            )
+        ] );
+
+        $html->end_row();
+
         $html->end_form_table();
     }
 

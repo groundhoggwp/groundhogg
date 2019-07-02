@@ -2,6 +2,7 @@
 namespace Groundhogg\Steps;
 use Groundhogg\Steps\Actions\Action;
 use Groundhogg\Steps\Actions\Admin_Notification;
+use Groundhogg\Steps\Actions\Advanced_Timer;
 use Groundhogg\Steps\Actions\Apply_Note;
 use Groundhogg\Steps\Actions\Apply_Owner;
 use Groundhogg\Steps\Actions\Apply_Tag;
@@ -62,6 +63,7 @@ class Manager {
         $this->elements[] = new Date_Timer();
         $this->elements[] = new Delay_Timer();
         $this->elements[] = new Field_Timer();
+        $this->elements[] = new Advanced_Timer();
         $this->elements[] = new Apply_Owner();
         $this->elements[] = new Create_User();
         $this->elements[] = new Edit_Meta();

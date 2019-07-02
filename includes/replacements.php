@@ -57,6 +57,11 @@ class Replacements
 
         $replacements = array(
             array(
+                'code'        => 'id',
+                'callback'    => [ $this, 'replacement_id' ],
+                'description' => _x( 'The contact\'s ID number.', 'replacement', 'groundhogg' ),
+            ),
+            array(
                 'code'        => 'first',
                 'callback'    => [ $this, 'replacement_first_name' ],
                 'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
@@ -456,6 +461,16 @@ class Replacements
             return '';
 
         return print_r( $this->get_current_contact()->get_meta( $arg ) , true );
+    }
+
+    /**
+     * Return back the ID of the contact.
+     *
+     * @param $contact_id int the contact_id
+     * @return string the first name
+     */
+    function replacement_id( $contact_id ){
+        return $contact_id;
     }
 
     /**

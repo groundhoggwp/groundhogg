@@ -243,6 +243,10 @@ class Form {
 
         $step = Plugin::$instance->utils->get_step( $this->get_id() );
 
+        if ( ! $step ){
+            return false;
+        }
+
         $submit_via_ajax = $step->get_meta( 'enable_ajax' );
 
         if ( $submit_via_ajax ){
