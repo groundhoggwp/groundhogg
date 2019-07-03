@@ -3,6 +3,8 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use function Groundhogg\get_contactdata;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 
@@ -39,7 +41,7 @@ class HTTP_Post extends Action
      */
     public function get_name()
     {
-        return _x( 'HTTP Post', 'step_name', 'groundhogg' );
+        return _x( 'Webhook', 'step_name', 'groundhogg' );
     }
 
     /**
@@ -92,11 +94,11 @@ class HTTP_Post extends Action
         
         ?>
 
-        <table class="form-table" id="meta-table-<?php echo $step->get_id() ; ?>">
+        <table class="form-table">
             <tbody>
             <tr>
                 <td>
-                    <strong><?php _e( 'Post Url:', 'groundhogg' ); ?></strong>
+                    <strong><?php _e( 'Url:', 'groundhogg' ); ?></strong>
                 </td>
                 <td colspan="2">
                     <?php $args = array(
@@ -106,9 +108,42 @@ class HTTP_Post extends Action
                         'value' => $post_url
                     );
 
-                    echo $html->input( $args ); ?>
+                    echo $html->input( $args );
+
+                    ?><span class="row-actions"><?php
+
+                    echo $html->button( [
+                        'type'      => 'button',
+                        'text'      => __( 'Send Test' ),
+                        'name'      => 'send_test',
+                        'id'        => '',
+                        'class'     => 'test-webhook button button-secondary',
+                        'value'     => 'send',
+                    ] );
+                    ?>
+                    </span>
+                    <p>
+                        <?php
+
+                        echo $html->checkbox( [
+                            'label'         => __( 'Send as JSON' ),
+                            'type'          => 'checkbox',
+                            'name'          => $this->setting_name_prefix( 'send_as_json' ),
+                            'id'            => $this->setting_id_prefix( 'send_as_json' ),
+                            'class'         => '',
+                            'value'         => '1',
+                            'checked'       => $this->get_setting( 'send_as_json' ),
+                            'title'         => '',
+                        ] );
+
+                        ?>
+                    </p>
                 </td>
             </tr>
+            </tbody>
+        </table>
+        <table class="form-table" id="meta-table-<?php echo $step->get_id() ; ?>">
+            <tbody>
             <?php foreach ( $post_keys as $i => $post_key): ?>
                 <tr>
                     <td>
@@ -143,9 +178,6 @@ class HTTP_Post extends Action
             <?php endforeach; ?>
             </tbody>
         </table>
-        <p>
-            <?php Plugin::$instance->replacements->show_replacements_button(); ?>
-        </p>
         <script>
             jQuery(function($){
                 var table = $( "#meta-table-<?php echo $step->ID; ?>" );
@@ -171,6 +203,7 @@ class HTTP_Post extends Action
     public function save( $step )
     {
         $this->save_setting( 'post_url', esc_url_raw( $this->get_posted_data( 'post_url' ) ) );
+        $this->save_setting( 'send_as_json', absint( $this->get_posted_data( 'send_as_json' ) ) );
 
         $post_keys = $this->get_posted_data( 'post_keys', [] );
 
@@ -194,7 +227,7 @@ class HTTP_Post extends Action
      * @param $contact Contact
      * @param $event Event
      *
-     * @return bool|object
+     * @return bool|object|array
      */
     public function run( $contact, $event )
     {
@@ -206,21 +239,35 @@ class HTTP_Post extends Action
             return false;
         }
 
-        $post_array = array();
+        $data = array();
 
         foreach ( $post_keys as $i => $key )
         {
             if ( ! empty( $key ) ){
-                $post_array[ sanitize_key( $key ) ] = Plugin::$instance->replacements->process( sanitize_text_field( $post_values[ $i ] ), $contact->get_id() );
+                $data[ sanitize_key( $key ) ] = Plugin::$instance->replacements->process( sanitize_text_field( $post_values[ $i ] ), $contact->get_id() );
             }
         }
 
         $post_url = $this->get_setting('post_url' );
         $post_url = Plugin::$instance->replacements->process( esc_url_raw( $post_url ), $contact->get_id() );
 
-        $response = wp_remote_post( $post_url, array(
-            'body' => $post_array
-        ) );
+
+        $headers = [];
+
+        if ( $this->get_setting( 'send_as_json' ) ){
+            $headers[ 'Content-Type' ] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
+            $data = wp_json_encode( $data );
+        }
+
+        $args = apply_filters( 'groundhogg/steps/http_post/run/request_data', [
+            'method'        => 'POST',
+            'headers'       => $headers,
+            'body'          => $data,
+            'data_format'   => 'body',
+            'sslverify'     => true
+        ] );
+
+        $response = wp_remote_post( $post_url, $args );
 
         if ( is_wp_error( $response ) ) {
             $contact->add_note( $response->get_error_message() );
@@ -230,10 +277,59 @@ class HTTP_Post extends Action
 
     }
 
-    public function test()
+    public function admin_scripts()
     {
+        wp_enqueue_script( 'groundhogg-funnel-webhook' );
+        wp_localize_script( 'groundhogg-funnel-webhook', 'WebhookStep', [
+            'test' => 'Hello World',
+        ] );
+    }
 
+    protected function add_additional_actions()
+    {
+        add_action( 'wp_ajax_groundhogg_test_webhook', [ $this, 'ajax_test' ] );
+    }
 
+    public function ajax_test()
+    {
+        if ( ! current_user_can( 'edit_funnels' ) ){
+            wp_send_json_error();
+        }
 
+        $step_id = absint( get_request_var( 'step_id' ) );
+
+        $step = new Step( $step_id );
+
+        if ( ! $step->exists() ){
+            wp_send_json_error();
+        }
+
+        $this->set_current_step( $step );
+
+        $contact = get_contactdata( wp_get_current_user()->user_email );
+
+        if ( ! $contact ){
+            wp_send_json_error();
+        }
+
+        $response = $this->run( $contact, new Event() );
+
+        if ( ! $response ){
+            wp_send_json_error( __( 'Something went wrong.' ) );
+        }
+
+        if ( is_wp_error( $response ) ){
+            wp_send_json_error( $response );
+        }
+
+        $body = wp_remote_retrieve_body( $response );
+
+        if ( json_decode( $body ) ){
+            $body = json_decode( $body );
+        }
+
+        wp_send_json_success( $body );
+
+        return;
     }
 }
