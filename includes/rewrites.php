@@ -225,7 +225,7 @@ class Rewrites
                 $export_string = wp_json_encode( $funnel->get_as_array() );
                 $filename = 'funnel-' . $funnel->get_title() . '-'. date("Y-m-d_H-i", time() );
 
-                header("Content-type: text/plain");
+                header("Content-type: application/json");
                 header( "Content-disposition: attachment; filename=".$filename.".funnel");
                 $file = fopen('php://output', 'w');
                 fputs( $file, $export_string );

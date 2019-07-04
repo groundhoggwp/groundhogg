@@ -142,42 +142,36 @@ class HTTP_Post extends Action
             </tr>
             </tbody>
         </table>
-        <table class="form-table" id="meta-table-<?php echo $step->get_id() ; ?>">
-            <tbody>
-            <?php foreach ( $post_keys as $i => $post_key): ?>
-                <tr>
-                    <td>
-                        <label><strong><?php _e( 'Key: ' ); ?></strong>
+        <?php
 
-                            <?php $args = array(
-                                'name'  => $this->setting_name_prefix( 'post_keys' ) . '[]',
-                                'class' => 'input',
-                                'value' => sanitize_key( $post_key )
-                            );
+        $rows = [];
 
-                            echo $html->input( $args ); ?>
+        foreach ( $post_keys as $i => $post_key ):
 
-                        </label>
-                    </td>
-                    <td>
-                        <label><strong><?php _e( 'Value: ' ); ?></strong> <?php $args = array(
-                                'name'  => $this->setting_name_prefix( 'post_values' ) . '[]',
-                                'class' => 'input',
-                                'value' => esc_html( $post_values[$i] )
-                            );
+            $rows[] = [
+                $html->input( [
+                    'name'  => $this->setting_name_prefix( 'post_keys' ) . '[]',
+                    'class' => 'input',
+                    'value' => sanitize_key( $post_key )
+                ] ),
+                $html->input( [
+                    'name'  => $this->setting_name_prefix( 'post_values' ) . '[]',
+                    'class' => 'input',
+                    'value' => esc_html( $post_values[$i] )
+                ] ),
+                "<span class=\"row-actions\">
+                        <span class=\"add\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"addmeta\"><span class=\"dashicons dashicons-plus\"></span></a></span> |
+                        <span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a></span>
+                    </span>"
+            ];
 
-                            echo $html->input( $args ); ?></label>
-                    </td>
-                    <td>
-                    <span class="row-actions">
-                        <span class="add"><a style="text-decoration: none" href="javascript:void(0)" class="addmeta"><span class="dashicons dashicons-plus"></span></a></span> |
-                        <span class="delete"><a style="text-decoration: none" href="javascript:void(0)" class="deletemeta"><span class="dashicons dashicons-trash"></span></a></span>
-                    </span>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+
+        endforeach;
+
+        $html->list_table( [ 'id' => 'meta-table-' . $step->get_id()  ], [ __( 'Key' ), __( 'Value' ), __( 'Actions' ) ], $rows, false );
+
+
+        ?>
         <script>
             jQuery(function($){
                 var table = $( "#meta-table-<?php echo $step->ID; ?>" );

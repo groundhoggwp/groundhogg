@@ -113,7 +113,7 @@ class Tag_Removed extends Benchmark
     public function save( $step )
     {
         $this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
-        $this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'tags', 'any' ) ) );
+        $this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) ) );
     }
 
     /**
@@ -208,8 +208,8 @@ class Tag_Removed extends Benchmark
                 $not_has_tags = in_array( $removed_tag, $tags );
                 break;
             case 'all':
-                $intersect = array_intersect( $tags, $this->get_current_contact()->get_tags() );
-                $not_has_tags = in_array( $removed_tag, $tags ) && count( $intersect ) === count( $tags );
+                $diff = array_diff( $tags, $this->get_current_contact()->get_tags() );
+                $not_has_tags = in_array( $removed_tag, $tags ) && count( $diff ) === count( $tags );
                 break;
         }
 

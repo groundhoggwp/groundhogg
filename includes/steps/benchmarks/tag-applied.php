@@ -113,7 +113,7 @@ class Tag_Applied extends Benchmark
     public function save( $step )
     {
         $this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
-        $this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'tags', 'any' ) ) );
+        $this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) ) );
     }
 
     /**

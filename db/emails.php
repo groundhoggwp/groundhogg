@@ -87,6 +87,7 @@ class Emails extends DB  {
         return [
             'ID'            => '%d',
             'subject'       => '%s',
+            'subject'       => '%s',
             'pre_header'    => '%s',
             'content'       => '%s',
             'author'        => '%d',
