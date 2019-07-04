@@ -43,6 +43,22 @@ class Funnels_Page extends Admin_Page
         add_action( 'wp_ajax_gh_add_contacts_to_funnel',  array( $this, 'add_contacts_to_funnel' ) );
     }
 
+    public function admin_title($admin_title, $title)
+    {
+        switch ( $this->get_current_action() ){
+            case 'add':
+                $admin_title = sprintf( "%s &lsaquo; %s", __( 'Add' ),  $admin_title );
+                break;
+            case 'edit':
+                $funnel_id = get_request_var( 'funnel' );
+                $funnel = Plugin::$instance->utils->get_funnel( absint( $funnel_id ) );
+                $admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $funnel->get_title(),  __( 'Edit' ),  $admin_title );
+                break;
+        }
+
+        return $admin_title;
+    }
+
     /**
      * Redirect to the add screen if no funnels are present.
      */

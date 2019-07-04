@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Email_Parser;
+use function Groundhogg\groundhogg_url;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
@@ -31,16 +32,6 @@ $email = new Email( $email_id );
 $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
 
 ?>
-
-<!-- NEW EMAIL TAB TITLE -->
-<?php if ( ! empty( $email->get_subject_line() ) ): ?>
-<span class="hidden" id="new-title"><?php echo $email->get_subject_line(); ?> &lsaquo; </span>
-<script>
-    document.title = jQuery( '#new-title' ).text() + document.title;
-</script>
-<?php endif; ?>
-<!-- /END TITLE -->
-
 <form method="post" id="email-form">
 
     <!-- Before-->
@@ -50,7 +41,16 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
     <div class="header-wrap">
         <div class="editor-header">
             <div class="title-wrap">
-                <span id="title"><?php _e( 'Edit Email', 'groundhogg'  ); ?></span><a class="button" href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Add New', 'groundhogg'  ); ?></a>
+                <input class="title" placeholder="<?php echo __('Enter email title...', 'groundhogg');?>" type="text" name="email_title" size="30" value="<?php esc_attr_e( $email->get_title() ); ?>" id="title" spellcheck="true" autocomplete="off">
+                <?php echo html()->e( 'a', [
+                        'class' => 'button button-secondary',
+                        'title' => __( 'Send as broadcast', 'groundhogg' ),
+                        'href' => groundhogg_url( 'broadcasts', [
+                            'action' => 'add',
+                            'type' => 'email',
+                            'email' => $email->get_id()
+                        ] ),
+                ], '<span class="dashicons dashicons-megaphone"></span>' ); ?>
             </div>
             <div class="status-options">
                 <div id="status">

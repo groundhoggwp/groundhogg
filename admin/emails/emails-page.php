@@ -45,6 +45,22 @@ class Emails_Page extends Admin_Page
         }
     }
 
+    public function admin_title($admin_title, $title)
+    {
+        switch ( $this->get_current_action() ){
+            case 'add':
+                $admin_title = sprintf( "%s &lsaquo; %s", __( 'Add' ),  $admin_title );
+                break;
+            case 'edit':
+                $email_id = Groundhogg\get_request_var( 'email' );
+                $email = Plugin::$instance->utils->get_email( absint( $email_id ) );
+                $admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $email->get_title(),  __( 'Edit' ),  $admin_title );
+                break;
+        }
+
+        return $admin_title;
+    }
+
     public function get_slug()
     {
         return 'gh_emails';
@@ -484,6 +500,7 @@ class Emails_Page extends Admin_Page
 
         $args[ 'status' ] = $status;
         $args[ 'subject' ] = $subject;
+        $args[ 'title' ] = sanitize_text_field( Groundhogg\get_request_var( 'email_title', $subject ) );
         $args[ 'pre_header' ] = $pre_header;
         $args[ 'content' ] = $content;
 
@@ -555,17 +572,18 @@ class Emails_Page extends Admin_Page
              */
             $args[ 'content' ] = $email_templates[ $_POST[ 'email_template' ] ][ 'content' ];
             $args[ 'subject' ] = $email_templates[ $_POST[ 'email_template' ] ][ 'title' ];
+            $args[ 'title' ] = $email_templates[ $_POST[ 'email_template' ] ][ 'title' ];
 
         } else if ( isset( $_POST[ 'email_id' ] ) ) {
 
+            $from_email = new Email( absint( $_POST[ 'email_id' ] ) );
 
-            $email = Plugin::$instance->dbs->get_db('emails' )->get( intval( $_POST['email_id'] ) );
-            $args[ 'content' ] = $email->content;
-            $args[ 'subject' ] = sprintf( "%s - (copy)", $email->subject );
-            $args[ 'pre_header' ] = $email->pre_header;
+            $args[ 'content' ] = $from_email->get_content();
+            $args[ 'subject' ] = $from_email->get_subject_line();
+            $args[ 'title' ] = sprintf( "%s - (copy)", $from_email->get_title() );
+            $args[ 'pre_header' ] = $from_email->get_pre_header();
 
         } else {
-
             return new \WP_Error( 'ooops',  __( 'Could not create email.', 'groundhogg' ) );
         }
 
@@ -682,21 +700,24 @@ class Emails_Page extends Admin_Page
     {
         ob_start();
 
-        $emails = array_slice( Plugin::$instance->dbs->get_db('emails')->query( [ 'search' => sanitize_text_field( wp_unslash( $_POST[ 's' ] ) ) ] ), 0, 20 );
+        $emails = array_slice( Plugin::$instance->dbs->get_db('emails')->query( [ 'search' => sanitize_text_field( Groundhogg\get_request_var( 's' ) ) ] ), 0, 20 );
 
         if ( empty( $emails ) ):
             ?> <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php
         else:
         ?>
-        <?php foreach ( $emails as $email ): ?>
+        <?php foreach ( $emails as $email ):
+            $email = new Email( $email->ID );
+            ?>
             <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
-                <h2 class="hndle"><?php echo $email->subject; ?></h2>
+                <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
                 <div class="inside">
-                    <p><?php echo empty( $email->pre_header )? __( 'Custom Email', 'groundhogg' ) :  $email->pre_header; ?></p>
-                    <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $email->ID; ?> " class="email-container postbox">
-                        <?php echo $email->content; ?>
+                    <p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
+                    <p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
+                    <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $email->get_id(); ?> " class="email-container postbox">
+                        <?php echo $email->get_content(); ?>
                     </div>
-                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email->ID; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
                 </div>
             </div>
         <?php endforeach;

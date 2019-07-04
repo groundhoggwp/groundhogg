@@ -3,7 +3,7 @@ Contributors: trainingbusinesspros, groundhogg, dhrumit
 Tags: marketing, email, contacts, contact, CRM, marketing automation, email automation, funnels, marketing funnels, marketing campaigns, campaigns, broadcast, contacts, contact management, funnel, smtp, form, form builder
 Donate link: https://groundhogg.io
 Requires at least: 4.9
-Tested up to: 5.1
+Tested up to: 5.2
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv3

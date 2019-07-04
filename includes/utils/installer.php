@@ -158,7 +158,9 @@ abstract class Installer {
             $this->activation_wrapper();
         }
 
-        file_put_contents( dirname( $this->get_plugin_file() ) . '/activation-errors.txt', ob_get_contents() );
+        if ( ob_get_contents() ){
+            file_put_contents( dirname( $this->get_plugin_file() ) . '/activation-errors.txt', ob_get_contents() );
+        }
     }
 
     /**

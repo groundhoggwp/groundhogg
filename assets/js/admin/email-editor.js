@@ -211,6 +211,8 @@
                 if ( self.inFrame() ){
                     parent.EmailStep.changesSaved = true;
                 }
+
+                // document.title = $( '#title' ).val();
             } );
         },
 

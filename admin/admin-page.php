@@ -42,11 +42,24 @@ abstract class Admin_Page
 
             add_action('admin_enqueue_scripts', [$this, 'scripts']);
             add_action('admin_enqueue_scripts', [$this, 'register_pointers']);
+            add_filter( 'admin_title', [ $this, 'admin_title' ], 10, 2 );
 
             add_action('admin_init', [$this, 'process_action']);
 
             $this->add_additional_actions();
         }
+    }
+
+    /**
+     * Modify the tab title...
+     *
+     * @param $admin_title string
+     * @param $title string
+     * @return mixed string
+     */
+    public function admin_title( $admin_title, $title )
+    {
+        return $admin_title;
     }
 
     /**
@@ -428,22 +441,28 @@ abstract class Admin_Page
     /**
      * Get the admin url with the given query string.
      *
-     * @param string $query_string
+     * @param string|array $query
      * @return string
      */
-    public function admin_url( $query_string = '' )
+    public function admin_url( $query = [] )
     {
-        $base = admin_url( sprintf( 'admin.php?page=%s', $this->get_slug() ) );
+        $base = add_query_arg( [ 'page' => $this->get_slug() ], 'admin.php' );
 
-        if ( empty( $query_string ) ){
+        if ( empty( $query ) ){
             return $base;
         }
 
-        if ( is_array( $query_string ) ){
-            $query_string = http_build_query( $query_string );
+        $url = $base;
+
+        if ( is_array( $query ) ){
+            $url = add_query_arg( $query, $base );
         }
 
-        return $base . '&' . $query_string;
+        if ( is_string( $query ) ){
+            $url = $base . '&' . $query;
+        }
+
+        return $url;
     }
 
     /**

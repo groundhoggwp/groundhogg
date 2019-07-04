@@ -116,11 +116,11 @@ class Text extends Block
     public function scripts()
     {
         wp_enqueue_editor();
-        wp_enqueue_style('editor-buttons');
-        wp_enqueue_style('groundhogg-admin-simple-editor' );
+//        wp_enqueue_style('editor-buttons');
+//        wp_enqueue_style('groundhogg-admin-simple-editor' );
 
-        wp_enqueue_script('wplink');
-        wp_enqueue_script( 'groundhogg-admin-simple-editor' );
+//        wp_enqueue_script('wplink');
+//        wp_enqueue_script( 'groundhogg-admin-simple-editor' );
         wp_enqueue_script( 'groundhogg-email-text' );
     }
 

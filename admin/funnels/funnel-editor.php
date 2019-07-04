@@ -27,10 +27,6 @@ $funnel_id = intval( $_GET['funnel'] );
 $funnel = new Funnel( $funnel_id );
 
 ?>
-<span class="hidden" id="new-title"><?php echo $funnel->get_title(); ?> &lsaquo; </span>
-<script>
-    document.title = jQuery( '#new-title' ).text() + document.title;
-</script>
 <form method="post" id="funnel-form">
     <?php wp_nonce_field(); ?>
     <?php $args = array(

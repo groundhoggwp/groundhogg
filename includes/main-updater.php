@@ -32,7 +32,18 @@ class Main_Updater extends Updater {
     {
         return [
             '2.0',
+            '2.0.1',
         ];
+    }
+
+    /**
+     * Update to 2.0.1
+     *
+     * Add title to emails DB
+     */
+    public function version_2_0_1()
+    {
+        get_db( 'emails' )->create_table();
     }
 
     /**

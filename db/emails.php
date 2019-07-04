@@ -64,7 +64,7 @@ class Emails extends DB  {
      */
     public function get_db_version()
     {
-        return '2.0';
+        return '2.1';
     }
 
     /**
@@ -87,7 +87,7 @@ class Emails extends DB  {
         return [
             'ID'            => '%d',
             'subject'       => '%s',
-            'subject'       => '%s',
+            'title'         => '%s',
             'pre_header'    => '%s',
             'content'       => '%s',
             'author'        => '%d',
@@ -109,6 +109,7 @@ class Emails extends DB  {
         return [
             'ID'            => 0,
             'subject'       => '',
+            'title'         => '',
             'pre_header'    => '',
             'content'       => '',
             'author'        => 0,
@@ -136,6 +137,7 @@ class Emails extends DB  {
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         content longtext NOT NULL,
         subject text NOT NULL,
+        title text NOT NULL,
         pre_header text NOT NULL,
         from_user bigint(20) unsigned NOT NULL,
         author bigint(20) unsigned NOT NULL,   

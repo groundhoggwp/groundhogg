@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Contact_Query;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
 
@@ -38,6 +39,10 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
                 $args[ 'name' ] = 'object_id';
                 $args[ 'required' ] = true;
 
+                if ( $email_id = absint( get_request_var( 'email' ) ) ){
+                    $args[ 'selected' ] = $email_id;
+                }
+
                 echo Plugin::$instance->utils->html->dropdown_emails($args) ;
                  ?>
                 <div class="row-actions">
@@ -53,6 +58,11 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
 			        $args[ 'id' ] = 'sms_id';
 			        $args[ 'name' ] = 'object_id';
 			        $args[ 'required' ] = true;
+
+                    if ( $sms_id = absint( get_request_var( 'sms' ) ) ){
+                        $args[ 'selected' ] = $sms_id;
+                    }
+
                     echo Plugin::$instance->utils->html->dropdown_sms($args) ; ?>
                     <div class="row-actions">
                         <a target="_blank" class="button button-secondary" href="<?php echo admin_url( 'admin.php?page=gh_sms&action=add' ); ?>"><?php _e( 'Create New SMS', 'groundhogg' ); ?></a>

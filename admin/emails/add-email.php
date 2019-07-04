@@ -94,8 +94,8 @@ if ( count( $custom_templates ) > 0 ){
         </style>
         <div class="postbox">
             <div class="inside">
-                <p style="float: left"><?php _e( 'Search your though your previous emails and copy it.', 'groundhogg' ); ?></p>
-                <input type="text" id="search_emails" placeholder="<?php esc_attr_e( 'Type in a search term like Special...', 'groundhogg' ) ;?>"  class="wp-filter-search" />
+                <p style="float: left"><?php _e( 'Search your previous emails and use them as a starting point.', 'groundhogg' ); ?></p>
+                <input type="text" id="search_emails" placeholder="<?php esc_attr_e( 'Type in a search term like "Special"...', 'groundhogg' ) ;?>"  class="wp-filter-search" />
             </div>
         </div>
         <div style="text-align: center;" id="spinner">
@@ -106,15 +106,19 @@ if ( count( $custom_templates ) > 0 ){
             <?php
             $emails = array_slice(  Plugin::$instance->dbs->get_db('emails' )->query() , 0, 20 );
             ?>
-            <?php foreach ( $emails as $email ): ?>
+            <?php foreach ( $emails as $email ):
+
+                $email = new Email( $email->ID );
+                ?>
                 <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
-                    <h2 class="hndle"><?php echo $email->subject; ?></h2>
+                    <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
                     <div class="inside">
-                        <p><?php echo empty( $email->pre_header )? __( 'Custom Email', 'groundhogg' ) :  $email->pre_header; ?></p>
-                        <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $email->ID; ?> " class="email-container postbox">
-                            <?php echo $email->content; ?>
+                        <p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
+                        <p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
+                        <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $email->get_id(); ?> " class="email-container postbox">
+                            <?php echo $email->get_content(); ?>
                         </div>
-                        <button class="choose-template button-primary" name="email_id" value="<?php echo $email->ID; ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+                        <button class="choose-template button-primary" name="email_id" value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
                     </div>
                 </div>
             <?php endforeach; ?>

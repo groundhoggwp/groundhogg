@@ -4,6 +4,7 @@ namespace Groundhogg\Api\V3;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+use Groundhogg\Email;
 use Groundhogg\Plugin;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\sort_by_string_in_array;
@@ -99,16 +100,18 @@ class Email_Api extends Base
         if ( $is_for_select2 ){
             $json = array();
 
-            usort($emails, sort_by_string_in_array('subject' ) );
-
             foreach ( $emails as $i => $email ) {
 
+                $email = new Email( $email->ID );
+
                 $json[] = array(
-                    'id' => $email->ID,
-                    'text' => $email->subject . ' (' . $email->status . ')'
+                    'id' => $email->get_id(),
+                    'text' => $email->get_title() . ' (' . $email->get_status() . ')'
                 );
 
             }
+
+            usort($json, sort_by_string_in_array('text' ) );
 
             $results = array( 'results' => $json, 'more' => false );
 

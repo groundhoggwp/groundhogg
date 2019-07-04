@@ -106,7 +106,7 @@ class Email extends Base_Object_With_Meta
 
     public function get_title()
     {
-        return $this->get_subject_line();
+        return $this->title ? $this->title : $this->get_subject_line();
     }
 
     public function get_pre_header()
