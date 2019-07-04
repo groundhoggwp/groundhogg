@@ -115,7 +115,7 @@ class Contacts_Page extends Admin_Page
                 $admin_title = sprintf( "%s &lsaquo; %s", __( 'Add' ),  $admin_title );
                 break;
             case 'edit':
-                $contact_id = get_request_var( 'funnel' );
+                $contact_id = get_request_var( 'contact' );
                 $contact = Plugin::$instance->utils->get_contact( absint( $contact_id ) );
                 $admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $contact->get_full_name(),  __( 'Edit' ),  $admin_title );
                 break;
