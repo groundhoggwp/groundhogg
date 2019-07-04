@@ -90,13 +90,6 @@ $tabs = apply_filters( 'groundhogg/admin/contact/record/tabs', $tabs );
 $cookie_tab = isset( $_COOKIE[ 'gh_contact_tab' ] ) ? str_replace( 'tab_', '', sanitize_key( $_COOKIE[ 'gh_contact_tab' ] ) ): 'general';
 $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ] ) ? sanitize_key( $_POST[ 'active_tab' ] ) : $cookie_tab;
 ?>
-
-<!-- Title -->
-<span class="hidden" id="new-title"><?php echo $title ?> &lsaquo; </span>
-<script>
-    document.title = jQuery( '#new-title' ).text() + document.title;
-</script>
-<!--/ Title -->
 <div class="local-time" style="float: right; padding: 10px;font-size: 18px;">
     <?php _ex( 'Local Time:', 'groundhogg' );?>
     <span style="font-family: Georgia, Times New Roman, Bitstream Charter, Times, serif;font-weight: 400;"><?php echo date_i18n( "D, F d h:i A", $contact->get_local_time() ); ?>
