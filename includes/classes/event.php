@@ -220,7 +220,6 @@ class Event extends Base_Object
         $this->contact = Plugin::$instance->utils->get_contact( $this->get_contact_id() );
 
         switch ( $this->get_event_type() ){
-            default:
             case self::FUNNEL:
                 $this->step = Plugin::$instance->utils->get_step( $this->get_step_id() );
                 break;
@@ -234,6 +233,8 @@ class Event extends Base_Object
                 $this->step = new Broadcast( $this->get_step_id() );
                 break;
         }
+
+        do_action( 'groundhogg/event/post_setup', $this );
     }
 
     /**
@@ -330,7 +331,7 @@ class Event extends Base_Object
 
         $this->complete();
 
-        do_action('groundhogg/event/run/after', $this);
+        do_action('groundhogg/event/run/after', $this );
 
         return true;
     }

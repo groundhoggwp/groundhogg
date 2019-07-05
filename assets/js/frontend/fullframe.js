@@ -43,23 +43,22 @@
         for (var i = 0; i < iFrames.length; i++ ){
             var ifrm = iFrames[ i ];
             var $ifrm = $( ifrm );
-            $ifrm.attr( 'id', 'frame-' + i );
+            $ifrm.attr( 'id', 'frame-' + ( i + 1 ) );
             var height = ifrm.contentWindow.postMessage( { action:'getFrameSize', id: $ifrm.attr( 'id') }, "*");
         }
     }
 
     function receiveMessage(event) {
+        // console.log( event.data );
         resizeFrame( event.data );
     }
 
     function resizeFrame( data ) {
         if (data.height) {
-            var f = document.getElementById( data.id );
+            var f = $( '#' + data.id );
             if (f) {
-                f.height = data.height;
-                f.width = data.width;
-                f.style.height = data.height;
-                f.style.width = data.width;
+                f.height( data.height );
+                f.width( data.width );
             }
         }
     }

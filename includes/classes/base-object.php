@@ -197,8 +197,15 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
      */
     public function exists()
     {
-        $data = implode( '', $this->data );
-        return ! empty( $data );
+        $has_data = false;
+
+        foreach ( $this->data as $key => $datum ){
+            if ( ! empty( $datum ) ){
+                $has_data = true;
+            }
+        }
+
+        return $has_data;
     }
 
     /**

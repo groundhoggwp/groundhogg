@@ -93,15 +93,18 @@
             // TODO
             if ( self.inFrame() ){
 
-                $( document ).on( 'change keydown keyup', function ( e ) {
-                    parent.EmailStep.changesSaved = false;
-                } );
+                if ( typeof parent.EmailStep  != "undefined" ){
+                    $( document ).on( 'change keydown keyup', function ( e ) {
+                        parent.EmailStep.changesSaved = false;
+                    } );
 
-                $(  parent.document ).on( 'click', '#popup-close-footer', function( e ){
-                    self.save( $('#email-form') );
-                } );
+                    $(  parent.document ).on( 'click', '#popup-close-footer', function( e ){
+                        self.save( $('#email-form') );
+                    } );
 
-                parent.EmailStep.newEmailId = self.id;
+                    parent.EmailStep.newEmailId = self.id;
+                }
+
             }
 
             self.editorSizing();
@@ -208,7 +211,7 @@
                 $('#email-inside').html( content );
 
                 $( '.row' ).wpghToolBar();
-                if ( self.inFrame() ){
+                if ( self.inFrame() && typeof  parent.EmailStep != "undefined" ){
                     parent.EmailStep.changesSaved = true;
                 }
 
