@@ -120,4 +120,9 @@ abstract class Tabbed_Admin_Page extends Admin_Page
         </div>
         <?php
     }
+
+    public function view()
+    {
+        return false;
+    }
 }
