@@ -39,7 +39,7 @@ abstract class Table extends \WP_List_Table
 
     protected function get_page_url()
     {
-        return get_request_var( 'page' );
+        return add_query_arg( 'page', get_request_var( 'page' ), admin_url( 'admin.php' ) );
     }
 
     /**
@@ -50,17 +50,16 @@ abstract class Table extends \WP_List_Table
      * @param $count
      * @return string
      */
-    protected function create_view($view, $display, $count )
+    protected function create_view($view, $display, $count=0 )
     {
         return html()->e( 'a',
             [
                 'class' => $this->get_view() === $view ? 'current' : '',
                 'href'  => add_query_arg( [
-                    'page' => $this->get_page_url(),
-                    'status' => 'active',
-                ] )
+                    'status' => $view,
+                ], $this->get_page_url() ),
             ],
-            sprintf( '%s (%d)', $display, html()->e( 'span', [ 'class' => 'count' ], $count ) )
+            sprintf( '%s <span class="count">(%d)</span>', $display, $count )
         );
     }
 
@@ -155,8 +154,8 @@ abstract class Table extends \WP_List_Table
                 'count' => 0
             ] );
 
-            if ( is_array( $view[ 'count' ]  ) ){
-                $view[ 'count' ] = $this->get_db()->query( $view[ 'count' ] );
+            if ( is_array( $view[ 'count' ] ) || is_object( $view[ 'count' ] ) ){
+                $view[ 'count' ] = $this->get_db()->count( $view[ 'count' ] );
             }
 
             $views[] = $this->create_view( $view[ 'view' ], $view[ 'display' ], $view[ 'count' ] );
@@ -206,7 +205,7 @@ abstract class Table extends \WP_List_Table
             $items[] = $this->parse_item( $datum );
         }
 
-        $this->items = $data;
+        $this->items = $items;
 
         $this->set_pagination_args( array(
             'total_items' => $total_items,

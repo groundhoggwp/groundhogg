@@ -803,5 +803,4 @@ abstract class DB {
      */
     abstract public function create_table();
 
-
 }
