@@ -212,6 +212,14 @@ class Tag_Mapping extends Bulk_Job
                'tag_name' => 'Complained',
                'tag_description' => 'This tag is applied to anyone whose optin status is complained.',
             ],
+            'gh_monthly_tag' => [
+               'tag_name' => 'Subscribed (Monthly)',
+               'tag_description' => 'This tag is applied to anyone whose receives emails monthly.',
+            ],
+            'gh_weekly_tag' => [
+               'tag_name' => 'Subscribed (Weekly)',
+               'tag_description' => 'This tag is applied to anyone who receives emails weekly.',
+            ],
             'gh_marketable_tag' => [
                'tag_name' => 'Marketable',
                'tag_description' => 'This tag is applied to anyone whose optin status is marketable.',
@@ -257,6 +265,8 @@ class Tag_Mapping extends Bulk_Job
                 Preferences::SPAM         => Plugin::$instance->settings->get_option( 'gh_spammed_tag', false ),
                 Preferences::HARD_BOUNCE  => Plugin::$instance->settings->get_option( 'gh_bounced_tag', false ),
                 Preferences::COMPLAINED   => Plugin::$instance->settings->get_option( 'gh_complained_tag', false ),
+                Preferences::WEEKLY       => Plugin::$instance->settings->get_option( 'gh_weekly_tag', false ),
+                Preferences::MONTHLY      => Plugin::$instance->settings->get_option( 'gh_monthly_tag', false ),
                 self::MARKETABLE          => Plugin::$instance->settings->get_option( 'gh_marketable_tag', false ),
                 self::NON_MARKETABLE      => Plugin::$instance->settings->get_option( 'gh_non_marketable_tag', false ),
             ];
@@ -349,7 +359,13 @@ class Tag_Mapping extends Bulk_Job
         $non_marketable_tag = $this->get_status_tag( self::NON_MARKETABLE );
         $marketable_tag = $this->get_status_tag( self::MARKETABLE );
 
-        if ( $event->get_last_error()->get_error_code() === 'NON_MARKETABLE' && $event->get_contact()->has_tag( $marketable_tag ) ){
+        if (
+        	// Check for unmarketable error code.
+        	$event->get_last_error()->get_error_code() === 'non_marketable'
+	        // Check if contact currently has marketable tag
+	        && $event->get_contact()->has_tag( $marketable_tag )
+	        // Ignore monthly or weekly preferences
+            && ! in_array( $event->get_contact()->get_optin_status(), [ Preferences::WEEKLY, Preferences::MONTHLY ] ) ){
             $event->get_contact()->remove_tag( $marketable_tag );
             $event->get_contact()->apply_tag( $non_marketable_tag );
         }

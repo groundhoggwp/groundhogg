@@ -225,7 +225,7 @@ class Settings_Page extends Admin_Page
                 'id'    => 'optin_status_tags',
                 'title' => _x( 'Optin Status Tags', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'tags'
-            ]
+            ],
         ) );
     }
 
@@ -240,7 +240,6 @@ class Settings_Page extends Admin_Page
         $api_keys_table->display();
         ?></div><?php
     }
-
 
     public function show_extensions()
     {
@@ -502,34 +501,6 @@ class Settings_Page extends Admin_Page
                     'placeholder'   => get_option( 'admin_email' )
                 ),
             ),
-//            'gh_max_events' => array(
-//                'id'        => 'gh_max_events',
-//                'section'   => 'event_queue',
-//                'label'     => _x( 'Max Queued Events', 'settings', 'groundhogg' ),
-//                'desc'      => _x( 'The maximum number of events that can be run during a single process of the event queue. For larger lists you may want to set this at a lower number for performance reasons.', 'settings', 'groundhogg' ),
-//                'type'      => 'number',
-//                'atts'      => array(
-//                    'id'            => 'gh_max_events',
-//                    'name'          => 'gh_max_events',
-//                    'placeholder'   => '999999'
-//                ),
-//            ),
-//            'gh_queue_interval' => array(
-//                'id'        => 'gh_queue_interval',
-//                'section'   => 'event_queue',
-//                'label'     => _x( 'Queue Interval', 'settings', 'groundhogg' ),
-//                'desc'      => _x( 'The time interval in between iterations of when the event queue is processed.', 'settings', 'groundhogg' ),
-//                'type'      => 'dropdown',
-//                'atts'      => array(
-//                    'id'            => 'gh_queue_interval',
-//                    'name'          => 'gh_queue_interval',
-//                    'options'       => array(
-//                        'every_1_minutes' => 'Every 1 Minutes',
-//                        'every_5_minutes' => 'Every 5 Minutes',
-//                        'every_10_minutes' => 'Every 10 Minutes',
-//                    ),
-//                ),
-//            ),
             'gh_script_debug' => array(
                 'id'        => 'gh_script_debug',
                 'section'   => 'misc_info',
@@ -765,22 +736,6 @@ class Settings_Page extends Admin_Page
                     'value'         => 'on',
                 ),
             ),
-//            'gh_enable_cron_ghss' => array(
-//                'id'        => 'gh_enable_cron_ghss',
-//                'section'   => 'service',
-//                'label'     => _x( 'Enable Cron Job', 'settings', 'groundhogg' ),
-//                'desc'      => _x( 'Enable cron job to make cron request to your site every minute.', 'settings', 'groundhogg' ),
-//                'type'      => 'checkbox',
-//                'atts' => array(
-//                    'label'         => __( 'Enable' ),
-//                    'name'          => 'gh_enable_cron_ghss',
-//                    'id'            => 'gh_enable_cron_ghss',
-//                    'value'         => 'on',
-//                ),
-//                'args' => [
-////                    'sanitize_callback' => [ WPGH()->service_manager, 'manage_cron' ] //todo
-//                ]
-//            ),
             'gh_disable_api' => array(
                 'id'        => 'gh_disable_api',
                 'section'   => 'api_settings',
@@ -863,6 +818,30 @@ class Settings_Page extends Admin_Page
                 'atts' => array(
                     'name'          => 'gh_complained_tag',
                     'id'            => 'gh_complained_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
+            'gh_monthly_tag' => [
+                'id'        => 'gh_monthly_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Subscribed Monthly Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All contacts which have requested monthly emails will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_monthly_tag',
+                    'id'            => 'gh_monthly_tag',
+                    'class'         => 'gh-single-tag-picker'
+                ),
+            ],
+            'gh_weekly_tag' => [
+                'id'        => 'gh_weekly_tag',
+                'section'   => 'optin_status_tags',
+                'label'     => _x( 'Subscribed Weekly Tag', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'All contacts which have requested weekly emails will have this tag.', 'settings', 'groundhogg' ),
+                'type'      => 'tag_picker',
+                'atts' => array(
+                    'name'          => 'gh_weekly_tag',
+                    'id'            => 'gh_weekly_tag',
                     'class'         => 'gh-single-tag-picker'
                 ),
             ],
@@ -1080,8 +1059,6 @@ class Settings_Page extends Admin_Page
         }
 
         $field[ 'atts' ][ 'id' ] = esc_attr( sanitize_key( $field['id'] ) );
-
-//        echo call_user_func( array( WPGH()->html, $field[ 'type' ] ), $field[ 'atts' ] ); todo
 
         echo html()->wrap( call_user_func( array( Plugin::$instance->utils->html, $field[ 'type' ] ), $field[ 'atts' ] ), 'div', [ 'style' => [ 'max-width' => '700px' ] ] );
 

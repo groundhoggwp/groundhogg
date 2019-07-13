@@ -115,8 +115,9 @@ class Contacts_Table extends WP_List_Table {
 
         $html .= "<a class='row-title' href='$editUrl'>" . esc_html( $contact->get_email() ) . "</a>";
 
-        if ( $contact->get_optin_status() === Preferences::UNCONFIRMED && ( ! isset( $_REQUEST[ 'optin_status' ] ) || $_REQUEST[ 'optin_status' ] !== 'unconfirmed' ) ){
-            $html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Unconfirmed', 'status', 'groundhogg' ) . ")</span>";
+        if ( ! get_request_var( 'optin_status' ) ){
+
+            $html .= " &#x2014; " . "<span class='post-state'>(" . Preferences::get_preference_pretty_name( $contact->get_optin_status() ) . ")</span>";
         }
 
         $html .= "</strong>";
@@ -242,6 +243,8 @@ class Contacts_Table extends WP_List_Table {
         $count = array(
             'unconfirmed'   => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::UNCONFIRMED   ] ),
             'confirmed'     => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::CONFIRMED     ] ),
+            'weekly'        => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::WEEKLY     ] ),
+            'monthly'       => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::MONTHLY     ] ),
             'opted_out'     => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::UNSUBSCRIBED  ] ),
             'spam'          => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::SPAM          ] ),
             'bounce'        => Plugin::$instance->dbs->get_db('contacts')->count( [ 'optin_status' => Preferences::HARD_BOUNCE   ] ),
@@ -250,6 +253,8 @@ class Contacts_Table extends WP_List_Table {
         return apply_filters( 'contact_views', array(
             'all'           => "<a class='" . ($view === 10 ? 'current' : '') . "' href='" . admin_url( 'admin.php?page=gh_contacts' ) . "'>" . _x( 'All', 'view', 'groundhogg' ) . ' <span class="count">('.  number_format_i18n( $count[ 'unconfirmed' ] + $count[ 'confirmed' ] ) .')</span>' . "</a>",
             'confirmed'     => "<a class='" . ($view === Preferences::CONFIRMED ? 'current' : '') . "' href='" . $base_url . Preferences::CONFIRMED . "'>" . _x( 'Confirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['confirmed'] ) .')</span>'. "</a>",
+            'weekly'        => "<a class='" . ($view === Preferences::WEEKLY ? 'current' : '') . "' href='" . $base_url . Preferences::WEEKLY . "'>" . _x( 'Weekly', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['weekly'] ) .')</span>'. "</a>",
+            'monthly'       => "<a class='" . ($view === Preferences::MONTHLY ? 'current' : '') . "' href='" . $base_url . Preferences::MONTHLY . "'>" . _x( 'Monthly', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['monthly'] ) .')</span>'. "</a>",
             'unconfirmed'   => "<a class='" . ($view === Preferences::UNCONFIRMED ? 'current' : '') . "' href='" . $base_url . Preferences::UNCONFIRMED . "'>" . _x( 'Unconfirmed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['unconfirmed'] ) . ')</span>' . "</a>",
             'opted_out'     => "<a class='" . ($view === Preferences::UNSUBSCRIBED ? 'current' : '') . "' href='" . $base_url . Preferences::UNSUBSCRIBED . "'>" . _x( 'Unsubscribed', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['opted_out'] ) .')</span>' . "</a>",
             'spam'          => "<a class='" . ($view === Preferences::SPAM ? 'current' : '') . "' href='" . $base_url . Preferences::SPAM . "'>" . _x( 'Spam', 'view', 'groundhogg' ) . ' <span class="count">('. number_format_i18n( $count['spam'] ) .')</span>' . "</a>",
@@ -281,7 +286,7 @@ class Contacts_Table extends WP_List_Table {
 
         $c_query = new Contact_Query();
 
-        $query = get_request_query( [ 'optin_status' => [ Preferences::CONFIRMED, Preferences::UNCONFIRMED ] ] );
+        $query = get_request_query( [ 'optin_status' => [ Preferences::CONFIRMED, Preferences::UNCONFIRMED, Preferences::WEEKLY, Preferences::MONTHLY ] ] );
 
         // Sales person can only see their own contacts...
         if ( current_user_is( 'sales_manager' ) ){

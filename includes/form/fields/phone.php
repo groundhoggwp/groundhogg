@@ -45,7 +45,7 @@ class Phone extends Input
      */
     public static function validate( $input, $config )
     {
-        if ( ! preg_match( '/^[+]?[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/', $input ) ){
+        if ( ! preg_match( '/^[+]?[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/', $input ) ){
             return new \WP_Error( 'invalid_phone_number', __( 'Please provide a valid number.', 'groundhogg' ) );
         }
 

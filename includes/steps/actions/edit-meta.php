@@ -87,44 +87,33 @@ class Edit_Meta extends Action
 
         $html = Plugin::$instance->utils->html;
 
-        ?>
+	    $rows = [];
 
-        <table class="form-table" id="meta-table-<?php echo $step->ID ; ?>">
-            <tbody>
-            <?php foreach ( $post_keys as $i => $post_key): ?>
-                <tr>
-                    <td>
-                        <label><strong><?php _e( 'Key: ' ); ?></strong>
+	    foreach ( $post_keys as $i => $post_key ):
 
-                            <?php $args = array(
-                                'name'  => $this->setting_name_prefix( 'meta_keys' ) . '[]',
-                                'class' => 'input',
-                                'value' => sanitize_key( $post_key )
-                            );
+		    $rows[] = [
+			    $html->input( [
+				    'name'  => $this->setting_name_prefix( 'meta_keys' ) . '[]',
+				    'class' => 'input',
+				    'value' => sanitize_key( $post_key )
+			    ] ),
+			    $html->input( [
+				    'name'  => $this->setting_name_prefix( 'meta_values' ) . '[]',
+				    'class' => 'input',
+				    'value' => esc_html( $post_values[$i] )
+			    ] ),
+			    "<span class=\"row-actions\">
+                        <span class=\"add\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"addmeta\"><span class=\"dashicons dashicons-plus\"></span></a></span> |
+                        <span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a></span>
+                    </span>"
+		    ];
 
-                            echo $html->input( $args ); ?>
 
-                        </label>
-                    </td>
-                    <td>
-                        <label><strong><?php _e( 'Value: ' ); ?></strong> <?php $args = array(
-                                'name'  => $this->setting_name_prefix( 'meta_values' ) . '[]',
-                                'class' => 'input',
-                                'value' => esc_html( $post_values[$i] )
-                            );
+	    endforeach;
 
-                            echo $html->input( $args ); ?></label>
-                    </td>
-                    <td>
-                    <span class="row-actions">
-                        <span class="add"><a style="text-decoration: none" href="javascript:void(0)" class="addmeta"><span class="dashicons dashicons-plus"></span></a></span> |
-                        <span class="delete"><a style="text-decoration: none" href="javascript:void(0)" class="deletemeta"><span class="dashicons dashicons-trash"></span></a></span>
-                    </span>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+	    $html->list_table( [ 'id' => 'meta-table-' . $step->get_id()  ], [ __( 'Key' ), __( 'Value' ), __( 'Actions' ) ], $rows, false );
+	    
+	    ?>
         <script>
             jQuery(function($){
                 var table = $( "#meta-table-<?php echo $step->ID; ?>" );
@@ -139,7 +128,7 @@ class Edit_Meta extends Action
                 });
             });
         </script>
-        <?php
+	    <?php
     }
 
     /**

@@ -53,6 +53,11 @@ class Emails_Page extends Admin_Page
                 break;
             case 'edit':
                 $email_id = Groundhogg\get_request_var( 'email' );
+
+                if ( ! $email_id ){
+                    wp_die( 'Invalid Email Id.' );
+                }
+
                 $email = Plugin::$instance->utils->get_email( absint( $email_id ) );
                 $admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $email->get_title(),  __( 'Edit' ),  $admin_title );
                 break;

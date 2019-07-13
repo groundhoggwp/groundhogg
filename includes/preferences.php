@@ -101,11 +101,11 @@ class Preferences
                 return _x( 'Unsubscribed. They will not receive marketing.','optin_status', 'groundhogg' );
                 break;
             case self::WEEKLY:
-                return _x( 'This contact will only receive marketing weekly.', 'optin_status','groundhogg' );
-                break;
-            case self::MONTHLY:
-                return _x( 'This contact will only receive marketing monthly.', 'optin_status','groundhogg' );
-                break;
+	        return _x( 'This contact will only receive marketing weekly.', 'optin_status','groundhogg' );
+	        break;
+	        case self::MONTHLY:
+		        return _x( 'This contact will only receive marketing monthly.', 'optin_status','groundhogg' );
+		        break;
             case self::HARD_BOUNCE:
                 return _x( 'This email address bounced, they will not receive marketing.', 'optin_status', 'groundhogg' );
                 break;
@@ -116,6 +116,42 @@ class Preferences
                 return _x( 'This contact complained about your emails. They will not receive marketing.', 'optin_status','groundhogg' );
                 break;
         }
+    }
+
+	/**
+	 * @param $preference int
+	 *
+	 * @return string|void
+	 */
+    public static function get_preference_pretty_name( $preference )
+    {
+	    switch ( $preference ){
+		    default:
+		    case self::UNCONFIRMED:
+			    return _x( 'Unconfirmed', 'optin_status', 'groundhogg' );
+			    break;
+		    case self::CONFIRMED:
+			    return _x( 'Confirmed', 'optin_status', 'groundhogg' );
+			    break;
+		    case self::UNSUBSCRIBED:
+			    return _x( 'Unsubscribed', 'optin_status', 'groundhogg' );
+			    break;
+		    case self::WEEKLY:
+			    return _x( 'Subscribed Weekly', 'optin_status','groundhogg' );
+			    break;
+		    case self::MONTHLY:
+			    return _x( 'Subscribed Monthly', 'optin_status','groundhogg' );
+			    break;
+		    case self::HARD_BOUNCE:
+			    return _x( 'Bounced', 'optin_status', 'groundhogg' );
+			    break;
+		    case self::SPAM:
+			    return _x( 'Spam', 'optin_status','groundhogg' );
+			    break;
+		    case self::COMPLAINED:
+			    return _x( 'Complained', 'optin_status','groundhogg' );
+			    break;
+	    }
     }
 
     /**

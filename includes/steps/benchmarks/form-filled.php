@@ -371,9 +371,12 @@ class Form_Filled extends Benchmark
                             'name'  => $this->setting_name_prefix( 'form' ),
                             'value' => $code,
                             'class' => 'code form-html',
-                            'cols'  => 64,
+                            'cols'  => '',
                             'rows'  => $rows,
-                            'attributes' => " style='white-space: nowrap;'"
+                            'style' => [
+                                'white-space' => ' nowrap',
+                                'width' => '100%'
+                            ],
                         ); ?>
 
                         <?php echo Plugin::$instance->utils->html->textarea( $args ) ?>

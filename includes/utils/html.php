@@ -927,9 +927,11 @@ class HTML
         $a[ 'selected' ] = wp_parse_id_list( $a[ 'selected' ] );
 
         foreach ( $a[ 'selected' ] as $email_id ){
-            if ( get_db( 'emails' )->exists( $email_id ) ){
-                $email = get_db( 'emails' )->get( $email_id );
-                $a[ 'data' ][ $email_id ] = $email->subject . ' (' . $email->status . ')';
+
+            $email = Plugin::$instance->utils->get_email( $email_id );
+
+            if ( $email ){
+                $a[ 'data' ][ $email_id ] = $email->get_title() . ' (' . $email->get_status() . ')';
 
             }
         }

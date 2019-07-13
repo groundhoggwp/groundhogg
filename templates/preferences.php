@@ -56,13 +56,7 @@ if ( ! function_exists( 'mail_gdpr_data' ) ){
 
         $contact = Plugin::$instance->utils->get_contact( $contact_id );
 
-//        if ( ! $contact ){
-//            return false;
-//        }
-
-        // 2D array
-
-        $message = __( "You are receiving this message because you have requested an audit of your personal information. This message contains all current information about your contact profile.\n" );
+        $message = __( "You are receiving this message because you have requested an audit of your personal information. This message contains all current information about your contact profile.\n", 'groundhogg' );
 
         $contact_data = apply_filters( 'groundhogg/preferences/contact_data', $contact->get_as_array() );
 
@@ -278,6 +272,8 @@ switch ( $action ):
                     break;
             }
 
+            do_action( 'groundhogg/preferences/manage/preferences_updated', $contact, $preference );
+
             Plugin::$instance->notices->add( 'updated', __( 'Preferences saved!' ) );
 
             wp_redirect( site_url( 'gh/preferences/profile' ) );
@@ -349,6 +345,7 @@ switch ( $action ):
 
         if ( ! wp_verify_nonce( get_request_var( 'key' ) ) ) {
             wp_redirect( site_url( 'gh/preferences/manage' ) );
+            die();
         }
 
         $contact->change_marketing_preference( Preferences::CONFIRMED );
