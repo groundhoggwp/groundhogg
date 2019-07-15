@@ -29,11 +29,27 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit;
 // Load WPGH file.
 include_once dirname(__FILE__) . '/groundhogg.php';
 
+global $wpdb;
 
 if( Plugin::$instance->settings->is_option_enabled( 'gh_uninstall_on_delete' ) ) {
 
     //Delete DBS
     Plugin::$instance->dbs->drop_dbs();
+
+    $other_tables = [
+        'gh_contractmeta',
+        'gh_contracts',
+        'gh_dealmeta',
+        'gh_deals',
+        'gh_pipelines_stages',
+        'gh_pipelines',
+        'gh_proof',
+    ];
+
+    foreach ( $other_tables as $table ){
+        $table_name = $wpdb->prefix . $table;
+        $wpdb->query( "DROP TABLE IF EXISTS " .$table_name );
+    }
 
     //Remove Roles & Caps
     Plugin::$instance->roles->remove_roles_and_caps();

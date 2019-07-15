@@ -150,7 +150,7 @@ class Form_Impressions extends DB  {
         count bigint(20) unsigned NOT NULL,
         PRIMARY KEY (ID),
         KEY timestamp (timestamp),
-        KEY form_id (form_id),
+        KEY form_id (form_id)
 		) $charset_collate;";
 
         dbDelta( $sql );

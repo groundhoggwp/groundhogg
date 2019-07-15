@@ -19,6 +19,19 @@ class Main_Installer extends Installer
 
         // Install Default tags for tag mapping.
         Plugin::$instance->tag_mapping->install_default_tags();
+
+        $settings = [
+            'gh_override_from_name' => get_bloginfo( 'name' ),
+            'gh_override_from_email' => get_bloginfo( 'admin_email' ),
+            'gh_confirmation_grace_period' => 14,
+            'gh_event_failure_notification_email' => get_bloginfo( 'admin_email' ),
+        ];
+
+        foreach ( $settings as $setting_name => $value ){
+            if ( ! get_option( $setting_name ) ){
+                update_option( $setting_name, $value );
+            }
+        }
     }
 
     protected function deactivate()

@@ -48,12 +48,14 @@ class Main_Updater extends Updater {
     public function version_2_0()
     {
         $privacy_policy_id = get_option( 'gh_privacy_policy' );
+
         if ( $privacy_policy_id ){
             $privacy_policy_link = get_permalink( absint( $privacy_policy_id ) );
             update_option( 'gh_privacy_policy', $privacy_policy_link );
         }
 
         $terms_id = get_option( 'gh_terms' );
+
         if ( $terms_id ){
             $terms_link = get_permalink( absint( $terms_id ) );
             update_option( 'gh_terms', $terms_link );

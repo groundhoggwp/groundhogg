@@ -34,7 +34,7 @@ abstract class Updater{
      */
     public function init()
     {
-        $this->previous_versions = Plugin::$instance->settings->get_option( $this->get_version_option_name(), [] );
+        $this->previous_versions = Plugin::$instance->settings->get_option( $this->get_version_option_name(), false );
     }
 
     /**
@@ -89,6 +89,13 @@ abstract class Updater{
     {
 
         $previous_updates  = $this->get_previous_versions();
+
+        // installing...
+        if ( ! $previous_updates ){
+            Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->get_available_updates() );
+            return;
+        }
+
         $available_updates = $this->get_available_updates();
 
         $missing_updates = array_diff( $available_updates, $previous_updates );

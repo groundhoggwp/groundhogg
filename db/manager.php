@@ -85,6 +85,10 @@ class Manager
      */
     public function drop_dbs()
     {
+        if ( empty( $this->dbs ) ) {
+            $this->init_dbs();
+        }
+
         foreach ( $this->dbs as $db ){
             $db->drop();
         }
