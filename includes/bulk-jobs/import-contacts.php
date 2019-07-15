@@ -3,6 +3,7 @@ namespace Groundhogg\Bulk_Jobs;
 
 use function Groundhogg\get_items_from_csv;
 use Groundhogg\Plugin;
+use Groundhogg\Preferences;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -11,6 +12,7 @@ class Import_Contacts extends Bulk_Job
 
     protected $field_map = [];
     protected $import_tags = [];
+    protected $confirm_contacts = false;
 
     /**
      * Get the action reference.
@@ -65,8 +67,13 @@ class Import_Contacts extends Bulk_Job
     protected function process_item( $item )
     {
         $contact = \Groundhogg\generate_contact_with_map( $item, $this->field_map );
+
         if ( $contact ) {
             $contact->apply_tag( $this->import_tags );
+
+            if ( $this->confirm_contacts ){
+                $contact->change_marketing_preference( Preferences::CONFIRMED );
+            }
         }
     }
 
@@ -79,6 +86,7 @@ class Import_Contacts extends Bulk_Job
     {
         $this->field_map    = Plugin::$instance->settings->get_transient( 'gh_import_map' );
         $this->import_tags  = wp_parse_id_list( Plugin::$instance->settings->get_transient( 'gh_import_tags' ) );
+        $this->confirm_contacts = Plugin::$instance->settings->get_transient( 'gh_import_confirm_contacts' );
     }
 
     /**
@@ -95,8 +103,9 @@ class Import_Contacts extends Bulk_Job
      */
     protected function clean_up()
     {
-        Plugin::$instance->settings->delete_transient('gh_import_map' );
+        Plugin::$instance->settings->delete_transient( 'gh_import_map' );
         Plugin::$instance->settings->delete_transient( 'gh_import_tags' );
+        Plugin::$instance->settings->delete_transient( 'gh_import_confirm_contacts' );
     }
 
     /**

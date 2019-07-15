@@ -482,6 +482,54 @@ function array_to_css( $atts )
 }
 
 /**
+ * Send an SMS message
+ *
+ * @param $to int|string|array single number or array of numbers.
+ * @param $message string the message to send
+ *
+ * @return bool|WP_Error
+ */
+function gh_sms( $to, $message )
+{
+    if ( ! is_array( $to ) ){
+        $to = explode( ',', $to );
+    }
+
+    $numbers = [];
+    foreach ( $to as $number ) {
+        $numbers[] = preg_replace( '/[^0-9]/', '', $number );
+    }
+
+    // Only if SMS is enable on the GH end of things...
+    if ( Plugin::$instance->sending_service->is_active_for_sms() ){
+
+        $sender_name = sanitize_from_name( Plugin::$instance->settings->get_option( 'business_name', get_bloginfo( 'name' ) ) );
+
+        foreach ( $numbers as $number ){
+            $data = array(
+                'message'       => $message,
+                'sender'        => $sender_name,
+                'phone_number'  => $number,
+//                'country_code'  => $country_code
+            );
+
+            $response = Plugin::$instance->sending_service->request( 'sms/send', $data, 'POST' );
+
+            if ( is_wp_error( $response ) ){
+                do_action( 'groundhogg/sms/failed', $response );
+                return $response;
+            }
+        }
+
+        return true;
+    } else {
+        $sent = apply_filters( 'groundhogg/sms/send_custom', false, $message, $to );
+    }
+
+    return $sent;
+}
+
+/**
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *

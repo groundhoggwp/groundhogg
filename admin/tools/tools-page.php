@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Bulk_Jobs\Delete_Contacts;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use \WP_Error;
 use function Groundhogg\isset_not_empty;
@@ -265,6 +266,11 @@ class Tools_Page extends Tabbed_Admin_Page
         $result = $this->handle_file_upload( 'import_file' );
 
         if ( is_wp_error( $result ) ){
+
+            if ( is_multisite() ){
+                return new WP_Error( 'multisite_add_csv', 'Could not import because CSV is not an allowed file type on this multisite. please add CSV to the list of allowed file types in the network settings.' );
+            }
+
             return $result;
         }
 
@@ -344,13 +350,13 @@ class Tools_Page extends Tabbed_Admin_Page
     public function process_import_map()
     {
         if ( ! current_user_can( 'import_contacts' ) ){
-            wp_die( 'Oops...' );
+            $this->wp_die_no_access();
         }
 
         $map = $_POST[ 'map' ];
 
         if ( ! is_array( $map ) ){
-            wp_die( 'Oops...' );
+            wp_die( 'Invalid map provided.' );
         }
 
         $file_name = $_POST[ 'import' ];
@@ -366,7 +372,9 @@ class Tools_Page extends Tabbed_Admin_Page
         set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS );
         set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );
 
-        var_dump( $this->importer );
+        if ( get_request_var( 'is_confirmed' ) ){
+            set_transient( 'gh_import_confirm_contacts', true, HOUR_IN_SECONDS );
+        }
 
         $this->importer->start( [ 'import' => $file_name ] );
     }

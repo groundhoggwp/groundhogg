@@ -207,7 +207,7 @@ class Form_Filled extends Benchmark
                         'label'         => __( 'Enable' ),
                         'name'          => $this->setting_name_prefix( 'enable_ajax' ),
                         'id'            => $this->setting_id_prefix( 'enable_ajax' ),
-                        'class'         => 'enable-ajax',
+                        'class'         => 'enable-ajax auto-save',
                         'value'         => '1',
                         'checked'       => $ajax_is_enabled,
                         'title'         => __( 'Enable Ajax' ),
@@ -222,14 +222,18 @@ class Form_Filled extends Benchmark
                     <?php
 
                     $args = array(
-                        'type'      => 'text',
                         'id'        => $this->setting_id_prefix( 'success_message' ),
                         'name'      => $this->setting_name_prefix( 'success_message' ),
                         'title'     => __( 'Thank You Message' ),
-                        'value'     => $this->get_setting( 'success_message', __( 'Your submission has been received.' ) )
+                        'value'     => $this->get_setting( 'success_message', __( 'Your submission has been received.' ) ),
+                        'cols'  => '',
+                        'rows'  => 3,
+                        'style' => [
+                            'width' => '100%'
+                        ],
                     );
 
-                    echo Plugin::$instance->utils->html->input( $args ); ?>
+                    echo Plugin::$instance->utils->html->textarea( $args ); ?>
                 </td>
             </tr>
             <tr class="<?php echo $ajax_is_enabled ? 'hidden' : ''; ?>">

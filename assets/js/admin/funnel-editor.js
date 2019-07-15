@@ -35,6 +35,11 @@
                 self.save( $(this) );
             });
 
+            $( document ).on( 'change', '.auto-save', function( e ){
+                e.preventDefault();
+                self.save( $('#funnel-form') );
+            });
+
             $( document ).on('GroundhoggModalClosed', function( e ){
                 e.preventDefault();
                 self.save( $('#funnel-form') );

@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Tools;
 
+use function Groundhogg\html;
 use Groundhogg\Plugin;
 use function Groundhogg\get_items_from_csv;
 use function Groundhogg\get_key_from_column_label;
@@ -85,9 +86,22 @@ $sample_item = array_shift( $items );
 
     ?>
     <tr>
-        <th><?php _e( 'Add additional tags to this import' ) ?></th>
+        <th><?php _e( 'Add additional tags to this import', 'groundhogg' ) ?></th>
         <td><div style="max-width: 500px"><?php echo Plugin::$instance->utils->html->tag_picker( [] ); ?></div></td>
     </tr>
+    <tr>
+        <th><?php _e( 'I have previously confirmed these email addresses.', 'groundhogg' ) ?></th>
+        <td><?php echo html()->checkbox( [
+                'label'         => __( 'Yes' ),
+                'name'          => 'is_confirmed',
+                'id'            => 'is_confirmed',
+                'class'         => '',
+                'value'         => '1',
+                'checked'       => false,
+                'title'         => 'I have confirmed.',
+            ] ); ?></td>
+    </tr>
+
     </tbody>
 </table>
     <?php submit_button( __( 'Import Contacts', 'groundhogg' ) )?>
