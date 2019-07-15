@@ -21,7 +21,13 @@ class Funnel_Breakdown extends Category_Graph
      */
     protected function hide_if_no_data()
     {
-        return false;
+        $has_funnels = get_db( 'funnels' )->count( [ 'status' => 'active' ] );
+
+        if ( $has_funnels ){
+            return false;
+        }
+
+        return true;
     }
 
     public function get_id()
