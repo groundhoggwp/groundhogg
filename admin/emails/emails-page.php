@@ -504,6 +504,7 @@ class Emails_Page extends Admin_Page
         $content = apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'content' ) );
 
         $args[ 'status' ] = $status;
+        $args[ 'from_user' ] = $from_user;
         $args[ 'subject' ] = $subject;
         $args[ 'title' ] = sanitize_text_field( Groundhogg\get_request_var( 'email_title', $subject ) );
         $args[ 'pre_header' ] = $pre_header;

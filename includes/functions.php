@@ -1798,3 +1798,17 @@ function form_errors( $return = true )
 
     return false;
 }
+
+/**
+ * Get the email templates
+ *
+ * @return array
+ */
+function get_email_templates()
+{
+    include GROUNDHOGG_PATH . 'templates/assets/email-templates.php';
+    /**
+     * @var $email_templates array
+     */
+    return $email_templates;
+}
