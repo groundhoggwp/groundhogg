@@ -10,8 +10,8 @@ namespace Groundhogg;
  */
 
 
-add_filter( 'groundhogg/admin/emails/sanitize_email_content', 'Groundhogg\safe_css_filter_rgb_to_hex', 10 );
-add_filter( 'groundhogg/admin/emails/sanitize_email_content', 'Groundhogg\add_safe_style_attributes_to_email', 10 );
+add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\safe_css_filter_rgb_to_hex', 10 );
+add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\add_safe_style_attributes_to_email', 10 );
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', 'wp_kses_post', 11 );
 
 /**
@@ -22,7 +22,7 @@ add_filter( 'groundhogg/admin/emails/sanitize_email_content', 'wp_kses_post', 11
  */
 function add_safe_style_attributes_to_email( $content )
 {
-    add_filter( 'safe_style_css', 'Groundhogg\_safe_display_css' );
+    add_filter( 'safe_style_css', __NAMESPACE__ . '\_safe_display_css' );
 
     return $content;
 }
@@ -47,7 +47,7 @@ function _safe_display_css( $attributes )
  */
 function safe_css_filter_rgb_to_hex( $content )
 {
-    $content = preg_replace_callback( '/rgb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/', 'Groundhogg\_safe_css_filter_rgb_to_hex_callback', $content );
+    $content = preg_replace_callback( '/rgb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/', __NAMESPACE__ . '\_safe_css_filter_rgb_to_hex_callback', $content );
     return $content;
 }
 
@@ -87,7 +87,7 @@ function rgb2hex($r, $g=-1, $b=-1)
 }
 
 
-add_filter( 'tiny_mce_before_init', '\Groundhogg\tiny_mce_before_init' );
+add_filter( 'tiny_mce_before_init', __NAMESPACE__ . '\tiny_mce_before_init' );
 
 // Add listener for on lick event
 function tiny_mce_before_init( $initArray )

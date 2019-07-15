@@ -315,8 +315,8 @@ class Plugin {
         $this->shortcodes = new Shortcodes();
         $this->submission_handler = new Submission_Handler();
 
-//        new Integrations_Manager();
-//        new Blocks\Blocks();
+        new Integrations_Manager();
+        new Blocks\Blocks();
         new Reviews();
     }
 

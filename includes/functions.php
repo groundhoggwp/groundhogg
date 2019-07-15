@@ -889,7 +889,7 @@ function listen_for_complaint_and_bounce_emails( $error )
     }
 }
 
-add_action( 'wp_mail_failed', '\Groundhogg\listen_for_complaint_and_bounce_emails' );
+add_action( 'wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_emails' );
 
 /**
  * Override the default from email
@@ -938,8 +938,8 @@ function sender_name( $original_email_from ) {
 }
 
 // Hooking up our functions to WordPress filters
-add_filter( 'wp_mail_from', '\Groundhogg\sender_email' );
-add_filter( 'wp_mail_from_name', '\Groundhogg\sender_name' );
+add_filter( 'wp_mail_from', __NAMESPACE__ . '\sender_email' );
+add_filter( 'wp_mail_from_name', __NAMESPACE__ . '\sender_name' );
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons
@@ -966,7 +966,7 @@ function remove_builder_toolbar( $content )
     return preg_replace( '/<wpgh-toolbar\b[^>]*>(.*?)<\/wpgh-toolbar>/', '', $content );
 }
 
-add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
+add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\remove_content_editable' );
 
 /**
  * Remove the content editable attribute from the email's html
@@ -979,7 +979,7 @@ function remove_content_editable( $content )
     return preg_replace( "/contenteditable=\"true\"/", '', $content );
 }
 
-add_filter( 'groundhogg/email/the_content', '\Groundhogg\remove_content_editable' );
+add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\remove_content_editable' );
 
 /**
  * Remove script tags from the email content
@@ -992,7 +992,7 @@ function strip_script_tags( $content )
     return preg_replace( '/<script\b[^>]*>(.*?)<\/script>/', '', $content );
 }
 
-add_filter( 'groundhogg/email/the_content', '\Groundhogg\strip_script_tags' );
+add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\strip_script_tags' );
 
 /**
  * Add a link to the FB group in the admin footer.
@@ -1009,7 +1009,7 @@ function add_bug_report_prompt( $text )
     return $text;
 }
 
-add_filter('admin_footer_text', '\Groundhogg\add_bug_report_prompt');
+add_filter('admin_footer_text', __NAMESPACE__ . '\add_bug_report_prompt');
 
 /**
  * Recount the contacts per tag...
@@ -1120,7 +1120,7 @@ function convert_user_to_contact_when_user_registered( $userId )
 }
 
 // Ensure runs before tag mapping stuff...
-add_action( 'user_register', '\Groundhogg\convert_user_to_contact_when_user_registered' );
+add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
 
 /**
  * Used for blocks...
@@ -1267,7 +1267,7 @@ function fix_html_pw_reset_link($message, $key, $user_login, $user_data )    {
     return $message;
 }
 
-add_filter( 'retrieve_password_message', '\Groundhogg\fix_html_pw_reset_link', 10, 4 );
+add_filter( 'retrieve_password_message', __NAMESPACE__ . '\fix_html_pw_reset_link', 10, 4 );
 
 /**
  * AWS Doesn't like special chars in the from name so we'll strip them out here.
@@ -1364,8 +1364,8 @@ function gh_ss_notify_low_credit($credits ){
 
 }
 
-add_action( 'groundhogg/ghss/credits_used', '\Groundhogg\gh_ss_notify_low_credit');
-add_action( 'groundhogg/ghss/sms_credits_used', '\Groundhogg\gh_ss_notify_low_credit');
+add_action( 'groundhogg/ghss/credits_used', __NAMESPACE__ . '\gh_ss_notify_low_credit');
+add_action( 'groundhogg/ghss/sms_credits_used', __NAMESPACE__ . '\gh_ss_notify_low_credit');
 
 if ( get_option( 'gh_send_notifications_on_event_failure' ) ) {
 
@@ -1384,7 +1384,7 @@ if ( get_option( 'gh_send_notifications_on_event_failure' ) ) {
         wp_mail( $to, $subject, $message );
     }
 
-    add_action('groundhogg/event/failed', '\Groundhogg\send_event_failure_notification');
+    add_action('groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_notification');
 }
 
 /**
