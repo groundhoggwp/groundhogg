@@ -1,13 +1,16 @@
 (function (gh, $) {
     $.extend( gh, {
-        leadSource: 'gh_referer',
-        refID: 'gh_ref_id',
+        leadSourceCookie: 'gh-referer',
+        formImpressionsCookie: 'gh-form-impressions',
+        previousFormImpressions: [],
+
         setCookie: function(cname, cvalue, exdays){
             var d = new Date();
             d.setTime(d.getTime() + (exdays*24*60*60*1000));
             var expires = "expires="+ d.toUTCString();
             document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
         },
+
         getCookie: function( cname ){
             var name = cname + "=";
             var ca = document.cookie.split(';');
@@ -22,6 +25,7 @@
             }
             return null;
         },
+
         pageView : function(){
             var self = this;
 
@@ -36,6 +40,7 @@
                 error: function(){}
             });
         },
+
         logFormImpressions : function() {
             var self = this;
             var forms = $( '.gh-form' );
@@ -44,8 +49,18 @@
                 self.formImpression( fId );
             });
         },
+
         formImpression : function( id ){
             var self = this;
+
+            if ( ! id ){
+                return;
+            }
+
+            if ( this.previousFormImpressions.indexOf( id  ) !== -1 ){
+                return;
+            }
+
             $.ajax({
                 type: "post",
                 url: self.form_impression_endpoint,
@@ -55,18 +70,28 @@
                     xhr.setRequestHeader( 'X-WP-Nonce', self._wpnonce );
                 },
                 success: function( response ){
-                    if( typeof response.ref_id !== 'undefined' ) {
-                        self.setCookie( self.refID, response.ref_id, 30 );
-                    }
+                    self.previousFormImpressions.push( [ id ] );
+                    self.setCookie( self.formImpressionsCookie, self.previousFormImpressions.join(), 3 )
                 },
                 error: function(){}
             });
         },
+
         init: function(){
-            var referer = this.getCookie( this.leadSource );
+            var referer = this.getCookie( this.leadSourceCookie );
+
             if ( ! referer ){
-                this.setCookie( this.leadSource, document.referrer, 3 )
+                this.setCookie( this.leadSourceCookie, document.referrer, 3 )
             }
+
+            var previousFormImpressions = this.getCookie( this.formImpressionsCookie );
+
+            if ( ! previousFormImpressions ){
+                previousFormImpressions = '';
+            }
+
+            this.previousFormImpressions = previousFormImpressions.split( ',' );
+
             this.pageView();
             this.logFormImpressions();
         }

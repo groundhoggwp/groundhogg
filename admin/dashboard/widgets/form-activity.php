@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Dashboard\Widgets;
 
+use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\percentage;
 use Groundhogg\Plugin;
@@ -77,9 +78,9 @@ class Form_Activity extends Time_Graph
     public function get_time_from_datum($datum)
     {
         if ( isset_not_empty( $datum, 'time' ) ){
-            return absint( $datum->time );
+            return absint( get_array_var( $datum, 'time' ) );
         } else if ( isset_not_empty( $datum, 'timestamp' ) ){
-            return absint( $datum->timestamp );
+            return absint( get_array_var( $datum, 'timestamp' ) );
         }
 
         return false;

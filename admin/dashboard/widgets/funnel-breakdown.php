@@ -132,6 +132,10 @@ class Funnel_Breakdown extends Category_Graph
 
         $rows = [];
 
+        if ( empty( $complete ) ){
+            return;
+        }
+
         $total_complete = max( wp_list_pluck( $complete, 1 ) );
 
         foreach ( $complete as $i => $set ){
