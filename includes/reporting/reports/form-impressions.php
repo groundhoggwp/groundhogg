@@ -47,14 +47,23 @@ class Form_Impressions extends Report
      */
     public function get_data()
     {
-        $db = get_db( 'activity' );
+        $db = get_db( 'form_impressions' );
 
         $data = $db->query( [
-            'activity_type' => Activity::FORM_IMPRESSION,
             'before' => $this->get_end_time(),
             'after' => $this->get_start_time()
         ] );
 
-        return $data;
+        $counts = [];
+
+        // Normalize data so reports don't have to change...
+        foreach ( $data as $datum ){
+            $count = absint( $datum->count );
+            for( $i = 0; $i < $count; $i++ ){
+               $counts[] = [ 'timestamp' => absint( $datum->timestamp ) ];
+            }
+        }
+
+        return $counts;
     }
 }

@@ -56,6 +56,7 @@ class Manager
         $this->tag_relationships = new Tag_Relationships();
         $this->submissions    = new Submissions();
         $this->submissionmeta = new Submission_Meta();
+        $this->form_impressions = new Form_Impressions();
 
         /**
          * Runs when the DB Manager is setup and all the standard DBs have been initialized.

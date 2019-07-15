@@ -99,69 +99,13 @@ class Tracking_Api extends Base
             return self::ERROR_400( 'form_dne', 'The given form does not exist.' );
         }
 
-        $step = Plugin::$instance->utils->get_step( $ID );
+        // TODO no track double impressions...
 
-        $response = array();
-
-        /*
-         * Is Contact
-         */
-        if ( $contact = Plugin::$instance->tracking->get_current_contact() ) {
-
-
-            /* Check if impression for contact exists... */
-            $args = array(
-                'funnel_id'     => $step->get_funnel_id(),
-                'step_id'       => $step->get_id(),
-                'contact_id'    => $contact->get_id(),
-                'activity_type' => 'form_impression',
-                'start'         => time() - DAY_IN_SECONDS
-            );
-
-            $response[ 'cid' ] = $contact->get_id();
-
-        } else {
-            /*
-            * Not a Contact
-            */
-
-            /* Check if impression for contact exists... */
-            if ( isset( $_COOKIE[ 'gh_ref_id' ] ) ){
-
-                $ref_id = sanitize_key( $_COOKIE[ 'gh_ref_id' ] );
-
-            } else {
-
-                if ( ! is_user_logged_in() && ! Plugin::$instance->utils->location->verify_ip() ){
-                    return self::ERROR_401( 'unverified_ip', 'Could not verify ip address.' );
-                }
-
-                $ref_id = uniqid( 'g' );
-            }
-
-            $args = array(
-                'funnel_id'     => $step->get_funnel_id(),
-                'step_id'       => $step->get_id(),
-                'activity_type' => 'form_impression',
-                'referer'       => $ref_id,
-                'from'         => time() - DAY_IN_SECONDS
-            );
-
-            $response[ 'ref_id' ] = $ref_id;
-
-        }
-
-        if ( get_db( 'activity' )->exists( $args ) ){
-            return self::ERROR_200( 'no_double_track', 'Unique views only.', $response );
-        }
+        get_db( 'form_impressions' )->add( [ 'form_id' => $ID ] );
 
         do_action( 'groundhogg/api/v3/tracking/form-impression' );
 
-        unset( $args[ 'start' ] );
-        $args[ 'timestamp' ] = time();
-        get_db( 'activity' )->add( $args );
-
-        return self::SUCCESS_RESPONSE( $response );
+        return self::SUCCESS_RESPONSE();
     }
 
 }

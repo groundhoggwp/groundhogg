@@ -90,6 +90,22 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
         return $this->get_db()->get_primary_key();
     }
 
+    /**
+     * Delete the object from the DB
+     *
+     * @return bool
+     */
+    public function delete()
+    {
+        if ( $this->get_db()->delete( $this->get_id() ) ){
+            unset( $this->data );
+            unset( $this->ID );
+
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Setup the class

@@ -1,6 +1,9 @@
 <?php
 namespace Groundhogg;
 
+use Groundhogg\Bulk_Jobs\Manager;
+use Groundhogg\DB\Activity;
+
 /**
  * Upgrade
  *
@@ -40,6 +43,7 @@ class Main_Updater extends Updater {
      *
      * 1. Convert any options.
      * 2. Add new rewrite rules for iframe, forms, email preferences, unsubscribe, email confirmed.
+     * 3. Move from impressions to new another DB.
      */
     public function version_2_0()
     {
@@ -55,8 +59,14 @@ class Main_Updater extends Updater {
             update_option( 'gh_terms', $terms_link );
         }
 
-	    get_db( 'emails' )->create_table();
+        // Give the DBS a quick update...
+	    Plugin::$instance->dbs->install_dbs();
 
 	    flush_rewrite_rules();
+
+	    // Redirect to the bulk job manage when ready.
+        add_action( "groundhogg/updater/main/finished", function (){
+            Plugin::$instance->bulk_jobs->migrate_form_impressions->start();
+        } );
     }
 }

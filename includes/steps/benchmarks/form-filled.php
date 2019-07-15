@@ -687,12 +687,13 @@ class Form_Filled extends Benchmark
             )
         ) );
 
-        $num_impressions = get_db('activity')->count(array(
-            'start'     => $start_time,
-            'end'       => $end_time,
-            'step_id'   => $step->get_id(),
-            'activity_type' => 'form_impression'
-        ));
+        $records = get_db( 'form_impressions' )->query( [
+            'after'    => $start_time,
+            'before'   => $end_time,
+            'form_id'  => $step->get_id(),
+        ] );
+
+        $num_impressions = array_sum( map_deep( wp_list_pluck( $records, 'count' ), 'absint' ) );
 
         ?>
         <p class="report">

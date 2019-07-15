@@ -23,6 +23,21 @@ class Activity extends Base_Object
         // TODO: Implement post_setup() method.
     }
 
+    public function get_timestamp()
+    {
+        return absint( $this->timestamp );
+    }
+
+    public function get_step_id()
+    {
+        return absint( $this->step_id );
+    }
+
+    public function get_funnel_id()
+    {
+        return absint( $this->funnel_id );
+    }
+
     /**
      * Return the DB instance that is associated with items of this type.
      *
