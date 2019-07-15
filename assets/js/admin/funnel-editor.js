@@ -45,6 +45,11 @@
                 self.save( $('#funnel-form') );
             });
 
+            $( document ).on('GroundhoggModalClosed', function( e ){
+                e.preventDefault();
+                self.save( $('#funnel-form') );
+            });
+
             if ( window.innerWidth > 600 ){
                 this.makeSortable();
                 this.makeDraggable();

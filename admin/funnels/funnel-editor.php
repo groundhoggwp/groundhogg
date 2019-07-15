@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
+use function Groundhogg\key_to_words;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -107,7 +108,7 @@ $funnel = new Funnel( $funnel_id );
                         'width'     => 700,
                     ) ); ?>
                 </div>
-                <div id="add-contacts">
+                <div id="add-contacts" class="<?php if ( ! $funnel->is_active() ) echo 'hidden'; ?>">
                     <?php echo  html()->modal_link( [
                         'title'     => __( 'Add Contacts', 'groundhogg' ),
                         'text'      => '<span style="padding: 5px;" class="dashicons dashicons-plus-alt"></span>',
@@ -115,66 +116,10 @@ $funnel = new Funnel( $funnel_id );
                         'id'        => '',
                         'class'     => 'add-contacts-link',
                         'source'    => 'add-contact-modal',
-                        'height'    => 300,
+                        'height'    => 400,
                         'width'     => 500,
-                        'footer'    => 'true',
-                        'preventSave' => 'true',
+                        'footer'    => 'false',
                     ] ); ?>
-                    <div class="hidden" id="add-contact-modal" style="display: none;">
-                        <div>
-                            <div class="add-contacts-response hidden"></div>
-                            <table class="add-contact-form" style="width: 100%;">
-                                <tbody>
-                                <tr>
-                                    <th>
-                                        <?php _e( 'Select contacts to add into funnel:', 'groundhogg' ); ?>
-                                    </th>
-
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <?php
-
-                                        echo Plugin::$instance->utils->html->tag_picker( array(
-                                            'name'  => 'add_contacts_to_funnel_tag_picker[]',
-                                            'id'    => 'add_contacts_to_funnel_tag_picker',
-                                        ) );
-
-                                        ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>
-                                        <?php _e( 'Select where to start:', 'groundhogg' ); ?>
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <?php
-
-                                        $steps = Plugin::$instance->dbs->get_db('steps')->query( array( 'funnel_id' => $funnel_id ) );
-                                        $options = array();
-                                        foreach ( $steps as $step ){
-                                            $step = Plugin::$instance->utils->get_step( $step->ID );
-                                            if ($step->is_active() ){
-                                                $options[ $step->ID ] = $step->get_title() . ' (' . str_replace( '_', ' ', $step->get_type() ) . ')';
-                                            }
-                                        }
-
-                                        echo Plugin::$instance->utils->html->select2( array(
-                                            'name'              => 'add_contacts_to_funnel_step_picker',
-                                            'id'                => 'add_contacts_to_funnel_step_picker',
-                                            'data'              => $options,
-                                            'multiple'          => false,
-                                        ) );
-
-                                        ?>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
                 <div id="export">
                     <a id="copy-share-link" style="text-decoration: none; display: inline-block" href="#"><span style="padding: 5px;" title="<?php esc_attr_e( 'Copy share link', 'groundhogg' ) ?>" class="dashicons dashicons-share"></span></a>
@@ -280,3 +225,61 @@ $funnel = new Funnel( $funnel_id );
         </div>
     </div>
 </form>
+<div class="hidden" id="add-contact-modal" style="display: none;">
+    <form method="post">
+        <?php wp_nonce_field(); ?>
+        <?php wp_nonce_field( 'add_contacts_to_funnel', 'add_contacts_nonce' ); ?>
+        <div>
+            <div class="add-contacts-response hidden"></div>
+            <table class="add-contact-form" style="width: 100%;">
+                <tbody>
+                <tr>
+                    <th>
+                        <?php _e( 'Select contacts to add into funnel:', 'groundhogg' ); ?>
+                    </th>
+
+                </tr>
+                <tr>
+                    <td>
+                        <?php
+
+                        echo Plugin::$instance->utils->html->tag_picker( array(
+                            'name'  => 'add_contacts_to_funnel_tag_picker[]',
+                            'id'    => 'add_contacts_to_funnel_tag_picker',
+                        ) );
+
+                        ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <?php _e( 'Select where to start:', 'groundhogg' ); ?>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <?php
+
+                        $options = [];
+
+                        $steps = $funnel->get_steps();
+                        foreach ( $steps as $step ){
+                            $options[ $step->get_id() ] = sprintf( "%d. %s (%s)", $step->get_order(), $step->get_title(), key_to_words( $step->get_type() ) );
+                        }
+
+                        echo Plugin::$instance->utils->html->select2( array(
+                            'name'              => 'add_contacts_to_funnel_step_picker',
+                            'id'                => 'add_contacts_to_funnel_step_picker',
+                            'data'              => $options,
+                            'multiple'          => false,
+                        ) );
+
+                        ?>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <?php submit_button( __( 'Add Contacts', 'groundhogg' ) ); ?>
+        </div>
+    </form>
+</div>

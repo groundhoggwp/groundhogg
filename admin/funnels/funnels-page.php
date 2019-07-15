@@ -7,6 +7,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_store_products;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
+use function Groundhogg\html;
 use Groundhogg\Plugin;
 use Groundhogg\Contact_Query;
 use Groundhogg\Step;
@@ -82,6 +83,14 @@ class Funnels_Page extends Admin_Page
             /* just need to enqueue it... */
             enqueue_groundhogg_modal();
         }
+
+        add_action( "groundhogg/admin/gh_funnels/before", function (){
+            if ( ! get_db( 'funnels' )->count( [ 'status' => 'active' ] ) ){
+                Plugin::$instance->notices->add( 'no_active_funnels', sprintf( '%s %s', __( 'You have no active funnels.' ), html()->e( 'a', [
+                    'href' => admin_url( 'admin.php?page=gh_funnels&status=inactive' ),
+                ], __( 'Activate a funnel!' ) ) ), 'warning' );
+            }
+        } );
     }
 
     public function get_slug()
@@ -612,14 +621,24 @@ class Funnels_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
+        $funnel_id = absint( get_request_var( 'funnel' ) );
+        $funnel = new Funnel( $funnel_id );
+
+        if ( wp_verify_nonce( get_request_var( 'add_contacts_nonce' ), 'add_contacts_to_funnel' ) ) {
+            if ( $funnel->is_active() ){
+                Plugin::$instance->bulk_jobs->add_contacts_to_funnel->start( [
+                    'tag_ids' => get_request_var( 'add_contacts_to_funnel_tag_picker' ),
+                    'step_id' => get_request_var( 'add_contacts_to_funnel_step_picker' ),
+                ] );
+            } else {
+                return new \WP_Error( 'inactive', __( 'You cannot do this while the funnel is not active.', 'groundhogg' ) );
+            }
+        }
+
         /* check if funnel is to big... */
         if ( count( $_POST, COUNT_RECURSIVE ) >= intval( ini_get( 'max_input_vars' ) ) ){
             return new \WP_Error( 'post_too_big', _x( 'Your [max_input_vars] is too small for your funnel! You may experience odd behaviour and your funnel may not save correctly. Please <a target="_blank" href="http://www.google.com/search?q=increase+max_input_vars+php">increase your [max_input_vars] to at least double the current size.</a>.', 'notice', 'groundhogg' ) );
         }
-
-        $funnel_id = absint( get_request_var( 'funnel' ) );
-
-        $funnel = new Funnel( $funnel_id );
 
         $title = sanitize_text_field( get_request_var( 'funnel_title' ) );
         $args[ 'title' ] = $title;
