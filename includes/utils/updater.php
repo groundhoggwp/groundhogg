@@ -13,28 +13,13 @@ namespace Groundhogg;
  */
 abstract class Updater{
 
-    /**
-     * List of all version which have had update paths.
-     *
-     * @var string[]
-     */
-    protected $previous_versions = [];
 
     /**
      * WPGH_Upgrade constructor.
      */
     public function __construct()
     {
-        add_action( 'init', [ $this, 'init' ] );
         add_action( 'init', [ $this, 'do_updates' ] );
-    }
-
-    /**
-     * Init
-     */
-    public function init()
-    {
-        $this->previous_versions = Plugin::$instance->settings->get_option( $this->get_version_option_name(), false );
     }
 
     /**
@@ -58,7 +43,7 @@ abstract class Updater{
      */
     protected function get_previous_versions()
     {
-        return $this->previous_versions;
+        return Plugin::$instance->settings->get_option( $this->get_version_option_name(), [] );
     }
 
     /**
@@ -68,8 +53,9 @@ abstract class Updater{
      */
     protected function remember_version_update( $version )
     {
-        $this->previous_versions[] = $version;
-        Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->previous_versions );
+        $versions = $this->get_previous_versions();
+        $versions[] = $version;
+        Plugin::$instance->settings->update_option( $this->get_version_option_name(), $versions );
     }
 
     /**
@@ -90,19 +76,26 @@ abstract class Updater{
 
         $previous_updates  = $this->get_previous_versions();
 
-        // installing...
-        if ( ! $previous_updates ){
-            Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->get_available_updates() );
-            return;
-        }
+        // installing... TODO Re-implement
+//        if ( ! $previous_updates ){
+//            Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->get_available_updates() );
+//            return;
+//        }
 
         $available_updates = $this->get_available_updates();
 
         $missing_updates = array_diff( $available_updates, $previous_updates );
 
+//        wp_send_json( [
+//            'available_updates' => $available_updates,
+//            'previous_updates' => $previous_updates
+//        ] );
+
         if ( empty( $missing_updates ) ){
             return;
         }
+
+//        wp_die();
 
         foreach ( $missing_updates as $update ){
             $this->update_to_version( $update );

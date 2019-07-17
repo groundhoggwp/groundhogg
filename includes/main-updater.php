@@ -67,8 +67,9 @@ class Main_Updater extends Updater {
 	    flush_rewrite_rules();
 
 	    // Redirect to the bulk job manage when ready.
-        add_action( "groundhogg/updater/main/finished", function (){
-            Plugin::$instance->bulk_jobs->migrate_form_impressions->start();
-        } );
+        // TODO
+//        add_action( "groundhogg/updater/main/finished", function (){
+//            Plugin::$instance->bulk_jobs->migrate_form_impressions->start();
+//        } );
     }
 }
