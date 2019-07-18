@@ -162,11 +162,26 @@ class Notices
     }
 
     /**
-     * Alias for notices()
+     * Print the notices.
+     *
+     * @param bool $echo
+     * @return true|string
      */
-    public function print_notices()
+    public function print_notices( $echo=true )
     {
+        if ( $echo ){
+            $this->notices();
+            return true;
+        }
+
+        ob_start();
+
         $this->notices();
+
+        $notices = ob_get_clean();
+
+        return $notices;
+
     }
 
 }

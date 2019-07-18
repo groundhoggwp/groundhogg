@@ -331,7 +331,10 @@ class Welcome_Page extends Admin_Page
 
         if ( apply_filters( 'wpgh_show_phil_on_welcome_page', true ) ): ?>
         <img class="phil" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340">
-    <?php endif; ?>
+        <?php endif; ?>
+        <div class="">
+
+        </div>
         <div id="welcome-page" class="welcome-page">
             <div id="poststuff">
                 <div class="welcome-header">
@@ -341,22 +344,6 @@ class Welcome_Page extends Admin_Page
                 <hr class="wp-header-end">
                 <?php do_action( 'wpgh_welcome_page_custom_content' ); ?>
                 <?php if ( apply_filters( 'wpgh_show_main_welcome_page_content', true ) ): ?>
-                    <?php if ( $this->should_show_stats_collection() ): ?>
-                        <div class="col">
-                            <div class="postbox stats-collection">
-                                <div class="inside">
-                                    <h3><?php _e( 'GET 30% OFF WHEN YOU HELP US MAKE GROUNDHOGG BETTER', 'Groundhogg' ); ?></h3>
-                                    <p><?php _e( "Want sweet discounts and to help us make Groundhogg even better? When you optin to our stats collection you will get a <b>30% discount off</b> any premium extension or subscription in our store by sharing <b>anonymous</b> data about your site. You can opt out any time from the settings page. Your email address & display name will be collected so we can send you the discount code.", 'groundhogg' ); ?></p>
-                                    <p style="text-align: center">
-                                        <a class="button button-primary" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=groundhogg&action=opt_in_to_stats' ), 'opt_in_to_stats' ); ?>" ><?php _e( 'Yes, I want to help make Groundhogg better!' ); ?></a>
-                                    </p>
-                                    <p style="text-align: center">
-                                        <a href="https://www.groundhogg.io/privacy-policy/#usage-tracking" target="_blank"><?php _e( 'Learn more', 'groundhogg' ); ?></a>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
                     <div class="left-col col">
                         <div id="support-articles">
                             <div class="postbox support">
@@ -424,7 +411,7 @@ class Welcome_Page extends Admin_Page
         ?>
 <style>
     #wpwrap {
-        background-image: url( '<?php echo apply_filters( 'wpgh_welcome_bg_image', GROUNDHOGG_ASSETS_URL . 'images/groundhogg-bg.jpg' ); ?>' );
+        background: linear-gradient( rgba(219, 116, 26, 0.45), rgba(219, 116, 26, 0.45)), url( '<?php echo apply_filters( 'wpgh_welcome_bg_image', GROUNDHOGG_ASSETS_URL . 'images/groundhogg-bg.jpg' ); ?>' );
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;

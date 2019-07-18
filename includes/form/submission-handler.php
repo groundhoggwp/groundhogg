@@ -447,7 +447,7 @@ class Submission_Handler extends Supports_Errors
                     }
 
                     /* if found */
-                    if ( strpos( $value, $word ) !== false ){
+                    if ( strpos( $value, $word ) !== false || strpos( $word, $value ) !== false ){
                         return true;
                         /* Further checking */
                     } else if ( apply_filters( 'groundhogg/submission_handler/spam', false, $value, $word, $this ) ){

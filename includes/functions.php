@@ -690,6 +690,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     $phpmailer->clearAttachments();
     $phpmailer->clearCustomHeaders();
     $phpmailer->clearReplyTos();
+    $phpmailer->AltBody = null;
 
     // From email and name
     // If we don't have a name from the input headers

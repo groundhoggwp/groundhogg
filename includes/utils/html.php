@@ -844,7 +844,7 @@ class HTML
             'class' => 'regular-text',
             'value' => '',
             'attributes' => '',
-            'placeholder' => 'yyy-mm-dd',
+            'placeholder' => 'yyyy-mm-dd',
             'min-date' => date( 'Y-m-d', strtotime( 'today' ) ),
             'max-date' => date( 'Y-m-d', strtotime( '+100 years' ) ),
             'format' => 'yy-mm-dd'

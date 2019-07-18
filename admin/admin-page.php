@@ -294,7 +294,7 @@ abstract class Admin_Page
     protected function wp_die_no_access()
     {
         if ( wp_doing_ajax() ){
-            return wp_send_json_error();
+            return wp_send_json_error( __( "Invalid permissions." , 'groundhogg' ) );
         }
 
         return wp_die( __( "Invalid permissions." , 'groundhogg' ), 'No Access!' );

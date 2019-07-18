@@ -1,39 +1,37 @@
 (function ($, gh ) {
 
-    (function ($) {
-        $.fn.serializeFormJSON = function () {
+    $.fn.serializeFormJSON = function () {
 
-            var o = {};
-            var a = this.serializeArray();
-            $.each(a, function () {
-                if (o[this.name]) {
-                    if (!o[this.name].push) {
-                        o[this.name] = [o[this.name]];
-                    }
-                    o[this.name].push(this.value || '');
-                } else {
-                    o[this.name] = this.value || '';
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
                 }
-            });
-            return o;
-        };
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
 
-        $.fn.hideButton = function () {
-            var $button = this.find( '.gh-submit-button' ).hide();
-            $button.before( '<div class="gh-loader" style="font-size: 10px;margin: 20px"></div>' );
-        };
+    $.fn.hideButton = function () {
+        var $button = this.find( '.gh-submit-button' ).hide();
+        $button.before( '<div class="gh-loader" style="font-size: 10px;margin: 20px"></div>' );
+    };
 
-        $.fn.showButton = function () {
-            var $button = this.find( '.gh-submit-button' ).show();
-            $( '.gh-loader' ).remove();
-        };
-
-    })(jQuery);
+    $.fn.showButton = function () {
+        var $button = this.find( '.gh-submit-button' ).show();
+        $( '.gh-loader' ).remove();
+    };
 
     $(function () {
         $( 'form.gh-form.ajax-submit' ).on( 'submit', function ( e ) {
             e.preventDefault();
             $( '.gh-form-errors-wrapper' ).remove();
+            $( '.gh-message-wrapper' ).remove();
             var $form = $(this);
 
             $form.hideButton();
