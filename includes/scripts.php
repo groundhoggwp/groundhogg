@@ -41,8 +41,8 @@ class Scripts
                 'form_impression_endpoint' => rest_url( 'gh/v3/tracking/form-impression/'),
                 'form_submission_endpoint' => rest_url( 'gh/v3/forms/submit/'),
                 'ajaxurl' => admin_url( 'admin-ajax.php' ),
-                '_wpnonce' => wp_create_nonce('wp_rest'),
-                '_ghnonce' => wp_create_nonce('groundhogg_frontend')
+                '_wpnonce' => wp_create_nonce('wp_rest' ),
+                '_ghnonce' => wp_create_nonce('groundhogg_frontend' )
             ));
         } else {
             /* backwards compat */
