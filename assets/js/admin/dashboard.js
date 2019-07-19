@@ -85,4 +85,4 @@
     $(function () {
         d.init();
     });
-})(jQuery,wpghDashboard);
+})(jQuery,GroundhoggDashboard);

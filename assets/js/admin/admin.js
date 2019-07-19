@@ -60,6 +60,7 @@
         apiPicker(  '.gh-single-tag-picker',    endpoints.tags, false, false );
         apiPicker(  '.gh-single-tag-picker',    endpoints.tags, false, false );
         apiPicker(  '.gh-email-picker',         endpoints.emails, false, false );
+        apiPicker(  '.gh-email-picker-multiple', endpoints.emails, true, false );
         apiPicker(  '.gh-sms-picker',           endpoints.sms, false, false );
         apiPicker(  '.gh-contact-picker',       endpoints.contacts, false, false );
         apiPicker(  '.gh-benchmark-picker',     endpoints.benchmarks, false, false );
