@@ -22,7 +22,11 @@ class Time_Range_Picker extends Dashboard_Widget
         ?>
         <form action="" method="get">
             <div class="actions">
-                <?php $args = array(
+                <?php
+
+                $html->hidden_GET_inputs();
+
+                $args = array(
                     'name'      => 'range',
                     'id'        => 'date_range',
                     'options'   => Plugin::$instance->reporting->get_reporting_ranges(),

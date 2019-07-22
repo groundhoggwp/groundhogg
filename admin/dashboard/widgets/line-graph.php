@@ -69,7 +69,7 @@ abstract class Line_Graph extends Dashboard_Widget
             ?>
             <div class="report">
                 <script type="text/javascript">
-                    jQuery(function($) {
+                    jQuery( function($) {
 
                         /* DATA OPERATION */
                         var dataset = <?php echo $data; ?>;
@@ -132,10 +132,14 @@ abstract class Line_Graph extends Dashboard_Widget
 
                         /* PLOT CHART */
 
-                        if ( $( "#graph-<?php echo $this->get_id(); ?>" ).width() > 0 ){
-                            $.plot($("#graph-<?php echo $this->get_id(); ?>"), dataset, options);
-                            $("#graph-<?php echo $this->get_id(); ?>").UseTooltip();
+                        function draw() {
+                            if ( $( "#graph-<?php echo $this->get_id(); ?>" ).width() > 0 ){
+                                $.plot($("#graph-<?php echo $this->get_id(); ?>"), dataset, options);
+                                $("#graph-<?php echo $this->get_id(); ?>").UseTooltip();
+                            }
                         }
+
+                        setTimeout( draw, 500 );
 
                     });
                 </script>
