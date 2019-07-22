@@ -430,12 +430,11 @@ class Step extends Base_Object_With_Meta implements Event_Process
             return true;
 
         $step_order = $this->get_order() - 1;
+        $steps = $this->get_funnel()->get_steps();
 
         while ( $step_order > 0 ){
 
-            $steps = $this->get_funnel()->get_steps();
-
-            $step = array_shift( $steps );
+            $step = $steps[ $step_order ];
 
             if ( $step->is_action() ){
                 return false;

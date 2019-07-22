@@ -93,6 +93,11 @@ class Funnel extends Base_Object
             $steps[] = Plugin::$instance->utils->get_step( $raw_step_id );
         }
 
+        usort( $steps, function (Step $a, Step $b){
+            if ($a->get_order()==$b->get_order()) return 0;
+            return ($a->get_order()<$b->get_order())?-1:1;
+        } );
+
         return $steps;
     }
 
