@@ -38,7 +38,6 @@ var ButtonBlock = {};
             this.textColor = $( '#button-text-color' );
             this.textColor.wpColorPicker({
                 change: function (event, ui) {
-                    console.log( self.textColor.val() );
                     editor.getActive().find('a')[0].style.color = self.textColor.val();
                 }
             });
