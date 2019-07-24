@@ -654,7 +654,7 @@ class Replacements
     function replacement_confirmation_link()
     {
         $link_text = apply_filters( 'groundhogg/replacements/confirmation_text', Plugin::$instance->settings->get_option( 'confirmation_text', __( 'Confirm your email.', 'groundhogg' ) ) );
-        $link_url = site_url( 'gh-confirmation/via/email/' );
+        $link_url = site_url( 'gh/preferences/confirm/' );
 
         return sprintf( "<a href=\"%s\" target=\"_blank\">%s</a>", $link_url, $link_text );
     }
@@ -667,7 +667,7 @@ class Replacements
      */
     function replacement_confirmation_link_raw()
     {
-        $link_url = site_url( 'gh-confirmation/via/email/' );
+        $link_url = site_url( 'gh/preferences/confirm/' );
         return $link_url;
     }
 

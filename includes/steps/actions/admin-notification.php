@@ -2,6 +2,7 @@
 namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
+use function Groundhogg\do_replacements;
 use Groundhogg\Event;
 use function Groundhogg\gh_sms;
 use Groundhogg\HTML;
@@ -102,7 +103,7 @@ class Admin_Notification extends Action
         ] );
 
         if ( ! $this->get_setting( 'is_sms' ) ){
-            $this->add_control( 'sent_to', [
+            $this->add_control( 'send_to', [
                 'label' => __( 'Send To:', 'groundhogg' ),
                 'type' => HTML::INPUT,
                 'default' => get_bloginfo( 'admin_email' ),
@@ -211,22 +212,25 @@ class Admin_Notification extends Action
 
         $note = $this->get_setting( 'note_text' );
 
-        $finished_note = sanitize_textarea_field( Plugin::$instance->replacements->process( $note, $contact->get_id() ) );
+        $finished_note = sanitize_textarea_field( do_replacements( $note, $contact->get_id() ) );
 
         $is_sms = $this->get_setting( 'is_sms', false );
 
         // Email
         if ( ! $is_sms ){
-            $finished_note.= sprintf( "\n\n%s: %s", __( 'Manage Contact', 'groundhogg' ), admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id()  ) );
+            $finished_note .= sprintf( "\n\n======== %s ========\nEdit: %s\nReply: %s", __( 'Manage Contact', 'groundhogg' ),
+                admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id()  ),
+                $contact->get_email()
+            );
 
             $subject = $this->get_setting( 'subject' );
-            $subject = sanitize_text_field( Plugin::$instance->replacements->process( $subject, $contact->get_id() ) );
+            $subject = sanitize_text_field( do_replacements( $subject, $contact->get_id() ) );
 
             $send_to = $this->get_setting( 'send_to' );
-            $reply_to = $this->get_setting( 'reply_to', $contact->get_email() );
+            $reply_to = do_replacements( $this->get_setting( 'reply_to', $contact->get_email() ) );
 
             if ( ! is_email( $send_to ) ){
-                $send_to = Plugin::$instance->replacements->process( $send_to, $contact->get_id() );
+                $send_to = do_replacements( $send_to, $contact->get_id() );
             }
 
             if ( ! $send_to ){
@@ -235,9 +239,13 @@ class Admin_Notification extends Action
 
             add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
-            $sent = wp_mail( $send_to, $subject, $finished_note, [
-                sprintf( 'Reply-To: <%s>', $reply_to )
-            ] );
+            $headers = [];
+
+            if ( is_email( $reply_to ) ){
+                $headers = sprintf( 'Reply-To: <%s>', $reply_to );
+            }
+
+            $sent = wp_mail( $send_to, $subject, $finished_note, $headers );
 
             remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
         } else {

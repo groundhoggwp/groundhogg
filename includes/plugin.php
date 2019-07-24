@@ -346,12 +346,19 @@ class Plugin {
 
         $this->register_autoloader();
         $this->init_dropins();
+        $this->load_immediate();
 
         if ( did_action( 'plugins_loaded' ) ){
             $this->init();
         } else {
             add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
         }
+
+    }
+
+    protected function load_immediate()
+    {
+        require  GROUNDHOGG_PATH . '/includes/pluggable.php';
     }
 
     /**
@@ -371,7 +378,6 @@ class Plugin {
         require  GROUNDHOGG_PATH . '/includes/functions.php';
         require  GROUNDHOGG_PATH . '/includes/filters.php';
         require  GROUNDHOGG_PATH . '/includes/tools.php';
-        require  GROUNDHOGG_PATH . '/includes/pluggable.php';
     }
 }
 
