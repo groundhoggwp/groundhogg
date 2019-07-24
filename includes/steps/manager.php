@@ -80,6 +80,9 @@ class Manager {
         $this->elements[] = new Tag_Applied();
         $this->elements[] = new Tag_Removed();
 
+        /* Other */
+        $this->elements[] = new Error();
+
         do_action( 'groundhogg/steps/init', $this );
     }
 
