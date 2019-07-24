@@ -531,6 +531,18 @@ function gh_sms( $to, $message )
 }
 
 /**
+ * Delete a cookie
+ *
+ * @param string $cookie
+ * @return bool
+ */
+function delete_cookie( $cookie='' ){
+    unset($_COOKIE[$cookie]);
+    // empty value and expiration one hour before
+    return setcookie($cookie, '', time() - 3600);
+}
+
+/**
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
