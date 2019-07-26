@@ -114,7 +114,10 @@ class Superlinks_Table extends WP_List_Table {
      */
     protected function column_source( $superlink )
     {
-        return sprintf( '<input style="max-width: 100%%;" class="regular-text" type="text" value="%s" onfocus="this.select()" readonly><p><a target="_blank" href="%s">%s</a></p>', site_url( 'superlinks/link/' . $superlink->get_id() ), site_url( 'superlinks/link/' . $superlink->get_id() ), site_url( 'superlinks/link/' . $superlink->get_id() ) );
+        return sprintf(
+            '<input style="max-width: 100%%;" class="regular-text" type="text" value="%s" onfocus="this.select()" readonly>',
+            $superlink->get_source_url()
+        );
     }
 
     /**

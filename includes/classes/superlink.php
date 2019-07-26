@@ -36,7 +36,7 @@ class Superlink extends Base_Object
 
     public function get_source_url()
     {
-        return sprintf( site_url( 'gh/superlinks/link/%d' ), $this->get_id() );
+        return trailingslashit( sprintf( site_url( 'gh/superlinks/link/%d' ), $this->get_id() ) );
     }
 
     public function get_replacement_code()

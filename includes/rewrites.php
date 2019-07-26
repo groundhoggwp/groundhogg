@@ -35,7 +35,7 @@ class Rewrites
         );
 
         // Superlink Rewrite
-        // http://localhost/wp1/gh/superlinks/link/1
+        // http://localhost/wp1/superlinks/link/1
         add_rewrite_rule(
             '^superlinks/link/([^/]*)/?$',
             'index.php?pagenow=superlink&superlink_id=$matches[1]',
