@@ -2,6 +2,7 @@
 namespace Groundhogg\Form;
 
 use function Groundhogg\after_form_submit_handler;
+use function Groundhogg\blacklist_check;
 use Groundhogg\Contact;
 use function Groundhogg\decrypt;
 use function Groundhogg\doing_rest;
@@ -432,29 +433,12 @@ class Submission_Handler extends Supports_Errors
         /* Turn into array */
         if ( ! is_array( $args ) ){ $args = [ $args ]; }
 
-        $blacklist = get_option( 'blacklist_keys', false );
+        foreach ( $args as $arg ){
 
-        if ( ! empty( $blacklist ) ) {
-
-            $words = explode(PHP_EOL, $blacklist );
-
-            foreach ($words as $word) {
-
-                foreach ( $args as $key => $value ){
-
-                    if ( is_array( $value ) ){
-                        continue;
-                    }
-
-                    /* if found */
-                    if ( strpos( $value, $word ) !== false || strpos( $word, $value ) !== false ){
-                        return true;
-                        /* Further checking */
-                    } else if ( apply_filters( 'groundhogg/submission_handler/spam', false, $value, $word, $this ) ){
-                        return true;
-                    }
-                }
+            if ( blacklist_check( $arg ) ){
+                return true;
             }
+
         }
 
         return false;
