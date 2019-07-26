@@ -281,10 +281,13 @@ class Event extends Base_Object
      */
     public function get_step_title()
     {
-        return $this->get_step()->get_step_title(); //todo
-//        return '';
-    }
+        if ( $this->get_step() ){
+            return $this->get_step()->get_step_title(); //todo
+        }
 
+        return __( 'Unknown', 'groundhogg' );
+
+    }
 
 
     /**
@@ -292,7 +295,11 @@ class Event extends Base_Object
      */
     public function get_funnel_title()
     {
-        return $this->get_step()->get_funnel_title();
+        if ( $this->get_step() ){
+            return $this->get_step()->get_funnel_title();
+        }
+
+        return __( 'Unknown', 'groundhogg' );
     }
 
     /**
@@ -309,6 +316,10 @@ class Event extends Base_Object
         do_action('groundhogg/event/run/before', $this);
 
         $this->in_progress();
+
+        if ( ! $this->get_step() ){
+            return false;
+        }
 
         $result = $this->get_step()->run( $this->get_contact(), $this );
 

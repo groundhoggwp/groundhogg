@@ -1,7 +1,15 @@
 <?php
+
 namespace Groundhogg\Steps\Actions;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+use Groundhogg\Contact;
+use Groundhogg\Event;
+use function Groundhogg\get_db;
+use function Groundhogg\html;
+use Groundhogg\Plugin;
+use Groundhogg\Step;
+
+if ( !defined( 'ABSPATH' ) ) exit;
 
 /**
  * Delay Timer
@@ -68,30 +76,16 @@ class Field_Timer extends Action
     }
 
     /**
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function settings( $step )
     {
-        $checked = $step->get_meta( 'disable' );
-
-        $amount = $step->get_meta( 'delay_amount');
-        if ( ! $amount )
-            $amount = 3;
-
-        $type = $step->get_meta( 'delay_type' );
-        if ( ! $type )
-            $type = 'days';
-
-        $run_when = $step->get_meta( 'run_when' );
-        if ( ! $run_when )
-            $run_when = 'now';
-
-        $run_time = $step->get_meta( 'run_time' );
-        if ( ! $run_time )
-            $run_time = '09:30';
-
-        $date_field = $step->get_meta( 'date_field' );
-        $before_or_after = $step->get_meta( 'before_or_after' )
+        $amount = $this->get_setting( 'delay_amount' , 3 );
+        $type = $this->get_setting('delay_type'  , 'days');
+        $run_when = $this->get_setting( 'run_when'  , 'now');
+        $run_time = $this->get_setting( 'run_time' , '09:30' );
+        $date_field = $this->get_setting( 'date_field' );
+        $before_or_after = $this->get_setting('before_or_after' )
 
         ?>
 
@@ -100,68 +94,63 @@ class Field_Timer extends Action
             <tr>
                 <th><?php echo esc_html__( 'Wait at least:', 'groundhogg' ); ?></th>
                 <td>
-                    <?php $args = array(
-                        'name'  => $step->prefix( 'delay_amount' ),
-                        'id'    => $step->prefix( 'delay_amount' ),
+                    <?php
+
+                    echo html()->number( [
+                        'name' => $this->setting_name_prefix( 'delay_amount' ),
+                        'id' => $this->setting_id_prefix( 'delay_amount' ),
                         'class' => 'input',
                         'value' => $amount,
-                        'min'   => 0,
-                        'max'   => 9999,
-                    );
+                        'min' => 0,
+                        'max' => 9999,
+                    ] );
 
-                    echo WPGH()->html->number( $args );
+                    echo html()->dropdown( [
+                        'name' => $this->setting_name_prefix( 'delay_type' ),
+                        'id' => $this->setting_id_prefix( 'delay_type' ),
+                        'options' => [
+                            'minutes' => __( 'Minutes' ),
+                            'hours' => __( 'Hours' ),
+                            'days' => __( 'Days' ),
+                            'weeks' => __( 'Weeks' ),
+                            'months' => __( 'Months' ),
+                            'no_delay' => __( 'No Delay' ),
+                        ],
+                        'selected' => $type,
+                        'option_none' => false,
+                    ] );
 
-                    $delay_types = array(
-                        'minutes'   => __( 'Minutes' ),
-                        'hours'     => __( 'Hours' ),
-                        'days'      => __( 'Days' ),
-                        'weeks'     => __( 'Weeks' ),
-                        'months'    => __( 'Months' ),
-                        'no_delay'  => __( 'No Delay' ),
-                    );
 
-                    $args = array(
-                        'name'          => $step->prefix( 'delay_type' ),
-                        'id'            => $step->prefix( 'delay_type' ),
-                        'options'       => $delay_types,
-                        'selected'      => $type,
-                        'option_none'   => false,
-                    );
-
-                    echo WPGH()->html->dropdown( $args );
-
-                    $args = array(
-                        'name'          => $step->prefix( 'before_or_after' ),
-                        'id'            => $step->prefix( 'before_or_after' ),
-                        'options'       => array(
+                    echo html()->dropdown( [
+                        'name' => $this->setting_name_prefix( 'before_or_after' ),
+                        'id' => $this->setting_id_prefix( 'before_or_after' ),
+                        'options' => array(
                             'before' => __( 'Before', 'groundhogg' ),
-                            'after'  => __( 'After', 'groundhogg' )
+                            'after' => __( 'After', 'groundhogg' )
                         ),
-                        'selected'      => $before_or_after,
-                        'option_none'   => false,
-                    );
+                        'selected' => $before_or_after,
+                        'option_none' => false,
+                    ] );
 
-                    echo WPGH()->html->dropdown( $args );
-
-                    $func = 'func_' . $step->prefix( uniqid() );
+                    $func = 'func_' . $this->setting_id_prefix( uniqid() );
 
                     ?>
                     <script>
-                        (function( $){
+                        (function ($) {
 
-                            function <?php echo $func; ?>(){
-                                var $delay = $("#<?php echo $step->prefix( 'delay_type' ); ?>");
-                                if ( $delay.val() === 'no_delay' ){
-                                    $( "#<?php echo $step->prefix( 'delay_amount' ); ?>" ).attr( 'disabled', 'disabled' );
-                                    $( "#<?php echo $step->prefix( 'before_or_after' ); ?>" ).attr( 'disabled', 'disabled' );
+                            function <?php echo $func; ?>() {
+                                var $delay = $("#<?php echo $this->setting_id_prefix( 'delay_type' ); ?>");
+                                if ($delay.val() === 'no_delay') {
+                                    $("#<?php echo $this->setting_id_prefix( 'delay_amount' ); ?>").attr('disabled', 'disabled');
+                                    $("#<?php echo $this->setting_id_prefix( 'before_or_after' ); ?>").attr('disabled', 'disabled');
                                 } else {
-                                    $( "#<?php echo $step->prefix( 'delay_amount' ); ?>" ).removeAttr( 'disabled' );
-                                    $( "#<?php echo $step->prefix( 'before_or_after' ); ?>" ).removeAttr( 'disabled' );
+                                    $("#<?php echo $this->setting_id_prefix( 'delay_amount' ); ?>").removeAttr('disabled');
+                                    $("#<?php echo $this->setting_id_prefix( 'before_or_after' ); ?>").removeAttr('disabled');
                                 }
                             };
 
                             <?php echo $func; ?>();
-                            $( "#<?php echo $step->prefix( 'delay_type' ); ?>" ).change( <?php echo $func; ?> );
+                            $("#<?php echo $this->setting_id_prefix( 'delay_type' ); ?>").change( <?php echo $func; ?> );
                         })(jQuery);
                     </script>
                 </td>
@@ -170,16 +159,13 @@ class Field_Timer extends Action
                 <th><?php echo esc_html__( 'Date Field:', 'groundhogg' ); ?></th>
                 <td>
                     <?php
-
-                    $args = array(
-                        'name'          => $step->prefix( 'date_field' ),
-                        'id'            => $step->prefix( 'date_field' ),
-                        'options'       => WPGH()->contact_meta->get_keys(),
-                        'selected'      => $date_field,
-                        'option_none'   => __( 'Please Select a Field', 'groundhogg' ),
-                    );
-
-                    echo WPGH()->html->dropdown( $args );
+                    echo html()->dropdown( [
+                        'name' => $this->setting_name_prefix( 'date_field' ),
+                        'id' => $this->setting_id_prefix( 'date_field' ),
+                        'options' => get_db( 'contactmeta' )->get_keys(),
+                        'selected' => $date_field,
+                        'option_none' => __( 'Please Select a Field', 'groundhogg' ),
+                    ] );
 
                     ?>
                 </td>
@@ -189,54 +175,32 @@ class Field_Timer extends Action
                 <td>
                     <?php
 
-                    $when_types = array(
-                        'now'   => __( 'Immediately', 'groundhogg' ),
+                    $when_types = [
+                        'now' => __( 'Immediately', 'groundhogg' ),
                         'later' => __( 'At time of day...', 'groundhogg' ),
-                    );
+                    ];
 
-                    $args = array(
-                        'name'          => $step->prefix( 'run_when' ),
-                        'id'            => $step->prefix( 'run_when' ),
-                        'options'       => $when_types,
-                        'selected'      => $run_when,
-                        'option_none'   => false,
-                    );
+                    echo html()->dropdown( [
+                        'name' => $this->setting_name_prefix( 'run_when' ),
+                        'id' => $this->setting_id_prefix( 'run_when' ),
+                        'options' => $when_types,
+                        'selected' => $run_when,
+                        'option_none' => false,
+                    ] );
 
-                    echo WPGH()->html->dropdown( $args );
-
-                    $args = array(
-                        'type'  => 'time',
+                    echo html()->input( [
+                        'type' => 'time',
                         'class' => ( 'now' === $run_when ) ? 'input hidden' : 'input',
-                        'name'  => $step->prefix( 'run_time' ),
-                        'id'    => $step->prefix( 'run_time' ),
+                        'name' => $this->setting_name_prefix( 'run_time' ),
+                        'id' => $this->setting_id_prefix( 'run_time' ),
                         'value' => $run_time,
-                    );
-
-                    echo WPGH()->html->input( $args ); ?>
+                    ] ); ?>
 
                     <script>
-                        jQuery( "#<?php echo $step->prefix( 'run_when' ); ?>" ).change(function(){
-                            jQuery( "#<?php echo $step->prefix( 'run_time' ); ?>" ).toggleClass( 'hidden' );
+                        jQuery("#<?php echo $this->setting_id_prefix( 'run_when' ); ?>").change(function () {
+                            jQuery("#<?php echo $this->setting_id_prefix( 'run_time' ); ?>").toggleClass('hidden');
                         });
                     </script>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <?php echo esc_html__( 'Disable Temporarily:', 'groundhogg' ); ?>
-                </th>
-                <td><?php
-                    $args = array(
-//                    'type'  => 'time',
-//                    'class' => 'input',
-                        'name'  => $step->prefix( 'disable' ),
-                        'id'    => $step->prefix( 'disable' ),
-                        'value' => 1,
-                        'checked' => $checked,
-                        'label' => __( 'Disable', 'groundhogg' )
-                    );
-
-                    echo WPGH()->html->checkbox( $args ); ?>
                 </td>
             </tr>
             </tbody>
@@ -248,86 +212,71 @@ class Field_Timer extends Action
     /**
      * Save the step settings
      *
-     * @param $step WPGH_Step
+     * @param $step Step
      */
     public function save( $step )
     {
-
-        $amount = intval( $_POST[ $step->prefix('delay_amount' ) ] );
-        $step->update_meta( 'delay_amount', $amount );
-
-        $type = sanitize_text_field( $_POST[ $step->prefix( 'delay_type' ) ] );
-        $step->update_meta( 'delay_type', $type );
-
-        $run_time = sanitize_text_field( $_POST[ $step->prefix( 'run_when' ) ] );
-        $step->update_meta( 'run_when', $run_time );
-
-        $run_time = sanitize_text_field( $_POST[ $step->prefix( 'run_time' ) ] );
-        $step->update_meta( 'run_time', $run_time );
-
-        $before_or_after = sanitize_text_field( $_POST[ $step->prefix( 'before_or_after' ) ] );
-        $step->update_meta( 'before_or_after', $before_or_after );
-
-        $date_field = sanitize_text_field( $_POST[ $step->prefix( 'date_field' ) ] );
-        $step->update_meta( 'date_field', $date_field );
-
-        if ( isset( $_POST[ $step->prefix( 'disable' ) ] ) ){
-            $step->update_meta( 'disable', 1 );
-        } else {
-            $step->delete_meta( 'disable' );
-        }
-
-
+        $this->save_setting( 'delay_amount', absint( $this->get_posted_data( 'delay_amount' ) ) );
+        $this->save_setting( 'delay_type', sanitize_text_field( $this->get_posted_data( 'delay_type' ) ) );
+        $this->save_setting( 'run_when', sanitize_text_field( $this->get_posted_data( 'run_when' ) ) );
+        $this->save_setting( 'run_time', sanitize_text_field( $this->get_posted_data( 'run_time' ) ) );
+        $this->save_setting( 'before_or_after', sanitize_text_field( $this->get_posted_data( 'before_or_after' ) ) );
+        $this->save_setting( 'date_field', sanitize_text_field( $this->get_posted_data( 'date_field' ) ) );
     }
 
     /**
      * Override the parent and set the run time of this function to the settings
      *
-     * @param WPGH_Step $step
+     * @param Step $step
      * @return int
      */
     public function enqueue( $step )
     {
-        
+
         $contact = $step->enqueued_contact;
 
-        if ( $step->get_meta( 'disable' ) ){
-            return parent::enqueue( $step );
-        }
-
-        $amount     = intval( $step->get_meta( 'delay_amount' ) );
-        $type       = $step->get_meta( 'delay_type' );
-        $run_when   = $step->get_meta( 'run_when' );
-        $run_time   = $step->get_meta( 'run_time' );
-        $before_or_after    = $step->get_meta( 'before_or_after' );
-        $date_field         = $step->get_meta( 'date_field' );
+        $amount = absint( $this->get_setting('delay_amount' ) );
+        $type = $this->get_setting( 'delay_type' );
+        $run_when = $this->get_setting( 'run_when' );
+        $run_time = $this->get_setting( 'run_time' );
+        $before_or_after = $this->get_setting( 'before_or_after' );
+        $date_field = $this->get_setting('date_field' );
 
 
         /* Get the date from the field string... */
         $date = $contact->get_meta( $date_field );
-        if ( ! $date ){
+
+        if ( ! $date ) {
             $date = date( 'Y-m-d', time() );
+        }
+
+        if ( is_numeric( $date ) ){
+            $date = date( 'Y-m-d', absint( $date ) );
+        }
+
+        if ( strtotime( $date ) <= 0 ){
+            return parent::enqueue( $step );
         }
 
         /* Calculate as if there is no delay... */
 
-        if ( $run_when == 'now' ){
-            $time_string = $date . ' ' . date( 'H:i:s', wpgh_convert_to_local_time( time() ) ) ;
-            $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
+        if ( $run_when == 'now' ) {
+            $time_string = $date . ' ' . date( 'H:i:s', Plugin::$instance->utils->date_time->convert_to_local_time( time() ) );
+            $final_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
         } else {
             $time_string = $date . ' ' . $run_time;
-            if ( strtotime( $time_string ) < time() ){
+            if ( strtotime( $time_string ) < time() ) {
                 $formatted_date = date( 'Y-m-d', strtotime( 'tomorrow' ) );
                 $time_string = $formatted_date . ' ' . $run_time;
             }
 
             /* convert to utc */
-            $final_time = wpgh_convert_to_utc_0( strtotime( $time_string ) );
+            $final_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
         }
 
         /* Now calculate delay time */
 
-        switch ( $type ){
+        switch ( $type ) {
             case 'minutes':
                 $diff = $amount * MINUTE_IN_SECONDS;
                 break;
@@ -350,7 +299,7 @@ class Field_Timer extends Action
                 break;
         }
 
-        if ( $diff > 0 ){
+        if ( $diff > 0 ) {
             $final_time = ( $before_or_after === 'before' ) ? $final_time - $diff : $final_time + $diff;
         }
 
@@ -360,8 +309,8 @@ class Field_Timer extends Action
     /**
      * Process the apply tag step...
      *
-     * @param $contact WPGH_Contact
-     * @param $event WPGH_Event
+     * @param $contact Contact
+     * @param $event Event
      *
      * @return true
      */

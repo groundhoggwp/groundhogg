@@ -158,7 +158,7 @@ switch ( $action ):
 
         if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'download_profile' ) ){
             if ( mail_gdpr_data( $contact->get_id() ) ){
-                Plugin::$instance->notices->add( 'sent', __( 'Profile information sent to your inbox!', 'groundhogg' ) );
+                Plugin::$instance->notices->add( 'sent', sprintf( __( 'Profile information sent to your inbox %s!', 'groundhogg' ), obfuscate_email( $contact->get_email() ) ) );
 
                 /**
                  * After the request is made to download the profile
@@ -379,6 +379,8 @@ switch ( $action ):
          * @param $contact Contact
          */
         do_action( 'groundhogg/preferences/erase_profile', $contact );
+
+        $contact->delete();
 
         managed_page_head( __( 'Erased', 'groundhogg' ), 'erase' );
 

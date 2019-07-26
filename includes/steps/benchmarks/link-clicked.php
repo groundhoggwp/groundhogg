@@ -68,12 +68,13 @@ class Link_Clicked extends Benchmark
         $this->add_control( 'tracking_link', [
             'label'         => __( 'Copy This Link:', 'groundhogg' ),
             'type'          => HTML::INPUT,
-            'default'       => sprintf( site_url( "gh/link/%d/" ), $step->get_id() ),
+            'default'       => sprintf( site_url( "gh/link/click/%d/" ), $step->get_id() ),
             'description'   => __( 'Paste this link in any email or page. Once a contact clicks it the benchmark will be completed and the contact will be redirected to the page set below.', 'groundhogg' ),
             'field'         => [
                 'class'     => 'regular-text code',
-                'value'   => sprintf( site_url( "gh/link/%d/" ), $step->get_id() ),
-                'attributes' => " onfocus=\"this.select()\" readonly"
+                'value'     => sprintf( site_url( "gh/link/click/%d/" ), $step->get_id() ),
+                'onfocus'   => "this.select()",
+                'readonly'  => true,
             ],
         ] );
 

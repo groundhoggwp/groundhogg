@@ -45,6 +45,6 @@ $tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $id );
     </table>
     <div class="edit-tag-actions">
         <?php submit_button( __( 'Update' ), 'primary', 'update', false ); ?>
-        <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_tags&action=delete&tag_id='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
+        <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_tags&action=delete&tag='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
     </div>
 </form>

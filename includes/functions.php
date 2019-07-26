@@ -506,11 +506,12 @@ function gh_sms( $to, $message )
         $sender_name = sanitize_from_name( Plugin::$instance->settings->get_option( 'business_name', get_bloginfo( 'name' ) ) );
 
         foreach ( $numbers as $number ){
+
             $data = array(
                 'message'       => $message,
                 'sender'        => $sender_name,
                 'phone_number'  => $number,
-//                'country_code'  => $country_code
+                'country_code'  => null
             );
 
             $response = Plugin::$instance->sending_service->request( 'sms/send', $data, 'POST' );
@@ -527,6 +528,18 @@ function gh_sms( $to, $message )
     }
 
     return $sent;
+}
+
+/**
+ * Delete a cookie
+ *
+ * @param string $cookie
+ * @return bool
+ */
+function delete_cookie( $cookie='' ){
+    unset($_COOKIE[$cookie]);
+    // empty value and expiration one hour before
+    return setcookie($cookie, '', time() - 3600);
 }
 
 /**

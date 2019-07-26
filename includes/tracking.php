@@ -86,6 +86,17 @@ class Tracking
 
         add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 1 );
 
+        add_action( 'groundhogg/preferences/erase_profile', [ $this, 'remove_tracking_cookie' ] );
+
+    }
+
+    /**
+     * Remove any cookies.
+     */
+    public function remove_tracking_cookie()
+    {
+       delete_cookie( self::TRACKING_COOKIE );
+       delete_cookie( self::LEAD_SOURCE_COOKIE );
     }
 
     /**

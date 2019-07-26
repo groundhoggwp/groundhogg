@@ -751,7 +751,7 @@ class Funnels_Page extends Admin_Page
 
         $new_step = new Step( [
             'funnel_id'      => $step->get_funnel_id(),
-            'step_title'     => $step->get_title(),
+            'step_title'     => sprintf( __( '%s - (copy)', 'groundhogg' ), $step->get_title() ),
             'step_type'      => $step->get_type(),
             'step_group'     => $step->get_group(),
             'step_status'    => 'ready',

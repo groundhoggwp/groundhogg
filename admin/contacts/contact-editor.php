@@ -914,7 +914,7 @@ endforeach;
     <div class="edit-contact-actions">
         <p class="submit">
             <?php \submit_button(_x( 'Update Contact', 'action', 'groundhogg' ), 'primary', 'update', false ); ?>
-            <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact='. $id ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
+            <span id="delete-link"><a class="delete" href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact='. $contact->get_id() ), 'delete'  ) ?>"><?php _e( 'Delete' ); ?></a></span>
         </p>
     </div>
 

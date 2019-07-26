@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Superlinks;
 use function Groundhogg\get_request_query;
 use Groundhogg\Superlink;
 use Groundhogg\Plugin;
+use Groundhogg\Tag;
 use VisualComposer\Modules\Settings\Traits\SubMenu;
 use WP_List_Table;
 
@@ -124,15 +125,11 @@ class Superlinks_Table extends WP_List_Table {
     protected function column_tags( $superlink )
     {
         $tags = array();
-        //todo
+
         foreach ( $superlink->get_tags() as $i => $tag_id ){
-
-//            var_dump( $tags );
-
-
-            if ( Plugin::$instance->dbs->get_db('tags')->exists( $tag_id ) ){
-                $tag = Plugin::$instance->dbs->get_db('tags')->get( $tag_id );
-                $tags[ $i ] = '<a href="'. admin_url( 'admin.php?page=gh_contacts&tags_include=' . $tag_id ) . '">' . $tag->tag_name . '</a>';
+            $tag = new Tag( $tag_id );
+            if ( $tag->exists() ) {
+                $tags[ $i ] = '<a href="'. admin_url( 'admin.php?page=gh_contacts&tags_include=' . $tag->get_id() ) . '">' . $tag->get_name() . '</a>';
             }
         }
 

@@ -463,7 +463,11 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function html()
     {
-        do_action( "groundhogg/steps/{$this->get_type()}/html", $this );
+        if ( has_action( "groundhogg/steps/{$this->get_type()}/html" ) ){
+            do_action( "groundhogg/steps/{$this->get_type()}/html", $this );
+        } else {
+            do_action( "groundhogg/steps/error/html", $this );
+        }
     }
 
     /**

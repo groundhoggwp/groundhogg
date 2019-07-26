@@ -77,6 +77,7 @@ abstract class Funnel_Step extends Supports_Errors
 
             add_action("groundhogg/steps/{$this->get_type()}/html", [$this, 'pre_html'], 1 );
             add_action("groundhogg/steps/{$this->get_type()}/html", [$this, 'html']);
+
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'pre_save'], 1 );
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'save'], 11 );
 

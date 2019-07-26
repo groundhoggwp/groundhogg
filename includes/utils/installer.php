@@ -34,10 +34,12 @@ abstract class Installer {
      */
     public function fail_safe_install()
     {
+
         $installed = get_option( "groundhogg_{$this->get_installer_name()}_installed", false );
+//        wp_send_json( date( 'Y-m-d', $installed ) );
 
         if ( ! $installed ){
-            $this->activation_hook();
+            $this->activation_wrapper();
         }
 
         return true;

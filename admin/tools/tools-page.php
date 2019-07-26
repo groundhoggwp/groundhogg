@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
@@ -15,7 +16,6 @@ use function set_transient;
  * Date: 2019-04-01
  * Time: 3:19 PM
  */
-
 class Tools_Page extends Tabbed_Admin_Page
 {
 
@@ -42,12 +42,24 @@ class Tools_Page extends Tabbed_Admin_Page
     public $syncer;
 
     // Unused functions.
-    public function view(){}
-    public function scripts(){}
-    public function help(){}
-    public function add_ajax_actions(){}
+    public function view()
+    {
+    }
 
-    protected function add_additional_actions(){
+    public function scripts()
+    {
+    }
+
+    public function help()
+    {
+    }
+
+    public function add_ajax_actions()
+    {
+    }
+
+    protected function add_additional_actions()
+    {
         add_action( "groundhogg/admin/{$this->get_slug()}", [ $this, 'delete_warning' ] );
 
         $this->init_bulk_jobs();
@@ -57,12 +69,19 @@ class Tools_Page extends Tabbed_Admin_Page
     {
         $this->importer = Plugin::$instance->bulk_jobs->import_contacts;
         $this->exporter = Plugin::$instance->bulk_jobs->export_contacts;
-        $this->deleter  = Plugin::$instance->bulk_jobs->delete_contacts;
-        $this->syncer   = Plugin::$instance->bulk_jobs->sync_contacts;
+        $this->deleter = Plugin::$instance->bulk_jobs->delete_contacts;
+        $this->syncer = Plugin::$instance->bulk_jobs->sync_contacts;
     }
 
-    public function get_order(){return 98;}
-    protected function get_parent_slug(){return 'groundhogg';}
+    public function get_order()
+    {
+        return 98;
+    }
+
+    protected function get_parent_slug()
+    {
+        return 'groundhogg';
+    }
 
     public function get_slug()
     {
@@ -82,7 +101,7 @@ class Tools_Page extends Tabbed_Admin_Page
     public function get_item_type()
     {
 
-        switch ( $this->get_current_tab() ){
+        switch ( $this->get_current_tab() ) {
             default:
             case 'system':
             case 'delete':
@@ -104,17 +123,17 @@ class Tools_Page extends Tabbed_Admin_Page
 
         $actions = [];
 
-        if ( $this->get_current_tab() === 'import' ){
+        if ( $this->get_current_tab() === 'import' ) {
             $actions[] = [
-                'link'      => $this->admin_url( [ 'action' => 'add', 'tab' => 'import' ] ),
-                'action'    => __( 'Import New List' ),
+                'link' => $this->admin_url( [ 'action' => 'add', 'tab' => 'import' ] ),
+                'action' => __( 'Import New List' ),
             ];
         }
 
-        if ( $this->get_current_tab() === 'export' ){
+        if ( $this->get_current_tab() === 'export' ) {
             $actions[] = [
-                'link'      => Plugin::$instance->bulk_jobs->export_contacts->get_start_url(), //todo enable
-                'action'    => __( 'Export All Contacts' ),
+                'link' => Plugin::$instance->bulk_jobs->export_contacts->get_start_url(), //todo enable
+                'action' => __( 'Export All Contacts' ),
             ];
         }
 
@@ -126,24 +145,24 @@ class Tools_Page extends Tabbed_Admin_Page
     {
         $tabs = [
             [
-                'name'  => __( 'System Info' ),
-                'slug'  => 'system',
+                'name' => __( 'System Info' ),
+                'slug' => 'system',
             ],
             [
                 'name' => __( 'Import' ),
-                'slug'  => 'import',
+                'slug' => 'import',
             ],
             [
                 'name' => __( 'Export' ),
-                'slug'  => 'export',
+                'slug' => 'export',
             ],
             [
                 'name' => __( 'Sync Users & Contacts' ),
-                'slug'  => 'sync',
+                'slug' => 'sync',
             ],
             [
                 'name' => __( 'Bulk Delete Contacts' ),
-                'slug'  => 'delete',
+                'slug' => 'delete',
             ]
         ];
 
@@ -165,9 +184,12 @@ class Tools_Page extends Tabbed_Admin_Page
                 <h2 class="hndle"><?php _e( 'Download System Info', 'groundhogg' ); ?></h2>
                 <div class="inside">
                     <p class="description"><?php _e( 'Download System Info when requesting support.', 'groundhogg' ); ?></p>
-                    <textarea class="code" style="width: 100%;height:600px;" readonly="readonly" onclick="this.focus(); this.select()" id="system-info-textarea" name="sysinfo"><?php echo groundhogg_tools_sysinfo_get(); ?></textarea>
+                    <textarea class="code" style="width: 100%;height:600px;" readonly="readonly"
+                              onclick="this.focus(); this.select()" id="system-info-textarea"
+                              name="sysinfo"><?php echo groundhogg_tools_sysinfo_get(); ?></textarea>
                     <p class="submit">
-                        <a class="button button-primary" href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php _e( 'Download System Info', 'groundhogg' ); ?></a>
+                        <a class="button button-primary"
+                           href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php _e( 'Download System Info', 'groundhogg' ); ?></a>
                     </p>
                 </div>
             </div>
@@ -193,7 +215,8 @@ class Tools_Page extends Tabbed_Admin_Page
                         ] ); ?>
                         <p><?php _e( 'The sync process will create new contact records for all users in the database. If a contact records already exists then the association will be updated.' ); ?></p>
                         <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                            <button style="width: 100%" class="button-primary" name="sync_users" value="sync"><?php _ex('Start Sync Process', 'action', 'groundhogg'); ?></button>
+                            <button style="width: 100%" class="button-primary" name="sync_users"
+                                    value="sync"><?php _ex( 'Start Sync Process', 'action', 'groundhogg' ); ?></button>
                         </p>
                     </form>
                 </div>
@@ -217,8 +240,8 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function import_view()
     {
-        if ( ! class_exists( 'WPGH_Imports_Table' ) ){
-            require_once dirname(__FILE__) . '/imports-table.php';
+        if ( !class_exists( 'WPGH_Imports_Table' ) ) {
+            require_once dirname( __FILE__ ) . '/imports-table.php';
         }
 
         $table = new Imports_Table(); ?>
@@ -234,7 +257,7 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function import_add()
     {
-        include dirname(__FILE__) . '/add-import.php';
+        include dirname( __FILE__ ) . '/add-import.php';
     }
 
     /**
@@ -242,7 +265,7 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function import_map()
     {
-        include dirname(__FILE__) . '/map-import.php';
+        include dirname( __FILE__ ) . '/map-import.php';
     }
 
     /**
@@ -253,34 +276,32 @@ class Tools_Page extends Tabbed_Admin_Page
     public function process_import_add()
     {
 
-        if ( ! current_user_can( 'import_contacts' ) ){
+        if ( !current_user_can( 'import_contacts' ) ) {
             $this->wp_die_no_access();
         }
 
-        if ( empty( $_FILES[ 'import_file' ][ 'name' ] ) ){
-            return new WP_Error( 'no_files', 'Please upload a file!' ) ;
+        if ( empty( $_FILES[ 'import_file' ][ 'name' ] ) ) {
+            return new WP_Error( 'no_files', 'Please upload a file!' );
         }
 
         $_FILES[ 'import_file' ][ 'name' ] = md5( $_FILES[ 'import_file' ][ 'name' ] ) . '.csv';
 
         $result = $this->handle_file_upload( 'import_file' );
 
-        if ( is_wp_error( $result ) ){
+        if ( is_wp_error( $result ) ) {
 
-            if ( is_multisite() ){
+            if ( is_multisite() ) {
                 return new WP_Error( 'multisite_add_csv', 'Could not import because CSV is not an allowed file type on this multisite. please add CSV to the list of allowed file types in the network settings.' );
             }
 
             return $result;
         }
 
-        wp_redirect( $this->admin_url( [
-            'action'    => 'map',
-            'tab'       => 'import',
-            'import'    => urlencode( basename( $result['file'] ) ),
+        return wp_redirect( $this->admin_url( [
+            'action' => 'map',
+            'tab' => 'import',
+            'import' => urlencode( basename( $result[ 'file' ] ) ),
         ] ) );
-
-        die();
 
     }
 
@@ -297,8 +318,8 @@ class Tools_Page extends Tabbed_Admin_Page
 
         $upload_overrides = array( 'test_form' => false );
 
-        if ( !function_exists('wp_handle_upload') ) {
-            require_once(ABSPATH . '/wp-admin/includes/file.php');
+        if ( !function_exists( 'wp_handle_upload' ) ) {
+            require_once( ABSPATH . '/wp-admin/includes/file.php' );
         }
 
         $this->set_uploads_path();
@@ -307,13 +328,13 @@ class Tools_Page extends Tabbed_Admin_Page
         $mfile = wp_handle_upload( $file, $upload_overrides );
         remove_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
 
-        if( isset( $mfile['error'] ) ) {
+        if ( isset( $mfile[ 'error' ] ) ) {
 
-            if ( empty( $mfile[ 'error' ] ) ){
+            if ( empty( $mfile[ 'error' ] ) ) {
                 $mfile[ 'error' ] = _x( 'Could not upload file.', 'error', 'groundhogg' );
             }
 
-            return new WP_Error( 'BAD_UPLOAD', $mfile['error'] );
+            return new WP_Error( 'BAD_UPLOAD', $mfile[ 'error' ] );
         }
 
         return $mfile;
@@ -327,9 +348,9 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function files_upload_dir( $param )
     {
-        $param['path']      = $this->uploads_path[ 'path'];
-        $param['url']       = $this->uploads_path[ 'url' ];
-        $param['subdir']    = $this->uploads_path[ 'subdir' ];
+        $param[ 'path' ] = $this->uploads_path[ 'path' ];
+        $param[ 'url' ] = $this->uploads_path[ 'url' ];
+        $param[ 'subdir' ] = $this->uploads_path[ 'subdir' ];
 
         return $param;
     }
@@ -340,8 +361,8 @@ class Tools_Page extends Tabbed_Admin_Page
     private function set_uploads_path()
     {
         $this->uploads_path[ 'subdir' ] = Plugin::$instance->utils->files->get_base_uploads_dir();
-        $this->uploads_path[ 'path' ]   = Plugin::$instance->utils->files->get_csv_imports_dir();
-        $this->uploads_path[ 'url' ]    = Plugin::$instance->utils->files->get_csv_imports_url();
+        $this->uploads_path[ 'path' ] = Plugin::$instance->utils->files->get_csv_imports_dir();
+        $this->uploads_path[ 'url' ] = Plugin::$instance->utils->files->get_csv_imports_url();
     }
 
     /**
@@ -349,13 +370,13 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function process_import_map()
     {
-        if ( ! current_user_can( 'import_contacts' ) ){
+        if ( !current_user_can( 'import_contacts' ) ) {
             $this->wp_die_no_access();
         }
 
         $map = $_POST[ 'map' ];
 
-        if ( ! is_array( $map ) ){
+        if ( !is_array( $map ) ) {
             wp_die( 'Invalid map provided.' );
         }
 
@@ -363,16 +384,16 @@ class Tools_Page extends Tabbed_Admin_Page
 
         $tags = [ sprintf( '%s - %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s' ) ) ];
 
-        if ( isset_not_empty( $_POST, 'tags' ) ){
+        if ( isset_not_empty( $_POST, 'tags' ) ) {
             $tags = array_merge( $tags, $_POST[ 'tags' ] );
         }
 
-        $tags = Plugin::$instance->dbs->get_db('tags')->validate( $tags );
+        $tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( $tags );
 
         set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS );
         set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );
 
-        if ( get_request_var( 'is_confirmed' ) ){
+        if ( get_request_var( 'is_confirmed' ) ) {
             set_transient( 'gh_import_confirm_contacts', true, HOUR_IN_SECONDS );
         }
 
@@ -386,13 +407,15 @@ class Tools_Page extends Tabbed_Admin_Page
     {
         $files = $this->get_items();
 
-        foreach ( $files as $file_name ){
+        foreach ( $files as $file_name ) {
             $filepath = Plugin::$instance->utils->files->get_csv_imports_dir( $file_name );
-            unlink( $filepath );
+            if(file_exists( $filepath )) {
+                unlink( $filepath );
+            }
         }
 
         $this->add_notice( 'file_removed', __( 'Imports deleted.', 'groundhogg' ) );
-        return true;
+        return admin_url( 'admin.php?page=gh_tools&action=add&tab=import' );
     }
 
     ####### EXPORT TAB FUNCTIONS #########
@@ -402,8 +425,8 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function export_view()
     {
-        if ( ! class_exists( 'Exports_Table' ) ){
-            require_once dirname(__FILE__) . '/exports-table.php';
+        if ( !class_exists( 'Exports_Table' ) ) {
+            require_once dirname( __FILE__ ) . '/exports-table.php';
         }
 
         $table = new Exports_Table(); ?>
@@ -421,23 +444,24 @@ class Tools_Page extends Tabbed_Admin_Page
     {
         $files = $this->get_items();
 
-        foreach ( $files as $file_name ){
+        foreach ( $files as $file_name ) {
             $filepath = Plugin::$instance->utils->files->get_csv_exports_dir( $file_name );
-            unlink( $filepath );
+            if ( file_exists( $filepath ) ) {
+                unlink( $filepath );
+            }
         }
 
         $this->add_notice( 'file_removed', __( 'Exports deleted.', 'groundhogg' ) );
-        return true;
+        return admin_url( 'admin.php?page=gh_tools&action=add&tab=export' );
     }
 
     ####### DELETE TAB FUNCTIONS #########
 
     public function delete_warning()
     {
-        if ( $this->get_current_tab() === 'delete' ){
+        if ( $this->get_current_tab() === 'delete' ) {
             $this->add_notice( 'no_going_back', __( '&#9888; There is no going back once the deletion process has started.', 'groudnhogg' ), 'warning' );
         }
-
     }
 
     public function delete_view()
@@ -455,9 +479,12 @@ class Tools_Page extends Tabbed_Admin_Page
                             'value' => 'bulk_delete',
                         ] ); ?>
                         <?php echo Plugin::$instance->utils->html->tag_picker( [] ); ?>
-                        <p>&#9888;&nbsp;<b><?php _e( 'Once you click the delete button there is no going back!' ); ?></b></p>
+                        <p>
+                            &#9888;&nbsp;<b><?php _e( 'Once you click the delete button there is no going back!' ); ?></b>
+                        </p>
                         <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                            <button style="width: 100%" class="button-primary" name="delete_contacts" value="delete"><?php _ex('Delete Contacts', 'action', 'groundhogg'); ?></button>
+                            <button style="width: 100%" class="button-primary" name="delete_contacts"
+                                    value="delete"><?php _ex( 'Delete Contacts', 'action', 'groundhogg' ); ?></button>
                         </p>
                     </form>
                 </div>
@@ -471,7 +498,7 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function process_delete_bulk_delete()
     {
-        $tags = Plugin::$instance->dbs->get_db('tags')->validate( $_POST[ 'tags' ] );
+        $tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( $_POST[ 'tags' ] );
         $this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] );
     }
 

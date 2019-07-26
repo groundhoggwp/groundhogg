@@ -11,6 +11,8 @@ class Main_Installer extends Installer
      */
     protected function activate()
     {
+//        wp_send_json( [ get_current_blog_id() ] );
+
         // Install our DBS...
         Plugin::$instance->dbs->install_dbs();
 

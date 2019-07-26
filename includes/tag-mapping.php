@@ -42,6 +42,12 @@ class Tag_Mapping extends Bulk_Job
         add_action( 'set_user_role', [ $this, 'apply_tags_to_contact_from_changed_roles' ], 10, 3 );
         add_action( 'remove_user_role', [ $this, 'remove_tags_from_contact_from_remove_roles' ], 10, 2 );
 
+        add_action( 'admin_init', function (){
+            if ( ! get_option( 'gh_confirmed_tag' ) ){
+                $this->install_default_tags();
+            }
+        } );
+
         parent::__construct();
     }
 
