@@ -81,10 +81,12 @@ class Contact extends Base_Object_With_Meta
     		return $this->profile_picture;
 	    }
 
-        $result = wp_remote_retrieve_body( wp_remote_get( sprintf( 'https://api.devidentify.com/%s', $this->get_email() ) ) );
-        $result = json_decode( $result );
+        $profile_pic = get_avatar_url( $this->get_email(), [ 'size' => 300 ] );
 
-        $profile_pic = ( isset( $result->success ) && filter_var( $result->success, FILTER_VALIDATE_BOOLEAN ) ) ? $result->profile_picture : get_avatar_url( $this->get_email() );
+//        $result = wp_remote_retrieve_body( wp_remote_get( sprintf( 'https://api.devidentify.com/%s', $this->get_email() ) ) );
+//        $result = json_decode( $result );
+
+//        $profile_pic = ( isset( $result->success ) && filter_var( $result->success, FILTER_VALIDATE_BOOLEAN ) ) ? $result->profile_picture : get_avatar_url( $this->get_email(), [ 'size' => 300 ] );
 
         $this->update_meta( 'profile_picture', $profile_pic );
 
@@ -241,7 +243,7 @@ class Contact extends Base_Object_With_Meta
      */
     public function get_full_name()
     {
-        return trim( ucwords( strtolower( sprintf( '%s %s', $this->get_first_name(), $this->get_last_name() ) ) ), ' ' );
+        return sprintf( '%s %s', $this->get_first_name(), $this->get_last_name() );
     }
 
     /**

@@ -421,6 +421,10 @@ class Contacts_Table extends WP_List_Table {
             $contact = Plugin::$instance->utils->get_contact( absint( $contact->ID ) );
         }
 
+        if ( ! $contact ){
+            return;
+        }
+
         ?>
         <tr id="contact-<?php echo $contact->get_id(); ?>">
             <?php $this->single_row_columns( $contact ); ?>

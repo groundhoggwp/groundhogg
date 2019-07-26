@@ -96,6 +96,89 @@ $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ]
         </span>
 </div>
 
+<form method="post" class="" enctype="multipart/form-data">
+    <?php wp_nonce_field( 'edit' ); ?>
+
+<div class="contact-details">
+
+    <!-- Photo -->
+    <div class="contact-picture">
+        <?php echo html()->e( 'img', [
+            'class' => 'profile-picture',
+            'title' => __( 'Profile Picture' ),
+            'width' => 150,
+            'height' => 150,
+            'src' => $contact->get_profile_picture()
+        ]); ?>
+    </div>
+    <div class="basic-details">
+        <!-- FIRST -->
+        <?php
+
+        echo html()->e( 'div', [ 'class' => 'details' ], html()->input( [
+            'name' => 'first_name',
+            'title' => __( 'First Name' ),
+            'value' => $contact->get_first_name(),
+//            'readonly' => true,
+            'class' => 'auto-copy regular-text',
+            'placeholder' => __( 'First Name' )
+        ] ) );
+
+        echo html()->e( 'div', [ 'class' => 'details' ], html()->input( [
+            'name' => 'last_name',
+            'title' => __( 'Last Name' ),
+            'value' => $contact->get_last_name(),
+//            'readonly' => true,
+            'class' => 'auto-copy regular-text',
+            'placeholder' => __( 'Last Name' )
+        ] ) );
+
+        echo html()->e( 'div', [ 'class' => 'details' ], [
+            html()->input( [
+                'title' => __( 'Email' ),
+                'name' => 'email_readonly',
+                'value' => $contact->get_email(),
+                'readonly' => true,
+                'placeholder' => __( 'Email' ),
+                'class' => 'auto-copy regular-text',
+                'style' => [
+                    'max-width' => '18em'
+                ]
+            ] ),
+            html()->e( 'a', [
+                'class' => 'button',
+                'title' => __( 'Send Email', 'groundhogg' ),
+                'href' => sprintf( 'mailto:%s', $contact->get_email() )
+            ], '<span class="dashicons dashicons-email"></span>' )
+        ] );
+
+        echo html()->e( 'div', [ 'class' => 'details' ], [
+            html()->input( [
+                'name' => 'primary_phone',
+                'title' => __( 'Phone' ),
+                'value' => $contact->get_phone_number(),
+                'placeholder' => __( 'Phone Number' ),
+                'class' => 'auto-copy regular-text',
+                'style' => [
+                    'max-width' => '18em'
+                ]
+            ] ),
+            html()->e( 'a', [
+                'class' => 'button',
+                'title' => __( 'Call Now', 'groundhogg' ),
+                'href' => sprintf( 'tel:%s', $contact->get_phone_number() )
+            ],'<span class="dashicons dashicons-phone"></span>' )
+        ] );
+
+        ?>
+        <!-- LAST -->
+        <!-- EMAIL -->
+        <!-- PHONE -->
+    </div>
+    <div class="wp-clearfix"></div>
+</div>
+<div class="wp-clearfix"></div>
+
 <?php do_action( 'groundhogg/contact/record/nav/before', $contact ); ?>
 
 <!-- BEGIN TABS -->
@@ -108,9 +191,6 @@ $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ]
 <?php do_action( 'groundhogg/contact/record/nav/after', $contact ); ?>
 
 <!-- END TABS -->
-
-<form method="post" class="" enctype="multipart/form-data">
-    <?php wp_nonce_field( 'edit' ); ?>
 <?php
 
 add_action( 'groundhogg/admin/contact/record/tab/general', '\Groundhogg\Admin\Contacts\contact_record_general_info' );
@@ -123,55 +203,57 @@ add_action( 'groundhogg/admin/contact/record/tab/general', '\Groundhogg\Admin\Co
 function contact_record_general_info( $contact )
 {
     ?>
+    <h2><?php _e('Email Status'); ?></h2>
     <!-- GENERAL NAME INFO -->
     <table class="form-table">
         <tbody>
         <tr>
-            <th><h2><?php _e('Name' ) ?></h2></th>
-<!--            --><?php //$contact->get_profile_picture(); ?>
-            <td><img id="profile-pic" alt="Avatar: Found with https://devidentify.com/" title="Avatar: Found with https://devidentify.com" width="96" height="96" src="<?php echo $contact->get_profile_picture(); ?>">
-            </td>
-        </tr>
-        <tr>
-            <th><label for="first_name"><?php echo _x( 'First Name', 'contact_record', 'groundhogg' ) ?></label></th>
+            <th><label for="email"><?php echo _x( 'Email', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(
-                    'id' => 'first_name',
-                    'name' => 'first_name',
-                    'value' => $contact->get_first_name(),
+                    'type' => 'email',
+                    'id' => 'email',
+                    'name' => 'email',
+                    'value' => $contact->get_email(),
                 );
                 echo Plugin::$instance->utils->html->input($args); ?>
+                <span class="row-actions"><a title="<?php printf( esc_attr__( 'Visit %s', 'groundhogg' ), substr($contact->get_email(), strpos($contact->get_email(), '@')+1)); ?>" style="text-decoration: none" target="_blank" href="<?php echo esc_url(substr($contact->get_email(), strpos($contact->get_email(), '@')+1)); ?>"><span class="dashicons dashicons-external"></span></a>
+                <a title="<?php esc_attr_e( 'Send email.', 'groundhogg' ); ?>" style="text-decoration: none" target="_blank" href="mailto:<?php echo $contact->get_email(); ?>"><span class="dashicons dashicons-email"></span></a></span>
+                <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' .  Plugin::$instance->preferences->get_optin_status_text($contact->get_id()); ?></p>
+                <?php if ($contact->get_optin_status() !== Preferences::UNSUBSCRIBED): ?>
+                    <div id="manual-unsubscribe" style="margin-bottom: 10px;">
+                        <label><input type="checkbox" name="unsubscribe" value="1"><?php _ex( 'Mark as unsubscribed.', 'contact_record', 'groundhogg' ); ?></label>
+                    </div>
+                <?php endif; ?>
+                <?php if ($contact->get_optin_status() !== Preferences::CONFIRMED): ?>
+                    <div id="manual-confirmation">
+                        <label><input type="checkbox" name="manual_confirm" id="manual-confirm" value="1"><?php _ex( 'Manually confirm this email address.', 'contact_record', 'groundhogg' ); ?></label>
+                        <div id="confirmation-reason" class="hidden">
+                            <?php echo Plugin::$instance->utils->html->textarea( [ 'name' => 'confirmation_reason', 'cols' => 50, 'rows' => 2,  'placeholder' => __( 'Confirmation reason...', 'groundhogg' ) ] ); ?>
+                        </div>
+                    </div>
+                    <script>jQuery(function ($) {
+                            $( '#manual-confirm' ).on( 'change', function () {
+                                $( '#confirmation-reason' ).toggleClass( 'hidden' );
+                            } );
+                        });</script>
+                <?php endif; ?>
             </td>
         </tr>
-        <tr>
-            <th><label for="last_name"><?php echo _x( 'Last Name', 'contact_record', 'groundhogg' ) ?></label></th>
-            <td><?php $args = array(
-                    'id' => 'last_name',
-                    'name' => 'last_name',
-                    'value' => $contact->get_last_name(),
-                );
-                echo Plugin::$instance->utils->html->input($args); ?></td>
-        </tr>
+        </tbody>
+    </table>
+    <h2><?php _e('User Account'); ?></h2>
+    <table class="form-table">
         <?php if ( $contact->get_userdata() ):   ?>
 
             <tr>
                 <th><label for="username"><?php _e('Username') ?></label></th>
                 <td><?php printf("<a href='%s'>%s</a>", admin_url('user-edit.php?user_id=' . $contact->get_user_id()), $contact->get_userdata()->user_login); ?>
-                <span class="row-actions">
+                    <span class="row-actions">
                     <?php submit_button( _x( 'Unlink', 'action', 'groundhogg'), 'secondary', 'unlink_user', false ); ?>
                 </span>
                 </td>
             </tr>
-
-        <?php endif; ?>
-        </tbody>
-    </table>
-
-    <?php do_action( 'groundhogg/admin/contact/record/name/after', $contact ); ?>
-
-    <?php if (!$contact->get_userdata()): ?>
-
-    <h2><?php _e('Create User Account'); ?></h2>
-    <table class="form-table">
+        <?php else: ?>
         <tr>
             <th><label for="create_account"><?php echo _x( 'Create New Account?', 'contact_record', 'groundhogg' ) ?></label></th>
             <td>
@@ -186,49 +268,13 @@ function contact_record_general_info( $contact )
                 <p class="description"><?php _ex( 'You can link an existing user account to this contact.', 'contact_record', 'groundhogg' ); ?></p>
             </td>
         </tr>
-
+        <?php endif; ?>
     </table>
-
     <?php do_action( 'groundhogg/admin/contact/record/user/after', $contact ); ?>
-
-<?php endif; ?>
-
     <!-- GENERAL CONTACT INFO -->
     <h2><?php _e('Contact Info' ); ?></h2>
     <table class="form-table">
         <tbody>
-        <tr>
-            <th><label for="email"><?php echo _x( 'Email', 'contact_record', 'groundhogg' ) ?></label></th>
-            <td><?php $args = array(
-                    'type' => 'email',
-                    'id' => 'email',
-                    'name' => 'email',
-                    'value' => $contact->get_email(),
-                );
-                echo Plugin::$instance->utils->html->input($args); ?>
-                <span class="row-actions"><a title="<?php printf( esc_attr__( 'Visit %s', 'groundhogg' ), substr($contact->get_email(), strpos($contact->get_email(), '@')+1)); ?>" style="text-decoration: none" target="_blank" href="<?php echo esc_url(substr($contact->get_email(), strpos($contact->get_email(), '@')+1)); ?>"><span class="dashicons dashicons-external"></span></a>
-                <a title="<?php esc_attr_e( 'Send email.', 'groundhogg' ); ?>" style="text-decoration: none" target="_blank" href="mailto:<?php echo $contact->get_email(); ?>"><span class="dashicons dashicons-email"></span></a></span>
-                    <p class="submit"><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' .  Plugin::$instance->preferences->get_optin_status_text($contact->get_id()); ?></p>
-                <?php if ($contact->get_optin_status() !== Preferences::UNSUBSCRIBED): ?>
-                    <div id="manual-unsubscribe" style="margin-bottom: 10px;">
-                        <label><input type="checkbox" name="unsubscribe" value="1"><?php _ex( 'Mark as unsubscribed.', 'contact_record', 'groundhogg' ); ?></label>
-                </div>
-                <?php endif; ?>
-                <?php if ($contact->get_optin_status() !== Preferences::CONFIRMED): ?>
-                <div id="manual-confirmation">
-                    <label><input type="checkbox" name="manual_confirm" id="manual-confirm" value="1"><?php _ex( 'Manually confirm this email address.', 'contact_record', 'groundhogg' ); ?></label>
-                    <div id="confirmation-reason" class="hidden">
-                        <?php echo Plugin::$instance->utils->html->textarea( [ 'name' => 'confirmation_reason', 'cols' => 50, 'rows' => 2,  'placeholder' => __( 'Confirmation reason...', 'groundhogg' ) ] ); ?>
-                    </div>
-                </div>
-                <script>jQuery(function ($) {
-                        $( '#manual-confirm' ).on( 'change', function () {
-                            $( '#confirmation-reason' ).toggleClass( 'hidden' );
-                        } );
-                    });</script>
-                <?php endif; ?>
-            </td>
-        </tr>
         <tr>
             <th><label for="primary_phone"><?php echo _x( 'Primary Phone', 'contact_record', 'groundhogg' ) ?></label></th>
             <td><?php $args = array(

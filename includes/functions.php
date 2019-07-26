@@ -1349,11 +1349,12 @@ function after_form_submit_handler( &$contact )
         $contact->update_meta( 'source_page', wpgh_get_referer() );
     }
 
-    if ( function_exists( 'is_user_logged_in' ) ){
-        if ( is_user_logged_in() && ! $contact->get_userdata() ){
-            $contact->update( [ 'user_id' => get_current_user_id() ] );
-        }
-    }
+//    if ( function_exists( 'is_user_logged_in' ) ){
+//        // Add additional check for same email address
+//        if ( is_user_logged_in() && ! $contact->get_userdata() && wp_get_current_user()->user_email === $contact->get_email() ) {
+//            $contact->update( [ 'user_id' => get_current_user_id() ] );
+//        }
+//    }
 
     if ( ! $contact->is_marketable() ) {
         $contact->change_marketing_preference( Preferences::UNCONFIRMED );

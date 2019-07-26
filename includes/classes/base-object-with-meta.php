@@ -63,22 +63,12 @@ abstract class Base_Object_With_Meta extends Base_Object
      */
     public function __get($name)
     {
-        // Check main data first
-        if (property_exists($this, $name)) {
-            return $this->$name;
-        }
-
-        // Check data array
-        if (key_exists($name, $this->data)) {
-            return $this->data[$name];
-        }
-
         // Check meta data
         if (key_exists($name, $this->meta)) {
             return $this->meta[$name];
         }
 
-        return false;
+        return parent::__get( $name );
     }
 
     /**

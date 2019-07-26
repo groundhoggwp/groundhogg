@@ -181,6 +181,10 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
             return $this->data[$name];
         }
 
+        if ( method_exists( $this, $name ) && is_callable( [ $this, $name ] ) ){
+            return call_user_func( [ $this, $name ] );
+        }
+
         return false;
     }
 

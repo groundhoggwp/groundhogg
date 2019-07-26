@@ -1,57 +1,60 @@
-.onoffswitch {
-    position: relative; width: 106px;
-    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
-}
-.onoffswitch-checkbox {
-    display: none !important;
-}
-.onoffswitch-label {
-    display: block; overflow: hidden; cursor: pointer;
-    border: 1px solid #E3E3E3; border-radius: 3px;
-}
-.onoffswitch-inner {
-    display: block; width: 200%; margin-left: -100%;
-    transition: margin 0.3s ease-in 0s;
-}
-.onoffswitch-inner:before, .onoffswitch-inner:after {
-    display: block; float: left; width: 50%; height: 27px; padding: 0; line-height: 23px;
-    font-size: 14px; color: white;
+.contact-details{
+    display: block;
+    float: left;
+    /*margin-right: 20px;*/
+    position: relative;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    background: #fff;
+    width: 500px;
+    max-width: 100%;
+    padding: 20px 20px 20px 20px;
     box-sizing: border-box;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-}
-.onoffswitch-inner:before {
-    content: "Edit";
-    padding-left: 10px;
-    background-color: #FFFFFF; color: #000000;
+    margin: 10px 0;
+    /*margin-left: 300px;*/
 }
 
-.onoffswitch-inner:after {
-    content: "Hide";
-    padding-right: 10px;
-    background-color: #FFFFFF; color: #666666;
-    text-align: right;
+.contact-picture {
+    display: inline-block;
+    float: left;
+    margin: 0 20px 10px 0;
+    position: relative;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    background: #fff;
 }
 
-.onoffswitch-switch {
-    display: block; width: 24px; margin: 0px;
-    background: #f7f7f7;
-    position: absolute; top: 0; bottom: 0;
-    right: 82px;
-    height: 26px;
-    border-width: 1px;
-    border-style: solid;
-    transition: all 0.3s ease-in 0s;
-    border-radius: 3px;
-    box-shadow: 0 1px 0 #ccc;
-    border-color: #ccc;
+.contact-picture img {
+    vertical-align: middle;
 }
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
-    margin-left: 0;
+
+.basic-details .details {
+    margin: 0 0 10px 2px;
 }
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
-    right: 0px;
-    background-color: #0085ba;
-    box-shadow: 0 1px 0 #006799;
-    border-color: #0073aa #006799 #006799;
+
+.deal-details .details {
+    margin: 0 0 10px 2px;
+}
+
+.contact-details textarea{
+    width: 100%;
+}
+.basic-details .details .regular-text {
+    width: 20em;
+}
+
+.basic-details .details a {
+    text-decoration: none;
+    padding: 0 4px 1px;
+}
+
+.basic-details .details .dashicons{
+    vertical-align: text-bottom;
+}
+
+.deal-details label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 3px;
 }
