@@ -44,7 +44,7 @@ class Tag_Mapping extends Bulk_Job
 
         add_action( 'admin_init', function (){
             if ( ! get_option( 'gh_confirmed_tag' ) ){
-                $this->install_default_tags();
+                Plugin::$instance->tag_mapping->install_default_tags();
             }
         } );
 
@@ -265,15 +265,15 @@ class Tag_Mapping extends Bulk_Job
 
         if ( empty( $this->tag_map ) ){
             $this->tag_map = [
-                Preferences::CONFIRMED    => Plugin::$instance->settings->get_option( 'gh_confirmed_tag', false ),
+                Preferences::CONFIRMED    => Plugin::$instance->settings->get_option( 'gh_confirmed_tag',   false ),
                 Preferences::UNCONFIRMED  => Plugin::$instance->settings->get_option( 'gh_unconfirmed_tag', false ),
                 Preferences::UNSUBSCRIBED => Plugin::$instance->settings->get_option( 'gh_unsubscribed_tag', false ),
-                Preferences::SPAM         => Plugin::$instance->settings->get_option( 'gh_spammed_tag', false ),
-                Preferences::HARD_BOUNCE  => Plugin::$instance->settings->get_option( 'gh_bounced_tag', false ),
-                Preferences::COMPLAINED   => Plugin::$instance->settings->get_option( 'gh_complained_tag', false ),
-                Preferences::WEEKLY       => Plugin::$instance->settings->get_option( 'gh_weekly_tag', false ),
-                Preferences::MONTHLY      => Plugin::$instance->settings->get_option( 'gh_monthly_tag', false ),
-                self::MARKETABLE          => Plugin::$instance->settings->get_option( 'gh_marketable_tag', false ),
+                Preferences::SPAM         => Plugin::$instance->settings->get_option( 'gh_spammed_tag',     false ),
+                Preferences::HARD_BOUNCE  => Plugin::$instance->settings->get_option( 'gh_bounced_tag',     false ),
+                Preferences::COMPLAINED   => Plugin::$instance->settings->get_option( 'gh_complained_tag',  false ),
+                Preferences::WEEKLY       => Plugin::$instance->settings->get_option( 'gh_weekly_tag',      false ),
+                Preferences::MONTHLY      => Plugin::$instance->settings->get_option( 'gh_monthly_tag',     false ),
+                self::MARKETABLE          => Plugin::$instance->settings->get_option( 'gh_marketable_tag',  false ),
                 self::NON_MARKETABLE      => Plugin::$instance->settings->get_option( 'gh_non_marketable_tag', false ),
             ];
         }
