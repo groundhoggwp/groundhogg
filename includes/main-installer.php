@@ -11,7 +11,12 @@ class Main_Installer extends Installer
      */
     protected function activate()
     {
-//        wp_send_json( [ get_current_blog_id() ] );
+        set_transient( 'groundhogg_review_request_dismissed', WEEK_IN_SECONDS );
+
+        // Multisite compatibility, re-init as after_setup_theme DB $prefix is wrong.!
+        if ( is_multisite() ){
+            Plugin::$instance->dbs->init_dbs();
+        }
 
         // Install our DBS...
         Plugin::$instance->dbs->install_dbs();
@@ -90,7 +95,6 @@ class Main_Installer extends Installer
     {
         if( $plugin == plugin_basename( GROUNDHOGG__FILE__ ) ) {
             if ( Plugin::$instance->settings->is_option_enabled( 'gh_guided_setup_finished' ) ){
-//            if ( false ){
                 exit( wp_redirect( admin_url( 'admin.php?page=groundhogg' ) ) );
             } else {
                 exit( wp_redirect( admin_url( 'admin.php?page=gh_guided_setup' ) ) );
