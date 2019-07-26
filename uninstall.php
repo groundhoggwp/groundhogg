@@ -44,6 +44,11 @@ if( Plugin::$instance->settings->is_option_enabled( 'gh_uninstall_on_delete' ) )
         'gh_pipelines_stages',
         'gh_pipelines',
         'gh_proof',
+        'gh_calendarmeta',
+        'gh_calendar',
+        'gh_appointmentmeta',
+        'gh_appointments'
+
     ];
 
     foreach ( $other_tables as $table ){
