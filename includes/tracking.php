@@ -104,15 +104,6 @@ class Tracking
      */
     public function add_rewrite_rules()
     {
-        // No Ref attribute
-        // OLD STRUCTURE
-        // TODO implement backwards compatibility.
-        add_rewrite_rule(
-            '^gh-tracking/([^/]*)/([^/]*)/?$',
-            'index.php?pagenow=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]$backwards_compat=true',
-            'bottom'
-        );
-
         // New tracking structure.
         // With Ref attribute
         add_rewrite_rule(

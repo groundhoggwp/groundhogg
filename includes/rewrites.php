@@ -34,14 +34,6 @@ class Rewrites
             'top'
         );
 
-        // Superlink Rewrite
-        // http://localhost/wp1/superlinks/link/1
-        add_rewrite_rule(
-            '^superlinks/link/([^/]*)/?$',
-            'index.php?pagenow=superlink&superlink_id=$matches[1]',
-            'top'
-        );
-
         // New tracking structure.
         add_rewrite_rule(
             '^gh/superlinks/link/([^/]*)/?$',
@@ -49,7 +41,7 @@ class Rewrites
             'top'
         );
 
-        // Benchmark links OLD
+        // Benchmark links
         add_rewrite_rule(
             '^gh/link/click/([^/]*)/?$',
             'index.php?pagenow=benchmark_link&link_id=$matches[1]',

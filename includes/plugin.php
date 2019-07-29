@@ -290,6 +290,10 @@ class Plugin {
         $this->scripts      = new Scripts();
         $this->notices      = new Notices();
         $this->rewrites     = new Rewrites();
+
+        // Back Compat...
+        new Backwards_Compatibility();
+
         $this->replacements = new Replacements();
         $this->tag_mapping  = new Tag_Mapping();
         $this->step_manager = new Step_Manager();

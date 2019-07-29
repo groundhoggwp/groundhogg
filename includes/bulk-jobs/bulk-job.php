@@ -139,7 +139,12 @@ abstract class Bulk_Job
 
         }
 
-        wp_send_json( $response );
+        $this->send_response( $response );
+    }
+
+    protected function send_response( $response )
+    {
+        wp_send_json( apply_filters( "groundhogg/bulk_job/{$this->get_action()}/send_response", $response ) );
     }
 
     /**
