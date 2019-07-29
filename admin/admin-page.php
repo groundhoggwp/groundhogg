@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin;
 
 use function Groundhogg\get_request_var;
+use function Groundhogg\html;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Pointers;
@@ -310,6 +311,7 @@ abstract class Admin_Page
     {
         ?>
         <form method="get" class="search-form">
+            <?php html()->hidden_GET_inputs( true ); ?>
             <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
             <p class="search-box">
                 <label class="screen-reader-text" for="post-search-input"><?php echo $title; ?>:</label>
