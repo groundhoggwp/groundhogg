@@ -39,7 +39,10 @@ abstract class Table extends \WP_List_Table
 
     protected function get_page_url()
     {
-        return add_query_arg( 'page', get_request_var( 'page' ), admin_url( 'admin.php' ) );
+        return add_query_arg( array_filter( [
+            'page' => get_request_var( 'page' ),
+            'tab'  => get_request_var( 'tab' )
+        ] ), admin_url( 'admin.php' ) );
     }
 
     /**
