@@ -252,7 +252,13 @@ abstract class Table extends \WP_List_Table
      */
     protected function get_view()
     {
-        return get_request_var( $this->view_param() );
+        return get_request_var( $this->view_param(), $this->get_default_view() );
+    }
+
+    protected function get_default_view()
+    {
+        $views = wp_list_pluck( $this->get_views_setup(), 'view' );
+        return array_shift( $views );
     }
 
     /**

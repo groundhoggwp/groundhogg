@@ -282,19 +282,14 @@ class Tracking
      */
     public function get_current_contact()
     {
-        $id = absint( $this->get_tracking_cookie_param( 'contact_id' ) );
-
-        $by_uid = false;
+        $id_or_email = absint( $this->get_tracking_cookie_param( 'contact_id' ) );
 
         // Override if the user is logged in.
-        if ( function_exists( 'is_user_logged_in' ) ){
-            if ( is_user_logged_in() ){
-                $id = get_current_user_id();
-                $by_uid = true;
-            }
+        if ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ){
+            $id_or_email = wp_get_current_user()->user_email;
         }
 
-        return Plugin::$instance->utils->get_contact( $id, $by_uid );
+        return Plugin::$instance->utils->get_contact( $id_or_email );
     }
 
     /**
@@ -303,6 +298,11 @@ class Tracking
     public function get_current_contact_id()
     {
         $id = absint( $this->get_tracking_cookie_param( 'contact_id' ) );
+
+        if ( ! $id && function_exists( 'is_user_logged_in' ) && is_user_logged_in() ){
+            $id = $this->get_current_contact()->get_id();
+        }
+
         return $id;
     }
 

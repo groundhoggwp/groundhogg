@@ -213,6 +213,9 @@ class Emails_Table extends WP_List_Table {
     protected function column_author( $email )
     {
         $user = get_userdata( intval( ( $email->get_author_id() ) ) );
+        if(!$user) {
+            return __('Unknown' , 'groundhogg' );
+        }
         $from_user = esc_html( $user->display_name );
         $queryUrl = admin_url( 'admin.php?page=gh_emails&view=author&author=' . $email->get_author_id() );
         return "<a href='$queryUrl'>$from_user</a>";
