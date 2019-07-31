@@ -8,8 +8,12 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 1.0.20
  */
+
+status_header( 200 );
+nocache_headers();
+
 header("Content-Type: application/javascript");
-header("Cache-Control: max-age=604800, public");
+
 
 ?>
 /**

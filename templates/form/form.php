@@ -45,8 +45,8 @@ set_query_var( 'doing_iframe', true );
         });
     </script>
 </head>
-<body class="groundhogg-form-body">
-<div id="main" style="padding: 20px">
+<body class="groundhogg-form-body" style="padding: 20px">
+<div id="main">
     <?php echo do_shortcode( $shortcode ); ?>
 </div>
 <?php

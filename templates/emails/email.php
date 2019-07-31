@@ -9,6 +9,10 @@ if ( ! $email_id ){
 
 $email = Plugin::$instance->utils->get_email( $email_id );
 
+if ( ! $email ){
+    wp_die( 'Invalid email.' );
+}
+
 $email->set_contact( Plugin::$instance->tracking->get_current_contact() );
 $email->set_event( Plugin::$instance->tracking->get_current_event() );
 

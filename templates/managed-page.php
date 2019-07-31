@@ -81,6 +81,9 @@ function managed_page_head( $title='', $action='' )
 	add_action( 'wp_head', 'wp_sensitive_page_meta' );
 	add_action( 'wp_head', 'Groundhogg\ensure_logo_is_there' );
 
+	status_header( 200 );
+	nocache_headers();
+
 	$mp_title = get_bloginfo( 'name', 'display' );
 
 	/* translators: Login screen title. 1: Login screen name, 2: Network or site name */
@@ -140,7 +143,7 @@ function managed_page_footer() {
 
 	$html = implode( ' | ', [
 		html()->e( 'a', [ 'href' => home_url( '/' ) ], sprintf( _x( '&larr; Back to %s', 'site' ), get_bloginfo( 'title', 'display' ) ) ),
-		html()->e( 'a', [ 'href' => site_url( 'gh/preferences/profile' ) ], __( 'Edit Profile', 'groundhogg' ) ),
+		html()->e( 'a', [ 'href' => site_url( 'gh/preferences/profile/' ) ], __( 'Edit Profile', 'groundhogg' ) ),
 		html()->e( 'a', [ 'href' => $privacy_policy_url ], __( 'Privacy Policy' ) ),
 	] );
 

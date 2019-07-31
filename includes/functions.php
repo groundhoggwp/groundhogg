@@ -143,6 +143,7 @@ function get_request_query( $default = [], $force=[] )
        'ids',
        'tab',
        'action',
+       'bulk_action',
        '_wpnonce'
    ] );
 

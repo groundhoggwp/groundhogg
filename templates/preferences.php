@@ -133,7 +133,7 @@ switch ( $action ):
                 if ( $contact ){
                     // Start tracking this contact
                     Plugin::$instance->tracking->start_tracking( $contact );
-                    die( wp_redirect( site_url( 'gh/preferences/profile' ) ) );
+                    die( wp_redirect( site_url( 'gh/preferences/profile/' ) ) );
                 }
             }
         }
@@ -231,15 +231,15 @@ switch ( $action ):
         <div class="box">
             <p><?php _e( 'Click below to manage your communication preferences and determine when and how you would like to receive communication from us.', 'groundhogg' ) ?></p>
             <p>
-                <a id="gotopreferences" class="button" href="<?php echo esc_url( site_url( 'gh/preferences/manage' ) ); ?>"><?php _e( 'Change Email Preferences', 'groundhogg' ) ?></a>
+                <a id="gotopreferences" class="button" href="<?php echo esc_url( site_url( 'gh/preferences/manage/' ) ); ?>"><?php _e( 'Change Email Preferences', 'groundhogg' ) ?></a>
             </p>
         </div>
     <?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
         <div class="box">
             <p><?php _e( 'Click below to email yourself an audit of all personal information currently on file. Or if you wish for us to no longer have access to this information you can request a data erasure in accordance with your privacy rights.', 'groundhogg' ) ?></p>
             <p>
-                <a id="downloadprofile" class="button" href="<?php echo esc_url( wp_nonce_url( site_url( 'gh/preferences/download' ), 'download_profile' ) ); ?>"><?php _e( 'Download Profile', 'groundhogg' ) ?></a>
-                <a id="eraseprofile" class="button right" href="<?php echo esc_url( wp_nonce_url( site_url( 'gh/preferences/erase' ), 'erase_profile' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
+                <a id="downloadprofile" class="button" href="<?php echo esc_url( wp_nonce_url( site_url( 'gh/preferences/download/' ), 'download_profile' ) ); ?>"><?php _e( 'Download Profile', 'groundhogg' ) ?></a>
+                <a id="eraseprofile" class="button right" href="<?php echo esc_url( wp_nonce_url( site_url( 'gh/preferences/erase/' ), 'erase_profile' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
             </p>
         </div>
     <?php endif; ?>
@@ -257,11 +257,11 @@ switch ( $action ):
 
             switch ( $preference ){
                 case 'unsubscribe':
-                    wp_redirect( wp_nonce_url( site_url( 'gh/preferences/unsubscribe' ), 'unsubscribe' ) );
+                    wp_redirect( wp_nonce_url( site_url( 'gh/preferences/unsubscribe/' ), 'unsubscribe' ) );
                     die();
                     break;
                 case 'confirm':
-                    wp_redirect( wp_nonce_url( site_url( 'gh/preferences/confirm' ), -1, 'key' ) );
+                    wp_redirect( wp_nonce_url( site_url( 'gh/preferences/confirm/' ), -1, 'key' ) );
                     die();
                     break;
                 case 'weekly':
@@ -276,7 +276,7 @@ switch ( $action ):
 
             Plugin::$instance->notices->add( 'updated', __( 'Preferences saved!' ) );
 
-            wp_redirect( site_url( 'gh/preferences/profile' ) );
+            wp_redirect( site_url( 'gh/preferences/profile/' ) );
             die();
 
         }
@@ -310,7 +310,7 @@ switch ( $action ):
     <?php endif; ?>
     <p>
         <input class="button" id="submit" type="submit" value="<?php esc_attr_e( 'Save Changes', 'groundhogg' ); ?>">
-        <a id="gotoprofile" class="button right" href="<?php echo esc_url( site_url( 'gh/preferences/profile' ) ); ?>"><?php _e( 'Cancel' ) ?></a>
+        <a id="gotoprofile" class="button right" href="<?php echo esc_url( site_url( 'gh/preferences/profile/' ) ); ?>"><?php _e( 'Cancel' ) ?></a>
     </p>
 </form>
     <?php
@@ -322,7 +322,8 @@ switch ( $action ):
     case 'unsubscribe':
 
         if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'unsubscribe' ) ) {
-            wp_redirect( site_url( 'gh/preferences/manage' ) );
+            wp_redirect( site_url( 'gh/preferences/manage/' ) );
+            die();
         }
 
         $contact->unsubscribe();
@@ -344,7 +345,7 @@ switch ( $action ):
     case 'confirm':
 
         if ( ! wp_verify_nonce( get_request_var( 'key' ) ) ) {
-            wp_redirect( site_url( 'gh/preferences/manage' ) );
+            wp_redirect( site_url( 'gh/preferences/manage/' ) );
             die();
         }
 

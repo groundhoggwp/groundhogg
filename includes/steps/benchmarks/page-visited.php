@@ -167,7 +167,7 @@ class Page_Visited extends Benchmark
         $url = $this->get_data( 'url' );
         $match_url = $this->get_setting( 'url_match' );
 
-        if ( ! $match_url ){
+        if ( ! $match_url || ! is_string( $match_url ) ){
             return false;
         }
 

@@ -25,7 +25,7 @@ class Preferences
      */
     public function add_rewrite_rules()
     {
-        add_rewrite_rule( '^gh/preferences/([^/?]*)', 'index.php?manage_preferences=true&action=$matches[1]', 'top' );
+        add_rewrite_rule( '^gh/preferences/([^/?]*)', 'index.php?pagename=groundhogg_managed_page&manage_preferences=true&action=$matches[1]', 'top' );
     }
 
     /**
@@ -36,6 +36,7 @@ class Preferences
      */
     public function add_query_vars( $vars )
     {
+        $vars[] = 'pagename';
         $vars[] = 'manage_preferences';
         $vars[] = 'action';
         return $vars;
@@ -49,6 +50,12 @@ class Preferences
      */
     public function template_include( $template )
     {
+        $pagename = get_query_var( 'pagename' );
+
+        if ( $pagename !== 'groundhogg_managed_page' ){
+            return $template;
+        }
+
         $managing_preferences = (bool) get_query_var( 'manage_preferences' );
         $new_template = GROUNDHOGG_PATH . 'templates/preferences.php';
 
@@ -121,7 +128,7 @@ class Preferences
 	/**
 	 * @param $preference int
 	 *
-	 * @return string|void
+	 * @return string
 	 */
     public static function get_preference_pretty_name( $preference )
     {

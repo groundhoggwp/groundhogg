@@ -45,6 +45,7 @@ class Admin_Menu
     public function init_admin(){
 
         $this->welcome  = new Welcome_Page();
+
         $this->contacts = new Contacts_Page();
         $this->tags     = new Tags_Page();
         $this->emails   = new Emails_Page();

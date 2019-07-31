@@ -23,58 +23,57 @@ class Rewrites
         // View Emails
         add_rewrite_rule(
             '^gh/browser-view/emails/([^/]*)/?$',
-            'index.php?pagenow=browser_view&email_id=$matches[1]',
+            'index.php?pagename=groundhogg_managed_page&pagenow=browser_view&email_id=$matches[1]',
             'top'
         );
 
         // View Emails
         add_rewrite_rule(
             '^gh/emails/([^/]*)/?$',
-            'index.php?pagenow=emails&email_id=$matches[1]',
+            'index.php?pagename=groundhogg_managed_page&pagenow=emails&email_id=$matches[1]',
             'top'
         );
 
         // New tracking structure.
         add_rewrite_rule(
             '^gh/superlinks/link/([^/]*)/?$',
-            'index.php?pagenow=superlink&superlink_id=$matches[1]',
+            'index.php?pagename=groundhogg_managed_page&pagenow=superlink&superlink_id=$matches[1]',
             'top'
         );
 
         // Benchmark links
         add_rewrite_rule(
             '^gh/link/click/([^/]*)/?$',
-            'index.php?pagenow=benchmark_link&link_id=$matches[1]',
+            'index.php?pagename=groundhogg_managed_page&pagenow=benchmark_link&link_id=$matches[1]',
             'top'
         );
 
         // Funnel Download/Export
         add_rewrite_rule(
             '^gh/funnels/export/([^/]*)/?$',
-            'index.php?pagenow=funnels&action=export&enc_funnel_id=$matches[1]',
+            'index.php?pagename=groundhogg_managed_page&pagenow=funnels&action=export&enc_funnel_id=$matches[1]',
             'top'
         );
 
         add_rewrite_rule(
             '^gh/forms/([^/]*)/submit/?$',
-            'index.php?pagenow=form_submit&form_id=$matches[1]',
+            'index.php?pagename=groundhogg_managed_page&pagenow=form_submit&form_id=$matches[1]',
             'top'
         );
 
         // Forms Iframe Script
         add_rewrite_rule(
             '^gh/forms/iframe/([^/]*)/?$',
-            'index.php?pagenow=forms_iframe&form_id=$matches[1]',
+            'index.php?pagename=groundhogg_managed_page&pagenow=forms_iframe&form_id=$matches[1]',
             'top'
         );
 
         // Forms Iframe Template
         add_rewrite_rule(
             '^gh/forms/([^/]*)/?$',
-            'index.php?pagenow=forms&form_id=$matches[1]',
+            'index.php?pagename=groundhogg_managed_page&pagenow=forms&form_id=$matches[1]',
             'top'
         );
-
 
     }
 
@@ -86,6 +85,7 @@ class Rewrites
      */
     public function add_query_vars( $vars )
     {
+        $vars[] = 'pagename';
         $vars[] = 'pagenow';
         $vars[] = 'action';
         $vars[] = 'superlink_id';
@@ -134,6 +134,12 @@ class Rewrites
      */
     public function template_include( $template )
     {
+        $pagename = get_query_var( 'pagename' );
+
+        if ( $pagename !== 'groundhogg_managed_page' ){
+            return $template;
+        }
+
         $pagenow = get_query_var( 'pagenow' );
 
         $template_loader = $this->get_template_loader();
@@ -146,9 +152,6 @@ class Rewrites
             case 'emails':
                 $template = $template_loader->get_template_part( 'emails/email', '', false );
                 break;
-            case 'forms_iframe':
-                $template = $template_loader->get_template_part( 'form/iframe.js', '', false );
-                break;
             case 'forms':
                 $template = $template_loader->get_template_part( 'form/form', '', false );
                 break;
@@ -156,8 +159,6 @@ class Rewrites
                 $template = $template_loader->get_template_part( 'form/submit', '', false );
                 break;
         }
-
-//        var_dump( $template );
 
         return $template;
     }
@@ -169,7 +170,16 @@ class Rewrites
      */
     public function template_redirect( $template='' )
     {
+
+        $pagename = get_query_var( 'pagename' );
+
+        if ( $pagename !== 'groundhogg_managed_page' ){
+            return;
+        }
+
         $pagenow = get_query_var( 'pagenow' );
+
+        $template_loader = $this->get_template_loader();
 
         switch ( $pagenow ){
             case 'superlink':
@@ -224,7 +234,10 @@ class Rewrites
                 fclose($file);
                 exit();
                 break;
-
+            case 'forms_iframe':
+                $template = $template_loader->get_template_part( 'form/iframe.js', '', true );
+                exit();
+                break;
         }
     }
 

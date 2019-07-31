@@ -3,6 +3,7 @@ namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
+use function Groundhogg\get_request_query;
 use Groundhogg\Plugin;
 
 /**
@@ -59,11 +60,7 @@ class Broadcast_Scheduler extends Bulk_Job
         }
 
         $query = new Contact_Query();
-        $args = $_GET;
-
-        // Unset GET irrelevant vars...
-        unset( $args[ 'page' ] );
-        unset( $args[ 'bulk_action' ] );
+        $args = get_request_query();
 
         if ( empty( $args ) ){
             $config = get_transient('gh_get_broadcast_config');
