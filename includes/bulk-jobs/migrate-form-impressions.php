@@ -19,7 +19,7 @@ class Migrate_Form_Impressions extends Bulk_Job
 
     public function show_upgrade_prompt()
     {
-        if ( get_option( 'gh_migrate_form_impressions' ) ){
+        if ( get_option( 'gh_migrate_form_impressions' ) && current_user_can( 'manage_options' ) ){
             Plugin::$instance->notices->add( 'db-update', "<a href='{$this->get_start_url()}'>" . __( 'Thank you for updating to 2.0! Please click here to update your database.', 'groundhogg' ) . "</a>" ) ;
         }
     }
