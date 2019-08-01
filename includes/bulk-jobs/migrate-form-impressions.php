@@ -11,6 +11,19 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Migrate_Form_Impressions extends Bulk_Job
 {
 
+    public function __construct()
+    {
+        add_action( 'admin_init', [ $this, 'show_upgrade_prompt' ] );
+        parent::__construct();
+    }
+
+    public function show_upgrade_prompt()
+    {
+        if ( get_option( 'gh_migrate_form_impressions' ) ){
+            Plugin::$instance->notices->add( 'db-update', "<a href='{$this->get_start_url()}'>" . __( 'Thank you for updating to 2.0! Please click here to update your database.', 'groundhogg' ) . "</a>" ) ;
+        }
+    }
+
     /**
      * Get the action reference.
      *
@@ -88,7 +101,9 @@ class Migrate_Form_Impressions extends Bulk_Job
      *
      * @return void
      */
-    protected function clean_up(){}
+    protected function clean_up(){
+        delete_option( 'gh_migrate_form_impressions' );
+    }
 
     /**
      * Get the return URL

@@ -77,10 +77,10 @@ abstract class Updater{
         $previous_updates  = $this->get_previous_versions();
 
 //        installing... TODO Re-implement
-//        if ( ! $previous_updates ){
-//            Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->get_available_updates() );
-//            return;
-//        }
+        if ( ! $previous_updates && ! get_option( 'wpgh_last_upgrade_version' ) ){
+            Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->get_available_updates() );
+            return;
+        }
 
         $available_updates = $this->get_available_updates();
         $missing_updates = array_diff( $available_updates, $previous_updates );
