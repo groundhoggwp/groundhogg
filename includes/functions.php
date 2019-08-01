@@ -1878,6 +1878,12 @@ function get_email_templates()
     return $email_templates;
 }
 
+/**
+ * Checks data to see if it matches anything in the blacklist.
+ *
+ * @param string $data
+ * @return bool
+ */
 function blacklist_check( $data='' ){
 
     $mod_keys = trim( get_option( 'blacklist_keys' ) );
@@ -1909,4 +1915,55 @@ function blacklist_check( $data='' ){
     }
 
     return false;
+}
+
+/**
+ * Get the ID of the managed page.
+ *
+ * @return int|WP_Error
+ */
+function get_managed_page_id()
+{
+    if ( $id = get_option( 'gh_managed_page_id' ) ){
+        return absint( $id );
+    }
+
+    $post_id = wp_insert_post([
+        'post_title'            => 'groundhogg-managed-page',
+        'post_status'           => 'publish',
+        'post_type'             => 'groundhogg_page',
+    ], true );
+
+    update_option( 'gh_managed_page_id', $post_id );
+
+    return $post_id;
+}
+
+/**
+ * Register the managed page post type.
+ */
+function register_manage_page_post_type()
+{
+    register_post_type( 'groundhogg_page', [
+        'public' => false,
+    ] );
+}
+
+add_action( 'init', __NAMESPACE__ . '\register_manage_page_post_type' );
+
+/**
+ * @param string $string
+ * @return string
+ */
+function managed_rewrite_rule( $string = '' )
+{
+    return sprintf( 'index.php?pagename=%s&p=%s&', 'groundhogg-managed-page', get_managed_page_id() ) . $string;
+}
+
+/**
+ * @return bool
+ */
+function is_managed_page()
+{
+    return get_query_var( 'pagename' ) === 'groundhogg-managed-page';
 }

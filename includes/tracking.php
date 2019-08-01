@@ -108,7 +108,7 @@ class Tracking
         // With Ref attribute
         add_rewrite_rule(
             '^gh/tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/ref/([^/]*)/?$',
-            'index.php?pagenow=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]&target_url=$matches[6]',
+            managed_rewrite_rule( 'subpage=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]&target_url=$matches[6]' ),
             'top'
         );
 
@@ -116,7 +116,7 @@ class Tracking
         // No Ref attribute
         add_rewrite_rule(
             '^gh/tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/?$',
-            'index.php?pagenow=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]',
+            managed_rewrite_rule( 'subpage=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]' ),
             'top'
         );
     }
@@ -130,7 +130,7 @@ class Tracking
     public function add_query_vars( $vars )
     {
         // Tracking vars
-        $vars[] = 'pagenow';
+        $vars[] = 'subpage';
         $vars[] = 'tracking_via';
         $vars[] = 'tracking_action';
         $vars[] = 'contact_id';
@@ -169,7 +169,7 @@ class Tracking
 //        var_dump( $vars );
 //        wp_die();
 
-        if ( get_array_var( $vars, 'pagenow' ) === 'tracking' ){
+        if ( get_array_var( $vars, 'subpage' ) === 'tracking' ){
             $this->map_query_var( $vars, 'contact_id', 'hexdec' );
             $this->map_query_var( $vars, 'event_id', 'hexdec' );
             $this->map_query_var( $vars, 'email_id', 'hexdec' );
@@ -187,10 +187,13 @@ class Tracking
      */
     public function template_redirect()
     {
+        if ( ! is_managed_page() ){
+            return;
+        }
 
-        $pagenow = get_query_var( 'pagenow' );
+        $subpage = get_query_var( 'subpage' );
 
-        if ( $pagenow !== 'tracking' ){
+        if ( $subpage !== 'tracking' ){
             return;
         }
 
@@ -455,6 +458,20 @@ class Tracking
         }
     }
 
+    protected function output_tracking_image()
+    {
+        /* thanks for coming! */
+        $file = GROUNDHOGG_ASSETS_PATH . 'images/email-open.png';
+        $type = 'image/png';
+
+        header( 'Content-Type:' . $type );
+        header( 'Content-Length:' . filesize( $file ) );
+        status_header( 200 );
+        readfile( $file );
+
+        die();
+    }
+
     /**
      * When an email is opened this function will be called at the INIT stage
      */
@@ -465,9 +482,7 @@ class Tracking
 
         if ( ! $event || ! $event->exists() ){
             if ( $this->doing_open ){
-                /* thanks for coming! */
-                wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
-                die();
+                $this->output_tracking_image();
             } else {
                 return;
             }
@@ -490,9 +505,7 @@ class Tracking
 
 	    /* only fire if actually doing an open as this may be called by the email_link_clicked method */
 	    if ( $this->doing_open ){
-		    /* thanks for coming! */
-		    wp_redirect( GROUNDHOGG_ASSETS_URL . 'images/email-open.png' );
-		    die();
+	        $this->output_tracking_image();
 	    }
     }
 

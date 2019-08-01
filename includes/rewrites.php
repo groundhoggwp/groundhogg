@@ -23,55 +23,55 @@ class Rewrites
         // View Emails
         add_rewrite_rule(
             '^gh/browser-view/emails/([^/]*)/?$',
-            'index.php?pagename=groundhogg_managed_page&pagenow=browser_view&email_id=$matches[1]',
+            managed_rewrite_rule( 'subpage=browser_view&email_id=$matches[1]' ),
             'top'
         );
 
         // View Emails
         add_rewrite_rule(
             '^gh/emails/([^/]*)/?$',
-            'index.php?pagename=groundhogg_managed_page&pagenow=emails&email_id=$matches[1]',
+            managed_rewrite_rule( 'subpage=emails&email_id=$matches[1]' ),
             'top'
         );
 
         // New tracking structure.
         add_rewrite_rule(
             '^gh/superlinks/link/([^/]*)/?$',
-            'index.php?pagename=groundhogg_managed_page&pagenow=superlink&superlink_id=$matches[1]',
+            managed_rewrite_rule( 'subpage=superlink&superlink_id=$matches[1]' ),
             'top'
         );
 
         // Benchmark links
         add_rewrite_rule(
             '^gh/link/click/([^/]*)/?$',
-            'index.php?pagename=groundhogg_managed_page&pagenow=benchmark_link&link_id=$matches[1]',
+            managed_rewrite_rule( 'subpage=benchmark_link&link_id=$matches[1]' ),
             'top'
         );
 
         // Funnel Download/Export
         add_rewrite_rule(
             '^gh/funnels/export/([^/]*)/?$',
-            'index.php?pagename=groundhogg_managed_page&pagenow=funnels&action=export&enc_funnel_id=$matches[1]',
+            managed_rewrite_rule( 'subpage=funnels&action=export&enc_funnel_id=$matches[1]' ),
             'top'
         );
 
         add_rewrite_rule(
             '^gh/forms/([^/]*)/submit/?$',
-            'index.php?pagename=groundhogg_managed_page&pagenow=form_submit&form_id=$matches[1]',
+            managed_rewrite_rule( 'subpage=form_submit&form_id=$matches[1]' ),
             'top'
         );
 
         // Forms Iframe Script
         add_rewrite_rule(
             '^gh/forms/iframe/([^/]*)/?$',
-            'index.php?pagename=groundhogg_managed_page&pagenow=forms_iframe&form_id=$matches[1]',
+            managed_rewrite_rule( 'subpage=forms_iframe&form_id=$matches[1]' ),
             'top'
         );
 
         // Forms Iframe Template
         add_rewrite_rule(
             '^gh/forms/([^/]*)/?$',
-            'index.php?pagename=groundhogg_managed_page&pagenow=forms&form_id=$matches[1]',
+            managed_rewrite_rule( 'subpage=forms&form_id=$matches[1]' ),
             'top'
         );
 
@@ -85,8 +85,7 @@ class Rewrites
      */
     public function add_query_vars( $vars )
     {
-        $vars[] = 'pagename';
-        $vars[] = 'pagenow';
+        $vars[] = 'subpage';
         $vars[] = 'action';
         $vars[] = 'superlink_id';
         $vars[] = 'funnel_id';
@@ -134,18 +133,14 @@ class Rewrites
      */
     public function template_include( $template )
     {
-        $pagename = get_query_var( 'pagename' );
-
-        if ( $pagename !== 'groundhogg_managed_page' ){
+        if ( ! is_managed_page() ){
             return $template;
         }
 
-        $pagenow = get_query_var( 'pagenow' );
-
+        $subpage = get_query_var( 'subpage' );
         $template_loader = $this->get_template_loader();
 
-        switch ( $pagenow ){
-
+        switch ( $subpage ){
             case 'browser_view':
                 $template = $template_loader->get_template_part( 'emails/browser-view', '', false );
                 break;
@@ -171,17 +166,14 @@ class Rewrites
     public function template_redirect( $template='' )
     {
 
-        $pagename = get_query_var( 'pagename' );
-
-        if ( $pagename !== 'groundhogg_managed_page' ){
+        if ( ! is_managed_page() ){
             return;
         }
 
-        $pagenow = get_query_var( 'pagenow' );
-
+        $subpage = get_query_var( 'subpage' );
         $template_loader = $this->get_template_loader();
 
-        switch ( $pagenow ){
+        switch ( $subpage ){
             case 'superlink':
 
                 $superlink_id = absint( get_query_var( 'superlink_id' ) );

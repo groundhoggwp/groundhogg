@@ -24,6 +24,10 @@ add_filter( 'show_admin_bar', '__return_false' );
 
 set_query_var( 'doing_iframe', true );
 
+status_header( 200 );
+header( 'Content-Type: text/html; charset=utf-8' );
+nocache_headers();
+
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>

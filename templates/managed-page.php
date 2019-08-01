@@ -82,7 +82,8 @@ function managed_page_head( $title='', $action='' )
 	add_action( 'wp_head', 'Groundhogg\ensure_logo_is_there' );
 
 	status_header( 200 );
-	nocache_headers();
+    header( 'Content-Type: text/html; charset=utf-8' );
+    nocache_headers();
 
 	$mp_title = get_bloginfo( 'name', 'display' );
 

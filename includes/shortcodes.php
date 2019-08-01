@@ -79,7 +79,7 @@ class Shortcodes
         if ( ! $contact )
             return '';
 
-        return Plugin::$instance->replacements->process( do_shortcode( $content ), $contact->ID );
+        return do_replacements( do_shortcode( $content ), $contact->get_id() );
     }
     
     /**

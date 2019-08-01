@@ -25,7 +25,7 @@ class Preferences
      */
     public function add_rewrite_rules()
     {
-        add_rewrite_rule( '^gh/preferences/([^/?]*)', 'index.php?pagename=groundhogg_managed_page&manage_preferences=true&action=$matches[1]', 'top' );
+        add_rewrite_rule( '^gh/preferences/([^/?]*)', managed_rewrite_rule( 'subpage=preferences&action=$matches[1]' ), 'top' );
     }
 
     /**
@@ -36,8 +36,7 @@ class Preferences
      */
     public function add_query_vars( $vars )
     {
-        $vars[] = 'pagename';
-        $vars[] = 'manage_preferences';
+        $vars[] = 'subpage';
         $vars[] = 'action';
         return $vars;
     }
@@ -50,16 +49,18 @@ class Preferences
      */
     public function template_include( $template )
     {
-        $pagename = get_query_var( 'pagename' );
-
-        if ( $pagename !== 'groundhogg_managed_page' ){
+        if ( ! is_managed_page() ){
             return $template;
         }
 
-        $managing_preferences = (bool) get_query_var( 'manage_preferences' );
-        $new_template = GROUNDHOGG_PATH . 'templates/preferences.php';
+        $page = get_query_var( 'subpage' );
 
-        if ( $managing_preferences && file_exists( $new_template ) ){
+        if ( $page !== 'preferences' ){
+            return $template;
+        }
+
+        $new_template = GROUNDHOGG_PATH . 'templates/preferences.php';
+        if ( file_exists( $new_template ) ){
             return $new_template;
         }
 

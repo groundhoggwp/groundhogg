@@ -64,7 +64,7 @@ class Main_Updater extends Updater {
         // Give the DBS a quick update...
 	    Plugin::$instance->dbs->install_dbs();
 
-	    flush_rewrite_rules();
+        flush_rewrite_rules();
 
 	    // Redirect to the bulk job manage when ready.
         // TODO
@@ -72,4 +72,5 @@ class Main_Updater extends Updater {
 //            Plugin::$instance->bulk_jobs->migrate_form_impressions->start();
 //        } );
     }
+
 }

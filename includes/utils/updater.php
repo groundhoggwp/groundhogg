@@ -19,7 +19,7 @@ abstract class Updater{
      */
     public function __construct()
     {
-        add_action( 'init', [ $this, 'do_updates' ] );
+        add_action( 'init', [ $this, 'do_updates' ], 99 ); // DO LAST
     }
 
     /**
@@ -76,26 +76,18 @@ abstract class Updater{
 
         $previous_updates  = $this->get_previous_versions();
 
-        // installing... TODO Re-implement
+//        installing... TODO Re-implement
 //        if ( ! $previous_updates ){
 //            Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->get_available_updates() );
 //            return;
 //        }
 
         $available_updates = $this->get_available_updates();
-
         $missing_updates = array_diff( $available_updates, $previous_updates );
-
-//        wp_send_json( [
-//            'available_updates' => $available_updates,
-//            'previous_updates' => $previous_updates
-//        ] );
 
         if ( empty( $missing_updates ) ){
             return;
         }
-
-//        wp_die();
 
         foreach ( $missing_updates as $update ){
             $this->update_to_version( $update );
