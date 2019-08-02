@@ -104,7 +104,10 @@ class Email_Confirmed extends Benchmark
      */
     protected function get_complete_hooks()
     {
-        return [ 'groundhogg/contact/preferences/updated' => 3 ];
+        return [
+            'groundhogg/contact/preferences/updated' => 3,
+            'groundhogg/step/email/confirmed'        => 3
+        ];
     }
 
     /**

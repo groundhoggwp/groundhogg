@@ -707,7 +707,19 @@ class Form_Filled extends Benchmark
                 </strong>
             </span> |
             <!-- TODO -->
-            <span class="submissions"><?php _e( 'Fills: ' ); ?><strong><a target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_contacts&view=report&status=complete&funnel=' . $step->get_funnel_id() . '&step=' . $step->ID . '&start=' . $start_time . '&end=' . $end_time ); ?>"><?php echo $num_events_completed; ?></a></strong></span> |
+            <span class="submissions"><?php _e( 'Fills: ' ); ?><strong>
+                    <a target="_blank" href="<?php echo add_query_arg( [
+                        'report' => [
+                            'step'  => $step->get_id(),
+                            'funnel'=> $step->get_funnel_id(),
+                            'status'=> 'complete',
+                            'start' => $start_time,
+                            'end'   => $end_time,
+                        ]
+                    ], admin_url( 'admin.php?page=gh_contacts' ) ); ?>">
+                <b><?php echo $num_events_completed; ?></b>
+            </a>
+                </strong></span> |
             <span class="cvr" title="<?php _e( 'Conversion Rate' ); ?>"><?php _e( 'CVR: '); ?><strong><?php echo round( ( $num_events_completed / ( ( $num_impressions > 0 )? $num_impressions : 1 ) * 100 ), 2 ); ?></strong>%</span>
         </p>
         <?php

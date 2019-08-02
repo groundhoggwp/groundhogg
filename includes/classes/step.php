@@ -506,7 +506,11 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function get_funnel_title()
     {
-        return $this->get_funnel()->get_title();
+        if ( $this->get_funnel() ){
+            return $this->get_funnel()->get_title();
+        }
+
+        return false;
     }
 
     /**
