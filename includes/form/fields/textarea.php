@@ -57,7 +57,7 @@ class Textarea extends Input
     public function render()
     {
         return sprintf(
-            '<label class="gh-input-label">%1$s <textarea name="%2$s" id="%3$s" class="gh-input %4$s" placeholder="%5$s" title="%6$s" %7$s %8$s>%9$s</label>',
+            '<label class="gh-input-label">%1$s <textarea name="%2$s" id="%3$s" class="gh-input %4$s" placeholder="%5$s" title="%6$s" %7$s %8$s>%9$s</textarea></label>',
             $this->get_label(),
             $this->get_name(),
             $this->get_id(),
