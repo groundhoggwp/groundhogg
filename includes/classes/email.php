@@ -340,6 +340,10 @@ class Email extends Base_Object_With_Meta
             $this->get_contact()->get_id()
         );
 
+        if ( $this->is_testing() ){
+            $subject = sprintf( __( '[TEST] %s' ), $subject );
+        }
+
         return apply_filters('groundhogg/email/subject', $subject );
     }
 

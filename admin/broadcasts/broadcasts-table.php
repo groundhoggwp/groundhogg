@@ -269,7 +269,7 @@ class Broadcasts_Table extends WP_List_Table {
                 "%s: <strong><a href='%s'>%d</a></strong><br/>",
                 _x( "Opened", 'stats', 'groundhogg' ),
                 add_query_arg(
-                    [ 'activity' => [ 'activity_type' => Activity::EMAIL_OPENED, 'step_id' => $broadcast->get_id(), 'funnel_id' => $broadcast->get_funnel_id() ] ],
+                    [ 'activity' => [ 'activity_type' => Activity::EMAIL_OPENED, 'step' => $broadcast->get_id(), 'funnel' => $broadcast->get_funnel_id() ] ],
                     admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
                 ),
                 $stats[ 'opened' ]
@@ -279,7 +279,7 @@ class Broadcasts_Table extends WP_List_Table {
                 "%s: <strong><a href='%s'>%d</a></strong><br/>",
                 _x( "Clicked", 'stats', 'groundhogg' ),
                 add_query_arg(
-                    [ 'activity' => [ 'activity_type' => Activity::EMAIL_CLICKED, 'step_id' => $broadcast->get_id(), 'funnel_id' => $broadcast->get_funnel_id() ] ],
+                    [ 'activity' => [ 'activity_type' => Activity::EMAIL_CLICKED, 'step' => $broadcast->get_id(), 'funnel' => $broadcast->get_funnel_id() ] ],
                     admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
                 ),
                 $stats[ 'clicked' ]
