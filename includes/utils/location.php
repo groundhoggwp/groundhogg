@@ -492,7 +492,7 @@ class Location
      * @param null $ip
      * @param string $purpose
      * @param bool $deep_detect
-     * @return array|string
+     * @return array|string|object
      */
     public function ip_info($ip = NULL, $purpose = "location", $deep_detect = TRUE)
     {

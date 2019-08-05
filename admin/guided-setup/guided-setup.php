@@ -7,8 +7,10 @@ use Groundhogg\Admin\Guided_Setup\Steps\Business_Info;
 use Groundhogg\Admin\Guided_Setup\Steps\Community;
 use Groundhogg\Admin\Guided_Setup\Steps\Compliance;
 use Groundhogg\Admin\Guided_Setup\Steps\Email;
+use Groundhogg\Admin\Guided_Setup\Steps\Extensions;
 use Groundhogg\Admin\Guided_Setup\Steps\Finished;
 use Groundhogg\Admin\Guided_Setup\Steps\Import_Contacts;
+use Groundhogg\Admin\Guided_Setup\Steps\Partners;
 use Groundhogg\Admin\Guided_Setup\Steps\Start;
 use Groundhogg\Admin\Guided_Setup\Steps\Step;
 use Groundhogg\Admin\Guided_Setup\Steps\Sync_Users;
@@ -67,6 +69,8 @@ class Guided_Setup extends Admin_Page
         $steps[] = new Email();
         $steps[] = new Tracking();
         $steps[] = new Community();
+        $steps[] = new Partners();
+        $steps[] = new Extensions();
         $steps[] = new Finished();
 
         $this->steps = $steps;
@@ -164,7 +168,7 @@ class Guided_Setup extends Admin_Page
         <?php if ( show_groundhogg_branding() ):
             floating_phil();
         endif; ?>
-        <form action="" method="post">
+        <form action="" method="post" id="poststuff">
             <?php wp_nonce_field(); ?>
             <div style="max-width: 600px;margin: auto;">
                 <?php $this->get_current_step()->view(); ?>

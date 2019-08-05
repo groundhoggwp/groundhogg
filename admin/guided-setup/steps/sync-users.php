@@ -15,7 +15,7 @@ class Sync_Users extends Step
 
     public function get_title()
     {
-        return _x( 'Sync Users With Contact Records', 'guided_setup', 'groundhogg' );
+        return _x( 'Sync Users & Contacts', 'guided_setup', 'groundhogg' );
     }
 
     public function get_slug()
