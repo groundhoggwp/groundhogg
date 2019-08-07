@@ -247,7 +247,8 @@ class Broadcast extends Base_Object implements Event_Process
 
         if ( $this->is_sent() ){
 
-            $data[ 'sent' ]         = get_db( 'events' )->count( [ 'step_id' => $this->get_id(), 'event_type' => Event::BROADCAST, 'status' => Event::COMPLETE ] );
+            $data[ 'id' ]   = $this->get_id();
+            $data[ 'sent' ] = get_db( 'events' )->count( [ 'step_id' => $this->get_id(), 'event_type' => Event::BROADCAST, 'status' => Event::COMPLETE ] );
 
             if ( ! $this->is_sms() ){
                 $data[ 'waiting' ]      = get_db( 'events' )->count( [ 'step_id' => $this->get_id(), 'event_type' => Event::BROADCAST, 'status' => Event::WAITING ] );
@@ -256,6 +257,7 @@ class Broadcast extends Base_Object implements Event_Process
                 $data[ 'clicked' ]      = get_db( 'activity' )->count( [ 'funnel_id' => $this->get_funnel_id(), 'step_id' => $this->get_id(), 'activity_type' => Activity::EMAIL_CLICKED ] );
                 $data[ 'click_through_rate' ] = percentage( $data[ 'clicked' ], $data[ 'opened' ] );
                 $data[ 'unopened' ] = $data[ 'sent' ] - $data[ 'opened' ];
+                $data[ 'opened_not_clicked' ] = $data[ 'opened' ] - $data[ 'clicked' ];
             }
 
         }

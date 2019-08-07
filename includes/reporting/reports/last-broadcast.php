@@ -2,6 +2,7 @@
 namespace Groundhogg\Reporting\Reports;
 
 
+use Groundhogg\Broadcast;
 use Groundhogg\DB\Meta_DB;
 use Groundhogg\Event;
 use function Groundhogg\get_db;
@@ -37,6 +38,22 @@ class Last_Broadcast extends Report
         return __( 'Last Broadcast', 'groundhogg' );
     }
 
+    public function get_broadcast()
+    {
+        $all_broadcasts = get_db( 'broadcasts' )->query( [ 'status' => 'sent' ], 'send_time' );
+
+        if ( empty( $all_broadcasts ) ){
+            return [];
+        }
+
+        $last_broadcast = array_pop( $all_broadcasts );
+        $last_broadcast_id = absint( $last_broadcast->ID );
+
+        $broadcast = new Broadcast( $last_broadcast_id );
+
+        return $broadcast;
+    }
+
     /**
      * Get the report data
      *
@@ -45,41 +62,12 @@ class Last_Broadcast extends Report
     public function get_data()
     {
 
-        $all_broadcasts = get_db( 'broadcasts' )->query( [ 'status' => 'sent' ] );
+        $broadcast = $this->get_broadcast();
 
-        if ( empty( $all_broadcasts ) ){
-            return [];
+        if ( $broadcast->exists() ){
+            return $broadcast->get_report_data();
         }
 
-        $last_broadcast = array_shift( $all_broadcasts );
-        $last_broadcast_id = absint( $last_broadcast->ID );
-
-        $total_sent = get_db( 'events' )->count( array(
-            'event_type'    => Event::BROADCAST,
-            'step_id'       => $last_broadcast_id,
-            'status'        => Event::COMPLETE
-        ) );
-
-        $opens = get_db( 'activity' )->count( array(
-            'step_id'       => $last_broadcast_id,
-            'activity_type' => 'email_opened'
-        ) );
-
-        $unopened = $total_sent - $opens;
-
-        $clicks = get_db( 'activity' )->count( array(
-            'step_id'       => $last_broadcast_id,
-            'activity_type' => 'email_link_click'
-        ) );
-
-        $unclicked = $opens - $clicks;
-
-        return [
-            'sent' => $total_sent,
-            'opens' => $opens,
-            'clicked' => $clicks,
-            'unopened' => $unopened,
-            'unclicked' => $unclicked
-        ];
+        return [];
     }
 }

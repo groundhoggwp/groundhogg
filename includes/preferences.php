@@ -109,8 +109,8 @@ class Preferences
                 return _x( 'Unsubscribed. They will not receive marketing.','optin_status', 'groundhogg' );
                 break;
             case self::WEEKLY:
-	        return _x( 'This contact will only receive marketing weekly.', 'optin_status','groundhogg' );
-	        break;
+	            return _x( 'This contact will only receive marketing weekly.', 'optin_status','groundhogg' );
+	            break;
 	        case self::MONTHLY:
 		        return _x( 'This contact will only receive marketing monthly.', 'optin_status','groundhogg' );
 		        break;
