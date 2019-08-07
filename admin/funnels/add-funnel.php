@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Funnels;
+use function Groundhogg\is_white_labeled;
 use Groundhogg\Plugin;
 
 
@@ -28,7 +29,9 @@ do_action( 'wpgh_before_new_funnel' );
 <?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'templates'; ?>
 <h2 class="nav-tab-wrapper">
     <a id="funnel-templates" href="?page=gh_funnels&action=add&tab=templates" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Funnel Templates', 'add_funnel_tab', 'groundhogg'); ?></a>
+    <?php if( !is_white_labeled()) :?>
     <a id="funnel-marketplace" href="?page=gh_funnels&action=add&tab=marketplace" class="nav-tab <?php echo $active_tab == 'marketplace' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Marketplace','add_funnel_tab', 'groundhogg'); ?></a>
+    <?php endif; ?>
     <a id="funnel-import" href="?page=gh_funnels&action=add&tab=import" class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Import Funnel', 'add_funnel_tab','groundhogg'); ?></a>
 </h2>
 <!-- search form -->

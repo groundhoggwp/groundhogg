@@ -15,7 +15,9 @@ use Groundhogg\Admin\Superlinks\Superlinks_Page;
 use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Tools\Tools_Page;
 use Groundhogg\Admin\Welcome\Welcome_Page;
+use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\white_labeled_name;
 
 /**
  * Admin Manager to manage databases in Groundhogg
@@ -45,7 +47,6 @@ class Admin_Menu
     public function init_admin(){
 
         $this->welcome  = new Welcome_Page();
-
         $this->contacts = new Contacts_Page();
         $this->tags     = new Tags_Page();
         $this->emails   = new Emails_Page();
@@ -60,7 +61,9 @@ class Admin_Menu
 
         $this->dashboard = new Dashboard_Widgets();
 
-        $this->guided_setup = new Guided_Setup();
+        if (!is_white_labeled()) {
+            $this->guided_setup = new Guided_Setup();
+        }
 
         do_action( 'groundhogg/admin/init', $this );
     }

@@ -6,9 +6,11 @@ use Groundhogg\Dropins\Test_Extension_2;
 use Groundhogg\Extension;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\is_white_labeled;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\white_labeled_name;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -63,7 +65,12 @@ class Settings_Page extends Admin_Page
 
     public function get_title()
     {
-        return _x( 'Groundhogg Settings', 'page_title', 'groundhogg' );
+        if ( is_white_labeled() ) {
+            return _x( 'Settings', 'page_title', 'groundhogg' );
+        } else {
+
+            return _x( 'Groundhogg Settings', 'page_title', 'groundhogg' );
+        }
     }
 
     public function get_cap()
@@ -127,7 +134,19 @@ class Settings_Page extends Admin_Page
      */
     private function get_default_tabs()
     {
-        return apply_filters( 'groundhogg/admin/settings/tabs', array(
+
+        if ( is_white_labeled() ) {
+
+            $licenses = [] ;
+        } else {
+            $licenses = [
+                'id'    => 'extensions',
+                'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' )
+            ] ;
+        }
+
+
+        $tabs  = [
             'general'      => array(
                 'id'    => 'general',
                 'title' => _x( 'General', 'settings_tabs', 'groundhogg' )
@@ -139,10 +158,6 @@ class Settings_Page extends Admin_Page
             'email'        =>  array(
                 'id'    => 'email',
                 'title' => _x( 'Email', 'settings_tabs', 'groundhogg' )
-            ),
-            'extensions'   =>  array(
-                'id'    => 'extensions',
-                'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' )
             ),
             'tags'   => [
                 'id'    => 'tags',
@@ -156,7 +171,16 @@ class Settings_Page extends Admin_Page
                 'id'    => 'misc',
                 'title' => _x( 'Misc', 'settings_tabs', 'groundhogg' )
             ),
-        ) );
+        ];
+
+        if ( ! is_white_labeled() ) {
+            $tabs['extensions'] = [
+                'id'    => 'extensions',
+                'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' )
+            ] ;
+        }
+
+        return apply_filters( 'groundhogg/admin/settings/tabs', $tabs );
     }
 
     /**
@@ -166,6 +190,18 @@ class Settings_Page extends Admin_Page
      */
     private function get_default_sections()
     {
+
+        if ( is_white_labeled() ) {
+
+            $service  = [];
+        } else {
+            $service = [
+                'id'    => 'bounces',
+                'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
+                'tab'   => 'email',
+                'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ], //todo
+            ];
+        }
 
 
         return apply_filters( 'groundhogg/admin/settings/sections', array(
@@ -204,12 +240,7 @@ class Settings_Page extends Admin_Page
                 'title' => _x( 'Overrides', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email'
             ],
-            'service' => array(
-                'id'    => 'service',
-                'title' => _x( 'Groundhogg Sending Service (Email & SMS)', 'settings_sections', 'groundhogg' ),
-                'tab'   => 'email',
-                'callback' => [ Plugin::$instance->sending_service, 'test_connection_ui' ], //todo
-            ),
+            'service' => $service,
             'bounces' => array(
                 'id'    => 'bounces',
                 'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
@@ -450,7 +481,7 @@ class Settings_Page extends Admin_Page
             'gh_uninstall_on_delete' => array(
                 'id'        => 'gh_uninstall_on_delete',
                 'section'   => 'misc_info',
-                'label'     => _x( 'Delete Groundhogg Data', 'settings', 'groundhogg' ),
+                'label'     => sprintf( _x( 'Delete %s Data', 'settings', 'groundhogg' ), white_labeled_name() ),
                 'desc'      => _x( 'Delete all information when uninstalling. This cannot be undone.', 'settings', 'groundhogg' ),
                 'type' => 'checkbox',
                 'atts' => array(
@@ -465,7 +496,7 @@ class Settings_Page extends Admin_Page
                 'id'        => 'gh_opted_in_stats_collection',
                 'section'   => 'misc_info',
                 'label'     => _x( 'Optin to anonymous usage tracking.', 'settings', 'groundhogg' ),
-                'desc'      => _x( 'Help us make Groundhogg better by providing anonymous usage information about your site.', 'settings', 'groundhogg' ),
+                'desc'      => sprintf( _x( 'Help us make %s better by providing anonymous usage information about your site.', 'settings', 'groundhogg' ), white_labeled_name()),
                 'type' => 'checkbox',
                 'atts' => array(
                     'label'         => __( 'Enable' ),
@@ -739,7 +770,7 @@ class Settings_Page extends Admin_Page
             'gh_disable_api' => array(
                 'id'        => 'gh_disable_api',
                 'section'   => 'api_settings',
-                'label'     => _x( 'Disable the Groundhogg API', 'settings', 'groundhogg' ),
+                'label'     => sprintf( _x( 'Disable the %s API', 'settings', 'groundhogg' ) , white_labeled_name()),
                 'desc'      => _x( 'Disabling the API will prevent other platforms from accessing information on this site. Functionality in some extensions may be affected as well.', 'settings', 'groundhogg' ),
                 'type'      => 'checkbox',
                 'atts' => array(

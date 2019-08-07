@@ -123,8 +123,10 @@ add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\strip_script_tags'
  */
 function add_bug_report_prompt( $text )
 {
-    if ( is_admin_groundhogg_page() && apply_filters( 'groundhogg/footer/show_text', true ) ){
-        return preg_replace( "/<\/span>/", sprintf( __( ' | Like Groundhogg? <a target="_blank" href="%s">Leave a Review</a>!</span>' ), __( 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post' ) ), $text );
+    if(! is_white_labeled() ){
+        if ( is_admin_groundhogg_page() && apply_filters( 'groundhogg/footer/show_text', true ) ){
+            return preg_replace( "/<\/span>/", sprintf( __( ' | Like Groundhogg? <a target="_blank" href="%s">Leave a Review</a>!</span>' ), __( 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post' ) ), $text );
+        }
     }
 
     return $text;

@@ -1887,7 +1887,19 @@ if ( ! function_exists( __NAMESPACE__ . '\is_white_labeled' ) ){
      * @return bool
      */
     function is_white_labeled(){
-        return false;
+        return false; // todo make false
+    }
+}
+
+if ( ! function_exists( __NAMESPACE__ . '\white_labeled_name' ) ){
+
+    /**
+     * Return replacement name form white label
+     *
+     * @return string
+     */
+    function white_labeled_name(){
+        return 'Groundhogg';  // TODO
     }
 }
 

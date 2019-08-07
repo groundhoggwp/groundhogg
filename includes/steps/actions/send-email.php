@@ -2,6 +2,7 @@
 namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Email;
+use function Groundhogg\get_array_var;
 use Groundhogg\Preferences;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
@@ -300,7 +301,7 @@ class Send_Email extends Action
             'content'       => search_and_replace_domain( $args['content'] ),
             'subject'       => $args['subject'],
             'pre_header'    => $args['pre_header'],
-            'title'         => $args['title'],
+            'title'         => get_array_var( $args, 'title', $args[ 'subject' ] ),
             'from_user'     => get_current_user_id(),
             'author'        => get_current_user_id()
         ] );

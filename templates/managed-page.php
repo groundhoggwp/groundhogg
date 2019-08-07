@@ -100,7 +100,7 @@ function managed_page_head( $title='', $action='' )
 		$header_title = get_network()->site_name;
 	} else {
 		$header_url   = site_url();
-		$header_title = __( 'Powered by Groundhogg', 'groundhogg' );
+		$header_title = sprintf( __( 'Powered by %s', 'groundhogg' ),  white_labeled_name()) ;
 	}
 
 	/*
