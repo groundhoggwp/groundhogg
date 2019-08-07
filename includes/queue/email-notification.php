@@ -82,6 +82,6 @@ class Email_Notification implements Event_Process
 
     public function get_step_title()
     {
-        return $this->email->get_subject_line();
+        return $this->email->get_title();
     }
 }

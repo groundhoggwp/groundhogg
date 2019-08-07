@@ -55,6 +55,7 @@ class Emails_Table extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'       => '<input type="checkbox" />', // Render a checkbox instead of text.
+			'title'    => _x( 'Title', 'Column label', 'groundhogg' ),
 			'subject'    => _x( 'Subject', 'Column label', 'groundhogg' ),
 			'from_user'   => _x( 'From User', 'Column label', 'groundhogg' ),
 			'author'   => _x( 'Author', 'Column label', 'groundhogg' ),
@@ -160,16 +161,16 @@ class Emails_Table extends WP_List_Table {
             $actions[ 'trash' ] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email='. $id ), 'trash' ). "'>" . __( 'Trash' ) . "</a></span>";
         }
 
-        return $this->row_actions( apply_filters( 'wpgh_email_row_actions', $actions, $email, $column_name ) );
+        return $this->row_actions( apply_filters( 'groundhogg/admin/emails/table/row_actions', $actions, $email, $column_name ) );
     }
 
     /**
      * @param $email Email
      * @return string
      */
-    protected function column_subject( $email )
+    protected function column_title( $email )
     {
-        $subject = ( ! $email->get_subject_line() )? '(' . __( 'no subject' ) . ')' : $email->get_subject_line() ;
+        $subject = ( ! $email->get_title() )? '(' . __( 'no title' ) . ')' : $email->get_title() ;
         $editUrl = admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $email->get_id() );
 
         if ( $this->get_view() === 'trash' ){
@@ -186,6 +187,15 @@ class Emails_Table extends WP_List_Table {
         }
 
         return $html;
+    }
+
+    /**
+     * @param $email Email
+     * @return mixed
+     */
+    protected function column_subject( $email )
+    {
+        return $email->get_subject_line();
     }
 
     /**

@@ -9,6 +9,128 @@ namespace Groundhogg;
  * Time: 9:38 AM
  */
 
+/**
+ * GHSS doesn't link the <pwlink> format so we have to fix it by removing the gl & lt
+ *
+ * @param $message
+ * @param $key
+ * @param $user_login
+ * @param $user_data
+ * @return string
+ */
+function fix_html_pw_reset_link($message, $key, $user_login, $user_data )    {
+    $message = preg_replace( '/<(https?:\/\/.*)>/', '$1', $message );
+    return $message;
+}
+
+add_filter( 'retrieve_password_message', __NAMESPACE__ . '\fix_html_pw_reset_link', 10, 4 );
+
+/**
+ * Override the default from email
+ *
+ * @param $original_email_address
+ * @return mixed
+ */
+function sender_email( $original_email_address ) {
+
+    // Get the site domain and get rid of www.
+    $sitename = strtolower( $_SERVER['SERVER_NAME'] );
+    if ( substr( $sitename, 0, 4 ) == 'www.' ) {
+        $sitename = substr( $sitename, 4 );
+    }
+
+    $from_email = 'wordpress@' . $sitename;
+
+    if ( $original_email_address === $from_email ){
+        $new_email_address = Plugin::$instance->settings->get_option( 'override_from_email', $original_email_address );
+
+        if ( ! empty( $new_email_address ) ){
+            $original_email_address = $new_email_address;
+        }
+    }
+
+    return $original_email_address;
+}
+
+/**
+ * Override the default from name
+ *
+ * @param $original_email_from
+ * @return mixed
+ */
+function sender_name( $original_email_from ) {
+
+    if( $original_email_from === 'WordPress' ){
+        $new_email_from = Plugin::$instance->settings->get_option( 'override_from_name', $original_email_from );
+
+        if ( ! empty( $new_email_from ) ){
+            $original_email_from = $new_email_from;
+        }
+    }
+
+    return $original_email_from;
+}
+
+// Hooking up our functions to WordPress filters
+add_filter( 'wp_mail_from', __NAMESPACE__ . '\sender_email' );
+add_filter( 'wp_mail_from_name', __NAMESPACE__ . '\sender_name' );
+
+/**
+ * Remove the editing toolbar from the email content so it doesn't show up in the client's email.
+ *
+ * @param $content string the email content
+ *
+ * @return string the new email content.
+ */
+function remove_builder_toolbar( $content )
+{
+    return preg_replace( '/<wpgh-toolbar\b[^>]*>(.*?)<\/wpgh-toolbar>/', '', $content );
+}
+
+add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\remove_content_editable' );
+
+/**
+ * Remove the content editable attribute from the email's html
+ *
+ * @param $content string email HTML
+ * @return string the filtered email content.
+ */
+function remove_content_editable( $content )
+{
+    return preg_replace( "/contenteditable=\"true\"/", '', $content );
+}
+
+add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\remove_content_editable' );
+
+/**
+ * Remove script tags from the email content
+ *
+ * @param $content string the email content
+ * @return string, sanitized email content
+ */
+function strip_script_tags( $content )
+{
+    return preg_replace( '/<script\b[^>]*>(.*?)<\/script>/', '', $content );
+}
+
+add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\strip_script_tags' );
+
+/**
+ * Add a link to the FB group in the admin footer.
+ *
+ * @param $text
+ * @return string|string[]|null
+ */
+function add_bug_report_prompt( $text )
+{
+    if ( is_admin_groundhogg_page() && apply_filters( 'groundhogg/footer/show_text', true ) ){
+        return preg_replace( "/<\/span>/", sprintf( __( ' | Like Groundhogg? <a target="_blank" href="%s">Leave a Review</a>!</span>' ), __( 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post' ) ), $text );
+    }
+
+    return $text;
+}
+
+add_filter('admin_footer_text', __NAMESPACE__ . '\add_bug_report_prompt');
 
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\safe_css_filter_rgb_to_hex', 10 );
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\add_safe_style_attributes_to_email', 10 );

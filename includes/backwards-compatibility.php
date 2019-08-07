@@ -25,8 +25,13 @@ class Backwards_Compatibility
         add_action( 'init', [ $this, 'add_old_rewrite_rules' ] );
         add_filter( 'query_vars', [ $this, 'add_old_query_vars' ] );
         add_action( 'template_redirect', [ $this, 'back_compat_redirect' ] );
+        add_action( 'edd_graph_load_scripts', [ $this, 'fix_edd_graph' ] );
     }
 
+    public function fix_edd_graph()
+    {
+        wp_enqueue_script( 'jquery-flot-time' );
+    }
 
     public function add_old_rewrite_rules()
     {
@@ -74,7 +79,7 @@ class Backwards_Compatibility
             switch ( $tracking_via ){
                 case 'link':
 
-                    wp_redirect( sprintf( site_url( 'gh/link/click/%s/', get_request_var( 'id' ) ) ) );
+                    wp_redirect( site_url( sprintf('gh/link/click/%s/', get_request_var( 'id' ) ) ) );
                     die();
 
                     break;

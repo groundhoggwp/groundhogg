@@ -300,6 +300,7 @@ class Send_Email extends Action
             'content'       => search_and_replace_domain( $args['content'] ),
             'subject'       => $args['subject'],
             'pre_header'    => $args['pre_header'],
+            'title'         => $args['title'],
             'from_user'     => get_current_user_id(),
             'author'        => get_current_user_id()
         ] );
@@ -327,6 +328,7 @@ class Send_Email extends Action
             return $args;
 
         $args[ 'subject'] = $email->get_subject_line();
+        $args[ 'title'] = $email->get_title();
         $args[ 'pre_header' ] = $email->get_pre_header();
         $args[ 'content' ] = $email->get_content();
 

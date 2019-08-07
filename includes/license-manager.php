@@ -367,6 +367,13 @@ class License_Manager
         /* I'm lazy so just covert it to an object*/
         $extension = (object) $args;
 
+        $extension->info->link = add_query_arg( [
+            'utm_source' => get_bloginfo(),
+            'utm_medium' => 'extension-ad',
+            'utm_campaign'  => 'admin-links',
+            'utm_content'   => sanitize_key( $extension->info->title ),
+        ], $extension->info->link );
+
         ?>
         <div class="postbox">
             <?php if ( $extension->info->title ): ?>

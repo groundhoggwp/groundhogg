@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Welcome;
 
 use Groundhogg\Admin\Admin_Page;
+use function Groundhogg\dashicon;
 use function Groundhogg\html;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
@@ -332,9 +333,6 @@ class Welcome_Page extends Admin_Page
         if ( apply_filters( 'wpgh_show_phil_on_welcome_page', true ) ): ?>
         <img class="phil" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340">
         <?php endif; ?>
-        <div class="">
-
-        </div>
         <div id="welcome-page" class="welcome-page">
             <div id="poststuff">
                 <div class="welcome-header">
@@ -344,6 +342,76 @@ class Welcome_Page extends Admin_Page
                 <hr class="wp-header-end">
                 <?php do_action( 'wpgh_welcome_page_custom_content' ); ?>
                 <?php if ( apply_filters( 'wpgh_show_main_welcome_page_content', true ) ): ?>
+
+                    <div class="col">
+                        <div class="postbox" id="ghmenu">
+                            <div class="inside" style="padding: 0;margin: 0">
+                                <ul>
+                                    <?php
+
+                                $links = [
+                                    [
+                                        'icon'     => 'admin-site',
+                                        'display'  => __( 'Groundhogg.io' ),
+                                        'url'      => 'https://www.groundhogg.io'
+                                    ],
+                                    [
+                                        'icon'     => 'media-document',
+                                        'display'  => __( 'Documentation' ),
+                                        'url'      => 'https://docs.groundhogg.io'
+                                    ],
+                                    [
+                                        'icon'     => 'store',
+                                        'display'  => __( 'Store' ),
+                                        'url'      => 'https://www.groundhogg.io/downloads/'
+                                    ],
+                                    [
+                                        'icon'     => 'admin-post',
+                                        'display'  => __( 'Blog' ),
+                                        'url'      => 'https://www.groundhogg.io/blog/'
+                                    ],
+                                    [
+                                        'icon'     => 'sos',
+                                        'display'  => __( 'Support Group' ),
+                                        'url'      => 'https://www.groundhogg.io/fb/'
+                                    ],
+                                    [
+                                        'icon'     => 'admin-users',
+                                        'display'  => __( 'My Account' ),
+                                        'url'      => 'https://www.groundhogg.io/account/'
+                                    ],
+                                    [
+                                        'icon'     => 'location-alt',
+                                        'display'  => __( 'Find a Partner' ),
+                                        'url'      => 'https://www.groundhogg.io/partner/certified-partner-directory/'
+                                    ],
+                                ];
+
+                                foreach ( $links as $link ){
+
+                                    echo html()->e( 'li', [], [
+                                        html()->e( 'a', [
+                                            'href' => add_query_arg( [
+                                                'utm_source'    => get_bloginfo(),
+                                                'utm_medium'    => 'welcome-page',
+                                                'utm_campaign'  => 'admin-links',
+                                                'utm_content'   => strtolower( $link[ 'display' ] ),
+                                            ], $link[ 'url' ] ),
+                                            'target' => '_blank'
+                                        ], [
+                                            dashicon( $link[ 'icon' ] ),
+                                            '&nbsp;',
+                                            $link[ 'display' ]
+                                        ] )
+                                    ] );
+
+                                }
+
+                                ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                     <div class="left-col col">
                         <div id="support-articles">
                             <div class="postbox support">

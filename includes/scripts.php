@@ -100,10 +100,10 @@ class Scripts
         wp_register_script('jquery-sticky-sidebar', GROUNDHOGG_ASSETS_URL . 'lib/sticky-sidebar/jquery.sticky-sidebar.js', ['jquery'] );
 
         // Flot
-        wp_register_script('jquery-flot', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot' . $IS_MINIFIED . '.js');
-        wp_register_script('jquery-flot-pie', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.pie' . $IS_MINIFIED . '.js');
-        wp_register_script('jquery-flot-time', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.time' . $IS_MINIFIED . '.js');
-        wp_register_script('jquery-flot-categories', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.categories' . $IS_MINIFIED . '.js');
+        wp_register_script('jquery-flot', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot' . $IS_MINIFIED . '.js' );
+        wp_register_script('jquery-flot-pie', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.pie' . $IS_MINIFIED . '.js', [ 'jquery-flot' ] );
+        wp_register_script('jquery-flot-time', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.time' . $IS_MINIFIED . '.js', [ 'jquery-flot' ] );
+        wp_register_script('jquery-flot-categories', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.categories' . $IS_MINIFIED . '.js', [ 'jquery-flot' ]);
 
         // Basic Admin Scripts
         wp_register_script('groundhogg-admin', GROUNDHOGG_ASSETS_URL . 'js/admin/admin' . $IS_MINIFIED . '.js', ['jquery', 'select2', 'jquery-ui-autocomplete'], GROUNDHOGG_VERSION, true);

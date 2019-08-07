@@ -26,16 +26,16 @@ class Shortcodes
     {
         add_filter( 'no_texturize_shortcodes', [ $this, 'no_texturize_form' ] );
 
-        add_shortcode( 'gh_form', [ $this, 'custom_form_shortcode' ] );
-        add_shortcode( 'gh_replacements', [ $this, 'merge_replacements_shortcode' ] );
-        add_shortcode( 'ghr', [ $this, 'merge_replacements_shortcode' ] );
-        add_shortcode( 'gh_contact', 'contact_replacement_shortcode' );
-        add_shortcode( 'gh_is_contact', 'is_contact_shortcode' );
-        add_shortcode( 'gh_is_not_contact', 'is_not_contact_shortcode' );
-        add_shortcode( 'gh_is_not_logged_in', 'is_not_logged_in' );
-        add_shortcode( 'gh_is_logged_in', 'is_logged_in' );
-        add_shortcode( 'gh_does_not_have_tags', 'contact_does_not_have_tag_shortcode' );
-        add_shortcode( 'gh_has_tags', 'contact_has_tag_shortcode' );
+        add_shortcode( 'gh_form',           [ $this, 'custom_form_shortcode' ] );
+        add_shortcode( 'gh_replacements',   [ $this, 'merge_replacements_shortcode' ] );
+        add_shortcode( 'ghr',               [ $this, 'merge_replacements_shortcode' ] );
+        add_shortcode( 'gh_contact',        [ $this, 'contact_replacement_shortcode' ] );
+        add_shortcode( 'gh_is_contact',     [ $this, 'is_contact_shortcode' ] );
+        add_shortcode( 'gh_is_not_contact', [ $this, 'is_not_contact_shortcode' ] );
+        add_shortcode( 'gh_is_not_logged_in',   [ $this, 'is_not_logged_in' ] );
+        add_shortcode( 'gh_is_logged_in',       [ $this, 'is_logged_in' ] );
+        add_shortcode( 'gh_does_not_have_tags', [ $this, 'contact_does_not_have_tag_shortcode' ] );
+        add_shortcode( 'gh_has_tags',           [ $this, 'contact_has_tag_shortcode' ] );
     }
 
     /**
@@ -49,7 +49,6 @@ class Shortcodes
     public function custom_form_shortcode( $atts )
     {
         $form = new Form( $atts );
-
         return $form->shortcode();
     }
     
@@ -85,7 +84,7 @@ class Shortcodes
     /**
      * Process the contact shortcode
      */
-    function contact_replacement_shortcode( $atts )
+    public function contact_replacement_shortcode( $atts )
     {
         $a = shortcode_atts( array(
             'field' => 'first'
@@ -93,12 +92,13 @@ class Shortcodes
 
         $contact = Plugin::$instance->tracking->get_current_contact();
 
-        if ( ! $contact )
+        if ( ! $contact ){
             return __( 'Friend', 'groundhogg' );
+        }
 
         $content = sprintf( '{%s}', $a[ 'field' ] );
 
-        return Plugin::$instance->replacements->process( $content, $contact->ID );
+        return Plugin::$instance->replacements->process( $content, $contact->get_id() );
     }
     
     /**

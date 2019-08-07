@@ -956,56 +956,6 @@ function listen_for_complaint_and_bounce_emails( $error )
 add_action( 'wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_emails' );
 
 /**
- * Override the default from email
- *
- * @param $original_email_address
- * @return mixed
- */
-function sender_email( $original_email_address ) {
-
-    // Get the site domain and get rid of www.
-    $sitename = strtolower( $_SERVER['SERVER_NAME'] );
-    if ( substr( $sitename, 0, 4 ) == 'www.' ) {
-        $sitename = substr( $sitename, 4 );
-    }
-
-    $from_email = 'wordpress@' . $sitename;
-
-    if ( $original_email_address === $from_email ){
-        $new_email_address = Plugin::$instance->settings->get_option( 'override_from_email', $original_email_address );
-
-        if ( ! empty( $new_email_address ) ){
-            $original_email_address = $new_email_address;
-        }
-    }
-
-    return $original_email_address;
-}
-
-/**
- * Override the default from name
- *
- * @param $original_email_from
- * @return mixed
- */
-function sender_name( $original_email_from ) {
-
-    if( $original_email_from === 'WordPress' ){
-        $new_email_from = Plugin::$instance->settings->get_option( 'override_from_name', $original_email_from );
-
-        if ( ! empty( $new_email_from ) ){
-            $original_email_from = $new_email_from;
-        }
-    }
-
-    return $original_email_from;
-}
-
-// Hooking up our functions to WordPress filters
-add_filter( 'wp_mail_from', __NAMESPACE__ . '\sender_email' );
-add_filter( 'wp_mail_from_name', __NAMESPACE__ . '\sender_name' );
-
-/**
  * Return the FULL URI from wp_get_referer for string comparisons
  *
  * @return string
@@ -1017,63 +967,6 @@ function wpgh_get_referer()
 
 	return ( is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
 }
-
-/**
- * Remove the editing toolbar from the email content so it doesn't show up in the client's email.
- *
- * @param $content string the email content
- *
- * @return string the new email content.
- */
-function remove_builder_toolbar( $content )
-{
-    return preg_replace( '/<wpgh-toolbar\b[^>]*>(.*?)<\/wpgh-toolbar>/', '', $content );
-}
-
-add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\remove_content_editable' );
-
-/**
- * Remove the content editable attribute from the email's html
- *
- * @param $content string email HTML
- * @return string the filtered email content.
- */
-function remove_content_editable( $content )
-{
-    return preg_replace( "/contenteditable=\"true\"/", '', $content );
-}
-
-add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\remove_content_editable' );
-
-/**
- * Remove script tags from the email content
- *
- * @param $content string the email content
- * @return string, sanitized email content
- */
-function strip_script_tags( $content )
-{
-    return preg_replace( '/<script\b[^>]*>(.*?)<\/script>/', '', $content );
-}
-
-add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\strip_script_tags' );
-
-/**
- * Add a link to the FB group in the admin footer.
- *
- * @param $text
- * @return string|string[]|null
- */
-function add_bug_report_prompt( $text )
-{
-    if ( apply_filters( 'groundhogg/footer/show_text', true ) ){
-        return preg_replace( "/<\/span>/", sprintf( __( ' | Find a bug in Groundhogg? <a target="_blank" href="%s">Report It</a>!</span>' ), __( 'https://www.facebook.com/groups/274900800010203/' ) ), $text );
-    }
-
-    return $text;
-}
-
-add_filter('admin_footer_text', __NAMESPACE__ . '\add_bug_report_prompt');
 
 /**
  * Recount the contacts per tag...
@@ -1315,23 +1208,6 @@ function parse_email_headers( $headers )
 
     return $map;
 }
-
-
-/**
- * GHSS doesn't link the <pwlink> format so we have to fix it by removing the gl & lt
- *
- * @param $message
- * @param $key
- * @param $user_login
- * @param $user_data
- * @return string
- */
-function fix_html_pw_reset_link($message, $key, $user_login, $user_data )    {
-    $message = preg_replace( '/<(https?:\/\/.*)>/', '$1', $message );
-    return $message;
-}
-
-add_filter( 'retrieve_password_message', __NAMESPACE__ . '\fix_html_pw_reset_link', 10, 4 );
 
 /**
  * AWS Doesn't like special chars in the from name so we'll strip them out here.
@@ -1967,3 +1843,51 @@ function is_managed_page()
 {
     return get_query_var( 'pagename' ) === 'groundhogg-managed-page';
 }
+
+/**
+ * @param $icon
+ * @param string $wrap
+ * @param array $atts
+ *
+ * @return string
+ */
+function dashicon( $icon, $wrap='span', $atts = [], $echo=false )
+{
+    $atts = wp_parse_args( $atts, [
+        'class' => 'dashicons dashicons-'
+    ] );
+
+    $atts[ 'class' ] .= $icon;
+
+    $html = html()->e( $wrap, $atts, '', false );
+
+    if ( $echo ){
+        echo $html;
+    }
+
+    return $html;
+}
+
+/**
+ * Whather the current admin page is a groundhogg page.
+ *
+ * @return bool
+ */
+function is_admin_groundhogg_page(){
+    $page = get_request_var( 'page' );
+    return is_admin()  && $page && ( preg_match( '/^gh/', $page ) || $page === 'groundhogg' );
+}
+
+
+if ( ! function_exists( __NAMESPACE__ . '\is_white_labeled' ) ){
+
+    /**
+     * Whether the Groundhogg is while labeled or not.
+     *
+     * @return bool
+     */
+    function is_white_labeled(){
+        return false;
+    }
+}
+

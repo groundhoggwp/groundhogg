@@ -335,10 +335,7 @@ class Email extends Base_Object_With_Meta
      */
     public function get_merged_subject_line()
     {
-        $subject = Plugin::$instance->replacements->process(
-            $this->get_subject_line(),
-            $this->get_contact()->get_id()
-        );
+        $subject = do_replacements( $this->get_subject_line(), $this->get_contact()->get_id() );
 
         if ( $this->is_testing() ){
             $subject = sprintf( __( '[TEST] %s' ), $subject );
@@ -697,7 +694,7 @@ class Email extends Base_Object_With_Meta
         add_filter('wp_mail_content_type', [ $this, 'send_in_html' ] );
 
         $to = $this->get_to_address();
-        $subject = $this->get_subject_line();
+        $subject = $this->get_merged_subject_line();
         $content = $this->build();
 
         $headers = $this->get_headers();

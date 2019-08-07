@@ -215,7 +215,7 @@
                     parent.EmailStep.changesSaved = true;
                 }
 
-                // document.title = $( '#title' ).val();
+                $( '#send-test' ).val( false );
             } );
         },
 

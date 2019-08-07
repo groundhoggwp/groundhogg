@@ -88,7 +88,7 @@ class Event_Store
 	public function claim_events( $event_ids, $claim )
 	{
 		global $wpdb;
-		return $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->table_name} SET claim = %s WHERE ID in ( %s )", $claim, implode( ', ', $event_ids ) ) );
+		return $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET claim = %s WHERE ID in ( %s )", $claim, implode( ', ', $event_ids ) ) );
 	}
 
 	/**
