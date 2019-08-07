@@ -4,8 +4,10 @@ namespace Groundhogg\Admin\Welcome;
 use Groundhogg\Admin\Admin_Page;
 use function Groundhogg\dashicon;
 use function Groundhogg\html;
+use function Groundhogg\is_white_labeled;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
+use function Groundhogg\white_labeled_name;
 
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -87,9 +89,16 @@ class Welcome_Page extends Admin_Page
      */
     public function register()
     {
+
+        if ( is_white_labeled() ) {
+            $name = white_labeled_name() ;
+        } else {
+            $name = 'Groundhogg';
+        }
+
         $page = add_menu_page(
             'Groundhogg',
-            'Groundhogg',
+            $name ,
             'view_contacts',
             'groundhogg',
             [ $this, 'page' ],
@@ -110,7 +119,7 @@ class Welcome_Page extends Admin_Page
         $this->screen_id = $page;
 
         /* White label compat */
-        if ( apply_filters( 'wpgh_remove_welcome_page', false ) ){
+        if ( is_white_labeled() ){
             remove_submenu_page( 'groundhogg', 'groundhogg' );
         }
 
