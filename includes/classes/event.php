@@ -30,6 +30,7 @@ class Event extends Base_Object
     const WAITING = 'waiting';
     const FAILED = 'failed';
     const IN_PROGRESS = 'in_progress';
+    const PAUSED = 'paused';
 
     /**
      * Supported Event Types
@@ -452,6 +453,18 @@ class Event extends Base_Object
 
         return $this->update( [
             'status' => self::IN_PROGRESS
+        ] );
+    }
+
+    /**
+     * Mark the event as skipped
+     */
+    public function pause()
+    {
+        do_action( 'groundhogg/event/pause', $this );
+
+        return $this->update( [
+            'status' => self::PAUSED
         ] );
     }
 

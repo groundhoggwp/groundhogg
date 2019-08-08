@@ -140,6 +140,7 @@ function get_request_query( $default = [], $force=[] )
 
    $ignore = apply_filters( 'groundhogg/get_request_query/ignore', [
        'page',
+       'paged',
        'ids',
        'tab',
        'action',
@@ -1883,7 +1884,7 @@ function is_admin_groundhogg_page(){
 if ( ! function_exists( __NAMESPACE__ . '\is_white_labeled' ) ){
 
     /**
-     * Whether the Groundhogg is while labeled or not.
+     * Whether the Groundhogg is white labeled or not.
      *
      * @return bool
      */

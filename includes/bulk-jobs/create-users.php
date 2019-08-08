@@ -2,20 +2,19 @@
 namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Contact_Query;
+use function Groundhogg\create_contact_from_user;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
-use Groundhogg\Step;
+use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Add_Contacts_To_Funnel extends Bulk_Job
+class Create_Users extends Bulk_Job
 {
 
-    /**
-     * @var Step
-     */
-    protected $step = null;
+    protected $send_notification = false;
 
     /**
      * Get the action reference.
@@ -23,7 +22,7 @@ class Add_Contacts_To_Funnel extends Bulk_Job
      * @return string
      */
     function get_action(){
-        return 'add_contacts_to_funnel';
+        return 'gh_create_users';
     }
 
     /**
@@ -34,16 +33,14 @@ class Add_Contacts_To_Funnel extends Bulk_Job
      */
     public function query( $items )
     {
-        if ( ! current_user_can( 'edit_contacts' ) ){
+        if ( ! current_user_can( 'add_users' ) ){
             return $items;
         }
 
-        set_transient( 'gh_step_id', absint( get_request_var( 'step_id' ) ), HOUR_IN_SECONDS );
-
         $query = new Contact_Query();
         $args = [
-            'tags_include' => wp_parse_id_list( get_request_var( 'include_tags' ) ),
-            'tags_exclude' => wp_parse_id_list( get_request_var( 'exclude_tags' ) )
+            'tags_include' => wp_parse_id_list( get_request_var( 'tags_include' ) ),
+            'tags_exclude' => wp_parse_id_list( get_request_var( 'tags_exclude' ) )
         ];
 
         $contacts = $query->query( $args );
@@ -61,11 +58,11 @@ class Add_Contacts_To_Funnel extends Bulk_Job
      */
     public function max_items($max, $items)
     {
-        if ( ! current_user_can( 'edit_contacts' ) ){
+        if ( ! current_user_can( 'add_users' ) ){
             return $max;
         }
 
-        return min( 100, intval( ini_get( 'max_input_vars' ) ) ) ;
+        return min( 20, intval( ini_get( 'max_input_vars' ) ) ) ;
     }
 
     /**
@@ -76,7 +73,28 @@ class Add_Contacts_To_Funnel extends Bulk_Job
      */
     protected function process_item( $item )
     {
-        $this->step->enqueue( get_contactdata( absint( $item )) );
+        if ( ! current_user_can( 'add_users' ) ){
+            return;
+        }
+
+        $contact = get_contactdata( $item );
+
+        // Do no run if the contact already has a linked user account
+        if ( ! $contact || $contact->get_userdata() || email_exists( $contact->get_email() ) ){
+            return;
+        }
+
+        $uid = wp_create_user( $contact->get_email(), wp_generate_password(), $contact->get_email() );
+
+        if ( $uid && ! is_wp_error( $uid ) ){
+
+            if ( $this->send_notification ){
+                wp_new_user_notification( $uid, null, 'user' );
+            }
+
+            $contact->update( [ 'user_id' => $uid ] );
+        }
+
     }
 
     /**
@@ -85,12 +103,7 @@ class Add_Contacts_To_Funnel extends Bulk_Job
      * @return void
      */
     protected function pre_loop(){
-        $step_id = absint( get_transient( 'gh_step_id' ) );
-        $this->step = new Step( $step_id );
-
-        if ( ! $this->step->exists() ){
-            wp_send_json_error();
-        }
+        $this->send_notification = boolval( get_transient( 'gh_send_account_email' ) );
     }
 
     /**
@@ -105,10 +118,10 @@ class Add_Contacts_To_Funnel extends Bulk_Job
      *
      * @return void
      */
-    protected function clean_up()
-    {
-        delete_transient( 'gh_step_id' );
+    protected function clean_up(){
+        delete_transient( 'gh_send_account_email' );
     }
+
 
     /**
      * Get the return URL
@@ -117,10 +130,7 @@ class Add_Contacts_To_Funnel extends Bulk_Job
      */
     protected function get_return_url()
     {
-        return add_query_arg( [
-            'page' => 'gh_funnels',
-            'action' => 'edit',
-            'funnel' => $this->step->get_funnel_id(),
-        ], admin_url( 'admin.php' ) );
+        $url = admin_url( 'users.php' );
+        return $url;
     }
 }

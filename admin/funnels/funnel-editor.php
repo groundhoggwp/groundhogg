@@ -112,13 +112,13 @@ $funnel = new Funnel( $funnel_id );
                     <?php echo  html()->modal_link( [
                         'title'     => __( 'Add Contacts', 'groundhogg' ),
                         'text'      => '<span style="padding: 5px;" class="dashicons dashicons-plus-alt"></span>',
-                        'footer_button_text' => __( 'Add Contacts' ),
+                        'footer_button_text' => __( 'Close' ),
                         'id'        => '',
                         'class'     => 'add-contacts-link',
                         'source'    => 'add-contact-modal',
-                        'height'    => 400,
+                        'height'    => 500,
                         'width'     => 500,
-                        'footer'    => 'false',
+                        'footer'    => 'ture',
                     ] ); ?>
                 </div>
                 <div id="export">
@@ -237,15 +237,31 @@ $funnel = new Funnel( $funnel_id );
                     <th>
                         <?php _e( 'Select contacts to add into funnel:', 'groundhogg' ); ?>
                     </th>
-
                 </tr>
                 <tr>
                     <td>
                         <?php
 
                         echo Plugin::$instance->utils->html->tag_picker( array(
-                            'name'  => 'add_contacts_to_funnel_tag_picker[]',
-                            'id'    => 'add_contacts_to_funnel_tag_picker',
+                            'name'  => 'include_tags[]',
+                            'id'    => 'include_tags',
+                        ) );
+
+                        ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <?php _e( 'Exclude these contacts:', 'groundhogg' ); ?>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <?php
+
+                        echo Plugin::$instance->utils->html->tag_picker( array(
+                            'name'  => 'exclude_tags[]',
+                            'id'    => 'exclude_tags',
                         ) );
 
                         ?>
@@ -268,8 +284,8 @@ $funnel = new Funnel( $funnel_id );
                         }
 
                         echo Plugin::$instance->utils->html->select2( array(
-                            'name'              => 'add_contacts_to_funnel_step_picker',
-                            'id'                => 'add_contacts_to_funnel_step_picker',
+                            'name'              => 'which_step',
+                            'id'                => 'which_step',
                             'data'              => $options,
                             'multiple'          => false,
                         ) );
@@ -279,7 +295,7 @@ $funnel = new Funnel( $funnel_id );
                 </tr>
                 </tbody>
             </table>
-            <?php submit_button( __( 'Add Contacts', 'groundhogg' ) ); ?>
+            <?php submit_button( __( 'Add Contacts to Funnel', 'groundhogg' ) ); ?>
         </div>
     </form>
 </div>

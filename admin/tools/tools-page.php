@@ -3,8 +3,10 @@
 namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Admin\Tabbed_Admin_Page;
+use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\Bulk_Jobs\Delete_Contacts;
 use function Groundhogg\get_request_var;
+use function Groundhogg\html;
 use Groundhogg\Plugin;
 use \WP_Error;
 use function Groundhogg\isset_not_empty;
@@ -41,6 +43,11 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public $syncer;
 
+    /**
+     * @var Create_Users;
+     */
+    public $create_users;
+
     // Unused functions.
     public function view()
     {
@@ -71,6 +78,7 @@ class Tools_Page extends Tabbed_Admin_Page
         $this->exporter = Plugin::$instance->bulk_jobs->export_contacts;
         $this->deleter = Plugin::$instance->bulk_jobs->delete_contacts;
         $this->syncer = Plugin::$instance->bulk_jobs->sync_contacts;
+        $this->create_users = Plugin::$instance->bulk_jobs->create_users;
     }
 
     public function get_order()
@@ -161,6 +169,10 @@ class Tools_Page extends Tabbed_Admin_Page
                 'slug' => 'sync',
             ],
             [
+                'name' => __( 'Create Users' ),
+                'slug' => 'create_users',
+            ],
+            [
                 'name' => __( 'Bulk Delete Contacts' ),
                 'slug' => 'delete',
             ]
@@ -231,6 +243,84 @@ class Tools_Page extends Tabbed_Admin_Page
     public function process_sync_bulk_sync()
     {
         $this->syncer->start(); //todo
+    }
+
+    ####### CREATE USER FUNCTIONS #########
+
+    public function create_users_view()
+    {
+        ?>
+        <div class="show-upload-view">
+            <div class="upload-plugin-wrap">
+                <div class="upload-plugin">
+                    <p class="install-help"><?php _e( 'Create Users', 'groundhogg' ); ?></p>
+                    <form method="post" class="wp-upload-form">
+                        <?php wp_nonce_field(); ?>
+                        <?php echo Plugin::$instance->utils->html->input( [
+                            'type' => 'hidden',
+                            'name' => 'action',
+                            'value' => 'start',
+                        ] );
+
+                        echo html()->e( 'p', [], [
+                            __( 'Select contacts to create accounts for.', 'groundhogg' ),
+                            html()->tag_picker( [
+                                'name'              => 'tags_include[]',
+                                'id'                => 'tags_include',
+                            ] ),
+                        ] );
+
+                        echo html()->e( 'p', [], [
+                            __( 'Exclude these contacts.', 'groundhogg' ),
+                            html()->tag_picker( [
+                                'name'              => 'tags_exclude[]',
+                                'id'                => 'tags_exclude',
+                            ] ),
+                        ] );
+
+                        echo html()->e( 'p', [], [
+                            html()->checkbox( [
+                                'label'         => __( 'Send email notification to user.', 'groundhogg' ),
+                                'name'          => 'send_email_notification',
+                                'value'         => '1',
+                                'checked'       => false,
+                            ] ),
+                            '<br/>',
+                            html()->e( 'i', [], sprintf( ' (%s)', __( 'Much slower' ) ) )
+                        ] );
+
+                        ?>
+                        <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
+                            <button style="width: 100%" class="button-primary" name="start"
+                                    value="start"><?php _ex( 'Create Users', 'action', 'groundhogg' ); ?></button>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Delete all them contacts.
+     */
+    public function process_create_users_start()
+    {
+
+        if ( ! current_user_can( 'add_users' ) ){
+            $this->wp_die_no_access();
+        }
+
+        delete_transient( 'gh_send_account_email' );
+
+        if ( get_request_var( 'send_email_notification' ) ){
+            set_transient( 'gh_send_account_email', 1 );
+        }
+
+        $this->create_users->start( [
+            'tags_include' => wp_parse_id_list( get_request_var( 'tags_include' ) ),
+            'tags_exclude' => wp_parse_id_list( get_request_var( 'tags_exclude' ) ),
+        ] ); //todo
     }
 
     ####### IMPORT TAB FUNCTIONS #########
