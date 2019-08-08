@@ -49,21 +49,13 @@ class Tools_Page extends Tabbed_Admin_Page
     public $create_users;
 
     // Unused functions.
-    public function view()
-    {
-    }
+    public function view(){}
 
-    public function scripts()
-    {
-    }
+    public function scripts(){}
 
-    public function help()
-    {
-    }
+    public function help(){}
 
-    public function add_ajax_actions()
-    {
-    }
+    public function add_ajax_actions(){}
 
     protected function add_additional_actions()
     {
