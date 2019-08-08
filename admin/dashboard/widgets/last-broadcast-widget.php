@@ -6,7 +6,6 @@ use Groundhogg\Classes\Activity;
 use function Groundhogg\html;
 use function Groundhogg\key_to_words;
 use function Groundhogg\percentage;
-use function Groundhogg\words_to_key;
 
 /**
  * Created by PhpStorm.

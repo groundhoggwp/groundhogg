@@ -373,7 +373,7 @@ class Contacts_Table extends WP_List_Table {
             __( 'Edit' )
         );
 
-        if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] === 'spam' ){
+        if ( absint( get_request_var( 'optin_status' ) ) === Preferences::SPAM ){
             $actions['unspam'] = sprintf(
 		        '<a href="%s" class="unspam" aria-label="%s">%s</a>',
 		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact='. $contact->get_id() .'&action=unspam')),
@@ -381,7 +381,7 @@ class Contacts_Table extends WP_List_Table {
 		        esc_attr( sprintf( _x( 'Mark %s as approved.', 'action', 'groundhogg' ), $title ) ),
 		        __( 'Approve' )
 	        );
-        } else if ( isset( $_REQUEST['optin_status'] ) && $_REQUEST[ 'optin_status' ] === 'bounce' ){
+        } else if ( absint( get_request_var( 'optin_status' ) ) === Preferences::HARD_BOUNCE ){
 	        $actions['unbounce'] = sprintf(
 		        '<a href="%s" class="unbounce" aria-label="%s">%s</a>',
 		        wp_nonce_url(admin_url('admin.php?page=gh_contacts&contact='. $contact->get_id() .'&action=unbounce')),

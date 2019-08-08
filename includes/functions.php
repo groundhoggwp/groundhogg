@@ -1005,13 +1005,14 @@ function create_contact_from_user($user, $sync_meta = false )
         return false;
     }
 
-    $contact = get_contactdata( $user->ID, true );
+    $contact = get_contactdata( $user->user_email );
 
     /**
      * Do not continue if the contact already exists. Just return it...
      */
     if ( $contact && $contact->exists() ){
         $contact->update( [ 'user_id' => $user->ID ] );
+        $contact->update_meta( 'user_login', $user->user_login );
         return $contact;
     }
 
