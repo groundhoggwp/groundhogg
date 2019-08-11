@@ -44,6 +44,14 @@ class Funnels_Page extends Admin_Page
         add_action( 'wp_ajax_gh_add_contacts_to_funnel',  array( $this, 'add_contacts_to_funnel' ) );
     }
 
+	/**
+	 * @return bool
+	 */
+    public function is_v2()
+    {
+        return absint( get_request_var( 'version' ) ) === 2;
+    }
+
     public function admin_title($admin_title, $title)
     {
         switch ( $this->get_current_action() ){
@@ -138,14 +146,21 @@ class Funnels_Page extends Admin_Page
 //           wp_enqueue_script( 'groundhogg-admin-link-picker' );
            wp_enqueue_script( 'sticky-sidebar' );
 
-           wp_enqueue_style(  'groundhogg-admin-funnel-editor' );
-           wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
+           if ( $this->is_v2() ){
+	           wp_enqueue_style(  'groundhogg-admin-funnel-editor-v2' );
+	           wp_enqueue_script( 'groundhogg-admin-funnel-editor-v2' );
+	           wp_localize_script( 'groundhogg-admin-funnel-editor-v2', 'Funnel', [
+		           'id' => absint( get_request_var( 'funnel' ) )
+	           ] );
+           } else {
+	           wp_enqueue_style(  'groundhogg-admin-funnel-editor' );
+	           wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
+	           wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
+		           'id' => absint( get_request_var( 'funnel' ) )
+	           ] );
+           }
 
-           wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
-               'id' => absint( get_request_var( 'funnel' ) )
-           ] );
-
-           wp_enqueue_script( 'jquery-flot' );
+	       wp_enqueue_script( 'jquery-flot' );
            wp_enqueue_script( 'jquery-flot-categories' );
 
            wp_enqueue_script( 'groundhogg-admin-replacements' );
@@ -854,6 +869,11 @@ class Funnels_Page extends Admin_Page
 	public function edit(){
         if ( ! current_user_can( 'edit_funnels' ) ){
             $this->wp_die_no_access();
+        }
+
+        if ( $this->is_v2() ){
+	        include dirname(__FILE__) . '/funnel-editor-v2.php';
+	        return;
         }
 
 		include dirname(__FILE__) . '/funnel-editor.php';

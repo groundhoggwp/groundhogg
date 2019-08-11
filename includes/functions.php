@@ -877,7 +877,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     // Hard set X-Mailer cuz we taking credit for this.
     $phpmailer->XMailer = sprintf( 'Groundhogg %s (https://www.groundhogg.io)', GROUNDHOGG_VERSION );
 
-    if ( $content_type === 'text/html' &&  empty( $phpmailer->AltBody ) ){
+    if ( $content_type === 'text/html' && empty( $phpmailer->AltBody ) ){
         $phpmailer->AltBody = wp_strip_all_tags( $message );
     }
 

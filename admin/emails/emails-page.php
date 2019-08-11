@@ -524,6 +524,14 @@ class Emails_Page extends Admin_Page
         $email->update_meta( 'browser_view', boolval( Groundhogg\get_request_var( 'browser_view' ) ) );
         $email->update_meta( 'reply_to_override', sanitize_email( Groundhogg\get_request_var( 'reply_to_override' ) ) );
 
+        if ( Groundhogg\get_request_var( 'use_custom_alt_body' ) ){
+            $email->update_meta( 'use_custom_alt_body', 1 );
+            $email->update_meta( 'alt_body', sanitize_textarea_field( Groundhogg\get_request_var( 'alt_body' ) ) );
+        } else {
+            $email->delete_meta( 'use_custom_alt_body' );
+            $email->delete_meta( 'alt_body' );
+        }
+
         if ( Groundhogg\get_request_var( 'update_and_test' ) ){
 
             if ( ! current_user_can( 'send_emails' ) ){

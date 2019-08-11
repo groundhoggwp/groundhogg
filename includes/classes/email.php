@@ -165,12 +165,40 @@ class Email extends Base_Object_With_Meta
         return $this->event;
     }
 
+	/**
+	 * @return string
+	 */
+    public function get_alt_body()
+    {
+    	if ( $this->has_custom_alt_body() ){
+    		return $this->get_meta( 'alt_body' );
+	    }
+
+    	return $this->strip_html_tags( $this->get_content() );
+    }
+
+	/**
+	 * @return string
+	 */
+    public function get_merged_alt_body()
+    {
+    	return do_replacements( $this->get_alt_body(), $this->get_contact()->get_id() );
+    }
+
     /**
      * @return bool
      */
     public function is_draft()
     {
         return $this->get_status() === 'draft';
+    }
+
+	/**
+	 * @return bool
+	 */
+    public function has_custom_alt_body()
+    {
+    	return boolval( $this->get_meta( 'use_custom_alt_body' ) );
     }
 
     /**
@@ -823,7 +851,7 @@ class Email extends Base_Object_With_Meta
     /**
      * Set the plain text version of the email
      *
-     * @param $phpmailer \PHPMailer|\GH_SS_Mailer
+     * @param $phpmailer \PHPMailer|GH_SS_Mailer
      */
     public function set_plaintext_body( $phpmailer ) {
 
@@ -833,8 +861,7 @@ class Email extends Base_Object_With_Meta
         }
 
         // set AltBody
-        $text_message = $this->strip_html_tags( $phpmailer->Body );
-        $phpmailer->AltBody = $text_message;
+        $phpmailer->AltBody = $this->get_merged_alt_body();
     }
 
     /**
@@ -876,7 +903,7 @@ class Email extends Base_Object_With_Meta
             $text );
 
         // strip all remaining HTML tags
-        $text = strip_tags( $text );
+        $text = wp_strip_all_tags( $text );
 
         // trim text
         $text = trim( $text );

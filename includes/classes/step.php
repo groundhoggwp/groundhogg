@@ -458,6 +458,18 @@ class Step extends Base_Object_With_Meta implements Event_Process
         return $this->get_id() . '_' . esc_attr( $name );
     }
 
+	/**
+	 * Output the HTML of a step.
+	 */
+	public function sortable_item()
+	{
+		if ( has_action( "groundhogg/steps/{$this->get_type()}/sortable" ) ){
+			do_action( "groundhogg/steps/{$this->get_type()}/sortable", $this );
+		} else {
+			do_action( "groundhogg/steps/error/sortable", $this );
+		}
+	}
+
     /**
      * Output the HTML of a step.
      */
@@ -469,6 +481,18 @@ class Step extends Base_Object_With_Meta implements Event_Process
             do_action( "groundhogg/steps/error/html", $this );
         }
     }
+
+	/**
+	 * Output the HTML of a step.
+	 */
+	public function html_v2()
+	{
+		if ( has_action( "groundhogg/steps/{$this->get_type()}/html_v2" ) ){
+			do_action( "groundhogg/steps/{$this->get_type()}/html_v2", $this );
+		} else {
+			do_action( "groundhogg/steps/error/html_v2", $this );
+		}
+	}
 
     /**
      * Save the step

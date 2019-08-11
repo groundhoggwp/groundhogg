@@ -54,17 +54,15 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
             </div>
             <div class="status-options">
                 <div id="status">
-                    <div id="template-save" style="margin: 3px 10px 0 0;">
-                        <?php echo Plugin::$instance->utils->html->checkbox( [
-                            'label'         => __( 'Save as template', 'groundhogg' ),
-                            'name'          => 'save_as_template',
-                            'id'            => 'save_as_template',
-                            'class'         => '',
-                            'value'         => '1',
-                            'checked'       => $email->is_template(),
-                        ] ); ?>
-                    </div>
                     <?php Plugin::$instance->replacements->show_replacements_button( true ); ?>&nbsp;
+                    <?php echo html()->modal_link( [
+	                    'title'     => __( 'Alt-Body', 'groundhogg' ),
+	                    'text'      => __( 'Alt-Body', 'groundhogg' ),
+	                    'footer_button_text' => __( 'Done' ),
+	                    'source'    => 'alt-body',
+	                    'height'    => 600,
+	                    'width'     => 600,
+                    ] ); ?>
                     <?php echo Plugin::$instance->utils->html->toggle( [
                         'name'          => 'editor_view',
                         'id'            => 'editor-toggle',
@@ -176,6 +174,16 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                                                 </select>
                                             </td>
                                         </tr>
+                                        <div id="template-save" style="margin: 3px 10px 0 0;">
+	                                        <?php echo Plugin::$instance->utils->html->checkbox( [
+		                                        'label'         => __( 'Save as template', 'groundhogg' ),
+		                                        'name'          => 'save_as_template',
+		                                        'id'            => 'save_as_template',
+		                                        'class'         => '',
+		                                        'value'         => '1',
+		                                        'checked'       => $email->is_template(),
+	                                        ] ); ?>
+                                        </div>
                                         <script>
                                             jQuery(function($){$("#send_test").on( 'input', function(){
                                                 $("#send-to").toggleClass( 'hidden' );
@@ -299,6 +307,39 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                 <!-- Saved Content -->
                 <div class="hidden">
                     <textarea id="content" name="content"><?php echo $email->get_content(); ?></textarea>
+                </div>
+
+                <div class="hidden">
+                    <div id="alt-body" class="no-padding">
+                        <p>
+                            <?php
+
+                            echo html()->e( 'b', [],  __( 'Use this custom Alt Body text', 'groundhogg' ) );
+                            echo '<br/>';
+                            echo html()->checkbox( [
+	                            'label'         => __( 'Enable' ),
+	                            'name'          => 'use_custom_alt_body',
+	                            'value'         => 1,
+	                            'checked'       => $email->get_meta( 'use_custom_alt_body' ),
+                            ] );
+                            echo '<br/>';
+                            echo html()->e( 'i', [],  __( 'If left un-enable an alt-body will be auto-generated.', 'groundhogg' ) );
+                            ?>
+                        </p>
+                        <p>
+                            <textarea name="alt_body" style="width: 100%" rows="16"><?php
+
+                            $alt_body = $email->get_meta( 'alt_body' );
+
+                            if ( ! $alt_body ){
+                                $alt_body = sanitize_textarea_field( $email->get_content() );
+                            }
+
+                            esc_html_e( $alt_body );
+
+                            ?></textarea>
+                        </p>
+                    </div>
                 </div>
 
             </div>

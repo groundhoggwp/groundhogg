@@ -36,14 +36,14 @@
     width: 100% !important;
 }
 
+.html-view #postbox-container-1{
+    display: none;
+}
+
 #poststuff #post-body.columns-2{
     margin-left: 400px;
     margin-right: 0 !important;
     border-left: 1px solid #e5e5e5;
-}
-
-.html-view #postbox-container-1{
-    display: none;
 }
 
 #post-body.columns-2 #postbox-container-1 {

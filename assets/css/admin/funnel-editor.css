@@ -1,3 +1,25 @@
+
+/* Full Screen */
+.full-screen #adminmenumain,
+.full-screen #wpadminbar{
+    display: none;
+}
+
+.full-screen #wpcontent{
+    margin: 0;
+}
+
+html.full-screen{
+    padding: 0;
+}
+
+.full-screen .funnel-editor-header{
+    top: 0;
+}
+
+/* END Full Screen */
+
+
 /* NEW STUFF */
 #wpbody-content{
     /*height: 100vh;*/

@@ -3,6 +3,7 @@ namespace Groundhogg\Steps;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use function Groundhogg\dashicon;
 use function Groundhogg\ensure_array;
 use function Groundhogg\html;
 use Groundhogg\Event;
@@ -75,8 +76,14 @@ abstract class Funnel_Step extends Supports_Errors
              */
             add_filter("groundhogg/steps/{$this->get_group()}s", [$this, 'register']);
 
+	        add_action("groundhogg/steps/{$this->get_type()}/sortable", [$this, 'pre_html'], 1 );
+	        add_action("groundhogg/steps/{$this->get_type()}/sortable", [$this, 'sortable_item'] );
+
             add_action("groundhogg/steps/{$this->get_type()}/html", [$this, 'pre_html'], 1 );
+            add_action("groundhogg/steps/{$this->get_type()}/html_V2", [$this, 'pre_html'], 1 );
+
             add_action("groundhogg/steps/{$this->get_type()}/html", [$this, 'html']);
+            add_action("groundhogg/steps/{$this->get_type()}/html_v2", [$this, 'html_v2']);
 
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'pre_save'], 1 );
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'save'], 11 );
@@ -546,19 +553,17 @@ abstract class Funnel_Step extends Supports_Errors
         return 'https://docs.groundhogg.io';
     }
 
-    /**
-     * @param $step Step
-     */
-    public function html( $step ){
-
-        $closed = $step->get_meta( 'is_closed' ) ? 'closed' : '' ;
+	/**
+	 * @param $step Step
+	 */
+    public function sortable_item( $step )
+    {
 
         ?>
-        <div data-type="<?php esc_attr_e( $this->get_type() ); ?>" title="<?php echo $step->get_title() ?>" id="<?php echo $step->get_id(); ?>" class="postbox step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php echo $closed; ?>">
-            <button type="button" class="handlediv collapse"><span class="toggle-indicator" aria-hidden="true"></span></button>
-            <input type="hidden" class="collapse-input" name="<?php echo $this->setting_name_prefix( 'closed' ); ?>" value="<?php echo $this->get_setting( 'is_closed' ); ?>">
+        <div data-type="<?php esc_attr_e( $this->get_type() ); ?>" title="<?php echo $step->get_title() ?>" id="<?php echo $step->get_id(); ?>" class="postbox step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?>">
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
 
+            <span class="actions">
             <!-- DELETE -->
             <button title="Delete" type="button" class="handlediv delete-step">
                 <span class="dashicons dashicons-trash"></span>
@@ -571,47 +576,44 @@ abstract class Funnel_Step extends Supports_Errors
             <button title="Help" type="button" class="handlediv help">
                 <?php echo html()->help_icon( $this->get_help_article() ); ?>
             </button>
+
+            <button title="Add Step" type="button" class="add-step button-secondary">
+                <?php echo dashicon( 'plus' ); ?>
+            </button>
+            </span>
             <!-- HNDLE -->
             <h2 class="hndle ui-sortable-handle">
                 <img class="hndle-icon" width="50" src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
 
-                <?php $args = array(
-                    'id'    => $this->setting_id_prefix( 'title' ),
-                    'name'  => $this->setting_name_prefix( 'title' ),
-                    'value' => __( $step->get_title(), 'groundhogg' ),
-                    'title' => __( 'Step Title', 'groundhogg' ),
-                );
+                <span>
+	                <?php $args = array(
+		                'id'    => $this->setting_id_prefix( 'title' ),
+		                'name'  => $this->setting_name_prefix( 'title' ),
+		                'value' => __( $step->get_title(), 'groundhogg' ),
+		                'title' => __( 'Step Title', 'groundhogg' ),
+		                'class' => 'step-title'
+	                );
 
-                echo Plugin::$instance->utils->html->input( $args ); ?>
-
-                <?php if( Plugin::$instance->settings->is_global_multisite() ): ?>
-                    <!-- MULTISITE BLOG OPTION -->
-                    <div class="wpmu-options">
-                        <label style="padding-left: 30px">
-                            <?php _e( 'Run on which blog?', 'groundhogg' ); ?>
-                            <?php
-
-                            $sites = get_sites();
-
-                            $options = array();
-                            foreach ( $sites as $site ){
-                                $options[ $site->blog_id ] = get_blog_details($site->blog_id)->blogname;
-                            }
-
-                            echo Plugin::$instance->utils->html->dropdown( array(
-                                'id'     => $this->setting_id_prefix( 'blog_id' ),
-                                'name'   => $this->setting_name_prefix( 'blog_id' ),
-                                'options' => $options,
-                                'selected' => $step->get_meta( 'blog_id' ),
-                                'option_none' => __( 'Any blog', 'groundhogg' )
-                            ) );
-
-                            ?>
-                        </label>
-                    </div>
-                    <!-- END MULTISITE BLOG OPTION -->
-                <?php endif; ?>
+	                echo Plugin::$instance->utils->html->input( $args );
+	                echo "<br/>";
+	                echo html()->e( 'span', [
+		                'class' => 'step-name',
+	                ],  $this->get_name() );
+	                ?>
+                </span>
+                <div class="wp-clearfix"></div>
             </h2>
+        </div>
+        <?php
+
+    }
+
+    /**
+     * @param $step Step
+     */
+    public function html_v2( $step ){
+        ?>
+        <div data-type="<?php esc_attr_e( $this->get_type() ); ?>" title="<?php echo $step->get_title() ?>" id="settings-<?php echo $step->get_id(); ?>" class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> hidden">
             <!-- INSIDE -->
             <div class="inside">
                 <!-- SETTINGS -->
@@ -639,7 +641,100 @@ abstract class Funnel_Step extends Supports_Errors
         <?php
     }
 
-    /**
+	/**
+	 * @param $step Step
+	 */
+	public function html( $step ){
+
+		$closed = $step->get_meta( 'is_closed' ) ? 'closed' : '' ;
+
+		?>
+        <div data-type="<?php esc_attr_e( $this->get_type() ); ?>" title="<?php echo $step->get_title() ?>" id="<?php echo $step->get_id(); ?>" class="postbox step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php echo $closed; ?>">
+            <button type="button" class="handlediv collapse"><span class="toggle-indicator" aria-hidden="true"></span></button>
+            <input type="hidden" class="collapse-input" name="<?php echo $this->setting_name_prefix( 'closed' ); ?>" value="<?php echo $this->get_setting( 'is_closed' ); ?>">
+            <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
+
+            <!-- DELETE -->
+            <button title="Delete" type="button" class="handlediv delete-step">
+                <span class="dashicons dashicons-trash"></span>
+            </button>
+            <!-- DUPLICATE -->
+            <button title="Duplicate" type="button" class="handlediv duplicate-step">
+                <span class="dashicons dashicons-admin-page"></span>
+            </button>
+            <!-- HELP -->
+            <button title="Help" type="button" class="handlediv help">
+				<?php echo html()->help_icon( $this->get_help_article() ); ?>
+            </button>
+            <!-- HNDLE -->
+            <h2 class="hndle ui-sortable-handle">
+                <img class="hndle-icon" width="50" src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
+
+				<?php $args = array(
+					'id'    => $this->setting_id_prefix( 'title' ),
+					'name'  => $this->setting_name_prefix( 'title' ),
+					'value' => __( $step->get_title(), 'groundhogg' ),
+					'title' => __( 'Step Title', 'groundhogg' ),
+				);
+
+				echo Plugin::$instance->utils->html->input( $args ); ?>
+
+				<?php if( Plugin::$instance->settings->is_global_multisite() ): ?>
+                    <!-- MULTISITE BLOG OPTION -->
+                    <div class="wpmu-options">
+                        <label style="padding-left: 30px">
+							<?php _e( 'Run on which blog?', 'groundhogg' ); ?>
+							<?php
+
+							$sites = get_sites();
+
+							$options = array();
+							foreach ( $sites as $site ){
+								$options[ $site->blog_id ] = get_blog_details($site->blog_id)->blogname;
+							}
+
+							echo Plugin::$instance->utils->html->dropdown( array(
+								'id'     => $this->setting_id_prefix( 'blog_id' ),
+								'name'   => $this->setting_name_prefix( 'blog_id' ),
+								'options' => $options,
+								'selected' => $step->get_meta( 'blog_id' ),
+								'option_none' => __( 'Any blog', 'groundhogg' )
+							) );
+
+							?>
+                        </label>
+                    </div>
+                    <!-- END MULTISITE BLOG OPTION -->
+				<?php endif; ?>
+            </h2>
+            <!-- INSIDE -->
+            <div class="inside">
+                <!-- SETTINGS -->
+				<?php //TODO Reporting enabled? ?>
+                <div class="step-edit <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? 'hidden' : '' ; ?>">
+                    <div class="custom-settings">
+						<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
+						<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
+						<?php $this->settings( $step ); ?>
+						<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
+						<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
+                    </div>
+                </div>
+                <!-- REPORTING  -->
+				<?php //TODO Reporting enabled? ?>
+                <div class="step-reporting <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden' ; ?>">
+					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
+					<?php do_action( 'groundhogg/steps/reporting/before', $step ); ?>
+					<?php $this->reporting( $step ); ?>
+					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
+					<?php do_action( 'groundhogg/steps/reporting/after', $step ); ?>
+                </div>
+            </div>
+        </div>
+		<?php
+	}
+
+	/**
      * Initialize the posted settings array
      *
      * @param $step Step

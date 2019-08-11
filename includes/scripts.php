@@ -113,7 +113,10 @@ class Scripts
         wp_register_script('groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'js/admin/inline-edit-contacts' . $IS_MINIFIED . '.js', ['jquery', 'groundhogg-admin'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'js/admin/dashboard' . $IS_MINIFIED . '.js', ['jquery', 'papaparse'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/email-editor' . $IS_MINIFIED . '.js', ['jquery', 'sticky-sidebar', 'jquery-ui-resizable', 'groundhogg-admin-functions' ], GROUNDHOGG_VERSION, true);
+
         wp_register_script('groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor' . $IS_MINIFIED . '.js', ['jquery', 'groundhogg-admin-functions', 'sticky-sidebar' ], GROUNDHOGG_VERSION, true);
+        wp_register_script('groundhogg-admin-funnel-editor-v2', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor-v2' . $IS_MINIFIED . '.js', ['jquery', 'groundhogg-admin-functions', 'sticky-sidebar' ], GROUNDHOGG_VERSION, true);
+
         wp_register_script('groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'js/admin/form-builder' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-iframe', GROUNDHOGG_ASSETS_URL . 'js/admin/iframe-checker' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, false);
         wp_register_script('groundhogg-admin-import-export', GROUNDHOGG_ASSETS_URL . 'js/admin/import-export' . $IS_MINIFIED . '.js', ['jquery', 'papaparse'], GROUNDHOGG_VERSION, true);
@@ -173,6 +176,7 @@ class Scripts
         wp_register_style('groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/contact-editor.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor.css', [], GROUNDHOGG_VERSION);
+        wp_register_style('groundhogg-admin-funnel-editor-v2', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor-v2.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'css/admin/dashboard.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-modal', GROUNDHOGG_ASSETS_URL . 'css/admin/modal.css', ['wp-color-picker'], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-extensions', GROUNDHOGG_ASSETS_URL . 'css/admin/extensions.css', [], GROUNDHOGG_VERSION);

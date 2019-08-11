@@ -2,7 +2,7 @@
 
     $.extend( funnel, {
 
-        editorID: '#normal-sortables',
+        editorID: '#funnel-form',
         editor: null,
         sortables: null,
         draggables: null,
@@ -22,6 +22,25 @@
             /* Bind Delete */
             this.editor.on( 'click', 'button.delete-step', function ( e ) {
                 self.deleteStep( this );
+            } );
+
+            this.editor.on( 'click', '#postbox-container-1 .step', function ( e ) {
+
+                console.log(e);
+
+                var $postbox = $(this);
+
+
+                $( '.step-settings .step' ).addClass( 'hidden' );
+                $( '#postbox-container-1 .step' ).removeClass( 'active' );
+
+                var id = '#settings-' + $postbox.attr( 'id' );
+
+                console.log(id);
+
+                $( id ).removeClass( 'hidden' );
+                $postbox.addClass( 'active' );
+
             } );
 
             /* Bind Duplicate */
@@ -57,7 +76,6 @@
 
             if ( window.innerWidth > 600 ){
                 this.makeSortable();
-                this.makeDraggable();
             }
 
             this.initReporting();
@@ -77,21 +95,6 @@
                 prompt( "Copy this link.", $('#share-link').val() );
             });
 
-            $( document ).on( 'click', '.postbox .collapse', function ( e ) {
-                var $step = $( this.parentNode );
-                if ( $step.hasClass( 'closed' ) ){
-                    self.expandStep( $step );
-                } else {
-                    self.collapseStep( $step );
-                }
-            } );
-
-            $( '#postbox-container-1 .hndle' ).click( function ( e ) {
-                var $metabox = $( this.parentNode );
-                $metabox.toggleClass( 'closed' );
-                self.sidebar.updateSticky();
-            })
-
         },
 
         editorSizing: function (){
@@ -99,10 +102,10 @@
             $( '#postbox-container-2').height( $('#wpbody').height() - 80 );
             // $( '#postbox-container-1' ).height( $(window).height() - (32 - 56));
 
-            this.sidebar = new StickySidebar( '#postbox-container-1' , {
-                // topSpacing: $( 'html' ).hasClass( 'full-screen' ) ? 47 : 78,
-                bottomSpacing: 0
-            });
+            // this.sidebar = new StickySidebar( '#postbox-container-1' , {
+            //     // topSpacing: $( 'html' ).hasClass( 'full-screen' ) ? 47 : 78,
+            //     bottomSpacing: 0
+            // });
 
             $( '#normal-sortables' ).css( 'visibility', 'visible' );
         },
@@ -207,43 +210,6 @@
             $(document).trigger('new-step');
         },
 
-        /**
-         * The callback when the draggable event is finished. Dragging in a new step
-         *
-         * @param e
-         */
-        convertDraggableToStep: function ( e ) {
-
-            var step_type = e.id;
-
-            if ( this.insertDummyStep('.ui-draggable') ){
-
-                var order = $('.step').index($('#temp-step')) + 1;
-                var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order, funnel_id:funnel.id};
-                this.getStepHtml( data );
-            }
-        },
-
-        /**
-         * Initializes the draggable state of the steps
-         */
-        makeDraggable: function () {
-            var self=this;
-
-            this.draggables = $(".ui-draggable").draggable({
-                connectToSortable: ".ui-sortable",
-                helper: "clone",
-                stop: function ( e, ui ) {
-                    /* double check we dropped in a step... */
-                    if ( ui.helper.closest( '#normal-sortables' ).length > 0 ){
-                        console.log( ui.helper.parent() );
-                        self.convertDraggableToStep( this )
-                    }
-
-                }
-            });
-        },
-
         makeSortable: function () {
             this.sortables = $(".ui-sortable").sortable({
                 placeholder: "sortable-placeholder",
@@ -317,49 +283,6 @@
                 self.replaceDummyStep(self.curHTML);
             } );
         },
-
-        addContacts: function () {
-
-            var tags    = $( '#add_contacts_to_funnel_tag_picker' ).val();
-
-            if ( ! tags ){
-                alert( 'Please select at least 1 tag.' );
-                return;
-            }
-
-            var stepId = $( '#add_contacts_to_funnel_step_picker' ).val();
-
-            if ( ! stepId ){
-                alert( 'Please select at funnel step.' );
-                return;
-            }
-
-            showSpinner();
-            adminAjaxRequest( { action: 'gh_add_contacts_to_funnel', tags: tags, step: stepId }, function ( response ) {
-                hideSpinner();
-            } );
-        },
-
-        /**
-         * Collapse a step
-         *
-         * @param $step jQuery object
-         */
-        collapseStep: function( $step ) {
-            console.log( $step );
-            $step.addClass( 'closed' );
-            $step.find( '.collapse-input' ).val( '1' )
-        },
-
-        /**
-         * Expand a step
-         *
-         * @param $step jQuery object
-         */
-        expandStep: function( $step ) {
-            $step.removeClass( 'closed' );
-            $step.find( '.collapse-input' ).val( '' )
-        }
     } );
 
     $(function(){

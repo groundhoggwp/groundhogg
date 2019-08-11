@@ -147,82 +147,19 @@ $funnel = new Funnel( $funnel_id );
         </div>
     </div>
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
+	    <?php Plugin::$instance->notices->print_notices(); ?>
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
             <div id="postbox-container-1" class="postbox-container sidebar">
-                <div id='benchmarks' class="postbox">
-                    <button title="Help" type="button" class="handlediv help">
-		                <?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/builder/benchmarks/' ); ?>
-                    </button>
-                    <h2 class="hndle"><?php echo __( 'Benchmarks', 'groundhogg' );?></h2>
-                    <div class="elements-inner inside">
-                        <table>
-                            <tbody>
-                            <tr><?php
-                                $benchmarks = Plugin::$instance->step_manager->get_benchmarks();
-                                $i = 0;
-                                foreach ( $benchmarks as $benchmark ):
-                                    if ( ( $i % 3 ) == 0 ):
-                                        ?></tr><tr><?php
-                                    endif;
-                                    ?><td><div id='<?php echo $benchmark->get_type(); ?>' title="<?php esc_attr_e( $benchmark->get_description() ); ?>" class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $benchmark->get_icon() ); ?>"></div><p><?php echo $benchmark->get_name()  ?></p></div></td><?php
-                                    $i++;
-
-                                endforeach;
-
-                            ?></tr>
-                            </tbody>
-                        </table>
-                        <p>
-                            <?php echo esc_html__( 'Benchmarks start and stop automation steps for a contact.','groundhogg' ); ?>
-                        </p>
-                    </div>
+                <div class="ui-sortable">
+	                <?php foreach ( $funnel->get_steps() as $step ): ?>
+		                <?php $step->sortable_item(); ?>
+	                <?php endforeach; ?>
                 </div>
-                <!-- End Benchmark Icons-->
-                <!-- Begin Action Icons-->
-                <div id='actions' class="postbox">
-                    <button title="Help" type="button" class="handlediv help">
-		                <?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/builder/actions/' ); ?>
-                    </button>
-                    <h2 class="hndle"><?php echo __( 'Actions', 'groundhogg' );?></h2>
-                    <div class="inside">
-                        <table>
-                            <tbody>
-                            <tr><?php
-                                $actions = Plugin::$instance->step_manager->get_actions();
-                                $i = 0;
-                                foreach ( $actions as $action ):
-                                if ( ( $i % 3 ) == 0 ):
-                                ?></tr><tr><?php
-                                endif;
-                                ?><td><div id='<?php echo $action->get_type(); ?>' title="<?php esc_attr_e( $action->get_description() ); ?>" class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $action->get_icon() ); ?>"></div><p><?php echo $action->get_name()  ?></p></div></td><?php
-                                $i++;
-
-                                endforeach;
-
-                                ?></tr>
-                            </tbody>
-                        </table>
-                        <p>
-                            <?php esc_html_e( 'Actions are launched whenever a contact completes a benchmark.','groundhogg' ); ?>
-                        </p>
-                    </div>
-
-                </div>
-                <!-- End Action Icons-->
             </div>
-            <?php Plugin::$instance->notices->print_notices(); ?>
-            <div style="width: 100%">
-                <?php include_once dirname( __FILE__ ) . '/reporting.php'; ?>
-            </div>
-            <div class="funnel-saving hidden"></div>
-            <div  id="postbox-container-2" class="postbox-container funnel-editor">
-                <div style="visibility: hidden" id="normal-sortables" class="meta-box-sortables ui-sortable">
-                    <?php $steps = $funnel->get_steps();
-                        foreach ( $steps as $i => $step ):
-                            $step->html();
-                            // echo $step;
-                        endforeach;?>
-                </div>
+            <div id="postbox-container-2" class="postbox-container step-settings">
+	            <?php foreach ( $funnel->get_steps() as $step ): ?>
+		            <?php $step->html_v2(); ?>
+	            <?php endforeach; ?>
             </div>
             <div style="clear: both;"></div>
         </div>
