@@ -165,6 +165,59 @@ $funnel = new Funnel( $funnel_id );
         </div>
     </div>
 </form>
+<div class="hidden" id="steps">
+    <div id='benchmarks'>
+        <?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/builder/benchmarks/' ); ?>
+        <h2><?php echo __( 'Benchmarks', 'groundhogg' );?></h2>
+        <p><?php echo esc_html__( 'Benchmarks start and stop automation steps for a contact.','groundhogg' ); ?></p>
+        <div class="elements-inner inside">
+            <table>
+                <tbody>
+                <tr><?php
+					$benchmarks = Plugin::$instance->step_manager->get_benchmarks();
+					$i = 0;
+					foreach ( $benchmarks as $benchmark ):
+					if ( ( $i % 4 ) == 0 ):
+					?></tr><tr><?php
+					endif;
+					?><td class="step-icon"><div id='<?php echo $benchmark->get_type(); ?>' title="<?php esc_attr_e( $benchmark->get_description() ); ?>" class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $benchmark->get_icon() ); ?>"></div><p><?php echo $benchmark->get_name()  ?></p></div></td><?php
+					$i++;
+
+					endforeach;
+
+					?></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr/>
+    <div id='actions'>
+        <?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/builder/actions/' ); ?>
+        <h2 class="hndle"><?php echo __( 'Actions', 'groundhogg' );?></h2>
+        <p><?php esc_html_e( 'Actions are launched whenever a contact completes a benchmark.','groundhogg' ); ?></p>
+        <div class="inside">
+            <table>
+                <tbody>
+                <tr><?php
+					$actions = Plugin::$instance->step_manager->get_actions();
+					$i = 0;
+					foreach ( $actions as $action ):
+					if ( ( $i % 4 ) == 0 ):
+					?></tr><tr><?php
+					endif;
+					?><td class="step-icon"><div id='<?php echo $action->get_type(); ?>' title="<?php esc_attr_e( $action->get_description() ); ?>" class="wpgh-element ui-draggable"><div class="step-icon"><img width="60" src="<?php echo esc_url( $action->get_icon() ); ?>"></div><p><?php echo $action->get_name()  ?></p></div></td><?php
+					$i++;
+
+					endforeach;
+
+					?></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <!-- End Action Icons-->
+</div>
 <div class="hidden" id="add-contact-modal" style="display: none;">
     <form method="post">
         <?php wp_nonce_field(); ?>

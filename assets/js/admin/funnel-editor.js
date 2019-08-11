@@ -100,7 +100,7 @@
             // $( '#postbox-container-1' ).height( $(window).height() - (32 - 56));
 
             this.sidebar = new StickySidebar( '#postbox-container-1' , {
-                // topSpacing: $( 'html' ).hasClass( 'full-screen' ) ? 47 : 78,
+                topSpacing: $( 'html' ).hasClass( 'full-screen' ) ? 47 : 78,
                 bottomSpacing: 0
             });
 

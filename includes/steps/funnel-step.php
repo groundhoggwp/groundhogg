@@ -577,9 +577,22 @@ abstract class Funnel_Step extends Supports_Errors
                 <?php echo html()->help_icon( $this->get_help_article() ); ?>
             </button>
 
-            <button title="Add Step" type="button" class="add-step button-secondary">
-                <?php echo dashicon( 'plus' ); ?>
-            </button>
+            <?php
+                echo html()->modal_link( [
+	                'title'     => __( 'Add Step' ),
+	                'text'      => dashicon( 'plus' ),
+	                'footer_button_text' => __( 'Cancel' ),
+	                'class'     => 'add-step button button-secondary',
+	                'source'    => 'steps',
+	                'height'    => 700,
+	                'width'     => 500,
+	                'footer'    => 'true',
+	                'preventSave'    => 'true',
+                ] );
+            ?>
+<!--            <a title="Add Step" type="button" class="add-step button-secondary">-->
+<!--                --><?php //echo dashicon( 'plus' ); ?>
+<!--            </a>-->
             </span>
             <!-- HNDLE -->
             <h2 class="hndle ui-sortable-handle">

@@ -2,74 +2,77 @@
 
     $.extend( funnel, {
 
-        editorID: '#funnel-form',
-        editor: null,
         sortables: null,
-        draggables: null,
-        curStep: null,
-        curHTML: null,
-        curOrder: 0,
         reportData: null,
-        sidebar: null,
 
         init: function () {
 
             var self = this;
 
-            /* Create Editor */
-            this.editor = $( this.editorID );
+            var $document = $( document );
+            var $form = $('#funnel-form');
+            var $steps = $( '#postbox-container-1' );
+            var $settings = $( '.step-settings' );
+
+            $document.on( 'click', '#postbox-container-1 .step', function ( e ) {
+                $settings.find( '.step' ).addClass( 'hidden' );
+                $settings.find( '.step' ).removeClass( 'active' );
+
+                $steps.find( '.step' ).removeClass( 'active' );
+
+                var $postbox = $(this);
+                $postbox.addClass( 'active' );
+
+                var id = '#settings-' + $postbox.attr( 'id' );
+                var $step_settings = $( id );
+
+                $step_settings.removeClass( 'hidden' );
+                $step_settings.addClass( 'active' );
+            } );
+
+            $document.on( 'click', '.add-step', function ( e ) {
+                var $button = $(this);
+                var $step = $button.closest( '.step' );
+            });
+
+            $document.on( 'click', 'td.step-icon', function ( e ) {
+                var $icon   = $(this);
+                var $type   = $icon.find( '.wpgh-element' );
+                var type    = $type.attr( 'id' );
+                var order = $('#postbox-container-1.step').index($('#temp-step')) + 1;
+                var data = {
+                    action:     "wpgh_get_step_html",
+                    step_type:  type,
+                    step_order: order,
+                    funnel_id:  self.id
+                };
+
+                // this.getStepHtml( data );
+
+            } );
 
             /* Bind Delete */
-            this.editor.on( 'click', 'button.delete-step', function ( e ) {
+            $document.on( 'click', 'button.delete-step', function ( e ) {
                 self.deleteStep( this );
             } );
 
-            this.editor.on( 'click', '#postbox-container-1 .step', function ( e ) {
-
-                console.log(e);
-
-                var $postbox = $(this);
-
-
-                $( '.step-settings .step' ).addClass( 'hidden' );
-                $( '#postbox-container-1 .step' ).removeClass( 'active' );
-
-                var id = '#settings-' + $postbox.attr( 'id' );
-
-                console.log(id);
-
-                $( id ).removeClass( 'hidden' );
-                $postbox.addClass( 'active' );
-
-            } );
-
             /* Bind Duplicate */
-            this.editor.on( 'click', 'button.duplicate-step', function ( e ) {
+            $document.on( 'click', 'button.duplicate-step', function ( e ) {
                 self.duplicateStep( this );
             } );
 
             /* Activate Spinner */
-            $('#funnel-form').on('submit', function( e ){
+            $form.on('submit', function( e ){
                 e.preventDefault();
-                self.save( $(this) );
+                self.save( $form );
             });
 
-            $( document ).on( 'change', '.auto-save', function( e ){
-                e.preventDefault();
-                self.save( $('#funnel-form') );
-            });
-
-            $( document ).on('GroundhoggModalClosed', function( e ){
+            $document.on( 'change', '.auto-save', function( e ){
                 e.preventDefault();
                 self.save( $('#funnel-form') );
             });
 
-            $( document ).on('GroundhoggModalClosed', function( e ){
-                e.preventDefault();
-                self.save( $('#funnel-form') );
-            });
-
-            $(document).on( 'click', '#enter-full-screen', function(e){
+            $document.on( 'click', '#enter-full-screen', function(e){
                 $( 'html' ).toggleClass( 'full-screen' );
                 self.editorSizing();
             } );
@@ -181,35 +184,6 @@
             } );
         },
 
-        /**
-         * Inserts a dummy step wherever the given class is
-         *
-         * @param e string class name
-         */
-        insertDummyStep: function (e) {
-            /* Check if we actually dropped it in */
-            if ( this.editor.find(e).length > 0 ){
-
-                this.editor.find(e).replaceWith(
-                    '<div id="temp-step" class="postbox step replace-me" style="width: 500px;margin-right: auto;margin-left: auto;"><h3 class="hndle">Please Wait...</h3><div class="inside">Loading content...</div></div>'
-                );
-
-                return true;
-            }
-
-            return false
-        },
-
-        /**
-         * Replaces the dummy step with the given html
-         *
-         * @param html
-         */
-        replaceDummyStep: function (html) {
-            this.editor.find('.replace-me').replaceWith(html);
-            $(document).trigger('new-step');
-        },
-
         makeSortable: function () {
             this.sortables = $(".ui-sortable").sortable({
                 placeholder: "sortable-placeholder",
@@ -239,7 +213,6 @@
             var result = confirm( "Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action." );
 
             if (result) {
-
                 adminAjaxRequest(
                     {action: "wpgh_delete_funnel_step", step_id: step.attr( 'id' ) },
                     function ( result ) {
@@ -275,9 +248,7 @@
          * @param obj
          */
         getStepHtml: function (obj) {
-
             var self = this;
-
             adminAjaxRequest( obj, function ( response ) {
                 self.curHTML = response.data.data.html;
                 self.replaceDummyStep(self.curHTML);

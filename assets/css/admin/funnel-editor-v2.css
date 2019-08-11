@@ -255,6 +255,11 @@ html.full-screen{
     font-weight: 400;
 }
 
+#benchmarks .help-icon,
+#actions .help-icon {
+    float: right;
+}
+
 #postbox-container-1 .step .add-step {
     display: none;
     padding: 0 5px 1px;
@@ -280,6 +285,16 @@ html.full-screen{
     padding: 10px 20px;
     box-sizing: border-box;
     overflow: auto;
+}
+
+td.step-icon{
+    border: 1px #e5e5e5 solid;
+    height: 100px;
+}
+
+td.step-icon:hover{
+    background: #f1f1f1;
+    cursor: pointer;
 }
 
 .step-reporting p,

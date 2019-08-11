@@ -478,7 +478,7 @@ class HTML
             'width'     => 1000,
             'footer'    => 'true',
             'preventSave'    => 'true',
-            'class' => 'dashicons dashicons-editor-help'
+            'class' => 'dashicons dashicons-editor-help help-icon'
         ] );
     }
 
