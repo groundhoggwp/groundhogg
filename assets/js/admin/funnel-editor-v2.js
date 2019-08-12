@@ -22,6 +22,14 @@
             var $steps = self.getSteps();
             var $settings = self.getSettings();
 
+            $document.on( 'change input', '.step-title-large', function () {
+                var $title = $(this);
+                var id = $title.attr( 'data-id' );
+                var $step = $( '#' + id );
+                $step.find( '.step-title' ).text( $title.val() )
+
+            } );
+
             $document.on( 'click', '#postbox-container-1 .step', function ( e ) {
                 self.makeActive( this.id );
             } );
@@ -71,7 +79,6 @@
 
             $document.on( 'click', '#enter-full-screen', function(e){
                 $( 'html' ).toggleClass( 'full-screen' );
-                self.editorSizing();
             } );
 
             if ( window.innerWidth > 600 ){

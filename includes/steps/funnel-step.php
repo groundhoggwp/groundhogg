@@ -636,7 +636,8 @@ abstract class Funnel_Step extends Supports_Errors
                             'name'  => $this->setting_name_prefix( 'title' ),
                             'value' => __( $step->get_title(), 'groundhogg' ),
                             'title' => __( 'Step Title', 'groundhogg' ),
-                            'class' => 'step-title-large'
+                            'class' => 'step-title-large',
+                            'data-id' => $step->get_id(),
                         );
 
                         echo Plugin::$instance->utils->html->input( $args );

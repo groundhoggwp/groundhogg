@@ -8,6 +8,7 @@ use function Groundhogg\get_store_products;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
 use Groundhogg\Plugin;
 use Groundhogg\Contact_Query;
 use Groundhogg\Step;
@@ -510,7 +511,13 @@ class Funnels_Page extends Admin_Page
 
         $this->add_notice( esc_attr( 'created' ), _x( 'Funnel created', 'notice', 'groundhogg' ), 'success' );
 
-        return admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' .  $funnel_id ) ;
+        $edit_url = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' .  $funnel_id );
+
+        if ( is_option_enabled( 'gh_use_builder_version_2' ) ){
+            $edit_url = add_query_arg( [ 'version' => '2' ], $edit_url );
+        }
+
+        return $edit_url;
 
     }
 
