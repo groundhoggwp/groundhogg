@@ -71,6 +71,11 @@ class Delay_Timer extends Action
         return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/delay-timer.png';
     }
 
+    public function admin_scripts()
+    {
+        wp_enqueue_script( 'groundhogg-funnel-delay-timer' );
+    }
+
     /**
      * @param $step Step
      */

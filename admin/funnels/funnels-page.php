@@ -555,7 +555,14 @@ class Funnels_Page extends Admin_Page
         $result = [];
 
         $result[ 'chartData' ] = $this->get_chart_data();
-        $result[ 'steps' ] = $this->get_step_html();
+
+        if ( ! $this->is_v2() ){
+            $result[ 'steps' ] = $this->get_step_html();
+        } else {
+            $result[ 'settings' ] = $this->get_step_html();
+            $result[ 'sortable' ] = $this->get_step_sortable();
+        }
+
 
         $this->send_ajax_response( $result );
 
@@ -569,7 +576,32 @@ class Funnels_Page extends Admin_Page
         $html="";
 
         foreach ( $steps as $step ){
-            $html .= $step->__toString();
+
+            if ( ! $this->is_v2() ){
+                $html .= $step->__toString();
+            } else {
+                ob_start();
+                $step->html_v2();
+                $html .= ob_get_clean();
+
+            }
+
+        }
+
+        return $html;
+    }
+
+    public function get_step_sortable()
+    {
+        $funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
+        $steps = $funnel->get_steps();
+
+        $html="";
+
+        foreach ( $steps as $step ){
+            ob_start();
+            $step->sortable_item();
+            $html .= ob_get_clean();
         }
 
         return $html;
@@ -713,9 +745,14 @@ class Funnels_Page extends Admin_Page
             return;
         }
 
-        $content = '';
         $step_type  = get_request_var( 'step_type' );
         $step_order = absint( get_request_var( 'step_order') );
+
+        if ( $this->is_v2() ){
+            $after_step = new Step( absint( get_request_var( 'after_step' ) ) );
+            $step_order = $after_step->get_order() + 1;
+        }
+
         $funnel_id  = absint( get_request_var( 'funnel_id' ) );
 
         $elements = Plugin::$instance->step_manager->get_elements();
@@ -723,7 +760,9 @@ class Funnels_Page extends Admin_Page
         $title = $elements[ $step_type ]->get_name();
         $step_group = $elements[ $step_type ]->get_group();
 
-        $step = new Step( [
+        $step = new Step();
+
+        $step_id = $step->create( [
             'funnel_id'     => $funnel_id,
             'step_title'    => $title,
             'step_type'     => $step_type,
@@ -731,11 +770,27 @@ class Funnels_Page extends Admin_Page
             'step_order'    => $step_order,
         ] );
 
-        if ( $step->exists() ){
+        if ( ! $step_id || ! $step->exists() ){
+            wp_send_json_error();
+        }
+
+        if ( ! $this->is_v2() ){
             ob_start();
             $step->html();
             $content = ob_get_clean();
             $this->send_ajax_response( [ 'html' => $content ] );
+        } else {
+            ob_start();
+            $step->sortable_item();
+            $sortable = ob_get_clean();
+            ob_start();
+            $step->html_v2();
+            $settings = ob_get_clean();
+            $this->send_ajax_response( [
+                'sortable' => $sortable,
+                'settings' => $settings,
+                'id' => $step->get_id(),
+            ] );
         }
 
         wp_send_json_error();
@@ -765,7 +820,9 @@ class Funnels_Page extends Admin_Page
             wp_send_json_error();
         }
 
-        $new_step = new Step( [
+        $new_step = new Step();
+
+        $new_step_id = $new_step->create( [
             'funnel_id'      => $step->get_funnel_id(),
             'step_title'     => sprintf( __( '%s - (copy)', 'groundhogg' ), $step->get_title() ),
             'step_type'      => $step->get_type(),
@@ -774,7 +831,7 @@ class Funnels_Page extends Admin_Page
             'step_order'     => $step->get_order() + 1,
         ] );
 
-        if ( ! $new_step->exists() ){
+        if ( ! $new_step_id || ! $new_step->exists() ){
             wp_send_json_error();
         }
 
@@ -784,13 +841,26 @@ class Funnels_Page extends Admin_Page
             $new_step->update_meta( $key, $value );
         }
 
-        ob_start();
+        if ( ! $this->is_v2() ){
+            ob_start();
+            $new_step->html();
+            $content = ob_get_clean();
+            wp_send_json_success( [ 'data' => [ 'html' => $content ] ] );
+        } else {
+            ob_start();
+            $new_step->sortable_item();
+            $sortable = ob_get_clean();
+            ob_start();
+            $new_step->html_v2();
+            $settings = ob_get_clean();
+            $this->send_ajax_response( [
+                'sortable' => $sortable,
+                'settings' => $settings,
+                'id' => $new_step->get_id(),
+            ] );
+        }
 
-        $new_step->html();
-
-        $content = ob_get_clean();
-
-        wp_send_json_success( [ 'data' => [ 'html' => $content ] ] );
+        wp_send_json_error();
     }
 
     /**

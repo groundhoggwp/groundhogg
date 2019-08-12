@@ -29,6 +29,10 @@ html.full-screen{
     font-weight: normal;
 }
 
+table.embed-options td{
+    padding: 0 !important;
+}
+
 .button.button-secondary.submit.trigger-popup {
     background: #f7f7f7 !important;
     border-color: #ccc !important;

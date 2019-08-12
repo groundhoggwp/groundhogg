@@ -6,6 +6,7 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 /**
@@ -98,7 +99,7 @@ class Apply_Tag extends Action
      */
     public function save( $step )
     {
-        $this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
+        $this->save_setting( 'tags', validate_tags( $this->get_posted_data( 'tags', [] ) ) );
     }
 
     /**

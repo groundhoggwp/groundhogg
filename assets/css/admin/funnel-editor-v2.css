@@ -1,3 +1,44 @@
+.triangle-bottom {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 100px 100px 0 100px;
+    border-color: #6980fe transparent transparent transparent;
+}
+
+.postbox.step.benchmark:after,
+.postbox.step.benchmark:before{
+    content: "";
+    position: absolute;
+    display: inline-block;
+    width: 0;
+    bottom: -10px;
+    left: 25px;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 10px 0 10px;
+    border-color: #EDF4F8 transparent transparent transparent;
+    z-index: 9999;
+}
+
+.postbox.step.benchmark:before{
+    left: 24px;
+    bottom: -11px;
+    border-width: 11px 11px 0 11px;
+    border-color: #ddd transparent transparent transparent;
+}
+
+.postbox.benchmark.active:after{
+    border-color: #9CD8F3 transparent transparent transparent;
+}
+
+
+
+#post-body{
+    min-height: 80vh;
+}
+
 
 #poststuff #post-body.columns-2{
     margin-left: 400px;
@@ -27,10 +68,16 @@ html.full-screen{
 
 .full-screen .funnel-editor-header{
     top: 0;
+    left: 0;
+    padding: 8px 8px 8px 8px;
+    max-width: 100%;
 }
 
 /* END Full Screen */
 
+#screen-meta-links{
+    display: none;
+}
 
 /* NEW STUFF */
 #wpbody-content{
@@ -78,7 +125,9 @@ html.full-screen{
 /*}*/
 
 #postbox-container-1{
-    /*overflow: auto;*/
+    overflow-y: auto;
+    max-height: 100vh;
+    padding-bottom: 20px;
 }
 
 #postbox-container-1 .postbox{
@@ -92,6 +141,10 @@ html.full-screen{
     border: none;
 }
 
+#postbox-container-2 .step {
+    max-width: 800px;
+}
+
 .postbox {
     margin: 0;
 }
@@ -99,10 +152,11 @@ html.full-screen{
 .funnel-editor-header{
     z-index: 999;
     top: 32px;
+    left: 0;
     box-sizing: border-box;
     position: fixed;
     height: 47px;
-    padding: 8px;
+    padding: 8px 8px 8px 170px;
     background: #FFFFFF;
     border-bottom: 1px solid #e2e4e7;
     display: block;
@@ -120,7 +174,7 @@ html.full-screen{
 
 .funnel-editor-header .status-options{
     float: right;
-    margin-right: 20px;
+    margin-right: 10px;
 }
 
 .funnel-editor-header #title{
@@ -250,7 +304,7 @@ html.full-screen{
 }
 
 .step span.step-name {
-    margin-left:6px;
+    /*margin-left:6px;*/
     font-size: 11px;
     font-weight: 400;
 }
@@ -303,6 +357,10 @@ td.step-icon:hover{
     font-size: 16px;
 }
 
+#postbox-container-1 .step .hndle{
+    padding: 12px 12px;
+}
+
 .hndle input {
     background: none;
     border: none;
@@ -313,17 +371,43 @@ td.step-icon:hover{
 
 .hndle .hndle-icon{
     /*border-radius: 100%;*/
-    background: #FFF;
+    /*background: #FFF;*/
     float: left;
     /*margin-left: -38px;*/
     margin-right: 10px;
     /*margin-top: 12px;*/
     /*margin-bottom: -37px;*/
-    border: 1px solid #e5e5e5;
+    /*border: 1px solid #e5e5e5;*/
+}
+
+table.embed-options td{
+    padding: 0 !important;
 }
 
 .step-title {
-    max-width: 200px;
+    display: inline-block;
+    width: 200px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+    /*white-space: nowrap;*/
+    overflow: hidden;
+}
+
+.step .step-title-large {
+    width: 400px;
+    font-size: 22px;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0 0 5px 0;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+}
+
+.step .step-title-large:focus{
+    outline: none;
+    /*border-color: transparent;*/
+    box-shadow: none;
 }
 
 .postbox.closed .hndle .hndle-icon{

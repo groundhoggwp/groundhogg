@@ -545,6 +545,19 @@ class Settings_Page extends Admin_Page
                     'value'         => 'on',
                 ),
             ),
+            'gh_use_builder_version_2' => array(
+                'id'        => 'gh_use_builder_version_2',
+                'section'   => 'misc_info',
+                'label'     => _x( 'Enable Funnel Builder V2 (Beta)', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'Use the new version of the Funnel Builder.', 'settings', 'groundhogg' ),
+                'type'      => 'checkbox',
+                'atts'      => array(
+                    'label'         => __( 'Enable' ),
+                    'name'          => 'gh_use_builder_version_2',
+                    'id'            => 'gh_use_builder_version_2',
+                    'value'         => 'on',
+                ),
+            ),
             'gh_privacy_policy' => array(
                 'id'        => 'gh_privacy_policy',
                 'section'   => 'compliance',

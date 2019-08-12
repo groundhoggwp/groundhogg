@@ -13,7 +13,7 @@
             var self = this;
 
             $( document ).on( 'click', '.edit-email', function ( e ) {
-                self.step = $(this).closest('.postbox' );
+                self.step = $(this).closest('.step' );
                 self.addingEmail  = false;
                 self.editingEmail = true;
 
@@ -27,7 +27,7 @@
             } );
 
             $( document ).on( 'click', '.add-email', function ( e ) {
-                self.step = $(this).closest('.postbox' );
+                self.step = $(this).closest('.step' );
                 self.addingEmail  = true;
                 self.editingEmail = false;
 

@@ -121,6 +121,11 @@ var GroundhoggModal = {};
         },
 
         close: function(){
+
+            if ( ! this.is_open ){
+                return;
+            }
+
             this.pushContent();
             this.hidePopUp();
             if ( this.args.preventSave === undefined || this.args.preventSave === false || this.args.preventSave === 'false' ){

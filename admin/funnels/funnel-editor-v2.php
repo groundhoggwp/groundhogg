@@ -148,6 +148,9 @@ $funnel = new Funnel( $funnel_id );
     </div>
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
 	    <?php Plugin::$instance->notices->print_notices(); ?>
+        <div style="width: 100%">
+            <?php include_once dirname( __FILE__ ) . '/reporting.php'; ?>
+        </div>
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
             <div id="postbox-container-1" class="postbox-container sidebar">
                 <div class="ui-sortable">
@@ -160,6 +163,9 @@ $funnel = new Funnel( $funnel_id );
 	            <?php foreach ( $funnel->get_steps() as $step ): ?>
 		            <?php $step->html_v2(); ?>
 	            <?php endforeach; ?>
+                <div class="step">
+
+                </div>
             </div>
             <div style="clear: both;"></div>
         </div>

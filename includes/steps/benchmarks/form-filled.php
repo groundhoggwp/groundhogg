@@ -145,6 +145,11 @@ class Form_Filled extends Benchmark
         $form_url = site_url( sprintf( 'gh/forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
 
         $default_form = $this->get_default_form();
+
+        if ( ! $this->get_setting( 'form' ) ){
+            $this->save_setting( 'form', $default_form );
+        }
+
         $form_embed_code = esc_html( $form->get_html_embed_code() );
 
         ?>
@@ -152,31 +157,40 @@ class Form_Filled extends Benchmark
             <tbody>
             <tr>
                 <th>
-                    <?php esc_attr_e( 'Shortcode, JS Script & HTML Embed Code:', 'groundhogg' ); ?>
+                    <?php esc_attr_e( 'Embed:', 'groundhogg' ); ?>
                 </th>
                 <td>
-
-                    <strong>
-                    <input
-                            type="text"
-                            onfocus="this.select()"
-                            class="regular-text code"
-                            value="<?php echo esc_attr( $form->get_shortcode() ); ?>"
-                            readonly>
-                    </strong>
-                    <input
-                            type="text"
-                            onfocus="this.select()"
-                            class="regular-text code"
-                            value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
-                            readonly>
-                    <input
-                            type="text"
-                            onfocus="this.select()"
-                            class="regular-text code"
-                            value="<?php echo esc_attr( $form_embed_code ); ?>"
-                            readonly>
-                    </strong>
+                    <table class="embed-options">
+                        <tbody>
+                        <tr>
+                            <td><?php printf( '%s:', __( 'Shortcode' ) ); ?></td>
+                            <td><input
+                                        type="text"
+                                        onfocus="this.select()"
+                                        class="regular-text code"
+                                        value="<?php echo esc_attr( $form->get_shortcode() ); ?>"
+                                        readonly></td>
+                        </tr>
+                        <tr>
+                            <td><?php printf( '%s:', __( 'Iframe' ) ); ?></td>
+                            <td> <input
+                                        type="text"
+                                        onfocus="this.select()"
+                                        class="regular-text code"
+                                        value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
+                                        readonly></td>
+                        </tr>
+                        <tr>
+                            <td><?php printf( '%s:', __( 'HTML' ) ); ?></td>
+                            <td> <input
+                                        type="text"
+                                        onfocus="this.select()"
+                                        class="regular-text code"
+                                        value="<?php echo esc_attr( $form_embed_code ); ?>"
+                                        readonly></td>
+                        </tr>
+                        </tbody>
+                    </table>
                     <p>
                         <?php echo Plugin::$instance->utils->html->modal_link( array(
                             'title'     => __( 'Preview' ),

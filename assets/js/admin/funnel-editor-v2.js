@@ -1,9 +1,17 @@
-( function( $, funnel ) {
+( function( $, funnel, modal, charts ) {
 
     $.extend( funnel, {
 
         sortables: null,
         reportData: null,
+
+        getSteps: function(){
+            return $( '#postbox-container-1' );
+        },
+
+        getSettings: function() {
+            return $( '.step-settings' );
+        },
 
         init: function () {
 
@@ -11,54 +19,43 @@
 
             var $document = $( document );
             var $form = $('#funnel-form');
-            var $steps = $( '#postbox-container-1' );
-            var $settings = $( '.step-settings' );
+            var $steps = self.getSteps();
+            var $settings = self.getSettings();
 
             $document.on( 'click', '#postbox-container-1 .step', function ( e ) {
-                $settings.find( '.step' ).addClass( 'hidden' );
-                $settings.find( '.step' ).removeClass( 'active' );
-
-                $steps.find( '.step' ).removeClass( 'active' );
-
-                var $postbox = $(this);
-                $postbox.addClass( 'active' );
-
-                var id = '#settings-' + $postbox.attr( 'id' );
-                var $step_settings = $( id );
-
-                $step_settings.removeClass( 'hidden' );
-                $step_settings.addClass( 'active' );
+                self.makeActive( this.id );
             } );
 
-            $document.on( 'click', '.add-step', function ( e ) {
-                var $button = $(this);
-                var $step = $button.closest( '.step' );
-            });
-
             $document.on( 'click', 'td.step-icon', function ( e ) {
+
+                var $activeStep = $steps.find( '.active' );
+                $( '<div class="replace-me"></div>' ).insertAfter( $activeStep );
+
                 var $icon   = $(this);
                 var $type   = $icon.find( '.wpgh-element' );
                 var type    = $type.attr( 'id' );
-                var order = $('#postbox-container-1.step').index($('#temp-step')) + 1;
+                var order = $steps.index( $activeStep ) + 1;
+
                 var data = {
                     action:     "wpgh_get_step_html",
                     step_type:  type,
-                    step_order: order,
-                    funnel_id:  self.id
+                    after_step: $activeStep.attr( 'id' ),
+                    funnel_id:  self.id,
+                    version: 2
                 };
 
-                // this.getStepHtml( data );
+                self.getStepHtml( data );
 
             } );
 
             /* Bind Delete */
             $document.on( 'click', 'button.delete-step', function ( e ) {
-                self.deleteStep( this );
+                self.deleteStep( this.parentNode.parentNode.id );
             } );
 
             /* Bind Duplicate */
             $document.on( 'click', 'button.duplicate-step', function ( e ) {
-                self.duplicateStep( this );
+                self.duplicateStep( this.parentNode.parentNode.id );
             } );
 
             /* Activate Spinner */
@@ -83,12 +80,6 @@
 
             this.initReporting();
 
-            this.editorSizing();
-
-            $( window ).resize(function() {
-                self.editorSizing();
-            });
-
             $( '#add-contacts-button' ).click( function(){
                 self.addContacts();
             });
@@ -98,19 +89,6 @@
                 prompt( "Copy this link.", $('#share-link').val() );
             });
 
-        },
-
-        editorSizing: function (){
-            $( '.funnel-editor-header').width( $('#poststuff').width() );
-            $( '#postbox-container-2').height( $('#wpbody').height() - 80 );
-            // $( '#postbox-container-1' ).height( $(window).height() - (32 - 56));
-
-            // this.sidebar = new StickySidebar( '#postbox-container-1' , {
-            //     // topSpacing: $( 'html' ).hasClass( 'full-screen' ) ? 47 : 78,
-            //     bottomSpacing: 0
-            // });
-
-            $( '#normal-sortables' ).css( 'visibility', 'visible' );
         },
 
         initReporting: function(){
@@ -164,20 +142,20 @@
             showSpinner();
 
             var fd = $form.serialize();
-            fd = fd +  '&action=gh_save_funnel_via_ajax';
+            fd = fd +  '&action=gh_save_funnel_via_ajax&version=2';
 
             adminAjaxRequest( fd, function ( response ) {
-
                 handleNotices( response.data.notices );
-                // console.log( response.data.notices );
-
                 hideSpinner();
+                self.getSettings().html( response.data.data.settings );
+                self.getSteps().html( response.data.data.sortable );
 
-                $( '#normal-sortables' ).html( response.data.data.steps );
+                console.log(response);
 
-                FunnelChart.data = response.data.data.chartData;
+                charts.data = response.data.data.chartData;
+
                 if( ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
-                    FunnelChart.draw();
+                    charts.draw();
                 }
 
                 $( document ).trigger( 'new-step' );
@@ -202,22 +180,25 @@
         /**
          * Given an element delete it
          *
-         * @param e node
+         * @param id int
          */
-        deleteStep: function (e) {
+        deleteStep: function ( id ) {
 
             showSpinner();
 
-            var step = $(e).closest('.step');
+            var $step = $( '#' + id );
 
             var result = confirm( "Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action." );
 
             if (result) {
                 adminAjaxRequest(
-                    {action: "wpgh_delete_funnel_step", step_id: step.attr( 'id' ) },
+                    { action: "wpgh_delete_funnel_step", step_id: id },
                     function ( result ) {
                         hideSpinner();
-                        step.remove();
+                        $step.remove();
+                        var sid = '#settings-' + id;
+                        var $step_settings = $( sid );
+                        $step_settings.remove();
                     }
                 );
             } else {
@@ -229,17 +210,13 @@
          * Given an element, duplicate the step and
          * Add it to the funnel
          *
-         * @param e node
+         * @param id int
          */
-        duplicateStep: function ( e ) {
-            var step = $(e).closest('.step');
-
-            $('<div class="replace-me"></div>').insertAfter( step );
-            this.insertDummyStep( '.replace-me' );
-
-            var data = {action: "wpgh_duplicate_funnel_step", step_id: step.attr( 'id' ) };
+        duplicateStep: function ( id ) {
+            var $step = $( '#' + id );
+            $('<div class="replace-me"></div>').insertAfter( $step );
+            var data = { action: "wpgh_duplicate_funnel_step", step_id: id, version: 2 };
             this.getStepHtml( data )
-
         },
 
         /**
@@ -249,10 +226,44 @@
          */
         getStepHtml: function (obj) {
             var self = this;
+            var $steps = self.getSteps();
+            var $settings = self.getSettings();
+            showSpinner();
             adminAjaxRequest( obj, function ( response ) {
-                self.curHTML = response.data.data.html;
-                self.replaceDummyStep(self.curHTML);
+                $steps.find('.replace-me').replaceWith( response.data.data.sortable );
+                $settings.append( response.data.data.settings );
+                self.makeActive( response.data.data.id );
+                modal.close();
+                hideSpinner();
+                $(document).trigger('new-step');
             } );
+        },
+
+        /**
+         * Make the given step active.
+         *
+         * @param id
+         */
+        makeActive : function ( id ){
+            var self = this;
+
+            var $steps = self.getSteps();
+            var $settings = self.getSettings();
+
+            $settings.find( '.step' ).addClass( 'hidden' );
+            $settings.find( '.step' ).removeClass( 'active' );
+            $steps.find( '.step' ).removeClass( 'active' );
+            $steps.find( '.is_active' ).val( null );
+
+            var $step = $( '#' + id );
+            $step.addClass( 'active' );
+            $step.find( '.is_active' ).val(1);
+
+            var sid = '#settings-' + $step.attr( 'id' );
+            var $step_settings = $( sid );
+
+            $step_settings.removeClass( 'hidden' );
+            $step_settings.addClass( 'active' );
         },
     } );
 
@@ -260,4 +271,4 @@
         funnel.init();
     });
 
-})( jQuery, Funnel );
+})( jQuery, Funnel, GroundhoggModal, FunnelChart );

@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Funnel;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use \WP_List_Table;
@@ -133,11 +134,27 @@ class Funnels_Table extends WP_List_Table {
         $actions = array();
         $id = $funnel->get_id();
 
+        $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
+
+        if ( is_option_enabled( 'gh_use_builder_version_2' ) ) {
+            $editUrlv2 = add_query_arg( [
+                'version' => 2
+            ], $editUrl );
+        }
+
         if ( $this->get_view() === 'archived' ) {
             $actions[ 'restore' ] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . _x( 'Restore', 'action', 'groundhogg'  ) . "</a></span>";
             $actions[ 'delete' ] = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . _x( 'Delete Permanently', 'action', 'groundhogg'  ) . "</a></span>";
         } else {
-            $actions[ 'edit' ] = "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_funnels&action=edit&funnel='. $id ). "'>" . __( 'Build' ) . "</a></span>";
+
+            if ( is_option_enabled( 'gh_use_builder_version_2' ) ){
+                $actions[ 'edit' ] = "<span class='edit'><a href='" . $editUrlv2 . "'>" . __( 'Build' ) . "</a></span>";
+                $actions[ 'edit-classic' ] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build (Classic)' ) . "</a></span>";
+            } else {
+                $actions[ 'edit' ] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build' ) . "</a></span>";
+                $actions[ 'edit-v2' ] = "<span class='edit'><a href='" . $editUrlv2 . "'>" . __( 'Build (v2)' ) . "</a></span>";
+            }
+
             $actions[ 'duplicate' ] = "<span class='duplicate'><a href='" .  wp_nonce_url(admin_url( 'admin.php?page=gh_funnels&action=duplicate&funnel='. $id ), 'duplicate' ). "'>" . _x( 'Duplicate', 'action', 'groundhogg' ) . "</a></span>";
             $actions[ 'export' ] = "<span class='export'><a href='" . $funnel->export_url() . "'>" . _x( 'Export', 'action', 'groundhogg' ) . "</a></span>";
             $actions[ 'trash' ] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive', 'action', 'groundhogg' ) . "</a></span>";
@@ -149,7 +166,14 @@ class Funnels_Table extends WP_List_Table {
     protected function column_title( $funnel )
     {
         $subject = ( ! $funnel->title )? '(' . __( 'no title' ) . ')' : $funnel->title ;
+
         $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
+
+        if ( is_option_enabled( 'gh_use_builder_version_2' ) ) {
+            $editUrl = add_query_arg( [
+                'version' => 2
+            ], $editUrl );
+        }
 
         if ( $this->get_view() === 'archived' ){
             $html = "<strong>{$subject}</strong>";

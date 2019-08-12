@@ -43,7 +43,7 @@ class Last_Broadcast extends Report
         $all_broadcasts = get_db( 'broadcasts' )->query( [ 'status' => 'sent' ], 'send_time' );
 
         if ( empty( $all_broadcasts ) ){
-            return [];
+            return false;
         }
 
         $last_broadcast = array_pop( $all_broadcasts );
@@ -64,7 +64,7 @@ class Last_Broadcast extends Report
 
         $broadcast = $this->get_broadcast();
 
-        if ( $broadcast->exists() ){
+        if ( $broadcast && $broadcast->exists() ){
             return $broadcast->get_report_data();
         }
 

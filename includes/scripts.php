@@ -136,6 +136,7 @@ class Scripts
 
         // Funnel Elements
         wp_register_script('groundhogg-funnel-email', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/email' . $IS_MINIFIED . '.js', ['jquery','groundhogg-admin-modal'], GROUNDHOGG_VERSION, true);
+        wp_register_script('groundhogg-funnel-delay-timer', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/delay-timer' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-funnel-webhook', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/webhook' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-funnel-form-integration', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/form-integration' . $IS_MINIFIED . '.js', ['jquery','groundhogg-admin', 'groundhogg-admin-modal'], GROUNDHOGG_VERSION, true);
 
