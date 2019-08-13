@@ -45,9 +45,15 @@
 
             var self = this;
 
+            var $document = $(document);
+
             self.editor  = $( '#email-body' );
             self.actions = $( '#editor-panel' );
             self.settings = $( '#settings-panel' );
+
+            $document.on( 'click', '#enter-full-screen', function(e){
+                $( 'html' ).toggleClass( 'full-screen' );
+            } );
 
             $( '#update_and_test' ).click( function (e) {
                 $( '#send-test' ).val( 'yes' );
@@ -220,7 +226,6 @@
         },
 
         editorSizing: function (){
-            $('.editor-header').width( $('#poststuff').width() );
             $('#email-body').css( 'min-height', $('#postbox-container-1').height() );
         },
 

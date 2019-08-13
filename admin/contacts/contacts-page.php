@@ -871,6 +871,10 @@ class Contacts_Page extends Admin_Page
             $contact->remove_tag($contact->get_tags());
         }
 
+        if ( get_request_var( 'unsubscribe' ) ){
+            $contact->unsubscribe();
+        }
+
         do_action('groundhogg/admin/contact/save_inline/after', $id, $contact );
 
         $contactTable = new Tables\Contacts_Table;

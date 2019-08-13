@@ -54,15 +54,35 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
             </div>
             <div class="status-options">
                 <div id="status">
-                    <?php Plugin::$instance->replacements->show_replacements_button( true ); ?>&nbsp;
-                    <?php echo html()->modal_link( [
-	                    'title'     => __( 'Alt-Body', 'groundhogg' ),
-	                    'text'      => __( 'Alt-Body', 'groundhogg' ),
-	                    'footer_button_text' => __( 'Done' ),
-	                    'source'    => 'alt-body',
-	                    'height'    => 600,
-	                    'width'     => 600,
-                    ] ); ?>
+                    <div id="full-screen">
+                        <a id="enter-full-screen" style="text-decoration: none; display: inline-block" href="#"><span
+                                    style="padding: 5px;" title="<?php esc_attr_e('Distraction Free Mode', 'groundhogg') ?>"
+                                    class="dashicons dashicons-editor-expand"></span></a>
+                    </div>
+                    <div>
+                        <?php echo Plugin::$instance->utils->html->modal_link(array(
+                            'title' => __('Replacements', 'groundhogg'),
+                            'text' => '<span style="padding: 5px;" class="dashicons dashicons-admin-users"></span>',
+                            'footer_button_text' => __('Insert'),
+                            'id' => 'replacements',
+                            'class' => 'no-padding replacements replacements-button',
+                            'source' => 'footer-replacement-codes',
+                            'height' => 900,
+                            'width' => 700,
+                        )); ?>
+                    </div>
+                    <div>
+                        <?php echo Plugin::$instance->utils->html->modal_link(array(
+                            'title' => __('Email Alt-Body', 'groundhogg'),
+                            'text' => '<span style="padding: 5px;" class="dashicons dashicons-text"></span>',
+                            'footer_button_text' => __('Done'),
+                            'id' => 'alt-body-trigger',
+                            'class' => 'alt-body',
+                            'source' => 'alt-body',
+                            'height' => 900,
+                            'width' => 700,
+                        )); ?>
+                    </div>
                     <?php echo Plugin::$instance->utils->html->toggle( [
                         'name'          => 'editor_view',
                         'id'            => 'editor-toggle',
@@ -301,11 +321,11 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                         <div style="clear: both;"></div>
                     </div>
                 </div>
-                <div id="html-editor">
+                <div id="html-editor" class="hidden">
                     <textarea style="width: 100%;"  id="html-code" ></textarea>
                 </div>
                 <!-- Saved Content -->
-                <div class="hidden">
+                <div class="hidden" style="display: none">
                     <textarea id="content" name="content"><?php echo $email->get_content(); ?></textarea>
                 </div>
 

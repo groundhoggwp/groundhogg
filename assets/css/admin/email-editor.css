@@ -1,3 +1,41 @@
+
+.replacements-button, #enter-full-screen, #alt-body-trigger {
+    display: inline-block;
+    text-decoration: none;
+}
+
+#alt-body-trigger {
+    margin-right: 10px;
+}
+
+/* Full Screen */
+.full-screen #adminmenumain,
+.full-screen #wpfooter,
+.full-screen #wpadminbar{
+    display: none;
+}
+
+.full-screen #wpcontent{
+    margin: 0;
+}
+
+html.full-screen{
+    padding: 0;
+}
+
+.full-screen .editor-header{
+    top: 0;
+    left: 0;
+    padding: 8px 8px 8px 8px;
+    max-width: 100%;
+}
+
+/* END Full Screen */
+
+#screen-meta-links{
+    display: none;
+}
+
 #wpcontent {
     padding-left: 0 !important;
     box-sizing: border-box;
@@ -5,6 +43,7 @@
 
 #wpfooter{
     display: none;
+    /*background: #f1f1f1;*/
 }
 
 #poststuff {
@@ -66,10 +105,11 @@
 .editor-header{
     z-index: 999;
     top: 32px;
+    left:0;
     box-sizing: border-box;
     position: fixed;
     height: 47px;
-    padding: 8px;
+    padding: 8px 8px 8px 168px;
     background: #FFFFFF;
     border-bottom: 1px solid #e2e4e7;
     display: block;
@@ -83,7 +123,6 @@
 
 .editor-header .status-options{
     float: right;
-    margin-right: 20px;
 }
 
 .editor-header #title{

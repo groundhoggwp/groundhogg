@@ -270,6 +270,10 @@ switch ( $action ):
                 case 'monthly':
                     $contact->change_marketing_preference( Preferences::MONTHLY );
                     break;
+                case 'gdpr_delete':
+                    wp_redirect( wp_nonce_url( site_url( 'gh/preferences/erase/' ), 'erase_profile' ) );
+                    die();
+                    break;
             }
 
             do_action( 'groundhogg/preferences/manage/preferences_updated', $contact, $preference );
@@ -388,7 +392,7 @@ switch ( $action ):
         ?>
         <div class="box">
             <p><b><?php _e( 'Your data has been erased!', 'groundhogg' ); ?></b></p>
-            <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.' ); ?></p>
+            <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further communication.' ); ?></p>
             <p>
                 <a id="gotosite" class="button" href="<?php echo esc_url( site_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
             </p>

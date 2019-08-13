@@ -135,12 +135,9 @@ class Funnels_Table extends WP_List_Table {
         $id = $funnel->get_id();
 
         $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
-
-        if ( is_option_enabled( 'gh_use_builder_version_2' ) ) {
-            $editUrlv2 = add_query_arg( [
-                'version' => 2
-            ], $editUrl );
-        }
+        $editUrlv2 = add_query_arg( [
+            'version' => 2
+        ], $editUrl );
 
         if ( $this->get_view() === 'archived' ) {
             $actions[ 'restore' ] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . _x( 'Restore', 'action', 'groundhogg'  ) . "</a></span>";
