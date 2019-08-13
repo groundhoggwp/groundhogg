@@ -214,14 +214,16 @@
                 hideSpinner();
 
                 var content = response.data.data.data.content;
+                var alt_body = response.data.data.meta.alt_body;
                 $('#email-inside').html( content );
+                $('#alt-body-input').val( alt_body );
 
                 $( '.row' ).wpghToolBar();
                 if ( self.inFrame() && typeof  parent.EmailStep != "undefined" ){
                     parent.EmailStep.changesSaved = true;
                 }
 
-                $( '#send-test' ).val( false );
+                $( '#send-test' ).val( null );
             } );
         },
 

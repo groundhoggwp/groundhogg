@@ -526,7 +526,7 @@ class Emails_Page extends Admin_Page
 
         if ( Groundhogg\get_request_var( 'use_custom_alt_body' ) ){
             $email->update_meta( 'use_custom_alt_body', 1 );
-            $email->update_meta( 'alt_body', sanitize_textarea_field( Groundhogg\get_request_var( 'alt_body' ) ) );
+            $email->update_meta( 'alt_body', wp_strip_all_tags( Groundhogg\get_request_var( 'alt_body' ) ) );
         } else {
             $email->delete_meta( 'use_custom_alt_body' );
             $email->delete_meta( 'alt_body' );
@@ -562,6 +562,8 @@ class Emails_Page extends Admin_Page
                 return new \WP_Error( 'oops', __( 'Failed to send test: No user selected. Please select a user to send the test to.', 'groundhogg' ) );
             }
         }
+
+        $email->alt_body = $email->get_alt_body();
 
         return $email->get_as_array();
     }

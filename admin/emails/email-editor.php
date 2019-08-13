@@ -347,7 +347,7 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                             ?>
                         </p>
                         <p>
-                            <textarea name="alt_body" style="width: 100%" rows="16"><?php
+                            <textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="16"><?php
 
                             $alt_body = $email->get_meta( 'alt_body' );
 
