@@ -23,7 +23,8 @@ html.full-screen{
     padding: 0;
 }
 
-.full-screen .editor-header{
+.full-screen .editor-header,
+.iframed .editor-header {
     top: 0;
     left: 0;
     padding: 8px 8px 8px 8px;

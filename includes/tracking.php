@@ -562,6 +562,10 @@ class Tracking
      */
     public function form_filled( $contact )
     {
+        if ( is_user_logged_in() ){
+            return;
+        }
+
         if ( ! isset_not_empty( $_COOKIE, self::TRACKING_COOKIE ) ){
             $this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
             $this->build_tracking_cookie();

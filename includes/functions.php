@@ -1764,30 +1764,40 @@ function get_email_templates()
  */
 function blacklist_check( $data='' ){
 
-    $mod_keys = trim( get_option( 'blacklist_keys' ) );
-    if ( '' == $mod_keys ) {
-        return false; // If moderation keys are empty
+    if ( ! is_array( $data ) && ! is_object( $data ) ){
+        $mod_keys = trim( get_option( 'blacklist_keys' ) );
+        if ( '' == $mod_keys ) {
+            return false; // If moderation keys are empty
+        }
+
+        // Ensure HTML tags are not being used to bypass the blacklist.
+        $data_no_html = wp_strip_all_tags( $data );
+
+        $words = explode( "\n", $mod_keys );
+
+        foreach ( (array) $words as $word ) {
+            $word = trim( $word );
+
+            // Skip empty lines
+            if ( empty( $word ) ) {
+                continue; }
+
+            // Do some escaping magic so that '#' chars in the
+            // spam words don't break things:
+            $word = preg_quote( $word, '#' );
+
+            $pattern = "#$word#i";
+
+            if ( preg_match( $pattern, $data ) || preg_match( $pattern, $data_no_html ) ){
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    // Ensure HTML tags are not being used to bypass the blacklist.
-    $data_no_html = wp_strip_all_tags( $data );
-
-    $words = explode( "\n", $mod_keys );
-
-    foreach ( (array) $words as $word ) {
-        $word = trim( $word );
-
-        // Skip empty lines
-        if ( empty( $word ) ) {
-            continue; }
-
-        // Do some escaping magic so that '#' chars in the
-        // spam words don't break things:
-        $word = preg_quote( $word, '#' );
-
-        $pattern = "#$word#i";
-
-        if ( preg_match( $pattern, $data ) || preg_match( $pattern, $data_no_html ) ){
+    foreach ( (array) $data as $datum ){
+        if ( blacklist_check( $datum ) ){
             return true;
         }
     }
