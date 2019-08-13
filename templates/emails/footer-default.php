@@ -10,10 +10,12 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+$footer_alignment = get_option( 'gh_email_footer_alignment', 'center' );
+
 $footer = apply_filters( 'groundhogg/email_template/footer_css', [
     'clear' => 'both', 
     'margin-top' => '10px', 
-    'text-align' => 'center', 
+    'text-align' => $footer_alignment,
     'width' => '100%',
 ] );
 
@@ -35,7 +37,7 @@ $footer_css = apply_filters( 'groundhogg/email_template/footer_content_css', [
     'padding-top' => '10px',
     'font-size' => '13px',
     'color' => '#999999',
-    'text-align' => 'center'
+    'text-align' => $footer_alignment
 ] );
 
 $footer_css = \Groundhogg\array_to_css( $footer_css );
@@ -43,7 +45,7 @@ $footer_css = \Groundhogg\array_to_css( $footer_css );
 $apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', [
     'color' => '#999999',
     'font-size' => '13px',
-    'text-align' => 'center',
+    'text-align' => $footer_alignment
 ]);
 
 $apple_link = \Groundhogg\array_to_css( $apple_link );

@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\key_to_words;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
@@ -26,6 +27,18 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 $funnel_id = intval( $_GET['funnel'] );
 
 $funnel = new Funnel( $funnel_id );
+
+$edit_url = add_query_arg( [
+    'page' => 'gh_funnels',
+    'action' => 'edit',
+    'funnel' => $funnel_id,
+    'version' => '2'
+], admin_url( 'admin.php' ) );
+
+if ( ! is_option_enabled( 'gh_use_builder_version_2' ) ){
+    Plugin::$instance->notices->add( 'edit-v2', sprintf( '%s <a href="%s">%s</a>', __( 'The new and improved Funnel Builder has Arrived!' ), $edit_url, __( 'Launch V2 Now!' ) ) );
+}
+
 
 ?>
 <form method="post" id="funnel-form">

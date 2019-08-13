@@ -733,6 +733,22 @@ class Settings_Page extends Admin_Page
                     'placeholder' => Plugin::$instance->settings->get_option( 'admin_email' ),
                 ),
             ],
+            'gh_email_footer_alignment' => [
+                'id'        => 'gh_email_footer_alignment',
+                'section'   => 'overrides',
+                'label'     => _x( 'Email Footer Alignment', 'settings', 'groundhogg' ),
+                'desc'      => _x( 'The alignment of the email footer in all emails.', 'settings', 'groundhogg' ),
+                'type'      => 'dropdown',
+                'atts' => array(
+                    'name'  => 'gh_email_footer_alignment',
+                    'id'    => 'gh_email_footer_alignment',
+                    'options' => [
+                        'center' => __( 'Center' ),
+                        'left' => __( 'Left' )
+                    ],
+                    'option_none' => false,
+                ),
+            ],
             'gh_custom_email_footer_text' => [
                 'id'        => 'gh_custom_email_footer_text',
                 'section'   => 'overrides',
