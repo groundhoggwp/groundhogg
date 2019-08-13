@@ -227,7 +227,7 @@ class Admin_Notification extends Action
             $subject = sanitize_text_field( do_replacements( $subject, $contact->get_id() ) );
 
             $send_to = $this->get_setting( 'send_to' );
-            $reply_to = do_replacements( $this->get_setting( 'reply_to', $contact->get_email() ) );
+            $reply_to = do_replacements( $this->get_setting( 'reply_to', $contact->get_email() ), $contact->get_id() );
 
             if ( ! is_email( $send_to ) ){
                 $send_to = do_replacements( $send_to, $contact->get_id() );

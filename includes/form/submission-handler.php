@@ -414,35 +414,7 @@ class Submission_Handler extends Supports_Errors
     public function get_tag_from_map( $field, $value )
     {
         $map = $this->get_field_config_att( $field, 'tag_mapping' );
-
-//        var_dump( $map );
-//        var_dump( md5( $value ) );
-
         return absint( get_array_var( $map, md5( $value ) ) );
-    }
-
-    /**
-     * Check a given value for spam.
-     * If it's in the blacklist, mark the contact as spam and die
-     *
-     * @param $args mixed
-     * @return bool true if spam | false if pass
-     */
-    public function is_spam( $args )
-    {
-        /* Turn into array */
-        if ( ! is_array( $args ) ){ $args = [ $args ]; }
-
-        foreach ( $args as $arg ){
-
-            if ( blacklist_check( $arg ) ){
-                return true;
-            }
-
-        }
-
-        return false;
-
     }
 
     /**
@@ -458,11 +430,26 @@ class Submission_Handler extends Supports_Errors
 
         $browser = new \Browser();
 
+        $posted_data = $this->get_posted_data();
+
+        $white_list_keys = [
+            '_ghnonce',
+            '_wpnonce',
+            'form_data',
+            'gh_submit_form_key',
+            'gh_submit_form',
+            'action'
+        ];
+
+        foreach ( $white_list_keys as $key ){
+            unset( $posted_data[ $key ] );
+        }
+
         $checks = [
             $browser->isRobot(),
             $browser->isAol(),
-            $this->is_spam( Plugin::$instance->utils->location->get_real_ip() ),
-            $this->is_spam( $this->get_posted_data() )
+            blacklist_check( Plugin::$instance->utils->location->get_real_ip() ),
+            blacklist_check( $posted_data )
         ];
 
         return in_array( true, $checks );
