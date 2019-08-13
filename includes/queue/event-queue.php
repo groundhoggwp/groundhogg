@@ -220,29 +220,6 @@ class Event_Queue extends Supports_Errors
         do_action( 'groundhogg/event_queue/process/after', $this );
 
         if ( $this->limits_exceeded( $completed_events ) ){
-
-            $execution_time        = $this->get_execution_time();
-            $max_execution_time    = $this->get_time_limit();
-            $time_per_action       = $execution_time / $completed_events;
-            $estimated_time        = $execution_time + ( $time_per_action * 3 );
-            $likely_to_be_exceeded = $estimated_time > $max_execution_time;
-
-            // TODO REMOVE
-            wp_send_json( [
-
-                'mem'  => $this->memory_exceeded(),
-                'time' => $this->time_likely_to_be_exceeded( $completed_events ),
-                'calcs' => [
-                    'completed_events' => $completed_events,
-                    'execution_time' => $execution_time,
-                    'max_execution_time' => $max_execution_time,
-                    'time_per_action' => $time_per_action,
-                    'estimated_time' => $estimated_time,
-                    'likely_to_be_exceeded' => $likely_to_be_exceeded
-                ]
-
-            ] );
-
             return $completed_events;
         }
 
