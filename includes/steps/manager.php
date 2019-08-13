@@ -15,6 +15,7 @@ use Groundhogg\Steps\Actions\HTTP_Post;
 use Groundhogg\Steps\Actions\Remove_Tag;
 use Groundhogg\Steps\Actions\Send_Email;
 use Groundhogg\Steps\Actions\Send_SMS;
+use Groundhogg\Steps\Actions\Sleep;
 use Groundhogg\Steps\Benchmarks\Account_Created;
 use Groundhogg\Steps\Benchmarks\Benchmark;
 use Groundhogg\Steps\Benchmarks\Email_Confirmed;
@@ -68,6 +69,7 @@ class Manager {
         $this->elements[] = new Create_User();
         $this->elements[] = new Edit_Meta();
         $this->elements[] = new HTTP_Post();
+//        $this->elements[] = new Sleep();
 
         /* Benchmarks */
         $this->elements[] = new Account_Created();

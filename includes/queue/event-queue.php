@@ -166,7 +166,7 @@ class Event_Queue extends Supports_Errors
      *
      * @return int the number of events process, 0 if no events.
      */
-    protected function process()
+    protected function process( $completed_events=0 )
     {
 
     	$max_events = apply_filters( 'groundhogg/event_queue/max_events', 50 );
@@ -174,7 +174,7 @@ class Event_Queue extends Supports_Errors
     	$claim = $this->store->stake_claim( $max_events );
     	$event_ids = $this->store->get_events_by_claim( $claim );
 
-        $completed_events = 0;
+//    	wp_send_json( $event_ids );
 
         if ( empty( $event_ids ) ){
             return 0;
@@ -183,6 +183,8 @@ class Event_Queue extends Supports_Errors
         do_action( 'groundhogg/event_queue/process/before', $event_ids );
 
         self::set_is_processing( true );
+
+//        wp_send_json( $event_ids );
 
         do{
             $event_id = array_pop( $event_ids );
@@ -207,7 +209,7 @@ class Event_Queue extends Supports_Errors
                 }
             }
 
-            $completed_events++;
+            $completed_events += 1;
 
         } while ( ! empty( $event_ids ) && ! $this->limits_exceeded( $completed_events ) );
 
@@ -218,10 +220,33 @@ class Event_Queue extends Supports_Errors
         do_action( 'groundhogg/event_queue/process/after', $this );
 
         if ( $this->limits_exceeded( $completed_events ) ){
+
+            $execution_time        = $this->get_execution_time();
+            $max_execution_time    = $this->get_time_limit();
+            $time_per_action       = $execution_time / $completed_events;
+            $estimated_time        = $execution_time + ( $time_per_action * 3 );
+            $likely_to_be_exceeded = $estimated_time > $max_execution_time;
+
+            // TODO REMOVE
+            wp_send_json( [
+
+                'mem'  => $this->memory_exceeded(),
+                'time' => $this->time_likely_to_be_exceeded( $completed_events ),
+                'calcs' => [
+                    'completed_events' => $completed_events,
+                    'execution_time' => $execution_time,
+                    'max_execution_time' => $max_execution_time,
+                    'time_per_action' => $time_per_action,
+                    'estimated_time' => $estimated_time,
+                    'likely_to_be_exceeded' => $likely_to_be_exceeded
+                ]
+
+            ] );
+
             return $completed_events;
         }
 
-        return $completed_events + $this->process();
+        return $this->process( $completed_events );
     }
 
     /**

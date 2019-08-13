@@ -234,8 +234,12 @@ class Event extends Base_Object
                 $this->step = new Broadcast( $this->get_step_id() );
                 break;
 	        default:
-	        	$class = apply_filters( 'groundhosgg/event/post_setup/step_class', __NAMESPACE__ . '' );
-	        	$this->step = new $class( $this->get_step_id() );
+	        	$class = apply_filters( 'groundhosgg/event/post_setup/step_class', false );
+
+	        	if ( class_exists( $class ) ){
+                    $this->step = new $class( $this->get_step_id() );
+                }
+
 	        	break;
         }
 

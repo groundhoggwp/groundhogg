@@ -489,7 +489,6 @@ class Tracking
         }
 
         $args = array(
-            'timestamp'     => time(),
             'contact_id'    => $event->get_contact_id(),
             'funnel_id'     => $event->get_funnel_id(),
             'step_id'       => $event->get_step_id(),
@@ -499,8 +498,13 @@ class Tracking
             'referer'       => ''
         );
 
-        if ( Plugin::$instance->dbs->get_db( 'activity' )->add( $args ) ){
-            do_action( 'groundhogg/tracking/email/opened', $this );
+        if ( ! get_db( 'activity' )->exists( $args ) ){
+
+            $args[ 'timestamp' ] = time();
+
+            if ( Plugin::$instance->dbs->get_db( 'activity' )->add( $args ) ){
+                do_action( 'groundhogg/tracking/email/opened', $this );
+            }
         }
 
 	    /* only fire if actually doing an open as this may be called by the email_link_clicked method */
