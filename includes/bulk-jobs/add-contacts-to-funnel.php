@@ -4,6 +4,7 @@ namespace Groundhogg\Bulk_Jobs;
 use Groundhogg\Contact_Query;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_request_var;
+use function Groundhogg\is_option_enabled;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 
@@ -117,10 +118,16 @@ class Add_Contacts_To_Funnel extends Bulk_Job
      */
     protected function get_return_url()
     {
-        return add_query_arg( [
+        $edit_url = add_query_arg( [
             'page' => 'gh_funnels',
             'action' => 'edit',
             'funnel' => $this->step->get_funnel_id(),
         ], admin_url( 'admin.php' ) );
+
+        if ( is_option_enabled( 'gh_use_builder_version_2' ) ){
+            $edit_url = add_query_arg( [ 'version' => '2' ], $edit_url );
+        }
+
+        return $edit_url;
     }
 }

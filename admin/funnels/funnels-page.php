@@ -430,7 +430,13 @@ class Funnels_Page extends Admin_Page
                 'success'
             );
 
-            return $this->admin_url( [ 'action' => 'edit', 'funnel' => $id ] );
+            $edit_url = $this->admin_url( [ 'action' => 'edit', 'funnel' => $id ] );
+
+            if ( is_option_enabled( 'gh_use_builder_version_2' ) ){
+                $edit_url = add_query_arg( [ 'version' => '2' ], $edit_url );
+            }
+
+            return $edit_url;
         }
 
         return false;
