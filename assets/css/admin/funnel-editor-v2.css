@@ -18,7 +18,7 @@
     height: 0;
     border-style: solid;
     border-width: 10px 10px 0 10px;
-    border-color: #EDF4F8 transparent transparent transparent;
+    border-color: #cce5ff transparent transparent transparent;
     z-index: 999;
 }
 
@@ -26,11 +26,11 @@
     left: 24px;
     bottom: -11px;
     border-width: 11px 11px 0 11px;
-    border-color: #ddd transparent transparent transparent;
+    border-color: #b8daff transparent transparent transparent;
 }
 
 .postbox.benchmark.active:after{
-    border-color: #9CD8F3 transparent transparent transparent;
+    border-color: #b0deff transparent transparent transparent;
 }
 
 #post-body{
@@ -130,8 +130,11 @@ html.full-screen{
 }
 
 #postbox-container-1 .postbox{
-    border: none;
+    /*border: none;*/
     box-shadow: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
     border-bottom: 1px solid #e5e5e5;
     margin: 0;
 }
@@ -279,15 +282,26 @@ html.full-screen{
 }
 
 .postbox.action.active .hndle{
-    background-color: rgba(62, 217, 32, 0.46);
+    background-color: rgb(204, 253, 203);
 }
 
-.postbox.benchmark .hndle{
-    background-color: rgba(0, 103, 153, 0.07);
+#postbox-container-1 .postbox.benchmark{
+    color: #004085;
+    background-color: #cce5ff;
+    border-bottom-color: #b8daff;
+}
+
+
+#postbox-container-1 .postbox.benchmark h2{
+    color: #004085;
+}
+
+#postbox-container-1 .postbox.benchmark .step-title{
+    border-bottom-color: #b8daff;
 }
 
 .postbox.benchmark.active .hndle{
-    background-color: rgba(53, 175, 230, 0.49);
+    background-color: #b0deff;
 }
 
 #postbox-container-1 .postbox.step h2 {

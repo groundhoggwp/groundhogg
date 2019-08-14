@@ -275,7 +275,7 @@ class Tracking
      */
     public function get_leadsource()
     {
-        return '';
+        return sanitize_text_field( $_COOKIE[ self::LEAD_SOURCE_COOKIE ] );
     }
 
     /**

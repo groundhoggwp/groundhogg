@@ -128,6 +128,42 @@ function get_request_var( $key='', $default=false, $post_only=false )
 }
 
 /**
+ * Get a variable from the $_POST global
+ *
+ * @param string $key
+ * @param bool $default
+ * @return mixed
+ */
+function get_post_var( $key='', $default=false )
+{
+    return wp_unslash( get_array_var( $_POST, $key, $default ) );
+}
+
+/**
+ * Get a variable from the $_GET global
+ *
+ * @param string $key
+ * @param bool $default
+ * @return mixed
+ */
+function get_url_var( $key='', $default=false )
+{
+    return urldecode( get_array_var( $_GET, $key, $default ) );
+}
+
+/**
+ * Get a variable from the $_GET global
+ *
+ * @param string $key
+ * @param bool $default
+ * @return mixed
+ */
+function get_url_param( $key='', $default=false )
+{
+    return get_url_var( $key, $default );
+}
+
+/**
  * Get a db query from the URL.
  *
  * @param array $default a default query if the given is empty

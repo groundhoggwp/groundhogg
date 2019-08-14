@@ -280,6 +280,14 @@ class Form_Filled extends Benchmark
 
                             $buttons = array(
                                 array(
+                                    'text' => __( 'Row', 'groundhogg' ),
+                                    'class' => 'button button-secondary row'
+                                ),
+                                array(
+                                    'text' => __( 'Col', 'groundhogg' ),
+                                    'class' => 'button button-secondary col'
+                                ),
+                                array(
                                     'text' => __( 'First', 'groundhogg' ),
                                     'class' => 'button button-secondary first'
                                 ),
@@ -298,22 +306,6 @@ class Form_Filled extends Benchmark
                                 array(
                                     'text' => __( 'Address', 'groundhogg' ),
                                     'class' => 'button button-secondary address'
-                                ),
-                                array(
-                                    'text' => __( 'Submit', 'groundhogg' ),
-                                    'class' => 'button button-secondary submit'
-                                ),
-                                array(
-                                    'text' => __( 'Row', 'groundhogg' ),
-                                    'class' => 'button button-secondary row'
-                                ),
-                                array(
-                                    'text' => __( 'Col', 'groundhogg' ),
-                                    'class' => 'button button-secondary col'
-                                ),
-                                array(
-                                    'text' => __( 'ReCaptcha', 'groundhogg' ),
-                                    'class' => 'button button-secondary recaptcha'
                                 ),
                                 array(
                                     'text' => __( 'GDPR', 'groundhogg' ),
@@ -358,6 +350,14 @@ class Form_Filled extends Benchmark
                                 array(
                                     'text' => __( 'File', 'groundhogg' ),
                                     'class' => 'button button-secondary file'
+                                ),
+                                array(
+                                    'text' => __( 'ReCaptcha', 'groundhogg' ),
+                                    'class' => 'button button-secondary recaptcha'
+                                ),
+                                array(
+                                    'text' => __( 'Submit', 'groundhogg' ),
+                                    'class' => 'button button-secondary submit'
                                 ),
                             );
 

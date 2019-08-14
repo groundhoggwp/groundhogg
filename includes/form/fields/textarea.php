@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\html;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -23,6 +25,8 @@ class Textarea extends Input
             'title'         => '',
             'attributes'    => '',
             'required'      => false,
+            'rows'          => '4',
+            'cols'          => false,
         ];
     }
 
@@ -56,17 +60,28 @@ class Textarea extends Input
      */
     public function render()
     {
-        return sprintf(
-            '<label class="gh-input-label">%1$s <textarea name="%2$s" id="%3$s" class="gh-input %4$s" placeholder="%5$s" rows="4" title="%6$s" %7$s %8$s>%9$s</textarea></label>',
+        $atts = [
+            'type'  => $this->get_type(),
+            'name'  => $this->get_name(),
+            'id'    => $this->get_id(),
+            'class' => $this->get_classes() . ' gh-input',
+            'value' => $this->get_value(),
+            'placeholder' => $this->get_placeholder(),
+            'title' => $this->get_title(),
+            'required' => $this->is_required(),
+            'rows' => $this->get_att( 'rows', 4 ),
+            'cols' => $this->get_att( 'cols', false )
+        ];
+
+        return html()->wrap([
             $this->get_label(),
-            $this->get_name(),
-            $this->get_id(),
-            $this->get_classes(),
-            $this->get_placeholder(),
-            $this->get_title(),
-            $this->get_attributes(),
-            $this->is_required() ? 'required' : '',
-            $this->get_value()
+            "&nbsp;",
+            html()->textarea( $atts )
+        ],
+            'label',
+            [
+                'class' => 'gh-input-label'
+            ]
         );
     }
 }
