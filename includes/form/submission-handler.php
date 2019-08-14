@@ -231,7 +231,19 @@ class Submission_Handler extends Supports_Errors
 
             // Check for tag mappings.
             if ( $this->has_tag_map( $field ) ){
-                $tags[] = $this->get_tag_from_map( $field, $value );
+                //get list of values
+                if (preg_match('/\,/' , $value)) {
+
+                    $values= explode( ',', $value );
+
+                    foreach ( $values as $value){
+                        $tags[] = $this->get_tag_from_map( $field, trim( $value ));
+                    }
+
+                } else {
+                    $tags[] = $this->get_tag_from_map( $field, $value );
+                }
+
             }
 
         }
