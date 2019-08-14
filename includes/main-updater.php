@@ -64,6 +64,8 @@ class Main_Updater extends Updater {
         // Give the DBS a quick update...
 	    Plugin::$instance->dbs->install_dbs();
 
+        wp_clear_scheduled_hook( 'wpgh_process_queue' );
+
         flush_rewrite_rules();
 
         update_option( 'gh_migrate_form_impressions', 1 );
