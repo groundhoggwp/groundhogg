@@ -70,19 +70,6 @@ class Role_Changed extends Benchmark
     }
 
 
-    /**
-     * Add the completion action
-     *
-     * WPGH_Form_Filled constructor.
-     */
-    public function __construct()
-    {
-
-        parent::__construct();
-
-        add_action( 'set_user_role', array( $this, 'complete' ), 10, 3 );
-        add_action( 'add_user_role', array( $this, 'complete' ), 10, 2 );
-    }
 
     /**
      * @param $step Step
