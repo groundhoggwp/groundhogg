@@ -603,14 +603,28 @@ class Contact_Query {
         }
 
         if ( $this->query_vars['report'] && is_array( $this->query_vars['report'] ) ) {
-            if ( !empty( $this->query_vars[ 'report' ][ 'funnel' ] ) ){
-                $funnel_id = $this->query_vars[ 'report' ][ 'funnel' ];
+
+            $map = [
+                'step' => 'step_id',
+                'funnel' => 'funnel_id',
+                'start' => 'after',
+                'end' => 'before'
+            ];
+
+            foreach ( $map as $old_key => $new_key ){
+                if ( $val = get_array_var( $this->query_vars[ 'report' ], $old_key ) ){
+                    $this->query_vars[ 'report' ][ $new_key ] = $val;
+                }
+            }
+
+            if ( !empty( $this->query_vars[ 'report' ][ 'funnel_id' ] ) ){
+                $funnel_id = $this->query_vars[ 'report' ][ 'funnel_id' ];
                 $where['report_funnel'] = "events.funnel_id IN ( $funnel_id )";
             }
 
             if ( !empty( $this->query_vars[ 'report' ][ 'status' ] ) ){
                 $status = $this->query_vars[ 'report' ][ 'status' ];
-                $where['report_funnel'] = "events.status LIKE '$status'";
+                $where['report_status'] = "events.status LIKE '$status'";
             }
 
             if ( !empty( $this->query_vars[ 'report' ][ 'type' ] ) ){
@@ -618,18 +632,18 @@ class Contact_Query {
                 $where['report_type'] = "events.event_type IN ($event_types)";
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'step' ] ) ){
-                $step_id = $this->query_vars[ 'report' ][ 'step' ];
+            if ( !empty( $this->query_vars[ 'report' ][ 'step_id' ] ) ){
+                $step_id = $this->query_vars[ 'report' ][ 'step_id' ];
                 $where['report_step'] = "events.step_id IN ( $step_id )";
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'start' ] ) ){
-                $start = $this->query_vars[ 'report' ][ 'start' ];
+            if ( !empty( $this->query_vars[ 'report' ][ 'after' ] ) ){
+                $start = $this->query_vars[ 'report' ][ 'after' ];
                 $where['report_start'] = "events.time >= $start";
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'end' ] ) ){
-                $end = $this->query_vars[ 'report' ][ 'end' ];
+            if ( !empty( $this->query_vars[ 'report' ][ 'before' ] ) ){
+                $end = $this->query_vars[ 'report' ][ 'before' ];
                 $where['report_end'] = "events.time <= $end";
             }
         }
@@ -640,14 +654,32 @@ class Contact_Query {
                 $where['report_type'] = "activity.activity_type = '$type'";
             }
 
+            $map = [
+                'step' => 'step_id',
+                'funnel' => 'funnel_id',
+                'start' => 'after',
+                'end' => 'before'
+            ];
+
+            foreach ( $map as $old_key => $new_key ){
+                if ( $val = get_array_var( $this->query_vars[ 'activity' ], $old_key ) ){
+                    $this->query_vars[ 'activity' ][ $new_key ] = $val;
+                }
+            }
+
 //            if ( !empty( $this->query_vars[ 'report' ][ 'event_type' ] ) ){
 //                $event_types = implode( ',', ensure_array( $this->query_vars[ 'activity' ][ 'event_type' ] ) );
 //                $where['report_event_type'] = "activity.event_type IN ( $event_types )";
 //            }
 
-            if ( !empty( $this->query_vars[ 'activity' ][ 'funnel' ] ) ){
-                $funnel_ids = implode( ',', ensure_array( $this->query_vars[ 'activity' ][ 'funnel' ] ) );
+            if ( !empty( $this->query_vars[ 'activity' ][ 'funnel_id' ] ) ){
+                $funnel_ids = implode( ',', ensure_array( $this->query_vars[ 'activity' ][ 'funnel_id' ] ) );
                 $where['report_funnel'] = "activity.funnel_id IN ( $funnel_ids )";
+            }
+
+            if ( !empty( $this->query_vars[ 'activity' ][ 'step_id' ] ) ){
+                $step_ids = implode( ',', ensure_array( $this->query_vars[ 'activity' ][ 'step_id' ] ) );
+                $where['report_step'] = "activity.step_id IN ( $step_ids )";
             }
 
             if ( !empty( $this->query_vars[ 'activity' ][ 'referer' ] ) ){
@@ -655,19 +687,14 @@ class Contact_Query {
                 $where['report_referer'] = "activity.referer LIKE '$referer'";
             }
 
-            if ( !empty( $this->query_vars[ 'activity' ][ 'step' ] ) ){
-                $step_id = $this->query_vars[ 'activity' ][ 'step' ];
-                $where['report_step'] = "activity.step_id IN ( $step_id )";
+            if ( !empty( $this->query_vars[ 'activity' ][ 'after' ] ) ){
+                $end = $this->query_vars[ 'activity' ][ 'after' ];
+                $where['report_end'] = "activity.timestamp >= $end";
             }
 
-            if ( !empty( $this->query_vars[ 'activity' ][ 'start' ] ) ){
-                $start = $this->query_vars[ 'activity' ][ 'start' ];
-                $where['report_start'] = "activity.timestamp >= $start";
-            }
-
-            if ( !empty( $this->query_vars[ 'activity' ][ 'end' ] ) ){
-                $end = $this->query_vars[ 'activity' ][ 'end' ];
-                $where['report_end'] = "activity.timestamp <= $end";
+            if ( !empty( $this->query_vars[ 'activity' ][ 'before' ] ) ){
+                $start = $this->query_vars[ 'activity' ][ 'before' ];
+                $where['report_start'] = "activity.timestamp <= $start";
             }
         }
 
