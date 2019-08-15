@@ -1961,3 +1961,30 @@ if ( ! function_exists( __NAMESPACE__ . '\white_labeled_name' ) ){
     }
 }
 
+/**
+ * Gets the main blog ID.
+ *
+ * @return int
+ */
+function get_main_blog_id()
+{
+    if ( is_multisite() ){
+        return get_network()->site_id;
+    }
+
+    return false;
+}
+
+/**
+ * Whether the current blog is the main blog.
+ *
+ * @return bool
+ */
+function is_main_blog()
+{
+    if ( ! is_multisite() ){
+        return true;
+    }
+
+    return get_main_blog_id() === get_current_blog_id();
+}

@@ -323,14 +323,14 @@ abstract class Extension
      * @return string
      */
     public function get_display_name(){
-	    return $this->get_plugin_data( 'Name' );
+	    return apply_filters( 'groundhogg/extension/name', $this->get_plugin_data( 'Name' ) );
     }
 
     /**
      * @return string
      */
     public function get_display_description(){
-	    return $this->get_plugin_data( 'Description' );
+	    return apply_filters( 'groundhogg/extension/description', $this->get_plugin_data( 'Description' ) );
     }
 
     /**
