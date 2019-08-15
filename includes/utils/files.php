@@ -3,6 +3,14 @@ namespace Groundhogg;
 
 class Files
 {
+
+    public function add_htaccess()
+    {
+        $htaccess_content = "Deny from all";
+        $base_url = $this->get_base_uploads_dir();
+        file_put_contents( $base_url . DIRECTORY_SEPARATOR . '.htacess', $htaccess_content );
+    }
+
     /**
      * Get the base path.
      *

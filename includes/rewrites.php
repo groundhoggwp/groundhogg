@@ -55,6 +55,13 @@ class Rewrites
             'top'
         );
 
+        // Funnel Download/Export
+        add_rewrite_rule(
+            '^gh/files/([^/]*)/?$',
+            managed_rewrite_rule( 'subpage=files&action=download&file_path=$matches[1]' ),
+            'top'
+        );
+
         add_rewrite_rule(
             '^gh/forms/([^/]*)/submit/?$',
             managed_rewrite_rule( 'subpage=form_submit&form_id=$matches[1]' ),
@@ -87,6 +94,7 @@ class Rewrites
     {
         $vars[] = 'subpage';
         $vars[] = 'action';
+        $vars[] = 'file_path';
         $vars[] = 'superlink_id';
         $vars[] = 'funnel_id';
         $vars[] = 'enc_funnel_id';
@@ -114,6 +122,8 @@ class Rewrites
         $this->map_query_var( $query, 'form_id', 'urldecode' );
         $this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
         $this->map_query_var( $query, 'form_id', 'absint' );
+
+        $this->map_query_var( $query, 'file_path', 'base64_decode' );
         return $query;
     }
 
@@ -224,6 +234,26 @@ class Rewrites
                 $file = fopen('php://output', 'w');
                 fputs( $file, $export_string );
                 fclose($file);
+                exit();
+                break;
+            case 'files':
+                $file_path = get_query_var( 'file_path' );
+
+                if ( ! $file_path || ! file_exists( $file_path ) ){
+                    return;
+                }
+
+                $content_type = sprintf( "Content-Type: %s", mime_content_type( $file_path ) );
+                $content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );
+                $content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
+
+                header( $content_type );
+                header( $content_size );
+                header( $content_disposition );
+                status_header( 200 );
+                nocache_headers();
+
+                readfile( $file_path );
                 exit();
                 break;
             case 'forms_iframe':

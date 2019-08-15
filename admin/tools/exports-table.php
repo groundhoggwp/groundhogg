@@ -175,8 +175,8 @@ class Exports_Table extends WP_List_Table {
                 $file = [
                     'file' => $filename,
                     'file_path' => $filepath,
-                    'file_url' => Plugin::$instance->utils->files->get_csv_exports_url($filename),
-                    'date' => filemtime($filepath),
+                    'file_url' => sprintf( site_url( 'gh/files/%s/' ), base64_encode( $filepath ) ),
+                    'date' => filemtime( $filepath ),
                     'rows' => count(file($filepath, FILE_SKIP_EMPTY_LINES)) - 1,
                 ];
 

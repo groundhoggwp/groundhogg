@@ -66,9 +66,11 @@ class Main_Updater extends Updater {
 
         wp_clear_scheduled_hook( 'wpgh_process_queue' );
 
-        flush_rewrite_rules();
-
         update_option( 'gh_migrate_form_impressions', 1 );
+
+        Plugin::$instance->utils->files->add_htaccess();
+
+        flush_rewrite_rules();
     }
 
 }
