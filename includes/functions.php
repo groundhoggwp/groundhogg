@@ -168,9 +168,10 @@ function get_url_param( $key='', $default=false )
  *
  * @param array $default a default query if the given is empty
  * @param array $force for the query to include the given
+ * @param array $accepted_keys for the query to include the given
  * @return array|string
  */
-function get_request_query( $default = [], $force=[] )
+function get_request_query( $default=[], $force=[], $accepted_keys=[] )
 {
    $query = $_GET;
 
@@ -196,12 +197,21 @@ function get_request_query( $default = [], $force=[] )
    }
 
    $query = array_merge( $query, $force );
+   $query = wp_parse_args( $query, $default );
 
-   if ( empty( $query ) ){
-       return $default;
+   if ( ! empty( $accepted_keys ) ){
+
+       $new_query = [];
+
+       foreach ( $accepted_keys as $key ){
+           $val = get_array_var( $query, $key );
+           $new_query[ $key ] = $val;
+       }
+
+       $query = $new_query;
    }
 
-   return wp_unslash( $query );
+   return wp_unslash( array_filter( $query ) );
 }
 
 /**
@@ -971,7 +981,7 @@ function listen_for_complaint_and_bounce_emails( $error )
 
         if ( ! empty( $bounces ) ){
             foreach ( $bounces as $email ){
-                if ( $contact = ( $email ) ){
+                if ( $contact = get_contactdata( $email ) ){
                     $contact->change_marketing_preference( Preferences::HARD_BOUNCE );
                 }
             }

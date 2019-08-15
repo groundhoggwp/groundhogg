@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Admin\Admin_Page;
+use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 
 // Exit if accessed directly
@@ -77,7 +78,6 @@ class Events_Page extends Admin_Page
         }
     }
 
-
     /**
      * Cancels scheduled broadcast
      *
@@ -100,6 +100,27 @@ class Events_Page extends Admin_Page
         $this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
         //false return users to the main page
+        return false;
+    }
+
+    /**
+     * Clean up the events DB if something goes wrong.
+     *
+     * @return bool
+     */
+    public function process_cleanup()
+    {
+        if ( !current_user_can( 'execute_events' ) ) {
+            $this->wp_die_no_access();
+        }
+
+        global $wpdb;
+
+        $events = get_db( 'events' );
+
+        $wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE claim <> ''" );
+        $wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'complete' WHERE status = 'in_progress'" );
+
         return false;
     }
 
