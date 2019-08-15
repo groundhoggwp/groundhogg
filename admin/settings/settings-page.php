@@ -134,18 +134,6 @@ class Settings_Page extends Admin_Page
      */
     private function get_default_tabs()
     {
-
-        if ( is_white_labeled() ) {
-
-            $licenses = [] ;
-        } else {
-            $licenses = [
-                'id'    => 'extensions',
-                'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' )
-            ] ;
-        }
-
-
         $tabs  = [
             'general'      => array(
                 'id'    => 'general',
@@ -173,7 +161,7 @@ class Settings_Page extends Admin_Page
             ),
         ];
 
-        if ( ! is_white_labeled() ) {
+        if ( ! is_white_labeled() || ! is_multisite() || \Groundhogg\is_main_blog() ) {
             $tabs['extensions'] = [
                 'id'    => 'extensions',
                 'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' )
@@ -191,10 +179,9 @@ class Settings_Page extends Admin_Page
     private function get_default_sections()
     {
 
-        if ( is_white_labeled() ) {
+        $service  = [];
 
-            $service  = [];
-        } else {
+        if ( ! is_white_labeled() ) {
             $service = [
                 'id'    => 'bounces',
                 'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
@@ -202,7 +189,6 @@ class Settings_Page extends Admin_Page
                 'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ], //todo
             ];
         }
-
 
         return apply_filters( 'groundhogg/admin/settings/sections', array(
             'business_info' => array(
@@ -225,11 +211,6 @@ class Settings_Page extends Admin_Page
                 'title' => _x( 'Event Notices', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'misc'
             ],
-//            'event_queue' => [
-//                'id'    => 'event_queue',
-//                'title' => _x( 'Event Queue', 'settings_sections', 'groundhogg' ),
-//                'tab'   => 'misc'
-//            ],
             'compliance' => array(
                 'id'    => 'compliance',
                 'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),

@@ -127,6 +127,11 @@ class Login_Status extends Benchmark
     public function setup( $user_login, $user ){
         $this->add_data(  'user_id', $user->ID );
         $contact = create_contact_from_user( $this->get_data( 'user_id' ) );
+
+        if ( is_wp_error( $contact ) || ! $contact ){
+            return;
+        }
+
         $times = absint( $contact->get_meta( 'times_logged_in' ) );
         $times++;
         /* Update the number of times logged in */
