@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Emails;
 
+use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
 
@@ -104,12 +105,10 @@ if ( count( $custom_templates ) > 0 ){
         <div id="emails">
             <!-- Only retrieve previous 20 emails.. -->
             <?php
-            $emails = array_slice(  Plugin::$instance->dbs->get_db('emails' )->query() , 0, 20 );
-            ?>
-            <?php foreach ( $emails as $email ):
-
-                $email = new Email( $email->ID );
-                ?>
+            $emails = get_db( 'emails' )->query( [], 'ID' );
+            $emails = array_slice( $emails, 0, 20 );
+            foreach ( $emails as $email ):
+                $email = new Email( absint( $email->ID ) ); ?>
                 <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
                     <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
                     <div class="inside">
