@@ -3,9 +3,12 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
+use Groundhogg\Reporting\Reporting;
+use Groundhogg\Utils\Graph;
 use function Groundhogg\encrypt;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
+use function Groundhogg\html;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -13,6 +16,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Event;
 use Groundhogg\Form;
 use Groundhogg\Submission;
+use function Groundhogg\percentage;
 
 
 /**
@@ -737,5 +741,90 @@ class Form_Filled extends Benchmark
             <span class="cvr" title="<?php _e( 'Conversion Rate' ); ?>"><?php _e( 'CVR: '); ?><strong><?php echo round( ( $num_events_completed / ( ( $num_impressions > 0 )? $num_impressions : 1 ) * 100 ), 2 ); ?></strong>%</span>
         </p>
         <?php
+    }
+
+    public function reporting_v2( $step )
+    {
+
+        $times = $this->get_reporting_interval();
+
+        $start_time = $times[ 'start_time' ];
+        $end_time = $times[ 'end_time' ];
+
+        $db = get_db( 'form_impressions' );
+
+        $data = $db->query( [
+            'before'    => $start_time,
+            'after'     => $end_time
+        ] );
+
+        $impressions = [];
+
+        // Normalize data so reports don't have to change...
+        foreach ( $data as $datum ){
+            $count = absint( $datum->count );
+            for( $i = 0; $i < $count; $i++ ){
+                $impressions[] = [ 'timestamp' => absint( $datum->timestamp ) ];
+            }
+        }
+
+        $submissions = get_db( 'events' )->query( [
+            'step_id' => $step->get_id(),
+            'status' => Event::COMPLETE,
+            'before' => $end_time,
+            'after' => $start_time
+        ] );
+
+        $total_impressions = count( $impressions );
+        $total_submissions = count( $submissions );
+
+        $impressions = Reporting::group_by_time( $impressions, 'timestamp', 'absint' );
+        $submissions = Reporting::group_by_time( $submissions, 'time', 'absint' );
+
+        $data = [
+            [
+                'label' => 'Impressions',
+                'data' => $impressions
+            ],
+            [
+                'label' => 'Submissions',
+                'data' => $submissions
+            ],
+        ];
+
+        $graph = new Graph( $step->get_id(), [
+            'mode' => 'time'
+        ], $data );
+
+        if ( $graph->has_data() ):
+
+        ?>
+        <div class="chart">
+            <div class="inside">
+                <?php $graph->render(); ?>
+            </div>
+        </div>
+        <?php
+
+        endif;
+
+        html()->list_table(
+            [ 'class' => 'form_activity' ],
+            [
+                __( 'Impressions', 'groundhogg' ),
+                __( 'Submissions', 'groundhogg' ),
+                __( 'Conversion Rate (%)', 'groundhogg' ),
+            ],
+            [
+                [
+                    html()->wrap( $total_impressions, 'span', [ 'class' => 'number-total' ] ),
+                    html()->wrap( $total_submissions, 'span', [ 'class' => 'number-total' ] ),
+                    html()->wrap( percentage( $total_impressions, $total_submissions ) . '%', 'span', [ 'class' => 'number-total' ] ),
+                ]
+            ],
+            false
+        );
+
+
     }
 }
