@@ -46,6 +46,15 @@ class Extensions extends Step
 			    display: inline-block;
 			    vertical-align: top;
 		    }
+
+            .postbox .inside {
+                padding: 0;
+                margin: 0 !important;
+            }
+
+            .article-description {
+                padding: 10px;
+            }
 	    </style>
 	    <div class="masonry">
 		    <?php

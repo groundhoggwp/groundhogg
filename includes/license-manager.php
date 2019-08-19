@@ -379,23 +379,22 @@ class License_Manager
             <?php if ( $extension->info->title ): ?>
                 <h2 class="hndle"><?php echo $extension->info->title; ?></h2>
             <?php endif; ?>
-            <div class="inside">
+            <div class="inside" style="padding: 0;margin: 0">
                 <?php if ( $extension->info->thumbnail ): ?>
                     <div class="img-container">
                         <a href="<?php echo $extension->info->link; ?>" target="_blank">
-                            <img src="<?php echo $extension->info->thumbnail; ?>" style="width: 100%;max-width: 100%;">
+                            <img src="<?php echo $extension->info->thumbnail; ?>" style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd">
                         </a>
                     </div>
-                    <hr/>
                 <?php endif; ?>
                 <?php if ( $extension->info->excerpt ): ?>
-                    <div class="article-description">
+                    <div class="article-description" style="padding: 10px;">
                         <?php echo $extension->info->excerpt; ?>
                     </div>
                     <hr/>
                 <?php endif; ?>
                 <?php if ( $extension->info->link ): ?>
-                    <p>
+                    <div class="buy" style="padding: 10px">
                         <?php $pricing = (array) $extension->pricing;
                         if (count($pricing) > 1) {
 
@@ -424,7 +423,7 @@ class License_Manager
                         }
 
                         ?>
-                    </p>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
