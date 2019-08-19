@@ -2,15 +2,21 @@
 
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Classes\Activity;
 use Groundhogg\Email;
+use Groundhogg\Reporting\Reporting;
+use Groundhogg\Utils\Graph;
 use function Groundhogg\get_array_var;
 use Groundhogg\Preferences;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
+use function Groundhogg\get_db;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\HTML;
+use function Groundhogg\html;
 use Groundhogg\Plugin;
+use function Groundhogg\percentage;
 use function Groundhogg\search_and_replace_domain;
 use Groundhogg\Step;
 
@@ -227,6 +233,98 @@ class Send_Email extends Action
             <span class="ctr"><?php _ex('C.T.R', 'stats', 'groundhogg'); ?>:&nbsp;<strong><?php echo round(($num_clicks / (($num_opens > 0) ? $num_opens : 1) * 100), 2); ?></strong>%</span>
         </p>
         <?php
+    }
+
+    /**
+     * @param Step $step Reporting v2
+     */
+    public function reporting_v2( $step )
+    {
+
+        $times = $this->get_reporting_interval();
+
+        $start_time = $times[ 'start_time' ];
+        $end_time = $times[ 'end_time' ];
+
+        $sent = get_db( 'events' )->query( [
+            'step_id' => $step->get_id(),
+            'status' => Event::COMPLETE,
+            'before' => $end_time,
+            'after' => $start_time
+        ] );
+
+        $opens = get_db( 'activity' )->query( [
+            'step_id' => $step->get_id(),
+            'activity_type' => Activity::EMAIL_OPENED,
+            'before' => $end_time,
+            'after' => $start_time,
+        ] );
+
+        $clicks = get_db( 'activity' )->query( [
+            'step_id' => $step->get_id(),
+            'activity_type' => Activity::EMAIL_CLICKED,
+            'before' => $end_time,
+            'after' => $start_time,
+        ] );
+
+        $total_sent = count( $sent );
+        $total_opens = count( $opens );
+        $total_clicks = count( $clicks );
+
+        $sent = Reporting::group_by_time( $sent, 'time', 'absint' );
+        $opens = Reporting::group_by_time( $opens, 'timestamp', 'absint' );
+        $clicks = Reporting::group_by_time( $clicks, 'timestamp', 'absint' );
+
+        $data = [
+            [
+                'label' => __( 'Sent', 'groudnhogg' ),
+                'data' => $sent
+            ],
+            [
+                'label' => 'Emails Opened',
+                'data' => $opens
+            ],
+            [
+                'label' => 'Emails Clicked',
+                'data' => $clicks
+            ]
+        ];
+
+        $graph = new Graph( $step->get_id(), [
+            'mode' => 'time'
+        ], $data );
+
+        if ( $graph->has_data() ):
+
+            ?>
+            <div class="chart">
+                <div class="inside">
+                    <?php $graph->render(); ?>
+                </div>
+            </div>
+        <?php
+
+        endif;
+
+        html()->list_table(
+            [
+                'class' => 'email_activity'
+            ],
+            [
+                __( 'Sent', 'groundhogg' ),
+                __( 'Opens (O.R)', 'groundhogg' ),
+                __( 'Clicks (C.T.R)', 'groundhogg' ),
+            ],
+            [
+                [
+                    html()->wrap( $total_sent, 'span', [ 'class' => 'number-total' ] ),
+                    html()->wrap( $total_opens . ' (' . percentage( $total_sent, $total_opens) . '%)', 'span', [ 'class' => 'number-total' ] ),
+                    html()->wrap( $total_clicks . ' (' . percentage( $total_opens, $total_clicks) . '%)', 'span', [ 'class' => 'number-total' ] ),
+                ]
+            ],
+            false
+        );
+
     }
 
     /**

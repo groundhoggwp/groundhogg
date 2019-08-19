@@ -433,9 +433,21 @@ abstract class Funnel_Step extends Supports_Errors
         $times = [
             'start_time' => Plugin::$instance->reporting->get_start_time(),
             'end_time' => Plugin::$instance->reporting->get_end_time(),
+            'range' => Plugin::$instance->reporting->get_range(),
         ];
 
         return $times;
+    }
+
+    /**
+     * Get the reporting view for the STEP
+     * Most steps will use the default step reporting given here...
+     *
+     * @param $step Step
+     */
+    public function reporting_v2( $step )
+    {
+
     }
 
     /**
@@ -510,6 +522,86 @@ abstract class Funnel_Step extends Supports_Errors
         </p>
         <?php
     }
+
+    /**
+     * Get the reporting view for the STEP
+     * Most steps will use the default step reporting given here...
+     *
+     * @param $step Step
+     * @return array
+     */
+    public function quick_stats( $step )
+    {
+
+        $times = $this->get_reporting_interval();
+
+        $start_time = $times[ 'start_time' ];
+        $end_time = $times[ 'end_time' ];
+
+        $cquery = new Contact_Query();
+
+        $stats = [];
+
+        if ( $step->is_action() ):
+
+            $num_events_waiting = $cquery->query( [
+                'count' => true,
+                'report' => [
+                    'step'  => $step->get_id(),
+                    'funnel'=> $step->get_funnel_id(),
+                    'status'=> 'waiting'
+                ]
+            ] );
+
+            $stats[] = html()->e( 'div', [ 'class' => 'report' ], [
+                __( 'Waiting: ', 'groundhogg' ),
+                html()->e( 'a', [
+                    'target' => '_blank',
+                    'class' => 'number',
+                    'href' => add_query_arg( [
+                        'report' => [
+                            'step'  => $step->get_id(),
+                            'funnel'=> $step->get_funnel_id(),
+                            'status'=> 'waiting'
+                        ]
+                    ], admin_url( 'admin.php?page=gh_contacts' ) )
+                ], absint( $num_events_waiting ), false )
+            ] );
+
+        endif;
+
+        $num_events_completed = $cquery->query( [
+            'count' => true,
+            'report' => [
+                'start' => $start_time,
+                'end'   => $end_time,
+                'step'  => $step->get_id(),
+                'funnel'=> $step->get_funnel_id(),
+                'status'=> 'complete'
+            ]
+        ] );
+
+        $stats[] = html()->e( 'div', [ 'class' => 'report' ], [
+            __( 'Complete: ', 'groundhogg' ),
+            html()->e( 'a', [
+                'target' => '_blank',
+                'class' => 'number',
+                'href' => add_query_arg( [
+                    'report' => [
+                        'start' => $start_time,
+                        'end'   => $end_time,
+                        'step'  => $step->get_id(),
+                        'funnel'=> $step->get_funnel_id(),
+                        'status'=> 'complete'
+                    ]
+                ], admin_url( 'admin.php?page=gh_contacts' ) )
+            ], absint( $num_events_completed ), false )
+        ] );
+
+        return apply_filters( "groundhogg/steps/{$this->get_type()}/reporting_v2", $stats );
+    }
+
+
 
     /**
      * Get similar steps which can be used by benchmarks.
@@ -605,11 +697,16 @@ abstract class Funnel_Step extends Supports_Errors
                         'class' => 'step-title',
                     ],  $step->get_title() );
                     echo "<br/>";
-	                echo html()->e( 'span', [
-		                'class' => 'step-name',
-	                ],  $this->get_name() );
+
 	                ?>
                 </span>
+                <?php echo html()->e( 'span', [
+                    'class' => 'step-name step-edit',
+                ],  $this->get_name()  );
+                ?>
+                <div class="step-reporting">
+                    <?php echo implode( '', $this->quick_stats( $step ) ); ?>
+                </div>
                 <div class="wp-clearfix"></div>
             </h2>
         </div>
@@ -626,8 +723,7 @@ abstract class Funnel_Step extends Supports_Errors
             <!-- INSIDE -->
             <div class="inside">
                 <!-- SETTINGS -->
-                <?php //TODO Reporting enabled? ?>
-                <div class="step-edit <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? 'hidden' : '' ; ?>">
+                <div class="step-edit">
                     <div class="custom-settings">
 
                         <?php
@@ -652,10 +748,10 @@ abstract class Funnel_Step extends Supports_Errors
                 </div>
                 <!-- REPORTING  -->
                 <?php //TODO Reporting enabled? ?>
-                <div class="step-reporting <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden' ; ?>">
+                <div class="step-reporting">
                     <?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
                     <?php do_action( 'groundhogg/steps/reporting/before', $step ); ?>
-                    <?php $this->reporting( $step ); ?>
+                    <?php $this->reporting_v2( $step ); ?>
                     <?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
                     <?php do_action( 'groundhogg/steps/reporting/after', $step ); ?>
                 </div>

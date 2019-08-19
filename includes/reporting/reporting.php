@@ -23,6 +23,8 @@ use Groundhogg\Reporting\Reports\Last_Broadcast;
 use Groundhogg\Reporting\Reports\New_Contacts;
 use Groundhogg\Reporting\Reports\Report;
 use Groundhogg\Reporting\Reports\Waiting_Funnel_Activity;
+use function Groundhogg\isset_not_empty;
+use function Groundhogg\search_and_replace_domain;
 
 /**
  * Created by PhpStorm.
@@ -71,6 +73,60 @@ class Reporting
         return $this->range;
     }
 
+    /**
+     * Get the time slots for the given time range...
+     *
+     * @return array
+     */
+    public static function get_date_points()
+    {
+        $points = Plugin::$instance->reporting->get_points();
+        $start = Plugin::$instance->reporting->get_start_time();
+        $diff = Plugin::$instance->reporting->get_difference();
+
+        $date_points = [];
+
+        for ( $i = 0;$i<$points;$i++){
+            $start = Plugin::$instance->utils->date_time->round_to( $start, $diff );
+            $date_points[ $start ] = [ $start * 1000, 0, date( 'Y-m-d H:i:s', $start ) ];
+            $start+=$diff;
+        }
+
+        return $date_points;
+    }
+
+    /**
+     * Group the given data into their respective time slots...
+     *
+     * @param $data array[] the data...
+     * @param $date_key string the key to which the date is present
+     * @param $map_callback string|callable|bool a callback function to map the date
+     * @return array
+     */
+    public static function group_by_time( $data, $date_key='time', $map_callback=false ){
+
+        $times = self::get_date_points();
+
+        foreach ( $data as $datum ){
+            $date = get_array_var( $datum, $date_key );
+            $date_point = Plugin::$instance->utils->date_time->round_to(
+                is_callable( $map_callback ) ? call_user_func( $map_callback, $date ) : $date,
+                Plugin::$instance->reporting->get_difference()
+            );
+
+            if ( isset_not_empty( $times, $date_point ) ){
+                $times[ $date_point ][ 1 ]++;
+            }
+        }
+
+        return array_values( $times );
+    }
+
+    /**
+     * Get the reporting ranges...
+     *
+     * @return mixed|void
+     */
     public function get_reporting_ranges()
     {
         return apply_filters( 'groundhogg/reporting/ranges', [

@@ -10,7 +10,7 @@ use Groundhogg\Plugin;
  */
 
 ?>
-<div id="funnel-chart" class="postbox hidden step-reporting" style="margin-bottom: 0;">
+<div id="funnel-chart" class="step-reporting" style="margin-bottom: 0;width: 100%;">
     <div class="inside">
         <script type="text/javascript">
 

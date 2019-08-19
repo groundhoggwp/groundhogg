@@ -246,6 +246,20 @@ html.full-screen{
     margin: 0 10px 0 0;
 }
 
+.step-reporting .chart{
+    background: #FFF;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e5e5e5;
+    margin-bottom: 20px;
+}
+
+.step-reporting .chart .inside {
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
 .wpgh-element.ui-draggable-dragging {
     width: 100px;
     height: 120px;
@@ -291,7 +305,6 @@ html.full-screen{
     border-bottom-color: #b8daff;
 }
 
-
 #postbox-container-1 .postbox.benchmark h2{
     color: #004085;
 }
@@ -312,8 +325,13 @@ html.full-screen{
     vertical-align: top;
 }
 
-.step span.actions{
+.step span.actions,
+.reporting-enabled .step:hover span.actions{
     visibility: hidden;
+}
+
+.step:hover span.actions{
+    visibility: visible;
 }
 
 .step span.step-name {
@@ -344,14 +362,21 @@ html.full-screen{
     vertical-align: middle;
 }
 
-.step:hover span.actions{
-    visibility: visible;
-}
-
 #postbox-container-2{
-    padding: 10px 20px;
+    /*padding: 10px 20px;*/
     box-sizing: border-box;
     overflow: auto;
+}
+
+.step-settings{
+    padding: 20px;
+}
+
+#funnel-chart{
+    background: #FFF;
+    padding: 20px;
+    border-bottom: 1px solid #e5e5e5;
+    box-sizing: border-box;
 }
 
 td.step-icon{
@@ -364,10 +389,33 @@ td.step-icon:hover{
     cursor: pointer;
 }
 
-.step-reporting p,
-.report {
-    text-align: center;
+.step-reporting{
+    display: none;
+}
+
+.reporting-enabled .step-reporting {
+    display: inline-block;
+}
+
+.reporting-enabled .step-edit {
+    display: none;
+}
+
+.step-reporting .report {
+    display: inline-block;
+    padding: 5px 8px;
+    margin: 5px;
+    background: white;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.step-reporting .report .number {
+    text-decoration: none;
+    font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
     font-size: 16px;
+    font-weight: 500;
 }
 
 #postbox-container-1 .step .hndle{
