@@ -747,7 +747,6 @@ abstract class Funnel_Step extends Supports_Errors
                     </div>
                 </div>
                 <!-- REPORTING  -->
-                <?php //TODO Reporting enabled? ?>
                 <div class="step-reporting">
                     <?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
                     <?php do_action( 'groundhogg/steps/reporting/before', $step ); ?>

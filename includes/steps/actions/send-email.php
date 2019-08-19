@@ -277,15 +277,15 @@ class Send_Email extends Action
 
         $data = [
             [
-                'label' => __( 'Sent', 'groudnhogg' ),
+                'label' => __( 'Sent', 'groundhogg' ),
                 'data' => $sent
             ],
             [
-                'label' => 'Emails Opened',
+                'label' => __( 'Emails Opened','groundhogg' ),
                 'data' => $opens
             ],
             [
-                'label' => 'Emails Clicked',
+                'label' => __( 'Emails Clicked','groundhogg'),
                 'data' => $clicks
             ]
         ];

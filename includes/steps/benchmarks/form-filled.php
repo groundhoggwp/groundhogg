@@ -783,11 +783,11 @@ class Form_Filled extends Benchmark
 
         $data = [
             [
-                'label' => 'Impressions',
+                'label' => __('Impressions','groundhogg'),
                 'data' => $impressions
             ],
             [
-                'label' => 'Submissions',
+                'label' => __('Submissions' , 'groundhogg'),
                 'data' => $submissions
             ],
         ];
