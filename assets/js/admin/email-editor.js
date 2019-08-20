@@ -37,6 +37,7 @@
         alignment:  null,
         sidebar:    null,
         htmlCode:   null,
+        sendTest: false,
 
         /**
          * Initialize the editor
@@ -56,7 +57,7 @@
             } );
 
             $( '#update_and_test' ).click( function (e) {
-                $( '#send-test' ).val( 'yes' );
+                self.sendTest = true;
             });
 
             self.editor.on( 'click', function (e) {
@@ -208,6 +209,11 @@
 
             fd = fd +  '&action=gh_update_email';
 
+            if ( self.sendTest ){
+                var email = prompt( self.send_test_prompt, self.test_email );
+                fd = fd + '&test_email=' + email;
+            }
+
             adminAjaxRequest( fd, function ( response ) {
 
                 handleNotices( response.data.notices );
@@ -224,6 +230,7 @@
                 }
 
                 $( '#send-test' ).val( null );
+                self.sendTest = false;
             } );
         },
 

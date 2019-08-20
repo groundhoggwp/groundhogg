@@ -181,13 +181,14 @@ class Graph
                         /* PLOT CHART */
 
                         function draw() {
-                            if ( $( "#graph-<?php echo $this->id; ?>" ).width() > 0 ){
+                            if ( $( "#graph-<?php echo $this->id; ?>" ).is( ':visible' ) ){
                                 $.plot($("#graph-<?php echo $this->id; ?>"), dataset, options);
                                 $("#graph-<?php echo $this->id; ?>").UseTooltip();
                             }
                         }
 
                         $( '.load-graph-<?php echo $this->id; ?>' ).click( draw );
+                        $( document ).click( draw );
 
                         setTimeout( draw, 500 );
 

@@ -415,6 +415,8 @@ class Email extends Base_Object_With_Meta
         $content = apply_filters('wpgh_email_template_make_clickable', true) ? make_clickable($content) : $content;
         $content = str_replace('&#038;', '&amp;', $content);
 
+        $content = do_shortcode( $content );
+
         return $content;
     }
 

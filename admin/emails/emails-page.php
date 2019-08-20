@@ -113,6 +113,8 @@ class Emails_Page extends Admin_Page
 
             wp_localize_script( 'groundhogg-admin-email-editor', 'EmailEditor', array(
                 'id' => absint( Groundhogg\get_request_var( 'email' ) ),
+                'test_email' => wp_get_current_user()->user_email,
+                'send_test_prompt' => __( 'Send test email to...', 'groundhogg' )
             ) );
 
         }
@@ -532,35 +534,33 @@ class Emails_Page extends Admin_Page
             $email->delete_meta( 'alt_body' );
         }
 
-        if ( Groundhogg\get_request_var( 'update_and_test' ) ){
+        if ( Groundhogg\get_request_var( 'test_email' ) ){
 
             if ( ! current_user_can( 'send_emails' ) ){
                 $this->wp_die_no_access();
             }
 
-            $contact = new Groundhogg\Contact( [ 'email' => wp_get_current_user()->user_email ] );
+            $test_email = sanitize_email( Groundhogg\get_request_var( 'test_email', wp_get_current_user()->user_email ) );
 
-            if ( $contact->exists() ){
+            $contact = new Groundhogg\Contact( [ 'email' => $test_email ] );
 
-                $email->enable_test_mode();
+            $email->enable_test_mode();
 
-                $sent = $email->send( $contact );
+            $sent = $email->send( $contact );
 
-                if ( ! $sent || is_wp_error( $sent ) ){
-                    return is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test." );
-                } else {
-                    $this->add_notice(
-                        esc_attr( 'sent-test' ),
-                        sprintf( "%s %s",
-                            __( 'Sent test email to', 'groundhogg' ),
-                            $contact->get_email() ),
-                        'success'
-                    );
-                }
-
+            if ( ! $sent || is_wp_error( $sent ) ){
+                return is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test." );
             } else {
-                return new \WP_Error( 'oops', __( 'Failed to send test: No user selected. Please select a user to send the test to.', 'groundhogg' ) );
+                $this->add_notice(
+                    esc_attr( 'sent-test' ),
+                    sprintf( "%s %s",
+                        __( 'Sent test email to', 'groundhogg' ),
+                        $contact->get_email() ),
+                    'success'
+                );
             }
+
+
         }
 
         $email->alt_body = $email->get_alt_body();

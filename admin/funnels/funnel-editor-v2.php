@@ -165,40 +165,38 @@ $funnel = new Funnel($funnel_id);
         <?php Plugin::$instance->notices->print_notices(); ?>
 
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
-            <div id="postbox-container-1" class="postbox-container sidebar">
-                <div class="ui-sortable">
-                    <?php foreach ($funnel->get_steps() as $step): ?>
-                        <?php $step->sortable_item(); ?>
-                    <?php endforeach; ?>
-                </div>
+            <div id="postbox-container-1" class="postbox-container sidebar ui-sortable">
+                <?php foreach ($funnel->get_steps() as $step): ?>
+                    <?php $step->sortable_item(); ?>
+                <?php endforeach; ?>
             </div>
             <div id="postbox-container-2" class="postbox-container">
-                <div style="width: 100%">
-                    <?php include_once dirname(__FILE__) . '/reporting.php'; ?>
+                <div style="width: 100%" id="reporting-wrap">
+                    <?php include_once dirname(__FILE__) . '/reporting.php';
+
+
+
+
+
+                    ?>
+                </div>
+                <div id="intro" class="postbox" style="margin: 20px 10px;">
+                    <div class="inside">
+                        <h1><?php _e('Funnel Builder V2 (BETA)', 'groundhogg'); ?></h1>
+                        <p><?php _e('Welcome to version 2 of the Funnel Builder!'); ?></p>
+                        <p><?php _e('Our newest iteration of the funnel builder has been designed to provide a superior editing experience on both large and small screens.', 'groundhogg'); ?></p>
+                        <iframe style="border: 1px solid #ddd" src="https://player.vimeo.com/video/353449484?title=0&byline=0&portrait=0" width="770"
+                                height="435" frameborder="1" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                    </div>
                 </div>
                 <div class="step-settings">
                     <?php
 
-                    $has_active = false;
-
                     foreach ($funnel->get_steps() as $step):
                         $step->html_v2();
 
-                        if ( $step->get_meta( 'is_active' ) ){
-                            $has_active = true;
-                        }
-
                     endforeach; ?>
                 </div>
-<!--                <div class="step postbox --><?php //if ($has_active){echo 'hidden';} ?><!--" style="margin: 20px 10px;">-->
-<!--                    <div class="inside">-->
-<!--                        <h1>--><?php //_e('Funnel Builder V2 (BETA)', 'groundhogg'); ?><!--</h1>-->
-<!--                        <p>--><?php //_e('Welcome to version 2 of the Funnel Builder!'); ?><!--</p>-->
-<!--                        <p>--><?php //_e('Our newest iteration of the funnel builder has been designed to provide a superior editing experience on both large and small screens.', 'groundhogg'); ?><!--</p>-->
-<!--                        <iframe style="border: 1px solid #ddd" src="https://player.vimeo.com/video/353449484?title=0&byline=0&portrait=0" width="770"-->
-<!--                                height="435" frameborder="1" allow="autoplay; fullscreen" allowfullscreen></iframe>-->
-<!--                    </div>-->
-<!--                </div>-->
             </div>
             <div style="clear: both;"></div>
         </div>

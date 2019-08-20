@@ -84,21 +84,19 @@ use Groundhogg\Plugin;
 
                         var $chart = $("#reporting-chart");
 
-                        $chart.plot( this.data, this.options);
-                        $chart.UseTooltip();
+                        if ( $chart.is(':visible') ){
+                            $chart.plot( this.data, this.options);
+                            $chart.UseTooltip();
+                        }
 
                     }
 
                 } );
 
                 $( '#reporting-toggle' ).on( 'change', function (e) {
-
-                    if ( $(this).is( ':checked' ) && ! $( '#funnel-chart' ).hasClass( 'hidden' ) ){
-
+                    if ( $(this).is( ':checked' ) && $( '#funnel-chart' ).is( ':visible' ) ){
                         chart.draw();
-
                     }
-
                 } );
 
             })(jQuery, FunnelChart);

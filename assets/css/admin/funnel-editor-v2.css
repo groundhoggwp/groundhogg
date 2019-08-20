@@ -389,15 +389,20 @@ td.step-icon:hover{
     cursor: pointer;
 }
 
-.step-reporting{
-    display: none;
-}
-
-.reporting-enabled .step-reporting {
+.reporting-enabled .step-reporting,
+.reporting-enabled #reporting-wrap{
     display: inline-block;
 }
 
-.reporting-enabled .step-edit {
+.active-step.reporting-enabled #reporting-wrap,
+.step-reporting,
+.reporting-enabled #intro,
+.active-step #intro,
+#reporting-wrap,
+.reporting-enabled .step-edit
+/*.reporting-enabled .step-settings */
+
+{
     display: none;
 }
 

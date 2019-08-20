@@ -240,6 +240,8 @@ class Send_Email extends Action
      */
     public function reporting_v2( $step )
     {
+        parent::reporting_v2( $step );
+
 
         $times = $this->get_reporting_interval();
 

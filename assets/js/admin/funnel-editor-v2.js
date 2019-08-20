@@ -248,21 +248,31 @@
 
             var $steps = self.getSteps();
             var $settings = self.getSettings();
+            var $html = $( 'html' );
+
+            var $step = $( '#' + id );
+
+            var was_active = $step.hasClass( 'active' );
 
             $settings.find( '.step' ).addClass( 'hidden' );
             $settings.find( '.step' ).removeClass( 'active' );
             $steps.find( '.step' ).removeClass( 'active' );
             $steps.find( '.is_active' ).val( null );
+            $html.removeClass( 'active-step' );
 
-            var $step = $( '#' + id );
-            $step.addClass( 'active' );
-            $step.find( '.is_active' ).val(1);
+            if ( ! was_active ){
+                $step.addClass( 'active' );
+                $step.find( '.is_active' ).val(1);
 
-            var sid = '#settings-' + $step.attr( 'id' );
-            var $step_settings = $( sid );
+                var sid = '#settings-' + $step.attr( 'id' );
+                var $step_settings = $( sid );
 
-            $step_settings.removeClass( 'hidden' );
-            $step_settings.addClass( 'active' );
+                $step_settings.removeClass( 'hidden' );
+                $step_settings.addClass( 'active' );
+                $html.addClass( 'active-step' );
+
+                $(document).trigger( 'step-active' );
+            }
         },
     } );
 

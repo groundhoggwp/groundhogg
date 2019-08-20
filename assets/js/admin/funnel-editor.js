@@ -115,9 +115,11 @@
                 if ( $(this).is(':checked')){
                     $('.step-reporting').removeClass('hidden');
                     $('.step-edit').addClass('hidden');
+                    $( 'html' ).addClass( 'reporting-enabled' );
                 } else {
                     $('.step-reporting').addClass('hidden');
                     $('.step-edit').removeClass('hidden');
+                    $( 'html' ).removeClass( 'reporting-enabled' );
                 }
             });
 
