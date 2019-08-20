@@ -860,7 +860,7 @@ function contact_record_section_activity( $contact )
     <!-- Form Submissions -->
     <h2><?php _ex( 'Form Submissions', 'contact_record', 'groundhogg' ); ?></h2>
     <div style="max-width: 800px">
-        <p class="description"><?php _ex( 'Any previous from submissions from this contact will show below as of version 2.0.', 'contact_record', 'groundhogg' ); ?></p>
+        <p class="description"><?php _ex( 'Any previous form submissions from this contact will show below as of version 2.0.', 'contact_record', 'groundhogg' ); ?></p>
         <?php
 
         $submission_ids = wp_parse_id_list( wp_list_pluck( get_db( 'submissions' )->query( [ 'contact_id' => $contact->get_id() ] ), 'ID' ) );
