@@ -959,7 +959,9 @@ class HTML
 			'tags'              => false,
 		) );
 
-		foreach ( $a[ 'selected' ] as $sms_id ){
+        $a[ 'selected' ] = wp_parse_id_list( $a[ 'selected' ] );
+
+        foreach ( $a[ 'selected' ] as $sms_id ){
 			if ( Plugin::$instance->dbs->get_db( 'sms' )->exists( $sms_id ) ){
 				$sms = Plugin::$instance->dbs->get_db( 'sms' )->get( $sms_id );
 				$a[ 'data' ][ $sms_id ] = $sms->title;

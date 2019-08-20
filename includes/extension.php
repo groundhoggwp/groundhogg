@@ -116,7 +116,12 @@ abstract class Extension
             include_once(ABSPATH . 'wp-admin/includes/plugin.php');
         }
 
-        foreach ( $plugins as $plugin_file_path ){
+        foreach ( $plugins as $plugin_file_path => $plugin_name ){
+
+            if ( is_numeric( $plugin_file_path ) ){
+                $plugin_file_path = $plugin_name;
+            }
+
             if ( ! is_plugin_active( $plugin_file_path ) ){
                 add_action( 'admin_notices', [ $this, 'dependencies_missing_notice' ] );
                 return false;
