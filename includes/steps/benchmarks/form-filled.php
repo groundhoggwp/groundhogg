@@ -754,8 +754,8 @@ class Form_Filled extends Benchmark
         $db = get_db( 'form_impressions' );
 
         $data = $db->query( [
-            'before'    => $start_time,
-            'after'     => $end_time
+            'before'    => $end_time,
+            'after'     => $start_time
         ] );
 
         $impressions = [];

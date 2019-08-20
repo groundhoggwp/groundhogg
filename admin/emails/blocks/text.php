@@ -148,7 +148,7 @@ class Text extends Block
         	return $buttons;
         } );
 
-        $html.= Plugin::$instance->utils->html->editor( [ 'id' => 'text-content', 'replacements_button' => true, 'settings' => [ 'editor_height' => 300, 'quicktags' => false ] ] );
+        $html.= Plugin::$instance->utils->html->editor( [ 'id' => 'text-content', 'replacements_button' => true, 'settings' => [ 'editor_height' => 300 ] ] );
 
         $html.= "<table class=\"form-table\">";
 

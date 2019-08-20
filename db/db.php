@@ -607,11 +607,11 @@ abstract class DB {
 
     /**
      * @param array $data
-     * @param string|false $ORDER
+     * @param string|false $ORDER_BY
      * @param bool $from_cache
      * @return array|bool|null|object
      */
-    public function query( $data = [], $ORDER='', $from_cache = true )
+    public function query($data = [], $ORDER_BY='', $from_cache = true )
     {
         // Check Cache
         $cache_key = md5( sprintf( '%s|%s|%s|%s' , multi_implode( '|', array_keys( $data ) ), multi_implode( '|', array_values( $data ) ), $this->get_object_type(), $this->get_table_name() ) );
@@ -622,8 +622,8 @@ abstract class DB {
 
         global  $wpdb;
 
-        if ( empty( $ORDER ) ){
-            $ORDER = $this->get_primary_key();
+        if ( empty( $ORDER_BY ) ){
+            $ORDER_BY = $this->get_primary_key();
         }
 
         if ( ! is_array( $data ) )
@@ -638,10 +638,8 @@ abstract class DB {
             unset( $data[ 'LIMIT' ] );
         }
 
-        if ( isset_not_empty( $data, 'ORDER_BY' ) ){
-            $ORDER = get_array_var( $data, 'ORDER_BY', 99999 );
-            unset( $data[ 'ORDER_BY' ] );
-        }
+        $ORDER_BY = get_array_var( $data, 'ORDER_BY', $ORDER_BY );
+        $ORDER = get_array_var( $data, 'ORDER', 'DESC' );
 
         $query = [];
 
@@ -689,8 +687,8 @@ abstract class DB {
             $clauses[] = [ 'WHERE', $query ];
         }
 
-        if ( isset( $ORDER ) && ! empty( $ORDER ) ){
-            $clauses[] = [ 'ORDER BY', '`' . $ORDER . '` ASC' ];
+        if ( isset( $ORDER_BY ) && ! empty( $ORDER_BY ) ){
+            $clauses[] = [ 'ORDER BY', '`' . $ORDER_BY . '` ' . $ORDER ];
         }
 
         if ( isset( $LIMIT ) && ! empty( $LIMIT ) ){
