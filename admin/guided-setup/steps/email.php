@@ -27,7 +27,11 @@ class Email extends Step
 
     public function get_description()
     {
-        return _x( 'There are different ways to send email with Groundhogg! Choose one below.', 'guided_setup', 'groundhogg' );
+        if ( ! Plugin::$instance->sending_service->has_dns_records() ):
+            return _x( 'See below to setup the Groundhogg Sending Service.', 'guided_setup', 'groundhogg' );
+        else:
+            return _x( 'There are different ways to send email with Groundhogg! Choose one below.', 'guided_setup', 'groundhogg' );
+        endif;
     }
 
     public function get_content()

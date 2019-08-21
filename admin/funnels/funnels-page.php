@@ -204,7 +204,7 @@ class Funnels_Page extends Admin_Page
             array(
                 'id' => 'gh_reporting',
                 'title' => __('Reporting'),
-                'content' => '<p>' . __('To view funnel reporting, simply dgo to the editing screen of any funnel, and then toggle the Reporting/Editing switch in the reporting box. You can select the time range which you would like to view by using the dropdown on the left and click the filter button.', 'groundhogg') . '</p>'
+                'content' => '<p>' . __('To view funnel reporting, simply go to the editing screen of any funnel, and then toggle the Reporting/Editing switch in the reporting box. You can select the time range which you would like to view by using the dropdown on the left and click the filter button.', 'groundhogg') . '</p>'
             )
         );
 

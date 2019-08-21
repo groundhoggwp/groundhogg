@@ -174,11 +174,25 @@ $funnel = new Funnel($funnel_id);
                 <div style="width: 100%" id="reporting-wrap">
                     <?php include_once dirname(__FILE__) . '/reporting.php';
 
-
-
-
-
                     ?>
+                    <div class="reporting-view-wrap">
+                        <?php
+
+                        html()->list_table( [], [
+                            __( 'Step', 'groundhogg' ),
+                            __( 'Complete', 'groundhogg' ),
+                            __( 'Waiting', 'groundhogg' )
+                        ],
+                            [
+                                [1,2,3],
+                                [1,2,3],
+                                [1,2,3],
+                                [1,2,3],
+                            ]
+                        );
+
+                        ?>
+                    </div>
                 </div>
                 <div id="intro" class="postbox" style="margin: 20px 10px;">
                     <div class="inside">
@@ -192,8 +206,14 @@ $funnel = new Funnel($funnel_id);
                 <div class="step-settings">
                     <?php
 
+                    $step_active = false;
+
                     foreach ($funnel->get_steps() as $step):
                         $step->html_v2();
+
+                        if ( $step->get_meta( 'is_active' ) ){
+                            $step_active = true;
+                        }
 
                     endforeach; ?>
                 </div>
@@ -202,77 +222,85 @@ $funnel = new Funnel($funnel_id);
         </div>
     </div>
 </form>
+<?php if ( $step_active ): ?>
+<script>jQuery('html').removeClass( 'active-step' );</script>
+<?php endif; ?>
 <div class="hidden" id="steps">
-    <div id='benchmarks'>
-        <?php echo html()->help_icon('https://docs.groundhogg.io/docs/builder/benchmarks/'); ?>
-        <h2><?php echo __('Benchmarks', 'groundhogg'); ?></h2>
-        <p><?php echo esc_html__('Benchmarks start and stop automation steps for a contact.', 'groundhogg'); ?></p>
-        <div class="elements-inner inside">
-            <table>
-                <tbody>
-                <tr><?php
-                    $benchmarks = Plugin::$instance->step_manager->get_benchmarks();
-                    $i = 0;
-                    foreach ($benchmarks
+    <div class="steps-select">
+        <div id='benchmarks'>
+            <?php echo html()->help_icon('https://docs.groundhogg.io/docs/builder/benchmarks/'); ?>
+            <div class="step-select-header">
+                <h2><?php echo __('Benchmarks', 'groundhogg'); ?></h2>
+                <p><?php echo esc_html__('Benchmarks start and stop automation steps for a contact.', 'groundhogg'); ?></p>
+            </div>
+            <div class="elements-inner inside">
+                <table>
+                    <tbody>
+                    <tr><?php
+                        $benchmarks = Plugin::$instance->step_manager->get_benchmarks();
+                        $i = 0;
+                        foreach ($benchmarks
 
-                    as $benchmark):
-                    if (($i % 4) == 0):
-                    ?></tr>
-                <tr><?php
-                    endif;
-                    ?>
-                    <td class="step-icon">
-                        <div id='<?php echo $benchmark->get_type(); ?>'
-                             title="<?php esc_attr_e($benchmark->get_description()); ?>"
-                             class="wpgh-element ui-draggable">
-                            <div class="step-icon"><img width="60" src="<?php echo esc_url($benchmark->get_icon()); ?>">
-                            </div>
-                            <p><?php echo $benchmark->get_name() ?></p></div>
-                    </td><?php
-                    $i++;
+                        as $benchmark):
+                        if (($i % 4) == 0):
+                        ?></tr>
+                    <tr><?php
+                        endif;
+                        ?>
+                        <td class="step-icon">
+                            <div id='<?php echo $benchmark->get_type(); ?>'
+                                 title="<?php esc_attr_e($benchmark->get_description()); ?>"
+                                 class="wpgh-element ui-draggable">
+                                <div class="step-icon"><img width="60" src="<?php echo esc_url($benchmark->get_icon()); ?>">
+                                </div>
+                                <p><?php echo $benchmark->get_name() ?></p></div>
+                        </td><?php
+                        $i++;
 
-                    endforeach;
+                        endforeach;
 
-                    ?></tr>
-                </tbody>
-            </table>
+                        ?></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    <hr/>
-    <div id='actions'>
-        <?php echo html()->help_icon('https://docs.groundhogg.io/docs/builder/actions/'); ?>
-        <h2 class="hndle"><?php echo __('Actions', 'groundhogg'); ?></h2>
-        <p><?php esc_html_e('Actions are launched whenever a contact completes a benchmark.', 'groundhogg'); ?></p>
-        <div class="inside">
-            <table>
-                <tbody>
-                <tr><?php
-                    $actions = Plugin::$instance->step_manager->get_actions();
-                    $i = 0;
-                    foreach ($actions
+        <div id='actions'>
+            <?php echo html()->help_icon('https://docs.groundhogg.io/docs/builder/actions/'); ?>
+            <div class="step-select-header">
+                <h2 class="hndle"><?php echo __('Actions', 'groundhogg'); ?></h2>
+                <p><?php esc_html_e('Actions are launched whenever a contact completes a benchmark.', 'groundhogg'); ?></p>
+            </div>
+            <div class="inside">
+                <table>
+                    <tbody>
+                    <tr><?php
+                        $actions = Plugin::$instance->step_manager->get_actions();
+                        $i = 0;
+                        foreach ($actions
 
-                    as $action):
-                    if (($i % 4) == 0):
-                    ?></tr>
-                <tr><?php
-                    endif;
-                    ?>
-                    <td class="step-icon">
-                        <div id='<?php echo $action->get_type(); ?>'
-                             title="<?php esc_attr_e($action->get_description()); ?>" class="wpgh-element ui-draggable">
-                            <div class="step-icon"><img width="60" src="<?php echo esc_url($action->get_icon()); ?>">
-                            </div>
-                            <p><?php echo $action->get_name() ?></p></div>
-                    </td><?php
-                    $i++;
+                        as $action):
+                        if (($i % 4) == 0):
+                        ?></tr>
+                    <tr><?php
+                        endif;
+                        ?>
+                        <td class="step-icon">
+                            <div id='<?php echo $action->get_type(); ?>'
+                                 title="<?php esc_attr_e($action->get_description()); ?>" class="wpgh-element ui-draggable">
+                                <div class="step-icon"><img width="60" src="<?php echo esc_url($action->get_icon()); ?>">
+                                </div>
+                                <p><?php echo $action->get_name() ?></p></div>
+                        </td><?php
+                        $i++;
 
-                    endforeach;
+                        endforeach;
 
-                    ?></tr>
-                </tbody>
-            </table>
+                        ?></tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
-
     </div>
     <!-- End Action Icons-->
 </div>

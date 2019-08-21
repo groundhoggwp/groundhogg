@@ -379,14 +379,33 @@ html.full-screen{
     box-sizing: border-box;
 }
 
+.steps-select{
+    background: #f1f1f1;
+}
+
+.step-select-header{
+    background: #f9f9f9;
+    padding: 10px;
+    border-width: 1px 0 1px 0;
+    border-style: solid;
+    border-color: #ddd;
+}
+
 td.step-icon{
     border: 1px #e5e5e5 solid;
+    background: #ffffff;
     height: 100px;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 td.step-icon:hover{
-    background: #f1f1f1;
+    background: #f9f9f9;
     cursor: pointer;
+}
+
+#benchmarks{
+    margin-bottom: 30px;
 }
 
 .reporting-enabled .step-reporting,
@@ -444,6 +463,10 @@ td.step-icon:hover{
     /*margin-top: 12px;*/
     /*margin-bottom: -37px;*/
     /*border: 1px solid #e5e5e5;*/
+}
+
+.reporting-view-wrap{
+    padding: 20px;
 }
 
 table.embed-options td{

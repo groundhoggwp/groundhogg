@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Groundhogg\n"
 "POT-Creation-Date: 2019-08-19 15:05-0400\n"
-"PO-Revision-Date: 2019-08-19 15:11-0400\n"
+"PO-Revision-Date: 2019-08-21 14:47-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -23,7 +23,6 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-1: node_modules\n"
 
 #: admin/admin-page.php:298 admin/admin-page.php:301
-#, fuzzy
 msgid "Invalid permissions."
 msgstr "Permissões inválidas."
 
@@ -39,21 +38,19 @@ msgstr "Selecione um e-mail para enviar."
 
 #: admin/broadcasts/add.php:49
 msgid "Create New Email"
-msgstr "Criar novo E-mail"
+msgstr "Criar novo e-mail"
 
 #: admin/broadcasts/add.php:51
 msgid "The Broadcast tool uses your global emails."
-msgstr "A ferramenta Broadcast usa seus emails globais."
+msgstr "A ferramenta Transmissão usa seus e-mails globais."
 
 #: admin/broadcasts/add.php:56
-#, fuzzy
 msgid "Select an SMS to send."
 msgstr "Selecione uma SMS para enviar."
 
 #: admin/broadcasts/add.php:68
-#, fuzzy
 msgid "Create New SMS"
-msgstr "Criar novo SMS"
+msgstr "Criar nova SMS"
 
 #: admin/broadcasts/add.php:74
 #: includes/steps/actions/admin-notification.php:107
@@ -63,20 +60,20 @@ msgstr "Enviar para:"
 
 #: admin/broadcasts/add.php:85
 msgid "This broadcast will be sent to contacts with these tags."
-msgstr "Esta transmissão será enviada para os contactos com estas etiquetas."
+msgstr "Esta transmissão será enviada para os contatos com estas tags."
 
 #: admin/broadcasts/add.php:89
 #, php-format
 msgid "%d Contacts"
-msgstr "%d Contactos"
+msgstr "%d Contatos"
 
 #: admin/broadcasts/add.php:94
 msgid "Exclude These Contacts:"
-msgstr "Excluir esses contatos:"
+msgstr "Excluir estes contatos:"
 
 #: admin/broadcasts/add.php:101
 msgid "These contacts will be excluded."
-msgstr "Estes contactos serão excluídos."
+msgstr "Estes contatos serão excluídos."
 
 #: admin/broadcasts/add.php:106
 msgid "Send On:"
@@ -100,26 +97,23 @@ msgid "The day the broadcast will be sent."
 msgstr "O dia em que a transmissão será enviada."
 
 #: admin/broadcasts/add.php:126
-#, fuzzy
 msgctxt "action"
 msgid "Send in the contact's local time."
-msgstr "Envie o contacto à hora local."
+msgstr "Envie no horário local do contato."
 
 #: admin/broadcasts/add.php:132
-#, fuzzy
 msgid "Send in the contact's local time."
-msgstr "Envie o contacto à hora local."
+msgstr "Envie no horário local do contato."
 
 #: admin/broadcasts/add.php:136
-#, fuzzy
 msgid ""
 "If checked, this email will be sent at the specified time in their local "
 "timezone. If the time has already passed the email will be scheduled for the "
 "following day."
 msgstr ""
-"Se verificado, este e-mail será enviado na hora especificada em seu fuso "
-"horário local. Se o tempo já passou, o e-mail será agendado para o dia "
-"seguinte."
+"Ao selecionar esta opção, este e-mail será enviado na hora especificada do "
+"fuso horário local do contato. Se o tempo já tiver passado, o e-mail será "
+"agendado para o dia seguinte."
 
 #: admin/broadcasts/add.php:142
 msgctxt "action"
@@ -130,7 +124,7 @@ msgstr "Agendar transmissão"
 #: admin/broadcasts/broadcasts-page.php:86
 msgctxt "page_title"
 msgid "Broadcasts"
-msgstr "Transmissão"
+msgstr "Transmissões"
 
 #: admin/broadcasts/broadcasts-page.php:83
 msgctxt "page_title"
@@ -142,41 +136,36 @@ msgstr "Agendar transmissão"
 msgctxt "notice"
 msgid "%d broadcasts cancelled"
 msgid_plural "%d broadcast cancelled"
-msgstr[0] "%d difusões canceladas"
+msgstr[0] "%d transmissões canceladas"
 msgstr[1] "%d difusões canceladas"
 
 #: admin/broadcasts/broadcasts-page.php:122
-#, fuzzy
 msgid "Please select an email or SMS to send."
 msgstr "Por favor, selecione um e-mail ou SMS para enviar."
 
 #: admin/broadcasts/broadcasts-page.php:133
 #: admin/broadcasts/broadcasts-page.php:139
-#, fuzzy
 msgid "You cannot schedule an email while it is in draft mode."
 msgstr ""
 "Você não pode agendar um e-mail enquanto ele estiver no modo de rascunho."
 
 #: admin/broadcasts/broadcasts-page.php:154
 msgid "Please select a tag with at least 1 contact"
-msgstr "Por favor, selecione uma tag com um ou mais contatos associados."
+msgstr "Por favor, selecione uma tag com um ou mais contatos associados"
 
 #: admin/broadcasts/broadcasts-page.php:171
 msgid "Please select a time in the future"
-msgstr "Por favor, envie em um momento no futuro!"
+msgstr "Por favor, envie em um momento no futuro"
 
 #: admin/broadcasts/broadcasts-page.php:189
-#, fuzzy
 msgid "Something went wrong while adding the broadcast."
-msgstr "Algo correu mal ao adicionar a transmissão."
+msgstr "Ocorreu algum problema ao adicionar a transmissão."
 
 #: admin/broadcasts/broadcasts-page.php:221
-#, fuzzy
 msgid "Schedule Email Broadcast"
 msgstr "Agendar transmissão de e-mail"
 
 #: admin/broadcasts/broadcasts-page.php:226
-#, fuzzy
 msgid "Schedule SMS Broadcast"
 msgstr "Programar transmissão de SMS"
 
@@ -184,10 +173,9 @@ msgstr "Programar transmissão de SMS"
 #: admin/broadcasts/broadcasts-page.php:247
 msgctxt "search"
 msgid "Search Broadcasts"
-msgstr "Transmissões de pesquisa"
+msgstr "Procurar transmissões"
 
 #: admin/broadcasts/broadcasts-table.php:66
-#, fuzzy
 msgctxt "Column label"
 msgid "Email/SMS"
 msgstr "Email/SMS"
@@ -203,14 +191,9 @@ msgid "Scheduled Run Date"
 msgstr "Data de execução agendada"
 
 #: admin/broadcasts/broadcasts-table.php:69
-#, fuzzy
 msgctxt "Column label"
 msgid "Sending To"
-msgstr ""
-"Quando você acredita que um e-mail está pronto para enviar definir o status "
-"para <strong> Ready </strong> e, em seguida, você pode usá-lo em qualquer "
-"transmissão ou funil. Um e-mail que está no modo de rascunho não será "
-"enviado."
+msgstr "Enviando para"
 
 #: admin/broadcasts/broadcasts-table.php:70
 msgctxt "Column label"
@@ -244,7 +227,6 @@ msgid "Edit Email"
 msgstr "Editar Email"
 
 #: admin/broadcasts/broadcasts-table.php:150
-#, fuzzy
 msgctxt "action"
 msgid "Edit SMS"
 msgstr "Editar SMS"
@@ -289,13 +271,8 @@ msgid "Clicked"
 msgstr "Clicado"
 
 #: admin/broadcasts/broadcasts-table.php:299
-#, fuzzy
 msgid "Sending"
-msgstr ""
-"Quando você acredita que um e-mail está pronto para enviar definir o status "
-"para <strong> Ready </strong> e, em seguida, você pode usá-lo em qualquer "
-"transmissão ou funil. Um e-mail que está no modo de rascunho não será "
-"enviado."
+msgstr "Enviando"
 
 #: admin/broadcasts/broadcasts-table.php:299
 #: admin/dashboard/widgets/email-activity.php:46
@@ -312,7 +289,7 @@ msgstr "Cancelar"
 #: admin/broadcasts/report.php:32
 msgctxt "notice"
 msgid "Stats will show once the broadcast has been sent."
-msgstr "Stats mostrará uma vez que a transmissão foi enviada."
+msgstr "As estatísticas serão exibidas assim que a transmissão for enviada."
 
 #: admin/broadcasts/report.php:45
 msgid "Stats"
@@ -326,7 +303,7 @@ msgstr "Total entregue"
 #: admin/broadcasts/report.php:63 includes/steps/actions/send-email.php:209
 msgctxt "stats"
 msgid "Opens"
-msgstr "Abertos"
+msgstr "Abrir"
 
 #: admin/broadcasts/report.php:78 includes/steps/actions/send-email.php:221
 msgctxt "stats"
@@ -336,13 +313,13 @@ msgstr "Cliques"
 #: admin/broadcasts/report.php:93
 msgctxt "stats"
 msgid "Click Through Rate"
-msgstr "Clique em taxa"
+msgstr "Índice de cliques"
 
 #: admin/broadcasts/report.php:97 admin/broadcasts/report.php:127
 #: admin/dashboard/widgets/last-broadcast-widget.php:86
 msgctxt "stats"
 msgid "Unopened"
-msgstr "Fechada"
+msgstr "Fechados"
 
 #: admin/broadcasts/report.php:176
 msgctxt "stats"
@@ -369,12 +346,10 @@ msgid "Processing..."
 msgstr "Processando..."
 
 #: admin/bulk-jobs/bulk-job-page.php:101
-#, fuzzy
 msgid "Do not leave the page till the process is complete!"
 msgstr "Não saia da página até que o processo esteja completo!"
 
 #: admin/bulk-jobs/bulk-job-page.php:130
-#, fuzzy
 msgid "The process is now complete."
 msgstr "O processo está agora concluído."
 
@@ -388,7 +363,6 @@ msgid "Quick Add"
 msgstr "Adição rápida"
 
 #: admin/contacts/add-contact.php:43
-#, fuzzy
 msgctxt "tab"
 msgid "Internal Form"
 msgstr "Formulário Interno"
@@ -429,7 +403,7 @@ msgstr "Telefone Principal"
 
 #: admin/contacts/add-contact.php:100
 msgid "Phone Extension"
-msgstr "Extensão do telefone"
+msgstr "Ramal"
 
 #: admin/contacts/add-contact.php:111 admin/contacts/search.php:137
 msgid "Segmentation"
@@ -456,16 +430,14 @@ msgstr "Adicionar contato"
 
 #: admin/contacts/add-contact.php:156 admin/contacts/contact-editor.php:644
 #: admin/contacts/form-admin-submit.php:37
-#, fuzzy
 msgctxt "contact_record"
 msgid "Internal Form"
 msgstr "Formulário Interno"
 
 #: admin/contacts/add-contact.php:174 admin/contacts/contact-editor.php:661
 #: admin/contacts/form-admin-submit.php:52
-#, fuzzy
 msgid "Please select a form"
-msgstr "Por favor, selecione um"
+msgstr "Por favor, selecione um formulário"
 
 #: admin/contacts/add-contact.php:177 admin/contacts/form-admin-submit.php:55
 msgid "Switch Form"
@@ -474,7 +446,7 @@ msgstr "Trocar de Formulário"
 #: admin/contacts/contact-editor.php:56
 msgctxt "contact_record"
 msgid "This contact has been deleted."
-msgstr "Este contacto foi eliminado."
+msgstr "Este contato foi eliminado."
 
 #: admin/contacts/contact-editor.php:66
 msgctxt "contact_record"
@@ -489,7 +461,7 @@ msgstr "Informações Gerais"
 #: admin/contacts/contact-editor.php:80
 msgctxt "contact_record_tab"
 msgid "Custom Info"
-msgstr "Personalizado"
+msgstr "Informações Personalizadas"
 
 #: admin/contacts/contact-editor.php:81
 msgctxt "contact_record_tab"
@@ -517,7 +489,6 @@ msgid "Activity"
 msgstr "Atividade"
 
 #: admin/contacts/contact-editor.php:94
-#, fuzzy
 msgctxt "groundhogg"
 msgid "Local Time:"
 msgstr "Hora local:"
@@ -528,7 +499,7 @@ msgstr "Foto do perfil"
 
 #: admin/contacts/contact-editor.php:150
 msgid "Send Email"
-msgstr "Enviar Email"
+msgstr "Enviar E-mail"
 
 #: admin/contacts/contact-editor.php:158 admin/contacts/search.php:102
 #: admin/settings/settings-page.php:452
@@ -538,14 +509,12 @@ msgstr "Telefone"
 
 #: admin/contacts/contact-editor.php:160
 #: admin/guided-setup/steps/business-info.php:36 includes/functions.php:1451
-#, fuzzy
 msgid "Phone Number"
-msgstr "O número de telefone comercial, conforme definido nas configurações."
+msgstr "Número de Telefone"
 
 #: admin/contacts/contact-editor.php:168
-#, fuzzy
 msgid "Call Now"
-msgstr "Ligue Agora"
+msgstr "Ligar Agora"
 
 #: admin/contacts/contact-editor.php:206
 msgid "Email Status"
@@ -562,9 +531,8 @@ msgid "Visit %s"
 msgstr "Visitar %s"
 
 #: admin/contacts/contact-editor.php:220
-#, fuzzy
 msgid "Send email."
-msgstr "Enviar Email"
+msgstr "Enviar E-mail."
 
 #: admin/contacts/contact-editor.php:221
 msgctxt "contact_record"
@@ -574,23 +542,20 @@ msgstr "Status de E-mail"
 #: admin/contacts/contact-editor.php:224
 msgctxt "contact_record"
 msgid "Mark as unsubscribed."
-msgstr "Marque como não inscrito."
+msgstr "Marcar como não inscrito."
 
 #: admin/contacts/contact-editor.php:229
-#, fuzzy
 msgctxt "contact_record"
 msgid "Manually confirm this email address."
-msgstr "Confirme manualmente este endereço de e-mail."
+msgstr "Confirmar manualmente este endereço de e-mail."
 
 #: admin/contacts/contact-editor.php:231
-#, fuzzy
 msgid "Confirmation reason..."
 msgstr "Motivo da confirmação..."
 
 #: admin/contacts/contact-editor.php:244
-#, fuzzy
 msgid "User Account"
-msgstr "Criar conta de usuário"
+msgstr "Conta de usuário"
 
 #: admin/contacts/contact-editor.php:249
 msgid "Username"
@@ -616,7 +581,7 @@ msgid ""
 "This contact does not have an associated user account? Would you like to "
 "create one?"
 msgstr ""
-"Esse contato não tem uma conta de usuário associada? Gostaria de criar um?"
+"Esse contato não tem uma conta de usuário associada? Gostaria de criar uma?"
 
 #: admin/contacts/contact-editor.php:266
 msgctxt "contact_record"
@@ -626,7 +591,7 @@ msgstr "Vincular conta existente?"
 #: admin/contacts/contact-editor.php:267
 msgctxt "contact_record"
 msgid "Select a User Account (optional)"
-msgstr "Selecione uma conta de usuário (opcional)"
+msgstr "Selecionar uma conta de usuário (opcional)"
 
 #: admin/contacts/contact-editor.php:268
 msgctxt "contact_record"
@@ -641,7 +606,7 @@ msgstr "Telefone Principal"
 #: admin/contacts/contact-editor.php:289
 msgctxt "contact_record"
 msgid "Phone Extension"
-msgstr "Extensão do telefone"
+msgstr "Ramal"
 
 #: admin/contacts/contact-editor.php:303
 msgctxt "contact_record"
@@ -676,7 +641,7 @@ msgstr "Endereço 1"
 #: admin/contacts/contact-editor.php:354
 msgctxt "contact_record"
 msgid "Street Address 2"
-msgstr "Endereço 2 da rua"
+msgstr "Endereço 2"
 
 #: admin/contacts/contact-editor.php:364
 msgctxt "contact_record"
@@ -701,7 +666,7 @@ msgstr "País"
 #: admin/contacts/contact-editor.php:402
 msgctxt "contact_record"
 msgid "Select a Country"
-msgstr "Selecione o País"
+msgstr "Selecionar o país"
 
 #: admin/contacts/contact-editor.php:409
 msgctxt "contact_record"
@@ -709,10 +674,9 @@ msgid "IP Address"
 msgstr "Endereço IP"
 
 #: admin/contacts/contact-editor.php:418
-#, fuzzy
 msgctxt "action"
 msgid "Extrapolate Location"
-msgstr "Localização Extrapolate"
+msgstr "Extrapolar Localização"
 
 #: admin/contacts/contact-editor.php:425
 msgctxt "contact_record"
@@ -722,12 +686,12 @@ msgstr "Fuso horário"
 #: admin/contacts/contact-editor.php:440
 msgctxt "contact_record"
 msgid "Compliance"
-msgstr "Auditoria"
+msgstr "Conformidade"
 
 #: admin/contacts/contact-editor.php:444
 msgctxt "contact_record"
 msgid "Agreed To Terms"
-msgstr "Acordo com os termos"
+msgstr "Concordou com os termos"
 
 #: admin/contacts/contact-editor.php:445 admin/contacts/contact-editor.php:450
 msgid "Agreed"
@@ -735,7 +699,7 @@ msgstr "Concordou"
 
 #: admin/contacts/contact-editor.php:449 includes/functions.php:1467
 msgid "GDPR Consent"
-msgstr "Consentimento GDPR"
+msgstr "Consentimento com o RGPD"
 
 #: admin/contacts/contact-editor.php:469
 msgctxt "contact_record"
@@ -754,12 +718,12 @@ msgstr "Página de origem"
 
 #: admin/contacts/contact-editor.php:489
 msgid "This is the page which the contact first submitted a form."
-msgstr "Esta é a página que o contato submeteu primeiramente um formulário."
+msgstr "Esta é a página em que o contato submeteu primeiramente um formulário."
 
 #: admin/contacts/contact-editor.php:494
 msgctxt "contact_record"
 msgid "Lead Source"
-msgstr "Fonte de chumbo"
+msgstr "Lead"
 
 #: admin/contacts/contact-editor.php:504
 msgid "This is where the contact originated from."
@@ -773,7 +737,7 @@ msgstr "Tags"
 #: admin/contacts/contact-editor.php:520
 msgctxt "contact_record"
 msgid "Add new tags by hitting [Enter] or by typing a [,]."
-msgstr "Adicione novas Tags batendo [Enter] ou digitando um [,]."
+msgstr "Adicione novas tags apertando [Enter] ou digitando uma [,]."
 
 #: admin/contacts/contact-editor.php:541
 msgctxt "contact_record"
@@ -794,7 +758,7 @@ msgstr "Ações"
 #: admin/contacts/contact-editor.php:586
 msgctxt "contact_record"
 msgid "Send Email"
-msgstr "Enviar Email"
+msgstr "Enviar E-mail"
 
 #: admin/contacts/contact-editor.php:591 admin/contacts/contact-editor.php:607
 msgid "Send"
@@ -816,7 +780,7 @@ msgstr "Iniciar"
 
 #: admin/contacts/contact-editor.php:665
 msgid "Submit Form"
-msgstr "Enviar"
+msgstr "Enviar Formulário"
 
 #: admin/contacts/contact-editor.php:683
 msgctxt "contact_record"
@@ -872,7 +836,7 @@ msgid ""
 "Any upcoming funnel steps will show up here. you can choose to cancel them "
 "or to run them immediately."
 msgstr ""
-"Todos os próximos passos funil vai aparecer aqui. Você pode optar por "
+"Todos os próximos passos do funil vão aparecer aqui. Você pode optar por "
 "cancelá-los ou executá-los imediatamente."
 
 #: admin/contacts/contact-editor.php:845
@@ -881,7 +845,6 @@ msgid "Recent Funnel History"
 msgstr "História recente do funil"
 
 #: admin/contacts/contact-editor.php:846
-#, fuzzy
 msgctxt "contact_record"
 msgid ""
 "Any previous funnel steps will show up here. You can choose run them again."
@@ -890,13 +853,13 @@ msgid ""
 msgstr ""
 "Todos os passos anteriores do funil aparecerão aqui. É possível selecionar "
 "executá-los novamente.<br/>Este relatório mostra apenas os 10 eventos mais "
-"recentes, para ver mais você pode ver todo o histórico deste contato na fila "
-"de eventos."
+"recentes. Para ver mais, você pode ver todo o histórico deste contato na "
+"fila de eventos."
 
 #: admin/contacts/contact-editor.php:853
 msgctxt "contact_record"
 msgid "Recent Email History"
-msgstr "Histórico de emails recentes"
+msgstr "Histórico de e-mails recentes"
 
 #: admin/contacts/contact-editor.php:855
 msgctxt "contact_record"
@@ -912,14 +875,13 @@ msgid "Form Submissions"
 msgstr "Registros"
 
 #: admin/contacts/contact-editor.php:863
-#, fuzzy
 msgctxt "contact_record"
 msgid ""
 "Any previous from submissions from this contact will show below as of "
 "version 2.0."
 msgstr ""
-"Qualquer antecedente de submissões deste contato será mostrado abaixo a "
-"partir da versão 2.0."
+"Qualquer envio anterior deste contato será mostrado abaixo a partir da "
+"versão 2.0."
 
 #: admin/contacts/contact-editor.php:892
 msgid "Form ID"
@@ -953,9 +915,8 @@ msgstr "Contatos"
 
 #: admin/contacts/contacts-page.php:115 admin/emails/emails-page.php:52
 #: admin/funnels/funnels-page.php:60
-#, fuzzy
 msgid "Add"
-msgstr "Selecione contatos para adicionar ao funil:"
+msgstr "Adicionar"
 
 #: admin/contacts/contacts-page.php:120
 #: admin/contacts/tables/contacts-table.php:372
@@ -978,7 +939,7 @@ msgid ""
 "This is where you can manage and view your contacts. Click the quick edit to "
 "quickly change contact details."
 msgstr ""
-"É aqui que pode gerir e ver os seus contactos. Clique na edição rápida para "
+"É aqui que pode gerir e ver os seus contatos. Clique na edição rápida para "
 "alterar rapidamente os detalhes de contato."
 
 #: admin/contacts/contacts-page.php:143 admin/emails/emails-page.php:153
@@ -999,20 +960,19 @@ msgid ""
 "Manually unsubscribe a contact by checking the \"mark as unsubscribed\" "
 "button."
 msgstr ""
-"Cancelar manualmente um contato marcando o botão \"marcar como não inscrito"
-"\"."
+"Cancelar manualmente um contato com o botão \"marcar como não inscrito\"."
 
 #: admin/contacts/contacts-page.php:147
 msgid ""
 "Make sure your in compliance by ensuring the terms of agreement and GDPR "
 "consent are both checked under the compliance section."
 msgstr ""
-"Certifique-se de sua conformidade, garantindo os termos de acordo e "
-"consentimento GDPR são ambos verificados na seção de conformidade."
+"Certifique-se de sua conformidade, garantindo que os termos de acordo e "
+"consentimento RGPD sejam ambos verificados na seção de conformidade."
 
 #: admin/contacts/contacts-page.php:148
 msgid "View the origin of the contact by looking at the lead source field."
-msgstr "Exiba a origem do contato examinando o campo de origem do Lead."
+msgstr "Veja a origem do contato examinando o campo de lead."
 
 #: admin/contacts/contacts-page.php:149
 msgid ""
@@ -1020,23 +980,24 @@ msgid ""
 "Meta\" section. Each meta also includes a replacement code to include it in "
 "an email."
 msgstr ""
-"Adicionar ou remover informações personalizadas sobre o contato, habilitando "
-"a seção \"Editar meta\". Cada meta também inclui um código de substituição "
-"para incluí-lo em um e-mail."
+"Adicione ou remova informações personalizadas sobre o contato, habilitando a "
+"seção \"Editar meta\". Cada meta também inclui um código de substituição "
+"para ser incluído em e-mail."
 
 #: admin/contacts/contacts-page.php:150
 msgid ""
 "Re-run or cancel events for this contact by viewing the \"Upcoming Events\" "
 "or \"Recent History\" Section"
 msgstr ""
-"Reexecutar ou cancelar eventos para este contacto visualizando a secção "
-"\"eventos futuros\" ou \"histórico recente\""
+"Reexecute ou cancele eventos para este contato visualizando a seção "
+"\"Próximo Eventos\" ou \"Histórico Recente\""
 
 #: admin/contacts/contacts-page.php:151
 msgid ""
 "Monitor their engagement by looking in the \"Recent Email History\" section."
 msgstr ""
-"Monitore seu engajamento examinando a seção \"histórico de emails recentes\"."
+"Monitore seu engajamento examinando a seção \"Histórico de E-mails Recentes"
+"\"."
 
 #: admin/contacts/contacts-page.php:314
 msgctxt "page_title"
@@ -1055,7 +1016,7 @@ msgid "Oops!"
 msgstr "Oops!"
 
 #: admin/contacts/contacts-page.php:331
-#, fuzzy, php-format
+#, php-format
 msgctxt "page_title"
 msgid "Submit Form For %s"
 msgstr "Enviar formulário para %s"
@@ -1063,7 +1024,7 @@ msgstr "Enviar formulário para %s"
 #: admin/contacts/contacts-page.php:333
 msgctxt "page_title"
 msgid "Submit Form"
-msgstr "Enviar"
+msgstr "Enviar Formulário"
 
 #: admin/contacts/contacts-page.php:338
 msgctxt "page_title"
@@ -1077,7 +1038,7 @@ msgstr "Importar"
 
 #: admin/contacts/contacts-page.php:377 admin/contacts/contacts-page.php:393
 msgid "Please enter a valid email address."
-msgstr "Por favor insira um endereço de e-mail válido."
+msgstr "Por favor, insira um endereço de e-mail válido."
 
 #: admin/contacts/contacts-page.php:389
 #, php-format
@@ -1086,9 +1047,8 @@ msgid "Sorry, the email %s already belongs to another contact."
 msgstr "Desculpe, o e-mail %s já pertence a outro contato."
 
 #: admin/contacts/contacts-page.php:399
-#, fuzzy
 msgid "Could not add contact."
-msgstr "Não foi possível adicionar contacto."
+msgstr "Não foi possível adicionar o contato."
 
 #: admin/contacts/contacts-page.php:413
 msgctxt "notice"
@@ -1096,9 +1056,8 @@ msgid "Contact created!"
 msgstr "Contato criado!"
 
 #: admin/contacts/contacts-page.php:463
-#, fuzzy
 msgid "Contact id not found."
-msgstr "Identificação de contacto não encontrada."
+msgstr "Identificação de contato não encontrada."
 
 #: admin/contacts/contacts-page.php:512 admin/contacts/contacts-page.php:840
 #, php-format
@@ -1107,14 +1066,13 @@ msgid "Sorry, the email %s already belongs to another contact."
 msgstr "Desculpe, o e-mail %s já pertence a outro contato."
 
 #: admin/contacts/contacts-page.php:551
-#, fuzzy
 msgctxt "notice"
 msgid "Location updated."
 msgstr "Localização atualizada."
 
 #: admin/contacts/contacts-page.php:572 admin/contacts/contacts-page.php:867
 msgid "Hmm, looks like we could not add the new tags..."
-msgstr "Hmm, parece que não poderíamos adicionar as novas Tags..."
+msgstr "Hmm, parece que não foi possível adicionar as novas tags..."
 
 #: admin/contacts/contacts-page.php:584
 msgctxt "notice"
@@ -1122,24 +1080,20 @@ msgid "This contact will no longer receive marketing."
 msgstr "Este contato deixará de receber marketing."
 
 #: admin/contacts/contacts-page.php:596
-#, fuzzy
 msgctxt "notice"
 msgid "This contact's email address has been confirmed."
-msgstr "O endereço de e-mail deste contacto foi confirmado."
+msgstr "O endereço de e-mail deste contato foi confirmado."
 
 #: admin/contacts/contacts-page.php:600
-#, fuzzy
 msgid "A reason is required to change the email confirmation status."
 msgstr "É necessário um motivo para alterar o status de confirmação de e-mail."
 
 #: admin/contacts/contacts-page.php:612
-#, fuzzy
 msgctxt "notice"
 msgid "The email has been added to the queue and will send shortly."
 msgstr "O e-mail foi adicionado à fila e será enviado em breve."
 
 #: admin/contacts/contacts-page.php:620
-#, fuzzy
 msgctxt "notice"
 msgid "The SMS has been added to the queue and will send shortly."
 msgstr "O SMS foi adicionado à fila e será enviado em breve."
@@ -1159,58 +1113,58 @@ msgstr "Contato atualizado!"
 msgctxt "notice"
 msgid "Deleted %d contact"
 msgid_plural "Deleted %d contacts"
-msgstr[0] "Excluído %d contatos."
-msgstr[1] "Excluído% d contatos."
+msgstr[0] "Excluído %d contato"
+msgstr[1] "Excluídos %d contatos"
 
 #: admin/contacts/contacts-page.php:702
 #, php-format
 msgctxt "notice"
 msgid "Marked %d contact as spam."
 msgid_plural "Marked %d contacts as spam."
-msgstr[0] "Marcado %d contato como spam."
-msgstr[1] "Marcado %d contato como spam."
+msgstr[0] "Contato %d marcado como spam."
+msgstr[1] "Contatos %d marcados como spam."
 
 #: admin/contacts/contacts-page.php:722 admin/contacts/contacts-page.php:742
-#, fuzzy, php-format
+#, php-format
 msgctxt "notice"
 msgid "Approved %d contact."
 msgid_plural "Approved %d contacts."
-msgstr[0] "Aprovado %d contatos."
-msgstr[1] "Aprovado% d contatos."
+msgstr[0] "Aprovado %d contato."
+msgstr[1] "Aprovados %d contatos."
 
 #: admin/contacts/contacts-page.php:765
-#, fuzzy, php-format
+#, php-format
 msgctxt "notice"
 msgid "Applied %d tags to %d contact"
 msgid_plural "Applied %d tags to %d contacts"
-msgstr[0] "Etiquetas %d aplicadas a %d contato"
-msgstr[1] "Etiquetas %d aplicadas a contactos %d"
+msgstr[0] "Tag %d aplicada a %d contato"
+msgstr[1] "Tags %d aplicadas a %d contatos"
 
 #: admin/contacts/contacts-page.php:794
-#, fuzzy, php-format
+#, php-format
 msgctxt "notice"
 msgid "Removed %d tags from %d contact"
 msgid_plural "Removed %d tags from %d contacts"
-msgstr[0] "Removidas as tags %d do contato %d"
+msgstr[0] "Removida a tag %d do contato %d"
 msgstr[1] "Removidas as tags %d dos contatos %d"
 
 #: admin/contacts/contacts-page.php:832
 msgctxt "notice"
 msgid "Email cannot be blank."
-msgstr "O email não pode estar em branco."
+msgstr "O e-mail não pode estar em branco."
 
 #: admin/contacts/contacts-page.php:834
 msgctxt "notice"
 msgid "Invalid email address."
-msgstr "Email inválido."
+msgstr "Endereço de e-mail inválido."
 
 #: admin/contacts/contacts-page.php:897
 msgid "Search Contacts"
-msgstr "Pesquisar contatos"
+msgstr "Pesquisar Contatos"
 
 #: admin/contacts/search.php:25
 msgid "Equals"
-msgstr "Iguais"
+msgstr "Igual a"
 
 #: admin/contacts/search.php:26
 msgid "Not Equals"
@@ -1238,7 +1192,7 @@ msgstr "Está vazio"
 
 #: admin/contacts/search.php:32
 msgid "Is Filled"
-msgstr "É preenchido"
+msgstr "Está preenchido"
 
 #: admin/contacts/search.php:103 includes/functions.php:1459
 msgid "Company Name"
@@ -1260,7 +1214,7 @@ msgstr "Endereço 1"
 #: admin/contacts/search.php:107 admin/guided-setup/steps/business-info.php:44
 #: includes/form/fields/address.php:70 includes/functions.php:1454
 msgid "Street Address 2"
-msgstr "Endereço 2 da rua"
+msgstr "Endereço 2"
 
 #: admin/contacts/search.php:108 admin/guided-setup/steps/business-info.php:48
 #: admin/settings/settings-page.php:404 includes/form/fields/address.php:78
@@ -1295,23 +1249,23 @@ msgstr "Página de origem"
 #: admin/contacts/search.php:153 admin/dashboard/widgets/lead-sources.php:51
 #: includes/functions.php:1464
 msgid "Lead Source"
-msgstr "Fonte de chumbo"
+msgstr "Lead"
 
 #: admin/contacts/search.php:166 admin/contacts/search.php:190
 msgid "Has ALL of these tags"
-msgstr "Tem todas essas Tags"
+msgstr "Tem TODAS essas Tags"
 
 #: admin/contacts/search.php:167 admin/contacts/search.php:191
 msgid "Has ANY of these tags"
-msgstr "Tem alguma dessas Tags"
+msgstr "Tem ALGUMA dessas Tags"
 
 #: admin/contacts/search.php:168 admin/contacts/search.php:192
 msgid "Does not have ALL of these tags"
-msgstr "Não tem todas essas Tags"
+msgstr "Não tem TODAS essas Tags"
 
 #: admin/contacts/search.php:169 admin/contacts/search.php:193
 msgid "Does not have ANY of these tags"
-msgstr "Não tem nenhuma dessas Tags"
+msgstr "Não tem NENHUMA dessas Tags"
 
 #: admin/contacts/search.php:183
 msgid "And"
@@ -1339,7 +1293,6 @@ msgstr "Clicado"
 
 #: admin/contacts/tables/contact-activity-table.php:121
 #: admin/events/events-table.php:177
-#, fuzzy
 msgid "local time"
 msgstr "hora local"
 
@@ -1357,7 +1310,6 @@ msgstr "Passo"
 
 #: admin/contacts/tables/contact-events-table.php:70
 #: admin/events/events-table.php:62
-#, fuzzy
 msgctxt "Column label"
 msgid "Time"
 msgstr "Tempo"
@@ -1370,20 +1322,19 @@ msgstr "Ações"
 #: admin/contacts/tables/contact-events-table.php:94
 msgctxt "contact_record"
 msgid "View All Events"
-msgstr "Ver todos os eventos"
+msgstr "Ver Todos os Eventos"
 
 #: admin/contacts/tables/contact-events-table.php:96
-#, fuzzy
 msgctxt "action"
 msgid "Process Events"
-msgstr "Processar eventos"
+msgstr "Processar Eventos"
 
 #: admin/contacts/tables/contact-events-table.php:122
 #: admin/contacts/tables/contact-events-table.php:123
 #: admin/events/events-table.php:405 admin/events/events-table.php:406
 msgctxt "action"
 msgid "Edit Funnel"
-msgstr "Editar funil"
+msgstr "Editar Funil"
 
 #: admin/contacts/tables/contact-events-table.php:131
 #: admin/contacts/tables/contact-events-table.php:132
@@ -1417,7 +1368,7 @@ msgstr "Sobrenome"
 #: admin/contacts/tables/contacts-table.php:67
 msgctxt "Column label"
 msgid "Username"
-msgstr "Nome de usuário"
+msgstr "Nome de Usuário"
 
 #: admin/contacts/tables/contacts-table.php:68
 msgctxt "Column label"
@@ -1425,7 +1376,6 @@ msgid "Owner"
 msgstr "Proprietário"
 
 #: admin/contacts/tables/contacts-table.php:69
-#, fuzzy
 msgctxt "Column label"
 msgid "Date"
 msgstr "Data"
@@ -1438,7 +1388,7 @@ msgstr "Criado"
 #: admin/contacts/tables/contacts-table.php:216
 msgctxt "List table bulk action"
 msgid "Apply Tag"
-msgstr "Alt tag"
+msgstr "Aplicar tag"
 
 #: admin/contacts/tables/contacts-table.php:218
 msgctxt "List table bulk action"
@@ -1473,10 +1423,9 @@ msgid "Confirmed"
 msgstr "Confirmado"
 
 #: admin/contacts/tables/contacts-table.php:256
-#, fuzzy
 msgctxt "view"
 msgid "Weekly"
-msgstr "Está ficando um pouco demais. Comunique-se comigo semanalmente."
+msgstr "Semanal"
 
 #: admin/contacts/tables/contacts-table.php:257
 msgctxt "view"
@@ -1486,7 +1435,7 @@ msgstr "Mensal"
 #: admin/contacts/tables/contacts-table.php:258
 msgctxt "view"
 msgid "Unconfirmed"
-msgstr "Despublicar"
+msgstr "Não Confirmado"
 
 #: admin/contacts/tables/contacts-table.php:259
 msgctxt "view"
@@ -1511,7 +1460,7 @@ msgstr "Edição rápida & #8220; %s & #8221; inline"
 
 #: admin/contacts/tables/contacts-table.php:363
 msgid "Quick&nbsp;Edit"
-msgstr "Edição&nbsp;rápida"
+msgstr "Edição&nbsp;Rápida"
 
 #. translators: %s: title
 #: admin/contacts/tables/contacts-table.php:381
@@ -1529,12 +1478,12 @@ msgstr "Aprovar"
 #, php-format
 msgctxt "action"
 msgid "Mark %s as a valid email."
-msgstr "Marque %s como um email válido."
+msgstr "Marque %s como um e-mail válido."
 
 #: admin/contacts/tables/contacts-table.php:390
 msgctxt "action"
 msgid "Valid Email"
-msgstr "Email válido"
+msgstr "E-mail válido"
 
 #. translators: %s: title
 #: admin/contacts/tables/contacts-table.php:397
@@ -1553,12 +1502,11 @@ msgstr "Spam"
 #: admin/superlinks/superlinks-table.php:284 admin/tags/tags-table.php:250
 #, php-format
 msgid "Delete &#8220;%s&#8221; permanently"
-msgstr "Excluir &#8220;%s&#8221; Permanentemente"
+msgstr "Excluir &#8220;%s&#8221; permanentemente"
 
 #: admin/contacts/tables/contacts-table.php:466
-#, fuzzy
 msgid "Bulk Apply/Remove Tags"
-msgstr "Aplicar/remover etiquetas em massa"
+msgstr "Aplicar/Remover Tags em massa"
 
 #: admin/contacts/tables/contacts-table.php:471
 #, php-format
@@ -1579,7 +1527,7 @@ msgstr "Selecione um proprietário"
 #: admin/contacts/tables/contacts-table.php:511
 msgctxt "action"
 msgid "Unsubscribe this contact."
-msgstr "Cancele o contato."
+msgstr "Cancelar o contato."
 
 #: admin/contacts/tables/contacts-table.php:524
 #: includes/steps/funnel-step.php:682 templates/preferences.php:317
@@ -1598,7 +1546,6 @@ msgstr "Atualizar"
 #: admin/dashboard/widgets/circle-graph.php:89
 #: admin/dashboard/widgets/line-graph.php:154
 #: admin/dashboard/widgets/table-widget.php:63 includes/utils/graph.php:203
-#, fuzzy
 msgid "No data to show yet."
 msgstr "Ainda não há dados para mostrar."
 
@@ -1610,9 +1557,8 @@ msgstr "Outro"
 #: admin/dashboard/widgets/country-widget.php:38
 #: admin/dashboard/widgets/optin-status-widget.php:46
 #: admin/dashboard/widgets/region-widget.php:40
-#, fuzzy
 msgid "Total"
-msgstr "/Total"
+msgstr "Total"
 
 #: admin/dashboard/widgets/country-widget.php:39
 #: admin/dashboard/widgets/optin-status-widget.php:47
@@ -1623,24 +1569,20 @@ msgstr "Porcentagem (%)"
 #: admin/dashboard/widgets/country-widget.php:67
 #: admin/emails/emails-table.php:227 includes/classes/event.php:297
 #: includes/classes/event.php:311
-#, fuzzy
 msgid "Unknown"
-msgstr "Não foi possível processar a fila por motivo desconhecido."
+msgstr "Desconhecido"
 
 #: admin/dashboard/widgets/email-activity.php:25
-#, fuzzy
 msgid "Email Activity"
-msgstr "Relatório de atividades de E-mail"
+msgstr "Relatório de Atividades de E-mail"
 
 #: admin/dashboard/widgets/email-activity.php:47
 #: includes/steps/actions/send-email.php:315
-#, fuzzy
 msgid "Opens (O.R)"
-msgstr "Abre (O.R.)"
+msgstr "Acessos (O.R.)"
 
 #: admin/dashboard/widgets/email-activity.php:48
 #: includes/steps/actions/send-email.php:316
-#, fuzzy
 msgid "Clicks (C.T.R)"
 msgstr "Cliques (C.T.R)"
 
@@ -1651,26 +1593,23 @@ msgstr "Atividade de formulário"
 #: admin/dashboard/widgets/form-activity.php:45
 #: includes/steps/benchmarks/form-filled.php:786
 #: includes/steps/benchmarks/form-filled.php:814
-#, fuzzy
 msgid "Impressions"
-msgstr "Impressões de formulário"
+msgstr "Impressões"
 
 #: admin/dashboard/widgets/form-activity.php:46
 #: includes/steps/benchmarks/form-filled.php:790
 #: includes/steps/benchmarks/form-filled.php:815
-#, fuzzy
 msgid "Submissions"
 msgstr "Registros"
 
 #: admin/dashboard/widgets/form-activity.php:47
 #: includes/steps/benchmarks/form-filled.php:816
-#, fuzzy
 msgid "Conversion Rate (%)"
-msgstr "Taxa de Conversão"
+msgstr "Taxa de Conversão (%)"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:40
 msgid "Funnel Breakdown"
-msgstr "Repartição do funil"
+msgstr "Análise do Funil"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:158
 msgid "Step"
@@ -1700,14 +1639,13 @@ msgstr "Clicado"
 #: admin/dashboard/widgets/new-contacts.php:52
 #: includes/reporting/reports/new-contacts.php:39
 msgid "New Contacts"
-msgstr "Novos contatos"
+msgstr "Novos Contatos"
 
 #: admin/dashboard/widgets/new-contacts.php:51
 msgid "Total Contacts"
-msgstr "Total de contatos"
+msgstr "Total de Contatos"
 
 #: admin/dashboard/widgets/new-contacts.php:53
-#, fuzzy
 msgid "Growth (%)"
 msgstr "Crescimento (%)"
 
@@ -1717,7 +1655,7 @@ msgstr "Status"
 
 #: admin/dashboard/widgets/optin-status-widget.php:67
 msgid "Unconfirmed"
-msgstr "Despublicar"
+msgstr "Não Confirmado"
 
 #: admin/dashboard/widgets/optin-status-widget.php:70
 #: templates/preferences.php:358
@@ -1742,7 +1680,6 @@ msgid "Search Engines"
 msgstr "Mecanismos de busca"
 
 #: admin/dashboard/widgets/social-platforms.php:56
-#, fuzzy
 msgid "Social Platform"
 msgstr "Plataforma Social"
 
@@ -1751,12 +1688,11 @@ msgid "Refresh"
 msgstr "Atualizar"
 
 #: admin/dashboard/widgets/time-range-picker.php:75
-#, fuzzy, php-format
+#, php-format
 msgid "Showing results from %s to %s."
 msgstr "Mostrando resultados de %s a %s."
 
 #: admin/dashboard/widgets/time-range-picker.php:76
-#, fuzzy
 msgid "Use this form to quickly change the reporting time range."
 msgstr ""
 "Utilize este formulário para alterar rapidamente o intervalo de tempo do "
@@ -1767,9 +1703,8 @@ msgid "Time Range"
 msgstr "Intervalo de Tempo"
 
 #: admin/dashboard/widgets/utm-campaigns.php:51 includes/functions.php:1472
-#, fuzzy
 msgid "UTM Campaign"
-msgstr "Relatório de campanha da UTM"
+msgstr "Relatório de Campanha da UTM"
 
 #: admin/emails/add-email.php:55
 msgid "My Templates"
@@ -1789,24 +1724,20 @@ msgid "Start Writing"
 msgstr "Começar a Escrever"
 
 #: admin/emails/add-email.php:98
-#, fuzzy
 msgid "Search your previous emails and use them as a starting point."
 msgstr "Pesquise seus e-mails anteriores e use-os como ponto de partida."
 
 #: admin/emails/add-email.php:99
-#, fuzzy
 msgid "Type in a search term like \"Special\"..."
 msgstr "Digite um termo de pesquisa como \"Especial\"..."
 
 #: admin/emails/add-email.php:115 admin/emails/emails-page.php:731
-#, fuzzy
 msgid "Subject: "
-msgstr "sem assunto"
+msgstr "Assunto: "
 
 #: admin/emails/add-email.php:116 admin/emails/emails-page.php:732
-#, fuzzy
 msgid "Pre-Header: "
-msgstr "Pré-Chefe"
+msgstr "Pré-Cabeçalho: "
 
 #: admin/emails/add-email.php:175
 msgid "Edit Template"
@@ -1835,11 +1766,11 @@ msgstr "Cor da Fonte"
 
 #: admin/emails/blocks/button.php:78
 msgid "Font Size"
-msgstr "Tamanho da fonte"
+msgstr "Tamanho da Fonte"
 
 #: admin/emails/blocks/button.php:90
 msgid "Button Font"
-msgstr "Fonte do botão"
+msgstr "Fonte do Botão"
 
 #: admin/emails/blocks/button.php:98 admin/emails/blocks/image.php:62
 #: admin/emails/email-editor.php:189
@@ -1870,7 +1801,6 @@ msgid "Column"
 msgstr "Coluna"
 
 #: admin/emails/blocks/column.php:62 admin/emails/blocks/column.php:69
-#, fuzzy
 msgid "Column content can only be edited in HTML mode at the moment."
 msgstr "O conteúdo da coluna só pode ser editado no modo HTML no momento."
 
@@ -1909,8 +1839,8 @@ msgid ""
 "support certain HTML."
 msgstr ""
 "Este é algum HTML personalizado que você pode editar à direita. Você pode "
-"inserir quaisquer Tags HTML válidas, mas elas podem ser filtradas como "
-"alguns navegadores de e-mail para não suportarem determinados HTML."
+"inserir quaisquer tags HTML válidas, mas elas podem ser filtradas por alguns "
+"navegadores de e-mail que não suportam determinados códigos HTML."
 
 #: admin/emails/blocks/image.php:34
 msgctxt "email_block"
@@ -1937,7 +1867,7 @@ msgstr "Bloco de Texto"
 
 #: admin/emails/blocks/text.php:55
 msgid "H1 Size"
-msgstr "H1 Tamanho"
+msgstr "Tamanho H1"
 
 #: admin/emails/blocks/text.php:67
 msgid "H1 Font"
@@ -1945,7 +1875,7 @@ msgstr "Fonte H1"
 
 #: admin/emails/blocks/text.php:75
 msgid "H2 Size"
-msgstr "H2 Size"
+msgstr "Tamanho H2"
 
 #: admin/emails/blocks/text.php:87
 msgid "H2 Font"
@@ -1953,11 +1883,11 @@ msgstr "Fonte H2"
 
 #: admin/emails/blocks/text.php:95
 msgid "Paragraph Size"
-msgstr "Tamanho do parágrafo"
+msgstr "Tamanho do Parágrafo"
 
 #: admin/emails/blocks/text.php:107
 msgid "Paragraph Font"
-msgstr "Fonte do parágrafo"
+msgstr "Fonte do Parágrafo"
 
 #: admin/emails/blocks/text.php:192
 msgid ""
@@ -1968,26 +1898,24 @@ msgid ""
 "change \n"
 "            the font styles of your email."
 msgstr ""
-"Personalize esta seção editando o texto, adicionando sua própria cópia, "
-"usando as opções acima para bold (realce), italicize, ou críe ligações e "
-"balas, ou use as opções no painel do \"projeto\" à esquerda para mudar os "
-"estilos da pia batismal de seu email."
+"Personalize esta seção editando o texto, adicionando sua própria cópia, \n"
+"usando as opções acima para deixar o texto em negrito, itálico, ou criar "
+"links e tópicos, \n"
+"ou use as opções no painel de \"Design\" à esquerda para mudar \n"
+"os estilos de fonte de seu e-mail."
 
 #: admin/emails/email-editor.php:44
-#, fuzzy
 msgid "Enter email title..."
-msgstr "Introduza o título do e-mail..."
+msgstr "Insira o título do e-mail..."
 
 #: admin/emails/email-editor.php:47
-#, fuzzy
 msgid "Send as broadcast"
 msgstr "Enviar como transmissão"
 
 #: admin/emails/email-editor.php:59 admin/funnels/funnel-editor-v2.php:109
 #: admin/funnels/funnel-editor.php:113
-#, fuzzy
 msgid "Distraction Free Mode"
-msgstr "Modo Distracção Livre"
+msgstr "Modo Sem Distração"
 
 #: admin/emails/email-editor.php:64 admin/funnels/funnel-editor-v2.php:114
 #: admin/funnels/funnel-editor.php:117 includes/replacements.php:440
@@ -1996,12 +1924,10 @@ msgstr "Substituições"
 
 #: admin/emails/email-editor.php:66 admin/funnels/funnel-editor-v2.php:116
 #: admin/funnels/funnel-editor.php:119 includes/replacements.php:442
-#, fuzzy
 msgid "Insert"
-msgstr "Inserir campo: %s"
+msgstr "Inserir"
 
 #: admin/emails/email-editor.php:76
-#, fuzzy
 msgid "Email Alt-Body"
 msgstr "Email Alt-Body"
 
@@ -2010,13 +1936,12 @@ msgid "Done"
 msgstr "Feito"
 
 #: admin/emails/email-editor.php:106 admin/sms/edit.php:48
-#, fuzzy
 msgid "Update & Test"
 msgstr "Atualização e Teste"
 
 #: admin/emails/email-editor.php:113
 msgid "Mobile Preview"
-msgstr "Visualização Mobile"
+msgstr "Visualização Prévia Mobile"
 
 #: admin/emails/email-editor.php:115 admin/emails/email-editor.php:127
 #: admin/funnels/funnel-editor-v2.php:128 admin/funnels/funnel-editor.php:131
@@ -2028,7 +1953,7 @@ msgstr "Fechar"
 
 #: admin/emails/email-editor.php:125
 msgid "Desktop Preview"
-msgstr "Visualização Desktop"
+msgstr "Visualização Prévia Desktop"
 
 #: admin/emails/email-editor.php:168
 msgid "Email Options"
@@ -2043,7 +1968,6 @@ msgid "The Contact's Owner"
 msgstr "O proprietário do contato"
 
 #: admin/emails/email-editor.php:178
-#, fuzzy
 msgid "Choose who this email comes from."
 msgstr "Escolha de quem vem este e-mail."
 
@@ -2053,13 +1977,12 @@ msgid "Reply To:"
 msgstr "Resposta Para:"
 
 #: admin/emails/email-editor.php:185
-#, fuzzy
 msgid ""
 "Override the email address replies are sent to. Leave empty to default to "
 "the sender address."
 msgstr ""
-"Substitua as respostas do endereço de e-mail para o qual as respostas são "
-"enviadas. Deixe em branco para o endereço padrão do remetente."
+"Substitua o endereço de e-mail para o qual as respostas são enviadas. Deixe "
+"em branco para escolher o endereço padrão do remetente."
 
 #: admin/emails/email-editor.php:199
 msgid "Save as template"
@@ -2067,7 +1990,7 @@ msgstr "Salvar como template"
 
 #: admin/emails/email-editor.php:217
 msgid "Enable Browser View"
-msgstr "Habilitar exibição do navegador"
+msgstr "Habilitar Exibição no Navegador"
 
 #: admin/emails/email-editor.php:227
 msgid "Blocks"
@@ -2075,14 +1998,13 @@ msgstr "Blocos"
 
 #: admin/emails/email-editor.php:292 admin/emails/email-editor.php:293
 msgid "Subject Line: Used to capture the attention of the reader."
-msgstr "Linha de assunto: usado para captar a atenção do leitor."
+msgstr "Linha de assunto: usada para captar a atenção do leitor."
 
 #: admin/emails/email-editor.php:296 admin/emails/email-editor.php:297
 msgid "Pre Header Text: Used to summarize the content of the email."
-msgstr "Texto de cabeçalho anterior: usado para resumir o conteúdo do e-mail."
+msgstr "Texto do pré-cabeçalho: usado para resumir o conteúdo do e-mail."
 
 #: admin/emails/email-editor.php:337
-#, fuzzy
 msgid "Use this custom Alt Body text"
 msgstr "Use este texto Alt Body personalizado"
 
@@ -2097,9 +2019,8 @@ msgid "Enable"
 msgstr "Habilitar"
 
 #: admin/emails/email-editor.php:346
-#, fuzzy
 msgid "If left un-enable an alt-body will be auto-generated."
-msgstr "Se não for activado, um alt-body será gerado automaticamente."
+msgstr "Se não for ativado, um alt-body será gerado automaticamente."
 
 #: admin/emails/emails-page.php:76 admin/emails/emails-page.php:340
 msgctxt "page_title"
@@ -2114,12 +2035,12 @@ msgid ""
 "                From this screen you can <strong>View/Edit/Delete</strong> "
 "emails and see their respective open rates across different funnels."
 msgstr ""
-"Ao contrário da maioria das plataformas de automação de marketing Groundhogg "
-"tomou a decisão de <strong> armazenar e-mails globalmente </strong>. Isso "
-"significa que você pode usar o mesmo e-mail em diferentes funis sem nunca "
-"ter que re-escrevê-lo.\n"
-"                A partir desta tela você pode <strong> View/Edit/Delete </"
-"strong> e-mails e ver suas respectivas taxas abertas em diferentes funis."
+"Ao contrário da maioria das plataformas de automação de marketing, a "
+"Groundhogg tomou a decisão de <strong>armazenar e-mails globalmente</"
+"strong>. Isso significa que você pode usar o mesmo e-mail em diferentes "
+"funis sem nunca ter que reescrevê-lo.\n"
+"                A partir desta tela você pode <strong>Ver/Editar/Deletar</"
+"strong> e-mails e ver suas respectivas taxas de acesso em diferentes funis."
 
 #: admin/emails/emails-page.php:146
 msgid ""
@@ -2127,10 +2048,10 @@ msgid ""
 "created by our in house digital marketing specialists or you can select one "
 "of your own past written emails to copy."
 msgstr ""
-"Quando você adicionar um novo e-mail você pode selecionar um modelo de e-"
-"mail pré-escrito criado por nossos especialistas em marketing digital em "
-"casa ou você pode selecionar um dos seus próprios e-mails escritos passados "
-"para copiar."
+"Quando você adicionar um novo e-mail, você pode selecionar um modelo de e-"
+"mail pré-escrito criado por nossos especialistas em marketing digital ou "
+"você pode selecionar um dos seus próprios e-mails já escritos anteriormente "
+"e copiar."
 
 #: admin/emails/emails-page.php:154
 #, php-format
@@ -2144,13 +2065,14 @@ msgid ""
 "this being 80% of email is read on mobile, so our email builder is optimized "
 "for better mobile consumption."
 msgstr ""
-"Quando você está editando um email, você pode arrastar em blocos novos do "
-"lado direito em seu índice do email. Você pode editar a aparência do e-mail "
+"Quando você está editando um e-mail, você pode arrastar em blocos novos do "
+"lado direito em seu índice do e-mail. Você pode editar a aparência do e-mail "
 "com as configurações no lado esquerdo do conteúdo do e-mail. Ao projetar "
-"nosso construtor do email nós fizemos a decisão para manter características "
-"esparsas. Portanto, sem colunas e não frilly coisas HTML. Apenas o básico. A "
-"razão para isso ser 80% de e-mail é lido no celular, para que o nosso "
-"Construtor de e-mail é otimizado para um melhor consumo móvel."
+"nosso\n"
+" construtor de e-mail nós tomamos a decisão de manter um nível baixo de "
+"recursos. Portanto, sem colunas e não vários itens HTML. Apenas o básico. A "
+"razão para isso é que 80% de e-mail é lido no celular, então nosso "
+"Construtor de e-mail é otimizado para um melhor consumo mobile."
 
 #: admin/emails/emails-page.php:156
 msgid ""
@@ -2158,8 +2080,8 @@ msgid ""
 "<strong>Ready</strong> and then you can use it in any broadcast or funnel. "
 "An email which is in draft mode will not be sent."
 msgstr ""
-"Quando você acredita que um e-mail está pronto para enviar definir o status "
-"para <strong> Ready </strong> e, em seguida, você pode usá-lo em qualquer "
+"Quando você achar que um e-mail está pronto para ser enviado, mude o status "
+"para <strong>Pronto</strong> e, em seguida, você pode usá-lo em qualquer "
 "transmissão ou funil. Um e-mail que está no modo de rascunho não será "
 "enviado."
 
@@ -2174,10 +2096,10 @@ msgid ""
 "results, use a minimal number of images, make text easy to read and write "
 "good content. Tests will be sent regardless of the email's current status."
 msgstr ""
-"Para testar um email, simplesmente marque a caixa de seleção <strong> Send "
-"Test </strong> e selecione a conta de usuário para a qual deseja enviar o "
+"Para testar um e-mail, simplesmente marque a caixa de seleção <strong>Enviar "
+"Teste</strong> e selecione a conta de usuário para a qual deseja enviar o "
 "teste. Para obter melhores resultados, use um número mínimo de imagens, "
-"tornar o texto fácil de ler e escrever um bom conteúdo. Os testes serão "
+"torne o texto fácil de ler e escreva um bom conteúdo. Os testes serão "
 "enviados independentemente do status atual do e-mail."
 
 #: admin/emails/emails-page.php:333
@@ -2188,12 +2110,11 @@ msgstr "Adicionar E-mail"
 #: admin/emails/emails-page.php:336
 msgctxt "page_title"
 msgid "Edit Email"
-msgstr "Editar Email"
+msgstr "Editar E-mail"
 
 #: admin/emails/emails-page.php:358 admin/sms/sms-page.php:92
-#, fuzzy
 msgid "Broadcast"
-msgstr "Esta transmissão será enviada para os contactos com estas etiquetas."
+msgstr "Transmissão"
 
 #: admin/emails/emails-page.php:378
 msgid "Restored"
@@ -2209,32 +2130,31 @@ msgid "Deleted"
 msgstr "Excluído"
 
 #: admin/emails/emails-page.php:426
-#, fuzzy, php-format
+#, php-format
 msgctxt "notice"
 msgid "Deleted %d email"
 msgid_plural "Deleted %d emails"
-msgstr[0] "Apagado %d email"
-msgstr[1] "Emails %d apagados"
+msgstr[0] "O e-mail %d foi apagado"
+msgstr[1] "Os e-mails %d foram apagados"
 
 #: admin/emails/emails-page.php:446
 msgid "Trashed"
-msgstr "Na Lixeira"
+msgstr "Lixeira"
 
 #: admin/emails/emails-page.php:490
-#, fuzzy
 msgid "Emails cannot be sent while in DRAFT mode."
-msgstr "Os e-mails não podem ser enviados no modo DRAFT."
+msgstr "Os e-mails não podem ser enviados no modo RASCUNHO."
 
 #: admin/emails/emails-page.php:498
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "You are sending this email from an email address (%s) which does not belong "
 "to this server. This may cause deliverability issues and harm your sender "
 "reputation."
 msgstr ""
 "Você está enviando este e-mail a partir de um endereço de e-mail (%s) que "
-"não pertence a este servidor. Isso pode causar problemas de entregabilidade "
-"e prejudicar a reputação do remetente."
+"não pertence a este servidor. Isso pode causar problemas de "
+"aprovisionabilidade e prejudicar a reputação do remetente."
 
 #: admin/emails/emails-page.php:518
 msgid "Email Updated."
@@ -2245,24 +2165,22 @@ msgid "Sent test email to"
 msgstr "Enviar e-mail de teste para"
 
 #: admin/emails/emails-page.php:562
-#, fuzzy
 msgid ""
 "Failed to send test: No user selected. Please select a user to send the test "
 "to."
 msgstr ""
-"Falhou em enviar o teste: Nenhum usuário selecionado. Por favor, selecione "
+"Problema ao enviar o teste: Nenhum usuário selecionado. Por favor, selecione "
 "um usuário para enviar o teste."
 
 #: admin/emails/emails-page.php:603 admin/emails/emails-page.php:614
 msgid "Could not create email."
-msgstr "Não foi possível criar e-mail."
+msgstr "Não foi possível criar o e-mail."
 
 #: admin/emails/emails-page.php:642
 msgid "Search Emails"
 msgstr "Pesquisar E-mails"
 
 #: admin/emails/emails-page.php:722
-#, fuzzy
 msgctxt "notice"
 msgid "Sorry, no emails were found."
 msgstr "Desculpe, não foram encontrados e-mails."
@@ -2355,15 +2273,15 @@ msgctxt "notice"
 msgid "%d event cancelled"
 msgid_plural "%d events cancelled"
 msgstr[0] "%d evento cancelado"
-msgstr[1] "%d evento cancelado"
+msgstr[1] "%d eventos cancelados"
 
 #: admin/events/events-page.php:148
 #, php-format
 msgctxt "notice"
 msgid "%d event rescheduled"
 msgid_plural "%d events rescheduled"
-msgstr[0] "%d eventos reagendadas"
-msgstr[1] "%d eventos reagendadas"
+msgstr[0] "%d evento reagendado"
+msgstr[1] "%d eventos reagendados"
 
 #: admin/events/events-table.php:59
 msgctxt "Column label"
@@ -2373,7 +2291,7 @@ msgstr "Contato"
 #: admin/events/events-table.php:63
 msgctxt "Column label"
 msgid "Error Code"
-msgstr "Código de erro"
+msgstr "Código de Erro"
 
 #: admin/events/events-table.php:64
 msgctxt "Column label"
@@ -2464,7 +2382,7 @@ msgstr "Executar"
 #: admin/events/events-table.php:396 admin/events/events-table.php:397
 msgctxt "action"
 msgid "View Contact"
-msgstr "Veja Contato"
+msgstr "Ver Contato"
 
 #: admin/funnels/add-funnel.php:31
 msgctxt "add_funnel_tab"
@@ -2479,12 +2397,12 @@ msgstr "Mercado"
 #: admin/funnels/add-funnel.php:35
 msgctxt "add_funnel_tab"
 msgid "Import Funnel"
-msgstr "Funil de importação"
+msgstr "Importar Funil"
 
 #: admin/funnels/add-funnel.php:58
 msgctxt "action"
 msgid "Start Building"
-msgstr "Comece a construir"
+msgstr "Começar a Construir"
 
 #: admin/funnels/add-funnel.php:77
 msgid "Search for templates from our marketplace."
@@ -2497,13 +2415,12 @@ msgid ""
 "\">Get Started Now!</a>"
 msgstr ""
 "Quer compartilhar seu funil com o mundo? <a target=\"_blank\" href=\"https://"
-"www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/\">comece "
+"www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/\">Comece "
 "agora! </a>"
 
 #: admin/funnels/add-funnel.php:80
-#, fuzzy
 msgid "Type in a search term like Webinar..."
-msgstr "Digite um termo de pesquisa como <i> webinar </i>..."
+msgstr "Digite um termo de pesquisa como \"webinar\"..."
 
 #: admin/funnels/add-funnel.php:138
 msgid ""
@@ -2515,7 +2432,7 @@ msgstr ""
 #: admin/funnels/add-funnel.php:142
 msgctxt "action"
 msgid "Import Funnel"
-msgstr "Funil de importação"
+msgstr "Importar Funil"
 
 #: admin/funnels/funnel-editor-v2.php:43 admin/funnels/funnel-editor.php:55
 msgid "Enter Funnel Name Here"
@@ -2531,22 +2448,19 @@ msgid "Add Contacts"
 msgstr "Adicionar Contatos"
 
 #: admin/funnels/funnel-editor-v2.php:139 admin/funnels/funnel-editor.php:141
-#, fuzzy
 msgid "Copy share link"
 msgstr "Copiar link de compartilhamento"
 
 #: admin/funnels/funnel-editor-v2.php:144 admin/funnels/funnel-editor.php:143
 #: admin/tools/exports-table.php:248 admin/tools/tools-page.php:156
-#, fuzzy
 msgid "Export"
-msgstr "Exportar %s contato"
+msgstr "Exportar"
 
 #: admin/funnels/funnel-editor-v2.php:210 admin/funnels/funnel-editor.php:169
 msgid "Benchmarks"
 msgstr "Benchmarks"
 
 #: admin/funnels/funnel-editor-v2.php:211 admin/funnels/funnel-editor.php:189
-#, fuzzy
 msgid "Benchmarks start and stop automation steps for a contact."
 msgstr "Benchmarks iniciam e param os passos de automação de um contato."
 
@@ -2559,35 +2473,30 @@ msgid "Select contacts to add into funnel:"
 msgstr "Selecione contatos para adicionar ao funil:"
 
 #: admin/funnels/funnel-editor-v2.php:308 admin/funnels/funnel-editor.php:271
-#, fuzzy
 msgid "Exclude these contacts:"
-msgstr "Excluir esses contatos:"
+msgstr "Excluir estes contatos:"
 
 #: admin/funnels/funnel-editor-v2.php:325 admin/funnels/funnel-editor.php:288
 msgid "Select where to start:"
 msgstr "Selecione onde começar:"
 
 #: admin/funnels/funnel-editor-v2.php:351 admin/funnels/funnel-editor.php:314
-#, fuzzy
 msgid "Add Contacts to Funnel"
 msgstr "Adicionar contatos ao funil"
 
 #: admin/funnels/funnel-editor.php:39
-#, fuzzy
 msgid "The new and improved Funnel Builder has Arrived!"
-msgstr "O novo e melhorado Funnel Builder Chegou!"
+msgstr "O novo e melhorado Funnel Builder chegou!"
 
 #: admin/funnels/funnel-editor.php:39
-#, fuzzy
 msgid "Launch V2 Now!"
-msgstr "Lançar V2 Agora!"
+msgstr "Usar V2 Agora!"
 
 #: admin/funnels/funnels-page.php:98
 msgid "You have no active funnels."
 msgstr "Você não tem funis ativos."
 
 #: admin/funnels/funnels-page.php:100
-#, fuzzy
 msgid "Activate a funnel!"
 msgstr "Activar um funil!"
 
@@ -2604,7 +2513,7 @@ msgid ""
 "last updated."
 msgstr ""
 "Aqui você pode editar seus funis. Um funil é um conjunto de etapas que podem "
-"executar a automação com base em interações de contato com seu site. Você "
+"executar a automação com base em interações do contato com seu site. Você "
 "pode exibir o número de contatos ativos em cada funil, bem como quando ele "
 "foi criado e atualizado pela última vez."
 
@@ -2615,9 +2524,9 @@ msgid ""
 "stop moving forward. The same goes for Archived funnels which simply do not "
 "show in the main list."
 msgstr ""
-"Funnels pode ser ativo/inativo/arquivado. Se um funil estiver inativo, "
+"Funis podem ser Ativos/Inativos/Arquivados. Se um funil estiver Inativo, "
 "nenhum contato poderá entrar e quaisquer contatos que possam estar no funil "
-"pararão de avançar. O mesmo vale para funis arquivados que simplesmente não "
+"pararão de avançar. O mesmo vale para funis Arquivados, que simplesmente não "
 "aparecem na lista principal."
 
 #: admin/funnels/funnels-page.php:187
@@ -2631,10 +2540,10 @@ msgid ""
 "click the import tab and upload the funnel file which will auto generate a "
 "funnel for you."
 msgstr ""
-"Para criar um novo funil, basta clicar no botão Adicionar novo no canto "
+"Para criar um novo funil, basta clicar no botão Adicionar Novo no canto "
 "superior esquerdo e selecionar um modelo de funil pré-construído. Se você "
-"tem um arquivo de importação funil você pode clicar na guia de importação e "
-"carregar o arquivo funil que irá gerar automaticamente um funil para você."
+"tem um arquivo de importação de funil você pode clicar na guia de importação "
+"e carregar o arquivo funil que irá gerar automaticamente um funil para você."
 
 #: admin/funnels/funnels-page.php:196
 msgid ""
@@ -2643,19 +2552,19 @@ msgid ""
 "while Actions are doing thing to a contact such as sending an email. Simply "
 "drag in the desired funnel steps in any order."
 msgstr ""
-"Ao editar um funil, você pode adicionar etapas do funil. Etapas do funil são "
-"benchmarks ou ações. Benchmarks são sempre que um contato \"faz\" alguma "
-"coisa, enquanto ações estão fazendo coisa para um contato, como o envio de "
-"um e-mail. Basta arrastar as etapas desejadas funil em qualquer ordem."
+"Ao editar um funil, você pode adicionar Etapas do Funil. Etapas do Funil são "
+"benchmarks ou ações. Benchmarks existem sempre que um contato \"faz\" alguma "
+"coisa, enquanto Ações compreendem fazer algo para um contato, como o envio "
+"de um e-mail. Basta arrastar as etapas do funil desejadas em qualquer ordem."
 
 #: admin/funnels/funnels-page.php:197
 msgid ""
 "Actions are run sequentially, so when an action takes place, it simply loads "
 "the next action. That means if you need to change it you can!"
 msgstr ""
-"Ações são executadas seqüencialmente, portanto, quando uma ação ocorre, ele "
-"simplesmente carrega a próxima ação. Isso significa que se você precisar "
-"mudá-lo você pode!"
+"Ações são executadas sequencialmente, portanto, quando uma ação ocorre, ele "
+"simplesmente carrega a próxima ação. Isso significa que, se você precisar "
+"mudá-lo, você pode!"
 
 #: admin/funnels/funnels-page.php:198
 msgid ""
@@ -2665,19 +2574,18 @@ msgid ""
 "That way you can have multiple automation triggers. "
 msgstr ""
 "Benchmarks são um pouco diferentes. Se você tiver vários benchmarks em uma "
-"linha, o que acontece é uma vez que um deles é completado por um contato a "
-"primeira ação encontrada procedendo que o benchmark é lançado, ignorando "
-"todos os outros benchmarks. Dessa forma, você pode ter vários gatilhos de "
-"automação."
+"linha, o que acontece é que, uma vez que um deles é completado por um "
+"contato, a primeira ação encontrada precedente àquele benchmark é lançada, "
+"ignorando todos os outros benchmarks. Dessa forma, você pode ter vários "
+"gatilhos de automação. "
 
 #: admin/funnels/funnels-page.php:199
-#, fuzzy
 msgid ""
 "Once a benchmark is complete all steps that are scheduled before that "
 "benchmark will stop immediately."
 msgstr ""
-"Quando um índice de referência estiver completo, todos os passos que estão "
-"programados antes desse índice de referência irão parar imediatamente."
+"Quando um benchmark estiver completo, todos os passos que estão programados "
+"antes desse benchmark irão parar imediatamente."
 
 #: admin/funnels/funnels-page.php:206
 msgid "Reporting"
@@ -2690,28 +2598,28 @@ msgid ""
 "select the time range which you would like to view by using the dropdown on "
 "the left and click the filter button."
 msgstr ""
-"Para exibir relatórios de funil, basta dgo para a tela de edição de qualquer "
-"funil e, em seguida, alternar o relatório/edição switch na caixa de "
+"Para exibir relatórios de funil, basta ir para a tela de edição de qualquer "
+"funil e, em seguida, alternar o botão Relatório/Edição na caixa de "
 "relatório. Você pode selecionar o intervalo de tempo que você gostaria de "
-"ver usando a lista suspensa à esquerda e clique no botão de filtro."
+"ver usando a lista suspensa à esquerda e clicando no botão de filtro."
 
 #: admin/funnels/funnels-page.php:357
 msgctxt "page_title"
 msgid "Add Funnel"
-msgstr "Adicionar funil"
+msgstr "Adicionar Funil"
 
 #: admin/funnels/funnels-page.php:360
 msgctxt "page_title"
 msgid "Edit Funnel"
-msgstr "Editar funil"
+msgstr "Editar Funil"
 
 #: admin/funnels/funnels-page.php:380
 #, php-format
 msgctxt "notice"
 msgid "Deleted %d funnel"
 msgid_plural "Deleted %d funnels"
-msgstr[0] "Excluído %d contatos."
-msgstr[1] "Excluído %d contatos."
+msgstr[0] "Excluído %d funil"
+msgstr[1] "Excluídos %d funis"
 
 #: admin/funnels/funnels-page.php:401
 #, php-format
@@ -2719,7 +2627,7 @@ msgctxt "notice"
 msgid "Restored %d funnel"
 msgid_plural "Deleted %d funnels"
 msgstr[0] "Restaurado %d funil"
-msgstr[1] "Excluído %d contatos."
+msgstr[1] "Excluídos %d funis"
 
 #: admin/funnels/funnels-page.php:429
 msgctxt "notice"
@@ -2731,8 +2639,8 @@ msgstr "Funil duplicado"
 msgctxt "notice"
 msgid "Archived %d funnel"
 msgid_plural "Archived %d funnels"
-msgstr[0] "Adicionar %d funil"
-msgstr[1] "Adicionar %d funil"
+msgstr[0] "Arquivado %d funil"
+msgstr[1] "Arquivados %d funis"
 
 #: admin/funnels/funnels-page.php:511
 msgid "Please select a template..."
@@ -2746,14 +2654,13 @@ msgstr "Funil criado"
 #: admin/funnels/funnels-page.php:664
 msgctxt "stats"
 msgid "Completed Events"
-msgstr "Eventos concluídos"
+msgstr "Eventos Concluídos"
 
 #: admin/funnels/funnels-page.php:668
 msgid "Waiting Contacts"
-msgstr "Contatos de espera"
+msgstr "Contatos em Espera"
 
 #: admin/funnels/funnels-page.php:695
-#, fuzzy
 msgid "You cannot do this while the funnel is not active."
 msgstr "Você não pode fazer isso enquanto o funil não estiver ativo."
 
@@ -2774,7 +2681,7 @@ msgstr ""
 #: admin/funnels/funnels-page.php:741
 msgctxt "warning"
 msgid "Funnels must start with 1 or more benchmarks"
-msgstr "Funis deve começar com 1 ou mais benchmarks"
+msgstr "Funis devem começar com 1 ou mais benchmarks"
 
 #: admin/funnels/funnels-page.php:744
 msgctxt "notice"
@@ -2782,7 +2689,7 @@ msgid "Funnel updated"
 msgstr "Funil atualizado"
 
 #: admin/funnels/funnels-page.php:840
-#, fuzzy, php-format
+#, php-format
 msgid "%s - (copy)"
 msgstr "%s - (cópia)"
 
@@ -2791,8 +2698,8 @@ msgstr "%s - (cópia)"
 msgctxt "notice"
 msgid "%d contact added to funnel"
 msgid_plural "%d contacts added to funnel"
-msgstr[0] "%d contatos adicionados ao funil!"
-msgstr[1] "%d contatos adicionados ao funil!"
+msgstr[0] "%d contato adicionado ao funil"
+msgstr[1] "%d contatos adicionados ao funil"
 
 #: admin/funnels/funnels-page.php:983
 msgid "Search Funnels"
@@ -2823,12 +2730,12 @@ msgstr "Desculpe, não foram encontrados modelos."
 #: admin/funnels/funnels-table.php:68
 msgctxt "Column label"
 msgid "Active Contacts"
-msgstr "Contatos ativos"
+msgstr "Contatos Ativos"
 
 #: admin/funnels/funnels-table.php:70
 msgctxt "Column label"
 msgid "Date Created"
-msgstr "Data Criada"
+msgstr "Data de Criação"
 
 #: admin/funnels/funnels-table.php:110
 msgctxt "view"
@@ -2857,17 +2764,15 @@ msgstr "Excluir Permanentemente"
 
 #: admin/funnels/funnels-table.php:148 admin/funnels/funnels-table.php:151
 msgid "Build"
-msgstr "Criar"
+msgstr "Editar"
 
 #: admin/funnels/funnels-table.php:149
-#, fuzzy
 msgid "Build (Classic)"
-msgstr "Build (Clássico)"
+msgstr "Editar (Clássico)"
 
 #: admin/funnels/funnels-table.php:152
-#, fuzzy
 msgid "Build (v2)"
-msgstr "Construir (v2)"
+msgstr "Editar (v2)"
 
 #: admin/funnels/funnels-table.php:155
 msgctxt "action"
@@ -2875,10 +2780,9 @@ msgid "Duplicate"
 msgstr "Duplicar"
 
 #: admin/funnels/funnels-table.php:156
-#, fuzzy
 msgctxt "action"
 msgid "Export"
-msgstr "Exportar %s contato"
+msgstr "Exportar"
 
 #: admin/funnels/funnels-table.php:157
 msgid "Archive"
@@ -2912,14 +2816,12 @@ msgid "Archive"
 msgstr "Arquivo"
 
 #: admin/guided-setup/guided-setup.php:96
-#, fuzzy
 msgid "Guided Setup"
-msgstr "Configuração guiada"
+msgstr "Configuração Guiada"
 
 #: admin/guided-setup/guided-setup.php:126
-#, fuzzy
 msgid "Look away!"
-msgstr "Olha para o outro lado!"
+msgstr "Olhe para o outro lado!"
 
 #: admin/guided-setup/steps/business-info.php:13
 msgctxt "guided_setup"
@@ -2927,7 +2829,6 @@ msgid "Business Information"
 msgstr "Informações de seu Negócio"
 
 #: admin/guided-setup/steps/business-info.php:23
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Your business information is needed so your list knows who is sending them "
@@ -2935,15 +2836,14 @@ msgid ""
 "CAN-SPAM legislation."
 msgstr ""
 "As informações da sua empresa são necessárias para que a sua lista saiba "
-"quem está enviando e-mails para eles. Todas estas informações aparecerão no "
-"rodapé do seu e-mail para cumprir a legislação CAN-SPAM."
+"quem está enviando e-mails. Todas estas informações aparecerão no rodapé do "
+"seu e-mail para cumprir a legislação CAN-SPAM."
 
 #: admin/guided-setup/steps/business-info.php:32
 msgid "Business Name"
 msgstr "Nome da Empresa"
 
 #: admin/guided-setup/steps/business-info.php:52
-#, fuzzy
 msgid "Postal/Zip code"
 msgstr "CEP"
 
@@ -2957,7 +2857,6 @@ msgid "Community"
 msgstr "Comunidade"
 
 #: admin/guided-setup/steps/community.php:30
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Join our online community and be a part of our global movement to "
@@ -2967,13 +2866,11 @@ msgstr ""
 "para democratizar o marketing e as vendas digitais."
 
 #: admin/guided-setup/steps/compliance.php:21
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Compliance Information"
-msgstr "Informações de conformidade"
+msgstr "Informações de Conformidade"
 
 #: admin/guided-setup/steps/compliance.php:31
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "These features help you stay within the letter of the law and make it easy "
@@ -2988,7 +2885,6 @@ msgid "Privacy Policy"
 msgstr "Política de Privacidade"
 
 #: admin/guided-setup/steps/compliance.php:46
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "This will be linked in the footer of your emails. It is important to let "
@@ -3003,17 +2899,15 @@ msgid "Terms & Conditions"
 msgstr "Termos e Condições"
 
 #: admin/guided-setup/steps/compliance.php:56
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Terms & conditions tell users about what they can expect from using your "
 "site."
 msgstr ""
-"Os termos e condições informam os usuários sobre o que eles podem esperar do "
+"Os Termos e Condições informam os usuários sobre o que eles podem esperar do "
 "uso do seu site."
 
 #: admin/guided-setup/steps/compliance.php:61
-#, fuzzy
 msgctxt "setting_label"
 msgid "I send email to subscribers in..."
 msgstr "Eu envio e-mail para assinantes em..."
@@ -3034,7 +2928,6 @@ msgid "Other"
 msgstr "Outro"
 
 #: admin/guided-setup/steps/compliance.php:83
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "If you send email in these areas special settings will be enabled to keep "
@@ -3044,13 +2937,11 @@ msgstr ""
 "para manter seu negócio dentro da lei."
 
 #: admin/guided-setup/steps/email.php:20
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Sending Email"
-msgstr "Envio de e-mail"
+msgstr "Envio de E-mail"
 
 #: admin/guided-setup/steps/email.php:30
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "There are different ways to send email with Groundhogg! Choose one below."
@@ -3059,12 +2950,10 @@ msgstr ""
 "das opções abaixo."
 
 #: admin/guided-setup/steps/email.php:39
-#, fuzzy
 msgid "Send Email & SMS With The Groundhogg Sending Service!"
-msgstr "Envie e-mail e SMS com o serviço de envio de Groundhogg!"
+msgstr "Envie e-mail e SMS com o serviço de envio da Groundhogg!"
 
 #: admin/guided-setup/steps/email.php:41
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "You can send your emails <b>and text messages</b> using our Groundhogg "
@@ -3072,8 +2961,8 @@ msgid ""
 "Get your <b>first 1000 credits free!</b>"
 msgstr ""
 "Você pode enviar seus e-mails <b>e mensagens de texto</b> usando nosso "
-"serviço de envio de Groundhogg para obter tempos de entrega mais rápidos e "
-"melhor entregabilidade. Receba os seus <b>primeiros 1000 créditos grátis!</b>"
+"serviço de envio da Groundhogg para obter tempos de entrega mais rápidos e "
+"melhor entrega. Receba os seus <b>primeiros 1000 créditos grátis!</b>"
 
 #: admin/guided-setup/steps/email.php:42
 msgctxt "guided_setup"
@@ -3081,13 +2970,11 @@ msgid "Learn more..."
 msgstr "Saiba mais..."
 
 #: admin/guided-setup/steps/email.php:45
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Already have an account? Connect & Activate!"
-msgstr "Já tem uma conta? Ligar e Activar!"
+msgstr "Já tem uma conta? Ligar e Ativar!"
 
 #: admin/guided-setup/steps/email.php:46
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Don't have an account? Sign Up Now!"
 msgstr "Não tem conta? Cadastre-se agora!"
@@ -3098,12 +2985,10 @@ msgid ""
 msgstr ""
 
 #: admin/guided-setup/steps/email.php:56
-#, fuzzy
 msgid "Alternatives"
 msgstr "Alternativas"
 
 #: admin/guided-setup/steps/email.php:59
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "You can send your emails using an <b>SMTP Service</b> using an SMTP plugin "
@@ -3114,19 +2999,16 @@ msgstr ""
 "serviço."
 
 #: admin/guided-setup/steps/email.php:61
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Get WP Mail SMTP"
 msgstr "Obter o WP Mail SMTP"
 
 #: admin/guided-setup/steps/email.php:62 admin/guided-setup/steps/email.php:70
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Browse Others..."
 msgstr "Procurar Outros..."
 
 #: admin/guided-setup/steps/email.php:67
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "You can send your emails using <b>Amazon SES</b> which is very cost "
@@ -3134,11 +3016,10 @@ msgid ""
 "difficult to setup."
 msgstr ""
 "Você pode enviar seus e-mails usando o <b>Amazon SES</b>, que é muito "
-"rentável e fornece uma classificação de alta entregabilidade, embora seja "
+"rentável e fornece uma classificação de alta taxa de entrega, embora seja "
 "mais difícil de configurar."
 
 #: admin/guided-setup/steps/email.php:69
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Get WP SES"
 msgstr "Obter WP SES"
@@ -3146,10 +3027,9 @@ msgstr "Obter WP SES"
 #: admin/guided-setup/steps/extensions.php:24
 msgctxt "guided_setup"
 msgid "Premium Extensions"
-msgstr "Premium Extensions"
+msgstr "Extensões Premium"
 
 #: admin/guided-setup/steps/extensions.php:34
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Integrate popular tools and add functionality with our premium extensions!"
@@ -3158,7 +3038,6 @@ msgstr ""
 "extensões premium!"
 
 #: admin/guided-setup/steps/extensions.php:69
-#, fuzzy
 msgid "See All Premium Extensions!"
 msgstr "Veja Todas as Extensões Premium!"
 
@@ -3168,13 +3047,12 @@ msgid "All Done!"
 msgstr "Tudo pronto!"
 
 #: admin/guided-setup/steps/finished.php:22
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Congratulations! Groundhogg has been successfully setup. Here are your next "
 "steps..."
 msgstr ""
-"Parabéns! A marmota foi configurada com sucesso. Aqui estão os próximos "
+"Parabéns! Groundhogg foi configurado com sucesso. Aqui estão os próximos "
 "passos..."
 
 #: admin/guided-setup/steps/finished.php:38
@@ -3183,7 +3061,6 @@ msgid "&larr; Back"
 msgstr "&larr; Voltar"
 
 #: admin/guided-setup/steps/finished.php:46
-#, fuzzy
 msgid "Complete Setup!"
 msgstr "Configuração Completa!"
 
@@ -3193,7 +3070,6 @@ msgid "Import Contacts"
 msgstr "Contatos importantes"
 
 #: admin/guided-setup/steps/import-contacts.php:26
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Import your contacts so you can start sending emails and marketing your "
@@ -3203,7 +3079,6 @@ msgstr ""
 "marketing do seu negócio."
 
 #: admin/guided-setup/steps/import-contacts.php:33
-#, fuzzy
 msgid "Click Here To Import Your List!"
 msgstr "Clique aqui para importar sua lista!"
 
@@ -3213,40 +3088,34 @@ msgid "Need Help?"
 msgstr "Precisa de ajuda?"
 
 #: admin/guided-setup/steps/partners.php:32
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Think you might want some implementation help? Find yourself a certified "
 "partner to help implement your marketing strategy."
 msgstr ""
-"Achas que queres alguma ajuda para a implementação? Encontre um parceiro "
+"Achas que precisa de alguma ajuda para a implementação? Encontre um parceiro "
 "certificado para ajudar a implementar a sua estratégia de marketing."
 
 #: admin/guided-setup/steps/partners.php:45
-#, fuzzy
 msgid "Find a Partner Near Me!"
 msgstr "Encontre um parceiro perto de mim!"
 
 #: admin/guided-setup/steps/start.php:20 admin/guided-setup/steps/start.php:71
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Get Started!"
 msgstr "Comece!"
 
 #: admin/guided-setup/steps/start.php:59
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Guided Setup"
-msgstr "Configuração guiada"
+msgstr "Configuração Guiada"
 
 #: admin/guided-setup/steps/start.php:65
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Welcome to the Guided Setup"
-msgstr "Bem-vindo à configuração guiada"
+msgstr "Bem-vindo à Configuração Guiada"
 
 #: admin/guided-setup/steps/start.php:66
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Follow these steps to quickly setup Groundhogg for your business. Setup only "
@@ -3258,36 +3127,31 @@ msgstr ""
 "modificar essas informações posteriormente na página de configurações."
 
 #: admin/guided-setup/steps/step.php:65
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Configuration saved!"
 msgstr "Configuração salva!"
 
 #: admin/guided-setup/steps/step.php:94
-#, fuzzy
 msgid "Save & Continue &rarr;"
-msgstr "Salvar & Continuar &rarr;"
+msgstr "Salvar e Continuar &rarr;"
 
 #: admin/guided-setup/steps/step.php:102
 msgid "Skip"
 msgstr "Pular"
 
 #: admin/guided-setup/steps/sync-users.php:18
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Sync Users & Contacts"
-msgstr "Sincronizar usuários e contatos"
+msgstr "Sincronizar Usuários e Contatos"
 
 #: admin/guided-setup/steps/sync-users.php:28
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Sync your existing users with the your contact lists."
 msgstr "Sincronize seus usuários existentes com as suas listas de contatos."
 
 #: admin/guided-setup/steps/sync-users.php:35
-#, fuzzy
 msgid "Click Here Sync!"
-msgstr "Clique Aqui Sincronizar!"
+msgstr "Clique Aqui para Sincronizar!"
 
 #: admin/guided-setup/steps/tracking.php:20
 msgctxt "guided_setup"
@@ -3295,25 +3159,23 @@ msgid "Enable Tracking"
 msgstr "Ativar Rastreamento"
 
 #: admin/guided-setup/steps/tracking.php:30
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Want a free extension? You can choose to share non sensitive data about how "
 "you use Groundhogg with us and in exchange you will receive a premium "
 "extension on us!"
 msgstr ""
-"Quer uma extensão gratuita? Você pode optar por compartilhar dados não "
-"confidenciais sobre como você usa a Groundhogg conosco e, em troca, você "
-"receberá uma extensão premium sobre nós!"
+"Quer uma extensão gratuita? Você pode optar por compartilhar conosco dados "
+"não confidenciais sobre como você usa o Groundhogg e, em troca, você "
+"receberá uma extensão premium de graça!"
 
 #: admin/guided-setup/steps/tracking.php:38
-#, fuzzy
 msgid "Yes, send me a discount code to receive a free extension."
 msgstr ""
 "Sim, envie-me um código de desconto para receber uma extensão gratuita."
 
 #: admin/guided-setup/steps/tracking.php:50
-#, fuzzy, php-format
+#, php-format
 msgid "A discount code will be emailed to %s upon completion."
 msgstr ""
 "Um código de desconto será enviado por e-mail para %s após a conclusão."
@@ -3324,27 +3186,27 @@ msgstr "Configurações"
 
 #: admin/multisite/network-settings-page.php:72
 msgid "Enable Multisite Database"
-msgstr "Habilitar banco de dados multisite"
+msgstr "Habilitar Banco de Dados Multisite"
 
 #: admin/multisite/network-settings-page.php:81
-#, fuzzy
 msgid ""
 "This will enable a global database for all your sites in this multisite "
 "installation. WARNING: This means the same information will be used among "
 "ALL subsites. Only enable if you do not host clients on your network."
 msgstr ""
-"Isto irá permitir uma base de dados global para todos os seus sites nesta "
+"Isto habilitará uma base de dados global para todos os seus sites nesta "
 "instalação multisite. ATENÇÃO: Isto significa que a mesma informação será "
-"utilizada entre TODAS as subsites. Ative apenas se você não hospedar "
-"clientes em sua rede."
+"utilizada entre TODOS os sites subsidiários. Ative apenas se você não "
+"hospedar clientes em sua rede."
 
 #: admin/multisite/network-settings-page.php:82
 msgid ""
 "You will have to manage all plugin settings from your MAIN blog, and any "
 "Groundhogg extensions should be made network active as well."
 msgstr ""
-"Você terá que gerenciar todas as configurações do plugin do seu blog "
-"principal, e quaisquer extensões Groundhogg deve ser feita rede ativa também."
+"Você terá que gerenciar todas as configurações de plug-in do seu blog "
+"principal, e quaisquer extensões Groundhogg também deverão ser ativadas na "
+"rede."
 
 #: admin/multisite/network-settings-page.php:91
 msgctxt "action"
@@ -3353,11 +3215,11 @@ msgstr "Salvar Alterações"
 
 #: admin/multisite/network-settings-page.php:110
 msgid "Settings Updated!"
-msgstr "Configurações salvas"
+msgstr "Configurações Salvas!"
 
 #: admin/settings/api-keys-table.php:56
 msgid "API Key"
-msgstr "Chave API"
+msgstr "Chave de API"
 
 #: admin/settings/api-keys-table.php:57
 msgid "API Keys"
@@ -3376,7 +3238,7 @@ msgstr "Revogar"
 #: admin/settings/api-keys-table.php:166
 msgctxt "column_title"
 msgid "Username"
-msgstr "Nome de usuário"
+msgstr "Nome de Usuário"
 
 #: admin/settings/api-keys-table.php:167
 msgctxt "column_title"
@@ -3400,7 +3262,7 @@ msgstr "Por favor, selecione um usuário"
 #: admin/settings/api-keys-table.php:195
 msgctxt "action"
 msgid "Generate New API Keys"
-msgstr "Gerar novas chaves de API"
+msgstr "Gerar novas Chaves de API"
 
 #: admin/settings/settings-page.php:63 admin/settings/settings-page.php:69
 msgctxt "page_title"
@@ -3408,10 +3270,9 @@ msgid "Settings"
 msgstr "Configurações"
 
 #: admin/settings/settings-page.php:72
-#, fuzzy
 msgctxt "page_title"
 msgid "Groundhogg Settings"
-msgstr "Definições de Marmota"
+msgstr "Configurações do Groundhogg"
 
 #: admin/settings/settings-page.php:140
 msgctxt "settings_tabs"
@@ -3451,7 +3312,7 @@ msgstr "Licenças"
 #: admin/settings/settings-page.php:187 admin/settings/settings-page.php:227
 msgctxt "settings_sections"
 msgid "Email Bounces"
-msgstr "Email bounces"
+msgstr "Recusas de E-mail"
 
 #: admin/settings/settings-page.php:196
 msgctxt "settings_sections"
@@ -3461,7 +3322,7 @@ msgstr "Configurações de Negócios"
 #: admin/settings/settings-page.php:201
 msgctxt "settings_sections"
 msgid "Misc Settings"
-msgstr "Configurações Misc."
+msgstr "Configurações Diversas"
 
 #: admin/settings/settings-page.php:206
 msgctxt "settings_sections"
@@ -3469,10 +3330,9 @@ msgid "Captcha"
 msgstr "Captcha"
 
 #: admin/settings/settings-page.php:211
-#, fuzzy
 msgctxt "settings_sections"
 msgid "Event Notices"
-msgstr "Avisos de eventos"
+msgstr "Avisos de Eventos"
 
 #: admin/settings/settings-page.php:216
 msgctxt "settings_sections"
@@ -3490,10 +3350,9 @@ msgid "API Settings"
 msgstr "Configurações de API"
 
 #: admin/settings/settings-page.php:238
-#, fuzzy
 msgctxt "settings_sections"
 msgid "Optin Status Tags"
-msgstr "Etiquetas de status Optin"
+msgstr "Etiquetas de Status Opt-in"
 
 #: admin/settings/settings-page.php:269
 msgid ""
@@ -3502,12 +3361,12 @@ msgid ""
 "account/\">please renew your license.</a>"
 msgstr ""
 "Digite suas chaves de licença de extensão aqui para receber atualizações "
-"para extensões compradas. Se a sua chave de licença expirou, < a href = "
-"\"https://groundhogg.io/account/\" > por favor, renovar sua licença. </a>"
+"para extensões compradas. Se a sua chave de licença expirou, <a href="
+"\"https://groundhogg.io/account/\"> por favor, renove sua licença. </a>"
 
 #: admin/settings/settings-page.php:296
 msgid "You have no extensions installed. Want some?"
-msgstr "Você não tem extensões instaladas. Quer um pouco?"
+msgstr "Você não tem extensões instaladas. Quer ganhar uma?"
 
 #: admin/settings/settings-page.php:296
 msgid "Get your first extension!"
@@ -3538,12 +3397,12 @@ msgstr "Como deve aparecer no rodapé do seu e-mail."
 #: admin/settings/settings-page.php:392
 msgctxt "settings"
 msgid "Street Address 2"
-msgstr "Endereço 2 da rua"
+msgstr "Endereço 2"
 
 #: admin/settings/settings-page.php:393
 msgctxt "settings"
 msgid "(Optional) As it should appear in your email footer."
-msgstr "Opcional Como deve aparecer no rodapé do seu e-mail."
+msgstr "(Opcional) Como deve aparecer no rodapé do seu e-mail."
 
 #: admin/settings/settings-page.php:398
 msgid "Unit 42"
@@ -3564,7 +3423,7 @@ msgid "State/Province/Region"
 msgstr "Estado/Província/Região"
 
 #: admin/settings/settings-page.php:465
-#, fuzzy, php-format
+#, php-format
 msgctxt "settings"
 msgid "Delete %s Data"
 msgstr "Eliminar %s Dados"
@@ -3573,31 +3432,28 @@ msgstr "Eliminar %s Dados"
 msgctxt "settings"
 msgid "Delete all information when uninstalling. This cannot be undone."
 msgstr ""
-"Exclua todas as informações ao desinstalar. Isso não pode ser desfeito."
+"Excluir todas as informações ao desinstalar. Isso não pode ser desfeito."
 
 #: admin/settings/settings-page.php:479
-#, fuzzy
 msgctxt "settings"
 msgid "Optin to anonymous usage tracking."
-msgstr "Optin para rastreamento de uso anônimo."
+msgstr "Opt-in para rastreamento de uso anônimo."
 
 #: admin/settings/settings-page.php:480
-#, fuzzy, php-format
+#, php-format
 msgctxt "settings"
 msgid ""
 "Help us make %s better by providing anonymous usage information about your "
 "site."
 msgstr ""
-"Ajude-nos a melhorar em %s, fornecendo informações anónimas sobre o seu site."
+"Ajude-nos a melhorar em %s, fornecendo informações anônimas sobre o seu site."
 
 #: admin/settings/settings-page.php:493
-#, fuzzy
 msgctxt "settings"
 msgid "Event Failure Notifications"
-msgstr "Notificações de falha de evento"
+msgstr "Notificações de Falha de Evento"
 
 #: admin/settings/settings-page.php:494
-#, fuzzy
 msgctxt "settings"
 msgid ""
 "This will let you know if something goes wrong in a funnel so you can fix it."
@@ -3606,41 +3462,35 @@ msgstr ""
 "consertá-lo."
 
 #: admin/settings/settings-page.php:506
-#, fuzzy
 msgctxt "settings"
 msgid "Event Failure Notification Email"
-msgstr "Email de notificação de falha de evento"
+msgstr "E-mail de notificação de falha de evento"
 
 #: admin/settings/settings-page.php:507
-#, fuzzy
 msgctxt "settings"
 msgid "The email which you would like to send failure notifications to."
 msgstr "O e-mail para o qual você gostaria de enviar notificações de falhas."
 
 #: admin/settings/settings-page.php:519
-#, fuzzy
 msgctxt "settings"
 msgid "Enable Script Debug Mode"
 msgstr "Habilitar Modo de Depuração de Script"
 
 #: admin/settings/settings-page.php:520
-#, fuzzy
 msgctxt "settings"
 msgid ""
 "This will attempt to load full JS files instead of minified JS files for "
 "debugging."
 msgstr ""
 "Isso tentará carregar arquivos JS completos em vez de arquivos JS "
-"minificados para depuração."
+"compactados para depuração."
 
 #: admin/settings/settings-page.php:532
-#, fuzzy
 msgctxt "settings"
 msgid "Enable Funnel Builder V2 (Beta)"
 msgstr "Ativar o Funil Builder V2 (Beta)"
 
 #: admin/settings/settings-page.php:533
-#, fuzzy
 msgctxt "settings"
 msgid "Use the new version of the Funnel Builder."
 msgstr "Use a nova versão do Funnel Builder."
@@ -3653,17 +3503,17 @@ msgstr "Política de Privacidade"
 #: admin/settings/settings-page.php:546
 msgctxt "settings"
 msgid "Link to your privacy policy."
-msgstr "Link para a sua política de privacidade."
+msgstr "Link para a sua Política de Privacidade."
 
 #: admin/settings/settings-page.php:556
 msgctxt "settings"
 msgid "Terms & Conditions (Terms of Service)"
-msgstr "Termos e condições (termos de serviço)"
+msgstr "Termos e Condições (Termos de Serviço)"
 
 #: admin/settings/settings-page.php:557
 msgctxt "settings"
 msgid "Link to your terms & conditions."
-msgstr "Link para seus termos e condições."
+msgstr "Link para seus Termos e Condições."
 
 #: admin/settings/settings-page.php:567
 msgctxt "settings"
@@ -3676,8 +3526,8 @@ msgid ""
 "This will stop emails being sent to contacts who do not have confirmed "
 "emails outside of the below grace period."
 msgstr ""
-"Isto irá parar e-mails que estão sendo enviados para os contatos que não têm "
-"confirmado e-mails fora do período de carência abaixo."
+"Isto interromperá o envio de e-mails para contatos que não confirmaram e-"
+"mails fora do período de carência abaixo."
 
 #: admin/settings/settings-page.php:581
 msgctxt "settings"
@@ -3697,7 +3547,7 @@ msgstr ""
 #: admin/settings/settings-page.php:594
 msgctxt "settings"
 msgid "Enable GDPR features."
-msgstr "Habilite os recursos do GDPR."
+msgstr "Habilite os recursos do RGPD."
 
 #: admin/settings/settings-page.php:595
 msgctxt "settings"
@@ -3705,7 +3555,7 @@ msgid ""
 "This will add a consent box to your forms as well as a \"Delete Everything\" "
 "Button to your email preferences page."
 msgstr ""
-"Isso adicionará uma caixa de consentimento aos seus formulários, bem como um "
+"Isto adicionará uma caixa de consentimento aos seus formulários, bem como um "
 "botão \"excluir tudo\" à sua página de preferências de e-mail."
 
 #: admin/settings/settings-page.php:608
@@ -3719,49 +3569,49 @@ msgid ""
 "This will prevent your system from sending emails to contacts for which you "
 "do not have explicit consent. Only works if GDPR features are enabled."
 msgstr ""
-"Isso impedirá que seu sistema envie emails para contatos para os quais você "
-"não tem consentimento explícito. Só funciona se os recursos do GDPR "
+"Isto impedirá que seu sistema envie e-mails para contatos para os quais você "
+"não tem consentimento explícito. Só funciona se os recursos do RGPD "
 "estiverem habilitados."
 
 #: admin/settings/settings-page.php:622
 msgctxt "settings"
 msgid "Recaptcha Site Key"
-msgstr "Chave do site(Recaptcha)"
+msgstr "Chave do Site (Recaptcha)"
 
 #: admin/settings/settings-page.php:623
 msgctxt "settings"
 msgid "This is the key which faces the users on the front-end"
-msgstr "Esta é a chave que enfrenta os usuários no front-end"
+msgstr "Esta é a chave que para os usuários no front-end"
 
 #: admin/settings/settings-page.php:633
 msgctxt "settings"
 msgid "Recaptcha Secret Key"
-msgstr "Chave secreta (Recaptcha)"
+msgstr "Chave Secreta (Recaptcha)"
 
 #: admin/settings/settings-page.php:634
 msgctxt "settings"
 msgid "Never ever ever share this with anyone!"
-msgstr "Nunca jamais compartilhe isso com ninguém!"
+msgstr "Jamais compartilhe isso com alguém!"
 
 #: admin/settings/settings-page.php:644
 msgctxt "settings"
 msgid "Bounce Inbox"
-msgstr "Caixa de entrada Bounce"
+msgstr "Caixa de Entrada (rejeitados)"
 
 #: admin/settings/settings-page.php:645
 msgctxt "settings"
 msgid "This is the inbox which emails will be sent to."
-msgstr "Esta é a caixa de entrada que e-mails serão enviados para."
+msgstr "Esta é a caixa de entrada para a qual os e-mails serão enviados."
 
 #: admin/settings/settings-page.php:658
 msgctxt "settings"
 msgid "Bounce Inbox Password"
-msgstr "Bounce senha inbox"
+msgstr "Senha para a Caixa de Entrada"
 
 #: admin/settings/settings-page.php:659
 msgctxt "settings"
 msgid "This password to access the inbox."
-msgstr "Esta senha para acessar a caixa de entrada."
+msgstr "Esta é a senha para acessar a caixa de entrada."
 
 #: admin/settings/settings-page.php:669
 msgctxt "settings"
@@ -3769,7 +3619,6 @@ msgid "Mail Server"
 msgstr "Servidor de E-mail"
 
 #: admin/settings/settings-page.php:670
-#, fuzzy
 msgctxt "settings"
 msgid ""
 "This is the domain your email inbox is hosted. Most likely mail.yourdomain."
@@ -3781,10 +3630,9 @@ msgstr ""
 #: admin/settings/settings-page.php:682
 msgctxt "settings"
 msgid "IMAP Port"
-msgstr "Porta do IMAP"
+msgstr "Porta IMAP"
 
 #: admin/settings/settings-page.php:683
-#, fuzzy
 msgctxt "settings"
 msgid ""
 "The bounce checker requires an IMAP connection. Most IMAP ports are 993."
@@ -3793,37 +3641,31 @@ msgstr ""
 "são 993."
 
 #: admin/settings/settings-page.php:695
-#, fuzzy
 msgctxt "settings"
 msgid "Default From Name"
-msgstr "Predefinição do nome"
+msgstr "Default a partir do nome"
 
 #: admin/settings/settings-page.php:696
-#, fuzzy
 msgctxt "settings"
 msgid "Override the default wp_mail from name."
-msgstr "Substitua o wp_mail padrão do nome."
+msgstr "Substituir o wp_mail padrão a partir do nome."
 
 #: admin/settings/settings-page.php:707
-#, fuzzy
 msgctxt "settings"
 msgid "Default From Email"
-msgstr "Predefinição de e-mail"
+msgstr "Default a partir do e-mail"
 
 #: admin/settings/settings-page.php:708
-#, fuzzy
 msgctxt "settings"
 msgid "Override the default wp_mail from email."
-msgstr "Substitua o wp_mail padrão do e-mail."
+msgstr "Substituir o wp_mail padrão  a partir do e-mail."
 
 #: admin/settings/settings-page.php:720
-#, fuzzy
 msgctxt "settings"
 msgid "Email Footer Alignment"
-msgstr "Alinhamento do Rodapé do Email"
+msgstr "Alinhamento do Rodapé do E-mail"
 
 #: admin/settings/settings-page.php:721
-#, fuzzy
 msgctxt "settings"
 msgid "The alignment of the email footer in all emails."
 msgstr "O alinhamento do rodapé do e-mail em todos os e-mails."
@@ -3831,10 +3673,9 @@ msgstr "O alinhamento do rodapé do e-mail em todos os e-mails."
 #: admin/settings/settings-page.php:736
 msgctxt "settings"
 msgid "Custom Footer Text"
-msgstr "Texto personalizado do rodapé"
+msgstr "Texto de Rodapé Personalizado"
 
 #: admin/settings/settings-page.php:737
-#, fuzzy
 msgctxt "settings"
 msgid ""
 "Text that will appear before the footer in every email. Accepts HTML and "
@@ -3844,7 +3685,6 @@ msgstr ""
 "simples."
 
 #: admin/settings/settings-page.php:745
-#, fuzzy
 msgctxt "settings"
 msgid "Email & SMS Service Token"
 msgstr "Token de serviço de e-mail e SMS"
@@ -3855,8 +3695,8 @@ msgid ""
 "Get this key from your <a target=\"_blank\" href=\"https://www.groundhogg.io/"
 "account/manage/\">Groundhogg Account Page.</a>"
 msgstr ""
-"Obter esta chave de seu <a target=\"_blank\" href=\"https://www.groundhogg."
-"io/account/manage/\"> página da conta Groundhogg."
+"Obtnhar esta chave a partir de sua <a target=\"_blank\" href=\"https://www."
+"groundhogg.io/account/manage/\"> página da conta Groundhogg.</a>"
 
 #: admin/settings/settings-page.php:757
 msgctxt "settings"
@@ -3864,7 +3704,6 @@ msgid "Send Email With Groundhogg"
 msgstr "Enviar E-mail com Groundhogg"
 
 #: admin/settings/settings-page.php:758
-#, fuzzy
 msgctxt "settings"
 msgid ""
 "Send email using the Groundhogg Sending Service! This will only be used by "
@@ -3872,22 +3711,19 @@ msgid ""
 "to send SMS if this is disabled."
 msgstr ""
 "Envie e-mail usando o Serviço de Envio da Groundhogg! Isto só será utilizado "
-"por e-mails enviados com o Groundhogg e não por outros e-mails WP. Você "
+"por e-mails enviados com o Groundhogg, e não por outros e-mails WP. Você "
 "ainda será capaz de enviar SMS se isso estiver desativado."
 
 #: admin/settings/settings-page.php:761 admin/settings/settings-page.php:774
-#, fuzzy
 msgid "Enable (Recommended)"
 msgstr "Habilitar (Recomendado)"
 
 #: admin/settings/settings-page.php:770
-#, fuzzy
 msgctxt "settings"
 msgid "Send Transactional Email With Groundhogg"
-msgstr "Enviar e-mail transacional com marmota"
+msgstr "Enviar E-mail transacional com a Groundhogg"
 
 #: admin/settings/settings-page.php:771
-#, fuzzy
 msgctxt "settings"
 msgid ""
 "By default, regular WP email such as password reset emails are sent through "
@@ -3899,148 +3735,128 @@ msgstr ""
 "senha, são enviados através do método de e-mail padrão do WordPress, "
 "independentemente das configurações acima. No entanto, você também pode "
 "optar por enviar todos os seus e-mails transacionais através do serviço de "
-"envio de Groundhogg também"
+"envio da Groundhogg. "
 
 #: admin/settings/settings-page.php:783
-#, fuzzy, php-format
+#, php-format
 msgctxt "settings"
 msgid "Disable the %s API"
-msgstr "Desativar o %s API"
+msgstr "Desativar a API %s"
 
 #: admin/settings/settings-page.php:784
-#, fuzzy
 msgctxt "settings"
 msgid ""
 "Disabling the API will prevent other platforms from accessing information on "
 "this site. Functionality in some extensions may be affected as well."
 msgstr ""
 "A desativação da API impedirá que outras plataformas acessem informações "
-"neste site. A funcionalidade em algumas extensões também pode ser afetada."
+"neste site. A funcionalidade de algumas extensões também pode ser afetada."
 
 #: admin/settings/settings-page.php:787
 msgid "Disable"
 msgstr "Desativar"
 
 #: admin/settings/settings-page.php:796
-#, fuzzy
 msgctxt "settings"
 msgid "Confirmed Tag"
 msgstr "Tag Confirmado"
 
 #: admin/settings/settings-page.php:797
-#, fuzzy
 msgctxt "settings"
 msgid "All confirmed contacts will have this tag."
 msgstr "Todos os contatos confirmados terão esta tag."
 
 #: admin/settings/settings-page.php:808
-#, fuzzy
 msgctxt "settings"
 msgid "Unconfirmed Tag"
-msgstr "Tag não confirmado"
+msgstr "Tag Não Confirmado"
 
 #: admin/settings/settings-page.php:809
-#, fuzzy
 msgctxt "settings"
 msgid "All unconfirmed contacts will have this tag."
 msgstr "Todos os contatos não confirmados terão esta tag."
 
 #: admin/settings/settings-page.php:820
-#, fuzzy
 msgctxt "settings"
 msgid "Unsubscribed Tag"
-msgstr "Tag não subscrito"
+msgstr "Tag Não Inscrito"
 
 #: admin/settings/settings-page.php:821
-#, fuzzy
 msgctxt "settings"
 msgid "All unsubscribed contacts will have this tag."
-msgstr "Todos os contatos unsubscribed terão este Tag."
+msgstr "Todos os contatos não inscritos terão esta tag."
 
 #: admin/settings/settings-page.php:832
-#, fuzzy
 msgctxt "settings"
 msgid "Spam Tag"
-msgstr "Etiqueta de Spam"
+msgstr "Tag de Spam"
 
 #: admin/settings/settings-page.php:833
-#, fuzzy
 msgctxt "settings"
 msgid "All contacts which are marked as spam will have this tag."
 msgstr "Todos os contatos marcados como spam terão esta tag."
 
 #: admin/settings/settings-page.php:844
-#, fuzzy
 msgctxt "settings"
 msgid "Bounced Tag"
-msgstr "Bounced Tag"
+msgstr "Tag Rejeitado"
 
 #: admin/settings/settings-page.php:845
-#, fuzzy
 msgctxt "settings"
 msgid "All contacts which have bounced will have this tag."
-msgstr "Todos os contatos que retornaram terão esta tag."
+msgstr "Todos os contatos que rejeitados terão esta tag."
 
 #: admin/settings/settings-page.php:856
-#, fuzzy
 msgctxt "settings"
 msgid "Complained Tag"
-msgstr "Tag Reclamado"
+msgstr "Tag de Reclamação"
 
 #: admin/settings/settings-page.php:857
-#, fuzzy
 msgctxt "settings"
 msgid "All contacts which have complained will have this tag."
 msgstr "Todos os contatos que tiverem reclamado terão esta tag."
 
 #: admin/settings/settings-page.php:868
-#, fuzzy
 msgctxt "settings"
 msgid "Subscribed Monthly Tag"
-msgstr "Tag Mensal Assinado"
+msgstr "Tag Assinatura Mensal"
 
 #: admin/settings/settings-page.php:869
-#, fuzzy
 msgctxt "settings"
 msgid "All contacts which have requested monthly emails will have this tag."
 msgstr "Todos os contatos que solicitaram e-mails mensais terão esta tag."
 
 #: admin/settings/settings-page.php:880
-#, fuzzy
 msgctxt "settings"
 msgid "Subscribed Weekly Tag"
-msgstr "Tag Semanal Assinado"
+msgstr "Tag Assinatura Semanal"
 
 #: admin/settings/settings-page.php:881
-#, fuzzy
 msgctxt "settings"
 msgid "All contacts which have requested weekly emails will have this tag."
 msgstr "Todos os contatos que solicitaram e-mails semanais terão esta tag."
 
 #: admin/settings/settings-page.php:892
-#, fuzzy
 msgctxt "settings"
 msgid "Marketable Tag"
-msgstr "Tag comercializável"
+msgstr "Tag Comercializável"
 
 #: admin/settings/settings-page.php:893
-#, fuzzy
 msgctxt "settings"
 msgid "All contacts which are considered marketable will have this tag."
 msgstr ""
 "Todos os contatos que são considerados comercializáveis terão esta tag."
 
 #: admin/settings/settings-page.php:904
-#, fuzzy
 msgctxt "settings"
 msgid "Non Marketable Tag"
-msgstr "Etiqueta Não Comercializável"
+msgstr "Tag Não Comercializável"
 
 #: admin/settings/settings-page.php:905
-#, fuzzy
 msgctxt "settings"
 msgid "All contacts which are considered unmarketable will have this tag."
-msgstr "Todos os contatos que são considerados unmarketable terão este Tag."
+msgstr ""
+"Todos os contatos que não são considerados comercializáveis terão esta tag."
 
 #: admin/sms/edit.php:30 admin/sms/sms-page.php:218
 #: includes/utils/html.php:1174
@@ -4048,9 +3864,8 @@ msgid "Title"
 msgstr "Título"
 
 #: admin/sms/edit.php:32 admin/sms/sms-page.php:220
-#, fuzzy
 msgid "Name it something simple so you do not forget it."
-msgstr "Nomeie uma tag algo simples para que você não esquecê-lo."
+msgstr "Coloque na tag um nome simples para que você não o esqueça."
 
 #: admin/sms/edit.php:36 admin/superlinks/edit.php:32
 #: admin/superlinks/superlinks-page.php:235
@@ -4058,62 +3873,54 @@ msgid "Target URL"
 msgstr "URL de Destino"
 
 #: admin/sms/edit.php:40 admin/sms/sms-page.php:227
-#, fuzzy
 msgid "Use any valid replacement codes in your text message."
 msgstr ""
 "Utilize quaisquer códigos de substituição válidos na sua mensagem de texto."
 
 #: admin/sms/sms-page.php:47
-#, fuzzy
 msgctxt "page_title"
 msgid "Sms"
 msgstr "Sms"
 
 #: admin/sms/sms-page.php:70
-#, fuzzy
 msgctxt "page_title"
 msgid "Edit SMS"
 msgstr "Editar SMS"
 
 #: admin/sms/sms-page.php:122
-#, fuzzy
 msgctxt "notice"
 msgid "SMS created"
-msgstr "SMS criado"
+msgstr "SMS criada"
 
 #: admin/sms/sms-page.php:166
-#, fuzzy
 msgctxt "notice"
 msgid "Updated SMS."
-msgstr "SMS atualizado."
+msgstr "SMS atualizada."
 
 #: admin/sms/sms-page.php:192
-#, fuzzy, php-format
+#, php-format
 msgctxt "notice"
 msgid "%d sms deleted"
 msgid_plural "%d sms deleted"
-msgstr[0] "%d sms Suprimido"
-msgstr[1] "%d sms Suprimido"
+msgstr[0] "%d sms excluída"
+msgstr[1] "%d sms excluídas"
 
 #: admin/sms/sms-page.php:206
-#, fuzzy
 msgid "Search SMS"
 msgstr "Pesquisar SMS"
 
 #: admin/sms/sms-page.php:213
-#, fuzzy
 msgid "Add New SMS"
-msgstr "Adicionar novo SMS"
+msgstr "Adicionar Nova SMS"
 
 #: admin/sms/sms-page.php:223
 msgid "Message"
 msgstr "Mensagem"
 
 #: admin/sms/sms-page.php:229
-#, fuzzy
 msgctxt "action"
 msgid "Add New SMS"
-msgstr "Adicionar novo SMS"
+msgstr "Adicionar Nova SMS"
 
 #: admin/sms/sms-table.php:57
 msgctxt "Column label"
@@ -4126,10 +3933,9 @@ msgstr "Nome do SuperLink"
 
 #: admin/superlinks/edit.php:28 admin/superlinks/superlinks-page.php:232
 msgid "Name a Superlink something simple so you do not forget it."
-msgstr "Nomeie um SuperLink algo simples para que você não esquecê-lo."
+msgstr "Coloque no SuperLink um nome simples para que você não o esqueça."
 
 #: admin/superlinks/edit.php:39 admin/superlinks/superlinks-page.php:241
-#, fuzzy
 msgid "Superlink target"
 msgstr "Superlink alvo"
 
@@ -4138,25 +3944,25 @@ msgid ""
 "This is the url the contact will be re-directed to after clicking this "
 "Superlink."
 msgstr ""
-"Esta é a URL que o contacto será redireccionado para depois de clicar neste "
+"Esta é a URL para a qual o contato será redirecionado depois de clicar neste "
 "SuperLink."
 
 #: admin/superlinks/edit.php:49 admin/superlinks/superlinks-page.php:247
 msgid "Apply Tags When Clicked"
-msgstr "Aplicar marcas quando clicado"
+msgstr "Aplicar tags quando clicado"
 
 #: admin/superlinks/edit.php:61
 msgid ""
 "These tags will be applied to a contact whenever this link is clicked. To "
 "create a new tag hit [enter] or [comma]"
 msgstr ""
-"Essas marcas serão aplicadas a um contato sempre que esse link for clicado. "
-"Para criar uma nova marca hit [Enter] ou [vírgula]"
+"Essas tags serão aplicadas a um contato sempre que este link for clicado. "
+"Para criar uma nova tag, aperte [Enter] ou [vírgula]"
 
 #: admin/superlinks/superlinks-page.php:50
 msgctxt "page_title"
 msgid "Superlinks"
-msgstr "Super links"
+msgstr "Superlinks"
 
 #: admin/superlinks/superlinks-page.php:77
 msgid ""
@@ -4164,8 +3970,8 @@ msgid ""
 "whenever clicked and then take the contact to a page of your choice. To use "
 "them, just copy the replacement code and paste in in email, button, or link."
 msgstr ""
-"Superlinks são superlinks especiais que permitem que você aplicar/remover "
-"Tags sempre que clicado e, em seguida, tomar o contato para uma página de "
+"Superlinks são superlinks especiais que permitem que você aplique/remova "
+"Tags sempre que for clicado e, em seguida, leve o contato para uma página de "
 "sua escolha. Para usá-los, basta copiar o código de substituição e colar no "
 "e-mail, botão ou link."
 
@@ -4176,29 +3982,24 @@ msgstr "Editar SuperLink"
 
 #: admin/superlinks/superlinks-page.php:113
 #: admin/superlinks/superlinks-page.php:154
-#, fuzzy
 msgid "Please enter super link name."
 msgstr "Por favor, digite o nome do super link."
 
 #: admin/superlinks/superlinks-page.php:117
 #: admin/superlinks/superlinks-page.php:158
-#, fuzzy
 msgid "Please enter super link target URL."
 msgstr "Por favor, digite o URL de destino do super link."
 
 #: admin/superlinks/superlinks-page.php:134
-#, fuzzy
 msgctxt "notice"
 msgid "Superlink created!"
-msgstr "SuperLink criado."
+msgstr "SuperLink criado!"
 
 #: admin/superlinks/superlinks-page.php:150
-#, fuzzy
 msgid "Given superlink not found!"
-msgstr "Dado o superlink não encontrado!"
+msgstr "Superlink não encontrado!"
 
 #: admin/superlinks/superlinks-page.php:175
-#, fuzzy
 msgctxt "notice"
 msgid "Superlink updated!"
 msgstr "Superlink atualizado!"
@@ -4224,16 +4025,16 @@ msgid ""
 "Insert a url that this link will direct to. This link can contain simple "
 "replacement codes."
 msgstr ""
-"Insira um URL para o qual este link será direto. Este link pode conter "
-"códigos de substituição simples."
+"Insira uma URL para a qual este link levará. Este link pode conter códigos "
+"de substituição simples."
 
 #: admin/superlinks/superlinks-page.php:253
 msgid ""
 "These tags will be applied to a contact whenever this link is clicked. To "
 "create a new tag hit [Enter] or [,]"
 msgstr ""
-"Essas marcas serão aplicadas a um contato sempre que esse link for clicado. "
-"Para criar uma nova marca hit [Enter] ou [,]"
+"Essas tags serão aplicadas a um contato sempre que este link for clicado. "
+"Para criar uma nova tag, aperte [Enter] ou [vírgula]"
 
 #: admin/superlinks/superlinks-page.php:255
 msgctxt "action"
@@ -4280,7 +4081,7 @@ msgid ""
 "contacts."
 msgstr ""
 "As descrições de Tags só são visíveis para os administradores e nunca serão "
-"vistas pelos contactos."
+"vistas pelos contatos."
 
 #: admin/tags/tags-page.php:43
 msgctxt "page_title"
@@ -4297,33 +4098,30 @@ msgstr "Editar Tag"
 msgctxt "notice"
 msgid "%d tag created"
 msgid_plural "%d tags created"
-msgstr[0] "%d marca criada"
-msgstr[1] "%d marca criada"
+msgstr[0] "Tag %d criada"
+msgstr[1] "Tags %d criadas"
 
 #: admin/tags/tags-page.php:125
-#, fuzzy
 msgctxt "notice"
 msgid "Tag created!"
-msgstr "Tag criado"
+msgstr "Tag criada!"
 
 #: admin/tags/tags-page.php:152
-#, fuzzy
 msgctxt "notice"
 msgid "Tag updated."
-msgstr "Tag actualizado"
+msgstr "Tag atualizada."
 
 #: admin/tags/tags-page.php:166
-#, fuzzy
 msgid "Tag associations reset."
-msgstr "Reset de associações de tags."
+msgstr "Reiniciar associações de tag."
 
 #: admin/tags/tags-page.php:190
 #, php-format
 msgctxt "notice"
 msgid "%d tag deleted"
 msgid_plural "%d tags deleted"
-msgstr[0] "%d tag excluído"
-msgstr[1] "%d tag excluído"
+msgstr[0] "Tag %d excluída"
+msgstr[1] "Tags %d excluídas"
 
 #: admin/tags/tags-page.php:206
 msgid "Search Tags"
@@ -4339,11 +4137,11 @@ msgstr "Nome da Tag"
 
 #: admin/tags/tags-page.php:220
 msgid "Name a tag something simple so you do not forget it."
-msgstr "Nomeie uma tag algo simples para que você não esquecê-lo."
+msgstr "Coloque um nome simples na tag para que você não o esqueça."
 
 #: admin/tags/tags-page.php:228
 msgid "Bulk Add Tags"
-msgstr "Bulk adicionar tags"
+msgstr "Adicionar tags em massa"
 
 #: admin/tags/tags-page.php:230
 msgid "Enter 1 tag per line."
@@ -4371,25 +4169,22 @@ msgstr "Contagem"
 #: admin/tags/tags-table.php:74
 msgctxt "action"
 msgid "Recount Contacts"
-msgstr "Recontagem de contatos"
+msgstr "Recontagem de Contatos"
 
 #: admin/tools/add-import.php:26
-#, fuzzy
 msgid "If you have a .CSV file you can upload it here!"
-msgstr "Se você tem um arquivo .CSV você pode enviá-lo aqui!"
+msgstr "Se você tem um arquivo .CSV, você pode enviá-lo aqui!"
 
 #: admin/tools/add-import.php:30
 msgctxt "action"
 msgid "Import Contacts"
-msgstr "Contatos importantes"
+msgstr "Contatos Importantes"
 
 #: admin/tools/add-import.php:32
-#, fuzzy
 msgid "Import from existing file."
 msgstr "Importar do arquivo existente."
 
 #: admin/tools/exports-table.php:50 admin/tools/imports-table.php:52
-#, fuzzy
 msgctxt "Column label"
 msgid "File"
 msgstr "Arquivo"
@@ -4400,52 +4195,44 @@ msgid "Rows"
 msgstr "Linhas"
 
 #: admin/tools/exports-table.php:52
-#, fuzzy
 msgctxt "Column label"
 msgid "Date Exported"
-msgstr "Data de exportação"
+msgstr "Data de Exportação"
 
 #: admin/tools/exports-table.php:256
-#, fuzzy
 msgid "Delete export"
-msgstr "Eliminar exportação"
+msgstr "Excluir Exportação"
 
 #: admin/tools/imports-table.php:54
 msgctxt "Column label"
 msgid "Date Uploaded"
-msgstr "Data de upload"
+msgstr "Data de Upload"
 
 #: admin/tools/imports-table.php:259
-#, fuzzy
 msgid "Delete Import"
-msgstr "Eliminar importação"
+msgstr "Excluir Importação"
 
 #: admin/tools/map-import.php:46
-#, fuzzy
 msgid "Map Contact Fields"
-msgstr "Campos de contato do mapa"
+msgstr "Mapear Campos de Contato"
 
 #: admin/tools/map-import.php:47
-#, fuzzy
 msgid "Map your CSV columns to the contact records fields below."
 msgstr "Mapeie suas colunas CSV para os campos de registros de contato abaixo."
 
 #: admin/tools/map-import.php:54
 msgid "Column Label"
-msgstr "Rótulo da coluna"
+msgstr "Rótulo da Coluna"
 
 #: admin/tools/map-import.php:55
-#, fuzzy
 msgid "Example Data / Contact Record Field"
-msgstr "Exemplo de dados / campo de registro de contato"
+msgstr "Exemplo de Dados / Campo de Registro de Contato"
 
 #: admin/tools/map-import.php:89
-#, fuzzy
 msgid "Add additional tags to this import"
 msgstr "Adicionar tags adicionais a esta importação"
 
 #: admin/tools/map-import.php:93
-#, fuzzy
 msgid "I have previously confirmed these email addresses."
 msgstr "Eu já confirmei estes endereços de e-mail."
 
@@ -4456,35 +4243,31 @@ msgstr "Sim"
 
 #: admin/tools/map-import.php:107
 msgid "Import Contacts"
-msgstr "Contatos importantes"
+msgstr "Importar Contatos"
 
 #: admin/tools/tools-page.php:93
 msgid "Tools"
 msgstr "Ferramentas"
 
 #: admin/tools/tools-page.php:129
-#, fuzzy
 msgid "Import New List"
-msgstr "Importar nova lista"
+msgstr "Importa Nova Lista"
 
 #: admin/tools/tools-page.php:136
-#, fuzzy
 msgid "Export All Contacts"
-msgstr "Exportar todos os contatos"
+msgstr "Exportar Todos os Contatos"
 
 #: admin/tools/tools-page.php:148
 msgid "System Info"
-msgstr "Informação do sistema"
+msgstr "Informação do Sistema"
 
 #: admin/tools/tools-page.php:160 admin/tools/tools-page.php:212
-#, fuzzy
 msgid "Sync Users & Contacts"
-msgstr "Sincronizar usuários e contatos"
+msgstr "Sincronizar Usuários e Contatos"
 
 #: admin/tools/tools-page.php:164 admin/tools/tools-page.php:248
-#, fuzzy
 msgid "Create Users"
-msgstr "Criar usuários"
+msgstr "Criar Usuários"
 
 #: admin/tools/tools-page.php:168
 msgid "Bulk Delete Contacts"
@@ -4499,47 +4282,40 @@ msgid "Download System Info when requesting support."
 msgstr "Baixe informações do sistema ao solicitar suporte."
 
 #: admin/tools/tools-page.php:220
-#, fuzzy
 msgid ""
 "The sync process will create new contact records for all users in the "
 "database. If a contact records already exists then the association will be "
 "updated."
 msgstr ""
-"O processo de sincronização irá criar novos registos de contactos para todos "
-"os utilizadores da base de dados. Se já existirem registos de contactos, a "
-"associação será actualizada."
+"O processo de sincronização irá criar novos registos de contatos para todos "
+"os utilizadores do banco de dados. Se já existirem registos de contatos, a "
+"associação será atualizada."
 
 #: admin/tools/tools-page.php:223
-#, fuzzy
 msgctxt "action"
 msgid "Start Sync Process"
-msgstr "Iniciar processo de sincronização"
+msgstr "Iniciar Processo de Sincronização"
 
 #: admin/tools/tools-page.php:258
-#, fuzzy
 msgid "Select contacts to create accounts for."
-msgstr "Selecione contatos para os quais criar contas."
+msgstr "Selecionar contatos para os quais criar contas."
 
 #: admin/tools/tools-page.php:266
-#, fuzzy
 msgid "Exclude these contacts."
-msgstr "Excluir esses contatos:"
+msgstr "Excluir esses contatos."
 
 #: admin/tools/tools-page.php:275
-#, fuzzy
 msgid "Send email notification to user."
 msgstr "Enviar notificação por e-mail ao usuário."
 
 #: admin/tools/tools-page.php:281
-#, fuzzy
 msgid "Much slower"
 msgstr "Muito mais lento"
 
 #: admin/tools/tools-page.php:287
-#, fuzzy
 msgctxt "action"
 msgid "Create Users"
-msgstr "Criar usuários"
+msgstr "Criar Usuários"
 
 #: admin/tools/tools-page.php:416
 msgctxt "error"
@@ -4547,36 +4323,31 @@ msgid "Could not upload file."
 msgstr "Não foi possível carregar o arquivo."
 
 #: admin/tools/tools-page.php:499
-#, fuzzy
 msgid "Imports deleted."
-msgstr "Importações suprimidas."
+msgstr "Importações excluídas."
 
 #: admin/tools/tools-page.php:536
-#, fuzzy
 msgid "Exports deleted."
-msgstr "Exportações eliminadas."
+msgstr "Exportações excluídas."
 
 #: admin/tools/tools-page.php:545
-#, fuzzy
 msgid "&#9888; There is no going back once the deletion process has started."
 msgstr ""
-"9888; Não há como voltar atrás uma vez que o processo de exclusão foi "
+"&#9888; Não há como voltar atrás uma vez que o processo de exclusão foi "
 "iniciado."
 
 #: admin/tools/tools-page.php:555
-#, fuzzy
 msgid "Delete Contacts in Bulk by Tag"
 msgstr "Excluir contatos em massa por tag"
 
 #: admin/tools/tools-page.php:565
-#, fuzzy
 msgid "Once you click the delete button there is no going back!"
-msgstr "Uma vez que você clique no botão de apagar não há como voltar atrás!"
+msgstr "Uma vez que você clique no botão de apagar, não há como voltar atrás!"
 
 #: admin/tools/tools-page.php:569
 msgctxt "action"
 msgid "Delete Contacts"
-msgstr "Excluir contatos"
+msgstr "Excluir Contatos"
 
 #: admin/welcome/welcome-page.php:112 admin/welcome/welcome-page.php:113
 msgctxt "page_title"
@@ -4584,7 +4355,6 @@ msgid "Welcome"
 msgstr "Bem-vindo"
 
 #: admin/welcome/welcome-page.php:146
-#, fuzzy
 msgctxt "notice"
 msgid "You have yet to complete the guided setup process."
 msgstr "Você ainda não concluiu o processo de configuração guiada."
@@ -4597,10 +4367,10 @@ msgid ""
 "look for one in <a target=\"_blank\" href=\"https://en-ca.wordpress.org/"
 "plugins/search/smtp/\">the WP repository.</a>"
 msgstr ""
-"SMS usa o <a target=\"_blank\" href=\"https://www.groundhogg.io/downloads/"
-"email-credits/\">Groundhogg sistema de crédito </a> e requer que você tenha "
-"configurado o seu <a target=\"_blank\" href=\"https://en-ca.wordpress.org/"
-"plugins/search/smtp/\"> Groundhogg conta </a>."
+"Recomendamos enviar o e-mail através de um serviço SMTP. <a target=\"_blank"
+"\" href=\"https://www.groundhogg.io/downloads/email-credits/\">Experimente o "
+"nosso!</a> Ou procure outro no <a target=\"_blank\" href=\"https://en-ca."
+"wordpress.org/plugins/search/smtp/\"> repositório WP.</a>"
 
 #: admin/welcome/welcome-page.php:194
 msgctxt "notice"
@@ -4608,13 +4378,13 @@ msgid ""
 "It appears you have incomplete settings! Go to <a href=\"?page=gh_settings"
 "\">the settings page</a> and fill out all your business information."
 msgstr ""
-"Parece que você tem configurações incompletas! Vá para  <a href=\"?"
+"Parece que você tem configurações incompletas! Vá para <a href=\"?"
 "page=gh_settings\"> a página de configurações </a> e preencha todas as suas "
 "informações de negócios."
 
 #: admin/welcome/welcome-page.php:271
 msgid "Read More..."
-msgstr "Leia Mais..."
+msgstr "Ler Mais..."
 
 #: admin/welcome/welcome-page.php:348
 #, php-format
@@ -4622,9 +4392,8 @@ msgid "Welcome %s!"
 msgstr "Bem-vindo %s!"
 
 #: admin/welcome/welcome-page.php:364
-#, fuzzy
 msgid "Groundhogg.io"
-msgstr "Marmota.io"
+msgstr "Groundhogg.io"
 
 #: admin/welcome/welcome-page.php:369
 msgid "Documentation"
@@ -4635,23 +4404,20 @@ msgid "Store"
 msgstr "Loja"
 
 #: admin/welcome/welcome-page.php:379
-#, fuzzy
 msgid "Blog"
-msgstr "Executar em que blog?"
+msgstr "Blog"
 
 #: admin/welcome/welcome-page.php:384
-#, fuzzy
 msgid "Support Group"
-msgstr "Grupo de Apoio"
+msgstr "Grupo de Suporte"
 
 #: admin/welcome/welcome-page.php:389
 msgid "My Account"
 msgstr "Minha Conta"
 
 #: admin/welcome/welcome-page.php:394
-#, fuzzy
 msgid "Find a Partner"
-msgstr "Encontre um parceiro"
+msgstr "Encontre um Parceiro"
 
 #: admin/welcome/welcome-page.php:428
 msgid "Support Articles"
@@ -4662,8 +4428,8 @@ msgid ""
 "Don't know where to start? Checkout these articles and learn how to make "
 "Groundhogg work for you."
 msgstr ""
-"Não sabe por onde começar? Checkout estes artigos e aprender a fazer "
-"Groundhogg trabalho para você."
+"Não sabe por onde começar? Leia estes artigos e aprenda a fazer o Groundhogg "
+"trabalhar para você."
 
 #: admin/welcome/welcome-page.php:432 admin/welcome/welcome-page.php:450
 msgid "View All!"
@@ -4671,7 +4437,7 @@ msgstr "Ver todos!"
 
 #: admin/welcome/welcome-page.php:447
 msgid "Awesome Extensions"
-msgstr "Extensões impressionantes"
+msgstr "Extensões Incríveis"
 
 #: admin/welcome/welcome-page.php:448
 msgid ""
@@ -4713,25 +4479,25 @@ msgstr ""
 #: api/v2/class-wpgh-api-v2-contacts.php:59
 msgctxt "api"
 msgid "ID of the contact which you want to delete."
-msgstr "ID do contacto que pretende eliminar."
+msgstr "ID do contato que pretende eliminar."
 
 #: api/v2/class-wpgh-api-v2-contacts.php:71
 msgctxt "api"
 msgid "The ID of the contact to update."
-msgstr "A identificação da marca para excluir."
+msgstr "A identificação da contato a ser atualizado."
 
 #: api/v2/class-wpgh-api-v2-contacts.php:75 api/v3/contacts-api.php:80
 msgctxt "api"
 msgid "Array of updated contact details."
-msgstr "Matriz de nomes de marca."
+msgstr "Matriz de detalhes de contato atualizada."
 
 #: api/v2/class-wpgh-api-v2-contacts.php:79
 msgctxt "api"
 msgid ""
 "Contains array of tag ids/slugs for which you want to apply to the contact."
 msgstr ""
-"Contém matriz de identificações de marca/slugs para o qual você deseja "
-"aplicar ao contato."
+"Contém matriz de tags de identificação/slugs que você deseja aplicar ao "
+"contato."
 
 #: api/v2/class-wpgh-api-v2-contacts.php:83
 msgctxt "api"
@@ -4739,8 +4505,8 @@ msgid ""
 "Contains array of tag ids/slugs for which you want to remove from the "
 "contact."
 msgstr ""
-"Contém matriz de identificações de marca/slugs para o qual você deseja "
-"remover do contato."
+"Contém matriz de tags de identificação/slugs que você deseja remover do "
+"contato."
 
 #: api/v2/class-wpgh-api-v2-contacts.php:95
 #: api/v2/class-wpgh-api-v2-contacts.php:214
@@ -4788,22 +4554,22 @@ msgstr "Desculpe, o e-mail %s já pertence a outro contato."
 #: api/v2/class-wpgh-api-v2-contacts.php:264
 msgctxt "api"
 msgid "Could not apply tags."
-msgstr "Não foi possível criar contato."
+msgstr "Não foi possível aplicar as tags."
 
 #: api/v2/class-wpgh-api-v2-contacts.php:273
 msgctxt "api"
 msgid "Could not remove tags."
-msgstr "Não foi possível criar contato."
+msgstr "Não foi possível remover as tags."
 
 #: api/v2/class-wpgh-api-v2-contacts.php:280 api/v3/contacts-api.php:450
 msgctxt "api"
 msgid "Contact updated successfully."
-msgstr "Contato atualizado com êxito."
+msgstr "Contato atualizado com sucesso."
 
 #: api/v2/class-wpgh-api-v2-contacts.php:283
 msgctxt "api"
 msgid "Could not update contact."
-msgstr "Não foi possível criar contato."
+msgstr "Não foi possível atualizar o contato."
 
 #: api/v2/class-wpgh-api-v2-contacts.php:300 api/v3/contacts-api.php:477
 msgctxt "api"
@@ -4816,7 +4582,6 @@ msgid "Something went wrong."
 msgstr "Algo deu errado."
 
 #: api/v2/class-wpgh-api-v2-emails.php:48 api/v2/class-wpgh-api-v2-sms.php:47
-#, fuzzy
 msgctxt "api"
 msgid "Contact ID, User ID, or Email Address which you want to send to."
 msgstr ""
@@ -4824,26 +4589,25 @@ msgstr ""
 "enviar."
 
 #: api/v2/class-wpgh-api-v2-emails.php:52 api/v2/class-wpgh-api-v2-sms.php:51
-#, fuzzy
 msgctxt "api"
 msgid "Search using the User ID."
-msgstr "Pesquise usando o ID de usuário."
+msgstr "Pesquisar usando o ID de usuário."
 
 #: api/v2/class-wpgh-api-v2-emails.php:56 api/v3/email-api.php:67
 msgctxt "api"
 msgid "Email ID which you want to send."
-msgstr "ID de E-mail que você deseja enviar."
+msgstr "ID de e-mail que você deseja enviar."
 
 #: api/v2/class-wpgh-api-v2-emails.php:90
 msgctxt "api"
 msgid "No emails found."
-msgstr "Nenhum email encontrado."
+msgstr "Nenhum e-mail encontrado."
 
 #: api/v2/class-wpgh-api-v2-emails.php:106
-#, fuzzy, php-format
+#, php-format
 msgctxt "api"
 msgid "Contact was not found given: %s"
-msgstr "O contato não foi encontrado dado: %s"
+msgstr "O contato não foi encontrado para: %s"
 
 #: api/v2/class-wpgh-api-v2-emails.php:110 api/v3/email-api.php:157
 #: api/v3/sms-api.php:155
@@ -4855,7 +4619,7 @@ msgstr "Email com ID %d não encontrado."
 #: api/v2/class-wpgh-api-v2-emails.php:118 api/v3/email-api.php:166
 msgctxt "api"
 msgid "Email sent successfully to contact."
-msgstr "E-mail enviado com sucesso para contato."
+msgstr "E-mail enviado com sucesso para o contato."
 
 #: api/v2/class-wpgh-api-v2-emails.php:121
 msgctxt "api"
@@ -4868,19 +4632,17 @@ msgid "email_id and contact_id are required to perform this operation."
 msgstr "email_id e contact_id são necessários para executar esta operação."
 
 #: api/v2/class-wpgh-api-v2-sms.php:55 api/v3/sms-api.php:67
-#, fuzzy
 msgctxt "api"
 msgid "SMS ID which you want to send."
 msgstr "ID SMS que pretende enviar."
 
 #: api/v2/class-wpgh-api-v2-sms.php:89
-#, fuzzy
 msgctxt "api"
 msgid "No sms found."
 msgstr "Não foram encontradas sms."
 
 #: api/v2/class-wpgh-api-v2-sms.php:105
-#, fuzzy, php-format
+#, php-format
 msgctxt "api"
 msgid "SMS with ID %d not found."
 msgstr "SMS com ID %d não encontrado."
@@ -4892,19 +4654,16 @@ msgid "Contact with ID %d not found."
 msgstr "Contato com ID %d não encontrado."
 
 #: api/v2/class-wpgh-api-v2-sms.php:117 api/v3/sms-api.php:164
-#, fuzzy
 msgctxt "api"
 msgid "SMS sent successfully to contact."
-msgstr "SMS enviado com sucesso para contato."
+msgstr "SMS enviado com sucesso para o contato."
 
 #: api/v2/class-wpgh-api-v2-sms.php:120
-#, fuzzy
 msgctxt "api"
 msgid "SMS not sent."
-msgstr "SMS não enviado."
+msgstr "SMS não enviada."
 
 #: api/v2/class-wpgh-api-v2-sms.php:124
-#, fuzzy
 msgctxt "api"
 msgid "sms_id and contact_id are required to perform this operation."
 msgstr "sms_id e contact_id são necessários para executar esta operação."
@@ -4912,22 +4671,22 @@ msgstr "sms_id e contact_id são necessários para executar esta operação."
 #: api/v2/class-wpgh-api-v2-tags.php:39
 msgctxt "api"
 msgid "The ID of tag to retrieve."
-msgstr "A identificação da marca para recuperar."
+msgstr "A identificação da tag a ser recuperada."
 
 #: api/v2/class-wpgh-api-v2-tags.php:50 api/v3/tags-api.php:56
 msgctxt "api"
 msgid "Array of tag names."
-msgstr "Matriz de nomes de marca."
+msgstr "Matriz de nomes de tag."
 
 #: api/v2/class-wpgh-api-v2-tags.php:61 api/v3/tags-api.php:67
 msgctxt "api"
 msgid "The ID of the tag to delete."
-msgstr "A identificação da marca para excluir."
+msgstr "A identificação da tag a ser excluída."
 
 #: api/v2/class-wpgh-api-v2-tags.php:72 api/v3/tags-api.php:78
 msgctxt "api"
 msgid "Contains array of tags to update."
-msgstr "Contém a matriz de marcas para atualizar."
+msgstr "Contém a matriz de tags a serem atualizadas."
 
 #: api/v2/class-wpgh-api-v2-tags.php:93 api/v2/class-wpgh-api-v2-tags.php:176
 #: api/v2/class-wpgh-api-v2-tags.php:179 api/v2/class-wpgh-api-v2-tags.php:206
@@ -4949,12 +4708,12 @@ msgstr "%d tags adicionadas com êxito."
 #: api/v2/class-wpgh-api-v2-tags.php:143
 msgctxt "api"
 msgid "Please enter tags."
-msgstr "Por favor, digite Tags."
+msgstr "Por favor, insiratags."
 
 #: api/v2/class-wpgh-api-v2-tags.php:170
 msgctxt "api"
 msgid "Tag updated successfully."
-msgstr "Marca atualizada com êxito."
+msgstr "Tag atualizada com êxito."
 
 #: api/v2/class-wpgh-api-v2-tags.php:173 api/v2/class-wpgh-api-v2-tags.php:202
 msgctxt "api"
@@ -4964,15 +4723,14 @@ msgstr "Algo deu errado"
 #: api/v2/class-wpgh-api-v2-tags.php:182
 msgctxt "api"
 msgid "Please provide a valid array of tags."
-msgstr "Forneça um array válido de Tags."
+msgstr "Forneça uma matriz de tags válida."
 
 #: api/v2/class-wpgh-api-v2-tags.php:199
 msgctxt "api"
 msgid "Tag deleted successfully."
-msgstr "Tag excluído com sucesso."
+msgstr "Tag excluída com sucesso."
 
 #: api/v3/base.php:168
-#, fuzzy
 msgctxt "api"
 msgid "Your user level does not have sufficient permissions."
 msgstr "Seu nível de usuário não tem permissões suficientes."
@@ -4983,32 +4741,29 @@ msgid "Unknown error."
 msgstr "Erro desconhecido."
 
 #: api/v3/base.php:228
-#, fuzzy, php-format
+#, php-format
 msgctxt "api"
 msgid "Contact with ID %s does not exist."
-msgstr "O contato com ID %s não existe."
+msgstr "O contato com o ID %s não existe."
 
 #: api/v3/base.php:230
-#, fuzzy, php-format
+#, php-format
 msgctxt "api"
 msgid "Contact with email %s does not exist."
 msgstr "O contato com o e-mail %s não existe."
 
 #: api/v3/base.php:276
-#, fuzzy
 msgctxt "api"
 msgid "Public key is invalid."
 msgstr "A chave pública é inválida."
 
 #: api/v3/broadcasts-api.php:110
-#, fuzzy
 msgctxt "api"
 msgid "You cannot schedule an email while it is in draft mode."
 msgstr ""
 "Você não pode agendar um e-mail enquanto ele estiver no modo de rascunho."
 
 #: api/v3/broadcasts-api.php:125
-#, fuzzy
 msgctxt "api"
 msgid "Please select a tag with at least 1 contact."
 msgstr "Por favor, selecione uma tag com um ou mais contatos associados."
@@ -5016,53 +4771,46 @@ msgstr "Por favor, selecione uma tag com um ou mais contatos associados."
 #: api/v3/broadcasts-api.php:151
 msgctxt "api"
 msgid "Please select a time in the future"
-msgstr "Por favor, envie em um momento no futuro!"
+msgstr "Por favor, envie em um momento no futuro"
 
 #: api/v3/broadcasts-api.php:187
-#, fuzzy
 msgctxt "api"
 msgid "Broadcast scheduled successfully."
 msgstr "Transmissão programada com sucesso."
 
 #: api/v3/contacts-api.php:34
-#, fuzzy
 msgctxt "api"
 msgid ""
 "An array of query args. See WPGH_Contact_Query for acceptable arguments."
 msgstr ""
-"Uma matriz de args de consulta. Consulte WPGH_Contact_Query para obter "
+"Uma matriz de argumentos de consulta. Consulte WPGH_Contact_Query para obter "
 "argumentos aceitáveis."
 
 #: api/v3/contacts-api.php:38 api/v3/email-api.php:34 api/v3/sms-api.php:34
 #: api/v3/tags-api.php:33
-#, fuzzy
 msgctxt "api"
 msgid "Whether to retrieve as available for a select input."
-msgstr "Se recuperar como disponível para uma entrada selecionada."
+msgstr ""
 
 #: api/v3/contacts-api.php:42 api/v3/email-api.php:38 api/v3/sms-api.php:38
 #: api/v3/tags-api.php:37
-#, fuzzy
 msgctxt "api"
 msgid "Whether to retrieve as available for an ajax select2 input."
-msgstr "Se recuperar como disponível para uma entrada ajax select2."
+msgstr ""
 
 #: api/v3/contacts-api.php:46 api/v3/email-api.php:42 api/v3/sms-api.php:42
 #: api/v3/tags-api.php:41
-#, fuzzy
 msgctxt "api"
 msgid "Search string for tag name."
-msgstr "Cadeia de pesquisa para o nome da etiqueta."
+msgstr "Cadeia de pesquisa para o nome da tag."
 
 #: api/v3/contacts-api.php:50 api/v3/email-api.php:46 api/v3/sms-api.php:46
 #: api/v3/tags-api.php:45
-#, fuzzy
 msgctxt "api"
 msgid "Shorthand for search."
 msgstr "Shorthand para pesquisa."
 
 #: api/v3/contacts-api.php:72
-#, fuzzy
 msgctxt "api"
 msgid "The ID or email of the contact you want to update."
 msgstr "O ID ou e-mail do contato que você deseja atualizar."
@@ -5073,13 +4821,11 @@ msgstr "O ID ou e-mail do contato que você deseja atualizar."
 #: api/v3/contacts-api.php:191 api/v3/contacts-api.php:213
 #: api/v3/contacts-api.php:228 api/v3/email-api.php:63 api/v3/sms-api.php:63
 #: api/v3/tags-api.php:102 api/v3/tags-api.php:124
-#, fuzzy
 msgctxt "api"
 msgid "Search using the user ID."
 msgstr "Pesquisar usando o ID do usuário."
 
 #: api/v3/contacts-api.php:91
-#, fuzzy
 msgctxt "api"
 msgid "The ID or email of the contact you want to delete."
 msgstr "O ID ou e-mail do contato que você deseja excluir."
@@ -5087,7 +4833,6 @@ msgstr "O ID ou e-mail do contato que você deseja excluir."
 #: api/v3/contacts-api.php:109 api/v3/contacts-api.php:124
 #: api/v3/contacts-api.php:165 api/v3/contacts-api.php:209
 #: api/v3/contacts-api.php:224 api/v3/tags-api.php:98
-#, fuzzy
 msgctxt "api"
 msgid "The ID or email of the contact you want to apply tags to."
 msgstr "O ID ou e-mail do contato ao qual você deseja aplicar as tags."
@@ -5095,20 +4840,17 @@ msgstr "O ID ou e-mail do contato ao qual você deseja aplicar as tags."
 #: api/v3/contacts-api.php:132 api/v3/contacts-api.php:151
 #: api/v3/contacts-api.php:173 api/v3/contacts-api.php:195
 #: api/v3/tags-api.php:106 api/v3/tags-api.php:128
-#, fuzzy
 msgctxt "api"
 msgid "Array of tag names or tag ids."
 msgstr "Conjunto de nomes de tags ou IDs de tags."
 
 #: api/v3/contacts-api.php:143 api/v3/contacts-api.php:187
 #: api/v3/tags-api.php:120
-#, fuzzy
 msgctxt "api"
 msgid "The ID or email of the contact you want to remove tags from."
 msgstr "O ID ou e-mail do contato do qual você deseja remover as tags."
 
 #: api/v3/contacts-api.php:232
-#, fuzzy
 msgctxt "api"
 msgid "the note text you wish to add."
 msgstr "o texto da nota que deseja adicionar."
@@ -5119,37 +4861,31 @@ msgid "Contact added successfully."
 msgstr "Contato adicionado com sucesso."
 
 #: api/v3/contacts-api.php:422
-#, fuzzy
 msgctxt "api"
 msgid "This email address already belongs to another contact."
 msgstr "Este endereço de e-mail já pertence a outro contato."
 
 #: api/v3/email-api.php:30 api/v3/sms-api.php:30
-#, fuzzy
 msgctxt "api"
 msgid "Any search parameters."
 msgstr "Quaisquer parâmetros de busca."
 
 #: api/v3/email-api.php:59
-#, fuzzy
 msgctxt "api"
 msgid "The ID or email of the contact you want to send email to."
 msgstr "O ID ou e-mail do contato para o qual você deseja enviar o e-mail."
 
 #: api/v3/sms-api.php:59
-#, fuzzy
 msgctxt "api"
 msgid "The ID or email of the contact you want to send sms to."
 msgstr "O ID ou e-mail do contato para o qual você deseja enviar SMS."
 
 #: api/v3/tags-api.php:81
-#, fuzzy
 msgctxt "api"
 msgid "The new name of the tag."
 msgstr "O novo nome da tag."
 
 #: api/v3/tags-api.php:84
-#, fuzzy
 msgctxt "api"
 msgid "the new description of the tag."
 msgstr "a nova descrição da tag."
@@ -5158,11 +4894,12 @@ msgstr "a nova descrição da tag."
 #: blocks/elementor/form-widget.php:15
 #: blocks/wpbakery/class-wpgh-wpbakery-widget.php:43
 msgid "Groundhogg Forms"
-msgstr "Formas Groundhogg"
+msgstr "Formulários Groundhogg"
 
 #: blocks/beaver-builder/form-widget.php:13
 msgid "Use Groundhogg forms to collect leads and launch automation!"
-msgstr "Use formas Groundhogg para coletar leads e automação de lançamento!"
+msgstr ""
+"Use formulários Groundhogg para coletar leads e dar início à automação!"
 
 #: blocks/beaver-builder/form-widget.php:15
 msgid "Forms"
@@ -5177,14 +4914,12 @@ msgid "Select a Form"
 msgstr "Selecione um Formulário"
 
 #: blocks/gutenberg/form/index.js:16
-#, fuzzy
 msgid "form"
-msgstr "Formulário"
+msgstr "formulário"
 
 #: blocks/gutenberg/form/index.js:16
-#, fuzzy
 msgid "optin"
-msgstr "optar"
+msgstr "opt-in"
 
 #. Plugin Name of the plugin/theme
 #: blocks/gutenberg/gutenberg.php:45
@@ -5211,11 +4946,11 @@ msgstr "Mostrar Título"
 
 #: blocks/gutenberg/gutenberg.php:51
 msgid "Show Description"
-msgstr "Mostre a descrição"
+msgstr "Mostrar Descrição"
 
 #: blocks/wpbakery/class-wpgh-wpbakery-widget.php:45
 msgid "place Groundhogg Forms"
-msgstr "Formas Groundhogg"
+msgstr "inserir Formulários Groundhogg"
 
 #: blocks/wpbakery/class-wpgh-wpbakery-widget.php:51
 msgid "Select Form"
@@ -5223,83 +4958,76 @@ msgstr "Selecionar Formulário"
 
 #: blocks/wpbakery/class-wpgh-wpbakery-widget.php:54
 msgid "Please select grondhogg form."
-msgstr "Por favor, selecione um"
+msgstr "Por favor, selecione um formulário groundhogg."
 
 #: db/steps.php:104
 msgid "New Step"
-msgstr "Novo Etapa"
+msgstr "Nova Etapa"
 
 #: dropins/test-extension.php:80
-#, fuzzy
 msgid "Test Title"
 msgstr "Título do teste"
 
 #: dropins/test-extension.php:88
-#, fuzzy
 msgid "This is a description."
 msgstr "Isto é uma descrição."
 
 #. translators: %s: PHP version
 #: groundhogg.php:82
-#, fuzzy, php-format
+#, php-format
 msgid "Groundhogg requires PHP version %s+, plugin is currently NOT RUNNING."
 msgstr ""
-"O Groundhogg requer a versão %s+ do PHP, o plugin atualmente NÃO está "
-"RUNNING."
+"O Groundhogg requer a versão %s+ do PHP, o plug-in atualmente NÃO está "
+"FUNCIONANDO."
 
 #. translators: %s: WordPress version
 #: groundhogg.php:98
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Groundhogg requires WordPress version %s+. Because you are using an earlier "
 "version, the plugin is currently NOT RUNNING."
 msgstr ""
 "O Groundhogg requer a versão do WordPress %s+. Como você está usando uma "
-"versão anterior, o plugin não está funcionando no momento."
+"versão anterior, o plug-in NÃO está FUNCIONANDO no momento."
 
 #: includes/bounce-checker.php:70
-#, fuzzy
 msgctxt "action"
 msgid "Test IMAP Connection"
-msgstr "Teste de conexão IMAP"
+msgstr "Teste de Conexão IMAP"
 
 #: includes/bounce-checker.php:153
-#, fuzzy
 msgctxt "notice"
 msgid "Successful IMAP connection established."
-msgstr "Conexão IMAP bem sucedida estabelecida."
+msgstr "Conexão IMAP estabelecida com sucesso."
 
 #: includes/bulk-jobs/broadcast-scheduler.php:229
 msgctxt "notice"
 msgid "Broadcast scheduled!"
-msgstr "Broadcast programado!"
+msgstr "Transmissão programada!"
 
 #: includes/bulk-jobs/bulk-job.php:197
-#, fuzzy
 msgctxt "notice"
 msgid "Job finished!"
 msgstr "Trabalho terminado!"
 
 #: includes/bulk-jobs/export-contacts.php:197
-#, fuzzy, php-format
+#, php-format
 msgctxt "notice"
 msgid "Export file created. %s"
-msgstr "File de exportação criado. %s"
+msgstr "Arquivo de exportação criado. %s"
 
 #: includes/bulk-jobs/migrate-form-impressions.php:23
-#, fuzzy
 msgid ""
 "Thank you for updating to 2.0! Please click here to update your database."
 msgstr ""
-"Obrigado por atualizar para 2.0! Clique aqui para actualizar a sua base de "
+"Obrigado por atualizar para 2.0! Clique aqui para atualizar seu banco de "
 "dados."
 
 #: includes/classes/broadcast.php:86
 msgid "Broadcast Email"
-msgstr "E-mail Broadcast"
+msgstr "Transmitir e-mail"
 
 #: includes/classes/broadcast.php:180
-#, fuzzy
 msgid "(The associated Email or SMS was deleted.)"
 msgstr "(O e-mail ou SMS associado foi eliminado.)"
 
@@ -5308,7 +5036,7 @@ msgid "Unable to upload file."
 msgstr "Não é possível fazer upload de arquivos."
 
 #: includes/classes/email.php:369
-#, fuzzy, php-format
+#, php-format
 msgid "[TEST] %s"
 msgstr "[TESTE] %s"
 
@@ -5317,12 +5045,11 @@ msgid "Terms"
 msgstr "Termos"
 
 #: includes/classes/email.php:695
-#, fuzzy, php-format
+#, php-format
 msgid "Emails cannot be sent in %s mode."
 msgstr "Os e-mails não podem ser enviados no modo %s."
 
 #: includes/classes/email.php:701 includes/classes/sms.php:96
-#, fuzzy
 msgid "No valid recipient was provided."
 msgstr "Nenhum destinatário válido foi fornecido."
 
@@ -5331,7 +5058,7 @@ msgid "Contact is not marketable."
 msgstr "O contato não é comercializável."
 
 #: includes/classes/email.php:811
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Email failed to send.\n"
 "\n"
@@ -5358,29 +5085,26 @@ msgstr ""
 "            Mensagem de erro"
 
 #: includes/classes/sms.php:131
-#, fuzzy
 msgid "This contact is currently unmarketable."
-msgstr "Este contacto é actualmente não comercializável."
+msgstr "Este contato não é atualmente comercializável."
 
 #: includes/classes/sms.php:138
-#, fuzzy, php-format
+#, php-format
 msgid "Contact %s has no phone number."
 msgstr "Contato %s não tem número de telefone."
 
 #: includes/classes/sms.php:144
-#, fuzzy
 msgid "A country code is required to send SMS."
 msgstr "É necessário um código de país para enviar SMS."
 
 #: includes/extension.php:131
-#, fuzzy, php-format
+#, php-format
 msgid "%s is missing required plugins to be active: %s"
-msgstr "Faltam plugins necessários para estar ativo: %s"
+msgstr "Faltam plug-ins necessários para %s estar ativo: %s"
 
 #: includes/extension.php:430
-#, fuzzy
 msgid "License"
-msgstr "A sua licença não está ativa para este URL."
+msgstr "Licença"
 
 #: includes/extension.php:437
 #, php-format
@@ -5396,16 +5120,15 @@ msgid "Activate"
 msgstr "Ativar"
 
 #: includes/filters.php:128
-#, fuzzy, php-format
+#, php-format
 msgid ""
 " | Like Groundhogg? <a target=\"_blank\" href=\"%s\">Leave a Review</a>!</"
 "span>"
 msgstr ""
-" | Como a Marmota? <a target=\"_blank\" href=\"%s\">Deixe um comentário</a>!"
-"</span>"
+" | Gostando do Groundhogg? <a target=\"_blank\" href=\"%s\">Deixe um "
+"comentário</a>!</span>"
 
 #: includes/filters.php:128
-#, fuzzy
 msgid "https://wordpress.org/support/plugin/groundhogg/reviews/#new-post"
 msgstr "https://wordpress.org/support/plugin/groundhogg/reviews/#new-post"
 
@@ -5415,7 +5138,6 @@ msgid "Address *"
 msgstr "Endereço*"
 
 #: includes/form/fields/address.php:86
-#, fuzzy
 msgid "Province/State"
 msgstr "Província/Estado"
 
@@ -5426,12 +5148,12 @@ msgstr "CEP"
 #: includes/form/fields/date.php:24
 msgctxt "form_default"
 msgid "Date *"
-msgstr "Data"
+msgstr "Data *"
 
 #: includes/form/fields/dropdown.php:17
 msgctxt "form_default"
 msgid "Select *"
-msgstr "Selecione"
+msgstr "Selecionar *"
 
 #: includes/form/fields/dropdown.php:24
 msgctxt "form_default"
@@ -5439,9 +5161,8 @@ msgid "Please select one"
 msgstr "Por favor, selecione um"
 
 #: includes/form/fields/dropdown.php:146
-#, fuzzy
 msgid "Please select a valid dropdown option."
-msgstr "Selecione uma opção suspensa válida."
+msgstr "Selecione uma opção válida."
 
 #: includes/form/fields/email.php:18
 msgctxt "form_default"
@@ -5455,7 +5176,7 @@ msgstr "Por favor, forneça um e-mail válido."
 #: includes/form/fields/file.php:26
 msgctxt "form_default"
 msgid "File *"
-msgstr "Arquivo"
+msgstr "Arquivo *"
 
 #: includes/form/fields/first.php:18
 msgctxt "form_default"
@@ -5468,7 +5189,6 @@ msgid "Do not include numbers or special characters."
 msgstr "Não inclua números ou caracteres especiais."
 
 #: includes/form/fields/first.php:40
-#, fuzzy
 msgid "Please provide a valid first name."
 msgstr "Por favor, forneça um nome válido."
 
@@ -5478,7 +5198,7 @@ msgid ""
 "I consent to having my personal information collected, and to receive "
 "marketing and transactional information related to my request."
 msgstr ""
-"Eu consinto em ter minhas informações pessoais coletadas, e para receber "
+"Eu consinto em ter minhas informações pessoais coletadas e em receber "
 "informações de marketing e transacional relacionadas ao meu pedido."
 
 #: includes/form/fields/gdpr.php:22
@@ -5492,17 +5212,15 @@ msgid "Last Name *"
 msgstr "Sobrenome *"
 
 #: includes/form/fields/last.php:50
-#, fuzzy
 msgid "Please provide a valid last name."
 msgstr "Por favor, forneça um sobrenome válido."
 
 #: includes/form/fields/number.php:24
 msgctxt "form_default"
 msgid "Number *"
-msgstr "Número"
+msgstr "Número *"
 
 #: includes/form/fields/number.php:75 includes/form/fields/phone.php:49
-#, fuzzy
 msgid "Please provide a valid number."
 msgstr "Por favor, forneça um número válido."
 
@@ -5514,18 +5232,16 @@ msgstr "Telefone *"
 #: includes/form/fields/radio.php:16
 msgctxt "form_default"
 msgid "Radio *"
-msgstr "Rádio"
+msgstr "Rádio *"
 
 #: includes/form/fields/radio.php:92
-#, fuzzy
 msgid "Please select a valid option."
 msgstr "Por favor, selecione uma opção válida."
 
 #: includes/form/fields/recaptcha.php:90
-#, fuzzy
 msgctxt "submission_error"
 msgid "Failed reCaptcha verification. You are probably a robot."
-msgstr "Falha na verificação reCaptcha. Provavelmente és um robô."
+msgstr "Falha na verificação reCaptcha. Provavelmente você é um robô."
 
 #: includes/form/fields/submit.php:15
 #: includes/steps/benchmarks/form-filled.php:363 templates/preferences.php:149
@@ -5545,20 +5261,18 @@ msgstr "Por favor, concorde com os termos de serviço."
 #: includes/form/fields/time.php:24
 msgctxt "form_default"
 msgid "Time *"
-msgstr "Tempo"
+msgstr "Tempo *"
 
 #: includes/form/form.php:202 includes/form/form.php:276
-#, fuzzy
 msgid "<b>Configuration Error:</b> This form has been deleted."
-msgstr "<b>Erro de configuração:</b> Este formulário foi eliminado."
+msgstr "<b>Erro de configuração:</b> Este formulário foi excluído."
 
 #: includes/form/form.php:212 includes/form/form.php:286
-#, fuzzy
 msgid ""
 "<b>Configuration Error:</b> This form has either been deleted or has not "
 "content yet."
 msgstr ""
-"<b>Erro de configuração:</b> Este formulário foi eliminado ou ainda não tem "
+"<b>Erro de configuração:</b> Este formulário foi excluído ou ainda não tem "
 "conteúdo."
 
 #: includes/form/form.php:294
@@ -5567,25 +5281,22 @@ msgstr "(Editar formulário)"
 
 #: includes/form/submission-handler.php:143
 #: includes/form/submission-handler.php:153
-#, fuzzy, php-format
+#, php-format
 msgid "<b>Missing a required field:</b> %s"
 msgstr "<b>Faltando um campo obrigatório:</b> %s"
 
 #: includes/form/submission-handler.php:257
-#, fuzzy
 msgid "First & last name should not be the same."
-msgstr "O primeiro e último nome não deve ser o mesmo."
+msgstr "O primeiro e último nome não podem ser o mesmo."
 
 #: includes/form/submission-handler.php:334
-#, fuzzy
 msgid "Your submission has been received!"
-msgstr "Sua submissão foi recebida!"
+msgstr "Seu envio foi recebido!"
 
 #: includes/form/submission-handler.php:341
-#, fuzzy
 msgctxt "notice"
 msgid "Form submitted"
-msgstr "Formulário apresentado"
+msgstr "Formulário enviado"
 
 #: includes/functions.php:1086
 msgid "Could not create contact."
@@ -5596,14 +5307,12 @@ msgid "Full Name"
 msgstr "Nome Completo"
 
 #: includes/functions.php:1446
-#, fuzzy
 msgid "Email Address"
-msgstr "Por favor insira um endereço de e-mail válido."
+msgstr "Endereço de E-mail"
 
 #: includes/functions.php:1447
-#, fuzzy
 msgid "Optin Status"
-msgstr "Status Optin"
+msgstr "Opt-in de Status"
 
 #: includes/functions.php:1448
 msgid "User Id"
@@ -5611,24 +5320,21 @@ msgstr "ID do Usuário"
 
 #: includes/functions.php:1449
 msgid "Owner Id"
-msgstr "Id do Hospedeiro"
+msgstr "Id do Proprietário"
 
 #: includes/functions.php:1450
 msgid "Date Created"
 msgstr "Data Criada"
 
 #: includes/functions.php:1452
-#, fuzzy
 msgid "Phone Number Extension"
 msgstr "Extensão do Número de Telefone"
 
 #: includes/functions.php:1456
-#, fuzzy
 msgid "Postal/Zip"
 msgstr "CEP"
 
 #: includes/functions.php:1457
-#, fuzzy
 msgid "Province/State/Region"
 msgstr "Província/Estado/Região"
 
@@ -5645,22 +5351,18 @@ msgid "IP Address"
 msgstr "Endereço IP"
 
 #: includes/functions.php:1466
-#, fuzzy
 msgid "Terms Agreement"
 msgstr "Acordo de Termos"
 
 #: includes/functions.php:1468
-#, fuzzy
 msgid "Add To Notes"
-msgstr "Adicionar às notas"
+msgstr "Adicionar às Notas"
 
 #: includes/functions.php:1469
-#, fuzzy
 msgid "Apply Value as Tag"
 msgstr "Aplicar valor como Tag"
 
 #: includes/functions.php:1470
-#, fuzzy
 msgid "Add as Custom Meta"
 msgstr "Adicionar como Meta Personalizado"
 
@@ -5691,7 +5393,7 @@ msgid "on %s"
 msgstr "em %s"
 
 #: includes/functions.php:1698
-#, fuzzy, php-format
+#, php-format
 msgctxt "status"
 msgid "in %s"
 msgstr "em %s"
@@ -5715,7 +5417,7 @@ msgstr ""
 
 #: includes/lib/edd/GH_EDD_SL_Plugin_Updater.php:466
 msgid "You do not have permission to install plugin updates"
-msgstr "Você não tem permissão para instalar atualizações de plugins"
+msgstr "Você não tem permissão para instalar atualizações de plug-ins"
 
 #: includes/lib/edd/GH_EDD_SL_Plugin_Updater.php:466
 #: includes/steps/error.php:13
@@ -5725,7 +5427,7 @@ msgstr "Erro"
 #: includes/license-manager.php:118
 msgctxt "notice"
 msgid "Invalid license format"
-msgstr "Licença inválida."
+msgstr "Licença inválida"
 
 #: includes/license-manager.php:147
 msgid "An error occurred, please try again."
@@ -5778,10 +5480,9 @@ msgid "Something went wrong."
 msgstr "Algo deu errado."
 
 #: includes/license-manager.php:228
-#, fuzzy
 msgctxt "notice"
 msgid "License deactivated."
-msgstr "Licença desactivada."
+msgstr "Licença desativada."
 
 #: includes/main-roles.php:38
 msgctxt "role"
@@ -5815,7 +5516,7 @@ msgstr "Sem contato"
 #: includes/preferences.php:91
 msgctxt "optin_status"
 msgid "This contact has not agreed to receive email marketing from you."
-msgstr "Este contato não concordou em receber e-mail marketing de você."
+msgstr "Este contato não concordou em receber marketing por e-mail de você."
 
 #: includes/preferences.php:100
 msgctxt "optin_status"
@@ -5823,28 +5524,28 @@ msgid ""
 "Unconfirmed. This contact will not receive emails, they are passed the email "
 "confirmation grace period."
 msgstr ""
-"Confirmado. Este contato não receberá e-mails, eles são passados a "
-"confirmação de e-mail período de carência."
+"Não confirmado. Este contato não receberá e-mails, eles passaram do período "
+"de carência da confirmação de e-mail."
 
 #: includes/preferences.php:103
 msgctxt "optin_status"
 msgid "Unconfirmed. They will receive marketing."
-msgstr "Confirmado. Eles receberão marketing."
+msgstr "Não confirmado. Eles receberão marketing."
 
 #: includes/preferences.php:106
 msgctxt "optin_status"
 msgid "Confirmed. They will receive marketing."
-msgstr "Confirmou. Eles receberão marketing."
+msgstr "Confirmado. Eles receberão marketing."
 
 #: includes/preferences.php:109
 msgctxt "optin_status"
 msgid "Unsubscribed. They will not receive marketing."
-msgstr "Retirado. Eles não receberão marketing."
+msgstr "Descadastrado. Eles não receberão marketing."
 
 #: includes/preferences.php:112
 msgctxt "optin_status"
 msgid "This contact will only receive marketing weekly."
-msgstr "Este contato só vai receber marketing semanal."
+msgstr "Este contato só receberá marketing semanal."
 
 #: includes/preferences.php:115
 msgctxt "optin_status"
@@ -5854,7 +5555,7 @@ msgstr "Este contato só receberá marketing mensal."
 #: includes/preferences.php:118
 msgctxt "optin_status"
 msgid "This email address bounced, they will not receive marketing."
-msgstr "Este endereço de e-mail devolvido, eles não receberão marketing."
+msgstr "Este endereço de e-mail foi rejeitado, eles não receberão marketing."
 
 #: includes/preferences.php:121
 msgctxt "optin_status"
@@ -5870,7 +5571,7 @@ msgstr "Este contato reclamou sobre seus emails. Eles não receberão marketing.
 #: includes/preferences.php:139
 msgctxt "optin_status"
 msgid "Unconfirmed"
-msgstr "Despublicar"
+msgstr "Não confirmado"
 
 #: includes/preferences.php:142
 msgctxt "optin_status"
@@ -5883,16 +5584,14 @@ msgid "Unsubscribed"
 msgstr "Descadastrado"
 
 #: includes/preferences.php:148
-#, fuzzy
 msgctxt "optin_status"
 msgid "Subscribed Weekly"
-msgstr "Assinado Semanalmente"
+msgstr "Assinatura Semanal"
 
 #: includes/preferences.php:151
-#, fuzzy
 msgctxt "optin_status"
 msgid "Subscribed Monthly"
-msgstr "Subscrição Mensal"
+msgstr "Assinatura Mensal"
 
 #: includes/preferences.php:154
 msgctxt "optin_status"
@@ -5905,14 +5604,13 @@ msgid "Spam"
 msgstr "Spam"
 
 #: includes/preferences.php:160
-#, fuzzy
 msgctxt "optin_status"
 msgid "Complained"
-msgstr "Reclamado"
+msgstr "Reclamação"
 
 #: includes/queue/email-notification.php:80
 msgid "Email Notification"
-msgstr "Notificação de Email"
+msgstr "Notificação por E-mail"
 
 #: includes/queue/event-queue.php:102
 msgctxt "cron_schedule"
@@ -5924,10 +5622,9 @@ msgid "SMS Notification"
 msgstr "Notificação por SMS"
 
 #: includes/replacements.php:62
-#, fuzzy
 msgctxt "replacement"
 msgid "The contact's ID number."
-msgstr "O número de identificação do contacto."
+msgstr "O número de identificação do contato."
 
 #: includes/replacements.php:67 includes/replacements.php:72
 msgctxt "replacement"
@@ -5941,10 +5638,9 @@ msgid "The contact's last name."
 msgstr "O sobrenome do contato."
 
 #: includes/replacements.php:87
-#, fuzzy
 msgctxt "replacement"
 msgid "The contact's full name."
-msgstr "O nome completo do contacto."
+msgstr "O nome completo do contato."
 
 #: includes/replacements.php:97
 msgctxt "replacement"
@@ -5974,7 +5670,7 @@ msgstr "O nome da empresa do contato."
 #: includes/replacements.php:122
 msgctxt "replacement"
 msgid "The contact's job title."
-msgstr "O título do trabalho do contato."
+msgstr "O título de trabalho do contato."
 
 #: includes/replacements.php:127
 msgctxt "replacement"
@@ -5984,7 +5680,7 @@ msgstr "O endereço da empresa do contato."
 #: includes/replacements.php:132
 msgctxt "replacement"
 msgid "Any meta data related to the contact. Usage: {meta.attribute}"
-msgstr "Qualquer meta dados relacionados ao contato. Uso: {meta.attribute}"
+msgstr "Quaisquer meta dados relacionados ao contato. Uso: {meta.attribute}"
 
 #: includes/replacements.php:137
 msgctxt "replacement"
@@ -5999,13 +5695,12 @@ msgstr "O número de telefone comercial, conforme definido nas configurações."
 #: includes/replacements.php:147
 msgctxt "replacement"
 msgid "The business address as defined in the settings."
-msgstr "O endereço comercial conforme definido nas configurações."
+msgstr "O endereço comercial, conforme definido nas configurações."
 
 #: includes/replacements.php:152
-#, fuzzy
 msgctxt "replacement"
 msgid "The site url."
-msgstr "A URL do site."
+msgstr "O URL do site."
 
 #: includes/replacements.php:157 includes/replacements.php:162
 msgctxt "replacement"
@@ -6033,7 +5728,7 @@ msgid ""
 "A link to confirm the email address of a contact which can be placed in a "
 "button or link."
 msgstr ""
-"Um link para confirmar o endereço de e-mail de um contato que pode ser "
+"Um link para confirmar o endereço de e-mail de um contato, que pode ser "
 "colocado em um botão ou link."
 
 #: includes/replacements.php:187
@@ -6058,11 +5753,10 @@ msgid ""
 "the relevant replacement code."
 msgstr ""
 "Insira um link de download para um arquivo. Uso {files.key}. Exemplo: {files."
-"custom_files}. Encontrar a chave para um arquivo ver o registro de contato e "
-"copie o código de substituição relevante."
+"custom_files}. Encontrar a chave para um arquivo, ver o registro de contato "
+"e copiar o código de substituição relevante."
 
 #: includes/replacements.php:202
-#, fuzzy
 msgctxt "replacement"
 msgid ""
 "Inserts a random quote from the movie Groundhog Day featuring Bill Murray"
@@ -6113,7 +5807,7 @@ msgstr "Últimos 30 dias"
 #: includes/reporting/reporting.php:138
 msgctxt "reporting_range"
 msgid "This Month"
-msgstr "Este mês"
+msgstr "Este Mês"
 
 #: includes/reporting/reporting.php:139
 msgctxt "reporting_range"
@@ -6133,12 +5827,12 @@ msgstr "Último Trimestre"
 #: includes/reporting/reporting.php:142
 msgctxt "reporting_range"
 msgid "This Year"
-msgstr "Este ano"
+msgstr "Este Ano"
 
 #: includes/reporting/reporting.php:143
 msgctxt "reporting_range"
 msgid "Last Year"
-msgstr "Último ano"
+msgstr "Último Ano"
 
 #: includes/reporting/reporting.php:144
 msgctxt "reporting_range"
@@ -6151,93 +5845,81 @@ msgid "Custom Range"
 msgstr "Personalizado"
 
 #: includes/reporting/reports/complete-funnel-activity.php:41
-#, fuzzy
 msgid "Complete Funnel Activity"
 msgstr "Atividade de Funil Completa"
 
 #: includes/reporting/reports/contacts-by-country.php:27
-#, fuzzy
 msgid "Contacts By Country"
-msgstr "Contactos por País"
+msgstr "Contatos por País"
 
 #: includes/reporting/reports/contacts-by-lead-source.php:27
-#, fuzzy
 msgid "Contacts By Lead Source"
-msgstr "Contactos por Fonte Principal"
+msgstr "Contatos por Lead"
 
 #: includes/reporting/reports/contacts-by-optin-status.php:27
-#, fuzzy
 msgid "Contacts By Optin Status"
-msgstr "Contatos por status Optin"
+msgstr "Contatos por Status de Opt-in"
 
 #: includes/reporting/reports/contacts-by-region.php:44
-#, fuzzy
 msgid "Contacts By Region"
-msgstr "Contactos por Região"
+msgstr "Contatos por Região"
 
 #: includes/reporting/reports/contacts-by-search-engine.php:32
-#, fuzzy
 msgid "Contacts By Search Engine"
-msgstr "Contactos por Motor de Busca"
+msgstr "Contatos por Motor de Busca"
 
 #: includes/reporting/reports/contacts-by-social-media.php:32
-#, fuzzy
 msgid "Contacts By Social Media"
 msgstr "Contatos por Mídia Social"
 
 #: includes/reporting/reports/contacts-by-source-page.php:27
-#, fuzzy
 msgid "Contacts By Source Page"
-msgstr "Contatos por página de origem"
+msgstr "Contatos por Página de Origem"
 
 #: includes/reporting/reports/contacts-by-utm-campaign.php:27
-#, fuzzy
 msgid "Contacts By UTM Campaign"
 msgstr "Contatos por Campanha UTM"
 
 #: includes/reporting/reports/emails-clicked.php:40
 #: includes/steps/actions/send-email.php:288
 msgid "Emails Clicked"
-msgstr "Emails clicados"
+msgstr "E-mails Clicados"
 
 #: includes/reporting/reports/emails-opened.php:40
 #: includes/steps/actions/send-email.php:284
 msgid "Emails Opened"
-msgstr "E-mails abertos"
+msgstr "E-mails Abertos"
 
 #: includes/reporting/reports/emails-sent.php:39
 msgid "Emails Sent"
-msgstr "Emails enviados"
+msgstr "Emails Enviados"
 
 #: includes/reporting/reports/form-impressions.php:40
 msgid "Form Impressions"
-msgstr "Impressões de formulário"
+msgstr "Impressões de Formulário"
 
 #: includes/reporting/reports/form-submissions.php:39
 msgid "Form Submissions"
-msgstr "Registros"
+msgstr "Registros de Formulários"
 
 #: includes/reporting/reports/last-broadcast.php:38
-#, fuzzy
 msgid "Last Broadcast"
 msgstr "Última transmissão"
 
 #: includes/reporting/reports/waiting-funnel-activity.php:41
-#, fuzzy
 msgid "Waiting Funnel Activity"
 msgstr "Atividade de Funil de Espera"
 
 #: includes/reviews.php:28
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Is Groundhogg working for you? Show your appreciation by leaving a 5 %s "
 "review on %s! %s | %s | %s"
 msgstr ""
-"A Marmota está a trabalhar para ti? Mostre o seu apreço deixando um "
-"comentário de 5 % em %s! %s | %s | %s"
+"Groundhogg está funcionando para você? Mostre o seu apreço deixando um "
+"comentário de 5 %s em %s! %s | %s | %s"
 
 #: includes/reviews.php:31
-#, fuzzy
 msgid "I don't want to"
 msgstr "Eu não quero"
 
@@ -6246,9 +5928,8 @@ msgid "I already did"
 msgstr "Eu já fiz isso"
 
 #: includes/reviews.php:33
-#, fuzzy
 msgid "I'll leave a review!"
-msgstr "Vou deixar uma crítica!"
+msgstr "Vou deixar uma avaliação!"
 
 #: includes/sending-service.php:218
 msgctxt "action"
@@ -6256,18 +5937,16 @@ msgid "Send Test Email"
 msgstr "Enviar E-mail de Teste"
 
 #: includes/sending-service.php:240
-#, fuzzy, php-format
+#, php-format
 msgid "Test message sent successfully to %s!"
 msgstr "Mensagem de teste enviada com sucesso para %s!"
 
 #: includes/sending-service.php:428
-#, fuzzy
 msgctxt "settings_page"
 msgid "DNS Records"
 msgstr "Registros DNS"
 
 #: includes/sending-service.php:442
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "Your account has been enabled to send emails & text messages! To finish this "
@@ -6278,13 +5957,11 @@ msgstr ""
 "DNS."
 
 #: includes/sending-service.php:443
-#, fuzzy
 msgctxt "guided_setup"
 msgid "Learn about adding DNS records."
 msgstr "Saiba mais sobre como adicionar registros DNS."
 
 #: includes/sending-service.php:444
-#, fuzzy
 msgctxt "guided_setup"
 msgid ""
 "After you have added the DNS records your domain will be automatically "
@@ -6314,29 +5991,27 @@ msgid "Friend"
 msgstr "Amigo"
 
 #: includes/stats-collection.php:47
-#, fuzzy
 msgctxt "notice"
 msgid "You have insufficient permissions to do this."
-msgstr "Não tem permissões suficientes para fazer isto."
+msgstr "Você não tem permissões suficientes para fazer isto."
 
 #: includes/stats-collection.php:55
-#, fuzzy
 msgctxt "notice"
 msgid "This site was already registered and has been opted back in."
 msgstr "Este site já foi cadastrado e optou por voltar."
 
 #: includes/stats-collection.php:66
-#, fuzzy, php-format
+#, php-format
 msgctxt "notice"
 msgid ""
 "You are now signed up! Your discount code is: %s (This code was also sent to "
 "%s)"
 msgstr ""
-"Já estás inscrito! Seu código de desconto é: %s (Este código também foi "
+"Você já está inscrito! Seu código de desconto é: %s (Este código também foi "
 "enviado para %s)"
 
 #: includes/stats-collection.php:68
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Hi %s,\n"
 "\n"
@@ -6348,27 +6023,25 @@ msgid ""
 "\n"
 "@ the Groundhogg Team"
 msgstr ""
-"Oi %s,\n"
+"Oi, %s,\n"
 "\n"
 "Obrigado por ter optado pelo nosso sistema de rastreamento de uso anônimo. "
-"Por causa de você poderemos criar melhores produtos WordPress para você em "
-"um futuro próximo e distante.\n"
-"Seu código de desconto de recompensa para 30% de desconto em qualquer "
+"Por sua causa poderemos criar melhores produtos WordPress para você em um "
+"futuro próximo e distante.\n"
+"Seu código de desconto de recompensa para 30%% de desconto em qualquer "
 "extensão premium é: %s\n"
 "Agradecemos a sua ajuda, boa sorte!\n"
 "\n"
 "@ the Groundhogg Team"
 
 #: includes/stats-collection.php:76
-#, fuzzy
 msgid "Groundhogg Discount Code"
-msgstr "Código de Desconto de Marmota"
+msgstr "Código de Desconto da Groundhogg"
 
 #: includes/stats-collection.php:102
-#, fuzzy
 msgctxt "notice"
 msgid "An unknown error occurred"
-msgstr "Ocorreu um erro desconhecido."
+msgstr "Ocorreu um erro desconhecido"
 
 #: includes/steps/actions/admin-notification.php:53
 msgctxt "step_name"
@@ -6376,7 +6049,6 @@ msgid "Admin Notification"
 msgstr "Notificação de administração"
 
 #: includes/steps/actions/admin-notification.php:73
-#, fuzzy
 msgctxt "step_description"
 msgid "Send an email or SMS notification to any email or list of emails."
 msgstr ""
@@ -6384,22 +6056,19 @@ msgstr ""
 "mails."
 
 #: includes/steps/actions/admin-notification.php:95
-#, fuzzy
 msgid "Send as SMS"
 msgstr "Enviar como SMS"
 
 #: includes/steps/actions/admin-notification.php:99
-#, fuzzy
 msgid "Send as a text message instead of as an email."
 msgstr "Enviar como uma mensagem de texto em vez de um e-mail."
 
 #: includes/steps/actions/admin-notification.php:110
 msgid "Use any email address or the {owner_email} replacement code."
 msgstr ""
-"Use qualquer endereço de e-mail ou o código de substituição {owner_email}."
+"Usar qualquer endereço de e-mail ou o código de substituição {owner_email}."
 
 #: includes/steps/actions/admin-notification.php:117
-#, fuzzy
 msgid ""
 "The email address which you can reply to. Use any address or the {email} "
 "code."
@@ -6418,22 +6087,19 @@ msgid "Use any valid replacement codes."
 msgstr "Use quaisquer códigos de substituição válidos."
 
 #: includes/steps/actions/admin-notification.php:131
-#, fuzzy
 msgid "Use any mobile phone number. Include country code!"
-msgstr "Use qualquer número de telemóvel. Incluir código do país!"
+msgstr "Use qualquer número de telefone móvel. Incluir código do país!"
 
 #: includes/steps/actions/admin-notification.php:136
 #: includes/steps/actions/apply-note.php:82
-#, fuzzy
 msgid "Content:"
-msgstr "Conteúdo"
+msgstr "Conteúdo:"
 
 #: includes/steps/actions/admin-notification.php:221
 msgid "Manage Contact"
 msgstr "Gerenciar contato"
 
 #: includes/steps/actions/advanced-timer.php:42
-#, fuzzy
 msgctxt "step_name"
 msgid "Advanced Timer"
 msgstr "Temporizador Avançado"
@@ -6446,22 +6112,18 @@ msgstr "É executado sempre que a página especificada é visitada."
 
 #: includes/steps/actions/advanced-timer.php:87
 #: includes/steps/benchmarks/form-filled.php:351
-#, fuzzy
 msgid "Time"
 msgstr "Tempo"
 
 #: includes/steps/actions/advanced-timer.php:96
-#, fuzzy
 msgid "Time is stored in UTC-0"
-msgstr "A hora é armazenada no UTC-0"
+msgstr "A hora é armazenada em  UTC-0"
 
 #: includes/steps/actions/advanced-timer.php:98
-#, fuzzy
 msgid "Local Time: "
-msgstr "Hora local"
+msgstr "Hora local: "
 
 #: includes/steps/actions/advanced-timer.php:126
-#, fuzzy
 msgid "A timer has a date set in the past and may cause unexpected behaviour."
 msgstr ""
 "Um timer tem uma data definida no passado e pode causar um comportamento "
@@ -6470,7 +6132,7 @@ msgstr ""
 #: includes/steps/actions/apply-note.php:41
 msgctxt "step_name"
 msgid "Apply Note"
-msgstr "Aplicar proprietário:"
+msgstr "Aplicar Nota"
 
 #: includes/steps/actions/apply-note.php:61
 msgctxt "step_description"
@@ -6480,7 +6142,7 @@ msgstr "Você não é o proprietário deste contato."
 #: includes/steps/actions/apply-owner.php:41
 msgctxt "step_name"
 msgid "Apply Owner"
-msgstr "Aplicar proprietário:"
+msgstr "Aplicar proprietário"
 
 #: includes/steps/actions/apply-owner.php:61
 msgctxt "step_description"
@@ -6488,28 +6150,26 @@ msgid "Set the contact owner to the specified user account."
 msgstr "Defina o proprietário do contato para a conta de usuário especificada."
 
 #: includes/steps/actions/apply-owner.php:83
-#, fuzzy
 msgid "Apply Owner:"
 msgstr "Aplicar proprietário:"
 
 #: includes/steps/actions/apply-owner.php:86
-#, fuzzy
 msgid "Selecting more than 1 owner will create a round robin."
-msgstr "Selecionar mais de 1 proprietário criará um robin redondo."
+msgstr "Selecionar mais de 1 proprietário criará um round-robin."
 
 #: includes/steps/actions/apply-tag.php:42
 msgctxt "step_name"
 msgid "Apply Tag"
-msgstr "Alt tag"
+msgstr "Aplicar Tag"
 
 #: includes/steps/actions/apply-tag.php:62
 msgctxt "step_description"
 msgid "Add a tag to a contact."
-msgstr "Adicione uma tag a um contato."
+msgstr "Adicionar uma tag a um contato."
 
 #: includes/steps/actions/apply-tag.php:84
 msgid "Apply These Tags:"
-msgstr "Aplique estas Tags:"
+msgstr "Aplicar estas Tags:"
 
 #: includes/steps/actions/apply-tag.php:86
 #: includes/steps/actions/remove-tag.php:86
@@ -6537,28 +6197,25 @@ msgid "User Role:"
 msgstr "Regra do usuário:"
 
 #: includes/steps/actions/create-user.php:88
-#, fuzzy
 msgid ""
 "This role will be added to the new user. If the user already exists, the "
 "role will be added in addition to existing roles."
 msgstr ""
 "Esta função será adicionada ao novo usuário. Se o usuário já existe, será "
-"adicionada a função além das funções existentes."
+"adicionada às funções existentes."
 
 #: includes/steps/actions/create-user.php:104
-#, fuzzy
 msgid "Which Site?"
 msgstr "Qual Site?"
 
 #: includes/steps/actions/create-user.php:108
-#, fuzzy
 msgid "Add to all sites"
 msgstr "Adicionar a todos os sites"
 
 #: includes/steps/actions/date-timer.php:42
 msgctxt "step_name"
 msgid "Date Timer"
-msgstr "Data de campo:"
+msgstr "Data"
 
 #: includes/steps/actions/date-timer.php:62
 msgctxt "step_description"
@@ -6571,16 +6228,14 @@ msgstr "Espere até:"
 
 #: includes/steps/actions/date-timer.php:110
 #: includes/steps/actions/delay-timer.php:147
-#, fuzzy
 msgctxt "action"
 msgid "Run in the contact's local time."
-msgstr "Corre na hora local do contacto."
+msgstr "Acionar na hora local do contato."
 
 #: includes/steps/actions/date-timer.php:115
 #: includes/steps/actions/delay-timer.php:152
-#, fuzzy
 msgid "Run in the contact's local time."
-msgstr "Corre na hora local do contacto."
+msgstr "Acionar na hora local do contato."
 
 #: includes/steps/actions/date-timer.php:165
 #, php-format
@@ -6589,9 +6244,9 @@ msgid ""
 "expected. See <a href=\"#%d\">%s</a>! Timers with dates in the past will run "
 "immediately."
 msgstr ""
-"Você tem data temporizadores com datas descendentes! O funil pode não "
-"funcionar como esperado. Veja <a href=\"#%d\">%s</a>! Temporizadores com "
-"datas no passado serão executados imediatamente."
+"Você tem temporizadores com datas descendentes! O funil pode não funcionar "
+"como esperado. Veja <a href=\"#%d\">%s</a>! Temporizadores com datas no "
+"passado serão executados imediatamente."
 
 #: includes/steps/actions/date-timer.php:170
 #, php-format
@@ -6600,14 +6255,14 @@ msgid ""
 "expected. See <a href=\"#%d\">%s</a>! Timers with dates in the past will run "
 "immediately."
 msgstr ""
-"Você tem data temporizadores com datas no passado! O funil pode não "
-"funcionar como esperado. Veja <a href=\"#%d\">%s</a>! Temporizadores com "
-"datas no passado serão executados imediatamente."
+"Você tem temporizadores com datas no passado! O funil pode não funcionar "
+"como esperado. Veja <a href=\"#%d\">%s</a>! Temporizadores com datas no "
+"passado serão executados imediatamente."
 
 #: includes/steps/actions/delay-timer.php:41
 msgctxt "step_name"
 msgid "Delay Timer"
-msgstr "Horário máximo"
+msgstr "Temporizador com Atraso"
 
 #: includes/steps/actions/delay-timer.php:91
 #: includes/steps/actions/field-timer.php:95
@@ -6642,7 +6297,7 @@ msgstr "Meses"
 #: includes/steps/actions/delay-timer.php:121
 #: includes/steps/actions/field-timer.php:174
 msgid "And run:"
-msgstr "E corra:"
+msgstr "E ative:"
 
 #: includes/steps/actions/delay-timer.php:130
 #: includes/steps/actions/field-timer.php:179
@@ -6650,9 +6305,8 @@ msgid "Immediately"
 msgstr "Imediatamente"
 
 #: includes/steps/actions/delay-timer.php:131
-#, fuzzy
 msgid "At time of day"
-msgstr "Na hora do dia..."
+msgstr "Na hora do dia"
 
 #: includes/steps/actions/edit-meta.php:40
 msgctxt "step_name"
@@ -6667,12 +6321,12 @@ msgstr "Você não é o proprietário deste contato."
 #: includes/steps/actions/field-timer.php:45
 msgctxt "step_name"
 msgid "Field Timer"
-msgstr "Horário mínimo"
+msgstr "Temporizador de campo"
 
 #: includes/steps/actions/field-timer.php:65
 msgctxt "step_description"
 msgid "Pause for the specified amount of time before a date in the meta."
-msgstr "Pause para o período de tempo especificado antes de uma data no meta."
+msgstr "Pause pelo período de tempo especificado antes de uma data no meta."
 
 #: includes/steps/actions/field-timer.php:117
 msgid "No Delay"
@@ -6688,7 +6342,7 @@ msgstr "Depois"
 
 #: includes/steps/actions/field-timer.php:159
 msgid "Date Field:"
-msgstr "Data de campo:"
+msgstr "Data:"
 
 #: includes/steps/actions/field-timer.php:167
 msgid "Please Select a Field"
@@ -6709,29 +6363,26 @@ msgid "Send an HTTP Post to your favorite external software."
 msgstr "Envie uma postagem HTTP para o seu software externo favorito."
 
 #: includes/steps/actions/http-post.php:101
-#, fuzzy
 msgid "Url:"
-msgstr "URL da fonte de chumbo"
+msgstr "URL:"
 
 #: includes/steps/actions/http-post.php:117
-#, fuzzy
 msgid "Send Test"
-msgstr "Enviar teste:"
+msgstr "Enviar Teste"
 
 #: includes/steps/actions/http-post.php:129
-#, fuzzy
 msgid "Send as JSON"
 msgstr "Enviar como JSON"
 
 #: includes/steps/actions/remove-tag.php:42
 msgctxt "step_name"
 msgid "Remove Tag"
-msgstr "Remover Marcação"
+msgstr "Remover Tag"
 
 #: includes/steps/actions/remove-tag.php:62
 msgctxt "step_description"
 msgid "Remove a tag from a contact."
-msgstr "Remova uma marca de um contato."
+msgstr "Remova uma Tag de um contato."
 
 #: includes/steps/actions/remove-tag.php:84
 msgid "Remove These Tags:"
@@ -6740,12 +6391,12 @@ msgstr "Remover estas Tags:"
 #: includes/steps/actions/send-email.php:56
 msgctxt "step_name"
 msgid "Send Email"
-msgstr "Enviar Email"
+msgstr "Enviar E-mail"
 
 #: includes/steps/actions/send-email.php:76
 msgctxt "step_description"
 msgid "Send an email to a contact."
-msgstr "Selecione um e-mail para enviar."
+msgstr "Enviar um e-mail para um contato."
 
 #: includes/steps/actions/send-email.php:95
 msgctxt "notice"
@@ -6764,23 +6415,21 @@ msgstr "Criar novo E-mail"
 
 #: includes/steps/actions/send-email.php:153
 msgid "Skip if confirmed?"
-msgstr "Pular se confirmado?"
+msgstr "Ignorar se confirmado?"
 
 #: includes/steps/actions/send-email.php:161
-#, fuzzy
 msgid ""
 "Skip to next <b>Email Confirmed</b> benchmark if email is already confirmed."
 msgstr ""
-"Pular para o próximo ponto de referência <b>Confirmado por e-mail</b> se o e-"
-"mail já estiver confirmado."
+"Pular para o próximo benchmark <b>E-mail Confirmado</b> se o e-mail já "
+"estiver confirmado."
 
 #: includes/steps/actions/send-email.php:233
 msgctxt "stats"
 msgid "C.T.R"
-msgstr "C.t.r"
+msgstr "C.T.R"
 
 #: includes/steps/actions/send-email.php:342
-#, fuzzy
 msgid ""
 "You still have emails in draft mode! These emails will not be sent and will "
 "cause automation to stop."
@@ -6796,20 +6445,17 @@ msgstr "Enviar SMS"
 #: includes/steps/actions/send-sms.php:49
 msgctxt "step_description"
 msgid "Send a one way text message to the contact."
-msgstr "Envie uma mensagem de texto de uma forma para o contato."
+msgstr "Envie uma mensagem de texto de uma via para o contato."
 
 #: includes/steps/actions/send-sms.php:71
-#, fuzzy
 msgid "Message:"
 msgstr "Mensagem de texto:"
 
 #: includes/steps/actions/send-sms.php:74
-#, fuzzy
 msgid "Choose the message you want to send."
 msgstr "Escolha a mensagem que pretende enviar."
 
 #: includes/steps/actions/send-sms.php:91
-#, fuzzy
 msgid "SMS message will not be sent until you active an SMS sender."
 msgstr "A mensagem SMS não será enviada até que você ative um remetente SMS."
 
@@ -6819,7 +6465,6 @@ msgid "Sleep"
 msgstr "Dormir"
 
 #: includes/steps/actions/sleep.php:63
-#, fuzzy
 msgctxt "step_description"
 msgid "Sleep for 1 second"
 msgstr "Dormir durante 1 segundo"
@@ -6839,21 +6484,17 @@ msgstr ""
 "não existir um."
 
 #: includes/steps/benchmarks/account-created.php:86
-#, fuzzy
 msgid "User Role(s):"
-msgstr "Função(ões) do usuário:"
+msgstr "Funções do Usuário:"
 
 #: includes/steps/benchmarks/account-created.php:89
-#, fuzzy
 msgid "New users with these roles will trigger this benchmark."
-msgstr ""
-"Os novos utilizadores com estas funções irão desencadear este parâmetro de "
-"referência."
+msgstr "Os novos utilizadores com estas funções irão ativar este benchmark."
 
 #: includes/steps/benchmarks/email-confirmed.php:38
 msgctxt "step_name"
 msgid "Email Confirmed"
-msgstr "Email confirmado"
+msgstr "E-mail confirmado"
 
 #: includes/steps/benchmarks/email-confirmed.php:58
 msgctxt "step_description"
@@ -6867,7 +6508,7 @@ msgstr "É executado sempre que um e-mail é confirmado enquanto neste funil"
 #: includes/steps/benchmarks/form-filled.php:54
 msgctxt "step_name"
 msgid "Web Form"
-msgstr "Formulário"
+msgstr "Formulário Web"
 
 #: includes/steps/benchmarks/form-filled.php:74
 msgctxt "step_description"
@@ -6879,14 +6520,12 @@ msgstr ""
 "site com códigos de atalho."
 
 #: includes/steps/benchmarks/form-filled.php:164
-#, fuzzy
 msgid "Embed:"
 msgstr "Incorporar:"
 
 #: includes/steps/benchmarks/form-filled.php:170
-#, fuzzy
 msgid "Shortcode"
-msgstr "Shortcode:"
+msgstr "Shortcode"
 
 #: includes/steps/benchmarks/form-filled.php:179
 msgid "Iframe"
@@ -6902,7 +6541,6 @@ msgid "Preview"
 msgstr "Visualização"
 
 #: includes/steps/benchmarks/form-filled.php:217
-#, fuzzy
 msgid "Submit via AJAX:"
 msgstr "Enviar via AJAX:"
 
@@ -6911,22 +6549,20 @@ msgid "Enable Ajax"
 msgstr "Habilitar Ajax"
 
 #: includes/steps/benchmarks/form-filled.php:237
-#, fuzzy
 msgid "Thank You Message:"
 msgstr "Mensagem de agradecimento:"
 
 #: includes/steps/benchmarks/form-filled.php:245
 msgid "Thank You Message"
-msgstr "Mensagem de obrigado"
+msgstr "Mensagem de agradecimento"
 
 #: includes/steps/benchmarks/form-filled.php:246
-#, fuzzy
 msgid "Your submission has been received."
 msgstr "A sua submissão foi recebida."
 
 #: includes/steps/benchmarks/form-filled.php:259
 msgid "Thank You Page:"
-msgstr "Obrigado página:"
+msgstr "Página de agradecimento:"
 
 #: includes/steps/benchmarks/form-filled.php:268
 msgid "Thank You Page"
@@ -6954,7 +6590,7 @@ msgstr "Endereço"
 
 #: includes/steps/benchmarks/form-filled.php:315
 msgid "GDPR"
-msgstr "GDPR"
+msgstr "RGPD"
 
 #: includes/steps/benchmarks/form-filled.php:323
 #: includes/steps/benchmarks/form-filled.php:484
@@ -6966,7 +6602,6 @@ msgid "Textarea"
 msgstr "Área de Texto"
 
 #: includes/steps/benchmarks/form-filled.php:331
-#, fuzzy
 msgid "Number"
 msgstr "Número"
 
@@ -6983,12 +6618,10 @@ msgid "Checkbox"
 msgstr "Checkbox"
 
 #: includes/steps/benchmarks/form-filled.php:347
-#, fuzzy
 msgid "Date"
 msgstr "Data"
 
 #: includes/steps/benchmarks/form-filled.php:355
-#, fuzzy
 msgid "File"
 msgstr "Arquivo"
 
@@ -7019,7 +6652,7 @@ msgstr "Rótulo"
 
 #: includes/steps/benchmarks/form-filled.php:481
 msgid "The field label."
-msgstr "O rótulo de campo."
+msgstr "O rótulo do campo."
 
 #: includes/steps/benchmarks/form-filled.php:487
 msgid "The button text."
@@ -7035,7 +6668,7 @@ msgstr "O texto fantasma dentro do campo."
 
 #: includes/steps/benchmarks/form-filled.php:499
 msgid "This will be the custom field name. I.E. {meta.name}"
-msgstr "Este será o nome de campo personalizado. I.E. {meta.name}"
+msgstr "Este será o nome do campo personalizado. I.E. {meta.name}"
 
 #: includes/steps/benchmarks/form-filled.php:504
 msgid "Min"
@@ -7062,9 +6695,8 @@ msgid "Add Tag"
 msgstr "Adicionar Tag"
 
 #: includes/steps/benchmarks/form-filled.php:527
-#, fuzzy
 msgid "Add a tag when this checkbox is selected."
-msgstr "Adicione uma marca quando esta caixa de seleção estiver selecionada."
+msgstr "Adicionar uma tag quando esta caixa de seleção estiver selecionada."
 
 #: includes/steps/benchmarks/form-filled.php:531
 msgid "Options"
@@ -7076,17 +6708,16 @@ msgid "Add Option"
 msgstr "Adicionar opção"
 
 #: includes/steps/benchmarks/form-filled.php:550
-#, fuzzy
 msgid ""
 "Enter option name to add option. Tags are optional.You need to save options "
 "when you make changes."
 msgstr ""
-"Digite o nome da opção para adicionar a opção. As etiquetas são opcionais. "
-"Você precisa salvar as opções ao fazer alterações."
+"Digite o nome da opção para adicionar a opção. As tags são opcionais. Você "
+"precisa salvar as opções ao fazer alterações."
 
 #: includes/steps/benchmarks/form-filled.php:554
 msgid "Allow Multiple Selections"
-msgstr "Permitir Multiplas Seleções"
+msgstr "Permitir Múltiplas Seleções"
 
 #: includes/steps/benchmarks/form-filled.php:560
 msgid "Default"
@@ -7146,8 +6777,8 @@ msgid ""
 "The minimum time a user can enter. You can enter a dynamic time or static "
 "time."
 msgstr ""
-"O tempo mínimo que um usuário pode inserir. Você pode inserir um tempo "
-"dinâmico ou um tempo estático."
+"O tempo mínimo que um usuário pode inserir. Você pode inserir um horário "
+"dinâmico ou um horário estático."
 
 #: includes/steps/benchmarks/form-filled.php:629
 msgid "Max Time"
@@ -7158,8 +6789,8 @@ msgid ""
 "The maximum time a user can enter. You can enter a dynamic time or static "
 "time."
 msgstr ""
-"O tempo máximo que um usuário pode inserir. Você pode inserir um tempo "
-"dinâmico ou um tempo estático."
+"O tempo máximo que um usuário pode inserir. Você pode inserir um horário "
+"dinâmico ou um horário estático."
 
 #: includes/steps/benchmarks/form-filled.php:638
 msgid "Max File Size"
@@ -7171,14 +6802,13 @@ msgid ""
 "Maximum size a file can be <b>in Bytes</b>. Your max upload size is %d Bytes."
 msgstr ""
 "Tamanho máximo que um arquivo pode ser <b> em bytes </b>. Seu tamanho máximo "
-"de upload é %d bytes"
+"de upload é %d bytes."
 
 #: includes/steps/benchmarks/form-filled.php:644
 msgid "Accepted File Types"
-msgstr "Arquivos aceitos:"
+msgstr "Tipos de Arquivos Aceitos"
 
 #: includes/steps/benchmarks/form-filled.php:647
-#, fuzzy
 msgid ""
 "The types of files a user may upload (comma separated). Leave empty to not "
 "specify."
@@ -7201,11 +6831,11 @@ msgstr "Classe CSS"
 
 #: includes/steps/benchmarks/form-filled.php:722
 msgid "Views: "
-msgstr "Visualizações:"
+msgstr "Visualizações: "
 
 #: includes/steps/benchmarks/form-filled.php:728
 msgid "Fills: "
-msgstr "Preenche:"
+msgstr "Preenchimentos: "
 
 #: includes/steps/benchmarks/form-filled.php:741
 msgid "Conversion Rate"
@@ -7213,18 +6843,16 @@ msgstr "Taxa de Conversão"
 
 #: includes/steps/benchmarks/form-filled.php:741
 msgid "CVR: "
-msgstr "Cvr:"
+msgstr "Cvr: "
 
 #: includes/steps/benchmarks/form-integration.php:64
-#, fuzzy
 msgid "Run when this form is submitted"
 msgstr "Executar quando este formulário for enviado"
 
 #: includes/steps/benchmarks/form-integration.php:75
 #: includes/steps/benchmarks/form-integration.php:76
-#, fuzzy
 msgid "Map Fields"
-msgstr "Campos do Mapa"
+msgstr "Campos de Mapa"
 
 #: includes/steps/benchmarks/form-integration.php:77
 #: includes/utils/html.php:497 templates/preferences.php:228
@@ -7233,7 +6861,6 @@ msgid "Save Changes"
 msgstr "Salvar Alterações"
 
 #: includes/steps/benchmarks/form-integration.php:134
-#, fuzzy
 msgid "Please select a valid form and update first."
 msgstr "Por favor, selecione um formulário válido e atualize primeiro."
 
@@ -7242,19 +6869,17 @@ msgid "Field ID"
 msgstr "ID do Campo"
 
 #: includes/steps/benchmarks/form-integration.php:164
-#, fuzzy
 msgid "Field Label"
-msgstr "O rótulo de campo."
+msgstr "O rótulo do campo"
 
 #: includes/steps/benchmarks/form-integration.php:165
-#, fuzzy
 msgid "Map To"
-msgstr "Mapa Para"
+msgstr "Mapear para"
 
 #: includes/steps/benchmarks/link-clicked.php:25
 msgctxt "step_name"
 msgid "Link Click"
-msgstr "Link Clique"
+msgstr "Link de Clique"
 
 #: includes/steps/benchmarks/link-clicked.php:45
 msgctxt "step_description"
@@ -7279,30 +6904,24 @@ msgstr ""
 "abaixo."
 
 #: includes/steps/benchmarks/link-clicked.php:82
-#, fuzzy
 msgid "Redirect To:"
-msgstr "Redirecionar para"
+msgstr "Redirecionar para:"
 
 #: includes/steps/benchmarks/link-clicked.php:85
-#, fuzzy
 msgid "Contacts will be redirected to this link."
 msgstr "Os contatos serão redirecionados para este link."
 
 #: includes/steps/benchmarks/login-status.php:21
-#, fuzzy
 msgctxt "step_name"
 msgid "Logs In"
 msgstr "Entrar"
 
 #: includes/steps/benchmarks/login-status.php:41
-#, fuzzy
 msgctxt "step_description"
 msgid "Whenever a user logs in for a certain amount of times."
-msgstr ""
-"Sempre que um utilizador iniciar sessão durante um certo número de vezes."
+msgstr "Sempre que um utilizador iniciar sessão um certo número de vezes."
 
 #: includes/steps/benchmarks/login-status.php:67
-#, fuzzy
 msgid "Run when a user logs in:"
 msgstr "Executar quando um usuário faz login:"
 
@@ -7311,7 +6930,6 @@ msgid "Any Time"
 msgstr "Qualquer Data"
 
 #: includes/steps/benchmarks/login-status.php:77
-#, fuzzy
 msgid "Number of Times"
 msgstr "Número de vezes"
 
@@ -7326,7 +6944,6 @@ msgid "Runs whenever the specified page is visited."
 msgstr "É executado sempre que a página especificada é visitada."
 
 #: includes/steps/benchmarks/page-visited.php:85
-#, fuzzy
 msgid "Run when contact visits this page."
 msgstr "Executar quando o contato visitar esta página."
 
@@ -7339,7 +6956,6 @@ msgid "Exact Match"
 msgstr "Correspondência exata"
 
 #: includes/steps/benchmarks/page-visited.php:107
-#, fuzzy
 msgid ""
 "This will only work if the contact is logged in, clicked a link in an email "
 "or filled out a form before browsing."
@@ -7348,13 +6964,11 @@ msgstr ""
 "mail ou preencher um formulário antes de navegar."
 
 #: includes/steps/benchmarks/role-changed.php:39
-#, fuzzy
 msgctxt "step_name"
 msgid "Role Changed"
 msgstr "Função modificada"
 
 #: includes/steps/benchmarks/role-changed.php:59
-#, fuzzy
 msgctxt "step_description"
 msgid "Runs whenever a user's role is changed."
 msgstr "É executado sempre que a função de um usuário é alterada."
@@ -7364,59 +6978,56 @@ msgid "Run when this access is given:"
 msgstr "Executar quando este acesso é dado:"
 
 #: includes/steps/benchmarks/role-changed.php:85
-#, fuzzy
 msgid "Users with these roles will trigger this benchmark."
 msgstr ""
-"Os utilizadores com estas funções irão activar este parâmetro de referência."
+"Os utilizadores com estas funções irão ativar este parâmetro de referência."
 
 #: includes/steps/benchmarks/tag-applied.php:42
 msgctxt "step_name"
 msgid "Tag Applied"
-msgstr "Tag aplicado"
+msgstr "Tag aplicada"
 
 #: includes/steps/benchmarks/tag-applied.php:62
 msgctxt "step_description"
 msgid "Runs whenever any of the specified tags are added to a contact."
 msgstr ""
-"É executado sempre que qualquer uma das marcas especificadas são adicionadas "
-"a um contato."
+"É executado sempre que qualquer uma das tags especificadas são adicionadas a "
+"um contato."
 
 #: includes/steps/benchmarks/tag-applied.php:91
 #: includes/steps/benchmarks/tag-removed.php:91
-#, fuzzy
 msgid "any"
-msgstr "Tem alguma dessas Tags"
+msgstr "qualquer"
 
 #: includes/steps/benchmarks/tag-applied.php:92
 #: includes/steps/benchmarks/tag-removed.php:92
-#, fuzzy
 msgid "all"
-msgstr "Todos"
+msgstr "todas"
 
 #: includes/steps/benchmarks/tag-applied.php:97
-#, fuzzy, php-format
+#, php-format
 msgid "Run when %s of these tags are applied:"
 msgstr "Executar quando %s destas tags são aplicadas:"
 
 #: includes/steps/benchmarks/tag-removed.php:42
 msgctxt "step_name"
 msgid "Tag Removed"
-msgstr "Nome da Tag"
+msgstr "Tag Removida"
 
 #: includes/steps/benchmarks/tag-removed.php:62
 msgctxt "step_description"
 msgid "Runs whenever any of the specified tags are removed from a contact."
 msgstr ""
-"É executado sempre que qualquer uma das marcas especificadas é removida de "
-"um contato."
+"É executado sempre que qualquer uma das tags especificadas é removida de um "
+"contato."
 
 #: includes/steps/benchmarks/tag-removed.php:97
-#, fuzzy, php-format
+#, php-format
 msgid "Run when %s of these tags are removed:"
 msgstr "Executar quando %s destas tags são removidas:"
 
 #: includes/steps/error.php:43
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "<b>%s</b> settings were not found. This may be because you disabled an add-"
 "on which utilized this step type."
@@ -7433,9 +7044,8 @@ msgid "Completed:"
 msgstr "Concluído:"
 
 #: includes/steps/funnel-step.php:557
-#, fuzzy
 msgid "Waiting: "
-msgstr "Esperando:"
+msgstr "Esperando: "
 
 #: includes/steps/funnel-step.php:585
 msgid "Complete: "
@@ -7443,7 +7053,7 @@ msgstr "Completo: "
 
 #: includes/steps/funnel-step.php:680
 msgid "Add Step"
-msgstr "Adicionar etapa"
+msgstr "Adicionar Etapa"
 
 #: includes/steps/funnel-step.php:734 includes/steps/funnel-step.php:795
 msgid "Step Title"
@@ -7458,7 +7068,7 @@ msgid "Any blog"
 msgstr "Qualquer blog"
 
 #: includes/tag-mapping.php:182
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "New features are now available, but we need to perform an upgrade process "
 "first! %s"
@@ -7467,13 +7077,12 @@ msgstr ""
 "de atualização primeiro! %s"
 
 #: includes/tag-mapping.php:472
-#, fuzzy
 msgctxt "notice"
 msgid ""
 "Job finished! Optin status & User Role tag mapping has now been enabled."
 msgstr ""
-"Trabalho terminado! O status Optin & mapeamento de tags de função do usuário "
-"agora foi habilitado."
+"Trabalho terminado! O status de Opt-in e mapeamento de tags de função do "
+"usuário foi agora habilitado."
 
 #: includes/utils/graph.php:198
 msgid "Load"
@@ -7485,10 +7094,9 @@ msgstr "Nenhum item encontrado."
 
 #: includes/utils/html.php:496
 msgid "Open Modal"
-msgstr "Abra o modal de texto"
+msgstr "Abrir Modal"
 
 #: includes/utils/html.php:807
-#, fuzzy
 msgid "Please Select a Tag"
 msgstr "Por favor, selecione uma Tag"
 
@@ -7501,23 +7109,20 @@ msgid "Please select an email"
 msgstr "Por favor, selecione um e-mail"
 
 #: includes/utils/html.php:958
-#, fuzzy
 msgid "Please select an SMS"
-msgstr "Por favor selecione um SMS"
+msgstr "Por favor, selecione um SMS"
 
 #: includes/utils/html.php:990
-#, fuzzy
 msgid "Please select one or more benchmarks"
 msgstr "Por favor, selecione um ou mais benchmarks"
 
 #: includes/utils/html.php:1032
-#, fuzzy
 msgid "Please select one or more steps."
-msgstr "Por favor, selecione um ou mais passos."
+msgstr "Por favor, selecione uma ou mais etapas."
 
 #: includes/utils/html.php:1053
 msgid "Please select 1 or more meta keys"
-msgstr "Por favor, selecione 1 ou mais chaves meta"
+msgstr "Por favor, selecione uma ou mais chaves meta"
 
 #: includes/utils/html.php:1151
 msgid "Upload Image"
@@ -7537,36 +7142,33 @@ msgstr "Comece a digitar…"
 
 #: integrations/elementor/elementor-integration-v2.php:24
 #: integrations/elementor/elementor-integration-v2.php:31
-#, fuzzy
 msgid "Groundhogg (v2)"
-msgstr "Marmota (v2)"
+msgstr "Groundhogg (v2)"
 
 #: integrations/elementor/elementor-integration-v2.php:51
-#, fuzzy
 msgid "Apply Tags"
-msgstr "Aplicar Etiquetas"
+msgstr "Aplicar Tags"
 
 #: integrations/elementor/elementor-integration-v2.php:62
 msgid "Field Mapping"
 msgstr "Mapeamento de Campo"
 
 #: integrations/elementor/elementor-integration-v2.php:93
-#, fuzzy
 msgid "Groundhogg integration requires an email field."
 msgstr "A integração com o Groundhogg requer um campo de e-mail."
 
 #: integrations/elementor/elementor-integration.php:170
 msgid "Apply Groundhogg Tags"
-msgstr "Excluir dados Groundhogg"
+msgstr "Excluir Tags Groundhogg"
 
 #: integrations/elementor/elementor-integration.php:176
 msgid "Once a contact is created this tag will be applied."
 msgstr "Uma vez que um contato é criado esta tag será aplicada."
 
 #: integrations/elementor/elementor-integration.php:192
-#, fuzzy, php-format
+#, php-format
 msgid "Map %s"
-msgstr "Mapa %s"
+msgstr "Mapear %s"
 
 #: templates/assets/email-templates.php:39
 msgctxt "email_template_name"
@@ -7576,7 +7178,7 @@ msgstr "Chamada Para Ação"
 #: templates/assets/email-templates.php:40
 msgctxt "email_template_description"
 msgid "Use when you need contacts to take an action, and FAST!"
-msgstr "Use quando você precisa de contatos para tomar uma ação, e FAST!"
+msgstr "Use quando você precisa de contatos para tomar uma ação, e RÁPIDO!"
 
 #: templates/assets/email-templates.php:49
 msgctxt "email_template_name"
@@ -7586,7 +7188,7 @@ msgstr "Texto simples"
 #: templates/assets/email-templates.php:50
 msgctxt "email_template_description"
 msgid "Perfect for easy breezy communication with contacts."
-msgstr "Aperfeiçoe para uma comunicação Breezy fácil com contatos."
+msgstr "Aperfeiçoe para uma comunicação fácil com contatos."
 
 #: templates/assets/email-templates.php:58
 msgctxt "email_template_name"
@@ -7601,12 +7203,12 @@ msgstr "Ideal para quando você tem muito para compartilhar."
 #: templates/assets/email-templates.php:68
 msgctxt "email_template_name"
 msgid "Excitement Generator"
-msgstr "Gerador de excitação"
+msgstr "Gerador de empolgação"
 
 #: templates/assets/email-templates.php:69
 msgctxt "email_template_description"
 msgid "Need people excited? This is what you need!"
-msgstr "Precisa de pessoas excitadas? Isto é o que você precisa!"
+msgstr "Precisa de pessoas empolgadas? Isto é o que você precisa!"
 
 #: templates/assets/email-templates.php:78
 msgctxt "email_template_name"
@@ -7616,12 +7218,12 @@ msgstr "E-mail de Boas-Vindas"
 #: templates/assets/email-templates.php:79
 msgctxt "email_template_description"
 msgid "New contact? Make the feel at home."
-msgstr "Novo contato? Faça a sensação em casa."
+msgstr "Novo contato? Faça com que se sintam em casa."
 
 #: templates/assets/email-templates.php:88
 msgctxt "email_template_name"
 msgid "Confirmation Email"
-msgstr "Ícones coloridos"
+msgstr "E-mail de Confirmação"
 
 #: templates/assets/email-templates.php:89
 msgctxt "email_template_description"
@@ -7631,7 +7233,7 @@ msgstr "Envie uma solicitação de confirmação para receber mais comunicação
 #: templates/assets/email-templates.php:98
 msgctxt "email_template_name"
 msgid "Review Request"
-msgstr "Solicitação de revisão"
+msgstr "Solicitação de Avaliação"
 
 #: templates/assets/email-templates.php:99
 msgctxt "email_template_description"
@@ -7641,7 +7243,7 @@ msgstr "Quer um feedback? Esta é a maneira mais fácil de obtê-lo."
 #: templates/assets/email-templates.php:108
 msgctxt "email_template_name"
 msgid "Appreciation Email"
-msgstr "Ícones coloridos"
+msgstr "E-mail de Valorização"
 
 #: templates/assets/email-templates.php:109
 msgctxt "email_template_description"
@@ -7651,7 +7253,7 @@ msgstr "Deixe que seus clientes saibam que você os valoriza."
 #: templates/assets/funnel-templates.php:18
 msgctxt "funnel_template_name"
 msgid "Welcome Series"
-msgstr "Bem-vindo %s!"
+msgstr "Série de Boas-vindas"
 
 #: templates/assets/funnel-templates.php:19
 msgctxt "funnel_template_description"
@@ -7671,7 +7273,7 @@ msgstr "Obtenha sua lista animada para um evento ou lançamento de produto"
 #: templates/assets/funnel-templates.php:32
 msgctxt "funnel_template_name"
 msgid "Long Term Nurture"
-msgstr "Nutrir a longo prazo"
+msgstr "Cuidado a longo prazo"
 
 #: templates/assets/funnel-templates.php:33
 msgctxt "funnel_template_description"
@@ -7686,36 +7288,34 @@ msgstr "Registro de Webinar"
 #: templates/assets/funnel-templates.php:40
 msgctxt "funnel_template_description"
 msgid "Collect leads, send reminders, and follow up with this!"
-msgstr "Colete leads, enviar lembretes, e acompanhar com isso!"
+msgstr "Colete leads, envie lembretes e acompanhe tudo isso!"
 
 #: templates/assets/funnel-templates.php:46
 msgctxt "funnel_template_name"
 msgid "Feedback Request"
-msgstr "Solicitação de revisão"
+msgstr "Solicitação de Feedback"
 
 #: templates/assets/funnel-templates.php:47
 msgctxt "funnel_template_description"
 msgid "Looking to generate some reviews? This is what you need."
-msgstr "Precisa de pessoas excitadas? Isto é o que você precisa!"
+msgstr "Precisa de alguma avaliações? Isto é o que você precisa."
 
 #: templates/assets/funnel-templates.php:53
 msgctxt "funnel_template_name"
 msgid "Lead Magnet Download"
-msgstr "Ímã de chumbo download"
+msgstr "Download de Lead Magnet"
 
 #: templates/assets/funnel-templates.php:54
 msgctxt "funnel_template_description"
 msgid "Giving away a lead magnet? Make it irresistible."
-msgstr "Dando um ímã de chumbo? Torná-lo irresistível."
+msgstr "Dando um imã de leads de presente? Torne-lo irresistível."
 
 #: templates/assets/funnel-templates.php:60
-#, fuzzy
 msgctxt "funnel_template_name"
 msgid "Login Abandonment"
 msgstr "Abandono de Login"
 
 #: templates/assets/funnel-templates.php:61
-#, fuzzy
 msgctxt "funnel_template_description"
 msgid "Remind your subscribers to login every once in a while."
 msgstr "Lembre seus assinantes de fazer login de vez em quando."
@@ -7728,30 +7328,27 @@ msgstr "Iniciar a partir do zero"
 #: templates/assets/funnel-templates.php:68
 msgctxt "funnel_template_description"
 msgid "Have some inspiration? Use this blank canvas!"
-msgstr "Tem alguma inspiração? Use esta tela em branco!"
+msgstr "Está inspirado? Use esta tela em branco!"
 
 #: templates/emails/browser-view.php:12
-#, fuzzy
 msgid "Could not load email..."
 msgstr "Não foi possível carregar o e-mail..."
 
 #: templates/emails/email.php:7
-#, fuzzy
 msgid "Could not load this email"
 msgstr "Não foi possível carregar este e-mail"
 
 #: templates/emails/email.php:7
-#, fuzzy
 msgid "Error loading email."
 msgstr "Erro ao carregar e-mail."
 
 #: templates/emails/footer-default.php:87
 msgid "Don't want these emails?"
-msgstr "Não quer esses emails?"
+msgstr "Não quer esses e-mails?"
 
 #: templates/emails/footer-default.php:88
 msgid "Unsubscribe."
-msgstr "Descadastrado"
+msgstr "Descadastrar."
 
 #. translators: Login screen title. 1: Login screen name, 2: Network or site name
 #: templates/emails/header-default.php:92 templates/managed-page.php:91
@@ -7761,7 +7358,7 @@ msgstr "%1$s &lsaquo;%2$s"
 
 #: templates/emails/header-default.php:131
 msgid "View In Browser..."
-msgstr "Ver E-mail na página do navegador"
+msgstr "Ver e-mail na página do navegador..."
 
 #: templates/managed-page.php:103
 #, php-format
@@ -7779,7 +7376,6 @@ msgid "Edit Profile"
 msgstr "Editar Perfil"
 
 #: templates/preferences.php:59
-#, fuzzy
 msgid ""
 "You are receiving this message because you have requested an audit of your "
 "personal information. This message contains all current information about "
@@ -7798,16 +7394,15 @@ msgid "Other Information"
 msgstr "Outra informação"
 
 #: templates/preferences.php:80
-#, fuzzy
 msgid "Profile Tags"
-msgstr "Etiquetas de perfil"
+msgstr "Tags de perfil"
 
 #: templates/preferences.php:93
 msgid "Files"
 msgstr "Arquivos"
 
 #: templates/preferences.php:100
-#, fuzzy, php-format
+#, php-format
 msgid "Your personal profile audit with %s"
 msgstr "Sua auditoria de perfil pessoal com %s"
 
@@ -7816,27 +7411,23 @@ msgid "Manage Preferences"
 msgstr "Gerir preferências"
 
 #: templates/preferences.php:146
-#, fuzzy
 msgid "Please enter your email address to manage your preferences."
 msgstr "Introduza o seu endereço de e-mail para gerir as suas preferências."
 
 #: templates/preferences.php:147
-#, fuzzy
 msgid "your.name@domain.com"
 msgstr "your.name@domain.com"
 
 #: templates/preferences.php:161
-#, fuzzy, php-format
+#, php-format
 msgid "Profile information sent to your inbox %s!"
 msgstr "Informação do perfil enviada para a sua caixa de entrada %s!"
 
 #: templates/preferences.php:171
-#, fuzzy
 msgid "Something went wrong sending your email."
-msgstr "Algo correu mal ao enviar o teu e-mail."
+msgstr "Ocorreu algum problema ao enviar seu e-mail."
 
 #: templates/preferences.php:185
-#, fuzzy
 msgid "You must verify your email address."
 msgstr "Você deve verificar seu endereço de e-mail."
 
@@ -7849,12 +7440,11 @@ msgid "Update Profile"
 msgstr "Atualizar Perfil"
 
 #: templates/preferences.php:208
-#, fuzzy, php-format
+#, php-format
 msgid "Update information for %s (%s)."
 msgstr "Atualizar informações para %s (%s)."
 
 #: templates/preferences.php:209
-#, fuzzy
 msgid "Use the form below to update your information to the most current."
 msgstr ""
 "Use o formulário abaixo para atualizar suas informações para o mais atual."
@@ -7864,7 +7454,6 @@ msgid "Confirm Email Address"
 msgstr "Confirmar endereço de e-mail"
 
 #: templates/preferences.php:232
-#, fuzzy
 msgid ""
 "Click below to manage your communication preferences and determine when and "
 "how you would like to receive communication from us."
@@ -7873,43 +7462,38 @@ msgstr ""
 "quando e como você gostaria de receber nossa comunicação."
 
 #: templates/preferences.php:234
-#, fuzzy
 msgid "Change Email Preferences"
 msgstr "Alterar Preferências de E-mail"
 
 #: templates/preferences.php:239
-#, fuzzy
 msgid ""
 "Click below to email yourself an audit of all personal information currently "
 "on file. Or if you wish for us to no longer have access to this information "
 "you can request a data erasure in accordance with your privacy rights."
 msgstr ""
 "Clique abaixo para enviar um e-mail para você mesmo uma auditoria de todas "
-"as informações pessoais atualmente no arquivo. Ou se desejar que deixemos de "
-"ter acesso a esta informação, pode solicitar um apagamento de dados de "
+"as informações pessoais atualmente no arquivo. Ou, se desejar que deixemos "
+"de ter acesso a esta informação, pode solicitar um apagamento de dados de "
 "acordo com os seus direitos de privacidade."
 
 #: templates/preferences.php:241
 msgid "Download Profile"
-msgstr "Download do perfil"
+msgstr "Download do Perfil"
 
 #: templates/preferences.php:242
-#, fuzzy
 msgid "Erase Profile"
 msgstr "Apagar Perfil"
 
 #: templates/preferences.php:281
-#, fuzzy
 msgid "Preferences saved!"
-msgstr "Preferências guardadas!"
+msgstr "Preferências salvas!"
 
 #: templates/preferences.php:291
 msgctxt "preferences"
 msgid ""
 "I love this company, you can communicate with me whenever you feel like."
 msgstr ""
-"Eu amo esta companhia, você pode comunicar-se comigo sempre que você sente "
-"como."
+"Eu amo esta empresa, você pode comunicar-se comigo sempre que você quiser."
 
 #: templates/preferences.php:292
 msgctxt "preferences"
@@ -7920,44 +7504,42 @@ msgstr "Está ficando um pouco demais. Comunique-se comigo semanalmente."
 msgctxt "preferences"
 msgid "Distance makes the heart grow fonder. Communicate with me monthly."
 msgstr ""
-"A distância faz o coração crescer mais Fonder. Comunique-se comigo "
-"mensalmente."
+"A distância faz o coração pulsar mais forte. Comunique-se comigo mensalmente."
 
 #: templates/preferences.php:294
 msgctxt "preferences"
 msgid "I no longer wish to receive any form of communication. Unsubscribe me!"
-msgstr "Não desejo mais receber qualquer forma de comunicação. Me cancele!"
+msgstr ""
+"Não desejo mais receber qualquer forma de comunicação. Cancele minha "
+"assinatura!"
 
 #: templates/preferences.php:298
-#, fuzzy
 msgctxt "preferences"
 msgid "Unsubscribe me and delete any personal information about me."
 msgstr ""
-"Cancelar a minha subscrição e apagar qualquer informação pessoal sobre mim."
+"Cancelar a minha assinatura e apagar qualquer informação pessoal sobre mim."
 
 #: templates/preferences.php:305
-#, fuzzy, php-format
+#, php-format
 msgid "Managing preferences for %s (%s)."
-msgstr "Gestão de preferências para %s (%s)."
+msgstr "Preferências de gestão para %s (%s)."
 
 #: templates/preferences.php:313
-#, fuzzy
 msgid "Request all information on record be removed."
 msgstr "Peço que todas as informações dos registos sejam removidas."
 
 #: templates/preferences.php:339
-#, fuzzy, php-format
+#, php-format
 msgid "Your email address %s has just been unsubscribed."
 msgstr "Seu endereço de e-mail %s acaba de ser cancelado."
 
 #: templates/preferences.php:340
-#, fuzzy
 msgid ""
 "Further interactions with our site may be interpreted as re-subscribing to "
 "our list and will result in further electronic communication."
 msgstr ""
-"Interacções adicionais com o nosso site podem ser interpretadas como uma "
-"nova inscrição na nossa lista e resultarão em mais comunicação electrónica."
+"Interações adicionais com o nosso site podem ser interpretadas como uma nova "
+"inscrição na nossa lista e resultarão em mais comunicação eletrônica."
 
 #: templates/preferences.php:342 templates/preferences.php:365
 #: templates/preferences.php:397
@@ -7966,12 +7548,12 @@ msgid "Return to %s"
 msgstr "Voltar para %s"
 
 #: templates/preferences.php:362
-#, fuzzy, php-format
+#, php-format
 msgid "Your email address %s has just been confirmed!"
 msgstr "O seu endereço de e-mail %s acaba de ser confirmado!"
 
 #: templates/preferences.php:363
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "You will now receive electronic communication from %1$s. Should you wish to "
 "change your communication preferences you may do so at any time by clicking "
@@ -7980,30 +7562,26 @@ msgid ""
 msgstr ""
 "Agora você receberá comunicação eletrônica de %1$s. Se desejar alterar as "
 "suas preferências de comunicação, pode fazê-lo a qualquer momento, clicando "
-"no link <b>Gerir Preferências</b> ou <b>Cancelar Subscrição</b> no rodapé de "
+"no link <b>Gerir Preferências</b> ou <b>Cancelar Assinatura</b> no rodapé de "
 "qualquer e-mail enviado por %1$s."
 
 #: templates/preferences.php:390
-#, fuzzy
 msgid "Erased"
 msgstr "Apagado"
 
 #: templates/preferences.php:394
-#, fuzzy
 msgid "Your data has been erased!"
 msgstr "Os seus dados foram apagados!"
 
 #: templates/preferences.php:395
-#, fuzzy
 msgid ""
 "Further interactions with our site may be interpreted as re-subscribing to "
 "our list and will result in further communication."
 msgstr ""
-"Interacções adicionais com o nosso site podem ser interpretadas como uma "
-"nova inscrição na nossa lista e resultarão em mais comunicação."
+"Interações adicionais com o nosso site podem ser interpretadas como uma nova "
+"inscrição na nossa lista e resultarão em mais comunicação."
 
 #. Plugin URI of the plugin/theme
-#, fuzzy
 msgid ""
 "https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=plugin-"
 "uri&utm_medium=wp-dash"
@@ -8020,7 +7598,6 @@ msgid "Groundhogg Inc."
 msgstr "Groundhogg Inc."
 
 #. Author URI of the plugin/theme
-#, fuzzy
 msgid ""
 "https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-"
 "uri&utm_medium=wp-dash"

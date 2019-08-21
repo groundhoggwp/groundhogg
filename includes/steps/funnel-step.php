@@ -678,7 +678,7 @@ abstract class Funnel_Step extends Supports_Errors
 	                'title'     => __( 'Add Step' ),
 	                'text'      => dashicon( 'plus' ),
 	                'footer_button_text' => __( 'Cancel' ),
-	                'class'     => 'add-step button button-secondary',
+	                'class'     => 'add-step button button-secondary no-padding',
 	                'source'    => 'steps',
 	                'height'    => 700,
 	                'width'     => 500,
