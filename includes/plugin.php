@@ -129,6 +129,11 @@ class Plugin {
     public $sending_service;
 
     /**
+     * @var Proxy_Service
+     */
+    public $proxy_service;
+
+    /**
      * @var Stats_Collection
      */
     public $stats_collection;
@@ -300,8 +305,9 @@ class Plugin {
         $this->bulk_jobs    = new Bulk_Job_Manager();
         $this->reporting    = new Reporting();
 
-        $this->bounce_checker = new Bounce_Checker();
-        $this->sending_service = new Sending_Service();
+        $this->bounce_checker   = new Bounce_Checker();
+        $this->sending_service  = new Sending_Service();
+        $this->proxy_service    = new Proxy_Service();
         $this->stats_collection = new Stats_Collection();
 
         $this->event_queue  = new Event_Queue();

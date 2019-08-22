@@ -1988,3 +1988,69 @@ function is_main_blog()
 
     return get_main_blog_id() === get_current_blog_id();
 }
+
+/**
+ * Remote post json content
+ * Glorified wp_remote_post wrapper
+ *
+ * @param string $url
+ * @param array $body
+ * @param string $method
+ * @param array $headers
+ * @return array|bool|WP_Error
+ */
+function remote_post_json( $url='', $body=[], $method='POST', $headers=[] )
+{
+    $method = strtoupper( $method );
+
+    if ( ! isset_not_empty( $headers, 'Content-type' ) ){
+        $headers[ 'Content-type' ] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
+    }
+
+    $body = is_array( $body ) ? wp_json_encode( $body ) : $body;
+
+    $args = [
+        'method'        => $method,
+        'headers'       => $headers,
+        'body'          => $body,
+        'data_format'   => 'body',
+        'sslverify'     => true
+    ];
+
+    if ( $method === 'GET' ){
+        $response = wp_remote_get( $url, $args );
+    } else {
+        $response = wp_remote_post( $url, $args );
+    }
+
+    if ( ! $response ){
+        return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), $response );
+    }
+
+    if ( is_wp_error( $response ) ){
+        return $response;
+    }
+
+    $json = json_decode( wp_remote_retrieve_body( $response ) );
+
+    if ( ! $json ){
+        return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), wp_remote_retrieve_body( $response )  );
+    }
+
+    if ( is_json_error( $json ) ){
+        $error = get_json_error( $json );
+
+        $data = (array) $error->get_error_data();
+
+        $data[ 'url' ] = $url;
+        $data[ 'method' ] = $method;
+        $data[ 'headers' ] = $headers;
+        $data[ 'body' ] = json_decode( $body );
+
+        $error->add_data( $data );
+
+        return $error;
+    }
+
+    return $json;
+}
