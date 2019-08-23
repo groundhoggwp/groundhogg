@@ -4,7 +4,9 @@ namespace Groundhogg\Admin\Broadcasts;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
+use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
+use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_url;
 use Groundhogg\Plugin;
 use function Groundhogg\scheduled_time;
@@ -113,7 +115,7 @@ class Broadcasts_Table extends WP_List_Table {
 
     protected function get_view()
     {
-        return ( isset( $_GET['status'] ) )? $_GET['status'] : 'scheduled';
+        return get_url_var( 'status', 'scheduled' );
     }
 
     /**
@@ -374,45 +376,47 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @uses $this->set_pagination_args()
 	 */
 	function prepare_items() {
-		/*
-		 * First, lets decide how many records per page to show
-		 */
-		$per_page = 20;
+        $columns  = $this->get_columns();
+        $hidden   = array(); // No hidden columns
+        $sortable = $this->get_sortable_columns();
 
-		$columns  = $this->get_columns();
-		$hidden   = array();
-		$sortable = $this->get_sortable_columns();
+        $this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$this->_column_headers = array( $columns, $hidden, $sortable );
+        $per_page = absint( get_url_var( 'limit', 20 ) );
+        $paged   = $this->get_pagenum();
+        $offset  = $per_page * ( $paged - 1 );
+        $search  = get_url_var( 's' );
+        $order   = get_url_var( 'order', 'DESC' );
+        $orderby = get_url_var( 'orderby', 'ID' );
 
-        $query = get_request_query();
+        $where = [
+            'relationship' => "AND",
+            [ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
+        ];
 
-        if ( empty( $query ) ){
-            $query = [
-                'status' => 'scheduled'
-            ];
-        }
+        $args = array(
+            'where'   => $where,
+            'search'  => $search,
+            'limit'   => $per_page,
+            'offset'  => $offset,
+            'order'   => $order,
+            'orderby' => $orderby,
+        );
 
-        $data = Plugin::$instance->dbs->get_db('broadcasts')->query( $query );
+        $events = get_db( 'funnels' )->query( $args );
+        $total = get_db( 'funnels' )->count( $args );
 
-        usort( $data, array( $this, 'usort_reorder' ) );
+        $this->items = $events;
 
-		$current_page = $this->get_pagenum();
+        // Add condition to be sure we don't divide by zero.
+        // If $this->per_page is 0, then set total pages to 1.
+        $total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
 
-		$total_items = count( $data );
-
-		$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
-
-		$this->items = $data;
-
-		/**
-		 * REQUIRED. We also have to register our pagination options & calculations.
-		 */
-		$this->set_pagination_args( array(
-			'total_items' => $total_items,                     // WE have to calculate the total number of items.
-			'per_page'    => $per_page,                        // WE have to determine how many items to show on a page.
-			'total_pages' => ceil( $total_items / $per_page ), // WE have to calculate the total number of pages.
-		) );
+        $this->set_pagination_args( array(
+            'total_items' => $total,
+            'per_page'    => $per_page,
+            'total_pages' => $total_pages,
+        ) );
 	}
 
 	/**

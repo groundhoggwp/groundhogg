@@ -2,7 +2,9 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Email;
+use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
+use function Groundhogg\get_url_var;
 use Groundhogg\Plugin;
 use WP_List_Table;
 
@@ -118,7 +120,7 @@ class Emails_Table extends WP_List_Table {
 
     protected function get_view()
     {
-        return ( isset( $_GET['status'] ) )? $_GET['status'] : 'all';
+        return get_url_var( 'status', [ 'ready', 'draft' ] );
     }
 
     /**
@@ -340,78 +342,46 @@ class Emails_Table extends WP_List_Table {
 	 */
 	function prepare_items() {
 
-        /*
-		 * First, lets decide how many records per page to show
-		 */
-		$per_page = 20;
+        $columns  = $this->get_columns();
+        $hidden   = array(); // No hidden columns
+        $sortable = $this->get_sortable_columns();
 
-		$columns  = $this->get_columns();
-		$hidden   = array();
-		$sortable = $this->get_sortable_columns();
+        $this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$this->_column_headers = array( $columns, $hidden, $sortable );
+        $per_page = absint( get_url_var( 'limit', 20 ) );
+        $paged   = $this->get_pagenum();
+        $offset  = $per_page * ( $paged - 1 );
+        $search  = get_url_var( 's' );
+        $order   = get_url_var( 'order', 'DESC' );
+        $orderby = get_url_var( 'orderby', 'ID' );
 
-        $query = get_request_query( [ 'status' => [ 'draft', 'ready' ] ] );
+        $where = [
+            'relationship' => "AND",
+            [ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
+        ];
 
-        $data = Plugin::$instance->dbs->get_db('emails' )->query( $query ); //todo check
+        $args = array(
+            'where'   => $where,
+            'search'  => $search,
+            'limit'   => $per_page,
+            'offset'  => $offset,
+            'order'   => $order,
+            'orderby' => $orderby,
+        );
 
-		/*
-		 * Sort the data
-		 */
-		usort( $data, array( $this, 'usort_reorder' ) );
+        $events = get_db( 'emails' )->query( $args );
+        $total = get_db( 'emails' )->count( $args );
 
+        $this->items = $events;
 
-		/*
-		 * REQUIRED for pagination. Let's figure out what page the user is currently
-		 * looking at. We'll need this later, so you should always include it in
-		 * your own package classes.
-		 */
-		$current_page = $this->get_pagenum();
-		/*
-		 * REQUIRED for pagination. Let's check how many items are in our data array.
-		 * In real-world use, this would be the total number of items in your database,
-		 * without filtering. We'll need this later, so you should always include it
-		 * in your own package classes.
-		 */
-		$total_items = count( $data );
-		/*
-		 * The WP_List_Table class does not handle pagination for us, so we need
-		 * to ensure that the data is trimmed to only the current page. We can use
-		 * array_slice() to do that.
-		 */
-		$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
-		/*
-		 * REQUIRED. Now we can add our *sorted* data to the items property, where
-		 * it can be used by the rest of the class.
-		 */
-		$this->items = $data;
-		/**
-		 * REQUIRED. We also have to register our pagination options & calculations.
-		 */
-		$this->set_pagination_args( array(
-			'total_items' => $total_items,                     // WE have to calculate the total number of items.
-			'per_page'    => $per_page,                        // WE have to determine how many items to show on a page.
-			'total_pages' => ceil( $total_items / $per_page ), // WE have to calculate the total number of pages.
-		) );
-	}
+        // Add condition to be sure we don't divide by zero.
+        // If $this->per_page is 0, then set total pages to 1.
+        $total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
 
-	/**
-	 * Callback to allow sorting of example data.
-	 *
-	 * @param string $a First value.
-	 * @param string $b Second value.
-	 *
-	 * @return int
-	 */
-	protected function usort_reorder( $a, $b ) {
-        $a = (array) $a;
-        $b = (array) $b;
-		// If no sort, default to title.
-		$orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'ID'; // WPCS: Input var ok.
-		// If no order, default to asc.
-		$order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
-		// Determine sort order.
-		$result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
-		return ( 'desc' === $order ) ? $result : - $result;
+        $this->set_pagination_args( array(
+            'total_items' => $total,
+            'per_page'    => $per_page,
+            'total_pages' => $total_pages,
+        ) );
 	}
 }

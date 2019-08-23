@@ -656,11 +656,27 @@ abstract class DB {
             'orderby' => $this->get_primary_key(),
             'order' => 'desc', // ASC || DESC
             'select' => '*',
+            'search' => false,
             'func' => false, // COUNT | AVG | SUM
         ] );
 
         // Build Where Statement
         $where = get_array_var( $query_vars, 'where', [] );
+
+        if ( $query_vars[ 'search' ] ) {
+
+            $search = ['relationship' => 'OR'];
+
+            foreach ($this->get_columns() as $column => $type) {
+                if ($type === '%s') {
+                    $search[] = ['col' => $column, 'val' => $query_vars['search'], 'compare' => 'RLIKE'];
+                }
+            }
+
+            $where[] = $search;
+
+        }
+
         $where = empty( $where ) ? '1=1' : $this->build_advanced_where_statement( $where );
         if ( empty( $where ) ){
             $where = '1=1';
@@ -695,6 +711,12 @@ abstract class DB {
 
         $sql = "SELECT {$select} FROM {$this->get_table_name()} WHERE $clauses";
 
+        $hash = md5( $sql );
+
+        if ( $cached_results = get_array_var( self::$cache, $hash ) ){
+            return $cached_results;
+        }
+
         $func = strtolower( $query_vars[ 'func' ] );
 
         switch ( $func ){
@@ -708,10 +730,8 @@ abstract class DB {
                 break;
         }
 
-//        var_dump( $wpdb->last_error );
-
         $results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
-
+        self::$cache[ $hash ] = $results;
         return $results;
     }
 

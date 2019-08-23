@@ -148,7 +148,7 @@ function get_post_var( $key='', $default=false )
  */
 function get_url_var( $key='', $default=false )
 {
-    return urldecode( get_array_var( $_GET, $key, $default ) );
+    return map_deep( get_array_var( $_GET, $key, $default ), 'urldecode' );
 }
 
 /**
