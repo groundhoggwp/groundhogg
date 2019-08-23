@@ -165,30 +165,61 @@ $funnel = new Funnel($funnel_id);
         <?php Plugin::$instance->notices->print_notices(); ?>
 
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
-            <div id="postbox-container-1" class="postbox-container sidebar ui-sortable">
-                <?php foreach ($funnel->get_steps() as $step): ?>
-                    <?php $step->sortable_item(); ?>
-                <?php endforeach; ?>
+            <div id="postbox-container-1" class="postbox-container sidebar">
+                <div id="step-sortable" class=" ui-sortable">
+                    <?php foreach ($funnel->get_steps() as $step): ?>
+                        <?php $step->sortable_item(); ?>
+                    <?php endforeach; ?>
+                </div>
+                <div class="add-step-bottom-wrap">
+                    <?php
+                    echo html()->modal_link( [
+                        'title'     => __( 'Add Step', 'groundhogg' ),
+                        'text'      => __( 'Add Step', 'groundhogg' ),
+                        'footer_button_text' => __( 'Cancel' ),
+                        'class'     => 'add-step button button-secondary no-padding',
+                        'source'    => 'steps',
+                        'height'    => 700,
+                        'width'     => 500,
+                        'footer'    => 'true',
+                        'preventSave'    => 'true',
+                    ] );
+                    ?>
+                </div>
             </div>
             <div id="postbox-container-2" class="postbox-container">
                 <div style="width: 100%" id="reporting-wrap">
-                    <?php include_once dirname(__FILE__) . '/reporting.php';
-
-                    ?>
+                    <?php include_once dirname(__FILE__) . '/reporting.php'; ?>
                     <div class="reporting-view-wrap">
                         <?php
+
+                        $chart_data = Plugin::$instance->admin->get_page( 'funnels' )->get_chart_data();
+
+                        $rows = [];
+
+                        if ( ! empty( $chart_data ) ){
+                            $complete = $chart_data[0][ 'data' ];
+                            $waiting = $chart_data[1][ 'data' ];
+
+                            foreach ( $complete as $i => $data ){
+
+                                $rows[] = [
+                                    $data[ 0 ],
+                                    html()->e( 'a', [ 'href' => $data[ 2 ] ], $data[ 1 ], false ),
+                                    html()->e( 'a', [ 'href' => $waiting[ $i ][ 2 ] ], $waiting[ $i ][ 1 ], false ),
+                                ];
+
+                            }
+                        }
+
+
 
                         html()->list_table( [], [
                             __( 'Step', 'groundhogg' ),
                             __( 'Complete', 'groundhogg' ),
                             __( 'Waiting', 'groundhogg' )
                         ],
-                            [
-                                [1,2,3],
-                                [1,2,3],
-                                [1,2,3],
-                                [1,2,3],
-                            ]
+                            $rows
                         );
 
                         ?>
@@ -223,17 +254,22 @@ $funnel = new Funnel($funnel_id);
     </div>
 </form>
 <?php if ( $step_active ): ?>
-<script>jQuery('html').removeClass( 'active-step' );</script>
+<script>jQuery('html').addClass( 'active-step' );</script>
 <?php endif; ?>
 <div class="hidden" id="steps">
     <div class="steps-select">
+        <?php
+
+        html()->tabs( [
+            'benchmarks-tab'    => __( 'Benchmarks', 'groundhogg' ),
+            'actions-tab'       => __( 'Actions', 'groundhogg' )
+        ], 'benchmarks-tab' );
+
+        ?>
         <div id='benchmarks'>
             <?php echo html()->help_icon('https://docs.groundhogg.io/docs/builder/benchmarks/'); ?>
-            <div class="step-select-header">
-                <h2><?php echo __('Benchmarks', 'groundhogg'); ?></h2>
-                <p><?php echo esc_html__('Benchmarks start and stop automation steps for a contact.', 'groundhogg'); ?></p>
-            </div>
             <div class="elements-inner inside">
+                <p class="description"><?php echo esc_html__('Benchmarks start and stop automation steps for a contact.', 'groundhogg'); ?></p>
                 <table>
                     <tbody>
                     <tr><?php
@@ -264,13 +300,10 @@ $funnel = new Funnel($funnel_id);
                 </table>
             </div>
         </div>
-        <div id='actions'>
+        <div id='actions' class="hidden">
             <?php echo html()->help_icon('https://docs.groundhogg.io/docs/builder/actions/'); ?>
-            <div class="step-select-header">
-                <h2 class="hndle"><?php echo __('Actions', 'groundhogg'); ?></h2>
-                <p><?php esc_html_e('Actions are launched whenever a contact completes a benchmark.', 'groundhogg'); ?></p>
-            </div>
             <div class="inside">
+                <p class="description"><?php esc_html_e('Actions are launched whenever a contact completes a benchmark.', 'groundhogg'); ?></p>
                 <table>
                     <tbody>
                     <tr><?php
@@ -299,11 +332,39 @@ $funnel = new Funnel($funnel_id);
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
     <!-- End Action Icons-->
 </div>
+<script>
+    jQuery(function ($) {
+
+        var $benchmarks = $( '#benchmarks' );
+        var $actions =  $( '#actions' );
+        var $tabs = $( '.nav-tab' );
+
+        $( '#actions-tab' ).on( 'click', function (e) {
+            e.preventDefault();
+
+            $tabs.removeClass( 'nav-tab-active' );
+            $(this).addClass( 'nav-tab-active' );
+
+            $benchmarks.addClass( 'hidden' );
+            $actions.removeClass( 'hidden' );
+        } );
+
+        $( '#benchmarks-tab' ).on( 'click', function (e) {
+            e.preventDefault();
+
+            $tabs.removeClass( 'nav-tab-active' );
+            $(this).addClass( 'nav-tab-active' );
+
+            $actions.addClass( 'hidden' );
+            $benchmarks.removeClass( 'hidden' );
+        } );
+
+    });
+</script>
 <div class="hidden" id="add-contact-modal" style="display: none;">
     <form method="post">
         <?php wp_nonce_field(); ?>

@@ -135,7 +135,7 @@ class Admin_Notification extends Action
         $this->add_control( 'note_text', [
             'label'         => __( 'Content:', 'groundhogg' ),
             'type'          => HTML::TEXTAREA,
-            'default'       => "Please follow up with {full_name} soon.\nEmail: {email}]\nPhone: {phone}",
+            'default'       => "Please follow up with {full_name} soon.\nEmail: {email}\nPhone: {phone}",
             'description'   => __( 'Use any valid replacement codes.', 'groundhogg' ),
             'field'         => [
                 'cols'  => 64,

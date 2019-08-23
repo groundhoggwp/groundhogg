@@ -622,17 +622,17 @@ class Contact extends Base_Object_With_Meta
             $time = time();
         }
 
-        $time_zone  = $this->get_time_zone();
-        $ip_address = $this->get_ip_address();
+        $time_zone = $this->get_time_zone();
 
-        if ( ! $time_zone && $ip_address ){
-           $this->extrapolate_location();
-        }
-
-        try {
-            $local_time = Plugin::$instance->utils->date_time->convert_to_foreign_time( $time, $time_zone );
-        } catch ( \Exception $e ){
-            $local_time = $time;
+        if ( $time_zone ){
+            try {
+                $local_time = Plugin::$instance->utils->date_time->convert_to_foreign_time( $time, $time_zone );
+            } catch ( \Exception $e ){
+                $local_time = $time;
+            }
+        } else {
+            // If no timezone specified assume local time of site
+            $local_time = Plugin::$instance->utils->date_time->convert_to_local_time( $time );
         }
 
         return $local_time;

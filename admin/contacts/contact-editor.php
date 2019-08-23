@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Contacts;
 
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_form_list;
 use function Groundhogg\get_request_var;
@@ -92,7 +93,7 @@ $active_tab = isset( $_POST[ 'active_tab' ] ) && ! empty( $_POST[ 'active_tab' ]
 ?>
 <div class="local-time" style="float: right; padding: 10px;font-size: 18px;">
     <?php _ex( 'Local Time:', 'groundhogg' );?>
-    <span style="font-family: Georgia, Times New Roman, Bitstream Charter, Times, serif;font-weight: 400;"><?php echo date_i18n( "D, F d h:i A", $contact->get_local_time() ); ?>
+    <span style="font-family: Georgia, Times New Roman, Bitstream Charter, Times, serif;font-weight: 400;"><?php echo date_i18n( get_date_time_format(), $contact->get_local_time() ); ?>
         </span>
 </div>
 

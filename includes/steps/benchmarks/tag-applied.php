@@ -85,7 +85,7 @@ class Tag_Applied extends Benchmark
             'name' => $this->setting_name_prefix( 'condition' ),
             'selected' => $this->get_setting( 'condition', 'any' ),
             'option_none' => false,
-            'attributes' => 'style="vertical-align:middle;"',
+            'style' => [ 'vertical-align' => 'middle' ],
             'options' =>
                 [
                     'any' => __( 'any' ),

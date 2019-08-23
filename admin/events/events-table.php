@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Event;
+use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
@@ -171,10 +172,10 @@ class Events_Table extends WP_List_Table {
 
         $time = scheduled_time( $event->get_time() );
 
-        $html = $time_prefix . '&nbsp;<abbr title="' . date_i18n( DATE_ISO8601, intval( $event->get_time() ) ) . '">' . $time . '</abbr>';
+        $html = $time_prefix . '&nbsp;<abbr title="' . date_i18n( get_date_time_format(), intval( $event->get_time() ) ) . '">' . $time . '</abbr>';
 
         if ( $event->get_contact() && $event->get_contact()->exists() ){
-            $html .= sprintf( '<br><i>(%s %s)', date_i18n( 'h:i A', $event->get_contact()->get_local_time( $event->get_time() ) ), __( 'local time' ) ) . '</i>';
+            $html .= sprintf( '<br><i>(%s %s)', date_i18n( get_option( 'time_format' ), $event->get_contact()->get_local_time( $event->get_time() ) ), __( 'local time' ) ) . '</i>';
         }
 
         return $html;

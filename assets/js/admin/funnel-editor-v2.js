@@ -6,7 +6,7 @@
         reportData: null,
 
         getSteps: function(){
-            return $( '#postbox-container-1' );
+            return $( '#step-sortable' );
         },
 
         getSettings: function() {
@@ -229,7 +229,15 @@
             var $settings = self.getSettings();
             showSpinner();
             adminAjaxRequest( obj, function ( response ) {
-                $steps.find('.replace-me').replaceWith( response.data.data.sortable );
+
+                var $replaceable = $steps.find('.replace-me');
+
+                if ( $replaceable.length > 0 ){
+                    $replaceable.replaceWith( response.data.data.sortable );
+                } else {
+                    $steps.append( response.data.data.sortable )
+                }
+
                 $settings.append( response.data.data.settings );
                 self.makeActive( response.data.data.id );
                 modal.close();

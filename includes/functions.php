@@ -1693,7 +1693,7 @@ function scheduled_time( $time )
     $time_diff = $p_time - $cur_time;
 
     if (  absint( $time_diff ) > DAY_IN_SECONDS  ){
-        $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( 'jS F, Y \@ h:i A', intval( $p_time )  ) );
+        $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( get_date_time_format(), intval( $p_time )  ) );
     } else {
         $format = $time_diff <= 0 ? _x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
         $time = sprintf( $format, human_time_diff( $p_time, $cur_time ) );
@@ -2053,4 +2053,14 @@ function remote_post_json( $url='', $body=[], $method='POST', $headers=[] )
     }
 
     return $json;
+}
+
+/**
+ * Returns the full format of dat time based on WP settings.
+ *
+ * @return string
+ */
+function get_date_time_format()
+{
+    return sprintf( "%s %s", get_option( 'date_format' ), get_option( 'time_format' ) );
 }

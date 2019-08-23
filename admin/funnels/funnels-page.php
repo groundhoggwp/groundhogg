@@ -620,8 +620,24 @@ class Funnels_Page extends Admin_Page
         return $html;
     }
 
+    /**
+     * Chart Data
+     *
+     * @var array
+     */
+    protected $chart_data = [];
+
+    /**
+     * The chart data
+     *
+     * @return array
+     */
     public function get_chart_data()
     {
+        if ( ! empty( $this->chart_data ) ){
+            return $this->chart_data;
+        }
+
         $funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
         $steps = $funnel->get_steps();
 
@@ -644,7 +660,9 @@ class Funnels_Page extends Admin_Page
 
             $count = count($query->query($args));
 
-            $dataset1[] = array( ( $i + 1 ) .'. '. $step->get_title(), $count );
+            $url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
+
+            $dataset1[] = array( ( $i + 1 ) .'. '. $step->get_title(), $count, $url );
 
             $args = array(
                 'report' => array(
@@ -656,18 +674,23 @@ class Funnels_Page extends Admin_Page
 
             $count = count($query->query($args));
 
-            $dataset2[] = array( ( $i + 1 ) .'. '. $step->get_title(), $count );
+            $url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
+
+            $dataset2[] = array( ( $i + 1 ) .'. '. $step->get_title(), $count, $url );
 
         }
 
         $ds[] = array(
             'label' => _x( 'Completed Events', 'stats', 'groundhogg' ),
             'data'  => $dataset1
-        ) ;
+        );
+
         $ds[] = array(
             'label' => __( 'Waiting Contacts', 'stats', 'groundhogg' ),
             'data'  => $dataset2
-        ) ;
+        );
+
+        $this->chart_data = $ds;
 
         return $ds;
     }
