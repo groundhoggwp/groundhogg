@@ -119,6 +119,14 @@ abstract class DB {
     /**
      * @return string
      */
+    public function get_id_key()
+    {
+        return 'ID';
+    }
+
+    /**
+     * @return string
+     */
     public function get_date_key()
     {
         return 'date_created';
@@ -606,6 +614,196 @@ abstract class DB {
     protected static $cache = [];
 
     /**
+     * @return array
+     */
+    public function get_allowed_columns()
+    {
+        return array_keys( $this->get_columns() );
+    }
+
+    public function get_allowed_comparisons()
+    {
+        return [
+            '=',
+            '!=',
+            '>',
+            '>=',
+            '<',
+            '<=',
+            '<>',
+            'LIKE',
+            'RLIKE',
+            'IN',
+        ];
+    }
+
+    /**
+     * New and improved query function to access DB in more complex and interesting ways.
+     *
+     * @param array $query_vars
+     * @return object[]|array[]|int
+     */
+    public function advanced_query( $query_vars=[] )
+    {
+
+        global $wpdb;
+
+        // Actual start
+        $query_vars = wp_parse_args( $query_vars, [
+            'where' => [],
+            'limit' => false,
+            'offest' => false,
+            'orderby' => $this->get_primary_key(),
+            'order' => 'desc', // ASC || DESC
+            'select' => '*',
+            'func' => false, // COUNT | AVG | SUM
+        ] );
+
+        // Build Where Statement
+        $where = get_array_var( $query_vars, 'where', [] );
+        $where = empty( $where ) ? '1=1' : $this->build_advanced_where_statement( $where );
+        if ( empty( $where ) ){
+            $where = '1=1';
+        }
+
+        // Build SELECT statement
+        $select = get_array_var( $query_vars, 'select', '*' );
+
+        if ( is_array( $select ) ){
+            $select = array_intersect( $select, $this->get_allowed_columns() );
+            $select = implode( ',', $select );
+        }
+
+        if ( $query_vars[ 'func'] ){
+            $select = sprintf( '%s(%s)', strtoupper( $query_vars[ 'func' ] ), $select );
+        }
+
+        $limit = $query_vars[ 'limit' ] ? sprintf( 'LIMIT %d', absint( $query_vars[ 'limit' ] ) ) : '';
+        $offset = $query_vars[ 'offset' ] ? sprintf( 'OFFSET %d', absint( $query_vars[ 'offset' ] ) ) : '';
+        $orderby = $query_vars[ 'orderby' ] && in_array( $query_vars[ 'orderby' ], $this->get_allowed_columns() ) ? sprintf( 'ORDER BY %s', $query_vars[ 'orderby' ] ) : '';
+        $order = $query_vars[ 'order' ] ? strtoupper( $query_vars[ 'order' ] ) : '';
+
+        $clauses = [
+            'where' => $where,
+            'orderby' => $orderby,
+            'order' => $order,
+            'limit' => $limit,
+            'offset' => $offset,
+        ];
+
+        $clauses = implode( ' ', array_filter( $clauses ) );
+
+        $sql = "SELECT {$select} FROM {$this->get_table_name()} WHERE $clauses";
+
+        $func = strtolower( $query_vars[ 'func' ] );
+
+        switch ( $func ){
+            case 'count':
+            case 'sum':
+            case 'avg':
+                $results = $wpdb->get_var( $sql );
+                break;
+            default:
+                $results = $wpdb->get_results( $sql );
+                break;
+        }
+
+//        var_dump( $wpdb->last_error );
+
+        $results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
+
+        return $results;
+    }
+
+    /**
+     * Allowes
+     *
+     * @return array
+     */
+    public function get_allowed_relationships()
+    {
+       return [ 'AND', 'OR' ];
+    }
+
+    /**
+     * Build the wherre clause statement using the new structure. Recursive
+     *
+     * @param $where array
+     * @return string
+     */
+    public function build_advanced_where_statement( $where )
+    {
+        global $wpdb;
+
+        $where = wp_parse_args( $where, [
+            'relationship' => 'AND'
+        ] );
+
+        $relationship = in_array( $where[ 'relationship' ], $this->get_allowed_relationships() ) ? strtoupper( $where[ 'relationship' ] ) : 'AND';
+
+        unset( $where[ 'relationship' ] );
+
+        $clause = [];
+
+        foreach ( $where as $condition ){
+
+            if ( isset_not_empty( $condition, 'relationship' ) ){
+
+                $clause[] = $this->build_advanced_where_statement( $condition );
+
+            } else {
+
+                $condition = wp_parse_args( $condition, [
+                    'col' => '',
+                    'val' => '',
+                    'compare' => '='
+                ] );
+
+                if ( in_array( $condition[ 'col' ], $this->get_allowed_columns() ) && in_array( $condition[ 'compare' ], $this->get_allowed_comparisons() ) ){
+
+                    $value = $condition[ 'val' ];
+
+                    if ( is_array( $value ) ){
+                        $condition[ 'compare' ] = 'IN';
+                        $value = map_deep( $value, 'sanitize_text_field' );
+
+                        $value = map_deep( $value, function( $i ){
+
+                            $i = esc_sql( $i );
+
+                            if ( is_numeric( $i ) ){
+                                return absint( $i );
+                            } else if ( is_string( $i )) {
+                                return "'{$i}'";
+                            }
+
+                            return false;
+                        } );
+
+                        $value = sprintf( "(%s)", implode(',', $value ) );
+
+                        $clause[] = "{$condition[ 'col' ]} IN {$value}";
+
+                    } else {
+
+                        if ( is_numeric( $value ) ){
+                            $clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %d", $value );
+                        } else {
+                            $clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %s", $value );
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return implode( " {$relationship} ", $clause );
+    }
+
+    /**
      * @param array $data
      * @param string|false $ORDER_BY
      * @param bool $from_cache
@@ -613,99 +811,70 @@ abstract class DB {
      */
     public function query($data = [], $ORDER_BY='', $from_cache = true )
     {
-        // Check Cache
-        $cache_key = md5( sprintf( '%s|%s|%s|%s' , multi_implode( '|', array_keys( $data ) ), multi_implode( '|', array_values( $data ) ), $this->get_object_type(), $this->get_table_name() ) );
-
-        if ( isset_not_empty( self::$cache, $cache_key ) && $from_cache ){
-            return self::$cache[ $cache_key ];
+        if ( isset_not_empty( $data, 'where' ) ){
+            return $this->advanced_query( $data );
         }
 
-        global  $wpdb;
+        $query_vars = [];
+        $where = [ 'relationship' => 'AND' ];
 
-        if ( empty( $ORDER_BY ) ){
-            $ORDER_BY = $this->get_primary_key();
+        // Parse data and turn into an advanced query search instead
+        foreach ( $data as $key => $val ){
+
+            if ( empty( $val ) ){
+                continue;
+            }
+
+            switch ( $key ){
+                case 's':
+                case 'search':
+
+                    $search = [ 'relationship' => 'OR' ];
+
+                    foreach ( $this->get_columns() as $column => $type ){
+                        if ( $type === '%s' ){
+                            $search[] = [ 'col' => $column, 'val' => $val, 'compare' => 'RLIKE' ];
+                        }
+                    }
+
+                    $where[] = $search;
+
+                    break;
+                case 'before':
+                    $where[] = [ 'col' => $this->get_date_key(), 'val' => $val, 'compare' => '<=' ];
+                    break;
+                case 'after':
+                    $where[] = [ 'col' => $this->get_date_key(), 'val' => $val, 'compare' => '>=' ];
+                    break;
+                case 'count':
+                    $query_vars[ 'func' ] = 'count';
+                    break;
+                case 'LIMIT':
+                    $query_vars[ 'limit' ] = $val;
+                    break;
+                case 'ORDER_BY':
+                    $query_vars[ 'orderby' ] = $val;
+                    break;
+                default:
+                    if ( in_array( $key, $this->get_allowed_columns() ) ){
+                        $where[] = [ 'col' => $key, 'val' => $val, 'compare' => '=' ];
+                    }
+
+                    break;
+            }
+
         }
 
-        if ( ! is_array( $data ) )
-            return false;
-
-        $data = (array) $data;
-        $data = esc_sql( $data );
-
-        // Compat for limits and order_by
-        if ( isset_not_empty( $data, 'LIMIT' ) ){
-            $LIMIT = get_array_var( $data, 'LIMIT', 99999 );
-            unset( $data[ 'LIMIT' ] );
+        if ( $ORDER_BY ){
+            $query_vars[ 'orderby' ] = $ORDER_BY;
         }
 
-        $ORDER_BY = get_array_var( $data, 'ORDER_BY', $ORDER_BY );
-        $ORDER = get_array_var( $data, 'ORDER', 'DESC' );
+        $query_vars[ 'where' ] = $where;
+        $query_vars[ 'order' ] = get_array_var( $data, 'order', 'DESC' );
 
-        $query = [];
+//        wp_send_json( $query_vars );
 
-        // Compat for search shorthand.
-        if ( isset_not_empty( $data, 's' ) ){
-            $data[ 'search' ] = $data[ 's' ];
-        }
-
-        if ( isset_not_empty( $data, 'search' ) ){
-            $query[] = sprintf( "(%s)", $this->generate_search( $data[ 'search' ] ) );
-        }
-
-        /* allow for special handling of time based search */
-        if ( isset_not_empty( $data, 'after' ) ){
-            $format = is_numeric( $data[ 'after' ] ) ? '%d' : "'%s'";
-            $query[] = sprintf( "`%s` >= $format", $this->get_date_key(), $data[ 'after' ] );
-        }
-
-        /* allow for special handling of time based search */
-        if (  isset_not_empty( $data, 'before' ) ){
-            $format = is_numeric( $data[ 'before' ] ) ? '%d' : "'%s'";
-            $query[] = sprintf( "`%s` <= $format", $this->get_date_key(), $data[ 'before' ] );
-        }
-
-        // Initialise column format array
-        $column_formats = $this->get_columns();
-
-        // Force fields to lower case
-        $data = array_change_key_case( $data );
-
-        // White list columns
-        $data = array_intersect_key( $data, $column_formats );
-
-        $where = $this->generate_where( $data );
-
-        if ( ! empty( $where ) ){
-            $query[] = $where;
-        }
-
-        $query = trim( implode( ' AND ', $query ), ' ' );
-
-        $clauses = [];
-
-        if ( ! empty( $query ) ){
-            $clauses[] = [ 'WHERE', $query ];
-        }
-
-        if ( isset( $ORDER_BY ) && ! empty( $ORDER_BY ) ){
-            $clauses[] = [ 'ORDER BY', '`' . $ORDER_BY . '` ' . $ORDER ];
-        }
-
-        if ( isset( $LIMIT ) && ! empty( $LIMIT ) ){
-            $clauses[] = [ 'LIMIT', $LIMIT ];
-        }
-
-        $sql = multi_implode( ' ', $clauses );
-
-        $sql = "SELECT * FROM $this->table_name $sql";
-
-        $results = $wpdb->get_results( $sql );
-
-        $results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results );
-
-        self::$cache[ $cache_key ] = $results;
-
-        return $results;
+        return $this->advanced_query( $query_vars );
     }
 
     /**
@@ -714,7 +883,17 @@ abstract class DB {
      */
     public function count( $args=[] )
     {
-        return count( $this->query( $args ) );
+        unset( $args['offset'] );
+        unset( $args['limit'] );
+        unset( $args['LIMIT'] );
+
+        if ( isset_not_empty( $args, 'where' ) ){
+            $args[ 'func' ] = 'count';
+        } else {
+            $args[ 'count' ] = true;
+        }
+
+        return $this->query( $args );
     }
 
 

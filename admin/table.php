@@ -4,6 +4,7 @@ namespace Groundhogg\Admin;
 use Groundhogg\DB\DB;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -177,63 +178,47 @@ abstract class Table extends \WP_List_Table
      */
     public function prepare_items()
     {
-        $per_page = $this->get_items_per_page( $this->get_table_id() );
-
         $columns  = $this->get_columns();
-
-        $hidden   = array();
-
+        $hidden   = array(); // No hidden columns
         $sortable = $this->get_sortable_columns();
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $query = $this->parse_query( get_request_query( $this->get_default_query() ) );
+        $data    = [];
+        $per_page = absint( get_url_var( 'limit', 30 ) );
+        $paged   = $this->get_pagenum();
+        $offset  = $per_page * ( $paged - 1 );
+        $search  = get_url_var( 's' );
+        $order   = get_url_var( 'order', 'DESC' );
+        $orderby = get_url_var( 'orderby', 'time' );
 
-        $data = $this->get_db()->query( $query );
+        $where = [
+            'relationship' => "AND",
+            [ 'col' => $this->view_param(), 'val' => $this->get_view(), 'compare' => '=' ],
+        ];
 
-        /*
-         * Sort the data
-         */
-        usort( $data, array( $this, 'usort_reorder' ) );
+        $args = array(
+            'where'   => $where,
+            'limit'   => $per_page,
+            'offset'  => $offset,
+            'order'   => $order,
+            'orderby' => $orderby,
+        );
 
-        $current_page = $this->get_pagenum();
+        $events = $this->get_db()->query( $args );
+        $total = $this->get_db()->count( $args );
 
-        $total_items = count( $data );
+        $this->items = $events;
 
-        $data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
-
-        $items = [];
-
-        foreach ( $data as $datum ){
-            $items[] = $this->parse_item( $datum );
-        }
-
-        $this->items = $items;
+        // Add condition to be sure we don't divide by zero.
+        // If $this->per_page is 0, then set total pages to 1.
+        $total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
 
         $this->set_pagination_args( array(
-            'total_items' => $total_items,
+            'total_items' => $total,
             'per_page'    => $per_page,
-            'total_pages' => ceil( $total_items / $per_page ),
+            'total_pages' => $total_pages,
         ) );
-    }
-
-    /**
-     * @param $a
-     * @param $b
-     * @return mixed
-     */
-    function usort_reorder( $a, $b ){
-
-        // If no sort, default to title.
-        $orderby = get_request_var( 'orderby', 'ID' );
-
-        // If no order, default to asc.
-        $order = get_request_var( 'orderby', 'asc' );
-
-        // Determine sort order.
-        $result = strnatcmp( $a->$orderby, $b->$orderby );
-
-        return ( 'desc' === $order ) ? $result : - $result;
     }
 
     /**

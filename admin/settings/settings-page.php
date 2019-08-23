@@ -179,18 +179,7 @@ class Settings_Page extends Admin_Page
     private function get_default_sections()
     {
 
-        $service  = [];
-
-        if ( ! is_white_labeled() ) {
-            $service = [
-                'id'    => 'bounces',
-                'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
-                'tab'   => 'email',
-                'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ], //todo
-            ];
-        }
-
-        return apply_filters( 'groundhogg/admin/settings/sections', array(
+        $sections = array(
             'business_info' => array(
                 'id'    => 'business_info',
                 'title' => _x( 'Business Settings', 'settings_sections', 'groundhogg' ),
@@ -221,7 +210,12 @@ class Settings_Page extends Admin_Page
                 'title' => _x( 'Overrides', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email'
             ],
-            'service' => $service,
+            'service' => [
+                'id'    => 'service',
+                'title' => _x( 'Groundhogg Sending Servoce', 'settings_sections', 'groundhogg' ),
+                'tab'   => 'email',
+                'callback' => [ Plugin::$instance->sending_service, 'test_connection_ui' ], //todo
+            ],
             'bounces' => array(
                 'id'    => 'bounces',
                 'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
@@ -238,7 +232,13 @@ class Settings_Page extends Admin_Page
                 'title' => _x( 'Optin Status Tags', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'tags'
             ],
-        ) );
+        );
+
+        if (  is_white_labeled() ) {
+            unset( $sections[ 'service' ] );
+        }
+
+        return apply_filters( 'groundhogg/admin/settings/sections', $sections );
     }
 
     /**
