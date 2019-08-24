@@ -147,6 +147,7 @@ html.full-screen{
     border: none;
 }
 
+#intro,
 #postbox-container-2 .step {
     max-width: 800px;
 }
@@ -505,7 +506,7 @@ table.embed-options td{
 
 .step-title {
     display: inline-block;
-    width: 200px;
+    /*width: 200px;*/
     padding-bottom: 5px;
     border-bottom: 1px solid #ddd;
     /*white-space: nowrap;*/

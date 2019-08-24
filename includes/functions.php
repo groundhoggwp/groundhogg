@@ -385,7 +385,10 @@ function dequeue_wc_css_compat()
  */
 function percentage( $a, $b )
 {
-    if ( $a === 0 ){
+    $a = intval( $a );
+    $b = intval( $b );
+
+    if ( ! $a ){
         return 0;
     }
 

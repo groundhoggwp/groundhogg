@@ -128,7 +128,7 @@ class Login_Status extends Benchmark
         $this->add_data(  'user_id', $user->ID );
         $contact = create_contact_from_user( $this->get_data( 'user_id' ) );
 
-        if ( is_wp_error( $contact ) || ! $contact ){
+        if ( ! $contact || is_wp_error( $contact ) ){
             return;
         }
 
