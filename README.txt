@@ -150,7 +150,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.0 (2019-08-27) =
+= 2.0.2 =
+* FIXED verbage in email for tracking optin.
+* TWEAKED HTML utils link picker class.
+
+= 2.0.1 (2019-08-27) =
 * See all new changes [here](https://www.groundhogg.io/new-in-2-0/).
 * USE Namespace, autoloader, and more goodies to improve code organization.
 
