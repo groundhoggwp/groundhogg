@@ -26,7 +26,7 @@ class Upgrade_Notice
 
         $message = sprintf(
             esc_html__('You are now using Groundhogg 2.0! We promise better usability, performance, efficiency and business happiness with the newest upgrades. %s', 'groundhogg'),
-            html()->e('a', ['class' => '', 'style' => ['color' => 'green'], 'href' => 'https://www.groundhogg.io/new-in-2-0', 'target' => '_blank'], __("What's new in 2.0?", 'groundhogg'))
+            html()->e('a', ['class' => '', 'style' => ['color' => 'green'], 'href' => 'https://www.groundhogg.io/new-in-2-0/', 'target' => '_blank'], __("What's new in 2.0?", 'groundhogg'))
         );
 
         $html_message = sprintf('<div class="upgrade-notice notice notice-info is-dismissible">%s</div>', wpautop($message));
@@ -38,7 +38,7 @@ class Upgrade_Notice
             (function ($) {
                 $(function () {
 
-                    $('.notice-dismiss').click(function (e) {
+                    $(document).on('click', '.notice-dismiss', function (e) {
 
                         var $notice = $(this).closest('.notice');
 

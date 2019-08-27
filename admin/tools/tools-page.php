@@ -167,6 +167,10 @@ class Tools_Page extends Tabbed_Admin_Page
             [
                 'name' => __( 'Bulk Delete Contacts' ),
                 'slug' => 'delete',
+            ],
+            [
+                'name' => __( 'Updates' ),
+                'slug' => 'updates'
             ]
         ];
 
@@ -535,6 +539,41 @@ class Tools_Page extends Tabbed_Admin_Page
 
         $this->add_notice( 'file_removed', __( 'Exports deleted.', 'groundhogg' ) );
         return admin_url( 'admin.php?page=gh_tools&action=add&tab=export' );
+    }
+
+    ####### UPDATES TAB FUNCTIONS #########
+
+    public function updates_view()
+    {
+        ?>
+        <div id="poststuff">
+            <div class="postbox">
+                <h2 class="hndle"><?php _e( 'Previous Updates', 'groundhogg' ); ?></h2>
+                <div class="inside">
+                    <p class="description"><?php _e( 'Run previous update paths in case of a failed update.', 'groundhogg' ); ?></p>
+                    <?php
+
+                    $updates = Plugin::$instance->updater->get_updates();
+
+                    foreach ( $updates as $update ):
+
+                        ?><p><?php
+
+                            echo html()->e( 'a', [ 'href' => add_query_arg( [
+                                'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
+                                'updater' => 'main',
+                                'manual_update' => $update
+                            ], $_SERVER[ 'REQUEST_URI' ] ) ], sprintf( __( 'Run update to version %s', 'groundhogg' ), $update ) )
+
+                        ?></p><?php
+
+                    endforeach;
+
+                    ?>
+                </div>
+            </div>
+        </div>
+        <?php
     }
 
     ####### DELETE TAB FUNCTIONS #########

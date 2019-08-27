@@ -20,6 +20,7 @@ abstract class Updater{
     public function __construct()
     {
         add_action( 'init', [ $this, 'do_updates' ], 99 ); // DO LAST
+        add_action( 'admin_init', [ $this, 'do_manual_updates' ], 99 ); // DO LAST
     }
 
     /**
@@ -35,6 +36,16 @@ abstract class Updater{
      * @return string[]
      */
     abstract protected function get_available_updates();
+
+    /**
+     * Get the updates
+     *
+     * @return string[]
+     */
+    public function get_updates()
+    {
+        return $this->get_available_updates();
+    }
 
     /**
      * Get the previous version which the plugin was updated to.
@@ -54,7 +65,11 @@ abstract class Updater{
     protected function remember_version_update( $version )
     {
         $versions = $this->get_previous_versions();
-        $versions[] = $version;
+
+        if ( ! in_array( $version, $versions ) ){
+            $versions[] = $version;
+        }
+
         Plugin::$instance->settings->update_option( $this->get_version_option_name(), $versions );
     }
 
@@ -66,6 +81,25 @@ abstract class Updater{
     protected function get_version_option_name()
     {
         return sanitize_key( sprintf( '%s_version_updates', $this->get_updater_name() ) );
+    }
+
+    /**
+     * Manually perform a selected update routine.
+     */
+    public function do_manual_updates()
+    {
+
+        if ( get_request_var( 'updater' ) !== $this->get_updater_name() || ! get_request_var( 'manual_update' ) || ! wp_verify_nonce( get_request_var( 'manual_update_nonce' ), 'gh_manual_update' ) || ! current_user_can( 'manage_plugins' ) ){
+            return;
+        }
+
+        $update = get_url_var( 'manual_update' );
+
+        if ( $this->update_to_version( $update ) ){
+            Plugin::$instance->notices->add( 'updated', __( 'Update successful!', 'groundhogg' ) );
+        } else {
+            Plugin::$instance->notices->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
+        }
     }
 
     /**
@@ -130,6 +164,10 @@ abstract class Updater{
             $this->remember_version_update( $version );
 
             do_action( "groundhogg/updater/{$this->get_updater_name()}/{$func}" );
+
+            return true;
         }
+
+        return false;
     }
 }
