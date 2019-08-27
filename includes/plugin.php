@@ -268,7 +268,7 @@ class Plugin {
          *
          * @since 1.0.0
          */
-        do_action( 'groundhogg/init' );
+        do_action( 'groundhogg/init/v2' );
     }
 
     /**

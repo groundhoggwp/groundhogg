@@ -57,8 +57,8 @@ abstract class Extension
 
             $this->register_autoloader();
 
-            if ( ! did_action( 'groundhogg/init' ) ){
-                add_action( 'groundhogg/init', [ $this, 'init' ] );
+            if ( ! did_action( 'groundhogg/init/v2' ) ){
+                add_action( 'groundhogg/init/v2', [ $this, 'init' ] );
             } else {
                 $this->init();
             }
