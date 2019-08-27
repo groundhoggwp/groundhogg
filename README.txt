@@ -150,9 +150,31 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.0 =
+= 2.0 (2019-08-27) =
 * See all new changes [here](https://www.groundhogg.io/new-in-2-0/).
 * USE Namespace, autoloader, and more goodies to improve code organization.
+
+= 1.3.11.13 =
+* FIXED bug that allowed the Create User step to add users to any subsite on a multisite.
+
+= 1.3.11.12 =
+* ADDED Preparation for upgrading to 2.0
+
+= 1.3.11.11 =
+
+* FIXED {id} not working
+* FIXED GDPR & Terms compliance being removed when updating a contact
+
+= 1.3.11.10 =
+* FIXED Altbody being included in plain text emails when using GH_SS_MAIL function.
+* FIXED Street Address 2 should not be required.
+
+= 1.3.11.9 =
+* ADDED {id} replacement code
+
+= 1.3.11.8 =
+* FIXED comptibility bug with plugins which include forms on all admin pages.
+* FIXED Plaintext emails being sent out with missing line breaks when using the Groundhogg sending service.
 
 = 1.3.7 =
 * ADDED extra nonce to frontend form impression checks to ensure request is intentional.
