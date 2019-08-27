@@ -9,18 +9,18 @@ class Upgrade_Notice
     public function __construct()
     {
 
-        add_action('admin_notices', [$this, 'show_upgrade_notice_request']);
+        add_action('admin_notices', [$this, 'show_upgrade_notice']);
         add_action('wp_ajax_groundhogg_dismiss_upgrade_notice', [$this, 'dismiss_upgrade_notice']);
 
     }
 
-    public function show_upgrade_notice_request()
+    public function show_upgrade_notice()
     {
         if (!current_user_can('administrator')) {
             return;
         }
 
-        if ( ! get_transient( 'groundhogg_upgrade_notice_request_active' ) ) {
+        if (!get_transient('groundhogg_upgrade_notice_request_active')) {
             return;
         }
 
