@@ -332,6 +332,8 @@ class Plugin {
             new Reviews();
             new Upgrade_Notice();
         }
+
+        new Extension_Updater();
     }
 
     /**

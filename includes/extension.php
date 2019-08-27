@@ -49,6 +49,13 @@ abstract class Extension
     public static $extensions = [];
 
     /**
+     * Keep a going array of the extension IDs which are available.
+     *
+     * @var int[]
+     */
+    public static $extension_ids = [];
+
+    /**
      * Extension constructor.
      */
     public function __construct()
@@ -66,6 +73,7 @@ abstract class Extension
 
         // Add to main list
         Extension::$extensions[] = $this;
+        Extension::$extension_ids[ $this->get_download_id() ] = $this->get_download_id();
     }
 
     /**
@@ -169,6 +177,8 @@ abstract class Extension
 
         add_filter( 'groundhogg/templates/emails', [ $this, 'register_email_templates' ] );
         add_filter( 'groundhogg/templates/funnels', [ $this, 'register_funnel_templates' ] );
+
+        $this->get_edd_updater();
     }
 
     /**

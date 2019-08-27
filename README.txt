@@ -150,6 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.3 =
+* ADDED class to allow for old versions of extensions to update.
+* FIXED EDD_Updater class not being initialized for 2.0 versions of extensions.
+
 = 2.0.2 =
 * FIXED verbage in email for tracking optin.
 * TWEAKED HTML utils link picker class.
