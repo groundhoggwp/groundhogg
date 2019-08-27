@@ -151,6 +151,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 == Changelog ==
 
 = 2.0 =
+* See all new changes [here](https://www.groundhogg.io/new-in-2-0/).
 * USE Namespace, autoloader, and more goodies to improve code organization.
 
 = 1.3.7 =
