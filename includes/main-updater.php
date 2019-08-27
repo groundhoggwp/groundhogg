@@ -70,7 +70,7 @@ class Main_Updater extends Updater {
 
         Plugin::$instance->utils->files->add_htaccess();
 
-        flush_rewrite_rules();
+        install_custom_rewrites();
     }
 
 }

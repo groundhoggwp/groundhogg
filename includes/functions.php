@@ -2067,3 +2067,15 @@ function get_date_time_format()
 {
     return sprintf( "%s %s", get_option( 'date_format' ), get_option( 'time_format' ) );
 }
+
+/**
+ * Add the new rewrite rules.
+ */
+function install_custom_rewrites()
+{
+    Plugin::$instance->tracking->add_rewrite_rules();
+    Plugin::$instance->rewrites->add_rewrite_rules();
+    Plugin::$instance->preferences->add_rewrite_rules();
+
+    flush_rewrite_rules();
+}

@@ -42,7 +42,7 @@ class Main_Installer extends Installer
             }
         }
 
-        flush_rewrite_rules();
+        install_custom_rewrites();
     }
 
     protected function deactivate()
