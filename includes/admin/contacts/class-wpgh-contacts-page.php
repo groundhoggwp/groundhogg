@@ -512,14 +512,36 @@ class WPGH_Contacts_Page
 
         do_action('wpgh_admin_update_contact_before', $id);
 
-        //todo security check
-
         /* Save the meta first... as actual fields might overwrite it later... */
         $cur_meta = WPGH()->contact_meta->get_meta($id);
 
         $exclude_meta_list = array(
+            'lead_source',
+            'source_page',
+            'page_source',
+            'terms_agreement',
+            'terms_agreement_date',
+            'gdpr_consent',
+            'gdpr_consent_date',
+            'primary_phone',
+            'primary_phone_extension',
+            'street_address_1',
+            'street_address_2',
+            'time_zone',
+            'city',
+            'postal_zip',
+            'region',
+            'country',
+            'notes',
             'files',
-            'notes'
+            'company_name',
+            'company_address',
+            'job_title',
+            'ip_address',
+            'last_optin',
+            'last_sent',
+            'country_name',
+            'region_code',
         );
 
         if (isset($_POST['meta'])) {

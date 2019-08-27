@@ -53,6 +53,11 @@ class WPGH_Replacements
 
         $replacements = array(
             array(
+                'code'        => 'id',
+                'callback'    => 'wpgh_replacement_id',
+                'description' => _x( 'The contact\'s ID number.', 'replacement', 'groundhogg' ),
+            ),
+            array(
                 'code'        => 'first',
                 'callback'    => 'wpgh_replacement_first_name',
                 'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
@@ -181,7 +186,7 @@ class WPGH_Replacements
                 'code'        => 'groundhogg_day_quote',
                 'callback'    => 'wpgh_get_random_groundhogday_quote',
                 'description' => _x( 'Inserts a random quote from the movie Groundhog Day featuring Bill Murray', 'replacement', 'groundhogg' ),
-            )
+            ),
         );
 
         $replacements = apply_filters( 'wpgh_replacement_defaults', $replacements );
@@ -420,9 +425,20 @@ function wpgh_replacement_meta( $arg, $contact_id )
  * @param $contact_id int the contact_id
  * @return string the first name
  */
+function wpgh_replacement_id( $contact_id )
+{
+    return $contact_id;
+}
+
+/**
+ * Return back the first name ot the contact.
+ *
+ * @param $contact_id int the contact_id
+ * @return string the first name
+ */
 function wpgh_replacement_first_name( $contact_id )
 {
-    return ucfirst( strtolower( WPGH()->contacts->get_column_by( 'first_name', 'ID', $contact_id ) ) );
+    return ucwords( strtolower( WPGH()->contacts->get_column_by( 'first_name', 'ID', $contact_id ) ) );
 }
 
 /**
@@ -433,7 +449,7 @@ function wpgh_replacement_first_name( $contact_id )
  */
 function wpgh_replacement_last_name( $contact_id )
 {
-    return ucfirst( strtolower( WPGH()->contacts->get_column_by( 'last_name', 'ID', $contact_id ) ) );
+    return ucwords( strtolower( WPGH()->contacts->get_column_by( 'last_name', 'ID', $contact_id ) ) );
 }
 
 /**

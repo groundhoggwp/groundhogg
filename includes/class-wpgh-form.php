@@ -645,7 +645,7 @@ class WPGH_Form
                     'id'            => $name_prefix . 'street_address_2',
                     'placeholder'   => 'Unit A',
                     'title'         => _x( 'Street Address 2', 'form_default', 'groundhogg' ),
-                    'required'      => $a[ 'required' ],
+                    'required'      => false,
                 )
             ) ) );
 

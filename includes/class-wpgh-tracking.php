@@ -673,7 +673,7 @@ class WPGH_Tracking
             //'timestamp'     => time(),
             'contact_id'    => $this->contact->ID,
             'funnel_id'     => ( $this->funnel )? $this->funnel->ID : WPGH_BROADCAST,
-            'step_id'       => $this->step->ID,
+            'step_id'       => absint( $this->step->ID ),
             'activity_type' => 'email_opened',
             'email_id'      => $this->email->ID,
             'event_id'      => $this->event->ID,

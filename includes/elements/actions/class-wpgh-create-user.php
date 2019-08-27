@@ -74,7 +74,7 @@ class WPGH_Create_User extends WPGH_Funnel_Step
                     </select>
                 </td>
             </tr>
-            <?php if ( is_multisite() ): ?>
+            <?php if ( wpgh_is_global_multisite() ): ?>
             <tr>
                 <th>
                     <?php _e( 'Which Blog?' ); ?>
@@ -182,7 +182,7 @@ class WPGH_Create_User extends WPGH_Funnel_Step
 
         }
 
-        if ( is_multisite() ){
+        if ( wpgh_is_global_multisite() ){
             if( $event->step->get_meta( 'add_to_blog_id' ) ){
                 add_user_to_blog( $event->step->get_meta( 'add_to_blog_id' ), $user_id, $role );
             } else {
