@@ -23,6 +23,14 @@
     text-align: center;
 }
 
+.powered-by {
+    color:white;
+}
+
+.powered-by img{
+    vertical-align: middle;
+}
+
 .welcome-header h1{
     font-size: 50px;
     color: white;

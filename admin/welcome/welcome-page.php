@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Welcome;
 
 use Groundhogg\Admin\Admin_Page;
 use function Groundhogg\dashicon;
+use function Groundhogg\groundhogg_logo;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
 use Groundhogg\License_Manager;
@@ -346,6 +347,7 @@ class Welcome_Page extends Admin_Page
             <div id="poststuff">
                 <div class="welcome-header">
                     <h1><?php echo sprintf( __( 'Welcome %s!', 'groundhogg' ), $user->display_name ); ?></h1>
+                    <div class="powered-by"><p><?php _e( 'Powered by', 'groundhogg' ); ?>&nbsp;<?php groundhogg_logo( 'white', 150 ); ?></p></div>
                 </div>
                 <?php $this->notices(); ?>
                 <hr class="wp-header-end">

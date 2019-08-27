@@ -1750,13 +1750,25 @@ function floating_phil()
 }
 
 /**
- * Show the Groundhogg Logo!
+ * Show the logo.
  *
- * @return void
+ * @param string $color
+ * @param int $width
  */
-function groundhogg_logo()
+function groundhogg_logo( $color='black', $width=300 )
 {
-    ?><img src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo.png'; ?>" width="300"><?php
+
+    switch ( $color ){
+        default:
+        case 'black':
+            $link = 'logo-black-1000x182.png';
+            break;
+        case 'white':
+            $link = 'logo-white-1000x182.png';
+            break;
+    }
+
+    ?><img src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/' .  $link; ?>" width="<?php echo $width; ?>"><?php
 }
 
 /**
