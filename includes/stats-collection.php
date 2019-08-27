@@ -68,7 +68,13 @@ class Stats_Collection
         $message = sprintf( __( "Hi %s,
 
 Thank you for opting in to our anonymous usage tracking system. Because of you we will be able to create better WordPress products for you in the near and distant future.
-Your reward discount code for 30%% off any premium extension is: %s
+Your reward discount code for a free extension is: %s
+
+This code is valid for the following extensions:
+- Form Styling (https://www.groundhogg.io/downloads/form-styling/)
+- Content Restriction (https://www.groundhogg.io/downloads/content-restriction/)
+- Email Countdown Timers (https://www.groundhogg.io/downloads/countdown/)
+
 We appreciate your help, best of luck!
 
 @ the Groundhogg Team", 'groundhogg' ), wp_get_current_user()->display_name, $discount );

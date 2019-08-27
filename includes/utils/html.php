@@ -1198,30 +1198,15 @@ class HTML
             'id'    => '',
             'class' => 'regular-text',
             'value' => '',
-            'attributes' => '',
             'placeholder' => __( 'Start typing...', 'groundhogg' ),
-            'autocomplete' => false,
+            'autocomplete' => 'off',
             'required' => false
         ) );
 
-        if ( $a[ 'required' ] ){
-            $a[ 'required' ] = 'required';
-        }
 
-        $a[ 'autocomplete' ] = $a[ 'autocomplete' ] ? 'on' : 'off';
+        $a[ 'class' ] .= ' gh-link-picker';
 
-        $html = sprintf(
-            "<input type='%s' id='%s' class='%s gh-link-picker' name='%s' value='%s' placeholder='%s' autocomplete='%s' %s %s>",
-            esc_attr( $a[ 'type'    ] ),
-            esc_attr( $a[ 'id'      ] ),
-            esc_attr( $a[ 'class'   ] ),
-            esc_attr( $a[ 'name'    ] ),
-            esc_attr( $a[ 'value'   ] ),
-            esc_attr( $a[ 'placeholder' ] ),
-            esc_attr( $a[ 'autocomplete' ] ),
-            $a[ 'attributes'  ],
-            $a[ 'required'  ]
-        );
+        $html =  $this->input( $a );
 
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( 'jquery-ui-autocomplete' );
