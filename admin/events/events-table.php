@@ -293,49 +293,6 @@ class Events_Table extends WP_List_Table {
      * @uses $this->get_pagenum()
      * @uses $this->set_pagination_args()
      */
-    function prepare_items_old() {
-
-        $per_page = 30;
-
-        $columns  = $this->get_columns();
-        $hidden   = array();
-        $sortable = $this->get_sortable_columns();
-
-        $this->_column_headers = array( $columns, $hidden, $sortable );
-
-        $query = get_request_query( [ 'status' => Event::WAITING ], [], array_keys( get_db( 'events' )->get_columns() ) );
-
-        $data = get_db( 'events' )->query( $query );
-
-        /*
-         * Sort the data
-         */
-        usort( $data, array( $this, 'usort_reorder' ) );
-
-        $current_page = $this->get_pagenum();
-
-        $total_items = count( $data );
-
-        $data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
-
-        $this->items = $data;
-
-        $this->set_pagination_args( array(
-            'total_items' => $total_items,                     // WE have to calculate the total number of items.
-            'per_page'    => $per_page,                        // WE have to determine how many items to show on a page.
-            'total_pages' => ceil( $total_items / $per_page ), // WE have to calculate the total number of pages.
-        ) );
-    }
-
-    /**
-     * Prepares the list of items for displaying.
-     * @uses $this->_column_headers
-     * @uses $this->items
-     * @uses $this->get_columns()
-     * @uses $this->get_sortable_columns()
-     * @uses $this->get_pagenum()
-     * @uses $this->set_pagination_args()
-     */
     function prepare_items() {
 
         $columns  = $this->get_columns();
@@ -344,7 +301,6 @@ class Events_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $data    = [];
         $per_page = absint( get_url_var( 'limit', 30 ) );
         $paged   = $this->get_pagenum();
         $offset  = $per_page * ( $paged - 1 );
@@ -379,26 +335,6 @@ class Events_Table extends WP_List_Table {
             'per_page'    => $per_page,
             'total_pages' => $total_pages,
         ) );
-    }
-
-    /**
-     * Callback to allow sorting of example data.
-     *
-     * @param string $a First value.
-     * @param string $b Second value.
-     *
-     * @return int
-     */
-    protected function usort_reorder( $a, $b ) {
-        $a = (array) $a;
-        $b = (array) $b;
-        // If no sort, default to title.
-        $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'time'; // WPCS: Input var ok.
-        // If no order, default to asc.
-        $order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
-        // Determine sort order.
-        $result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
-        return ( 'desc' === $order ) ? $result : - $result;
     }
 
     /**

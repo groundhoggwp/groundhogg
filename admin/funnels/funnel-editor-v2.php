@@ -230,8 +230,10 @@ $funnel = new Funnel($funnel_id);
                         <h1><?php _e('Funnel Builder V2 (BETA)', 'groundhogg'); ?></h1>
                         <p><?php _e('Welcome to version 2 of the Funnel Builder!'); ?></p>
                         <p><?php _e('Our newest iteration of the funnel builder has been designed to provide a superior editing experience on both large and small screens.', 'groundhogg'); ?></p>
-                        <iframe style="border: 1px solid #ddd" src="https://player.vimeo.com/video/353449484?title=0&byline=0&portrait=0" width="770"
-                                height="435" frameborder="1" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                        <div style="position:relative;padding-top:56.25%;">
+                            <iframe src="https://player.vimeo.com/video/353449484?title=0&byline=0&portrait=0" frameborder="0" allowfullscreen
+                                    style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+                        </div>
                     </div>
                 </div>
                 <div class="step-settings">

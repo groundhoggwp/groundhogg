@@ -641,9 +641,10 @@ abstract class DB {
      * New and improved query function to access DB in more complex and interesting ways.
      *
      * @param array $query_vars
+     * @param bool $from_cache
      * @return object[]|array[]|int
      */
-    public function advanced_query( $query_vars=[] )
+    public function advanced_query( $query_vars=[], $from_cache=true )
     {
 
         global $wpdb;
@@ -652,7 +653,7 @@ abstract class DB {
         $query_vars = wp_parse_args( $query_vars, [
             'where' => [],
             'limit' => false,
-            'offest' => false,
+            'offset' => false,
             'orderby' => $this->get_primary_key(),
             'order' => 'desc', // ASC || DESC
             'select' => '*',
@@ -713,7 +714,7 @@ abstract class DB {
 
         $hash = md5( $sql );
 
-        if ( $cached_results = get_array_var( self::$cache, $hash ) ){
+        if ( ( $cached_results = get_array_var( self::$cache, $hash ) ) && $from_cache ){
             return $cached_results;
         }
 
@@ -829,10 +830,10 @@ abstract class DB {
      * @param bool $from_cache
      * @return array|bool|null|object
      */
-    public function query($data = [], $ORDER_BY='', $from_cache = true )
+    public function query($data = [], $ORDER_BY='', $from_cache=true )
     {
         if ( isset_not_empty( $data, 'where' ) ){
-            return $this->advanced_query( $data );
+            return $this->advanced_query( $data, $from_cache );
         }
 
         $query_vars = [];
@@ -894,7 +895,7 @@ abstract class DB {
 
 //        wp_send_json( $query_vars );
 
-        return $this->advanced_query( $query_vars );
+        return $this->advanced_query( $query_vars, $from_cache );
     }
 
     /**
