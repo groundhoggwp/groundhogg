@@ -71,6 +71,8 @@ class Main_Updater extends Updater {
         Plugin::$instance->utils->files->add_htaccess();
 
         install_custom_rewrites();
+
+        set_transient( 'groundhogg_upgrade_notice_request_active', 1, WEEK_IN_SECONDS );
     }
 
 }
