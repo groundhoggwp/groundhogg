@@ -125,6 +125,11 @@ class Submission_Handler extends Supports_Errors
         $this->process();
     }
 
+    /**
+     * Process the form values
+     *
+     * @return bool|false
+     */
     public function process()
     {
 
@@ -292,8 +297,11 @@ class Submission_Handler extends Supports_Errors
         // Upload the files.
         foreach ( $files as $file_key => $file ){
             $file = $contact->upload_file( $file );
-            // Add direct url to meta
-            $meta[ $file_key ] = $file[ 'url' ];
+
+            if ( ! is_wp_error( $file ) && is_array( $file ) ){
+                // Add direct url to meta
+                $meta[ $file_key ] = $file[ 'url' ];
+            }
         }
 
         // Update the meta

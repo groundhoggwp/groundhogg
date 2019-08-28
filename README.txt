@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.6 =
+* FIXED File uploader causing error when file is not uploaded.
+
 = 2.0.5 =
 * FIXED Typo in the Sending Service settings
 * FIXED Updates showing for inactive premium extensions.

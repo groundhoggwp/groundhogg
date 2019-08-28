@@ -3,7 +3,7 @@
  * Plugin Name: Groundhogg
  * Plugin URI:  https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
  * Description: CRM and marketing automation for WordPress
- * Version: 2.0.5
+ * Version: 2.0.6
  * Author: Groundhogg Inc.
  * Author URI: https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain: groundhogg
@@ -22,8 +22,8 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'GROUNDHOGG_VERSION', '2.0.5' );
-define( 'GROUNDHOGG_PREVIOUS_STABLE_VERSION', '2.0.4' );
+define( 'GROUNDHOGG_VERSION', '2.0.6' );
+define( 'GROUNDHOGG_PREVIOUS_STABLE_VERSION', '2.0.5' );
 
 define( 'GROUNDHOGG__FILE__', __FILE__ );
 define( 'GROUNDHOGG_PLUGIN_BASE', plugin_basename( GROUNDHOGG__FILE__ ) );
@@ -38,9 +38,9 @@ add_action( 'plugins_loaded', 'groundhogg_load_plugin_textdomain' );
 
 define( 'GROUNDHOGG_TEXT_DOMAIN', 'groundhogg' );
 
-if ( ! version_compare( PHP_VERSION, '5.4', '>=' ) ) {
+if ( ! version_compare( PHP_VERSION, '5.6', '>=' ) ) {
     add_action( 'admin_notices', 'groundhogg_fail_php_version' );
-} elseif ( ! version_compare( get_bloginfo( 'version' ), '4.7', '>=' ) ) {
+} elseif ( ! version_compare( get_bloginfo( 'version' ), '4.9', '>=' ) ) {
     add_action( 'admin_notices', 'groundhogg_fail_wp_version' );
 } else {
     require GROUNDHOGG_PATH . 'includes/plugin.php';
