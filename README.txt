@@ -150,6 +150,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.4 =
+* FIXED Fallback from details missing when email sending from contact owner but no owner is set.
+* FIXED Non-required phone field throwing validation error.
+* FIXED Broadcasts not showing in table.
+
 = 2.0.3 =
 * ADDED class to allow for old versions of extensions to update.
 * FIXED EDD_Updater class not being initialized for 2.0 versions of extensions.

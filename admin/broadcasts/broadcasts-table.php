@@ -309,7 +309,7 @@ class Broadcasts_Table extends WP_List_Table {
      */
     protected function column_date_scheduled( $broadcast )
     {
-        $ds_time = strtotime( $broadcast->get_date_scheduled() );
+        $ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $broadcast->get_date_scheduled() ) );
         $time = scheduled_time( $ds_time );
 
         return __( 'Scheduled', 'groundhogg' ) . '<br><abbr title="' . date_i18n( DATE_ISO8601, $ds_time ) . '">' . $time . '</abbr>';
@@ -403,8 +403,8 @@ class Broadcasts_Table extends WP_List_Table {
             'orderby' => $orderby,
         );
 
-        $events = get_db( 'funnels' )->query( $args );
-        $total = get_db( 'funnels' )->count( $args );
+        $events = get_db( 'broadcasts' )->query( $args );
+        $total = get_db( 'broadcasts' )->count( $args );
 
         $this->items = $events;
 
@@ -417,26 +417,5 @@ class Broadcasts_Table extends WP_List_Table {
             'per_page'    => $per_page,
             'total_pages' => $total_pages,
         ) );
-	}
-
-	/**
-	 * Callback to allow sorting of example data.
-	 *
-	 * @param string $a First value.
-	 * @param string $b Second value.
-	 *
-	 * @return int
-	 */
-	protected function usort_reorder( $a, $b ) {
-        $a = (array) $a;
-        $b = (array) $b;
-
-		// If no sort, default to title.
-		$orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'date_scheduled'; // WPCS: Input var ok.
-		// If no order, default to asc.
-		$order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
-		// Determine sort order.
-		$result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
-		return ( 'desc' === $order ) ? $result : - $result;
 	}
 }

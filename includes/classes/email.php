@@ -612,9 +612,14 @@ class Email extends Base_Object_With_Meta
     {
         if ( $this->get_from_user() ) {
             return $this->get_from_user()->display_name;
-        } else {
+        }
+
+        if ( $this->get_contact()->get_ownerdata() ){
             return $this->get_contact()->get_ownerdata()->display_name;
         }
+
+        return get_bloginfo( 'name' );
+
     }
 
     /**
@@ -626,9 +631,13 @@ class Email extends Base_Object_With_Meta
     {
         if ( $this->get_from_user() ) {
             return $this->get_from_user()->user_email;
-        } else {
+        }
+
+        if ( $this->get_contact()->get_ownerdata() ){
             return $this->get_contact()->get_ownerdata()->user_email;
         }
+
+        return get_bloginfo('admin_email');
     }
 
 
