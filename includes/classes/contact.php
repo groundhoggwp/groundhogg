@@ -765,7 +765,7 @@ class Contact extends Base_Object_With_Meta
                 $file = [
                     'file_name' => $filename,
                     'file_path' => $filepath,
-                    'file_url'  => sprintf( site_url( 'gh/files/%s/' ), base64_encode( $filepath ) ),
+                    'file_url'  => file_access_url( $filepath ),
                     'date_uploaded' => filectime($filepath),
                 ];
 

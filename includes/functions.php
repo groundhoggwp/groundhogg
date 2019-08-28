@@ -2091,3 +2091,13 @@ function install_custom_rewrites()
 
     flush_rewrite_rules();
 }
+
+/**
+ * Url to access protected files in the Groundhogg uploads folder.
+ *
+ * @param $path
+ * @return string
+ */
+function file_access_url( $path ){
+    return sprintf( site_url( 'gh/files/%s/' ), base64_encode( $path ) );
+}

@@ -245,11 +245,15 @@ class Rewrites
 
                 $content_type = sprintf( "Content-Type: %s", mime_content_type( $file_path ) );
                 $content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );
-                $content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
 
                 header( $content_type );
                 header( $content_size );
-                header( $content_disposition );
+
+                if ( get_request_var( 'download' ) ){
+                    $content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
+                    header( $content_disposition );
+                }
+
                 status_header( 200 );
                 nocache_headers();
 
