@@ -7,7 +7,8 @@ class Settings
     /**
      * Check if the site is global multisite enabled
      *
-     * @return bool
+     * @return false
+     * @deprecated
      */
     public function is_global_multisite()
     {
@@ -19,7 +20,8 @@ class Settings
             return false;
         }
 
-        return true;
+//        return true;
+        return false;
     }
 
     /**

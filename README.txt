@@ -131,7 +131,7 @@ No, you can use Groundhogg for free forever. Groundhogg is a Open Source project
 Yes, you can find our Official [Woocommerce](https://groundhogg.io/downloads/woocommerce) extension on our site among other extensions for other popular plugins.
 
 = Does Groundhogg work with my theme? =
-Groundhogg is them agnostic, meaning it will work with every and any theme. Groundhogg is mostly administrative and very little is seen by visitors.
+Groundhogg is theme agnostic, meaning it will work with every and any theme. Groundhogg is mostly administrative and very little is seen by visitors.
 
 = Does Groundhogg track my subscribers? =
 Yes, Groundhogg has a very smart tracking system that will allow you to monitor your clients interactions with your emails and your site.
@@ -149,6 +149,10 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 == Changelog ==
+
+= 2.0.5 =
+* FIXED Typo in the Sending Service settings
+* FIXED Updates showing for inactive premium extensions.
 
 = 2.0.4 =
 * FIXED Fallback from details missing when email sending from contact owner but no owner is set.

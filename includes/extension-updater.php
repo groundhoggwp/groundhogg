@@ -55,7 +55,7 @@ class Extension_Updater
      *
      * @return array
      */
-    protected function get_extension_ids()
+    protected function get_licensed_extensions()
     {
         return get_option("gh_extensions", array());
     }
@@ -66,12 +66,9 @@ class Extension_Updater
     public function check_for_updates()
     {
 
-        $extensions = $this->get_extension_ids();
-
-//        wp_send_json( $extensions );
+        $extensions = $this->get_licensed_extensions();
 
         foreach ($extensions as $plugin_id => $extension) {
-
 
             $plugin_id = absint( $plugin_id );
 
@@ -89,18 +86,22 @@ class Extension_Updater
             $subpath = $this->file_map[$plugin_id];
             $file_path = WP_PLUGIN_DIR . '/' . $subpath;
 
+            if ( ! file_exists( $file_path ) ){
+                continue;
+            }
+
+            $data = get_plugin_data( $file_path );
+
             if ( ! class_exists('\GH_EDD_SL_Plugin_Updater') ){
                 require_once dirname(__FILE__) . '/lib/edd/GH_EDD_SL_Plugin_Updater.php';
             }
 
             $updater = new \GH_EDD_SL_Plugin_Updater(License_Manager::$storeUrl, $file_path, [
-                'version' => '1.3',
+                'version' => $data[ 'Version' ],
                 'license' => $license,
                 'item_id' => $plugin_id,
                 'url' => home_url()
             ]);
-
-//            wp_send_json( $updater );
 
         }
 

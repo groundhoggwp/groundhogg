@@ -212,15 +212,15 @@ class Settings_Page extends Admin_Page
             ],
             'service' => [
                 'id'    => 'service',
-                'title' => _x( 'Groundhogg Sending Servoce', 'settings_sections', 'groundhogg' ),
+                'title' => _x( 'Groundhogg Sending Service', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email',
-                'callback' => [ Plugin::$instance->sending_service, 'test_connection_ui' ], //todo
+                'callback' => [ Plugin::$instance->sending_service, 'test_connection_ui' ],
             ],
             'bounces' => array(
                 'id'    => 'bounces',
                 'title' => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
                 'tab'   => 'email',
-                'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ], //todo
+                'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ],
             ),
             'api_settings' => array(
                 'id'    => 'api_settings',
