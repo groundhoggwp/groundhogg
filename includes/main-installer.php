@@ -34,7 +34,7 @@ class Main_Installer extends Installer
             'gh_event_failure_notification_email' => get_bloginfo( 'admin_email' ),
         ];
 
-        Plugin::$instance->utils->files->add_htaccess();
+        Plugin::$instance->utils->files->mk_dir();
 
         foreach ( $settings as $setting_name => $value ){
             if ( ! get_option( $setting_name ) ){

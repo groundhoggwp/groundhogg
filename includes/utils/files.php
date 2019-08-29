@@ -4,11 +4,24 @@ namespace Groundhogg;
 class Files
 {
 
+    /**
+     * Create the uploads dir.
+     */
+    public function mk_dir()
+    {
+        if ( wp_mkdir_p( $this->get_base_uploads_dir() ) ){
+            $this->add_htaccess();
+        }
+    }
+
+    /**
+     * Create an .htaccess file for the uploads dir.
+     */
     public function add_htaccess()
     {
         $htaccess_content = "Deny from all";
         $base_url = $this->get_base_uploads_dir();
-        file_put_contents( $base_url . DIRECTORY_SEPARATOR . '.htacess', $htaccess_content );
+        file_put_contents( $base_url . DIRECTORY_SEPARATOR . '.htaccess', $htaccess_content );
     }
 
     /**

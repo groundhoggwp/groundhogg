@@ -1,7 +1,8 @@
 <?php
+
 namespace Groundhogg;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 /**
  * Bounce Checker
@@ -48,27 +49,32 @@ class Bounce_Checker
         $this->setup();
 
         /* run whenever these jobs are run */
-        add_action( 'init', array( $this, 'setup_cron' ) );
-        add_action( self::ACTION, array( $this, 'check' )  );
+        add_action('init', array($this, 'setup_cron'));
 
-        if ( is_admin() && get_request_var( 'test_imap_connection' ) ){
-            add_action( 'init', array( $this, 'do_test_connection' ) );
+
+        add_action(self::ACTION, array($this, 'check'));
+        if (is_admin() && get_request_var('test_imap_connection')) {
+            add_action('init', array($this, 'do_test_connection'));
         }
+
+
     }
 
     public function setup_cron()
     {
-        if ( ! wp_next_scheduled( self::ACTION )  ){
-            wp_schedule_event( time(), 'hourly' , self::ACTION );
+        if (!wp_next_scheduled(self::ACTION)) {
+            wp_schedule_event(time(), 'hourly', self::ACTION);
         }
     }
 
-    public function test_connection_ui(){
+    public function test_connection_ui()
+    {
 
-        if ( $this->inbox && $this->password ){
+        if ($this->inbox && $this->password) {
             ?>
-<a href="<?php echo wp_nonce_url( add_query_arg( 'test_imap_connection', '1', $_SERVER[ 'REQUEST_URI' ] ) ); ?>" class="button-secondary"><?php _ex( 'Test IMAP Connection', 'action', 'groundhogg' ) ?></a>
-<?php
+            <a href="<?php echo wp_nonce_url(add_query_arg('test_imap_connection', '1', $_SERVER['REQUEST_URI'])); ?>"
+               class="button-secondary"><?php _ex('Test IMAP Connection', 'action', 'groundhogg') ?></a>
+            <?php
         }
 
     }
@@ -78,7 +84,7 @@ class Bounce_Checker
      */
     public function get_bounce_inbox_pw()
     {
-        return Plugin::$instance->settings->get_option( 'bounce_inbox_password' );
+        return Plugin::$instance->settings->get_option('bounce_inbox_password');
     }
 
     /**
@@ -86,7 +92,7 @@ class Bounce_Checker
      */
     public function get_bounce_inbox()
     {
-        return Plugin::$instance->settings->get_option( 'bounce_inbox' );
+        return Plugin::$instance->settings->get_option('bounce_inbox');
     }
 
     /**
@@ -94,7 +100,7 @@ class Bounce_Checker
      */
     public function get_mail_server()
     {
-        return  Plugin::$instance->settings->get_option( 'bounce_inbox_host', wp_parse_url( site_url(), PHP_URL_HOST ) );
+        return Plugin::$instance->settings->get_option('bounce_inbox_host', wp_parse_url(site_url(), PHP_URL_HOST));
     }
 
     /**
@@ -102,7 +108,7 @@ class Bounce_Checker
      */
     public function get_port()
     {
-        return  Plugin::$instance->settings->get_option( 'bounce_inbox_port', 993 );
+        return Plugin::$instance->settings->get_option('bounce_inbox_port', 993);
     }
 
     /**
@@ -113,10 +119,10 @@ class Bounce_Checker
     private function get_bounce_handler()
     {
 
-        if ( ! $this->bounce_handler ){
+        if (!$this->bounce_handler) {
 
-            if ( ! class_exists( '\BounceHandler' ) ){
-                include_once dirname( __FILE__ ) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
+            if (!class_exists('\BounceHandler')) {
+                include_once dirname(__FILE__) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
             }
 
             $this->bounce_handler = new \BounceHandler();
@@ -130,8 +136,8 @@ class Bounce_Checker
      */
     private function setup()
     {
-        $this->inbox    = get_option( 'gh_bounce_inbox' );
-        $this->password = get_option( 'gh_bounce_inbox_password' );
+        $this->inbox = get_option('gh_bounce_inbox');
+        $this->password = get_option('gh_bounce_inbox_password');
     }
 
     /**
@@ -139,18 +145,18 @@ class Bounce_Checker
      */
     public function do_test_connection()
     {
-        if ( ! is_admin() || ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( get_request_var( '_wpnonce' ) ) ){
+        if (!is_admin() || !current_user_can('manage_options') || !wp_verify_nonce(get_request_var('_wpnonce'))) {
             return;
         }
 
         $test = $this->test_connection();
 
-        if ( is_wp_error( $test ) ){
-            Plugin::$instance->notices->add( $test );
+        if (is_wp_error($test)) {
+            Plugin::$instance->notices->add($test);
             return;
         }
 
-        Plugin::$instance->notices->add( 'imap_success', _x( 'Successful IMAP connection established.', 'notice', 'groundhogg' ) );
+        Plugin::$instance->notices->add('imap_success', _x('Successful IMAP connection established.', 'notice', 'groundhogg'));
 
     }
 
@@ -164,32 +170,38 @@ class Bounce_Checker
 
         $this->setup();
 
-        $domain = explode( '@', $this->inbox );
-        $domain = $domain[1];
-        $domain = get_option( 'gh_bounce_inbox_host', $domain );
-        $port = get_option( 'gh_bounce_inbox_port', 993 );
+        $domain = explode('@', $this->inbox);
 
-        $hostname = sprintf( '{%s:%d/imap/ssl/novalidate-cert}INBOX', $domain, $port );
-
-        /* try to connect */
-        try{
-            $inbox = @imap_open( $hostname, $this->inbox, $this->password, OP_READONLY );
-
-            if ( $inbox ){
-                imap_close( $inbox );
-            }
-        } catch ( \Exception $e ){
-            $inbox = new \WP_Error( $e->getCode(), $e->getMessage() );
+        if (!empty($domain)) {
+            $domain = $domain[1];
         }
 
-//        ob_clean();
+        $domain = get_option('gh_bounce_inbox_host', $domain);
+        $port = get_option('gh_bounce_inbox_port', 993);
 
-        if ( is_wp_error( $inbox ) ){
+        $hostname = sprintf('{%s:%d/imap/ssl/novalidate-cert}INBOX', $domain, $port);
+
+        if ( ! function_exists( 'imap_open' ) ){
+            return new \WP_Error( 'PHP IMAP library is not installed and is required to use this function.' );
+        }
+
+        /* try to connect */
+        try {
+            $inbox = @\imap_open($hostname, $this->inbox, $this->password, OP_READONLY);
+
+            if ($inbox) {
+                \imap_close($inbox);
+            }
+        } catch (\Exception $e) {
+            $inbox = new \WP_Error($e->getCode(), $e->getMessage());
+        }
+
+        if (is_wp_error($inbox)) {
             return $inbox;
         }
 
-        if ( ! $inbox ){
-            return new \WP_Error( 'imap_failed', sprintf( "Failed to connect. Error: %s", imap_last_error() ) );
+        if (!$inbox) {
+            return new \WP_Error('imap_failed', sprintf("Failed to connect. Error: %s", imap_last_error()));
         }
 
         return true;
@@ -200,55 +212,58 @@ class Bounce_Checker
      */
     public function check()
     {
-        $domain = explode( '@', $this->inbox );
-
-        $domain = $domain[1];
-
-        $domain = \get_option( 'gh_bounce_inbox_host', $domain );
-
-        if ( ! $domain ){
+        if ( ! function_exists( 'imap_open' ) ){
             return;
         }
 
-        $port = \get_option( 'gh_bounce_inbox_port', 993 );
+        $domain = explode('@', $this->inbox);
 
-        $hostname = sprintf( '{%s:%d/imap/ssl/novalidate-cert}INBOX', $domain, $port );
+        if (!empty($domain)) {
+            $domain = $domain[1];
+        }
+
+        $domain = \get_option('gh_bounce_inbox_host', $domain);
+
+
+        $port = \get_option('gh_bounce_inbox_port', 993);
+
+        $hostname = sprintf('{%s:%d/imap/ssl/novalidate-cert}INBOX', $domain, $port);
 
         /* try to connect */
-        $inbox = imap_open( $hostname, $this->inbox, $this->password, OP_READONLY );
+        $inbox = \imap_open($hostname, $this->inbox, $this->password, OP_READONLY);
 
-        if ( ! $inbox ){
+        if (!$inbox) {
             return;
         }
 
         /* grab emails, for now assume these messages go unread */
-        $emails = imap_search( $inbox, sprintf( 'SINCE "%s" UNSEEN', date( 'j F Y', strtotime( '1 day ago' ) ) ) );
+        $emails = \imap_search($inbox, sprintf('SINCE "%s" UNSEEN', date('j F Y', strtotime('1 day ago'))));
 
-        if ( ! $emails )
+        if (!$emails)
             return;
 
         $this->get_bounce_handler();
 
-        foreach( $emails as $email_number ) {
+        foreach ($emails as $email_number) {
 
             /* get information specific to this email */
-            $message = imap_fetchbody( $inbox, $email_number,"" );
-	        $multiArray = $this->bounce_handler->get_the_facts( $message );
+            $message = \imap_fetchbody($inbox, $email_number, "");
+            $multiArray = $this->bounce_handler->get_the_facts($message);
 
-            foreach( $multiArray as $the ){
+            foreach ($multiArray as $the) {
 
-                $contact  = get_contactdata( $the['recipient'] );
+                $contact = get_contactdata($the['recipient']);
 
-                if ( ! $contact->exists() ){
+                if (!$contact->exists()) {
                     continue;
                 }
 
-                switch( $the['action'] ){
+                switch ($the['action']) {
                     case 'failed':
                         //do something
-                        if ( $contact->get_optin_status() !== Preferences::HARD_BOUNCE){
-                            $contact->add_note( sprintf( $this->bounce_handler->fetch_status_messages( $the['status'] ) ) );
-                            $contact->change_marketing_preference( Preferences::HARD_BOUNCE );
+                        if ($contact->get_optin_status() !== Preferences::HARD_BOUNCE) {
+                            $contact->add_note(sprintf($this->bounce_handler->fetch_status_messages($the['status'])));
+                            $contact->change_marketing_preference(Preferences::HARD_BOUNCE);
                         }
                         break;
                     case 'transient':
@@ -264,7 +279,7 @@ class Bounce_Checker
             }
         }
 
-        imap_close( $inbox );
+        \imap_close($inbox);
     }
 
 }

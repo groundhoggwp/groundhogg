@@ -36,6 +36,7 @@ class Main_Updater extends Updater {
         return [
             '2.0',
             '2.0.7',
+            '2.0.7.1',
         ];
     }
 
@@ -82,6 +83,14 @@ class Main_Updater extends Updater {
     public function version_2_0_7()
     {
         install_custom_rewrites();
+    }
+
+    /**
+     * Fix add .htaccess issue.
+     */
+    public function version_2_0_7_1()
+    {
+        Plugin::$instance->utils->files->mk_dir();
     }
 
 }

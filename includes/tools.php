@@ -121,6 +121,8 @@ function groundhogg_tools_sysinfo_get() {
     $return .= 'GDPR Strict:               ' . ( $plugin->preferences->is_gdpr_strict()  ? "Enabled\n" : "Disabled\n" );
 
     $return .= "\n" . '-- Bounce Configuration' . "\n\n";
+
+    $return .= 'IMAP Enabled:              ' . ( function_exists( 'imap_open' ) ? "Enabled\n" : "Disabled\n" );
     $return .= 'Tracking Bounces:          ' . ( $plugin->bounce_checker->get_bounce_inbox() && $plugin->bounce_checker->get_bounce_inbox_pw() ? "Enabled\n" : "Disabled\n" );
     $return .= 'Mail Server:               ' . $plugin->bounce_checker->get_mail_server() . "\n";
     $return .= 'Port:                      ' . $plugin->bounce_checker->get_port() . "\n";
