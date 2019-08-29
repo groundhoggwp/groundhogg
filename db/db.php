@@ -733,6 +733,7 @@ abstract class DB {
 
         $results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
         self::$cache[ $hash ] = $results;
+
         return $results;
     }
 

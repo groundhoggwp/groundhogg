@@ -204,6 +204,25 @@ class Submission_Handler extends Supports_Errors
 		            }
 
 	            	break;
+                case 'birthday';
+
+                    $parts = [
+                        'year',
+                        'month',
+                        'day',
+                    ];
+
+                    $birthday = [];
+
+                    foreach ( $parts as $key ){
+                        $date = get_array_var( $value, $key );
+                        $birthday[] = $date;
+                        $meta[ 'birthday_' . $key ] = $date;
+                    }
+
+                    $meta[ 'birthday' ] = implode( '-', $birthday );
+
+                    break;
                 // Only checks whether value is not empty.
                 case 'terms_agreement':
                     if ( ! empty( $value ) ){

@@ -76,7 +76,10 @@ class Tracking
 
         add_action( 'after_setup_theme', [ $this, 'deconstruct_tracking_cookie' ], 1 );
         add_action( 'init', [ $this, 'add_rewrite_rules' ] );
-        add_action( 'init', [ $this, 'parse_utm' ] );
+
+        if ( ! is_admin() ){
+            add_action( 'init', [ $this, 'parse_utm' ] );
+        }
 
         add_filter( 'request', [ $this, 'parse_request' ] );
         add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
@@ -434,10 +437,6 @@ class Tracking
      */
     public function parse_utm()
     {
-        if ( ! $this->get_current_contact() ){
-            return;
-        }
-
         $utm_defaults = array(
             'utm_campaign' => '',
             'utm_content'  => '',
@@ -447,6 +446,12 @@ class Tracking
         );
 
         $utm = array_intersect_key( $_GET, $utm_defaults );
+
+        $has_utm = array_filter( array_values( $utm_defaults ) );
+
+        if ( ! $has_utm || ! $this->get_current_contact() ){
+            return;
+        }
 
         foreach ( $utm as $utm_var => $utm_val ){
             if ( ! empty( $utm_val ) ){

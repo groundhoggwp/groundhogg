@@ -31,12 +31,16 @@ class Event_Store
 	 */
 	public function get_queued_event_ids( $count )
 	{
-		$queued_events = $this->db()->query( [
-			'status' => 'waiting',
-			'before' => time(),
-			'claim'  => '',
-			'LIMIT'  => $count
-		], 'time', false );
+		$queued_events = $this->db()->advanced_query( [
+		    'where' => [
+		        'relationship' => 'AND',
+                [ 'col' => 'status', 'val' => 'waiting', 'compare' => '=' ],
+                [ 'col' => 'time', 'val' => time(), 'compare' => '<=' ],
+                [ 'col' => 'claim', 'val' => '', 'compare' => '=' ],
+            ],
+			'limit'  => $count,
+            'orderby' => 'time',
+		], false );
 
 		$ids = wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
 
@@ -52,9 +56,13 @@ class Event_Store
 	 */
 	public function get_events_by_claim( $claim )
 	{
-		$queued_events = $this->db()->query( [
-			'claim'  => $claim,
-		], 'time', false );
+        $queued_events = $this->db()->advanced_query( [
+            'where' => [
+                'relationship' => 'AND',
+                [ 'col' => 'claim', 'val' => $claim, 'compare' => '=' ],
+            ],
+            'orderby' => 'time',
+        ], false );
 
 		$ids = wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
 
@@ -71,9 +79,7 @@ class Event_Store
 	public function stake_claim( $count = 100 )
 	{
 		$claim = $this->generate_claim_id();
-
 		$events = $this->get_queued_event_ids( $count );
-
 		$this->claim_events( $events, $claim );
 
 		return $claim;

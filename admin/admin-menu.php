@@ -72,7 +72,7 @@ class Admin_Menu
      * Set the data to the given value
      *
      * @param $key string
-     * @return Admin_Page|Funnels_Page
+     * @return Admin_Page|Funnels_Page|Contacts_Page
      */
     public function get_page( $key ){
         return $this->$key;

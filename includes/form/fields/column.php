@@ -14,7 +14,7 @@ class Column extends Field
     {
         return [
             'size'  => false,
-            'width' => '1/2',
+            'width' => '1/1',
             'id'    => '',
             'class' => ''
         ];
@@ -75,10 +75,10 @@ class Column extends Field
         $width = $this->get_width();
 
         switch ( $width ){
+            default:
             case '1/1':
                 $width = 'col-1-of-1';
                 break;
-            default:
             case '1/2':
                 $width = 'col-1-of-2';
                 break;

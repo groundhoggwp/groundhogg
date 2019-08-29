@@ -229,12 +229,10 @@ class Tag_Relationships extends DB
 
         global $wpdb;
 
-        $results = $wpdb->get_col("SELECT $return FROM $this->table_name WHERE $column LIKE $value ORDER BY $this->primary_key DESC" );
+        $results = $wpdb->get_col("SELECT $return FROM $this->table_name WHERE $column = $value ORDER BY $this->primary_key DESC" );
 
         if ( empty( $results ) ) {
-
             return false;
-
         }
 
         return $results;

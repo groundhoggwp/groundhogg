@@ -778,6 +778,33 @@ class Contact extends Base_Object_With_Meta
     }
 
     /**
+     * Get the age of the contact
+     *
+     * @return int
+     */
+    public function get_age()
+    {
+
+        $date[] = $this->get_meta( 'birthday_year' );
+        $date[] = $this->get_meta( 'birthday_month' );
+        $date[] = $this->get_meta( 'birthday_day' );
+
+        $date = array_filter( $date );
+
+        if ( empty( $date ) ){
+            return false;
+        }
+
+        $date = implode( '-', $date );
+
+        $age_in_seconds = time() - strtotime( $date );
+        $age_in_years = round( $age_in_seconds / YEAR_IN_SECONDS, 0 );
+
+        return absint( $age_in_years );
+    }
+
+
+    /**
      * Get the contact data as an array.
      *
      * @return array
@@ -788,6 +815,7 @@ class Contact extends Base_Object_With_Meta
 
         $contact['ID'] = (string) $this->get_id();
         $contact['gravatar'] = $this->get_profile_picture();
+        $contact[ 'age' ] = $this->get_age();
 
         return apply_filters(
             "groundhogg/{$this->get_object_type()}/get_as_array",

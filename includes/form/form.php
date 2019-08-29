@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Form;
 
+use Groundhogg\Form\Fields\Birthday;
 use function Groundhogg\array_to_atts;
 use function Groundhogg\encrypt;
 use Groundhogg\Form\Fields\Address;
@@ -88,7 +89,8 @@ class Form {
         $this->gdpr = new GDPR($this->get_id());
         $this->address = new Address( $this->get_id());
         $this->recaptcha = new Recaptcha($this->get_id());
-        $this->submint = new Submit($this->get_id());
+        $this->submit = new Submit($this->get_id());
+        $this->birthday = new Birthday($this->get_id());
 
         do_action( 'groundhogg/form/fields/init', $this );
     }

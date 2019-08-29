@@ -418,6 +418,10 @@ class Contacts_Page extends Admin_Page
     public function get_meta_key_exclusions()
     {
         return apply_filters( 'groundhogg/admin/contacts/exclude_meta_list', [
+            'birthday',
+            'birthday_month',
+            'birthday_day',
+            'birthday_year',
             'lead_source',
             'source_page',
             'page_source',
@@ -446,7 +450,6 @@ class Contacts_Page extends Admin_Page
             'region_code',
         ] );
     }
-
 
     /**
      * Update the contact via the admin screen
@@ -536,6 +539,9 @@ class Contacts_Page extends Admin_Page
            'source_page',
            'ip_address',
            'time_zone',
+           'birthday_year',
+           'birthday_month',
+           'birthday_day',
         ];
 
         $basic_text_fields = apply_filters( 'groundhogg/contact/update/basic_fields', $basic_text_fields, $contact );
