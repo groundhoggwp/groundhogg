@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Tools;
 
 use \WP_List_Table;
 use Groundhogg\Plugin;
+use function Groundhogg\file_access_url;
 
 /**
  * Contacts Table Class
@@ -169,7 +170,6 @@ class Imports_Table extends WP_List_Table {
 
             $scanned_directory = array_diff(scandir( Plugin::$instance->utils->files->get_csv_imports_dir() ), ['..', '.']);
 
-
             foreach ($scanned_directory as $filename) {
 
                 $filepath = Plugin::$instance->utils->files->get_csv_imports_dir( $filename );
@@ -178,7 +178,7 @@ class Imports_Table extends WP_List_Table {
                     'file' => $filename,
                     'file_path' => $filepath,
 //                    'file_url' => Plugin::$instance->utils->files->get_csv_imports_url( $filename ),
-                    'file_url' => sprintf( site_url( 'gh/files/%s/' ), base64_encode( $filepath ) ),
+                    'file_url' => file_access_url( $filepath, true ),
                     'date' => filemtime($filepath),
                     'rows' => count(file($filepath, FILE_SKIP_EMPTY_LINES)) - 1,
                 ];

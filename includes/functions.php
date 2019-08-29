@@ -2095,9 +2095,17 @@ function install_custom_rewrites()
 /**
  * Url to access protected files in the Groundhogg uploads folder.
  *
- * @param $path
+ * @param $path string abspath to a file.
+ * @param $download bool
  * @return string
  */
-function file_access_url( $path ){
-    return sprintf( site_url( 'gh/files/%s/' ), base64_encode( $path ) );
+function file_access_url( $path, $download=false ){
+
+    $url = sprintf( site_url( 'gh/files/%s/%s' ), urlencode( base64_encode( $path ) ), basename( $path ) );
+
+    if ( $download ){
+        $url = add_query_arg( [ 'download' => true ], $url );
+    }
+
+    return $url;
 }

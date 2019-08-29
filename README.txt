@@ -150,23 +150,27 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.0.6 =
+= 2.0.7 (2019-08-29) =
+* ADDED file_access_url() to create access links for protected Groundhogg files.
+* FIXED Admin_Page::admin_url() not using based admin_url() function.
+
+= 2.0.6 (2019-08-28) =
 * FIXED File uploader causing error when file is not uploaded.
 
-= 2.0.5 =
+= 2.0.5 (2019-08-28) =
 * FIXED Typo in the Sending Service settings
 * FIXED Updates showing for inactive premium extensions.
 
-= 2.0.4 =
+= 2.0.4 (2019-08-28) =
 * FIXED Fallback from details missing when email sending from contact owner but no owner is set.
 * FIXED Non-required phone field throwing validation error.
 * FIXED Broadcasts not showing in table.
 
-= 2.0.3 =
+= 2.0.3 (2019-08-27) =
 * ADDED class to allow for old versions of extensions to update.
 * FIXED EDD_Updater class not being initialized for 2.0 versions of extensions.
 
-= 2.0.2 =
+= 2.0.2 (2019-08-27) =
 * FIXED verbage in email for tracking optin.
 * TWEAKED HTML utils link picker class.
 

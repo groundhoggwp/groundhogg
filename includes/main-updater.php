@@ -35,6 +35,7 @@ class Main_Updater extends Updater {
     {
         return [
             '2.0',
+            '2.0.7',
         ];
     }
 
@@ -73,6 +74,14 @@ class Main_Updater extends Updater {
         install_custom_rewrites();
 
         set_transient( 'groundhogg_upgrade_notice_request_active', 1, WEEK_IN_SECONDS );
+    }
+
+    /**
+     * Update the rewrites to support new file access links.
+     */
+    public function version_2_0_7()
+    {
+        install_custom_rewrites();
     }
 
 }

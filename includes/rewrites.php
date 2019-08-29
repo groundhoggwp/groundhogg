@@ -55,9 +55,16 @@ class Rewrites
             'top'
         );
 
-        // Funnel Download/Export
+        // File download
         add_rewrite_rule(
             '^gh/files/([^/]*)/?$',
+            managed_rewrite_rule( 'subpage=files&action=download&file_path=$matches[1]' ),
+            'top'
+        );
+
+        // File view with basename.
+        add_rewrite_rule(
+            '^gh/files/([^/]*)/([^/]*)/?$',
             managed_rewrite_rule( 'subpage=files&action=download&file_path=$matches[1]' ),
             'top'
         );
@@ -123,6 +130,7 @@ class Rewrites
         $this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
         $this->map_query_var( $query, 'form_id', 'absint' );
 
+        $this->map_query_var( $query, 'file_path', 'urldecode' );
         $this->map_query_var( $query, 'file_path', 'base64_decode' );
         return $query;
     }
