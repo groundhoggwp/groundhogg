@@ -448,7 +448,7 @@ abstract class Admin_Page
      */
     public function admin_url( $query = [] )
     {
-        $base = add_query_arg( [ 'page' => $this->get_slug() ], 'admin.php' );
+        $base = add_query_arg( [ 'page' => $this->get_slug() ], admin_url( 'admin.php' ) );
 
         if ( empty( $query ) ){
             return $base;
