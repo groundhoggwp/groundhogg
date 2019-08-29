@@ -4,7 +4,7 @@ namespace Groundhogg;
 
 class Proxy_Service extends Supports_Errors
 {
-    const PROXY_URL = 'https://proxy.groundho.gg/wp-json/proxy/';
+    const PROXY_URL = 'https://proxy.groundhogg.io/wp-json/proxy/';
 
     public function request( $endpoint='', $body=[], $method='POST', $headers=[] ){
 
