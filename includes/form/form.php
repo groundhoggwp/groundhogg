@@ -4,6 +4,7 @@ namespace Groundhogg\Form;
 
 use Groundhogg\Form\Fields\Birthday;
 use function Groundhogg\array_to_atts;
+use function Groundhogg\do_replacements;
 use function Groundhogg\encrypt;
 use Groundhogg\Form\Fields\Address;
 use Groundhogg\Form\Fields\Checkbox;
@@ -280,7 +281,7 @@ class Form {
 
         do_action( 'groundhogg/form/shortcode/before', $this );
 
-        $content = do_shortcode( $step->get_meta( 'form' ) );
+        $content = do_replacements( do_shortcode( $step->get_meta( 'form' ) ) );
 
         do_action( 'groundhogg/form/shortcode/after', $this );
 

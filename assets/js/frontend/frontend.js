@@ -29,16 +29,20 @@
         pageView : function(){
             var self = this;
 
-            $.ajax({
-                type: "post",
-                url: self.page_view_endpoint,
-                data: { ref: window.location.href, _ghnonce: self._ghnonce },
-                beforeSend: function ( xhr ) {
-                    xhr.setRequestHeader( 'X-WP-Nonce', self._wpnonce );
-                },
-                success: function( response ){},
-                error: function(){}
-            });
+            if ( this.tracking_enabled ){
+
+                $.ajax({
+                    type: "post",
+                    url: self.page_view_endpoint,
+                    data: { ref: window.location.href, _ghnonce: self._ghnonce },
+                    beforeSend: function ( xhr ) {
+                        xhr.setRequestHeader( 'X-WP-Nonce', self._wpnonce );
+                    },
+                    success: function( response ){},
+                    error: function(){}
+                });
+
+            }
         },
 
         logFormImpressions : function() {

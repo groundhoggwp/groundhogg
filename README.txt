@@ -151,9 +151,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 == Changelog ==
 
 = 2.0.8 (2019-08-30) =
+* ADDED birthday field support for the form builder and contact record.
+* ADDED option to disable the JS page tracking script.
+* TWEAKED optimized some DB queries and tables
+* TWEAKED form shortcode supports do_replacements to autopopulate form fields with replacements info.
 * FIXED Un-needed tracking script loading on admin pages.
-* TWEAKED optimized some DB queries
-* ADDED birthday support for the form builder and contact record.
+* FIXED Form impressions cookie checked before logging new impression.
 
 = 2.0.7.1 (2019-08-29) =
 * FIXED Error adding .htaccess to protected /groundhogg/ uploads folder

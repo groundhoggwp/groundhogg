@@ -37,6 +37,7 @@ class Main_Updater extends Updater {
             '2.0',
             '2.0.7',
             '2.0.7.1',
+            '2.0.8',
         ];
     }
 
@@ -91,6 +92,20 @@ class Main_Updater extends Updater {
     public function version_2_0_7_1()
     {
         Plugin::$instance->utils->files->mk_dir();
+    }
+
+    /**
+     * Index the date_created column
+     */
+    public function version_2_0_8()
+    {
+
+        global $wpdb;
+
+        $db = get_db( 'contacts' );
+
+        $wpdb->query( "CREATE INDEX date_created ON {$db->get_table_name()}(date_created)" );
+
     }
 
 }

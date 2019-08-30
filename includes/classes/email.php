@@ -640,6 +640,15 @@ class Email extends Base_Object_With_Meta
         return get_bloginfo('admin_email');
     }
 
+    /**
+     * The reply-to address
+     *
+     * @return string
+     */
+    public function get_reply_to_address()
+    {
+        return ( is_email( $this->get_meta( 'reply_to_override' ) ) ? $this->get_meta( 'reply_to_override' ) : $this->get_from_email() );
+    }
 
     /**
      * Get the headers to send
@@ -651,7 +660,7 @@ class Email extends Base_Object_With_Meta
         /* Use default mail-server */
         $headers = [];
         $headers['from'] = 'From: ' . $this->get_from_name() . ' <' . $this->get_from_email() . '>';
-        $headers['reply_to'] = 'Reply-To: ' . $this->get_meta( 'reply_to_override' ) ? $this->get_meta( 'reply_to_override' ) : $this->get_from_email();
+        $headers['reply_to'] = 'Reply-To: ' . $this->get_reply_to_address();
         $headers['return_path'] = 'Return-Path: ' . Plugin::$instance->settings->get_option('bounce_inbox', $this->get_from_email());
         $headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
         $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), $this->get_click_tracking_link(), urlencode($this->get_unsubscribe_link() ) );
@@ -852,7 +861,7 @@ class Email extends Base_Object_With_Meta
     /**
      * Set the return path to the bounce email in the settings
      *
-     * @param $phpmailer \PHPMailer|\GH_SS_Mailer
+     * @param $phpmailer \PHPMailer|GH_SS_Mailer
      */
     public function set_bounce_return_path( $phpmailer )
     {

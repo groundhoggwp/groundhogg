@@ -296,7 +296,7 @@ class Contact_Query {
         $this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
 
         if ( $this->query_vars['number'] < 1 ) {
-            $this->query_vars['number'] = 999999999999;
+            $this->query_vars['number'] = false;
         }
 
         $this->query_vars['offset'] = absint( $this->query_vars['offset'] );

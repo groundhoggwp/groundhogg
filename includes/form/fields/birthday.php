@@ -84,6 +84,7 @@ class Birthday extends Input
                         'options'           => $years,
                         'multiple'          => false,
                         'option_none'       => false,
+                        'required'          => $this->is_required(),
                         'class' => 'gh-input'
                     ] ),
                 ] ),
@@ -95,6 +96,7 @@ class Birthday extends Input
                         'options'           => $months,
                         'multiple'          => false,
                         'option_none'       => false,
+                        'required'          => $this->is_required(),
                         'class' => 'gh-input'
                     ] ),
                 ] ),
@@ -106,6 +108,7 @@ class Birthday extends Input
                         'options'           => $days,
                         'multiple'          => false,
                         'option_none'       => false,
+                        'required'          => $this->is_required(),
                         'class' => 'gh-input'
                     ] ),
                 ] ),

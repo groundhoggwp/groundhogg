@@ -583,6 +583,29 @@ function gh_sms( $to, $message )
 }
 
 /**
+ * Get a cookie value
+ *
+ * @param string $cookie
+ * @param bool $default
+ * @return mixed
+ */
+function get_cookie( $cookie='', $default=false){
+    return get_array_var( $_COOKIE, $cookie, $default );
+}
+
+/**
+ * Set a cookie the WP way
+ *
+ * @param string $cookie
+ * @param mixed $value
+ * @param int $expiration
+ * @return bool
+ */
+function set_cookie( $cookie='', $value='', $expiration=3600 ){
+    return setcookie($cookie, $value, time() + $expiration, COOKIEPATH, COOKIE_DOMAIN );
+}
+
+/**
  * Delete a cookie
  *
  * @param string $cookie

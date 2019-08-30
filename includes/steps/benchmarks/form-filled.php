@@ -193,6 +193,15 @@ class Form_Filled extends Benchmark
                                         value="<?php echo esc_attr( $form_embed_code ); ?>"
                                         readonly></td>
                         </tr>
+                        <tr>
+                            <td><?php printf( '%s:', __( 'Hosted' ) ); ?></td>
+                            <td> <input
+                                        type="text"
+                                        onfocus="this.select()"
+                                        class="regular-text code"
+                                        value="<?php echo esc_attr( $form->get_submission_url() ); ?>"
+                                        readonly></td>
+                        </tr>
                         </tbody>
                     </table>
                     <p>
@@ -310,6 +319,10 @@ class Form_Filled extends Benchmark
                                 array(
                                     'text' => __( 'Address', 'groundhogg' ),
                                     'class' => 'button button-secondary address'
+                                ),
+                                array(
+                                    'text' => __( 'Birthday', 'groundhogg' ),
+                                    'class' => 'button button-secondary birthday'
                                 ),
                                 array(
                                     'text' => __( 'GDPR', 'groundhogg' ),

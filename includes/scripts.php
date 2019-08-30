@@ -35,26 +35,20 @@ class Scripts
         // Integrations
         wp_register_script( 'groundhogg-elementor-integration', GROUNDHOGG_URL . 'integrations/elementor' . $IS_MINIFIED .'.js', [], GROUNDHOGG_VERSION, true );
 
-        if (!Plugin::$instance->settings->is_option_enabled('disable_api')) {
+        if ( ! Plugin::$instance->settings->is_option_enabled('disable_api') ) {
+
             wp_localize_script('groundhogg-frontend', 'Groundhogg', array(
-                'page_view_endpoint' => rest_url( 'gh/v3/tracking/page-view/'),
+                'tracking_enabled' => ! is_option_enabled( 'gh_disable_page_view_tracking' ),
                 'form_impression_endpoint' => rest_url( 'gh/v3/tracking/form-impression/'),
+                'page_view_endpoint' => rest_url( 'gh/v3/tracking/page-view/'),
                 'form_submission_endpoint' => rest_url( 'gh/v3/forms/submit/'),
                 'ajaxurl' => admin_url( 'admin-ajax.php' ),
                 '_wpnonce' => wp_create_nonce('wp_rest' ),
-                '_ghnonce' => wp_create_nonce('groundhogg_frontend' )
+                '_ghnonce' => wp_create_nonce('groundhogg_frontend' ),
             ));
-        } else {
-            /* backwards compat */
-            wp_localize_script('groundhogg-frontend', 'Groundhogg', array(
-                'page_view_endpoint' => admin_url('admin-ajax.php?action=gh_page_view'),
-                'form_impression_endpoint' => admin_url('admin-ajax.php?action=gh_form_impression'),
-                '_wpnonce' => wp_create_nonce('wp_rest'),
-                '_ghnonce' => wp_create_nonce('groundhogg_frontend')
-            ));
-        }
 
-        wp_enqueue_script( 'groundhogg-frontend' );
+            wp_enqueue_script( 'groundhogg-frontend' );
+        }
 
         do_action('groundhogg/scripts/after_register_frontend_scripts', $this->is_script_debug_enabled(), $IS_MINIFIED );
     }

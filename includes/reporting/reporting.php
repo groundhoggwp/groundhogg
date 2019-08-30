@@ -244,7 +244,7 @@ class Reporting
                 break;
             case 'custom';
                 $this->start_time   = Plugin::$instance->utils->date_time->round_to_day( strtotime( get_request_var( 'custom_date_range_start' ) ) );
-                $this->end_time     = Plugin::$instance->utils->date_time->round_to_day( strtotime( get_request_var( 'custom_date_range_end' ) ) );
+                $this->end_time     = Plugin::$instance->utils->date_time->round_to_day( strtotime( get_request_var( 'custom_date_range_end' ) ) ) + DAY_IN_SECONDS - 1;
                 $range = $this->end_time - $this->start_time;
                 $this->points       = ceil( $range  / $this->get_time_diff( $range ) );
                 $this->difference   = $this->get_time_diff( $range );

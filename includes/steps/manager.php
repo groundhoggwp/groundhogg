@@ -26,6 +26,7 @@ use Groundhogg\Steps\Benchmarks\Page_Visited;
 use Groundhogg\Steps\Benchmarks\Role_Changed;
 use Groundhogg\Steps\Benchmarks\Tag_Applied;
 use Groundhogg\Steps\Benchmarks\Tag_Removed;
+use function Groundhogg\is_option_enabled;
 
 /**
  * Created by PhpStorm.
@@ -77,7 +78,12 @@ class Manager {
         $this->elements[] = new Email_Confirmed();
         $this->elements[] = new Link_Clicked();
         $this->elements[] = new Login_Status();
-        $this->elements[] = new Page_Visited();
+
+        // No page view if tracking is disabled.
+        if ( ! is_option_enabled( 'gh_disable_page_view_tracking' ) ){
+            $this->elements[] = new Page_Visited();
+        }
+
         $this->elements[] = new Role_Changed();
         $this->elements[] = new Tag_Applied();
         $this->elements[] = new Tag_Removed();

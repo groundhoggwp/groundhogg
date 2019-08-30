@@ -403,7 +403,8 @@ class Contacts extends DB {
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY (ID),
 		UNIQUE KEY email (email),
-		KEY user (user_id)
+		KEY user (user_id),
+		KEY date_created (date_created)
 		) {$this->get_charset_collate()};";
 
         dbDelta( $sql );

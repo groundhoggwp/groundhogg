@@ -110,6 +110,7 @@ var FormBuilder = {};
             this.types.radio        = ['required','label','name','options','id','class'];
             this.types.checkbox     = ['required','label','name','value','tag','id','class'];
             this.types.address      = ['required','label','id','class'];
+            this.types.birthday     = ['required','label','id','class'];
             this.types.row          = ['id','class'];
             this.types.col          = ['width','id','class'];
             this.types.date         = ['required','label','name','min_date','max_date','id','class'];
