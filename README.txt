@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.8.1 (2019-08-31) =
+* FIXED Bug in Abstract Table class causing fatal error in some extensions in Admin view.
+
 = 2.0.8 (2019-08-30) =
 * ADDED birthday field support for the form builder and contact record.
 * ADDED option to disable the JS page tracking script.

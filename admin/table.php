@@ -206,10 +206,14 @@ abstract class Table extends \WP_List_Table
             'orderby' => $orderby,
         );
 
-        $events = $this->get_db()->query( $args );
+        $items = $this->get_db()->query( $args );
         $total = $this->get_db()->count( $args );
+        
+        foreach ($items as $i => $item){
+        	$items[$i] = $this->parse_item($item);
+        }
 
-        $this->items = $events;
+        $this->items = $items;
 
         // Add condition to be sure we don't divide by zero.
         // If $this->per_page is 0, then set total pages to 1.
