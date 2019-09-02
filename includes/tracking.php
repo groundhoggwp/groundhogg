@@ -190,9 +190,7 @@ class Tracking
      */
     public function template_redirect()
     {
-//    	wp_send_json_error();
-
-        if ( ! is_managed_page() ){
+    	if ( ! is_managed_page() ){
             return;
         }
 

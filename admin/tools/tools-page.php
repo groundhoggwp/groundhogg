@@ -275,6 +275,17 @@ class Tools_Page extends Tabbed_Admin_Page
                         ] );
 
                         echo html()->e( 'p', [], [
+                            __( 'Choose role.', 'groundhogg' ),
+                            html()->dropdown( [
+                                'name'              => 'role',
+                                'id'                => 'role',
+                                'options' => Plugin::$instance->roles->get_roles_for_select(),
+                                'selected' => 'subscriber',
+                                'style' => [ 'width' => '100%' ]
+                            ] ),
+                        ] );
+
+                        echo html()->e( 'p', [], [
                             html()->checkbox( [
                                 'label'         => __( 'Send email notification to user.', 'groundhogg' ),
                                 'name'          => 'send_email_notification',
@@ -307,11 +318,14 @@ class Tools_Page extends Tabbed_Admin_Page
             $this->wp_die_no_access();
         }
 
-        delete_transient( 'gh_send_account_email' );
+        delete_transient( 'gh_create_user_job_config' );
 
-        if ( get_request_var( 'send_email_notification' ) ){
-            set_transient( 'gh_send_account_email', 1 );
-        }
+        $config = [
+            'send_email' => boolval( get_request_var( 'send_email_notification' ) ),
+            'role' => sanitize_text_field( get_request_var( 'role', 'subscriber' ) ),
+        ];
+
+        set_transient( 'gh_create_user_job_config', $config, HOUR_IN_SECONDS );
 
         $this->create_users->start( [
             'tags_include' => wp_parse_id_list( get_request_var( 'tags_include' ) ),

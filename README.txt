@@ -150,8 +150,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.0.8.1 (2019-08-31) =
+= 2.0.8.1 (2019-09-02) =
+* ADDED Rewrite rules list to system report.
+* TWEAKED Create user bulk job now has a 'Role' option.
 * FIXED Bug in Abstract Table class causing fatal error in some extensions in Admin view.
+* FIXED Bug where adding query strings to url in email builder caused a 404 error.
 
 = 2.0.8 (2019-08-30) =
 * ADDED birthday field support for the form builder and contact record.

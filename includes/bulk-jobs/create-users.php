@@ -15,6 +15,7 @@ class Create_Users extends Bulk_Job
 {
 
     protected $send_notification = false;
+    protected $role = 'subscriber';
 
     /**
      * Get the action reference.
@@ -93,6 +94,8 @@ class Create_Users extends Bulk_Job
             }
 
             $contact->update( [ 'user_id' => $uid ] );
+
+            $contact->get_userdata()->add_role( $this->role );
         }
 
     }
@@ -103,7 +106,11 @@ class Create_Users extends Bulk_Job
      * @return void
      */
     protected function pre_loop(){
-        $this->send_notification = boolval( get_transient( 'gh_send_account_email' ) );
+
+    	$config = get_transient( 'gh_create_user_job_config' );
+
+        $this->send_notification = get_array_var( $config, 'send_email' );
+        $this->role = get_array_var( $config, 'role', 'subscriber' );
     }
 
     /**
