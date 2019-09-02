@@ -110,7 +110,7 @@ class Tracking
         // New tracking structure.
         // With Ref attribute
         add_rewrite_rule(
-            '^gh/tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/ref/([^/]*)/?$',
+            '^gh/tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/ref/(.*)$',
             managed_rewrite_rule( 'subpage=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]&target_url=$matches[6]' ),
             'top'
         );
@@ -190,6 +190,8 @@ class Tracking
      */
     public function template_redirect()
     {
+//    	wp_send_json_error();
+
         if ( ! is_managed_page() ){
             return;
         }
@@ -531,11 +533,13 @@ class Tracking
         $event_id = $this->get_tracking_cookie_param( 'event_id' );
         $event = Plugin::$instance->utils->get_event( $event_id );
 
+        $redirect = add_query_arg( [ 'key' => wp_create_nonce() ], $target );
+
         if ( ! $event ){
 
             // Assume testing...
             if ( is_user_logged_in() ){
-                wp_redirect( wp_nonce_url( $target,  -1, 'key' ) );
+                wp_redirect( $redirect );
                 return;
             }
 
@@ -556,7 +560,7 @@ class Tracking
         if ( get_db( 'activity' )->add( $args ) ){
             do_action( 'groundhogg/tracking/email/click', $this );
 
-            wp_redirect( wp_nonce_url( $target,  -1, 'key' ) );
+            wp_redirect( $redirect );
             return;
         }
 

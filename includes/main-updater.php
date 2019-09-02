@@ -38,6 +38,7 @@ class Main_Updater extends Updater {
             '2.0.7',
             '2.0.7.1',
             '2.0.8',
+            '2.0.8.1',
         ];
     }
 
@@ -107,5 +108,14 @@ class Main_Updater extends Updater {
         $wpdb->query( "CREATE INDEX date_created ON {$db->get_table_name()}(date_created)" );
 
     }
+
+	/**
+	 * Fix tracking link bug. url encoding the string causes 404 error.
+	 */
+    public function version_2_0_8_1()
+    {
+    	install_custom_rewrites();
+    }
+
 
 }

@@ -430,7 +430,7 @@ class Email extends Base_Object_With_Meta
     public function convert_to_tracking_links( $content )
     {
         /* Filter the superlinks to include data about the email, campaign, and funnel steps... */
-        return preg_replace_callback('/(href=")(?!mailto)([^"]*)(")/i', [ $this, 'tracking_link_callback' ], $content);
+        return preg_replace_callback('/(href=")(?!mailto)(?!tel)([^"]*)(")/i', [ $this, 'tracking_link_callback' ], $content);
     }
 
     /**
@@ -441,7 +441,7 @@ class Email extends Base_Object_With_Meta
      */
     public function tracking_link_callback( $matches )
     {
-        return $matches[1] . $this->get_click_tracking_link() . urlencode( base64_encode( $matches[2]) ) . $matches[3];
+        return $matches[1] . $this->get_click_tracking_link() . base64_encode( $matches[2]) . $matches[3];
     }
 
     /**
@@ -663,7 +663,7 @@ class Email extends Base_Object_With_Meta
         $headers['reply_to'] = 'Reply-To: ' . $this->get_reply_to_address();
         $headers['return_path'] = 'Return-Path: ' . Plugin::$instance->settings->get_option('bounce_inbox', $this->get_from_email());
         $headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
-        $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), $this->get_click_tracking_link(), urlencode($this->get_unsubscribe_link() ) );
+        $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), $this->get_click_tracking_link(), $this->get_unsubscribe_link() );
 
         return apply_filters("groundhogg/email/headers", $headers);
     }
