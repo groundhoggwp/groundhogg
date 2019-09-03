@@ -532,4 +532,12 @@ abstract class Admin_Page
         wp_send_json_success( $response );
     }
 
+    /**
+     * Default process view
+     */
+    public function process_view()
+    {
+        $paged = get_request_var( 'paged', 1 );
+        return add_query_arg( 'paged', $paged, wp_get_referer() );
+    }
 }

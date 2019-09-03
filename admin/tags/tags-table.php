@@ -180,7 +180,7 @@ class Tags_Table extends WP_List_Table {
         $paged   = $this->get_pagenum();
         $offset  = $per_page * ( $paged - 1 );
         $search  = get_url_var( 's' );
-        $order   = get_url_var( 'order', 'DESC' );
+        $order   = strtoupper( get_url_var( 'order', 'DESC' ) );
         $orderby = get_url_var( 'orderby', 'tag_id' );
 
         $args = array(
@@ -205,27 +205,6 @@ class Tags_Table extends WP_List_Table {
             'per_page'    => $per_page,
             'total_pages' => $total_pages,
         ) );
-    }
-
-    /**
-     * Callback to allow sorting of example data.
-     *
-     * @param string $a First value.
-     * @param string $b Second value.
-     *
-     * @return int
-     */
-    protected function usort_reorder( $a, $b ) {
-        $a = (array) $a;
-        $b = (array) $b;
-
-        // If no sort, default to title.
-        $orderby = ! empty( $_REQUEST['orderby'] ) ? wp_unslash( $_REQUEST['orderby'] ) : 'tag_id'; // WPCS: Input var ok.
-        // If no order, default to asc.
-        $order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
-        // Determine sort order.
-        $result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
-        return ( 'desc' === $order ) ? $result : - $result;
     }
 
     /**

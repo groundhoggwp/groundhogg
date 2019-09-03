@@ -7,6 +7,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
+use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Preferences;
 use \WP_List_Table;
@@ -121,7 +122,7 @@ class Contacts_Table extends WP_List_Table
 
         $html .= "<strong>";
 
-        $html .= "<a class='row-title' href='$editUrl'>" . esc_html($contact->get_email()) . "</a>";
+        $html .= "<a class='row-title' href='$editUrl'>" . html()->e( 'img', [ 'src' => $contact->get_profile_picture(), 'style' => [ 'float' => 'left', 'margin-right' => '10px' ], 'width' => 40 ] ) . esc_html($contact->get_email()) . "</a>";
 
         if (!get_request_var('optin_status')) {
 

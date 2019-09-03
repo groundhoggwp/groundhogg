@@ -150,6 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.1 (2019-09-03) =
+* FIXED pagination bug when manually selecting a page.
+* FIXED DB query bug showing too many results on tags page.
+
 = 2.0.9 (2019-09-03) =
 * ADDED Plugins API benchmark! Developer happiness is now at an all time high!
 * ADDED Plugins API endpoint for using webhooks to move people through funnels.

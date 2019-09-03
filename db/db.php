@@ -849,7 +849,17 @@ abstract class DB {
             return $this->advanced_query( $data, $from_cache );
         }
 
-        $query_vars = [];
+        $query_vars = wp_parse_args( $data, [
+            'where' => [],
+            'limit' => false,
+            'offset' => false,
+            'orderby' => $this->get_primary_key(),
+            'order' => 'desc',
+            'select' => '*',
+            'search' => false,
+            'func' => false,
+        ] );
+
         $where = [ 'relationship' => 'AND' ];
 
         // Parse data and turn into an advanced query search instead
@@ -905,8 +915,6 @@ abstract class DB {
 
         $query_vars[ 'where' ] = $where;
         $query_vars[ 'order' ] = get_array_var( $data, 'order', 'DESC' );
-
-//        wp_send_json( $query_vars );
 
         return $this->advanced_query( $query_vars, $from_cache );
     }
