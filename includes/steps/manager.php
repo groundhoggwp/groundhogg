@@ -17,6 +17,7 @@ use Groundhogg\Steps\Actions\Send_Email;
 use Groundhogg\Steps\Actions\Send_SMS;
 use Groundhogg\Steps\Actions\Sleep;
 use Groundhogg\Steps\Benchmarks\Account_Created;
+use Groundhogg\Steps\Benchmarks\Plugin_Api;
 use Groundhogg\Steps\Benchmarks\Benchmark;
 use Groundhogg\Steps\Benchmarks\Email_Confirmed;
 use Groundhogg\Steps\Benchmarks\Form_Filled;
@@ -87,6 +88,7 @@ class Manager {
         $this->elements[] = new Role_Changed();
         $this->elements[] = new Tag_Applied();
         $this->elements[] = new Tag_Removed();
+        $this->elements[] = new Plugin_Api();
 
         /* Other */
         $this->elements[] = new Error();

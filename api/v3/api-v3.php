@@ -48,6 +48,7 @@ class API_V3
         $this->broadcasts = new Broadcasts_Api();
         $this->bulk_job = new Bulk_Job_Api();
 //        $this->forms    = new Forms_Api();
+        $this->plugin_api = new Plugin_Api();
 
     }
 

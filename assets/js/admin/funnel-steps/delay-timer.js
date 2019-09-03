@@ -1,31 +1,26 @@
 var DelayTimer = {};
-
-(function ($,fi) {
-
-    $.extend( fi, {
-
+(function ($, fi) {
+    $.extend(fi, {
         init: function () {
-
-            $( document ).on( 'change', '.run_when', function(){
-
+            $(document).on('change', '.run_when', function () {
                 var $when = $(this);
-                var $step = $when.closest( '.step' );
-                var $time = $step.find( '.run_time' );
+                var $step = $when.closest('.step');
+                var $time = $step.find('.run_time');
 
-                if ( $when.val() === 'now' ){
-                    $time.addClass( 'hidden' );
+                if ($when.val() === 'now') {
+                    $time.addClass('hidden');
                 } else {
-                    $time.removeClass( 'hidden' );
+                    $time.removeClass('hidden');
                 }
 
             });
 
         }
 
-    } );
-
-    $(function () {
-       fi.init();
     });
 
-})( jQuery, DelayTimer );
+    $(function () {
+        fi.init();
+    });
+
+})(jQuery, DelayTimer);

@@ -661,6 +661,12 @@ abstract class DB {
             'func' => false, // COUNT | AVG | SUM
         ] );
 
+        $hash = md5( serialize( $query_vars ) );
+
+        if ( ( $cached_results = get_array_var( self::$cache, $hash ) ) && $from_cache ){
+            return $cached_results;
+        }
+
         // Build Where Statement
         $where = get_array_var( $query_vars, 'where', [] );
 
@@ -712,12 +718,6 @@ abstract class DB {
 
         $sql = "SELECT {$select} FROM {$this->get_table_name()} WHERE $clauses";
 
-        $hash = md5( $sql );
-
-        if ( ( $cached_results = get_array_var( self::$cache, $hash ) ) && $from_cache ){
-            return $cached_results;
-        }
-
         $func = strtolower( $query_vars[ 'func' ] );
 
         switch ( $func ){
@@ -738,7 +738,7 @@ abstract class DB {
     }
 
     /**
-     * Allowes
+     * Allowed relationships
      *
      * @return array
      */
@@ -748,7 +748,7 @@ abstract class DB {
     }
 
     /**
-     * Build the wherre clause statement using the new structure. Recursive
+     * Build the where clause statement using the new structure. Recursive
      *
      * @param $where array
      * @return string
@@ -760,6 +760,12 @@ abstract class DB {
         $where = wp_parse_args( $where, [
             'relationship' => 'AND'
         ] );
+
+        // Normalize 'relation' => 'relationship'
+        if ( isset_not_empty( $where, 'relation' ) ){
+            $where[ 'relationship' ] = $where[ 'relation' ];
+            unset( $where[ 'relation' ] );
+        }
 
         $relationship = in_array( $where[ 'relationship' ], $this->get_allowed_relationships() ) ? strtoupper( $where[ 'relationship' ] ) : 'AND';
 
@@ -780,6 +786,12 @@ abstract class DB {
                     'val' => '',
                     'compare' => '='
                 ] );
+
+                // Normalize 'value' => 'val'
+                if ( isset_not_empty( $where, 'value' ) ){
+                    $where[ 'val' ] = $where[ 'value' ];
+                    unset( $where[ 'value' ] );
+                }
 
                 if ( in_array( $condition[ 'col' ], $this->get_allowed_columns() ) && in_array( $condition[ 'compare' ], $this->get_allowed_comparisons() ) ){
 

@@ -1474,6 +1474,7 @@ function get_mappable_fields( $extra=[] )
         'user_id'                   => __( 'User Id' ),
         'owner_id'                  => __( 'Owner Id' ),
         'date_created'              => __( 'Date Created' ),
+        'birthday'                  => __( 'Birthday' ),
         'primary_phone'             => __( 'Phone Number' ),
         'primary_phone_extension'   => __( 'Phone Number Extension' ),
         'street_address_1'          => __( 'Street Address 1' ),
@@ -1626,7 +1627,16 @@ function generate_contact_with_map( $fields, $map )
                 if ( $ip ){
                     $meta[ $field ] = $ip;
                 }
+                break;
+            case 'birthday':
 
+                $date = date( 'Y-m-d', strtotime( $value ) );
+                $parts = map_deep( explode( '-', $date ), 'absint' );
+
+                $meta[ 'birthday_year' ]    = $parts[0];
+                $meta[ 'birthday_month' ]   = $parts[1];
+                $meta[ 'birthday_day' ]     = $parts[2];
+                $meta[ 'birthday' ]         = $date;
                 break;
         }
 
@@ -2131,4 +2141,28 @@ function file_access_url( $path, $download=false ){
     }
 
     return $url;
+}
+
+/**
+ * Triggers the API benchmark
+ *
+ * @param string $call_name the name you wish to call
+ * @param string $id_or_email id or email of the contact
+ * @param bool $by_user_id whether the ID is the ID of a WP user
+ */
+function do_api_trigger( $call_name='', $id_or_email='', $by_user_id=false )
+{
+    do_action( 'groundhogg/steps/benchmarks/api', $call_name, $id_or_email, $by_user_id );
+}
+
+/**
+ * Wrapper for the do_api_trigger function.
+ *
+ * @param string $call_name
+ * @param string $id_or_email
+ * @param bool $by_user_id
+ */
+function do_api_benchmark( $call_name='', $id_or_email='', $by_user_id=false )
+{
+    do_api_trigger( $call_name, $id_or_email, $by_user_id );
 }

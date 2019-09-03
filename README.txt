@@ -150,6 +150,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9 (2019-09-03) =
+* ADDED Plugins API benchmark! Developer happiness is now at an all time high!
+* ADDED Plugins API endpoint for using webhooks to move people through funnels.
+* ADDED Birthday field mapping for importer and form integrations.
+* TWEAKED Added compatibility for DB query vars with similar names. e.g. 'val' & 'value' or 'relation' & 'relationship'
+* FIXED missing minified file for the delay timer action.
+* FIXED Field label showing even if no label in the form builder.
+
 = 2.0.8.1 (2019-09-02) =
 * ADDED Rewrite rules list to system report.
 * TWEAKED Create user bulk job now has a 'Role' option.

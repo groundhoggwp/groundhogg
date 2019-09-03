@@ -230,13 +230,13 @@ abstract class Input extends Field
 
         return html()->wrap([
             $this->get_label(),
-            "&nbsp;",
             html()->input( $atts )
         ],
-        'label',
-        [
-            'class' => 'gh-input-label'
-        ]
+            'label',
+            [
+                'class' => 'gh-input-label'
+            ]
         );
+
     }
 }
