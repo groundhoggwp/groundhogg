@@ -1,6 +1,6 @@
 === Groundhogg — Marketing Automation & CRM for WordPress ===
 Contributors: trainingbusinesspros, groundhogg, dhrumit
-Tags: marketing, email, contacts, contact, CRM, marketing automation, email automation, funnels, marketing funnels, marketing campaigns, campaigns, broadcast, contacts, contact management, funnel, smtp, form, form builder
+Tags: crm, email marketing, email, marketing automation, automation
 Donate link: https://groundhogg.io
 Requires at least: 4.9
 Tested up to: 5.2
