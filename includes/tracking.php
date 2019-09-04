@@ -109,18 +109,16 @@ class Tracking
     {
         // New tracking structure.
         // With Ref attribute
-        add_rewrite_rule(
-            '^gh/tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/ref/(.*)$',
-            managed_rewrite_rule( 'subpage=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]&target_url=$matches[6]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/ref/(.*)$',
+            'subpage=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]&target_url=$matches[6]'
         );
 
         // New tracking structure.
         // No Ref attribute
-        add_rewrite_rule(
-            '^gh/tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'tracking/([^/]*)/([^/]*)/u/([^/]*)/e/([^/]*)/i/([^/]*)/?$',
+            'subpage=tracking&tracking_via=$matches[1]&tracking_action=$matches[2]&contact_id=$matches[3]&event_id=$matches[4]&email_id=$matches[5]'
         );
     }
 

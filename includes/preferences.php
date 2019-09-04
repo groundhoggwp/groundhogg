@@ -25,7 +25,7 @@ class Preferences
      */
     public function add_rewrite_rules()
     {
-        add_rewrite_rule( '^gh/preferences/([^/?]*)', managed_rewrite_rule( 'subpage=preferences&action=$matches[1]' ), 'top' );
+        add_managed_rewrite_rule( 'preferences/([^/?]*)', 'subpage=preferences&action=$matches[1]', 'top' );
     }
 
     /**
@@ -245,6 +245,11 @@ class Preferences
         return Plugin::$instance->settings->is_option_enabled( 'strict_confirmation' );
     }
 
+    /**
+     * Get the grace period for confirmation
+     *
+     * @return mixed
+     */
     public function get_grace_period()
     {
         return Plugin::$instance->settings->get_option( 'confirmation_grace_period', 14 );

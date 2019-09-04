@@ -1900,46 +1900,67 @@ function blacklist_check( $data='' ){
 }
 
 /**
- * Get the ID of the managed page.
- *
- * @return int|WP_Error
+ * @return mixed|void
  */
-function get_managed_page_id()
+function get_managed_page_name()
 {
-    if ( $id = get_option( 'gh_managed_page_id' ) ){
-        return absint( $id );
-    }
-
-    $post_id = wp_insert_post([
-        'post_title'            => 'groundhogg-managed-page',
-        'post_status'           => 'publish',
-        'post_type'             => 'groundhogg_page',
-    ], true );
-
-    update_option( 'gh_managed_page_id', $post_id );
-
-    return $post_id;
+    return get_option( 'gh_managed_page_name_override', 'gh' );
 }
 
 /**
- * Register the managed page post type.
+ * Setup the managed page
  */
-function register_manage_page_post_type()
+function setup_managed_page()
 {
-    register_post_type( 'groundhogg_page', [
-        'public' => false,
+    $managed_page_name = get_managed_page_name();
+
+    $posts = get_posts( [
+        'post_name' => $managed_page_name
     ] );
+
+    if ( empty( $posts ) ){
+        $post_id = wp_insert_post([
+            'post_title'            => 'managed-page',
+            'post_status'           => 'publish',
+            'post_name'             => $managed_page_name,
+            'post_type'             => 'page',
+            'post_content'          => "Shhhh! This is a secret page. Go away!"
+        ], true );
+    }
+
 }
 
-add_action( 'init', __NAMESPACE__ . '\register_manage_page_post_type' );
+/**
+ * Add a managed rewrite rule
+ *
+ * @param string $regex
+ * @param string $query
+ * @param string $after
+ */
+function add_managed_rewrite_rule( $regex='', $query='', $after='top' ){
+
+    $managed_page_name = get_managed_page_name();
+
+    if ( strpos( $query, 'index.php' ) === false ){
+        $ahead = sprintf( 'index.php?pagename=%s&', $managed_page_name );
+        $query = $ahead . $query;
+    }
+
+    if ( strpos( $regex, '^' . $managed_page_name ) !== 0 ){
+        $regex = '^' . $managed_page_name . '/' . $regex;
+    }
+
+    add_rewrite_rule( $regex, $query, $after );
+}
 
 /**
  * @param string $string
+ * @deprecated since 2.0.9.2
  * @return string
  */
 function managed_rewrite_rule( $string = '' )
 {
-    return sprintf( 'index.php?pagename=%s&p=%s&', 'groundhogg-managed-page', get_managed_page_id() ) . $string;
+    return sprintf( 'index.php?pagename=%s&', get_managed_page_name() ) . $string;
 }
 
 /**
@@ -1947,7 +1968,21 @@ function managed_rewrite_rule( $string = '' )
  */
 function is_managed_page()
 {
-    return get_query_var( 'pagename' ) === 'groundhogg-managed-page';
+    return get_query_var( 'pagename' ) === get_managed_page_name();
+}
+
+/**
+ * Add the new rewrite rules.
+ */
+function install_custom_rewrites()
+{
+    setup_managed_page();
+
+    Plugin::$instance->tracking->add_rewrite_rules();
+    Plugin::$instance->rewrites->add_rewrite_rules();
+    Plugin::$instance->preferences->add_rewrite_rules();
+
+    flush_rewrite_rules();
 }
 
 /**
@@ -2111,18 +2146,6 @@ function remote_post_json( $url='', $body=[], $method='POST', $headers=[] )
 function get_date_time_format()
 {
     return sprintf( "%s %s", get_option( 'date_format' ), get_option( 'time_format' ) );
-}
-
-/**
- * Add the new rewrite rules.
- */
-function install_custom_rewrites()
-{
-    Plugin::$instance->tracking->add_rewrite_rules();
-    Plugin::$instance->rewrites->add_rewrite_rules();
-    Plugin::$instance->preferences->add_rewrite_rules();
-
-    flush_rewrite_rules();
 }
 
 /**

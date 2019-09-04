@@ -145,7 +145,7 @@ function managed_page_footer() {
 	$html = implode( ' | ', [
 		html()->e( 'a', [ 'href' => home_url( '/' ) ], sprintf( _x( '&larr; Back to %s', 'site' ), get_bloginfo( 'title', 'display' ) ) ),
 		html()->e( 'a', [ 'href' => site_url( 'gh/preferences/profile/' ) ], __( 'Edit Profile', 'groundhogg' ) ),
-		html()->e( 'a', [ 'href' => $privacy_policy_url ], __( 'Privacy Policy' ) ),
+		html()->e( 'a', [ 'href' => $privacy_policy_url ], __( 'Privacy Policy', 'groundhogg' ) ),
 	] );
 
 	?>

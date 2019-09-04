@@ -21,72 +21,62 @@ class Rewrites
     public function add_rewrite_rules()
     {
         // View Emails
-        add_rewrite_rule(
-            '^gh/browser-view/emails/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=browser_view&email_id=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'browser-view/emails/([^/]*)/?$',
+            'subpage=browser_view&email_id=$matches[1]'
         );
 
         // View Emails
-        add_rewrite_rule(
-            '^gh/emails/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=emails&email_id=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'emails/([^/]*)/?$',
+            'subpage=emails&email_id=$matches[1]'
         );
 
         // New tracking structure.
-        add_rewrite_rule(
-            '^gh/superlinks/link/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=superlink&superlink_id=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'superlinks/link/([^/]*)/?$',
+            'subpage=superlink&superlink_id=$matches[1]'
         );
 
         // Benchmark links
-        add_rewrite_rule(
-            '^gh/link/click/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=benchmark_link&link_id=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'link/click/([^/]*)/?$',
+            'subpage=benchmark_link&link_id=$matches[1]'
         );
 
         // Funnel Download/Export
-        add_rewrite_rule(
-            '^gh/funnels/export/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=funnels&action=export&enc_funnel_id=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'funnels/export/([^/]*)/?$',
+            'subpage=funnels&action=export&enc_funnel_id=$matches[1]'
         );
 
         // File download
-        add_rewrite_rule(
-            '^gh/files/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=files&action=download&file_path=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'files/([^/]*)/?$',
+             'subpage=files&action=download&file_path=$matches[1]'
         );
 
         // File view with basename.
-        add_rewrite_rule(
-            '^gh/files/([^/]*)/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=files&action=download&file_path=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'files/([^/]*)/([^/]*)/?$',
+            'subpage=files&action=download&file_path=$matches[1]'
         );
 
-        add_rewrite_rule(
-            '^gh/forms/([^/]*)/submit/?$',
-            managed_rewrite_rule( 'subpage=form_submit&form_id=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'forms/([^/]*)/submit/?$',
+            'subpage=form_submit&form_id=$matches[1]'
         );
 
         // Forms Iframe Script
-        add_rewrite_rule(
-            '^gh/forms/iframe/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=forms_iframe&form_id=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'forms/iframe/([^/]*)/?$',
+            'subpage=forms_iframe&form_id=$matches[1]'
         );
 
         // Forms Iframe Template
-        add_rewrite_rule(
-            '^gh/forms/([^/]*)/?$',
-            managed_rewrite_rule( 'subpage=forms&form_id=$matches[1]' ),
-            'top'
+        add_managed_rewrite_rule(
+            'forms/([^/]*)/?$',
+            'subpage=forms&form_id=$matches[1]'
         );
 
     }

@@ -150,6 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.2 (2019-09-04) =
+* ADDED missing translation contexts to preferences page
+* TWEAKED rewrite url structure for managed pages now open to modification if you know what you're doing.
+
 = 2.0.9.1 (2019-09-03) =
 * FIXED pagination bug when manually selecting a page.
 * FIXED DB query bug showing too many results on tags page.
