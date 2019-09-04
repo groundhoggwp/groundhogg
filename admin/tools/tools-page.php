@@ -78,6 +78,8 @@ class Tools_Page extends Tabbed_Admin_Page
         return 98;
     }
 
+    public function screen_options(){}
+
     protected function get_parent_slug()
     {
         return 'groundhogg';

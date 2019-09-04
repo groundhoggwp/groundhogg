@@ -7,6 +7,7 @@ use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
@@ -301,7 +302,7 @@ class Events_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $per_page = absint( get_url_var( 'limit', 30 ) );
+        $per_page = absint(get_url_var('limit', get_screen_option( 'per_page' ) ));
         $paged   = $this->get_pagenum();
         $offset  = $per_page * ( $paged - 1 );
         $search  = get_url_var( 's' );

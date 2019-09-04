@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\SMS;
 
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
+use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use Groundhogg\SMS;
 use Groundhogg\Plugin;
@@ -158,12 +159,12 @@ class SMS_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $per_page = absint( get_url_var( 'limit', 20 ) );
+        $per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
         $paged   = $this->get_pagenum();
         $offset  = $per_page * ( $paged - 1 );
         $search  = get_url_var( 's' );
         $order   = get_url_var( 'order', 'DESC' );
-        $orderby = get_url_var( 'orderby', 'tag_id' );
+        $orderby = get_url_var( 'orderby', 'ID' );
 
         $args = array(
             'search'  => $search,

@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Funnel;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
+use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
@@ -329,7 +330,7 @@ class Funnels_Table extends WP_List_Table {
 
         $this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $per_page = absint( get_url_var( 'limit', 20 ) );
+        $per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
         $paged   = $this->get_pagenum();
         $offset  = $per_page * ( $paged - 1 );
         $search  = get_url_var( 's' );

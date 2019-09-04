@@ -44,6 +44,7 @@ abstract class Admin_Page
             add_action('admin_enqueue_scripts', [$this, 'scripts']);
             add_action('admin_enqueue_scripts', [$this, 'register_pointers']);
             add_filter( 'admin_title', [ $this, 'admin_title' ], 10, 2 );
+            add_filter( 'set-screen-option', [ $this, 'set_screen_options' ], 10, 3 );
 
             add_action('admin_init', [$this, 'process_action']);
 
@@ -155,7 +156,9 @@ abstract class Admin_Page
      */
     abstract public function scripts();
 
-    /* Register the page */
+    /**
+     * Register the page
+     */
     public function register()
     {
         $page = add_submenu_page(
@@ -170,6 +173,34 @@ abstract class Admin_Page
         $this->screen_id = $page;
 
         add_action("load-" . $page, [$this, 'help']);
+        add_action("load-" . $page, [$this, 'screen_options']);
+    }
+
+    /**
+     * Add some screen options
+     */
+    public function screen_options()
+    {
+        $args = array(
+            'label' => __('Per page', 'groundhogg'),
+            'default' => 20,
+            'option' => $this->get_slug() . '_per_page'
+        );
+
+        add_screen_option( 'per_page', $args );
+    }
+
+    /**
+     * Save screen option per page
+     *
+     * @param $status
+     * @param $option
+     * @param $value
+     * @return mixed|void
+     */
+    public function set_screen_options( $status, $option, $value )
+    {
+        if ( $this->get_slug() . '_per_page' == $option ) return $value;
     }
 
     /**

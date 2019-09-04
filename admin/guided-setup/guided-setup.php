@@ -44,9 +44,11 @@ class Guided_Setup extends Admin_Page
     /**
      * Add Ajax actions...
      *
-     * @return mixed
+     * @return void
      */
     protected function add_ajax_actions(){}
+
+    public function screen_options(){}
 
     /**
      * Adds additional actions.

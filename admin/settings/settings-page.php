@@ -137,6 +137,8 @@ class Settings_Page extends Admin_Page
         do_action('groundhogg/admin/settings/init_defaults', $this);
     }
 
+    public function screen_options(){}
+
     /**
      * Returns a list of tabs
      *

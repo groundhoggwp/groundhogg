@@ -6,6 +6,7 @@ use function Groundhogg\current_user_is;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
@@ -294,7 +295,7 @@ class Contacts_Table extends WP_List_Table
 
         $this->_column_headers = array($columns, $hidden, $sortable);
 
-        $per_page = absint(get_url_var('limit', 30));
+        $per_page = absint(get_url_var('limit', get_screen_option( 'per_page' ) ));
         $paged = $this->get_pagenum();
         $offset = $per_page * ($paged - 1);
         $search = get_url_var('s');
@@ -339,28 +340,6 @@ class Contacts_Table extends WP_List_Table
             'per_page' => $per_page,
             'total_pages' => $total_pages,
         ));
-    }
-
-    /**
-     * Callback to allow sorting of example data.
-     *
-     * @param string $a First value.
-     * @param string $b Second value.
-     *
-     * @return int
-     */
-    protected function usort_reorder($a, $b)
-    {
-        // If no sort, default to title.
-        $a = (array)$a;
-        $b = (array)$b;
-
-        $orderby = !empty($_REQUEST['orderby']) ? wp_unslash($_REQUEST['orderby']) : 'date_created'; // WPCS: Input var ok.
-        // If no order, default to asc.
-        $order = !empty($_REQUEST['order']) ? wp_unslash($_REQUEST['order']) : 'asc'; // WPCS: Input var ok.
-        // Determine sort order.
-        $result = strnatcmp($a[$orderby], $b[$orderby]);
-        return ('desc' === $order) ? $result : -$result;
     }
 
     /**

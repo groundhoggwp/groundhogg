@@ -39,6 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Contacts_Page extends Admin_Page
 {
 
+    protected function add_additional_actions(){}
 
     protected function add_ajax_actions()
     {
@@ -123,8 +124,8 @@ class Contacts_Page extends Admin_Page
 
         return $admin_title;
     }
-
     /* help bar */
+
     public function help()
     {
         $screen = get_current_screen();
@@ -806,6 +807,7 @@ class Contacts_Page extends Admin_Page
         return false;
     }
 
+
     /**
      * Save the contact during inline edit
      */
@@ -888,7 +890,6 @@ class Contacts_Page extends Admin_Page
         wp_die();
     }
 
-
     /**
      * Display the contact table
      */
@@ -953,10 +954,5 @@ class Contacts_Page extends Admin_Page
             $this->wp_die_no_access();
         }
         include dirname(__FILE__) . '/form-admin-submit.php';
-    }
-
-    protected function add_additional_actions()
-    {
-        // TODO: Implement add_additional_actions() method.
     }
 }

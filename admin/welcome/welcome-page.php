@@ -23,6 +23,7 @@ class Welcome_Page extends Admin_Page
 {
     // UNUSED FUNCTIONS
     public function help() {}
+    public function screen_options() {}
     protected function add_ajax_actions() {}
     /**
      * Get the menu order between 1 - 99

@@ -2189,3 +2189,23 @@ function do_api_benchmark( $call_name='', $id_or_email='', $by_user_id=false )
 {
     do_api_trigger( $call_name, $id_or_email, $by_user_id );
 }
+
+/**
+ * Get the value of an option.
+ *
+ * @param string $option
+ * @return mixed|string
+ */
+function get_screen_option( $option='' )
+{
+    $user = get_current_user_id();
+    $screen = get_current_screen();
+    $screen_option = $screen->get_option($option, 'option');
+    $value = get_user_meta($user, $screen_option, true);
+
+    if ( empty( $value ) || ( is_numeric( $value) && $value < 1 ) ) {
+        $value = $screen->get_option( $option, 'default' );
+    }
+
+    return $value;
+}

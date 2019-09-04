@@ -152,7 +152,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.0.9.2 (2019-09-04) =
 * ADDED missing translation contexts to preferences page
+* ADDED Screen options panel to change number of records per page
 * TWEAKED rewrite url structure for managed pages now open to modification if you know what you're doing.
+* FIXED SMS page orderby broken
 
 = 2.0.9.1 (2019-09-03) =
 * FIXED pagination bug when manually selecting a page.
