@@ -1911,9 +1911,10 @@ function get_managed_page_id()
     }
 
     $post_id = wp_insert_post([
-        'post_title'            => 'groundhogg-managed-page',
+        'post_title'            => 'Groundhogg Managed Page',
+        'post_name'             => 'gh',
         'post_status'           => 'publish',
-        'post_type'             => 'groundhogg_page',
+        'post_type'             => 'page',
     ], true );
 
     update_option( 'gh_managed_page_id', $post_id );
@@ -1921,17 +1922,25 @@ function get_managed_page_id()
     return $post_id;
 }
 
-/**
- * Register the managed page post type.
- */
-function register_manage_page_post_type()
-{
-    register_post_type( 'groundhogg_page', [
-        'public' => false,
-    ] );
-}
+//delete_option( 'gh_managed_page_id' );
+//get_managed_page_id();
 
-add_action( 'init', __NAMESPACE__ . '\register_manage_page_post_type' );
+///**
+// * Register the managed page post type.
+// */
+//function register_manage_page_post_type()
+//{
+//    register_post_type( 'groundhogg_page', [
+//        'public' => false,
+//    ] );
+//}
+//
+//add_action( 'init', __NAMESPACE__ . '\register_manage_page_post_type' );
+
+function add_managed_rewrite_rule( $regex, $query, $after )
+{
+    add_rewrite_rule( '^gh/([^/]*)/', '', '' );
+}
 
 /**
  * @param string $string

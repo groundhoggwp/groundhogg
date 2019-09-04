@@ -15,7 +15,7 @@ class Preferences
 
     public function __construct()
     {
-        add_action( 'init', [ $this, 'add_rewrite_rules' ] );
+//        add_action( 'init', [ $this, 'add_rewrite_rules' ] );
         add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
         add_filter( 'template_include', [ $this, 'template_include' ] );
     }

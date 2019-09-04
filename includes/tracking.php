@@ -75,7 +75,7 @@ class Tracking
         add_action( 'wp_login', [ $this, 'wp_login' ], 10, 2 );
 
         add_action( 'after_setup_theme', [ $this, 'deconstruct_tracking_cookie' ], 1 );
-        add_action( 'init', [ $this, 'add_rewrite_rules' ] );
+//        add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 
         if ( ! is_admin() ){
             add_action( 'init', [ $this, 'parse_utm' ] );
