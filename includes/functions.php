@@ -1899,56 +1899,38 @@ function blacklist_check( $data='' ){
     return false;
 }
 
-/**
- * Get the ID of the managed page.
- *
- * @return int|WP_Error
- */
-function get_managed_page_id()
-{
-    if ( $id = get_option( 'gh_managed_page_id' ) ){
-        return absint( $id );
-    }
-
-    $post_id = wp_insert_post([
-        'post_title'            => 'Groundhogg Managed Page',
-        'post_name'             => 'gh',
-        'post_status'           => 'publish',
-        'post_type'             => 'page',
-    ], true );
-
-    update_option( 'gh_managed_page_id', $post_id );
-
-    return $post_id;
-}
-
 //delete_option( 'gh_managed_page_id' );
 //get_managed_page_id();
 
-///**
-// * Register the managed page post type.
-// */
+/**
+ * Register the managed page post type.
+ */
 //function register_manage_page_post_type()
 //{
-//    register_post_type( 'groundhogg_page', [
+//    register_post_type( 'gh', [
 //        'public' => false,
 //    ] );
 //}
 //
 //add_action( 'init', __NAMESPACE__ . '\register_manage_page_post_type' );
 
-function add_managed_rewrite_rule( $regex, $query, $after )
+/*function add_managed_rewrite_rule()
 {
-    add_rewrite_rule( '^gh/([^/]*)/', '', '' );
-}
+    add_rewrite_rule( '^gh/(.?.+?)(?:/([^/]+))?/?$', 'index.php?gh=$matches[1]&page=$matches[2]', 'top' );
+}*/
+
+//add_action( 'init', __NAMESPACE__ . '\add_managed_rewrite_rule' );
 
 /**
- * @param string $string
- * @return string
+ * Add managed rewrite rule
+ *
+ * @param string $regex
+ * @param string $query
+ * @param string $after
  */
-function managed_rewrite_rule( $string = '' )
+function add_managed_rewrite_rule( $regex='', $query='', $after='top' )
 {
-    return sprintf( 'index.php?pagename=%s&p=%s&', 'groundhogg-managed-page', get_managed_page_id() ) . $string;
+    add_rewrite_rule( $regex, sprintf( 'index.php?pagename=groundhogg&%s', $query ), $after );
 }
 
 /**
@@ -1956,7 +1938,7 @@ function managed_rewrite_rule( $string = '' )
  */
 function is_managed_page()
 {
-    return get_query_var( 'pagename' ) === 'groundhogg-managed-page';
+    return get_query_var( 'pagename' ) === 'groundhogg';
 }
 
 /**

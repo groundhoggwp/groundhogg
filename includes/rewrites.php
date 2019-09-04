@@ -9,10 +9,10 @@ class Rewrites
     public function __construct()
     {
 //        add_action( 'init', [ $this, 'add_rewrite_rules' ] );
-        add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
-        add_filter( 'request', [ $this, 'parse_query' ] );
-        add_filter( 'template_include', [ $this, 'template_include' ] );
-        add_action( 'template_redirect', [ $this, 'template_redirect' ] );
+//        add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
+//        add_filter( 'request', [ $this, 'parse_query' ] );
+//        add_filter( 'template_include', [ $this, 'template_include' ] );
+//        add_action( 'template_redirect', [ $this, 'template_redirect' ] );
     }
 
     /**

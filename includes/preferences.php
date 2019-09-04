@@ -15,7 +15,7 @@ class Preferences
 
     public function __construct()
     {
-//        add_action( 'init', [ $this, 'add_rewrite_rules' ] );
+        add_action( 'init', [ $this, 'add_rewrite_rules' ] );
         add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
         add_filter( 'template_include', [ $this, 'template_include' ] );
     }
@@ -25,7 +25,7 @@ class Preferences
      */
     public function add_rewrite_rules()
     {
-        add_rewrite_rule( '^gh/preferences/([^/?]*)', managed_rewrite_rule( 'subpage=preferences&action=$matches[1]' ), 'top' );
+        add_managed_rewrite_rule( '^gh/preferences/([^/?]*)',  'subpage=preferences&action=$matches[1]' );
     }
 
     /**
@@ -49,6 +49,8 @@ class Preferences
      */
     public function template_include( $template )
     {
+        wp_send_json_error( get_query_var( 'pagename' ) );
+
         if ( ! is_managed_page() ){
             return $template;
         }
@@ -60,6 +62,7 @@ class Preferences
         }
 
         $new_template = GROUNDHOGG_PATH . 'templates/preferences.php';
+
         if ( file_exists( $new_template ) ){
             return $new_template;
         }

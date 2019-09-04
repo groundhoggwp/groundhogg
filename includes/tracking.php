@@ -81,11 +81,11 @@ class Tracking
             add_action( 'init', [ $this, 'parse_utm' ] );
         }
 
-        add_filter( 'request', [ $this, 'parse_request' ] );
-        add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
+//        add_filter( 'request', [ $this, 'parse_request' ] );
+//        add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
 
 //        add_action( 'template_redirect', [ $this, 'fix_tracking_ssl' ] );
-        add_action( 'template_redirect', [ $this, 'template_redirect'] );
+//        add_action( 'template_redirect', [ $this, 'template_redirect'] );
 
         add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 1 );
 
