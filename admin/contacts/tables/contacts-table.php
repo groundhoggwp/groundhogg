@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Contacts\Tables;
 
 use function Groundhogg\current_user_is;
+use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
@@ -183,7 +184,7 @@ class Contacts_Table extends WP_List_Table
         $time_diff = $dc_time - $cur_time;
         $time_prefix = __('Created', 'groundhogg');
         if (absint($time_diff) > 24 * HOUR_IN_SECONDS) {
-            $time = date_i18n('Y/m/d \@ h:i A', intval($dc_time));
+            $time = date_i18n(get_date_time_format(), intval($dc_time));
         } else {
             $time = sprintf("%s ago", human_time_diff($dc_time, $cur_time));
         }

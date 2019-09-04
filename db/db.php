@@ -93,7 +93,7 @@ abstract class DB {
      */
     public function register_table() {
         global $wpdb;
-        $wpdb->__set( $this->get_object_type() . 's', $this->get_table_name() );
+        $wpdb->__set( 'gh_' . $this->get_object_type() . 's', $this->get_table_name() );
         $wpdb->tables[] = $this->get_db_suffix();
     }
 

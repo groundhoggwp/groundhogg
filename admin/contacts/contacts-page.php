@@ -96,6 +96,7 @@ class Contacts_Page extends Admin_Page
      */
     public function scripts()
     {
+
         wp_enqueue_style( 'groundhogg-admin' );
 
         if ($this->get_current_action() === 'edit' || $this->get_current_action() === 'add' || $this->get_current_action() === 'form' ) {

@@ -1,10 +1,11 @@
 <?php
+
 namespace Groundhogg;
 
 // Exit if accessed directly
 use Groundhogg\DB\Contacts;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 /**
  * Contact query class
@@ -16,7 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @license     http://opensource.org/licenses/gpl-3.0 GNU Public License
  * @since       0.9
  */
-class Contact_Query {
+class Contact_Query
+{
 
     /**
      * SQL for database query.
@@ -32,7 +34,7 @@ class Contact_Query {
      *
      * @access public
      * @since  2.8
-     * @var    object WP_Date_Query
+     * @var    object \WP_Date_Query
      */
     public $date_query = false;
 
@@ -41,9 +43,14 @@ class Contact_Query {
      *
      * @access public
      * @since  2.8
-     * @var    object WP_Meta_Query
+     * @var    object \WP_Meta_Query
      */
     public $meta_query = false;
+
+    /**
+     * @var Tag_Query
+     */
+    public $tag_query = null;
 
     /**
      * Query vars set by the user.
@@ -98,12 +105,12 @@ class Contact_Query {
      * @var    array
      */
     protected $sql_clauses = array(
-        'select'  => '',
-        'from'    => '',
-        'where'   => array(),
+        'select' => '',
+        'from' => '',
+        'where' => array(),
         'groupby' => '',
         'orderby' => '',
-        'limits'  => '',
+        'limits' => '',
     );
 
     /**
@@ -114,6 +121,13 @@ class Contact_Query {
      * @var array
      */
     protected $meta_query_clauses = array();
+
+    /**
+     * Tag query clauses
+     *
+     * @var array
+     */
+    protected $tag_query_clauses = array();
 
     /**
      * WPGH_DB_Contacts instance.
@@ -175,14 +189,12 @@ class Contact_Query {
      * Sets up the contact query defaults and optionally runs a query.
      *
      * @access public
-     * @since  2.8
-     *
      * @param string|array $query {
      *     Optional. Array or query string of contact query parameters. Default empty.
      *
-     *     @type int          $number         Maximum number of contacts to retrieve. Default 20.
-     *     @type int          $offset         Number of contacts to offset the query. Default 0.
-     *     @type string|array $orderby        Customer status or array of statuses. To use 'meta_value'
+     * @type int $number Maximum number of contacts to retrieve. Default 20.
+     * @type int $offset Number of contacts to offset the query. Default 0.
+     * @type string|array $orderby Customer status or array of statuses. To use 'meta_value'
      *                                        or 'meta_value_num', `$meta_key` must also be provided.
      *                                        To sort by a specific `$meta_query` clause, use that
      *                                        clause's array key. Accepts 'ID', 'user_id', 'first_name',
@@ -191,48 +203,51 @@ class Contact_Query {
      *                                        the value of `$meta_key`, and the array keys of `$meta_query`.
      *                                        Also accepts false, an empty array, or 'none' to disable the
      *                                        `ORDER BY` clause. Default 'ID'.
-     *     @type string       $order          How to order retrieved contacts. Accepts 'ASC', 'DESC'.
+     * @type string $order How to order retrieved contacts. Accepts 'ASC', 'DESC'.
      *                                        Default 'DESC'.
-     *     @type string|array $include        String or array of contact IDs to include. Default empty.
-     *     @type string|array $exclude        String or array of contact IDs to exclude. Default empty.
-     *     @type string|array $users_include  String or array of contact user IDs to include. Default
+     * @type string|array $include String or array of contact IDs to include. Default empty.
+     * @type string|array $exclude String or array of contact IDs to exclude. Default empty.
+     * @type string|array $users_include String or array of contact user IDs to include. Default
      *                                        empty.
-     *     @type string|array $users_exclude  String or array of contact user IDs to exclude. Default
+     * @type string|array $users_exclude String or array of contact user IDs to exclude. Default
      *                                        empty.
-     *     @type string|array $tags_include   String or array of tags the contact should have
-     *     @type string|array $tags_exclude   String or array of tags the contact should not have
-     *     @type string|array $email          Limit results to those contacts affiliated with one of
+     * @type string|array $tags_include String or array of tags the contact should have
+     * @type string|array $tags_exclude String or array of tags the contact should not have
+     * @type string|array $email Limit results to those contacts affiliated with one of
      *                                        the given emails. Default empty.
-     *     @type string|array $report         array of args for an activity report.
-     *     @type string       $search         Search term(s) to retrieve matching contacts for. Searches
+     * @type string|array $report array of args for an activity report.
+     * @type string $search Search term(s) to retrieve matching contacts for. Searches
      *                                        through contact names. Default empty.
-     *     @type string|array $search_columns Columns to search using the value of `$search`. Default 'first_name'.
-     *     @type string       $meta_key       Include contacts with a matching contact meta key.
+     * @type string|array $search_columns Columns to search using the value of `$search`. Default 'first_name'.
+     * @type string $meta_key Include contacts with a matching contact meta key.
      *                                        Default empty.
-     *     @type string       $meta_value     Include contacts with a matching contact meta value.
+     * @type string $meta_value Include contacts with a matching contact meta value.
      *                                        Requires `$meta_key` to be set. Default empty.
-     *     @type array        $meta_query     Meta query clauses to limit retrieved contacts by.
+     * @type array $meta_query Meta query clauses to limit retrieved contacts by.
      *                                        See `WP_Meta_Query`. Default empty.
-     *     @type array        $date_query     Date query clauses to limit retrieved contacts by.
+     * @type array $date_query Date query clauses to limit retrieved contacts by.
      *                                        See `WP_Date_Query`. Default empty.
-     *     @type bool         $count          Whether to return a count (true) instead of an array of
+     * @type bool $count Whether to return a count (true) instead of an array of
      *                                        contact objects. Default false.
-     *     @type bool         $no_found_rows  Whether to disable the `SQL_CALC_FOUND_ROWS` query.
+     * @type bool $no_found_rows Whether to disable the `SQL_CALC_FOUND_ROWS` query.
      *                                        Default true.
      * }
+     * @since  2.8
+     *
      */
-    public function __construct( $query = '', $wpgh_db_contacts = null ) {
-        if ( $wpgh_db_contacts ) {
+    public function __construct($query = '', $wpgh_db_contacts = null)
+    {
+        if ($wpgh_db_contacts) {
             $this->wpgh_db_contacts = $wpgh_db_contacts;
         } else {
-            $this->wpgh_db_contacts = Plugin::$instance->dbs->get_db( 'contacts' );
+            $this->wpgh_db_contacts = Plugin::$instance->dbs->get_db('contacts');
         }
 
-        $this->table_name       = $this->wpgh_db_contacts->get_table_name();
-        $this->meta_type        = $this->wpgh_db_contacts->get_object_type();
-        $this->primary_key      = $this->wpgh_db_contacts->get_primary_key();
-        $this->date_key         = $this->wpgh_db_contacts->get_date_key();
-        $this->cache_group      = $this->wpgh_db_contacts->get_cache_group();
+        $this->table_name = $this->wpgh_db_contacts->get_table_name();
+        $this->meta_type = $this->wpgh_db_contacts->get_object_type();
+        $this->primary_key = $this->wpgh_db_contacts->get_primary_key();
+        $this->date_key = $this->wpgh_db_contacts->get_date_key();
+        $this->cache_group = $this->wpgh_db_contacts->get_cache_group();
 
         $this->query_var_defaults = array(
             'number'        => -1,
@@ -243,8 +258,10 @@ class Contact_Query {
             'exclude'       => '',
             'users_include' => '',
             'users_exclude' => '',
-            'tags_include'  => '',
-            'tags_exclude'  => '',
+            'tags_include'  => 0,
+            'tags_exclude'  => 0,
+            'tags_relation' => 'AND',
+            'tag_query'     => [],
             'optin_status'  => 'any',
             'owner'         => 0,
             'report'        => false,
@@ -253,18 +270,18 @@ class Contact_Query {
             'search'        => '',
             'first_name'    => '',
             'last_name'     => '',
-            'search_columns'    => array(),
+            'search_columns' => array(),
             'meta_key'      => '',
             'meta_value'    => '',
-            'meta_query'    => '',
             'meta_compare'  => '=',
+            'meta_query'    => '',
             'date_query'    => null,
             'count'         => false,
             'no_found_rows' => true,
         );
 
-        if ( ! empty( $query ) ) {
-            $this->query( $query );
+        if (!empty($query)) {
+            $this->query($query);
         }
     }
 
@@ -272,15 +289,16 @@ class Contact_Query {
      * Sets up the query for retrieving contacts.
      *
      * @access public
+     * @param string|array $query Array or query string of parameters. See WPGH_Contact_Query::__construct().
+     * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
      * @since  2.8
      *
      * @see WPGH_Contact_Query::__construct()
      *
-     * @param string|array $query Array or query string of parameters. See WPGH_Contact_Query::__construct().
-     * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
      */
-    public function query( $query ) {
-        $this->query_vars = wp_parse_args( $query );
+    public function query($query)
+    {
+        $this->query_vars = wp_parse_args($query);
         $items = $this->get_items();
 
         return $items;
@@ -292,34 +310,58 @@ class Contact_Query {
      * @access protected
      * @since  2.8
      */
-    protected function parse_query() {
-        $this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
+    protected function parse_query()
+    {
+        $this->query_vars = wp_parse_args($this->query_vars, $this->query_var_defaults);
 
-        if ( $this->query_vars['number'] < 1 ) {
+        if ($this->query_vars['number'] < 1) {
             $this->query_vars['number'] = false;
         }
 
-        $this->query_vars['offset'] = absint( $this->query_vars['offset'] );
+        $this->query_vars['offset'] = absint($this->query_vars['offset']);
 
-        if ( ! empty( $this->query_vars['date_query'] ) && is_array( $this->query_vars['date_query'] ) ) {
-            $this->date_query = new \WP_Date_Query( $this->query_vars['date_query'], $this->table_name . '.' . $this->date_key );
+        if (!empty($this->query_vars['date_query']) && is_array($this->query_vars['date_query'])) {
+            $this->date_query = new \WP_Date_Query($this->query_vars['date_query'], $this->table_name . '.' . $this->date_key);
         }
 
         $this->meta_query = new \WP_Meta_Query();
-        $this->meta_query->parse_query_vars( $this->query_vars );
+        $this->meta_query->parse_query_vars($this->query_vars);
 
-        if ( ! empty( $this->meta_query->queries ) ) {
-            $this->meta_query_clauses = $this->meta_query->get_sql( $this->meta_type, $this->table_name, $this->primary_key, $this );
+        if (!empty($this->meta_query->queries)) {
+            $this->meta_query_clauses = $this->meta_query->get_sql($this->meta_type, $this->table_name, $this->primary_key, $this);
+        }
+
+        if (!empty($this->query_vars['tags_include']) || !empty($this->query_vars['tags_exclude']) || ! empty( $this->query_vars[ 'tag_query' ] ) ) {
+
+            $query = ( ! empty( $this->query_vars[ 'tag_query' ] ) ) ? $this->query_vars[ 'tag_query' ] : [
+                'relation' => $this->query_vars[ 'tags_relation' ],
+                [
+                    'tags' => $this->query_vars['tags_include'],
+                    'field' => 'tag_id',
+                    'operator' => 'IN',
+                ],
+                [
+                    'tags' => $this->query_vars['tags_exclude'],
+                    'field' => 'tag_id',
+                    'operator' => 'NOT IN',
+                ]
+            ];
+            
+            $this->tag_query = new Tag_Query( $query );
+
+            if (!empty($this->tag_query->queries)) {
+                $this->tag_query_clauses = $this->tag_query->get_sql($this->table_name, $this->primary_key);
+            }
         }
 
         /**
          * Fires after the contact query vars have been parsed.
          *
+         * @param Contact_Query &$this The WPGH_Contact_Query instance (passed by reference).
          * @since 2.8
          *
-         * @param Contact_Query &$this The WPGH_Contact_Query instance (passed by reference).
          */
-        do_action_ref_array( 'wpgh_parse_contact_query', array( &$this ) );
+        do_action_ref_array('wpgh_parse_contact_query', array(&$this));
     }
 
     /**
@@ -328,55 +370,56 @@ class Contact_Query {
      * Tries to use a cached value and otherwise uses `WPGH_Contact_Query::query_items()`.
      *
      * @access protected
+     * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
      * @since  2.8
      *
-     * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
      */
-    protected function get_items() {
+    protected function get_items()
+    {
         $this->parse_query();
 
         /**
          * Fires before contacts are retrieved.
          *
+         * @param Contact_Query &$this Current instance of WPGH_Contact_Query, passed by reference.
          * @since 2.8
          *
-         * @param Contact_Query &$this Current instance of WPGH_Contact_Query, passed by reference.
          */
-        do_action_ref_array( 'wpgh_pre_get_contacts', array( &$this ) );
+        do_action_ref_array('wpgh_pre_get_contacts', array(&$this));
 
         // $args can include anything. Only use the args defined in the query_var_defaults to compute the key.
-        $key = md5( serialize( wp_array_slice_assoc( $this->query_vars, array_keys( $this->query_var_defaults ) ) ) );
+        $key = md5(serialize(wp_array_slice_assoc($this->query_vars, array_keys($this->query_var_defaults))));
 
         $last_changed = $this->wpgh_db_contacts->get_last_changed();
 
         $cache_key = "query:$key:$last_changed";
-        $cache_value = wp_cache_get( $cache_key, $this->cache_group );
+        $cache_value = wp_cache_get($cache_key, $this->cache_group);
 
-        if ( false === $cache_value ) {
+        if (false === $cache_value) {
             $items = $this->query_items();
 
-            if ( $items ) {
+            if ($items) {
                 $this->set_found_items();
             }
 
             $cache_value = array(
-                'items'       => $items,
+                'items' => $items,
                 'found_items' => $this->found_items,
             );
-            wp_cache_add( $cache_key, $cache_value, $this->cache_group );
+            wp_cache_add($cache_key, $cache_value, $this->cache_group);
         } else {
             $items = $cache_value['items'];
             $this->found_items = $cache_value['found_items'];
         }
 
-        if ( $this->found_items && $this->query_vars['number'] ) {
-            $this->max_num_pages = ceil( $this->found_items / $this->query_vars['number'] );
+        if ($this->found_items && $this->query_vars['number']) {
+            $this->max_num_pages = ceil($this->found_items / $this->query_vars['number']);
         }
 
         // If querying for a count only, there's nothing more to do.
-        if ( $this->query_vars['count'] ) {
+        if ($this->query_vars['count']) {
             // $items is actually a count in this case.
-            return intval( $items[0]->count );
+            return intval($items[0]->count);
         }
 
         $this->items = $items;
@@ -388,49 +431,52 @@ class Contact_Query {
      * Runs a database query to retrieve contacts.
      *
      * @access protected
-     * @since  2.8
-     *
+     * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
      * @global \wpdb $wpdb WordPress database abstraction object.
      *
-     * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
+     * @since  2.8
+     *
      */
-    protected function query_items() {
+    protected function query_items()
+    {
         global $wpdb;
 
         $fields = $this->construct_request_fields();
-        $join   = $this->construct_request_join();
+        $join = $this->construct_request_join();
 
         $this->sql_clauses['where'] = $this->construct_request_where();
 
         $orderby = $this->construct_request_orderby();
-        $limits  = $this->construct_request_limits();
+        $limits = $this->construct_request_limits();
         $groupby = $this->construct_request_groupby();
 
-        $found_rows = ! $this->query_vars['no_found_rows'] ? 'SQL_CALC_FOUND_ROWS' : '';
+        $found_rows = !$this->query_vars['no_found_rows'] ? 'SQL_CALC_FOUND_ROWS' : '';
 
-        $where = implode( ' AND ', $this->sql_clauses['where'] );
+        $where = implode(' AND ', $this->sql_clauses['where']);
 
-        if ( $where ) {
+        if ($where) {
             $where = "WHERE $where";
         }
 
-        if ( $orderby ) {
+        if ($orderby) {
             $orderby = "ORDER BY $orderby";
         }
 
-        if ( $groupby ) {
+        if ($groupby) {
             $groupby = "GROUP BY $groupby";
         }
 
-        $this->sql_clauses['select']  = "SELECT $found_rows $fields";
-        $this->sql_clauses['from']    = "FROM $this->table_name $join";
+        $this->sql_clauses['select'] = "SELECT $found_rows $fields";
+        $this->sql_clauses['from'] = "FROM $this->table_name $join";
         $this->sql_clauses['groupby'] = $groupby;
         $this->sql_clauses['orderby'] = $orderby;
-        $this->sql_clauses['limits']  = $limits;
+        $this->sql_clauses['limits'] = $limits;
 
         $this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$where} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
 
-        $results       = $wpdb->get_results( $this->request );
+//        var_dump( $this->request );
+
+        $results = $wpdb->get_results($this->request);
 
         return $results;
     }
@@ -443,21 +489,22 @@ class Contact_Query {
      *
      * @global \wpdb $wpdb WordPress database abstraction object.
      */
-    protected function set_found_items() {
+    protected function set_found_items()
+    {
         global $wpdb;
 
-        if ( $this->query_vars['number'] && ! $this->query_vars['no_found_rows'] ) {
+        if ($this->query_vars['number'] && !$this->query_vars['no_found_rows']) {
             /**
              * Filters the query used to retrieve the count of found contacts.
              *
+             * @param string $found_contacts_query SQL query. Default 'SELECT FOUND_ROWS()'.
+             * @param Contact_Query $contact_query The `WPGH_Contact_Query` instance.
              * @since 2.8
              *
-             * @param string             $found_contacts_query SQL query. Default 'SELECT FOUND_ROWS()'.
-             * @param Contact_Query $contact_query        The `WPGH_Contact_Query` instance.
              */
-            $found_items_query = apply_filters( 'wpgh_found_contacts_query', 'SELECT FOUND_ROWS()', $this );
+            $found_items_query = apply_filters('wpgh_found_contacts_query', 'SELECT FOUND_ROWS()', $this);
 
-            $this->found_items = (int) $wpdb->get_var( $found_items_query );
+            $this->found_items = (int)$wpdb->get_var($found_items_query);
         }
     }
 
@@ -465,12 +512,13 @@ class Contact_Query {
      * Constructs the fields segment of the SQL request.
      *
      * @access protected
+     * @return string SQL fields segment.
      * @since  2.8
      *
-     * @return string SQL fields segment.
      */
-    protected function construct_request_fields() {
-        if ( $this->query_vars['count'] ) {
+    protected function construct_request_fields()
+    {
+        if ($this->query_vars['count']) {
             return "COUNT(DISTINCT $this->table_name.$this->primary_key) AS count";
         }
 
@@ -481,21 +529,26 @@ class Contact_Query {
      * Constructs the join segment of the SQL request.
      *
      * @access protected
+     * @return string SQL join segment.
      * @since  2.8
      *
-     * @return string SQL join segment.
      */
-    protected function construct_request_join() {
+    protected function construct_request_join()
+    {
         $join = '';
 
-        if ( ! empty( $this->meta_query_clauses['join'] ) ) {
+        if (!empty($this->meta_query_clauses['join'])) {
             $join .= $this->meta_query_clauses['join'];
         }
 
-        if ( ! empty( $this->query_vars['email'] ) && ! is_array( $this->query_vars['email'] ) ) {
-            $meta_table = _get_meta_table( $this->meta_type );
+        if (!empty($this->tag_query_clauses['join'])) {
+            $join .= $this->tag_query_clauses['join'];
+        }
 
-            $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
+        if (!empty($this->query_vars['email']) && !is_array($this->query_vars['email'])) {
+            $meta_table = _get_meta_table($this->meta_type);
+
+            $join_type = false !== strpos($join, 'INNER JOIN') ? 'INNER JOIN' : 'LEFT JOIN';
 
             $join .= " $join_type $meta_table AS email_mt ON $this->table_name.$this->primary_key = email_mt.{$this->meta_type}_id";
         }
@@ -508,18 +561,18 @@ class Contact_Query {
 //            $join .= " $join_type $tags_table AS c_tags ON $this->table_name.$this->primary_key = c_tags.{$this->meta_type}_id";
 //        }
 
-        if ( ! empty( $this->query_vars[ 'report' ] ) ){
-            $events_table = Plugin::$instance->dbs->get_db( 'events' )->get_table_name();
+        if (!empty($this->query_vars['report'])) {
+            $events_table = Plugin::$instance->dbs->get_db('events')->get_table_name();
 
-            $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
+            $join_type = false !== strpos($join, 'INNER JOIN') ? 'INNER JOIN' : 'LEFT JOIN';
 
             $join .= " $join_type $events_table AS events ON $this->table_name.$this->primary_key = events.{$this->meta_type}_id";
         }
 
-        if ( ! empty( $this->query_vars[ 'activity' ] ) ){
-            $activity_table = Plugin::$instance->dbs->get_db( 'activity' )->get_table_name();
+        if (!empty($this->query_vars['activity'])) {
+            $activity_table = Plugin::$instance->dbs->get_db('activity')->get_table_name();
 
-            $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
+            $join_type = false !== strpos($join, 'INNER JOIN') ? 'INNER JOIN' : 'LEFT JOIN';
 
             $join .= " $join_type $activity_table AS activity ON $this->table_name.$this->primary_key = activity.{$this->meta_type}_id";
         }
@@ -531,78 +584,74 @@ class Contact_Query {
      * Constructs the where segment of the SQL request.
      *
      * @access protected
+     * @return array SQL where segment.
      * @since  2.8
      *
-     * @return array SQL where segment.
      */
-    protected function construct_request_where() {
+    protected function construct_request_where()
+    {
         global $wpdb;
 
         $where = array();
 
-        if ( ! empty( $this->query_vars['include'] ) ) {
-            $include_ids = implode( ',', wp_parse_id_list( $this->query_vars['include'] ) );
+        if (!empty($this->query_vars['include'])) {
+            $include_ids = implode(',', wp_parse_id_list($this->query_vars['include']));
             $where['include'] = "$this->primary_key IN ( $include_ids )";
         }
 
-        if ( ! empty( $this->query_vars['exclude'] ) ) {
-            $exclude_ids = implode( ',', wp_parse_id_list( $this->query_vars['exclude'] ) );
+        if (!empty($this->query_vars['exclude'])) {
+            $exclude_ids = implode(',', wp_parse_id_list($this->query_vars['exclude']));
             $where['exclude'] = "$this->primary_key NOT IN ( $exclude_ids )";
         }
 
-        if ( ! empty( $this->query_vars['users_include'] ) ) {
-            $users_include_ids = implode( ',', wp_parse_id_list( $this->query_vars['users_include'] ) );
+        if (!empty($this->query_vars['users_include'])) {
+            $users_include_ids = implode(',', wp_parse_id_list($this->query_vars['users_include']));
             $where['users_include'] = "user_id IN ( $users_include_ids )";
         }
 
-        if ( ! empty( $this->query_vars['users_exclude'] ) ) {
-            $users_exclude_ids = implode( ',', wp_parse_id_list( $this->query_vars['users_exclude'] ) );
+        if (!empty($this->query_vars['users_exclude'])) {
+            $users_exclude_ids = implode(',', wp_parse_id_list($this->query_vars['users_exclude']));
             $where['users_exclude'] = "user_id NOT IN ( $users_exclude_ids )";
         }
 
-        if ( $this->query_vars[ 'optin_status' ]  !== 'any' ) {
+        if ($this->query_vars['optin_status'] !== 'any') {
 
-            if ( is_array( $this->query_vars[ 'optin_status' ] ) ){
-                $this->query_vars[ 'optin_status' ] = implode( ',', wp_parse_id_list( $this->query_vars[ 'optin_status' ] ) );
+            if (is_array($this->query_vars['optin_status'])) {
+                $this->query_vars['optin_status'] = implode(',', wp_parse_id_list($this->query_vars['optin_status']));
             } else {
-                $this->query_vars[ 'optin_status' ] = abs( $this->query_vars[ 'optin_status' ] );
+                $this->query_vars['optin_status'] = abs($this->query_vars['optin_status']);
             }
 
             $where['optin_status'] = "optin_status in ( {$this->query_vars['optin_status']} )";
         }
 
-        if ( $this->query_vars[ 'owner' ] ) {
+        if ($this->query_vars['owner']) {
             $where['owner'] = "owner_id IN ( {$this->query_vars['owner']} )";
         }
 
-        if ( ! empty( $this->query_vars['email'] ) ) {
-            if ( is_array( $this->query_vars['email'] ) ) {
-                $email_placeholders = implode( ', ', array_fill( 0, count( $this->query_vars['email'] ), '%s' ) );
+        if (!empty($this->query_vars['email'])) {
+            if (is_array($this->query_vars['email'])) {
+                $email_placeholders = implode(', ', array_fill(0, count($this->query_vars['email']), '%s'));
 
                 $where['email'] = "email IN( $email_placeholders )";
             } else {
-                $where['email'] = $wpdb->prepare( "( ( email_mt.meta_key = 'additional_email' AND email_mt.meta_value = %s ) OR email = %s )", $this->query_vars['email'], $this->query_vars['email'] );
+                $where['email'] = $wpdb->prepare("( ( email_mt.meta_key = 'additional_email' AND email_mt.meta_value = %s ) OR email = %s )", $this->query_vars['email'], $this->query_vars['email']);
             }
         }
 
-        if ( ! empty( $this->query_vars[ 'tags_include' ] ) ){
+//        if (!empty($this->query_vars['tags_include'])) {
+//            $ids = $this->get_contact_ids_with_tags($this->query_vars['tags_include'], $this->query_vars['tags_relation']);
+//            $ids = !empty($ids) ? implode(',', $ids) : '0';
+//            $where['tags_include'] = "ID IN ( $ids )";
+//        }
+//
+//        if (!empty($this->query_vars['tags_exclude'])) {
+//            $ids = $this->get_contact_ids_with_tags($this->query_vars['tags_exclude'], $this->query_vars['tags_relation']);
+//            $ids = !empty($ids) ? implode(',', $ids) : '0';
+//            $where['tags_exclude'] = "ID NOT IN ( $ids )";
+//        }
 
-            $relationships = Plugin::$instance->dbs->get_db( 'tag_relationships' )->query( [ 'tag_id' => wp_parse_id_list( $this->query_vars['tags_include'] ) ], 'contact_id' );
-            $ids = wp_parse_id_list( wp_list_pluck( $relationships, 'contact_id' ) );
-            // Use 1=2 to signify no contacts have this tag...
-            $ids = ! empty( $ids ) ? implode( ',', $ids ) : '0';
-            $where['tags_include'] = "ID IN ( $ids )";
-        }
-
-        if ( ! empty( $this->query_vars[ 'tags_exclude' ] ) ){
-            $relationships = Plugin::$instance->dbs->get_db( 'tag_relationships' )->query( [ 'tag_id' => wp_parse_id_list( $this->query_vars['tags_exclude'] ) ], 'contact_id' );
-            $ids = wp_parse_id_list( wp_list_pluck( $relationships, 'contact_id' ) );
-            // Use 1=2 to signify no contacts have this tag...
-            $ids = ! empty( $ids ) ? implode( ',', $ids ) : '0';
-            $where['tags_exclude'] = "ID NOT IN ( $ids )";
-        }
-
-        if ( $this->query_vars['report'] && is_array( $this->query_vars['report'] ) ) {
+        if ($this->query_vars['report'] && is_array($this->query_vars['report'])) {
 
             $map = [
                 'step' => 'step_id',
@@ -611,46 +660,46 @@ class Contact_Query {
                 'end' => 'before'
             ];
 
-            foreach ( $map as $old_key => $new_key ){
-                if ( $val = get_array_var( $this->query_vars[ 'report' ], $old_key ) ){
-                    $this->query_vars[ 'report' ][ $new_key ] = $val;
+            foreach ($map as $old_key => $new_key) {
+                if ($val = get_array_var($this->query_vars['report'], $old_key)) {
+                    $this->query_vars['report'][$new_key] = $val;
                 }
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'funnel_id' ] ) ){
-                $funnel_id = $this->query_vars[ 'report' ][ 'funnel_id' ];
+            if (!empty($this->query_vars['report']['funnel_id'])) {
+                $funnel_id = $this->query_vars['report']['funnel_id'];
                 $where['report_funnel'] = "events.funnel_id IN ( $funnel_id )";
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'status' ] ) ){
-                $status = $this->query_vars[ 'report' ][ 'status' ];
+            if (!empty($this->query_vars['report']['status'])) {
+                $status = $this->query_vars['report']['status'];
                 $where['report_status'] = "events.status LIKE '$status'";
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'type' ] ) ){
-                $event_types = implode( ',', ensure_array( $this->query_vars[ 'report' ][ 'type' ] ) );
+            if (!empty($this->query_vars['report']['type'])) {
+                $event_types = implode(',', ensure_array($this->query_vars['report']['type']));
                 $where['report_type'] = "events.event_type IN ($event_types)";
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'step_id' ] ) ){
-                $step_id = $this->query_vars[ 'report' ][ 'step_id' ];
+            if (!empty($this->query_vars['report']['step_id'])) {
+                $step_id = $this->query_vars['report']['step_id'];
                 $where['report_step'] = "events.step_id IN ( $step_id )";
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'after' ] ) ){
-                $start = $this->query_vars[ 'report' ][ 'after' ];
+            if (!empty($this->query_vars['report']['after'])) {
+                $start = $this->query_vars['report']['after'];
                 $where['report_start'] = "events.time >= $start";
             }
 
-            if ( !empty( $this->query_vars[ 'report' ][ 'before' ] ) ){
-                $end = $this->query_vars[ 'report' ][ 'before' ];
+            if (!empty($this->query_vars['report']['before'])) {
+                $end = $this->query_vars['report']['before'];
                 $where['report_end'] = "events.time <= $end";
             }
         }
 
-        if ( $this->query_vars['activity'] && is_array( $this->query_vars['activity'] ) ) {
-            if ( !empty( $this->query_vars[ 'activity' ][ 'activity_type' ] ) ){
-                $type = $this->query_vars[ 'activity' ][ 'activity_type' ];
+        if ($this->query_vars['activity'] && is_array($this->query_vars['activity'])) {
+            if (!empty($this->query_vars['activity']['activity_type'])) {
+                $type = $this->query_vars['activity']['activity_type'];
                 $where['report_type'] = "activity.activity_type = '$type'";
             }
 
@@ -661,9 +710,9 @@ class Contact_Query {
                 'end' => 'before'
             ];
 
-            foreach ( $map as $old_key => $new_key ){
-                if ( $val = get_array_var( $this->query_vars[ 'activity' ], $old_key ) ){
-                    $this->query_vars[ 'activity' ][ $new_key ] = $val;
+            foreach ($map as $old_key => $new_key) {
+                if ($val = get_array_var($this->query_vars['activity'], $old_key)) {
+                    $this->query_vars['activity'][$new_key] = $val;
                 }
             }
 
@@ -672,116 +721,152 @@ class Contact_Query {
 //                $where['report_event_type'] = "activity.event_type IN ( $event_types )";
 //            }
 
-            if ( !empty( $this->query_vars[ 'activity' ][ 'funnel_id' ] ) ){
-                $funnel_ids = implode( ',', ensure_array( $this->query_vars[ 'activity' ][ 'funnel_id' ] ) );
+            if (!empty($this->query_vars['activity']['funnel_id'])) {
+                $funnel_ids = implode(',', ensure_array($this->query_vars['activity']['funnel_id']));
                 $where['report_funnel'] = "activity.funnel_id IN ( $funnel_ids )";
             }
 
-            if ( !empty( $this->query_vars[ 'activity' ][ 'step_id' ] ) ){
-                $step_ids = implode( ',', ensure_array( $this->query_vars[ 'activity' ][ 'step_id' ] ) );
+            if (!empty($this->query_vars['activity']['step_id'])) {
+                $step_ids = implode(',', ensure_array($this->query_vars['activity']['step_id']));
                 $where['report_step'] = "activity.step_id IN ( $step_ids )";
             }
 
-            if ( !empty( $this->query_vars[ 'activity' ][ 'referer' ] ) ){
-                $referer = $this->query_vars[ 'activity' ][ 'referer' ];
+            if (!empty($this->query_vars['activity']['referer'])) {
+                $referer = $this->query_vars['activity']['referer'];
                 $where['report_referer'] = "activity.referer LIKE '$referer'";
             }
 
-            if ( !empty( $this->query_vars[ 'activity' ][ 'after' ] ) ){
-                $end = $this->query_vars[ 'activity' ][ 'after' ];
+            if (!empty($this->query_vars['activity']['after'])) {
+                $end = $this->query_vars['activity']['after'];
                 $where['report_end'] = "activity.timestamp >= $end";
             }
 
-            if ( !empty( $this->query_vars[ 'activity' ][ 'before' ] ) ){
-                $start = $this->query_vars[ 'activity' ][ 'before' ];
+            if (!empty($this->query_vars['activity']['before'])) {
+                $start = $this->query_vars['activity']['before'];
                 $where['report_start'] = "activity.timestamp <= $start";
             }
         }
 
-        if ( strlen( $this->query_vars['search'] ) ) {
-            if ( ! empty( $this->query_vars['search_columns'] ) ) {
-                $search_columns = array_map( 'sanitize_key', (array) $this->query_vars['search_columns'] );
+        if (strlen($this->query_vars['search'])) {
+            if (!empty($this->query_vars['search_columns'])) {
+                $search_columns = array_map('sanitize_key', (array)$this->query_vars['search_columns']);
             } else {
-                $search_columns = array( 'first_name', 'last_name', 'email' );
+                $search_columns = array('first_name', 'last_name', 'email');
             }
 
-            $where['search'] = $this->get_search_sql( $this->query_vars['search'], $search_columns );
+            $where['search'] = $this->get_search_sql($this->query_vars['search'], $search_columns);
         }
 
-        if ( strlen( $this->query_vars['first_name'] ) ){
-            $where['first_name'] = $this->get_search_sql( $this->query_vars['first_name'], array( 'first_name' ) );
+        if (strlen($this->query_vars['first_name'])) {
+            $where['first_name'] = $this->get_search_sql($this->query_vars['first_name'], array('first_name'));
         }
 
-        if ( strlen( $this->query_vars['last_name'] ) ){
-            $where['last_name'] = $this->get_search_sql( $this->query_vars['last_name'], array( 'last_name' ) );
+        if (strlen($this->query_vars['last_name'])) {
+            $where['last_name'] = $this->get_search_sql($this->query_vars['last_name'], array('last_name'));
         }
 
 
-        if ( $this->date_query ) {
-            $where['date_query'] = preg_replace( '/^\s*AND\s*/', '', $this->date_query->get_sql() );
+        if ($this->date_query) {
+            $where['date_query'] = preg_replace('/^\s*AND\s*/', '', $this->date_query->get_sql());
         }
 
-        if ( ! empty( $this->meta_query_clauses['where'] ) ) {
-            $where['meta_query'] = preg_replace( '/^\s*AND\s*/', '', $this->meta_query_clauses['where'] );
+        if (!empty($this->meta_query_clauses['where'])) {
+            $where['meta_query'] = preg_replace('/^\s*AND\s*/', '', $this->meta_query_clauses['where']);
+        }
+
+        if (!empty($this->tag_query_clauses['where'])) {
+            $where['tax_query'] = preg_replace('/^\s*AND\s*/', '', $this->tag_query_clauses['where']);
         }
 
         return $where;
     }
 
     /**
+     * @param array|string $tag_ids
+     * @param string $relation
+     * @return array
+     */
+    protected function get_contact_ids_with_tags($tag_ids = [], $relation = 'OR')
+    {
+
+        if (!is_array($tag_ids)) {
+            $tag_ids = wp_parse_id_list(explode(',', $tag_ids));
+        }
+
+        if (strtoupper($relation) === 'AND') {
+            $ids = [];
+            foreach ($tag_ids as $tag_id) {
+                $relationships = get_db('tag_relationships')->query(['tag_id' => $tag_id]);
+                $cids = wp_parse_id_list(wp_list_pluck($relationships, 'contact_id'));
+                if (empty($ids)) {
+                    $ids = $cids;
+                }
+                $ids = array_intersect($ids, $cids);
+            }
+        } else {
+            $relationships = get_db('tag_relationships')->query(['tag_id' => $tag_ids], 'contact_id');
+            $ids = wp_parse_id_list(wp_list_pluck($relationships, 'contact_id'));
+        }
+
+        return $ids;
+    }
+
+    /**
      * Constructs the orderby segment of the SQL request.
      *
      * @access protected
+     * @return string SQL orderby segment.
      * @since  2.8
      *
-     * @return string SQL orderby segment.
      */
-    protected function construct_request_orderby() {
-        if ( in_array( $this->query_vars['orderby'], array( 'none', array(), false ), true ) ) {
+    protected function construct_request_orderby()
+    {
+        if (in_array($this->query_vars['orderby'], array('none', array(), false), true)) {
             return '';
         }
 
-        if ( empty( $this->query_vars['orderby'] ) ) {
-            return $this->primary_key . ' ' . $this->parse_order_string( $this->query_vars['order'], $this->query_vars['orderby'] );
+        if (empty($this->query_vars['orderby'])) {
+            return $this->primary_key . ' ' . $this->parse_order_string($this->query_vars['order'], $this->query_vars['orderby']);
         }
 
-        if ( is_string( $this->query_vars['orderby'] ) ) {
-            $ordersby = array( $this->query_vars['orderby'] => $this->query_vars['order'] );
+        if (is_string($this->query_vars['orderby'])) {
+            $ordersby = array($this->query_vars['orderby'] => $this->query_vars['order']);
         } else {
             $ordersby = $this->query_vars['orderby'];
         }
 
         $orderby_array = array();
 
-        foreach ( $ordersby as $orderby => $order ) {
-            $parsed_orderby = $this->parse_orderby_string( $orderby );
-            if ( ! $parsed_orderby ) {
+        foreach ($ordersby as $orderby => $order) {
+            $parsed_orderby = $this->parse_orderby_string($orderby);
+            if (!$parsed_orderby) {
                 continue;
             }
 
-            $parsed_order = $this->parse_order_string( $order, $orderby );
+            $parsed_order = $this->parse_order_string($order, $orderby);
 
-            if ( $parsed_order ) {
+            if ($parsed_order) {
                 $orderby_array[] = $parsed_orderby . ' ' . $parsed_order;
             } else {
                 $orderby_array[] = $parsed_orderby;
             }
         }
 
-        return implode( ', ', $orderby_array );
+        return implode(', ', $orderby_array);
     }
 
     /**
      * Constructs the limits segment of the SQL request.
      *
      * @access protected
+     * @return string SQL limits segment.
      * @since  2.8
      *
-     * @return string SQL limits segment.
      */
-    protected function construct_request_limits() {
-        if ( $this->query_vars['number'] ) {
-            if ( $this->query_vars['offset'] ) {
+    protected function construct_request_limits()
+    {
+        if ($this->query_vars['number']) {
+            if ($this->query_vars['offset']) {
                 return "LIMIT {$this->query_vars['offset']},{$this->query_vars['number']}";
             }
 
@@ -795,12 +880,13 @@ class Contact_Query {
      * Constructs the groupby segment of the SQL request.
      *
      * @access protected
+     * @return string SQL groupby segment.
      * @since  2.8
      *
-     * @return string SQL groupby segment.
      */
-    protected function construct_request_groupby() {
-        if ( ! empty( $this->meta_query_clauses['join'] ) || ( ! empty( $this->query_vars['email'] ) && ! is_array( $this->query_vars['email'] ) ) ) {
+    protected function construct_request_groupby()
+    {
+        if (!empty($this->meta_query_clauses['join']) || (!empty($this->query_vars['email']) && !is_array($this->query_vars['email']))) {
             return "$this->table_name.$this->primary_key";
         }
 
@@ -811,72 +897,74 @@ class Contact_Query {
      * Used internally to generate an SQL string for searching across multiple columns.
      *
      * @access protected
+     * @param string $string Search string.
+     * @param array $columns Columns to search.
+     * @return string Search SQL.
+     * @global \wpdb $wpdb WordPress database abstraction object.
+     *
      * @since  2.8
      *
-     * @global \wpdb  $wpdb WordPress database abstraction object.
-     *
-     * @param string $string  Search string.
-     * @param array  $columns Columns to search.
-     * @return string Search SQL.
      */
-    protected function get_search_sql( $string, $columns ) {
+    protected function get_search_sql($string, $columns)
+    {
         global $wpdb;
 
-        if ( false !== strpos( $string, '*' ) ) {
-            $like = '%' . implode( '%', array_map( array( $wpdb, 'esc_like' ), explode( '*', $string ) ) ) . '%';
+        if (false !== strpos($string, '*')) {
+            $like = '%' . implode('%', array_map(array($wpdb, 'esc_like'), explode('*', $string))) . '%';
         } else {
-            $like = '%' . $wpdb->esc_like( $string ) . '%';
+            $like = '%' . $wpdb->esc_like($string) . '%';
         }
 
         $searches = array();
-        foreach ( $columns as $column ) {
-            $searches[] = $wpdb->prepare( "$column LIKE %s", $like );
+        foreach ($columns as $column) {
+            $searches[] = $wpdb->prepare("$column LIKE %s", $like);
         }
 
-        return '(' . implode( ' OR ', $searches ) . ')';
+        return '(' . implode(' OR ', $searches) . ')';
     }
 
     /**
      * Parses a single orderby string.
      *
      * @access protected
-     * @since  2.8
-     *
      * @param string $orderby Orderby string.
      * @return string Parsed orderby string to use in the SQL request, or an empty string.
+     * @since  2.8
+     *
      */
-    protected function parse_orderby_string( $orderby ) {
-        if ( 'include' === $orderby ) {
-            if ( empty( $this->query_vars['include'] ) ) {
+    protected function parse_orderby_string($orderby)
+    {
+        if ('include' === $orderby) {
+            if (empty($this->query_vars['include'])) {
                 return '';
             }
 
-            $ids = implode( ',', wp_parse_id_list( $this->query_vars['include'] ) );
+            $ids = implode(',', wp_parse_id_list($this->query_vars['include']));
 
             return "FIELD( $this->table_name.$this->primary_key, $ids )";
         }
 
-        if ( ! empty( $this->meta_query_clauses['where'] ) ) {
-            $meta_table = _get_meta_table( $this->meta_type );
+        if (!empty($this->meta_query_clauses['where'])) {
+            $meta_table = _get_meta_table($this->meta_type);
 
-            if ( $this->query_vars['meta_key'] === $orderby || 'meta_value' === $orderby ) {
+            if ($this->query_vars['meta_key'] === $orderby || 'meta_value' === $orderby) {
                 return "$meta_table.meta_value";
             }
 
-            if ( 'meta_value_num' === $orderby ) {
+            if ('meta_value_num' === $orderby) {
                 return "$meta_table.meta_value+0";
             }
 
             $meta_query_clauses = $this->meta_query->get_clauses();
 
-            if ( isset( $meta_query_clauses[ $orderby ] ) ) {
-                return sprintf( "CAST(%s.meta_value AS %s)", esc_sql( $meta_query_clauses[ $orderby ]['alias'] ), esc_sql( $meta_query_clauses[ $orderby ]['cast'] ) );
+            if (isset($meta_query_clauses[$orderby])) {
+                return sprintf("CAST(%s.meta_value AS %s)", esc_sql($meta_query_clauses[$orderby]['alias']), esc_sql($meta_query_clauses[$orderby]['cast']));
             }
         }
 
         $allowed_keys = $this->get_allowed_orderby_keys();
 
-        if ( in_array( $orderby, $allowed_keys, true ) ) {
+        if (in_array($orderby, $allowed_keys, true)) {
             /* This column needs special handling here. */
 
             return "$this->table_name.$orderby";
@@ -889,21 +977,22 @@ class Contact_Query {
      * Parses a single order string.
      *
      * @access protected
-     * @since  2.8
-     *
      * @param string $orderby Order string.
      * @return string Parsed order string to use in the SQL request, or an empty string.
+     * @since  2.8
+     *
      */
-    protected function parse_order_string( $order, $orderby ) {
-        if ( 'include' === $orderby ) {
+    protected function parse_order_string($order, $orderby)
+    {
+        if ('include' === $orderby) {
             return '';
         }
 
-        if ( ! is_string( $order ) || empty( $order ) ) {
+        if (!is_string($order) || empty($order)) {
             return 'DESC';
         }
 
-        if ( 'ASC' === strtoupper( $order ) ) {
+        if ('ASC' === strtoupper($order)) {
             return 'ASC';
         } else {
             return 'DESC';
@@ -914,11 +1003,12 @@ class Contact_Query {
      * Returns the basic allowed keys to use for the orderby clause.
      *
      * @access protected
+     * @return array Allowed keys.
      * @since  2.8
      *
-     * @return array Allowed keys.
      */
-    protected function get_allowed_orderby_keys() {
-        return array_keys( $this->wpgh_db_contacts->get_columns() );
+    protected function get_allowed_orderby_keys()
+    {
+        return array_keys($this->wpgh_db_contacts->get_columns());
     }
 }
