@@ -1914,8 +1914,9 @@ function setup_managed_page()
 {
     $managed_page_name = get_managed_page_name();
 
-    $posts = get_posts( [
-        'post_name' => $managed_page_name
+    $query = new \WP_Query();
+    $posts = $query->query( [
+        'name' => $managed_page_name
     ] );
 
     if ( empty( $posts ) ){
@@ -1926,6 +1927,10 @@ function setup_managed_page()
             'post_type'             => 'page',
             'post_content'          => "Shhhh! This is a secret page. Go away!"
         ], true );
+
+        if ( is_wp_error( $post_id )){
+            Plugin::$instance->notices->add( $post_id );
+        }
     }
 
 }

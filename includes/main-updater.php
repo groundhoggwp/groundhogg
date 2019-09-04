@@ -39,7 +39,7 @@ class Main_Updater extends Updater {
             '2.0.7.1',
             '2.0.8',
             '2.0.8.1',
-            '2.0.9.2',
+            '2.0.9.3',
         ];
     }
 
@@ -122,7 +122,7 @@ class Main_Updater extends Updater {
 	 * Attempt more compatibility with the rewrites.
      *
 	 */
-    public function version_2_0_9_2()
+    public function version_2_0_9_3()
     {
     	install_custom_rewrites();
     }

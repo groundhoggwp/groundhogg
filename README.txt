@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.3 (2019-09-04) =
+* FIXED Managed page query not working.
+
 = 2.0.9.2 (2019-09-04) =
 * ADDED missing translation contexts to preferences page
 * ADDED Screen options panel to change number of records per page
