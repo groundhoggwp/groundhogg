@@ -39,7 +39,7 @@ class Main_Updater extends Updater {
             '2.0.7.1',
             '2.0.8',
             '2.0.8.1',
-            '2.0.9.5.1',
+            '2.0.9.6',
         ];
     }
 
@@ -114,7 +114,7 @@ class Main_Updater extends Updater {
 	 * Attempt more compatibility with the rewrites.
      *
 	 */
-    public function version_2_0_9_5_1()
+    public function version_2_0_9_6()
     {
     	install_custom_rewrites();
     	Plugin::$instance->roles->add_caps();
