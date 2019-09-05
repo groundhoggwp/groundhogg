@@ -241,7 +241,7 @@ class Rewrites
                 $groundhogg_path = Plugin::$instance->utils->files->get_base_uploads_dir();
                 $file_path = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $file_path );
 
-                if ( ! $file_path || ! file_exists( $groundhogg_path ) ){
+                if ( ! $file_path || ! file_exists( $file_path ) ){
                     return;
                 }
 
@@ -252,7 +252,7 @@ class Rewrites
                 // OPnly directories which should be access are contact uploads, imports, and exports
                 if ( in_array( $subfolder, [ 'imports', 'exports' ] ) && ! current_user_can( 'download_files' ) ){
                     return;
-                } else if ( ! $contact || md5( encrypt( $contact->get_email() ) ) !== $subfolder ) {
+                } else if ( ! $contact || $contact->get_upload_folder_basename() !== $subfolder ) {
                     return;
                 }
 
