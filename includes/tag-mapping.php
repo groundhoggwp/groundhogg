@@ -48,7 +48,25 @@ class Tag_Mapping extends Bulk_Job
             }
         } );
 
+        add_action( 'admin_init', [ $this, 'reset_tags' ] );
+
         parent::__construct();
+    }
+
+    public function reset_tags()
+    {
+        if ( current_user_can( 'manage_options' ) && wp_verify_nonce( get_request_var( 'reset_tags' ), 'reset_tags' ) ){
+            $this->install_default_tags();
+            Plugin::$instance->notices->add( 'tags_reset', __( 'Tags have been reset!', 'groundhogg' ) );
+//            wp_redirect( wp_get_referer() );
+        }
+    }
+
+    public function reset_tags_ui()
+    {
+        ?>
+        <a href="<?php echo wp_nonce_url( $_SERVER[ 'REQUEST_URI' ], 'reset_tags', 'reset_tags' ); ?>" class="button-secondary"><?php _ex( 'Reset Tags', 'action', 'groundhogg' ) ?></a>
+        <?php
     }
 
     /**

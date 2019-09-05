@@ -242,7 +242,9 @@ class Settings_Page extends Admin_Page
             'optin_status_tags' => [
                 'id' => 'optin_status_tags',
                 'title' => _x('Optin Status Tags', 'settings_sections', 'groundhogg'),
-                'tab' => 'tags'
+                'tab' => 'tags',
+                'callback' => [Plugin::$instance->tag_mapping, 'reset_tags_ui'],
+
             ],
         );
 
