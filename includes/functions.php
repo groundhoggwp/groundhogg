@@ -190,7 +190,6 @@ function get_request_query( $default=[], $force=[], $accepted_keys=[] )
    }
 
    $query = urldecode_deep( $query );
-   $query = map_deep( $query, 'sanitize_text_field' );
 
    if ( isset_not_empty( $_GET, 's' ) ){
        $query[ 'search' ] = get_request_var( 's' );
@@ -211,7 +210,9 @@ function get_request_query( $default=[], $force=[], $accepted_keys=[] )
        $query = $new_query;
    }
 
-   return wp_unslash( array_filter( $query ) );
+    $query = map_deep( $query, 'sanitize_text_field' );
+
+    return wp_unslash( array_filter( $query ) );
 }
 
 /**
@@ -1609,7 +1610,7 @@ function generate_contact_with_map( $fields, $map )
                 break;
             case 'files':
                 if ( isset_not_empty( $_FILES, $column ) ){
-                    $files[ $column ] = $_FILES[ $column ];
+                    $files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
                 }
                 break;
             case 'notes':
@@ -2161,13 +2162,10 @@ function get_date_time_format()
  * @return string
  */
 function file_access_url( $path, $download=false ){
-
-    $url = sprintf( site_url( 'gh/files/%s/%s' ), urlencode( base64_encode( $path ) ), basename( $path ) );
-
+    $url = site_url( preg_replace('/(\/+)/','/', sprintf( untrailingslashit( 'gh/files/%s' ), $path ) ) );
     if ( $download ){
         $url = add_query_arg( [ 'download' => true ], $url );
     }
-
     return $url;
 }
 

@@ -6,6 +6,7 @@ use Groundhogg\Contact_Query;
 use function Groundhogg\encrypt;
 use function Groundhogg\file_access_url;
 use function Groundhogg\get_db;
+use function Groundhogg\get_request_query;
 use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
 
@@ -41,7 +42,7 @@ class Export_Contacts extends Bulk_Job
         }
 
         $query = new Contact_Query();
-        $args = $_GET;
+        $args = get_request_query();
 
         $contacts = $query->query( $args );
         $ids = wp_list_pluck( $contacts, 'ID' );
@@ -134,7 +135,7 @@ class Export_Contacts extends Bulk_Job
         if ( ! $file_name ){
 
             // randomize the file path to prevent direct access.
-            $file_name = md5( encrypt( current_time( 'mysql' ) ) ) . '.csv'; //todo
+            $file_name = sanitize_file_name(md5( encrypt( current_time( 'mysql' ) ) ) . '.csv' ); //todo
 
             // get the full path.
             $file_path = Plugin::$instance->utils->files->get_csv_exports_dir( $file_name, true );
@@ -153,7 +154,6 @@ class Export_Contacts extends Bulk_Job
 
         $this->fp = $fp;
         $this->file_name = $file_name;
-        $this->file_path = $file_path;
         $this->headers = $headers;
     }
 
@@ -194,7 +194,7 @@ class Export_Contacts extends Bulk_Job
      */
     protected function get_finished_notice()
     {
-        $file_url = file_access_url( $this->file_path, true );
+        $file_url = file_access_url( '/exports/' . $this->file_name, true );
         return sprintf( _x( 'Export file created. %s', 'notice', 'groundhogg'), "&nbsp;&nbsp;&nbsp;<a class='button button-primary' href='$file_url'>Download Now</a>" );
     }
 }

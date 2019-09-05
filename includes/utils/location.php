@@ -518,7 +518,14 @@ class Location
             "SA" => "South America"
         );
         if (filter_var($ip, FILTER_VALIDATE_IP) && in_array($purpose, $support)) {
-            $ipdat = @json_decode(file_get_contents("http://www.geoplugin.net/json.gp?ip=" . $ip));
+
+            $ipdat = wp_remote_get( "http://www.geoplugin.net/json.gp?ip=" . $ip );
+
+            if ( is_wp_error( $ipdat ) || ! $ipdat ){
+                return false;
+            }
+
+            $ipdat = @json_decode($ipdat);
             if (@strlen(trim($ipdat->geoplugin_countryCode)) == 2) {
                 switch ($purpose) {
                     case "location":

@@ -4,6 +4,7 @@ namespace Groundhogg\Bulk_Jobs;
 use function Groundhogg\get_items_from_csv;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
+use function Groundhogg\get_url_var;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -35,7 +36,7 @@ class Import_Contacts extends Bulk_Job
             return $items;
         }
 
-        $file_name = urldecode( $_GET[ 'import' ] );
+        $file_name = sanitize_file_name( get_url_var( 'import' ) );
         $file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
 
         return get_items_from_csv( $file_path );

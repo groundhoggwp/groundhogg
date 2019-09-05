@@ -177,7 +177,7 @@ class Exports_Table extends WP_List_Table {
                 $file = [
                     'file' => $filename,
                     'file_path' => $filepath,
-                    'file_url' => file_access_url( $filepath, true ),
+                    'file_url' => file_access_url( '/exports/' . $filename , true ),
                     'date' => filemtime( $filepath ),
                     'rows' => count(file($filepath, FILE_SKIP_EMPTY_LINES)) - 1,
                 ];

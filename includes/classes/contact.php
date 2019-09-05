@@ -703,6 +703,8 @@ class Contact extends Base_Object_With_Meta
     public function upload_file( &$file )
     {
 
+        $file[ 'name' ] = sanitize_file_name( $file[ 'name' ] );
+
         $upload_overrides = array( 'test_form' => false );
 
         if ( !function_exists('wp_handle_upload') ) {
@@ -765,7 +767,7 @@ class Contact extends Base_Object_With_Meta
                 $file = [
                     'file_name' => $filename,
                     'file_path' => $filepath,
-                    'file_url'  => file_access_url( $filepath ),
+                    'file_url'  => file_access_url( '/uploads/' . $this->get_upload_folder_basename() . '/' . $filename ),
                     'date_uploaded' => filectime($filepath),
                 ];
 

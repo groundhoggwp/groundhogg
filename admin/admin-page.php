@@ -1,7 +1,9 @@
 <?php
+
 namespace Groundhogg\Admin;
 
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
@@ -21,7 +23,7 @@ use Groundhogg\Pointers;
  */
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 abstract class Admin_Page
 {
@@ -43,8 +45,8 @@ abstract class Admin_Page
 
             add_action('admin_enqueue_scripts', [$this, 'scripts']);
             add_action('admin_enqueue_scripts', [$this, 'register_pointers']);
-            add_filter( 'admin_title', [ $this, 'admin_title' ], 10, 2 );
-            add_filter( 'set-screen-option', [ $this, 'set_screen_options' ], 10, 3 );
+            add_filter('admin_title', [$this, 'admin_title'], 10, 2);
+            add_filter('set-screen-option', [$this, 'set_screen_options'], 10, 3);
 
             add_action('admin_init', [$this, 'process_action']);
 
@@ -59,7 +61,7 @@ abstract class Admin_Page
      * @param $title string
      * @return mixed string
      */
-    public function admin_title( $admin_title, $title )
+    public function admin_title($admin_title, $title)
     {
         return $admin_title;
     }
@@ -145,7 +147,7 @@ abstract class Admin_Page
     {
         // Return basic check to see if we are on the current page doing a normal request
         if (!wp_doing_ajax()) {
-            return isset($_GET['page']) && $_GET['page'] === $this->get_slug();
+            return get_request_var('page') === $this->get_slug();
         }
 
         return false;
@@ -187,7 +189,7 @@ abstract class Admin_Page
             'option' => $this->get_slug() . '_per_page'
         );
 
-        add_screen_option( 'per_page', $args );
+        add_screen_option('per_page', $args);
     }
 
     /**
@@ -198,9 +200,9 @@ abstract class Admin_Page
      * @param $value
      * @return mixed|void
      */
-    public function set_screen_options( $status, $option, $value )
+    public function set_screen_options($status, $option, $value)
     {
-        if ( $this->get_slug() . '_per_page' == $option ) return $value;
+        if ($this->get_slug() . '_per_page' == $option) return $value;
     }
 
     /**
@@ -215,7 +217,7 @@ abstract class Admin_Page
      */
     public function register_pointers()
     {
-        new Pointers( $this->get_pointers() );
+        new Pointers($this->get_pointers());
     }
 
     /**
@@ -225,11 +227,11 @@ abstract class Admin_Page
     {
         $pointers = [];
 
-        if ( method_exists( $this, 'get_pointers_' . $this->get_current_action() ) ){
-            $pointers = call_user_func( [ $this, 'get_pointers_' . $this->get_current_action() ] );
+        if (method_exists($this, 'get_pointers_' . $this->get_current_action())) {
+            $pointers = call_user_func([$this, 'get_pointers_' . $this->get_current_action()]);
         }
 
-        return apply_filters( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_action()}/pointers", $pointers );
+        return apply_filters("groundhogg/admin/{$this->get_slug()}/{$this->get_current_action()}/pointers", $pointers);
     }
 
     /**
@@ -239,12 +241,12 @@ abstract class Admin_Page
      */
     protected function get_items()
     {
-        $items = isset($_REQUEST[ $this->get_item_type() ]) ? $_REQUEST[$this->get_item_type()] : null;
+        $items = get_url_var($this->get_item_type(), null);
 
         if (!$items)
             return false;
 
-        return is_array($items) ? $items : array( $items );
+        return is_array($items) ? $items : array($items);
     }
 
     /**
@@ -254,14 +256,14 @@ abstract class Admin_Page
      */
     protected function get_current_action()
     {
-        if (isset($_REQUEST['filter_action']) && !empty($_REQUEST['filter_action']))
+        if (isset_not_empty($_REQUEST, 'filter_action'))
             return false;
 
-        if (isset($_REQUEST['action']) && -1 != $_REQUEST['action'])
-            return $_REQUEST['action'];
+        if (isset_not_empty($_REQUEST, 'action'))
+            return sanitize_text_field(get_request_var('action'));
 
-        if (isset($_REQUEST['action2']) && -1 != $_REQUEST['action2'])
-            return $_REQUEST['action2'];
+        if (isset_not_empty($_REQUEST, 'action2'))
+            return sanitize_text_field(get_request_var('action2'));
 
         return 'view';
     }
@@ -303,21 +305,21 @@ abstract class Admin_Page
      */
     protected function verify_action()
     {
-        if ( ! get_request_var( '_wpnonce' ) || ! current_user_can( $this->get_cap() ) )
+        if (!get_request_var('_wpnonce') || !current_user_can($this->get_cap()))
             return false;
 
-        $nonce = get_request_var( '_wpnonce' );
+        $nonce = get_request_var('_wpnonce');
 
 //        var_dump( $nonce );
 //        wp_die();
 
         $checks = [
-            wp_verify_nonce( $nonce ),
-            wp_verify_nonce( $nonce, $this->get_current_action() ),
-            wp_verify_nonce( $nonce, sprintf( 'bulk-%s', $this->get_item_type_plural() ) )
+            wp_verify_nonce($nonce),
+            wp_verify_nonce($nonce, $this->get_current_action()),
+            wp_verify_nonce($nonce, sprintf('bulk-%s', $this->get_item_type_plural()))
         ];
 
-        return in_array( true, $checks );
+        return in_array(true, $checks);
     }
 
     /**
@@ -325,11 +327,11 @@ abstract class Admin_Page
      */
     protected function wp_die_no_access()
     {
-        if ( wp_doing_ajax() ){
-            return wp_send_json_error( __( "Invalid permissions." , 'groundhogg' ) );
+        if (wp_doing_ajax()) {
+            return wp_send_json_error(__("Invalid permissions.", 'groundhogg'));
         }
 
-        return wp_die( __( "Invalid permissions." , 'groundhogg' ), 'No Access!' );
+        return wp_die(__("Invalid permissions.", 'groundhogg'), 'No Access!');
     }
 
     /**
@@ -338,16 +340,17 @@ abstract class Admin_Page
      * @param $title
      * @param string $name
      */
-    protected function search_form( $title, $name='s' )
+    protected function search_form($title, $name = 's')
     {
         ?>
         <form method="get" class="search-form">
-            <?php html()->hidden_GET_inputs( true ); ?>
-            <input type="hidden" name="page" value="<?php esc_attr_e( get_request_var( 'page' ) ); ?>">
+            <?php html()->hidden_GET_inputs(true); ?>
+            <input type="hidden" name="page" value="<?php esc_attr_e(get_request_var('page')); ?>">
             <p class="search-box">
                 <label class="screen-reader-text" for="post-search-input"><?php echo $title; ?>:</label>
-                <input type="search" id="post-search-input" name="<?php echo $name?>" value="<?php esc_attr_e( get_request_var( $name ) ); ?>">
-                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( $title ); ?>">
+                <input type="search" id="post-search-input" name="<?php echo $name ?>"
+                       value="<?php esc_attr_e(get_request_var($name)); ?>">
+                <input type="submit" id="search-submit" class="button" value="<?php esc_attr_e($title); ?>">
             </p>
         </form>
         <?php
@@ -359,42 +362,42 @@ abstract class Admin_Page
     public function process_action()
     {
 
-        if ( ! $this->get_current_action() || ! $this->verify_action() )
+        if (!$this->get_current_action() || !$this->verify_action())
             return;
 
-        $base_url = remove_query_arg( [ '_wpnonce', 'action', 'process_queue' ], wp_get_referer() );
+        $base_url = remove_query_arg(['_wpnonce', 'action', 'process_queue'], wp_get_referer());
 
-        $func = sprintf( "process_%s", $this->get_current_action() );
+        $func = sprintf("process_%s", $this->get_current_action());
 
         $exitCode = null;
 
-        if ( method_exists( $this, $func ) ){
-            $exitCode = call_user_func( [ $this, $func ] );
+        if (method_exists($this, $func)) {
+            $exitCode = call_user_func([$this, $func]);
         }
 
-        set_transient('groundhogg_last_action', $this->get_current_action(), 30 );
+        set_transient('groundhogg_last_action', $this->get_current_action(), 30);
 
-        if ( is_wp_error( $exitCode ) ){
-            $this->add_notice( $exitCode );
+        if (is_wp_error($exitCode)) {
+            $this->add_notice($exitCode);
             return;
         }
 
-        if ( is_string( $exitCode ) && esc_url_raw( $exitCode ) ){
-            wp_redirect( $exitCode );
+        if (is_string($exitCode) && esc_url_raw($exitCode)) {
+            wp_redirect($exitCode);
             die();
         }
 
         // Return to self if true response.
-        if ( $exitCode === true ){
+        if ($exitCode === true) {
             return;
         }
 
         // IF NULL return to main table
-        if ( ! empty( $this->get_items() ) ){
+        if (!empty($this->get_items())) {
             $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
         }
 
-        wp_redirect( $base_url );
+        wp_redirect($base_url);
         die();
     }
 
@@ -403,11 +406,12 @@ abstract class Admin_Page
      *
      * @return array[]
      */
-    protected function get_title_actions(){
+    protected function get_title_actions()
+    {
         return [
             [
-                'link' => $this->admin_url( [ 'action' => 'add' ] ),
-                'action' => __( 'Add New', 'groundhogg' ),
+                'link' => $this->admin_url(['action' => 'add']),
+                'action' => __('Add New', 'groundhogg'),
                 'target' => '_self',
             ]
         ];
@@ -418,16 +422,17 @@ abstract class Admin_Page
      */
     protected function do_title_actions()
     {
-        foreach ( $this->get_title_actions() as $action ):
+        foreach ($this->get_title_actions() as $action):
 
-            $action = wp_parse_args( $action, [
+            $action = wp_parse_args($action, [
                 'link' => admin_url(),
-                'action' => __( 'Add New', 'groundhogg' ),
+                'action' => __('Add New', 'groundhogg'),
                 'target' => '_self',
-            ] )
+            ])
 
             ?>
-            <a class="page-title-action aria-button-if-js" target="<?php esc_attr_e( $action[ 'target' ] ); ?>" href="<?php esc_attr_e( $action[ 'link' ] ); ?>"><?php _e( $action[ 'action' ] ); ?></a>
+            <a class="page-title-action aria-button-if-js" target="<?php esc_attr_e($action['target']); ?>"
+               href="<?php esc_attr_e($action['link']); ?>"><?php _e($action['action']); ?></a>
         <?php
         endforeach;
 
@@ -444,9 +449,10 @@ abstract class Admin_Page
     /**
      * Display the title and dependent action include the appropriate page content
      */
-    public function page(){
+    public function page()
+    {
 
-        do_action( "groundhogg/admin/{$this->get_slug()}/before" );
+        do_action("groundhogg/admin/{$this->get_slug()}/before");
 
         ?>
         <div class="wrap">
@@ -458,19 +464,19 @@ abstract class Admin_Page
             <hr class="wp-header-end">
             <?php
 
-            if ( method_exists( $this, $this->get_current_action() ) ){
-                call_user_func( [ $this, $this->get_current_action() ] );
-            } else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}" ) ) {
-                do_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}", $this );
+            if (method_exists($this, $this->get_current_action())) {
+                call_user_func([$this, $this->get_current_action()]);
+            } else if (has_action("groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}")) {
+                do_action("groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}", $this);
             } else {
-                call_user_func( [ $this, 'view' ] );
+                call_user_func([$this, 'view']);
             }
 
             ?>
         </div>
         <?php
 
-        do_action( "groundhogg/admin/{$this->get_slug()}/after" );
+        do_action("groundhogg/admin/{$this->get_slug()}/after");
     }
 
     /**
@@ -479,21 +485,21 @@ abstract class Admin_Page
      * @param string|array $query
      * @return string
      */
-    public function admin_url( $query = [] )
+    public function admin_url($query = [])
     {
-        $base = add_query_arg( [ 'page' => $this->get_slug() ], admin_url( 'admin.php' ) );
+        $base = add_query_arg(['page' => $this->get_slug()], admin_url('admin.php'));
 
-        if ( empty( $query ) ){
+        if (empty($query)) {
             return $base;
         }
 
         $url = $base;
 
-        if ( is_array( $query ) ){
-            $url = add_query_arg( $query, $base );
+        if (is_array($query)) {
+            $url = add_query_arg($query, $base);
         }
 
-        if ( is_string( $query ) ){
+        if (is_string($query)) {
             $url = $base . '&' . $query;
         }
 
@@ -508,13 +514,13 @@ abstract class Admin_Page
      * @param string $type
      * @param bool $cap
      */
-    protected function add_notice( $code='', $message='', $type='success', $cap=false )
+    protected function add_notice($code = '', $message = '', $type = 'success', $cap = false)
     {
-        if ( ! $cap ){
+        if (!$cap) {
             $cap = $this->get_cap();
         }
 
-        Plugin::instance()->notices->add( $code, $message, $type, $cap );
+        Plugin::instance()->notices->add($code, $message, $type, $cap);
     }
 
     /**
@@ -522,9 +528,9 @@ abstract class Admin_Page
      *
      * @param string $code
      */
-    protected function remove_notice( $code='' )
+    protected function remove_notice($code = '')
     {
-        Plugin::instance()->notices->remove( $code );
+        Plugin::instance()->notices->remove($code);
     }
 
     /**
@@ -541,14 +547,14 @@ abstract class Admin_Page
      * @param array $data
      * @return bool|void
      */
-    protected function send_ajax_response( $data = [] )
+    protected function send_ajax_response($data = [])
     {
-        if ( ! wp_doing_ajax() ){
+        if (!wp_doing_ajax()) {
             return;
         }
 
-        if ( ! is_array( $data ) ){
-            $data = (array) $data;
+        if (!is_array($data)) {
+            $data = (array)$data;
         }
 
         ob_start();
@@ -562,7 +568,7 @@ abstract class Admin_Page
             'data' => $data
         ];
 
-        wp_send_json_success( $response );
+        wp_send_json_success($response);
     }
 
     /**
@@ -570,7 +576,7 @@ abstract class Admin_Page
      */
     public function process_view()
     {
-        $paged = get_request_var( 'paged', 1 );
-        return add_query_arg( 'paged', $paged, wp_get_referer() );
+        $paged = get_request_var('paged', 1);
+        return add_query_arg('paged', $paged, wp_get_referer());
     }
 }

@@ -796,7 +796,7 @@ $active_tab = isset($_POST['active_tab']) && !empty($_POST['active_tab']) ? sani
                 $info = pathinfo($item['file_path']);
 
                 $rows[] = [
-                    sprintf("<a href='%s' target='_blank'>%s</a>", $item['file_url'], esc_html($info['basename'])),
+                    sprintf("<a href='%s' target='_blank'>%s</a>", esc_url( $item['file_url'] ), esc_html($info['basename'])),
                     esc_html(size_format(filesize($item['file_path']))),
                     esc_html($info['extension'])
                 ];

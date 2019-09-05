@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Guided_Setup\Steps;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
+use function Groundhogg\isset_not_empty;
 
 /**
  * Created by PhpStorm.
@@ -54,12 +55,12 @@ class Email extends Step
                 ] ); ?>
             </p>
         </div>
-        <p class="description"><?php _ex( '', 'guided_setup', 'groundhogg' ); ?></p>
+<!--        <p class="description">--><?php //_ex( '', 'guided_setup', 'groundhogg' ); ?><!--</p>-->
         <div class="wp-clearfix"></div>
         <hr>
         <h3><?php _e( 'Alternatives' ); ?></h3>
         <div class="postbox" style="padding: 10px">
-            <img src="https://ps.w.org/wp-mail-smtp/assets/banner-772x250.png" width="300" style="float: left; margin: 10px 20px 0 0;border: 1px solid #ededed">
+            <img src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/recommended/wp-mail-smtp.png'; ?>" width="300" style="float: left; margin: 10px 20px 0 0;border: 1px solid #ededed">
             <p><?php _ex( 'You can send your emails using an <b>SMTP Service</b> using an SMTP plugin like WP Mail SMTP. This is recommended if you do not use our service.', 'guided_setup', 'groundhogg' ); ?></p>
             <p>
                 <a target="_blank" class="button button-primary" href="<?php echo admin_url( 'plugin-install.php?s=WP+Mail+SMTP&tab=search&type=term' ); ?>"><?php _ex( 'Get WP Mail SMTP', 'guided_setup', 'groundhogg' ); ?></a>
@@ -67,7 +68,7 @@ class Email extends Step
             </p>
             <div class="wp-clearfix"></div>
         </div><div class="postbox" style="padding: 10px">
-            <img src="https://ps.w.org/wp-ses/assets/banner-772x250.jpg" width="300" style="float: left; margin: 10px 20px 0 0;border: 1px solid #ededed">
+            <img src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/recommended/wp-ses.jpg'; ?>" width="300" style="float: left; margin: 10px 20px 0 0;border: 1px solid #ededed">
             <p><?php _ex( 'You can send your emails using <b>Amazon SES</b> which is very cost effective and provides a high deliverability rating, although is more difficult to setup.', 'guided_setup', 'groundhogg' ); ?></p>
             <p>
                 <a target="_blank" class="button button-primary" href="<?php echo admin_url( 'plugin-install.php?s=wp+ses&tab=search&type=term' ); ?>"><?php _ex( 'Get WP SES', 'guided_setup', 'groundhogg' ); ?></a>
@@ -92,7 +93,7 @@ class Email extends Step
 	 */
     public function save()
     {
-        if ( isset( $_POST[ 'gh_active_email' ] ) ){
+        if ( isset_not_empty( 'gh_active_email' ) ){
 	        $redirect_to = sprintf( 'https://www.groundhogg.io/wp-login.php?doing_oauth=true&redirect_to=%s', urlencode( admin_url( 'admin.php?page=gh_guided_setup&action=connect_to_gh&step=' . $this->get_current_step_id() ) ) );
 	        set_transient( 'gh_listen_for_connect', 1, HOUR_IN_SECONDS );
 	        wp_redirect( $redirect_to );

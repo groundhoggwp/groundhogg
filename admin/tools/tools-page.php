@@ -5,6 +5,8 @@ namespace Groundhogg\Admin\Tools;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\Bulk_Jobs\Delete_Contacts;
+use function Groundhogg\get_array_var;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
@@ -382,18 +384,19 @@ class Tools_Page extends Tabbed_Admin_Page
             $this->wp_die_no_access();
         }
 
-        if ( empty( $_FILES[ 'import_file' ][ 'name' ] ) ) {
-            return new WP_Error( 'no_files', 'Please upload a file!' );
+        $file = get_array_var( $_FILES, 'import_file' );
+
+        if ( ! $file || ! $file[ 'name' ] ||  mime_content_type( $file[ 'tmp_name' ] ) !== 'text/csv' ) {
+            return new WP_Error( 'no_files', 'Please upload a valid CSV file!' );
         }
 
-        $_FILES[ 'import_file' ][ 'name' ] = md5( $_FILES[ 'import_file' ][ 'name' ] ) . '.csv';
-
-        $result = $this->handle_file_upload( 'import_file' );
+        $file[ 'name' ] = sanitize_file_name( md5( $file[ 'name' ] ) . '.csv' );
+        $result = $this->handle_file_upload( $file );
 
         if ( is_wp_error( $result ) ) {
 
             if ( is_multisite() ) {
-                return new WP_Error( 'multisite_add_csv', 'Could not import because CSV is not an allowed file type on this multisite. please add CSV to the list of allowed file types in the network settings.' );
+                return new WP_Error( 'multisite_add_csv', 'Could not import because CSV is not an allowed file type on this multisite. Please add CSV to the list of allowed file types in the network settings.' );
             }
 
             return $result;
@@ -410,14 +413,12 @@ class Tools_Page extends Tabbed_Admin_Page
     /**
      * Upload a file to the Groundhogg file directory
      *
-     * @param $key
+     * @param $file array
      * @param $config
      * @return array|bool|WP_Error
      */
-    private function handle_file_upload( $key )
+    private function handle_file_upload( $file )
     {
-        $file = $_FILES[ $key ];
-
         $upload_overrides = array( 'test_form' => false );
 
         if ( !function_exists( 'wp_handle_upload' ) ) {
@@ -476,18 +477,18 @@ class Tools_Page extends Tabbed_Admin_Page
             $this->wp_die_no_access();
         }
 
-        $map = $_POST[ 'map' ];
+        $map = map_deep( get_post_var( 'map' ), 'sanitize_text_field' );
 
         if ( !is_array( $map ) ) {
             wp_die( 'Invalid map provided.' );
         }
 
-        $file_name = $_POST[ 'import' ];
+        $file_name = sanitize_file_name( get_post_var( 'import' ) );
 
         $tags = [ sprintf( '%s - %s', __( 'Import' ), date_i18n( 'Y-m-d H:i:s' ) ) ];
 
         if ( isset_not_empty( $_POST, 'tags' ) ) {
-            $tags = array_merge( $tags, $_POST[ 'tags' ] );
+            $tags = array_merge( $tags, get_post_var( 'tags' ) );
         }
 
         $tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( $tags );
