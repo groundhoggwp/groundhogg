@@ -234,30 +234,32 @@ class Rewrites
                 fclose($file);
                 exit();
                 break;
-            case 'files':
-                $file_path = get_query_var( 'file_path' );
 
-                if ( ! $file_path || ! file_exists( $file_path ) ){
-                    return;
-                }
-
-                $content_type = sprintf( "Content-Type: %s", mime_content_type( $file_path ) );
-                $content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );
-
-                header( $content_type );
-                header( $content_size );
-
-                if ( get_request_var( 'download' ) ){
-                    $content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
-                    header( $content_disposition );
-                }
-
-                status_header( 200 );
-                nocache_headers();
-
-                readfile( $file_path );
-                exit();
-                break;
+            // Todo fix code for a later date.
+//            case 'files':
+//                $file_path = get_query_var( 'file_path' );
+//
+//                if ( ! $file_path || ! file_exists( $file_path ) ){
+//                    return;
+//                }
+//
+//                $content_type = sprintf( "Content-Type: %s", mime_content_type( $file_path ) );
+//                $content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );
+//
+//                header( $content_type );
+//                header( $content_size );
+//
+//                if ( get_request_var( 'download' ) ){
+//                    $content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
+//                    header( $content_disposition );
+//                }
+//
+//                status_header( 200 );
+//                nocache_headers();
+//
+//                readfile( $file_path );
+//                exit();
+//                break;
             case 'forms_iframe':
                 $template = $template_loader->get_template_part( 'form/iframe.js', '', true );
                 exit();

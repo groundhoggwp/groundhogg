@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.5 (2019-09-05) =
+* FIXED Arbitrary readfile vulnerability
+
 = 2.0.9.4 (2019-09-05) =
 * TWEAKED Contact Query class optimized
 * FIXED bug where admin user linked to contact record on update.
