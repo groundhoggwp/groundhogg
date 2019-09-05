@@ -39,7 +39,7 @@ class Main_Updater extends Updater {
             '2.0.7.1',
             '2.0.8',
             '2.0.8.1',
-            '2.0.9.3',
+            '2.0.9.5.1',
         ];
     }
 
@@ -110,21 +110,14 @@ class Main_Updater extends Updater {
 
     }
 
-	/**
-	 * Fix tracking link bug. url encoding the string causes 404 error.
-	 */
-    public function version_2_0_8_1()
-    {
-    	install_custom_rewrites();
-    }
-
     /**
 	 * Attempt more compatibility with the rewrites.
      *
 	 */
-    public function version_2_0_9_3()
+    public function version_2_0_9_5_1()
     {
     	install_custom_rewrites();
+    	Plugin::$instance->roles->add_caps();
     }
 
 

@@ -14,8 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @param $by_user_id
  * @return false|Contact
  */
-function get_contactdata( $contact_id_or_email, $by_user_id=false )
+function get_contactdata( $contact_id_or_email=false, $by_user_id=false )
 {
+    if ( ! $contact_id_or_email ){
+        return Plugin::$instance->tracking->get_current_contact();
+    }
+
     return Plugin::$instance->utils->get_contact( $contact_id_or_email, $by_user_id );
 }
 

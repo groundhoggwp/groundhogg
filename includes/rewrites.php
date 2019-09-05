@@ -235,7 +235,6 @@ class Rewrites
                 exit();
                 break;
 
-            // Todo fix code for a later date.
             case 'files':
                 $file_path = get_query_var( 'file_path' );
 
@@ -243,6 +242,17 @@ class Rewrites
                 $file_path = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $file_path );
 
                 if ( ! $file_path || ! file_exists( $groundhogg_path ) ){
+                    return;
+                }
+
+                $subfolder = basename( dirname( $file_path ) );
+
+                $contact = get_contactdata();
+
+                // OPnly directories which should be access are contact uploads, imports, and exports
+                if ( in_array( $subfolder, [ 'imports', 'exports' ] ) && ! current_user_can( 'download_files' ) ){
+                    return;
+                } else if ( ! $contact || md5( encrypt( $contact->get_email() ) ) !== $subfolder ) {
                     return;
                 }
 

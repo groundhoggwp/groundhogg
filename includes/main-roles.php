@@ -324,6 +324,14 @@ class Main_Roles extends Roles {
         return apply_filters( 'groundhogg/roles/caps/events', $caps );
     }
 
+    public function get_file_caps()
+    {
+        return [
+            'download_files',
+            'upload_files'
+        ];
+    }
+
     /**
      * Reports
      *  - View Reports
@@ -373,7 +381,8 @@ class Main_Roles extends Roles {
             $this->get_tag_caps(),
             $this->get_report_caps(),
             $this->get_sms_caps(),
-            $this->get_other_caps()
+            $this->get_other_caps(),
+            $this->get_file_caps()
         );
 
         return $caps;
