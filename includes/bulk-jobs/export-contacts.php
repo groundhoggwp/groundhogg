@@ -4,6 +4,7 @@ namespace Groundhogg\Bulk_Jobs;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\encrypt;
+use function Groundhogg\file_access_url;
 use function Groundhogg\get_db;
 use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
@@ -193,7 +194,7 @@ class Export_Contacts extends Bulk_Job
      */
     protected function get_finished_notice()
     {
-        $file_url =Plugin::$instance->utils->files->get_csv_exports_url( $this->file_name );
+        $file_url = file_access_url( $this->file_path, true );
         return sprintf( _x( 'Export file created. %s', 'notice', 'groundhogg'), "&nbsp;&nbsp;&nbsp;<a class='button button-primary' href='$file_url'>Download Now</a>" );
     }
 }

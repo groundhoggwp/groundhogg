@@ -125,6 +125,32 @@ class Events_Page extends Admin_Page
     }
 
     /**
+     * Clean up the events DB if something goes wrong.
+     *
+     * @return bool
+     */
+    public function process_process_queue()
+    {
+        if ( !current_user_can( 'execute_events' ) ) {
+            $this->wp_die_no_access();
+        }
+
+        $queue = Plugin::$instance->event_queue;
+
+        Plugin::$instance->notices->add( 'queue-complete', sprintf( "%d events have been completed in %s seconds.", $queue->run_queue(), $queue->get_last_execution_time() ) );
+
+        if ( $queue->has_errors() ){
+            Plugin::$instance->notices->add( 'queue-errors', sprintf( "%d events failed to complete. Please see the following errors.", count( $queue->get_errors() ) ), 'warning' );
+
+            foreach ( $queue->get_errors() as $error ){
+                Plugin::instance()->notices->add( $error );
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Executes the event
      *
      * @return bool

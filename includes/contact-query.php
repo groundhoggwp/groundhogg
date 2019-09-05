@@ -346,7 +346,7 @@ class Contact_Query
                     'operator' => 'NOT IN',
                 ]
             ];
-            
+
             $this->tag_query = new Tag_Query( $query );
 
             if (!empty($this->tag_query->queries)) {
@@ -473,11 +473,7 @@ class Contact_Query
         $this->sql_clauses['limits'] = $limits;
 
         $this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$where} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
-
-//        var_dump( $this->request );
-
         $results = $wpdb->get_results($this->request);
-
         return $results;
     }
 
@@ -519,10 +515,10 @@ class Contact_Query
     protected function construct_request_fields()
     {
         if ($this->query_vars['count']) {
-            return "COUNT(DISTINCT $this->table_name.$this->primary_key) AS count";
+            return "COUNT($this->table_name.$this->primary_key) AS count";
         }
 
-        return "DISTINCT $this->table_name.*";
+        return "$this->table_name.*";
     }
 
     /**
@@ -551,30 +547,6 @@ class Contact_Query
             $join_type = false !== strpos($join, 'INNER JOIN') ? 'INNER JOIN' : 'LEFT JOIN';
 
             $join .= " $join_type $meta_table AS email_mt ON $this->table_name.$this->primary_key = email_mt.{$this->meta_type}_id";
-        }
-
-//        if ( ( ! empty( $this->query_vars['tags_include'] ) || ! empty( $this->query_vars['tags_exclude'] ) ) ) {
-//            $tags_table = WPGH()->tag_relationships->table_name;
-//
-//            $join_type = false !== strpos( $join, 'INNER JOIN' ) ? 'INNER JOIN' : 'LEFT JOIN';
-//
-//            $join .= " $join_type $tags_table AS c_tags ON $this->table_name.$this->primary_key = c_tags.{$this->meta_type}_id";
-//        }
-
-        if (!empty($this->query_vars['report'])) {
-            $events_table = Plugin::$instance->dbs->get_db('events')->get_table_name();
-
-            $join_type = false !== strpos($join, 'INNER JOIN') ? 'INNER JOIN' : 'LEFT JOIN';
-
-            $join .= " $join_type $events_table AS events ON $this->table_name.$this->primary_key = events.{$this->meta_type}_id";
-        }
-
-        if (!empty($this->query_vars['activity'])) {
-            $activity_table = Plugin::$instance->dbs->get_db('activity')->get_table_name();
-
-            $join_type = false !== strpos($join, 'INNER JOIN') ? 'INNER JOIN' : 'LEFT JOIN';
-
-            $join .= " $join_type $activity_table AS activity ON $this->table_name.$this->primary_key = activity.{$this->meta_type}_id";
         }
 
         return $join;
@@ -639,25 +611,14 @@ class Contact_Query
             }
         }
 
-//        if (!empty($this->query_vars['tags_include'])) {
-//            $ids = $this->get_contact_ids_with_tags($this->query_vars['tags_include'], $this->query_vars['tags_relation']);
-//            $ids = !empty($ids) ? implode(',', $ids) : '0';
-//            $where['tags_include'] = "ID IN ( $ids )";
-//        }
-//
-//        if (!empty($this->query_vars['tags_exclude'])) {
-//            $ids = $this->get_contact_ids_with_tags($this->query_vars['tags_exclude'], $this->query_vars['tags_relation']);
-//            $ids = !empty($ids) ? implode(',', $ids) : '0';
-//            $where['tags_exclude'] = "ID NOT IN ( $ids )";
-//        }
-
         if ($this->query_vars['report'] && is_array($this->query_vars['report'])) {
 
             $map = [
                 'step' => 'step_id',
                 'funnel' => 'funnel_id',
                 'start' => 'after',
-                'end' => 'before'
+                'end' => 'before',
+                'type' => 'event_type',
             ];
 
             foreach ($map as $old_key => $new_key) {
@@ -666,42 +627,39 @@ class Contact_Query
                 }
             }
 
-            if (!empty($this->query_vars['report']['funnel_id'])) {
-                $funnel_id = $this->query_vars['report']['funnel_id'];
-                $where['report_funnel'] = "events.funnel_id IN ( $funnel_id )";
+            $subwhere = [ 'relationship' => 'AND' ];
+
+            foreach ( $this->query_vars[ 'report' ] as $col => $val ){
+
+                if ( ! empty( $val) ){
+                    switch ( $col ){
+                        default:
+                            $compare = '=';
+                            break;
+                        case 'before':
+                            $compare = '<=';
+                            break;
+                        case 'after':
+                            $compare = '>=';
+                            break;
+                    }
+
+                    $subwhere[] = [ 'col' => $col, 'val' => $val, 'compare' => $compare ];
+                }
+
             }
 
-            if (!empty($this->query_vars['report']['status'])) {
-                $status = $this->query_vars['report']['status'];
-                $where['report_status'] = "events.status LIKE '$status'";
-            }
+            $sql = get_db( 'events' )->get_sql( [
+                'where' => $subwhere,
+                'select' => 'contact_id',
+                'orderby' => false,
+                'order' => ''
+            ] );
 
-            if (!empty($this->query_vars['report']['type'])) {
-                $event_types = implode(',', ensure_array($this->query_vars['report']['type']));
-                $where['report_type'] = "events.event_type IN ($event_types)";
-            }
-
-            if (!empty($this->query_vars['report']['step_id'])) {
-                $step_id = $this->query_vars['report']['step_id'];
-                $where['report_step'] = "events.step_id IN ( $step_id )";
-            }
-
-            if (!empty($this->query_vars['report']['after'])) {
-                $start = $this->query_vars['report']['after'];
-                $where['report_start'] = "events.time >= $start";
-            }
-
-            if (!empty($this->query_vars['report']['before'])) {
-                $end = $this->query_vars['report']['before'];
-                $where['report_end'] = "events.time <= $end";
-            }
+            $where[ 'report' ] = "$this->table_name.$this->primary_key IN ( $sql )";
         }
 
         if ($this->query_vars['activity'] && is_array($this->query_vars['activity'])) {
-            if (!empty($this->query_vars['activity']['activity_type'])) {
-                $type = $this->query_vars['activity']['activity_type'];
-                $where['report_type'] = "activity.activity_type = '$type'";
-            }
 
             $map = [
                 'step' => 'step_id',
@@ -716,35 +674,36 @@ class Contact_Query
                 }
             }
 
-//            if ( !empty( $this->query_vars[ 'report' ][ 'event_type' ] ) ){
-//                $event_types = implode( ',', ensure_array( $this->query_vars[ 'activity' ][ 'event_type' ] ) );
-//                $where['report_event_type'] = "activity.event_type IN ( $event_types )";
-//            }
+            $subwhere = [ 'relationship' => 'AND' ];
 
-            if (!empty($this->query_vars['activity']['funnel_id'])) {
-                $funnel_ids = implode(',', ensure_array($this->query_vars['activity']['funnel_id']));
-                $where['report_funnel'] = "activity.funnel_id IN ( $funnel_ids )";
+            foreach ( $this->query_vars[ 'activity' ] as $col => $val ){
+
+                if ( ! empty( $val) ){
+                    switch ( $col ){
+                        default:
+                            $compare = '=';
+                            break;
+                        case 'before':
+                            $compare = '<=';
+                            break;
+                        case 'after':
+                            $compare = '>=';
+                            break;
+                    }
+
+                    $subwhere[] = [ 'col' => $col, 'val' => $val, 'compare' => $compare ];
+                }
+
             }
 
-            if (!empty($this->query_vars['activity']['step_id'])) {
-                $step_ids = implode(',', ensure_array($this->query_vars['activity']['step_id']));
-                $where['report_step'] = "activity.step_id IN ( $step_ids )";
-            }
+            $sql = get_db( 'activity' )->get_sql( [
+                'where' => $subwhere,
+                'select' => 'contact_id',
+                'orderby' => false,
+                'order' => ''
+            ] );
 
-            if (!empty($this->query_vars['activity']['referer'])) {
-                $referer = $this->query_vars['activity']['referer'];
-                $where['report_referer'] = "activity.referer LIKE '$referer'";
-            }
-
-            if (!empty($this->query_vars['activity']['after'])) {
-                $end = $this->query_vars['activity']['after'];
-                $where['report_end'] = "activity.timestamp >= $end";
-            }
-
-            if (!empty($this->query_vars['activity']['before'])) {
-                $start = $this->query_vars['activity']['before'];
-                $where['report_start'] = "activity.timestamp <= $start";
-            }
+            $where[ 'activity' ] = "$this->table_name.$this->primary_key IN ( $sql )";
         }
 
         if (strlen($this->query_vars['search'])) {
@@ -779,36 +738,6 @@ class Contact_Query
         }
 
         return $where;
-    }
-
-    /**
-     * @param array|string $tag_ids
-     * @param string $relation
-     * @return array
-     */
-    protected function get_contact_ids_with_tags($tag_ids = [], $relation = 'OR')
-    {
-
-        if (!is_array($tag_ids)) {
-            $tag_ids = wp_parse_id_list(explode(',', $tag_ids));
-        }
-
-        if (strtoupper($relation) === 'AND') {
-            $ids = [];
-            foreach ($tag_ids as $tag_id) {
-                $relationships = get_db('tag_relationships')->query(['tag_id' => $tag_id]);
-                $cids = wp_parse_id_list(wp_list_pluck($relationships, 'contact_id'));
-                if (empty($ids)) {
-                    $ids = $cids;
-                }
-                $ids = array_intersect($ids, $cids);
-            }
-        } else {
-            $relationships = get_db('tag_relationships')->query(['tag_id' => $tag_ids], 'contact_id');
-            $ids = wp_parse_id_list(wp_list_pluck($relationships, 'contact_id'));
-        }
-
-        return $ids;
     }
 
     /**
@@ -886,7 +815,7 @@ class Contact_Query
      */
     protected function construct_request_groupby()
     {
-        if (!empty($this->meta_query_clauses['join']) || (!empty($this->query_vars['email']) && !is_array($this->query_vars['email']))) {
+        if (!empty($this->meta_query_clauses['join']) || (!empty($this->query_vars['email']) && !is_array($this->query_vars['email'])) || !empty($this->query_vars['report'] ) || !empty($this->query_vars['activity'] ) ) {
             return "$this->table_name.$this->primary_key";
         }
 

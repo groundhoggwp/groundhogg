@@ -280,7 +280,7 @@ $active_tab = isset($_POST['active_tab']) && !empty($_POST['active_tab']) ? sani
                     <th>
                         <label for="link_existing"><?php echo _x('Link Existing Account?', 'contact_record', 'groundhogg') ?></label>
                     </th>
-                    <td><?php wp_dropdown_users(array('show_option_none' => _x('Select a User Account (optional)', 'contact_record', 'groundhogg'))); ?>
+                    <td><?php wp_dropdown_users(array('show_option_none' => _x('Select a User Account (optional)', 'contact_record', 'groundhogg'), 'option_none_value' => 0 ) ); ?>
                         <p class="description"><?php _ex('You can link an existing user account to this contact.', 'contact_record', 'groundhogg'); ?></p>
                     </td>
                 </tr>

@@ -523,6 +523,8 @@ class Contacts_Page extends Admin_Page
         $args['owner_id'] = absint( get_request_var( 'owner_id' ) );
         $args['user_id'] = absint( get_request_var( 'user' ) );
 
+//        wp_send_json( $args );
+
         $contact->update($args);
 
         $basic_text_fields = [

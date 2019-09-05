@@ -390,7 +390,9 @@ abstract class Admin_Page
         }
 
         // IF NULL return to main table
-        $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
+        if ( ! empty( $this->get_items() ) ){
+            $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
+        }
 
         wp_redirect( $base_url );
         die();

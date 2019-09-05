@@ -150,6 +150,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.4 (2019-09-05) =
+* TWEAKED Contact Query class optimized
+* FIXED bug where admin user linked to contact record on update.
+* FIXED bug completed events shows zero when running queue manually.
+* FIXED redirect after running queue to remove url params from query string.
+* FIXED missing translation context in form errors.
+
 = 2.0.9.3 (2019-09-04) =
 * FIXED Managed page query not working.
 

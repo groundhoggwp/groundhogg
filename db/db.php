@@ -647,8 +647,43 @@ abstract class DB {
     public function advanced_query( $query_vars=[], $from_cache=true )
     {
 
+        $hash = md5( serialize( $query_vars ) );
+
+        if ( ( $cached_results = get_array_var( self::$cache, $hash ) ) && $from_cache ){
+            return $cached_results;
+        }
+
+        $sql = $this->get_sql( $query_vars );
+
         global $wpdb;
 
+        $func = strtolower( get_array_var( $query_vars, 'func' ) );
+
+        switch ( $func ){
+            case 'count':
+            case 'sum':
+            case 'avg':
+                $results = $wpdb->get_var( $sql );
+                break;
+            default:
+                $results = $wpdb->get_results( $sql );
+                break;
+        }
+
+        $results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
+        self::$cache[ $hash ] = $results;
+
+        return $results;
+    }
+
+    /**
+     * Generate the SQL Statement
+     *
+     * @param array $query_vars
+     * @return string
+     */
+    public function get_sql( $query_vars=[] )
+    {
         // Actual start
         $query_vars = wp_parse_args( $query_vars, [
             'where' => [],
@@ -659,13 +694,8 @@ abstract class DB {
             'select' => '*',
             'search' => false,
             'func' => false, // COUNT | AVG | SUM
+            'groupby' => false,
         ] );
-
-        $hash = md5( serialize( $query_vars ) );
-
-        if ( ( $cached_results = get_array_var( self::$cache, $hash ) ) && $from_cache ){
-            return $cached_results;
-        }
 
         // Build Where Statement
         $where = get_array_var( $query_vars, 'where', [] );
@@ -704,6 +734,7 @@ abstract class DB {
         $limit = $query_vars[ 'limit' ] ? sprintf( 'LIMIT %d', absint( $query_vars[ 'limit' ] ) ) : '';
         $offset = $query_vars[ 'offset' ] ? sprintf( 'OFFSET %d', absint( $query_vars[ 'offset' ] ) ) : '';
         $orderby = $query_vars[ 'orderby' ] && in_array( $query_vars[ 'orderby' ], $this->get_allowed_columns() ) ? sprintf( 'ORDER BY %s', $query_vars[ 'orderby' ] ) : '';
+        $groupby = $query_vars[ 'groupby' ] && in_array( $query_vars[ 'groupby' ], $this->get_allowed_columns() ) ? sprintf( 'GROUP BY %s', $query_vars[ 'groupby' ] ) : '';
         $order = $query_vars[ 'order' ] ? strtoupper( $query_vars[ 'order' ] ) : '';
 
         $clauses = [
@@ -711,6 +742,7 @@ abstract class DB {
             'orderby' => $orderby,
             'order' => $order,
             'limit' => $limit,
+            'groupby' => $groupby,
             'offset' => $offset,
         ];
 
@@ -718,23 +750,7 @@ abstract class DB {
 
         $sql = "SELECT {$select} FROM {$this->get_table_name()} WHERE $clauses";
 
-        $func = strtolower( $query_vars[ 'func' ] );
-
-        switch ( $func ){
-            case 'count':
-            case 'sum':
-            case 'avg':
-                $results = $wpdb->get_var( $sql );
-                break;
-            default:
-                $results = $wpdb->get_results( $sql );
-                break;
-        }
-
-        $results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
-        self::$cache[ $hash ] = $results;
-
-        return $results;
+        return $sql;
     }
 
     /**
@@ -757,15 +773,15 @@ abstract class DB {
     {
         global $wpdb;
 
-        $where = wp_parse_args( $where, [
-            'relationship' => 'AND'
-        ] );
-
         // Normalize 'relation' => 'relationship'
         if ( isset_not_empty( $where, 'relation' ) ){
             $where[ 'relationship' ] = $where[ 'relation' ];
             unset( $where[ 'relation' ] );
         }
+
+        $where = wp_parse_args( $where, [
+            'relationship' => 'AND'
+        ] );
 
         $relationship = in_array( $where[ 'relationship' ], $this->get_allowed_relationships() ) ? strtoupper( $where[ 'relationship' ] ) : 'AND';
 
@@ -775,7 +791,9 @@ abstract class DB {
 
         foreach ( $where as $condition ){
 
-            if ( isset_not_empty( $condition, 'relationship' ) ){
+            if ( ! is_array( $condition ) ){
+                // Todo?
+            } else if ( isset_not_empty( $condition, 'relationship' ) ){
 
                 $clause[] = $this->build_advanced_where_statement( $condition );
 

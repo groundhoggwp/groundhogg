@@ -75,14 +75,8 @@ class Event_Queue extends Supports_Errors
     public function __construct()
     {
         add_filter( 'cron_schedules', [ $this, 'add_cron_schedules' ] );
-
         add_action( 'init', [ $this, 'setup_cron_jobs' ] );
-
         add_action( self::WP_CRON_HOOK , [ $this, 'run_queue' ] );
-
-        if ( get_request_var( 'process_queue' ) && is_admin() ){
-            add_action( 'init' , array( $this, 'run_queue_manually' ) );
-        }
     }
 
     /**
@@ -174,17 +168,13 @@ class Event_Queue extends Supports_Errors
     	$claim = $this->store->stake_claim( $max_events );
     	$event_ids = $this->store->get_events_by_claim( $claim );
 
-//    	wp_send_json( $event_ids );
-
         if ( empty( $event_ids ) ){
-            return 0;
+            return $completed_events;
         }
 
         do_action( 'groundhogg/event_queue/process/before', $event_ids );
 
         self::set_is_processing( true );
-
-//        wp_send_json( $event_ids );
 
         do{
             $event_id = array_pop( $event_ids );
