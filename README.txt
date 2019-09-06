@@ -205,7 +205,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.0.7 (2019-08-29) =
 * ADDED file_access_url() to create access links for protected Groundhogg files.
-* FIXED Admin_Page::admin_url() not using based admin_url() function.
+* FIXED Admin_Page::admin_url() not using based admin_url() funtction.
 
 = 2.0.6 (2019-08-28) =
 * FIXED File uploader causing error when file is not uploaded.

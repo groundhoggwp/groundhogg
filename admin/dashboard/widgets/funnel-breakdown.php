@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Dashboard\Widgets;
 
 use Groundhogg\Funnel;
 use function Groundhogg\get_db;
+use function Groundhogg\html;
 use function Groundhogg\percentage;
 use Groundhogg\Plugin;
 
@@ -65,13 +66,7 @@ class Funnel_Breakdown extends Category_Graph
             <form method="get" action="">
                 <?php
 
-                foreach ( $_GET as $key => $value ){
-                    echo Plugin::$instance->utils->html->input( [
-                        'type' => 'hidden',
-                        'name' => $key,
-                        'value' => $value
-                    ] );
-                }
+                echo html()->hidden_GET_inputs();
 
                 $args = array(
                     'name'      => 'funnel',

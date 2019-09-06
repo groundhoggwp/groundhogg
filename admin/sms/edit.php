@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\SMS;
 
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 
 
@@ -18,8 +19,7 @@ use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$id = intval( $_GET[ 'sms' ] );
-
+$id = absint( get_request_var( 'sms' ) );
 $sms = Plugin::$instance->dbs->get_db('sms')->get($id);
 
 ?>

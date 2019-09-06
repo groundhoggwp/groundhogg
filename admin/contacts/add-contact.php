@@ -37,7 +37,7 @@ use function Groundhogg\isset_not_empty;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 ?>
-<?php $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'default'; ?>
+<?php $active_tab = sanitize_text_field( get_request_var( 'tab', 'default' ) ); ?>
 <h2 class="nav-tab-wrapper">
     <a href="?page=gh_contacts&action=add&tab=default" class="nav-tab <?php echo $active_tab == 'default' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Quick Add', 'tab', 'groundhogg'); ?></a>
     <a href="?page=gh_contacts&action=add&tab=form" class="nav-tab <?php echo $active_tab == 'form' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Internal Form', 'tab', 'groundhogg'); ?></a>

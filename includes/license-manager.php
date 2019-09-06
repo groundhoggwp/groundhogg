@@ -112,7 +112,7 @@ class License_Manager
     		if ( ! current_user_can('manage_options' ) )
     			wp_die( "Cannot access this functionality" );
 
-    		$licenses = $_POST[ 'licenses' ];
+    		$licenses = map_deep( get_request_var( 'licenses' ), 'sanitize_text_field' );
 
     		if ( ! is_array( $licenses ) ){
     		    wp_die( _x( 'Invalid license format', 'notice', 'groundhogg' ) );

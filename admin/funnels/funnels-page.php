@@ -511,7 +511,7 @@ class Funnels_Page extends Admin_Page
 
         } else if ( isset( $_POST[ 'funnel_id' ] ) ) {
 
-            $from_funnel = absint( $_POST[ 'funnel_id' ] );
+            $from_funnel = absint( get_request_var( 'funnel_id' ) );
             $from_funnel = new Funnel( $from_funnel );
 
             $json = $from_funnel->export();

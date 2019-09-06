@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Contacts;
 
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_cookie;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_form_list;
@@ -87,9 +88,8 @@ $tabs = array(
 );
 
 $tabs = apply_filters('groundhogg/admin/contact/record/tabs', $tabs);
-
-$cookie_tab = isset($_COOKIE['gh_contact_tab']) ? str_replace('tab_', '', sanitize_key($_COOKIE['gh_contact_tab'])) : 'general';
-$active_tab = isset($_POST['active_tab']) && !empty($_POST['active_tab']) ? sanitize_key($_POST['active_tab']) : $cookie_tab;
+$cookie_tab = str_replace('tab_', '', get_cookie( 'gh_contact_tab', 'general' ) );
+$active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 ?>
 <div class="local-time" style="float: right; padding: 10px;font-size: 18px;">
     <?php _ex('Local Time:', 'groundhogg'); ?>

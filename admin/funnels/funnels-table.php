@@ -118,7 +118,7 @@ class Funnels_Table extends WP_List_Table {
 
     protected function get_view()
     {
-        return ( isset( $_GET['status'] ) )? $_GET['status'] : 'active';
+        return sanitize_text_field( get_request_var( 'status', 'active' ) );
     }
 
 	/**

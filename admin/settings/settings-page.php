@@ -1050,7 +1050,7 @@ class Settings_Page extends Admin_Page
      */
     private function active_tab()
     {
-        return isset($_GET['tab']) ? $_GET['tab'] : 'general';
+        return sanitize_key( get_request_var( 'tab', 'general' ) );
     }
 
     /**

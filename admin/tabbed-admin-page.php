@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Admin;
 
+use function Groundhogg\get_request_var;
+use function Groundhogg\get_url_var;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
 
@@ -36,7 +38,8 @@ abstract class Tabbed_Admin_Page extends Admin_Page
      */
     protected function get_current_tab()
     {
-        return isset_not_empty( $_GET, 'tab' ) ? $_GET[ 'tab' ] : $this->get_tabs()[ 0 ][ 'slug' ];
+        $tabs = $this->get_tabs();
+        return get_request_var( 'tab', $tabs[ 0 ][ 'slug' ] );
     }
 
     /**

@@ -195,8 +195,8 @@ function get_request_query( $default=[], $force=[], $accepted_keys=[] )
 
    $query = urldecode_deep( $query );
 
-   if ( isset_not_empty( $_GET, 's' ) ){
-       $query[ 'search' ] = get_request_var( 's' );
+   if ( $search = get_request_var( 's' ) ){
+       $query[ 'search' ] = $search;
    }
 
    $query = array_merge( $query, $force );

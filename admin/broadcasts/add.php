@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Contact_Query;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
@@ -85,7 +86,7 @@ $type =  isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' :
                 <p class="description"><?php _e( 'This broadcast will be sent to contacts with these tags.', 'groundhogg' ); ?></p>
                 <?php else:
                 $query = new Contact_Query();
-                $num = count( $query->query( $_GET ) );
+                $num = count( $query->query( get_request_query() ) );
                     printf( __( "%d Contacts", 'groundhogg' ), $num );
                 endif; ?>
             </td>

@@ -24,7 +24,7 @@ use function Groundhogg\html;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$funnel_id = intval( $_GET['funnel'] );
+$funnel_id = absint( get_request_var( 'funnel' ) );
 
 $funnel = new Funnel( $funnel_id );
 

@@ -154,8 +154,8 @@ class Broadcasts_Page extends Admin_Page
              return new \WP_Error( 'no_contacts', __( 'Please select a tag with at least 1 contact','groundhogg'));
         }
 
-        $send_date = isset($_POST['date']) ? $_POST['date'] : date('Y/m/d', strtotime('tomorrow'));
-        $send_time = isset($_POST['time']) ? $_POST['time'] : '09:30';
+        $send_date = isset($_POST['date']) ? sanitize_text_field( $_POST['date'] ): date('Y/m/d', strtotime('tomorrow'));
+        $send_time = isset($_POST['time']) ? sanitize_text_field( $_POST['time'] ): '09:30';
 
         $time_string = $send_date . ' ' . $send_time;
 

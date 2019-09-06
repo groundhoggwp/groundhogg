@@ -586,9 +586,16 @@ class Emails_Page extends Admin_Page
              * @var $email_templates array
              * @see /templates/email-templates.php
              */
-            $args[ 'content' ] = $email_templates[ $_POST[ 'email_template' ] ][ 'content' ];
-            $args[ 'subject' ] = $email_templates[ $_POST[ 'email_template' ] ][ 'title' ];
-            $args[ 'title' ] = $email_templates[ $_POST[ 'email_template' ] ][ 'title' ];
+
+            $template = sanitize_text_field( Groundhogg\get_request_var( 'email_template' ) );
+
+            if ( ! Groundhogg\isset_not_empty( $email_templates, $template ) ){
+                return new \WP_Error( 'no_template', 'The request template was not found.' );
+            }
+
+            $args[ 'content' ] = $email_templates[ $template ][ 'content' ];
+            $args[ 'subject' ] = $email_templates[ $template ][ 'title' ];
+            $args[ 'title' ] = $email_templates[ $template ][ 'title' ];
 
         } else if ( isset( $_POST[ 'email_id' ] ) ) {
 
@@ -615,15 +622,6 @@ class Emails_Page extends Admin_Page
         }
 
         $return_path = admin_url( 'admin.php?page=gh_emails&action=edit&email=' .  $email_id );
-
-        if ( isset( $_GET['return_step'] ) ){
-
-            /* Make it easy to return back to the funnel editing screen */
-            $step_id = intval( $_GET['return_step'] );
-            $funnel_id = intval( $_GET['return_funnel'] );
-            $return_path .= sprintf( "&return_funnel=%s&return_step=%s", $funnel_id, $step_id );
-            Groundhogg\get_db('stepmeta' )->update_meta( $step_id, 'email_id', $email_id );
-        }
 
         return $return_path ;
 

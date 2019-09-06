@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Dashboard\Widgets;
 
+use function Groundhogg\html;
 use function Groundhogg\percentage;
 use Groundhogg\Plugin;
 
@@ -64,13 +65,7 @@ class Region_Widget extends Circle_Graph
             <form method="get" action="">
                 <?php
 
-                foreach ( $_GET as $key => $value ){
-                    echo Plugin::$instance->utils->html->input( [
-                        'type' => 'hidden',
-                        'name' => $key,
-                        'value' => $value
-                    ] );
-                }
+                echo html()->hidden_GET_inputs();
 
                 ?><div style="width: 300px;display: inline-block;margin-right:10px;margin-bottom: 10px;"><?php
 

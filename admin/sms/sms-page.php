@@ -2,6 +2,8 @@
 namespace Groundhogg\Admin\SMS;
 use Groundhogg\Admin\Admin_Page;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\SMS;
 use function  Groundhogg\isset_not_empty;
@@ -106,7 +108,7 @@ class SMS_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        $title = sanitize_text_field(wp_unslash($_POST['title']));
+        $title = sanitize_text_field(get_post_var('title'));
         $message = sanitize_textarea_field(wp_strip_all_tags(wp_unslash($_POST['message'])));
 
         $args = array(
@@ -134,9 +136,9 @@ class SMS_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        $id = absint( $_GET['sms'] );
-        $title = sanitize_text_field(wp_unslash($_POST['title']));
-        $message = sanitize_textarea_field(wp_strip_all_tags(wp_unslash($_POST['message'])));
+        $id = absint( get_request_var( 'sms' ) );
+        $title = sanitize_text_field( get_request_var( 'title' ) );
+        $message = sanitize_textarea_field(wp_strip_all_tags( get_request_var( 'message' ) ));
 
         $args = array(
             'title' => $title,

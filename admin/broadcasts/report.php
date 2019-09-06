@@ -5,7 +5,7 @@ namespace Groundhogg\Admin\Broadcasts;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
-use function Groundhogg\percentage;
+use function Groundhogg\get_request_var;use function Groundhogg\percentage;
 use Groundhogg\Plugin;
 
 /**
@@ -24,7 +24,7 @@ use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$id = absint( $_GET[ 'broadcast' ] );
+$id = absint( get_request_var( 'broadcast' ) );
 
 $broadcast = new Broadcast( $id );
 

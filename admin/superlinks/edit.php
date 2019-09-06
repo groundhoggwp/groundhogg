@@ -1,7 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Superlinks;
 
-use Groundhogg\Plugin;
+use function Groundhogg\get_request_var;use Groundhogg\Plugin;
 /**
  * Edit A Superlink
  *
@@ -14,7 +14,7 @@ use Groundhogg\Plugin;
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
-$id = intval( $_GET[ 'superlink' ] );
+$id = absint( get_request_var( 'superlink' ) );
 
 $superlink =Plugin::instance()->dbs->get_db('superlinks')->get($id);
 

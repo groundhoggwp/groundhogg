@@ -3,7 +3,7 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Email_Parser;
-use function Groundhogg\groundhogg_url;
+use function Groundhogg\get_request_var;use function Groundhogg\groundhogg_url;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
@@ -26,7 +26,7 @@ use Groundhogg\Email;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-$email_id = intval( $_GET['email'] );
+$email_id = absint( get_request_var( 'email' ) );
 $email = new Email( $email_id );
 
 $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );

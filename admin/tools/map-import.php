@@ -24,7 +24,7 @@ use function Groundhogg\get_mappable_fields;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$file_name = urldecode( $_GET[ 'import' ] );
+$file_name = sanitize_file_name( urldecode( $_GET[ 'import' ] ) );
 $file_path = Plugin::$instance->utils->files->get_csv_imports_dir( $file_name );
 
 if ( ! file_exists( $file_path ) ){

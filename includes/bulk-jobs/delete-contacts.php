@@ -2,6 +2,7 @@
 namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Contact_Query;
+use function Groundhogg\get_request_query;
 use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -30,9 +31,9 @@ class Delete_Contacts extends Bulk_Job
             return $items;
         }
 
-        $query = new Contact_Query();
-        $args = $_GET;
+	    $args = get_request_query();
 
+	    $query = new Contact_Query();
         $contacts = $query->query( $args );
         $ids = wp_list_pluck( $contacts, 'ID' );
 

@@ -2,6 +2,8 @@
 namespace Groundhogg\Api\V3;
 
 // Exit if accessed directly
+use function Groundhogg\get_url_var;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
@@ -53,7 +55,7 @@ class Bulk_Job_Api extends Base
     {
         // Sanitize the bulk action
         // Permitted Characters 0-9, A-z, _, -, / to keep inline with the Groundhogg Action Structure. No spaces.
-        $bulk_action = preg_replace( '/[^0-9A-z_\-\/]/', '', $_GET[ 'bulk_action' ] );
+        $bulk_action = preg_replace( '/[^0-9A-z_\-\/]/', '', get_url_var( 'bulk_action' ) );
 
         if ( ! $bulk_action ){
             return self::ERROR_403( 'invalid_action', 'Invalid bulk action provided.' );

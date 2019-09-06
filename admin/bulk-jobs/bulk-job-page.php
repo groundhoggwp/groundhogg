@@ -1,6 +1,7 @@
 <?php
 namespace  Groundhogg\Admin\Bulk_Jobs;
 
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Admin\Admin_Page;
 
@@ -33,9 +34,9 @@ class Bulk_Job_Page extends Admin_Page
 
         // Sanitize the bulk action
         // Permitted Characters 0-9, A-z, _, -, / to keep inline with the Groundhogg Action Structure. No spaces.
-	    $bulk_action = preg_replace( '/[^0-9A-z_\-\/]/', '', $_POST[ 'bulk_action' ] );
+	    $bulk_action = preg_replace( '/[^0-9A-z_\-\/]/', '', get_request_var( 'bulk_action' ) );
 
-	    if ( ! wp_verify_nonce( $_POST[ '_wpnonce' ], $bulk_action ) ){
+	    if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), $bulk_action ) ){
 	        return;
         }
 

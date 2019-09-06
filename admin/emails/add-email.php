@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Emails;
 
 use function Groundhogg\get_db;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
 
@@ -38,24 +39,22 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 </style>
 <?php
 
-$from_funnel = ( isset( $_GET['return_funnel'] ) )? '&return_funnel=' . $_GET['return_funnel']: '';
-$from_funnel .= ( isset( $_GET['return_step'] ) )? '&return_step=' . $_GET['return_step']: '';
 $custom_templates = Plugin::$instance->dbs->get_db('emails')->query( [ 'is_template' => 1 ] );
 
 if ( count( $custom_templates ) > 0 ){
-    $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'my-templates';
+    $active_tab = sanitize_text_field( get_request_var( 'tab', 'my-templates' ) );
 } else {
-    $active_tab = isset( $_GET[ 'tab' ] ) ?  $_GET[ 'tab' ] : 'templates';
+	$active_tab = sanitize_text_field( get_request_var( 'tab', 'templates' ) );
 }
 
 ?>
 
 <h2 class="nav-tab-wrapper">
     <?php if ( count( $custom_templates ) > 0 ): ?>
-    <a id="my-templates" href="?page=gh_emails&action=add&tab=my-templates<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'my-templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Templates', 'groundhogg'); ?></a>
+    <a id="my-templates" href="?page=gh_emails&action=add&tab=my-templates" class="nav-tab <?php echo $active_tab == 'my-templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Templates', 'groundhogg'); ?></a>
     <?php endif; ?>
-    <a id="default-templates" href="?page=gh_emails&action=add&tab=templates<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Default Templates', 'groundhogg'); ?></a>
-    <a id="my-emails" href="?page=gh_emails&action=add&tab=my-emails<?php echo $from_funnel; ?>" class="nav-tab <?php echo $active_tab == 'my-emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Emails', 'groundhogg'); ?></a>
+    <a id="default-templates" href="?page=gh_emails&action=add&tab=templates" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Default Templates', 'groundhogg'); ?></a>
+    <a id="my-emails" href="?page=gh_emails&action=add&tab=my-emails" class="nav-tab <?php echo $active_tab == 'my-emails' ? 'nav-tab-active' : ''; ?>"><?php _e( 'My Emails', 'groundhogg'); ?></a>
 </h2>
 <form method="post" id="poststuff" >
     <!-- search form -->

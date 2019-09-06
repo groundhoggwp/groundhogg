@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Tags;
 
 
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -17,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since       File available since Release 0.1
  */
 
-$id = absint( $_GET[ 'tag' ] );
+$id = absint( get_request_var( 'tag' ) );
 
 if ( ! $id ){
     return;
