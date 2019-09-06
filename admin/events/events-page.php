@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Event;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 
@@ -122,6 +123,23 @@ class Events_Page extends Admin_Page
         $wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'complete' WHERE status = 'in_progress'" );
 
         return false;
+    }
+
+    public function process_purge()
+    {
+        if ( !current_user_can( 'cancel_events' ) ) {
+            $this->wp_die_no_access();
+        }
+
+        global $wpdb;
+        $events = get_db( 'events' );
+        $result = $wpdb->delete( $events->get_table_name(), [
+            'status' => Event::FAILED
+        ] );
+
+        if ( $result ){
+            $this->add_notice( 'events_purged', __( 'Purged failed events!' ) );
+        }
     }
 
     /**

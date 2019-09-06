@@ -241,7 +241,7 @@ abstract class Admin_Page
      */
     protected function get_items()
     {
-        $items = get_url_var($this->get_item_type(), null);
+        $items = get_request_var($this->get_item_type(), null);
 
         if (!$items)
             return false;

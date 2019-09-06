@@ -211,7 +211,10 @@ class Events_Table extends WP_List_Table {
         <div class="alignleft gh-actions">
             <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'process_queue' ], $_SERVER[ 'REQUEST_URI' ] ), 'process_queue' ); ?>"><?php printf( _x( 'Process Events (Auto Runs In %s)', 'action', 'groundhogg' ), $next_run_in ); ?></a>
             <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cleanup' ], $_SERVER[ 'REQUEST_URI' ] ), 'cleanup' ); ?>"><?php printf( _x( 'Cleanup', 'action', 'groundhogg' ), $next_run_in ); ?></a>
-        </div>
+            <?php if ( $this->get_view() === 'failed' ): ?>
+            <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'purge' ], $_SERVER[ 'REQUEST_URI' ] ), 'purge' ); ?>"><?php printf( _x( 'Purge failed events', 'action', 'groundhogg' ), $next_run_in ); ?></a>
+            <?php endif; ?>
+            </div>
         <?php
     }
 

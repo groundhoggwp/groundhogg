@@ -419,7 +419,10 @@ class Contact_Query
         // If querying for a count only, there's nothing more to do.
         if ($this->query_vars['count']) {
             // $items is actually a count in this case.
-            return intval($items[0]->count);
+            if ( ! empty( $items ) ){
+                return intval($items[0]->count);
+            }
+
         }
 
         $this->items = $items;
