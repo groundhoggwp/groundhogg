@@ -385,8 +385,9 @@ class Tools_Page extends Tabbed_Admin_Page
         }
 
         $file = get_array_var( $_FILES, 'import_file' );
+        $extension = strtolower( end(explode('.', $file['name'] ) ) );
 
-        if ( ! $file || ! $file[ 'name' ] ||  mime_content_type( $file[ 'tmp_name' ] ) !== 'text/csv' ) {
+        if ( ! $file || ! $file[ 'name' ] || ! in_array(  mime_content_type( $file[ 'tmp_name' ] ), [ 'text/csv', 'text/plain' ] )  || ! $extension === 'csv' ) {
             return new WP_Error( 'no_files', 'Please upload a valid CSV file!' );
         }
 
@@ -396,7 +397,7 @@ class Tools_Page extends Tabbed_Admin_Page
         if ( is_wp_error( $result ) ) {
 
             if ( is_multisite() ) {
-                return new WP_Error( 'multisite_add_csv', 'Could not import because CSV is not an allowed file type on this multisite. Please add CSV to the list of allowed file types in the network settings.' );
+                return new WP_Error( 'multisite_add_csv', 'Could not import because CSV is not an allowed file type on this subsite. Please add CSV to the list of allowed file types in the network settings.' );
             }
 
             return $result;

@@ -150,9 +150,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.0.9.6 (2019-09-15) =
+= 2.0.9.7 (2019-09-06) =
 * ADDED Action to reset tags in the event of a failed install.
 * FIXED Various recommendations from the WP Plugin team
+* FIXED Import function for contacts not working.
+
+= 2.0.9.6 (2019-09-05) =
+* FIXED Various security issues.
 
 = 2.0.9.5 (2019-09-05) =
 * FIXED Arbitrary readfile vulnerability
