@@ -1921,7 +1921,9 @@ function setup_managed_page()
 
     $query = new \WP_Query();
     $posts = $query->query( [
-        'name' => $managed_page_name
+        'name' => $managed_page_name,
+        'post_type' => 'page',
+        'post_status' => 'publish'
     ] );
 
     if ( empty( $posts ) ){

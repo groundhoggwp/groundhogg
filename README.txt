@@ -150,6 +150,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.8 (2019-09-07) =
+* FIXED first and last name checked eve if not present in form
+* FIXED manage-page added to posts db every time plugin updates
+* FIXED Bug where nested replacements caused fatal error.
+
 = 2.0.9.7 (2019-09-06) =
 * ADDED Action to reset tags in the event of a failed install.
 * FIXED Various recommendations from the WP Plugin team

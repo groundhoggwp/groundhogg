@@ -289,6 +289,10 @@ class Replacements
     public function process( $content, $contact_id=null )
     {
 
+        if ( ! preg_match( '/{([^{}]+)}/', $content  ) ){
+            return $content;
+        }
+
         $contact_id = absint( $contact_id );
 
         if ( ! $contact_id ){
@@ -313,11 +317,7 @@ class Replacements
 
         $new_content = preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
 
-        $this->contact_id = null;
-        $this->current_contact = null;
-
         return $new_content;
-
     }
 
     /**

@@ -277,7 +277,7 @@ class Submission_Handler extends Supports_Errors
         $first = get_array_var( $args, 'first_name' );
         $last = get_array_var( $args, 'last_name' );
 
-        if ( $first === $last ){
+        if ( $first && $last && $first === $last ){
             $this->add_error( new \WP_Error( 'error', __( 'First & last name should not be the same.', 'groundhogg' ) ) );
         }
 
