@@ -70,12 +70,13 @@ class Stats_Collection
 Thank you for opting in to our anonymous usage tracking system. Because of you we will be able to create better WordPress products for you in the near and distant future.
 Your reward discount code for a free extension is: %s
 
-This code is valid for the following extensions:
+This code is valid for any ONE of the following extensions:
 - Form Styling (https://www.groundhogg.io/downloads/form-styling/)
 - Content Restriction (https://www.groundhogg.io/downloads/content-restriction/)
 - Email Countdown Timers (https://www.groundhogg.io/downloads/countdown/)
+- SMTP (https://www.groundhogg.io/downloads/smtp/)
 
-We appreciate your help, best of luck!
+We appreciate your help, enjoy!
 
 @ the Groundhogg Team", 'groundhogg' ), wp_get_current_user()->display_name, $discount );
 

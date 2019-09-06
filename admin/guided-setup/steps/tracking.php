@@ -27,13 +27,11 @@ class Tracking extends Step
 
     public function get_description()
     {
-        return _x( 'Want a free extension? You can choose to share non sensitive data about how you use Groundhogg with us and in exchange you will receive a premium extension on us!', 'guided_setup', 'groundhogg' );
+        return _x( 'Want a free extension? You can choose to share non sensitive data about how you use Groundhogg with us and in exchange you will receive one premium extension on us!', 'guided_setup', 'groundhogg' );
     }
 
     public function get_content()
     {
-
-
         echo html()->wrap( html()->checkbox( [
             'label'         => __( 'Yes, send me a discount code to receive a free extension.' ),
             'name'          => 'enable_tracking',
