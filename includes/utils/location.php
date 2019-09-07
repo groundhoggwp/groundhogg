@@ -525,7 +525,13 @@ class Location
                 return false;
             }
 
+	        $ipdat = wp_remote_retrieve_body( $ipdat );
             $ipdat = @json_decode($ipdat);
+
+            if ( ! $ipdat ){
+            	return false;
+            }
+
             if (@strlen(trim($ipdat->geoplugin_countryCode)) == 2) {
                 switch ($purpose) {
                     case "location":

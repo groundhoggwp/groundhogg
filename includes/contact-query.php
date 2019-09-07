@@ -421,6 +421,8 @@ class Contact_Query
             // $items is actually a count in this case.
             if ( ! empty( $items ) ){
                 return intval($items[0]->count);
+            } else {
+            	return 0;
             }
 
         }

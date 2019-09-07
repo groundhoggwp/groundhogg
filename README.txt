@@ -150,7 +150,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.0.9.8 (2019-09-07) =
+= 2.0.9.9 (2019-09-07) =
+* FIXED Unable to download export files.
+* FIXED Contact Query returning an array during when counting if count is 0
+* FIXED GeoIP not working after switch to wp_remote_get
+
+= 2.0.9.8 (2019-09-06) =
 * FIXED first and last name checked eve if not present in form
 * FIXED manage-page added to posts db every time plugin updates
 * FIXED Bug where nested replacements caused fatal error.

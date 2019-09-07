@@ -249,11 +249,11 @@ class Rewrites
 
                 $contact = get_contactdata();
 
-                // OPnly directories which should be access are contact uploads, imports, and exports
-                if ( in_array( $subfolder, [ 'imports', 'exports' ] ) && ! current_user_can( 'download_files' ) ){
-                    return;
-                } else if ( ! $contact || $contact->get_upload_folder_basename() !== $subfolder ) {
-                    return;
+                $admin_read_access = in_array( $subfolder, [ 'imports', 'exports' ] ) && ! current_user_can( 'download_files' );
+                $contact_read_access = $contact && $contact->get_upload_folder_basename() !== $subfolder;
+
+                if ( ! $admin_read_access && ! $contact_read_access ){
+                	return;
                 }
 
                 $mimes = get_allowed_mime_types( get_current_user_id() );
