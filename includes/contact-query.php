@@ -419,12 +419,7 @@ class Contact_Query
         // If querying for a count only, there's nothing more to do.
         if ($this->query_vars['count']) {
             // $items is actually a count in this case.
-            if ( ! empty( $items ) ){
-                return intval($items[0]->count);
-            } else {
-            	return 0;
-            }
-
+            return intval($items[0]->count);
         }
 
         $this->items = $items;
@@ -473,11 +468,17 @@ class Contact_Query
 
         $this->sql_clauses['select'] = "SELECT $found_rows $fields";
         $this->sql_clauses['from'] = "FROM $this->table_name $join";
-        $this->sql_clauses['groupby'] = $groupby;
-        $this->sql_clauses['orderby'] = $orderby;
+
+        // No need for this in count.
+        if ( ! $this->query_vars[ 'count' ] ){
+	        $this->sql_clauses['groupby'] = $groupby;
+	        $this->sql_clauses['orderby'] = $orderby;
+        }
+
         $this->sql_clauses['limits'] = $limits;
 
         $this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$where} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
+
         $results = $wpdb->get_results($this->request);
         return $results;
     }

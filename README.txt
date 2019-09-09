@@ -150,6 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.9 (2019-09-09) =
+* FIXED Unconfirmed view in contacts table showing all contacts
+* FIXED Contact query using groupby in count request causing unexpected behaviour
+
 = 2.0.9.9 (2019-09-07) =
 * FIXED Unable to download export files.
 * FIXED Contact Query returning an array during when counting if count is 0
