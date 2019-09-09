@@ -36,7 +36,6 @@ abstract class Installer {
     {
 
         $installed = get_option( "groundhogg_{$this->get_installer_name()}_installed", false );
-//        wp_send_json( date( 'Y-m-d', $installed ) );
 
         if ( ! $installed ){
             $this->activation_wrapper();
@@ -146,19 +145,7 @@ abstract class Installer {
      */
     public function activation_hook( $network_wide=false )
     {
-        global $wpdb;
-
-        if ( is_multisite() && $network_wide ) {
-
-            foreach ( $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs LIMIT 100" ) as $blog_id ) {
-                switch_to_blog( $blog_id );
-                $this->activation_wrapper();
-                restore_current_blog();
-            }
-
-        } else {
-            $this->activation_wrapper();
-        }
+        $this->activation_wrapper();
 
         if ( ob_get_contents() ){
             file_put_contents( dirname( $this->get_plugin_file() ) . '/activation-errors.txt', ob_get_contents() );
@@ -199,16 +186,13 @@ abstract class Installer {
      * @param  array  $meta    Blog Meta
      * @return void
      */
-    public function new_blog_created( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
-
+    public function new_blog_created( $blog_id, $user_id, $domain, $path, $site_id, $meta )
+    {
         if ( is_plugin_active_for_network( plugin_basename( $this->get_plugin_file() ) ) ) {
-
             switch_to_blog( $blog_id );
             $this->activation_wrapper();
             restore_current_blog();
-
         }
-
     }
 
     /**
