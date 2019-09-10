@@ -413,7 +413,7 @@ function sort_by_string_in_array($key) {
  * @return bool
  */
 function is_json_error( $json ){
-    return isset( $json->code ) && isset( $json->message );
+    return isset( $json->code ) && isset( $json->message ) && $json->code !== 'success';
 }
 
 /**
@@ -2218,3 +2218,23 @@ function get_screen_option( $option='' )
 
     return $value;
 }
+
+if (!function_exists(__NAMESPACE__ . '\get_email_top_image_url')):
+
+    /**
+     * Return the theme logo URL.
+     *
+     * @return mixed
+     */
+    function get_email_top_image_url()
+    {
+        $image = wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full');
+
+        if (!$image) {
+            return 'https://via.placeholder.com/350x150';
+        }
+
+        return $image[0];
+    }
+
+endif;

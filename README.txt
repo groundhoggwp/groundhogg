@@ -150,6 +150,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.11 (2019-09-10) =
+* TWEAKED DB queries make better use of the wp_cache system.
+* TWEAKED Tracking stats optin now requires a choice of which free extension you want to avoid confusion.
+* FIXED possible function re-declaration causing fatal error.
+* FIXED File access rule for admins not allowing them to download contact files.
+
 = 2.0.9.10 (2019-09-09) =
 * FIXED Unconfirmed view in contacts table showing all contacts
 * FIXED Contact query using groupby in count request causing unexpected behaviour

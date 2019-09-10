@@ -1,5 +1,6 @@
 <?php
 namespace Groundhogg\Templates;
+use function Groundhogg\get_email_top_image_url;
 
 /**
  * This is a Neswletter Email.

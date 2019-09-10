@@ -221,7 +221,7 @@ class Rewrites
                 $funnel_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_funnel_id' ), 'd' ) );
                 $funnel = new Funnel( $funnel_id );
                 if ( ! $funnel->exists() ){
-                    return;
+                    wp_die( 'The requested funnel was not found.', 'Funnel not found.', [ 'status' => 404 ] );
                 }
 
                 $export_string = wp_json_encode( $funnel->get_as_array() );
@@ -237,23 +237,21 @@ class Rewrites
 
             case 'files':
                 $file_path = get_query_var( 'file_path' );
-
                 $groundhogg_path = Plugin::$instance->utils->files->get_base_uploads_dir();
                 $file_path = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $file_path );
 
-                if ( ! $file_path || ! file_exists( $file_path ) ){
-                    return;
+                if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ){
+                    wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
                 }
 
                 $subfolder = basename( dirname( $file_path ) );
-
                 $contact = get_contactdata();
 
-                $admin_read_access = in_array( $subfolder, [ 'imports', 'exports' ] ) && ! current_user_can( 'download_files' );
+                $admin_read_access = current_user_can( 'download_files' );
                 $contact_read_access = $contact && $contact->get_upload_folder_basename() !== $subfolder;
 
                 if ( ! $admin_read_access && ! $contact_read_access ){
-                	return;
+                    wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
                 }
 
                 $mimes = get_allowed_mime_types( get_current_user_id() );
@@ -261,7 +259,7 @@ class Rewrites
 
                 // Assume can only download uploadable mime types
                 if ( ! in_array( $mime, $mimes ) ){
-                    return;
+                    wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
                 }
 
                 $content_type = sprintf( "Content-Type: %s", $mime );

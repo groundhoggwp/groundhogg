@@ -17,7 +17,7 @@ class Stats_Collection
     {
         if ( $this->is_enabled() ){
             add_action( 'admin_init', [ $this, 'init_cron' ] );
-            add_action( 'gh_do_stats_collection', [ $this, 'send_stats' ] );
+            add_action( self::ACTION, [ $this, 'send_stats' ] );
         }
 
         if ( is_admin() && get_request_var( 'action' ) === 'opt_in_to_stats' ){
@@ -61,26 +61,23 @@ class Stats_Collection
             return;
         }
 
-        $discount = sanitize_text_field( $response->discount );
+        $uid = get_current_user_id();
+        $checkout_link = get_user_meta( $uid, 'gh_free_extension_checkout_link', true );
 
-        Plugin::$instance->notices->add( 'opted_in', sprintf( _x( 'You are now signed up! Your discount code is: %s (This code was also sent to %s)', 'notice', 'groundhogg' ), $discount, wp_get_current_user()->user_email ) );
+        Plugin::$instance->notices->add( 'opted_in', sprintf( _x( 'You are now signed up &rarr; <a href="%s" target="_blank">Download my free extension!</a>', 'notice', 'groundhogg' ), esc_url( $checkout_link ) ) );
 
         $message = sprintf( __( "Hi %s,
 
 Thank you for opting in to our anonymous usage tracking system. Because of you we will be able to create better WordPress products for you in the near and distant future.
-Your reward discount code for a free extension is: %s
+As a thank you, you've been granted access to download 1 premium extension of your choice for free.
 
-This code is valid for any ONE of the following extensions:
-- Form Styling (https://www.groundhogg.io/downloads/form-styling/)
-- Content Restriction (https://www.groundhogg.io/downloads/content-restriction/)
-- Email Countdown Timers (https://www.groundhogg.io/downloads/countdown/)
-- SMTP (https://www.groundhogg.io/downloads/smtp/)
+Download Now >> [%s]
 
 We appreciate your help, enjoy!
 
-@ the Groundhogg Team", 'groundhogg' ), wp_get_current_user()->display_name, $discount );
+@ the Groundhogg Team", 'groundhogg' ), wp_get_current_user()->display_name, $checkout_link );
 
-        wp_mail( wp_get_current_user()->user_email, __( 'Groundhogg Discount Code', 'groundhogg' ), $message );
+        wp_mail( wp_get_current_user()->user_email, __( '[Groundhogg] Download your free extension.', 'groundhogg' ), $message );
     }
 
     /**
@@ -95,27 +92,24 @@ We appreciate your help, enjoy!
             'site_key'  => md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) ),
             'site_email' => base64_encode( wp_get_current_user()->user_email ),
             'display_name' => base64_encode( wp_get_current_user()->display_name ),
+            'extension_choice' => get_transient( 'extension_choice' ),
+            'is_v2' => true,
         ];
 
-        $response = wp_remote_post( 'https://www.groundhogg.io/wp-json/gh/stats/optin/', array( 'body' => $stats ) );
+        $response = remote_post_json( 'https://www.groundhogg.io/wp-json/gh/stats/optin/', $stats );
 
         /* Success */
         if ( ! is_wp_error( $response ) ){
 
-            $body = wp_remote_retrieve_body( $response );
-            $json = json_decode( $body );
-
-            if ( ! isset( $json->code ) ){
-                return new \WP_Error( 'optin_error', _x( 'An unknown error occurred', 'notice', 'groundhogg' ) );
-            }
-
-            if ( $json->code !== 'success' ){
-                return new \WP_Error( $json->code, $json->message );
-            }
+            $json = $response;
 
             update_option( 'gh_site_key', $stats[ 'site_key' ] );
             update_option( 'gh_opted_in_stats_collection', 1 );
-            update_user_meta( wp_get_current_user()->ID, 'gh_discount_code', $json->discount );
+
+            if ( is_user_logged_in() ){
+                update_user_meta( wp_get_current_user()->ID, 'gh_free_extension_checkout_link', esc_url_raw( $json->checkout_link ) );
+                update_user_meta( wp_get_current_user()->ID, 'gh_free_extension_discount', sanitize_text_field( $json->discount ) );
+            }
 
             return $json;
 

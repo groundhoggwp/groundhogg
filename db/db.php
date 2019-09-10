@@ -647,10 +647,15 @@ abstract class DB {
     public function advanced_query( $query_vars=[], $from_cache=true )
     {
 
-        $hash = md5( serialize( $query_vars ) );
+        $key = md5(serialize( $query_vars ) );
 
-        if ( ( $cached_results = get_array_var( self::$cache, $hash ) ) && $from_cache ){
-            return $cached_results;
+        $last_changed = $this->get_last_changed();
+
+        $cache_key = "query:$key:$last_changed";
+        $cache_value = wp_cache_get( $cache_key, $this->get_cache_group() );
+
+        if ( $cache_value && $from_cache ){
+            return $cache_value;
         }
 
         $sql = $this->get_sql( $query_vars );
@@ -671,7 +676,8 @@ abstract class DB {
         }
 
         $results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
-        self::$cache[ $hash ] = $results;
+
+        wp_cache_add( $cache_key, $cache_value, $this->get_cache_group() );
 
         return $results;
     }
