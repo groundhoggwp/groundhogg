@@ -14,11 +14,6 @@ class Api_Loader
 {
 
     /**
-     * @var WPGH_API_V2
-     */
-    public $v2;
-
-    /**
      * @var API_V3
      */
     public $v3;
@@ -33,7 +28,6 @@ class Api_Loader
 
     public function load_api()
     {
-//        $this->v2 = new WPGH_API_V2();
         $this->v3 = new API_V3();
     }
 

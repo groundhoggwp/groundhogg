@@ -157,6 +157,8 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * FIXED Alt-body newlines missing when auto generated from html content.
 * FIXED Clicking on a funnel/step/contact in the events table shows events related to the query
 * FIXED Error during saving email causing block toolbar to dissapear
+* REMOVED API V2, it wasn't being included anyway so it's just taking up file space
+* REMOVED WP Bakery Block, wasn't working anyway and WP Bakery is no longer relevant to support
 
 = 2.0.9.11 (2019-09-10) =
 * TWEAKED DB queries make better use of the wp_cache system.
