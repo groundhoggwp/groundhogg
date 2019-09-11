@@ -811,10 +811,16 @@ abstract class DB {
                     'compare' => '='
                 ] );
 
-                // Normalize 'value' => 'val'
-                if ( isset_not_empty( $where, 'value' ) ){
-                    $where[ 'val' ] = $where[ 'value' ];
-                    unset( $where[ 'value' ] );
+                $normalize_keys = [
+                    'value' => 'val',
+                    'key' => 'col',
+                    'column' => 'col',
+                ];
+
+                foreach ( $normalize_keys as $from => $to ){
+                    if ( isset_not_empty( $condition, $from ) ){
+                        $condition[ $to ] = $condition[ $from ];
+                    }
                 }
 
                 if ( in_array( $condition[ 'col' ], $this->get_allowed_columns() ) && in_array( $condition[ 'compare' ], $this->get_allowed_comparisons() ) ){

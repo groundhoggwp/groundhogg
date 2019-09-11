@@ -106,7 +106,7 @@ class Events_Table extends WP_List_Table {
             return sprintf( "<strong>(%s)</strong>",  _x( 'contact deleted', 'status', 'groundhogg' ) );
 
         $html = sprintf( "<a class='row-title' href='%s'>%s</a>",
-            admin_url( 'admin.php?page=gh_events&contact_id=' . $event->get_contact_id() ),
+            sprintf( admin_url( 'admin.php?page=gh_events&contact_id=%s&&status=%s' ), $event->get_contact_id(), $this->get_view() ),
             $event->get_contact()->get_email()
         );
 
@@ -125,7 +125,7 @@ class Events_Table extends WP_List_Table {
             return sprintf( "<strong>(%s)</strong>", _x( 'funnel deleted', 'status', 'groundhogg' ) );
 
         return sprintf( "<a href='%s'>%s</a>",
-            sprintf( admin_url( 'admin.php?page=gh_events&funnel_id=%s&event_type=%s' ), $event->get_funnel_id(), $event->get_event_type() ),
+            sprintf( admin_url( 'admin.php?page=gh_events&funnel_id=%s&event_type=%s&status=%s' ), $event->get_funnel_id(), $event->get_event_type(), $this->get_view() ),
             $funnel_title );    }
 
     /**
@@ -140,7 +140,7 @@ class Events_Table extends WP_List_Table {
             return sprintf( "<strong>(%s)</strong>", _x( 'step deleted', 'status', 'groundhogg' ) );
 
         return sprintf( "<a href='%s'>%s</a>",
-            admin_url( sprintf( 'admin.php?page=gh_events&step_id=%d&event_type=%s', $event->get_step_id(), $event->get_event_type() ) ),
+            admin_url( sprintf( 'admin.php?page=gh_events&step_id=%d&event_type=%s&status=%s', $event->get_step_id(), $event->get_event_type(), $this->get_view() ) ),
             $step_title );
 
     }
@@ -308,11 +308,9 @@ class Events_Table extends WP_List_Table {
         $per_page = absint(get_url_var('limit', get_screen_option( 'per_page' ) ));
         $paged   = $this->get_pagenum();
         $offset  = $per_page * ( $paged - 1 );
-        $search  = get_url_var( 's' );
+//        $search  = get_url_var( 's' );
         $order   = get_url_var( 'order', 'DESC' );
         $orderby = get_url_var( 'orderby', 'time' );
-
-
 
         $where = [
             'relationship' => "AND",
@@ -321,9 +319,11 @@ class Events_Table extends WP_List_Table {
 
         $request_query = get_request_query( [], [], array_keys( get_db( 'events' )->get_columns() ) );
 
+        unset( $request_query[ 'status' ] );
+
         if ( ! empty( $request_query ) ){
             foreach ( $request_query as $key => $value ){
-                $where[] = [ 'col' => $key, 'vale' => $value, 'compare' => '=' ];
+                $where[] = [ 'col' => $key, 'val' => $value, 'compare' => '=' ];
             }
         }
 
