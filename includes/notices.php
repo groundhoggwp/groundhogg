@@ -87,10 +87,14 @@ class Notices
         $data = [];
 
         if ( is_wp_error( $code ) ){
-            $data = $code->get_error_data();
             $error = $code;
             $code = $error->get_error_code();
-            $message = esc_html($error->get_error_message() );
+            $message = sanitize_text_field( sprintf( "%s: %s", strtoupper( key_to_words( $code ) ), $error->get_error_message() ) );
+            $data = [
+                'code' => $error->get_error_code(),
+                'message' => $error->get_error_message(),
+                'data' => $error->get_error_data(),
+            ];
             $type = 'error';
         }
 

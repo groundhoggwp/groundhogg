@@ -180,7 +180,7 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                                         </tr>
                                         <tr>
                                             <th><?php _e( 'Reply To:', 'groundhogg'  ); ?></th>
-                                            <?php $args = [ 'type' => 'email', 'name' => 'reply_to_override', 'value' => $email->get_meta( 'reply_to_override' ) ]; ?>
+                                            <?php $args = [ 'type' => 'email', 'name' => 'reply_to_override', 'id' => 'reply_to_override', 'value' => $email->get_meta( 'reply_to_override' ) ]; ?>
                                             <td><?php echo Plugin::$instance->utils->html->input( $args ); ?>
                                                 <?php echo html()->description( __( 'Override the email address replies are sent to. Leave empty to default to the sender address.' ) ); ?>
                                             </td>
@@ -215,7 +215,7 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                                         <tbody>
                                         <tr>
                                             <th><?php _e( 'Enable Browser View' , 'groundhogg' ); ?></th>
-                                            <td><input type="checkbox" name="browser_view" value="1" <?php if ( $email->get_meta( 'browser_view' ) == 1 ) echo 'checked' ; ?>></td>
+                                            <td><input type="checkbox" id="browser_view"  name="browser_view" value="1" <?php if ( $email->get_meta( 'browser_view' ) == 1 ) echo 'checked' ; ?>></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -339,21 +339,18 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
                             echo html()->checkbox( [
 	                            'label'         => __( 'Enable' ),
 	                            'name'          => 'use_custom_alt_body',
+	                            'id'            => 'use_custom_alt_body',
 	                            'value'         => 1,
 	                            'checked'       => $email->get_meta( 'use_custom_alt_body' ),
                             ] );
                             echo '<br/>';
-                            echo html()->e( 'i', [],  __( 'If left un-enable an alt-body will be auto-generated.', 'groundhogg' ) );
+                            echo html()->e( 'i', [],  __( 'If left un-enabled an alt-body will be auto-generated.', 'groundhogg' ) );
                             ?>
                         </p>
                         <p>
                             <textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="16"><?php
 
-                            $alt_body = $email->get_meta( 'alt_body' );
-
-                            if ( ! $alt_body ){
-                                $alt_body = sanitize_textarea_field( $email->get_content() );
-                            }
+                            $alt_body = $email->get_alt_body();
 
                             esc_html_e( $alt_body );
 

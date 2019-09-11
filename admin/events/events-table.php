@@ -312,10 +312,20 @@ class Events_Table extends WP_List_Table {
         $order   = get_url_var( 'order', 'DESC' );
         $orderby = get_url_var( 'orderby', 'time' );
 
+
+
         $where = [
             'relationship' => "AND",
             [ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
         ];
+
+        $request_query = get_request_query( [], [], array_keys( get_db( 'events' )->get_columns() ) );
+
+        if ( ! empty( $request_query ) ){
+            foreach ( $request_query as $key => $value ){
+                $where[] = [ 'col' => $key, 'vale' => $value, 'compare' => '=' ];
+            }
+        }
 
         $args = array(
             'where'   => $where,

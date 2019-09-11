@@ -203,24 +203,36 @@
 
             self.prepareEmailHTML();
 
-            $('#content').val( $('#email-inside').html() );
+            var fd = $form.serializeFormJSON();
 
-            var fd = $form.serialize();
-
-            fd = fd +  '&action=gh_update_email';
+            fd.action = 'gh_update_email';
+            fd.content = $('#email-inside').html();
 
             if ( self.sendTest ){
-                var email = prompt( self.send_test_prompt, self.test_email );
-                fd = fd + '&test_email=' + email;
+                self.email = prompt( self.send_test_prompt, self.test_email );
+                fd.test_email = self.email;
             }
 
-            adminAjaxRequest( fd, function ( response ) {
+            var args = {};
+            var removed = {};
+
+            for (var key in fd) {
+                if (fd.hasOwnProperty(key)  ) {
+                    if ( self.allowed_post_keys.includes( key ) ){
+                        args[ key ] = fd[ key ];
+                    } else {
+                        removed[ key ] = fd[ key ];
+                    }
+                }
+            }
+
+            adminAjaxRequest( args, function ( response ) {
 
                 handleNotices( response.data.notices );
                 hideSpinner();
 
                 var content = response.data.data.data.content;
-                var alt_body = response.data.data.meta.alt_body;
+                var alt_body = response.data.data.data.alt_body;
                 $('#email-inside').html( content );
                 $('#alt-body-input').val( alt_body );
 

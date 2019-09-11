@@ -368,20 +368,6 @@ function words_to_key( $words )
 }
 
 /**
- * Dequeue WooCommerce style for compatibility
- */
-function dequeue_wc_css_compat()
-{
-    global $wp_styles;
-    $maybe_dequeue = $wp_styles->queue;
-    foreach ( $maybe_dequeue as $style ){
-        if ( strpos( $style, 'woocommerce' ) !== false ){
-            wp_dequeue_style( $style );
-        }
-    }
-}
-
-/**
  * Return the percentage to the second degree.
  *
  * @param $a
@@ -473,6 +459,20 @@ function dequeue_theme_css_compat()
 }
 
 /**
+ * Dequeue WooCommerce style for compatibility
+ */
+function dequeue_wc_css_compat()
+{
+    global $wp_styles;
+    $maybe_dequeue = $wp_styles->queue;
+    foreach ( $maybe_dequeue as $style ){
+        if ( strpos( $style, 'woocommerce' ) !== false ){
+            wp_dequeue_style( $style );
+        }
+    }
+}
+
+/**
  * Enqueues the modal scripts
  *
  * @return Modal
@@ -503,21 +503,35 @@ function search_and_replace_domain( $string ){
 function array_to_atts( $atts )
 {
 	$tag = '';
+
 	foreach ($atts as $key => $value) {
 
 	    if ( empty( $value ) ){
 	        continue;
         }
 
-		if ( $key === 'style' && is_array( $value ) ){
-			$value = array_to_css( $value );
-		}
+		$key = strtolower( $key );
 
-		if ( is_array( $value ) ){
-		    $value = implode( ' ', $value );
+		switch ( $key ) {
+            case 'style':
+                $value = array_to_css( $value );
+                break;
+            case 'href':
+            case 'action':
+            case 'src':
+                $value = esc_url( $value );
+                break;
+            default:
+                if ( is_array( $value ) ){
+                    $value = implode( ' ', $value );
+                }
+
+                $value = esc_attr( $value );
+                break;
+
         }
 
-		$tag .= sanitize_key( $key ) . '="' . esc_attr( $value ) . '" ';
+		$tag .= sanitize_key( $key ) . '="' . $value . '" ';
     }
 
 	return $tag;

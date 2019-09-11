@@ -171,7 +171,7 @@ class Email extends Base_Object_With_Meta
     public function get_alt_body()
     {
     	if ( $this->has_custom_alt_body() ){
-    		return $this->get_meta( 'alt_body' );
+    		return wp_strip_all_tags( $this->get_meta( 'alt_body' ), false );
 	    }
 
     	return $this->strip_html_tags( $this->get_content() );
@@ -922,12 +922,10 @@ class Email extends Base_Object_With_Meta
             " \$0",
             $text );
 
-        // strip all remaining HTML tags
-        $text = wp_strip_all_tags( $text );
+        // strip all remaining HTML tags, but not line breaks
+        $text = wp_strip_all_tags( $text, false );
 
-        // trim text
-        $text = trim( $text );
-
+        // Give it back
         return $text;
     }
 

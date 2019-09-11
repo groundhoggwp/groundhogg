@@ -111,10 +111,32 @@ class Emails_Page extends Admin_Page
             wp_enqueue_style( 'groundhogg-admin-email-editor' );
             wp_enqueue_script( 'groundhogg-admin-email-editor' );
 
+            $test_email = get_user_meta( get_current_user_id(), 'preferred_test_email', true );
+
             wp_localize_script( 'groundhogg-admin-email-editor', 'EmailEditor', array(
                 'id' => absint( Groundhogg\get_request_var( 'email' ) ),
-                'test_email' => wp_get_current_user()->user_email,
-                'send_test_prompt' => __( 'Send test email to...', 'groundhogg' )
+                '_wpnonce' => wp_create_nonce(),
+                'test_email' => $test_email ? $test_email : wp_get_current_user()->user_email,
+                'send_test_prompt' => __( 'Send test email to...', 'groundhogg' ),
+                'allowed_post_keys' => [
+                    'action',
+                    '_wpnonce',
+                    '_wp_http_referer',
+                    'use_custom_alt_body',
+                    'alt_body',
+                    'browser_view',
+                    'email',
+                    'email_title',
+                    'subject',
+                    'pre_header',
+                    'from_user',
+                    'email_alignment',
+                    'reply_to_override',
+                    'save_as_template',
+                    'update_and_test',
+                    'test_email',
+                    'content',
+                ],
             ) );
 
         }
@@ -548,8 +570,11 @@ class Emails_Page extends Admin_Page
 
             $sent = $email->send( $contact );
 
+            update_user_meta( get_current_user_id(), 'preferred_test_email', $test_email );
+
             if ( ! $sent || is_wp_error( $sent ) ){
-                return is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test." );
+                $error = is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test." );
+                $this->add_notice( $error );
             } else {
                 $this->add_notice(
                     esc_attr( 'sent-test' ),
@@ -559,8 +584,6 @@ class Emails_Page extends Admin_Page
                     'success'
                 );
             }
-
-
         }
 
         $email->alt_body = $email->get_alt_body();

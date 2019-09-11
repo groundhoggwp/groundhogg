@@ -647,14 +647,14 @@ abstract class DB {
     public function advanced_query( $query_vars=[], $from_cache=true )
     {
 
-        $key = md5(serialize( $query_vars ) );
+        $key = md5( serialize( $query_vars ) );
 
         $last_changed = $this->get_last_changed();
 
         $cache_key = "query:$key:$last_changed";
         $cache_value = wp_cache_get( $cache_key, $this->get_cache_group() );
 
-        if ( $cache_value && $from_cache ){
+        if ( $cache_value && $from_cache !== false ){
             return $cache_value;
         }
 
