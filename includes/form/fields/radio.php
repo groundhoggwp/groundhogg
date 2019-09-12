@@ -102,7 +102,7 @@ class Radio extends Dropdown
     {
         $options = $this->get_options();
 
-        $optionHTML = "";
+        $optionHTML = sprintf( "<label class='gh-input-label'>%s</label>", esc_html( $this->get_label() ) );
 
         foreach ( $options as $i => $value ){
 
