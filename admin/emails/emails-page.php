@@ -127,6 +127,7 @@ class Emails_Page extends Admin_Page
                     'browser_view',
                     'email',
                     'email_title',
+                    'email_status',
                     'subject',
                     'pre_header',
                     'from_user',
@@ -135,7 +136,7 @@ class Emails_Page extends Admin_Page
                     'save_as_template',
                     'update_and_test',
                     'test_email',
-                    'content',
+                    'email_content',
                 ],
             ) );
 
@@ -525,7 +526,7 @@ class Emails_Page extends Admin_Page
 
         $subject = sanitize_text_field( Groundhogg\get_request_var( 'subject' ) );
         $pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );
-        $content = apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'content' ) );
+        $content = apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'email_content' ) );
 
         $args[ 'status' ] = $status;
         $args[ 'from_user' ] = $from_user;

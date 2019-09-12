@@ -150,6 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.13 (2019-09-11) =
+* FIXED Unable to save email as ready.
+* FIXED Bug where content not deselected in email editor after update
+
 = 2.0.9.12 (2019-09-11) =
 * TWEAKED Email saving to only post required arguments instead of whole form
 * TWEAKED Error notice JSON will now also include the original error code and message

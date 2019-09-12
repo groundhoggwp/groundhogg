@@ -206,7 +206,7 @@
             var fd = $form.serializeFormJSON();
 
             fd.action = 'gh_update_email';
-            fd.content = $('#email-inside').html();
+            fd.email_content = $('#email-inside').html();
 
             if ( self.sendTest ){
                 self.email = prompt( self.send_test_prompt, self.test_email );
@@ -243,6 +243,8 @@
 
                 $( '#send-test' ).val( null );
                 self.sendTest = false;
+
+                self.feed();
             } );
         },
 
