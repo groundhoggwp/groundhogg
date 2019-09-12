@@ -168,45 +168,45 @@ class Reporting
         switch ( $this->range ){
             case 'today';
                 $this->start_time   = strtotime( 'today' );
-                $this->end_time     = $this->start_time + DAY_IN_SECONDS;
+                $this->end_time     = ( $this->start_time + DAY_IN_SECONDS ) - 1;
                 $this->points       = 24;
                 $this->difference   = HOUR_IN_SECONDS;
                 break;
             case 'yesterday';
                 $this->start_time   = strtotime( 'yesterday' );
-                $this->end_time     = $this->start_time + DAY_IN_SECONDS;
+                $this->end_time     = ( $this->start_time + DAY_IN_SECONDS ) - 1;
                 $this->points       = 24;
                 $this->difference   = HOUR_IN_SECONDS;
                 break;
             default:
             case 'this_week';
                 $this->start_time   = mktime(0, 0, 0, date("n"), date("j") - date("N") + 1);
-                $this->end_time     = $this->start_time + WEEK_IN_SECONDS;
+                $this->end_time     = ( $this->start_time + WEEK_IN_SECONDS ) - 1;
                 $this->points       = 7;
                 $this->difference   = DAY_IN_SECONDS;
                 break;
             case 'last_week';
                 $this->start_time   = mktime(0, 0, 0, date("n"), date("j") - date("N") + 1) - WEEK_IN_SECONDS;
-                $this->end_time     = $this->start_time + WEEK_IN_SECONDS;
+                $this->end_time     = ( $this->start_time + WEEK_IN_SECONDS ) - 1;
                 $this->points       = 7;
                 $this->difference   = DAY_IN_SECONDS;
                 break;
             case 'last_30';
                 $this->start_time   = Plugin::$instance->utils->date_time->round_to_day( time() - MONTH_IN_SECONDS );
-                $this->end_time     = Plugin::$instance->utils->date_time->round_to_day( time() );
-                $this->points       = ceil( MONTH_IN_SECONDS / DAY_IN_SECONDS );
+                $this->end_time     = Plugin::$instance->utils->date_time->round_to_day( time() ) - 1;
+                $this->points       = ceil( ($this->end_time - $this->start_time  ) / DAY_IN_SECONDS );
                 $this->difference   = DAY_IN_SECONDS;
                 break;
             case 'this_month';
                 $this->start_time   = strtotime( 'first day of ' . date( 'F Y' ) );
-                $this->end_time     = strtotime( 'first day of ' . date( 'F Y', time() + MONTH_IN_SECONDS ) );
-                $this->points       = ceil( MONTH_IN_SECONDS / DAY_IN_SECONDS );
+                $this->end_time     = strtotime( 'first day of ' . date( 'F Y', time() + MONTH_IN_SECONDS ) ) - 1;
+                $this->points       = ceil( ( $this->end_time - $this->start_time ) / DAY_IN_SECONDS );
                 $this->difference   = DAY_IN_SECONDS;
                 break;
             case 'last_month';
                 $this->start_time   = strtotime( 'first day of ' . date( 'F Y' , time() - MONTH_IN_SECONDS ) );
-                $this->end_time     = strtotime( 'last day of ' . date( 'F Y' ) );
-                $this->points       = ceil( MONTH_IN_SECONDS / DAY_IN_SECONDS );
+                $this->end_time     = strtotime( 'last day of ' . date( 'F Y', time() - MONTH_IN_SECONDS ) ) + DAY_IN_SECONDS - 1;
+                $this->points       = ceil( ( $this->end_time - $this->start_time ) / DAY_IN_SECONDS );
                 $this->difference   = DAY_IN_SECONDS;
                 break;
             case 'this_quarter';
@@ -249,7 +249,6 @@ class Reporting
                 $this->points       = ceil( $range  / $this->get_time_diff( $range ) );
                 $this->difference   = $this->get_time_diff( $range );
                 break;
-
         }
     }
 

@@ -20,6 +20,7 @@ abstract class Updater{
     public function __construct()
     {
         add_action( 'init', [ $this, 'do_updates' ], 99 ); // DO LAST
+        add_action( 'groundhogg/admin/tools/updates', [ $this, 'show_manual_updates' ] ); // DO LAST
         add_action( 'admin_init', [ $this, 'do_manual_updates' ], 99 ); // DO LAST
     }
 
@@ -36,16 +37,6 @@ abstract class Updater{
      * @return string[]
      */
     abstract protected function get_available_updates();
-
-    /**
-     * Get the updates
-     *
-     * @return string[]
-     */
-    public function get_updates()
-    {
-        return $this->get_available_updates();
-    }
 
     /**
      * Get the previous version which the plugin was updated to.
@@ -83,20 +74,40 @@ abstract class Updater{
         return sanitize_key( sprintf( '%s_version_updates', $this->get_updater_name() ) );
     }
 
+    public function show_manual_updates()
+    {
+        ?>
+        <h3><?php echo $this->get_updater_name(); ?></h3><?php
+
+        foreach ( $this->get_available_updates() as $update ):
+
+            ?><p><?php
+
+            echo html()->e( 'a', [ 'href' => add_query_arg( [
+                'updater' => $this->get_updater_name(),
+                'manual_update' => $update,
+                'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
+            ], $_SERVER[ 'REQUEST_URI' ] ) ], sprintf( __( 'Version %s', 'groundhogg' ), $update ) )
+
+            ?></p><?php
+
+        endforeach;
+    }
+
     /**
      * Manually perform a selected update routine.
      */
     public function do_manual_updates()
     {
 
-        if ( get_request_var( 'updater' ) !== $this->get_updater_name() || ! get_request_var( 'manual_update' ) || ! wp_verify_nonce( get_request_var( 'manual_update_nonce' ), 'gh_manual_update' ) || ! current_user_can( 'manage_plugins' ) ){
+        if ( get_request_var( 'updater' ) !== $this->get_updater_name() || ! get_request_var( 'manual_update' ) || ! wp_verify_nonce( get_request_var( 'manual_update_nonce' ), 'gh_manual_update' ) || ! current_user_can( 'install_plugins' ) ){
             return;
         }
 
         $update = get_url_var( 'manual_update' );
 
         if ( $this->update_to_version( $update ) ){
-            Plugin::$instance->notices->add( 'updated', __( 'Update successful!', 'groundhogg' ) );
+            Plugin::$instance->notices->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ) );
         } else {
             Plugin::$instance->notices->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
         }

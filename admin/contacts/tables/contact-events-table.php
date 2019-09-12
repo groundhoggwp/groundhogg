@@ -91,11 +91,13 @@ class Contact_Events_Table extends Events\Events_Table {
 
     public function extra_tablenav($which)
     {
+        $contact_id = absint( get_request_var( 'contact' ) );
+
         ?>
         <div class="alignleft gh-actions">
-        <a class="button button-secondary" href="<?php echo admin_url('admin.php?page=gh_events&view=contact&contact=' . get_request_var( 'contact' ) ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
+        <a class="button button-secondary" href="<?php echo admin_url('admin.php?page=gh_events&contact_id=' . $contact_id . '&status=' . $this->status ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
         <?php if ( $this->status === 'waiting' ): ?>
-            <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( 'process_queue', '1', $_SERVER[ 'REQUEST_URI' ] ), 'process_queue' ); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
+            <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'process_queue' ], admin_url( 'admin.php?page=gh_events&return_to_contact=' . $contact_id ) ), 'process_queue' ); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
         <?php endif; ?>
         </div>
         <?php
@@ -146,8 +148,8 @@ class Contact_Events_Table extends Events\Events_Table {
      */
     protected function column_actions( $event )
     {
-        $run = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->get_id() . '&action=execute' ), 'execute' ) );
-        $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->get_id() . '&action=cancel' ), 'cancel' ) );
+        $run = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->get_id() . '&action=execute&return_to_contact=' . $event->get_contact_id() ), 'execute' ) );
+        $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->get_id() . '&action=cancel&return_to_contact=' . $event->get_contact_id() ), 'cancel' ) );
         $actions = array();
 
         if ( $event->time > time() && $event->status === 'waiting' ){

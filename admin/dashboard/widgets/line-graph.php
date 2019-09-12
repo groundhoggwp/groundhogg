@@ -93,6 +93,31 @@ abstract class Line_Graph extends Dashboard_Widget
                         /* TOOL TIP */
                         var previousPoint = null, previousLabel = null;
 
+                        <?php if ( $this->get_mode() === 'time' ): ?>
+
+                        <?php $offset = intval( get_option( 'gmt_offset' ) ) * HOUR_IN_SECONDS * 1000 ; ?>
+                        $.fn.UseTooltipTime = function () {
+                            $(this).bind("plothover", function (event, pos, item) {
+                                if (item) {
+                                    if ((previousLabel != item.series.label) || (previousPoint != item.dataIndex)) {
+                                        previousPoint = item.dataIndex;
+                                        previousLabel = item.series.label;
+                                        $("#tooltip").remove();
+                                        var x = item.datapoint[0];
+                                        var y = item.datapoint[1];
+                                        var color = item.series.color;
+                                        var date =  new Date( x - <?php echo $offset; ?> );
+                                        showTooltip(item.pageX, item.pageY, color, "<strong>" + item.series.label + "</strong>: " + y + "<br/>" + date.toDateString() );
+                                    }
+                                } else {
+                                    $("#tooltip").remove();
+                                    previousPoint = null;
+                                }
+                            });
+                        };
+
+                        <?php else: ?>
+
                         $.fn.UseTooltip = function () {
                             $(this).bind("plothover", function (event, pos, item) {
                                 if (item) {
@@ -103,8 +128,7 @@ abstract class Line_Graph extends Dashboard_Widget
                                         var x = item.datapoint[0];
                                         var y = item.datapoint[1];
                                         var color = item.series.color;
-                                        var date =  new Date(x).toDateString();
-                                        showTooltip(item.pageX, item.pageY, color, "<strong>" + item.series.label + "</strong>: " + y + "<br/>" + date );
+                                        showTooltip(item.pageX, item.pageY, color, "<strong>" + item.series.label + "</strong>: " + y + "<br/>" );
                                     }
                                 } else {
                                     $("#tooltip").remove();
@@ -112,6 +136,8 @@ abstract class Line_Graph extends Dashboard_Widget
                                 }
                             });
                         };
+
+                        <?php endif; ?>
 
                         function showTooltip(x, y, color, contents) {
                             $('<div id="tooltip">' + contents + '</div>').css({
@@ -125,7 +151,7 @@ abstract class Line_Graph extends Dashboard_Widget
                                 'border-radius': '5px',
                                 'background-color': '#fff',
                                 'font-family': 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                                'z-index': 999999999999999999999999,
+                                'z-index': '99999',
                                 opacity: 0.9
                             }).appendTo("body").fadeIn(200);
                         }
@@ -135,7 +161,12 @@ abstract class Line_Graph extends Dashboard_Widget
                         function draw() {
                             if ( $( "#graph-<?php echo $this->get_id(); ?>" ).width() > 0 ){
                                 $.plot($("#graph-<?php echo $this->get_id(); ?>"), dataset, options);
+
+                                <?php if ( $this->get_mode() === 'time' ): ?>
+                                $("#graph-<?php echo $this->get_id(); ?>").UseTooltipTime();
+                            <?php else: ?>
                                 $("#graph-<?php echo $this->get_id(); ?>").UseTooltip();
+                            <?php endif; ?>
                             }
                         }
 

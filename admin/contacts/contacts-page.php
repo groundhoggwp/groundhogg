@@ -485,7 +485,14 @@ class Contacts_Page extends Admin_Page
             $deletable_meta = array_diff( $editable_meta, $posted_meta_keys );
 
             foreach ( $editable_meta as $key ){
-                $contact->update_meta( $key, get_array_var( $posted_meta, $key ) );
+
+                $value = sanitize_text_field( get_array_var( $posted_meta, $key ) );
+
+                // Ignore serialized data
+                if ( $value !== 'SERIALIZED DATA' ){
+                    $contact->update_meta( $key, $value );
+                }
+
             }
 
             foreach ( $deletable_meta as $key ){
@@ -505,7 +512,6 @@ class Contacts_Page extends Admin_Page
         }
 
         $args = [];
-
 
         $email = sanitize_email( get_request_var( 'email' ) );
 

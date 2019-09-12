@@ -61,7 +61,8 @@ abstract class Time_Graph extends Line_Graph
         foreach ( $data as $datum ){
             $date_point = Plugin::$instance->utils->date_time->round_to(
                     $this->get_time_from_datum( $datum ),
-                    Plugin::$instance->reporting->get_difference()
+                    Plugin::$instance->reporting->get_difference(),
+                false
             );
 
             if ( isset_not_empty( $times, $date_point ) ){
@@ -89,7 +90,6 @@ abstract class Time_Graph extends Line_Graph
                     'data'  => $this->group_by_time( $report->get_data() )
                 ];
             }
-
         }
 
         $this->dataset = $data;

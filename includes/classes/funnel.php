@@ -152,7 +152,7 @@ class Funnel extends Base_Object
      */
     public function export_url()
     {
-        return site_url( sprintf( 'gh/funnels/export/%s/', Plugin::$instance->utils->encrypt_decrypt( $this->get_id() ) ) );
+        return managed_page_url( sprintf( 'funnels/export/%s/', Plugin::$instance->utils->encrypt_decrypt( $this->get_id() ) ) );
     }
 
     /**

@@ -271,7 +271,7 @@ class Email extends Base_Object_With_Meta
             switch_to_blog( get_site()->site_id );
         }
 
-        $url = sprintf( "%s/gh/browser-view/emails/%d", site_url(), $this->get_id() );
+        $url = managed_page_url( sprintf( "browser-view/emails/%d", $this->get_id() ) );
 
         if ( is_multisite() && ms_is_switched() ) {
             restore_current_blog();
@@ -287,8 +287,8 @@ class Email extends Base_Object_With_Meta
      */
     public function get_open_tracking_link()
     {
-        return site_url(sprintf(
-            "gh/tracking/email/open/u/%s/e/%s/i/%s/",
+        return managed_page_url( sprintf(
+            "tracking/email/open/u/%s/e/%s/i/%s/",
             dechex( $this->get_contact()->get_id() ),
             ! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
             dechex( $this->get_id() )
@@ -302,8 +302,8 @@ class Email extends Base_Object_With_Meta
      */
     public function get_click_tracking_link()
     {
-        return site_url(
-            sprintf('gh/tracking/email/click/u/%s/e/%s/i/%s/ref/',
+        return managed_page_url(
+            sprintf('tracking/email/click/u/%s/e/%s/i/%s/ref/',
                 dechex( $this->get_contact()->get_id() ),
                 ! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
                 dechex( $this->get_id() )
@@ -503,9 +503,20 @@ class Email extends Base_Object_With_Meta
      */
     public function get_unsubscribe_link( $url='' )
     {
-        $url = site_url( 'gh/preferences/profile/' );
+        $url = managed_page_url( 'preferences/manage' );
         return $url;
+    }
 
+    /**
+     * Get the unsub link
+     *
+     * @param $url
+     * @return false|string
+     */
+    public function get_preferences_link( $url='' )
+    {
+        $url = managed_page_url( 'preferences/profile' );
+        return $url;
     }
 
     /**
@@ -521,6 +532,7 @@ class Email extends Base_Object_With_Meta
         add_filter( 'groundhogg/email_template/content',            [ $this, 'get_merged_content'] );
         add_filter( 'groundhogg/email_template/footer_text',        [ $this, 'get_footer_text'] );
         add_filter( 'groundhogg/email_template/unsubscribe_link',   [ $this, 'get_unsubscribe_link'] );
+        add_filter( 'groundhogg/email_template/preferences_link',   [ $this, 'get_preferences_link'] );
         add_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link'] );
         add_filter( 'groundhogg/email/the_content',                 [ $this, 'convert_to_tracking_links'] );
         add_filter( 'groundhogg/email/the_content',                 [ $this, 'minify'] );
@@ -540,6 +552,7 @@ class Email extends Base_Object_With_Meta
         remove_filter( 'groundhogg/email_template/content',            [ $this, 'get_merged_content'] );
         remove_filter( 'groundhogg/email_template/footer_text',        [ $this, 'get_footer_text'] );
         remove_filter( 'groundhogg/email_template/unsubscribe_link',   [ $this, 'get_unsubscribe_link'] );
+        remove_filter( 'groundhogg/email_template/preferences_link',   [ $this, 'get_preferences_link'] );
         remove_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link'] );
         remove_filter( 'groundhogg/email/the_content',                 [ $this, 'convert_to_tracking_links'] );
         remove_filter( 'groundhogg/email/the_content',                 [ $this, 'minify'] );

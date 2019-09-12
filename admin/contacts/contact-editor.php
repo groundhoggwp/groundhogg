@@ -849,7 +849,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
             foreach ($meta as $meta_key => $value):
 
                 // Exclude serialized values...
-                if (!in_array($meta_key, $meta_exclude_list) && !is_array($value) && !is_object($value)): ?>
+                if (!in_array($meta_key, $meta_exclude_list) ): ?>
 
                     <tr id="meta-<?php esc_attr_e($meta_key) ?>">
                         <th>
@@ -859,9 +859,16 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         <td>
                             <?php
 
-                            $value = is_array($value) ? multi_implode(',', $value) : $value;
-
-                            if (strpos($value, PHP_EOL) !== false) {
+                            if ( is_serialized( $value ) ){
+                                $args = array(
+                                    'name' => 'meta[' . $meta_key . ']',
+                                    'id' => $meta_key,
+                                    'value' => 'SERIALIZED DATA',
+                                    'type' => 'text',
+                                    'readonly' => true
+                                );
+                                echo Plugin::$instance->utils->html->input($args);
+                            } elseif (strpos($value, PHP_EOL) !== false) {
                                 $args = array(
                                     'name' => 'meta[' . $meta_key . ']',
                                     'id' => $meta_key,
@@ -877,10 +884,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                                 echo Plugin::$instance->utils->html->input($args);
                             }
                             ?>
-                            <span class="row-actions"><span class="delete"><a style="text-decoration: none"
-                                                                              href="javascript:void(0)"
-                                                                              class="deletemeta"><span
-                                                class="dashicons dashicons-trash"></span></a></span></span>
+                            <span class="row-actions"><span class="delete"><a style="text-decoration: none" href="javascript:void(0)" class="deletemeta"><span class="dashicons dashicons-trash"></span></a></span></span>
                         </td>
                     </tr>
                 <?php endif;

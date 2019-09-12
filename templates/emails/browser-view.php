@@ -21,7 +21,7 @@ managed_page_head( $subject, 'view' );
 
 ?>
 <div class="box">
-    <iframe width="100%" src="<?php echo esc_url( site_url( 'gh/emails/' . $email_id ) ); ?>"></iframe>
+    <iframe width="100%" src="<?php echo esc_url( managed_page_url( 'emails/' . $email_id ) ); ?>"></iframe>
 </div>
 <?php
 

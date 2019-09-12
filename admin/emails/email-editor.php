@@ -7,6 +7,7 @@ use function Groundhogg\get_request_var;use function Groundhogg\groundhogg_url;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
+use function Groundhogg\managed_page_url;
 
 /**
  * Email Editor
@@ -115,7 +116,7 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
 	                    'footer_button_text' => __( 'Close' ),
 	                    'id'        => '',
 	                    'class'     => 'button button-secondary',
-	                    'source'    => site_url( 'gh/emails/' . $email->get_id() ),
+	                    'source'    => managed_page_url( 'emails/' . $email->get_id() ),
 	                    'height'    => 580,
 	                    'width'     => 340,
 	                    'footer'    => 'true',
@@ -127,7 +128,7 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
 		                'footer_button_text' => __( 'Close' ),
 		                'id'        => '',
 		                'class'     => 'button button-secondary',
-		                'source'    => site_url( 'gh/emails/' . $email->get_id() ),
+		                'source'    => managed_page_url( 'emails/' . $email->get_id() ),
 		                'height'    => 600,
 		                'width'     => 700,
 		                'footer'    => 'true',

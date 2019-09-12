@@ -6,6 +6,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Event;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
+use function Groundhogg\get_request_var;
 
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
@@ -98,7 +99,12 @@ class Events_Page extends Admin_Page
                 )
             );
         }
+
         $this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+
+        if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
+            return admin_url('admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id);
+        }
 
         //false return users to the main page
         return false;
@@ -165,6 +171,10 @@ class Events_Page extends Admin_Page
             }
         }
 
+        if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ){
+            return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
+        }
+
         return false;
     }
 
@@ -190,6 +200,10 @@ class Events_Page extends Admin_Page
         }
 
         $this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+
+        if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ){
+            return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
+        }
 
         return false;
     }

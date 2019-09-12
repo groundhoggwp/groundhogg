@@ -8,6 +8,9 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
+
+use function Groundhogg\html;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 $footer_alignment = get_option( 'gh_email_footer_alignment', 'center' );
@@ -52,25 +55,32 @@ $apple_link = \Groundhogg\array_to_css( $apple_link );
 
 do_action( 'groundhogg/templates/email/footer/before' );
 
+$footer_info = [
+    html()->e( 'a', [
+        'href' => apply_filters( 'groundhogg/email_template/preferences_link', site_url() ),
+    ], apply_filters( 'groundhogg/email_template/preferences_text', __( "Change preferences", 'groundhogg' ) ) ) . '.',
+    html()->e( 'span', [], [
+        apply_filters( 'groundhogg/email_template/pre_unsubscribe_text', __( "Don't want these emails?", 'groundhogg' )),
+        " ",
+        html()->e( 'a', [
+            'href' => apply_filters( 'groundhogg/email_template/unsubscribe_link', site_url() ),
+        ], apply_filters( 'groundhogg/email_template/unsubscribe_text', __( "Unsubscribe", 'groundhogg' ) ) ) . '.'
+    ] ),
+];
+
 $custom_text = get_option( 'gh_custom_email_footer_text' );
 
-if ( $custom_text ):
-
-    ?>
-<div class="pre-footer">
-    <table border="0" cellpadding="0" cellspacing="0" style="<?php echo $footer_container; ?>">
-        <tr>
-            <td class="content-block" style="">
-                <?php echo wpautop( $custom_text ); ?>
-            </td>
-        </tr>
-    </table>
-</div>
-<?php
-
-endif;
-
-?>
+if ( $custom_text ): ?>
+                                <div class="pre-footer">
+                                    <table border="0" cellpadding="0" cellspacing="0" style="<?php echo $footer_container; ?>">
+                                        <tr>
+                                            <td class="content-block" style="">
+                                                <?php echo wpautop( $custom_text ); ?>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <?php endif; ?>
                                 <!-- START FOOTER -->
                                 <div class="footer" style="<?php echo $footer; ?>">
                                     <table border="0" cellpadding="0" cellspacing="0" style="<?php echo $footer_container; ?>">
@@ -84,9 +94,7 @@ endif;
                                         <tr>
                                             <td class="content-block" style="<?php echo $footer_css; ?>">
                                                 <span style="<?php echo $apple_link; ?>">
-                                                    <?php _e( apply_filters( 'groundhogg/email_template/pre_unsubscribe_text', __( "Don't want these emails?", 'groundhogg' ) ), 'groundhogg'); ?> <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email_template/unsubscribe_link', site_url() ) ); ?>">
-                                                        <?php _e( apply_filters( 'groundhogg/email_template/unsubscribe_text', __( "Unsubscribe.", 'groundhogg' ) ), 'groundhogg'); ?>
-                                                    </a>
+                                                    <?php echo implode( ' | ', $footer_info ); ?>
                                                 </span>
                                             </td>
                                         </tr>

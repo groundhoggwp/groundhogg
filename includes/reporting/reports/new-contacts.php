@@ -55,8 +55,6 @@ class New_Contacts extends Report
             ]
         ] );
 
-//        var_dump( $data );
-
         return $data;
     }
 }

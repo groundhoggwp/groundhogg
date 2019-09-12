@@ -531,12 +531,10 @@ class Funnels_Page extends Admin_Page
 
                 $funnel_id = $this->import_funnel($json);
             }
-        } else {
-            return new \WP_Error( 'error', __('Please select a template...' , 'groundhogg')  );
         }
 
         if ( ! isset( $funnel_id ) || empty( $funnel_id ) ){
-            wp_die( 'Error creating funnel.' );
+            return new \WP_Error( 'error', __('Could not create funnel.' , 'groundhogg')  );
         }
 
         $this->add_notice( esc_attr( 'created' ), _x( 'Funnel created', 'notice', 'groundhogg' ), 'success' );

@@ -175,7 +175,11 @@ class Tools_Page extends Tabbed_Admin_Page
             [
                 'name' => __( 'Updates' ),
                 'slug' => 'updates'
-            ]
+            ],
+            [
+                'name' => __( 'Install' ),
+                'slug' => 'install'
+            ],
         ];
 
         $tabs = apply_filters( 'groundhogg/admin/tools/tabs', $tabs );
@@ -226,6 +230,13 @@ class Tools_Page extends Tabbed_Admin_Page
                             'value' => 'bulk_sync',
                         ] ); ?>
                         <p><?php _e( 'The sync process will create new contact records for all users in the database. If a contact records already exists then the association will be updated.' ); ?></p>
+                        <p>
+                            <?php echo html()->checkbox( [
+                                    'label' => __( 'Sync all user meta.', 'groundhogg' ),
+                                'value' => 1,
+                                'name' => 'sync_user_meta'
+                            ] ); ?>
+                        </p>
                         <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
                             <button style="width: 100%" class="button-primary" name="sync_users"
                                     value="sync"><?php _ex( 'Start Sync Process', 'action', 'groundhogg' ); ?></button>
@@ -242,6 +253,10 @@ class Tools_Page extends Tabbed_Admin_Page
      */
     public function process_sync_bulk_sync()
     {
+        if ( get_request_var( 'sync_user_meta' ) ){
+            set_transient( 'gh_sync_user_meta', true, HOUR_IN_SECONDS );
+        }
+
         $this->syncer->start(); //todo
     }
 
@@ -571,21 +586,28 @@ class Tools_Page extends Tabbed_Admin_Page
                     <p class="description"><?php _e( 'Run previous update paths in case of a failed update.', 'groundhogg' ); ?></p>
                     <?php
 
-                    $updates = Plugin::$instance->updater->get_updates();
+                    do_action( 'groundhogg/admin/tools/updates' );
 
-                    foreach ( $updates as $update ):
+                    ?>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
 
-                        ?><p><?php
+    ####### UPDATES TAB FUNCTIONS #########
 
-                            echo html()->e( 'a', [ 'href' => add_query_arg( [
-                                'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
-                                'updater' => 'main',
-                                'manual_update' => $update
-                            ], $_SERVER[ 'REQUEST_URI' ] ) ], sprintf( __( 'Run update to version %s', 'groundhogg' ), $update ) )
+    public function install_view()
+    {
+        ?>
+        <div id="poststuff">
+            <div class="postbox">
+                <h2 class="hndle"><?php _e( 'Install Help', 'groundhogg' ); ?></h2>
+                <div class="inside">
+                    <p class="description"><?php _e( 'In the event there were installation issues you can run the install process from here.', 'groundhogg' ); ?></p>
+                    <?php
 
-                        ?></p><?php
-
-                    endforeach;
+                    do_action( 'groundhogg/admin/tools/install' );
 
                     ?>
                 </div>

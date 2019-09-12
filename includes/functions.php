@@ -1131,10 +1131,19 @@ function create_contact_from_user($user, $sync_meta = false )
         return new \WP_Error( 'db_error', __( 'Could not create contact.', 'groundhogg' ) );
     }
 
-    // Additional stuff.
-
     // Save the login
     $contact->update_meta( 'user_login', $user->user_login );
+
+    if ( $sync_meta ){
+
+        $user_meta = get_user_meta( $user->ID );
+
+        // Note: $values will be an array as single is false
+        foreach ( $user_meta as $key => $values ){
+            $contact->update_meta( $key, array_shift( $values ) );
+        }
+
+    }
 
     return $contact;
 }
@@ -1923,7 +1932,18 @@ function blacklist_check( $data='' ){
  */
 function get_managed_page_name()
 {
-    return get_option( 'gh_managed_page_name_override', 'gh' );
+    return apply_filters( 'groundhogg/managed_page_name', get_option( 'gh_managed_page_name_override', 'gh' ) );
+}
+
+/**
+ * Return the URL markeup for the managed page
+ *
+ * @param string $url
+ * @return string|void
+ */
+function managed_page_url( $url='' )
+{
+    return trailingslashit( rtrim( site_url( get_managed_page_name() ), '/' ) . '/' . ltrim( $url, '/' ) );
 }
 
 /**
@@ -1953,7 +1973,6 @@ function setup_managed_page()
             Plugin::$instance->notices->add( $post_id );
         }
     }
-
 }
 
 /**
@@ -2009,6 +2028,20 @@ function install_custom_rewrites()
     Plugin::$instance->preferences->add_rewrite_rules();
 
     flush_rewrite_rules();
+}
+
+/**
+ * Retrieve URL with nonce added to URL query.
+ *
+ * @since 2.0.4
+ *
+ * @param string     $actionurl URL to add nonce action.
+ * @param int|string $action    Optional. Nonce action name. Default -1.
+ * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
+ * @return string
+ */
+function nonce_url_no_amp( $actionurl, $action = -1, $name = '_wpnonce' ) {
+    return add_query_arg( $name, wp_create_nonce( $action ), $actionurl );
 }
 
 /**
@@ -2182,7 +2215,11 @@ function get_date_time_format()
  * @return string
  */
 function file_access_url( $path, $download=false ){
-    $url = site_url( preg_replace('/(\/+)/','/', sprintf( untrailingslashit( 'gh/files/%s' ), $path ) ) );
+
+    $path = wp_normalize_path( $path );
+    $url = managed_page_url( 'files/' . ltrim( $path, '/' ) );
+    $url = preg_replace('/(\/+)/','/', $url );
+
     if ( $download ){
         $url = add_query_arg( [ 'download' => true ], $url );
     }

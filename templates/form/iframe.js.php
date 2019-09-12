@@ -9,7 +9,7 @@
  * @since       File available since Release 1.0.20
  */
 
-status_header( 200 );
+use function Groundhogg\managed_page_url;status_header( 200 );
 nocache_headers();
 
 header("Content-Type: application/javascript");
@@ -168,4 +168,4 @@ header("Content-Type: application/javascript");
 
 })();
 
-ghFormClient.addForm('<?php echo site_url( sprintf( 'gh/forms/%s/', urlencode( \Groundhogg\encrypt( get_query_var( 'form_id' ) ) ) ) ); ?>' );
+ghFormClient.addForm('<?php echo managed_page_url( sprintf( 'forms/%s/', urlencode( \Groundhogg\encrypt( get_query_var( 'form_id' ) ) ) ) ); ?>' );

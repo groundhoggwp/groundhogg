@@ -25,6 +25,40 @@ abstract class Installer {
         add_action( 'wpmu_new_blog', [ $this, 'new_blog_created' ], 10, 6 );
         add_filter( 'wpmu_drop_tables', [ $this, 'wpmu_drop_tables' ], 10, 2 );
         add_action( 'activated_plugin', [ $this, 'plugin_activated' ] );
+
+        add_action( 'groundhogg/admin/tools/install', [ $this, 'show_manual_install' ] ); // DO LAST
+        add_action( 'admin_init', [ $this, 'do_manual_install' ], 99 ); // DO LAST
+    }
+
+    public function show_manual_install()
+    {
+
+        ?>
+        <h3><?php echo $this->get_installer_name(); ?></h3>
+        <p><?php
+
+        echo html()->e( 'a', [ 'class' => 'button', 'href' => add_query_arg( [
+            'manual_install' => $this->get_installer_name(),
+            'manual_install_nonce' => wp_create_nonce( 'gh_manual_install' ),
+        ], $_SERVER[ 'REQUEST_URI' ] ) ], __( 'Run Install', 'groundhogg' ) )
+
+        ?></p><?php
+
+    }
+
+    /**
+     * Manually perform a selected update routine.
+     */
+    public function do_manual_install()
+    {
+
+        if (get_request_var( 'manual_install' ) !== $this->get_installer_name() || ! wp_verify_nonce( get_request_var( 'manual_install_nonce' ), 'gh_manual_install' ) || ! current_user_can( 'install_plugins' ) ){
+            return;
+        }
+
+        $this->activation_wrapper();
+
+        Plugin::$instance->notices->add( 'installed', __( 'Re-installed successful!', 'groundhogg' ) );
     }
 
     /**

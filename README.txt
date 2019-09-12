@@ -150,6 +150,17 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.14 (2019-09-12) =
+* ADDED Support for serialized contact meta on the custom info page.
+* ADDED Support for syncing contact meta in the user sync tool
+* ADDED Support for manually starting upgrade process for Groundhogg and other extensions
+* ADDED Support for manually starting install/activation process for Groundhogg and other extensions
+* ADDED New "change preferences" link takes contacts to the profile preferences page
+* TWEAKED "Unsubscribe" link now takes contacts to the manage preferences page instead of the profile preferences page
+* TWEAKED Reporting time ranges
+* FIXED Events actions in the contact activity tab not redirecting back to contact record.
+* FIXED View all events in contact activity tab not showing contact specific events.
+
 = 2.0.9.13 (2019-09-11) =
 * FIXED Unable to save email as ready.
 * FIXED Bug where content not deselected in email editor after update

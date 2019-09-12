@@ -33,6 +33,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
+use function Groundhogg\managed_page_url;
 
 /**
  * Created by PhpStorm.
@@ -148,7 +149,7 @@ class Form {
 
     public function get_iframe_embed_code()
     {
-        $form_iframe_url = site_url( sprintf( 'gh/forms/iframe/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
+        $form_iframe_url = managed_page_url( sprintf( 'forms/iframe/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
         $script = sprintf('<script id="%s" type="text/javascript" src="%s"></script>', 'groundhogg_form_' . $this->get_id(), $form_iframe_url );
 
         return $script;
@@ -156,7 +157,7 @@ class Form {
 
     public function get_submission_url()
     {
-        return site_url( sprintf( 'gh/forms/%s/submit/', urlencode( encrypt( $this->get_id() ) ) ) );
+        return managed_page_url( sprintf( 'forms/%s/submit/', urlencode( encrypt( $this->get_id() ) ) ) );
     }
 
     protected function get_honey_pot_code()

@@ -25,15 +25,18 @@ class Date_Time
     /**
      * @param $time
      * @param bool $diff
+     * @param bool $can_round_up
      * @return bool|int
      */
-    function round_to( $time, $diff=false )
+    function round_to( $time, $diff=false, $can_round_up=true )
     {
         $leftover = $time % $diff;
 
         $time -= $leftover;
 
-        if ($leftover >= ( $diff / 2 ) ) $time += $diff;
+        if ( $can_round_up ){
+            if ($leftover >= ( $diff / 2 ) ) $time += $diff;
+        }
 
         // Handle MONTH conversion.
         if ( $diff === MONTH_IN_SECONDS ){

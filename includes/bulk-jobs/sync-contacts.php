@@ -76,7 +76,7 @@ class Sync_Contacts extends Bulk_Job
             return;
         }
 
-        create_contact_from_user( absint( $item ) );
+        create_contact_from_user( absint( $item ), get_transient( 'gh_sync_user_meta' ) );
     }
 
     /**
@@ -91,7 +91,9 @@ class Sync_Contacts extends Bulk_Job
      *
      * @return void
      */
-    protected function post_loop(){}
+    protected function post_loop(){
+        delete_transient( 'gh_sync_user_meta' );
+    }
 
     /**
      * Cleanup any options/transients/notices after the bulk job has been processed.

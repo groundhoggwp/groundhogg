@@ -16,6 +16,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Event;
 use Groundhogg\Form;
 use Groundhogg\Submission;
+use function Groundhogg\managed_page_url;
 use function Groundhogg\percentage;
 
 
@@ -146,7 +147,7 @@ class Form_Filled extends Benchmark
     {
         $form = new Form\Form( [ 'id' => $step->get_id() ] );
 
-        $form_url = site_url( sprintf( 'gh/forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
+        $form_url = managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
 
         $default_form = $this->get_default_form();
 

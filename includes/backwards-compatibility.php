@@ -79,7 +79,7 @@ class Backwards_Compatibility
             switch ( $tracking_via ){
                 case 'link':
 
-                    wp_redirect( site_url( sprintf('gh/link/click/%s/', get_request_var( 'id' ) ) ) );
+                    wp_redirect( managed_page_url( sprintf('link/click/%s/', get_request_var( 'id' ) ) ) );
                     die();
 
                     break;
@@ -88,9 +88,9 @@ class Backwards_Compatibility
                     switch ( $tracking_action ){
                         case 'open':
 
-                            $url = site_url(
+                            $url = managed_page_url(
                                 sprintf(
-                                    'gh/tracking/email/open/u/%s/e/%s/i/%s/',
+                                    'tracking/email/open/u/%s/e/%s/i/%s/',
                                     get_request_var( 'u' ),
                                     get_request_var( 'e' ),
                                     get_request_var( 'i' )
@@ -103,9 +103,9 @@ class Backwards_Compatibility
                             break;
                         case 'click':
 
-                            $url = site_url(
+                            $url = managed_page_url(
                                 sprintf(
-                                    'gh/tracking/email/click/u/%s/e/%s/i/%s/ref/%s/',
+                                    'tracking/email/click/u/%s/e/%s/i/%s/ref/%s/',
                                     get_request_var( 'u' ),
                                     get_request_var( 'e' ),
                                     get_request_var( 'i' ),
@@ -126,14 +126,14 @@ class Backwards_Compatibility
         $confirmation = get_query_var( 'confirmation' );
 
         if ( $confirmation ){
-            wp_redirect( site_url( 'gh/preferences/confirm/' ) );
+            wp_redirect( managed_page_url( 'preferences/confirm/' ) );
             die();
         }
 
         $superlink = get_query_var( 'superlink' );
 
         if ( $superlink ){
-            wp_redirect( sprintf( site_url( 'gh/superlinks/link/%s/' ), absint( get_query_var( 'superlink_id' ) ) ) );
+            wp_redirect( sprintf( managed_page_url( 'superlinks/link/%s/' ), absint( get_query_var( 'superlink_id' ) ) ) );
             die();
         }
 
