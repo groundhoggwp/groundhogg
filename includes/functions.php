@@ -2216,13 +2216,12 @@ function get_date_time_format()
  */
 function file_access_url( $path, $download=false ){
 
-    $path = wp_normalize_path( $path );
     $url = managed_page_url( 'files/' . ltrim( $path, '/' ) );
-    $url = preg_replace('/(\/+)/','/', $url );
 
     if ( $download ){
         $url = add_query_arg( [ 'download' => true ], $url );
     }
+
     return $url;
 }
 

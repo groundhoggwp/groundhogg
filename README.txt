@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.9.15 =
+* FIXED File access URL
+
 = 2.0.9.14 (2019-09-12) =
 * ADDED Support for serialized contact meta on the custom info page.
 * ADDED Support for syncing contact meta in the user sync tool
