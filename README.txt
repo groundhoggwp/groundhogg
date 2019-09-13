@@ -150,7 +150,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.0.9.15 =
+= 2.0.9.16 (2019-09-13) =
+* ADDED German translation. Shout out to Josef Weindler for making that possible.
+* FIXED updated POT file to include new and updated strings.
+* FIXED IP geolocation from geoplugin.net not working due to the referer not being set properly.
+
+= 2.0.9.15 (2019-09-12) =
 * FIXED File access URL
 
 = 2.0.9.14 (2019-09-12) =

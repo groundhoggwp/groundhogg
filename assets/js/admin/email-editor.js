@@ -209,8 +209,8 @@
             fd.email_content = $('#email-inside').html();
 
             if ( self.sendTest ){
-                self.email = prompt( self.send_test_prompt, self.test_email );
-                fd.test_email = self.email;
+                self.test_email = prompt( self.send_test_prompt, self.test_email );
+                fd.test_email = self.test_email;
             }
 
             var args = {};

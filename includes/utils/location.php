@@ -519,9 +519,14 @@ class Location
         );
         if (filter_var($ip, FILTER_VALIDATE_IP) && in_array($purpose, $support)) {
 
-            $ipdat = wp_remote_get( "http://www.geoplugin.net/json.gp?ip=" . $ip );
 
-            if ( is_wp_error( $ipdat ) || ! $ipdat ){
+            $ipdat = wp_remote_get( "http://www.geoplugin.net/json.gp?ip=" . $ip, [
+                'headers' => [
+                    'Referer' => site_url()
+                ]
+            ] );
+
+            if ( is_wp_error( $ipdat ) || ! $ipdat || wp_remote_retrieve_response_code( $ipdat ) !== 200 ){
                 return false;
             }
 
