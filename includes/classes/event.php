@@ -25,7 +25,7 @@ class Event extends Base_Object
 
     /** @var string Event statuses */
     const COMPLETE = 'complete';
-    const CANCELLED = 'canceled';
+    const CANCELLED = 'cancelled';
     const SKIPPED = 'skipped';
     const WAITING = 'waiting';
     const FAILED = 'failed';
@@ -399,7 +399,7 @@ class Event extends Base_Object
     }
 
     /**
-     * Mark the event as canceled
+     * Mark the event as cancelled
      */
     public function cancel()
     {
@@ -461,7 +461,7 @@ class Event extends Base_Object
     }
 
     /**
-     * Mark the event as skipped
+     * Mark the event as paused
      */
     public function pause()
     {
@@ -482,6 +482,7 @@ class Event extends Base_Object
 
         return $this->update( [
             'status' => self::COMPLETE,
+            'time' => time(),
             'error_code' => '',
             'error_message' => '',
         ] );

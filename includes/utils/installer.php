@@ -30,11 +30,16 @@ abstract class Installer {
         add_action( 'admin_init', [ $this, 'do_manual_install' ], 99 ); // DO LAST
     }
 
+	public function get_display_name()
+	{
+		return key_to_words( $this->get_installer_name() );
+	}
+
     public function show_manual_install()
     {
 
         ?>
-        <h3><?php echo $this->get_installer_name(); ?></h3>
+        <h3><?php echo $this->get_display_name(); ?></h3>
         <p><?php
 
         echo html()->e( 'a', [ 'class' => 'button', 'href' => add_query_arg( [

@@ -40,6 +40,7 @@ class Main_Updater extends Updater {
             '2.0.8',
             '2.0.8.1',
             '2.0.9.6',
+            '2.0.10',
         ];
     }
 
@@ -118,6 +119,20 @@ class Main_Updater extends Updater {
     {
     	install_custom_rewrites();
     	Plugin::$instance->roles->add_caps();
+    }
+
+    public function get_display_name() {
+	    return white_labeled_name();
+    }
+
+	/**
+	 * Update the tags table to support custom preference options.
+	 * Fix typo in the cancelled status
+	 */
+    public function version_2_0_10()
+    {
+    	get_db( 'tags' )->create_table();
+    	get_db( 'events' )->mass_update( [ 'status' => Event::CANCELLED ], [ 'status' => 'canceled' ] );
     }
 
 

@@ -166,10 +166,6 @@ class Tracking
      */
     public function parse_request( $vars )
     {
-
-//        var_dump( $vars );
-//        wp_die();
-
         if ( get_array_var( $vars, 'subpage' ) === 'tracking' ){
             $this->map_query_var( $vars, 'contact_id', 'hexdec' );
             $this->map_query_var( $vars, 'event_id', 'hexdec' );
@@ -290,7 +286,13 @@ class Tracking
 
         // Override if the user is logged in.
         if ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ){
-            $id_or_email = wp_get_current_user()->user_email;
+
+        	$ignore_user_precedence = apply_filters( 'groundhogg/tracking/ignore_user_precedence', is_option_enabled( 'gh_ignore_user_precedence' ) );
+
+        	// You can have user precedence if the id_or_email is false and the user is logged in or if the disable option is not enabled.
+	        if ( ! $ignore_user_precedence || ! $id_or_email ){
+		        $id_or_email = wp_get_current_user()->user_email;
+	        }
         }
 
         return Plugin::$instance->utils->get_contact( $id_or_email );
@@ -303,9 +305,15 @@ class Tracking
     {
         $id = absint( $this->get_tracking_cookie_param( 'contact_id' ) );
 
-        if ( ! $id && function_exists( 'is_user_logged_in' ) && is_user_logged_in() ){
-            $id = $this->get_current_contact()->get_id();
-        }
+        // Get from the user if logged in and the ID is not available.
+	    if ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ){
+
+	    	$contact = $this->get_current_contact();
+
+	    	if ( $contact ){
+			    $id = $contact->get_id();
+		    }
+	    }
 
         return $id;
     }

@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Tags;
 
 use Groundhogg\Admin\Admin_Page;
 use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use function Groundhogg\recount_tag_contacts_count;
 
@@ -102,6 +103,8 @@ class Tags_Page extends Admin_Page {
 
 				if ( $id ) {
 					$ids[] = $id;
+
+					do_action( 'groundhogg/admin/tags/add', $id );
 				}
 			}
 
@@ -125,6 +128,8 @@ class Tags_Page extends Admin_Page {
 				return new \WP_Error( 'unable_to_add_tag', "Something went wrong adding the tag." );
 			}
 
+			do_action( 'groundhogg/admin/tags/add', $id );
+
 			$this->add_notice( 'new-tag', _x( 'Tag created!', 'notice', 'groundhogg' ) );
 
 		}
@@ -141,6 +146,8 @@ class Tags_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
+		$id = absint( get_request_var( 'tag' ) );
+
 		$tag_name        = sanitize_text_field( get_post_var( 'name' ) );
 		$tag_description = sanitize_textarea_field( get_post_var( 'description' ) );
 
@@ -153,6 +160,8 @@ class Tags_Page extends Admin_Page {
 		Plugin::$instance->dbs->get_db( 'tags' )->update( absint( $_GET['tag'] ), $args );
 
 		$this->add_notice( 'updated', _x( 'Tag updated.', 'notice', 'groundhogg' ) );
+
+		do_action( 'groundhogg/admin/tags/edit', $id );
 
 		// Return false to return to main page.
 		return false;
@@ -249,7 +258,10 @@ class Tags_Page extends Admin_Page {
                                     });
                                 });
                             </script>
-							<?php submit_button( _x( 'Add New Tag', 'action', 'groundhogg' ), 'primary', 'add_tag' ); ?>
+
+	                        <?php do_action( 'groundhogg/admin/tags/add/form' ); ?>
+
+                            <?php submit_button( _x( 'Add New Tag', 'action', 'groundhogg' ), 'primary', 'add_tag' ); ?>
                         </form>
                     </div>
                 </div>

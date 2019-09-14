@@ -56,7 +56,7 @@ class Tags_Table extends WP_List_Table {
             'tag_description'   => _x( 'Description', 'Column label', 'groundhogg' ),
             'contact_count' => _x( 'Count', 'Column label', 'groundhogg' ),
         );
-        return $columns;
+        return apply_filters( 'groundhogg/admin/tags/table/get_columns', $columns );
     }
     /**
      * @return array An associative array containing all the columns that should be sortable.
@@ -130,7 +130,7 @@ class Tags_Table extends WP_List_Table {
      */
     protected function column_default( $tag, $column_name ) {
 
-        return print_r( $tag->$column_name, true );
+        return do_action( "groundhogg/admin/tags/table/{$column_name}", $tag );
 
     }
 

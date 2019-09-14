@@ -45,6 +45,10 @@ class Main_Installer extends Installer
         install_custom_rewrites();
     }
 
+	public function get_display_name() {
+		return white_labeled_name();
+	}
+
     protected function deactivate()
     {
         // TODO: Implement deactivate() method.

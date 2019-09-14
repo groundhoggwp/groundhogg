@@ -89,7 +89,9 @@ Join our [Facebook group](https://www.groundhogg.io/fb/) to talk to others who a
 
 We started building Groundhogg because we believe that every business, regardless of location, language, or budget deserves equal access to marketing and sales tools that will allow them to grow.
 
-Every tools we build draws from this belief so that we can be the #1 resource for accessible marketing and sales tools.
+Every tool we build draws from this belief so that we can be the #1 resource for accessible marketing and sales tools.
+
+[](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
 == Screenshots ==
 1. The funnel builder in all its glory, Benchmarks show on right.
@@ -149,6 +151,14 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 == Changelog ==
+
+= 2.0.10 (2019-09-14) =
+* ADDED Option to disable behaviour of the logged in user taking precedence over tracking link information.
+* ADDED Compatibility to extend the preferences center.
+* TWEAKED Failed event notifications will send a max of 1 per minute.
+* TWEAKED Updates amd Install tools tab shows display names instead of identifiers.
+* FIXED Typo in 'cancelled' status.
+* FIXED CSS issue in "Add Step" modal in the V2 editor.
 
 = 2.0.9.16 (2019-09-13) =
 * ADDED German translation. Shout out to Josef Weindler for making that possible.

@@ -24,6 +24,11 @@ abstract class Updater{
         add_action( 'admin_init', [ $this, 'do_manual_updates' ], 99 ); // DO LAST
     }
 
+    public function get_display_name()
+    {
+        return key_to_words( $this->get_updater_name() );
+    }
+
     /**
      * A unique name for the updater to avoid conflicts
      *
@@ -76,8 +81,7 @@ abstract class Updater{
 
     public function show_manual_updates()
     {
-        ?>
-        <h3><?php echo $this->get_updater_name(); ?></h3><?php
+        ?><h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3><?php
 
         foreach ( $this->get_available_updates() as $update ):
 

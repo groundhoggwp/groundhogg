@@ -1419,12 +1419,20 @@ if ( get_option( 'gh_send_notifications_on_event_failure' ) ) {
      */
     function send_event_failure_notification($event)
     {
+
+        if ( get_transient( 'gh_hold_failed_event_notification' ) ){
+            return;
+        }
+
         $subject = sprintf("Event (%s) failed for %s on %s", $event->get_step_title(), $event->get_contact()->get_email(), esc_html( get_bloginfo( 'title' ) ) );
         $message = sprintf("This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->get_contact()->get_full_name(), $event->get_contact()->get_email());
         $message .= sprintf("\nFailure Reason: %s", $event->get_failure_reason());
         $message .= sprintf("\nManage Failed Events: %s", admin_url('admin.php?page=gh_events&view=status&status=failed'));
         $to = Plugin::$instance->settings->get_option('event_failure_notification_email', get_option('admin_email') );
-        wp_mail( $to, $subject, $message );
+
+        if ( wp_mail( $to, $subject, $message ) ){
+            set_transient('gh_hold_failed_event_notification', true, MINUTE_IN_SECONDS );
+        }
     }
 
     add_action('groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_notification');
@@ -2288,3 +2296,13 @@ if (!function_exists(__NAMESPACE__ . '\get_email_top_image_url')):
     }
 
 endif;
+
+/**
+ * Gets the ids of the magic tags.
+ *
+ * @return int[]
+ */
+function get_magic_tag_ids()
+{
+    return array_values( Plugin::$instance->tag_mapping->get_tag_map() );
+}

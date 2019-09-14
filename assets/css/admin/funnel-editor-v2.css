@@ -392,7 +392,6 @@ html.full-screen{
 
 .steps-select{
     background: #f1f1f1;
-    height: 100%;
 }
 
 .steps-select .description{
@@ -418,10 +417,6 @@ td.step-icon{
 td.step-icon:hover{
     background: #f9f9f9;
     cursor: pointer;
-}
-
-#benchmarks{
-    margin-bottom: 30px;
 }
 
 .reporting-enabled .step-reporting,
@@ -461,6 +456,7 @@ td.step-icon:hover{
 #postbox-container-1 .step .hndle{
     padding: 12px 12px;
 }
+
 .add-step-bottom-wrap{
     box-sizing: border-box;
     width: 100%;

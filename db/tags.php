@@ -87,6 +87,7 @@ class Tags extends DB
             'tag_slug'           => '%s',
             'tag_description'    => '%s',
             'contact_count'      => '%d',
+            'show_as_preference' => '%d',
         );
     }
 
@@ -103,6 +104,7 @@ class Tags extends DB
             'tag_slug'           => '',
             'tag_description'    => '',
             'contact_count'      => 0,
+            'show_as_preference' => 0,
         );
     }
 
@@ -378,6 +380,7 @@ class Tags extends DB
         tag_name mediumtext NOT NULL,
         tag_description text NOT NULL,
         contact_count bigint(20) unsigned NOT NULL,
+        show_as_preference tinyint unsigned NOT NULL,
         PRIMARY KEY (tag_id),
         UNIQUE KEY tag_slug (tag_slug)
 		) {$this->get_charset_collate()};";

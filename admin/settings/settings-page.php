@@ -577,6 +577,19 @@ class Settings_Page extends Admin_Page
                     'value' => 'on',
                 ),
             ),
+            'gh_ignore_user_precedence' => array(
+	            'id' => 'gh_ignore_user_precedence',
+	            'section' => 'misc_info',
+	            'label' => _x('Disable logged in user tracking precedence.', 'settings', 'groundhogg'),
+	            'desc' => _x('By default, Groundhogg will always show info of a logged in user before referencing information from tracking links or forms. You can disable this behaviour with this option.', 'settings', 'groundhogg'),
+	            'type' => 'checkbox',
+	            'atts' => array(
+		            'label' => __('Disable'),
+		            'name' => 'gh_ignore_user_precedence',
+		            'id' => 'gh_ignore_user_precedence',
+		            'value' => 'on',
+	            ),
+            ),
             'gh_privacy_policy' => array(
                 'id' => 'gh_privacy_policy',
                 'section' => 'compliance',

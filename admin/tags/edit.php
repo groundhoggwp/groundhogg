@@ -30,7 +30,8 @@ $tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $id );
 <form name="edittag" id="edittag" method="post" action="" class="validate">
     <?php wp_nonce_field(); ?>
     <table class="form-table">
-        <tbody><tr class="form-field form-required term-name-wrap">
+        <tbody>
+        <tr class="form-field form-required term-name-wrap">
             <th scope="row"><label for="name"><?php _e( 'Name' ) ?></label></th>
             <td><input name="name" id="name" type="text" value="<?php esc_attr_e( $tag->tag_name ); ?>" size="40" aria-required="true">
                 <p class="description"><?php _e( 'A descriptive name of the tag so you remember what it means', 'groundhogg' ) ?>.</p>
@@ -43,6 +44,7 @@ $tag = Plugin::$instance->dbs->get_db( 'tags' )->get( $id );
             </td>
         </tr>
         </tbody>
+        <?php do_action( 'groundhogg/admin/tags/edit/form', $id ); ?>
     </table>
     <div class="edit-tag-actions">
         <?php submit_button( __( 'Update' ), 'primary', 'update', false ); ?>

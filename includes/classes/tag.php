@@ -63,6 +63,14 @@ class Tag extends Base_Object {
         return absint( $this->contact_count );
     }
 
+	/**
+	 * @return bool
+	 */
+    public function is_preference_tag()
+    {
+    	return boolval( $this->show_as_preference );
+    }
+
     /**
      * @return string
      */
