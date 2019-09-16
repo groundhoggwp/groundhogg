@@ -107,8 +107,14 @@ class Emails_Page extends Admin_Page
     {
         if ( $this->get_current_action() === 'edit_plain' ){
 	        wp_enqueue_style( 'groundhogg-admin-email-editor-plain' );
+	        wp_enqueue_script( 'groundhogg-admin-email-editor-plain' );
 
-	        remove_editor_styles();
+	        wp_localize_script( 'groundhogg-admin-email-editor-plain', 'Email', [
+		        'send_test_prompt' => __( 'Send test email to...', 'groundhogg' ),
+                'email_id' => absint( Groundhogg\get_request_var( 'email' ) ),
+	        ] );
+
+            remove_editor_styles();
         }
 
         if ( $this->get_current_action() === 'edit' ){

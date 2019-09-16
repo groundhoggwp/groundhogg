@@ -176,7 +176,9 @@ $email    = new Email( $email_id );
 					<?php echo html()->editor( [
 						'id'                  => 'email_content',
 						'content'             => $email->get_content(),
-						'settings'            => [],
+						'settings'            => [
+						        'editor_height' => 500,
+                        ],
 						'replacements_button' => true,
 					] ); ?>
                 </div>
@@ -184,20 +186,3 @@ $email    = new Email( $email_id );
         </div>
     </div>
 </form>
-<script>
-    (function ($) {
-        $( 'form' ).on( 'submit', function () {
-            $( '.spinner' ).css( 'visibility', 'visible' )
-        } );
-        $( '#update_and_test' ).on( 'click', function () {
-            var test = $( '#test-email' );
-
-            var test_email = prompt( "<?php _e( 'Send test email to...', 'groundhogg' ); ?>", test.val() );
-
-            if ( test_email ){
-                test.attr( 'name', 'test_email' );
-                test.val( test_email );
-            }
-        } );
-    })(jQuery);
-</script>
