@@ -843,7 +843,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     try {
         $phpmailer->setFrom( $from_email, $from_name, false );
     } catch ( \phpmailerException $e ) {
-        $mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+        $mail_error_data                    = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+        $mail_error_data['set_from_name']   = $from_name;
+        $mail_error_data['set_from_email']  = $from_email;
         $mail_error_data['phpmailer_exception_code'] = $e->getCode();
 
         /** This filter is documented in wp-includes/pluggable.php */
@@ -982,6 +984,8 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
         $mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
         $mail_error_data['phpmailer_exception_code'] = $e->getCode();
         $mail_error_data['mime_message'] = $phpmailer->getSentMIMEMessage();
+        $mail_error_data['set_from_name']   = $from_name;
+        $mail_error_data['set_from_email']  = $from_email;
 
         if ( Plugin::$instance->sending_service->has_errors() ){
             $mail_error_data[ 'orig_error_data' ] = Plugin::$instance->sending_service->get_last_error()->get_error_data();
