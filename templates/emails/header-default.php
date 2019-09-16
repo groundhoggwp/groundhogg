@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 $body = [
     "background-color"          => "#FFFFFF",
-	'font-family'               => 'sans-serif',
+	'font-family'               => 'Arial, "Helvetica Neue", Helvetica, sans-serif;',
 	'-webkit-font-smoothing'    => 'antialiased',
 	'font-size'                 => '14px',
 	'line-height'               => '1.4',
@@ -37,7 +37,7 @@ $wrapper = apply_filters( 'groundhogg/email_template/wrapper_css', [
 $wrapper = \Groundhogg\array_to_css( $wrapper );
 
 $template_container = apply_filters( 'groundhogg/email_template/container_css', [
-	'font-family' => 'sans-serif',
+	'font-family' => 'Arial, "Helvetica Neue", Helvetica, sans-serif',
 	'font-size' => '14px',
 	'vertical-align' => 'top',
 	'display' => 'block',
@@ -105,11 +105,12 @@ $email_width = $is_showing_in_iframe ? '100%' : $email_width;
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title><?php echo $email_title; ?></title>
     <base target="_parent">
-    <?php do_action( 'groundhogg/templates/email/head/after' ); ?>
     <style>
         img{max-width: 100%;}
         body{font-size: 14px;font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-weight: 400;}
+        <?php do_action( 'groundhogg/templates/email/head/style' ); ?>
     </style>
+	<?php do_action( 'groundhogg/templates/email/head/after' ); ?>
 </head>
 <!-- /HEAD -->
 

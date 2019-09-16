@@ -313,7 +313,7 @@ $blocks = apply_filters( 'groundhogg/admin/emails/blocks', [] );
 
                             <!-- Editor Content -->
                             <div id="email-inside" class="email-sortable email-content-wrapper" style="max-width: 580px;margin-top:40px;<?php echo $margins;?>">
-                                <?php echo $email->get_content(); ?>
+                                <?php echo wpautop( $email->get_content() ); ?>
                             </div>
                             <div id="example-footer">
                                 <?php ?>

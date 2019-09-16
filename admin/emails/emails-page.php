@@ -107,6 +107,8 @@ class Emails_Page extends Admin_Page
     {
         if ( $this->get_current_action() === 'edit_plain' ){
 	        wp_enqueue_style( 'groundhogg-admin-email-editor-plain' );
+
+	        remove_editor_styles();
         }
 
         if ( $this->get_current_action() === 'edit' ){
@@ -163,7 +165,9 @@ class Emails_Page extends Admin_Page
             wp_enqueue_style( 'groundhogg-admin-iframe' );
         }
 
-        wp_enqueue_style( 'groundhogg-admin' );
+	    remove_editor_styles();
+
+	    wp_enqueue_style( 'groundhogg-admin' );
     }
 
 

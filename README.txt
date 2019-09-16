@@ -156,6 +156,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED New simple email builder option for users who'd rather use the WP editor instead of our email builder.
 * ADDED Show Premium SMTP options in email step during guided setup.
 * TWEAKED Shortened the tracking link markup
+* TWEAKED remove editor styles from email text block.
 * FIXED Email Browser view sometimes not loading email at correct height.
 
 = 2.0.10 (2019-09-14) =
