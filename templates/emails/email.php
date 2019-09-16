@@ -21,4 +21,12 @@ status_header( 200 );
 header( 'Content-Type: text/html; charset=utf-8' );
 nocache_headers();
 
+add_action( 'groundhogg/templates/email/head/after', function(){
+	?>
+<style>
+	body{padding: 0 10px !important;}
+</style>
+		<?php
+} );
+
 echo $email->build();

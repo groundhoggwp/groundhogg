@@ -30,8 +30,10 @@ var ImageBlock = {};
 
             this.width = $( '#image-width' );
             this.width.on( 'change input', function ( e ) {
-                editor.getActive().find('img').css('width',$(this).val() + '%' );
+                var px_width = ( $(this).val() / 100 ) * 566;
+                editor.getActive().find('img').css('width', px_width + 'px' );
                 editor.getActive().find('img').attr('width', editor.getActive().find('img').width() );
+                editor.getActive().find('img').css('max-width', '100%' );
             });
 
             this.title = $( '#image-title' );

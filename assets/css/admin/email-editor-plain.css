@@ -1,0 +1,23 @@
+#subject,
+#title,
+#pre_header{
+    width: 100%;
+    font-size:18px;
+}
+
+#content-wrap,
+#subject-wrap{
+    margin-top: 20px;
+}
+
+/*#save{*/
+/*    padding: 10px;*/
+/*}*/
+
+.button .dashicons {
+    vertical-align: middle;
+}
+
+#poststuff .dash-button{
+    padding: 0 5px 1px;
+}

@@ -30,7 +30,7 @@ class Scripts
         wp_register_script('groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend/frontend' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true );
         wp_register_script('groundhogg-ajax-form', GROUNDHOGG_ASSETS_URL . 'js/frontend/ajax-form' . $IS_MINIFIED . '.js', ['jquery', 'groundhogg-frontend' ], GROUNDHOGG_VERSION, true );
         wp_register_script('manage-preferences', GROUNDHOGG_ASSETS_URL . 'js/frontend/preferences' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
-        wp_register_script('fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
+        wp_register_script('fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true );
 
         // Integrations
         wp_register_script( 'groundhogg-elementor-integration', GROUNDHOGG_URL . 'integrations/elementor' . $IS_MINIFIED .'.js', [], GROUNDHOGG_VERSION, true );
@@ -170,6 +170,7 @@ class Scripts
         wp_register_style('groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'css/admin/contacts.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/contact-editor.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor.css', [], GROUNDHOGG_VERSION);
+        wp_register_style('groundhogg-admin-email-editor-plain', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor-plain.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-funnel-editor-v2', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor-v2.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'css/admin/dashboard.css', [], GROUNDHOGG_VERSION);

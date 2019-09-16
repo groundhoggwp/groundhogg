@@ -189,7 +189,10 @@ abstract class Admin_Page
             'option' => $this->get_slug() . '_per_page'
         );
 
-        add_screen_option('per_page', $args);
+
+        if ( $this->get_current_action() === 'view' ) {
+	        add_screen_option('per_page', $args);
+        }
     }
 
     /**

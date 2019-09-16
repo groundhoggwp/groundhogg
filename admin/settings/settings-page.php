@@ -564,6 +564,19 @@ class Settings_Page extends Admin_Page
                     'value' => 'on',
                 ),
             ),
+            'gh_use_plain_email_editor' => array(
+                'id' => 'gh_use_plain_email_editor',
+                'section' => 'misc_info',
+                'label' => _x('Enable the plain email editor.', 'settings', 'groundhogg'),
+                'desc' => _x('This will enable the plain email editor which utilizes the basic WP editor instead of the block builder.', 'settings', 'groundhogg'),
+                'type' => 'checkbox',
+                'atts' => array(
+                    'label' => __('Enable'),
+                    'name' => 'gh_use_plain_email_editor',
+                    'id' => 'gh_use_plain_email_editor',
+                    'value' => 'on',
+                ),
+            ),
             'gh_disable_page_view_tracking' => array(
                 'id' => 'gh_disable_page_view_tracking',
                 'section' => 'misc_info',

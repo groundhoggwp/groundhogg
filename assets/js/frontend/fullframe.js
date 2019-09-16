@@ -28,6 +28,8 @@
                 $(this).height( $(this.contentWindow.document ).height() );
             });
         }
+
+        console.log( iFrames );
     }
 
     function addEvent( event, callback ){

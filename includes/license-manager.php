@@ -277,8 +277,10 @@ class License_Manager
      */
     public static function get_store_products( $args=array() )
     {
-        if ( get_transient( 'gh_store_products' ) ){
-            return get_transient( 'gh_store_products' );
+        $key = md5( serialize( $args ) );
+
+        if ( get_transient( "gh_store_products_{$key}" ) ){
+            return get_transient( "gh_store_products_{$key}" );
         }
 
         $args = wp_parse_args( $args, array(
@@ -300,7 +302,7 @@ class License_Manager
 
         $products = json_decode( wp_remote_retrieve_body( $response ) );
 
-        set_transient( 'gh_store_products', $products, WEEK_IN_SECONDS );
+        set_transient( "gh_store_products_{$key}", $products, WEEK_IN_SECONDS );
 
         return $products;
     }

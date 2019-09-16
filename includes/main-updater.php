@@ -41,6 +41,7 @@ class Main_Updater extends Updater {
             '2.0.8.1',
             '2.0.9.6',
             '2.0.10',
+            '2.0.11',
         ];
     }
 
@@ -102,18 +103,13 @@ class Main_Updater extends Updater {
      */
     public function version_2_0_8()
     {
-
         global $wpdb;
-
         $db = get_db( 'contacts' );
-
         $wpdb->query( "CREATE INDEX date_created ON {$db->get_table_name()}(date_created)" );
-
     }
 
     /**
 	 * Attempt more compatibility with the rewrites.
-     *
 	 */
     public function version_2_0_9_6()
     {
@@ -133,6 +129,14 @@ class Main_Updater extends Updater {
     {
     	get_db( 'tags' )->create_table();
     	get_db( 'events' )->mass_update( [ 'status' => Event::CANCELLED ], [ 'status' => 'canceled' ] );
+    }
+
+	/**
+	 * Update tracking link options
+	 */
+    public function version_2_0_11()
+    {
+    	install_custom_rewrites();
     }
 
 

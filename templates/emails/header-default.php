@@ -106,6 +106,10 @@ $email_width = $is_showing_in_iframe ? '100%' : $email_width;
     <title><?php echo $email_title; ?></title>
     <base target="_parent">
     <?php do_action( 'groundhogg/templates/email/head/after' ); ?>
+    <style>
+        img{max-width: 100%;}
+        body{font-size: 14px;font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-weight: 400;}
+    </style>
 </head>
 <!-- /HEAD -->
 

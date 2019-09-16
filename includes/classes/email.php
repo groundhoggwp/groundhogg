@@ -266,18 +266,7 @@ class Email extends Base_Object_With_Meta
      */
     public function browser_view_link($link)
     {
-
-        if ( Plugin::$instance->settings->is_global_multisite() ) {
-            switch_to_blog( get_site()->site_id );
-        }
-
-        $url = managed_page_url( sprintf( "browser-view/emails/%d", $this->get_id() ) );
-
-        if ( is_multisite() && ms_is_switched() ) {
-            restore_current_blog();
-        }
-
-        return $url;
+        return managed_page_url( sprintf( "browser-view/emails/%d", $this->get_id() ) );
     }
 
     /**
@@ -288,7 +277,7 @@ class Email extends Base_Object_With_Meta
     public function get_open_tracking_link()
     {
         return managed_page_url( sprintf(
-            "tracking/email/open/u/%s/e/%s/i/%s/",
+            "tracking/email/open/%s/%s/%s/",
             dechex( $this->get_contact()->get_id() ),
             ! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
             dechex( $this->get_id() )
@@ -303,12 +292,21 @@ class Email extends Base_Object_With_Meta
     public function get_click_tracking_link()
     {
         return managed_page_url(
-            sprintf('tracking/email/click/u/%s/e/%s/i/%s/ref/',
+            sprintf('tracking/email/click/%s/%s/%s/',
                 dechex( $this->get_contact()->get_id() ),
                 ! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
                 dechex( $this->get_id() )
             )
         );
+    }
+
+	/**
+	 * @param $link
+	 *
+	 * @return string
+	 */
+    public function click_tracking_link( $link ){
+    	return sprintf( "{$this->get_click_tracking_link()}/%s", base64_encode( $link ) );
     }
 
     /**
@@ -406,7 +404,11 @@ class Email extends Base_Object_With_Meta
             $this->get_contact()->get_id()
         );
 
-        /* filter out double http based on bug where superlinks have http:// prepended */
+        if ( $this->get_meta( 'is_plain' ) ){
+	        $content = wpautop( $content );
+        }
+
+	    /* filter out double http based on bug where superlinks have http:// prepended */
         $schema = is_ssl() ? 'https://' : 'http://';
         $content = str_replace('http://https://', $schema, $content);
         $content = str_replace('http://http://', $schema, $content);
@@ -430,7 +432,9 @@ class Email extends Base_Object_With_Meta
     public function convert_to_tracking_links( $content )
     {
         /* Filter the superlinks to include data about the email, campaign, and funnel steps... */
-        return preg_replace_callback('/(href=")(?!mailto)(?!tel)([^"]*)(")/i', [ $this, 'tracking_link_callback' ], $content);
+	    $content = preg_replace_callback('/(href=")(?!mailto)(?!tel)([^"]*)(")/i', [ $this, 'tracking_link_callback' ], $content );
+	    // Also get single quote HTML since that's a thing that can happen.
+	    return preg_replace_callback('/(href=\')(?!mailto)(?!tel)([^"]*)(\')/i', [ $this, 'tracking_link_callback' ], $content );
     }
 
     /**
@@ -465,12 +469,12 @@ class Email extends Base_Object_With_Meta
         $sub = array();
 
         if ( Plugin::$instance->settings->get_option('phone', 0 ) ) {
-            $sub[] = "<a href='tel:{business_phone}'>{business_phone}</a>";
+            $sub[] = "<a href=\"tel:{business_phone}\">{business_phone}</a>";
         }
 
         if ( Plugin::$instance->settings->get_option('privacy_policy' ) ) {
             $sub[] = sprintf(
-                "<a href='%s'>%s</a>",
+                "<a href=\"%s\">%s</a>",
                 esc_url( Plugin::$instance->settings->get_option('privacy_policy' ) ),
                 apply_filters('groundhogg/email/privacy_policy_link_text', __('Privacy Policy', 'groundhogg'))
             );
@@ -478,7 +482,7 @@ class Email extends Base_Object_With_Meta
 
         if (Plugin::$instance->settings->get_option('terms' ) ) {
             $sub[] = sprintf(
-                "<a href='%s'>%s</a>",
+                "<a href=\"%s\">%s</a>",
                 esc_url( Plugin::$instance->settings->get_option('terms') ),
                 apply_filters('groundhogg/email/terms_link_text', __( 'Terms', 'groundhogg' ) )
             );
@@ -676,7 +680,7 @@ class Email extends Base_Object_With_Meta
         $headers['reply_to'] = 'Reply-To: ' . $this->get_reply_to_address();
         $headers['return_path'] = 'Return-Path: ' . Plugin::$instance->settings->get_option('bounce_inbox', $this->get_from_email());
         $headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
-        $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe%%20%s>,<%s%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), $this->get_click_tracking_link(), $this->get_unsubscribe_link() );
+        $headers['unsub'] = sprintf('List-Unsubscribe: <mailto:%s?subject=Unsubscribe %s from %s>,<%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), get_bloginfo(), $this->click_tracking_link( $this->get_unsubscribe_link() ) );
 
         return apply_filters("groundhogg/email/headers", $headers);
     }
@@ -777,7 +781,6 @@ class Email extends Base_Object_With_Meta
                 $headers
             );
         }
-
 
         remove_action('phpmailer_init', [ $this, 'set_bounce_return_path' ] );
         remove_action('phpmailer_init', [ $this, 'set_plaintext_body' ] );
