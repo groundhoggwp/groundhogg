@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Admin\Tools;
 
+use function Groundhogg\get_request_var;
+use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
 use function Groundhogg\get_items_from_csv;
@@ -33,7 +35,11 @@ if ( ! file_exists( $file_path ) ){
 
 $items = get_items_from_csv( $file_path );
 
-$sample_item = array_shift( $items );
+$selected = absint( get_url_var(  'preview_item' ) );
+
+$total_items = count( $items );
+
+$sample_item = $items[ $selected ]
 
 ?>
 <form method="post">
@@ -48,6 +54,30 @@ $sample_item = array_shift( $items );
 <style>
     select {vertical-align: top !important;}
 </style>
+    <div class="tablenav" style="max-width: 900px;">
+        <div class="alignright">
+            <?php
+
+            $base_admin_url = add_query_arg( [
+                'page' => 'gh_tools',
+                'tab' => 'import',
+                'action' => 'map',
+                'import' => $file_name,
+            ], admin_url( 'admin.php' ) );
+
+            if ( $selected > 0 ){
+                echo html()->e( 'a', [ 'href' => add_query_arg( 'preview_item', $selected - 1, $base_admin_url ), 'class' => 'button' ], __( '&larr; Prev' ) );
+                echo '&nbsp;';
+            }
+
+            if ( $selected < $total_items - 1 ){
+                echo html()->e( 'a', [ 'href' => add_query_arg( 'preview_item', $selected + 1, $base_admin_url ), 'class' => 'button' ], __( 'Next &rarr;' ) );
+            }
+
+
+            ?>
+        </div>
+    </div>
 <table class="form-table">
     <thead>
     <tr>
@@ -65,9 +95,9 @@ $sample_item = array_shift( $items );
         <td>
             <?php echo Plugin::$instance->utils->html->input( [
                 'name' => 'no_submit',
-                'id'   => 'no_submit',
                 'value' => $value,
-                'attributes' => 'readonly'
+                'readonly' => true,
+//                'disabled' => true,
             ] );
 
             echo Plugin::$instance->utils->html->dropdown( [

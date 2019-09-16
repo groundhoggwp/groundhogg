@@ -152,6 +152,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.11.1 (2019-09-17) =
+* ADDED Preview pagination to paginate records during the import mapping process
+* ADDED ALT-Body editor to the new Simple Email Editor
+* TWEAKED Parse email content for images and sanitize their styling for guaranteed responsiveness.
+* FIXED export list function only exports the contacts listed and not all the contacts from the query.
+
 = 2.0.11 (2019-09-16) =
 * ADDED New simple email builder option for users who'd rather use the WP editor instead of our email builder.
 * ADDED Show Premium SMTP options in email step during guided setup.

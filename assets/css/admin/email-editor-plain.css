@@ -1,10 +1,12 @@
 #subject,
 #title,
+#alt-wrap,
 #pre_header{
     width: 100%;
     font-size:18px;
 }
 
+#alt-wrap,
 #content-wrap,
 #subject-wrap{
     margin-top: 20px;

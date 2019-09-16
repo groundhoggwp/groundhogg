@@ -116,6 +116,84 @@ function strip_script_tags( $content )
 add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\strip_script_tags' );
 
 /**
+ * Ensure images have responsive styling
+ *
+ * @param $content
+ * @return string|string[]|null
+ */
+function responsive_tag_compat( $content )
+{
+    $tags = [
+        'figure',
+        'img'
+    ];
+
+    foreach ( $tags as $tag ){
+        $content = preg_replace_callback( "/<{$tag}[^>]+>/", __NAMESPACE__ . '\_responsive_tag_compat_callback', $content );
+    }
+
+    return $content;
+}
+
+add_filter( 'groundhogg/email_template/content', __NAMESPACE__ . '\responsive_tag_compat', 99 );
+
+/**
+ * @param $tag
+ * @return string
+ */
+function _responsive_tag_compat_callback( $matches )
+{
+    $tag = $matches[ 0 ];
+
+    $tag_name = get_tag_name( $tag );
+    $atts = get_tag_attributes( $tag );
+
+    if ( empty( $atts ) || empty( $tag_name )){
+        return $tag;
+    }
+
+    $classes = explode( ' ', get_array_var( $atts, 'class' ) );
+    $style = get_array_var( $atts, 'style', [] );
+    $style = array_merge( $style, [
+        'max-width' => get_array_var( $atts, 'width', '300' ) . 'px',
+        'height' => 'auto',
+        'width' => '100%',
+    ] );
+
+    foreach ( $classes as $class ){
+        switch ( $class ){
+            case 'aligncenter':
+                $style[ 'display' ] = 'block';
+                $style[ 'margin' ] = '0.5em auto';
+                break;
+            case 'alignleft':
+                $style[ 'float' ] = 'left';
+                $style[ 'margin' ] = '0.5em 1em 0.5em 0';
+                break;
+            case 'alignright':
+                $style[ 'float' ] = 'right';
+                $style[ 'margin' ] = '0.5em 0 0.5em 1em';
+                break;
+        }
+    }
+
+    unset( $atts[ 'height' ] );
+    unset( $atts[ 'width' ] );
+
+    $atts[ 'style' ] = $style;
+
+    $self_closing = [
+        'img'
+    ];
+
+    if ( in_array( $tag_name, $self_closing ) ){
+        return html()->e( $tag_name, $atts );
+    }
+
+    return sprintf( "<%s %s>", $tag_name, array_to_atts( $atts ) );
+}
+
+/**
  * Add a link to the FB group in the admin footer.
  *
  * @param $text
@@ -147,7 +225,6 @@ add_filter( 'groundhogg/admin/emails/sanitize_email_content', 'wp_kses_post', 11
 function add_safe_style_attributes_to_email( $content )
 {
     add_filter( 'safe_style_css', __NAMESPACE__ . '\_safe_display_css' );
-
     return $content;
 }
 
@@ -210,6 +287,27 @@ function rgb2hex($r, $g=-1, $b=-1)
     return '#'.$color;
 }
 
+/**
+ * Strip the hieght attribute from any images since
+ *
+ * @param $content
+ * @return string|string[]|null
+ */
+function remove_image_width( $content )
+{
+    return preg_replace( "/<img(.*) width=\"[0-9]+\"(.*)\/>/", "<img$1$2/>", $content );
+}
+
+/**
+ * Strip the hieght attribute from any images since
+ *
+ * @param $content
+ * @return string|string[]|null
+ */
+function remove_image_height( $content )
+{
+    return preg_replace( "/<img(.*) height=\"[0-9]+\"(.*)\/>/", "<img$1$2/>", $content );
+}
 
 add_filter( 'tiny_mce_before_init', __NAMESPACE__ . '\tiny_mce_before_init' );
 

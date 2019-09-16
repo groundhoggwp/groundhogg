@@ -2310,3 +2310,81 @@ function get_magic_tag_ids()
 {
     return array_values( Plugin::$instance->tag_mapping->get_tag_map() );
 }
+
+/**
+ *
+ *
+ * @param $content
+ * @param $tag
+ * @return array|false
+ */
+function get_tag_attributes( $tag )
+{
+    if ( ! preg_match( '/<[^>]+>/', $tag, $matches ) ){
+        return false;
+    }
+
+    $tag = $matches[0];
+
+    preg_match_all( "/[a-z\-]+=\"[^\"]+\"/", $tag, $all_atts );
+
+    $attributes=[];
+
+    foreach ( $all_atts[0] as $i => $ugly_att ){
+
+        // Haas =
+        if ( strpos( $ugly_att, '=' ) !== false ){
+            $ugly_att = explode( '=', $ugly_att );
+            $key = sanitize_key( $ugly_att[0] );
+            $val = trim(  $ugly_att[1], "\"" );
+
+            if ( $key === 'style' ){
+                $val = parse_inline_styles( $val );
+            }
+
+            $attributes[ $key ] = $val;
+        } else {
+            $key = sanitize_key( $ugly_att );
+            $attributes[ $key ] = true;
+        }
+    }
+
+    return $attributes;
+}
+
+/**
+ * Gets the tag name given a tag
+ *
+ * @param $tag
+ * @return bool|mixed
+ */
+function get_tag_name( $tag ){
+    if ( ! preg_match( '/<[^>]+>/', $tag ) ){
+        return false;
+    }
+    preg_match( '/<([^\W]+)/', $tag, $matches );
+    return $matches[ 1 ];
+}
+
+/**
+ * Given a string of inline styles, parse it and return an array of [ attribute => value ]
+ *
+ * @param $style string
+ * @return array
+ */
+function parse_inline_styles( $style )
+{
+    $bits = explode( ';', $style );
+
+    $css = [];
+
+    foreach ( $bits as $bit ){
+
+        $rule = explode( ':', $bit );
+        $attribute = sanitize_key( $rule[0] );
+        $value = trim( $rule[1] );
+        $css[ $attribute ] = $value;
+    }
+
+    return $css;
+}

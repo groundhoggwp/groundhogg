@@ -108,6 +108,14 @@ $email_width = $is_showing_in_iframe ? '100%' : $email_width;
     <style>
         img{max-width: 100%;}
         body{font-size: 14px;font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-weight: 400;}
+        .aligncenter {display: block;margin-left: auto;margin-right: auto;}
+        .alignleft {float: left;margin: 0.5em 1em 0.5em 0;}
+        .alignright {float: right;margin: 0.5em 0 0.5em 1em;}
+        @media only screen and (max-width: 300px) {
+            .alignleft {display: block;float: none;margin-left: auto;margin-right: auto;}
+            .alignright {display: block;float: none;margin-left: auto;margin-right: auto;}
+        }
+
         <?php do_action( 'groundhogg/templates/email/head/style' ); ?>
     </style>
 	<?php do_action( 'groundhogg/templates/email/head/after' ); ?>

@@ -9,6 +9,7 @@ use function Groundhogg\html;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
 use function Groundhogg\managed_page_url;
+use function Groundhogg\white_labeled_name;
 
 /**
  * Email Editor
@@ -128,6 +129,7 @@ $email    = new Email( $email_id );
 						} ?>><?php _e( 'Center' ); ?></option>
                     </select>
                 </p>
+                <h3><?php _e( 'Additional' ); ?></h3>
                 <p>
 		            <?php echo Plugin::$instance->utils->html->checkbox( [
 			            'label'   => __('Enable browser view', 'groundhogg' ),
@@ -147,6 +149,16 @@ $email    = new Email( $email_id );
 			            'value'   => '1',
 			            'checked' => $email->is_template(),
 		            ] ); ?>
+                </p>
+                <p>
+                    <?php echo Plugin::$instance->utils->html->checkbox( [
+                        'label'   => __( 'Use custom Alt-Body', 'groundhogg' ),
+                        'name'    => 'use_custom_alt_body',
+                        'id'      => 'use_custom_alt_body',
+                        'class'   => '',
+                        'value'   => '1',
+                        'checked' => $email->has_custom_alt_body(),
+                    ] ); ?>
                 </p>
             </div>
             <div id="post-body-content">
@@ -191,6 +203,17 @@ $email    = new Email( $email_id );
 						'replacements_button' => true,
 					] ); ?>
                 </div>
+
+                <?php if ($email->has_custom_alt_body()) :?>
+                <div id="alt-wrap">
+                    <h3><?php _e( 'Alt-Body', 'groundhogg' ); ?></h3>
+                    <textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="16"><?php
+                        $alt_body = $email->get_alt_body();
+                        esc_html_e( $alt_body );
+                        ?></textarea>
+                    <p class="description"><?php printf( __( 'Having a custom Alt-Body will improve the deliverability of your emails. %s automatically generates one for you but if you want full control over it you can define it below.', 'groundhogg' ), white_labeled_name() ); ?></p>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

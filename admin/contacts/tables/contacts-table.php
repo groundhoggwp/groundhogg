@@ -473,9 +473,17 @@ class Contacts_Table extends WP_List_Table
                 ]); ?></div>
         </div>
         <div class="alignleft gh-actions">
+            <?php
+
+            $export_query = $this->query;
+
+            unset( $export_query[ 'number' ] );
+            unset( $export_query[ 'limit' ] );
+
+            $export_url = Plugin::$instance->bulk_jobs->export_contacts->get_start_url( $export_query );
+            ?>
             <a class="button action export-contacts"
-               href="<?php echo Plugin::$instance->bulk_jobs->export_contacts->get_start_url($this->query); //todo uncomment
-               ?>"><?php printf(_nx('Export %s contact', 'Export %s contacts', $this->get_pagination_arg('total_items'), 'action', 'groundhogg'), number_format_i18n($this->get_pagination_arg('total_items'))); ?></a>
+               href="<?php echo esc_url( $export_url ); ?>"><?php printf(_nx('Export %s contact', 'Export %s contacts', $this->get_pagination_arg('total_items'), 'action', 'groundhogg'), number_format_i18n($this->get_pagination_arg('total_items'))); ?></a>
         </div><?php
         do_action('groundhogg/admin/contacts/table/extra_tablenav', $this);
     }

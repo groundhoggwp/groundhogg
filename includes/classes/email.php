@@ -170,11 +170,17 @@ class Email extends Base_Object_With_Meta
 	 */
     public function get_alt_body()
     {
+        $body = "";
+
     	if ( $this->has_custom_alt_body() ){
-    		return wp_strip_all_tags( $this->get_meta( 'alt_body' ), false );
+    		$body = wp_strip_all_tags( $this->get_meta( 'alt_body' ), false );
 	    }
 
-    	return $this->strip_html_tags( $this->get_content() );
+    	if ( empty( $body ) ){
+    	    $body = $this->strip_html_tags( $this->get_content() );
+        }
+
+    	return $body;
     }
 
 	/**
