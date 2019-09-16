@@ -1,0 +1,9 @@
+body#tinymce.wp-editor {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 14px;
+    max-width: 600px;
+}
+
+body#tinymce.wp-editor.align-email-center{
+    margin: auto;
+}

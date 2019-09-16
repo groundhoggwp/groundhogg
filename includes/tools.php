@@ -1,4 +1,9 @@
 <?php
+
+use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
+use function Groundhogg\white_labeled_name;
+
 /**
  * Get system info
  *
@@ -110,6 +115,7 @@ function groundhogg_tools_sysinfo_get() {
 	$return .= "\n" . '-- Plugin Configuration' . "\n\n";
 	$return .= 'Version:                  ' . GROUNDHOGG_VERSION . "\n";
 	$return .= 'Global Multisite:         ' . ( $plugin->settings->is_global_multisite() ? "Enabled\n" : "Disabled\n" );
+	$return .= 'Safe Mode:                ' . ( is_option_enabled( 'gh_safe_mode_enabled' ) ? "Enabled\n" : "Disabled\n" );
 
 	$return .= "\n" . '-- Compliance Configuration' . "\n\n";
 	$return .= 'Confirmed Emails Only:     ' . ( $plugin->preferences->is_confirmation_strict() ? "Enabled\n" : "Disabled\n" );
@@ -364,3 +370,83 @@ function groundhogg_tools_sysinfo_download() {
 }
 
 add_action( 'admin_init', 'groundhogg_tools_sysinfo_download' );
+
+
+/**
+ * Enable safe mode which disables all active plugins
+ * @return bool
+ */
+function groundhogg_enable_safe_mode()
+{
+    if ( ! current_user_can( 'deactivate_plugins' ) ){
+        return false;
+    }
+
+    $active_plugins = (array) get_option( 'active_plugins', array() );
+    $keep_plugins =[];
+
+    // Find Groundhogg only plugins
+    foreach ( $active_plugins as $plugin ){
+        if ( preg_match( '/groundhogg/', $plugin ) ){
+            $keep_plugins[] = $plugin;
+        }
+    }
+
+    // Save new plugins
+    update_option( 'active_plugins', $keep_plugins );
+
+    // Store old plugins
+    update_option( 'gh_safe_mode_restore_plugins', $active_plugins );
+
+    // Enabled safe mode
+    update_option( 'gh_safe_mode_enabled', 1 );
+
+    do_action( 'groundhogg/safe_mode_enabled' );
+
+    return true;
+}
+
+/**
+ * Restore WP from safe mode
+ * @return bool
+ */
+function groundhogg_disable_safe_mode()
+{
+    if ( ! current_user_can( 'activate_plugins' ) ){
+        return false;
+    }
+
+    // Restore old plugins
+    $active_plugins = (array) get_option( 'gh_safe_mode_restore_plugins', array() );
+    update_option( 'active_plugins', $active_plugins );
+
+    // Delete options
+    delete_option( 'gh_safe_mode_enabled' );
+    delete_option( 'gh_safe_mode_restore_plugins' );
+
+    do_action( 'groundhogg/safe_mode_disabled' );
+
+    return true;
+}
+
+/**
+ * Groundhogg admin notice for minimum WordPress version.
+ *
+ * Warning when the site doesn't have the minimum required WordPress version.
+ *
+ * @since 2.0
+ *
+ * @return void
+ */
+function groundhogg_safe_mode_enabled_notice() {
+
+    if ( ! is_option_enabled( 'gh_safe_mode_enabled' ) || ! current_user_can( 'activate_plugins' ) ){
+        return;
+    }
+
+    $message = sprintf( esc_html__( '%s safe mode is currently enabled. All other plugins are inactive. %s', 'groundhogg' ), white_labeled_name(), html()->e( 'a', [ 'href' => admin_url( 'admin.php?page=gh_tools&tab=system' ) ], __( 'Disable Safe Mode', 'groundhogg' ) ) );
+    $html_message = sprintf( '<div class="notice notice-warning">%s</div>', wpautop( $message ) );
+    echo wp_kses_post( $html_message );
+}
+
+add_action( 'admin_notices', 'groundhogg_safe_mode_enabled_notice' );

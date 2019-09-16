@@ -31,6 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 $email_id = absint( get_request_var( 'email' ) );
+global $email;
 $email    = new Email( $email_id );
 
 ?>
@@ -47,7 +48,7 @@ $email    = new Email( $email_id );
 
     <div id='poststuff'>
 
-        <div id="post-body" class="metabox-holder columns-2" style="clear: both">
+        <div id="post-body" class="metabox-holder columns-2  <?php if ( $email->get_meta( 'alignment' ) === 'center' ) echo 'align-email-center'; ?>" style="clear: both">
 
             <div id="postbox-container-1" class="postbox-container sidebar">
                 <div id="save" class="postbox">
@@ -83,7 +84,7 @@ $email    = new Email( $email_id );
                     </div>
                 </div>
 
-                <h3><?php _e( 'Status:', 'groundhogg' ); ?></h3>
+                <h3><?php _e( 'Status', 'groundhogg' ); ?></h3>
                 <p>
 	                <?php echo Plugin::$instance->utils->html->toggle( [
 		                'name'          => 'email_status',
@@ -94,7 +95,7 @@ $email    = new Email( $email_id );
 		                'off'           => 'Draft',
 	                ]); ?>
                 </p>
-                <h3><?php _e( 'From:', 'groundhogg' ); ?></h3>
+                <h3><?php _e( 'From', 'groundhogg' ); ?></h3>
 				<?php $args = array(
 					'option_none' => __( 'The Contact\'s Owner' ),
 					'id'          => 'from_user',
@@ -105,7 +106,7 @@ $email    = new Email( $email_id );
                 <p><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></p>
 	            <?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
 
-                <h3><?php _e( 'Reply To:', 'groundhogg' ); ?></h3>
+                <h3><?php _e( 'Reply To', 'groundhogg' ); ?></h3>
 				<?php $args = [
 					'type'  => 'email',
 					'name'  => 'reply_to_override',
@@ -158,7 +159,7 @@ $email    = new Email( $email_id );
                 </div>
 
                 <div id="subject-wrap">
-                    <h3><?php _e( 'Subject & Pre-Header:', 'groundhogg' ); ?></h3>
+                    <h3><?php _e( 'Subject & Pre-Header', 'groundhogg' ); ?></h3>
                     <!-- Subject Line -->
                     <input placeholder="<?php echo __( 'Subject Line: Used to capture the attention of the reader.', 'groundhogg' ); ?>"
                            type="text" name="subject" size="30"
@@ -173,11 +174,19 @@ $email    = new Email( $email_id );
                 </div>
 
                 <div id="content-wrap">
-					<?php echo html()->editor( [
+					<?php
+
+                    add_filter( 'tiny_mce_before_init', function ( $mceinit ){
+                        global $email;
+                        $mceinit[ 'body_class' ] .= $email->get_meta( 'alignment' ) === 'center' ? ' align-email-center' : '';
+                        return $mceinit;
+                    } );
+
+                    echo html()->editor( [
 						'id'                  => 'email_content',
 						'content'             => $email->get_content(),
 						'settings'            => [
-						        'editor_height' => 500,
+                            'editor_height' => 500,
                         ],
 						'replacements_button' => true,
 					] ); ?>

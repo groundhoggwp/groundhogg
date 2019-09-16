@@ -11,7 +11,10 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
 use \WP_Error;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\nonce_url_no_amp;
+use function Groundhogg\white_labeled_name;
 use function set_transient;
 
 /**
@@ -149,7 +152,7 @@ class Tools_Page extends Tabbed_Admin_Page
     {
         $tabs = [
             [
-                'name' => __( 'System Info' ),
+                'name' => __( 'System Info & Debug' ),
                 'slug' => 'system',
             ],
             [
@@ -204,13 +207,57 @@ class Tools_Page extends Tabbed_Admin_Page
                               onclick="this.focus(); this.select()" id="system-info-textarea"
                               name="sysinfo"><?php echo groundhogg_tools_sysinfo_get(); ?></textarea>
                     <p class="submit">
-                        <a class="button button-primary"
+                        <a class="button button-secondary"
                            href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php _e( 'Download System Info', 'groundhogg' ); ?></a>
+                    </p>
+                </div>
+            </div>
+            <div class="postbox">
+                <h2 class="hndle"><?php _e( 'Safe Mode', 'groundhogg' ); ?></h2>
+                <div class="inside">
+                    <p class="description"><?php printf( __( 'Safe mode will disable any non %s related plugins for debugging purposes.', 'groundhogg' ), white_labeled_name() ); ?></p>
+                    <p class="submit">
+                        <?php
+
+                        if ( ! is_option_enabled( 'gh_safe_mode_enabled' ) ):
+
+                            echo html()->e( 'a', [
+                                'href' => nonce_url_no_amp( $this->admin_url( [ 'action' => 'enable_safe_mode' ] ), 'enable_safe_mode' ),
+                                'class' => [ 'button button-primary' ]
+                            ], __( 'Enable Safe Mode' ) );
+
+                        else:
+
+                            echo html()->e( 'a', [
+                                'href' => nonce_url_no_amp( $this->admin_url( [ 'action' => 'disable_safe_mode' ] ), 'disable_safe_mode' ),
+                                'class' => [ 'button button-secondary' ]
+                            ], __( 'Disable Safe Mode' ) );
+
+                        endif;
+
+                        ?>
                     </p>
                 </div>
             </div>
         </div>
         <?php
+    }
+
+    /**
+     * Enable safe mode
+     */
+    public function process_enable_safe_mode()
+    {
+        if( groundhogg_enable_safe_mode() ){
+            $this->add_notice( 'safe_mode_enabled', __( 'Safe mode has been enabled.' ) );
+        }
+    }
+
+    public function process_disable_safe_mode()
+    {
+        if( groundhogg_disable_safe_mode() ){
+            $this->add_notice( 'safe_mode_disabled', __( 'Safe mode has been disabled.' ) );
+        }
     }
 
     ####### SYNC TAB FUNCTIONS #########
