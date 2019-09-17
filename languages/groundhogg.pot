@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Groundhogg\n"
-"POT-Creation-Date: 2019-09-13 16:23-0400\n"
+"POT-Creation-Date: 2019-09-17 09:22-0400\n"
 "PO-Revision-Date: 2019-08-19 15:15-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -26,13 +26,13 @@ msgstr ""
 msgid "Per page"
 msgstr ""
 
-#: admin/admin-page.php:331 admin/admin-page.php:334
+#: admin/admin-page.php:334 admin/admin-page.php:337
 msgid "Invalid permissions."
 msgstr ""
 
-#: admin/admin-page.php:414 admin/admin-page.php:429
-#: admin/contacts/contacts-page.php:354 admin/emails/emails-page.php:170
-#: admin/emails/emails-page.php:378 admin/sms/sms-page.php:89
+#: admin/admin-page.php:417 admin/admin-page.php:432
+#: admin/contacts/contacts-page.php:354 admin/emails/emails-page.php:201
+#: admin/emails/emails-page.php:416 admin/sms/sms-page.php:89
 msgid "Add New"
 msgstr ""
 
@@ -367,22 +367,22 @@ msgctxt "tab"
 msgid "Internal Form"
 msgstr ""
 
-#: admin/contacts/add-contact.php:49 admin/tags/edit.php:34
+#: admin/contacts/add-contact.php:49 admin/tags/edit.php:35
 #: includes/steps/benchmarks/form-filled.php:510
 msgid "Name"
 msgstr ""
 
 #: admin/contacts/add-contact.php:53 admin/contacts/contact-editor.php:121
 #: admin/contacts/contact-editor.php:125 admin/contacts/search.php:96
-#: admin/contacts/tables/contacts-table.php:506 includes/functions.php:1498
-#: templates/preferences.php:212
+#: admin/contacts/tables/contacts-table.php:514 includes/functions.php:1531
+#: templates/preferences.php:218
 msgid "First Name"
 msgstr ""
 
 #: admin/contacts/add-contact.php:63 admin/contacts/contact-editor.php:130
 #: admin/contacts/contact-editor.php:134 admin/contacts/search.php:97
-#: admin/contacts/tables/contacts-table.php:511 includes/functions.php:1499
-#: templates/preferences.php:217
+#: admin/contacts/tables/contacts-table.php:519 includes/functions.php:1532
+#: templates/preferences.php:223
 msgid "Last Name"
 msgstr ""
 
@@ -392,7 +392,7 @@ msgstr ""
 
 #: admin/contacts/add-contact.php:78 admin/contacts/contact-editor.php:139
 #: admin/contacts/contact-editor.php:143 admin/contacts/search.php:98
-#: admin/contacts/tables/contacts-table.php:501
+#: admin/contacts/tables/contacts-table.php:509
 #: includes/steps/benchmarks/form-filled.php:313
 msgid "Email"
 msgstr ""
@@ -410,12 +410,12 @@ msgid "Segmentation"
 msgstr ""
 
 #: admin/contacts/add-contact.php:115 admin/contacts/search.php:140
-#: admin/contacts/tables/contacts-table.php:516
+#: admin/contacts/tables/contacts-table.php:524
 msgid "Owner"
 msgstr ""
 
 #: admin/contacts/add-contact.php:122 admin/contacts/search.php:159
-#: admin/contacts/tables/contacts-table.php:531
+#: admin/contacts/tables/contacts-table.php:539
 msgid "Tags"
 msgstr ""
 
@@ -508,7 +508,7 @@ msgid "Phone"
 msgstr ""
 
 #: admin/contacts/contact-editor.php:161
-#: admin/guided-setup/steps/business-info.php:36 includes/functions.php:1506
+#: admin/guided-setup/steps/business-info.php:36 includes/functions.php:1539
 msgid "Phone Number"
 msgstr ""
 
@@ -710,7 +710,7 @@ msgstr ""
 msgid "Agreed"
 msgstr ""
 
-#: admin/contacts/contact-editor.php:529 includes/functions.php:1522
+#: admin/contacts/contact-editor.php:529 includes/functions.php:1555
 msgid "GDPR Consent"
 msgstr ""
 
@@ -906,7 +906,7 @@ msgstr ""
 #: admin/contacts/contact-editor.php:993
 #: admin/contacts/tables/contacts-table.php:412 admin/sms/edit.php:49
 #: admin/sms/sms-table.php:222 admin/superlinks/edit.php:68
-#: admin/superlinks/superlinks-table.php:271 admin/tags/edit.php:49
+#: admin/superlinks/superlinks-table.php:271 admin/tags/edit.php:51
 #: admin/tags/tags-table.php:242
 msgid "Delete"
 msgstr ""
@@ -916,14 +916,14 @@ msgctxt "page_title"
 msgid "Contacts"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:117 admin/emails/emails-page.php:52
+#: admin/contacts/contacts-page.php:117 admin/emails/emails-page.php:63
 #: admin/funnels/funnels-page.php:63
 msgid "Add"
 msgstr ""
 
 #: admin/contacts/contacts-page.php:122
 #: admin/contacts/tables/contacts-table.php:377
-#: admin/contacts/tables/contacts-table.php:378 admin/emails/emails-page.php:62
+#: admin/contacts/tables/contacts-table.php:378 admin/emails/emails-page.php:74
 #: admin/emails/emails-table.php:163 admin/funnels/funnels-page.php:68
 #: admin/sms/sms-table.php:213 admin/sms/sms-table.php:214
 #: admin/superlinks/superlinks-table.php:262
@@ -932,7 +932,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:137 admin/emails/emails-page.php:161
+#: admin/contacts/contacts-page.php:137 admin/emails/emails-page.php:192
 #: admin/funnels/funnels-page.php:181 admin/superlinks/superlinks-page.php:76
 msgid "Overview"
 msgstr ""
@@ -943,7 +943,7 @@ msgid ""
 "quickly change contact details."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:145 admin/emails/emails-page.php:178
+#: admin/contacts/contacts-page.php:145 admin/emails/emails-page.php:209
 #: admin/funnels/funnels-page.php:198
 msgid "Editing"
 msgstr ""
@@ -1021,7 +1021,7 @@ msgid "Search Contacts"
 msgstr ""
 
 #: admin/contacts/contacts-page.php:359 admin/tools/imports-table.php:250
-#: admin/tools/tools-page.php:156 admin/tools/tools-page.php:504
+#: admin/tools/tools-page.php:159 admin/tools/tools-page.php:551
 msgid "Import"
 msgstr ""
 
@@ -1183,11 +1183,11 @@ msgstr ""
 msgid "Is Filled"
 msgstr ""
 
-#: admin/contacts/search.php:103 includes/functions.php:1514
+#: admin/contacts/search.php:103 includes/functions.php:1547
 msgid "Company Name"
 msgstr ""
 
-#: admin/contacts/search.php:104 includes/functions.php:1516
+#: admin/contacts/search.php:104 includes/functions.php:1549
 msgid "Job Title"
 msgstr ""
 
@@ -1196,18 +1196,18 @@ msgid "Company Address"
 msgstr ""
 
 #: admin/contacts/search.php:106 admin/guided-setup/steps/business-info.php:40
-#: includes/form/fields/address.php:62 includes/functions.php:1508
+#: includes/form/fields/address.php:62 includes/functions.php:1541
 msgid "Street Address 1"
 msgstr ""
 
 #: admin/contacts/search.php:107 admin/guided-setup/steps/business-info.php:44
-#: includes/form/fields/address.php:70 includes/functions.php:1509
+#: includes/form/fields/address.php:70 includes/functions.php:1542
 msgid "Street Address 2"
 msgstr ""
 
 #: admin/contacts/search.php:108 admin/guided-setup/steps/business-info.php:48
 #: admin/settings/settings-page.php:429 includes/form/fields/address.php:78
-#: includes/functions.php:1510
+#: includes/functions.php:1543
 msgid "City"
 msgstr ""
 
@@ -1222,7 +1222,7 @@ msgstr ""
 #: admin/contacts/search.php:111 admin/dashboard/widgets/country-widget.php:37
 #: admin/guided-setup/steps/business-info.php:60
 #: admin/settings/settings-page.php:465 includes/form/fields/address.php:102
-#: includes/functions.php:1513
+#: includes/functions.php:1546
 msgid "Country"
 msgstr ""
 
@@ -1231,12 +1231,12 @@ msgid "General Information"
 msgstr ""
 
 #: admin/contacts/search.php:148 admin/dashboard/widgets/source-pages.php:51
-#: includes/functions.php:1520
+#: includes/functions.php:1553
 msgid "Source Page"
 msgstr ""
 
 #: admin/contacts/search.php:153 admin/dashboard/widgets/lead-sources.php:51
-#: includes/functions.php:1519
+#: includes/functions.php:1552
 msgid "Lead Source"
 msgstr ""
 
@@ -1497,7 +1497,7 @@ msgstr ""
 msgid "Bulk Apply/Remove Tags"
 msgstr ""
 
-#: admin/contacts/tables/contacts-table.php:478
+#: admin/contacts/tables/contacts-table.php:486
 #, php-format
 msgctxt "action"
 msgid "Export %s contact"
@@ -1505,31 +1505,31 @@ msgid_plural "Export %s contacts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/contacts/tables/contacts-table.php:498
+#: admin/contacts/tables/contacts-table.php:506
 msgid "Quick Edit"
 msgstr ""
 
-#: admin/contacts/tables/contacts-table.php:518
+#: admin/contacts/tables/contacts-table.php:526
 msgid "Select an owner"
 msgstr ""
 
-#: admin/contacts/tables/contacts-table.php:524
+#: admin/contacts/tables/contacts-table.php:532
 msgctxt "action"
 msgid "Unsubscribe this contact."
 msgstr ""
 
-#: admin/contacts/tables/contacts-table.php:537
+#: admin/contacts/tables/contacts-table.php:545
 #: admin/funnels/funnel-editor-v2.php:179 includes/steps/funnel-step.php:680
-#: templates/preferences.php:317
+#: templates/preferences.php:338
 msgid "Cancel"
 msgstr ""
 
-#: admin/contacts/tables/contacts-table.php:540
+#: admin/contacts/tables/contacts-table.php:548
 #: admin/dashboard/widgets/funnel-breakdown.php:78
 #: admin/dashboard/widgets/region-widget.php:82
-#: admin/emails/email-editor.php:106 admin/funnels/funnel-editor-v2.php:159
-#: admin/funnels/funnel-editor.php:157 admin/sms/edit.php:47
-#: admin/superlinks/edit.php:67 admin/tags/edit.php:48
+#: admin/emails/email-editor-plain.php:59 admin/emails/email-editor.php:106
+#: admin/funnels/funnel-editor-v2.php:159 admin/funnels/funnel-editor.php:157
+#: admin/sms/edit.php:47 admin/superlinks/edit.php:67 admin/tags/edit.php:50
 msgid "Update"
 msgstr ""
 
@@ -1643,6 +1643,7 @@ msgid "Growth (%)"
 msgstr ""
 
 #: admin/dashboard/widgets/optin-status-widget.php:45
+#: admin/emails/email-editor-plain.php:88
 msgid "Status"
 msgstr ""
 
@@ -1651,7 +1652,7 @@ msgid "Unconfirmed"
 msgstr ""
 
 #: admin/dashboard/widgets/optin-status-widget.php:70
-#: templates/preferences.php:358
+#: templates/preferences.php:384
 msgid "Confirmed"
 msgstr ""
 
@@ -1660,7 +1661,7 @@ msgid "Bounced"
 msgstr ""
 
 #: admin/dashboard/widgets/optin-status-widget.php:79
-#: templates/preferences.php:335
+#: templates/preferences.php:357
 msgid "Unsubscribed"
 msgstr ""
 
@@ -1693,7 +1694,7 @@ msgstr ""
 msgid "Time Range"
 msgstr ""
 
-#: admin/dashboard/widgets/utm-campaigns.php:51 includes/functions.php:1527
+#: admin/dashboard/widgets/utm-campaigns.php:51 includes/functions.php:1560
 msgid "UTM Campaign"
 msgstr ""
 
@@ -1710,7 +1711,7 @@ msgid "My Emails"
 msgstr ""
 
 #: admin/emails/add-email.php:82 admin/emails/add-email.php:119
-#: admin/emails/add-email.php:173 admin/emails/emails-page.php:758
+#: admin/emails/add-email.php:173 admin/emails/emails-page.php:828
 msgid "Start Writing"
 msgstr ""
 
@@ -1722,11 +1723,11 @@ msgstr ""
 msgid "Type in a search term like \"Special\"..."
 msgstr ""
 
-#: admin/emails/add-email.php:114 admin/emails/emails-page.php:753
+#: admin/emails/add-email.php:114 admin/emails/emails-page.php:823
 msgid "Subject: "
 msgstr ""
 
-#: admin/emails/add-email.php:115 admin/emails/emails-page.php:754
+#: admin/emails/add-email.php:115 admin/emails/emails-page.php:824
 msgid "Pre-Header: "
 msgstr ""
 
@@ -1764,17 +1765,19 @@ msgid "Button Font"
 msgstr ""
 
 #: admin/emails/blocks/button.php:98 admin/emails/blocks/image.php:62
-#: admin/emails/email-editor.php:190
+#: admin/emails/email-editor-plain.php:121 admin/emails/email-editor.php:190
 msgid "Alignment"
 msgstr ""
 
 #: admin/emails/blocks/button.php:103 admin/emails/blocks/image.php:67
-#: admin/emails/email-editor.php:193 admin/settings/settings-page.php:766
+#: admin/emails/email-editor-plain.php:126 admin/emails/email-editor.php:193
+#: admin/settings/settings-page.php:792
 msgid "Left"
 msgstr ""
 
 #: admin/emails/blocks/button.php:104 admin/emails/blocks/image.php:68
-#: admin/emails/email-editor.php:194 admin/settings/settings-page.php:765
+#: admin/emails/email-editor-plain.php:129 admin/emails/email-editor.php:194
+#: admin/settings/settings-page.php:791
 msgid "Center"
 msgstr ""
 
@@ -1886,6 +1889,101 @@ msgid ""
 "            the font styles of your email."
 msgstr ""
 
+#: admin/emails/email-editor-plain.php:57
+msgid "Save & Preview"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:60 admin/emails/email-editor.php:107
+#: admin/sms/edit.php:48
+msgid "Update & Test"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:62 admin/emails/email-editor.php:114
+msgid "Mobile Preview"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:64
+#: admin/emails/email-editor-plain.php:76 admin/emails/email-editor.php:116
+#: admin/emails/email-editor.php:128 admin/funnels/funnel-editor-v2.php:128
+#: admin/funnels/funnel-editor.php:131 admin/welcome/welcome-page.php:274
+#: includes/modal.php:39 includes/modal.php:65
+#: includes/steps/benchmarks/form-filled.php:212 includes/utils/html.php:474
+msgid "Close"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:74 admin/emails/email-editor.php:126
+msgid "Desktop Preview"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:99
+msgid "From"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:101 admin/emails/email-editor.php:177
+#: admin/emails/emails-table.php:217
+msgid "The Contact's Owner"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:108 admin/emails/email-editor.php:179
+msgid "Choose who this email comes from."
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:110
+msgid "Reply To"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:119 admin/emails/email-editor.php:186
+msgid ""
+"Override the email address replies are sent to. Leave empty to default to "
+"the sender address."
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:132
+msgid "Additional"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:135
+msgid "Enable browser view"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:145 admin/emails/email-editor.php:200
+msgid "Save as template"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:155
+msgid "Use custom Alt-Body"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:168
+msgid "Admin Title"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:174
+msgid "Subject & Pre-Header"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:176 admin/emails/email-editor.php:293
+#: admin/emails/email-editor.php:294
+msgid "Subject Line: Used to capture the attention of the reader."
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:182 admin/emails/email-editor.php:297
+#: admin/emails/email-editor.php:298
+msgid "Pre Header Text: Used to summarize the content of the email."
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:209
+msgid "Alt-Body"
+msgstr ""
+
+#: admin/emails/email-editor-plain.php:214
+#, php-format
+msgid ""
+"Having a custom Alt-Body will improve the deliverability of your emails. %s "
+"automatically generates one for you but if you want full control over it you "
+"can define it below."
+msgstr ""
+
 #: admin/emails/email-editor.php:45
 msgid "Enter email title..."
 msgstr ""
@@ -1917,26 +2015,6 @@ msgstr ""
 msgid "Done"
 msgstr ""
 
-#: admin/emails/email-editor.php:107 admin/sms/edit.php:48
-msgid "Update & Test"
-msgstr ""
-
-#: admin/emails/email-editor.php:114
-msgid "Mobile Preview"
-msgstr ""
-
-#: admin/emails/email-editor.php:116 admin/emails/email-editor.php:128
-#: admin/funnels/funnel-editor-v2.php:128 admin/funnels/funnel-editor.php:131
-#: admin/welcome/welcome-page.php:274 includes/modal.php:39
-#: includes/modal.php:65 includes/steps/benchmarks/form-filled.php:212
-#: includes/utils/html.php:474
-msgid "Close"
-msgstr ""
-
-#: admin/emails/email-editor.php:126
-msgid "Desktop Preview"
-msgstr ""
-
 #: admin/emails/email-editor.php:169
 msgid "Email Options"
 msgstr ""
@@ -1945,27 +2023,9 @@ msgstr ""
 msgid "From:"
 msgstr ""
 
-#: admin/emails/email-editor.php:177 admin/emails/emails-table.php:217
-msgid "The Contact's Owner"
-msgstr ""
-
-#: admin/emails/email-editor.php:179
-msgid "Choose who this email comes from."
-msgstr ""
-
 #: admin/emails/email-editor.php:183
 #: includes/steps/actions/admin-notification.php:114
 msgid "Reply To:"
-msgstr ""
-
-#: admin/emails/email-editor.php:186
-msgid ""
-"Override the email address replies are sent to. Leave empty to default to "
-"the sender address."
-msgstr ""
-
-#: admin/emails/email-editor.php:200
-msgid "Save as template"
 msgstr ""
 
 #: admin/emails/email-editor.php:218
@@ -1976,14 +2036,6 @@ msgstr ""
 msgid "Blocks"
 msgstr ""
 
-#: admin/emails/email-editor.php:293 admin/emails/email-editor.php:294
-msgid "Subject Line: Used to capture the attention of the reader."
-msgstr ""
-
-#: admin/emails/email-editor.php:297 admin/emails/email-editor.php:298
-msgid "Pre Header Text: Used to summarize the content of the email."
-msgstr ""
-
 #: admin/emails/email-editor.php:338
 msgid "Use this custom Alt Body text"
 msgstr ""
@@ -1991,8 +2043,8 @@ msgstr ""
 #: admin/emails/email-editor.php:341 admin/settings/settings-page.php:494
 #: admin/settings/settings-page.php:508 admin/settings/settings-page.php:522
 #: admin/settings/settings-page.php:548 admin/settings/settings-page.php:561
-#: admin/settings/settings-page.php:609 admin/settings/settings-page.php:636
-#: admin/settings/settings-page.php:650
+#: admin/settings/settings-page.php:574 admin/settings/settings-page.php:635
+#: admin/settings/settings-page.php:662 admin/settings/settings-page.php:676
 #: includes/steps/actions/send-email.php:158
 #: includes/steps/benchmarks/form-filled.php:235
 msgid "Enable"
@@ -2002,16 +2054,16 @@ msgstr ""
 msgid "If left un-enabled an alt-body will be auto-generated."
 msgstr ""
 
-#: admin/emails/emails-page.php:76 admin/emails/emails-page.php:365
+#: admin/emails/emails-page.php:88 admin/emails/emails-page.php:397
 msgctxt "page_title"
 msgid "Emails"
 msgstr ""
 
-#: admin/emails/emails-page.php:120
+#: admin/emails/emails-page.php:114 admin/emails/emails-page.php:149
 msgid "Send test email to..."
 msgstr ""
 
-#: admin/emails/emails-page.php:162
+#: admin/emails/emails-page.php:193
 msgid ""
 "Unlike most marketing automation platforms Groundhogg made the decision to "
 "<strong>store emails globally</strong>. That means that you can use the same "
@@ -2020,14 +2072,14 @@ msgid ""
 "emails and see their respective open rates across different funnels."
 msgstr ""
 
-#: admin/emails/emails-page.php:171
+#: admin/emails/emails-page.php:202
 msgid ""
 "When you add a new email you can either select a pre-written email template "
 "created by our in house digital marketing specialists or you can select one "
 "of your own past written emails to copy."
 msgstr ""
 
-#: admin/emails/emails-page.php:179
+#: admin/emails/emails-page.php:210
 #, php-format
 msgid ""
 "When you are editing an email, you can drag in new blocks from the right "
@@ -2040,18 +2092,18 @@ msgid ""
 "for better mobile consumption."
 msgstr ""
 
-#: admin/emails/emails-page.php:181
+#: admin/emails/emails-page.php:212
 msgid ""
 "When you believe an email is ready for sending set the status to "
 "<strong>Ready</strong> and then you can use it in any broadcast or funnel. "
 "An email which is in draft mode will not be sent."
 msgstr ""
 
-#: admin/emails/emails-page.php:188
+#: admin/emails/emails-page.php:219
 msgid "Testing"
 msgstr ""
 
-#: admin/emails/emails-page.php:189
+#: admin/emails/emails-page.php:220
 msgid ""
 "To test an email simply check off the <strong>Send Test</strong> checkbox "
 "and select the user account you'd like to send the test to. For best "
@@ -2059,34 +2111,34 @@ msgid ""
 "good content. Tests will be sent regardless of the email's current status."
 msgstr ""
 
-#: admin/emails/emails-page.php:358
+#: admin/emails/emails-page.php:389
 msgctxt "page_title"
 msgid "Add Email"
 msgstr ""
 
-#: admin/emails/emails-page.php:361
+#: admin/emails/emails-page.php:393
 msgctxt "page_title"
 msgid "Edit Email"
 msgstr ""
 
-#: admin/emails/emails-page.php:383 admin/sms/sms-page.php:94
+#: admin/emails/emails-page.php:421 admin/sms/sms-page.php:94
 msgid "Broadcast"
 msgstr ""
 
-#: admin/emails/emails-page.php:403
+#: admin/emails/emails-page.php:441
 msgid "Restored"
 msgstr ""
 
-#: admin/emails/emails-page.php:405 admin/emails/emails-page.php:430
-#: admin/emails/emails-page.php:473
+#: admin/emails/emails-page.php:443 admin/emails/emails-page.php:468
+#: admin/emails/emails-page.php:511
 msgid "Emails"
 msgstr ""
 
-#: admin/emails/emails-page.php:428
+#: admin/emails/emails-page.php:466
 msgid "Deleted"
 msgstr ""
 
-#: admin/emails/emails-page.php:451
+#: admin/emails/emails-page.php:489
 #, php-format
 msgctxt "notice"
 msgid "Deleted %d email"
@@ -2094,15 +2146,15 @@ msgid_plural "Deleted %d emails"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/emails/emails-page.php:471
+#: admin/emails/emails-page.php:509
 msgid "Trashed"
 msgstr ""
 
-#: admin/emails/emails-page.php:515
+#: admin/emails/emails-page.php:571
 msgid "Emails cannot be sent while in DRAFT mode."
 msgstr ""
 
-#: admin/emails/emails-page.php:523
+#: admin/emails/emails-page.php:579
 #, php-format
 msgid ""
 "You are sending this email from an email address (%s) which does not belong "
@@ -2110,23 +2162,23 @@ msgid ""
 "reputation."
 msgstr ""
 
-#: admin/emails/emails-page.php:543
+#: admin/emails/emails-page.php:599
 msgid "Email Updated."
 msgstr ""
 
-#: admin/emails/emails-page.php:583
+#: admin/emails/emails-page.php:639
 msgid "Sent test email to"
 msgstr ""
 
-#: admin/emails/emails-page.php:634 admin/emails/emails-page.php:645
+#: admin/emails/emails-page.php:695 admin/emails/emails-page.php:706
 msgid "Could not create email."
 msgstr ""
 
-#: admin/emails/emails-page.php:664
+#: admin/emails/emails-page.php:725
 msgid "Search Emails"
 msgstr ""
 
-#: admin/emails/emails-page.php:744
+#: admin/emails/emails-page.php:814
 msgctxt "notice"
 msgid "Sorry, no emails were found."
 msgstr ""
@@ -2402,7 +2454,7 @@ msgid "Copy share link"
 msgstr ""
 
 #: admin/funnels/funnel-editor-v2.php:144 admin/funnels/funnel-editor.php:143
-#: admin/tools/exports-table.php:250 admin/tools/tools-page.php:160
+#: admin/tools/exports-table.php:250 admin/tools/tools-page.php:163
 msgid "Export"
 msgstr ""
 
@@ -2639,19 +2691,19 @@ msgstr[1] ""
 msgid "Search Funnels"
 msgstr ""
 
-#: admin/funnels/funnels-page.php:1113 includes/license-manager.php:406
+#: admin/funnels/funnels-page.php:1113 includes/license-manager.php:408
 #, php-format
 msgctxt "action"
 msgid "Buy Now ($%s - $%s)"
 msgstr ""
 
-#: admin/funnels/funnels-page.php:1122 includes/license-manager.php:415
+#: admin/funnels/funnels-page.php:1122 includes/license-manager.php:417
 #, php-format
 msgctxt "action"
 msgid "Buy Now ($%s)"
 msgstr ""
 
-#: admin/funnels/funnels-page.php:1127 includes/license-manager.php:420
+#: admin/funnels/funnels-page.php:1127 includes/license-manager.php:422
 msgctxt "action"
 msgid "Download"
 msgstr ""
@@ -2733,7 +2785,7 @@ msgid "Updated"
 msgstr ""
 
 #: admin/funnels/funnels-table.php:234 admin/funnels/funnels-table.php:253
-#: includes/functions.php:1762
+#: includes/functions.php:1817
 #, php-format
 msgctxt "status"
 msgid "%s ago"
@@ -2857,27 +2909,27 @@ msgid ""
 "your business within the law."
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:21
+#: admin/guided-setup/steps/email.php:20
 msgctxt "guided_setup"
 msgid "Sending Email"
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:32
+#: admin/guided-setup/steps/email.php:29
 msgctxt "guided_setup"
 msgid "See below to setup the Groundhogg Sending Service."
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:34
+#: admin/guided-setup/steps/email.php:31
 msgctxt "guided_setup"
 msgid ""
 "There are different ways to send email with Groundhogg! Choose one below."
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:44
+#: admin/guided-setup/steps/email.php:40
 msgid "Send Email & SMS With The Groundhogg Sending Service!"
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:46
+#: admin/guided-setup/steps/email.php:43
 msgctxt "guided_setup"
 msgid ""
 "You can send your emails <b>and text messages</b> using our Groundhogg "
@@ -2885,43 +2937,47 @@ msgid ""
 "Get your <b>first 1000 credits free!</b>"
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:47
+#: admin/guided-setup/steps/email.php:45
 msgctxt "guided_setup"
 msgid "Learn more..."
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:50
+#: admin/guided-setup/steps/email.php:49
 msgctxt "guided_setup"
 msgid "Already have an account? Connect & Activate!"
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:51
+#: admin/guided-setup/steps/email.php:50
 msgctxt "guided_setup"
 msgid "Don't have an account? Sign Up Now!"
 msgstr ""
 
 #: admin/guided-setup/steps/email.php:61
+msgid "Premium"
+msgstr ""
+
+#: admin/guided-setup/steps/email.php:83
 msgid "Alternatives"
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:64
+#: admin/guided-setup/steps/email.php:87
 msgctxt "guided_setup"
 msgid ""
 "You can send your emails using an <b>SMTP Service</b> using an SMTP plugin "
 "like WP Mail SMTP. This is recommended if you do not use our service."
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:66
+#: admin/guided-setup/steps/email.php:90
 msgctxt "guided_setup"
 msgid "Get WP Mail SMTP"
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:67 admin/guided-setup/steps/email.php:75
+#: admin/guided-setup/steps/email.php:92 admin/guided-setup/steps/email.php:104
 msgctxt "guided_setup"
 msgid "Browse Others..."
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:72
+#: admin/guided-setup/steps/email.php:99
 msgctxt "guided_setup"
 msgid ""
 "You can send your emails using <b>Amazon SES</b> which is very cost "
@@ -2929,7 +2985,7 @@ msgid ""
 "difficult to setup."
 msgstr ""
 
-#: admin/guided-setup/steps/email.php:74
+#: admin/guided-setup/steps/email.php:102
 msgctxt "guided_setup"
 msgid "Get WP SES"
 msgstr ""
@@ -3373,10 +3429,22 @@ msgstr ""
 
 #: admin/settings/settings-page.php:570
 msgctxt "settings"
-msgid "Disable page view tracking script"
+msgid "Enable the plain email editor."
 msgstr ""
 
 #: admin/settings/settings-page.php:571
+msgctxt "settings"
+msgid ""
+"This will enable the plain email editor which utilizes the basic WP editor "
+"instead of the block builder."
+msgstr ""
+
+#: admin/settings/settings-page.php:583
+msgctxt "settings"
+msgid "Disable page view tracking script"
+msgstr ""
+
+#: admin/settings/settings-page.php:584
 msgctxt "settings"
 msgid ""
 "This will disable the page view tracking script that loads on every page if "
@@ -3384,201 +3452,215 @@ msgid ""
 "benchmark to no longer work."
 msgstr ""
 
-#: admin/settings/settings-page.php:574 admin/settings/settings-page.php:825
+#: admin/settings/settings-page.php:587 admin/settings/settings-page.php:600
+#: admin/settings/settings-page.php:851
 msgid "Disable"
 msgstr ""
 
-#: admin/settings/settings-page.php:583 includes/classes/email.php:475
+#: admin/settings/settings-page.php:596
+msgctxt "settings"
+msgid "Disable logged in user tracking precedence."
+msgstr ""
+
+#: admin/settings/settings-page.php:597
+msgctxt "settings"
+msgid ""
+"By default, Groundhogg will always show info of a logged in user before "
+"referencing information from tracking links or forms. You can disable this "
+"behaviour with this option."
+msgstr ""
+
+#: admin/settings/settings-page.php:609 includes/classes/email.php:485
 #: templates/managed-page.php:148
 msgid "Privacy Policy"
 msgstr ""
 
-#: admin/settings/settings-page.php:584
+#: admin/settings/settings-page.php:610
 msgctxt "settings"
 msgid "Link to your privacy policy."
 msgstr ""
 
-#: admin/settings/settings-page.php:594
+#: admin/settings/settings-page.php:620
 msgctxt "settings"
 msgid "Terms & Conditions (Terms of Service)"
 msgstr ""
 
-#: admin/settings/settings-page.php:595
+#: admin/settings/settings-page.php:621
 msgctxt "settings"
 msgid "Link to your terms & conditions."
 msgstr ""
 
-#: admin/settings/settings-page.php:605
+#: admin/settings/settings-page.php:631
 msgctxt "settings"
 msgid "Only send to confirmed emails."
 msgstr ""
 
-#: admin/settings/settings-page.php:606
+#: admin/settings/settings-page.php:632
 msgctxt "settings"
 msgid ""
 "This will stop emails being sent to contacts who do not have confirmed "
 "emails outside of the below grace period."
 msgstr ""
 
-#: admin/settings/settings-page.php:619
+#: admin/settings/settings-page.php:645
 msgctxt "settings"
 msgid "Email confirmation grace Period"
 msgstr ""
 
-#: admin/settings/settings-page.php:620
+#: admin/settings/settings-page.php:646
 msgctxt "settings"
 msgid ""
 "The number of days for which you can send an email to a contact after they "
 "are created but their email has not been confirmed. The default is 14 days."
 msgstr ""
 
-#: admin/settings/settings-page.php:632
+#: admin/settings/settings-page.php:658
 msgctxt "settings"
 msgid "Enable GDPR features."
 msgstr ""
 
-#: admin/settings/settings-page.php:633
+#: admin/settings/settings-page.php:659
 msgctxt "settings"
 msgid ""
 "This will add a consent box to your forms as well as a \"Delete Everything\" "
 "Button to your email preferences page."
 msgstr ""
 
-#: admin/settings/settings-page.php:646
+#: admin/settings/settings-page.php:672
 msgctxt "settings"
 msgid "Do not send email without consent."
 msgstr ""
 
-#: admin/settings/settings-page.php:647
+#: admin/settings/settings-page.php:673
 msgctxt "settings"
 msgid ""
 "This will prevent your system from sending emails to contacts for which you "
 "do not have explicit consent. Only works if GDPR features are enabled."
 msgstr ""
 
-#: admin/settings/settings-page.php:660
+#: admin/settings/settings-page.php:686
 msgctxt "settings"
 msgid "Recaptcha Site Key"
 msgstr ""
 
-#: admin/settings/settings-page.php:661
+#: admin/settings/settings-page.php:687
 msgctxt "settings"
 msgid "This is the key which faces the users on the front-end"
 msgstr ""
 
-#: admin/settings/settings-page.php:671
+#: admin/settings/settings-page.php:697
 msgctxt "settings"
 msgid "Recaptcha Secret Key"
 msgstr ""
 
-#: admin/settings/settings-page.php:672
+#: admin/settings/settings-page.php:698
 msgctxt "settings"
 msgid "Never ever ever share this with anyone!"
 msgstr ""
 
-#: admin/settings/settings-page.php:682
+#: admin/settings/settings-page.php:708
 msgctxt "settings"
 msgid "Bounce Inbox"
 msgstr ""
 
-#: admin/settings/settings-page.php:683
+#: admin/settings/settings-page.php:709
 msgctxt "settings"
 msgid "This is the inbox which emails will be sent to."
 msgstr ""
 
-#: admin/settings/settings-page.php:696
+#: admin/settings/settings-page.php:722
 msgctxt "settings"
 msgid "Bounce Inbox Password"
 msgstr ""
 
-#: admin/settings/settings-page.php:697
+#: admin/settings/settings-page.php:723
 msgctxt "settings"
 msgid "This password to access the inbox."
 msgstr ""
 
-#: admin/settings/settings-page.php:707
+#: admin/settings/settings-page.php:733
 msgctxt "settings"
 msgid "Mail Server"
 msgstr ""
 
-#: admin/settings/settings-page.php:708
+#: admin/settings/settings-page.php:734
 msgctxt "settings"
 msgid ""
 "This is the domain your email inbox is hosted. Most likely mail.yourdomain."
 "com"
 msgstr ""
 
-#: admin/settings/settings-page.php:720
+#: admin/settings/settings-page.php:746
 msgctxt "settings"
 msgid "IMAP Port"
 msgstr ""
 
-#: admin/settings/settings-page.php:721
+#: admin/settings/settings-page.php:747
 msgctxt "settings"
 msgid ""
 "The bounce checker requires an IMAP connection. Most IMAP ports are 993."
 msgstr ""
 
-#: admin/settings/settings-page.php:733
+#: admin/settings/settings-page.php:759
 msgctxt "settings"
 msgid "Default From Name"
 msgstr ""
 
-#: admin/settings/settings-page.php:734
+#: admin/settings/settings-page.php:760
 msgctxt "settings"
 msgid "Override the default wp_mail from name."
 msgstr ""
 
-#: admin/settings/settings-page.php:745
+#: admin/settings/settings-page.php:771
 msgctxt "settings"
 msgid "Default From Email"
 msgstr ""
 
-#: admin/settings/settings-page.php:746
+#: admin/settings/settings-page.php:772
 msgctxt "settings"
 msgid "Override the default wp_mail from email."
 msgstr ""
 
-#: admin/settings/settings-page.php:758
+#: admin/settings/settings-page.php:784
 msgctxt "settings"
 msgid "Email Footer Alignment"
 msgstr ""
 
-#: admin/settings/settings-page.php:759
+#: admin/settings/settings-page.php:785
 msgctxt "settings"
 msgid "The alignment of the email footer in all emails."
 msgstr ""
 
-#: admin/settings/settings-page.php:774
+#: admin/settings/settings-page.php:800
 msgctxt "settings"
 msgid "Custom Footer Text"
 msgstr ""
 
-#: admin/settings/settings-page.php:775
+#: admin/settings/settings-page.php:801
 msgctxt "settings"
 msgid ""
 "Text that will appear before the footer in every email. Accepts HTML and "
 "plain text."
 msgstr ""
 
-#: admin/settings/settings-page.php:783
+#: admin/settings/settings-page.php:809
 msgctxt "settings"
 msgid "Email & SMS Service Token"
 msgstr ""
 
-#: admin/settings/settings-page.php:784
+#: admin/settings/settings-page.php:810
 msgctxt "settings"
 msgid ""
 "Get this key from your <a target=\"_blank\" href=\"https://www.groundhogg.io/"
 "account/manage/\">Groundhogg Account Page.</a>"
 msgstr ""
 
-#: admin/settings/settings-page.php:795
+#: admin/settings/settings-page.php:821
 msgctxt "settings"
 msgid "Send Email With Groundhogg"
 msgstr ""
 
-#: admin/settings/settings-page.php:796
+#: admin/settings/settings-page.php:822
 msgctxt "settings"
 msgid ""
 "Send email using the Groundhogg Sending Service! This will only be used by "
@@ -3586,16 +3668,16 @@ msgid ""
 "to send SMS if this is disabled."
 msgstr ""
 
-#: admin/settings/settings-page.php:799 admin/settings/settings-page.php:812
+#: admin/settings/settings-page.php:825 admin/settings/settings-page.php:838
 msgid "Enable (Recommended)"
 msgstr ""
 
-#: admin/settings/settings-page.php:808
+#: admin/settings/settings-page.php:834
 msgctxt "settings"
 msgid "Send Transactional Email With Groundhogg"
 msgstr ""
 
-#: admin/settings/settings-page.php:809
+#: admin/settings/settings-page.php:835
 msgctxt "settings"
 msgid ""
 "By default, regular WP email such as password reset emails are sent through "
@@ -3604,115 +3686,115 @@ msgid ""
 "the Groundhogg Sending Service as well. "
 msgstr ""
 
-#: admin/settings/settings-page.php:821
+#: admin/settings/settings-page.php:847
 #, php-format
 msgctxt "settings"
 msgid "Disable the %s API"
 msgstr ""
 
-#: admin/settings/settings-page.php:822
+#: admin/settings/settings-page.php:848
 msgctxt "settings"
 msgid ""
 "Disabling the API will prevent other platforms from accessing information on "
 "this site. Functionality in some extensions may be affected as well."
 msgstr ""
 
-#: admin/settings/settings-page.php:834
+#: admin/settings/settings-page.php:860
 msgctxt "settings"
 msgid "Confirmed Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:835
+#: admin/settings/settings-page.php:861
 msgctxt "settings"
 msgid "All confirmed contacts will have this tag."
 msgstr ""
 
-#: admin/settings/settings-page.php:846
+#: admin/settings/settings-page.php:872
 msgctxt "settings"
 msgid "Unconfirmed Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:847
+#: admin/settings/settings-page.php:873
 msgctxt "settings"
 msgid "All unconfirmed contacts will have this tag."
 msgstr ""
 
-#: admin/settings/settings-page.php:858
+#: admin/settings/settings-page.php:884
 msgctxt "settings"
 msgid "Unsubscribed Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:859
+#: admin/settings/settings-page.php:885
 msgctxt "settings"
 msgid "All unsubscribed contacts will have this tag."
 msgstr ""
 
-#: admin/settings/settings-page.php:870
+#: admin/settings/settings-page.php:896
 msgctxt "settings"
 msgid "Spam Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:871
+#: admin/settings/settings-page.php:897
 msgctxt "settings"
 msgid "All contacts which are marked as spam will have this tag."
 msgstr ""
 
-#: admin/settings/settings-page.php:882
+#: admin/settings/settings-page.php:908
 msgctxt "settings"
 msgid "Bounced Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:883
+#: admin/settings/settings-page.php:909
 msgctxt "settings"
 msgid "All contacts which have bounced will have this tag."
 msgstr ""
 
-#: admin/settings/settings-page.php:894
+#: admin/settings/settings-page.php:920
 msgctxt "settings"
 msgid "Complained Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:895
+#: admin/settings/settings-page.php:921
 msgctxt "settings"
 msgid "All contacts which have complained will have this tag."
 msgstr ""
 
-#: admin/settings/settings-page.php:906
+#: admin/settings/settings-page.php:932
 msgctxt "settings"
 msgid "Subscribed Monthly Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:907
+#: admin/settings/settings-page.php:933
 msgctxt "settings"
 msgid "All contacts which have requested monthly emails will have this tag."
 msgstr ""
 
-#: admin/settings/settings-page.php:918
+#: admin/settings/settings-page.php:944
 msgctxt "settings"
 msgid "Subscribed Weekly Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:919
+#: admin/settings/settings-page.php:945
 msgctxt "settings"
 msgid "All contacts which have requested weekly emails will have this tag."
 msgstr ""
 
-#: admin/settings/settings-page.php:930
+#: admin/settings/settings-page.php:956
 msgctxt "settings"
 msgid "Marketable Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:931
+#: admin/settings/settings-page.php:957
 msgctxt "settings"
 msgid "All contacts which are considered marketable will have this tag."
 msgstr ""
 
-#: admin/settings/settings-page.php:942
+#: admin/settings/settings-page.php:968
 msgctxt "settings"
 msgid "Non Marketable Tag"
 msgstr ""
 
-#: admin/settings/settings-page.php:943
+#: admin/settings/settings-page.php:969
 msgctxt "settings"
 msgid "All contacts which are considered unmarketable will have this tag."
 msgstr ""
@@ -3912,32 +3994,32 @@ msgctxt "Column label"
 msgid "Target Url"
 msgstr ""
 
-#: admin/tags/edit.php:36
+#: admin/tags/edit.php:37
 msgid "A descriptive name of the tag so you remember what it means"
 msgstr ""
 
-#: admin/tags/edit.php:40 admin/tags/tags-page.php:223
+#: admin/tags/edit.php:41 admin/tags/tags-page.php:232
 #: includes/replacements.php:406
 msgid "Description"
 msgstr ""
 
-#: admin/tags/edit.php:42 admin/tags/tags-page.php:225
+#: admin/tags/edit.php:43 admin/tags/tags-page.php:234
 msgid ""
 "Tag descriptions are only visible to admins and will never be seen by "
 "contacts."
 msgstr ""
 
-#: admin/tags/tags-page.php:48
+#: admin/tags/tags-page.php:49
 msgctxt "page_title"
 msgid "Tags"
 msgstr ""
 
-#: admin/tags/tags-page.php:78
+#: admin/tags/tags-page.php:79
 msgctxt "page_title"
 msgid "Edit Tag"
 msgstr ""
 
-#: admin/tags/tags-page.php:112
+#: admin/tags/tags-page.php:115
 #, php-format
 msgctxt "notice"
 msgid "%d tag created"
@@ -3945,21 +4027,21 @@ msgid_plural "%d tags created"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/tags/tags-page.php:128
+#: admin/tags/tags-page.php:133
 msgctxt "notice"
 msgid "Tag created!"
 msgstr ""
 
-#: admin/tags/tags-page.php:155
+#: admin/tags/tags-page.php:162
 msgctxt "notice"
 msgid "Tag updated."
 msgstr ""
 
-#: admin/tags/tags-page.php:168
+#: admin/tags/tags-page.php:177
 msgid "Tag associations reset."
 msgstr ""
 
-#: admin/tags/tags-page.php:191
+#: admin/tags/tags-page.php:200
 #, php-format
 msgctxt "notice"
 msgid "%d tag deleted"
@@ -3967,35 +4049,35 @@ msgid_plural "%d tags deleted"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/tags/tags-page.php:206
+#: admin/tags/tags-page.php:215
 msgid "Search Tags"
 msgstr ""
 
-#: admin/tags/tags-page.php:213
+#: admin/tags/tags-page.php:222
 msgid "Add New Tag"
 msgstr ""
 
-#: admin/tags/tags-page.php:218
+#: admin/tags/tags-page.php:227
 msgid "Tag Name"
 msgstr ""
 
-#: admin/tags/tags-page.php:220
+#: admin/tags/tags-page.php:229
 msgid "Name a tag something simple so you do not forget it."
 msgstr ""
 
-#: admin/tags/tags-page.php:228
+#: admin/tags/tags-page.php:237
 msgid "Bulk Add Tags"
 msgstr ""
 
-#: admin/tags/tags-page.php:230
+#: admin/tags/tags-page.php:239
 msgid "Enter 1 tag per line."
 msgstr ""
 
-#: admin/tags/tags-page.php:234
+#: admin/tags/tags-page.php:243
 msgid "Add tags in bulk?"
 msgstr ""
 
-#: admin/tags/tags-page.php:252
+#: admin/tags/tags-page.php:264
 msgctxt "action"
 msgid "Add New Tag"
 msgstr ""
@@ -4056,168 +4138,202 @@ msgstr ""
 msgid "Delete Import"
 msgstr ""
 
-#: admin/tools/map-import.php:46
+#: admin/tools/map-import.php:52
 msgid "Map Contact Fields"
 msgstr ""
 
-#: admin/tools/map-import.php:47
+#: admin/tools/map-import.php:53
 msgid "Map your CSV columns to the contact records fields below."
 msgstr ""
 
-#: admin/tools/map-import.php:54
+#: admin/tools/map-import.php:69
+msgid "&larr; Prev"
+msgstr ""
+
+#: admin/tools/map-import.php:74
+msgid "Next &rarr;"
+msgstr ""
+
+#: admin/tools/map-import.php:84
 msgid "Column Label"
 msgstr ""
 
-#: admin/tools/map-import.php:55
+#: admin/tools/map-import.php:85
 msgid "Example Data / Contact Record Field"
 msgstr ""
 
-#: admin/tools/map-import.php:89
+#: admin/tools/map-import.php:119
 msgid "Add additional tags to this import"
 msgstr ""
 
-#: admin/tools/map-import.php:93
+#: admin/tools/map-import.php:123
 msgid "I have previously confirmed these email addresses."
 msgstr ""
 
-#: admin/tools/map-import.php:95 includes/steps/benchmarks/form-filled.php:488
+#: admin/tools/map-import.php:125 includes/steps/benchmarks/form-filled.php:488
 #: includes/steps/benchmarks/form-filled.php:570
 msgid "Yes"
 msgstr ""
 
-#: admin/tools/map-import.php:107
+#: admin/tools/map-import.php:137
 msgid "Import Contacts"
 msgstr ""
 
-#: admin/tools/tools-page.php:97
+#: admin/tools/tools-page.php:100
 msgid "Tools"
 msgstr ""
 
-#: admin/tools/tools-page.php:133
+#: admin/tools/tools-page.php:136
 msgid "Import New List"
 msgstr ""
 
-#: admin/tools/tools-page.php:140
+#: admin/tools/tools-page.php:143
 msgid "Export All Contacts"
 msgstr ""
 
-#: admin/tools/tools-page.php:152
-msgid "System Info"
+#: admin/tools/tools-page.php:155
+msgid "System Info & Debug"
 msgstr ""
 
-#: admin/tools/tools-page.php:164 admin/tools/tools-page.php:224
+#: admin/tools/tools-page.php:167 admin/tools/tools-page.php:271
 msgid "Sync Users & Contacts"
 msgstr ""
 
-#: admin/tools/tools-page.php:168 admin/tools/tools-page.php:271
+#: admin/tools/tools-page.php:171 admin/tools/tools-page.php:318
 msgid "Create Users"
 msgstr ""
 
-#: admin/tools/tools-page.php:172
+#: admin/tools/tools-page.php:175
 msgid "Bulk Delete Contacts"
 msgstr ""
 
-#: admin/tools/tools-page.php:176
+#: admin/tools/tools-page.php:179
 msgid "Updates"
 msgstr ""
 
-#: admin/tools/tools-page.php:180
+#: admin/tools/tools-page.php:183
 msgid "Install"
 msgstr ""
 
-#: admin/tools/tools-page.php:200 admin/tools/tools-page.php:208
+#: admin/tools/tools-page.php:203 admin/tools/tools-page.php:211
 msgid "Download System Info"
 msgstr ""
 
-#: admin/tools/tools-page.php:202
+#: admin/tools/tools-page.php:205
 msgid "Download System Info when requesting support."
 msgstr ""
 
-#: admin/tools/tools-page.php:232
+#: admin/tools/tools-page.php:216
+msgid "Safe Mode"
+msgstr ""
+
+#: admin/tools/tools-page.php:218
+#, php-format
+msgid ""
+"Safe mode will disable any non %s related plugins for debugging purposes."
+msgstr ""
+
+#: admin/tools/tools-page.php:227
+msgid "Enable Safe Mode"
+msgstr ""
+
+#: admin/tools/tools-page.php:234 includes/tools.php:447
+msgid "Disable Safe Mode"
+msgstr ""
+
+#: admin/tools/tools-page.php:252
+msgid "Safe mode has been enabled."
+msgstr ""
+
+#: admin/tools/tools-page.php:259
+msgid "Safe mode has been disabled."
+msgstr ""
+
+#: admin/tools/tools-page.php:279
 msgid ""
 "The sync process will create new contact records for all users in the "
 "database. If a contact records already exists then the association will be "
 "updated."
 msgstr ""
 
-#: admin/tools/tools-page.php:235
+#: admin/tools/tools-page.php:282
 msgid "Sync all user meta."
 msgstr ""
 
-#: admin/tools/tools-page.php:242
+#: admin/tools/tools-page.php:289
 msgctxt "action"
 msgid "Start Sync Process"
 msgstr ""
 
-#: admin/tools/tools-page.php:281
+#: admin/tools/tools-page.php:328
 msgid "Select contacts to create accounts for."
 msgstr ""
 
-#: admin/tools/tools-page.php:289
+#: admin/tools/tools-page.php:336
 msgid "Exclude these contacts."
 msgstr ""
 
-#: admin/tools/tools-page.php:297
+#: admin/tools/tools-page.php:344
 msgid "Choose role."
 msgstr ""
 
-#: admin/tools/tools-page.php:309
+#: admin/tools/tools-page.php:356
 msgid "Send email notification to user."
 msgstr ""
 
-#: admin/tools/tools-page.php:315
+#: admin/tools/tools-page.php:362
 msgid "Much slower"
 msgstr ""
 
-#: admin/tools/tools-page.php:321
+#: admin/tools/tools-page.php:368
 msgctxt "action"
 msgid "Create Users"
 msgstr ""
 
-#: admin/tools/tools-page.php:453
+#: admin/tools/tools-page.php:500
 msgctxt "error"
 msgid "Could not upload file."
 msgstr ""
 
-#: admin/tools/tools-page.php:536
+#: admin/tools/tools-page.php:583
 msgid "Imports deleted."
 msgstr ""
 
-#: admin/tools/tools-page.php:573
+#: admin/tools/tools-page.php:620
 msgid "Exports deleted."
 msgstr ""
 
-#: admin/tools/tools-page.php:584
+#: admin/tools/tools-page.php:631
 msgid "Previous Updates"
 msgstr ""
 
-#: admin/tools/tools-page.php:586
+#: admin/tools/tools-page.php:633
 msgid "Run previous update paths in case of a failed update."
 msgstr ""
 
-#: admin/tools/tools-page.php:605
+#: admin/tools/tools-page.php:652
 msgid "Install Help"
 msgstr ""
 
-#: admin/tools/tools-page.php:607
+#: admin/tools/tools-page.php:654
 msgid ""
 "In the event there were installation issues you can run the install process "
 "from here."
 msgstr ""
 
-#: admin/tools/tools-page.php:624
+#: admin/tools/tools-page.php:671
 msgid "&#9888; There is no going back once the deletion process has started."
 msgstr ""
 
-#: admin/tools/tools-page.php:634
+#: admin/tools/tools-page.php:681
 msgid "Delete Contacts in Bulk by Tag"
 msgstr ""
 
-#: admin/tools/tools-page.php:644
+#: admin/tools/tools-page.php:691
 msgid "Once you click the delete button there is no going back!"
 msgstr ""
 
-#: admin/tools/tools-page.php:648
+#: admin/tools/tools-page.php:695
 msgctxt "action"
 msgid "Delete Contacts"
 msgstr ""
@@ -4674,29 +4790,29 @@ msgstr ""
 msgid "Unable to upload file."
 msgstr ""
 
-#: includes/classes/email.php:369
+#: includes/classes/email.php:373
 #, php-format
 msgid "[TEST] %s"
 msgstr ""
 
-#: includes/classes/email.php:483 includes/steps/benchmarks/form-filled.php:333
+#: includes/classes/email.php:493 includes/steps/benchmarks/form-filled.php:333
 msgid "Terms"
 msgstr ""
 
-#: includes/classes/email.php:728
+#: includes/classes/email.php:738
 #, php-format
 msgid "Emails cannot be sent in %s mode."
 msgstr ""
 
-#: includes/classes/email.php:734 includes/classes/sms.php:96
+#: includes/classes/email.php:744 includes/classes/sms.php:96
 msgid "No valid recipient was provided."
 msgstr ""
 
-#: includes/classes/email.php:746
+#: includes/classes/email.php:756
 msgid "Contact is not marketable."
 msgstr ""
 
-#: includes/classes/email.php:844
+#: includes/classes/email.php:853
 #, php-format
 msgid ""
 "Email failed to send.\n"
@@ -4747,14 +4863,14 @@ msgstr ""
 msgid "Activate"
 msgstr ""
 
-#: includes/filters.php:128
+#: includes/filters.php:206
 #, php-format
 msgid ""
 " | Like Groundhogg? <a target=\"_blank\" href=\"%s\">Leave a Review</a>!</"
 "span>"
 msgstr ""
 
-#: includes/filters.php:128
+#: includes/filters.php:206
 msgid "https://wordpress.org/support/plugin/groundhogg/reviews/#new-post"
 msgstr ""
 
@@ -4873,7 +4989,7 @@ msgid "Failed reCaptcha verification. You are probably a robot."
 msgstr ""
 
 #: includes/form/fields/submit.php:15
-#: includes/steps/benchmarks/form-filled.php:377 templates/preferences.php:149
+#: includes/steps/benchmarks/form-filled.php:377 templates/preferences.php:153
 msgid "Submit"
 msgstr ""
 
@@ -4925,105 +5041,105 @@ msgctxt "notice"
 msgid "Form submitted"
 msgstr ""
 
-#: includes/functions.php:1131
+#: includes/functions.php:1149
 msgid "Could not create contact."
 msgstr ""
 
-#: includes/functions.php:1497
+#: includes/functions.php:1530
 msgid "Full Name"
 msgstr ""
 
-#: includes/functions.php:1500
+#: includes/functions.php:1533
 msgid "Email Address"
 msgstr ""
 
-#: includes/functions.php:1501
+#: includes/functions.php:1534
 msgid "Optin Status"
 msgstr ""
 
-#: includes/functions.php:1502
+#: includes/functions.php:1535
 msgid "User Id"
 msgstr ""
 
-#: includes/functions.php:1503
+#: includes/functions.php:1536
 msgid "Owner Id"
 msgstr ""
 
-#: includes/functions.php:1504
+#: includes/functions.php:1537
 msgid "Date Created"
 msgstr ""
 
-#: includes/functions.php:1505 includes/steps/benchmarks/form-filled.php:325
+#: includes/functions.php:1538 includes/steps/benchmarks/form-filled.php:325
 msgid "Birthday"
 msgstr ""
 
-#: includes/functions.php:1507
+#: includes/functions.php:1540
 msgid "Phone Number Extension"
 msgstr ""
 
-#: includes/functions.php:1511
+#: includes/functions.php:1544
 msgid "Postal/Zip"
 msgstr ""
 
-#: includes/functions.php:1512
+#: includes/functions.php:1545
 msgid "Province/State/Region"
 msgstr ""
 
-#: includes/functions.php:1515
+#: includes/functions.php:1548
 msgid "Full Company Address"
 msgstr ""
 
-#: includes/functions.php:1517
+#: includes/functions.php:1550
 msgid "Time Zone"
 msgstr ""
 
-#: includes/functions.php:1518
+#: includes/functions.php:1551
 msgid "IP Address"
 msgstr ""
 
-#: includes/functions.php:1521
+#: includes/functions.php:1554
 msgid "Terms Agreement"
 msgstr ""
 
-#: includes/functions.php:1523
+#: includes/functions.php:1556
 msgid "Add To Notes"
 msgstr ""
 
-#: includes/functions.php:1524
+#: includes/functions.php:1557
 msgid "Apply Value as Tag"
 msgstr ""
 
-#: includes/functions.php:1525
+#: includes/functions.php:1558
 msgid "Add as Custom Meta"
 msgstr ""
 
-#: includes/functions.php:1526
+#: includes/functions.php:1559
 msgid "Upload File"
 msgstr ""
 
-#: includes/functions.php:1528
+#: includes/functions.php:1561
 msgid "UTM Content"
 msgstr ""
 
-#: includes/functions.php:1529
+#: includes/functions.php:1562
 msgid "UTM Medium"
 msgstr ""
 
-#: includes/functions.php:1530
+#: includes/functions.php:1563
 msgid "UTM Term"
 msgstr ""
 
-#: includes/functions.php:1531
+#: includes/functions.php:1564
 msgid "UTM Source"
 msgstr ""
 
-#: includes/functions.php:1760
+#: includes/functions.php:1815
 #, php-format
 msgctxt "status"
 msgid "on %s"
 msgstr ""
 
-#: includes/functions.php:1762
+#: includes/functions.php:1817
 #, php-format
 msgctxt "status"
 msgid "in %s"
@@ -6417,8 +6533,8 @@ msgid "Map Fields"
 msgstr ""
 
 #: includes/steps/benchmarks/form-integration.php:77
-#: includes/utils/html.php:497 templates/preferences.php:228
-#: templates/preferences.php:316
+#: includes/utils/html.php:497 templates/preferences.php:235
+#: templates/preferences.php:336
 msgid "Save Changes"
 msgstr ""
 
@@ -6655,6 +6771,11 @@ msgstr ""
 msgid "Inexistent tags."
 msgstr ""
 
+#: includes/tools.php:447
+#, php-format
+msgid "%s safe mode is currently enabled. All other plugins are inactive. %s"
+msgstr ""
+
 #: includes/upgrade-notice.php:28
 #, php-format
 msgid ""
@@ -6722,25 +6843,25 @@ msgstr ""
 msgid "Start typing..."
 msgstr ""
 
-#: includes/utils/installer.php:43
+#: includes/utils/installer.php:48
 msgid "Run Install"
 msgstr ""
 
-#: includes/utils/installer.php:61
+#: includes/utils/installer.php:66
 msgid "Re-installed successful!"
 msgstr ""
 
-#: includes/utils/updater.php:90
+#: includes/utils/updater.php:94
 #, php-format
 msgid "Version %s"
 msgstr ""
 
-#: includes/utils/updater.php:110
+#: includes/utils/updater.php:114
 #, php-format
 msgid "Update to version %s successful!"
 msgstr ""
 
-#: includes/utils/updater.php:112
+#: includes/utils/updater.php:116
 msgid "Update failed."
 msgstr ""
 
@@ -6964,7 +7085,7 @@ msgstr ""
 msgid "%1$s &lsaquo; %2$s"
 msgstr ""
 
-#: templates/emails/header-default.php:131
+#: templates/emails/header-default.php:144
 msgid "View In Browser..."
 msgstr ""
 
@@ -6983,167 +7104,163 @@ msgstr ""
 msgid "Edit Profile"
 msgstr ""
 
-#: templates/preferences.php:59
+#: templates/preferences.php:62
 msgid ""
 "You are receiving this message because you have requested an audit of your "
 "personal information. This message contains all current information about "
 "your contact profile.\n"
 msgstr ""
 
-#: templates/preferences.php:64
+#: templates/preferences.php:67
 msgid "Basic Information"
 msgstr ""
 
-#: templates/preferences.php:72
+#: templates/preferences.php:75
 msgid "Other Information"
 msgstr ""
 
-#: templates/preferences.php:80
+#: templates/preferences.php:83
 msgid "Profile Tags"
 msgstr ""
 
-#: templates/preferences.php:93
+#: templates/preferences.php:96
 msgid "Files"
 msgstr ""
 
-#: templates/preferences.php:100
+#: templates/preferences.php:103
 #, php-format
 msgid "Your personal profile audit with %s"
 msgstr ""
 
-#: templates/preferences.php:141 templates/preferences.php:288
+#: templates/preferences.php:144 templates/preferences.php:303
 msgid "Manage Preferences"
 msgstr ""
 
-#: templates/preferences.php:146
+#: templates/preferences.php:149
 msgid "Please enter your email address to manage your preferences."
 msgstr ""
 
-#: templates/preferences.php:147
+#: templates/preferences.php:151
 msgid "your.name@domain.com"
 msgstr ""
 
-#: templates/preferences.php:161
+#: templates/preferences.php:165
 #, php-format
 msgid "Profile information sent to your inbox %s!"
 msgstr ""
 
-#: templates/preferences.php:171
+#: templates/preferences.php:175
 msgid "Something went wrong sending your email."
 msgstr ""
 
-#: templates/preferences.php:185
+#: templates/preferences.php:189
 msgid "You must verify your email address."
 msgstr ""
 
-#: templates/preferences.php:197
+#: templates/preferences.php:201
 msgid "Profile updated!"
 msgstr ""
 
-#: templates/preferences.php:204
+#: templates/preferences.php:208
 msgid "Update Profile"
 msgstr ""
 
-#: templates/preferences.php:208
+#: templates/preferences.php:213
 #, php-format
 msgid "Update information for %s (%s)."
 msgstr ""
 
-#: templates/preferences.php:209
+#: templates/preferences.php:215
 msgid "Use the form below to update your information to the most current."
 msgstr ""
 
-#: templates/preferences.php:222
+#: templates/preferences.php:228
 msgid "Confirm Email Address"
 msgstr ""
 
-#: templates/preferences.php:232
+#: templates/preferences.php:239
 msgid ""
 "Click below to manage your communication preferences and determine when and "
 "how you would like to receive communication from us."
 msgstr ""
 
-#: templates/preferences.php:234
+#: templates/preferences.php:242
 msgid "Change Email Preferences"
 msgstr ""
 
-#: templates/preferences.php:239
+#: templates/preferences.php:247
 msgid ""
 "Click below to email yourself an audit of all personal information currently "
 "on file. Or if you wish for us to no longer have access to this information "
 "you can request a data erasure in accordance with your privacy rights."
 msgstr ""
 
-#: templates/preferences.php:241
+#: templates/preferences.php:250
 msgid "Download Profile"
 msgstr ""
 
-#: templates/preferences.php:242
+#: templates/preferences.php:252
 msgid "Erase Profile"
 msgstr ""
 
-#: templates/preferences.php:281
+#: templates/preferences.php:296
 msgid "Preferences saved!"
 msgstr ""
 
-#: templates/preferences.php:291
+#: templates/preferences.php:306
 msgctxt "preferences"
 msgid ""
 "I love this company, you can communicate with me whenever you feel like."
 msgstr ""
 
-#: templates/preferences.php:292
+#: templates/preferences.php:307
 msgctxt "preferences"
 msgid "It's getting a bit much. Communicate with me weekly."
 msgstr ""
 
-#: templates/preferences.php:293
+#: templates/preferences.php:308
 msgctxt "preferences"
 msgid "Distance makes the heart grow fonder. Communicate with me monthly."
 msgstr ""
 
-#: templates/preferences.php:294
+#: templates/preferences.php:309
 msgctxt "preferences"
 msgid "I no longer wish to receive any form of communication. Unsubscribe me!"
 msgstr ""
 
-#: templates/preferences.php:298
+#: templates/preferences.php:313
 msgctxt "preferences"
 msgid "Unsubscribe me and delete any personal information about me."
 msgstr ""
 
-#: templates/preferences.php:305
+#: templates/preferences.php:323
 #, php-format
 msgid "Managing preferences for %s (%s)."
 msgstr ""
 
-#: templates/preferences.php:313
-msgid "Request all information on record be removed."
-msgstr ""
-
-#: templates/preferences.php:339
+#: templates/preferences.php:362
 #, php-format
 msgid "Your email address %s has just been unsubscribed."
 msgstr ""
 
-#: templates/preferences.php:340
+#: templates/preferences.php:364
 msgid ""
 "Further interactions with our site may be interpreted as re-subscribing to "
 "our list and will result in further electronic communication."
 msgstr ""
 
-#: templates/preferences.php:342 templates/preferences.php:365
-#: templates/preferences.php:397
+#: templates/preferences.php:367 templates/preferences.php:394
+#: templates/preferences.php:427
 #, php-format
 msgid "Return to %s"
 msgstr ""
 
-#: templates/preferences.php:362
+#: templates/preferences.php:389
 #, php-format
 msgid "Your email address %s has just been confirmed!"
 msgstr ""
 
-#: templates/preferences.php:363
+#: templates/preferences.php:391
 #, php-format
 msgid ""
 "You will now receive electronic communication from %1$s. Should you wish to "
@@ -7152,15 +7269,15 @@ msgid ""
 "of any email sent by %1$s."
 msgstr ""
 
-#: templates/preferences.php:390
+#: templates/preferences.php:419
 msgid "Erased"
 msgstr ""
 
-#: templates/preferences.php:394
+#: templates/preferences.php:423
 msgid "Your data has been erased!"
 msgstr ""
 
-#: templates/preferences.php:395
+#: templates/preferences.php:424
 msgid ""
 "Further interactions with our site may be interpreted as re-subscribing to "
 "our list and will result in further communication."

@@ -156,7 +156,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED Preview pagination to paginate records during the import mapping process
 * ADDED ALT-Body editor to the new Simple Email Editor
 * TWEAKED Parse email content for images and sanitize their styling for guaranteed responsiveness.
+* TWEAKED Mapping User/Owner ID also supports user email and username as well as ID
 * FIXED export list function only exports the contacts listed and not all the contacts from the query.
+* FIXED Updated the POT file.
 
 = 2.0.11 (2019-09-16) =
 * ADDED New simple email builder option for users who'd rather use the WP editor instead of our email builder.
