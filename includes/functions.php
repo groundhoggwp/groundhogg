@@ -1396,7 +1396,8 @@ function email_is_same_domain($email)
 {
     $email_domain = substr($email, strrpos($email, '@') + 1);
     $site_domain = site_url();
-    return strpos($site_domain, $email_domain) !== false;
+    $is_same = strpos($site_domain, $email_domain) !== false;
+    return apply_filters( 'groundhogg/email_is_same_domain', $is_same, $email, $site_domain );
 }
 
 /**
@@ -2367,9 +2368,9 @@ function get_magic_tag_ids()
 }
 
 /**
- *
- *
- * @param $content
+ * Get the attribute of an HTML tag from the tag.
+ * NOTE: This currently does NOT support attributes which do not have values in quotes.
+ * Todo Support 'magic' attributes
  * @param $tag
  * @return array|false
  */
@@ -2381,27 +2382,14 @@ function get_tag_attributes($tag)
 
     $tag = $matches[0];
 
-    preg_match_all("/[a-z\-]+=\"[^\"]+\"/", $tag, $all_atts);
+    preg_match_all("/([a-z\-]+)(=\"([^\"]+)\")/", $tag, $all_atts);
 
-    $attributes = [];
+    $attributes = map_deep( $all_atts[ 1 ], 'sanitize_key' );
+    $values = $all_atts[ 3 ];
+    $attributes = array_combine( $attributes, $values );
 
-    foreach ($all_atts[0] as $i => $ugly_att) {
-
-        // Haas =
-        if (strpos($ugly_att, '=') !== false) {
-            $ugly_att = explode('=', $ugly_att);
-            $key = sanitize_key($ugly_att[0]);
-            $val = trim($ugly_att[1], "\"");
-
-            if ($key === 'style') {
-                $val = parse_inline_styles($val);
-            }
-
-            $attributes[$key] = $val;
-        } else {
-            $key = sanitize_key($ugly_att);
-            $attributes[$key] = true;
-        }
+    if ( isset_not_empty( $attributes, 'style' ) ){
+        $attributes[ 'style' ] = parse_inline_styles( $attributes[ 'style' ] );
     }
 
     return $attributes;

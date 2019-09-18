@@ -223,7 +223,7 @@ class Contact extends Base_Object_With_Meta
      */
     public function get_first_name()
     {
-        return ucwords( strtolower( $this->first_name ) );
+        return $this->first_name;
     }
 
     /**
@@ -233,7 +233,7 @@ class Contact extends Base_Object_With_Meta
      */
     public function get_last_name()
     {
-        return ucwords( strtolower( $this->last_name ) );
+        return $this->last_name;
     }
 
     /**
@@ -372,7 +372,7 @@ class Contact extends Base_Object_With_Meta
      */
     public function is_marketable()
     {
-        return Plugin::instance()->preferences->is_marketable( $this->ID );
+        return apply_filters( 'groundhogg/contact/is_marketable', Plugin::instance()->preferences->is_marketable( $this->ID ), $this );
     }
 
     /**

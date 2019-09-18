@@ -5,8 +5,7 @@ use Groundhogg;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
-use function Groundhogg\wpgh_email_is_same_domain;
-use function Groundhogg\wpgh_create_contact_from_user;
+use function Groundhogg\managed_page_url;
 use Groundhogg\Admin\Emails\Blocks;
 
 // Exit if accessed directly
@@ -822,9 +821,7 @@ class Emails_Page extends Admin_Page
                 <div class="inside">
                     <p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
                     <p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
-                    <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $email->get_id(); ?> " class="email-container postbox">
-                        <?php echo $email->get_content(); ?>
-                    </div>
+                    <iframe class="email-container postbox" style="margin-bottom: 10px;" width="100%" height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
                     <button class="choose-template button-primary" name="email_id" value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
                 </div>
             </div>

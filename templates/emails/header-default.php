@@ -11,6 +11,8 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+$email_width = apply_filters( 'groundhogg/email_template/width', 580 );
+
 $body = [
     "background-color"          => "#FFFFFF",
 	'font-family'               => 'Arial, "Helvetica Neue", Helvetica, sans-serif;',
@@ -42,13 +44,11 @@ $template_container = apply_filters( 'groundhogg/email_template/container_css', 
 	'vertical-align' => 'top',
 	'display' => 'block',
 	'width' => '100%',
-	'max-width' => '580px',
+	'max-width' => $email_width . 'px',
 	'padding' => '0px',
 ] );
 
 $template_container = \Groundhogg\array_to_css( $template_container );
-
-$email_width = apply_filters( 'groundhogg/email_template/width', 580 );
 
 $alignment = apply_filters( 'groundhogg/email_template/alignment', 'center' );
 
@@ -57,7 +57,7 @@ $template_content = apply_filters( 'groundhogg/email_template/content_css', [
     'display' => 'block',
     'Margin' => '0 auto',
     'width' => '100%',
-    'max-width' => '580px',
+    'max-width' => $email_width . 'px',
    ' padding' => '5px',
 ] );
 

@@ -135,7 +135,7 @@ function responsive_tag_compat( $content )
     return $content;
 }
 
-add_filter( 'groundhogg/email_template/content', __NAMESPACE__ . '\responsive_tag_compat', 99 );
+//add_filter( 'groundhogg/email_template/content', __NAMESPACE__ . '\responsive_tag_compat', 99 );
 
 /**
  * @param $tag
