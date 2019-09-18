@@ -152,6 +152,8 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.11.2 (2019-09-18) =
+
 = 2.0.11.1 (2019-09-17) =
 * ADDED Preview pagination to paginate records during the import mapping process
 * ADDED ALT-Body editor to the new Simple Email Editor

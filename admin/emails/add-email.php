@@ -5,6 +5,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Email;
+use function Groundhogg\managed_page_url;
 
 /**
  * Add Email
@@ -104,8 +105,7 @@ if ( count( $custom_templates ) > 0 ){
         <div id="emails">
             <!-- Only retrieve previous 20 emails.. -->
             <?php
-            $emails = get_db( 'emails' )->query( [], 'ID' );
-            $emails = array_slice( $emails, 0, 20 );
+            $emails = get_db( 'emails' )->query( [ 'limit' => 10 ] );
             foreach ( $emails as $email ):
                 $email = new Email( absint( $email->ID ) ); ?>
                 <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
@@ -113,9 +113,7 @@ if ( count( $custom_templates ) > 0 ){
                     <div class="inside">
                         <p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
                         <p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
-                        <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $email->get_id(); ?> " class="email-container postbox">
-                            <?php echo $email->get_content(); ?>
-                        </div>
+                        <iframe class="email-container postbox" style="margin-bottom: 10px;" width="100%" height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
                         <button class="choose-template button-primary" name="email_id" value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
                     </div>
                 </div>
@@ -160,18 +158,17 @@ if ( count( $custom_templates ) > 0 ){
             })(jQuery);
         </script>
     <?php else:
-        foreach ( $custom_templates as $id => $email ): ?>
+        foreach ( $custom_templates as $id => $email ):
+            $email = new Email( absint( $email->ID ) ); ?>
             <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
-                <h2 class="hndle"><?php esc_html_e( $email->subject ); ?></h2>
+                <h2 class="hndle"><?php esc_html_e( $email->get_subject_line() ); ?></h2>
                 <div class="inside">
                     <p><?php
-                        echo ( ! empty( $email->pre_header ) ) ? esc_html( $email->pre_header ) : '&#x2014;';
+                        echo ( ! empty( $email->get_pre_header() ) ) ? esc_html( $email->get_pre_header() ) : '&#x2014;';
                     ?></p>
-                    <div style="zoom: 85%;height: 500px;overflow: auto;padding: 10px;" id="<?php echo $id; ?> " class="email-container postbox">
-                        <?php echo $email->content; ?>
-                    </div>
-                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email->ID;  //todo find var ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
-                    <a class="button-secondary" href="<?php printf( admin_url( 'admin.php?page=gh_emails&action=edit&email=%d' ), $email->ID ); ?>"><?php _e( 'Edit Template', 'groundhogg' ); ?></a>
+                    <iframe class="email-container postbox" style="margin-bottom: 10px;" width="100%" height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
+                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+                    <a class="button-secondary" href="<?php printf( admin_url( 'admin.php?page=gh_emails&action=edit&email=%d' ), $email->get_id() ); ?>"><?php _e( 'Edit Template', 'groundhogg' ); ?></a>
                 </div>
             </div>
         <?php endforeach;

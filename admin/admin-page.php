@@ -262,10 +262,10 @@ abstract class Admin_Page
         if (isset_not_empty($_REQUEST, 'filter_action'))
             return false;
 
-        if (isset_not_empty($_REQUEST, 'action'))
+        if (isset_not_empty($_REQUEST, 'action') && $_REQUEST[ 'action' ] != -1 )
             return sanitize_text_field(get_request_var('action'));
 
-        if (isset_not_empty($_REQUEST, 'action2'))
+        if (isset_not_empty($_REQUEST, 'action2') && $_REQUEST[ 'action2' ] != -1 )
             return sanitize_text_field(get_request_var('action2'));
 
         return 'view';
