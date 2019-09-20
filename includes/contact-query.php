@@ -651,9 +651,11 @@ class Contact_Query
                             break;
                         case 'before':
                             $compare = '<=';
+                            $col = 'time';
                             break;
                         case 'after':
                             $compare = '>=';
+                            $col = 'time';
                             break;
                     }
 
@@ -698,9 +700,11 @@ class Contact_Query
                             break;
                         case 'before':
                             $compare = '<=';
+                            $col = 'timestamp';
                             break;
                         case 'after':
                             $compare = '>=';
+                            $col = 'timestamp';
                             break;
                     }
 

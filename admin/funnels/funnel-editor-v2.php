@@ -212,8 +212,6 @@ $funnel = new Funnel($funnel_id);
                             }
                         }
 
-
-
                         html()->list_table( [], [
                             __( 'Step', 'groundhogg' ),
                             __( 'Complete', 'groundhogg' ),

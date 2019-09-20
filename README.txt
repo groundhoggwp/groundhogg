@@ -152,6 +152,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.11.4 (2019-09-23) =
+* FIXED Reporting time ranges not being respected in some cases by the Contact Query
+
 = 2.0.11.3 (2019-09-20) =
 * FIXED 'upload_files' cap is removed if uninstalling and "remove all GH data" is enabled in the settings.
 * FIXED leadsource cookie in js not matching up with PHP causing leadsource to be missing in some cases.
