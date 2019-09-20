@@ -4,6 +4,7 @@ namespace Groundhogg\Api\V3;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+use Groundhogg\Tracking;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
@@ -100,7 +101,7 @@ class Tracking_Api extends Base
             return self::ERROR_400( 'form_dne', 'The given form does not exist.' );
         }
 
-        $impressions = explode( ',', get_cookie( 'gh-form-impressions' ) );
+        $impressions = explode( ',', get_cookie( Tracking::FORM_IMPRESSIONS_COOKIE ) );
 
         if ( ! in_array( $ID, $impressions ) ){
             get_db( 'form_impressions' )->add( [ 'form_id' => $ID ] );

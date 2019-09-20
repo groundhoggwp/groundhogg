@@ -154,12 +154,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.0.11.3 (2019-09-20) =
 * FIXED 'upload_files' cap is removed if uninstalling and "remove all GH data" is enabled in the settings.
-* FIXED First & Last will no longer be modified to strtolower or ucwords not working from last update
+* FIXED leadsource cookie in js not matching up with PHP causing leadsource to be missing in some cases.
+* FIXED First & Last will no longer be modified to strtolower or ucwords
+* FIXED Contact appearing in query twice if has 2 tags which are both in the tags_include request
 
 = 2.0.11.2 (2019-09-18) =
 * ADDED More developer hooks and filters.
 * TWEAKED Show merged content email in the add view instead of plain body in div.
-* TWEAKED First & Last will no longer be modified to strtolower or ucwords
 * FIXED Bottom bulk action not working
 * FIXED Image SRC with query strings were being unfairly sanitized when email is sent.
 

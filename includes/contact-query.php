@@ -418,6 +418,12 @@ class Contact_Query
 
         // If querying for a count only, there's nothing more to do.
         if ($this->query_vars['count']) {
+
+            // Count items will be an array of counts, so return the number of counts.
+            if ( ! empty( $this->sql_clauses['groupby']  ) ){
+                return count( $items );
+            }
+
             // $items is actually a count in this case.
             return intval($items[0]->count);
         }
@@ -470,8 +476,9 @@ class Contact_Query
         $this->sql_clauses['from'] = "FROM $this->table_name $join";
 
         // No need for this in count.
+        $this->sql_clauses['groupby'] = $groupby;
+
         if ( ! $this->query_vars[ 'count' ] ){
-	        $this->sql_clauses['groupby'] = $groupby;
 	        $this->sql_clauses['orderby'] = $orderby;
         }
 
@@ -821,7 +828,12 @@ class Contact_Query
      */
     protected function construct_request_groupby()
     {
-        if (!empty($this->meta_query_clauses['join']) || (!empty($this->query_vars['email']) && !is_array($this->query_vars['email'])) || !empty($this->query_vars['report'] ) || !empty($this->query_vars['activity'] ) ) {
+        if ( ! empty($this->meta_query_clauses['join'])
+            || ! empty($this->tag_query_clauses['join'])
+            || !empty($this->query_vars['report'] )
+            || !empty($this->query_vars['activity'] )
+            || (!empty($this->query_vars['email']) && !is_array($this->query_vars['email']))
+        ) {
             return "$this->table_name.$this->primary_key";
         }
 

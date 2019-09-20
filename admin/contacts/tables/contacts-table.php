@@ -329,7 +329,10 @@ class Contacts_Table extends WP_List_Table
 
         set_transient('groundhogg_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS);
 
-        $total = get_db('contacts')->count($query);
+        // Unset number for the count full count
+        unset( $query[ 'number' ] );
+
+        $total = get_db('contacts')->count( $query );
 
         $this->items = $data;
 

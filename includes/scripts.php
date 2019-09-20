@@ -45,6 +45,11 @@ class Scripts
                 'ajaxurl' => admin_url( 'admin-ajax.php' ),
                 '_wpnonce' => wp_create_nonce('wp_rest' ),
                 '_ghnonce' => wp_create_nonce('groundhogg_frontend' ),
+                'cookies' => [
+                    'tracking' => Tracking::TRACKING_COOKIE,
+                    'lead_source' => Tracking::LEAD_SOURCE_COOKIE,
+                    'form_impressions' => Tracking::FORM_IMPRESSIONS_COOKIE
+                ]
             ));
 
             wp_enqueue_script( 'groundhogg-frontend' );

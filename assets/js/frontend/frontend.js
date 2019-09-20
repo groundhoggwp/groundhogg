@@ -1,7 +1,5 @@
 (function (gh, $) {
     $.extend( gh, {
-        leadSourceCookie: 'gh-referer',
-        formImpressionsCookie: 'gh-form-impressions',
         previousFormImpressions: [],
 
         setCookie: function(cname, cvalue, exdays){
@@ -75,20 +73,20 @@
                 },
                 success: function( response ){
                     self.previousFormImpressions.push( [ id ] );
-                    self.setCookie( self.formImpressionsCookie, self.previousFormImpressions.join(), 3 )
+                    self.setCookie( self.cookies.form_impression, self.previousFormImpressions.join(), 3 )
                 },
                 error: function(){}
             });
         },
 
         init: function(){
-            var referer = this.getCookie( this.leadSourceCookie );
+            var referer = this.getCookie( this.cookies.lead_source );
 
             if ( ! referer ){
-                this.setCookie( this.leadSourceCookie, document.referrer, 3 )
+                this.setCookie( this.cookies.lead_source, document.referrer, 3 )
             }
 
-            var previousFormImpressions = this.getCookie( this.formImpressionsCookie );
+            var previousFormImpressions = this.getCookie( this.cookies.form_impressions );
 
             if ( ! previousFormImpressions ){
                 previousFormImpressions = '';

@@ -303,7 +303,7 @@ class Contacts_Api extends Base
             foreach ( $contacts as $i => $contact ) {
 
                 $json[] = array(
-                    'id' => $contact->ID,
+                    'id' => absint( $contact->ID ),
                     'text' => sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email )
                 );
 
@@ -314,12 +314,12 @@ class Contacts_Api extends Base
             return rest_ensure_response( $results );
         }
 
-        if ( $is_for_select ){
+        else if ( $is_for_select ){
 
             $response_contacts = [];
 
             foreach ( $contacts as $i => $contact ) {
-                $response_contacts[ $contact->ID ] = sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email );
+                $response_contacts[ absint( $contact->ID ) ] = sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email );
             }
 
             $contacts = $response_contacts;
@@ -331,14 +331,24 @@ class Contacts_Api extends Base
             $response_contacts = [];
 
             foreach ( $contacts as $contact ) {
-                $response_contacts[ $contact->ID ] = $this->get_contact_for_rest_response( $contact->ID );
+
+                $id = absint( $contact->ID );
+
+                $response_contacts[ $id ] = $this->get_contact_for_rest_response( $id );
             }
 
             $contacts = $response_contacts;
         }
 
+        $response = [
+            'contacts' => $contacts,
+        ];
 
-        return self::SUCCESS_RESPONSE( [ 'contacts' => $contacts ] );
+        if ( $request->get_param( 'show_sql' ) ){
+            $response[ 'sql' ] = $contact_query->request;
+        }
+
+        return self::SUCCESS_RESPONSE( $response );
     }
 
     /**

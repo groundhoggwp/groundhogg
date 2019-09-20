@@ -396,8 +396,22 @@ abstract class Extension
             'version' 	=> $this->get_version(),
             'license' 	=> $this->get_license_key(),
             'item_id'   => $this->get_download_id(),
+            'author'    => $this->get_author(),
             'url'       => home_url()
         ] );
+    }
+
+    /**
+     * Return the author string
+     *
+     * @return string
+     */
+    protected function get_author()
+    {
+        if ( ! is_white_labeled() )
+            return 'Groundhogg Inc.';
+        else
+            return white_labeled_name();
     }
 
     /**

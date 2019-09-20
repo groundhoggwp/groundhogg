@@ -22,6 +22,7 @@ class Tracking
      */
     const TRACKING_COOKIE = 'groundhogg-tracking';
     const LEAD_SOURCE_COOKIE = 'groundhogg-lead-source';
+    const FORM_IMPRESSIONS_COOKIE = 'groundhogg-form-impressions';
 
     /**
      * Cookie expiry time in days
@@ -286,7 +287,7 @@ class Tracking
      */
     public function get_leadsource()
     {
-        return sanitize_text_field( $_COOKIE[ self::LEAD_SOURCE_COOKIE ] );
+        return sanitize_text_field( get_cookie( self::LEAD_SOURCE_COOKIE ) );
     }
 
     /**
