@@ -117,8 +117,17 @@ class Main_Roles extends Roles {
      */
     public function get_sales_manager_caps()
     {
-        // TODO
-        return [];
+        return [
+            'edit_contacts',
+            'view_contacts',
+            'view_own_contacts',
+            'import_contacts',
+            'send_emails',
+            'send_sms',
+            'view_events',
+            'manage_tags',
+            'download_contact_files'
+        ];
     }
 
     /**
@@ -128,8 +137,16 @@ class Main_Roles extends Roles {
      */
     public function get_sales_rep_caps()
     {
-        // TODO
-        return [];
+        return [
+            'edit_contacts',
+            'view_contacts',
+            'view_own_contacts',
+            'import_contacts',
+            'send_emails',
+            'send_sms',
+            'view_events',
+            'manage_tags'
+        ];
     }
 
     ###################
@@ -328,7 +345,7 @@ class Main_Roles extends Roles {
     {
         return [
             'download_files',
-            'upload_files'
+            'download_contact_files',
         ];
     }
 

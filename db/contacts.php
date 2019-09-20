@@ -427,7 +427,7 @@ class Contacts extends DB {
 
                 case 'first_name':
                 case 'last_name' :
-                    $cols[ $key ] = ucwords( strtolower( sanitize_text_field( $val ) ) );
+                    $cols[ $key ] = sanitize_text_field( $val );
                     break;
                 case 'email':
                     $cols[ $key ] = strtolower( sanitize_email( $val ) );

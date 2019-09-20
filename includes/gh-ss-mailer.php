@@ -24,7 +24,7 @@ class GH_SS_Mailer extends \PHPMailer
     {
         try {
 
-            if (!$this->preSend()) {
+            if ( ! $this->preSend() ) {
                 return false;
             }
 
