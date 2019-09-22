@@ -152,8 +152,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.0.11.4 (2019-09-23) =
+= 2.0.11.4 (2019-09-22) =
 * FIXED Reporting time ranges not being respected in some cases by the Contact Query
+* FIXED Calling static method from instance causing PHP notice.
 
 = 2.0.11.3 (2019-09-20) =
 * FIXED 'upload_files' cap is removed if uninstalling and "remove all GH data" is enabled in the settings.

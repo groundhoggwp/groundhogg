@@ -5,6 +5,7 @@ use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
+use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Step;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -190,7 +191,7 @@ class Date_Timer extends Action
         $final_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
 
         /* Modify according to the contacts timezone */
-        if ( $send_in_timezone && Plugin::$instance->event_queue::is_processing()  ){
+        if ( $send_in_timezone && Event_Queue::is_processing()  ){
             $final_time = Plugin::$instance->event_queue->get_current_contact()->get_local_time_in_utc_0( $final_time );
             if ( $final_time < time() ){
                 $final_time+=DAY_IN_SECONDS;
