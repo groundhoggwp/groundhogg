@@ -96,6 +96,10 @@ Class SMS extends Base_Object
             return new WP_Error('no_recipient', __( 'No valid recipient was provided.' ) );
         }
 
+        if ( ! $contact->is_marketable() ){
+            return new WP_Error( 'non_marketable', __( 'This contact is currently unmarketable.', 'groundhogg' ) );
+        }
+
         $this->contact = $contact;
 
         /* we got an event so all is well */
@@ -126,10 +130,6 @@ Class SMS extends Base_Object
     {
 
         $contact = $this->get_contact();
-
-        if ( ! $contact->is_marketable() ){
-            return new WP_Error( 'non_marketable', __( 'This contact is currently unmarketable.', 'groundhogg' ) );
-        }
 
         // Send to groundhogg
         $phone = $contact->get_phone_number();

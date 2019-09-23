@@ -139,5 +139,13 @@ class Main_Updater extends Updater {
     	install_custom_rewrites();
     }
 
+    /**
+     * Re-install caps for roles.
+     */
+    public function version_2_0_11_5()
+    {
+        Plugin::instance()->roles->add_caps();
+    }
+
 
 }

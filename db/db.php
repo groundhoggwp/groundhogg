@@ -707,17 +707,15 @@ abstract class DB {
         $where = get_array_var( $query_vars, 'where', [] );
 
         if ( $query_vars[ 'search' ] ) {
-
             $search = ['relationship' => 'OR'];
 
             foreach ($this->get_columns() as $column => $type) {
                 if ($type === '%s') {
-                    $search[] = ['col' => $column, 'val' => $query_vars['search'], 'compare' => 'RLIKE'];
+                    $search[] = ['col' => $column, 'val' => esc_sql( $query_vars[ 'search' ] ), 'compare' => 'RLIKE'];
                 }
             }
 
             $where[] = $search;
-
         }
 
         $where = empty( $where ) ? '1=1' : $this->build_advanced_where_statement( $where );
@@ -741,7 +739,8 @@ abstract class DB {
         $offset = $query_vars[ 'offset' ] ? sprintf( 'OFFSET %d', absint( $query_vars[ 'offset' ] ) ) : '';
         $orderby = $query_vars[ 'orderby' ] && in_array( $query_vars[ 'orderby' ], $this->get_allowed_columns() ) ? sprintf( 'ORDER BY %s', $query_vars[ 'orderby' ] ) : '';
         $groupby = $query_vars[ 'groupby' ] && in_array( $query_vars[ 'groupby' ], $this->get_allowed_columns() ) ? sprintf( 'GROUP BY %s', $query_vars[ 'groupby' ] ) : '';
-        $order = $query_vars[ 'order' ] ? strtoupper( $query_vars[ 'order' ] ) : '';
+        $query_vars[ 'order' ] = strtoupper( $query_vars[ 'order' ] );
+        $order = in_array( $query_vars[ 'order' ], ['ASC','DESC'] ) ? $query_vars[ 'order' ] : 'DESC';
 
         $clauses = [
             'where' => $where,

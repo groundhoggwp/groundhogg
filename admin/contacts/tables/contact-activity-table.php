@@ -54,6 +54,7 @@ class Contact_Activity_Table extends WP_List_Table {
             'ajax'     => false,       // Does this table support ajax?
         ) );
     }
+
     /**
      * @see WP_List_Table::::single_row_columns()
      * @return array An associative array containing column information.

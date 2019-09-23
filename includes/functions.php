@@ -2432,3 +2432,43 @@ function parse_inline_styles($style)
 
     return $css;
 }
+
+/**
+ * echo an action input, similar to wp_nonce_field
+ *
+ * @param string $action
+ * @param bool $echo
+ * @return bool|string
+ */
+function action_input( $action='', $echo=true )
+{
+    $input = html()->input( [ 'value' => $action, 'type' => 'hidden', 'name' => 'action' ] );
+
+    if ( $echo ){
+        echo $input;
+        return true;
+    }
+
+    return $input;
+}
+
+/**
+ * Return an actionable url
+ *
+ * @param $action
+ * @param array $args
+ * @return string
+ */
+function action_url( $action, $args=[] )
+{
+    $url_args = [
+        'page' => get_request_var( 'page' ),
+        'tab' => get_request_var( 'tab' ),
+        'action' => $action,
+        '_wpnonce' => wp_create_nonce( $action )
+    ];
+
+    $url_args = array_filter( array_merge( $url_args, $args ) );
+
+    return add_query_arg( $url_args, admin_url( 'admin.php' ) );
+}
