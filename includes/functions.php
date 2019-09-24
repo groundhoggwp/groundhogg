@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Lib\Mobile\Mobile_Validator;
 use WP_Error;
 
 // Exit if accessed directly
@@ -2471,4 +2472,84 @@ function action_url( $action, $args=[] )
     $url_args = array_filter( array_merge( $url_args, $args ) );
 
     return add_query_arg( $url_args, admin_url( 'admin.php' ) );
+}
+
+global $groundhogg_mobile_validator;
+
+/**
+ * Get the default country code of the site.
+ *
+ * @return string the cc code of the site. US is default
+ */
+function get_default_country_code()
+{
+    // Is the CC already set?
+    $cc = get_option( 'gh_default_country_code' );
+
+    if ( $cc ){
+        return $cc;
+    }
+
+    // Get the IP of the logged in user
+    if ( is_user_logged_in() && current_user_can( 'manage_options' ) ){
+
+        $cc = Plugin::instance()->utils->location->ip_info( null,'countrycode' );
+
+        if ( $cc ){
+            update_option( 'gh_default_country_code', $cc );
+            return $cc;
+        }
+
+    }
+
+    // Get the IP of the site wherever it's being hosted
+    $parse_url = wp_parse_url( site_url(), PHP_URL_HOST );
+
+    if ( $parse_url ){
+        $ip = gethostbyname( $parse_url );
+        $cc = Plugin::instance()->utils->location->ip_info( $ip,'countrycode' );
+
+        if ( $cc ){
+            update_option( 'gh_default_country_code', $cc );
+            return $cc;
+        }
+    }
+
+    return 'US';
+}
+
+/**
+ * Validate a mobile number
+ *
+ * @param $number string
+ * @param string $country_code the country code of the supposed contact
+ * @param bool $with_plus whether to return with the + or not
+ * @return bool|string
+ */
+function validate_mobile_number( $number, $country_code='', $with_plus=false )
+{
+    global $groundhogg_mobile_validator;
+
+    if ( ! $groundhogg_mobile_validator instanceof Mobile_Validator ){
+        $groundhogg_mobile_validator = new Mobile_Validator();
+    }
+
+    if ( ! $country_code ){
+        $country_code = get_default_country_code();
+    }
+
+    $number = $groundhogg_mobile_validator->normalize( $number, $country_code );
+
+    if ( empty( $number ) ){
+        return false;
+    }
+
+    $number = $number[0];
+
+    // Remove the plus from the string
+    if ( $with_plus ){
+        $number = str_replace( '+', '', $number );
+    }
+
+    return $number;
 }

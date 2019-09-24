@@ -152,6 +152,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.11.5 (2019-09-24) =
+* ADDED Default localization library ans supporting functions for mobile phone numbers
+* TWEAKED Birthday field in contact record support empty value to not save DOB
+* FIXED Minor DB error introduced in last update
+
 = 2.0.11.4 (2019-09-22) =
 * FIXED Reporting time ranges not being respected in some cases by the Contact Query
 * FIXED Calling static method from instance causing PHP notice.

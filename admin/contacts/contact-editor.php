@@ -335,7 +335,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                             'id' => 'birthday_year',
                             'options' => $years,
                             'multiple' => false,
-                            'option_none' => false,
+                            'option_none' => __( 'Select one', 'groundhogg' ),
                             'selected' => $contact->get_meta( 'birthday_year' ),
                             'class' => 'gh-input'
                         ]),
@@ -344,7 +344,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                             'id' => 'birthday_month',
                             'options' => $months,
                             'multiple' => false,
-                            'option_none' => false,
+                            'option_none' => __( 'Select one', 'groundhogg' ),
                             'selected' => $contact->get_meta( 'birthday_month' ),
                             'class' => 'gh-input'
                         ]),
@@ -353,7 +353,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                             'id' => 'birthday_day',
                             'options' => $days,
                             'multiple' => false,
-                            'option_none' => false,
+                            'option_none' => __( 'Select one', 'groundhogg' ),
                             'selected' => $contact->get_meta( 'birthday_day' ),
                             'class' => 'gh-input'
                         ]),

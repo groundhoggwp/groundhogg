@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg;
 use Groundhogg\Admin\Admin_Menu;
+use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
 use Groundhogg\DB\Manager;
 use Groundhogg\Reporting\Reports\Report;
 
@@ -167,6 +168,7 @@ abstract class Extension
         add_action( 'groundhogg/bulk_jobs/init',  [ $this, 'register_bulk_jobs' ] );
         add_action( 'groundhogg/admin/init',      [ $this, 'register_admin_pages'] );
         add_action( 'groundhogg/steps/init',      [ $this, 'register_funnel_steps' ] );
+        add_action( 'groundhogg/dashboard/widgets/init', [ $this, 'register_dashboard_widgets' ] );
         add_action( 'groundhogg/replacements/init', [ $this, 'add_replacements' ] );
         add_filter( 'groundhogg/admin/emails/blocks/init', [ $this, 'register_email_blocks' ] );
 
@@ -246,6 +248,11 @@ abstract class Extension
      * @param $manager \Groundhogg\Steps\Manager
      */
     public function register_funnel_steps( $manager ){}
+
+    /**
+     * @param $dashboard Dashboard_Widgets
+     */
+    public function register_dashboard_widgets( $dashboard ){}
 
     /**
      * @param $manager \Groundhogg\Bulk_Jobs\Manager
