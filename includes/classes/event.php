@@ -144,7 +144,7 @@ class Event extends Base_Object
      */
     public function get_failure_reason()
     {
-        return $this->failure_reason;
+        return $this->get_error_code() . ': ' .$this->get_error_message();
     }
 
     /**

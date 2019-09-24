@@ -328,33 +328,40 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         $months[$i] = date_i18n("F", $timestamp);
                     }
 
+                    $birthday = $contact->get_meta( 'birthday' );
+                    $birthday_parts = [];
+
+                    if ( $birthday ){
+                        $birthday_parts = explode( '-', $birthday );
+                    }
+
                     echo html()->e('span', [], [
                         // Year
                         html()->dropdown([
-                            'name' => 'birthday_year',
+                            'name' => 'birthday[year]',
                             'id' => 'birthday_year',
                             'options' => $years,
                             'multiple' => false,
                             'option_none' => __( 'Select one', 'groundhogg' ),
-                            'selected' => $contact->get_meta( 'birthday_year' ),
+                            'selected' => get_array_var( $birthday_parts, 0 ),
                             'class' => 'gh-input'
                         ]),
                         html()->dropdown([
-                            'name' => 'birthday_month',
+                            'name' => 'birthday[month]',
                             'id' => 'birthday_month',
                             'options' => $months,
                             'multiple' => false,
                             'option_none' => __( 'Select one', 'groundhogg' ),
-                            'selected' => $contact->get_meta( 'birthday_month' ),
+                            'selected' => get_array_var( $birthday_parts, 1 ),
                             'class' => 'gh-input'
                         ]),
                         html()->dropdown([
-                            'name' => 'birthday_day',
+                            'name' => 'birthday[day]',
                             'id' => 'birthday_day',
                             'options' => $days,
                             'multiple' => false,
                             'option_none' => __( 'Select one', 'groundhogg' ),
-                            'selected' => $contact->get_meta( 'birthday_day' ),
+                            'selected' => get_array_var( $birthday_parts, 2 ),
                             'class' => 'gh-input'
                         ]),
                     ]);

@@ -153,8 +153,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 == Changelog ==
 
 = 2.0.11.5 (2019-09-24) =
-* ADDED Default localization library ans supporting functions for mobile phone numbers
-* TWEAKED Birthday field in contact record support empty value to not save DOB
+* ADDED Default localization library and supporting functions for validating mobile phone numbers
+* TWEAKED Birthday field in contact record now supports empty value to not save DOB as incorrect date
+* TWEAKED Better handling of the birthday field in the admin
+* FIXED Connection to Groundhogg sending service account in guided setup not starting
+* FIXED First & Last name field only accepts values longer than 3 characters. Changed to a minimum of 2 characters.
+* FIXED failed event notifications missing failure reason.
+* FIXED form errors not showing on managed submit page.
+* FIXED Missing roles after updating to 2.0.11.3
 * FIXED Minor DB error introduced in last update
 
 = 2.0.11.4 (2019-09-22) =

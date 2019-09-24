@@ -549,9 +549,6 @@ class Contacts_Page extends Admin_Page
            'source_page',
            'ip_address',
            'time_zone',
-           'birthday_year',
-           'birthday_month',
-           'birthday_day',
         ];
 
         $basic_text_fields = apply_filters( 'groundhogg/contact/update/basic_fields', $basic_text_fields, $contact );
@@ -565,6 +562,30 @@ class Contacts_Page extends Admin_Page
         if ( get_request_var( 'extrapolate_location' ) ){
             if ( $contact->extrapolate_location() ){
                 $this->add_notice('location_updated', _x( 'Location updated.', 'notice', 'groundhogg' ), 'info');
+            }
+        }
+
+        $birthday_parts = map_deep( get_request_var( 'birthday', [] ), 'absint' );
+
+        if ( ! empty( $birthday_parts ) ){
+            // Birthday
+            $parts = [
+                'year',
+                'month',
+                'day',
+            ];
+
+            $birthday = [];
+
+            foreach ( $parts as $key ){
+                $date = get_array_var( $birthday_parts, $key );
+                $birthday[] = $date;
+            }
+
+            // If is valid date
+            if ( checkdate( $birthday[1], $birthday[2], $birthday[0] ) ){
+                $birthday = implode( '-', $birthday );
+                $contact->update_meta( 'birthday', $birthday );
             }
         }
 

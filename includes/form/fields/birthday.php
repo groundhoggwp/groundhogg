@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\get_array_var;
 use function Groundhogg\html;
 
 /**
@@ -51,6 +52,25 @@ class Birthday extends Input
      */
     public static function validate( $input, $config )
     {
+        $input = array_map( 'absint', $input );
+
+        $parts = [
+            'year',
+            'month',
+            'day',
+        ];
+
+        $birthday = [];
+
+        foreach ( $parts as $key ){
+            $date = get_array_var( $input, $key );
+            $birthday[] = $date;
+        }
+
+        if ( ! checkdate( $birthday[1], $birthday[2], $birthday[0] ) ){
+            return new \WP_Error( 'invalid_date', 'Please provide a valid date!' );
+        }
+
         return apply_filters( 'groundhogg/form/fields/birthday/validate' , array_map( 'absint', $input ) );
     }
 

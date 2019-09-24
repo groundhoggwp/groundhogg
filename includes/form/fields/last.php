@@ -46,7 +46,7 @@ class Last extends Input
      */
     public static function validate( $input, $config )
     {
-        if ( ! preg_match( '/^[\w\pL\-,.][^0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$/', $input ) ){
+        if ( ! preg_match( '/^[\w\pL\-,.][^0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$/', $input ) ){
             return new \WP_Error( 'invalid_last_name', __( 'Please provide a valid last name.', 'groundhogg' ) );
         }
 

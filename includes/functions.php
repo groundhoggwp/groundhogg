@@ -1366,13 +1366,6 @@ function after_form_submit_handler(&$contact)
         $contact->update_meta('source_page', wpgh_get_referer());
     }
 
-//    if ( function_exists( 'is_user_logged_in' ) ){
-//        // Add additional check for same email address
-//        if ( is_user_logged_in() && ! $contact->get_userdata() && wp_get_current_user()->user_email === $contact->get_email() ) {
-//            $contact->update( [ 'user_id' => get_current_user_id() ] );
-//        }
-//    }
-
     if (!$contact->is_marketable()) {
         $contact->change_marketing_preference(Preferences::UNCONFIRMED);
     }
@@ -1408,7 +1401,6 @@ function email_is_same_domain($email)
  */
 function gh_ss_notify_low_credit($credits)
 {
-
     if ($credits > 1000) {
         return;
     }
@@ -1436,33 +1428,30 @@ function gh_ss_notify_low_credit($credits)
 add_action('groundhogg/ghss/credits_used', __NAMESPACE__ . '\gh_ss_notify_low_credit');
 add_action('groundhogg/ghss/sms_credits_used', __NAMESPACE__ . '\gh_ss_notify_low_credit');
 
-if (get_option('gh_send_notifications_on_event_failure')) {
-
-    /**
-     * Send event failure notification.
-     *
-     * @param $event Event
-     */
-    function send_event_failure_notification($event)
-    {
-
-        if (get_transient('gh_hold_failed_event_notification')) {
-            return;
-        }
-
-        $subject = sprintf("Event (%s) failed for %s on %s", $event->get_step_title(), $event->get_contact()->get_email(), esc_html(get_bloginfo('title')));
-        $message = sprintf("This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->get_contact()->get_full_name(), $event->get_contact()->get_email());
-        $message .= sprintf("\nFailure Reason: %s", $event->get_failure_reason());
-        $message .= sprintf("\nManage Failed Events: %s", admin_url('admin.php?page=gh_events&view=status&status=failed'));
-        $to = Plugin::$instance->settings->get_option('event_failure_notification_email', get_option('admin_email'));
-
-        if (wp_mail($to, $subject, $message)) {
-            set_transient('gh_hold_failed_event_notification', true, MINUTE_IN_SECONDS);
-        }
+/**
+ * Send event failure notification.
+ *
+ * @param $event Event
+ */
+function send_event_failure_notification($event)
+{
+    if ( ! is_option_enabled('gh_send_notifications_on_event_failure' ) || get_transient('gh_hold_failed_event_notification') ) {
+        return;
     }
 
-    add_action('groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_notification');
+    $subject = sprintf("Event (%s) failed for %s on %s", $event->get_step_title(), $event->get_contact()->get_email(), esc_html(get_bloginfo('title')));
+    $message = sprintf("This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->get_contact()->get_full_name(), $event->get_contact()->get_email());
+    $message .= sprintf("\nFailure Reason: %s", $event->get_failure_reason());
+    $message .= sprintf("\nManage Failed Events: %s", admin_url('admin.php?page=gh_events&view=status&status=failed'));
+    $to = Plugin::$instance->settings->get_option('event_failure_notification_email', get_option('admin_email'));
+
+    if (wp_mail($to, $subject, $message)) {
+        set_transient('gh_hold_failed_event_notification', true, MINUTE_IN_SECONDS);
+    }
 }
+
+add_action('groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_notification');
+
 
 /**
  * Split a name into first and last.
@@ -1917,7 +1906,7 @@ function form_errors($return = true)
             return $err_html;
         }
 
-        echo $return;
+        echo $err_html;
 
         return true;
     }

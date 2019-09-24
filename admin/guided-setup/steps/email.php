@@ -54,8 +54,6 @@ class Email extends Step {
 					] ); ?>
                 </p>
             </div>
-            <!--        <p class="description">--><?php //_ex( '', 'guided_setup', 'groundhogg' );
-			?><!--</p>-->
             <div class="wp-clearfix"></div>
             <hr>
             <h3><?php _e( 'Premium' ); ?></h3>

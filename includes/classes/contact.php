@@ -787,17 +787,11 @@ class Contact extends Base_Object_With_Meta
     public function get_age()
     {
 
-        $date[] = $this->get_meta( 'birthday_year' );
-        $date[] = $this->get_meta( 'birthday_month' );
-        $date[] = $this->get_meta( 'birthday_day' );
-
-        $date = array_filter( $date );
+        $date = $this->get_meta( 'birthday' );
 
         if ( empty( $date ) ){
             return false;
         }
-
-        $date = implode( '-', $date );
 
         $age_in_seconds = time() - strtotime( $date );
         $age_in_years = round( $age_in_seconds / YEAR_IN_SECONDS, 0 );

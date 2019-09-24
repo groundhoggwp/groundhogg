@@ -217,10 +217,13 @@ class Submission_Handler extends Supports_Errors
                     foreach ( $parts as $key ){
                         $date = get_array_var( $value, $key );
                         $birthday[] = $date;
-                        $meta[ 'birthday_' . $key ] = $date;
                     }
 
-                    $meta[ 'birthday' ] = implode( '-', $birthday );
+                    // If is valid date
+                    if ( checkdate( $birthday[1], $birthday[2], $birthday[0] ) ){
+                        $birthday = implode( '-', $birthday );
+                        $meta[ 'birthday' ] = $birthday;
+                    }
 
                     break;
                 // Only checks whether value is not empty.
