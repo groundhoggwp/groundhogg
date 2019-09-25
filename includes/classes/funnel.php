@@ -158,7 +158,7 @@ class Funnel extends Base_Object
     /**
      * Import a funnel
      **
-     * @return bool|int
+     * @return bool|int|\WP_Error
      */
     public function import( $import )
     {
@@ -166,8 +166,9 @@ class Funnel extends Base_Object
             $import = json_decode( $import, true );
         }
 
-        if ( ! is_array( $import ) )
-            return false;
+        if ( ! is_array( $import ) ){
+            return new \WP_Error( 'invalid_funnel', 'Invalid funnel markup.' );
+        }
 
         $title = $import[ 'title' ];
 
@@ -180,7 +181,7 @@ class Funnel extends Base_Object
         $funnel_id = $this->create( $args );
 
         if ( ! $funnel_id ){
-            return false;
+            return new \WP_Error( 'db_error', 'Could not add to the DB.' );
         }
 
         $steps = $import[ 'steps' ];
@@ -204,9 +205,6 @@ class Funnel extends Base_Object
             $step = new Step( $args );
 
             if ( ! $step->exists() ){
-
-                wp_die();
-
                 continue;
             }
 

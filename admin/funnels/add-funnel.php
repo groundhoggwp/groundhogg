@@ -139,8 +139,19 @@ do_action( 'wpgh_before_new_funnel' );
                 <p class="install-help"><?php _e( 'If you have a funnel import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
                 <form method="post" enctype="multipart/form-data" class="wp-upload-form">
                     <?php wp_nonce_field(); ?>
+                    <p class="description"><?php _e( 'Upload a .funnel export file.', 'groundhogg' ); ?></p>
+                    <hr/>
                     <input type="file" name="funnel_template" id="funnel_template" accept=".funnel">
-                    <button class="button-primary" name="funnel_import" value="import"><?php _ex('Import Funnel', 'action', 'groundhogg'); ?></button>
+                    <button style="float: right" class="button-primary" name="funnel_import" value="import"><?php _ex('Import Funnel', 'action', 'groundhogg'); ?></button>
+                    <div class="wp-clearfix"></div>
+                </form>
+                <form method="post" class="wp-upload-form">
+                    <?php wp_nonce_field(); ?>
+                    <p class="description"><?php _e( 'Copy and paste JSON from a .funnel export file if you are having issue uploading.', 'groundhogg' ); ?></p>
+                    <hr/>
+                    <textarea style="width: 100%;margin-bottom: 5px;" rows="3" name="funnel_json" id="funnel_json" placeholder="<?php esc_attr_e( 'Paste JSON from .funnel file.', 'groundhogg' ) ;?>"></textarea>
+                    <button style="float: right" class="button-primary" name="funnel_import" value="import"><?php _ex('Import Funnel', 'action', 'groundhogg'); ?></button>
+                    <div class="wp-clearfix"></div>
                 </form>
             </div>
         </div>

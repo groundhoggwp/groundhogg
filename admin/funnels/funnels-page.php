@@ -1,7 +1,6 @@
 <?php
 namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
-use Groundhogg\DB\Steps;
 use Groundhogg\Funnel;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
@@ -9,6 +8,7 @@ use function Groundhogg\get_post_var;
 use function Groundhogg\get_store_products;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\html;
 use function Groundhogg\is_option_enabled;
 use Groundhogg\Plugin;
@@ -488,6 +488,8 @@ class Funnels_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
+        $funnel_id = false;
+
         if ( isset( $_POST[ 'funnel_template' ] ) ){
 
             include GROUNDHOGG_PATH . 'templates/assets/funnel-templates.php';
@@ -520,17 +522,40 @@ class Funnels_Page extends Admin_Page
         } else if ( isset( $_FILES[ 'funnel_template' ] ) ) {
             $file = get_array_var(  $_FILES, 'funnel_template' );
 
-            if ($file['error'] == UPLOAD_ERR_OK && is_uploaded_file($file['tmp_name'] ) && mime_content_type( $file[ 'tmp_name' ] ) === 'text/plain'  ) {
+            $file = map_deep( $file, 'sanitize_text_field' );
 
-                $json = file_get_contents( $_FILES['funnel_template']['tmp_name'] );
-                $json = json_decode($json, true);
+            $error = get_upload_wp_error( $file );
 
-                if ( ! $json ){
-                    return new \WP_Error( 'invalid_json', 'Funnel template has invalid JSON.' );
-                }
-
-                $funnel_id = $this->import_funnel($json);
+            if ( is_wp_error( $error ) ){
+                return $error;
             }
+
+            if ( ! in_array( mime_content_type( $file[ 'tmp_name' ] ), [ 'text/plain', 'application/json' ] ) ){
+                return new \WP_Error( 'unexpected_file_type', 'The file type you have uploaded is not a valid funnel file.', $file );
+            }
+
+            $json = file_get_contents( $_FILES['funnel_template']['tmp_name'] );
+            $json = json_decode($json, true);
+
+            if ( ! $json ){
+                return new \WP_Error( 'invalid_json', 'Funnel template has invalid JSON.' );
+            }
+
+            $funnel_id = $this->import_funnel($json);
+
+        } else if ( $json = get_request_var( 'funnel_json' ) ) {
+
+            $json = json_decode($json, true);
+
+            if ( ! $json ){
+                return new \WP_Error( 'invalid_json', 'Invalid JSON provided.' );
+            }
+
+            $funnel_id = $this->import_funnel($json);
+        }
+
+        if ( is_wp_error( $funnel_id ) ){
+            return $funnel_id;
         }
 
         if ( ! isset( $funnel_id ) || empty( $funnel_id ) ){
