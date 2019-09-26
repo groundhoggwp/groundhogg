@@ -530,7 +530,10 @@ class Funnels_Page extends Admin_Page
                 return $error;
             }
 
-            if ( ! in_array( mime_content_type( $file[ 'tmp_name' ] ), [ 'text/plain', 'application/json' ] ) ){
+            $path = $file['name'];
+            $ext = pathinfo($path, PATHINFO_EXTENSION);
+
+            if ( $ext !== 'funnel' || ! in_array( mime_content_type( $file[ 'tmp_name' ] ), [ 'text/plain', 'text/html', 'application/json' ] ) ){
                 return new \WP_Error( 'unexpected_file_type', 'The file type you have uploaded is not a valid funnel file.', $file );
             }
 

@@ -647,6 +647,17 @@ class Replacements
         return $user->last_name;
     }
 
+    function replacement_owner_phone( $contact_id )
+    {
+        $user = $this->get_current_contact()->get_ownerdata();
+
+        if ( ! $user || ! $user->phone ){
+            return $this->replacement_business_phone();
+        }
+
+        return $user->phone;
+    }
+
     /**
      * Return a confirmation link for the contact
      * This just gets the Optin Page link for now.

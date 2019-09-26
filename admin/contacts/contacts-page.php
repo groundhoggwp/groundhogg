@@ -586,6 +586,8 @@ class Contacts_Page extends Admin_Page
             if ( checkdate( $birthday[1], $birthday[2], $birthday[0] ) ){
                 $birthday = implode( '-', $birthday );
                 $contact->update_meta( 'birthday', $birthday );
+            } else {
+                $this->add_notice( new \WP_Error( 'invalid_date', __( 'The birthday date provided is not a valid date.' ) ) );
             }
         }
 

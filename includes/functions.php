@@ -2556,7 +2556,7 @@ function get_upload_wp_error( $file )
     }
 
     // no Error
-    if ( $file[ 'error' ] === UPLOAD_ERR_OK ){
+    if ( absint( $file[ 'error' ] ) === UPLOAD_ERR_OK ){
         return false;
     }
 

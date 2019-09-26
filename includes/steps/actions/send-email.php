@@ -370,9 +370,9 @@ class Send_Email extends Action
             if ($this->get_setting('skip_if_confirmed') && $contact->get_optin_status() === Preferences::CONFIRMED) {
 
                 /* This will simply get the upcoming email confirmed step and complete it. No muss not fuss */
-                do_action('groundhogg/step/email/confirmed', $contact->get_id(), Preferences::CONFIRMED, Preferences::CONFIRMED);
+                do_action('groundhogg/step/email/confirmed', $contact->get_id(), Preferences::CONFIRMED, Preferences::CONFIRMED, $event->get_funnel_id() );
 
-                /* Return false to avoid enqueue the next step. */
+                /* Return false to avoid enqueueing the next step. */
                 return false;
 
             }
@@ -380,7 +380,6 @@ class Send_Email extends Action
         }
 
         return $email->send($contact, $event);
-
     }
 
     /**

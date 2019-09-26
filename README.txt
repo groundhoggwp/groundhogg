@@ -152,6 +152,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.11.6 (2019-09-26) =
+* ADDED a new method "JSON import" for importing funnels.
+* ADDED error message when invalid birthday provided in the admin.
+* ADDED the {owner_phone} replacement code. Set user phone number under users > edit > contact methods
+* TWEAKED Remove error code from error message in admin because it's very ugly.
+* FIXED "Skip if confirmed" causing all confirmation "Email Confirmed" steps to trigger. Should only trigger the steps in the current funnel.
+
 = 2.0.11.5 (2019-09-24) =
 * ADDED Default localization library and supporting functions for validating mobile phone numbers
 * TWEAKED Birthday field in contact record now supports empty value to not save DOB as incorrect date

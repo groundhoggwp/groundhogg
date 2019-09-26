@@ -326,3 +326,12 @@ function tiny_mce_before_init( $initArray )
 JS;
     return $initArray;
 }
+
+// Add the phone to the contact methods!
+add_filter( 'user_contactmethods', __NAMESPACE__ . '\add_phone_contact_method', 99, 2 );
+
+function add_phone_contact_method( $methods, $user )
+{
+    $methods[ 'phone' ] = __( 'Phone', 'groundhogg' );
+    return $methods;
+}

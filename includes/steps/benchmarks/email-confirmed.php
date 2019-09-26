@@ -106,7 +106,7 @@ class Email_Confirmed extends Benchmark
     {
         return [
             'groundhogg/contact/preferences/updated' => 3,
-            'groundhogg/step/email/confirmed'        => 3
+            'groundhogg/step/email/confirmed'        => 4
         ];
     }
 
@@ -114,11 +114,13 @@ class Email_Confirmed extends Benchmark
      * @param $contact_id int
      * @param $preference int
      * @param $old_preference int
+     * @param $funnel_id int|bool only passed in SendEMail step if skip if confirmed is enabled.
      */
-    public function setup( $contact_id, $preference, $old_preference )
+    public function setup( $contact_id, $preference, $old_preference, $funnel_id=false )
     {
         $this->add_data( 'contact_id', $contact_id );
         $this->add_data( 'preference', $preference );
+        $this->add_data( 'funnel_id', $funnel_id );
     }
 
     /**
@@ -137,6 +139,13 @@ class Email_Confirmed extends Benchmark
      */
     protected function can_complete_step()
     {
+        $funnel_id = $this->get_data('funnel_id' );
+
+        // False if the funnel ID is set (From Email step) and the current step is not in that funnel
+        if ( $funnel_id && $funnel_id !== $this->get_current_step()->get_funnel_id() ){
+            return false;
+        }
+
         return $this->get_data( 'preference' ) === Preferences::CONFIRMED && $this->get_current_contact()->get_optin_status() === Preferences::CONFIRMED;
     }
 }
