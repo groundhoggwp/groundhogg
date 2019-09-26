@@ -430,9 +430,11 @@ class Event extends Base_Object
             $args[ 'error_message' ] = $this->get_last_error()->get_error_message();
         }
 
+        $updated = $this->update( $args );
+
         do_action( 'groundhogg/event/failed', $this );
 
-        return $this->update( $args );
+        return $updated;
     }
 
     /**
