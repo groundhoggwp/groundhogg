@@ -2460,7 +2460,7 @@ function action_url( $action, $args=[] )
 
     $url_args = array_filter( array_merge( $url_args, $args ) );
 
-    return add_query_arg( $url_args, admin_url( 'admin.php' ) );
+    return add_query_arg( urlencode_deep( $url_args ), admin_url( 'admin.php' ) );
 }
 
 global $groundhogg_mobile_validator;

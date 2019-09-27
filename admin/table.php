@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin;
 
+use Groundhogg\Base_Object;
 use Groundhogg\DB\DB;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
@@ -64,6 +65,20 @@ abstract class Table extends \WP_List_Table
                 ], $this->get_page_url() ),
             ],
             sprintf( '%s <span class="count">(%d)</span>', $display, $count )
+        );
+    }
+
+    /**
+     * Get value for checkbox column.
+     *
+     * @param $item Base_Object A singular item (one full row's worth of data).
+     * @return string Text to be placed inside the column <td>.
+     */
+    protected function column_cb( $identity ) {
+        return sprintf(
+            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
+            $this->_args['singular'],
+            $identity->get_id()
         );
     }
 

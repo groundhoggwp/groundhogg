@@ -78,6 +78,29 @@ abstract class Extension
     }
 
     /**
+     * Instance.
+     *
+     * Ensures only one instance of the plugin class is loaded or can be loaded.
+     *
+     * @since 1.0.0
+     * @access public
+     * @static
+     *
+     * @return Extension
+     */
+    public static function instance() {
+
+        $class = get_called_class();
+
+        if ( is_null( $class::$instance ) ) {
+
+            $class::$instance = new $class();
+        }
+
+        return $class::$instance;
+    }
+
+    /**
      * Register autoloader.
      *
      * Groundhogg autoloader loads all the classes needed to run the plugin.
@@ -328,7 +351,7 @@ abstract class Extension
 
     protected $plugin_data = [];
 
-	/**
+    /**
 	 * @param string $key
 	 *
 	 * @return string
@@ -419,29 +442,6 @@ abstract class Extension
             return 'Groundhogg Inc.';
         else
             return white_labeled_name();
-    }
-
-    /**
-     * Instance.
-     *
-     * Ensures only one instance of the plugin class is loaded or can be loaded.
-     *
-     * @since 1.0.0
-     * @access public
-     * @static
-     *
-     * @return Extension
-     */
-    public static function instance() {
-
-        $class = get_called_class();
-
-        if ( is_null( $class::$instance ) ) {
-
-            $class::$instance = new $class();
-        }
-
-        return $class::$instance;
     }
 
     final public function __clone() {

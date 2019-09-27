@@ -117,11 +117,14 @@ abstract class Tabbed_Admin_Page extends Admin_Page
             <?php
 
             $method = sprintf( '%s_%s', $this->get_current_tab(), $this->get_current_action() );
+            $backup_method = sprintf( '%s_%s', $this->get_current_tab(), 'view' );
 
             if ( method_exists( $this, $method ) ){
                 call_user_func( [ $this, $method ] );
-            } else {
+            } else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ){
                 do_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}", $this );
+            } else {
+                call_user_func( [ $this, $backup_method ] );
             }
 
             ?>

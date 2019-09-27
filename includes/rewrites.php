@@ -255,6 +255,9 @@ class Rewrites
                 }
 
                 $mime = mime_content_type( $file_path );
+
+                // Todo revisit this?
+
 //                $mimes = get_allowed_mime_types( get_current_user_id() );
 //                // Assume can only download uploadable mime types
 //                if ( ! in_array( $mime, $mimes ) ){
