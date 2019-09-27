@@ -128,6 +128,11 @@ class Tag_Mapping extends Bulk_Job
     public function remove_tags_from_contact_from_remove_roles( $user_id, $role )
     {
         $contact = Plugin::$instance->utils->get_contact( $user_id, true );
+
+        if ( ! $contact || ! $contact->exists() ){
+            return;
+        }
+
         $role = $this->get_role_pretty_name( $role );
         $contact->remove_tag( $role );
     }

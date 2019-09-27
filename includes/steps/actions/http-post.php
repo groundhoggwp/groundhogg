@@ -242,6 +242,10 @@ class HTTP_Post extends Action
             }
         }
 
+        if ( empty( $data ) ){
+            $data = $contact->get_as_array();
+        }
+
         $post_url = $this->get_setting('post_url' );
         $post_url = Plugin::$instance->replacements->process( esc_url_raw( $post_url ), $contact->get_id() );
 
@@ -295,7 +299,7 @@ class HTTP_Post extends Action
         $step = new Step( $step_id );
 
         if ( ! $step->exists() ){
-            wp_send_json_error();
+            wp_send_json_error( new \WP_Error( 'error', 'The provided step does not exist.' ) );
         }
 
         $this->set_current_step( $step );

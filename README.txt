@@ -152,6 +152,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.11.7 (2019-09-27) =
+* TWEAKED Table base class now provides better support for queries in the URL
+* TWEAKED Table base class includes column_cb function
+* TWEAKED Admin_Page class will fallback on to the default view action if no method is supported for the current action.
+* TWEAKED if webhook body is empty, pass the full contact details.
+* FIXED fatal error when removing a role from a user that does not have an associated contact record.
+* FIXED Webhook test does not work in funnel builder 2.0
+* FIXED Birthday error when birthday is left blank
+
 = 2.0.11.6 (2019-09-26) =
 * ADDED a new method "JSON import" for importing funnels.
 * ADDED error message when invalid birthday provided in the admin.

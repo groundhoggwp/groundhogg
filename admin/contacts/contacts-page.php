@@ -567,7 +567,8 @@ class Contacts_Page extends Admin_Page
 
         $birthday_parts = map_deep( get_request_var( 'birthday', [] ), 'absint' );
 
-        if ( ! empty( $birthday_parts ) ){
+        // Ignore 0 values.
+        if ( ! empty( $birthday_parts ) && array_sum( $birthday_parts ) > 0 ){
             // Birthday
             $parts = [
                 'year',

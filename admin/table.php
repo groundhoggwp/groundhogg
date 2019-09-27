@@ -51,17 +51,18 @@ abstract class Table extends \WP_List_Table
      * Generate a view link.
      *
      * @param $view
+     * @param $param
      * @param $display
      * @param $count
      * @return string
      */
-    protected function create_view($view, $display, $count=0 )
+    protected function create_view($view, $param, $display, $count=0 )
     {
         return html()->e( 'a',
             [
-                'class' => $this->get_view() === $view ? 'current' : '',
+                'class' => get_request_var( $param ) === $view ? 'current' : '',
                 'href'  => add_query_arg( [
-                    'status' => $view,
+                    $param => $view,
                 ], $this->get_page_url() ),
             ],
             sprintf( '%s <span class="count">(%d)</span>', $display, $count )
@@ -170,14 +171,15 @@ abstract class Table extends \WP_List_Table
             $view = wp_parse_args( $view, [
                 'display' => '',
                 'view' => '',
-                'count' => 0
+                'count' => 0,
+                'param' => $this->view_param()
             ] );
 
             if ( is_array( $view[ 'count' ] ) || is_object( $view[ 'count' ] ) ){
                 $view[ 'count' ] = $this->get_db()->count( $view[ 'count' ] );
             }
 
-            $views[] = $this->create_view( $view[ 'view' ], $view[ 'display' ], $view[ 'count' ] );
+            $views[] = $this->create_view( $view[ 'view' ], $view[ 'param' ], $view[ 'display' ], $view[ 'count' ] );
         }
 
         return apply_filters( "groundhogg/admin/table/{$this->get_table_id()}/get_views", $views );
@@ -207,10 +209,18 @@ abstract class Table extends \WP_List_Table
         $order   = get_url_var( 'order', 'DESC' );
         $orderby = get_url_var( 'orderby', $this->get_db()->get_primary_key() );
 
+        $relation = strtoupper( get_url_var( 'relation' ) );
+        $relationship = in_array( $relation, [ 'AND', 'OR' ] ) ? $relation: 'AND';
+
         $where = [
-            'relationship' => "AND",
-            [ 'col' => $this->view_param(), 'val' => $this->get_view(), 'compare' => '=' ],
+            'relationship' => $relationship,
         ];
+
+        $query = get_request_query();
+
+        foreach ( $query as $param => $val ){
+            $where[] = [ 'col' => $param, 'val' => $val, 'compare' => '=' ];
+        }
 
         $args = array(
             'where'   => $where,
