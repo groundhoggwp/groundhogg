@@ -501,7 +501,7 @@ class Sending_Service
     {
 
         $method = strtoupper( $method );
-        $url = sprintf( 'https://aws.groundhogg.io/wp-json/api/v2/%s', $endpoint );
+        $url = sprintf( 'https://groundhogg-api.com/%s', $endpoint );
 
         /* Set Default Headers */
         if ( empty( $headers ) ){
@@ -522,7 +522,8 @@ class Sending_Service
             'headers'       => $headers,
             'body'          => $body,
             'data_format'   => 'body',
-            'sslverify'     => true
+            'sslverify'     => true,
+            'timeout'       => 30 // Set timeout to 20 seconds to allow aws to warm up.
         ];
 
         if ( $method === 'GET' ){
@@ -583,9 +584,5 @@ class Sending_Service
         }
 
         return $json;
-
     }
-
-
-
 }
