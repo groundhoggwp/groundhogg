@@ -501,7 +501,7 @@ class Sending_Service
     {
 
         $method = strtoupper( $method );
-        $url = sprintf( 'https://aws.groundhogg.io/wp-json/api/v2/%s', $endpoint );
+        $url = sprintf( 'https://groundhogg-api.com/%s', $endpoint );
 
         /* Set Default Headers */
         if ( empty( $headers ) ){
@@ -583,9 +583,5 @@ class Sending_Service
         }
 
         return $json;
-
     }
-
-
-
 }
