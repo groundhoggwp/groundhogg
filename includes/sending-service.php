@@ -522,7 +522,8 @@ class Sending_Service
             'headers'       => $headers,
             'body'          => $body,
             'data_format'   => 'body',
-            'sslverify'     => true
+            'sslverify'     => true,
+            'timeout'       => 30 // Set timeout to 20 seconds to allow aws to warm up.
         ];
 
         if ( $method === 'GET' ){
