@@ -108,7 +108,6 @@ class Emails_Page extends Admin_Page
 	        wp_enqueue_style( 'groundhogg-admin-email-editor-plain' );
 	        wp_enqueue_script( 'groundhogg-admin-email-editor-plain' );
 
-
             wp_localize_script( 'groundhogg-admin-email-editor-plain', 'Email', [
 		        'send_test_prompt' => __( 'Send test email to...', 'groundhogg' ),
                 'email_id' => absint( Groundhogg\get_request_var( 'email' ) ),
@@ -167,7 +166,6 @@ class Emails_Page extends Admin_Page
                     'email_content',
                 ],
             ) );
-
         }
 
         if ( in_array( $this->get_current_action(), ['add', 'edit', 'edit_plain'] ) ){
@@ -768,7 +766,7 @@ class Emails_Page extends Admin_Page
 			$this->wp_die_no_access();
 		}
 
-		include dirname(__FILE__) . '/email-editor-plain.php';
+		include dirname( __FILE__ ) . '/email-editor.php';
 	}
 
     public function page()

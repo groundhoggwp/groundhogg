@@ -48,10 +48,10 @@ class Manager
         $this->emails       = new Emails();
         $this->events       = new Events();
         $this->funnels      = new Funnels();
-        $this->sms          = new SMS();
+//        $this->sms          = new SMS();
         $this->stepmeta     = new Step_Meta();
         $this->steps        = new Steps();
-        $this->superlinks   = new Superlinks();
+//        $this->superlinks   = new Superlinks();
         $this->tags         = new Tags();
         $this->tag_relationships = new Tag_Relationships();
         $this->submissions    = new Submissions();
