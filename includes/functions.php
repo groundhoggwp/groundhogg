@@ -54,6 +54,19 @@ function groundhogg_url($page = '', $args = [])
 }
 
 /**
+ * Easier url builder.
+ *
+ * @param $page
+ * @param $args
+ * @return string
+ */
+function admin_page_url( $page, $args )
+{
+    $args = wp_parse_args( $args, [ 'page' => $page ] );
+    return add_query_arg( $args, admin_url( 'admin.php' ) );
+}
+
+/**
  * Similar to wp_list_pluck in that we take the ID and the title and match them up.
  *
  * @param array $data array[]
@@ -2099,6 +2112,8 @@ function nonce_url_no_amp($actionurl, $action = -1, $name = '_wpnonce')
 }
 
 /**
+ * Return a dashicon
+ *
  * @param $icon
  * @param string $wrap
  * @param array $atts
@@ -2121,6 +2136,19 @@ function dashicon($icon, $wrap = 'span', $atts = [], $echo = false)
 
     return $html;
 }
+
+/**
+ * Output a dashicon
+ *
+ * @param $icon
+ * @param string $wrap
+ * @param array $atts
+ */
+function dashicon_e( $icon, $wrap = 'span', $atts = [] )
+{
+    dashicon( $icon, $wrap, $atts, true );
+}
+
 
 /**
  * Whather the current admin page is a groundhogg page.
@@ -2592,4 +2620,14 @@ function get_upload_wp_error( $file )
     }
 
     return new WP_Error( 'upload_error', $message, $file );
+}
+
+/**
+ * Whether the guided setup is finished or not.
+ *
+ * @return mixed
+ */
+function guided_setup_finished()
+{
+    return (bool) Plugin::$instance->settings->get_option('gh_guided_setup_finished', false );
 }
