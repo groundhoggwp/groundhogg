@@ -152,6 +152,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.12 (2019-10-08) =
+* ADDED SendWP integration is now the recommended email delivery tool.
+* TWEAKED improved birthday field UI in the form.
+
 = 2.0.11.8 (2019-10-07) =
 * TWEAKED Sending service now pings new serverless architecture!
 
