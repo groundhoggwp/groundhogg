@@ -334,6 +334,9 @@ class Plugin {
         }
 
         new Extension_Updater();
+
+        // Partner
+        SendWp::instance();
     }
 
     /**

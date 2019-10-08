@@ -17,9 +17,16 @@ abstract class Step
     public function __construct()
     {
         if ( $this->get_slug() === sanitize_key( get_request_var( 'guided_setup_step_save' ) ) ){
+            add_action( 'init', [ $this, 'load_dependencies' ] );
             add_action( 'admin_init', [ $this, 'go_to_next' ] );
+            add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
         }
     }
+
+    /**
+     * Any scripts that need to be loaded.
+     */
+    public function scripts(){}
 
     /**
      * Allow overwriting of dependencies.
