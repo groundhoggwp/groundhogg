@@ -32,9 +32,6 @@ class Scripts
         wp_register_script('manage-preferences', GROUNDHOGG_ASSETS_URL . 'js/frontend/preferences' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION);
         wp_register_script('fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $IS_MINIFIED . '.js', ['jquery'], GROUNDHOGG_VERSION, true );
 
-        // Integrations
-        wp_register_script( 'groundhogg-elementor-integration', GROUNDHOGG_URL . 'integrations/elementor' . $IS_MINIFIED .'.js', [], GROUNDHOGG_VERSION, true );
-
         if ( ! Plugin::$instance->settings->is_option_enabled('disable_api') ) {
 
             wp_localize_script('groundhogg-frontend', 'Groundhogg', array(
@@ -79,7 +76,6 @@ class Scripts
     {
         // Whether to include minified files or not.
         $IS_MINIFIED = $this->is_script_debug_enabled() ? '' : '.min';
-        wp_register_script( 'groundhogg-elementor-integration', GROUNDHOGG_URL . 'integrations/elementor' . $IS_MINIFIED .'.js', [], GROUNDHOGG_VERSION, true );
 
         // Select 2
         wp_register_script('select2', GROUNDHOGG_ASSETS_URL . 'lib/select2/js/select2.full' . $IS_MINIFIED . '.js', ['jquery'] );
