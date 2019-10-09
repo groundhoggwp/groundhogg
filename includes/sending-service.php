@@ -115,11 +115,14 @@ class Sending_Service
     /**
      * Whether the Groundhogg sending service is the system to use for SMS
      *
+     * The sending service is being deprecated entirely.
+     *
+     * @deprecated
      * @return bool
      */
     public function is_active_for_sms()
     {
-        return (bool) apply_filters( 'groundhogg/sending_service/send_sms', true );
+        return (bool) apply_filters( 'groundhogg/sending_service/send_sms', false );
     }
 
     /**

@@ -2495,15 +2495,6 @@ function validate_mobile_number( $number, $country_code='', $with_plus=false )
     return $number;
 }
 
-function is_sms_plugin_active(){
-
-    if ( is_plugin_active( 'groundhogg-sms/groundhogg-sms.php' ) ) {
-        return true;
-    }
-    return false;
-}
-
-
 /**
  * Get an error from an uploaded file.
  *
@@ -2563,4 +2554,23 @@ function get_upload_wp_error( $file )
 function guided_setup_finished()
 {
     return (bool) Plugin::$instance->settings->get_option('gh_guided_setup_finished', false );
+}
+
+/**
+ * Whether the SMS plugin is active. For backwards compatibility
+ *
+ * @return bool
+ */
+function is_sms_plugin_active(){
+    return defined( 'GROUNDHOGG_SMS_VERSION' );
+}
+
+/**
+ * Checks if Groundhogg pro features are installed.
+ *
+ * @return bool
+ */
+function is_pro_features_active()
+{
+    return defined( 'GROUNDHOGG_PRO_VERSION' );
 }
