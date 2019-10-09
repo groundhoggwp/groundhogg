@@ -425,7 +425,9 @@ abstract class Admin_Page
      */
     protected function do_title_actions()
     {
-        foreach ($this->get_title_actions() as $action):
+        $actions = apply_filters( "gronudhogg/admin/{$this->get_slug()}/{$this->get_current_action()}/title_actions", $this->get_title_actions()  );
+
+        foreach ($actions as $action):
 
             $action = wp_parse_args($action, [
                 'link' => admin_url(),

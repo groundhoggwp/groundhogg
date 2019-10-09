@@ -1271,8 +1271,7 @@ class HTML
             'off'           => 'Off',
         ), $args );
 
-        $css = sprintf( "<style>#%s-switch .onoffswitch-inner:before {content: \"%s\";}
-#%s-switch .onoffswitch-inner:after {content: \"%s\";}</style>",esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'on' ] ), esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'off' ] ) );
+        $css = sprintf( "<style>#%s-switch .onoffswitch-inner:before {content: \"%s\";} #%s-switch .onoffswitch-inner:after {content: \"%s\";}</style>",esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'on' ] ), esc_attr( $a[ 'id' ] ), esc_attr( $a[ 'off' ] ) );
 
         wp_enqueue_style( 'groundhogg-admin' );
 

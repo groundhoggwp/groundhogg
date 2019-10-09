@@ -148,6 +148,16 @@ function get_request_var($key = '', $default = false, $post_only = false)
 }
 
 /**
+ * Set the $_REQUEST param
+ *
+ * @param $key
+ * @param $value
+ */
+function set_request_var( $key, $value ){
+    $_REQUEST[ $key ] = $value;
+}
+
+/**
  * Get a variable from the $_POST global
  *
  * @param string $key

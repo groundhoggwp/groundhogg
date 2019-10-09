@@ -24,19 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Emails_Page extends Admin_Page
 {
 
-    protected function add_ajax_actions()
-    {
-        do_action( 'groundhogg/admin/email/add_ajax_actions', $this );
-    }
-
-    protected function add_additional_actions()
-    {
-        if ( $this->get_current_action() === 'edit' ){
-            add_action( 'in_admin_header' , array( $this, 'prevent_notices' )  );
-        }
-
-        do_action( 'groundhogg/admin/email/add_additional_actions', $this );
-    }
+    protected function add_ajax_actions(){}
+    protected function add_additional_actions(){}
 
 	public function admin_title($admin_title, $title)
     {
@@ -86,23 +75,22 @@ class Emails_Page extends Admin_Page
 
     public function scripts()
     {
-        if ( $this->get_current_action() === 'edit' ){
-	        wp_enqueue_style( 'groundhogg-admin-email-editor-plain' );
-	        wp_enqueue_script( 'groundhogg-admin-email-editor-plain' );
+        if ( in_array( $this->get_current_action(), ['add', 'edit' ] ) ){
+
+            wp_enqueue_style( 'groundhogg-admin-email-editor-plain' );
+            wp_enqueue_script( 'groundhogg-admin-email-editor-plain' );
 
             wp_localize_script( 'groundhogg-admin-email-editor-plain', 'Email', [
-		        'send_test_prompt' => __( 'Send test email to...', 'groundhogg' ),
+                'send_test_prompt' => __( 'Send test email to...', 'groundhogg' ),
                 'email_id' => absint( Groundhogg\get_request_var( 'email' ) ),
-	        ] );
+            ] );
 
             remove_editor_styles();
 
             add_filter( 'mce_css', function ( $mce_css ){
                 return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
             } );
-        }
 
-        if ( in_array( $this->get_current_action(), ['add', 'edit' ] ) ){
             wp_enqueue_script( 'groundhogg-admin-iframe' );
             wp_enqueue_style( 'groundhogg-admin-iframe' );
         }
@@ -254,6 +242,34 @@ class Emails_Page extends Admin_Page
         return false;
     }
 
+    /**
+     * Add the email to the DB
+     *
+     * @return bool|string|\WP_Error
+     */
+    public function process_add()
+    {
+        if ( ! current_user_can( 'add_emails' ) ){
+            $this->wp_die_no_access();
+        }
+
+        $email_id = Groundhogg\get_db( 'emails' )->add();
+
+        if ( ! $email_id ){
+            return new \WP_Error( 'error', 'Unable to create email.' );
+        }
+
+        Groundhogg\set_request_var( 'email', $email_id );
+
+        $result = $this->process_edit();
+
+        if ( $result === true ){
+            return Groundhogg\admin_page_url( 'gh_emails', [ 'action' => 'edit', 'email' => $email_id ] );
+        }
+
+        return $result;
+    }
+
 	/**
      * Process the editing actions of the email
      *
@@ -292,10 +308,9 @@ class Emails_Page extends Admin_Page
         $args[ 'status' ] = $status;
         $args[ 'from_user' ] = $from_user;
         $args[ 'subject' ] = $subject;
-        $args[ 'title' ] = sanitize_text_field( Groundhogg\get_request_var( 'email_title', $subject ) );
+        $args[ 'title' ] = sanitize_text_field( Groundhogg\get_request_var( 'title', $subject ) );
         $args[ 'pre_header' ] = $pre_header;
         $args[ 'content' ] = $content;
-
         $args[ 'last_updated' ] = current_time( 'mysql' );
         $args[ 'is_template' ] = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
 
@@ -371,6 +386,15 @@ class Emails_Page extends Admin_Page
         <?php
     }
 
+    public function add()
+    {
+        if ( ! current_user_can( 'add_emails' ) ){
+            $this->wp_die_no_access();
+        }
+
+        include dirname(__FILE__) . '/add.php';
+    }
+
     public function edit()
     {
         if ( ! current_user_can( 'edit_emails' ) ){
@@ -378,15 +402,5 @@ class Emails_Page extends Admin_Page
         }
 
         include dirname(__FILE__) . '/email-editor.php';
-    }
-
-    /**
-     * Prevent notices from other plugins appearing on the edit funnel screen as the break the format.
-     */
-    public function prevent_notices()
-    {
-        remove_all_actions( 'network_admin_notices' );
-        remove_all_actions( 'user_admin_notices' );
-        remove_all_actions( 'admin_notices' );
     }
 }
