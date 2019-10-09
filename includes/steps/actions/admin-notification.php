@@ -8,6 +8,7 @@ use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use function Groundhogg\is_sms_plugin_active;
+use function Groundhogg\validate_mobile_number;
 
 /**
  * Admin Notification
@@ -83,6 +84,11 @@ class Admin_Notification extends Action
         return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/admin-notification.png';
     }
 
+    protected function is_sms()
+    {
+        return (bool) $this->get_setting( 'is_sms' );
+    }
+
     /**
      * @param $step Step
      */
@@ -103,7 +109,7 @@ class Admin_Notification extends Action
             ] );
         }
 
-        if ( ! $this->get_setting( 'is_sms' ) ){
+        if ( ! $this->is_sms() || ! is_sms_plugin_active()  ){
             $this->add_control( 'send_to', [
                 'label' => __( 'Send To:', 'groundhogg' ),
                 'type' => HTML::INPUT,
@@ -169,19 +175,21 @@ class Admin_Notification extends Action
             $this->save_setting( 'send_to', $send_to );
         }
 
-        $send_to_sms = $this->get_posted_data( 'send_to_sms' );
+        if ( is_sms_plugin_active() ){
+            $send_to_sms = $this->get_posted_data( 'send_to_sms' );
 
-        if ( $send_to_sms ){
-            $send_to_sms = sanitize_text_field( $send_to_sms );
-            $numbers = array_map( 'trim', explode( ',', $send_to_sms ) );
-            $sanitized_numbers = array();
+            if ( $send_to_sms ){
+                $send_to_sms = sanitize_text_field( $send_to_sms );
+                $numbers = array_map( 'trim', explode( ',', $send_to_sms ) );
+                $sanitized_numbers = array();
 
-            foreach ( $numbers as $number ){
-                $sanitized_numbers[] = preg_replace( '/[^0-9]/', '', $number );
+                foreach ( $numbers as $number ){
+                    $sanitized_numbers[] = preg_replace( '/[^0-9]/', '', $number );
+                }
+
+                $send_to = implode( ', ', $sanitized_numbers );
+                $this->save_setting( 'send_to_sms', $send_to );
             }
-
-            $send_to = implode( ', ', $sanitized_numbers );
-            $this->save_setting( 'send_to_sms', $send_to );
         }
 
         $reply_to = $this->get_posted_data( 'reply_to' );
@@ -194,7 +202,10 @@ class Admin_Notification extends Action
             $this->save_setting( 'reply_to', $reply_to );
         }
 
-        $this->save_setting( 'is_sms', boolval( $this->get_posted_data( 'is_sms' ) ) );
+        if ( is_sms_plugin_active() ){
+            $this->save_setting( 'is_sms', boolval( $this->get_posted_data( 'is_sms' ) ) );
+        }
+
         $this->save_setting( 'subject', sanitize_text_field( $this->get_posted_data( 'subject' ) ) );
         $this->save_setting( 'note_text', sanitize_textarea_field( $this->get_posted_data( 'note_text' ) ) );
     }
@@ -249,11 +260,29 @@ class Admin_Notification extends Action
 
             remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
         } else {
-            // Todo
 
-            if ( function_exists( '\GroundhoggSMS\gh_sms' ) ){
-                $sent = \GroundhoggSMS\gh_sms( $this->get_setting( 'send_to_sms' ), $finished_note );
+            if ( ! is_sms_plugin_active() ){
+                return new \WP_Error( 'sms_inactive', 'The SMS extension was not found.' );
             }
+
+            // Todo
+            $to = $contact->get_phone_number();
+
+            $country_code = $contact->get_meta( 'country' );
+
+            $to = validate_mobile_number( $to, $country_code );
+
+            if ( ! $to ){
+                return new \WP_Error( 'invalid_number', 'Cell number provided is invalid.' );
+            }
+
+            $sent = false;
+
+            if ( function_exists( '\GroundhoggSMS\send_sms' ) ){
+                $sent = \GroundhoggSMS\send_sms( $to, $finished_note );
+            }
+
+            return $sent;
         }
 
         if ( $this->has_errors() ){
@@ -270,6 +299,6 @@ class Admin_Notification extends Action
      */
     public function mail_failed( $result )
     {
-//        $this->add_error( $result );
+        $this->add_error( $result );
     }
 }
