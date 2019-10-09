@@ -133,7 +133,7 @@ class Backwards_Compatibility
         $superlink = get_query_var( 'superlink' );
 
         if ( $superlink ){
-            wp_redirect( sprintf( managed_page_url( 'superlinks/link/%s/' ), absint( get_query_var( 'superlink_id' ) ) ) );
+            wp_safe_redirect( sprintf( managed_page_url( 'superlinks/link/%s/' ), absint( get_query_var( 'superlink_id' ) ) ) );
             die();
         }
 

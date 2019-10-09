@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
+use function Groundhogg\dashicon;
 use function Groundhogg\key_to_words;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
@@ -175,9 +176,10 @@ $funnel = new Funnel($funnel_id);
                     <?php
                     echo html()->modal_link( [
                         'title'     => __( 'Add Step', 'groundhogg' ),
-                        'text'      => __( 'Add Step', 'groundhogg' ),
+                        'text'      => dashicon( 'plus' ) . __( 'Add Step', 'groundhogg' ),
                         'footer_button_text' => __( 'Cancel' ),
                         'class'     => 'add-step button button-secondary no-padding',
+                        'id'        => 'add-step-bottom',
                         'source'    => 'steps',
                         'height'    => 700,
                         'width'     => 500,

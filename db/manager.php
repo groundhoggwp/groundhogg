@@ -48,10 +48,8 @@ class Manager
         $this->emails       = new Emails();
         $this->events       = new Events();
         $this->funnels      = new Funnels();
-//        $this->sms          = new SMS();
         $this->stepmeta     = new Step_Meta();
         $this->steps        = new Steps();
-//        $this->superlinks   = new Superlinks();
         $this->tags         = new Tags();
         $this->tag_relationships = new Tag_Relationships();
         $this->submissions    = new Submissions();
@@ -72,8 +70,6 @@ class Manager
     	if ( empty( $this->dbs ) ){
     		$this->init_dbs();
 	    }
-
-//    	wp_send_json_error( $this->dbs );
 
         foreach ( $this->dbs as $db ){
             $db->create_table();

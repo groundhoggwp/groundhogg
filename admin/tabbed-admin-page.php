@@ -86,6 +86,11 @@ abstract class Tabbed_Admin_Page extends Admin_Page
             return;
         }
 
+        if (is_string($exitCode) && esc_url_raw($exitCode)) {
+            wp_safe_redirect( $exitCode );
+            die();
+        }
+
         // Return to self if true response.
         if ( $exitCode === true ){
             return;
@@ -94,7 +99,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page
         // IF NULL return to main table
         $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
 
-        wp_redirect( $base_url );
+        wp_safe_redirect( $base_url );
         die();
     }
 

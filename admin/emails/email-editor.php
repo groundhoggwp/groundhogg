@@ -30,27 +30,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-
 $email_id = absint( get_request_var( 'email' ) );
 global $email;
-$email    = new Email( $email_id );
+$email = new Email( $email_id );
 
 ?>
 <form method="post" id="email-form">
-
     <!-- Before-->
-	<?php wp_nonce_field( 'edit_plain' ); ?>
-	<?php
+	<?php wp_nonce_field( 'edit' );
 
 	$test_email = get_user_meta( get_current_user_id(), 'preferred_test_email', true );
 	$test_email = $test_email ? $test_email : wp_get_current_user()->user_email;
 
     echo Plugin::$instance->utils->html->input( [ 'type' => 'hidden', 'id' => 'test-email', 'value' => $test_email ] ); ?>
-
     <div id='poststuff'>
-
         <div id="post-body" class="metabox-holder columns-2  <?php if ( $email->get_meta( 'alignment' ) === 'center' ) echo 'align-email-center'; ?>" style="clear: both">
-
             <div id="postbox-container-1" class="postbox-container sidebar">
                 <div id="save" class="postbox">
                     <span class="spinner"></span>

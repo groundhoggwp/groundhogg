@@ -683,7 +683,7 @@ class Contacts_Page extends Admin_Page
         do_action( 'groundhogg/admin/contact/save', $contact->get_id(), $contact );
 
         if ( get_request_var( 'switch_form' ) ){
-            wp_redirect( $this->admin_url( [
+            wp_safe_redirect( $this->admin_url( [
                 'action' => 'form',
                 'contact' => $contact->get_id(),
                 'form' => get_request_var( 'manual_form_submission' ),

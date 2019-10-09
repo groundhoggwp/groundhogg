@@ -63,7 +63,6 @@ class Autoloader {
         'Submission'    => 'includes/classes/submission.php',
         'Email'         => 'includes/classes/email.php',
         'Event'         => 'includes/classes/event.php',
-        'Superlink'     => 'includes/classes/superlink.php',
         'Tag'           => 'includes/classes/tag.php',
         'SMS'           => 'includes/classes/sms.php',
         'Broadcast'     => 'includes/classes/broadcast.php',

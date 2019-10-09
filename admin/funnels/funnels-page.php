@@ -53,7 +53,7 @@ class Funnels_Page extends Admin_Page
 	 */
     public function is_v2()
     {
-        return absint( get_request_var( 'version' ) ) === 2;
+        return absint( get_request_var( 'version' ) ) !== 1;
     }
 
     public function admin_title($admin_title, $title)

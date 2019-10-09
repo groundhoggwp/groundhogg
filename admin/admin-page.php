@@ -386,7 +386,7 @@ abstract class Admin_Page
         }
 
         if (is_string($exitCode) && esc_url_raw($exitCode)) {
-            wp_redirect($exitCode);
+            wp_safe_redirect( $exitCode );
             die();
         }
 
@@ -400,7 +400,7 @@ abstract class Admin_Page
             $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
         }
 
-        wp_redirect($base_url);
+        wp_safe_redirect( $base_url );
         die();
     }
 

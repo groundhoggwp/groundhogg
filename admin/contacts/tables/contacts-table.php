@@ -348,7 +348,7 @@ class Contacts_Table extends WP_List_Table
     }
 
     /**
-     * Generates and displays row action superlinks.
+     * Generates and displays row action links.
      *
      * @param $contact Contact Contact being acted upon.
      * @param string $column_name Current column name.

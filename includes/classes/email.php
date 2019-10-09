@@ -410,9 +410,7 @@ class Email extends Base_Object_With_Meta
             $this->get_contact()->get_id()
         );
 
-        if ( $this->get_meta( 'is_plain' ) ){
-	        $content = wpautop( $content );
-        }
+        $content = wpautop( $content );
 
 	    /* filter out double http based on bug where superlinks have http:// prepended */
         $schema = is_ssl() ? 'https://' : 'http://';

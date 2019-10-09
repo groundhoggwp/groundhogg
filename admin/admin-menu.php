@@ -53,7 +53,7 @@ class Admin_Menu
 //        $this->sms      = new SMS_Page();
         $this->broadcasts = new Broadcasts_Page();
         $this->funnels  = new Funnels_Page();
-//        $this->superlinks = new Superlinks_Page();
+//        $this->groundhoggs = new Superlinks_Page();
         $this->events   = new Events_Page();
         $this->tools    = new Tools_Page();
         $this->settings = new Settings_Page();

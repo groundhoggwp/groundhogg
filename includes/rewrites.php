@@ -32,12 +32,6 @@ class Rewrites
             'subpage=emails&email_id=$matches[1]'
         );
 
-        // New tracking structure.
-        add_managed_rewrite_rule(
-            'superlinks/link/([^/]*)/?$',
-            'subpage=superlink&superlink_id=$matches[1]'
-        );
-
         // Benchmark links
         add_managed_rewrite_rule(
             'link/click/([^/]*)/?$',
@@ -92,7 +86,6 @@ class Rewrites
         $vars[] = 'subpage';
         $vars[] = 'action';
         $vars[] = 'file_path';
-        $vars[] = 'superlink_id';
         $vars[] = 'funnel_id';
         $vars[] = 'enc_funnel_id';
         $vars[] = 'enc_form_id';
@@ -119,9 +112,6 @@ class Rewrites
         $this->map_query_var( $query, 'form_id', 'urldecode' );
         $this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
         $this->map_query_var( $query, 'form_id', 'absint' );
-
-//        $this->map_query_var( $query, 'file_path', 'urldecode' );
-//        $this->map_query_var( $query, 'file_path', 'base64_decode' );
         return $query;
     }
 
@@ -182,16 +172,6 @@ class Rewrites
         $template_loader = $this->get_template_loader();
 
         switch ( $subpage ){
-            case 'superlink':
-
-                $superlink_id = absint( get_query_var( 'superlink_id' ) );
-                $superlink = new Superlink( $superlink_id );
-
-                if ( $superlink->exists() ){
-                    $superlink->process( Plugin::$instance->tracking->get_current_contact() );
-                }
-
-                break;
             case 'benchmark_link':
 
                 $link_id = absint( get_query_var( 'link_id' ) );

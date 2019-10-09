@@ -39,9 +39,7 @@ class Utils
         'step'      => '\Groundhogg\Step',
         'event'     => '\Groundhogg\Event',
         'email'     => '\Groundhogg\Email',
-        'sms'       => '\Groundhogg\SMS',
         'broadcast' => '\Groundhogg\Broadcast',
-        'superlink' => '\Groundhogg\Superlink',
         'tag'       => '\Groundhogg\Tag',
     ];
 
