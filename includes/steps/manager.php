@@ -58,37 +58,21 @@ class Manager {
     {
         /* actions */
         $this->elements[] = new Send_Email();
-        $this->elements[] = new Send_SMS();
         $this->elements[] = new Admin_Notification();
         $this->elements[] = new Apply_Tag();
         $this->elements[] = new Remove_Tag();
         $this->elements[] = new Apply_Note();
-        $this->elements[] = new Date_Timer();
         $this->elements[] = new Delay_Timer();
-        $this->elements[] = new Field_Timer();
-        $this->elements[] = new Advanced_Timer();
-        $this->elements[] = new Apply_Owner();
-        $this->elements[] = new Create_User();
-        $this->elements[] = new Edit_Meta();
-        $this->elements[] = new HTTP_Post();
-//        $this->elements[] = new Sleep();
 
         /* Benchmarks */
         $this->elements[] = new Account_Created();
         $this->elements[] = new Form_Filled();
         $this->elements[] = new Email_Confirmed();
         $this->elements[] = new Link_Clicked();
-        $this->elements[] = new Login_Status();
 
         // No page view if tracking is disabled.
-        if ( ! is_option_enabled( 'gh_disable_page_view_tracking' ) ){
-            $this->elements[] = new Page_Visited();
-        }
-
-        $this->elements[] = new Role_Changed();
         $this->elements[] = new Tag_Applied();
         $this->elements[] = new Tag_Removed();
-        $this->elements[] = new Plugin_Api();
 
         /* Other */
         $this->elements[] = new Error();
