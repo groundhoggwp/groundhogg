@@ -14,7 +14,6 @@ use Groundhogg\Steps\Actions\Field_Timer;
 use Groundhogg\Steps\Actions\HTTP_Post;
 use Groundhogg\Steps\Actions\Remove_Tag;
 use Groundhogg\Steps\Actions\Send_Email;
-use Groundhogg\Steps\Actions\Send_SMS;
 use Groundhogg\Steps\Actions\Sleep;
 use Groundhogg\Steps\Benchmarks\Account_Created;
 use Groundhogg\Steps\Benchmarks\Plugin_Api;

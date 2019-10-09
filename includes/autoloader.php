@@ -64,7 +64,6 @@ class Autoloader {
         'Email'         => 'includes/classes/email.php',
         'Event'         => 'includes/classes/event.php',
         'Tag'           => 'includes/classes/tag.php',
-        'SMS'           => 'includes/classes/sms.php',
         'Broadcast'     => 'includes/classes/broadcast.php',
         'Funnel'        => 'includes/classes/funnel.php',
         'Step'          => 'includes/classes/step.php',

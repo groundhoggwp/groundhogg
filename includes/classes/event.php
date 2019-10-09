@@ -4,7 +4,7 @@ namespace Groundhogg;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Events;
 use Groundhogg\Queue\Email_Notification;
-use Groundhogg\Queue\SMS_Notification;
+
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -38,7 +38,6 @@ class Event extends Base_Object
     const FUNNEL = 1;
     const BROADCAST = 2;
     const EMAIL_NOTIFICATION = 3;
-    const SMS_NOTIFICATION = 4;
 
     /**
      * @var Contact
@@ -164,7 +163,7 @@ class Event extends Base_Object
     }
 
     /**
-     * @return Step|Email_Notification|SMS_Notification|Broadcast
+     * @return Step|Email_Notification|Broadcast
      */
     public function get_step()
     {
@@ -264,23 +263,7 @@ class Event extends Base_Object
         return $this->get_event_type() === self::BROADCAST;
     }
 
-    /**
-     * @since 1.2
-     * @return bool
-     */
-    public function is_sms_notification_event()
-    {
-        return $this->get_event_type() === self::EMAIL_NOTIFICATION;
-    }
 
-    /**
-     * @since 1.2
-     * @return bool
-     */
-    public function is_email_notification_event()
-    {
-        return $this->get_event_type() === self::SMS_NOTIFICATION;
-    }
 
     /**
      * @return string

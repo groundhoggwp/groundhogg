@@ -4,6 +4,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Broadcast;
 use Groundhogg\Bulk_Jobs\Broadcast_Scheduler;
 use Groundhogg\Plugin;
+use function Groundhogg\is_sms_plugin_active;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -215,18 +216,23 @@ class Broadcasts_Page extends Admin_Page
      */
     protected function get_title_actions()
     {
-        return [
+        $actions = [
             [
                 'link' => $this->admin_url( [ 'action' => 'add'  , 'type' => 'email' ] ),
                 'action' => __( 'Schedule Email Broadcast', 'groundhogg' ),
                 'target' => '_self',
-            ],
-            [
+            ]
+        ];
+
+        if (is_sms_plugin_active()) {
+            $actions[] = [
                 'link' => $this->admin_url( [ 'action' => 'add'  , 'type' => 'sms' ] ),
                 'action' => __( 'Schedule SMS Broadcast', 'groundhogg' ),
                 'target' => '_self',
-            ]
-        ];
+            ];
+        }
+
+        return $actions;
     }
 
     /**

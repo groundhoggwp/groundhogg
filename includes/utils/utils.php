@@ -68,6 +68,8 @@ class Utils
      */
     public function get_object( $id = 0 , $by = 'ID' , $object = 'contact', $get_from_cache = true ){
 
+
+
         $cache_key = md5(  $id . '|' . $by . '|' . $object );
 
         if ( $get_from_cache ){

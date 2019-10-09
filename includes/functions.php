@@ -587,55 +587,6 @@ function array_to_css($atts)
 }
 
 /**
- * Send an SMS message
- *
- * @param $to int|string|array single number or array of numbers.
- * @param $message string the message to send
- *
- * @return bool|WP_Error
- */
-function gh_sms($to, $message)
-{
-    if (!is_array($to)) {
-        $to = explode(',', $to);
-    }
-
-    $numbers = [];
-    foreach ($to as $number) {
-        $numbers[] = preg_replace('/[^0-9]/', '', $number);
-    }
-
-    // Only if SMS is enable on the GH end of things...
-    if (Plugin::$instance->sending_service->is_active_for_sms()) {
-
-        $sender_name = sanitize_from_name(Plugin::$instance->settings->get_option('business_name', get_bloginfo('name')));
-
-        foreach ($numbers as $number) {
-
-            $data = array(
-                'message' => $message,
-                'sender' => $sender_name,
-                'phone_number' => $number,
-                'country_code' => null
-            );
-
-            $response = Plugin::$instance->sending_service->request('sms/send', $data, 'POST');
-
-            if (is_wp_error($response)) {
-                do_action('groundhogg/sms/failed', $response);
-                return $response;
-            }
-        }
-
-        return true;
-    } else {
-        $sent = apply_filters('groundhogg/sms/send_custom', false, $message, $to);
-    }
-
-    return $sent;
-}
-
-/**
  * Get a cookie value
  *
  * @param string $cookie
@@ -1288,43 +1239,6 @@ function send_email_notification($email_id, $contact_id_or_email, $time = 0)
     return false;
 }
 
-/**
- * Schedule a 1 off sms notification
- *
- * @param $sms_id int the ID of the sms to send
- * @param $contact_id_or_email int|string the ID of the contact to send to
- * @param int $time time time to send at, defaults to time()
- *
- * @return bool whether the scheduling was successful.
- */
-function send_sms_notification($sms_id, $contact_id_or_email, $time = 0)
-{
-    $contact = Plugin::$instance->utils->get_contact($contact_id_or_email);
-    $sms = Plugin::$instance->utils->get_sms($sms_id);
-
-    if (!$contact || !$sms) {
-        return false;
-    }
-
-    if (!$time) {
-        $time = time();
-    }
-
-    $event = [
-        'time' => $time,
-        'funnel_id' => 0,
-        'step_id' => $sms->get_id(),
-        'contact_id' => $contact->get_id(),
-        'event_type' => Event::SMS_NOTIFICATION,
-        'status' => 'waiting',
-    ];
-
-    if (Plugin::$instance->dbs->get_db('events')->add($event)) {
-        return true;
-    }
-
-    return false;
-}
 
 /**
  * Parse the headers and return things like from/to etc...
@@ -1437,7 +1351,7 @@ function gh_ss_notify_low_credit($credits)
         case 300:
         case 100:
         case 0:
-            $subject = sprintf("Low on Email/SMS credits!");
+            $subject = sprintf("Low on Email credits!");
             $message = sprintf("You are running low on credits! Only %s credits remaining. Top up on credits &rarr; https://www.groundhogg.io/downloads/credits/", $credits);
             break;
     }
@@ -1449,7 +1363,7 @@ function gh_ss_notify_low_credit($credits)
 }
 
 add_action('groundhogg/ghss/credits_used', __NAMESPACE__ . '\gh_ss_notify_low_credit');
-add_action('groundhogg/ghss/sms_credits_used', __NAMESPACE__ . '\gh_ss_notify_low_credit');
+
 
 /**
  * Send event failure notification.
@@ -2581,9 +2495,9 @@ function validate_mobile_number( $number, $country_code='', $with_plus=false )
     return $number;
 }
 
-function is_pro_plugin_active(){
+function is_sms_plugin_active(){
 
-    if ( is_plugin_active( 'groundhogg-pro/groundhogg-pro.php' ) ) {
+    if ( is_plugin_active( 'groundhogg-sms/groundhogg-sms.php' ) ) {
         return true;
     }
     return false;

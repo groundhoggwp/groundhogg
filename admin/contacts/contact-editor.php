@@ -686,23 +686,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                     </div>
                 </td>
             </tr>
-            <tr>
-                <th><?php _ex('Send SMS', 'contact_record', 'groundhogg'); ?></th>
-                <td>
-                    <div style="max-width: 400px">
-                        <?php
-                        $args = array(
-                            'id' => 'sms_id',
-                            'name' => 'sms_id',
-                        );
-                        echo Plugin::$instance->utils->html->dropdown_sms($args); ?>
-                        <div class="row-actions">
-                            <button type="submit" name="send_sms" value="send"
-                                    class="button"><?php _e('Send'); ?></button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
+
             <tr>
                 <th><?php _ex('Add To Funnel', 'contact_record', 'groundhogg'); ?></th>
                 <td>
@@ -768,7 +752,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         <?php
     }
 
-    add_action('groundhogg/admin/contact/record/tab/files', '\Groundhogg\Admin\Contacts\contact_record_section_files');
+    add_action('groundhogg/admin/contact/record/tab/files', '\Groundhogg\Admin\Contacts\contact_record_section_files' );
 
     /**
      * @param $contact Contact
