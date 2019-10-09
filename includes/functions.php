@@ -2571,6 +2571,15 @@ function validate_mobile_number( $number, $country_code='', $with_plus=false )
     return $number;
 }
 
+function is_pro_plugin_active(){
+
+    if ( is_plugin_active( 'groundhogg-pro/groundhogg-pro.php' ) ) {
+        return true;
+    }
+    return false;
+}
+
+
 /**
  * Get an error from an uploaded file.
  *

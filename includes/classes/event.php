@@ -62,7 +62,7 @@ class Event extends Base_Object
      */
     protected function get_db()
     {
-        return Plugin::instance()->dbs->get_db('events' );
+        return get_db('events' );
     }
 
     /**
@@ -227,14 +227,11 @@ class Event extends Base_Object
             case self::EMAIL_NOTIFICATION:
                 $this->step = new Email_Notification( $this->get_step_id() );
                 break;
-            case self::SMS_NOTIFICATION:
-                $this->step = new SMS_Notification( $this->get_step_id() );
-                break;
             case self::BROADCAST:
                 $this->step = new Broadcast( $this->get_step_id() );
                 break;
 	        default:
-	        	$class = apply_filters( 'groundhosgg/event/post_setup/step_class', false );
+	        	$class = apply_filters( 'groundhogg/event/post_setup/step_class', false, $this );
 
 	        	if ( class_exists( $class ) ){
                     $this->step = new $class( $this->get_step_id() );
@@ -295,9 +292,7 @@ class Event extends Base_Object
         }
 
         return __( 'Unknown', 'groundhogg' );
-
     }
-
 
     /**
      * @return string

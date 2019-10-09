@@ -123,7 +123,6 @@ class Main_Roles extends Roles {
             'view_own_contacts',
             'import_contacts',
             'send_emails',
-            'send_sms',
             'view_events',
             'manage_tags',
             'download_contact_files'
@@ -143,7 +142,6 @@ class Main_Roles extends Roles {
             'view_own_contacts',
             'import_contacts',
             'send_emails',
-            'send_sms',
             'view_events',
             'manage_tags'
         ];
@@ -225,27 +223,6 @@ class Main_Roles extends Roles {
         return apply_filters( 'groundhogg/roles/caps/superlinks', $caps );
     }
 
-    /**
-	 * SMS:
-	 * - Add sms
-	 * - Delete sms
-	 * - Edit sms
-	 *
-	 * Get caps related to managing sms
-	 *
-	 * @return array
-	 */
-	public function get_sms_caps()
-	{
-		$caps = array(
-			'add_sms',
-			'delete_sms',
-			'edit_sms',
-			'send_sms',
-		);
-
-		return apply_filters( 'groundhogg/roles/caps/sms', $caps );
-	}
 
     /**
      * Broadcasts:
@@ -397,7 +374,6 @@ class Main_Roles extends Roles {
             $this->get_superlink_caps(),
             $this->get_tag_caps(),
             $this->get_report_caps(),
-            $this->get_sms_caps(),
             $this->get_other_caps(),
             $this->get_file_caps()
         );
