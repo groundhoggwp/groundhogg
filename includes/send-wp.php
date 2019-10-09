@@ -42,8 +42,6 @@ class SendWp {
             return;
         }
 
-        add_action( 'admin_print_styles', array( $this, 'output_css' ) );
-        add_action( 'admin_print_footer_scripts', array( $this, 'output_js' ) );
         add_action( 'wp_ajax_groundhogg_sendwp_remote_install', array( $this, 'ajax_callback_remote_install' ) );
     }
 
