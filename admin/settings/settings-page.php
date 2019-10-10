@@ -494,7 +494,7 @@ class Settings_Page extends Admin_Page
             'gh_uninstall_on_delete' => array(
                 'id' => 'gh_uninstall_on_delete',
                 'section' => 'misc_info',
-                'label' => sprintf(_x('Delete %s Data', 'settings', 'groundhogg'), white_labeled_name()),
+                'label' => sprintf(_x('Delete %s data', 'settings', 'groundhogg'), white_labeled_name()),
                 'desc' => _x('Delete all information when uninstalling. This cannot be undone.', 'settings', 'groundhogg'),
                 'type' => 'checkbox',
                 'atts' => array(
@@ -548,7 +548,7 @@ class Settings_Page extends Admin_Page
             'gh_script_debug' => array(
                 'id' => 'gh_script_debug',
                 'section' => 'misc_info',
-                'label' => _x('Enable Script Debug Mode', 'settings', 'groundhogg'),
+                'label' => _x('Enable script debug mode', 'settings', 'groundhogg'),
                 'desc' => _x('This will attempt to load full JS files instead of minified JS files for debugging.', 'settings', 'groundhogg'),
                 'type' => 'checkbox',
                 'atts' => array(
