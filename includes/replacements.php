@@ -182,11 +182,6 @@ class Replacements
                 'description' => _x( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'superlink',
-                'callback'    => [ $this, 'replacement_superlink' ],
-                'description' => _x( 'A superlink code. Usage: {superlink.id}', 'replacement', 'groundhogg' ),
-            ),
-            array(
                 'code'        => 'date',
                 'callback'    => [ $this, 'replacement_date' ],
                 'description' => _x( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
@@ -205,8 +200,7 @@ class Replacements
 
         $replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
 
-        foreach ( $replacements as $replacement )
-        {
+        foreach ( $replacements as $replacement ) {
             $this->add( $replacement['code'], $replacement[ 'callback' ], $replacement[ 'description' ] );
         }
 
@@ -682,19 +676,6 @@ class Replacements
     {
         $link_url = managed_page_url( 'preferences/confirm/' );
         return $link_url;
-    }
-
-    /**
-     * Do the link replacement...
-     *
-     * @param $linkId int the ID of the link
-     *
-     * @return string the superlink url
-     */
-    function replacement_superlink( $linkId )
-    {
-        $linkId = absint( intval( $linkId ) );
-        return site_url( 'superlinks/link/' . $linkId );
     }
 
     /**

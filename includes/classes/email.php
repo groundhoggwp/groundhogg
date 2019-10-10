@@ -415,7 +415,7 @@ class Email extends Base_Object_With_Meta
             $content = wpautop( $content );
         }
 
-	    /* filter out double http based on bug where superlinks have http:// prepended */
+	    /* filter out double http based on bug where links have http:// prepended */
         $schema = is_ssl() ? 'https://' : 'http://';
         $content = str_replace('http://https://', $schema, $content);
         $content = str_replace('http://http://', $schema, $content);
@@ -430,7 +430,7 @@ class Email extends Base_Object_With_Meta
     }
 
     /**
-     * Convert superlinks to tracking superlinks
+     * Convert links to tracking links
      *
      * @param $content string content which may contain Superlinks
      *
@@ -438,7 +438,7 @@ class Email extends Base_Object_With_Meta
      */
     public function convert_to_tracking_links( $content )
     {
-        /* Filter the superlinks to include data about the email, campaign, and funnel steps... */
+        /* Filter the links to include data about the email, campaign, and funnel steps... */
 	    $content = preg_replace_callback('/(href=")(?!mailto)(?!tel)([^"]*)(")/i', [ $this, 'tracking_link_callback' ], $content );
 	    // Also get single quote HTML since that's a thing that can happen.
 	    return preg_replace_callback('/(href=\')(?!mailto)(?!tel)([^"]*)(\')/i', [ $this, 'tracking_link_callback' ], $content );

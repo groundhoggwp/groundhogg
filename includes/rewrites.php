@@ -106,8 +106,6 @@ class Rewrites
         $this->map_query_var( $query, 'link_id', 'absint' );
         $this->map_query_var( $query, 'email_id', 'absint' );
 
-        $this->map_query_var( $query, 'superlink_id', 'absint' );
-
         // form
         $this->map_query_var( $query, 'form_id', 'urldecode' );
         $this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
