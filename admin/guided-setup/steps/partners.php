@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
+use function Groundhogg\dashicon_e;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
@@ -34,15 +35,19 @@ class Partners extends Step
 
     public function get_content()
     {
-	    $ip_info = Plugin::$instance->utils->location->ip_info();
+	    $cc = Plugin::$instance->utils->location->ip_info( null, 'countrycode' );
+
+	    if ( ! $cc ){
+	        $cc = 'US';
+        }
 
     	$partner_search_link = add_query_arg( [
-    		'country' => $ip_info[ 'country_code' ]
+    		'country' => $cc
 	    ], self::PARTNER_DIRECTORY_URL );
 
 	    ?>
 	    <p class="submit" style="text-align: center">
-		    <a class="button button-primary" target="_blank" href="<?php echo esc_url( $partner_search_link ); ?>"><?php _e( 'Find a Partner Near Me!' ) ?></a>
+		    <a class="button button-primary big-button" target="_blank" href="<?php echo esc_url( $partner_search_link ); ?>"><?php dashicon_e( 'groups' );_e( 'Find a Partner Near Me!' ) ?></a>
 	    </p>
 	    <?php
     }

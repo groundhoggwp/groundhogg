@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
 use Groundhogg\Plugin;
+use function Groundhogg\dashicon_e;
 
 /**
  * Created by PhpStorm.
@@ -32,7 +33,7 @@ class Sync_Users extends Step
     {
         ?>
         <p class="submit" style="text-align: center">
-            <a class="button button-primary" target="_blank" href="<?php echo Plugin::$instance->bulk_jobs->sync_contacts->get_start_url(); ?>"><?php _e( 'Click Here Sync!' ) ?></a>
+            <a class="button button-primary big-button" target="_blank" href="<?php echo Plugin::$instance->bulk_jobs->sync_contacts->get_start_url(); ?>"><?php dashicon_e( 'update-alt' ); _e( 'Click Here Sync!' ) ?></a>
         </p>
         <?php
     }

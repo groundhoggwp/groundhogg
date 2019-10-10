@@ -188,3 +188,15 @@ input[type=range].slider:focus::-ms-fill-upper {
     width: 100% !important;
     max-width: 400px !important;
 }
+
+#wpbody .big-button{
+    font-size: 16px;
+    margin: 20px auto;
+    padding: 8px 14px;
+    height: auto;
+}
+
+#wpbody .big-button .dashicons{
+    font-size: 24px;
+    margin-right: 10px;
+}

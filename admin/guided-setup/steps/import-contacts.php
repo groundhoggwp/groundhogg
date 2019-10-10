@@ -1,6 +1,8 @@
 <?php
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
+use function Groundhogg\dashicon_e;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -30,7 +32,7 @@ class Import_Contacts extends Step
     {
         ?>
         <p class="submit" style="text-align: center">
-            <a class="button button-primary" target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_tools&action=add&tab=import' );?>"><?php _e( 'Click Here To Import Your List!' ) ?></a>
+            <a class="button button-primary big-button" target="_blank" href="<?php echo admin_url( 'admin.php?page=gh_tools&action=add&tab=import' );?>"><?php  dashicon_e( 'upload' ); _e( 'Click Here To Import Your List!' ) ?></a>
         </p>
         <?php
     }

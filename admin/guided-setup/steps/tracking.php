@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
+use function Groundhogg\dashicon_e;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
@@ -17,7 +18,7 @@ class Tracking extends Step
 
     public function get_title()
     {
-        return _x('Enable Tracking', 'guided_setup', 'groundhogg');
+        return _x('Enable Statistics', 'guided_setup', 'groundhogg');
     }
 
     public function get_slug()
@@ -27,7 +28,7 @@ class Tracking extends Step
 
     public function get_description()
     {
-        return _x('Want a free extension? You can choose to share non sensitive data about how you use Groundhogg with us and in exchange you will receive one of the following premium extensions on us!', 'guided_setup', 'groundhogg');
+        return _x('Help us make Groundhogg better! Enable anonymous statistics collection.', 'guided_setup', 'groundhogg');
     }
 
     /**
@@ -39,88 +40,38 @@ class Tracking extends Step
     public function get_content()
     {
 
-        echo html()->e( 'style', [], ".radio{display:block;margin:10px;}" );
+        $pricing_url = add_query_arg( [
+            'utm_source'    => get_bloginfo(),
+            'utm_medium'    => 'guided-setup',
+            'utm_campaign'  => 'tracking-optin',
+            'utm_content'   => 'description',
+        ], 'https://www.groundhogg.io/pricing/' );
 
-        echo html()->wrap([
-            html()->e( 'label', [ 'class' => 'radio' ], [
-                html()->input([
-                    'name' => 'extension_choice',
-                    'type' => 'radio',
-                    'class' => '',
-                    'value' => 'smtp',
-                    'checked' => false,
-                ]),
-                " ",
-                html()->e( 'b', [],__( 'SMTP Add-On' ) ),
-                '. ',
-                html()->e( 'a', [ 'href' => 'https://www.groundhogg.io/downloads/smtp/', 'target' => '_blank' ], __( 'More details &rarr;' ) ),
-            ] ),
-            html()->e( 'label', [ 'class' => 'radio' ], [
-                html()->input([
-                    'name' => 'extension_choice',
-                    'type' => 'radio',
-                    'class' => '',
-                    'value' => 'styling',
-                    'checked' => false,
-                ]),
-                " ",
-                html()->e( 'b', [],__( 'Form Styling Add-On' ) ),
-                '. ',
-                html()->e( 'a', [ 'href' => 'https://www.groundhogg.io/downloads/form-styling/', 'target' => '_blank' ], __( 'More details &rarr;' ) ),
-            ] ),
-            html()->e( 'label', [ 'class' => 'radio' ], [
-                html()->input([
-                    'name' => 'extension_choice',
-                    'type' => 'radio',
-                    'class' => '',
-                    'value' => 'restriction',
-                    'checked' => false,
-                ]),
-                " ",
-                html()->e( 'b', [],__( 'Content Restriction Add-On' ) ),
-                '. ',
-                html()->e( 'a', [ 'href' => 'https://www.groundhogg.io/downloads/content-restriction/', 'target' => '_blank' ], __( 'More details &rarr;' ) ),
-            ] ),
-            html()->e( 'label', [ 'class' => 'radio' ], [
-                html()->input([
-                    'name' => 'extension_choice',
-                    'type' => 'radio',
-                    'class' => '',
-                    'value' => 'timers',
-                    'checked' => false,
-                    'required' => true
-                ]),
-                " ",
-                html()->e( 'b', [],__( 'Email Countdown Timers Add-On' ) ),
-                '. ',
-                html()->e( 'a', [ 'href' => 'https://www.groundhogg.io/downloads/countdown/', 'target' => '_blank' ], __( 'More details &rarr;' ) ),
-            ] ),
-        ], 'div', ['style' => [
-            'padding' => '10px'
-        ]]);
+        ?>
+        <style>
+            #enable-tracking h3{
+                text-align: center;
+            }
+            #enable-tracking p{
+                text-align: justify;
+            }
 
-        echo html()->wrap(html()->checkbox([
-            'label' => __('Yes, send me a discount code to receive my free extension.'),
-            'name' => 'enable_tracking',
-            'id' => 'enable_tracking',
-            'value' => '1',
-            'checked' => false,
-            'required' => true,
-        ]), 'div', ['style' => [
-            'font-weight' => '500',
-            'padding' => '20px'
-        ]]);
-
-        echo html()->description(sprintf(__('A discount code will be emailed to %s upon completion.', 'groundhogg'), wp_get_current_user()->user_email));
+            #enabled-tracking-button {
+                display: block;
+            }
+        </style>
+        <div id="enable-tracking">
+            <h3><?php _e( 'Want 25% off any premium plan?', 'groundhogg' ); ?></h3>
+            <p><?php printf( __( "When you enable anonymous statistics collection, you help us make Groundhogg better. As a thank you we'll send you a 25%% discount code which you can use for any <a href='%s' target='_blank'>Groundhogg premium plan.</a>", 'groundhogg' ), $pricing_url ); ?></p>
+            <button id="enabled-tracking-button" type="submit" class="button-primary big-button" name="enable_tracking" value="enable"><?php dashicon_e( 'yes' );_e( 'Yes! I Want <b>25% Off!</b>' ); ?></button>
+            <p class="description"><?php echo sprintf(__('A discount code will be emailed to %s upon completion.', 'groundhogg'), wp_get_current_user()->user_email ); ?></p>
+        </div>
+        <?php
     }
 
     public function save()
     {
-
-        if (get_request_var('enable_tracking')) {
-
-            set_transient( 'extension_choice', sanitize_text_field( get_request_var( 'extension_choice' ) ), HOUR_IN_SECONDS );
-
+        if ( get_request_var('enable_tracking') === 'enable' ) {
             Plugin::$instance->stats_collection->stats_tracking_optin();
         }
 

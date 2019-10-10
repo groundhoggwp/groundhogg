@@ -242,10 +242,21 @@ class SendWp {
     public function settings_connect_ui(){
 
         $this->output_css();
-        $this->output_connect_button();
-        $this->output_js();
 
-        ?><p class="description"><?php _e( 'Never worry about sending email again! <a href="https://sendwp.com/" target="_blank">SendWP</a> takes care of everything for you for just <b>$9/month!</b>', 'groundhogg' ); ?></p><?php
+        ?>
+        <table class="form-table">
+            <tbody>
+            <tr>
+                <th><?php _e( 'A better way to send email.', 'groundhogg' ); ?></th>
+                <td><?php $this->output_connect_button(); ?>
+                    <p class="description"><?php _e( 'Never worry about sending email again! <a href="https://sendwp.com/" target="_blank">SendWP</a> takes care of everything for you for just <b>$9/month!</b>', 'groundhogg' ); ?></p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <?php
+
+        $this->output_js();
     }
 
     /**
