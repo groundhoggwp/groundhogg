@@ -11,8 +11,6 @@ use Groundhogg\Admin\Events\Events_Page;
 use Groundhogg\Admin\Funnels\Funnels_Page;
 use Groundhogg\Admin\Guided_Setup\Guided_Setup;
 use Groundhogg\Admin\Settings\Settings_Page;
-use Groundhogg\Admin\SMS\SMS_Page;
-use Groundhogg\Admin\Superlinks\Superlinks_Page;
 use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Tools\Tools_Page;
 use Groundhogg\Admin\Welcome\Welcome_Page;

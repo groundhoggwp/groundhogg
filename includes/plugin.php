@@ -188,16 +188,6 @@ class Plugin {
      */
     public $reporting;
 
-//    /**
-//     * @var Log_Manager
-//     */
-//    public $logger;
-//
-//    /**
-//     * @var Core\Upgrade\Manager
-//     */
-//    public $upgrade;
-
     /**
      * Clone.
      *
