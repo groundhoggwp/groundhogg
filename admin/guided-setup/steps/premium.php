@@ -26,7 +26,7 @@ class Premium extends Step
 
     public function get_description()
     {
-        return _x( 'Unlock functionality, powerups, and integrations by upgrading to premium!', 'guided_setup', 'groundhogg' );
+        return _x( 'Unlock functionality, powerups and integrations by upgrading to premium!', 'guided_setup', 'groundhogg' );
     }
 
     public function get_content()
@@ -38,8 +38,8 @@ class Premium extends Step
             'utm_content'   => 'description',
         ], 'https://www.groundhogg.io/pricing/' );
         
-        $discount = false;//todo
-        
+        $discount = get_user_meta( wp_get_current_user()->ID, 'gh_free_extension_discount', true );
+
         if ( $discount ){
             $pricing_url = add_query_arg( [ 'discount' => $discount ], $pricing_url );
         }
@@ -63,7 +63,7 @@ class Premium extends Step
             <p style="text-align: center">
                 <a id="pricing-button" class="button-primary big-button" href="<?php echo esc_url( $pricing_url ); ?>" target="_blank"><?php dashicon_e( 'cart' );_e( 'Yes, I Want To Upgrade!' ); ?></a>
             </p>
-            <p class="description"><?php _e('If you request a discount code from the previous step it will automatically be applied at checkout.', 'groundhogg'); ?></p>
+            <p class="description"><?php _e('If you requested a discount code from the previous step it will automatically be applied at checkout.', 'groundhogg'); ?></p>
         </div>
         <?php
 	}
