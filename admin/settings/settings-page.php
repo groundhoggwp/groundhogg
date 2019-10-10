@@ -6,6 +6,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Dropins\Test_Extension;
 use Groundhogg\Dropins\Test_Extension_2;
 use Groundhogg\Extension;
+use Groundhogg\SendWp;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
@@ -217,16 +218,16 @@ class Settings_Page extends Admin_Page
                 'title' => _x('Compliance', 'settings_sections', 'groundhogg'),
                 'tab' => 'marketing'
             ),
+            'sendwp' => [
+                'id' => 'sendwp',
+                'title' => _x('SendWP', 'settings_sections', 'groundhogg'),
+                'tab' => 'email',
+                'callback' => [SendWp::instance(), 'settings_connect_ui'],
+            ],
             'overrides' => [
                 'id' => 'overrides',
                 'title' => _x('Overrides', 'settings_sections', 'groundhogg'),
                 'tab' => 'email'
-            ],
-            'service' => [
-                'id' => 'service',
-                'title' => _x('Groundhogg Sending Service', 'settings_sections', 'groundhogg'),
-                'tab' => 'email',
-                'callback' => [Plugin::$instance->sending_service, 'test_connection_ui'],
             ],
             'bounces' => array(
                 'id' => 'bounces',
@@ -234,6 +235,12 @@ class Settings_Page extends Admin_Page
                 'tab' => 'email',
                 'callback' => [Plugin::$instance->bounce_checker, 'test_connection_ui'],
             ),
+            'service' => [
+                'id' => 'service',
+                'title' => _x('Groundhogg Sending Service (Deprecated)', 'settings_sections', 'groundhogg'),
+                'tab' => 'email',
+                'callback' => [Plugin::$instance->sending_service, 'test_connection_ui'],
+            ],
             'api_settings' => array(
                 'id' => 'api_settings',
                 'title' => _x('API Settings', 'settings_sections', 'groundhogg'),

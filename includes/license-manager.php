@@ -379,7 +379,7 @@ class License_Manager
         ?>
         <div class="postbox">
             <?php if ( $extension->info->title ): ?>
-                <h2 class="hndle"><?php echo $extension->info->title; ?></h2>
+                <h2 class="hndle"><b><?php echo $extension->info->title; ?></b></h2>
             <?php endif; ?>
             <div class="inside" style="padding: 0;margin: 0">
                 <?php if ( $extension->info->thumbnail ): ?>
@@ -404,7 +404,7 @@ class License_Manager
                             $price2 = max($pricing);
 
                             ?>
-                            <a class="button-primary" target="_blank"
+                            <a class="button-secondary" target="_blank"
                                href="<?php echo $extension->info->link; ?>"> <?php printf( _x('Buy Now ($%s - $%s)', 'action', 'groundhogg'), $price1, $price2 ); ?></a>
                             <?php
                         } else {
@@ -413,12 +413,12 @@ class License_Manager
 
                             if ($price > 0.00) {
                                 ?>
-                                <a class="button-primary" target="_blank"
+                                <a class="button-secondary" target="_blank"
                                    href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action','groundhogg' ), $price ); ?></a>
                                 <?php
                             } else {
                                 ?>
-                                <a class="button-primary" target="_blank"
+                                <a class="button-secondary" target="_blank"
                                    href="<?php echo $extension->info->link; ?>"> <?php _ex('Download', 'action', 'groundhogg'); ?></a>
                                 <?php
                             }
