@@ -19,7 +19,7 @@ var FormIntegration = {};
 
                 var args = {
                     action: self.action_prefix + type,
-                    step_id: $step.attr('id'),
+                    step_id: $step.attr('data-id'),
                     form_id: $picker.val()
                 };
 

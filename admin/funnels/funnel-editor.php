@@ -48,7 +48,11 @@ if ( ! is_option_enabled( 'gh_use_builder_version_2' ) ){
         'name' => 'funnel',
         'id'    => 'funnel',
         'value' => $funnel_id
-    ); echo Plugin::$instance->utils->html->input( $args ); ?>
+    ); echo Plugin::$instance->utils->html->input( $args );
+
+    echo html()->input( [ 'type' => 'hidden', 'value' => 1, 'name' => 'version' ] );
+
+    ?>
     <div class="header-wrap">
         <div class="funnel-editor-header">
             <div class="title alignleft">
