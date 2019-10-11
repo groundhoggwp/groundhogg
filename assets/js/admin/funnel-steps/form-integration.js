@@ -12,7 +12,7 @@ var FormIntegration = {};
 
             $(document).on('change', '.form-integration-picker', function () {
                 var $picker = $(this);
-                var $step = $picker.closest('.postbox');
+                var $step = $picker.closest('.step');
                 var type = $step.attr('data-type');
 
                 showSpinner();
