@@ -200,3 +200,75 @@ input[type=range].slider:focus::-ms-fill-upper {
     font-size: 24px;
     margin-right: 10px;
 }
+
+.nav-tab-wrapper a[href="?page=gh_help&tab=fb"] .dashicons{
+    margin-right: 4px;
+}
+
+.post-box-grid .postbox {
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    float: left;
+    overflow: hidden;
+    margin: 0 16px 16px 0;
+}
+
+@media only screen and (max-width: 800px) {
+    .post-box-grid .postbox {
+        display: block;
+        width: 100%;
+        margin-right: 0;
+    }
+}
+
+
+@media only screen and (max-width: 1300px) and (min-width: 800px) {
+    .post-box-grid .postbox {
+        width: calc(50% - 16px);
+    }
+
+    .post-box-grid .postbox:nth-child(2n+1){
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    .post-box-grid .postbox:nth-child(2n+2){
+        margin-right: 0;
+    }
+}
+
+@media only screen and (min-width: 1300px) and (max-width: 1800px){
+    .post-box-grid .postbox {
+        width: calc(33% - 16px);
+    }
+
+    .post-box-grid .postbox:nth-child(3n+1){
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    .post-box-grid .postbox:nth-child(3n){
+        width: 33%;
+        margin-right: 0;
+    }
+}
+
+@media only screen and (min-width: 1800px) {
+    .post-box-grid .postbox {
+        width: calc(25% - 16px);
+    }
+
+    .post-box-grid .postbox:nth-child(4n+1){
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    .post-box-grid .postbox:nth-child(4n){
+        width: 25%;
+        margin-right: 0;
+    }
+}

@@ -324,7 +324,7 @@ class Settings_Page extends Admin_Page
                     }
                 </style>
                 <p><?php _e('You have no extensions installed. Want some?', 'groundhogg'); ?> <a
-                            href="https://groundhogg.io/downloads/"><?php _e('Get your first extension!', 'groundhogg') ?></a>
+                            href="https://groundhogg.io/pricing/"><?php _e('Get your first extension!', 'groundhogg') ?></a>
                 </p>
                 <div class="masonry">
                     <?php

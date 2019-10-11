@@ -80,7 +80,11 @@ class License_Manager
     	if ( empty( static::$extensions ) )
     		static::$extensions = get_option( "gh_extensions", array() );
 
-        return static::$extensions[$item_id]['license'];
+    	if ( isset_not_empty( static::$extensions, $item_id ) ){
+            return static::$extensions[$item_id]['license'];
+        }
+
+    	return false;
     }
 
     public static function get_license_status( $item_id )

@@ -61,7 +61,7 @@ class Premium extends Step
             <h3><?php _e( 'Unlock powerful tools and integrations when you go premium!', 'groundhogg' ); ?></h3>
             <p><?php _e( "Get access to over 30 premium extensions and integrations including WooCommerce, Zapier, Amazon Web Services, LifterLMS, Scheduling and more which will help you build the prefect customer journey." ); ?></p>
             <p style="text-align: center">
-                <a id="pricing-button" class="button-primary big-button" href="<?php echo esc_url( $pricing_url ); ?>" target="_blank"><?php dashicon_e( 'cart' );_e( 'Yes, I Want To Upgrade!' ); ?></a>
+                <a id="pricing-button" class="button-primary big-button" href="<?php echo esc_url( $pricing_url ); ?>" target="_blank"><?php dashicon_e( 'star-filled' );_e( 'Yes, I Want To Upgrade!' ); ?></a>
             </p>
             <p class="description"><?php _e('If you requested a discount code from the previous step it will automatically be applied at checkout.', 'groundhogg'); ?></p>
         </div>

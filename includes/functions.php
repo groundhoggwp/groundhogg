@@ -2574,3 +2574,17 @@ function is_pro_features_active()
 {
     return defined( 'GROUNDHOGG_PRO_VERSION' );
 }
+
+add_action( 'admin_print_styles', function (){
+    ?><style>
+        #adminmenu #toplevel_page_groundhogg a[href="admin.php?page=gh_go_pro"] .dashicons{
+            font-size: 18px;
+            margin-right: 2px;
+        }
+        #adminmenu #toplevel_page_groundhogg a[href="admin.php?page=gh_go_pro"]{
+            color: #DB741A;
+            font-weight: bold;
+        }
+    </style>
+    <?php
+} );

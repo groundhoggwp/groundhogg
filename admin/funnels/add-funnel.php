@@ -30,9 +30,9 @@ do_action( 'wpgh_before_new_funnel' );
 <?php $active_tab = sanitize_key( get_request_var( 'tab', 'templates' ) ); ?>
 <h2 class="nav-tab-wrapper">
     <a id="funnel-templates" href="?page=gh_funnels&action=add&tab=templates" class="nav-tab <?php echo $active_tab == 'templates' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Funnel Templates', 'add_funnel_tab', 'groundhogg'); ?></a>
-    <?php if( !is_white_labeled()) :?>
-    <a id="funnel-marketplace" href="?page=gh_funnels&action=add&tab=marketplace" class="nav-tab <?php echo $active_tab == 'marketplace' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Marketplace','add_funnel_tab', 'groundhogg'); ?></a>
-    <?php endif; ?>
+<!--    --><?php //if( !is_white_labeled()) :?>
+<!--    <a id="funnel-marketplace" href="?page=gh_funnels&action=add&tab=marketplace" class="nav-tab --><?php //echo $active_tab == 'marketplace' ? 'nav-tab-active' : ''; ?><!--">--><?php //_ex( 'Marketplace','add_funnel_tab', 'groundhogg'); ?><!--</a>-->
+<!--    --><?php //endif; ?>
     <a id="funnel-import" href="?page=gh_funnels&action=add&tab=import" class="nav-tab <?php echo $active_tab == 'import' ? 'nav-tab-active' : ''; ?>"><?php _ex( 'Import Funnel', 'add_funnel_tab','groundhogg'); ?></a>
 </h2>
 <!-- search form -->
@@ -43,23 +43,24 @@ do_action( 'wpgh_before_new_funnel' );
         <?php wp_nonce_field(); ?>
         <?php include GROUNDHOGG_PATH . 'templates/assets/funnel-templates.php'; ?>
         <div  id="poststuff" >
+            <div class="post-box-grid">
+                <?php
 
-            <?php
+                /**
+                 * @var $funnel_templates array
+                 * @see templates/assets/funnels
+                 */
 
-            /**
-             * @var $funnel_templates array
-             * @see templates/assets/funnels
-             */
-
-            foreach ( $funnel_templates as $id => $funnel_args ): ?>
-                <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
-                    <h2 class="hndle"><?php echo $funnel_args['title']; ?></h2>
-                    <div class="inside">
-                        <p><?php echo $funnel_args['description']; ?></p>
-                        <button class="button-primary" name="funnel_template" value="<?php echo $id ?>"><?php _ex('Start Building', 'action', 'groundhogg'); ?></button>
+                foreach ( $funnel_templates as $id => $funnel_args ): ?>
+                    <div class="postbox">
+                        <h2 class="hndle"><?php echo $funnel_args['title']; ?></h2>
+                        <div class="inside">
+                            <p><?php echo $funnel_args['description']; ?></p>
+                            <button class="button-primary" name="funnel_template" value="<?php echo $id ?>"><?php _ex('Start Building', 'action', 'groundhogg'); ?></button>
+                        </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            </div>
         </div>
     </form>
 <?php elseif ( 'marketplace' === $active_tab ):
@@ -85,7 +86,7 @@ do_action( 'wpgh_before_new_funnel' );
         <div style="text-align: center;" id="spinner">
             <span class="spinner" style="float: none; visibility: visible"></span>
         </div>
-        <div id="downloads">
+        <div id="downloads" class="post-box-grid">
             <?php Plugin::$instance->admin->get_page( 'funnels' )->display_funnel_templates();  ?>
         </div>
     </div>

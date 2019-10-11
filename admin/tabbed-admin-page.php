@@ -128,7 +128,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page
                 call_user_func( [ $this, $method ] );
             } else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ){
                 do_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}", $this );
-            } else {
+            } else if ( method_exists( $this, $backup_method ) ) {
                 call_user_func( [ $this, $backup_method ] );
             }
 

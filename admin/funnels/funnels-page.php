@@ -169,6 +169,8 @@ class Funnels_Page extends Admin_Page
 
            wp_enqueue_script( 'groundhogg-admin-replacements' );
        }
+
+       wp_enqueue_style( 'groundhogg-admin' );
     }
 
     public function help()
