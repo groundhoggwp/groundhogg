@@ -1,7 +1,9 @@
 <?php
 
+use function Groundhogg\admin_page_url;
 use function Groundhogg\html;
 use function Groundhogg\is_option_enabled;
+use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\white_labeled_name;
 
 /**
@@ -444,7 +446,9 @@ function groundhogg_safe_mode_enabled_notice() {
         return;
     }
 
-    $message = sprintf( esc_html__( '%s safe mode is currently enabled. All other plugins are inactive. %s', 'groundhogg' ), white_labeled_name(), html()->e( 'a', [ 'href' => admin_url( 'admin.php?page=gh_tools&tab=system' ) ], __( 'Disable Safe Mode', 'groundhogg' ) ) );
+    $disable_safe_mode_url = nonce_url_no_amp( admin_page_url( 'gh_tools', [ 'action' => 'disable_safe_mode' ] ), 'disable_safe_mode' );
+
+    $message = sprintf( esc_html__( '%s safe mode is currently enabled. All other plugins are inactive. %s', 'groundhogg' ), white_labeled_name(), html()->e( 'a', [ 'href' => $disable_safe_mode_url ], __( 'Disable Safe Mode', 'groundhogg' ) ) );
     $html_message = sprintf( '<div class="notice notice-warning">%s</div>', wpautop( $message ) );
     echo wp_kses_post( $html_message );
 }
