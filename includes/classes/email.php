@@ -733,6 +733,7 @@ class Email extends Base_Object_With_Meta
      */
     public function send( $contact_id_or_email, $event = 0 )
     {
+        $this->clear_errors();
 
         if ( $this->is_draft() && ! $this->is_testing() ){
             return new WP_Error('email_not_ready', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
