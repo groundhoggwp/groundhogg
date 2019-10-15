@@ -152,6 +152,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.12.1 (2019-10-15) =
+* FIXED Bug caused emails which were sent to appear as failed with an error related to another email address.
+
 = 2.0.12 (2019-10-08) =
 * ADDED SendWP integration is now the recommended email delivery tool.
 * TWEAKED improved birthday field UI in the form.
