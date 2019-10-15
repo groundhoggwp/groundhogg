@@ -33,6 +33,14 @@ abstract class Supports_Errors
     }
 
     /**
+     * Clear the errors.
+     */
+    public function clear_errors()
+    {
+        $this->errors = [];
+    }
+
+    /**
      * @return bool
      */
     public function has_errors()
