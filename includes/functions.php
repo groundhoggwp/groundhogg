@@ -115,6 +115,16 @@ function html()
 }
 
 /**
+ * Shorthand
+ *
+ * @return Notices
+ */
+function notices()
+{
+    return Plugin::$instance->notices;
+}
+
+/**
  * Return if a value in an array isset and is not empty
  *
  * @param $array

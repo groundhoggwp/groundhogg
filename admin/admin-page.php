@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin;
 
+use Groundhogg\Supports_Errors;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -25,7 +26,7 @@ use Groundhogg\Pointers;
 // Exit if accessed directly
 if (!defined('ABSPATH')) exit;
 
-abstract class Admin_Page
+abstract class Admin_Page extends Supports_Errors
 {
 
     protected $screen_id;
@@ -396,7 +397,9 @@ abstract class Admin_Page
         }
 
         // IF NULL return to main table
-        if (!empty($this->get_items())) {
+        $items = $this->get_items();
+
+        if ( ! empty( $items ) ) {
             $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
         }
 

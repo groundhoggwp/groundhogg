@@ -125,10 +125,10 @@ class Help_Page extends Tabbed_Admin_Page
                 'name' => __('Support Ticket', 'groundhogg'),
                 'slug' => 'support'
             ],
-            [
-                'name' => dashicon( 'sos' ) . __('Support Group', 'groundhogg'),
-                'slug' => 'fb'
-            ]
+//            [
+//                'name' => __('Support Group', 'groundhogg'),
+//                'slug' => 'fb'
+//            ]
         ];
 
         if (!is_pro_features_active()) {
@@ -360,6 +360,9 @@ class Help_Page extends Tabbed_Admin_Page
                        target="_blank"><?php dashicon_e('star-filled');
                         _e('Yes, I Want To Upgrade!'); ?></a>
                 </p>
+                <p style="text-align: center">
+                    <a href="https://www.groundhogg.io/fb/" target="_blank"><?php _e( 'Post to Facebook.', 'groundhogg' ); ?></a>
+                </p>
             </div>
         <?php
 
@@ -368,6 +371,34 @@ class Help_Page extends Tabbed_Admin_Page
         do_action( 'groundhogg/support_ticket_form' );
     }
 
+    /**
+     * @var int
+     */
+    protected $ticket_id = 0;
+
+    /**
+     * Create a support ticket
+     */
+    public function process_support_submit_ticket()
+    {
+        add_action( 'groundhogg/create_support_ticket/failed', [ $this, 'listen_for_support_error' ] );
+
+        do_action( 'groundhogg/create_support_ticket' );
+
+        if ( $this->has_errors() ){
+            return $this->get_last_error();
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $error \WP_Error
+     */
+    public function listen_for_support_error( $error )
+    {
+        $this->add_error( $error );
+    }
 
     /**
      * Output the basic view.

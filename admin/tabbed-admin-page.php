@@ -97,7 +97,9 @@ abstract class Tabbed_Admin_Page extends Admin_Page
         }
 
         // IF NULL return to main table
-        $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
+        if ( count( $this->get_items() ) > 0 ){
+            $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
+        }
 
         wp_safe_redirect( $base_url );
         die();
