@@ -693,7 +693,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                     <div style="max-width: 400px">
                         <?php
 
-                        $steps = Plugin::$instance->dbs->get_db('steps')->query();
+                        $steps = Plugin::$instance->dbs->get_db('steps')->query( [ 'orderby' => 'step_order', 'order' => 'asc' ] );
                         $options = array();
                         foreach ($steps as $step) {
                             $step = Plugin::$instance->utils->get_step($step->ID);
@@ -713,8 +713,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
                         ?>
                         <div class="row-actions">
-                            <button type="submit" name="start_funnel" value="start"
-                                    class="button"><?php _e('Start'); ?></button>
+                            <button type="submit" name="start_funnel" value="start" class="button"><?php _e('Start'); ?></button>
                         </div>
                     </div>
                 </td>

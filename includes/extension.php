@@ -222,25 +222,25 @@ abstract class Extension
 
     /**
      * @param $is_minified bool
-     * @param $IS_MINIFIED string
+     * @param $dot_min string
      */
-    public function register_admin_scripts( $is_minified, $IS_MINIFIED ){}
+    public function register_admin_scripts( $is_minified, $dot_min ){}
 
     /**
      * @param $is_minified bool
-     * @param $IS_MINIFIED string
+     * @param $dot_min string
      */
     public function register_admin_styles(){}
 
     /**
      * @param $is_minified bool
-     * @param $IS_MINIFIED string
+     * @param $dot_min string
      */
-    public function register_frontend_scripts( $is_minified, $IS_MINIFIED ){}
+    public function register_frontend_scripts( $is_minified, $dot_min ){}
 
     /**
      * @param $is_minified bool
-     * @param $IS_MINIFIED string
+     * @param $dot_min string
      */
     public function register_frontend_styles(){}
 

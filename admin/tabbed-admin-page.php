@@ -96,8 +96,10 @@ abstract class Tabbed_Admin_Page extends Admin_Page
             return;
         }
 
+        $items = $this->get_items();
+
         // IF NULL return to main table
-        if ( count( $this->get_items() ) > 0 ){
+        if ( ! empty( $items ) ){
             $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
         }
 
