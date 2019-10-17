@@ -170,7 +170,7 @@ class Contacts_Table extends WP_List_Table
      */
     protected function column_owner_id($contact)
     {
-        return !empty($contact->get_owner_id()) ? '<a href="' . admin_url('admin.php?page=gh_contacts&owner_id=' . $contact->get_owner_id()) . '">' . $contact->owner->user_login . '</a>' : '&#x2014;';
+        return !empty($contact->get_owner_id()) ? '<a href="' . admin_url('admin.php?page=gh_contacts&owner=' . $contact->get_owner_id()) . '">' . $contact->get_ownerdata()->user_login . '</a>' : '&#x2014;';
     }
 
     /**

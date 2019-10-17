@@ -696,10 +696,10 @@ class Replacements
     function replacement_date( $time_string )
     {
 
-        $parts =preg_split( "/(\||;)/", $time_string );
+        $parts = preg_split( "/\||;/", $time_string );
 
         if ( count( $parts ) === 1 ){
-            $format = 'l jS \of F Y';
+            $format = get_date_time_format();
             $when = $parts[0];
         } else {
             $format = $parts[0];
@@ -707,10 +707,9 @@ class Replacements
         }
 
         /* convert to local time */
-        $time = strtotime( $when ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $time = strtotime( $when );
 
         return date_i18n( $format, $time );
-
     }
 
     /**
@@ -815,7 +814,6 @@ class Replacements
         $quotes[] = "We mustn't keep our audience waiting.";
         $quotes[] = "Okay campers, rise and shine, and don't forget your booties cause its cold out there...its cold out there every day.";
         $quotes[] = "I peg you as a glass half empty kinda guy.";
-//        $quotes[] = "Why would anybody steal a groundhog? I can probably think of a couple of reasons... pervert.";
         $quotes[] = "Well, what if there is no tomorrow? There wasn't one today.";
         $quotes[] = "Did he actually refer to himself as \"the talent\"?";
         $quotes[] = "Did you sleep well Mr. Connors?";
