@@ -20,7 +20,19 @@ class Notices
 {
     const TRANSIENT = 'groundhogg_notices';
 
-	/**
+    public function __construct()
+    {
+
+        add_action( 'admin_notices', [ $this, 'pre_notices' ] );
+        add_action( 'admin_notices', [ $this, 'notices' ] );
+    }
+
+    public function pre_notices()
+    {
+//        $this->add(  'pricing-changes', "Pricing is changing. Lock in now!", 'success', 'administrator', true );
+    }
+
+    /**
 	 * @return bool|string
 	 */
     protected function get_transient_name()
@@ -65,14 +77,15 @@ class Notices
     /**
      * Add a notice
      *
-     * @param $code string|\WP_Error ID of the notice
+     * @param $code string|\WP_Error|array ID of the notice
      * @param $message string message
      * @param string $type
      * @param string|bool $cap
+     * @param bool $site_wide whether the notice should be displayed site_wide
      *
      * @return true|false
      */
-    public function add( $code='', $message='', $type='success', $cap=false )
+    public function add( $code='', $message='', $type='success', $cap=false, $site_wide=false )
     {
         if ( ! $this->can_add_notices() ){
             return false;
@@ -86,6 +99,7 @@ class Notices
 
         $data = [];
 
+        // Is WP Error
         if ( is_wp_error( $code ) ){
             $error = $code;
             $code = $error->get_error_code();
@@ -101,12 +115,27 @@ class Notices
 
             $type = 'error';
         }
+        // Passed as array
+        elseif ( is_array( $code ) ){
+
+            $args = wp_parse_args( $code, [
+                'code' => '',
+                'message' => '',
+                'type' => 'success',
+                'data' => false,
+                'cap' => false,
+                'site_wide' => false
+            ] );
+
+            extract( $args );
+        }
 
         $notices[$code][ 'code' ]    = $code;
         $notices[$code][ 'message' ] = $message;
         $notices[$code][ 'type' ]    = $type;
         $notices[$code][ 'data' ]    = $data;
         $notices[$code][ 'cap' ]     = $cap;
+        $notices[$code][ 'site_wide' ] = $site_wide;
 
         $this->store_notices( $notices );
 
@@ -148,6 +177,11 @@ class Notices
         }
 
         foreach ( $notices as $notice ){
+
+            // If doing admin_notices do not show sitewide notices.
+            if ( doing_action( 'admin_notices' ) && ! get_array_var( $notice, 'site_wide' ) ){
+                continue;
+            }
 
             if ( isset_not_empty( $notice, 'cap' ) && ! current_user_can( $notice[ 'cap' ] ) ){
                 continue;
