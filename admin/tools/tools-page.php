@@ -673,7 +673,7 @@ class Tools_Page extends Tabbed_Admin_Page
     public function delete_warning()
     {
         if ( $this->get_current_tab() === 'delete' ) {
-            $this->add_notice( 'no_going_back', __( '&#9888; There is no going back once the deletion process has started.', 'groudnhogg' ), 'warning' );
+            $this->add_notice( 'no_going_back', __( '&#9888; There is no going back once the deletion process has started.', 'groundhogg' ), 'warning' );
         }
     }
 

@@ -99,7 +99,7 @@ class Bulk_Job_Page extends Admin_Page
      */
     public function page(){
 
-        $this->add_notice( 'do_not_leave', __( 'Do not leave the page till the process is complete!', 'groudnhogg' ), 'warning' );
+        $this->add_notice( 'do_not_leave', __( 'Do not leave the page till the process is complete!', 'groundhogg' ), 'warning' );
 
         ?>
         <div class="wrap">
