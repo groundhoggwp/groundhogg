@@ -834,7 +834,6 @@ class Replacements
         $quotes[] = "We mustn't keep our audience waiting.";
         $quotes[] = "Okay campers, rise and shine, and don't forget your booties cause its cold out there...its cold out there every day.";
         $quotes[] = "I peg you as a glass half empty kinda guy.";
-//        $quotes[] = "Why would anybody steal a groundhog? I can probably think of a couple of reasons... pervert.";
         $quotes[] = "Well, what if there is no tomorrow? There wasn't one today.";
         $quotes[] = "Did he actually refer to himself as \"the talent\"?";
         $quotes[] = "Did you sleep well Mr. Connors?";

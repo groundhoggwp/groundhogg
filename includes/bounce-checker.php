@@ -46,18 +46,14 @@ class Bounce_Checker
 
     public function __construct()
     {
-        $this->setup();
-
         /* run whenever these jobs are run */
         add_action('init', array($this, 'setup_cron'));
 
-
         add_action(self::ACTION, array($this, 'check'));
+
         if (is_admin() && get_request_var('test_imap_connection')) {
             add_action('init', array($this, 'do_test_connection'));
         }
-
-
     }
 
     public function setup_cron()
@@ -69,6 +65,7 @@ class Bounce_Checker
 
     public function test_connection_ui()
     {
+        $this->setup();
 
         if ($this->inbox && $this->password) {
             ?>
@@ -170,6 +167,10 @@ class Bounce_Checker
 
         $this->setup();
 
+        if ( empty( $this->password ) || empty( $this->inbox ) ){
+            return false;
+        }
+
         $domain = explode('@', $this->inbox);
 
         if (!empty($domain)) {
@@ -216,6 +217,10 @@ class Bounce_Checker
             return;
         }
 
+        if ( empty( $this->password ) || empty( $this->inbox ) ){
+            return;
+        }
+
         $domain = explode('@', $this->inbox);
 
         if (!empty($domain)) {
@@ -230,14 +235,14 @@ class Bounce_Checker
         $hostname = sprintf('{%s:%d/imap/ssl/novalidate-cert}INBOX', $domain, $port);
 
         /* try to connect */
-        $inbox = \imap_open($hostname, $this->inbox, $this->password, OP_READONLY);
+        $inbox = @\imap_open($hostname, $this->inbox, $this->password, OP_READONLY);
 
         if (!$inbox) {
             return;
         }
 
         /* grab emails, for now assume these messages go unread */
-        $emails = \imap_search($inbox, sprintf('SINCE "%s" UNSEEN', date('j F Y', strtotime('1 day ago'))));
+        $emails = @\imap_search($inbox, sprintf('SINCE "%s" UNSEEN', date('j F Y', strtotime('1 day ago'))));
 
         if (!$emails)
             return;
@@ -247,7 +252,7 @@ class Bounce_Checker
         foreach ($emails as $email_number) {
 
             /* get information specific to this email */
-            $message = \imap_fetchbody($inbox, $email_number, "");
+            $message = @\imap_fetchbody($inbox, $email_number, "");
             $multiArray = $this->bounce_handler->get_the_facts($message);
 
             foreach ($multiArray as $the) {
@@ -279,7 +284,7 @@ class Bounce_Checker
             }
         }
 
-        \imap_close($inbox);
+        @\imap_close($inbox);
     }
 
 }

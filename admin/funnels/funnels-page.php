@@ -530,14 +530,13 @@ class Funnels_Page extends Admin_Page
                 return $error;
             }
 
-            $path = $file['name'];
-            $ext = pathinfo($path, PATHINFO_EXTENSION);
+            $validate = wp_check_filetype_and_ext( $file[ 'tmp_name' ], $file[ 'name' ], [ 'funnel' => 'text/plain' ] );
 
-            if ( $ext !== 'funnel' || ! in_array( mime_content_type( $file[ 'tmp_name' ] ), [ 'text/plain', 'text/html', 'application/json' ] ) ){
-                return new \WP_Error( 'unexpected_file_type', 'The file type you have uploaded is not a valid funnel file.', $file );
+            if( $validate[ 'ext' ] !== 'funnel' || $validate[ 'type' ] !== 'text/plain' ){
+                return new \WP_Error( 'invalid_template', 'Please upload a valid funnel template.' );
             }
 
-            $json = file_get_contents( $_FILES['funnel_template']['tmp_name'] );
+            $json = file_get_contents( $file['tmp_name'] );
             $json = json_decode($json, true);
 
             if ( ! $json ){

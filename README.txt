@@ -152,6 +152,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.0.12.2 (2019-10-22) =
+* FIXED Bounce checker running even if settings are not setup
+* FIXED fixed deprecated calls to mime_content_type in PHP 7.2+
+* FIXED file upload through form saving wrong URL to meta
+
 = 2.0.12.1 (2019-10-15) =
 * FIXED Bug caused emails which were sent to appear as failed with an error related to another email address.
 
