@@ -30,6 +30,7 @@ use Groundhogg\Submission;
  *
  * add_action( 'contact_edit_before_history', 'my_settings_section' ); ( $id )
  *
+ *
  * This will add your section right above the funnel events history section.
  *
  * To save your custom information you will need to hook into the save method which you do by...
@@ -342,7 +343,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                             'id' => 'birthday_year',
                             'options' => $years,
                             'multiple' => false,
-                            'option_none' => __( 'Select one', 'groundhogg' ),
+                            'option_none' => __( 'Year', 'groundhogg' ),
                             'selected' => get_array_var( $birthday_parts, 0 ),
                             'class' => 'gh-input'
                         ]),
@@ -351,7 +352,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                             'id' => 'birthday_month',
                             'options' => $months,
                             'multiple' => false,
-                            'option_none' => __( 'Select one', 'groundhogg' ),
+                            'option_none' => __( 'Month', 'groundhogg' ),
                             'selected' => get_array_var( $birthday_parts, 1 ),
                             'class' => 'gh-input'
                         ]),
@@ -360,7 +361,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                             'id' => 'birthday_day',
                             'options' => $days,
                             'multiple' => false,
-                            'option_none' => __( 'Select one', 'groundhogg' ),
+                            'option_none' => __( 'Day', 'groundhogg' ),
                             'selected' => get_array_var( $birthday_parts, 2 ),
                             'class' => 'gh-input'
                         ]),

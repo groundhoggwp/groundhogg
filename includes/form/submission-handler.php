@@ -6,6 +6,7 @@ use function Groundhogg\blacklist_check;
 use Groundhogg\Contact;
 use function Groundhogg\decrypt;
 use function Groundhogg\doing_rest;
+use function Groundhogg\file_access_url;
 use function Groundhogg\form_errors;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
@@ -322,7 +323,7 @@ class Submission_Handler extends Supports_Errors
 
             if ( ! is_wp_error( $file ) && is_array( $file ) ){
                 // Add direct url to meta
-                $meta[ $file_key ] = $file[ 'url' ];
+                $meta[ $file_key ] = file_access_url( $file[ 'url' ] );
             }
         }
 

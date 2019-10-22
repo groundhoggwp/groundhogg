@@ -232,15 +232,12 @@ class Rewrites
                     wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
                 }
 
-                $mime = mime_content_type( $file_path );
+                $mime = wp_check_filetype( $file_path );
+                $mime = $mime[ 'type' ];
 
-                // Todo revisit this?
-
-//                $mimes = get_allowed_mime_types( get_current_user_id() );
-//                // Assume can only download uploadable mime types
-//                if ( ! in_array( $mime, $mimes ) ){
-//                    wp_die( 'Unexpected file type.', 'Access denied.', [ 'status' => 403 ] );
-//                }
+                if ( ! $mime ){
+                    wp_die( 'The request file type is unrecognized and has been blocked for your protection.', 'Access denied.', [ 'status' => 403 ] );
+                }
 
                 $content_type = sprintf( "Content-Type: %s", $mime );
                 $content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );

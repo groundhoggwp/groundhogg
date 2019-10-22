@@ -2235,6 +2235,17 @@ function get_date_time_format()
  */
 function file_access_url($path, $download = false)
 {
+    // Get the base path
+    $base_uploads_folder = Plugin::instance()->utils->files->get_base_uploads_dir();
+    $base_uploads_url = Plugin::instance()->utils->files->get_base_uploads_url();
+
+    // Remove the extra path info from the path
+    if ( strpos( $path, $base_uploads_folder ) !== false ){
+        $path = str_replace( $base_uploads_folder, '', $path );
+    // Remove the extra url info from the path
+    } else if ( strpos( $path, $base_uploads_url ) !== false  ){
+        $path = str_replace( $base_uploads_url, '', $path );
+    }
 
     $url = managed_page_url('files/' . ltrim($path, '/'));
 
@@ -2598,3 +2609,14 @@ add_action( 'admin_print_styles', function (){
     </style>
     <?php
 } );
+
+function allow_funnel_uploads()
+{
+    add_filter( 'mime_types', __NAMESPACE__ . '\_allow_funnel_uploads' );
+}
+
+function _allow_funnel_uploads( $mimes )
+{
+    $mimes[ 'funnel' ] = 'text/plain';
+    return $mimes;
+}
