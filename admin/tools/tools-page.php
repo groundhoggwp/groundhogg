@@ -447,13 +447,18 @@ class Tools_Page extends Tabbed_Admin_Page
         }
 
         $file = get_array_var( $_FILES, 'import_file' );
-        $extension = strtolower( end(explode('.', $file['name'] ) ) );
 
-        if ( ! $file || ! $file[ 'name' ] || ! in_array(  mime_content_type( $file[ 'tmp_name' ] ), [ 'text/csv', 'text/plain' ] )  || ! $extension === 'csv' ) {
-            return new WP_Error( 'no_files', 'Please upload a valid CSV file!' );
+        $validate = wp_check_filetype_and_ext( $file[ 'tmp_name' ], $file[ 'name' ], [ 'csv' => 'text/csv' ] );
+
+        if( $validate[ 'ext' ] !== 'csv' || $validate[ 'type' ] !== 'text/csv' ){
+            return new WP_Error( 'invalid_csv', 'Please upload a valid CSV.' );
         }
 
-        $file[ 'name' ] = sanitize_file_name( md5( $file[ 'name' ] ) . '.csv' );
+        $file_name = str_replace( '.csv', '', $file[ 'name' ] );
+        $file_name .= '-' . current_time( 'mysql' ) . '.csv';
+
+        $file[ 'name' ] = sanitize_file_name( $file_name );
+
         $result = $this->handle_file_upload( $file );
 
         if ( is_wp_error( $result ) ) {

@@ -185,13 +185,17 @@ class Event_Queue extends Supports_Errors
             $contact = $event->get_contact();
             $this->set_current_contact( $contact );
 
-            if ( $event->run() && $event->is_funnel_event() ){
+            if ( $event->run() ){
 
-                $next_step = $event->get_step()->get_next_action();
+                if (  $event->is_funnel_event() ){
 
-                if ( $next_step instanceof Step && $next_step->is_active() ){
-                    $next_step->enqueue( $event->get_contact() );
+                    $next_step = $event->get_step()->get_next_action();
+
+                    if ( $next_step instanceof Step && $next_step->is_active() ){
+                        $next_step->enqueue( $event->get_contact() );
+                    }
                 }
+
 
             } else {
                 if ( $event->has_errors() ){
