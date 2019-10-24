@@ -6,7 +6,9 @@
  * Time: 10:39 AM
  */
 
-if ( ! function_exists( 'wp_mail' ) && get_option( 'gh_send_all_email_through_ghss', false ) ):
+$gh_override_wp_mail = get_option( 'gh_send_all_email_through_ghss', false );
+
+if ( ! function_exists( 'wp_mail' ) && ! empty( $gh_override_wp_mail ) ):
 
     function wp_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
         try{
