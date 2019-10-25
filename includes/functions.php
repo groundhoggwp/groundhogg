@@ -1868,11 +1868,11 @@ function form_errors($return = true)
  */
 function get_email_templates()
 {
-    include GROUNDHOGG_PATH . 'templates/assets/email-templates.php';
+    $templates = apply_filters( 'groundhogg/get_email_templates', [] );
     /**
      * @var $email_templates array
      */
-    return $email_templates;
+    return $templates;
 }
 
 /**
