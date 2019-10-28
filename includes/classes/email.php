@@ -452,7 +452,7 @@ class Email extends Base_Object_With_Meta
      */
     public function tracking_link_callback( $matches )
     {
-        return $matches[1] . $this->get_click_tracking_link() . base64_encode( $matches[2]) . $matches[3];
+        return $matches[1] . $this->get_click_tracking_link() . base64_encode( str_replace( '&amp;', '&', $matches[2] ) ) . $matches[3];
     }
 
     /**

@@ -554,15 +554,18 @@ class Tracking
 
         $redirect = add_query_arg( [ 'key' => wp_create_nonce() ], $target );
 
+        /**
+         * @since 2.1
+         *
+         * If the event is not found, don't show an error
+         * Just keep moving them to the desired page.
+         *
+         * Event Ids can go missing for a variety of reason, its unreasonable to assume the data wil remain integral
+         * always.
+         */
         if ( ! $event ){
-
-            // Assume testing...
-            if ( is_user_logged_in() ){
-                wp_redirect( $redirect );
-                return;
-            }
-
-            wp_die( 'Oops... You may have clicked an expired link, or your cookies may not be enabled.' );
+            wp_redirect( $redirect );
+            return;
         }
 
         $args = array(
