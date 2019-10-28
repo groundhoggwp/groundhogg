@@ -695,7 +695,7 @@ function gh_ss_mail($to, $subject, $message, $headers = '', $attachments = array
     global $phpmailer;
 
     /* Use the GH SS Mailer class instead */
-    if (!($phpmailer instanceof GH_SS_Mailer)) {
+    if ( ! ( $phpmailer instanceof GH_SS_Mailer ) ) {
 //        require_once dirname(__FILE__) . '/gh-ss-mailer.php';
         $phpmailer = new GH_SS_Mailer(true);
     }
@@ -1868,11 +1868,11 @@ function form_errors($return = true)
  */
 function get_email_templates()
 {
-    include GROUNDHOGG_PATH . 'templates/assets/email-templates.php';
+    $templates = apply_filters( 'groundhogg/get_email_templates', [] );
     /**
      * @var $email_templates array
      */
-    return $email_templates;
+    return $templates;
 }
 
 /**
@@ -2575,6 +2575,27 @@ function get_upload_wp_error( $file )
 function guided_setup_finished()
 {
     return (bool) Plugin::$instance->settings->get_option('gh_guided_setup_finished', false );
+}
+
+/**
+ * Convert a multi-dimensional array into a single-dimensional array.
+ * @author Sean Cannon, LitmusBox.com | seanc@litmusbox.com
+ * @param  array $array The multi-dimensional array.
+ * @return array
+ */
+function array_flatten($array) {
+    if (!is_array($array)) {
+        return false;
+    }
+    $result = array();
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            $result = array_merge($result, array_flatten($value));
+        } else {
+            $result[$key] = $value;
+        }
+    }
+    return $result;
 }
 
 /**
