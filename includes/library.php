@@ -51,7 +51,7 @@ class Library extends Supports_Errors
             return $emails;
         }
 
-        $response = $this->request( 'email/templates/', [], 'GET' );
+        $response = $this->request( 'email/templates', [], 'GET' );
 
         $emails = $response->emails;
 
