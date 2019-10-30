@@ -28,7 +28,7 @@ class Library extends Supports_Errors
             return $funnels;
         }
 
-        $response = $this->request( 'funnels', [], 'GET' );
+        $response = $this->request( 'funnels/', [], 'GET' );
 
         $funnels = $response->funnels;
 
