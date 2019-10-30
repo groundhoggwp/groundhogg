@@ -2,11 +2,11 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Funnels;
+use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Steps;
 
-class Funnel extends Base_Object
+class Funnel extends Base_Object_With_Meta
 {
-
     /**
      * Do any post setup actions.
      *
@@ -34,6 +34,12 @@ class Funnel extends Base_Object
     {
         return Plugin::instance()->dbs->get_db('steps' );
     }
+
+    protected function get_meta_db()
+    {
+        return Plugin::instance()->dbs->get_db('funnelmeta' );
+    }
+
 
     /**
      * A string to represent the object type

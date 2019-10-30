@@ -23,7 +23,7 @@ class Notices
     public function __construct()
     {
 
-        add_action( 'admin_notices', [ $this, 'pre_notices' ] );
+//        add_action( 'admin_notices', [ $this, 'pre_notices' ] );
         add_action( 'admin_notices', [ $this, 'notices' ] );
     }
 
@@ -176,7 +176,7 @@ class Notices
             ?><div id="groundhogg-notices"><?php
         }
 
-        foreach ( $notices as $notice ){
+        foreach ( $notices as $code => $notice ){
 
             // If doing admin_notices do not show sitewide notices.
             if ( doing_action( 'admin_notices' ) && ! get_array_var( $notice, 'site_wide' ) ){
@@ -194,13 +194,19 @@ class Notices
                 <?php endif; ?>
             </div>
             <?php
+
+            unset( $notices[ $code ] );
         }
 
         if ( ! wp_doing_ajax() ) {
             ?></div><?php
         }
 
-        delete_transient( $this->get_transient_name() );
+        if ( ! empty( $notices ) ){
+            set_transient( $this->get_transient_name(), $notices, MINUTE_IN_SECONDS );
+        } else {
+            delete_transient( $this->get_transient_name() );
+        }
     }
 
     /**

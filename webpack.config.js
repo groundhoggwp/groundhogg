@@ -30,11 +30,9 @@ const extractConfig = {
     ],
 };
 
-
 module.exports = {
     entry: {
         './assets/js/editor.blocks' : './blocks/index.js',
-
     },
     output: {
         path: path.resolve( __dirname ),
