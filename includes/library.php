@@ -4,7 +4,7 @@ namespace Groundhogg;
 
 class Library extends Supports_Errors
 {
-    const PROXY_URL = 'http://localhost/wp/wp-json/gh/v3/';
+    const PROXY_URL = 'https://library.groundhogg.io/wp-json/gh/v3/';
 
     public function request( $endpoint = '', $body = [], $method = 'GET', $headers = [] )
     {
@@ -62,7 +62,6 @@ class Library extends Supports_Errors
 
     public function get_email_template( $id )
     {
-
         $response = $this->request( 'email/templates/get', [ 'id' => $id ], 'GET' );
         return $response->email;
     }
