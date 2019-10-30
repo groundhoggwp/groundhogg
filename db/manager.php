@@ -48,6 +48,7 @@ class Manager
         $this->emails       = new Emails();
         $this->events       = new Events();
         $this->funnels      = new Funnels();
+        $this->funnelmeta   = new Funnel_Meta();
         $this->stepmeta     = new Step_Meta();
         $this->steps        = new Steps();
         $this->tags         = new Tags();

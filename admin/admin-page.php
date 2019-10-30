@@ -387,7 +387,7 @@ abstract class Admin_Page extends Supports_Errors
         }
 
         if (is_string($exitCode) && esc_url_raw($exitCode)) {
-            wp_safe_redirect( $exitCode );
+            wp_redirect( $exitCode );
             die();
         }
 

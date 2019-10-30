@@ -228,7 +228,7 @@ class Tags_Page extends Admin_Page
             )
         );
 
-        return true;
+        return false;
     }
 
     public function view()

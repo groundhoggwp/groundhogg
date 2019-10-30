@@ -1,1 +1,0 @@
-{"title":"Start From Scratch - Copy","steps":[{"title":"New User","group":"benchmark","order":1,"type":"account_created","meta":{"role":["subscriber"]},"args":[]},{"title":"Apply Tag","group":"action","order":2,"type":"apply_tag","meta":{"is_active":"1"},"args":{"tags":[]}}]}
