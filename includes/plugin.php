@@ -322,7 +322,7 @@ class Plugin {
             new Upgrade_Notice();
         }
 
-        new Extension_Updater();
+        new Extension_Upgrader();
 
         // Partner
         SendWp::instance();

@@ -5,6 +5,8 @@ namespace Groundhogg\Admin\Tools;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\Bulk_Jobs\Delete_Contacts;
+use Groundhogg\Extension_Upgrader;
+use function Groundhogg\action_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -715,6 +717,7 @@ class Tools_Page extends Tabbed_Admin_Page
         $this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] );
     }
 
+
     /**
      * Get the menu order between 1 - 99
      *
@@ -724,4 +727,40 @@ class Tools_Page extends Tabbed_Admin_Page
     {
         return 98;
     }
+
+    ########### OTHER ###########
+
+    public function remote_install_view()
+    {
+
+        echo action_url( 'remote_install_plugins', [ 'download_id' => 210 ] );
+
+    }
+
+    public function process_remote_install_plugins()
+    {
+        $download_id = absint( get_request_var( 'download_id' ) );
+
+        if ( ! $download_id ){
+            return new WP_Error( 'error', 'Please provide a download ID.' );
+        }
+
+        $installed = Extension_Upgrader::remote_install( 210 );
+
+        if ( is_wp_error( $installed ) ){
+            return $installed;
+        }
+
+        if ( ! $installed ){
+            return new WP_Error( 'error', 'Could not remotely install plugin...' );
+        }
+
+        if ( $installed ){
+            $this->add_notice( 'installed', 'Installed extension successfully!' );
+        }
+
+        return false;
+    }
+
+
 }
