@@ -372,7 +372,7 @@ class License_Manager
     public static function get_version( $item_id, $license )
     {
         $api_params = array(
-            'edd_action' => 'check_license',
+            'edd_action' => 'get_version',
             'license' => $license,
             'item_id' => $item_id,
             'url' => home_url()
