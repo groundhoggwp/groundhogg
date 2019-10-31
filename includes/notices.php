@@ -22,14 +22,13 @@ class Notices
 
     public function __construct()
     {
-
-//        add_action( 'admin_notices', [ $this, 'pre_notices' ] );
+        add_action( 'admin_notices', [ $this, 'pre_notices' ] );
         add_action( 'admin_notices', [ $this, 'notices' ] );
     }
 
     public function pre_notices()
     {
-//        $this->add(  'pricing-changes', "Pricing is changing. Lock in now!", 'success', 'administrator', true );
+        $this->add(  'features-notice', sprintf( "IMPORTANT! Several features were removed in from Groundhogg in version 2.1. Please go here to <a class='button-primary' href='%s'>re-install features!</a> <a class='button' href='%s'>Dismiss</a>", admin_page_url( 'gh_tools', [ 'tab' => 'remote_install' ] ), action_url( 'dismiss_notice' ) ), 'warning', 'administrator', true );
     }
 
     /**

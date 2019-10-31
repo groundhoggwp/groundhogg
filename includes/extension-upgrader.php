@@ -114,7 +114,7 @@ class Extension_Upgrader
      * @param $item_id
      * @param $license
      *
-     * @return bool
+     * @return bool|\WP_Error
      */
     public static function remote_install( $item_id, $license='' )
     {
@@ -126,7 +126,7 @@ class Extension_Upgrader
         $plugin = get_array_var( self::$file_map, $item_id );
 
         if ( ! $plugin ){
-            return false;
+            return new \WP_Error( 'invalid_plugin_id', 'Invalid plugin ID provided.' );
         }
 
         $is_installed = false;
@@ -158,9 +158,11 @@ class Extension_Upgrader
                 return $activated;
             }
 
-            include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-            include_once ABSPATH . 'wp-admin/includes/file.php';
-            include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+            if ( ! class_exists( '\Plugin_Upgrader' ) ){
+                include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+                include_once ABSPATH . 'wp-admin/includes/file.php';
+                include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+            }
 
             // Get the package info from the Store API
             $api = License_Manager::get_version( $item_id, $license );
@@ -170,7 +172,7 @@ class Extension_Upgrader
             }
 
             if ( ! get_array_var( $api, 'download_link' ) ){
-                return false;
+                return new \WP_Error( 'error', 'Could not retrieve download package', $api );
             }
 
             // Use the AJAX upgrader skin to quietly install the plugin.
