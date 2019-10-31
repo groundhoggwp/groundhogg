@@ -2028,6 +2028,8 @@ function install_custom_rewrites()
     Plugin::$instance->rewrites->add_rewrite_rules();
     Plugin::$instance->preferences->add_rewrite_rules();
 
+    do_action( 'groundhogg/install_custom_rewrites' );
+
     flush_rewrite_rules();
 }
 
