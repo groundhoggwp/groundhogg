@@ -40,6 +40,17 @@ class Extension_Upgrader
         15036   => 'groundhogg-lifterlms/groundhogg-lifterlms.php',
         15028   => 'groundhogg-learndash/groundhogg-learndash.php',
         15016   => 'groundhogg-content-restriction/groundhogg-content-restriction.php',
+        16538   => 'groundhogg-tutorlms/groundhogg-tutorlms.php',
+        16557   => 'groundhogg-divi/groundhogg-divi.php',
+        17321   => 'groundhogg-smtp/groundhogg-smtp.php',
+        18312   => 'groundhogg-birthday/groundhogg-birthday.php',
+        19378   => 'groundhogg-advanced-preferences/groundhogg-advanced-preferences.php',
+        20158   => 'groundhogg-thrivecart/groundhogg-thrivecart.php',
+        22198   => 'groundhogg-elementor/groundhogg-elementor.php',
+        22397   => 'groundhogg-pro/groundhogg-pro.php',
+        23532   => 'groundhogg-weforms/groundhogg-weforms.php',
+        23534   => 'groundhogg-fluent-form/groundhogg-fluent-form.php',
+        23538   => 'groundhogg-sms/groundhogg-sms.php',
     ];
 
     /**

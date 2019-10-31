@@ -152,6 +152,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1 (2019-11-01) =
+* ADDED Template library to replace builtin templates.
+* TWEAKED Better guided setup onboarding experience.
+* FIXED Some special characters not being accepted in first & last name fields.
+* REMOVED SMS, Superlinks, Advanced Email Editor, Advanced Funnel Steps.
+
 = 2.0.12.2 (2019-10-22) =
 * FIXED Bounce checker running even if settings are not setup
 * FIXED fixed deprecated calls to mime_content_type in PHP 7.2+

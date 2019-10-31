@@ -10,7 +10,7 @@ use function Groundhogg\words_to_key;
 abstract class Input extends Field
 {
 
-    public function __construct(int $id = 0)
+    public function __construct($id = 0)
     {
         add_action( 'groundhogg/form/shortcode/after', [ self::class, 'save_config' ] );
 

@@ -69,11 +69,11 @@ class Stats_Collection
         $message = sprintf( __( "Hi %s,
 
 Thank you for opting in to our anonymous usage tracking system. Because of you we will be able to create better WordPress products for you in the near and distant future.
-As a thank you, you've received a discount code for 25%% off any premium plan.
+As a thank you, you've received a discount code for 15%% off any premium plan.
 
 Upgrade Now >> [%s]
 
-Note, this discount will expire in 7 days.
+Note, you have 7 days to use this code.
 
 We appreciate your help, enjoy!
 

@@ -19,16 +19,71 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Notices
 {
     const TRANSIENT = 'groundhogg_notices';
+    const DISMISSED_NOTICES_OPTION = 'gh_dismissed_notices';
+
+    public static $dismissed_notices = [];
 
     public function __construct()
     {
+        add_action( 'after_setup_theme', [ $this, 'init' ] );
+
         add_action( 'admin_notices', [ $this, 'pre_notices' ] );
         add_action( 'admin_notices', [ $this, 'notices' ] );
+
+        add_action( 'admin_init', [ $this, 'dismiss_notices' ] );
+    }
+
+    public function init()
+    {
+        self::$dismissed_notices = get_user_meta( get_current_user_id(), self::DISMISSED_NOTICES_OPTION, true );
+
+        if ( ! is_array( self::$dismissed_notices ) ){
+            self::$dismissed_notices = [];
+        }
     }
 
     public function pre_notices()
     {
-        $this->add(  'features-notice', sprintf( "IMPORTANT! Several features were removed in from Groundhogg in version 2.1. Please go here to <a class='button-primary' href='%s'>re-install features!</a> <a class='button' href='%s'>Dismiss</a>", admin_page_url( 'gh_tools', [ 'tab' => 'remote_install' ] ), action_url( 'dismiss_notice' ) ), 'warning', 'administrator', true );
+
+        // If this site is updating from an older version
+        if ( get_option( 'gh_updating_to_2_1' ) ){
+            // Show a notice that features have been removed
+            $this->add(
+                'features-removed-notice',
+                sprintf( "IMPORTANT! Several features were removed in from Groundhogg in version 2.1. Please go here to <a class='button-primary' href='%s'>re-install features!</a> <a class='button' href='%s'>Dismiss</a>",
+                    admin_page_url( 'gh_tools', [ 'tab' => 'remote_install' ] ),
+                    action_url( 'gh_dismiss_notice', [ 'notice' => 'features-removed-notice' ] ) ),
+                'warning',
+                'administrator',
+                true );
+        }
+
+    }
+
+    /**
+     * @param $id
+     */
+    public function dismiss_notice( $id )
+    {
+        self::$dismissed_notices[ $id ] = $id;
+
+        update_user_meta( get_current_user_id(), self::DISMISSED_NOTICES_OPTION, self::$dismissed_notices );
+    }
+
+    public function dismiss_notices()
+    {
+
+        if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'gh_dismiss_notice' ) ){
+            return;
+        }
+
+        $notice_id = get_request_var( 'notice' );
+
+        $this->dismiss_notice( $notice_id );
+
+        // Send them back to from whence they came.
+        wp_safe_redirect( wp_get_referer() );
+        die();
     }
 
     /**
@@ -91,6 +146,11 @@ class Notices
         }
 
         $notices = $this->get_stored_notices();
+
+        // Do not re-show dismissed notices
+        if ( isset_not_empty( self::$dismissed_notices, $code ) ){
+            return false;
+        }
 
         if ( ! $notices || ! is_array( $notices ) ) {
             $notices = array();

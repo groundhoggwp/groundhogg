@@ -46,7 +46,12 @@ class Last extends Input
      */
     public static function validate( $input, $config )
     {
-        if ( ! preg_match( '/^[\w\pL\-,.][^0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$/', $input ) ){
+        if ( preg_match( '/[0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]/', $input ) ){
+
+            if ( current_user_can( 'edit_funnels' ) ){
+                return new \WP_Error( 'invalid_last_name', __( 'Names should not contain numbers or special symbols.', 'groundhogg' ) );
+            }
+
             return new \WP_Error( 'invalid_last_name', __( 'Please provide a valid last name.', 'groundhogg' ) );
         }
 

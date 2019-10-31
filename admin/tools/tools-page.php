@@ -18,6 +18,7 @@ use \WP_Error;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\nonce_url_no_amp;
+use function Groundhogg\notices;
 use function Groundhogg\white_labeled_name;
 use function set_transient;
 
@@ -188,6 +189,14 @@ class Tools_Page extends Tabbed_Admin_Page
                 'slug' => 'install'
             ],
         ];
+
+        // If old customer updating to new version.
+        if ( get_option( 'gh_updating_to_2_1' ) ){
+            $tabs[] = [
+                'name' => __( 'Re-install Features' ),
+                'slug' => 'remote_install'
+            ];
+        }
 
         $tabs = apply_filters( 'groundhogg/admin/tools/tabs', $tabs );
 
@@ -784,9 +793,9 @@ class Tools_Page extends Tabbed_Admin_Page
         }
 
         $downloads = [
-            210,
-            216,
-            219
+            23538, // SMS
+            22198, // Elementor
+            22397  // Pro features
         ];
 
         $installed = false;
@@ -806,6 +815,10 @@ class Tools_Page extends Tabbed_Admin_Page
         if ($installed) {
             $this->add_notice('installed', 'Installed extension successfully!');
         }
+
+        notices()->dismiss_notice( 'features-removed-notice' );
+
+        delete_option( 'gh_updating_to_2_1' );
 
         return false;
     }

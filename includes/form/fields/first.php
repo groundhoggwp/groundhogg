@@ -36,8 +36,14 @@ class First extends Input
      */
     public static function validate( $input, $config )
     {
-        if ( ! preg_match( '/^[\w\pL\-,.][^0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$/', $input ) ){
+        if ( preg_match( '/[0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]/', $input ) ){
+
+            if ( current_user_can( 'edit_funnels' ) ){
+                return new \WP_Error( 'invalid_first_name', __( 'Names should not contain numbers or special symbols.', 'groundhogg' ) );
+            }
+
             return new \WP_Error( 'invalid_first_name', __( 'Please provide a valid first name.', 'groundhogg' ) );
+
         }
 
         return apply_filters( 'groundhogg/form/fields/first/validate' , sanitize_textarea_field( $input ) );
