@@ -147,11 +147,6 @@ class Notices
 
         $notices = $this->get_stored_notices();
 
-        // Do not re-show dismissed notices
-        if ( isset_not_empty( self::$dismissed_notices, $code ) ){
-            return false;
-        }
-
         if ( ! $notices || ! is_array( $notices ) ) {
             $notices = array();
         }
@@ -187,6 +182,11 @@ class Notices
             ] );
 
             extract( $args );
+        }
+
+        // Do not re-show dismissed notices
+        if ( isset_not_empty( self::$dismissed_notices, $code ) ){
+            return false;
         }
 
         $notices[$code][ 'code' ]    = $code;

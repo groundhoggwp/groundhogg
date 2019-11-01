@@ -3,7 +3,9 @@ namespace Groundhogg\Admin\Emails;
 
 use Groundhogg;
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Email;
 use Groundhogg\Plugin;
+use function Groundhogg\managed_page_url;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -24,7 +26,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Emails_Page extends Admin_Page
 {
 
-    protected function add_ajax_actions(){}
+
+    protected function add_ajax_actions()
+    {
+        add_action( 'wp_ajax_gh_update_email', array( $this, 'update_email_ajax' ) );
+        add_action( 'wp_ajax_get_my_emails_search_results', array( $this, 'get_my_emails_search_results' ) );
+    }
+
     protected function add_additional_actions(){}
 
 	public function admin_title($admin_title, $title)
@@ -253,21 +261,58 @@ class Emails_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        $email_id = Groundhogg\get_db( 'emails' )->add();
+        $tab = Groundhogg\get_url_var( 'tab', 'new-email' );
 
-        if ( ! $email_id ){
-            return new \WP_Error( 'error', 'Unable to create email.' );
+        switch ( $tab ){
+
+            case 'new-email':
+
+                $email_id = Groundhogg\get_db( 'emails' )->add();
+
+                if ( ! $email_id ){
+                    return new \WP_Error( 'error', 'Unable to create email.' );
+                }
+
+                Groundhogg\set_request_var( 'email', $email_id );
+
+                $result = $this->process_edit();
+
+                if ( $result === true ){
+                    return Groundhogg\admin_page_url( 'gh_emails', [ 'action' => 'edit', 'email' => $email_id ] );
+                }
+
+                return $result;
+
+                break;
+
+            case 'my-templates':
+            case 'my-emails':
+                $from_email = new Email( absint( Groundhogg\get_post_var( 'email_id' ) ) );
+                if ( ! $from_email->exists() ){
+                    return new \WP_Error( 'error', 'Invalid email ID!' );
+                }
+                $args[ 'content' ] = $from_email->get_content();
+                $args[ 'subject' ] = $from_email->get_subject_line();
+                $args[ 'title' ] = sprintf( "%s - (copy)", $from_email->get_title() );
+                $args[ 'pre_header' ] = $from_email->get_pre_header();
+                $args[ 'author' ] = get_current_user_id();
+                $args[ 'from_user' ] = get_current_user_id();
+
+                $email = new Email( $args );
+
+                if ( ! $email->exists() ){
+                    return new \WP_Error( 'error', 'Could not create email.' );
+                }
+
+                return Groundhogg\admin_page_url( 'gh_emails', [ 'action' => 'edit', 'email' => $email->get_id() ] );
+
+                break;
+            default:
+                do_action( "groundhogg/admin/emails/process_add/{$tab}", $this );
+                break;
         }
 
-        Groundhogg\set_request_var( 'email', $email_id );
-
-        $result = $this->process_edit();
-
-        if ( $result === true ){
-            return Groundhogg\admin_page_url( 'gh_emails', [ 'action' => 'edit', 'email' => $email_id ] );
-        }
-
-        return $result;
+        return true;
     }
 
 	/**
@@ -402,5 +447,39 @@ class Emails_Page extends Admin_Page
         }
 
         include dirname(__FILE__) . '/email-editor.php';
+    }
+
+
+    /**
+     * Get search results
+     */
+    public function get_my_emails_search_results()
+    {
+        ob_start();
+
+        $emails = array_slice( Plugin::$instance->dbs->get_db('emails')->query( [ 'search' => sanitize_text_field( Groundhogg\get_request_var( 's' ) ) ] ), 0, 20 );
+
+        if ( empty( $emails ) ):
+            ?> <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php
+        else:
+            ?>
+            <?php foreach ( $emails as $email ):
+            $email = new Email( $email->ID );
+            ?>
+            <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
+                <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
+                <div class="inside">
+                    <p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
+                    <p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
+                    <iframe class="email-container" style="margin-bottom: 10px; border: 1px solid #e5e5e5;" width="100%" height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
+                    <button class="choose-template button-primary" name="email_id" value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+                </div>
+            </div>
+        <?php endforeach;
+
+        endif;
+
+        $response = [ 'html' => ob_get_clean() ];
+        wp_send_json( $response );
     }
 }
