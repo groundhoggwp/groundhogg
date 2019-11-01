@@ -118,6 +118,13 @@ class Admin_Notification extends Action
                 'description' => __( 'Use any email address or the {owner_email} replacement code.', 'groundhogg' )
             ] );
 
+            $this->add_control( 'from', [
+                'label' => __( 'From:', 'groundhogg' ),
+                'type' => HTML::INPUT,
+                'default' => get_bloginfo( 'admin_email' ),
+                'description' => __( 'The email address which you want to send email from. Accepts one email address.', 'groundhogg' )
+            ] );
+
             $this->add_control( 'reply_to', [
                 'label' => __( 'Reply To:', 'groundhogg' ),
                 'type' => HTML::INPUT,
@@ -195,13 +202,18 @@ class Admin_Notification extends Action
 
         $reply_to = $this->get_posted_data( 'reply_to' );
 
+
         if ( $reply_to ) {
             $reply_to = sanitize_text_field( $reply_to );
+
             $emails = array_map( 'trim', explode( ',', $reply_to ) );
             $email = array_shift( $emails );
             $reply_to = ( $email === '{email}' ) ? '{email}' : sanitize_email( $email );
             $this->save_setting( 'reply_to', $reply_to );
         }
+
+        $from  = sanitize_email( $this->get_posted_data( 'from' ) );
+        $this->save_setting( 'from',  $from);
 
         if ( is_sms_plugin_active() ) {
             $this->save_setting( 'is_sms', boolval( $this->get_posted_data( 'is_sms' ) ) );
@@ -240,6 +252,8 @@ class Admin_Notification extends Action
 
             $send_to = $this->get_setting( 'send_to' );
             $reply_to = do_replacements( $this->get_setting( 'reply_to', $contact->get_email() ), $contact->get_id() );
+            $from = do_replacements( $this->get_setting( 'from', $contact->get_email() ), $contact->get_id() );
+
 
             if ( !is_email( $send_to ) ) {
                 $send_to = do_replacements( $send_to, $contact->get_id() );
@@ -255,6 +269,10 @@ class Admin_Notification extends Action
 
             if ( is_email( $reply_to ) ) {
                 $headers = sprintf( 'Reply-To: <%s>', $reply_to );
+            }
+
+            if ( is_email( $from ) ) {
+                $headers = sprintf( 'From: <%s>', $from );
             }
 
             $sent = wp_mail( $send_to, $subject, $finished_note, $headers );
