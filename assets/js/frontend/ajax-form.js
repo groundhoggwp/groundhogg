@@ -38,16 +38,25 @@
 
             // console.log( $form.serializeFormJSON() );
 
-            var data = $form.serializeFormJSON();
+            // var data = $form.serializeFormJSON();
+
+            var data = new FormData($form[0]);
             data._ghnonce = gh._ghnonce;
-            data.form_data = $form.serializeArray();
+            // data.form_data = $form.serializeArray();
             data.action = 'groundhogg_ajax_form_submit';
+
+            // console.log(data);
 
             $.ajax( {
                 method: 'POST',
-                dataType: 'json',
+                // dataType: 'json',
                 url: gh.ajaxurl,
                 data: data,
+                processData: false,
+                contentType: false,
+                cache: false,
+                timeout: 600000,
+                enctype: 'multipart/form-data',
                 success: function( response ){
                     if ( response.success == undefined ){
                         return;

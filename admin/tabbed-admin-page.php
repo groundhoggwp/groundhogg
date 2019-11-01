@@ -86,15 +86,24 @@ abstract class Tabbed_Admin_Page extends Admin_Page
             return;
         }
 
+        if (is_string($exitCode) && esc_url_raw($exitCode)) {
+            wp_safe_redirect( $exitCode );
+            die();
+        }
+
         // Return to self if true response.
         if ( $exitCode === true ){
             return;
         }
 
-        // IF NULL return to main table
-        $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
+        $items = $this->get_items();
 
-        wp_redirect( $base_url );
+        // IF NULL return to main table
+        if ( ! empty( $items ) ){
+            $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
+        }
+
+        wp_safe_redirect( $base_url );
         die();
     }
 
@@ -123,7 +132,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page
                 call_user_func( [ $this, $method ] );
             } else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ){
                 do_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}", $this );
-            } else {
+            } else if ( method_exists( $this, $backup_method ) ) {
                 call_user_func( [ $this, $backup_method ] );
             }
 

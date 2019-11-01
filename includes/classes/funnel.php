@@ -2,11 +2,11 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Funnels;
+use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Steps;
 
-class Funnel extends Base_Object
+class Funnel extends Base_Object_With_Meta
 {
-
     /**
      * Do any post setup actions.
      *
@@ -34,6 +34,12 @@ class Funnel extends Base_Object
     {
         return Plugin::instance()->dbs->get_db('steps' );
     }
+
+    protected function get_meta_db()
+    {
+        return Plugin::instance()->dbs->get_db('funnelmeta' );
+    }
+
 
     /**
      * A string to represent the object type
@@ -127,8 +133,8 @@ class Funnel extends Base_Object
             $export['steps'][$i]['type']  = $step->get_type();
             $export['steps'][$i]['meta']  = $step->get_meta();
             $export['steps'][$i]['args']  = $step->export();
-
         }
+
 
         $export = apply_filters( 'groundhogg/funnel/export', $export, $this );
 
@@ -211,16 +217,17 @@ class Funnel extends Base_Object
             $step_meta = $step_args[ 'meta' ];
 
             foreach ( $step_meta as $key => $value ) {
-                if ( is_array( $value ) ){
-                    $value = array_shift( $value );
-                }
+//              ###### Removed to fix Edit meta import issue #######
+//                if ( is_array( $value ) ){
+//                    $value = array_shift( $value );
+//                }
 
                 // Replace URL
                 if ( is_string( $value ) ){
                     $value = search_and_replace_domain( $value );
                 }
 
-                $step->update_meta( $key, $value );
+               $step->update_meta( $key, $value ) ;
 
             }
 

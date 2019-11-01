@@ -43,6 +43,7 @@ class Main_Updater extends Updater {
             '2.0.10',
             '2.0.11',
             '2.0.11.5',
+            '2.1',
         ];
     }
 
@@ -146,6 +147,11 @@ class Main_Updater extends Updater {
     public function version_2_0_11_5()
     {
         Plugin::instance()->roles->add_caps();
+    }
+
+    public function version_2_1()
+    {
+        update_option( 'gh_updating_to_2_1', true );
     }
 
 }

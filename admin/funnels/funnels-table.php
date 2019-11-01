@@ -137,8 +137,9 @@ class Funnels_Table extends WP_List_Table {
         $id = $funnel->get_id();
 
         $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
-        $editUrlv2 = add_query_arg( [
-            'version' => 2
+
+        $editUrlClassic = add_query_arg( [
+            'version' => 1
         ], $editUrl );
 
         if ( $this->get_view() === 'archived' ) {
@@ -146,12 +147,11 @@ class Funnels_Table extends WP_List_Table {
             $actions[ 'delete' ] = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . _x( 'Delete Permanently', 'action', 'groundhogg'  ) . "</a></span>";
         } else {
 
-            if ( is_option_enabled( 'gh_use_builder_version_2' ) ){
-                $actions[ 'edit' ] = "<span class='edit'><a href='" . $editUrlv2 . "'>" . __( 'Build' ) . "</a></span>";
-                $actions[ 'edit-classic' ] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build (Classic)' ) . "</a></span>";
-            } else {
+            if ( ! is_option_enabled( 'gh_use_classic_builder' ) ){
                 $actions[ 'edit' ] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build' ) . "</a></span>";
-                $actions[ 'edit-v2' ] = "<span class='edit'><a href='" . $editUrlv2 . "'>" . __( 'Build (v2)' ) . "</a></span>";
+            } else {
+                $actions[ 'edit' ] = "<span class='edit'><a href='" . $editUrlClassic . "'>" . __( 'Build' ) . "</a></span>";
+                $actions[ 'edit-v2' ] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build (v2)' ) . "</a></span>";
             }
 
             $actions[ 'duplicate' ] = "<span class='duplicate'><a href='" .  wp_nonce_url(admin_url( 'admin.php?page=gh_funnels&action=duplicate&funnel='. $id ), 'duplicate' ). "'>" . _x( 'Duplicate', 'action', 'groundhogg' ) . "</a></span>";
@@ -168,9 +168,9 @@ class Funnels_Table extends WP_List_Table {
 
         $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
 
-        if ( is_option_enabled( 'gh_use_builder_version_2' ) ) {
+        if ( is_option_enabled( 'gh_use_classic_builder' ) ) {
             $editUrl = add_query_arg( [
-                'version' => 2
+                'version' => 1
             ], $editUrl );
         }
 

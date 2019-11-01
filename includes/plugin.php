@@ -188,16 +188,6 @@ class Plugin {
      */
     public $reporting;
 
-//    /**
-//     * @var Log_Manager
-//     */
-//    public $logger;
-//
-//    /**
-//     * @var Core\Upgrade\Manager
-//     */
-//    public $upgrade;
-
     /**
      * Clone.
      *
@@ -325,15 +315,14 @@ class Plugin {
         $this->shortcodes = new Shortcodes();
         $this->submission_handler = new Submission_Handler();
 
-        new Integrations_Manager();
         new Blocks\Blocks();
 
-        if( !is_white_labeled()) {
+        if( ! is_white_labeled() ) {
             new Reviews();
             new Upgrade_Notice();
         }
 
-        new Extension_Updater();
+        new Extension_Upgrader();
 
         // Partner
         SendWp::instance();
@@ -364,7 +353,6 @@ class Plugin {
     private function __construct() {
 
         $this->register_autoloader();
-        $this->init_dropins();
         $this->load_immediate();
 
         if ( did_action( 'plugins_loaded' ) ){
@@ -378,15 +366,6 @@ class Plugin {
     protected function load_immediate()
     {
         require  GROUNDHOGG_PATH . '/includes/pluggable.php';
-    }
-
-    /**
-     * initialize any dropins.
-     */
-    protected function init_dropins()
-    {
-//        new Test_Extension();
-//        new Test_Extension_2();
     }
 
     /**

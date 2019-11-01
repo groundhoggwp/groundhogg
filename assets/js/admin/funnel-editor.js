@@ -221,7 +221,7 @@
             if ( this.insertDummyStep('.ui-draggable') ){
 
                 var order = $('.step').index($('#temp-step')) + 1;
-                var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order, funnel_id:funnel.id};
+                var data = {action: "wpgh_get_step_html", step_type: step_type, step_order: order, funnel_id:funnel.id, version:1};
                 this.getStepHtml( data );
             }
         },
@@ -300,8 +300,8 @@
             $('<div class="replace-me"></div>').insertAfter( step );
             this.insertDummyStep( '.replace-me' );
 
-            var data = {action: "wpgh_duplicate_funnel_step", step_id: step.attr( 'id' ) };
-            this.getStepHtml( data )
+            var data = {action: "wpgh_duplicate_funnel_step", step_id: step.attr( 'id' ), version: 1 };
+            this.getStepHtml( data );
 
         },
 
@@ -313,7 +313,6 @@
         getStepHtml: function (obj) {
 
             var self = this;
-
             adminAjaxRequest( obj, function ( response ) {
                 self.curHTML = response.data.data.html;
                 self.replaceDummyStep(self.curHTML);

@@ -11,7 +11,6 @@ use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
 use function Groundhogg\send_email_notification;
-use function Groundhogg\send_sms_notification;
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -653,13 +652,7 @@ class Contacts_Page extends Admin_Page
             }
         }
 
-        /* USE the same email priviledges */
-        if (isset($_POST['send_sms']) && isset($_POST['sms_id']) && current_user_can('send_emails')) {
-            $sms_id = intval( $_POST['sms_id'] );
-            if( send_sms_notification( $sms_id, $contact->get_id() ) ){
-                $this->add_notice( 'sms_queued', _x( 'The SMS has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
-            }
-        }
+
 
         if (isset($_POST['start_funnel']) && isset($_POST['add_contacts_to_funnel_step_picker']) && current_user_can('edit_contacts')) {
             $step = Plugin::$instance->utils->get_step(intval($_POST['add_contacts_to_funnel_step_picker']));
@@ -683,7 +676,7 @@ class Contacts_Page extends Admin_Page
         do_action( 'groundhogg/admin/contact/save', $contact->get_id(), $contact );
 
         if ( get_request_var( 'switch_form' ) ){
-            wp_redirect( $this->admin_url( [
+            wp_safe_redirect( $this->admin_url( [
                 'action' => 'form',
                 'contact' => $contact->get_id(),
                 'form' => get_request_var( 'manual_form_submission' ),

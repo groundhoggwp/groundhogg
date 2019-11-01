@@ -67,6 +67,11 @@ class License_Manager
 	    return update_option( "gh_extensions", static::$extensions );
     }
 
+    /**
+     * Whether the current install has extensions installed.
+     *
+     * @return bool
+     */
     public static function has_extensions()
     {
         if ( empty( static::$extensions ) )
@@ -75,12 +80,38 @@ class License_Manager
         return ! empty( static::$extensions );
     }
 
-    public static function get_license( $item_id )
+    /**
+     * Will get a specific license for a given item
+     * If no item is specified, will return the first license
+     * If item is specific but no license exists, return false
+     *
+     * @param bool $item_id
+     * @return bool|mixed
+     */
+    public static function get_license( $item_id=false )
     {
     	if ( empty( static::$extensions ) )
     		static::$extensions = get_option( "gh_extensions", array() );
 
-        return static::$extensions[$item_id]['license'];
+    	if ( empty( static::$extensions ) ){
+    	    return false;
+        }
+
+    	if ( $item_id && isset_not_empty( static::$extensions, $item_id ) ){
+            return static::$extensions[$item_id]['license'];
+        }
+
+    	if ( ! $item_id ){
+
+    	    $licenses = array_filter( wp_list_pluck( static::$extensions, 'license' ) );
+
+    	    if ( ! empty( $licenses ) ){
+    	        return $licenses[0];
+            }
+
+        }
+
+    	return false;
     }
 
     public static function get_license_status( $item_id )
@@ -127,6 +158,74 @@ class License_Manager
                 }
             }
 	    }
+    }
+
+    /**
+     * Activate a license quietly
+     *
+     * @param $license
+     * @param $item_id
+     * @return bool|\WP_Error
+     */
+    public static function activate_license_quietly( $license, $item_id )
+    {
+        $api_params = array(
+            'edd_action' => 'activate_license',
+            'license'    => $license,
+            'item_id'    => $item_id,// The ID of the item in EDD,
+            // 'item_name'  => $item_name,
+            'url'        => home_url(),
+            'beta'      => false
+        );
+        // Call the custom api.
+        $response = wp_remote_post( static::$storeUrl, array( 'timeout' => 15, 'sslverify' => true, 'body' => $api_params ) );
+        // make sure the response came back okay
+        if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+            $message =  ( is_wp_error( $response ) && $response->get_error_message() ) ? $response->get_error_message() : __( 'An error occurred, please try again.' );
+        } else {
+            $license_data = json_decode( wp_remote_retrieve_body( $response ) );
+            if ( false === $license_data->success ) {
+                switch( $license_data->error ) {
+                    case 'expired' :
+                        $message = sprintf(
+                            _x( 'Your license key expired on %s.', 'notice', 'groundhogg' ),
+                            date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) )
+                        );
+                        break;
+                    case 'revoked' :
+                        $message = _x( 'Your license key has been disabled.', 'notice', 'groundhogg' );
+                        break;
+                    case 'missing' :
+                        $message = _x( 'Invalid license.', 'notice', 'groundhogg' );
+                        break;
+                    case 'invalid' :
+                    case 'site_inactive' :
+                        $message = _x( 'Your license is not active for this URL.', 'notice', 'groundhogg' );
+                        break;
+                    case 'item_name_mismatch' :
+                        $message = sprintf( _x( 'This appears to be an invalid license key', 'notice', 'groundhogg' ) );
+                        break;
+                    case 'no_activations_left':
+                        $message = _x( 'Your license key has reached its activation limit.' , 'notice', 'groundhogg' );
+                        break;
+                    default :
+                        $message = _x( 'An error occurred, please try again.', 'notice', 'groundhogg' );
+                        break;
+                }
+            }
+        }
+
+        // Check if anything passed on a message constituting a failure
+        if ( ! empty( $message ) ) {
+            return new \WP_Error( 'license_failed', __( $message ), $license_data );
+        }
+
+        $status = 'valid';
+        $expiry = $license_data->expires;
+
+        self::add_extension( $item_id, $license, $status, $expiry );
+
+        return true;
     }
 
     public static function activate_license( $license, $item_id )
@@ -261,6 +360,36 @@ class License_Manager
         }
 
         return true;
+    }
+
+    /**
+     * Get download package details of a plugin
+     *
+     * @param $item_id
+     * @param $license
+     * @return bool
+     */
+    public static function get_version( $item_id, $license )
+    {
+        $api_params = array(
+            'edd_action' => 'get_version',
+            'license' => $license,
+            'item_id' => $item_id,
+            'url' => home_url()
+        );
+
+        $response = wp_remote_post( static::$storeUrl, array( 'body' => $api_params, 'timeout' => 15, 'sslverify' => true ) );
+
+        if ( is_wp_error( $response ) ) {
+            // return true in the event of an error. Check again later...
+            return true;
+        }
+
+        $license_data = json_decode( wp_remote_retrieve_body( $response ) );
+
+        // Todo parse license data?
+
+        return $license_data;
     }
 
     /**

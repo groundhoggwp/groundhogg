@@ -324,7 +324,7 @@ class Settings_Page extends Admin_Page
                     }
                 </style>
                 <p><?php _e('You have no extensions installed. Want some?', 'groundhogg'); ?> <a
-                            href="https://groundhogg.io/downloads/"><?php _e('Get your first extension!', 'groundhogg') ?></a>
+                            href="https://groundhogg.io/pricing/"><?php _e('Get your first extension!', 'groundhogg') ?></a>
                 </p>
                 <div class="masonry">
                     <?php
@@ -494,7 +494,7 @@ class Settings_Page extends Admin_Page
             'gh_uninstall_on_delete' => array(
                 'id' => 'gh_uninstall_on_delete',
                 'section' => 'misc_info',
-                'label' => sprintf(_x('Delete %s Data', 'settings', 'groundhogg'), white_labeled_name()),
+                'label' => sprintf(_x('Delete %s data', 'settings', 'groundhogg'), white_labeled_name()),
                 'desc' => _x('Delete all information when uninstalling. This cannot be undone.', 'settings', 'groundhogg'),
                 'type' => 'checkbox',
                 'atts' => array(
@@ -548,7 +548,7 @@ class Settings_Page extends Admin_Page
             'gh_script_debug' => array(
                 'id' => 'gh_script_debug',
                 'section' => 'misc_info',
-                'label' => _x('Enable Script Debug Mode', 'settings', 'groundhogg'),
+                'label' => _x('Enable script debug mode', 'settings', 'groundhogg'),
                 'desc' => _x('This will attempt to load full JS files instead of minified JS files for debugging.', 'settings', 'groundhogg'),
                 'type' => 'checkbox',
                 'atts' => array(
@@ -558,42 +558,16 @@ class Settings_Page extends Admin_Page
                     'value' => 'on',
                 ),
             ),
-            'gh_use_builder_version_2' => array(
-                'id' => 'gh_use_builder_version_2',
+            'gh_use_classic_builder' => array(
+                'id' => 'gh_use_classic_builder',
                 'section' => 'misc_info',
-                'label' => _x('Enable Funnel Builder V2 (Beta)', 'settings', 'groundhogg'),
-                'desc' => _x('Use the new version of the Funnel Builder.', 'settings', 'groundhogg'),
+                'label' => _x('Use the classic funnel builder.', 'settings', 'groundhogg'),
+                'desc' => _x("Don't like the new funnel builder? You can use the original one by enabling this option.", 'settings', 'groundhogg'),
                 'type' => 'checkbox',
                 'atts' => array(
                     'label' => __('Enable'),
-                    'name' => 'gh_use_builder_version_2',
-                    'id' => 'gh_use_builder_version_2',
-                    'value' => 'on',
-                ),
-            ),
-            'gh_use_plain_email_editor' => array(
-                'id' => 'gh_use_plain_email_editor',
-                'section' => 'misc_info',
-                'label' => _x('Enable the plain email editor.', 'settings', 'groundhogg'),
-                'desc' => _x('This will enable the plain email editor which utilizes the basic WP editor instead of the block builder.', 'settings', 'groundhogg'),
-                'type' => 'checkbox',
-                'atts' => array(
-                    'label' => __('Enable'),
-                    'name' => 'gh_use_plain_email_editor',
-                    'id' => 'gh_use_plain_email_editor',
-                    'value' => 'on',
-                ),
-            ),
-            'gh_disable_page_view_tracking' => array(
-                'id' => 'gh_disable_page_view_tracking',
-                'section' => 'misc_info',
-                'label' => _x('Disable page view tracking script', 'settings', 'groundhogg'),
-                'desc' => _x("This will disable the page view tracking script that loads on every page if it causes longer than normal load times. This will cause the 'Page View' benchmark to no longer work.", 'settings', 'groundhogg'),
-                'type' => 'checkbox',
-                'atts' => array(
-                    'label' => __('Disable'),
-                    'name' => 'gh_disable_page_view_tracking',
-                    'id' => 'gh_disable_page_view_tracking',
+                    'name' => 'gh_use_classic_builder',
+                    'id' => 'gh_use_classic_builder',
                     'value' => 'on',
                 ),
             ),

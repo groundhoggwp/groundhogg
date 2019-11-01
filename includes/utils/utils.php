@@ -39,9 +39,7 @@ class Utils
         'step'      => '\Groundhogg\Step',
         'event'     => '\Groundhogg\Event',
         'email'     => '\Groundhogg\Email',
-        'sms'       => '\Groundhogg\SMS',
         'broadcast' => '\Groundhogg\Broadcast',
-        'superlink' => '\Groundhogg\Superlink',
         'tag'       => '\Groundhogg\Tag',
     ];
 
@@ -69,6 +67,8 @@ class Utils
      * @return false|Base_Object|Base_Object_With_Meta
      */
     public function get_object( $id = 0 , $by = 'ID' , $object = 'contact', $get_from_cache = true ){
+
+
 
         $cache_key = md5(  $id . '|' . $by . '|' . $object );
 

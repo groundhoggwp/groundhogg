@@ -11,6 +11,7 @@ use Groundhogg\Admin\Guided_Setup\Steps\Extensions;
 use Groundhogg\Admin\Guided_Setup\Steps\Finished;
 use Groundhogg\Admin\Guided_Setup\Steps\Import_Contacts;
 use Groundhogg\Admin\Guided_Setup\Steps\Partners;
+use Groundhogg\Admin\Guided_Setup\Steps\Premium;
 use Groundhogg\Admin\Guided_Setup\Steps\Start;
 use Groundhogg\Admin\Guided_Setup\Steps\Step;
 use Groundhogg\Admin\Guided_Setup\Steps\Sync_Users;
@@ -70,9 +71,9 @@ class Guided_Setup extends Admin_Page
         $steps[] = new Sync_Users();
         $steps[] = new Email();
         $steps[] = new Tracking();
+        $steps[] = new Premium();
         $steps[] = new Community();
         $steps[] = new Partners();
-        $steps[] = new Extensions();
         $steps[] = new Finished();
 
         $this->steps = $steps;
@@ -183,7 +184,9 @@ class Guided_Setup extends Admin_Page
     /**
      * Enqueue any scripts
      */
-    public function scripts(){}
+    public function scripts(){
+        wp_enqueue_style( 'groundhogg-admin' );
+    }
 
     /**
      * Add any help items

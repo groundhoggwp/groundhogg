@@ -136,10 +136,10 @@ html.full-screen{
 #postbox-container-1 .postbox{
     /*border: none;*/
     box-shadow: none;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    border-bottom: 1px solid #e5e5e5;
+    border-top: 2px solid;
+    border-left: 2px solid;
+    border-right: 2px solid;
+    border-bottom: 2px solid #e5e5e5;
     margin: 0;
 }
 
@@ -281,8 +281,6 @@ html.full-screen{
 #actions table td,
 #benchmarks table td{
     text-align: center;
-    /*border: 1px solid #F1F1F1;*/
-
 }
 
 .wpgh-element.ui-draggable-dragging {
@@ -296,20 +294,29 @@ html.full-screen{
     margin: 0;
 }
 
+#postbox-container-1 .postbox.action{
+    border-color: rgb(241, 253, 243);
+    border-bottom-color: #dbe6dc;
+}
+
+#postbox-container-1 .postbox.action.active{
+    border-color: #44ea1f;
+}
+
 .postbox.action .hndle{
     background-color: rgb(241, 253, 243);
 }
 
-#postbox-container-1 .postbox.action.active{
-    border-color: #7cea8c;
+#postbox-container-1 .postbox.active{
     border-width: 2px 2px 2px 2px;
     border-style: dashed;
-    /*background-color: rgb(204, 253, 203);*/
+    transition: 0.4s;
 }
 
 #postbox-container-1 .postbox.benchmark{
     color: #004085;
     background-color: #cce5ff;
+    border-color: #cce5ff;
     border-bottom-color: #b8daff;
 }
 
@@ -322,10 +329,7 @@ html.full-screen{
 }
 
 #postbox-container-1 .postbox.benchmark.active{
-    /*background-color: #b0deff;*/
     border-color: #0d79e5;
-    border-width: 2px 2px 2px 2px;
-    border-style: dashed;
 }
 
 #postbox-container-1 .postbox.step h2 {
@@ -392,6 +396,7 @@ html.full-screen{
 
 .steps-select{
     background: #f1f1f1;
+    min-height: 100%;
 }
 
 .steps-select .description{
@@ -502,7 +507,7 @@ table.embed-options td{
 
 .step-title {
     display: inline-block;
-    /*width: 200px;*/
+    max-width: 190px;
     padding-bottom: 5px;
     border-bottom: 1px solid #ddd;
     /*white-space: nowrap;*/
@@ -555,4 +560,18 @@ table.embed-options td{
 
 input, select, textarea{
     max-width: 100% !important;
+}
+
+#add-step-bottom {
+    font-size: 16px;
+    height: auto;
+    margin: 0 0 6px;
+    padding: 8px 14px;
+}
+
+#add-step-bottom .dashicons{
+    /*vertical-align: middle;*/
+    font-size: 22px;
+    vertical-align: middle;
+    margin-right: 10px;
 }

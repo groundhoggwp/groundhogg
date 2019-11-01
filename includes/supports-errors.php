@@ -33,7 +33,7 @@ abstract class Supports_Errors
     }
 
     /**
-     * Clear all the errors.
+     * Clear the errors.
      */
     public function clear_errors()
     {

@@ -1,7 +1,7 @@
 <?php
 namespace Groundhogg;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( !defined( 'ABSPATH' ) ) exit;
 
 /**
  * Replacements
@@ -43,8 +43,8 @@ class Replacements
 
         add_action( 'init', [ $this, 'setup_defaults' ] );
 
-        if ( isset_not_empty( $_GET, 'page' ) && strpos( $_GET[ 'page' ],'gh_' ) !== false ){
-            add_action( 'admin_footer' , [ $this, 'replacements_in_footer' ] );
+        if ( isset_not_empty( $_GET, 'page' ) && strpos( $_GET[ 'page' ], 'gh_' ) !== false ) {
+            add_action( 'admin_footer', [ $this, 'replacements_in_footer' ] );
         }
 
     }
@@ -57,157 +57,151 @@ class Replacements
 
         $replacements = array(
             array(
-                'code'        => 'id',
-                'callback'    => [ $this, 'replacement_id' ],
+                'code' => 'id',
+                'callback' => [ $this, 'replacement_id' ],
                 'description' => _x( 'The contact\'s ID number.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'first',
-                'callback'    => [ $this, 'replacement_first_name' ],
+                'code' => 'first',
+                'callback' => [ $this, 'replacement_first_name' ],
                 'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'first_name',
-                'callback'    => [ $this, 'replacement_first_name' ],
+                'code' => 'first_name',
+                'callback' => [ $this, 'replacement_first_name' ],
                 'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'last',
-                'callback'    => [ $this, 'replacement_last_name' ],
+                'code' => 'last',
+                'callback' => [ $this, 'replacement_last_name' ],
                 'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'last_name',
-                'callback'    => [ $this, 'replacement_last_name' ],
+                'code' => 'last_name',
+                'callback' => [ $this, 'replacement_last_name' ],
                 'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'full_name',
-                'callback'    => [ $this, 'replacement_full_name' ],
+                'code' => 'full_name',
+                'callback' => [ $this, 'replacement_full_name' ],
                 'description' => _x( 'The contact\'s full name.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'   => 'username',
-                'callback'    => [ $this, 'replacement_username' ],
+                'code' => 'username',
+                'callback' => [ $this, 'replacement_username' ],
                 'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'email',
-                'callback'    => [ $this, 'replacement_email' ],
+                'code' => 'email',
+                'callback' => [ $this, 'replacement_email' ],
                 'description' => _x( 'The contact\'s email address.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'phone',
-                'callback'    => [ $this, 'replacement_phone' ],
+                'code' => 'phone',
+                'callback' => [ $this, 'replacement_phone' ],
                 'description' => _x( 'The contact\'s phone number.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'phone_ext',
-                'callback'    => [ $this, 'replacement_phone_ext' ],
+                'code' => 'phone_ext',
+                'callback' => [ $this, 'replacement_phone_ext' ],
                 'description' => _x( 'The contact\'s phone number extension.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'address',
-                'callback'    => [ $this, 'replacement_address' ],
+                'code' => 'address',
+                'callback' => [ $this, 'replacement_address' ],
                 'description' => _x( 'The contact\'s full address.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'company_name',
-                'callback'    => [ $this, 'replacement_company_name' ],
+                'code' => 'company_name',
+                'callback' => [ $this, 'replacement_company_name' ],
                 'description' => _x( 'The contact\'s company name.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'job_title',
-                'callback'    => [ $this, 'replacement_job_title' ],
+                'code' => 'job_title',
+                'callback' => [ $this, 'replacement_job_title' ],
                 'description' => _x( 'The contact\'s job title.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'company_address',
-                'callback'    => [ $this, 'replacement_company_address' ],
+                'code' => 'company_address',
+                'callback' => [ $this, 'replacement_company_address' ],
                 'description' => _x( 'The contact\'s company address.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'meta',
-                'callback'    => [ $this, 'replacement_meta' ],
+                'code' => 'meta',
+                'callback' => [ $this, 'replacement_meta' ],
                 'description' => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'business_name',
-                'callback'    => [ $this, 'replacement_business_name' ],
+                'code' => 'business_name',
+                'callback' => [ $this, 'replacement_business_name' ],
                 'description' => _x( 'The business name as defined in the settings.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'business_phone',
-                'callback'    => [ $this, 'replacement_business_phone' ],
+                'code' => 'business_phone',
+                'callback' => [ $this, 'replacement_business_phone' ],
                 'description' => _x( 'The business phone number as defined in the settings.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'business_address',
-                'callback'    => [ $this, 'replacement_business_address' ],
+                'code' => 'business_address',
+                'callback' => [ $this, 'replacement_business_address' ],
                 'description' => _x( 'The business address as defined in the settings.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'site_url',
-                'callback'    => [ $this, 'site_url' ],
+                'code' => 'site_url',
+                'callback' => [ $this, 'site_url' ],
                 'description' => _x( 'The site url.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'owner_first_name',
-                'callback'    => [ $this, 'replacement_owner_first_name' ],
+                'code' => 'owner_first_name',
+                'callback' => [ $this, 'replacement_owner_first_name' ],
                 'description' => _x( 'The contact owner\'s name.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'owner_last_name',
-                'callback'    => [ $this, 'replacement_owner_last_name' ],
+                'code' => 'owner_last_name',
+                'callback' => [ $this, 'replacement_owner_last_name' ],
                 'description' => _x( 'The contact owner\'s name.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'owner_email',
-                'callback'    => [ $this, 'replacement_owner_email' ],
+                'code' => 'owner_email',
+                'callback' => [ $this, 'replacement_owner_email' ],
                 'description' => _x( 'The contact owner\'s email address.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'owner_phone',
-                'callback'    => [ $this, 'replacement_owner_phone' ],
+                'code' => 'owner_phone',
+                'callback' => [ $this, 'replacement_owner_phone' ],
                 'description' => _x( 'The contact owner\'s phone number.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'confirmation_link',
-                'callback'    => [ $this, 'replacement_confirmation_link' ],
+                'code' => 'confirmation_link',
+                'callback' => [ $this, 'replacement_confirmation_link' ],
                 'description' => _x( 'A link to confirm the email address of a contact.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'confirmation_link_raw',
-                'callback'    => [ $this, 'replacement_confirmation_link_raw' ],
+                'code' => 'confirmation_link_raw',
+                'callback' => [ $this, 'replacement_confirmation_link_raw' ],
                 'description' => _x( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'superlink',
-                'callback'    => [ $this, 'replacement_superlink' ],
-                'description' => _x( 'A superlink code. Usage: {superlink.id}', 'replacement', 'groundhogg' ),
-            ),
-            array(
-                'code'        => 'date',
-                'callback'    => [ $this, 'replacement_date' ],
+                'code' => 'date',
+                'callback' => [ $this, 'replacement_date' ],
                 'description' => _x( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'files',
-                'callback'    => [ $this, 'replacement_files' ],
+                'code' => 'files',
+                'callback' => [ $this, 'replacement_files' ],
                 'description' => _x( 'Insert a download link for a file. Usage {files.key}. Example: {files.custom_files}. Do find the key for a file see the contact record and copy the relevant replacement code.', 'replacement', 'groundhogg' ),
             ),
             array(
-                'code'        => 'groundhogg_day_quote',
-                'callback'    => [ $this, 'get_random_groundhogday_quote' ],
+                'code' => 'groundhogg_day_quote',
+                'callback' => [ $this, 'get_random_groundhogday_quote' ],
                 'description' => _x( 'Inserts a random quote from the movie Groundhog Day featuring Bill Murray', 'replacement', 'groundhogg' ),
             )
         );
 
         $replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
 
-        foreach ( $replacements as $replacement )
-        {
-            $this->add( $replacement['code'], $replacement[ 'callback' ], $replacement[ 'description' ] );
+        foreach ( $replacements as $replacement ) {
+            $this->add( $replacement[ 'code' ], $replacement[ 'callback' ], $replacement[ 'description' ] );
         }
 
         do_action( 'groundhogg/replacements/init', $this );
@@ -222,13 +216,12 @@ class Replacements
      *
      * @return bool
      */
-    function add( $code, $callback, $description='' )
+    function add( $code, $callback, $description = '' )
     {
-        if ( ! $code || ! $callback )
+        if ( !$code || !$callback )
             return false;
 
-        if ( is_callable( $callback ) )
-        {
+        if ( is_callable( $callback ) ) {
             $this->replacement_codes[ $code ] = array(
                 'code' => $code,
                 'callback' => $callback,
@@ -245,13 +238,13 @@ class Replacements
     /**
      * Remove a replacement code
      *
+     * @param string $code to remove
      * @since 1.9
      *
-     * @param string $code to remove
      */
     public function remove( $code )
     {
-        unset( $this->replacement_codes[$code] );
+        unset( $this->replacement_codes[ $code ] );
     }
 
     /**
@@ -269,9 +262,9 @@ class Replacements
     /**
      * Returns a list of all replacement codes
      *
+     * @return array
      * @since 1.9
      *
-     * @return array
      */
     public function get_replacements()
     {
@@ -286,32 +279,32 @@ class Replacements
      *
      * @return string
      */
-    public function process( $content, $contact_id=null )
+    public function process( $content, $contact_id = null )
     {
 
-        if ( ! preg_match( '/{([^{}]+)}/', $content  ) ){
+        if ( !preg_match( '/{([^{}]+)}/', $content ) ) {
             return $content;
         }
 
         $contact_id = absint( $contact_id );
 
-        if ( ! $contact_id ){
+        if ( !$contact_id ) {
             // TODO implement tracking...
             $contact_id = Plugin::$instance->tracking->get_current_contact_id();
         }
 
-        if ( ! $contact_id || ! is_int( $contact_id ) )
+        if ( !$contact_id || !is_int( $contact_id ) )
             return $content;
 
         // Check if there is at least one tag added
-        if ( empty( $this->replacement_codes ) || ! is_array( $this->replacement_codes ) ) {
+        if ( empty( $this->replacement_codes ) || !is_array( $this->replacement_codes ) ) {
             return $content;
         }
 
         $this->contact_id = $contact_id;
         $this->current_contact = get_contactdata( $contact_id );
 
-        if ( ! $this->current_contact ){
+        if ( !$this->current_contact ) {
             return $content;
         }
 
@@ -328,16 +321,17 @@ class Replacements
         return $this->current_contact;
     }
 
-    protected function parse_code( $code = '' ){
+    protected function parse_code( $code = '' )
+    {
 
         $default = $code;
         $arg = false;
 
         //Support Default Arguments.
-        if ( strpos( $code, '::' ) > 0 ){
+        if ( strpos( $code, '::' ) > 0 ) {
             $parts = explode( '::', $code );
-            $code = $parts[0];
-            $default = $parts[1];
+            $code = $parts[ 0 ];
+            $default = $parts[ 1 ];
         }
 
         /* make sure that if it's a dynamic code to remove anything after the period */
@@ -349,7 +343,7 @@ class Replacements
 
         return [
             'code' => $code,
-            'arg'  => $arg,
+            'arg' => $arg,
             'default' => $default
         ];
 
@@ -365,30 +359,30 @@ class Replacements
     private function do_replacement( $m )
     {
         // Get tag
-        $code = $m[1];
+        $code = $m[ 1 ];
 
         $parts = $this->parse_code( $code );
 
-        $arg     = $parts[ 'arg' ];
-        $code    = $parts[ 'code' ];
+        $arg = $parts[ 'arg' ];
+        $code = $parts[ 'code' ];
         $default = $parts[ 'default' ];
 
         // Return tag if tag not set
-        if ( ! $this->has_replacement( $code ) && substr( $code, 0, 1 ) !== '_' ) {
+        if ( !$this->has_replacement( $code ) && substr( $code, 0, 1 ) !== '_' ) {
             return $default;
         }
 
         // Access contact fields.
-        if ( substr( $code, 0, 1) === '_' ) {
+        if ( substr( $code, 0, 1 ) === '_' ) {
             $field = substr( $code, 1 );
             $text = $this->get_current_contact()->$field;
         } else if ( $arg ) {
-            $text = call_user_func( $this->replacement_codes[ $code ]['callback'], $arg, $this->contact_id, $code );
+            $text = call_user_func( $this->replacement_codes[ $code ][ 'callback' ], $arg, $this->contact_id, $code );
         } else {
-            $text = call_user_func( $this->replacement_codes[ $code ]['callback'], $this->contact_id, $code );
+            $text = call_user_func( $this->replacement_codes[ $code ][ 'callback' ], $this->contact_id, $code );
         }
 
-        if ( empty( $text ) ){
+        if ( empty( $text ) ) {
             $text = $default;
         }
 
@@ -402,7 +396,8 @@ class Replacements
         <table class="wp-list-table widefat fixed striped">
             <thead>
             <tr>
-                <th><?php _e( 'Replacement Code' );?>&nbsp;<?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/features/replacement-codes/' );?></th>
+                <th><?php _e( 'Replacement Code' ); ?>
+                    &nbsp;<?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/features/replacement-codes/' ); ?></th>
                 <th><?php _e( 'Description' ); ?></th>
             </tr>
             </thead>
@@ -411,7 +406,9 @@ class Replacements
             <?php foreach ( $this->get_replacements() as $replacement ): ?>
                 <tr>
                     <td>
-                        <input class="replacement-selector" style="border: none;outline: none;background: transparent;width: 100%;" onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}" readonly>
+                        <input class="replacement-selector"
+                               style="border: none;outline: none;background: transparent;width: 100%;"
+                               onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}" readonly>
                     </td>
                     <td>
                         <span><?php esc_html_e( $replacement[ 'description' ] ); ?></span>
@@ -437,14 +434,14 @@ class Replacements
         wp_enqueue_script( 'groundhogg-admin-replacements' );
 
         echo Plugin::$instance->utils->html->modal_link( array(
-            'title'     => __( 'Replacements', 'groundhogg' ),
-            'text'      => $short ? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>' : '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
+            'title' => __( 'Replacements', 'groundhogg' ),
+            'text' => $short ? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>' : '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
             'footer_button_text' => __( 'Insert' ),
-            'id'        => 'replacements',
-            'class'     => 'button button-secondary no-padding replacements replacements-button',
-            'source'    => 'footer-replacement-codes',
-            'height'    => 900,
-            'width'     => 700,
+            'id' => 'replacements',
+            'class' => 'button button-secondary no-padding replacements replacements-button',
+            'source' => 'footer-replacement-codes',
+            'height' => 900,
+            'width' => 700,
         ) );
 
     }
@@ -462,7 +459,7 @@ class Replacements
         if ( empty( $arg ) )
             return '';
 
-        return print_r( $this->get_current_contact()->get_meta( $arg ) , true );
+        return print_r( $this->get_current_contact()->get_meta( $arg ), true );
     }
 
     /**
@@ -471,7 +468,8 @@ class Replacements
      * @param $contact_id int the contact_id
      * @return string the first name
      */
-    function replacement_id( $contact_id ){
+    function replacement_id( $contact_id )
+    {
         return $contact_id;
     }
 
@@ -609,7 +607,7 @@ class Replacements
     {
         $user = $this->get_current_contact()->get_ownerdata();
 
-        if ( ! $user )
+        if ( !$user )
             return get_bloginfo( 'admin_email' );
 
         return $user->user_email;
@@ -625,8 +623,10 @@ class Replacements
     {
         $user = $this->get_current_contact()->get_ownerdata();
 
-        if ( ! $user )
-            return get_bloginfo( 'admin_email' );
+        if ( !$user ) {
+            // return admin details
+            $user = get_user_by( 'email', get_bloginfo( 'admin_email' ) );
+        }
 
         return $user->first_name;
     }
@@ -641,8 +641,10 @@ class Replacements
     {
         $user = $this->get_current_contact()->get_ownerdata();
 
-        if ( ! $user )
-            return get_bloginfo( 'admin_email' );
+        if ( !$user ) {
+            //return admin details
+            $user = get_user_by( 'email', get_bloginfo( 'admin_email' ) );
+        }
 
         return $user->last_name;
     }
@@ -651,7 +653,7 @@ class Replacements
     {
         $user = $this->get_current_contact()->get_ownerdata();
 
-        if ( ! $user || ! $user->phone ){
+        if ( !$user || !$user->phone ) {
             return $this->replacement_business_phone();
         }
 
@@ -685,19 +687,6 @@ class Replacements
     }
 
     /**
-     * Do the link replacement...
-     *
-     * @param $linkId int the ID of the link
-     *
-     * @return string the superlink url
-     */
-    function replacement_superlink( $linkId )
-    {
-        $linkId = absint( intval( $linkId ) );
-        return site_url( 'superlinks/link/' . $linkId );
-    }
-
-    /**
      * @return string
      */
     function site_url()
@@ -715,21 +704,20 @@ class Replacements
     function replacement_date( $time_string )
     {
 
-        $parts =preg_split( "/(\||;)/", $time_string );
+        $parts = preg_split( "/\||;/", $time_string );
 
-        if ( count( $parts ) === 1 ){
-            $format = 'l jS \of F Y';
-            $when = $parts[0];
+        if ( count( $parts ) === 1 ) {
+            $format = get_date_time_format();
+            $when = $parts[ 0 ];
         } else {
-            $format = $parts[0];
-            $when = $parts[1];
+            $format = $parts[ 0 ];
+            $when = $parts[ 1 ];
         }
 
         /* convert to local time */
-        $time = strtotime( $when ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+        $time = strtotime( $when );
 
         return date_i18n( $format, $time );
-
     }
 
     /**
@@ -770,11 +758,11 @@ class Replacements
 
         $address = [];
 
-        foreach ( $address_keys as $key ){
+        foreach ( $address_keys as $key ) {
 
             $val = Plugin::$instance->settings->get_option( $key );
-            if ( ! empty( $val ) ){
-                $address[$key] = $val;
+            if ( !empty( $val ) ) {
+                $address[ $key ] = $val;
             }
         }
 
@@ -796,17 +784,17 @@ class Replacements
 
         $files = $this->get_current_contact()->get_files();
 
-        if ( ! empty( $files ) ){
+        if ( !empty( $files ) ) {
             return __( 'No files found.', 'groundhogg' );
         }
 
         $html = '';
 
-        if ( $file = get_array_var( $files, $key ) ){
+        if ( $file = get_array_var( $files, $key ) ) {
             return sprintf( '<a href="%s">%s</a>', esc_url( $file[ 'file_url' ] ), esc_html( $file[ 'file_name' ] ) );
         }
 
-        foreach ( $files as $i => $file ){
+        foreach ( $files as $i => $file ) {
             $html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( $file[ 'file_url' ] ), esc_html( $file[ 'file_name' ] ) );
         }
 

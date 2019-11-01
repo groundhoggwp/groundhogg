@@ -10,6 +10,8 @@ use Groundhogg\Admin\Emails\Emails_Page;
 use Groundhogg\Admin\Events\Events_Page;
 use Groundhogg\Admin\Funnels\Funnels_Page;
 use Groundhogg\Admin\Guided_Setup\Guided_Setup;
+use Groundhogg\Admin\Help\Help_Page;
+use Groundhogg\Admin\Pro\Pro_Page;
 use Groundhogg\Admin\Settings\Settings_Page;
 use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Tools\Tools_Page;
@@ -58,6 +60,7 @@ class Admin_Menu
 
         $this->broadcasts = new Broadcasts_Page();
         $this->funnels = new Funnels_Page();
+
         $this->events = new Events_Page();
         $this->tools = new Tools_Page();
         $this->settings = new Settings_Page();
@@ -65,9 +68,16 @@ class Admin_Menu
 
         $this->dashboard = new Dashboard_Widgets();
 
-        if ( !is_white_labeled() ) {
+        if ( ! is_white_labeled() ) {
             $this->guided_setup = new Guided_Setup();
+            $this->help = new Help_Page();
+
+            if ( ! is_pro_features_active() ){
+                $this->pro = new Pro_Page();
+            }
         }
+
+
 
         do_action( 'groundhogg/admin/init', $this );
     }

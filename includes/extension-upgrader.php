@@ -10,10 +10,10 @@ namespace Groundhogg;
  *
  * @package Groundhogg
  */
-class Extension_Updater
+class Extension_Upgrader
 {
 
-    protected $file_map = [
+    protected static $file_map = [
         210     => 'groundhogg-wooc/groundhogg-wooc.php',
         216     => 'groundhogg-edd/groundhogg-edd.php',
         219     => 'groundhogg-gravity/groundhogg-gravity.php',
@@ -40,6 +40,17 @@ class Extension_Updater
         15036   => 'groundhogg-lifterlms/groundhogg-lifterlms.php',
         15028   => 'groundhogg-learndash/groundhogg-learndash.php',
         15016   => 'groundhogg-content-restriction/groundhogg-content-restriction.php',
+        16538   => 'groundhogg-tutorlms/groundhogg-tutorlms.php',
+        16557   => 'groundhogg-divi/groundhogg-divi.php',
+        17321   => 'groundhogg-smtp/groundhogg-smtp.php',
+        18312   => 'groundhogg-birthday/groundhogg-birthday.php',
+        19378   => 'groundhogg-advanced-preferences/groundhogg-advanced-preferences.php',
+        20158   => 'groundhogg-thrivecart/groundhogg-thrivecart.php',
+        22198   => 'groundhogg-elementor/groundhogg-elementor.php',
+        22397   => 'groundhogg-pro/groundhogg-pro.php',
+        23532   => 'groundhogg-weforms/groundhogg-weforms.php',
+        23534   => 'groundhogg-fluent-form/groundhogg-fluent-form.php',
+        23538   => 'groundhogg-sms/groundhogg-sms.php',
     ];
 
     /**
@@ -79,11 +90,11 @@ class Extension_Updater
 
             $license = get_array_var($extension, 'license');
 
-            if ( ! isset_not_empty( $this->file_map, $plugin_id ) ){
+            if ( ! isset_not_empty( self::$file_map, $plugin_id ) ){
                 continue;
             }
 
-            $subpath = $this->file_map[$plugin_id];
+            $subpath = self::$file_map[$plugin_id];
             $file_path = WP_PLUGIN_DIR . '/' . $subpath;
 
             if ( ! file_exists( $file_path ) ){
@@ -100,11 +111,101 @@ class Extension_Updater
                 'version' => $data[ 'Version' ],
                 'license' => $license,
                 'item_id' => $plugin_id,
+                'author' => $data[ 'Author' ],
                 'url' => home_url()
             ]);
 
         }
 
     }
+
+    /**
+     * Remotely install an extension
+     *
+     * @param $item_id
+     * @param $license
+     *
+     * @return bool|\WP_Error
+     */
+    public static function remote_install( $item_id, $license='' )
+    {
+        if ( empty( $license ) ){
+            // Get the first available license
+            $license = License_Manager::get_license();
+        }
+
+        $plugin = get_array_var( self::$file_map, $item_id );
+
+        if ( ! $plugin ){
+            return new \WP_Error( 'invalid_plugin_id', 'Invalid plugin ID provided.' );
+        }
+
+        $is_installed = false;
+
+        foreach ( get_plugins() as $path => $details ) {
+            if ( false === strpos( $path, $plugin ) ) {
+                continue;
+            }
+
+            $is_installed = true;
+
+            $activate = activate_plugin( $path );
+
+            if ( is_wp_error( $activate ) ) {
+                return $activate;
+            }
+
+            break;
+        }
+
+        $install = null;
+
+        if ( ! $is_installed ) {
+
+            // Activate the download
+            $activated = License_Manager::activate_license_quietly( $license, $item_id );
+
+            if ( ! $activated || is_wp_error( $activated ) ){
+                return $activated;
+            }
+
+            if ( ! class_exists( '\Plugin_Upgrader' ) ){
+                include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+                include_once ABSPATH . 'wp-admin/includes/file.php';
+                include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+            }
+
+            // Get the package info from the Store API
+            $api = License_Manager::get_version( $item_id, $license );
+
+            if ( is_wp_error( $api ) ) {
+                return $api;
+            }
+
+            if ( ! get_array_var( $api, 'download_link' ) ){
+                return new \WP_Error( 'error', 'Could not retrieve download package', $api );
+            }
+
+            // Use the AJAX upgrader skin to quietly install the plugin.
+            $upgrader = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin() );
+
+            $install  = $upgrader->install( get_array_var( $api, 'download_link' ) );
+
+            if ( is_wp_error( $install ) ) {
+                return $install;
+            }
+
+            $activate = activate_plugin( $upgrader->plugin_info() );
+
+            if ( is_wp_error( $activate ) ) {
+                return $activate;
+            }
+        }
+
+        return true;
+
+
+    }
+
 
 }

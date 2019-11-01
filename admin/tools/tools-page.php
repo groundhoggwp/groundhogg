@@ -5,6 +5,10 @@ namespace Groundhogg\Admin\Tools;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\Bulk_Jobs\Delete_Contacts;
+use Groundhogg\Extension_Upgrader;
+use Groundhogg\License_Manager;
+use function Groundhogg\action_input;
+use function Groundhogg\action_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -14,6 +18,7 @@ use \WP_Error;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\nonce_url_no_amp;
+use function Groundhogg\notices;
 use function Groundhogg\white_labeled_name;
 use function set_transient;
 
@@ -184,6 +189,14 @@ class Tools_Page extends Tabbed_Admin_Page
                 'slug' => 'install'
             ],
         ];
+
+        // If old customer updating to new version.
+        if ( get_option( 'gh_updating_to_2_1' ) ){
+            $tabs[] = [
+                'name' => __( 'Re-install Features' ),
+                'slug' => 'remote_install'
+            ];
+        }
 
         $tabs = apply_filters( 'groundhogg/admin/tools/tabs', $tabs );
 
@@ -673,7 +686,7 @@ class Tools_Page extends Tabbed_Admin_Page
     public function delete_warning()
     {
         if ( $this->get_current_tab() === 'delete' ) {
-            $this->add_notice( 'no_going_back', __( '&#9888; There is no going back once the deletion process has started.', 'groudnhogg' ), 'warning' );
+            $this->add_notice( 'no_going_back', __( '&#9888; There is no going back once the deletion process has started.', 'groundhogg' ), 'warning' );
         }
     }
 
@@ -715,6 +728,7 @@ class Tools_Page extends Tabbed_Admin_Page
         $this->deleter->start( [ 'tags_include' => implode( ',', $tags ) ] );
     }
 
+
     /**
      * Get the menu order between 1 - 99
      *
@@ -724,4 +738,90 @@ class Tools_Page extends Tabbed_Admin_Page
     {
         return 98;
     }
+
+    ########### OTHER ###########
+
+    public function remote_install_view()
+    {
+
+        ?>
+        <form method="post">
+        <h3><?php _e( 'Re-install features.' ); ?></h3>
+        <p><?php _e( 'The following features have been removed from the Groundhogg core plugin in version 2.1 and have instead been added to separate premium extensions.' ); ?></p>
+        <ol>
+            <li><?php _e( 'Elementor integration' ); ?></li>
+            <li><?php _e( 'SMS functionality' ); ?></li>
+            <li><?php _e( 'Advanced email editor' ); ?></li>
+            <li><?php _e( 'Advanced funnel steps' ); ?></li>
+            <li><?php _e( 'Superlinks' ); ?></li>
+        </ol>
+        <p><?php _e( 'You can learn more about this change <i>(officially announced Oct 17th)</i> <a href="https://www.groundhogg.io/press/new-pricing-and-updates-planned-for-november-1st/" target="_blank">on our blog.</a>' ); ?></p>
+        <p><?php _e( 'If you have an All Access Pass, <a href="https://www.groundhogg.io/pricing/" target="_blank">Premium Plan</a> or a <a href="https://www.groundhogg.io/grandfather-program/" target="_blank">Grandfather license</a> get you can enter it below to automatically install and activate the removed features.' ); ?></p>
+        <?php
+
+        action_input( 'remote_install_plugins' );
+        wp_nonce_field( 'remote_install_plugins' );
+
+        html()->start_form_table();
+
+        html()->start_row();
+
+        html()->th( __( 'License Key:' ) );
+
+        html()->td( [
+            html()->input( [ 'name' => 'license_key', 'value' => License_Manager::get_license() ] ),
+            html()->description( implode( '', [
+                    html()->e( 'a', [ 'href' => 'https://www.groundhogg.io/account/', 'target' => '_blank' ],  __( 'Find my license key', 'groundhogg' ) ),
+                    ' | ',
+                    html()->e( 'a', [ 'href' => 'https://www.groundhogg.io/pricing/', 'target' => '_blank' ],  __( 'Get a license key', 'groundhogg' ) ),
+                ] )
+            )
+        ] );
+
+        html()->end_row();
+
+        html()->end_form_table();
+
+        submit_button( __( 'Install extensions!' ) );
+
+    }
+
+    public function process_remote_install_plugins()
+    {
+        if ( ! current_user_can( 'install_plugins' ) ){
+            $this->wp_die_no_access();
+        }
+
+        $downloads = [
+            23538, // SMS
+            22198, // Elementor
+            22397  // Pro features
+        ];
+
+        $installed = false;
+
+        foreach ( $downloads as $download ) {
+            $installed = Extension_Upgrader::remote_install($download, sanitize_text_field(get_request_var('license_key')));
+
+            if (is_wp_error($installed)) {
+                return $installed;
+            }
+
+            if (!$installed) {
+                return new WP_Error('error', 'Could not remotely install plugin...');
+            }
+        }
+
+        if ($installed) {
+            $this->add_notice('installed', 'Installed extension successfully!');
+        }
+
+        notices()->dismiss_notice( 'features-removed-notice' );
+
+        delete_option( 'gh_updating_to_2_1' );
+
+        return false;
+    }
+
+
 }

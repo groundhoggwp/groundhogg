@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin;
 
+use Groundhogg\Supports_Errors;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -25,7 +26,7 @@ use Groundhogg\Pointers;
 // Exit if accessed directly
 if (!defined('ABSPATH')) exit;
 
-abstract class Admin_Page
+abstract class Admin_Page extends Supports_Errors
 {
 
     protected $screen_id;
@@ -386,7 +387,7 @@ abstract class Admin_Page
         }
 
         if (is_string($exitCode) && esc_url_raw($exitCode)) {
-            wp_redirect($exitCode);
+            wp_redirect( $exitCode );
             die();
         }
 
@@ -396,11 +397,13 @@ abstract class Admin_Page
         }
 
         // IF NULL return to main table
-        if (!empty($this->get_items())) {
+        $items = $this->get_items();
+
+        if ( ! empty( $items ) ) {
             $base_url = add_query_arg('ids', urlencode(implode(',', $this->get_items())), $base_url);
         }
 
-        wp_redirect($base_url);
+        wp_safe_redirect( $base_url );
         die();
     }
 
@@ -425,7 +428,9 @@ abstract class Admin_Page
      */
     protected function do_title_actions()
     {
-        foreach ($this->get_title_actions() as $action):
+        $actions = apply_filters( "gronudhogg/admin/{$this->get_slug()}/{$this->get_current_action()}/title_actions", $this->get_title_actions()  );
+
+        foreach ($actions as $action):
 
             $action = wp_parse_args($action, [
                 'link' => admin_url(),
