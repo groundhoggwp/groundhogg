@@ -392,7 +392,7 @@ class Emails_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        include dirname(__FILE__) . '/add.php';
+        include dirname(__FILE__) . '/add-new.php';
     }
 
     public function edit()
