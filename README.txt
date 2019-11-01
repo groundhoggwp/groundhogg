@@ -152,6 +152,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.1 (2019-11-01) =
+* TWEAKED instant regret for the new add email flow. We put the old one back.
+* FIXED Notices bug when adding notice with WP_Error
+
 = 2.1 (2019-11-01) =
 * ADDED Template library to replace builtin templates.
 * TWEAKED Better guided setup onboarding experience.
