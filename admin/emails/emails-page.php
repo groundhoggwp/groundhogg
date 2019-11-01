@@ -466,7 +466,7 @@ class Emails_Page extends Admin_Page
             <?php foreach ( $emails as $email ):
             $email = new Email( $email->ID );
             ?>
-            <div class="postbox" style="margin-right:20px;width: calc( 95% / 2 );max-width: 550px;display: inline-block;">
+            <div class="postbox">
                 <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
                 <div class="inside">
                     <p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
