@@ -16,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 $footer_alignment = get_option( 'gh_email_footer_alignment', 'center' );
 
 $footer = apply_filters( 'groundhogg/email_template/footer_css', [
-    'clear' => 'both', 
-    'margin-top' => '10px', 
+    'clear' => 'both',
+    'margin-top' => '10px',
     'text-align' => $footer_alignment,
     'width' => '100%',
 ] );
@@ -26,15 +26,15 @@ $footer = \Groundhogg\array_to_css( $footer );
 
 $footer_container = apply_filters( 'groundhogg/email_template/footer_container_css', [
     'border-collapse' => 'separate',
-    'mso-table-lspace' => '0pt', 
-    'mso-table-rspace' => '0pt', 
+    'mso-table-lspace' => '0pt',
+    'mso-table-rspace' => '0pt',
     'width' => '100%',
 ] );
 
 $footer_container = \Groundhogg\array_to_css( $footer_container );
 
 $footer_css = apply_filters( 'groundhogg/email_template/footer_content_css', [
-    'font-family' => 'sans-serif', 
+    'font-family' => 'sans-serif',
     'vertical-align' => 'top',
     'padding-bottom' => '10px',
     'padding-top' => '10px',
@@ -98,6 +98,23 @@ if ( $custom_text ): ?>
                                                 </span>
                                             </td>
                                         </tr>
+                                        <?php if(\Groundhogg\is_option_enabled( 'gh_affiliate_link_in_email')) : ?>
+                                            <tr>
+                                                <td style="padding: 20px" style="<?php echo $footer_css; ?>">
+                                                    <p style="<?php echo $apple_link; ?>">
+                                                        <?php _e("This email was sent with" , 'groundhogg'); ?>
+                                                        <a href="<?php echo add_query_arg( [
+                                                            'utm_source'    => 'email',
+                                                            'utm_medium'    => 'footer-link',
+                                                            'utm_campaign'  => 'email-affiliate',
+                                                            'aff'           => absint( get_option( 'gh_affiliate_id' ) ),
+                                                        ], 'https://www.groundhogg.io/pricing/' ); ?>" target="_blank">
+                                                            <img style="vertical-align: middle" height="18.33" width="100" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png'; ?>"/>
+                                                        </a>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        <?php endif; ?>
                                     </table>
                                 </div>
                                 <!-- END FOOTER -->

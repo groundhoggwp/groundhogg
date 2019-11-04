@@ -203,6 +203,11 @@ class Settings_Page extends Admin_Page
                 'title' => _x('Misc Settings', 'settings_sections', 'groundhogg'),
                 'tab' => 'misc'
             ),
+            'affiliate' => array(
+                'id' => 'affiliate',
+                'title' => _x('Affiliate Section', 'settings_sections', 'groundhogg'),
+                'tab' => 'misc'
+            ),
             'captcha' => array(
                 'id' => 'captcha',
                 'title' => _x('Captcha', 'settings_sections', 'groundhogg'),
@@ -518,6 +523,31 @@ class Settings_Page extends Admin_Page
                     'id' => 'gh_opted_in_stats_collection',
                     'value' => 'on',
                 ),
+            ),
+            'gh_affiliate_id' => array(
+                'id' => 'gh_affiliate_id',
+                'section' => 'affiliate',
+                'label' => _x('Affiliate ID', 'settings', 'groundhogg'),
+                'desc' => _x('Please enter your affiliate ID you received from Groundhogg.', 'settings', 'groundhogg'),
+                'type' => 'input',
+                'atts' =>[
+                    'type' => 'number',
+                    'id' => 'gh_affiliate_id',
+                    'name' => 'gh_affiliate_id',
+                ],
+            ),
+            'gh_affiliate_link_in_email' => array(
+                'id' => 'gh_affiliate_link_in_email',
+                'section' => 'affiliate',
+                'label' => _x('Affiliate Link in emails', 'settings', 'groundhogg'),
+                'desc' => _x('This settings adds affiliate link in every email you send using Groundhogg.', 'settings', 'groundhogg'),
+                'type' => 'checkbox',
+                'atts' => [
+                    'label' => __('Enable' ,'groundhogg'),
+                    //keep brackets for backwards compat
+                    'name' => 'gh_affiliate_link_in_email',
+                    'id' => 'gh_affiliate_link_in_email',
+                ],
             ),
             'gh_send_notifications_on_event_failure' => array(
                 'id' => 'gh_send_notifications_on_event_failure',
