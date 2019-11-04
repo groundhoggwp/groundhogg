@@ -5,6 +5,7 @@ use function Groundhogg\after_form_submit_handler;
 use function Groundhogg\blacklist_check;
 use Groundhogg\Contact;
 use function Groundhogg\decrypt;
+use function Groundhogg\do_replacements;
 use function Groundhogg\doing_rest;
 use function Groundhogg\file_access_url;
 use function Groundhogg\form_errors;
@@ -359,7 +360,7 @@ class Submission_Handler extends Supports_Errors
 
             if ( $this->is_ajax_request() ) {
 
-                $success_message = $this->step->get_meta( 'success_message' );
+                $success_message = do_replacements( $this->step->get_meta( 'success_message' ), $contact->get_id() );
 
                 if ( !$success_message ) {
                     $success_message = __( 'Your submission has been received!', 'groundhogg' );
@@ -376,7 +377,7 @@ class Submission_Handler extends Supports_Errors
 
             } else {
 
-                $success_page = $this->step->get_meta( 'success_page' );
+                $success_page = do_replacements( $this->step->get_meta( 'success_page' ), $contact->get_id() );
                 wp_redirect( $success_page );
                 die();
 

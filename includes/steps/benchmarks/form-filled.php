@@ -695,7 +695,7 @@ class Form_Filled extends Benchmark
     public function save( $step )
     {
         $this->save_setting( 'form', wp_kses_post( $this->get_posted_data( 'form' ) ) );
-        $this->save_setting( 'success_page', esc_url_raw( $this->get_posted_data( 'success_page' ) ) );
+        $this->save_setting( 'success_page', sanitize_text_field( $this->get_posted_data( 'success_page' ) ) );
         $this->save_setting( 'success_message', sanitize_textarea_field( $this->get_posted_data( 'success_message' ) ) );
         $this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );
     }

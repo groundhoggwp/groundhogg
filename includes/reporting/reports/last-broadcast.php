@@ -40,13 +40,13 @@ class Last_Broadcast extends Report
 
     public function get_broadcast()
     {
-        $all_broadcasts = get_db( 'broadcasts' )->query( [ 'status' => 'sent' ], 'send_time' );
+        $all_broadcasts = get_db( 'broadcasts' )->query( [ 'status' => 'sent', 'orderby' => 'send_time', 'order' => 'desc', 'limit' => 10 ] );
 
         if ( empty( $all_broadcasts ) ){
             return false;
         }
 
-        $last_broadcast = array_pop( $all_broadcasts );
+        $last_broadcast = array_shift( $all_broadcasts );
         $last_broadcast_id = absint( $last_broadcast->ID );
 
         $broadcast = new Broadcast( $last_broadcast_id );

@@ -152,6 +152,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.2 (2019-11-04) =
+* ADDED options to set your Groundhogg affiliate ID.
+* ADDED option to show "this email was sent with Groundhogg" in the email footer. (using aff ID)
+* TWEAKED The form response and TY page now support replacements.
+* FIXED replacement codes in links not working in basic email editor.
+* FIXED Last broadcast report not showing most recent broadcast stats.
+
 = 2.1.1 (2019-11-01) =
 * TWEAKED instant regret for the new add email flow. We put the old one back.
 * FIXED Notices bug when adding notice with WP_Error

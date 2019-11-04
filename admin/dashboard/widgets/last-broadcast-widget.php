@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Dashboard\Widgets;
 
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\html;
 use function Groundhogg\key_to_words;
 use function Groundhogg\percentage;
@@ -33,15 +34,24 @@ class Last_Broadcast_Widget extends Circle_Graph
             return;
         }
 
+        $broadcast = new Broadcast( $this->stats[ 'id' ] );
+
         html()->list_table(
             [ 'class' => 'last-broadcast' ],
             [
+                __( 'Name', 'groundhogg' ),
                 __( 'Total Sent', 'groundhogg' ),
                 __( 'Opened', 'groundhogg' ),
                 __( 'Clicked', 'groundhogg' ),
             ],
             [
                 [
+                    html()->e( 'a', [
+                        'href' => admin_page_url( 'gh_broadcasts', [
+                            'action' => 'report',
+                            'broadcast' => $broadcast->get_id()
+                        ] )
+                    ], $broadcast->get_title() ),
                     html()->wrap( $this->stats[ 'sent' ], 'span', [ 'class' => 'number-total' ] ),
                     html()->wrap( sprintf( '%d (%s%%)', $this->stats[ 'opened' ], percentage( $this->stats[ 'sent' ], $this->stats[ 'opened' ] ) ), 'span', [ 'class' => 'number-total' ] ),
                     html()->wrap( sprintf( '%d (%s%%)', $this->stats[ 'clicked' ], percentage( $this->stats[ 'opened' ], $this->stats[ 'clicked' ] ) ), 'span', [ 'class' => 'number-total' ] ),
