@@ -152,6 +152,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.3 (2019-11-06) =
+* ADDED Support for {owner_phone} in admin notification SMS field
+* ADDED Replacements support for WP_User
+* TWEAKED Saved templates shows admin title instead of subject line as title.
+* TWEAKED Updated PO file.
+* FIXED Adding new email from "My Emails" tab while advanced email editor is enabled.
+
 = 2.1.2 (2019-11-04) =
 * ADDED options to set your Groundhogg affiliate ID.
 * ADDED option to show "this email was sent with Groundhogg" in the email footer. (using aff ID)

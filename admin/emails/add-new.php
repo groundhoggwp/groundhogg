@@ -67,11 +67,10 @@ switch ( $tab ):
                 foreach ( $custom_templates as $id => $email ):
                     $email = new Email( absint( $email->ID ) ); ?>
                     <div class="postbox">
-                        <h2 class="hndle"><?php esc_html_e( $email->get_subject_line() ); ?></h2>
+                        <h2 class="hndle"><?php esc_html_e( $email->get_title() ); ?></h2>
                         <div class="inside">
-                            <p><?php
-                                echo ( !empty( $email->get_pre_header() ) ) ? esc_html( $email->get_pre_header() ) : '&#x2014;';
-                                ?></p>
+                            <p><?php echo __( 'Subject: ', 'groundhogg-pro' ) . $email->get_subject_line(); ?></p>
+                            <p><?php echo __( 'Pre-Header: ', 'groundhogg-pro' ) . $email->get_pre_header(); ?></p>
                             <iframe class="email-container" style="margin-bottom: 10px;border: 1px solid #e5e5e5;"
                                     width="100%" height="500"
                                     src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>

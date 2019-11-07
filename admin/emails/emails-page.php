@@ -261,7 +261,9 @@ class Emails_Page extends Admin_Page
             $this->wp_die_no_access();
         }
 
-        $tab = Groundhogg\get_url_var( 'tab', 'new-email' );
+        $default_tab = Groundhogg\is_option_enabled( 'gh_use_advanced_email_editor' ) ? 'my-emails' : 'new-email';
+
+        $tab = Groundhogg\get_url_var( 'tab', $default_tab );
 
         switch ( $tab ){
 
@@ -288,13 +290,16 @@ class Emails_Page extends Admin_Page
             case 'my-templates':
             case 'my-emails':
                 $from_email = new Email( absint( Groundhogg\get_post_var( 'email_id' ) ) );
+
                 if ( ! $from_email->exists() ){
                     return new \WP_Error( 'error', 'Invalid email ID!' );
                 }
+
                 $args[ 'content' ] = $from_email->get_content();
                 $args[ 'subject' ] = $from_email->get_subject_line();
                 $args[ 'title' ] = sprintf( "%s - (copy)", $from_email->get_title() );
                 $args[ 'pre_header' ] = $from_email->get_pre_header();
+
                 $args[ 'author' ] = get_current_user_id();
                 $args[ 'from_user' ] = get_current_user_id();
 

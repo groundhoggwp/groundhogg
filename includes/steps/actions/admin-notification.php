@@ -143,7 +143,7 @@ class Admin_Notification extends Action
                 'label' => __( 'Send To:', 'groundhogg' ),
                 'type' => HTML::INPUT,
                 'default' => get_option( 'gh_business_phone' ),
-                'description' => __( 'Use any mobile phone number. Include country code!', 'groundhogg' )
+                'description' => __( 'Use any mobile phone number. Include country code! Also accepts {owner_phone}', 'groundhogg' )
             ] );
         }
 
@@ -192,7 +192,7 @@ class Admin_Notification extends Action
                 $sanitized_numbers = array();
 
                 foreach ( $numbers as $number ) {
-                    $sanitized_numbers[] = preg_replace( '/[^0-9]/', '', $number );
+                    $sanitized_numbers[] = ( $number === '{owner_phone}' ) ? '{owner_phone}' : preg_replace( '/[^0-9]/', '', $number );
                 }
 
                 $send_to = implode( ', ', $sanitized_numbers );
@@ -241,7 +241,7 @@ class Admin_Notification extends Action
         $is_sms = $this->get_setting( 'is_sms', false );
 
         // Email
-        if ( !$is_sms ) {
+        if ( ! $is_sms ) {
             $finished_note .= sprintf( "\n\n======== %s ========\nEdit: %s\nReply: %s", __( 'Manage Contact', 'groundhogg' ),
                 admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() ),
                 $contact->get_email()
@@ -286,17 +286,14 @@ class Admin_Notification extends Action
 
             $to = $this->get_setting( 'send_to_sms' );
 
+            $to = explode( ',', do_replacements( $to, $contact->get_id() ) );
+
             $sent = false;
 
-            if ( is_array( $to ) ) {
-                foreach ( $to as $number ) {
-                    if ( function_exists( '\GroundhoggSMS\send_sms' ) ) {
-                        $sent = \GroundhoggSMS\send_sms( $number, $finished_note );
-                    }
-                }
-            } else {
+            foreach ( $to as $number ) {
+
                 if ( function_exists( '\GroundhoggSMS\send_sms' ) ) {
-                    $sent = \GroundhoggSMS\send_sms( $to, $finished_note );
+                    $sent = \GroundhoggSMS\send_sms( $number, $finished_note );
                 }
             }
 

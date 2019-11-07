@@ -132,6 +132,11 @@ class Replacements
                 'description' => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
             ),
             array(
+                'code' => 'user',
+                'callback' => [ $this, 'replacement_user' ],
+                'description' => _x( 'Any data related to the contact\'s linked user record. Usage: {user.attribute}', 'replacement', 'groundhogg' ),
+            ),
+            array(
                 'code' => 'business_name',
                 'callback' => [ $this, 'replacement_business_name' ],
                 'description' => _x( 'The business name as defined in the settings.', 'replacement', 'groundhogg' ),
@@ -461,6 +466,29 @@ class Replacements
 
         return print_r( $this->get_current_contact()->get_meta( $arg ), true );
     }
+
+    /**
+     * Return the contact meta
+     *
+     * @param $contact_id int
+     * @param $arg string the meta key
+     * @return mixed|string
+     */
+    function replacement_user( $arg, $contact_id )
+    {
+        if ( empty( $arg ) || ! $this->get_current_contact()->get_user_id() )
+            return '';
+
+        $rep = $this->get_current_contact()->get_userdata()->$arg;
+
+        // Try to get from meta
+        if ( ! $rep ){
+            $rep = get_user_meta( $this->get_current_contact()->get_user_id(), $arg, true );
+        }
+
+        return print_r( $rep, true );
+    }
+
 
     /**
      * Return back the ID of the contact.
