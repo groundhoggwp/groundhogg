@@ -153,11 +153,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 == Changelog ==
 
 = 2.1.3 (2019-11-06) =
-* ADDED Support for {owner_phone} in admin notification SMS field
-* ADDED Replacements support for WP_User
+* ADDED Support for {owner_phone} in admin notification SMS field.
+* ADDED Replacements support for WP_User.
 * TWEAKED Saved templates shows admin title instead of subject line as title.
 * TWEAKED Updated PO file.
 * FIXED Adding new email from "My Emails" tab while advanced email editor is enabled.
+* FIXED Bulk apply tag action not working in contact list.
 
 = 2.1.2 (2019-11-04) =
 * ADDED options to set your Groundhogg affiliate ID.

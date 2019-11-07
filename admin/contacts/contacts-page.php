@@ -11,6 +11,8 @@ use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
 use function Groundhogg\send_email_notification;
+use function Groundhogg\validate_tags;
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -786,7 +788,7 @@ class Contacts_Page extends Admin_Page
 
         if ( get_request_var( 'bulk_tags', false ) ){
 
-            $tags = wp_parse_id_list( get_request_var( 'bulk_tags' ) );
+            $tags = validate_tags( get_request_var( 'bulk_tags' ) );
 
             foreach ($this->get_items() as $id) {
                 $contact = Plugin::$instance->utils->get_contact($id);
@@ -799,6 +801,7 @@ class Contacts_Page extends Admin_Page
                 'success'
             );
         }
+
         return false;
     }
 
