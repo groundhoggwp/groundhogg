@@ -94,16 +94,14 @@ Every tool we build draws from this belief so that we can be the #1 resource for
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
 == Screenshots ==
-1. The funnel builder in all its glory, Benchmarks show on right.
-2. The Funnel builder in reporting mode
-3. The funnel builder in all its glory, Actions show on right.
-4. Our HTML Email editor
-5. Use Superlinks to dynamically send contacts to different places
-6. Segment contacts using custom tags
-7. Import or export Funnels across multiple sites.
-8. Ditch your current CRM and import your list TODAY!
-9. Start with awesome funnel templates designed by digital marketers.
-10. Pre-written email templates provide inspiration for you next literary masterpiece.
+1. Drag and drop steps in any order to create your sales funnel.
+2. View funnel reports to help optimize your sales process.
+3. Choose from a variety of actions to to communicate with your customers.
+4. Choose from a variety of benchmarks to start and move customers through your funnels.
+5. Write personalized emails and send them right from WordPress.
+6. Send out mass emails to your list whenever you want.
+7. keep customer info up to date, pull reports and more with your CRM.
+8. Know your KPIs with your executive dashboard reports.
 
 == Installation ==
 = Plugin Repo =
