@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.4 (2019-11-08) =
+* ADDED Better all around support for default from anme and email address.
+
 = 2.1.3 (2019-11-06) =
 * ADDED Support for {owner_phone} in admin notification SMS field.
 * ADDED Replacements support for WP_User.
