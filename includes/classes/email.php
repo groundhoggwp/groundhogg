@@ -1,11 +1,8 @@
 <?php
 namespace Groundhogg;
 
-use Groundhogg\DB\DB;
 use Groundhogg\DB\Email_Meta;
 use Groundhogg\DB\Emails;
-use Groundhogg\DB\Meta_DB;
-use mysql_xdevapi\Exception;
 use WP_Error;
 use WP_User;
 
