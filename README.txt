@@ -150,8 +150,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.5 (2019-11-11) =
+* TWEAKED List of installed premium Groundhogg extensions sent to Library API to fetch relevant funnel templates.
+
 = 2.1.4 (2019-11-08) =
-* ADDED Better all around support for default from anme and email address.
+* ADDED Better all around support for default from name and email address.
 
 = 2.1.3 (2019-11-06) =
 * ADDED Support for {owner_phone} in admin notification SMS field.

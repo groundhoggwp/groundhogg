@@ -2678,6 +2678,9 @@ add_action( 'admin_print_styles', function () {
     <?php
 } );
 
+/**
+ * Allow funnel files to be uploaded
+ */
 function allow_funnel_uploads()
 {
     add_filter( 'mime_types', __NAMESPACE__ . '\_allow_funnel_uploads' );
@@ -2687,4 +2690,27 @@ function _allow_funnel_uploads( $mimes )
 {
     $mimes[ 'funnel' ] = 'text/plain';
     return $mimes;
+}
+
+/**
+ * Check if all the items in the given array are in a dataset.
+ *
+ * @param $items array
+ * @param $dataset array
+ *
+ * @return bool
+ */
+function has_all( $items=[], $dataset=[] )
+{
+    if ( ! is_array( $items ) || ! is_array( $dataset ) ){
+        return false;
+    }
+
+    // if empty then automatically true
+    if ( empty( $items ) ){
+        return true;
+    }
+
+    // If the count of intersect is the same as $items then all the items are in the dataset
+    return count( array_intersect( $items, $dataset ) ) === count( $items );
 }

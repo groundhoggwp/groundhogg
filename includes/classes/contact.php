@@ -341,7 +341,9 @@ class Contact extends Base_Object_With_Meta
             'postal_zip',
             'city',
             'region',
+	        'region_code',
             'country',
+            'country_name',
         ];
 
         $address = [];

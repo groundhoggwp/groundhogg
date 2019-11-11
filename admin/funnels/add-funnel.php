@@ -3,11 +3,11 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Funnels;
+use function Groundhogg\get_url_var;
 use Groundhogg\Library;
 use function Groundhogg\get_request_var;
 use function Groundhogg\is_white_labeled;
 use Groundhogg\Plugin;
-
 
 /**
  * Add Funnel
@@ -28,6 +28,10 @@ if ( !defined( 'ABSPATH' ) ) exit;
 
 do_action( 'wpgh_before_new_funnel' );
 
+if ( get_url_var( 'flush' ) ){
+    Plugin::$instance->library->flush();
+}
+
 ?>
     <?php $active_tab = sanitize_key( get_request_var( 'tab', 'templates' ) ); ?>
     <h2 class="nav-tab-wrapper">
@@ -43,10 +47,7 @@ do_action( 'wpgh_before_new_funnel' );
     <form method="post">
         <?php wp_nonce_field( 'add' ); ?>
         <!-- GET FUNNEL TEMPLATES FROM HERE -->
-        <?php
-        $library = new Library();
-        $funnel_templates = $library->get_funnel_templates();
-        ?>
+        <?php $funnel_templates = Plugin::$instance->library->get_funnel_templates(); ?>
         <div id="poststuff">
             <div class="post-box-grid">
                 <?php

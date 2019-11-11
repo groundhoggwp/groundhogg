@@ -188,6 +188,11 @@ class Plugin {
      */
     public $reporting;
 
+	/**
+	 * @var Library
+	 */
+    public $library;
+
     /**
      * Clone.
      *
@@ -314,6 +319,8 @@ class Plugin {
 
         $this->shortcodes = new Shortcodes();
         $this->submission_handler = new Submission_Handler();
+
+        $this->library = new Library();
 
         new Blocks\Blocks();
 
