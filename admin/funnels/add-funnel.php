@@ -2,11 +2,8 @@
 
 namespace Groundhogg\Admin\Funnels;
 
-use Groundhogg\Admin\Funnels;
 use function Groundhogg\get_url_var;
-use Groundhogg\Library;
 use function Groundhogg\get_request_var;
-use function Groundhogg\is_white_labeled;
 use Groundhogg\Plugin;
 
 /**

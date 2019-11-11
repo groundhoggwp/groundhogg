@@ -4,7 +4,6 @@ namespace Groundhogg\Admin\Emails;
 
 
 use Groundhogg\Email;
-use Groundhogg\Plugin;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
