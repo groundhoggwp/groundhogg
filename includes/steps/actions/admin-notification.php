@@ -5,6 +5,8 @@ namespace Groundhogg\Steps\Actions;
 use Groundhogg\Contact;
 use function Groundhogg\do_replacements;
 use Groundhogg\Event;
+use function Groundhogg\get_default_from_email;
+use function Groundhogg\get_default_from_name;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -265,10 +267,12 @@ class Admin_Notification extends Action
 
             add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
-            $headers = [];
+            $headers = [
+            	sprintf( 'From: %s <%s>', get_default_from_name(), get_default_from_email() )
+            ];
 
             if ( is_email( $reply_to ) ) {
-                $headers = sprintf( 'Reply-To: <%s>', $reply_to );
+                $headers[] = sprintf( 'Reply-To: <%s>', $reply_to );
             }
 
             if ( is_email( $from ) ) {

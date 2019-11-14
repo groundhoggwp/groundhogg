@@ -72,7 +72,7 @@ class SendWp {
      */
     public function do_remote_install() {
 
-        if ( ! current_user_can( 'install_plugins' ) ) {
+        if ( ! current_user_can( 'install_plugins' ) || ! wp_verify_nonce( get_request_var( 'nonce' ), 'install_sendwp' ) ) {
             return array(
                 'code'    => 'sendwp_install_unauthorized',
                 'message' => __( 'You do not have permission to perform this action.', 'groundhogg' ),
@@ -102,10 +102,10 @@ class SendWp {
 
         return array(
             'partner_id'      => self::PARTNER_ID,
-            'register_url'    => sendwp_get_server_url() . '_/signup',
-            'client_name'     => sendwp_get_client_name(),
-            'client_secret'   => sendwp_get_client_secret(),
-            'client_redirect' => $redirect,
+            'register_url'    => esc_url( sendwp_get_server_url() . '_/signup' ),
+            'client_name'     => esc_url( sendwp_get_client_name() ),
+            'client_redirect' => esc_url( $redirect ),
+            'client_secret'   => esc_attr( sendwp_get_client_secret() ),
         );
 
     }
@@ -285,6 +285,7 @@ class SendWp {
             function groundhogg_sendwp_remote_install() {
                 var data = {
                     'action': 'groundhogg_sendwp_remote_install',
+                    'nonce' : '<?php echo wp_create_nonce( 'install_sendwp' ); ?>'
                 };
 
                 jQuery.post( ajaxurl, data, function( res ) {

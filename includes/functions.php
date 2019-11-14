@@ -636,6 +636,39 @@ function delete_cookie( $cookie = '' )
 }
 
 /**
+ * Get the default from name
+ *
+ * @return string
+ */
+function get_default_from_name()
+{
+    $from = get_option( 'gh_override_from_name' );
+
+    if ( empty( $from ) ){
+        $from = get_bloginfo( 'name' );
+    }
+
+    return apply_filters( 'groundhogg/get_default_from_name', $from );
+}
+
+/**
+ * Get the default from email
+ *
+ * @return string
+ */
+function get_default_from_email()
+{
+	$from = get_option( 'gh_override_from_email' );
+
+	if ( empty( $from ) ){
+		$from = get_bloginfo( 'admin_email' );
+	}
+
+	return apply_filters( 'groundhogg/get_default_from_email', $from );
+}
+
+
+/**
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
@@ -2645,6 +2678,9 @@ add_action( 'admin_print_styles', function () {
     <?php
 } );
 
+/**
+ * Allow funnel files to be uploaded
+ */
 function allow_funnel_uploads()
 {
     add_filter( 'mime_types', __NAMESPACE__ . '\_allow_funnel_uploads' );
@@ -2654,4 +2690,27 @@ function _allow_funnel_uploads( $mimes )
 {
     $mimes[ 'funnel' ] = 'text/plain';
     return $mimes;
+}
+
+/**
+ * Check if all the items in the given array are in a dataset.
+ *
+ * @param $items array
+ * @param $dataset array
+ *
+ * @return bool
+ */
+function has_all( $items=[], $dataset=[] )
+{
+    if ( ! is_array( $items ) || ! is_array( $dataset ) ){
+        return false;
+    }
+
+    // if empty then automatically true
+    if ( empty( $items ) ){
+        return true;
+    }
+
+    // If the count of intersect is the same as $items then all the items are in the dataset
+    return count( array_intersect( $items, $dataset ) ) === count( $items );
 }

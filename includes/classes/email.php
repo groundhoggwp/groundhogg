@@ -1,10 +1,8 @@
 <?php
 namespace Groundhogg;
 
-use Groundhogg\DB\DB;
 use Groundhogg\DB\Email_Meta;
 use Groundhogg\DB\Emails;
-use Groundhogg\DB\Meta_DB;
 use WP_Error;
 use WP_User;
 
@@ -81,7 +79,9 @@ class Email extends Base_Object_With_Meta
      */
     protected function post_setup()
     {
-        $this->from_userdata = get_userdata( $this->get_from_user_id() );
+    	if ( $this->get_from_user_id() ){
+		    $this->from_userdata = get_userdata( $this->get_from_user_id() );
+	    }
     }
 
     /**
@@ -609,9 +609,6 @@ class Email extends Base_Object_With_Meta
 
         $content = ob_get_clean();
 
-//        if ( empty( $content ) )
-//            $content = 'No content...';
-
         $content = apply_filters( 'groundhogg/email/the_content', $content );
 
         $this->remove_filters();
@@ -634,7 +631,7 @@ class Email extends Base_Object_With_Meta
             return $this->get_contact()->get_ownerdata()->display_name;
         }
 
-        return get_bloginfo( 'name' );
+        return get_default_from_name();
 
     }
 
@@ -653,7 +650,7 @@ class Email extends Base_Object_With_Meta
             return $this->get_contact()->get_ownerdata()->user_email;
         }
 
-        return get_bloginfo('admin_email');
+        return get_default_from_email();
     }
 
     /**
@@ -767,12 +764,19 @@ class Email extends Base_Object_With_Meta
 
         /* Send with API. Do not send with API while in TEST MODE */
         if ( Plugin::$instance->sending_service->is_active_for_email() ) {
-            $sent = $this->send_with_gh(
-                $to,
-                $subject,
-                $content,
-                $headers
-            );
+
+        	try{
+		        $sent = $this->send_with_gh(
+			        $to,
+			        $subject,
+			        $content,
+			        $headers
+		        );
+	        } catch ( \Exception $e ){
+        		$this->add_error( new WP_Error( 'error', $e->getMessage() ) );
+        		$sent = false;
+	        }
+
         } else {
             /* Send with default WP */
             $sent = $this->send_with_wp(
@@ -830,7 +834,11 @@ class Email extends Base_Object_With_Meta
      * @param $content
      * @param $headers
      *
+     * @deprecated since 2.1
+     *
      * @return bool|wp_error
+     *
+     * @throws \Exception
      */
     private function send_with_gh($to, $subject, $content, $headers)
     {
