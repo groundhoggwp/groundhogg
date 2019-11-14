@@ -5,3 +5,15 @@
 #wpbody-content .inline-edit-row-contact .inline-edit-col-right{
     width: 50%;
 }
+
+.search-label{
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.search-param {
+    display: inline-block;
+    margin: 5px;
+    max-width: 100%;
+    width: 300px;
+}

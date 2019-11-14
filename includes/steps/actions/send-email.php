@@ -342,6 +342,8 @@ class Send_Email extends Action
 
         if ($email->is_draft() && $step->get_funnel()->is_active()) {
             Plugin::$instance->notices->add('email_in_draft_mode', __('You still have emails in draft mode! These emails will not be sent and will cause automation to stop.'), 'warning');
+
+            $step->update_meta( 'has_errors', true );
         }
 
         $this->save_setting('skip_if_confirmed', ( bool )$this->get_posted_data('skip_if_confirmed', false));

@@ -324,9 +324,7 @@ class Contacts_Api extends Base
 
             $contacts = $response_contacts;
 
-        }
-
-        else {
+        } else {
 
             $response_contacts = [];
 

@@ -293,7 +293,7 @@ class Replacements
 
         $contact_id = absint( $contact_id );
 
-        if ( !$contact_id ) {
+        if ( ! $contact_id ) {
             // TODO implement tracking...
             $contact_id = Plugin::$instance->tracking->get_current_contact_id();
         }

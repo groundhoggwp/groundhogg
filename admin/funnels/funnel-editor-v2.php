@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\key_to_words;
 use Groundhogg\Plugin;
@@ -163,8 +164,6 @@ $funnel = new Funnel($funnel_id);
         </div>
     </div>
     <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
-        <?php Plugin::$instance->notices->print_notices(); ?>
-
         <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
             <div id="postbox-container-1" class="postbox-container sidebar">
                 <div id="step-sortable" class=" ui-sortable">
@@ -190,66 +189,70 @@ $funnel = new Funnel($funnel_id);
                 </div>
             </div>
             <div id="postbox-container-2" class="postbox-container">
-                <div style="width: 100%" id="reporting-wrap">
-                    <?php include_once dirname(__FILE__) . '/reporting.php'; ?>
-                    <div class="reporting-view-wrap">
-                        <?php
+                <div id="postbox-container-2-inner">
+                    <?php Plugin::$instance->notices->print_notices(); ?>
+                    <div style="width: 100%" id="reporting-wrap">
+                        <?php include_once dirname(__FILE__) . '/reporting.php'; ?>
+                        <div class="reporting-view-wrap">
+                            <?php
 
-                        $chart_data = Plugin::$instance->admin->get_page( 'funnels' )->get_chart_data();
+                            $chart_data = Plugin::$instance->admin->get_page( 'funnels' )->get_chart_data();
 
-                        $rows = [];
+                            $rows = [];
 
-                        if ( ! empty( $chart_data ) ){
-                            $complete = $chart_data[0][ 'data' ];
-                            $waiting = $chart_data[1][ 'data' ];
+                            if ( ! empty( $chart_data ) ){
+                                $complete = $chart_data[0][ 'data' ];
+                                $waiting = $chart_data[1][ 'data' ];
 
-                            foreach ( $complete as $i => $data ){
+                                foreach ( $complete as $i => $data ){
 
-                                $rows[] = [
-                                    $data[ 0 ],
-                                    html()->e( 'a', [ 'href' => $data[ 2 ] ], $data[ 1 ], false ),
-                                    html()->e( 'a', [ 'href' => $waiting[ $i ][ 2 ] ], $waiting[ $i ][ 1 ], false ),
-                                ];
+                                    $rows[] = [
+                                        $data[ 0 ],
+                                        html()->e( 'a', [ 'href' => $data[ 2 ] ], $data[ 1 ], false ),
+                                        html()->e( 'a', [ 'href' => $waiting[ $i ][ 2 ] ], $waiting[ $i ][ 1 ], false ),
+                                    ];
 
+                                }
                             }
-                        }
 
-                        html()->list_table( [], [
-                            __( 'Step', 'groundhogg' ),
-                            __( 'Complete', 'groundhogg' ),
-                            __( 'Waiting', 'groundhogg' )
-                        ],
-                            $rows
-                        );
+                            html()->list_table( [], [
+                                __( 'Step', 'groundhogg' ),
+                                __( 'Complete', 'groundhogg' ),
+                                __( 'Waiting', 'groundhogg' )
+                            ],
+                                $rows
+                            );
 
-                        ?>
-                    </div>
-                </div>
-                <div id="intro" class="postbox" style="margin: 20px 10px;">
-                    <div class="inside">
-                        <h1><?php _e('Funnel Builder V2 (BETA)', 'groundhogg'); ?></h1>
-                        <p><?php _e('Welcome to version 2 of the Funnel Builder!'); ?></p>
-                        <p><?php _e('Our newest iteration of the funnel builder has been designed to provide a superior editing experience on both large and small screens.', 'groundhogg'); ?></p>
-                        <div style="position:relative;padding-top:56.25%;">
-                            <iframe src="https://player.vimeo.com/video/353449484?title=0&byline=0&portrait=0" frameborder="0" allowfullscreen
-                                    style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+                            ?>
                         </div>
                     </div>
+                    <div id="intro" class="postbox" style="margin: 20px 20px;">
+                        <div class="inside">
+                            <h1><?php _e('Funnel Builder V2 (BETA)', 'groundhogg'); ?></h1>
+                            <p><?php _e('Welcome to version 2 of the Funnel Builder!'); ?></p>
+                            <p><?php _e('Our newest iteration of the funnel builder has been designed to provide a superior editing experience on both large and small screens.', 'groundhogg'); ?></p>
+                            <div style="position:relative;padding-top:56.25%;">
+                                <iframe src="https://player.vimeo.com/video/353449484?title=0&byline=0&portrait=0" frameborder="0" allowfullscreen
+                                        style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-settings">
+                        <?php
+
+                        $step_active = false;
+
+                        foreach ($funnel->get_steps() as $step):
+                            $step->html_v2();
+
+                            if ( $step->get_meta( 'is_active' ) ){
+                                $step_active = true;
+                            }
+
+                        endforeach; ?>
+                    </div>
                 </div>
-                <div class="step-settings">
-                    <?php
 
-                    $step_active = false;
-
-                    foreach ($funnel->get_steps() as $step):
-                        $step->html_v2();
-
-                        if ( $step->get_meta( 'is_active' ) ){
-                            $step_active = true;
-                        }
-
-                    endforeach; ?>
-                </div>
             </div>
             <div style="clear: both;"></div>
         </div>
@@ -441,3 +444,9 @@ $funnel = new Funnel($funnel_id);
         </div>
     </form>
 </div>
+<?php
+
+echo html()->e( 'a', [ 'class' => 'button back-to-admin', 'href' => admin_page_url( 'gh_funnels', [] ) ], __( '&larr; Back to Admin', 'groundhogg' ) );
+
+?>
+

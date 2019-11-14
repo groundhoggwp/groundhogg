@@ -466,10 +466,6 @@ class Email extends Base_Object_With_Meta
     {
         $footer = "";
 
-        if ( Plugin::$instance->settings->is_global_multisite() ) {
-            switch_to_blog( get_site()->site_id );
-        }
-
         $footer .= "&copy; {business_name}<br/>";
         $footer .= "{business_address}<br/>";
 
@@ -497,11 +493,7 @@ class Email extends Base_Object_With_Meta
 
         $footer .= implode(' | ', $sub );
 
-        $footer = Plugin::$instance->replacements->process( $footer, $this->get_contact()->get_id() );
-
-        if ( is_multisite() && ms_is_switched()) {
-            restore_current_blog();
-        }
+        $footer = do_replacements( $footer, $this->get_contact()->get_id() );
 
         return apply_filters('groundhogg/email/footer', $footer);
     }

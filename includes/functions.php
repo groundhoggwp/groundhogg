@@ -60,7 +60,7 @@ function groundhogg_url( $page = '', $args = [] )
  * @param $args
  * @return string
  */
-function admin_page_url( $page, $args )
+function admin_page_url( $page, $args=[] )
 {
     $args = wp_parse_args( $args, [ 'page' => $page ] );
     return add_query_arg( $args, admin_url( 'admin.php' ) );

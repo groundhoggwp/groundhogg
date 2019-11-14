@@ -14,6 +14,7 @@ use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
+use function Groundhogg\notices;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -87,6 +88,7 @@ abstract class Funnel_Step extends Supports_Errors
 
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'pre_save'], 1 );
             add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'save'], 11 );
+            add_action("groundhogg/steps/{$this->get_type()}/save", [$this, 'after_save'], 99 );
 
             add_action("admin_enqueue_scripts", [$this, 'admin_scripts'] );
         }
@@ -691,9 +693,17 @@ abstract class Funnel_Step extends Supports_Errors
                 <img class="hndle-icon" width="50" src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
                 <span>
 	                <?php
+
+                    $title = $step->get_title();
+
+                    if ( $step->get_meta( 'has_errors' ) ){
+                        $title = "<span class='step-error'>&#x26A0</span> " . $title;
+                    }
+
                     echo html()->e( 'span', [
                         'class' => 'step-title',
-                    ],  $step->get_title() );
+                    ], $title );
+
                     echo "<br/>";
 
 	                ?>
@@ -882,6 +892,8 @@ abstract class Funnel_Step extends Supports_Errors
         } else {
             $step->delete_meta( 'is_closed' );
         }
+
+        $step->delete_meta( 'has_errors' );
     }
 
     /**
@@ -890,6 +902,24 @@ abstract class Funnel_Step extends Supports_Errors
      * @param $step Step
      */
     abstract public function save( $step );
+
+    /**
+     * @param $step Step
+     */
+    public function after_save( $step )
+    {
+        if ( $this->has_errors() ){
+            foreach ( $this->get_errors() as $error ){
+                notices()->add( $error );
+            }
+        }
+
+        if ( $step->has_errors() ) {
+            foreach ($step->get_errors() as $error) {
+                notices()->add($error);
+            }
+        }
+    }
 
     /**
      * Setup args before the action/benchmark is run

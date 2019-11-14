@@ -133,7 +133,7 @@ class Welcome_Page extends Admin_Page
      */
     public function status_check()
     {
-        $this->check_smtp_plugins();
+//        $this->check_smtp_plugins();
         $this->check_settings();
         $this->other_notices();
     }

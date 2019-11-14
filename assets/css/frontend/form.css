@@ -21,6 +21,13 @@
     border-color: #c3e6cb;
 }
 
+.gh-form-warning-wrapper{
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+
+
 ul.gh-form-errors{
     padding-left: 20px;
     margin: 0;

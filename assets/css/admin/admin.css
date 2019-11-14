@@ -121,7 +121,7 @@ input[type=range].slider:focus::-ms-fill-upper {
 
 .onoffswitch-label {
     display: block; overflow: hidden; cursor: pointer;
-    border: 1px solid #E3E3E3; border-radius: 3px;
+    border: 1px solid #7e8993; border-radius: 3px;
 }
 
 .onoffswitch-inner {
@@ -155,22 +155,22 @@ input[type=range].slider:focus::-ms-fill-upper {
     background: #f7f7f7;
     position: absolute; top: 0; bottom: 0;
     right: 82px;
-    height: 26px;
+    height: 27px;
     border-width: 1px;
     border-style: solid;
     transition: all 0.3s ease-in 0s;
     border-radius: 3px;
-    box-shadow: 0 1px 0 #ccc;
-    border-color: #ccc;
+    /*box-shadow: 0 1px 0 #ccd0d4;*/
+    border-color: #0071a1;
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
     margin-left: 0;
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px;
-    background-color: #0085ba;
-    box-shadow: 0 1px 0 #006799;
-    border-color: #0073aa #006799 #006799;
+    background-color: #007cba;
+    /*box-shadow: 0 1px 0 #006799;*/
+    /*border-color: #0073aa #006799 #006799;*/
 }
 
 .gh-select2,

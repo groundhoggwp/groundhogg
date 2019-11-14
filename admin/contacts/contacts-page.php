@@ -1,10 +1,12 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Admin\Admin_Page;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_url;
 use function Groundhogg\normalize_files;
 use Groundhogg\Plugin;
@@ -358,6 +360,11 @@ class Contacts_Page extends Admin_Page
             [
                 'link' => Plugin::$instance->admin->tools->admin_url( [ 'tab' => 'import', 'action' => 'add' ] ),
                 'action' => __( 'Import', 'groundhogg' ),
+                'target' => '_self',
+            ],
+            [
+                'link' => admin_page_url( 'gh_contacts', [ 'search' => 1 ] ),
+                'action' => __( 'Search', 'groundhogg' ),
                 'target' => '_self',
             ],
         ];
@@ -929,6 +936,10 @@ class Contacts_Page extends Admin_Page
         }
 
         $contacts_table = new Tables\Contacts_Table();
+
+        if ( get_url_var( 'search' ) ){
+            include dirname( __FILE__) . '/search.php';
+        }
 
         $this->search_form( __( 'Search Contacts', 'groundhogg' ) );
 

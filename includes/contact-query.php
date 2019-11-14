@@ -136,7 +136,7 @@ class Contact_Query
      * @since  2.8
      * @var Contacts
      */
-    protected $wpgh_db_contacts;
+    protected $gh_db_contacts;
 
     /**
      * The name of our database table.
@@ -235,48 +235,50 @@ class Contact_Query
      * @since  2.8
      *
      */
-    public function __construct($query = '', $wpgh_db_contacts = null)
+    public function __construct($query = '', $gh_db_contacts = null)
     {
-        if ($wpgh_db_contacts) {
-            $this->wpgh_db_contacts = $wpgh_db_contacts;
+        if ($gh_db_contacts) {
+            $this->gh_db_contacts = $gh_db_contacts;
         } else {
-            $this->wpgh_db_contacts = Plugin::$instance->dbs->get_db('contacts');
+            $this->gh_db_contacts = Plugin::$instance->dbs->get_db('contacts');
         }
 
-        $this->table_name = $this->wpgh_db_contacts->get_table_name();
-        $this->meta_type = $this->wpgh_db_contacts->get_object_type();
-        $this->primary_key = $this->wpgh_db_contacts->get_primary_key();
-        $this->date_key = $this->wpgh_db_contacts->get_date_key();
-        $this->cache_group = $this->wpgh_db_contacts->get_cache_group();
+        $this->table_name = $this->gh_db_contacts->get_table_name();
+        $this->meta_type = $this->gh_db_contacts->get_object_type();
+        $this->primary_key = $this->gh_db_contacts->get_primary_key();
+        $this->date_key = $this->gh_db_contacts->get_date_key();
+        $this->cache_group = $this->gh_db_contacts->get_cache_group();
 
         $this->query_var_defaults = array(
-            'number'        => -1,
-            'offset'        => 0,
-            'orderby'       => 'ID',
-            'order'         => 'DESC',
-            'include'       => '',
-            'exclude'       => '',
+            'number' => -1,
+            'offset' => 0,
+            'orderby' => 'ID',
+            'order' => 'DESC',
+            'include' => '',
+            'exclude' => '',
             'users_include' => '',
             'users_exclude' => '',
-            'tags_include'  => 0,
-            'tags_exclude'  => 0,
+            'tags_include' => 0,
+            'tags_include_needs_all' => false,
+            'tags_exclude' => 0,
+            'tags_exclude_needs_all' => false,
             'tags_relation' => 'AND',
-            'tag_query'     => [],
-            'optin_status'  => 'any',
-            'owner'         => 0,
-            'report'        => false,
-            'activity'      => false,
-            'email'         => '',
-            'search'        => '',
-            'first_name'    => '',
-            'last_name'     => '',
+            'tag_query' => [],
+            'optin_status' => 'any',
+            'owner' => 0,
+            'report' => false,
+            'activity' => false,
+            'email' => '',
+            'search' => '',
+            'first_name' => '',
+            'last_name' => '',
             'search_columns' => array(),
-            'meta_key'      => '',
-            'meta_value'    => '',
-            'meta_compare'  => '=',
-            'meta_query'    => '',
-            'date_query'    => null,
-            'count'         => false,
+            'meta_key' => '',
+            'meta_value' => '',
+            'meta_compare' => '=',
+            'meta_query' => '',
+            'date_query' => null,
+            'count' => false,
             'no_found_rows' => true,
         );
 
@@ -331,23 +333,65 @@ class Contact_Query
             $this->meta_query_clauses = $this->meta_query->get_sql($this->meta_type, $this->table_name, $this->primary_key, $this);
         }
 
-        if (!empty($this->query_vars['tags_include']) || !empty($this->query_vars['tags_exclude']) || ! empty( $this->query_vars[ 'tag_query' ] ) ) {
+        if (!empty($this->query_vars['tags_include']) || !empty($this->query_vars['tags_exclude']) || !empty($this->query_vars['tag_query'])) {
 
-            $query = ( ! empty( $this->query_vars[ 'tag_query' ] ) ) ? $this->query_vars[ 'tag_query' ] : [
-                'relation' => $this->query_vars[ 'tags_relation' ],
-                [
-                    'tags' => $this->query_vars['tags_include'],
-                    'field' => 'tag_id',
-                    'operator' => 'IN',
-                ],
-                [
-                    'tags' => $this->query_vars['tags_exclude'],
-                    'field' => 'tag_id',
-                    'operator' => 'NOT IN',
-                ]
+            $backup_query = [
+                'relation' => $this->query_vars['tags_relation'],
             ];
 
-            $this->tag_query = new Tag_Query( $query );
+            if (!empty($this->query_vars['tags_include'])) {
+
+                if (!empty($this->query_vars['tags_include_needs_all'])) {
+
+                    if (!is_array($this->query_vars['tags_include'])) {
+                        $this->query_vars['tags_include'] = explode(',', $this->query_vars['tags_include']);
+                    }
+
+                    foreach ($this->query_vars['tags_include'] as $tag) {
+                        $backup_query[] = [
+                            'tags' => $tag,
+                            'field' => 'tag_id',
+                            'operator' => 'IN',
+                        ];
+                    }
+
+                } else {
+                    $backup_query[] = [
+                        'tags' => $this->query_vars['tags_include'],
+                        'field' => 'tag_id',
+                        'operator' => 'IN',
+                    ];
+                }
+            }
+
+            if (!empty($this->query_vars['tags_exclude'])) {
+
+                if (!empty($this->query_vars['tags_exclude_needs_all'])) {
+
+                    if (!is_array($this->query_vars['tags_exclude'])) {
+                        $this->query_vars['tags_exclude'] = explode(',', $this->query_vars['tags_exclude']);
+                    }
+
+                    foreach ($this->query_vars['tags_exclude'] as $tag) {
+                        $backup_query[] = [
+                            'tags' => $tag,
+                            'field' => 'tag_id',
+                            'operator' => 'NOT IN',
+                        ];
+                    }
+
+                } else {
+                    $backup_query[] = [
+                        'tags' => $this->query_vars['tags_exclude'],
+                        'field' => 'tag_id',
+                        'operator' => 'NOT IN',
+                    ];
+                }
+            }
+
+            $query = (!empty($this->query_vars['tag_query'])) ? $this->query_vars['tag_query'] : $backup_query;
+
+            $this->tag_query = new Tag_Query($query);
 
             if (!empty($this->tag_query->queries)) {
                 $this->tag_query_clauses = $this->tag_query->get_sql($this->table_name, $this->primary_key);
@@ -361,7 +405,7 @@ class Contact_Query
          * @since 2.8
          *
          */
-        do_action_ref_array('wpgh_parse_contact_query', array(&$this));
+        do_action_ref_array('gh_parse_contact_query', array(&$this));
     }
 
     /**
@@ -385,12 +429,12 @@ class Contact_Query
          * @since 2.8
          *
          */
-        do_action_ref_array('wpgh_pre_get_contacts', array(&$this));
+        do_action_ref_array('gh_pre_get_contacts', array(&$this));
 
         // $args can include anything. Only use the args defined in the query_var_defaults to compute the key.
         $key = md5(serialize(wp_array_slice_assoc($this->query_vars, array_keys($this->query_var_defaults))));
 
-        $last_changed = $this->wpgh_db_contacts->get_last_changed();
+        $last_changed = $this->gh_db_contacts->get_last_changed();
 
         $cache_key = "query:$key:$last_changed";
         $cache_value = wp_cache_get($cache_key, $this->cache_group);
@@ -420,8 +464,8 @@ class Contact_Query
         if ($this->query_vars['count']) {
 
             // Count items will be an array of counts, so return the number of counts.
-            if ( ! empty( $this->sql_clauses['groupby']  ) ){
-                return count( $items );
+            if (!empty($this->sql_clauses['groupby'])) {
+                return count($items);
             }
 
             // $items is actually a count in this case.
@@ -478,8 +522,8 @@ class Contact_Query
         // No need for this in count.
         $this->sql_clauses['groupby'] = $groupby;
 
-        if ( ! $this->query_vars[ 'count' ] ){
-	        $this->sql_clauses['orderby'] = $orderby;
+        if (!$this->query_vars['count']) {
+            $this->sql_clauses['orderby'] = $orderby;
         }
 
         $this->sql_clauses['limits'] = $limits;
@@ -511,7 +555,7 @@ class Contact_Query
              * @since 2.8
              *
              */
-            $found_items_query = apply_filters('wpgh_found_contacts_query', 'SELECT FOUND_ROWS()', $this);
+            $found_items_query = apply_filters('gh_found_contacts_query', 'SELECT FOUND_ROWS()', $this);
 
             $this->found_items = (int)$wpdb->get_var($found_items_query);
         }
@@ -640,12 +684,12 @@ class Contact_Query
                 }
             }
 
-            $subwhere = [ 'relationship' => 'AND' ];
+            $subwhere = ['relationship' => 'AND'];
 
-            foreach ( $this->query_vars[ 'report' ] as $col => $val ){
+            foreach ($this->query_vars['report'] as $col => $val) {
 
-                if ( ! empty( $val) ){
-                    switch ( $col ){
+                if (!empty($val)) {
+                    switch ($col) {
                         default:
                             $compare = '=';
                             break;
@@ -659,19 +703,19 @@ class Contact_Query
                             break;
                     }
 
-                    $subwhere[] = [ 'col' => $col, 'val' => $val, 'compare' => $compare ];
+                    $subwhere[] = ['col' => $col, 'val' => $val, 'compare' => $compare];
                 }
 
             }
 
-            $sql = get_db( 'events' )->get_sql( [
+            $sql = get_db('events')->get_sql([
                 'where' => $subwhere,
                 'select' => 'contact_id',
                 'orderby' => false,
                 'order' => ''
-            ] );
+            ]);
 
-            $where[ 'report' ] = "$this->table_name.$this->primary_key IN ( $sql )";
+            $where['report'] = "$this->table_name.$this->primary_key IN ( $sql )";
         }
 
         if ($this->query_vars['activity'] && is_array($this->query_vars['activity'])) {
@@ -689,12 +733,12 @@ class Contact_Query
                 }
             }
 
-            $subwhere = [ 'relationship' => 'AND' ];
+            $subwhere = ['relationship' => 'AND'];
 
-            foreach ( $this->query_vars[ 'activity' ] as $col => $val ){
+            foreach ($this->query_vars['activity'] as $col => $val) {
 
-                if ( ! empty( $val) ){
-                    switch ( $col ){
+                if (!empty($val)) {
+                    switch ($col) {
                         default:
                             $compare = '=';
                             break;
@@ -708,19 +752,19 @@ class Contact_Query
                             break;
                     }
 
-                    $subwhere[] = [ 'col' => $col, 'val' => $val, 'compare' => $compare ];
+                    $subwhere[] = ['col' => $col, 'val' => $val, 'compare' => $compare];
                 }
 
             }
 
-            $sql = get_db( 'activity' )->get_sql( [
+            $sql = get_db('activity')->get_sql([
                 'where' => $subwhere,
                 'select' => 'contact_id',
                 'orderby' => false,
                 'order' => ''
-            ] );
+            ]);
 
-            $where[ 'activity' ] = "$this->table_name.$this->primary_key IN ( $sql )";
+            $where['activity'] = "$this->table_name.$this->primary_key IN ( $sql )";
         }
 
         if (strlen($this->query_vars['search'])) {
@@ -832,10 +876,10 @@ class Contact_Query
      */
     protected function construct_request_groupby()
     {
-        if ( ! empty($this->meta_query_clauses['join'])
-            || ! empty($this->tag_query_clauses['join'])
-            || !empty($this->query_vars['report'] )
-            || !empty($this->query_vars['activity'] )
+        if (!empty($this->meta_query_clauses['join'])
+            || !empty($this->tag_query_clauses['join'])
+            || !empty($this->query_vars['report'])
+            || !empty($this->query_vars['activity'])
             || (!empty($this->query_vars['email']) && !is_array($this->query_vars['email']))
         ) {
             return "$this->table_name.$this->primary_key";
@@ -960,6 +1004,6 @@ class Contact_Query
      */
     protected function get_allowed_orderby_keys()
     {
-        return array_keys($this->wpgh_db_contacts->get_columns());
+        return array_keys($this->gh_db_contacts->get_columns());
     }
 }

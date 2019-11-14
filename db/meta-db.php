@@ -109,15 +109,16 @@ abstract class Meta_DB extends DB {
     public function get_meta( $object_id = 0, $meta_key = '', $single = false ) {
         $object_id = $this->sanitize_id( $object_id );
 
-//        var_dump( $object_id );
-
         if ( false === $object_id ) {
             return false;
         }
+         $getted = get_metadata( $this->get_object_type(), $object_id, $meta_key, $single );
 
-//        var_dump( $this->get_object_type() );
+        if ( $getted ){
+            do_action( "groundhogg/meta/{$this->get_object_type()}/get", $object_id, $meta_key, $single, $getted );
+        }
 
-        return get_metadata( $this->get_object_type(), $object_id, $meta_key, $single );
+        return $getted;
     }
 
     /**
@@ -134,13 +135,20 @@ abstract class Meta_DB extends DB {
      * @access  private
      * @since   2.6
      */
-    public function add_meta( $object_id = 0, $meta_key = '', $meta_value, $unique = false ) {
+    public function add_meta( $object_id = 0, $meta_key = '', $meta_value='', $unique = false ) {
         $object_id = $this->sanitize_id( $object_id );
+
         if ( false === $object_id ) {
             return false;
         }
 
-        return add_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $unique );
+        $added = add_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $unique );
+
+        if ( $added ){
+            do_action( "groundhogg/meta/{$this->get_object_type()}/add", $object_id, $meta_key, $meta_value, $unique );
+        }
+
+        return $added;
     }
 
     /**
@@ -162,13 +170,20 @@ abstract class Meta_DB extends DB {
      * @access  private
      * @since   2.6
      */
-    public function update_meta( $object_id = 0, $meta_key = '', $meta_value, $prev_value = '' ) {
+    public function update_meta( $object_id = 0, $meta_key = '', $meta_value='', $prev_value = '' ) {
         $object_id = $this->sanitize_id( $object_id );
+
         if ( false === $object_id ) {
             return false;
         }
 
-        return update_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $prev_value );
+        $updated = update_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $prev_value );
+
+        if ( $updated ){
+            do_action( "groundhogg/meta/{$this->get_object_type()}/update", $object_id, $meta_key, $meta_value, $prev_value );
+        }
+
+        return $updated;
     }
 
     /**
@@ -189,7 +204,20 @@ abstract class Meta_DB extends DB {
      * @since   2.6
      */
     public function delete_meta( $object_id = 0, $meta_key = '', $meta_value = '' ) {
-        return delete_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value );
+
+        $object_id = $this->sanitize_id( $object_id );
+
+        if ( false === $object_id ) {
+            return false;
+        }
+
+        $deleted = delete_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value );
+
+        if ( $deleted ){
+            do_action( "groundhogg/meta/{$this->get_object_type()}/delete", $object_id, $meta_key, $meta_value );
+        }
+
+        return $deleted;
     }
 
     /**
@@ -199,21 +227,15 @@ abstract class Meta_DB extends DB {
      */
     public function get_keys()
     {
-
         global $wpdb;
 
         $keys = $wpdb->get_col(
             "SELECT DISTINCT meta_key FROM $this->table_name ORDER BY meta_key DESC"
         );
 
-        $key_array = array();
-
-        foreach ( $keys as $key ){
-            $key_array[ $key ] = $key;
-        }
+        $key_array = array_combine( $keys, $keys );
 
         return $key_array;
-
     }
 
     /**
