@@ -43,8 +43,10 @@ class Add_Contacts_To_Funnel extends Bulk_Job
 
         $query = new Contact_Query();
         $args = [
-            'tags_include' => wp_parse_id_list( get_request_var( 'include_tags' ) ),
-            'tags_exclude' => wp_parse_id_list( get_request_var( 'exclude_tags' ) )
+            'tags_include' => wp_parse_id_list( get_request_var( 'tags_include' ) ),
+            'tags_exclude' => wp_parse_id_list( get_request_var( 'tags_exclude' ) ),
+            'tags_include_needs_all' => absint( get_request_var( 'tags_include_needs_all' ) ),
+            'tags_exclude_needs_all' => absint( get_request_var( 'tags_exclude_needs_all' ) ),
         ];
 
         $contacts = $query->query( $args );

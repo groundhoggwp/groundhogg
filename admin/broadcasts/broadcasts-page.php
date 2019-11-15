@@ -4,6 +4,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Broadcast;
 use Groundhogg\Bulk_Jobs\Broadcast_Scheduler;
 use Groundhogg\Plugin;
+use function Groundhogg\get_request_var;
 use function Groundhogg\is_sms_plugin_active;
 
 // Exit if accessed directly
@@ -194,8 +195,12 @@ class Broadcasts_Page extends Admin_Page
 
         $query = array(
             'tags_include' => $tags,
-            'tags_exclude' => $exclude_tags
+            'tags_exclude' => $exclude_tags,
+            'tags_include_needs_all' => absint( get_request_var( 'tags_include_needs_all' ) ),
+            'tags_exclude_needs_all' => absint( get_request_var( 'tags_exclude_needs_all' ) )
         );
+
+        $query = array_filter( $query );
 
         $config['contact_query'] = $query;
 

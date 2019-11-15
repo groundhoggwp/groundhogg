@@ -149,6 +149,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 == Changelog ==
+= 2.1.5 (2019-11-15) =
+* ADDED The beginning of the advanced contacts search.
+* ADDED Ability to search for contacts that have 1 or more tags.
+* TWEAKED UI in funnel editor to make it easier to edit funnels
+* TWEAKED Steps will show an icon when there is a configuration error
 
 = 2.1.4 (2019-11-11) =
 * ADDED Better all around support for default from name and email address.

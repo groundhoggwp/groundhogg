@@ -17,21 +17,21 @@
     background-color: #fff;
     z-index: 100050;
     text-align: left;
-    -webkit-box-shadow: 0 3px 6px rgba( 0, 0, 0, 0.3 );
-    box-shadow: 0 3px 6px rgba( 0, 0, 0, 0.3 );
+    /*-webkit-box-shadow: 0 3px 6px rgba( 0, 0, 0, 0.3 );*/
+    /*box-shadow: 0 3px 6px rgba( 0, 0, 0, 0.3 );*/
     /*width: 500px;*/
     /*height:500px;*/
 }
 
 .popup-title-container {
     background: #fcfcfc;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ccd0d4;
     height: 50px;
 }
 
 .popup-footer {
     background: #fcfcfc;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #ccd0d4;
     height: 50px;
     left:0;
     bottom:0;

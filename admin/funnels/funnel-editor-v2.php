@@ -132,8 +132,8 @@ $funnel = new Funnel($funnel_id);
                         'class' => 'add-contacts-link',
                         'source' => 'add-contact-modal',
                         'height' => 500,
-                        'width' => 500,
-                        'footer' => 'ture',
+                        'width' => 600,
+                        'footer' => 'true',
                     ]); ?>
                 </div>
                 <div id="export">
@@ -387,6 +387,19 @@ $funnel = new Funnel($funnel_id);
                     <td>
                         <?php
 
+                        echo html()->dropdown([
+                            'name' => 'tags_include_needs_all',
+                            'id' => 'tags_include_needs_all',
+                            'class' => '',
+                            'options' => array(
+                                0 => __('Any', 'groundhogg'),
+                                1 => __('All', 'groundhogg')
+                            ),
+                            'option_none' => false
+                        ]);
+
+                        _e( ' of ', 'groundhogg' );
+
                         echo Plugin::$instance->utils->html->tag_picker(array(
                             'name' => 'include_tags[]',
                             'id' => 'include_tags',
@@ -403,6 +416,19 @@ $funnel = new Funnel($funnel_id);
                 <tr>
                     <td>
                         <?php
+
+                        echo html()->dropdown([
+                            'name' => 'tags_exclude_needs_all',
+                            'id' => 'tags_exclude_needs_all',
+                            'class' => '',
+                            'options' => array(
+                                0 => __('Any', 'groundhogg'),
+                                1 => __('All', 'groundhogg')
+                            ),
+                            'option_none' => false
+                        ]);
+
+                        _e( ' of ', 'groundhogg' );
 
                         echo Plugin::$instance->utils->html->tag_picker(array(
                             'name' => 'exclude_tags[]',

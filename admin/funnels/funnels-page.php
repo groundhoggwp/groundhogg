@@ -776,11 +776,18 @@ class Funnels_Page extends Admin_Page
 
         if ( wp_verify_nonce( get_request_var( 'add_contacts_nonce' ), 'add_contacts_to_funnel' ) ) {
             if ( $funnel->is_active() ) {
-                Plugin::$instance->bulk_jobs->add_contacts_to_funnel->start( [
-                    'include_tags' => get_request_var( 'include_tags' ),
-                    'exclude_tags' => get_request_var( 'exclude_tags' ),
-                    'step_id' => get_request_var( 'which_step' ),
-                ] );
+
+                $query = [
+                    'step_id' => absint( get_request_var( 'which_step' ) ),
+                    'tags_include' => wp_parse_id_list( get_request_var( 'include_tags' ) ),
+                    'tags_exclude' => wp_parse_id_list( get_request_var( 'exclude_tags' ) ),
+                    'tags_include_needs_all' => absint( get_request_var( 'tags_include_needs_all' ) ),
+                    'tags_exclude_needs_all' => absint( get_request_var( 'tags_exclude_needs_all' ) ),
+                ];
+
+                $query = array_filter( $query );
+
+                Plugin::$instance->bulk_jobs->add_contacts_to_funnel->start( $query );
             } else {
                 return new \WP_Error( 'inactive', __( 'You cannot do this while the funnel is not active.', 'groundhogg' ) );
             }
