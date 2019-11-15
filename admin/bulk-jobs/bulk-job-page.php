@@ -1,6 +1,7 @@
 <?php
 namespace  Groundhogg\Admin\Bulk_Jobs;
 
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Admin\Admin_Page;
@@ -29,15 +30,17 @@ class Bulk_Job_Page extends Admin_Page
     public function ajax_listener()
     {
         if ( ! current_user_can( 'perform_bulk_actions' ) ){
-            return;
+            $this->wp_die_no_access();
         }
 
         // Sanitize the bulk action
         // Permitted Characters 0-9, A-z, _, -, / to keep inline with the Groundhogg Action Structure. No spaces.
 	    $bulk_action = preg_replace( '/[^0-9A-z_\-\/]/', '', get_request_var( 'bulk_action' ) );
 
-	    if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), $bulk_action ) ){
-	        return;
+        $nonce = get_post_var( 'bulk_action_nonce' );
+
+	    if ( ! wp_verify_nonce( $nonce, $bulk_action ) ){
+	        wp_send_json_error( [ 'Invalid nonce.', $nonce, $bulk_action, $_POST ] );
         }
 
 	    //Double check and that everything is okay.
@@ -145,6 +148,8 @@ class Bulk_Job_Page extends Admin_Page
                     complete: 0,
                     all:0,
                     size: <?php echo $max_items; ?>,
+                    bulk_action_nonce: '<?php echo wp_create_nonce(  $this->get_current_action() ); ?>',
+                    bulk_action: '<?php echo $this->get_current_action(); ?>',
                     bar: null,
                     title: "",
 
@@ -155,10 +160,6 @@ class Bulk_Job_Page extends Admin_Page
                         this.bar = $( '#bulk-job' );
                         this.progress = $( '#bulk-job-percentage' );
                         this.title = document.title;
-
-                        if ( this.all < 400 ){
-                            this.size = Math.ceil( this.all / 4 );
-                        }
 
                         this.send();
 
@@ -172,12 +173,6 @@ class Bulk_Job_Page extends Admin_Page
                         }
 
                         return this.items.splice( 0, end );
-
-                        // for ( var i = 0; i < items.length; i++ ){
-                        //     this.clean( items[ i ] )
-                        // }
-                        //
-                        // return items;
                     },
 
                     isLastOfThem: function (){
@@ -200,7 +195,7 @@ class Bulk_Job_Page extends Admin_Page
                     },
 
                     error: function( response ){
-                        // console.log( response );
+                        console.log( response );
                         bp.bar.css( 'background-color', '#f70000' );
                         this.progress.removeClass( 'spinner' );
                         alert( 'Something went wrong...' );
@@ -229,7 +224,7 @@ class Bulk_Job_Page extends Admin_Page
                             type: "post",
                             url: ajaxurl,
                             dataType: 'json',
-                            data: { action: 'bulk_action_listener', bulk_action: '<?php echo $this->get_current_action(); ?>', items: self.getItems(), _wpnonce: '<?php echo wp_create_nonce(  $this->get_current_action() ); ?>', the_end: self.isLastOfThem() },
+                            data: { action: 'bulk_action_listener', bulk_action: self.bulk_action, bulk_action_nonce: self.bulk_action_nonce, items: self.getItems(), the_end: self.isLastOfThem() },
                             success: function( response ){
 
                                 console.log(response);
@@ -238,7 +233,7 @@ class Bulk_Job_Page extends Admin_Page
                                     self.complete += response.complete;
                                     self.updateProgress();
 
-                                    if ( bp.items.length > 0 ){
+                                    if ( self.items.length > 0 ){
                                         self.send();
                                     }
 

@@ -1,10 +1,12 @@
 <?php
 namespace Groundhogg\Bulk_Jobs;
 
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_items_from_csv;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use function Groundhogg\get_url_var;
+use function Groundhogg\guided_setup_finished;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -52,9 +54,10 @@ class Import_Contacts extends Bulk_Job
     public function max_items($max, $items)
     {
         $item = array_shift( $items );
-        $fields = count( $item );
+        $fields = count( array_keys( $item ) );
+
         $max = intval( ini_get( 'max_input_vars' ) );
-        $max_items = floor( $max / $fields ) - 1;
+        $max_items = floor( $max / $fields );
 
         return min( $max_items, 100 );
     }
@@ -116,11 +119,11 @@ class Import_Contacts extends Bulk_Job
      */
     protected function get_return_url()
     {
-        $url = admin_url( 'admin.php?page=gh_contacts' );
+        $url = admin_page_url( 'gh_contacts' );
 
         // Return to guided setup if it's not yet complete.
-        if ( ! Plugin::$instance->settings->get_option('gh_guided_setup_finished', false ) ){
-            $url = admin_url( 'admin.php?page=gh_guided_setup&step=4' );
+        if ( ! guided_setup_finished() ){
+            $url = admin_page_url( 'gh_guided_setup', [ 'step' => 4 ] );
         }
 
         return $url;

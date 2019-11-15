@@ -127,7 +127,10 @@ abstract class Bulk_Job
 
         $this->post_loop();
 
-        $response = [ 'complete' => $completed ];
+        $response = [
+            'complete' => $completed,
+            'POST' => $_POST
+        ];
 
         if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
 

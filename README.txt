@@ -154,6 +154,8 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED Ability to search for contacts that have 1 or more tags.
 * TWEAKED UI in funnel editor to make it easier to edit funnels
 * TWEAKED Steps will show an icon when there is a configuration error
+* FIXED Bug in admin email notification when FROM email set in the settings.
+* FIXED Bug in bulk action screen causing nonce failure when items is less than 400 and importing large list.
 
 = 2.1.4 (2019-11-11) =
 * ADDED Better all around support for default from name and email address.
