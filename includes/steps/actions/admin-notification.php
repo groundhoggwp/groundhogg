@@ -254,7 +254,7 @@ class Admin_Notification extends Action
 
             $send_to = $this->get_setting( 'send_to' );
             $reply_to = do_replacements( $this->get_setting( 'reply_to', $contact->get_email() ), $contact->get_id() );
-            $from = do_replacements( $this->get_setting( 'from', $contact->get_email() ), $contact->get_id() );
+            $from = do_replacements( $this->get_setting( 'from', get_default_from_name() ), $contact->get_id() );
 
 
             if ( !is_email( $send_to ) ) {
@@ -267,16 +267,14 @@ class Admin_Notification extends Action
 
             add_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
+            $from_email = is_email( $from ) ? $from : get_default_from_name();
+
             $headers = [
-            	sprintf( 'From: %s <%s>', get_default_from_name(), get_default_from_email() )
+            	sprintf( 'From: %s <%s>', get_default_from_name(), $from_email )
             ];
 
             if ( is_email( $reply_to ) ) {
-                $headers[] = sprintf( 'Reply-To: <%s>', $reply_to );
-            }
-
-            if ( is_email( $from ) ) {
-                $headers = sprintf( 'From: <%s>', $from );
+                $headers[] = sprintf( 'Reply-To: %s', $reply_to );
             }
 
             $sent = wp_mail( $send_to, $subject, $finished_note, $headers );

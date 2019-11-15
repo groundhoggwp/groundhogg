@@ -85,6 +85,7 @@ html.full-screen{
 /* NEW STUFF */
 #wpbody-content{
     /*height: 100vh;*/
+    padding-bottom: 0;
 }
 
 .trigger-popup{
@@ -132,17 +133,17 @@ html.full-screen{
 }
 
 #postbox-container-1{
+    background: #fff;
+    min-height: 100vh;
     padding-bottom: 20px;
 }
 
 #postbox-container-1 .postbox{
     /*border: none;*/
     box-shadow: none;
-    border-top: 1px solid;
-    border-left: 1px solid;
-    border-right: 1px solid;
-    border-bottom: 1px solid #ccd0d4;
-    margin: 0;
+    /*border: 1px solid #ccd0d4;*/
+    margin: 5px;
+    /*margin: 0;*/
 }
 
 #postbox-container-1 .postbox h2{
@@ -313,8 +314,8 @@ html.full-screen{
 }
 
 #postbox-container-1 .postbox.action{
-    border-color: rgb(241, 253, 243);
-    border-bottom-color: #dbe6dc;
+    /*border-color: rgb(241, 253, 243);*/
+    /*border-bottom-color: #dbe6dc;*/
 }
 
 #postbox-container-1 .postbox.action.active{
@@ -334,8 +335,8 @@ html.full-screen{
 #postbox-container-1 .postbox.benchmark{
     color: #004085;
     background-color: #cce5ff;
-    border-color: #cce5ff;
-    border-bottom-color: #b8daff;
+    /*border-color: #cce5ff;*/
+    /*border-bottom-color: #b8daff;*/
 }
 
 #postbox-container-1 .postbox.benchmark h2{
@@ -430,7 +431,7 @@ html.full-screen{
 }
 
 td.step-icon{
-    border: 1px #e5e5e5 solid;
+    border: 1px #ccd0d4 solid;
     background: #ffffff;
     height: 100px;
     border-radius: 5px;
