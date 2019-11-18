@@ -127,7 +127,7 @@ class Tag_Applied extends Benchmark
 
         $tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( get_array_var( $args, 'tags' ) );
 
-        $this->save_setting( 'tags', $tags );;
+        $this->save_setting( 'tags', $tags );
     }
 
     /**

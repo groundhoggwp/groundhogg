@@ -152,7 +152,7 @@ class Contact_Events_Table extends Events\Events_Table {
         $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->get_id() . '&action=cancel&return_to_contact=' . $event->get_contact_id() ), 'cancel' ) );
         $actions = array();
 
-        if ( $event->time > time() && $event->status === 'waiting' ){
+        if ( $event->is_waiting() ){
             $actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Now', 'action', 'groundhogg' ) );
             $actions[] = sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, _x( 'Cancel', 'action', 'groundhogg' ) );
         } else {

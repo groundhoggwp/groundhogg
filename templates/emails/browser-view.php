@@ -12,7 +12,7 @@ if ( ! $email ){
     wp_die( __( 'Could not load email...' ) );
 }
 
-$contact = Plugin::$instance->tracking->get_current_contact();
+$contact = get_contactdata();
 $email->set_contact( $contact );
 
 $subject = $email->get_merged_subject_line();

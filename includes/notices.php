@@ -95,7 +95,7 @@ class Notices
             return self::TRANSIENT . '_user_' . get_current_user_id();
         }
 
-        if ( Plugin::$instance->tracking->get_current_contact() ){
+        if ( get_contactdata() ){
 	        return self::TRANSIENT . '_contact_' . Plugin::$instance->tracking->get_current_contact_id();
         }
 

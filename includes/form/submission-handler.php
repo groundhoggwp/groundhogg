@@ -293,7 +293,7 @@ class Submission_Handler extends Supports_Errors
         $email = get_array_var( $args, 'email' );
 
         if ( !$email ) {
-            $contact = Plugin::$instance->tracking->get_current_contact();
+            $contact = get_contactdata();
         } else {
 
             $contact = new Contact( $args );

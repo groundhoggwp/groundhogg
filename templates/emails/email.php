@@ -13,7 +13,7 @@ if ( ! $email ){
     wp_die( 'Invalid email.' );
 }
 
-$email->set_contact( Plugin::$instance->tracking->get_current_contact() );
+$email->set_contact( get_contactdata() );
 $email->set_event( Plugin::$instance->tracking->get_current_event() );
 
 

@@ -154,23 +154,27 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                 ], '<span class="dashicons dashicons-email"></span>')
             ]);
 
-            echo html()->e('div', ['class' => 'details'], [
-                html()->input([
-                    'name' => 'primary_phone',
-                    'title' => __('Phone'),
-                    'value' => $contact->get_phone_number(),
-                    'placeholder' => __('Phone Number'),
-                    'class' => 'auto-copy regular-text',
-                    'style' => [
-                        'max-width' => '18em'
-                    ]
-                ]),
-                html()->e('a', [
-                    'class' => 'button',
-                    'title' => __('Call Now', 'groundhogg'),
-                    'href' => sprintf('tel:%s', $contact->get_phone_number())
-                ], '<span class="dashicons dashicons-phone"></span>')
-            ]);
+            if ( $contact->get_phone_number() ){
+                echo html()->e('div', ['class' => 'details'], [
+                    html()->input([
+                        'name' => 'primary_phone_readonly',
+                        'title' => __('Phone'),
+                        'value' => $contact->get_phone_number(),
+                        'placeholder' => __('Phone Number'),
+                        'readonly' => true,
+                        'class' => 'auto-copy regular-text',
+                        'style' => [
+                            'max-width' => '18em'
+                        ]
+                    ]),
+                    html()->e('a', [
+                        'class' => 'button',
+                        'title' => __('Call Now', 'groundhogg'),
+                        'href' => sprintf('tel:%s', $contact->get_phone_number())
+                    ], '<span class="dashicons dashicons-phone"></span>')
+                ]);
+            }
+
 
             ?>
             <!-- LAST -->
@@ -206,7 +210,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
     function contact_record_general_info($contact)
     {
         ?>
-        <h2><?php _e('Email Status'); ?></h2>
+        <h2><?php _e('Contact Information'); ?></h2>
         <!-- GENERAL NAME INFO -->
         <table class="form-table">
             <tbody>
@@ -252,6 +256,28 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                     <?php endif; ?>
                 </td>
             </tr>
+            <tr>
+                <th><label for="primary_phone"><?php echo _x('Primary Phone', 'contact_record', 'groundhogg') ?></label>
+                </th>
+                <td><?php $args = array(
+                        'type' => 'tel',
+                        'id' => 'primary_phone',
+                        'name' => 'primary_phone',
+                        'value' => $contact->get_meta('primary_phone'),
+                    );
+                    echo Plugin::$instance->utils->html->input($args); ?></td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="primary_phone_extension"><?php echo _x('Phone Extension', 'contact_record', 'groundhogg') ?></label>
+                </th>
+                <td><?php $args = array(
+                        'id' => 'primary_phone_extension',
+                        'name' => 'primary_phone_extension',
+                        'value' => $contact->get_meta('primary_phone_extension'),
+                    );
+                    echo Plugin::$instance->utils->html->input($args); ?></td>
+            </tr>
             </tbody>
         </table>
         <h2><?php _e('User Account'); ?></h2>
@@ -292,28 +318,6 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         <h2><?php _e('Personal Info'); ?></h2>
         <table class="form-table">
             <tbody>
-            <tr>
-                <th><label for="primary_phone"><?php echo _x('Primary Phone', 'contact_record', 'groundhogg') ?></label>
-                </th>
-                <td><?php $args = array(
-                        'type' => 'tel',
-                        'id' => 'primary_phone',
-                        'name' => 'primary_phone',
-                        'value' => $contact->get_meta('primary_phone'),
-                    );
-                    echo Plugin::$instance->utils->html->input($args); ?></td>
-            </tr>
-            <tr>
-                <th>
-                    <label for="primary_phone_extension"><?php echo _x('Phone Extension', 'contact_record', 'groundhogg') ?></label>
-                </th>
-                <td><?php $args = array(
-                        'id' => 'primary_phone_extension',
-                        'name' => 'primary_phone_extension',
-                        'value' => $contact->get_meta('primary_phone_extension'),
-                    );
-                    echo Plugin::$instance->utils->html->input($args); ?></td>
-            </tr>
             <tr>
                 <th><?php echo _x('Birthday', 'contact_record', 'groundhogg') ?></th>
                 <td><?php

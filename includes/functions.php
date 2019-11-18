@@ -3,10 +3,21 @@
 namespace Groundhogg;
 
 use Groundhogg\Lib\Mobile\Mobile_Validator;
+use Groundhogg\Queue\Event_Queue;
 use WP_Error;
 
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
+
+/**
+ * Wrapper function
+ *
+ * @return false|Contact
+ */
+function get_current_contact()
+{
+    return get_contactdata();
+}
 
 /**
  * Wrapper function for Utils function.
@@ -17,7 +28,12 @@ if ( !defined( 'ABSPATH' ) ) exit;
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false )
 {
-    if ( !$contact_id_or_email ) {
+    if ( ! $contact_id_or_email ) {
+
+        if ( Event_Queue::is_processing() ){
+            return Plugin::instance()->event_queue->get_current_contact();
+        }
+
         return Plugin::$instance->tracking->get_current_contact();
     }
 

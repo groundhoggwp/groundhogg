@@ -149,6 +149,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 == Changelog ==
+
+= 2.1.5.1 (2019-11-18) =
+* TWEAKED Re-arranged the phone number and email field in the contact editor.
+* TWEAKED Event cancel link shown based on status instead of time.
+* TWEAKED Ensured conditional shortcodes work in the email builder.
+* FIXED Some UTF-8 characters not being accepted in web forms.
+
 = 2.1.5 (2019-11-15) =
 * ADDED The beginning of the advanced contacts search.
 * ADDED Ability to search for contacts that have 1 or more tags.

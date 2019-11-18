@@ -173,7 +173,7 @@ class Rewrites
             case 'benchmark_link':
 
                 $link_id = absint( get_query_var( 'link_id' ) );
-                $contact = Plugin::$instance->tracking->get_current_contact();
+                $contact = get_contactdata();
 
                 $step = Plugin::$instance->utils->get_step( $link_id );
 

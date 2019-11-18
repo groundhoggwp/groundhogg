@@ -113,7 +113,7 @@ add_action( 'enqueue_managed_page_scripts', function () {
 	wp_enqueue_script( 'manage-preferences' );
 } );
 
-$contact = Plugin::$instance->tracking->get_current_contact();
+$contact = get_contactdata();
 $action  = get_query_var( 'action', 'profile' );
 
 // Compat for erase action which will be true because there will be no contact.

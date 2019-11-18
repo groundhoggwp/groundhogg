@@ -403,9 +403,9 @@ class Email extends Base_Object_With_Meta
      *
      * @return string
      */
-    public function get_merged_content( $content = '' )
+    public function get_merged_content( $content='' )
     {
-        $content = Plugin::$instance->replacements->process(
+        $content = do_replacements(
             $this->get_content(),
             $this->get_contact()->get_id()
         );
@@ -586,7 +586,6 @@ class Email extends Base_Object_With_Meta
             $templates->get_template_part('emails/header', $this->get_template());
         }
 
-//        wp_die( 'HI!' );
         if (has_action("groundhogg/email/body/{$template}")) {
             /**
              *  Rather than loading the email from the default template, load whatever the custom template is.

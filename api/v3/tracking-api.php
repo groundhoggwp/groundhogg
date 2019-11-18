@@ -60,7 +60,7 @@ class Tracking_Api extends Base
      */
     public function page_view( WP_REST_Request $request )
     {
-        $contact = Plugin::$instance->tracking->get_current_contact();
+        $contact = get_contactdata();
 
         if ( ! $contact ){
             return self::ERROR_200( 'no_contact', 'No contact to track...' );

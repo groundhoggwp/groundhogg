@@ -37,7 +37,9 @@ class Replacements
      */
     protected $current_contact;
 
-
+    /**
+     * Replacements constructor.
+     */
     public function __construct()
     {
 
@@ -279,37 +281,33 @@ class Replacements
     /**
      * Process the codes based on the given contact ID
      *
-     * @param $contact_id int ID of the contact
+     * @param $contact_id_or_email int|bool|Contact ID of the contact
      * @param $content
      *
      * @return string
      */
-    public function process( $content, $contact_id = null )
+    public function process( $content, $contact_id_or_email = false )
     {
 
         if ( !preg_match( '/{([^{}]+)}/', $content ) ) {
             return $content;
         }
 
-        $contact_id = absint( $contact_id );
-
-        if ( ! $contact_id ) {
-            // TODO implement tracking...
-            $contact_id = Plugin::$instance->tracking->get_current_contact_id();
+        if ( $contact_id_or_email instanceof Contact ){
+            $contact = $contact_id_or_email;
+        } else {
+            $contact = get_contactdata( $contact_id_or_email );
         }
 
-        if ( !$contact_id || !is_int( $contact_id ) )
+        if ( ! $contact || ! $contact->exists() ){
             return $content;
+        }
+
+        $this->contact_id = $contact->get_id();
+        $this->current_contact = $contact ;
 
         // Check if there is at least one tag added
         if ( empty( $this->replacement_codes ) || !is_array( $this->replacement_codes ) ) {
-            return $content;
-        }
-
-        $this->contact_id = $contact_id;
-        $this->current_contact = get_contactdata( $contact_id );
-
-        if ( !$this->current_contact ) {
             return $content;
         }
 
@@ -326,6 +324,10 @@ class Replacements
         return $this->current_contact;
     }
 
+    /**
+     * @param string $code
+     * @return array
+     */
     protected function parse_code( $code = '' )
     {
 
@@ -841,7 +843,7 @@ class Replacements
 
         $quotes[] = "I'm not going to live by their rules anymore!";
         $quotes[] = "When Chekhov saw the long winter, he saw a winter bleak and dark and bereft of hope. Yet we know that winter is just another step in the cycle of life. But standing here among the people of Punxsutawney and basking in the warmth of their hearths and hearts, I couldn't imagine a better fate than a long and lustrous winter.";
-        $quotes[] = "Hi, three cheeseburgers, two large fries, two milkshakes, and one large coke.";;
+        $quotes[] = "Hi, three cheeseburgers, two large fries, two milkshakes, and one large coke.";
         $quotes[] = "It's the same thing every day, Clean up your room, stand up straight, pick up your feet, take it like a man, be nice to your sister, don't mix beer and wine ever, Oh yeah, don't drive on the railroad tracks.";
         $quotes[] = "I'm a god, I'm not the God. I don't think.";
         $quotes[] = "Don't drive angry! Don't drive angry!";

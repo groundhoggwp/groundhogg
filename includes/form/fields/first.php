@@ -36,7 +36,7 @@ class First extends Input
      */
     public static function validate( $input, $config )
     {
-        if ( preg_match( '/[0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]/', $input ) ){
+        if ( preg_match( '/[0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]/u', $input ) ){
 
             if ( current_user_can( 'edit_funnels' ) ){
                 return new \WP_Error( 'invalid_first_name', __( 'Names should not contain numbers or special symbols.', 'groundhogg' ) );

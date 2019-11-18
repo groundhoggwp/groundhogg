@@ -2,6 +2,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Form\Form;
+use Groundhogg\Queue\Event_Queue;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -73,7 +74,7 @@ class Shortcodes
      */
     public function merge_replacements_shortcode( $atts, $content = '' )
     {
-        $contact = Plugin::$instance->tracking->get_current_contact();
+        $contact = get_contactdata();
 
         if ( ! $contact )
             return '';
@@ -90,7 +91,7 @@ class Shortcodes
             'field' => 'first'
         ), $atts );
 
-        $contact = Plugin::$instance->tracking->get_current_contact();
+        $contact = get_contactdata();
 
         if ( ! $contact ){
             return __( 'Friend', 'groundhogg' );
@@ -110,7 +111,7 @@ class Shortcodes
      */
     function is_contact_shortcode( $atts, $content )
     {
-        $contact = Plugin::$instance->tracking->get_current_contact();
+        $contact = get_contactdata();
 
         if ( $contact ) {
             return do_shortcode( $content );
@@ -128,7 +129,7 @@ class Shortcodes
      */
     function is_not_contact_shortcode( $atts, $content )
     {
-        $contact = Plugin::$instance->tracking->get_current_contact();
+        $contact = get_contactdata();
 
         if ( $contact ) {
             return '';
@@ -155,7 +156,7 @@ class Shortcodes
         $tags = array_map( 'trim', $tags );
         $tags = array_map( 'intval', $tags );
 
-        $contact = Plugin::$instance->tracking->get_current_contact();
+        $contact = get_current_contact();
 
         if ( ! $contact ) {
             return '';
@@ -204,7 +205,7 @@ class Shortcodes
         $tags = array_map( 'trim', $tags );
         $tags = array_map( 'intval', $tags );
 
-        $contact = Plugin::$instance->tracking->get_current_contact();
+        $contact = get_current_contact();
 
         if ( ! $contact ) {
             return '';
