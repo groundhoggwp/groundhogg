@@ -21,7 +21,7 @@ class Manager
      */
     public function __construct()
     {
-        $this->init_jobs();
+        add_action( 'init', [ $this,  'init_jobs' ] );
     }
 
     public function init_jobs()
