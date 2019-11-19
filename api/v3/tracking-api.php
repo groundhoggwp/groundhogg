@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 use Groundhogg\Tracking;
 use function Groundhogg\get_cookie;
+use function Groundhogg\get_current_contact;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use WP_REST_Server;
@@ -60,7 +61,7 @@ class Tracking_Api extends Base
      */
     public function page_view( WP_REST_Request $request )
     {
-        $contact = get_contactdata();
+        $contact = get_current_contact();
 
         if ( ! $contact ){
             return self::ERROR_200( 'no_contact', 'No contact to track...' );

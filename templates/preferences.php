@@ -57,7 +57,7 @@ if ( ! function_exists( 'mail_gdpr_data' ) ) {
 	 */
 	function mail_gdpr_data( $contact_id ) {
 
-		$contact = Plugin::$instance->utils->get_contact( $contact_id );
+		$contact = get_contactdata( $contact_id );
 
 		$message = __( "You are receiving this message because you have requested an audit of your personal information. This message contains all current information about your contact profile.\n", 'groundhogg' );
 
@@ -131,11 +131,11 @@ switch ( $action ):
 			$email = sanitize_email( get_request_var( 'email' ) );
 
 			if ( is_email( $email ) ) {
-				$contact = Plugin::$instance->utils->get_contact( $email );
+				$contact = get_contactdata( $email );
 
 				if ( $contact ) {
 					// Start tracking this contact
-					Plugin::$instance->tracking->start_tracking( $contact );
+					after_form_submit_handler( $contact );
 					die( wp_redirect( managed_page_url( 'preferences/profile/' ) ) );
 				}
 			}

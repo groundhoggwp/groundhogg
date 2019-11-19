@@ -123,8 +123,13 @@ add_filter( 'groundhogg/email/the_content', __NAMESPACE__ . '\strip_script_tags'
  */
 function responsive_tag_compat( $content )
 {
+    // Disable for advanced email editor
+    if ( is_option_enabled( 'gh_use_advanced_email_editor' ) ){
+        return $content;
+    }
+
     $tags = [
-        'figure',
+//        'figure',
         'img'
     ];
 
@@ -135,7 +140,7 @@ function responsive_tag_compat( $content )
     return $content;
 }
 
-//add_filter( 'groundhogg/email_template/content', __NAMESPACE__ . '\responsive_tag_compat', 99 );
+add_filter( 'groundhogg/email_template/content', __NAMESPACE__ . '\responsive_tag_compat', 99 );
 
 /**
  * @param $tag
@@ -155,9 +160,9 @@ function _responsive_tag_compat_callback( $matches )
     $classes = explode( ' ', get_array_var( $atts, 'class' ) );
     $style = get_array_var( $atts, 'style', [] );
     $style = array_merge( $style, [
-        'max-width' => get_array_var( $atts, 'width', '300' ) . 'px',
+        'width' => get_array_var( $atts, 'width', '300' ) . 'px',
         'height' => 'auto',
-        'width' => '100%',
+        'max-width' => '100%',
     ] );
 
     foreach ( $classes as $class ){
