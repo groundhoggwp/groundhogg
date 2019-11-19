@@ -150,6 +150,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 = 2.1.5.2 (2019-11-19) =
+* TWEAKED When basic email editor is in use parse images to make them responsive.
 * FIXED Fatal error in tracking API caused by undefined function call.
 
 = 2.1.5.1 (2019-11-18) =
