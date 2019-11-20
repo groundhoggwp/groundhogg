@@ -354,6 +354,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function get_current_funnel_step_order( $contact )
     {
+        // Todo, possible to make this more efficient?
 
         // Search waiting events, automatically the current event.
         $events = $this->get_events_db()->query( [
