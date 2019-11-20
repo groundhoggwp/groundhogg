@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
@@ -199,20 +200,17 @@ class Funnels_Table extends WP_List_Table {
 
         $query  = new Contact_Query();
 
-        $start = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_start_time();
-        $end   = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_end_time();
-
         $query_args = [
             'report' => array(
-                'start'     => $start,
-                'end'       => $end,
-                'funnel'    => $funnel->get_id()
+                'funnel'    => $funnel->get_id(),
+                'status'    => 'waiting'
             )
         ];
 
 
         $count = $query->query( array_merge( [ 'count' => true ], $query_args ) );
-        $queryUrl = admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( $query_args ) ) );
+
+        $queryUrl = admin_page_url( 'gh_contacts', $query_args );
 
         return "<a href='$queryUrl'>$count</a>";
     }

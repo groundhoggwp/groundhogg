@@ -200,15 +200,10 @@ class Step extends Base_Object_With_Meta implements Event_Process
 
         $i = $this->get_order();
 
-//        var_dump( $i );
-//        var_dump( $items );
-//        wp_die();
-
         if ( $i >= count( $items ) ) {
 
             /* This is the last step. */
             return false;
-
         }
 
         if ( $items[ $i ]->get_group() === self::ACTION ){
@@ -221,7 +216,6 @@ class Step extends Base_Object_With_Meta implements Event_Process
 
         if ( $this->is_benchmark() ) {
 
-            //todo verify comparison
             while ( $i < count( $items ) ) {
 
                 if ( $items[ $i ]->get_group() === self::ACTION ) {
@@ -270,15 +264,11 @@ class Step extends Base_Object_With_Meta implements Event_Process
             return false;
         }
 
-        $this->switch_to_blog();
-
         do_action( "groundhogg/steps/{$this->get_type()}/run/before", $this  );
 
         $result = apply_filters( "groundhogg/steps/{$this->get_type()}/run", $contact, $event, $this );
 
         do_action( "groundhogg/steps/{$this->get_type()}/run/after", $this  );
-
-        $this->restore_current_blog();
 
         return $result;
     }
@@ -303,7 +293,6 @@ class Step extends Base_Object_With_Meta implements Event_Process
                 'contact_id'    => $contact->get_id(),
                 'event_type'    => Event::FUNNEL,
                 'status'        => Event::WAITING
-
             ]
         );
 
@@ -321,78 +310,86 @@ class Step extends Base_Object_With_Meta implements Event_Process
     }
 
     /**
-     * Switches to the blog which the step can run on.
-     */
-    public function switch_to_blog()
-    {
-        if ( Plugin::$instance->settings->is_global_multisite() ) {
-            $blog_id = $this->get_meta( 'blog_id' );
-            if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
-                switch_to_blog( $blog_id );
-            }
-        }
-    }
-
-    /**
-     * Restore the process to the current blog.
-     */
-    public function restore_current_blog()
-    {
-        if ( Plugin::$instance->settings->is_global_multisite() && ms_is_switched() ) {
-            restore_current_blog();
-        }
-    }
-
-    /**
-     * Return whether or not the current action can run.
-     * This was implement so that WPMU could be effectively implemented with the GLOBAL DB option enabled.
-     *
-     * Alwasy return true if not a multisite or multisite global is not enabled
-     * otherwise compare the current blog ID to the blg ID associated with the step.
-     */
-    public function can_run()
-    {
-
-        if ( Plugin::$instance->settings->is_global_multisite() ){
-
-            $blog_id = $this->get_meta( 'blog_id' );
-
-            /* all blogs */
-            if ( ! $blog_id ){
-
-                return true;
-
-            /* Current blog */
-            } else if ( intval( $blog_id ) === get_current_blog_id() ){
-
-                return true;
-
-            /* Wrong Blog */
-            } else {
-
-                return false;
-
-            }
-
-        }
-
-        return true;
-
-    }
-
-    /**
      * Whether this step can actually be completed
      * @param $contact Contact
      * @return bool
      */
     public function can_complete( $contact=null )
     {
+        // Actions cannot be completed.
         if ( $this->is_action() )
             return false;
 
-        return $this->is_active() && ( $this->is_starting() || $this->contact_in_funnel( $contact ) );
+        // Check if active
+        if ( ! $this->is_active() ){
+            return false;
+        }
+
+        // Check if starting
+        if ( $this->is_starting() ){
+            return true;
+        }
+
+        // If inner step, check if contact is at a step before this one.
+        if ( $this->is_inner() ){
+
+            // get the current funnel step
+            $current_order = $this->get_current_funnel_step_order( $contact );
+
+            // If the step order is < than this one, return true.
+            if ( $current_order && $current_order < $this->get_order() ){
+                return true;
+            }
+        }
+
+        return apply_filters( 'groundhogg/step/can_complete', false, $this, $contact );
     }
 
+    /**
+     * Get the current step order of the contact in the same funnel
+     * as this step.
+     *
+     * @param $contact Contact
+     * @return bool|int
+     */
+    public function get_current_funnel_step_order( $contact )
+    {
+
+        // Search waiting events, automatically the current event.
+        $events = $this->get_events_db()->query( [
+            'funnel_id' => $this->get_funnel_id(),
+            'contact_id' => $contact->get_id(),
+            'status' => Event::WAITING
+        ] );
+
+        if ( ! empty( $events ) ){
+            $event = array_shift( $events );
+            $event = new Event( absint( $event->ID ) );
+            if ( $event->exists() ){
+                return $event->get_step()->get_order();
+            }
+        }
+
+        // The most recent completed event for this funnel and contact.
+        $events = $this->get_events_db()->query( [
+            'funnel_id' => $this->get_funnel_id(),
+            'contact_id' => $contact->get_id(),
+            'status' => Event::COMPLETE,
+            'order' => 'DESC',
+            'orderby' => 'time'
+        ] );
+
+        if ( ! empty( $events ) ){
+            // get top element.
+            $event = array_shift( $events );
+            $event = new Event( absint( $event->ID ) );
+            if ( $event->exists() ){
+                return $event->get_step()->get_order();
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Returns whether the contact is currently in the funnel
@@ -414,6 +411,16 @@ class Step extends Base_Object_With_Meta implements Event_Process
     public function is_active()
     {
         return $this->get_funnel() && $this->get_funnel()->is_active();
+    }
+
+    /**
+     * Whether the step is an inner step. Works for both benchmarks and actions.
+     *
+     * @return bool
+     */
+    public function is_inner()
+    {
+        return ! $this->is_starting();
     }
 
     /**
@@ -446,6 +453,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
         return true;
     }
 
+
     /**
      * Return the name given with the ID prefixed for easy access in the $_POST variable
      *
@@ -458,7 +466,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
         return $this->get_id() . '_' . esc_attr( $name );
     }
 
-	/**
+    /**
 	 * Output the HTML of a step.
 	 */
 	public function sortable_item()
@@ -482,7 +490,7 @@ class Step extends Base_Object_With_Meta implements Event_Process
         }
     }
 
-	/**
+    /**
 	 * Output the HTML of a step.
 	 */
 	public function html_v2()
@@ -551,5 +559,71 @@ class Step extends Base_Object_With_Meta implements Event_Process
         $html = ob_get_clean();
 
         return $html;
+    }
+
+    /**
+     * Return whether or not the current action can run.
+     * This was implement so that WPMU could be effectively implemented with the GLOBAL DB option enabled.
+     *
+     * Always return true if not a multisite or multisite global is not enabled
+     * otherwise compare the current blog ID to the blg ID associated with the step.
+     *
+     * @deprecated
+     */
+    public function can_run()
+    {
+
+        if ( Plugin::$instance->settings->is_global_multisite() ){
+
+            $blog_id = $this->get_meta( 'blog_id' );
+
+            /* all blogs */
+            if ( ! $blog_id ){
+
+                return true;
+
+                /* Current blog */
+            } else if ( intval( $blog_id ) === get_current_blog_id() ){
+
+                return true;
+
+                /* Wrong Blog */
+            } else {
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Restore the process to the current blog.
+     *
+     * @deprecated since 2.0
+     */
+    public function restore_current_blog()
+    {
+        if ( Plugin::$instance->settings->is_global_multisite() && ms_is_switched() ) {
+            restore_current_blog();
+        }
+    }
+
+    /**
+     * Switches to the blog which the step can run on.
+     *
+     * @deprecated since 2.0
+     */
+    public function switch_to_blog()
+    {
+        if ( Plugin::$instance->settings->is_global_multisite() ) {
+            $blog_id = $this->get_meta( 'blog_id' );
+            if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
+                switch_to_blog( $blog_id );
+            }
+        }
     }
 }

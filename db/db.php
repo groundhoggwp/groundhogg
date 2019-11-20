@@ -922,11 +922,19 @@ abstract class DB {
                 case 'count':
                     $query_vars[ 'func' ] = 'count';
                     break;
+                case 'limit':
                 case 'LIMIT':
                     $query_vars[ 'limit' ] = $val;
                     break;
                 case 'ORDER_BY':
+                case 'ORDERBY':
+                case 'orderby':
+                case 'order_by':
                     $query_vars[ 'orderby' ] = $val;
+                    break;
+                case 'order':
+                case 'ORDER':
+                    $query_vars[ 'order' ] = $val;
                     break;
                 default:
                     if ( in_array( $key, $this->get_allowed_columns() ) ){
@@ -943,7 +951,6 @@ abstract class DB {
         }
 
         $query_vars[ 'where' ] = $where;
-        $query_vars[ 'order' ] = get_array_var( $data, 'order', 'DESC' );
 
         return $this->advanced_query( $query_vars, $from_cache );
     }

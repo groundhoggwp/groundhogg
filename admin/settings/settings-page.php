@@ -260,7 +260,9 @@ class Settings_Page extends Admin_Page
             ],
         );
 
-        if (is_white_labeled()) {
+        // Hide the sending service if no API token is set since it is deprecated.
+        // Hide if the plugin is currently white labeled.
+        if ( is_white_labeled() || ! Plugin::instance()->sending_service->has_api_token() ) {
             unset($sections['service']);
         }
 

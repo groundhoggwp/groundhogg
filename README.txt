@@ -149,6 +149,13 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 == Changelog ==
+
+= 2.1.5.3 (2019-11-20) =
+* TWEAKED Contacts will no longer be able to move backwards through a funnel, they will only be able to complete benchmarks which come after the current active step. Contacts will still be able to restart a funnel upon completing the initial benchmark.
+* TWEAKED Hide Sending Service settings if no key is present.
+* FIXED Active contacts funnel column not showing accurate results.
+* FIXED PHP Notice when Base_Object data is empty.
+
 = 2.1.5.2 (2019-11-19) =
 * TWEAKED When basic email editor is in use parse images to make them responsive.
 * FIXED Fatal error in tracking API caused by undefined function call.

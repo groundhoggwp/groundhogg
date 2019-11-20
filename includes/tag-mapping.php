@@ -453,24 +453,32 @@ class Tag_Mapping extends Bulk_Job
      * Process an item
      *
      * @param $item mixed
-     * @param $args array
      * @return void
      */
     protected function process_item( $item )
     {
-        $contact = Plugin::$instance->utils->get_contact( absint( $item ) );
+        $contact = get_contactdata( absint( $item ) );
 
-        if ( $contact ){
+        if ( $contact && $contact->exists() ){
 
-            $tags = [];
+            // First, remove all tags so we have a clean slate.
+            $remove_tags = array_values( $this->get_tag_map() );
+            $contact->remove_tag( $remove_tags );
 
-            $tags[] = $this->get_status_tag( $contact->get_optin_status() );
-            $tags[] = $contact->is_marketable() ? $this->get_status_tag( self::MARKETABLE ) : $this->get_status_tag( self::NON_MARKETABLE );
+            // Generate list of appropriate tags to add.
+            $apply_tags = [];
 
+            // The tag for the optin status
+            $apply_tags[] = $this->get_status_tag( $contact->get_optin_status() );
+            // Marketable/Unmarketable
+            $apply_tags[] = $contact->is_marketable() ? $this->get_status_tag( self::MARKETABLE ) : $this->get_status_tag( self::NON_MARKETABLE );
+
+            // Role tag
             $role_tags = $this->get_roles_pretty_names( $contact->get_userdata()->roles );
-            $tags = array_merge( $tags, $role_tags );
+            $apply_tags = array_merge( $apply_tags, $role_tags );
 
-            $contact->apply_tag( $tags );
+            // Add the tags
+            $contact->apply_tag( $apply_tags );
 
         }
     }

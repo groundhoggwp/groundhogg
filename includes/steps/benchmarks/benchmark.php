@@ -99,9 +99,6 @@ abstract class Benchmark extends Funnel_Step
     {
         $steps = $this->get_like_steps();
 
-//        var_dump( 'here' );
-//        wp_die();
-
         foreach ( $steps as $step ) {
 
             $this->set_current_step( $step );

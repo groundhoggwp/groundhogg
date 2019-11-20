@@ -177,7 +177,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
         }
 
         // Check data array
-        if (key_exists($name, $this->data)) {
+        if (!empty($this->data) && key_exists($name, $this->data)) {
             return $this->data[$name];
         }
 
