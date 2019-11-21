@@ -3,7 +3,7 @@ Contributors: trainingbusinesspros, groundhogg, dhrumit
 Tags: crm, email marketing, email, marketing automation, automation
 Donate link: https://groundhogg.io
 Requires at least: 4.9
-Tested up to: 5.2
+Tested up to: 5.3
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv3
@@ -160,6 +160,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TWEAKED Hide Sending Service settings if no key is present.
 * FIXED Active contacts funnel column not showing accurate results.
 * FIXED PHP Notice when Base_Object data is empty.
+* FIXED Email will be recognized as a confirmation email when {confirmation_link_raw} is included.
 
 = 2.1.5.2 (2019-11-19) =
 * TWEAKED When basic email editor is in use parse images to make them responsive.
