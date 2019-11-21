@@ -18,6 +18,7 @@ Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Ma
 Want to upgrade to premium? Now is the time to do it!
 
 There is a BIGGER DISCOUNT the week **BEFORE** Black Friday!
+
 * November 22 to November 28 = **25%** DISCOUNT
 * November 29 to December 2 = **15%** DISCOUNT
 
@@ -161,6 +162,11 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 == Changelog ==
+
+= 2.1.6.1 (2019-11-20) =
+* ADDED Filter to submission handler contact args before creating a contact.
+* FIXED Fatal error in submission handler cause by undefined function when an email address is not present in the posted data.
+* FIXED continuous redirect with benchmark link click caused on some setups.
 
 = 2.1.6 (2019-11-20) =
 * ADDED More error checking for incorrectly configured funnels.

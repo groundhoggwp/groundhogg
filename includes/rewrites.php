@@ -187,7 +187,7 @@ class Rewrites
 
                 $target_url = Plugin::$instance->replacements->process( $target_url, $contact->get_id() );
 
-                wp_redirect( wp_nonce_url( $target_url,  -1, 'key' ) );
+                wp_redirect( $target_url );
                 die();
 
                 break;

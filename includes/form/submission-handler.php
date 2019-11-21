@@ -10,6 +10,7 @@ use function Groundhogg\doing_rest;
 use function Groundhogg\file_access_url;
 use function Groundhogg\form_errors;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_current_contact;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use function Groundhogg\split_name;
@@ -292,9 +293,11 @@ class Submission_Handler extends Supports_Errors
 
         $email = get_array_var( $args, 'email' );
 
-        if ( !$email ) {
-            $contact = get_contactdata();
+        if ( ! $email ) {
+            $contact = get_current_contact();
         } else {
+
+            $args = apply_filters( 'groundhogg/form/submission_handler/contact_args', $args );
 
             $contact = new Contact( $args );
 
