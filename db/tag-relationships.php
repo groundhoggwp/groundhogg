@@ -190,33 +190,6 @@ class Tag_Relationships extends DB
     }
 
     /**
-     * Checks if a tag relationship exists
-     *
-     * @access  public
-     * @since   2.1
-     */
-    public function exists( $tag_id = 0, $contact_id = 0 ) {
-
-        if ( empty( $tag_id ) || empty( $contact_id ) ) {
-            return false;
-        }
-
-        if ( ! WPGH()->tags->exists( $tag_id ) || ! WPGH()->contacts->exists( $contact_id, 'ID' ) ) {
-
-            return false;
-
-        }
-
-        global $wpdb;
-
-        $result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE contact_id = %s AND tag_id = %s", $contact_id, $tag_id ) );
-
-        return (bool) $result;
-
-    }
-
-
-    /**
      * Retrieve tags from the database
      *
      * @access  public
@@ -258,36 +231,6 @@ class Tag_Relationships extends DB
     public function get_contacts_by_tag( $tag_id = 0 ){
         return $this->get_relationships( $tag_id, 'tag_id', 'contact_id' );
 
-    }
-
-    /**
-     * Sets the last_changed cache key for tags.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function set_last_changed() {
-        wp_cache_set( 'last_changed', microtime(), $this->cache_group );
-    }
-
-    /**
-     * Retrieves the value of the last_changed cache key for tags.
-     *
-     * @access public
-     * @since  2.8
-     */
-    public function get_last_changed() {
-        if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-            return wp_cache_get_last_changed( $this->cache_group );
-        }
-
-        $last_changed = wp_cache_get( 'last_changed', $this->cache_group );
-        if ( ! $last_changed ) {
-            $last_changed = microtime();
-            wp_cache_set( 'last_changed', $last_changed, $this->cache_group );
-        }
-
-        return $last_changed;
     }
 
     /**

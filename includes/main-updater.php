@@ -44,6 +44,7 @@ class Main_Updater extends Updater {
             '2.0.11',
             '2.0.11.5',
             '2.1',
+            '2.1.6',
         ];
     }
 
@@ -149,9 +150,19 @@ class Main_Updater extends Updater {
         Plugin::instance()->roles->add_caps();
     }
 
+    /**
+     * Set the update notice.
+     */
     public function version_2_1()
     {
         update_option( 'gh_updating_to_2_1', true );
     }
 
+    /**
+     * Reset the stats collection hook to ping the site weekly, not daily.
+     */
+    public function version_2_1_6()
+    {
+        wp_clear_scheduled_hook( 'gh_do_stats_collection' );
+    }
 }

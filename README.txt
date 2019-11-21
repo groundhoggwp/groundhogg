@@ -150,7 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.5.3 (2019-11-20) =
+= 2.1.6 (2019-11-20) =
+* ADDED More error checking for incorrectly configured funnels.
+* ADDED Installed premium extensions now included in the stats collection.
+* ADDED Collect more useful data from stats collection like language and PHP version.
 * TWEAKED Contacts will no longer be able to move backwards through a funnel, they will only be able to complete benchmarks which come after the current active step. Contacts will still be able to restart a funnel upon completing the initial benchmark.
 * TWEAKED Hide Sending Service settings if no key is present.
 * FIXED Active contacts funnel column not showing accurate results.

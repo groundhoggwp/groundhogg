@@ -65,12 +65,11 @@ class Step extends Base_Object_With_Meta implements Event_Process
     /**
      * Do any post setup actions.
      *
+     * Nothing to do here...
+     *
      * @return void
      */
-    protected function post_setup()
-    {
-        // TODO: Implement post_setup() method.
-    }
+    protected function post_setup(){}
 
     /**
      * A string to represent the object type
@@ -248,29 +247,6 @@ class Step extends Base_Object_With_Meta implements Event_Process
         }
 
         return $time;
-    }
-
-    /**
-     * Do the event when being processed from the event queue...
-     *
-     * @param $contact Contact
-     * @param $event Event
-     *
-     * @return bool|\WP_Error whether it was successful or not
-     */
-    public function run( $contact, $event = null )
-    {
-        if ( ! $this->is_active() ) {
-            return false;
-        }
-
-        do_action( "groundhogg/steps/{$this->get_type()}/run/before", $this  );
-
-        $result = apply_filters( "groundhogg/steps/{$this->get_type()}/run", $contact, $event, $this );
-
-        do_action( "groundhogg/steps/{$this->get_type()}/run/after", $this  );
-
-        return $result;
     }
 
     /**
@@ -454,7 +430,6 @@ class Step extends Base_Object_With_Meta implements Event_Process
         return true;
     }
 
-
     /**
      * Return the name given with the ID prefixed for easy access in the $_POST variable
      *
@@ -465,6 +440,35 @@ class Step extends Base_Object_With_Meta implements Event_Process
     public function prefix( $name )
     {
         return $this->get_id() . '_' . esc_attr( $name );
+    }
+
+
+    /**
+     * Do the event when being processed from the event queue...
+     *
+     * @param $contact Contact
+     * @param $event Event
+     *
+     * @return bool|\WP_Error whether it was successful or not
+     */
+    public function run( $contact, $event = null )
+    {
+        if ( ! $this->is_active() ) {
+            return false;
+        }
+
+        do_action( "groundhogg/steps/{$this->get_type()}/run/before", $this  );
+
+        // Throw error
+        if ( has_filter( "groundhogg/steps/{$this->get_type()}/run" ) ){
+            $result = apply_filters( "groundhogg/steps/{$this->get_type()}/run", $contact, $event, $this );
+        } else {
+            $result = apply_filters( "groundhogg/steps/error/run", $contact, $event, $this );
+        }
+
+        do_action( "groundhogg/steps/{$this->get_type()}/run/after", $this  );
+
+        return $result;
     }
 
     /**
@@ -508,7 +512,11 @@ class Step extends Base_Object_With_Meta implements Event_Process
      */
     public function save()
     {
-        do_action( "groundhogg/steps/{$this->get_type()}/save", $this );
+        if ( has_action( "groundhogg/steps/{$this->get_type()}/save" ) ){
+            do_action( "groundhogg/steps/{$this->get_type()}/save", $this );
+        } else {
+            do_action( "groundhogg/steps/error/save", $this );
+        }
     }
 
     /**

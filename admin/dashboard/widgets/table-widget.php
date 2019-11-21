@@ -19,6 +19,19 @@ abstract class Table_Widget extends Reporting_Widget
      */
     abstract function column_title();
 
+    protected function column_data_title()
+    {
+        return __( 'Contacts', 'groundhogg' );
+    }
+
+    /**
+     * @return bool
+     */
+    protected function only_show_top_10()
+    {
+        return apply_filters( "groundhogg/admin/dashboard/widgets/{$this->get_id()}", true );
+    }
+
     /**
      * Output the widget HTML
      */
@@ -50,7 +63,7 @@ abstract class Table_Widget extends Reporting_Widget
                 [],
                 [
                     $this->column_title(),
-                    __( 'Contacts', 'groundhogg'),
+                    $this->column_data_title(),
                 ],
                 $data,
                 false
@@ -89,6 +102,10 @@ abstract class Table_Widget extends Reporting_Widget
      */
     protected function normalize_data( $data )
     {
+        if ( empty( $data ) ){
+            $data = [];
+        }
+
         $dataset = [];
 
         foreach ( $data as $key => $datum ){
@@ -102,7 +119,7 @@ abstract class Table_Widget extends Reporting_Widget
         usort( $dataset , array( $this, 'sort' ) );
 
         /* Pair down the results to largest 10 */
-        if ( count( $dataset ) > 10 ){
+        if ( count( $dataset ) > 10 && $this->only_show_top_10() ){
 
             $other_dataset = [
                 'label' => __( 'Other' ),

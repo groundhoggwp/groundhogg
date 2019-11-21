@@ -1,8 +1,6 @@
 <?php
 namespace Groundhogg;
 
-// TODO Remove old cron "wpgh_do_stats_collection"
-
 class Stats_Collection
 {
 
@@ -25,15 +23,21 @@ class Stats_Collection
         }
     }
 
+    /**
+     * @return bool
+     */
     public function is_enabled()
     {
-        return Plugin::$instance->settings->is_option_enabled( 'gh_opted_in_stats_collection' );
+        return is_option_enabled( 'gh_opted_in_stats_collection' );
     }
 
+    /**
+     * Perform the request weekly, daily is too much
+     */
 	public function init_cron()
 	{
 		if ( ! wp_next_scheduled( 'gh_do_stats_collection' )  ){
-			wp_schedule_event( time(), 'daily' , 'gh_do_stats_collection' );
+			wp_schedule_event( time(), 'weekly' , 'gh_do_stats_collection' );
 		}
 	}
 
@@ -90,8 +94,12 @@ We appreciate your help, enjoy!
     public function optin()
     {
 
+        $site_key = $this->generate_site_key();
+
+        update_option( 'gh_site_key', $site_key );
+
         $stats = [
-            'site_key'  => md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) ),
+            'site_key'  => $site_key,
             'site_email' => base64_encode( wp_get_current_user()->user_email ),
             'display_name' => base64_encode( wp_get_current_user()->display_name ),
             'is_v3' => true,
@@ -104,7 +112,6 @@ We appreciate your help, enjoy!
 
             $json = $response;
 
-            update_option( 'gh_site_key', $stats[ 'site_key' ] );
             update_option( 'gh_opted_in_stats_collection', 1 );
 
             if ( is_user_logged_in() ){
@@ -114,9 +121,18 @@ We appreciate your help, enjoy!
 
             return $json;
 
+        } else if ( $response->get_error_code() === 'already_registered' ){
+            update_option( 'gh_opted_in_stats_collection', 1 );
         }
 
         return $response;
+    }
+
+    static protected $api_url = 'https://www.groundhogg.io/wp-json/gh/v3/stats/';
+
+    protected function generate_site_key()
+    {
+        return md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) );
     }
 
     /**
@@ -126,7 +142,12 @@ We appreciate your help, enjoy!
     public function send_stats()
     {
 
+        if ( ! $this->is_enabled() ){
+            return;
+        }
+
         global $wpdb;
+
         $events = get_db( 'events' )->get_table_name();
         $steps  = get_db( 'steps' )->get_table_name();
         $time = time();
@@ -136,38 +157,37 @@ We appreciate your help, enjoy!
         $num_clicks = get_db( 'activity' )->count( array( 'end' => $time, 'activity_type' => 'email_link_click' ) );
 
         $stats = [
-            'site_key'  => get_option( 'gh_site_key', md5( str_replace( 'www.' , '', parse_url( site_url(), PHP_URL_HOST ) ) ) ),
-            'contacts'  => get_db( 'contacts' )->count(),
-            'funnels'   => get_db( 'funnels' )->count(),
-            'emails'    => get_db( 'emails' )->count(),
-            'sent'      => $num_emails_sent,
-            'opens'     => $num_opens,
-            'clicks'    => $num_clicks,
+            'site_key'  => get_option( 'gh_site_key', $this->generate_site_key() ),
+            'system_info' => [
+                'php_version'   => PHP_VERSION,
+                'wp_version'    => get_bloginfo( 'version' ),
+                'gh_version'    => GROUNDHOGG_VERSION,
+                'site_lang'     => get_bloginfo( 'language' ),
+            ],
+            'usages' => [
+                'contacts'  => get_db( 'contacts' )->count(),
+                'funnels'   => get_db( 'funnels' )->count(),
+                'emails'    => get_db( 'emails' )->count(),
+                'sent'      => $num_emails_sent,
+                'opens'     => $num_opens,
+                'clicks'    => $num_clicks,
+            ],
+            'extensions' => array_values( Extension::$extension_ids )
         ];
 
-        $response = wp_remote_post( 'https://www.groundhogg.io/wp-json/gh/stats/collect/', array( 'body' => $stats ) );
+        apply_filters( 'groundhogg/stats_collection/report', $stats );
+
+        // TODO Change to stats.groundhogg.io
+        $response = remote_post_json( self::$api_url, $stats );
 
         /* Success */
-        if ( ! is_wp_error( $response ) ){
+        if ( ! is_wp_error( $response ) ) {
 
-            $body = wp_remote_retrieve_body( $response );
-            $json = json_decode( $body );
-
-            if ( is_json_error( $json ) ){
-
-                $error = get_json_error( $json );
-
-                /* Optin if not already and optin enabled via settings... */
-                if ( $error->get_error_code() === 'site_unregistered' ){
-
-                    $this->optin();
-
-                }
-
+            /* Optin if not already and optin enabled via settings... */
+            if ($response->get_error_code() === 'site_unregistered') {
+                $this->optin();
             }
-
         }
-
     }
 
 }
