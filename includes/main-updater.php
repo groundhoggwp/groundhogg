@@ -45,6 +45,7 @@ class Main_Updater extends Updater {
             '2.0.11.5',
             '2.1',
             '2.1.6',
+            '2.1.6.2',
         ];
     }
 
@@ -164,5 +165,13 @@ class Main_Updater extends Updater {
     public function version_2_1_6()
     {
         wp_clear_scheduled_hook( 'gh_do_stats_collection' );
+    }
+
+    /**
+     * Re-install all the rewrites.
+     */
+    public function version_2_1_6_2()
+    {
+        install_custom_rewrites();
     }
 }

@@ -163,6 +163,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.6.2 (2019-11-22) =
+* TWEAKED Changed /files/ permalink structure to /uploads/ for backwards compatibility with older versions of WP multisite.
+
 = 2.1.6.1 (2019-11-20) =
 * ADDED Filter to submission handler contact args before creating a contact.
 * FIXED Fatal error in submission handler cause by undefined function when an email address is not present in the posted data.
