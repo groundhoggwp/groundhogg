@@ -290,6 +290,8 @@ class Contacts_Table extends WP_List_Table
     function prepare_items()
     {
 
+
+
         $columns = $this->get_columns();
         $hidden = array(); // No hidden columns
         $sortable = $this->get_sortable_columns();
@@ -306,7 +308,7 @@ class Contacts_Table extends WP_List_Table
         $query = get_request_query(['optin_status' => [Preferences::CONFIRMED, Preferences::UNCONFIRMED, Preferences::WEEKLY, Preferences::MONTHLY]]);
 
         // Since unconfirmed is 0 (aside maybe we should change that) we need to specify we actually want it still.
-	    $optin_status = absint( get_request_var( 'optin_status' ) );
+	    $optin_status =  get_request_var( 'optin_status' ) ;
         if ( $optin_status || ( $optin_status === Preferences::UNCONFIRMED && isset( $_GET[ 'optin_status' ] ) ) ) {
             $query['optin_status'] = $optin_status;
         }
