@@ -15,61 +15,88 @@ use function Groundhogg\html;
             <div class="tags-include inline-block search-param">
                 <?php
 
-                echo html()->e('label', [ 'class' => 'search-label' ], __('Includes Tags', 'groundhogg'));
+                echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Includes Tags', 'groundhogg' ) );
                 echo "&nbsp;";
-                echo html()->dropdown([
+                echo html()->dropdown( [
                     'name' => 'tags_include_needs_all',
                     'id' => 'tags_include_needs_all',
                     'class' => '',
                     'options' => array(
-                        0 => __('Any', 'groundhogg'),
-                        1 => __('All', 'groundhogg')
+                        0 => __( 'Any', 'groundhogg' ),
+                        1 => __( 'All', 'groundhogg' )
                     ),
                     'selected' => absint( get_url_var( 'tags_include_needs_all' ) ),
                     'option_none' => false
-                ]);
+                ] );
 
-                echo html()->e('p', [], [
-                    html()->tag_picker([
+                echo html()->e( 'p', [], [
+                    html()->tag_picker( [
                         'name' => 'tags_include[]',
                         'id' => 'tags_include',
                         'selected' => wp_parse_id_list( get_url_var( 'tags_include' ) )
-                    ])
+                    ] )
 
-                ]);
+                ] );
 
                 ?>
             </div>
             <div class="tags-exclude inline-block search-param">
                 <?php
 
-                echo html()->e('label', [ 'class' => 'search-label' ], __('Excludes Tags', 'groundhogg'));
+                echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Excludes Tags', 'groundhogg' ) );
                 echo "&nbsp;";
 
-                echo html()->dropdown([
+                echo html()->dropdown( [
                     'name' => 'tags_exclude_needs_all',
                     'id' => 'tags_exclude_needs_all',
                     'class' => '',
                     'options' => array(
-                        0 => __('Any', 'groundhogg'),
-                        1 => __('All', 'groundhogg')
+                        0 => __( 'Any', 'groundhogg' ),
+                        1 => __( 'All', 'groundhogg' )
                     ),
                     'selected' => absint( get_url_var( 'tags_exclude_needs_all' ) ),
                     'option_none' => false
-                ]);
+                ] );
 
-                echo html()->e('p', [], [
-                    html()->tag_picker([
+                echo html()->e( 'p', [], [
+                    html()->tag_picker( [
                         'name' => 'tags_exclude[]',
                         'id' => 'tags_exclude',
                         'selected' => wp_parse_id_list( get_url_var( 'tags_exclude' ) )
-                    ])
-                ]);
+                    ] )
+                ] );
+
+                ?>
+            </div>
+            <div class="tags-exclude inline-block search-param">
+
+                <?php
+
+                echo html()->e( 'label', [ 'class' => 'search-label' ], __('Filter By Status', 'groundhogg' ) );
+                echo "&nbsp;";
+
+                echo html()->select2( [
+                    'name' => 'optin_status[]',
+                    'id' => 'optin_status',
+                    'class' => 'gh-select2',
+                    'options' => [
+                        0 => __( 'Unconfirmed', 'groundhogg' ),
+                        1 => __( 'Confirmed', 'groundhogg' ),
+                        2 => __( 'Unsubscribed', 'groundhogg' ),
+                        3 => __( 'Weekly', 'groundhogg' ),
+                        4 => __( 'Monthly', 'groundhogg' ),
+                        5 => __( 'Bounced', 'groundhogg' ),
+                        6 => __( 'Spam', 'groundhogg' ),
+                        7 => __( 'Complained', 'groundhogg' ),
+                    ],
+                    'multiple' => true,
+                    'selected' => wp_parse_id_list( get_url_var( 'optin_status' ) ),
+                ] );
 
                 ?>
             </div>
             <div>
-                <?php submit_button(__('Search'), 'primary', 'submit', false); ?>
+                <?php submit_button( __( 'Search' ), 'primary', 'submit', false ); ?>
             </div>
         </form>
     </div>
