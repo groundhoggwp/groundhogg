@@ -498,35 +498,10 @@ class Funnels_Page extends Admin_Page
 
         if ( isset( $_POST[ 'funnel_template' ] ) ) {
 
-//            include GROUNDHOGG_PATH . 'templates/assets/funnel-templates.php';
-//
-//            /* @var $funnel_templates array included from funnel-templates.php */
-//            $template_name = get_post_var( 'funnel_template' );
-//            if ( ! isset_not_empty( $funnel_templates, $template_name ) ){
-//                return new \WP_Error( 'invalid_template', 'The requested template does not exist.' );
-//            }
-//
-//            $file_name = basename( $funnel_templates[ $template_name ][ 'file' ] );
-//
-//            $file_path = GROUNDHOGG_PATH . "templates/assets/funnels/$file_name.funnel";
-//
-//            if ( ! file_exists( $file_path ) ){
-//                return new \WP_Error( 'invalid_template', 'The requested template could not be read.' );
-//            }
-
-//            $json = file_get_contents( $file_path );
-
             $template_id = get_request_var( 'funnel_template' );
             $library = new Library();
             $template = $library->get_funnel_template($template_id);
-//            var_dump($template);
-
             $json = json_encode($template->import_json);
-
-//            var_dump($json);
-//            wp_die('');
-
-
             $funnel_id = $this->import_funnel( json_decode( $json, true ) );
 
         } else if ( isset( $_POST[ 'funnel_id' ] ) ) {
@@ -548,10 +523,10 @@ class Funnels_Page extends Admin_Page
                 return $error;
             }
 
-            $validate = wp_check_filetype_and_ext( $file[ 'tmp_name' ], $file[ 'name' ], [ 'funnel' => 'text/plain' ] );
+            $validate = wp_check_filetype( $file[ 'name' ], [ 'funnel' => 'text/plain' ] );
 
-            if ( $validate[ 'ext' ] !== 'funnel' || $validate[ 'type' ] !== 'text/plain' ) {
-                return new \WP_Error( 'invalid_template', 'Please upload a valid funnel template.' );
+            if( $validate[ 'ext' ] !== 'funnel' || $validate[ 'text/plain' ]  ){
+                return new \WP_Error( 'invalid_template', sprintf( 'Please upload a valid funnel template. Expected mime type of <i>text/plain</i> but got <i>%s</i>', esc_html( $file[ 'type' ] ) ) );
             }
 
             $json = file_get_contents( $file[ 'tmp_name' ] );
