@@ -164,6 +164,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 == Changelog ==
 
 = 2.1.6.2 (2019-11-22) =
+* ADDED optin status filter to contact search
 * TWEAKED Changed /files/ permalink structure to /uploads/ for backwards compatibility with older versions of WP multisite.
 * FIXED Import funnel upload not working.
 

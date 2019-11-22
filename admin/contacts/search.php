@@ -15,7 +15,7 @@ use function Groundhogg\html;
             <div class="tags-include inline-block search-param">
                 <?php
 
-                echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Includes Tags', 'groundhogg' ) );
+                echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Includes contacts with', 'groundhogg' ) );
                 echo "&nbsp;";
                 echo html()->dropdown( [
                     'name' => 'tags_include_needs_all',
@@ -43,7 +43,7 @@ use function Groundhogg\html;
             <div class="tags-exclude inline-block search-param">
                 <?php
 
-                echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Excludes Tags', 'groundhogg' ) );
+                echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Excludes contacts with', 'groundhogg' ) );
                 echo "&nbsp;";
 
                 echo html()->dropdown( [
@@ -72,10 +72,10 @@ use function Groundhogg\html;
 
                 <?php
 
-                echo html()->e( 'label', [ 'class' => 'search-label' ], __('Filter By Status', 'groundhogg' ) );
+                echo html()->e( 'label', [ 'class' => 'search-label' ], __('Filter By Optin Status', 'groundhogg' ) );
                 echo "&nbsp;";
 
-                echo html()->select2( [
+                echo html()->wrap( html()->select2( [
                     'name' => 'optin_status[]',
                     'id' => 'optin_status',
                     'class' => 'gh-select2',
@@ -91,7 +91,7 @@ use function Groundhogg\html;
                     ],
                     'multiple' => true,
                     'selected' => wp_parse_id_list( get_url_var( 'optin_status' ) ),
-                ] );
+                ] ), 'p' );
 
                 ?>
             </div>
