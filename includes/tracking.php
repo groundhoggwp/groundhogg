@@ -587,7 +587,7 @@ class Tracking
         }
 
         // Tracking not available.
-        wp_die( 'Oops... You may have clicked an expired link, or your cookies may not be enabled.' );
+        wp_die( __( 'Oops... This link is currently unavailable.', 'groundhogg' ) );
     }
 
     /**

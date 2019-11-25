@@ -163,6 +163,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.6.3 (2019-11-24) =
+* ADDED Complained view to contact list.
+* TWEAKED Tracking link error message when error occurs.
+* TWEAKED Ignore form spam check if user is logged in.
+* FIXED PHP notice occurring when hiding sending service settings.
+
 = 2.1.6.2 (2019-11-22) =
 * ADDED optin status filter to contact search
 * TWEAKED Changed /files/ permalink structure to /uploads/ for backwards compatibility with older versions of WP multisite.

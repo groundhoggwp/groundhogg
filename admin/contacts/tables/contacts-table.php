@@ -263,6 +263,7 @@ class Contacts_Table extends WP_List_Table
             'opted_out' => Plugin::$instance->dbs->get_db('contacts')->count(['optin_status' => Preferences::UNSUBSCRIBED]),
             'spam' => Plugin::$instance->dbs->get_db('contacts')->count(['optin_status' => Preferences::SPAM]),
             'bounce' => Plugin::$instance->dbs->get_db('contacts')->count(['optin_status' => Preferences::HARD_BOUNCE]),
+            'complained' => Plugin::$instance->dbs->get_db('contacts')->count(['optin_status' => Preferences::COMPLAINED]),
         );
 
         return apply_filters('contact_views', array(
@@ -273,7 +274,8 @@ class Contacts_Table extends WP_List_Table
             'unconfirmed' => "<a class='" . ($view === Preferences::UNCONFIRMED ? 'current' : '') . "' href='" . $base_url . Preferences::UNCONFIRMED . "'>" . _x('Unconfirmed', 'view', 'groundhogg') . ' <span class="count">(' . number_format_i18n($count['unconfirmed']) . ')</span>' . "</a>",
             'opted_out' => "<a class='" . ($view === Preferences::UNSUBSCRIBED ? 'current' : '') . "' href='" . $base_url . Preferences::UNSUBSCRIBED . "'>" . _x('Unsubscribed', 'view', 'groundhogg') . ' <span class="count">(' . number_format_i18n($count['opted_out']) . ')</span>' . "</a>",
             'spam' => "<a class='" . ($view === Preferences::SPAM ? 'current' : '') . "' href='" . $base_url . Preferences::SPAM . "'>" . _x('Spam', 'view', 'groundhogg') . ' <span class="count">(' . number_format_i18n($count['spam']) . ')</span>' . "</a>",
-            'bounce' => "<a class='" . ($view === Preferences::HARD_BOUNCE ? 'current' : '') . "' href='" . $base_url . Preferences::HARD_BOUNCE . "'>" . _x('Bounced', 'view', 'groundhogg') . ' <span class="count">(' . number_format_i18n($count['bounce']) . ')</span>' . "</a>"
+            'bounce' => "<a class='" . ($view === Preferences::HARD_BOUNCE ? 'current' : '') . "' href='" . $base_url . Preferences::HARD_BOUNCE . "'>" . _x('Bounced', 'view', 'groundhogg') . ' <span class="count">(' . number_format_i18n($count['bounce']) . ')</span>' . "</a>",
+            'complained' => "<a class='" . ($view === Preferences::COMPLAINED ? 'current' : '') . "' href='" . $base_url . Preferences::COMPLAINED . "'>" . _x('Complained', 'view', 'groundhogg') . ' <span class="count">(' . number_format_i18n($count['complained']) . ')</span>' . "</a>"
         ));
     }
 
