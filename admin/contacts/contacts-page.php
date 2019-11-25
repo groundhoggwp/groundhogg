@@ -737,6 +737,8 @@ class Contacts_Page extends Admin_Page
                 $blacklist = sanitize_textarea_field($blacklist);
                 update_option('blacklist_keys', $blacklist);
             }
+
+	        do_action( 'groundhogg/admin/contacts/spam', $contact );
         }
 
         $this->add_notice(
@@ -757,6 +759,8 @@ class Contacts_Page extends Admin_Page
         foreach ($this->get_items() as $id) {
             $contact = Plugin::$instance->utils->get_contact($id);
             $contact->change_marketing_preference( Preferences::UNCONFIRMED );
+
+            do_action( 'groundhogg/admin/contacts/unspam', $contact );
         }
 
         $this->add_notice(
@@ -777,6 +781,8 @@ class Contacts_Page extends Admin_Page
         foreach ($this->get_items() as $id) {
             $contact = Plugin::$instance->utils->get_contact($id);
             $contact->change_marketing_preference( Preferences::UNCONFIRMED );
+
+	        do_action( 'groundhogg/admin/contacts/unbounce', $contact );
         }
 
         $this->add_notice(

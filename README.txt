@@ -165,6 +165,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.1.6.3 (2019-11-24) =
 * ADDED Complained view to contact list.
+* ADDED More hooks to optin status management functions for the contacts admin screen
 * TWEAKED Tracking link error message when error occurs.
 * TWEAKED Ignore form spam check if user is logged in.
 * FIXED PHP notice occurring when hiding sending service settings.
