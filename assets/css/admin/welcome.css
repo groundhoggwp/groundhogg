@@ -1,18 +1,18 @@
-.phil{
-    position: fixed;
-    bottom: -80px;
-    right: -80px;
-    transform: rotate(-20deg);
-}
+/*.phil{*/
+/*    position: fixed;*/
+/*    bottom: -80px;*/
+/*    right: -80px;*/
+/*    transform: rotate(-20deg);*/
+/*}*/
 
-#wpcontent{
-    padding: 0;
-    background-color: rgba(169, 169, 169, 0.25);
-}
+/*#wpcontent{*/
+/*    padding: 0;*/
+/*    background-color: rgba(169, 169, 169, 0.25);*/
+/*}*/
 
-#wpfooter{
-    background-color: #F1F1F1;
-}
+/*#wpfooter{*/
+/*    background-color: #F1F1F1;*/
+/*}*/
 
 #welcome-page{
     max-width: 1000px;
@@ -23,9 +23,9 @@
     text-align: center;
 }
 
-.powered-by {
-    color:white;
-}
+/*.powered-by {*/
+/*    color:white;*/
+/*}*/
 
 .powered-by img{
     vertical-align: middle;
@@ -33,9 +33,10 @@
 
 .welcome-header h1{
     font-size: 50px;
-    color: white;
-    font-family: "Arial Black";
-    text-shadow: 2px 2px 2px rgba(43, 43, 43, 0.63);
+    font-weight: 600;
+    /*color: white;*/
+    /*font-family: "Arial Black";*/
+    /*text-shadow: 2px 2px 2px rgba(43, 43, 43, 0.63);*/
 }
 
 .progress h2{
@@ -64,16 +65,15 @@
     /*border-radius: 5px ;*/
 }
 
-.col h3{
-    text-align: center;
-    font-family: "Arial Black";
-    text-transform: uppercase;
-}
+/*.col h3{*/
+/*    text-align: center;*/
+/*    text-transform: uppercase;*/
+/*}*/
 
-.postbox .hndle{
-    font-family: "Arial Black";
-    text-transform: uppercase;
-}
+/*.postbox .hndle{*/
+/*    font-family: "Arial Black";*/
+/*    text-transform: uppercase;*/
+/*}*/
 
 
 #ghmenu ul {
