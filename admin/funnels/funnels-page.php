@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
+use function Groundhogg\dashicon;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
@@ -158,7 +159,9 @@ class Funnels_Page extends Admin_Page
                 wp_enqueue_style( 'groundhogg-admin-funnel-editor-v2' );
                 wp_enqueue_script( 'groundhogg-admin-funnel-editor-v2' );
                 wp_localize_script( 'groundhogg-admin-funnel-editor-v2', 'Funnel', [
-                    'id' => absint( get_request_var( 'funnel' ) )
+                    'id' => absint( get_request_var( 'funnel' ) ),
+                    'save_text' => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
+                    'saving_text' => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
                 ] );
             } else {
                 wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
@@ -1028,7 +1031,7 @@ class Funnels_Page extends Admin_Page
         }
 
         if ( $this->is_v2() ) {
-            include dirname( __FILE__ ) . '/funnel-editor-v2.php';
+            include dirname( __FILE__ ) . '/funnel-editor-v3.php';
             return;
         }
 

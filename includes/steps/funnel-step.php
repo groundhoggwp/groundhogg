@@ -449,15 +449,28 @@ abstract class Funnel_Step extends Supports_Errors
      */
     public function reporting_v2( $step )
     {
-        echo html()->e( 'h3', [ 'class' => 'step-title-large' ], $step->get_title() );
 
-        $stats = $this->quick_stats( $step );
+        ?>
+        <div class="step-title-wrap">
+            <div class="step-title-view">
+                <?php printf( __( 'Reporting %s', 'groundhogg' ), html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ) ); ?>
+            </div>
+        </div>
+        <div class="reporting-results">
+            <h3><?php _e( 'History', 'groundhogg' ); ?></h3>
+            <?php
 
-        $cols = wp_list_pluck( $stats, 0 );
-        $stats = wp_list_pluck( $stats, 1 );
+            $stats = $this->quick_stats( $step );
 
-        html()->list_table( [ 'style' => [ 'margin-bottom' => '10px' ] ], $cols, [ $stats ], false );
-    }
+            $cols = wp_list_pluck( $stats, 0 );
+            $stats = wp_list_pluck( $stats, 1 );
+
+            html()->list_table( [ 'style' => [ 'margin-bottom' => '10px' ] ], $cols, [ $stats ], false );
+
+            ?>
+        </div>
+        <?php
+   }
 
     /**
      * Get the reporting view for the STEP
@@ -735,21 +748,26 @@ abstract class Funnel_Step extends Supports_Errors
             <div class="inside">
                 <!-- SETTINGS -->
                 <div class="step-edit">
+                    <div class="step-title-wrap">
+                        <div class="step-title-edit hidden">
+                            <?php
+                            $args = array(
+                                'id'    => $this->setting_id_prefix( 'title' ),
+                                'name'  => $this->setting_name_prefix( 'title' ),
+                                'value' => __( $step->get_title(), 'groundhogg' ),
+                                'title' => __( 'Step Title', 'groundhogg' ),
+                                'class' => 'step-title-large edit-title',
+                                'data-id' => $step->get_id(),
+                            );
+
+                            echo Plugin::$instance->utils->html->input( $args );
+                            ?>
+                        </div>
+                        <div class="step-title-view">
+                            <?php printf( __( 'Editing %s', 'groundhogg' ), html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ) ); ?>
+                        </div>
+                    </div>
                     <div class="custom-settings">
-
-                        <?php
-                        $args = array(
-                            'id'    => $this->setting_id_prefix( 'title' ),
-                            'name'  => $this->setting_name_prefix( 'title' ),
-                            'value' => __( $step->get_title(), 'groundhogg' ),
-                            'title' => __( 'Step Title', 'groundhogg' ),
-                            'class' => 'step-title-large',
-                            'data-id' => $step->get_id(),
-                        );
-
-                        echo Plugin::$instance->utils->html->input( $args );
-                        ?>
-
                         <?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
                         <?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
                         <?php $this->settings( $step ); ?>
@@ -772,6 +790,8 @@ abstract class Funnel_Step extends Supports_Errors
 
 	/**
 	 * @param $step Step
+     *
+     * @deprecated since 2.1
 	 */
 	public function html( $step ){
 
