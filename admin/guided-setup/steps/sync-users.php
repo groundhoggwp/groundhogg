@@ -26,7 +26,7 @@ class Sync_Users extends Step
 
     public function get_description()
     {
-        return _x( 'Sync your existing users with the your contact lists.', 'guided_setup', 'groundhogg' );
+        return _x( 'Sync your existing users with your contact lists.', 'guided_setup', 'groundhogg' );
     }
 
     public function get_content()
