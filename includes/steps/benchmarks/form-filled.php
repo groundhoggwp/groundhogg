@@ -761,6 +761,8 @@ class Form_Filled extends Benchmark
     {
         parent::reporting_v2( $step );
 
+        ?><div class="reporting-results"><?php
+
         $times = $this->get_reporting_interval();
 
         $start_time = $times[ 'start_time' ];
@@ -823,6 +825,10 @@ class Form_Filled extends Benchmark
 
         endif;
 
+        ?>
+        <h3><?php _e( 'Activity', 'groundhogg' ); ?></h3>
+        <?php
+
         html()->list_table(
             [ 'class' => 'form_activity' ],
             [
@@ -840,6 +846,7 @@ class Form_Filled extends Benchmark
             false
         );
 
+        ?></div><?php
 
     }
 }

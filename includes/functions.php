@@ -458,7 +458,7 @@ function sort_by_string_in_array( $key )
  */
 function is_json_error( $json )
 {
-    return isset( $json->code ) && isset( $json->message ) && $json->code !== 'success';
+    return isset_not_empty( $json, 'code' ) && isset_not_empty( $json, 'message' ) && get_array_var( $json, 'code' ) !== 'success';
 }
 
 /**
@@ -469,9 +469,8 @@ function is_json_error( $json )
  */
 function get_json_error( $json )
 {
-
     if ( is_json_error( $json ) ) {
-        return new WP_Error( $json->code, $json->message, $json->data );
+        return new WP_Error( get_array_var( $json, 'code' ), get_array_var( $json, 'message' ), get_array_var( $json, 'data' ) );
     }
 
     return false;
@@ -2210,9 +2209,10 @@ function is_main_blog()
  * @param array $body
  * @param string $method
  * @param array $headers
- * @return array|bool|WP_Error
+ * @param bool $as_array
+ * @return array|bool|WP_Error|object
  */
-function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [] )
+function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [], $as_array=false )
 {
     $method = strtoupper( $method );
 
@@ -2251,7 +2251,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
         return $response;
     }
 
-    $json = json_decode( wp_remote_retrieve_body( $response ) );
+    $json = json_decode( wp_remote_retrieve_body( $response ), $as_array );
 
     if ( !$json ) {
         return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), wp_remote_retrieve_body( $response ) );

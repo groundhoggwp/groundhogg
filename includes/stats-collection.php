@@ -28,7 +28,7 @@ class Stats_Collection
      */
     public function is_enabled()
     {
-        return is_option_enabled( 'gh_opted_in_stats_collection' );
+        return apply_filters( 'groundhogg/stats_collection/is_enabled', is_option_enabled( 'gh_opted_in_stats_collection' ) );
     }
 
     /**
