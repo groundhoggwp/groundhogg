@@ -23,6 +23,22 @@
     text-align: center;
 }
 
+.postbox img{
+    max-width: 100%;
+}
+
+.guide-link{
+    margin: 10px auto 20px;
+    text-decoration: none;
+}
+
+.guide-link,
+#wpbody .big-button{
+    text-align: center;
+    width: 300px;
+    display: block;
+}
+
 /*.powered-by {*/
 /*    color:white;*/
 /*}*/
@@ -32,11 +48,13 @@
 }
 
 .welcome-header h1{
-    font-size: 50px;
-    font-weight: 600;
-    /*color: white;*/
-    /*font-family: "Arial Black";*/
-    /*text-shadow: 2px 2px 2px rgba(43, 43, 43, 0.63);*/
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.welcome-header h1 img{
+    vertical-align: middle;
+    margin-left: 10px;
 }
 
 .progress h2{

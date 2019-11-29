@@ -73,8 +73,13 @@
 
             $document.on( 'change', '.auto-save', function( e ){
                 e.preventDefault();
-                self.save( $('#funnel-form') );
+                self.save( $form );
             });
+
+            $document.on( 'auto-save', function (e) {
+                e.preventDefault();
+                self.save( $form );
+            } );
 
             // Funnel Title
             $document.on( 'click', '.title-view .title', function( e ){
@@ -184,6 +189,10 @@
 
             adminAjaxRequest( fd, function ( response ) {
                 handleNotices( response.data.notices );
+
+                setTimeout( function () {
+                    $( '.notice-success' ).fadeOut();
+                }, 3000 );
 
                 $saveButton.removeClass( 'spin' );
                 $saveButton.html( self.save_text );

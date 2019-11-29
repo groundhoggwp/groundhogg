@@ -104,47 +104,46 @@ $funnel = new Funnel($funnel_id);
             <div id="reporting">
                 <div class="reporting-filters"><?php
 
-                _e( 'Reporting date range: ', 'groundhogg' );
+                    _e('Reporting date range: ', 'groundhogg');
 
-                $args = array(
-                    'name' => 'range',
-                    'id' => 'date_range',
-                    'class' => '',
-//                    'style' => [ 'margin-left' => '5px' ],
-                    'options' => Plugin::$instance->reporting->get_reporting_ranges(),
-                    'selected' => get_request_var('range', 'this_week'), //todo
-                );
+                    $args = array(
+                        'name' => 'range',
+                        'id' => 'date_range',
+                        'class' => '',
+                        'options' => Plugin::$instance->reporting->get_reporting_ranges(),
+                        'selected' => get_request_var('range', 'this_week'), //todo
+                    );
 
-                echo Plugin::$instance->utils->html->dropdown($args);
+                    echo Plugin::$instance->utils->html->dropdown($args);
 
-                $class = get_request_var('date_range') === 'custom' ? '' : 'hidden'; //todo
+                    $class = get_request_var('date_range') === 'custom' ? '' : 'hidden'; //todo
 
-                ?>
-                <span class="custom-range <?php echo $class ?>"><?php
-                    _e( 'From: ', 'groundhogg' );
-                    echo Plugin::$instance->utils->html->date_picker(array(
-                        'name' => 'custom_date_range_start',
-                        'id' => 'custom_date_range_start',
-                        'class' => 'input',
-                        'value' => get_request_var('custom_date_range_start'),
-                        'attributes' => '',
-                        'placeholder' => 'YYYY-MM-DD',
-                        'min-date' => date('Y-m-d', strtotime('-100 years')),
-                        'max-date' => date('Y-m-d', strtotime('+100 years')),
-                        'format' => 'yy-mm-dd'
-                    ));
-                    _e( 'To: ', 'groundhogg' );
-                    echo Plugin::$instance->utils->html->date_picker(array(
-                        'name' => 'custom_date_range_end',
-                        'id' => 'custom_date_range_end',
-                        'class' => 'input',
-                        'value' => get_request_var('custom_date_range_end'), //todo
-                        'attributes' => '',
-                        'placeholder' => 'YYYY-MM-DD',
-                        'min-date' => date('Y-m-d', strtotime('-100 years')),
-                        'max-date' => date('Y-m-d', strtotime('+100 years')),
-                        'format' => 'yy-mm-dd'
-                    )); ?>
+                    ?>
+                    <span class="custom-range <?php echo $class ?>"><?php
+                        _e('From: ', 'groundhogg');
+                        echo Plugin::$instance->utils->html->date_picker(array(
+                            'name' => 'custom_date_range_start',
+                            'id' => 'custom_date_range_start',
+                            'class' => 'input',
+                            'value' => get_request_var('custom_date_range_start'),
+                            'attributes' => '',
+                            'placeholder' => 'YYYY-MM-DD',
+                            'min-date' => date('Y-m-d', strtotime('-100 years')),
+                            'max-date' => date('Y-m-d', strtotime('+100 years')),
+                            'format' => 'yy-mm-dd'
+                        ));
+                        _e('To: ', 'groundhogg');
+                        echo Plugin::$instance->utils->html->date_picker(array(
+                            'name' => 'custom_date_range_end',
+                            'id' => 'custom_date_range_end',
+                            'class' => 'input',
+                            'value' => get_request_var('custom_date_range_end'), //todo
+                            'attributes' => '',
+                            'placeholder' => 'YYYY-MM-DD',
+                            'min-date' => date('Y-m-d', strtotime('-100 years')),
+                            'max-date' => date('Y-m-d', strtotime('+100 years')),
+                            'format' => 'yy-mm-dd'
+                        )); ?>
                 </span>
                     <?php submit_button(_x('Refresh', 'action', 'groundhogg'), 'secondary', 'change_reporting', false); ?>
                 </div>
@@ -164,7 +163,7 @@ $funnel = new Funnel($funnel_id);
                 <div>
                     <?php echo Plugin::$instance->utils->html->modal_link(array(
                         'title' => __('Replacements', 'groundhogg'),
-                        'text' => dashicon( 'admin-users' ) . __( 'Replacements', 'groundhogg' ),
+                        'text' => dashicon('admin-users') . __('Replacements', 'groundhogg'),
                         'footer_button_text' => __('Insert'),
                         'id' => 'replacements',
                         'class' => 'no-padding replacements replacements-button button-secondary',
@@ -176,7 +175,7 @@ $funnel = new Funnel($funnel_id);
                 <div id="add-contacts" class="<?php if (!$funnel->is_active()) echo 'hidden'; ?>">
                     <?php echo html()->modal_link([
                         'title' => __('Add Contacts', 'groundhogg'),
-                        'text' => dashicon( 'plus' ) . __( 'Add Contacts', 'groundhogg' ),
+                        'text' => dashicon('plus') . __('Add Contacts', 'groundhogg'),
                         'footer_button_text' => __('Close'),
                         'id' => '',
                         'class' => 'add-contacts-link button',
@@ -189,10 +188,11 @@ $funnel = new Funnel($funnel_id);
                 <div id="export">
                     <a id="copy-share-link" href="#" class="button"><span
                                 title="<?php esc_attr_e('Copy share link', 'groundhogg') ?>"
-                                class="dashicons dashicons-share"></span> <?php _e( 'Share', 'groundhogg' ); ?></a>
+                                class="dashicons dashicons-share"></span> <?php _e('Share', 'groundhogg'); ?></a>
                     <input id="share-link" type="hidden" value="<?php echo esc_attr($funnel->export_url()); ?>">
                     <a href="<?php echo esc_url($funnel->export_url()); ?>" class="button"><span
-                                title="<?php esc_attr_e('Export', 'groundhogg') ?>" class="dashicons dashicons-download"></span> <?php _e( 'Export', 'groundhogg' ); ?></a>
+                                title="<?php esc_attr_e('Export', 'groundhogg') ?>"
+                                class="dashicons dashicons-download"></span> <?php _e('Export', 'groundhogg'); ?></a>
                 </div>
             </div>
         </div>
@@ -260,16 +260,36 @@ $funnel = new Funnel($funnel_id);
                             ?>
                         </div>
                     </div>
-                    <div id="intro" class="postbox" style="margin: 20px 20px;">
-                        <div class="inside">
-                            <h1><?php _e('Funnel Builder V2 (BETA)', 'groundhogg'); ?></h1>
-                            <p><?php _e('Welcome to version 2 of the Funnel Builder!'); ?></p>
-                            <p><?php _e('Our newest iteration of the funnel builder has been designed to provide a superior editing experience on both large and small screens.', 'groundhogg'); ?></p>
-                            <div style="position:relative;padding-top:56.25%;">
-                                <iframe src="https://player.vimeo.com/video/353449484?title=0&byline=0&portrait=0"
-                                        frameborder="0" allowfullscreen
-                                        style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
-                            </div>
+                    <div id="intro">
+                        <?php
+
+                        echo html()->e( 'img', [
+                            'src' => GROUNDHOGG_ASSETS_URL . 'images/funnel-intro/select-a-step-to-edit.png',
+                            'class' => 'select-a-step-arrow'
+                        ] );
+
+                        echo html()->e( 'img', [
+                            'src' => GROUNDHOGG_ASSETS_URL . 'images/funnel-intro/actions-links-arrow.png',
+                            'class' => 'actions-links-arrow'
+                        ] );
+
+                        echo html()->modal_link([
+                            'title' => __('Funnel Builder Tour', 'groundhogg'),
+                            'text' => html()->e('img', [
+                                'src' => GROUNDHOGG_ASSETS_URL . 'images/funnel-intro/funnel-builder-guided-tour.png'
+                            ]),
+                            'footer_button_text' => __('Close'),
+                            'source' => 'funnel-builder-guided-tour',
+                            'class' => 'img-link no-padding demo-video',
+                            'height' => 555,
+                            'width' => 800,
+                            'footer' => 'true',
+                            'preventSave' => 'true',
+                        ]);
+
+                        ?>
+                        <div class="hidden" id="funnel-builder-guided-tour">
+                            <iframe width="800" height="450" src="https://www.youtube.com/embed/Bof5kMEpXrY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         </div>
                     </div>
                     <div class="step-settings">

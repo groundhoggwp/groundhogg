@@ -65,13 +65,6 @@ html{
     padding: 0 !important;
 }
 
-.full-screen .funnel-editor-header{
-    top: 0;
-    left: 0;
-    padding: 8px 8px 8px 8px;
-    max-width: 100%;
-}
-
 /* END Full Screen */
 
 #screen-meta-links{
@@ -182,7 +175,7 @@ html{
     box-sizing: border-box;
     position: fixed;
     height: 60px;
-    padding: 8px 8px 8px 8px;
+    padding: 8px 8px 8px 16px;
     background: #FFFFFF;
     border-bottom: 1px solid #ccd0d4;
     display: block;
@@ -640,8 +633,8 @@ table.embed-options td{
 .step-title-wrap{
     background: #FFF;
     border-bottom: 1px solid #ccd0d4;
-    padding: 3px 20px;
-    height: 50px;
+    padding: 8px 20px;
+    height: 45px;
 }
 
 .step-title {
@@ -690,8 +683,7 @@ table.embed-options td{
 }
 
 .form-table th {
-    width: auto;
-    max-width: 120px;
+    width: 160px;
 }
 
 input, select, textarea{
@@ -721,4 +713,28 @@ input, select, textarea{
 
 .step-error{
  font-size: 24px;
+}
+
+.demo-video{
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    margin: 40px auto;
+    margin-top: 250px;
+    max-width: 722px;
+    display: block;
+}
+
+.demo-video img{
+    vertical-align: middle;
+}
+
+.actions-links-arrow{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.select-a-step-arrow{
+    position: absolute;
+    top:0;
+    left:0;
 }

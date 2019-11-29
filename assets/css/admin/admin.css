@@ -111,7 +111,7 @@ input[type=range].slider:focus::-ms-fill-upper {
 }
 
 .big-toggle.onoffswitch{
-    width: 126px;
+    width: 130px;
 }
 
 .onoffswitch {
@@ -170,7 +170,7 @@ input[type=range].slider:focus::-ms-fill-upper {
 .big-toggle .onoffswitch-switch{
     width: 34px;
     height: 40px;
-    right: 90px;
+    right: 94px;
 }
 
 .onoffswitch-switch {

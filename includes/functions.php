@@ -1861,8 +1861,10 @@ function floating_phil()
  *
  * @param string $color
  * @param int $width
+ *
+ * @return string|bool
  */
-function groundhogg_logo( $color = 'black', $width = 300 )
+function groundhogg_logo( $color = 'black', $width = 300, $echo=true )
 {
 
     switch ( $color ) {
@@ -1875,7 +1877,17 @@ function groundhogg_logo( $color = 'black', $width = 300 )
             break;
     }
 
-    ?><img src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/' . $link; ?>" width="<?php echo $width; ?>"><?php
+    $img = html()->e( 'img', [
+        'src' => GROUNDHOGG_ASSETS_URL . 'images/' . $link,
+        'width' => $width
+    ] );
+
+    if ( $echo ){
+        echo $img;
+        return true;
+    }
+
+    return $img;
 }
 
 /**
@@ -2730,3 +2742,17 @@ function has_all( $items=[], $dataset=[] )
     // If the count of intersect is the same as $items then all the items are in the dataset
     return count( array_intersect( $items, $dataset ) ) === count( $items );
 }
+
+/**
+ * If WP CRON is not
+ */
+function fallback_disable_wp_cron()
+{
+    if ( ! defined( 'DISABLE_WP_CRON' ) && is_option_enabled( 'gh_disable_wp_cron' ) ){
+        define( 'DISABLE_WP_CRON', true );
+        define( 'GH_SHOW_DISABLE_WP_CRON_OPTION', true );
+    }
+}
+
+// Before wp_cron is added.
+add_action( 'init', __NAMESPACE__ . '\fallback_disable_wp_cron', 1 );

@@ -60,6 +60,8 @@
                 e.addingEmail = false;
                 e.editingEmail = false;
 
+                $(document).trigger( 'auto-save' );
+
             } );
 
         },
