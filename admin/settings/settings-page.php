@@ -1029,7 +1029,11 @@ class Settings_Page extends Admin_Page
         do_action('groundhogg/admin/register_settings/before', $this);
 
         foreach ($this->settings as $id => $setting) {
-//            print_r($setting[ 'section' ]);
+
+            if ( ! isset_not_empty( $this->sections, $setting[ 'section' ] ) ){
+                continue;
+            }
+
             add_settings_field($setting['id'], $setting['label'], array($this, 'settings_callback'), 'gh_' . $this->sections[$setting['section']]['tab'], 'gh_' . $setting['section'], $setting);
             $args = isset_not_empty($setting, 'args') ? $setting['args'] : [];
             register_setting('gh_' . $this->sections[$setting['section']]['tab'], $setting['id'], $args);
