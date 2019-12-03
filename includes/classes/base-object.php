@@ -34,6 +34,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
      */
     public function __construct( $identifier_or_args = 0, $field = null )
     {
+        // Fallback plan
+        if ( ! are_dbs_initialised() ){
+            emergency_init_dbs();
+        }
+
         if ( ! $field ){
             $field = $this->get_identifier_key();
         }

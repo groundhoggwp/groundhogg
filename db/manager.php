@@ -19,6 +19,8 @@ class Manager
      */
     protected $dbs = [];
 
+    protected $initialized = false;
+
     /**
      * Manager constructor.
      */
@@ -34,6 +36,14 @@ class Manager
     public function listen_for_addons()
     {
         do_action( 'groundhogg/db/manager/init', $this );
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_initialized()
+    {
+        return $this->initialized;
     }
 
     /**
@@ -61,6 +71,8 @@ class Manager
          * Runs when the DB Manager is setup and all the standard DBs have been initialized.
          */
         $this->listen_for_addons();
+
+        $this->initialized = true;
     }
 
     /**

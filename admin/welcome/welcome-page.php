@@ -363,7 +363,6 @@ class Welcome_Page extends Admin_Page
                         </div>
                     </div>
 
-
                     <!-- Configure CRON -->
                     <div class="postbox">
                     <?php

@@ -101,7 +101,7 @@ class Contact extends Base_Object_With_Meta
      */
     protected function get_db()
     {
-        return Plugin::instance()->dbs->get_db('contacts');
+        return get_db('contacts' );
     }
 
     /**
@@ -111,7 +111,7 @@ class Contact extends Base_Object_With_Meta
      */
     protected function get_meta_db()
     {
-        return Plugin::instance()->dbs->get_db('contactmeta');
+        return get_db('contactmeta');
     }
 
     /**
@@ -121,7 +121,7 @@ class Contact extends Base_Object_With_Meta
      */
     protected function get_tags_db()
     {
-        return Plugin::instance()->dbs->get_db('tags');
+        return get_db('tags');
     }
 
     /**
@@ -131,7 +131,7 @@ class Contact extends Base_Object_With_Meta
      */
     protected function get_tag_rel_db()
     {
-        return Plugin::instance()->dbs->get_db('tag_relationships');
+        return get_db('tag_relationships');
     }
 
     /**

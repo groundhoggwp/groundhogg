@@ -145,7 +145,8 @@ class Tag_Mapping extends Bulk_Job
      */
     public function apply_tags_to_contact_from_new_roles( $user_id, $role )
     {
-        $contact = Plugin::$instance->utils->get_contact( $user_id, true );
+
+        $contact = get_contactdata( $user_id, true );
 
         if ( ! $contact || ! $contact->exists() ){
             return;

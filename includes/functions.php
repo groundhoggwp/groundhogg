@@ -110,6 +110,24 @@ function get_db( $name )
 }
 
 /**
+ * Can the dbs be used?
+ *
+ * @return bool
+ */
+function are_dbs_initialised()
+{
+    return Plugin::$instance->dbs->is_initialized();
+}
+
+/**
+ * Emergency initialize the dbs.
+ */
+function emergency_init_dbs()
+{
+    Plugin::$instance->dbs->init_dbs();
+}
+
+/**
  * Wrapper
  *
  * @param string $option
