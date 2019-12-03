@@ -854,7 +854,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         <td>
                             <?php
 
-                            if ( is_serialized( $value ) ){
+                            if ( is_serialized( $value ) || is_array( $value ) || is_object( $value ) ){
                                 $args = array(
                                     'name' => 'meta[' . $meta_key . ']',
                                     'id' => $meta_key,

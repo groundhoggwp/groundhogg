@@ -369,6 +369,7 @@ button.button.save-button {
     /*padding-bottom: 70px;*/
 }
 .wpgh-element p{
+    font-size: 16px;
     margin: -12px 0 0 0;
 }
 
@@ -524,8 +525,27 @@ button.button.save-button {
     min-height: 100%;
 }
 
+.steps-select .inside{
+    padding: 0 25px
+}
+
 .steps-select .description{
     padding: 10px;
+}
+
+.steps-select .nav-tab-wrapper{
+    text-align: center;
+}
+
+.steps-select .nav-tab{
+    float: none;
+    display: inline-block;
+}
+
+.steps-select .nav-tab-wrapper .nav-tab{
+    font-size: 20px;
+    padding: 5px 15px;
+    /*font-weight: bold;*/
 }
 
 .step-select-header{
@@ -539,7 +559,7 @@ button.button.save-button {
 td.step-icon{
     border: 1px #ccd0d4 solid;
     background: #ffffff;
-    height: 100px;
+    height: 115px;
     border-radius: 5px;
     padding: 5px;
 }

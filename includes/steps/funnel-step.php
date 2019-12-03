@@ -690,19 +690,15 @@ abstract class Funnel_Step extends Supports_Errors
             <button title="Duplicate" type="button" class="handlediv duplicate-step">
                 <span class="dashicons dashicons-admin-page"></span>
             </button>
-            <!-- HELP -->
-            <button title="Help" type="button" class="handlediv help">
-                <?php echo html()->help_icon( $this->get_help_article() ); ?>
-            </button>
             <?php
                 echo html()->modal_link( [
 	                'title'     => __( 'Add Step' ),
 	                'text'      => dashicon( 'plus' ),
 	                'footer_button_text' => __( 'Cancel' ),
 	                'class'     => 'add-step button button-secondary no-padding',
-	                'source'    => 'steps',
+                    'source'    => 'steps',
 	                'height'    => 700,
-	                'width'     => 500,
+	                'width'     => 600,
 	                'footer'    => 'true',
 	                'preventSave'    => 'true',
                 ] );

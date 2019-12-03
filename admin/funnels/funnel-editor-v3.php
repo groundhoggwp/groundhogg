@@ -320,16 +320,14 @@ $funnel = new Funnel($funnel_id);
     <div class="steps-select">
         <?php
 
-        html()->tabs([
+        html()->tabs( [
             'benchmarks-tab' => __('Benchmarks', 'groundhogg'),
             'actions-tab' => __('Actions', 'groundhogg')
         ], 'benchmarks-tab');
 
         ?>
         <div id='benchmarks'>
-            <?php echo html()->help_icon('https://docs.groundhogg.io/docs/builder/benchmarks/'); ?>
             <div class="elements-inner inside">
-                <p class="description"><?php echo esc_html__('Benchmarks start and stop automation steps for a contact.', 'groundhogg'); ?></p>
                 <table>
                     <tbody>
                     <tr><?php
@@ -362,9 +360,7 @@ $funnel = new Funnel($funnel_id);
             </div>
         </div>
         <div id='actions' class="hidden">
-            <?php echo html()->help_icon('https://docs.groundhogg.io/docs/builder/actions/'); ?>
             <div class="inside">
-                <p class="description"><?php esc_html_e('Actions are launched whenever a contact completes a benchmark.', 'groundhogg'); ?></p>
                 <table>
                     <tbody>
                     <tr><?php

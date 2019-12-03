@@ -162,6 +162,17 @@ class Funnels_Page extends Admin_Page
                     'id' => absint( get_request_var( 'funnel' ) ),
                     'save_text' => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
                     'saving_text' => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
+                    'add_step_button' => html()->modal_link([
+                        'title' => __('Add Step'),
+                        'text' => dashicon('plus'),
+                        'footer_button_text' => __('Cancel'),
+                        'class' => 'add-step button button-secondary no-padding',
+                        'source' => 'steps',
+                        'height' => 700,
+                        'width' => 500,
+                        'footer' => 'true',
+                        'preventSave' => 'true',
+                    ])
                 ] );
             } else {
                 wp_enqueue_style( 'groundhogg-admin-funnel-editor' );

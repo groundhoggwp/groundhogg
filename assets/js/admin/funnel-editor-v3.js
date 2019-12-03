@@ -28,9 +28,9 @@
                 var $step = $( '#' + id );
                 $step.find( '.step-title' ).text( $title.val() )
             } );
-//
+
             $document.on( 'click', '#postbox-container-1 .step', function ( e ) {
-                self.makeActive( this.id );
+                self.makeActive( this.id, e );
             } );
 
             $document.on( 'click', 'td.step-icon', function ( e ) {
@@ -71,11 +71,13 @@
                 self.save( $form );
             });
 
+            /* Auto save */
             $document.on( 'change', '.auto-save', function( e ){
                 e.preventDefault();
                 self.save( $form );
             });
 
+            /* Auto save */
             $document.on( 'auto-save', function (e) {
                 e.preventDefault();
                 self.save( $form );
@@ -87,6 +89,7 @@
                 $( '.title-edit' ).show();
                 $( '#title' ).focus();
             });
+
 
             $document.on( 'blur change', '#title', function( e ){
 
@@ -249,6 +252,7 @@
                         var sid = '#settings-' + id;
                         var $step_settings = $( sid );
                         $step_settings.remove();
+                        $('html').removeClass( 'active-step' )
                     }
                 );
             } else {
@@ -300,10 +304,15 @@
         /**
          * Make the given step active.
          *
-         * @param id
+         * @param id string
+         * @param e object
          */
-        makeActive : function ( id ){
+        makeActive : function ( id, e ){
             var self = this;
+
+            if ( typeof e == 'undefined' ){
+                e = false;
+            }
 
             var $steps = self.getSteps();
             var $settings = self.getSettings();
@@ -313,12 +322,30 @@
 
             var was_active = $step.hasClass( 'active' );
 
-            $settings.find( '.step' ).addClass( 'hidden' );
-            $settings.find( '.step' ).removeClass( 'active' );
-            $steps.find( '.step' ).removeClass( 'active' );
-            $steps.find( '.is_active' ).val( null );
-            $html.removeClass( 'active-step' );
+            // Remove active from the active step
 
+            var make_inactive = true;
+
+            if ( e ){
+                var $target = $(e.target);
+
+                // console.log( e.target );
+
+                if ( was_active && ( $target.hasClass( 'dashicons' ) ||  $target.hasClass( 'add-step' ) ) ){
+                    // console.log( e )
+                    make_inactive = false;
+                }
+            }
+
+            if ( make_inactive ){
+                $settings.find( '.step' ).addClass( 'hidden' );
+                $settings.find( '.step' ).removeClass( 'active' );
+                $steps.find( '.step' ).removeClass( 'active' );
+                $steps.find( '.is_active' ).val( null );
+                $html.removeClass( 'active-step' );
+            }
+
+            // Make the clicked step active
             if ( ! was_active ){
                 $step.addClass( 'active' );
                 $step.find( '.is_active' ).val(1);
