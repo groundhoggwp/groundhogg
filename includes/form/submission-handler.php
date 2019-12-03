@@ -471,6 +471,11 @@ class Submission_Handler extends Supports_Errors
      */
     public function spam_check()
     {
+    	if ( is_user_logged_in() ){
+    		return false;
+	    }
+
+
         if ( !class_exists( '\Browser' ) ) {
             require_once GROUNDHOGG_PATH . 'includes/lib/browser.php';
         }

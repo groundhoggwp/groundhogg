@@ -1209,17 +1209,21 @@ function create_contact_from_user( $user, $sync_meta = false )
 function convert_user_to_contact_when_user_registered( $userId )
 {
     $user = get_userdata( $userId );
-    $contact = create_contact_from_user( $user );
 
-    if ( !$contact ) {
+    if ( ! $user || is_wp_error( $user ) ){
         return;
     }
 
-    if ( !is_admin() ) {
+    $contact = create_contact_from_user( $user );
+
+    if ( ! $contact || is_wp_error( $contact ) ) {
+        return;
+    }
+
+    if ( ! is_admin() ) {
 
         /* register front end which is technically an optin */
         $contact->update_meta( 'last_optin', time() );
-
     }
 
     /**
@@ -1260,6 +1264,7 @@ function get_form_list()
 
     return $form_options;
 }
+
 
 /**
  * Schedule a 1 off email notification
