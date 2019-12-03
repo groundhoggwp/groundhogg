@@ -168,7 +168,8 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TWEAKED Funnel builder UI now takes over the whole screen for the best editing experience.
 * TWEAKED Overall improvement of the layout of the funnel builder and js event management.
 * TWEAKED {files} will not longer take any parameters, just simply list the files in the filebox.
-* FIXED Deprecated Multisite function compatibility
+* TWEAKED Re-designed the guided setup onboarding experience.
+* FIXED Deprecated Multisite function compatibility.
 * FIXED Import CSV not uploading on some occasions.
 * FIXED Default attribute in the contact shortcode works now as per the docs
 

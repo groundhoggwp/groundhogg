@@ -741,6 +741,67 @@ class Tools_Page extends Tabbed_Admin_Page
 
     ########### OTHER ###########
 
+    public function cron_setup_view()
+    {
+
+        ?>
+        <h2><?php _e( 'WP Cron Setup', 'groundhogg' ); ?></h2>
+        <p><?php _e( 'Follow this guide to properly configure WP Cron.', 'groundhogg' ); ?></p>
+        <h3><?php _e( '1. Disable built-in WP Cron', 'groundhogg' ); ?></h3>
+        <p><?php _e( 'For the best performance you need to disable the built-in WP Cron. This will improve your overall WP performance while ensuring Groundhogg works properly.', 'groundhogg' ); ?></p>
+        <form method="post">
+            <?php
+            action_input( 'disable_wp_cron' );
+            wp_nonce_field( 'disable_wp_cron' );
+
+            if ( ! defined( 'DISABLE_WP_CRON' ) ){
+                submit_button( __( 'Disable WP Cron', 'groundhogg' ) );
+            } else {
+                ?>
+                <p><b><?php _e( 'Built-in WP Cron is already disabled.', 'groundhogg' ); ?></b></p>
+                <?php
+            }
+
+            ?>
+        </form>
+        <h3><?php _e( '2. Create an external Cron Job.', 'groundhogg' ); ?></h3>
+        <p><?php _e( 'You need to replace the built-in WP Cron with an external cron-job. Choose one of the following methods.', 'groundhogg' ); ?></p>
+        <h4><?php _e( 'a) Use Cron-Job.org', 'groundhogg' ); ?></h4>
+        <p><?php _e( 'Cron-Job.org is a free site you can use to quickly setup an external cron-job.', 'groundhogg' ); ?></p>
+        <p><?php _e( 'Use the below URL as the request URL.', 'groundhogg' ); ?></p>
+        <p><?php _e( '<b>Cron URL: </b>' ); echo html()->input([
+                'readonly' => true,
+                'onfocus' => "this.select()",
+                'value' => site_url( 'wp-cron.php' )
+            ]); ?></p>
+        <a class="button button-secondary" target="_blank" href="https://help.groundhogg.io/article/49-add-an-external-cron-job-cron-job-org"><?php _e( 'Use Cron-Job.org' ); ?></a>
+        <h4><?php _e( 'a) Use CPanel', 'groundhogg' ); ?></h4>
+        <p><?php _e( 'If you have access to CPanel you may be able to use CPanels cron system to setup the cron-job.', 'groundhogg' ); ?></p>
+        <p><?php _e( 'Use the below command.', 'groundhogg' ); ?></p>
+        <p><?php _e( '<b>Command: </b>' ); echo html()->input([
+                'readonly' => true,
+                'onfocus' => "this.select()",
+                'value' => sprintf( "/usr/bin/wget -q -O - %s >/dev/null 2>&1", site_url( 'wp-cron.php?doing_wp_cron=1' ) )
+            ]); ?></p>
+        <a class="button button-secondary" target="_blank" href="https://help.groundhogg.io/article/51-add-an-external-cron-job-cpanel"><?php _e( 'Use CPanel' ); ?></a>
+
+        <?php
+
+    }
+
+    public function process_disable_wp_cron()
+    {
+        if ( ! current_user_can( 'manage_options' ) ){
+            $this->wp_die_no_access();
+        }
+
+        update_option( 'gh_disable_wp_cron', true );
+
+        $this->add_notice( 'success', __( 'WP Cron has been disabled!', 'groundhogg' ) );
+
+        return false;
+    }
+
     public function remote_install_view()
     {
 

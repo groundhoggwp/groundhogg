@@ -366,14 +366,30 @@ class Welcome_Page extends Admin_Page
 
                     <!-- Configure CRON -->
                     <div class="postbox">
-                        <?php echo html()->e('img', [
-                            'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/correctly-configure-wp-cron-for-groundhogg.png'
-                        ]); ?>
-                        <?php echo html()->e('a', [
+                    <?php
+                        echo html()->modal_link([
+                            'title' => __('Configure WP-Cron', 'groundhogg'),
+                            'text' => html()->e('img', [
+                                    'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/correctly-configure-wp-cron-for-groundhogg.png'
+                            ]),
+                            'footer_button_text' => __('Close'),
+                            'source' => 'configure-wp-cron',
+                            'class' => 'img-link no-padding',
+                            'height' => 555,
+                            'width' => 800,
+                            'footer' => 'true',
+                            'preventSave' => 'true',
+                        ]);
+
+                        echo html()->e('a', [
                             'class' => 'button big-button',
-                            'href' => admin_page_url('gh_emails', ['action' => 'add'])
-                        ], __('Configure WP-Cron!')) ?>
-                        <?php echo html()->e('a', ['class' => 'guide-link', 'href' => 'https://help.groundhogg.io/article/45-how-to-disable-builtin-wp-cron', 'target' => '_blank'], __('Read the full guide', 'groundhogg')); ?>
+                            'href' => admin_page_url('gh_tools', ['tab' => 'cron_setup'] )
+                        ], __('Configure WP-Cron!'));
+
+                         echo html()->e('a', ['class' => 'guide-link', 'href' => 'https://help.groundhogg.io/article/45-how-to-disable-builtin-wp-cron', 'target' => '_blank'], __('Read the full guide', 'groundhogg')); ?>
+                        <div class="hidden" id="configure-wp-cron">
+                            <iframe width="800" height="450" src="https://www.youtube.com/embed/1-csY3W-WP0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
                     </div>
                 </div>
             </div>

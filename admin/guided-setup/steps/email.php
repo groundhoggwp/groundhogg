@@ -35,6 +35,8 @@ class Email extends Step
         wp_enqueue_script( 'groundhogg-sendwp' );
     }
 
+    protected function step_nav(){}
+
     public function get_description()
     {
         if (!Plugin::$instance->sending_service->has_dns_records()):

@@ -16,6 +16,7 @@ use Groundhogg\Admin\Guided_Setup\Steps\Start;
 use Groundhogg\Admin\Guided_Setup\Steps\Step;
 use Groundhogg\Admin\Guided_Setup\Steps\Sync_Users;
 use Groundhogg\Admin\Guided_Setup\Steps\Tracking;
+use function Groundhogg\dashicon;
 use function Groundhogg\floating_phil;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
@@ -67,13 +68,9 @@ class Guided_Setup extends Admin_Page
         $steps[] = new Start();
         $steps[] = new Business_Info();
         $steps[] = new Compliance();
-        $steps[] = new Import_Contacts();
-        $steps[] = new Sync_Users();
         $steps[] = new Email();
         $steps[] = new Tracking();
         $steps[] = new Premium();
-        $steps[] = new Community();
-        $steps[] = new Partners();
         $steps[] = new Finished();
 
         $this->steps = $steps;
@@ -186,6 +183,12 @@ class Guided_Setup extends Admin_Page
      */
     public function scripts(){
         wp_enqueue_style( 'groundhogg-admin' );
+        wp_enqueue_style( 'groundhogg-admin' );
+        wp_enqueue_style( 'groundhogg-admin-guided-setup' );
+        wp_enqueue_script( 'groundhogg-admin-guided-setup' );
+        wp_localize_script( 'groundhogg-admin-guided-setup', 'GroundhoggSetupObject', [
+            'saving_text' => dashicon( 'admin-generic' ) . __( 'Working...', 'groundhogg' ),
+        ] );
     }
 
     /**

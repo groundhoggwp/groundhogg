@@ -20,7 +20,7 @@ class Business_Info extends Step
 
     public function get_description()
     {
-        return _x( 'Your business information is needed so your list knows who is sending them emails. All this information will appear in your email footer to comply with CAN-SPAM legislation.', 'guided_setup', 'groundhogg' );
+        return _x( 'Your business information is needed so your list knows who is sending them emails. All this information will appear in your email footer to keep you compliant.', 'guided_setup', 'groundhogg' );
     }
 
     public function get_content()

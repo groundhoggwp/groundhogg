@@ -1,8 +1,11 @@
 <?php
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
+use function Groundhogg\admin_page_url;
+use function Groundhogg\dashicon;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
+use function Groundhogg\html;
 
 /**
  * Created by PhpStorm.
@@ -69,8 +72,8 @@ abstract class Step
             }
 
             if ( $this->save() ){
-                Plugin::$instance->notices->add( 'SAVED', _x( 'Configuration saved!', 'guided_setup', 'groundhogg' ) );
-                wp_redirect( sprintf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), $this->get_current_step_id() + 1 ) );
+                Plugin::$instance->notices->add( 'save', _x( 'Configuration saved!', 'guided_setup', 'groundhogg' ) );
+                wp_redirect( admin_page_url( 'gh_guided_setup', [ 'step' => $this->get_current_step_id() + 1 ] ) );
                 die();
             }
         }
@@ -88,37 +91,15 @@ abstract class Step
 
     protected function step_nav()
     {
-        $html = Plugin::$instance->utils->html;
-
-        echo $html->wrap( __( '&larr; Back', 'groundhogg' ), 'a', [
-            'class' => 'button button-secondary',
-            'style' => [
-                'float' => 'left'
-            ],
-            'href' => $this->prev_step_url()
-        ]);
-
-        echo $html->wrap( __( 'Save & Continue &rarr;', 'groundhogg' ), 'button', [
-            'class' => 'button button-primary',
+        echo html()->wrap( dashicon( 'yes' ) . __( 'Next', 'groundhogg' ), 'button', [
+            'class' => 'button button-primary big-button next-button',
             'type'  => 'submit',
-            'style' => [
-                'float' => 'right'
-            ]
-        ]);
-
-        echo $html->wrap( __( 'Skip', 'groundhogg' ), 'a', [
-            'class' => 'button button-secondary',
-            'style' => [
-                'float' => 'right',
-                'margin-right' => '10px',
-            ],
-            'href' => $this->next_step_url()
-        ]);
+        ] );
     }
 
     protected function step_url( $step_id = 0 )
     {
-        return add_query_arg( [ 'step' => $step_id ], admin_url( 'admin.php?page=gh_guided_setup' ) );
+        return add_query_arg( [ 'step' => $step_id ], admin_page_url( 'gh_guided_setup' ) );
     }
 
     protected function next_step_url()
@@ -138,13 +119,12 @@ abstract class Step
      */
     public function view()
     {
-        $html = Plugin::$instance->utils->html;
 
-        echo $html->input(array(
-                'type' => 'hidden',
-                'name' => 'guided_setup_step_save',
-                'value' => $this->get_slug(),
-            )); ?>
+        echo html()->input( array(
+            'type' => 'hidden',
+            'name' => 'guided_setup_step_save',
+            'value' => $this->get_slug(),
+        )); ?>
         <div class="big-header" style="text-align: center;margin: 1.5em;">
             <span style="font-size: 40px;line-height: 1.2em;"><b><?php echo $this->get_title(); ?></b></span>
         </div>
@@ -152,21 +132,37 @@ abstract class Step
             <h1 class="hidden">&nbsp;</h1>
             <?php Plugin::$instance->notices->print_notices(); ?>
         </div>
-        <div class="setup">
+        <div class="setup-wrap">
             <div class="postbox">
-                <div class="inside" style="padding: 10px 30px 20px 30px;">
+                <div class="inside">
                     <?php if ( ! empty( $this->get_description() ) ): ?>
-                        <?php echo $this->get_description(); ?>
+                        <div class="description">
+                            <p>
+                                <?php echo $this->get_description(); ?>
+                            </p>
+                        </div>
                         <hr>
                     <?php endif; ?>
                     <?php $this->get_content(); ?>
-                    <p class="submit">
+                    <div class="step-nav">
                         <?php $this->step_nav(); ?>
-                    </p>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="setup-footer-nav">
+            <?php $this->footer_nav(); ?>
+        </div>
         <?php
+    }
+
+    protected function footer_nav(){
+        $links = [];
+
+        $links[] = html()->e( 'a', [ 'href' => $this->prev_step_url() ], __( '&larr; Back' ) );
+        $links[] = html()->e( 'a', [ 'href' => $this->next_step_url() ], __( 'Skip this step &rarr;' ) );
+
+        echo implode( ' | ', $links );
     }
 
 }

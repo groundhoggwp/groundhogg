@@ -1,0 +1,62 @@
+.setup-footer-nav{
+    text-align: center;
+}
+
+.setup-footer-nav a {
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.step-nav{
+    text-align: center;
+}
+
+.setup-wrap .inside{
+    padding: 10px 30px 20px 30px;
+}
+
+.postbox .description p{
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.postbox h3 {
+    font-size: 24px;
+}
+
+#wpbody .step-nav .big-button {
+    font-size: 18px;
+    font-weight: 600;
+    position: relative;
+    height: auto;
+    padding-left: 42px;
+}
+
+.big-button .dashicons{
+    position: absolute;
+    font-size: 24px;
+    top: 15px;
+    left: 10px;
+    width: auto;
+    height: auto;
+}
+
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
+
+.big-button.spin .dashicons{
+    animation: spin;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}

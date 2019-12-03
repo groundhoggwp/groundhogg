@@ -47,6 +47,7 @@ class Premium extends Step
         ?>
         <style>
             #pricing h3{
+                font-size: 16px;
                 text-align: center;
             }
             #pricing p{
@@ -58,7 +59,7 @@ class Premium extends Step
             }
         </style>
         <div id="pricing">
-            <h3><?php _e( 'Unlock powerful tools and integrations when you go premium!', 'groundhogg' ); ?></h3>
+            <h3><?php _e( "Unlock powerful tools and integrations when you go premium!", 'groundhogg' ); ?></h3>
             <p><?php _e( "Get access to over 30 premium extensions and integrations including WooCommerce, Zapier, Amazon Web Services, LifterLMS, Scheduling and more which will help you build the prefect customer journey." ); ?></p>
             <p style="text-align: center">
                 <a id="pricing-button" class="button-primary big-button" href="<?php echo esc_url( $pricing_url ); ?>" target="_blank"><?php dashicon_e( 'star-filled' );_e( 'Yes, I Want To Upgrade!' ); ?></a>
@@ -68,9 +69,10 @@ class Premium extends Step
         <?php
 	}
 
+    protected function step_nav(){}
+
     public function save()
     {
-
         return true;
     }
 

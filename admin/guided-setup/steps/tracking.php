@@ -69,6 +69,8 @@ class Tracking extends Step
         <?php
     }
 
+    protected function step_nav(){}
+
     public function save()
     {
         if ( get_request_var('enable_tracking') === 'enable' ) {

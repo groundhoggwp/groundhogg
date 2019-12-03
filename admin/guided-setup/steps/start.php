@@ -1,8 +1,10 @@
 <?php
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
+use function Groundhogg\dashicon;
 use function Groundhogg\floating_phil;
 use function Groundhogg\groundhogg_logo;
+use function Groundhogg\html;
 use function Groundhogg\show_groundhogg_branding;
 
 /**
@@ -43,6 +45,14 @@ class Start extends Step
 
     public function get_description(){}
 
+    protected function step_nav()
+    {
+        echo html()->wrap( dashicon( 'admin-tools' ) . __( 'Start Guided Setup', 'groundhogg' ), 'button', [
+            'class' => 'button button-primary big-button next-button',
+            'type'  => 'submit',
+        ] );
+    }
+
     /**
      * Get default step content.
      *
@@ -50,7 +60,12 @@ class Start extends Step
      */
     public function view()
     {
-        ?>
+
+        echo html()->input( array(
+            'type' => 'hidden',
+            'name' => 'guided_setup_step_save',
+            'value' => $this->get_slug(),
+        )); ?>
         <div class="big-header" style="text-align: center;margin: 2.5em;">
             <?php if ( show_groundhogg_branding() ): ?>
                 <?php floating_phil(); ?>
@@ -59,17 +74,18 @@ class Start extends Step
                 <h1 style="font-size: 40px;"><b><?php _ex( 'Guided Setup', 'guided_setup', 'groundhogg' ); ?></b></h1>
             <?php endif; ?>
         </div>
-        <div class="">
+        <h1></h1>
+        <div class="setup-wrap">
             <div class="postbox">
-                <div class="inside" style="padding: 30px;">
-                    <h2><b><?php _ex( 'Welcome to the Guided Setup', 'guided_setup', 'groundhogg' );?></b></h2>
-                    <p><?php _ex( 'Follow these steps to quickly setup Groundhogg for your business. Setup only takes a few minutes. You can always change this information later in the settings page.', 'guided_setup', 'groundhogg' ); ?></p>
-                    <?php if ( show_groundhogg_branding() ): ?>
-                        <iframe style="border: 3px solid #e5e5e5" src="https://player.vimeo.com/video/339378375" width="538" height="303" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
-                    <?php endif; ?>
-                    <p class="submit" style="text-align: center">
-                        <a style="float: right" class="button button-primary" href="<?php printf( admin_url( 'admin.php?page=gh_guided_setup&step=%d' ), 1 ) ?>"><?php _ex( 'Get Started!', 'guided_setup', 'groundhogg' ); ?></a>
-                    </p>
+                <div class="inside">
+
+                    <h3 style="text-align: center"><?php _e( 'Welcome to Groundhogg!', 'groundhogg' ); ?></h3>
+                    <div class="description">
+                        <p><?php _ex( 'Please take 5 minutes to complete a few steps so we can properly configure Groundhogg for you.', 'guided_setup', 'groundhogg' ); ?></p>
+                    </div>
+                    <div class="step-nav">
+                        <?php $this->step_nav(); ?>
+                    </div>
                 </div>
             </div>
         </div>

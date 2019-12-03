@@ -1,8 +1,9 @@
 <?php
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
-use Groundhogg\Plugin;
-use function Groundhogg\show_groundhogg_branding;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\dashicon;
+use function Groundhogg\html;
 
 class Finished extends Step
 {
@@ -26,34 +27,53 @@ class Finished extends Step
     {
 
         update_option( 'gh_guided_setup_finished', 1 );
-        if ( show_groundhogg_branding() ): ?>
-            <iframe style="border: 3px solid #e5e5e5" src="https://player.vimeo.com/video/339379046" width="538" height="303" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
-        <?php endif;
+        ?>
+        <style>
+            #socials{
+                margin-bottom: 50px;
+            }
+            #socials .social-button{
+                display: inline-block;
+                float: right;
+                font-size: 16px;
+                height: auto;
+                margin-left: 20px;
+                padding: 8px 14px;
+            }
+        </style>
+
+        <div id="socials">
+        <?php
+
+        echo html()->e( 'style', [], '.button .dashicons { vertical-align: middle;}.title{font-size: 18px;padding: 0;font-weight:600;margin: 1em 0 1em 0;line-height: 1.4;}' );
+        echo html()->e( 'div', [ 'class' => 'title'  ], 'Support Group' );
+        echo html()->e( 'a', [ 'href' => 'https://www.facebook.com/groups/groundhoggwp/', 'class' => 'button button-secondary social-button', 'target' => '_blank' ], '<span class="dashicons dashicons-facebook"></span> Join the group now!' );
+        echo html()->e( 'p', [], 'Our support group is where you can crowd-source support from our awesome user community!' );
+
+        echo html()->e( 'div', [ 'class' => 'title'  ], 'Facebook' );
+        echo html()->e( 'a', [ 'href' => 'https://www.facebook.com/groundhoggwp/', 'class' => 'button button-secondary social-button', 'target' => '_blank'], '<span class="dashicons dashicons-facebook-alt"></span> Like us on Facebook!' );
+        echo html()->e( 'p', [], 'Get inspiration from our Facebook page as we share podcasts, tutorials, and how to guides.' );
+
+        echo html()->e( 'div', [ 'class' => 'title' ], 'Twitter' );
+        echo html()->e( 'a', [ 'href' => 'https://twitter.com/Groundhoggwp', 'class' => 'button button-secondary social-button', 'target' => '_blank' ], '<span class="dashicons dashicons-twitter"></span> Follow us on Twitter!' );
+        echo html()->e( 'p', [], 'Get promotions, important news, and general updates by staying up to date with us on Twitter.' );
+
+        echo html()->e( 'div', [ 'class' => 'title' ], 'Youtube' );
+        echo html()->e( 'a', [ 'href' => 'https://www.youtube.com/channel/UChHW8I3wPv-KUhQYX-eUp6g', 'class' => 'button button-secondary social-button', 'target' => '_blank' ], '<span class="dashicons dashicons-playlist-video"></span> Subscribe to us on YouTube!' );
+        echo html()->e( 'p', [], 'Watch tutorials, how to\'s, guides, and podcasts on our official Youtube channel.' );
+        ?></div><?php
+
     }
 
     protected function step_nav()
     {
-        $html = Plugin::$instance->utils->html;
-
-        echo $html->wrap( __( '&larr; Back', 'groundhogg' ), 'a', [
-            'class' => 'button button-secondary',
-            'style' => [
-                'float' => 'left'
-            ],
-            'href' => $this->prev_step_url()
-        ]);
-
-        echo $html->wrap( __( 'Complete Setup!', 'groundhogg' ), 'a', [
-            'class' => 'button button-primary',
-            'style' => [
-                'float' => 'right',
-            ],
-            'href' => admin_url( 'admin.php?page=groundhogg' )
-        ]);
+        echo html()->wrap( dashicon( 'yes' ) . __( 'Finish', 'groundhogg' ), 'a', [
+            'class' => 'button button-primary big-button next-button',
+            'href'  => admin_page_url( 'groundhogg' ),
+        ] );
     }
 
-    public function save()
-    {
-        // TODO: Implement save() method.
-    }
+    protected function footer_nav(){}
+
+    public function save(){}
 }
