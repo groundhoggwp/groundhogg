@@ -129,7 +129,7 @@ class HTML
         <?php
     }
 
-    public function tabs( $tabs=[], $active_tab=false )
+    public function tabs( $tabs=[], $active_tab=false, $class="nav-tab-wrapper" )
     {
         if ( empty( $tabs ) ){
             return;
@@ -146,7 +146,7 @@ class HTML
         }
 
         ?>
-        <h2 class="nav-tab-wrapper">
+        <h2 class="<?php esc_attr_e( $class ) ;?>">
             <?php foreach ( $tabs as $id => $tab ):
 
                 echo html()->e( 'a', [

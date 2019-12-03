@@ -110,6 +110,10 @@ input[type=range].slider:focus::-ms-fill-upper {
     background: #ffffff;
 }
 
+.big-toggle.onoffswitch{
+    width: 130px;
+}
+
 .onoffswitch {
     position: relative; width: 106px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
@@ -129,9 +133,22 @@ input[type=range].slider:focus::-ms-fill-upper {
     transition: margin 0.3s ease-in 0s;
 }
 
+.big-toggle .onoffswitch-inner:before,
+.big-toggle .onoffswitch-inner:after{
+    height: 40px;
+    line-height: 34px;
+    font-size: 18px;
+}
+
 .onoffswitch-inner:before, .onoffswitch-inner:after {
-    display: block; float: left; width: 50%; height: 27px; padding: 0; line-height: 23px;
-    font-size: 14px; color: white;
+    display: block;
+    float: left;
+    width: 50%;
+    height: 27px;
+    line-height: 23px;
+    padding: 0;
+    font-size: 14px;
+    color: white;
     box-sizing: border-box;
     border: 2px solid transparent;
     background-clip: padding-box;
@@ -150,12 +167,20 @@ input[type=range].slider:focus::-ms-fill-upper {
     text-align: right;
 }
 
+.big-toggle .onoffswitch-switch{
+    width: 34px;
+    height: 40px;
+    right: 94px;
+}
+
 .onoffswitch-switch {
-    display: block; width: 24px; margin: 0px;
+    display: block;
+    width: 24px;
+    height: 27px;
+    margin: 0px;
     background: #f7f7f7;
     position: absolute; top: 0; bottom: 0;
     right: 82px;
-    height: 27px;
     border-width: 1px;
     border-style: solid;
     transition: all 0.3s ease-in 0s;

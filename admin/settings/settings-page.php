@@ -6,7 +6,6 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Dropins\Test_Extension;
 use Groundhogg\Dropins\Test_Extension_2;
 use Groundhogg\Extension;
-use function Groundhogg\get_array_var;
 use Groundhogg\SendWp;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -139,135 +138,8 @@ class Settings_Page extends Admin_Page
         do_action('groundhogg/admin/settings/init_defaults', $this);
     }
 
-    public function screen_options(){}
-
-    /**
-     * Returns a list of tabs
-     *
-     * @return array
-     */
-    private function get_default_tabs()
+    public function screen_options()
     {
-        $tabs = [
-            'general' => array(
-                'id' => 'general',
-                'title' => _x('General', 'settings_tabs', 'groundhogg')
-            ),
-            'marketing' => array(
-                'id' => 'marketing',
-                'title' => _x('Compliance', 'settings_tabs', 'groundhogg')
-            ),
-            'email' => array(
-                'id' => 'email',
-                'title' => _x('Email', 'settings_tabs', 'groundhogg')
-            ),
-            'tags' => [
-                'id' => 'tags',
-                'title' => _x('Tags', 'settings_tabs', 'groundhogg')
-            ],
-            'api_tab' => array(
-                'id' => 'api_tab',
-                'title' => _x('API', 'settings_tabs', 'groundhogg')
-            ),
-            'misc' => array(
-                'id' => 'misc',
-                'title' => _x('Misc', 'settings_tabs', 'groundhogg')
-            ),
-        ];
-
-        if (!is_white_labeled() || !is_multisite() || \Groundhogg\is_main_blog()) {
-            $tabs['extensions'] = [
-                'id' => 'extensions',
-                'title' => _x('Licenses', 'settings_tabs', 'groundhogg')
-            ];
-        }
-
-        return apply_filters('groundhogg/admin/settings/tabs', $tabs);
-    }
-
-    /**
-     * Returns a list of all the default sections
-     *
-     * @return array
-     */
-    private function get_default_sections()
-    {
-
-        $sections = array(
-            'business_info' => array(
-                'id' => 'business_info',
-                'title' => _x('Business Settings', 'settings_sections', 'groundhogg'),
-                'tab' => 'general'
-            ),
-            'misc_info' => array(
-                'id' => 'misc_info',
-                'title' => _x('Misc Settings', 'settings_sections', 'groundhogg'),
-                'tab' => 'misc'
-            ),
-            'affiliate' => array(
-                'id' => 'affiliate',
-                'title' => _x('Affiliate Section', 'settings_sections', 'groundhogg'),
-                'tab' => 'misc'
-            ),
-            'captcha' => array(
-                'id' => 'captcha',
-                'title' => _x('Captcha', 'settings_sections', 'groundhogg'),
-                'tab' => 'misc'
-            ),
-            'event_notices' => [
-                'id' => 'event_notices',
-                'title' => _x('Event Notices', 'settings_sections', 'groundhogg'),
-                'tab' => 'misc'
-            ],
-            'compliance' => array(
-                'id' => 'compliance',
-                'title' => _x('Compliance', 'settings_sections', 'groundhogg'),
-                'tab' => 'marketing'
-            ),
-            'sendwp' => [
-                'id' => 'sendwp',
-                'title' => _x('SendWP', 'settings_sections', 'groundhogg'),
-                'tab' => 'email',
-                'callback' => [SendWp::instance(), 'settings_connect_ui'],
-            ],
-            'overrides' => [
-                'id' => 'overrides',
-                'title' => _x('Overrides', 'settings_sections', 'groundhogg'),
-                'tab' => 'email'
-            ],
-            'bounces' => array(
-                'id' => 'bounces',
-                'title' => _x('Email Bounces', 'settings_sections', 'groundhogg'),
-                'tab' => 'email',
-                'callback' => [Plugin::$instance->bounce_checker, 'test_connection_ui'],
-            ),
-            'service' => [
-                'id' => 'service',
-                'title' => _x('Groundhogg Sending Service (Deprecated)', 'settings_sections', 'groundhogg'),
-                'tab' => 'email',
-                'callback' => [Plugin::$instance->sending_service, 'test_connection_ui'],
-            ],
-            'api_settings' => array(
-                'id' => 'api_settings',
-                'title' => _x('API Settings', 'settings_sections', 'groundhogg'),
-                'tab' => 'api_tab'
-            ),
-            'optin_status_tags' => [
-                'id' => 'optin_status_tags',
-                'title' => _x('Optin Status Tags', 'settings_sections', 'groundhogg'),
-                'tab' => 'tags',
-                'callback' => [Plugin::$instance->tag_mapping, 'reset_tags_ui'],
-
-            ],
-        );
-
-        // Hide the sending service if no API token is set since it is deprecated.
-        // Hide if the plugin is currently white labeled.
-        if ( is_white_labeled() || ! Plugin::instance()->sending_service->has_api_token() ) {
-            unset($sections['service']);
-        }
-
-        return apply_filters('groundhogg/admin/settings/sections', $sections);
     }
 
     /**
@@ -398,10 +270,149 @@ class Settings_Page extends Admin_Page
 
     }
 
+    /**
+     * Returns a list of tabs
+     *
+     * @return array
+     */
+    private function get_default_tabs()
+    {
+        $tabs = [
+            'general' => array(
+                'id' => 'general',
+                'title' => _x('General', 'settings_tabs', 'groundhogg')
+            ),
+            'marketing' => array(
+                'id' => 'marketing',
+                'title' => _x('Compliance', 'settings_tabs', 'groundhogg')
+            ),
+            'email' => array(
+                'id' => 'email',
+                'title' => _x('Email', 'settings_tabs', 'groundhogg')
+            ),
+            'tags' => [
+                'id' => 'tags',
+                'title' => _x('Tags', 'settings_tabs', 'groundhogg')
+            ],
+            'api_tab' => array(
+                'id' => 'api_tab',
+                'title' => _x('API', 'settings_tabs', 'groundhogg')
+            ),
+            'misc' => array(
+                'id' => 'misc',
+                'title' => _x('Misc', 'settings_tabs', 'groundhogg')
+            ),
+        ];
+
+        if (!is_white_labeled() || !is_multisite() || \Groundhogg\is_main_blog()) {
+            $tabs['extensions'] = [
+                'id' => 'extensions',
+                'title' => _x('Licenses', 'settings_tabs', 'groundhogg')
+            ];
+        }
+
+        return apply_filters('groundhogg/admin/settings/tabs', $tabs);
+    }
+
+    /**
+     * Returns a list of all the default sections
+     *
+     * @return array
+     */
+    private function get_default_sections()
+    {
+
+        $sections = array(
+            'business_info' => array(
+                'id' => 'business_info',
+                'title' => _x('Business Settings', 'settings_sections', 'groundhogg'),
+                'tab' => 'general'
+            ),
+            'misc_info' => array(
+                'id' => 'misc_info',
+                'title' => _x('Misc Settings', 'settings_sections', 'groundhogg'),
+                'tab' => 'misc'
+            ),
+            'wp_cron' => [
+                'id' => 'wp_cron',
+                'title' => _x('WP Cron', 'settings_sections', 'groundhogg'),
+                'tab' => 'misc',
+            ],
+            'affiliate' => array(
+                'id' => 'affiliate',
+                'title' => _x('Affiliate Section', 'settings_sections', 'groundhogg'),
+                'tab' => 'misc'
+            ),
+            'captcha' => array(
+                'id' => 'captcha',
+                'title' => _x('Captcha', 'settings_sections', 'groundhogg'),
+                'tab' => 'misc'
+            ),
+            'event_notices' => [
+                'id' => 'event_notices',
+                'title' => _x('Event Notices', 'settings_sections', 'groundhogg'),
+                'tab' => 'misc'
+            ],
+            'compliance' => array(
+                'id' => 'compliance',
+                'title' => _x('Compliance', 'settings_sections', 'groundhogg'),
+                'tab' => 'marketing'
+            ),
+            'sendwp' => [
+                'id' => 'sendwp',
+                'title' => _x('SendWP', 'settings_sections', 'groundhogg'),
+                'tab' => 'email',
+                'callback' => [SendWp::instance(), 'settings_connect_ui'],
+            ],
+            'overrides' => [
+                'id' => 'overrides',
+                'title' => _x('Overrides', 'settings_sections', 'groundhogg'),
+                'tab' => 'email'
+            ],
+            'bounces' => array(
+                'id' => 'bounces',
+                'title' => _x('Email Bounces', 'settings_sections', 'groundhogg'),
+                'tab' => 'email',
+                'callback' => [Plugin::$instance->bounce_checker, 'test_connection_ui'],
+            ),
+            'service' => [
+                'id' => 'service',
+                'title' => _x('Groundhogg Sending Service (Deprecated)', 'settings_sections', 'groundhogg'),
+                'tab' => 'email',
+                'callback' => [Plugin::$instance->sending_service, 'test_connection_ui'],
+            ],
+            'api_settings' => array(
+                'id' => 'api_settings',
+                'title' => _x('API Settings', 'settings_sections', 'groundhogg'),
+                'tab' => 'api_tab'
+            ),
+            'optin_status_tags' => [
+                'id' => 'optin_status_tags',
+                'title' => _x('Optin Status Tags', 'settings_sections', 'groundhogg'),
+                'tab' => 'tags',
+                'callback' => [Plugin::$instance->tag_mapping, 'reset_tags_ui'],
+
+            ],
+        );
+
+        // Hide the sending service if no API token is set since it is deprecated.
+        // Hide if the plugin is currently white labeled.
+        if (is_white_labeled() || !Plugin::instance()->sending_service->has_api_token()) {
+            unset( $sections['service'] );
+        }
+
+        if ( defined( 'DISABLE_WP_CRON' ) && ! defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ) ){
+            unset( $sections['wp_cron'] );
+        }
+
+
+        return apply_filters('groundhogg/admin/settings/sections', $sections);
+    }
+
     private function get_default_settings()
     {
 
-        return apply_filters('groundhogg/admin/settings/settings', array(
+        $settings = array(
             'gh_business_name' => array(
                 'id' => 'gh_business_name',
                 'section' => 'business_info',
@@ -533,7 +544,7 @@ class Settings_Page extends Admin_Page
                 'label' => _x('Affiliate ID', 'settings', 'groundhogg'),
                 'desc' => _x('Please enter your affiliate ID you received from Groundhogg.', 'settings', 'groundhogg'),
                 'type' => 'input',
-                'atts' =>[
+                'atts' => [
                     'type' => 'number',
                     'id' => 'gh_affiliate_id',
                     'name' => 'gh_affiliate_id',
@@ -546,7 +557,7 @@ class Settings_Page extends Admin_Page
                 'desc' => _x('This settings adds affiliate link in every email you send using Groundhogg.', 'settings', 'groundhogg'),
                 'type' => 'checkbox',
                 'atts' => [
-                    'label' => __('Enable' ,'groundhogg'),
+                    'label' => __('Enable', 'groundhogg'),
                     //keep brackets for backwards compat
                     'name' => 'gh_affiliate_link_in_email',
                     'id' => 'gh_affiliate_link_in_email',
@@ -605,17 +616,17 @@ class Settings_Page extends Admin_Page
                 ),
             ),
             'gh_ignore_user_precedence' => array(
-	            'id' => 'gh_ignore_user_precedence',
-	            'section' => 'misc_info',
-	            'label' => _x('Disable logged in user tracking precedence.', 'settings', 'groundhogg'),
-	            'desc' => _x('By default, Groundhogg will always show info of a logged in user before referencing information from tracking links or forms. You can disable this behaviour with this option.', 'settings', 'groundhogg'),
-	            'type' => 'checkbox',
-	            'atts' => array(
-		            'label' => __('Disable'),
-		            'name' => 'gh_ignore_user_precedence',
-		            'id' => 'gh_ignore_user_precedence',
-		            'value' => 'on',
-	            ),
+                'id' => 'gh_ignore_user_precedence',
+                'section' => 'misc_info',
+                'label' => _x('Disable logged in user tracking precedence.', 'settings', 'groundhogg'),
+                'desc' => _x('By default, Groundhogg will always show info of a logged in user before referencing information from tracking links or forms. You can disable this behaviour with this option.', 'settings', 'groundhogg'),
+                'type' => 'checkbox',
+                'atts' => array(
+                    'label' => __('Disable'),
+                    'name' => 'gh_ignore_user_precedence',
+                    'id' => 'gh_ignore_user_precedence',
+                    'value' => 'on',
+                ),
             ),
             'gh_privacy_policy' => array(
                 'id' => 'gh_privacy_policy',
@@ -988,7 +999,25 @@ class Settings_Page extends Admin_Page
                     'class' => 'gh-single-tag-picker'
                 ),
             ],
-        ));
+        );
+
+        if ( ! defined( 'DISABLE_WP_CRON' ) || defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ) ){
+            $settings['gh_disable_wp_cron'] = array(
+                'id' => 'gh_disable_wp_cron',
+                'section' => 'wp_cron',
+                'label' => _x('Disable WP Cron.', 'settings', 'groundhogg'),
+                'desc' => _x('Disable the built-in WP Cron system. This is recommended if you are using an external cron job.', 'settings', 'groundhogg'),
+                'type' => 'checkbox',
+                'atts' => array(
+                    'label' => __('Disable'),
+                    'name' => 'gh_disable_wp_cron',
+                    'id' => 'gh_disable_wp_cron',
+                    'value' => 'on',
+                ),
+            );
+        }
+
+        return  apply_filters('groundhogg/admin/settings/settings', $settings );
     }
 
     /**
@@ -1001,12 +1030,13 @@ class Settings_Page extends Admin_Page
 
         foreach ($this->settings as $id => $setting) {
 
-            if ( isset_not_empty( $this->sections, $setting[ 'section' ] ) ){
-	            add_settings_field($setting['id'], $setting['label'], array($this, 'settings_callback'), 'gh_' . $this->sections[$setting['section']]['tab'], 'gh_' . $setting['section'], $setting);
-	            $args = isset_not_empty($setting, 'args') ? $setting['args'] : [];
-	            register_setting('gh_' . $this->sections[$setting['section']]['tab'], $setting['id'], $args);
+            if ( ! isset_not_empty( $this->sections, $setting[ 'section' ] ) ){
+                continue;
             }
 
+            add_settings_field($setting['id'], $setting['label'], array($this, 'settings_callback'), 'gh_' . $this->sections[$setting['section']]['tab'], 'gh_' . $setting['section'], $setting);
+            $args = isset_not_empty($setting, 'args') ? $setting['args'] : [];
+            register_setting('gh_' . $this->sections[$setting['section']]['tab'], $setting['id'], $args);
         }
 
         do_action('groundhogg/admin/register_settings/after', $this);
@@ -1093,7 +1123,7 @@ class Settings_Page extends Admin_Page
      */
     private function active_tab()
     {
-        return sanitize_key( get_request_var( 'tab', 'general' ) );
+        return sanitize_key(get_request_var('tab', 'general'));
     }
 
     /**

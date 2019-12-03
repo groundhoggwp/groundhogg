@@ -19,7 +19,7 @@
     border-style: solid;
     border-width: 10px 10px 0 10px;
     border-color: #cce5ff transparent transparent transparent;
-    z-index: 999;
+    z-index: 998;
 }
 
 .postbox.step.benchmark:before{
@@ -55,25 +55,14 @@
 }
 
 /* Full Screen */
-.full-screen #adminmenumain,
-.full-screen #wpfooter,
-.full-screen #wpadminbar{
-    display: none;
+#adminmenumain,
+#wpfooter,
+#wpadminbar{
+    display: none !important;
 }
 
-.full-screen #wpcontent{
-    margin: 0;
-}
-
-html.full-screen{
-    padding: 0;
-}
-
-.full-screen .funnel-editor-header{
-    top: 0;
-    left: 0;
-    padding: 8px 8px 8px 8px;
-    max-width: 100%;
+html{
+    padding: 0 !important;
 }
 
 /* END Full Screen */
@@ -109,7 +98,7 @@ html.full-screen{
 
 #poststuff {
     padding-top: 0px;
-    margin-top: 47px;
+    margin-top: 107px;
 }
 
 .replacements-button,
@@ -156,10 +145,19 @@ html.full-screen{
     width: calc( 100% - 400px );
     height: calc( 100vh - 79px );
     overflow: auto;
+    background: #6B6B6B;
 }
 
 #postbox-container-2-inner .step {
-    max-width: 800px;
+    /*max-width: 800px;*/
+    background: #F1F1F1;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    /*padding: 10px;*/
+}
+
+.reporting-results,
+.custom-settings{
+    padding: 20px;
 }
 
 .postbox {
@@ -170,23 +168,24 @@ html.full-screen{
     margin-left: 0;
 }
 
-#adminmenumain,
-#wpfooter{
-    display: none;
-}
-
 .funnel-editor-header{
     z-index: 999;
-    top: 32px;
+    top: 0;
     left: 0;
     box-sizing: border-box;
     position: fixed;
-    height: 47px;
-    padding: 8px 8px 8px 8px;
+    height: 60px;
+    padding: 8px 8px 8px 16px;
     background: #FFFFFF;
     border-bottom: 1px solid #ccd0d4;
     display: block;
     width: inherit;
+}
+
+.funnel-editor-header.sub-header{
+    top: 60px;
+    height: 47px;
+    background: #f7f7f7;
 }
 
 .funnel-editor-header div{
@@ -199,20 +198,127 @@ html.full-screen{
 }
 
 .funnel-editor-header .status-options{
-    float: right;
-    margin-right: 10px;
+    position: absolute;
+    top: 0;
+    padding: 8px;
+    right: 65px;
+}
+
+.reporting-enabled .toolbar-buttons{
+    display: none;
+}
+
+.toolbar-buttons{
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px;
+}
+
+.toolbar-buttons .dashicons{
+    width: auto;
+    height: auto;
+    vertical-align: middle;
+    font-size: 14px;
+    margin-right: 3px;
 }
 
 .funnel-editor-header #title{
-    border: none;
     width: 300px;
-    font-size: 18px;
-    box-shadow: none;
+    font-size: 20px;
+    font-weight: 600;
 }
 
-.funnel-editor-header #reporting input[type='text']{
-    vertical-align: top;
-    max-width: 100px;
+.title-section{
+    width: 100%;
+    /*text-align: center;*/
+}
+
+.step-title-view,
+.title-view{
+    line-height: 40px;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.step-title-view .title,
+.title-view .title{
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button.button.save-button {
+    font-size: 18px;
+    margin-left: 10px;
+    font-weight: 600;
+    position: relative;
+    height: auto;
+    padding: 2px 14px 2px 32px;
+}
+
+.save-button .dashicons{
+    position: absolute;
+    font-size: 24px;
+    top: 10px;
+    left: 5px;
+    width: auto;
+    height: auto;
+}
+
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
+
+.save-button.spin .dashicons{
+    animation: spin;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+.exit{
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #fff;
+    color: #909090;
+    border-left: 1px solid #d3d3d3;
+    height: 44px;
+    text-decoration: none;
+    float: right;
+    padding: 15px 15px 0 15px;
+}
+
+.exit .dashicons{
+    font-size: 32px;
+    height: auto;
+    width: auto;
+}
+
+#reporting{
+    display: none;
+}
+
+.reporting-filters{
+    line-height: 30px;
+    font-weight: 600;
+}
+
+
+.reporting-enabled #reporting{
+    display: inline-block;
+    text-align: center;
+    width: 100%;
 }
 
 #reporting select{
@@ -263,6 +369,7 @@ html.full-screen{
     /*padding-bottom: 70px;*/
 }
 .wpgh-element p{
+    font-size: 16px;
     margin: -12px 0 0 0;
 }
 
@@ -403,7 +510,7 @@ html.full-screen{
 }
 
 .step-settings{
-    padding: 20px;
+    padding: 30px;
 }
 
 #funnel-chart{
@@ -418,8 +525,27 @@ html.full-screen{
     min-height: 100%;
 }
 
+.steps-select .inside{
+    padding: 0 25px
+}
+
 .steps-select .description{
     padding: 10px;
+}
+
+.steps-select .nav-tab-wrapper{
+    text-align: center;
+}
+
+.steps-select .nav-tab{
+    float: none;
+    display: inline-block;
+}
+
+.steps-select .nav-tab-wrapper .nav-tab{
+    font-size: 20px;
+    padding: 5px 15px;
+    /*font-weight: bold;*/
 }
 
 .step-select-header{
@@ -433,7 +559,7 @@ html.full-screen{
 td.step-icon{
     border: 1px #ccd0d4 solid;
     background: #ffffff;
-    height: 100px;
+    height: 115px;
     border-radius: 5px;
     padding: 5px;
 }
@@ -524,6 +650,13 @@ table.embed-options td{
     padding: 0 !important;
 }
 
+.step-title-wrap{
+    background: #FFF;
+    border-bottom: 1px solid #ccd0d4;
+    padding: 8px 20px;
+    height: 45px;
+}
+
 .step-title {
     display: inline-block;
     max-width: 190px;
@@ -541,17 +674,10 @@ table.embed-options td{
 }
 
 .step .step-title-large {
-    width: 400px;
-    font-size: 22px;
+    width: auto;
+    font-size: 20px;
     box-shadow: none;
     font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.step .step-title-large:focus{
-    outline: none;
-    /*border-color: transparent;*/
-    box-shadow: none;
 }
 
 .postbox.closed .hndle .hndle-icon{
@@ -577,8 +703,7 @@ table.embed-options td{
 }
 
 .form-table th {
-    width: auto;
-    max-width: 120px;
+    width: 160px;
 }
 
 input, select, textarea{
@@ -608,4 +733,28 @@ input, select, textarea{
 
 .step-error{
  font-size: 24px;
+}
+
+.demo-video{
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    margin: 40px auto;
+    margin-top: 250px;
+    max-width: 722px;
+    display: block;
+}
+
+.demo-video img{
+    vertical-align: middle;
+}
+
+.actions-links-arrow{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.select-a-step-arrow{
+    position: absolute;
+    top:0;
+    left:0;
 }

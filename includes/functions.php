@@ -458,7 +458,7 @@ function sort_by_string_in_array( $key )
  */
 function is_json_error( $json )
 {
-    return isset( $json->code ) && isset( $json->message ) && $json->code !== 'success';
+    return isset_not_empty( $json, 'code' ) && isset_not_empty( $json, 'message' ) && get_array_var( $json, 'code' ) !== 'success';
 }
 
 /**
@@ -469,9 +469,8 @@ function is_json_error( $json )
  */
 function get_json_error( $json )
 {
-
     if ( is_json_error( $json ) ) {
-        return new WP_Error( $json->code, $json->message, $json->data );
+        return new WP_Error( get_array_var( $json, 'code' ), get_array_var( $json, 'message' ), get_array_var( $json, 'data' ) );
     }
 
     return false;
@@ -1867,8 +1866,10 @@ function floating_phil()
  *
  * @param string $color
  * @param int $width
+ *
+ * @return string|bool
  */
-function groundhogg_logo( $color = 'black', $width = 300 )
+function groundhogg_logo( $color = 'black', $width = 300, $echo=true )
 {
 
     switch ( $color ) {
@@ -1881,7 +1882,17 @@ function groundhogg_logo( $color = 'black', $width = 300 )
             break;
     }
 
-    ?><img src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/' . $link; ?>" width="<?php echo $width; ?>"><?php
+    $img = html()->e( 'img', [
+        'src' => GROUNDHOGG_ASSETS_URL . 'images/' . $link,
+        'width' => $width
+    ] );
+
+    if ( $echo ){
+        echo $img;
+        return true;
+    }
+
+    return $img;
 }
 
 /**
@@ -2215,9 +2226,10 @@ function is_main_blog()
  * @param array $body
  * @param string $method
  * @param array $headers
- * @return array|bool|WP_Error
+ * @param bool $as_array
+ * @return array|bool|WP_Error|object
  */
-function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [] )
+function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [], $as_array=false )
 {
     $method = strtoupper( $method );
 
@@ -2256,7 +2268,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
         return $response;
     }
 
-    $json = json_decode( wp_remote_retrieve_body( $response ) );
+    $json = json_decode( wp_remote_retrieve_body( $response ), $as_array );
 
     if ( !$json ) {
         return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), wp_remote_retrieve_body( $response ) );
@@ -2735,3 +2747,17 @@ function has_all( $items=[], $dataset=[] )
     // If the count of intersect is the same as $items then all the items are in the dataset
     return count( array_intersect( $items, $dataset ) ) === count( $items );
 }
+
+/**
+ * If WP CRON is not
+ */
+function fallback_disable_wp_cron()
+{
+    if ( ! defined( 'DISABLE_WP_CRON' ) && is_option_enabled( 'gh_disable_wp_cron' ) ){
+        define( 'DISABLE_WP_CRON', true );
+        define( 'GH_SHOW_DISABLE_WP_CRON_OPTION', true );
+    }
+}
+
+// Before wp_cron is added.
+add_action( 'init', __NAMESPACE__ . '\fallback_disable_wp_cron', 1 );

@@ -22,7 +22,7 @@ abstract class Installer {
         register_activation_hook( $this->get_plugin_file(), [ $this, 'activation_hook' ] );
         register_deactivation_hook( $this->get_plugin_file(), [ $this, 'deactivation_hook' ] );
 
-        add_action( 'wpmu_new_blog', [ $this, 'new_blog_created' ], 10, 6 );
+        add_action( 'wp_insert_site', [ $this, 'new_blog_created' ], 10, 6 );
         add_filter( 'wpmu_drop_tables', [ $this, 'wpmu_drop_tables' ], 10, 2 );
         add_action( 'activated_plugin', [ $this, 'plugin_activated' ] );
 
@@ -214,21 +214,17 @@ abstract class Installer {
     }
 
     /**
-     * When a new Blog is created in multisite, see if WPGH is network activated, and run the installer
+     * When a new Blog is created in multisite, see if GH is network activated, and run the installer
      *
      * @since  2.5
-     * @param  int    $blog_id The Blog ID created
-     * @param  int    $user_id The User ID set as the admin
-     * @param  string $domain  The URL
-     * @param  string $path    Site Path
-     * @param  int    $site_id The Site ID
-     * @param  array  $meta    Blog Meta
+     *
+     * @param $blog \WP_Site
      * @return void
      */
-    public function new_blog_created( $blog_id, $user_id, $domain, $path, $site_id, $meta )
+    public function new_blog_created( $blog )
     {
         if ( is_plugin_active_for_network( plugin_basename( $this->get_plugin_file() ) ) ) {
-            switch_to_blog( $blog_id );
+            switch_to_blog( $blog->id );
             $this->activation_wrapper();
             restore_current_blog();
         }

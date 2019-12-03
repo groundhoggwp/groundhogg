@@ -242,7 +242,7 @@ class Send_Email extends Action
     {
         parent::reporting_v2( $step );
 
-
+        ?><div class="reporting-results"><?php
         $times = $this->get_reporting_interval();
 
         $start_time = $times[ 'start_time' ];
@@ -308,6 +308,10 @@ class Send_Email extends Action
 
         endif;
 
+        ?>
+        <h3><?php _e( 'Activity', 'groundhogg' ); ?></h3>
+        <?php
+
         html()->list_table(
             [
                 'class' => 'email_activity'
@@ -326,6 +330,7 @@ class Send_Email extends Action
             ],
             false
         );
+        ?></div><?php
 
     }
 

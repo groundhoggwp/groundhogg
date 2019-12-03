@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Welcome;
 
 use Groundhogg\Admin\Admin_Page;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\html;
@@ -143,22 +144,44 @@ class Welcome_Page extends Admin_Page
         wp_enqueue_style('groundhogg-admin-welcome');
     }
 
+    /**
+     * Display the title and dependent action include the appropriate page content
+     */
+    public function page()
+    {
+
+        do_action("groundhogg/admin/{$this->get_slug()}/before");
+
+        ?>
+        <div class="wrap">
+            <?php
+
+            if (method_exists($this, $this->get_current_action())) {
+                call_user_func([$this, $this->get_current_action()]);
+            } else if (has_action("groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}")) {
+                do_action("groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}", $this);
+            } else {
+                call_user_func([$this, 'view']);
+            }
+
+            ?>
+        </div>
+        <?php
+
+        do_action("groundhogg/admin/{$this->get_slug()}/after");
+    }
+
 
     /**
      * The main output
      */
     public function view()
     {
-        // TODO revisit actions...
-
-        $user = wp_get_current_user();
         ?>
         <div id="welcome-page" class="welcome-page">
             <div id="poststuff">
                 <div class="welcome-header">
-                    <h1><?php echo sprintf(__('Welcome %s!', 'groundhogg'), $user->display_name); ?></h1>
-                    <div class="powered-by"><p><?php _e('Powered by', 'groundhogg'); ?>
-                            &nbsp;<?php groundhogg_logo('black', 150); ?></p></div>
+                    <h1><?php echo sprintf(__('Welcome to %s', 'groundhogg'), groundhogg_logo('black', 300, false)); ?></h1>
                 </div>
                 <?php $this->notices(); ?>
                 <hr class="wp-header-end">
@@ -232,15 +255,126 @@ class Welcome_Page extends Admin_Page
                     </div>
                 </div>
                 <div class="left-col col">
-                    <div class="postbox">
-                        <h3></h3>
-                        <div class="inside">
 
+                     <!-- Import your list -->
+                    <div class="postbox">
+                        <?php
+
+                        echo html()->modal_link([
+                            'title' => __('Import your list!'),
+                            'text' => html()->e('img', [
+                                'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/import-your-contact-list-with-groundhogg.png',
+                            ]),
+                            'footer_button_text' => __('Close'),
+                            'source' => 'import-list-video',
+                            'class' => 'img-link no-padding',
+                            'height' => 555,
+                            'width' => 800,
+                            'footer' => 'true',
+                            'preventSave' => 'true',
+                        ]);
+
+                        echo html()->e('a', [
+                            'class' => 'button big-button',
+                            'href' => admin_page_url('gh_tools', ['tab' => 'import', 'action' => 'add'])
+                        ], __('Import your Contact List!', 'groundhogg'));
+
+                        echo html()->e('a', ['class' => 'guide-link', 'href' => 'https://help.groundhogg.io/article/14-how-do-i-import-my-list', 'target' => '_blank'], __('Read the full guide', 'groundhogg'));
+
+                        ?>
+                        <div class="hidden" id="import-list-video">
+                            <iframe width="800" height="450" src="https://www.youtube.com/embed/BmTmVAoWSb0"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <!-- Create a funnel -->
+                    <div class="postbox">
+                        <?php
+
+                        echo html()->modal_link([
+                            'title' => __('Create your first funnel!', 'groundhogg'),
+                            'text' => html()->e('img', [
+                                'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/create-your-first-funnel-with-groundhogg.png'
+                            ]),
+                            'footer_button_text' => __('Close'),
+                            'source' => 'create-your-first-funnel-video',
+                            'class' => 'img-link no-padding',
+                            'height' => 555,
+                            'width' => 800,
+                            'footer' => 'true',
+                            'preventSave' => 'true',
+                        ]);
+
+                        echo html()->e('a', [
+                            'class' => 'button big-button',
+                            'href' => admin_page_url('gh_funnels', ['action' => 'add'])
+                        ], __('Create your first Funnel!', 'groundhogg'));
+
+                        echo html()->e('a', ['class' => 'guide-link', 'href' => 'https://help.groundhogg.io/article/112-how-to-setup-a-lead-magnet-download-funnel', 'target' => '_blank'], __('Read the full guide', 'groundhogg'));
+
+                        ?>
+                        <div class="hidden" id="create-your-first-funnel-video">
+                            <iframe width="800" height="450" src="https://www.youtube.com/embed/W1dwQrqEPVw"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe>
                         </div>
                     </div>
                 </div>
                 <div class="right-col col">
 
+                    <!-- Send a Broadcast -->
+                    <div class="postbox">
+                        <?php
+
+                        echo html()->modal_link([
+                            'title' => __('Send your first broadcast!', 'groundhogg'),
+                            'text' => html()->e('img', [
+                                'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/send-your-first-broadcast-with-groundhogg.png'
+                            ]),
+                            'footer_button_text' => __('Close'),
+                            'source' => 'send-your-first-broadcast-video',
+                            'class' => 'img-link no-padding',
+                            'height' => 555,
+                            'width' => 800,
+                            'footer' => 'true',
+                            'preventSave' => 'true',
+                        ]);
+
+                        echo html()->e('a', [
+                            'class' => 'button big-button',
+                            'href' => admin_page_url('gh_emails', ['action' => 'add'])
+                        ], __('Send your first Broadcast!')) ?>
+
+                        <?php echo html()->e('a', [
+                            'class' => 'guide-link',
+                            'href' => 'https://help.groundhogg.io/article/86-how-to-schedule-a-broadcast',
+                            'target' => '_blank'
+                        ], __('Read the full guide', 'groundhogg') ); ?>
+
+                        <div class="hidden" id="send-your-first-broadcast-video">
+                            <iframe width="800" height="450" src="https://www.youtube.com/embed/bwIbcsEG7Kg"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+
+                    <!-- Configure CRON -->
+                    <div class="postbox">
+                        <?php echo html()->e('img', [
+                            'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/correctly-configure-wp-cron-for-groundhogg.png'
+                        ]); ?>
+                        <?php echo html()->e('a', [
+                            'class' => 'button big-button',
+                            'href' => admin_page_url('gh_emails', ['action' => 'add'])
+                        ], __('Configure WP-Cron!')) ?>
+                        <?php echo html()->e('a', ['class' => 'guide-link', 'href' => 'https://help.groundhogg.io/article/45-how-to-disable-builtin-wp-cron', 'target' => '_blank'], __('Read the full guide', 'groundhogg')); ?>
+                    </div>
                 </div>
             </div>
         </div>

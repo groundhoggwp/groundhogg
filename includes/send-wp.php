@@ -120,6 +120,7 @@ class SendWp {
     private function install() {
 
         $is_sendwp_installed = false;
+
         foreach ( get_plugins() as $path => $details ) {
             if ( false === strpos( $path, '/sendwp.php' ) ) {
                 continue;

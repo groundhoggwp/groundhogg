@@ -17,7 +17,7 @@
                 self.addingEmail  = false;
                 self.editingEmail = true;
 
-                modal.init( 'Add Email', {
+                modal.init( 'Edit Email', {
                     source: self.edit_email_path + '&email=' + self.getEmailId(),
                     width: 1500,
                     height: 900,
@@ -31,7 +31,7 @@
                 self.addingEmail  = true;
                 self.editingEmail = false;
 
-                modal.init( 'Edit Email', {
+                modal.init( 'Add Email', {
                     source: self.add_email_path,
                     width: 1500,
                     height: 900,
@@ -59,6 +59,8 @@
 
                 e.addingEmail = false;
                 e.editingEmail = false;
+
+                $(document).trigger( 'auto-save' );
 
             } );
 
