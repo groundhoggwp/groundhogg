@@ -169,6 +169,8 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TWEAKED Overall improvement of the layout of the funnel builder and js event management.
 * TWEAKED {files} will not longer take any parameters, just simply list the files in the filebox.
 * TWEAKED Re-designed the guided setup onboarding experience.
+* TWEAKED Initialize Groundhogg DB objects during plugins_loaded instead of setup_theme.
+* TWEAKED Add a fallback emergency DB init to the base_object class in the event a plugin calls something before the DBs are initialized.
 * FIXED Deprecated Multisite function compatibility.
 * FIXED Import CSV not uploading on some occasions.
 * FIXED Default attribute in the contact shortcode works now as per the docs

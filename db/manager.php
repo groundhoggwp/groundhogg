@@ -27,7 +27,7 @@ class Manager
     public function __construct()
     {
         // GET THOSE DBS UP AND RUNNING ASAP
-        add_action( 'setup_theme', [ $this, 'init_dbs' ], 1 );
+        add_action( 'plugins_loaded', [ $this, 'init_dbs' ], 1 );
 
         // Re-init the DBS if a new plugin is activated, like an extension.
         add_action( 'activate_plugin', [ $this, 'listen_for_addons' ], 1 );
