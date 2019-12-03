@@ -655,7 +655,7 @@ abstract class Funnel_Step extends Supports_Errors
 	 */
     public function get_help_article()
     {
-        return 'https://docs.groundhogg.io';
+        return 'https://help.groundhogg.io';
     }
 
     public function add_error($code = '', $message = '', $data = [])

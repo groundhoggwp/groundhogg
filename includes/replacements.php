@@ -403,8 +403,7 @@ class Replacements
         <table class="wp-list-table widefat fixed striped">
             <thead>
             <tr>
-                <th><?php _e( 'Replacement Code' ); ?>
-                    &nbsp;<?php echo html()->help_icon( 'https://docs.groundhogg.io/docs/features/replacement-codes/' ); ?></th>
+                <th><?php _e( 'Replacement Code' ); ?></th>
                 <th><?php _e( 'Description' ); ?></th>
             </tr>
             </thead>

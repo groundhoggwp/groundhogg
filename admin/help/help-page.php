@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Help;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Plugin;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_request_var;
@@ -97,6 +98,7 @@ class Help_Page extends Tabbed_Admin_Page
     public function scripts()
     {
         wp_enqueue_style('groundhogg-admin');
+        wp_enqueue_style('groundhogg-admin-help');
     }
 
     /**
@@ -118,7 +120,7 @@ class Help_Page extends Tabbed_Admin_Page
     {
         $tabs = [
             [
-                'name' => __('Documentation', 'groundhogg'),
+                'name' => __('Basic Help', 'groundhogg'),
                 'slug' => 'docs'
             ],
             [
@@ -138,173 +140,93 @@ class Help_Page extends Tabbed_Admin_Page
         return $tabs;
     }
 
-    public function get_docs()
-    {
-
-        $args = ['per_page' => 15];
-
-        $search = urlencode(get_request_var('search'));
-
-        if (!empty($search)) {
-            $args['search'] = $search;
-        }
-
-        $url = 'https://docs.groundhogg.io/wp-json/wp/v2/docs/';
-        $response = wp_remote_get(add_query_arg($args, $url));
-
-        if (is_wp_error($response)) {
-            return $response->get_error_message();
-        }
-
-        $docs = json_decode(wp_remote_retrieve_body($response));
-        $articles = apply_filters('groundhogg/admin/help/support', $docs);
-
-        return $articles;
-    }
-
-    public function display_docs()
-    {
-
-        $docs = $this->get_docs();
-
-        if (empty($docs)) {
-            ?>
-            <p style="text-align: center;font-size: 24px;"><?php _ex('Sorry, no docs were found.', 'notice', 'groundhogg'); ?></p> <?php
-            return;
-        }
-
-        foreach ($docs as $doc) {
-            $this->doc_to_html($doc);
-        }
-    }
-
-    public function get_docs_ajax()
-    {
-
-        ob_start();
-
-        $this->display_docs();
-
-        $html = ob_get_clean();
-
-        wp_send_json(['html' => $html]);
-    }
-
-    /**
-     * Convert array to html article
-     *
-     * @param $args array
-     */
-    public function doc_to_html($args = array())
-    {
-        /* I'm lazy so just covert it to an object*/
-        $article = (object)$args;
-
-        ?>
-        <div class="postbox">
-            <?php if ($article->title): ?>
-                <h2 class="hndle"><?php echo $article->title->rendered; ?></h2>
-            <?php endif; ?>
-            <div class="inside">
-                <?php if ($article->content->rendered): ?>
-                    <div class="article-description">
-                        <?php echo wp_trim_words(wp_strip_all_tags($article->content->rendered), 30); ?>
-                    </div>
-                    <hr/>
-                <?php endif; ?>
-                <?php if ($article->link): ?>
-                    <p>
-                        <?php echo html()->modal_link([
-                            'title' => $article->title->rendered,
-                            'text' => __('Read More...', 'groundhogg'),
-                            'footer_button_text' => __('Close'),
-                            'id' => '',
-                            'source' => $article->link,
-                            'height' => 800,
-                            'width' => 1000,
-                            'footer' => 'true',
-                            'class' => 'button button-primary',
-                            'preventSave' => 'true',
-                        ]); ?>
-                    </p>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <?php
-    }
-
     public function docs_view()
     {
         ?>
-        <style>
-            .wp-filter-search {
-                box-sizing: border-box;
-                width: 100%;
-                font-size: 16px;
-                padding: 6px;
-            }
-        </style>
         <div id="poststuff">
-            <div class="postbox">
-                <div class="inside">
-                    <p style="float: left"><?php _e('Search the documentation for answers and tutorials.', 'groundhogg'); ?></p>
-                    <form class="search-form" method="get">
-                        <input type="text" id="search"
-                               placeholder="<?php esc_attr_e('Type in a search term like "How to..."', 'groundhogg'); ?>"
-                               class="wp-filter-search"/>
-                    </form>
+            <div id="docs" class="post-box-grid">
+
+                <!-- getting Started -->
+                <div class="postbox">
+                    <h2><?php _e( 'New to Groundhogg?', 'groundhogg' ); ?></h2>
+                    <p class="inner"><?php _e( 'If you are new to Groundhogg, try browsing our getting started articles to learn what you need to know!', 'groundhogg' ); ?></p>
+                    <?php
+
+                    echo html()->e('a', [
+                        'class' => 'button big-button',
+                        'target' => '_blank',
+                        'href' => 'https://help.groundhogg.io/collection/1-getting-started'
+                    ], __('I need help getting started!', 'groundhogg' ) ); ?>
+
+
+                </div>
+
+                <!-- Building something -->
+                <div class="postbox">
+                    <h2><?php _e( 'Building something?', 'groundhogg' ); ?></h2>
+                    <p class="inner"><?php _e( 'Are you building something custom with Groundhogg? Take a look at our developer oriented articles.', 'groundhogg' ); ?></p>
+                    <?php
+
+                    echo html()->e('a', [
+                        'class' => 'button big-button',
+                        'target' => '_blank',
+                        'href' => 'https://help.groundhogg.io/collection/141-developers',
+                    ], __('I need help with development!', 'groundhogg' ) ); ?>
+
+                </div>
+
+                <!-- FAQ -->
+                <div class="postbox">
+                    <h2><?php _e( 'Have a question?', 'groundhogg' ); ?></h2>
+                    <p class="inner"><?php _e( 'Someone else may have already asked your question. Check out our FAQs to see if there is an answer for you.', 'groundhogg' ); ?></p>
+                    <?php
+
+                    echo html()->e('a', [
+                        'class' => 'button big-button',
+                        'target' => '_blank',
+                        'href' => 'https://help.groundhogg.io/collection/6-faqs'
+                    ], __('I have a question!', 'groundhogg' ) ); ?>
+                </div>
+
+                <!-- Extension -->
+                <div class="postbox">
+                    <h2><?php _e( 'Installing an extension?', 'groundhogg' ); ?></h2>
+                    <p class="inner"><?php _e( 'We have detailed setup guides for all of our premium extensions. Find the one you need!', 'groundhogg' ); ?></p>
+                    <?php
+
+                    echo html()->e('a', [
+                        'class' => 'button big-button',
+                        'target' => '_blank',
+                        'href' => 'https://help.groundhogg.io/collection/24-extensions'
+                    ], __('I need help with an extension!', 'groundhogg' ) ); ?>
+                </div>
+
+                <!-- Extension -->
+                <div class="postbox">
+                    <h2><?php _e( "Didn't find what you need?", 'groundhogg' ); ?></h2>
+                    <p class="inner"><?php _e( "If you didn't find what you were looking for then you can join our support group and ask the community!", 'groundhogg' ); ?></p>
+                    <?php
+
+                    echo html()->e('a', [
+                        'class' => 'button big-button',
+                        'target' => '_blank',
+                        'href' => 'https://www.groundhogg.io/fb/'
+                    ], __('Join the community!', 'groundhogg' ) ); ?>
+                </div>
+
+                <!-- Support ticket -->
+                <div class="postbox">
+                    <h2><?php _e( "Need technical help?", 'groundhogg' ); ?></h2>
+                    <p class="inner"><?php _e( "If you require technical assistance then the best option is to open a support ticket with our advanced support team.", 'groundhogg' ); ?></p>
+                    <?php
+
+                    echo html()->e('a', [
+                        'class' => 'button big-button',
+                        'href' => admin_page_url( 'gh_help', [ 'tab' => 'support' ] )
+                    ], __('Open a ticket!', 'groundhogg' ) ); ?>
                 </div>
             </div>
-            <div style="text-align: center;" id="spinner">
-                <span class="spinner" style="float: none; visibility: visible"></span>
-            </div>
-
-            <style>
-
-            </style>
-            <div id="docs" class="post-box-grid">
-                <?php $this->display_docs(); ?>
-            </div>
         </div>
-        <script type="text/javascript">
-            (function ($) {
-
-                //setup before functions
-                var typingTimer;                //timer identifier
-                var doneTypingInterval = 500;  //time in ms, 5 second for example
-                var $search = $('#search');
-                var $docs = $('#docs');
-                var $spinner = $('#spinner');
-
-                $spinner.hide();
-
-                $search.keyup(function () {
-                    clearTimeout(typingTimer);
-                    typingTimer = setTimeout(ajaxCall, doneTypingInterval);
-                });
-
-                $search.keydown(function () {
-                    clearTimeout(typingTimer);
-                });
-
-                function ajaxCall() {
-                    $docs.hide();
-                    $spinner.show();
-                    var ajaxCall = $.ajax({
-                        type: "post",
-                        url: ajaxurl,
-                        dataType: 'json',
-                        data: {action: 'groundhogg_get_docs', search: $search.val()},
-                        success: function (response) {
-                            $spinner.hide();
-                            $docs.show();
-                            $docs.html(response.html);
-                        }
-                    });
-                }
-            })(jQuery);
-        </script>
         <?php
     }
 

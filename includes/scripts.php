@@ -175,6 +175,7 @@ class Scripts
         wp_register_style('groundhogg-admin-iframe', GROUNDHOGG_ASSETS_URL . 'css/admin/iframe.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-simple-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/simple-editor.css', [], GROUNDHOGG_VERSION);
         wp_register_style('groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'css/admin/setup.css', [], GROUNDHOGG_VERSION);
+        wp_register_style('groundhogg-admin-help', GROUNDHOGG_ASSETS_URL . 'css/admin/help.css', [], GROUNDHOGG_VERSION);
 
         wp_register_style('groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION);
 

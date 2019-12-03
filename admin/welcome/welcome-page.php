@@ -200,7 +200,7 @@ class Welcome_Page extends Admin_Page
                                     [
                                         'icon' => 'media-document',
                                         'display' => __('Documentation'),
-                                        'url' => 'https://docs.groundhogg.io'
+                                        'url' => 'https://help.groundhogg.io'
                                     ],
                                     [
                                         'icon' => 'store',

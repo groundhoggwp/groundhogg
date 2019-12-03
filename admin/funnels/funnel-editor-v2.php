@@ -272,7 +272,6 @@ $funnel = new Funnel($funnel_id);
 
         ?>
         <div id='benchmarks'>
-            <?php echo html()->help_icon('https://docs.groundhogg.io/docs/builder/benchmarks/'); ?>
             <div class="elements-inner inside">
                 <p class="description"><?php echo esc_html__('Benchmarks start and stop automation steps for a contact.', 'groundhogg'); ?></p>
                 <table>

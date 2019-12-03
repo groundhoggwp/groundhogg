@@ -30,7 +30,7 @@ class Reviews
             '<a target="_blank" href="https://wordpress.org/support/plugin/groundhogg/reviews/#new-post">WordPress.org</a>',
             html()->e( 'a', [ 'class' => 'notice-dismiss-link', 'style' => [ 'color' => '#a00' ], 'href' => '#' ],  __( "I don't want to", 'groundhogg' ) ),
             html()->e( 'a', [ 'class' => 'notice-dismiss-link', 'style' => [ 'color' => '' ], 'href' => '#' ], __( "I already did", 'groundhogg' ) ),
-            html()->e( 'a', [ 'class' => '', 'style' => [ 'color' => 'green' ], 'href' => 'https://docs.groundhogg.io/docs/other-stuff/wordpress-org/how-to-leave-a-review/', 'target' => '_blank' ], __( "I'll leave a review!", 'groundhogg' ) )
+            html()->e( 'a', [ 'class' => '', 'style' => [ 'color' => 'green' ], 'href' => 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post', 'target' => '_blank' ], __( "I'll leave a review!", 'groundhogg' ) )
         );
 
         $html_message = sprintf( '<div class="review-request notice notice-info is-dismissible">%s</div>', wpautop( $message ) );
