@@ -461,9 +461,9 @@ class Tools_Page extends Tabbed_Admin_Page
 
         $file = get_array_var( $_FILES, 'import_file' );
 
-        $validate = wp_check_filetype_and_ext( $file[ 'tmp_name' ], $file[ 'name' ] );
+        $validate = wp_check_filetype( $file[ 'name' ], [ 'csv' => 'text/csv' ] );
 
-        if( $validate[ 'ext' ] !== 'csv' || $validate[ 'type' ] !== 'text/csv' ){
+        if( $validate[ 'ext' ] !== 'csv' || $validate[ 'text/csv' ]  ){
             return new WP_Error( 'invalid_csv', sprintf( 'Please upload a valid CSV. Expected mime type of <i>text/csv</i> but got <i>%s</i>', esc_html( $file[ 'type' ] ) ) );
         }
 

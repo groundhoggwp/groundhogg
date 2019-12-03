@@ -196,7 +196,7 @@ class Replacements
             array(
                 'code' => 'files',
                 'callback' => [ $this, 'replacement_files' ],
-                'description' => _x( 'Insert a download link for a file. Usage {files.key}. Example: {files.custom_files}. Do find the key for a file see the contact record and copy the relevant replacement code.', 'replacement', 'groundhogg' ),
+                'description' => _x( 'Insert all the files in a contact\'s file box.', 'replacement', 'groundhogg' ),
             ),
             array(
                 'code' => 'groundhogg_day_quote',
@@ -811,18 +811,19 @@ class Replacements
      */
     function replacement_files( $key = '', $contact_id = null )
     {
+        // Backwards compat
+        if ( ! $contact_id ){
+            $contact_id = $key;
+            $key = false;
+        }
 
         $files = $this->get_current_contact()->get_files();
 
-        if ( !empty( $files ) ) {
+        if ( empty( $files ) ) {
             return __( 'No files found.', 'groundhogg' );
         }
 
         $html = '';
-
-        if ( $file = get_array_var( $files, $key ) ) {
-            return sprintf( '<a href="%s">%s</a>', esc_url( $file[ 'file_url' ] ), esc_html( $file[ 'file_name' ] ) );
-        }
 
         foreach ( $files as $i => $file ) {
             $html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( $file[ 'file_url' ] ), esc_html( $file[ 'file_name' ] ) );

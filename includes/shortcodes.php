@@ -88,18 +88,24 @@ class Shortcodes
     public function contact_replacement_shortcode( $atts )
     {
         $a = shortcode_atts( array(
-            'field' => 'first'
+            'field' => 'first',
+            'default' => ''
         ), $atts );
 
         $contact = get_contactdata();
+        $default = $a[ 'default' ];
 
         if ( ! $contact ){
-            return __( 'Friend', 'groundhogg' );
+            return $default;
         }
 
-        $content = sprintf( '{%s}', $a[ 'field' ] );
+        if ( ! empty( $default ) ){
+            $content = sprintf( '{%s::%s}', $a[ 'field' ], $default );
+        } else {
+            $content = sprintf( '{%s}', $a[ 'field' ] );
+        }
 
-        return Plugin::$instance->replacements->process( $content, $contact->get_id() );
+        return do_replacements( $content, $contact->get_id() );
     }
     
     /**

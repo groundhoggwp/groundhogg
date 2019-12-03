@@ -163,6 +163,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.7 (2019-12-03) =
+* TWEAKED Whole new welcome page UI. Goodbye to the BG image and docs/extensions. New welcome page is just focused on education.
+* TWEAKED Funnel builder UI now takes over the whole screen for the best editing experience.
+* TWEAKED Overall improvement of the layout of the funnel builder and js event management.
+* TWEAKED {files} will not longer take any parameters, just simply list the files in the filebox.
+* FIXED Deprecated Multisite function compatibility
+* FIXED Import CSV not uploading on some occasions.
+* FIXED Default attribute in the contact shortcode works now as per the docs
+
 = 2.1.6.3 (2019-11-24) =
 * ADDED Complained view to contact list.
 * ADDED More hooks to optin status management functions for the contacts admin screen

@@ -3,8 +3,6 @@
 namespace Groundhogg\Admin\Settings;
 
 use Groundhogg\Admin\Admin_Page;
-use Groundhogg\Dropins\Test_Extension;
-use Groundhogg\Dropins\Test_Extension_2;
 use Groundhogg\Extension;
 use Groundhogg\SendWp;
 use function Groundhogg\get_request_var;
