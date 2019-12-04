@@ -13,19 +13,6 @@ Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Ma
 
 == Description ==
 
-## BLACK FRIDAY IS HERE!
-
-Want to upgrade to premium? Now is the time to do it!
-
-There is a BIGGER DISCOUNT the week **BEFORE** Black Friday!
-
-* November 22 to November 28 = **25%** DISCOUNT
-* November 29 to December 2 = **15%** DISCOUNT
-
-Coupon Code: **BLACKFRIDAY19**
-
-[Upgrade now!](https://www.groundhogg.io/pricing/?discount=BLACKFRIDAY19)
-
 ## ATTENTION MARKETERS, FREELANCERS, STORE OWNERS, PODCASTERS, AGENCIES & WORDPRESS AFICIONADOS!
 
 Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
@@ -173,7 +160,8 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TWEAKED Add a fallback emergency DB init to the base_object class in the event a plugin calls something before the DBs are initialized.
 * FIXED Deprecated Multisite function compatibility.
 * FIXED Import CSV not uploading on some occasions.
-* FIXED Default attribute in the contact shortcode works now as per the docs
+* FIXED Default attribute in the contact shortcode works now as per the docs.
+* FIXED Unconfirmed view in the contacts table not working.
 
 = 2.1.6.3 (2019-11-24) =
 * ADDED Complained view to contact list.

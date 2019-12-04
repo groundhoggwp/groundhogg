@@ -177,15 +177,16 @@ class Rewrites
 
                 $step = Plugin::$instance->utils->get_step( $link_id );
 
-                if ( ! $contact || ! $step ) {
+                if ( ! $step ) {
                     return;
                 }
 
                 $target_url = $step->get_meta( 'redirect_to' );
 
-                do_action( 'groundhogg/rewrites/benchmark_link/clicked', $contact, $step );
-
-                $target_url = Plugin::$instance->replacements->process( $target_url, $contact->get_id() );
+                if ( $contact ){
+                    do_action( 'groundhogg/rewrites/benchmark_link/clicked', $contact, $step );
+                    $target_url = do_replacements( $target_url, $contact->get_id() );
+                }
 
                 wp_redirect( $target_url );
                 die();

@@ -369,7 +369,8 @@ class Contacts_Table extends WP_List_Table {
 		] );
 
 		// Since unconfirmed is 0 (aside maybe we should change that) we need to specify we actually want it still.
-		$optin_status = get_request_var( 'optin_status' );
+		$optin_status = absint( get_request_var( 'optin_status' ) );
+
 		if ( $optin_status || ( $optin_status === Preferences::UNCONFIRMED && isset( $_GET['optin_status'] ) ) ) {
 			$query['optin_status'] = $optin_status;
 		}
