@@ -56,7 +56,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
             } else {
 
-                $id = $this->create( $identifier_or_args );
+                $primary_key = $this->get_db()->get_primary_key();
+
+                // ignore if the primary key is passed in the args
+                if ( ! key_exists( $primary_key, $identifier_or_args ) ){
+                    $this->create( $identifier_or_args );
+                }
 
             }
 

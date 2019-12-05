@@ -1189,5 +1189,4 @@ class Funnels_Page extends Admin_Page
     {
         return (bool) get_request_var( 'reporting_on' );
     }
-
 }
