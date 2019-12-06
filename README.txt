@@ -150,6 +150,16 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.7.1 (2019-12-06) =
+* ADDED Ability to remove files from a contact from the contact editor.
+* ADDED Last 7 Days reporting range.
+* TWEAKED You can now save contact fields as empty.
+* TWEAKED CSS compatibility for advanced email editor.
+* TWEAKED Reporting range picker now shows dates in local date format.
+* FIXED File access links not working in email if not logged in.
+* FIXED Email author was not being set in simple email builder.
+* FIXED Replacements not inserting into tiny_mce content from the replacement modal
+
 = 2.1.7 (2019-12-03) =
 * TWEAKED Whole new welcome page UI. Goodbye to the BG image and docs/extensions. New welcome page is just focused on education.
 * TWEAKED Funnel builder UI now takes over the whole screen for the best editing experience.

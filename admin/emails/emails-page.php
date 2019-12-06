@@ -269,7 +269,7 @@ class Emails_Page extends Admin_Page
 
             case 'new-email':
 
-                $email_id = Groundhogg\get_db( 'emails' )->add();
+                $email_id = Groundhogg\get_db( 'emails' )->add( [ 'author' => get_current_user_id() ] );
 
                 if ( ! $email_id ){
                     return new \WP_Error( 'error', 'Unable to create email.' );

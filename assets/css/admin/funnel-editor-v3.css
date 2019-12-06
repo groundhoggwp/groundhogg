@@ -7,8 +7,8 @@
     border-color: #6980fe transparent transparent transparent;
 }
 
-.postbox.step.benchmark:after,
-.postbox.step.benchmark:before{
+.step.benchmark:after,
+.step.benchmark:before{
     content: "";
     position: absolute;
     display: inline-block;
@@ -22,14 +22,14 @@
     z-index: 998;
 }
 
-.postbox.step.benchmark:before{
+.step.benchmark:before{
     left: 24px;
     bottom: -11px;
     border-width: 11px 11px 0 11px;
     border-color: #b8daff transparent transparent transparent;
 }
 
-.postbox.benchmark.active:before{
+.step.benchmark.active:before{
     left: 23px;
     bottom: -12px;
     /*border-color: #b0deff transparent transparent transparent;*/
@@ -127,15 +127,15 @@ html{
     padding-bottom: 20px;
 }
 
-#postbox-container-1 .postbox{
+#postbox-container-1 .step{
     /*border: none;*/
     box-shadow: none;
-    /*border: 1px solid #ccd0d4;*/
+    border: 1px solid #ccd0d4;
     margin: 5px;
     /*margin: 0;*/
 }
 
-#postbox-container-1 .postbox h2{
+#postbox-container-1 .step h2{
     border: none;
 }
 
@@ -160,8 +160,9 @@ html{
     padding: 20px;
 }
 
-.postbox {
+.step {
     margin: 0;
+    position: relative;
 }
 
 #wpcontent{
@@ -420,45 +421,45 @@ button.button.save-button {
     margin: 0;
 }
 
-#postbox-container-1 .postbox.action{
+#postbox-container-1 .step.action{
     /*border-color: rgb(241, 253, 243);*/
     /*border-bottom-color: #dbe6dc;*/
 }
 
-#postbox-container-1 .postbox.action.active{
+#postbox-container-1 .step.action.active{
     border-color: #44ea1f;
 }
 
-.postbox.action .hndle{
+.step.action .hndle{
     background-color: rgb(241, 253, 243);
 }
 
-#postbox-container-1 .postbox.active{
+#postbox-container-1 .step.active{
     border-width: 2px 2px 2px 2px;
     border-style: dashed;
     transition: 0.4s;
 }
 
-#postbox-container-1 .postbox.benchmark{
+#postbox-container-1 .step.benchmark{
     color: #004085;
     background-color: #cce5ff;
     /*border-color: #cce5ff;*/
     /*border-bottom-color: #b8daff;*/
 }
 
-#postbox-container-1 .postbox.benchmark h2{
+#postbox-container-1 .step.benchmark h2{
     color: #004085;
 }
 
-#postbox-container-1 .postbox.benchmark .step-title{
+#postbox-container-1 .step.benchmark .step-title{
     border-bottom-color: #b8daff;
 }
 
-#postbox-container-1 .postbox.benchmark.active{
+#postbox-container-1 .step.benchmark.active{
     border-color: #0d79e5;
 }
 
-#postbox-container-1 .postbox.step h2 {
+#postbox-container-1 .step.step h2 {
     cursor: pointer !important;
 }
 
@@ -680,9 +681,23 @@ table.embed-options td{
     font-weight: 600;
 }
 
-.postbox.closed .hndle .hndle-icon{
+.step.closed .hndle .hndle-icon{
     margin-top: -3px;
     margin-bottom: -8px;
+}
+
+.step .handlediv{
+    float: right;
+    background: none;
+    color: #5c5c5c;
+    opacity: 0.6;
+    border: none;
+    cursor: pointer;
+    padding: 8px 4px;
+}
+
+.step .handlediv:hover{
+    opacity: 0.9;
 }
 
 .row-actions{

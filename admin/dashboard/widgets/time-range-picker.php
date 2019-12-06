@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Dashboard\Widgets;
 
+use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 
@@ -72,7 +73,7 @@ class Time_Range_Picker extends Dashboard_Widget
             </div>
         </form>
         <hr>
-        <p><?php printf( __( 'Showing results from %s to %s.', 'groundhogg' ), $html->wrap( date_i18n( 'Y-m-d', $reporting->get_start_time() ), 'b' ), $html->wrap( date_i18n( 'Y-m-d', $reporting->get_end_time() ), 'b' ) );?></p>
+        <p><?php printf( __( 'Showing results from %s to %s.', 'groundhogg' ), $html->wrap( date_i18n( get_date_time_format(), $reporting->get_start_time() ), 'b' ), $html->wrap( date_i18n( get_date_time_format(), $reporting->get_end_time() ), 'b' ) );?></p>
         <p class="description"><?php _e( 'Use this form to quickly change the reporting time range.', 'groundhogg' ); ?></p>
 <?php
     }

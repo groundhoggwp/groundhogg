@@ -227,7 +227,11 @@ class Rewrites
                 $contact = get_contactdata();
 
                 $admin_read_access = current_user_can( 'download_files' );
-                $contact_read_access = $contact && $contact->get_upload_folder_basename() !== $subfolder;
+
+                $nonce = get_url_var( 'key' );
+                $nonce_read_access = $nonce && wp_verify_nonce( $nonce );
+
+                $contact_read_access = $contact && $contact->get_upload_folder_basename() === $subfolder && $nonce_read_access;
 
                 if ( ! $admin_read_access && ! $contact_read_access ){
                     wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );

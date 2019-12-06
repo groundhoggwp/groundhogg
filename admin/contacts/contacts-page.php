@@ -564,6 +564,8 @@ class Contacts_Page extends Admin_Page
         foreach ( $basic_text_fields as $field ){
             if ( get_request_var( $field, false, true ) ) {
                 $contact->update_meta($field, sanitize_text_field(  get_request_var( $field, false, true ) ) );
+            } else {
+                $contact->delete_meta( $field );
             }
         }
 
@@ -660,8 +662,6 @@ class Contacts_Page extends Admin_Page
                 $this->add_notice( 'email_queued', _x( 'The email has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
             }
         }
-
-
 
         if (isset($_POST['start_funnel']) && isset($_POST['add_contacts_to_funnel_step_picker']) && current_user_can('edit_contacts')) {
             $step = Plugin::$instance->utils->get_step(intval($_POST['add_contacts_to_funnel_step_picker']));
@@ -930,6 +930,41 @@ class Contacts_Page extends Admin_Page
         $contactTable = new Tables\Contacts_Table;
         $contactTable->single_row( $contact );
         wp_die();
+    }
+
+    /**
+     * Remove a file from the contact file box
+     */
+    public function process_remove_file()
+    {
+        if ( ! current_user_can( 'edit_contacts' ) ){
+            $this->wp_die_no_access();
+        }
+
+        $file_name = sanitize_text_field( get_url_var( 'file' ) );
+
+        $contact = get_contactdata( absint(get_url_var( 'contact' )));
+
+        if ( ! $contact ){
+            return new \WP_Error( 'error', 'The given contact does nto exist.' );
+        }
+
+        $folders = $contact->get_uploads_folder();
+        $path = $folders[ 'path' ];
+
+        $file_path = wp_normalize_path( $path . DIRECTORY_SEPARATOR . $file_name ) ;
+
+        if ( ! file_exists( $file_path ) ){
+            return new \WP_Error( 'error', 'The requested file does nto exist.' );
+        }
+
+        unlink( $file_path );
+
+        $this->add_notice( 'success', __( 'File deleted.', 'groundhogg' ) );
+
+        // Return to contact edit screen.
+        return admin_page_url( 'gh_contacts', [ 'action' => 'edit', 'contact' => $contact->get_id() ] );
+
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 
+use function Groundhogg\admin_page_url;
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
@@ -793,15 +794,27 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                 $rows[] = [
                     sprintf("<a href='%s' target='_blank'>%s</a>", esc_url( $item['file_url'] ), esc_html($info['basename'])),
                     esc_html(size_format(filesize($item['file_path']))),
-                    esc_html($info['extension'])
+                    esc_html($info['extension']),
+                    html()->e( 'span', [ 'class' => 'row-actions' ], [
+                        html()->e( 'span', [ 'class' => 'delete' ],
+                        html()->e( 'a', [
+                            'class' => 'delete',
+                            'href' => admin_page_url( 'gh_contacts', [
+                                'action' => 'remove_file',
+                                'file'   => $info[ 'basename' ],
+                                'contact' => $contact->get_id(),
+                                '_wpnonce' => wp_create_nonce( 'remove_file' )
+                        ] ) ], __( 'Delete' ) ) ),
+                    ] )
                 ];
 
             }
 
-            html()->list_table([], [
+            html()->list_table([ 'class' => 'files', 'id' => 'files' ], [
                 _x('Name', 'contact_record', 'groundhogg'),
                 _x('Size', 'contact_record', 'groundhogg'),
                 _x('Type', 'contact_record', 'groundhogg'),
+                _x('Actions', 'contact_record', 'groundhogg'),
             ], $rows);
             ?>
             <div>

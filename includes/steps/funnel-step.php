@@ -671,7 +671,7 @@ abstract class Funnel_Step extends Supports_Errors
     {
 
         ?>
-        <div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>" title="<?php echo $step->get_title() ?>" id="<?php echo $step->get_id(); ?>" class="postbox step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php if ( $step->get_meta( 'is_active' ) ){ echo 'active'; } ?>">
+        <div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>" title="<?php echo $step->get_title() ?>" id="<?php echo $step->get_id(); ?>" class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php if ( $step->get_meta( 'is_active' ) ){ echo 'active'; } ?>">
             <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
             <?php echo html()->input( [
                 'type' => 'hidden',

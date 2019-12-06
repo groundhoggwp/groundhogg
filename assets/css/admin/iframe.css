@@ -16,19 +16,6 @@ html.iframed {
 .iframed #adminmenuback,
 .iframed #wpfooter,
 .iframed #screen-meta-links,
-.iframed #screen-meta
-{
+.iframed #screen-meta {
     display: none;
-}
-
-.iframed .editor-header{
-    top: 0 !important;
-}
-
-.iframed #poststuff{
-    min-height: 100vh;
-}
-
-.iframed #email-content{
-    min-height: 80vh;
 }

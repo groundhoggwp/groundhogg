@@ -322,9 +322,7 @@ function tiny_mce_before_init( $initArray )
     $initArray['setup'] = <<<JS
 [function(ed) {
     ed.on( 'click', function(ed, e) {
-        //your function goes here
-        $(document).trigger( 'to_mce' );
-        // console.log( {trigger:'to_mce'} );
+        jQuery(document).trigger( 'to_mce' );
     });
 
 }][0]

@@ -2341,7 +2341,7 @@ function file_access_url( $path, $download = false )
         $path = str_replace( $base_uploads_url, '', $path );
     }
 
-    $url = managed_page_url( 'uploads/' . ltrim( $path, '/' ) );
+    $url = untrailingslashit( managed_page_url( 'uploads/' . ltrim( $path, '/' ) ) );
 
     if ( $download ) {
         $url = add_query_arg( [ 'download' => true ], $url );

@@ -134,6 +134,8 @@ class Reporting
             'yesterday'     => _x( 'Yesterday', 'reporting_range', 'groundhogg' ),
             'this_week'     => _x( 'This Week', 'reporting_range', 'groundhogg' ),
             'last_week'     => _x( 'Last Week', 'reporting_range', 'groundhogg' ),
+            'last_7'        => _x( 'Last 7 Days', 'reporting_range', 'groundhogg' ),
+            'last_14'       => _x( 'Last 14 Days', 'reporting_range', 'groundhogg' ),
             'last_30'       => _x( 'Last 30 Days', 'reporting_range', 'groundhogg' ),
             'this_month'    => _x( 'This Month', 'reporting_range', 'groundhogg' ),
             'last_month'    => _x( 'Last Month', 'reporting_range', 'groundhogg' ),
@@ -189,6 +191,18 @@ class Reporting
                 $this->start_time   = mktime(0, 0, 0, date("n"), date("j") - date("N") + 1) - WEEK_IN_SECONDS;
                 $this->end_time     = ( $this->start_time + WEEK_IN_SECONDS ) - 1;
                 $this->points       = 7;
+                $this->difference   = DAY_IN_SECONDS;
+                break;
+            case 'last_7';
+                $this->start_time   = Plugin::$instance->utils->date_time->round_to_day( time() - WEEK_IN_SECONDS );
+                $this->end_time     = Plugin::$instance->utils->date_time->round_to_day( time() ) - 1;
+                $this->points       = ceil( ($this->end_time - $this->start_time  ) / DAY_IN_SECONDS );
+                $this->difference   = DAY_IN_SECONDS;
+                break;
+            case 'last_14';
+                $this->start_time   = Plugin::$instance->utils->date_time->round_to_day( time() - ( 2 * WEEK_IN_SECONDS ) );
+                $this->end_time     = Plugin::$instance->utils->date_time->round_to_day( time() ) - 1;
+                $this->points       = ceil( ($this->end_time - $this->start_time  ) / DAY_IN_SECONDS );
                 $this->difference   = DAY_IN_SECONDS;
                 break;
             case 'last_30';

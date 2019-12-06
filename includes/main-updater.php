@@ -46,6 +46,7 @@ class Main_Updater extends Updater {
             '2.1',
             '2.1.6',
             '2.1.6.2',
+            '2.1.7.1',
         ];
     }
 
@@ -173,5 +174,12 @@ class Main_Updater extends Updater {
     public function version_2_1_6_2()
     {
         install_custom_rewrites();
+    }
+
+    public function version_2_1_7_1()
+    {
+        if ( is_user_logged_in() ){
+            get_db( 'emails' )->mass_update( [ 'author' => get_current_user_id() ], [ 'author' => 0 ] );
+        }
     }
 }
