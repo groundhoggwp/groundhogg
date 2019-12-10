@@ -208,6 +208,13 @@ abstract class Input extends Field
         return $parsed;
     }
 
+    public function has_label()
+    {
+        $label = $this->get_label();
+        return ! empty( $label );
+    }
+
+
     /**
      * Render the field in HTML
      *
@@ -227,6 +234,11 @@ abstract class Input extends Field
             'required' => $this->is_required(),
             'pattern' => $this->get_att( 'pattern' )
         ];
+
+        // No label, do not wrap in label element.
+        if ( ! $this->has_label() ){
+            return html()->input( $atts );
+        }
 
         return html()->wrap([
             $this->get_label(),

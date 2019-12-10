@@ -745,6 +745,7 @@ abstract class Funnel_Step extends Supports_Errors
                 <!-- SETTINGS -->
                 <div class="step-edit">
                     <div class="step-title-wrap">
+                        <img class="step-icon" src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
                         <div class="step-title-edit hidden">
                             <?php
                             $args = array(
@@ -760,7 +761,7 @@ abstract class Funnel_Step extends Supports_Errors
                             ?>
                         </div>
                         <div class="step-title-view">
-                            <?php printf( __( 'Editing %s', 'groundhogg' ), html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ) ); ?>
+                            <?php echo html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ); ?>
                         </div>
                     </div>
                     <div class="custom-settings">

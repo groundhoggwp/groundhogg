@@ -150,6 +150,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.7.2 (2019-12-11) =
+* TWEAKED Replacement codes are parsed based on the first occurrence of the delimiter only.
+* TWEAKED Added the step icon to the step settings section.
+* FIXED Some CSS in the funnel builder.
+
 = 2.1.7.1 (2019-12-06) =
 * ADDED Ability to remove files from a contact from the contact editor.
 * ADDED Last 7 Days reporting range.

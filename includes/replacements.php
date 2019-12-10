@@ -336,14 +336,14 @@ class Replacements
 
         //Support Default Arguments.
         if ( strpos( $code, '::' ) > 0 ) {
-            $parts = explode( '::', $code );
+            $parts = explode( '::', $code, 2 );
             $code = $parts[ 0 ];
             $default = $parts[ 1 ];
         }
 
         /* make sure that if it's a dynamic code to remove anything after the period */
         if ( strpos( $code, '.' ) > 0 ) {
-            $parts = explode( '.', $code );
+            $parts = explode( '.', $code, 2 );
             $code = $parts[ 0 ];
             $arg = $parts[ 1 ];
         }

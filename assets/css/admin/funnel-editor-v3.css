@@ -1,14 +1,5 @@
-.triangle-bottom {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 100px 100px 0 100px;
-    border-color: #6980fe transparent transparent transparent;
-}
-
-.step.benchmark:after,
-.step.benchmark:before{
+#step-sortable .step.benchmark:after,
+#step-sortable .step.benchmark:before{
     content: "";
     position: absolute;
     display: inline-block;
@@ -22,14 +13,14 @@
     z-index: 998;
 }
 
-.step.benchmark:before{
+#step-sortable .step.benchmark:before{
     left: 24px;
     bottom: -11px;
     border-width: 11px 11px 0 11px;
     border-color: #b8daff transparent transparent transparent;
 }
 
-.step.benchmark.active:before{
+#step-sortable  .step.benchmark.active:before{
     left: 23px;
     bottom: -12px;
     /*border-color: #b0deff transparent transparent transparent;*/
@@ -237,7 +228,7 @@ html{
 
 .step-title-view,
 .title-view{
-    line-height: 40px;
+    line-height: 44px;
     font-size: 20px;
     font-weight: 400;
 }
@@ -245,6 +236,8 @@ html{
 .step-title-view .title,
 .title-view .title{
     font-weight: 600;
+    padding: 8px;
+    line-height: 1em;
     cursor: pointer;
 }
 
@@ -324,10 +317,6 @@ button.button.save-button {
 
 #reporting select{
     vertical-align: top;
-}
-
-.notice {
-    margin: 0 0 1px 0;
 }
 
 /* END NEW STUFF */
@@ -654,8 +643,20 @@ table.embed-options td{
 .step-title-wrap{
     background: #FFF;
     border-bottom: 1px solid #ccd0d4;
-    padding: 8px 20px;
+    padding: 8px 70px;
     height: 45px;
+    position: relative;
+}
+
+.step-title-wrap .step-icon{
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 61px;
+    background: #ffffff;
+    vertical-align: middle;
+    border-right: 1px solid #ccd0d4;
 }
 
 .step-title {
@@ -744,6 +745,12 @@ input, select, textarea{
     width: 400px;
     right: 20px;
     bottom: 20px;
+}
+
+#groundhogg-notices .notice {
+    border-radius: 5px;
+    /*border-width: 2px;*/
+    border-width: 0 0 0 5px;
 }
 
 .step-error{
