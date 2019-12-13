@@ -1952,7 +1952,7 @@ function form_errors( $return = true )
  */
 function get_email_templates()
 {
-    $templates = apply_filters( 'groundhogg/get_email_templates', [] );
+    $templates = apply_filters( 'groundhogg/templates/emails', [] );
     /**
      * @var $email_templates array
      */
