@@ -700,6 +700,17 @@ function get_default_from_email()
 	return apply_filters( 'groundhogg/get_default_from_email', $from );
 }
 
+/**
+ * Get the return path email
+ *
+ * @return mixed|void
+ */
+function get_return_path_email()
+{
+    $return = get_option( 'gh_bounce_inbox' );
+    return apply_filters( 'groundhogg/get_return_path_email', $return );
+}
+
 
 /**
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead

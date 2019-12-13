@@ -70,6 +70,20 @@ class Notices
         update_user_meta( get_current_user_id(), self::DISMISSED_NOTICES_OPTION, self::$dismissed_notices );
     }
 
+    /**
+     * Is a notice dismissed
+     *
+     * @param $id
+     * @return bool
+     */
+    public function is_dismissed( $id )
+    {
+        return isset_not_empty( self::$dismissed_notices, $id );
+    }
+
+    /**
+     * Dismiss a notice via the URL permanently.
+     */
     public function dismiss_notices()
     {
 
