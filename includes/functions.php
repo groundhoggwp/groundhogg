@@ -1383,6 +1383,9 @@ function sanitize_from_name( $name )
  */
 function after_form_submit_handler( &$contact )
 {
+    if ( ! $contact instanceof Contact ){
+        return;
+    }
 
     if ( $contact->update_meta( 'ip_address', Plugin::$instance->utils->location->get_real_ip() ) ) {
         $contact->extrapolate_location();
@@ -2352,7 +2355,12 @@ function file_access_url( $path, $download = false )
         $path = str_replace( $base_uploads_url, '', $path );
     }
 
-    $url = untrailingslashit( managed_page_url( 'uploads/' . ltrim( $path, '/' ) ) );
+    $url = managed_page_url( 'uploads/' . ltrim( $path, '/' ) );
+
+    // WP Engine file download links to not work if forward slash is not present.
+    if( ! is_wpengine() ){
+        $url = untrailingslashit( $url );
+    }
 
     if ( $download ) {
         $url = add_query_arg( [ 'download' => true ], $url );
@@ -2790,3 +2798,12 @@ function fallback_disable_wp_cron()
 
 // Before wp_cron is added.
 add_action( 'init', __NAMESPACE__ . '\fallback_disable_wp_cron', 1 );
+
+/**
+ * Is the current hosting provider wpengine?
+ *
+ * @return bool
+ */
+function is_wpengine(){
+    return defined( 'WPE_PLUGIN_BASE' );
+}

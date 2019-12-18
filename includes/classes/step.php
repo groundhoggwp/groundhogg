@@ -457,16 +457,25 @@ class Step extends Base_Object_With_Meta implements Event_Process
             return false;
         }
 
-        do_action( "groundhogg/steps/{$this->get_type()}/run/before", $this  );
+        $result = false;
 
-        // Throw error
-        if ( has_filter( "groundhogg/steps/{$this->get_type()}/run" ) ){
-            $result = apply_filters( "groundhogg/steps/{$this->get_type()}/run", $contact, $event, $this );
-        } else {
-            $result = apply_filters( "groundhogg/steps/error/run", $contact, $event, $this );
+        // Do the step?
+        $do_step = apply_filters( 'groundhogg/steps/run/do_step', true, $this, $contact, $event );
+
+        if ( $do_step ){
+            do_action( "groundhogg/steps/{$this->get_type()}/run/before", $this  );
+
+            if ( has_filter( "groundhogg/steps/{$this->get_type()}/run" ) ){
+                $result = apply_filters( "groundhogg/steps/{$this->get_type()}/run", $contact, $event, $this );
+            } else {
+                $result = apply_filters( "groundhogg/steps/error/run", $contact, $event, $this );
+            }
+
+            do_action( "groundhogg/steps/{$this->get_type()}/run/after", $this  );
         }
 
-        do_action( "groundhogg/steps/{$this->get_type()}/run/after", $this  );
+        // Modify the result
+        $result = apply_filters( 'groundhogg/steps/run/result', $result, $this, $contact, $event );
 
         return $result;
     }

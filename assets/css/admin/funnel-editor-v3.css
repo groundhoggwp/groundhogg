@@ -499,6 +499,10 @@ button.button.save-button {
     overflow: auto;
 }
 
+/*.saving #poststuff{*/
+/*    opacity: 0.5;*/
+/*}*/
+
 .step-settings{
     padding: 30px;
 }

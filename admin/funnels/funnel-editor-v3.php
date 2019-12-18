@@ -214,8 +214,8 @@ $funnel = new Funnel($funnel_id);
                         'class' => 'add-step button button-secondary no-padding',
                         'id' => 'add-step-bottom',
                         'source' => 'steps',
-                        'height' => 700,
-                        'width' => 500,
+                        'height'    => 700,
+                        'width'     => 600,
                         'footer' => 'true',
                         'preventSave' => 'true',
                     ]);

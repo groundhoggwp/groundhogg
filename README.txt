@@ -150,6 +150,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.8 (2019-12-18) =
+* ADDED More filters to the event process to allow for conditional logic.
+* ADDED Meta query search to the contact search filters.
+* TWEAKED the "ALL" view in the contacts screen will now show ALL contacts regardless of optin status.
+* FIXED Specialchars in radio button options causing form to not submit.
+* FIXED Default shortcode [col] using "size" instead of "width."
+* FIXED File access URL not working on WPEngine
+* UPDATED POT file
+
 = 2.1.7.2 (2019-12-11) =
 * TWEAKED Added the step icon to the step settings section.
 * FIXED Replacement codes are parsed based on the first occurrence of the delimiter only.

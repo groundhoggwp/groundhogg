@@ -378,7 +378,7 @@ abstract class Funnel_Step extends Supports_Errors
     /**
      * @return Step
      */
-    protected function get_current_step()
+    public function get_current_step()
     {
         return $this->current_step;
     }
@@ -931,6 +931,8 @@ abstract class Funnel_Step extends Supports_Errors
      */
     public function after_save( $step )
     {
+        do_action( 'groundhogg/steps/save/after', $this, $step );
+
         if ( $this->has_errors() ){
             foreach ( $this->get_errors() as $error ){
                 notices()->add( $error );

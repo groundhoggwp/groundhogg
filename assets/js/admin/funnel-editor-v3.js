@@ -184,6 +184,8 @@
 
             var $saveButton = $( '.save-button' );
 
+            $( 'body' ).addClass( 'saving' );
+
             $saveButton.html( self.saving_text );
             $saveButton.addClass( 'spin' );
 
@@ -212,6 +214,8 @@
                 }
 
                 $( document ).trigger( 'new-step' );
+
+                $( 'body' ).removeClass( 'saving' );
             } );
         },
 

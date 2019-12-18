@@ -12,7 +12,11 @@ abstract class Input extends Field
 
     public function __construct($id = 0)
     {
-        add_action( 'groundhogg/form/shortcode/after', [ self::class, 'save_config' ] );
+
+        // No sense in updating for every single visitor visit... not efficient
+        if ( current_user_can( 'edit_funnels' ) ){
+            add_action( 'groundhogg/form/shortcode/after', [ self::class, 'save_config' ] );
+        }
 
         parent::__construct($id);
     }
@@ -170,7 +174,8 @@ abstract class Input extends Field
     public function shortcode( $atts, $content = '' )
     {
         $this->content = $content;
-        $this->atts = shortcode_atts( $this->get_default_args(), $atts, $this->get_shortcode_name() );
+
+        $this->atts = map_deep( shortcode_atts( $this->get_default_args(), $atts, $this->get_shortcode_name() ), 'wp_specialchars_decode' );
 
         $content = do_shortcode( $this->field_wrap( $this->render() ) );
 

@@ -135,7 +135,6 @@ class Submission_Handler extends Supports_Errors
      */
     public function process()
     {
-
         // Arrays for stuff
         $meta = [];
         $tags = [];

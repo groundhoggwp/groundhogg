@@ -312,8 +312,10 @@ class Event extends Base_Object
 
         // Soft fail when return false
         if ( ! $result ){
+
             $this->skip();
-            return false;
+
+            return apply_filters( 'groundhogg/event/run/skipped_result', false, $this );
         }
 
         // Hard fail when WP Error
@@ -323,8 +325,7 @@ class Event extends Base_Object
 
             $this->fail();
 
-            return false;
-
+            return apply_filters( 'groundhogg/event/run/failed_result', false, $this );
         }
 
         $this->complete();

@@ -359,14 +359,7 @@ class Contacts_Table extends WP_List_Table {
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', 'time' );
 
-		$query = get_request_query( [
-			'optin_status' => [
-				Preferences::CONFIRMED,
-				Preferences::UNCONFIRMED,
-				Preferences::WEEKLY,
-				Preferences::MONTHLY
-			]
-		] );
+		$query = get_request_query();
 
 		// Since unconfirmed is 0 (aside maybe we should change that) we need to specify we actually want it still.
 		$optin_status = absint( get_request_var( 'optin_status' ) );

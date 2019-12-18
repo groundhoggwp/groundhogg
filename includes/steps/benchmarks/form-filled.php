@@ -137,7 +137,7 @@ class Form_Filled extends Benchmark
 
     public function get_default_form()
     {
-        return "[row][col size=\"1/2\"][first required=\"true\" label=\"First Name *\" placeholder=\"John\"][/col][col size=\"1/2\"][last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"][/col][/row][row][col width=\"1/1\"][email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"][/col][/row][row][col width=\"1/1\"][submit text=\"Submit\"][/col][/row]";
+        return "[row][col width=\"1/2\"][first required=\"true\" label=\"First Name *\" placeholder=\"John\"][/col][col width=\"1/2\"][last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"][/col][/row][row][col width=\"1/1\"][email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"][/col][/row][row][col width=\"1/1\"][submit text=\"Submit\"][/col][/row]";
     }
 
     /**
