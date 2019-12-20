@@ -16,11 +16,7 @@ class Reviews
 
     public function show_review_request()
     {
-        if ( ! current_user_can( 'administrator' ) ){
-            return;
-        }
-
-        if ( get_transient( 'groundhogg_review_request_dismissed' ) || notices()->is_dismissed( 'groundhogg_review_request' ) ){
+        if ( ! current_user_can( 'administrator' ) || is_white_labeled() ||  get_transient( 'groundhogg_review_request_dismissed' ) || notices()->is_dismissed( 'groundhogg_review_request' )  ){
             return;
         }
 

@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.8.1 (2019-12-20) =
+* TWEAKED Prevent review request if Groundhogg is whitelabeled.
+
 = 2.1.8 (2019-12-18) =
 * ADDED More filters to the event process to allow for conditional logic.
 * ADDED Meta query search to the contact search filters.

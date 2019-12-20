@@ -45,7 +45,11 @@ class Broadcast extends Base_Object implements Event_Process
                 $this->object = Plugin::$instance->utils->get_email( $this->get_object_id() );
                 break;
             case self::TYPE_SMS:
-                $this->object = Plugin::$instance->utils->get_sms( $this->get_object_id() );
+
+                if ( is_sms_plugin_active() ){
+                    $this->object = Plugin::$instance->utils->get_sms( $this->get_object_id() );
+                }
+
                 break;
         }
     }
