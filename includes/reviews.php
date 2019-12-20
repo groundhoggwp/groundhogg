@@ -16,7 +16,7 @@ class Reviews
 
     public function show_review_request()
     {
-        if ( ! current_user_can( 'administrator' ) || is_white_labeled() ||  get_transient( 'groundhogg_review_request_dismissed' ) || notices()->is_dismissed( 'groundhogg_review_request' )  ){
+        if ( ! current_user_can( 'administrator' ) || is_white_labeled() ||  get_transient( 'groundhogg_review_request_dismissed' ) || notices()->is_dismissed( 'gh_review_request' )  ){
             return;
         }
 
@@ -35,27 +35,46 @@ class Reviews
         ?>
         <script>
             (function($){
-                $(function () {
 
-                    $( '.notice-dismiss-link' ).click( function (e) {
+
+                function dismiss_review( permanently ) {
+
+                    var args = { action: 'groundhogg_dismiss_review' };
+
+                    if ( permanently ){
+                        args.permanent = true;
+                    }
+
+                    adminAjaxRequest( args, function ( response ) {
+                        console.log( response )
+                    } );
+                }
+
+                function init() {
+
+                    $( document ).on( 'click', '.review-request .notice-dismiss', function (e) {
+                        dismiss_review( false );
+                    });
+
+                    $( '.review-request .notice-dismiss-link' ).click( function (e) {
                         e.preventDefault();
 
                         var $this = $(this);
 
-                        var args = { action: 'groundhogg_dismiss_review' };
-
                         if ( $this.hasClass( 'permanent' ) ){
-                            args.permanent = true;
+                            dismiss_review( true )
+                        } else {
+                            dismiss_review( false );
                         }
 
                         $this.closest( '.notice' ).fadeOut( 100, function () {
                             $(this).remove();
                         } );
-
-                        adminAjaxRequest( args, function ( response ) {
-                            console.log( response )
-                        } );
                     } )
+                }
+
+                $(function () {
+                    init();
                 });
             })(jQuery)
         </script>
@@ -75,7 +94,6 @@ class Reviews
         } else {
             set_transient( 'groundhogg_review_request_dismissed', WEEK_IN_SECONDS );
         }
-
 
         wp_send_json_success();
     }

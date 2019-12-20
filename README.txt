@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.8.2 (2019-12-20) =
+* TWEAKED Regular notice dismiss button will also dismiss the review notice request.
+
 = 2.1.8.1 (2019-12-20) =
 * TWEAKED Prevent review request if Groundhogg is whitelabeled.
 
