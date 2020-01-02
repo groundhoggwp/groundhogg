@@ -6,6 +6,17 @@
     font-size:18px;
 }
 
+#subject{
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+#pre_header{
+    border-top-width: 0;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
+
 #alt-wrap,
 #content-wrap,
 #subject-wrap{
