@@ -179,13 +179,37 @@ class Contacts_Page extends Admin_Page
                 'screen' => $this->get_screen_id(),
                 'target' => '.subsubsub',
                 'title' => 'Filter Contacts',
-                'show_next' => false,
+                'show_next' => true,
                 'content' => 'You can quickly see which of you contacts can be marketed to and which cannot by filtering them here.',
                 'position' => [
                     'edge' => 'top', //top, bottom, left, right
                     'align' => 'middle' //top, bottom, left, right, middle
                 ]
             ],
+            [
+                'id' => 'search_contacts',
+                'screen' => $this->get_screen_id(),
+                'target' => '#search_contacts',
+                'title' => 'Search Contacts',
+                'show_next' => true,
+                'content' => 'Search for contacts that meet more detailed criteria.',
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ],
+            [
+                'id' => 'import_contacts',
+                'screen' => $this->get_screen_id(),
+                'target' => '#import_contacts',
+                'title' => 'Import Contacts',
+                'show_next' => false,
+                'content' => 'Have a list already? Import them now!',
+                'position' => [
+                    'edge' => 'top', //top, bottom, left, right
+                    'align' => 'left' //top, bottom, left, right, middle
+                ]
+            ]
         ];
     }
 
@@ -356,16 +380,19 @@ class Contacts_Page extends Admin_Page
                 'link' => $this->admin_url( [ 'action' => 'add' ] ),
                 'action' => __( 'Add New', 'groundhogg' ),
                 'target' => '_self',
+                'id'     => '',
             ],
             [
                 'link' => Plugin::$instance->admin->tools->admin_url( [ 'tab' => 'import', 'action' => 'add' ] ),
                 'action' => __( 'Import', 'groundhogg' ),
                 'target' => '_self',
+                'id' => 'import_contacts'
             ],
             [
                 'link' => admin_page_url( 'gh_contacts', [ 'search' => 1 ] ),
                 'action' => __( 'Search', 'groundhogg' ),
                 'target' => '_self',
+                'id' => 'search_contacts'
             ],
         ];
     }

@@ -150,6 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.8.3 (2020-01-03) =
+* TWEAKED Some admin CSS for 5.3.2 compatibility.
+* FIXED check that $.fn.pointer is defined for plugin compatibility when starting the guided tour.
+
 = 2.1.8.2 (2019-12-20) =
 * TWEAKED Regular notice dismiss button will also dismiss the review notice request.
 

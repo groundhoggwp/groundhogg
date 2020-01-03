@@ -248,18 +248,18 @@ class Funnels_Page extends Admin_Page
                     'align' => 'middle' //top, bottom, left, right, middle
                 ]
             ],
-            [
-                'id' => 'funnel_marketplace',
-                'screen' => $this->get_screen_id(),
-                'target' => '#funnel-marketplace',
-                'title' => 'Funnel Marketplace',
-                'show_next' => true,
-                'content' => 'Browse the Groundhogg Marketplace for templates that fit your business niche.',
-                'position' => [
-                    'edge' => 'left',
-                    'align' => 'middle'
-                ]
-            ],
+//            [
+//                'id' => 'funnel_marketplace',
+//                'screen' => $this->get_screen_id(),
+//                'target' => '#funnel-marketplace',
+//                'title' => 'Funnel Marketplace',
+//                'show_next' => true,
+//                'content' => 'Browse the Groundhogg Marketplace for templates that fit your business niche.',
+//                'position' => [
+//                    'edge' => 'left',
+//                    'align' => 'middle'
+//                ]
+//            ],
             [
                 'id' => 'import_funnel_template',
                 'screen' => $this->get_screen_id(),

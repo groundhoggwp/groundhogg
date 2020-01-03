@@ -436,12 +436,16 @@ abstract class Admin_Page extends Supports_Errors
                 'link' => admin_url(),
                 'action' => __('Add New', 'groundhogg'),
                 'target' => '_self',
-            ])
+                'id' => '',
+            ]);
 
-            ?>
-            <a class="page-title-action aria-button-if-js" target="<?php esc_attr_e($action['target']); ?>"
-               href="<?php esc_attr_e($action['link']); ?>"><?php _e($action['action']); ?></a>
-        <?php
+            echo html()->e( 'a', [
+                    'class' => 'page-title-action aria-button-if-js',
+                    'target' => $action[ 'target' ],
+                    'href'   => $action[ 'link' ],
+                    'id'     => $action[ 'id' ],
+            ], $action[ 'action' ] );
+
         endforeach;
 
     }

@@ -29,7 +29,7 @@ class Pointers {
 		$this->register_pointers($pntrs);
 
 		add_action( 'admin_enqueue_scripts', array( &$this, 'add_pointers' ), 1000 );
-		add_action( 'admin_head', array( &$this, 'add_scripts' ) );
+		add_action( 'admin_footer', array( &$this, 'add_scripts' ) );
 	}
 
 	public function register_pointers( $pntrs )
@@ -113,7 +113,8 @@ class Pointers {
                             self.help_pointer_open(i);
                         });
 
-                        $(document).on( 'click', '.pointer-next', function () {
+                        $(document).on( 'click', '.pointer-next', function (e) {
+                            e.preventDefault();
                             self.open_next_pointer();
                         });
                     },
@@ -142,6 +143,10 @@ class Pointers {
                             }
                         });
 
+                        if ( typeof $.fn.pointer != 'function' ){
+                            return;
+                        }
+
                         var $pointer = $( pointer.target ).pointer( options );
 
                         this.pointers[ i ] = $pointer;
@@ -162,4 +167,4 @@ class Pointers {
         </script>
         <?php
     }
-} // end class
+}
