@@ -151,6 +151,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 == Changelog ==
 
 = 2.1.8.3 (2020-01-03) =
+* ADDED "view terms" link to the Terms form field. Links to the link provided in the settings.
 * TWEAKED Some admin CSS for 5.3.2 compatibility.
 * FIXED check that $.fn.pointer is defined for plugin compatibility when starting the guided tour.
 
