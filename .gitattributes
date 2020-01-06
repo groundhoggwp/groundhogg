@@ -1,0 +1,13 @@
+# Directories
+/.wordpress-org export-ignore
+/.github export-ignore
+/node_modules export-ignore
+
+# Files
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.distignore export-ignore
+/.babelrc export-ignore
+/webpack.config.js export-ignore
+/package.json export-ignore
+/package-lock.json export-ignore
