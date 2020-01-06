@@ -7,13 +7,17 @@ class Plugin_Compatibility
 
     public function __construct()
     {
-        add_action( 'admin_init', [ $this, 'remove_unwanted_actions_and_filters_from_editors' ], 999 );
+//        add_action( 'current_screen', [ $this, 'remove_unwanted_actions_and_filters_from_editors' ], 999 );
         add_action( 'admin_enqueue_scripts', [ $this, 'remove_styles_and_scripts_from_editors' ], 999 );
     }
 
     protected function is_editor_page()
     {
         $screen = get_current_screen();
+
+        if ( ! $screen ){
+            return false;
+        }
 
         $action = get_request_var( 'action', 'view' );
 
