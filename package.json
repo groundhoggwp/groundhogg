@@ -1,6 +1,6 @@
 {
   "name": "groundhogg",
-  "version": "2.1.8.3",
+  "version": "2.1.8",
   "license": "MIT",
   "main": "blocks/gutenberg/index.js",
   "scripts": {
@@ -23,7 +23,8 @@
     "raw-loader": "^0.5.1",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.19.1",
-    "webpack": "^3.11.0"
+    "webpack": "^3.11.0",
+    "autoprefixer": "^9.7.3"
   },
   "dependencies": {
     "uglify-es": "^3.3.10",

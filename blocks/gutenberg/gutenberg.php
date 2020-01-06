@@ -51,7 +51,7 @@ function enqueue_block_editor_assets() {
         'show_description' => esc_html__( 'Show Description', 'groundhogg' ),
     );
 
-    wp_enqueue_script( 'groundhogg-gutenberg-form-selector',plugin_dir_url( __FILE__ ) . 'js/block.min.js', array( 'wp-blocks', 'wp-i18n', 'wp-element' ,'wp-editor', 'wp-components'  ),GROUNDHOGG_VERSION );
+    wp_enqueue_script( 'groundhogg-gutenberg-form-selector',plugin_dir_url( __FILE__ ) . 'js/blocks.js', array( 'wp-blocks', 'wp-i18n', 'wp-element' ,'wp-editor', 'wp-components'  ),GROUNDHOGG_VERSION );
     wp_enqueue_style('groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION);
 
     $forms = get_db( 'steps' )->query( [ 'step_type' => 'form_fill' ] );

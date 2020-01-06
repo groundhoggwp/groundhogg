@@ -32,7 +32,7 @@ const extractConfig = {
 
 module.exports = {
     entry: {
-        './assets/js/editor.blocks' : './blocks/index.js',
+        './blocks/gutenberg/js/blocks' : './blocks/gutenberg/index.js',
     },
     output: {
         path: path.resolve( __dirname ),
