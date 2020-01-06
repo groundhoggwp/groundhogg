@@ -330,6 +330,7 @@ class Plugin {
         }
 
         new Extension_Upgrader();
+        new Plugin_Compatibility();
 
         // Partner
         SendWp::instance();
