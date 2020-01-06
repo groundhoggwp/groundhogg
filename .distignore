@@ -4,6 +4,7 @@
 /node_modules
 
 .distignore
+.gitattributes
 .gitignore
 .babelrc
 package.json
