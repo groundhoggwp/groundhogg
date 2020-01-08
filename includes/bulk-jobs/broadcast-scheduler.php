@@ -70,6 +70,7 @@ class Broadcast_Scheduler extends Bulk_Job
         }
 
         $contacts = $query->query( $args );
+
         $ids = wp_list_pluck( $contacts, 'ID' );
 
         return $ids;

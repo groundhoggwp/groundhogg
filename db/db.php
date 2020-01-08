@@ -794,10 +794,20 @@ abstract class DB {
 
         $clause = [];
 
-        foreach ( $where as $condition ){
+        foreach ( $where as $i => $condition ){
 
             if ( ! is_array( $condition ) ){
-                // Todo?
+                // Assume first order ==
+
+                $value = $condition;
+                $col = $i;
+
+                if ( is_numeric( $value ) ){
+                    $clause[] = $wpdb->prepare( "$col = %d", $value );
+                } else {
+                    $clause[] = $wpdb->prepare( "$col = %s", $value );
+                }
+
             } else if ( isset_not_empty( $condition, 'relationship' ) ){
 
                 $clause[] = $this->build_advanced_where_statement( $condition );

@@ -55,7 +55,23 @@ class Notices
                     action_url( 'gh_dismiss_notice', [ 'notice' => 'features-removed-notice' ] ) ),
                 'warning',
                 'administrator',
-                true );
+                true
+            );
+        }
+
+
+        if ( Plugin::$instance->sending_service->is_active_for_email() ){
+            $this->add(
+                'sending-service-deprecated',
+                sprintf( "IMPORTANT! The sending service is officially being discontinued as of Monday, January 13th 2020. Please use an alternative method such as <a href='%s'>SendWP</a>, <a href='%s'>AWS SES</a> or <a href='%s'>Another SMTP service</a>.",
+                    admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ),
+                    'https://www.groundhogg.io/downloads/aws/',
+                    'https://www.groundhogg.io/downloads/smtp/'
+                ),
+                'warning',
+                'administrator',
+                true
+            );
         }
 
     }

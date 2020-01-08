@@ -74,7 +74,8 @@ class Broadcasts_Table extends WP_List_Table {
             'stats' => _x( 'Stats', 'Column label', 'groundhogg' ),
             'date_scheduled' => _x( 'Date Scheduled', 'Column label', 'groundhogg' ),
 		);
-		return apply_filters( 'wpgh_broadcast_columns', $columns );
+
+		return apply_filters( 'groundhogg/admin/broadcasts/table/columns', $columns );
 	}
 	/**
 	 * Get a list of sortable columns. The format is:
@@ -91,7 +92,7 @@ class Broadcasts_Table extends WP_List_Table {
 			'send_time' => array( 'send_at', false ),
 			'date_scheduled' => array( 'date_scheduled', false )
 		);
-		return apply_filters( 'wpgh_broadcast_sortable_columns', $sortable_columns );
+		return apply_filters( 'groundhogg/admin/broadcast/table/sortable_columns', $sortable_columns );
 	}
 
     /**
@@ -327,7 +328,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_default( $broadcast, $column_name )
     {
-	    do_action( 'groundhogg/admin/broadcasts/table/columns', $broadcast, $column_name );
+	    do_action( 'groundhogg/admin/broadcasts/table/column_default', $broadcast, $column_name );
 	    return '';
 	}
 

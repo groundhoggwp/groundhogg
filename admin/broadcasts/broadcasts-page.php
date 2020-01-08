@@ -215,6 +215,17 @@ class Broadcasts_Page extends Admin_Page
         return false;
     }
 
+    /**
+     * Resend a broadcast to anyone who has not opened it. Schedule as a new broadcast.
+     */
+    public function process_resend_to_unopened()
+    {
+        if (!current_user_can('schedule_broadcasts')) {
+            $this->wp_die_no_access();
+        }
+
+        do_action( 'groundhogg/admin/broadcasts/process_resend_to_unopened' );
+    }
 
     /**
      * @return array|array[]
