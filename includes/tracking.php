@@ -533,7 +533,7 @@ class Tracking
             }
         }
 
-	    /* only fire if actually doing an open as this may be called by the email_link_clicked method */
+        /* only fire if actually doing an open as this may be called by the email_link_clicked method */
 	    if ( $this->doing_open ){
 	        $this->output_tracking_image();
 	    }
