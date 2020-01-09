@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.9.1 (2020-01-09) =
+* FIXED Bug during stats collection causing fatal error.
+
 = 2.1.9 (2020-01-08) =
 * TWEAKED Make way for new Advanced Features in the broadcast tool.
 * TWEAKED Support first order clause in the DB query sql builder.

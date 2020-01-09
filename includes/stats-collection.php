@@ -181,7 +181,7 @@ We appreciate your help, enjoy!
         $response = remote_post_json( self::$api_url, $stats );
 
         /* Success */
-        if ( ! is_wp_error( $response ) ) {
+        if ( is_wp_error( $response ) ) {
 
             /* Optin if not already and optin enabled via settings... */
             if ($response->get_error_code() === 'site_unregistered') {
