@@ -233,8 +233,12 @@ class Rewrites
 
                 $contact_read_access = $contact && $contact->get_upload_folder_basename() === $subfolder && $nonce_read_access;
 
-                if ( ! $admin_read_access && ! $contact_read_access ){
-                    wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
+                $unrestricted = is_option_enabled( 'gh_allow_unrestricted_file_access' );
+
+                if ( ! $unrestricted ){
+                    if ( ! $admin_read_access && ! $contact_read_access ){
+                        wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
+                    }
                 }
 
                 $mime = wp_check_filetype( $file_path );

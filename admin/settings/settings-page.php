@@ -32,17 +32,11 @@ class Settings_Page extends Admin_Page
 {
 
     // UNUSED FUNCTIONS
-    protected function add_ajax_actions()
-    {
-    }
+    protected function add_ajax_actions(){}
 
-    public function help()
-    {
-    }
+    public function help(){}
 
-    public function scripts()
-    {
-    }
+    public function scripts(){}
 
     /**
      * Settings_Page constructor.
@@ -533,6 +527,20 @@ class Settings_Page extends Admin_Page
                     //keep brackets for backwards compat
                     'name' => 'gh_opted_in_stats_collection',
                     'id' => 'gh_opted_in_stats_collection',
+                    'value' => 'on',
+                ),
+            ),
+            'gh_allow_unrestricted_file_access' => array(
+                'id' => 'gh_allow_unrestricted_file_access',
+                'section' => 'misc_info',
+                'label' => _x('Allow unrestricted access to contact file uploads.', 'settings', 'groundhogg'),
+                'desc' => _x('This will allow anyone with a file access link to view uploads regardless of whether they are logged in.', 'settings', 'groundhogg'),
+                'type' => 'checkbox',
+                'atts' => array(
+                    'label' => __('Allow'),
+                    //keep brackets for backwards compat
+                    'name' => 'gh_allow_unrestricted_file_access',
+                    'id' => 'gh_allow_unrestricted_file_access',
                     'value' => 'on',
                 ),
             ),

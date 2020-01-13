@@ -208,9 +208,9 @@ class Welcome_Page extends Admin_Page
                                         'url' => 'https://www.groundhogg.io/downloads/'
                                     ],
                                     [
-                                        'icon' => 'admin-post',
-                                        'display' => __('Blog'),
-                                        'url' => 'https://www.groundhogg.io/blog/'
+                                        'icon' => 'welcome-learn-more',
+                                        'display' => __('Courses'),
+                                        'url' => 'https://academy.groundhogg.io/'
                                     ],
                                     [
                                         'icon' => 'sos',
@@ -254,6 +254,24 @@ class Welcome_Page extends Admin_Page
                         </div>
                     </div>
                 </div>
+
+                <div class="col">
+                    <div class="postbox">
+                        <?php
+
+                        echo html()->e( 'a', [ 'href' => 'https://academy.groundhogg.io/course/groundhogg-quickstart/', 'target' => '_blank' ], html()->e('img', [
+                            'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/quickstart-course-welcome-screen.png',
+                        ] ) );
+
+                        echo html()->e('a', [
+                            'class' => 'button big-button',
+                            'href' => admin_page_url('gh_tools', ['tab' => 'import', 'action' => 'add'])
+                        ], __('Take The Quickstart Course!', 'groundhogg'));
+
+                        ?>
+                    </div>
+                </div>
+
                 <div class="left-col col">
 
                      <!-- Import your list -->

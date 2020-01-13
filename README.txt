@@ -1,7 +1,7 @@
 === Groundhogg — Marketing Automation & CRM for WordPress ===
 Contributors: trainingbusinesspros, groundhogg, dhrumit
 Tags: crm, email marketing, email, marketing automation, automation
-Donate link: https://groundhogg.io
+Donate link: https://www.groundhogg.io/try/
 Requires at least: 4.9
 Tested up to: 5.3
 Requires PHP: 5.6
@@ -149,6 +149,12 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 == Changelog ==
+
+= 2.1.10 (2020-01-09) =
+* ADDED Courses link to welcome screen menu.
+* ADDED CTA to take the quickstart course on the welcome screen.
+* ADDED Setting to enable unrestricted access to contact file uploads.
+* FIXED Minified js file missing from package.
 
 = 2.1.9.1 (2020-01-09) =
 * FIXED Bug during stats collection causing fatal error.
