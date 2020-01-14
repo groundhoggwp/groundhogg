@@ -42,9 +42,11 @@ class Notices
         }
     }
 
+    /**
+     * Arbitrary function to add any notices that don't really belong in other plugin files.
+     */
     public function pre_notices()
     {
-
         // If this site is updating from an older version
         if ( get_option( 'gh_updating_to_2_1' ) ){
             // Show a notice that features have been removed
@@ -59,21 +61,20 @@ class Notices
             );
         }
 
-
-        if ( Plugin::$instance->sending_service->is_active_for_email() ){
+        if ( is_option_enabled( 'gh_send_with_gh_api' ) ){
             $this->add(
                 'sending-service-deprecated',
-                sprintf( "IMPORTANT! The sending service is officially being discontinued as of Monday, January 13th 2020. Please use an alternative method such as <a href='%s'>SendWP</a>, <a href='%s'>AWS SES</a> or <a href='%s'>Another SMTP service</a>.",
+                sprintf( "IMPORTANT! The sending service has been officially discontinued. Please use an alternative method such as <a href='%s'>SendWP</a>, <a href='%s'>AWS SES</a> or <a href='%s'>Another SMTP service</a>. <a class='button' href='%s'>Dismiss</a>",
                     admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ),
                     'https://www.groundhogg.io/downloads/aws/',
-                    'https://www.groundhogg.io/downloads/smtp/'
+                    'https://www.groundhogg.io/downloads/smtp/',
+                    action_url( 'gh_dismiss_notice', [ 'notice' => 'sending-service-deprecated' ] )
                 ),
                 'warning',
                 'administrator',
                 true
             );
         }
-
     }
 
     /**

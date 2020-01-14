@@ -367,12 +367,6 @@ class Settings_Page extends Admin_Page
                 'tab' => 'email',
                 'callback' => [Plugin::$instance->bounce_checker, 'test_connection_ui'],
             ),
-            'service' => [
-                'id' => 'service',
-                'title' => _x('Groundhogg Sending Service (Deprecated)', 'settings_sections', 'groundhogg'),
-                'tab' => 'email',
-                'callback' => [Plugin::$instance->sending_service, 'test_connection_ui'],
-            ],
             'api_settings' => array(
                 'id' => 'api_settings',
                 'title' => _x('API Settings', 'settings_sections', 'groundhogg'),
@@ -386,12 +380,6 @@ class Settings_Page extends Admin_Page
 
             ],
         );
-
-        // Hide the sending service if no API token is set since it is deprecated.
-        // Hide if the plugin is currently white labeled.
-        if (is_white_labeled() || !Plugin::instance()->sending_service->has_api_token()) {
-            unset( $sections['service'] );
-        }
 
         if ( defined( 'DISABLE_WP_CRON' ) && ! defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ) ){
             unset( $sections['wp_cron'] );
@@ -834,44 +822,6 @@ class Settings_Page extends Admin_Page
                 'args' => ['sanitize_callback' => 'wp_kses_post'],
                 'atts' => ['replacements_button' => true],
             ],
-            'gh_email_token' => array(
-                'id' => 'gh_email_token',
-                'section' => 'service',
-                'label' => _x('Email & SMS Service Token', 'settings', 'groundhogg'),
-                'desc' => _x('Get this key from your <a target="_blank" href="https://www.groundhogg.io/account/manage/">Groundhogg Account Page.</a>', 'settings', 'groundhogg'),
-                'type' => 'input',
-                'atts' => array(
-                    'type' => 'password',
-                    'name' => 'gh_email_token',
-                    'id' => 'gh_email_token',
-                ),
-            ),
-            'gh_send_with_gh_api' => array(
-                'id' => 'gh_send_with_gh_api',
-                'section' => 'service',
-                'label' => _x('Send Email With Groundhogg', 'settings', 'groundhogg'),
-                'desc' => _x('Send email using the Groundhogg Sending Service! This will only be used by emails sent with Groundhogg and not other WP emails. You will still be able to send SMS if this is disabled.', 'settings', 'groundhogg'),
-                'type' => 'checkbox',
-                'atts' => array(
-                    'label' => __('Enable (Recommended)'),
-                    'name' => 'gh_send_with_gh_api[]',
-                    'id' => 'gh_send_with_gh_api',
-                    'value' => 'on',
-                ),
-            ),
-            'gh_send_all_email_through_ghss' => array(
-                'id' => 'gh_send_all_email_through_ghss',
-                'section' => 'service',
-                'label' => _x('Send Transactional Email With Groundhogg', 'settings', 'groundhogg'),
-                'desc' => _x('By default, regular WP email such as password reset emails are sent through the default WordPress email method regardless of the above settings. However, you can also choose to send all your transactional email through the Groundhogg Sending Service as well. ', 'settings', 'groundhogg'),
-                'type' => 'checkbox',
-                'atts' => array(
-                    'label' => __('Enable (Recommended)'),
-                    'name' => 'gh_send_all_email_through_ghss[]',
-                    'id' => 'gh_send_all_email_through_ghss',
-                    'value' => 'on',
-                ),
-            ),
             'gh_disable_api' => array(
                 'id' => 'gh_disable_api',
                 'section' => 'api_settings',

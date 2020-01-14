@@ -22,38 +22,6 @@ class GH_SS_Mailer extends \PHPMailer
      */
     public function send()
     {
-        try {
-
-            if ( ! $this->preSend() ) {
-                return false;
-            }
-
-            $message = $this->getSentMIMEMessage();
-
-            if ( apply_filters( 'groundhogg/gh_ss_mailer/use_gh_ss', true ) ){
-                $response = Plugin::$instance->sending_service->request( 'emails/send', [
-                    'message' => $message,
-                ], 'POST' );
-            } else {
-                $response = apply_filters( 'groundhogg/gh_ss_mailer/send', $message );
-            }
-
-        } catch (\phpmailerException $exc) {
-
-            $this->mailHeader = '';
-            $this->setError($exc->getMessage());
-
-            if ($this->exceptions) {
-                throw $exc;
-            }
-
-            return false;
-        }
-
-        if ( is_wp_error( $response ) ){
-            throw new \phpmailerException( $response->get_error_message(), self::STOP_CRITICAL );
-        }
-
-        return true;
+        throw new \phpmailerException( 'Please use a dedicated transactional email service like AWS, SendGrid, Mailgun or SendWP.', self::STOP_CRITICAL );
     }
 }

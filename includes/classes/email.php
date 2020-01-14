@@ -768,30 +768,13 @@ class Email extends Base_Object_With_Meta
 
         $headers = $this->get_headers();
 
-        /* Send with API. Do not send with API while in TEST MODE */
-        if ( Plugin::$instance->sending_service->is_active_for_email() ) {
-
-        	try{
-		        $sent = $this->send_with_gh(
-			        $to,
-			        $subject,
-			        $content,
-			        $headers
-		        );
-	        } catch ( \Exception $e ){
-        		$this->add_error( new WP_Error( 'error', $e->getMessage() ) );
-        		$sent = false;
-	        }
-
-        } else {
-            /* Send with default WP */
-            $sent = $this->send_with_wp(
-                $to,
-                $subject,
-                $content,
-                $headers
-            );
-        }
+        /* Send with default WP */
+        $sent = $this->send_with_wp(
+            $to,
+            $subject,
+            $content,
+            $headers
+        );
 
         remove_action('phpmailer_init', [ $this, 'set_bounce_return_path' ] );
         remove_action('phpmailer_init', [ $this, 'set_plaintext_body' ] );
@@ -815,7 +798,6 @@ class Email extends Base_Object_With_Meta
         }
 
         return $sent;
-
     }
 
     /**
@@ -830,25 +812,6 @@ class Email extends Base_Object_With_Meta
     private function send_with_wp($to, $subject, $content, $headers)
     {
         return wp_mail( $to, $subject, $content, $headers );
-    }
-
-    /**
-     * Send to Groundhogg
-     *
-     * @param $to
-     * @param $subject
-     * @param $content
-     * @param $headers
-     *
-     * @deprecated since 2.1
-     *
-     * @return bool|wp_error
-     *
-     * @throws \Exception
-     */
-    private function send_with_gh($to, $subject, $content, $headers)
-    {
-        return gh_ss_mail( $to, $subject, $content, $headers );
     }
 
     /**
@@ -896,7 +859,11 @@ class Email extends Base_Object_With_Meta
      */
     public function set_bounce_return_path( $phpmailer )
     {
-        $phpmailer->Sender = Plugin::$instance->settings->get_option( 'bounce_inbox', $phpmailer->From );
+        $return_path = Plugin::$instance->settings->get_option( 'bounce_inbox', $phpmailer->From );
+
+        if ( is_email( $return_path ) ){
+            $phpmailer->Sender = $return_path;
+        }
     }
 
     /**

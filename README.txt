@@ -150,7 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.10 (2020-01-09) =
+= 2.1.11 (2020-01-14) =
+* REMOVED Groundhogg Sending Service functionality. Please use an alternative transactional email service.
+
+= 2.1.10 (2020-01-013) =
 * ADDED Courses link to welcome screen menu.
 * ADDED CTA to take the quickstart course on the welcome screen.
 * ADDED Setting to enable unrestricted access to contact file uploads.

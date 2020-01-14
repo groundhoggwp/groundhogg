@@ -726,7 +726,8 @@ function get_return_path_email()
  * @throws \Exception
  *
  * @since 1.2.10
- **
+ * @deprecated 2.1.11
+ *
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() )
 {
