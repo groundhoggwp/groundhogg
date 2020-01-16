@@ -177,6 +177,9 @@ class Main_Updater extends Updater {
         install_custom_rewrites();
     }
 
+    /**
+     * Update missing author in emails table
+     */
     public function version_2_1_7_1()
     {
         if ( is_user_logged_in() ){
