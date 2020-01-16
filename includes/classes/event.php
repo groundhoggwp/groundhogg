@@ -93,6 +93,14 @@ class Event extends Base_Object
     /**
      * @return int
      */
+    public function get_time_scheduled()
+    {
+        return absint($this->time_scheduled);
+    }
+
+    /**
+     * @return int
+     */
     public function get_event_type()
     {
         return absint($this->event_type);

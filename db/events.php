@@ -89,6 +89,7 @@ class Events extends DB  {
         return array(
             'ID'            => '%d',
             'time'          => '%d',
+            'time_scheduled'=> '%d',
             'funnel_id'     => '%d',
             'step_id'       => '%d',
             'contact_id'    => '%d',
@@ -110,6 +111,7 @@ class Events extends DB  {
         return array(
             'ID'            => 0,
             'time'          => time(),
+            'time_scheduled'=> time(),
             'funnel_id'     => 0,
             'step_id'       => 0,
             'contact_id'    => 0,
@@ -203,6 +205,7 @@ class Events extends DB  {
         $sql = "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         time bigint(20) unsigned NOT NULL,
+        time_scheduled bigint(20) unsigned NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
@@ -213,6 +216,7 @@ class Events extends DB  {
         claim varchar(20) NOT NULL,
         PRIMARY KEY (ID),
         KEY time (time),
+        KEY time_scheduled (time_scheduled),
         KEY contact_id (contact_id),
         KEY funnel_id (funnel_id),
         KEY step_id (step_id)

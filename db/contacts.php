@@ -150,8 +150,11 @@ class Contacts extends DB {
 
             // update an existing contact
             $contact = $this->get_contact_by( 'email', $args[ 'email' ] );
-            $this->update( $contact->ID, $data );
-            $result = $contact->ID;
+
+            $contact_id = absint( $contact->ID );
+
+            $this->update( $contact_id, $data );
+            $result = $contact_id;
 
         } else {
             $result = $this->insert( $args );

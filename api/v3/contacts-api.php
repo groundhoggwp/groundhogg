@@ -247,7 +247,7 @@ class Contacts_Api extends Base
     {
         $contact = get_contactdata( $id );
 
-        return $contact? $contact->get_as_array() : false;
+        return $contact ? $contact->get_as_array() : false;
     }
 
     /**
@@ -370,6 +370,13 @@ class Contacts_Api extends Base
             unset( $args['meta'] );
         }
 
+        $tags = null;
+
+        if ( $args[ 'tags' ] ) {
+            $tags = $args['tags'];
+            unset( $args['tags'] );
+        }
+
         if( ! isset( $args['email'] ) || ! is_email($args['email'] ) ) {
             return self::ERROR_400('invalid_email', _x( 'Please provide a valid email address.', 'api', 'groundhogg' ) );
         }
@@ -378,10 +385,20 @@ class Contacts_Api extends Base
 
         $contact_id = Plugin::$instance->dbs->get_db( 'contacts' )->add( $args );
 
+        if ( ! $contact_id ){
+            return self::ERROR_400( 'error', 'Unable to add contact.' );
+        }
+
+        $contact = get_contactdata( $contact_id );
+
         if ( $meta ) {
             foreach( $meta as $key => $value ) {
-                Plugin::$instance->dbs->get_db( 'contactmeta' )->update_meta( $contact_id, sanitize_key( $key ), sanitize_text_field( $value ) );
+                $contact->update_meta( sanitize_key( $key ), sanitize_text_field( $value ) );
             }
+        }
+
+        if ( ! empty( $tags ) ){
+            $contact->add_tag( $tags );
         }
 
         $contact = $this->get_contact_for_rest_response( $contact_id );

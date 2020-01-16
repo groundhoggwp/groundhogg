@@ -150,6 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.11.1 (2020-01-16) =
+* TWEAKED Added time_scheduled column to the events table to start tracking when an event is initially added to the queue
+* TWEAKED Modified the contact REST API ADD endpoint to support the addition of tags to the contact record.
+
 = 2.1.11 (2020-01-14) =
 * REMOVED Groundhogg Sending Service functionality. Please use an alternative transactional email service.
 
