@@ -3,6 +3,7 @@
 namespace Groundhogg\Bulk_Jobs;
 
 // Exit if accessed directly
+use function Groundhogg\get_post_var;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
 
@@ -95,7 +96,9 @@ abstract class Bulk_Job
      */
     public function is_then_end()
     {
-        return filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN );
+	    $the_end = get_post_var( 'the_end', false );
+
+	    return filter_var( $the_end, FILTER_VALIDATE_BOOLEAN );
     }
 
     /**
@@ -113,6 +116,16 @@ abstract class Bulk_Job
      */
     public function process()
     {
+
+    	if ( ! key_exists( 'the_end', $_POST ) ){
+
+    		$error = new \WP_Error(
+    			'error',
+			    __( 'There was an error performing this process. This is most likely due to the PHP max_input_vars variable not being high enough.', 'groundhogg' )
+		    );
+
+    		wp_send_json_error( $error );
+	    }
 
         $items = $this->get_items();
 
@@ -132,7 +145,9 @@ abstract class Bulk_Job
             'POST' => $_POST
         ];
 
-        if ( filter_var( $_POST[ 'the_end' ], FILTER_VALIDATE_BOOLEAN ) ){
+        $the_end = get_post_var( 'the_end', false );
+
+        if ( filter_var( $the_end, FILTER_VALIDATE_BOOLEAN ) ){
 
             $this->clean_up();
 
