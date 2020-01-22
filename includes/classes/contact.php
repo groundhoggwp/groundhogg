@@ -695,13 +695,13 @@ class Contact extends Base_Object_With_Meta
     }
 
     /**
-     * Upload a file
-     *
-     * Usage: $contact->upload_file( $_FILES[ 'file_name' ] )
-     *
-     * @param $file
-     * @return array|\WP_Error
-     */
+ * Upload a file
+ *
+ * Usage: $contact->upload_file( $_FILES[ 'file_name' ] )
+ *
+ * @param $file
+ * @return array|\WP_Error
+ */
     public function upload_file( &$file )
     {
 
@@ -830,4 +830,18 @@ class Contact extends Base_Object_With_Meta
     {
         return sprintf( "%s (%s)", $this->get_full_name(), $this->get_email() );
     }
+
+
+    public function get_company()
+    {
+        return $this->get_meta('company_name');
+    }
+
+    public function get_job_title()
+    {
+        return $this-> get_meta('job_title') ;
+    }
+
+
+
 }

@@ -889,18 +889,17 @@ class HTML
             'tags'              => false,
         ) );
 
+        if ( $a[ 'multiple' ] ){
+            $a[ 'class' ] = 'gh-contact-picker-multiple';
+        }
+
         foreach ( $a[ 'selected' ] as $contact_id ){
 
             $contact = get_contactdata( $contact_id );
-
             if ( $contact->exists() ) {
-
                 $a[ 'data' ][ $contact_id ] = sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email );
-
             }
-
         }
-
 
         return apply_filters( 'groundhogg/html/dropdown_contacts', $this->select2( $a ), $a );
     }
