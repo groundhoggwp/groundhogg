@@ -259,13 +259,27 @@ class Welcome_Page extends Admin_Page
                     <div class="postbox">
                         <?php
 
-                        echo html()->e( 'a', [ 'href' => 'https://academy.groundhogg.io/course/groundhogg-quickstart/', 'target' => '_blank' ], html()->e('img', [
+                        echo html()->e('a', [
+                            'href' => add_query_arg([
+                                'utm_source' => get_bloginfo(),
+                                'utm_medium' => 'welcome-page',
+                                'utm_campaign' => 'quickstart',
+                                'utm_content' => 'image',
+                            ], 'https://academy.groundhogg.io/course/groundhogg-quickstart/')
+                            , 'target' => '_blank'
+                        ], html()->e('img', [
                             'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/quickstart-course-welcome-screen.png',
-                        ] ) );
+                        ]));
 
                         echo html()->e('a', [
+                            'target' => '_blank',
                             'class' => 'button big-button',
-                            'href' => admin_page_url('gh_tools', ['tab' => 'import', 'action' => 'add'])
+                            'href' => add_query_arg([
+                                'utm_source' => get_bloginfo(),
+                                'utm_medium' => 'welcome-page',
+                                'utm_campaign' => 'quickstart',
+                                'utm_content' => 'button',
+                            ], 'https://academy.groundhogg.io/course/groundhogg-quickstart/'),
                         ], __('Take The Quickstart Course!', 'groundhogg'));
 
                         ?>
@@ -274,7 +288,7 @@ class Welcome_Page extends Admin_Page
 
                 <div class="left-col col">
 
-                     <!-- Import your list -->
+                    <!-- Import your list -->
                     <div class="postbox">
                         <?php
 
@@ -371,7 +385,7 @@ class Welcome_Page extends Admin_Page
                             'class' => 'guide-link',
                             'href' => 'https://help.groundhogg.io/article/86-how-to-schedule-a-broadcast',
                             'target' => '_blank'
-                        ], __('Read the full guide', 'groundhogg') ); ?>
+                        ], __('Read the full guide', 'groundhogg')); ?>
 
                         <div class="hidden" id="send-your-first-broadcast-video">
                             <iframe width="800" height="450" src="https://www.youtube.com/embed/bwIbcsEG7Kg"
@@ -383,11 +397,11 @@ class Welcome_Page extends Admin_Page
 
                     <!-- Configure CRON -->
                     <div class="postbox">
-                    <?php
+                        <?php
                         echo html()->modal_link([
                             'title' => __('Configure WP-Cron', 'groundhogg'),
                             'text' => html()->e('img', [
-                                    'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/correctly-configure-wp-cron-for-groundhogg.png'
+                                'src' => GROUNDHOGG_ASSETS_URL . 'images/welcome/correctly-configure-wp-cron-for-groundhogg.png'
                             ]),
                             'footer_button_text' => __('Close'),
                             'source' => 'configure-wp-cron',
@@ -400,12 +414,15 @@ class Welcome_Page extends Admin_Page
 
                         echo html()->e('a', [
                             'class' => 'button big-button',
-                            'href' => admin_page_url('gh_tools', ['tab' => 'cron_setup'] )
+                            'href' => admin_page_url('gh_tools', ['tab' => 'cron_setup'])
                         ], __('Configure WP-Cron!'));
 
-                         echo html()->e('a', ['class' => 'guide-link', 'href' => 'https://help.groundhogg.io/article/45-how-to-disable-builtin-wp-cron', 'target' => '_blank'], __('Read the full guide', 'groundhogg')); ?>
+                        echo html()->e('a', ['class' => 'guide-link', 'href' => 'https://help.groundhogg.io/article/45-how-to-disable-builtin-wp-cron', 'target' => '_blank'], __('Read the full guide', 'groundhogg')); ?>
                         <div class="hidden" id="configure-wp-cron">
-                            <iframe width="800" height="450" src="https://www.youtube.com/embed/1-csY3W-WP0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            <iframe width="800" height="450" src="https://www.youtube.com/embed/1-csY3W-WP0"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe>
                         </div>
                     </div>
                 </div>

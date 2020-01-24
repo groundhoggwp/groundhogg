@@ -150,6 +150,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.11.3 (2020-01-24) =
+* FIXED Link to quickstart course on welcome page going to wrong place.
+
 = 2.1.11.2 (2020-01-18) =
 * TWEAKED Bulk Job processor will now notify user of low max_input_vars
 * TWEAKED Transients for contact imports is now set to 1 DAY instead of 1 HOUR
