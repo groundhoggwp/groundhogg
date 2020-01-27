@@ -637,7 +637,7 @@ class Replacements
         $user = $this->get_current_contact()->get_ownerdata();
 
         if ( !$user )
-            return get_bloginfo( 'admin_email' );
+            return get_default_from_email();
 
         return $user->user_email;
     }
@@ -652,9 +652,13 @@ class Replacements
     {
         $user = $this->get_current_contact()->get_ownerdata();
 
-        if ( !$user ) {
+        if ( ! $user ) {
             // return admin details
-            $user = get_user_by( 'email', get_bloginfo( 'admin_email' ) );
+            $user = get_user_by( 'email', get_default_from_email() );
+
+            if ( ! $user ){
+                return $this->replacement_business_name();
+            }
         }
 
         return $user->first_name;
@@ -672,7 +676,11 @@ class Replacements
 
         if ( !$user ) {
             //return admin details
-            $user = get_user_by( 'email', get_bloginfo( 'admin_email' ) );
+            $user = get_user_by( 'email', get_default_from_email() );
+
+            if ( ! $user ){
+                return '';
+            }
         }
 
         return $user->last_name;

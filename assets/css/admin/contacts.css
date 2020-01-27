@@ -11,10 +11,21 @@
     font-size: 14px;
 }
 
+#search-filters{
+    margin-top: 20px;
+}
+
 .search-param {
     display: inline-block;
     margin: 5px;
-    max-width: 100%;
-    width: 300px;
+    max-width: 300px;
+    /*min-height: 150px;*/
+    /*min-width: 300px;*/
     vertical-align: top;
+    padding: 10px;
+    /*border: 1px solid #e5e5e5;*/
+}
+
+.start-search{
+    padding-left: 15px;
 }

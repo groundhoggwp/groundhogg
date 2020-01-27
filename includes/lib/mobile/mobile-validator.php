@@ -2,8 +2,6 @@
 
 namespace Groundhogg\Lib\Mobile;
 
-require_once dirname( __FILE__ ) . '/iso3116.php';
-
 class Mobile_Validator {
     private function get_iso3166_entry( $country_name ) {
         switch ( strlen( $country_name ) ) {
@@ -171,5 +169,16 @@ class Mobile_Validator {
         } else {
             return array();
         }
+    }
+
+    /**
+     * A direct way to get the ISO phone info
+     *
+     * @param $phone_number string
+     * @return array
+     */
+    function maybe_get_iso3166_by_phone( $phone_number  ){
+        $phone_number = preg_replace( "/\D/", "", $phone_number );
+        return $this->get_iso3166_by_phone( $phone_number );
     }
 }

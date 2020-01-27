@@ -1,5 +1,16 @@
 window.wp = window.wp || {};
 
+(function ($) {
+
+    $(function () {
+        $( '#search_contacts' ).click( function () {
+            // Toggle search filters
+            $( "#search-filters" ).toggleClass( 'hidden' );
+        })
+    });
+
+})(jQuery);
+
 /**
  * Manages the quick edit contact.
  */
