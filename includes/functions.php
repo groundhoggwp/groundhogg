@@ -2606,7 +2606,7 @@ function validate_mobile_number( $number, $country_code = '', $with_plus = false
 {
     global $groundhogg_mobile_validator;
 
-    if ( !$groundhogg_mobile_validator instanceof Mobile_Validator ) {
+    if ( ! $groundhogg_mobile_validator instanceof Mobile_Validator ) {
         $groundhogg_mobile_validator = new Mobile_Validator();
     }
 
@@ -2623,7 +2623,7 @@ function validate_mobile_number( $number, $country_code = '', $with_plus = false
     $number = $number[ 0 ];
 
     // Remove the plus from the string
-    if ( $with_plus ) {
+    if ( ! $with_plus ) {
         $number = str_replace( '+', '', $number );
     }
 
