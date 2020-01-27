@@ -574,11 +574,11 @@ class Tools_Page extends Tabbed_Admin_Page
 
         $tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( $tags );
 
-        set_transient( 'gh_import_tags', $tags, HOUR_IN_SECONDS );
-        set_transient( 'gh_import_map', $map, HOUR_IN_SECONDS );
+        set_transient( 'gh_import_tags', $tags, DAY_IN_SECONDS );
+        set_transient( 'gh_import_map', $map, DAY_IN_SECONDS );
 
         if ( get_request_var( 'is_confirmed' ) ) {
-            set_transient( 'gh_import_confirm_contacts', true, HOUR_IN_SECONDS );
+            set_transient( 'gh_import_confirm_contacts', true, DAY_IN_SECONDS );
         }
 
         $this->importer->start( [ 'import' => $file_name ] );

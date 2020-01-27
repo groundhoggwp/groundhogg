@@ -150,6 +150,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.11.3 (2020-01-24) =
+* FIXED Link to quickstart course on welcome page going to wrong place.
+
+= 2.1.11.2 (2020-01-18) =
+* TWEAKED Bulk Job processor will now notify user of low max_input_vars
+* TWEAKED Transients for contact imports is now set to 1 DAY instead of 1 HOUR
+* TWEAKED Show contacts by descending ID instead of ascending
+
 = 2.1.11.1 (2020-01-16) =
 * TWEAKED Added time_scheduled column to the events table to start tracking when an event is initially added to the queue
 * TWEAKED Modified the contact REST API ADD endpoint to support the addition of tags to the contact record.

@@ -59,6 +59,12 @@ class Import_Contacts extends Bulk_Job
         $max = intval( ini_get( 'max_input_vars' ) );
         $max_items = floor( $max / $fields );
 
+        $max_override = absint( get_url_var( 'max_items' ) );
+
+        if ( $max_override > 0 ){
+        	return $max_override;
+        }
+
         return min( $max_items, 100 );
     }
 

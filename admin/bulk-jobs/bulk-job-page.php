@@ -195,10 +195,20 @@ class Bulk_Job_Page extends Admin_Page
                     },
 
                     error: function( response ){
+
                         console.log( response );
+
+                        var message = 'Something went wrong. Please contact Groundhogg support.';
+
+                        if ( typeof response.data != 'undefined' ){
+                            message = response.data[0].message
+                        }
+
                         bp.bar.css( 'background-color', '#f70000' );
+
                         this.progress.removeClass( 'spinner' );
-                        alert( 'Something went wrong...' );
+
+                        alert( message );
                     },
 
                     clean: function( obj ){
