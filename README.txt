@@ -155,6 +155,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED Owner Filter to contact search
 * ADDED New hooks for search filters
 * ADDED New hooks for contact query search params
+* ADDED Support for a "primary" user for referencing contact details
 * TWEAKED Owner replacement codes will fallback to default from email instead of administrative email.
 * TWEAKED after_form_submit_handler called during non admin user registration.
 * FIXED Number validation adding "+" when shouldn't.
