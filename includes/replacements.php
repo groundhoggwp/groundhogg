@@ -654,10 +654,10 @@ class Replacements
 
         if ( ! $user ) {
             // return admin details
-            $user = get_user_by( 'email', get_default_from_email() );
+            $user = get_primary_user();
 
             if ( ! $user ){
-                return $this->replacement_business_name();
+                return '';
             }
         }
 
@@ -676,7 +676,7 @@ class Replacements
 
         if ( !$user ) {
             //return admin details
-            $user = get_user_by( 'email', get_default_from_email() );
+            $user = get_primary_user();
 
             if ( ! $user ){
                 return '';
@@ -686,6 +686,12 @@ class Replacements
         return $user->last_name;
     }
 
+    /**
+     * Return the owner's phone #
+     *
+     * @param $contact_id
+     * @return mixed|string
+     */
     function replacement_owner_phone( $contact_id )
     {
         $user = $this->get_current_contact()->get_ownerdata();

@@ -2848,3 +2848,20 @@ function is_wpengine()
 {
     return defined('WPE_PLUGIN_BASE');
 }
+
+/**
+ * Get the primary user.
+ *
+ * @return bool|\WP_User
+ */
+function get_primary_user(){
+    $primary_user_id = absint( get_option( 'gh_primary_user', 1 ) );
+
+    if ( ! $primary_user_id ){
+        return false;
+    }
+
+    $user = get_userdata( $primary_user_id );
+
+    return $user;
+}
