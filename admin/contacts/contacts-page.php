@@ -389,7 +389,7 @@ class Contacts_Page extends Admin_Page
                 'id' => 'import_contacts'
             ],
             [
-                'link' => admin_page_url( 'gh_contacts', [ 'search' => 1 ] ),
+                'link' => '#',
                 'action' => __( 'Search', 'groundhogg' ),
                 'target' => '_self',
                 'id' => 'search_contacts'
@@ -1005,9 +1005,7 @@ class Contacts_Page extends Admin_Page
 
         $contacts_table = new Tables\Contacts_Table();
 
-        if ( get_url_var( 'search' ) ){
-            include dirname( __FILE__) . '/search.php';
-        }
+        include dirname( __FILE__) . '/search.php';
 
         $this->search_form( __( 'Search Contacts', 'groundhogg' ) );
 

@@ -320,6 +320,11 @@ class Settings_Page extends Admin_Page
                 'title' => _x('Business Settings', 'settings_sections', 'groundhogg'),
                 'tab' => 'general'
             ),
+            'general_other' => array(
+                'id' => 'general_other',
+                'title' => _x( 'Other', 'settings_sections', 'groundhogg'),
+                'tab' => 'general'
+            ),
             'misc_info' => array(
                 'id' => 'misc_info',
                 'title' => _x('Misc Settings', 'settings_sections', 'groundhogg'),
@@ -488,6 +493,17 @@ class Settings_Page extends Admin_Page
                     'id' => 'gh_phone',
                     'name' => 'gh_phone',
                     'placeholder' => '+1 (555) 555-555'
+                ),
+            ),
+            'gh_primary_user' => array(
+                'id' => 'gh_primary_user',
+                'section' => 'general_other',
+                'label' => __('Primary User', 'groundhogg'),
+                'desc' => _x('The primary user to reference for contact information.', 'settings', 'groundhogg'),
+                'type' => 'dropdown_owners',
+                'atts' => array(
+                    'id' => 'gh_primary_user',
+                    'name' => 'gh_primary_user',
                 ),
             ),
             'gh_uninstall_on_delete' => array(
@@ -1156,6 +1172,7 @@ class Settings_Page extends Admin_Page
                 $field['atts']['selected'] = is_array($value) ? $value : [$value];
                 break;
             case 'dropdown':
+            case 'dropdown_owners':
                 $field['atts']['selected'] = $value;
                 break;
             case 'checkbox':

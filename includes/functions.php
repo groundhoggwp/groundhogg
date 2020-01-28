@@ -2,12 +2,13 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use WP_Error;
 
 // Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 /**
  * Wrapper function
@@ -26,18 +27,18 @@ function get_current_contact()
  * @param $by_user_id
  * @return false|Contact
  */
-function get_contactdata( $contact_id_or_email = false, $by_user_id = false )
+function get_contactdata($contact_id_or_email = false, $by_user_id = false)
 {
-    if ( ! $contact_id_or_email ) {
+    if (!$contact_id_or_email) {
 
-        if ( Event_Queue::is_processing() ){
+        if (Event_Queue::is_processing()) {
             return Plugin::instance()->event_queue->get_current_contact();
         }
 
         return Plugin::$instance->tracking->get_current_contact();
     }
 
-    return Plugin::$instance->utils->get_contact( $contact_id_or_email, $by_user_id );
+    return Plugin::$instance->utils->get_contact($contact_id_or_email, $by_user_id);
 }
 
 /**
@@ -46,12 +47,12 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false )
  * @param string $role
  * @return bool
  */
-function current_user_is( $role = 'subscriber' )
+function current_user_is($role = 'subscriber')
 {
-    if ( is_user_logged_in() ) {
+    if (is_user_logged_in()) {
         $user = wp_get_current_user();
-        $roles = ( array ) $user->roles;
-        return in_array( $role, $roles );
+        $roles = ( array )$user->roles;
+        return in_array($role, $roles);
     } else {
         return false;
     }
@@ -64,9 +65,9 @@ function current_user_is( $role = 'subscriber' )
  * @param array $args
  * @return string
  */
-function groundhogg_url( $page = '', $args = [] )
+function groundhogg_url($page = '', $args = [])
 {
-    return Plugin::$instance->admin->get_page( $page )->admin_url( $args );
+    return Plugin::$instance->admin->get_page($page)->admin_url($args);
 }
 
 /**
@@ -76,10 +77,10 @@ function groundhogg_url( $page = '', $args = [] )
  * @param $args
  * @return string
  */
-function admin_page_url( $page, $args=[] )
+function admin_page_url($page, $args = [])
 {
-    $args = wp_parse_args( $args, [ 'page' => $page ] );
-    return add_query_arg( $args, admin_url( 'admin.php' ) );
+    $args = wp_parse_args($args, ['page' => $page]);
+    return add_query_arg($args, admin_url('admin.php'));
 }
 
 /**
@@ -90,11 +91,11 @@ function admin_page_url( $page, $args=[] )
  * @param string $title_col string
  * @return array
  */
-function parse_select2_results( $data = [], $id_col = 'ID', $title_col = 'title' )
+function parse_select2_results($data = [], $id_col = 'ID', $title_col = 'title')
 {
-    $ids = wp_parse_id_list( wp_list_pluck( $data, $id_col ) );
-    $names = wp_list_pluck( $data, $title_col );
-    $results = array_combine( $ids, $names );
+    $ids = wp_parse_id_list(wp_list_pluck($data, $id_col));
+    $names = wp_list_pluck($data, $title_col);
+    $results = array_combine($ids, $names);
     return $results;
 }
 
@@ -104,9 +105,9 @@ function parse_select2_results( $data = [], $id_col = 'ID', $title_col = 'title'
  * @param $name
  * @return DB\DB|DB\Meta_DB|DB\Tags
  */
-function get_db( $name )
+function get_db($name)
 {
-    return Plugin::$instance->dbs->get_db( $name );
+    return Plugin::$instance->dbs->get_db($name);
 }
 
 /**
@@ -133,9 +134,9 @@ function emergency_init_dbs()
  * @param string $option
  * @return bool
  */
-function is_option_enabled( $option = '' )
+function is_option_enabled($option = '')
 {
-    return Plugin::$instance->settings->is_option_enabled( $option );
+    return Plugin::$instance->settings->is_option_enabled($option);
 }
 
 /**
@@ -166,12 +167,12 @@ function notices()
  *
  * @return bool
  */
-function isset_not_empty( $array, $key = '' )
+function isset_not_empty($array, $key = '')
 {
-    if ( is_object( $array ) ) {
-        return isset( $array->$key ) && !empty( $array->$key );
-    } elseif ( is_array( $array ) ) {
-        return isset( $array[ $key ] ) && !empty( $array[ $key ] );
+    if (is_object($array)) {
+        return isset($array->$key) && !empty($array->$key);
+    } elseif (is_array($array)) {
+        return isset($array[$key]) && !empty($array[$key]);
     }
 
     return false;
@@ -185,10 +186,10 @@ function isset_not_empty( $array, $key = '' )
  * @param bool $post_only
  * @return mixed
  */
-function get_request_var( $key = '', $default = false, $post_only = false )
+function get_request_var($key = '', $default = false, $post_only = false)
 {
     $global = $post_only ? $_POST : $_REQUEST;
-    return wp_unslash( get_array_var( $global, $key, $default ) );
+    return wp_unslash(get_array_var($global, $key, $default));
 }
 
 /**
@@ -197,9 +198,9 @@ function get_request_var( $key = '', $default = false, $post_only = false )
  * @param $key
  * @param $value
  */
-function set_request_var( $key, $value )
+function set_request_var($key, $value)
 {
-    $_REQUEST[ $key ] = $value;
+    $_REQUEST[$key] = $value;
 }
 
 /**
@@ -209,9 +210,9 @@ function set_request_var( $key, $value )
  * @param bool $default
  * @return mixed
  */
-function get_post_var( $key = '', $default = false )
+function get_post_var($key = '', $default = false)
 {
-    return wp_unslash( get_array_var( $_POST, $key, $default ) );
+    return wp_unslash(get_array_var($_POST, $key, $default));
 }
 
 /**
@@ -221,9 +222,9 @@ function get_post_var( $key = '', $default = false )
  * @param bool $default
  * @return mixed
  */
-function get_url_var( $key = '', $default = false )
+function get_url_var($key = '', $default = false)
 {
-    return map_deep( get_array_var( $_GET, $key, $default ), 'urldecode' );
+    return map_deep(get_array_var($_GET, $key, $default), 'urldecode');
 }
 
 /**
@@ -233,9 +234,9 @@ function get_url_var( $key = '', $default = false )
  * @param bool $default
  * @return mixed
  */
-function get_url_param( $key = '', $default = false )
+function get_url_param($key = '', $default = false)
 {
-    return get_url_var( $key, $default );
+    return get_url_var($key, $default);
 }
 
 /**
@@ -246,11 +247,11 @@ function get_url_param( $key = '', $default = false )
  * @param array $accepted_keys for the query to include the given
  * @return array|string
  */
-function get_request_query( $default = [], $force = [], $accepted_keys = [] )
+function get_request_query($default = [], $force = [], $accepted_keys = [])
 {
     $query = $_GET;
 
-    $ignore = apply_filters( 'groundhogg/get_request_query/ignore', [
+    $ignore = apply_filters('groundhogg/get_request_query/ignore', [
         'page',
         'paged',
         'ids',
@@ -258,36 +259,36 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] )
         'action',
         'bulk_action',
         '_wpnonce'
-    ] );
+    ]);
 
-    foreach ( $ignore as $key ) {
-        unset( $query[ $key ] );
+    foreach ($ignore as $key) {
+        unset($query[$key]);
     }
 
-    $query = urldecode_deep( $query );
+    $query = urldecode_deep($query);
 
-    if ( $search = get_request_var( 's' ) ) {
-        $query[ 'search' ] = $search;
+    if ($search = get_request_var('s')) {
+        $query['search'] = $search;
     }
 
-    $query = array_merge( $query, $force );
-    $query = wp_parse_args( $query, $default );
+    $query = array_merge($query, $force);
+    $query = wp_parse_args($query, $default);
 
-    if ( !empty( $accepted_keys ) ) {
+    if (!empty($accepted_keys)) {
 
         $new_query = [];
 
-        foreach ( $accepted_keys as $key ) {
-            $val = get_array_var( $query, $key );
-            $new_query[ $key ] = $val;
+        foreach ($accepted_keys as $key) {
+            $val = get_array_var($query, $key);
+            $new_query[$key] = $val;
         }
 
         $query = $new_query;
     }
 
-    $query = map_deep( $query, 'sanitize_text_field' );
+    $query = map_deep($query, 'sanitize_text_field');
 
-    return wp_unslash( array_filter( $query ) );
+    return wp_unslash(array_filter($query));
 }
 
 /**
@@ -296,13 +297,13 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] )
  * @param $array
  * @return array
  */
-function ensure_array( $array )
+function ensure_array($array)
 {
-    if ( is_array( $array ) ) {
+    if (is_array($array)) {
         return $array;
     }
 
-    return [ $array ];
+    return [$array];
 }
 
 /**
@@ -311,9 +312,9 @@ function ensure_array( $array )
  * @param $maybe_tags
  * @return array
  */
-function validate_tags( $maybe_tags )
+function validate_tags($maybe_tags)
 {
-    return get_db( 'tags' )->validate( $maybe_tags );
+    return get_db('tags')->validate($maybe_tags);
 }
 
 /**
@@ -323,9 +324,9 @@ function validate_tags( $maybe_tags )
  * @param int $contact_id
  * @return string
  */
-function do_replacements( $content = '', $contact_id = 0 )
+function do_replacements($content = '', $contact_id = 0)
 {
-    return Plugin::$instance->replacements->process( $content, $contact_id );
+    return Plugin::$instance->replacements->process($content, $contact_id);
 }
 
 /**
@@ -334,9 +335,9 @@ function do_replacements( $content = '', $contact_id = 0 )
  * @param $data
  * @return bool|string
  */
-function encrypt( $data )
+function encrypt($data)
 {
-    return Plugin::$instance->utils->encrypt_decrypt( $data, 'e' );
+    return Plugin::$instance->utils->encrypt_decrypt($data, 'e');
 }
 
 /**
@@ -346,7 +347,7 @@ function encrypt( $data )
  */
 function doing_rest()
 {
-    return ( defined( 'REST_REQUEST' ) && REST_REQUEST );
+    return (defined('REST_REQUEST') && REST_REQUEST);
 }
 
 /**
@@ -355,9 +356,9 @@ function doing_rest()
  * @param $data
  * @return bool|string
  */
-function decrypt( $data )
+function decrypt($data)
 {
-    return Plugin::$instance->utils->encrypt_decrypt( $data, 'd' );
+    return Plugin::$instance->utils->encrypt_decrypt($data, 'd');
 }
 
 /**
@@ -368,13 +369,13 @@ function decrypt( $data )
  * @param bool $default
  * @return mixed
  */
-function get_array_var( $array, $key = '', $default = false )
+function get_array_var($array, $key = '', $default = false)
 {
-    if ( isset_not_empty( $array, $key ) ) {
-        if ( is_object( $array ) ) {
+    if (isset_not_empty($array, $key)) {
+        if (is_object($array)) {
             return $array->$key;
-        } elseif ( is_array( $array ) ) {
-            return $array[ $key ];
+        } elseif (is_array($array)) {
+            return $array[$key];
         }
     }
 
@@ -387,9 +388,9 @@ function get_array_var( $array, $key = '', $default = false )
  * @param $key
  * @return string
  */
-function key_to_words( $key )
+function key_to_words($key)
 {
-    return ucwords( preg_replace( '/[-_]/', ' ', $key ) );
+    return ucwords(preg_replace('/[-_]/', ' ', $key));
 }
 
 /**
@@ -398,13 +399,13 @@ function key_to_words( $key )
  * @param $term
  * @return array
  */
-function get_terms_for_select( $term )
+function get_terms_for_select($term)
 {
-    $terms = get_terms( $term );
+    $terms = get_terms($term);
     $options = [];
 
-    foreach ( $terms as $term ) {
-        $options[ absint( $term->term_id ) ] = esc_html( $term->name );
+    foreach ($terms as $term) {
+        $options[absint($term->term_id)] = esc_html($term->name);
     }
 
     return $options;
@@ -414,18 +415,18 @@ function get_terms_for_select( $term )
  * @param $post_type string|array
  * @return array
  */
-function get_posts_for_select( $post_type )
+function get_posts_for_select($post_type)
 {
-    $posts = get_posts( array(
+    $posts = get_posts(array(
         'post_type' => $post_type,
         'post_status' => 'publish',
         'numberposts' => -1
-    ) );
+    ));
 
     $options = [];
 
-    foreach ( $posts as $i => $post ) {
-        $options[ $post->ID ] = $post->post_title;
+    foreach ($posts as $i => $post) {
+        $options[$post->ID] = $post->post_title;
     }
 
     return $options;
@@ -437,9 +438,9 @@ function get_posts_for_select( $post_type )
  * @param $words
  * @return string
  */
-function words_to_key( $words )
+function words_to_key($words)
 {
-    return sanitize_key( str_replace( ' ', '_', $words ) );
+    return sanitize_key(str_replace(' ', '_', $words));
 }
 
 /**
@@ -449,22 +450,22 @@ function words_to_key( $words )
  * @param $b
  * @return float
  */
-function percentage( $a, $b )
+function percentage($a, $b)
 {
-    $a = intval( $a );
-    $b = intval( $b );
+    $a = intval($a);
+    $b = intval($b);
 
-    if ( !$a ) {
+    if (!$a) {
         return 0;
     }
 
-    return round( ( $b / $a ) * 100, 2 );
+    return round(($b / $a) * 100, 2);
 }
 
-function sort_by_string_in_array( $key )
+function sort_by_string_in_array($key)
 {
-    return function ( $a, $b ) use ( $key ) {
-        return strnatcmp( get_array_var( $a, $key ), get_array_var( $b, $key ) );
+    return function ($a, $b) use ($key) {
+        return strnatcmp(get_array_var($a, $key), get_array_var($b, $key));
     };
 }
 
@@ -474,9 +475,9 @@ function sort_by_string_in_array( $key )
  * @param $json
  * @return bool
  */
-function is_json_error( $json )
+function is_json_error($json)
 {
-    return isset_not_empty( $json, 'code' ) && isset_not_empty( $json, 'message' ) && get_array_var( $json, 'code' ) !== 'success';
+    return isset_not_empty($json, 'code') && isset_not_empty($json, 'message') && get_array_var($json, 'code') !== 'success';
 }
 
 /**
@@ -485,10 +486,10 @@ function is_json_error( $json )
  * @param $json
  * @return bool|WP_Error
  */
-function get_json_error( $json )
+function get_json_error($json)
 {
-    if ( is_json_error( $json ) ) {
-        return new WP_Error( get_array_var( $json, 'code' ), get_array_var( $json, 'message' ), get_array_var( $json, 'data' ) );
+    if (is_json_error($json)) {
+        return new WP_Error(get_array_var($json, 'code'), get_array_var($json, 'message'), get_array_var($json, 'data'));
     }
 
     return false;
@@ -500,15 +501,15 @@ function get_json_error( $json )
  * @param $files
  * @return array
  */
-function normalize_files( &$files )
+function normalize_files(&$files)
 {
     $_files = [];
-    $_files_count = count( $files[ 'name' ] );
-    $_files_keys = array_keys( $files );
+    $_files_count = count($files['name']);
+    $_files_keys = array_keys($files);
 
-    for ( $i = 0; $i < $_files_count; $i++ )
-        foreach ( $_files_keys as $key )
-            $_files[ $i ][ $key ] = $files[ $key ][ $i ];
+    for ($i = 0; $i < $_files_count; $i++)
+        foreach ($_files_keys as $key)
+            $_files[$i][$key] = $files[$key][$i];
 
     return $_files;
 }
@@ -518,19 +519,19 @@ function normalize_files( &$files )
  */
 function dequeue_theme_css_compat()
 {
-    $theme_name = basename( get_stylesheet_directory() );
+    $theme_name = basename(get_stylesheet_directory());
 
     // Dequeue Theme Support.
-    wp_dequeue_style( $theme_name . '-style' );
-    wp_dequeue_style( $theme_name );
-    wp_dequeue_style( 'style' );
+    wp_dequeue_style($theme_name . '-style');
+    wp_dequeue_style($theme_name);
+    wp_dequeue_style('style');
 
     // Extra compat.
     global $wp_styles;
     $maybe_dequeue = $wp_styles->queue;
-    foreach ( $maybe_dequeue as $style ) {
-        if ( strpos( $style, $theme_name ) !== false ) {
-            wp_dequeue_style( $style );
+    foreach ($maybe_dequeue as $style) {
+        if (strpos($style, $theme_name) !== false) {
+            wp_dequeue_style($style);
         }
     }
 }
@@ -542,9 +543,9 @@ function dequeue_wc_css_compat()
 {
     global $wp_styles;
     $maybe_dequeue = $wp_styles->queue;
-    foreach ( $maybe_dequeue as $style ) {
-        if ( strpos( $style, 'woocommerce' ) !== false ) {
-            wp_dequeue_style( $style );
+    foreach ($maybe_dequeue as $style) {
+        if (strpos($style, 'woocommerce') !== false) {
+            wp_dequeue_style($style);
         }
     }
 }
@@ -567,9 +568,9 @@ function enqueue_groundhogg_modal()
  * @param $string
  * @return string|string[]|null
  */
-function search_and_replace_domain( $string )
+function search_and_replace_domain($string)
 {
-    return preg_replace( '#https?:\/\/[^\\/\s]+#', site_url(), $string );
+    return preg_replace('#https?:\/\/[^\\/\s]+#', site_url(), $string);
 }
 
 /**
@@ -578,38 +579,38 @@ function search_and_replace_domain( $string )
  * @param $atts
  * @return string
  */
-function array_to_atts( $atts )
+function array_to_atts($atts)
 {
     $tag = '';
 
-    foreach ( $atts as $key => $value ) {
+    foreach ($atts as $key => $value) {
 
-        if ( empty( $value ) ) {
+        if (empty($value)) {
             continue;
         }
 
-        $key = strtolower( $key );
+        $key = strtolower($key);
 
-        switch ( $key ) {
+        switch ($key) {
             case 'style':
-                $value = array_to_css( $value );
+                $value = array_to_css($value);
                 break;
             case 'href':
             case 'action':
             case 'src':
-                $value = esc_url( $value );
+                $value = esc_url($value);
                 break;
             default:
-                if ( is_array( $value ) ) {
-                    $value = implode( ' ', $value );
+                if (is_array($value)) {
+                    $value = implode(' ', $value);
                 }
 
-                $value = esc_attr( $value );
+                $value = esc_attr($value);
                 break;
 
         }
 
-        $tag .= sanitize_key( $key ) . '="' . $value . '" ';
+        $tag .= sanitize_key($key) . '="' . $value . '" ';
     }
 
     return $tag;
@@ -621,11 +622,11 @@ function array_to_atts( $atts )
  * @param $atts
  * @return string
  */
-function array_to_css( $atts )
+function array_to_css($atts)
 {
     $css = '';
-    foreach ( $atts as $key => $value ) {
-        $css .= sanitize_key( $key ) . ':' . esc_attr( $value ) . ';';
+    foreach ($atts as $key => $value) {
+        $css .= sanitize_key($key) . ':' . esc_attr($value) . ';';
     }
     return $css;
 }
@@ -637,9 +638,9 @@ function array_to_css( $atts )
  * @param bool $default
  * @return mixed
  */
-function get_cookie( $cookie = '', $default = false )
+function get_cookie($cookie = '', $default = false)
 {
-    return get_array_var( $_COOKIE, $cookie, $default );
+    return get_array_var($_COOKIE, $cookie, $default);
 }
 
 /**
@@ -650,9 +651,9 @@ function get_cookie( $cookie = '', $default = false )
  * @param int $expiration
  * @return bool
  */
-function set_cookie( $cookie = '', $value = '', $expiration = 3600 )
+function set_cookie($cookie = '', $value = '', $expiration = 3600)
 {
-    return setcookie( $cookie, $value, time() + $expiration, COOKIEPATH, COOKIE_DOMAIN );
+    return setcookie($cookie, $value, time() + $expiration, COOKIEPATH, COOKIE_DOMAIN);
 }
 
 /**
@@ -661,11 +662,11 @@ function set_cookie( $cookie = '', $value = '', $expiration = 3600 )
  * @param string $cookie
  * @return bool
  */
-function delete_cookie( $cookie = '' )
+function delete_cookie($cookie = '')
 {
-    unset( $_COOKIE[ $cookie ] );
+    unset($_COOKIE[$cookie]);
     // empty value and expiration one hour before
-    return setcookie( $cookie, '', time() - 3600 );
+    return setcookie($cookie, '', time() - 3600);
 }
 
 /**
@@ -675,13 +676,13 @@ function delete_cookie( $cookie = '' )
  */
 function get_default_from_name()
 {
-    $from = get_option( 'gh_override_from_name' );
+    $from = get_option('gh_override_from_name');
 
-    if ( empty( $from ) ){
-        $from = get_bloginfo( 'name' );
+    if (empty($from)) {
+        $from = get_bloginfo('name');
     }
 
-    return apply_filters( 'groundhogg/get_default_from_name', $from );
+    return apply_filters('groundhogg/get_default_from_name', $from);
 }
 
 /**
@@ -691,13 +692,13 @@ function get_default_from_name()
  */
 function get_default_from_email()
 {
-	$from = get_option( 'gh_override_from_email' );
+    $from = get_option('gh_override_from_email');
 
-	if ( empty( $from ) ){
-		$from = get_bloginfo( 'admin_email' );
-	}
+    if (empty($from)) {
+        $from = get_bloginfo('admin_email');
+    }
 
-	return apply_filters( 'groundhogg/get_default_from_email', $from );
+    return apply_filters('groundhogg/get_default_from_email', $from);
 }
 
 /**
@@ -707,8 +708,8 @@ function get_default_from_email()
  */
 function get_return_path_email()
 {
-    $return = get_option( 'gh_bounce_inbox' );
-    return apply_filters( 'groundhogg/get_return_path_email', $return );
+    $return = get_option('gh_bounce_inbox');
+    return apply_filters('groundhogg/get_return_path_email', $return);
 }
 
 
@@ -729,7 +730,7 @@ function get_return_path_email()
  * @deprecated 2.1.11
  *
  */
-function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() )
+function gh_ss_mail($to, $subject, $message, $headers = '', $attachments = array())
 {
     // Compact the input, apply the filters, and extract them back out
 
@@ -741,129 +742,129 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
      * @since 2.2.0
      *
      */
-    $atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
+    $atts = apply_filters('wp_mail', compact('to', 'subject', 'message', 'headers', 'attachments'));
 
-    if ( isset( $atts[ 'to' ] ) ) {
-        $to = $atts[ 'to' ];
+    if (isset($atts['to'])) {
+        $to = $atts['to'];
     }
 
-    if ( !is_array( $to ) ) {
-        $to = explode( ',', $to );
+    if (!is_array($to)) {
+        $to = explode(',', $to);
     }
 
-    if ( isset( $atts[ 'subject' ] ) ) {
-        $subject = $atts[ 'subject' ];
+    if (isset($atts['subject'])) {
+        $subject = $atts['subject'];
     }
 
-    if ( isset( $atts[ 'message' ] ) ) {
-        $message = $atts[ 'message' ];
+    if (isset($atts['message'])) {
+        $message = $atts['message'];
     }
 
-    if ( isset( $atts[ 'headers' ] ) ) {
-        $headers = $atts[ 'headers' ];
+    if (isset($atts['headers'])) {
+        $headers = $atts['headers'];
     }
 
-    if ( isset( $atts[ 'attachments' ] ) ) {
-        $attachments = $atts[ 'attachments' ];
+    if (isset($atts['attachments'])) {
+        $attachments = $atts['attachments'];
     }
 
-    if ( !is_array( $attachments ) ) {
-        $attachments = explode( "\n", str_replace( "\r\n", "\n", $attachments ) );
+    if (!is_array($attachments)) {
+        $attachments = explode("\n", str_replace("\r\n", "\n", $attachments));
     }
 
     global $phpmailer;
 
     /* Use the GH SS Mailer class instead */
-    if ( !( $phpmailer instanceof GH_SS_Mailer ) ) {
+    if (!($phpmailer instanceof GH_SS_Mailer)) {
 //        require_once dirname(__FILE__) . '/gh-ss-mailer.php';
-        $phpmailer = new GH_SS_Mailer( true );
+        $phpmailer = new GH_SS_Mailer(true);
     }
 
     // Headers
     $cc = $bcc = $reply_to = array();
 
-    if ( empty( $headers ) ) {
+    if (empty($headers)) {
         $headers = array();
     } else {
-        if ( !is_array( $headers ) ) {
+        if (!is_array($headers)) {
             // Explode the headers out, so this function can take both
             // string headers and an array of headers.
-            $tempheaders = explode( "\n", str_replace( "\r\n", "\n", $headers ) );
+            $tempheaders = explode("\n", str_replace("\r\n", "\n", $headers));
         } else {
             $tempheaders = $headers;
         }
         $headers = array();
 
         // If it's actually got contents
-        if ( !empty( $tempheaders ) ) {
+        if (!empty($tempheaders)) {
             // Iterate through the raw headers
-            foreach ( (array) $tempheaders as $header ) {
-                if ( strpos( $header, ':' ) === false ) {
-                    if ( false !== stripos( $header, 'boundary=' ) ) {
-                        $parts = preg_split( '/boundary=/i', trim( $header ) );
-                        $boundary = trim( str_replace( array( "'", '"' ), '', $parts[ 1 ] ) );
+            foreach ((array)$tempheaders as $header) {
+                if (strpos($header, ':') === false) {
+                    if (false !== stripos($header, 'boundary=')) {
+                        $parts = preg_split('/boundary=/i', trim($header));
+                        $boundary = trim(str_replace(array("'", '"'), '', $parts[1]));
                     }
                     continue;
                 }
                 // Explode them out
-                list( $name, $content ) = explode( ':', trim( $header ), 2 );
+                list($name, $content) = explode(':', trim($header), 2);
 
                 // Cleanup crew
-                $name = trim( $name );
-                $content = trim( $content );
+                $name = trim($name);
+                $content = trim($content);
 
-                switch ( strtolower( $name ) ) {
+                switch (strtolower($name)) {
                     // Mainly for legacy -- process a From: header if it's there
                     case 'from':
-                        $bracket_pos = strpos( $content, '<' );
-                        if ( $bracket_pos !== false ) {
+                        $bracket_pos = strpos($content, '<');
+                        if ($bracket_pos !== false) {
                             // Text before the bracketed email is the "From" name.
-                            if ( $bracket_pos > 0 ) {
-                                $from_name = substr( $content, 0, $bracket_pos - 1 );
-                                $from_name = str_replace( '"', '', $from_name );
-                                $from_name = trim( $from_name );
+                            if ($bracket_pos > 0) {
+                                $from_name = substr($content, 0, $bracket_pos - 1);
+                                $from_name = str_replace('"', '', $from_name);
+                                $from_name = trim($from_name);
                             }
 
-                            $from_email = substr( $content, $bracket_pos + 1 );
-                            $from_email = str_replace( '>', '', $from_email );
-                            $from_email = trim( $from_email );
+                            $from_email = substr($content, $bracket_pos + 1);
+                            $from_email = str_replace('>', '', $from_email);
+                            $from_email = trim($from_email);
 
                             // Avoid setting an empty $from_email.
-                        } elseif ( '' !== trim( $content ) ) {
-                            $from_email = trim( $content );
+                        } elseif ('' !== trim($content)) {
+                            $from_email = trim($content);
                         }
                         break;
                     case 'mime-version':
                         // Ensure mime-version does not survive do avoid duplicate header.
                         break;
                     case 'content-type':
-                        if ( strpos( $content, ';' ) !== false ) {
-                            list( $type, $charset_content ) = explode( ';', $content );
-                            $content_type = trim( $type );
-                            if ( false !== stripos( $charset_content, 'charset=' ) ) {
-                                $charset = trim( str_replace( array( 'charset=', '"' ), '', $charset_content ) );
-                            } elseif ( false !== stripos( $charset_content, 'boundary=' ) ) {
-                                $boundary = trim( str_replace( array( 'BOUNDARY=', 'boundary=', '"' ), '', $charset_content ) );
+                        if (strpos($content, ';') !== false) {
+                            list($type, $charset_content) = explode(';', $content);
+                            $content_type = trim($type);
+                            if (false !== stripos($charset_content, 'charset=')) {
+                                $charset = trim(str_replace(array('charset=', '"'), '', $charset_content));
+                            } elseif (false !== stripos($charset_content, 'boundary=')) {
+                                $boundary = trim(str_replace(array('BOUNDARY=', 'boundary=', '"'), '', $charset_content));
                                 $charset = '';
                             }
 
                             // Avoid setting an empty $content_type.
-                        } elseif ( '' !== trim( $content ) ) {
-                            $content_type = trim( $content );
+                        } elseif ('' !== trim($content)) {
+                            $content_type = trim($content);
                         }
                         break;
                     case 'cc':
-                        $cc = array_merge( (array) $cc, explode( ',', $content ) );
+                        $cc = array_merge((array)$cc, explode(',', $content));
                         break;
                     case 'bcc':
-                        $bcc = array_merge( (array) $bcc, explode( ',', $content ) );
+                        $bcc = array_merge((array)$bcc, explode(',', $content));
                         break;
                     case 'reply-to':
-                        $reply_to = array_merge( (array) $reply_to, explode( ',', $content ) );
+                        $reply_to = array_merge((array)$reply_to, explode(',', $content));
                         break;
                     default:
                         // Add it to our grand headers array
-                        $headers[ trim( $name ) ] = trim( $content );
+                        $headers[trim($name)] = trim($content);
                         break;
                 }
             }
@@ -879,7 +880,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
     // From email and name
     // If we don't have a name from the input headers
-    if ( !isset( $from_name ) ) {
+    if (!isset($from_name)) {
         $from_name = 'WordPress';
     }
 
@@ -890,11 +891,11 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
      * https://core.trac.wordpress.org/ticket/5007.
      */
 
-    if ( !isset( $from_email ) ) {
+    if (!isset($from_email)) {
         // Get the site domain and get rid of www.
-        $sitename = strtolower( $_SERVER[ 'SERVER_NAME' ] );
-        if ( substr( $sitename, 0, 4 ) == 'www.' ) {
-            $sitename = substr( $sitename, 4 );
+        $sitename = strtolower($_SERVER['SERVER_NAME']);
+        if (substr($sitename, 0, 4) == 'www.') {
+            $sitename = substr($sitename, 4);
         }
 
         $from_email = 'wordpress@' . $sitename;
@@ -907,7 +908,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
      * @since 2.2.0
      *
      */
-    $from_email = apply_filters( 'wp_mail_from', $from_email );
+    $from_email = apply_filters('wp_mail_from', $from_email);
 
     /**
      * Filters the name to associate with the "from" email address.
@@ -916,57 +917,57 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
      * @since 2.3.0
      *
      */
-    $from_name = apply_filters( 'wp_mail_from_name', $from_name );
+    $from_name = apply_filters('wp_mail_from_name', $from_name);
 
     try {
-        $phpmailer->setFrom( $from_email, $from_name, false );
-    } catch ( \phpmailerException $e ) {
-        $mail_error_data = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
-        $mail_error_data[ 'set_from_name' ] = $from_name;
-        $mail_error_data[ 'set_from_email' ] = $from_email;
-        $mail_error_data[ 'phpmailer_exception_code' ] = $e->getCode();
+        $phpmailer->setFrom($from_email, $from_name, false);
+    } catch (\phpmailerException $e) {
+        $mail_error_data = compact('to', 'subject', 'message', 'headers', 'attachments');
+        $mail_error_data['set_from_name'] = $from_name;
+        $mail_error_data['set_from_email'] = $from_email;
+        $mail_error_data['phpmailer_exception_code'] = $e->getCode();
 
         /** This filter is documented in wp-includes/pluggable.php */
-        do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
+        do_action('wp_mail_failed', new WP_Error('wp_mail_failed', $e->getMessage(), $mail_error_data));
 
         return false;
     }
 
     // Set destination addresses, using appropriate methods for handling addresses
-    $address_headers = compact( 'to', 'cc', 'bcc', 'reply_to' );
+    $address_headers = compact('to', 'cc', 'bcc', 'reply_to');
 
-    foreach ( $address_headers as $address_header => $addresses ) {
-        if ( empty( $addresses ) ) {
+    foreach ($address_headers as $address_header => $addresses) {
+        if (empty($addresses)) {
             continue;
         }
 
-        foreach ( (array) $addresses as $address ) {
+        foreach ((array)$addresses as $address) {
             try {
                 // Break $recipient into name and address parts if in the format "Foo <bar@baz.com>"
                 $recipient_name = '';
 
-                if ( preg_match( '/(.*)<(.+)>/', $address, $matches ) ) {
-                    if ( count( $matches ) == 3 ) {
-                        $recipient_name = $matches[ 1 ];
-                        $address = $matches[ 2 ];
+                if (preg_match('/(.*)<(.+)>/', $address, $matches)) {
+                    if (count($matches) == 3) {
+                        $recipient_name = $matches[1];
+                        $address = $matches[2];
                     }
                 }
 
-                switch ( $address_header ) {
+                switch ($address_header) {
                     case 'to':
-                        $phpmailer->addAddress( $address, $recipient_name );
+                        $phpmailer->addAddress($address, $recipient_name);
                         break;
                     case 'cc':
-                        $phpmailer->addCc( $address, $recipient_name );
+                        $phpmailer->addCc($address, $recipient_name);
                         break;
                     case 'bcc':
-                        $phpmailer->addBcc( $address, $recipient_name );
+                        $phpmailer->addBcc($address, $recipient_name);
                         break;
                     case 'reply_to':
-                        $phpmailer->addReplyTo( $address, $recipient_name );
+                        $phpmailer->addReplyTo($address, $recipient_name);
                         break;
                 }
-            } catch ( \phpmailerException $e ) {
+            } catch (\phpmailerException $e) {
                 continue;
             }
         }
@@ -974,7 +975,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
     // Set Content-Type and charset
     // If we don't have a content-type from the input headers
-    if ( !isset( $content_type ) || empty( $content_type ) ) {
+    if (!isset($content_type) || empty($content_type)) {
         $content_type = 'text/plain';
     }
 
@@ -985,15 +986,15 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
      * @since 2.3.0
      *
      */
-    $content_type = apply_filters( 'wp_mail_content_type', $content_type );
+    $content_type = apply_filters('wp_mail_content_type', $content_type);
 
     $phpmailer->ContentType = $content_type;
 
     // Set the content-type and charset
     // Set whether it's plaintext, depending on $content_type
     // GHSS can only send HTML emails apparently. So convert all emails to HTML
-    if ( 'text/html' == $content_type ) {
-        $phpmailer->isHTML( true );
+    if ('text/html' == $content_type) {
+        $phpmailer->isHTML(true);
     }
 
     // Set mail's subject and body
@@ -1001,8 +1002,8 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
     $phpmailer->Body = $message;
 
     // If we don't have a charset from the input headers
-    if ( !isset( $charset ) ) {
-        $charset = get_bloginfo( 'charset' );
+    if (!isset($charset)) {
+        $charset = get_bloginfo('charset');
     }
 
 
@@ -1013,24 +1014,24 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
      * @since 2.3.0
      *
      */
-    $phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
+    $phpmailer->CharSet = apply_filters('wp_mail_charset', $charset);
 
     // Set custom headers
-    if ( !empty( $headers ) ) {
-        foreach ( (array) $headers as $name => $content ) {
-            $phpmailer->addCustomHeader( sprintf( '%1$s: %2$s', $name, $content ) );
+    if (!empty($headers)) {
+        foreach ((array)$headers as $name => $content) {
+            $phpmailer->addCustomHeader(sprintf('%1$s: %2$s', $name, $content));
         }
 
-        if ( false !== stripos( $content_type, 'multipart' ) && !empty( $boundary ) ) {
-            $phpmailer->addCustomHeader( sprintf( "Content-Type: %s;\n\t boundary=\"%s\"", $content_type, $boundary ) );
+        if (false !== stripos($content_type, 'multipart') && !empty($boundary)) {
+            $phpmailer->addCustomHeader(sprintf("Content-Type: %s;\n\t boundary=\"%s\"", $content_type, $boundary));
         }
     }
 
-    if ( !empty( $attachments ) ) {
-        foreach ( $attachments as $attachment ) {
+    if (!empty($attachments)) {
+        foreach ($attachments as $attachment) {
             try {
-                $phpmailer->addAttachment( $attachment );
-            } catch ( \phpmailerException $e ) {
+                $phpmailer->addAttachment($attachment);
+            } catch (\phpmailerException $e) {
                 continue;
             }
         }
@@ -1043,13 +1044,13 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
      * @since 2.2.0
      *
      */
-    do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
+    do_action_ref_array('phpmailer_init', array(&$phpmailer));
 
     // Hard set X-Mailer cuz we taking credit for this.
-    $phpmailer->XMailer = sprintf( 'Groundhogg %s (https://www.groundhogg.io)', GROUNDHOGG_VERSION );
+    $phpmailer->XMailer = sprintf('Groundhogg %s (https://www.groundhogg.io)', GROUNDHOGG_VERSION);
 
-    if ( $content_type === 'text/html' && empty( $phpmailer->AltBody ) ) {
-        $phpmailer->AltBody = wp_strip_all_tags( $message );
+    if ($content_type === 'text/html' && empty($phpmailer->AltBody)) {
+        $phpmailer->AltBody = wp_strip_all_tags($message);
     }
 
     // Send!
@@ -1057,18 +1058,18 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
         return $phpmailer->send();
 
-    } catch ( \phpmailerException $e ) {
+    } catch (\phpmailerException $e) {
 
-        $mail_error_data = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
-        $mail_error_data[ 'phpmailer_exception_code' ] = $e->getCode();
-        $mail_error_data[ 'mime_message' ] = $phpmailer->getSentMIMEMessage();
-        $mail_error_data[ 'set_from_name' ] = $from_name;
-        $mail_error_data[ 'set_from_email' ] = $from_email;
+        $mail_error_data = compact('to', 'subject', 'message', 'headers', 'attachments');
+        $mail_error_data['phpmailer_exception_code'] = $e->getCode();
+        $mail_error_data['mime_message'] = $phpmailer->getSentMIMEMessage();
+        $mail_error_data['set_from_name'] = $from_name;
+        $mail_error_data['set_from_email'] = $from_email;
 
-        if ( Plugin::$instance->sending_service->has_errors() ) {
-            $mail_error_data[ 'orig_error_data' ] = Plugin::$instance->sending_service->get_last_error()->get_error_data();
-            $mail_error_data[ 'orig_error_message' ] = Plugin::$instance->sending_service->get_last_error()->get_error_message();
-            $mail_error_data[ 'orig_error_code' ] = Plugin::$instance->sending_service->get_last_error()->get_error_code();
+        if (Plugin::$instance->sending_service->has_errors()) {
+            $mail_error_data['orig_error_data'] = Plugin::$instance->sending_service->get_last_error()->get_error_data();
+            $mail_error_data['orig_error_message'] = Plugin::$instance->sending_service->get_last_error()->get_error_message();
+            $mail_error_data['orig_error_code'] = Plugin::$instance->sending_service->get_last_error()->get_error_code();
         }
 
         /**
@@ -1079,7 +1080,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
          * @since 4.4.0
          *
          */
-        do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
+        do_action('wp_mail_failed', new WP_Error('wp_mail_failed', $e->getMessage(), $mail_error_data));
 
         return false;
     }
@@ -1090,44 +1091,44 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
  *
  * @param $error WP_Error
  */
-function listen_for_complaint_and_bounce_emails( $error )
+function listen_for_complaint_and_bounce_emails($error)
 {
-    $data = (array) $error->get_error_data();
+    $data = (array)$error->get_error_data();
 
-    if ( !isset_not_empty( $data, 'orig_error_data' ) ) {
+    if (!isset_not_empty($data, 'orig_error_data')) {
         return;
     }
 
-    $code = $data[ 'orig_error_code' ];
-    $data = $data[ 'orig_error_data' ];
+    $code = $data['orig_error_code'];
+    $data = $data['orig_error_data'];
 
-    if ( $code === 'invalid_recipients' ) {
+    if ($code === 'invalid_recipients') {
 
         /* handle bounces */
-        $bounces = isset_not_empty( $data, 'bounces' ) ? $data[ 'bounces' ] : [];
+        $bounces = isset_not_empty($data, 'bounces') ? $data['bounces'] : [];
 
-        if ( !empty( $bounces ) ) {
-            foreach ( $bounces as $email ) {
-                if ( $contact = get_contactdata( $email ) ) {
-                    $contact->change_marketing_preference( Preferences::HARD_BOUNCE );
+        if (!empty($bounces)) {
+            foreach ($bounces as $email) {
+                if ($contact = get_contactdata($email)) {
+                    $contact->change_marketing_preference(Preferences::HARD_BOUNCE);
                 }
             }
 
         }
 
-        $complaints = isset_not_empty( $data, 'complaints' ) ? $data[ 'complaints' ] : [];
+        $complaints = isset_not_empty($data, 'complaints') ? $data['complaints'] : [];
 
-        if ( !empty( $complaints ) ) {
-            foreach ( $complaints as $email ) {
-                if ( $contact = get_contactdata( $email ) ) {
-                    $contact->change_marketing_preference( Preferences::COMPLAINED );
+        if (!empty($complaints)) {
+            foreach ($complaints as $email) {
+                if ($contact = get_contactdata($email)) {
+                    $contact->change_marketing_preference(Preferences::COMPLAINED);
                 }
             }
         }
     }
 }
 
-add_action( 'wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_emails' );
+add_action('wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_emails');
 
 /**
  * Return the FULL URI from wp_get_referer for string comparisons
@@ -1136,10 +1137,10 @@ add_action( 'wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_
  */
 function wpgh_get_referer()
 {
-    if ( !isset( $_POST[ '_wp_http_referer' ] ) )
+    if (!isset($_POST['_wp_http_referer']))
         return wp_get_referer();
 
-    return ( is_ssl() ? "https" : "http" ) . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
+    return (is_ssl() ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST['_wp_http_referer'];
 }
 
 /**
@@ -1148,12 +1149,12 @@ function wpgh_get_referer()
 function recount_tag_contacts_count()
 {
     /* Recount tag relationships */
-    $tags = Plugin::$instance->dbs->get_db( 'tags' )->query();
+    $tags = Plugin::$instance->dbs->get_db('tags')->query();
 
-    if ( !empty( $tags ) ) {
-        foreach ( $tags as $tag ) {
-            $count = Plugin::$instance->dbs->get_db( 'tag_relationships' )->count( [ 'tag_id' => absint( $tag->tag_id ) ] );
-            Plugin::$instance->dbs->get_db( 'tags' )->update( absint( $tag->tag_id ), [ 'contact_count' => $count ] );
+    if (!empty($tags)) {
+        foreach ($tags as $tag) {
+            $count = Plugin::$instance->dbs->get_db('tag_relationships')->count(['tag_id' => absint($tag->tag_id)]);
+            Plugin::$instance->dbs->get_db('tags')->update(absint($tag->tag_id), ['contact_count' => $count]);
         }
     }
 }
@@ -1165,28 +1166,28 @@ function recount_tag_contacts_count()
  * @param $sync_meta bool whether to copy the meta data over.
  * @return Contact|false|WP_Error the new contact, false on failure, or WP_Error on error
  */
-function create_contact_from_user( $user, $sync_meta = false )
+function create_contact_from_user($user, $sync_meta = false)
 {
 
-    if ( is_int( $user ) ) {
-        $user = get_userdata( $user );
-        if ( !$user ) {
+    if (is_int($user)) {
+        $user = get_userdata($user);
+        if (!$user) {
             return false;
         }
     }
 
-    if ( !$user instanceof \WP_User ) {
+    if (!$user instanceof \WP_User) {
         return false;
     }
 
-    $contact = get_contactdata( $user->user_email );
+    $contact = get_contactdata($user->user_email);
 
     /**
      * Do not continue if the contact already exists. Just return it...
      */
-    if ( $contact && $contact->exists() ) {
-        $contact->update( [ 'user_id' => $user->ID ] );
-        $contact->update_meta( 'user_login', $user->user_login );
+    if ($contact && $contact->exists()) {
+        $contact->update(['user_id' => $user->ID]);
+        $contact->update_meta('user_login', $user->user_login);
         return $contact;
     }
 
@@ -1201,28 +1202,28 @@ function create_contact_from_user( $user, $sync_meta = false )
         'optin_status' => Preferences::UNCONFIRMED
     );
 
-    if ( empty( $args[ 'first_name' ] ) ) {
-        $args[ 'first_name' ] = $user->display_name;
+    if (empty($args['first_name'])) {
+        $args['first_name'] = $user->display_name;
     }
 
     $contact = new Contact();
 
-    $id = $contact->create( $args );
+    $id = $contact->create($args);
 
-    if ( !$id ) {
-        return new \WP_Error( 'db_error', __( 'Could not create contact.', 'groundhogg' ) );
+    if (!$id) {
+        return new \WP_Error('db_error', __('Could not create contact.', 'groundhogg'));
     }
 
     // Save the login
-    $contact->update_meta( 'user_login', $user->user_login );
+    $contact->update_meta('user_login', $user->user_login);
 
-    if ( $sync_meta ) {
+    if ($sync_meta) {
 
-        $user_meta = get_user_meta( $user->ID );
+        $user_meta = get_user_meta($user->ID);
 
         // Note: $values will be an array as single is false
-        foreach ( $user_meta as $key => $values ) {
-            $contact->update_meta( $key, array_shift( $values ) );
+        foreach ($user_meta as $key => $values) {
+            $contact->update_meta($key, array_shift($values));
         }
 
     }
@@ -1235,24 +1236,24 @@ function create_contact_from_user( $user, $sync_meta = false )
  *
  * @param $userId int the Id of the user
  */
-function convert_user_to_contact_when_user_registered( $userId )
+function convert_user_to_contact_when_user_registered($userId)
 {
-    $user = get_userdata( $userId );
+    $user = get_userdata($userId);
 
-    if ( ! $user || is_wp_error( $user ) ){
+    if (!$user || is_wp_error($user)) {
         return;
     }
 
-    $contact = create_contact_from_user( $user );
+    $contact = create_contact_from_user($user);
 
-    if ( ! $contact || is_wp_error( $contact ) ) {
+    if (!$contact || is_wp_error($contact)) {
         return;
     }
 
-    if ( ! is_admin() ) {
+    if (!is_admin()) {
 
         /* register front end which is technically an optin */
-        $contact->update_meta( 'last_optin', time() );
+        after_form_submit_handler($contact);
     }
 
     /**
@@ -1261,11 +1262,11 @@ function convert_user_to_contact_when_user_registered( $userId )
      * @param $user \WP_User
      * @param $contact Contact
      */
-    do_action( 'groundhogg/contact_created_from_user', $user, $contact );
+    do_action('groundhogg/contact_created_from_user', $user, $contact);
 }
 
 // Ensure runs before tag mapping stuff...
-add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
+add_action('user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered');
 
 /**
  * Used for blocks...
@@ -1275,19 +1276,19 @@ add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user
 function get_form_list()
 {
 
-    $forms = Plugin::$instance->dbs->get_db( 'steps' )->query( [
+    $forms = Plugin::$instance->dbs->get_db('steps')->query([
         'step_type' => 'form_fill'
-    ] );
+    ]);
 
     $form_options = array();
     $default = 0;
-    foreach ( $forms as $form ) {
-        if ( !$default ) {
+    foreach ($forms as $form) {
+        if (!$default) {
             $default = $form->ID;
         }
-        $step = Plugin::$instance->utils->get_step( $form->ID );
-        if ( $step->is_active() ) {
-            $form_options[ $form->ID ] = $form->step_title;
+        $step = Plugin::$instance->utils->get_step($form->ID);
+        if ($step->is_active()) {
+            $form_options[$form->ID] = $form->step_title;
         }
     }
 
@@ -1304,16 +1305,16 @@ function get_form_list()
  *
  * @return bool whether the scheduling was successful.
  */
-function send_email_notification( $email_id, $contact_id_or_email, $time = 0 )
+function send_email_notification($email_id, $contact_id_or_email, $time = 0)
 {
-    $contact = Plugin::$instance->utils->get_contact( $contact_id_or_email );
-    $email = Plugin::$instance->utils->get_email( $email_id );
+    $contact = Plugin::$instance->utils->get_contact($contact_id_or_email);
+    $email = Plugin::$instance->utils->get_email($email_id);
 
-    if ( !$contact || !$email ) {
+    if (!$contact || !$email) {
         return false;
     }
 
-    if ( !$time ) {
+    if (!$time) {
         $time = time();
     }
 
@@ -1326,7 +1327,7 @@ function send_email_notification( $email_id, $contact_id_or_email, $time = 0 )
         'status' => 'waiting',
     ];
 
-    if ( Plugin::$instance->dbs->get_db( 'events' )->add( $event ) ) {
+    if (Plugin::$instance->dbs->get_db('events')->add($event)) {
         return true;
     }
 
@@ -1340,27 +1341,27 @@ function send_email_notification( $email_id, $contact_id_or_email, $time = 0 )
  * @param $headers string|string[]
  * @return array|false
  */
-function parse_email_headers( $headers )
+function parse_email_headers($headers)
 {
-    $headers = is_array( $headers ) ? implode( PHP_EOL, $headers ) : $headers;
-    if ( !is_string( $headers ) ) {
+    $headers = is_array($headers) ? implode(PHP_EOL, $headers) : $headers;
+    if (!is_string($headers)) {
         return false;
     }
 
-    $parsed = imap_rfc822_parse_headers( $headers );
+    $parsed = imap_rfc822_parse_headers($headers);
 
-    if ( !$parsed ) {
+    if (!$parsed) {
         return false;
     }
 
     $map = [];
 
-    if ( $parsed->sender && !is_array( $parsed->sender ) ) {
-        $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
-        $map[ 'from' ] = $parsed->sender->personal;
-    } else if ( is_array( $parsed->sender ) ) {
-        $map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender[ 0 ]->mailbox, $parsed->sender[ 0 ]->host );
-        $map[ 'from' ] = $parsed->sender[ 0 ]->personal;
+    if ($parsed->sender && !is_array($parsed->sender)) {
+        $map['sender'] = sprintf('%s@%s', $parsed->sender->mailbox, $parsed->sender->host);
+        $map['from'] = $parsed->sender->personal;
+    } else if (is_array($parsed->sender)) {
+        $map['sender'] = sprintf('%s@%s', $parsed->sender[0]->mailbox, $parsed->sender[0]->host);
+        $map['from'] = $parsed->sender[0]->personal;
     }
 
     return $map;
@@ -1372,9 +1373,9 @@ function parse_email_headers( $headers )
  * @param $name
  * @return string
  */
-function sanitize_from_name( $name )
+function sanitize_from_name($name)
 {
-    return sanitize_text_field( preg_replace( '/[^A-z0-9 ]/', '', $name ) );
+    return sanitize_text_field(preg_replace('/[^A-z0-9 ]/', '', $name));
 }
 
 /**
@@ -1382,36 +1383,36 @@ function sanitize_from_name( $name )
  *
  * @param $contact Contact
  */
-function after_form_submit_handler( &$contact )
+function after_form_submit_handler(&$contact)
 {
-    if ( ! $contact instanceof Contact ){
+    if (!$contact instanceof Contact) {
         return;
     }
 
-    if ( $contact->update_meta( 'ip_address', Plugin::$instance->utils->location->get_real_ip() ) ) {
+    if ($contact->update_meta('ip_address', Plugin::$instance->utils->location->get_real_ip())) {
         $contact->extrapolate_location();
     }
 
-    if ( !$contact->get_meta( 'lead_source' ) ) {
-        $contact->update_meta( 'lead_source', Plugin::$instance->tracking->get_leadsource() );
+    if (!$contact->get_meta('lead_source')) {
+        $contact->update_meta('lead_source', Plugin::$instance->tracking->get_leadsource());
     }
 
-    if ( !$contact->get_meta( 'source_page' ) ) {
-        $contact->update_meta( 'source_page', wpgh_get_referer() );
+    if (!$contact->get_meta('source_page')) {
+        $contact->update_meta('source_page', wpgh_get_referer());
     }
 
-    if ( !$contact->is_marketable() ) {
-        $contact->change_marketing_preference( Preferences::UNCONFIRMED );
+    if (!$contact->is_marketable()) {
+        $contact->change_marketing_preference(Preferences::UNCONFIRMED);
     }
 
-    $contact->update_meta( 'last_optin', time() );
+    $contact->update_meta('last_optin', time());
 
     /**
      * Helper function.
      *
      * @param $contact Contact
      */
-    do_action( 'groundhogg/after_form_submit', $contact );
+    do_action('groundhogg/after_form_submit', $contact);
 }
 
 /**
@@ -1420,12 +1421,12 @@ function after_form_submit_handler( &$contact )
  * @param $email
  * @return bool
  */
-function email_is_same_domain( $email )
+function email_is_same_domain($email)
 {
-    $email_domain = substr( $email, strrpos( $email, '@' ) + 1 );
+    $email_domain = substr($email, strrpos($email, '@') + 1);
     $site_domain = site_url();
-    $is_same = strpos( $site_domain, $email_domain ) !== false;
-    return apply_filters( 'groundhogg/email_is_same_domain', $is_same, $email, $site_domain );
+    $is_same = strpos($site_domain, $email_domain) !== false;
+    return apply_filters('groundhogg/email_is_same_domain', $is_same, $email, $site_domain);
 }
 
 /**
@@ -1433,33 +1434,33 @@ function email_is_same_domain( $email )
  *
  * @param $credits
  */
-function gh_ss_notify_low_credit( $credits )
+function gh_ss_notify_low_credit($credits)
 {
-    if ( $credits > 1000 ) {
+    if ($credits > 1000) {
         return;
     }
 
     $message = false;
     $subject = false;
 
-    switch ( $credits ) {
+    switch ($credits) {
         case 1000:
         case 500:
         case 300:
         case 100:
         case 0:
-            $subject = sprintf( "Low on Email credits!" );
-            $message = sprintf( "You are running low on credits! Only %s credits remaining. Top up on credits &rarr; https://www.groundhogg.io/downloads/credits/", $credits );
+            $subject = sprintf("Low on Email credits!");
+            $message = sprintf("You are running low on credits! Only %s credits remaining. Top up on credits &rarr; https://www.groundhogg.io/downloads/credits/", $credits);
             break;
     }
 
-    if ( $message && $subject ) {
-        wp_mail( get_bloginfo( 'admin_email' ), $subject, $message );
+    if ($message && $subject) {
+        wp_mail(get_bloginfo('admin_email'), $subject, $message);
     }
 
 }
 
-add_action( 'groundhogg/ghss/credits_used', __NAMESPACE__ . '\gh_ss_notify_low_credit' );
+add_action('groundhogg/ghss/credits_used', __NAMESPACE__ . '\gh_ss_notify_low_credit');
 
 
 /**
@@ -1467,24 +1468,24 @@ add_action( 'groundhogg/ghss/credits_used', __NAMESPACE__ . '\gh_ss_notify_low_c
  *
  * @param $event Event
  */
-function send_event_failure_notification( $event )
+function send_event_failure_notification($event)
 {
-    if ( !is_option_enabled( 'gh_send_notifications_on_event_failure' ) || get_transient( 'gh_hold_failed_event_notification' ) ) {
+    if (!is_option_enabled('gh_send_notifications_on_event_failure') || get_transient('gh_hold_failed_event_notification')) {
         return;
     }
 
-    $subject = sprintf( "Event (%s) failed for %s on %s", $event->get_step_title(), $event->get_contact()->get_email(), esc_html( get_bloginfo( 'title' ) ) );
-    $message = sprintf( "This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->get_contact()->get_full_name(), $event->get_contact()->get_email() );
-    $message .= sprintf( "\nFailure Reason: %s", $event->get_failure_reason() );
-    $message .= sprintf( "\nManage Failed Events: %s", admin_url( 'admin.php?page=gh_events&view=status&status=failed' ) );
-    $to = Plugin::$instance->settings->get_option( 'event_failure_notification_email', get_option( 'admin_email' ) );
+    $subject = sprintf("Event (%s) failed for %s on %s", $event->get_step_title(), $event->get_contact()->get_email(), esc_html(get_bloginfo('title')));
+    $message = sprintf("This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->get_contact()->get_full_name(), $event->get_contact()->get_email());
+    $message .= sprintf("\nFailure Reason: %s", $event->get_failure_reason());
+    $message .= sprintf("\nManage Failed Events: %s", admin_url('admin.php?page=gh_events&view=status&status=failed'));
+    $to = Plugin::$instance->settings->get_option('event_failure_notification_email', get_option('admin_email'));
 
-    if ( wp_mail( $to, $subject, $message ) ) {
-        set_transient( 'gh_hold_failed_event_notification', true, MINUTE_IN_SECONDS );
+    if (wp_mail($to, $subject, $message)) {
+        set_transient('gh_hold_failed_event_notification', true, MINUTE_IN_SECONDS);
     }
 }
 
-add_action( 'groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_notification' );
+add_action('groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_notification');
 
 
 /**
@@ -1494,12 +1495,12 @@ add_action( 'groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_noti
  *
  * @return array
  */
-function split_name( $name )
+function split_name($name)
 {
-    $name = trim( $name );
-    $last_name = ( strpos( $name, ' ' ) === false ) ? '' : preg_replace( '#.*\s([\w-]*)$#', '$1', $name );
-    $first_name = trim( preg_replace( '#' . $last_name . '#', '', $name ) );
-    return array( $first_name, $last_name );
+    $name = trim($name);
+    $last_name = (strpos($name, ' ') === false) ? '' : preg_replace('#.*\s([\w-]*)$#', '$1', $name);
+    $first_name = trim(preg_replace('#' . $last_name . '#', '', $name));
+    return array($first_name, $last_name);
 }
 
 /**
@@ -1508,33 +1509,33 @@ function split_name( $name )
  * @param string $file_path
  * @return array
  */
-function get_items_from_csv( $file_path = '' )
+function get_items_from_csv($file_path = '')
 {
 
-    if ( !file_exists( $file_path ) ) {
+    if (!file_exists($file_path)) {
         return [];
     }
 
     $header = NULL;
     $header_count = 0;
     $data = array();
-    if ( ( $handle = fopen( $file_path, 'r' ) ) !== FALSE ) {
-        while ( ( $row = fgetcsv( $handle, 0, ',' ) ) !== FALSE ) {
-            if ( !$header ) {
+    if (($handle = fopen($file_path, 'r')) !== FALSE) {
+        while (($row = fgetcsv($handle, 0, ',')) !== FALSE) {
+            if (!$header) {
                 $header = $row;
-                $header_count = count( $header );
+                $header_count = count($header);
             } else {
 
-                if ( count( $row ) > $header_count ) {
-                    $row = array_slice( $row, 0, $header_count );
-                } else if ( count( $row ) < $header_count ) {
-                    $row = array_pad( $row, $header_count - count( $row ) + 1, null );
+                if (count($row) > $header_count) {
+                    $row = array_slice($row, 0, $header_count);
+                } else if (count($row) < $header_count) {
+                    $row = array_pad($row, $header_count - count($row) + 1, null);
                 }
 
-                $data[] = array_combine( $header, $row );
+                $data[] = array_combine($header, $row);
             }
         }
-        fclose( $handle );
+        fclose($handle);
     }
 
     return $data;
@@ -1548,50 +1549,50 @@ function get_items_from_csv( $file_path = '' )
  * @param array $extra
  * @return array
  */
-function get_mappable_fields( $extra = [] )
+function get_mappable_fields($extra = [])
 {
 
     $defaults = [
-        'full_name' => __( 'Full Name' ),
-        'first_name' => __( 'First Name' ),
-        'last_name' => __( 'Last Name' ),
-        'email' => __( 'Email Address' ),
-        'optin_status' => __( 'Optin Status' ),
-        'user_id' => __( 'User Id' ),
-        'owner_id' => __( 'Owner Id' ),
-        'date_created' => __( 'Date Created' ),
-        'birthday' => __( 'Birthday' ),
-        'primary_phone' => __( 'Phone Number' ),
-        'primary_phone_extension' => __( 'Phone Number Extension' ),
-        'street_address_1' => __( 'Street Address 1' ),
-        'street_address_2' => __( 'Street Address 2' ),
-        'city' => __( 'City' ),
-        'postal_zip' => __( 'Postal/Zip' ),
-        'region' => __( 'Province/State/Region' ),
-        'country' => __( 'Country' ),
-        'company_name' => __( 'Company Name' ),
-        'company_address' => __( 'Full Company Address' ),
-        'job_title' => __( 'Job Title' ),
-        'time_zone' => __( 'Time Zone' ),
-        'ip_address' => __( 'IP Address' ),
-        'lead_source' => __( 'Lead Source' ),
-        'source_page' => __( 'Source Page' ),
-        'terms_agreement' => __( 'Terms Agreement' ),
-        'gdpr_consent' => __( 'GDPR Consent' ),
-        'notes' => __( 'Add To Notes' ),
-        'tags' => __( 'Apply Value as Tag' ),
-        'meta' => __( 'Add as Custom Meta' ),
-        'file' => __( 'Upload File' ),
-        'utm_campaign' => __( 'UTM Campaign' ),
-        'utm_content' => __( 'UTM Content' ),
-        'utm_medium' => __( 'UTM Medium' ),
-        'utm_term' => __( 'UTM Term' ),
-        'utm_source' => __( 'UTM Source' ),
+        'full_name' => __('Full Name'),
+        'first_name' => __('First Name'),
+        'last_name' => __('Last Name'),
+        'email' => __('Email Address'),
+        'optin_status' => __('Optin Status'),
+        'user_id' => __('User Id'),
+        'owner_id' => __('Owner Id'),
+        'date_created' => __('Date Created'),
+        'birthday' => __('Birthday'),
+        'primary_phone' => __('Phone Number'),
+        'primary_phone_extension' => __('Phone Number Extension'),
+        'street_address_1' => __('Street Address 1'),
+        'street_address_2' => __('Street Address 2'),
+        'city' => __('City'),
+        'postal_zip' => __('Postal/Zip'),
+        'region' => __('Province/State/Region'),
+        'country' => __('Country'),
+        'company_name' => __('Company Name'),
+        'company_address' => __('Full Company Address'),
+        'job_title' => __('Job Title'),
+        'time_zone' => __('Time Zone'),
+        'ip_address' => __('IP Address'),
+        'lead_source' => __('Lead Source'),
+        'source_page' => __('Source Page'),
+        'terms_agreement' => __('Terms Agreement'),
+        'gdpr_consent' => __('GDPR Consent'),
+        'notes' => __('Add To Notes'),
+        'tags' => __('Apply Value as Tag'),
+        'meta' => __('Add as Custom Meta'),
+        'file' => __('Upload File'),
+        'utm_campaign' => __('UTM Campaign'),
+        'utm_content' => __('UTM Content'),
+        'utm_medium' => __('UTM Medium'),
+        'utm_term' => __('UTM Term'),
+        'utm_source' => __('UTM Source'),
     ];
 
-    $fields = array_merge( $defaults, $extra );
+    $fields = array_merge($defaults, $extra);
 
-    return apply_filters( 'groundhogg/mappable_fields', $fields );
+    return apply_filters('groundhogg/mappable_fields', $fields);
 
 }
 
@@ -1603,7 +1604,7 @@ function get_mappable_fields( $extra = [] )
  *
  * @return Contact|false
  */
-function generate_contact_with_map( $fields, $map )
+function generate_contact_with_map($fields, $map)
 {
     $meta = [];
     $tags = [];
@@ -1611,58 +1612,58 @@ function generate_contact_with_map( $fields, $map )
     $args = [];
     $files = [];
 
-    foreach ( $fields as $column => $value ) {
+    foreach ($fields as $column => $value) {
 
         // ignore if we are not mapping it.
-        if ( !key_exists( $column, $map ) ) {
+        if (!key_exists($column, $map)) {
             continue;
         }
 
-        $value = wp_unslash( $value );
+        $value = wp_unslash($value);
 
-        $field = $map[ $column ];
+        $field = $map[$column];
 
-        switch ( $field ) {
+        switch ($field) {
             case 'full_name':
-                $parts = split_name( $value );
-                $args[ 'first_name' ] = sanitize_text_field( $parts[ 0 ] );
-                $args[ 'last_name' ] = sanitize_text_field( $parts[ 1 ] );
+                $parts = split_name($value);
+                $args['first_name'] = sanitize_text_field($parts[0]);
+                $args['last_name'] = sanitize_text_field($parts[1]);
                 break;
             case 'first_name':
             case 'last_name':
-                $args[ $field ] = sanitize_text_field( $value );
+                $args[$field] = sanitize_text_field($value);
                 break;
             case 'email':
-                $args[ $field ] = sanitize_email( $value );
+                $args[$field] = sanitize_email($value);
                 break;
             case 'date_created':
-                $args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
+                $args[$field] = date('Y-m-d H:i:s', strtotime($value));
                 break;
             case 'optin_status':
-                $args[ $field ] = absint( $value );
+                $args[$field] = absint($value);
                 break;
             case 'user_id':
             case 'owner_id':
 
                 // Email Passed
-                if ( is_email( $value ) ) {
+                if (is_email($value)) {
                     $by = 'email';
                     // Username passed
-                } elseif ( is_string( $value ) && !is_numeric( $value ) ) {
+                } elseif (is_string($value) && !is_numeric($value)) {
                     $by = 'login';
                     // ID Passed
                 } else {
                     $by = 'id';
-                    $value = absint( $value );
+                    $value = absint($value);
                 }
 
-                $user = get_user_by( $by, $value );
+                $user = get_user_by($by, $value);
 
                 // Make sure User exists
-                if ( $user ) {
+                if ($user) {
                     // Check the mapped owner can actually own contacts.
-                    if ( $field !== 'owner_id' || user_can( $user->ID, 'edit_contacts' ) ) {
-                        $args[ $field ] = $user->ID;
+                    if ($field !== 'owner_id' || user_can($user->ID, 'edit_contacts')) {
+                        $args[$field] = $user->ID;
                     }
                 }
 
@@ -1684,112 +1685,112 @@ function generate_contact_with_map( $fields, $map )
             case 'utm_content':
             case 'utm_term':
             case 'utm_source':
-                $meta[ $field ] = sanitize_text_field( $value );
+                $meta[$field] = sanitize_text_field($value);
                 break;
             // Only checks whether value is not empty.
             case 'terms_agreement':
-                if ( !empty( $value ) ) {
-                    $meta[ 'terms_agreement' ] = 'yes';
-                    $meta[ 'terms_agreement_date' ] = date_i18n( get_date_time_format() );
+                if (!empty($value)) {
+                    $meta['terms_agreement'] = 'yes';
+                    $meta['terms_agreement_date'] = date_i18n(get_date_time_format());
                 }
                 break;
             // Only checks whether value is not empty.
             case 'gdpr_consent':
-                if ( !empty( $value ) ) {
-                    $meta[ 'gdpr_consent' ] = 'yes';
-                    $meta[ 'gdpr_consent_date' ] = date_i18n( get_date_time_format() );
+                if (!empty($value)) {
+                    $meta['gdpr_consent'] = 'yes';
+                    $meta['gdpr_consent_date'] = date_i18n(get_date_time_format());
                 }
                 break;
             case 'country':
-                if ( strlen( $value ) !== 2 ) {
+                if (strlen($value) !== 2) {
                     $countries = Plugin::$instance->utils->location->get_countries_list();
-                    $code = array_search( $value, $countries );
-                    if ( $code ) {
+                    $code = array_search($value, $countries);
+                    if ($code) {
                         $value = $code;
                     }
                 }
-                $meta[ $field ] = $value;
+                $meta[$field] = $value;
                 break;
             case 'tags':
-                $maybe_tags = explode( ',', $value );
-                $tags = array_merge( $tags, $maybe_tags );
+                $maybe_tags = explode(',', $value);
+                $tags = array_merge($tags, $maybe_tags);
                 break;
             case 'meta':
-                $meta[ get_key_from_column_label( $column ) ] = sanitize_text_field( $value );
+                $meta[get_key_from_column_label($column)] = sanitize_text_field($value);
                 break;
             case 'files':
-                if ( isset_not_empty( $_FILES, $column ) ) {
-                    $files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
+                if (isset_not_empty($_FILES, $column)) {
+                    $files[$column] = wp_unslash(get_array_var($_FILES, $column));
                 }
                 break;
             case 'notes':
-                $notes[] = sanitize_textarea_field( $value );
+                $notes[] = sanitize_textarea_field($value);
                 break;
             case 'time_zone':
                 $zones = Plugin::$instance->utils->location->get_time_zones();
-                $code = array_search( $value, $zones );
-                if ( $code ) {
-                    $meta[ $field ] = $code;
+                $code = array_search($value, $zones);
+                if ($code) {
+                    $meta[$field] = $code;
                 }
                 break;
             case 'ip_address':
-                $ip = filter_var( $value, FILTER_VALIDATE_IP );
-                if ( $ip ) {
-                    $meta[ $field ] = $ip;
+                $ip = filter_var($value, FILTER_VALIDATE_IP);
+                if ($ip) {
+                    $meta[$field] = $ip;
                 }
                 break;
             case 'birthday':
 
-                $date = date( 'Y-m-d', strtotime( $value ) );
-                $parts = map_deep( explode( '-', $date ), 'absint' );
+                $date = date('Y-m-d', strtotime($value));
+                $parts = map_deep(explode('-', $date), 'absint');
 
-                $meta[ 'birthday_year' ] = $parts[ 0 ];
-                $meta[ 'birthday_month' ] = $parts[ 1 ];
-                $meta[ 'birthday_day' ] = $parts[ 2 ];
-                $meta[ 'birthday' ] = $date;
+                $meta['birthday_year'] = $parts[0];
+                $meta['birthday_month'] = $parts[1];
+                $meta['birthday_day'] = $parts[2];
+                $meta['birthday'] = $date;
                 break;
         }
 
     }
 
     $contact = new Contact();
-    $id = $contact->create( $args );
+    $id = $contact->create($args);
 
-    if ( !$id ) {
+    if (!$id) {
         return false;
     }
 
     // Add Tags
-    if ( !empty( $tags ) ) {
-        $contact->apply_tag( $tags );
+    if (!empty($tags)) {
+        $contact->apply_tag($tags);
     }
 
     // Add notes
-    if ( !empty( $notes ) ) {
-        foreach ( $notes as $note ) {
-            $contact->add_note( $note );
+    if (!empty($notes)) {
+        foreach ($notes as $note) {
+            $contact->add_note($note);
         }
     }
 
     // update meta data
-    if ( !empty( $meta ) ) {
-        foreach ( $meta as $key => $value ) {
-            $contact->update_meta( $key, $value );
+    if (!empty($meta)) {
+        foreach ($meta as $key => $value) {
+            $contact->update_meta($key, $value);
         }
     }
 
-    if ( !empty( $files ) ) {
-        foreach ( $files as $file ) {
-            $contact->upload_file( $file );
+    if (!empty($files)) {
+        foreach ($files as $file) {
+            $contact->upload_file($file);
         }
     }
 
-    $contact->update_meta( 'last_optin', time() );
+    $contact->update_meta('last_optin', time());
 
     return $contact;
 }
 
-if ( !function_exists( 'get_key_from_column_label' ) ):
+if (!function_exists('get_key_from_column_label')):
 
     /**
      * Get a key from a column label
@@ -1797,27 +1798,27 @@ if ( !function_exists( 'get_key_from_column_label' ) ):
      * @param $column
      * @return string
      */
-    function get_key_from_column_label( $column )
+    function get_key_from_column_label($column)
     {
-        return words_to_key( $column );
+        return words_to_key($column);
     }
 
 endif;
 
-if ( !function_exists( 'multi_implode' ) ):
-    function multi_implode( $glue, $array )
+if (!function_exists('multi_implode')):
+    function multi_implode($glue, $array)
     {
         $ret = '';
 
-        foreach ( $array as $item ) {
-            if ( is_array( $item ) ) {
-                $ret .= multi_implode( $glue, $item ) . $glue;
+        foreach ($array as $item) {
+            if (is_array($item)) {
+                $ret .= multi_implode($glue, $item) . $glue;
             } else {
                 $ret .= $item . $glue;
             }
         }
 
-        $ret = substr( $ret, 0, 0 - strlen( $glue ) );
+        $ret = substr($ret, 0, 0 - strlen($glue));
 
         return $ret;
     }
@@ -1829,46 +1830,46 @@ endif;
  * @param $time
  * @return string
  */
-function scheduled_time( $time )
+function scheduled_time($time)
 {
     // convert to local time.
-    $p_time = Plugin::$instance->utils->date_time->convert_to_local_time( $time );
+    $p_time = Plugin::$instance->utils->date_time->convert_to_local_time($time);
 
     // Get the current time.
-    $cur_time = (int) current_time( 'timestamp' );
+    $cur_time = (int)current_time('timestamp');
 
     $time_diff = $p_time - $cur_time;
 
-    if ( absint( $time_diff ) > DAY_IN_SECONDS ) {
-        $time = sprintf( _x( "on %s", 'status', 'groundhogg' ), date_i18n( get_date_time_format(), intval( $p_time ) ) );
+    if (absint($time_diff) > DAY_IN_SECONDS) {
+        $time = sprintf(_x("on %s", 'status', 'groundhogg'), date_i18n(get_date_time_format(), intval($p_time)));
     } else {
-        $format = $time_diff <= 0 ? _x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
-        $time = sprintf( $format, human_time_diff( $p_time, $cur_time ) );
+        $format = $time_diff <= 0 ? _x("%s ago", 'status', 'groundhogg') : _x("in %s", 'status', 'groundhogg');
+        $time = sprintf($format, human_time_diff($p_time, $cur_time));
     }
 
     return $time;
 }
 
-function get_store_products( $args = [] )
+function get_store_products($args = [])
 {
-    $args = wp_parse_args( $args, array(
+    $args = wp_parse_args($args, array(
         //'category' => 'templates',
         'category' => '',
         'tag' => '',
         's' => '',
         'page' => '',
         'number' => '-1'
-    ) );
+    ));
 
     $url = 'https://www.groundhogg.io/edd-api/v2/products/';
 
-    $response = wp_remote_get( add_query_arg( $args, $url ) );
+    $response = wp_remote_get(add_query_arg($args, $url));
 
-    if ( is_wp_error( $response ) ) {
+    if (is_wp_error($response)) {
         return $response->get_error_message();
     }
 
-    $products = json_decode( wp_remote_retrieve_body( $response ) );
+    $products = json_decode(wp_remote_retrieve_body($response));
 
     return $products;
 }
@@ -1880,7 +1881,7 @@ function get_store_products( $args = [] )
  */
 function show_groundhogg_branding()
 {
-    return apply_filters( 'groundhogg/show_branding', true );
+    return apply_filters('groundhogg/show_branding', true);
 }
 
 /**
@@ -1902,10 +1903,10 @@ function floating_phil()
  *
  * @return string|bool
  */
-function groundhogg_logo( $color = 'black', $width = 300, $echo=true )
+function groundhogg_logo($color = 'black', $width = 300, $echo = true)
 {
 
-    switch ( $color ) {
+    switch ($color) {
         default:
         case 'black':
             $link = 'logo-black-1000x182.png';
@@ -1915,12 +1916,12 @@ function groundhogg_logo( $color = 'black', $width = 300, $echo=true )
             break;
     }
 
-    $img = html()->e( 'img', [
+    $img = html()->e('img', [
         'src' => GROUNDHOGG_ASSETS_URL . 'images/' . $link,
         'width' => $width
-    ] );
+    ]);
 
-    if ( $echo ){
+    if ($echo) {
         echo $img;
         return true;
     }
@@ -1934,21 +1935,21 @@ function groundhogg_logo( $color = 'black', $width = 300, $echo=true )
  * @param bool $return
  * @return bool|string
  */
-function form_errors( $return = true )
+function form_errors($return = true)
 {
-    if ( Plugin::$instance->submission_handler->has_errors() ) {
+    if (Plugin::$instance->submission_handler->has_errors()) {
 
         $errors = Plugin::$instance->submission_handler->get_errors();
         $err_html = "";
 
-        foreach ( $errors as $error ) {
-            $err_html .= sprintf( '<li id="%s">%s</li>', $error->get_error_code(), $error->get_error_message() );
+        foreach ($errors as $error) {
+            $err_html .= sprintf('<li id="%s">%s</li>', $error->get_error_code(), $error->get_error_message());
         }
 
-        $err_html = sprintf( "<ul class='gh-form-errors'>%s</ul>", $err_html );
-        $err_html = sprintf( "<div class='gh-message-wrapper gh-form-errors-wrapper'>%s</div>", $err_html );
+        $err_html = sprintf("<ul class='gh-form-errors'>%s</ul>", $err_html);
+        $err_html = sprintf("<div class='gh-message-wrapper gh-form-errors-wrapper'>%s</div>", $err_html);
 
-        if ( $return ) {
+        if ($return) {
             return $err_html;
         }
 
@@ -1967,7 +1968,7 @@ function form_errors( $return = true )
  */
 function get_email_templates()
 {
-    $templates = apply_filters( 'groundhogg/templates/emails', [] );
+    $templates = apply_filters('groundhogg/templates/emails', []);
     /**
      * @var $email_templates array
      */
@@ -1980,35 +1981,35 @@ function get_email_templates()
  * @param string $data
  * @return bool
  */
-function blacklist_check( $data = '' )
+function blacklist_check($data = '')
 {
 
-    if ( !is_array( $data ) && !is_object( $data ) ) {
-        $mod_keys = trim( get_option( 'blacklist_keys' ) );
-        if ( '' == $mod_keys ) {
+    if (!is_array($data) && !is_object($data)) {
+        $mod_keys = trim(get_option('blacklist_keys'));
+        if ('' == $mod_keys) {
             return false; // If moderation keys are empty
         }
 
         // Ensure HTML tags are not being used to bypass the blacklist.
-        $data_no_html = wp_strip_all_tags( $data );
+        $data_no_html = wp_strip_all_tags($data);
 
-        $words = explode( "\n", $mod_keys );
+        $words = explode("\n", $mod_keys);
 
-        foreach ( (array) $words as $word ) {
-            $word = trim( $word );
+        foreach ((array)$words as $word) {
+            $word = trim($word);
 
             // Skip empty lines
-            if ( empty( $word ) ) {
+            if (empty($word)) {
                 continue;
             }
 
             // Do some escaping magic so that '#' chars in the
             // spam words don't break things:
-            $word = preg_quote( $word, '#' );
+            $word = preg_quote($word, '#');
 
             $pattern = "#$word#i";
 
-            if ( preg_match( $pattern, $data ) || preg_match( $pattern, $data_no_html ) ) {
+            if (preg_match($pattern, $data) || preg_match($pattern, $data_no_html)) {
                 return true;
             }
         }
@@ -2016,8 +2017,8 @@ function blacklist_check( $data = '' )
         return false;
     }
 
-    foreach ( (array) $data as $datum ) {
-        if ( blacklist_check( $datum ) ) {
+    foreach ((array)$data as $datum) {
+        if (blacklist_check($datum)) {
             return true;
         }
     }
@@ -2030,7 +2031,7 @@ function blacklist_check( $data = '' )
  */
 function get_managed_page_name()
 {
-    return apply_filters( 'groundhogg/managed_page_name', get_option( 'gh_managed_page_name_override', 'gh' ) );
+    return apply_filters('groundhogg/managed_page_name', get_option('gh_managed_page_name_override', 'gh'));
 }
 
 /**
@@ -2039,9 +2040,9 @@ function get_managed_page_name()
  * @param string $url
  * @return string|void
  */
-function managed_page_url( $url = '' )
+function managed_page_url($url = '')
 {
-    return trailingslashit( rtrim( site_url( get_managed_page_name() ), '/' ) . '/' . ltrim( $url, '/' ) );
+    return trailingslashit(rtrim(site_url(get_managed_page_name()), '/') . '/' . ltrim($url, '/'));
 }
 
 /**
@@ -2052,23 +2053,23 @@ function setup_managed_page()
     $managed_page_name = get_managed_page_name();
 
     $query = new \WP_Query();
-    $posts = $query->query( [
+    $posts = $query->query([
         'name' => $managed_page_name,
         'post_type' => 'page',
         'post_status' => 'publish'
-    ] );
+    ]);
 
-    if ( empty( $posts ) ) {
-        $post_id = wp_insert_post( [
+    if (empty($posts)) {
+        $post_id = wp_insert_post([
             'post_title' => 'managed-page',
             'post_status' => 'publish',
             'post_name' => $managed_page_name,
             'post_type' => 'page',
             'post_content' => "Shhhh! This is a secret page. Go away!"
-        ], true );
+        ], true);
 
-        if ( is_wp_error( $post_id ) ) {
-            Plugin::$instance->notices->add( $post_id );
+        if (is_wp_error($post_id)) {
+            Plugin::$instance->notices->add($post_id);
         }
     }
 }
@@ -2080,21 +2081,21 @@ function setup_managed_page()
  * @param string $query
  * @param string $after
  */
-function add_managed_rewrite_rule( $regex = '', $query = '', $after = 'top' )
+function add_managed_rewrite_rule($regex = '', $query = '', $after = 'top')
 {
 
     $managed_page_name = get_managed_page_name();
 
-    if ( strpos( $query, 'index.php' ) === false ) {
-        $ahead = sprintf( 'index.php?pagename=%s&', $managed_page_name );
+    if (strpos($query, 'index.php') === false) {
+        $ahead = sprintf('index.php?pagename=%s&', $managed_page_name);
         $query = $ahead . $query;
     }
 
-    if ( strpos( $regex, '^' . $managed_page_name ) !== 0 ) {
+    if (strpos($regex, '^' . $managed_page_name) !== 0) {
         $regex = '^' . $managed_page_name . '/' . $regex;
     }
 
-    add_rewrite_rule( $regex, $query, $after );
+    add_rewrite_rule($regex, $query, $after);
 }
 
 /**
@@ -2102,9 +2103,9 @@ function add_managed_rewrite_rule( $regex = '', $query = '', $after = 'top' )
  * @return string
  * @deprecated since 2.0.9.2
  */
-function managed_rewrite_rule( $string = '' )
+function managed_rewrite_rule($string = '')
 {
-    return sprintf( 'index.php?pagename=%s&', get_managed_page_name() ) . $string;
+    return sprintf('index.php?pagename=%s&', get_managed_page_name()) . $string;
 }
 
 /**
@@ -2112,7 +2113,7 @@ function managed_rewrite_rule( $string = '' )
  */
 function is_managed_page()
 {
-    return get_query_var( 'pagename' ) === get_managed_page_name();
+    return get_query_var('pagename') === get_managed_page_name();
 }
 
 /**
@@ -2126,7 +2127,7 @@ function install_custom_rewrites()
     Plugin::$instance->rewrites->add_rewrite_rules();
     Plugin::$instance->preferences->add_rewrite_rules();
 
-    do_action( 'groundhogg/install_custom_rewrites' );
+    do_action('groundhogg/install_custom_rewrites');
 
     flush_rewrite_rules();
 }
@@ -2141,9 +2142,9 @@ function install_custom_rewrites()
  * @since 2.0.4
  *
  */
-function nonce_url_no_amp( $actionurl, $action = -1, $name = '_wpnonce' )
+function nonce_url_no_amp($actionurl, $action = -1, $name = '_wpnonce')
 {
-    return add_query_arg( $name, wp_create_nonce( $action ), $actionurl );
+    return add_query_arg($name, wp_create_nonce($action), $actionurl);
 }
 
 /**
@@ -2155,17 +2156,17 @@ function nonce_url_no_amp( $actionurl, $action = -1, $name = '_wpnonce' )
  *
  * @return string
  */
-function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false )
+function dashicon($icon, $wrap = 'span', $atts = [], $echo = false)
 {
-    $atts = wp_parse_args( $atts, [
+    $atts = wp_parse_args($atts, [
         'class' => 'dashicons dashicons-'
-    ] );
+    ]);
 
-    $atts[ 'class' ] .= $icon;
+    $atts['class'] .= $icon;
 
-    $html = html()->e( $wrap, $atts, '', false );
+    $html = html()->e($wrap, $atts, '', false);
 
-    if ( $echo ) {
+    if ($echo) {
         echo $html;
     }
 
@@ -2179,9 +2180,9 @@ function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false )
  * @param string $wrap
  * @param array $atts
  */
-function dashicon_e( $icon, $wrap = 'span', $atts = [] )
+function dashicon_e($icon, $wrap = 'span', $atts = [])
 {
-    dashicon( $icon, $wrap, $atts, true );
+    dashicon($icon, $wrap, $atts, true);
 }
 
 
@@ -2192,12 +2193,12 @@ function dashicon_e( $icon, $wrap = 'span', $atts = [] )
  */
 function is_admin_groundhogg_page()
 {
-    $page = get_request_var( 'page' );
-    return is_admin() && $page && ( preg_match( '/^gh/', $page ) || $page === 'groundhogg' );
+    $page = get_request_var('page');
+    return is_admin() && $page && (preg_match('/^gh/', $page) || $page === 'groundhogg');
 }
 
 
-if ( !function_exists( __NAMESPACE__ . '\is_white_labeled' ) ) {
+if (!function_exists(__NAMESPACE__ . '\is_white_labeled')) {
 
     /**
      * Whether the Groundhogg is white labeled or not.
@@ -2210,7 +2211,7 @@ if ( !function_exists( __NAMESPACE__ . '\is_white_labeled' ) ) {
     }
 }
 
-if ( !function_exists( __NAMESPACE__ . '\white_labeled_name' ) ) {
+if (!function_exists(__NAMESPACE__ . '\white_labeled_name')) {
 
     /**
      * Return replacement name form white label
@@ -2230,7 +2231,7 @@ if ( !function_exists( __NAMESPACE__ . '\white_labeled_name' ) ) {
  */
 function get_main_blog_id()
 {
-    if ( is_multisite() ) {
+    if (is_multisite()) {
         return get_network()->site_id;
     }
 
@@ -2244,7 +2245,7 @@ function get_main_blog_id()
  */
 function is_main_blog()
 {
-    if ( !is_multisite() ) {
+    if (!is_multisite()) {
         return true;
     }
 
@@ -2262,20 +2263,20 @@ function is_main_blog()
  * @param bool $as_array
  * @return array|bool|WP_Error|object
  */
-function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [], $as_array=false )
+function remote_post_json($url = '', $body = [], $method = 'POST', $headers = [], $as_array = false)
 {
-    $method = strtoupper( $method );
+    $method = strtoupper($method);
 
-    if ( !isset_not_empty( $headers, 'Content-type' ) ) {
-        $headers[ 'Content-type' ] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
+    if (!isset_not_empty($headers, 'Content-type')) {
+        $headers['Content-type'] = sprintf('application/json; charset=%s', get_bloginfo('charset'));
     }
 
-    switch ( $method ) {
+    switch ($method) {
         case 'POST':
         case 'PUT':
         case 'PATCH':
         case 'DELETE':
-            $body = is_array( $body ) ? wp_json_encode( $body ) : $body;
+            $body = is_array($body) ? wp_json_encode($body) : $body;
             break;
     }
 
@@ -2287,37 +2288,37 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
         'sslverify' => true
     ];
 
-    if ( $method === 'GET' ) {
-        $response = wp_remote_get( $url, $args );
+    if ($method === 'GET') {
+        $response = wp_remote_get($url, $args);
     } else {
-        $response = wp_remote_post( $url, $args );
+        $response = wp_remote_post($url, $args);
     }
 
-    if ( !$response ) {
-        return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), $response );
+    if (!$response) {
+        return new WP_Error('unknown_error', sprintf('Failed to initialize remote %s.', $method), $response);
     }
 
-    if ( is_wp_error( $response ) ) {
+    if (is_wp_error($response)) {
         return $response;
     }
 
-    $json = json_decode( wp_remote_retrieve_body( $response ), $as_array );
+    $json = json_decode(wp_remote_retrieve_body($response), $as_array);
 
-    if ( !$json ) {
-        return new WP_Error( 'unknown_error', sprintf( 'Failed to initialize remote %s.', $method ), wp_remote_retrieve_body( $response ) );
+    if (!$json) {
+        return new WP_Error('unknown_error', sprintf('Failed to initialize remote %s.', $method), wp_remote_retrieve_body($response));
     }
 
-    if ( is_json_error( $json ) ) {
-        $error = get_json_error( $json );
+    if (is_json_error($json)) {
+        $error = get_json_error($json);
 
-        $data = (array) $error->get_error_data();
+        $data = (array)$error->get_error_data();
 
-        $data[ 'url' ] = $url;
-        $data[ 'method' ] = $method;
-        $data[ 'headers' ] = $headers;
-        $data[ 'body' ] = json_decode( $body );
+        $data['url'] = $url;
+        $data['method'] = $method;
+        $data['headers'] = $headers;
+        $data['body'] = json_decode($body);
 
-        $error->add_data( $data );
+        $error->add_data($data);
 
         return $error;
     }
@@ -2332,7 +2333,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
  */
 function get_date_time_format()
 {
-    return sprintf( "%s %s", get_option( 'date_format' ), get_option( 'time_format' ) );
+    return sprintf("%s %s", get_option('date_format'), get_option('time_format'));
 }
 
 /**
@@ -2342,29 +2343,29 @@ function get_date_time_format()
  * @param $download bool
  * @return string
  */
-function file_access_url( $path, $download = false )
+function file_access_url($path, $download = false)
 {
     // Get the base path
     $base_uploads_folder = Plugin::instance()->utils->files->get_base_uploads_dir();
     $base_uploads_url = Plugin::instance()->utils->files->get_base_uploads_url();
 
     // Remove the extra path info from the path
-    if ( strpos( $path, $base_uploads_folder ) !== false ) {
-        $path = str_replace( $base_uploads_folder, '', $path );
+    if (strpos($path, $base_uploads_folder) !== false) {
+        $path = str_replace($base_uploads_folder, '', $path);
         // Remove the extra url info from the path
-    } else if ( strpos( $path, $base_uploads_url ) !== false ) {
-        $path = str_replace( $base_uploads_url, '', $path );
+    } else if (strpos($path, $base_uploads_url) !== false) {
+        $path = str_replace($base_uploads_url, '', $path);
     }
 
-    $url = managed_page_url( 'uploads/' . ltrim( $path, '/' ) );
+    $url = managed_page_url('uploads/' . ltrim($path, '/'));
 
     // WP Engine file download links to not work if forward slash is not present.
-    if( ! is_wpengine() ){
-        $url = untrailingslashit( $url );
+    if (!is_wpengine()) {
+        $url = untrailingslashit($url);
     }
 
-    if ( $download ) {
-        $url = add_query_arg( [ 'download' => true ], $url );
+    if ($download) {
+        $url = add_query_arg(['download' => true], $url);
     }
 
     return $url;
@@ -2377,9 +2378,9 @@ function file_access_url( $path, $download = false )
  * @param string $id_or_email id or email of the contact
  * @param bool $by_user_id whether the ID is the ID of a WP user
  */
-function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false )
+function do_api_trigger($call_name = '', $id_or_email = '', $by_user_id = false)
 {
-    do_action( 'groundhogg/steps/benchmarks/api', $call_name, $id_or_email, $by_user_id );
+    do_action('groundhogg/steps/benchmarks/api', $call_name, $id_or_email, $by_user_id);
 }
 
 /**
@@ -2389,9 +2390,9 @@ function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false
  * @param string $id_or_email
  * @param bool $by_user_id
  */
-function do_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = false )
+function do_api_benchmark($call_name = '', $id_or_email = '', $by_user_id = false)
 {
-    do_api_trigger( $call_name, $id_or_email, $by_user_id );
+    do_api_trigger($call_name, $id_or_email, $by_user_id);
 }
 
 /**
@@ -2400,21 +2401,21 @@ function do_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = fal
  * @param string $option
  * @return mixed|string
  */
-function get_screen_option( $option = '' )
+function get_screen_option($option = '')
 {
     $user = get_current_user_id();
     $screen = get_current_screen();
-    $screen_option = $screen->get_option( $option, 'option' );
-    $value = get_user_meta( $user, $screen_option, true );
+    $screen_option = $screen->get_option($option, 'option');
+    $value = get_user_meta($user, $screen_option, true);
 
-    if ( empty( $value ) || ( is_numeric( $value ) && $value < 1 ) ) {
-        $value = $screen->get_option( $option, 'default' );
+    if (empty($value) || (is_numeric($value) && $value < 1)) {
+        $value = $screen->get_option($option, 'default');
     }
 
     return $value;
 }
 
-if ( !function_exists( __NAMESPACE__ . '\get_email_top_image_url' ) ):
+if (!function_exists(__NAMESPACE__ . '\get_email_top_image_url')):
 
     /**
      * Return the theme logo URL.
@@ -2423,13 +2424,13 @@ if ( !function_exists( __NAMESPACE__ . '\get_email_top_image_url' ) ):
      */
     function get_email_top_image_url()
     {
-        $image = wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' );
+        $image = wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full');
 
-        if ( !$image ) {
+        if (!$image) {
             return 'https://via.placeholder.com/350x150';
         }
 
-        return $image[ 0 ];
+        return $image[0];
     }
 
 endif;
@@ -2441,7 +2442,7 @@ endif;
  */
 function get_magic_tag_ids()
 {
-    return array_values( Plugin::$instance->tag_mapping->get_tag_map() );
+    return array_values(Plugin::$instance->tag_mapping->get_tag_map());
 }
 
 /**
@@ -2451,22 +2452,22 @@ function get_magic_tag_ids()
  * @param $tag
  * @return array|false
  */
-function get_tag_attributes( $tag )
+function get_tag_attributes($tag)
 {
-    if ( !preg_match( '/<[^>]+>/', $tag, $matches ) ) {
+    if (!preg_match('/<[^>]+>/', $tag, $matches)) {
         return false;
     }
 
-    $tag = $matches[ 0 ];
+    $tag = $matches[0];
 
-    preg_match_all( "/([a-z\-]+)(=\"([^\"]+)\")/", $tag, $all_atts );
+    preg_match_all("/([a-z\-]+)(=\"([^\"]+)\")/", $tag, $all_atts);
 
-    $attributes = map_deep( $all_atts[ 1 ], 'sanitize_key' );
-    $values = $all_atts[ 3 ];
-    $attributes = array_combine( $attributes, $values );
+    $attributes = map_deep($all_atts[1], 'sanitize_key');
+    $values = $all_atts[3];
+    $attributes = array_combine($attributes, $values);
 
-    if ( isset_not_empty( $attributes, 'style' ) ) {
-        $attributes[ 'style' ] = parse_inline_styles( $attributes[ 'style' ] );
+    if (isset_not_empty($attributes, 'style')) {
+        $attributes['style'] = parse_inline_styles($attributes['style']);
     }
 
     return $attributes;
@@ -2478,13 +2479,13 @@ function get_tag_attributes( $tag )
  * @param $tag
  * @return bool|mixed
  */
-function get_tag_name( $tag )
+function get_tag_name($tag)
 {
-    if ( !preg_match( '/<[^>]+>/', $tag ) ) {
+    if (!preg_match('/<[^>]+>/', $tag)) {
         return false;
     }
-    preg_match( '/<([^\W]+)/', $tag, $matches );
-    return $matches[ 1 ];
+    preg_match('/<([^\W]+)/', $tag, $matches);
+    return $matches[1];
 }
 
 /**
@@ -2493,18 +2494,18 @@ function get_tag_name( $tag )
  * @param $style string
  * @return array
  */
-function parse_inline_styles( $style )
+function parse_inline_styles($style)
 {
-    $bits = explode( ';', $style );
+    $bits = explode(';', $style);
 
     $css = [];
 
-    foreach ( $bits as $bit ) {
+    foreach ($bits as $bit) {
 
-        $rule = explode( ':', $bit );
-        $attribute = sanitize_key( $rule[ 0 ] );
-        $value = trim( $rule[ 1 ] );
-        $css[ $attribute ] = $value;
+        $rule = explode(':', $bit);
+        $attribute = sanitize_key($rule[0]);
+        $value = trim($rule[1]);
+        $css[$attribute] = $value;
     }
 
     return $css;
@@ -2517,11 +2518,11 @@ function parse_inline_styles( $style )
  * @param bool $echo
  * @return bool|string
  */
-function action_input( $action = '', $echo = true )
+function action_input($action = '', $echo = true)
 {
-    $input = html()->input( [ 'value' => $action, 'type' => 'hidden', 'name' => 'action' ] );
+    $input = html()->input(['value' => $action, 'type' => 'hidden', 'name' => 'action']);
 
-    if ( $echo ) {
+    if ($echo) {
         echo $input;
         return true;
     }
@@ -2536,18 +2537,18 @@ function action_input( $action = '', $echo = true )
  * @param array $args
  * @return string
  */
-function action_url( $action, $args = [] )
+function action_url($action, $args = [])
 {
     $url_args = [
-        'page' => get_request_var( 'page' ),
-        'tab' => get_request_var( 'tab' ),
+        'page' => get_request_var('page'),
+        'tab' => get_request_var('tab'),
         'action' => $action,
-        '_wpnonce' => wp_create_nonce( $action )
+        '_wpnonce' => wp_create_nonce($action)
     ];
 
-    $url_args = array_filter( array_merge( $url_args, $args ) );
+    $url_args = array_filter(array_merge($url_args, $args));
 
-    return add_query_arg( urlencode_deep( $url_args ), admin_url( 'admin.php' ) );
+    return add_query_arg(urlencode_deep($url_args), admin_url('admin.php'));
 }
 
 global $groundhogg_mobile_validator;
@@ -2560,38 +2561,52 @@ global $groundhogg_mobile_validator;
 function get_default_country_code()
 {
     // Is the CC already set?
-    $cc = get_option( 'gh_default_country_code' );
+    $cc = get_option('gh_default_country_code');
 
-    if ( $cc ) {
+    if ($cc) {
         return $cc;
     }
 
     // Get the IP of the logged in user
-    if ( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
+    if (is_user_logged_in() && current_user_can('manage_options')) {
 
-        $cc = Plugin::instance()->utils->location->ip_info( null, 'countrycode' );
+        $cc = Plugin::instance()->utils->location->ip_info(null, 'countrycode');
 
-        if ( $cc ) {
-            update_option( 'gh_default_country_code', $cc );
+        if ($cc) {
+            update_option('gh_default_country_code', $cc);
             return $cc;
         }
 
     }
 
     // Get the IP of the site wherever it's being hosted
-    $parse_url = wp_parse_url( site_url(), PHP_URL_HOST );
+    $parse_url = wp_parse_url(site_url(), PHP_URL_HOST);
 
-    if ( $parse_url ) {
-        $ip = gethostbyname( $parse_url );
-        $cc = Plugin::instance()->utils->location->ip_info( $ip, 'countrycode' );
+    if ($parse_url) {
+        $ip = gethostbyname($parse_url);
+        $cc = Plugin::instance()->utils->location->ip_info($ip, 'countrycode');
 
-        if ( $cc ) {
-            update_option( 'gh_default_country_code', $cc );
+        if ($cc) {
+            update_option('gh_default_country_code', $cc);
             return $cc;
         }
     }
 
     return 'US';
+}
+
+/**
+ * @return Mobile_Validator
+ */
+function mobile_validator()
+{
+    global $groundhogg_mobile_validator;
+
+    if (!$groundhogg_mobile_validator instanceof Mobile_Validator) {
+        $groundhogg_mobile_validator = new Mobile_Validator();
+    }
+
+    return $groundhogg_mobile_validator;
 }
 
 /**
@@ -2602,32 +2617,56 @@ function get_default_country_code()
  * @param bool $with_plus whether to return with the + or not
  * @return bool|string
  */
-function validate_mobile_number( $number, $country_code = '', $with_plus = false )
+function validate_mobile_number($number, $country_code = '', $with_plus = false)
 {
-    global $groundhogg_mobile_validator;
-
-    if ( ! $groundhogg_mobile_validator instanceof Mobile_Validator ) {
-        $groundhogg_mobile_validator = new Mobile_Validator();
-    }
-
-    if ( !$country_code ) {
+    if (!$country_code) {
         $country_code = get_default_country_code();
     }
 
-    $number = $groundhogg_mobile_validator->normalize( $number, $country_code );
+    $number = preg_replace("/[^0-9]/", "", $number);
 
-    if ( empty( $number ) ) {
+    if (!number_has_country_code($number)) {
+        $number = \Groundhogg\mobile_validator()->normalize($number, $country_code);
+    }
+
+    if (empty($number)) {
         return false;
     }
 
-    $number = $number[ 0 ];
+    // Number may come from validator meaning it will be in array
+    if (is_array($number)) {
+        $number = $number[0];
+    }
 
-    // Remove the plus from the string
-    if ( ! $with_plus ) {
-        $number = str_replace( '+', '', $number );
+    // Add plus to string if not there
+    if ($with_plus) {
+        if (strpos($number, '+') === false) {
+            $number = '+' . $number;
+        }
+    // Remove plus from string
+    } else {
+        $number = str_replace('+', '', $number);
     }
 
     return $number;
+}
+
+/**
+ * Check if the number has a specific country code.
+ *
+ * @param string $number
+ * @return bool
+ */
+function number_has_country_code($number = '')
+{
+    if (!$number) {
+        return false;
+    }
+
+    $iso3166 = \Groundhogg\mobile_validator()->maybe_get_iso3166_by_phone($number);
+
+    // If found ISO than number has country code.
+    return !empty($iso3166);
 }
 
 /**
@@ -2636,22 +2675,22 @@ function validate_mobile_number( $number, $country_code = '', $with_plus = false
  * @param $file
  * @return bool|WP_Error
  */
-function get_upload_wp_error( $file )
+function get_upload_wp_error($file)
 {
-    if ( !is_array( $file ) ) {
-        return new WP_Error( 'not_a_file', 'No file was provided.' );
+    if (!is_array($file)) {
+        return new WP_Error('not_a_file', 'No file was provided.');
     }
 
     // no Error
-    if ( absint( $file[ 'error' ] ) === UPLOAD_ERR_OK ) {
+    if (absint($file['error']) === UPLOAD_ERR_OK) {
         return false;
     }
 
-    if ( !is_uploaded_file( $file[ 'tmp_name' ] ) ) {
-        return new WP_Error( 'upload_error', 'File is not uploaded.' );
+    if (!is_uploaded_file($file['tmp_name'])) {
+        return new WP_Error('upload_error', 'File is not uploaded.');
     }
 
-    switch ( $file[ 'error' ] ) {
+    switch ($file['error']) {
         case UPLOAD_ERR_INI_SIZE:
             $message = "The uploaded file exceeds the upload_max_filesize directive in php.ini";
             break;
@@ -2678,7 +2717,7 @@ function get_upload_wp_error( $file )
             break;
     }
 
-    return new WP_Error( 'upload_error', $message, $file );
+    return new WP_Error('upload_error', $message, $file);
 }
 
 /**
@@ -2688,7 +2727,7 @@ function get_upload_wp_error( $file )
  */
 function guided_setup_finished()
 {
-    return (bool) Plugin::$instance->settings->get_option( 'gh_guided_setup_finished', false );
+    return (bool)Plugin::$instance->settings->get_option('gh_guided_setup_finished', false);
 }
 
 /**
@@ -2697,17 +2736,17 @@ function guided_setup_finished()
  * @return array
  * @author Sean Cannon, LitmusBox.com | seanc@litmusbox.com
  */
-function array_flatten( $array )
+function array_flatten($array)
 {
-    if ( !is_array( $array ) ) {
+    if (!is_array($array)) {
         return false;
     }
     $result = array();
-    foreach ( $array as $key => $value ) {
-        if ( is_array( $value ) ) {
-            $result = array_merge( $result, array_flatten( $value ) );
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            $result = array_merge($result, array_flatten($value));
         } else {
-            $result[ $key ] = $value;
+            $result[$key] = $value;
         }
     }
     return $result;
@@ -2720,7 +2759,7 @@ function array_flatten( $array )
  */
 function is_sms_plugin_active()
 {
-    return defined( 'GROUNDHOGG_SMS_VERSION' );
+    return defined('GROUNDHOGG_SMS_VERSION');
 }
 
 /**
@@ -2730,10 +2769,10 @@ function is_sms_plugin_active()
  */
 function is_pro_features_active()
 {
-    return defined( 'GROUNDHOGG_PRO_VERSION' );
+    return defined('GROUNDHOGG_PRO_VERSION');
 }
 
-add_action( 'admin_print_styles', function () {
+add_action('admin_print_styles', function () {
     ?>
     <style>
         #adminmenu #toplevel_page_groundhogg a[href="admin.php?page=gh_go_pro"] .dashicons {
@@ -2747,19 +2786,19 @@ add_action( 'admin_print_styles', function () {
         }
     </style>
     <?php
-} );
+});
 
 /**
  * Allow funnel files to be uploaded
  */
 function allow_funnel_uploads()
 {
-    add_filter( 'mime_types', __NAMESPACE__ . '\_allow_funnel_uploads' );
+    add_filter('mime_types', __NAMESPACE__ . '\_allow_funnel_uploads');
 }
 
-function _allow_funnel_uploads( $mimes )
+function _allow_funnel_uploads($mimes)
 {
-    $mimes[ 'funnel' ] = 'text/plain';
+    $mimes['funnel'] = 'text/plain';
     return $mimes;
 }
 
@@ -2771,19 +2810,19 @@ function _allow_funnel_uploads( $mimes )
  *
  * @return bool
  */
-function has_all( $items=[], $dataset=[] )
+function has_all($items = [], $dataset = [])
 {
-    if ( ! is_array( $items ) || ! is_array( $dataset ) ){
+    if (!is_array($items) || !is_array($dataset)) {
         return false;
     }
 
     // if empty then automatically true
-    if ( empty( $items ) ){
+    if (empty($items)) {
         return true;
     }
 
     // If the count of intersect is the same as $items then all the items are in the dataset
-    return count( array_intersect( $items, $dataset ) ) === count( $items );
+    return count(array_intersect($items, $dataset)) === count($items);
 }
 
 /**
@@ -2791,20 +2830,38 @@ function has_all( $items=[], $dataset=[] )
  */
 function fallback_disable_wp_cron()
 {
-    if ( ! defined( 'DISABLE_WP_CRON' ) && is_option_enabled( 'gh_disable_wp_cron' ) ){
-        define( 'DISABLE_WP_CRON', true );
-        define( 'GH_SHOW_DISABLE_WP_CRON_OPTION', true );
+    if (!defined('DISABLE_WP_CRON') && is_option_enabled('gh_disable_wp_cron')) {
+        define('DISABLE_WP_CRON', true);
+        define('GH_SHOW_DISABLE_WP_CRON_OPTION', true);
     }
 }
 
 // Before wp_cron is added.
-add_action( 'init', __NAMESPACE__ . '\fallback_disable_wp_cron', 1 );
+add_action('init', __NAMESPACE__ . '\fallback_disable_wp_cron', 1);
 
 /**
  * Is the current hosting provider wpengine?
  *
  * @return bool
  */
-function is_wpengine(){
-    return defined( 'WPE_PLUGIN_BASE' );
+function is_wpengine()
+{
+    return defined('WPE_PLUGIN_BASE');
+}
+
+/**
+ * Get the primary user.
+ *
+ * @return bool|\WP_User
+ */
+function get_primary_user(){
+    $primary_user_id = absint( get_option( 'gh_primary_user', 1 ) );
+
+    if ( ! $primary_user_id ){
+        return false;
+    }
+
+    $user = get_userdata( $primary_user_id );
+
+    return $user;
 }

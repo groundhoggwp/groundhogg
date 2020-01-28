@@ -112,7 +112,9 @@ class Broadcast_Scheduler extends Bulk_Job
         if ( $this->send_in_timezone && ! $this->send_now ) {
 
             $contact = Plugin::$instance->utils->get_contact($id);
+
             $local_time = $contact->get_local_time_in_utc_0( $this->send_time );
+
             if ($local_time < time()) {
                 $local_time += DAY_IN_SECONDS;
             }

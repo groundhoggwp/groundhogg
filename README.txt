@@ -150,6 +150,19 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.12 (2020-01-27) =
+* ADDED Date Filter to contact search
+* ADDED Owner Filter to contact search
+* ADDED New hooks for search filters
+* ADDED New hooks for contact query search params
+* ADDED Support for a "primary" user for referencing contact details
+* TWEAKED Owner replacement codes will fallback to default from email instead of administrative email.
+* TWEAKED after_form_submit_handler called during non admin user registration.
+* FIXED Number validation adding "+" when shouldn't.
+* FIXED Some SMS functions related to validating mobile numbers.
+* FIXED When scheduling broadcast with "send in local time" contact tz defaulting to utc-0 instead of site time.
+* FIXED SMS Broadcast appearing as email broadcast in events table
+
 = 2.1.11.3 (2020-01-24) =
 * FIXED Link to quickstart course on welcome page going to wrong place.
 

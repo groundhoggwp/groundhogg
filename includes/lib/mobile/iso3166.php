@@ -8,6 +8,22 @@ class Iso3166 {
         return self::$data;
     }
 
+    private static $cc = [];
+
+    /**
+     * Get all the country codes
+     *
+     * @return mixed
+     */
+    public static function get_country_codes(){
+
+        if ( empty( self::$cc ) ){
+            self::$cc = wp_list_pluck( self::$data, 'country_code' );
+        }
+
+        return self::$cc;
+    }
+
     private static $data = array (
         0 =>
             array (

@@ -663,8 +663,14 @@ class Contact extends Base_Object_With_Meta
      */
     function get_time_zone_offset()
     {
+
+        // Return site timezone offset if no timezone in contact record?
+        if ( ! $this->get_time_zone() ){
+            Plugin::$instance->utils->date_time->get_wp_offset();
+        }
+
         try {
-            return Plugin::$instance->utils->date_time->get_timezone_offset( $this->time_zone );
+            return Plugin::$instance->utils->date_time->get_timezone_offset( $this->get_time_zone() );
         } catch (\Exception $e ){
             return 0;
         }
@@ -675,9 +681,8 @@ class Contact extends Base_Object_With_Meta
      *
      * @return int
      */
-    function get_utc_0_offset()
-    {
-        return intval( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) - $this->get_time_zone_offset();
+    function get_utc_0_offset(){
+        return Plugin::$instance->utils->date_time->get_wp_offset() - $this->get_time_zone_offset();
     }
 
     /**

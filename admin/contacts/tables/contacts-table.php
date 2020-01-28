@@ -6,6 +6,7 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_screen_option;
@@ -362,9 +363,11 @@ class Contacts_Table extends WP_List_Table {
 		$query = get_request_query();
 
 		// Since unconfirmed is 0 (aside maybe we should change that) we need to specify we actually want it still.
-		$optin_status = absint( get_request_var( 'optin_status' ) );
+		$optin_status = get_request_var( 'optin_status' );
 
-		if ( $optin_status || ( $optin_status === Preferences::UNCONFIRMED && isset( $_GET['optin_status'] ) ) ) {
+		if ( is_array( $optin_status ) ){
+            $query['optin_status'] = map_deep( $optin_status, 'absint' );
+        } else if ( $optin_status || ( absint( $optin_status ) === Preferences::UNCONFIRMED && isset( $_GET['optin_status'] ) && ! isset_not_empty( $_GET, 'search' ) ) ) {
 			$query['optin_status'] = $optin_status;
 		}
 
@@ -373,16 +376,52 @@ class Contacts_Table extends WP_List_Table {
 			$query['owner'] = get_current_user_id();
 		}
 
+		$date_query = [
+            'relation' => 'AND'
+        ];
+		
+		$date_inner_query = [ 'inclusive' => true ];
+
+		$include_date_query = false;
+
+		if ( $date_before = get_request_var( 'date_before' ) ){
+//		    $date_before = sanitize_text_field( sprintf( '%s 00:00:00', $date_before ) );
+		    $date_before = sanitize_text_field( $date_before );
+		    $date_inner_query[ 'before' ] = $date_before;
+
+		    $include_date_query = true;
+        }
+
+        if ( $date_after = get_request_var( 'date_after' ) ){
+//            $date_after = sanitize_text_field( sprintf( '%s 00:00:00', $date_after ) );
+            $date_after = sanitize_text_field( $date_after );
+            $date_inner_query[ 'after' ] = $date_after;
+
+            $include_date_query = true;
+        }
+
+        $date_query[] = $date_inner_query;
+
+        if ( $include_date_query ){
+            $query[ 'date_query' ] = $date_query;
+        }
+
 		$query['number']  = $per_page;
 		$query['offset']  = $offset;
 		$query['orderby'] = $orderby;
 		$query['search']  = $search;
 		$query['order']   = $order;
 
+		$query = apply_filters( 'groundhogg/admin/contacts/search_query', $query );
+
 		$this->query = $query;
+
+//		var_dump( $query );
 
 		$c_query = new Contact_Query();
 		$data    = $c_query->query( $query );
+//        var_dump( $c_query->request );
+//        die();
 
 		set_transient( 'groundhogg_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
 
