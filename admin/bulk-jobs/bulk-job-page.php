@@ -5,6 +5,9 @@ use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Admin\Admin_Page;
+use function Groundhogg\get_url_var;
+use function Groundhogg\html;
+use function Groundhogg\use_experimental_features;
 
 class Bulk_Job_Page extends Admin_Page
 {
@@ -129,7 +132,32 @@ class Bulk_Job_Page extends Admin_Page
 
         echo Plugin::$instance->utils->html->progress_bar( [ 'id' => 'bulk-job', 'hidden' => false ] );
 
+        $bp_args = [];
+
+        if ( use_experimental_features() ){
+            $bp_args[ 'experimental_features' ] = true;
+        }
+
         ?>
+        <p>
+            <?php _e( 'Total Complete: '); ?><b><span id="total-complete">0</span></b>
+        </p>
+        <p>
+            <?php _e( 'Total Remaining: '); ?><b><span id="total-remaining">0</span></b>
+        </p>
+        <p>
+            <?php echo html()->textarea( [
+                'name'  => '',
+                'id'    => 'bulk-log',
+                'class' => '',
+                'value' => __( '### LOG ###', 'groundhogg' ),
+                'cols'  => '',
+                'rows'  => '10',
+                'readonly' => true,
+                'style' => [ 'width' => '100%' ],
+                'placeholder' => 'Log...',
+            ] ); ?>
+        </p>
         <div id="job-complete" class="hidden">
             <p><?php _e( "The process is now complete.", 'groundhogg' ); ?></p>
             <p class="submit">
@@ -138,7 +166,7 @@ class Bulk_Job_Page extends Admin_Page
         </div>
 
         <script>
-            var BulkProcessor = {};
+            var BulkProcessor = <?php echo wp_json_encode( $bp_args ); ?>;
 
             ( function ( $, bp, items ) {
 
@@ -151,18 +179,37 @@ class Bulk_Job_Page extends Admin_Page
                     bulk_action_nonce: '<?php echo wp_create_nonce(  $this->get_current_action() ); ?>',
                     bulk_action: '<?php echo $this->get_current_action(); ?>',
                     bar: null,
+                    total: null,
                     title: "",
+                    log: null,
 
                     init: function () {
 
                         this.items = items;
                         this.all = items.length;
                         this.bar = $( '#bulk-job' );
+                        this.log = $( '#bulk-log' );
                         this.progress = $( '#bulk-job-percentage' );
+                        this.total = $( '#total-complete' );
+                        this.remaining = $( '#total-remaining' );
                         this.title = document.title;
 
-                        this.send();
+                        if ( typeof this.experimental_features != "undefined" ){
+                            this.experimental();
+                        } else {
+                            this.send();
+                        }
 
+                    },
+
+                    experimental: function(){
+                        var threshold = 10000;
+                        var processes = Math.ceil( items.length / threshold );
+                        // console.log( processes );
+
+                        for ( var i=0; i<processes;i++){
+                            this.send();
+                        }
                     },
 
                     getItems: function (){
@@ -181,11 +228,16 @@ class Bulk_Job_Page extends Admin_Page
 
                     updateProgress: function() {
 
-                        var p = Math.round( ( this.complete / this.all ) * 100 );
+                        var p = ( this.complete / this.all ) * 100;
 
-                        this.bar.animate( { 'width': p + '%' } );
+                        p = p.toFixed( 2 );
+
+                        // this.bar.animate( { 'width': p + '%' } );
+                        this.bar.css( 'width', p + '%' );
                         this.progress.text( p + '%' );
                         document.title = '(' + p + '%) ' + this.title;
+                        this.total.text( this.complete );
+                        this.remaining.text( this.all - this.complete );
 
                         if ( this.complete === this.all ){
                             $( '#job-complete' ).removeClass( 'hidden' );
@@ -242,6 +294,9 @@ class Bulk_Job_Page extends Admin_Page
                                 if ( typeof response.complete !== "undefined" ){
                                     self.complete += response.complete;
                                     self.updateProgress();
+
+                                    self.log.val( self.log.val() + "\n" + response.message );
+                                    self.log.scrollTop( self.log[ 0 ].scrollHeight );
 
                                     if ( self.items.length > 0 ){
                                         self.send();

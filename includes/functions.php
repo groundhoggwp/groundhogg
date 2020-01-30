@@ -2865,3 +2865,12 @@ function get_primary_user(){
 
     return $user;
 }
+
+/**
+ * Whether experimental features are enabled.
+ *
+ * @return bool
+ */
+function use_experimental_features(){
+    return is_option_enabled( 'gh_enable_experimental_features' );
+}

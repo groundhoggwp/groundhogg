@@ -87,7 +87,7 @@ class Broadcast extends Base_Object implements Event_Process
      */
     public function get_funnel_title()
     {
-        if ( $this->is_sms() ){
+        if ( $this->is_email() ){
             return __( 'Broadcast Email', 'groundhogg' );
         } else {
             return __( 'Broadcast SMS', 'groundhogg' );
