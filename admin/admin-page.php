@@ -314,9 +314,6 @@ abstract class Admin_Page extends Supports_Errors
 
         $nonce = get_request_var('_wpnonce');
 
-//        var_dump( $nonce );
-//        wp_die();
-
         $checks = [
             wp_verify_nonce($nonce),
             wp_verify_nonce($nonce, $this->get_current_action()),
@@ -375,8 +372,14 @@ abstract class Admin_Page extends Supports_Errors
 
         $exitCode = null;
 
+        $action_or_filter = "groundhogg/admin/{$this->get_slug()}/process/{$this->get_current_action()}";
+
         if (method_exists($this, $func)) {
             $exitCode = call_user_func([$this, $func]);
+        } elseif ( has_action( $action_or_filter )){
+            do_action( $action_or_filter );
+        } else if ( has_filter( $action_or_filter ) ) {
+            $exitCode = apply_filters( $action_or_filter, $exitCode );
         }
 
         set_transient('groundhogg_last_action', $this->get_current_action(), 30);
