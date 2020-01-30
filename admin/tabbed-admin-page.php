@@ -69,7 +69,10 @@ abstract class Tabbed_Admin_Page extends Admin_Page
         $base_url = remove_query_arg( [ '_wpnonce', 'action' ], wp_get_referer() );
 
         $func = sprintf( "process_%s_%s", $this->get_current_tab(), $this->get_current_action() );
+        $action_func = sprintf( "%s_%s", $this->get_current_tab(), $this->get_current_action() );
+
         $backup_func = sprintf( "process_%s", $this->get_current_action() );
+        $action_backup_func = sprintf( "%s", $this->get_current_action() );
 
         // Check for tab method
         if ( method_exists( $this, $func ) ){
@@ -77,6 +80,10 @@ abstract class Tabbed_Admin_Page extends Admin_Page
         // check for global method
         } else if ( method_exists( $this, $backup_func ) ){
             $exitCode = call_user_func( [ $this, $backup_func ] );
+        } else if ( has_action( "groundhogg/admin/{$this->get_slug()}/process/{$action_func}" ) ){
+            do_action( "groundhogg/admin/{$this->get_slug()}/process/{$action_func}" );
+        } else if ( has_action( "groundhogg/admin/{$this->get_slug()}/process/{$action_backup_func}" ) ){
+            do_action( "groundhogg/admin/{$this->get_slug()}/process/{$action_backup_func}" );
         }
 
         set_transient('groundhogg_last_action', $this->get_current_action(), 30 );
