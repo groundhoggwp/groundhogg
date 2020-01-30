@@ -2643,7 +2643,7 @@ function validate_mobile_number($number, $country_code = '', $with_plus = false)
         if (strpos($number, '+') === false) {
             $number = '+' . $number;
         }
-    // Remove plus from string
+        // Remove plus from string
     } else {
         $number = str_replace('+', '', $number);
     }
@@ -2772,17 +2772,59 @@ function is_pro_features_active()
     return defined('GROUNDHOGG_PRO_VERSION');
 }
 
+add_action('admin_menu', function () {
+
+    global $submenu;
+
+    $groundhogg = get_array_var($submenu, 'groundhogg');
+
+    foreach ($groundhogg as &$li) {
+        $li[4] = $li[2];
+    }
+
+    $submenu[ 'groundhogg' ] = $groundhogg;
+
+}, 99999999 );
+
+
 add_action('admin_print_styles', function () {
     ?>
     <style>
-        #adminmenu #toplevel_page_groundhogg a[href="admin.php?page=gh_go_pro"] .dashicons {
+        #adminmenu #toplevel_page_groundhogg a.gh_go_pro .dashicons {
             font-size: 18px;
-            margin-right: 2px;
+            margin-right: 8px;
         }
 
-        #adminmenu #toplevel_page_groundhogg a[href="admin.php?page=gh_go_pro"] {
-            color: #DB741A;
+        #adminmenu #toplevel_page_groundhogg a.gh_go_pro {
+            color: #FFF;
             font-weight: bold;
+            display: inline-block;
+            width: calc(100% - 44px);
+            background: #dc741b;
+        }
+
+        #adminmenu #toplevel_page_groundhogg a.gh_go_pro:hover {
+            background: #eb7c1e;
+        }
+
+        #adminmenu #toplevel_page_groundhogg li.gh_go_pro{
+            text-align: center;
+        }
+
+        #adminmenu #toplevel_page_groundhogg li.gh_tools:before,
+        #adminmenu #toplevel_page_groundhogg li.gh_go_pro:before,
+        #adminmenu #toplevel_page_groundhogg li.gh_contacts:before{
+            background: #b4b9be;
+            content: "";
+            display: block;
+            height: 1px;
+            margin: 5px auto 0;
+            width: calc(100% - 24px);
+            opacity: .4;
+        }
+
+        #adminmenu #toplevel_page_groundhogg li.gh_go_pro:before{
+            margin-bottom: 8px;
         }
     </style>
     <?php
@@ -2796,6 +2838,12 @@ function allow_funnel_uploads()
     add_filter('mime_types', __NAMESPACE__ . '\_allow_funnel_uploads');
 }
 
+/**
+ * Allow .funnel files to be uploaded
+ *
+ * @param $mimes
+ * @return mixed
+ */
 function _allow_funnel_uploads($mimes)
 {
     $mimes['funnel'] = 'text/plain';
@@ -2854,14 +2902,15 @@ function is_wpengine()
  *
  * @return bool|\WP_User
  */
-function get_primary_user(){
-    $primary_user_id = absint( get_option( 'gh_primary_user', 1 ) );
+function get_primary_user()
+{
+    $primary_user_id = absint(get_option('gh_primary_user', 1));
 
-    if ( ! $primary_user_id ){
+    if (!$primary_user_id) {
         return false;
     }
 
-    $user = get_userdata( $primary_user_id );
+    $user = get_userdata($primary_user_id);
 
     return $user;
 }
@@ -2871,6 +2920,7 @@ function get_primary_user(){
  *
  * @return bool
  */
-function use_experimental_features(){
-    return is_option_enabled( 'gh_enable_experimental_features' );
+function use_experimental_features()
+{
+    return is_option_enabled('gh_enable_experimental_features');
 }
