@@ -150,6 +150,16 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.12.2 (2020-01-30) =
+* ADDED Option to hide the admin links in the Admin notification footer
+* TWEAKED The admin menu items for better organization
+
+= 2.1.12.1 (2020-01-30) =
+* ADDED Option to enable "Experimental features," for flexibility to test new stuff without breaking anything.
+* TWEAKED More contextual information about the current process added to the bulk processor page.
+* FIXED Broadcast title in events table showing as SMS instead of Email and vice versa.
+* FIXED Tag relationships automatically recalculated after import or deletion of contacts.
+
 = 2.1.12 (2020-01-27) =
 * ADDED Date Filter to contact search
 * ADDED Owner Filter to contact search

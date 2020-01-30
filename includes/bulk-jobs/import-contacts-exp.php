@@ -2,20 +2,21 @@
 namespace Groundhogg\Bulk_Jobs;
 
 use function Groundhogg\admin_page_url;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_items_from_csv;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use function Groundhogg\get_url_var;
 use function Groundhogg\guided_setup_finished;
-use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Import_Contacts extends Bulk_Job
+class Import_Contacts_Exp extends Bulk_Job
 {
 
     protected $field_map = [];
     protected $import_tags = [];
+    protected $records = [];
     protected $confirm_contacts = false;
 
     /**
@@ -40,9 +41,22 @@ class Import_Contacts extends Bulk_Job
         }
 
         $file_name = sanitize_file_name( get_url_var( 'import' ) );
+
+        set_transient( 'gh_import_file_name', $file_name, WEEK_IN_SECONDS );
+
         $file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
 
-        return get_items_from_csv( $file_path );
+        $items = get_items_from_csv( $file_path );
+
+        $total_items = count( $items );
+
+        $return = [];
+
+        for ( $i=0; $i<$total_items; $i++){
+            $return[] = $i;
+        }
+
+        return $return;
     }
 
     /**
@@ -54,19 +68,19 @@ class Import_Contacts extends Bulk_Job
      */
     public function max_items($max, $items)
     {
-        $item = array_shift( $items );
-        $fields = count( array_keys( $item ) );
+//        $item = array_shift( $items );
+//        $fields = count( array_keys( $item ) );
+//
+//        $max = intval( ini_get( 'max_input_vars' ) );
+//        $max_items = floor( $max / $fields );
+//
+//        $max_override = absint( get_url_var( 'max_items' ) );
+//
+//        if ( $max_override > 0 ){
+//        	return $max_override;
+//        }
 
-        $max = intval( ini_get( 'max_input_vars' ) );
-        $max_items = floor( $max / $fields );
-
-        $max_override = absint( get_url_var( 'max_items' ) );
-
-        if ( $max_override > 0 ){
-        	return $max_override;
-        }
-
-        return min( $max_items, 100 );
+        return 100;
     }
 
     /**
@@ -77,7 +91,8 @@ class Import_Contacts extends Bulk_Job
      */
     protected function process_item( $item )
     {
-        $contact = \Groundhogg\generate_contact_with_map( $item, $this->field_map );
+        $record = get_array_var( $this->records, $item );
+        $contact = \Groundhogg\generate_contact_with_map( $record, $this->field_map );
 
         if ( $contact ) {
             $contact->apply_tag( $this->import_tags );
@@ -95,6 +110,11 @@ class Import_Contacts extends Bulk_Job
      */
     protected function pre_loop()
     {
+        $file_name = get_transient( 'gh_import_file_name' );
+        $file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
+
+        $this->records = get_items_from_csv( $file_path );
+
         $this->field_map    = Plugin::$instance->settings->get_transient( 'gh_import_map' );
         $this->import_tags  = wp_parse_id_list( Plugin::$instance->settings->get_transient( 'gh_import_tags' ) );
         $this->confirm_contacts = Plugin::$instance->settings->get_transient( 'gh_import_confirm_contacts' );
@@ -117,8 +137,7 @@ class Import_Contacts extends Bulk_Job
         Plugin::$instance->settings->delete_transient( 'gh_import_map' );
         Plugin::$instance->settings->delete_transient( 'gh_import_tags' );
         Plugin::$instance->settings->delete_transient( 'gh_import_confirm_contacts' );
-
-        recount_tag_contacts_count();
+        Plugin::$instance->settings->delete_transient( 'gh_import_file_name' );
     }
 
     /**

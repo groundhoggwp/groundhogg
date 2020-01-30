@@ -3,6 +3,7 @@ namespace Groundhogg\Bulk_Jobs;
 
 use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\use_experimental_features;
 
 /**
  * Created by PhpStorm.
@@ -29,7 +30,13 @@ class Manager
         $this->broadcast_scheduler  = new Broadcast_Scheduler();
         $this->delete_contacts      = new Delete_Contacts();
         $this->export_contacts      = new Export_Contacts();
+
+//        if ( use_experimental_features() ){
+//            $this->import_contacts      = new Import_Contacts_Exp();
+//        } else {
         $this->import_contacts      = new Import_Contacts();
+//        }
+
         $this->sync_contacts        = new Sync_Contacts();
         $this->migrate_form_impressions = new Migrate_Form_Impressions();
         $this->add_contacts_to_funnel = new Add_Contacts_To_Funnel();

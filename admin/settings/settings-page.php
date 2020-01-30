@@ -548,6 +548,20 @@ class Settings_Page extends Admin_Page
                     'value' => 'on',
                 ),
             ),
+            'gh_enable_experimental_features' => array(
+                'id' => 'gh_enable_experimental_features',
+                'section' => 'misc_info',
+                'label' => _x('Enable experimental features.', 'settings', 'groundhogg'),
+                'desc' => _x('This will enabled experimental features in Groundhogg and various extensions.', 'settings', 'groundhogg'),
+                'type' => 'checkbox',
+                'atts' => array(
+                    'label' => __('Enable'),
+                    //keep brackets for backwards compat
+                    'name' => 'gh_enable_experimental_features',
+                    'id' => 'gh_enable_experimental_features',
+                    'value' => 'on',
+                ),
+            ),
             'gh_affiliate_id' => array(
                 'id' => 'gh_affiliate_id',
                 'section' => 'affiliate',

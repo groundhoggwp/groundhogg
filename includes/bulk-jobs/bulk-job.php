@@ -117,6 +117,8 @@ abstract class Bulk_Job
     public function process()
     {
 
+        $start = microtime( true );
+
     	if ( ! key_exists( 'the_end', $_POST ) ){
 
     		$error = new \WP_Error(
@@ -140,9 +142,12 @@ abstract class Bulk_Job
 
         $this->post_loop();
 
+        $end = microtime( true );
+        $diff = round( $end - $start, 2 );
+
         $response = [
             'complete' => $completed,
-            'POST' => $_POST
+            'message' => esc_html( sprintf( __( 'Processed %d items in %s seconds.', 'groundhogg' ), $completed, $diff ) ),
         ];
 
         $the_end = get_post_var( 'the_end', false );

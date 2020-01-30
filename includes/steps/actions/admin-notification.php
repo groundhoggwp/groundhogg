@@ -160,6 +160,18 @@ class Admin_Notification extends Action
             ],
         ] );
 
+        if ( ! $this->is_sms() ){
+            $this->add_control( 'hide_admin_links', [
+                'label' => __( 'Hide admin links', 'groundhogg' ),
+                'type' => HTML::CHECKBOX,
+                'default' => false,
+                'field' => [
+                    'label' => Plugin::$instance->utils->html->wrap( __( 'Will hide the admin links to the contact record in the footer of the email.', 'groundhogg' ), 'span', [ 'class' => 'description' ] ),
+                ],
+                'description' => false
+            ] );
+        }
+
         $this->end_controls_section();
     }
 
@@ -221,6 +233,7 @@ class Admin_Notification extends Action
             $this->save_setting( 'is_sms', boolval( $this->get_posted_data( 'is_sms' ) ) );
         }
 
+        $this->save_setting( 'hide_admin_links', boolval( $this->get_posted_data( 'hide_admin_links' ) ) );
         $this->save_setting( 'subject', sanitize_text_field( $this->get_posted_data( 'subject' ) ) );
         $this->save_setting( 'note_text', sanitize_textarea_field( $this->get_posted_data( 'note_text' ) ) );
     }
@@ -241,13 +254,19 @@ class Admin_Notification extends Action
         $finished_note = sanitize_textarea_field( do_replacements( $note, $contact->get_id() ) );
 
         $is_sms = $this->get_setting( 'is_sms', false );
+        $hide_admin_links = $this->get_setting( 'hide_admin_links', false );
 
         // Email
         if ( ! $is_sms ) {
-            $finished_note .= sprintf( "\n\n======== %s ========\nEdit: %s\nReply: %s", __( 'Manage Contact', 'groundhogg' ),
-                admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() ),
-                $contact->get_email()
-            );
+
+            if ( ! $hide_admin_links ){
+
+                $finished_note .= sprintf( "\n\n======== %s ========\nEdit: %s\nReply: %s", __( 'Manage Contact', 'groundhogg' ),
+                    admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() ),
+                    $contact->get_email()
+                );
+
+            }
 
             $subject = $this->get_setting( 'subject' );
             $subject = sanitize_text_field( do_replacements( $subject, $contact->get_id() ) );

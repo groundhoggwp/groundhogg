@@ -79,7 +79,7 @@ class Help_Page extends Tabbed_Admin_Page
 
     public function get_priority()
     {
-        return 998;
+        return 2;
     }
 
     /**

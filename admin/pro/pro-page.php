@@ -43,7 +43,7 @@ class Pro_Page extends Admin_Page
 
     public function get_priority()
     {
-        return 999;
+        return 9999;
     }
 
     /**
