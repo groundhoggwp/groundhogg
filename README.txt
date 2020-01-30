@@ -150,6 +150,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.12.3 (2020-02-03) =
+* ADDED Base action/benchmark classes for better LMS integrations with LifterLMS, LearnDash, TutorLMS and any others.
+* ADDED More actions/filters to extend admin pages.
+
 = 2.1.12.2 (2020-01-30) =
 * ADDED Option to hide the admin links in the Admin notification footer
 * TWEAKED The admin menu items for better organization
