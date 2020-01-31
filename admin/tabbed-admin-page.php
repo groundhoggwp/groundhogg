@@ -84,10 +84,6 @@ abstract class Tabbed_Admin_Page extends Admin_Page
         // check for global method
         } else if ( method_exists( $this, $backup_func ) ){
             $exitCode = call_user_func( [ $this, $backup_func ] );
-        } else if ( has_action( $action_or_filter ) ){
-            do_action( $action_or_filter );
-        } else if ( has_action( $backup_action_or_filter ) ){
-            do_action( $backup_action_or_filter );
         } else if ( has_filter( $action_or_filter ) ){
             $exitCode = apply_filters( $action_or_filter, $exitCode );
         } else if ( has_filter( $backup_action_or_filter ) ){

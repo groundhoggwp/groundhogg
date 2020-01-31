@@ -376,9 +376,7 @@ abstract class Admin_Page extends Supports_Errors
 
         if (method_exists($this, $func)) {
             $exitCode = call_user_func([$this, $func]);
-        } elseif ( has_action( $action_or_filter )){
-            do_action( $action_or_filter );
-        } else if ( has_filter( $action_or_filter ) ) {
+        } elseif ( has_filter( $action_or_filter ) ){
             $exitCode = apply_filters( $action_or_filter, $exitCode );
         }
 
