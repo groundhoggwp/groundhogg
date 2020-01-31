@@ -150,7 +150,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.12.3 (2020-02-03) =
+= 2.1.12.3 (2020-02-31) =
 * ADDED Base action/benchmark classes for better LMS integrations with LifterLMS, LearnDash, TutorLMS and any others.
 * ADDED More actions/filters to extend admin pages.
 

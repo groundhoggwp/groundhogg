@@ -188,10 +188,10 @@ abstract class LMS_Integration extends Benchmark
 
         html()->end_row();
 
-        // COURSE
-        html()->start_row();
+	    if ($this->get_setting('action') === 'lesson_completed'):
 
-        if ($this->get_setting('action') === 'lesson_complete'):
+		    // COURSE
+        html()->start_row();
 
             html()->th([
                 __('Lesson', 'groundhogg')

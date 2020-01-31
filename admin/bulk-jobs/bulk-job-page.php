@@ -315,7 +315,7 @@ class Bulk_Job_Page extends Admin_Page
 
                             },
                             error: function ( response ) {
-                                self.error();
+                                self.error( response );
                             }
                         });
 

@@ -115,6 +115,7 @@ class Contacts_Page extends Admin_Page
 
     public function admin_title($admin_title, $title)
     {
+
         switch ( $this->get_current_action() ){
             case 'add':
                 $admin_title = sprintf( "%s &lsaquo; %s", __( 'Add' ),  $admin_title );
@@ -122,8 +123,12 @@ class Contacts_Page extends Admin_Page
             case 'edit':
                 $contact_id = get_request_var( 'contact' );
                 $contact = Plugin::$instance->utils->get_contact( absint( $contact_id ) );
-                $admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $contact->get_full_name(),  __( 'Edit' ),  $admin_title );
-                break;
+
+                if ( $contact ){
+	                $admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $contact->get_full_name(),  __( 'Edit' ),  $admin_title );
+                }
+
+	            break;
         }
 
         return $admin_title;
