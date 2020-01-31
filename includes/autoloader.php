@@ -80,7 +80,7 @@ class Autoloader {
         'Form\Fields\Textarea'  => 'includes/form/fields/textarea.php',
         'Form\Fields\First'  => 'includes/form/fields/first.php',
         'Form\Fields\Last'  => 'includes/form/fields/last.php',
-        ''
+        'Steps\Benchmarks\Form_Integration'  => 'includes/steps/benchmarks/base/form-integration.php',
     ];
 
     /**
@@ -108,6 +108,7 @@ class Autoloader {
 	 * @param string $relative_class_name Class name.
 	 */
 	private static function load_class( $relative_class_name ) {
+
 		if ( isset( self::$classes_map[ $relative_class_name ] ) ) {
 			$filename = GROUNDHOGG_PATH . '/' . self::$classes_map[ $relative_class_name ];
 		} else {
