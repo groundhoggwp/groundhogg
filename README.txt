@@ -13,15 +13,17 @@ Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Ma
 
 == Description ==
 
-## ATTENTION MARKETERS, FREELANCERS, STORE OWNERS, PODCASTERS, AGENCIES & WORDPRESS AFICIONADOS!
+## ATTENTION MARKETERS, AGENCIES, FREELANCERS, STORE OWNERS, PODCASTERS & WORDPRESS AFICIONADOS!
 
-Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
+Want to launch your marketing strategy right now? **We can help!**
+
+Simplify, consolidate and automate your sales and marketing so you can save valuable time and get better results faster than ever before.
 
 **Marketing Automation** is one of the most effective tools that can help you build your list and generate more revenue for your business.
 
 With Groundhogg you can turn your static blog, e-commerce store or membership site into a personalized customer journey that will help you create more raving fans and maximize profits.
 
-Groundhogg is the only Marketing Automation tools for WordPress that can handle CRM, Email Marketing, SMS Marketing, and more without the need for third-party software. This means you can design your ideal customer journey without ever leaving your WordPress site!
+Groundhogg is the only open source Marketing Automation tool of its kind, built for power WordPress users. Imagine having your CRM, Email Marketing, SMS Marketing and more, all contained in your Wordpress environment! This allows for power users to execute real ninja moves as you design the ideal customer journey for your visitors and users. And you do it all without ever leaving your WordPress site!
 
 ### GROUNDHOGG IS PERFECT FOR:
 
@@ -38,27 +40,48 @@ Groundhogg is the perfect alternative to [Infusionsoft, HubSpot, Actionetics, Ac
 
 ### CUT COSTS, NOT FEATURES
 
-Groundhogg takes what the big guys charge thousands of dollars for, and gives them to you for free.
+Go ahead, compare Groundhogg to any SaaS product side by side! The savings alone will make you go “wow!” In addition, here are Groundhogg’s super powers:
 
 * **Send Unlimited Emails** — Groundhogg does not impose a limit on the number of emails you send.
 * **Collect Unlimited Contacts** — Groundhogg does not impose a limit on the number of contacts you can have.
-* **Send SMS Right from WordPress** — Using the Groundhogg Sending Service you can send text messages without paying for any other tools.
 * **Deep WordPress Integration** — Being a WordPress plugin, we are deeply integrated with WP so that setup is minimal.
 * **Unlimited Custom Fields** — Collect an unlimited amount of data about your customers to help you make crucial decisions about your business.
 * **Drag & Drop Email Builder** — Our email builder allows you to create beautiful looking emails that can be viewed without issue in every email client including the oldest versions of outlook.
 * **Automated Funnel Builder** — *La piece de resistance,* Our funnel builder is the ultimate tool that will allow you to design high converting customer journeys that integrate with your favorite WordPress tools.
 * **Import & Export EVERYTHING** — Everything in Groundhogg can be exported and imported into any other website in seconds! Emails, Funnels, Contacts, Settings, EVERYTHING! This makes sharing strategies with customers or clients a breeze.
+* **Share Marketing Strategies** — Push your funnels from one site to another. Groundhogg makes sharing strategies with customers or clients a breeze.
 
 And there is so much more that Groundhogg can do for you.
 
 ### WHY IS GROUNDHOGG A GAME CHANGER?
 
-* **Marketing Automation Tools are Expensive!** — Most tools comparable to Groundhogg cost at least $49/month USD. And at that low price point, the number of contacts you can store and emails you can send is nominal at best.
-* **Marketing Automation Tools are Complicated!** — A lot of the other tools inundate you with a huge feature set and hard to understand documentation. We make it easy by providing you with concrete instructions, templates, and videos.
-* **Marketing Automation Tools are Closed Source!** — We believe that every business has the right to the tools they need, that's why Groundhogg is *OPEN SOURCE,* because that way anyone can make Groundhogg work for them.
-* **Marketing Automation Tools Keep You Stuck!** — The business model of our competitors is to lock you in with their features so that it becomes too painful to leave. We think that sucks, and that's why we've worked hard so that our tools but you back in control.
-* **Marketing Automation Tools are hard to integrate!** — Most other tools require third-party add-ons to integrate like Zapier. Groundhogg can be integrated with many popular WordPress plugins in seconds without the need to pay third parties.
-* **Marketing Automation Tools Promote Their Partners!** — Many of our competitors make their tools deliberately hard to use to so that you'll pay more for their implementation services. **That sucks!** With Groundhogg, everything is DIY and easy as 123.
+* **YOU OWN YOUR DATA** — You’ve heard the horror stories of the businesses that didn’t pay their CRM bill and they lost all their data. With Groundhogg all your data is contained in your WordPress site! This means whether you upgrade, downgrade or pay nothing, you never lose your data!
+* **SHORT LEARNING CURVE** — A lot SaaS products inundate you with a huge feature set and really steep learning curve. It’s almost like you have to learn a new language! Not with Groundhogg. We make it easy by providing you with concrete instructions, templates, and videos in [Groundhogg Academy](https://academy.groundhogg.io). If you know something about WordPress, you’ll get this marketing automation tool fast!
+* **IT'S OPEN SOURCE** — It’s a no brainer. Why rent when you can own? Because Groundhogg is open source you can make any modifications you need to tailor Groundhogg perfectly to your business.
+* **LOCKED IN PRICING** — The business model of our competitors is to lock you in with their features so that it becomes too painful to leave, and charge you more every time your list grows. We think that sucks, and that’s why we’ve worked hard to build tools that put you back in control. When your list grows, your price stays the same.
+* **25+ NATIVE INTEGRATIONS** — Groundhogg integrates seamlessly with many popular WordPress plugins like WooCommerce, LifterLMS, Zapier, LearnDash, ThriveCart etc. [Go here to see all Extensions!](https://www.groundhogg.io/downloads/)
+* **ACTIVE COMMUNITY** — We have an active [Facebook Community](https://www.groundhogg.io/fb/) where users share their high value knowledge and answer questions when you need answers. Office hours and weekly discussions also provide an opportunity for you to speak directly with the Groundhogg team.
+
+### WHAT IS INCLUDED IN THE FREE PLUG IN?
+
+Groundhogg guarantees that you can...
+
+* Send Emails
+* Create Funnels
+* Complete CRM
+* Send Broadcasts
+* Top Tier Reporting
+* Lead Source Tracking
+* CASL/GDPR Compliant
+* REST API
+
+You can buy addons and extensions separately. Or upgrade to a plan at any time without losing any of your data.
+
+[Upgrade to a paid plan to get…](https://www.groundhogg.io/pricing/)
+
+* Integrations with 25+ WordPress plugins and services.
+* 15+ extensions to improve Groundhogg and add additional features
+* Premium technical support
 
 ### WHO CAN USE GROUNDHOGG TO GROW?
 
@@ -87,9 +110,13 @@ Join our [Facebook group](https://www.groundhogg.io/fb/) to talk to others who a
 
 ### ABOUT US
 
-We started building Groundhogg because we believe that every business, regardless of location, language, or budget deserves equal access to marketing and sales tools that will allow them to grow.
+We used to be a digital marketing agency that would implement many different SaaS CRM products for our clients.
 
-Every tool we build draws from this belief so that we can be the #1 resource for accessible marketing and sales tools.
+Over time we grew frustrated with the common issues we faced with implementing SaaS products for our clients. They were too expensive, too complicated, and lacked a decent integration with WordPress.
+
+We decided to build our own tool that would help us move faster and get better results for our customers.
+
+Today, we are helping more than 800+ businesses in 30+ countries reach their audiences and grow their lists.
 
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
