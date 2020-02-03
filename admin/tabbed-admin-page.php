@@ -47,10 +47,12 @@ abstract class Tabbed_Admin_Page extends Admin_Page
      */
     protected function do_page_tabs()
     {
+        $tabs = apply_filters( "groundhogg/admin/{$this->get_slug()}/tabs", $this->get_tabs() );
+
         ?>
         <!-- BEGIN TABS -->
         <h2 class="nav-tab-wrapper">
-            <?php foreach ( $this->get_tabs() as $id => $tab ): ?>
+            <?php foreach ( $tabs as $id => $tab ): ?>
                 <a href="?page=<?php echo $this->get_slug(); ?>&tab=<?php echo $tab[ 'slug' ]; ?>" class="nav-tab <?php echo $this->get_current_tab() ==  $tab[ 'slug' ] ? 'nav-tab-active' : ''; ?>"><?php _e(  $tab[ 'name' ], 'groundhogg'); ?></a>
             <?php endforeach; ?>
         </h2>
@@ -84,10 +86,6 @@ abstract class Tabbed_Admin_Page extends Admin_Page
         // check for global method
         } else if ( method_exists( $this, $backup_func ) ){
             $exitCode = call_user_func( [ $this, $backup_func ] );
-        } else if ( has_action( $action_or_filter ) ){
-            do_action( $action_or_filter );
-        } else if ( has_action( $backup_action_or_filter ) ){
-            do_action( $backup_action_or_filter );
         } else if ( has_filter( $action_or_filter ) ){
             $exitCode = apply_filters( $action_or_filter, $exitCode );
         } else if ( has_filter( $backup_action_or_filter ) ){

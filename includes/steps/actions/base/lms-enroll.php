@@ -17,7 +17,7 @@ abstract class LMS_Enroll extends Action
      */
     public function get_name()
     {
-        return __( 'Enroll in Course', 'groundhogg' );
+        return __( 'Change Enrollment', 'groundhogg' );
     }
 
     /**
@@ -30,6 +30,11 @@ abstract class LMS_Enroll extends Action
         return 'lms_enroll';
     }
 
+	/**
+	 * The icon
+	 *
+	 * @return string
+	 */
     public function get_icon(){
         return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/lms.png';
     }
@@ -41,7 +46,7 @@ abstract class LMS_Enroll extends Action
      */
     public function get_description()
     {
-        return __( 'Enroll students in a course.', 'groundhogg' );
+        return __( 'Enroll students in a course or unenroll students form a course.', 'groundhogg' );
     }
 
     /**
@@ -52,6 +57,30 @@ abstract class LMS_Enroll extends Action
     public function settings($step)
     {
         html()->start_form_table();
+
+	    // ACTION
+	    html()->start_row();
+
+	    html()->th([
+		    __('Action', 'groundhogg')
+	    ]);
+
+	    html()->td([
+		    html()->dropdown([
+			    'name' => $this->setting_name_prefix('action'),
+			    'id' => $this->setting_id_prefix('action'),
+			    'class' => 'auto-save',
+			    'options' => [
+				    'enroll' => __('Enroll Student', 'groundhogg'),
+				    'unenroll' => __('Unenroll Student', 'groundhogg'),
+			    ],
+			    'selected' => $this->get_setting('action'),
+			    'multiple' => false,
+			    'option_none' => false,
+		    ])
+	    ]);
+
+	    html()->end_row();
 
         // COURSE
         html()->start_row();
@@ -85,6 +114,7 @@ abstract class LMS_Enroll extends Action
     public function save($step)
     {
         $this->save_setting( 'course', absint( $this->get_posted_data( 'course' ) ) );
+        $this->save_setting( 'action', sanitize_key( $this->get_posted_data( 'action' ) ) );
     }
 
     /**
@@ -102,6 +132,15 @@ abstract class LMS_Enroll extends Action
      */
     abstract protected function enroll_in_course( $user_id );
 
+	/**
+	 * Remove from a course
+	 *
+	 * @param $user_id int
+	 *
+	 * @return mixed
+	 */
+    abstract protected function unenroll_in_course( $user_id );
+
     /**
      * @param \Groundhogg\Contact $contact
      * @param \Groundhogg\Event $event
@@ -111,11 +150,22 @@ abstract class LMS_Enroll extends Action
     {
         $user_id = $contact->get_user_id();
 
+        $action = $this->get_setting( 'action', 'enroll' );
+
         if ( ! $user_id ){
             $user_id = create_user_from_contact( $contact, $this->get_student_role(), 'user' );
         }
 
-        return $this->enroll_in_course( $user_id );
+        switch ( $action ){
+	        case 'enroll':
+		        return $this->enroll_in_course( $user_id );
+		        break;
+	        case 'unenroll':
+		        return $this->unenroll_in_course( $user_id );
+		        break;
+        }
+
+        return false;
     }
 
     /**
